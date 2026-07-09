@@ -35,3 +35,42 @@ export interface InboxConversation {
   my_role: MemberRole;
   participants: InboxParticipant[];
 }
+
+export interface MessageReaction {
+  emoji: string;
+  actor_type: ActorType;
+  actor_id: string;
+  user_id: string;
+}
+
+export interface ReplyPreview {
+  id: string;
+  body: string | null;
+  type: MessageType;
+  deleted: boolean;
+  sender_actor_type: ActorType;
+  sender_actor_id: string;
+  sender_name: string | null;
+}
+
+export interface ThreadMessage {
+  id: string;
+  conversation_id: string;
+  sender_actor_type: ActorType;
+  sender_actor_id: string;
+  sender_user_id: string;
+  sender_name: string | null;
+  sender_avatar_url: string | null;
+  sender_username: string | null;
+  sender_verified: boolean | null;
+  type: MessageType;
+  body: string | null;
+  attachments: unknown | null;
+  metadata: unknown | null;
+  reply_to_id: string | null;
+  reply_preview: ReplyPreview | null;
+  edited_at: string | null;
+  deleted_at: string | null;
+  created_at: string;
+  reactions: MessageReaction[];
+}
