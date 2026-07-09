@@ -326,6 +326,7 @@ const ThreadV2Page: React.FC = () => {
         className="flex-1 overflow-y-auto"
         style={{
           padding: '8px 12px 12px 12px',
+          paddingBottom: composerHeight + keyboardHeight + 12,
           WebkitOverflowScrolling: 'touch',
         }}
       >
@@ -388,6 +389,7 @@ const ThreadV2Page: React.FC = () => {
                   isFirstOfRun={f.isFirstOfRun}
                   isLastOfRun={f.isLastOfRun}
                   showTicks={f.isOutgoing && i === lastOutgoingIndex}
+                  onRetry={handleRetry}
                 />
               );
             })}
@@ -396,77 +398,14 @@ const ThreadV2Page: React.FC = () => {
         )}
       </div>
 
-      <div
-        style={{
-          background: COMPOSER_BG,
-          borderTop: `0.5px solid ${HAIRLINE}`,
-          paddingTop: 8,
-          paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)',
-          paddingLeft: 10,
-          paddingRight: 10,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          flexShrink: 0,
-        }}
-      >
-        <button
-          type="button"
-          disabled
-          aria-label="Attach"
-          style={{
-            width: 36,
-            height: 36,
-            borderRadius: 999,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'transparent',
-            border: 'none',
-            color: SUB,
-            opacity: 0.6,
-          }}
-        >
-          <Plus size={22} />
-        </button>
-        <div
-          aria-disabled
-          style={{
-            flex: 1,
-            minHeight: 36,
-            background: COMPOSER_INPUT_BG,
-            borderRadius: 18,
-            padding: '8px 14px',
-            color: HINT,
-            fontSize: 14,
-            display: 'flex',
-            alignItems: 'center',
-          }}
-        >
-          Message
-        </div>
-        <button
-          type="button"
-          disabled
-          aria-label="Send"
-          style={{
-            width: 36,
-            height: 36,
-            borderRadius: 999,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: '#15171F',
-            border: 'none',
-            color: '#F5F6F7',
-            opacity: 0.5,
-          }}
-        >
-          <ArrowUp size={18} />
-        </button>
-      </div>
+      <Composer
+        conversationId={conversationId}
+        onHeightChange={setComposerHeight}
+        onAfterSend={scrollToBottom}
+      />
     </div>
   );
 };
 
 export default ThreadV2Page;
+
