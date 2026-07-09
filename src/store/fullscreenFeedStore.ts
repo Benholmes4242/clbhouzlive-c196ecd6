@@ -231,8 +231,18 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
     if (borrow) {
       // handback = returnBorrow tail done (approximated on next frame); tileLive
       // = lane playing on tile (armed on the borrowed lane's next 'playing').
+      // The borrowed lane is often already playing at handback, so a fresh
+      // 'playing' event may never fire — without a fallback the span would
+      // orphan to the 15s watchdog. Close on rAF; keep the 'playing' arm as
+      // a diagnostic waypoint (vperfEnd removes the span, later arms no-op).
       requestAnimationFrame(() => {
-        import('@/perf/vperf').then((m) => m.vperfMark(closeSpanId, 'handback')).catch(() => {});
+        import('@/perf/vperf').then((m) => {
+          m.vperfMark(closeSpanId, 'handback');
+          requestAnimationFrame(() => {
+            m.vperfMark(closeSpanId, 'tileLive');
+            m.vperfEnd(closeSpanId, { closedBy: 'handbackBind' });
+          });
+        }).catch(() => {});
       });
       vperfArmLane(borrow.laneId, { spanId: closeSpanId, endOn: 'playing', phase: 'tileLive' });
       vperfArmLane(borrow.laneId, { spanId: closeSpanId, endOn: 'playing' });
@@ -240,7 +250,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       requestAnimationFrame(() => {
         import('@/perf/vperf').then((m) => {
           m.vperfMark(closeSpanId, 'tileLive');
-          m.vperfEnd(closeSpanId, { note: 'no-borrow raf' });
+          m.vperfEnd(closeSpanId, { closedBy: 'no-borrow raf' });
         }).catch(() => {});
       });
     }
