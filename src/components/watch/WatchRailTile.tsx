@@ -9,6 +9,7 @@ import { buildLqipUrl } from '@/utils/mediaThumbs';
 import { shouldUseLqip } from '@/utils/lqipQueue';
 import Pressable from '@/components/ui/Pressable';
 import { useRailLane } from '@/video/useRailLane';
+import { usePreroutePrefetch } from '@/video/usePreroutePrefetch';
 
 
 
@@ -99,6 +100,13 @@ export default function WatchRailTile({
     postId: post.id,
   });
 
+  // Scroll-guarded pointerdown warm — cold (non-borrow) video tiles only.
+  const { onPreroute, onPrerouteCancel } = usePreroutePrefetch({
+    ownerKey,
+    hlsUrl: isVideo ? hlsUrl : null,
+    enabled: isVideo && !isAutoplayActive,
+  });
+
 
   const handleClick = useCallback(() => {
     openWithOrigin({
@@ -121,6 +129,8 @@ export default function WatchRailTile({
       as="div"
       variant="media"
       onPress={handleClick}
+      onPreroute={onPreroute}
+      onPrerouteCancel={onPrerouteCancel}
       ref={cardRef as any}
       data-watch-tile-index={index}
       data-post-id={post.id}

@@ -8,6 +8,7 @@ import { buildLqipUrl } from '@/utils/mediaThumbs';
 import { shouldUseLqip } from '@/utils/lqipQueue';
 import Pressable from '@/components/ui/Pressable';
 import { useRailLane } from '@/video/useRailLane';
+import { usePreroutePrefetch } from '@/video/usePreroutePrefetch';
 
 
 
@@ -55,6 +56,13 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, onDecoded,
     postId: post.id,
   });
 
+  // Scroll-guarded pointerdown warm — cold (non-borrow) video tiles only.
+  const { onPreroute, onPrerouteCancel } = usePreroutePrefetch({
+    ownerKey,
+    hlsUrl: isVideo ? hlsUrl! : null,
+    enabled: isVideo && !isAutoplayActive,
+  });
+
   const handleClick = () => {
     openWithOrigin({
       openedFrom: 'watch',
@@ -84,6 +92,8 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, onDecoded,
       as="div"
       variant="media"
       onPress={handleClick}
+      onPreroute={onPreroute}
+      onPrerouteCancel={onPrerouteCancel}
       data-watch-tile-index={index}
       data-post-id={post.id}
       className="relative w-full h-full overflow-hidden select-none bg-muted/40"
