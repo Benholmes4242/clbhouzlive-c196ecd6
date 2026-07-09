@@ -406,6 +406,12 @@ const ThreadV2Page: React.FC = () => {
         onHeightChange={setComposerHeight}
         onAfterSend={scrollToBottom}
       />
+
+      <ConversationSettingsSheet
+        open={settingsOpen}
+        conversationId={conversationId}
+        onClose={() => setSettingsOpen(false)}
+      />
     </div>
   );
 };
