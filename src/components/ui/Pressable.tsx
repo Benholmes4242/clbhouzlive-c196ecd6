@@ -99,6 +99,19 @@ export interface PressableProps
   innerClassName?: string;
   /** Extra style applied to the INNER transform wrapper. */
   innerStyle?: React.CSSProperties;
+  /**
+   * Scroll-guarded pointerdown preroute. Fires ~40ms after pointerdown IFF the
+   * pointer has stayed within the tap threshold — i.e. this looks like a tap,
+   * not a scroll/drag. Cold video tiles use this to warm the HLS cache before
+   * the click commits (~80-150ms head start on mobile).
+   */
+  onPreroute?: () => void;
+  /**
+   * Fires when a preroute that already fired needs to be cancelled — pointer
+   * moved past the tap threshold after the fire, or held past the long-press
+   * window without releasing. Tiles use it to abort the in-flight warm.
+   */
+  onPrerouteCancel?: () => void;
 }
 
 const Pressable = forwardRef<HTMLElement, PressableProps>(function Pressable(
