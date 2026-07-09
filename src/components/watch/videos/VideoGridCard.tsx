@@ -2,6 +2,8 @@ import { memo, useCallback, useRef, useState } from 'react';
 import { Clock, Heart } from 'lucide-react';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { useRailLane } from '@/video/useRailLane';
+import { usePreroutePrefetch } from '@/video/usePreroutePrefetch';
+import Pressable from '@/components/ui/Pressable';
 import { Pin } from '../proshop/Pin';
 import type { FeedPost } from '@/components/media-system/types/media';
 
@@ -51,26 +53,37 @@ function VideoGridCardInner({ post, index, allPosts, active = false }: VideoGrid
     postId: post.id,
   });
 
-  const btnRef = useRef<HTMLButtonElement>(null);
+  // Scroll-guarded pointerdown warm — cold (non-borrow) video tiles only.
+  const { onPrerouteArm, onPreroute, onPrerouteCancel } = usePreroutePrefetch({
+    ownerKey,
+    hlsUrl: isVideo ? hlsUrl! : null,
+    enabled: isVideo && !active,
+  });
+
+  const rootRef = useRef<HTMLElement>(null);
   const handleTap = useCallback(() => {
     openWithOrigin({
       openedFrom: 'watch',
       posts: allPosts,
       index,
-      originEl: btnRef.current,
+      originEl: rootRef.current,
       posterUrl: thumb || null,
       railOwnerKey: ownerKey,
     });
-  }, [allPosts, index, thumb, hlsUrl, ownerKey]);
+  }, [allPosts, index, thumb, ownerKey]);
 
   return (
-    <button
-      ref={btnRef}
-      type="button"
-      onClick={handleTap}
+    <Pressable
+      as="div"
+      variant="media"
+      ref={rootRef}
+      onPress={handleTap}
+      onPrerouteArm={onPrerouteArm}
+      onPreroute={onPreroute}
+      onPrerouteCancel={onPrerouteCancel}
       data-watch-tile-index={index}
-      className="block text-left"
-      style={{ flex: 1, minWidth: 0, padding: 0, background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', height: '100%' }}
+      data-post-id={post.id}
+      style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', height: '100%', textAlign: 'left' }}
     >
       <div
         style={{
@@ -166,7 +179,7 @@ function VideoGridCardInner({ post, index, allPosts, active = false }: VideoGrid
           </>
         )}
       </div>
-    </button>
+    </Pressable>
   );
 }
 

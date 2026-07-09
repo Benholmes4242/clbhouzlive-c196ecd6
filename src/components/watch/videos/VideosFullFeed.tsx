@@ -131,7 +131,7 @@ function VideosFullFeedInner({ userId, mood, searchQuery, onClearSearch, onReset
   const useRhythm = !searchQuery && mood === 'for_you';
   const segments = useMemo(() => (useRhythm ? buildRhythm(posts) : []), [useRhythm, posts]);
 
-  const { activeIdx: activeGridIdx, railRef: feedRef } = useWatchAutoplay({ railId: 'vids-fullfeed', posts });
+  const { activeIndices, railRef: feedRef } = useWatchAutoplay({ railId: 'vids-fullfeed', posts, maxActive: 3 });
 
 
   const renderVideoFeedBody = () => {
@@ -217,7 +217,7 @@ function VideosFullFeedInner({ userId, mood, searchQuery, onClearSearch, onReset
                       post={post}
                       index={postIdx}
                       allPosts={posts}
-                      active={activeGridIdx === postIdx}
+                      active={activeIndices.has(postIdx)}
                     />
                   );
                 })}
@@ -238,7 +238,7 @@ function VideosFullFeedInner({ userId, mood, searchQuery, onClearSearch, onReset
     }
 
     return (
-      <div style={{ padding: '12px 0 24px', display: 'flex', flexDirection: 'column', gap: 13 }}>
+      <div ref={feedRef} style={{ padding: '12px 0 24px', display: 'flex', flexDirection: 'column', gap: 13 }}>
         <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 13 }}>
           {posts.map((post, i) => (
             <CompactVideoRow key={post.id} post={post} index={i} allPosts={posts} />
