@@ -133,6 +133,33 @@ export function openWithOrigin({
   options,
 }: OpenWithOriginArgs): void {
 
+  // [TRACE] correlation id — one openId per open, threaded through every
+  // downstream layer via traceLookup on ownerKey/postId. Gated on
+  // isPerfEnabled inside trace().
+  const openId = traceGenId();
+  const originElForTap: any = originEl ?? null;
+  // Register the open BEFORE any layer runs so early load() traces can find it.
+  const openingPostForTap: any = posts[index];
+  const postIdEarly: string | null = openingPostForTap?.id ?? null;
+  traceRegisterOpen({
+    openId,
+    surface: openedFrom,
+    ownerKey: railOwnerKey ?? (postIdEarly ? `${postIdEarly}:${mediaIndex ?? 0}` : null),
+    postId: postIdEarly,
+    startedAt: performance.now(),
+  });
+  trace('tap', {
+    openId,
+    surface: openedFrom,
+    postId: postIdEarly,
+    ownerKeyPassed: null,
+    railOwnerKeyPassed: railOwnerKey ?? null,
+    hasOriginEl: !!originElForTap,
+    originElId: elIdOf(originElForTap),
+    mediaIndex: mediaIndex ?? 0,
+    mediaId: mediaId ?? null,
+  });
+
   // Resolve the tapped media's intrinsic dims from the post's mediaItems so
   // the FLIP clone can grow into the correct resting rect on GRID surfaces
   // (course media / explore / watch), where the tile aspect is uniform and
