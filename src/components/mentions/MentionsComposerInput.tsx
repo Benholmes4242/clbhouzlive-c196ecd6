@@ -421,7 +421,8 @@ function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
         bottom: geom?.bottom ?? 0,
         width: '100%',
         maxHeight: geom?.maxHeight ?? PANEL_MAX_HEIGHT,
-        overflowY: 'auto',
+        display: 'flex',
+        flexDirection: 'column',
         background: '#FFFFFF',
         borderRadius: '18px 18px 0 0',
         borderTop: '1px solid rgba(15,23,42,0.12)',
@@ -429,15 +430,12 @@ function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
         pointerEvents: 'auto',
         opacity: geom ? 1 : 0,
         zIndex: Z.mentionsPanel,
-        WebkitOverflowScrolling: 'touch',
       }}
     >
       {hasChildren && (
         <div
           style={{
-            position: 'sticky',
-            top: 0,
-            zIndex: 1,
+            flexShrink: 0,
             background: '#FFFFFF',
           }}
         >
@@ -479,7 +477,26 @@ function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
           </div>
         </div>
       )}
-      {children}
+      <div
+        style={{
+          flex: 1,
+          minHeight: 0,
+          overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch',
+        }}
+      >
+        {children}
+      </div>
+      {hasChildren && (
+        <div
+          style={{
+            flexShrink: 0,
+            height: 6,
+            borderTop: `1px solid ${BORDER}`,
+            background: '#FFFFFF',
+          }}
+        />
+      )}
     </div>,
     document.body,
   );
