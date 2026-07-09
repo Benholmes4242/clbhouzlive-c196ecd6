@@ -26,7 +26,7 @@ import React, {
 } from 'react';
 import { triggerHaptic, type HapticType } from '@/lib/ui/haptics';
 
-export type PressableVariant = 'card' | 'icon' | 'row' | 'toggle';
+export type PressableVariant = 'card' | 'icon' | 'row' | 'toggle' | 'media';
 export type PressableHaptic = 'none' | HapticType;
 
 // Single shared transition token — used everywhere press feedback lives.
@@ -67,6 +67,13 @@ const VARIANTS: Record<PressableVariant, VariantSpec> = {
   toggle: {
     pressedScale: 0.96,
     pressedBg: 'hsl(var(--muted) / 0.60)',
+    transition: TRANSITION,
+  },
+  // Media tile — press feedback OFF. Retains tap/scroll disambiguation,
+  // haptics, and FLIP commit ordering; just no scale/bg on press.
+  media: {
+    pressedScale: null,
+    pressedBg: null,
     transition: TRANSITION,
   },
 };

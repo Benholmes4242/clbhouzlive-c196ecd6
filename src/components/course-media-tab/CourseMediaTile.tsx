@@ -90,7 +90,7 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, f
         transition: 'transform 100ms ease',
         background: INK_TINT_04,
       }}
-      className="active:scale-[0.97]"
+      
     >
       {/* Poster or fallback */}
       {thumbnailUrl ? (

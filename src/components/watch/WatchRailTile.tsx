@@ -119,7 +119,7 @@ export default function WatchRailTile({
   return (
     <Pressable
       as="div"
-      variant="card"
+      variant="media"
       onPress={handleClick}
       ref={cardRef as any}
       data-watch-tile-index={index}

@@ -82,7 +82,7 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, onDecoded,
     <Pressable
       ref={rootRef}
       as="div"
-      variant="card"
+      variant="media"
       onPress={handleClick}
       data-watch-tile-index={index}
       data-post-id={post.id}
