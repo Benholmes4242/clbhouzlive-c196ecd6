@@ -49,13 +49,12 @@ const SETTLE_MS = 80;
 // debounce indefinitely, leaving landing activation stuck at null until scroll).
 const MAX_SETTLE_MS = 250;
 
-// Approach-warming band: a tile whose visible fraction is between these bounds
-// is entering the viewport and is a strong candidate for the next tap/promote.
-// Warm its manifest+first-segment via PrefetchController (max 2 in-flight,
-// saveData/2g skips, LRU dedupe) so promotion / cold fullscreen open hits
-// warm cache instead of a cold HLS attach.
+// Approach-warming coverage: every visible tile gets its manifest+first
+// segment warmed via PrefetchController (idempotent, LRU-deduped, capped
+// 2 in-flight, saveData/2g skips). Widened to cover fully-visible tiles
+// too so cold fullscreen opens on tiles that never won activation still
+// hit the browser HTTP cache instead of a cold HLS attach.
 const APPROACH_MIN = 0.02;
-const APPROACH_MAX = 0.4;
 
 const IO_THRESHOLDS = [0, 0.1, 0.2, 0.3, 0.35, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0];
 
@@ -67,15 +66,29 @@ export interface UseWatchAutoplayOptions {
   /**
    * Optional post list aligned with `data-watch-tile-index`. When provided,
    * the hook drives PrefetchController warming for tiles that are entering
-   * the viewport (approach band) — kills the multi-second cold fullscreen
-   * open for tiles that never won activation.
+   * the viewport — kills the multi-second cold fullscreen open for tiles
+   * that never won activation.
    */
   posts?: FeedPost[];
+  /**
+   * Max concurrent active tiles. Rails leave this at 1 (default) to keep
+   * one-active-per-rail. The Watch grid opts into 3 so multiple visible
+   * tiles autoplay simultaneously (bounded by the RailLanePool budget).
+   */
+  maxActive?: number;
 }
 
 export interface UseWatchAutoplayResult {
-  /** Winning tile index, or null when no tile clears PLAY_IN or a gate is closed. */
+  /**
+   * Highest-visibility active tile (back-compat for single-active callers).
+   * When `maxActive > 1`, this is simply the top of `activeIndices`.
+   */
   activeIdx: number | null;
+  /**
+   * Full active set (size ≤ `maxActive`). Grid consumers gate playback
+   * on `activeIndices.has(idx)`; single-active callers can ignore this.
+   */
+  activeIndices: Set<number>;
   /**
    * Callback ref — attach to the rail/grid container that holds
    * `[data-watch-tile-index]` tiles. Owning the element in state guarantees
