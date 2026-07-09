@@ -246,6 +246,25 @@ class VideoEngineImpl {
     const lane = this.getLane(laneId);
     const alreadyParented = lane.el.parentElement === hostEl;
     if (!alreadyParented) {
+      // INVARIANT TRIPWIRE — double-bind guard for the singleton fullscreen
+      // lane. The React-layer single-source gate in FeedSlide should make
+      // this impossible; if it ever fires, a new render path started
+      // binding 'fullscreen' concurrently and must be gated.
+      if (
+        laneId === 'fullscreen' &&
+        lane.mountedHost &&
+        lane.mountedHost !== hostEl &&
+        lane.el.parentElement === lane.mountedHost &&
+        !this.borrowedLanes.has(laneId)
+      ) {
+        const openT = traceLookup({ ownerKey: lane.postId });
+        trace('lane.bind.rejected', {
+          openId: openT?.openId,
+          laneId,
+          reason: 'fullscreen-already-bound',
+          currentPostId: lane.postId,
+        });
+      }
       hostEl.appendChild(lane.el);
       DBG(laneId, 'mounted');
     }

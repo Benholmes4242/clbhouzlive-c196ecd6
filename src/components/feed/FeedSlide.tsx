@@ -134,7 +134,12 @@ export const FeedSlide = memo(function FeedSlide({
     // posts. Only the active page mounts the SHOWING lane; inactive pages
     // render posters. First horizontal swipe on a borrow slide triggers the
     // one-shot demote via the store → overlay effect runs returnBorrow.
-    if (isFullscreen && media && media.length > 1) {
+    //
+    // DOUBLE-MOUNT FIX: gate on `isActive` so ONLY the current fullscreen
+    // slide instantiates the pager (and therefore the fullscreen lane).
+    // Vertical neighbours (± virtualization window) fall through to the
+    // poster-only branch below — they never bind 'fullscreen'.
+    if (isFullscreen && isActive && media && media.length > 1) {
       return (
         <FullscreenMediaPager
           post={post}
@@ -166,7 +171,11 @@ export const FeedSlide = memo(function FeedSlide({
           openIdx,
         });
       }
-      if (isFullscreen && mHlsUrl) {
+      // DOUBLE-MOUNT FIX: only the ACTIVE fullscreen slide mounts
+      // FullscreenVideoSlot. Vertical neighbours (± virtualization window)
+      // fall through to the poster fallback below and never bind the
+      // singleton 'fullscreen' lane.
+      if (isFullscreen && mHlsUrl && isActive) {
         return (
           <FullscreenVideoSlot
             postId={post.id}
@@ -174,12 +183,6 @@ export const FeedSlide = memo(function FeedSlide({
             posterSrc={posterSrc}
             isActive={isActive}
             onFirstFrameReady={onFirstFrameReady}
-            // Canonical `${postId}:0` for single-media video — matches the
-            // key the tile / rail pool / prefetch wrote under, so the
-            // fullscreen lane loads under the SAME ownerKey the cold-path
-            // reveal gate and lastPos reads look up. Without this the lane
-            // loaded under a bare postId, the poster/blur never swapped,
-            // and prefetch.wasPrefetched(`${id}:0`) missed on cold opens.
             ownerKey={`${post.id}:0`}
             mediaW={m.width ?? 0}
             mediaH={m.height ?? 0}
