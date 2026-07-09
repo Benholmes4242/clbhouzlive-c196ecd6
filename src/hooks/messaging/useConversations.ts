@@ -23,7 +23,11 @@ export function useConversations() {
         p_actor_id: actorId,
       });
       if (error) throw error;
-      return (data ?? []) as unknown as InboxConversation[];
+      const rows = (data ?? []) as unknown as InboxConversation[];
+      return rows.map((r) => ({
+        ...r,
+        participants: Array.isArray(r.participants) ? r.participants : [],
+      }));
     },
   });
 
