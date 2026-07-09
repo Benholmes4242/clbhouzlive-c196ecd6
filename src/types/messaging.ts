@@ -38,6 +38,27 @@ export interface InboxConversation {
   participants: InboxParticipant[];
 }
 
+export interface ConversationMember {
+  actor_type: ActorType;
+  actor_id: string;
+  role: MemberRole;
+  joined_at: string;
+  name: string | null;
+  avatar_url: string | null;
+  username: string | null;
+  verified: boolean | null;
+}
+
+export interface ConversationDetail {
+  conversation_id: string;
+  type: ConversationType;
+  title: string | null;
+  avatar_url: string | null;
+  created_by_user: string;
+  created_at: string;
+  members: ConversationMember[];
+}
+
 export interface MessageReaction {
   emoji: string;
   actor_type: ActorType;
