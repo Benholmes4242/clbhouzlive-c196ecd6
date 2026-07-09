@@ -2,6 +2,7 @@ import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { Plus, ArrowUp } from 'lucide-react';
 import { useSendMessage } from '@/hooks/messaging/useSendMessage';
 import { useKeyboardHeight } from '@/hooks/messaging/useKeyboardHeight';
+import { pickMediaFiles, validateMediaFiles } from '@/utils/media/pickMediaFiles';
 
 const INK = '#1F2428';
 const SUB = '#8A9099';
