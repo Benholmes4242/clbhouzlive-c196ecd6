@@ -192,7 +192,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
 
   const handleToggleMute = useCallback(async () => {
     if (!actor || !detail) return;
-    const nextUntil = isMuted(detail) ? null : farFutureIso();
+    const nextUntil = muted ? null : farFutureIso();
     await runRpc(async () => {
       const { error } = await supabase.rpc('msg_set_mute', {
         p_conversation_id: conversationId,
@@ -206,7 +206,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
 
   const handleToggleArchive = useCallback(async () => {
     if (!actor || !detail) return;
-    const next = !isArchived(detail);
+    const next = !archived;
     await runRpc(async () => {
       const { error } = await supabase.rpc('msg_set_archive', {
         p_conversation_id: conversationId,
@@ -538,25 +538,25 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
             <div style={{ padding: '8px 0' }}>
               <ActionRow
                 icon={
-                  isMuted(detail) ? (
+                  muted ? (
                     <BellOff size={20} color={INK} />
                   ) : (
                     <Bell size={20} color={INK} />
                   )
                 }
-                label={isMuted(detail) ? 'Unmute' : 'Mute notifications'}
+                label={muted ? 'Unmute' : 'Mute notifications'}
                 onClick={handleToggleMute}
                 disabled={busy}
               />
               <ActionRow
                 icon={
-                  isArchived(detail) ? (
+                  archived ? (
                     <ArchiveRestore size={20} color={INK} />
                   ) : (
                     <Archive size={20} color={INK} />
                   )
                 }
-                label={isArchived(detail) ? 'Unarchive' : 'Archive'}
+                label={archived ? 'Unarchive' : 'Archive'}
                 onClick={handleToggleArchive}
                 disabled={busy}
               />
