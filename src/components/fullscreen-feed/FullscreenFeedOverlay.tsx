@@ -590,6 +590,20 @@ export function FullscreenFeedOverlay() {
       watchdogRef.current = setTimeout(() => {
         setMotionComplete(true);
         setChildReady(true);
+        // [BASELINE] image fs.open — fallback close for the fs.open span in
+        // case the clone's transform transitionend never fires (reduced
+        // motion, no geometry delta, instant layout, missed event). Without
+        // this, the span orphans to the 15s watchdog (measurement artifact).
+        try {
+          const sid: string | undefined = (window as any).__vperfFsOpenSpanId;
+          if (sid && origin?.mediaType === 'image') {
+            import('@/perf/vperf').then((m) => {
+              m.vperfImagePhase(sid, 'settled');
+              m.vperfEnd(sid, { closedBy: 'imageFallback' });
+              (window as any).__vperfFsOpenSpanId = null;
+            }).catch(() => {});
+          }
+        } catch {}
       }, 500);
       return () => {
         cancelAnimationFrame(raf1);
