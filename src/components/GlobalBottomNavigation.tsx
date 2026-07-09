@@ -344,6 +344,9 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                             strokeLinejoin="round"
                             shapeRendering="geometricPrecision"
                             vectorEffect="non-scaling-stroke"
+                            {...(tab.id === 'post'
+                              ? { plusColor: theme === 'dark' ? '#F7931E' : '#C2740B' }
+                              : {})}
                             style={{
                               width: iconSize,
                               height: iconSize,
