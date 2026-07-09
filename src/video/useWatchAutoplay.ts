@@ -224,6 +224,14 @@ export function useWatchAutoplay(
       tiles.forEach((t) => io.observe(t));
     };
 
+    // A tile belongs to THIS hook iff its nearest [data-autoplay-scope]
+    // ancestor is our root. This isolates nested rails (e.g. QuickClips
+    // inside VideosFullFeed) so their tiles don't leak into the outer
+    // observer's index-space and cause wrong-lane borrows on tap.
+    const belongsToThisScope = (el: HTMLElement): boolean => {
+      return el.closest('[data-autoplay-scope]') === root;
+    };
+
     const io = new IntersectionObserver(
       (entries) => {
         let touched = false;
@@ -258,13 +266,19 @@ export function useWatchAutoplay(
       { threshold: IO_THRESHOLDS },
     );
 
+    const observeOwnTiles = (candidates: NodeListOf<HTMLElement> | HTMLElement[]) => {
+      candidates.forEach((t) => {
+        if (belongsToThisScope(t)) io.observe(t);
+      });
+    };
+
     const initial = root.querySelectorAll<HTMLElement>('[data-watch-tile-index]');
-    observeTiles(initial);
+    observeOwnTiles(initial);
     scheduleRecompute();
 
     const mo = new MutationObserver(() => {
       const next = root.querySelectorAll<HTMLElement>('[data-watch-tile-index]');
-      observeTiles(next);
+      observeOwnTiles(next);
       scheduleRecompute();
     });
     mo.observe(root, { childList: true, subtree: true });
@@ -276,6 +290,7 @@ export function useWatchAutoplay(
       if (maxWaitTimer.current) { clearTimeout(maxWaitTimer.current); maxWaitTimer.current = null; }
       ratiosRef.current.clear();
     };
+
   }, [eligible, root, maxActive]);
 
   const outSet = eligible ? activeSet : EMPTY_SET;
