@@ -524,7 +524,11 @@ class VideoEngineImpl {
         return lvl.bitrate <= cap ? idx : best;
       }, hls.levels.length - 1);
       hls.autoLevelCapping = maxLevel;
-      this.transition(lane, 'ready');
+      // SOFT-RESET HYGIENE: do NOT promote to 'ready' here. MANIFEST_PARSED
+      // fires before any segment is decoded, so element.readyState is still 0
+      // — promoting state='ready' now creates a state/readyState decoupling
+      // that lets the borrow stateGate lie for the window until loadeddata.
+      // Real promotion happens in markReadyToShow (loadeddata/canplay) below.
     };
     const onError = (_evt: unknown, data: any) => {
       if (data?.fatal) {
