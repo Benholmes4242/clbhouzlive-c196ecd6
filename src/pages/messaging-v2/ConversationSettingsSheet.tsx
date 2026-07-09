@@ -61,6 +61,13 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
   const { detail, members, isLoading, refetch } = useConversationDetail(
     open ? conversationId : null,
   );
+  const { conversations } = useConversations();
+  const inboxRow = useMemo(
+    () => conversations.find((c) => c.conversation_id === conversationId) ?? null,
+    [conversations, conversationId],
+  );
+  const muted = !!inboxRow?.is_muted;
+  const archived = !!inboxRow?.is_archived;
 
   const me = useMemo<ConversationMember | null>(() => {
     if (!actor) return null;
