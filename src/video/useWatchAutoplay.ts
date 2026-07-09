@@ -194,6 +194,24 @@ export function useWatchAutoplay(
           if (Number.isNaN(idx)) continue;
           if (entry.isIntersecting) {
             ratiosRef.current.set(idx, entry.intersectionRatio);
+            // Approach-warm: tiles entering the viewport (ratio in the
+            // approach band) are the next tap/promote candidates. Warm the
+            // manifest + first segment via PrefetchController — idempotent,
+            // LRU-deduped, capped at 2 in-flight, saveData/2g skips. Skipped
+            // when no posts list is wired.
+            const list = postsRef.current;
+            if (
+              list &&
+              entry.intersectionRatio >= APPROACH_MIN &&
+              entry.intersectionRatio <= APPROACH_MAX
+            ) {
+              const post = list[idx];
+              const media = post?.mediaItems?.find((m) => m.type === 'video');
+              const hlsUrl = (media as any)?.hlsUrl as string | undefined;
+              if (post && hlsUrl) {
+                try { PrefetchController.request(`${post.id}:0`, hlsUrl); } catch { /* noop */ }
+              }
+            }
           } else {
             ratiosRef.current.delete(idx);
           }
