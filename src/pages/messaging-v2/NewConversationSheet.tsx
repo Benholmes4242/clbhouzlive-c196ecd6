@@ -196,7 +196,7 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
                   fontWeight: 500,
                 }}
               >
-                <SquircleAvatar src={s.avatar_url ?? undefined} name={s.name} size={20} />
+                <SquircleAvatar src={s.avatar_url ?? undefined} alt={s.name} size={20} />
                 <span>{s.name}</span>
                 <X size={14} color={SUB} />
               </button>
@@ -294,7 +294,7 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
                     cursor: disabled ? 'not-allowed' : 'pointer',
                   }}
                 >
-                  <SquircleAvatar src={c.avatar_url ?? undefined} name={c.name} size={44} />
+                  <SquircleAvatar src={c.avatar_url ?? undefined} alt={c.name} size={44} />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div
                       style={{
