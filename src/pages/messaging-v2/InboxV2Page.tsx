@@ -41,23 +41,23 @@ const InboxV2Page: React.FC = () => {
   return (
     <div
       className="min-h-screen w-full"
-      style={{ background: '#FFFFFF', color: INK }}
+      style={{ background: CANVAS, color: INK }}
     >
       <header
         className="sticky top-0 z-10"
         style={{
-          background: '#FFFFFF',
+          background: CANVAS,
           paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)',
           paddingBottom: 12,
           paddingLeft: 16,
           paddingRight: 16,
-          borderBottom: `1px solid ${HAIRLINE}`,
+          borderBottom: `0.5px solid ${HAIRLINE}`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
         }}
       >
-        <h1 style={{ fontSize: 22, fontWeight: 500, color: INK, margin: 0 }}>
+        <h1 style={{ fontSize: 20, fontWeight: 500, color: INK, margin: 0 }}>
           Messages
         </h1>
         <button
@@ -73,7 +73,7 @@ const InboxV2Page: React.FC = () => {
             justifyContent: 'center',
             background: 'transparent',
             border: 'none',
-            color: INK,
+            color: SUB,
           }}
         >
           <PencilLine size={20} />
