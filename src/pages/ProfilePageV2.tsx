@@ -840,13 +840,13 @@ const ProfilePageV2Content: React.FC = () => {
             {/* Row 1 — Message (primary CTA, full width) */}
             <button
               type="button"
-              onClick={() => profileUserId && startDM(profileUserId)}
-              disabled={dmStarting === profileUserId}
+              onClick={() => profileUserId && startConversation({ actorType: 'personal', actorId: profileUserId })}
+              disabled={dmStarting}
               className="h-11 w-full rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 px-4 whitespace-nowrap disabled:opacity-60 active:scale-[0.98] transition-transform"
               style={{ background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.30)', color: '#F7931E' }}
               aria-label="Send message"
             >
-              {dmStarting === profileUserId ? (
+              {dmStarting ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
               ) : (
                 <>
