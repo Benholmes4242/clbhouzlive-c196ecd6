@@ -2,6 +2,8 @@ import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { Clock, Heart } from 'lucide-react';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import Pressable from '@/components/ui/Pressable';
+import { usePreroutePrefetch } from '@/video/usePreroutePrefetch';
 import { Pin } from '../proshop/Pin';
 import type { FeedPost } from '@/components/media-system/types/media';
 
@@ -61,24 +63,42 @@ function VideoHeroCardInner({ post, index, allPosts }: VideoHeroCardProps) {
   const courseName = (post as any).courseName as string | undefined;
   const likeCount = post.likeCount ?? 0;
 
-  const btnRef = useRef<HTMLButtonElement>(null);
+  const hlsUrl = (media as any)?.hlsUrl as string | undefined;
+  const isVideo = !!media && media.type === 'video' && !!hlsUrl;
+  const ownerKey = isVideo ? `${post.id}:0` : null;
+
+  // Scroll-guarded pointerdown warm — hero never autoplays in-place.
+  const { onPrerouteArm, onPreroute, onPrerouteCancel } = usePreroutePrefetch({
+    ownerKey,
+    hlsUrl: isVideo ? hlsUrl! : null,
+    enabled: isVideo,
+  });
+
+  const rootRef = useRef<HTMLElement>(null);
   const handleTap = useCallback(() => {
     openWithOrigin({
       openedFrom: 'watch',
       posts: allPosts,
       index,
-      originEl: btnRef.current,
+      originEl: rootRef.current,
       posterUrl: thumb || null,
+      railOwnerKey: ownerKey,
     });
-  }, [allPosts, index, thumb, media]);
+  }, [allPosts, index, thumb, ownerKey]);
 
 
   return (
     <section style={{ padding: '0 16px' }}>
-      <button
-        ref={btnRef}
-        type="button"
-        onClick={handleTap}
+      <Pressable
+        as="div"
+        variant="media"
+        ref={rootRef}
+        onPress={handleTap}
+        onPrerouteArm={onPrerouteArm}
+        onPreroute={onPreroute}
+        onPrerouteCancel={onPrerouteCancel}
+        data-watch-tile-index={index}
+        data-post-id={post.id}
         className="block w-full text-left"
         style={{
           position: 'relative',
@@ -87,8 +107,6 @@ function VideoHeroCardInner({ post, index, allPosts }: VideoHeroCardProps) {
           borderRadius: 8,
           overflow: 'hidden',
           background: 'hsl(var(--muted))',
-          border: 'none',
-          padding: 0,
         }}
       >
         {thumb && !failed ? (
@@ -126,7 +144,7 @@ function VideoHeroCardInner({ post, index, allPosts }: VideoHeroCardProps) {
             </Pin>
           </div>
         ) : null}
-      </button>
+      </Pressable>
 
       <div
         style={{
