@@ -525,9 +525,29 @@ export function openWithOrigin({
   } else {
     vperfSetBudget(fsOpenSpanId, source === 'borrow' ? 150 : 500);
     const targetLaneId: string = borrow ? borrow.laneId : 'fullscreen';
-    // firstFrame ENDS the span (perceived open). playing is a waypoint AFTER.
-    vperfArmLane(targetLaneId, { spanId: fsOpenSpanId, endOn: 'firstFrame' });
-    vperfArmLane(targetLaneId, { spanId: fsOpenSpanId, endOn: 'playing', phase: 'playing' });
+    if (borrow) {
+      // Borrow opens reuse an already-decoded, already-playing lane — the
+      // engine's 'firstFrame' event only fires on a fresh decode, so arming
+      // endOn:'firstFrame' here would never resolve and every borrow span
+      // would hit the 15s watchdog (measurement artifact, not a real hang).
+      // Perceived open for a borrow is tap → element bound into the fs host,
+      // which happens on the next paint after storeOpen. Close the span at
+      // that paint via rAF; record 'playing' as a later waypoint only.
+      const raf =
+        typeof requestAnimationFrame === 'function'
+          ? requestAnimationFrame
+          : (cb: FrameRequestCallback) => setTimeout(() => cb(performance.now()), 16);
+      raf(() => {
+        vperfMark(fsOpenSpanId, 'borrowBind');
+        vperfEnd(fsOpenSpanId, { closedBy: 'borrowBind' });
+      });
+      vperfArmLane(targetLaneId, { spanId: fsOpenSpanId, endOn: 'playing', phase: 'playing' });
+    } else {
+      // Cold opens do decode — firstFrame ENDS the span (perceived open).
+      // playing is a waypoint AFTER.
+      vperfArmLane(targetLaneId, { spanId: fsOpenSpanId, endOn: 'firstFrame' });
+      vperfArmLane(targetLaneId, { spanId: fsOpenSpanId, endOn: 'playing', phase: 'playing' });
+    }
   }
 
   // [VPERF] fs.open motion trace — borrow opens only (the reported screen
