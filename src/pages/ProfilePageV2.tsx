@@ -577,7 +577,7 @@ const ProfilePageV2Content: React.FC = () => {
   return (
     <PageRoot className="min-h-screen" style={{ background: BG_COLOR, position: 'relative' }} immersiveStatusBar immersive>
       {/* Hero Section - full-bleed immersive, extends behind notch */}
-      <div className="relative pointer-events-none" style={{ zIndex: 1 }}>
+      <div className="relative pointer-events-none" style={{ zIndex: 11 }}>
         {/* Hero Image Container - full-bleed behind notch */}
         <div className="relative w-full overflow-hidden" style={{ height: '35dvh' }}>
           {heroUrl ? (
@@ -697,18 +697,7 @@ const ProfilePageV2Content: React.FC = () => {
             {isSelf && !isUploadingAvatar && (
               <button
                 type="button"
-                onPointerDown={(e) => {
-                  const el = document.elementFromPoint(e.clientX, e.clientY);
-                  // eslint-disable-next-line no-console
-                  console.log('[AVATAR_TAP] pointerdown', {
-                    x: Math.round(e.clientX), y: Math.round(e.clientY),
-                    topEl: (el?.tagName ?? '') + '.' + (el?.className?.toString().slice(0, 40) ?? ''),
-                    isThisButton: el === e.currentTarget,
-                  });
-                }}
                 onClick={() => {
-                  // eslint-disable-next-line no-console
-                  console.log('[AVATAR_TAP] click fired -> opening sheet');
                   setPhotoSheet('avatar');
                 }}
                 className="absolute z-20 pointer-events-auto cursor-pointer"
@@ -719,18 +708,7 @@ const ProfilePageV2Content: React.FC = () => {
             {!isSelf && (
               <button
                 type="button"
-                onPointerDown={(e) => {
-                  const el = document.elementFromPoint(e.clientX, e.clientY);
-                  // eslint-disable-next-line no-console
-                  console.log('[AVATAR_TAP] pointerdown', {
-                    x: Math.round(e.clientX), y: Math.round(e.clientY),
-                    topEl: (el?.tagName ?? '') + '.' + (el?.className?.toString().slice(0, 40) ?? ''),
-                    isThisButton: el === e.currentTarget,
-                  });
-                }}
                 onClick={() => {
-                  // eslint-disable-next-line no-console
-                  console.log('[AVATAR_TAP] click fired -> opening sheet');
                   setIsAvatarLightboxOpen(true);
                 }}
                 className="absolute z-20 pointer-events-auto cursor-pointer"

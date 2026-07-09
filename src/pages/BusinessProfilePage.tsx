@@ -362,7 +362,7 @@ const BusinessProfilePage: React.FC = () => {
   return (
     <PageRoot className="min-h-screen" style={{ background: 'var(--bg-page)' }} immersiveStatusBar immersive>
       {/* ───── Hero (full-bleed) ───── */}
-      <div className="relative pointer-events-none" style={{ zIndex: 1 }}>
+      <div className="relative pointer-events-none" style={{ zIndex: 11 }}>
         <div
           className="relative w-full overflow-hidden"
           style={{
