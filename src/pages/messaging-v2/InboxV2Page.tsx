@@ -4,7 +4,8 @@ import { PencilLine } from 'lucide-react';
 import { useConversations } from '@/hooks/messaging/useConversations';
 import { ConversationRow } from './ConversationRow';
 
-const INK = '#1A1D21';
+const CANVAS = '#F8FAFC';
+const INK = '#1F2428';
 const SUB = '#8A9099';
 const HAIRLINE = 'rgba(0,0,0,0.07)';
 
