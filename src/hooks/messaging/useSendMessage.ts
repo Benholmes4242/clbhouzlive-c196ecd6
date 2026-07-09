@@ -1,6 +1,7 @@
 import { useCallback, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import type { Json } from '@/integrations/supabase/types';
 import { useMessagingActor } from './useMessagingActor';
 import {
   insertOptimistic,
@@ -13,9 +14,9 @@ import type { ThreadMessage, MessageType } from '@/types/messaging';
 export interface SendPayload {
   body?: string | null;
   type?: MessageType;
-  attachments?: unknown | null;
+  attachments?: Json | null;
   replyToId?: string | null;
-  metadata?: unknown | null;
+  metadata?: Json | null;
 }
 
 /** Shape of the row returned by msg_send (matches generated types). */
@@ -27,9 +28,9 @@ interface ServerMessageRow {
   sender_user_id: string;
   type: string;
   body: string | null;
-  attachments: unknown | null;
+  attachments: Json | null;
   reply_to_id: string | null;
-  metadata: unknown | null;
+  metadata: Json | null;
   client_id: string | null;
   edited_at: string | null;
   deleted_at: string | null;
@@ -52,9 +53,9 @@ export function useSendMessage(conversationId: string) {
         p_as_actor_id: actor.actorId,
         p_body: payload.body ?? undefined,
         p_type: payload.type ?? 'text',
-        p_attachments: (payload.attachments ?? undefined) as never,
+        p_attachments: payload.attachments ?? undefined,
         p_reply_to_id: payload.replyToId ?? undefined,
-        p_metadata: (payload.metadata ?? undefined) as never,
+        p_metadata: payload.metadata ?? undefined,
         p_client_id: clientId,
       });
       if (error || !data) {

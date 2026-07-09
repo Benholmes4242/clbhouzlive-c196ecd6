@@ -1,3 +1,5 @@
+import type { Json } from '@/integrations/supabase/types';
+
 export type ActorType = 'personal' | 'business';
 export type ConversationType = 'direct' | 'group';
 export type MemberRole = 'owner' | 'admin' | 'member';
@@ -65,8 +67,8 @@ export interface ThreadMessage {
   sender_verified: boolean | null;
   type: MessageType;
   body: string | null;
-  attachments: unknown | null;
-  metadata: unknown | null;
+  attachments: Json | null;
+  metadata: Json | null;
   reply_to_id: string | null;
   reply_preview: ReplyPreview | null;
   edited_at: string | null;
