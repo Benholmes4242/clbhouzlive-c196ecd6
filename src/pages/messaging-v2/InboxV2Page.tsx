@@ -63,7 +63,7 @@ const InboxV2Page: React.FC = () => {
         <button
           type="button"
           aria-label="New message"
-          onClick={() => navigate('/messages-v2')}
+          onClick={() => setComposeOpen(true)}
           className="active:opacity-60 transition-opacity"
           style={{
             width: 36,
