@@ -22,7 +22,7 @@ import { RailLanePool } from '@/video/railLanePool';
 import { PrefetchController } from '@/video/PrefetchController';
 
 import { isPerfEnabled } from '@/perf/navTiming';
-import { vperfStart, vperfMark, vperfArmLane, vperfNextId, vperfSetBudget, vperfMeta, vperfMotionTrace } from '@/perf/vperf';
+import { vperfStart, vperfMark, vperfArmLane, vperfNextId, vperfSetBudget, vperfMeta, vperfMotionTrace, vperfEnd } from '@/perf/vperf';
 import { coldOpenRoute } from '@/perf/coldOpen';
 import { trace, traceGenId, traceRegisterOpen, elIdOf } from '@/perf/trace';
 import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
