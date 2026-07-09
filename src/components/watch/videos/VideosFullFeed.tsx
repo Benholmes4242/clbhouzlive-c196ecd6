@@ -238,7 +238,7 @@ function VideosFullFeedInner({ userId, mood, searchQuery, onClearSearch, onReset
     }
 
     return (
-      <div style={{ padding: '12px 0 24px', display: 'flex', flexDirection: 'column', gap: 13 }}>
+      <div ref={feedRef} style={{ padding: '12px 0 24px', display: 'flex', flexDirection: 'column', gap: 13 }}>
         <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 13 }}>
           {posts.map((post, i) => (
             <CompactVideoRow key={post.id} post={post} index={i} allPosts={posts} />
