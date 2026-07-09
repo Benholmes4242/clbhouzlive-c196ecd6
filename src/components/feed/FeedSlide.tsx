@@ -134,7 +134,12 @@ export const FeedSlide = memo(function FeedSlide({
     // posts. Only the active page mounts the SHOWING lane; inactive pages
     // render posters. First horizontal swipe on a borrow slide triggers the
     // one-shot demote via the store → overlay effect runs returnBorrow.
-    if (isFullscreen && media && media.length > 1) {
+    //
+    // DOUBLE-MOUNT FIX: gate on `isActive` so ONLY the current fullscreen
+    // slide instantiates the pager (and therefore the fullscreen lane).
+    // Vertical neighbours (± virtualization window) fall through to the
+    // poster-only branch below — they never bind 'fullscreen'.
+    if (isFullscreen && isActive && media && media.length > 1) {
       return (
         <FullscreenMediaPager
           post={post}
