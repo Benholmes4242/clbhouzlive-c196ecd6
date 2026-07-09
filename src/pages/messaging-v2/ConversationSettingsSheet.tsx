@@ -656,50 +656,6 @@ function farFutureIso(): string {
   return d.toISOString();
 }
 
-// The detail RPC doesn't return per-viewer mute/archive; fall back to inbox row
-// via the react-query cache if present. Simplification: we treat these as
-// unknown -> default label toggles by looking up the inbox cache via a global
-// lookup would be overkill here, so we store toggle intent locally by checking
-// the query cache through a light-weight helper.
-function isMuted(_detail: { conversation_id: string }): boolean {
-  return readInboxFlag(_detail.conversation_id, 'is_muted');
-}
-function isArchived(_detail: { conversation_id: string }): boolean {
-  return readInboxFlag(_detail.conversation_id, 'is_archived');
-}
-
-// Reads the inbox react-query cache directly without a hook (avoids extra fetches).
-function readInboxFlag(
-  conversationId: string,
-  field: 'is_muted' | 'is_archived',
-): boolean {
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { QueryClient } = require('@tanstack/react-query') as {
-      QueryClient: unknown;
-    };
-    void QueryClient;
-  } catch {
-    /* noop */
-  }
-  const w = window as unknown as {
-    __LOVABLE_QC__?: {
-      getQueriesData: (f: { queryKey: unknown[] }) => Array<[unknown, unknown]>;
-    };
-  };
-  const qc = w.__LOVABLE_QC__;
-  if (!qc) return false;
-  const rows = qc.getQueriesData({ queryKey: ['messaging', 'inbox'] });
-  for (const [, data] of rows) {
-    if (!Array.isArray(data)) continue;
-    for (const r of data as Array<Record<string, unknown>>) {
-      if (r?.conversation_id === conversationId) {
-        return !!r[field];
-      }
-    }
-  }
-  return false;
-}
 
 // ============ Add people sub-sheet ============
 
