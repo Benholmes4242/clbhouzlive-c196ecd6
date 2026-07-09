@@ -1,0 +1,411 @@
+import React, { useMemo, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { X, Check } from 'lucide-react';
+import { BottomSheet } from '@/components/ui/BottomSheet';
+import { SheetHeader } from '@/components/ui/SheetHeader';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
+import {
+  useGlobalEntitySearch,
+  type PersonResult,
+  type BusinessResult,
+} from '@/hooks/useGlobalEntitySearch';
+import { useMessagingActor } from '@/hooks/messaging/useMessagingActor';
+import { canActorMessage } from '@/hooks/messaging/canActorMessage';
+import { supabase } from '@/integrations/supabase/client';
+
+const CANVAS = '#F8FAFC';
+const INK = '#1F2428';
+const SUB = '#8A9099';
+const AMBER = '#F7931E';
+const HAIRLINE = 'rgba(0,0,0,0.07)';
+
+type Candidate = {
+  actor_type: 'personal' | 'business';
+  actor_id: string;
+  name: string;
+  avatar_url: string | null;
+  verified?: boolean;
+};
+
+interface NewConversationSheetProps {
+  open: boolean;
+  onClose: () => void;
+}
+
+const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClose }) => {
+  const navigate = useNavigate();
+  const actor = useMessagingActor();
+  const [query, setQuery] = useState('');
+  const debounced = useDebouncedValue(query, 250);
+  const [selected, setSelected] = useState<Candidate[]>([]);
+  const [title, setTitle] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  const { people, businesses, isLoading } = useGlobalEntitySearch({
+    query: debounced,
+    enabled: open && debounced.trim().length > 0,
+    limits: { people: 8, businesses: 8 },
+  });
+
+  const candidates: Candidate[] = useMemo(() => {
+    const personActors: Candidate[] = (people ?? []).map((p: PersonResult) => ({
+      actor_type: 'personal',
+      actor_id: p.id,
+      name: p.display_name,
+      avatar_url: p.avatar_url,
+      verified: p.verified,
+    }));
+    const bizActors: Candidate[] = (businesses ?? []).map((b: BusinessResult) => ({
+      actor_type: 'business',
+      actor_id: b.id,
+      name: b.name,
+      avatar_url: b.logo_url,
+      verified: b.verified,
+    }));
+    const list = [...personActors, ...bizActors];
+    // Exclude the current actor itself.
+    return list.filter(
+      (c) => !(actor && c.actor_type === actor.actorType && c.actor_id === actor.actorId),
+    );
+  }, [people, businesses, actor]);
+
+  const toggleSelect = useCallback((c: Candidate) => {
+    setSelected((prev) => {
+      const idx = prev.findIndex(
+        (s) => s.actor_type === c.actor_type && s.actor_id === c.actor_id,
+      );
+      if (idx >= 0) {
+        const next = prev.slice();
+        next.splice(idx, 1);
+        return next;
+      }
+      return [...prev, c];
+    });
+  }, []);
+
+  const isSelected = useCallback(
+    (c: Candidate) =>
+      selected.some((s) => s.actor_type === c.actor_type && s.actor_id === c.actor_id),
+    [selected],
+  );
+
+  // Intro framing shown when the acting business is targeting any personal.
+  const showIntro = useMemo(() => {
+    if (!actor || actor.actorType !== 'business') return false;
+    return selected.some((s) => s.actor_type === 'personal');
+  }, [actor, selected]);
+
+  const reset = useCallback(() => {
+    setQuery('');
+    setSelected([]);
+    setTitle('');
+    setBusy(false);
+  }, []);
+
+  const handleClose = useCallback(() => {
+    reset();
+    onClose();
+  }, [reset, onClose]);
+
+  const startDM = useCallback(async () => {
+    if (!actor || selected.length !== 1 || busy) return;
+    const target = selected[0];
+    setBusy(true);
+    try {
+      const { data, error } = await supabase.rpc('msg_start_direct', {
+        p_as_actor_type: actor.actorType,
+        p_as_actor_id: actor.actorId,
+        p_target_actor_type: target.actor_type,
+        p_target_actor_id: target.actor_id,
+      });
+      if (error) throw error;
+      const id = data as unknown as string;
+      handleClose();
+      navigate(`/messages-v2/${id}`);
+    } catch (e) {
+      console.error(e);
+      toast.error('Could not start conversation');
+      setBusy(false);
+    }
+  }, [actor, selected, busy, navigate, handleClose]);
+
+  const createGroup = useCallback(async () => {
+    if (!actor || selected.length < 2 || busy) return;
+    setBusy(true);
+    try {
+      const members = selected.map((s) => ({
+        actor_type: s.actor_type,
+        actor_id: s.actor_id,
+      }));
+      const finalTitle =
+        title.trim() ||
+        selected
+          .map((s) => s.name.split(' ')[0])
+          .slice(0, 4)
+          .join(', ');
+      const { data, error } = await supabase.rpc('msg_create_group', {
+        p_as_actor_type: actor.actorType,
+        p_as_actor_id: actor.actorId,
+        p_title: finalTitle,
+        p_members: members as unknown as never,
+        p_avatar_url: undefined,
+      });
+      if (error) throw error;
+      const id = data as unknown as string;
+      handleClose();
+      navigate(`/messages-v2/${id}`);
+    } catch (e) {
+      console.error(e);
+      toast.error('Could not create group');
+      setBusy(false);
+    }
+  }, [actor, selected, title, busy, navigate, handleClose]);
+
+  return (
+    <BottomSheet open={open} onClose={handleClose} zIndexBase={1400}>
+      <SheetHeader title="New message" onClose={handleClose} />
+
+      <div style={{ background: CANVAS, paddingBottom: 12 }}>
+        {/* Selected chips */}
+        {selected.length > 0 && (
+          <div
+            style={{
+              display: 'flex',
+              gap: 8,
+              flexWrap: 'wrap',
+              padding: '10px 16px 4px',
+            }}
+          >
+            {selected.map((s) => (
+              <button
+                key={`${s.actor_type}:${s.actor_id}`}
+                type="button"
+                onClick={() => toggleSelect(s)}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '4px 8px 4px 4px',
+                  background: '#FFFFFF',
+                  border: `0.5px solid ${HAIRLINE}`,
+                  borderRadius: 999,
+                  color: INK,
+                  fontSize: 13,
+                  fontWeight: 500,
+                }}
+              >
+                <SquircleAvatar src={s.avatar_url ?? undefined} alt={s.name} size={20} />
+                <span>{s.name}</span>
+                <X size={14} color={SUB} />
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Search input */}
+        <div style={{ padding: '10px 16px' }}>
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search people or businesses"
+            autoFocus
+            style={{
+              width: '100%',
+              padding: '10px 14px',
+              borderRadius: 12,
+              background: '#FFFFFF',
+              border: `0.5px solid ${HAIRLINE}`,
+              color: INK,
+              fontSize: 15,
+              outline: 'none',
+            }}
+          />
+        </div>
+
+        {/* Group title (only when 2+ selected) */}
+        {selected.length >= 2 && (
+          <div style={{ padding: '0 16px 10px' }}>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Group name (optional)"
+              style={{
+                width: '100%',
+                padding: '10px 14px',
+                borderRadius: 12,
+                background: '#FFFFFF',
+                border: `0.5px solid ${HAIRLINE}`,
+                color: INK,
+                fontSize: 15,
+                outline: 'none',
+              }}
+            />
+          </div>
+        )}
+
+        {/* Results */}
+        <div
+          style={{
+            maxHeight: '50vh',
+            overflowY: 'auto',
+            borderTop: `0.5px solid ${HAIRLINE}`,
+          }}
+        >
+          {debounced.trim().length === 0 ? (
+            <div style={{ padding: '24px 16px', color: SUB, fontSize: 14, textAlign: 'center' }}>
+              Search for someone to message.
+            </div>
+          ) : isLoading ? (
+            <div style={{ padding: '24px 16px', color: SUB, fontSize: 14, textAlign: 'center' }}>
+              Searching…
+            </div>
+          ) : candidates.length === 0 ? (
+            <div style={{ padding: '24px 16px', color: SUB, fontSize: 14, textAlign: 'center' }}>
+              No results.
+            </div>
+          ) : (
+            candidates.map((c) => {
+              const permission = actor
+                ? canActorMessage({ actorType: actor.actorType }, { actorType: c.actor_type })
+                : { allowed: false as const, reason: 'Not signed in' };
+              const disabled = !permission.allowed;
+              const selectedRow = isSelected(c);
+              return (
+                <button
+                  key={`${c.actor_type}:${c.actor_id}`}
+                  type="button"
+                  disabled={disabled}
+                  onClick={() => !disabled && toggleSelect(c)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    width: '100%',
+                    padding: '10px 16px',
+                    background: 'transparent',
+                    border: 'none',
+                    borderBottom: `0.5px solid ${HAIRLINE}`,
+                    textAlign: 'left',
+                    opacity: disabled ? 0.5 : 1,
+                    cursor: disabled ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  <SquircleAvatar src={c.avatar_url ?? undefined} alt={c.name} size={44} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div
+                      style={{
+                        color: INK,
+                        fontSize: 15,
+                        fontWeight: 500,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {c.name}
+                    </div>
+                    <div style={{ color: SUB, fontSize: 12, marginTop: 2 }}>
+                      {c.actor_type === 'business'
+                        ? 'Business'
+                        : disabled
+                        ? (permission as { allowed: false; reason: string }).reason
+                        : 'Person'}
+                    </div>
+                  </div>
+                  <div
+                    aria-hidden
+                    style={{
+                      width: 22,
+                      height: 22,
+                      borderRadius: 999,
+                      border: `1.5px solid ${selectedRow ? INK : 'rgba(0,0,0,0.18)'}`,
+                      background: selectedRow ? INK : 'transparent',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#FFFFFF',
+                    }}
+                  >
+                    {selectedRow && <Check size={14} strokeWidth={2.5} />}
+                  </div>
+                </button>
+              );
+            })
+          )}
+        </div>
+
+        {/* Footer actions */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            padding: '12px 16px 4px',
+            borderTop: `0.5px solid ${HAIRLINE}`,
+          }}
+        >
+          {showIntro && (
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                padding: '4px 10px',
+                borderRadius: 999,
+                background: 'rgba(247,147,30,0.10)',
+                color: AMBER,
+                fontSize: 12,
+                fontWeight: 500,
+              }}
+            >
+              Intro message
+            </span>
+          )}
+          <div style={{ flex: 1 }} />
+          {selected.length <= 1 ? (
+            <button
+              type="button"
+              disabled={selected.length !== 1 || busy}
+              onClick={startDM}
+              style={{
+                background: INK,
+                color: '#FFFFFF',
+                fontSize: 14,
+                fontWeight: 500,
+                padding: '10px 18px',
+                borderRadius: 999,
+                border: 'none',
+                opacity: selected.length !== 1 || busy ? 0.4 : 1,
+              }}
+            >
+              Message
+            </button>
+          ) : (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={createGroup}
+              style={{
+                background: INK,
+                color: '#FFFFFF',
+                fontSize: 14,
+                fontWeight: 500,
+                padding: '10px 18px',
+                borderRadius: 999,
+                border: 'none',
+                opacity: busy ? 0.4 : 1,
+              }}
+            >
+              Create group
+            </button>
+          )}
+        </div>
+      </div>
+    </BottomSheet>
+  );
+};
+
+export default NewConversationSheet;
