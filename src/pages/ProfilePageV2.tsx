@@ -662,6 +662,10 @@ const ProfilePageV2Content: React.FC = () => {
             }}
             aria-label={isSelf ? "Change profile photo" : "View profile photo"}
           >
+            {/* Invisible hit expander — enlarges the tap target beyond the
+                masked squircle corners so a comfortable ring around the whole
+                avatar + camera badge is tappable. Clicks bubble to the wrapper. */}
+            <div aria-hidden="true" className="absolute" style={{ inset: '-14px' }} />
             {/* Avatar-on-cover: solid bg ring for separation --
                 canon exception, no hairline. */}
             <div className="clbhouz-squircle absolute inset-0 bg-background" />
