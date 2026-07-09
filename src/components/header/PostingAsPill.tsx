@@ -3,7 +3,6 @@ import { ChevronDown } from 'lucide-react';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
-import { useMessagingContext } from '@/contexts/MessagingContext';
 import { useActorUnreadCounts } from '@/hooks/useActorUnreadCounts';
 
 interface PostingAsPillProps {
@@ -29,11 +28,12 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
     // Per-actor unread (badge hybrid): show a small dot on the pill when ANY
     // non-active actor has unread activity — tells the owner "another profile
     // has activity".
-    const { hasOtherUnread } = useActorUnreadCounts();
+    const { hasOtherUnread, countFor } = useActorUnreadCounts();
 
-    // Get unread messages count from messaging system
-    const { conversations } = useMessagingContext();
-    const hasUnreadMessages = conversations?.some(conv => conv.unread_count > 0) || false;
+    // Green dot when the active actor has unread activity (notifications or DMs).
+    const hasUnreadMessages = activeActor
+      ? countFor(activeActor.type as 'personal' | 'business', activeActor.id) > 0
+      : false;
 
 
     // Bare theme — no background, no chevron, white-ringed avatar with drop shadow
