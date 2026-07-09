@@ -131,6 +131,8 @@ const InboxV2Page: React.FC = () => {
           </div>
         )}
       </main>
+
+      <NewConversationSheet open={composeOpen} onClose={() => setComposeOpen(false)} />
     </div>
   );
 };
