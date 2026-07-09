@@ -848,7 +848,7 @@ export function FullscreenFeedOverlay() {
                         if (sid && origin?.mediaType === 'image') {
                           import('@/perf/vperf').then((m) => {
                             m.vperfImagePhase(sid, 'settled');
-                            m.vperfEnd(sid, {});
+                            m.vperfEnd(sid, { closedBy: 'transitionend' });
                             (window as any).__vperfFsOpenSpanId = null;
                           }).catch(() => {});
                         }
