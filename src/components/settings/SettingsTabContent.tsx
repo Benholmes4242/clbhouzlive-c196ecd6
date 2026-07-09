@@ -58,7 +58,11 @@ export function SettingsTabContent() {
 
   useEffect(() => {
     if (user?.id && user?.email) {
-      supabase.rpc('sync_user_email', { user_id_param: user.id, current_email: user.email }).then(() => {});
+      supabase
+        .rpc('sync_user_email', { user_id_param: user.id, current_email: user.email })
+        .then(({ error }) => {
+          if (error) console.warn('[settings] sync_user_email skipped:', error.message);
+        });
     }
   }, [user?.id, user?.email]);
 
