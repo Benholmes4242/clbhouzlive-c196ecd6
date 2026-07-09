@@ -1,6 +1,8 @@
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import Pressable from '@/components/ui/Pressable';
+import { usePreroutePrefetch } from '@/video/usePreroutePrefetch';
 import type { FeedPost } from '@/components/media-system/types/media';
 import DecodedImage from '../shared/DecodedImage';
 
@@ -53,30 +55,43 @@ function CompactVideoRowInner({ post, index, allPosts, onDecoded }: CompactVideo
   const ageLabel = useMemo(() => formatAge(post.createdAt), [post.createdAt]);
   const channel = post.displayName || post.username || 'Clbhouz';
 
-  const btnRef = useRef<HTMLButtonElement>(null);
+  const hlsUrl = (media as any)?.hlsUrl as string | undefined;
+  const isVideo = !!media && media.type === 'video' && !!hlsUrl;
+  const ownerKey = isVideo ? `${post.id}:0` : null;
+
+  const { onPrerouteArm, onPreroute, onPrerouteCancel } = usePreroutePrefetch({
+    ownerKey,
+    hlsUrl: isVideo ? hlsUrl! : null,
+    enabled: isVideo,
+  });
+
+  const rootRef = useRef<HTMLElement>(null);
   const handleClick = useCallback(() => {
     openWithOrigin({
       openedFrom: 'watch',
       posts: allPosts,
       index,
-      originEl: btnRef.current,
+      originEl: rootRef.current,
       posterUrl: thumb || null,
+      railOwnerKey: ownerKey,
     });
-  }, [allPosts, index, thumb, media]);
+  }, [allPosts, index, thumb, ownerKey]);
 
   return (
-    <button
-      ref={btnRef}
-      type="button"
-      onClick={handleClick}
+    <Pressable
+      as="div"
+      variant="media"
+      ref={rootRef}
+      onPress={handleClick}
+      onPrerouteArm={onPrerouteArm}
+      onPreroute={onPreroute}
+      onPrerouteCancel={onPrerouteCancel}
+      data-watch-tile-index={index}
+      data-post-id={post.id}
       style={{
         display: 'flex',
         gap: 11,
         width: '100%',
-        padding: 0,
-        background: 'transparent',
-        border: 'none',
-        cursor: 'pointer',
         textAlign: 'left',
         alignItems: 'flex-start',
       }}
@@ -177,7 +192,7 @@ function CompactVideoRowInner({ post, index, allPosts, onDecoded }: CompactVideo
           </span>
         </div>
       </div>
-    </button>
+    </Pressable>
   );
 }
 
