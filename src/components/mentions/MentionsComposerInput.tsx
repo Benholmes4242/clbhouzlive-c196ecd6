@@ -67,6 +67,7 @@ interface RichSuggestion extends SuggestionDataItem {
 async function searchMentions(
   query: string,
   render: (data: SuggestionDataItem[]) => void,
+  excludeKeys?: Set<string>,
 ) {
   const q = (query ?? '').trim();
   if (q.length === 0) {
@@ -114,11 +115,13 @@ async function searchMentions(
       if (s.secondary?.toLowerCase().includes(qs)) return 1;
       return 2;
     };
-    const merged = [...userRows, ...bizRows]
-      .sort((a, b) => rank(a) - rank(b))
-      .slice(0, 6);
+    // Filter BEFORE slice so excluded rows don't eat visible slots.
+    const merged = [...userRows, ...bizRows].sort((a, b) => rank(a) - rank(b));
+    const filtered = excludeKeys && excludeKeys.size > 0
+      ? merged.filter(r => !excludeKeys.has(r.id))
+      : merged;
 
-    render(merged);
+    render(filtered.slice(0, 6));
   } catch {
     // Silent — the library ignores our returned promise, and empty results
     // simply keep the panel closed. Errors don't cascade.
