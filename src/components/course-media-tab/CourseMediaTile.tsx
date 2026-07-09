@@ -3,7 +3,9 @@ import { Film } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 import { useRailLane } from '@/video/useRailLane';
+import { usePreroutePrefetch } from '@/video/usePreroutePrefetch';
 import { originHostRegistry } from '@/video/originHostRegistry';
+import Pressable from '@/components/ui/Pressable';
 import { INK_TINT_04, INK_TINT_06, SURFACE } from '@/features/courses/_shared/tokens';
 
 
@@ -43,7 +45,7 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, f
   const isVideo = media?.type === 'video';
   const thumbnailUrl = isVideo ? media?.thumbnailUrl : (media?.imageUrl || media?.thumbnailUrl);
   const duration = media?.duration;
-  const tileRef = useRef<HTMLDivElement>(null);
+  const tileRef = useRef<HTMLElement>(null);
   const hlsUrl = (media as any)?.hlsUrl as string | undefined;
   const isVideoLane = isVideo && !!hlsUrl;
   const ownerKey = isVideoLane ? `${post.id}:0` : null;
@@ -66,20 +68,33 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, f
     return () => originHostRegistry.unregister(ownerKey, el);
   }, [ownerKey, laneHostRef]);
 
+  // Scroll-guarded pointerdown warm — cold (non-active) video tiles only.
+  const { onPrerouteArm, onPreroute, onPrerouteCancel } = usePreroutePrefetch({
+    ownerKey,
+    hlsUrl: isVideoLane ? hlsUrl! : null,
+    enabled: isVideoLane && !active,
+  });
+
+  const handlePress = () => {
+    const perMediaPosts = allPosts ?? [post];
+    onOpenFullscreen?.(perMediaPosts, index, {
+      originEl: tileRef.current,
+      railOwnerKey: ownerKey,
+      posterUrl: thumbnailUrl || null,
+    });
+  };
+
   return (
-    <div
+    <Pressable
       ref={tileRef}
+      as="div"
+      variant="media"
+      onPress={handlePress}
+      onPrerouteArm={onPrerouteArm}
+      onPreroute={onPreroute}
+      onPrerouteCancel={onPrerouteCancel}
       data-course-media-index={index}
       data-watch-tile-index={index}
-      onClick={() => {
-        const perMediaPosts = allPosts ?? [post];
-        onOpenFullscreen?.(perMediaPosts, index, {
-          originEl: tileRef.current,
-          railOwnerKey: ownerKey,
-          posterUrl: thumbnailUrl || null,
-        });
-      }}
-
       style={{
         position: 'absolute',
         inset: 0,
@@ -90,7 +105,6 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, f
         transition: 'transform 100ms ease',
         background: INK_TINT_04,
       }}
-      
     >
       {/* Poster or fallback */}
       {thumbnailUrl ? (
@@ -234,6 +248,6 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, f
           </span>
         </div>
       )}
-    </div>
+    </Pressable>
   );
 };
