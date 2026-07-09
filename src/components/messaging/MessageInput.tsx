@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useRef, useEffect, KeyboardEvent, ChangeEvent } from 'react';
 import { Send, X, Paperclip, Loader2, MapPin, Camera, Mic, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';

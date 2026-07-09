@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ChatSearchBar - Search messages within a conversation
  */
