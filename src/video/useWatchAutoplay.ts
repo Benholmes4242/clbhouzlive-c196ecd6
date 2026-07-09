@@ -107,7 +107,7 @@ export interface UseWatchAutoplayResult {
 const EMPTY_SET: Set<number> = new Set();
 
 export function useWatchAutoplay(
-  { railId: _railId, enabled = true, posts, maxActive = 1 }: UseWatchAutoplayOptions,
+  { railId, enabled = true, posts, maxActive = 1 }: UseWatchAutoplayOptions,
 ): UseWatchAutoplayResult {
   const revealed = useWatchRevealed();
   const reducedMotion = usePrefersReducedMotion();
@@ -125,8 +125,14 @@ export function useWatchAutoplay(
   useEffect(() => { postsRef.current = posts; }, [posts]);
 
   const railRef = useCallback((el: HTMLElement | null) => {
+    // Stamp a scope marker on the container so nested useWatchAutoplay
+    // instances can be isolated: a tile "belongs" to the hook whose root is
+    // its NEAREST [data-autoplay-scope] ancestor. Prevents the outer feed
+    // observer from ever seeing (and mis-resolving) a nested rail's tiles.
+    if (el) el.setAttribute('data-autoplay-scope', railId);
     setRoot(el);
-  }, []);
+  }, [railId]);
+
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
