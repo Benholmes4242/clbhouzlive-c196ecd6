@@ -180,6 +180,19 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
   closeAnimDone: false,
 
   open: (posts, startIndex = 0, options) => {
+    const openingPost: any = posts[startIndex];
+    const slidePostId: string | null = openingPost?.id ?? null;
+    const openT = traceLookup({ postId: slidePostId });
+    trace('store.open', {
+      openId: openT?.openId,
+      slidePostId,
+      slideOwnerKey: slidePostId ? `${slidePostId}:${options?.mediaIndex ?? 0}` : null,
+      mediaIndex: options?.mediaIndex ?? 0,
+      mediaId: options?.mediaId ?? null,
+      isBorrow: !!options?.borrow,
+      startPosition: options?.startPosition ?? 0,
+      openedFrom: options?.openedFrom ?? null,
+    });
     set({
       isOpen: true,
       posts,
