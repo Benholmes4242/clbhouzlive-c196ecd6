@@ -28,6 +28,7 @@ import { getActorRouteByType } from '@/types/actor';
 
 
 import { isPerfEnabled } from '@/perf/navTiming';
+import { coldOpenRevealSample, coldOpenIsActive } from '@/perf/coldOpen';
 import { VideoEngine } from '@/video/VideoEngine';
 import { feedLaneRoles } from '@/video/feedLaneRoles';
 import { RailLanePool } from '@/video/railLanePool';
@@ -594,6 +595,33 @@ export function FullscreenFeedOverlay() {
   const handleSnapFeedFirstFrame = useCallback(() => {
     setChildReady(true);
   }, []);
+
+  // [COLDOPEN] reveal.wait sampler — fires only when a cold trace is active
+  // (i.e. non-borrow watch open). Samples at open, +500ms, +2000ms so we can
+  // see whether the reveal gate is stuck because firstFrame never fires or
+  // because the swap logic never reacts.
+  useEffect(() => {
+    if (!isOpen) return;
+    if (borrow) return;
+    if (!coldOpenIsActive()) return;
+    const isVideoOpen = origin?.mediaType === 'video';
+    const sample = () => {
+      coldOpenRevealSample({
+        needsFirstFrame: !!(isVideoOpen && !firstFrameReady),
+        hasFirstFrame: firstFrameReady,
+        posterVisible: !!origin?.posterUrl && cloneVisible,
+        blurLayerVisible: !!origin?.posterUrl && cloneVisible,
+      });
+    };
+    sample();
+    const t1 = setTimeout(sample, 500);
+    const t2 = setTimeout(sample, 2000);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+    // Intentionally sample against the state at each timer fire; dependencies
+    // limited to open lifecycle so we don't re-arm on every state tick.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, borrow, origin]);
+
 
   // Combined reveal gate: for VIDEO opens require BOTH motion complete AND
   // the child's real first frame painted (kills the post-settle poster→video

@@ -39,6 +39,7 @@ import {
   vperfNextId,
 } from '@/perf/vperf';
 import { readSeededBandwidth } from './bandwidthMemory';
+import { coldOpenAttach, coldOpenFirstFrame } from '@/perf/coldOpen';
 
 
 
@@ -405,6 +406,20 @@ class VideoEngineImpl {
     hls.config.startPosition = startPosition;
     hls.loadSource(hlsUrl);
 
+    // [COLDOPEN] attach — trace only wires up if this is the 'fullscreen'
+    // lane taking the cold path started by openWithOrigin.
+    try {
+      coldOpenAttach({
+        laneId,
+        hlsUrl,
+        hls,
+        el: lane.el,
+        cap: typeof hls.autoLevelCapping === 'number' ? hls.autoLevelCapping : null,
+        startLevel: hls.config?.startLevel ?? null,
+        capReason: laneId.startsWith('rail-') ? 'rail-override' : 'none',
+      });
+    } catch { /* trace-only */ }
+
     const onManifest = () => {
       // Enforce ABR ceiling based on manifest levels.
       const cap = ABR_MAX_KBPS * 1000;
@@ -486,6 +501,8 @@ class VideoEngineImpl {
       try { lane.el.removeAttribute('poster'); } catch {}
       // [VPERF] first painted frame — resolves fs.open/autoplay firstFrame arms.
       vperfLaneEvent(lane.id, 'firstFrame');
+      // [COLDOPEN] firstFrame — trace only reacts if this lane matches.
+      try { coldOpenFirstFrame(lane.id); } catch { /* trace-only */ }
       this.emit(lane);
     };
     const onLoadedData = () => {
