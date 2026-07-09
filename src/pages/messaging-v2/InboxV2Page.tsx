@@ -1,8 +1,8 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 import { PencilLine } from 'lucide-react';
 import { useConversations } from '@/hooks/messaging/useConversations';
 import { ConversationRow } from './ConversationRow';
+import NewConversationSheet from './NewConversationSheet';
 
 const CANVAS = '#F8FAFC';
 const INK = '#1F2428';
