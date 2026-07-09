@@ -22,7 +22,7 @@ export { OfflineBanner } from './OfflineBanner';
 export { ChatHeaderMenu } from './ChatHeaderMenu';
 export { SwipeableConversationItem } from './SwipeableConversationItem';
 export { BlockUserDialog } from './BlockUserDialog';
-export { ReportSheet } from './ReportSheet';
+export { ReportSheet } from '@/components/moderation/ReportSheet';
 export { DeleteMessageSheet } from './DeleteMessageSheet';
 export { ForwardMessageModal } from './ForwardMessageModal';
 export { AddMembersSheet } from './AddMembersSheet';

@@ -30,7 +30,7 @@ import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useBusinessImageUpload } from '@/hooks/useBusinessImageUpload';
 import { useBusinessTeam } from '@/hooks/useBusinessTeam';
-import { useStartDM } from '@/hooks/useStartDM';
+import { useStartConversation } from '@/hooks/messaging/useStartConversation';
 
 import { Button } from '@/components/ui/button';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
@@ -54,7 +54,7 @@ import {
 } from '@/components/ui/alert-dialog';
 
 import { trackBusinessProfileVisit, trackBusinessAction } from '@/lib/businessAnalyticsTracking';
-import { ReportSheet } from '@/components/messaging/ReportSheet';
+import { ReportSheet } from '@/components/moderation/ReportSheet';
 import { PhotoActionSheet } from '@/components/profile/edit-v2/PhotoActionSheet';
 import { useBusinessReviewStats } from '@/hooks/useBusinessReviewStats';
 import { supabase } from '@/integrations/supabase/client';
@@ -142,7 +142,7 @@ const BusinessProfilePage: React.FC = () => {
     viewerActorId,
   });
   const toggleFollow = useToggleFollow();
-  const { startDM, isStarting: isStartingDM } = useStartDM();
+  const { start: startConversation, isStarting: isStartingDM } = useStartConversation();
 
   const { uploadLogo, removeLogo, uploadCover, removeCover, uploadingLogo, uploadingCover } =
     useBusinessImageUpload(business?.id);
@@ -699,11 +699,11 @@ const BusinessProfilePage: React.FC = () => {
                   <button
                     className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]"
                     style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
-                    onClick={() => { trackBusinessAction(business.id, 'message', user?.id); startDM(business.id, 'business'); }}
-                    disabled={isStartingDM === business.id}
+                    onClick={() => { trackBusinessAction(business.id, 'message', user?.id); startConversation({ actorType: 'business', actorId: business.id }); }}
+                    disabled={isStartingDM}
                     aria-label={`Message ${business.name}`}
                   >
-                    {isStartingDM === business.id
+                    {isStartingDM
                       ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
                       : <MessageCircle className="w-3.5 h-3.5" />}
                     Message

@@ -6,7 +6,7 @@ import { trackedLazy } from '@/perf/navTiming';
 const lazy = <T extends { default: React.ComponentType<any> }>(factory: () => Promise<T>) =>
   trackedLazy('route', factory);
 import { usePageTracking } from '@/hooks/usePageTracking';
-import { MessagingProvider } from '@/contexts/MessagingContext';
+
 
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -260,7 +260,7 @@ const News = lazy(() => import("./pages/News"));
 
 
 
-const MessagesPage = lazy(() => import("./pages/MessagesPage"));
+
 const InboxV2Page = lazy(() => import("./pages/messaging-v2/InboxV2Page"));
 const ThreadV2Page = lazy(() => import("./pages/messaging-v2/ThreadV2Page"));
 
@@ -586,10 +586,8 @@ function AppRoutes() {
         <Route path="/challenges" element={<Suspense fallback={<GenericPageSkeleton />}><ChallengesPage /></Suspense>} />
         
         
-        <Route path="/messages" element={<Suspense fallback={<GenericPageSkeleton />}><MessagesPage /></Suspense>} />
-        <Route path="/messages/:conversationId" element={<Suspense fallback={<GenericPageSkeleton />}><MessagesPage /></Suspense>} />
-        <Route path="/messages-v2" element={<Suspense fallback={<GenericPageSkeleton />}><InboxV2Page /></Suspense>} />
-        <Route path="/messages-v2/:conversationId" element={<Suspense fallback={<GenericPageSkeleton />}><ThreadV2Page /></Suspense>} />
+        <Route path="/messages" element={<Suspense fallback={<GenericPageSkeleton />}><InboxV2Page /></Suspense>} />
+        <Route path="/messages/:conversationId" element={<Suspense fallback={<GenericPageSkeleton />}><ThreadV2Page /></Suspense>} />
 
         <Route path="/notificationmessages" element={<Suspense fallback={<ActivityPageSkeleton />}><ActivityPageWrapped /></Suspense>} />
         <Route path="/golferstofollow" element={<Suspense fallback={<GenericPageSkeleton />}><GolfersToFollowPage /></Suspense>} />
@@ -955,8 +953,6 @@ const AppInner: React.FC = () => {
                                         <MountSignal />
                                         <AuthWrapper>
 
-                                          <MessagingProvider>
-                                          
                                           <FriendSheetProvider>
                                             <SeasonWrapModal />
                                             <AchievementToastWrapper />
@@ -979,8 +975,6 @@ const AppInner: React.FC = () => {
                                             <ReviewBottomSheetPortal />
                                             <RequestCourseSheetHost />
                                           </FriendSheetProvider>
-                                          
-                                          </MessagingProvider>
                                         </AuthWrapper>
                                         <Sonner />
                                         <GlobalBottomNavigation />

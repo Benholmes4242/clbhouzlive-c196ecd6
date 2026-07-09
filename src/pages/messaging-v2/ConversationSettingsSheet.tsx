@@ -238,7 +238,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
       }
       qc.invalidateQueries({ queryKey: ['messaging', 'inbox'] });
       onClose();
-      navigate('/messages-v2');
+      navigate('/messages');
     } catch (e) {
       console.error(e);
       toast.error('Could not leave group');

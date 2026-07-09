@@ -124,7 +124,7 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
       if (error) throw error;
       const id = data as unknown as string;
       handleClose();
-      navigate(`/messages-v2/${id}`);
+      navigate(`/messages/${id}`);
     } catch (e) {
       console.error(e);
       toast.error('Could not start conversation');
@@ -156,7 +156,7 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
       if (error) throw error;
       const id = data as unknown as string;
       handleClose();
-      navigate(`/messages-v2/${id}`);
+      navigate(`/messages/${id}`);
     } catch (e) {
       console.error(e);
       toast.error('Could not create group');

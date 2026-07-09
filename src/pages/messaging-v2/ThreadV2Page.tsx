@@ -263,7 +263,7 @@ const ThreadV2Page: React.FC = () => {
         <button
           type="button"
           aria-label="Back"
-          onClick={() => navigate('/messages-v2')}
+          onClick={() => navigate('/messages')}
           className="active:opacity-60"
           style={{
             width: 40,

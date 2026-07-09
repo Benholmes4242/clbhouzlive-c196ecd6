@@ -11,7 +11,6 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 import { useActorUnreadCounts } from '@/hooks/useActorUnreadCounts';
-import { useMessagingContext } from '@/contexts/MessagingContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { cn } from '@/lib/utils';
 import { postingAsCopy } from '@/lib/postingAsCopy';
@@ -39,10 +38,11 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   const { hasUnread, unreadCount: unreadNotificationCount } = useUnreadNotifications();
   const { countFor: actorUnreadFor } = useActorUnreadCounts();
 
-  
-  // Get unread messages from shared messaging context
-  const { conversations } = useMessagingContext();
-  const unreadMessageCount = conversations?.reduce((sum, conv) => sum + (conv.unread_count || 0), 0) || 0;
+
+  // Unread messages count derived from per-actor totals (notifications + DMs).
+  const unreadMessageCount = activeActor
+    ? actorUnreadFor(activeActor.type as 'personal' | 'business', activeActor.id)
+    : 0;
   
   const [uploadCenterOpen, setUploadCenterOpen] = useState(false);
   const { hasPending, hasFailed } = useUploadJobs();

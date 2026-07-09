@@ -28,7 +28,7 @@ import { useBlockActions } from '@/hooks/useBlockActions';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Trophy, ChevronRight, ChevronDown, ChevronLeft, MoreHorizontal, Send, UserPlus, UserCheck, UserMinus, Check, ExternalLink, Loader2, ArrowLeft, Pencil, Camera, Share2, Link2, Flag, Ban, Settings, Building2, MessageCircle } from 'lucide-react';
-import { useStartDM } from '@/hooks/useStartDM';
+import { useStartConversation } from '@/hooks/messaging/useStartConversation';
 import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
@@ -78,7 +78,7 @@ import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
 import { ImageCropModal } from '@/components/business/ImageCropModal';
 import { ProfileTouchDebugProvider, useProfileTouchDebug } from '@/components/profile/debug/ProfileTouchDebugProvider';
 import { ProfileTouchDebugPanel } from '@/components/profile/debug/ProfileTouchDebugPanel';
-import { ReportSheet } from '@/components/messaging/ReportSheet';
+import { ReportSheet } from '@/components/moderation/ReportSheet';
 import { PhotoActionSheet } from '@/components/profile/edit-v2/PhotoActionSheet';
 
 
@@ -209,7 +209,7 @@ const ProfilePageV2Content: React.FC = () => {
     });
   };
 
-  const { startDM, isStarting: dmStarting } = useStartDM();
+  const { start: startConversation, isStarting: dmStarting } = useStartConversation();
   const {
     status: friendshipStatus,
     isUpdating: friendshipUpdating,
@@ -840,13 +840,13 @@ const ProfilePageV2Content: React.FC = () => {
             {/* Row 1 — Message (primary CTA, full width) */}
             <button
               type="button"
-              onClick={() => profileUserId && startDM(profileUserId)}
-              disabled={dmStarting === profileUserId}
+              onClick={() => profileUserId && startConversation({ actorType: 'personal', actorId: profileUserId })}
+              disabled={dmStarting}
               className="h-11 w-full rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 px-4 whitespace-nowrap disabled:opacity-60 active:scale-[0.98] transition-transform"
               style={{ background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.30)', color: '#F7931E' }}
               aria-label="Send message"
             >
-              {dmStarting === profileUserId ? (
+              {dmStarting ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
               ) : (
                 <>

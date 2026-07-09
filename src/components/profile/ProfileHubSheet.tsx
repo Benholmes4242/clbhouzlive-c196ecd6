@@ -24,7 +24,7 @@ import {
   MessageCircle, Bell, Settings as SettingsIcon, UserCog,
 } from 'lucide-react';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
-import { useMessagingContext } from '@/contexts/MessagingContext';
+import { useActorUnreadCounts } from '@/hooks/useActorUnreadCounts';
 import { useNavigate } from 'react-router-dom';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { useLogout } from '@/hooks/useLogout';
@@ -332,10 +332,10 @@ function ProfileHubSheet({
   const editRoute = useEditProfileRoute();
   const { logout: handleLogout } = useLogout();
   const { unreadCount: unreadNotificationCount } = useUnreadNotifications();
-  const { conversations } = useMessagingContext();
-  const unreadMessageCount = conversations?.reduce(
-    (sum, conv) => sum + (conv.unread_count || 0), 0,
-  ) || 0;
+  const { countFor: actorUnreadFor } = useActorUnreadCounts();
+  const unreadMessageCount = currentActor
+    ? actorUnreadFor(currentActor.type as 'personal' | 'business', currentActor.id)
+    : 0;
 
   const sheetY = useMotionValue(0);
   const panelRef = useRef<HTMLDivElement | null>(null);

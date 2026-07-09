@@ -3,7 +3,7 @@ import { RequestCourseCTA } from '@/components/courses/RequestCourseCTA';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, X, Clock, BadgeCheck, Briefcase, Star, Lock, MessageCircle, Loader2, ChevronRight } from 'lucide-react';
-import { useStartDM } from '@/hooks/useStartDM';
+import { useStartConversation } from '@/hooks/messaging/useStartConversation';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { SuggestedCreatorsShelf } from '@/components/shared/SuggestedCreatorsShelf';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
@@ -185,7 +185,7 @@ interface GlobalSearchOverlayProps {
 function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
-  const { startDM, isStarting: dmStarting } = useStartDM();
+  const { start: startConversation, isStarting: dmStarting } = useStartConversation();
   const inputRef = useRef<HTMLInputElement>(null);
   const [inputValue, setInputValue] = useState('');
   const debouncedQuery = useDebounce(inputValue, 250);
@@ -806,8 +806,8 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                             {!isSelf && (
                               <button
                                 type="button"
-                                onClick={(e) => { e.stopPropagation(); startDM(person.id); }}
-                                disabled={dmStarting === person.id}
+                                onClick={(e) => { e.stopPropagation(); startConversation({ actorType: 'personal', actorId: person.id }); }}
+                                disabled={dmStarting}
                                 className="flex items-center justify-center flex-shrink-0 active:scale-[0.97] transition-all disabled:opacity-50"
                                 style={{
                                   width: 32, height: 32, borderRadius: '50%',
@@ -817,7 +817,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                                 }}
                                 aria-label={`Message ${person.display_name}`}
                               >
-                                {dmStarting === person.id ? (
+                                {dmStarting ? (
                                   <Loader2 className="w-3.5 h-3.5 animate-spin" style={{ color: AMBER }} />
                                 ) : (
                                   <MessageCircle className="w-3.5 h-3.5" style={{ color: AMBER }} />
