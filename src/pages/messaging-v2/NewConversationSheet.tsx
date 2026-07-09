@@ -150,7 +150,7 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
         p_as_actor_type: actor.actorType,
         p_as_actor_id: actor.actorId,
         p_title: finalTitle,
-        p_members: members as unknown as never,
+        p_members: members as unknown as Json,
         p_avatar_url: undefined,
       });
       if (error) throw error;
