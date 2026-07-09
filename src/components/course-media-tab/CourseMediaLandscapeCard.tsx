@@ -84,7 +84,7 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
         gridColumn: '1 / -1',
         background: INK_TINT_04,
       }}
-      className="active:scale-[0.99] transition-transform"
+      className="transition-transform"
     >
       {thumbnailUrl ? (
         <img
