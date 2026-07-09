@@ -205,9 +205,31 @@ class VideoEngineImpl {
   }
 
   private resetFirstFrameForLane(lane: Lane, reason: string): void {
-    if (!lane.firstFrame) return;
+    if (!lane.firstFrame) {
+      // Still log the reset intent so ordering (reset BEFORE snapshot read)
+      // is provable even when firstFrame was already false.
+      const openT = traceLookup({ postId: lane.postId });
+      trace('engine.reset', {
+        openId: openT?.openId,
+        laneId: lane.id,
+        elId: elIdOf(lane.el),
+        reason,
+        wasTrue: false,
+      });
+      return;
+    }
     lane.firstFrame = false;
     DBG(lane.id, 'firstFrame.reset', { reason, postId: lane.postId });
+    {
+      const openT = traceLookup({ postId: lane.postId });
+      trace('engine.reset', {
+        openId: openT?.openId,
+        laneId: lane.id,
+        elId: elIdOf(lane.el),
+        reason,
+        wasTrue: true,
+      });
+    }
     this.emit(lane);
   }
 
