@@ -17,6 +17,7 @@ interface Props {
   isFirstOfRun: boolean;
   isLastOfRun: boolean;
   showTicks: boolean;
+  onRetry?: (clientId: string) => void;
 }
 
 function formatTime(iso: string): string {
