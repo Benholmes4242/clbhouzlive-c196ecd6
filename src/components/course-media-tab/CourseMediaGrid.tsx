@@ -287,7 +287,7 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
                     fetchNextPage={fetchNextPage}
                     hasNextPage={hasNextPage}
                     isFetchingNextPage={isFetchingNextPage}
-                    active={activeIdx === index}
+                    active={activeIndices.has(index)}
                     onOpenFullscreen={handleOpenFullscreen}
                   />
                 </div>
