@@ -953,8 +953,6 @@ const AppInner: React.FC = () => {
                                         <MountSignal />
                                         <AuthWrapper>
 
-                                          <MessagingProvider>
-                                          
                                           <FriendSheetProvider>
                                             <SeasonWrapModal />
                                             <AchievementToastWrapper />
@@ -977,8 +975,6 @@ const AppInner: React.FC = () => {
                                             <ReviewBottomSheetPortal />
                                             <RequestCourseSheetHost />
                                           </FriendSheetProvider>
-                                          
-                                          </MessagingProvider>
                                         </AuthWrapper>
                                         <Sonner />
                                         <GlobalBottomNavigation />
