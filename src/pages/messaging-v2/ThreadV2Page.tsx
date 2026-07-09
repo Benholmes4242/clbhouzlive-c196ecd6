@@ -145,11 +145,27 @@ const ThreadV2Page: React.FC = () => {
     isFetchingOlder,
     error,
   } = useThread(conversationId || null);
+  const { retry } = useSendMessage(conversationId);
+  const keyboardHeight = useKeyboardHeight();
+  const [composerHeight, setComposerHeight] = useState(56);
 
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const bottomAnchorRef = useRef<HTMLDivElement | null>(null);
   const didInitialScrollRef = useRef(false);
   const lastMessageIdRef = useRef<string | null>(null);
+
+  const handleRetry = useCallback(
+    (clientId: string) => {
+      void retry(clientId);
+    },
+    [retry],
+  );
+
+  const scrollToBottom = useCallback(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    el.scrollTop = el.scrollHeight;
+  }, []);
 
   // Pin to bottom on first load / new outgoing/incoming message.
   useEffect(() => {
