@@ -408,6 +408,16 @@ class VideoEngineImpl {
     if (usingNative) {
       // Safari path — no hls.js instance, use the element's native player.
       lane.el.src = hlsUrl;
+      {
+        const openT = traceLookup({ ownerKey: lane.postId });
+        trace('engine.attach', {
+          openId: openT?.openId,
+          laneId,
+          elId: elIdOf(lane.el),
+          srcSet: hlsUrl,
+          hlsAttached: false,
+        });
+      }
       this.wireElementEvents(lane, /* usingHls */ false);
       if (startPosition > 0) {
         const onMeta = () => {
