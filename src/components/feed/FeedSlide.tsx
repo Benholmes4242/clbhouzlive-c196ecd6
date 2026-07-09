@@ -18,6 +18,15 @@ import { FS_TRANSITION_MODE } from '@/lib/media/transitionMode';
 import { usePostViewTracker } from '@/hooks/usePostViewTracker';
 import { MentionText } from '@/components/mentions/MentionText';
 
+const normalizeOwnerKey = (key: string | null | undefined): string | null => {
+  if (!key) return null;
+  return key.includes(':') ? key : `${key}:0`;
+};
+
+const ownerKeysMatch = (laneKey: string | null | undefined, expectedKey: string): boolean => {
+  return normalizeOwnerKey(laneKey) === normalizeOwnerKey(expectedKey);
+};
+
 interface FeedSlideProps {
   post: FeedPost;
   index: number;
@@ -426,7 +435,8 @@ const FullscreenVideoSlot: React.FC<{
   // it from <BorrowedFullscreenSlot/> on the next rAF post-mount.
   const firedRef = React.useRef(false);
   const targetReady = startPosition <= 0 || lane.snapshot.currentTime >= startPosition - 0.3;
-  const showVideo = lane.snapshot.firstFrame && targetReady;
+  const laneOwnerMatches = ownerKeysMatch(lane.snapshot.postId, resumeKey);
+  const showVideo = lane.snapshot.firstFrame && laneOwnerMatches && targetReady;
 
   React.useEffect(() => {
     if (isBorrowSlide) return;
