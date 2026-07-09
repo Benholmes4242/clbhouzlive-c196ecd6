@@ -56,6 +56,7 @@ export const MessageBubble: React.FC<Props> = ({
   isFirstOfRun,
   isLastOfRun,
   showTicks,
+  onRetry,
 }) => {
   const isDeleted = message.deleted_at != null;
   const isSending = message.status === 'sending';
