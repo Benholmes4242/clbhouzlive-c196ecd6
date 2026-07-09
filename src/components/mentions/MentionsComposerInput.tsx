@@ -40,7 +40,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MentionsInput, Mention, type SuggestionDataItem } from 'react-mentions';
 
-import { CheckCircle2, Building2 } from 'lucide-react';
+import { CheckCircle2, Building2, AtSign } from 'lucide-react';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { supabase } from '@/integrations/supabase/client';
 import { Z } from '@/config/zIndex';
@@ -50,7 +50,7 @@ const INK_SUBTLE = '#94A3B8';
 const AMBER = '#F7931E';
 const BORDER = 'rgba(15,23,42,0.10)';
 
-const PANEL_MAX_HEIGHT = 5 * 44 + 8; // 5 rows scrollable
+const PANEL_MAX_HEIGHT = 6 * 44 + 44 + 8; // 6 rows + eyebrow header + gutter
 const PANEL_GAP = 6;                 // px between panel and anchor
 
 /** react-mentions passes `id` as a string; we encode `${kind}:${uuid}` there. */
@@ -264,11 +264,27 @@ function renderSuggestion(
     <div
       className="flex items-center gap-2.5 text-left"
       style={{
-        padding: '8px 10px',
+        position: 'relative',
+        padding: '9px 14px',
         minHeight: 44,
-        background: focused ? 'rgba(247,147,30,0.08)' : 'transparent',
+        background: focused ? 'rgba(247,147,30,0.10)' : 'transparent',
       }}
     >
+      {focused && (
+        <span
+          aria-hidden
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 6,
+            bottom: 6,
+            width: 3,
+            background: AMBER,
+            borderTopRightRadius: 2,
+            borderBottomRightRadius: 2,
+          }}
+        />
+      )}
       <SquircleAvatar
         size={30}
         src={s.avatarUrl ?? undefined}
@@ -281,7 +297,7 @@ function renderSuggestion(
         <div className="flex items-center gap-1">
           <span
             className="truncate"
-            style={{ fontSize: 13.5, fontWeight: 600, color: INK, letterSpacing: '-0.01em' }}
+            style={{ fontSize: 14, fontWeight: 600, color: INK, letterSpacing: '-0.01em' }}
           >
             {s.display}
           </span>
@@ -295,7 +311,7 @@ function renderSuggestion(
         {s.secondary && (
           <div
             className="truncate"
-            style={{ fontSize: 11.5, color: INK_SUBTLE, lineHeight: 1.2, marginTop: 1 }}
+            style={{ fontSize: 12, color: INK_SUBTLE, lineHeight: 1.2, marginTop: 1 }}
           >
             {s.secondary}
           </div>
@@ -361,8 +377,14 @@ function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
       ? Math.max(vTop + 8, r.top - PANEL_GAP - Math.min(panelH, maxHeight))
       : Math.min(vBottom - Math.min(panelH, maxHeight) - 8, r.bottom + PANEL_GAP);
 
+    // Clamp to visual viewport so a narrow sheet can never cause overflow.
+    const vLeft = vv?.offsetLeft ?? 0;
+    const vW = vv?.width ?? window.innerWidth;
+    const clampedLeft = Math.max(vLeft + 8, r.left);
+    const clampedWidth = Math.min(r.width, vW - 16);
+
     setGeom(prev => {
-      const next = { top, left: r.left, width: r.width, maxHeight, placement: (wantsAbove ? 'above' : 'below') as 'above' | 'below' };
+      const next = { top, left: clampedLeft, width: clampedWidth, maxHeight, placement: (wantsAbove ? 'above' : 'below') as 'above' | 'below' };
       if (
         prev &&
         prev.top === next.top &&
@@ -413,6 +435,8 @@ function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
   // can clip / pierce / occlude it. React tree is unchanged, so the
   // library's synthetic click handlers on the <li>s still route.
   if (typeof document === 'undefined') return null;
+  const hasChildren = React.Children.count(children) > 0;
+  const placement = geom?.placement ?? 'below';
   return ReactDOM.createPortal(
     <div
       ref={panelRef}
@@ -427,16 +451,44 @@ function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
         maxHeight: geom?.maxHeight ?? PANEL_MAX_HEIGHT,
         overflowY: 'auto',
         background: '#FFFFFF',
-        borderRadius: 14,
+        borderRadius:
+          placement === 'above' ? '16px 16px 4px 4px' : '4px 4px 16px 16px',
         border: `1px solid rgba(15,23,42,0.08)`,
         boxShadow:
-          '0 12px 32px -8px rgba(15,23,42,0.22), 0 2px 6px rgba(15,23,42,0.08)',
+          placement === 'above'
+            ? '0 -8px 28px -6px rgba(15,23,42,0.18), 0 -1px 4px rgba(15,23,42,0.06)'
+            : '0 12px 32px -8px rgba(15,23,42,0.22), 0 2px 6px rgba(15,23,42,0.08)',
         fontSize: 13.5,
         pointerEvents: 'auto',
         opacity: geom ? 1 : 0,
         zIndex: Z.mentionsPanel,
       }}
     >
+      {hasChildren && (
+        <div
+          aria-hidden
+          style={{
+            position: 'sticky',
+            top: 0,
+            zIndex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '10px 14px 8px',
+            background: '#FFFFFF',
+            borderBottom: `1px solid ${BORDER}`,
+            fontSize: 10.5,
+            fontWeight: 700,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            color: INK_SUBTLE,
+            pointerEvents: 'none',
+          }}
+        >
+          <AtSign size={11} strokeWidth={2.25} style={{ color: INK_SUBTLE }} />
+          Mention someone
+        </div>
+      )}
       {children}
     </div>,
     document.body,
