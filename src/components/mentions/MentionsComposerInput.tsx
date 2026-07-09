@@ -264,11 +264,27 @@ function renderSuggestion(
     <div
       className="flex items-center gap-2.5 text-left"
       style={{
-        padding: '8px 10px',
+        position: 'relative',
+        padding: '9px 14px',
         minHeight: 44,
-        background: focused ? 'rgba(247,147,30,0.08)' : 'transparent',
+        background: focused ? 'rgba(247,147,30,0.10)' : 'transparent',
       }}
     >
+      {focused && (
+        <span
+          aria-hidden
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 6,
+            bottom: 6,
+            width: 3,
+            background: AMBER,
+            borderTopRightRadius: 2,
+            borderBottomRightRadius: 2,
+          }}
+        />
+      )}
       <SquircleAvatar
         size={30}
         src={s.avatarUrl ?? undefined}
@@ -281,7 +297,7 @@ function renderSuggestion(
         <div className="flex items-center gap-1">
           <span
             className="truncate"
-            style={{ fontSize: 13.5, fontWeight: 600, color: INK, letterSpacing: '-0.01em' }}
+            style={{ fontSize: 14, fontWeight: 600, color: INK, letterSpacing: '-0.01em' }}
           >
             {s.display}
           </span>
@@ -295,7 +311,7 @@ function renderSuggestion(
         {s.secondary && (
           <div
             className="truncate"
-            style={{ fontSize: 11.5, color: INK_SUBTLE, lineHeight: 1.2, marginTop: 1 }}
+            style={{ fontSize: 12, color: INK_SUBTLE, lineHeight: 1.2, marginTop: 1 }}
           >
             {s.secondary}
           </div>
