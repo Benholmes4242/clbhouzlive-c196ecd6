@@ -459,17 +459,12 @@ const BusinessProfilePage: React.FC = () => {
         {/* Canon exception: 2px bg-background die-cut ring over the cover photo — */}
         {/* matches the personal profile hero avatar-on-cover rule; no hairline. */}
         <div className="absolute left-5 z-20 pointer-events-auto" style={{ bottom: '-62px' }}>
-          <button
-            className="relative w-[124px] h-[124px] block cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7931E] focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
-            onClick={() => {
-              if (isOwner) setPhotoSheet('logo');
-              else if (!uploadingLogo) setIsAvatarLightboxOpen(true);
-            }}
-            aria-label={isOwner ? 'Change business logo' : 'View business logo'}
+          <div
+            className="relative w-[124px] h-[124px] block rounded-[34%]"
           >
-            <div className="clbhouz-squircle absolute inset-0 bg-background" />
+            <div className="clbhouz-squircle absolute inset-0 bg-background pointer-events-none" />
             <div
-              className="clbhouz-squircle absolute overflow-hidden"
+              className="clbhouz-squircle absolute overflow-hidden pointer-events-none"
               style={{ inset: 2, boxShadow: '0 12px 30px rgba(15,15,15,0.22)' }}
             >
               {business.logo_url ? (
@@ -485,7 +480,7 @@ const BusinessProfilePage: React.FC = () => {
             </div>
             {isOwner && (
               <div
-                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center z-10"
+                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center z-10 pointer-events-none"
                 style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '2px solid white' }}
               >
                 {uploadingLogo ? (
@@ -495,7 +490,27 @@ const BusinessProfilePage: React.FC = () => {
                 )}
               </div>
             )}
-          </button>
+
+            {/* Full-rect transparent tap target — matches cover-photo pattern. */}
+            {isOwner && !uploadingLogo && (
+              <button
+                type="button"
+                onClick={() => setPhotoSheet('logo')}
+                className="absolute z-20 pointer-events-auto cursor-pointer rounded-[34%]"
+                style={{ inset: '-14px', background: 'transparent', border: 'none' }}
+                aria-label="Change logo"
+              />
+            )}
+            {!isOwner && (
+              <button
+                type="button"
+                onClick={() => setIsAvatarLightboxOpen(true)}
+                className="absolute z-20 pointer-events-auto cursor-pointer rounded-[34%]"
+                style={{ inset: '-14px', background: 'transparent', border: 'none' }}
+                aria-label="View business logo"
+              />
+            )}
+          </div>
         </div>
 
         {/* City pill (right of hero) */}

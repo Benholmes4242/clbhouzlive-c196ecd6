@@ -635,30 +635,17 @@ const ProfilePageV2Content: React.FC = () => {
           className="absolute left-5 z-20 pointer-events-auto"
           style={{ bottom: '-62px' }}
         >
-          <button
-            className="relative w-[124px] h-[124px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7931E] focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
+          <div
+            className="relative w-[124px] h-[124px] rounded-[34%]"
             data-debug-id="profile-photo"
-            onPointerDown={(e) => {
-              logPoint('profile_photo.pointerdown', { x: e.clientX, y: e.clientY });
-            }}
-            onClick={() => {
-              if (isUploadingAvatar) return;
-              logPoint('profile_photo.click');
-              if (isSelf) {
-                setPhotoSheet('avatar');
-              } else {
-                setIsAvatarLightboxOpen(true);
-              }
-            }}
-            aria-label={isSelf ? "Change profile photo" : "View profile photo"}
           >
             {/* Avatar-on-cover: solid bg ring for separation --
                 canon exception, no hairline. */}
-            <div className="clbhouz-squircle absolute inset-0 bg-background" />
+            <div className="clbhouz-squircle absolute inset-0 bg-background pointer-events-none" />
 
             {/* Avatar image */}
             <div
-              className="clbhouz-squircle absolute overflow-hidden"
+              className="clbhouz-squircle absolute overflow-hidden pointer-events-none"
               style={{
                 inset: '2px',
                 boxShadow: '0 12px 30px rgba(15,15,15,0.22)',
@@ -680,7 +667,7 @@ const ProfilePageV2Content: React.FC = () => {
             {/* Camera badge — bottom right, Instagram style */}
             {isSelf && !isUploadingAvatar && (
               <div
-                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center z-10"
+                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center z-10 pointer-events-none"
                 style={{
                   background: 'rgba(0, 0, 0, 0.55)',
                   backdropFilter: 'blur(8px)',
@@ -695,7 +682,7 @@ const ProfilePageV2Content: React.FC = () => {
             {/* Spinner badge — shows during upload */}
             {isSelf && isUploadingAvatar && (
               <div
-                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center z-10"
+                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center z-10 pointer-events-none"
                 style={{
                   background: 'rgba(0, 0, 0, 0.55)',
                   border: '2px solid white',
@@ -704,7 +691,28 @@ const ProfilePageV2Content: React.FC = () => {
                 <div className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />
               </div>
             )}
-          </button>
+
+            {/* Full-rect transparent tap target — matches cover-photo pattern.
+                inset:-14px extends beyond squircle corners + covers badge overhang. */}
+            {isSelf && !isUploadingAvatar && (
+              <button
+                type="button"
+                onClick={() => setPhotoSheet('avatar')}
+                className="absolute z-20 pointer-events-auto cursor-pointer rounded-[34%]"
+                style={{ inset: '-14px', background: 'transparent', border: 'none' }}
+                aria-label="Change profile photo"
+              />
+            )}
+            {!isSelf && (
+              <button
+                type="button"
+                onClick={() => setIsAvatarLightboxOpen(true)}
+                className="absolute z-20 pointer-events-auto cursor-pointer rounded-[34%]"
+                style={{ inset: '-14px', background: 'transparent', border: 'none' }}
+                aria-label="View profile photo"
+              />
+            )}
+          </div>
         </div>
 
       </div>
