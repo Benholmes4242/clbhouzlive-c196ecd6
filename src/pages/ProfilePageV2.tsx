@@ -28,7 +28,7 @@ import { useBlockActions } from '@/hooks/useBlockActions';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Trophy, ChevronRight, ChevronDown, ChevronLeft, MoreHorizontal, Send, UserPlus, UserCheck, UserMinus, Check, ExternalLink, Loader2, ArrowLeft, Pencil, Camera, Share2, Link2, Flag, Ban, Settings, Building2, MessageCircle } from 'lucide-react';
-import { useStartDM } from '@/hooks/useStartDM';
+import { useStartConversation } from '@/hooks/messaging/useStartConversation';
 import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
@@ -209,7 +209,7 @@ const ProfilePageV2Content: React.FC = () => {
     });
   };
 
-  const { startDM, isStarting: dmStarting } = useStartDM();
+  const { start: startConversation, isStarting: dmStarting } = useStartConversation();
   const {
     status: friendshipStatus,
     isUpdating: friendshipUpdating,

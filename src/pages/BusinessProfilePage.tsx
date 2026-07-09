@@ -699,11 +699,11 @@ const BusinessProfilePage: React.FC = () => {
                   <button
                     className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]"
                     style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
-                    onClick={() => { trackBusinessAction(business.id, 'message', user?.id); startDM(business.id, 'business'); }}
-                    disabled={isStartingDM === business.id}
+                    onClick={() => { trackBusinessAction(business.id, 'message', user?.id); startConversation({ actorType: 'business', actorId: business.id }); }}
+                    disabled={isStartingDM}
                     aria-label={`Message ${business.name}`}
                   >
-                    {isStartingDM === business.id
+                    {isStartingDM
                       ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
                       : <MessageCircle className="w-3.5 h-3.5" />}
                     Message
