@@ -575,6 +575,21 @@ class VideoEngineImpl {
       // the poster per new source, so future cold-loads still get their
       // pre-paint cover.
       try { lane.el.removeAttribute('poster'); } catch {}
+      // [TRACE] engine.firstFrame — REAL frame? videoWidth>0 == real,
+      // videoWidth==0 == phantom (stale flag re-emit).
+      {
+        const openT = traceLookup({ ownerKey: lane.postId });
+        trace('engine.firstFrame', {
+          openId: openT?.openId,
+          laneId: lane.id,
+          elId: elIdOf(lane.el),
+          currentTime: +(lane.el.currentTime || 0).toFixed(3),
+          readyState: lane.el.readyState,
+          videoWidth: (lane.el as HTMLVideoElement).videoWidth || 0,
+          videoHeight: (lane.el as HTMLVideoElement).videoHeight || 0,
+          source: _source,
+        });
+      }
       // [VPERF] first painted frame — resolves fs.open/autoplay firstFrame arms.
       vperfLaneEvent(lane.id, 'firstFrame');
       // [COLDOPEN] firstFrame — trace only reacts if this lane matches.
