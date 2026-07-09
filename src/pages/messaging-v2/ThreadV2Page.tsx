@@ -1,11 +1,14 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ChevronLeft, MoreVertical, BadgeCheck, Plus, ArrowUp } from 'lucide-react';
+import { ChevronLeft, MoreVertical, BadgeCheck } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useThread } from '@/hooks/messaging/useThread';
 import { useConversations } from '@/hooks/messaging/useConversations';
 import { useMessagingActor } from '@/hooks/messaging/useMessagingActor';
+import { useSendMessage } from '@/hooks/messaging/useSendMessage';
+import { useKeyboardHeight } from '@/hooks/messaging/useKeyboardHeight';
 import { MessageBubble } from './MessageBubble';
+import { Composer } from './Composer';
 import type {
   InboxConversation,
   InboxParticipant,
@@ -18,8 +21,6 @@ const SUB = '#8A9099';
 const HINT = '#AEB4BC';
 const AMBER = '#F7931E';
 const HAIRLINE = 'rgba(0,0,0,0.07)';
-const COMPOSER_BG = '#FFFFFF';
-const COMPOSER_INPUT_BG = '#EDEFF2';
 
 interface HeaderIdentity {
   name: string;
