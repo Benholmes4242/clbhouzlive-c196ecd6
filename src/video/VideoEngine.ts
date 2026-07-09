@@ -524,7 +524,11 @@ class VideoEngineImpl {
         return lvl.bitrate <= cap ? idx : best;
       }, hls.levels.length - 1);
       hls.autoLevelCapping = maxLevel;
-      this.transition(lane, 'ready');
+      // SOFT-RESET HYGIENE: do NOT promote to 'ready' here. MANIFEST_PARSED
+      // fires before any segment is decoded, so element.readyState is still 0
+      // — promoting state='ready' now creates a state/readyState decoupling
+      // that lets the borrow stateGate lie for the window until loadeddata.
+      // Real promotion happens in markReadyToShow (loadeddata/canplay) below.
     };
     const onError = (_evt: unknown, data: any) => {
       if (data?.fatal) {
@@ -938,6 +942,27 @@ class VideoEngineImpl {
       firstFrame: lane.firstFrame,
       postId: lane.postId,
     };
+  }
+
+  /**
+   * Live-read directly from the underlying element (no cached state). Used by
+   * openWithOrigin at bind time to re-validate a borrow candidate immediately
+   * before committing — catches post-decision drops (rebind/HLS reattach) that
+   * a prior snapshot read would miss.
+   */
+  isLivePlayable(laneId: LaneId): {
+    playable: boolean;
+    readyState: number;
+    currentTime: number;
+    paused: boolean;
+  } {
+    const lane = this.getLane(laneId);
+    const el = lane.el;
+    const readyState = el.readyState;
+    const currentTime = el.currentTime || 0;
+    const paused = el.paused;
+    const playable = readyState >= 2 && currentTime > 0 && !paused;
+    return { playable, readyState, currentTime, paused };
   }
 
   subscribe(laneId: LaneId, listener: LaneListener): () => void {
