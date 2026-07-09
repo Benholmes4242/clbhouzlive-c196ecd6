@@ -748,8 +748,11 @@ class VideoEngineImpl {
       // match the NEW postId against the PREVIOUS video's decoded frame and
       // flash prior content under the new identity. Same-owner resume keeps
       // its frame (no regression to instant re-open of the same video).
-      const laneOwner = normalizeOwnerKey(lane.postId);
-      const callOwner = normalizeOwnerKey(caller);
+      const norm = (k: string | null): string | null =>
+        k == null ? null : (k.includes(':') ? k : `${k}:0`);
+      const laneOwner = norm(lane.postId);
+      const callOwner = norm(caller);
+
       if (lane.postId != null && laneOwner !== callOwner && lane.firstFrame) {
         lane.firstFrame = false;
         DBG(lane.id, 'firstFrame.reset', { reason: 'play.repoint', from: lane.postId, to: caller });
