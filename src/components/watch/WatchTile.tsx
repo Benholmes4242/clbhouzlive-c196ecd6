@@ -8,6 +8,7 @@ import { buildLqipUrl } from '@/utils/mediaThumbs';
 import { shouldUseLqip } from '@/utils/lqipQueue';
 import Pressable from '@/components/ui/Pressable';
 import { useRailLane } from '@/video/useRailLane';
+import { usePreroutePrefetch } from '@/video/usePreroutePrefetch';
 
 
 
