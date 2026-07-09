@@ -209,10 +209,39 @@ export const RailLanePool = {
     return false;
   },
 
-  /** Which lane (if any) does this owner currently hold? Null = none. */
+  /**
+   * Which lane (if any) does this owner currently hold? Null = none.
+   * A lane that is mid flip-return is reported as null so a new open falls
+   * through to the cold path instead of racing the return animation.
+   */
   laneFor(ownerKey: OwnerKey | null | undefined): LaneId | null {
     if (!ownerKey) return null;
-    return owners.get(ownerKey)?.laneId ?? null;
+    const laneId = owners.get(ownerKey)?.laneId ?? null;
+    if (!laneId) return null;
+    if (returningLanes.has(laneId)) return null;
+    return laneId;
+  },
+
+  /**
+   * Mark a lane as mid flip-return. Called at `beginCloseAnim('borrow')`
+   * — from that moment until `clearReturning`, the lane is unavailable to
+   * new opens (borrow or fresh acquire). Idempotent.
+   */
+  markReturning(laneId: LaneId): void {
+    returningLanes.add(laneId);
+    POOL_DBG('return.mark', { laneId });
+  },
+
+  /** Clear the returning mark once `returnBorrow` has completed. Idempotent. */
+  clearReturning(laneId: LaneId): void {
+    if (!returningLanes.has(laneId)) return;
+    returningLanes.delete(laneId);
+    POOL_DBG('return.clear', { laneId });
+  },
+
+  /** Read-only: is this lane currently mid flip-return? */
+  isReturning(laneId: LaneId): boolean {
+    return returningLanes.has(laneId);
   },
 
   /** Subscribe to lane-change events for a given owner (eviction → null). */
