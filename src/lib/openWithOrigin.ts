@@ -278,6 +278,27 @@ export function openWithOrigin({
       mediaId: mediaId ?? null,
       surface: openedFrom,
     });
+
+    // [COLDOPEN] — non-borrow watch open with a rail owner key means the
+    // tapped tile was NOT holding a live rail lane (or the pool no longer
+    // has one). Fullscreen must cold-load. Start the cold trace so the
+    // engine/overlay hooks can attach.
+    if (railOwnerKey && postId) {
+      try {
+        const items = openingPost?.mediaItems as Array<{ hlsUrl?: string }> | undefined;
+        const item = items?.[mediaIndex ?? 0];
+        const hlsUrl = item?.hlsUrl;
+        if (hlsUrl) {
+          coldOpenRoute({
+            ownerKey: railOwnerKey,
+            hlsUrl,
+            prefetched: PrefetchController.wasPrefetched(railOwnerKey),
+          });
+        }
+      } catch {
+        /* trace-only */
+      }
+    }
   }
 
   // Two-way resume: prefer the tile's live rail-lane playhead (Watch tap),
