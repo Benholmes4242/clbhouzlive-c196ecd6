@@ -501,6 +501,8 @@ class VideoEngineImpl {
       try { lane.el.removeAttribute('poster'); } catch {}
       // [VPERF] first painted frame — resolves fs.open/autoplay firstFrame arms.
       vperfLaneEvent(lane.id, 'firstFrame');
+      // [COLDOPEN] firstFrame — trace only reacts if this lane matches.
+      try { coldOpenFirstFrame(lane.id); } catch { /* trace-only */ }
       this.emit(lane);
     };
     const onLoadedData = () => {
