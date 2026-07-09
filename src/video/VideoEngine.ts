@@ -742,7 +742,24 @@ class VideoEngineImpl {
     // Ownership: the moment a card issues play() it becomes the lane owner.
     // Guarantees pause() owner-guard below can reject stale outgoing cards
     // even if load() hasn't yet updated lane.postId for this caller.
-    if (caller != null) lane.postId = caller;
+    if (caller != null) {
+      // Repoint to a DIFFERENT owner must atomically reset firstFrame — else
+      // the reveal gate (firstFrame && laneOwnerMatches && targetReady) can
+      // match the NEW postId against the PREVIOUS video's decoded frame and
+      // flash prior content under the new identity. Same-owner resume keeps
+      // its frame (no regression to instant re-open of the same video).
+      const norm = (k: string | null): string | null =>
+        k == null ? null : (k.includes(':') ? k : `${k}:0`);
+      const laneOwner = norm(lane.postId);
+      const callOwner = norm(caller);
+
+      if (lane.postId != null && laneOwner !== callOwner && lane.firstFrame) {
+        lane.firstFrame = false;
+        DBG(lane.id, 'firstFrame.reset', { reason: 'play.repoint', from: lane.postId, to: caller });
+      }
+      lane.postId = caller;
+    }
+
     // Persistent intent: set now, honored on mount + on canplay after (re)load.
     lane.wantPlay = true;
     if (!lane.mountedHost) {
