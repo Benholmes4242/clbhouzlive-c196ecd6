@@ -107,11 +107,16 @@ export interface PressableProps
    */
   onPreroute?: () => void;
   /**
-   * Fires when a preroute that already fired needs to be cancelled — pointer
-   * moved past the tap threshold after the fire, or held past the long-press
-   * window without releasing. Tiles use it to abort the in-flight warm.
+   * Fires when a preroute is CANCELLED, with the reason. Called for every
+   * cancel path — before or after `onPreroute` fired — so consumers can log
+   * arm/cancel independent of whether the warm actually ran.
+   * `moved`     → pointer exceeded the tap threshold (drag/scroll on-tile)
+   * `scroll`    → pointercancel (native scroller took over the gesture)
+   * `longpress` → still holding after the long-press window
    */
-  onPrerouteCancel?: () => void;
+  onPrerouteCancel?: (reason: 'moved' | 'scroll' | 'longpress') => void;
+  /** Fires once at pointerdown — the moment a preroute is armed (pre-guard). */
+  onPrerouteArm?: () => void;
 }
 
 const Pressable = forwardRef<HTMLElement, PressableProps>(function Pressable(
