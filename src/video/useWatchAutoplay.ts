@@ -92,7 +92,7 @@ export interface UseWatchAutoplayResult {
  * Attach the returned `railRef` to the tile container.
  */
 export function useWatchAutoplay(
-  { railId: _railId, enabled = true }: UseWatchAutoplayOptions,
+  { railId: _railId, enabled = true, posts }: UseWatchAutoplayOptions,
 ): UseWatchAutoplayResult {
   const revealed = useWatchRevealed();
   const reducedMotion = usePrefersReducedMotion();
@@ -101,6 +101,11 @@ export function useWatchAutoplay(
   );
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
   const [root, setRoot] = useState<HTMLElement | null>(null);
+
+  // Keep a ref to posts so the IO callback (inside a stable effect) can
+  // resolve hlsUrl for approach-warming without re-running the observer.
+  const postsRef = useRef<FeedPost[] | undefined>(posts);
+  useEffect(() => { postsRef.current = posts; }, [posts]);
 
   const railRef = useCallback((el: HTMLElement | null) => {
     setRoot(el);
