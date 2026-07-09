@@ -220,9 +220,8 @@ export function useWatchAutoplay(
       }
     };
 
-    const observeTiles = (tiles: NodeListOf<HTMLElement> | HTMLElement[]) => {
-      tiles.forEach((t) => io.observe(t));
-    };
+
+
 
     // A tile belongs to THIS hook iff its nearest [data-autoplay-scope]
     // ancestor is our root. This isolates nested rails (e.g. QuickClips
