@@ -366,7 +366,7 @@ function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
     const vHeight = vv?.height ?? innerH;
     const vOffsetTop = vv?.offsetTop ?? 0;
     const keyboardH = Math.max(0, innerH - vHeight - vOffsetTop);
-    const maxHeight = Math.min(PANEL_MAX_HEIGHT, Math.round(vHeight * 0.45));
+    const maxHeight = Math.min(PANEL_MAX_HEIGHT, Math.round(vHeight * 0.60));
     setGeom(prev => {
       const next = { left: 0, width: window.innerWidth, bottom: keyboardH, maxHeight };
       if (prev && prev.left === next.left && prev.width === next.width &&
