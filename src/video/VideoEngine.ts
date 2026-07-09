@@ -460,6 +460,17 @@ class VideoEngineImpl {
     const hls = lane.hls;
     hls.config.startPosition = startPosition;
     hls.loadSource(hlsUrl);
+    // [TRACE] engine.attach — source pointed at this lane's element.
+    {
+      const openT = traceLookup({ ownerKey: lane.postId });
+      trace('engine.attach', {
+        openId: openT?.openId,
+        laneId,
+        elId: elIdOf(lane.el),
+        srcSet: hlsUrl,
+        hlsAttached: true,
+      });
+    }
 
     // [COLDOPEN] attach — trace only wires up if this is the 'fullscreen'
     // lane taking the cold path started by openWithOrigin.
