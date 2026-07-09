@@ -4,7 +4,8 @@ import { PencilLine } from 'lucide-react';
 import { useConversations } from '@/hooks/messaging/useConversations';
 import { ConversationRow } from './ConversationRow';
 
-const INK = '#1A1D21';
+const CANVAS = '#F8FAFC';
+const INK = '#1F2428';
 const SUB = '#8A9099';
 const HAIRLINE = 'rgba(0,0,0,0.07)';
 
@@ -12,9 +13,10 @@ const SkeletonRow: React.FC = () => (
   <div
     className="flex items-center gap-3"
     style={{
-      padding: '10px 16px',
+      padding: '11px 14px',
       minHeight: 72,
-      borderBottom: `1px solid ${HAIRLINE}`,
+      borderBottom: `0.5px solid ${HAIRLINE}`,
+      background: 'transparent',
     }}
   >
     <div
@@ -27,7 +29,7 @@ const SkeletonRow: React.FC = () => (
     />
     <div className="flex-1 flex flex-col gap-2">
       <div style={{ height: 12, width: '40%', background: '#EEF0F2', borderRadius: 4 }} />
-      <div style={{ height: 10, width: '70%', background: '#F3F5F7', borderRadius: 4 }} />
+      <div style={{ height: 10, width: '70%', background: '#EEF0F2', borderRadius: 4 }} />
     </div>
   </div>
 );
@@ -39,23 +41,23 @@ const InboxV2Page: React.FC = () => {
   return (
     <div
       className="min-h-screen w-full"
-      style={{ background: '#FFFFFF', color: INK }}
+      style={{ background: CANVAS, color: INK }}
     >
       <header
         className="sticky top-0 z-10"
         style={{
-          background: '#FFFFFF',
+          background: CANVAS,
           paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)',
           paddingBottom: 12,
           paddingLeft: 16,
           paddingRight: 16,
-          borderBottom: `1px solid ${HAIRLINE}`,
+          borderBottom: `0.5px solid ${HAIRLINE}`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
         }}
       >
-        <h1 style={{ fontSize: 22, fontWeight: 500, color: INK, margin: 0 }}>
+        <h1 style={{ fontSize: 20, fontWeight: 500, color: INK, margin: 0 }}>
           Messages
         </h1>
         <button
@@ -71,7 +73,7 @@ const InboxV2Page: React.FC = () => {
             justifyContent: 'center',
             background: 'transparent',
             border: 'none',
-            color: INK,
+            color: SUB,
           }}
         >
           <PencilLine size={20} />
