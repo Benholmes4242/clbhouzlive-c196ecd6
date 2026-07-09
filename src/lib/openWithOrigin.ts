@@ -298,6 +298,19 @@ export function openWithOrigin({
     }
   }
 
+  // [TRACE] decision — one line per open, always emitted, records whether
+  // borrow was taken, denied, or unavailable.
+  trace('decision', {
+    openId,
+    borrowAttempted: !!(railOwnerKey && postId),
+    borrowResult: borrow ? 'borrow' : (railOwnerKey ? 'skip' : 'no-lane'),
+    railOwnerKeyPassed: railOwnerKey ?? null,
+    ownerKeyResolved: borrow?.ownerKey ?? (railOwnerKey ?? (postId ? `${postId}:${mediaIndex ?? 0}` : null)),
+    willColdLoad: !borrow,
+    hasOriginEl: !!originEl,
+    surface: openedFrom,
+  });
+
   if (!borrow) {
     DECIDE('borrow.skip', {
       hasOriginEl: !!originEl,
@@ -321,6 +334,12 @@ export function openWithOrigin({
             ownerKey: railOwnerKey,
             hlsUrl,
             prefetched: PrefetchController.wasPrefetched(railOwnerKey),
+          });
+          trace('cold.route', {
+            openId,
+            ownerKeyIntoStore: railOwnerKey,
+            postIdIntoStore: postId,
+            hlsUrl,
           });
         }
       } catch {
