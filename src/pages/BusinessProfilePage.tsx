@@ -54,7 +54,7 @@ import {
 } from '@/components/ui/alert-dialog';
 
 import { trackBusinessProfileVisit, trackBusinessAction } from '@/lib/businessAnalyticsTracking';
-import { ReportSheet } from '@/components/messaging/ReportSheet';
+import { ReportSheet } from '@/components/moderation/ReportSheet';
 import { PhotoActionSheet } from '@/components/profile/edit-v2/PhotoActionSheet';
 import { useBusinessReviewStats } from '@/hooks/useBusinessReviewStats';
 import { supabase } from '@/integrations/supabase/client';

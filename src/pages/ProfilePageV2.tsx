@@ -78,7 +78,7 @@ import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
 import { ImageCropModal } from '@/components/business/ImageCropModal';
 import { ProfileTouchDebugProvider, useProfileTouchDebug } from '@/components/profile/debug/ProfileTouchDebugProvider';
 import { ProfileTouchDebugPanel } from '@/components/profile/debug/ProfileTouchDebugPanel';
-import { ReportSheet } from '@/components/messaging/ReportSheet';
+import { ReportSheet } from '@/components/moderation/ReportSheet';
 import { PhotoActionSheet } from '@/components/profile/edit-v2/PhotoActionSheet';
 
 

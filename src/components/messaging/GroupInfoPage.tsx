@@ -21,7 +21,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { ConversationWithDetails, ParticipantWithProfile } from '@/types/messaging';
 import { AddMembersSheet } from './AddMembersSheet';
-import { ReportSheet } from './ReportSheet';
+import { ReportSheet } from '@/components/moderation/ReportSheet';
 import { SharedMediaGallery } from './SharedMediaGallery';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import {

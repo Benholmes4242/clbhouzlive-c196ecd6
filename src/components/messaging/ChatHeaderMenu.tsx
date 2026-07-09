@@ -38,7 +38,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { haptic } from '@/utils/haptics';
 import { BlockUserDialog } from './BlockUserDialog';
-import { ReportSheet } from './ReportSheet';
+import { ReportSheet } from '@/components/moderation/ReportSheet';
 import type { ConversationWithDetails } from '@/types/messaging';
 import { AMBER, DESTRUCTIVE, HAIRLINE_INK_6, HAIRLINE_INK_7, INK, INK_TINT_05, SURFACE } from './_shared/tokens';
 
