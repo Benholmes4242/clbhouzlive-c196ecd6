@@ -9,6 +9,7 @@ import { useSendMessage } from '@/hooks/messaging/useSendMessage';
 import { useKeyboardHeight } from '@/hooks/messaging/useKeyboardHeight';
 import { MessageBubble } from './MessageBubble';
 import { Composer } from './Composer';
+import { ConversationSettingsSheet } from './ConversationSettingsSheet';
 import type {
   InboxConversation,
   InboxParticipant,
