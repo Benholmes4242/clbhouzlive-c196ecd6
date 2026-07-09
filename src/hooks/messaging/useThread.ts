@@ -110,6 +110,36 @@ export function useThread(conversationId: string | null) {
       .then(() => undefined, () => undefined);
   }, [conversationId, actor, newestId]);
 
+  // Cache mutators bound to this conversationId (convenience for consumers).
+  const insertOptimistic = useCallback(
+    (msg: ThreadMessage) => {
+      if (!conversationId) return;
+      cacheInsertOptimistic(queryClient, conversationId, msg);
+    },
+    [conversationId, queryClient],
+  );
+  const resolveOptimistic = useCallback(
+    (clientId: string, serverRow: Partial<ThreadMessage>) => {
+      if (!conversationId) return;
+      cacheResolveOptimistic(queryClient, conversationId, clientId, serverRow);
+    },
+    [conversationId, queryClient],
+  );
+  const markFailed = useCallback(
+    (clientId: string) => {
+      if (!conversationId) return;
+      cacheMarkFailed(queryClient, conversationId, clientId);
+    },
+    [conversationId, queryClient],
+  );
+  const removeOptimistic = useCallback(
+    (clientId: string) => {
+      if (!conversationId) return;
+      cacheRemoveOptimistic(queryClient, conversationId, clientId);
+    },
+    [conversationId, queryClient],
+  );
+
   return {
     messages,
     fetchOlder: query.fetchNextPage,
@@ -117,5 +147,9 @@ export function useThread(conversationId: string | null) {
     isLoading: query.isLoading,
     isFetchingOlder: query.isFetchingNextPage,
     error: query.error,
+    insertOptimistic,
+    resolveOptimistic,
+    markFailed,
+    removeOptimistic,
   };
 }
