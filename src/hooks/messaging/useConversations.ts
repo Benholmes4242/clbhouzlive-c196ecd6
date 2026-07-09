@@ -15,12 +15,13 @@ export function useConversations() {
     queryKey: ['messaging', 'inbox', actorType, actorId],
     enabled: !!actor,
     queryFn: async () => {
-      const { data, error } = await supabase.rpc('get_inbox' as never, {
+      if (!actorType || !actorId) return [];
+      const { data, error } = await supabase.rpc('get_inbox', {
         p_actor_type: actorType,
         p_actor_id: actorId,
-      } as never);
+      });
       if (error) throw error;
-      return ((data ?? []) as unknown) as InboxConversation[];
+      return (data ?? []) as InboxConversation[];
     },
   });
 
