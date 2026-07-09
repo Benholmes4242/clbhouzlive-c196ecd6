@@ -152,6 +152,13 @@ interface Props {
   style?: React.CSSProperties;
   inputRef?: (el: HTMLTextAreaElement | null) => void;
   textStyle?: MentionsTextStyle;
+  /**
+   * Current viewer's user id. Excludes self from the picker (never mentionable).
+   * Pass null when the host has no user id already in scope — already-mentioned
+   * exclusion still works without it. Do NOT add a new supabase.auth.getUser()
+   * call to satisfy this prop (that reintroduces a first-keystroke race).
+   */
+  currentUserId?: string | null;
 }
 
 const DEFAULT_TEXT_STYLE: Required<Pick<MentionsTextStyle, 'fontSize' | 'lineHeight' | 'padding' | 'color' | 'caretColor'>> = {
