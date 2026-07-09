@@ -99,6 +99,8 @@ function returnBorrow(borrow: BorrowDescriptor, reason: 'close' | 'route' | 'dem
       let hadPendingRelease = false;
       if (isRail) {
         hadPendingRelease = RailLanePool.unpin(borrow.laneId, { executeDeferred: false });
+        // Return complete — lane may be re-acquired for new opens again.
+        RailLanePool.clearReturning(borrow.laneId);
       }
       BORROW_DBG('return.animate', {
         laneId: borrow.laneId, ownerKey: borrow.ownerKey, postId: borrow.postId,
@@ -120,6 +122,8 @@ function returnBorrow(borrow: BorrowDescriptor, reason: 'close' | 'route' | 'dem
   let hadPendingRelease = false;
   if (isRail) {
     hadPendingRelease = RailLanePool.unpin(borrow.laneId, { executeDeferred: true });
+    // Fallback / demote path also completes any pending "returning" state.
+    RailLanePool.clearReturning(borrow.laneId);
   }
   BORROW_DBG(reason === 'demote' ? 'unpin' : 'return.fallback', {
     laneId: borrow.laneId, ownerKey: borrow.ownerKey, postId: borrow.postId,
