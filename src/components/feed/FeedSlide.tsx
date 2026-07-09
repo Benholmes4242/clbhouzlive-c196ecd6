@@ -431,6 +431,52 @@ const FullscreenVideoSlot: React.FC<{
     });
   }, [isActive, isBorrowSlide, resumeKey, startPosition]);
 
+  // [TRACE] slot.render — once per active mount of this slot for correlation.
+  const didTraceRenderRef = React.useRef(false);
+  React.useEffect(() => {
+    if (!isActive) { didTraceRenderRef.current = false; return; }
+    if (didTraceRenderRef.current) return;
+    didTraceRenderRef.current = true;
+    const openT = traceLookup({ ownerKey: resumeKey, postId });
+    trace('slot.render', {
+      openId: openT?.openId,
+      propOwnerKey: ownerKey ?? null,
+      propPostId: postId,
+      resumeKey,
+      isBorrowSlide,
+      isActive,
+      laneHlsUrl: !!laneHlsUrl,
+    });
+  }, [isActive, isBorrowSlide, resumeKey, postId, ownerKey, laneHlsUrl]);
+
+  // [TRACE] slot.laneBind — fires once per active bind of a non-borrow slot.
+  const didTraceBindRef = React.useRef(false);
+  React.useEffect(() => {
+    if (isBorrowSlide) { didTraceBindRef.current = false; return; }
+    if (!isActive) { didTraceBindRef.current = false; return; }
+    if (didTraceBindRef.current) return;
+    didTraceBindRef.current = true;
+    const openT = traceLookup({ ownerKey: resumeKey });
+    let snapPostId: string | null = null;
+    let firstFrame = false;
+    let elId = 'NULL';
+    try {
+      const s = VideoEngine.snapshot('fullscreen');
+      snapPostId = s.postId;
+      firstFrame = s.firstFrame;
+      const el = (document.querySelector('video[data-lane-id="fullscreen"]') as HTMLVideoElement | null);
+      elId = (el?.dataset as any)?.vid ?? 'NULL';
+    } catch {}
+    trace('slot.laneBind', {
+      openId: openT?.openId,
+      laneId: 'fullscreen',
+      requestedOwnerKey: resumeKey,
+      useVideoLaneReturnedSnapshotPostId: snapPostId,
+      snapshotFirstFrame: firstFrame,
+      snapshotElId: elId,
+    });
+  }, [isActive, isBorrowSlide, resumeKey]);
+
   // Fire onFirstFrameReady ONLY when the engine has painted the real frame
   // at (or past) startPosition — for non-borrow slides. Borrow slide fires
   // it from <BorrowedFullscreenSlot/> on the next rAF post-mount.
@@ -448,6 +494,117 @@ const FullscreenVideoSlot: React.FC<{
       onFirstFrameReady?.();
     }
   }, [isActive, isBorrowSlide, showVideo, onFirstFrameReady]);
+
+  // [TRACE] lane.firstFrameCb — fires when the slot's local snapshot
+  // firstFrame flips true for the first time, matched against the RIGHT
+  // owner key so we can prove which callback fired for which open.
+  const firstFrameCbFiredRef = React.useRef(false);
+  React.useEffect(() => {
+    if (!isActive || isBorrowSlide) { firstFrameCbFiredRef.current = false; return; }
+    if (!lane.snapshot.firstFrame) return;
+    if (firstFrameCbFiredRef.current) return;
+    firstFrameCbFiredRef.current = true;
+    const openT = traceLookup({ ownerKey: resumeKey });
+    let elId = 'NULL';
+    try {
+      const el = document.querySelector('video[data-lane-id="fullscreen"]') as HTMLVideoElement | null;
+      elId = (el?.dataset as any)?.vid ?? 'NULL';
+    } catch {}
+    trace('lane.firstFrameCb', {
+      openId: openT?.openId,
+      laneId: 'fullscreen',
+      firedWithSnapshotPostId: lane.snapshot.postId,
+      firedWithFirstFrame: lane.snapshot.firstFrame,
+      matchedCurrentOwnerKey: laneOwnerMatches,
+      elId,
+    });
+  }, [isActive, isBorrowSlide, lane.snapshot.firstFrame, lane.snapshot.postId, laneOwnerMatches, resumeKey]);
+
+  // [TRACE] gate — sample the reveal-gate at 100 / 500 / 1000 / 3000 ms.
+  // Emits gate.reveal the first time showVideo flips true, or gate.stuck at
+  // 3s if it never did.
+  const gateSnapshotRef = React.useRef({ showVideo, revealed: false });
+  gateSnapshotRef.current.showVideo = showVideo;
+  React.useEffect(() => {
+    if (!isActive || isBorrowSlide) return;
+    const openT = traceLookup({ ownerKey: resumeKey });
+    const openId = openT?.openId;
+    const started = performance.now();
+    gateSnapshotRef.current.revealed = false;
+    const readElId = (): string => {
+      try {
+        const el = document.querySelector('video[data-lane-id="fullscreen"]') as HTMLVideoElement | null;
+        return (el?.dataset as any)?.vid ?? 'NULL';
+      } catch { return 'NULL'; }
+    };
+    const sample = (label: string) => {
+      let snapPostId: string | null = null;
+      let ff = false;
+      try {
+        const s = VideoEngine.snapshot('fullscreen');
+        snapPostId = s.postId;
+        ff = s.firstFrame;
+      } catch {}
+      trace('gate', {
+        openId,
+        laneId: 'fullscreen',
+        at: label,
+        snapshotFirstFrame: ff,
+        laneOwnerMatches: ownerKeysMatch(snapPostId, resumeKey),
+        targetReady,
+        showVideoResult: gateSnapshotRef.current.showVideo,
+        snapshotPostId: snapPostId,
+        expectedOwnerKey: resumeKey,
+        snapshotElId: readElId(),
+      });
+    };
+    const timers: number[] = [];
+    timers.push(window.setTimeout(() => sample('100ms'), 100));
+    timers.push(window.setTimeout(() => sample('500ms'), 500));
+    timers.push(window.setTimeout(() => sample('1000ms'), 1000));
+    timers.push(window.setTimeout(() => {
+      sample('3000ms');
+      if (!gateSnapshotRef.current.revealed) {
+        let snapPostId: string | null = null;
+        let ff = false;
+        try {
+          const s = VideoEngine.snapshot('fullscreen');
+          snapPostId = s.postId;
+          ff = s.firstFrame;
+        } catch {}
+        trace('gate.stuck', {
+          openId,
+          snapshotFirstFrame: ff,
+          laneOwnerMatches: ownerKeysMatch(snapPostId, resumeKey),
+          targetReady,
+          snapshotElId: readElId(),
+          expectedOwnerKey: resumeKey,
+        });
+      }
+    }, 3000));
+    // Fire reveal marker when showVideo first becomes true within this
+    // active session via a rAF poll (cheap; only runs while stuck).
+    let raf = 0;
+    const poll = () => {
+      if (gateSnapshotRef.current.revealed) return;
+      if (gateSnapshotRef.current.showVideo) {
+        gateSnapshotRef.current.revealed = true;
+        trace('gate.reveal', {
+          openId,
+          ms: Math.round(performance.now() - started),
+          elId: readElId(),
+        });
+        return;
+      }
+      raf = requestAnimationFrame(poll);
+    };
+    raf = requestAnimationFrame(poll);
+    return () => {
+      timers.forEach((t) => clearTimeout(t));
+      if (raf) cancelAnimationFrame(raf);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isActive, isBorrowSlide, resumeKey]);
 
   // Borrow branch: re-parent the live rail-pool <video> into a wrapper here
   // and run the two-phase cover→contain FLIP.
