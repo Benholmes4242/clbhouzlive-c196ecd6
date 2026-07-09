@@ -23,7 +23,7 @@ export function useConversations() {
         p_actor_id: actorId,
       });
       if (error) throw error;
-      return (data ?? []) as InboxConversation[];
+      return (data ?? []) as unknown as InboxConversation[];
     },
   });
 
