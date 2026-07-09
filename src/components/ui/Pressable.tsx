@@ -273,10 +273,10 @@ const Pressable = forwardRef<HTMLElement, PressableProps>(function Pressable(
         releasePressed();
         // Cancel any pending preroute + abort in-flight warm if already fired.
         clearPrerouteTimers();
-        cancelPrerouteIfFired();
+        cancelPreroute('moved');
       }
     },
-    [releasePressed, clearPrerouteTimers, cancelPrerouteIfFired],
+    [releasePressed, clearPrerouteTimers, cancelPreroute],
   );
 
   const handlePointerUp = useCallback(
@@ -298,6 +298,7 @@ const Pressable = forwardRef<HTMLElement, PressableProps>(function Pressable(
       // Tap committed (or aborted) — stop the long-press guard. A warm that
       // already fired stays in-flight; the imminent open will hit warm cache.
       clearPrerouteTimers();
+      s.prerouteArmed = false;
       s.prerouteFired = false;
 
       if (wasAborted || dx > MOVE_THRESHOLD_PX || dy > MOVE_THRESHOLD_PX || dt > MAX_TAP_MS) {
@@ -321,8 +322,9 @@ const Pressable = forwardRef<HTMLElement, PressableProps>(function Pressable(
     s.aborted = false;
     releasePressed();
     clearPrerouteTimers();
-    cancelPrerouteIfFired();
-  }, [releasePressed, clearPrerouteTimers, cancelPrerouteIfFired]);
+    // pointercancel on mobile ~ native scroller took over the gesture.
+    cancelPreroute('scroll');
+  }, [releasePressed, clearPrerouteTimers, cancelPreroute]);
 
   // iOS :active deadzone: a no-op touchstart listener flips iOS into applying
   // active/press styles on tap. Not strictly needed here (we don't rely on
