@@ -225,13 +225,26 @@ export const MessageBubble: React.FC<Props> = ({
           }}
         >
           {isFailed ? (
-            <span
-              className="inline-flex items-center gap-1"
-              style={{ color: '#DC2626', fontSize: 10.5, fontWeight: 500 }}
+            <button
+              type="button"
+              onClick={() => {
+                if (onRetry && message.client_id) onRetry(message.client_id);
+              }}
+              className="inline-flex items-center gap-1 active:opacity-60"
+              style={{
+                color: '#DC2626',
+                fontSize: 10.5,
+                fontWeight: 500,
+                background: 'transparent',
+                border: 'none',
+                padding: 0,
+                cursor: 'pointer',
+              }}
+              aria-label="Retry send"
             >
               <AlertCircle size={11} />
-              Failed
-            </span>
+              Failed — tap to retry
+            </button>
           ) : isSending ? (
             <Clock size={11} style={{ color: HINT }} />
           ) : null}
