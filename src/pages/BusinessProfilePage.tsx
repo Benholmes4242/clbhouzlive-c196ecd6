@@ -476,6 +476,9 @@ const BusinessProfilePage: React.FC = () => {
             }}
             aria-label={isOwner ? 'Change business logo' : 'View business logo'}
           >
+            {/* Invisible hit expander — enlarges tap target beyond the masked
+                squircle corners so the whole avatar + camera area is tappable. */}
+            <div aria-hidden="true" className="absolute" style={{ inset: '-14px' }} />
             <div className="clbhouz-squircle absolute inset-0 bg-background" />
             <div
               className="clbhouz-squircle absolute overflow-hidden"
