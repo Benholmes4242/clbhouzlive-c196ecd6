@@ -3,7 +3,9 @@ import { Film } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 import { useRailLane } from '@/video/useRailLane';
+import { usePreroutePrefetch } from '@/video/usePreroutePrefetch';
 import { originHostRegistry } from '@/video/originHostRegistry';
+import Pressable from '@/components/ui/Pressable';
 import { INK_TINT_04, INK_TINT_06, SURFACE } from '@/features/courses/_shared/tokens';
 
 
