@@ -459,36 +459,48 @@ const BusinessProfilePage: React.FC = () => {
         {/* Canon exception: 2px bg-background die-cut ring over the cover photo — */}
         {/* matches the personal profile hero avatar-on-cover rule; no hairline. */}
         <div className="absolute left-5 z-20 pointer-events-auto" style={{ bottom: '-62px' }}>
-          <button
-            className="relative w-[124px] h-[124px] block cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7931E] focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
-            onClick={() => {
-              if (isOwner) setPhotoSheet('logo');
-              else if (!uploadingLogo) setIsAvatarLightboxOpen(true);
-            }}
-            aria-label={isOwner ? 'Change business logo' : 'View business logo'}
-          >
-            <div className="clbhouz-squircle absolute inset-0 bg-background" />
+          <div className="relative w-[124px] h-[124px]">
             <div
-              className="clbhouz-squircle absolute overflow-hidden"
-              style={{ inset: 2, boxShadow: '0 12px 30px rgba(15,15,15,0.22)' }}
+              role="button"
+              tabIndex={0}
+              className="absolute inset-0 block cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7931E] focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
+              onClick={() => {
+                if (isOwner) setPhotoSheet('logo');
+                else if (!uploadingLogo) setIsAvatarLightboxOpen(true);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  if (isOwner) setPhotoSheet('logo');
+                  else if (!uploadingLogo) setIsAvatarLightboxOpen(true);
+                }
+              }}
+              aria-label={isOwner ? 'Change business logo' : 'View business logo'}
             >
-              {business.logo_url ? (
-                <img src={business.logo_url} alt={business.name} className="w-full h-full object-cover" />
-              ) : (
-                <div
-                  className="w-full h-full flex items-center justify-center text-3xl font-bold text-muted-foreground"
-                  style={{ background: 'rgba(15,23,42,0.06)' }}
-                >
-                  {initials}
-                </div>
-              )}
+              <div className="clbhouz-squircle absolute inset-0 bg-background" />
+              <div
+                className="clbhouz-squircle absolute overflow-hidden"
+                style={{ inset: 2, boxShadow: '0 12px 30px rgba(15,15,15,0.22)' }}
+              >
+                {business.logo_url ? (
+                  <img src={business.logo_url} alt={business.name} className="w-full h-full object-cover" />
+                ) : (
+                  <div
+                    className="w-full h-full flex items-center justify-center text-3xl font-bold text-muted-foreground"
+                    style={{ background: 'rgba(15,23,42,0.06)' }}
+                  >
+                    {initials}
+                  </div>
+                )}
+              </div>
             </div>
             {isOwner && (
-              <div
-                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center z-10"
-                style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '2px solid white', cursor: 'pointer' }}
-                onClick={(e) => { e.stopPropagation(); setPhotoSheet('logo'); }}
-                role="button"
+              <button
+                type="button"
+                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center z-20 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7931E]"
+                style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '2px solid white' }}
+                onPointerDown={(e) => { e.stopPropagation(); }}
+                onClick={(e) => { e.stopPropagation(); if (!uploadingLogo) setPhotoSheet('logo'); }}
                 aria-label="Change logo"
               >
                 {uploadingLogo ? (
@@ -496,9 +508,9 @@ const BusinessProfilePage: React.FC = () => {
                 ) : (
                   <Camera className="w-3.5 h-3.5 text-white" />
                 )}
-              </div>
+              </button>
             )}
-          </button>
+          </div>
         </div>
 
         {/* City pill (right of hero) */}
