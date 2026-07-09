@@ -78,6 +78,23 @@ export function useVideoLane(
   useEffect(() => {
 
     if (!laneId) return;
+    // [TRACE] lane.mount — capture the initial snapshot the hook read at
+    // setState() time. This is the stale-state suspect.
+    {
+      const initial = VideoEngine.snapshot(laneId);
+      const openT = traceLookup({
+        ownerKey: opts.ownerKey ?? null,
+        postId: opts.postId ?? initial.postId ?? null,
+      });
+      trace('lane.mount', {
+        openId: openT?.openId,
+        laneId,
+        initialSnapshotFirstFrame: initial.firstFrame,
+        initialSnapshotPostId: initial.postId,
+        ownerKey: opts.ownerKey ?? null,
+        postId: opts.postId ?? null,
+      });
+    }
     let raf = 0;
     const tryMount = () => {
       const host = hostRef.current;
