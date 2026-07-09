@@ -223,13 +223,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className, hidden = false
       } else if (isMessagesRoute) {
         navigate(-1);
       } else if (isHandicapRoute) {
-        // Course Legends drilldown deep-links may have no in-app history — fall back to Compete tab.
-        const isCourseLegendsRoute = location.pathname.startsWith('/handicap/legends/courses/');
-        if (isCourseLegendsRoute) {
-          safeGoBack(navigate, '/handicap?subtab=compete');
-        } else {
-          navigate(-1);
-        }
+        navigate(-1);
       } else if (isWatchSubpageRoute) {
         navigate(-1);
       } else if (isTourDeepRoute) {
