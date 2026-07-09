@@ -205,12 +205,33 @@ export function openWithOrigin({
   if (railOwnerKey && postId) {
     try {
       const liveLane = RailLanePool.laneFor(railOwnerKey);
+      // Readiness gate: a rail lane is borrow-eligible only when its element
+      // is genuinely playable. `firstFrame` alone can be a phantom (fires on
+      // timeupdate at ct=0 / readyState=0 on iOS HLS) — borrowing such a lane
+      // stalls the fullscreen open ~1.4s waiting for real decode. A prefetched
+      // cold open on this same tile is ~100ms, so a not-ready lane must fall
+      // through to the cold path.
+      let readySnap: ReturnType<typeof VideoEngine.snapshot> | null = null;
+      let ready = false;
+      let notReadyBy: 'readyState' | 'ct' | 'state' | null = null;
+      if (liveLane) {
+        readySnap = VideoEngine.snapshot(liveLane);
+        const rsGate = readySnap.readyState >= 2; // HAVE_CURRENT_DATA
+        const ctGate = readySnap.currentTime > 0;
+        const stateGate = readySnap.state === 'playing' || readySnap.state === 'ready';
+        ready = rsGate && ctGate && stateGate;
+        notReadyBy = !rsGate ? 'readyState' : !ctGate ? 'ct' : !stateGate ? 'state' : null;
+      }
       DECIDE('borrow.rail', {
         ownerKey: railOwnerKey,
         poolLane: liveLane ?? null,
-        outcome: liveLane ? 'borrow' : 'no-lane',
+        readyState: readySnap?.readyState ?? null,
+        currentTime: readySnap ? +readySnap.currentTime.toFixed(3) : null,
+        snapState: readySnap?.state ?? null,
+        outcome: !liveLane ? 'no-lane' : ready ? 'borrow' : 'not-ready',
+        notReadyBy,
       });
-      if (liveLane) {
+      if (liveLane && ready) {
         borrow = {
           laneId: liveLane,
           ownerKey: railOwnerKey,
