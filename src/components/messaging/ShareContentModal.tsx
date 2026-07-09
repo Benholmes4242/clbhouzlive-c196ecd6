@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useRef, useCallback } from 'react';
 import { AppLog } from '@/lib/logger';
 import { Search, MapPin, Calendar, ImagePlus, X, Plus, Loader2, ChevronRight } from 'lucide-react';

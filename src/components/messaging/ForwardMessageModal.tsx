@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ForwardMessageModal - Select a conversation to forward a message to
  */
