@@ -149,6 +149,7 @@ const ThreadV2Page: React.FC = () => {
   const { retry } = useSendMessage(conversationId);
   const keyboardHeight = useKeyboardHeight();
   const [composerHeight, setComposerHeight] = useState(56);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const bottomAnchorRef = useRef<HTMLDivElement | null>(null);
