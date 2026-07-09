@@ -18881,6 +18881,30 @@ export type Database = {
           width: number
         }[]
       }
+      get_thread: {
+        Args: { p_before?: string; p_conversation_id: string; p_limit?: number }
+        Returns: {
+          attachments: Json
+          body: string
+          conversation_id: string
+          created_at: string
+          deleted_at: string
+          edited_at: string
+          id: string
+          metadata: Json
+          reactions: Json
+          reply_preview: Json
+          reply_to_id: string
+          sender_actor_id: string
+          sender_actor_type: string
+          sender_avatar_url: string
+          sender_name: string
+          sender_user_id: string
+          sender_username: string
+          sender_verified: boolean
+          type: string
+        }[]
+      }
       get_top_video_reviews:
         | {
             Args: {
