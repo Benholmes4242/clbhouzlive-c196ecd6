@@ -78,7 +78,9 @@ function notify(ownerKey: OwnerKey, laneId: LaneId | null) {
 
 function pickFreeLane(): LaneId | null {
   for (const id of RAIL_LANE_IDS) {
-    if (!laneOwner.has(id)) return id;
+    if (laneOwner.has(id)) continue;
+    if (returningLanes.has(id)) continue; // mid flip-return — unavailable
+    return id;
   }
   return null;
 }
@@ -88,6 +90,7 @@ function pickLruOwner(): OwnerKey | null {
   let lruTime = Infinity;
   for (const [k, v] of owners) {
     if (pinnedByBorrow.has(v.laneId)) continue; // skip pinned
+    if (returningLanes.has(v.laneId)) continue; // skip mid flip-return
     if (v.lastUsed < lruTime) {
       lruTime = v.lastUsed;
       lru = k;
