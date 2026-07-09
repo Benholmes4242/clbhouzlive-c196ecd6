@@ -635,84 +635,80 @@ const ProfilePageV2Content: React.FC = () => {
           className="absolute left-5 z-20 pointer-events-auto"
           style={{ bottom: '-62px' }}
         >
-          <div className="relative w-[124px] h-[124px]">
-            <div
-              role="button"
-              tabIndex={0}
-              className="absolute inset-0 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7931E] focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
-              data-debug-id="profile-photo"
-              onPointerDown={(e) => {
-                logPoint('profile_photo.pointerdown', { x: e.clientX, y: e.clientY });
-              }}
-              onClick={() => {
+          <div
+            role="button"
+            tabIndex={0}
+            className="relative w-[124px] h-[124px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7931E] focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
+            data-debug-id="profile-photo"
+            onPointerDown={(e) => {
+              logPoint('profile_photo.pointerdown', { x: e.clientX, y: e.clientY });
+            }}
+            onClick={() => {
+              if (isUploadingAvatar) return;
+              logPoint('profile_photo.click');
+              if (isSelf) {
+                setPhotoSheet('avatar');
+              } else {
+                setIsAvatarLightboxOpen(true);
+              }
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
                 if (isUploadingAvatar) return;
-                logPoint('profile_photo.click');
-                if (isSelf) {
-                  setPhotoSheet('avatar');
-                } else {
-                  setIsAvatarLightboxOpen(true);
-                }
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  if (isUploadingAvatar) return;
-                  if (isSelf) setPhotoSheet('avatar');
-                  else setIsAvatarLightboxOpen(true);
-                }
-              }}
-              aria-label={isSelf ? "Change profile photo" : "View profile photo"}
-            >
-              {/* Avatar-on-cover: solid bg ring for separation --
-                  canon exception, no hairline. */}
-              <div className="clbhouz-squircle absolute inset-0 bg-background" />
+                if (isSelf) setPhotoSheet('avatar');
+                else setIsAvatarLightboxOpen(true);
+              }
+            }}
+            aria-label={isSelf ? "Change profile photo" : "View profile photo"}
+          >
+            {/* Avatar-on-cover: solid bg ring for separation --
+                canon exception, no hairline. */}
+            <div className="clbhouz-squircle absolute inset-0 bg-background" />
 
-              {/* Avatar image */}
-              <div
-                className="clbhouz-squircle absolute overflow-hidden"
-                style={{
-                  inset: '2px',
-                  boxShadow: '0 12px 30px rgba(15,15,15,0.22)',
-                }}
-              >
-                {profile?.profile_photo_url ? (
-                  <img
-                    src={profile.profile_photo_url}
-                    alt={displayName}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-muted flex items-center justify-center text-3xl font-bold text-muted-foreground">
-                    {displayName.charAt(0)}
-                  </div>
-                )}
-              </div>
+            {/* Avatar image */}
+            <div
+              className="clbhouz-squircle absolute overflow-hidden"
+              style={{
+                inset: '2px',
+                boxShadow: '0 12px 30px rgba(15,15,15,0.22)',
+              }}
+            >
+              {profile?.profile_photo_url ? (
+                <img
+                  src={profile.profile_photo_url}
+                  alt={displayName}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-muted flex items-center justify-center text-3xl font-bold text-muted-foreground">
+                  {displayName.charAt(0)}
+                </div>
+              )}
             </div>
 
-            {/* Camera badge — sibling of the photo hit target so its taps aren't
-                swallowed by the outer interactive (nested-interactive fix). */}
+            {/* Camera badge — purely decorative overlay; taps bubble to the
+                avatar wrapper so the whole photo (badge included) is one hit target. */}
             {isSelf && !isUploadingAvatar && (
-              <button
-                type="button"
-                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center z-20 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7931E]"
+              <div
+                aria-hidden="true"
+                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center pointer-events-none"
                 style={{
                   background: 'rgba(0, 0, 0, 0.55)',
                   backdropFilter: 'blur(8px)',
                   WebkitBackdropFilter: 'blur(8px)',
                   border: '2px solid white',
                 }}
-                onPointerDown={(e) => { e.stopPropagation(); logPoint('camera_badge.pointerdown', { x: e.clientX, y: e.clientY }); }}
-                onClick={(e) => { e.stopPropagation(); logPoint('camera_badge.click'); setPhotoSheet('avatar'); }}
-                aria-label="Change profile photo"
               >
                 <Camera className="w-3.5 h-3.5 text-white" />
-              </button>
+              </div>
             )}
 
             {/* Spinner badge — shows during upload */}
             {isSelf && isUploadingAvatar && (
               <div
-                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center z-20 pointer-events-none"
+                aria-hidden="true"
+                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center pointer-events-none"
                 style={{
                   background: 'rgba(0, 0, 0, 0.55)',
                   border: '2px solid white',
