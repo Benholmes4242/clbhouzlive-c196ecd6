@@ -635,72 +635,84 @@ const ProfilePageV2Content: React.FC = () => {
           className="absolute left-5 z-20 pointer-events-auto"
           style={{ bottom: '-62px' }}
         >
-          <button
-            className="relative w-[124px] h-[124px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7931E] focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
-            data-debug-id="profile-photo"
-            onPointerDown={(e) => {
-              logPoint('profile_photo.pointerdown', { x: e.clientX, y: e.clientY });
-            }}
-            onClick={() => {
-              if (isUploadingAvatar) return;
-              logPoint('profile_photo.click');
-              if (isSelf) {
-                setPhotoSheet('avatar');
-              } else {
-                setIsAvatarLightboxOpen(true);
-              }
-            }}
-            aria-label={isSelf ? "Change profile photo" : "View profile photo"}
-          >
-            {/* Avatar-on-cover: solid bg ring for separation --
-                canon exception, no hairline. */}
-            <div className="clbhouz-squircle absolute inset-0 bg-background" />
-
-            {/* Avatar image */}
+          <div className="relative w-[124px] h-[124px]">
             <div
-              className="clbhouz-squircle absolute overflow-hidden"
-              style={{
-                inset: '2px',
-                boxShadow: '0 12px 30px rgba(15,15,15,0.22)',
+              role="button"
+              tabIndex={0}
+              className="absolute inset-0 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7931E] focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
+              data-debug-id="profile-photo"
+              onPointerDown={(e) => {
+                logPoint('profile_photo.pointerdown', { x: e.clientX, y: e.clientY });
               }}
+              onClick={() => {
+                if (isUploadingAvatar) return;
+                logPoint('profile_photo.click');
+                if (isSelf) {
+                  setPhotoSheet('avatar');
+                } else {
+                  setIsAvatarLightboxOpen(true);
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  if (isUploadingAvatar) return;
+                  if (isSelf) setPhotoSheet('avatar');
+                  else setIsAvatarLightboxOpen(true);
+                }
+              }}
+              aria-label={isSelf ? "Change profile photo" : "View profile photo"}
             >
-              {profile?.profile_photo_url ? (
-                <img
-                  src={profile.profile_photo_url}
-                  alt={displayName}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-muted flex items-center justify-center text-3xl font-bold text-muted-foreground">
-                  {displayName.charAt(0)}
-                </div>
-              )}
+              {/* Avatar-on-cover: solid bg ring for separation --
+                  canon exception, no hairline. */}
+              <div className="clbhouz-squircle absolute inset-0 bg-background" />
+
+              {/* Avatar image */}
+              <div
+                className="clbhouz-squircle absolute overflow-hidden"
+                style={{
+                  inset: '2px',
+                  boxShadow: '0 12px 30px rgba(15,15,15,0.22)',
+                }}
+              >
+                {profile?.profile_photo_url ? (
+                  <img
+                    src={profile.profile_photo_url}
+                    alt={displayName}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-muted flex items-center justify-center text-3xl font-bold text-muted-foreground">
+                    {displayName.charAt(0)}
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Camera badge — bottom right, Instagram style */}
+            {/* Camera badge — sibling of the photo hit target so its taps aren't
+                swallowed by the outer interactive (nested-interactive fix). */}
             {isSelf && !isUploadingAvatar && (
-              <div
-                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center z-10"
+              <button
+                type="button"
+                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center z-20 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7931E]"
                 style={{
                   background: 'rgba(0, 0, 0, 0.55)',
                   backdropFilter: 'blur(8px)',
                   WebkitBackdropFilter: 'blur(8px)',
                   border: '2px solid white',
-                  cursor: 'pointer',
                 }}
-                onPointerDown={(e) => { logPoint('camera_badge.pointerdown', { x: e.clientX, y: e.clientY }); }}
+                onPointerDown={(e) => { e.stopPropagation(); logPoint('camera_badge.pointerdown', { x: e.clientX, y: e.clientY }); }}
                 onClick={(e) => { e.stopPropagation(); logPoint('camera_badge.click'); setPhotoSheet('avatar'); }}
-                role="button"
                 aria-label="Change profile photo"
               >
                 <Camera className="w-3.5 h-3.5 text-white" />
-              </div>
+              </button>
             )}
 
             {/* Spinner badge — shows during upload */}
             {isSelf && isUploadingAvatar && (
               <div
-                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center z-10"
+                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center z-20 pointer-events-none"
                 style={{
                   background: 'rgba(0, 0, 0, 0.55)',
                   border: '2px solid white',
@@ -709,7 +721,7 @@ const ProfilePageV2Content: React.FC = () => {
                 <div className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />
               </div>
             )}
-          </button>
+          </div>
         </div>
 
       </div>
