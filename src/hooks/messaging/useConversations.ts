@@ -5,9 +5,6 @@ import { useMessagingActor } from './useMessagingActor';
 import type { InboxConversation, InboxParticipant, ConversationType, MemberRole } from '@/types/messaging';
 import type { Json } from '@/integrations/supabase/types';
 
-function isInboxParticipantArray(value: Json): value is InboxParticipant[] {
-  return Array.isArray(value);
-}
 
 export function useConversations() {
   const actor = useMessagingActor();
