@@ -107,7 +107,7 @@ export interface UseWatchAutoplayResult {
 const EMPTY_SET: Set<number> = new Set();
 
 export function useWatchAutoplay(
-  { railId: _railId, enabled = true, posts, maxActive = 1 }: UseWatchAutoplayOptions,
+  { railId, enabled = true, posts, maxActive = 1 }: UseWatchAutoplayOptions,
 ): UseWatchAutoplayResult {
   const revealed = useWatchRevealed();
   const reducedMotion = usePrefersReducedMotion();
@@ -125,8 +125,14 @@ export function useWatchAutoplay(
   useEffect(() => { postsRef.current = posts; }, [posts]);
 
   const railRef = useCallback((el: HTMLElement | null) => {
+    // Stamp a scope marker on the container so nested useWatchAutoplay
+    // instances can be isolated: a tile "belongs" to the hook whose root is
+    // its NEAREST [data-autoplay-scope] ancestor. Prevents the outer feed
+    // observer from ever seeing (and mis-resolving) a nested rail's tiles.
+    if (el) el.setAttribute('data-autoplay-scope', railId);
     setRoot(el);
-  }, []);
+  }, [railId]);
+
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
@@ -214,8 +220,15 @@ export function useWatchAutoplay(
       }
     };
 
-    const observeTiles = (tiles: NodeListOf<HTMLElement> | HTMLElement[]) => {
-      tiles.forEach((t) => io.observe(t));
+
+
+
+    // A tile belongs to THIS hook iff its nearest [data-autoplay-scope]
+    // ancestor is our root. This isolates nested rails (e.g. QuickClips
+    // inside VideosFullFeed) so their tiles don't leak into the outer
+    // observer's index-space and cause wrong-lane borrows on tap.
+    const belongsToThisScope = (el: HTMLElement): boolean => {
+      return el.closest('[data-autoplay-scope]') === root;
     };
 
     const io = new IntersectionObserver(
@@ -252,13 +265,19 @@ export function useWatchAutoplay(
       { threshold: IO_THRESHOLDS },
     );
 
+    const observeOwnTiles = (candidates: NodeListOf<HTMLElement> | HTMLElement[]) => {
+      candidates.forEach((t) => {
+        if (belongsToThisScope(t)) io.observe(t);
+      });
+    };
+
     const initial = root.querySelectorAll<HTMLElement>('[data-watch-tile-index]');
-    observeTiles(initial);
+    observeOwnTiles(initial);
     scheduleRecompute();
 
     const mo = new MutationObserver(() => {
       const next = root.querySelectorAll<HTMLElement>('[data-watch-tile-index]');
-      observeTiles(next);
+      observeOwnTiles(next);
       scheduleRecompute();
     });
     mo.observe(root, { childList: true, subtree: true });
@@ -270,6 +289,7 @@ export function useWatchAutoplay(
       if (maxWaitTimer.current) { clearTimeout(maxWaitTimer.current); maxWaitTimer.current = null; }
       ratiosRef.current.clear();
     };
+
   }, [eligible, root, maxActive]);
 
   const outSet = eligible ? activeSet : EMPTY_SET;
