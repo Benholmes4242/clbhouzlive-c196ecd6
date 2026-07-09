@@ -613,6 +613,33 @@ export type Database = {
         }
         Relationships: []
       }
+      blocked_actors: {
+        Row: {
+          blocked_actor_id: string
+          blocked_actor_type: string
+          blocker_actor_id: string
+          blocker_actor_type: string
+          created_at: string
+          created_by_user: string
+        }
+        Insert: {
+          blocked_actor_id: string
+          blocked_actor_type: string
+          blocker_actor_id: string
+          blocker_actor_type: string
+          created_at?: string
+          created_by_user?: string
+        }
+        Update: {
+          blocked_actor_id?: string
+          blocked_actor_type?: string
+          blocker_actor_id?: string
+          blocker_actor_type?: string
+          created_at?: string
+          created_by_user?: string
+        }
+        Relationships: []
+      }
       business_access_requests: {
         Row: {
           business_id: string
@@ -2708,49 +2735,46 @@ export type Database = {
           },
         ]
       }
-      conversation_participants: {
+      conversation_members: {
         Row: {
           actor_id: string
           actor_type: string
           archived_at: string | null
-          conversation_id: string | null
+          conversation_id: string
           id: string
-          is_archived: boolean | null
-          is_muted: boolean | null
-          joined_at: string | null
-          last_read_at: string | null
-          role: string | null
-          user_id: string | null
+          joined_at: string
+          last_read_message_id: string | null
+          left_at: string | null
+          muted_until: string | null
+          role: string
         }
         Insert: {
           actor_id: string
-          actor_type?: string
+          actor_type: string
           archived_at?: string | null
-          conversation_id?: string | null
+          conversation_id: string
           id?: string
-          is_archived?: boolean | null
-          is_muted?: boolean | null
-          joined_at?: string | null
-          last_read_at?: string | null
-          role?: string | null
-          user_id?: string | null
+          joined_at?: string
+          last_read_message_id?: string | null
+          left_at?: string | null
+          muted_until?: string | null
+          role?: string
         }
         Update: {
           actor_id?: string
           actor_type?: string
           archived_at?: string | null
-          conversation_id?: string | null
+          conversation_id?: string
           id?: string
-          is_archived?: boolean | null
-          is_muted?: boolean | null
-          joined_at?: string | null
-          last_read_at?: string | null
-          role?: string | null
-          user_id?: string | null
+          joined_at?: string
+          last_read_message_id?: string | null
+          left_at?: string | null
+          muted_until?: string | null
+          role?: string
         }
         Relationships: [
           {
-            foreignKeyName: "conversation_participants_conversation_id_fkey"
+            foreignKeyName: "conversation_members_conversation_id_fkey"
             columns: ["conversation_id"]
             isOneToOne: false
             referencedRelation: "conversations"
@@ -2761,48 +2785,39 @@ export type Database = {
       conversations: {
         Row: {
           avatar_url: string | null
-          created_at: string | null
-          created_by: string | null
-          deleted_at: string | null
-          deleted_by: string | null
-          description: string | null
-          group_settings: Json | null
+          created_at: string
+          created_by_user: string | null
+          dm_key: string | null
           id: string
-          last_message_at: string | null
+          last_message_at: string
           last_message_preview: string | null
-          name: string | null
+          title: string | null
           type: string
-          updated_at: string | null
+          updated_at: string
         }
         Insert: {
           avatar_url?: string | null
-          created_at?: string | null
-          created_by?: string | null
-          deleted_at?: string | null
-          deleted_by?: string | null
-          description?: string | null
-          group_settings?: Json | null
+          created_at?: string
+          created_by_user?: string | null
+          dm_key?: string | null
           id?: string
-          last_message_at?: string | null
+          last_message_at?: string
           last_message_preview?: string | null
-          name?: string | null
+          title?: string | null
           type: string
-          updated_at?: string | null
+          updated_at?: string
         }
         Update: {
           avatar_url?: string | null
-          created_at?: string | null
-          created_by?: string | null
-          deleted_at?: string | null
-          deleted_by?: string | null
-          description?: string | null
-          group_settings?: Json | null
+          created_at?: string
+          created_by_user?: string | null
+          dm_key?: string | null
           id?: string
-          last_message_at?: string | null
+          last_message_at?: string
           last_message_preview?: string | null
-          name?: string | null
+          title?: string | null
           type?: string
-          updated_at?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -3766,35 +3781,6 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
-      }
-      deleted_message_users: {
-        Row: {
-          deleted_at: string
-          id: string
-          message_id: string
-          user_id: string
-        }
-        Insert: {
-          deleted_at?: string
-          id?: string
-          message_id: string
-          user_id: string
-        }
-        Update: {
-          deleted_at?: string
-          id?: string
-          message_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "deleted_message_users_message_id_fkey"
-            columns: ["message_id"]
-            isOneToOne: false
-            referencedRelation: "messages"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       discover_rail_cache: {
         Row: {
@@ -6455,97 +6441,6 @@ export type Database = {
         }
         Relationships: []
       }
-      hub_conversation_members: {
-        Row: {
-          conversation_id: string
-          id: string
-          joined_at: string
-          last_read_at: string | null
-          user_id: string
-        }
-        Insert: {
-          conversation_id: string
-          id?: string
-          joined_at?: string
-          last_read_at?: string | null
-          user_id: string
-        }
-        Update: {
-          conversation_id?: string
-          id?: string
-          joined_at?: string
-          last_read_at?: string | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "hub_conversation_members_conversation_id_fkey"
-            columns: ["conversation_id"]
-            isOneToOne: false
-            referencedRelation: "hub_conversations"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      hub_conversations: {
-        Row: {
-          conversation_type: string
-          created_at: string
-          id: string
-          title: string | null
-          updated_at: string
-        }
-        Insert: {
-          conversation_type?: string
-          created_at?: string
-          id?: string
-          title?: string | null
-          updated_at?: string
-        }
-        Update: {
-          conversation_type?: string
-          created_at?: string
-          id?: string
-          title?: string | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      hub_messages: {
-        Row: {
-          body: string
-          conversation_id: string
-          created_at: string
-          id: string
-          read_at: string | null
-          sender_id: string
-        }
-        Insert: {
-          body: string
-          conversation_id: string
-          created_at?: string
-          id?: string
-          read_at?: string | null
-          sender_id: string
-        }
-        Update: {
-          body?: string
-          conversation_id?: string
-          created_at?: string
-          id?: string
-          read_at?: string | null
-          sender_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "hub_messages_conversation_id_fkey"
-            columns: ["conversation_id"]
-            isOneToOne: false
-            referencedRelation: "hub_conversations"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       invite_requests: {
         Row: {
           club: string | null
@@ -6845,27 +6740,59 @@ export type Database = {
         }
         Relationships: []
       }
-      message_reactions: {
+      message_hidden: {
         Row: {
-          created_at: string | null
-          emoji: string
-          id: string
-          message_id: string | null
-          user_id: string | null
+          actor_id: string
+          actor_type: string
+          hidden_at: string
+          message_id: string
         }
         Insert: {
-          created_at?: string | null
-          emoji: string
-          id?: string
-          message_id?: string | null
-          user_id?: string | null
+          actor_id: string
+          actor_type: string
+          hidden_at?: string
+          message_id: string
         }
         Update: {
-          created_at?: string | null
+          actor_id?: string
+          actor_type?: string
+          hidden_at?: string
+          message_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_hidden_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      message_reactions: {
+        Row: {
+          actor_id: string
+          actor_type: string
+          created_at: string
+          emoji: string
+          message_id: string
+          user_id: string
+        }
+        Insert: {
+          actor_id: string
+          actor_type: string
+          created_at?: string
+          emoji: string
+          message_id: string
+          user_id?: string
+        }
+        Update: {
+          actor_id?: string
+          actor_type?: string
+          created_at?: string
           emoji?: string
-          id?: string
-          message_id?: string | null
-          user_id?: string | null
+          message_id?: string
+          user_id?: string
         }
         Relationships: [
           {
@@ -6877,92 +6804,54 @@ export type Database = {
           },
         ]
       }
-      message_read_receipts: {
-        Row: {
-          id: string
-          message_id: string | null
-          read_at: string | null
-          user_id: string | null
-        }
-        Insert: {
-          id?: string
-          message_id?: string | null
-          read_at?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          id?: string
-          message_id?: string | null
-          read_at?: string | null
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "message_read_receipts_message_id_fkey"
-            columns: ["message_id"]
-            isOneToOne: false
-            referencedRelation: "messages"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       messages: {
         Row: {
-          content: string | null
-          conversation_id: string | null
-          created_at: string | null
+          attachments: Json | null
+          body: string | null
+          client_id: string | null
+          conversation_id: string
+          created_at: string
           deleted_at: string | null
-          delivered_at: string | null
-          delivery_status: string | null
           edited_at: string | null
           id: string
-          is_edited: boolean | null
-          media_metadata: Json | null
-          media_url: string | null
-          message_type: string | null
-          read_at: string | null
+          metadata: Json | null
           reply_to_id: string | null
           sender_actor_id: string
           sender_actor_type: string
-          sender_id: string | null
+          sender_user_id: string
+          type: string
         }
         Insert: {
-          content?: string | null
-          conversation_id?: string | null
-          created_at?: string | null
+          attachments?: Json | null
+          body?: string | null
+          client_id?: string | null
+          conversation_id: string
+          created_at?: string
           deleted_at?: string | null
-          delivered_at?: string | null
-          delivery_status?: string | null
           edited_at?: string | null
           id?: string
-          is_edited?: boolean | null
-          media_metadata?: Json | null
-          media_url?: string | null
-          message_type?: string | null
-          read_at?: string | null
+          metadata?: Json | null
           reply_to_id?: string | null
           sender_actor_id: string
-          sender_actor_type?: string
-          sender_id?: string | null
+          sender_actor_type: string
+          sender_user_id?: string
+          type?: string
         }
         Update: {
-          content?: string | null
-          conversation_id?: string | null
-          created_at?: string | null
+          attachments?: Json | null
+          body?: string | null
+          client_id?: string | null
+          conversation_id?: string
+          created_at?: string
           deleted_at?: string | null
-          delivered_at?: string | null
-          delivery_status?: string | null
           edited_at?: string | null
           id?: string
-          is_edited?: boolean | null
-          media_metadata?: Json | null
-          media_url?: string | null
-          message_type?: string | null
-          read_at?: string | null
+          metadata?: Json | null
           reply_to_id?: string | null
           sender_actor_id?: string
           sender_actor_type?: string
-          sender_id?: string | null
+          sender_user_id?: string
+          type?: string
         }
         Relationships: [
           {
@@ -8831,15 +8720,7 @@ export type Database = {
           reviewed_by?: string | null
           status?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "reports_reported_conversation_id_fkey"
-            columns: ["reported_conversation_id"]
-            isOneToOne: false
-            referencedRelation: "conversations"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       review_responses: {
         Row: {
@@ -8993,35 +8874,6 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "user_profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      saved_messages: {
-        Row: {
-          created_at: string | null
-          id: string
-          message_id: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          message_id: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          message_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "saved_messages_message_id_fkey"
-            columns: ["message_id"]
-            isOneToOne: false
-            referencedRelation: "messages"
             referencedColumns: ["id"]
           },
         ]
@@ -12112,15 +11964,7 @@ export type Database = {
           started_at?: string | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "typing_indicators_conversation_id_fkey"
-            columns: ["conversation_id"]
-            isOneToOne: false
-            referencedRelation: "conversations"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       user_achievements: {
         Row: {
@@ -16606,25 +16450,6 @@ export type Database = {
         Args: { p_evidence_url?: string; p_note?: string; p_request_id: string }
         Returns: undefined
       }
-      add_group_members: {
-        Args: { p_conversation_id: string; p_user_ids: string[] }
-        Returns: number
-      }
-      add_message_reaction: {
-        Args: { p_emoji: string; p_message_id: string }
-        Returns: string
-      }
-      add_system_message: {
-        Args: {
-          p_actor_id?: string
-          p_actor_name?: string
-          p_conversation_id: string
-          p_event_type: string
-          p_user_id: string
-          p_user_name: string
-        }
-        Returns: string
-      }
       addauth: { Args: { "": string }; Returns: boolean }
       addgeometrycolumn:
         | {
@@ -16880,19 +16705,6 @@ export type Database = {
         }
         Returns: string
       }
-      create_group_conversation:
-        | {
-            Args: { group_name: string; participant_ids: string[] }
-            Returns: string
-          }
-        | {
-            Args: {
-              group_avatar_url?: string
-              group_name: string
-              participant_ids: string[]
-            }
-            Returns: string
-          }
       current_auth_uid: { Args: never; Returns: string }
       decline_golfer_verification_invite: {
         Args: { p_note?: string; p_request_id: string }
@@ -16906,7 +16718,6 @@ export type Database = {
         Args: { p_business_id: string; p_user_profile_id: string }
         Returns: boolean
       }
-      delete_group: { Args: { p_conversation_id: string }; Returns: boolean }
       delete_message_for_me: {
         Args: { p_message_id: string }
         Returns: undefined
@@ -17486,14 +17297,6 @@ export type Database = {
           start_date: string
         }[]
       }
-      get_actor_dm_unread_counts: {
-        Args: never
-        Returns: {
-          actor_id: string
-          actor_type: string
-          unread_count: number
-        }[]
-      }
       get_actor_social_counts: {
         Args: { p_actor_id: string; p_actor_type: string }
         Returns: {
@@ -17709,14 +17512,6 @@ export type Database = {
           stream_id: string
           total_seconds: number
           width: number
-        }[]
-      }
-      get_conversation_last_senders: {
-        Args: { p_conversation_ids: string[] }
-        Returns: {
-          conversation_id: string
-          created_at: string
-          sender_id: string
         }[]
       }
       get_countries_leaderboard: {
@@ -18590,17 +18385,6 @@ export type Database = {
           total_rounds: number
         }[]
       }
-      get_or_create_dm_conversation:
-        | { Args: { other_user_id: string }; Returns: string }
-        | {
-            Args: {
-              p_caller_actor_id?: string
-              p_caller_actor_type?: string
-              p_target_actor_id: string
-              p_target_actor_type: string
-            }
-            Returns: string
-          }
       get_played_unrated_courses: {
         Args: { p_user_id: string }
         Returns: {
@@ -19351,7 +19135,6 @@ export type Database = {
         }
         Returns: Json
       }
-      get_unread_count: { Args: { p_conversation_id: string }; Returns: number }
       get_user_achievements_for_viewer: {
         Args: { p_user_id: string }
         Returns: {
@@ -19850,18 +19633,12 @@ export type Database = {
         Args: { _conversation_id: string; _user_id?: string }
         Returns: boolean
       }
-      is_message_saved: { Args: { p_message_id: string }; Returns: boolean }
       is_mobile_device: { Args: never; Returns: boolean }
       is_panel_admin: { Args: never; Returns: boolean }
       is_thread_member: { Args: { _thread_id: string }; Returns: boolean }
       is_user_blocked: {
         Args: { p_blocked_id: string; p_blocker_id: string }
         Returns: boolean
-      }
-      leave_group: { Args: { p_conversation_id: string }; Returns: boolean }
-      leave_group_conversation: {
-        Args: { p_conversation_id: string }
-        Returns: undefined
       }
       log_user_achievement: {
         Args: { p_event: string; p_metadata: Json; p_user_id: string }
@@ -19872,21 +19649,7 @@ export type Database = {
         Args: { p_conversation_id: string }
         Returns: undefined
       }
-      mark_conversation_read:
-        | { Args: { p_conversation_id: string }; Returns: undefined }
-        | {
-            Args: {
-              p_actor_id?: string
-              p_actor_type?: string
-              p_conversation_id: string
-            }
-            Returns: undefined
-          }
       mark_message_read: { Args: { p_message_id: string }; Returns: undefined }
-      mark_messages_read_in_conversation: {
-        Args: { p_conversation_id: string }
-        Returns: undefined
-      }
       mark_today_visited: { Args: never; Returns: undefined }
       match_tour_rankings_players: { Args: never; Returns: undefined }
       match_whs_course_to_golf_course: {
@@ -20076,14 +19839,6 @@ export type Database = {
         Args: { p_note?: string; p_user_id: string }
         Returns: undefined
       }
-      remove_group_member: {
-        Args: { p_conversation_id: string; p_user_id: string }
-        Returns: boolean
-      }
-      remove_message_reaction: {
-        Args: { p_emoji: string; p_message_id: string }
-        Returns: undefined
-      }
       reorder_after_removal: {
         Args: { p_course_ids: string[]; p_user_id: string }
         Returns: undefined
@@ -20219,31 +19974,6 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: undefined
       }
-      send_message:
-        | {
-            Args: {
-              p_content: string
-              p_conversation_id: string
-              p_media_metadata?: Json
-              p_media_url?: string
-              p_message_type?: string
-              p_reply_to_id?: string
-            }
-            Returns: string
-          }
-        | {
-            Args: {
-              p_content: string
-              p_conversation_id: string
-              p_media_metadata: Json
-              p_media_url: string
-              p_message_type: string
-              p_reply_to_id: string
-              p_sender_actor_id: string
-              p_sender_actor_type: string
-            }
-            Returns: string
-          }
       send_push_notification: {
         Args: {
           data?: Json
@@ -20947,15 +20677,6 @@ export type Database = {
         Args: { p_friend_id: string; p_new_status: string; p_user_id: string }
         Returns: undefined
       }
-      toggle_conversation_archive: {
-        Args: { p_archive: boolean; p_conversation_id: string }
-        Returns: boolean
-      }
-      toggle_conversation_mute: {
-        Args: { p_conversation_id: string; p_mute: boolean }
-        Returns: undefined
-      }
-      toggle_saved_message: { Args: { p_message_id: string }; Returns: boolean }
       toggle_whs_round_reaction: {
         Args: { p_reaction_type?: string; p_score_id: string }
         Returns: {
@@ -21020,27 +20741,6 @@ export type Database = {
         Args: { p_notes?: string; p_profile_id: string; p_status: string }
         Returns: undefined
       }
-      update_group_info: {
-        Args: {
-          p_avatar_url?: string
-          p_conversation_id: string
-          p_description?: string
-          p_name?: string
-        }
-        Returns: boolean
-      }
-      update_member_role: {
-        Args: {
-          p_conversation_id: string
-          p_new_role: string
-          p_user_id: string
-        }
-        Returns: boolean
-      }
-      update_message_delivery_status: {
-        Args: { p_message_id: string; p_status: string }
-        Returns: undefined
-      }
       update_mobile_crop_data: {
         Args: {
           p_crop_height: number
@@ -21091,10 +20791,6 @@ export type Database = {
           p_whs_name_norm: string
         }
         Returns: undefined
-      }
-      user_in_conversation: {
-        Args: { p_conversation_id: string }
-        Returns: boolean
       }
       user_is_conversation_participant: {
         Args: { check_user_id: string; conv_id: string }
