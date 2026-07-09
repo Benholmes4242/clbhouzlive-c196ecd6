@@ -30,7 +30,7 @@ import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useBusinessImageUpload } from '@/hooks/useBusinessImageUpload';
 import { useBusinessTeam } from '@/hooks/useBusinessTeam';
-import { useStartDM } from '@/hooks/useStartDM';
+import { useStartConversation } from '@/hooks/messaging/useStartConversation';
 
 import { Button } from '@/components/ui/button';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
@@ -142,7 +142,7 @@ const BusinessProfilePage: React.FC = () => {
     viewerActorId,
   });
   const toggleFollow = useToggleFollow();
-  const { startDM, isStarting: isStartingDM } = useStartDM();
+  const { start: startConversation, isStarting: isStartingDM } = useStartConversation();
 
   const { uploadLogo, removeLogo, uploadCover, removeCover, uploadingLogo, uploadingCover } =
     useBusinessImageUpload(business?.id);
