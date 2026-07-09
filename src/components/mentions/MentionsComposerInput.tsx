@@ -519,9 +519,32 @@ export function MentionsComposerInput({
   style,
   inputRef,
   textStyle,
+  currentUserId,
 }: Props) {
   const mentionsStyle = React.useMemo(() => buildMentionsStyle(textStyle), [textStyle]);
   const anchorRef = React.useRef<HTMLDivElement | null>(null);
+
+  // Exclude set — self + everyone already mentioned in the current draft.
+  // Derived from live `value`, so removing a mention chip re-enables that
+  // person automatically. Keys match `${kind}:${uuid}` shape emitted by
+  // searchMentions row ids.
+  const excludeKeys = React.useMemo(() => {
+    const set = new Set<string>();
+    if (currentUserId) set.add(`u:${currentUserId}`);
+    for (const m of extractMentions(value)) {
+      set.add(`${m.entityType === 'business' ? 'b' : 'u'}:${m.entityId}`);
+    }
+    return set;
+  }, [value, currentUserId]);
+  // Stable ref for the react-mentions data callback so its identity is
+  // stable across renders but always reads the latest exclude set.
+  const excludeKeysRef = React.useRef(excludeKeys);
+  React.useEffect(() => { excludeKeysRef.current = excludeKeys; }, [excludeKeys]);
+  const dataFn = React.useCallback(
+    (q: string, render: (d: SuggestionDataItem[]) => void) =>
+      searchMentions(q, render, excludeKeysRef.current),
+    [],
+  );
 
   // Server-render / test safety: only enable the portal once we know
   // document.body exists. React-mentions treats a falsy portal host
