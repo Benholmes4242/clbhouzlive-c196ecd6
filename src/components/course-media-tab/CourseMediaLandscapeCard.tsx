@@ -101,7 +101,7 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
         background: INK_TINT_04,
       }}
       className="transition-transform"
-    >{'\n'}
+    >
       {thumbnailUrl ? (
         <img
           src={thumbnailUrl}
