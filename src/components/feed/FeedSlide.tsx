@@ -413,9 +413,17 @@ const FullscreenVideoSlot: React.FC<{
   // Fire onFirstFrameReady ONLY when the engine has painted the real frame
   // at (or past) startPosition — for non-borrow slides. Borrow slide fires
   // it from <BorrowedFullscreenSlot/> on the next rAF post-mount.
+  //
+  // STALL SAFETY NET: once the lane is in 'playing' state we also consider
+  // the video revealable even when the target seek hasn't visibly committed.
+  // This prevents the "poster + blur, never plays" hang that occurred when a
+  // stale resume `startPosition` never resolved via seeked/timeupdate —
+  // playback is happening, so show it (even from t=0) rather than trap the
+  // user behind the poster.
   const firedRef = React.useRef(false);
   const targetReady = startPosition <= 0 || lane.snapshot.currentTime >= startPosition - 0.3;
-  const showVideo = lane.snapshot.firstFrame && targetReady;
+  const isPlayingState = lane.snapshot.state === 'playing';
+  const showVideo = lane.snapshot.firstFrame && (targetReady || isPlayingState);
 
   React.useEffect(() => {
     if (isBorrowSlide) return;
