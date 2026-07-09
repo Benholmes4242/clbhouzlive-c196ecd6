@@ -697,8 +697,21 @@ const ProfilePageV2Content: React.FC = () => {
             {isSelf && !isUploadingAvatar && (
               <button
                 type="button"
-                onClick={() => setPhotoSheet('avatar')}
-                className="absolute z-20 pointer-events-auto cursor-pointer rounded-[34%]"
+                onPointerDown={(e) => {
+                  const el = document.elementFromPoint(e.clientX, e.clientY);
+                  // eslint-disable-next-line no-console
+                  console.log('[AVATAR_TAP] pointerdown', {
+                    x: Math.round(e.clientX), y: Math.round(e.clientY),
+                    topEl: (el?.tagName ?? '') + '.' + (el?.className?.toString().slice(0, 40) ?? ''),
+                    isThisButton: el === e.currentTarget,
+                  });
+                }}
+                onClick={() => {
+                  // eslint-disable-next-line no-console
+                  console.log('[AVATAR_TAP] click fired -> opening sheet');
+                  setPhotoSheet('avatar');
+                }}
+                className="absolute z-20 pointer-events-auto cursor-pointer"
                 style={{ inset: '-14px', background: 'transparent', border: 'none' }}
                 aria-label="Change profile photo"
               />
@@ -706,8 +719,21 @@ const ProfilePageV2Content: React.FC = () => {
             {!isSelf && (
               <button
                 type="button"
-                onClick={() => setIsAvatarLightboxOpen(true)}
-                className="absolute z-20 pointer-events-auto cursor-pointer rounded-[34%]"
+                onPointerDown={(e) => {
+                  const el = document.elementFromPoint(e.clientX, e.clientY);
+                  // eslint-disable-next-line no-console
+                  console.log('[AVATAR_TAP] pointerdown', {
+                    x: Math.round(e.clientX), y: Math.round(e.clientY),
+                    topEl: (el?.tagName ?? '') + '.' + (el?.className?.toString().slice(0, 40) ?? ''),
+                    isThisButton: el === e.currentTarget,
+                  });
+                }}
+                onClick={() => {
+                  // eslint-disable-next-line no-console
+                  console.log('[AVATAR_TAP] click fired -> opening sheet');
+                  setIsAvatarLightboxOpen(true);
+                }}
+                className="absolute z-20 pointer-events-auto cursor-pointer"
                 style={{ inset: '-14px', background: 'transparent', border: 'none' }}
                 aria-label="View profile photo"
               />
