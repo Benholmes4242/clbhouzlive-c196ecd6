@@ -688,7 +688,8 @@ const ProfilePageV2Content: React.FC = () => {
                   border: '2px solid white',
                   cursor: 'pointer',
                 }}
-                onClick={(e) => { e.stopPropagation(); setPhotoSheet('avatar'); }}
+                onPointerDown={(e) => { logPoint('camera_badge.pointerdown', { x: e.clientX, y: e.clientY }); }}
+                onClick={(e) => { e.stopPropagation(); logPoint('camera_badge.click'); setPhotoSheet('avatar'); }}
                 role="button"
                 aria-label="Change profile photo"
               >
