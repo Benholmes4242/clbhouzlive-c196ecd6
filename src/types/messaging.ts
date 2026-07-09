@@ -73,4 +73,8 @@ export interface ThreadMessage {
   deleted_at: string | null;
   created_at: string;
   reactions: MessageReaction[];
+  /** Client-only: set by the send hook to render sending/failed states. */
+  status?: 'sending' | 'sent' | 'failed';
+  /** Idempotency key. Server rows include this; optimistic rows set it too. */
+  client_id?: string | null;
 }
