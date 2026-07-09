@@ -40,7 +40,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MentionsInput, Mention, type SuggestionDataItem } from 'react-mentions';
 
-import { CheckCircle2, Building2 } from 'lucide-react';
+import { CheckCircle2, Building2, AtSign } from 'lucide-react';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { supabase } from '@/integrations/supabase/client';
 import { Z } from '@/config/zIndex';
@@ -50,7 +50,7 @@ const INK_SUBTLE = '#94A3B8';
 const AMBER = '#F7931E';
 const BORDER = 'rgba(15,23,42,0.10)';
 
-const PANEL_MAX_HEIGHT = 5 * 44 + 8; // 5 rows scrollable
+const PANEL_MAX_HEIGHT = 6 * 44 + 44 + 8; // 6 rows + eyebrow header + gutter
 const PANEL_GAP = 6;                 // px between panel and anchor
 
 /** react-mentions passes `id` as a string; we encode `${kind}:${uuid}` there. */
