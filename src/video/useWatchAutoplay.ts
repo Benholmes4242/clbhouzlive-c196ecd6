@@ -104,15 +104,19 @@ export interface UseWatchAutoplayResult {
  * Owns the intersection observer + activation policy for a Watch rail/grid.
  * Attach the returned `railRef` to the tile container.
  */
+const EMPTY_SET: Set<number> = new Set();
+
 export function useWatchAutoplay(
-  { railId: _railId, enabled = true, posts }: UseWatchAutoplayOptions,
+  { railId: _railId, enabled = true, posts, maxActive = 1 }: UseWatchAutoplayOptions,
 ): UseWatchAutoplayResult {
   const revealed = useWatchRevealed();
   const reducedMotion = usePrefersReducedMotion();
   const [docVisible, setDocVisible] = useState(
     typeof document === 'undefined' ? true : !document.hidden,
   );
-  const [activeIdx, setActiveIdx] = useState<number | null>(null);
+  // Active set. Size ≤ maxActive. For single-active callers this is always
+  // {} or a singleton — behavior unchanged. Grid uses maxActive=3.
+  const [activeSet, setActiveSet] = useState<Set<number>>(() => new Set());
   const [root, setRoot] = useState<HTMLElement | null>(null);
 
   // Keep a ref to posts so the IO callback (inside a stable effect) can
@@ -143,36 +147,56 @@ export function useWatchAutoplay(
 
   useEffect(() => {
     if (!eligible) {
-      setActiveIdx(null);
+      setActiveSet(new Set());
       ratiosRef.current.clear();
       return;
     }
     if (!root) return;
 
     const recompute = () => {
-      let bestIdx = -1;
-      let bestRatio = 0;
+      // Rank tracked tiles by visibility, best-first.
+      const ranked: Array<{ idx: number; ratio: number }> = [];
       ratiosRef.current.forEach((ratio, idx) => {
-        if (ratio > bestRatio) {
-          bestRatio = ratio;
-          bestIdx = idx;
-        }
+        ranked.push({ idx, ratio });
       });
+      ranked.sort((a, b) => b.ratio - a.ratio);
 
-      setActiveIdx((prev) => {
-        const prevRatio = prev != null ? (ratiosRef.current.get(prev) ?? 0) : 0;
-        // Keep incumbent while still >= PLAY_OUT and nobody clearly beats it.
-        if (prev != null && prevRatio >= PLAY_OUT && bestRatio - prevRatio < HYSTERESIS) {
-          return prev;
+      setActiveSet((prev) => {
+        const next = new Set<number>();
+
+        // 1) Keep incumbents that still clear PLAY_OUT (hysteresis) — top-N
+        //    of the still-visible incumbents fill first so a rested set of
+        //    tiles doesn't churn under micro-scroll.
+        for (const { idx, ratio } of ranked) {
+          if (next.size >= maxActive) break;
+          if (prev.has(idx) && ratio >= PLAY_OUT) next.add(idx);
         }
-        // Promote a challenger that has cleared PLAY_IN.
-        if (bestIdx >= 0 && bestRatio >= PLAY_IN) return bestIdx;
-        // Between-tiles: hold the incumbent if it's still barely visible.
-        if (prev != null && prevRatio >= PLAY_OUT) return prev;
-        // Cold start / everyone dropped out: pick the most-visible if it
-        // clears PLAY_OUT — otherwise release the slot.
-        if (bestIdx >= 0 && bestRatio >= PLAY_OUT) return bestIdx;
-        return null;
+
+        // 2) Fill remaining slots with fresh challengers that cleared PLAY_IN.
+        //    "Play on entry" — a tile crossing PLAY_IN joins the active set
+        //    up to maxActive, without needing to win most-visible.
+        for (const { idx, ratio } of ranked) {
+          if (next.size >= maxActive) break;
+          if (next.has(idx)) continue;
+          if (ratio >= PLAY_IN) next.add(idx);
+        }
+
+        // 3) Cold-start fallback: if nothing cleared PLAY_IN yet, admit the
+        //    most-visible tile that at least reaches PLAY_OUT so the surface
+        //    isn't dead on first paint.
+        if (next.size === 0) {
+          for (const { idx, ratio } of ranked) {
+            if (ratio >= PLAY_OUT) { next.add(idx); break; }
+          }
+        }
+
+        // Stable-ref shortcut when the set is identical.
+        if (prev.size === next.size) {
+          let same = true;
+          for (const v of prev) if (!next.has(v)) { same = false; break; }
+          if (same) return prev;
+        }
+        return next;
       });
     };
 
@@ -185,8 +209,6 @@ export function useWatchAutoplay(
     const scheduleRecompute = () => {
       if (settleTimer.current) clearTimeout(settleTimer.current);
       settleTimer.current = setTimeout(runRecompute, SETTLE_MS);
-      // Max-wait ceiling: even if bursts keep resetting the trailing timer,
-      // force a recompute so landing activation lands during hydration churn.
       if (!maxWaitTimer.current) {
         maxWaitTimer.current = setTimeout(runRecompute, MAX_SETTLE_MS);
       }
@@ -207,17 +229,12 @@ export function useWatchAutoplay(
           if (Number.isNaN(idx)) continue;
           if (entry.isIntersecting) {
             ratiosRef.current.set(idx, entry.intersectionRatio);
-            // Approach-warm: tiles entering the viewport (ratio in the
-            // approach band) are the next tap/promote candidates. Warm the
-            // manifest + first segment via PrefetchController — idempotent,
-            // LRU-deduped, capped at 2 in-flight, saveData/2g skips. Skipped
-            // when no posts list is wired.
+            // Approach-warm: EVERY visible tile is a candidate for tap →
+            // warm manifest+first segment via PrefetchController. Coverage
+            // widened (no upper bound) so tiles fully in-view but outside
+            // the top-N active set still get cache-warmed for cold opens.
             const list = postsRef.current;
-            if (
-              list &&
-              entry.intersectionRatio >= APPROACH_MIN &&
-              entry.intersectionRatio <= APPROACH_MAX
-            ) {
+            if (list && entry.intersectionRatio >= APPROACH_MIN) {
               const post = list[idx];
               const media = post?.mediaItems?.find((m) => m.type === 'video');
               const hlsUrl = (media as any)?.hlsUrl as string | undefined;
@@ -237,11 +254,8 @@ export function useWatchAutoplay(
 
     const initial = root.querySelectorAll<HTMLElement>('[data-watch-tile-index]');
     observeTiles(initial);
-    // Kick a recompute after initial observe so IO's async first-batch delivery
-    // has a pending compute even if hydration bursts start immediately.
     scheduleRecompute();
 
-    // Re-scan on DOM mutations (feeds paginate / rails hydrate late).
     const mo = new MutationObserver(() => {
       const next = root.querySelectorAll<HTMLElement>('[data-watch-tile-index]');
       observeTiles(next);
@@ -256,10 +270,21 @@ export function useWatchAutoplay(
       if (maxWaitTimer.current) { clearTimeout(maxWaitTimer.current); maxWaitTimer.current = null; }
       ratiosRef.current.clear();
     };
-  }, [eligible, root]);
+  }, [eligible, root, maxActive]);
 
-  return { activeIdx: eligible ? activeIdx : null, railRef };
-
+  const outSet = eligible ? activeSet : EMPTY_SET;
+  // activeIdx = highest-visibility member of the set (back-compat).
+  let activeIdx: number | null = null;
+  if (outSet.size > 0) {
+    let bestIdx = -1;
+    let bestRatio = -1;
+    for (const idx of outSet) {
+      const r = ratiosRef.current.get(idx) ?? 0;
+      if (r > bestRatio) { bestRatio = r; bestIdx = idx; }
+    }
+    activeIdx = bestIdx >= 0 ? bestIdx : null;
+  }
+  return { activeIdx, activeIndices: outSet, railRef };
 }
 
 export default useWatchAutoplay;
