@@ -65,7 +65,7 @@ const WatchGrid: React.FC<WatchGridProps> = ({
   const sentinelRef = useRef<HTMLDivElement>(null);
   const decodedCountRef = useRef(0);
   const firedRef = useRef(false);
-  const { activeIdx, railRef: autoplayRef } = useWatchAutoplay({ railId: 'watch-grid' });
+  const { activeIdx, railRef: autoplayRef } = useWatchAutoplay({ railId: 'watch-grid', posts });
   const setGridRef = useCallback((el: HTMLDivElement | null) => {
     autoplayRef(el);
     if (gridRef) (gridRef as React.MutableRefObject<HTMLDivElement | null>).current = el;

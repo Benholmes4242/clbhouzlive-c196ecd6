@@ -164,6 +164,24 @@ export function useRailLane(opts: UseRailLaneOptions): UseRailLaneResult {
     });
   }, [laneId]);
 
+  // Rested-tile quality upshift. Rails cold-start with `startLevel: 0` +
+  // `capLevelToPlayerSize` (RAIL_HLS_OVERRIDES) so scroll-through stays on
+  // the lowest rung — good for bandwidth, bad for a tile the user actually
+  // sits on. After the tile has been active AND painted for REST_MS we
+  // nudge hls.js to re-evaluate the cap so it can upshift to the level
+  // appropriate for the rendered size (hero cards benefit most). The dwell
+  // filters out fast scroll-throughs — we only pay the upshift cost when
+  // the user rests. Only the currently-rested tile upshifts; scrolling
+  // tiles stay capped. Nudge is idempotent and a no-op on native HLS lanes.
+  useEffect(() => {
+    if (!laneId || !ready) return;
+    const REST_MS = 400;
+    const t = window.setTimeout(() => {
+      try { VideoEngine.nudgeLevelCap(laneId); } catch { /* noop */ }
+    }, REST_MS);
+    return () => window.clearTimeout(t);
+  }, [laneId, ready]);
+
   return { hostRef, laneId, ready };
 }
 

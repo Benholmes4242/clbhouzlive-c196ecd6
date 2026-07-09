@@ -26,7 +26,7 @@ export default function LatestVideosRail() {
 
   const { posts, isLoading, hasResolved } = useVideosFeed({ userId, filter: 'latest' });
 
-  const { activeIdx, railRef } = useWatchAutoplay({ railId: 'latest-videos' });
+  const { activeIdx, railRef } = useWatchAutoplay({ railId: 'latest-videos', posts });
 
 
   const { settled: firstVisibleDecoded, onDecoded } = useFirstVisibleDecoded(posts.length, VISIBLE_COUNT);

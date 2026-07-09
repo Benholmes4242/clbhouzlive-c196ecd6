@@ -32,15 +32,30 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { useWatchRevealed } from '@/components/watch/WatchRevealContext';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { PrefetchController } from './PrefetchController';
+import type { FeedPost } from '@/components/media-system/types/media';
 
-const PLAY_IN = 0.5;
-const PLAY_OUT = 0.35;
+// PLAY_IN/OUT match CardFeed's early-activation stance (CardFeed.tsx:236-237)
+// so watch tiles begin muted playback AS they enter the viewport, not once
+// they're past the centre — kills the "playing when half in-view" lag while
+// respecting the existing single-active-per-rail rule (an early promotion
+// simply replaces the incumbent).
+const PLAY_IN = 0.30;
+const PLAY_OUT = 0.20;
 const HYSTERESIS = 0.1;
 const SETTLE_MS = 80;
 // Max-wait ceiling: guarantees recompute runs even under continuous IO bursts
 // (hydration churn on masonry/full-feed grids can otherwise starve the trailing
 // debounce indefinitely, leaving landing activation stuck at null until scroll).
 const MAX_SETTLE_MS = 250;
+
+// Approach-warming band: a tile whose visible fraction is between these bounds
+// is entering the viewport and is a strong candidate for the next tap/promote.
+// Warm its manifest+first-segment via PrefetchController (max 2 in-flight,
+// saveData/2g skips, LRU dedupe) so promotion / cold fullscreen open hits
+// warm cache instead of a cold HLS attach.
+const APPROACH_MIN = 0.02;
+const APPROACH_MAX = 0.4;
 
 const IO_THRESHOLDS = [0, 0.1, 0.2, 0.3, 0.35, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0];
 
@@ -49,6 +64,13 @@ export interface UseWatchAutoplayOptions {
   railId: string;
   /** Master gate. Defaults to true. */
   enabled?: boolean;
+  /**
+   * Optional post list aligned with `data-watch-tile-index`. When provided,
+   * the hook drives PrefetchController warming for tiles that are entering
+   * the viewport (approach band) — kills the multi-second cold fullscreen
+   * open for tiles that never won activation.
+   */
+  posts?: FeedPost[];
 }
 
 export interface UseWatchAutoplayResult {
@@ -70,7 +92,7 @@ export interface UseWatchAutoplayResult {
  * Attach the returned `railRef` to the tile container.
  */
 export function useWatchAutoplay(
-  { railId: _railId, enabled = true }: UseWatchAutoplayOptions,
+  { railId: _railId, enabled = true, posts }: UseWatchAutoplayOptions,
 ): UseWatchAutoplayResult {
   const revealed = useWatchRevealed();
   const reducedMotion = usePrefersReducedMotion();
@@ -79,6 +101,11 @@ export function useWatchAutoplay(
   );
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
   const [root, setRoot] = useState<HTMLElement | null>(null);
+
+  // Keep a ref to posts so the IO callback (inside a stable effect) can
+  // resolve hlsUrl for approach-warming without re-running the observer.
+  const postsRef = useRef<FeedPost[] | undefined>(posts);
+  useEffect(() => { postsRef.current = posts; }, [posts]);
 
   const railRef = useCallback((el: HTMLElement | null) => {
     setRoot(el);
@@ -167,6 +194,24 @@ export function useWatchAutoplay(
           if (Number.isNaN(idx)) continue;
           if (entry.isIntersecting) {
             ratiosRef.current.set(idx, entry.intersectionRatio);
+            // Approach-warm: tiles entering the viewport (ratio in the
+            // approach band) are the next tap/promote candidates. Warm the
+            // manifest + first segment via PrefetchController — idempotent,
+            // LRU-deduped, capped at 2 in-flight, saveData/2g skips. Skipped
+            // when no posts list is wired.
+            const list = postsRef.current;
+            if (
+              list &&
+              entry.intersectionRatio >= APPROACH_MIN &&
+              entry.intersectionRatio <= APPROACH_MAX
+            ) {
+              const post = list[idx];
+              const media = post?.mediaItems?.find((m) => m.type === 'video');
+              const hlsUrl = (media as any)?.hlsUrl as string | undefined;
+              if (post && hlsUrl) {
+                try { PrefetchController.request(`${post.id}:0`, hlsUrl); } catch { /* noop */ }
+              }
+            }
           } else {
             ratiosRef.current.delete(idx);
           }

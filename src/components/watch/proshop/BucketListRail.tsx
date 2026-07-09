@@ -125,7 +125,7 @@ function BucketListRailInner() {
     </section>
   );
 
-  const { activeIdx, railRef } = useWatchAutoplay({ railId: 'bucket-list' });
+  const { activeIdx, railRef } = useWatchAutoplay({ railId: 'bucket-list', posts: orderedPosts });
 
 
   if (!hasResolved || stillLoading) return skeleton;

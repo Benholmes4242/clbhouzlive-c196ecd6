@@ -18,7 +18,7 @@ interface VideosQuickClipsRailProps {
  */
 function VideosQuickClipsRailInner({ userId }: VideosQuickClipsRailProps) {
   const { data: posts = [], isLoading } = useQuickClipsRail(userId, 8);
-  const { activeIdx, railRef } = useWatchAutoplay({ railId: 'videos-quick-clips' });
+  const { activeIdx, railRef } = useWatchAutoplay({ railId: 'videos-quick-clips', posts });
 
 
   if (!userId) return null;
