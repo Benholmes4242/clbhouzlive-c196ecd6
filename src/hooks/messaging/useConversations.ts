@@ -2,7 +2,12 @@ import { useEffect, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useMessagingActor } from './useMessagingActor';
-import type { InboxConversation } from '@/types/messaging';
+import type { InboxConversation, InboxParticipant, ConversationType, MemberRole } from '@/types/messaging';
+import type { Json } from '@/integrations/supabase/types';
+
+function isInboxParticipantArray(value: Json): value is InboxParticipant[] {
+  return Array.isArray(value);
+}
 
 export function useConversations() {
   const actor = useMessagingActor();
@@ -15,12 +20,13 @@ export function useConversations() {
     queryKey: ['messaging', 'inbox', actorType, actorId],
     enabled: !!actor,
     queryFn: async () => {
-      const { data, error } = await supabase.rpc('get_inbox' as never, {
+      if (!actorType || !actorId) return [];
+      const { data, error } = await supabase.rpc('get_inbox', {
         p_actor_type: actorType,
         p_actor_id: actorId,
-      } as never);
+      });
       if (error) throw error;
-      return ((data ?? []) as unknown) as InboxConversation[];
+      return (data ?? []) as InboxConversation[];
     },
   });
 
