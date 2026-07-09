@@ -26,6 +26,7 @@ import {
 } from '@/hooks/useGlobalEntitySearch';
 import { useMessagingActor } from '@/hooks/messaging/useMessagingActor';
 import { useConversationDetail } from '@/hooks/messaging/useConversationDetail';
+import { useConversations } from '@/hooks/messaging/useConversations';
 import { supabase } from '@/integrations/supabase/client';
 import type { Json } from '@/integrations/supabase/types';
 import type { ConversationMember, MemberRole } from '@/types/messaging';
