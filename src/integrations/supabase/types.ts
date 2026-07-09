@@ -17522,6 +17522,18 @@ export type Database = {
           width: number
         }[]
       }
+      get_conversation_detail: {
+        Args: { p_conversation_id: string }
+        Returns: {
+          avatar_url: string
+          conversation_id: string
+          created_at: string
+          created_by_user: string
+          members: Json
+          title: string
+          type: string
+        }[]
+      }
       get_countries_leaderboard: {
         Args: {
           p_current_user_id?: string
