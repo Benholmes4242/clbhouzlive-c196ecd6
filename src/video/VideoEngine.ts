@@ -944,6 +944,27 @@ class VideoEngineImpl {
     };
   }
 
+  /**
+   * Live-read directly from the underlying element (no cached state). Used by
+   * openWithOrigin at bind time to re-validate a borrow candidate immediately
+   * before committing — catches post-decision drops (rebind/HLS reattach) that
+   * a prior snapshot read would miss.
+   */
+  isLivePlayable(laneId: LaneId): {
+    playable: boolean;
+    readyState: number;
+    currentTime: number;
+    paused: boolean;
+  } {
+    const lane = this.getLane(laneId);
+    const el = lane.el;
+    const readyState = el.readyState;
+    const currentTime = el.currentTime || 0;
+    const paused = el.paused;
+    const playable = readyState >= 2 && currentTime > 0 && !paused;
+    return { playable, readyState, currentTime, paused };
+  }
+
   subscribe(laneId: LaneId, listener: LaneListener): () => void {
     const lane = this.getLane(laneId);
     lane.listeners.add(listener);
