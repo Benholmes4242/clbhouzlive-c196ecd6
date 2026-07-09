@@ -1166,6 +1166,7 @@ function CommentsSheet({
                         onSubmit={handleSend}
                         placeholder={replyingTo ? `Reply to ${replyingTo.displayName}...` : 'Add a comment...'}
                         inputRef={(el) => { (textareaRef as any).current = el; }}
+                        currentUserId={currentUserId}
                       />
                     </div>
                   </div>

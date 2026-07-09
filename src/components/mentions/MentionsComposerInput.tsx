@@ -44,6 +44,7 @@ import { CheckCircle2, Building2, AtSign } from 'lucide-react';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { supabase } from '@/integrations/supabase/client';
 import { Z } from '@/config/zIndex';
+import { extractMentions } from '@/lib/mentions/format';
 
 const INK = '#0F172A';
 const INK_SUBTLE = '#94A3B8';
@@ -66,6 +67,7 @@ interface RichSuggestion extends SuggestionDataItem {
 async function searchMentions(
   query: string,
   render: (data: SuggestionDataItem[]) => void,
+  excludeKeys?: Set<string>,
 ) {
   const q = (query ?? '').trim();
   if (q.length === 0) {
@@ -113,11 +115,13 @@ async function searchMentions(
       if (s.secondary?.toLowerCase().includes(qs)) return 1;
       return 2;
     };
-    const merged = [...userRows, ...bizRows]
-      .sort((a, b) => rank(a) - rank(b))
-      .slice(0, 6);
+    // Filter BEFORE slice so excluded rows don't eat visible slots.
+    const merged = [...userRows, ...bizRows].sort((a, b) => rank(a) - rank(b));
+    const filtered = excludeKeys && excludeKeys.size > 0
+      ? merged.filter(r => !excludeKeys.has(r.id))
+      : merged;
 
-    render(merged);
+    render(filtered.slice(0, 6));
   } catch {
     // Silent — the library ignores our returned promise, and empty results
     // simply keep the panel closed. Errors don't cascade.
@@ -148,6 +152,13 @@ interface Props {
   style?: React.CSSProperties;
   inputRef?: (el: HTMLTextAreaElement | null) => void;
   textStyle?: MentionsTextStyle;
+  /**
+   * Current viewer's user id. Excludes self from the picker (never mentionable).
+   * Pass null when the host has no user id already in scope — already-mentioned
+   * exclusion still works without it. Do NOT add a new supabase.auth.getUser()
+   * call to satisfy this prop (that reintroduces a first-keystroke race).
+   */
+  currentUserId?: string | null;
 }
 
 const DEFAULT_TEXT_STYLE: Required<Pick<MentionsTextStyle, 'fontSize' | 'lineHeight' | 'padding' | 'color' | 'caretColor'>> = {
@@ -508,9 +519,32 @@ export function MentionsComposerInput({
   style,
   inputRef,
   textStyle,
+  currentUserId,
 }: Props) {
   const mentionsStyle = React.useMemo(() => buildMentionsStyle(textStyle), [textStyle]);
   const anchorRef = React.useRef<HTMLDivElement | null>(null);
+
+  // Exclude set — self + everyone already mentioned in the current draft.
+  // Derived from live `value`, so removing a mention chip re-enables that
+  // person automatically. Keys match `${kind}:${uuid}` shape emitted by
+  // searchMentions row ids.
+  const excludeKeys = React.useMemo(() => {
+    const set = new Set<string>();
+    if (currentUserId) set.add(`u:${currentUserId}`);
+    for (const m of extractMentions(value)) {
+      set.add(`${m.entityType === 'business' ? 'b' : 'u'}:${m.entityId}`);
+    }
+    return set;
+  }, [value, currentUserId]);
+  // Stable ref for the react-mentions data callback so its identity is
+  // stable across renders but always reads the latest exclude set.
+  const excludeKeysRef = React.useRef(excludeKeys);
+  React.useEffect(() => { excludeKeysRef.current = excludeKeys; }, [excludeKeys]);
+  const dataFn = React.useCallback(
+    (q: string, render: (d: SuggestionDataItem[]) => void) =>
+      searchMentions(q, render, excludeKeysRef.current),
+    [],
+  );
 
   // Server-render / test safety: only enable the portal once we know
   // document.body exists. React-mentions treats a falsy portal host
@@ -555,7 +589,7 @@ export function MentionsComposerInput({
       >
         <Mention
           trigger="@"
-          data={searchMentions}
+          data={dataFn}
           renderSuggestion={renderSuggestion}
           displayTransform={(_id, display) => `@${display}`}
           appendSpaceOnAdd
