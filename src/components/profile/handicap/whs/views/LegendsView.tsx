@@ -22,7 +22,7 @@ export const LegendsView: React.FC<Props> = ({
   const navigate = useNavigate();
 
   const handleSelectCourse = (selection: CourseSelection) => {
-    navigate(`/handicap/legends/courses/${selection.courseId}`);
+    navigate(`/courses/${selection.courseId}?tab=legends`);
   };
 
   return (
