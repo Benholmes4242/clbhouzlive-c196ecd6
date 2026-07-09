@@ -119,6 +119,9 @@ function ensureHiddenHost(): HTMLElement {
 function createLaneElement(laneId: LaneId): HTMLVideoElement {
   const el = document.createElement('video');
   el.dataset.laneId = laneId;
+  // [TRACE] element identity — every lane <video> carries a stable short id
+  // so trace lines across layers can prove they hold the SAME element.
+  (el.dataset as any).vid = traceGenElId();
   el.playsInline = true;
   el.muted = true;
   el.loop = true; // Stage-1 polish: loop by default on both feed + fullscreen lanes.
