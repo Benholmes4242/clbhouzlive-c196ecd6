@@ -16,7 +16,7 @@ import { haptic } from '@/utils/haptics';
 import { AppLog } from '@/lib/logger';
 import { cn } from '@/lib/utils';
 import { SectionHeader } from '@/components/ui/SectionHeader';
-import { HAIRLINE_INK_7 } from './_shared/tokens';
+import { HAIRLINE_INK_7 } from '@/components/messaging/_shared/tokens';
 
 interface ReportSheetProps {
   open: boolean;
