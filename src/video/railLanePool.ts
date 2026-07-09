@@ -40,6 +40,15 @@ const owners = new Map<OwnerKey, OwnerRecord>();
 const laneOwner = new Map<LaneId, OwnerKey>();
 const subs = new Map<OwnerKey, Set<OwnerListener>>();
 const pinnedByBorrow = new Set<LaneId>();
+/**
+ * Lanes that are mid flip-return to their origin tile. Marked at
+ * `beginCloseAnim('borrow')` and cleared once `returnBorrow` completes.
+ * A returning lane is UNAVAILABLE — laneFor() reports null, and acquire()
+ * refuses to hand it out (free-pick + LRU eviction skip it). This prevents
+ * a new open from contending with an in-flight close animation on the same
+ * lane (the 6s flip-return race).
+ */
+const returningLanes = new Set<LaneId>();
 let clock = 0;
 
 const DBG = (evt: string, payload: Record<string, unknown> = {}) => {
