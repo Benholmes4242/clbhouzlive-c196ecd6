@@ -65,7 +65,7 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
 }, ref) => {
   const navigate = useNavigate();
   const sentinelRef = useRef<HTMLDivElement>(null);
-  const { activeIdx, railRef: autoplayRef } = useWatchAutoplay({ railId: 'course-media', posts });
+  const { activeIndices, railRef: autoplayRef } = useWatchAutoplay({ railId: 'course-media', posts, maxActive: 3 });
   const setGridRef = useCallback((el: HTMLDivElement | null) => {
     autoplayRef(el);
     if (typeof ref === 'function') ref(el);
