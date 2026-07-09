@@ -508,7 +508,10 @@ export function openWithOrigin({
   });
 
   // [VPERF] end of the synchronous open() call — mark storeOpen phase and
-  // arm the target lane's next 'playing' event to close the span.
+  // arm the target lane's next 'firstFrame' event to close the span
+  // (perceived open = frame painted). 'playing' is recorded as a LATER
+  // waypoint for diagnostics; on iOS HLS it fires well after first paint
+  // and must not close/extend the span.
   vperfMark(fsOpenSpanId, 'storeOpen');
   const source: 'borrow' | 'lane' = borrow ? 'borrow' : 'lane';
   const isImage = mediaKind === 'image';
@@ -522,8 +525,9 @@ export function openWithOrigin({
   } else {
     vperfSetBudget(fsOpenSpanId, source === 'borrow' ? 150 : 500);
     const targetLaneId: string = borrow ? borrow.laneId : 'fullscreen';
-    vperfArmLane(targetLaneId, { spanId: fsOpenSpanId, endOn: 'firstFrame', phase: 'firstFrame' });
-    vperfArmLane(targetLaneId, { spanId: fsOpenSpanId, endOn: 'playing' });
+    // firstFrame ENDS the span (perceived open). playing is a waypoint AFTER.
+    vperfArmLane(targetLaneId, { spanId: fsOpenSpanId, endOn: 'firstFrame' });
+    vperfArmLane(targetLaneId, { spanId: fsOpenSpanId, endOn: 'playing', phase: 'playing' });
   }
 
   // [VPERF] fs.open motion trace — borrow opens only (the reported screen
