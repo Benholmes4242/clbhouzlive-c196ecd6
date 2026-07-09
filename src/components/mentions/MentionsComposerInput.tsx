@@ -589,7 +589,7 @@ export function MentionsComposerInput({
       >
         <Mention
           trigger="@"
-          data={searchMentions}
+          data={dataFn}
           renderSuggestion={renderSuggestion}
           displayTransform={(_id, display) => `@${display}`}
           appendSpaceOnAdd
