@@ -14,6 +14,7 @@ import {
 import { useMessagingActor } from '@/hooks/messaging/useMessagingActor';
 import { canActorMessage } from '@/hooks/messaging/canActorMessage';
 import { supabase } from '@/integrations/supabase/client';
+import type { Json } from '@/integrations/supabase/types';
 
 const CANVAS = '#F8FAFC';
 const INK = '#1F2428';
