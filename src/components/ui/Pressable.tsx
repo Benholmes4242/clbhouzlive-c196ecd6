@@ -69,6 +69,13 @@ const VARIANTS: Record<PressableVariant, VariantSpec> = {
     pressedBg: 'hsl(var(--muted) / 0.60)',
     transition: TRANSITION,
   },
+  // Media tile — press feedback OFF. Retains tap/scroll disambiguation,
+  // haptics, and FLIP commit ordering; just no scale/bg on press.
+  media: {
+    pressedScale: null,
+    pressedBg: null,
+    transition: TRANSITION,
+  },
 };
 
 export interface PressableProps
