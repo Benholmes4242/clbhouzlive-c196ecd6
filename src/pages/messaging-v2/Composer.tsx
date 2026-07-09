@@ -31,7 +31,8 @@ export const Composer: React.FC<Props> = ({
   onHeightChange,
   onAfterSend,
 }) => {
-  const { send } = useSendMessage(conversationId);
+  const { send, sendMedia } = useSendMessage(conversationId);
+  const [picking, setPicking] = useState(false);
   const keyboardHeight = useKeyboardHeight();
   const [text, setText] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
