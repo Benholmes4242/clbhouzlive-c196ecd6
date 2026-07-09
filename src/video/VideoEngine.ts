@@ -297,6 +297,19 @@ class VideoEngineImpl {
   ): void {
     const lane = this.getLane(laneId);
     const { hlsUrl, posterUrl = null, startPosition = -1, postId = null } = opts;
+    // [TRACE] engine.load — one line per load() call, before any decisions.
+    {
+      const openT = traceLookup({ ownerKey: postId, postId: lane.postId });
+      trace('engine.load', {
+        openId: openT?.openId,
+        laneId,
+        ownerKeyIn: postId,
+        priorPostId: lane.postId,
+        priorFirstFrame: lane.firstFrame,
+        elId: elIdOf(lane.el),
+        hlsInstanceReused: !!lane.hls,
+      });
+    }
     // Same postId + same URL already loaded → no reload. This makes remount
     // (element moving between card hosts) cheap and avoids re-fetching HLS.
     //
