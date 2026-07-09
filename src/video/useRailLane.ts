@@ -144,8 +144,26 @@ export function useRailLane(opts: UseRailLaneOptions): UseRailLaneResult {
       m.vperfSetBudget(autoSpanId, warm ? 120 : 600);
     }).catch(() => {});
     vperfMark(autoSpanId, 'load');
-    vperfArmLane(laneId, { spanId: autoSpanId, endOn: 'firstFrame', phase: 'firstFrame' });
-    vperfArmLane(laneId, { spanId: autoSpanId, endOn: 'playing' });
+    if (warm) {
+      // Warm-skip: engine did NOT reload, so 'firstFrame' will NOT re-fire.
+      // Close the span on the next paint after mount+play (perceived
+      // autoplay is the visible frame that's already decoded). Without this
+      // the span would orphan to the 15s watchdog.
+      const raf =
+        typeof requestAnimationFrame === 'function'
+          ? requestAnimationFrame
+          : (cb: FrameRequestCallback) => setTimeout(() => cb(performance.now()), 16);
+      raf(() => {
+        import('@/perf/vperf').then((m) => {
+          m.vperfMark(autoSpanId, 'warmBind');
+          m.vperfEnd(autoSpanId, { closedBy: 'warmBind' });
+        }).catch(() => {});
+      });
+      vperfArmLane(laneId, { spanId: autoSpanId, endOn: 'playing', phase: 'playing' });
+    } else {
+      vperfArmLane(laneId, { spanId: autoSpanId, endOn: 'firstFrame', phase: 'firstFrame' });
+      vperfArmLane(laneId, { spanId: autoSpanId, endOn: 'playing' });
+    }
 
     void VideoEngine.play(laneId, { callerPostId: caller });
 
