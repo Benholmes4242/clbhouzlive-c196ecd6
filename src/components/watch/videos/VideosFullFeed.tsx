@@ -217,7 +217,7 @@ function VideosFullFeedInner({ userId, mood, searchQuery, onClearSearch, onReset
                       post={post}
                       index={postIdx}
                       allPosts={posts}
-                      active={activeGridIdx === postIdx}
+                      active={activeIndices.has(postIdx)}
                     />
                   );
                 })}
