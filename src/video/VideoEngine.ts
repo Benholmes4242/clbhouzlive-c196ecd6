@@ -200,6 +200,17 @@ class VideoEngineImpl {
     return lane;
   }
 
+  private resetFirstFrameForLane(lane: Lane, reason: string): void {
+    if (!lane.firstFrame) return;
+    lane.firstFrame = false;
+    DBG(lane.id, 'firstFrame.reset', { reason, postId: lane.postId });
+    this.emit(lane);
+  }
+
+  resetFirstFrame(laneId: LaneId, reason = 'manual'): void {
+    this.resetFirstFrameForLane(this.getLane(laneId), reason);
+  }
+
   /**
    * Move the lane's <video> into a host container. Idempotent + move-safe:
    * appendChild atomically removes the element from any previous parent and
@@ -244,6 +255,9 @@ class VideoEngineImpl {
     }
     lane.mountedHost = null;
     lane.wantPlay = false;
+    if (laneId === 'fullscreen') {
+      this.resetFirstFrameForLane(lane, 'unmount');
+    }
     vperfSessionEnd(laneId, 'unmount');
   }
 
@@ -314,8 +328,10 @@ class VideoEngineImpl {
     (this as any)._lastLoadWasWarmSkip = false;
     // Session re-point: if a session was running on this lane, close it out
     // before the new source takes over.
-    if (lane.postId != null && lane.postId !== postId) {
+    const identityChanged = lane.postId != null && laneOwner !== callOwner;
+    if (identityChanged) {
       vperfSessionEnd(laneId, 'load-repoint');
+      this.resetFirstFrameForLane(lane, 'load-repoint');
     }
 
 
@@ -808,7 +824,7 @@ class VideoEngineImpl {
     lane.detachFns.forEach((fn) => fn());
     lane.detachFns = [];
     lane.hlsUrl = null;
-    lane.firstFrame = false;
+    this.resetFirstFrameForLane(lane, 'release');
     lane.wantPlay = false;
     this.transition(lane, 'idle');
     DBG(laneId, 'released');

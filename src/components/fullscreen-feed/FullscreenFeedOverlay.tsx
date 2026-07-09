@@ -476,6 +476,10 @@ export function FullscreenFeedOverlay() {
           borrowRef.current = null;
         }
 
+        // Close/route teardown must park the fullscreen singleton and clear
+        // firstFrame before the next cold open can synchronously snapshot it.
+        try { VideoEngine.unmountLane('fullscreen'); } catch {}
+
         unlockBodyScroll();
         document.body.classList.remove('route-fullscreen-overlay');
         // Restore shield to transparent (NOT #F8FAFC) so the dark feed background
