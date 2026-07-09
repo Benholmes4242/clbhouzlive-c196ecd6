@@ -68,6 +68,29 @@ export const Composer: React.FC<Props> = ({
     onAfterSend?.();
   }, [text, disabled, send, onAfterSend]);
 
+  const handleAttach = useCallback(async () => {
+    if (disabled || picking) return;
+    setPicking(true);
+    try {
+      const picked = await pickMediaFiles({
+        accept: 'image/*',
+        multiple: true,
+        maxFiles: 10,
+      });
+      if (!picked.length) return;
+      const valid = await validateMediaFiles(picked);
+      const images = valid.filter((f) => f.type.startsWith('image/'));
+      for (const file of images) {
+        void sendMedia({ file, kind: 'image' });
+      }
+      if (images.length > 0) onAfterSend?.();
+    } catch (e) {
+      console.warn('[composer] attach failed', e);
+    } finally {
+      setPicking(false);
+    }
+  }, [disabled, picking, sendMedia, onAfterSend]);
+
   return (
     <div
       ref={containerRef}
