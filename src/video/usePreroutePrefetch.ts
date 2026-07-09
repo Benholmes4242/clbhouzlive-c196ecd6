@@ -1,21 +1,23 @@
 /**
  * usePreroutePrefetch — scroll-guarded pointerdown warm for cold video tiles.
  *
- * Returns `{ onPreroute, onPrerouteCancel }` callbacks that Pressable (or any
- * pointer host) invokes:
- *   - `onPreroute`  fires when a pointerdown has "settled" (tap intent, not
- *     scroll/drag). We ask PrefetchController to warm the HLS cache for
- *     `${ownerKey}` — reusing the SAME warmer (max 2 in-flight, saveData/2g
- *     skip, LRU). Idempotent; no-op when disabled, no live lane, or no URL.
- *   - `onPrerouteCancel` fires when the gesture proved to be a scroll/drag or
- *     long-press. Aborts the in-flight warm so we don't burn bandwidth on
- *     scroll-touches.
+ * Returns `{ onPrerouteArm, onPreroute, onPrerouteCancel }` callbacks that
+ * Pressable invokes across the gesture:
+ *   - `onPrerouteArm`    at pointerdown (before the guard runs).
+ *   - `onPreroute`       once the fire timer elapses and the gesture still
+ *                        looks like a tap → warms via PrefetchController.
+ *   - `onPrerouteCancel` when the guard cancels (moved/scroll/longpress) →
+ *                        aborts the in-flight warm.
  *
- * The scroll-guard itself lives in Pressable (movement threshold + long-press
- * timer). This hook just wires the warm/abort to the tile's ownerKey.
+ * DBG logging is gated on `isPerfEnabled()` — production is silent unless the
+ * perf pill is on. When on, a scroll shows lots of `armed → cancelled{scroll}`
+ * and zero `fired`; a clean tap shows `armed → fired`.
  */
 import { useCallback, useMemo } from 'react';
 import { PrefetchController } from '@/video/PrefetchController';
+import { isPerfEnabled } from '@/perf/navTiming';
+
+type CancelReason = 'moved' | 'scroll' | 'longpress';
 
 interface Options {
   /** Cold-tile owner key (`${postId}:0`). Null when tile is not a video. */
@@ -29,18 +31,34 @@ interface Options {
   enabled: boolean;
 }
 
+function dbg(kind: 'armed' | 'fired' | 'cancelled', payload: Record<string, unknown>): void {
+  if (!isPerfEnabled()) return;
+  // eslint-disable-next-line no-console
+  console.info(`[PREROUTE] ${kind}`, payload);
+}
+
 export function usePreroutePrefetch({ ownerKey, hlsUrl, enabled }: Options) {
+  const onPrerouteArm = useCallback(() => {
+    if (!enabled || !ownerKey || !hlsUrl) return;
+    dbg('armed', { ownerKey });
+  }, [enabled, ownerKey, hlsUrl]);
+
   const onPreroute = useCallback(() => {
     if (!enabled || !ownerKey || !hlsUrl) return;
     PrefetchController.request(ownerKey, hlsUrl);
+    dbg('fired', { ownerKey });
   }, [enabled, ownerKey, hlsUrl]);
 
-  const onPrerouteCancel = useCallback(() => {
+  const onPrerouteCancel = useCallback((reason: CancelReason) => {
     if (!ownerKey) return;
-    PrefetchController.abort(ownerKey, 'preroute-cancel');
+    PrefetchController.abort(ownerKey, `preroute-${reason}`);
+    dbg('cancelled', { ownerKey, reason });
   }, [ownerKey]);
 
-  return useMemo(() => ({ onPreroute, onPrerouteCancel }), [onPreroute, onPrerouteCancel]);
+  return useMemo(
+    () => ({ onPrerouteArm, onPreroute, onPrerouteCancel }),
+    [onPrerouteArm, onPreroute, onPrerouteCancel],
+  );
 }
 
 export default usePreroutePrefetch;
