@@ -129,6 +129,7 @@ export default function WatchRailTile({
       as="div"
       variant="media"
       onPress={handleClick}
+      onPrerouteArm={onPrerouteArm}
       onPreroute={onPreroute}
       onPrerouteCancel={onPrerouteCancel}
       ref={cardRef as any}
