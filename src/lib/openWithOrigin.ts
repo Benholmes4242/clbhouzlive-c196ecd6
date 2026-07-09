@@ -313,24 +313,36 @@ export function openWithOrigin({
         deniedBy,
       });
       if (owns && isLive) {
-        borrow = {
+        // BIND-TIME RE-VALIDATION (see rail branch above for rationale).
+        const live = VideoEngine.isLivePlayable(activeLaneId);
+        DECIDE('borrow.feed.bindCheck', {
+          postId,
           laneId: activeLaneId,
-          ownerKey: snap.postId ?? tappedOwnerKey,
-          postId,
-          posterUrl: posterUrl ?? null,
-          viewportW: typeof window !== 'undefined' ? window.innerWidth : 0,
-          viewportH: typeof window !== 'undefined' ? window.innerHeight : 0,
-          wasMuted: snap.muted,
-        };
-        VideoEngine.markBorrowed(activeLaneId);
-        feedLaneRoles.freeze(activeLaneId);
-        BORROW_DBG('mount', {
-          source: 'feed-active-role',
-          activeLaneId,
-          ownerKey: borrow.ownerKey,
-          postId,
-          wasMuted: snap.muted,
+          readyState: live.readyState,
+          currentTime: +live.currentTime.toFixed(3),
+          paused: live.paused,
+          outcome: live.playable ? 'commit' : 'abandon',
         });
+        if (live.playable) {
+          borrow = {
+            laneId: activeLaneId,
+            ownerKey: snap.postId ?? tappedOwnerKey,
+            postId,
+            posterUrl: posterUrl ?? null,
+            viewportW: typeof window !== 'undefined' ? window.innerWidth : 0,
+            viewportH: typeof window !== 'undefined' ? window.innerHeight : 0,
+            wasMuted: snap.muted,
+          };
+          VideoEngine.markBorrowed(activeLaneId);
+          feedLaneRoles.freeze(activeLaneId);
+          BORROW_DBG('mount', {
+            source: 'feed-active-role',
+            activeLaneId,
+            ownerKey: borrow.ownerKey,
+            postId,
+            wasMuted: snap.muted,
+          });
+        }
       }
     } catch {
       /* engine may not be booted yet on deep-link openers */
