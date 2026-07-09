@@ -248,6 +248,6 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, f
           </span>
         </div>
       )}
-    </div>
+    </Pressable>
   );
 };
