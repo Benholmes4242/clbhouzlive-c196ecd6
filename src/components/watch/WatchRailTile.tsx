@@ -129,6 +129,8 @@ export default function WatchRailTile({
       as="div"
       variant="media"
       onPress={handleClick}
+      onPreroute={onPreroute}
+      onPrerouteCancel={onPrerouteCancel}
       ref={cardRef as any}
       data-watch-tile-index={index}
       data-post-id={post.id}
