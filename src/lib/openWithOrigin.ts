@@ -232,17 +232,35 @@ export function openWithOrigin({
         notReadyBy,
       });
       if (liveLane && ready) {
-        borrow = {
-          laneId: liveLane,
+        // BIND-TIME RE-VALIDATION: read the element LIVE one more time right
+        // before commit. Catches post-decision drops (Safari/HLS rebind reset,
+        // level switch, source swap racing the tap) that snap-time reads miss.
+        // If the lane dropped, ABANDON the borrow — cold path (~100ms) beats
+        // waiting multiple seconds on a lane that just went not-ready.
+        const live = VideoEngine.isLivePlayable(liveLane);
+        DECIDE('borrow.rail.bindCheck', {
           ownerKey: railOwnerKey,
-          postId,
-          posterUrl: posterUrl ?? null,
-          viewportW: typeof window !== 'undefined' ? window.innerWidth : 0,
-          viewportH: typeof window !== 'undefined' ? window.innerHeight : 0,
-        };
-        RailLanePool.pin(liveLane);
-        VideoEngine.markBorrowed(liveLane);
-        BORROW_DBG('pin', { ownerKey: railOwnerKey, laneId: liveLane, postId });
+          laneId: liveLane,
+          readyState: live.readyState,
+          currentTime: +live.currentTime.toFixed(3),
+          paused: live.paused,
+          outcome: live.playable ? 'commit' : 'abandon',
+        });
+        if (!live.playable) {
+          // Fall through to cold path; do NOT pin/mark.
+        } else {
+          borrow = {
+            laneId: liveLane,
+            ownerKey: railOwnerKey,
+            postId,
+            posterUrl: posterUrl ?? null,
+            viewportW: typeof window !== 'undefined' ? window.innerWidth : 0,
+            viewportH: typeof window !== 'undefined' ? window.innerHeight : 0,
+          };
+          RailLanePool.pin(liveLane);
+          VideoEngine.markBorrowed(liveLane);
+          BORROW_DBG('pin', { ownerKey: railOwnerKey, laneId: liveLane, postId });
+        }
       }
     } catch {
       /* pool not ready — no borrow */
