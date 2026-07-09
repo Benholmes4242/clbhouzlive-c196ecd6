@@ -1,0 +1,455 @@
+import React, { useEffect, useMemo, useRef } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ChevronLeft, MoreVertical, BadgeCheck, Plus, ArrowUp } from 'lucide-react';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { useThread } from '@/hooks/messaging/useThread';
+import { useConversations } from '@/hooks/messaging/useConversations';
+import { useMessagingActor } from '@/hooks/messaging/useMessagingActor';
+import { MessageBubble } from './MessageBubble';
+import type {
+  InboxConversation,
+  InboxParticipant,
+  ThreadMessage,
+} from '@/types/messaging';
+
+const CANVAS = '#F8FAFC';
+const INK = '#1F2428';
+const SUB = '#8A9099';
+const HINT = '#AEB4BC';
+const AMBER = '#F7931E';
+const HAIRLINE = 'rgba(0,0,0,0.07)';
+const COMPOSER_BG = '#FFFFFF';
+const COMPOSER_INPUT_BG = '#EDEFF2';
+
+interface HeaderIdentity {
+  name: string;
+  avatarUrl: string | null;
+  userId: string;
+  verified: boolean;
+  secondary: string;
+}
+
+function resolveHeaderIdentity(
+  conv: InboxConversation | null,
+  selfActorType: string | null,
+  selfActorId: string | null,
+  firstIncoming: ThreadMessage | null,
+): HeaderIdentity {
+  if (conv) {
+    if (conv.type === 'group') {
+      return {
+        name: conv.title ?? 'Group',
+        avatarUrl: conv.avatar_url,
+        userId: conv.conversation_id,
+        verified: false,
+        secondary: `${conv.participants.length} members`,
+      };
+    }
+    const others = conv.participants.filter(
+      (p) => !(p.actor_type === selfActorType && p.actor_id === selfActorId),
+    );
+    const p: InboxParticipant | undefined = others[0] ?? conv.participants[0];
+    return {
+      name: p?.name ?? p?.username ?? 'Unknown',
+      avatarUrl: p?.avatar_url ?? null,
+      userId: p?.actor_id ?? conv.conversation_id,
+      verified: !!p?.verified,
+      secondary: p?.actor_type === 'business' ? 'Business' : '',
+    };
+  }
+  if (firstIncoming) {
+    return {
+      name: firstIncoming.sender_name ?? 'Conversation',
+      avatarUrl: firstIncoming.sender_avatar_url,
+      userId: firstIncoming.sender_actor_id,
+      verified: !!firstIncoming.sender_verified,
+      secondary: firstIncoming.sender_actor_type === 'business' ? 'Business' : '',
+    };
+  }
+  return { name: 'Conversation', avatarUrl: null, userId: '', verified: false, secondary: '' };
+}
+
+interface RunFlags {
+  isFirstOfRun: boolean;
+  isLastOfRun: boolean;
+  isOutgoing: boolean;
+}
+
+const RUN_GAP_MS = 5 * 60 * 1000;
+
+function computeRuns(
+  messages: ThreadMessage[],
+  selfActorType: string | null,
+  selfActorId: string | null,
+): { flags: RunFlags[]; lastOutgoingIndex: number } {
+  const flags: RunFlags[] = [];
+  let lastOutgoingIndex = -1;
+  for (let i = 0; i < messages.length; i++) {
+    const m = messages[i];
+    const isOutgoing =
+      m.sender_actor_type === selfActorType && m.sender_actor_id === selfActorId;
+    const prev = i > 0 ? messages[i - 1] : null;
+    const next = i < messages.length - 1 ? messages[i + 1] : null;
+    const t = new Date(m.created_at).getTime();
+    const sameAsPrev =
+      !!prev &&
+      prev.sender_actor_type === m.sender_actor_type &&
+      prev.sender_actor_id === m.sender_actor_id &&
+      Math.abs(t - new Date(prev.created_at).getTime()) < RUN_GAP_MS;
+    const sameAsNext =
+      !!next &&
+      next.sender_actor_type === m.sender_actor_type &&
+      next.sender_actor_id === m.sender_actor_id &&
+      Math.abs(new Date(next.created_at).getTime() - t) < RUN_GAP_MS;
+    flags.push({
+      isFirstOfRun: !sameAsPrev,
+      isLastOfRun: !sameAsNext,
+      isOutgoing,
+    });
+    if (isOutgoing && m.deleted_at == null) lastOutgoingIndex = i;
+  }
+  return { flags, lastOutgoingIndex };
+}
+
+const SkeletonBubble: React.FC<{ side: 'left' | 'right'; w: number }> = ({ side, w }) => (
+  <div
+    className="w-full flex"
+    style={{ justifyContent: side === 'right' ? 'flex-end' : 'flex-start', marginTop: 10 }}
+  >
+    <div
+      style={{
+        width: `${w}%`,
+        height: 34,
+        background: side === 'right' ? '#DDE1E6' : '#EDEFF2',
+        borderRadius: 18,
+      }}
+    />
+  </div>
+);
+
+const ThreadV2Page: React.FC = () => {
+  const { conversationId = '' } = useParams<{ conversationId: string }>();
+  const navigate = useNavigate();
+  const actor = useMessagingActor();
+  const { conversations } = useConversations();
+  const conv = useMemo(
+    () => conversations.find((c) => c.conversation_id === conversationId) ?? null,
+    [conversations, conversationId],
+  );
+  const {
+    messages,
+    fetchOlder,
+    hasOlder,
+    isLoading,
+    isFetchingOlder,
+    error,
+  } = useThread(conversationId || null);
+
+  const scrollerRef = useRef<HTMLDivElement | null>(null);
+  const bottomAnchorRef = useRef<HTMLDivElement | null>(null);
+  const didInitialScrollRef = useRef(false);
+  const lastMessageIdRef = useRef<string | null>(null);
+
+  // Pin to bottom on first load / new outgoing/incoming message.
+  useEffect(() => {
+    if (!messages.length) return;
+    const el = scrollerRef.current;
+    if (!el) return;
+    const lastId = messages[messages.length - 1].id;
+    if (!didInitialScrollRef.current) {
+      el.scrollTop = el.scrollHeight;
+      didInitialScrollRef.current = true;
+      lastMessageIdRef.current = lastId;
+      return;
+    }
+    if (lastId !== lastMessageIdRef.current) {
+      const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 200;
+      if (nearBottom) el.scrollTop = el.scrollHeight;
+      lastMessageIdRef.current = lastId;
+    }
+  }, [messages]);
+
+  // Load older on scroll near top; preserve scroll offset.
+  const prevHeightRef = useRef<number>(0);
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      if (el.scrollTop < 80 && hasOlder && !isFetchingOlder) {
+        prevHeightRef.current = el.scrollHeight;
+        void fetchOlder();
+      }
+    };
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => el.removeEventListener('scroll', onScroll);
+  }, [fetchOlder, hasOlder, isFetchingOlder]);
+
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el || !prevHeightRef.current) return;
+    const delta = el.scrollHeight - prevHeightRef.current;
+    if (delta > 0) el.scrollTop = el.scrollTop + delta;
+    prevHeightRef.current = 0;
+  }, [messages.length]);
+
+  const firstIncoming = useMemo(
+    () =>
+      messages.find(
+        (m) =>
+          !(
+            m.sender_actor_type === actor?.actorType &&
+            m.sender_actor_id === actor?.actorId
+          ),
+      ) ?? null,
+    [messages, actor],
+  );
+
+  const header = resolveHeaderIdentity(
+    conv,
+    actor?.actorType ?? null,
+    actor?.actorId ?? null,
+    firstIncoming,
+  );
+
+  const { flags, lastOutgoingIndex } = useMemo(
+    () =>
+      computeRuns(messages, actor?.actorType ?? null, actor?.actorId ?? null),
+    [messages, actor],
+  );
+
+  return (
+    <div
+      className="flex flex-col"
+      style={{
+        background: CANVAS,
+        color: INK,
+        height: '100dvh',
+        width: '100%',
+      }}
+    >
+      <header
+        style={{
+          background: CANVAS,
+          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 8px)',
+          paddingBottom: 10,
+          paddingLeft: 6,
+          paddingRight: 6,
+          borderBottom: `0.5px solid ${HAIRLINE}`,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 4,
+          flexShrink: 0,
+        }}
+      >
+        <button
+          type="button"
+          aria-label="Back"
+          onClick={() => navigate('/messages-v2')}
+          className="active:opacity-60"
+          style={{
+            width: 40,
+            height: 40,
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'transparent',
+            border: 'none',
+            color: INK,
+          }}
+        >
+          <ChevronLeft size={24} />
+        </button>
+        <div className="flex items-center gap-2.5 flex-1 min-w-0">
+          <SquircleAvatar
+            src={header.avatarUrl}
+            userId={header.userId}
+            alt={header.name}
+            size={34}
+          />
+          <div className="flex flex-col min-w-0" style={{ gap: 1 }}>
+            <div className="flex items-center gap-1.5 min-w-0">
+              <span
+                className="truncate"
+                style={{ color: INK, fontSize: 15, fontWeight: 600, lineHeight: '18px' }}
+              >
+                {header.name}
+              </span>
+              {header.verified ? (
+                <BadgeCheck size={13} style={{ color: AMBER, flexShrink: 0 }} />
+              ) : null}
+            </div>
+            {header.secondary ? (
+              <span style={{ color: SUB, fontSize: 12, lineHeight: '14px' }}>
+                {header.secondary}
+              </span>
+            ) : null}
+          </div>
+        </div>
+        <button
+          type="button"
+          aria-label="More"
+          className="active:opacity-60"
+          style={{
+            width: 40,
+            height: 40,
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'transparent',
+            border: 'none',
+            color: SUB,
+          }}
+        >
+          <MoreVertical size={20} />
+        </button>
+      </header>
+
+      <div
+        ref={scrollerRef}
+        className="flex-1 overflow-y-auto"
+        style={{
+          padding: '8px 12px 12px 12px',
+          WebkitOverflowScrolling: 'touch',
+        }}
+      >
+        {isLoading ? (
+          <div className="flex flex-col">
+            <SkeletonBubble side="left" w={55} />
+            <SkeletonBubble side="right" w={40} />
+            <SkeletonBubble side="left" w={65} />
+            <SkeletonBubble side="right" w={35} />
+            <SkeletonBubble side="left" w={45} />
+          </div>
+        ) : error ? (
+          <div
+            className="flex flex-col items-center justify-center text-center"
+            style={{ padding: '80px 24px', gap: 12 }}
+          >
+            <p style={{ color: INK, fontSize: 16, fontWeight: 500, margin: 0 }}>
+              Couldn't load this conversation
+            </p>
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="rounded-full"
+              style={{
+                background: AMBER,
+                color: '#FFFFFF',
+                fontSize: 14,
+                fontWeight: 500,
+                padding: '8px 20px',
+                border: 'none',
+              }}
+            >
+              Retry
+            </button>
+          </div>
+        ) : messages.length === 0 ? (
+          <div
+            className="flex flex-col items-center justify-center text-center"
+            style={{ padding: '96px 24px' }}
+          >
+            <p style={{ color: SUB, fontSize: 14, margin: 0 }}>No messages yet</p>
+          </div>
+        ) : (
+          <>
+            {isFetchingOlder ? (
+              <div
+                className="flex justify-center"
+                style={{ padding: '8px 0', color: HINT, fontSize: 12 }}
+              >
+                Loading...
+              </div>
+            ) : null}
+            {messages.map((m, i) => {
+              const f = flags[i];
+              return (
+                <MessageBubble
+                  key={m.id}
+                  message={m}
+                  isOutgoing={f.isOutgoing}
+                  isFirstOfRun={f.isFirstOfRun}
+                  isLastOfRun={f.isLastOfRun}
+                  showTicks={f.isOutgoing && i === lastOutgoingIndex}
+                />
+              );
+            })}
+            <div ref={bottomAnchorRef} />
+          </>
+        )}
+      </div>
+
+      <div
+        style={{
+          background: COMPOSER_BG,
+          borderTop: `0.5px solid ${HAIRLINE}`,
+          paddingTop: 8,
+          paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)',
+          paddingLeft: 10,
+          paddingRight: 10,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          flexShrink: 0,
+        }}
+      >
+        <button
+          type="button"
+          disabled
+          aria-label="Attach"
+          style={{
+            width: 36,
+            height: 36,
+            borderRadius: 999,
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'transparent',
+            border: 'none',
+            color: SUB,
+            opacity: 0.6,
+          }}
+        >
+          <Plus size={22} />
+        </button>
+        <div
+          aria-disabled
+          style={{
+            flex: 1,
+            minHeight: 36,
+            background: COMPOSER_INPUT_BG,
+            borderRadius: 18,
+            padding: '8px 14px',
+            color: HINT,
+            fontSize: 14,
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
+          Message
+        </div>
+        <button
+          type="button"
+          disabled
+          aria-label="Send"
+          style={{
+            width: 36,
+            height: 36,
+            borderRadius: 999,
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: '#15171F',
+            border: 'none',
+            color: '#F5F6F7',
+            opacity: 0.5,
+          }}
+        >
+          <ArrowUp size={18} />
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default ThreadV2Page;
