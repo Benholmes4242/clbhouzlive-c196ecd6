@@ -568,14 +568,10 @@ Deno.serve(async (req) => {
         display_name: anonymizedDisplayName,
         username: anonymizedUsername,
         bio: null,
-        avatar_url: null,
-        cover_image_url: null,
+        profile_photo_url: null,
+        cover_photo_url: null,
         phone: null,
-        home_course: null,
-        handicap: null,
         is_public: false,
-        is_creator: false,
-        creator_only: false,
       })
       .eq('id', user.id)
 
