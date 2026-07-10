@@ -848,9 +848,17 @@ const AppInner: React.FC = () => {
 
     runWhenMedianReady(register);
 
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') {
+        import('@/utils/pushBadge').then((m) => m.clearAppBadge());
+      }
+    };
+    document.addEventListener('visibilitychange', onVisible);
+
     return () => {
       cancelled = true;
       if (pollInterval) clearInterval(pollInterval);
+      document.removeEventListener('visibilitychange', onVisible);
     };
   }, []);
 
