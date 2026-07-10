@@ -833,6 +833,9 @@ const AppInner: React.FC = () => {
         try { os.login?.(userId); } catch {}
         try { os.User?.addAlias?.('external_id', userId); } catch {}
 
+        // Clear iOS app icon badge on cold open + on every foreground.
+        import('@/utils/pushBadge').then((m) => m.clearAppBadge());
+
         const platform = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase())
           ? 'ios' : 'android';
 
