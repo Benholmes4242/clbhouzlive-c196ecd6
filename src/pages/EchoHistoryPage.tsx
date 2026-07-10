@@ -156,7 +156,7 @@ const EchoHistoryPage: React.FC = () => {
           <button
             type="button"
             aria-label="Back"
-            onClick={() => navigate('/echo-v2')}
+            onClick={() => navigate('/echo')}
             className="active:opacity-60"
             style={{
               width: 40,
@@ -241,7 +241,7 @@ const EchoHistoryPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() =>
-                        navigate(`/echo-v2/${c.id}`, { state: { from: 'history' } })
+                        navigate(`/echo/${c.id}`, { state: { from: 'history' } })
                       }
                       className="active:opacity-70"
                       style={{
