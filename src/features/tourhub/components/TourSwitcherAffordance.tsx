@@ -13,6 +13,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SheetHeader } from '@/components/ui/SheetHeader';
 import { getTourLogo } from '../utils/tourLogos';
 import { useAllToursTickerData } from '../hooks/useOverviewModules';
+import { useActiveMensMajor } from '../hooks/useActiveMensMajor';
 import { useTourSelection } from '../context/TourSelectionContext';
 import {
   AMBER,
@@ -38,6 +39,10 @@ const TOUR_LABEL: Record<string, string> = {
   liv: 'LIV GOLF',
 };
 
+const GOLD_TINT_10 = 'rgba(255,184,0,0.10)';
+const GOLD_TINT_18 = 'rgba(255,184,0,0.18)';
+const GOLD_BORDER = 'rgba(255,184,0,0.45)';
+
 export interface TourSwitcherAffordanceProps {
   variant?: 'glass' | 'default';
 }
@@ -46,6 +51,7 @@ export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
   variant = 'default',
 }) => {
   const { data } = useAllToursTickerData();
+  const activeMajor = useActiveMensMajor();
   const [open, setOpen] = useState(false);
   const { selectedTourSlug, selectTour, viewingTourSlug } = useTourSelection();
 
@@ -53,6 +59,7 @@ export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
   // random landing, swipe, dots, and taps). Fall back to the user's explicit
   // pick, then PGA before the hero has reported anything.
   const activeTourSlug = viewingTourSlug ?? selectedTourSlug ?? 'pga';
+  const isMajorActive = activeTourSlug === 'major';
 
   const tourStatus = (slug: string): 'live' | 'results' | 'upcoming' | 'none' => {
     // Precedence mirrors deriveHeroState: live > results (≤72h) > upcoming > none.
@@ -63,6 +70,8 @@ export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
     if (data?.upcomingTourSlugs?.includes(slug)) return 'upcoming';
     return 'none';
   };
+
+  const pillLabel = isMajorActive ? 'THE MAJORS' : (TOUR_LABEL[activeTourSlug] ?? 'PGA TOUR');
 
   return (
     <>
@@ -81,14 +90,17 @@ export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
             gap: 7,
             padding: '0 15px',
             borderRadius: 999,
-            background: 'rgba(255,255,255,0.16)',
-            border: '1px solid rgba(255,255,255,0.30)',
+            background: isMajorActive ? GOLD_TINT_18 : 'rgba(255,255,255,0.16)',
+            border: `1px solid ${isMajorActive ? GOLD_BORDER : 'rgba(255,255,255,0.30)'}`,
             backdropFilter: 'blur(14px)',
             WebkitBackdropFilter: 'blur(14px)',
             whiteSpace: 'nowrap',
             cursor: 'pointer',
           }}
         >
+          {isMajorActive && (
+            <Trophy size={13} strokeWidth={2.4} color={GOLD} aria-hidden />
+          )}
           <span
             style={{
               fontFamily: 'Geist',
@@ -96,12 +108,12 @@ export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
               fontSize: 13,
               fontWeight: 800,
               letterSpacing: '0.02em',
-              color: '#FFFFFF',
+              color: isMajorActive ? GOLD : '#FFFFFF',
             }}
           >
-            {TOUR_LABEL[activeTourSlug] ?? 'PGA TOUR'}
+            {pillLabel}
           </span>
-          <ArrowLeftRight size={14} strokeWidth={2.4} color="#F7931E" />
+          <ArrowLeftRight size={14} strokeWidth={2.4} color={isMajorActive ? GOLD : '#F7931E'} />
         </button>
       ) : (
         <button
@@ -130,12 +142,12 @@ export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
               fontSize: 8,
               fontWeight: 800,
               letterSpacing: '0.14em',
-              color: AMBER,
+              color: isMajorActive ? GOLD_DEEP : AMBER,
               textTransform: 'uppercase',
               lineHeight: 1,
             }}
           >
-            Tour
+            {isMajorActive ? 'Major' : 'Tour'}
           </span>
           <span
             style={{
@@ -145,13 +157,13 @@ export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
               fontSize: 11,
               fontWeight: 700,
               letterSpacing: '0.04em',
-              color: '#0A0E14',
+              color: isMajorActive ? GOLD_DEEP : '#0A0E14',
               textTransform: 'uppercase',
               lineHeight: 1,
             }}
           >
-            {TOUR_LABEL[activeTourSlug] ?? 'PGA TOUR'}
-            <ArrowLeftRight size={11} strokeWidth={2.2} color="#0A0E14" aria-hidden />
+            {pillLabel}
+            <ArrowLeftRight size={11} strokeWidth={2.2} color={isMajorActive ? GOLD_DEEP : '#0A0E14'} aria-hidden />
           </span>
         </button>
       )}
@@ -168,6 +180,83 @@ export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
         />
 
         <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {activeMajor && (
+            <button
+              key="major"
+              type="button"
+              onClick={() => {
+                selectTour('major');
+                setOpen(false);
+              }}
+              aria-pressed={isMajorActive}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                padding: '14px 16px',
+                background: isMajorActive ? GOLD_TINT_18 : GOLD_TINT_10,
+                border: 'none',
+                borderBottom: `0.5px solid ${INK_TINT_07}`,
+                cursor: 'pointer',
+                textAlign: 'left',
+                fontFamily: FONT,
+              }}
+            >
+              <div
+                style={{
+                  width: 28,
+                  height: 28,
+                  flexShrink: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: 6,
+                  background: GOLD_TINT_18,
+                  border: `0.5px solid ${GOLD_BORDER}`,
+                }}
+              >
+                <Trophy size={15} strokeWidth={2.4} color={GOLD_DEEP} aria-hidden />
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 800,
+                    color: GOLD_DEEP,
+                    letterSpacing: '0.06em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  The Majors
+                </div>
+                <div
+                  style={{
+                    marginTop: 2,
+                    fontSize: 11,
+                    fontWeight: 600,
+                    color: INK,
+                    letterSpacing: '0.01em',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
+                  {activeMajor.name}
+                </div>
+              </div>
+              {activeMajor.status === 'live' ? (
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_LIVE, display: 'inline-block' }} />
+                  <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: STATUS_LIVE }}>LIVE</span>
+                </span>
+              ) : (
+                <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: GOLD_DEEP }}>
+                  UPCOMING
+                </span>
+              )}
+            </button>
+          )}
           {Object.entries(TOUR_LABEL).map(([slug, label]) => {
             const isActive = slug === activeTourSlug;
             const status = tourStatus(slug);

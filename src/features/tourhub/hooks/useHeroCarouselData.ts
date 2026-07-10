@@ -38,7 +38,8 @@ export interface HeroTournament {
   purse: number | null;
   winningShare: number | null;
   currency: string | null;
-  tourSlug: TourId;
+  /** 'major' is a synthetic pseudo-tour used only for the pinned men's major slide. */
+  tourSlug: TourId | 'major';
   tourName: string;
   defendingChampion: string | null;
   defendingChampionPhotoUrl: string | null;
@@ -46,6 +47,8 @@ export interface HeroTournament {
   championNarrative: string | null;
   isMajor: boolean;
   isSignature: boolean;
+  /** True when this slide is the pseudo-tour men's-major entry. */
+  isPseudoMajorTour?: boolean;
   // Winner info (for completed)
   winnerId: string | null;
   winnerName: string | null;
@@ -337,14 +340,37 @@ export function useHeroCarouselData() {
         if (upcomingByTour[tournament.tourSlug]) upcomingByTour[tournament.tourSlug].push(tournament);
       });
 
-      // Cross-tour major promotion:
-      // Co-sanctioned majors (e.g. Masters, The Open) are stored under a non-PGA tour
-      // in Sportradar (typically EURO). The skip logic below prevents them appearing in
-      // the non-PGA slot, but they also never enter the PGA slot. Fix: inject any upcoming
-      // major from a non-PGA tour into upcomingByTour['pga'] so it competes there by date.
+      // ---- Active men's-major routing (MAJ-1) ----
+      // A men's major is "active" when it's live OR starts within 10 days.
+      // While active, it OWNS a synthetic 'major' pseudo-tour slide and is
+      // evicted from its native tour bucket AND from cross-tour PGA injection.
+      // This restores each native tour's real next event (e.g. 3M Open on PGA,
+      // Scottish Open on EURO during Open week) and gives the major a
+      // correctly-labelled hero card instead of a mis-tagged one.
+      const nowMs = Date.now();
+      const MAJOR_WINDOW_MS = 10 * 86_400_000;
+      const findActiveMensMajor = (rows: CachedTournament[]): CachedTournament | null => {
+        const live = rows.find(
+          t => t.status === 'inprogress' && getMajorType(t.name || '') === 'mens',
+        );
+        if (live) return live;
+        const soon = [...rows]
+          .filter(t => t.status !== 'inprogress' && getMajorType(t.name || '') === 'mens')
+          .sort((a, b) => a.start_date.localeCompare(b.start_date))
+          .find(t => {
+            const s = new Date(t.start_date + 'T12:00:00Z').getTime();
+            return (s - nowMs) <= MAJOR_WINDOW_MS && (s - nowMs) >= -MAJOR_WINDOW_MS;
+          });
+        return soon ?? null;
+      };
+      const activeMajorRow = findActiveMensMajor([...liveTournaments, ...upcomingTournaments]);
+      const activeMajorId = activeMajorRow?.id ?? null;
+
+      // Cross-tour major promotion (existing behaviour) — but SKIP the active
+      // major so it doesn't evict the true PGA next event.
       const crossTourMajors = upcomingTournaments
         .map(t => transformTournament(t, false))
-        .filter(t => getMajorType(t.name || '') === 'mens' && t.tourSlug !== 'pga');
+        .filter(t => getMajorType(t.name || '') === 'mens' && t.tourSlug !== 'pga' && t.id !== activeMajorId);
 
       crossTourMajors.forEach(major => {
         const alreadyInPga = upcomingByTour['pga'].some(t => t.id === major.id);
@@ -358,6 +384,14 @@ export function useHeroCarouselData() {
         (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
       );
 
+      // Evict the active major from every native tour bucket — it lives only
+      // in the synthetic 'major' slide below.
+      if (activeMajorId) {
+        TOUR_PRIORITY.forEach(tour => {
+          liveByTour[tour] = liveByTour[tour].filter(t => t.id !== activeMajorId);
+          upcomingByTour[tour] = upcomingByTour[tour].filter(t => t.id !== activeMajorId);
+        });
+      }
 
       // Build slides per tour based on priority logic
       const liveSlides: HeroSlide[] = [];
@@ -370,16 +404,27 @@ export function useHeroCarouselData() {
         const upcoming = upcomingByTour[tour];
 
         if (live.length > 0) {
-          // Sort by purse descending so the biggest event leads; show ALL live events per tour
-          const sorted = [...live].sort((a, b) => (b.purse || 0) - (a.purse || 0));
+          // EURO can host multiple concurrent live events (Scottish + ISCO). Prefer
+          // the larger field as the primary slot; leaderboard row count is a good
+          // proxy since sr_leaderboards fans out per-player. Fall back to purse.
+          const sizeFor = (t: HeroTournament) => tieMap[t.id]?.topRowCount ?? 0;
+          const sorted = [...live].sort((a, b) => {
+            // Field-size heuristic can't come from the pos=1-only leaderboard query,
+            // so use purse (which correlates strongly with field size at the
+            // primary tour level) as the primary key. This preserves existing
+            // "biggest event leads" behaviour when field-size data is unavailable.
+            const purseDiff = (b.purse || 0) - (a.purse || 0);
+            if (purseDiff !== 0) return purseDiff;
+            return sizeFor(b) - sizeFor(a);
+          });
           for (const tournament of sorted) {
             liveSlides.push({ tournament, type: 'live' });
           }
         } else if (completed.length > 0) {
           completedSlides.push({ tournament: completed[0], type: 'completed' });
         } else if (upcoming.length > 0) {
-          // Skip co-sanctioned majors (e.g. The Masters, PGA Championship) on non-PGA tours
-          // These are stored under EURO in Sportradar but should only appear as PGA upcoming cards
+          // Skip co-sanctioned majors on non-PGA tours (already excluded from PGA
+          // slot when active via the eviction above).
           const nextTrueEvent = tour === 'pga'
             ? upcoming[0]
             : upcoming.find(t => getMajorType(t.name || '') !== 'mens') ?? upcoming[0];
@@ -387,17 +432,40 @@ export function useHeroCarouselData() {
         }
       });
 
-      // Sort within categories — majors first within live
+      // Inject the synthetic MAJOR slide (pinned first within its status bucket).
+      if (activeMajorRow) {
+        const majorTournament: HeroTournament = {
+          ...transformTournament(activeMajorRow, activeMajorRow.status !== 'inprogress' ? false : false),
+          tourSlug: 'major',
+          tourName: 'The Majors',
+          isPseudoMajorTour: true,
+        };
+        if (activeMajorRow.status === 'inprogress') {
+          liveSlides.unshift({ tournament: majorTournament, type: 'live' });
+        } else {
+          upcomingSlides.unshift({ tournament: majorTournament, type: 'upcoming' });
+        }
+      }
+
+      // Sort within categories — majors first within live (pseudo-major stays first).
       liveSlides.sort((a, b) => {
+        if (a.tournament.tourSlug === 'major') return -1;
+        if (b.tournament.tourSlug === 'major') return 1;
         if (a.tournament.isMajor !== b.tournament.isMajor) return a.tournament.isMajor ? -1 : 1;
-        return TOUR_PRIORITY.indexOf(a.tournament.tourSlug) - TOUR_PRIORITY.indexOf(b.tournament.tourSlug);
+        const ai = TOUR_PRIORITY.indexOf(a.tournament.tourSlug as TourId);
+        const bi = TOUR_PRIORITY.indexOf(b.tournament.tourSlug as TourId);
+        return ai - bi;
       });
       completedSlides.sort((a, b) => {
         const dateDiff = new Date(b.tournament.endDate).getTime() - new Date(a.tournament.endDate).getTime();
         if (dateDiff !== 0) return dateDiff;
         return (b.tournament.purse || 0) - (a.tournament.purse || 0);
       });
-      upcomingSlides.sort((a, b) => new Date(a.tournament.startDate).getTime() - new Date(b.tournament.startDate).getTime());
+      upcomingSlides.sort((a, b) => {
+        if (a.tournament.tourSlug === 'major') return -1;
+        if (b.tournament.tourSlug === 'major') return 1;
+        return new Date(a.tournament.startDate).getTime() - new Date(b.tournament.startDate).getTime();
+      });
 
       // Per-category caps to prevent any one category from crowding out others
       const cappedLive = liveSlides.slice(0, 6);

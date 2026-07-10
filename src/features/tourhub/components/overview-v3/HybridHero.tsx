@@ -281,7 +281,13 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
       : endD
         ? format(endD, 'MMM d').toUpperCase()
         : null;
-  const tourLabel = tournament.tourName || tournament.tourSlug?.toUpperCase() || null;
+  const isPseudoMajor = tournament.tourSlug === 'major';
+  const tourLabel = isPseudoMajor
+    ? 'MAJOR CHAMPIONSHIP'
+    : tournament.tourName || tournament.tourSlug?.toUpperCase() || null;
+  // Same-tour majors (Evian on LPGA, Senior PGA on CHAMP, etc.) get a small
+  // gold "MAJOR" tag next to the eyebrow — no relocation, cosmetic only.
+  const showMajorTag = !isPseudoMajor && tournament.isMajor;
 
   // Direction A: CinematicFrame is the single hero surface for all three states.
   // Legacy three-band path is retained only for the cancelled variant.
@@ -331,6 +337,8 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
             fieldSize={safeLeaderboard.length}
             venueImageUrl={venueImageUrl}
             tourSlug={tournament.tourSlug}
+            isPseudoMajor={isPseudoMajor}
+            showMajorTag={showMajorTag}
             onCtaTap={onCtaTap}
             champion={champion}
             defendingChamp={defendingChamp ?? null}
