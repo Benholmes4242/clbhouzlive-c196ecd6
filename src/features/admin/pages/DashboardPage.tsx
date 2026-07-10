@@ -370,3 +370,43 @@ function EgSyncCard({ data, loading, isError }: { data: any; loading: boolean; i
     </Card>
   );
 }
+
+function EchoHealthLinkRow() {
+  const { data, isLoading, isError } = useEchoEngineHealth();
+  const latest = data?.latest ?? [];
+  let dotColor = t.line;
+  let sub = 'No checks yet';
+  if (isLoading) {
+    sub = 'Loading…';
+  } else if (isError) {
+    dotColor = t.warn;
+    sub = 'Status unavailable';
+  } else if (latest.length > 0) {
+    const anyFail = latest.some(r => !r.ok);
+    dotColor = anyFail ? t.danger : t.ok;
+    const okCount = latest.filter(r => r.ok).length;
+    sub = anyFail ? `${latest.length - okCount} of ${latest.length} engines failing` : `${okCount} of ${latest.length} engines ok`;
+  }
+  return (
+    <Link
+      to="/admin-v2/echo-health"
+      style={{
+        display: 'flex', alignItems: 'center', gap: 12,
+        background: t.surface, border: `1px solid ${t.line}`,
+        borderRadius: t.radius.lg, boxShadow: t.shadowCard,
+        padding: '12px 14px',
+        textDecoration: 'none', color: t.ink,
+      }}
+    >
+      <span
+        aria-hidden
+        style={{ width: 10, height: 10, borderRadius: 999, background: dotColor, flexShrink: 0 }}
+      />
+      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+        <span style={{ fontSize: 14, fontWeight: 700, color: t.ink }}>Echo Engine Health</span>
+        <span style={{ fontSize: 11, color: t.inkMuted }}>{sub}</span>
+      </div>
+      <ChevronRight size={16} color={t.inkFaint} />
+    </Link>
+  );
+}
