@@ -82,9 +82,9 @@ export function LivePreviewCard({
   scores,
   media,
 }: Props) {
-  const tier = getRatingTier(overall);
-  const isGold = tier === 'EXCEPTIONAL';
   void verdict;
+  void tier;
+  void isGold;
 
   return (
     <article
