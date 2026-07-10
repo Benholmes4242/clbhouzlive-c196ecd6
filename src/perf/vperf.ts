@@ -803,12 +803,15 @@ export function vperfScorecard(trigger: 'auto' | 'nav' | 'manual' = 'manual'): v
   const keys = [...scorecardBuckets.keys()].sort();
   for (const k of keys) {
     const s = scorecardBuckets.get(k)!;
-    const passPct = s.count > 0 ? Math.round((s.pass / s.count) * 100) : 0;
+    const evaluated = Math.max(0, s.count - (s.superseded ?? 0));
+    const passPct = evaluated > 0 ? Math.round((s.pass / evaluated) * 100) : 0;
     const worst = s.totals.reduce((m, v) => v > m ? v : m, 0);
+    const supTag = (s.superseded ?? 0) > 0 ? ` SUP=${s.superseded}` : '';
     lines.push(
-      `  ${k.padEnd(36)} ${String(s.count).padStart(5)} ${String(pct(s.totals, 0.5)).padStart(4)} ${String(pct(s.totals, 0.95)).padStart(5)} ${String(Math.round(worst)).padStart(6)}  ${String(passPct).padStart(3)}%  (SLOW=${s.slow} TO=${s.timeout})`,
+      `  ${k.padEnd(36)} ${String(s.count).padStart(5)} ${String(pct(s.totals, 0.5)).padStart(4)} ${String(pct(s.totals, 0.95)).padStart(5)} ${String(Math.round(worst)).padStart(6)}  ${String(passPct).padStart(3)}%  (SLOW=${s.slow} TO=${s.timeout}${supTag})`,
     );
   }
+
   const sh = sessionHealth;
   const stallRate = sh.totalDurationMs > 0 ? (sh.totalStallMs / sh.totalDurationMs) : 0;
   const dropRate = sh.totalFrames > 0 ? (sh.droppedFrames / sh.totalFrames) : 0;
