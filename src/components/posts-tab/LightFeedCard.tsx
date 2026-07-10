@@ -309,9 +309,11 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
           POOR:        'rgba(154,74,14,0.15)',    // #9A4A0E ember (Option B low end)
         } as const;
         const tierKey = getRatingTier(reviewRating);
+        const ghostExceptional = tierKey === 'EXCEPTIONAL';
         return (
           <span
             aria-hidden
+            className={ghostExceptional ? 'clbhouz-gold-shimmer-light' : undefined}
             style={{
               position: 'absolute',
               right: -7,
@@ -319,9 +321,9 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
               transform: 'translateY(-50%)',
               fontSize: 110,
               fontWeight: 800, letterSpacing: '-0.05em', lineHeight: 1,
-              color: GHOST[tierKey],
               pointerEvents: 'none', whiteSpace: 'nowrap', zIndex: 0,
               fontVariantNumeric: 'tabular-nums',
+              ...(ghostExceptional ? { opacity: 0.30 } : { color: GHOST[tierKey] }),
             }}
           >
             {formatRatingValue(reviewRating)}

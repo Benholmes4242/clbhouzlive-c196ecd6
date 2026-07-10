@@ -28,12 +28,17 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
     // Per-actor unread (badge hybrid): show a small dot on the pill when ANY
     // non-active actor has unread activity — tells the owner "another profile
     // has activity".
-    const { hasOtherUnread, countFor } = useActorUnreadCounts();
+    const { otherUnreadTotal, countFor } = useActorUnreadCounts();
 
     // Combined unread count for the active actor (notifications + DMs).
     const activeUnread = activeActor
       ? countFor(activeActor.type as 'personal' | 'business', activeActor.id)
       : 0;
+
+    // Single unified badge value: active actor's unread takes priority; if the
+    // active actor is clear, surface the other-accounts total instead (so the
+    // owner still sees a numbered top-right badge, never a bare top-left dot).
+    const badgeCount = activeUnread > 0 ? activeUnread : otherUnreadTotal;
 
 
     // Bare theme — no background, no chevron, white-ringed avatar with drop shadow
@@ -75,28 +80,21 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
 
           </span>
 
-          {activeUnread > 0 && (
+          {badgeCount > 0 && (
             <span
               className={cn(
                 "absolute -top-1 -right-1 flex items-center justify-center rounded-full bg-[#F7931E] font-bold",
-                activeUnread > 9
+                badgeCount > 9
                   ? "h-[18px] min-w-[18px] px-[4px] text-[10px]"
                   : "h-[18px] w-[18px] text-[10px]"
               )}
               style={{ color: 'rgba(255,255,255,0.95)', boxShadow: '0 0 0 0.5px rgba(255,255,255,0.95)' }}
-              aria-label={`${activeUnread} unread`}
+              aria-label={`${badgeCount} unread`}
             >
               <span style={{ lineHeight: 1 }}>
-                {activeUnread > 99 ? '99+' : activeUnread}
+                {badgeCount > 99 ? '99+' : badgeCount}
               </span>
             </span>
-          )}
-
-          {hasOtherUnread && activeUnread === 0 && (
-            <span
-              className="absolute -top-0.5 -left-0.5 h-2 w-2 rounded-full bg-[#F7931E] ring-[1.5px] ring-black"
-              aria-label="Another profile has unread activity"
-            />
           )}
         </button>
       );
@@ -195,32 +193,21 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
 
           </span>
           
-          {/* Combined unread badge — notifications + DMs (top-right) */}
-          {activeUnread > 0 && (
+          {/* Single unified unread badge — top-right, numbered (matches profile sheet) */}
+          {badgeCount > 0 && (
             <span
               className={cn(
                 "absolute -top-1 -right-1 flex items-center justify-center rounded-full bg-[#F7931E] font-bold text-white",
-                activeUnread > 9
+                badgeCount > 9
                   ? "h-[16px] min-w-[16px] px-[3px] text-[8px]"
                   : "h-[14px] w-[14px] text-[8px]"
               )}
-              aria-label={`${activeUnread} unread`}
+              aria-label={`${badgeCount} unread`}
             >
               <span style={{ lineHeight: 1 }}>
-                {activeUnread > 99 ? '99+' : activeUnread}
+                {badgeCount > 99 ? '99+' : badgeCount}
               </span>
             </span>
-          )}
-
-          {/* Amber micro-dot — another profile (non-active actor) has unread */}
-          {hasOtherUnread && activeUnread === 0 && (
-            <span
-              className={cn(
-                "absolute -top-0.5 -left-0.5 h-2 w-2 rounded-full bg-[#F7931E]",
-                useLightTheme ? "ring-[1.5px] ring-background" : "ring-[1.5px] ring-black"
-              )}
-              aria-label="Another profile has unread activity"
-            />
           )}
         </div>
 
