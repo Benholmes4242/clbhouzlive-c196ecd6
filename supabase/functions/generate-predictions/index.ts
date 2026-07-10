@@ -1107,7 +1107,7 @@ ${venueHistorySection}
 ${detailedStatsSection}
 
 ## FIELD DATA
-${fieldNote}
+${fieldNote}${statsLightNote}
 
 ${JSON.stringify(playerDataFormatted, null, 2)}
 
