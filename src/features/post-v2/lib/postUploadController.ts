@@ -95,7 +95,8 @@ async function runImage(job: InternalJob, item: StageMediaItem, displayOrder: nu
     totalFiles: job.items.length,
   });
 
-  let sourceFile = item.file;
+  if (!item.file) throw new Error('Image item missing file');
+  let sourceFile: File = item.file;
   if (item.frame && item.frame !== 'original') {
     try {
       sourceFile = await bakeFrameCrop(item.file, item.frame as '4:5' | '1:1' | '9:16', { x: 50, y: 50 });
