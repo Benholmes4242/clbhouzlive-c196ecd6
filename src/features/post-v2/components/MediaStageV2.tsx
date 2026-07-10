@@ -25,7 +25,7 @@ interface Props {
 const KEYFRAMES_CSS = `
 @keyframes pv2-floaty {
   0%,100% { transform: translateY(0) rotate(var(--r)); }
-  50% { transform: translateY(-6px) rotate(var(--r)); }
+  50% { transform: translateY(-14px) rotate(calc(var(--r) + 2.5deg)); }
 }
 `;
 
