@@ -79,17 +79,14 @@ export function useReviewComposer(existing?: ExistingReview | null, hasNewMedia?
   );
 
   const canSubmit = useMemo(
-    () => state.verdict != null && state.overall != null && allCategoriesSet,
-    [state.verdict, state.overall, allCategoriesSet],
+    () => state.overall != null && allCategoriesSet,
+    [state.overall, allCategoriesSet],
   );
 
   const progressPct = useMemo(() => {
+    // Buckets: overall + categories (all four) + words-or-skip + media-or-skip
+    const total = 4;
     let filled = 0;
-    let total = 4; // verdict + overall + 4 categories = 6? plus text + media = 8, but categories count as one bucket per brief
-    // Brief: verdict + overall + categories + words-or-skip + media-or-skip
-    // Represent categories as one weighted bucket (require all four)
-    total = 5;
-    if (state.verdict) filled++;
     if (state.overall != null) filled++;
     if (allCategoriesSet) filled++;
     if (state.reviewText.trim().length > 0) filled++;
