@@ -33,6 +33,8 @@ export interface SubmitResult {
   kind: SubmitResultKind;
   postId: string;
   scheduledAt?: string;
+  /** Present on the media path; drives live progress in PostSuccessV2. */
+  jobId?: string;
   /** True when the client returned early and the controller is still uploading. */
   isUploading?: boolean;
   /** True when the post is scheduled (independent of upload state). */
