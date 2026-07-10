@@ -16548,6 +16548,18 @@ export type Database = {
         Returns: string
       }
       create_generic_invite: { Args: { p_source?: string }; Returns: Json }
+      create_post_v2: {
+        Args: {
+          p_actor_id: string
+          p_actor_type: string
+          p_content: string
+          p_course_id?: string
+          p_has_media?: boolean
+          p_scheduled_at?: string
+          p_visibility?: string
+        }
+        Returns: Json
+      }
       current_auth_uid: { Args: never; Returns: string }
       decline_golfer_verification_invite: {
         Args: { p_note?: string; p_request_id: string }
@@ -16689,6 +16701,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      finalize_post_v2: { Args: { p_post_id: string }; Returns: Json }
       find_best_trigram_match: {
         Args: { country_filter?: string; input_name: string }
         Returns: {

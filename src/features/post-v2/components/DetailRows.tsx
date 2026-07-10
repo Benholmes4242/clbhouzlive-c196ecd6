@@ -1,0 +1,51 @@
+// DetailRows - three tap-through rows: course, actor, schedule.
+
+import { ChevronRight, MapPin, User2, Clock } from 'lucide-react';
+import type { StageCourse } from '../hooks/useStageComposer';
+import type { ActiveActor } from '@/types/actor';
+
+interface Props {
+  course: StageCourse | null;
+  onOpenCourse: () => void;
+  actor: ActiveActor | null;
+  onOpenActor: () => void;
+  scheduledAt: Date | null;
+  onOpenSchedule: () => void;
+}
+
+export default function DetailRows({ course, onOpenCourse, actor, onOpenActor, scheduledAt, onOpenSchedule }: Props) {
+  return (
+    <div style={{ background: '#F8FAFC' }}>
+      <Row icon={<MapPin size={16} />} label="Tag a course" value={course?.name ?? null} onClick={onOpenCourse} />
+      <Row icon={<User2 size={16} />} label="Posting as" value={actor?.name ?? null} onClick={onOpenActor} />
+      <Row icon={<Clock size={16} />} label="Schedule for later" value={scheduledAt ? scheduledAt.toLocaleString() : null} onClick={onOpenSchedule} />
+    </div>
+  );
+}
+
+function Row({ icon, label, value, onClick }: { icon: React.ReactNode; label: string; value: string | null; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+        width: '100%',
+        background: 'transparent',
+        border: 0,
+        padding: '14px 16px',
+        borderTop: '1px solid rgba(0,0,0,0.07)',
+        cursor: 'pointer',
+        textAlign: 'left',
+      }}
+    >
+      <span style={{ color: '#8A9099' }}>{icon}</span>
+      <span style={{ color: '#1F2428', fontSize: 14, flex: '0 0 auto' }}>{label}</span>
+      <span style={{ color: value ? '#1F2428' : '#AEB4BC', fontWeight: value ? 600 : 400, fontSize: 13, marginLeft: 'auto', maxWidth: '55%', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+        {value ?? 'Not set'}
+      </span>
+      <ChevronRight size={16} color="#AEB4BC" />
+    </button>
+  );
+}

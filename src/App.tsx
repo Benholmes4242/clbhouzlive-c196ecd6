@@ -249,6 +249,7 @@ const UserReviewsPage = lazy(() => import("./pages/UserReviewsPage"));
 const CourseDetailPage = lazy(() => import("./pages/CourseDetailPage"));
 const CourseReviewsPage = lazy(() => import("./pages/CourseReviewsPage"));
 const ReviewComposerV2 = lazy(() => import("./features/review-v2/ReviewComposerV2"));
+const PostV2Page = lazy(() => import("./features/post-v2/PostV2Page"));
 
 // ShareReviewPage removed in PR-5 Part 2 (zero navigators — orphan preview surface, ReviewWizard shares inline).
 const UserCoursesPage = lazy(() => import("./pages/UserCoursesPage"));
@@ -566,6 +567,7 @@ function AppRoutes() {
         <Route path="/courses/:courseId" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseDetailPage /></Suspense>} />
         <Route path="/courses/:courseId/rate" element={<Suspense fallback={<RateCoursePageSkeleton />}><ReviewComposerV2 /></Suspense>} />
         <Route path="/rate-course-v2/:courseId" element={<RateCourseV2Redirect />} />
+        <Route path="/post-v2" element={<Suspense fallback={<GenericPageSkeleton />}><PostV2Page /></Suspense>} />
         
         {/* /courses/:courseId/share-review/:reviewId removed in PR-5 Part 2 — orphan surface. ReviewWizard shares inline. */}
         <Route path="/courses/:courseId/reviews" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseReviewsPage /></Suspense>} />
