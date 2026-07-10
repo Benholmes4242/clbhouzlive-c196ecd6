@@ -14,7 +14,7 @@ import {
   MoreHorizontal,
   X,
   Check,
-} from 'lucide-react';
+  Trash2,
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SheetHeader } from '@/components/ui/SheetHeader';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
