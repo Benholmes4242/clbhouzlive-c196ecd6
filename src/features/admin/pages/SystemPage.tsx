@@ -20,6 +20,7 @@ import ConfirmDialog from '../components/ConfirmDialog';
 import { useAudit, type AuditEntry } from '../hooks/useAudit';
 import { useDashboard } from '../hooks/useDashboard';
 import { useAdminPillVisibility } from '@/hooks/useAdminPillVisibility';
+import { isPerfEnabled, setPerfLive, subscribePerfLive } from '@/perf/navTiming';
 
 type TabId = 'audit' | 'tools' | 'settings';
 
