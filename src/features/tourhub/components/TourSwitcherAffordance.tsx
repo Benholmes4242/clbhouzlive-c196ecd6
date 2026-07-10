@@ -51,6 +51,7 @@ export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
   variant = 'default',
 }) => {
   const { data } = useAllToursTickerData();
+  const activeMajor = useActiveMensMajor();
   const [open, setOpen] = useState(false);
   const { selectedTourSlug, selectTour, viewingTourSlug } = useTourSelection();
 
@@ -58,6 +59,7 @@ export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
   // random landing, swipe, dots, and taps). Fall back to the user's explicit
   // pick, then PGA before the hero has reported anything.
   const activeTourSlug = viewingTourSlug ?? selectedTourSlug ?? 'pga';
+  const isMajorActive = activeTourSlug === 'major';
 
   const tourStatus = (slug: string): 'live' | 'results' | 'upcoming' | 'none' => {
     // Precedence mirrors deriveHeroState: live > results (≤72h) > upcoming > none.
@@ -68,6 +70,8 @@ export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
     if (data?.upcomingTourSlugs?.includes(slug)) return 'upcoming';
     return 'none';
   };
+
+  const pillLabel = isMajorActive ? 'THE MAJORS' : (TOUR_LABEL[activeTourSlug] ?? 'PGA TOUR');
 
   return (
     <>
