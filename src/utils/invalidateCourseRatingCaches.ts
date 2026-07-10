@@ -3,7 +3,7 @@ import type { QueryClient } from '@tanstack/react-query';
 /**
  * Invalidate every query cache that depends on course_ratings data.
  * Call after ANY course rating/review submission (useSubmitRating,
- * useReviewWizard, AddToPlayedModal, CoursePickerModal).
+ * review-v2 composer, AddToPlayedModal, CoursePickerModal).
  *
  * Uses exact: false so partial-key matches (e.g. ['userProfile', id]) all fire.
  */
@@ -65,7 +65,7 @@ export function invalidateCourseRatingCaches(queryClient: QueryClient) {
 
   // ── Clubhouse + feed surfaces ──
   // These cache reviews shared as posts. Keys must match the set
-  // currently invalidated by useReviewWizard's DELETE branch
+  // invalidated by the review-v2 composer's DELETE branch
   // and useShareReview. Centralising here ensures submit + edit
   // paths also invalidate feed caches.
   queryClient.invalidateQueries({ queryKey: ['posts'], exact: false });

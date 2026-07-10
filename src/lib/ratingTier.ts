@@ -44,7 +44,7 @@ export function getRatingTierLabel(rating: number | null | undefined): string {
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Unified rating design tokens (Phase 1 — shared foundation)
-// Use these across the review wizard, course detail, fullscreen media,
+// Use these across the review composer, course detail, fullscreen media,
 // and feed so every rating expression speaks the same visual language.
 // ═══════════════════════════════════════════════════════════════════════════
 

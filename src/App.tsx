@@ -248,7 +248,6 @@ const UserReviewsPage = lazy(() => import("./pages/UserReviewsPage"));
 // Courses page now uses CoursesWrapped (imported above) which handles header/dim reset
 const CourseDetailPage = lazy(() => import("./pages/CourseDetailPage"));
 const CourseReviewsPage = lazy(() => import("./pages/CourseReviewsPage"));
-// RateCoursePage (old wizard) orphaned in R4 cutover; will be deleted in R5.
 const ReviewComposerV2 = lazy(() => import("./features/review-v2/ReviewComposerV2"));
 
 // ShareReviewPage removed in PR-5 Part 2 (zero navigators — orphan preview surface, ReviewWizard shares inline).
