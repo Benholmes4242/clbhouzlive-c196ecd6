@@ -30,11 +30,11 @@ const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 // ─── Model pins (current stable flagship tier as of build time) ──────────
 // Upgrade from v1's claude-sonnet-4, gpt-4o(-mini), gemini-1.5-pro, sonar.
-const ANTHROPIC_MODEL_SYNTH   = "claude-sonnet-4-5-20250929"; // Claude Sonnet 4.5
-const OPENAI_MODEL_SYNTH      = "gpt-4.1";                    // 4o-tier synthesis
-const OPENAI_MODEL_INTENT     = "gpt-4.1-mini";               // reserved mini-tier
-const GEMINI_MODEL            = "gemini-2.5-pro";             // Gemini Pro tier
-const PERPLEXITY_MODEL        = "sonar-pro";                  // current sonar tier
+const ANTHROPIC_MODEL_SYNTH   = "claude-sonnet-5";     // Claude Sonnet 5 (current)
+const OPENAI_MODEL_SYNTH      = "gpt-5.5";             // GPT-5.5 synthesis
+const OPENAI_MODEL_INTENT     = "gpt-5.5";             // reserved; keep in sync with SYNTH
+const GEMINI_MODEL            = "gemini-3.5-flash";    // Gemini 3.5 Flash
+const PERPLEXITY_MODEL        = "sonar-pro";           // unchanged, verified current
 
 // Rate limit windows (identical to v1).
 const RATE_LIMIT_MINUTE = 10;
