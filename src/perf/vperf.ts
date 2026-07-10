@@ -871,13 +871,14 @@ export function vperfScorecard(trigger: 'auto' | 'nav' | 'manual' = 'manual'): v
 
 
 function scorecardEmitOnNav(): void {
-  if (!on()) return;
+  if (!consoleOn()) return; // PHASE-2: console-only path
   vperfScorecard('nav');
 }
 
-// Auto-emit every 60s while enabled (installed once at module eval).
+// Auto-emit every 60s while the pill is on (installed once at module eval).
 if (typeof window !== 'undefined') {
-  setInterval(() => { try { if (on()) vperfScorecard('auto'); } catch {} }, 60_000);
+  setInterval(() => { try { if (consoleOn()) vperfScorecard('auto'); } catch {} }, 60_000);
+
   (window as any).vperfScorecard = vperfScorecard;
 }
 
