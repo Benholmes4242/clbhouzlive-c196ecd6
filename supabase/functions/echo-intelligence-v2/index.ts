@@ -341,7 +341,14 @@ async function callClaudeSync(
     throw new Error(`Claude API error: ${r.status}`);
   }
   const d = await r.json();
-  const text = (d?.content?.[0]?.text || "").trim();
+  // Sonnet 5 returns content: [{type:"thinking",...}, {type:"text", text:"..."}].
+  // Concatenate ALL text blocks; skip thinking and any unknown block types.
+  const blocks = Array.isArray(d?.content) ? d.content : [];
+  const text = blocks
+    .filter((b: any) => b?.type === "text" && typeof b?.text === "string")
+    .map((b: any) => b.text)
+    .join("")
+    .trim();
   if (!text) {
     throw new Error(`Claude empty on 2xx: ${shapeSnippet(d)}`);
   }
