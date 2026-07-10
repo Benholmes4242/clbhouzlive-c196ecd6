@@ -12,14 +12,19 @@ interface Props {
   onOpenActor: () => void;
   scheduledAt: Date | null;
   onOpenSchedule: () => void;
+  /** Edit mode: actor is display-only; schedule row can be hidden. */
+  actorLocked?: boolean;
+  showSchedule?: boolean;
 }
 
-export default function DetailRows({ course, onOpenCourse, actor, onOpenActor, scheduledAt, onOpenSchedule }: Props) {
+export default function DetailRows({ course, onOpenCourse, actor, onOpenActor, scheduledAt, onOpenSchedule, actorLocked, showSchedule = true }: Props) {
   return (
     <div style={{ background: '#F8FAFC' }}>
       <Row icon={<MapPin size={16} />} label="Tag a course" value={course?.name ?? null} onClick={onOpenCourse} />
-      <Row icon={<User2 size={16} />} label="Posting as" value={actor?.name ?? null} onClick={onOpenActor} />
-      <Row icon={<Clock size={16} />} label="Schedule for later" value={scheduledAt ? formatSchedule(scheduledAt) : null} onClick={onOpenSchedule} />
+      <Row icon={<User2 size={16} />} label="Posting as" value={actor?.name ?? null} onClick={onOpenActor} disabled={actorLocked} />
+      {showSchedule && (
+        <Row icon={<Clock size={16} />} label="Schedule for later" value={scheduledAt ? formatSchedule(scheduledAt) : null} onClick={onOpenSchedule} />
+      )}
     </div>
   );
 }
