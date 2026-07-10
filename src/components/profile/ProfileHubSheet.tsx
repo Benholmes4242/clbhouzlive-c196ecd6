@@ -20,8 +20,8 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion';
 import type { PanInfo } from 'framer-motion';
 import {
-  ChevronRight, ChevronDown, LogOut, Shield,
-  MessageCircle, Bell, Settings as SettingsIcon, UserCog,
+  ChevronRight, LogOut, Shield,
+  MessageCircle, Bell, Settings as SettingsIcon, UserCog, Plus,
 } from 'lucide-react';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 import { useActorUnreadCounts } from '@/hooks/useActorUnreadCounts';
