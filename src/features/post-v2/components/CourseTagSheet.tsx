@@ -112,22 +112,6 @@ function CourseRow({ row, onSelect }: { row: RecentRow; onSelect: (c: StageCours
   );
 }
 
-function CourseRow({ row, onSelect }: { row: RecentRow; onSelect: (c: StageCourse) => void }) {
-  const locality = row.sub_country || row.country || null;
-  return (
-    <button onClick={() => onSelect({ id: row.id, name: row.name, country: row.country ?? null })} style={rowBtn}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ width: 34, height: 34, borderRadius: 12, background: '#F1F5F9', border: '1px solid rgba(15,23,42,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <MapPin size={16} color="#0F172A" />
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 14, color: '#0F172A', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.name}</div>
-          {locality && <div style={{ fontSize: 12, color: '#94A3B8' }}>{locality}</div>}
-        </div>
-      </div>
-    </button>
-  );
-}
 
 const rowBtn: React.CSSProperties = {
   display: 'block',
