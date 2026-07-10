@@ -295,9 +295,6 @@ const EchoHistoryPage = lazy(() => import("./pages/EchoHistoryPage"));
 // Removed: DiscoverGamesPage lazy import — /games/discover now redirects to /clubhouse
 
 
-// Public Echo Share Page
-const EchoSharePage = lazy(() => import("./pages/EchoSharePage").then(m => ({ default: m.EchoSharePage })));
-
 // Tour Hub pages
 const TourHubMainPage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TourHubMainPage })));
 const TournamentDetailPage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TournamentDetailPage })));
