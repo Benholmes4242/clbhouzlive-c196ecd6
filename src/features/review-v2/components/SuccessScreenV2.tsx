@@ -126,7 +126,7 @@ export function SuccessScreenV2({
       >
         <button
           type="button"
-          onClick={onViewOnCourse}
+          onClick={onViewReview}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -145,7 +145,7 @@ export function SuccessScreenV2({
           }}
         >
           <Eye size={16} />
-          View on course page
+          View review
         </button>
         <div style={{ display: 'flex', gap: 8 }}>
           <button
