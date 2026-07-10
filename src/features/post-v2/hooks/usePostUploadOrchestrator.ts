@@ -19,7 +19,7 @@ import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { uploadEventBus } from '@/uploads/uploadEventBus';
 import { usePendingPostsStore } from '@/uploads/pendingPostsStore';
-import { compressImage } from '@/uploads/imageCompression';
+import { compressImage, COMPRESSION_PRESETS } from '@/uploads/imageCompression';
 import { uploadVideoWithTus } from '@/uploads/tusVideoUpload';
 import { uploadToCloudflareR2 } from '@/utils/cloudflareUpload';
 import type { StageMediaItem } from './useStageComposer';
@@ -60,7 +60,7 @@ async function uploadImageItem(
     totalFiles: 0,
   });
   // Compress
-  const compressed = await compressImage(item.file, 'feed');
+  const compressed = await compressImage(item.file, COMPRESSION_PRESETS.feed);
   uploadEventBus.emit('file:upload-progress', {
     type: 'file:upload-progress',
     jobId: ctx.jobId,
