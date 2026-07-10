@@ -14,6 +14,7 @@ import { ImmersiveFullscreenChrome } from '@/components/fullscreen-feed/Immersiv
 import { FullscreenScrubber } from '@/components/fullscreen-feed/FullscreenScrubber';
 import CommentsSheet from '@/components/comments/CommentsSheet';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
+import { buildReviewSheetPayload } from '@/components/posts/buildReviewSheetPayload';
 import { useReviewerStats } from '@/hooks/useReviewerStats';
 import { useClubhouseLikes } from '@/components/clubhouse/hooks/useClubhouseLikes';
 import { useClubhouseFollows } from '@/components/clubhouse/hooks/useClubhouseFollows';
