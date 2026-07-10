@@ -59,6 +59,7 @@ import { RequestCourseSheetHost } from '@/components/courses/RequestCourseSheetH
 
 
 import { FriendSheetProvider } from '@/components/friend-sheet/FriendSheetProvider';
+import { InviteSheetProvider } from '@/components/invite/InviteSheetProvider';
 import { useUploadGuard } from '@/hooks/useUploadGuard';
 import { FLAGS } from '@/config/flags';
 import { FEATURE_FLAGS } from '@/config/featureFlags';
@@ -339,6 +340,8 @@ const BusinessReviewsPage = lazy(() => import("./pages/BusinessReviewsPage"));
 
 
 const NotFound = lazy(() => import("./pages/NotFound"));
+const JoinLandingPage = lazy(() => import("./pages/public/JoinLandingPage"));
+const InviteLandingPage = lazy(() => import("./pages/public/InviteLandingPage"));
 const PrivacyPolicyPage = lazy(() => import("./pages/legal/PrivacyPolicyPage"));
 const TermsPage = lazy(() => import("./pages/legal/TermsPage"));
 const LegalDocumentPage = lazy(() => import("./pages/legal/LegalDocumentPage"));
@@ -684,9 +687,14 @@ function AppRoutes() {
         <Route path="/privacy" element={<Suspense fallback={<GenericPageSkeleton />}><PrivacyPolicyPage /></Suspense>} />
         <Route path="/terms" element={<Suspense fallback={<GenericPageSkeleton />}><TermsPage /></Suspense>} />
         <Route path="/legal/:slug" element={<Suspense fallback={<GenericPageSkeleton />}><LegalDocumentPage /></Suspense>} />
-        
+
+        {/* Public invite landings — logged-out, no header/nav chrome */}
+        <Route path="/join" element={<Suspense fallback={<GenericPageSkeleton />}><JoinLandingPage /></Suspense>} />
+        <Route path="/i/:inviteCode" element={<Suspense fallback={<GenericPageSkeleton />}><InviteLandingPage /></Suspense>} />
+
         <Route path="*" element={<Suspense fallback={<GenericPageSkeleton />}><NotFound /></Suspense>} />
       </Routes>
+
 
       
       {/* VideoPlayerModal removed in PR-5 (queue family strip). */}
@@ -971,6 +979,7 @@ const AppInner: React.FC = () => {
                                         <AuthWrapper>
 
                                           <FriendSheetProvider>
+                                            <InviteSheetProvider>
                                             <SeasonWrapModal />
                                             <AchievementToastWrapper />
                                             <Suspense fallback={null}>
@@ -991,8 +1000,10 @@ const AppInner: React.FC = () => {
                                             {/* Unified ReviewBottomSheet portal — single mount, store-driven */}
                                             <ReviewBottomSheetPortal />
                                             <RequestCourseSheetHost />
+                                            </InviteSheetProvider>
                                           </FriendSheetProvider>
                                         </AuthWrapper>
+
                                         <Sonner />
                                         <GlobalBottomNavigation />
                                         <GlobalPostComposer />

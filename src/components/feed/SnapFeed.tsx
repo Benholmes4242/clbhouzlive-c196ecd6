@@ -13,6 +13,7 @@ import { PrefetchController } from '@/video/PrefetchController';
 import { trace } from '@/perf/trace';
 import { VideoEngine } from '@/video/VideoEngine';
 import { isPerfEnabled } from '@/perf/navTiming';
+import { useInviteSheet } from '@/hooks/useInviteSheet';
 
 // Normalized owner-key compare — bare "X" ≡ "X:0", ":1"/":2" distinct.
 // Never use strict === here; strict compare caused false-null mismatch
@@ -79,6 +80,7 @@ export function SnapFeed({
   readOnly = false,
 }: SnapFeedProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const { openInviteSheet } = useInviteSheet();
   const slideRefs = useRef<Map<number, HTMLDivElement>>(new Map());
   const observerRef = useRef<IntersectionObserver | null>(null);
   const firstFrameFired = useRef(false);
@@ -750,29 +752,87 @@ export function SnapFeed({
             height: '100dvh',
             scrollSnapAlign: 'start',
             scrollSnapStop: 'always',
+            padding: '0 24px',
           }}
         >
-          <div className="flex flex-col items-center gap-4 px-8 text-center">
-            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
-              <span className="text-3xl">⛳</span>
+          <div
+            style={{
+              width: '100%',
+              maxWidth: 340,
+              background: '#FFFFFF',
+              borderRadius: 16,
+              padding: '24px 20px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 12,
+              boxShadow: '0 10px 30px rgba(15,23,42,0.10)',
+            }}
+          >
+            <div
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 15,
+                background: '#FFF7EC',
+                border: '0.5px solid #F7931E',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              aria-hidden
+            >
+              <span style={{ fontSize: 22 }}>⛳</span>
             </div>
-            <div className="space-y-2">
-              <h3 className="text-lg font-bold text-foreground">
-                You've seen it all
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                You're all caught up. Check back later for new posts.
-              </p>
+            <div
+              style={{
+                fontSize: 13,
+                fontWeight: 500,
+                color: '#0F172A',
+                textAlign: 'center',
+              }}
+            >
+              You're all caught up
+            </div>
+            <div
+              style={{
+                fontSize: 11,
+                color: '#64748B',
+                textAlign: 'center',
+                lineHeight: 1.45,
+              }}
+            >
+              Your feed gets louder with more of your group on here.
             </div>
             <button
+              type="button"
+              onClick={() => openInviteSheet('feed_end')}
+              style={{
+                marginTop: 4,
+                padding: '9px 18px',
+                borderRadius: 999,
+                background: '#F7931E',
+                color: '#fff',
+                border: 'none',
+                fontSize: 12.5,
+                fontWeight: 700,
+                cursor: 'pointer',
+                boxShadow: '0 4px 14px rgba(247,147,30,0.28)',
+              }}
+            >
+              Invite friends
+            </button>
+            <button
               onClick={() => containerRef.current?.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="mt-2 px-6 py-2.5 rounded-full bg-foreground text-background text-sm font-semibold active:scale-[0.97] transition-all"
+              className="mt-1 text-xs font-semibold text-muted-foreground active:scale-[0.97] transition-all"
+              style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
             >
               Back to top
             </button>
           </div>
         </div>
       )}
+
     </div>
   );
 }

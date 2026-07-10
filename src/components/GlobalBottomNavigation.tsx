@@ -30,6 +30,7 @@ const HIDDEN_ROUTES = [
   '/followers',
   '/following',
   '/messages',
+  '/join',
 ];
 
 const HIDDEN_ROUTE_PREFIXES = [
@@ -44,6 +45,7 @@ const HIDDEN_ROUTE_PREFIXES = [
   '/businesses/manage',
   '/business/create',
   '/business/invite/accept',
+  '/i/',
 ];
 
 const HIDDEN_ROUTE_PATTERNS: RegExp[] = [

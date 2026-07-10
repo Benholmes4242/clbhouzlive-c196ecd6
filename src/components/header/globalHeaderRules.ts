@@ -21,6 +21,7 @@ export const GLOBAL_HEADER_EXCLUDED_ROUTES = [
   '/handicap',
   '/followers',            // Own followers redirect — settings-style standalone
   '/following',            // Own following redirect — settings-style standalone
+  '/join',                 // Public invite landing — no chrome
 ] as const;
 
 export const GLOBAL_HEADER_EXCLUDED_PREFIXES = [
@@ -41,6 +42,7 @@ export const GLOBAL_HEADER_EXCLUDED_PREFIXES = [
   '/businesses/manage', // Manage business profiles uses ManagePageShell (own header, no global chrome)
   '/business/create', // Create business profile uses ManagePageShell (own header, no global chrome)
   '/business/invite/accept', // Team invite accept uses ManagePageShell (own header, no global chrome)
+  '/i/',              // Public WHS invite landing — no chrome
 
 ] as const;
 
