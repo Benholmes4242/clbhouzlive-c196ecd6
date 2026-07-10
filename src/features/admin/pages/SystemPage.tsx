@@ -533,38 +533,23 @@ function SettingsTab() {
               Reveal the floating DBG / BOOT toggles on this device. Toggling flips live — no reload needed.
             </div>
           </div>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={pillsVisible}
-            onClick={() => setPillsVisible(!pillsVisible)}
-            style={{
-              flexShrink: 0,
-              width: 44,
-              height: 26,
-              borderRadius: 999,
-              border: 'none',
-              background: pillsVisible ? '#0F172A' : t.line,
-              position: 'relative',
-              cursor: 'pointer',
-              padding: 0,
-              transition: 'background .15s',
-            }}
-          >
-            <span
-              style={{
-                position: 'absolute',
-                top: 3,
-                left: pillsVisible ? 21 : 3,
-                width: 20,
-                height: 20,
-                borderRadius: '50%',
-                background: '#fff',
-                boxShadow: '0 1px 2px rgba(0,0,0,0.2)',
-                transition: 'left .15s',
-              }}
-            />
-          </button>
+          <ToggleSwitch
+            checked={pillsVisible}
+            onChange={() => setPillsVisible(!pillsVisible)}
+          />
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ color: t.ink, fontSize: 13, fontWeight: 600 }}>Instrumentation logging (DBG)</div>
+            <div style={{ color: t.inkMuted, fontSize: 12, marginTop: 2 }}>
+              Console perf/trace logging on this device. Same switch as the DBG pill.
+            </div>
+          </div>
+          <ToggleSwitch
+            checked={perfEnabled}
+            onChange={() => setPerfLive(!perfEnabled)}
+          />
         </div>
       </Card>
     </div>
