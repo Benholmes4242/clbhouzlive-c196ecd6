@@ -26,6 +26,14 @@ export interface UploadJobContext {
   actorId: string;
   isScheduled: boolean;
   scheduledAt?: string;
+  /**
+   * Edit mode: post already exists and is (usually) published. Skip the
+   * finalize_post_v2 call (which flips processing -> published) and skip
+   * the post:shell-created event (no pending card - the post row is real).
+   */
+  skipFinalize?: boolean;
+  /** Continue numbering post_media.display_order from this offset (edit adds). */
+  displayOrderOffset?: number;
 }
 
 export type UploadJobPhase = 'running' | 'complete' | 'failed';
