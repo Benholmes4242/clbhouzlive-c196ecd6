@@ -88,17 +88,18 @@ export default function MediaStageV2({ item, index, total, onOpenAdjust, onOpenT
       }
       if (!needsJs) return;
       const start = performance.now();
+      const PERIOD = 3.2;
       const tick = (t: number) => {
         if (stopped) return;
         const elapsed = (t - start) / 1000;
         FRAMES.forEach((f, i) => {
           const el = frameRefs.current[i];
           if (!el) return;
-          const phase = (elapsed - f.delay) / 4;
-          const y = -6 * Math.max(0, Math.sin(phase * Math.PI * 2) / 2 + 0.5) * 2 + 6;
-          // simpler: 0..-6..0 sine wave
-          const ty = -6 * (0.5 - 0.5 * Math.cos(phase * Math.PI * 2));
-          el.style.transform = `translateY(${ty}px) rotate(${f.r}deg)`;
+          const phase = (elapsed - f.delay) / PERIOD;
+          const s = 0.5 - 0.5 * Math.cos(phase * Math.PI * 2); // 0..1..0
+          const ty = -14 * s;
+          const rot = f.r + 2.5 * s;
+          el.style.transform = `translateY(${ty}px) rotate(${rot}deg)`;
         });
         raf = requestAnimationFrame(tick);
       };
