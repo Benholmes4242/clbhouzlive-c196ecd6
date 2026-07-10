@@ -14,7 +14,7 @@ interface Props {
   bottomOffset?: number;
 }
 
-export default function BottomSheet({ open, title, onClose, children, fullHeight }: Props) {
+export default function BottomSheet({ open, title, onClose, children, fullHeight, bottomOffset }: Props) {
   if (!open) return null;
   return (
     <div
@@ -25,6 +25,8 @@ export default function BottomSheet({ open, title, onClose, children, fullHeight
         display: 'flex',
         alignItems: 'flex-end',
         background: 'rgba(15,17,23,0.45)',
+        paddingBottom: bottomOffset ? `${bottomOffset}px` : undefined,
+        transition: 'padding-bottom 180ms cubic-bezier(.2,.8,.2,1)',
       }}
       onClick={onClose}
     >
