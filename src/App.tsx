@@ -687,9 +687,14 @@ function AppRoutes() {
         <Route path="/privacy" element={<Suspense fallback={<GenericPageSkeleton />}><PrivacyPolicyPage /></Suspense>} />
         <Route path="/terms" element={<Suspense fallback={<GenericPageSkeleton />}><TermsPage /></Suspense>} />
         <Route path="/legal/:slug" element={<Suspense fallback={<GenericPageSkeleton />}><LegalDocumentPage /></Suspense>} />
-        
+
+        {/* Public invite landings — logged-out, no header/nav chrome */}
+        <Route path="/join" element={<Suspense fallback={<GenericPageSkeleton />}><JoinLandingPage /></Suspense>} />
+        <Route path="/i/:inviteCode" element={<Suspense fallback={<GenericPageSkeleton />}><InviteLandingPage /></Suspense>} />
+
         <Route path="*" element={<Suspense fallback={<GenericPageSkeleton />}><NotFound /></Suspense>} />
       </Routes>
+
 
       
       {/* VideoPlayerModal removed in PR-5 (queue family strip). */}
