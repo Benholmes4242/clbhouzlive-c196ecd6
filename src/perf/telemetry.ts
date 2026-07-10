@@ -18,7 +18,7 @@
 //   random; device_class is a coarse UA bucket.
 // ============================================================================
 
-import { isPerfEnabled } from '@/perf/navTiming';
+import { isPerfEnabled, subscribePerfLive } from '@/perf/navTiming';
 import {
   __vperfSnapshotTelemetry,
   __vperfResetTelemetry,
@@ -35,8 +35,13 @@ const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const SUPABASE_ANON = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
 
 let __installed = false;
+let __listenersAttached = false;
 let __sessionId: string | null = null;
-let __enrolled = false;
+let __coinFlip = false; // sticky per-session coin flip only
+
+function isEffectivelyEnrolled(): boolean {
+  return __coinFlip || isPerfEnabledSafe();
+}
 
 function pct(arr: number[], p: number): number {
   if (arr.length === 0) return 0;
@@ -93,19 +98,22 @@ function enrolSession(): void {
     if (raw) {
       const p = JSON.parse(raw);
       __sessionId = String(p.sessionId);
-      __enrolled = Boolean(p.enrolled);
+      // Backward compat: older sessions stored `enrolled`; treat that as the
+      // coin flip. New sessions store `coinFlip` explicitly.
+      __coinFlip = Boolean(p.coinFlip ?? p.enrolled);
       return;
     }
   } catch {}
   __sessionId = uuid();
-  __enrolled = Math.random() < SAMPLE_RATE;
+  __coinFlip = Math.random() < SAMPLE_RATE;
   try {
     sessionStorage.setItem(SESSION_KEY, JSON.stringify({
       sessionId: __sessionId,
-      enrolled: __enrolled,
+      coinFlip: __coinFlip,
     }));
   } catch {}
 }
+
 
 interface RollupRow {
   session_id: string;
@@ -243,7 +251,7 @@ async function postRows(rows: RollupRow[]): Promise<boolean> {
 }
 
 async function flush(): Promise<void> {
-  if (!__enrolled) return;
+  if (!isEffectivelyEnrolled()) return;
   const snap = __vperfSnapshotTelemetry();
   const rows = buildRows(snap);
   if (rows.length === 0) return;
@@ -254,19 +262,16 @@ async function flush(): Promise<void> {
 }
 
 function maybeThresholdFlush(): void {
-  if (!__enrolled) return;
+  if (!isEffectivelyEnrolled()) return;
   if (__vperfApproxRowCount() >= FLUSH_ROW_THRESHOLD) {
     void flush();
   }
 }
 
-export function installVideoPerfTelemetry(): void {
-  if (__installed) return;
-  if (typeof window === 'undefined' || typeof document === 'undefined') return;
-  __installed = true;
-  enrolSession();
-  if (!__enrolled) return; // non-enrolled sessions do zero work beyond the coin-flip
+function attachListeners(): void {
+  if (__listenersAttached) return;
   if (!endpoint()) return; // no supabase env → nothing to do
+  __listenersAttached = true;
 
   const onHidden = () => {
     if (document.visibilityState === 'hidden') void flush();
@@ -279,6 +284,34 @@ export function installVideoPerfTelemetry(): void {
     }
   }, FLUSH_INTERVAL_MS);
 }
+
+export function installVideoPerfTelemetry(): void {
+  if (__installed) return;
+  if (typeof window === 'undefined' || typeof document === 'undefined') return;
+  __installed = true;
+  enrolSession();
+
+  // Effective enrolment = sticky coin flip OR live perf pill. Recomputed at
+  // every flush / listener check so flipping the pill mid-session Just Works.
+  if (isEffectivelyEnrolled()) {
+    attachListeners();
+  }
+
+  // React to the perf pill flipping ON later in the session: attach listeners
+  // then and do a small immediate flush so the user sees rows land promptly.
+  // Flipping OFF mid-session: coin-flip-enrolled sessions keep shipping;
+  // coin-flip-lost sessions simply stop producing rows at flush time (the
+  // idle listeners are harmless).
+  try {
+    subscribePerfLive(() => {
+      if (isEffectivelyEnrolled() && !__listenersAttached) {
+        attachListeners();
+        void flush();
+      }
+    });
+  } catch {}
+}
+
 
 // Test/debug hook (not part of any UI).
 export function __flushVideoPerfTelemetryForTest(): Promise<void> { return flush(); }
