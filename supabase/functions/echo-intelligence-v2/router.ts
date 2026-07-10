@@ -113,8 +113,32 @@ function mentionsRecentYear(text: string): boolean {
   return yearRegex.test(text);
 }
 
+// LIVE recency short-circuit (v2 divergence from v1)
+// Recency phrasing alone forces 'live' - a wrongly-grounded technique answer
+// costs latency; an ungrounded live answer fabricates.
+const LIVE_RECENCY_PATTERNS = [
+  /\bright now\b/i,
+  /\bcurrently\b/i,
+  /\bat the moment\b/i,
+  /\blive\b/i,
+  /\btoday\b/i,
+  /\bthis week\b/i,
+  /\bleading\b/i,
+  /\bleader(board)?\b/i,
+  /\blatest\b/i,
+  /\bcurrent(ly)?\b.{0,30}\b(score|standing|standings|position|ranking|rankings|odds)\b/i,
+  /\bwho('s| is)\s+(winning|leading)\b/i,
+
+  /\bwhat happened\b/i,
+];
+
 export function needsStaticExplainer(q: string): [boolean, string] {
   const p = q.toLowerCase();
+
+  // v2 short-circuit: recency phrasing forces 'live' before any other rule
+  if (LIVE_RECENCY_PATTERNS.some(pattern => pattern.test(p))) {
+    return [false, "live-recency"];
+  }
 
   // First check for live data patterns (high priority)
   if (LIVE_DATA_PATTERNS.some(pattern => pattern.test(p))) {

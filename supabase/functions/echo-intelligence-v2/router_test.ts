@@ -18,6 +18,12 @@ const cases: Case[] = [
   { q: "LPGA leaderboard today", exp: "live" },
   { q: "What are tee times for the Masters tomorrow?", exp: "live" },
 
+  // v2 LIVE recency short-circuit
+  { q: "Who is leading the Open Championship right now?", exp: "live" },
+  { q: "who's winning today", exp: "live" },
+  { q: "latest leaderboard", exp: "live" },
+  { q: "current world ranking of Rahm", exp: "live" },
+
   // Static explainers / historical
   { q: "Explain how golf handicap works", exp: "static" },
   { q: "How to read a green", exp: "static" },
@@ -56,4 +62,20 @@ Deno.test("decideRoute() respects forced mode", () => {
 
   const forcedStatic = decideRoute("Leaderboard today", "static");
   assertEquals(forcedStatic.route, "static");
+});
+
+// v2 LIVE recency short-circuit (isolated so pre-existing v1 misroutes don't hide these)
+Deno.test("decideRoute() live-recency short-circuit", () => {
+  const recencyCases = [
+    "Who is leading the Open Championship right now?",
+    "who's winning today",
+    "latest leaderboard",
+    "current world ranking of Rahm",
+    "what happened at the Masters",
+    "at the moment, who leads?",
+  ];
+  for (const q of recencyCases) {
+    const d = decideRoute(q, "auto");
+    assertEquals(d.route, "live", `Recency misrouted: "${q}" -> ${d.route} (${d.reason})`);
+  }
 });
