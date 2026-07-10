@@ -34,8 +34,8 @@ export default function BottomSheet({ open, title, onClose, children, fullHeight
         onClick={(e) => e.stopPropagation()}
         style={{
           width: '100%',
-          maxHeight: '92vh',
-          height: fullHeight ? '92vh' : undefined,
+          maxHeight: fullHeight ? '92vh' : '85dvh',
+          height: fullHeight ? '92vh' : 'auto',
           background: '#F8FAFC',
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
@@ -43,6 +43,7 @@ export default function BottomSheet({ open, title, onClose, children, fullHeight
           flexDirection: 'column',
           overflow: 'hidden',
           boxShadow: '0 -8px 24px rgba(15,17,23,0.18)',
+          paddingBottom: fullHeight ? undefined : 'env(safe-area-inset-bottom, 0px)',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '8px 0 4px' }}>
@@ -60,7 +61,7 @@ export default function BottomSheet({ open, title, onClose, children, fullHeight
             </button>
           </div>
         )}
-        <div style={{ flex: 1, overflow: 'auto' }}>{children}</div>
+        <div style={{ flex: fullHeight ? 1 : '0 1 auto', overflow: 'auto', minHeight: 0 }}>{children}</div>
       </div>
     </div>
   );
