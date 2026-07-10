@@ -197,7 +197,7 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
                   fontWeight: 500,
                 }}
               >
-                <SquircleAvatar src={s.avatar_url ?? undefined} alt={s.name} size={20} />
+                <SquircleAvatar src={s.avatar_url ?? undefined} alt={s.name} size={20} hairlineRing />
                 <span>{s.name}</span>
                 <X size={14} color={SUB} />
               </button>
