@@ -924,8 +924,8 @@ const AppInner: React.FC = () => {
       <SecurityHeaders />
       <BrowserRouter>
         <NavTimingProvider>
-        <PerfHud />
-        <LogHud />
+        <AdminGatedPerfHud />
+        <AdminGatedLogHud />
         <AdminGatedPerfPill />
         <AdminGatedBootTimelinePill />
         
