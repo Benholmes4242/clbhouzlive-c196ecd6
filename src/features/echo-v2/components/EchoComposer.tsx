@@ -2,6 +2,7 @@ import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { ArrowUp } from 'lucide-react';
 import { useKeyboardHeight } from '@/hooks/messaging/useKeyboardHeight';
 
+
 const INK = '#1F2428';
 const HINT = '#AEB4BC';
 const HAIRLINE = 'rgba(0,0,0,0.07)';
