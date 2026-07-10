@@ -44,6 +44,9 @@ import type {
 import type { TrackedPrediction } from './tournament-insights/types';
 import { IntelligenceSheet } from './IntelligenceSheet';
 import { SectionHeader as CanonicalSectionHeader } from '@/components/ui/SectionHeader';
+import { useTourSelection } from '../context/TourSelectionContext';
+import { useHeroCarouselData } from '../hooks/useHeroCarouselData';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   getPlayerHeadshotCandidates,
 } from '@/utils/playerHeadshot';
