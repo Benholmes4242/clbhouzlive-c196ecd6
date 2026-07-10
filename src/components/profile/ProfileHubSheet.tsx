@@ -20,8 +20,8 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion';
 import type { PanInfo } from 'framer-motion';
 import {
-  ChevronRight, ChevronDown, LogOut, Shield,
-  MessageCircle, Bell, Settings as SettingsIcon, UserCog,
+  ChevronRight, LogOut, Shield,
+  MessageCircle, Bell, Settings as SettingsIcon, UserCog, Plus,
 } from 'lucide-react';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 import { useActorUnreadCounts } from '@/hooks/useActorUnreadCounts';
@@ -34,7 +34,7 @@ import { useUserProfile } from '@/hooks/useUserProfile';
 import { useWhsConnection, useHandicapTrend } from '@/lib/whs/hooks';
 import HandicapMasthead from '@/components/profile/HandicapMasthead';
 
-import { ProfileSwitcherPopover } from '@/components/profile/ProfileSwitcherPopover';
+
 import { useProfileSheetStats } from '@/hooks/useProfileSheetStats';
 import { useHasBusinesses } from '@/hooks/useMyBusinesses';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -634,38 +634,163 @@ function ProfileHubSheet({
                           {identitySubLine}
                         </div>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => setSwitcherOpen((v) => !v)}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 2,
-                          padding: '6px 8px',
-                          background: '#FFFFFF',
-                          border: `0.5px solid ${HAIRLINE}`,
-                          borderRadius: 8,
-                          cursor: 'pointer',
-                          flexShrink: 0,
-                        }}
-                        aria-haspopup="menu"
-                        aria-expanded={switcherOpen}
-                      >
-                        <span style={{ fontSize: 11, fontWeight: 700, color: INK_SOFT, letterSpacing: '0.02em' }}>
-                          Profiles
-                        </span>
-                        <ChevronDown size={12} color={INK_SOFT} strokeWidth={2} />
-                      </button>
                     </div>
 
-                    <ProfileSwitcherPopover
-                      open={switcherOpen}
-                      onClose={() => setSwitcherOpen(false)}
-                      profiles={profiles}
-                      activeId={localActiveId}
-                      onSelectProfile={handleSwitchProfile}
-                      onAddBusiness={() => handleNav('/businesses/manage')}
-                    />
+                    {/* ── SWITCH ACCOUNT — always-visible tile grid ── */}
+                    <div style={{ marginTop: 2, marginBottom: 6 }}>
+                      <div
+                        style={{
+                          padding: '0 4px 8px',
+                          fontSize: 11,
+                          fontWeight: 600,
+                          color: '#8A9099',
+                          letterSpacing: '0.05em',
+                          textTransform: 'uppercase' as const,
+                        }}
+                      >
+                        Switch account
+                      </div>
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexWrap: 'wrap',
+                          gap: 12,
+                          maxHeight: 180,
+                          overflowY: 'auto',
+                          padding: '4px 2px',
+                        }}
+                      >
+                        {profiles.map((p) => {
+                          const isActive = p.id === localActiveId;
+                          const unread = isActive
+                            ? 0
+                            : actorUnreadFor(p.type, p.id);
+                          return (
+                            <button
+                              key={p.id}
+                              type="button"
+                              onClick={() => handleSwitchProfile(p.id)}
+                              aria-label={`Switch to ${p.name}`}
+                              aria-pressed={isActive}
+                              style={{
+                                width: 58,
+                                background: 'transparent',
+                                border: 'none',
+                                padding: 0,
+                                cursor: 'pointer',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                gap: 6,
+                              }}
+                            >
+                              <div style={{ position: 'relative', width: 50, height: 50 }}>
+                                <div
+                                  style={{
+                                    width: 50,
+                                    height: 50,
+                                    borderRadius: '34%',
+                                    boxShadow: isActive ? `0 0 0 2.5px ${AMBER}` : 'none',
+                                  }}
+                                >
+                                  <SquircleAvatar
+                                    size={50}
+                                    src={p.avatarUrl}
+                                    alt={p.name}
+                                    fallback={p.name?.charAt(0)?.toUpperCase() ?? '?'}
+                                    hairlineRing
+                                    ringColor={LIGHT_HAIRLINE}
+                                  />
+                                </div>
+                                {unread > 0 && (
+                                  <span
+                                    style={{
+                                      position: 'absolute',
+                                      top: -4,
+                                      right: -4,
+                                      minWidth: 19,
+                                      height: 19,
+                                      padding: '0 5px',
+                                      borderRadius: 10,
+                                      background: AMBER,
+                                      color: '#FFFFFF',
+                                      fontSize: 10.5,
+                                      fontWeight: 800,
+                                      lineHeight: '15px',
+                                      textAlign: 'center',
+                                      border: '2px solid #F8FAFC',
+                                      fontVariantNumeric: 'tabular-nums',
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      boxSizing: 'border-box',
+                                    }}
+                                  >
+                                    {unread > 99 ? '99+' : unread}
+                                  </span>
+                                )}
+                              </div>
+                              <span
+                                style={{
+                                  fontSize: 10.5,
+                                  fontWeight: isActive ? 600 : 500,
+                                  color: isActive ? '#1F2428' : '#8A9099',
+                                  maxWidth: 58,
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  whiteSpace: 'nowrap',
+                                  textAlign: 'center',
+                                }}
+                              >
+                                {p.name}
+                              </span>
+                            </button>
+                          );
+                        })}
+                        <button
+                          type="button"
+                          onClick={() => handleNav('/businesses/manage')}
+                          aria-label="Add business"
+                          style={{
+                            width: 58,
+                            background: 'transparent',
+                            border: 'none',
+                            padding: 0,
+                            cursor: 'pointer',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: 6,
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: 50,
+                              height: 50,
+                              borderRadius: '34%',
+                              border: `1.5px dashed ${INK_FAINT}`,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              color: INK_SOFT,
+                              boxSizing: 'border-box',
+                            }}
+                          >
+                            <Plus size={20} strokeWidth={2} />
+                          </div>
+                          <span
+                            style={{
+                              fontSize: 10.5,
+                              fontWeight: 500,
+                              color: INK_SOFT,
+                              textAlign: 'center',
+                            }}
+                          >
+                            Add
+                          </span>
+                        </button>
+                      </div>
+                    </div>
                   </div>
 
                   {/* ── 2. Handicap masthead — personal profiles only (business has no handicap) ── */}
