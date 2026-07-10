@@ -270,6 +270,13 @@ export const MediaCarousel: React.FC<Props> = ({
           const url = m.imageUrl || m.thumbnailUrl || '';
           const isVideo = m.type === 'video';
           const isActiveSlide = isCardActive && i === active;
+          // Adjacent-slide keep-warm: the i±1 slide of the active card mounts
+          // its lane paused-but-ready via earlyMotion (role='next'). Bounded
+          // to ≤2 warm neighbours per active card — total lanes for a multi-
+          // video carousel: i-1 + i + i+1 = 3, matching the feed's 3-lane
+          // pool (active/next/prev). Only when the CARD is active.
+          const isAdjacentSlide =
+            isCardActive && !isActiveSlide && Math.abs(i - active) === 1;
           const slideOwnerKey = postId
             ? `${postId}:${i}`
             : `${m.id ?? 'noid'}:${i}`;
@@ -314,9 +321,10 @@ export const MediaCarousel: React.FC<Props> = ({
                   <InlineVideo
                     item={m}
                     isActive={isActiveSlide}
-                    isNear={mountVideo}
+                    isNear={isActiveSlide || isAdjacentSlide}
+                    earlyMotion={isAdjacentSlide}
                     postId={postId ?? null}
-                    ownerKey={postId ? `${postId}:${i}` : `${m.id ?? 'noid'}:${i}`}
+                    ownerKey={slideOwnerKey}
                     objectFit="cover"
                   />
                 ) : m.thumbnailUrl ? (
@@ -328,6 +336,7 @@ export const MediaCarousel: React.FC<Props> = ({
                       position: 'absolute',
                       inset: 0,
                       width: '100%',
+
                       height: '100%',
                       objectFit: 'cover',
                       objectPosition: 'center',
