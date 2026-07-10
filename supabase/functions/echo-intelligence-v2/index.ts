@@ -28,14 +28,18 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 // Service-role client for all writes (RLS blocks anon on rate-limit / cache).
 const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-// ─── Model pins (current stable flagship tier as of build time) ──────────
-// Upgrade from v1's claude-sonnet-4, gpt-4o(-mini), gemini-1.5-pro, sonar.
-const ANTHROPIC_MODEL_SYNTH   = "claude-sonnet-5";     // Claude Sonnet 5 (current)
-const OPENAI_MODEL_SYNTH      = "gpt-5.5";             // GPT-5.5 synthesis
-const OPENAI_MODEL_INTENT     = "gpt-5.5";             // reserved; keep in sync with SYNTH
-const GEMINI_MODEL            = "gemini-3.5-flash";    // Gemini 3.5 Flash
-const PERPLEXITY_MODEL        = "sonar-pro";           // unchanged, verified current
-const BUILD                   = "e2.8";                // bump on every change to this function
+// ─── Model pins (imported from _shared for cross-fn parity) ──────────────
+import {
+  ANTHROPIC_MODEL_SYNTH,
+  OPENAI_MODEL_SYNTH,
+  OPENAI_MODEL_INTENT,
+  GEMINI_MODEL,
+  PERPLEXITY_MODEL,
+  BUILD,
+} from "../_shared/echo-models.ts";
+// Silence unused-import warning while INTENT is reserved.
+void OPENAI_MODEL_INTENT;
+
 
 // Rate limit windows (identical to v1).
 const RATE_LIMIT_MINUTE = 10;
