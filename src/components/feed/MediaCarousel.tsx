@@ -108,6 +108,8 @@ export const MediaCarousel: React.FC<Props> = ({
   // [CAROUSEL] instrumentation — observable slide switches within a post.
   // Gated on isPerfEnabled(); zero behaviour change.
   const prevActiveRef = useRef<number>(active);
+  // Timer holder for the [CAROUSEL2] +500ms active.health sample.
+  const activateHealthTimerRef = useRef<{ id: number } | null>(null);
   const ownerKeyOf = useCallback(
     (i: number) =>
       postId ? `${postId}:${i}` : `${items[i]?.id ?? 'noid'}:${i}`,
