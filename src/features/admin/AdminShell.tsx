@@ -35,6 +35,7 @@ const SECTION_TITLES: Record<string, string> = {
   waitlist:   'Handicap demand',
   support:    'Support',
   verifications: 'Verifications',
+  'video-perf': 'Video Perf',
 };
 
 export default function AdminShell() {
