@@ -14,6 +14,7 @@ interface SubmitArgs {
 
 interface SubmitResult {
   ratingId: string;
+  shareToFeed: boolean;
 }
 
 export function useReviewSubmit() {
@@ -53,7 +54,7 @@ export function useReviewSubmit() {
         anyData?.rating_id ?? anyData?.id ?? (typeof anyData === 'string' ? anyData : undefined);
       if (!ratingId) throw new Error('Submit succeeded but no rating id returned');
 
-      return { ratingId };
+      return { ratingId, shareToFeed: state.shareToFeed };
     } catch (e: any) {
       setError(e?.message || 'Submit failed');
       throw e;

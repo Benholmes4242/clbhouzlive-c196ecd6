@@ -177,19 +177,19 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
   const composer = useReviewComposer(existing, media.hasNewMedia);
   const submit = useReviewSubmit();
 
-  const [success, setSuccess] = useState<{ ratingId: string } | null>(null);
+  const [success, setSuccess] = useState<{ ratingId: string; shareToFeed: boolean } | null>(null);
   const [removeOpen, setRemoveOpen] = useState(false);
   const [dictationFlashKey, setDictationFlashKey] = useState(0);
 
   const handleSubmit = useCallback(async () => {
     try {
-      const { ratingId } = await submit.submit({
+      const { ratingId, shareToFeed } = await submit.submit({
         courseId: course.id,
         state: composer.state,
       });
       // Fire uploads AFTER the RPC (media picked before submit is held locally).
       media.flushToReview(ratingId).catch(() => { /* per-item errors surfaced in tray */ });
-      setSuccess({ ratingId });
+      setSuccess({ ratingId, shareToFeed });
     } catch {
       // hook exposed error state already
     }
@@ -215,6 +215,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
   }, [existing, submit, existingMedia, onExit]);
 
   if (success) {
+    const courseUrl = `${window.location.origin}/courses/${course.id}`;
     return (
       <SuccessScreenV2
         course={course}
@@ -224,16 +225,26 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
         reviewText={composer.state.reviewText}
         scores={composer.state.scores}
         media={media.items}
-        onViewOnCourse={() => navigate(`/courses/${course.id}`, { replace: true })}
+        shareToFeed={success.shareToFeed}
+        onViewReview={() => navigate(`/courses/${course.id}`, { replace: true })}
         onShare={async () => {
-          try {
-            if (navigator.share) {
-              await navigator.share({
-                title: 'My review',
-                url: `${window.location.origin}/courses/${course.id}`,
-              });
+          const title = `My review of ${course.name}`;
+          if (typeof navigator !== 'undefined' && navigator.share) {
+            try {
+              await navigator.share({ title, url: courseUrl });
+              return;
+            } catch (err) {
+              if ((err as Error)?.name === 'AbortError') return;
+              // fall through to clipboard
             }
-          } catch { /* dismissed */ }
+          }
+          try {
+            await navigator.clipboard.writeText(courseUrl);
+            const { toast } = await import('sonner');
+            toast.success('Link copied');
+          } catch {
+            /* noop */
+          }
         }}
         onDone={onExit}
       />

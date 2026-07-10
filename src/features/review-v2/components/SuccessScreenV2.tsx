@@ -18,7 +18,8 @@ interface Props {
   reviewText: string;
   scores: Record<CategoryKey, number | null>;
   media: MediaItem[];
-  onViewOnCourse: () => void;
+  shareToFeed: boolean;
+  onViewReview: () => void;
   onShare: () => void;
   onDone: () => void;
 }
@@ -31,10 +32,14 @@ export function SuccessScreenV2({
   reviewText,
   scores,
   media,
-  onViewOnCourse,
+  shareToFeed,
+  onViewReview,
   onShare,
   onDone,
 }: Props) {
+  const subtitle = shareToFeed
+    ? "Live on the course page and in your friends' feeds."
+    : 'Live on the course page.';
   return (
     <div
       style={{
@@ -70,7 +75,7 @@ export function SuccessScreenV2({
             boxShadow: '0 8px 22px -8px rgba(21,23,31,0.45)',
           }}
         >
-          <Check size={26} color="#F7BF3F" strokeWidth={3} />
+          <Check size={26} color="#F5F6F7" strokeWidth={3} />
         </div>
         <h1
           style={{
@@ -83,6 +88,18 @@ export function SuccessScreenV2({
         >
           Review posted
         </h1>
+        <p
+          style={{
+            margin: 0,
+            fontSize: 13,
+            color: RV2.secondary,
+            textAlign: 'center',
+            lineHeight: 1.4,
+            maxWidth: 300,
+          }}
+        >
+          {subtitle}
+        </p>
       </div>
 
       <div style={{ padding: '4px 16px 20px' }}>
@@ -109,7 +126,7 @@ export function SuccessScreenV2({
       >
         <button
           type="button"
-          onClick={onViewOnCourse}
+          onClick={onViewReview}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -128,7 +145,7 @@ export function SuccessScreenV2({
           }}
         >
           <Eye size={16} />
-          View on course page
+          View review
         </button>
         <div style={{ display: 'flex', gap: 8 }}>
           <button
