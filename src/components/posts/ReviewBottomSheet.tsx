@@ -18,7 +18,7 @@ import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { MapPin } from 'lucide-react';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
-import { formatFrostRating } from '@/lib/frostPanel';
+
 import { useReviewerStats } from '@/hooks/useReviewerStats';
 import { MentionText } from '@/components/mentions/MentionText';
 import { REVIEW_SHEET_Z } from '@/lib/zLayers';
