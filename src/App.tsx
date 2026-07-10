@@ -340,6 +340,8 @@ const BusinessReviewsPage = lazy(() => import("./pages/BusinessReviewsPage"));
 
 
 const NotFound = lazy(() => import("./pages/NotFound"));
+const JoinLandingPage = lazy(() => import("./pages/public/JoinLandingPage"));
+const InviteLandingPage = lazy(() => import("./pages/public/InviteLandingPage"));
 const PrivacyPolicyPage = lazy(() => import("./pages/legal/PrivacyPolicyPage"));
 const TermsPage = lazy(() => import("./pages/legal/TermsPage"));
 const LegalDocumentPage = lazy(() => import("./pages/legal/LegalDocumentPage"));
