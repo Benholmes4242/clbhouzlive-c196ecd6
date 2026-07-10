@@ -20,6 +20,8 @@ import { createTapHandler } from './mediaTap';
 import { isPerfEnabled } from '@/perf/navTiming';
 import { VideoEngine } from '@/video/VideoEngine';
 import { feedLaneRoles } from '@/video/feedLaneRoles';
+import { PrefetchController } from '@/video/PrefetchController';
+
 
 interface Props {
   items: MediaItem[];
