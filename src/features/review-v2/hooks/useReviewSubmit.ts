@@ -14,6 +14,7 @@ interface SubmitArgs {
 
 interface SubmitResult {
   ratingId: string;
+  shareToFeed: boolean;
 }
 
 export function useReviewSubmit() {
