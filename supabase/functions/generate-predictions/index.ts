@@ -272,10 +272,10 @@ serve(async (req) => {
       );
     }
 
-    // --- Fetch player statistics (with raw_data for detailed extraction) ---
+    // --- TI-8: Fetch season stats (enrichment only, not the pool) ---
     let playerStats: any[] = [];
     let usedSeasonId: string | null = null;
-    
+
     for (const season of seasons) {
       const { data: stats, error: statsError } = await supabase
         .from('sr_player_statistics')
@@ -296,57 +296,83 @@ serve(async (req) => {
       if (!statsError && stats && stats.length > 0) {
         playerStats = stats;
         usedSeasonId = season.id;
-        console.log(`[generate-predictions] Using ${season.year} season stats (${stats.length} players)`);
+        console.log(`[generate-predictions] Season stats available: ${season.year} (${stats.length} players) - used for enrichment only`);
         break;
       }
     }
 
-    if (playerStats.length === 0) throw new Error('Failed to fetch player statistics from any season');
-
-    // Fetch world rankings
+    // Fetch world rankings (used for ordering; missing = unranked)
     const { data: rankings } = await supabase
       .from('sr_world_rankings')
       .select('player_id, rank, prior_rank, points')
       .order('rank', { ascending: true })
-      .limit(200);
+      .limit(500);
 
     const rankingsMap = new Map(rankings?.map(r => [r.player_id, r]) || []);
 
-    // Build player array with raw_data preserved
-    const players: PlayerStats[] = playerStats
-      .map(ps => {
-        const player = ps.sr_players as any;
-        const stats = (ps.raw_data as any)?.statistics || {};
-        const ranking = rankingsMap.get(player.id);
+    // Build stats index by player_id (may be empty for non-PGA tours)
+    const statsById = new Map<string, { raw_data: any; player: any }>();
+    for (const ps of playerStats) {
+      const sp = ps.sr_players as any;
+      if (sp?.id) statsById.set(sp.id, { raw_data: ps.raw_data, player: sp });
+    }
 
-        if (hasConfirmedField && !confirmedFieldPlayerIds!.has(player.id)) return null;
-        if (!hasConfirmedField && (!ranking || ranking.rank > 150)) return null;
+    // TI-8: FIELD-FIRST POOL. Load sr_players for every confirmed entrant.
+    const fieldIds = Array.from(confirmedFieldPlayerIds!);
+    const { data: fieldPlayerRows, error: fieldPlayersError } = await supabase
+      .from('sr_players')
+      .select('id, first_name, last_name, country, photo_url, pga_tour_id')
+      .in('id', fieldIds);
+
+    if (fieldPlayersError) {
+      throw new Error(`Field player lookup failed: ${fieldPlayersError.message}`);
+    }
+
+    const playersById = new Map((fieldPlayerRows ?? []).map((p: any) => [p.id, p]));
+
+    let statsRichCount = 0;
+    let statsLightCount = 0;
+
+    const players: (PlayerStats & { statsAvailable: boolean })[] = fieldIds
+      .map((pid) => {
+        const sp = playersById.get(pid);
+        if (!sp) return null;
+        const statsEntry = statsById.get(pid);
+        const stats = (statsEntry?.raw_data as any)?.statistics || null;
+        const ranking = rankingsMap.get(pid);
+        const statsAvailable = !!stats;
+        if (statsAvailable) statsRichCount++;
+        else statsLightCount++;
 
         return {
-          player_id: player.id,
-          first_name: player.first_name || '',
-          last_name: player.last_name || '',
-          country: player.country || 'USA',
-          photo_url: player.photo_url,
-          pga_tour_id: player.pga_tour_id,
-          world_rank: ranking?.rank || 999,
-          prior_rank: ranking?.prior_rank || 999,
-          points: ranking?.points || 0,
-          drive_avg: stats.drive_avg || 0,
-          drive_acc: stats.drive_acc || 0,
-          gir_pct: stats.gir_pct || 0,
-          scrambling_pct: stats.scrambling_pct || 0,
-          putt_avg: stats.putt_avg || 0,
-          sg_total: stats.strokes_gained_total || 0,
-          sg_tee_green: stats.strokes_gained_tee_green || 0,
-          raw_data: ps.raw_data,
-        };
+          player_id: pid,
+          first_name: sp.first_name || '',
+          last_name: sp.last_name || '',
+          country: sp.country || '',
+          photo_url: sp.photo_url ?? null,
+          pga_tour_id: sp.pga_tour_id ?? null,
+          world_rank: ranking?.rank ?? 999,
+          prior_rank: ranking?.prior_rank ?? 999,
+          points: ranking?.points ?? 0,
+          // Neutral defaults for stats-light players (no fake numbers).
+          drive_avg: stats?.drive_avg ?? 0,
+          drive_acc: stats?.drive_acc ?? 0,
+          gir_pct: stats?.gir_pct ?? 0,
+          scrambling_pct: stats?.scrambling_pct ?? 0,
+          putt_avg: stats?.putt_avg ?? 0,
+          sg_total: stats?.strokes_gained_total ?? 0,
+          sg_tee_green: stats?.strokes_gained_tee_green ?? 0,
+          raw_data: statsEntry?.raw_data ?? null,
+          statsAvailable,
+        } as PlayerStats & { statsAvailable: boolean };
       })
-      .filter((p): p is PlayerStats => p !== null)
+      .filter((p): p is PlayerStats & { statsAvailable: boolean } => p !== null)
       .sort((a, b) => a.world_rank - b.world_rank)
-      .slice(0, hasConfirmedField ? 120 : 75);
+      .slice(0, 150);
 
-    console.log(`[generate-predictions] Fetched ${players.length} players (field ${hasConfirmedField ? 'confirmed' : 'estimated'})`);
+    console.log(
+      `[ti] pool=${players.length} field players (${statsRichCount} with stats, ${statsLightCount} stats-light)`
+    );
 
     // --- 2B: Fetch course history ---
     let courseHistoryData: { playerName: string; playerId: string; finishes: { year: number; position: number | null; score: number | null }[] }[] = [];
