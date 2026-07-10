@@ -39,7 +39,7 @@ export default function MediaTrimSheet({ open, onClose, item, onApply }: Props) 
             setDuration(d);
             if (!item.trimEnd) setEnd(d);
           }}
-          style={{ width: '100%', maxHeight: 240, background: '#0E1013', borderRadius: 10 }}
+          style={{ width: '100%', maxHeight: 240, background: '#15171F', borderRadius: 10 }}
         />
         <label style={label}>Start: {start.toFixed(2)}s
           <input type="range" min={0} max={Math.max(duration, 0.01)} step={0.05} value={start} onChange={(e) => setStart(Math.min(Number(e.target.value), end))} />
