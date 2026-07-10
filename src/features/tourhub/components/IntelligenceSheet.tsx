@@ -586,7 +586,7 @@ function PicksHistoryBody({ onClose, tourSlug, tourTag }: { onClose: () => void;
         {isLoading ? (
           <SkeletonList />
         ) : tournaments.length === 0 ? (
-          <EmptyState onClose={onClose} />
+          <EmptyState onClose={onClose} tourTag={tourTag} />
         ) : filtered.length === 0 ? (
           <NoMatchState />
         ) : (
