@@ -4,7 +4,8 @@ import { useBusinessDirectory, BusinessDirectoryItem } from '@/hooks/useBusiness
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Building2, MapPin, Search, CheckCircle2, ChevronLeft, Plus, Pencil } from 'lucide-react';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
+import { Building2, MapPin, Search, ChevronLeft, Plus, Pencil } from 'lucide-react';
 import { BUSINESS_CATEGORIES } from '@/types/profile';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileData } from '@/hooks/useProfileData';
@@ -195,9 +196,7 @@ const BusinessDirectoryPage = () => {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">
                       <span className="font-medium truncate">{biz.name}</span>
-                      {biz.is_verified && (
-                        <CheckCircle2 className="h-4 w-4 text-emerald-500 flex-shrink-0" />
-                      )}
+                      {biz.is_verified && <VerifiedBadge size="sm" />}
                     </div>
                     {biz.slug && (
                       <div className="text-xs text-muted-foreground truncate">
