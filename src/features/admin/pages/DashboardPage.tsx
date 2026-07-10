@@ -19,6 +19,8 @@ import DataList from '../components/DataList';
 import EmptyState from '../components/EmptyState';
 import StatTile from '../components/StatTile';
 import StatusPill from '../components/StatusPill';
+import EchoEngineHealthCard from '../components/EchoEngineHealthCard';
+
 
 function relTime(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
