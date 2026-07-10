@@ -111,7 +111,7 @@ export default function MediaStageV2({ item, index, total, onOpenAdjust, onOpenT
   if (!item) {
     const plusSize = 56;
     return (
-      <div style={{ flex: 1, background: '#0E1013', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+      <div style={{ flex: 1, background: '#15171F', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
         <style>{KEYFRAMES_CSS}</style>
         <button
           onClick={onRequestAdd}
@@ -202,7 +202,7 @@ export default function MediaStageV2({ item, index, total, onOpenAdjust, onOpenT
     ? { aspectRatio: `${ratio}`, width: '100%', maxHeight: '100%' }
     : { width: '100%', height: '100%' };
   return (
-    <div style={{ flex: 1, background: '#0E1013', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', transition: 'all 250ms cubic-bezier(.2,.8,.2,1)' }}>
+    <div style={{ flex: 1, background: '#15171F', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', transition: 'all 250ms cubic-bezier(.2,.8,.2,1)' }}>
       <div style={boxStyle}>
         {item.type === 'video' ? (
           <video src={item.previewUrl} playsInline muted loop autoPlay style={{ width: '100%', height: '100%', objectFit: 'cover' }} />

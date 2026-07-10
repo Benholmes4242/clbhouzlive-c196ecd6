@@ -48,7 +48,7 @@ export default function MediaTray({ media, activeIndex, onSelect, onRemove, onRe
               dragFrom.current = null;
             }}
             onClick={() => onSelect(i)}
-            style={{ position: 'relative', minWidth: 56, height: 56, borderRadius: 12, overflow: 'hidden', boxShadow: active ? '0 0 0 2px #F7931E' : '0 0 0 1px rgba(0,0,0,0.07)', cursor: 'grab', background: '#0E1013' }}
+            style={{ position: 'relative', minWidth: 56, height: 56, borderRadius: 12, overflow: 'hidden', boxShadow: active ? '0 0 0 2px #F7931E' : '0 0 0 1px rgba(0,0,0,0.07)', cursor: 'grab', background: '#15171F' }}
           >
             {m.type === 'video' ? (
               <video src={m.previewUrl} muted style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
