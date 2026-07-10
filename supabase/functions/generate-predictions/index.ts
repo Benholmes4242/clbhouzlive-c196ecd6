@@ -939,6 +939,9 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
+    } finally {
+      await releaseLock();
+    }
 
   } catch (error) {
     console.error('[generate-predictions] Error:', error);
