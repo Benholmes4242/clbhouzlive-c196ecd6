@@ -1,6 +1,10 @@
-// ScheduleSheetV2 - native datetime-local pickers + presets + View Scheduled footer.
+// ScheduleSheetV2 - custom, no native inputs.
+// Preset chips, 14-day date strip, hour + 15-min steppers, live summary,
+// View scheduled footer.
 
-import { useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import { toast } from 'sonner';
 import BottomSheet from './BottomSheet';
 
 interface Props {
@@ -12,68 +16,225 @@ interface Props {
   scheduledCount: number;
 }
 
-function toLocal(dt: Date) {
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}T${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
+const DAY_LABELS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+function startOfDay(d: Date) {
+  const n = new Date(d);
+  n.setHours(0, 0, 0, 0);
+  return n;
+}
+function sameDay(a: Date, b: Date) {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+function fmtSummaryDay(target: Date, now: Date) {
+  if (sameDay(target, now)) return 'today';
+  const tmr = new Date(now); tmr.setDate(tmr.getDate() + 1);
+  if (sameDay(target, tmr)) return 'tomorrow';
+  return `${DAY_LABELS[target.getDay()][0] + DAY_LABELS[target.getDay()].slice(1).toLowerCase()} ${target.getDate()} ${MONTH_LABELS[target.getMonth()]}`;
 }
 
 export default function ScheduleSheetV2({ open, onClose, value, onChange, onOpenScheduled, scheduledCount }: Props) {
-  const [draft, setDraft] = useState<string>(value ? toLocal(value) : '');
+  const now = useMemo(() => new Date(), [open]);
+  const initial = value ?? (() => { const d = new Date(now.getTime() + 60 * 60_000); d.setSeconds(0, 0); d.setMinutes(Math.round(d.getMinutes() / 15) * 15); return d; })();
+  const [selDate, setSelDate] = useState<Date>(startOfDay(initial));
+  const [hour, setHour] = useState<number>(initial.getHours());
+  const [minute, setMinute] = useState<number>(Math.round(initial.getMinutes() / 15) * 15 % 60);
 
-  const apply = () => {
-    if (!draft) { onChange(null); onClose(); return; }
-    const d = new Date(draft);
-    if (Number.isNaN(d.getTime()) || d.getTime() <= Date.now()) {
-      alert('Pick a future time.');
-      return;
-    }
+  const stripRef = useRef<HTMLDivElement>(null);
+  const selBtnRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    // reset from value each open
+    const seed = value ?? (() => { const d = new Date(); d.setTime(Date.now() + 60 * 60_000); d.setSeconds(0, 0); d.setMinutes(Math.round(d.getMinutes() / 15) * 15); return d; })();
+    setSelDate(startOfDay(seed));
+    setHour(seed.getHours());
+    setMinute(Math.round(seed.getMinutes() / 15) * 15 % 60);
+  }, [open, value]);
+
+  useEffect(() => {
+    if (!open) return;
+    requestAnimationFrame(() => {
+      selBtnRef.current?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    });
+  }, [open, selDate]);
+
+  const days = useMemo(() => {
+    const base = startOfDay(new Date());
+    return Array.from({ length: 14 }, (_, i) => {
+      const d = new Date(base); d.setDate(d.getDate() + i); return d;
+    });
+  }, [open]);
+
+  const finalDate = useMemo(() => {
+    const d = new Date(selDate);
+    d.setHours(hour, minute, 0, 0);
+    return d;
+  }, [selDate, hour, minute]);
+
+  const isPast = finalDate.getTime() <= Date.now();
+
+  const setPreset = (kind: '1h' | 'eve' | 'tmr') => {
+    let d: Date;
+    if (kind === '1h') { d = new Date(Date.now() + 60 * 60_000); d.setSeconds(0, 0); d.setMinutes(Math.round(d.getMinutes() / 15) * 15); }
+    else if (kind === 'eve') { d = new Date(); d.setHours(18, 0, 0, 0); if (d.getTime() < Date.now()) d.setDate(d.getDate() + 1); }
+    else { d = new Date(); d.setDate(d.getDate() + 1); d.setHours(9, 0, 0, 0); }
     onChange(d);
     onClose();
   };
 
-  const preset = (mins: number) => {
-    const d = new Date(Date.now() + mins * 60_000);
-    setDraft(toLocal(d));
+  const bumpHour = (delta: number) => setHour(h => (h + delta + 24) % 24);
+  const bumpMinute = (delta: number) => setMinute(m => (m + delta + 60) % 60);
+
+  const apply = () => {
+    if (isPast) { toast('Pick a future time.'); return; }
+    onChange(finalDate);
+    onClose();
   };
 
+  const clear = () => { onChange(null); onClose(); };
+
   return (
-    <BottomSheet open={open} title="Schedule for later" onClose={onClose}>
-      <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <input
-          type="datetime-local"
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          style={{ padding: '10px 12px', border: '1px solid rgba(0,0,0,0.1)', borderRadius: 10, fontSize: 14 }}
-        />
+    <BottomSheet open={open} title="Schedule" onClose={onClose} fullHeight>
+      <div style={{ padding: '4px 16px 16px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+        {/* Preset chips */}
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {[
-            ['In 1 hour', 60],
-            ['This evening 6pm', -1],
-            ['Tomorrow 9am', -2],
-          ].map(([label, mins]) => (
-            <button
-              key={label as string}
-              onClick={() => {
-                if (mins === -1) {
-                  const d = new Date(); d.setHours(18, 0, 0, 0); if (d.getTime() < Date.now()) d.setDate(d.getDate() + 1); setDraft(toLocal(d));
-                } else if (mins === -2) {
-                  const d = new Date(); d.setDate(d.getDate() + 1); d.setHours(9, 0, 0, 0); setDraft(toLocal(d));
-                } else {
-                  preset(mins as number);
-                }
-              }}
-              style={{ background: 'transparent', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 999, padding: '6px 12px', fontSize: 12, cursor: 'pointer', color: '#1F2428' }}
-            >{label as string}</button>
-          ))}
+          <Preset onClick={() => setPreset('1h')}>In 1 hour</Preset>
+          <Preset onClick={() => setPreset('eve')}>This evening, 6pm</Preset>
+          <Preset onClick={() => setPreset('tmr')}>Tomorrow, 9am</Preset>
         </div>
-        <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
-          <button onClick={() => { onChange(null); setDraft(''); onClose(); }} style={{ flex: 1, background: '#fff', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 12, padding: '10px', fontSize: 14, cursor: 'pointer' }}>Clear</button>
-          <button onClick={apply} style={{ flex: 1, background: '#15171F', color: '#F5F6F7', border: 0, borderRadius: 12, padding: '10px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Apply</button>
+
+        <SectionLabel>Date</SectionLabel>
+        <div ref={stripRef} style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, margin: '0 -16px', padding: '0 16px 4px' }}>
+          {days.map((d, i) => {
+            const selected = sameDay(d, selDate);
+            const isToday = i === 0;
+            return (
+              <button
+                key={d.toISOString()}
+                ref={selected ? selBtnRef : undefined}
+                onClick={() => setSelDate(startOfDay(d))}
+                style={{
+                  flex: '0 0 auto',
+                  width: 60,
+                  padding: '10px 0 10px',
+                  borderRadius: 14,
+                  background: selected ? '#0F172A' : '#FFFFFF',
+                  border: selected ? 0 : '1px solid rgba(15,23,42,0.08)',
+                  color: selected ? '#F8FAFC' : '#0F172A',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 2,
+                  position: 'relative',
+                }}
+              >
+                {isToday && (
+                  <span style={{ position: 'absolute', top: -6, right: -4, fontSize: 9, fontWeight: 800, letterSpacing: 0.4, color: selected ? '#F7931E' : '#F7931E', background: selected ? 'transparent' : 'transparent', padding: '1px 4px' }}>TODAY</span>
+                )}
+                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.6, color: selected ? '#F7931E' : '#94A3B8' }}>{DAY_LABELS[d.getDay()]}</span>
+                <span style={{ fontSize: 17, fontWeight: 700, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>{d.getDate()}</span>
+                <span style={{ fontSize: 10, color: selected ? 'rgba(248,250,252,0.7)' : '#94A3B8' }}>{MONTH_LABELS[d.getMonth()]}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        <SectionLabel>Time</SectionLabel>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20 }}>
+          <Stepper value={hour} format={(v) => String(v).padStart(2, '0')} onInc={() => bumpHour(1)} onDec={() => bumpHour(-1)} />
+          <div style={{ fontSize: 34, fontWeight: 200, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>:</div>
+          <Stepper value={minute} format={(v) => String(v).padStart(2, '0')} onInc={() => bumpMinute(15)} onDec={() => bumpMinute(-15)} />
+        </div>
+
+        {/* Summary */}
+        <div style={{ marginTop: 4, padding: '12px 14px', borderRadius: 12, background: '#FFFFFF', border: '1px solid rgba(15,23,42,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ fontSize: 13, color: isPast ? '#B00020' : '#0F172A' }}>
+            {isPast ? 'Pick a future time.' : (
+              <>Goes live <span style={{ fontWeight: 700 }}>{fmtSummaryDay(selDate, now)}</span> - <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{String(hour).padStart(2, '0')}:{String(minute).padStart(2, '0')}</span></>
+            )}
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', gap: 8 }}>
+          {value && (
+            <button onClick={clear} style={{ flex: 1, background: '#fff', border: '1px solid rgba(15,23,42,0.12)', borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer', color: '#0F172A' }}>Clear</button>
+          )}
+          <button
+            onClick={apply}
+            disabled={isPast}
+            style={{
+              flex: 2,
+              background: isPast ? 'rgba(247,147,30,0.4)' : '#F7931E',
+              color: '#15171F',
+              border: 0,
+              borderRadius: 12,
+              padding: '12px',
+              fontSize: 14,
+              fontWeight: 700,
+              cursor: isPast ? 'not-allowed' : 'pointer',
+            }}
+          >
+            Set schedule
+          </button>
         </div>
       </div>
-      <button onClick={onOpenScheduled} style={{ display: 'block', width: '100%', border: 0, borderTop: '1px solid rgba(0,0,0,0.07)', background: 'transparent', padding: '14px 16px', textAlign: 'left', fontSize: 13, color: '#1F2428', cursor: 'pointer' }}>
-        View scheduled - {scheduledCount}
+
+      <button
+        onClick={onOpenScheduled}
+        style={{ display: 'block', width: '100%', border: 0, borderTop: '1px solid rgba(15,23,42,0.07)', background: 'transparent', padding: '14px 16px', textAlign: 'left', fontSize: 13, color: '#0F172A', cursor: 'pointer' }}
+      >
+        View scheduled - <span style={{ fontWeight: 700 }}>{scheduledCount}</span>
       </button>
     </BottomSheet>
   );
 }
+
+function Preset({ children, onClick }: { children: React.ReactNode; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        background: '#FFFFFF',
+        border: '1px solid rgba(15,23,42,0.1)',
+        borderRadius: 999,
+        padding: '8px 14px',
+        fontSize: 13,
+        fontWeight: 600,
+        color: '#0F172A',
+        cursor: 'pointer',
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: 1, color: '#94A3B8' }}>{children}</div>
+  );
+}
+
+function Stepper({ value, format, onInc, onDec }: { value: number; format: (n: number) => string; onInc: () => void; onDec: () => void }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+      <button onClick={onInc} aria-label="Increase" style={stepBtn}><ChevronUp size={18} color="#94A3B8" /></button>
+      <div style={{ fontSize: 34, fontWeight: 200, color: '#0F172A', fontVariantNumeric: 'tabular-nums', lineHeight: 1.05, minWidth: 56, textAlign: 'center' }}>{format(value)}</div>
+      <button onClick={onDec} aria-label="Decrease" style={stepBtn}><ChevronDown size={18} color="#94A3B8" /></button>
+    </div>
+  );
+}
+
+const stepBtn: React.CSSProperties = {
+  width: 40,
+  height: 28,
+  border: 0,
+  background: 'transparent',
+  cursor: 'pointer',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+};
