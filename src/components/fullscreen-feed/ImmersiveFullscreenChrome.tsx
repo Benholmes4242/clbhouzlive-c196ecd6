@@ -179,7 +179,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           left: 0,
           right: 0,
           height: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 78px)',
-          background: 'linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 100%)',
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.55) 100%)',
           pointerEvents: 'none',
           zIndex: 0,
         }}
