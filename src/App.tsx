@@ -650,7 +650,9 @@ function AppRoutes() {
 
         {/* Echo v2 (parallel build - cutover pending) */}
         <Route path="/echo-v2" element={<Suspense fallback={<HubSkeleton />}><EchoV2Page /></Suspense>} />
+        <Route path="/echo-v2/history" element={<Suspense fallback={<HubSkeleton />}><EchoHistoryPage /></Suspense>} />
         <Route path="/echo-v2/:chatId" element={<Suspense fallback={<HubSkeleton />}><EchoV2Page /></Suspense>} />
+
 
         {/* Public Echo Share Page */}
         <Route path="/echo/share/:token" element={<Suspense fallback={<GenericPageSkeleton />}><EchoSharePage /></Suspense>} />
