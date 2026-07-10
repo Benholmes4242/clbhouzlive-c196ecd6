@@ -3869,6 +3869,71 @@ export type Database = {
         }
         Relationships: []
       }
+      echo_chat_messages: {
+        Row: {
+          chat_id: string
+          content: string
+          created_at: string
+          id: string
+          meta: Json
+          role: string
+        }
+        Insert: {
+          chat_id: string
+          content: string
+          created_at?: string
+          id?: string
+          meta?: Json
+          role: string
+        }
+        Update: {
+          chat_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          meta?: Json
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "echo_chat_messages_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "echo_chats"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      echo_chats: {
+        Row: {
+          created_at: string
+          id: string
+          last_message_at: string
+          pinned: boolean
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_message_at?: string
+          pinned?: boolean
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_message_at?: string
+          pinned?: boolean
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       echo_conversation_messages: {
         Row: {
           content: string
@@ -4277,6 +4342,57 @@ export type Database = {
           tsv?: unknown
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      echo_v2_rate_limits: {
+        Row: {
+          count: number
+          user_id: string
+          window_kind: string
+          window_start: string
+        }
+        Insert: {
+          count?: number
+          user_id: string
+          window_kind: string
+          window_start: string
+        }
+        Update: {
+          count?: number
+          user_id?: string
+          window_kind?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
+      echo_v2_response_cache: {
+        Row: {
+          created_at: string
+          expires_at: string
+          hit_count: number
+          meta: Json
+          query_hash: string
+          response_text: string
+          route: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          hit_count?: number
+          meta?: Json
+          query_hash: string
+          response_text: string
+          route: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          hit_count?: number
+          meta?: Json
+          query_hash?: string
+          response_text?: string
+          route?: string
         }
         Relationships: []
       }

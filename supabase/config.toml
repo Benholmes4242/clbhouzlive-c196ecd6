@@ -244,3 +244,6 @@ verify_jwt = false
 
 [functions.send-business-invite]
 verify_jwt = true
+
+[functions.echo-intelligence-v2]
+verify_jwt = true
