@@ -53,6 +53,22 @@ export interface IntelligenceSheetProps {
   onClose: () => void;
   trackRecord: { wins: number; topFives: number };
   initialTab?: Tab;
+  /** Selected tour slug from the hero picker (`pga`, `lpga`, `euro`, ...). */
+  tourSlug?: string;
+}
+
+const TOUR_TAG_LABEL: Record<string, string> = {
+  pga: 'PGA',
+  lpga: 'LPGA',
+  euro: 'DP World',
+  pgad: 'Korn Ferry',
+  champ: 'Champions',
+  liv: 'LIV',
+};
+
+function tourTag(slug: string | undefined): string {
+  const key = (slug ?? 'pga').toLowerCase();
+  return TOUR_TAG_LABEL[key] ?? key.toUpperCase();
 }
 
 export const IntelligenceSheet = memo(function IntelligenceSheet({
@@ -60,11 +76,14 @@ export const IntelligenceSheet = memo(function IntelligenceSheet({
   onClose,
   trackRecord,
   initialTab = 'history',
+  tourSlug,
 }: IntelligenceSheetProps) {
   const [tab, setTab] = useState<Tab>(initialTab);
   useEffect(() => {
     if (open) setTab(initialTab);
   }, [open, initialTab]);
+
+  const tag = tourTag(tourSlug);
 
   return (
     <BottomSheet
@@ -73,12 +92,12 @@ export const IntelligenceSheet = memo(function IntelligenceSheet({
       style={{ maxHeight: '85vh', backgroundColor: '#F8FAFC', display: 'flex', flexDirection: 'column' }}
       ariaLabelledBy="intelligence-sheet-title"
     >
-      <Header onClose={onClose} />
+      <Header onClose={onClose} tourTag={tag} />
       <TabStrip tab={tab} onChange={setTab} />
       {tab === 'how' ? (
-        <HowWePickBody trackRecord={trackRecord} />
+        <HowWePickBody trackRecord={trackRecord} tourSlug={tourSlug} />
       ) : (
-        <PicksHistoryBody onClose={onClose} />
+        <PicksHistoryBody onClose={onClose} tourSlug={tourSlug} tourTag={tag} />
       )}
     </BottomSheet>
   );
@@ -86,7 +105,7 @@ export const IntelligenceSheet = memo(function IntelligenceSheet({
 
 // ─── Header ─────────────────────────────────────────────────────────────────
 
-function Header({ onClose }: { onClose: () => void }) {
+function Header({ onClose, tourTag }: { onClose: () => void; tourTag: string }) {
   return (
     <div
       style={{
@@ -99,11 +118,27 @@ function Header({ onClose }: { onClose: () => void }) {
       }}
     >
       <div style={{ minWidth: 0, flex: 1 }}>
-        {/* canonical eyebrow: Brain mark + caps tag */}
+        {/* canonical eyebrow: Brain mark + caps tag + tour context */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
           <Brain size={14} color={AMBER} strokeWidth={2.5} />
           <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#94A3B8', lineHeight: 1 }}>
             Intelligence
+          </span>
+          <span
+            aria-label={`Tour: ${tourTag}`}
+            style={{
+              fontSize: 10,
+              fontWeight: 800,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              color: AMBER,
+              padding: '2px 6px',
+              borderRadius: 4,
+              background: AMBER_TINT_08,
+              lineHeight: 1,
+            }}
+          >
+            {tourTag}
           </span>
         </div>
         {/* amber cut-line */}
@@ -228,7 +263,7 @@ const ANALYSE_ROWS: AnalyseRow[] = [
   { icon: Cloud, iconColor: GREEN_ACCENT, iconBg: 'rgba(16,185,129,0.10)', title: 'Course conditions', body: 'Wind, rain, and turf conditions that historically reshape the leaderboard.' },
 ];
 
-function HowWePickBody({ trackRecord }: { trackRecord: { wins: number; topFives: number } }) {
+function HowWePickBody({ trackRecord, tourSlug }: { trackRecord: { wins: number; topFives: number }; tourSlug?: string }) {
   return (
     <div
       style={{
@@ -253,7 +288,7 @@ function HowWePickBody({ trackRecord }: { trackRecord: { wins: number; topFives:
         ))}
       </div>
       <SectionLabel>Receipts</SectionLabel>
-      <BackedByResultsCard wins={trackRecord.wins} topFives={trackRecord.topFives} />
+      <BackedByResultsCard wins={trackRecord.wins} topFives={trackRecord.topFives} tourSlug={tourSlug} />
       <Footnote />
     </div>
   );
@@ -338,8 +373,8 @@ function AnalyseRowItem({ row, isLast }: { row: AnalyseRow; isLast: boolean }) {
   );
 }
 
-function BackedByResultsCard({ wins, topFives }: { wins: number; topFives: number }) {
-  const { data: tournaments = [] } = useIntelligenceHistoricalPicks();
+function BackedByResultsCard({ wins, topFives, tourSlug }: { wins: number; topFives: number; tourSlug?: string }) {
+  const { data: tournaments = [] } = useIntelligenceHistoricalPicks(tourSlug);
   const totalResolved = tournaments.length;
   const hitRatePct = totalResolved > 0 ? Math.round((topFives / totalResolved) * 100) : 0;
 
@@ -485,10 +520,10 @@ function sortPicksByFinish<T extends { actualPosition: number | null }>(picks: T
   });
 }
 
-function PicksHistoryBody({ onClose }: { onClose: () => void }) {
+function PicksHistoryBody({ onClose, tourSlug, tourTag }: { onClose: () => void; tourSlug?: string; tourTag: string }) {
   const navigate = useNavigate();
   const [filter, setFilter] = useState<FilterKey>('all');
-  const { data: tournaments = [], isLoading } = useIntelligenceHistoricalPicks();
+  const { data: tournaments = [], isLoading } = useIntelligenceHistoricalPicks(tourSlug);
 
   const filtered = useMemo(
     () => tournaments.filter((t) => matchesFilter(t.outcome, filter)),
@@ -551,7 +586,7 @@ function PicksHistoryBody({ onClose }: { onClose: () => void }) {
         {isLoading ? (
           <SkeletonList />
         ) : tournaments.length === 0 ? (
-          <EmptyState onClose={onClose} />
+          <EmptyState onClose={onClose} tourTag={tourTag} />
         ) : filtered.length === 0 ? (
           <NoMatchState />
         ) : (
@@ -759,7 +794,7 @@ function SkeletonList() {
   );
 }
 
-function EmptyState({ onClose }: { onClose: () => void }) {
+function EmptyState({ onClose, tourTag }: { onClose: () => void; tourTag: string }) {
   return (
     <div
       style={{
@@ -784,10 +819,10 @@ function EmptyState({ onClose }: { onClose: () => void }) {
         <Brain size={26} color={AMBER} strokeWidth={2.8} style={{ display: 'block' }} />
       </div>
       <h3 style={{ margin: '16px 0 0', fontSize: 16, fontWeight: 800, color: SLATE_900, letterSpacing: '-0.2px' }}>
-        No picks yet this season.
+        No picks yet.
       </h3>
       <p style={{ margin: '6px 0 0', fontSize: 13, color: SLATE_500, maxWidth: 280, lineHeight: 1.4 }}>
-        First picks drop with the next tournament.
+        Pick tracking for {tourTag} starts this week.
       </p>
       <button
         type="button"
