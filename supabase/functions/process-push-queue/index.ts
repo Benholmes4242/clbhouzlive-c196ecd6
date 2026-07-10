@@ -3,7 +3,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-push-secret',
 };
 
 async function sendPush(
@@ -12,7 +12,8 @@ async function sendPush(
   body: string,
   data: Record<string, unknown>,
   appId: string,
-  apiKey: string
+  apiKey: string,
+  idempotencyKey: string
 ): Promise<{ success: boolean; error?: string }> {
   const response = await fetch('https://onesignal.com/api/v1/notifications', {
     method: 'POST',
@@ -27,6 +28,7 @@ async function sendPush(
       headings: { en: title },
       contents: { en: body || '' },
       data: data || {},
+      external_id: idempotencyKey,
       ios_badgeType: 'Increase',
       ios_badgeCount: 1,
       priority: 10,
@@ -44,6 +46,19 @@ async function sendPush(
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
+  // Shared-secret gate — cron/trigger callers set x-push-secret; direct
+  // unauthorised callers get 401. When the secret is not configured this is
+  // a no-op (dev environments still work).
+  const expectedSecret = Deno.env.get('PUSH_QUEUE_SECRET');
+  if (expectedSecret) {
+    const provided = req.headers.get('x-push-secret');
+    if (provided !== expectedSecret) {
+      return new Response(JSON.stringify({ success: false, error: 'Unauthorized' }), {
+        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+  }
+
   try {
     const ONESIGNAL_APP_ID = Deno.env.get('ONESIGNAL_APP_ID');
     const ONESIGNAL_API_KEY = Deno.env.get('ONESIGNAL_REST_API_KEY');
@@ -59,13 +74,11 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     );
 
+    // Atomic claim: marks rows claimed_at=now() under FOR UPDATE SKIP LOCKED,
+    // releases zombie claims (>5 min), and expires stale rows (>6h) so an
+    // outage backlog can never burst-flush. All inside the DB function.
     const { data: queue, error: fetchError } = await supabase
-      .from('push_notification_queue')
-      .select('*')
-      .is('sent_at', null)
-      .is('error', null)
-      .order('created_at', { ascending: true })
-      .limit(100);
+      .rpc('claim_push_queue_batch', { p_limit: 100 });
 
     if (fetchError) {
       return new Response(JSON.stringify({ success: false, error: fetchError.message }), {
@@ -95,9 +108,10 @@ serve(async (req) => {
     let successCount = 0;
     let errorCount = 0;
 
-    // Fan-out is now done at enqueue time (auto_queue_push_notification trigger).
-    // Each queue row already targets a single (user_id, device_id), so we just
-    // send it — applying that user's muted_types filter.
+    // Fan-out is done at enqueue time. Each queue row targets a single
+    // (user_id, device_id); we apply that user's muted_types filter then send.
+    // OneSignal's `external_id` body field is the idempotency key — reusing
+    // the queue row UUID guarantees at-most-once even on retry.
     for (const item of queue) {
       try {
         const data = (item.data ?? {}) as Record<string, any>;
@@ -120,7 +134,8 @@ serve(async (req) => {
           item.body || '',
           item.data || {},
           ONESIGNAL_APP_ID,
-          ONESIGNAL_API_KEY
+          ONESIGNAL_API_KEY,
+          item.id
         );
 
         if (result.success) {
