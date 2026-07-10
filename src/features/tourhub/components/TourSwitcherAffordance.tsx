@@ -262,93 +262,115 @@ export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
               )}
             </button>
           )}
-          {Object.entries(TOUR_LABEL).map(([slug, label]) => {
-            const isActive = slug === activeTourSlug;
-            const status = tourStatus(slug);
-            const selectable = status !== 'none';
+          {Object.entries(TOUR_LABEL).flatMap(([slug, label]) => {
+            const tourSlides = slidesByTour[slug] ?? [];
 
-            return (
-              <button
-                key={slug}
-                type="button"
-                onClick={() => {
-                  if (!selectable) return;
-                  selectTour(slug);
-                  setOpen(false);
-                }}
-                disabled={!selectable}
-                aria-pressed={isActive}
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  padding: '14px 16px',
-                  background: isActive ? AMBER_TINT_04 : 'transparent',
-                  border: 'none',
-                  borderBottom: `0.5px solid ${INK_TINT_07}`,
-                  cursor: selectable ? 'pointer' : 'default',
-                  opacity: selectable ? 1 : 0.4,
-                  textAlign: 'left',
-                  fontFamily: FONT,
-                }}
-              >
-                <div
+            // Tour with zero hero slides: keep a single non-interactive row.
+            if (tourSlides.length === 0) {
+              return [(
+                <button
+                  key={slug}
+                  type="button"
+                  disabled
+                  aria-pressed={false}
                   style={{
-                    width: 28,
-                    height: 28,
-                    flexShrink: 0,
+                    width: '100%',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
+                    gap: 12,
+                    padding: '14px 16px',
+                    background: 'transparent',
+                    border: 'none',
+                    borderBottom: `0.5px solid ${INK_TINT_07}`,
+                    cursor: 'default',
+                    opacity: 0.4,
+                    textAlign: 'left',
+                    fontFamily: FONT,
                   }}
                 >
-                  <img
-                    src={getTourLogo(slug)}
-                    alt=""
-                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                  />
-                </div>
-
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div
-                    style={{
-                      fontSize: 13,
-                      fontWeight: 700,
-                      color: INK,
-                      letterSpacing: '0.04em',
-                      textTransform: 'uppercase',
-                    }}
-                  >
-                    {label}
+                  <div style={{ width: 28, height: 28, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <img src={getTourLogo(slug)} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                   </div>
-                </div>
-
-                {status === 'live' ? (
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                    <span style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_LIVE, display: 'inline-block' }} />
-                    <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: STATUS_LIVE }}>LIVE</span>
-                  </span>
-                ) : status === 'results' ? (
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                    <Trophy size={12} strokeWidth={2.5} style={{ color: GOLD_DEEP }} aria-hidden />
-                    <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: GOLD_DEEP }}>RESULTS</span>
-                  </span>
-
-                ) : status === 'upcoming' ? (
-                  <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: INK_ALPHA_45 }}>
-                    UPCOMING
-                  </span>
-                ) : (
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: INK, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                      {label}
+                    </div>
+                    <div style={{ marginTop: 2, fontSize: 12, fontWeight: 500, color: SUBTITLE_COLOR, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      No events this week
+                    </div>
+                  </div>
                   <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: 'rgba(15,23,42,0.30)' }}>
                     NO EVENT
                   </span>
-                )}
+                </button>
+              )];
+            }
 
-              </button>
-            );
+            // One row per hero slide (multi-event tours render multiple adjacent rows).
+            return tourSlides.map((slide) => {
+              const t = slide.tournament;
+              const isActive = !isMajorActive
+                && (viewingTournamentId
+                  ? t.id === viewingTournamentId
+                  : slug === activeTourSlug && slide === tourSlides[0]);
+
+              return (
+                <button
+                  key={`${slug}:${t.id}`}
+                  type="button"
+                  onClick={() => {
+                    selectTour(slug, { tournamentId: t.id });
+                    setOpen(false);
+                  }}
+                  aria-pressed={isActive}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    padding: '14px 16px',
+                    background: isActive ? AMBER_TINT_04 : 'transparent',
+                    border: 'none',
+                    borderBottom: `0.5px solid ${INK_TINT_07}`,
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    fontFamily: FONT,
+                  }}
+                >
+                  <div style={{ width: 28, height: 28, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <img src={getTourLogo(slug)} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                  </div>
+
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: INK, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                      {label}
+                    </div>
+                    <div style={{ marginTop: 2, fontSize: 12, fontWeight: 500, color: SUBTITLE_COLOR, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {t.name}
+                    </div>
+                  </div>
+
+                  {slide.type === 'live' ? (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                      <span style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_LIVE, display: 'inline-block' }} />
+                      <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: STATUS_LIVE }}>LIVE</span>
+                    </span>
+                  ) : slide.type === 'completed' ? (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                      <Trophy size={12} strokeWidth={2.5} style={{ color: GOLD_DEEP }} aria-hidden />
+                      <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: GOLD_DEEP }}>RESULTS</span>
+                    </span>
+                  ) : (
+                    <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: INK_ALPHA_45 }}>
+                      UPCOMING
+                    </span>
+                  )}
+                </button>
+              );
+            });
           })}
         </div>
+
 
         <div style={{ height: 'env(safe-area-inset-bottom, 0px)' }} />
       </BottomSheet>
