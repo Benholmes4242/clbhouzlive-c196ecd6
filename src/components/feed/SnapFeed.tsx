@@ -10,6 +10,19 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { vperfStart, vperfArmLane, vperfNextId, vperfFeedScrollTick, vperfFeedActivateStart, vperfFeedActivateEnd } from '@/perf/vperf';
 import { PrefetchController } from '@/video/PrefetchController';
+import { trace } from '@/perf/trace';
+import { VideoEngine } from '@/video/VideoEngine';
+import { isPerfEnabled } from '@/perf/navTiming';
+
+// Normalized owner-key compare — bare "X" ≡ "X:0", ":1"/":2" distinct.
+// Never use strict === here; strict compare caused false-null mismatch
+// reports on the [CAROUSEL2] diagnostic and burned a round.
+const _normalizeOwnerKey = (k: string | null | undefined): string | null =>
+  !k ? null : k.includes(':') ? k : `${k}:0`;
+const ownerKeysMatch = (
+  laneKey: string | null | undefined,
+  expectedKey: string,
+): boolean => _normalizeOwnerKey(laneKey) === _normalizeOwnerKey(expectedKey);
 
 
 
@@ -147,46 +160,94 @@ export function SnapFeed({
   const location = useLocation();
 
   // [VPERF] S4 swipe.vertical — a vertical settle on a video slide.
-  // Ends on the next 'playing' event on the feed-active lane. We assume the
-  // active slide's primary media is a video; image-only settles simply time
-  // out (TIMEOUT verdict) and are harmless / rare in the vertical feed.
+  // Closes on the next 'firstFrame' event on the feed-active lane; 'playing'
+  // is a phase waypoint only (mirrors fs.open). Image-only settles time out
+  // (TIMEOUT verdict) and are harmless / rare in the vertical feed. The
+  // 900ms fallback below is the orphan-span guard.
   const prevActiveRef = useRef<number>(activeIndex);
   const activateT0Ref = useRef<number>(0);
   const activateWarmRef = useRef<boolean>(false);
   const activateDoneRef = useRef<boolean>(true);
   useEffect(() => {
     if (prevActiveRef.current === activeIndex) return;
+    const fromIdx = prevActiveRef.current;
     prevActiveRef.current = activeIndex;
     const post = posts[activeIndex];
     if (!post) return;
     const spanId = vperfNextId(`swipe.vertical:${post.id}`);
     vperfStart(spanId, 'swipe.vertical', { postId: post.id, activeIndex });
-    vperfArmLane('feed-active', { spanId, endOn: 'firstFrame', phase: 'firstFrame' });
-    vperfArmLane('feed-active', { spanId, endOn: 'playing' });
+    // Closer on firstFrame, waypoint on playing (mirror fs.open arms).
+    vperfArmLane('feed-active', { spanId, endOn: 'firstFrame' });
+    vperfArmLane('feed-active', { spanId, endOn: 'playing', phase: 'playing' });
 
     // [BASELINE] feed.activate — activation → media visible latency.
     activateT0Ref.current = vperfFeedActivateStart();
     activateDoneRef.current = false;
-    // Heuristic warm: if activation happens within 400ms of prior activation,
-    // treat as warm (fast swipes reuse buffered adjacent lanes).
     const hasVideo = (post as any)?.mediaItems?.some?.((m: any) => m?.type === 'video');
     const mediaType: 'image' | 'video' = hasVideo ? 'video' : 'image';
-    // Rely on the swipe.vertical span's arming: when a 'playing' or 'firstFrame'
-    // event fires on feed-active, we approximate activation completion by
-    // ending here on the next microtask if not already ended. Simpler path:
-    // measure until 'playing'/'firstFrame' via a lane arm.
     const armId = vperfNextId(`feed.activate:${post.id}`);
     vperfStart(armId, mediaType === 'image' ? 'feed.activate.image' : 'feed.activate.video.cold', { idx: activeIndex });
     if (mediaType === 'video') {
+      // Closer on firstFrame, waypoint on playing.
       vperfArmLane('feed-active', { spanId: armId, endOn: 'firstFrame' });
-      vperfArmLane('feed-active', { spanId: armId, endOn: 'playing' });
+      vperfArmLane('feed-active', { spanId: armId, endOn: 'playing', phase: 'playing' });
     }
-    // Emit the aggregator-facing feed.activate line as well (short, budgeted).
+
+    // [FSVERT] slide.change — vertical activeIndex transition. Fullscreen
+    // overlay surface only (matches the [FSVERT] axis). isPerfEnabled-gated
+    // inside trace().
+    if (isFullscreen) {
+      const wasPrefetched = PrefetchController.wasPrefetched(`${post.id}:0`);
+      const dir: 1 | -1 | 0 = activeIndex > fromIdx ? 1 : activeIndex < fromIdx ? -1 : 0;
+      trace('slide.change', {
+        surface: 'FSVERT',
+        from: fromIdx,
+        to: activeIndex,
+        dir,
+        postId: post.id,
+        mediaType,
+        prefetched: wasPrefetched,
+      });
+
+      // [FSVERT] slide.mismatch guard — sample the fullscreen lane the first
+      // time it reports firstFrame after this transition; compare its owner
+      // key against the expected postId:0 using NORMALIZED equality.
+      if (isPerfEnabled()) {
+        const expectedKey = `${post.id}:0`;
+        const started = performance.now();
+        let raf = 0;
+        let done = false;
+        const poll = () => {
+          if (done) return;
+          if (performance.now() - started > 1500) {
+            done = true;
+            return;
+          }
+          try {
+            const s = VideoEngine.snapshot('fullscreen');
+            if (s.firstFrame) {
+              done = true;
+              if (!ownerKeysMatch(s.postId, expectedKey)) {
+                trace('slide.mismatch', {
+                  surface: 'FSVERT',
+                  expectedOwnerKey: expectedKey,
+                  laneOwnerKey: s.postId,
+                  activeIndex,
+                });
+              }
+              return;
+            }
+          } catch { /* trace-only */ }
+          raf = requestAnimationFrame(poll);
+        };
+        raf = requestAnimationFrame(poll);
+        // best-effort: no explicit cancel, done flag terminates the loop.
+      }
+    }
+
     const finalize = () => {
       if (activateDoneRef.current) return;
       activateDoneRef.current = true;
-      // [PREDICT] prefetched flag — did the PrefetchController warm this
-      // ownerKey (post.id:0 for the primary media) before activation?
       const wasPrefetched = PrefetchController.wasPrefetched(`${post.id}:0`);
       vperfFeedActivateEnd({
         t0: activateT0Ref.current,
@@ -196,13 +257,12 @@ export function SnapFeed({
         prefetched: wasPrefetched,
       });
     };
-    // Fallback finalize after 900ms if lane events never arrive.
+    // Fallback finalize after 900ms if lane events never arrive (orphan guard).
     const to = window.setTimeout(finalize, 900);
-    // For images, resolve on next frame — image branch has no lane events.
     if (mediaType === 'image') requestAnimationFrame(() => { finalize(); });
     return () => { clearTimeout(to); finalize(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeIndex]);
+  }, [activeIndex, isFullscreen]);
 
 
   // [BASELINE] feed.scroll sampler — subscribes to the outer scroll element.

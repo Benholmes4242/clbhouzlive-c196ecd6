@@ -12,6 +12,7 @@ import { originHostRegistry } from '@/video/originHostRegistry';
 import { isPerfEnabled } from '@/perf/navTiming';
 import { vperfStart, vperfArmLane, vperfNextId, vperfMotionMark } from '@/perf/vperf';
 import { trace, traceLookup } from '@/perf/trace';
+import { PrefetchController } from '@/video/PrefetchController';
 import { resolveRestingRect, getCurrentViewport, type RestingRect } from '@/lib/media/resolveRestingRect';
 import { FS_TRANSITION_MODE } from '@/lib/media/transitionMode';
 
@@ -1048,17 +1049,48 @@ const FullscreenMediaPager: React.FC<{
   const borrow = useFullscreenFeedStore((s) => s.borrow);
   const demotedRef = useRef(false);
 
+  // [FSPAGER] HTTP warm — request i±1 video neighbours through the
+  // PrefetchController on mount and on every page transition. Lane-free:
+  // structurally impossible to warm engine lanes without a second lane
+  // (see A4). abortAll is global — vertical warms may be momentarily
+  // cancelled; controller re-issues on the next scroll sample.
+  const warmNeighbours = React.useCallback((idx: number) => {
+    for (const k of [-1, 1]) {
+      const i = idx + k;
+      if (i < 0 || i >= media.length) continue;
+      const m = media[i];
+      if (!m || m.type !== 'video') continue;
+      const hlsUrl = (m as any).hlsUrl as string | undefined;
+      if (!hlsUrl) continue;
+      PrefetchController.request(`${post.id}:${i}`, hlsUrl);
+    }
+  }, [media, post.id]);
+
   // Jump to the opening media on mount (auto, no smooth animation — the FLIP
   // clone / borrow FLIP is the visual open animation).
   useEffect(() => {
     const el = scrollerRef.current;
     if (!el) return;
-    // Wait a tick so layout has resolved clientWidth.
     const raf = requestAnimationFrame(() => {
       el.scrollLeft = openIdx * el.clientWidth;
     });
     return () => cancelAnimationFrame(raf);
   }, [openIdx]);
+
+  // [FSPAGER] pager.openIdxMount + first neighbour warm.
+  useEffect(() => {
+    trace('pager.openIdxMount', {
+      surface: 'FSPAGER',
+      postId: post.id,
+      openIdx,
+      count: media.length,
+    });
+    warmNeighbours(openIdx);
+    return () => {
+      PrefetchController.abortAll('pagerUnmount');
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Track the active page by scroll-snap position. Also detects the
   // first-swipe borrow demote and requests it via the store BEFORE the new
@@ -1075,7 +1107,9 @@ const FullscreenMediaPager: React.FC<{
         if (w <= 0) return;
         const idx = Math.round(el.scrollLeft / w);
         if (idx === activePagerIdx) return;
+        const fromIdx = activePagerIdx;
         // Borrow demote — one-shot on first horizontal move.
+        let demoteReason: 'borrow.demote' | null = null;
         if (
           !demotedRef.current &&
           borrow &&
@@ -1083,24 +1117,80 @@ const FullscreenMediaPager: React.FC<{
           idx !== openIdx
         ) {
           demotedRef.current = true;
+          demoteReason = 'borrow.demote';
+          trace('borrow.demote', {
+            surface: 'FSPAGER',
+            postId: post.id,
+            fromIdx,
+            toIdx: idx,
+          });
           useFullscreenFeedStore.getState().demoteBorrow();
         }
         setActivePagerIdx(idx);
-        // [VPERF] S5 swipe.pager — measure horizontal settle onto a video
-        // page → next 'playing' event on the fullscreen lane. The borrow
-        // (if any) was just demoted by this same swipe on the very first
-        // move; all non-opening pages bind the fullscreen lane, so we arm
-        // 'fullscreen' unconditionally. Image pages: no span.
+
         const nextItem = media[idx];
-        if (nextItem && nextItem.type === 'video') {
+        const pageKind: 'video' | 'image' | 'unknown' =
+          nextItem?.type === 'video' ? 'video' : nextItem?.type === 'image' ? 'image' : 'unknown';
+
+        // [FSPAGER] slide.change trace.
+        const dir: 1 | -1 | 0 = idx > fromIdx ? 1 : idx < fromIdx ? -1 : 0;
+        const wasPrefetched = pageKind === 'video'
+          ? PrefetchController.wasPrefetched(`${post.id}:${idx}`)
+          : false;
+        trace('slide.change', {
+          surface: 'FSPAGER',
+          postId: post.id,
+          from: fromIdx,
+          to: idx,
+          dir,
+          pageKind,
+          prefetched: wasPrefetched,
+          ...(demoteReason ? { demoted: true } : {}),
+        });
+
+        // HTTP warm for the new neighbours.
+        warmNeighbours(idx);
+
+        // [VPERF] S5 swipe.pager — measure horizontal settle onto a video
+        // page. Closer on firstFrame, waypoint on playing (mirror fs.open).
+        if (pageKind === 'video') {
           const spanId = vperfNextId(`swipe.pager:${post.id}:${idx}`);
           vperfStart(spanId, 'swipe.pager', {
             postId: post.id,
             mediaIndex: idx,
             pageKind: 'video',
           });
-          vperfArmLane('fullscreen', { spanId, endOn: 'firstFrame', phase: 'firstFrame' });
-          vperfArmLane('fullscreen', { spanId, endOn: 'playing' });
+          vperfArmLane('fullscreen', { spanId, endOn: 'firstFrame' });
+          vperfArmLane('fullscreen', { spanId, endOn: 'playing', phase: 'playing' });
+
+          // [FSPAGER] slide.mismatch guard — sample fullscreen lane on the
+          // first firstFrame after this transition. Normalized compare.
+          if (isPerfEnabled()) {
+            const expectedKey = `${post.id}:${idx}`;
+            const started = performance.now();
+            let done = false;
+            const poll = () => {
+              if (done) return;
+              if (performance.now() - started > 1500) { done = true; return; }
+              try {
+                const s = VideoEngine.snapshot('fullscreen');
+                if (s.firstFrame) {
+                  done = true;
+                  if (!ownerKeysMatch(s.postId, expectedKey)) {
+                    trace('slide.mismatch', {
+                      surface: 'FSPAGER',
+                      expectedOwnerKey: expectedKey,
+                      laneOwnerKey: s.postId,
+                      pagerIdx: idx,
+                    });
+                  }
+                  return;
+                }
+              } catch { /* trace-only */ }
+              requestAnimationFrame(poll);
+            };
+            requestAnimationFrame(poll);
+          }
         }
       });
     };
@@ -1108,7 +1198,9 @@ const FullscreenMediaPager: React.FC<{
     return () => {
       el.removeEventListener('scroll', onScroll);
       if (raf) cancelAnimationFrame(raf);
+      PrefetchController.abortAll('slideDeactivated');
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activePagerIdx, borrow, post.id, openIdx]);
 
   return (
@@ -1209,6 +1301,24 @@ const FullscreenPagerPage: React.FC<{
     if (!isActivePage) return;
     onZoomChange?.(zoomScale > 1);
   }, [isActivePage, zoomScale, onZoomChange]);
+
+  // [FSPAGER] slide.video.play / slide.video.pause — emit whenever a video
+  // page's isActivePage flips. Reasons are structural (page activation /
+  // deactivation); the borrow.demote reason is emitted alongside in the
+  // parent scroll handler. isPerfEnabled-gated inside trace().
+  const wasActiveRef = useRef(isActivePage);
+  useEffect(() => {
+    if (m?.type !== 'video') return;
+    if (wasActiveRef.current === isActivePage) return;
+    wasActiveRef.current = isActivePage;
+    trace(isActivePage ? 'slide.video.play' : 'slide.video.pause', {
+      surface: 'FSPAGER',
+      postId: post.id,
+      pageIdx,
+      ownerKey,
+      reason: isActivePage ? 'pageActivated' : 'pageInactivated',
+    });
+  }, [isActivePage, m?.type, post.id, pageIdx, ownerKey]);
 
   if (m?.type === 'video') {
     const posterSrc = m.thumbnailUrl || '';
