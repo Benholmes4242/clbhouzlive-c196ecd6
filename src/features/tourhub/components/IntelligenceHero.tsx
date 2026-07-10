@@ -19,6 +19,7 @@
  */
 
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   Brain,
   Check,
@@ -28,7 +29,9 @@ import {
   Trophy,
   Award,
   Clock,
+  Flag,
 } from 'lucide-react';
+import { AnimatedEchoWave } from '@/features/echo-v2/components/AnimatedEchoWave';
 import {
   useIntelligenceLifecycleState,
   type IntelligenceLifecycleState,
