@@ -53,6 +53,22 @@ export interface IntelligenceSheetProps {
   onClose: () => void;
   trackRecord: { wins: number; topFives: number };
   initialTab?: Tab;
+  /** Selected tour slug from the hero picker (`pga`, `lpga`, `euro`, ...). */
+  tourSlug?: string;
+}
+
+const TOUR_TAG_LABEL: Record<string, string> = {
+  pga: 'PGA',
+  lpga: 'LPGA',
+  euro: 'DP World',
+  pgad: 'Korn Ferry',
+  champ: 'Champions',
+  liv: 'LIV',
+};
+
+function tourTag(slug: string | undefined): string {
+  const key = (slug ?? 'pga').toLowerCase();
+  return TOUR_TAG_LABEL[key] ?? key.toUpperCase();
 }
 
 export const IntelligenceSheet = memo(function IntelligenceSheet({
@@ -60,11 +76,14 @@ export const IntelligenceSheet = memo(function IntelligenceSheet({
   onClose,
   trackRecord,
   initialTab = 'history',
+  tourSlug,
 }: IntelligenceSheetProps) {
   const [tab, setTab] = useState<Tab>(initialTab);
   useEffect(() => {
     if (open) setTab(initialTab);
   }, [open, initialTab]);
+
+  const tag = tourTag(tourSlug);
 
   return (
     <BottomSheet
@@ -73,12 +92,12 @@ export const IntelligenceSheet = memo(function IntelligenceSheet({
       style={{ maxHeight: '85vh', backgroundColor: '#F8FAFC', display: 'flex', flexDirection: 'column' }}
       ariaLabelledBy="intelligence-sheet-title"
     >
-      <Header onClose={onClose} />
+      <Header onClose={onClose} tourTag={tag} />
       <TabStrip tab={tab} onChange={setTab} />
       {tab === 'how' ? (
-        <HowWePickBody trackRecord={trackRecord} />
+        <HowWePickBody trackRecord={trackRecord} tourSlug={tourSlug} />
       ) : (
-        <PicksHistoryBody onClose={onClose} />
+        <PicksHistoryBody onClose={onClose} tourSlug={tourSlug} tourTag={tag} />
       )}
     </BottomSheet>
   );
