@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Users, MapPin, BarChart3, Settings, Shield, ShieldAlert, ShieldCheck, LifeBuoy, ArrowLeft,
-  ClipboardList, MessagesSquare, BadgeCheck, Gauge, Activity,
+  ClipboardList, MessagesSquare, BadgeCheck, Gauge, Activity, Bell,
   type LucideIcon,
 } from 'lucide-react';
 import { adminTheme as t } from './theme';
@@ -30,6 +30,7 @@ const NAV: NavItem[] = [
   { to: '/admin-v2/video-perf', label: 'Video Perf', icon: Gauge, requireFull: true },
   { to: '/admin-v2/system',     label: 'System',     icon: Settings },
   { to: '/admin-v2/echo-health', label: 'Echo Health', icon: Activity, requireFull: true },
+  { to: '/admin-v2/push-health', label: 'Push Health', icon: Bell, requireFull: true },
 ];
 
 interface Props {
