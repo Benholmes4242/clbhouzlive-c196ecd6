@@ -160,10 +160,13 @@ export function SnapFeed({
   const location = useLocation();
 
   // [VPERF] S4 swipe.vertical — a vertical settle on a video slide.
-  // Closes on the next 'firstFrame' event on the feed-active lane; 'playing'
-  // is a phase waypoint only (mirrors fs.open). Image-only settles time out
-  // (TIMEOUT verdict) and are harmless / rare in the vertical feed. The
-  // 900ms fallback below is the orphan-span guard.
+  // Closes on the next 'firstFrame' event on the surface's active lane
+  // ('feed-active' in the Clubhouse feed; 'fullscreen' in the overlay —
+  // the singleton fullscreen lane is where the video actually plays, so
+  // arming feed-active there yielded 15001ms watchdog orphans). 'playing'
+  // is a phase waypoint only. Image slides skip the lane arm entirely
+  // (no lane events => the 900ms fallback below closes feed.activate;
+  // swipe.vertical is not started for image slides to avoid orphans).
   const prevActiveRef = useRef<number>(activeIndex);
   const activateT0Ref = useRef<number>(0);
   const activateWarmRef = useRef<boolean>(false);
@@ -174,23 +177,32 @@ export function SnapFeed({
     prevActiveRef.current = activeIndex;
     const post = posts[activeIndex];
     if (!post) return;
-    const spanId = vperfNextId(`swipe.vertical:${post.id}`);
-    vperfStart(spanId, 'swipe.vertical', { postId: post.id, activeIndex });
-    // Closer on firstFrame, waypoint on playing (mirror fs.open arms).
-    vperfArmLane('feed-active', { spanId, endOn: 'firstFrame' });
-    vperfArmLane('feed-active', { spanId, endOn: 'playing', phase: 'playing' });
+
+    const hasVideo = (post as any)?.mediaItems?.some?.((m: any) => m?.type === 'video');
+    const mediaType: 'image' | 'video' = hasVideo ? 'video' : 'image';
+    // Surface-aware lane: fullscreen overlay plays on the singleton
+    // 'fullscreen' lane; the inline feed plays on 'feed-active'.
+    const armLane: 'fullscreen' | 'feed-active' =
+      surface === 'fullscreen' ? 'fullscreen' : 'feed-active';
+
+    // swipe.vertical — video slides only. Image slides have no lane
+    // events on either surface, so starting the span would guarantee
+    // a 15001ms watchdog orphan.
+    if (mediaType === 'video') {
+      const spanId = vperfNextId(`swipe.vertical:${post.id}`);
+      vperfStart(spanId, 'swipe.vertical', { postId: post.id, activeIndex, surface });
+      vperfArmLane(armLane, { spanId, endOn: 'firstFrame' });
+      vperfArmLane(armLane, { spanId, endOn: 'playing', phase: 'playing' });
+    }
 
     // [BASELINE] feed.activate — activation → media visible latency.
     activateT0Ref.current = vperfFeedActivateStart();
     activateDoneRef.current = false;
-    const hasVideo = (post as any)?.mediaItems?.some?.((m: any) => m?.type === 'video');
-    const mediaType: 'image' | 'video' = hasVideo ? 'video' : 'image';
     const armId = vperfNextId(`feed.activate:${post.id}`);
     vperfStart(armId, mediaType === 'image' ? 'feed.activate.image' : 'feed.activate.video.cold', { idx: activeIndex });
     if (mediaType === 'video') {
-      // Closer on firstFrame, waypoint on playing.
-      vperfArmLane('feed-active', { spanId: armId, endOn: 'firstFrame' });
-      vperfArmLane('feed-active', { spanId: armId, endOn: 'playing', phase: 'playing' });
+      vperfArmLane(armLane, { spanId: armId, endOn: 'firstFrame' });
+      vperfArmLane(armLane, { spanId: armId, endOn: 'playing', phase: 'playing' });
     }
 
     // [FSVERT] slide.change — vertical activeIndex transition. Fullscreen
@@ -209,11 +221,18 @@ export function SnapFeed({
         prefetched: wasPrefetched,
       });
 
-      // [FSVERT] slide.mismatch guard — sample the fullscreen lane the first
-      // time it reports firstFrame after this transition; compare its owner
-      // key against the expected postId:0 using NORMALIZED equality.
-      if (isPerfEnabled()) {
+      // [FSVERT] slide.mismatch guard — video slides only. Retained prior
+      // content on the fullscreen lane (paused previous video while the
+      // incoming slide is an image, or before the repoint lands) must
+      // never fire the guard. Record the lane owner at transition start
+      // and wait until EITHER (a) firstFrame && the lane repointed away
+      // from that start-owner (real new frame) — then compare with the
+      // expected key; OR (b) firstFrame && the lane already matches the
+      // expected key; OR (c) 1500ms timeout — report nothing.
+      if (mediaType === 'video' && isPerfEnabled()) {
         const expectedKey = `${post.id}:0`;
+        let laneOwnerKeyAtStart: string | null = null;
+        try { laneOwnerKeyAtStart = VideoEngine.snapshot('fullscreen').postId ?? null; } catch { /* noop */ }
         const started = performance.now();
         let raf = 0;
         let done = false;
@@ -226,22 +245,31 @@ export function SnapFeed({
           try {
             const s = VideoEngine.snapshot('fullscreen');
             if (s.firstFrame) {
-              done = true;
-              if (!ownerKeysMatch(s.postId, expectedKey)) {
+              const repointed = !ownerKeysMatch(s.postId, laneOwnerKeyAtStart ?? '');
+              const matches = ownerKeysMatch(s.postId, expectedKey);
+              if (matches) {
+                done = true;
+                return;
+              }
+              if (repointed) {
+                done = true;
                 trace('slide.mismatch', {
                   surface: 'FSVERT',
                   expectedOwnerKey: expectedKey,
                   laneOwnerKey: s.postId,
+                  laneOwnerKeyAtStart,
                   activeIndex,
                 });
+                return;
               }
-              return;
+              // firstFrame but still on the retained prior owner —
+              // keep polling for the repoint (or timeout).
             }
           } catch { /* trace-only */ }
           raf = requestAnimationFrame(poll);
         };
         raf = requestAnimationFrame(poll);
-        // best-effort: no explicit cancel, done flag terminates the loop.
+        // best-effort: no explicit cancel, done flag + timeout terminate.
       }
     }
 

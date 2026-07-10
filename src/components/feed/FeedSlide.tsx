@@ -1163,10 +1163,16 @@ const FullscreenMediaPager: React.FC<{
           vperfArmLane('fullscreen', { spanId, endOn: 'firstFrame' });
           vperfArmLane('fullscreen', { spanId, endOn: 'playing', phase: 'playing' });
 
-          // [FSPAGER] slide.mismatch guard — sample fullscreen lane on the
-          // first firstFrame after this transition. Normalized compare.
+          // [FSPAGER] slide.mismatch guard — video pages only (already
+          // gated by pageKind === 'video' above). Retained prior lane
+          // content must not fire the guard: record laneOwnerKeyAtStart
+          // and wait until EITHER (a) firstFrame && repointed away from
+          // start-owner (compare with expected); OR (b) firstFrame &&
+          // already matches expected; OR (c) 1500ms timeout — nothing.
           if (isPerfEnabled()) {
             const expectedKey = `${post.id}:${idx}`;
+            let laneOwnerKeyAtStart: string | null = null;
+            try { laneOwnerKeyAtStart = VideoEngine.snapshot('fullscreen').postId ?? null; } catch { /* noop */ }
             const started = performance.now();
             let done = false;
             const poll = () => {
@@ -1175,16 +1181,21 @@ const FullscreenMediaPager: React.FC<{
               try {
                 const s = VideoEngine.snapshot('fullscreen');
                 if (s.firstFrame) {
-                  done = true;
-                  if (!ownerKeysMatch(s.postId, expectedKey)) {
+                  const repointed = !ownerKeysMatch(s.postId, laneOwnerKeyAtStart ?? '');
+                  const matches = ownerKeysMatch(s.postId, expectedKey);
+                  if (matches) { done = true; return; }
+                  if (repointed) {
+                    done = true;
                     trace('slide.mismatch', {
                       surface: 'FSPAGER',
                       expectedOwnerKey: expectedKey,
                       laneOwnerKey: s.postId,
+                      laneOwnerKeyAtStart,
                       pagerIdx: idx,
                     });
+                    return;
                   }
-                  return;
+                  // firstFrame on retained prior owner — keep polling.
                 }
               } catch { /* trace-only */ }
               requestAnimationFrame(poll);
