@@ -137,11 +137,10 @@ const InboxV2Page: React.FC = () => {
             ))}
           </div>
         )}
-      </main>
-
+      </div>
 
       <NewConversationSheet open={composeOpen} onClose={() => setComposeOpen(false)} />
-    </div>
+    </ManagePageShell>
   );
 };
 
