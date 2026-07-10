@@ -1,6 +1,6 @@
 // CaptionField - MentionsComposerInput host.
 
-import MentionsComposerInput from '@/components/mentions/MentionsComposerInput';
+import { MentionsComposerInput } from '@/components/mentions/MentionsComposerInput';
 
 interface Props {
   value: string;
