@@ -75,7 +75,7 @@ export function SuccessScreenV2({
             boxShadow: '0 8px 22px -8px rgba(21,23,31,0.45)',
           }}
         >
-          <Check size={26} color="#F7BF3F" strokeWidth={3} />
+          <Check size={26} color="#F5F6F7" strokeWidth={3} />
         </div>
         <h1
           style={{
@@ -88,6 +88,18 @@ export function SuccessScreenV2({
         >
           Review posted
         </h1>
+        <p
+          style={{
+            margin: 0,
+            fontSize: 13,
+            color: RV2.secondary,
+            textAlign: 'center',
+            lineHeight: 1.4,
+            maxWidth: 300,
+          }}
+        >
+          {subtitle}
+        </p>
       </div>
 
       <div style={{ padding: '4px 16px 20px' }}>
