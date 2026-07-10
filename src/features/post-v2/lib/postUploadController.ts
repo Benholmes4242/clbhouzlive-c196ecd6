@@ -285,11 +285,8 @@ export function startPostUpload(ctx: UploadJobContext, items: StageMediaItem[]):
       uploadEventBus.emit('upload:failed', {
         type: 'upload:failed',
         jobId: ctx.jobId,
-        uploadType: 'post',
         postId: ctx.postId,
-        actorType: ctx.actorType,
-        actorId: ctx.actorId,
-        error: job.snapshot.error,
+        error: job.snapshot.error ?? 'Upload failed',
       });
       emitSnapshot(job);
       setTimeout(() => jobs.delete(ctx.jobId), 30_000);
