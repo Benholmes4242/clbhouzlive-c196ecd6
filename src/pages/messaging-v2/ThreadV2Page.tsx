@@ -4,6 +4,7 @@ import { ChevronLeft, MoreVertical, BadgeCheck, MessageCircle } from 'lucide-rea
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useThread } from '@/hooks/messaging/useThread';
 import { useConversations } from '@/hooks/messaging/useConversations';
+import { useConversationDetail } from '@/hooks/messaging/useConversationDetail';
 import { useMessagingActor } from '@/hooks/messaging/useMessagingActor';
 import { useSendMessage } from '@/hooks/messaging/useSendMessage';
 import { useKeyboardHeight } from '@/hooks/messaging/useKeyboardHeight';
@@ -11,10 +12,13 @@ import { MessageBubble } from './MessageBubble';
 import { Composer } from './Composer';
 import { ConversationSettingsSheet } from './ConversationSettingsSheet';
 import type {
+  ConversationDetail,
+  ConversationMember,
   InboxConversation,
   InboxParticipant,
   ThreadMessage,
 } from '@/types/messaging';
+
 
 const CANVAS = '#F8FAFC';
 const INK = '#1F2428';
