@@ -1559,6 +1559,7 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
         open={aboutOpen}
         onClose={handleCloseAbout}
         trackRecord={{ wins: stats.wins, topFives: stats.topFives }}
+        tourSlug={viewingTourSlug ?? undefined}
       />
     </section>
   );
