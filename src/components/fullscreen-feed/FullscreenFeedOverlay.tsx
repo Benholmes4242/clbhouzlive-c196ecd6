@@ -14,6 +14,7 @@ import { ImmersiveFullscreenChrome } from '@/components/fullscreen-feed/Immersiv
 import { FullscreenScrubber } from '@/components/fullscreen-feed/FullscreenScrubber';
 import CommentsSheet from '@/components/comments/CommentsSheet';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
+import { buildReviewSheetPayload } from '@/components/posts/buildReviewSheetPayload';
 import { useReviewerStats } from '@/hooks/useReviewerStats';
 import { useClubhouseLikes } from '@/components/clubhouse/hooks/useClubhouseLikes';
 import { useClubhouseFollows } from '@/components/clubhouse/hooks/useClubhouseFollows';
@@ -354,7 +355,7 @@ export function FullscreenFeedOverlay() {
   const { commentsOpen, overlayVisible, openComments, closeComments, getCommentCount } = useClubhouseComments();
   const safeOpenComments = useCallback(() => { if (!readOnly) openComments(); }, [readOnly, openComments]);
   const { handleShare } = useClubhouseShare(userId);
-  const { activePost, golfCourse, activeReview, isActiveReview } = useActivePostDerived(posts, activeIndex);
+  const { activePost, golfCourse } = useActivePostDerived(posts, activeIndex);
   const manageableBusinessIds = useManageableBusinessIds(userId);
   const isOwnPost = canManagePost(
     activePost
@@ -380,26 +381,11 @@ export function FullscreenFeedOverlay() {
   }, [activePost, handleClose, navigate]);
 
   const handleReviewTap = useCallback(() => {
-    if (!activeReview || !activePost) return;
-    openReviewSheet({
-      user: {
-        id: activePost.userId ?? '',
-        name: activePost.displayName ?? '',
-        username: activePost.username,
-        avatar: activePost.avatarUrl,
-      },
-      courseId: activeReview.courseId ?? '',
-      courseName: activeReview.courseName ?? '',
-      rating: activeReview.rating ?? 0,
-      reviewId: activeReview.reviewId,
-      courseCountry: activeReview.courseCountry,
-      courseRegion: activeReview.courseRegion,
-      courseSubCountry: activeReview.courseSubCountry,
-      reviewText: activeReview.reviewText,
-      breakdown: (activeReview as any).breakdown ?? null,
-      reviewerStats: reviewerStats ?? null,
-    });
-  }, [activeReview, activePost, openReviewSheet, reviewerStats]);
+    if (!activePost) return;
+    const payload = buildReviewSheetPayload(activePost, reviewerStats ?? null);
+    if (!payload) return;
+    openReviewSheet(payload);
+  }, [activePost, openReviewSheet, reviewerStats]);
 
   // ESC to close — but defer to the review sheet if it's open on top.
   useEffect(() => {

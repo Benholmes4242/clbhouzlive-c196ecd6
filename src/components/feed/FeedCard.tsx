@@ -16,7 +16,9 @@
  * whole feed; tapping any media opens the immersive `FullscreenFeedOverlay`.
  */
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useReviewSheetStore } from '@/stores/reviewSheetStore';
+import { useReviewerStats } from '@/hooks/useReviewerStats';
+import { buildReviewSheetPayload } from '@/components/posts/buildReviewSheetPayload';
 import { Heart, MapPin, MessageCircle, Share } from 'lucide-react';
 import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
 import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
@@ -259,7 +261,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   isFirstCard = false,
   onContentReady,
 }) => {
-  const navigate = useNavigate();
+  
   const { activeActor, setActiveActor } = useActiveActor();
   const [captionExpanded, setCaptionExpanded] = useState(false);
   const [isCaptionClamped, setIsCaptionClamped] = useState(false);
@@ -293,14 +295,14 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   }, [liked, onLike, post, effectiveActor]);
 
   const reviewCourseId = post.review?.courseId ?? post.courseId;
-  const reviewId = post.review?.reviewId;
+  const openReviewSheet = useReviewSheetStore((s) => s.open);
+  const { data: reviewerStats } = useReviewerStats(post.userId);
   const handleReadReview = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!reviewCourseId) return;
-    const url = reviewId
-      ? `/courses/${reviewCourseId}?tab=reviews&review=${reviewId}`
-      : `/courses/${reviewCourseId}?tab=reviews`;
-    navigate(url);
+    const payload = buildReviewSheetPayload(post, reviewerStats ?? null);
+    if (!payload) return;
+    openReviewSheet(payload);
+    onReviewTap?.(post);
   };
   const mountFollowPill =
     !!onFollow &&
