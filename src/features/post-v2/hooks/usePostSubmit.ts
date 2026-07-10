@@ -134,6 +134,7 @@ export function usePostSubmit() {
       return {
         kind: 'uploading',
         postId,
+        jobId,
         scheduledAt: input.scheduledAt?.toISOString(),
         isUploading: true,
         isScheduled: !!input.scheduledAt,
