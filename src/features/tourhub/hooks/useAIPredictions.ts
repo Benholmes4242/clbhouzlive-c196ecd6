@@ -109,51 +109,106 @@ export interface UseAIPredictionsResult {
 // MAIN HOOK
 // =============================================
 
-export function useAIPredictions(): UseAIPredictionsResult {
+export function useAIPredictions(tournamentIdArg?: string | null): UseAIPredictionsResult {
+  const scoped = typeof tournamentIdArg !== 'undefined';
+  const scopedTid = tournamentIdArg ?? null;
+
+  // Scoped path: fetch for a specific tournament id (Tour Hub Intelligence
+  // follows the hero's viewing tour). Legacy zero-arg path preserved below.
+  const scopedQuery = useQuery({
+    queryKey: ['ai-predictions', 'scoped', scopedTid],
+    queryFn: () => fetchScopedTournamentPredictions(scopedTid!),
+    enabled: scoped && !!scopedTid,
+    staleTime: 15 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
+    refetchOnWindowFocus: true,
+    retry: 1,
+  });
+
+  const scopedIsLive = scopedQuery.data?.tournamentPhase === 'in-progress';
+  useQuery({
+    queryKey: ['ai-predictions', 'scoped', scopedTid, 'poll'],
+    queryFn: () => fetchScopedTournamentPredictions(scopedTid!),
+    enabled: scoped && !!scopedTid && scopedIsLive,
+    refetchInterval: scopedIsLive ? 3 * 60 * 1000 : false,
+  });
+
   const mainQuery = useQuery({
     queryKey: ['ai-predictions', 'active-tournament'],
     queryFn: fetchActiveTournamentPredictions,
+    enabled: !scoped,
     staleTime: 15 * 60 * 1000,
     gcTime: 60 * 60 * 1000,
     refetchOnWindowFocus: true,
     retry: 2,
   });
 
-  const result = mainQuery.data;
+  const result = scoped ? scopedQuery.data : mainQuery.data;
   const tournamentPhase = result?.tournamentPhase ?? 'pre-tournament';
   const isLive = tournamentPhase === 'in-progress';
-  const activeTournamentId = result?.predictions?.tournament?.id ?? null;
+  const activeTournamentId = result?.predictions?.tournament?.id ?? (scoped ? scopedTid : null);
 
-  // Fetch next tournament preview when live
+  // Fetch next tournament preview (only legacy path — scoped consumers use
+  // the hero to swipe between per-tour events).
   const nextQuery = useQuery({
     queryKey: ['ai-predictions', 'next-tournament-preview'],
     queryFn: fetchNextTournamentPreview,
+    enabled: !scoped,
     staleTime: 15 * 60 * 1000,
     gcTime: 60 * 60 * 1000,
     refetchOnWindowFocus: false,
     retry: 1,
-    enabled: true,
   });
 
-  // Live polling: refetch main query every 3 minutes during live tournaments
+  // Live polling for legacy path
   useQuery({
-    queryKey: ['ai-predictions', 'active-tournament'],
+    queryKey: ['ai-predictions', 'active-tournament', 'poll'],
     queryFn: fetchActiveTournamentPredictions,
-    refetchInterval: isLive ? 3 * 60 * 1000 : false,
+    enabled: !scoped && isLive,
+    refetchInterval: !scoped && isLive ? 3 * 60 * 1000 : false,
   });
 
   return {
     data: result?.predictions ?? undefined,
-    isLoading: mainQuery.isLoading,
-    error: mainQuery.error,
+    isLoading: scoped ? scopedQuery.isLoading : mainQuery.isLoading,
+    error: (scoped ? scopedQuery.error : mainQuery.error) as Error | null,
     tournamentPhase,
     activeTournamentId,
-    nextTournament: nextQuery.data?.preview ?? null,
-    nextTournamentPredictions: nextQuery.data?.predictions ?? null,
-    nextTournamentPreview: nextQuery.data?.preview ?? null,
-    nextTournamentPredictionsLoading: nextQuery.isLoading,
+    nextTournament: scoped ? null : nextQuery.data?.preview ?? null,
+    nextTournamentPredictions: scoped ? null : nextQuery.data?.predictions ?? null,
+    nextTournamentPreview: scoped ? null : nextQuery.data?.preview ?? null,
+    nextTournamentPredictionsLoading: scoped ? false : nextQuery.isLoading,
   };
 }
+
+// =============================================
+// FETCH: Scoped tournament (by explicit id)
+// =============================================
+
+async function fetchScopedTournamentPredictions(
+  tournamentId: string,
+): Promise<ActiveTournamentResult> {
+  const { data: tournament } = await supabase
+    .from('sr_tournaments')
+    .select('*')
+    .eq('id', tournamentId)
+    .maybeSingle();
+
+  if (!tournament) {
+    return { predictions: null, tournamentPhase: 'pre-tournament' };
+  }
+
+  const predictions = await fetchPredictionsForTournament(tournament);
+  const status = (tournament as any).status;
+  let tournamentPhase: TournamentPhase = 'pre-tournament';
+  if (status === 'inprogress' || status === 'in_progress') {
+    tournamentPhase = 'in-progress';
+  } else if (status === 'closed' || status === 'complete') {
+    tournamentPhase = 'completed';
+  }
+  return { predictions, tournamentPhase };
+}
+
 
 // =============================================
 // FETCH: Active tournament (priority-based)

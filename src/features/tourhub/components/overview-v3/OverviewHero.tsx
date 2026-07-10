@@ -48,7 +48,7 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const count = slides.length;
 
-  const { selectedTourSlug, selectionNonce, setViewingTourSlug } = useTourSelection();
+  const { selectedTourSlug, selectionNonce, setViewingTourSlug, setViewingTournamentId } = useTourSelection();
 
   useEffect(() => {
     if (!selectedTourSlug || count === 0) return;
@@ -64,10 +64,15 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
     setActiveIndex(0);
   }, [idSignature]);
 
-  const viewingSlug = count > 0 ? slides[Math.min(activeIndex, count - 1)]?.tournament.tourSlug : undefined;
+  const activeSlide = count > 0 ? slides[Math.min(activeIndex, count - 1)] : undefined;
+  const viewingSlug = activeSlide?.tournament.tourSlug;
+  const viewingTid = activeSlide?.tournament.id ?? null;
   useEffect(() => {
     if (viewingSlug) setViewingTourSlug(viewingSlug);
   }, [viewingSlug, setViewingTourSlug]);
+  useEffect(() => {
+    setViewingTournamentId(viewingTid);
+  }, [viewingTid, setViewingTournamentId]);
 
   const goTo = useCallback((i: number) => setActiveIndex(i), []);
 

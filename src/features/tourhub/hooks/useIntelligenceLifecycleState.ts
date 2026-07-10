@@ -40,14 +40,16 @@ export interface UseIntelligenceLifecycleStateResult {
 /** 1.5 days, matching `useTournamentsCache` and HeroCarousel display window. */
 const RESULTS_WINDOW_MS = 36 * 60 * 60 * 1000;
 
-export function useIntelligenceLifecycleState(): UseIntelligenceLifecycleStateResult {
+export function useIntelligenceLifecycleState(
+  tournamentIdArg?: string | null,
+): UseIntelligenceLifecycleStateResult {
   const {
     data,
     activeTournamentId,
     tournamentPhase,
     nextTournamentPredictions,
     isLoading,
-  } = useAIPredictions();
+  } = useAIPredictions(tournamentIdArg);
 
   let state: IntelligenceLifecycleState;
 
