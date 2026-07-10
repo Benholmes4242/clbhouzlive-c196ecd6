@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MessageSquare, PencilLine } from 'lucide-react';
+import { Flag, PencilLine } from 'lucide-react';
 import { useConversations } from '@/hooks/messaging/useConversations';
 import { ConversationRow } from './ConversationRow';
 import NewConversationSheet from './NewConversationSheet';
