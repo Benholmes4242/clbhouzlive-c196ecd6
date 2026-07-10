@@ -157,28 +157,6 @@ export default function MediaStageV2({ item, index, total, onOpenAdjust, onOpenT
   );
 }
 
-function Ghost({ style, play }: { style: React.CSSProperties; play?: boolean }) {
-  return (
-    <div
-      style={{
-        position: 'absolute',
-        borderRadius: 16,
-        border: '1.5px dashed rgba(255,255,255,0.22)',
-        background: 'rgba(255,255,255,0.03)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        ...style,
-      }}
-    >
-      {play && (
-        <div style={{ width: 34, height: 34, borderRadius: 999, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Play size={16} color="rgba(255,255,255,0.55)" fill="rgba(255,255,255,0.35)" />
-        </div>
-      )}
-    </div>
-  );
-}
 
 const chipStyle: React.CSSProperties = {
   background: 'rgba(0,0,0,0.55)',
