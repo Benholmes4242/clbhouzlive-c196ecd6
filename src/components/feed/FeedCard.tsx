@@ -16,7 +16,6 @@
  * whole feed; tapping any media opens the immersive `FullscreenFeedOverlay`.
  */
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { useReviewerStats } from '@/hooks/useReviewerStats';
 import { buildReviewSheetPayload } from '@/components/posts/buildReviewSheetPayload';
