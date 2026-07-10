@@ -15,6 +15,10 @@ import {
   HERO_NUMBER_STYLE,
   ratingTextColor,
 } from '@/lib/ratingTier';
+import {
+  ReviewGhostNumeral,
+  ReviewVerdictLabel,
+} from '@/components/shared/ReviewGhostScore';
 import { RV2, type VerdictSlug } from '../tokens';
 import type { CategoryKey, MediaItem, ReviewV2Course } from '../types';
 
