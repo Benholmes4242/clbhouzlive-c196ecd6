@@ -10,7 +10,7 @@ import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { ReviewWizard } from '@/components/courses/review-wizard';
+import { useNavigate } from 'react-router-dom';
 import { InlineSpinner } from '@/components/ui/InlineSpinner';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useUI } from '@/contexts/UIContext';
