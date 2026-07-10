@@ -848,10 +848,11 @@ export function vperfScorecard(trigger: 'auto' | 'nav' | 'manual' = 'manual'): v
     lines.push(`  decide.${bucket}: ${parts.join(' ')}`);
   }
   // [PREDICT] median startLevel per feed lane class.
-  for (const [laneId, arr] of startLevelsByLane) {
-    if (arr.length === 0) continue;
-    lines.push(`  startLevel.${laneId}: n=${arr.length} p50=${pct(arr, 0.5)} p95=${pct(arr, 0.95)}`);
+  for (const [laneId, ring] of startLevelsByLane) {
+    if (ring.arr.length === 0) continue;
+    lines.push(`  startLevel.${laneId}: n=${ring.arr.length} p50=${pct(ring.arr, 0.5)} p95=${pct(ring.arr, 0.95)}`);
   }
+
   // [PREDICT] prefetch counters.
   const ps = prefetchStats;
   const hitRate = ps.activationsWithPrefetch > 0
