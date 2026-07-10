@@ -55,6 +55,16 @@ const Spinner: React.FC = () => (
 const InboxV2Page: React.FC = () => {
   const [composeOpen, setComposeOpen] = useState(false);
   const { conversations, isLoading, error, refetch, hasActor } = useConversations();
+  const actor = useMessagingActor();
+  const [bannerDismissed, setBannerDismissed] = useState(false);
+
+  useEffect(() => {
+    if (!actor) return;
+    const key = `clbhouz_bizmsg_earlyaccess_dismissed_${actor.actorId}`;
+    if (safeLocalStorage.get(key) === 'true') {
+      setBannerDismissed(true);
+    }
+  }, [actor]);
 
 
   const composeButton = (
