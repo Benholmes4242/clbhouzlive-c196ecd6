@@ -17955,6 +17955,7 @@ export type Database = {
           threshold: number
         }[]
       }
+      get_echo_engine_health_summary: { Args: never; Returns: Json }
       get_eg_sync_health: { Args: never; Returns: Json }
       get_exploration_leaderboard: {
         Args: {

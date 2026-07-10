@@ -19,6 +19,8 @@ import DataList from '../components/DataList';
 import EmptyState from '../components/EmptyState';
 import StatTile from '../components/StatTile';
 import StatusPill from '../components/StatusPill';
+import EchoEngineHealthCard from '../components/EchoEngineHealthCard';
+
 
 function relTime(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
@@ -114,6 +116,11 @@ export default function DashboardPage() {
 
       {/* EG Sync Health */}
       <EgSyncCard data={egSyncHealth.data} loading={egSyncHealth.isLoading} isError={egSyncHealth.isError} />
+
+      {/* Echo Engine Health */}
+      <EchoEngineHealthCard />
+
+
 
       {/* Today at a glance */}
       <section className="admin-v2-twocol">
