@@ -90,14 +90,17 @@ export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
             gap: 7,
             padding: '0 15px',
             borderRadius: 999,
-            background: 'rgba(255,255,255,0.16)',
-            border: '1px solid rgba(255,255,255,0.30)',
+            background: isMajorActive ? GOLD_TINT_18 : 'rgba(255,255,255,0.16)',
+            border: `1px solid ${isMajorActive ? GOLD_BORDER : 'rgba(255,255,255,0.30)'}`,
             backdropFilter: 'blur(14px)',
             WebkitBackdropFilter: 'blur(14px)',
             whiteSpace: 'nowrap',
             cursor: 'pointer',
           }}
         >
+          {isMajorActive && (
+            <Trophy size={13} strokeWidth={2.4} color={GOLD} aria-hidden />
+          )}
           <span
             style={{
               fontFamily: 'Geist',
@@ -105,12 +108,12 @@ export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
               fontSize: 13,
               fontWeight: 800,
               letterSpacing: '0.02em',
-              color: '#FFFFFF',
+              color: isMajorActive ? GOLD : '#FFFFFF',
             }}
           >
-            {TOUR_LABEL[activeTourSlug] ?? 'PGA TOUR'}
+            {pillLabel}
           </span>
-          <ArrowLeftRight size={14} strokeWidth={2.4} color="#F7931E" />
+          <ArrowLeftRight size={14} strokeWidth={2.4} color={isMajorActive ? GOLD : '#F7931E'} />
         </button>
       ) : (
         <button
