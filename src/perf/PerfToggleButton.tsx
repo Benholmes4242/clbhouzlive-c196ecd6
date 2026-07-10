@@ -3,8 +3,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { isPerfEnabled, setPerfLive, subscribePerfLive } from '@/perf/navTiming';
 import { vperfScorecard } from '@/perf/vperf';
+import { usePanelRole } from '@/hooks/usePanelRole';
 
 export function PerfToggleButton() {
+  const { role, loading } = usePanelRole();
+  if (loading || role !== 'full') return null;
+
   const [, force] = useState(0);
   useEffect(() => subscribePerfLive(() => force((n) => n + 1)), []);
   const on = isPerfEnabled();
