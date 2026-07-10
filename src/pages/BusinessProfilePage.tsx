@@ -851,12 +851,6 @@ const BusinessProfilePage: React.FC = () => {
                 }}
               >
                 {tab.label}
-                {isActive && (
-                  <div style={{
-                    position: 'absolute', bottom: 0, left: 0, right: 0, height: 2.5,
-                    borderRadius: 2, background: '#0F172A',
-                  }} />
-                )}
               </button>
             );
           })}
