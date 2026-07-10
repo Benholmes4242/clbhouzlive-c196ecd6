@@ -292,6 +292,13 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
     };
   }, [activeIdx, posts]);
 
+  // Hoisted early (before neighbour-warm effect) so warm can read the
+  // persisted carousel positions to warm the neighbour's LANDING slide,
+  // not always :0. Duplicate selectors below removed.
+  const carouselPositionsByTab = useClubhouseStore((s) => s.carouselPositionsByTab);
+  const globalCarouselPositions = useClubhouseStore((s) => s.carouselPositions);
+  const carouselPositions = tab ? (carouselPositionsByTab[tab] ?? globalCarouselPositions) : globalCarouselPositions;
+
   // Warm the neighbour cards' HLS symmetrically via role lookup: the RECYCLED
   // lane in each direction is whichever physical lane currently holds the
   // 'next' / 'prev' role. Warming is idempotent (alreadyLoaded skip in the
