@@ -529,12 +529,15 @@ const BusinessProfilePage: React.FC = () => {
 
       {/* ───── Identity ───── */}
       <div className="pt-[68px] px-5 text-left relative z-10 pointer-events-auto">
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <h1 className="text-[28px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.03em' }}>
-            {business.name}
-          </h1>
-          {business.is_verified && <VerifiedBadge size="lg" />}
-        </div>
+        <h1 className="text-[28px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.03em' }}>
+          {business.name}
+          {business.is_verified && (
+            <span className="inline-flex align-middle ml-1.5">
+              <VerifiedBadge size="lg" />
+            </span>
+          )}
+        </h1>
+
 
         {subtitleText && (
           <p className="mt-1 text-sm text-muted-foreground">{subtitleText}</p>

@@ -31,13 +31,14 @@ export function VerifiedBadge({
   const iconSize = sizeConfig[size];
   
   return (
-    <BadgeCheck 
+    <BadgeCheck
       size={iconSize}
       className={cn(
-        'text-emerald-500 shrink-0',
+        'shrink-0',
         placement === 'avatar-corner' && 'drop-shadow-sm',
         className
       )}
+      style={{ color: '#F7931E' }}
       aria-label="Verified"
     />
   );
