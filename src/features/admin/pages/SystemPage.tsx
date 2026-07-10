@@ -19,6 +19,7 @@ import StatTile from '../components/StatTile';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { useAudit, type AuditEntry } from '../hooks/useAudit';
 import { useDashboard } from '../hooks/useDashboard';
+import { useAdminPillVisibility } from '@/hooks/useAdminPillVisibility';
 
 type TabId = 'audit' | 'tools' | 'settings';
 
@@ -475,6 +476,7 @@ const ghostBtn: React.CSSProperties = {
 function SettingsTab() {
   const { user } = useSupabaseSession();
   const { role } = usePanelRole();
+  const [pillsVisible, setPillsVisible] = useAdminPillVisibility();
 
   const signOut = async () => {
     try {
@@ -490,27 +492,75 @@ function SettingsTab() {
     role === 'full' ? 'Full Admin' : role === 'limited' ? 'Limited Admin' : '—';
 
   return (
-    <Card title="Account">
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <Field label="Signed in as" value={user?.email ?? '—'} />
-        <Field label="User ID" value={user?.id ?? '—'} mono />
-        <Field label="Role">
-          <StatusPill tone={role === 'full' ? 'ok' : role === 'limited' ? 'warn' : 'neutral'}>
-            {roleLabel}
-          </StatusPill>
-        </Field>
-      </div>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 4 }}>
-        <Link to="/clubhouse" style={{ textDecoration: 'none' }}>
-          <button style={ghostBtn}>
-            <ArrowLeft size={12} /> Back to App
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <Card title="Account">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <Field label="Signed in as" value={user?.email ?? '—'} />
+          <Field label="User ID" value={user?.id ?? '—'} mono />
+          <Field label="Role">
+            <StatusPill tone={role === 'full' ? 'ok' : role === 'limited' ? 'warn' : 'neutral'}>
+              {roleLabel}
+            </StatusPill>
+          </Field>
+        </div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 4 }}>
+          <Link to="/clubhouse" style={{ textDecoration: 'none' }}>
+            <button style={ghostBtn}>
+              <ArrowLeft size={12} /> Back to App
+            </button>
+          </Link>
+          <button onClick={signOut} style={{ ...ghostBtn, color: t.dangerText, borderColor: t.dangerSoft }}>
+            <LogOut size={12} /> Sign out
           </button>
-        </Link>
-        <button onClick={signOut} style={{ ...ghostBtn, color: t.dangerText, borderColor: t.dangerSoft }}>
-          <LogOut size={12} /> Sign out
-        </button>
-      </div>
-    </Card>
+        </div>
+      </Card>
+
+      <Card
+        title="Developer Tools"
+        subtitle="Per-device preferences for admin instrumentation"
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ color: t.ink, fontSize: 13, fontWeight: 600 }}>Show video debug pills</div>
+            <div style={{ color: t.inkMuted, fontSize: 12, marginTop: 2 }}>
+              Reveal the floating DBG / BOOT toggles on this device. Toggling flips live — no reload needed.
+            </div>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={pillsVisible}
+            onClick={() => setPillsVisible(!pillsVisible)}
+            style={{
+              flexShrink: 0,
+              width: 44,
+              height: 26,
+              borderRadius: 999,
+              border: 'none',
+              background: pillsVisible ? '#0F172A' : t.line,
+              position: 'relative',
+              cursor: 'pointer',
+              padding: 0,
+              transition: 'background .15s',
+            }}
+          >
+            <span
+              style={{
+                position: 'absolute',
+                top: 3,
+                left: pillsVisible ? 21 : 3,
+                width: 20,
+                height: 20,
+                borderRadius: '50%',
+                background: '#fff',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.2)',
+                transition: 'left .15s',
+              }}
+            />
+          </button>
+        </div>
+      </Card>
+    </div>
   );
 }
 
