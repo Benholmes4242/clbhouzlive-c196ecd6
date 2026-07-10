@@ -413,36 +413,9 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       }}
     >
       {/* Card-level ghost numeral — overflows the header, clipped by card edges */}
-      {reviewRating != null && (() => {
-        const GHOST = {
-          EXCEPTIONAL: 'rgba(255,194,61,0.16)',
-          EXCELLENT:   'rgba(247,147,30,0.14)',
-          GOOD:        'rgba(247,147,30,0.12)',
-          FAIR:        'rgba(154,74,14,0.14)',
-          POOR:        'rgba(154,74,14,0.12)',
-        } as const;
-        const tierKey = getRatingTier(reviewRating);
-        const ghostExceptional = tierKey === 'EXCEPTIONAL';
-        return (
-          <span
-            aria-hidden
-            className={ghostExceptional ? 'clbhouz-gold-shimmer' : undefined}
-            style={{
-              position: 'absolute',
-              right: -7,
-              top: 28,
-              transform: 'translateY(-50%)',
-              fontSize: 110,
-              fontWeight: 800, letterSpacing: '-0.05em', lineHeight: 1,
-              pointerEvents: 'none', whiteSpace: 'nowrap', zIndex: 0,
-              fontVariantNumeric: 'tabular-nums',
-              ...(ghostExceptional ? { opacity: 0.22 } : { color: GHOST[tierKey] }),
-            }}
-          >
-            {formatRatingValue(reviewRating)}
-          </span>
-        );
-      })()}
+      {reviewRating != null && (
+        <ReviewGhostNumeral rating={reviewRating} fontSize={110} right={-7} top={28} />
+      )}
 
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px 2px', position: 'relative', zIndex: 2 }}>
