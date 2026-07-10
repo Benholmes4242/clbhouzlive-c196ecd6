@@ -4002,6 +4002,39 @@ export type Database = {
         }
         Relationships: []
       }
+      echo_engine_health: {
+        Row: {
+          chars: number | null
+          checked_at: string
+          engine: string
+          error: string | null
+          id: string
+          model_id: string | null
+          ms: number | null
+          ok: boolean
+        }
+        Insert: {
+          chars?: number | null
+          checked_at?: string
+          engine: string
+          error?: string | null
+          id?: string
+          model_id?: string | null
+          ms?: number | null
+          ok: boolean
+        }
+        Update: {
+          chars?: number | null
+          checked_at?: string
+          engine?: string
+          error?: string | null
+          id?: string
+          model_id?: string | null
+          ms?: number | null
+          ok?: boolean
+        }
+        Relationships: []
+      }
       echo_events: {
         Row: {
           created_at: string
