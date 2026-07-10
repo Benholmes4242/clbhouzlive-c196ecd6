@@ -339,6 +339,27 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
           )}
         </div>
 
+        {/* Early-access note for business -> personal */}
+        {showIntro && (
+          <div style={{ padding: '8px 16px 0' }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 9,
+                padding: '10px 12px',
+                background: 'rgba(247,147,30,0.08)',
+                borderRadius: 11,
+              }}
+            >
+              <Sparkles size={16} color={AMBER} />
+              <span style={{ color: '#B45309', fontSize: 12.5, lineHeight: 1.4 }}>
+                Free during early access - business message limits are coming soon.
+              </span>
+            </div>
+          </div>
+        )}
+
         {/* Footer actions */}
         <div
           style={{
@@ -349,22 +370,6 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
             borderTop: `0.5px solid ${HAIRLINE}`,
           }}
         >
-          {showIntro && (
-            <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                padding: '4px 10px',
-                borderRadius: 999,
-                background: 'rgba(247,147,30,0.10)',
-                color: AMBER,
-                fontSize: 12,
-                fontWeight: 500,
-              }}
-            >
-              Intro message
-            </span>
-          )}
           <div style={{ flex: 1 }} />
           {selected.length <= 1 ? (
             <button
