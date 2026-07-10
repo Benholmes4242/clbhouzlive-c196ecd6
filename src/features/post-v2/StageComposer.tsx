@@ -3,7 +3,7 @@
 // Owns: header, media stage + frame pills, media tray, caption field,
 // detail rows, and orchestrates opening / closing every sheet.
 // Delegates: state -> useStageComposer, submit -> usePostSubmit,
-// drafts -> useDrafts, orchestration -> usePostUploadOrchestrator (via submit).
+// drafts -> useDrafts, orchestration -> postUploadController (module-level, survives unmount).
 
 import { useMemo, useRef, useState } from 'react';
 import { X } from 'lucide-react';
