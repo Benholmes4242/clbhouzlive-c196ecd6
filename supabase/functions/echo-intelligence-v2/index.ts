@@ -356,7 +356,7 @@ async function callOpenAISynth(
       // voice fast; if the API 400s on this param the existing error log
       // will show it and we drop back to the longer timeout alone.
       model: OPENAI_MODEL_SYNTH,
-      max_completion_tokens: 1024,
+      max_completion_tokens: 2000,
       reasoning_effort: "low",
       messages: [
         { role: "system", content: systemPrompt },
