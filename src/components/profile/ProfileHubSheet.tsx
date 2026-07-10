@@ -330,6 +330,80 @@ function GroupedRow({
   );
 }
 
+function InviteFriendsRow({
+  userId,
+  onOpen,
+}: {
+  userId: string | undefined;
+  onOpen: () => void;
+}) {
+  const { data: joinedCount = 0 } = useQuery({
+    queryKey: ['invite-hub-monthly-joined', userId],
+    enabled: !!userId,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const start = new Date();
+      start.setDate(1);
+      start.setHours(0, 0, 0, 0);
+      const { count, error } = await supabase
+        .from('whs_invites')
+        .select('id', { count: 'exact', head: true })
+        .eq('inviter_user_id', userId!)
+        .gte('redeemed_at', start.toISOString());
+      if (error) return 0;
+      return count ?? 0;
+    },
+  });
+
+  const sub =
+    joinedCount > 0
+      ? `${joinedCount} of your circle joined this month`
+      : "Golf's better with your mates on here";
+
+  return (
+    <Pressable
+      as="button"
+      variant="row"
+      haptic="selection"
+      onPress={onOpen}
+      innerClassName="w-full flex items-center gap-3"
+      style={{
+        padding: '12px 14px',
+        background: '#FFF9F0',
+        border: 'none',
+        borderTop: `0.5px solid ${HAIRLINE_SOFT}`,
+        textAlign: 'left',
+        width: '100%',
+        borderRadius: '0 0 14px 14px',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%' }}>
+        <div
+          style={{
+            width: 24,
+            height: 24,
+            borderRadius: 8,
+            background: AMBER,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+          }}
+        >
+          <UserPlus size={13} color="#fff" strokeWidth={2.2} />
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 13, fontWeight: 500, color: INK }}>Invite friends</div>
+          <div style={{ fontSize: 11, color: '#B45309', marginTop: 1 }}>{sub}</div>
+        </div>
+        <ChevronRight size={13} color={AMBER} />
+      </div>
+    </Pressable>
+  );
+}
+
+
+
 
 function ProfileHubSheet({
   open, onClose, currentActor, profiles,
