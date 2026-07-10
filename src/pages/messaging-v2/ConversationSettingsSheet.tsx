@@ -15,8 +15,6 @@ import {
   X,
   Check,
   Trash2,
-  Camera,
-  Loader2,
 } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SheetHeader } from '@/components/ui/SheetHeader';
@@ -33,9 +31,6 @@ import { useConversations } from '@/hooks/messaging/useConversations';
 import { supabase } from '@/integrations/supabase/client';
 import type { Json } from '@/integrations/supabase/types';
 import type { ConversationMember, MemberRole } from '@/types/messaging';
-import { pickMediaFiles } from '@/utils/media/pickMediaFiles';
-import { compressImage, COMPRESSION_PRESETS } from '@/uploads/imageCompression';
-import { uploadToR2Only } from '@/utils/r2OnlyUpload';
 
 const CANVAS = '#F8FAFC';
 const INK = '#1F2428';
@@ -95,8 +90,6 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
   const [confirmLeave, setConfirmLeave] = useState(false);
   const [busy, setBusy] = useState(false);
 
-  const [avatarUploading, setAvatarUploading] = useState(false);
-
   const invalidateAll = useCallback(() => {
     void refetch();
     qc.invalidateQueries({ queryKey: ['messaging', 'inbox'] });
@@ -139,47 +132,6 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
     }, 'Could not update group');
     setTitleEdit(null);
   }, [actor, detail, titleEdit, runRpc, conversationId]);
-
-  const handleChangeAvatar = useCallback(async () => {
-    if (!actor || !detail) return;
-    if (avatarUploading) return;
-    let files: File[] = [];
-    try {
-      files = await pickMediaFiles({ accept: 'image/*', multiple: false, maxFiles: 1 });
-    } catch (e) {
-      console.error(e);
-      return;
-    }
-    const file = files[0];
-    if (!file) return;
-    setAvatarUploading(true);
-    try {
-      const compressed = await compressImage(file, COMPRESSION_PRESETS.avatar);
-      const upload = await uploadToR2Only(
-        compressed.file,
-        'clbhouz-profile-images',
-        `group-${conversationId}-${Date.now()}.jpg`,
-      );
-      if (!upload.success || !upload.publicUrl) {
-        throw new Error(upload.error || 'Upload failed');
-      }
-      const { error } = await supabase.rpc('msg_update_group', {
-        p_conversation_id: conversationId,
-        p_as_actor_type: actor.actorType,
-        p_as_actor_id: actor.actorId,
-        p_title: detail.title ?? '',
-        p_avatar_url: upload.publicUrl,
-      });
-      if (error) throw error;
-      invalidateAll();
-      toast.success('Group photo updated');
-    } catch (e) {
-      console.error(e);
-      toast.error('Could not update group photo');
-    } finally {
-      setAvatarUploading(false);
-    }
-  }, [actor, detail, avatarUploading, conversationId, invalidateAll]);
 
   const handleSetRole = useCallback(
     async (target: ConversationMember, role: 'admin' | 'member') => {
@@ -332,73 +284,13 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                 borderBottom: `0.5px solid ${HAIRLINE}`,
               }}
             >
-              {isGroup && isAdmin ? (
-                <button
-                  type="button"
-                  onClick={handleChangeAvatar}
-                  disabled={avatarUploading}
-                  aria-label="Change group photo"
-                  style={{
-                    position: 'relative',
-                    background: 'transparent',
-                    border: 'none',
-                    padding: 0,
-                    cursor: avatarUploading ? 'default' : 'pointer',
-                    borderRadius: 20,
-                  }}
-                >
-                  <SquircleAvatar
-                    src={headerAvatar}
-                    userId={headerId}
-                    alt={headerTitle}
-                    size={72}
-                    hairlineRing
-                  />
-                  <span
-                    aria-hidden
-                    style={{
-                      position: 'absolute',
-                      right: -2,
-                      bottom: -2,
-                      width: 26,
-                      height: 26,
-                      borderRadius: 999,
-                      background: INK,
-                      color: '#FFF',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      border: '2px solid #FFF',
-                      boxShadow: '0 1px 2px rgba(0,0,0,0.12)',
-                    }}
-                  >
-                    {avatarUploading ? (
-                      <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} />
-                    ) : (
-                      <Camera size={14} strokeWidth={2} />
-                    )}
-                  </span>
-                  {avatarUploading && (
-                    <span
-                      aria-hidden
-                      style={{
-                        position: 'absolute',
-                        inset: 0,
-                        borderRadius: 20,
-                        background: 'rgba(255,255,255,0.35)',
-                      }}
-                    />
-                  )}
-                </button>
-              ) : (
-                <SquircleAvatar
-                  src={headerAvatar}
-                  userId={headerId}
-                  alt={headerTitle}
-                  size={72}
-                  hairlineRing
-                />
-              )}
+              <SquircleAvatar
+                src={headerAvatar}
+                userId={headerId}
+                alt={headerTitle}
+                size={72}
+                hairlineRing
+              />
               {isGroup && isAdmin && titleEdit != null ? (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', maxWidth: 320 }}>
                   <input
