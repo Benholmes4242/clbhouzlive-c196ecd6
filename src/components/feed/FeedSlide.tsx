@@ -1302,6 +1302,24 @@ const FullscreenPagerPage: React.FC<{
     onZoomChange?.(zoomScale > 1);
   }, [isActivePage, zoomScale, onZoomChange]);
 
+  // [FSPAGER] slide.video.play / slide.video.pause — emit whenever a video
+  // page's isActivePage flips. Reasons are structural (page activation /
+  // deactivation); the borrow.demote reason is emitted alongside in the
+  // parent scroll handler. isPerfEnabled-gated inside trace().
+  const wasActiveRef = useRef(isActivePage);
+  useEffect(() => {
+    if (m?.type !== 'video') return;
+    if (wasActiveRef.current === isActivePage) return;
+    wasActiveRef.current = isActivePage;
+    trace(isActivePage ? 'slide.video.play' : 'slide.video.pause', {
+      surface: 'FSPAGER',
+      postId: post.id,
+      pageIdx,
+      ownerKey,
+      reason: isActivePage ? 'pageActivated' : 'pageInactivated',
+    });
+  }, [isActivePage, m?.type, post.id, pageIdx, ownerKey]);
+
   if (m?.type === 'video') {
     const posterSrc = m.thumbnailUrl || '';
     const mHlsUrl = (m as any).hlsUrl || null;
