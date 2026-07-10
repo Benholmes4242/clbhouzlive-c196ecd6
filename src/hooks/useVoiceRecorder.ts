@@ -188,5 +188,6 @@ export const useVoiceRecorder = (): UseVoiceRecorderReturn => {
     resumeRecording,
     resetRecording,
     error,
+    stream,
   };
 };
