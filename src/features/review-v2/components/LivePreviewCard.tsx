@@ -80,7 +80,6 @@ export function LivePreviewCard({
 }: Props) {
   const tier = getRatingTier(overall);
   const isGold = tier === 'EXCEPTIONAL';
-  const tierLabel = overall != null ? getRatingTierLabel(overall) : null;
   void verdict;
 
   return (
