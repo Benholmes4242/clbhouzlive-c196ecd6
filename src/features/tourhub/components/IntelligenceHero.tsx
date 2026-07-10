@@ -1450,6 +1450,15 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
 
   const hasWinner = state === 'results' && resultsPicks.some((p) => p.outcome === 'win');
 
+  // Fallback event name from the hero slide (covers team events + guard-refused
+  // rows where we get no predictions/tournament payload back).
+  const heroEventName = viewingSlide?.tournament.name
+    ? stripLeadingThe(viewingSlide.tournament.name)
+    : null;
+  const unavailableLabel = heroEventName
+    ? `Intelligence for ${heroEventName} arrives once the field is confirmed`
+    : 'Intelligence arrives once the field is confirmed';
+
   // Decide what to render in the carousel.
   let cards: React.ReactNode = null;
   let renderEmpty: React.ReactNode = null;
@@ -1457,25 +1466,27 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
     renderEmpty = <StateMessage label="Loading Intelligence…" />;
   } else if (state === 'upcoming') {
     if (upcomingPicks.length === 0) {
-      renderEmpty = (
-        <StateMessage label="Picks for the next event drop soon." />
-      );
+      renderEmpty = <StateMessage label={unavailableLabel} />;
     } else {
       cards = upcomingPicks.map((p) => <UpcomingCard key={p.rank} pick={p} expanded={reasonsExpanded} onToggle={toggleReasons} />);
     }
   } else if (state === 'live') {
     if (livePicks.length === 0) {
-      renderEmpty = <StateMessage label="Tracking our picks live…" />;
+      renderEmpty = <StateMessage label={unavailableLabel} />;
     } else {
       cards = livePicks.map((p) => <LiveCard key={p.rank} pick={p} expanded={reasonsExpanded} onToggle={toggleReasons} />);
     }
   } else if (state === 'results') {
     if (resultsPicks.length === 0) {
-      renderEmpty = <StateMessage label="Final results coming in…" />;
+      renderEmpty = <StateMessage label={unavailableLabel} />;
     } else {
       cards = resultsPicks.map((p) => <ResultsCard key={p.rank} pick={p} expanded={reasonsExpanded} onToggle={toggleReasons} />);
     }
   }
+
+  // Crossfade key — flips whenever the hero jumps to a new tournament so the
+  // TI section fades in lockstep with the hero's own AnimatePresence.
+  const crossfadeKey = viewingTournamentId ?? activeTournamentId ?? 'none';
 
   return (
     <section
@@ -1513,24 +1524,35 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
         }
       `}</style>
 
-      <SectionHeader
-        meta={meta}
-        headline={headline}
-        tournamentName={headlineTournamentName}
-        courseName={headlineCourseName}
-        onAboutClick={handleOpenAbout}
-      />
-
-      {renderEmpty ?? (
-        <Carousel stats={stats} hasWinner={hasWinner}>
-          {cards}
-          <ReceiptsTailCard
-            stats={stats}
-            hasWinner={hasWinner}
-            onClick={handleOpenAbout}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={crossfadeKey}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.25 }}
+        >
+          <SectionHeader
+            meta={meta}
+            headline={headline}
+            tournamentName={headlineTournamentName}
+            courseName={headlineCourseName}
+            onAboutClick={handleOpenAbout}
           />
-        </Carousel>
-      )}
+
+          {renderEmpty ?? (
+            <Carousel stats={stats} hasWinner={hasWinner}>
+              {cards}
+              <ReceiptsTailCard
+                stats={stats}
+                hasWinner={hasWinner}
+                onClick={handleOpenAbout}
+              />
+            </Carousel>
+          )}
+        </motion.div>
+      </AnimatePresence>
+
 
       <IntelligenceSheet
         open={aboutOpen}
