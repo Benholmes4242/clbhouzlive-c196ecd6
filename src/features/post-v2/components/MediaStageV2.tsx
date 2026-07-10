@@ -152,7 +152,7 @@ export default function MediaStageV2({ item, index, total, onOpenAdjust, onOpenT
             };
             (style as any)['--r'] = `${f.r}deg`;
             if (!reduced) {
-              style.animation = `pv2-floaty 4s ${f.delay}s ease-in-out infinite`;
+              style.animation = `pv2-floaty 3.2s ${f.delay}s ease-in-out infinite`;
             }
             return (
               <div
