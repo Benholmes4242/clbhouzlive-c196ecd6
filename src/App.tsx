@@ -974,6 +974,7 @@ const AppInner: React.FC = () => {
                                         <AuthWrapper>
 
                                           <FriendSheetProvider>
+                                            <InviteSheetProvider>
                                             <SeasonWrapModal />
                                             <AchievementToastWrapper />
                                             <Suspense fallback={null}>
@@ -994,8 +995,10 @@ const AppInner: React.FC = () => {
                                             {/* Unified ReviewBottomSheet portal — single mount, store-driven */}
                                             <ReviewBottomSheetPortal />
                                             <RequestCourseSheetHost />
+                                            </InviteSheetProvider>
                                           </FriendSheetProvider>
                                         </AuthWrapper>
+
                                         <Sonner />
                                         <GlobalBottomNavigation />
                                         <GlobalPostComposer />
