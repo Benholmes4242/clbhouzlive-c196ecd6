@@ -18,7 +18,8 @@ interface Props {
   reviewText: string;
   scores: Record<CategoryKey, number | null>;
   media: MediaItem[];
-  onViewOnCourse: () => void;
+  shareToFeed: boolean;
+  onViewReview: () => void;
   onShare: () => void;
   onDone: () => void;
 }
