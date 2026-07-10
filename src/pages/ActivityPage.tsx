@@ -129,6 +129,13 @@ const ActivityPage: React.FC = () => {
 
   const { data, isLoading, isFetching, error } = useActivityFeed('all', null);
 
+  // Clear the iOS app icon badge when the notifications view mounts.
+  useEffect(() => {
+    import('@/utils/pushBadge').then((m) => m.clearAppBadge());
+  }, []);
+
+
+
 
   // Auto-mark seen on first load (parity with prior implementation).
   const hasMarkedSeen = useRef(false);

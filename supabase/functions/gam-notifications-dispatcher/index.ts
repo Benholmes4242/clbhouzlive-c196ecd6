@@ -61,13 +61,39 @@ async function runOnce() {
 
   let sent = 0, bundled = 0, deferred = 0;
 
+  // Device filter — do not enqueue for users without a subscribed device.
+  // Bulk lookup, then any row for an unsubscribed user is marked sent so it
+  // never retries and the queue insert is skipped. Stops the daily
+  // "All included players are not subscribed" error rows at their source.
+  const allUserIds = [...new Set(rows.map((r) => r.user_id))];
+  const subscribed = new Set<string>();
+  if (allUserIds.length > 0) {
+    const { data: devices } = await supabase
+      .from("user_push_devices")
+      .select("user_id")
+      .in("user_id", allUserIds)
+      .eq("enabled", true);
+    for (const d of devices ?? []) subscribed.add((d as any).user_id);
+  }
+
+  const unsubscribedRowIds = rows.filter((r) => !subscribed.has(r.user_id)).map((r) => r.id);
+  if (unsubscribedRowIds.length > 0) {
+    await supabase
+      .from("gam_notification_outbox")
+      .update({ status: "sent", sent_at: new Date().toISOString() })
+      .in("id", unsubscribedRowIds);
+  }
+
+  const deliverableRows = rows.filter((r) => subscribed.has(r.user_id));
+
   // Group by user
   const byUser = new Map<string, OutboxRow[]>();
-  for (const r of rows) {
+  for (const r of deliverableRows) {
     const arr = byUser.get(r.user_id) ?? [];
     arr.push(r);
     byUser.set(r.user_id, arr);
   }
+
 
   // Pre-load badge catalogue for renders (cheap, small table)
   const { data: badgeCatalogue } = await supabase
@@ -131,11 +157,13 @@ async function runOnce() {
         continue;
       }
 
+      // Stamp `type` into the queue row's data so the push sender's
+      // muted_types filter applies to gamification notifications too.
       const { error: pushErr } = await supabase.from("push_notification_queue").insert({
         user_id: userId,
         title: rendered.title,
         body: rendered.body,
-        data: rendered.data,
+        data: { ...rendered.data, type: r.notification_type },
       });
       if (pushErr) {
         console.warn("[dispatcher] push insert", pushErr.message);

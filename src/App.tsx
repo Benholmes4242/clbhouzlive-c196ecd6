@@ -833,6 +833,9 @@ const AppInner: React.FC = () => {
         try { os.login?.(userId); } catch {}
         try { os.User?.addAlias?.('external_id', userId); } catch {}
 
+        // Clear iOS app icon badge on cold open + on every foreground.
+        import('@/utils/pushBadge').then((m) => m.clearAppBadge());
+
         const platform = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase())
           ? 'ios' : 'android';
 
@@ -845,9 +848,17 @@ const AppInner: React.FC = () => {
 
     runWhenMedianReady(register);
 
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') {
+        import('@/utils/pushBadge').then((m) => m.clearAppBadge());
+      }
+    };
+    document.addEventListener('visibilitychange', onVisible);
+
     return () => {
       cancelled = true;
       if (pollInterval) clearInterval(pollInterval);
+      document.removeEventListener('visibilitychange', onVisible);
     };
   }, []);
 

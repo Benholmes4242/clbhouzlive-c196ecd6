@@ -200,7 +200,6 @@ export function SettingsTabContent() {
           <SettingsChevronRow
             icon={<Bell size={18} />}
             title="Notification Preferences"
-            isBeta
             iconTheme="notifications"
             onClick={() => navigate('/manage/notifications')}
           />
