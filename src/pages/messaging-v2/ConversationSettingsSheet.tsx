@@ -575,7 +575,22 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                   disabled={busy}
                   danger
                 />
-              ) : null}
+              ) : (
+                <ActionRow
+                  icon={<Trash2 size={20} color={DANGER} />}
+                  label={confirmLeave ? 'Tap again to confirm' : 'Delete conversation'}
+                  onClick={() => {
+                    if (!confirmLeave) {
+                      setConfirmLeave(true);
+                      setTimeout(() => setConfirmLeave(false), 3000);
+                      return;
+                    }
+                    void handleLeave();
+                  }}
+                  disabled={busy}
+                  danger
+                />
+              )}
             </div>
           </>
         )}
