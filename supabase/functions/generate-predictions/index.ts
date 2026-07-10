@@ -111,26 +111,89 @@ serve(async (req) => {
       if (error || !data) throw new Error(`Tournament not found: ${tournamentId}`);
       tournament = data;
     } else {
-      const { data: seasons } = await supabase
-        .from('sr_seasons')
-        .select('id')
-        .ilike('tour_name', 'pga')
-        .order('year', { ascending: false })
-        .limit(1);
-      
-      const pgaSeasonId = seasons?.[0]?.id;
-      if (!pgaSeasonId) throw new Error('No PGA season found');
-      
+      // ---------------------------------------------------------------
+      // TI-2 default picker: majors-aware, cross-tour, field-driven.
+      // Candidates: PGA + EURO seasons, status IN ('created','scheduled'),
+      // starting in the next 14 days. On the earliest start_date, choose
+      // by synced field size (majors self-select). If chosen candidate's
+      // field is under MIN_POOL_SIZE, fall through to the next candidate.
+      // ---------------------------------------------------------------
+      const PICKER_MIN_POOL_SIZE = 20;
+      const today = new Date();
+      const todayIso = today.toISOString().split('T')[0];
+      const horizon = new Date(today);
+      horizon.setDate(horizon.getDate() + 14);
+      const horizonIso = horizon.toISOString().split('T')[0];
+
+      const { data: candidatesRaw, error: candErr } = await supabase
+        .from('sr_tournaments')
+        .select('id, name, start_date, status, sr_seasons!inner(tour_name)')
+        .in('status', ['created', 'scheduled'])
+        .gte('start_date', todayIso)
+        .lte('start_date', horizonIso)
+        .order('start_date', { ascending: true });
+
+      if (candErr) throw new Error(`Picker query failed: ${candErr.message}`);
+
+      const candidates = (candidatesRaw || []).filter((c: any) => {
+        const t = String((c.sr_seasons?.tour_name ?? '')).toLowerCase().trim();
+        return t === 'pga' || t === 'euro';
+      });
+
+      if (candidates.length === 0) throw new Error('No upcoming tournament found');
+
+      // Measure field size per candidate (tee times preferred, leaderboard fallback).
+      async function measureField(tId: string): Promise<number> {
+        const tt = await supabase
+          .from('sr_tee_time_players')
+          .select('player_id, sr_tee_times!inner(tournament_id)', { count: 'exact', head: true })
+          .eq('sr_tee_times.tournament_id', tId);
+        if (!tt.error && (tt.count ?? 0) > 0) return tt.count ?? 0;
+        const lb = await supabase
+          .from('sr_leaderboards')
+          .select('player_id', { count: 'exact', head: true })
+          .eq('tournament_id', tId);
+        return lb.count ?? 0;
+      }
+
+      const measured = await Promise.all(
+        candidates.map(async (c: any) => ({
+          id: c.id as string,
+          name: c.name as string,
+          start_date: c.start_date as string,
+          tour: String(c.sr_seasons?.tour_name ?? '').toLowerCase(),
+          field: await measureField(c.id),
+        }))
+      );
+
+      // Sort: earliest start_date first; within a date, largest field first.
+      measured.sort((a, b) => {
+        if (a.start_date !== b.start_date) return a.start_date < b.start_date ? -1 : 1;
+        return b.field - a.field;
+      });
+
+      let chosen: typeof measured[number] | null = null;
+      for (const c of measured) {
+        if (c.field >= PICKER_MIN_POOL_SIZE) {
+          chosen = c;
+          break;
+        }
+        console.log(`[ti] picker: ${c.name} pool=${c.field} too thin, trying next candidate`);
+      }
+      // Last resort: take earliest even if thin, so we still attempt.
+      if (!chosen) chosen = measured[0];
+
+      console.log(
+        `[ti] picker: chose ${chosen.name} (${chosen.tour}, ${chosen.start_date}, pool=${chosen.field}) over ${measured.length - 1} other candidates`
+      );
+
       const { data, error } = await supabase
         .from('sr_tournaments')
         .select('*')
-        .eq('status', 'scheduled')
-        .eq('season_id', pgaSeasonId)
-        .order('start_date', { ascending: true })
-        .limit(1)
+        .eq('id', chosen.id)
         .single();
-      
-      if (error || !data) throw new Error('No upcoming tournament found');
+
+      if (error || !data) throw new Error(`Chosen tournament fetch failed: ${chosen.id}`);
       tournament = data;
     }
 
@@ -697,7 +760,7 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
         model_version: 'consensus_v1',
         prompt_version: 'v4',
         consensus_data: {
-          pipeline: 'ti-1',
+          pipeline: 'ti-2',
           method: consensus.consensusMethod,
           agreementScore: consensus.agreementScore,
           modelResults: consensus.modelResults.map(r => ({
