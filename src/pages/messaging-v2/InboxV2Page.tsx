@@ -3,6 +3,8 @@ import { PencilLine } from 'lucide-react';
 import { useConversations } from '@/hooks/messaging/useConversations';
 import { ConversationRow } from './ConversationRow';
 import NewConversationSheet from './NewConversationSheet';
+import { ManagePageShell } from '@/components/manage/ManagePageShell';
+
 
 const CANVAS = '#F8FAFC';
 const INK = '#1F2428';
