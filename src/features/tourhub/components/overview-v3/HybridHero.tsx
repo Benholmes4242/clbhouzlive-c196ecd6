@@ -337,6 +337,8 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
             fieldSize={safeLeaderboard.length}
             venueImageUrl={venueImageUrl}
             tourSlug={tournament.tourSlug}
+            isPseudoMajor={isPseudoMajor}
+            showMajorTag={showMajorTag}
             onCtaTap={onCtaTap}
             champion={champion}
             defendingChamp={defendingChamp ?? null}
