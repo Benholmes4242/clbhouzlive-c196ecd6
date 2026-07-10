@@ -655,8 +655,6 @@ function AppRoutes() {
 
 
 
-        {/* Public Echo Share Page */}
-        <Route path="/echo/share/:token" element={<Suspense fallback={<GenericPageSkeleton />}><EchoSharePage /></Suspense>} />
         
 
 
