@@ -193,7 +193,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
 
   const handleTabClickWithCamera = (tab: { id: string; path: string | null; isAction?: boolean }) => {
     if (tab.isAction && tab.id === 'post') {
-      openPostStudio({ returnPath: location.pathname });
+      setCreateSheetOpen(true);
       return;
     }
     if (tab.id === 'clubhouse' && (location.pathname === '/' || location.pathname === '/clubhouse')) {
