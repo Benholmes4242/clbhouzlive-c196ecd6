@@ -35,34 +35,69 @@ interface HeaderIdentity {
   secondary: string;
 }
 
+function resolveHeaderFromDetail(
+  detail: ConversationDetail,
+  selfActorType: string | null,
+  selfActorId: string | null,
+): HeaderIdentity {
+  if (detail.type === 'group') {
+    return {
+      name: detail.title ?? 'Group',
+      avatarUrl: detail.avatar_url,
+      userId: detail.conversation_id,
+      verified: false,
+      secondary: `${detail.members.length} ${detail.members.length === 1 ? 'member' : 'members'}`,
+    };
+  }
+  const others = detail.members.filter(
+    (m) => !(m.actor_type === selfActorType && m.actor_id === selfActorId),
+  );
+  const m: ConversationMember | undefined = others[0] ?? detail.members[0];
+  return {
+    name: m?.name ?? m?.username ?? 'Unknown',
+    avatarUrl: m?.avatar_url ?? null,
+    userId: m?.actor_id ?? detail.conversation_id,
+    verified: !!m?.verified,
+    secondary: m?.actor_type === 'business' ? 'Business' : '',
+  };
+}
+
+function resolveHeaderFromInbox(
+  conv: InboxConversation,
+  selfActorType: string | null,
+  selfActorId: string | null,
+): HeaderIdentity {
+  if (conv.type === 'group') {
+    return {
+      name: conv.title ?? 'Group',
+      avatarUrl: conv.avatar_url,
+      userId: conv.conversation_id,
+      verified: false,
+      secondary: `${conv.participants.length} members`,
+    };
+  }
+  const others = conv.participants.filter(
+    (p) => !(p.actor_type === selfActorType && p.actor_id === selfActorId),
+  );
+  const p: InboxParticipant | undefined = others[0] ?? conv.participants[0];
+  return {
+    name: p?.name ?? p?.username ?? 'Unknown',
+    avatarUrl: p?.avatar_url ?? null,
+    userId: p?.actor_id ?? conv.conversation_id,
+    verified: !!p?.verified,
+    secondary: p?.actor_type === 'business' ? 'Business' : '',
+  };
+}
+
 function resolveHeaderIdentity(
+  detail: ConversationDetail | null,
   conv: InboxConversation | null,
   selfActorType: string | null,
   selfActorId: string | null,
   firstIncoming: ThreadMessage | null,
 ): HeaderIdentity {
-  if (conv) {
-    if (conv.type === 'group') {
-      return {
-        name: conv.title ?? 'Group',
-        avatarUrl: conv.avatar_url,
-        userId: conv.conversation_id,
-        verified: false,
-        secondary: `${conv.participants.length} members`,
-      };
-    }
-    const others = conv.participants.filter(
-      (p) => !(p.actor_type === selfActorType && p.actor_id === selfActorId),
-    );
-    const p: InboxParticipant | undefined = others[0] ?? conv.participants[0];
-    return {
-      name: p?.name ?? p?.username ?? 'Unknown',
-      avatarUrl: p?.avatar_url ?? null,
-      userId: p?.actor_id ?? conv.conversation_id,
-      verified: !!p?.verified,
-      secondary: p?.actor_type === 'business' ? 'Business' : '',
-    };
-  }
+  if (detail) return resolveHeaderFromDetail(detail, selfActorType, selfActorId);
+  if (conv) return resolveHeaderFromInbox(conv, selfActorType, selfActorId);
   if (firstIncoming) {
     return {
       name: firstIncoming.sender_name ?? 'Conversation',
@@ -74,6 +109,7 @@ function resolveHeaderIdentity(
   }
   return { name: 'Conversation', avatarUrl: null, userId: '', verified: false, secondary: '' };
 }
+
 
 interface RunFlags {
   isFirstOfRun: boolean;
