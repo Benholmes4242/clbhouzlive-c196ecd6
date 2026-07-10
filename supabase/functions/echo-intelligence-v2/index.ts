@@ -322,7 +322,7 @@ async function callClaudeSync(
     body: JSON.stringify({
       // Claude Sonnet 5: no temperature/top_p/top_k.
       model: ANTHROPIC_MODEL_SYNTH,
-      max_tokens: 1024,
+      max_tokens: 2000,
       system: systemPrompt,
       messages: messages.map(m => ({ role: m.role, content: m.content })),
     }),
