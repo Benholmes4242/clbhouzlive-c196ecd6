@@ -525,9 +525,8 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
 
   const setActiveIndex = useClubhouseStore((s) => s.setActiveIndex);
   const setCarouselPosition = useClubhouseStore((s) => s.setCarouselPosition);
-  const carouselPositionsByTab = useClubhouseStore((s) => s.carouselPositionsByTab);
-  const globalCarouselPositions = useClubhouseStore((s) => s.carouselPositions);
-  const carouselPositions = tab ? (carouselPositionsByTab[tab] ?? globalCarouselPositions) : globalCarouselPositions;
+  // carouselPositions selectors are hoisted earlier in the component so
+  // the neighbour-warm effect can read them; do not redeclare here.
   const openFullscreen = useFullscreenFeedStore((s) => s.open);
   // NOTE: fsOpen / borrow.ownerKey are intentionally NOT read at this level.
   // They are consumed inside `FeedItemGate` so viewer-open doesn't change
