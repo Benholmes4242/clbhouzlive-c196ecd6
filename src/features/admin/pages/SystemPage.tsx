@@ -556,6 +556,43 @@ function SettingsTab() {
   );
 }
 
+function ToggleSwitch({ checked, onChange }: { checked: boolean; onChange: () => void }) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      onClick={onChange}
+      style={{
+        flexShrink: 0,
+        width: 44,
+        height: 26,
+        borderRadius: 999,
+        border: 'none',
+        background: checked ? '#0F172A' : t.line,
+        position: 'relative',
+        cursor: 'pointer',
+        padding: 0,
+        transition: 'background .15s',
+      }}
+    >
+      <span
+        style={{
+          position: 'absolute',
+          top: 3,
+          left: checked ? 21 : 3,
+          width: 20,
+          height: 20,
+          borderRadius: '50%',
+          background: '#fff',
+          boxShadow: '0 1px 2px rgba(0,0,0,0.2)',
+          transition: 'left .15s',
+        }}
+      />
+    </button>
+  );
+}
+
 function Field({
   label,
   value,
