@@ -98,19 +98,19 @@ const EMPTY_STATES: Record<EmptyStateType, {
 
 export function LeaderboardEmptyState({ type, onResetFilters }: LeaderboardEmptyStateProps) {
   const navigate = useNavigate();
+  const { openInviteSheet } = useInviteSheet();
   const state = EMPTY_STATES[type];
   const Icon = state.icon;
 
   const handleCta = () => {
     if (!state.cta) return;
-    
+
     switch (state.cta.action) {
       case 'find-friends':
         navigate('/golferstofollow');
         break;
       case 'invite-friend':
-        // Could open share sheet or invite flow
-        navigate('/golferstofollow');
+        openInviteSheet('leaderboard_empty');
         break;
       case 'show-top100':
         navigate('/courses?tab=top100');
@@ -123,6 +123,7 @@ export function LeaderboardEmptyState({ type, onResetFilters }: LeaderboardEmpty
         break;
     }
   };
+
 
   return (
     <div className="max-w-[520px] w-full mx-auto px-6 py-12">
