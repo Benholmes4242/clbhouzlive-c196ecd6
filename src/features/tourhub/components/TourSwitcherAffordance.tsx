@@ -180,6 +180,83 @@ export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
         />
 
         <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {activeMajor && (
+            <button
+              key="major"
+              type="button"
+              onClick={() => {
+                selectTour('major');
+                setOpen(false);
+              }}
+              aria-pressed={isMajorActive}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                padding: '14px 16px',
+                background: isMajorActive ? GOLD_TINT_18 : GOLD_TINT_10,
+                border: 'none',
+                borderBottom: `0.5px solid ${INK_TINT_07}`,
+                cursor: 'pointer',
+                textAlign: 'left',
+                fontFamily: FONT,
+              }}
+            >
+              <div
+                style={{
+                  width: 28,
+                  height: 28,
+                  flexShrink: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: 6,
+                  background: GOLD_TINT_18,
+                  border: `0.5px solid ${GOLD_BORDER}`,
+                }}
+              >
+                <Trophy size={15} strokeWidth={2.4} color={GOLD_DEEP} aria-hidden />
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 800,
+                    color: GOLD_DEEP,
+                    letterSpacing: '0.06em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  The Majors
+                </div>
+                <div
+                  style={{
+                    marginTop: 2,
+                    fontSize: 11,
+                    fontWeight: 600,
+                    color: INK,
+                    letterSpacing: '0.01em',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
+                  {activeMajor.name}
+                </div>
+              </div>
+              {activeMajor.status === 'live' ? (
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_LIVE, display: 'inline-block' }} />
+                  <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: STATUS_LIVE }}>LIVE</span>
+                </span>
+              ) : (
+                <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: GOLD_DEEP }}>
+                  UPCOMING
+                </span>
+              )}
+            </button>
+          )}
           {Object.entries(TOUR_LABEL).map(([slug, label]) => {
             const isActive = slug === activeTourSlug;
             const status = tourStatus(slug);
