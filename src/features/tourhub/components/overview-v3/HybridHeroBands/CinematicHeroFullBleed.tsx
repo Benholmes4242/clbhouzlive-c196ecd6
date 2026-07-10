@@ -730,8 +730,8 @@ export function CinematicHeroFullBleed({
               display: 'flex',
               alignItems: 'center',
               gap: 10,
-              padding: '9px 18px',
-              borderTop: '0.5px solid rgba(255,255,255,0.08)',
+              padding: '5px 18px',
+              borderTop: 'none',
             };
             if (row.kind === 'solo') {
               return (
