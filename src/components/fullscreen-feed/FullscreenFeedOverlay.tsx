@@ -380,26 +380,11 @@ export function FullscreenFeedOverlay() {
   }, [activePost, handleClose, navigate]);
 
   const handleReviewTap = useCallback(() => {
-    if (!activeReview || !activePost) return;
-    openReviewSheet({
-      user: {
-        id: activePost.userId ?? '',
-        name: activePost.displayName ?? '',
-        username: activePost.username,
-        avatar: activePost.avatarUrl,
-      },
-      courseId: activeReview.courseId ?? '',
-      courseName: activeReview.courseName ?? '',
-      rating: activeReview.rating ?? 0,
-      reviewId: activeReview.reviewId,
-      courseCountry: activeReview.courseCountry,
-      courseRegion: activeReview.courseRegion,
-      courseSubCountry: activeReview.courseSubCountry,
-      reviewText: activeReview.reviewText,
-      breakdown: (activeReview as any).breakdown ?? null,
-      reviewerStats: reviewerStats ?? null,
-    });
-  }, [activeReview, activePost, openReviewSheet, reviewerStats]);
+    if (!activePost) return;
+    const payload = buildReviewSheetPayload(activePost, reviewerStats ?? null);
+    if (!payload) return;
+    openReviewSheet(payload);
+  }, [activePost, openReviewSheet, reviewerStats]);
 
   // ESC to close — but defer to the review sheet if it's open on top.
   useEffect(() => {
