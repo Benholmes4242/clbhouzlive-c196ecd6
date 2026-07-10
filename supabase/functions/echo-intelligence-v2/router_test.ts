@@ -63,3 +63,19 @@ Deno.test("decideRoute() respects forced mode", () => {
   const forcedStatic = decideRoute("Leaderboard today", "static");
   assertEquals(forcedStatic.route, "static");
 });
+
+// v2 LIVE recency short-circuit (isolated so pre-existing v1 misroutes don't hide these)
+Deno.test("decideRoute() live-recency short-circuit", () => {
+  const recencyCases = [
+    "Who is leading the Open Championship right now?",
+    "who's winning today",
+    "latest leaderboard",
+    "current world ranking of Rahm",
+    "what happened at the Masters",
+    "at the moment, who leads?",
+  ];
+  for (const q of recencyCases) {
+    const d = decideRoute(q, "auto");
+    assertEquals(d.route, "live", `Recency misrouted: "${q}" -> ${d.route} (${d.reason})`);
+  }
+});
