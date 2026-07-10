@@ -253,7 +253,9 @@ async function streamClaude(
       // Claude Sonnet 5: no temperature/top_p/top_k — recent generations
       // dropped those sampling params. Keep max_tokens + stream.
       model: ANTHROPIC_MODEL_SYNTH,
-      max_tokens: 1200,
+      // Synthesis stream — bumped from 1200 to 2000 so longer answers don't
+      // truncate mid-sentence on dual/full routes.
+      max_tokens: 2000,
       system: systemPrompt,
       messages: messages.map(m => ({ role: m.role, content: m.content })),
       stream: true,
