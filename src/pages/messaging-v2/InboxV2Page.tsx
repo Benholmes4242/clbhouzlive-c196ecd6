@@ -186,10 +186,10 @@ const InboxV2Page: React.FC = () => {
 
             <div className="flex flex-col items-center" style={{ gap: 8 }}>
               <p style={{ color: INK, fontSize: 21, fontWeight: 600, margin: 0, letterSpacing: '-0.01em' }}>
-                The first tee is yours
+                Start the conversation
               </p>
               <p style={{ color: SUB, fontSize: 14, lineHeight: 1.5, maxWidth: 250, margin: 0 }}>
-                Every round starts with a conversation. Reach out and get one going.
+                Message golfers, clubs, or businesses - it all lands here.
               </p>
             </div>
             <button
