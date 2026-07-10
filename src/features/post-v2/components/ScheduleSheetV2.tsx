@@ -150,7 +150,7 @@ export default function ScheduleSheetV2({ open, onClose, value, onChange, onOpen
         <div style={{ marginTop: 4, padding: '12px 14px', borderRadius: 12, background: '#FFFFFF', border: '1px solid rgba(15,23,42,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ fontSize: 13, color: isPast ? '#B00020' : '#0F172A' }}>
             {isPast ? 'Pick a future time.' : (
-              <>Goes live <span style={{ fontWeight: 700 }}>{fmtSummaryDay(selDate, now)}</span> - <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{String(hour).padStart(2, '0')}:{String(minute).padStart(2, '0')}</span></>
+              <>Goes live <span style={{ fontWeight: 700 }}>{formatScheduleDay(finalDate, now)}</span> - <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{formatScheduleTime(finalDate)}</span></>
             )}
           </div>
         </div>
