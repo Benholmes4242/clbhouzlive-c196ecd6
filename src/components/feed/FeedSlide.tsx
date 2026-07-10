@@ -1264,20 +1264,9 @@ const FullscreenMediaPager: React.FC<{
           );
         })}
       </div>
-      {/* Dots — bottom-center, above the action rail. */}
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          left: 0,
-          right: 0,
-          bottom: 88,
-          display: 'flex',
-          justifyContent: 'center',
-          zIndex: 25,
-        }}
-      >
-        <CarouselDots count={media.length} active={activePagerIdx} variant="elongated" />
-      </div>
+      {/* Carousel dots for the fullscreen pager are rendered by
+          ImmersiveFullscreenChrome (bottom-center, above the scrubber). No
+          inline dots here to avoid a duplicate row above the author block. */}
     </div>
   );
 };
