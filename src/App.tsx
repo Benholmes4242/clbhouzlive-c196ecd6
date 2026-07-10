@@ -288,9 +288,7 @@ const AdminShell = lazy(() => import('./features/admin/AdminShell'));
 
 // Hub lazy imports removed — Hub page decommissioned
 
-// Echo full-page experience
-const EchoPage = lazy(() => import("./pages/EchoPage"));
-// Echo v2 (parallel build)
+// Echo v2 full-page experience (cutover from legacy EchoPage)
 const EchoV2Page = lazy(() => import("./pages/EchoV2Page"));
 const EchoHistoryPage = lazy(() => import("./pages/EchoHistoryPage"));
 
