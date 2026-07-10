@@ -157,25 +157,9 @@ export function LivePreviewCard({
           <div style={{ fontSize: 11, color: T_MUTE, marginTop: 2 }}>Just now</div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, zIndex: 3 }}>
-          {overall != null && tierLabel ? (
-            <span
-              className={isGold ? 'clbhouz-gold-shimmer-light' : undefined}
-              style={{
-                fontSize: 11.5,
-                fontWeight: 800,
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-                ...(isGold ? {} : { color: ratingTextColor(overall) }),
-              }}
-            >
-              {tierLabel}
-            </span>
-          ) : (
-            <Ghost width={72} height={12} />
-          )}
-        </div>
+        {/* Tier label removed — score numeral + gold shimmer carries the tiering. */}
       </div>
+
 
       {/* Verdict chip removed — tier label (top-right) is the derived
           verdict, matching ReviewBottomSheet's ReviewVerdictLabel. */}
