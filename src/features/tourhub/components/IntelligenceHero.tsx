@@ -1359,6 +1359,235 @@ function StateMessage({ label }: { label: string }) {
   );
 }
 
+/**
+ * Skeleton shimmer of the real pick-card layout. 1.2s shimmer sweep,
+ * three ghost cards + a receipts tail card. Never rendered with text.
+ */
+function IntelligenceSkeleton() {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        gap: 12,
+        padding: '0 16px 4px',
+        overflow: 'hidden',
+      }}
+      aria-hidden="true"
+    >
+      <style>{`
+        @keyframes ti-skel-shimmer {
+          0%   { background-position: -220% 0; }
+          100% { background-position: 220% 0; }
+        }
+        .ti-skel {
+          background: linear-gradient(
+            90deg,
+            rgba(15,23,42,0.05) 0%,
+            rgba(15,23,42,0.10) 50%,
+            rgba(15,23,42,0.05) 100%
+          );
+          background-size: 220% 100%;
+          animation: ti-skel-shimmer 1.2s ease-in-out infinite;
+        }
+      `}</style>
+      {[0, 1, 2].map((i) => (
+        <div
+          key={i}
+          style={{
+            flexShrink: 0,
+            width: 280,
+            background: SURFACE,
+            borderRadius: 18,
+            overflow: 'hidden',
+            border: `1px solid ${SLATE_200}`,
+          }}
+        >
+          <div className="ti-skel" style={{ height: 220, width: '100%' }} />
+          <div style={{ padding: '12px 14px 14px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div className="ti-skel" style={{ height: 10, width: '55%', borderRadius: 4 }} />
+            <div className="ti-skel" style={{ height: 10, width: '90%', borderRadius: 4 }} />
+            <div className="ti-skel" style={{ height: 10, width: '75%', borderRadius: 4 }} />
+          </div>
+        </div>
+      ))}
+      <div
+        style={{
+          flexShrink: 0,
+          width: 200,
+          background: SURFACE,
+          borderRadius: 18,
+          border: `1px solid ${SLATE_200}`,
+          padding: 16,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 10,
+        }}
+      >
+        <div className="ti-skel" style={{ height: 10, width: '60%', borderRadius: 4 }} />
+        <div className="ti-skel" style={{ height: 22, width: '40%', borderRadius: 4 }} />
+        <div className="ti-skel" style={{ height: 10, width: '80%', borderRadius: 4 }} />
+      </div>
+    </div>
+  );
+}
+
+const GENERATING_COPY = [
+  { at: 0, text: 'Reading the field' },
+  { at: 8000, text: 'Weighing course fit' },
+  { at: 20000, text: 'Comparing form lines' },
+];
+
+/**
+ * "Echo is studying the field" card — shown when we know a row is being
+ * generated (tournament week, no cached row yet). Rotates sub-copy at
+ * 0s / 8s / 20s; caller polls ai_predictions upstream.
+ */
+function IntelligenceGenerating() {
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    const t1 = setTimeout(() => setIdx(1), GENERATING_COPY[1].at);
+    const t2 = setTimeout(() => setIdx(2), GENERATING_COPY[2].at);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, []);
+  return (
+    <div style={{ padding: '4px 16px 8px' }}>
+      <div
+        style={{
+          background: SURFACE,
+          border: `1px solid ${SLATE_200}`,
+          borderRadius: 16,
+          padding: '18px 16px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 14,
+          boxShadow: '0 1px 3px rgba(15,23,42,0.04)',
+        }}
+      >
+        <div style={{ flexShrink: 0, display: 'inline-flex' }}>
+          <AnimatedEchoWave size={28} color={AMBER} active />
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0 }}>
+          <div
+            style={{
+              fontFamily: FONT,
+              fontSize: 13.5,
+              fontWeight: 700,
+              color: INK,
+              letterSpacing: '-0.005em',
+            }}
+          >
+            Echo is studying the field
+          </div>
+          <div
+            key={idx}
+            style={{
+              fontFamily: FONT,
+              fontSize: 12,
+              fontWeight: 500,
+              color: INK_SOFT,
+              opacity: 0.9,
+              transition: 'opacity 250ms ease',
+            }}
+          >
+            {GENERATING_COPY[idx].text}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function formatTeeOffCountdown(hours: number | null): string | null {
+  if (hours == null || !Number.isFinite(hours)) return null;
+  if (hours <= 0) return 'is teeing off now';
+  if (hours < 24) {
+    const h = Math.max(1, Math.round(hours));
+    return `tees off in ${h} ${h === 1 ? 'hour' : 'hours'}`;
+  }
+  const d = Math.round(hours / 24);
+  return `tees off in ${d} ${d === 1 ? 'day' : 'days'}`;
+}
+
+/**
+ * Waiting card — event has no confirmed field yet. Designed row with a
+ * 2px amber left rule, a Flag glyph, headline, and a hero-aware sub-line.
+ */
+function IntelligenceWaiting({
+  eventName,
+  hoursUntilStart,
+  isMajor,
+}: {
+  eventName: string | null;
+  hoursUntilStart: number | null;
+  isMajor?: boolean;
+}) {
+  const countdown = formatTeeOffCountdown(hoursUntilStart);
+  const subject = eventName ? `The ${eventName.replace(/^The\s+/i, '')}` : 'This event';
+  const glyphColor = isMajor ? GOLD : AMBER;
+  const ruleColor = isMajor ? GOLD : AMBER;
+  const sub = countdown
+    ? `${subject} ${countdown} — fields typically confirm early in tournament week`
+    : `${subject}'s field is not yet confirmed — fields typically confirm early in tournament week`;
+  return (
+    <div style={{ padding: '4px 16px 8px' }}>
+      <div
+        style={{
+          background: SURFACE,
+          border: `1px solid ${SLATE_200}`,
+          borderLeft: `2px solid ${ruleColor}`,
+          borderRadius: 12,
+          padding: '14px 14px 14px 14px',
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: 12,
+          boxShadow: '0 1px 3px rgba(15,23,42,0.04)',
+        }}
+      >
+        <div
+          style={{
+            flexShrink: 0,
+            width: 28,
+            height: 28,
+            borderRadius: 8,
+            background: isMajor ? 'rgba(232,194,106,0.14)' : AMBER_SOFT_BG,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Flag size={14} color={glyphColor} strokeWidth={2.2} />
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
+          <div
+            style={{
+              fontFamily: FONT,
+              fontSize: 14,
+              fontWeight: 600,
+              color: INK,
+              letterSpacing: '-0.005em',
+              lineHeight: 1.3,
+            }}
+          >
+            Picks land once the field is confirmed
+          </div>
+          <div
+            style={{
+              fontFamily: FONT,
+              fontSize: 12.5,
+              fontWeight: 500,
+              color: INK_SOFT,
+              lineHeight: 1.4,
+            }}
+          >
+            {sub}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
 // ─── Component ──────────────────────────────────────────────────────────────
 export const IntelligenceHero = memo(function IntelligenceHero() {
   // Follow the hero: whichever event is currently on-screen drives our picks.
