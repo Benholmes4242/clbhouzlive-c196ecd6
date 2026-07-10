@@ -12,7 +12,7 @@
 
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Check, Eye, Home, X, ArrowRight } from 'lucide-react';
+import { Check, Eye, Home, X, ArrowRight, UserPlus } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import {
   getRatingTier,
@@ -21,6 +21,7 @@ import {
   HERO_NUMBER_STYLE,
 } from '@/lib/ratingTier';
 import type { ReviewWizardCourse, SuccessVariant } from './types';
+import { useInviteSheet } from '@/hooks/useInviteSheet';
 
 interface SuccessScreenProps {
   variant: SuccessVariant;
