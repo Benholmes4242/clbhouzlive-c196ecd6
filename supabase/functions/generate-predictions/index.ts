@@ -242,8 +242,11 @@ serve(async (req) => {
       .select('player_id, sr_tee_times!inner(tournament_id)')
       .eq('sr_tee_times.tournament_id', tournament.id);
 
-    if (teeTimePlayers && teeTimePlayers.length > 10) {
-      confirmedFieldPlayerIds = new Set(teeTimePlayers.map((t: any) => t.player_id));
+    const teeTimeCount = teeTimePlayers?.length ?? 0;
+    let leaderboardCount = 0;
+
+    if (teeTimeCount > 10) {
+      confirmedFieldPlayerIds = new Set(teeTimePlayers!.map((t: any) => t.player_id));
       console.log(`[generate-predictions] Found ${confirmedFieldPlayerIds.size} confirmed entrants from tee times`);
     } else {
       const { data: leaderboardEntries } = await supabase
@@ -251,13 +254,23 @@ serve(async (req) => {
         .select('player_id')
         .eq('tournament_id', tournament.id);
 
-      if (leaderboardEntries && leaderboardEntries.length > 10) {
-        confirmedFieldPlayerIds = new Set(leaderboardEntries.map((l: any) => l.player_id));
+      leaderboardCount = leaderboardEntries?.length ?? 0;
+      if (leaderboardCount > 10) {
+        confirmedFieldPlayerIds = new Set(leaderboardEntries!.map((l: any) => l.player_id));
         console.log(`[generate-predictions] Found ${confirmedFieldPlayerIds.size} confirmed entrants from leaderboard`);
       }
     }
 
     const hasConfirmedField = confirmedFieldPlayerIds !== null && confirmedFieldPlayerIds.size > 0;
+
+    // TI-7: no confirmed field -> refuse. Never fall back to season-stats as pool.
+    if (!hasConfirmedField) {
+      console.warn(`[ti] no confirmed field for ${tournament.name} (tee_times=${teeTimeCount}, leaderboard=${leaderboardCount}) - refusing to write predictions`);
+      return new Response(
+        JSON.stringify({ skipped: true, reason: 'no confirmed field' }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     // --- Fetch player statistics (with raw_data for detailed extraction) ---
     let playerStats: any[] = [];
@@ -760,7 +773,7 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
         model_version: 'consensus_v1',
         prompt_version: 'v4',
         consensus_data: {
-         pipeline: 'ti-3',
+         pipeline: 'ti-7',
           method: consensus.consensusMethod,
           agreementScore: consensus.agreementScore,
           modelResults: consensus.modelResults.map(r => ({
