@@ -2,6 +2,7 @@ import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { ArrowUp } from 'lucide-react';
 import { useKeyboardHeight } from '@/hooks/messaging/useKeyboardHeight';
 
+
 const INK = '#1F2428';
 const HINT = '#AEB4BC';
 const HAIRLINE = 'rgba(0,0,0,0.07)';
@@ -20,9 +21,10 @@ interface Props {
   value?: string;
   onValueChange?: (v: string) => void;
   onSend: (text: string) => void;
+  onHeightChange?: (heightPx: number) => void;
 }
 
-export const EchoComposer: React.FC<Props> = ({ disabled, value, onValueChange, onSend }) => {
+export const EchoComposer: React.FC<Props> = ({ disabled, value, onValueChange, onSend, onHeightChange }) => {
   const keyboardHeight = useKeyboardHeight();
   const [internal, setInternal] = useState('');
   const text = value !== undefined ? value : internal;
@@ -31,6 +33,7 @@ export const EchoComposer: React.FC<Props> = ({ disabled, value, onValueChange, 
     else setInternal(v);
   };
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   const canSend = text.trim().length > 0 && !disabled;
 
@@ -42,6 +45,14 @@ export const EchoComposer: React.FC<Props> = ({ disabled, value, onValueChange, 
     el.style.height = `${next}px`;
     el.style.overflowY = el.scrollHeight > MAX_HEIGHT ? 'auto' : 'hidden';
   }, [text]);
+
+  useLayoutEffect(() => {
+    if (!onHeightChange) return;
+    const el = containerRef.current;
+    if (!el) return;
+    onHeightChange(el.getBoundingClientRect().height);
+  }, [onHeightChange, text, keyboardHeight]);
+
 
   const handleSend = useCallback(() => {
     const body = text.trim();
@@ -60,6 +71,7 @@ export const EchoComposer: React.FC<Props> = ({ disabled, value, onValueChange, 
 
   return (
     <div
+      ref={containerRef}
       style={{
         background: COMPOSER_BG,
         borderTop: `0.5px solid ${HAIRLINE}`,
