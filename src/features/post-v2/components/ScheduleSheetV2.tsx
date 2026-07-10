@@ -28,12 +28,8 @@ function startOfDay(d: Date) {
 function sameDay(a: Date, b: Date) {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 }
-function fmtSummaryDay(target: Date, now: Date) {
-  if (sameDay(target, now)) return 'today';
-  const tmr = new Date(now); tmr.setDate(tmr.getDate() + 1);
-  if (sameDay(target, tmr)) return 'tomorrow';
-  return `${DAY_LABELS[target.getDay()][0] + DAY_LABELS[target.getDay()].slice(1).toLowerCase()} ${target.getDate()} ${MONTH_LABELS[target.getMonth()]}`;
-}
+
+
 
 export default function ScheduleSheetV2({ open, onClose, value, onChange, onOpenScheduled, scheduledCount }: Props) {
   const now = useMemo(() => new Date(), [open]);
