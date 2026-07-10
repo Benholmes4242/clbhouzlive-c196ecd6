@@ -670,8 +670,10 @@ interface KindStat {
   pass: number;
   slow: number;
   timeout: number;
+  superseded: number;
   totals: number[]; // durations for p50/p95/worst
 }
+
 
 const scorecardBuckets = new Map<string, KindStat>();      // key = `${kind}|${page}`
 const sessionHealth = {
