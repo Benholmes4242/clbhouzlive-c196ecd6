@@ -59,6 +59,7 @@ import { RequestCourseSheetHost } from '@/components/courses/RequestCourseSheetH
 
 
 import { FriendSheetProvider } from '@/components/friend-sheet/FriendSheetProvider';
+import { InviteSheetProvider } from '@/components/invite/InviteSheetProvider';
 import { useUploadGuard } from '@/hooks/useUploadGuard';
 import { FLAGS } from '@/config/flags';
 import { FEATURE_FLAGS } from '@/config/featureFlags';
