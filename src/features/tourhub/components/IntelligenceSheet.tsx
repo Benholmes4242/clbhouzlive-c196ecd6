@@ -263,7 +263,7 @@ const ANALYSE_ROWS: AnalyseRow[] = [
   { icon: Cloud, iconColor: GREEN_ACCENT, iconBg: 'rgba(16,185,129,0.10)', title: 'Course conditions', body: 'Wind, rain, and turf conditions that historically reshape the leaderboard.' },
 ];
 
-function HowWePickBody({ trackRecord }: { trackRecord: { wins: number; topFives: number } }) {
+function HowWePickBody({ trackRecord, tourSlug }: { trackRecord: { wins: number; topFives: number }; tourSlug?: string }) {
   return (
     <div
       style={{
