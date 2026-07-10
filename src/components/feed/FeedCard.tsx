@@ -24,7 +24,8 @@ import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
 import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
 import { canManagePost } from '@/lib/canManagePost';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getRatingTier, getRatingTierLabel } from '@/lib/ratingTier';
+import { getRatingTierLabel } from '@/lib/ratingTier';
+import { ReviewGhostNumeral, ReviewVerdictLabel } from '@/components/shared/ReviewGhostScore';
 import { formatRatingValue } from '@/utils/formatters';
 import { useActiveActor } from '@/context/ActiveActorContext';
 
@@ -413,36 +414,9 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       }}
     >
       {/* Card-level ghost numeral — overflows the header, clipped by card edges */}
-      {reviewRating != null && (() => {
-        const GHOST = {
-          EXCEPTIONAL: 'rgba(255,194,61,0.16)',
-          EXCELLENT:   'rgba(247,147,30,0.14)',
-          GOOD:        'rgba(247,147,30,0.12)',
-          FAIR:        'rgba(154,74,14,0.14)',
-          POOR:        'rgba(154,74,14,0.12)',
-        } as const;
-        const tierKey = getRatingTier(reviewRating);
-        const ghostExceptional = tierKey === 'EXCEPTIONAL';
-        return (
-          <span
-            aria-hidden
-            className={ghostExceptional ? 'clbhouz-gold-shimmer' : undefined}
-            style={{
-              position: 'absolute',
-              right: -7,
-              top: 28,
-              transform: 'translateY(-50%)',
-              fontSize: 110,
-              fontWeight: 800, letterSpacing: '-0.05em', lineHeight: 1,
-              pointerEvents: 'none', whiteSpace: 'nowrap', zIndex: 0,
-              fontVariantNumeric: 'tabular-nums',
-              ...(ghostExceptional ? { opacity: 0.22 } : { color: GHOST[tierKey] }),
-            }}
-          >
-            {formatRatingValue(reviewRating)}
-          </span>
-        );
-      })()}
+      {reviewRating != null && (
+        <ReviewGhostNumeral rating={reviewRating} fontSize={110} right={-7} top={28} />
+      )}
 
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px 2px', position: 'relative', zIndex: 2 }}>
@@ -514,43 +488,13 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               DEAL
             </span>
           )}
-          {reviewRating != null && (() => {
-            const LABEL_COLOR = {
-              EXCEPTIONAL: '#FFCE5C',
-              EXCELLENT:   '#FBA63F',
-              GOOD:        '#FBA63F',
-              FAIR:        'rgba(255,255,255,0.68)',
-              POOR:        'rgba(255,255,255,0.58)',
-            } as const;
-            const tierKey = getRatingTier(reviewRating);
-            const tierLabel = getRatingTierLabel(reviewRating);
-            const isExceptional = tierKey === 'EXCEPTIONAL';
-            return (
-              <button
-                type="button"
-                onClick={handleReadReview}
-                style={{
-                  position: 'relative', zIndex: 3,
-                  background: 'transparent', border: 'none', padding: 0, cursor: 'pointer',
-                  flexShrink: 0,
-                }}
-                aria-label={`Your review: ${formatRatingValue(reviewRating)} ${tierLabel}`}
-              >
-                <span
-                  className={isExceptional ? 'clbhouz-gold-shimmer' : undefined}
-                  style={{
-                    fontSize: 12.5, fontWeight: 800, letterSpacing: '0.14em',
-                    textTransform: 'uppercase', whiteSpace: 'nowrap',
-                    ...(isExceptional
-                      ? {}
-                      : { color: LABEL_COLOR[tierKey] }),
-                  }}
-                >
-                  {tierLabel}
-                </span>
-              </button>
-            );
-          })()}
+          {reviewRating != null && (
+            <ReviewVerdictLabel
+              rating={reviewRating}
+              onClick={handleReadReview}
+              ariaLabel={`Your review: ${formatRatingValue(reviewRating)} ${getRatingTierLabel(reviewRating)}`}
+            />
+          )}
         </div>
       </div>
 

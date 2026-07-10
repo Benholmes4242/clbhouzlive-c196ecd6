@@ -18,10 +18,11 @@ import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { MapPin } from 'lucide-react';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
-import { formatFrostRating } from '@/lib/frostPanel';
+
 import { useReviewerStats } from '@/hooks/useReviewerStats';
 import { MentionText } from '@/components/mentions/MentionText';
 import { REVIEW_SHEET_Z } from '@/lib/zLayers';
+import { ReviewGhostNumeral, ReviewVerdictLabel } from '@/components/shared/ReviewGhostScore';
 
 const AMBER = '#F7931E';
 const FONT_GEIST =
@@ -146,7 +147,6 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
     [user.name],
   );
 
-  const formattedRating = formatFrostRating(rating);
   const monthLabel = formatMonthLabel(reviewDate ?? null);
 
   const breakdownEntries = useMemo(() => {
@@ -239,10 +239,16 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 padding: '0 18px 14px',
                 position: 'relative',
                 touchAction: 'none',
+                overflow: 'hidden',
               }}
             >
+              {/* Ghost numeral — huge watermark, top-right, clipped by header edge */}
+              {rating != null && (
+                <ReviewGhostNumeral rating={rating} fontSize={86} right={-7} top={54} />
+              )}
+
               {/* Drag handle */}
-              <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8, paddingBottom: 10 }}>
+              <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8, paddingBottom: 10, position: 'relative', zIndex: 2 }}>
                 <div
                   style={{
                     width: 32,
@@ -253,8 +259,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 />
               </div>
 
-              {/* Top row: eyebrow + course info (left) | score (right) */}
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
+              {/* Top row: eyebrow + course info (left) | verdict label (right) */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, position: 'relative', zIndex: 2 }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   {/* Amber eyebrow */}
                   <div
@@ -326,39 +332,10 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   )}
                 </div>
 
-                {/* Score — large + light */}
-                <div
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'baseline',
-                    flexShrink: 0,
-                    fontVariantNumeric: 'tabular-nums',
-                    fontFeatureSettings: '"kern" 1, "liga" 1',
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: 30,
-                      fontWeight: 200,
-                      lineHeight: 1,
-                      color: '#F8FAFC',
-                      letterSpacing: '-0.02em',
-                    }}
-                  >
-                    {formattedRating}
-                  </span>
-                  <span
-                    style={{
-                      fontSize: 12,
-                      fontWeight: 300,
-                      color: '#F8FAFC',
-                      opacity: 0.5,
-                      marginLeft: 2,
-                    }}
-                  >
-                    /10
-                  </span>
-                </div>
+                {/* Verdict label — tier word over the ghost numeral, top-right */}
+                {rating != null && (
+                  <ReviewVerdictLabel rating={rating} />
+                )}
               </div>
 
               {/* 2×2 breakdown grid */}
