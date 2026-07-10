@@ -316,6 +316,7 @@ async function callClaudeSync(
   systemPrompt: string,
   messages: Array<{ role: string; content: string }>,
 ): Promise<string> {
+  const t0 = Date.now();
   const r = await withTimeout(fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -345,6 +346,7 @@ async function callClaudeSync(
   if (!text) {
     throw new Error(`Claude empty on 2xx: ${shapeSnippet(d)}`);
   }
+  console.log(`[echo-v2] sync/claude ok in ${Date.now() - t0}ms, ${text.length} chars`);
   return text;
 }
 
@@ -352,6 +354,10 @@ async function callOpenAISynth(
   systemPrompt: string,
   messages: Array<{ role: string; content: string }>,
 ): Promise<string> {
+  const t0 = Date.now();
+  // Contributor voice — Claude synthesizes the final answer, so keep this
+  // short and opinionated rather than an essay.
+  const contribPrompt = `${systemPrompt}\n\nRespond concisely in under 400 words — key claims and reasoning only.`;
   const r = await withTimeout(fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -360,14 +366,14 @@ async function callOpenAISynth(
     },
     body: JSON.stringify({
       // GPT-5.5: chat completions rejects legacy `max_tokens` — use
-      // `max_completion_tokens`. `reasoning_effort: "low"` keeps a consensus
-      // voice fast; if the API 400s on this param the existing error log
-      // will show it and we drop back to the longer timeout alone.
+      // `max_completion_tokens`. `reasoning_effort: "minimal"` is the fastest
+      // tier (GPT-5-series). If the API 400s on "minimal", the existing
+      // error log shows it and we fall back to "low".
       model: OPENAI_MODEL_SYNTH,
-      max_completion_tokens: 2000,
-      reasoning_effort: "low",
+      max_completion_tokens: 700,
+      reasoning_effort: "minimal",
       messages: [
-        { role: "system", content: systemPrompt },
+        { role: "system", content: contribPrompt },
         ...messages.map(m => ({ role: m.role, content: m.content })),
       ],
     }),
@@ -382,6 +388,7 @@ async function callOpenAISynth(
   if (!text) {
     throw new Error(`OpenAI empty on 2xx: ${shapeSnippet(d)}`);
   }
+  console.log(`[echo-v2] sync/openai ok in ${Date.now() - t0}ms, ${text.length} chars`);
   return text;
 }
 
@@ -389,6 +396,7 @@ async function callGemini(
   systemPrompt: string,
   messages: Array<{ role: string; content: string }>,
 ): Promise<string> {
+  const t0 = Date.now();
   const contents = messages.map(m => ({
     role: m.role === "assistant" ? "model" : "user",
     parts: [{ text: m.content }],
@@ -425,12 +433,14 @@ async function callGemini(
   if (!text) {
     throw new Error(`Gemini empty on 2xx: ${shapeSnippet(d)}`);
   }
+  console.log(`[echo-v2] sync/gemini ok in ${Date.now() - t0}ms, ${text.length} chars`);
   return text;
 }
 
 async function callPerplexitySync(
   messages: Array<{ role: string; content: string }>,
 ): Promise<string> {
+  const t0 = Date.now();
   const r = await withTimeout(fetch("https://api.perplexity.ai/chat/completions", {
     method: "POST",
     headers: {
@@ -458,8 +468,10 @@ async function callPerplexitySync(
   if (!text) {
     throw new Error(`Perplexity empty on 2xx: ${shapeSnippet(d)}`);
   }
+  console.log(`[echo-v2] sync/perplexity ok in ${Date.now() - t0}ms, ${text.length} chars`);
   return text;
 }
+
 
 
 // Streaming Perplexity for pure live queries.
