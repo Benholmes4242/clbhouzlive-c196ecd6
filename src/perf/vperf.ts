@@ -1325,3 +1325,104 @@ export function __vperfFlowRollupLines(): string[] {
   return lines;
 }
 
+
+// ============================================================================
+// PHASE-2 TELEMETRY EXPORTS
+// Internal-only helpers consumed by src/perf/telemetry.ts to ship silent
+// aggregates to Supabase. Do NOT call from feature code.
+// snapshot() returns a plain-JSON view of every counter; reset() zeros the
+// stores so rows are deltas across flushes.
+// ============================================================================
+
+export interface VperfBucketSnapshot {
+  key: string;      // `${kind}|${page}`
+  count: number;
+  pass: number;
+  slow: number;
+  timeout: number;
+  superseded: number;
+  totals: number[]; // copy — safe to serialise
+}
+
+export interface VperfSnapshot {
+  buckets: VperfBucketSnapshot[];
+  sessionHealth: typeof sessionHealth;
+  prefetchStats: {
+    issued: number;
+    aborted: Record<string, number>;
+    activationsWithPrefetch: number;
+    activationsWithPrefetchWarm: number;
+  };
+  feedRollup: Array<{ page: string } & { scrolls: number; longFrames: number; frames: number; worstMs: number; activateWarm: number; activateCold: number }>;
+  startLevelsByLane: Array<{ laneId: string; totals: number[] }>;
+  decideCounters: Array<{ bucket: string; counts: Record<string, number> }>;
+}
+
+export function __vperfSnapshotTelemetry(): VperfSnapshot {
+  const buckets: VperfBucketSnapshot[] = [];
+  for (const [key, s] of scorecardBuckets) {
+    buckets.push({
+      key,
+      count: s.count,
+      pass: s.pass,
+      slow: s.slow,
+      timeout: s.timeout,
+      superseded: s.superseded ?? 0,
+      totals: s.totals.slice(),
+    });
+  }
+  const aborted: Record<string, number> = {};
+  for (const [k, v] of prefetchStats.aborted) aborted[k] = v;
+  const feedRollupOut = [] as VperfSnapshot['feedRollup'];
+  for (const [page, r] of feedRollup) feedRollupOut.push({ page, ...r });
+  const startLevelsOut = [] as VperfSnapshot['startLevelsByLane'];
+  for (const [laneId, ring] of startLevelsByLane) startLevelsOut.push({ laneId, totals: ring.arr.slice() });
+  const decideOut = [] as VperfSnapshot['decideCounters'];
+  for (const [bucket, m] of decideCounters) {
+    const counts: Record<string, number> = {};
+    for (const [k, v] of m) counts[k] = v;
+    decideOut.push({ bucket, counts });
+  }
+  return {
+    buckets,
+    sessionHealth: { ...sessionHealth },
+    prefetchStats: {
+      issued: prefetchStats.issued,
+      aborted,
+      activationsWithPrefetch: prefetchStats.activationsWithPrefetch,
+      activationsWithPrefetchWarm: prefetchStats.activationsWithPrefetchWarm,
+    },
+    feedRollup: feedRollupOut,
+    startLevelsByLane: startLevelsOut,
+    decideCounters: decideOut,
+  };
+}
+
+export function __vperfResetTelemetry(): void {
+  scorecardBuckets.clear();
+  sessionHealth.sessionCount = 0;
+  sessionHealth.totalStalls = 0;
+  sessionHealth.totalDurationMs = 0;
+  sessionHealth.totalStallMs = 0;
+  sessionHealth.levelSwitches = 0;
+  sessionHealth.totalFrames = 0;
+  sessionHealth.droppedFrames = 0;
+  prefetchStats.issued = 0;
+  prefetchStats.aborted.clear();
+  prefetchStats.activationsWithPrefetch = 0;
+  prefetchStats.activationsWithPrefetchWarm = 0;
+  feedRollup.clear();
+  startLevelsByLane.clear();
+  decideCounters.clear();
+}
+
+/** Approx row count the next flush would produce — used for the >40 row
+ * early-flush threshold in the shipper. */
+export function __vperfApproxRowCount(): number {
+  return scorecardBuckets.size
+    + 1 /* session */
+    + 1 /* prefetch */
+    + feedRollup.size
+    + startLevelsByLane.size
+    + decideCounters.size;
+}
