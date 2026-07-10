@@ -95,8 +95,20 @@ const InboxV2Page: React.FC = () => {
         </button>
       </header>
 
-      <main>
-        {isLoading ? (
+      <main
+        style={{
+          paddingBottom: 'var(--bottom-nav-height, 88px)',
+        }}
+      >
+        <style>{`@keyframes msg-spin { to { transform: rotate(360deg); } }`}</style>
+        {!hasActor ? (
+          <div
+            className="flex items-center justify-center"
+            style={{ padding: '96px 24px' }}
+          >
+            <Spinner />
+          </div>
+        ) : isLoading ? (
           <>
             {Array.from({ length: 7 }).map((_, i) => (
               <SkeletonRow key={i} />
@@ -146,6 +158,7 @@ const InboxV2Page: React.FC = () => {
           </div>
         )}
       </main>
+
 
       <NewConversationSheet open={composeOpen} onClose={() => setComposeOpen(false)} />
     </div>
