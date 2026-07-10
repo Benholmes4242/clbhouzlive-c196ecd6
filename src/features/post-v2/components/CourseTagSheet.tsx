@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import BottomSheet from './BottomSheet';
 import type { StageCourse } from '../hooks/useStageComposer';
 import { useRecentCourses } from '../hooks/useRecentCourses';
+import useKeyboardHeight from '@/hooks/messaging/useKeyboardHeight';
 
 interface Props {
   open: boolean;
@@ -13,6 +14,7 @@ interface Props {
   onSelect: (c: StageCourse | null) => void;
   current: StageCourse | null;
   userId?: string | null;
+  title?: string;
 }
 
 interface RecentRow extends StageCourse {
@@ -20,10 +22,11 @@ interface RecentRow extends StageCourse {
   isHomeClub?: boolean;
 }
 
-export default function CourseTagSheet({ open, onClose, onSelect, current, userId }: Props) {
+export default function CourseTagSheet({ open, onClose, onSelect, current, userId, title = 'Tag a course' }: Props) {
   const [q, setQ] = useState('');
   const [rows, setRows] = useState<RecentRow[]>([]);
   const { rows: recents } = useRecentCourses(open, userId ?? null);
+  const keyboardHeight = useKeyboardHeight();
 
   useEffect(() => {
     if (!open) return;
@@ -42,7 +45,7 @@ export default function CourseTagSheet({ open, onClose, onSelect, current, userI
   const showRecents = q.trim().length === 0;
 
   return (
-    <BottomSheet open={open} title="Tag a course" onClose={onClose} fullHeight>
+    <BottomSheet open={open} title={title} onClose={onClose} fullHeight bottomOffset={keyboardHeight}>
       <div style={{ padding: '4px 16px 12px' }}>
         <div style={{ position: 'relative' }}>
           <Search size={16} color="#94A3B8" style={{ position: 'absolute', top: 12, left: 12 }} />

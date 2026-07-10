@@ -25,7 +25,7 @@ interface Props {
 const KEYFRAMES_CSS = `
 @keyframes pv2-floaty {
   0%,100% { transform: translateY(0) rotate(var(--r)); }
-  50% { transform: translateY(-6px) rotate(var(--r)); }
+  50% { transform: translateY(-14px) rotate(calc(var(--r) + 2.5deg)); }
 }
 `;
 
@@ -50,9 +50,9 @@ function useContainerSize(ref: React.RefObject<HTMLElement>) {
       const rect = el.getBoundingClientRect();
       const h = rect.height || 240;
       const w = rect.width || 320;
-      // Collage scales to min(56% of stage height, 300px), and never wider than
-      // the stage.
-      setSize(Math.max(140, Math.min(h * 0.56, w * 0.78, 300)));
+      // Collage sized to command the phone stage without clipping:
+      // min(92vw, 480px, stageHeight * 0.8).
+      setSize(Math.max(140, Math.min(w * 0.92, 480, h * 0.8)));
     };
     measure();
     const ro = new ResizeObserver(measure);
@@ -88,17 +88,18 @@ export default function MediaStageV2({ item, index, total, onOpenAdjust, onOpenT
       }
       if (!needsJs) return;
       const start = performance.now();
+      const PERIOD = 3.2;
       const tick = (t: number) => {
         if (stopped) return;
         const elapsed = (t - start) / 1000;
         FRAMES.forEach((f, i) => {
           const el = frameRefs.current[i];
           if (!el) return;
-          const phase = (elapsed - f.delay) / 4;
-          const y = -6 * Math.max(0, Math.sin(phase * Math.PI * 2) / 2 + 0.5) * 2 + 6;
-          // simpler: 0..-6..0 sine wave
-          const ty = -6 * (0.5 - 0.5 * Math.cos(phase * Math.PI * 2));
-          el.style.transform = `translateY(${ty}px) rotate(${f.r}deg)`;
+          const phase = (elapsed - f.delay) / PERIOD;
+          const s = 0.5 - 0.5 * Math.cos(phase * Math.PI * 2); // 0..1..0
+          const ty = -14 * s;
+          const rot = f.r + 2.5 * s;
+          el.style.transform = `translateY(${ty}px) rotate(${rot}deg)`;
         });
         raf = requestAnimationFrame(tick);
       };
@@ -151,7 +152,7 @@ export default function MediaStageV2({ item, index, total, onOpenAdjust, onOpenT
             };
             (style as any)['--r'] = `${f.r}deg`;
             if (!reduced) {
-              style.animation = `pv2-floaty 4s ${f.delay}s ease-in-out infinite`;
+              style.animation = `pv2-floaty 3.2s ${f.delay}s ease-in-out infinite`;
             }
             return (
               <div
