@@ -619,13 +619,13 @@ export function CinematicHeroFullBleed({
           style={{
             position: 'relative',
             zIndex: 2,
-            padding: '16px 18px 18px',
+            padding: '10px 18px 10px',
             borderTop: '0.5px solid rgba(255,255,255,0.10)',
             background:
               'linear-gradient(180deg, rgba(232,194,106,0.06) 0%, rgba(232,194,106,0) 100%)',
             display: 'flex',
             alignItems: 'center',
-            gap: 14,
+            gap: 12,
           }}
         >
           <SquircleAvatar
@@ -635,7 +635,7 @@ export function CinematicHeroFullBleed({
             hairlineRing
             ringColor={GOLD_RING}
           />
-          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
             <span
               style={{
                 fontSize: 9.5,
