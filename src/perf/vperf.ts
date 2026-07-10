@@ -816,7 +816,8 @@ function pct(arr: number[], p: number): number {
 
 /** Emit one multi-line [BASELINE] scorecard block. */
 export function vperfScorecard(trigger: 'auto' | 'nav' | 'manual' = 'manual'): void {
-  if (!on()) return;
+  if (!consoleOn()) return; // PHASE-2: emission gated on pill; counters are always-on
+
   const lines: string[] = [];
   lines.push(`[BASELINE] trigger=${trigger} page=${__currentPage} @${Math.round(performance.now())}ms`);
   lines.push('  kind|page                              count  p50   p95  worst  PASS%');
