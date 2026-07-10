@@ -34,7 +34,7 @@ import { useUserProfile } from '@/hooks/useUserProfile';
 import { useWhsConnection, useHandicapTrend } from '@/lib/whs/hooks';
 import HandicapMasthead from '@/components/profile/HandicapMasthead';
 
-import { ProfileSwitcherPopover } from '@/components/profile/ProfileSwitcherPopover';
+
 import { useProfileSheetStats } from '@/hooks/useProfileSheetStats';
 import { useHasBusinesses } from '@/hooks/useMyBusinesses';
 import { analyticsEvents } from '@/utils/analyticsEvents';
