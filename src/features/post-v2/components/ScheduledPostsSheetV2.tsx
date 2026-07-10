@@ -67,7 +67,7 @@ export default function ScheduledPostsSheetV2({ open, onClose, userId, onCountCh
         <div key={r.id} style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '12px 16px', borderTop: '1px solid rgba(0,0,0,0.07)' }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 14, color: '#1F2428', fontWeight: 500 }}>{(r.content || '(no caption)').slice(0, 60)}</div>
-            <div style={{ fontSize: 12, color: '#8A9099', marginTop: 2 }}>{r.scheduled_at ? new Date(r.scheduled_at).toLocaleString() : '-'}</div>
+            <div style={{ fontSize: 12, color: '#8A9099', marginTop: 2 }}>{r.scheduled_at ? formatSchedule(new Date(r.scheduled_at)) : '-'}</div>
           </div>
           <button onClick={() => reschedule(r.id)} style={{ background: 'transparent', border: '1px solid rgba(0,0,0,0.12)', color: '#1F2428', borderRadius: 999, padding: '4px 10px', fontSize: 12, cursor: 'pointer' }}>Reschedule</button>
           <button onClick={() => cancel(r.id)} aria-label="Cancel" style={{ background: 'transparent', border: 0, color: '#8A9099', cursor: 'pointer', padding: 8 }}>
