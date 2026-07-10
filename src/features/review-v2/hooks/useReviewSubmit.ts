@@ -1,0 +1,82 @@
+/**
+ * useReviewSubmit — thin wrapper around the two v2 RPCs.
+ * The client never writes course_ratings/posts/notifications directly.
+ */
+
+import { useCallback, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import type { ReviewComposerState } from '../types';
+
+interface SubmitArgs {
+  courseId: string;
+  state: ReviewComposerState;
+}
+
+interface SubmitResult {
+  ratingId: string;
+}
+
+export function useReviewSubmit() {
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const submit = useCallback(async ({ courseId, state }: SubmitArgs): Promise<SubmitResult> => {
+    if (state.overall == null) throw new Error('Overall score required');
+    if (
+      state.scores.design == null ||
+      state.scores.condition == null ||
+      state.scores.clubhouse == null ||
+      state.scores.facilities == null
+    ) {
+      throw new Error('All category scores required');
+    }
+
+    setSubmitting(true);
+    setError(null);
+    try {
+      const { data, error } = await supabase.rpc('submit_course_review_v2', {
+        p_course_id: courseId,
+        p_rating: state.overall,
+        p_design: state.scores.design,
+        p_condition: state.scores.condition,
+        p_clubhouse: state.scores.clubhouse,
+        p_facilities: state.scores.facilities,
+        p_review: state.reviewText || undefined,
+        p_verdict: state.verdict || undefined,
+        p_share_to_feed: state.shareToFeed,
+      });
+      if (error) throw error;
+
+      // RPC returns Json — accept { rating_id } or { id } or a bare uuid.
+      const anyData = data as any;
+      const ratingId: string | undefined =
+        anyData?.rating_id ?? anyData?.id ?? (typeof anyData === 'string' ? anyData : undefined);
+      if (!ratingId) throw new Error('Submit succeeded but no rating id returned');
+
+      return { ratingId };
+    } catch (e: any) {
+      setError(e?.message || 'Submit failed');
+      throw e;
+    } finally {
+      setSubmitting(false);
+    }
+  }, []);
+
+  const remove = useCallback(async (ratingId: string) => {
+    setSubmitting(true);
+    setError(null);
+    try {
+      const { error } = await supabase.rpc('delete_course_review_v2', {
+        p_rating_id: ratingId,
+      });
+      if (error) throw error;
+    } catch (e: any) {
+      setError(e?.message || 'Delete failed');
+      throw e;
+    } finally {
+      setSubmitting(false);
+    }
+  }, []);
+
+  return { submit, remove, submitting, error };
+}

@@ -1,0 +1,133 @@
+/**
+ * RemoveReviewSheetV2 — confirm sheet. Deletion goes through the v2 RPC
+ * and cleanup-review-media handles storage assets.
+ */
+
+import React from 'react';
+import { X, Trash2 } from 'lucide-react';
+import { RV2 } from '../tokens';
+
+interface Props {
+  open: boolean;
+  submitting?: boolean;
+  onCancel: () => void;
+  onConfirm: () => void;
+}
+
+export function RemoveReviewSheetV2({ open, submitting, onCancel, onConfirm }: Props) {
+  if (!open) return null;
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 10000,
+        background: 'rgba(15,23,42,0.4)',
+        display: 'flex',
+        alignItems: 'flex-end',
+        justifyContent: 'center',
+      }}
+      onClick={onCancel}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          width: '100%',
+          maxWidth: 480,
+          background: '#FFFFFF',
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
+          padding: '18px 18px calc(env(safe-area-inset-bottom, 0px) + 18px)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 14,
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <div style={{ width: 36, height: 4, borderRadius: 999, background: 'rgba(15,23,42,0.16)' }} />
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 12,
+              background: 'rgba(239,68,68,0.10)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Trash2 size={18} color="#EF4444" />
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 15, fontWeight: 700, color: RV2.ink }}>Remove review?</div>
+            <div style={{ fontSize: 12.5, color: RV2.secondary, marginTop: 2 }}>
+              Your score, verdict, and any media go with it.
+            </div>
+          </div>
+          <button
+            type="button"
+            aria-label="Close"
+            onClick={onCancel}
+            style={{
+              width: 30,
+              height: 30,
+              borderRadius: '50%',
+              background: 'rgba(15,23,42,0.06)',
+              border: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+            }}
+          >
+            <X size={14} color={RV2.secondary} />
+          </button>
+        </div>
+
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={submitting}
+            style={{
+              flex: 1,
+              padding: 13,
+              borderRadius: 12,
+              background: '#FFFFFF',
+              border: `1px solid ${RV2.hairline}`,
+              fontSize: 14,
+              fontWeight: 600,
+              color: RV2.ink,
+              cursor: submitting ? 'not-allowed' : 'pointer',
+            }}
+          >
+            Keep it
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            disabled={submitting}
+            style={{
+              flex: 1,
+              padding: 13,
+              borderRadius: 12,
+              background: '#EF4444',
+              border: 'none',
+              fontSize: 14,
+              fontWeight: 700,
+              color: '#FFFFFF',
+              cursor: submitting ? 'not-allowed' : 'pointer',
+            }}
+          >
+            {submitting ? 'Removing...' : 'Remove'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -43,6 +43,7 @@ export const GLOBAL_HEADER_EXCLUDED_PREFIXES = [
   '/business/create', // Create business profile uses ManagePageShell (own header, no global chrome)
   '/business/invite/accept', // Team invite accept uses ManagePageShell (own header, no global chrome)
   '/i/',              // Public WHS invite landing — no chrome
+  '/rate-course-v2/', // Review composer v2 — parallel test route, own chrome
 
 ] as const;
 

@@ -1,0 +1,444 @@
+/**
+ * ReviewComposerV2 — the sheet/page shell.
+ *
+ * Live-assembling feed-card preview at the top; verdict / overall /
+ * categories / mentions-aware textarea / media tray / share toggle stack
+ * below; pinned submit bar. All writes flow through the v2 RPCs — the
+ * client never touches course_ratings, posts, notifications,
+ * user_courses, or user_top10_exclusions directly.
+ */
+
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ChevronLeft, Trash2 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { MentionsComposerInput } from '@/components/mentions/MentionsComposerInput';
+import AccessControl from '@/components/AccessControl';
+
+import { RV2 } from './tokens';
+import { useReviewComposer } from './hooks/useReviewComposer';
+import { useReviewSubmit } from './hooks/useReviewSubmit';
+import { useReviewMediaPipeline } from './hooks/useReviewMediaPipeline';
+import { LivePreviewCard } from './components/LivePreviewCard';
+import { VerdictPills } from './components/VerdictPills';
+import { OverallScrubber } from './components/OverallScrubber';
+import { CategoryGrid } from './components/CategoryGrid';
+import { MediaTray } from './components/MediaTray';
+import { ShareToggle } from './components/ShareToggle';
+import { SubmitBar } from './components/SubmitBar';
+import { SuccessScreenV2 } from './components/SuccessScreenV2';
+import { RemoveReviewSheetV2 } from './components/RemoveReviewSheetV2';
+import type { ExistingMedia, ExistingReview, ReviewV2Course } from './types';
+
+function Section({ eyebrow, children }: { eyebrow: string; children: React.ReactNode }) {
+  return (
+    <section style={{ padding: '4px 16px 4px' }}>
+      <div
+        style={{
+          fontSize: 10.5,
+          fontWeight: 700,
+          color: RV2.amber,
+          textTransform: 'uppercase',
+          letterSpacing: '0.14em',
+          marginBottom: 10,
+        }}
+      >
+        {eyebrow}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function InnerComposer() {
+  const { courseId } = useParams<{ courseId: string }>();
+  const navigate = useNavigate();
+  const { user } = useSupabaseSession();
+  const userId = user?.id ?? null;
+
+  const courseQ = useQuery({
+    queryKey: ['rv2-course', courseId],
+    enabled: !!courseId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('golf_courses')
+        .select('id, name, thumbnail_image, country, sub_country, region')
+        .eq('id', courseId!)
+        .single();
+      if (error) throw error;
+      return data as ReviewV2Course;
+    },
+  });
+
+  const existingQ = useQuery({
+    queryKey: ['rv2-existing', courseId, userId],
+    enabled: !!courseId && !!userId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('course_ratings')
+        .select('id, rating, design_score, condition_score, clubhouse_score, facilities_score, review, verdict, share_to_feed')
+        .eq('course_id', courseId!)
+        .eq('user_id', userId!)
+        .maybeSingle();
+      return (data as ExistingReview | null) ?? null;
+    },
+  });
+
+  const existingMediaQ = useQuery({
+    queryKey: ['rv2-existing-media', existingQ.data?.id],
+    enabled: !!existingQ.data?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('course_review_media')
+        .select('id, media_url, media_type, poster_url, stream_id')
+        .eq('review_id', existingQ.data!.id);
+      return (data as ExistingMedia[] | null) ?? [];
+    },
+  });
+
+  const profileQ = useQuery({
+    queryKey: ['rv2-me', userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('user_profiles')
+        .select('id, display_name, username, profile_photo_url')
+        .eq('id', userId!)
+        .maybeSingle();
+      return data;
+    },
+  });
+
+  const ready =
+    !!courseQ.data &&
+    !existingQ.isLoading &&
+    (!existingQ.data || !existingMediaQ.isLoading);
+
+  if (!ready) {
+    return (
+      <div
+        style={{
+          minHeight: '100vh',
+          background: RV2.canvas,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: RV2.muted,
+          fontSize: 13,
+        }}
+      >
+        Loading course...
+      </div>
+    );
+  }
+
+  return (
+    <Composer
+      course={courseQ.data!}
+      userId={userId}
+      existing={existingQ.data}
+      existingMedia={existingMediaQ.data ?? []}
+      author={{
+        displayName:
+          (profileQ.data as any)?.display_name ||
+          (profileQ.data as any)?.username ||
+          'You',
+        avatarUrl: (profileQ.data as any)?.profile_photo_url ?? null,
+      }}
+      onExit={() => {
+        if (window.history.state && (window.history.state as any).idx > 0) {
+          navigate(-1);
+        } else if (courseId) {
+          navigate(`/courses/${courseId}`, { replace: true });
+        } else {
+          navigate('/', { replace: true });
+        }
+      }}
+    />
+  );
+}
+
+interface ComposerProps {
+  course: ReviewV2Course;
+  userId: string | null;
+  existing: ExistingReview | null | undefined;
+  existingMedia: ExistingMedia[];
+  author: { displayName: string; avatarUrl: string | null };
+  onExit: () => void;
+}
+
+function Composer({ course, userId, existing, existingMedia, author, onExit }: ComposerProps) {
+  const isEditMode = !!existing;
+  const navigate = useNavigate();
+
+  const media = useReviewMediaPipeline({ userId, existingMedia });
+  const composer = useReviewComposer(existing, media.hasNewMedia);
+  const submit = useReviewSubmit();
+
+  const [success, setSuccess] = useState<{ ratingId: string } | null>(null);
+  const [removeOpen, setRemoveOpen] = useState(false);
+
+  const handleSubmit = useCallback(async () => {
+    try {
+      const { ratingId } = await submit.submit({
+        courseId: course.id,
+        state: composer.state,
+      });
+      // Fire uploads AFTER the RPC (media picked before submit is held locally).
+      media.flushToReview(ratingId).catch(() => { /* per-item errors surfaced in tray */ });
+      setSuccess({ ratingId });
+    } catch {
+      // hook exposed error state already
+    }
+  }, [submit, media, composer.state, course.id]);
+
+  const handleRemove = useCallback(async () => {
+    if (!existing) return;
+    try {
+      await submit.remove(existing.id);
+      // Clean up any storage assets for existing media.
+      for (const m of existingMedia) {
+        supabase.functions
+          .invoke('cleanup-review-media', {
+            body: { mediaId: m.id, streamId: m.stream_id, mediaUrl: m.media_url },
+          })
+          .catch(() => { /* noop */ });
+      }
+      setRemoveOpen(false);
+      onExit();
+    } catch {
+      // error surfaced via hook
+    }
+  }, [existing, submit, existingMedia, onExit]);
+
+  if (success) {
+    return (
+      <SuccessScreenV2
+        course={course}
+        author={author}
+        overall={composer.state.overall}
+        verdict={composer.state.verdict}
+        reviewText={composer.state.reviewText}
+        scores={composer.state.scores}
+        media={media.items}
+        onViewOnCourse={() => navigate(`/courses/${course.id}`, { replace: true })}
+        onShare={async () => {
+          try {
+            if (navigator.share) {
+              await navigator.share({
+                title: 'My review',
+                url: `${window.location.origin}/courses/${course.id}`,
+              });
+            }
+          } catch { /* dismissed */ }
+        }}
+        onDone={onExit}
+      />
+    );
+  }
+
+  return (
+    <div
+      style={{
+        minHeight: '100vh',
+        background: RV2.canvas,
+        color: RV2.ink,
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      {/* Header */}
+      <div
+        style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 5,
+          background: RV2.canvas,
+          paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            padding: '6px 12px 10px',
+          }}
+        >
+          <button
+            type="button"
+            onClick={onExit}
+            aria-label="Back"
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: 10,
+              border: 'none',
+              background: 'transparent',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+            }}
+          >
+            <ChevronLeft size={20} color={RV2.ink} />
+          </button>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 15, fontWeight: 700, color: RV2.ink, letterSpacing: '-0.01em' }}>
+              {isEditMode ? 'Edit review' : 'Write a review'}
+            </div>
+            <div
+              style={{
+                fontSize: 11.5,
+                color: RV2.secondary,
+                marginTop: 1,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {course.name}
+            </div>
+          </div>
+          {isEditMode && (
+            <button
+              type="button"
+              onClick={() => setRemoveOpen(true)}
+              aria-label="Remove review"
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 10,
+                border: 'none',
+                background: 'transparent',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                color: '#EF4444',
+              }}
+            >
+              <Trash2 size={16} />
+            </button>
+          )}
+        </div>
+        {/* Amber progress hairline */}
+        <div style={{ height: 2, background: RV2.hairline, position: 'relative' }}>
+          <div
+            style={{
+              position: 'absolute',
+              left: 0,
+              top: 0,
+              bottom: 0,
+              width: `${composer.progressPct}%`,
+              background: RV2.amber,
+              transition: 'width 200ms ease',
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Live preview */}
+      <div style={{ padding: '14px 16px 8px' }}>
+        <LivePreviewCard
+          course={course}
+          author={author}
+          overall={composer.state.overall}
+          verdict={composer.state.verdict}
+          reviewText={composer.state.reviewText}
+          scores={composer.state.scores}
+          media={media.items}
+        />
+      </div>
+
+      {/* Verdict */}
+      <Section eyebrow="Verdict">
+        <VerdictPills value={composer.state.verdict} onChange={composer.setVerdict} />
+      </Section>
+
+      {/* Overall */}
+      <Section eyebrow="Overall">
+        <div
+          style={{
+            background: '#FFFFFF',
+            border: `1px solid ${RV2.hairline}`,
+            borderRadius: RV2.panelRadius,
+            padding: '14px 16px 12px',
+          }}
+        >
+          <OverallScrubber value={composer.state.overall} onChange={composer.setOverall} />
+        </div>
+      </Section>
+
+      {/* Categories */}
+      <Section eyebrow="Category scores">
+        <CategoryGrid values={composer.state.scores} onChange={composer.setCategory} />
+      </Section>
+
+      {/* Words */}
+      <Section eyebrow="Words">
+        <div
+          style={{
+            background: '#FFFFFF',
+            border: `1px solid ${RV2.hairline}`,
+            borderRadius: RV2.panelRadius,
+            padding: '4px 12px',
+            minHeight: 96,
+          }}
+        >
+          <MentionsComposerInput
+            value={composer.state.reviewText}
+            onChange={composer.setReviewText}
+            placeholder="Best hole? Green speeds? @mention your fourball..."
+            currentUserId={userId}
+            textStyle={{ fontSize: 14, lineHeight: '20px', minHeight: 80, maxHeight: 260, padding: '10px 0', color: RV2.ink, caretColor: RV2.ink }}
+          />
+        </div>
+      </Section>
+
+      {/* Media */}
+      <Section eyebrow="Photos & video">
+        <MediaTray
+          items={media.items}
+          onPick={media.addFiles}
+          onRemove={media.removeItem}
+          pickerError={media.pickerError}
+          onClearError={media.clearPickerError}
+        />
+      </Section>
+
+      {/* Share toggle */}
+      <div style={{ padding: '10px 16px 8px' }}>
+        <ShareToggle value={composer.state.shareToFeed} onChange={composer.setShareToFeed} />
+      </div>
+
+      <div style={{ flex: 1, minHeight: 20 }} />
+
+      <SubmitBar
+        canSubmit={composer.canSubmit}
+        submitting={submit.submitting}
+        onSubmit={handleSubmit}
+        isEditMode={isEditMode}
+      />
+
+      <RemoveReviewSheetV2
+        open={removeOpen}
+        submitting={submit.submitting}
+        onCancel={() => setRemoveOpen(false)}
+        onConfirm={handleRemove}
+      />
+    </div>
+  );
+}
+
+export default function ReviewComposerV2() {
+  return (
+    <AccessControl requireAuth={true} noBlockingLoader={true}>
+      <div className="w-full md:max-w-[440px] md:mx-auto">
+        <InnerComposer />
+      </div>
+    </AccessControl>
+  );
+}
