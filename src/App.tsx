@@ -83,9 +83,8 @@ import { ReviewIslandLoader } from '@/ReviewIslandLoader';
 import { supabase } from '@/integrations/supabase/client';
 import { migrateChatHistory } from '@/utils/chatHistoryMigration';
 import { NavTimingProvider } from '@/perf/NavTimingProvider';
-import { PerfHud } from '@/perf/PerfHud';
-import { LogHud } from '@/perf/LogHud';
-import { AdminGatedPerfPill, AdminGatedBootTimelinePill } from '@/perf/AdminGatedPills';
+import { AdminGatedPerfPill, AdminGatedBootTimelinePill, AdminGatedPerfHud, AdminGatedLogHud } from '@/perf/AdminGatedPills';
+
 
 
 
