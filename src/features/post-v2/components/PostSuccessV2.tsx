@@ -129,11 +129,5 @@ const doneBtn: React.CSSProperties = {
   marginTop: 4,
 };
 
-// The controller keys jobs by jobId, but SubmitResult only carries postId.
-// We stash the jobId on the result via a WeakMap-like side channel below.
-function getJobIdFromResult(_result: SubmitResult): string | null {
-  // usePostSubmit doesn't currently expose jobId; the progress ring degrades
-  // to the indeterminate spinner when we can't find a live snapshot. The
-  // feed pending card owns the authoritative live progress after dismissal.
-  return null;
-}
+
+
