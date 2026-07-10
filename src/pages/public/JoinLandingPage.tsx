@@ -103,7 +103,7 @@ export function PublicLanding({
           maxWidth: 360,
         }}
       >
-        the social home for golf
+        the home of golf courses
       </h1>
 
       {eyebrowNote && (

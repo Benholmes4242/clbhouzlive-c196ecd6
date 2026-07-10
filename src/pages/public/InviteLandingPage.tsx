@@ -41,7 +41,7 @@ export default function InviteLandingPage() {
     <PublicLanding
       href={href}
       eyebrow="you've been invited"
-      eyebrowNote="A friend invited you to clbhouz. Connect your England Golf handicap and compare rounds."
+      eyebrowNote="A friend invited you to clbhouz. Discover courses, follow the tours, and compare rounds."
     />
   );
 }
