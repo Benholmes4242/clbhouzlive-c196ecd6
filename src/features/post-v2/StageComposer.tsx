@@ -1,19 +1,30 @@
 // StageComposer - the shell of the P2 Stage composer.
 //
+// Modes:
+//  - Create (default): fresh composer + create_post_v2 flow.
+//  - Edit (editPostId): prefill from an existing post + owner-CRUD save.
+//    Actor is display-only, schedule row shows only for status='scheduled'.
+//  - Draft restore (draftId): fetch the draft row and hydrate the composer
+//    the same way the in-composer Drafts sheet does.
+//
 // Owns: header, media stage + frame pills, media tray, caption field,
 // detail rows, and orchestrates opening / closing every sheet.
 // Delegates: state -> useStageComposer, submit -> usePostSubmit,
-// drafts -> useDrafts, orchestration -> postUploadController (module-level, survives unmount).
+// drafts -> useDrafts, uploads -> postUploadController (module-level, survives unmount).
 
-import { useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { X } from 'lucide-react';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
 
-import { useStageComposer } from './hooks/useStageComposer';
+import { useStageComposer, type StageMediaItem } from './hooks/useStageComposer';
 import { usePostSubmit, type SubmitResult } from './hooks/usePostSubmit';
 import { useDrafts } from './hooks/useDrafts';
+import { useEditablePost } from '@/hooks/useEditablePost';
+import { startPostUpload } from './lib/postUploadController';
 
 import MediaStageV2 from './components/MediaStageV2';
 import FramePills from './components/FramePills';
@@ -33,27 +44,121 @@ import BottomSheet from './components/BottomSheet';
 interface Props {
   onClose: () => void;
   onPosted?: () => void;
+  /** Edit mode: existing post id (owner-scoped). */
+  editPostId?: string | null;
+  /** Draft deep-link: hydrate the composer from this draft. */
+  draftId?: string | null;
 }
 
-export default function StageComposer({ onClose, onPosted }: Props) {
+export default function StageComposer({ onClose, onPosted, editPostId, draftId }: Props) {
   const { profile } = useProfileData();
   const { activeActor, setActiveActor } = useActiveActor();
   const composer = useStageComposer();
-  const { state, addFiles, removeAt, reorder, setActiveIndex, updateActive, setCaption, setCourse, setScheduledAt, restoreDraft, reset } = composer;
+  const { state, addFiles, removeAt, reorder, setActiveIndex, updateActive, setCaption, setCourse, setScheduledAt, restoreDraft, hydrate, reset } = composer;
   const { submit, submitting } = usePostSubmit();
   const drafts = useDrafts(profile?.id);
+  const queryClient = useQueryClient();
+
+  const isEditMode = !!editPostId;
+
+  // Edit-mode load
+  const editable = useEditablePost(editPostId ?? null);
+  const [editStatus, setEditStatus] = useState<{ status: string | null; scheduledAt: string | null } | null>(null);
+  const [hydrated, setHydrated] = useState(false);
+  const [removedExistingIds, setRemovedExistingIds] = useState<string[]>([]);
+  const [saving, setSaving] = useState(false);
+
+  // Fetch the post's status + scheduled_at (useEditablePost doesn't return them).
+  useEffect(() => {
+    if (!editPostId) return;
+    let cancelled = false;
+    supabase
+      .from('posts')
+      .select('status, scheduled_at')
+      .eq('id', editPostId)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (cancelled) return;
+        setEditStatus({
+          status: (data?.status as string | null) ?? null,
+          scheduledAt: (data?.scheduled_at as string | null) ?? null,
+        });
+      });
+    return () => { cancelled = true; };
+  }, [editPostId]);
+
+  // Prefill state once the editable post lands.
+  useEffect(() => {
+    if (!isEditMode) return;
+    if (hydrated) return;
+    const data = editable.data;
+    if (!data || !data.canManage) return;
+    const media: StageMediaItem[] = data.media.map((m) => ({
+      id: `existing-${m.id}`,
+      existingId: m.id,
+      type: m.mediaType,
+      previewUrl: m.mediaUrl,
+      frame: 'original',
+      crop: null,
+      trimStart: null,
+      trimEnd: null,
+      posterTimestamp: null,
+    }));
+    const firstCourse = data.courses[0] ?? null;
+    hydrate({
+      caption: data.caption,
+      course: firstCourse
+        ? { id: firstCourse.courseId, name: firstCourse.courseName, country: firstCourse.country }
+        : null,
+      scheduledAt: editStatus?.status === 'scheduled' && editStatus.scheduledAt
+        ? new Date(editStatus.scheduledAt)
+        : null,
+      media,
+      activeIndex: 0,
+    });
+    setHydrated(true);
+  }, [isEditMode, hydrated, editable.data, editStatus, hydrate]);
+
+  // Draft deep-link hydration.
+  useEffect(() => {
+    if (isEditMode) return;
+    if (!draftId || !profile?.id) return;
+    let cancelled = false;
+    supabase
+      .from('post_drafts')
+      .select('id, actor_type, actor_id, content, course_id, course_name, course_country')
+      .eq('id', draftId)
+      .eq('user_id', profile.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (cancelled || !data) return;
+        restoreDraft({
+          caption: (data.content as string) ?? '',
+          course: data.course_id && data.course_name
+            ? { id: data.course_id as string, name: data.course_name as string, country: (data.course_country as string) ?? null }
+            : null,
+        });
+      });
+    return () => { cancelled = true; };
+  }, [draftId, isEditMode, profile?.id, restoreDraft]);
 
   const [sheet, setSheet] = useState<null | 'course' | 'actor' | 'schedule' | 'drafts' | 'scheduled' | 'trim' | 'cover' | 'close-guard'>(null);
   const [success, setSuccess] = useState<SubmitResult | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const [scheduledCount, setScheduledCount] = useState<number>(0);
 
   const active = state.media[state.activeIndex] ?? null;
-  const canSubmit = !submitting && (state.caption.trim().length > 0 || state.media.length > 0) && !!activeActor;
 
-  const postButtonLabel = state.scheduledAt ? 'Schedule' : 'Post';
-  const postButtonStyle: React.CSSProperties = {
-    background: state.scheduledAt ? '#F7931E' : '#15171F',
-    color: state.scheduledAt ? '#15171F' : '#F5F6F7',
+  // Post button vs Save button gating.
+  const canSubmit = !submitting && !saving && (state.caption.trim().length > 0 || state.media.length > 0) && !!activeActor;
+
+  // Edit-mode: schedule row visible only for still-scheduled posts.
+  const showScheduleRow = !isEditMode || editStatus?.status === 'scheduled';
+
+  const primaryLabel = isEditMode ? 'Save changes' : (state.scheduledAt ? 'Schedule' : 'Post');
+  const primaryStyle: React.CSSProperties = {
+    background: (!isEditMode && state.scheduledAt) ? '#F7931E' : '#15171F',
+    color: (!isEditMode && state.scheduledAt) ? '#15171F' : '#F5F6F7',
     border: 0,
     borderRadius: 999,
     padding: '8px 16px',
@@ -67,7 +172,7 @@ export default function StageComposer({ onClose, onPosted }: Props) {
   const authorAvatar = activeActor?.avatarUrl ?? profile?.profile_photo_url ?? null;
   const authorUsername = activeActor?.slug ?? profile?.username ?? null;
 
-  const doSubmit = async () => {
+  const doCreate = async () => {
     if (!canSubmit || !activeActor) return;
     try {
       const res = await submit({
@@ -88,8 +193,115 @@ export default function StageComposer({ onClose, onPosted }: Props) {
     }
   };
 
+  const doSaveEdit = useCallback(async () => {
+    if (!editPostId || !editable.data) return;
+    if (saving) return;
+    setSaving(true);
+    try {
+      const patch: Record<string, unknown> = {
+        content: state.caption?.length ? state.caption : null,
+        course_id: state.course?.id ?? null,
+      };
+      // Only touch scheduled_at when the post is still scheduled.
+      if (editStatus?.status === 'scheduled') {
+        patch.scheduled_at = state.scheduledAt ? state.scheduledAt.toISOString() : null;
+      }
+      const { error: upErr } = await supabase.from('posts').update(patch as never).eq('id', editPostId);
+      if (upErr) throw upErr;
+
+      // Sync the single-course junction row to the primary course (best-effort;
+      // full multi-course junction editing stays with useUpdatePost).
+      await supabase.from('post_courses').delete().eq('post_id', editPostId);
+      if (state.course?.id) {
+        await supabase.from('post_courses').insert({
+          post_id: editPostId,
+          course_id: state.course.id,
+          display_order: 0,
+        } as never);
+      }
+
+      // Removed media rows: snapshot for cleanup, then delete.
+      if (removedExistingIds.length > 0) {
+        const { data: rows } = await supabase
+          .from('post_media')
+          .select('id, media_url, media_type, stream_id')
+          .in('id', removedExistingIds);
+        const snapshot = (rows ?? []).map((r: any) => ({
+          id: r.id,
+          media_url: r.media_url,
+          media_type: (r.media_type === 'video' ? 'video' : 'image') as 'image' | 'video',
+          stream_id: r.stream_id ?? null,
+        }));
+        const { error: delErr } = await supabase
+          .from('post_media')
+          .delete()
+          .in('id', removedExistingIds);
+        if (delErr) throw delErr;
+        if (snapshot.length > 0) {
+          supabase.functions
+            .invoke('cleanup-review-media', { body: { mediaItems: snapshot } })
+            .catch((err) => console.warn('[post-v2] media cleanup failed:', err));
+        }
+      }
+
+      // Reorder kept existing media by their new position.
+      const kept = state.media.filter((m) => m.existingId);
+      for (let i = 0; i < kept.length; i++) {
+        const m = kept[i];
+        if (!m.existingId) continue;
+        await supabase.from('post_media').update({ display_order: i } as never).eq('id', m.existingId);
+      }
+
+      // New media additions: hand to the controller against the existing post.
+      const newMedia = state.media.filter((m) => !m.existingId && m.file);
+      if (newMedia.length > 0) {
+        startPostUpload(
+          {
+            jobId: crypto.randomUUID(),
+            postId: editPostId,
+            userId: editable.data.userId,
+            actorType: editable.data.actorType,
+            actorId: editable.data.actorId,
+            isScheduled: editStatus?.status === 'scheduled',
+            scheduledAt: state.scheduledAt?.toISOString(),
+            skipFinalize: true,
+            displayOrderOffset: kept.length,
+          },
+          newMedia,
+        );
+      }
+
+      // Invalidate common caches.
+      queryClient.invalidateQueries({ queryKey: ['editable-post', editPostId] });
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      queryClient.invalidateQueries({ queryKey: ['feed'] });
+      queryClient.invalidateQueries({ queryKey: ['post', editPostId] });
+      window.dispatchEvent(new CustomEvent('postUpdated', { detail: { postId: editPostId } }));
+
+      setSaveSuccess(true);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Couldn't save changes");
+    } finally {
+      setSaving(false);
+    }
+  }, [editPostId, editable.data, state, saving, editStatus, removedExistingIds, queryClient]);
+
+  const onPrimary = () => {
+    if (isEditMode) return void doSaveEdit();
+    return void doCreate();
+  };
+
+  // Removal wrapper: track existing-id removals for the save phase.
+  const handleRemoveAt = useCallback((idx: number) => {
+    const item = state.media[idx];
+    if (item?.existingId) {
+      setRemovedExistingIds((ids) => (ids.includes(item.existingId!) ? ids : [...ids, item.existingId!]));
+    }
+    removeAt(idx);
+  }, [state.media, removeAt]);
+
   const handleClose = () => {
-    if (state.dirty) {
+    if (state.dirty && !isEditMode) {
       setSheet('close-guard');
       return;
     }
@@ -111,6 +323,17 @@ export default function StageComposer({ onClose, onPosted }: Props) {
     onClose();
   };
 
+  if (saveSuccess) {
+    return (
+      <div style={{ position: 'fixed', inset: 0, background: '#F8FAFC', display: 'flex', flexDirection: 'column', zIndex: 12000 }}>
+        <PostSuccessV2
+          result={{ kind: 'published', postId: editPostId ?? '' }}
+          onDone={() => { setSaveSuccess(false); onPosted?.(); onClose(); }}
+        />
+      </div>
+    );
+  }
+
   if (success) {
     return (
       <div style={{ position: 'fixed', inset: 0, background: '#F8FAFC', display: 'flex', flexDirection: 'column', zIndex: 12000 }}>
@@ -127,6 +350,21 @@ export default function StageComposer({ onClose, onPosted }: Props) {
     e.target.value = '';
   };
 
+  // Ownership guard: if edit target isn't manageable, close out.
+  if (isEditMode && editable.data && !editable.data.canManage) {
+    return (
+      <div style={{ position: 'fixed', inset: 0, background: '#F8FAFC', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 12000, padding: 24, gap: 12 }}>
+        <div style={{ fontSize: 16, fontWeight: 600, color: '#1F2428' }}>Can't edit this post</div>
+        <div style={{ fontSize: 13, color: '#5A6270', textAlign: 'center' }}>
+          {editable.data.blockedReason === 'review-derived'
+            ? 'Review posts are edited from the course page.'
+            : "You don't have permission to edit this post."}
+        </div>
+        <button onClick={onClose} style={{ background: '#15171F', color: '#F5F6F7', border: 0, borderRadius: 999, padding: '10px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Close</button>
+      </div>
+    );
+  }
+
   return (
     <div style={{ position: 'fixed', inset: 0, background: '#F8FAFC', display: 'flex', flexDirection: 'column', zIndex: 12000 }}>
       {/* Header */}
@@ -134,13 +372,15 @@ export default function StageComposer({ onClose, onPosted }: Props) {
         <button onClick={handleClose} aria-label="Close" style={{ background: 'transparent', border: 0, color: '#1F2428', cursor: 'pointer', padding: 8 }}>
           <X size={22} />
         </button>
-        {drafts.drafts.length > 0 && (
+        {isEditMode ? (
+          <div style={{ fontSize: 14, fontWeight: 600, color: '#1F2428' }}>Edit post</div>
+        ) : drafts.drafts.length > 0 && (
           <button onClick={() => setSheet('drafts')} style={{ background: 'transparent', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 999, padding: '4px 10px', fontSize: 12, color: '#1F2428', cursor: 'pointer' }}>
             Drafts - {drafts.drafts.length}
           </button>
         )}
         <div style={{ flex: 1 }} />
-        <button onClick={doSubmit} disabled={!canSubmit} style={postButtonStyle}>{postButtonLabel}</button>
+        <button onClick={onPrimary} disabled={!canSubmit} style={primaryStyle}>{primaryLabel}</button>
       </div>
 
       <input ref={stageAddInputRef} type="file" accept="image/*,video/*" multiple hidden onChange={handleStageAddFiles} />
@@ -156,7 +396,7 @@ export default function StageComposer({ onClose, onPosted }: Props) {
           onOpenCover={() => setSheet('cover')}
           onRequestAdd={handleStageAdd}
         />
-        {active && (
+        {active && !active.existingId && (
           <FramePills value={active.frame} onChange={(f) => updateActive({ frame: f })} />
         )}
       </div>
@@ -166,7 +406,7 @@ export default function StageComposer({ onClose, onPosted }: Props) {
         media={state.media}
         activeIndex={state.activeIndex}
         onSelect={setActiveIndex}
-        onRemove={removeAt}
+        onRemove={handleRemoveAt}
         onReorder={reorder}
         onAddFiles={addFiles}
       />
@@ -182,6 +422,8 @@ export default function StageComposer({ onClose, onPosted }: Props) {
         onOpenActor={() => setSheet('actor')}
         scheduledAt={state.scheduledAt}
         onOpenSchedule={() => setSheet('schedule')}
+        actorLocked={isEditMode}
+        showSchedule={showScheduleRow}
       />
 
       {/* Sheets */}
