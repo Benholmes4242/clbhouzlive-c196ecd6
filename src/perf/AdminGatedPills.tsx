@@ -24,3 +24,18 @@ export function AdminGatedBootTimelinePill() {
   if (loading || role !== 'full' || !visible) return null;
   return <BootTimelineToggleButton />;
 }
+
+export function AdminGatedPerfHud() {
+  const { role, loading } = usePanelRole();
+  const [visible] = useAdminPillVisibility();
+  if (loading || role !== 'full' || !visible) return null;
+  return <PerfHud />;
+}
+
+export function AdminGatedLogHud() {
+  const { role, loading } = usePanelRole();
+  const [visible] = useAdminPillVisibility();
+  if (loading || role !== 'full' || !visible) return null;
+  return <LogHud />;
+}
+
