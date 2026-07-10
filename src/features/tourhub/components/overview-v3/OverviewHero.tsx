@@ -108,7 +108,8 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
 
   return (
     <div style={{ position: 'relative', width: '100%' }} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
-      <div style={{ position: 'absolute', top: 'calc(env(safe-area-inset-top) + 8px)', right: 14, zIndex: 65 }}>
+      <div style={{ position: 'absolute', top: 'calc(env(safe-area-inset-top) + 8px)', right: 14, zIndex: 65, display: 'flex', alignItems: 'center', gap: 8 }}>
+        <HandicapChip pill />
         <TourSwitcherAffordance variant="glass" />
       </div>
       <AnimatePresence mode="wait">
