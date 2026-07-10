@@ -37,6 +37,8 @@ import type { BorrowDescriptor } from '@/store/fullscreenFeedStore';
 import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
 import { resolveRestingRect, getCurrentViewport } from '@/lib/media/resolveRestingRect';
 import { FS_TRANSITION_MODE, FS_CUT_FADE_MS } from '@/lib/media/transitionMode';
+import { FS_OVERLAY_Z } from '@/lib/zLayers';
+
 
 const fsTimeStart = (_label: string) => {};
 const fsTimeEnd = (_label: string, _note?: string) => {};
@@ -719,7 +721,9 @@ export function FullscreenFeedOverlay() {
             }}
 
             data-vperf="fs-overlay"
-            className="fixed inset-0 z-[200] flex flex-col"
+            className="fixed inset-0 flex flex-col"
+            style={{ zIndex: FS_OVERLAY_Z }}
+
           >
             {/* Black wash — solid canvas that fades OUT during the symmetric
                 close motion so the underlying page (with the origin tile) is

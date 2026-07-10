@@ -1,40 +1,31 @@
 /**
- * ReviewBottomSheet — Calm dark sheet.
+ * ReviewBottomSheet — Glass bottom sheet (rebuild).
  *
- * Three-zone layout:
- *   - Pinned header: drag handle + REVIEW eyebrow + Geist headline + location + 50px score | 2×2 labelled breakdown
- *   - Scrollable middle: plain Geist paragraphs (no drop cap, no watermark)
- *   - Pinned footer: author card + Visit Profile + Full Review CTAs
+ * Single overlay used from both entry points:
+ *   1. Clubhouse "Read review" card CTA
+ *   2. Fullscreen viewer "read review ›" chrome
+ * Both open through useReviewSheetStore + ReviewBottomSheetPortal.
  *
- * Driven by the unified store via ReviewBottomSheetPortal.
+ * Stacking is centralized in @/lib/zLayers so this sheet always renders
+ * above FullscreenFeedOverlay (see REVIEW_SHEET_Z > FS_OVERLAY_Z).
+ *
+ * One blur surface only (the panel). Scrim is a plain rgba dim.
  */
 
 import React, { useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { UserCheck, ChevronRight } from 'lucide-react';
-import { toast } from 'sonner';
-import { SquircleAvatar, LIGHT_HAIRLINE} from '@/components/ui/SquircleAvatar';
-import {
-  FROST,
-  formatFrostRating,
-  splitCourseName,
-} from '@/lib/frostPanel';
-import { HERO_NUMBER_STYLE, ratingTextColor } from '@/lib/ratingTier';
-import { useViewportWidth, COMPACT_VIEWPORT_MAX } from '@/hooks/useViewportWidth';
+import { MapPin } from 'lucide-react';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { formatFrostRating } from '@/lib/frostPanel';
 import { useReviewerStats } from '@/hooks/useReviewerStats';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useFollowState } from '@/hooks/useFollowState';
-import { useToggleFollow } from '@/hooks/useToggleFollow';
-import { useActiveActor } from '@/context/ActiveActorContext';
 import { MentionText } from '@/components/mentions/MentionText';
+import { REVIEW_SHEET_Z } from '@/lib/zLayers';
 
-const FONTS = {
-  geist: "'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
-  serifDisplay: "'Playfair Display', Georgia, 'Times New Roman', serif",
-  serifSystem: "Georgia, 'Times New Roman', serif",
-};
+const AMBER = '#F7931E';
+const FONT_GEIST =
+  "'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif";
 
 export interface ReviewBottomSheetProps {
   isOpen: boolean;
@@ -53,7 +44,6 @@ export interface ReviewBottomSheetProps {
   courseRegion?: string | null;
   courseSubCountry?: string | null;
   reviewText?: string | null;
-
   breakdown?: {
     design?: number | null;
     conditions?: number | null;
@@ -65,6 +55,7 @@ export interface ReviewBottomSheetProps {
     averageRating?: number | null;
     memberSince?: string | null;
   } | null;
+  reviewDate?: string | null;
   courseSubtitle?: string | null;
 }
 
@@ -76,17 +67,28 @@ const BREAKDOWN_LABELS: Record<typeof BREAKDOWN_KEYS[number], string> = {
   facilities: 'FACILITIES',
 };
 
-const SR_ONLY: React.CSSProperties = {
-  position: 'absolute',
-  width: 1,
-  height: 1,
-  padding: 0,
-  margin: -1,
-  overflow: 'hidden',
-  clip: 'rect(0,0,0,0)',
-  whiteSpace: 'nowrap',
-  border: 0,
-};
+function relativeMonths(iso?: string | null): string | null {
+  if (!iso) return null;
+  const then = new Date(iso).getTime();
+  if (!Number.isFinite(then)) return null;
+  const diff = Date.now() - then;
+  const day = 24 * 60 * 60 * 1000;
+  const d = Math.floor(diff / day);
+  if (d < 1) return 'today';
+  if (d < 7) return `${d}d`;
+  if (d < 30) return `${Math.floor(d / 7)}w`;
+  if (d < 365) return `${Math.floor(d / 30)}mo`;
+  return `${Math.floor(d / 365)}y`;
+}
+
+function formatMonthLabel(iso?: string | null): string {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  return d
+    .toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+    .toUpperCase();
+}
 
 export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   isOpen,
@@ -102,67 +104,18 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   reviewText,
   breakdown,
   reviewerStats,
-  courseSubtitle,
+  reviewDate,
 }) => {
   const navigate = useNavigate();
-  const viewportWidth = useViewportWidth();
-  const isCompact = viewportWidth < COMPACT_VIEWPORT_MAX;
 
-  // Live reviewer stats — falls back to the snapshot from the payload while loading.
-  // Same React Query key dedupes with any earlier fetch (e.g. tile mount).
-  const { data: liveStats, isLoading: statsLoading } = useReviewerStats(user?.id);
+  // Live reviewer stats (React Query dedupes with earlier fetches).
+  const { data: liveStats } = useReviewerStats(user?.id);
   const effectiveStats = liveStats ?? reviewerStats ?? null;
 
-  // ─── Follow wiring (Phase 2: actor-aware viewer) ────────────────
-  const { user: viewer } = useSupabaseSession();
-  const { activeActor } = useActiveActor();
-  const viewerActorType: 'personal' | 'business' = activeActor?.type ?? 'personal';
-  const viewerActorId = activeActor?.id ?? viewer?.id;
-  const isOwnReview =
-    !!viewer?.id &&
-    viewerActorType === 'personal' &&
-    viewer.id === user.id;
-  const followEnabled = !isOwnReview && user.id !== 'preview' && !!viewerActorId;
-
-  const { isFollowing: cachedFollowing } = useFollowState({
-    targetActorType: 'personal',
-    targetActorId: followEnabled ? user.id : undefined,
-    viewerActorType,
-    viewerActorId: followEnabled ? viewerActorId : undefined,
-  });
-
-  const isFollowing = cachedFollowing ?? false;
-
-  const toggleFollow = useToggleFollow();
-
-  const handleToggleFollow = useCallback(
-    (e: React.MouseEvent) => {
-      e.stopPropagation();
-      if (isOwnReview || user.id === 'preview') return;
-      if (!viewer?.id || !viewerActorId) {
-        toast.error('Please sign in to follow users');
-        return;
-      }
-      if (toggleFollow.isPending) return;
-
-      toggleFollow.mutate({
-        targetActorType: 'personal',
-        targetActorId: user.id,
-        targetUserId: user.id,
-        viewerActorType,
-        viewerActorId,
-        viewerUserId: viewer.id,
-        isFollowing,
-      });
-    },
-    [isFollowing, isOwnReview, user.id, viewer?.id, toggleFollow, viewerActorType, viewerActorId],
-  );
-
-  // ─── Drag scoping ─────────────────────────────────────────────
-  // Scope drag to header only so the scrollable middle scrolls without dismissing.
+  // Scope drag to header only so the middle scrolls without dismissing.
   const dragControls = useDragControls();
 
-  const handleVisitProfile = useCallback(() => {
+  const handleGoToProfile = useCallback(() => {
     if (!user.id) return;
     onClose();
     const handle = user.username || user.id;
@@ -178,14 +131,9 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
     navigate(url);
   }, [courseId, reviewId, navigate, onClose]);
 
-  const reviewDateLabel = useMemo(() => {
-    // Format as "Apr 2026". reviewDate isn't on payload yet; derive from memberSince fallback or omit.
-    // Per brief: if missing, render just "REVIEW ────" with no date.
-    return '';
-  }, []);
-
-  const locationParts = [courseSubCountry || courseRegion, courseCountry].filter(Boolean);
-  const locationStr = locationParts.join(', ');
+  const locationStr = [courseSubCountry || courseRegion, courseCountry]
+    .filter(Boolean)
+    .join(', ');
 
   const initials = useMemo(
     () =>
@@ -199,41 +147,27 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   );
 
   const formattedRating = formatFrostRating(rating);
-
-  const { name: titleName, subtitle: derivedSubtitle } = useMemo(
-    () => (courseSubtitle ? { name: courseName, subtitle: courseSubtitle } : splitCourseName(courseName)),
-    [courseName, courseSubtitle],
-  );
+  const monthLabel = formatMonthLabel(reviewDate ?? null);
 
   const breakdownEntries = useMemo(() => {
     if (!breakdown) return [];
     return BREAKDOWN_KEYS.flatMap((k) => {
       const v = breakdown[k];
-      return v == null || Number.isNaN(v) ? [] : [{ key: k, label: BREAKDOWN_LABELS[k], value: v }];
+      return v == null || Number.isNaN(v)
+        ? []
+        : [{ key: k, label: BREAKDOWN_LABELS[k], value: v }];
     });
   }, [breakdown]);
 
-  // Stats sub-line — render only segments present (uses live → snapshot fallback)
-  const statsSubLine = useMemo(() => {
-    if (!effectiveStats) return '';
-    const segs: string[] = [];
-    if (effectiveStats.coursesRated != null) {
-      const noun = effectiveStats.coursesRated === 1 ? 'course' : 'courses';
-      segs.push(`${effectiveStats.coursesRated} ${noun}`);
-    }
-    if (
-      effectiveStats.averageRating != null &&
-      (effectiveStats.coursesRated ?? 0) >= 3
-    ) {
-      segs.push(`Avg ${effectiveStats.averageRating.toFixed(1)}`);
-    }
-    if (effectiveStats.memberSince) {
-      segs.push(`Reviewing since ${effectiveStats.memberSince}`);
-    }
-    return segs.join(' · ');
-  }, [effectiveStats]);
+  const relMonths = relativeMonths(reviewDate ?? effectiveStats?.memberSince ?? null);
+  const handicapSeg =
+    (effectiveStats as any)?.handicap != null
+      ? `handicap ${(effectiveStats as any).handicap}`
+      : effectiveStats?.averageRating != null && (effectiveStats?.coursesRated ?? 0) >= 3
+      ? `avg ${effectiveStats.averageRating.toFixed(1)}`
+      : null;
+  const metaSeg = [relMonths, handicapSeg].filter(Boolean).join(' · ');
 
-  // Split review into paragraphs on double-newline
   const paragraphs = useMemo(() => {
     if (!reviewText) return [];
     return reviewText.split(/\n\n+/).map((p) => p.trim()).filter(Boolean);
@@ -243,9 +177,9 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
+          {/* Scrim — plain dim, no blur (single blur surface = panel only). */}
           <motion.div
-            key="review-backdrop"
+            key="review-scrim"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -254,16 +188,14 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
             style={{
               position: 'fixed',
               inset: 0,
-              zIndex: 100,
-              background: 'rgba(0, 0, 0, 0.65)',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
+              zIndex: REVIEW_SHEET_Z,
+              background: 'rgba(0,0,0,0.35)',
             }}
           />
 
-          {/* Sheet */}
+          {/* Panel — the one blur surface. */}
           <motion.div
-            key="review-sheet"
+            key="review-panel"
             role="dialog"
             aria-modal="true"
             aria-labelledby="review-sheet-title"
@@ -273,9 +205,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
             dragConstraints={{ top: 0 }}
             dragElastic={{ top: 0, bottom: 0.3 }}
             onDragEnd={(_, info) => {
-              if (info.velocity.y > 300 || info.offset.y > 120) {
-                onClose();
-              }
+              if (info.velocity.y > 300 || info.offset.y > 120) onClose();
             }}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
@@ -285,222 +215,209 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               position: 'fixed',
               insetInline: 0,
               bottom: 0,
-              zIndex: 101,
+              zIndex: REVIEW_SHEET_Z + 1,
               width: '100%',
-              maxHeight: '85dvh',
+              height: '72dvh',
               display: 'flex',
               flexDirection: 'column',
               overflow: 'hidden',
-              borderRadius: '28px 28px 0 0',
-              background: '#0F1419',
-              border: '1px solid rgba(255,255,255,0.07)',
-              borderBottom: 'none',
-              color: FROST.ink,
-              boxShadow: '0 -20px 60px rgba(0,0,0,0.5)',
+              borderRadius: '18px 18px 0 0',
+              background: 'rgba(24,28,24,0.62)',
+              backdropFilter: 'blur(14px)',
+              WebkitBackdropFilter: 'blur(14px)',
+              borderTop: '1px solid rgba(255,255,255,0.18)',
+              color: '#F8FAFC',
+              fontFamily: FONT_GEIST,
               transform: 'translateZ(0)',
-              fontFamily: FONTS.geist,
             }}
           >
-            {/* Sheet title id is set on the h1 inside the header */}
-
             {/* ─── PINNED HEADER ─────────────────────────────── */}
             <div
               onPointerDown={(e) => dragControls.start(e)}
               style={{
                 flex: '0 0 auto',
-                padding: '0 22px 18px',
+                padding: '0 18px 14px',
                 position: 'relative',
-                zIndex: 1,
                 touchAction: 'none',
               }}
             >
               {/* Drag handle */}
-              <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 10, paddingBottom: 4 }}>
+              <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8, paddingBottom: 10 }}>
                 <div
                   style={{
-                    width: 44,
+                    width: 32,
                     height: 4,
                     borderRadius: 2,
-                    background: 'rgba(255,255,255,0.30)',
+                    background: 'rgba(255,255,255,0.35)',
                   }}
                 />
               </div>
 
-              {/* Eyebrow — "REVIEW · APR 2026 ────" */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12 }}>
-                <span
-                  style={{
-                    fontFamily: FONTS.geist,
-                    fontSize: 11,
-                    fontWeight: 700,
-                    letterSpacing: '0.14em',
-                    textTransform: 'uppercase',
-                    color: FROST.amberSoft,
-                    flexShrink: 0,
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  Review{reviewDateLabel ? <><span style={{ padding: '0 6px', color: FROST.inkFaint }}>·</span>{reviewDateLabel}</> : null}
-                </span>
-                <div
-                  aria-hidden
-                  style={{
-                    flex: 1,
-                    height: 1,
-                    background: 'rgba(255,255,255,0.07)',
-                  }}
-                />
-              </div>
-
-              {/* Title — Geist headline */}
-              <h1
-                id="review-sheet-title"
-                style={{
-                  fontFamily: FONTS.geist,
-                  fontSize: isCompact ? 24 : 26,
-                  fontWeight: 800,
-                  letterSpacing: '-0.6px',
-                  lineHeight: 1.1,
-                  color: FROST.ink,
-                  wordBreak: 'break-word',
-                  marginTop: 10,
-                  marginBottom: 0,
-                }}
-              >
-                {titleName}
-                {derivedSubtitle && (
-                  <>
-                    <span
-                      style={{
-                        color: FROST.inkMute,
-                        fontWeight: 500,
-                      }}
-                    >
-                      {' — '}{derivedSubtitle}
-                    </span>
-                  </>
-                )}
-              </h1>
-              {locationStr ? (
-                <div
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 500,
-                    color: FROST.inkMuter,
-                    letterSpacing: '0.2px',
-                    marginTop: 6,
-                  }}
-                >
-                  {locationStr}
-                </div>
-              ) : null}
-
-              {/* Score + 2×2 breakdown side-by-side */}
-              <div
-                style={{
-                  marginTop: 16,
-                  paddingTop: 14,
-                  borderTop: `1px solid ${FROST.borderSoft}`,
-                }}
-              >
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: isCompact ? 'column' : 'row',
-                    alignItems: 'flex-start',
-                    gap: isCompact ? 14 : 20,
-                  }}
-                >
-                  {/* Score on left — 50px */}
+              {/* Top row: eyebrow + course info (left) | score (right) */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  {/* Amber eyebrow */}
                   <div
                     style={{
+                      fontSize: 9,
+                      fontWeight: 700,
+                      letterSpacing: '0.14em',
+                      color: AMBER,
+                      textTransform: 'uppercase',
                       display: 'flex',
-                      alignItems: 'flex-end',
-                      flexShrink: 0,
+                      alignItems: 'center',
+                      gap: 6,
                     }}
                   >
-                    <span
-                      style={{
-                        ...HERO_NUMBER_STYLE,
-                        color: ratingTextColor(rating),
-                        fontSize: 50,
-                        lineHeight: 1,
-                      }}
-                    >
-                      {formattedRating}
-                    </span>
-                    <span
-                      style={{
-                        fontSize: 14,
-                        color: FROST.inkFaint,
-                        fontWeight: 500,
-                        marginLeft: 4,
-                        marginBottom: 4,
-                        letterSpacing: '-0.3px',
-                      }}
-                    >
-                      /10
-                    </span>
+                    <span>REVIEW</span>
+                    {monthLabel ? (
+                      <>
+                        <span style={{ opacity: 0.5 }}>·</span>
+                        <span>{monthLabel}</span>
+                      </>
+                    ) : (
+                      <span aria-hidden style={{ opacity: 0.5, letterSpacing: '-0.02em' }}>
+                        ────
+                      </span>
+                    )}
                   </div>
 
-                  {/* 2×2 breakdown on right — FULL labels */}
-                  {breakdownEntries.length > 0 && (
+                  {/* Course name */}
+                  <h1
+                    id="review-sheet-title"
+                    style={{
+                      margin: '4px 0 0',
+                      fontSize: 15,
+                      fontWeight: 500,
+                      lineHeight: 1.2,
+                      color: '#F8FAFC',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {courseName}
+                  </h1>
+
+                  {/* Location */}
+                  {locationStr && (
                     <div
                       style={{
-                        flex: isCompact ? 'none' : 1,
-                        width: isCompact ? '100%' : 'auto',
-                        minWidth: 0,
-                        display: 'grid',
-                        gridTemplateColumns: '1fr 1fr',
-                        columnGap: 16,
-                        rowGap: 8,
-                        alignSelf: isCompact ? 'stretch' : 'center',
+                        marginTop: 3,
+                        fontSize: 9,
+                        color: '#F8FAFC',
+                        opacity: 0.7,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 3,
                       }}
                     >
-                      {breakdownEntries.map(({ key, label, value }) => (
-                        <div
-                          key={key}
-                          style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'baseline',
-                            gap: 6,
-                            minWidth: 0,
-                          }}
-                        >
-                          <span
-                            style={{
-                              fontSize: 10,
-                              fontWeight: 700,
-                              letterSpacing: '0.8px',
-                              textTransform: 'uppercase',
-                              color: FROST.inkMuter,
-                              whiteSpace: 'nowrap',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                            }}
-                          >
-                            {label}
-                          </span>
-                          <span
-                            style={{
-                              fontSize: 13,
-                              ...HERO_NUMBER_STYLE,
-                              color: ratingTextColor(value),
-                              flexShrink: 0,
-                            }}
-                          >
-                            {value.toFixed(1)}
-                          </span>
-                        </div>
-                      ))}
+                      <MapPin size={9} strokeWidth={2} />
+                      <span
+                        style={{
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
+                        {locationStr}
+                      </span>
                     </div>
                   )}
                 </div>
+
+                {/* Score — large + light */}
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'baseline',
+                    flexShrink: 0,
+                    fontVariantNumeric: 'tabular-nums',
+                    fontFeatureSettings: '"kern" 1, "liga" 1',
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 30,
+                      fontWeight: 200,
+                      lineHeight: 1,
+                      color: '#F8FAFC',
+                      letterSpacing: '-0.02em',
+                    }}
+                  >
+                    {formattedRating}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 300,
+                      color: '#F8FAFC',
+                      opacity: 0.5,
+                      marginLeft: 2,
+                    }}
+                  >
+                    /10
+                  </span>
+                </div>
               </div>
+
+              {/* 2×2 breakdown grid */}
+              {breakdownEntries.length > 0 && (
+                <div
+                  style={{
+                    marginTop: 12,
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: 6,
+                  }}
+                >
+                  {breakdownEntries.map(({ key, label, value }) => (
+                    <div
+                      key={key}
+                      style={{
+                        background: 'rgba(255,255,255,0.08)',
+                        borderRadius: 8,
+                        padding: '6px 9px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: 6,
+                        minWidth: 0,
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: 7,
+                          fontWeight: 600,
+                          letterSpacing: '0.08em',
+                          color: '#F8FAFC',
+                          opacity: 0.6,
+                          textTransform: 'uppercase',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
+                        {label}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: 11,
+                          fontWeight: 500,
+                          color: '#F8FAFC',
+                          fontVariantNumeric: 'tabular-nums',
+                          flexShrink: 0,
+                        }}
+                      >
+                        {value.toFixed(1)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
-            {/* ─── SCROLLABLE MIDDLE (review body) ──── */}
+            {/* ─── SCROLL REGION ──────────────────────────────── */}
             <div
               style={{
                 flex: '1 1 auto',
@@ -508,67 +425,60 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 overflowX: 'hidden',
                 overscrollBehavior: 'contain',
                 WebkitOverflowScrolling: 'touch',
-                padding: '20px 22px 20px',
+                padding: '4px 18px 16px',
                 minHeight: 0,
-                position: 'relative',
-                zIndex: 1,
               }}
             >
-              {paragraphs.length === 0 && (
+              {paragraphs.length === 0 ? (
                 <div
                   style={{
-                    fontFamily: FONTS.geist,
-                    fontSize: 14,
-                    color: FROST.inkFaint,
-                    padding: '12px 0',
+                    fontSize: 10,
+                    lineHeight: 1.5,
+                    color: '#F8FAFC',
+                    opacity: 0.6,
+                    padding: '6px 0',
                   }}
                 >
                   No written review — the score speaks for itself.
                 </div>
+              ) : (
+                paragraphs.map((para, i) => (
+                  <MentionText
+                    key={i}
+                    as="p"
+                    text={para}
+                    style={{
+                      fontSize: 10,
+                      lineHeight: 1.5,
+                      color: '#F8FAFC',
+                      opacity: 0.85,
+                      margin: 0,
+                      marginBottom: i === paragraphs.length - 1 ? 0 : 12,
+                    }}
+                  />
+                ))
               )}
-              {paragraphs.map((para, i) => (
-                <MentionText
-                  key={i}
-                  as="p"
-                  text={para}
-                  style={{
-                    fontFamily: FONTS.geist,
-                    fontSize: 15,
-                    lineHeight: 1.6,
-                    color: FROST.inkSoft,
-                    letterSpacing: '-0.1px',
-                    margin: 0,
-                    marginBottom: i === paragraphs.length - 1 ? 0 : 14,
-                  }}
-                />
-              ))}
             </div>
 
             {/* ─── PINNED FOOTER ─────────────────────────────── */}
             <div
               style={{
                 flex: '0 0 auto',
-                padding: '14px 22px 20px',
-                background: '#0F1419',
-                borderTop: '1px solid rgba(255,255,255,0.07)',
-                position: 'relative',
-                zIndex: 1,
+                padding: '10px 18px calc(env(safe-area-inset-bottom, 0px) + 14px)',
+                borderTop: '1px solid rgba(255,255,255,0.12)',
               }}
             >
-              {/* Author card */}
+              {/* Reviewer row */}
               <div
                 style={{
-                  padding: 14,
-                  borderRadius: 16,
-                  background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.07)',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 12,
+                  gap: 10,
+                  marginBottom: 10,
                 }}
               >
                 <SquircleAvatar
-                  size={42}
+                  size={28}
                   src={user.avatar}
                   alt={user.name}
                   fallback={initials}
@@ -578,10 +488,9 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div
                     style={{
-                      fontSize: 15,
-                      fontWeight: 700,
-                      letterSpacing: '-0.2px',
-                      color: FROST.ink,
+                      fontSize: 11,
+                      fontWeight: 500,
+                      color: '#F8FAFC',
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
@@ -589,114 +498,66 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   >
                     {user.name}
                   </div>
-                  {statsSubLine ? (
+                  {metaSeg && (
                     <div
                       style={{
-                        marginTop: 2,
-                        fontSize: 12,
-                        color: FROST.inkMuter,
-                        fontVariantNumeric: 'tabular-nums',
+                        marginTop: 1,
+                        fontSize: 8,
+                        color: '#F8FAFC',
+                        opacity: 0.6,
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                       }}
                     >
-                      {statsSubLine}
+                      {metaSeg}
                     </div>
-                  ) : statsLoading ? (
-                    /* Stats sub-line shimmer placeholder while live query resolves */
-                    <div
-                      className="clb-shimmer-dark"
-                      aria-hidden
-                      style={{
-                        marginTop: 6,
-                        width: 140,
-                        height: 10,
-                        borderRadius: 4,
-                        background: 'rgba(255,255,255,0.06)',
-                        overflow: 'hidden',
-                      }}
-                    />
-                  ) : null}
+                  )}
                 </div>
-                {!isOwnReview && user.id !== 'preview' && (
-                  <button
-                    type="button"
-                    onClick={handleToggleFollow}
-                    disabled={toggleFollow.isPending}
-                    aria-label={isFollowing ? `Unfollow ${user.name}` : `Follow ${user.name}`}
-                    aria-pressed={isFollowing}
-                    style={{
-                      padding: '6px 14px',
-                      borderRadius: 99,
-                      background: isFollowing
-                        ? 'rgba(255,255,255,0.04)'
-                        : 'rgba(255,255,255,0.10)',
-                      border: `1px solid ${isFollowing ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.15)'}`,
-                      color: isFollowing ? FROST.inkMute : FROST.ink,
-                      fontSize: 12,
-                      fontWeight: 600,
-                      cursor: toggleFollow.isPending ? 'default' : 'pointer',
-                      opacity: toggleFollow.isPending ? 0.6 : 1,
-                      fontFamily: 'inherit',
-                      flexShrink: 0,
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 5,
-                      transition: 'background 150ms ease, color 150ms ease, border-color 150ms ease',
-                    }}
-                  >
-                    {isFollowing && <UserCheck size={12} strokeWidth={2.5} />}
-                    {isFollowing ? 'Following' : 'Follow'}
-                  </button>
-                )}
               </div>
 
-              {/* CTAs — Visit Profile + Full Review */}
-              <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
+              {/* Two buttons */}
+              <div style={{ display: 'flex', gap: 8 }}>
                 <button
                   type="button"
-                  onClick={handleVisitProfile}
+                  onClick={handleGoToReview}
+                  disabled={!courseId}
                   style={{
                     flex: 1,
-                    padding: 14,
-                    borderRadius: 14,
-                    background: 'rgba(255,255,255,0.08)',
-                    border: '1px solid rgba(255,255,255,0.15)',
-                    color: FROST.ink,
-                    fontSize: 14,
+                    padding: '11px 12px',
+                    borderRadius: 10,
+                    background: AMBER,
+                    border: 'none',
+                    color: '#0A0E14',
+                    fontSize: 12,
+                    fontWeight: 700,
+                    cursor: courseId ? 'pointer' : 'default',
+                    opacity: courseId ? 1 : 0.5,
+                    fontFamily: 'inherit',
+                    letterSpacing: '0.01em',
+                  }}
+                >
+                  Go to review
+                </button>
+                <button
+                  type="button"
+                  onClick={handleGoToProfile}
+                  style={{
+                    flex: 1,
+                    padding: '11px 12px',
+                    borderRadius: 10,
+                    background: 'rgba(255,255,255,0.12)',
+                    border: '0.5px solid rgba(255,255,255,0.2)',
+                    color: '#F8FAFC',
+                    fontSize: 12,
                     fontWeight: 600,
                     cursor: 'pointer',
                     fontFamily: 'inherit',
+                    letterSpacing: '0.01em',
                   }}
                 >
-                  Visit Profile
+                  Go to profile
                 </button>
-                {courseId && (
-                  <button
-                    type="button"
-                    onClick={handleGoToReview}
-                    style={{
-                      flex: 1,
-                      padding: 14,
-                      borderRadius: 14,
-                      background: FROST.amber,
-                      border: 'none',
-                      color: '#0A0E14',
-                      fontSize: 14,
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                      fontFamily: 'inherit',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: 4,
-                    }}
-                  >
-                    Full Review
-                    <ChevronRight size={16} strokeWidth={2.5} />
-                  </button>
-                )}
               </div>
             </div>
           </motion.div>
