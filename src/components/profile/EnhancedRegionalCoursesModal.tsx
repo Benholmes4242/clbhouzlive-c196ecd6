@@ -804,15 +804,10 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
         )}
               </div>
 
-              {/* Review Modal */}
-              {reviewModalCourse && (
-                <ReviewWizard
-                  course={reviewModalCourse}
-                  isOpen={!!reviewModalCourse}
-                  onClose={() => setReviewModalCourse(null)}
-                  isEditMode={false}
-                />
-              )}
+              {/* Review modal: R4 cutover — navigates to Composer route
+                  (/courses/:id/rate) instead of rendering inline wizard.
+                  Inline pattern was not load-bearing; the modal already
+                  triggers a full-screen route change. */}
               </div>
             </div>
           </div>
