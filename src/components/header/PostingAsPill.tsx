@@ -80,28 +80,21 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
 
           </span>
 
-          {activeUnread > 0 && (
+          {badgeCount > 0 && (
             <span
               className={cn(
                 "absolute -top-1 -right-1 flex items-center justify-center rounded-full bg-[#F7931E] font-bold",
-                activeUnread > 9
+                badgeCount > 9
                   ? "h-[18px] min-w-[18px] px-[4px] text-[10px]"
                   : "h-[18px] w-[18px] text-[10px]"
               )}
               style={{ color: 'rgba(255,255,255,0.95)', boxShadow: '0 0 0 0.5px rgba(255,255,255,0.95)' }}
-              aria-label={`${activeUnread} unread`}
+              aria-label={`${badgeCount} unread`}
             >
               <span style={{ lineHeight: 1 }}>
-                {activeUnread > 99 ? '99+' : activeUnread}
+                {badgeCount > 99 ? '99+' : badgeCount}
               </span>
             </span>
-          )}
-
-          {hasOtherUnread && activeUnread === 0 && (
-            <span
-              className="absolute -top-0.5 -left-0.5 h-2 w-2 rounded-full bg-[#F7931E] ring-[1.5px] ring-black"
-              aria-label="Another profile has unread activity"
-            />
           )}
         </button>
       );
