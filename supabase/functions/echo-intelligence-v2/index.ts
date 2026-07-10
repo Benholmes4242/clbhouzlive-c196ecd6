@@ -253,7 +253,9 @@ async function streamClaude(
       // Claude Sonnet 5: no temperature/top_p/top_k — recent generations
       // dropped those sampling params. Keep max_tokens + stream.
       model: ANTHROPIC_MODEL_SYNTH,
-      max_tokens: 1200,
+      // Synthesis stream — bumped from 1200 to 2000 so longer answers don't
+      // truncate mid-sentence on dual/full routes.
+      max_tokens: 2000,
       system: systemPrompt,
       messages: messages.map(m => ({ role: m.role, content: m.content })),
       stream: true,
@@ -320,7 +322,7 @@ async function callClaudeSync(
     body: JSON.stringify({
       // Claude Sonnet 5: no temperature/top_p/top_k.
       model: ANTHROPIC_MODEL_SYNTH,
-      max_tokens: 1024,
+      max_tokens: 2000,
       system: systemPrompt,
       messages: messages.map(m => ({ role: m.role, content: m.content })),
     }),
@@ -354,7 +356,7 @@ async function callOpenAISynth(
       // voice fast; if the API 400s on this param the existing error log
       // will show it and we drop back to the longer timeout alone.
       model: OPENAI_MODEL_SYNTH,
-      max_completion_tokens: 1024,
+      max_completion_tokens: 2000,
       reasoning_effort: "low",
       messages: [
         { role: "system", content: systemPrompt },
@@ -842,8 +844,10 @@ serve(async (req: Request) => {
           text: finalText,
           ...metaExtras,
         };
-        // Cache successful non-live responses.
-        if (cacheRoute && finalText && !metaExtras.error) {
+        // Cache successful non-live responses. `live` flips true whenever
+        // Perplexity contributed (full route with a live grounding), so we
+        // skip caching those too — freshness > 6h TTL would stale them fast.
+        if (cacheRoute && finalText && !metaExtras.error && !live) {
           await cachePut(queryHash, cacheRoute, finalText, meta);
         }
         // Persist assistant message even if client disconnected.
