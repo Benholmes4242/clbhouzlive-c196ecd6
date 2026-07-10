@@ -445,6 +445,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                         userId={m.actor_id}
                         alt={m.name ?? 'Member'}
                         size={40}
+                        hairlineRing
                       />
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div
