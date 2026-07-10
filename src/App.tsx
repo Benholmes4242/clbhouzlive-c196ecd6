@@ -317,6 +317,10 @@ const VideoIdToPostRedirect: React.FC = () => {
   const { videoId } = useParams<{ videoId: string }>();
   return <Navigate to={videoId ? `/post/${videoId}` : '/watch'} replace />;
 };
+const EchoV2Redirect: React.FC = () => {
+  const { chatId } = useParams<{ chatId: string }>();
+  return <Navigate to={chatId ? `/echo/${chatId}` : '/echo'} replace />;
+};
 const SeasonShop = lazy(() => import("./pages/SeasonShop"));
 const ChallengesPage = lazy(() => import("./pages/ChallengesPage"));
 
