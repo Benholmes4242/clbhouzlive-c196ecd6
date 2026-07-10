@@ -105,7 +105,7 @@ export const IntelligenceSheet = memo(function IntelligenceSheet({
 
 // ─── Header ─────────────────────────────────────────────────────────────────
 
-function Header({ onClose }: { onClose: () => void }) {
+function Header({ onClose, tourTag }: { onClose: () => void; tourTag: string }) {
   return (
     <div
       style={{
