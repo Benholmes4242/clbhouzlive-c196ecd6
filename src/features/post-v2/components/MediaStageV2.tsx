@@ -50,9 +50,9 @@ function useContainerSize(ref: React.RefObject<HTMLElement>) {
       const rect = el.getBoundingClientRect();
       const h = rect.height || 240;
       const w = rect.width || 320;
-      // Collage scales to min(56% of stage height, 300px), and never wider than
-      // the stage.
-      setSize(Math.max(140, Math.min(h * 0.56, w * 0.78, 300)));
+      // Collage sized to command the phone stage without clipping:
+      // min(92vw, 480px, stageHeight * 0.8).
+      setSize(Math.max(140, Math.min(w * 0.92, 480, h * 0.8)));
     };
     measure();
     const ro = new ResizeObserver(measure);
