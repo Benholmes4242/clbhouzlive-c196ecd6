@@ -94,8 +94,13 @@ const EchoV2Page: React.FC = () => {
         <EchoV2Header
           streaming={state.streaming}
           showBack={inChat}
-          onBack={() => navigate('/echo-v2')}
+          onBack={() => {
+            const from = (location.state as { from?: string } | null)?.from;
+            navigate(from === 'history' ? '/echo-v2/history' : '/echo-v2');
+          }}
+          onHistoryClick={() => navigate('/echo-v2/history')}
         />
+
 
         <div
           ref={scrollerRef}
