@@ -29,10 +29,11 @@ export default function DetailRows({ course, onOpenCourse, actor, onOpenActor, s
   );
 }
 
-function Row({ icon, label, value, onClick }: { icon: React.ReactNode; label: string; value: string | null; onClick: () => void }) {
+function Row({ icon, label, value, onClick, disabled }: { icon: React.ReactNode; label: string; value: string | null; onClick: () => void; disabled?: boolean }) {
   return (
     <button
-      onClick={onClick}
+      onClick={disabled ? undefined : onClick}
+      disabled={disabled}
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -42,8 +43,9 @@ function Row({ icon, label, value, onClick }: { icon: React.ReactNode; label: st
         border: 0,
         padding: '14px 16px',
         borderTop: '1px solid rgba(0,0,0,0.07)',
-        cursor: 'pointer',
+        cursor: disabled ? 'default' : 'pointer',
         textAlign: 'left',
+        opacity: disabled ? 0.75 : 1,
       }}
     >
       <span style={{ color: '#8A9099' }}>{icon}</span>
@@ -51,7 +53,7 @@ function Row({ icon, label, value, onClick }: { icon: React.ReactNode; label: st
       <span style={{ color: value ? '#1F2428' : '#AEB4BC', fontWeight: value ? 600 : 400, fontSize: 13, marginLeft: 'auto', maxWidth: '55%', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
         {value ?? 'Not set'}
       </span>
-      <ChevronRight size={16} color="#AEB4BC" />
+      {!disabled && <ChevronRight size={16} color="#AEB4BC" />}
     </button>
   );
 }
