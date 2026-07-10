@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
-import { Flag, PencilLine } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Flag, PencilLine, Sparkles, X } from 'lucide-react';
 import { useConversations } from '@/hooks/messaging/useConversations';
 import { ConversationRow } from './ConversationRow';
 import NewConversationSheet from './NewConversationSheet';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
+import { useMessagingActor } from '@/hooks/messaging/useMessagingActor';
+import { safeLocalStorage } from '@/utils/safeLocalStorage';
 
 
 const CANVAS = '#F8FAFC';
@@ -53,6 +55,16 @@ const Spinner: React.FC = () => (
 const InboxV2Page: React.FC = () => {
   const [composeOpen, setComposeOpen] = useState(false);
   const { conversations, isLoading, error, refetch, hasActor } = useConversations();
+  const actor = useMessagingActor();
+  const [bannerDismissed, setBannerDismissed] = useState(false);
+
+  useEffect(() => {
+    if (!actor) return;
+    const key = `clbhouz_bizmsg_earlyaccess_dismissed_${actor.actorId}`;
+    if (safeLocalStorage.get(key) === 'true') {
+      setBannerDismissed(true);
+    }
+  }, [actor]);
 
 
   const composeButton = (
@@ -216,6 +228,71 @@ const InboxV2Page: React.FC = () => {
 
         ) : (
           <div>
+            {actor?.actorType === 'business' && !bannerDismissed && (
+              <div style={{ padding: '12px 16px 0' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 11,
+                    padding: '12px 13px',
+                    borderRadius: 14,
+                    background: 'linear-gradient(135deg, rgba(247,147,30,0.09), rgba(247,147,30,0.05))',
+                    border: '0.5px solid rgba(247,147,30,0.22)',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 34,
+                      height: 34,
+                      borderRadius: 11,
+                      background: '#F7931E',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Sparkles size={18} color="#FFFFFF" />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ margin: 0, fontSize: 13.5, fontWeight: 600, color: '#1F2428', lineHeight: 1.3 }}>
+                      Early access: business messaging
+                    </p>
+                    <p style={{ margin: '2px 0 0', fontSize: 12.5, color: '#6B7280', lineHeight: 1.45 }}>
+                      Message golfers directly - free while we're in early access. Limits and credits come later.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    aria-label="Dismiss"
+                    onClick={() => {
+                      if (actor) {
+                        safeLocalStorage.set(
+                          `clbhouz_bizmsg_earlyaccess_dismissed_${actor.actorId}`,
+                          'true',
+                        );
+                      }
+                      setBannerDismissed(true);
+                    }}
+                    className="active:opacity-60 transition-opacity"
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      padding: 4,
+                      cursor: 'pointer',
+                      color: '#AEB4BC',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              </div>
+            )}
             {conversations.map((c) => (
               <ConversationRow key={c.conversation_id} conversation={c} />
             ))}
