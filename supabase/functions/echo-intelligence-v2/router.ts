@@ -126,8 +126,9 @@ const LIVE_RECENCY_PATTERNS = [
   /\bleading\b/i,
   /\bleader(board)?\b/i,
   /\blatest\b/i,
-  /\bcurrent(ly)?\s+(score|standing|position|ranking|odds)/i,
+  /\bcurrent(ly)?\b.{0,30}\b(score|standing|standings|position|ranking|rankings|odds)\b/i,
   /\bwho('s| is)\s+(winning|leading)\b/i,
+
   /\bwhat happened\b/i,
 ];
 
