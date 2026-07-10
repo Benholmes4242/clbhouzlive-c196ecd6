@@ -125,32 +125,31 @@ const InboxV2Page: React.FC = () => {
           >
             <div
               style={{
-                width: 72,
-                height: 72,
-                borderRadius: '50%',
-                background: 'linear-gradient(145deg, #FDBE6E, #F7931E)',
+                width: 64,
+                height: 64,
+                borderRadius: 20,
+                background: '#EDEFF2',
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 8px 20px rgba(247,147,30,0.25)',
               }}
             >
-              <Flag size={32} color="#FFFFFF" />
+              <MessageSquare size={30} color="#8A9099" />
             </div>
             <div className="flex flex-col items-center" style={{ gap: 6 }}>
-              <p style={{ color: INK, fontSize: 20, fontWeight: 600, margin: 0, lineHeight: '24px' }}>
-                Your clubhouse is quiet
+              <p style={{ color: INK, fontSize: 19, fontWeight: 600, margin: 0, lineHeight: '24px' }}>
+                No messages yet
               </p>
               <p
                 style={{
                   color: SUB,
                   fontSize: 14,
                   lineHeight: 1.45,
-                  maxWidth: 270,
+                  maxWidth: 260,
                   margin: 0,
                 }}
               >
-                Message a playing partner, sort a fourball, or start a group for your society.
+                Start a conversation with a golfer or group and it'll show up here.
               </p>
             </div>
             <button
@@ -164,14 +163,14 @@ const InboxV2Page: React.FC = () => {
                 background: '#15171F',
                 color: '#F5F6F7',
                 borderRadius: 22,
-                padding: '12px 24px',
+                padding: '12px 22px',
                 fontSize: 14,
                 fontWeight: 500,
                 border: 'none',
               }}
             >
               <PencilLine size={16} />
-              New message
+              Start a conversation
             </button>
           </div>
         ) : (
