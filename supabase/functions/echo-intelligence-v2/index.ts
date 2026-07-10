@@ -326,10 +326,14 @@ async function callClaudeSync(
     body: JSON.stringify({
       // Claude Sonnet 5: no temperature/top_p/top_k.
       model: ANTHROPIC_MODEL_SYNTH,
-      max_tokens: 2000,
+      max_tokens: 3000,
+      // Force LOW effort (adaptive thinking defaults HIGH) so thinking tokens
+      // don't consume max_tokens and starve the visible answer.
+      effort: "low",
       system: systemPrompt,
       messages: messages.map(m => ({ role: m.role, content: m.content })),
     }),
+
   }), SYNC_TIMEOUT_MS);
   if (!r.ok) {
     const body = await r.text().catch(() => "");
