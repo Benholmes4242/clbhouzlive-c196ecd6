@@ -18,6 +18,12 @@ const cases: Case[] = [
   { q: "LPGA leaderboard today", exp: "live" },
   { q: "What are tee times for the Masters tomorrow?", exp: "live" },
 
+  // v2 LIVE recency short-circuit
+  { q: "Who is leading the Open Championship right now?", exp: "live" },
+  { q: "who's winning today", exp: "live" },
+  { q: "latest leaderboard", exp: "live" },
+  { q: "current world ranking of Rahm", exp: "live" },
+
   // Static explainers / historical
   { q: "Explain how golf handicap works", exp: "static" },
   { q: "How to read a green", exp: "static" },
