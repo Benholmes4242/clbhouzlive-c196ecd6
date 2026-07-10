@@ -30,11 +30,11 @@ const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 // ─── Model pins (current stable flagship tier as of build time) ──────────
 // Upgrade from v1's claude-sonnet-4, gpt-4o(-mini), gemini-1.5-pro, sonar.
-const ANTHROPIC_MODEL_SYNTH   = "claude-sonnet-4-5-20250929"; // Claude Sonnet 4.5
-const OPENAI_MODEL_SYNTH      = "gpt-4.1";                    // 4o-tier synthesis
-const OPENAI_MODEL_INTENT     = "gpt-4.1-mini";               // reserved mini-tier
-const GEMINI_MODEL            = "gemini-2.5-pro";             // Gemini Pro tier
-const PERPLEXITY_MODEL        = "sonar-pro";                  // current sonar tier
+const ANTHROPIC_MODEL_SYNTH   = "claude-sonnet-5";     // Claude Sonnet 5 (current)
+const OPENAI_MODEL_SYNTH      = "gpt-5.5";             // GPT-5.5 synthesis
+const OPENAI_MODEL_INTENT     = "gpt-5.5";             // reserved; keep in sync with SYNTH
+const GEMINI_MODEL            = "gemini-3.5-flash";    // Gemini 3.5 Flash
+const PERPLEXITY_MODEL        = "sonar-pro";           // unchanged, verified current
 
 // Rate limit windows (identical to v1).
 const RATE_LIMIT_MINUTE = 10;
@@ -250,6 +250,8 @@ async function streamClaude(
       "anthropic-version": "2023-06-01",
     },
     body: JSON.stringify({
+      // Claude Sonnet 5: no temperature/top_p/top_k — recent generations
+      // dropped those sampling params. Keep max_tokens + stream.
       model: ANTHROPIC_MODEL_SYNTH,
       max_tokens: 1200,
       system: systemPrompt,
@@ -258,7 +260,11 @@ async function streamClaude(
     }),
   }), 30000);
 
-  if (!response.ok) throw new Error(`Claude API error: ${response.status}`);
+  if (!response.ok) {
+    const body = await response.text().catch(() => "");
+    console.error(`[echo-v2] Claude stream ${response.status}:`, body);
+    throw new Error(`Claude API error: ${response.status}`);
+  }
 
   const reader = response.body!.getReader();
   const decoder = new TextDecoder();
@@ -299,12 +305,18 @@ async function callClaudeSync(
       "anthropic-version": "2023-06-01",
     },
     body: JSON.stringify({
+      // Claude Sonnet 5: no temperature/top_p/top_k.
       model: ANTHROPIC_MODEL_SYNTH,
       max_tokens: 1024,
       system: systemPrompt,
       messages: messages.map(m => ({ role: m.role, content: m.content })),
     }),
   }), 20000);
+  if (!r.ok) {
+    const body = await r.text().catch(() => "");
+    console.error(`[echo-v2] Claude sync ${r.status}:`, body);
+    throw new Error(`Claude API error: ${r.status}`);
+  }
   const d = await r.json();
   return d?.content?.[0]?.text || "";
 }
@@ -320,15 +332,21 @@ async function callOpenAISynth(
       "Authorization": `Bearer ${OPENAI_API_KEY}`,
     },
     body: JSON.stringify({
+      // GPT-5.5: chat completions rejects legacy `max_tokens` — use
+      // `max_completion_tokens`. No temperature (defaults only).
       model: OPENAI_MODEL_SYNTH,
-      max_tokens: 1024,
+      max_completion_tokens: 1024,
       messages: [
         { role: "system", content: systemPrompt },
         ...messages.map(m => ({ role: m.role, content: m.content })),
       ],
     }),
   }), 20000);
-  if (!r.ok) throw new Error(`OpenAI error: ${r.status}`);
+  if (!r.ok) {
+    const body = await r.text().catch(() => "");
+    console.error(`[echo-v2] OpenAI ${r.status}:`, body);
+    throw new Error(`OpenAI error: ${r.status}`);
+  }
   const d = await r.json();
   return d?.choices?.[0]?.message?.content || "";
 }
@@ -347,13 +365,19 @@ async function callGemini(
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        // Gemini 3.5 Flash: minimal body. Legacy 1.5-era safety /
+        // generationConfig fields (temperature, maxOutputTokens knobs)
+        // dropped — new gen rejects several of them. Defaults are fine.
         system_instruction: { parts: [{ text: systemPrompt }] },
         contents,
-        generationConfig: { maxOutputTokens: 1024, temperature: 0.7 },
       }),
     },
   ), 20000);
-  if (!r.ok) throw new Error(`Gemini error: ${r.status}`);
+  if (!r.ok) {
+    const body = await r.text().catch(() => "");
+    console.error(`[echo-v2] Gemini ${r.status}:`, body);
+    throw new Error(`Gemini error: ${r.status}`);
+  }
   const d = await r.json();
   return d?.candidates?.[0]?.content?.parts?.[0]?.text || "";
 }
@@ -376,6 +400,11 @@ async function callPerplexitySync(
       max_tokens: 512,
     }),
   }), 20000);
+  if (!r.ok) {
+    const body = await r.text().catch(() => "");
+    console.error(`[echo-v2] Perplexity sync ${r.status}:`, body);
+    throw new Error(`Perplexity error: ${r.status}`);
+  }
   const d = await r.json();
   return (d?.choices?.[0]?.message?.content || "").replace(/\[\d+\]/g, "");
 }
@@ -827,12 +856,14 @@ serve(async (req: Request) => {
           finalText = buf.trim();
           strength = 0.75;
         } else if (routeLevel === "dual") {
-          engines = 2;
-          // Fan out to the two synthesis sources in parallel.
+          // Fan out to the two synthesis sources in parallel. Per-engine
+          // failure returns "" (logged inside the call) — the pipeline
+          // does NOT abort; `engines` reflects the actual contributors.
           const [a, b] = await Promise.all([
-            callClaudeSync(enrichedSystemPrompt, finalMessages).catch(() => ""),
-            callOpenAISynth(enrichedSystemPrompt, finalMessages).catch(() => ""),
+            callClaudeSync(enrichedSystemPrompt, finalMessages).catch((e) => { console.error("[echo-v2] dual/claude drop:", e?.message || e); return ""; }),
+            callOpenAISynth(enrichedSystemPrompt, finalMessages).catch((e) => { console.error("[echo-v2] dual/openai drop:", e?.message || e); return ""; }),
           ]);
+          engines = [a, b].filter(Boolean).length;
           // Stream the SYNTHESIS itself so the user sees consensus tokens live.
           let raw = "";
           const strengthTail = /STRENGTH:\s*[0-9.]*\s*$/i;
@@ -847,21 +878,17 @@ serve(async (req: Request) => {
             },
           );
           const { cleaned, strength: s } = extractStrength(raw, 0.8);
-          // If we suppressed a tail chunk, flush the delta of cleaned vs already-sent text.
-          // Simpler: send a corrective final "reset" event isn't in the contract — instead
-          // rely on server-side finalText being cleaned; client should render on finalText
-          // when meta arrives. We still emit an END marker via meta.
           finalText = cleaned;
           strength = s;
         } else {
           // full
-          engines = 4;
           const [a, b, c, d] = await Promise.all([
-            callClaudeSync(enrichedSystemPrompt, finalMessages).catch(() => ""),
-            callOpenAISynth(enrichedSystemPrompt, finalMessages).catch(() => ""),
-            callGemini(enrichedSystemPrompt, finalMessages).catch(() => ""),
-            callPerplexitySync(finalMessages).catch(() => ""),
+            callClaudeSync(enrichedSystemPrompt, finalMessages).catch((e) => { console.error("[echo-v2] full/claude drop:", e?.message || e); return ""; }),
+            callOpenAISynth(enrichedSystemPrompt, finalMessages).catch((e) => { console.error("[echo-v2] full/openai drop:", e?.message || e); return ""; }),
+            callGemini(enrichedSystemPrompt, finalMessages).catch((e) => { console.error("[echo-v2] full/gemini drop:", e?.message || e); return ""; }),
+            callPerplexitySync(finalMessages).catch((e) => { console.error("[echo-v2] full/perplexity drop:", e?.message || e); return ""; }),
           ]);
+          engines = [a, b, c, d].filter(Boolean).length;
           live = Boolean(d);
           let raw = "";
           const strengthTail = /STRENGTH:\s*[0-9.]*\s*$/i;
