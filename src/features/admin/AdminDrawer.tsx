@@ -29,6 +29,7 @@ const NAV: NavItem[] = [
   { to: '/admin-v2/support',    label: 'Support',    icon: MessagesSquare, moderatorAllowed: true },
   { to: '/admin-v2/video-perf', label: 'Video Perf', icon: Gauge, requireFull: true },
   { to: '/admin-v2/system',     label: 'System',     icon: Settings },
+  { to: '/admin-v2/echo-health', label: 'Echo Health', icon: Activity, requireFull: true },
 ];
 
 interface Props {
