@@ -177,7 +177,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
   const composer = useReviewComposer(existing, media.hasNewMedia);
   const submit = useReviewSubmit();
 
-  const [success, setSuccess] = useState<{ ratingId: string } | null>(null);
+  const [success, setSuccess] = useState<{ ratingId: string; shareToFeed: boolean } | null>(null);
   const [removeOpen, setRemoveOpen] = useState(false);
   const [dictationFlashKey, setDictationFlashKey] = useState(0);
 
