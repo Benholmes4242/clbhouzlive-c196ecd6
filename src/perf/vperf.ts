@@ -736,11 +736,11 @@ function scorecardIngest(kind: string, payload: Record<string, unknown>): void {
     const laneId = String((payload as any).laneId ?? '');
     const sl = (payload as any).startLevel;
     if (typeof sl === 'number' && (laneId === 'feed-active' || laneId === 'fullscreen')) {
-      const arr = startLevelsByLane.get(laneId) ?? [];
-      arr.push(sl);
-      if (arr.length > 500) arr.shift();
-      startLevelsByLane.set(laneId, arr);
+      const ring = startLevelsByLane.get(laneId) ?? { arr: [], idx: 0 };
+      ring.idx = ringPush(ring.arr, ring.idx, STARTLEVELS_CAP, sl);
+      startLevelsByLane.set(laneId, ring);
     }
+
     return;
   }
 
