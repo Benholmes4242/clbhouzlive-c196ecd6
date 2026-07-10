@@ -7,14 +7,15 @@
  * Nothing flows back up from the hero.
  */
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { ArrowLeftRight, Trophy } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SheetHeader } from '@/components/ui/SheetHeader';
 import { getTourLogo } from '../utils/tourLogos';
-import { useAllToursTickerData } from '../hooks/useOverviewModules';
+import { useHeroCarouselData, type HeroSlide } from '../hooks/useHeroCarouselData';
 import { useActiveMensMajor } from '../hooks/useActiveMensMajor';
 import { useTourSelection } from '../context/TourSelectionContext';
+import type { TourId } from '../hooks/useOverviewData';
 import {
   AMBER,
   AMBER_TINT_04,
@@ -25,7 +26,6 @@ import {
   INK_ALPHA_45,
   INK_TINT_07,
   STATUS_LIVE,
-  SURFACE,
 } from '../_shared/tokens';
 
 // Canonical tour priority order — PGA → LPGA → DP World → Korn Ferry → Champions → LIV.
@@ -42,6 +42,7 @@ const TOUR_LABEL: Record<string, string> = {
 const GOLD_TINT_10 = 'rgba(255,184,0,0.10)';
 const GOLD_TINT_18 = 'rgba(255,184,0,0.18)';
 const GOLD_BORDER = 'rgba(255,184,0,0.45)';
+const SUBTITLE_COLOR = '#8A9099';
 
 export interface TourSwitcherAffordanceProps {
   variant?: 'glass' | 'default';
@@ -50,10 +51,10 @@ export interface TourSwitcherAffordanceProps {
 export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
   variant = 'default',
 }) => {
-  const { data } = useAllToursTickerData();
+  const { data: heroSlides } = useHeroCarouselData();
   const activeMajor = useActiveMensMajor();
   const [open, setOpen] = useState(false);
-  const { selectedTourSlug, selectTour, viewingTourSlug } = useTourSelection();
+  const { selectedTourSlug, selectTour, viewingTourSlug, viewingTournamentId } = useTourSelection();
 
   // Pill + active-row reflect the tour CURRENTLY IN VIEW on the hero (updates on
   // random landing, swipe, dots, and taps). Fall back to the user's explicit
@@ -61,17 +62,21 @@ export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
   const activeTourSlug = viewingTourSlug ?? selectedTourSlug ?? 'pga';
   const isMajorActive = activeTourSlug === 'major';
 
-  const tourStatus = (slug: string): 'live' | 'results' | 'upcoming' | 'none' => {
-    // Precedence mirrors deriveHeroState: live > results (≤72h) > upcoming > none.
-    // The `completed` bucket is already 72h-bounded (RESULTS_WINDOW_HOURS) at the
-    // cache layer, so presence here == the hero's results state.
-    if (data?.live.some((c) => c.tourSlug === slug)) return 'live';
-    if (data?.completed.some((c) => c.tourSlug === slug)) return 'results';
-    if (data?.upcomingTourSlugs?.includes(slug)) return 'upcoming';
-    return 'none';
-  };
+  // Group hero slides by native tour (skip the synthetic 'major' pseudo-tour;
+  // it's rendered as the pinned MAJORS row above).
+  const slidesByTour = useMemo(() => {
+    const map: Record<string, HeroSlide[]> = {};
+    (heroSlides ?? []).forEach((s) => {
+      const slug = s.tournament.tourSlug;
+      if (slug === 'major') return;
+      if (!map[slug]) map[slug] = [];
+      map[slug].push(s);
+    });
+    return map;
+  }, [heroSlides]);
 
   const pillLabel = isMajorActive ? 'THE MAJORS' : (TOUR_LABEL[activeTourSlug] ?? 'PGA TOUR');
+
 
   return (
     <>
