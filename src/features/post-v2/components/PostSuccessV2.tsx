@@ -43,9 +43,7 @@ export default function PostSuccessV2({ result, onDone }: Props) {
 }
 
 function UploadingState({ result, onDone }: Props) {
-  // Live progress from the controller (may be null if the job was already
-  // fire-and-forget'd and the composer remounted; safe fallback to 0).
-  const jobId = getJobIdFromResult(result);
+  const jobId = result.jobId ?? null;
   const [progress, setProgress] = useState<number>(() => {
     const snap = jobId ? getJobSnapshot(jobId) : null;
     return snap?.overallProgress ?? 0;
