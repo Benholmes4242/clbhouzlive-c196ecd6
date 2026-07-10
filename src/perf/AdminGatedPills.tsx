@@ -7,6 +7,9 @@ import { usePanelRole } from '@/hooks/usePanelRole';
 import { useAdminPillVisibility } from '@/hooks/useAdminPillVisibility';
 import { PerfToggleButton } from '@/perf/PerfToggleButton';
 import { BootTimelineToggleButton } from '@/perf/BootTimelineToggleButton';
+import { PerfHud } from '@/perf/PerfHud';
+import { LogHud } from '@/perf/LogHud';
+
 
 export function AdminGatedPerfPill() {
   const { role, loading } = usePanelRole();
@@ -21,3 +24,18 @@ export function AdminGatedBootTimelinePill() {
   if (loading || role !== 'full' || !visible) return null;
   return <BootTimelineToggleButton />;
 }
+
+export function AdminGatedPerfHud() {
+  const { role, loading } = usePanelRole();
+  const [visible] = useAdminPillVisibility();
+  if (loading || role !== 'full' || !visible) return null;
+  return <PerfHud />;
+}
+
+export function AdminGatedLogHud() {
+  const { role, loading } = usePanelRole();
+  const [visible] = useAdminPillVisibility();
+  if (loading || role !== 'full' || !visible) return null;
+  return <LogHud />;
+}
+
