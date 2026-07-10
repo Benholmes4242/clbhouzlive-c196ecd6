@@ -13,7 +13,7 @@
 
 import React, { memo, useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import { Pressable } from '@/components/ui/Pressable';
-import { AnimatedEchoWave } from '@/features/echo/components/ui/AnimatedEchoWave';
+import { AnimatedEchoWave } from '@/features/echo-v2/components/AnimatedEchoWave';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { overlayOpen, overlayMark } from '@/perf/overlayTiming';
 import { createPortal } from 'react-dom';
@@ -841,14 +841,13 @@ function ProfileHubSheet({
                           width: 40,
                           height: 40,
                           borderRadius: 12,
-                          background: `linear-gradient(135deg, ${AMBER}, #E8920A)`,
+                          background: '#15171F',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          boxShadow: '0 2px 8px rgba(247,147,30,0.30)',
                         }}
                       >
-                        <AnimatedEchoWave size={16} color="#FFFFFF" active={true} />
+                        <AnimatedEchoWave size={20} active={true} />
                       </div>
                     </QuickActionTile>
 
