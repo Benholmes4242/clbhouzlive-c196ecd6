@@ -157,11 +157,13 @@ async function runOnce() {
         continue;
       }
 
+      // Stamp `type` into the queue row's data so the push sender's
+      // muted_types filter applies to gamification notifications too.
       const { error: pushErr } = await supabase.from("push_notification_queue").insert({
         user_id: userId,
         title: rendered.title,
         body: rendered.body,
-        data: rendered.data,
+        data: { ...rendered.data, type: r.notification_type },
       });
       if (pushErr) {
         console.warn("[dispatcher] push insert", pushErr.message);
