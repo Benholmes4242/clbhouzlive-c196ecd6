@@ -1110,7 +1110,6 @@ export function CinematicHeroFullBleed({
                 alignItems: 'center',
                 gap: 12,
                 padding: '14px 18px',
-                borderTop: '0.5px solid rgba(255,255,255,0.10)',
               }}
             >
               <SquircleAvatar
@@ -1167,7 +1166,6 @@ export function CinematicHeroFullBleed({
                 alignItems: 'center',
                 gap: 18,
                 padding: '14px 18px',
-                borderTop: '0.5px solid rgba(255,255,255,0.10)',
               }}
             >
               {courseStats.par != null && (
@@ -1179,7 +1177,7 @@ export function CinematicHeroFullBleed({
             </div>
           ) : null}
 
-          <Footer leftText="" isLive={false} />
+          <Footer leftText="" isLive={false} noBorder />
         </button>
       )}
     </div>
@@ -1188,7 +1186,7 @@ export function CinematicHeroFullBleed({
 
 // ---- shared footer --------------------------------------------------------
 
-function Footer({ leftText, isLive }: { leftText: string; isLive: boolean }) {
+function Footer({ leftText, isLive, noBorder }: { leftText: string; isLive: boolean; noBorder?: boolean }) {
   return (
     <div
       style={{
@@ -1196,7 +1194,7 @@ function Footer({ leftText, isLive }: { leftText: string; isLive: boolean }) {
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '11px 18px 14px',
-        borderTop: '0.5px solid rgba(255,255,255,0.12)',
+        borderTop: noBorder ? 'none' : '0.5px solid rgba(255,255,255,0.12)',
       }}
     >
       <span
