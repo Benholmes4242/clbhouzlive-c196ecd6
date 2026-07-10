@@ -22,6 +22,7 @@ import { formatFrostRating } from '@/lib/frostPanel';
 import { useReviewerStats } from '@/hooks/useReviewerStats';
 import { MentionText } from '@/components/mentions/MentionText';
 import { REVIEW_SHEET_Z } from '@/lib/zLayers';
+import { ReviewGhostNumeral, ReviewVerdictLabel } from '@/components/shared/ReviewGhostScore';
 
 const AMBER = '#F7931E';
 const FONT_GEIST =
