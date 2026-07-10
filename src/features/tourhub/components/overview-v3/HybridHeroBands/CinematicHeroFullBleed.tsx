@@ -566,10 +566,10 @@ export function CinematicHeroFullBleed({
         style={{
           position: 'relative',
           zIndex: 2,
-          padding: '0 18px 14px',
+          padding: '0 18px 10px',
           display: 'flex',
           flexDirection: 'column',
-          gap: 8,
+          gap: 6,
         }}
       >
         {EyebrowSpan}
@@ -599,7 +599,7 @@ export function CinematicHeroFullBleed({
               color: 'rgba(255,255,255,0.7)',
               letterSpacing: '0.02em',
               textTransform: 'uppercase',
-              marginTop: 2,
+              marginTop: 1,
             }}
           >
             {upcomingSub}
@@ -607,7 +607,7 @@ export function CinematicHeroFullBleed({
         )}
 
         {isUpcoming && hoursUntilStart != null && Number.isFinite(hoursUntilStart) && (
-          <div style={{ marginTop: 14 }}>
+          <div style={{ marginTop: 8 }}>
             <CountdownPills hoursUntilStart={hoursUntilStart} />
           </div>
         )}
