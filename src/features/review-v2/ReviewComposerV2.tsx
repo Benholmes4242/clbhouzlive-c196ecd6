@@ -179,6 +179,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
 
   const [success, setSuccess] = useState<{ ratingId: string } | null>(null);
   const [removeOpen, setRemoveOpen] = useState(false);
+  const [dictationFlashKey, setDictationFlashKey] = useState(0);
 
   const handleSubmit = useCallback(async () => {
     try {
