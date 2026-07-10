@@ -24,19 +24,34 @@ const SkeletonRow: React.FC = () => (
         width: 52,
         height: 52,
         borderRadius: 18,
-        background: '#EEF0F2',
+        background: '#E4E7EB',
       }}
     />
     <div className="flex-1 flex flex-col gap-2">
-      <div style={{ height: 12, width: '40%', background: '#EEF0F2', borderRadius: 4 }} />
-      <div style={{ height: 10, width: '70%', background: '#EEF0F2', borderRadius: 4 }} />
+      <div style={{ height: 12, width: '40%', background: '#E4E7EB', borderRadius: 4 }} />
+      <div style={{ height: 10, width: '70%', background: '#E4E7EB', borderRadius: 4 }} />
     </div>
   </div>
 );
 
+const Spinner: React.FC = () => (
+  <div
+    aria-label="Loading"
+    style={{
+      width: 22,
+      height: 22,
+      borderRadius: '50%',
+      border: '2px solid #E4E7EB',
+      borderTopColor: '#8A9099',
+      animation: 'msg-spin 0.8s linear infinite',
+    }}
+  />
+);
+
 const InboxV2Page: React.FC = () => {
   const [composeOpen, setComposeOpen] = useState(false);
-  const { conversations, isLoading, error, refetch } = useConversations();
+  const { conversations, isLoading, error, refetch, hasActor } = useConversations();
+
 
   return (
     <div
@@ -80,8 +95,20 @@ const InboxV2Page: React.FC = () => {
         </button>
       </header>
 
-      <main>
-        {isLoading ? (
+      <main
+        style={{
+          paddingBottom: 'var(--bottom-nav-height, 88px)',
+        }}
+      >
+        <style>{`@keyframes msg-spin { to { transform: rotate(360deg); } }`}</style>
+        {!hasActor ? (
+          <div
+            className="flex items-center justify-center"
+            style={{ padding: '96px 24px' }}
+          >
+            <Spinner />
+          </div>
+        ) : isLoading ? (
           <>
             {Array.from({ length: 7 }).map((_, i) => (
               <SkeletonRow key={i} />
@@ -131,6 +158,7 @@ const InboxV2Page: React.FC = () => {
           </div>
         )}
       </main>
+
 
       <NewConversationSheet open={composeOpen} onClose={() => setComposeOpen(false)} />
     </div>

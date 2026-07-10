@@ -329,7 +329,7 @@ const ThreadV2Page: React.FC = () => {
         className="flex-1 overflow-y-auto"
         style={{
           padding: '8px 12px 12px 12px',
-          paddingBottom: composerHeight + keyboardHeight + 12,
+          paddingBottom: `calc(${composerHeight + keyboardHeight + 12}px + env(safe-area-inset-bottom, 0px))`,
           WebkitOverflowScrolling: 'touch',
         }}
       >

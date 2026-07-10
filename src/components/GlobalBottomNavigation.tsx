@@ -48,6 +48,9 @@ const HIDDEN_ROUTE_PREFIXES = [
 const HIDDEN_ROUTE_PATTERNS: RegExp[] = [
   /^\/profile\/[^/]+\/(followers|following)$/,
   /^\/business\/[^/]+\/(followers|following)$/,
+  // Hide inside a conversation thread (composer would otherwise sit behind the pill),
+  // but keep the nav on the inbox (/messages).
+  /^\/messages\/[^/]+$/,
 ];
 
 interface GlobalBottomNavigationProps {

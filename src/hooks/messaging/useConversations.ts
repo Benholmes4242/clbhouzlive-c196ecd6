@@ -72,5 +72,6 @@ export function useConversations() {
     isLoading: query.isLoading,
     error: query.error,
     refetch: query.refetch,
+    hasActor: !!actor,
   };
 }
