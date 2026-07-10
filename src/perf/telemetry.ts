@@ -219,10 +219,37 @@ function endpoint(): string | null {
   return `${SUPABASE_URL}/rest/v1/video_perf_rollups`;
 }
 
+const ROW_DEFAULTS = {
+  session_id: null as string | null,
+  flushed_at: null as string | null,
+  app_build: null as string | null,
+  device_class: null as string | null,
+  is_debug: null as boolean | null,
+  row_kind: null as string | null,
+  kind: null as string | null,
+  page: null as string | null,
+  count: null as number | null,
+  p50: null as number | null,
+  p95: null as number | null,
+  worst: null as number | null,
+  pass: null as number | null,
+  slow: null as number | null,
+  timeout: null as number | null,
+  superseded: null as number | null,
+  extra: null as Record<string, unknown> | null,
+};
+
+function shape(r: RollupRow): Record<string, unknown> {
+  return { ...ROW_DEFAULTS, ...r };
+}
+
 async function postRows(rows: RollupRow[]): Promise<boolean> {
   const url = endpoint();
   if (!url || rows.length === 0) return false;
-  const body = JSON.stringify(rows);
+  // PostgREST bulk insert requires identical key sets across all objects in
+  // the array. Row kinds populate different fields, so shape every row through
+  // ROW_DEFAULTS to guarantee a uniform key set (unused columns → null).
+  const body = JSON.stringify(rows.map(shape));
   // Primary: keepalive fetch — supports custom headers (needed for anon key).
   try {
     const res = await fetch(url, {
