@@ -251,7 +251,7 @@ async function postRows(rows: RollupRow[]): Promise<boolean> {
 }
 
 async function flush(): Promise<void> {
-  if (!__enrolled) return;
+  if (!isEffectivelyEnrolled()) return;
   const snap = __vperfSnapshotTelemetry();
   const rows = buildRows(snap);
   if (rows.length === 0) return;
@@ -262,19 +262,16 @@ async function flush(): Promise<void> {
 }
 
 function maybeThresholdFlush(): void {
-  if (!__enrolled) return;
+  if (!isEffectivelyEnrolled()) return;
   if (__vperfApproxRowCount() >= FLUSH_ROW_THRESHOLD) {
     void flush();
   }
 }
 
-export function installVideoPerfTelemetry(): void {
-  if (__installed) return;
-  if (typeof window === 'undefined' || typeof document === 'undefined') return;
-  __installed = true;
-  enrolSession();
-  if (!__enrolled) return; // non-enrolled sessions do zero work beyond the coin-flip
+function attachListeners(): void {
+  if (__listenersAttached) return;
   if (!endpoint()) return; // no supabase env → nothing to do
+  __listenersAttached = true;
 
   const onHidden = () => {
     if (document.visibilityState === 'hidden') void flush();
@@ -287,6 +284,34 @@ export function installVideoPerfTelemetry(): void {
     }
   }, FLUSH_INTERVAL_MS);
 }
+
+export function installVideoPerfTelemetry(): void {
+  if (__installed) return;
+  if (typeof window === 'undefined' || typeof document === 'undefined') return;
+  __installed = true;
+  enrolSession();
+
+  // Effective enrolment = sticky coin flip OR live perf pill. Recomputed at
+  // every flush / listener check so flipping the pill mid-session Just Works.
+  if (isEffectivelyEnrolled()) {
+    attachListeners();
+  }
+
+  // React to the perf pill flipping ON later in the session: attach listeners
+  // then and do a small immediate flush so the user sees rows land promptly.
+  // Flipping OFF mid-session: coin-flip-enrolled sessions keep shipping;
+  // coin-flip-lost sessions simply stop producing rows at flush time (the
+  // idle listeners are harmless).
+  try {
+    subscribePerfLive(() => {
+      if (isEffectivelyEnrolled() && !__listenersAttached) {
+        attachListeners();
+        void flush();
+      }
+    });
+  } catch {}
+}
+
 
 // Test/debug hook (not part of any UI).
 export function __flushVideoPerfTelemetryForTest(): Promise<void> { return flush(); }
