@@ -719,20 +719,99 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
       courseHistoryData, recentFormData,
       courseFitSection, venueHistorySection, detailedStatsSection,
       courseDNA?.course_type || null,
+      statsLightCount,
     );
 
-    console.log(`[ti] running consensus engine, pool=${players.length}`);
+    // =============================================
+    // TI-8: Single-flight generation lock (per tournament)
+    // =============================================
+    // Uses a lock table (advisory-lock semantics won't survive the PostgREST
+    // pool). Concurrent invokes collapse to one run + readers.
+    const LOCK_STALE_MS = 5 * 60 * 1000;
 
-    const consensus = await runConsensus(
-      '', // system prompt is embedded in the user prompt
-      prompt,
-      fitScoreMap,
-      undefined,
-      poolPlayerIds,
-      poolNameToId,
-    );
+    async function tryAcquireLock(): Promise<boolean> {
+      // Best-effort: drop any stale row before insert.
+      await supabase
+        .from('ti_generation_locks')
+        .delete()
+        .eq('tournament_id', tournament.id)
+        .lt('acquired_at', new Date(Date.now() - LOCK_STALE_MS).toISOString());
+      const { error } = await supabase
+        .from('ti_generation_locks')
+        .insert({ tournament_id: tournament.id });
+      return !error;
+    }
 
-    console.log(`[ti] consensus complete: ${consensus.consensusMethod}, ${consensus.topContenders.length} contenders`);
+    async function releaseLock(): Promise<void> {
+      await supabase
+        .from('ti_generation_locks')
+        .delete()
+        .eq('tournament_id', tournament.id);
+    }
+
+    const acquired = await tryAcquireLock();
+    if (!acquired) {
+      console.log(`[ti] lock held by another invoke for ${tournament.name} - waiting for cached row`);
+      // Poll ai_predictions for up to ~30s; whoever holds the lock will write it.
+      for (let i = 0; i < 15; i++) {
+        await new Promise((r) => setTimeout(r, 2000));
+        const { data: cached } = await supabase
+          .from('ai_predictions')
+          .select('*')
+          .eq('tournament_id', tournament.id)
+          .maybeSingle();
+        if (cached && !isPredictionStale(cached)) {
+          return new Response(
+            JSON.stringify({
+              success: true,
+              cached: true,
+              tournament: { id: tournament.id, name: tournament.name },
+              predictions: formatStoredPredictions(cached),
+            }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+          );
+        }
+      }
+      return new Response(
+        JSON.stringify({ skipped: true, reason: 'lock timeout' }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      );
+    }
+
+    try {
+      // Double-check: another run may have finished while we were waiting to acquire.
+      if (!forceRegenerate) {
+        const { data: fresh } = await supabase
+          .from('ai_predictions')
+          .select('*')
+          .eq('tournament_id', tournament.id)
+          .maybeSingle();
+        if (fresh && !isPredictionStale(fresh)) {
+          console.log(`[ti] double-check: fresh row appeared, skipping generation`);
+          return new Response(
+            JSON.stringify({
+              success: true,
+              cached: true,
+              tournament: { id: tournament.id, name: tournament.name },
+              predictions: formatStoredPredictions(fresh),
+            }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+          );
+        }
+      }
+
+      console.log(`[ti] running consensus engine, pool=${players.length}`);
+
+      const consensus = await runConsensus(
+        '', // system prompt is embedded in the user prompt
+        prompt,
+        fitScoreMap,
+        undefined,
+        poolPlayerIds,
+        poolNameToId,
+      );
+
+      console.log(`[ti] consensus complete: ${consensus.consensusMethod}, ${consensus.topContenders.length} contenders`);
 
     // =============================================
     // STEP 6: Enrich with Photo URLs & PGA Tour IDs + Override courseFitScore
