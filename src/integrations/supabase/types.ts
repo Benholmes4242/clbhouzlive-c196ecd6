@@ -17948,6 +17948,7 @@ export type Database = {
           width: number
         }[]
       }
+      get_push_health_summary: { Args: never; Returns: Json }
       get_recent_course_records: {
         Args: { p_limit?: number }
         Returns: {
