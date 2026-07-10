@@ -285,9 +285,7 @@ export const MediaCarousel: React.FC<Props> = ({
     }
   }, [active, isCardActive, items, postId, ownerKeyOf]);
 
-  // Timer holder for the +500ms active.health sample (avoids leak across
-  // rapid swipes). Pure instrumentation — cleared on the next activate.
-  const activateHealthTimerRef = useRef<{ id: number } | null>(null);
+  // Cleanup the [CAROUSEL2] health-sample timer on unmount.
   useEffect(() => () => {
     if (activateHealthTimerRef.current?.id) {
       window.clearTimeout(activateHealthTimerRef.current.id);
