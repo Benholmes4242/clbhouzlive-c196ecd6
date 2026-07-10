@@ -179,6 +179,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
 
   const [success, setSuccess] = useState<{ ratingId: string } | null>(null);
   const [removeOpen, setRemoveOpen] = useState(false);
+  const [dictationFlashKey, setDictationFlashKey] = useState(0);
 
   const handleSubmit = useCallback(async () => {
     try {
@@ -398,18 +399,30 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
               const prev = composer.state.reviewText;
               const joiner = prev.length === 0 || /\s$/.test(prev) ? '' : ' ';
               composer.setReviewText(`${prev}${joiner}${text}`);
+              setDictationFlashKey((k) => k + 1);
             }}
           />
         </div>
         <div
+          key={dictationFlashKey}
           style={{
             background: '#FFFFFF',
             border: `1px solid ${RV2.hairline}`,
             borderRadius: RV2.panelRadius,
             padding: '4px 12px',
             minHeight: 96,
+            animation: dictationFlashKey > 0 ? 'rv2-dictation-flash 900ms ease-out' : 'none',
           }}
         >
+          <style>{`
+            @keyframes rv2-dictation-flash {
+              0%   { background-color: rgba(247,147,30,0.16); box-shadow: 0 0 0 2px rgba(247,147,30,0.28); }
+              100% { background-color: #FFFFFF; box-shadow: 0 0 0 0 rgba(247,147,30,0); }
+            }
+            @media (prefers-reduced-motion: reduce) {
+              [data-rv2-flash="1"] { animation: none !important; }
+            }
+          `}</style>
           <MentionsComposerInput
             value={composer.state.reviewText}
             onChange={composer.setReviewText}
@@ -419,6 +432,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
           />
         </div>
       </section>
+
 
 
 

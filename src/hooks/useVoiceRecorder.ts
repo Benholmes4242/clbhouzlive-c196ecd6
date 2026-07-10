@@ -14,6 +14,9 @@ interface UseVoiceRecorderReturn {
   resumeRecording: () => void;
   resetRecording: () => void;
   error: string | null;
+  /** Live mic stream while recording; null when idle. Consumers can attach
+   *  an AnalyserNode for waveform rendering. */
+  stream: MediaStream | null;
 }
 
 export const useVoiceRecorder = (): UseVoiceRecorderReturn => {
@@ -23,6 +26,7 @@ export const useVoiceRecorder = (): UseVoiceRecorderReturn => {
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [stream, setStream] = useState<MediaStream | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -59,19 +63,20 @@ export const useVoiceRecorder = (): UseVoiceRecorderReturn => {
       setDuration(0);
       chunksRef.current = [];
 
-      const stream = await navigator.mediaDevices.getUserMedia({ 
+      const mediaStream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
           sampleRate: 44100,
-        } 
+        }
       });
-      
-      streamRef.current = stream;
 
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: MediaRecorder.isTypeSupported('audio/webm;codecs=opus') 
-          ? 'audio/webm;codecs=opus' 
+      streamRef.current = mediaStream;
+      setStream(mediaStream);
+
+      const mediaRecorder = new MediaRecorder(mediaStream, {
+        mimeType: MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+          ? 'audio/webm;codecs=opus'
           : 'audio/webm'
       });
 
@@ -89,12 +94,13 @@ export const useVoiceRecorder = (): UseVoiceRecorderReturn => {
           setAudioBlob(blob);
           setAudioUrl(URL.createObjectURL(blob));
         }
-        
+
         // Clean up stream
         if (streamRef.current) {
           streamRef.current.getTracks().forEach(track => track.stop());
           streamRef.current = null;
         }
+        setStream(null);
       };
 
       mediaRecorder.start(100); // Collect data every 100ms
@@ -138,6 +144,7 @@ export const useVoiceRecorder = (): UseVoiceRecorderReturn => {
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
     }
+    setStream(null);
     
     setIsRecording(false);
     setIsPaused(false);
@@ -181,5 +188,6 @@ export const useVoiceRecorder = (): UseVoiceRecorderReturn => {
     resumeRecording,
     resetRecording,
     error,
+    stream,
   };
 };
