@@ -38,8 +38,8 @@ const EMPTY_STATES: Record<EmptyStateType, {
   },
   'friends-no-activity': {
     icon: Users,
-    title: 'Friends League',
-    body: "Your friends haven't logged any Top 100 courses yet. Be the first to set the pace!",
+    title: 'No friends on this board yet',
+    body: "A leaderboard of one isn't much of a contest.",
     cta: { label: 'Invite a friend', action: 'invite-friend' },
   },
   'around-you-no-rank': {
