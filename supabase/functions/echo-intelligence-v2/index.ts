@@ -844,8 +844,10 @@ serve(async (req: Request) => {
           text: finalText,
           ...metaExtras,
         };
-        // Cache successful non-live responses.
-        if (cacheRoute && finalText && !metaExtras.error) {
+        // Cache successful non-live responses. `live` flips true whenever
+        // Perplexity contributed (full route with a live grounding), so we
+        // skip caching those too — freshness > 6h TTL would stale them fast.
+        if (cacheRoute && finalText && !metaExtras.error && !live) {
           await cachePut(queryHash, cacheRoute, finalText, meta);
         }
         // Persist assistant message even if client disconnected.
