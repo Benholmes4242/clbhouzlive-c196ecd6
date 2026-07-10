@@ -373,8 +373,8 @@ function AnalyseRowItem({ row, isLast }: { row: AnalyseRow; isLast: boolean }) {
   );
 }
 
-function BackedByResultsCard({ wins, topFives }: { wins: number; topFives: number }) {
-  const { data: tournaments = [] } = useIntelligenceHistoricalPicks();
+function BackedByResultsCard({ wins, topFives, tourSlug }: { wins: number; topFives: number; tourSlug?: string }) {
+  const { data: tournaments = [] } = useIntelligenceHistoricalPicks(tourSlug);
   const totalResolved = tournaments.length;
   const hitRatePct = totalResolved > 0 ? Math.round((topFives / totalResolved) * 100) : 0;
 
