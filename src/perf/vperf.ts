@@ -41,7 +41,7 @@ import { writeBandwidthSample, getNetClass } from '@/video/bandwidthMemory';
 
 const SPAN_TTL_MS = 15_000;
 
-type Verdict = 'PASS' | 'SLOW' | 'TIMEOUT';
+type Verdict = 'PASS' | 'SLOW' | 'TIMEOUT' | 'SUPERSEDED';
 
 interface SpanRec {
   spanId: string;
@@ -210,8 +210,43 @@ export function vperfEnd(
   const rec = spans.get(spanId);
   if (!rec) return;
   spans.delete(spanId);
+  clearLaneArmsBySpan(spanId);
   finish(rec, 'PASS', extraMeta);
 }
+
+/** Close an in-flight span as SUPERSEDED — reports actual elapsed time but
+ *  is excluded from PASS/SLOW/TIMEOUT verdict rollups (flicked-past posts
+ *  and abandoned opens are not slow, they were superseded). No-op if the
+ *  span is not currently in the map. */
+export function vperfSupersede(
+  spanId: string,
+  extraMeta: Record<string, unknown> = {},
+): void {
+  if (!on()) return;
+  const rec = spans.get(spanId);
+  if (!rec) return;
+  spans.delete(spanId);
+  clearLaneArmsBySpan(spanId);
+  clearTimeout(rec.timer);
+  const totalMs = Math.round(performance.now() - rec.t0);
+  emit(rec.kind, {
+    totalMs,
+    phases: rec.phases,
+    budgetMs: rec.budgetMs,
+    verdict: 'SUPERSEDED' as Verdict,
+    ...rec.meta,
+    ...extraMeta,
+  });
+}
+
+function clearLaneArmsBySpan(spanId: string): void {
+  for (const [laneId, list] of laneArms) {
+    const filtered = list.filter((a) => a.spanId !== spanId);
+    if (filtered.length === 0) laneArms.delete(laneId);
+    else if (filtered.length !== list.length) laneArms.set(laneId, filtered);
+  }
+}
+
 
 /** Adjust the budget for an in-flight span (e.g. once you know whether the
  *  open path is borrow vs cold-lane). No-op if the span has already ended. */
@@ -635,8 +670,10 @@ interface KindStat {
   pass: number;
   slow: number;
   timeout: number;
+  superseded: number;
   totals: number[]; // durations for p50/p95/worst
 }
+
 
 const scorecardBuckets = new Map<string, KindStat>();      // key = `${kind}|${page}`
 const sessionHealth = {
@@ -709,7 +746,16 @@ function scorecardIngest(kind: string, payload: Record<string, unknown>): void {
 
   if (!isFinite(totalMs) || totalMs < 0) return;
   const key = bucketKey(kind, page);
-  const stat = scorecardBuckets.get(key) ?? { count: 0, pass: 0, slow: 0, timeout: 0, totals: [] };
+  const stat = scorecardBuckets.get(key) ?? { count: 0, pass: 0, slow: 0, timeout: 0, superseded: 0, totals: [] };
+  // SUPERSEDED spans (flick-past, abandoned open) are counted separately
+  // and never contribute to pass/slow/timeout tallies or p50/p95 totals —
+  // otherwise abandoned events would inflate SLOW verdicts.
+  if (verdict === 'SUPERSEDED') {
+    stat.count += 1;
+    stat.superseded = (stat.superseded ?? 0) + 1;
+    scorecardBuckets.set(key, stat);
+    return;
+  }
   stat.count += 1;
   if (verdict === 'PASS') stat.pass += 1;
   else if (verdict === 'SLOW') stat.slow += 1;
@@ -718,6 +764,7 @@ function scorecardIngest(kind: string, payload: Record<string, unknown>): void {
   if (stat.totals.length > 500) stat.totals.shift();
   scorecardBuckets.set(key, stat);
 }
+
 
 /** Tally a [DECIDE] outcome for the scorecard's counters. Call sites are
  *  incremental; unused buckets don't render. */
@@ -756,12 +803,15 @@ export function vperfScorecard(trigger: 'auto' | 'nav' | 'manual' = 'manual'): v
   const keys = [...scorecardBuckets.keys()].sort();
   for (const k of keys) {
     const s = scorecardBuckets.get(k)!;
-    const passPct = s.count > 0 ? Math.round((s.pass / s.count) * 100) : 0;
+    const evaluated = Math.max(0, s.count - (s.superseded ?? 0));
+    const passPct = evaluated > 0 ? Math.round((s.pass / evaluated) * 100) : 0;
     const worst = s.totals.reduce((m, v) => v > m ? v : m, 0);
+    const supTag = (s.superseded ?? 0) > 0 ? ` SUP=${s.superseded}` : '';
     lines.push(
-      `  ${k.padEnd(36)} ${String(s.count).padStart(5)} ${String(pct(s.totals, 0.5)).padStart(4)} ${String(pct(s.totals, 0.95)).padStart(5)} ${String(Math.round(worst)).padStart(6)}  ${String(passPct).padStart(3)}%  (SLOW=${s.slow} TO=${s.timeout})`,
+      `  ${k.padEnd(36)} ${String(s.count).padStart(5)} ${String(pct(s.totals, 0.5)).padStart(4)} ${String(pct(s.totals, 0.95)).padStart(5)} ${String(Math.round(worst)).padStart(6)}  ${String(passPct).padStart(3)}%  (SLOW=${s.slow} TO=${s.timeout}${supTag})`,
     );
   }
+
   const sh = sessionHealth;
   const stallRate = sh.totalDurationMs > 0 ? (sh.totalStallMs / sh.totalDurationMs) : 0;
   const dropRate = sh.totalFrames > 0 ? (sh.droppedFrames / sh.totalFrames) : 0;

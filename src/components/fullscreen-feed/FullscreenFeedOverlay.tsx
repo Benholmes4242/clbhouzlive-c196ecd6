@@ -618,7 +618,21 @@ export function FullscreenFeedOverlay() {
       setChildReady(false);
       setTargetRect(null);
       if (watchdogRef.current) { clearTimeout(watchdogRef.current); watchdogRef.current = null; }
+      // [BASELINE] fs.open supersede — if the overlay closed before the
+      // open span settled (image transitionend / video firstFrame), the
+      // open was abandoned mid-load. Supersede instead of orphaning to
+      // the 15s watchdog with a SLOW/TIMEOUT verdict.
+      try {
+        const sid: string | undefined = (window as any).__vperfFsOpenSpanId;
+        if (sid) {
+          import('@/perf/vperf').then((m) => {
+            m.vperfSupersede(sid, { supersededBy: 'overlayClose' });
+            (window as any).__vperfFsOpenSpanId = null;
+          }).catch(() => {});
+        }
+      } catch {}
     }
+
   }, [isOpen, origin, borrow]);
 
   const handleSnapFeedFirstFrame = useCallback(() => {

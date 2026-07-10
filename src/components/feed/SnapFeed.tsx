@@ -8,7 +8,7 @@ import { haptic } from '@/utils/haptics';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
-import { vperfStart, vperfArmLane, vperfNextId, vperfFeedScrollTick, vperfFeedActivateStart, vperfFeedActivateEnd } from '@/perf/vperf';
+import { vperfStart, vperfArmLane, vperfNextId, vperfFeedScrollTick, vperfFeedActivateStart, vperfFeedActivateEnd, vperfEnd, vperfSupersede } from '@/perf/vperf';
 import { PrefetchController } from '@/video/PrefetchController';
 import { trace } from '@/perf/trace';
 import { VideoEngine } from '@/video/VideoEngine';
@@ -188,21 +188,29 @@ export function SnapFeed({
     // swipe.vertical — video slides only. Image slides have no lane
     // events on either surface, so starting the span would guarantee
     // a 15001ms watchdog orphan.
+    let swipeSpanId: string | null = null;
     if (mediaType === 'video') {
-      const spanId = vperfNextId(`swipe.vertical:${post.id}`);
-      vperfStart(spanId, 'swipe.vertical', { postId: post.id, activeIndex, surface });
-      vperfArmLane(armLane, { spanId, endOn: 'firstFrame' });
-      vperfArmLane(armLane, { spanId, endOn: 'playing', phase: 'playing' });
+      swipeSpanId = vperfNextId(`swipe.vertical:${post.id}`);
+      vperfStart(swipeSpanId, 'swipe.vertical', { postId: post.id, activeIndex, surface });
+      vperfArmLane(armLane, { spanId: swipeSpanId, endOn: 'firstFrame' });
+      vperfArmLane(armLane, { spanId: swipeSpanId, endOn: 'playing', phase: 'playing' });
     }
 
     // [BASELINE] feed.activate — activation → media visible latency.
     activateT0Ref.current = vperfFeedActivateStart();
     activateDoneRef.current = false;
     const armId = vperfNextId(`feed.activate:${post.id}`);
-    vperfStart(armId, mediaType === 'image' ? 'feed.activate.image' : 'feed.activate.video.cold', { idx: activeIndex });
+    vperfStart(armId, mediaType === 'image' ? 'feed.activate.image' : 'feed.activate.video.cold', { idx: activeIndex, surface });
     if (mediaType === 'video') {
       vperfArmLane(armLane, { spanId: armId, endOn: 'firstFrame' });
       vperfArmLane(armLane, { spanId: armId, endOn: 'playing', phase: 'playing' });
+    } else {
+      // Image slides have no lane events — close the armId span on the
+      // next frame via imageFallback so it never orphans to the 15s
+      // watchdog on either surface (inline OR fullscreen overlay).
+      requestAnimationFrame(() => {
+        vperfEnd(armId, { closedBy: 'imageFallback' });
+      });
     }
 
     // [FSVERT] slide.change — vertical activeIndex transition. Fullscreen
@@ -288,9 +296,18 @@ export function SnapFeed({
     // Fallback finalize after 900ms if lane events never arrive (orphan guard).
     const to = window.setTimeout(finalize, 900);
     if (mediaType === 'image') requestAnimationFrame(() => { finalize(); });
-    return () => { clearTimeout(to); finalize(); };
+    return () => {
+      clearTimeout(to);
+      finalize();
+      // Supersede any still-open spans for the OUTGOING slide — user
+      // swiped past before firstFrame arrived. vperfSupersede is a
+      // no-op if the span already closed via lane events or fallback.
+      if (swipeSpanId) vperfSupersede(swipeSpanId, { supersededBy: 'deactivate' });
+      vperfSupersede(armId, { supersededBy: 'deactivate' });
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeIndex, isFullscreen]);
+
 
 
   // [BASELINE] feed.scroll sampler — subscribes to the outer scroll element.
