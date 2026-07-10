@@ -279,6 +279,10 @@ export interface CinematicHeroFullBleedProps {
   hoursUntilStart?: number;
   venueName?: string | null;
   datesString?: string | null;
+  /** MAJ-1: this slide is the pseudo-tour men's-major entry. */
+  isPseudoMajor?: boolean;
+  /** MAJ-1: append a small gold MAJOR tag to the eyebrow (LPGA/CHAMP majors). */
+  showMajorTag?: boolean;
 }
 
 // ---- component ------------------------------------------------------------
@@ -299,6 +303,8 @@ export function CinematicHeroFullBleed({
   hoursUntilStart,
   venueName,
   datesString,
+  isPseudoMajor,
+  showMajorTag,
 }: CinematicHeroFullBleedProps) {
   const isLive = state.kind === 'live';
   const isResults = state.kind === 'results';
@@ -321,16 +327,24 @@ export function CinematicHeroFullBleed({
   // ----- Eyebrow -----
   let eyebrowGold = false;
   let eyebrowText = '';
+  // Pseudo-major slides never render a tour name (e.g. "DP WORLD TOUR").
+  const tourSuffix = tourLabel && !isPseudoMajor ? ` · ${tourLabel.toUpperCase()}` : '';
   if (isLive) {
-    eyebrowText = `LIVE · ${roundLabel(state.round, state.totalRounds).toUpperCase()}${tourLabel ? ` · ${tourLabel.toUpperCase()}` : ''}`;
+    eyebrowText = isPseudoMajor
+      ? `LIVE · MAJOR CHAMPIONSHIP`
+      : `LIVE · ${roundLabel(state.round, state.totalRounds).toUpperCase()}${tourSuffix}`;
+    if (isPseudoMajor) eyebrowGold = true;
   } else if (awaitingPlayoff) {
-    eyebrowText = `PLAYOFF${tourLabel ? ` · ${tourLabel.toUpperCase()}` : ''}`;
+    eyebrowText = `PLAYOFF${tourSuffix}`;
     eyebrowGold = true;
   } else if (isResults) {
-    eyebrowText = `🏆 FINAL${tourLabel ? ` · ${tourLabel.toUpperCase()}` : ''}`;
+    eyebrowText = `🏆 FINAL${tourSuffix}`;
     eyebrowGold = true;
   } else if (isUpcoming) {
-    eyebrowText = `UPCOMING${tourLabel ? ` · ${tourLabel.toUpperCase()}` : ''}`;
+    eyebrowText = isPseudoMajor
+      ? `UPCOMING · MAJOR CHAMPIONSHIP`
+      : `UPCOMING${tourSuffix}`;
+    if (isPseudoMajor) eyebrowGold = true;
   }
 
   // ----- Rows for live / awaiting-playoff (top-3 with ties) -----
