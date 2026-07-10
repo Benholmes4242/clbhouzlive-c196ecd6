@@ -20,7 +20,7 @@
  * Pass criteria:
  *   • 0 cycles where the active ownerKey lost its lane binding.
  *   • 0 cycles where firstFrame regressed true→false.
- *   • preload.rejected count > 0 (guard actually fired).
+ *   • preload.rejected count >= cycles (guard actually fired at least once per cycle).
  */
 
 import { VideoEngine } from './VideoEngine';
@@ -67,13 +67,13 @@ async function run(opts: { cycles?: number; intervalMs?: number } = {}) {
   const baselineFirstFrame = activeSnap.firstFrame;
   const rows: HealthRow[] = [];
 
-  // Count rejects by monkey-patching trace briefly.
+  // Count rejects from the actual trace('preload.rejected') emission path.
   let rejectCount = 0;
-  const w = window as unknown as { __trace_sink__?: (name: string) => void };
+  const w = window as unknown as { __trace_sink__?: (name: string, payload?: Record<string, unknown>) => void };
   const priorSink = w.__trace_sink__;
-  w.__trace_sink__ = (name: string) => {
+  w.__trace_sink__ = (name: string, payload?: Record<string, unknown>) => {
     if (name === 'preload.rejected') rejectCount++;
-    priorSink?.(name);
+    priorSink?.(name, payload);
   };
 
   // eslint-disable-next-line no-console
@@ -117,7 +117,7 @@ async function run(opts: { cycles?: number; intervalMs?: number } = {}) {
 
   const bindingLosses = rows.filter((r) => r.bindingLost).length;
   const ffRegressions = rows.filter((r) => r.firstFrameRegressed).length;
-  const pass = bindingLosses === 0 && ffRegressions === 0 && rejectCount > 0;
+  const pass = bindingLosses === 0 && ffRegressions === 0 && rejectCount >= cycles;
 
   // eslint-disable-next-line no-console
   console.info(`[laneChurn] ${pass ? 'PASS' : 'FAIL'}`, {

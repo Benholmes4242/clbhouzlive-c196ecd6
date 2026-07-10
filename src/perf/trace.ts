@@ -22,6 +22,8 @@ const opens: TraceOpen[] = [];
 const MAX_OPENS = 8;
 let vidSeq = 0;
 
+type TraceSink = (evt: string, payload: Record<string, unknown>) => void;
+
 export function traceGenId(): string {
   return Math.random().toString(36).slice(2, 8);
 }
@@ -61,6 +63,12 @@ export function traceLatestOpen(): TraceOpen | null {
 
 export function trace(evt: string, payload: Record<string, unknown> = {}): void {
   if (!isPerfEnabled()) return;
+  try {
+    const sink = typeof window !== 'undefined'
+      ? (window as unknown as { __trace_sink__?: TraceSink }).__trace_sink__
+      : undefined;
+    sink?.(evt, payload);
+  } catch { /* trace-only */ }
   // eslint-disable-next-line no-console
   console.info('[TRACE]', evt, payload);
 }
