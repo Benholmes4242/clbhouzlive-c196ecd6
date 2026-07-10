@@ -12,7 +12,6 @@ import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/mentions/MentionText';
 import {
   getRatingTier,
-  getRatingTierLabel,
   HERO_NUMBER_STYLE,
   ratingTextColor,
 } from '@/lib/ratingTier';
