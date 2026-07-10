@@ -28,12 +28,17 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
     // Per-actor unread (badge hybrid): show a small dot on the pill when ANY
     // non-active actor has unread activity — tells the owner "another profile
     // has activity".
-    const { hasOtherUnread, countFor } = useActorUnreadCounts();
+    const { otherUnreadTotal, countFor } = useActorUnreadCounts();
 
     // Combined unread count for the active actor (notifications + DMs).
     const activeUnread = activeActor
       ? countFor(activeActor.type as 'personal' | 'business', activeActor.id)
       : 0;
+
+    // Single unified badge value: active actor's unread takes priority; if the
+    // active actor is clear, surface the other-accounts total instead (so the
+    // owner still sees a numbered top-right badge, never a bare top-left dot).
+    const badgeCount = activeUnread > 0 ? activeUnread : otherUnreadTotal;
 
 
     // Bare theme — no background, no chevron, white-ringed avatar with drop shadow
