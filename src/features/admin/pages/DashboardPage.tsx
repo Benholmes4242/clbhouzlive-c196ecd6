@@ -117,8 +117,8 @@ export default function DashboardPage() {
       {/* EG Sync Health */}
       <EgSyncCard data={egSyncHealth.data} loading={egSyncHealth.isLoading} isError={egSyncHealth.isError} />
 
-      {/* Echo Engine Health */}
-      <EchoEngineHealthCard />
+      {/* Echo Engine Health — compact link row */}
+      <EchoHealthLinkRow />
 
 
 
