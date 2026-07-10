@@ -16,7 +16,7 @@ import {
   HERO_NUMBER_STYLE,
   ratingTextColor,
 } from '@/lib/ratingTier';
-import { RV2, VERDICTS, type VerdictSlug } from '../tokens';
+import { RV2, type VerdictSlug } from '../tokens';
 import type { CategoryKey, MediaItem, ReviewV2Course } from '../types';
 
 interface Author {
@@ -82,8 +82,7 @@ export function LivePreviewCard({
   const tier = getRatingTier(overall);
   const isGold = tier === 'EXCEPTIONAL';
   const tierLabel = overall != null ? getRatingTierLabel(overall) : null;
-  const verdictLabel =
-    verdict != null ? VERDICTS.find((v) => v.slug === verdict)?.label : null;
+  void verdict;
 
   return (
     <article
@@ -178,28 +177,8 @@ export function LivePreviewCard({
         </div>
       </div>
 
-      {/* Verdict chip */}
-      <div style={{ padding: '4px 14px 6px', position: 'relative', zIndex: 2 }}>
-        {verdictLabel ? (
-          <span
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              padding: '4px 10px',
-              borderRadius: 999,
-              background: RV2.amberSoft,
-              color: RV2.amber,
-              fontSize: 11.5,
-              fontWeight: 700,
-              letterSpacing: '0.02em',
-            }}
-          >
-            {verdictLabel}
-          </span>
-        ) : (
-          <Ghost width={110} height={22} radius={999} />
-        )}
-      </div>
+      {/* Verdict chip removed — tier label (top-right) is the derived
+          verdict, matching ReviewBottomSheet's ReviewVerdictLabel. */}
 
       {/* Review body */}
       <div style={{ padding: '4px 14px 10px', position: 'relative', zIndex: 2 }}>
