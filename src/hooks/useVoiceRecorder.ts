@@ -144,6 +144,7 @@ export const useVoiceRecorder = (): UseVoiceRecorderReturn => {
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
     }
+    setStream(null);
     
     setIsRecording(false);
     setIsPaused(false);
