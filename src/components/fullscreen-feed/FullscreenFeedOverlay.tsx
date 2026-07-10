@@ -801,6 +801,11 @@ export function FullscreenFeedOverlay() {
                     readOnly={readOnly}
                     onBeforeNavigate={handleClose}
                   />
+
+                  <FullscreenScrubber
+                    activePost={activePost}
+                    activeIndex={activeIndex}
+                  />
                 </div>
 
                 {/* ── Blurred self-backdrop (surround) ──
