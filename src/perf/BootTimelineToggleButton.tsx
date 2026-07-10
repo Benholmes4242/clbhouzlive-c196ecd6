@@ -1,18 +1,15 @@
-// Pre-launch visible debug toggle for boot-timeline events. Mounted app-wide
-// in App.tsx beside <PerfToggleButton/>. localStorage flip + reload — boot
-// events only matter from the next cold boot anyway.
+// Pre-launch visible debug toggle for boot-timeline events. Mounted via
+// AdminGatedBootTimelinePill wrapper. localStorage flip + reload — boot events
+// only matter from the next cold boot anyway.
+// NOTE: gating lives in the wrapper — keep hook calls unconditional here.
 import React, { useState, useEffect } from 'react';
 import { enableBootTimeline, disableBootTimeline } from '@/utils/bootTimeline';
-import { usePanelRole } from '@/hooks/usePanelRole';
 
 const isBootOn = () =>
   typeof window !== 'undefined' &&
   window.localStorage?.getItem('BOOT_TIMELINE') === 'true';
 
 export function BootTimelineToggleButton() {
-  const { role, loading } = usePanelRole();
-  if (loading || role !== 'full') return null;
-
   const [on, setOn] = useState(isBootOn());
   useEffect(() => setOn(isBootOn()), []);
   return (
