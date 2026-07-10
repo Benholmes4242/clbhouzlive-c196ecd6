@@ -75,35 +75,24 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
 
           </span>
 
-          {hasUnreadNotifications && (
+          {activeUnread > 0 && (
             <span
               className={cn(
                 "absolute -top-1 -right-1 flex items-center justify-center rounded-full bg-[#F7931E] font-bold",
-                notificationCount > 9
+                activeUnread > 9
                   ? "h-[18px] min-w-[18px] px-[4px] text-[10px]"
-                  : notificationCount > 0
-                  ? "h-[18px] w-[18px] text-[10px]"
-                  : "h-2.5 w-2.5"
+                  : "h-[18px] w-[18px] text-[10px]"
               )}
               style={{ color: 'rgba(255,255,255,0.95)', boxShadow: '0 0 0 0.5px rgba(255,255,255,0.95)' }}
-              aria-label={`${notificationCount} unread notifications`}
+              aria-label={`${activeUnread} unread`}
             >
-              {notificationCount > 0 && (
-                <span style={{ lineHeight: 1 }}>
-                  {notificationCount > 99 ? '99+' : notificationCount}
-                </span>
-              )}
+              <span style={{ lineHeight: 1 }}>
+                {activeUnread > 99 ? '99+' : activeUnread}
+              </span>
             </span>
           )}
 
-          {hasUnreadMessages && (
-            <span
-              className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-[1.5px] ring-black"
-              aria-label="Unread messages"
-            />
-          )}
-
-          {hasOtherUnread && !hasUnreadNotifications && (
+          {hasOtherUnread && activeUnread === 0 && (
             <span
               className="absolute -top-0.5 -left-0.5 h-2 w-2 rounded-full bg-[#F7931E] ring-[1.5px] ring-black"
               aria-label="Another profile has unread activity"
