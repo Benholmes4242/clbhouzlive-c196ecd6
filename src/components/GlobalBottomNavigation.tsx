@@ -417,6 +417,11 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
           </motion.div>
         )}
       </AnimatePresence>
+      <CreateSheetV2
+        open={createSheetOpen}
+        onClose={() => setCreateSheetOpen(false)}
+        returnPath={location.pathname}
+      />
     </>
   );
 };
