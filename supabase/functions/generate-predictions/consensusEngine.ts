@@ -101,9 +101,9 @@ async function callClaude(
       'anthropic-version': '2023-06-01',
     },
     body: JSON.stringify({
-      // Sonnet 5: no temperature / top_p / top_k.
+      // Sonnet 5: no temperature / top_p / top_k. ti-9
       model: ANTHROPIC_MODEL_SYNTH,
-      max_tokens: 4000,
+      max_tokens: 10000,
       system: systemPrompt,
       messages: [{ role: 'user', content: `${userPrompt}\n\nReturn compact JSON - no markdown fences, no prose, reasons under 12 words each.` }],
     }),
