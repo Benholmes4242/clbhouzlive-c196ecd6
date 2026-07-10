@@ -115,7 +115,7 @@ export default function MediaStageV2({ item, index, total, onOpenAdjust, onOpenT
   if (!item) {
     const plusSize = 56;
     return (
-      <div style={{ flex: 1, background: '#15171F', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+      <div ref={stageRef} style={{ flex: 1, background: '#15171F', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
         <style>{KEYFRAMES_CSS}</style>
         <button
           onClick={onRequestAdd}
