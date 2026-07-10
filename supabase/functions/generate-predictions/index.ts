@@ -1008,7 +1008,7 @@ function formatDate(dateStr: string): string {
 
 function buildAnalysisPrompt(
   tournament: Tournament, 
-  players: PlayerStats[],
+  players: (PlayerStats & { statsAvailable?: boolean })[],
   researchContext: string = '',
   hasConfirmedField: boolean = false,
   courseHistoryData: any[] = [],
@@ -1017,6 +1017,7 @@ function buildAnalysisPrompt(
   venueHistorySection: string = '',
   detailedStatsSection: string = '',
   courseDNAType: string | null = null,
+  statsLightCount: number = 0,
 ): string {
   const courseType = determineCourseType(tournament, courseDNAType);
   
@@ -1027,7 +1028,8 @@ function buildAnalysisPrompt(
     worldRank: p.world_rank,
     priorRank: p.prior_rank,
     momentum: p.prior_rank - p.world_rank,
-    stats: {
+    statsAvailable: p.statsAvailable !== false,
+    stats: p.statsAvailable === false ? null : {
       drivingDistance: p.drive_avg,
       drivingAccuracy: p.drive_acc,
       greensInRegulation: p.gir_pct,
@@ -1069,8 +1071,12 @@ ${formLines}
   }
 
   const fieldNote = hasConfirmedField
-    ? '**Note**: The player pool below contains ONLY confirmed tournament entrants.'
+    ? `**Note**: The player pool below contains ONLY confirmed tournament entrants (${players.length} players).`
     : '**Note**: Confirmed field not yet available — pool is top players by world ranking. Some may not be in the field.';
+
+  const statsLightNote = statsLightCount > 0
+    ? `\n**Stats coverage**: ${statsLightCount} of ${players.length} field players have \`statsAvailable: false\` (no PGA-season stats row). For those players, weigh recent results, world ranking, and the live research above — do not treat missing stats as weakness.\n`
+    : '';
 
   return `You are an expert PGA Tour analyst with deep knowledge of player statistics, course management, and tournament history. Your analysis is data-driven but also considers intangibles like pressure performance, course fit, and current form.
 
