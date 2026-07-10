@@ -58,6 +58,7 @@ export function SuccessScreen({
   onViewReview,
   onDone,
 }: SuccessScreenProps) {
+  const { openInviteSheet } = useInviteSheet();
   const courseName = course?.name || 'the course';
   const isNewReview = !isEditMode;
 
