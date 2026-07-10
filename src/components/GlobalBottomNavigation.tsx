@@ -14,6 +14,7 @@ import { isMedianApp } from '@/utils/median/isMedianApp';
 import { useNavTheme } from '@/hooks/useNavTheme';
 import { useNavScrollState, pushForceExpand, resetToExpanded } from '@/hooks/useScrollDirection';
 import { cn } from '@/lib/utils';
+import CreateSheetV2 from '@/features/post-v2/components/CreateSheetV2';
 
 // ---- Public token: total vertical space to reserve at the bottom of any
 // scrollable page so its last content clears the floating pill.
