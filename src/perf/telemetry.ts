@@ -35,8 +35,13 @@ const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const SUPABASE_ANON = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
 
 let __installed = false;
+let __listenersAttached = false;
 let __sessionId: string | null = null;
-let __enrolled = false;
+let __coinFlip = false; // sticky per-session coin flip only
+
+function isEffectivelyEnrolled(): boolean {
+  return __coinFlip || isPerfEnabledSafe();
+}
 
 function pct(arr: number[], p: number): number {
   if (arr.length === 0) return 0;
@@ -93,19 +98,22 @@ function enrolSession(): void {
     if (raw) {
       const p = JSON.parse(raw);
       __sessionId = String(p.sessionId);
-      __enrolled = Boolean(p.enrolled);
+      // Backward compat: older sessions stored `enrolled`; treat that as the
+      // coin flip. New sessions store `coinFlip` explicitly.
+      __coinFlip = Boolean(p.coinFlip ?? p.enrolled);
       return;
     }
   } catch {}
   __sessionId = uuid();
-  __enrolled = Math.random() < SAMPLE_RATE;
+  __coinFlip = Math.random() < SAMPLE_RATE;
   try {
     sessionStorage.setItem(SESSION_KEY, JSON.stringify({
       sessionId: __sessionId,
-      enrolled: __enrolled,
+      coinFlip: __coinFlip,
     }));
   } catch {}
 }
+
 
 interface RollupRow {
   session_id: string;
