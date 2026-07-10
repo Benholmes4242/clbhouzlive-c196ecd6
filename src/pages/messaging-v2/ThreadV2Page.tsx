@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ChevronLeft, MoreVertical, BadgeCheck } from 'lucide-react';
+import { ChevronLeft, MoreVertical, BadgeCheck, MessageCircle } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useThread } from '@/hooks/messaging/useThread';
 import { useConversations } from '@/hooks/messaging/useConversations';
@@ -368,9 +368,29 @@ const ThreadV2Page: React.FC = () => {
         ) : messages.length === 0 ? (
           <div
             className="flex flex-col items-center justify-center text-center"
-            style={{ padding: '96px 24px' }}
+            style={{ padding: '96px 24px', gap: 10 }}
           >
-            <p style={{ color: SUB, fontSize: 14, margin: 0 }}>No messages yet</p>
+            <div
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: '50%',
+                background: '#EDEFF2',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <MessageCircle size={28} color="#AEB4BC" />
+            </div>
+            <div className="flex flex-col items-center" style={{ gap: 2 }}>
+              <p style={{ color: INK, fontSize: 16, fontWeight: 500, margin: 0, lineHeight: '20px' }}>
+                Say hello
+              </p>
+              <p style={{ color: SUB, fontSize: 13, margin: 0, lineHeight: '18px' }}>
+                This is the start of your conversation.
+              </p>
+            </div>
           </div>
         ) : (
           <>
