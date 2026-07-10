@@ -927,8 +927,8 @@ const AppInner: React.FC = () => {
         <NavTimingProvider>
         <PerfHud />
         <LogHud />
-        <PerfToggleButton />
-        <BootTimelineToggleButton />
+        <AdminGatedPerfPill />
+        <AdminGatedBootTimelinePill />
         
         
         
