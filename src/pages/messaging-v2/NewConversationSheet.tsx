@@ -295,7 +295,7 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
                     cursor: disabled ? 'not-allowed' : 'pointer',
                   }}
                 >
-                  <SquircleAvatar src={c.avatar_url ?? undefined} alt={c.name} size={44} />
+                  <SquircleAvatar src={c.avatar_url ?? undefined} alt={c.name} size={44} hairlineRing />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div
                       style={{
