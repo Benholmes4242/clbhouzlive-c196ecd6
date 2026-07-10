@@ -265,6 +265,7 @@ const ThreadV2Page: React.FC = () => {
   );
 
   const header = resolveHeaderIdentity(
+    detail,
     conv,
     actor?.actorType ?? null,
     actor?.actorId ?? null,
