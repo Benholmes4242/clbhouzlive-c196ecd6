@@ -82,18 +82,19 @@ export default function MediaStageV2({ item, index, total, onOpenAdjust, onOpenT
               }}
             >
               {f.play && (
-                <Play size={12} color="rgba(255,255,255,0.3)" style={{ marginLeft: 1 }} />
-              )}
-              {f.play && (
                 <div
                   style={{
-                    position: 'absolute',
                     width: 20,
                     height: 20,
                     borderRadius: 999,
                     border: '1px solid rgba(255,255,255,0.3)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                   }}
-                />
+                >
+                  <Play size={10} color="rgba(255,255,255,0.3)" fill="rgba(255,255,255,0.3)" style={{ marginLeft: 1 }} />
+                </div>
               )}
             </div>
           ))}
