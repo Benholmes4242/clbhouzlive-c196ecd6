@@ -23,10 +23,21 @@ interface Props {
 }
 
 const KEYFRAMES = `
-@keyframes ghostDriftA { 0%,100% { transform: translate(-6%, -3%) rotate(-4deg); } 50% { transform: translate(-2%, 1%) rotate(-2deg); } }
-@keyframes ghostDriftB { 0%,100% { transform: translate(0%, 0%) rotate(0deg); } 50% { transform: translate(2%, -2%) rotate(1.5deg); } }
-@keyframes ghostDriftC { 0%,100% { transform: translate(6%, 3%) rotate(4deg); } 50% { transform: translate(3%, -1%) rotate(2deg); } }
+@keyframes ghostFloaty {
+  0%,100% { transform: translateY(0) rotate(var(--r)); }
+  50% { transform: translateY(-6px) rotate(var(--r)); }
+}
 `;
+
+interface FrameDef {
+  w: number; h: number; x: number; y: number; r: number; delay: number; play?: boolean;
+}
+
+const FRAMES: FrameDef[] = [
+  { w: 96,  h: 120, x: -78, y: -34, r: -7, delay: 0 },
+  { w: 110, h: 82,  x: 34,  y: -66, r: 4,  delay: 0.4, play: true },
+  { w: 86,  h: 104, x: 52,  y: 40,  r: 9,  delay: 0.8 },
+];
 
 export default function MediaStageV2({ item, index, total, onOpenAdjust, onOpenTrim, onOpenCover, onRequestAdd }: Props) {
   const reduced = useMemo(
@@ -38,39 +49,76 @@ export default function MediaStageV2({ item, index, total, onOpenAdjust, onOpenT
     return (
       <div style={{ flex: 1, background: '#0E1013', position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
         <style>{KEYFRAMES}</style>
-        <div style={{ position: 'relative', width: 260, height: 220 }}>
-          <Ghost
-            style={{ left: '2%', top: '18%', width: 130, height: 160, animation: reduced ? undefined : 'ghostDriftA 4.2s ease-in-out infinite' }}
-          />
-          <Ghost
-            style={{ left: '30%', top: '4%', width: 140, height: 180, animation: reduced ? undefined : 'ghostDriftB 4.8s ease-in-out infinite 0.4s' }}
-            play
-          />
-          <Ghost
-            style={{ right: '2%', top: '22%', width: 120, height: 150, animation: reduced ? undefined : 'ghostDriftC 4.5s ease-in-out infinite 0.9s' }}
-          />
-        </div>
         <button
           onClick={onRequestAdd}
           aria-label="Add media"
           style={{
-            marginTop: 22,
-            width: 60,
-            height: 60,
-            borderRadius: 999,
-            background: '#F7931E',
+            position: 'relative',
+            width: 260,
+            height: 260,
+            background: 'transparent',
             border: 0,
-            color: '#15171F',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            padding: 0,
             cursor: 'pointer',
-            boxShadow: '0 10px 28px rgba(247,147,30,0.35), 0 2px 6px rgba(247,147,30,0.25)',
           }}
         >
-          <Plus size={26} strokeWidth={2.4} />
+          {FRAMES.map((f, i) => (
+            <div
+              key={i}
+              style={{
+                position: 'absolute',
+                left: `calc(50% + ${f.x}px - ${f.w / 2}px)`,
+                top: `calc(50% + ${f.y}px - ${f.h / 2}px)`,
+                width: f.w,
+                height: f.h,
+                borderRadius: 12,
+                border: '1.5px dashed rgba(255,255,255,0.22)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                ['--r' as any]: `${f.r}deg`,
+                transform: `rotate(${f.r}deg)`,
+                animation: reduced ? undefined : `ghostFloaty 4s ${f.delay}s ease-in-out infinite`,
+              }}
+            >
+              {f.play && (
+                <div
+                  style={{
+                    width: 20,
+                    height: 20,
+                    borderRadius: 999,
+                    border: '1px solid rgba(255,255,255,0.3)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Play size={10} color="rgba(255,255,255,0.3)" fill="rgba(255,255,255,0.3)" style={{ marginLeft: 1 }} />
+                </div>
+              )}
+            </div>
+          ))}
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%,-50%)',
+              width: 52,
+              height: 52,
+              borderRadius: 999,
+              background: '#F7931E',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 8px 24px rgba(247,147,30,0.4)',
+            }}
+          >
+            <Plus size={24} strokeWidth={2} color="#FFFFFF" />
+          </div>
         </button>
-        <div style={{ marginTop: 18, color: 'rgba(255,255,255,0.5)', fontSize: 12.5, letterSpacing: 0.1 }}>
+        <div style={{ marginTop: 46, color: 'rgba(255,255,255,0.5)', fontSize: 12.5, letterSpacing: 0.1 }}>
           Every round has a highlight.
         </div>
       </div>
@@ -110,28 +158,6 @@ export default function MediaStageV2({ item, index, total, onOpenAdjust, onOpenT
   );
 }
 
-function Ghost({ style, play }: { style: React.CSSProperties; play?: boolean }) {
-  return (
-    <div
-      style={{
-        position: 'absolute',
-        borderRadius: 16,
-        border: '1.5px dashed rgba(255,255,255,0.22)',
-        background: 'rgba(255,255,255,0.03)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        ...style,
-      }}
-    >
-      {play && (
-        <div style={{ width: 34, height: 34, borderRadius: 999, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Play size={16} color="rgba(255,255,255,0.55)" fill="rgba(255,255,255,0.35)" />
-        </div>
-      )}
-    </div>
-  );
-}
 
 const chipStyle: React.CSSProperties = {
   background: 'rgba(0,0,0,0.55)',
