@@ -520,10 +520,10 @@ function sortPicksByFinish<T extends { actualPosition: number | null }>(picks: T
   });
 }
 
-function PicksHistoryBody({ onClose }: { onClose: () => void }) {
+function PicksHistoryBody({ onClose, tourSlug, tourTag }: { onClose: () => void; tourSlug?: string; tourTag: string }) {
   const navigate = useNavigate();
   const [filter, setFilter] = useState<FilterKey>('all');
-  const { data: tournaments = [], isLoading } = useIntelligenceHistoricalPicks();
+  const { data: tournaments = [], isLoading } = useIntelligenceHistoricalPicks(tourSlug);
 
   const filtered = useMemo(
     () => tournaments.filter((t) => matchesFilter(t.outcome, filter)),
