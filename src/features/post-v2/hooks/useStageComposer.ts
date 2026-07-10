@@ -11,7 +11,8 @@ export type FrameId = 'original' | '4:5' | '1:1' | '9:16';
 
 export interface StageMediaItem {
   id: string;
-  file: File;
+  /** Present for newly-picked items only. Existing (already-uploaded) items omit this. */
+  file?: File;
   type: 'image' | 'video';
   previewUrl: string;
   naturalWidth?: number;
@@ -23,6 +24,8 @@ export interface StageMediaItem {
   trimStart?: number | null;
   trimEnd?: number | null;
   posterTimestamp?: number | null;
+  /** Set for items loaded from an existing post - the post_media.id. */
+  existingId?: string;
 }
 
 export interface StageCourse {
