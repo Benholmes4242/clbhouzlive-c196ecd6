@@ -18,7 +18,7 @@
 //   random; device_class is a coarse UA bucket.
 // ============================================================================
 
-import { isPerfEnabled } from '@/perf/navTiming';
+import { isPerfEnabled, subscribePerfLive } from '@/perf/navTiming';
 import {
   __vperfSnapshotTelemetry,
   __vperfResetTelemetry,
