@@ -697,6 +697,7 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
         model_version: 'consensus_v1',
         prompt_version: 'v4',
         consensus_data: {
+          pipeline: 'ti-1',
           method: consensus.consensusMethod,
           agreementScore: consensus.agreementScore,
           modelResults: consensus.modelResults.map(r => ({
