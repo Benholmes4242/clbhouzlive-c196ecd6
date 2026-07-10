@@ -30,10 +30,10 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
     // has activity".
     const { hasOtherUnread, countFor } = useActorUnreadCounts();
 
-    // Green dot when the active actor has unread activity (notifications or DMs).
-    const hasUnreadMessages = activeActor
-      ? countFor(activeActor.type as 'personal' | 'business', activeActor.id) > 0
-      : false;
+    // Combined unread count for the active actor (notifications + DMs).
+    const activeUnread = activeActor
+      ? countFor(activeActor.type as 'personal' | 'business', activeActor.id)
+      : 0;
 
 
     // Bare theme — no background, no chevron, white-ringed avatar with drop shadow
