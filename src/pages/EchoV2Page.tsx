@@ -112,6 +112,8 @@ const EchoV2Page: React.FC = () => {
           style={{
             WebkitOverflowScrolling: 'touch',
             paddingBottom: showWelcome ? 0 : scrollPadBottom,
+            display: showWelcome ? 'flex' : undefined,
+            flexDirection: showWelcome ? 'column' : undefined,
           }}
         >
           {showWelcome ? (
