@@ -289,8 +289,65 @@ export function SuccessScreen({
           Your verdict on {courseName} is live in the feed.
         </motion.p>
 
+        {/* Invite chip — dark surface, appended after existing content */}
+        <motion.button
+          type="button"
+          onClick={() => openInviteSheet('review_success')}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+          style={{
+            marginTop: 4,
+            marginBottom: 4,
+            width: '100%',
+            maxWidth: 340,
+            background: '#0F172A',
+            borderRadius: 14,
+            padding: 4,
+            border: 'none',
+            cursor: 'pointer',
+          }}
+          aria-label="Invite friends"
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              padding: '10px 12px',
+              background: 'rgba(255,255,255,0.06)',
+              border: '0.5px solid rgba(255,255,255,0.12)',
+              borderRadius: 12,
+            }}
+          >
+            <UserPlus size={15} color="#F7931E" strokeWidth={2.2} />
+            <span
+              style={{
+                flex: 1,
+                textAlign: 'left',
+                fontSize: 11,
+                color: 'rgba(255,255,255,0.85)',
+                lineHeight: 1.35,
+              }}
+            >
+              Played it with your fourball? Get them on here.
+            </span>
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                color: '#F7931E',
+                letterSpacing: '0.02em',
+              }}
+            >
+              Invite
+            </span>
+          </div>
+        </motion.button>
+
         <div style={{ flex: 1, minHeight: 24 }} />
       </div>
+
 
       {/* Bottom buttons — pinned */}
       <motion.div
