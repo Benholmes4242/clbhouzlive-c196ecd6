@@ -21,8 +21,11 @@ import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion'
 import type { PanInfo } from 'framer-motion';
 import {
   ChevronRight, LogOut, Shield,
-  MessageCircle, Bell, Settings as SettingsIcon, UserCog, Plus,
+  MessageCircle, Bell, Settings as SettingsIcon, UserCog, Plus, UserPlus,
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useInviteSheet } from '@/hooks/useInviteSheet';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 import { useActorUnreadCounts } from '@/hooks/useActorUnreadCounts';
 import { useNavigate } from 'react-router-dom';
