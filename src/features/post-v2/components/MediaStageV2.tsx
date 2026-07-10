@@ -2,7 +2,7 @@
 // Empty state: "ghost collage" - three dashed drifting frames + amber add CTA.
 
 import { Plus, Play } from 'lucide-react';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { StageMediaItem, FrameId } from '../hooks/useStageComposer';
 
 const FRAME_RATIO: Record<FrameId, number | null> = {
@@ -22,8 +22,8 @@ interface Props {
   onRequestAdd?: () => void;
 }
 
-const KEYFRAMES = `
-@keyframes ghostFloaty {
+const KEYFRAMES_CSS = `
+@keyframes pv2-floaty {
   0%,100% { transform: translateY(0) rotate(var(--r)); }
   50% { transform: translateY(-6px) rotate(var(--r)); }
 }
@@ -33,71 +33,146 @@ interface FrameDef {
   w: number; h: number; x: number; y: number; r: number; delay: number; play?: boolean;
 }
 
+// Base values authored at container=260. Scaled proportionally.
+const BASE = 260;
 const FRAMES: FrameDef[] = [
   { w: 96,  h: 120, x: -78, y: -34, r: -7, delay: 0 },
   { w: 110, h: 82,  x: 34,  y: -66, r: 4,  delay: 0.4, play: true },
   { w: 86,  h: 104, x: 52,  y: 40,  r: 9,  delay: 0.8 },
 ];
 
+function useContainerSize() {
+  const [size, setSize] = useState(() => {
+    if (typeof window === 'undefined') return 300;
+    return Math.min(window.innerWidth * 0.78, 340);
+  });
+  useEffect(() => {
+    const onResize = () => setSize(Math.min(window.innerWidth * 0.78, 340));
+    onResize();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+  return size;
+}
+
 export default function MediaStageV2({ item, index, total, onOpenAdjust, onOpenTrim, onOpenCover, onRequestAdd }: Props) {
   const reduced = useMemo(
     () => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches,
     [],
   );
+  const containerSize = useContainerSize();
+  const k = containerSize / BASE;
+  const frameRefs = useRef<Array<HTMLDivElement | null>>([]);
+
+  // rAF fallback: if computed animation-name isn't picked up (odd CSS
+  // sandboxing), drive translateY via a sine loop with matching amplitude
+  // (6px) and period (4s).
+  useEffect(() => {
+    if (item) return;
+    if (reduced) return;
+    let raf = 0;
+    let stopped = false;
+    let needsJs = false;
+    // Probe after mount: if animation-name is not pv2-floaty on the first
+    // frame, engage the JS driver.
+    const probe = () => {
+      const el = frameRefs.current[0];
+      if (!el) return;
+      const cs = window.getComputedStyle(el);
+      if (!cs.animationName || cs.animationName === 'none' || !cs.animationName.includes('pv2-floaty')) {
+        needsJs = true;
+      }
+      if (!needsJs) return;
+      const start = performance.now();
+      const tick = (t: number) => {
+        if (stopped) return;
+        const elapsed = (t - start) / 1000;
+        FRAMES.forEach((f, i) => {
+          const el = frameRefs.current[i];
+          if (!el) return;
+          const phase = (elapsed - f.delay) / 4;
+          const y = -6 * Math.max(0, Math.sin(phase * Math.PI * 2) / 2 + 0.5) * 2 + 6;
+          // simpler: 0..-6..0 sine wave
+          const ty = -6 * (0.5 - 0.5 * Math.cos(phase * Math.PI * 2));
+          el.style.transform = `translateY(${ty}px) rotate(${f.r}deg)`;
+        });
+        raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
+    };
+    const id = window.setTimeout(probe, 60);
+    return () => {
+      stopped = true;
+      window.clearTimeout(id);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [item, reduced]);
 
   if (!item) {
+    const plusSize = 56;
     return (
-      <div style={{ flex: 1, background: '#0E1013', position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-        <style>{KEYFRAMES}</style>
+      <div style={{ flex: 1, background: '#0E1013', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+        <style>{KEYFRAMES_CSS}</style>
         <button
           onClick={onRequestAdd}
           aria-label="Add media"
           style={{
             position: 'relative',
-            width: 260,
-            height: 260,
+            width: containerSize,
+            height: containerSize,
             background: 'transparent',
             border: 0,
             padding: 0,
             cursor: 'pointer',
           }}
         >
-          {FRAMES.map((f, i) => (
-            <div
-              key={i}
-              style={{
-                position: 'absolute',
-                left: `calc(50% + ${f.x}px - ${f.w / 2}px)`,
-                top: `calc(50% + ${f.y}px - ${f.h / 2}px)`,
-                width: f.w,
-                height: f.h,
-                borderRadius: 12,
-                border: '1.5px dashed rgba(255,255,255,0.22)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                ['--r' as any]: `${f.r}deg`,
-                transform: `rotate(${f.r}deg)`,
-                animation: reduced ? undefined : `ghostFloaty 4s ${f.delay}s ease-in-out infinite`,
-              }}
-            >
-              {f.play && (
-                <div
-                  style={{
-                    width: 20,
-                    height: 20,
-                    borderRadius: 999,
-                    border: '1px solid rgba(255,255,255,0.3)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Play size={10} color="rgba(255,255,255,0.3)" fill="rgba(255,255,255,0.3)" style={{ marginLeft: 1 }} />
-                </div>
-              )}
-            </div>
-          ))}
+          {FRAMES.map((f, i) => {
+            const w = f.w * k;
+            const h = f.h * k;
+            const x = f.x * k;
+            const y = f.y * k;
+            const style: React.CSSProperties = {
+              position: 'absolute',
+              left: `calc(50% + ${x}px - ${w / 2}px)`,
+              top: `calc(50% + ${y}px - ${h / 2}px)`,
+              width: w,
+              height: h,
+              borderRadius: 12,
+              border: '1.5px dashed rgba(255,255,255,0.22)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              willChange: 'transform',
+              transform: `rotate(${f.r}deg)`,
+            };
+            (style as any)['--r'] = `${f.r}deg`;
+            if (!reduced) {
+              style.animation = `pv2-floaty 4s ${f.delay}s ease-in-out infinite`;
+            }
+            return (
+              <div
+                key={i}
+                ref={(el) => { frameRefs.current[i] = el; }}
+                style={style}
+              >
+                {f.play && (
+                  <div
+                    style={{
+                      width: 20,
+                      height: 20,
+                      borderRadius: 999,
+                      border: '1px solid rgba(255,255,255,0.3)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Play size={10} color="rgba(255,255,255,0.3)" fill="rgba(255,255,255,0.3)" style={{ marginLeft: 1 }} />
+                  </div>
+                )}
+              </div>
+            );
+          })}
           <div
             aria-hidden
             style={{
@@ -105,8 +180,8 @@ export default function MediaStageV2({ item, index, total, onOpenAdjust, onOpenT
               left: '50%',
               top: '50%',
               transform: 'translate(-50%,-50%)',
-              width: 52,
-              height: 52,
+              width: plusSize,
+              height: plusSize,
               borderRadius: 999,
               background: '#F7931E',
               display: 'flex',
@@ -118,9 +193,6 @@ export default function MediaStageV2({ item, index, total, onOpenAdjust, onOpenT
             <Plus size={24} strokeWidth={2} color="#FFFFFF" />
           </div>
         </button>
-        <div style={{ marginTop: 46, color: 'rgba(255,255,255,0.5)', fontSize: 12.5, letterSpacing: 0.1 }}>
-          Every round has a highlight.
-        </div>
       </div>
     );
   }
@@ -157,7 +229,6 @@ export default function MediaStageV2({ item, index, total, onOpenAdjust, onOpenT
     </div>
   );
 }
-
 
 const chipStyle: React.CSSProperties = {
   background: 'rgba(0,0,0,0.55)',
