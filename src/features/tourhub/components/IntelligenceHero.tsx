@@ -1674,52 +1674,97 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
     [state, activeData, tracker],
   );
 
+  // Fallback event name from the hero slide (covers team events + guard-refused
+  // rows where we get no predictions/tournament payload back). Every state uses
+  // this so the header always names the same subject as the hero.
+  const heroEventName = viewingSlide?.tournament.name
+    ? stripLeadingThe(viewingSlide.tournament.name)
+    : null;
+
+  const metaName = meta.name && meta.name !== '—' ? meta.name : null;
+  const resolvedEventName = metaName ?? heroEventName;
+
   const headline =
     state === 'live'
       ? 'Tracking our 3 picks live.'
       : 'Our picks for';
-  const headlineTournamentName = state === 'live' ? undefined : meta.name && meta.name !== '—' ? meta.name : undefined;
+  const headlineTournamentName = state === 'live' ? undefined : resolvedEventName ?? undefined;
   const headlineCourseName = state === 'live' ? undefined : meta.course && meta.course !== '—' ? meta.course : undefined;
 
   const hasWinner = state === 'results' && resultsPicks.some((p) => p.outcome === 'win');
 
-  // Fallback event name from the hero slide (covers team events + guard-refused
-  // rows where we get no predictions/tournament payload back).
-  const heroEventName = viewingSlide?.tournament.name
-    ? stripLeadingThe(viewingSlide.tournament.name)
+  // Countdown context for the WAITING state.
+  const heroStartMs = viewingSlide?.tournament.startDate
+    ? new Date(viewingSlide.tournament.startDate).getTime()
     : null;
-  const unavailableLabel = heroEventName
-    ? `Intelligence for ${heroEventName} arrives once the field is confirmed`
-    : 'Intelligence arrives once the field is confirmed';
+  const hoursUntilStart =
+    heroStartMs != null ? (heroStartMs - Date.now()) / 3_600_000 : null;
+  // "Tournament week" — Sunday-through-tee-off window. Outside this, the
+  // field will not be confirmed, so we go straight to WAITING.
+  const isTournamentWeek =
+    hoursUntilStart != null && hoursUntilStart <= 96 && hoursUntilStart > -24;
+  const isPseudoMajor =
+    viewingSlide?.tournament.tourSlug === ('major' as any) ||
+    !!viewingSlide?.tournament.isMajor;
 
   // Decide what to render in the carousel.
   let cards: React.ReactNode = null;
+  let hasCards = false;
+  if (state === 'upcoming' && upcomingPicks.length > 0) {
+    cards = upcomingPicks.map((p) => <UpcomingCard key={p.rank} pick={p} expanded={reasonsExpanded} onToggle={toggleReasons} />);
+    hasCards = true;
+  } else if (state === 'live' && livePicks.length > 0) {
+    cards = livePicks.map((p) => <LiveCard key={p.rank} pick={p} expanded={reasonsExpanded} onToggle={toggleReasons} />);
+    hasCards = true;
+  } else if (state === 'results' && resultsPicks.length > 0) {
+    cards = resultsPicks.map((p) => <ResultsCard key={p.rank} pick={p} expanded={reasonsExpanded} onToggle={toggleReasons} />);
+    hasCards = true;
+  }
+
+  // GENERATING poll: while empty + in tournament week, refetch every 10s for
+  // at most 2 minutes; after that fall through to WAITING silently.
+  const queryClient = useQueryClient();
+  const [pollExpired, setPollExpired] = useState(false);
+  const emptyKindPreExpire: 'generating' | 'waiting' = isTournamentWeek ? 'generating' : 'waiting';
+  const emptyKind: 'generating' | 'waiting' =
+    emptyKindPreExpire === 'generating' && !pollExpired ? 'generating' : 'waiting';
+  const shouldPoll = !isLoading && !hasCards && emptyKindPreExpire === 'generating' && !pollExpired;
+  useEffect(() => {
+    setPollExpired(false);
+  }, [crossfadeKeyBase(viewingTournamentId, activeTournamentId)]);
+  useEffect(() => {
+    if (!shouldPoll) return;
+    const startedAt = Date.now();
+    const iv = window.setInterval(() => {
+      if (Date.now() - startedAt > 120_000) {
+        setPollExpired(true);
+        window.clearInterval(iv);
+        return;
+      }
+      queryClient.invalidateQueries({ queryKey: ['ai-predictions'] });
+    }, 10_000);
+    return () => window.clearInterval(iv);
+  }, [shouldPoll, queryClient]);
+
   let renderEmpty: React.ReactNode = null;
   if (isLoading) {
-    renderEmpty = <StateMessage label="Loading Intelligence…" />;
-  } else if (state === 'upcoming') {
-    if (upcomingPicks.length === 0) {
-      renderEmpty = <StateMessage label={unavailableLabel} />;
-    } else {
-      cards = upcomingPicks.map((p) => <UpcomingCard key={p.rank} pick={p} expanded={reasonsExpanded} onToggle={toggleReasons} />);
-    }
-  } else if (state === 'live') {
-    if (livePicks.length === 0) {
-      renderEmpty = <StateMessage label={unavailableLabel} />;
-    } else {
-      cards = livePicks.map((p) => <LiveCard key={p.rank} pick={p} expanded={reasonsExpanded} onToggle={toggleReasons} />);
-    }
-  } else if (state === 'results') {
-    if (resultsPicks.length === 0) {
-      renderEmpty = <StateMessage label={unavailableLabel} />;
-    } else {
-      cards = resultsPicks.map((p) => <ResultsCard key={p.rank} pick={p} expanded={reasonsExpanded} onToggle={toggleReasons} />);
-    }
+    renderEmpty = <IntelligenceSkeleton />;
+  } else if (!hasCards) {
+    renderEmpty = emptyKind === 'generating' ? (
+      <IntelligenceGenerating />
+    ) : (
+      <IntelligenceWaiting
+        eventName={resolvedEventName}
+        hoursUntilStart={hoursUntilStart}
+        isMajor={isPseudoMajor}
+      />
+    );
   }
 
   // Crossfade key — flips whenever the hero jumps to a new tournament so the
   // TI section fades in lockstep with the hero's own AnimatePresence.
   const crossfadeKey = viewingTournamentId ?? activeTournamentId ?? 'none';
+
 
   return (
     <section
