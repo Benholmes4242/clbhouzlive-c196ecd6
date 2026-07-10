@@ -289,6 +289,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                 userId={headerId}
                 alt={headerTitle}
                 size={72}
+                hairlineRing
               />
               {isGroup && isAdmin && titleEdit != null ? (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', maxWidth: 320 }}>
