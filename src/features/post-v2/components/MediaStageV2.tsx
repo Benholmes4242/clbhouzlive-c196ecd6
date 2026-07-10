@@ -41,17 +41,24 @@ const FRAMES: FrameDef[] = [
   { w: 86,  h: 104, x: 52,  y: 40,  r: 9,  delay: 0.8 },
 ];
 
-function useContainerSize() {
-  const [size, setSize] = useState(() => {
-    if (typeof window === 'undefined') return 300;
-    return Math.min(window.innerWidth * 0.78, 340);
-  });
+function useContainerSize(ref: React.RefObject<HTMLElement>) {
+  const [size, setSize] = useState(240);
   useEffect(() => {
-    const onResize = () => setSize(Math.min(window.innerWidth * 0.78, 340));
-    onResize();
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, []);
+    const el = ref.current;
+    if (!el) return;
+    const measure = () => {
+      const rect = el.getBoundingClientRect();
+      const h = rect.height || 240;
+      const w = rect.width || 320;
+      // Collage scales to min(56% of stage height, 300px), and never wider than
+      // the stage.
+      setSize(Math.max(140, Math.min(h * 0.56, w * 0.78, 300)));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [ref]);
   return size;
 }
 
