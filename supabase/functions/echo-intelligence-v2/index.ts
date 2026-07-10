@@ -250,6 +250,8 @@ async function streamClaude(
       "anthropic-version": "2023-06-01",
     },
     body: JSON.stringify({
+      // Claude Sonnet 5: no temperature/top_p/top_k — recent generations
+      // dropped those sampling params. Keep max_tokens + stream.
       model: ANTHROPIC_MODEL_SYNTH,
       max_tokens: 1200,
       system: systemPrompt,
@@ -258,7 +260,11 @@ async function streamClaude(
     }),
   }), 30000);
 
-  if (!response.ok) throw new Error(`Claude API error: ${response.status}`);
+  if (!response.ok) {
+    const body = await response.text().catch(() => "");
+    console.error(`[echo-v2] Claude stream ${response.status}:`, body);
+    throw new Error(`Claude API error: ${response.status}`);
+  }
 
   const reader = response.body!.getReader();
   const decoder = new TextDecoder();
