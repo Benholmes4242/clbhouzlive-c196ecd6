@@ -1,62 +1,74 @@
 /**
- * ImmersiveFullscreenChrome — persistent top+bottom overlay chrome for the
- * fullscreen viewer.
- *
- * Layout (see BRIEF: Fullscreen viewer overlay redesign — Option B):
- *   TOP scrim (persistent, ~70px, linear-gradient(rgba(0,0,0,.45)→transparent)):
- *     - Back chevron (top-LEFT, circular rgba(0,0,0,.32))
- *     - Optional mute toggle (video posts only, next to back)
- *     - Segmented carousel dots (top-CENTER, WHITE active)
- *     - Course-score chip (top-RIGHT, solid rgba(0,0,0,.4), amber ◉ glyph)
- *   BOTTOM scrim (persistent, ~150px, transparent → rgba(0,0,0,.68)):
- *     - LEFT info stack: amber verdict eyebrow · course name · attribution ·
- *       "read review ›" (review posts only)
- *     - RIGHT vertical action rail: avatar (with follow+) · heart+count ·
- *       comment+count · share · more
- *
- * NO fade-on-idle. Chrome is permanent whenever the overlay is open.
- * Chrome only — video playback machinery (SnapFeed / VideoEngine / lanes) is
+ * ImmersiveFullscreenChrome — persistent top+bottom chrome for the fullscreen
+ * viewer. Chrome-only; playback machinery (SnapFeed / VideoEngine / lanes) is
  * untouched.
+ *
+ * Layout:
+ *   TOP scrim (persistent, ~78px, rgba(0,0,0,.5)→transparent):
+ *     - Back chevron top-LEFT (circular rgba(0,0,0,.32))
+ *     - Course block top-RIGHT (name 12/500 ellipsis, location 9/.75 w/ map-pin,
+ *       amber ◉ score chip below)
+ *   BOTTOM scrim (persistent, ~130px, transparent → rgba(0,0,0,.7)):
+ *     - LEFT: 32px squircle avatar + column (name · [2mo · FollowPill] · read
+ *       review ›)
+ *     - CENTER: segmented carousel dots (white active)
+ *     - RIGHT: vertical action rail (heart, comment, send, more)
+ *
+ * NO fade-on-idle. NO carousel dots at top. NO score eyebrow. Course chip in
+ * the top-right is the ONLY score surface.
  */
 import React, { memo, useCallback, useMemo } from 'react';
-import { motion } from 'framer-motion';
 import {
   ChevronLeft,
   Heart,
   MessageCircle,
   Send,
   MoreHorizontal,
-  Volume2,
-  VolumeX,
-  Plus,
-  Check,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useClubhouseStore } from '@/store/clubhouseStore';
-import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { CarouselDots } from '@/components/media/CarouselDots';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
-import { getRatingTheme } from '@/lib/globalAchievementMilestoneSystem';
+import { FeedFollowPill } from '@/components/feed/FeedFollowPill';
+import MapPinIcon from '@/components/icons/MapPinIcon';
 import { Z } from '@/config/zIndex';
 import { formatRatingValue } from '@/utils/formatters';
 import type { FeedPost } from '@/components/media-system/types/media';
 
-// Shared amber accent — matches FeedCard.tsx:52.
 const AMBER = '#F7931E';
 const CHEVRON_BG = 'rgba(0,0,0,0.32)';
 const CHIP_BG = 'rgba(0,0,0,0.40)';
 const ICON_SHADOW = 'drop-shadow(0 1px 3px rgba(0,0,0,0.55))';
 const TEXT_SHADOW = '0 1px 3px rgba(0,0,0,0.55)';
 
-const formatCount = (n: number | null | undefined): string | null => {
+function formatCount(n: number | null | undefined): string | null {
   if (n === null || n === undefined || n === 0) return null;
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
   if (n >= 1_000) return `${(n / 1_000).toFixed(1)}k`;
-  return n.toString();
-};
+  return String(n);
+}
 
-interface ImmersiveFullscreenChromeProps {
+function timeAgo(iso: string | null | undefined) {
+  if (!iso) return '';
+  const t = new Date(iso).getTime();
+  if (!isFinite(t)) return '';
+  const s = Math.max(1, Math.floor((Date.now() - t) / 1000));
+  if (s < 60) return `${s}s`;
+  const m = Math.floor(s / 60);
+  if (m < 60) return `${m}m`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h`;
+  const d = Math.floor(h / 24);
+  if (d < 7) return `${d}d`;
+  const w = Math.floor(d / 7);
+  if (w < 5) return `${w}w`;
+  const mo = Math.floor(d / 30);
+  if (mo < 12) return `${mo}mo`;
+  return `${Math.floor(d / 365)}y`;
+}
+
+interface Props {
   posts: FeedPost[];
   activeIndex: number;
   onClose: () => void;
@@ -71,7 +83,7 @@ interface ImmersiveFullscreenChromeProps {
   onViewProfile: () => void;
   onReviewTap: () => void;
   isOwnPost: boolean;
-  golfCourse?: { id: string; name: string; country?: string } | null;
+  golfCourse?: { id?: string | null; name?: string | null; courseCountry?: string | null } | null;
   readOnly?: boolean;
   onBeforeNavigate?: () => void;
 }
@@ -94,24 +106,14 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   golfCourse,
   readOnly = false,
   onBeforeNavigate,
-}: ImmersiveFullscreenChromeProps) {
+}: Props) {
   const navigate = useNavigate();
-  const isMuted = useClubhouseStore((s) => s.isMuted);
-  const toggleMute = useClubhouseStore((s) => s.toggleMute);
-  const markUserGestureUnmute = useClubhouseStore((s) => s.markUserGestureUnmute);
   const carouselPositions = useClubhouseStore((s) => s.carouselPositions);
   const isTournamentCardActive = useClubhouseStore((s) => s.isTournamentCardActive);
 
   const activePost = posts[activeIndex] ?? null;
   const carouselSlide = carouselPositions.get(activeIndex) ?? 0;
   const mediaCount = activePost?.mediaItems?.length ?? 0;
-  const activeMedia = activePost?.mediaItems?.[carouselSlide];
-  const isVideo = activeMedia?.type === 'video';
-
-  const handleToggleMute = useCallback(() => {
-    if (isMuted) markUserGestureUnmute();
-    toggleMute();
-  }, [isMuted, markUserGestureUnmute, toggleMute]);
 
   const ownerMenu = useMemo(() => {
     if (!activePost || !isOwnPost) return null;
@@ -126,14 +128,10 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
         variant="overlay"
       />
     );
-  }, [
-    isOwnPost,
-    activePost,
-  ]);
+  }, [isOwnPost, activePost]);
 
   if (!activePost) return null;
 
-  // Editorial / tournament cards own their own chrome — bail out.
   const isEditorialCard =
     activePost.postType === 'tournament_result' ||
     activePost.postType === 'pga_card' ||
@@ -143,38 +141,25 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   const likeState = getLikeState(activePost);
   const commentCount = getCommentCount(activePost);
   const isFollowed = getFollowState(activePost);
-  const showFollowPlus = !readOnly && !isOwnPost && !isFollowed;
 
-  // Review verdict eyebrow (only for reviews).
-  const reviewRating = activePost.review?.rating ?? null;
-  const reviewTierLabel =
-    reviewRating != null ? getRatingTheme(reviewRating).label : null;
-
-  // Bottom-left title priority: review course name → tagged course → post title fallback.
-  const bigTitle =
+  const courseName =
     activePost.review?.courseName ??
     golfCourse?.name ??
     activePost.courseName ??
-    activePost.displayName;
-
-  // Attribution line — author + a secondary label. For non-reviews, homeClub
-  // makes the most sense; for reviews we surface author + verdict/course region
-  // secondary if the golf course carries one.
-  const attributionSecondary =
-    activePost.homeClub ??
+    null;
+  const courseLocation =
     activePost.review?.courseSubCountry ??
     activePost.review?.courseCountry ??
+    (activePost as any).courseSubCountry ??
+    (activePost as any).courseCountry ??
+    golfCourse?.courseCountry ??
     null;
-  const attribution = attributionSecondary
-    ? `${activePost.displayName} · ${attributionSecondary}`
-    : activePost.displayName;
-
-  // Course chip (top-right) — only when a community rating is known.
   const courseRating = activePost.courseRating ?? null;
   const showCourseChip = courseRating != null;
 
   const likeStr = formatCount(likeState.count);
   const commentStr = formatCount(commentCount);
+  const timeLabel = timeAgo(activePost.createdAt);
 
   const handleCourseTap = () => {
     const cid = activePost.review?.courseId ?? golfCourse?.id ?? activePost.courseId;
@@ -184,11 +169,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   };
 
   return (
-    <div
-      className="fixed inset-0"
-      style={{ zIndex: 30, pointerEvents: 'none' }}
-      data-immersive-chrome
-    >
+    <div className="fixed inset-0" style={{ zIndex: 30, pointerEvents: 'none' }} data-immersive-chrome>
       {/* ─── TOP scrim ─────────────────────────────────────────── */}
       <div
         aria-hidden
@@ -197,17 +178,13 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           top: 0,
           left: 0,
           right: 0,
-          height: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 70px)',
-          background:
-            'linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0) 100%)',
+          height: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 78px)',
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 100%)',
           pointerEvents: 'none',
           zIndex: 0,
         }}
       />
-
-      <motion.div
-        initial={false}
-        animate={{ opacity: 1 }}
+      <div
         style={{
           position: 'fixed',
           top: 0,
@@ -218,403 +195,266 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 8px)',
           paddingLeft: 'max(14px, env(safe-area-inset-left, 0px))',
           paddingRight: 'max(14px, env(safe-area-inset-right, 0px))',
-          paddingBottom: 12,
-          display: 'grid',
-          gridTemplateColumns: '1fr auto 1fr',
-          alignItems: 'center',
+          paddingBottom: 10,
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
           gap: 12,
           fontFamily: 'Geist, system-ui, sans-serif',
         }}
       >
-        {/* LEFT cluster — back chevron + mute (video only) */}
-        <div
+        {/* LEFT — back chevron */}
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onClose(); }}
+          aria-label="Back"
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            justifySelf: 'start',
+            width: 38, height: 38, borderRadius: '50%', background: CHEVRON_BG,
+            border: 'none', display: 'inline-flex', alignItems: 'center',
+            justifyContent: 'center', color: '#fff', cursor: 'pointer',
+            pointerEvents: 'auto', padding: 0, flexShrink: 0,
           }}
         >
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onClose();
-            }}
-            aria-label="Back"
+          <ChevronLeft size={22} stroke="#fff" strokeWidth={2.5} />
+        </button>
+
+        {/* RIGHT — course block */}
+        {courseName && (
+          <div
             style={{
-              width: 38,
-              height: 38,
-              borderRadius: '50%',
-              background: CHEVRON_BG,
-              border: 'none',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#fff',
-              cursor: 'pointer',
-              pointerEvents: 'auto',
-              padding: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-end',
+              gap: 3,
+              maxWidth: '60%',
+              minWidth: 0,
+              textAlign: 'right',
             }}
           >
-            <ChevronLeft size={22} stroke="#fff" strokeWidth={2.5} />
-          </button>
-
-          {isVideo && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleToggleMute();
-              }}
-              aria-label={isMuted ? 'Unmute video' : 'Mute video'}
+            <span
+              title={courseName}
               style={{
-                width: 38,
-                height: 38,
-                borderRadius: '50%',
-                background: CHEVRON_BG,
-                border: 'none',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#fff',
-                cursor: 'pointer',
-                pointerEvents: 'auto',
-                padding: 0,
+                fontSize: 12, fontWeight: 500, color: '#fff', lineHeight: 1.2,
+                textShadow: TEXT_SHADOW,
+                maxWidth: '100%', overflow: 'hidden',
+                textOverflow: 'ellipsis', whiteSpace: 'nowrap',
               }}
             >
-              {isMuted ? (
-                <VolumeX size={20} stroke="#fff" strokeWidth={2} />
-              ) : (
-                <Volume2 size={20} stroke="#fff" strokeWidth={2} />
-              )}
-            </button>
-          )}
-        </div>
-
-        {/* CENTER — carousel dots (persistent white). Reserved slot so grid
-            layout keeps left/right anchored even on single-media posts. */}
-        <div
-          style={{
-            justifySelf: 'center',
-            minHeight: 10,
-            display: 'flex',
-            alignItems: 'center',
-          }}
-        >
-          {mediaCount > 1 && (
-            <CarouselDots
-              count={mediaCount}
-              active={carouselSlide}
-              tone="light"
-              isVisible
-            />
-          )}
-        </div>
-
-        {/* RIGHT — course-score chip (solid bg, amber ◉) */}
-        <div style={{ justifySelf: 'end' }}>
-          {showCourseChip && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleCourseTap();
-              }}
-              aria-label={`Community rating ${formatRatingValue(courseRating!)}`}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 5,
-                background: CHIP_BG,
-                border: 'none',
-                borderRadius: 8,
-                padding: '4px 8px',
-                color: '#fff',
-                fontFamily: 'inherit',
-                fontSize: 11,
-                fontWeight: 500,
-                lineHeight: 1,
-                letterSpacing: '0.01em',
-                cursor: 'pointer',
-                pointerEvents: 'auto',
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
+              {courseName}
+            </span>
+            {courseLocation && (
               <span
-                aria-hidden
                 style={{
-                  color: AMBER,
-                  fontSize: 12,
-                  lineHeight: 1,
+                  display: 'inline-flex', alignItems: 'center', gap: 3,
+                  fontSize: 9, color: '#fff', opacity: 0.75, lineHeight: 1.1,
+                  textShadow: TEXT_SHADOW,
+                  maxWidth: '100%', overflow: 'hidden',
+                  textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                 }}
               >
-                ◉
+                <MapPinIcon width={9} height={9} style={{ flexShrink: 0 }} />
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {courseLocation}
+                </span>
               </span>
-              {formatRatingValue(courseRating!)}
-            </button>
-          )}
-        </div>
-      </motion.div>
+            )}
+            {showCourseChip && (
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); handleCourseTap(); }}
+                aria-label={`Community rating ${formatRatingValue(courseRating!)}`}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 5,
+                  background: CHIP_BG, border: 'none', borderRadius: 8,
+                  padding: '3px 8px', color: '#fff', fontFamily: 'inherit',
+                  fontSize: 10, fontWeight: 500, lineHeight: 1,
+                  letterSpacing: '0.01em', cursor: 'pointer',
+                  pointerEvents: 'auto', fontVariantNumeric: 'tabular-nums',
+                  marginTop: 2,
+                }}
+              >
+                <span aria-hidden style={{ color: AMBER, fontSize: 11, lineHeight: 1 }}>◉</span>
+                {formatRatingValue(courseRating!)}
+              </button>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* ─── BOTTOM scrim ──────────────────────────────────────── */}
       <div
         aria-hidden
         style={{
           position: 'fixed',
-          left: 0,
-          right: 0,
-          bottom: 0,
-          height: 'calc(max(env(safe-area-inset-bottom, 0px), 24px) + 150px)',
+          left: 0, right: 0, bottom: 0,
+          height: 'calc(max(env(safe-area-inset-bottom, 0px), 24px) + 130px)',
           background:
-            'linear-gradient(to top, rgba(0,0,0,0.68) 0%, rgba(0,0,0,0.30) 55%, rgba(0,0,0,0) 100%)',
+            'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.32) 55%, rgba(0,0,0,0) 100%)',
           pointerEvents: 'none',
           zIndex: 0,
         }}
       />
 
-      {/* Bottom info stack (LEFT) */}
-      <div
-        style={{
-          position: 'fixed',
-          bottom: 'calc(max(env(safe-area-inset-bottom, 0px), 24px) + 18px)',
-          left: 'max(16px, env(safe-area-inset-left, 0px))',
-          right: 92, // reserve room for the vertical action rail
-          zIndex: Z.echo,
-          pointerEvents: 'none',
-          fontFamily: 'Geist, system-ui, sans-serif',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 4,
-        }}
-      >
-        {reviewTierLabel && reviewRating != null && (
-          <span
-            style={{
-              fontSize: 9,
-              fontWeight: 500,
-              color: AMBER,
-              letterSpacing: '0.6px',
-              textTransform: 'uppercase',
-              lineHeight: 1,
-              fontVariantNumeric: 'tabular-nums',
-              textShadow: TEXT_SHADOW,
-            }}
-          >
-            {reviewTierLabel} · {formatRatingValue(reviewRating)}
-          </span>
-        )}
-
-        <span
-          style={{
-            fontSize: 15,
-            fontWeight: 500,
-            color: '#fff',
-            lineHeight: 1.2,
-            textShadow: TEXT_SHADOW,
-            wordBreak: 'break-word',
-          }}
-        >
-          {bigTitle}
-        </span>
-
-        <span
-          style={{
-            fontSize: 10,
-            fontWeight: 500,
-            color: '#fff',
-            opacity: 0.78,
-            lineHeight: 1.25,
-            textShadow: TEXT_SHADOW,
-          }}
-        >
-          {attribution}
-        </span>
-
-        {activePost.isReview && activePost.review && (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onReviewTap();
-            }}
-            aria-label="Read review"
-            style={{
-              alignSelf: 'flex-start',
-              marginTop: 2,
-              background: 'transparent',
-              border: 'none',
-              padding: 0,
-              cursor: 'pointer',
-              pointerEvents: 'auto',
-              fontFamily: 'inherit',
-              fontSize: 10,
-              fontWeight: 500,
-              color: '#fff',
-              opacity: 0.62,
-              lineHeight: 1,
-              textShadow: TEXT_SHADOW,
-            }}
-          >
-            read review ›
-          </button>
-        )}
-      </div>
-
-      {/* Bottom-RIGHT vertical action rail */}
-      <div
-        style={{
-          position: 'fixed',
-          right: 'max(12px, env(safe-area-inset-right, 0px))',
-          bottom: 'calc(max(env(safe-area-inset-bottom, 0px), 24px) + 24px)',
-          zIndex: Z.echo,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 16,
-          pointerEvents: 'none',
-          fontFamily: 'Geist, system-ui, sans-serif',
-        }}
-      >
-        {/* Creator squircle (38px) with amber follow+ badge */}
+      {/* Carousel dots — bottom-center, above scrubber (~16px from bottom) */}
+      {mediaCount > 1 && (
         <div
           style={{
-            position: 'relative',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            filter: ICON_SHADOW,
+            position: 'fixed',
+            left: 0, right: 0,
+            bottom: 'calc(max(env(safe-area-inset-bottom, 0px), 12px) + 12px)',
+            display: 'flex', justifyContent: 'center',
+            pointerEvents: 'none',
+            zIndex: Z.echo + 1,
           }}
         >
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onViewProfile();
-            }}
-            aria-label={`View ${activePost.displayName}'s profile`}
-            style={{
-              width: 38,
-              height: 38,
-              padding: 0,
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              pointerEvents: 'auto',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <SquircleAvatar
-              size={38}
-              src={activePost.avatarUrl}
-              alt={activePost.displayName}
-              fallback={activePost.displayName?.[0] ?? '?'}
-              hairlineRing
-            />
-          </button>
+          <CarouselDots count={mediaCount} active={carouselSlide} tone="light" isVisible />
+        </div>
+      )}
 
-          {showFollowPlus && (
+      {/* Bottom-LEFT — author + info stack */}
+      <div
+        style={{
+          position: 'fixed',
+          bottom: 'calc(max(env(safe-area-inset-bottom, 0px), 24px) + 26px)',
+          left: 'max(14px, env(safe-area-inset-left, 0px))',
+          right: 64, // reserve space for right rail
+          zIndex: Z.echo,
+          pointerEvents: 'none',
+          fontFamily: 'Geist, system-ui, sans-serif',
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: 10,
+          minWidth: 0,
+        }}
+      >
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onViewProfile(); }}
+          aria-label={`View ${activePost.displayName}'s profile`}
+          style={{
+            width: 32, height: 32, padding: 0, background: 'transparent',
+            border: 'none', cursor: 'pointer', pointerEvents: 'auto',
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0, filter: ICON_SHADOW,
+          }}
+        >
+          <SquircleAvatar
+            size={32}
+            src={activePost.avatarUrl}
+            alt={activePost.displayName}
+            fallback={activePost.displayName?.[0] ?? '?'}
+            hairlineRing
+          />
+        </button>
+
+        <div
+          style={{
+            display: 'flex', flexDirection: 'column', minWidth: 0, gap: 2, flex: 1,
+          }}
+        >
+          {/* Name row — name ellipses first, follow never pushed off */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+            <span
+              onClick={(e) => { e.stopPropagation(); onViewProfile(); }}
+              style={{
+                fontSize: 12, fontWeight: 500, color: '#fff', lineHeight: 1.2,
+                textShadow: TEXT_SHADOW,
+                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                minWidth: 0, flex: '0 1 auto', pointerEvents: 'auto', cursor: 'pointer',
+              }}
+            >
+              {activePost.displayName}
+            </span>
+          </div>
+
+          {/* Sub-row: timeAgo · Follow pill */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minHeight: 18 }}>
+            {timeLabel && (
+              <span
+                style={{
+                  fontSize: 9, color: '#fff', opacity: 0.7, lineHeight: 1,
+                  textShadow: TEXT_SHADOW, flexShrink: 0,
+                }}
+              >
+                {timeLabel}
+              </span>
+            )}
+            {!readOnly && !isOwnPost && (
+              <div style={{ pointerEvents: 'auto', flexShrink: 0 }}>
+                <FeedFollowPill
+                  isFollowed={isFollowed}
+                  onFollow={() => onFollow(activePost)}
+                />
+              </div>
+            )}
+          </div>
+
+          {activePost.isReview && activePost.review && (
             <button
               type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onFollow(activePost);
-              }}
-              aria-label="Follow"
+              onClick={(e) => { e.stopPropagation(); onReviewTap(); }}
+              aria-label="Read review"
               style={{
-                position: 'absolute',
-                bottom: -8,
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: 20,
-                height: 20,
-                borderRadius: '50%',
-                background: AMBER,
-                border: '2px solid rgba(255,255,255,0.95)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: 0,
-                cursor: 'pointer',
-                pointerEvents: 'auto',
+                alignSelf: 'flex-start', marginTop: 2, background: 'transparent',
+                border: 'none', padding: 0, cursor: 'pointer', pointerEvents: 'auto',
+                fontFamily: 'inherit', fontSize: 10, fontWeight: 500, color: '#fff',
+                opacity: 0.62, lineHeight: 1, textShadow: TEXT_SHADOW,
               }}
             >
-              <Plus size={12} strokeWidth={2.5} color="#fff" />
+              read review ›
             </button>
           )}
-          {!readOnly && !isOwnPost && isFollowed && (
-            <span
-              aria-hidden
-              style={{
-                position: 'absolute',
-                bottom: -8,
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: 20,
-                height: 20,
-                borderRadius: '50%',
-                background: AMBER,
-                border: '2px solid rgba(255,255,255,0.95)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                opacity: 0,
-              }}
-            >
-              <Check size={12} strokeWidth={3} color="#fff" />
-            </span>
+        </div>
+      </div>
+
+      {/* Bottom-RIGHT — vertical action rail (no avatar) */}
+      {!readOnly && (
+        <div
+          style={{
+            position: 'fixed',
+            right: 'max(10px, env(safe-area-inset-right, 0px))',
+            bottom: 'calc(max(env(safe-area-inset-bottom, 0px), 24px) + 22px)',
+            zIndex: Z.echo,
+            display: 'flex', flexDirection: 'column', alignItems: 'center',
+            gap: 14, pointerEvents: 'none',
+            fontFamily: 'Geist, system-ui, sans-serif',
+          }}
+        >
+          <RailButton
+            onClick={() => onLike(activePost)}
+            ariaLabel={likeState.isLiked ? 'Unlike' : 'Like'}
+            count={likeStr}
+            accent={likeState.isLiked}
+          >
+            <Heart
+              size={25}
+              fill={likeState.isLiked ? AMBER : 'transparent'}
+              stroke={likeState.isLiked ? AMBER : '#fff'}
+              strokeWidth={2}
+            />
+          </RailButton>
+
+          <RailButton onClick={onComment} ariaLabel="Comments" count={commentStr}>
+            <MessageCircle size={25} stroke="#fff" strokeWidth={2} />
+          </RailButton>
+
+          <RailButton onClick={() => onShare(activePost)} ariaLabel="Share">
+            <Send size={25} stroke="#fff" strokeWidth={2} />
+          </RailButton>
+
+          {ownerMenu ? (
+            <div style={{ filter: ICON_SHADOW, pointerEvents: 'auto' }}>{ownerMenu}</div>
+          ) : (
+            <RailButton onClick={onMore} ariaLabel="More options">
+              <MoreHorizontal size={25} stroke="#fff" strokeWidth={2} />
+            </RailButton>
           )}
         </div>
-
-        {!readOnly && (
-          <>
-            <RailButton
-              onClick={() => onLike(activePost)}
-              ariaLabel={likeState.isLiked ? 'Unlike' : 'Like'}
-              count={likeStr}
-              accent={likeState.isLiked}
-            >
-              <Heart
-                size={26}
-                fill={likeState.isLiked ? AMBER : 'transparent'}
-                stroke={likeState.isLiked ? AMBER : '#fff'}
-                strokeWidth={2}
-              />
-            </RailButton>
-
-            <RailButton
-              onClick={onComment}
-              ariaLabel="Comments"
-              count={commentStr}
-            >
-              <MessageCircle size={26} stroke="#fff" strokeWidth={2} />
-            </RailButton>
-
-            <RailButton onClick={() => onShare(activePost)} ariaLabel="Share">
-              <Send size={26} stroke="#fff" strokeWidth={2} />
-            </RailButton>
-
-            {ownerMenu ? (
-              <div
-                style={{ filter: ICON_SHADOW, pointerEvents: 'auto' }}
-              >
-                {ownerMenu}
-              </div>
-            ) : (
-              <RailButton onClick={onMore} ariaLabel="More options">
-                <MoreHorizontal size={26} stroke="#fff" strokeWidth={2} />
-              </RailButton>
-            )}
-          </>
-        )}
-      </div>
+      )}
     </div>
   );
 });
 
-// ── Rail button (icon + optional count below) ──
 interface RailButtonProps {
   onClick: () => void;
   ariaLabel: string;
@@ -622,52 +462,26 @@ interface RailButtonProps {
   accent?: boolean;
   children: React.ReactNode;
 }
-const RailButton: React.FC<RailButtonProps> = ({
-  onClick,
-  ariaLabel,
-  count,
-  accent,
-  children,
-}) => (
+const RailButton: React.FC<RailButtonProps> = ({ onClick, ariaLabel, count, accent, children }) => (
   <button
     type="button"
-    onClick={(e) => {
-      e.stopPropagation();
-      onClick();
-    }}
+    onClick={(e) => { e.stopPropagation(); onClick(); }}
     aria-label={ariaLabel}
     style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      gap: 3,
-      background: 'transparent',
-      border: 'none',
-      padding: 0,
-      cursor: 'pointer',
-      pointerEvents: 'auto',
-      filter: ICON_SHADOW,
+      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
+      background: 'transparent', border: 'none', padding: 0, cursor: 'pointer',
+      pointerEvents: 'auto', filter: ICON_SHADOW,
       fontFamily: 'Geist, system-ui, sans-serif',
     }}
   >
-    <span
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
+    <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
       {children}
     </span>
     {count && (
       <span
         style={{
-          fontSize: 10,
-          fontWeight: 700,
-          color: accent ? AMBER : '#fff',
-          lineHeight: 1,
-          fontVariantNumeric: 'tabular-nums',
-          textShadow: TEXT_SHADOW,
+          fontSize: 10, fontWeight: 700, color: accent ? AMBER : '#fff',
+          lineHeight: 1, fontVariantNumeric: 'tabular-nums', textShadow: TEXT_SHADOW,
         }}
       >
         {count}
