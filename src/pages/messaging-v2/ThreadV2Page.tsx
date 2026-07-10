@@ -4,6 +4,7 @@ import { ChevronLeft, MoreVertical, BadgeCheck, MessageCircle } from 'lucide-rea
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useThread } from '@/hooks/messaging/useThread';
 import { useConversations } from '@/hooks/messaging/useConversations';
+import { useConversationDetail } from '@/hooks/messaging/useConversationDetail';
 import { useMessagingActor } from '@/hooks/messaging/useMessagingActor';
 import { useSendMessage } from '@/hooks/messaging/useSendMessage';
 import { useKeyboardHeight } from '@/hooks/messaging/useKeyboardHeight';
@@ -11,10 +12,13 @@ import { MessageBubble } from './MessageBubble';
 import { Composer } from './Composer';
 import { ConversationSettingsSheet } from './ConversationSettingsSheet';
 import type {
+  ConversationDetail,
+  ConversationMember,
   InboxConversation,
   InboxParticipant,
   ThreadMessage,
 } from '@/types/messaging';
+
 
 const CANVAS = '#F8FAFC';
 const INK = '#1F2428';
@@ -31,34 +35,69 @@ interface HeaderIdentity {
   secondary: string;
 }
 
+function resolveHeaderFromDetail(
+  detail: ConversationDetail,
+  selfActorType: string | null,
+  selfActorId: string | null,
+): HeaderIdentity {
+  if (detail.type === 'group') {
+    return {
+      name: detail.title ?? 'Group',
+      avatarUrl: detail.avatar_url,
+      userId: detail.conversation_id,
+      verified: false,
+      secondary: `${detail.members.length} ${detail.members.length === 1 ? 'member' : 'members'}`,
+    };
+  }
+  const others = detail.members.filter(
+    (m) => !(m.actor_type === selfActorType && m.actor_id === selfActorId),
+  );
+  const m: ConversationMember | undefined = others[0] ?? detail.members[0];
+  return {
+    name: m?.name ?? m?.username ?? 'Unknown',
+    avatarUrl: m?.avatar_url ?? null,
+    userId: m?.actor_id ?? detail.conversation_id,
+    verified: !!m?.verified,
+    secondary: m?.actor_type === 'business' ? 'Business' : '',
+  };
+}
+
+function resolveHeaderFromInbox(
+  conv: InboxConversation,
+  selfActorType: string | null,
+  selfActorId: string | null,
+): HeaderIdentity {
+  if (conv.type === 'group') {
+    return {
+      name: conv.title ?? 'Group',
+      avatarUrl: conv.avatar_url,
+      userId: conv.conversation_id,
+      verified: false,
+      secondary: `${conv.participants.length} members`,
+    };
+  }
+  const others = conv.participants.filter(
+    (p) => !(p.actor_type === selfActorType && p.actor_id === selfActorId),
+  );
+  const p: InboxParticipant | undefined = others[0] ?? conv.participants[0];
+  return {
+    name: p?.name ?? p?.username ?? 'Unknown',
+    avatarUrl: p?.avatar_url ?? null,
+    userId: p?.actor_id ?? conv.conversation_id,
+    verified: !!p?.verified,
+    secondary: p?.actor_type === 'business' ? 'Business' : '',
+  };
+}
+
 function resolveHeaderIdentity(
+  detail: ConversationDetail | null,
   conv: InboxConversation | null,
   selfActorType: string | null,
   selfActorId: string | null,
   firstIncoming: ThreadMessage | null,
 ): HeaderIdentity {
-  if (conv) {
-    if (conv.type === 'group') {
-      return {
-        name: conv.title ?? 'Group',
-        avatarUrl: conv.avatar_url,
-        userId: conv.conversation_id,
-        verified: false,
-        secondary: `${conv.participants.length} members`,
-      };
-    }
-    const others = conv.participants.filter(
-      (p) => !(p.actor_type === selfActorType && p.actor_id === selfActorId),
-    );
-    const p: InboxParticipant | undefined = others[0] ?? conv.participants[0];
-    return {
-      name: p?.name ?? p?.username ?? 'Unknown',
-      avatarUrl: p?.avatar_url ?? null,
-      userId: p?.actor_id ?? conv.conversation_id,
-      verified: !!p?.verified,
-      secondary: p?.actor_type === 'business' ? 'Business' : '',
-    };
-  }
+  if (detail) return resolveHeaderFromDetail(detail, selfActorType, selfActorId);
+  if (conv) return resolveHeaderFromInbox(conv, selfActorType, selfActorId);
   if (firstIncoming) {
     return {
       name: firstIncoming.sender_name ?? 'Conversation',
@@ -70,6 +109,7 @@ function resolveHeaderIdentity(
   }
   return { name: 'Conversation', avatarUrl: null, userId: '', verified: false, secondary: '' };
 }
+
 
 interface RunFlags {
   isFirstOfRun: boolean;
@@ -138,6 +178,7 @@ const ThreadV2Page: React.FC = () => {
     () => conversations.find((c) => c.conversation_id === conversationId) ?? null,
     [conversations, conversationId],
   );
+  const { detail } = useConversationDetail(conversationId || null);
   const {
     messages,
     fetchOlder,
@@ -224,6 +265,7 @@ const ThreadV2Page: React.FC = () => {
   );
 
   const header = resolveHeaderIdentity(
+    detail,
     conv,
     actor?.actorType ?? null,
     actor?.actorId ?? null,
@@ -367,32 +409,94 @@ const ThreadV2Page: React.FC = () => {
             </button>
           </div>
         ) : messages.length === 0 ? (
-          <div
-            className="flex flex-col items-center justify-center text-center"
-            style={{ padding: '96px 24px', gap: 10 }}
-          >
-            <div
-              style={{
-                width: 48,
-                height: 48,
-                borderRadius: '50%',
-                background: '#EDEFF2',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <MessageCircle size={28} color="#AEB4BC" />
-            </div>
-            <div className="flex flex-col items-center" style={{ gap: 2 }}>
-              <p style={{ color: INK, fontSize: 16, fontWeight: 500, margin: 0, lineHeight: '20px' }}>
-                Say hello
-              </p>
-              <p style={{ color: SUB, fontSize: 13, margin: 0, lineHeight: '18px' }}>
-                This is the start of your conversation.
-              </p>
-            </div>
-          </div>
+          (() => {
+            const isGroup = (detail?.type ?? conv?.type) === 'group';
+            const subtitle = isGroup
+              ? `This is the start of ${header.name && header.name !== 'Conversation' ? header.name : 'this group'}.`
+              : header.name && header.name !== 'Conversation' && header.name !== 'Unknown'
+                ? `This is the start of your conversation with ${header.name}.`
+                : 'This is the start of your conversation.';
+            return (
+              <div
+                className="flex flex-col items-center justify-center text-center"
+                style={{ padding: '96px 24px', gap: 14 }}
+              >
+                <div
+                  className="thread-empty-squircle"
+                  style={{
+                    width: 52,
+                    height: 52,
+                    borderRadius: 17,
+                    background: '#15171F',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    willChange: 'transform',
+                  }}
+                >
+                  <MessageCircle size={24} color="#FFFFFF" strokeWidth={2} />
+                  <div
+                    aria-hidden
+                    className="thread-empty-sheen"
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      background:
+                        'linear-gradient(100deg, transparent 40%, rgba(255,255,255,0.14) 50%, transparent 60%)',
+                      pointerEvents: 'none',
+                    }}
+                  />
+                </div>
+                <div className="flex flex-col items-center" style={{ gap: 4 }}>
+                  <p
+                    style={{
+                      color: INK,
+                      fontSize: 17,
+                      fontWeight: 600,
+                      margin: 0,
+                      lineHeight: '22px',
+                      letterSpacing: '-0.01em',
+                    }}
+                  >
+                    Say hello
+                  </p>
+                  <p
+                    style={{
+                      color: SUB,
+                      fontSize: 14,
+                      margin: 0,
+                      lineHeight: 1.5,
+                      maxWidth: 260,
+                    }}
+                  >
+                    {subtitle}
+                  </p>
+                </div>
+                <style>{`
+                  @keyframes thread-empty-float {
+                    0%, 100% { transform: translateY(0); }
+                    50% { transform: translateY(-3px); }
+                  }
+                  @keyframes thread-empty-sheen {
+                    0% { transform: translateX(-120%); }
+                    60%, 100% { transform: translateX(120%); }
+                  }
+                  .thread-empty-squircle {
+                    animation: thread-empty-float 3.6s ease-in-out infinite;
+                  }
+                  .thread-empty-sheen {
+                    animation: thread-empty-sheen 5s ease-in-out infinite;
+                  }
+                  @media (prefers-reduced-motion: reduce) {
+                    .thread-empty-squircle { animation: none; }
+                    .thread-empty-sheen { display: none; }
+                  }
+                `}</style>
+              </div>
+            );
+          })()
         ) : (
           <>
             {isFetchingOlder ? (
