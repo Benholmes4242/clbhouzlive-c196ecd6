@@ -13,6 +13,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SheetHeader } from '@/components/ui/SheetHeader';
 import { getTourLogo } from '../utils/tourLogos';
 import { useAllToursTickerData } from '../hooks/useOverviewModules';
+import { useActiveMensMajor } from '../hooks/useActiveMensMajor';
 import { useTourSelection } from '../context/TourSelectionContext';
 import {
   AMBER,
@@ -37,6 +38,10 @@ const TOUR_LABEL: Record<string, string> = {
   champ: 'CHAMPIONS',
   liv: 'LIV GOLF',
 };
+
+const GOLD_TINT_10 = 'rgba(255,184,0,0.10)';
+const GOLD_TINT_18 = 'rgba(255,184,0,0.18)';
+const GOLD_BORDER = 'rgba(255,184,0,0.45)';
 
 export interface TourSwitcherAffordanceProps {
   variant?: 'glass' | 'default';
