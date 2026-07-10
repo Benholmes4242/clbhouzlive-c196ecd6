@@ -1080,6 +1080,7 @@ export function CinematicHeroFullBleed({
           <Footer
             leftText={`${fieldSize} in the field`}
             isLive
+            noBorder
           />
         </button>
       )}
