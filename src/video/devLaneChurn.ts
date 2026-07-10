@@ -1,5 +1,5 @@
 /**
- * devLaneChurn — dev-only synthetic lane-churn harness.
+ * devLaneChurn — perf-gated synthetic lane-churn harness.
  *
  * Purpose: prove `VideoEngine.preload()`'s active-lane identity guard keeps
  * the currently-playing feed-active binding intact when neighbour warms hammer
