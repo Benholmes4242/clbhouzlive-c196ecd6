@@ -140,6 +140,47 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
     setTitleEdit(null);
   }, [actor, detail, titleEdit, runRpc, conversationId]);
 
+  const handleChangeAvatar = useCallback(async () => {
+    if (!actor || !detail) return;
+    if (avatarUploading) return;
+    let files: File[] = [];
+    try {
+      files = await pickMediaFiles({ accept: 'image/*', multiple: false, maxFiles: 1 });
+    } catch (e) {
+      console.error(e);
+      return;
+    }
+    const file = files[0];
+    if (!file) return;
+    setAvatarUploading(true);
+    try {
+      const compressed = await compressImage(file, COMPRESSION_PRESETS.avatar);
+      const upload = await uploadToR2Only(
+        compressed.file,
+        'clbhouz-profile-images',
+        `group-${conversationId}-${Date.now()}.jpg`,
+      );
+      if (!upload.success || !upload.publicUrl) {
+        throw new Error(upload.error || 'Upload failed');
+      }
+      const { error } = await supabase.rpc('msg_update_group', {
+        p_conversation_id: conversationId,
+        p_as_actor_type: actor.actorType,
+        p_as_actor_id: actor.actorId,
+        p_title: detail.title ?? '',
+        p_avatar_url: upload.publicUrl,
+      });
+      if (error) throw error;
+      invalidateAll();
+      toast.success('Group photo updated');
+    } catch (e) {
+      console.error(e);
+      toast.error('Could not update group photo');
+    } finally {
+      setAvatarUploading(false);
+    }
+  }, [actor, detail, avatarUploading, conversationId, invalidateAll]);
+
   const handleSetRole = useCallback(
     async (target: ConversationMember, role: 'admin' | 'member') => {
       if (!actor) return;
