@@ -507,6 +507,27 @@ export function CinematicHeroFullBleed({
       >
         {eyebrowText}
       </span>
+      {showMajorTag && (
+        <span
+          aria-label="Major championship"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            padding: '2px 6px',
+            borderRadius: 4,
+            background: GOLD_TINT,
+            border: `0.5px solid ${GOLD_RING}`,
+            color: GOLD,
+            fontSize: 9,
+            fontWeight: 800,
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            lineHeight: 1,
+          }}
+        >
+          Major
+        </span>
+      )}
     </div>
   );
 
