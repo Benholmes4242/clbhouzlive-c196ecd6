@@ -22,7 +22,7 @@ import { useReviewComposer } from './hooks/useReviewComposer';
 import { useReviewSubmit } from './hooks/useReviewSubmit';
 import { useReviewMediaPipeline } from './hooks/useReviewMediaPipeline';
 import { LivePreviewCard } from './components/LivePreviewCard';
-import { VerdictPills } from './components/VerdictPills';
+import { VoiceDictateButton } from './components/VoiceDictateButton';
 import { OverallScrubber } from './components/OverallScrubber';
 import { CategoryGrid } from './components/CategoryGrid';
 import { MediaTray } from './components/MediaTray';
