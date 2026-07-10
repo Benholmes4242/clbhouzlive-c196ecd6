@@ -1,14 +1,29 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BellOff, BadgeCheck } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import {
+  BellOff,
+  BadgeCheck,
+  MoreHorizontal,
+  Bell,
+  Archive,
+  ArchiveRestore,
+  LogOut,
+  Trash2,
+} from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { BottomSheet } from '@/components/ui/BottomSheet';
+import { SheetHeader } from '@/components/ui/SheetHeader';
 import { useMessagingActor } from '@/hooks/messaging/useMessagingActor';
+import { supabase } from '@/integrations/supabase/client';
 import type { InboxConversation, InboxParticipant } from '@/types/messaging';
 
 const INK = '#1F2428';
 const SUB = '#8A9099';
 const HINT = '#AEB4BC';
 const AMBER = '#F7931E';
+const DANGER = '#DC2626';
 const HAIRLINE = 'rgba(0,0,0,0.07)';
 
 interface Props {
@@ -77,9 +92,16 @@ function formatRelative(iso: string | null): string {
   return `${day} ${month}`;
 }
 
+function farFutureIso(): string {
+  const d = new Date();
+  d.setFullYear(d.getFullYear() + 100);
+  return d.toISOString();
+}
+
 export const ConversationRow: React.FC<Props> = ({ conversation }) => {
   const navigate = useNavigate();
   const actor = useMessagingActor();
+  const qc = useQueryClient();
   const identity = resolveIdentity(
     conversation,
     actor?.actorType ?? null,
@@ -89,99 +111,329 @@ export const ConversationRow: React.FC<Props> = ({ conversation }) => {
   const unread = conversation.unread_count > 0;
   const time = formatRelative(conversation.last_message_at);
   const previewColor = unread ? INK : SUB;
-  const nameWeight = unread ? 500 : 500;
+  const nameWeight = 500;
   const previewWeight = unread ? 500 : 400;
   const timeColor = unread ? AMBER : HINT;
 
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [confirmLeave, setConfirmLeave] = useState(false);
+
+  const isGroup = conversation.type === 'group';
+  const muted = !!conversation.is_muted;
+  const archived = !!conversation.is_archived;
+
+  const invalidateInbox = useCallback(() => {
+    if (!actor) return;
+    qc.invalidateQueries({
+      queryKey: ['messaging', 'inbox', actor.actorType, actor.actorId],
+    });
+    qc.invalidateQueries({ queryKey: ['messaging', 'inbox'] });
+  }, [qc, actor]);
+
+  const handleToggleMute = useCallback(async () => {
+    if (!actor) return;
+    try {
+      setBusy(true);
+      const { error } = await supabase.rpc('msg_set_mute', {
+        p_conversation_id: conversation.conversation_id,
+        p_as_actor_type: actor.actorType,
+        p_as_actor_id: actor.actorId,
+        p_until: muted ? null : farFutureIso(),
+      });
+      if (error) throw error;
+      invalidateInbox();
+      setMenuOpen(false);
+    } catch (e) {
+      console.error(e);
+      toast.error('Could not update mute');
+    } finally {
+      setBusy(false);
+    }
+  }, [actor, conversation.conversation_id, muted, invalidateInbox]);
+
+  const handleToggleArchive = useCallback(async () => {
+    if (!actor) return;
+    try {
+      setBusy(true);
+      const { error } = await supabase.rpc('msg_set_archive', {
+        p_conversation_id: conversation.conversation_id,
+        p_as_actor_type: actor.actorType,
+        p_as_actor_id: actor.actorId,
+        p_archived: !archived,
+      });
+      if (error) throw error;
+      invalidateInbox();
+      setMenuOpen(false);
+    } catch (e) {
+      console.error(e);
+      toast.error('Could not update archive');
+    } finally {
+      setBusy(false);
+    }
+  }, [actor, conversation.conversation_id, archived, invalidateInbox]);
+
+  const handleLeaveOrDelete = useCallback(async () => {
+    if (!actor) return;
+    try {
+      setBusy(true);
+      const { error } = await supabase.rpc('msg_leave', {
+        p_conversation_id: conversation.conversation_id,
+        p_as_actor_type: actor.actorType,
+        p_as_actor_id: actor.actorId,
+      });
+      if (error) {
+        const msg = (error.message || '').toLowerCase();
+        if (msg.includes('owner') || msg.includes('transfer')) {
+          toast.error('Make someone else an admin or owner first');
+        } else {
+          toast.error(isGroup ? 'Could not leave group' : 'Could not delete conversation');
+        }
+        return;
+      }
+      invalidateInbox();
+      setMenuOpen(false);
+    } catch (e) {
+      console.error(e);
+      toast.error(isGroup ? 'Could not leave group' : 'Could not delete conversation');
+    } finally {
+      setBusy(false);
+    }
+  }, [actor, conversation.conversation_id, isGroup, invalidateInbox]);
+
+  const handleRowActivate = () => {
+    if (menuOpen) return;
+    navigate(`/messages/${conversation.conversation_id}`);
+  };
+
+  const stop = (e: React.SyntheticEvent) => {
+    e.stopPropagation();
+  };
+
   return (
-    <button
-      type="button"
-      onClick={() => navigate(`/messages/${conversation.conversation_id}`)}
-      className="w-full text-left flex items-center gap-3 active:bg-black/[0.03] transition-colors"
-      style={{
-        padding: '11px 14px',
-        minHeight: 72,
-        borderBottom: `0.5px solid ${HAIRLINE}`,
-        background: 'transparent',
-        border: 'none',
-        borderRadius: 0,
-      }}
-    >
-      <SquircleAvatar
-        src={identity.avatarUrl}
-        userId={identity.userId}
-        alt={identity.name}
-        size={52}
-      />
-      <div className="flex-1 min-w-0 flex items-center gap-3">
-        <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
-          <div className="flex items-center gap-1.5 min-w-0">
+    <>
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={handleRowActivate}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleRowActivate();
+          }
+        }}
+        className="w-full text-left flex items-center gap-3 active:bg-black/[0.03] transition-colors cursor-pointer"
+        style={{
+          padding: '11px 14px',
+          minHeight: 72,
+          borderBottom: `0.5px solid ${HAIRLINE}`,
+          background: 'transparent',
+        }}
+      >
+        <SquircleAvatar
+          src={identity.avatarUrl}
+          userId={identity.userId}
+          alt={identity.name}
+          size={52}
+        />
+        <div className="flex-1 min-w-0 flex items-center gap-3">
+          <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <span
+                className="truncate"
+                style={{
+                  color: INK,
+                  fontSize: 16,
+                  fontWeight: nameWeight,
+                  lineHeight: '20px',
+                  minWidth: 0,
+                }}
+              >
+                {identity.name}
+              </span>
+              {identity.verified ? (
+                <BadgeCheck size={14} style={{ color: AMBER, flexShrink: 0 }} />
+              ) : null}
+            </div>
             <span
               className="truncate"
               style={{
-                color: INK,
-                fontSize: 16,
-                fontWeight: nameWeight,
-                lineHeight: '20px',
+                color: previewColor,
+                fontSize: 14,
+                lineHeight: '18px',
+                fontWeight: previewWeight,
                 minWidth: 0,
               }}
             >
-              {identity.name}
+              {conversation.last_message_preview ?? ''}
             </span>
-            {identity.verified ? (
-              <BadgeCheck size={14} style={{ color: AMBER, flexShrink: 0 }} />
-            ) : null}
           </div>
-          <span
-            className="truncate"
-            style={{
-              color: previewColor,
-              fontSize: 14,
-              lineHeight: '18px',
-              fontWeight: previewWeight,
-              minWidth: 0,
-            }}
+          <div
+            className="flex flex-col items-end justify-center gap-1"
+            style={{ flexShrink: 0, minWidth: 40 }}
           >
-            {conversation.last_message_preview ?? ''}
-          </span>
-        </div>
-        <div
-          className="flex flex-col items-end justify-center gap-1"
-          style={{ flexShrink: 0, minWidth: 40 }}
-        >
-          <span
-            style={{
-              color: timeColor,
-              fontSize: 12,
-              lineHeight: '16px',
-              fontWeight: unread ? 500 : 400,
-            }}
-          >
-            {time}
-          </span>
-          {unread ? (
             <span
-              className="inline-flex items-center justify-center rounded-full"
               style={{
-                background: AMBER,
-                color: '#FFFFFF',
+                color: timeColor,
                 fontSize: 12,
-                fontWeight: 600,
-                minWidth: 20,
-                height: 20,
-                padding: '0 6px',
-                lineHeight: '20px',
+                lineHeight: '16px',
+                fontWeight: unread ? 500 : 400,
               }}
             >
-              {conversation.unread_count > 99 ? '99+' : conversation.unread_count}
+              {time}
             </span>
-          ) : conversation.is_muted ? (
-            <BellOff size={14} style={{ color: HINT }} />
-          ) : null}
+            {unread ? (
+              <span
+                className="inline-flex items-center justify-center rounded-full"
+                style={{
+                  background: AMBER,
+                  color: '#FFFFFF',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  minWidth: 20,
+                  height: 20,
+                  padding: '0 6px',
+                  lineHeight: '20px',
+                }}
+              >
+                {conversation.unread_count > 99 ? '99+' : conversation.unread_count}
+              </span>
+            ) : conversation.is_muted ? (
+              <BellOff size={14} style={{ color: HINT }} />
+            ) : null}
+          </div>
+          <button
+            type="button"
+            onClick={(e) => {
+              stop(e);
+              setConfirmLeave(false);
+              setMenuOpen(true);
+            }}
+            onPointerDown={stop}
+            aria-label="Conversation actions"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: SUB,
+              padding: 6,
+              marginLeft: 2,
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <MoreHorizontal size={18} />
+          </button>
         </div>
       </div>
-    </button>
+
+      <BottomSheet
+        open={menuOpen}
+        onClose={() => {
+          setMenuOpen(false);
+          setConfirmLeave(false);
+        }}
+        zIndexBase={1500}
+      >
+        <SheetHeader title={identity.name} onClose={() => setMenuOpen(false)} />
+        <div style={{ background: '#F8FAFC', paddingBottom: 32 }}>
+          <ActionRow
+            icon={muted ? <BellOff size={20} color={INK} /> : <Bell size={20} color={INK} />}
+            label={muted ? 'Unmute' : 'Mute notifications'}
+            onClick={() => void handleToggleMute()}
+            disabled={busy}
+          />
+          <ActionRow
+            icon={
+              archived ? (
+                <ArchiveRestore size={20} color={INK} />
+              ) : (
+                <Archive size={20} color={INK} />
+              )
+            }
+            label={archived ? 'Unarchive' : 'Archive'}
+            onClick={() => void handleToggleArchive()}
+            disabled={busy}
+          />
+          {isGroup ? (
+            <ActionRow
+              icon={<LogOut size={20} color={DANGER} />}
+              label={confirmLeave ? 'Tap again to confirm' : 'Leave group'}
+              onClick={() => {
+                if (!confirmLeave) {
+                  setConfirmLeave(true);
+                  setTimeout(() => setConfirmLeave(false), 3000);
+                  return;
+                }
+                void handleLeaveOrDelete();
+              }}
+              disabled={busy}
+              danger
+            />
+          ) : (
+            <ActionRow
+              icon={<Trash2 size={20} color={DANGER} />}
+              label={confirmLeave ? 'Tap again to confirm' : 'Delete conversation'}
+              onClick={() => {
+                if (!confirmLeave) {
+                  setConfirmLeave(true);
+                  setTimeout(() => setConfirmLeave(false), 3000);
+                  return;
+                }
+                void handleLeaveOrDelete();
+              }}
+              disabled={busy}
+              danger
+            />
+          )}
+        </div>
+      </BottomSheet>
+    </>
   );
 };
+
+interface ActionRowProps {
+  icon: React.ReactNode;
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+  danger?: boolean;
+}
+
+const ActionRow: React.FC<ActionRowProps> = ({ icon, label, onClick, disabled, danger }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    disabled={disabled}
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: 14,
+      padding: '14px 16px',
+      width: '100%',
+      background: 'transparent',
+      border: 'none',
+      color: danger ? DANGER : INK,
+      fontSize: 15,
+      fontWeight: 500,
+      textAlign: 'left',
+      opacity: disabled ? 0.5 : 1,
+    }}
+  >
+    <div
+      style={{
+        width: 28,
+        height: 28,
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      {icon}
+    </div>
+    {label}
+  </button>
+);
 
 export default ConversationRow;
