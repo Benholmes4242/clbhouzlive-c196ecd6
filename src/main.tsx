@@ -2,6 +2,9 @@
 // No-op unless DEV || ?perf=1. MUST be first so it catches boot-time logs.
 import './perf/consoleCapture';
 
+// Dev-only lane-churn harness: exposes window.__lovable_laneChurn in DEV.
+import './video/devLaneChurn';
+
 // Boot Timeline: Import for side effects (attaches to window)
 import './utils/bootTimeline';
 // Discover Timing: Import for side effects (attaches to window)

@@ -298,6 +298,8 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   // engine); a two-lane degraded window (one lane frozen by a borrow) simply
   // warms into the ex-active — safe by construction.
   useEffect(() => {
+    const activePost = posts[playingIdx];
+    const expectedActiveOwnerKey = activePost ? `${activePost.id}:0` : undefined;
     const warm = (role: 'next' | 'prev', post: FeedPost | undefined) => {
       const m = post?.mediaItems?.[0];
       if (!post || !m || m.type !== 'video' || !(m as any).hlsUrl) return;
@@ -313,6 +315,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
           hlsUrl: (m as any).hlsUrl,
           posterUrl: (m as any).thumbnailUrl ?? null,
           postId: ownerKey,
+          expectedActiveOwnerKey,
         });
       } catch { /* engine may not be booted yet — safe to ignore */ }
     };
