@@ -488,43 +488,13 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               DEAL
             </span>
           )}
-          {reviewRating != null && (() => {
-            const LABEL_COLOR = {
-              EXCEPTIONAL: '#FFCE5C',
-              EXCELLENT:   '#FBA63F',
-              GOOD:        '#FBA63F',
-              FAIR:        'rgba(255,255,255,0.68)',
-              POOR:        'rgba(255,255,255,0.58)',
-            } as const;
-            const tierKey = getRatingTier(reviewRating);
-            const tierLabel = getRatingTierLabel(reviewRating);
-            const isExceptional = tierKey === 'EXCEPTIONAL';
-            return (
-              <button
-                type="button"
-                onClick={handleReadReview}
-                style={{
-                  position: 'relative', zIndex: 3,
-                  background: 'transparent', border: 'none', padding: 0, cursor: 'pointer',
-                  flexShrink: 0,
-                }}
-                aria-label={`Your review: ${formatRatingValue(reviewRating)} ${tierLabel}`}
-              >
-                <span
-                  className={isExceptional ? 'clbhouz-gold-shimmer' : undefined}
-                  style={{
-                    fontSize: 12.5, fontWeight: 800, letterSpacing: '0.14em',
-                    textTransform: 'uppercase', whiteSpace: 'nowrap',
-                    ...(isExceptional
-                      ? {}
-                      : { color: LABEL_COLOR[tierKey] }),
-                  }}
-                >
-                  {tierLabel}
-                </span>
-              </button>
-            );
-          })()}
+          {reviewRating != null && (
+            <ReviewVerdictLabel
+              rating={reviewRating}
+              onClick={handleReadReview}
+              ariaLabel={`Your review: ${formatRatingValue(reviewRating)} ${getRatingTierLabel(reviewRating)}`}
+            />
+          )}
         </div>
       </div>
 
