@@ -685,23 +685,14 @@ function ProfileHubSheet({
                               }}
                             >
                               <div style={{ position: 'relative', width: 50, height: 50 }}>
-                                <div
-                                  style={{
-                                    width: 50,
-                                    height: 50,
-                                    borderRadius: '34%',
-                                    boxShadow: isActive ? `0 0 0 2.5px ${AMBER}` : 'none',
-                                  }}
-                                >
-                                  <SquircleAvatar
-                                    size={50}
-                                    src={p.avatarUrl}
-                                    alt={p.name}
-                                    fallback={p.name?.charAt(0)?.toUpperCase() ?? '?'}
-                                    hairlineRing
-                                    ringColor={LIGHT_HAIRLINE}
-                                  />
-                                </div>
+                                <SquircleAvatar
+                                  size={50}
+                                  src={p.avatarUrl}
+                                  alt={p.name}
+                                  fallback={p.name?.charAt(0)?.toUpperCase() ?? '?'}
+                                  hairlineRing
+                                  ringColor={isActive ? AMBER : LIGHT_HAIRLINE}
+                                />
                                 {unread > 0 && (
                                   <span
                                     style={{
