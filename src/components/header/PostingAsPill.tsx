@@ -195,41 +195,25 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
 
           </span>
           
-          {/* Orange badge — social notifications (top-right) */}
-          {hasUnreadNotifications && (
+          {/* Combined unread badge — notifications + DMs (top-right) */}
+          {activeUnread > 0 && (
             <span
               className={cn(
                 "absolute -top-1 -right-1 flex items-center justify-center rounded-full bg-[#F7931E] font-bold text-white",
-                "",
-                notificationCount > 9
+                activeUnread > 9
                   ? "h-[16px] min-w-[16px] px-[3px] text-[8px]"
-                  : notificationCount > 0
-                  ? "h-[14px] w-[14px] text-[8px]"
-                  : "h-2.5 w-2.5"
+                  : "h-[14px] w-[14px] text-[8px]"
               )}
-              aria-label={`${notificationCount} unread notifications`}
+              aria-label={`${activeUnread} unread`}
             >
-              {notificationCount > 0 && (
-                <span style={{ lineHeight: 1 }}>
-                  {notificationCount > 99 ? '99+' : notificationCount}
-                </span>
-              )}
+              <span style={{ lineHeight: 1 }}>
+                {activeUnread > 99 ? '99+' : activeUnread}
+              </span>
             </span>
-          )}
-          
-          {/* Green dot — unread messages (bottom-right) */}
-          {hasUnreadMessages && (
-            <span 
-              className={cn(
-                "absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-500",
-                useLightTheme ? "ring-[1.5px] ring-background" : "ring-[1.5px] ring-black"
-              )}
-              aria-label="Unread messages"
-            />
           )}
 
           {/* Amber micro-dot — another profile (non-active actor) has unread */}
-          {hasOtherUnread && !hasUnreadNotifications && (
+          {hasOtherUnread && activeUnread === 0 && (
             <span
               className={cn(
                 "absolute -top-0.5 -left-0.5 h-2 w-2 rounded-full bg-[#F7931E]",
