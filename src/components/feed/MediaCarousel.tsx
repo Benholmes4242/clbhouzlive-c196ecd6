@@ -217,11 +217,17 @@ export const MediaCarousel: React.FC<Props> = ({
     // lanes' bindings, each slide's role/lane/readiness, and warm outcomes.
     if (isCardActive && isPerfEnabled()) {
       const FEED_LANES: LaneId[] = ['feed-active', 'feed-next', 'feed-prev'];
+      // [FIX C] Normalise ownerKey equivalence so `X` ↔ `X:0` match, and a
+      // slide index `X:k` compares strictly. Mirrors VideoEngine's
+      // normalizeOwnerKey (bare↔:0 only; distinct :k stays distinct).
+      const norm = (k: string | null | undefined): string | null =>
+        k == null ? null : (k.includes(':') ? k : `${k}:0`);
       const findLaneForOwner = (owner: string) => {
+        const target = norm(owner);
         for (const lid of FEED_LANES) {
           try {
             const s = VideoEngine.snapshot(lid);
-            if (s.postId === owner) return { laneId: lid, snap: s };
+            if (norm(s.postId) === target) return { laneId: lid, snap: s };
           } catch { /* engine not booted */ }
         }
         return null;
