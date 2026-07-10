@@ -20233,6 +20233,10 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: undefined
       }
+      send_business_welcome: {
+        Args: { p_target_business_id: string }
+        Returns: undefined
+      }
       send_push_notification: {
         Args: {
           data?: Json
