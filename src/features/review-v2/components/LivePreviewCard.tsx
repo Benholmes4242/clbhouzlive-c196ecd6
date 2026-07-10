@@ -82,8 +82,7 @@ export function LivePreviewCard({
   const tier = getRatingTier(overall);
   const isGold = tier === 'EXCEPTIONAL';
   const tierLabel = overall != null ? getRatingTierLabel(overall) : null;
-  const verdictLabel =
-    verdict != null ? VERDICTS.find((v) => v.slug === verdict)?.label : null;
+  void verdict;
 
   return (
     <article
