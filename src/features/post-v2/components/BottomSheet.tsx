@@ -10,6 +10,8 @@ interface Props {
   onClose: () => void;
   children: React.ReactNode;
   fullHeight?: boolean;
+  /** Extra bottom padding on the backdrop; lifts the sheet above the iOS keyboard. */
+  bottomOffset?: number;
 }
 
 export default function BottomSheet({ open, title, onClose, children, fullHeight }: Props) {
