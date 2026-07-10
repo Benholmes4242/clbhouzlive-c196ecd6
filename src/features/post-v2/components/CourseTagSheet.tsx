@@ -45,7 +45,7 @@ export default function CourseTagSheet({ open, onClose, onSelect, current, userI
   const showRecents = q.trim().length === 0;
 
   return (
-    <BottomSheet open={open} title={title} onClose={onClose} fullHeight bottomOffset={keyboardHeight}>
+    <BottomSheet open={open} title={title} onClose={onClose} bottomOffset={keyboardHeight}>
       <div style={{ padding: '4px 16px 12px' }}>
         <div style={{ position: 'relative' }}>
           <Search size={16} color="#94A3B8" style={{ position: 'absolute', top: 12, left: 12 }} />

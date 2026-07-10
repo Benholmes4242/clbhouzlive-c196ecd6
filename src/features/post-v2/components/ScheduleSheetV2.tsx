@@ -93,7 +93,7 @@ export default function ScheduleSheetV2({ open, onClose, value, onChange, onOpen
   const clear = () => { onChange(null); onClose(); };
 
   return (
-    <BottomSheet open={open} title="Schedule" onClose={onClose} fullHeight>
+    <BottomSheet open={open} title="Schedule" onClose={onClose}>
       <div style={{ padding: '4px 16px 16px', display: 'flex', flexDirection: 'column', gap: 18 }}>
         {/* Preset chips */}
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -128,10 +128,7 @@ export default function ScheduleSheetV2({ open, onClose, value, onChange, onOpen
                   position: 'relative',
                 }}
               >
-                {isToday && (
-                  <span style={{ position: 'absolute', top: -6, right: -4, fontSize: 9, fontWeight: 800, letterSpacing: 0.4, color: selected ? '#F7931E' : '#F7931E', background: selected ? 'transparent' : 'transparent', padding: '1px 4px' }}>TODAY</span>
-                )}
-                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.6, color: selected ? '#F7931E' : '#94A3B8' }}>{DAY_LABELS[d.getDay()]}</span>
+                <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: 0.6, color: isToday ? '#F7931E' : (selected ? '#F7931E' : '#94A3B8') }}>{isToday ? 'TODAY' : DAY_LABELS[d.getDay()]}</span>
                 <span style={{ fontSize: 17, fontWeight: 700, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>{d.getDate()}</span>
                 <span style={{ fontSize: 10, color: selected ? 'rgba(248,250,252,0.7)' : '#94A3B8' }}>{MONTH_LABELS[d.getMonth()]}</span>
               </button>
