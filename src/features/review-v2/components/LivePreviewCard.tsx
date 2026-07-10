@@ -132,15 +132,19 @@ export function LivePreviewCard({
           >
             {author.displayName || 'You'}
           </div>
-          <div style={{ fontSize: 11, color: T_MUTE, marginTop: 2 }}>Just now</div>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              marginTop: 2,
+            }}
+          >
+            <span style={{ fontSize: 11, color: T_MUTE }}>Just now</span>
+            {overall != null && <ReviewVerdictLabel rating={overall} fontSize={11} />}
+          </div>
         </div>
-
-        {/* Tier label removed — score numeral + gold shimmer carries the tiering. */}
       </div>
-
-
-      {/* Verdict chip removed — tier label (top-right) is the derived
-          verdict, matching ReviewBottomSheet's ReviewVerdictLabel. */}
 
       {/* Review body */}
       <div style={{ padding: '4px 14px 10px', position: 'relative', zIndex: 2 }}>
