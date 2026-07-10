@@ -13,6 +13,7 @@ import { PrefetchController } from '@/video/PrefetchController';
 import { trace } from '@/perf/trace';
 import { VideoEngine } from '@/video/VideoEngine';
 import { isPerfEnabled } from '@/perf/navTiming';
+import { useInviteSheet } from '@/hooks/useInviteSheet';
 
 // Normalized owner-key compare — bare "X" ≡ "X:0", ":1"/":2" distinct.
 // Never use strict === here; strict compare caused false-null mismatch
