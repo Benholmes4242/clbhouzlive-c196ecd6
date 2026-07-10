@@ -286,10 +286,14 @@ async function streamClaude(
       if (!data || data === "[DONE]") continue;
       try {
         const parsed = JSON.parse(data);
-        const token = parsed?.delta?.text || "";
-        if (token) {
-          full += token;
-          onChunk(token);
+        // Sonnet 5 emits thinking_delta / signature_delta blocks before/around
+        // the visible text_delta stream. Only append text_delta content.
+        if (parsed?.type === "content_block_delta" && parsed?.delta?.type === "text_delta") {
+          const token = parsed.delta.text || "";
+          if (token) {
+            full += token;
+            onChunk(token);
+          }
         }
       } catch { /* partial chunk */ }
     }
