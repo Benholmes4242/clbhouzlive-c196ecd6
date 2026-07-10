@@ -138,8 +138,9 @@ export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChang
                   alt={a.name}
                   userId={a.type === 'personal' ? a.id : null}
                   hairlineRing
-                  ringColor={LIGHT_HAIRLINE}
+                  ringColor={theme === 'dark' ? DARK_HAIRLINE : LIGHT_HAIRLINE}
                 />
+
                 <span style={{ fontSize: 15, fontWeight: 600, flex: 1 }}>{a.name}</span>
                 {isActive && <Check size={18} color="#F7931E" />}
               </button>
