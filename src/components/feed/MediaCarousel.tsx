@@ -21,6 +21,7 @@ import { isPerfEnabled } from '@/perf/navTiming';
 import { VideoEngine } from '@/video/VideoEngine';
 import { feedLaneRoles } from '@/video/feedLaneRoles';
 import { PrefetchController } from '@/video/PrefetchController';
+import type { LaneId } from '@/video/lanePolicy';
 
 
 interface Props {
