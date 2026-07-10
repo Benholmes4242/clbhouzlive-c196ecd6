@@ -19,7 +19,7 @@ import DataList from '../components/DataList';
 import EmptyState from '../components/EmptyState';
 import StatTile from '../components/StatTile';
 import StatusPill from '../components/StatusPill';
-import EchoEngineHealthCard from '../components/EchoEngineHealthCard';
+import { useEchoEngineHealth } from '../hooks/useEchoEngineHealth';
 
 
 function relTime(iso: string): string {
