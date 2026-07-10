@@ -52,7 +52,7 @@ export function SubmitBar({
         {submitting
           ? isEditMode ? 'Saving...' : 'Posting...'
           : canSubmit
-            ? isEditMode ? 'Save changes' : 'Sign your scorecard'
+            ? isEditMode ? 'Save changes' : 'Share your verdict'
             : disabledLabel}
       </button>
     </div>

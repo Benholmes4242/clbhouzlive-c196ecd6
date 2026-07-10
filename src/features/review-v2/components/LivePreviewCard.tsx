@@ -15,6 +15,10 @@ import {
   HERO_NUMBER_STYLE,
   ratingTextColor,
 } from '@/lib/ratingTier';
+import {
+  ReviewGhostNumeral,
+  ReviewVerdictLabel,
+} from '@/components/shared/ReviewGhostScore';
 import { RV2, type VerdictSlug } from '../tokens';
 import type { CategoryKey, MediaItem, ReviewV2Course } from '../types';
 
@@ -78,8 +82,6 @@ export function LivePreviewCard({
   scores,
   media,
 }: Props) {
-  const tier = getRatingTier(overall);
-  const isGold = tier === 'EXCEPTIONAL';
   void verdict;
 
   return (
@@ -93,31 +95,9 @@ export function LivePreviewCard({
         boxShadow: '0 1px 3px rgba(15,23,42,0.04)',
       }}
     >
-      {/* Ghost numeral — fills in when overall is set. */}
+      {/* Ghost numeral — shared component ensures parity with feed/clubhouse. */}
       {overall != null && (
-        <span
-          aria-hidden
-          className={isGold ? 'clbhouz-gold-shimmer-light' : undefined}
-          style={{
-            position: 'absolute',
-            right: -8,
-            top: 26,
-            transform: 'translateY(-50%)',
-            fontSize: 96,
-            fontWeight: 800,
-            letterSpacing: '-0.05em',
-            lineHeight: 1,
-            pointerEvents: 'none',
-            whiteSpace: 'nowrap',
-            zIndex: 0,
-            fontVariantNumeric: 'tabular-nums',
-            ...(isGold
-              ? { opacity: 0.32 }
-              : { color: 'rgba(247,147,30,0.18)' }),
-          }}
-        >
-          {overall.toFixed(1)}
-        </span>
+        <ReviewGhostNumeral rating={overall} fontSize={96} right={-8} top={26} />
       )}
 
       {/* Header */}
@@ -152,15 +132,19 @@ export function LivePreviewCard({
           >
             {author.displayName || 'You'}
           </div>
-          <div style={{ fontSize: 11, color: T_MUTE, marginTop: 2 }}>Just now</div>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              marginTop: 2,
+            }}
+          >
+            <span style={{ fontSize: 11, color: T_MUTE }}>Just now</span>
+            {overall != null && <ReviewVerdictLabel rating={overall} fontSize={11} />}
+          </div>
         </div>
-
-        {/* Tier label removed — score numeral + gold shimmer carries the tiering. */}
       </div>
-
-
-      {/* Verdict chip removed — tier label (top-right) is the derived
-          verdict, matching ReviewBottomSheet's ReviewVerdictLabel. */}
 
       {/* Review body */}
       <div style={{ padding: '4px 14px 10px', position: 'relative', zIndex: 2 }}>
