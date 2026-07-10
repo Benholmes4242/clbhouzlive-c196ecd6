@@ -236,7 +236,6 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
   currentUserId,
   feedIndex,
 }) => {
-  const navigate = useNavigate();
   const { activeActor, setActiveActor } = useActiveActor();
   const [captionExpanded, setCaptionExpanded] = useState(false);
   const [isCaptionClamped, setIsCaptionClamped] = useState(false);
@@ -246,14 +245,14 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
   const singleMediaBtnRef = useRef<HTMLButtonElement | null>(null);
 
   const reviewCourseId = post.review?.courseId ?? post.courseId;
-  const reviewId = post.review?.reviewId;
+  const openReviewSheet = useReviewSheetStore((s) => s.open);
+  const { data: reviewerStats } = useReviewerStats(post.userId);
   const handleReadReview = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!reviewCourseId) return;
-    const url = reviewId
-      ? `/courses/${reviewCourseId}?tab=reviews&review=${reviewId}`
-      : `/courses/${reviewCourseId}?tab=reviews`;
-    navigate(url);
+    const payload = buildReviewSheetPayload(post, reviewerStats ?? null);
+    if (!payload) return;
+    openReviewSheet(payload);
+    onReviewTap?.(post);
   };
   const mountFollowPill =
     !!onFollow &&
