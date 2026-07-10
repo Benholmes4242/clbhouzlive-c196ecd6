@@ -16214,64 +16214,6 @@ export type Database = {
             }
             Returns: string
           }
-      admin_echo_kpis: {
-        Args: never
-        Returns: {
-          exports_7d: number
-          msgs_total: number
-          shares_active: number
-          threads_total: number
-          users_active_7d: number
-        }[]
-      }
-      admin_echo_rates: {
-        Args: never
-        Returns: {
-          pct_starred: number
-          pct_with_response: number
-          period: string
-        }[]
-      }
-      admin_echo_summary: {
-        Args: { days: number }
-        Returns: {
-          bulk_exports: number
-          conversations_created: number
-          exports_started: number
-          period: string
-          shares_created: number
-          starred_toggles: number
-        }[]
-      }
-      admin_echo_threads_timeseries: {
-        Args: never
-        Returns: {
-          threads: number
-          ts: string
-        }[]
-      }
-      admin_echo_timeseries: {
-        Args: { days: number; event_names: string[] }
-        Returns: {
-          d: string
-          n: number
-        }[]
-      }
-      admin_echo_top_tags:
-        | {
-            Args: never
-            Returns: {
-              tag: string
-              uses: number
-            }[]
-          }
-        | {
-            Args: { days: number; limit_n: number }
-            Returns: {
-              name: string
-              threads: number
-            }[]
-          }
       admin_guard: { Args: never; Returns: undefined }
       admin_launch_authority: {
         Args: { _body_name: string; _country_id: string }
@@ -16385,7 +16327,6 @@ export type Database = {
       }
       check_email_exists: { Args: { lookup_email: string }; Returns: boolean }
       check_expiring_admin_access: { Args: never; Returns: undefined }
-      cleanup_echo_data: { Args: never; Returns: undefined }
       cleanup_expired_dismissals: { Args: never; Returns: undefined }
       cleanup_expired_open_to_play: { Args: never; Returns: undefined }
       cleanup_old_gate_attempts: { Args: never; Returns: undefined }
@@ -20308,7 +20249,6 @@ export type Database = {
         Args: { current_email: string; user_id_param: string }
         Returns: undefined
       }
-      test_echo_insert: { Args: never; Returns: string }
       test_lab_clear_notifications: {
         Args: { p_target_user_id: string; p_test_user_id: string }
         Returns: undefined
