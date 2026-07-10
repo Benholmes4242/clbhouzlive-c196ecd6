@@ -178,6 +178,7 @@ const ThreadV2Page: React.FC = () => {
     () => conversations.find((c) => c.conversation_id === conversationId) ?? null,
     [conversations, conversationId],
   );
+  const { detail } = useConversationDetail(conversationId || null);
   const {
     messages,
     fetchOlder,
