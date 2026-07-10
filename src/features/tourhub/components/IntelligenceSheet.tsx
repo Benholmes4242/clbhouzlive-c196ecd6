@@ -118,11 +118,27 @@ function Header({ onClose, tourTag }: { onClose: () => void; tourTag: string }) 
       }}
     >
       <div style={{ minWidth: 0, flex: 1 }}>
-        {/* canonical eyebrow: Brain mark + caps tag */}
+        {/* canonical eyebrow: Brain mark + caps tag + tour context */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
           <Brain size={14} color={AMBER} strokeWidth={2.5} />
           <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#94A3B8', lineHeight: 1 }}>
             Intelligence
+          </span>
+          <span
+            aria-label={`Tour: ${tourTag}`}
+            style={{
+              fontSize: 10,
+              fontWeight: 800,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              color: AMBER,
+              padding: '2px 6px',
+              borderRadius: 4,
+              background: AMBER_TINT_08,
+              lineHeight: 1,
+            }}
+          >
+            {tourTag}
           </span>
         </div>
         {/* amber cut-line */}
