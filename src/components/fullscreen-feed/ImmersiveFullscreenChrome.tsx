@@ -34,6 +34,7 @@ import { FeedFollowPill } from '@/components/feed/FeedFollowPill';
 import MapPinIcon from '@/components/icons/MapPinIcon';
 import { Z } from '@/config/zIndex';
 import { formatRatingValue } from '@/utils/formatters';
+import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 const AMBER = '#F7931E';
@@ -154,7 +155,16 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
     (activePost as any).courseCountry ??
     golfCourse?.courseCountry ??
     null;
-  const courseRating = activePost.courseRating ?? null;
+  // Fallback: not every feed-post payload path carries course_avg_overall_score
+  // (tag-only posts, older RPCs). Resolve the community rating from
+  // course_rating_aggregates when the payload is missing it.
+  const resolvedCourseId = activePost.review?.courseId ?? golfCourse?.id ?? activePost.courseId ?? null;
+  const { data: ratingAggregate } = useCourseRatingAggregates(
+    activePost.courseRating == null ? resolvedCourseId ?? undefined : undefined,
+  );
+  const courseRating =
+    activePost.courseRating ??
+    (ratingAggregate?.avg_overall_score != null ? Number(ratingAggregate.avg_overall_score) : null);
   const showCourseChip = courseRating != null;
 
   const likeStr = formatCount(likeState.count);
@@ -179,7 +189,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           left: 0,
           right: 0,
           height: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 78px)',
-          background: 'linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 100%)',
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.55) 100%)',
           pointerEvents: 'none',
           zIndex: 0,
         }}
@@ -298,7 +308,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           left: 0, right: 0, bottom: 0,
           height: 'calc(max(env(safe-area-inset-bottom, 0px), 24px) + 130px)',
           background:
-            'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.32) 55%, rgba(0,0,0,0) 100%)',
+            'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.72) 45%, rgba(0,0,0,0.55) 100%)',
           pointerEvents: 'none',
           zIndex: 0,
         }}

@@ -44,9 +44,6 @@ export const FeedFollowPill: React.FC<FeedFollowPillProps> = ({ onFollow, isFoll
 
   useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
 
-  if (isFollowed && !justFollowed) return null;
-  if (initiallyFollowedRef.current && !justFollowed) return null;
-
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (isFollowed) return;
@@ -64,6 +61,28 @@ export const FeedFollowPill: React.FC<FeedFollowPillProps> = ({ onFollow, isFoll
         }}
       >
         FOLLOWING ✓
+      </span>
+    );
+  }
+
+  // Two-state pill (mirrors the Clubhouse card):
+  // - Not following → amber outline FOLLOW cta
+  // - Following    → subdued glass "Following" chip (non-interactive)
+  if (isFollowed) {
+    return (
+      <span
+        aria-label="Following"
+        style={{
+          ...BASE_STYLE,
+          color: 'rgba(255,255,255,0.85)',
+          background: 'rgba(255,255,255,0.10)',
+          border: '1px solid rgba(255,255,255,0.18)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          cursor: 'default',
+        }}
+      >
+        FOLLOWING
       </span>
     );
   }

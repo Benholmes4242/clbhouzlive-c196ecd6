@@ -224,6 +224,9 @@ export const FeedSlide = memo(function FeedSlide({
               backgroundImage: `url(${imgSrc})`, backgroundSize: 'cover', backgroundPosition: 'center',
               filter: 'blur(40px) brightness(0.5) saturate(1.2)', transform: 'scale(1.2)',
             }} />
+            {/* Dim the surround: near-black wash, IG-style. Media itself sits
+                above at zIndex 1 and is NOT dimmed. */}
+            <div aria-hidden="true" className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.55)' }} />
             <div
               ref={zoomRef}
               style={{
@@ -638,6 +641,8 @@ const FullscreenVideoSlot: React.FC<{
           filter: 'blur(40px) brightness(0.5) saturate(1.2)', transform: 'scale(1.2)',
         }} />
       )}
+      {/* Dim the surround (near-black); media sits above at zIndex ≥ 1. */}
+      <div aria-hidden="true" className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.55)' }} />
       {posterSrc && (
         <img
           src={posterSrc}
@@ -1356,6 +1361,8 @@ const FullscreenPagerPage: React.FC<{
             }}
           />
         )}
+        {/* Dim the surround (near-black); media sits above at zIndex 1. */}
+        <div aria-hidden="true" className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.55)' }} />
         {posterSrc && (
           <img
             src={posterSrc}
@@ -1391,6 +1398,8 @@ const FullscreenPagerPage: React.FC<{
             transform: 'scale(1.2)',
           }}
         />
+        {/* Dim the surround (near-black); media sits above at zIndex 1. */}
+        <div aria-hidden="true" className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.55)' }} />
         <div
           ref={zoomRef}
           style={{
