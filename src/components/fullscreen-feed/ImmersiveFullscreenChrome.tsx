@@ -264,19 +264,28 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
                 onClick={(e) => { e.stopPropagation(); handleCourseTap(); }}
                 aria-label={`Community rating ${formatRatingValue(courseRating!)}`}
                 style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 5,
-                  background: CHIP_BG, border: 'none', borderRadius: 8,
-                  padding: '3px 8px', color: '#fff', fontFamily: 'inherit',
-                  fontSize: 10, fontWeight: 500, lineHeight: 1,
-                  letterSpacing: '0.01em', cursor: 'pointer',
-                  pointerEvents: 'auto', fontVariantNumeric: 'tabular-nums',
-                  marginTop: 2,
+                  display: 'inline-flex', alignItems: 'center', gap: 5, flexShrink: 0,
+                  background: 'rgba(255,255,255,0.08)',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  padding: '3px 9px 3px 4px', borderRadius: 999,
+                  cursor: 'pointer', marginTop: 2,
+                  backdropFilter: 'blur(8px)',
+                  WebkitBackdropFilter: 'blur(8px)',
+                  pointerEvents: 'auto', fontFamily: 'inherit',
                 }}
               >
-                <span aria-hidden style={{ color: AMBER, fontSize: 11, lineHeight: 1 }}>◉</span>
-                {formatRatingValue(courseRating!)}
+                <img
+                  src="/lovable-uploads/2b0e2d79-6b26-4b6b-a27b-8dd5f8cc5aad.png"
+                  alt=""
+                  aria-hidden="true"
+                  style={{ width: 16, height: 16, flexShrink: 0, objectFit: 'contain' }}
+                />
+                <span style={{ fontSize: 11, fontWeight: 800, color: '#F8FAFC', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+                  {formatRatingValue(courseRating!)}
+                </span>
               </button>
             )}
+
           </div>
         )}
       </div>
