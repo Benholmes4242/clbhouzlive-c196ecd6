@@ -253,13 +253,17 @@ async function streamClaude(
       // Claude Sonnet 5: no temperature/top_p/top_k — recent generations
       // dropped those sampling params. Keep max_tokens + stream.
       model: ANTHROPIC_MODEL_SYNTH,
-      // Synthesis stream — bumped from 1200 to 2000 so longer answers don't
-      // truncate mid-sentence on dual/full routes.
-      max_tokens: 2000,
+      // Synthesis stream — 3000 for headroom against Sonnet 5 thinking tokens
+      // that count against max_tokens and can starve visible output.
+      max_tokens: 3000,
+      // Sonnet 5 adaptive thinking defaults HIGH; force LOW so a consensus
+      // synthesizer prioritizes speed + completion over deep deliberation.
+      effort: "low",
       system: systemPrompt,
       messages: messages.map(m => ({ role: m.role, content: m.content })),
       stream: true,
     }),
+
   }), 30000);
 
   if (!response.ok) {
@@ -322,10 +326,14 @@ async function callClaudeSync(
     body: JSON.stringify({
       // Claude Sonnet 5: no temperature/top_p/top_k.
       model: ANTHROPIC_MODEL_SYNTH,
-      max_tokens: 2000,
+      max_tokens: 3000,
+      // Force LOW effort (adaptive thinking defaults HIGH) so thinking tokens
+      // don't consume max_tokens and starve the visible answer.
+      effort: "low",
       system: systemPrompt,
       messages: messages.map(m => ({ role: m.role, content: m.content })),
     }),
+
   }), SYNC_TIMEOUT_MS);
   if (!r.ok) {
     const body = await r.text().catch(() => "");
