@@ -32,10 +32,14 @@ export function SuccessScreenV2({
   reviewText,
   scores,
   media,
-  onViewOnCourse,
+  shareToFeed,
+  onViewReview,
   onShare,
   onDone,
 }: Props) {
+  const subtitle = shareToFeed
+    ? "Live on the course page and in your friends' feeds."
+    : 'Live on the course page.';
   return (
     <div
       style={{
