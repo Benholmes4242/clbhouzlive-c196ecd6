@@ -35,7 +35,7 @@ const OPENAI_MODEL_SYNTH      = "gpt-5.5";             // GPT-5.5 synthesis
 const OPENAI_MODEL_INTENT     = "gpt-5.5";             // reserved; keep in sync with SYNTH
 const GEMINI_MODEL            = "gemini-3.5-flash";    // Gemini 3.5 Flash
 const PERPLEXITY_MODEL        = "sonar-pro";           // unchanged, verified current
-const BUILD                   = "e2.6";                // bump on every change to this function
+const BUILD                   = "e2.7";                // bump on every change to this function
 
 // Rate limit windows (identical to v1).
 const RATE_LIMIT_MINUTE = 10;
@@ -257,9 +257,6 @@ async function streamClaude(
       // Synthesis stream — 3000 for headroom against Sonnet 5 thinking tokens
       // that count against max_tokens and can starve visible output.
       max_tokens: 3000,
-      // Sonnet 5 adaptive thinking defaults HIGH; force LOW so a consensus
-      // synthesizer prioritizes speed + completion over deep deliberation.
-      effort: "low",
       system: systemPrompt,
       messages: messages.map(m => ({ role: m.role, content: m.content })),
       stream: true,
@@ -329,9 +326,6 @@ async function callClaudeSync(
       // Claude Sonnet 5: no temperature/top_p/top_k.
       model: ANTHROPIC_MODEL_SYNTH,
       max_tokens: 3000,
-      // Force LOW effort (adaptive thinking defaults HIGH) so thinking tokens
-      // don't consume max_tokens and starve the visible answer.
-      effort: "low",
       system: systemPrompt,
       messages: messages.map(m => ({ role: m.role, content: m.content })),
     }),
@@ -367,12 +361,11 @@ async function callOpenAISynth(
     },
     body: JSON.stringify({
       // GPT-5.5: chat completions rejects legacy `max_tokens` — use
-      // `max_completion_tokens`. `reasoning_effort: "minimal"` is the fastest
-      // tier (GPT-5-series). If the API 400s on "minimal", the existing
-      // error log shows it and we fall back to "low".
+      // `max_completion_tokens`. `reasoning_effort: "none"` is the fastest
+      // tier (GPT-5-series).
       model: OPENAI_MODEL_SYNTH,
       max_completion_tokens: 700,
-      reasoning_effort: "minimal",
+      reasoning_effort: "none",
       messages: [
         { role: "system", content: contribPrompt },
         ...messages.map(m => ({ role: m.role, content: m.content })),
@@ -408,11 +401,8 @@ async function callGemini(
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        // Gemini 3.x: request low thinking so the answer lands quickly.
-        // High is the default and adds seconds of latency.
         system_instruction: { parts: [{ text: systemPrompt }] },
         contents,
-        thinking_level: "low",
       }),
     },
   ), SYNC_TIMEOUT_MS);
