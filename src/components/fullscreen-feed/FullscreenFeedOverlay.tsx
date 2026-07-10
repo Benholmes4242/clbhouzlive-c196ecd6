@@ -781,9 +781,10 @@ export function FullscreenFeedOverlay() {
                     readOnly={readOnly}
                   />
 
-                  <FeedOverlayLayer
+                  <ImmersiveFullscreenChrome
                     posts={posts}
-                    activeIndexOverride={activeIndex}
+                    activeIndex={activeIndex}
+                    onClose={handleClose}
                     onLike={handleLike}
                     onComment={safeOpenComments}
                     onShare={handleShare}
@@ -794,22 +795,10 @@ export function FullscreenFeedOverlay() {
                     onFollow={(post) => handleFollowChange(post.userId, !getFollowState(post))}
                     onViewProfile={handleViewProfile}
                     onReviewTap={handleReviewTap}
-                    onBeforeNavigate={handleClose}
-                    overlayVisible={true}
                     isOwnPost={isOwnPost}
                     golfCourse={golfCourse}
-                    activeReview={activeReview}
-                    isActiveReview={isActiveReview}
-                    bottomOffset={0}
-                    topActionBar
-                    onClose={handleClose}
                     readOnly={readOnly}
-                  />
-
-
-                  <FullscreenCarouselOverlay
-                    activePost={activePost}
-                    activeIndex={activeIndex}
+                    onBeforeNavigate={handleClose}
                   />
                 </div>
 
