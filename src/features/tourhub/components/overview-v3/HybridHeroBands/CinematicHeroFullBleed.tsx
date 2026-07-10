@@ -536,10 +536,13 @@ export function CinematicHeroFullBleed({
     ? [venueName, datesString].filter(Boolean).join(' · ')
     : '';
 
-  // Cinematic photo variant (upcoming/results): shorter clamp height biases
-  // toward course architecture, not sky. Live keeps the taller frame so the
-  // in-hero leaderboard band has room to breathe.
-  const heroHeight = isLive ? '78vh' : 'clamp(420px, 52dvh, 560px)';
+  // Cinematic photo variant: clamped height biases toward course
+  // architecture, not sky. Live is slightly taller (56dvh vs 52dvh) because
+  // it carries the in-hero leaderboard band, but both share the same
+  // discipline: TI eyebrow reachable at the fold.
+  const heroHeight = isLive
+    ? 'clamp(480px, 56dvh, 620px)'
+    : 'clamp(420px, 52dvh, 560px)';
   return (
     <div
       style={{
@@ -554,7 +557,7 @@ export function CinematicHeroFullBleed({
       }}
     >
       {/* Spacer */}
-      <div style={{ flex: 1, minHeight: isLive ? 220 : 140 }} />
+      <div style={{ flex: 1, minHeight: isLive ? 170 : 140 }} />
 
 
       {/* Title block */}
@@ -919,7 +922,7 @@ export function CinematicHeroFullBleed({
               display: 'flex',
               alignItems: 'center',
               gap: 10,
-              padding: '9px 18px',
+              padding: isLive ? '7px 18px' : '9px 18px',
               borderTop: '0.5px solid rgba(255,255,255,0.08)',
             };
             if (row.kind === 'solo') {
