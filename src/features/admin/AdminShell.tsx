@@ -37,6 +37,7 @@ const SECTION_TITLES: Record<string, string> = {
   support:    'Support',
   verifications: 'Verifications',
   'video-perf': 'Video Perf',
+  'echo-health': 'Echo Health',
 };
 
 export default function AdminShell() {
