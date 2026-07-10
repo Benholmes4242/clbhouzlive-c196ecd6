@@ -80,6 +80,7 @@ export function SnapFeed({
   readOnly = false,
 }: SnapFeedProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const { openInviteSheet } = useInviteSheet();
   const slideRefs = useRef<Map<number, HTMLDivElement>>(new Map());
   const observerRef = useRef<IntersectionObserver | null>(null);
   const firstFrameFired = useRef(false);
