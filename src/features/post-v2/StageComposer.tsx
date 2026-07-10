@@ -366,9 +366,9 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
   }
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: '#F8FAFC', display: 'flex', flexDirection: 'column', zIndex: 12000 }}>
+    <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: '#F8FAFC', display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 12000 }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', background: '#F8FAFC', borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', paddingTop: 'max(env(safe-area-inset-top), 12px)', background: '#F8FAFC', borderBottom: '1px solid rgba(0,0,0,0.07)', flex: 'none' }}>
         <button onClick={handleClose} aria-label="Close" style={{ background: 'transparent', border: 0, color: '#1F2428', cursor: 'pointer', padding: 8 }}>
           <X size={22} />
         </button>
@@ -385,8 +385,8 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
 
       <input ref={stageAddInputRef} type="file" accept="image/*,video/*" multiple hidden onChange={handleStageAddFiles} />
 
-      {/* Stage */}
-      <div style={{ position: 'relative', flex: 1, minHeight: 240, display: 'flex' }}>
+      {/* Stage — shrinkable */}
+      <div style={{ position: 'relative', flex: '1 1 0', minHeight: 0, display: 'flex' }}>
         <MediaStageV2
           item={active}
           index={state.activeIndex}
@@ -401,30 +401,28 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
         )}
       </div>
 
-      {/* Media tray */}
-      <MediaTray
-        media={state.media}
-        activeIndex={state.activeIndex}
-        onSelect={setActiveIndex}
-        onRemove={handleRemoveAt}
-        onReorder={reorder}
-        onAddFiles={addFiles}
-      />
-
-      {/* Caption */}
-      <CaptionField value={state.caption} onChange={setCaption} currentUserId={profile?.id ?? null} />
-
-      {/* Detail rows */}
-      <DetailRows
-        course={state.course}
-        onOpenCourse={() => setSheet('course')}
-        actor={activeActor}
-        onOpenActor={() => setSheet('actor')}
-        scheduledAt={state.scheduledAt}
-        onOpenSchedule={() => setSheet('schedule')}
-        actorLocked={isEditMode}
-        showSchedule={showScheduleRow}
-      />
+      {/* Bottom stack — never grows the page; scrolls itself only if too tall */}
+      <div style={{ flex: 'none', maxHeight: '55dvh', overflowY: 'auto', paddingBottom: 'max(env(safe-area-inset-bottom), 12px)', background: '#F8FAFC' }}>
+        <MediaTray
+          media={state.media}
+          activeIndex={state.activeIndex}
+          onSelect={setActiveIndex}
+          onRemove={handleRemoveAt}
+          onReorder={reorder}
+          onAddFiles={addFiles}
+        />
+        <CaptionField value={state.caption} onChange={setCaption} currentUserId={profile?.id ?? null} />
+        <DetailRows
+          course={state.course}
+          onOpenCourse={() => setSheet('course')}
+          actor={activeActor}
+          onOpenActor={() => setSheet('actor')}
+          scheduledAt={state.scheduledAt}
+          onOpenSchedule={() => setSheet('schedule')}
+          actorLocked={isEditMode}
+          showSchedule={showScheduleRow}
+        />
+      </div>
 
       {/* Sheets */}
       <CourseTagSheet open={sheet === 'course'} onClose={() => setSheet(null)} onSelect={setCourse} current={state.course} userId={profile?.id ?? null} />
