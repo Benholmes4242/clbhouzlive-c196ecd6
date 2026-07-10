@@ -566,10 +566,10 @@ export function CinematicHeroFullBleed({
         style={{
           position: 'relative',
           zIndex: 2,
-          padding: '0 18px 14px',
+          padding: '0 18px 10px',
           display: 'flex',
           flexDirection: 'column',
-          gap: 8,
+          gap: 6,
         }}
       >
         {EyebrowSpan}
@@ -599,7 +599,7 @@ export function CinematicHeroFullBleed({
               color: 'rgba(255,255,255,0.7)',
               letterSpacing: '0.02em',
               textTransform: 'uppercase',
-              marginTop: 2,
+              marginTop: 1,
             }}
           >
             {upcomingSub}
@@ -607,7 +607,7 @@ export function CinematicHeroFullBleed({
         )}
 
         {isUpcoming && hoursUntilStart != null && Number.isFinite(hoursUntilStart) && (
-          <div style={{ marginTop: 14 }}>
+          <div style={{ marginTop: 8 }}>
             <CountdownPills hoursUntilStart={hoursUntilStart} />
           </div>
         )}
@@ -619,13 +619,13 @@ export function CinematicHeroFullBleed({
           style={{
             position: 'relative',
             zIndex: 2,
-            padding: '16px 18px 18px',
+            padding: '10px 18px 10px',
             borderTop: '0.5px solid rgba(255,255,255,0.10)',
             background:
               'linear-gradient(180deg, rgba(232,194,106,0.06) 0%, rgba(232,194,106,0) 100%)',
             display: 'flex',
             alignItems: 'center',
-            gap: 14,
+            gap: 12,
           }}
         >
           <SquircleAvatar
@@ -635,7 +635,7 @@ export function CinematicHeroFullBleed({
             hairlineRing
             ringColor={GOLD_RING}
           />
-          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
             <span
               style={{
                 fontSize: 9.5,
@@ -730,8 +730,8 @@ export function CinematicHeroFullBleed({
               display: 'flex',
               alignItems: 'center',
               gap: 10,
-              padding: '9px 18px',
-              borderTop: '0.5px solid rgba(255,255,255,0.08)',
+              padding: '5px 18px',
+              borderTop: 'none',
             };
             if (row.kind === 'solo') {
               return (
@@ -1109,8 +1109,8 @@ export function CinematicHeroFullBleed({
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 12,
-                padding: '14px 18px',
+                gap: 10,
+                padding: '10px 18px',
               }}
             >
               <SquircleAvatar
@@ -1120,7 +1120,7 @@ export function CinematicHeroFullBleed({
                 hairlineRing
                 ringColor={GOLD_RING}
               />
-              <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 1 }}>
                 <span
                   style={{
                     fontSize: 9.5,
@@ -1166,7 +1166,7 @@ export function CinematicHeroFullBleed({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 18,
-                padding: '14px 18px',
+                padding: '10px 18px',
               }}
             >
               {courseStats.par != null && (
@@ -1194,7 +1194,7 @@ function Footer({ leftText, isLive, noBorder }: { leftText: string; isLive: bool
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '11px 18px 14px',
+        padding: '7px 18px 10px',
         borderTop: noBorder ? 'none' : '0.5px solid rgba(255,255,255,0.12)',
       }}
     >
