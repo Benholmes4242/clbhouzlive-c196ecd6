@@ -30,10 +30,10 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
     // has activity".
     const { hasOtherUnread, countFor } = useActorUnreadCounts();
 
-    // Green dot when the active actor has unread activity (notifications or DMs).
-    const hasUnreadMessages = activeActor
-      ? countFor(activeActor.type as 'personal' | 'business', activeActor.id) > 0
-      : false;
+    // Combined unread count for the active actor (notifications + DMs).
+    const activeUnread = activeActor
+      ? countFor(activeActor.type as 'personal' | 'business', activeActor.id)
+      : 0;
 
 
     // Bare theme — no background, no chevron, white-ringed avatar with drop shadow
@@ -75,35 +75,24 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
 
           </span>
 
-          {hasUnreadNotifications && (
+          {activeUnread > 0 && (
             <span
               className={cn(
                 "absolute -top-1 -right-1 flex items-center justify-center rounded-full bg-[#F7931E] font-bold",
-                notificationCount > 9
+                activeUnread > 9
                   ? "h-[18px] min-w-[18px] px-[4px] text-[10px]"
-                  : notificationCount > 0
-                  ? "h-[18px] w-[18px] text-[10px]"
-                  : "h-2.5 w-2.5"
+                  : "h-[18px] w-[18px] text-[10px]"
               )}
               style={{ color: 'rgba(255,255,255,0.95)', boxShadow: '0 0 0 0.5px rgba(255,255,255,0.95)' }}
-              aria-label={`${notificationCount} unread notifications`}
+              aria-label={`${activeUnread} unread`}
             >
-              {notificationCount > 0 && (
-                <span style={{ lineHeight: 1 }}>
-                  {notificationCount > 99 ? '99+' : notificationCount}
-                </span>
-              )}
+              <span style={{ lineHeight: 1 }}>
+                {activeUnread > 99 ? '99+' : activeUnread}
+              </span>
             </span>
           )}
 
-          {hasUnreadMessages && (
-            <span
-              className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-[1.5px] ring-black"
-              aria-label="Unread messages"
-            />
-          )}
-
-          {hasOtherUnread && !hasUnreadNotifications && (
+          {hasOtherUnread && activeUnread === 0 && (
             <span
               className="absolute -top-0.5 -left-0.5 h-2 w-2 rounded-full bg-[#F7931E] ring-[1.5px] ring-black"
               aria-label="Another profile has unread activity"
@@ -206,41 +195,25 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
 
           </span>
           
-          {/* Orange badge — social notifications (top-right) */}
-          {hasUnreadNotifications && (
+          {/* Combined unread badge — notifications + DMs (top-right) */}
+          {activeUnread > 0 && (
             <span
               className={cn(
                 "absolute -top-1 -right-1 flex items-center justify-center rounded-full bg-[#F7931E] font-bold text-white",
-                "",
-                notificationCount > 9
+                activeUnread > 9
                   ? "h-[16px] min-w-[16px] px-[3px] text-[8px]"
-                  : notificationCount > 0
-                  ? "h-[14px] w-[14px] text-[8px]"
-                  : "h-2.5 w-2.5"
+                  : "h-[14px] w-[14px] text-[8px]"
               )}
-              aria-label={`${notificationCount} unread notifications`}
+              aria-label={`${activeUnread} unread`}
             >
-              {notificationCount > 0 && (
-                <span style={{ lineHeight: 1 }}>
-                  {notificationCount > 99 ? '99+' : notificationCount}
-                </span>
-              )}
+              <span style={{ lineHeight: 1 }}>
+                {activeUnread > 99 ? '99+' : activeUnread}
+              </span>
             </span>
-          )}
-          
-          {/* Green dot — unread messages (bottom-right) */}
-          {hasUnreadMessages && (
-            <span 
-              className={cn(
-                "absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-500",
-                useLightTheme ? "ring-[1.5px] ring-background" : "ring-[1.5px] ring-black"
-              )}
-              aria-label="Unread messages"
-            />
           )}
 
           {/* Amber micro-dot — another profile (non-active actor) has unread */}
-          {hasOtherUnread && !hasUnreadNotifications && (
+          {hasOtherUnread && activeUnread === 0 && (
             <span
               className={cn(
                 "absolute -top-0.5 -left-0.5 h-2 w-2 rounded-full bg-[#F7931E]",
