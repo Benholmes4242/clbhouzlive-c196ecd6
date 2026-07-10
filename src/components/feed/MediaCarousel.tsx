@@ -209,7 +209,88 @@ export const MediaCarousel: React.FC<Props> = ({
       }
     }
     prevActiveRef.current = to;
+
+    // ── [CAROUSEL2] deep lane/role instrumentation ─────────────────
+    // Pure logging, gated on isPerfEnabled(). Shows the 3 physical feed
+    // lanes' bindings, each slide's role/lane/readiness, and warm outcomes.
+    if (isCardActive && isPerfEnabled()) {
+      const FEED_LANES: LaneId[] = ['feed-active', 'feed-next', 'feed-prev'];
+      const findLaneForOwner = (owner: string) => {
+        for (const lid of FEED_LANES) {
+          try {
+            const s = VideoEngine.snapshot(lid);
+            if (s.postId === owner) return { laneId: lid, snap: s };
+          } catch { /* engine not booted */ }
+        }
+        return null;
+      };
+      const roles = feedLaneRoles.snapshot();
+      const snapPost = (lid: LaneId): string | null => {
+        try { return VideoEngine.snapshot(lid).postId; } catch { return null; }
+      };
+      const activeOwner = ownerKeyOf(to);
+      const activeLoc = findLaneForOwner(activeOwner);
+      // eslint-disable-next-line no-console
+      console.info('[CAROUSEL2] lanes', {
+        activeSlideIndex: to,
+        laneRoles: {
+          active: snapPost(roles.active),
+          next: snapPost(roles.next),
+          prev: snapPost(roles.prev),
+        },
+        activeSlideLaneId: activeLoc?.laneId ?? null,
+        activeSlideOwnerKey: activeOwner,
+      });
+
+      const emitSlideLaneState = (idx: number) => {
+        if (idx < 0 || idx >= items.length) return;
+        const it = items[idx];
+        const owner = ownerKeyOf(idx);
+        const loc = findLaneForOwner(owner);
+        const role = loc ? feedLaneRoles.roleForLane(loc.laneId) : null;
+        // eslint-disable-next-line no-console
+        console.info('[CAROUSEL2] slide.laneState', {
+          index: idx,
+          ownerKey: owner,
+          role,
+          laneId: loc?.laneId ?? null,
+          mounted: !!loc,
+          firstFrame: loc?.snap.firstFrame ?? false,
+          readyState: loc?.snap.readyState ?? 0,
+          isVideo: it?.type === 'video',
+        });
+      };
+      emitSlideLaneState(to - 1);
+      emitSlideLaneState(to);
+      emitSlideLaneState(to + 1);
+
+      const sampleHealth = (label: string) => {
+        const loc = findLaneForOwner(activeOwner);
+        // eslint-disable-next-line no-console
+        console.info('[CAROUSEL2] active.health', {
+          when: label,
+          ownerKey: activeOwner,
+          laneId: loc?.laneId ?? null,
+          firstFrame: loc?.snap.firstFrame ?? false,
+          playing: loc?.snap.state === 'playing',
+          readyState: loc?.snap.readyState ?? 0,
+        });
+      };
+      sampleHealth('activate');
+      const t = window.setTimeout(() => sampleHealth('+500ms'), 500);
+      // Cleanup handled by effect return below.
+      (activateHealthTimerRef.current ??= { id: 0 }).id = t;
+    }
   }, [active, isCardActive, items, postId, ownerKeyOf]);
+
+  // Timer holder for the +500ms active.health sample (avoids leak across
+  // rapid swipes). Pure instrumentation — cleared on the next activate.
+  const activateHealthTimerRef = useRef<{ id: number } | null>(null);
+  useEffect(() => () => {
+    if (activateHealthTimerRef.current?.id) {
+      window.clearTimeout(activateHealthTimerRef.current.id);
+    }
+  }, []);
 
   // ────────────────────────────────────────────────────────────────────
   // Adjacent-slide warming (media axis).
@@ -228,16 +309,68 @@ export const MediaCarousel: React.FC<Props> = ({
   // ────────────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!isCardActive) return;
+    const perf = isPerfEnabled();
+    const isAnyLaneLoading = (() => {
+      try { return VideoEngine.isAnyLaneLoading(); } catch { return false; }
+    })();
     const neighbours = [active - 1, active + 1];
     for (const j of neighbours) {
       if (j < 0 || j >= items.length) continue;
       const it = items[j];
-      if (!it || it.type !== 'video') continue;
+      const owner = ownerKeyOf(j);
+      // Mount warm attempt (InlineVideo isNear/earlyMotion render below).
+      if (perf) {
+        if (it?.type !== 'video') {
+          // eslint-disable-next-line no-console
+          console.info('[CAROUSEL2] warm.attempt', {
+            ownerKey: owner, method: 'mount',
+            outcome: 'noop:not-video', isAnyLaneLoading,
+          });
+        } else {
+          // eslint-disable-next-line no-console
+          console.info('[CAROUSEL2] warm.attempt', {
+            ownerKey: owner, method: 'mount',
+            outcome: 'issued', isAnyLaneLoading,
+          });
+        }
+      }
+      // Prefetch warm attempt.
+      if (!it || it.type !== 'video') {
+        if (perf) {
+          // eslint-disable-next-line no-console
+          console.info('[CAROUSEL2] warm.attempt', {
+            ownerKey: owner, method: 'prefetch',
+            outcome: 'noop:not-video', isAnyLaneLoading,
+          });
+        }
+        continue;
+      }
       const hlsUrl = (it as any).hlsUrl || '';
-      if (!hlsUrl || typeof hlsUrl !== 'string' || hlsUrl.startsWith('blob:')) continue;
-      PrefetchController.request(ownerKeyOf(j), hlsUrl);
+      if (!hlsUrl || typeof hlsUrl !== 'string' || hlsUrl.startsWith('blob:')) {
+        if (perf) {
+          // eslint-disable-next-line no-console
+          console.info('[CAROUSEL2] warm.attempt', {
+            ownerKey: owner, method: 'prefetch',
+            outcome: 'noop:no-hls-url', isAnyLaneLoading,
+          });
+        }
+        continue;
+      }
+      if (perf) {
+        const already = PrefetchController.wasPrefetched(owner);
+        const outcome = already
+          ? 'noop:already-warmed'
+          : (isAnyLaneLoading ? 'skipped:laneLoading' : 'issued');
+        // eslint-disable-next-line no-console
+        console.info('[CAROUSEL2] warm.attempt', {
+          ownerKey: owner, method: 'prefetch',
+          outcome, isAnyLaneLoading,
+        });
+      }
+      PrefetchController.request(owner, hlsUrl);
     }
   }, [active, isCardActive, items, ownerKeyOf]);
+
 
 
 
