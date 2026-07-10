@@ -14,6 +14,9 @@ interface UseVoiceRecorderReturn {
   resumeRecording: () => void;
   resetRecording: () => void;
   error: string | null;
+  /** Live mic stream while recording; null when idle. Consumers can attach
+   *  an AnalyserNode for waveform rendering. */
+  stream: MediaStream | null;
 }
 
 export const useVoiceRecorder = (): UseVoiceRecorderReturn => {
@@ -23,6 +26,7 @@ export const useVoiceRecorder = (): UseVoiceRecorderReturn => {
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [stream, setStream] = useState<MediaStream | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
