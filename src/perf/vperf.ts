@@ -1053,10 +1053,12 @@ export function vperfImagePhase(
 // ============================================================================
 
 function emitFlow(kind: string, payload: Record<string, unknown>): void {
+  if (!consoleOn()) return; // PHASE-2: [FLOW] is console-only diagnostic
   const merged = { ...payload, page: (payload as any).page ?? __currentPage };
   // eslint-disable-next-line no-console
   console.info(`[FLOW] ${kind}`, merged);
 }
+
 
 /** Visible fraction of `el` inside the current viewport, 2dp, clamped 0..1. */
 export function vperfCardFraction(el: HTMLElement | null | undefined): number {
