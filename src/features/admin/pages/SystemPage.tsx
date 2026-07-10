@@ -478,6 +478,12 @@ function SettingsTab() {
   const { user } = useSupabaseSession();
   const { role } = usePanelRole();
   const [pillsVisible, setPillsVisible] = useAdminPillVisibility();
+  const [perfEnabled, setPerfEnabled] = useState(() => isPerfEnabled());
+
+  useEffect(() => {
+    const unsub = subscribePerfLive(() => setPerfEnabled(isPerfEnabled()));
+    return unsub;
+  }, []);
 
   const signOut = async () => {
     try {
