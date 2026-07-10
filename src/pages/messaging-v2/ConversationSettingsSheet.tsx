@@ -33,6 +33,9 @@ import { useConversations } from '@/hooks/messaging/useConversations';
 import { supabase } from '@/integrations/supabase/client';
 import type { Json } from '@/integrations/supabase/types';
 import type { ConversationMember, MemberRole } from '@/types/messaging';
+import { pickMediaFiles } from '@/utils/media/pickMediaFiles';
+import { compressImage, COMPRESSION_PRESETS } from '@/uploads/imageCompression';
+import { uploadToR2Only } from '@/utils/r2OnlyUpload';
 
 const CANVAS = '#F8FAFC';
 const INK = '#1F2428';
