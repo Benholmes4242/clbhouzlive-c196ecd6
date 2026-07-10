@@ -11,6 +11,7 @@ import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 
 
 import { ImmersiveFullscreenChrome } from '@/components/fullscreen-feed/ImmersiveFullscreenChrome';
+import { FullscreenScrubber } from '@/components/fullscreen-feed/FullscreenScrubber';
 import CommentsSheet from '@/components/comments/CommentsSheet';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { useReviewerStats } from '@/hooks/useReviewerStats';
