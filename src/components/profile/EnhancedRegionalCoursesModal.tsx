@@ -340,10 +340,11 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
   });
 
   // Mark as played - in ratings-only system, open rating modal instead
+  // Mark as played - open the Composer route (R4 cutover).
   const handleMarkAsPlayed = (courseId: string) => {
     const course = allRegionCourses.find(c => c.golf_courses.id === courseId);
-    if (course) {
-      setReviewModalCourse(course.golf_courses);
+    if (course?.golf_courses?.id) {
+      navigate(`/courses/${course.golf_courses.id}/rate`);
     }
   };
 
