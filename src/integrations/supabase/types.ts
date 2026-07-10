@@ -3464,10 +3464,12 @@ export type Database = {
           review: string | null
           review_date: string | null
           review_of_week_week: string | null
+          share_to_feed: boolean
           title: string | null
           unhelpful_count: number | null
           updated_at: string
           user_id: string | null
+          verdict: string | null
         }
         Insert: {
           clubhouse_score?: number | null
@@ -3484,10 +3486,12 @@ export type Database = {
           review?: string | null
           review_date?: string | null
           review_of_week_week?: string | null
+          share_to_feed?: boolean
           title?: string | null
           unhelpful_count?: number | null
           updated_at?: string
           user_id?: string | null
+          verdict?: string | null
         }
         Update: {
           clubhouse_score?: number | null
@@ -3504,10 +3508,12 @@ export type Database = {
           review?: string | null
           review_date?: string | null
           review_of_week_week?: string | null
+          share_to_feed?: boolean
           title?: string | null
           unhelpful_count?: number | null
           updated_at?: string
           user_id?: string | null
+          verdict?: string | null
         }
         Relationships: [
           {
@@ -16555,6 +16561,7 @@ export type Database = {
         Args: { p_business_id: string; p_user_profile_id: string }
         Returns: boolean
       }
+      delete_course_review_v2: { Args: { p_rating_id: string }; Returns: Json }
       delete_message_for_me: {
         Args: { p_message_id: string }
         Returns: undefined
@@ -20385,6 +20392,20 @@ export type Database = {
             }
             Returns: Json
           }
+      submit_course_review_v2: {
+        Args: {
+          p_clubhouse: number
+          p_condition: number
+          p_course_id: string
+          p_design: number
+          p_facilities: number
+          p_rating: number
+          p_review?: string
+          p_share_to_feed?: boolean
+          p_verdict?: string
+        }
+        Returns: Json
+      }
       submit_golfer_verification_request: {
         Args: { _evidence_url?: string; _note?: string; _request_id: string }
         Returns: undefined

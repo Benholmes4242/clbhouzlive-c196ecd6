@@ -46,6 +46,7 @@ const HIDDEN_ROUTE_PREFIXES = [
   '/business/create',
   '/business/invite/accept',
   '/i/',
+  '/rate-course-v2/',
 ];
 
 const HIDDEN_ROUTE_PATTERNS: RegExp[] = [
