@@ -284,6 +284,7 @@ const ThreadV2Page: React.FC = () => {
             userId={header.userId}
             alt={header.name}
             size={34}
+            hairlineRing
           />
           <div className="flex flex-col min-w-0" style={{ gap: 1 }}>
             <div className="flex items-center gap-1.5 min-w-0">

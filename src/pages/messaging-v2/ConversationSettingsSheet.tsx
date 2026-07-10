@@ -289,6 +289,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                 userId={headerId}
                 alt={headerTitle}
                 size={72}
+                hairlineRing
               />
               {isGroup && isAdmin && titleEdit != null ? (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', maxWidth: 320 }}>
@@ -444,6 +445,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                         userId={m.actor_id}
                         alt={m.name ?? 'Member'}
                         size={40}
+                        hairlineRing
                       />
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div
@@ -817,6 +819,7 @@ const AddPeopleSheet: React.FC<AddPeopleSheetProps> = ({
                 userId={c.actor_id}
                 alt={c.name}
                 size={40}
+                hairlineRing
               />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ color: INK, fontSize: 15, fontWeight: 500 }}>{c.name}</div>
