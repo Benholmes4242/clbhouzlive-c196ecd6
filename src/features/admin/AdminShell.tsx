@@ -124,6 +124,7 @@ export default function AdminShell() {
                 <Route path="support/*"   element={can.viewModeration ? <SupportPage /> : <AdminAccessDenied />} />
                 <Route path="verifications/*" element={can.viewUsers ? <VerificationsPage /> : <AdminAccessDenied />} />
                 <Route path="video-perf/*" element={<VideoPerfPage />} />
+                <Route path="echo-health/*" element={can.manageAdmins ? <EchoHealthPage /> : <AdminAccessDenied />} />
                 <Route path="*" element={<Navigate to={role === 'moderator' ? 'moderation' : 'dashboard'} replace />} />
               </Routes>
             </Suspense>
