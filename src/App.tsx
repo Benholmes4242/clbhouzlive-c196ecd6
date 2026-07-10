@@ -288,9 +288,7 @@ const AdminShell = lazy(() => import('./features/admin/AdminShell'));
 
 // Hub lazy imports removed — Hub page decommissioned
 
-// Echo full-page experience
-const EchoPage = lazy(() => import("./pages/EchoPage"));
-// Echo v2 (parallel build)
+// Echo v2 full-page experience (cutover from legacy EchoPage)
 const EchoV2Page = lazy(() => import("./pages/EchoV2Page"));
 const EchoHistoryPage = lazy(() => import("./pages/EchoHistoryPage"));
 
@@ -316,6 +314,10 @@ const MiniPlayer = lazy(() => import("./components/videos/MiniPlayer"));
 const VideoIdToPostRedirect: React.FC = () => {
   const { videoId } = useParams<{ videoId: string }>();
   return <Navigate to={videoId ? `/post/${videoId}` : '/watch'} replace />;
+};
+const EchoV2Redirect: React.FC = () => {
+  const { chatId } = useParams<{ chatId: string }>();
+  return <Navigate to={chatId ? `/echo/${chatId}` : '/echo'} replace />;
 };
 const SeasonShop = lazy(() => import("./pages/SeasonShop"));
 const ChallengesPage = lazy(() => import("./pages/ChallengesPage"));
@@ -644,14 +646,16 @@ function AppRoutes() {
         {/* /create-moment removed — PostStudio is now the sole creation flow */}
         <Route path="/error-logs" element={<ErrorLogPage />} />
         
-        {/* Echo AI */}
-        <Route path="/echo" element={<Suspense fallback={<HubSkeleton />}><EchoPage /></Suspense>} />
-        <Route path="/echo/:conversationId" element={<Suspense fallback={<HubSkeleton />}><EchoPage /></Suspense>} />
+        {/* Echo AI (v2) */}
+        <Route path="/echo" element={<Suspense fallback={<HubSkeleton />}><EchoV2Page /></Suspense>} />
+        <Route path="/echo/history" element={<Suspense fallback={<HubSkeleton />}><EchoHistoryPage /></Suspense>} />
+        <Route path="/echo/:chatId" element={<Suspense fallback={<HubSkeleton />}><EchoV2Page /></Suspense>} />
 
-        {/* Echo v2 (parallel build - cutover pending) */}
-        <Route path="/echo-v2" element={<Suspense fallback={<HubSkeleton />}><EchoV2Page /></Suspense>} />
-        <Route path="/echo-v2/history" element={<Suspense fallback={<HubSkeleton />}><EchoHistoryPage /></Suspense>} />
-        <Route path="/echo-v2/:chatId" element={<Suspense fallback={<HubSkeleton />}><EchoV2Page /></Suspense>} />
+        {/* Legacy /echo-v2 redirects */}
+        <Route path="/echo-v2" element={<Navigate to="/echo" replace />} />
+        <Route path="/echo-v2/history" element={<Navigate to="/echo/history" replace />} />
+        <Route path="/echo-v2/:chatId" element={<EchoV2Redirect />} />
+
 
 
         {/* Public Echo Share Page */}

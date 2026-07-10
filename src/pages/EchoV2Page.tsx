@@ -48,7 +48,7 @@ const EchoV2Page: React.FC = () => {
       requestAnimationFrame(scrollToBottom);
       await send(chatId ?? null, text, {
         onChatId: (newChatId) => {
-          if (!chatId) navigate(`/echo-v2/${newChatId}`, { replace: true });
+          if (!chatId) navigate(`/echo/${newChatId}`, { replace: true });
         },
         onDone: async (_finalText, _meta, resolvedChatId) => {
           const target = resolvedChatId ?? chatId ?? null;
@@ -96,9 +96,9 @@ const EchoV2Page: React.FC = () => {
           showBack={inChat}
           onBack={() => {
             const from = (location.state as { from?: string } | null)?.from;
-            navigate(from === 'history' ? '/echo-v2/history' : '/echo-v2');
+            navigate(from === 'history' ? '/echo/history' : '/echo');
           }}
-          onHistoryClick={() => navigate('/echo-v2/history')}
+          onHistoryClick={() => navigate('/echo/history')}
         />
 
 
