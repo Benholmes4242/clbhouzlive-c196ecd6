@@ -17,6 +17,9 @@ import type { MediaItem } from '@/components/media-system/types/media';
 import { CarouselDots } from '@/components/media/CarouselDots';
 import { InlineVideo } from './InlineVideo';
 import { createTapHandler } from './mediaTap';
+import { isPerfEnabled } from '@/perf/navTiming';
+import { VideoEngine } from '@/video/VideoEngine';
+import { feedLaneRoles } from '@/video/feedLaneRoles';
 
 interface Props {
   items: MediaItem[];
@@ -98,6 +101,104 @@ export const MediaCarousel: React.FC<Props> = ({
   useEffect(() => () => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
   }, []);
+
+  // [CAROUSEL] instrumentation — observable slide switches within a post.
+  // Gated on isPerfEnabled(); zero behaviour change.
+  const prevActiveRef = useRef<number>(active);
+  const ownerKeyOf = useCallback(
+    (i: number) =>
+      postId ? `${postId}:${i}` : `${items[i]?.id ?? 'noid'}:${i}`,
+    [postId, items],
+  );
+  useEffect(() => {
+    if (!isPerfEnabled()) {
+      prevActiveRef.current = active;
+      return;
+    }
+    const from = prevActiveRef.current;
+    const to = active;
+    const fromItem = items[from];
+    const toItem = items[to];
+    const toMediaType: 'video' | 'image' =
+      toItem?.type === 'video' ? 'video' : 'image';
+    if (from !== to) {
+      // eslint-disable-next-line no-console
+      console.info('[CAROUSEL] slide.change', {
+        postId,
+        fromIndex: from,
+        toIndex: to,
+        fromOwnerKey: ownerKeyOf(from),
+        toOwnerKey: ownerKeyOf(to),
+        toMediaType,
+        totalSlides: items.length,
+      });
+      if (fromItem?.type === 'video') {
+        // eslint-disable-next-line no-console
+        console.info('[CAROUSEL] slide.video', {
+          ownerKey: ownerKeyOf(from),
+          index: from,
+          action: 'pause',
+          reason: 'carousel.swipe-out',
+        });
+      }
+      if (toItem?.type === 'video') {
+        // eslint-disable-next-line no-console
+        console.info('[CAROUSEL] slide.video', {
+          ownerKey: ownerKeyOf(to),
+          index: to,
+          action: 'play',
+          reason: 'carousel.swipe-in',
+        });
+      }
+    }
+    if (isCardActive) {
+      // eslint-disable-next-line no-console
+      console.info('[CAROUSEL] slide.activate', {
+        postId,
+        index: to,
+        ownerKey: ownerKeyOf(to),
+        mediaType: toMediaType,
+        isCardActive,
+      });
+      // Mismatch guard: on the MEDIA axis, if the active feed lane is bound
+      // to a different ownerKey/postId than the slide we just activated, we
+      // are about to render the wrong media in this slot. Best-effort — only
+      // logs when the engine has a concrete bound postId to compare against.
+      if (toItem?.type === 'video') {
+        try {
+          const laneId = feedLaneRoles.laneForRole('active');
+          const bound = VideoEngine.snapshot(laneId).postId;
+          const expected = ownerKeyOf(to);
+          if (
+            bound &&
+            bound !== expected &&
+            bound !== postId &&
+            !bound.startsWith(`${postId ?? ''}:`)
+          ) {
+            // eslint-disable-next-line no-console
+            console.warn('[CAROUSEL] slide.mismatch', {
+              expectedOwnerKey: expected,
+              boundLanePostId: bound,
+              index: to,
+            });
+          } else if (bound && postId && bound.startsWith(`${postId}:`) && bound !== expected) {
+            // Same post, wrong slide index bound to the active lane.
+            // eslint-disable-next-line no-console
+            console.warn('[CAROUSEL] slide.mismatch', {
+              expectedOwnerKey: expected,
+              boundLanePostId: bound,
+              index: to,
+            });
+          }
+        } catch {
+          /* engine not booted — ignore */
+        }
+      }
+    }
+    prevActiveRef.current = to;
+  }, [active, isCardActive, items, postId, ownerKeyOf]);
+
+
 
   return (
     <div
