@@ -764,6 +764,10 @@ serve(async (req: Request) => {
           engines,
           live,
           ms: Date.now() - t0,
+          // Authoritative cleaned text (post STRENGTH strip) so the client
+          // can reconcile any tail characters that may have streamed before
+          // the marker was fully seen.
+          text: finalText,
           ...metaExtras,
         };
         // Cache successful non-live responses.
