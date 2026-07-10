@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PencilLine } from 'lucide-react';
+import { Flag, PencilLine } from 'lucide-react';
 import { useConversations } from '@/hooks/messaging/useConversations';
 import { ConversationRow } from './ConversationRow';
 import NewConversationSheet from './NewConversationSheet';
@@ -121,14 +121,58 @@ const InboxV2Page: React.FC = () => {
         ) : conversations.length === 0 ? (
           <div
             className="flex flex-col items-center justify-center text-center"
-            style={{ padding: '96px 24px', gap: 8 }}
+            style={{ padding: '96px 24px', gap: 20, flex: 1 }}
           >
-            <p style={{ color: INK, fontSize: 17, fontWeight: 500, margin: 0 }}>
-              No messages yet
-            </p>
-            <p style={{ color: SUB, fontSize: 14, margin: 0 }}>
-              Start a conversation with a friend or group.
-            </p>
+            <div
+              style={{
+                width: 72,
+                height: 72,
+                borderRadius: '50%',
+                background: 'linear-gradient(145deg, #FDBE6E, #F7931E)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 8px 20px rgba(247,147,30,0.25)',
+              }}
+            >
+              <Flag size={32} color="#FFFFFF" />
+            </div>
+            <div className="flex flex-col items-center" style={{ gap: 6 }}>
+              <p style={{ color: INK, fontSize: 20, fontWeight: 600, margin: 0, lineHeight: '24px' }}>
+                Your clubhouse is quiet
+              </p>
+              <p
+                style={{
+                  color: SUB,
+                  fontSize: 14,
+                  lineHeight: 1.45,
+                  maxWidth: 270,
+                  margin: 0,
+                }}
+              >
+                Message a playing partner, sort a fourball, or start a group for your society.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setComposeOpen(true)}
+              className="active:opacity-60 transition-opacity"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                background: '#15171F',
+                color: '#F5F6F7',
+                borderRadius: 22,
+                padding: '12px 24px',
+                fontSize: 14,
+                fontWeight: 500,
+                border: 'none',
+              }}
+            >
+              <PencilLine size={16} />
+              New message
+            </button>
           </div>
         ) : (
           <div>
