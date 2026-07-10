@@ -290,6 +290,8 @@ const AdminShell = lazy(() => import('./features/admin/AdminShell'));
 
 // Echo full-page experience
 const EchoPage = lazy(() => import("./pages/EchoPage"));
+// Echo v2 (parallel build)
+const EchoV2Page = lazy(() => import("./pages/EchoV2Page"));
 
 // Removed: DiscoverGamesPage lazy import — /games/discover now redirects to /clubhouse
 
@@ -644,7 +646,11 @@ function AppRoutes() {
         {/* Echo AI */}
         <Route path="/echo" element={<Suspense fallback={<HubSkeleton />}><EchoPage /></Suspense>} />
         <Route path="/echo/:conversationId" element={<Suspense fallback={<HubSkeleton />}><EchoPage /></Suspense>} />
-        
+
+        {/* Echo v2 (parallel build - cutover pending) */}
+        <Route path="/echo-v2" element={<Suspense fallback={<HubSkeleton />}><EchoV2Page /></Suspense>} />
+        <Route path="/echo-v2/:chatId" element={<Suspense fallback={<HubSkeleton />}><EchoV2Page /></Suspense>} />
+
         {/* Public Echo Share Page */}
         <Route path="/echo/share/:token" element={<Suspense fallback={<GenericPageSkeleton />}><EchoSharePage /></Suspense>} />
         
