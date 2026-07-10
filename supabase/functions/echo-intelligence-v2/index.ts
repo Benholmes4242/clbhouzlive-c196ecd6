@@ -293,6 +293,19 @@ async function streamClaude(
   return full;
 }
 
+// Shared timeout for SYNC consensus calls. Streaming fetches keep the 20s
+// default (that only guards headers). GPT-5.5 reasoning + Gemini 3 thinking
+// need more than 20s for a full body.
+const SYNC_TIMEOUT_MS = 45000;
+
+function shapeSnippet(d: unknown): string {
+  try {
+    return JSON.stringify(d).slice(0, 300);
+  } catch {
+    return String(d).slice(0, 300);
+  }
+}
+
 async function callClaudeSync(
   systemPrompt: string,
   messages: Array<{ role: string; content: string }>,
@@ -311,14 +324,18 @@ async function callClaudeSync(
       system: systemPrompt,
       messages: messages.map(m => ({ role: m.role, content: m.content })),
     }),
-  }), 20000);
+  }), SYNC_TIMEOUT_MS);
   if (!r.ok) {
     const body = await r.text().catch(() => "");
     console.error(`[echo-v2] Claude sync ${r.status}:`, body);
     throw new Error(`Claude API error: ${r.status}`);
   }
   const d = await r.json();
-  return d?.content?.[0]?.text || "";
+  const text = (d?.content?.[0]?.text || "").trim();
+  if (!text) {
+    throw new Error(`Claude empty on 2xx: ${shapeSnippet(d)}`);
+  }
+  return text;
 }
 
 async function callOpenAISynth(
@@ -333,22 +350,29 @@ async function callOpenAISynth(
     },
     body: JSON.stringify({
       // GPT-5.5: chat completions rejects legacy `max_tokens` — use
-      // `max_completion_tokens`. No temperature (defaults only).
+      // `max_completion_tokens`. `reasoning_effort: "low"` keeps a consensus
+      // voice fast; if the API 400s on this param the existing error log
+      // will show it and we drop back to the longer timeout alone.
       model: OPENAI_MODEL_SYNTH,
       max_completion_tokens: 1024,
+      reasoning_effort: "low",
       messages: [
         { role: "system", content: systemPrompt },
         ...messages.map(m => ({ role: m.role, content: m.content })),
       ],
     }),
-  }), 20000);
+  }), SYNC_TIMEOUT_MS);
   if (!r.ok) {
     const body = await r.text().catch(() => "");
     console.error(`[echo-v2] OpenAI ${r.status}:`, body);
     throw new Error(`OpenAI error: ${r.status}`);
   }
   const d = await r.json();
-  return d?.choices?.[0]?.message?.content || "";
+  const text = (d?.choices?.[0]?.message?.content || "").trim();
+  if (!text) {
+    throw new Error(`OpenAI empty on 2xx: ${shapeSnippet(d)}`);
+  }
+  return text;
 }
 
 async function callGemini(
@@ -365,21 +389,33 @@ async function callGemini(
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        // Gemini 3.5 Flash: minimal body. Legacy 1.5-era safety /
-        // generationConfig fields (temperature, maxOutputTokens knobs)
-        // dropped — new gen rejects several of them. Defaults are fine.
+        // Gemini 3.x: request low thinking so the answer lands quickly.
+        // High is the default and adds seconds of latency.
         system_instruction: { parts: [{ text: systemPrompt }] },
         contents,
+        thinking_level: "low",
       }),
     },
-  ), 20000);
+  ), SYNC_TIMEOUT_MS);
   if (!r.ok) {
     const body = await r.text().catch(() => "");
     console.error(`[echo-v2] Gemini ${r.status}:`, body);
     throw new Error(`Gemini error: ${r.status}`);
   }
   const d = await r.json();
-  return d?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+  // Gemini 3.x returns multiple parts — some marked `thought: true`. Concat
+  // every non-thought text part; the answer may not sit at parts[0].
+  const parts: Array<{ text?: string; thought?: boolean }> =
+    d?.candidates?.[0]?.content?.parts ?? [];
+  const text = parts
+    .filter((p) => p && p.thought !== true && typeof p.text === "string")
+    .map((p) => p.text as string)
+    .join("")
+    .trim();
+  if (!text) {
+    throw new Error(`Gemini empty on 2xx: ${shapeSnippet(d)}`);
+  }
+  return text;
 }
 
 async function callPerplexitySync(
@@ -399,15 +435,22 @@ async function callPerplexitySync(
       ],
       max_tokens: 512,
     }),
-  }), 20000);
+  }), SYNC_TIMEOUT_MS);
   if (!r.ok) {
     const body = await r.text().catch(() => "");
     console.error(`[echo-v2] Perplexity sync ${r.status}:`, body);
     throw new Error(`Perplexity error: ${r.status}`);
   }
   const d = await r.json();
-  return (d?.choices?.[0]?.message?.content || "").replace(/\[\d+\]/g, "");
+  const text = (d?.choices?.[0]?.message?.content || "")
+    .replace(/\[\d+\]/g, "")
+    .trim();
+  if (!text) {
+    throw new Error(`Perplexity empty on 2xx: ${shapeSnippet(d)}`);
+  }
+  return text;
 }
+
 
 // Streaming Perplexity for pure live queries.
 async function* streamPerplexity(
