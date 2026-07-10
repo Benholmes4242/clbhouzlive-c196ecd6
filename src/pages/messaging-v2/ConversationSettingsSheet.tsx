@@ -95,6 +95,8 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
   const [confirmLeave, setConfirmLeave] = useState(false);
   const [busy, setBusy] = useState(false);
 
+  const [avatarUploading, setAvatarUploading] = useState(false);
+
   const invalidateAll = useCallback(() => {
     void refetch();
     qc.invalidateQueries({ queryKey: ['messaging', 'inbox'] });
