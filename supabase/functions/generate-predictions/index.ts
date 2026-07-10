@@ -587,8 +587,30 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
     }).join('\n');
 
     // =============================================
-    // STEP 5: Build Prompt & Run Consensus Engine
+    // STEP 5: Build Prompt & Run Consensus Engine (TI-1)
     // =============================================
+
+    // TI-1 fabrication guard: models may ONLY pick players from this pool.
+    const MIN_POOL_SIZE = 20;
+    if (players.length < MIN_POOL_SIZE) {
+      console.warn(`[ti] insufficient field for ${tournament.name}: pool=${players.length} (< ${MIN_POOL_SIZE}) - refusing to write predictions`);
+      return new Response(
+        JSON.stringify({
+          success: false,
+          skipped: true,
+          reason: 'insufficient field',
+          tournament: { id: tournament.id, name: tournament.name },
+          poolSize: players.length,
+        }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      );
+    }
+
+    const poolPlayerIds = new Set(players.map((p) => p.player_id));
+    const poolNameToId = new Map(players.map((p) => [
+      `${p.first_name} ${p.last_name}`.toLowerCase().trim(),
+      p.player_id,
+    ]));
 
     const prompt = buildAnalysisPrompt(
       tournament, players, researchContext, hasConfirmedField,
@@ -597,15 +619,18 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
       courseDNA?.course_type || null,
     );
 
-    console.log('[generate-predictions] Running consensus engine...');
+    console.log(`[ti] running consensus engine, pool=${players.length}`);
 
     const consensus = await runConsensus(
       '', // system prompt is embedded in the user prompt
       prompt,
       fitScoreMap,
+      undefined,
+      poolPlayerIds,
+      poolNameToId,
     );
 
-    console.log(`[generate-predictions] Consensus complete: ${consensus.consensusMethod}, ${consensus.topContenders.length} contenders`);
+    console.log(`[ti] consensus complete: ${consensus.consensusMethod}, ${consensus.topContenders.length} contenders`);
 
     // =============================================
     // STEP 6: Enrich with Photo URLs & PGA Tour IDs + Override courseFitScore
