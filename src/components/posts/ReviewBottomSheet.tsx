@@ -147,7 +147,6 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
     [user.name],
   );
 
-  const formattedRating = formatFrostRating(rating);
   const monthLabel = formatMonthLabel(reviewDate ?? null);
 
   const breakdownEntries = useMemo(() => {
