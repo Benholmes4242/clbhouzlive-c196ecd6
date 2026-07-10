@@ -856,12 +856,14 @@ serve(async (req: Request) => {
           finalText = buf.trim();
           strength = 0.75;
         } else if (routeLevel === "dual") {
-          engines = 2;
-          // Fan out to the two synthesis sources in parallel.
+          // Fan out to the two synthesis sources in parallel. Per-engine
+          // failure returns "" (logged inside the call) — the pipeline
+          // does NOT abort; `engines` reflects the actual contributors.
           const [a, b] = await Promise.all([
-            callClaudeSync(enrichedSystemPrompt, finalMessages).catch(() => ""),
-            callOpenAISynth(enrichedSystemPrompt, finalMessages).catch(() => ""),
+            callClaudeSync(enrichedSystemPrompt, finalMessages).catch((e) => { console.error("[echo-v2] dual/claude drop:", e?.message || e); return ""; }),
+            callOpenAISynth(enrichedSystemPrompt, finalMessages).catch((e) => { console.error("[echo-v2] dual/openai drop:", e?.message || e); return ""; }),
           ]);
+          engines = [a, b].filter(Boolean).length;
           // Stream the SYNTHESIS itself so the user sees consensus tokens live.
           let raw = "";
           const strengthTail = /STRENGTH:\s*[0-9.]*\s*$/i;
@@ -876,21 +878,17 @@ serve(async (req: Request) => {
             },
           );
           const { cleaned, strength: s } = extractStrength(raw, 0.8);
-          // If we suppressed a tail chunk, flush the delta of cleaned vs already-sent text.
-          // Simpler: send a corrective final "reset" event isn't in the contract — instead
-          // rely on server-side finalText being cleaned; client should render on finalText
-          // when meta arrives. We still emit an END marker via meta.
           finalText = cleaned;
           strength = s;
         } else {
           // full
-          engines = 4;
           const [a, b, c, d] = await Promise.all([
-            callClaudeSync(enrichedSystemPrompt, finalMessages).catch(() => ""),
-            callOpenAISynth(enrichedSystemPrompt, finalMessages).catch(() => ""),
-            callGemini(enrichedSystemPrompt, finalMessages).catch(() => ""),
-            callPerplexitySync(finalMessages).catch(() => ""),
+            callClaudeSync(enrichedSystemPrompt, finalMessages).catch((e) => { console.error("[echo-v2] full/claude drop:", e?.message || e); return ""; }),
+            callOpenAISynth(enrichedSystemPrompt, finalMessages).catch((e) => { console.error("[echo-v2] full/openai drop:", e?.message || e); return ""; }),
+            callGemini(enrichedSystemPrompt, finalMessages).catch((e) => { console.error("[echo-v2] full/gemini drop:", e?.message || e); return ""; }),
+            callPerplexitySync(finalMessages).catch((e) => { console.error("[echo-v2] full/perplexity drop:", e?.message || e); return ""; }),
           ]);
+          engines = [a, b, c, d].filter(Boolean).length;
           live = Boolean(d);
           let raw = "";
           const strengthTail = /STRENGTH:\s*[0-9.]*\s*$/i;
