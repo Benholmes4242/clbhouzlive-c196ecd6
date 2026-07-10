@@ -1,10 +1,11 @@
-// CourseTagSheet - search + recent courses empty state.
+// CourseTagSheet - search + "courses you play" empty state.
 
 import { useEffect, useState } from 'react';
 import { MapPin, Search } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import BottomSheet from './BottomSheet';
 import type { StageCourse } from '../hooks/useStageComposer';
+import { useRecentCourses } from '../hooks/useRecentCourses';
 
 interface Props {
   open: boolean;
@@ -16,34 +17,13 @@ interface Props {
 
 interface RecentRow extends StageCourse {
   sub_country?: string | null;
+  isHomeClub?: boolean;
 }
 
 export default function CourseTagSheet({ open, onClose, onSelect, current, userId }: Props) {
   const [q, setQ] = useState('');
   const [rows, setRows] = useState<RecentRow[]>([]);
-  const [recents, setRecents] = useState<RecentRow[]>([]);
-
-  useEffect(() => {
-    if (!open || !userId) return;
-    (async () => {
-      const { data } = await supabase
-        .from('course_ratings')
-        .select('created_at, course:golf_courses(id, name, country, sub_country)')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-        .limit(20);
-      const seen = new Set<string>();
-      const list: RecentRow[] = [];
-      for (const row of (data ?? []) as Array<{ course: { id: string; name: string; country?: string | null; sub_country?: string | null } | null }>) {
-        const c = row.course;
-        if (!c || seen.has(c.id)) continue;
-        seen.add(c.id);
-        list.push({ id: c.id, name: c.name, country: c.country ?? null, sub_country: c.sub_country ?? null });
-        if (list.length >= 5) break;
-      }
-      setRecents(list);
-    })();
-  }, [open, userId]);
+  const { rows: recents } = useRecentCourses(open, userId ?? null);
 
   useEffect(() => {
     if (!open) return;
@@ -87,10 +67,14 @@ export default function CourseTagSheet({ open, onClose, onSelect, current, userI
           {recents.length > 0 ? (
             <>
               <div style={{ padding: '10px 16px 6px', fontSize: 10, fontWeight: 800, letterSpacing: 1, color: '#94A3B8' }}>
-                YOUR RECENT COURSES
+                COURSES YOU PLAY
               </div>
               {recents.map(r => (
-                <CourseRow key={r.id} row={r} onSelect={(c) => { onSelect(c); onClose(); }} />
+                <CourseRow
+                  key={r.id}
+                  row={{ id: r.id, name: r.name, country: r.country, sub_country: r.sub_country, isHomeClub: r.isHomeClub }}
+                  onSelect={(c) => { onSelect(c); onClose(); }}
+                />
               ))}
               <div style={{ padding: '16px', fontSize: 12, color: '#94A3B8' }}>
                 Can't see it? Search any of 40,000+ courses above.
@@ -108,6 +92,23 @@ export default function CourseTagSheet({ open, onClose, onSelect, current, userI
         ))
       )}
     </BottomSheet>
+  );
+}
+
+function CourseRow({ row, onSelect }: { row: RecentRow; onSelect: (c: StageCourse) => void }) {
+  const locality = row.isHomeClub ? 'Your home club' : (row.sub_country || row.country || null);
+  return (
+    <button onClick={() => onSelect({ id: row.id, name: row.name, country: row.country ?? null })} style={rowBtn}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ width: 34, height: 34, borderRadius: 12, background: '#F1F5F9', border: '1px solid rgba(15,23,42,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <MapPin size={16} color="#0F172A" />
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 14, color: '#0F172A', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.name}</div>
+          {locality && <div style={{ fontSize: 12, color: row.isHomeClub ? '#F7931E' : '#94A3B8', fontWeight: row.isHomeClub ? 700 : 400 }}>{locality}</div>}
+        </div>
+      </div>
+    </button>
   );
 }
 
