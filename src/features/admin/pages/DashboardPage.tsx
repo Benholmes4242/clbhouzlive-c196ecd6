@@ -374,7 +374,7 @@ function EgSyncCard({ data, loading, isError }: { data: any; loading: boolean; i
 function EchoHealthLinkRow() {
   const { data, isLoading, isError } = useEchoEngineHealth();
   const latest = data?.latest ?? [];
-  let dotColor = t.line;
+  let dotColor: string = t.line;
   let sub = 'No checks yet';
   if (isLoading) {
     sub = 'Loading…';
