@@ -35,7 +35,7 @@ const OPENAI_MODEL_SYNTH      = "gpt-5.5";             // GPT-5.5 synthesis
 const OPENAI_MODEL_INTENT     = "gpt-5.5";             // reserved; keep in sync with SYNTH
 const GEMINI_MODEL            = "gemini-3.5-flash";    // Gemini 3.5 Flash
 const PERPLEXITY_MODEL        = "sonar-pro";           // unchanged, verified current
-const BUILD                   = "e2.7";                // bump on every change to this function
+const BUILD                   = "e2.8";                // bump on every change to this function
 
 // Rate limit windows (identical to v1).
 const RATE_LIMIT_MINUTE = 10;
