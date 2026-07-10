@@ -4,7 +4,7 @@ import { Check } from 'lucide-react';
 import BottomSheet from './BottomSheet';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import type { ActiveActor } from '@/types/actor';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 interface Props {
   open: boolean;
@@ -21,7 +21,7 @@ export default function ActorSheet({ open, onClose, onSelect, selectedId }: Prop
         const active = a.id === selectedId;
         return (
           <button key={`${a.type}:${a.id}`} onClick={() => { onSelect(a); onClose(); }} style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%', border: 0, borderTop: '1px solid rgba(0,0,0,0.07)', padding: '12px 16px', background: 'transparent', cursor: 'pointer', textAlign: 'left' }}>
-            <SquircleAvatar src={a.avatarUrl ?? null} alt={a.name} size={40} />
+            <SquircleAvatar src={a.avatarUrl ?? null} alt={a.name} size={40} hairlineRing ringColor={LIGHT_HAIRLINE} />
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 14, color: '#1F2428', fontWeight: 600 }}>{a.name}</div>
               <div style={{ fontSize: 12, color: '#8A9099' }}>{a.type === 'business' ? 'Business' : 'Personal'}</div>
