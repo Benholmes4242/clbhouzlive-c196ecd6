@@ -15,6 +15,7 @@ import {
   X,
   Check,
   Trash2,
+} from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SheetHeader } from '@/components/ui/SheetHeader';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
