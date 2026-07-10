@@ -21,6 +21,7 @@ export const GLOBAL_HEADER_EXCLUDED_ROUTES = [
   '/handicap',
   '/followers',            // Own followers redirect — settings-style standalone
   '/following',            // Own following redirect — settings-style standalone
+  '/join',                 // Public invite landing — no chrome
 ] as const;
 
 export const GLOBAL_HEADER_EXCLUDED_PREFIXES = [
