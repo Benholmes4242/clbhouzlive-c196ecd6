@@ -71,6 +71,7 @@ export const EchoComposer: React.FC<Props> = ({ disabled, value, onValueChange, 
 
   return (
     <div
+      ref={containerRef}
       style={{
         background: COMPOSER_BG,
         borderTop: `0.5px solid ${HAIRLINE}`,
