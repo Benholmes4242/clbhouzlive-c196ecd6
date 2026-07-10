@@ -141,8 +141,78 @@ async function run(opts: { cycles?: number; intervalMs?: number } = {}) {
   return { pass, bindingLosses, ffRegressions, rejectCount, rows };
 }
 
-if (typeof window !== 'undefined' && import.meta.env.DEV) {
+/**
+ * Attach + auto-trigger gating.
+ *
+ * Gated on the DBG pill (`isPerfEnabled`) — NOT `import.meta.env.DEV` — so
+ * the harness is reachable in both the Lovable preview and the on-device
+ * build wherever the pill is toggled on. When the pill is off, nothing
+ * attaches to `window` and `?churn=1` is a no-op.
+ *
+ * Auto-run: if the URL contains `?churn=1` and the pill is on, we poll
+ * the feed-active lane and kick off a single run once a video is bound.
+ * All output flows through `console.info` / `trace()` which the DBG
+ * consoleCapture ring buffer records, so a pill LOG capture includes the
+ * `[laneChurn]` summary and every `preload.rejected` trace.
+ */
+import { isPerfEnabled, subscribePerfLive } from '@/perf/navTiming';
+
+let attached = false;
+let autoRunScheduled = false;
+
+function attach(): void {
+  if (attached) return;
+  if (typeof window === 'undefined') return;
+  if (!isPerfEnabled()) return;
+  attached = true;
   (window as unknown as { __lovable_laneChurn?: { run: typeof run } }).__lovable_laneChurn = { run };
+  console.info('[laneChurn] attached (window.__lovable_laneChurn.run available)');
+  maybeScheduleAutoRun();
 }
+
+function maybeScheduleAutoRun(): void {
+  if (autoRunScheduled) return;
+  if (typeof window === 'undefined') return;
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('churn') !== '1') return;
+  } catch { return; }
+  autoRunScheduled = true;
+
+  const started = performance.now();
+  const TIMEOUT_MS = 60_000;
+  const POLL_MS = 250;
+
+  console.info('[laneChurn] ?churn=1 detected — waiting for feed-active video…');
+
+  const poll = () => {
+    if (!isPerfEnabled()) { autoRunScheduled = false; return; }
+    let ownerKey: string | null = null;
+    try {
+      const laneId = feedLaneRoles.laneForRole('active');
+      const snap = VideoEngine.snapshot(laneId);
+      if (snap.postId && (snap.state === 'playing' || snap.firstFrame || snap.readyState >= 2)) {
+        ownerKey = snap.postId;
+      }
+    } catch { /* engine not booted yet */ }
+
+    if (ownerKey) {
+      console.info('[laneChurn] auto-run start', { ownerKey });
+      run({ cycles: 100, intervalMs: 20 }).catch((e) => {
+        console.warn('[laneChurn] auto-run error', e);
+      });
+      return;
+    }
+    if (performance.now() - started > TIMEOUT_MS) {
+      console.warn('[laneChurn] auto-run timeout — no feed-active video within 60s');
+      return;
+    }
+    setTimeout(poll, POLL_MS);
+  };
+  setTimeout(poll, POLL_MS);
+}
+
+attach();
+subscribePerfLive(() => { try { attach(); } catch { /* ignore */ } });
 
 export const laneChurnHarness = { run };
