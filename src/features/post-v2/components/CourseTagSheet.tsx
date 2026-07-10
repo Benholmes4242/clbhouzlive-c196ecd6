@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import BottomSheet from './BottomSheet';
 import type { StageCourse } from '../hooks/useStageComposer';
 import { useRecentCourses } from '../hooks/useRecentCourses';
+import useKeyboardHeight from '@/hooks/messaging/useKeyboardHeight';
 
 interface Props {
   open: boolean;
@@ -13,6 +14,7 @@ interface Props {
   onSelect: (c: StageCourse | null) => void;
   current: StageCourse | null;
   userId?: string | null;
+  title?: string;
 }
 
 interface RecentRow extends StageCourse {
