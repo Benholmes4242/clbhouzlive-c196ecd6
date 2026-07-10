@@ -3,6 +3,7 @@
 import { ChevronRight, MapPin, User2, Clock } from 'lucide-react';
 import type { StageCourse } from '../hooks/useStageComposer';
 import type { ActiveActor } from '@/types/actor';
+import { formatSchedule } from '../lib/formatSchedule';
 
 interface Props {
   course: StageCourse | null;
@@ -18,7 +19,7 @@ export default function DetailRows({ course, onOpenCourse, actor, onOpenActor, s
     <div style={{ background: '#F8FAFC' }}>
       <Row icon={<MapPin size={16} />} label="Tag a course" value={course?.name ?? null} onClick={onOpenCourse} />
       <Row icon={<User2 size={16} />} label="Posting as" value={actor?.name ?? null} onClick={onOpenActor} />
-      <Row icon={<Clock size={16} />} label="Schedule for later" value={scheduledAt ? scheduledAt.toLocaleString() : null} onClick={onOpenSchedule} />
+      <Row icon={<Clock size={16} />} label="Schedule for later" value={scheduledAt ? formatSchedule(scheduledAt) : null} onClick={onOpenSchedule} />
     </div>
   );
 }
