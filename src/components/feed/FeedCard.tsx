@@ -420,9 +420,11 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           POOR:        'rgba(154,74,14,0.12)',
         } as const;
         const tierKey = getRatingTier(reviewRating);
+        const ghostExceptional = tierKey === 'EXCEPTIONAL';
         return (
           <span
             aria-hidden
+            className={ghostExceptional ? 'clbhouz-gold-shimmer' : undefined}
             style={{
               position: 'absolute',
               right: -7,
@@ -430,9 +432,9 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               transform: 'translateY(-50%)',
               fontSize: 110,
               fontWeight: 800, letterSpacing: '-0.05em', lineHeight: 1,
-              color: GHOST[tierKey],
               pointerEvents: 'none', whiteSpace: 'nowrap', zIndex: 0,
               fontVariantNumeric: 'tabular-nums',
+              ...(ghostExceptional ? { opacity: 0.22 } : { color: GHOST[tierKey] }),
             }}
           >
             {formatRatingValue(reviewRating)}
