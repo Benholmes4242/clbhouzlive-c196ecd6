@@ -197,8 +197,12 @@ function QuickActionTile({
               color: '#FFFFFF',
               fontSize: 9.5,
               fontWeight: 700,
-              lineHeight: '16px',
+              lineHeight: 1,
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
               textAlign: 'center',
+              boxSizing: 'border-box',
               fontVariantNumeric: 'tabular-nums',
             }}
           >
