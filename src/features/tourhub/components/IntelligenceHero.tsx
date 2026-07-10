@@ -1731,7 +1731,7 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
   const shouldPoll = !isLoading && !hasCards && emptyKindPreExpire === 'generating' && !pollExpired;
   useEffect(() => {
     setPollExpired(false);
-  }, [crossfadeKeyBase(viewingTournamentId, activeTournamentId)]);
+  }, [viewingTournamentId, activeTournamentId]);
   useEffect(() => {
     if (!shouldPoll) return;
     const startedAt = Date.now();
