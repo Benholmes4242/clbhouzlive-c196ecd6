@@ -22,9 +22,20 @@ export interface EchoEngineDay {
   checked_at: string;
 }
 
+export interface EchoEngineRecent {
+  engine: EchoEngine;
+  ok: boolean;
+  ms: number | null;
+  model_id: string | null;
+  error: string | null;
+  checked_at: string;
+}
+
 export interface EchoEngineHealthSummary {
   latest: EchoEngineLatest[];
   days7:  EchoEngineDay[];
+  days14: EchoEngineDay[];
+  recent: EchoEngineRecent[];
 }
 
 const ENGINES: EchoEngine[] = ['claude', 'openai', 'gemini', 'perplexity'];
@@ -36,6 +47,8 @@ async function fetchSummary(): Promise<EchoEngineHealthSummary> {
   return {
     latest: Array.isArray(d.latest) ? d.latest : [],
     days7:  Array.isArray(d.days7)  ? d.days7  : [],
+    days14: Array.isArray(d.days14) ? d.days14 : [],
+    recent: Array.isArray(d.recent) ? d.recent : [],
   };
 }
 
