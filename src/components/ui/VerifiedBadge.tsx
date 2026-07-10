@@ -18,7 +18,7 @@ const sizeConfig = {
 };
 
 /**
- * Unified Verified Badge - BadgeCheck icon in emerald green
+ * Unified Verified Badge - BadgeCheck icon in amber
  * 
  * Used across personal profiles, business profiles, notifications, and lists.
  * This is the ONLY verified badge component - no shields, no variations.
