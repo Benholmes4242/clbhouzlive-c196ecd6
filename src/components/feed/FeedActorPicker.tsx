@@ -8,7 +8,9 @@ import type { ActiveActor } from '@/types/actor';
 
 const PALETTE = {
   dark: {
-    chevron: 'var(--hcp-t-60)',
+    // FeedCard footer is NOT inside .hcp-dark scope, so we can't rely on
+    // var(--hcp-t-60) here — resolve to a concrete color.
+    chevron: 'rgba(255, 255, 255, 0.7)',
     rowText: 'var(--hcp-t-100)',
     activeRowBg: 'var(--hcp-bg-2)',
     sheetVariant: 'dark' as const,
@@ -16,7 +18,7 @@ const PALETTE = {
     sheetBg: 'var(--hcp-bg-0)',
   },
   light: {
-    chevron: 'var(--hcp-t-60)',
+    chevron: '#64748B',
     rowText: 'var(--hcp-t-100)',
     activeRowBg: 'var(--hcp-bg-2)',
     sheetVariant: 'light' as const,
