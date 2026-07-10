@@ -17,6 +17,9 @@ import type { MediaItem } from '@/components/media-system/types/media';
 import { CarouselDots } from '@/components/media/CarouselDots';
 import { InlineVideo } from './InlineVideo';
 import { createTapHandler } from './mediaTap';
+import { isPerfEnabled } from '@/perf/navTiming';
+import { VideoEngine } from '@/video/VideoEngine';
+import { feedLaneRoles } from '@/video/feedLaneRoles';
 
 interface Props {
   items: MediaItem[];
