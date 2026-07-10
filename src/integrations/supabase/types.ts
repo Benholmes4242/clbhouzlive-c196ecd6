@@ -14395,6 +14395,72 @@ export type Database = {
         }
         Relationships: []
       }
+      video_perf_rollups: {
+        Row: {
+          app_build: string | null
+          count: number | null
+          created_at: string
+          device_class: string | null
+          extra: Json | null
+          flushed_at: string
+          id: string
+          is_debug: boolean
+          kind: string | null
+          p50: number | null
+          p95: number | null
+          page: string | null
+          pass: number | null
+          row_kind: string
+          session_id: string
+          slow: number | null
+          superseded: number | null
+          timeout: number | null
+          worst: number | null
+        }
+        Insert: {
+          app_build?: string | null
+          count?: number | null
+          created_at?: string
+          device_class?: string | null
+          extra?: Json | null
+          flushed_at?: string
+          id?: string
+          is_debug?: boolean
+          kind?: string | null
+          p50?: number | null
+          p95?: number | null
+          page?: string | null
+          pass?: number | null
+          row_kind: string
+          session_id: string
+          slow?: number | null
+          superseded?: number | null
+          timeout?: number | null
+          worst?: number | null
+        }
+        Update: {
+          app_build?: string | null
+          count?: number | null
+          created_at?: string
+          device_class?: string | null
+          extra?: Json | null
+          flushed_at?: string
+          id?: string
+          is_debug?: boolean
+          kind?: string | null
+          p50?: number | null
+          p95?: number | null
+          page?: string | null
+          pass?: number | null
+          row_kind?: string
+          session_id?: string
+          slow?: number | null
+          superseded?: number | null
+          timeout?: number | null
+          worst?: number | null
+        }
+        Relationships: []
+      }
       video_progress: {
         Row: {
           created_at: string
