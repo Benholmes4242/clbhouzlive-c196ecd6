@@ -87,6 +87,11 @@ initializePerformanceMonitoring();
 initWebVitals(sendToAnalytics);
 initPerformanceObserver();
 
+// Silent video-perf telemetry (Phase 2). Sticky 10% sample per session.
+// Non-enrolled sessions do zero work beyond a boot-time coin-flip.
+import('@/perf/telemetry').then((m) => m.installVideoPerfTelemetry()).catch(() => {});
+
+
 const root = createRoot(container);
 
 // Render without StrictMode for better performance
