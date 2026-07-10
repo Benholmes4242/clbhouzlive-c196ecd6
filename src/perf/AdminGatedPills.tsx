@@ -7,6 +7,9 @@ import { usePanelRole } from '@/hooks/usePanelRole';
 import { useAdminPillVisibility } from '@/hooks/useAdminPillVisibility';
 import { PerfToggleButton } from '@/perf/PerfToggleButton';
 import { BootTimelineToggleButton } from '@/perf/BootTimelineToggleButton';
+import { PerfHud } from '@/perf/PerfHud';
+import { LogHud } from '@/perf/LogHud';
+
 
 export function AdminGatedPerfPill() {
   const { role, loading } = usePanelRole();
