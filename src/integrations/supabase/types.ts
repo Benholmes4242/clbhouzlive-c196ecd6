@@ -8195,9 +8195,25 @@ export type Database = {
         }
         Relationships: []
       }
+      push_drain_debounce: {
+        Row: {
+          id: number
+          last_fired: string
+        }
+        Insert: {
+          id?: number
+          last_fired?: string
+        }
+        Update: {
+          id?: number
+          last_fired?: string
+        }
+        Relationships: []
+      }
       push_notification_queue: {
         Row: {
           body: string | null
+          claimed_at: string | null
           created_at: string | null
           data: Json | null
           device_id: string | null
@@ -8209,6 +8225,7 @@ export type Database = {
         }
         Insert: {
           body?: string | null
+          claimed_at?: string | null
           created_at?: string | null
           data?: Json | null
           device_id?: string | null
@@ -8220,6 +8237,7 @@ export type Database = {
         }
         Update: {
           body?: string | null
+          claimed_at?: string | null
           created_at?: string | null
           data?: Json | null
           device_id?: string | null
@@ -16327,6 +16345,27 @@ export type Database = {
       }
       check_email_exists: { Args: { lookup_email: string }; Returns: boolean }
       check_expiring_admin_access: { Args: never; Returns: undefined }
+      claim_push_queue_batch: {
+        Args: { p_limit?: number }
+        Returns: {
+          body: string | null
+          claimed_at: string | null
+          created_at: string | null
+          data: Json | null
+          device_id: string | null
+          error: string | null
+          id: string
+          sent_at: string | null
+          title: string
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "push_notification_queue"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       cleanup_expired_dismissals: { Args: never; Returns: undefined }
       cleanup_expired_open_to_play: { Args: never; Returns: undefined }
       cleanup_old_gate_attempts: { Args: never; Returns: undefined }
@@ -19409,10 +19448,6 @@ export type Database = {
         Returns: undefined
       }
       refresh_whs_handicap_distribution: { Args: never; Returns: undefined }
-      register_push_token: {
-        Args: { p_platform: string; p_token: string }
-        Returns: string
-      }
       reinvite_golfer_verification_request:
         | {
             Args: { p_admin_id: string; p_note?: string; p_request_id: string }
@@ -19588,16 +19623,6 @@ export type Database = {
       }
       send_business_welcome: {
         Args: { p_target_business_id: string }
-        Returns: undefined
-      }
-      send_push_notification: {
-        Args: {
-          data?: Json
-          message: string
-          notification_type: string
-          target_user_id: string
-          title: string
-        }
         Returns: undefined
       }
       send_user_ping: { Args: { p_recipient_id: string }; Returns: undefined }
@@ -20333,7 +20358,6 @@ export type Database = {
         }
         Returns: string
       }
-      trigger_push_queue_processing: { Args: never; Returns: undefined }
       trigger_video_metadata_backfill: { Args: never; Returns: undefined }
       trigger_watch_editorial_blurb_refresh: { Args: never; Returns: undefined }
       try_acquire_orchestrator_lock: {
@@ -20343,7 +20367,6 @@ export type Database = {
       unaccent: { Args: { "": string }; Returns: string }
       unblock_user: { Args: { p_blocked_id: string }; Returns: undefined }
       unlockrows: { Args: { "": string }; Returns: number }
-      unregister_push_token: { Args: { p_token: string }; Returns: undefined }
       update_business_member_role: {
         Args: {
           p_business_id: string
