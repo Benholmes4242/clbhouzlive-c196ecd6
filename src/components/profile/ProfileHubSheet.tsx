@@ -338,6 +338,7 @@ function ProfileHubSheet({
   const navigate = useNavigate();
   const editRoute = useEditProfileRoute();
   const { logout: handleLogout } = useLogout();
+  const { openInviteSheet } = useInviteSheet();
   const { unreadCount: unreadNotificationCount } = useUnreadNotifications();
   const { countFor: actorUnreadFor } = useActorUnreadCounts();
   const unreadMessageCount = currentActor
