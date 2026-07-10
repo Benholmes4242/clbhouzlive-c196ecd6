@@ -288,15 +288,12 @@ const AdminShell = lazy(() => import('./features/admin/AdminShell'));
 
 // Hub lazy imports removed — Hub page decommissioned
 
-// Echo v2 full-page experience (cutover from legacy EchoPage)
+// Echo v2 full-page experience
 const EchoV2Page = lazy(() => import("./pages/EchoV2Page"));
 const EchoHistoryPage = lazy(() => import("./pages/EchoHistoryPage"));
 
 // Removed: DiscoverGamesPage lazy import — /games/discover now redirects to /clubhouse
 
-
-// Public Echo Share Page
-const EchoSharePage = lazy(() => import("./pages/EchoSharePage").then(m => ({ default: m.EchoSharePage })));
 
 // Tour Hub pages
 const TourHubMainPage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TourHubMainPage })));
@@ -658,8 +655,6 @@ function AppRoutes() {
 
 
 
-        {/* Public Echo Share Page */}
-        <Route path="/echo/share/:token" element={<Suspense fallback={<GenericPageSkeleton />}><EchoSharePage /></Suspense>} />
         
 
 
