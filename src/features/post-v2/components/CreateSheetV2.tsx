@@ -55,7 +55,6 @@ export default function CreateSheetV2({ open, onClose, returnPath }: Props) {
       <CourseTagSheet
         open={courseOpen}
         title="Choose a course"
-        open={courseOpen}
         onClose={() => { setCourseOpen(false); onClose(); }}
         current={null}
         userId={profile?.id ?? null}
