@@ -719,7 +719,9 @@ export function FullscreenFeedOverlay() {
             }}
 
             data-vperf="fs-overlay"
-            className="fixed inset-0 z-[200] flex flex-col"
+            className="fixed inset-0 flex flex-col"
+            style={{ zIndex: FS_OVERLAY_Z }}
+
           >
             {/* Black wash — solid canvas that fades OUT during the symmetric
                 close motion so the underlying page (with the origin tile) is
