@@ -332,13 +332,73 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                 borderBottom: `0.5px solid ${HAIRLINE}`,
               }}
             >
-              <SquircleAvatar
-                src={headerAvatar}
-                userId={headerId}
-                alt={headerTitle}
-                size={72}
-                hairlineRing
-              />
+              {isGroup && isAdmin ? (
+                <button
+                  type="button"
+                  onClick={handleChangeAvatar}
+                  disabled={avatarUploading}
+                  aria-label="Change group photo"
+                  style={{
+                    position: 'relative',
+                    background: 'transparent',
+                    border: 'none',
+                    padding: 0,
+                    cursor: avatarUploading ? 'default' : 'pointer',
+                    borderRadius: 20,
+                  }}
+                >
+                  <SquircleAvatar
+                    src={headerAvatar}
+                    userId={headerId}
+                    alt={headerTitle}
+                    size={72}
+                    hairlineRing
+                  />
+                  <span
+                    aria-hidden
+                    style={{
+                      position: 'absolute',
+                      right: -2,
+                      bottom: -2,
+                      width: 26,
+                      height: 26,
+                      borderRadius: 999,
+                      background: INK,
+                      color: '#FFF',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      border: '2px solid #FFF',
+                      boxShadow: '0 1px 2px rgba(0,0,0,0.12)',
+                    }}
+                  >
+                    {avatarUploading ? (
+                      <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} />
+                    ) : (
+                      <Camera size={14} strokeWidth={2} />
+                    )}
+                  </span>
+                  {avatarUploading && (
+                    <span
+                      aria-hidden
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        borderRadius: 20,
+                        background: 'rgba(255,255,255,0.35)',
+                      }}
+                    />
+                  )}
+                </button>
+              ) : (
+                <SquircleAvatar
+                  src={headerAvatar}
+                  userId={headerId}
+                  alt={headerTitle}
+                  size={72}
+                  hairlineRing
+                />
+              )}
               {isGroup && isAdmin && titleEdit != null ? (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', maxWidth: 320 }}>
                   <input
