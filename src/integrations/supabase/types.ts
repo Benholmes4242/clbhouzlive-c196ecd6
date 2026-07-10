@@ -10958,6 +10958,21 @@ export type Database = {
         }
         Relationships: []
       }
+      ti_generation_locks: {
+        Row: {
+          acquired_at: string
+          tournament_id: string
+        }
+        Insert: {
+          acquired_at?: string
+          tournament_id: string
+        }
+        Update: {
+          acquired_at?: string
+          tournament_id?: string
+        }
+        Relationships: []
+      }
       top_ten_comments: {
         Row: {
           body: string

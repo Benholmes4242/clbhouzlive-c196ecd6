@@ -272,10 +272,10 @@ serve(async (req) => {
       );
     }
 
-    // --- Fetch player statistics (with raw_data for detailed extraction) ---
+    // --- TI-8: Fetch season stats (enrichment only, not the pool) ---
     let playerStats: any[] = [];
     let usedSeasonId: string | null = null;
-    
+
     for (const season of seasons) {
       const { data: stats, error: statsError } = await supabase
         .from('sr_player_statistics')
@@ -296,57 +296,83 @@ serve(async (req) => {
       if (!statsError && stats && stats.length > 0) {
         playerStats = stats;
         usedSeasonId = season.id;
-        console.log(`[generate-predictions] Using ${season.year} season stats (${stats.length} players)`);
+        console.log(`[generate-predictions] Season stats available: ${season.year} (${stats.length} players) - used for enrichment only`);
         break;
       }
     }
 
-    if (playerStats.length === 0) throw new Error('Failed to fetch player statistics from any season');
-
-    // Fetch world rankings
+    // Fetch world rankings (used for ordering; missing = unranked)
     const { data: rankings } = await supabase
       .from('sr_world_rankings')
       .select('player_id, rank, prior_rank, points')
       .order('rank', { ascending: true })
-      .limit(200);
+      .limit(500);
 
     const rankingsMap = new Map(rankings?.map(r => [r.player_id, r]) || []);
 
-    // Build player array with raw_data preserved
-    const players: PlayerStats[] = playerStats
-      .map(ps => {
-        const player = ps.sr_players as any;
-        const stats = (ps.raw_data as any)?.statistics || {};
-        const ranking = rankingsMap.get(player.id);
+    // Build stats index by player_id (may be empty for non-PGA tours)
+    const statsById = new Map<string, { raw_data: any; player: any }>();
+    for (const ps of playerStats) {
+      const sp = ps.sr_players as any;
+      if (sp?.id) statsById.set(sp.id, { raw_data: ps.raw_data, player: sp });
+    }
 
-        if (hasConfirmedField && !confirmedFieldPlayerIds!.has(player.id)) return null;
-        if (!hasConfirmedField && (!ranking || ranking.rank > 150)) return null;
+    // TI-8: FIELD-FIRST POOL. Load sr_players for every confirmed entrant.
+    const fieldIds = Array.from(confirmedFieldPlayerIds!);
+    const { data: fieldPlayerRows, error: fieldPlayersError } = await supabase
+      .from('sr_players')
+      .select('id, first_name, last_name, country, photo_url, pga_tour_id')
+      .in('id', fieldIds);
+
+    if (fieldPlayersError) {
+      throw new Error(`Field player lookup failed: ${fieldPlayersError.message}`);
+    }
+
+    const playersById = new Map((fieldPlayerRows ?? []).map((p: any) => [p.id, p]));
+
+    let statsRichCount = 0;
+    let statsLightCount = 0;
+
+    const players: (PlayerStats & { statsAvailable: boolean })[] = fieldIds
+      .map((pid) => {
+        const sp = playersById.get(pid);
+        if (!sp) return null;
+        const statsEntry = statsById.get(pid);
+        const stats = (statsEntry?.raw_data as any)?.statistics || null;
+        const ranking = rankingsMap.get(pid);
+        const statsAvailable = !!stats;
+        if (statsAvailable) statsRichCount++;
+        else statsLightCount++;
 
         return {
-          player_id: player.id,
-          first_name: player.first_name || '',
-          last_name: player.last_name || '',
-          country: player.country || 'USA',
-          photo_url: player.photo_url,
-          pga_tour_id: player.pga_tour_id,
-          world_rank: ranking?.rank || 999,
-          prior_rank: ranking?.prior_rank || 999,
-          points: ranking?.points || 0,
-          drive_avg: stats.drive_avg || 0,
-          drive_acc: stats.drive_acc || 0,
-          gir_pct: stats.gir_pct || 0,
-          scrambling_pct: stats.scrambling_pct || 0,
-          putt_avg: stats.putt_avg || 0,
-          sg_total: stats.strokes_gained_total || 0,
-          sg_tee_green: stats.strokes_gained_tee_green || 0,
-          raw_data: ps.raw_data,
-        };
+          player_id: pid,
+          first_name: sp.first_name || '',
+          last_name: sp.last_name || '',
+          country: sp.country || '',
+          photo_url: sp.photo_url ?? null,
+          pga_tour_id: sp.pga_tour_id ?? null,
+          world_rank: ranking?.rank ?? 999,
+          prior_rank: ranking?.prior_rank ?? 999,
+          points: ranking?.points ?? 0,
+          // Neutral defaults for stats-light players (no fake numbers).
+          drive_avg: stats?.drive_avg ?? 0,
+          drive_acc: stats?.drive_acc ?? 0,
+          gir_pct: stats?.gir_pct ?? 0,
+          scrambling_pct: stats?.scrambling_pct ?? 0,
+          putt_avg: stats?.putt_avg ?? 0,
+          sg_total: stats?.strokes_gained_total ?? 0,
+          sg_tee_green: stats?.strokes_gained_tee_green ?? 0,
+          raw_data: statsEntry?.raw_data ?? null,
+          statsAvailable,
+        } as PlayerStats & { statsAvailable: boolean };
       })
-      .filter((p): p is PlayerStats => p !== null)
+      .filter((p): p is PlayerStats & { statsAvailable: boolean } => p !== null)
       .sort((a, b) => a.world_rank - b.world_rank)
-      .slice(0, hasConfirmedField ? 120 : 75);
+      .slice(0, 150);
 
-    console.log(`[generate-predictions] Fetched ${players.length} players (field ${hasConfirmedField ? 'confirmed' : 'estimated'})`);
+    console.log(
+      `[ti] pool=${players.length} field players (${statsRichCount} with stats, ${statsLightCount} stats-light)`
+    );
 
     // --- 2B: Fetch course history ---
     let courseHistoryData: { playerName: string; playerId: string; finishes: { year: number; position: number | null; score: number | null }[] }[] = [];
@@ -693,20 +719,99 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
       courseHistoryData, recentFormData,
       courseFitSection, venueHistorySection, detailedStatsSection,
       courseDNA?.course_type || null,
+      statsLightCount,
     );
 
-    console.log(`[ti] running consensus engine, pool=${players.length}`);
+    // =============================================
+    // TI-8: Single-flight generation lock (per tournament)
+    // =============================================
+    // Uses a lock table (advisory-lock semantics won't survive the PostgREST
+    // pool). Concurrent invokes collapse to one run + readers.
+    const LOCK_STALE_MS = 5 * 60 * 1000;
 
-    const consensus = await runConsensus(
-      '', // system prompt is embedded in the user prompt
-      prompt,
-      fitScoreMap,
-      undefined,
-      poolPlayerIds,
-      poolNameToId,
-    );
+    async function tryAcquireLock(): Promise<boolean> {
+      // Best-effort: drop any stale row before insert.
+      await supabase
+        .from('ti_generation_locks')
+        .delete()
+        .eq('tournament_id', tournament.id)
+        .lt('acquired_at', new Date(Date.now() - LOCK_STALE_MS).toISOString());
+      const { error } = await supabase
+        .from('ti_generation_locks')
+        .insert({ tournament_id: tournament.id });
+      return !error;
+    }
 
-    console.log(`[ti] consensus complete: ${consensus.consensusMethod}, ${consensus.topContenders.length} contenders`);
+    async function releaseLock(): Promise<void> {
+      await supabase
+        .from('ti_generation_locks')
+        .delete()
+        .eq('tournament_id', tournament.id);
+    }
+
+    const acquired = await tryAcquireLock();
+    if (!acquired) {
+      console.log(`[ti] lock held by another invoke for ${tournament.name} - waiting for cached row`);
+      // Poll ai_predictions for up to ~30s; whoever holds the lock will write it.
+      for (let i = 0; i < 15; i++) {
+        await new Promise((r) => setTimeout(r, 2000));
+        const { data: cached } = await supabase
+          .from('ai_predictions')
+          .select('*')
+          .eq('tournament_id', tournament.id)
+          .maybeSingle();
+        if (cached && !isPredictionStale(cached)) {
+          return new Response(
+            JSON.stringify({
+              success: true,
+              cached: true,
+              tournament: { id: tournament.id, name: tournament.name },
+              predictions: formatStoredPredictions(cached),
+            }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+          );
+        }
+      }
+      return new Response(
+        JSON.stringify({ skipped: true, reason: 'lock timeout' }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      );
+    }
+
+    try {
+      // Double-check: another run may have finished while we were waiting to acquire.
+      if (!forceRegenerate) {
+        const { data: fresh } = await supabase
+          .from('ai_predictions')
+          .select('*')
+          .eq('tournament_id', tournament.id)
+          .maybeSingle();
+        if (fresh && !isPredictionStale(fresh)) {
+          console.log(`[ti] double-check: fresh row appeared, skipping generation`);
+          return new Response(
+            JSON.stringify({
+              success: true,
+              cached: true,
+              tournament: { id: tournament.id, name: tournament.name },
+              predictions: formatStoredPredictions(fresh),
+            }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+          );
+        }
+      }
+
+      console.log(`[ti] running consensus engine, pool=${players.length}`);
+
+      const consensus = await runConsensus(
+        '', // system prompt is embedded in the user prompt
+        prompt,
+        fitScoreMap,
+        undefined,
+        poolPlayerIds,
+        poolNameToId,
+      );
+
+      console.log(`[ti] consensus complete: ${consensus.consensusMethod}, ${consensus.topContenders.length} contenders`);
 
     // =============================================
     // STEP 6: Enrich with Photo URLs & PGA Tour IDs + Override courseFitScore
@@ -773,7 +878,7 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
         model_version: 'consensus_v1',
         prompt_version: 'v4',
         consensus_data: {
-         pipeline: 'ti-7',
+         pipeline: 'ti-8',
           method: consensus.consensusMethod,
           agreementScore: consensus.agreementScore,
           modelResults: consensus.modelResults.map(r => ({
@@ -834,6 +939,9 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
+    } finally {
+      await releaseLock();
+    }
 
   } catch (error) {
     console.error('[generate-predictions] Error:', error);
@@ -900,7 +1008,7 @@ function formatDate(dateStr: string): string {
 
 function buildAnalysisPrompt(
   tournament: Tournament, 
-  players: PlayerStats[],
+  players: (PlayerStats & { statsAvailable?: boolean })[],
   researchContext: string = '',
   hasConfirmedField: boolean = false,
   courseHistoryData: any[] = [],
@@ -909,6 +1017,7 @@ function buildAnalysisPrompt(
   venueHistorySection: string = '',
   detailedStatsSection: string = '',
   courseDNAType: string | null = null,
+  statsLightCount: number = 0,
 ): string {
   const courseType = determineCourseType(tournament, courseDNAType);
   
@@ -919,7 +1028,8 @@ function buildAnalysisPrompt(
     worldRank: p.world_rank,
     priorRank: p.prior_rank,
     momentum: p.prior_rank - p.world_rank,
-    stats: {
+    statsAvailable: p.statsAvailable !== false,
+    stats: p.statsAvailable === false ? null : {
       drivingDistance: p.drive_avg,
       drivingAccuracy: p.drive_acc,
       greensInRegulation: p.gir_pct,
@@ -961,8 +1071,12 @@ ${formLines}
   }
 
   const fieldNote = hasConfirmedField
-    ? '**Note**: The player pool below contains ONLY confirmed tournament entrants.'
+    ? `**Note**: The player pool below contains ONLY confirmed tournament entrants (${players.length} players).`
     : '**Note**: Confirmed field not yet available — pool is top players by world ranking. Some may not be in the field.';
+
+  const statsLightNote = statsLightCount > 0
+    ? `\n**Stats coverage**: ${statsLightCount} of ${players.length} field players have \`statsAvailable: false\` (no PGA-season stats row). For those players, weigh recent results, world ranking, and the live research above — do not treat missing stats as weakness.\n`
+    : '';
 
   return `You are an expert PGA Tour analyst with deep knowledge of player statistics, course management, and tournament history. Your analysis is data-driven but also considers intangibles like pressure performance, course fit, and current form.
 
@@ -993,7 +1107,7 @@ ${venueHistorySection}
 ${detailedStatsSection}
 
 ## FIELD DATA
-${fieldNote}
+${fieldNote}${statsLightNote}
 
 ${JSON.stringify(playerDataFormatted, null, 2)}
 
