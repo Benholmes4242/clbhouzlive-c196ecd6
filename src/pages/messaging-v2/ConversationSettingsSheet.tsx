@@ -819,6 +819,7 @@ const AddPeopleSheet: React.FC<AddPeopleSheetProps> = ({
                 userId={c.actor_id}
                 alt={c.name}
                 size={40}
+                hairlineRing
               />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ color: INK, fontSize: 15, fontWeight: 500 }}>{c.name}</div>
