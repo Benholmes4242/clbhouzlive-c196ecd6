@@ -42,7 +42,7 @@ export function useReviewSubmit() {
         p_clubhouse: state.scores.clubhouse,
         p_facilities: state.scores.facilities,
         p_review: state.reviewText || undefined,
-        p_verdict: state.verdict || undefined,
+        p_verdict: null as any,
         p_share_to_feed: state.shareToFeed,
       });
       if (error) throw error;
