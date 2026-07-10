@@ -765,7 +765,8 @@ function scorecardIngest(kind: string, payload: Record<string, unknown>): void {
 
   if (!isFinite(totalMs) || totalMs < 0) return;
   const key = bucketKey(kind, page);
-  const stat = scorecardBuckets.get(key) ?? { count: 0, pass: 0, slow: 0, timeout: 0, superseded: 0, totals: [] };
+  const stat: KindStat = scorecardBuckets.get(key)
+    ?? { count: 0, pass: 0, slow: 0, timeout: 0, superseded: 0, totals: [], totalsIdx: 0 };
   // SUPERSEDED spans (flick-past, abandoned open) are counted separately
   // and never contribute to pass/slow/timeout tallies or p50/p95 totals —
   // otherwise abandoned events would inflate SLOW verdicts.
@@ -779,10 +780,10 @@ function scorecardIngest(kind: string, payload: Record<string, unknown>): void {
   if (verdict === 'PASS') stat.pass += 1;
   else if (verdict === 'SLOW') stat.slow += 1;
   else if (verdict === 'TIMEOUT') stat.timeout += 1;
-  stat.totals.push(totalMs);
-  if (stat.totals.length > 500) stat.totals.shift();
+  stat.totalsIdx = ringPush(stat.totals, stat.totalsIdx, TOTALS_CAP, totalMs);
   scorecardBuckets.set(key, stat);
 }
+
 
 
 /** Tally a [DECIDE] outcome for the scorecard's counters. Call sites are
