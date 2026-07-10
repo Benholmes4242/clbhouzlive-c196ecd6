@@ -196,9 +196,7 @@ const BusinessDirectoryPage = () => {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">
                       <span className="font-medium truncate">{biz.name}</span>
-                      {biz.is_verified && (
-                        <CheckCircle2 className="h-4 w-4 text-emerald-500 flex-shrink-0" />
-                      )}
+                      {biz.is_verified && <VerifiedBadge size="sm" />}
                     </div>
                     {biz.slug && (
                       <div className="text-xs text-muted-foreground truncate">
