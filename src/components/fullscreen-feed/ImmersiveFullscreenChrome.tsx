@@ -155,7 +155,16 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
     (activePost as any).courseCountry ??
     golfCourse?.courseCountry ??
     null;
-  const courseRating = activePost.courseRating ?? null;
+  // Fallback: not every feed-post payload path carries course_avg_overall_score
+  // (tag-only posts, older RPCs). Resolve the community rating from
+  // course_rating_aggregates when the payload is missing it.
+  const resolvedCourseId = activePost.review?.courseId ?? golfCourse?.id ?? activePost.courseId ?? null;
+  const { data: ratingAggregate } = useCourseRatingAggregates(
+    activePost.courseRating == null ? resolvedCourseId ?? undefined : undefined,
+  );
+  const courseRating =
+    activePost.courseRating ??
+    (ratingAggregate?.avg_overall_score != null ? Number(ratingAggregate.avg_overall_score) : null);
   const showCourseChip = courseRating != null;
 
   const likeStr = formatCount(likeState.count);
