@@ -288,7 +288,7 @@ function HowWePickBody({ trackRecord, tourSlug }: { trackRecord: { wins: number;
         ))}
       </div>
       <SectionLabel>Receipts</SectionLabel>
-      <BackedByResultsCard wins={trackRecord.wins} topFives={trackRecord.topFives} />
+      <BackedByResultsCard wins={trackRecord.wins} topFives={trackRecord.topFives} tourSlug={tourSlug} />
       <Footnote />
     </div>
   );
