@@ -140,6 +140,14 @@ export function useStageComposer() {
     setState(s => ({ ...s, ...patch, dirty: false }));
   }, []);
 
+  /**
+   * Hydrate the composer for edit mode: seed caption/course/media without
+   * flipping `dirty`. Called once on mount when editPostId is set.
+   */
+  const hydrate = useCallback((patch: Partial<StageState>) => {
+    setState(s => ({ ...s, ...patch, dirty: false }));
+  }, []);
+
   const reset = useCallback(() => setState(emptyState), []);
 
   return {
@@ -153,6 +161,7 @@ export function useStageComposer() {
     setCourse,
     setScheduledAt,
     restoreDraft,
+    hydrate,
     reset,
   };
 }
