@@ -103,8 +103,15 @@ export const InlineVideo: React.FC<Props> = ({
   // and playback stay off so no load/seek/play fires.
   const detectRoleForMatch = (): FeedRole | null => {
     if (!resolvedOwnerKey) return null;
+    // OwnerKey-normalized compare (bare `X` ≡ `X:0`, `X:1` distinct). Drops
+    // the legacy `s.postId === postId` arm which could accidentally satisfy
+    // a slide-0 lookup against a lane written for slide 1 once carousel
+    // neighbour warms start writing `${postId}:${i}` shapes.
+    const norm = (k: string | null): string | null =>
+      k == null ? null : (k.includes(':') ? k : `${k}:0`);
+    const target = norm(resolvedOwnerKey);
     const matches = (s: LaneSnapshot) =>
-      s.postId != null && (s.postId === postId || s.postId === resolvedOwnerKey);
+      s.postId != null && norm(s.postId) === target;
     try {
       for (const r of ['next', 'prev', 'active'] as FeedRole[]) {
         const lane = feedLaneRoles.laneForRole(r);
