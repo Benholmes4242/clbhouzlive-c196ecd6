@@ -83,8 +83,6 @@ export function LivePreviewCard({
   media,
 }: Props) {
   void verdict;
-  void tier;
-  void isGold;
 
   return (
     <article
@@ -97,31 +95,9 @@ export function LivePreviewCard({
         boxShadow: '0 1px 3px rgba(15,23,42,0.04)',
       }}
     >
-      {/* Ghost numeral — fills in when overall is set. */}
+      {/* Ghost numeral — shared component ensures parity with feed/clubhouse. */}
       {overall != null && (
-        <span
-          aria-hidden
-          className={isGold ? 'clbhouz-gold-shimmer-light' : undefined}
-          style={{
-            position: 'absolute',
-            right: -8,
-            top: 26,
-            transform: 'translateY(-50%)',
-            fontSize: 96,
-            fontWeight: 800,
-            letterSpacing: '-0.05em',
-            lineHeight: 1,
-            pointerEvents: 'none',
-            whiteSpace: 'nowrap',
-            zIndex: 0,
-            fontVariantNumeric: 'tabular-nums',
-            ...(isGold
-              ? { opacity: 0.32 }
-              : { color: 'rgba(247,147,30,0.18)' }),
-          }}
-        >
-          {overall.toFixed(1)}
-        </span>
+        <ReviewGhostNumeral rating={overall} fontSize={96} right={-8} top={26} />
       )}
 
       {/* Header */}
