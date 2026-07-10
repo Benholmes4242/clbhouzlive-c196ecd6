@@ -22,6 +22,7 @@ import { usePendingPostsStore } from '@/uploads/pendingPostsStore';
 import { compressImage, COMPRESSION_PRESETS } from '@/uploads/imageCompression';
 import { uploadVideoWithTus } from '@/uploads/tusVideoUpload';
 import { uploadToCloudflareR2 } from '@/utils/cloudflareUpload';
+import { bakeFrameCrop } from '@/components/post-composer/bakeFrameCrop';
 import type { StageMediaItem } from './useStageComposer';
 
 export interface OrchestratorContext {
@@ -59,8 +60,17 @@ async function uploadImageItem(
     fileIndex: displayOrder,
     totalFiles: 0,
   });
+  // Bake frame crop before compression so the stored image matches the framed preview.
+  let sourceFile = item.file;
+  if (item.frame && item.frame !== 'original') {
+    try {
+      sourceFile = await bakeFrameCrop(item.file, item.frame as '4:5' | '1:1' | '9:16', { x: 50, y: 50 });
+    } catch (err) {
+      console.warn('[post-v2] frame bake failed, falling back to original', err);
+    }
+  }
   // Compress
-  const compressed = await compressImage(item.file, COMPRESSION_PRESETS.feed);
+  const compressed = await compressImage(sourceFile, COMPRESSION_PRESETS.feed);
   uploadEventBus.emit('file:upload-progress', {
     type: 'file:upload-progress',
     jobId: ctx.jobId,
