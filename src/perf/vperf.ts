@@ -41,7 +41,7 @@ import { writeBandwidthSample, getNetClass } from '@/video/bandwidthMemory';
 
 const SPAN_TTL_MS = 15_000;
 
-type Verdict = 'PASS' | 'SLOW' | 'TIMEOUT';
+type Verdict = 'PASS' | 'SLOW' | 'TIMEOUT' | 'SUPERSEDED';
 
 interface SpanRec {
   spanId: string;
