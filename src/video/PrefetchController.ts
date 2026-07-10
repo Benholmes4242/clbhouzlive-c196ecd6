@@ -45,20 +45,15 @@ class PrefetchControllerImpl {
   private warmed = new Set<string>();
   private warmedOrder: string[] = [];
 
-  /** True when the current network / engine state forbids prefetch.
-   *  `allowWhileLoading` lets same-card horizontal (carousel) warms bypass
-   *  the laneLoading gate — they don't compete with cross-post prediction
-   *  the way a far cold fetch would. saveData / slow-net skips still apply. */
-  private shouldSkip(allowWhileLoading = false): { skip: true; reason: string } | { skip: false } {
+  /** True when the current network / engine state forbids prefetch. */
+  private shouldSkip(): { skip: true; reason: string } | { skip: false } {
     if (typeof navigator !== 'undefined') {
       const conn = (navigator as any).connection;
       if (conn?.saveData === true) return { skip: true, reason: 'saveData' };
       const t = conn?.effectiveType as string | undefined;
       if (t === 'slow-2g' || t === '2g') return { skip: true, reason: 'slowNet' };
     }
-    if (!allowWhileLoading && VideoEngine.isAnyLaneLoading()) {
-      return { skip: true, reason: 'laneLoading' };
-    }
+    if (VideoEngine.isAnyLaneLoading()) return { skip: true, reason: 'laneLoading' };
     return { skip: false };
   }
 
@@ -104,18 +99,13 @@ class PrefetchControllerImpl {
    * Request a cache-warm for `ownerKey` (HLS manifest + first segment of the
    * lowest rung). Idempotent: no-op if already warmed or in-flight. Silently
    * skipped when discipline rules forbid it.
-   *
-   * `opts.allowWhileLoading` — bypass the "any lane loading" skip. Used by
-   * the carousel adjacent-slide warm path (same card, low cost, must fire
-   * even while the active slide's HLS is loading). saveData/slow-net still
-   * skip.
    */
-  request(ownerKey: string, hlsUrl: string, opts?: { allowWhileLoading?: boolean }): void {
+  request(ownerKey: string, hlsUrl: string): void {
     if (!ownerKey || !hlsUrl) return;
     if (this.warmed.has(ownerKey)) return;
     if (this.inflight.some(i => i.ownerKey === ownerKey)) return;
 
-    const skip = this.shouldSkip(opts?.allowWhileLoading === true);
+    const skip = this.shouldSkip();
     if (skip.skip) {
       log('aborted', { ownerKey, reason: skip.reason });
       vperfPrefetchTally('aborted', skip.reason);

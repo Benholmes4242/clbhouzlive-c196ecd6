@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Flag, PencilLine } from 'lucide-react';
+import { MessageSquare, PencilLine } from 'lucide-react';
 import { useConversations } from '@/hooks/messaging/useConversations';
 import { ConversationRow } from './ConversationRow';
 import NewConversationSheet from './NewConversationSheet';
@@ -121,111 +121,35 @@ const InboxV2Page: React.FC = () => {
         ) : conversations.length === 0 ? (
           <div
             className="flex flex-col items-center justify-center text-center"
-            style={{ padding: '80px 24px', gap: 24, flex: 1, overflow: 'hidden' }}
+            style={{ padding: '96px 24px', gap: 20, flex: 1 }}
           >
-            <style>{`
-              @keyframes inbox-ripple {
-                0% { transform: translate(-50%, -50%) scale(0.6); opacity: 0.55; }
-                80% { opacity: 0; }
-                100% { transform: translate(-50%, -50%) scale(1.6); opacity: 0; }
-              }
-              @keyframes inbox-float {
-                0%, 100% { transform: translateY(0); }
-                50% { transform: translateY(-4px); }
-              }
-              @keyframes inbox-sheen {
-                0% { transform: translateX(-120%); }
-                60%, 100% { transform: translateX(220%); }
-              }
-              .inbox-ripple {
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                width: 150px;
-                height: 150px;
-                border: 1.5px solid rgba(15,23,42,0.10);
-                border-radius: 50%;
-                transform: translate(-50%, -50%) scale(0.6);
-                animation: inbox-ripple 4.2s ease-out infinite;
-                will-change: transform, opacity;
-              }
-              .inbox-squircle {
-                animation: inbox-float 3.6s ease-in-out infinite;
-                will-change: transform;
-              }
-              .inbox-sheen {
-                animation: inbox-sheen 5s ease-in-out infinite;
-                will-change: transform;
-              }
-              @media (prefers-reduced-motion: reduce) {
-                .inbox-ripple { display: none; }
-                .inbox-squircle { animation: none; }
-                .inbox-sheen { animation: none; display: none; }
-              }
-            `}</style>
             <div
               style={{
-                position: 'relative',
-                width: 150,
-                height: 150,
-                display: 'flex',
+                width: 64,
+                height: 64,
+                borderRadius: 20,
+                background: '#EDEFF2',
+                display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
-              <span className="inbox-ripple" style={{ animationDelay: '0s' }} />
-              <span className="inbox-ripple" style={{ animationDelay: '1.4s' }} />
-              <span className="inbox-ripple" style={{ animationDelay: '2.8s' }} />
-              <div
-                className="inbox-squircle"
-                style={{
-                  position: 'relative',
-                  width: 62,
-                  height: 62,
-                  borderRadius: 20,
-                  background: '#15171F',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  overflow: 'hidden',
-                }}
-              >
-                <Flag size={28} color="#FFFFFF" />
-                <span
-                  className="inbox-sheen"
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    background:
-                      'linear-gradient(100deg, transparent, rgba(255,255,255,0.14), transparent)',
-                    pointerEvents: 'none',
-                  }}
-                />
-              </div>
+              <MessageSquare size={30} color="#8A9099" />
             </div>
-            <div className="flex flex-col items-center" style={{ gap: 8 }}>
-              <p
-                style={{
-                  color: INK,
-                  fontSize: 21,
-                  fontWeight: 600,
-                  margin: 0,
-                  lineHeight: '26px',
-                  letterSpacing: '-0.01em',
-                }}
-              >
-                The first tee is yours
+            <div className="flex flex-col items-center" style={{ gap: 6 }}>
+              <p style={{ color: INK, fontSize: 19, fontWeight: 600, margin: 0, lineHeight: '24px' }}>
+                No messages yet
               </p>
               <p
                 style={{
                   color: SUB,
                   fontSize: 14,
-                  lineHeight: 1.5,
-                  maxWidth: 250,
+                  lineHeight: 1.45,
+                  maxWidth: 260,
                   margin: 0,
                 }}
               >
-                Every round starts with a conversation. Reach out and get one going.
+                Start a conversation with a golfer or group and it'll show up here.
               </p>
             </div>
             <button
@@ -239,14 +163,14 @@ const InboxV2Page: React.FC = () => {
                 background: '#15171F',
                 color: '#F5F6F7',
                 borderRadius: 22,
-                padding: '12px 24px',
+                padding: '12px 22px',
                 fontSize: 14,
                 fontWeight: 500,
                 border: 'none',
               }}
             >
               <PencilLine size={16} />
-              New message
+              Start a conversation
             </button>
           </div>
         ) : (

@@ -211,60 +211,32 @@ export const MediaCarousel: React.FC<Props> = ({
   }, [active, isCardActive, items, postId, ownerKeyOf]);
 
   // ────────────────────────────────────────────────────────────────────
-  // Adjacent-slide warming (media axis) — TWO cooperating mechanisms.
+  // Adjacent-slide warming (media axis).
+  // For the active slide `i`, cache-warm i±1 VIDEO slides via
+  // PrefetchController. Distinct per-slide keys (${postId}:${j}) — same
+  // convention InlineVideo binds under, so the browser HTTP cache is
+  // primed for the exact hlsUrl hls.js will fetch on activation.
   //
-  // 1. HTTP-cache prefetch (PrefetchController): primes the browser cache
-  //    for i±1 hlsUrls so hls.js hits cache on activation. Uses
-  //    `allowWhileLoading: true` — carousel warms are same-card and MUST
-  //    fire even while the active slide's HLS is loading (otherwise every
-  //    neighbour request is dropped by the laneLoading gate). saveData /
-  //    slow-net skips still apply inside PrefetchController.
-  //
-  // 2. Lane CLAIM (VideoEngine.preload): stamps the `next` / `prev`
-  //    physical feed lanes with the neighbour ownerKey so InlineVideo's
-  //    detectRoleForMatch resolves for i±1 (which have never been mounted
-  //    before). This is what makes the isNear/earlyMotion mount-warm
-  //    actually mount — without a lane bound to the neighbour's ownerKey,
-  //    detectRoleForMatch returns null and useVideoLane no-ops.
-  //
-  // Budget: only i±1 (max 2 warm requests + 2 lane claims) on top of the
-  // active slide — total ≤ 3 lanes, matching the 3-lane feed pool
-  // (active/next/prev). Multi-video carousels temporarily borrow the
-  // vertical feed's next/prev claims for their own neighbours; CardFeed
-  // re-warms next/prev the moment playingIdx moves.
+  // Budget: only i±1 (max 2 warm requests on the horizontal axis) on top
+  // of the active slide — total ≤ 3, within the 3-lane pool (feed
+  // active/next/prev). PrefetchController itself caps in-flight at 2 and
+  // skips when any lane is buffering, so cannot stall the active video.
+  // Adjacent-slide MOUNT/warm inside InlineVideo (isNear/earlyMotion)
+  // is handled below on the render pass — this effect covers the pure
+  // HTTP-cache priming that mirrors the vertical feed's next-card warm.
   // ────────────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!isCardActive) return;
-    const claimRoles: Array<{ delta: -1 | 1; role: 'prev' | 'next' }> = [
-      { delta: -1, role: 'prev' },
-      { delta: 1, role: 'next' },
-    ];
-    for (const { delta, role } of claimRoles) {
-      const j = active + delta;
+    const neighbours = [active - 1, active + 1];
+    for (const j of neighbours) {
       if (j < 0 || j >= items.length) continue;
       const it = items[j];
       if (!it || it.type !== 'video') continue;
       const hlsUrl = (it as any).hlsUrl || '';
       if (!hlsUrl || typeof hlsUrl !== 'string' || hlsUrl.startsWith('blob:')) continue;
-      const ownerKey = ownerKeyOf(j);
-      // (1) HTTP-cache prefetch — bypasses laneLoading gate for same-card warms.
-      PrefetchController.request(ownerKey, hlsUrl, { allowWhileLoading: true });
-      // (2) Lane claim — stamp the neighbour's ownerKey on the next/prev
-      //     physical lane so the adjacent InlineVideo's detectRoleForMatch
-      //     resolves and useVideoLane mounts it paused-ready.
-      try {
-        const laneId = feedLaneRoles.laneForRole(role);
-        VideoEngine.preload(laneId, {
-          hlsUrl,
-          posterUrl: (it as any).thumbnailUrl ?? null,
-          postId: ownerKey,
-        });
-      } catch {
-        /* engine not booted — safe to ignore */
-      }
+      PrefetchController.request(ownerKeyOf(j), hlsUrl);
     }
   }, [active, isCardActive, items, ownerKeyOf]);
-
 
 
 
@@ -350,17 +322,11 @@ export const MediaCarousel: React.FC<Props> = ({
                     item={m}
                     isActive={isActiveSlide}
                     isNear={isActiveSlide || isAdjacentSlide}
-                    /* Carousel neighbours are KEPT-BOUND PAUSED, not early-
-                     * playing (unlike vertical feed neighbours). isNear +
-                     * the lane claim above give detectRoleForMatch a real
-                     * role → useVideoLane mounts paused-ready. earlyMotion
-                     * would flip playbackIntent=true and start playback. */
-                    earlyMotion={false}
+                    earlyMotion={isAdjacentSlide}
                     postId={postId ?? null}
                     ownerKey={slideOwnerKey}
                     objectFit="cover"
                   />
-
                 ) : m.thumbnailUrl ? (
                   <img
                     src={m.thumbnailUrl}
