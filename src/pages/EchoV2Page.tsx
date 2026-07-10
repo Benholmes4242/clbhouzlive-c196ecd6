@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { EchoV2Header } from '@/features/echo-v2/components/EchoV2Header';
@@ -16,7 +16,9 @@ const BOTTOM_NAV_CLEAR = 94;
 const EchoV2Page: React.FC = () => {
   const { chatId } = useParams<{ chatId?: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const qc = useQueryClient();
+
 
   const [composerValue, setComposerValue] = useState('');
   const [pendingUserMessage, setPendingUserMessage] = useState<string | null>(null);
@@ -92,8 +94,13 @@ const EchoV2Page: React.FC = () => {
         <EchoV2Header
           streaming={state.streaming}
           showBack={inChat}
-          onBack={() => navigate('/echo-v2')}
+          onBack={() => {
+            const from = (location.state as { from?: string } | null)?.from;
+            navigate(from === 'history' ? '/echo-v2/history' : '/echo-v2');
+          }}
+          onHistoryClick={() => navigate('/echo-v2/history')}
         />
+
 
         <div
           ref={scrollerRef}
