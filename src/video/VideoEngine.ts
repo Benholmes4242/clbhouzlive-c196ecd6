@@ -611,7 +611,21 @@ class VideoEngineImpl {
         } catch { /* trace-only */ }
         return;
       }
-    } catch { /* engine not booted / lane missing — fall through */ }
+    } catch (error) {
+      if (opts.expectedActiveOwnerKey != null) {
+        try {
+          trace('preload.rejected', {
+            laneId,
+            reason: 'guard-check-failed',
+            incomingOwnerKey: norm(postId),
+            expectedActiveOwnerKey: opts.expectedActiveOwnerKey,
+            error: error instanceof Error ? error.message : String(error),
+          });
+        } catch { /* trace-only */ }
+        return;
+      }
+      /* engine not booted / lane missing with no guarded caller — preserve legacy fall-through */
+    }
     this.load(laneId, {
       hlsUrl: opts.hlsUrl,
       posterUrl: opts.posterUrl ?? null,
