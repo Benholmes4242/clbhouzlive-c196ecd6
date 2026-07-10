@@ -157,7 +157,9 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
   const [view, setView] = useState<ViewOption>('grid');
   const [sortBy, setSortBy] = useState<SortOption>('recently-played');
   const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
   const [reviewModalCourse, setReviewModalCourse] = useState<any>(null);
+  void reviewModalCourse; void setReviewModalCourse;
   const [entered, setEntered] = useState(false);
   const isMobile = useIsMobile();
   const queryClient = useQueryClient();
