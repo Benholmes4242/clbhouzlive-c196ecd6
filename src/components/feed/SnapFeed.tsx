@@ -10,6 +10,19 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { vperfStart, vperfArmLane, vperfNextId, vperfFeedScrollTick, vperfFeedActivateStart, vperfFeedActivateEnd } from '@/perf/vperf';
 import { PrefetchController } from '@/video/PrefetchController';
+import { trace } from '@/perf/trace';
+import { VideoEngine } from '@/video/VideoEngine';
+import { isPerfEnabled } from '@/perf/navTiming';
+
+// Normalized owner-key compare — bare "X" ≡ "X:0", ":1"/":2" distinct.
+// Never use strict === here; strict compare caused false-null mismatch
+// reports on the [CAROUSEL2] diagnostic and burned a round.
+const _normalizeOwnerKey = (k: string | null | undefined): string | null =>
+  !k ? null : k.includes(':') ? k : `${k}:0`;
+const ownerKeysMatch = (
+  laneKey: string | null | undefined,
+  expectedKey: string,
+): boolean => _normalizeOwnerKey(laneKey) === _normalizeOwnerKey(expectedKey);
 
 
 
