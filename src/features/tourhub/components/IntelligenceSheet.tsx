@@ -794,7 +794,7 @@ function SkeletonList() {
   );
 }
 
-function EmptyState({ onClose }: { onClose: () => void }) {
+function EmptyState({ onClose, tourTag }: { onClose: () => void; tourTag: string }) {
   return (
     <div
       style={{
@@ -819,10 +819,10 @@ function EmptyState({ onClose }: { onClose: () => void }) {
         <Brain size={26} color={AMBER} strokeWidth={2.8} style={{ display: 'block' }} />
       </div>
       <h3 style={{ margin: '16px 0 0', fontSize: 16, fontWeight: 800, color: SLATE_900, letterSpacing: '-0.2px' }}>
-        No picks yet this season.
+        No picks yet.
       </h3>
       <p style={{ margin: '6px 0 0', fontSize: 13, color: SLATE_500, maxWidth: 280, lineHeight: 1.4 }}>
-        First picks drop with the next tournament.
+        Pick tracking for {tourTag} starts this week.
       </p>
       <button
         type="button"
