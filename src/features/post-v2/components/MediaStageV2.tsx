@@ -67,13 +67,10 @@ export default function MediaStageV2({ item, index, total, onOpenAdjust, onOpenT
     () => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches,
     [],
   );
-  const containerSize = useContainerSize();
+  const stageRef = useRef<HTMLDivElement>(null);
+  const containerSize = useContainerSize(stageRef);
   const k = containerSize / BASE;
   const frameRefs = useRef<Array<HTMLDivElement | null>>([]);
-
-  // rAF fallback: if computed animation-name isn't picked up (odd CSS
-  // sandboxing), drive translateY via a sine loop with matching amplitude
-  // (6px) and period (4s).
   useEffect(() => {
     if (item) return;
     if (reduced) return;
