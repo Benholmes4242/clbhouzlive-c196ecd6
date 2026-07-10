@@ -45,7 +45,7 @@ const COL_THRU = 30;
 const COL_TODAY = 32;
 
 const FALLBACK_GRADIENT = 'linear-gradient(180deg,#1E4D38,#0F172A)';
-const IMAGE_FOCAL = 'center 40%';
+const IMAGE_FOCAL = '50% 72%';
 
 // ---- helpers --------------------------------------------------------------
 
