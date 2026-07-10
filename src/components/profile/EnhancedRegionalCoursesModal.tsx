@@ -10,7 +10,7 @@ import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { ReviewWizard } from '@/components/courses/review-wizard';
+import { useNavigate } from 'react-router-dom';
 import { InlineSpinner } from '@/components/ui/InlineSpinner';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useUI } from '@/contexts/UIContext';
@@ -157,7 +157,9 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
   const [view, setView] = useState<ViewOption>('grid');
   const [sortBy, setSortBy] = useState<SortOption>('recently-played');
   const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
   const [reviewModalCourse, setReviewModalCourse] = useState<any>(null);
+  void reviewModalCourse; void setReviewModalCourse;
   const [entered, setEntered] = useState(false);
   const isMobile = useIsMobile();
   const queryClient = useQueryClient();
@@ -338,10 +340,11 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
   });
 
   // Mark as played - in ratings-only system, open rating modal instead
+  // Mark as played - open the Composer route (R4 cutover).
   const handleMarkAsPlayed = (courseId: string) => {
     const course = allRegionCourses.find(c => c.golf_courses.id === courseId);
-    if (course) {
-      setReviewModalCourse(course.golf_courses);
+    if (course?.golf_courses?.id) {
+      navigate(`/courses/${course.golf_courses.id}/rate`);
     }
   };
 
@@ -802,15 +805,10 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
         )}
               </div>
 
-              {/* Review Modal */}
-              {reviewModalCourse && (
-                <ReviewWizard
-                  course={reviewModalCourse}
-                  isOpen={!!reviewModalCourse}
-                  onClose={() => setReviewModalCourse(null)}
-                  isEditMode={false}
-                />
-              )}
+              {/* Review modal: R4 cutover — navigates to Composer route
+                  (/courses/:id/rate) instead of rendering inline wizard.
+                  Inline pattern was not load-bearing; the modal already
+                  triggers a full-screen route change. */}
               </div>
             </div>
           </div>

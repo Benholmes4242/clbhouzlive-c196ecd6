@@ -248,7 +248,7 @@ const UserReviewsPage = lazy(() => import("./pages/UserReviewsPage"));
 // Courses page now uses CoursesWrapped (imported above) which handles header/dim reset
 const CourseDetailPage = lazy(() => import("./pages/CourseDetailPage"));
 const CourseReviewsPage = lazy(() => import("./pages/CourseReviewsPage"));
-const RateCoursePage = lazy(() => import("./pages/RateCoursePage"));
+// RateCoursePage (old wizard) orphaned in R4 cutover; will be deleted in R5.
 const ReviewComposerV2 = lazy(() => import("./features/review-v2/ReviewComposerV2"));
 
 // ShareReviewPage removed in PR-5 Part 2 (zero navigators — orphan preview surface, ReviewWizard shares inline).
@@ -317,6 +317,10 @@ const VideoIdToPostRedirect: React.FC = () => {
 const EchoV2Redirect: React.FC = () => {
   const { chatId } = useParams<{ chatId: string }>();
   return <Navigate to={chatId ? `/echo/${chatId}` : '/echo'} replace />;
+};
+const RateCourseV2Redirect: React.FC = () => {
+  const { courseId } = useParams<{ courseId: string }>();
+  return <Navigate to={courseId ? `/courses/${courseId}/rate` : '/'} replace />;
 };
 const SeasonShop = lazy(() => import("./pages/SeasonShop"));
 const ChallengesPage = lazy(() => import("./pages/ChallengesPage"));
@@ -561,8 +565,8 @@ function AppRoutes() {
         <Route path="/explore" element={<Navigate to="/courses?tab=discover" replace />} />
         <Route path="/courses" element={<Suspense fallback={<CoursesListSkeleton />}><CoursesWrapped /></Suspense>} />
         <Route path="/courses/:courseId" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseDetailPage /></Suspense>} />
-        <Route path="/courses/:courseId/rate" element={<Suspense fallback={<RateCoursePageSkeleton />}><RateCoursePage /></Suspense>} />
-        <Route path="/rate-course-v2/:courseId" element={<Suspense fallback={<RateCoursePageSkeleton />}><ReviewComposerV2 /></Suspense>} />
+        <Route path="/courses/:courseId/rate" element={<Suspense fallback={<RateCoursePageSkeleton />}><ReviewComposerV2 /></Suspense>} />
+        <Route path="/rate-course-v2/:courseId" element={<RateCourseV2Redirect />} />
         
         {/* /courses/:courseId/share-review/:reviewId removed in PR-5 Part 2 — orphan surface. ReviewWizard shares inline. */}
         <Route path="/courses/:courseId/reviews" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseReviewsPage /></Suspense>} />
