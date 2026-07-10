@@ -4,7 +4,7 @@ import { Check } from 'lucide-react';
 import BottomSheet from './BottomSheet';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import type { ActiveActor } from '@/types/actor';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 interface Props {
   open: boolean;
