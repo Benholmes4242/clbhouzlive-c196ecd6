@@ -1166,7 +1166,6 @@ export function CinematicHeroFullBleed({
                 alignItems: 'center',
                 gap: 18,
                 padding: '14px 18px',
-                borderTop: '0.5px solid rgba(255,255,255,0.10)',
               }}
             >
               {courseStats.par != null && (
@@ -1178,7 +1177,7 @@ export function CinematicHeroFullBleed({
             </div>
           ) : null}
 
-          <Footer leftText="" isLive={false} />
+          <Footer leftText="" isLive={false} noBorder />
         </button>
       )}
     </div>
@@ -1195,7 +1194,7 @@ function Footer({ leftText, isLive, noBorder }: { leftText: string; isLive: bool
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '11px 18px 14px',
-        borderTop: '0.5px solid rgba(255,255,255,0.12)',
+        borderTop: noBorder ? 'none' : '0.5px solid rgba(255,255,255,0.12)',
       }}
     >
       <span
