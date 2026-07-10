@@ -40,11 +40,17 @@ type HealthRow = {
 
 const FEED_LANES: LaneId[] = ['feed-active', 'feed-next', 'feed-prev'];
 
+function normOwner(k: string | null | undefined): string | null {
+  if (k == null) return null;
+  return k.includes(':') ? k : `${k}:0`;
+}
+
 function findLaneForOwner(owner: string): { laneId: LaneId; snap: ReturnType<typeof VideoEngine.snapshot> } | null {
+  const target = normOwner(owner);
   for (const lid of FEED_LANES) {
     try {
       const s = VideoEngine.snapshot(lid);
-      if (s.postId === owner) return { laneId: lid, snap: s };
+      if (normOwner(s.postId) === target) return { laneId: lid, snap: s };
     } catch { /* not booted */ }
   }
   return null;
@@ -83,9 +89,8 @@ async function run(opts: { cycles?: number; intervalMs?: number } = {}) {
 
   for (let c = 0; c < cycles; c++) {
     const targets: LaneId[] = [
-      'feed-active',
-      'feed-next',
-      'feed-prev',
+      activeLaneId,
+      ...FEED_LANES.filter((lane) => lane !== activeLaneId),
       FEED_LANES[Math.floor(Math.random() * FEED_LANES.length)],
     ];
     for (let i = 0; i < targets.length; i++) {
