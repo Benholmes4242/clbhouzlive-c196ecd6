@@ -142,12 +142,12 @@ export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
               fontSize: 8,
               fontWeight: 800,
               letterSpacing: '0.14em',
-              color: AMBER,
+              color: isMajorActive ? GOLD_DEEP : AMBER,
               textTransform: 'uppercase',
               lineHeight: 1,
             }}
           >
-            Tour
+            {isMajorActive ? 'Major' : 'Tour'}
           </span>
           <span
             style={{
@@ -157,13 +157,14 @@ export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
               fontSize: 11,
               fontWeight: 700,
               letterSpacing: '0.04em',
-              color: '#0A0E14',
+              color: isMajorActive ? GOLD_DEEP : '#0A0E14',
               textTransform: 'uppercase',
               lineHeight: 1,
             }}
           >
-            {TOUR_LABEL[activeTourSlug] ?? 'PGA TOUR'}
-            <ArrowLeftRight size={11} strokeWidth={2.2} color="#0A0E14" aria-hidden />
+            {pillLabel}
+            <ArrowLeftRight size={11} strokeWidth={2.2} color={isMajorActive ? GOLD_DEEP : '#0A0E14'} aria-hidden />
+          </span>
           </span>
         </button>
       )}
