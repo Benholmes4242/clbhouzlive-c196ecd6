@@ -14,6 +14,7 @@ import { isMedianApp } from '@/utils/median/isMedianApp';
 import { useNavTheme } from '@/hooks/useNavTheme';
 import { useNavScrollState, pushForceExpand, resetToExpanded } from '@/hooks/useScrollDirection';
 import { cn } from '@/lib/utils';
+import CreateSheetV2 from '@/features/post-v2/components/CreateSheetV2';
 
 // ---- Public token: total vertical space to reserve at the bottom of any
 // scrollable page so its last content clears the floating pill.
@@ -106,6 +107,8 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const liveTournamentCount = tournamentsCache?.live?.length ?? 0;
   const isTourHubLive = liveTournamentCount > 0;
   const openPostStudio = usePostStudioStore((s) => s.openPostStudio);
+  void openPostStudio;
+  const [createSheetOpen, setCreateSheetOpen] = useState(false);
 
   const theme = useNavTheme();
   const tokens = theme === 'dark' ? DARK_TOKENS : LIGHT_TOKENS;
@@ -190,7 +193,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
 
   const handleTabClickWithCamera = (tab: { id: string; path: string | null; isAction?: boolean }) => {
     if (tab.isAction && tab.id === 'post') {
-      openPostStudio({ returnPath: location.pathname });
+      setCreateSheetOpen(true);
       return;
     }
     if (tab.id === 'clubhouse' && (location.pathname === '/' || location.pathname === '/clubhouse')) {
@@ -414,6 +417,11 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
           </motion.div>
         )}
       </AnimatePresence>
+      <CreateSheetV2
+        open={createSheetOpen}
+        onClose={() => setCreateSheetOpen(false)}
+        returnPath={location.pathname}
+      />
     </>
   );
 };
