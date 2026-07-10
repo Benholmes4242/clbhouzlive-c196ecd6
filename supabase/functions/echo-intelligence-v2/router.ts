@@ -22,7 +22,7 @@ const GOLF_TECHNIQUE_PATTERNS = [
 
 // Golf equipment keywords - route to static
 const GOLF_EQUIPMENT_PATTERNS = [
-  /\b(driver|iron|wedge|putter|hybrid|fairway wood|wood|loft|lie angle|shaft|flex)/i,
+  /\b(driver|iron|wedge|putter|hybrid|fairway wood|wood|loft|lie angle|shaft|flex)\b/i,
   /\b(graphite|steel shaft|regular flex|stiff flex|x.?stiff|senior flex)/i,
   /\b(club fitting|launch angle|spin rate|smash factor|ball speed|carry distance)/i,
   /\b(golf ball|titleist|callaway|taylormade|ping|cobra|mizuno|cleveland|vokey)/i,
