@@ -74,9 +74,9 @@ const EchoV2Page: React.FC = () => {
   // so the last bubble is never hidden behind the docked composer.
   const scrollPadBottom = `calc(${composerHeight + keyboardHeight + 12}px + env(safe-area-inset-bottom, 0px))`;
 
-  // Welcome route keeps the global bottom nav visible: reserve room below
-  // the composer so it never sits under the nav bar.
-  const outerPadBottom = !inChat ? BOTTOM_NAV_CLEAR : 0;
+  // Composer is a flex child pinned to the viewport bottom on BOTH welcome
+  // and chat routes. The global bottom nav is hidden on /echo, so no extra
+  // reserve is needed here — safe-area is handled by the composer itself.
 
   return (
     <PageRoot fixedHeight hasBottomNav={false} style={{ background: CANVAS }}>
@@ -87,15 +87,20 @@ const EchoV2Page: React.FC = () => {
           height: '100%',
           width: '100%',
           background: CANVAS,
-          paddingBottom: outerPadBottom,
         }}
       >
         <EchoV2Header
           streaming={state.streaming}
-          showBack={inChat}
+          showBack
           onBack={() => {
-            const from = (location.state as { from?: string } | null)?.from;
-            navigate(from === 'history' ? '/echo/history' : '/echo');
+            if (inChat) {
+              const from = (location.state as { from?: string } | null)?.from;
+              navigate(from === 'history' ? '/echo/history' : '/echo');
+              return;
+            }
+            // Welcome back: exit Echo to previous history entry or home.
+            if (location.key !== 'default') navigate(-1);
+            else navigate('/');
           }}
           onHistoryClick={() => navigate('/echo/history')}
         />
