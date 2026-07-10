@@ -16,7 +16,7 @@ import {
   HERO_NUMBER_STYLE,
   ratingTextColor,
 } from '@/lib/ratingTier';
-import { RV2, VERDICTS, type VerdictSlug } from '../tokens';
+import { RV2, type VerdictSlug } from '../tokens';
 import type { CategoryKey, MediaItem, ReviewV2Course } from '../types';
 
 interface Author {
