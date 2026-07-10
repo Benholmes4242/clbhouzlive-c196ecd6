@@ -103,9 +103,9 @@ async function callClaude(
     body: JSON.stringify({
       // Sonnet 5: no temperature / top_p / top_k.
       model: ANTHROPIC_MODEL_SYNTH,
-      max_tokens: 4096,
+      max_tokens: 4000,
       system: systemPrompt,
-      messages: [{ role: 'user', content: userPrompt }],
+      messages: [{ role: 'user', content: `${userPrompt}\n\nReturn compact JSON - no markdown fences, no prose, reasons under 12 words each.` }],
     }),
   });
   if (!res.ok) {
