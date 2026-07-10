@@ -29,7 +29,7 @@ export default function JoinLandingPage() {
   const [href, setHref] = useState<string>(FALLBACK_URL);
 
   useEffect(() => {
-    document.title = 'Join clbhouz — the social home for golf';
+    document.title = 'Join clbhouz — the home of golf courses';
     const ref = params.get('ref');
     if (ref) {
       try {
@@ -131,9 +131,9 @@ export function PublicLanding({
           maxWidth: 320,
         }}
       >
-        <ValueRow>Feed with your mates</ValueRow>
-        <ValueRow>Live tour hub</ValueRow>
-        <ValueRow>England Golf handicap sync</ValueRow>
+        <ValueRow>Discover the world's courses</ValueRow>
+        <ValueRow>Live tours</ValueRow>
+        <ValueRow>Official WHS handicap sync</ValueRow>
       </div>
 
       <a
