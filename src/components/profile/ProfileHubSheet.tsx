@@ -922,11 +922,18 @@ function ProfileHubSheet({
                           Icon={UserCog}
                           label={isBusinessActor ? 'Edit profile' : 'Manage profile and settings'}
                           onClick={() => handleNav(editTarget)}
-                          isLast
+                        />
+                        <InviteFriendsRow
+                          userId={activeProfileType === 'personal' ? localActiveId : undefined}
+                          onOpen={() => {
+                            onClose();
+                            openInviteSheet('profile_hub');
+                          }}
                         />
                       </SheetGroup>
                     );
                   })()}
+
 
                   {/* ── 5b. Businesses group (only for existing owners) ── */}
                   {hasBusinesses && (
