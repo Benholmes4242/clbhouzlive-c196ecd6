@@ -353,11 +353,6 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
         />
       </div>
 
-      {/* Verdict */}
-      <Section eyebrow="Verdict">
-        <VerdictPills value={composer.state.verdict} onChange={composer.setVerdict} />
-      </Section>
-
       {/* Overall */}
       <Section eyebrow="Overall">
         <div
@@ -378,7 +373,34 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
       </Section>
 
       {/* Words */}
-      <Section eyebrow="Words">
+      <section style={{ padding: '4px 16px 4px' }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: 10,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 10.5,
+              fontWeight: 700,
+              color: RV2.amber,
+              textTransform: 'uppercase',
+              letterSpacing: '0.14em',
+            }}
+          >
+            Words
+          </div>
+          <VoiceDictateButton
+            onAppend={(text) => {
+              const prev = composer.state.reviewText;
+              const joiner = prev.length === 0 || /\s$/.test(prev) ? '' : ' ';
+              composer.setReviewText(`${prev}${joiner}${text}`);
+            }}
+          />
+        </div>
         <div
           style={{
             background: '#FFFFFF',
@@ -396,7 +418,9 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
             textStyle={{ fontSize: 14, lineHeight: '20px', minHeight: 80, maxHeight: 260, padding: '10px 0', color: RV2.ink, caretColor: RV2.ink }}
           />
         </div>
-      </Section>
+      </section>
+
+
 
       {/* Media */}
       <Section eyebrow="Photos & video">
