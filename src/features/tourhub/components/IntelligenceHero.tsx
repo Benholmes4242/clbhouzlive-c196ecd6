@@ -1358,13 +1358,21 @@ function StateMessage({ label }: { label: string }) {
 
 // ─── Component ──────────────────────────────────────────────────────────────
 export const IntelligenceHero = memo(function IntelligenceHero() {
+  // Follow the hero: whichever event is currently on-screen drives our picks.
+  // Falls back to the legacy auto-resolve when no hero context exists.
+  const { viewingTournamentId } = useTourSelection();
+  const { data: heroSlides = [] } = useHeroCarouselData();
+  const viewingSlide = viewingTournamentId
+    ? heroSlides.find((s) => s.tournament.id === viewingTournamentId) ?? null
+    : null;
+
   const {
     state,
     activeTournamentId,
     data,
     nextTournamentPredictions,
     isLoading,
-  } = useIntelligenceLifecycleState();
+  } = useIntelligenceLifecycleState(viewingTournamentId);
   const { data: tournaments = [] } = useIntelligenceHistoricalPicks();
 
   const trackerEnabled = state === 'live' || state === 'results';
