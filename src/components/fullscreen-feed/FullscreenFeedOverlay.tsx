@@ -10,8 +10,7 @@ import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkelet
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 
 
-import { FeedOverlayLayer } from '@/components/feed/FeedOverlayLayer';
-import { FullscreenCarouselOverlay } from '@/components/media/FullscreenCarouselOverlay';
+import { ImmersiveFullscreenChrome } from '@/components/fullscreen-feed/ImmersiveFullscreenChrome';
 import CommentsSheet from '@/components/comments/CommentsSheet';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { useReviewerStats } from '@/hooks/useReviewerStats';
@@ -782,9 +781,10 @@ export function FullscreenFeedOverlay() {
                     readOnly={readOnly}
                   />
 
-                  <FeedOverlayLayer
+                  <ImmersiveFullscreenChrome
                     posts={posts}
-                    activeIndexOverride={activeIndex}
+                    activeIndex={activeIndex}
+                    onClose={handleClose}
                     onLike={handleLike}
                     onComment={safeOpenComments}
                     onShare={handleShare}
@@ -795,22 +795,10 @@ export function FullscreenFeedOverlay() {
                     onFollow={(post) => handleFollowChange(post.userId, !getFollowState(post))}
                     onViewProfile={handleViewProfile}
                     onReviewTap={handleReviewTap}
-                    onBeforeNavigate={handleClose}
-                    overlayVisible={true}
                     isOwnPost={isOwnPost}
                     golfCourse={golfCourse}
-                    activeReview={activeReview}
-                    isActiveReview={isActiveReview}
-                    bottomOffset={0}
-                    topActionBar
-                    onClose={handleClose}
                     readOnly={readOnly}
-                  />
-
-
-                  <FullscreenCarouselOverlay
-                    activePost={activePost}
-                    activeIndex={activeIndex}
+                    onBeforeNavigate={handleClose}
                   />
                 </div>
 
