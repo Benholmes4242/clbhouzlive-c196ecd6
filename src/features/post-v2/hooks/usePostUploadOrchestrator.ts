@@ -22,7 +22,7 @@ import { usePendingPostsStore } from '@/uploads/pendingPostsStore';
 import { compressImage, COMPRESSION_PRESETS } from '@/uploads/imageCompression';
 import { uploadVideoWithTus } from '@/uploads/tusVideoUpload';
 import { uploadToCloudflareR2 } from '@/utils/cloudflareUpload';
-import { bakeFrameCrop } from '@/components/post-composer/bakeFrameCrop';
+import { bakeFrameCrop } from '../lib/bakeFrameCrop';
 import type { StageMediaItem } from './useStageComposer';
 
 export interface OrchestratorContext {

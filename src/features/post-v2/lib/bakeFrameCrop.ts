@@ -1,12 +1,13 @@
 // Bake a frame + reposition into a new image File.
-// frame: '4:5' | '1:1' (object-fit: cover @ object-position pos.x% pos.y%)
-// 'original' should NOT call this — submit the file untouched.
+// frame: '4:5' | '1:1' | '9:16' (object-fit: cover @ object-position pos.x% pos.y%)
+// 'original' should NOT call this - submit the file untouched.
 
-export type FrameId = 'original' | '4:5' | '1:1';
+export type FrameId = 'original' | '4:5' | '1:1' | '9:16';
 
 const FRAME_RATIO: Record<Exclude<FrameId, 'original'>, number> = {
   '4:5': 4 / 5,
   '1:1': 1,
+  '9:16': 9 / 16,
 };
 
 function loadImage(src: string): Promise<HTMLImageElement> {
@@ -22,7 +23,7 @@ function loadImage(src: string): Promise<HTMLImageElement> {
 export async function bakeFrameCrop(
   file: File,
   frame: Exclude<FrameId, 'original'>,
-  pos: { x: number; y: number }
+  pos: { x: number; y: number } = { x: 50, y: 50 }
 ): Promise<File> {
   const url = URL.createObjectURL(file);
   try {
@@ -32,17 +33,14 @@ export async function bakeFrameCrop(
     const srcRatio = iw / ih;
     const target = FRAME_RATIO[frame];
 
-    // cover-fit: crop rect inside source matching target ratio
     let cropW: number, cropH: number;
     if (srcRatio > target) {
-      // source wider → crop horizontally
       cropH = ih;
       cropW = cropH * target;
     } else {
       cropW = iw;
       cropH = cropW / target;
     }
-    // object-position: 50% means center; map pos.x 0..100 → sx 0..(iw-cropW)
     const sx = Math.max(0, Math.min(iw - cropW, ((pos.x ?? 50) / 100) * (iw - cropW)));
     const sy = Math.max(0, Math.min(ih - cropH, ((pos.y ?? 50) / 100) * (ih - cropH)));
 
@@ -71,7 +69,8 @@ export async function bakeFrameCrop(
       );
     });
     const baseName = file.name.replace(/\.[^.]+$/, '');
-    return new File([blob], `${baseName}-${frame.replace(':', 'x')}.${ext}`, {
+    const safeFrame = frame.replace(':', 'x');
+    return new File([blob], `${baseName}-${safeFrame}.${ext}`, {
       type: outType,
       lastModified: Date.now(),
     });
