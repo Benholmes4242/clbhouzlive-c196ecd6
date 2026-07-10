@@ -1,7 +1,10 @@
 // DraftsSheetV2 - list, restore, delete drafts on post_drafts.
+// Empty state + filled rows aligned to messaging-v2 polish.
 
+import { useState } from 'react';
 import BottomSheet from './BottomSheet';
-import { Trash2 } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
+import { relativeTime } from '@/utils/relativeTime';
 import type { DraftRow } from '../hooks/useDrafts';
 
 interface Props {
@@ -13,22 +16,88 @@ interface Props {
 }
 
 export default function DraftsSheetV2({ open, onClose, drafts, onRestore, onDelete }: Props) {
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+
   return (
-    <BottomSheet open={open} title={`Drafts - ${drafts.length}`} onClose={onClose} fullHeight>
-      {drafts.length === 0 && (
-        <div style={{ padding: 24, color: '#8A9099', fontSize: 13 }}>No drafts yet.</div>
-      )}
-      {drafts.map(d => (
-        <div key={d.id} style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '12px 16px', borderTop: '1px solid rgba(0,0,0,0.07)' }}>
-          <button onClick={() => { onRestore(d); onClose(); }} style={{ flex: 1, textAlign: 'left', background: 'transparent', border: 0, cursor: 'pointer' }}>
-            <div style={{ fontSize: 14, color: '#1F2428', fontWeight: 500 }}>{(d.content || '(empty)').slice(0, 80)}</div>
-            <div style={{ fontSize: 12, color: '#8A9099', marginTop: 2 }}>{d.actor_type} - {new Date(d.updated_at).toLocaleString()}</div>
-          </button>
-          <button onClick={() => onDelete(d.id)} aria-label="Delete draft" style={{ background: 'transparent', border: 0, color: '#8A9099', cursor: 'pointer', padding: 8 }}>
-            <Trash2 size={16} />
-          </button>
+    <BottomSheet open={open} title={drafts.length > 0 ? `Drafts - ${drafts.length}` : 'Drafts'} onClose={onClose} fullHeight>
+      {drafts.length === 0 ? (
+        <div style={{ padding: '32px 24px 40px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
+          <div style={{ width: 56, height: 56, borderRadius: 18, background: '#0F172A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Pencil size={22} color="#F8FAFC" />
+          </div>
+          <div style={{ fontSize: 16, fontWeight: 700, color: '#0F172A' }}>Nothing saved yet</div>
+          <div style={{ fontSize: 13, color: '#94A3B8', textAlign: 'center', maxWidth: 280, lineHeight: 1.45 }}>
+            Close a post mid-write and we'll offer to keep it here - ready when you are.
+          </div>
         </div>
-      ))}
+      ) : (
+        <>
+          {drafts.map(d => {
+            const isBusiness = d.actor_type === 'business';
+            return (
+              <div key={d.id} style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '12px 16px', borderTop: '1px solid rgba(15,23,42,0.06)' }}>
+                <div
+                  style={{
+                    width: 34,
+                    height: 34,
+                    borderRadius: 12,
+                    background: isBusiness ? '#F7931E' : '#0F172A',
+                    color: isBusiness ? '#15171F' : '#F8FAFC',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 13,
+                    fontWeight: 800,
+                    flex: '0 0 auto',
+                  }}
+                >
+                  {isBusiness ? 'B' : 'P'}
+                </div>
+                <button
+                  onClick={() => { onRestore(d); onClose(); }}
+                  style={{ flex: 1, textAlign: 'left', background: 'transparent', border: 0, cursor: 'pointer', minWidth: 0, padding: 0 }}
+                >
+                  <div style={{ fontSize: 14, color: '#0F172A', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {(d.content || '(no caption yet)').slice(0, 100)}
+                  </div>
+                  <div style={{ fontSize: 12, color: '#94A3B8', marginTop: 2 }}>
+                    {relativeTime(d.updated_at)}{isBusiness ? ' - as business' : ''}
+                    {d.course_name ? ` - ${d.course_name}` : ''}
+                  </div>
+                </button>
+                <button
+                  onClick={() => setConfirmId(d.id)}
+                  aria-label="Delete draft"
+                  style={{ background: 'transparent', border: 0, color: '#94A3B8', cursor: 'pointer', padding: 8 }}
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            );
+          })}
+          <div style={{ padding: '16px', fontSize: 12, color: '#94A3B8', textAlign: 'center' }}>
+            Drafts keep your words, tags and settings - media re-attaches on restore.
+          </div>
+        </>
+      )}
+
+      {confirmId && (
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(15,17,23,0.35)', display: 'flex', alignItems: 'flex-end', zIndex: 10 }}>
+          <div style={{ width: '100%', background: '#F8FAFC', padding: 16, borderTopLeftRadius: 18, borderTopRightRadius: 18, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ fontSize: 15, fontWeight: 700, color: '#0F172A' }}>Delete this draft?</div>
+            <div style={{ fontSize: 13, color: '#94A3B8' }}>This can't be undone.</div>
+            <div style={{ display: 'flex', gap: 8, marginTop: 6 }}>
+              <button onClick={() => setConfirmId(null)} style={{ flex: 1, background: '#fff', border: '1px solid rgba(15,23,42,0.12)', borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer', color: '#0F172A' }}>Cancel</button>
+              <button
+                onClick={() => { const id = confirmId; setConfirmId(null); onDelete(id!); }}
+                style={{ flex: 1, background: '#B00020', color: '#F8FAFC', border: 0, borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </BottomSheet>
   );
 }

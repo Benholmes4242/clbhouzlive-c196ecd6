@@ -5,7 +5,7 @@
 // Delegates: state -> useStageComposer, submit -> usePostSubmit,
 // drafts -> useDrafts, orchestration -> usePostUploadOrchestrator (via submit).
 
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { X } from 'lucide-react';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useActiveActor } from '@/context/ActiveActorContext';
@@ -119,6 +119,14 @@ export default function StageComposer({ onClose, onPosted }: Props) {
     );
   }
 
+  const stageAddInputRef = useRef<HTMLInputElement>(null);
+  const handleStageAdd = () => stageAddInputRef.current?.click();
+  const handleStageAddFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    if (files.length) addFiles(files);
+    e.target.value = '';
+  };
+
   return (
     <div style={{ position: 'fixed', inset: 0, background: '#F8FAFC', display: 'flex', flexDirection: 'column', zIndex: 12000 }}>
       {/* Header */}
@@ -126,12 +134,16 @@ export default function StageComposer({ onClose, onPosted }: Props) {
         <button onClick={handleClose} aria-label="Close" style={{ background: 'transparent', border: 0, color: '#1F2428', cursor: 'pointer', padding: 8 }}>
           <X size={22} />
         </button>
-        <button onClick={() => setSheet('drafts')} style={{ background: 'transparent', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 999, padding: '4px 10px', fontSize: 12, color: '#1F2428', cursor: 'pointer' }}>
-          Drafts - {drafts.drafts.length}
-        </button>
+        {drafts.drafts.length > 0 && (
+          <button onClick={() => setSheet('drafts')} style={{ background: 'transparent', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 999, padding: '4px 10px', fontSize: 12, color: '#1F2428', cursor: 'pointer' }}>
+            Drafts - {drafts.drafts.length}
+          </button>
+        )}
         <div style={{ flex: 1 }} />
         <button onClick={doSubmit} disabled={!canSubmit} style={postButtonStyle}>{postButtonLabel}</button>
       </div>
+
+      <input ref={stageAddInputRef} type="file" accept="image/*,video/*" multiple hidden onChange={handleStageAddFiles} />
 
       {/* Stage */}
       <div style={{ position: 'relative', flex: 1, minHeight: 240, display: 'flex' }}>
@@ -142,6 +154,7 @@ export default function StageComposer({ onClose, onPosted }: Props) {
           onOpenAdjust={() => toast('Adjust: crop/reposition (P3)')}
           onOpenTrim={() => setSheet('trim')}
           onOpenCover={() => setSheet('cover')}
+          onRequestAdd={handleStageAdd}
         />
         {active && (
           <FramePills value={active.frame} onChange={(f) => updateActive({ frame: f })} />
@@ -172,7 +185,7 @@ export default function StageComposer({ onClose, onPosted }: Props) {
       />
 
       {/* Sheets */}
-      <CourseTagSheet open={sheet === 'course'} onClose={() => setSheet(null)} onSelect={setCourse} current={state.course} />
+      <CourseTagSheet open={sheet === 'course'} onClose={() => setSheet(null)} onSelect={setCourse} current={state.course} userId={profile?.id ?? null} />
       <ActorSheet open={sheet === 'actor'} onClose={() => setSheet(null)} onSelect={(a) => setActiveActor(a)} selectedId={activeActor?.id ?? null} />
       <ScheduleSheetV2
         open={sheet === 'schedule'}
