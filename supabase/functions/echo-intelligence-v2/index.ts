@@ -305,12 +305,18 @@ async function callClaudeSync(
       "anthropic-version": "2023-06-01",
     },
     body: JSON.stringify({
+      // Claude Sonnet 5: no temperature/top_p/top_k.
       model: ANTHROPIC_MODEL_SYNTH,
       max_tokens: 1024,
       system: systemPrompt,
       messages: messages.map(m => ({ role: m.role, content: m.content })),
     }),
   }), 20000);
+  if (!r.ok) {
+    const body = await r.text().catch(() => "");
+    console.error(`[echo-v2] Claude sync ${r.status}:`, body);
+    throw new Error(`Claude API error: ${r.status}`);
+  }
   const d = await r.json();
   return d?.content?.[0]?.text || "";
 }
@@ -326,15 +332,21 @@ async function callOpenAISynth(
       "Authorization": `Bearer ${OPENAI_API_KEY}`,
     },
     body: JSON.stringify({
+      // GPT-5.5: chat completions rejects legacy `max_tokens` — use
+      // `max_completion_tokens`. No temperature (defaults only).
       model: OPENAI_MODEL_SYNTH,
-      max_tokens: 1024,
+      max_completion_tokens: 1024,
       messages: [
         { role: "system", content: systemPrompt },
         ...messages.map(m => ({ role: m.role, content: m.content })),
       ],
     }),
   }), 20000);
-  if (!r.ok) throw new Error(`OpenAI error: ${r.status}`);
+  if (!r.ok) {
+    const body = await r.text().catch(() => "");
+    console.error(`[echo-v2] OpenAI ${r.status}:`, body);
+    throw new Error(`OpenAI error: ${r.status}`);
+  }
   const d = await r.json();
   return d?.choices?.[0]?.message?.content || "";
 }
@@ -353,13 +365,19 @@ async function callGemini(
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        // Gemini 3.5 Flash: minimal body. Legacy 1.5-era safety /
+        // generationConfig fields (temperature, maxOutputTokens knobs)
+        // dropped — new gen rejects several of them. Defaults are fine.
         system_instruction: { parts: [{ text: systemPrompt }] },
         contents,
-        generationConfig: { maxOutputTokens: 1024, temperature: 0.7 },
       }),
     },
   ), 20000);
-  if (!r.ok) throw new Error(`Gemini error: ${r.status}`);
+  if (!r.ok) {
+    const body = await r.text().catch(() => "");
+    console.error(`[echo-v2] Gemini ${r.status}:`, body);
+    throw new Error(`Gemini error: ${r.status}`);
+  }
   const d = await r.json();
   return d?.candidates?.[0]?.content?.parts?.[0]?.text || "";
 }
@@ -382,6 +400,11 @@ async function callPerplexitySync(
       max_tokens: 512,
     }),
   }), 20000);
+  if (!r.ok) {
+    const body = await r.text().catch(() => "");
+    console.error(`[echo-v2] Perplexity sync ${r.status}:`, body);
+    throw new Error(`Perplexity error: ${r.status}`);
+  }
   const d = await r.json();
   return (d?.choices?.[0]?.message?.content || "").replace(/\[\d+\]/g, "");
 }
