@@ -22,6 +22,7 @@ const WaitlistPage = lazy(() => import('./pages/WaitlistPage'));
 const SupportPage = lazy(() => import('./pages/SupportPage'));
 const VerificationsPage = lazy(() => import('./pages/VerificationsPage'));
 const VideoPerfPage = lazy(() => import('./pages/VideoPerfPage'));
+const EchoHealthPage = lazy(() => import('./pages/EchoHealthPage'));
 
 const SECTION_TITLES: Record<string, string> = {
   dashboard:  'Dashboard',
@@ -36,6 +37,7 @@ const SECTION_TITLES: Record<string, string> = {
   support:    'Support',
   verifications: 'Verifications',
   'video-perf': 'Video Perf',
+  'echo-health': 'Echo Health',
 };
 
 export default function AdminShell() {
@@ -122,6 +124,7 @@ export default function AdminShell() {
                 <Route path="support/*"   element={can.viewModeration ? <SupportPage /> : <AdminAccessDenied />} />
                 <Route path="verifications/*" element={can.viewUsers ? <VerificationsPage /> : <AdminAccessDenied />} />
                 <Route path="video-perf/*" element={<VideoPerfPage />} />
+                <Route path="echo-health/*" element={can.manageAdmins ? <EchoHealthPage /> : <AdminAccessDenied />} />
                 <Route path="*" element={<Navigate to={role === 'moderator' ? 'moderation' : 'dashboard'} replace />} />
               </Routes>
             </Suspense>
