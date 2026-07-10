@@ -318,6 +318,10 @@ const EchoV2Redirect: React.FC = () => {
   const { chatId } = useParams<{ chatId: string }>();
   return <Navigate to={chatId ? `/echo/${chatId}` : '/echo'} replace />;
 };
+const RateCourseV2Redirect: React.FC = () => {
+  const { courseId } = useParams<{ courseId: string }>();
+  return <Navigate to={courseId ? `/courses/${courseId}/rate` : '/'} replace />;
+};
 const SeasonShop = lazy(() => import("./pages/SeasonShop"));
 const ChallengesPage = lazy(() => import("./pages/ChallengesPage"));
 
