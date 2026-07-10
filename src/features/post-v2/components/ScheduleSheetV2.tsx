@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { toast } from 'sonner';
 import BottomSheet from './BottomSheet';
+import { formatScheduleDay, formatScheduleTime } from '../lib/formatSchedule';
 
 interface Props {
   open: boolean;
