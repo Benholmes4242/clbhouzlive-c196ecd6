@@ -20,6 +20,8 @@ import { createTapHandler } from './mediaTap';
 import { isPerfEnabled } from '@/perf/navTiming';
 import { VideoEngine } from '@/video/VideoEngine';
 import { feedLaneRoles } from '@/video/feedLaneRoles';
+import { PrefetchController } from '@/video/PrefetchController';
+
 
 interface Props {
   items: MediaItem[];
@@ -159,6 +161,16 @@ export const MediaCarousel: React.FC<Props> = ({
         ownerKey: ownerKeyOf(to),
         mediaType: toMediaType,
         isCardActive,
+        prefetched: PrefetchController.wasPrefetched(ownerKeyOf(to)),
+        warm: (() => {
+          try {
+            const laneId = feedLaneRoles.laneForRole('active');
+            const bound = VideoEngine.snapshot(laneId).postId;
+            return bound === ownerKeyOf(to);
+          } catch {
+            return false;
+          }
+        })(),
       });
       // Mismatch guard: on the MEDIA axis, if the active feed lane is bound
       // to a different ownerKey/postId than the slide we just activated, we
@@ -198,6 +210,35 @@ export const MediaCarousel: React.FC<Props> = ({
     prevActiveRef.current = to;
   }, [active, isCardActive, items, postId, ownerKeyOf]);
 
+  // ────────────────────────────────────────────────────────────────────
+  // Adjacent-slide warming (media axis).
+  // For the active slide `i`, cache-warm i±1 VIDEO slides via
+  // PrefetchController. Distinct per-slide keys (${postId}:${j}) — same
+  // convention InlineVideo binds under, so the browser HTTP cache is
+  // primed for the exact hlsUrl hls.js will fetch on activation.
+  //
+  // Budget: only i±1 (max 2 warm requests on the horizontal axis) on top
+  // of the active slide — total ≤ 3, within the 3-lane pool (feed
+  // active/next/prev). PrefetchController itself caps in-flight at 2 and
+  // skips when any lane is buffering, so cannot stall the active video.
+  // Adjacent-slide MOUNT/warm inside InlineVideo (isNear/earlyMotion)
+  // is handled below on the render pass — this effect covers the pure
+  // HTTP-cache priming that mirrors the vertical feed's next-card warm.
+  // ────────────────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!isCardActive) return;
+    const neighbours = [active - 1, active + 1];
+    for (const j of neighbours) {
+      if (j < 0 || j >= items.length) continue;
+      const it = items[j];
+      if (!it || it.type !== 'video') continue;
+      const hlsUrl = (it as any).hlsUrl || '';
+      if (!hlsUrl || typeof hlsUrl !== 'string' || hlsUrl.startsWith('blob:')) continue;
+      PrefetchController.request(ownerKeyOf(j), hlsUrl);
+    }
+  }, [active, isCardActive, items, ownerKeyOf]);
+
+
 
 
   return (
@@ -229,6 +270,13 @@ export const MediaCarousel: React.FC<Props> = ({
           const url = m.imageUrl || m.thumbnailUrl || '';
           const isVideo = m.type === 'video';
           const isActiveSlide = isCardActive && i === active;
+          // Adjacent-slide keep-warm: the i±1 slide of the active card mounts
+          // its lane paused-but-ready via earlyMotion (role='next'). Bounded
+          // to ≤2 warm neighbours per active card — total lanes for a multi-
+          // video carousel: i-1 + i + i+1 = 3, matching the feed's 3-lane
+          // pool (active/next/prev). Only when the CARD is active.
+          const isAdjacentSlide =
+            isCardActive && !isActiveSlide && Math.abs(i - active) === 1;
           const slideOwnerKey = postId
             ? `${postId}:${i}`
             : `${m.id ?? 'noid'}:${i}`;
@@ -273,9 +321,10 @@ export const MediaCarousel: React.FC<Props> = ({
                   <InlineVideo
                     item={m}
                     isActive={isActiveSlide}
-                    isNear={mountVideo}
+                    isNear={isActiveSlide || isAdjacentSlide}
+                    earlyMotion={isAdjacentSlide}
                     postId={postId ?? null}
-                    ownerKey={postId ? `${postId}:${i}` : `${m.id ?? 'noid'}:${i}`}
+                    ownerKey={slideOwnerKey}
                     objectFit="cover"
                   />
                 ) : m.thumbnailUrl ? (
