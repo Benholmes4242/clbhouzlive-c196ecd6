@@ -125,13 +125,17 @@ export function vperfSetPage(page: string): void {
 }
 export function vperfGetPage(): string { return __currentPage; }
 
-function on(): boolean {
-  try {
-    return isPerfEnabled();
-  } catch {
-    return false;
-  }
+// PHASE-2 GATE SPLIT.
+//   recordOn() — always true; drives every counter/rollup path so real
+//     devices silently accumulate aggregate stats for the telemetry shipper.
+//   consoleOn() — mirrors isPerfEnabled(); guards every console.info /
+//     scorecard emission so pill/console behaviour stays byte-identical.
+// Old `on()` is kept (=recordOn) so the ~25 existing call sites don't churn.
+function on(): boolean { return true; }
+function consoleOn(): boolean {
+  try { return isPerfEnabled(); } catch { return false; }
 }
+
 
 function budgetFor(kind: string, metaBudget: number | undefined): number {
   if (typeof metaBudget === 'number' && isFinite(metaBudget) && metaBudget > 0) {
