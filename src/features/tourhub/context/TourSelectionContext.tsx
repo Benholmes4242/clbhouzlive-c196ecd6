@@ -7,11 +7,12 @@
  *  1. COMMAND (switcher → hero):  selectTour(slug) bumps selectionNonce; the
  *     hero's jump effect keys ONLY on selectionNonce and moves its index.
  *
- *  2. DISPLAY (hero → switcher):  setViewingTourSlug(slug) reports whichever
- *     tour the hero is currently showing (random landing, swipe, dots, or a
- *     tap-jump). The switcher reads viewingTourSlug for its LABEL/highlight
- *     ONLY. The hero must NEVER read viewingTourSlug back into its index — that
- *     would close the loop. It is display-only, a dead end.
+ *  2. DISPLAY (hero → switcher + downstream):  setViewingTourSlug /
+ *     setViewingTournamentId report whichever tour + tournament the hero is
+ *     currently showing. The switcher reads viewingTourSlug for its LABEL
+ *     only; Tournament Intelligence reads viewingTournamentId so its picks
+ *     always match the hero. The hero must NEVER read these back into its
+ *     own index — display-only, dead end.
  */
 
 import React, { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
@@ -22,6 +23,8 @@ interface TourSelectionValue {
   selectTour: (slug: string) => void;
   viewingTourSlug: string | null;
   setViewingTourSlug: (slug: string) => void;
+  viewingTournamentId: string | null;
+  setViewingTournamentId: (id: string | null) => void;
 }
 
 const TourSelectionContext = createContext<TourSelectionValue | null>(null);
@@ -30,6 +33,7 @@ export function TourSelectionProvider({ children }: { children: ReactNode }) {
   const [selectedTourSlug, setSelectedTourSlug] = useState<string | null>(null);
   const [selectionNonce, setSelectionNonce] = useState(0);
   const [viewingTourSlug, setViewingTourSlugState] = useState<string | null>(null);
+  const [viewingTournamentId, setViewingTournamentIdState] = useState<string | null>(null);
 
   const selectTour = useCallback((slug: string) => {
     setSelectedTourSlug(slug);
@@ -40,9 +44,21 @@ export function TourSelectionProvider({ children }: { children: ReactNode }) {
     setViewingTourSlugState((prev) => (prev === slug ? prev : slug));
   }, []);
 
+  const setViewingTournamentId = useCallback((id: string | null) => {
+    setViewingTournamentIdState((prev) => (prev === id ? prev : id));
+  }, []);
+
   return (
     <TourSelectionContext.Provider
-      value={{ selectedTourSlug, selectionNonce, selectTour, viewingTourSlug, setViewingTourSlug }}
+      value={{
+        selectedTourSlug,
+        selectionNonce,
+        selectTour,
+        viewingTourSlug,
+        setViewingTourSlug,
+        viewingTournamentId,
+        setViewingTournamentId,
+      }}
     >
       {children}
     </TourSelectionContext.Provider>
@@ -58,6 +74,8 @@ export function useTourSelection(): TourSelectionValue {
       selectTour: () => {},
       viewingTourSlug: null,
       setViewingTourSlug: () => {},
+      viewingTournamentId: null,
+      setViewingTournamentId: () => {},
     };
   }
   return ctx;
