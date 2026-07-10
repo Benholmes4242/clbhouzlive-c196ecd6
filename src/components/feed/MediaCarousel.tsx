@@ -217,11 +217,17 @@ export const MediaCarousel: React.FC<Props> = ({
     // lanes' bindings, each slide's role/lane/readiness, and warm outcomes.
     if (isCardActive && isPerfEnabled()) {
       const FEED_LANES: LaneId[] = ['feed-active', 'feed-next', 'feed-prev'];
+      // [FIX C] Normalise ownerKey equivalence so `X` ↔ `X:0` match, and a
+      // slide index `X:k` compares strictly. Mirrors VideoEngine's
+      // normalizeOwnerKey (bare↔:0 only; distinct :k stays distinct).
+      const norm = (k: string | null | undefined): string | null =>
+        k == null ? null : (k.includes(':') ? k : `${k}:0`);
       const findLaneForOwner = (owner: string) => {
+        const target = norm(owner);
         for (const lid of FEED_LANES) {
           try {
             const s = VideoEngine.snapshot(lid);
-            if (s.postId === owner) return { laneId: lid, snap: s };
+            if (norm(s.postId) === target) return { laneId: lid, snap: s };
           } catch { /* engine not booted */ }
         }
         return null;
@@ -313,6 +319,31 @@ export const MediaCarousel: React.FC<Props> = ({
     const isAnyLaneLoading = (() => {
       try { return VideoEngine.isAnyLaneLoading(); } catch { return false; }
     })();
+
+    // [FIX A] active-health sample BEFORE any neighbour warm — proves the
+    // active slide's feed-active lane is untouched by neighbour preloads.
+    const activeLaneId = (() => {
+      try { return feedLaneRoles.laneForRole('active'); } catch { return null as LaneId | null; }
+    })();
+    const activeOwnerNow = ownerKeyOf(active);
+    const sampleActive = (when: 'warm:before' | 'warm:after') => {
+      if (!perf) return;
+      try {
+        const s = activeLaneId ? VideoEngine.snapshot(activeLaneId) : null;
+        // eslint-disable-next-line no-console
+        console.info('[CAROUSEL2] active.health', {
+          when,
+          ownerKey: activeOwnerNow,
+          laneId: activeLaneId,
+          lanePostId: s?.postId ?? null,
+          firstFrame: s?.firstFrame ?? false,
+          playing: s?.state === 'playing',
+          readyState: s?.readyState ?? 0,
+        });
+      } catch { /* engine not booted */ }
+    };
+    sampleActive('warm:before');
+
     const neighbours = [active - 1, active + 1];
     for (const j of neighbours) {
       if (j < 0 || j >= items.length) continue;
@@ -368,7 +399,40 @@ export const MediaCarousel: React.FC<Props> = ({
         });
       }
       PrefetchController.request(owner, hlsUrl);
+
+      // [FIX A] Engine-lane warm: preload the neighbour slide onto the
+      // physical lane that currently holds the next/prev ROLE. NEVER touch
+      // feed-active (the active slide owns it). If the resolved lane
+      // happens to be the same physical lane as active (shouldn't for feed
+      // roles, but defensive) we skip. Idempotent under engine's
+      // alreadyLoaded guard.
+      try {
+        const role: 'next' | 'prev' = j > active ? 'next' : 'prev';
+        const laneId = feedLaneRoles.laneForRole(role);
+        if (laneId && laneId !== activeLaneId) {
+          VideoEngine.preload(laneId, {
+            hlsUrl,
+            posterUrl: (it as any).thumbnailUrl ?? null,
+            postId: owner,
+          });
+          if (perf) {
+            // eslint-disable-next-line no-console
+            console.info('[CAROUSEL2] warm.attempt', {
+              ownerKey: owner, method: 'engine-preload',
+              role, laneId, outcome: 'issued',
+            });
+          }
+        } else if (perf) {
+          // eslint-disable-next-line no-console
+          console.info('[CAROUSEL2] warm.attempt', {
+            ownerKey: owner, method: 'engine-preload',
+            role, laneId, outcome: 'skipped:lane-collides-active',
+          });
+        }
+      } catch { /* engine not booted */ }
     }
+
+    sampleActive('warm:after');
   }, [active, isCardActive, items, ownerKeyOf]);
 
 

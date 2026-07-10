@@ -292,33 +292,47 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
     };
   }, [activeIdx, posts]);
 
+  // Hoisted early (before neighbour-warm effect) so warm can read the
+  // persisted carousel positions to warm the neighbour's LANDING slide,
+  // not always :0. Duplicate selectors below removed.
+  const carouselPositionsByTab = useClubhouseStore((s) => s.carouselPositionsByTab);
+  const globalCarouselPositions = useClubhouseStore((s) => s.carouselPositions);
+  const carouselPositions = tab ? (carouselPositionsByTab[tab] ?? globalCarouselPositions) : globalCarouselPositions;
+
   // Warm the neighbour cards' HLS symmetrically via role lookup: the RECYCLED
   // lane in each direction is whichever physical lane currently holds the
   // 'next' / 'prev' role. Warming is idempotent (alreadyLoaded skip in the
   // engine); a two-lane degraded window (one lane frozen by a borrow) simply
   // warms into the ex-active — safe by construction.
   useEffect(() => {
-    const warm = (role: 'next' | 'prev', post: FeedPost | undefined) => {
-      const m = post?.mediaItems?.[0];
-      if (!post || !m || m.type !== 'video' || !(m as any).hlsUrl) return;
+    const warm = (role: 'next' | 'prev', post: FeedPost | undefined, neighbourIdx: number) => {
+      if (!post) return;
+      const media = (post as any)?.mediaItems as any[] | undefined;
+      if (!Array.isArray(media) || media.length === 0) return;
+      // [FIX B] For carousel neighbours, warm the slide the user will land
+      // on (its persisted carousel position), not always :0. Falls back to
+      // slide 0 for single-media posts / no stored position.
+      const landingSlide = media.length > 1
+        ? Math.max(0, Math.min((carouselPositions.get(neighbourIdx) ?? 0), media.length - 1))
+        : 0;
+      const m = media[landingSlide];
+      if (!m || m.type !== 'video' || !m.hlsUrl) return;
       try {
         const laneId = feedLaneRoles.laneForRole(role);
-        // Canonical owner key: primary media of a feed post is `${postId}:0`
-        // — matches what InlineVideo's `resolvedOwnerKey` stamps on load/play.
-        // Passing bare `post.id` here causes VideoEngine.alreadyLoaded to
-        // MISS on promotion (`abc` vs `abc:0`), forcing a reload → poster
-        // flash → stale-resume. Normalise at the write site.
-        const ownerKey = `${post.id}:0`;
+        // Canonical owner key: `${postId}:${slideIndex}` — matches what
+        // InlineVideo's `resolvedOwnerKey` stamps on load/play so the
+        // engine's alreadyLoaded guard hits on promotion (no reload flash).
+        const ownerKey = `${post.id}:${landingSlide}`;
         VideoEngine.preload(laneId, {
-          hlsUrl: (m as any).hlsUrl,
-          posterUrl: (m as any).thumbnailUrl ?? null,
+          hlsUrl: m.hlsUrl,
+          posterUrl: m.thumbnailUrl ?? null,
           postId: ownerKey,
         });
       } catch { /* engine may not be booted yet — safe to ignore */ }
     };
-    warm('next', posts[playingIdx + 1]);
-    warm('prev', posts[playingIdx - 1]);
-  }, [playingIdx, posts]);
+    warm('next', posts[playingIdx + 1], playingIdx + 1);
+    warm('prev', posts[playingIdx - 1], playingIdx - 1);
+  }, [playingIdx, posts, carouselPositions]);
 
 
 
@@ -511,9 +525,8 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
 
   const setActiveIndex = useClubhouseStore((s) => s.setActiveIndex);
   const setCarouselPosition = useClubhouseStore((s) => s.setCarouselPosition);
-  const carouselPositionsByTab = useClubhouseStore((s) => s.carouselPositionsByTab);
-  const globalCarouselPositions = useClubhouseStore((s) => s.carouselPositions);
-  const carouselPositions = tab ? (carouselPositionsByTab[tab] ?? globalCarouselPositions) : globalCarouselPositions;
+  // carouselPositions selectors are hoisted earlier in the component so
+  // the neighbour-warm effect can read them; do not redeclare here.
   const openFullscreen = useFullscreenFeedStore((s) => s.open);
   // NOTE: fsOpen / borrow.ownerKey are intentionally NOT read at this level.
   // They are consumed inside `FeedItemGate` so viewer-open doesn't change
