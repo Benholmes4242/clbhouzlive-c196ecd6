@@ -355,7 +355,7 @@ export function FullscreenFeedOverlay() {
   const { commentsOpen, overlayVisible, openComments, closeComments, getCommentCount } = useClubhouseComments();
   const safeOpenComments = useCallback(() => { if (!readOnly) openComments(); }, [readOnly, openComments]);
   const { handleShare } = useClubhouseShare(userId);
-  const { activePost, golfCourse, activeReview, isActiveReview } = useActivePostDerived(posts, activeIndex);
+  const { activePost, golfCourse } = useActivePostDerived(posts, activeIndex);
   const manageableBusinessIds = useManageableBusinessIds(userId);
   const isOwnPost = canManagePost(
     activePost
