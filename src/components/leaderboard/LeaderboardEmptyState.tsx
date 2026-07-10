@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Users, TrendingUp, MapPin, Star, Filter, Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useInviteSheet } from '@/hooks/useInviteSheet';
 
 type EmptyStateType = 
   | 'friends-no-friends'
