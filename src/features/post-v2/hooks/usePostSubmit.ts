@@ -1,12 +1,10 @@
-// usePostSubmit - orchestrates the create_post_v2 / finalize_post_v2 pair.
+// usePostSubmit - orchestrates create_post_v2 and hands media uploads to
+// the module-level postUploadController, which OUTLIVES the composer.
 //
 // Text-only:  one create_post_v2(has_media:false) round trip and we're done.
-// With media: create_post_v2(has_media:true) -> orchestrator uploads +
-//             finalize_post_v2 -> success.
-//
-// Optimistic feed card: we push a PendingPost into the store BEFORE
-// create_post_v2 returns (jobId scoped), then attachPostId once the RPC
-// returns. Selectors dedupe against the real row that lands on finalize.
+// With media: create_post_v2(has_media:true) -> addPending/attachPostId ->
+//             startPostUpload(...) fires and returns synchronously so the
+//             composer can dismiss instantly. Controller finalizes later.
 
 import { useCallback, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
@@ -14,7 +12,7 @@ import { uploadEventBus } from '@/uploads/uploadEventBus';
 import { usePendingPostsStore, type PendingPost } from '@/uploads/pendingPostsStore';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useProfileData } from '@/hooks/useProfileData';
-import { usePostUploadOrchestrator } from './usePostUploadOrchestrator';
+import { startPostUpload } from '../lib/postUploadController';
 import type { StageMediaItem, StageCourse } from './useStageComposer';
 
 export interface SubmitInput {
@@ -29,18 +27,21 @@ export interface SubmitInput {
   authorUsername: string | null;
 }
 
-export type SubmitResultKind = 'published' | 'scheduled';
+export type SubmitResultKind = 'published' | 'scheduled' | 'uploading';
 
 export interface SubmitResult {
   kind: SubmitResultKind;
   postId: string;
   scheduledAt?: string;
+  /** True when the client returned early and the controller is still uploading. */
+  isUploading?: boolean;
+  /** True when the post is scheduled (independent of upload state). */
+  isScheduled?: boolean;
 }
 
 export function usePostSubmit() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const orchestrator = usePostUploadOrchestrator();
   const { activeActor } = useActiveActor();
   const { profile } = useProfileData();
 
@@ -109,30 +110,31 @@ export function usePostSubmit() {
           kind: input.scheduledAt ? 'scheduled' : 'published',
           postId,
           scheduledAt: bornObj.scheduled_at,
+          isScheduled: !!input.scheduledAt,
         };
       }
 
-      // Media path: orchestrate uploads then finalize.
-      const finalized = (await orchestrator(
-        { jobId, postId, userId, actorType: input.actorType, actorId: input.actorId },
+      // Media path: hand off to the module-level controller and return
+      // immediately. The controller finalizes on completion.
+      startPostUpload(
+        {
+          jobId,
+          postId,
+          userId,
+          actorType: input.actorType,
+          actorId: input.actorId,
+          isScheduled: !!input.scheduledAt,
+          scheduledAt: input.scheduledAt?.toISOString(),
+        },
         input.media,
-      )) as { status?: string; scheduled_at?: string } | null;
-
-      uploadEventBus.emit('upload:complete', {
-        type: 'upload:complete',
-        jobId,
-        uploadType: 'post',
-        postId,
-        actorType: input.actorType,
-        actorId: input.actorId,
-        isScheduled: !!input.scheduledAt,
-        scheduledAt: input.scheduledAt?.toISOString(),
-      });
+      );
 
       return {
-        kind: input.scheduledAt ? 'scheduled' : 'published',
+        kind: 'uploading',
         postId,
-        scheduledAt: finalized?.scheduled_at,
+        scheduledAt: input.scheduledAt?.toISOString(),
+        isUploading: true,
+        isScheduled: !!input.scheduledAt,
       };
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Submit failed';
@@ -141,7 +143,7 @@ export function usePostSubmit() {
     } finally {
       setSubmitting(false);
     }
-  }, [orchestrator, profile?.id, activeActor?.id, activeActor?.type]);
+  }, [profile?.id, activeActor?.id, activeActor?.type]);
 
   return { submit, submitting, error };
 }
