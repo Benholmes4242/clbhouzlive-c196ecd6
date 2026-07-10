@@ -22,10 +22,11 @@ interface RecentRow extends StageCourse {
   isHomeClub?: boolean;
 }
 
-export default function CourseTagSheet({ open, onClose, onSelect, current, userId }: Props) {
+export default function CourseTagSheet({ open, onClose, onSelect, current, userId, title = 'Tag a course' }: Props) {
   const [q, setQ] = useState('');
   const [rows, setRows] = useState<RecentRow[]>([]);
   const { rows: recents } = useRecentCourses(open, userId ?? null);
+  const keyboardHeight = useKeyboardHeight();
 
   useEffect(() => {
     if (!open) return;
