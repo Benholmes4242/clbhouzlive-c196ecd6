@@ -1,0 +1,155 @@
+// useStageComposer - central state for the Stage composer.
+//
+// One reducer-esque state object; each surface (media stage, tray, caption,
+// detail rows, sheets) reads/writes through this hook. Kept intentionally
+// small - no orchestration or DB writes live here (see usePostSubmit +
+// usePostUploadOrchestrator for those).
+
+import { useCallback, useEffect, useState } from 'react';
+
+export type FrameId = 'original' | '4:5' | '1:1' | '9:16';
+
+export interface StageMediaItem {
+  id: string;
+  file: File;
+  type: 'image' | 'video';
+  previewUrl: string;
+  naturalWidth?: number;
+  naturalHeight?: number;
+  duration?: number;
+  // Edits held on the client until upload:
+  frame: FrameId;
+  crop?: { x: number; y: number; scale: number } | null;
+  trimStart?: number | null;
+  trimEnd?: number | null;
+  posterTimestamp?: number | null;
+}
+
+export interface StageCourse {
+  id: string;
+  name: string;
+  country?: string | null;
+}
+
+export const MAX_MEDIA = 10;
+
+export interface StageState {
+  media: StageMediaItem[];
+  activeIndex: number;
+  caption: string;
+  course: StageCourse | null;
+  scheduledAt: Date | null;
+  dirty: boolean;
+}
+
+const emptyState: StageState = {
+  media: [],
+  activeIndex: 0,
+  caption: '',
+  course: null,
+  scheduledAt: null,
+  dirty: false,
+};
+
+export function useStageComposer() {
+  const [state, setState] = useState<StageState>(emptyState);
+
+  // revoke blob URLs when unmounting so we don't leak
+  useEffect(() => {
+    return () => {
+      for (const m of state.media) {
+        if (m.previewUrl.startsWith('blob:')) {
+          try { URL.revokeObjectURL(m.previewUrl); } catch { /* ignore */ }
+        }
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const markDirty = (patch: Partial<StageState>) =>
+    setState(s => ({ ...s, ...patch, dirty: true }));
+
+  const addFiles = useCallback((files: File[]) => {
+    setState(s => {
+      const remaining = MAX_MEDIA - s.media.length;
+      const accepted = files.slice(0, Math.max(0, remaining));
+      const newItems: StageMediaItem[] = accepted.map(file => {
+        const isVideo = file.type.startsWith('video/');
+        return {
+          id: crypto.randomUUID(),
+          file,
+          type: isVideo ? 'video' : 'image',
+          previewUrl: URL.createObjectURL(file),
+          frame: 'original',
+          crop: null,
+          trimStart: null,
+          trimEnd: null,
+          posterTimestamp: null,
+        };
+      });
+      return {
+        ...s,
+        media: [...s.media, ...newItems],
+        activeIndex: s.media.length === 0 ? 0 : s.activeIndex,
+        dirty: true,
+      };
+    });
+  }, []);
+
+  const removeAt = useCallback((idx: number) => {
+    setState(s => {
+      const removed = s.media[idx];
+      if (removed?.previewUrl.startsWith('blob:')) {
+        try { URL.revokeObjectURL(removed.previewUrl); } catch { /* ignore */ }
+      }
+      const media = s.media.filter((_, i) => i !== idx);
+      const activeIndex = Math.max(0, Math.min(s.activeIndex, media.length - 1));
+      return { ...s, media, activeIndex, dirty: true };
+    });
+  }, []);
+
+  const reorder = useCallback((from: number, to: number) => {
+    setState(s => {
+      if (from === to) return s;
+      const media = [...s.media];
+      const [item] = media.splice(from, 1);
+      media.splice(to, 0, item);
+      return { ...s, media, activeIndex: to, dirty: true };
+    });
+  }, []);
+
+  const setActiveIndex = useCallback((i: number) => {
+    setState(s => ({ ...s, activeIndex: i }));
+  }, []);
+
+  const updateActive = useCallback((patch: Partial<StageMediaItem>) => {
+    setState(s => {
+      const media = s.media.map((m, i) => (i === s.activeIndex ? { ...m, ...patch } : m));
+      return { ...s, media, dirty: true };
+    });
+  }, []);
+
+  const setCaption = useCallback((v: string) => markDirty({ caption: v }), []);
+  const setCourse = useCallback((c: StageCourse | null) => markDirty({ course: c }), []);
+  const setScheduledAt = useCallback((d: Date | null) => markDirty({ scheduledAt: d }), []);
+
+  const restoreDraft = useCallback((patch: Partial<StageState>) => {
+    setState(s => ({ ...s, ...patch, dirty: false }));
+  }, []);
+
+  const reset = useCallback(() => setState(emptyState), []);
+
+  return {
+    state,
+    addFiles,
+    removeAt,
+    reorder,
+    setActiveIndex,
+    updateActive,
+    setCaption,
+    setCourse,
+    setScheduledAt,
+    restoreDraft,
+    reset,
+  };
+}
