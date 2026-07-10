@@ -165,7 +165,6 @@ export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
             {pillLabel}
             <ArrowLeftRight size={11} strokeWidth={2.2} color={isMajorActive ? GOLD_DEEP : '#0A0E14'} aria-hidden />
           </span>
-          </span>
         </button>
       )}
 
