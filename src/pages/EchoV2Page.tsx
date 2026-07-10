@@ -11,7 +11,6 @@ import { useEchoChatMessages } from '@/features/echo-v2/hooks/useEchoChatMessage
 import { useEchoStream } from '@/features/echo-v2/hooks/useEchoStream';
 
 const CANVAS = '#F8FAFC';
-const BOTTOM_NAV_CLEAR = 94;
 
 const EchoV2Page: React.FC = () => {
   const { chatId } = useParams<{ chatId?: string }>();
