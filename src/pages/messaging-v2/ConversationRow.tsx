@@ -235,6 +235,7 @@ export const ConversationRow: React.FC<Props> = ({ conversation }) => {
           userId={identity.userId}
           alt={identity.name}
           size={52}
+          hairlineRing
         />
         <div className="flex-1 min-w-0 flex items-center gap-3">
           <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
