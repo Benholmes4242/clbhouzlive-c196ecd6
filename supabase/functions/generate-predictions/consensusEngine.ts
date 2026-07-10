@@ -1,15 +1,25 @@
 /**
- * Priority 1: Multi-Model Consensus Prediction Engine
- * (Adapted to available Sportradar stats)
- * 
- * Calls Claude, GPT-4, and Gemini independently with the same data,
- * then aggregates their picks using weighted Borda count scoring.
- * 
- * Gracefully degrades: if only Claude's API key is available, falls back
- * to single-model with all other improvements (course DNA, calculated fit, etc.)
+ * TI-1 Multi-Model Consensus Prediction Engine
+ *
+ * Model pins imported from ../_shared/echo-models.ts (single source of truth).
+ * Request shapes and parsers aligned to the echo-v2 standard:
+ *   - Claude Sonnet 5: no sampling params; concat all content[] blocks where type==="text".
+ *   - OpenAI GPT-5.5: max_completion_tokens + reasoning_effort:"none"; no legacy max_tokens.
+ *   - Gemini 3.5 Flash: minimal body; concatenate every non-thought text part.
+ * Never-silent guarantees:
+ *   - Every model call logs "[ti] <model> ok in Xms, N picks" on success.
+ *   - On failure logs the VERBATIM error body.
+ *   - Empty on 2xx throws with a shape snippet.
+ *   - modelResults[].error records the failure reason string (not just success:false).
  */
 
-// ── Types ──────────────────────────────────────────────────────────────────────
+import {
+  ANTHROPIC_MODEL_SYNTH,
+  OPENAI_MODEL_SYNTH,
+  GEMINI_MODEL,
+} from '../_shared/echo-models.ts';
+
+// -- Types ----------------------------------------------------------------
 
 export interface ModelPick {
   playerId: string;
@@ -46,7 +56,7 @@ export interface ConsensusPick {
   rank: number;
   consensusScore: number;
   winProbability: number;
-  courseFitScore: number | null;       // null when no DNA + no AI-returned fit
+  courseFitScore: number | null;
   reasons: string[];
   modelVotes: ModelVote[];
   isDarkHorse: boolean;
@@ -58,7 +68,7 @@ interface ModelVote {
   winProbability: number;
 }
 
-// ── Model Weights ──────────────────────────────────────────────────────────────
+// -- Weights --------------------------------------------------------------
 
 const DEFAULT_MODEL_WEIGHTS: Record<string, number> = {
   claude: 0.40,
@@ -66,7 +76,17 @@ const DEFAULT_MODEL_WEIGHTS: Record<string, number> = {
   gemini: 0.25,
 };
 
-// ── API Callers ────────────────────────────────────────────────────────────────
+// -- Helpers --------------------------------------------------------------
+
+function shapeSnippet(d: unknown): string {
+  try {
+    return JSON.stringify(d).slice(0, 300);
+  } catch {
+    return String(d).slice(0, 300);
+  }
+}
+
+// -- API Callers ----------------------------------------------------------
 
 async function callClaude(
   systemPrompt: string,
@@ -81,17 +101,32 @@ async function callClaude(
       'anthropic-version': '2023-06-01',
     },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
+      // Sonnet 5: no temperature / top_p / top_k.
+      model: ANTHROPIC_MODEL_SYNTH,
       max_tokens: 4096,
       system: systemPrompt,
       messages: [{ role: 'user', content: userPrompt }],
     }),
   });
+  if (!res.ok) {
+    const body = await res.text().catch(() => '');
+    console.error(`[ti] claude ${res.status}:`, body);
+    throw new Error(`Claude ${res.status}: ${body.slice(0, 300)}`);
+  }
   const data = await res.json();
-  return { response: data.content?.[0]?.text || '', latencyMs: Date.now() - start };
+  const blocks = Array.isArray(data?.content) ? data.content : [];
+  const text = blocks
+    .filter((b: any) => b?.type === 'text' && typeof b?.text === 'string')
+    .map((b: any) => b.text)
+    .join('')
+    .trim();
+  if (!text) {
+    throw new Error(`Claude empty on 2xx: ${shapeSnippet(data)}`);
+  }
+  return { response: text, latencyMs: Date.now() - start };
 }
 
-async function callGPT4(
+async function callOpenAI(
   systemPrompt: string,
   userPrompt: string,
 ): Promise<{ response: string; latencyMs: number }> {
@@ -103,8 +138,11 @@ async function callGPT4(
       'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
     },
     body: JSON.stringify({
-      model: 'gpt-5-mini',
+      // GPT-5.5: use max_completion_tokens (chat completions rejects legacy
+      // max_tokens on GPT-5-series); reasoning_effort:"none" is fastest tier.
+      model: OPENAI_MODEL_SYNTH,
       max_completion_tokens: 16384,
+      reasoning_effort: 'none',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },
@@ -112,20 +150,17 @@ async function callGPT4(
       response_format: { type: 'json_object' },
     }),
   });
-  const data = await res.json();
-  const content = data.choices?.[0]?.message?.content || '';
-  const finishReason = data.choices?.[0]?.finish_reason;
-  const usage = data.usage;
-  if (!content || content.length < 50) {
-    console.warn('[Consensus] GPT-5 short/empty response:',
-      'finish_reason:', finishReason,
-      'content_len:', content.length,
-      'usage:', JSON.stringify(usage),
-      'http_status:', res.status,
-      'api_error:', data.error?.message,
-    );
+  if (!res.ok) {
+    const body = await res.text().catch(() => '');
+    console.error(`[ti] openai ${res.status}:`, body);
+    throw new Error(`OpenAI ${res.status}: ${body.slice(0, 300)}`);
   }
-  return { response: content, latencyMs: Date.now() - start };
+  const data = await res.json();
+  const text = (data?.choices?.[0]?.message?.content || '').trim();
+  if (!text) {
+    throw new Error(`OpenAI empty on 2xx: ${shapeSnippet(data)}`);
+  }
+  return { response: text, latencyMs: Date.now() - start };
 }
 
 async function callGemini(
@@ -135,42 +170,51 @@ async function callGemini(
   const start = Date.now();
   const apiKey = Deno.env.get('GEMINI_API_KEY');
   const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }] }],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 16384,
-          responseMimeType: 'application/json',
-        },
+        system_instruction: { parts: [{ text: systemPrompt }] },
+        contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
       }),
     },
   );
-
   if (!res.ok) {
-    const errorBody = await res.text();
-    console.error(`[Consensus] Gemini HTTP ${res.status}:`, errorBody);
-    return { response: '', latencyMs: Date.now() - start };
+    const body = await res.text().catch(() => '');
+    console.error(`[ti] gemini ${res.status}:`, body);
+    throw new Error(`Gemini ${res.status}: ${body.slice(0, 300)}`);
   }
-
   const data = await res.json();
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  const parts: Array<{ text?: string; thought?: boolean }> =
+    data?.candidates?.[0]?.content?.parts ?? [];
+  const text = parts
+    .filter((p) => p && p.thought !== true && typeof p.text === 'string')
+    .map((p) => p.text as string)
+    .join('')
+    .trim();
   if (!text) {
-    console.error('[Consensus] Gemini empty response. Status:', res.status, 'finishReason:', data.candidates?.[0]?.finishReason, 'blockReason:', data.promptFeedback?.blockReason);
+    throw new Error(`Gemini empty on 2xx: ${shapeSnippet(data)}`);
   }
   return { response: text, latencyMs: Date.now() - start };
 }
 
-// ── Response Parser ────────────────────────────────────────────────────────────
+// -- Response Parser ------------------------------------------------------
 
-function parseModelResponse(rawResponse: string, modelName: string): { picks: ModelPick[]; confidence: number; courseAnalysis: any } {
+function parseModelResponse(
+  rawResponse: string,
+  modelName: string,
+): { picks: ModelPick[]; confidence: number; courseAnalysis: any } {
   try {
     let json = rawResponse.trim();
     if (json.startsWith('```')) {
       json = json.replace(/```json?\n?/g, '').replace(/```$/g, '').trim();
+    }
+    // Gemini/Claude sometimes wrap JSON in prose; grab the outermost object.
+    if (!json.startsWith('{')) {
+      const first = json.indexOf('{');
+      const last = json.lastIndexOf('}');
+      if (first >= 0 && last > first) json = json.slice(first, last + 1);
     }
     const parsed = JSON.parse(json);
     const contenders = parsed.topContenders || parsed.top_contenders || parsed.picks || [];
@@ -189,7 +233,7 @@ function parseModelResponse(rawResponse: string, modelName: string): { picks: Mo
         winProbability: c.winProbability || c.win_probability || 0,
         courseFitScore: rawFit,
         reasons: (c.reasons || []).slice(0, 3).map((r: any) =>
-          typeof r === 'string' ? r : r.text || r.reason || ''
+          typeof r === 'string' ? r : r.text || r.reason || '',
         ),
       };
     });
@@ -200,26 +244,24 @@ function parseModelResponse(rawResponse: string, modelName: string): { picks: Mo
       courseAnalysis: parsed.courseAnalysis || parsed.course_analysis || null,
     };
   } catch (err) {
-    console.error(`[Consensus] Failed to parse ${modelName} response:`, err);
+    console.error(`[ti] ${modelName} parse failed:`, (err as Error).message, 'raw head:', rawResponse.slice(0, 200));
     return { picks: [], confidence: 0, courseAnalysis: null };
   }
 }
 
-// ── Consensus Aggregation ──────────────────────────────────────────────────────
+// -- Consensus Aggregation -----------------------------------------------
 
 export function aggregateConsensus(
   modelResults: ModelResult[],
   modelWeights: Record<string, number> = DEFAULT_MODEL_WEIGHTS,
   calculatedFitScores?: Map<string, number>,
 ): ConsensusResult {
-  
   const successfulModels = modelResults.filter((r) => r.success);
-  
+
   if (successfulModels.length === 0) {
-    throw new Error('All models failed — cannot generate consensus');
+    throw new Error('All models failed - cannot generate consensus');
   }
 
-  // Single model fallback
   if (successfulModels.length === 1) {
     const model = successfulModels[0];
     return {
@@ -227,7 +269,9 @@ export function aggregateConsensus(
         ...p,
         rank: i + 1,
         consensusScore: 100 - i * 10,
-        courseFitScore: calculatedFitScores?.get(p.playerId) ?? (typeof p.courseFitScore === 'number' && p.courseFitScore > 0 ? p.courseFitScore : null),
+        courseFitScore:
+          calculatedFitScores?.get(p.playerId) ??
+          (typeof p.courseFitScore === 'number' && p.courseFitScore > 0 ? p.courseFitScore : null),
         modelVotes: [{ model: model.model, rank: p.rank, winProbability: p.winProbability }],
         isDarkHorse: false,
       })),
@@ -239,16 +283,15 @@ export function aggregateConsensus(
     };
   }
 
-  // Normalize weights for active models
   const activeWeightSum = successfulModels.reduce(
-    (sum, r) => sum + (modelWeights[r.model] || 0.33), 0
+    (sum, r) => sum + (modelWeights[r.model] || 0.33),
+    0,
   );
   const normalizedWeights: Record<string, number> = {};
   for (const r of successfulModels) {
     normalizedWeights[r.model] = (modelWeights[r.model] || 0.33) / activeWeightSum;
   }
 
-  // Weighted Borda count
   const playerScores = new Map<string, {
     name: string;
     score: number;
@@ -286,9 +329,8 @@ export function aggregateConsensus(
 
   const ranked = [...playerScores.entries()].sort(([, a], [, b]) => b.score - a.score);
 
-  // Agreement score
   const top5ByModel = successfulModels.map((r) =>
-    new Set(r.picks.slice(0, 5).map((p) => p.playerId))
+    new Set(r.picks.slice(0, 5).map((p) => p.playerId)),
   );
   let overlapCount = 0;
   let totalPairComparisons = 0;
@@ -299,16 +341,10 @@ export function aggregateConsensus(
       totalPairComparisons += 5;
     }
   }
-  const agreementScore = totalPairComparisons > 0
-    ? Math.round((overlapCount / totalPairComparisons) * 100) : 0;
+  const agreementScore =
+    totalPairComparisons > 0 ? Math.round((overlapCount / totalPairComparisons) * 100) : 0;
 
-  // Build final contenders
   const topContenders: ConsensusPick[] = ranked.slice(0, 8).map(([playerId, data], index) => {
-    const bestVote = data.votes.reduce((best, v) =>
-      (v.rank !== null && (!best || v.rank < best.rank!)) ? v : best
-    );
-
-    // Reasons fallback: walk models in confidence-weight order, take first non-empty.
     const modelsByWeight = Object.entries(normalizedWeights)
       .sort(([, a], [, b]) => b - a)
       .map(([model]) => model);
@@ -324,18 +360,17 @@ export function aggregateConsensus(
       bestReasons = ['Strong overall profile'];
     }
 
-    const avgWinProb = data.winProbabilities.length > 0
-      ? data.winProbabilities.reduce((a, b) => a + b, 0) / data.winProbabilities.length : 0;
+    const avgWinProb =
+      data.winProbabilities.length > 0
+        ? data.winProbabilities.reduce((a, b) => a + b, 0) / data.winProbabilities.length
+        : 0;
 
-    // Course-fit fallback chain:
-    //   1. Calculated score from courseFitCalculator
-    //   2. Average of model-returned scores
-    //   3. Null — UI hides the bar gracefully
     const calculatedFit = calculatedFitScores?.get(playerId);
     const modelFitValues = [...data.courseFitScores.values()];
-    const avgModelFit = modelFitValues.length > 0
-      ? Math.round(modelFitValues.reduce((a, b) => a + b, 0) / modelFitValues.length)
-      : null;
+    const avgModelFit =
+      modelFitValues.length > 0
+        ? Math.round(modelFitValues.reduce((a, b) => a + b, 0) / modelFitValues.length)
+        : null;
     const finalFit = calculatedFit ?? avgModelFit ?? null;
 
     return {
@@ -352,97 +387,176 @@ export function aggregateConsensus(
   });
 
   const bestModel = successfulModels.reduce((best, r) =>
-    r.confidence > (best?.confidence || 0) ? r : best
+    r.confidence > (best?.confidence || 0) ? r : best,
   );
 
   return {
     topContenders,
     modelResults,
     consensusMethod: 'weighted_borda_count',
-    consensusConfidence: Math.round(
-      successfulModels.reduce((sum, r) => sum + r.confidence, 0) / successfulModels.length * 100
-    ) / 100,
+    consensusConfidence:
+      Math.round((successfulModels.reduce((sum, r) => sum + r.confidence, 0) / successfulModels.length) * 100) / 100,
     courseAnalysis: bestModel.courseAnalysis,
     agreementScore,
   };
 }
 
-// ── Main Orchestrator ──────────────────────────────────────────────────────────
+// -- Fabrication Guard ---------------------------------------------------
+
+/**
+ * Discards any pick whose playerId/playerName is not present in the provided
+ * field pool. Logs every discard so it appears in the never-silent log stream.
+ */
+export function filterPicksToPool(
+  picks: ModelPick[],
+  poolPlayerIds: Set<string>,
+  poolNameToId: Map<string, string>,
+  modelName: string,
+): ModelPick[] {
+  const kept: ModelPick[] = [];
+  for (const p of picks) {
+    if (p.playerId && poolPlayerIds.has(p.playerId)) {
+      kept.push(p);
+      continue;
+    }
+    // Try match-by-name so an AI that omitted or garbled the ID isn't
+    // silently dropped as long as the NAME is genuinely in the pool.
+    const nameKey = (p.playerName || '').toLowerCase().trim();
+    const idFromName = nameKey ? poolNameToId.get(nameKey) : undefined;
+    if (idFromName) {
+      kept.push({ ...p, playerId: idFromName });
+      continue;
+    }
+    console.warn(`[ti] ${modelName} DISCARDED fabricated pick: "${p.playerName}" (id="${p.playerId}") - not in field pool`);
+  }
+  return kept;
+}
+
+// -- Main Orchestrator ---------------------------------------------------
 
 export async function runConsensus(
   systemPrompt: string,
   userPrompt: string,
   calculatedFitScores?: Map<string, number>,
   modelWeights?: Record<string, number>,
+  poolPlayerIds?: Set<string>,
+  poolNameToId?: Map<string, string>,
 ): Promise<ConsensusResult> {
-  
-  console.log('[Consensus] Starting multi-model prediction...');
+  console.log('[ti] Starting multi-model prediction...');
+  console.log(`[ti] pins claude=${ANTHROPIC_MODEL_SYNTH} openai=${OPENAI_MODEL_SYNTH} gemini=${GEMINI_MODEL}`);
 
   const modelCalls: Array<Promise<ModelResult>> = [];
 
-  // Always call Claude (required)
+  // Claude (required)
   modelCalls.push(
     (async (): Promise<ModelResult> => {
+      const t0 = Date.now();
       try {
         const { response, latencyMs } = await callClaude(systemPrompt, userPrompt);
-        const { picks, confidence, courseAnalysis } = parseModelResponse(response, 'claude');
-        return { model: 'claude', picks, confidence, courseAnalysis, rawResponse: response, latencyMs, success: picks.length >= 5 };
+        const parsed = parseModelResponse(response, 'claude');
+        let picks = parsed.picks;
+        if (poolPlayerIds && poolNameToId) {
+          picks = filterPicksToPool(picks, poolPlayerIds, poolNameToId, 'claude');
+        }
+        const success = picks.length >= 5;
+        console.log(`[ti] claude ${success ? 'ok' : 'insufficient'} in ${latencyMs}ms, ${picks.length} picks`);
+        return {
+          model: 'claude',
+          picks,
+          confidence: parsed.confidence,
+          courseAnalysis: parsed.courseAnalysis,
+          rawResponse: response,
+          latencyMs,
+          success,
+          error: success ? undefined : `only ${picks.length} valid picks after fabrication guard`,
+        };
       } catch (err: any) {
-        console.error('[Consensus] Claude failed:', err.message);
-        return { model: 'claude', picks: [], confidence: 0, courseAnalysis: null, rawResponse: '', latencyMs: 0, success: false, error: err.message };
+        const msg = err?.message || String(err);
+        console.error(`[ti] claude FAILED in ${Date.now() - t0}ms:`, msg);
+        return { model: 'claude', picks: [], confidence: 0, courseAnalysis: null, rawResponse: '', latencyMs: Date.now() - t0, success: false, error: msg };
       }
-    })()
+    })(),
   );
 
-  // Optionally call GPT-4
+  // OpenAI (optional)
   if (Deno.env.get('OPENAI_API_KEY')) {
     modelCalls.push(
       (async (): Promise<ModelResult> => {
+        const t0 = Date.now();
         try {
-          const { response, latencyMs } = await callGPT4(systemPrompt, userPrompt);
-          const { picks, confidence, courseAnalysis } = parseModelResponse(response, 'gpt4');
-          return { model: 'gpt4', picks, confidence, courseAnalysis, rawResponse: response, latencyMs, success: picks.length >= 5 };
+          const { response, latencyMs } = await callOpenAI(systemPrompt, userPrompt);
+          const parsed = parseModelResponse(response, 'gpt4');
+          let picks = parsed.picks;
+          if (poolPlayerIds && poolNameToId) {
+            picks = filterPicksToPool(picks, poolPlayerIds, poolNameToId, 'gpt4');
+          }
+          const success = picks.length >= 5;
+          console.log(`[ti] openai ${success ? 'ok' : 'insufficient'} in ${latencyMs}ms, ${picks.length} picks`);
+          return {
+            model: 'gpt4',
+            picks,
+            confidence: parsed.confidence,
+            courseAnalysis: parsed.courseAnalysis,
+            rawResponse: response,
+            latencyMs,
+            success,
+            error: success ? undefined : `only ${picks.length} valid picks after fabrication guard`,
+          };
         } catch (err: any) {
-          console.error('[Consensus] GPT-4 failed:', err.message);
-          return { model: 'gpt4', picks: [], confidence: 0, courseAnalysis: null, rawResponse: '', latencyMs: 0, success: false, error: err.message };
+          const msg = err?.message || String(err);
+          console.error(`[ti] openai FAILED in ${Date.now() - t0}ms:`, msg);
+          return { model: 'gpt4', picks: [], confidence: 0, courseAnalysis: null, rawResponse: '', latencyMs: Date.now() - t0, success: false, error: msg };
         }
-      })()
+      })(),
     );
   } else {
-    console.log('[Consensus] Skipping GPT-4 — no OPENAI_API_KEY');
+    console.log('[ti] skipping openai - no OPENAI_API_KEY');
   }
 
-  // Optionally call Gemini
+  // Gemini (optional)
   if (Deno.env.get('GEMINI_API_KEY')) {
     modelCalls.push(
       (async (): Promise<ModelResult> => {
+        const t0 = Date.now();
         try {
           const { response, latencyMs } = await callGemini(systemPrompt, userPrompt);
-          const { picks, confidence, courseAnalysis } = parseModelResponse(response, 'gemini');
-          return { model: 'gemini', picks, confidence, courseAnalysis, rawResponse: response, latencyMs, success: picks.length >= 5 };
+          const parsed = parseModelResponse(response, 'gemini');
+          let picks = parsed.picks;
+          if (poolPlayerIds && poolNameToId) {
+            picks = filterPicksToPool(picks, poolPlayerIds, poolNameToId, 'gemini');
+          }
+          const success = picks.length >= 5;
+          console.log(`[ti] gemini ${success ? 'ok' : 'insufficient'} in ${latencyMs}ms, ${picks.length} picks`);
+          return {
+            model: 'gemini',
+            picks,
+            confidence: parsed.confidence,
+            courseAnalysis: parsed.courseAnalysis,
+            rawResponse: response,
+            latencyMs,
+            success,
+            error: success ? undefined : `only ${picks.length} valid picks after fabrication guard`,
+          };
         } catch (err: any) {
-          console.error('[Consensus] Gemini failed:', err.message);
-          return { model: 'gemini', picks: [], confidence: 0, courseAnalysis: null, rawResponse: '', latencyMs: 0, success: false, error: err.message };
+          const msg = err?.message || String(err);
+          console.error(`[ti] gemini FAILED in ${Date.now() - t0}ms:`, msg);
+          return { model: 'gemini', picks: [], confidence: 0, courseAnalysis: null, rawResponse: '', latencyMs: Date.now() - t0, success: false, error: msg };
         }
-      })()
+      })(),
     );
   } else {
-    console.log('[Consensus] Skipping Gemini — no GEMINI_API_KEY');
+    console.log('[ti] skipping gemini - no GEMINI_API_KEY');
   }
 
-  // Run all models in parallel
   const modelResults = await Promise.all(modelCalls);
-  
+
   const successCount = modelResults.filter((r) => r.success).length;
-  console.log(`[Consensus] ${successCount}/${modelResults.length} models succeeded`);
-  for (const r of modelResults) {
-    console.log(`[Consensus] ${r.model}: ${r.success ? `${r.picks.length} picks in ${r.latencyMs}ms` : `FAILED — ${r.error}`}`);
-  }
+  console.log(`[ti] ${successCount}/${modelResults.length} models succeeded`);
 
   const consensus = aggregateConsensus(modelResults, modelWeights || DEFAULT_MODEL_WEIGHTS, calculatedFitScores);
-  
-  console.log(`[Consensus] Top 5: ${consensus.topContenders.slice(0, 5).map((p) => p.playerName).join(', ')}`);
-  console.log(`[Consensus] Agreement: ${consensus.agreementScore}%, Method: ${consensus.consensusMethod}`);
+
+  console.log(`[ti] Top 5: ${consensus.topContenders.slice(0, 5).map((p) => p.playerName).join(', ')}`);
+  console.log(`[ti] agreement=${consensus.agreementScore}% method=${consensus.consensusMethod}`);
 
   return consensus;
 }
