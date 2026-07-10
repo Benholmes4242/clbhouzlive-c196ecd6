@@ -558,13 +558,65 @@ class VideoEngineImpl {
    */
   preload(
     laneId: LaneId,
-    opts: { hlsUrl: string; posterUrl?: string | null; postId?: string | null }
+    opts: {
+      hlsUrl: string;
+      posterUrl?: string | null;
+      postId?: string | null;
+      /**
+       * GUARD: caller asserts this ownerKey currently owns the 'active' role's
+       * physical lane. When provided, preload refuses to write if:
+       *  (a) `laneId` is the physical lane currently bound to role 'active', or
+       *  (b) the active lane's current postId (normalized bare↔`:0`) equals
+       *      `expectedActiveOwnerKey` AND the incoming postId differs — i.e.
+       *      this write would evict/rebind the known-active binding.
+       * When omitted, preload behaves as before (no guard).
+       */
+      expectedActiveOwnerKey?: string;
+    }
   ): void {
+    // OwnerKey discipline: bare `X` → canonical `X:0`. Flag so callers can be
+    // audited and eventually normalized at the source.
+    let postId = opts.postId ?? null;
+    if (postId != null && !postId.includes(':')) {
+      const from = postId;
+      postId = `${postId}:0`;
+      try {
+        trace('preload.normalized', { laneId, from, to: postId });
+      } catch { /* trace-only */ }
+    }
+    // Active-lane identity guard.
+    const norm = (k: string | null): string | null =>
+      k == null ? null : (k.includes(':') ? k : `${k}:0`);
+    try {
+      const activeLaneId = feedLaneRoles.laneForRole('active');
+      const activeSnap = this.snapshot(activeLaneId);
+      const activeOwner = norm(activeSnap.postId);
+      const incomingOwner = norm(postId);
+      const expected = opts.expectedActiveOwnerKey ?? null;
+      const wouldWriteActiveLane = laneId === activeLaneId;
+      const wouldEvictKnownActive =
+        expected != null &&
+        activeOwner === norm(expected) &&
+        incomingOwner !== activeOwner;
+      if (wouldWriteActiveLane || wouldEvictKnownActive) {
+        try {
+          trace('preload.rejected', {
+            laneId,
+            reason: wouldWriteActiveLane ? 'is-active-lane' : 'would-evict-active',
+            incomingOwnerKey: incomingOwner,
+            expectedActiveOwnerKey: expected,
+            currentActiveLanePostId: activeSnap.postId,
+            activeLaneId,
+          });
+        } catch { /* trace-only */ }
+        return;
+      }
+    } catch { /* engine not booted / lane missing — fall through */ }
     this.load(laneId, {
       hlsUrl: opts.hlsUrl,
       posterUrl: opts.posterUrl ?? null,
       startPosition: -1,
-      postId: opts.postId ?? null,
+      postId,
     });
     // Explicitly ensure the preload lane is paused (its element is in the
     // hidden host — nothing to render — but paused keeps the decoder cool).
