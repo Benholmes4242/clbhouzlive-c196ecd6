@@ -161,6 +161,16 @@ export const MediaCarousel: React.FC<Props> = ({
         ownerKey: ownerKeyOf(to),
         mediaType: toMediaType,
         isCardActive,
+        prefetched: PrefetchController.wasPrefetched(ownerKeyOf(to)),
+        warm: (() => {
+          try {
+            const laneId = feedLaneRoles.laneForRole('active');
+            const bound = VideoEngine.snapshot(laneId).postId;
+            return bound === ownerKeyOf(to);
+          } catch {
+            return false;
+          }
+        })(),
       });
       // Mismatch guard: on the MEDIA axis, if the active feed lane is bound
       // to a different ownerKey/postId than the slide we just activated, we
@@ -199,6 +209,35 @@ export const MediaCarousel: React.FC<Props> = ({
     }
     prevActiveRef.current = to;
   }, [active, isCardActive, items, postId, ownerKeyOf]);
+
+  // ────────────────────────────────────────────────────────────────────
+  // Adjacent-slide warming (media axis).
+  // For the active slide `i`, cache-warm i±1 VIDEO slides via
+  // PrefetchController. Distinct per-slide keys (${postId}:${j}) — same
+  // convention InlineVideo binds under, so the browser HTTP cache is
+  // primed for the exact hlsUrl hls.js will fetch on activation.
+  //
+  // Budget: only i±1 (max 2 warm requests on the horizontal axis) on top
+  // of the active slide — total ≤ 3, within the 3-lane pool (feed
+  // active/next/prev). PrefetchController itself caps in-flight at 2 and
+  // skips when any lane is buffering, so cannot stall the active video.
+  // Adjacent-slide MOUNT/warm inside InlineVideo (isNear/earlyMotion)
+  // is handled below on the render pass — this effect covers the pure
+  // HTTP-cache priming that mirrors the vertical feed's next-card warm.
+  // ────────────────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!isCardActive) return;
+    const neighbours = [active - 1, active + 1];
+    for (const j of neighbours) {
+      if (j < 0 || j >= items.length) continue;
+      const it = items[j];
+      if (!it || it.type !== 'video') continue;
+      const hlsUrl = (it as any).hlsUrl || '';
+      if (!hlsUrl || typeof hlsUrl !== 'string' || hlsUrl.startsWith('blob:')) continue;
+      PrefetchController.request(ownerKeyOf(j), hlsUrl);
+    }
+  }, [active, isCardActive, items, ownerKeyOf]);
+
 
 
 
