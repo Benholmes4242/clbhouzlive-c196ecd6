@@ -125,13 +125,17 @@ export function vperfSetPage(page: string): void {
 }
 export function vperfGetPage(): string { return __currentPage; }
 
-function on(): boolean {
-  try {
-    return isPerfEnabled();
-  } catch {
-    return false;
-  }
+// PHASE-2 GATE SPLIT.
+//   recordOn() — always true; drives every counter/rollup path so real
+//     devices silently accumulate aggregate stats for the telemetry shipper.
+//   consoleOn() — mirrors isPerfEnabled(); guards every console.info /
+//     scorecard emission so pill/console behaviour stays byte-identical.
+// Old `on()` is kept (=recordOn) so the ~25 existing call sites don't churn.
+function on(): boolean { return true; }
+function consoleOn(): boolean {
+  try { return isPerfEnabled(); } catch { return false; }
 }
+
 
 function budgetFor(kind: string, metaBudget: number | undefined): number {
   if (typeof metaBudget === 'number' && isFinite(metaBudget) && metaBudget > 0) {
@@ -143,9 +147,11 @@ function budgetFor(kind: string, metaBudget: number | undefined): number {
 function emit(kind: string, payload: Record<string, unknown>): void {
   const merged = { ...payload, page: (payload as any).page ?? __currentPage };
   try { scorecardIngest(kind, merged); } catch {}
+  if (!consoleOn()) return; // pill off: no console spam, no format work
   // eslint-disable-next-line no-console
   console.info(`[VPERF] ${kind}`, merged);
 }
+
 
 function finish(rec: SpanRec, verdict: Verdict, extra: Record<string, unknown>): void {
   clearTimeout(rec.timer);
@@ -671,9 +677,21 @@ interface KindStat {
   slow: number;
   timeout: number;
   superseded: number;
-  totals: number[]; // durations for p50/p95/worst
+  totals: number[];  // fixed-size ring; length ≤ TOTALS_CAP, order not meaningful
+  totalsIdx: number; // next write index once full
 }
 
+// PHASE-2: bounded rings for always-on collection. push+shift was O(n) and
+// caused GC churn under load; ring push is O(1). p50/p95/worst are computed
+// only at flush time (scorecard emit / telemetry snapshot), never on the
+// hot path.
+const TOTALS_CAP = 500;
+const STARTLEVELS_CAP = 500;
+function ringPush(arr: number[], idx: number, cap: number, v: number): number {
+  if (arr.length < cap) { arr.push(v); return arr.length === cap ? 0 : idx; }
+  arr[idx] = v;
+  return (idx + 1) % cap;
+}
 
 const scorecardBuckets = new Map<string, KindStat>();      // key = `${kind}|${page}`
 const sessionHealth = {
@@ -690,13 +708,14 @@ const feedRollup = new Map<string, { scrolls: number; longFrames: number; frames
 
 // [PREDICT] scorecard extras — per-lane-class start levels (median target)
 // and prefetch counters (issued / aborted / hit-rate).
-const startLevelsByLane = new Map<string, number[]>(); // laneId → startLevels
+const startLevelsByLane = new Map<string, { arr: number[]; idx: number }>();
 const prefetchStats = {
   issued: 0,
   aborted: new Map<string, number>(),
   activationsWithPrefetch: 0,
   activationsWithPrefetchWarm: 0,
 };
+
 
 
 function bucketKey(kind: string, page: string): string { return `${kind}|${page}`; }
@@ -717,11 +736,11 @@ function scorecardIngest(kind: string, payload: Record<string, unknown>): void {
     const laneId = String((payload as any).laneId ?? '');
     const sl = (payload as any).startLevel;
     if (typeof sl === 'number' && (laneId === 'feed-active' || laneId === 'fullscreen')) {
-      const arr = startLevelsByLane.get(laneId) ?? [];
-      arr.push(sl);
-      if (arr.length > 500) arr.shift();
-      startLevelsByLane.set(laneId, arr);
+      const ring = startLevelsByLane.get(laneId) ?? { arr: [], idx: 0 };
+      ring.idx = ringPush(ring.arr, ring.idx, STARTLEVELS_CAP, sl);
+      startLevelsByLane.set(laneId, ring);
     }
+
     return;
   }
 
@@ -746,7 +765,8 @@ function scorecardIngest(kind: string, payload: Record<string, unknown>): void {
 
   if (!isFinite(totalMs) || totalMs < 0) return;
   const key = bucketKey(kind, page);
-  const stat = scorecardBuckets.get(key) ?? { count: 0, pass: 0, slow: 0, timeout: 0, superseded: 0, totals: [] };
+  const stat: KindStat = scorecardBuckets.get(key)
+    ?? { count: 0, pass: 0, slow: 0, timeout: 0, superseded: 0, totals: [], totalsIdx: 0 };
   // SUPERSEDED spans (flick-past, abandoned open) are counted separately
   // and never contribute to pass/slow/timeout tallies or p50/p95 totals —
   // otherwise abandoned events would inflate SLOW verdicts.
@@ -760,10 +780,10 @@ function scorecardIngest(kind: string, payload: Record<string, unknown>): void {
   if (verdict === 'PASS') stat.pass += 1;
   else if (verdict === 'SLOW') stat.slow += 1;
   else if (verdict === 'TIMEOUT') stat.timeout += 1;
-  stat.totals.push(totalMs);
-  if (stat.totals.length > 500) stat.totals.shift();
+  stat.totalsIdx = ringPush(stat.totals, stat.totalsIdx, TOTALS_CAP, totalMs);
   scorecardBuckets.set(key, stat);
 }
+
 
 
 /** Tally a [DECIDE] outcome for the scorecard's counters. Call sites are
@@ -796,7 +816,8 @@ function pct(arr: number[], p: number): number {
 
 /** Emit one multi-line [BASELINE] scorecard block. */
 export function vperfScorecard(trigger: 'auto' | 'nav' | 'manual' = 'manual'): void {
-  if (!on()) return;
+  if (!consoleOn()) return; // PHASE-2: emission gated on pill; counters are always-on
+
   const lines: string[] = [];
   lines.push(`[BASELINE] trigger=${trigger} page=${__currentPage} @${Math.round(performance.now())}ms`);
   lines.push('  kind|page                              count  p50   p95  worst  PASS%');
@@ -827,10 +848,11 @@ export function vperfScorecard(trigger: 'auto' | 'nav' | 'manual' = 'manual'): v
     lines.push(`  decide.${bucket}: ${parts.join(' ')}`);
   }
   // [PREDICT] median startLevel per feed lane class.
-  for (const [laneId, arr] of startLevelsByLane) {
-    if (arr.length === 0) continue;
-    lines.push(`  startLevel.${laneId}: n=${arr.length} p50=${pct(arr, 0.5)} p95=${pct(arr, 0.95)}`);
+  for (const [laneId, ring] of startLevelsByLane) {
+    if (ring.arr.length === 0) continue;
+    lines.push(`  startLevel.${laneId}: n=${ring.arr.length} p50=${pct(ring.arr, 0.5)} p95=${pct(ring.arr, 0.95)}`);
   }
+
   // [PREDICT] prefetch counters.
   const ps = prefetchStats;
   const hitRate = ps.activationsWithPrefetch > 0
@@ -849,13 +871,14 @@ export function vperfScorecard(trigger: 'auto' | 'nav' | 'manual' = 'manual'): v
 
 
 function scorecardEmitOnNav(): void {
-  if (!on()) return;
+  if (!consoleOn()) return; // PHASE-2: console-only path
   vperfScorecard('nav');
 }
 
-// Auto-emit every 60s while enabled (installed once at module eval).
+// Auto-emit every 60s while the pill is on (installed once at module eval).
 if (typeof window !== 'undefined') {
-  setInterval(() => { try { if (on()) vperfScorecard('auto'); } catch {} }, 60_000);
+  setInterval(() => { try { if (consoleOn()) vperfScorecard('auto'); } catch {} }, 60_000);
+
   (window as any).vperfScorecard = vperfScorecard;
 }
 
@@ -1030,10 +1053,12 @@ export function vperfImagePhase(
 // ============================================================================
 
 function emitFlow(kind: string, payload: Record<string, unknown>): void {
+  if (!consoleOn()) return; // PHASE-2: [FLOW] is console-only diagnostic
   const merged = { ...payload, page: (payload as any).page ?? __currentPage };
   // eslint-disable-next-line no-console
   console.info(`[FLOW] ${kind}`, merged);
 }
+
 
 /** Visible fraction of `el` inside the current viewport, 2dp, clamped 0..1. */
 export function vperfCardFraction(el: HTMLElement | null | undefined): number {
@@ -1300,3 +1325,104 @@ export function __vperfFlowRollupLines(): string[] {
   return lines;
 }
 
+
+// ============================================================================
+// PHASE-2 TELEMETRY EXPORTS
+// Internal-only helpers consumed by src/perf/telemetry.ts to ship silent
+// aggregates to Supabase. Do NOT call from feature code.
+// snapshot() returns a plain-JSON view of every counter; reset() zeros the
+// stores so rows are deltas across flushes.
+// ============================================================================
+
+export interface VperfBucketSnapshot {
+  key: string;      // `${kind}|${page}`
+  count: number;
+  pass: number;
+  slow: number;
+  timeout: number;
+  superseded: number;
+  totals: number[]; // copy — safe to serialise
+}
+
+export interface VperfSnapshot {
+  buckets: VperfBucketSnapshot[];
+  sessionHealth: typeof sessionHealth;
+  prefetchStats: {
+    issued: number;
+    aborted: Record<string, number>;
+    activationsWithPrefetch: number;
+    activationsWithPrefetchWarm: number;
+  };
+  feedRollup: Array<{ page: string } & { scrolls: number; longFrames: number; frames: number; worstMs: number; activateWarm: number; activateCold: number }>;
+  startLevelsByLane: Array<{ laneId: string; totals: number[] }>;
+  decideCounters: Array<{ bucket: string; counts: Record<string, number> }>;
+}
+
+export function __vperfSnapshotTelemetry(): VperfSnapshot {
+  const buckets: VperfBucketSnapshot[] = [];
+  for (const [key, s] of scorecardBuckets) {
+    buckets.push({
+      key,
+      count: s.count,
+      pass: s.pass,
+      slow: s.slow,
+      timeout: s.timeout,
+      superseded: s.superseded ?? 0,
+      totals: s.totals.slice(),
+    });
+  }
+  const aborted: Record<string, number> = {};
+  for (const [k, v] of prefetchStats.aborted) aborted[k] = v;
+  const feedRollupOut = [] as VperfSnapshot['feedRollup'];
+  for (const [page, r] of feedRollup) feedRollupOut.push({ page, ...r });
+  const startLevelsOut = [] as VperfSnapshot['startLevelsByLane'];
+  for (const [laneId, ring] of startLevelsByLane) startLevelsOut.push({ laneId, totals: ring.arr.slice() });
+  const decideOut = [] as VperfSnapshot['decideCounters'];
+  for (const [bucket, m] of decideCounters) {
+    const counts: Record<string, number> = {};
+    for (const [k, v] of m) counts[k] = v;
+    decideOut.push({ bucket, counts });
+  }
+  return {
+    buckets,
+    sessionHealth: { ...sessionHealth },
+    prefetchStats: {
+      issued: prefetchStats.issued,
+      aborted,
+      activationsWithPrefetch: prefetchStats.activationsWithPrefetch,
+      activationsWithPrefetchWarm: prefetchStats.activationsWithPrefetchWarm,
+    },
+    feedRollup: feedRollupOut,
+    startLevelsByLane: startLevelsOut,
+    decideCounters: decideOut,
+  };
+}
+
+export function __vperfResetTelemetry(): void {
+  scorecardBuckets.clear();
+  sessionHealth.sessionCount = 0;
+  sessionHealth.totalStalls = 0;
+  sessionHealth.totalDurationMs = 0;
+  sessionHealth.totalStallMs = 0;
+  sessionHealth.levelSwitches = 0;
+  sessionHealth.totalFrames = 0;
+  sessionHealth.droppedFrames = 0;
+  prefetchStats.issued = 0;
+  prefetchStats.aborted.clear();
+  prefetchStats.activationsWithPrefetch = 0;
+  prefetchStats.activationsWithPrefetchWarm = 0;
+  feedRollup.clear();
+  startLevelsByLane.clear();
+  decideCounters.clear();
+}
+
+/** Approx row count the next flush would produce — used for the >40 row
+ * early-flush threshold in the shipper. */
+export function __vperfApproxRowCount(): number {
+  return scorecardBuckets.size
+    + 1 /* session */
+    + 1 /* prefetch */
+    + feedRollup.size
+    + startLevelsByLane.size
+    + decideCounters.size;
+}
