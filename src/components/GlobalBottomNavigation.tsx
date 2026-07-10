@@ -29,6 +29,7 @@ const HIDDEN_ROUTES = [
   '/notificationmessages',
   '/followers',
   '/following',
+  '/messages',
 ];
 
 const HIDDEN_ROUTE_PREFIXES = [

@@ -3,6 +3,8 @@ import { PencilLine } from 'lucide-react';
 import { useConversations } from '@/hooks/messaging/useConversations';
 import { ConversationRow } from './ConversationRow';
 import NewConversationSheet from './NewConversationSheet';
+import { ManagePageShell } from '@/components/manage/ManagePageShell';
+
 
 const CANVAS = '#F8FAFC';
 const INK = '#1F2428';
@@ -53,54 +55,32 @@ const InboxV2Page: React.FC = () => {
   const { conversations, isLoading, error, refetch, hasActor } = useConversations();
 
 
-  return (
-    <div
-      className="min-h-screen w-full"
-      style={{ background: CANVAS, color: INK }}
+  const composeButton = (
+    <button
+      type="button"
+      aria-label="New message"
+      onClick={() => setComposeOpen(true)}
+      className="active:opacity-60 transition-opacity"
+      style={{
+        width: 36,
+        height: 36,
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'transparent',
+        border: 'none',
+        color: SUB,
+      }}
     >
-      <header
-        className="sticky top-0 z-10"
-        style={{
-          background: CANVAS,
-          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)',
-          paddingBottom: 12,
-          paddingLeft: 16,
-          paddingRight: 16,
-          borderBottom: `0.5px solid ${HAIRLINE}`,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
-        <h1 style={{ fontSize: 20, fontWeight: 500, color: INK, margin: 0 }}>
-          Messages
-        </h1>
-        <button
-          type="button"
-          aria-label="New message"
-          onClick={() => setComposeOpen(true)}
-          className="active:opacity-60 transition-opacity"
-          style={{
-            width: 36,
-            height: 36,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'transparent',
-            border: 'none',
-            color: SUB,
-          }}
-        >
-          <PencilLine size={20} />
-        </button>
-      </header>
+      <PencilLine size={20} />
+    </button>
+  );
 
-      <main
-        style={{
-          paddingBottom: 'var(--bottom-nav-height, 88px)',
-        }}
-      >
+  return (
+    <ManagePageShell title="Messages" right={composeButton}>
+      <div style={{ background: CANVAS, color: INK, minHeight: '100%' }}>
         <style>{`@keyframes msg-spin { to { transform: rotate(360deg); } }`}</style>
+
         {!hasActor ? (
           <div
             className="flex items-center justify-center"
@@ -157,11 +137,10 @@ const InboxV2Page: React.FC = () => {
             ))}
           </div>
         )}
-      </main>
-
+      </div>
 
       <NewConversationSheet open={composeOpen} onClose={() => setComposeOpen(false)} />
-    </div>
+    </ManagePageShell>
   );
 };
 
