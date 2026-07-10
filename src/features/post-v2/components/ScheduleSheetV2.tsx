@@ -93,7 +93,7 @@ export default function ScheduleSheetV2({ open, onClose, value, onChange, onOpen
   const clear = () => { onChange(null); onClose(); };
 
   return (
-    <BottomSheet open={open} title="Schedule" onClose={onClose} fullHeight>
+    <BottomSheet open={open} title="Schedule" onClose={onClose}>
       <div style={{ padding: '4px 16px 16px', display: 'flex', flexDirection: 'column', gap: 18 }}>
         {/* Preset chips */}
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
