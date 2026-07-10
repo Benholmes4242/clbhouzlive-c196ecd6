@@ -261,7 +261,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   isFirstCard = false,
   onContentReady,
 }) => {
-  const navigate = useNavigate();
+  
   const { activeActor, setActiveActor } = useActiveActor();
   const [captionExpanded, setCaptionExpanded] = useState(false);
   const [isCaptionClamped, setIsCaptionClamped] = useState(false);
