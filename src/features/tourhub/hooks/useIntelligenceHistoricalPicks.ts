@@ -99,37 +99,67 @@ function formatFinalPosition(
   return `${actualPositionTied ? 'T' : ''}${actualPosition}`;
 }
 
-async function getScopedSeasonIds(): Promise<{ all: string[]; euro: string[] }> {
-  const [pgaSeasons, euroSeasons] = await Promise.all([
-    supabase
-      .from('sr_seasons')
-      .select('id')
-      .ilike('tour_name', 'pga')
-      .order('year', { ascending: false })
-      .limit(3),
-    supabase
-      .from('sr_seasons')
-      .select('id')
-      .ilike('tour_name', 'EURO')
-      .order('year', { ascending: false })
-      .limit(3),
-  ]);
-  const pgaIds = (pgaSeasons.data ?? []).map((s: any) => s.id);
-  const euroIds = (euroSeasons.data ?? []).map((s: any) => s.id);
-  return { all: [...pgaIds, ...euroIds], euro: euroIds };
+/**
+ * Resolve season IDs for the requested tour. When the tour is PGA (or omitted,
+ * for back-compat), also return EURO season IDs so cross-tour majors (Masters,
+ * The Open) fold back into the PGA history. Other tours are scoped strictly
+ * to their own seasons — no fold-back, no cross-tour bleed.
+ */
+async function getScopedSeasonIds(
+  tourSlug: string,
+): Promise<{ all: string[]; euroFoldback: string[]; tourLabel: string }> {
+  const normalized = (tourSlug || 'pga').toLowerCase();
+  const isPga = normalized === 'pga';
+
+  const primaryReq = supabase
+    .from('sr_seasons')
+    .select('id')
+    .ilike('tour_name', normalized)
+    .order('year', { ascending: false })
+    .limit(3);
+
+  if (isPga) {
+    const [pgaSeasons, euroSeasons] = await Promise.all([
+      primaryReq,
+      supabase
+        .from('sr_seasons')
+        .select('id')
+        .ilike('tour_name', 'EURO')
+        .order('year', { ascending: false })
+        .limit(3),
+    ]);
+    const pgaIds = (pgaSeasons.data ?? []).map((s: any) => s.id);
+    const euroIds = (euroSeasons.data ?? []).map((s: any) => s.id);
+    return { all: [...pgaIds, ...euroIds], euroFoldback: euroIds, tourLabel: 'PGA' };
+  }
+
+  const { data } = await primaryReq;
+  const ids = (data ?? []).map((s: any) => s.id);
+  const labelMap: Record<string, string> = {
+    lpga: 'LPGA',
+    euro: 'DP World',
+    pgad: 'Korn Ferry',
+    champ: 'Champions',
+    liv: 'LIV',
+  };
+  return { all: ids, euroFoldback: [], tourLabel: labelMap[normalized] ?? normalized.toUpperCase() };
 }
 
-export function useIntelligenceHistoricalPicks() {
+/**
+ * Tour-scoped Intelligence pick history. Pass a tour slug (`pga`, `lpga`,
+ * `euro`, `pgad`, `champ`, `liv`) to scope to that tour. Omitting the arg
+ * preserves the legacy PGA + majors fold-back behavior for existing callers.
+ */
+export function useIntelligenceHistoricalPicks(tourSlug?: string) {
+  const normalizedSlug = (tourSlug ?? 'pga').toLowerCase();
   return useQuery({
-    queryKey: ['intelligence-historical-picks'],
+    queryKey: ['intelligence-historical-picks', normalizedSlug],
     staleTime: 30 * 60 * 1000,
     gcTime: 60 * 60 * 1000,
     queryFn: async (): Promise<IntelligenceHistoricalTournament[]> => {
-      const { all: allSeasonIds, euro: euroSeasonIds } = await getScopedSeasonIds();
+      const { all: allSeasonIds, euroFoldback, tourLabel } = await getScopedSeasonIds(normalizedSlug);
       if (!allSeasonIds.length) return [];
 
-      // Step 1: completed tournaments with predictions, most recent first, capped 50.
-      // Includes PGA + EURO seasons so cross-tour majors (e.g. The Masters) are in scope.
       const { data: predRows, error: predError } = await supabase
         .from('ai_predictions')
         .select(`
@@ -152,11 +182,6 @@ export function useIntelligenceHistoricalPicks() {
 
       const tournamentIds = predRows.map(r => r.tournament_id);
 
-      // Step 2: batched leaderboard fetch keyed by tournament + sr_id/name.
-      // Leaderboard can exceed PostgREST's default 1000-row cap (≈18 tournaments
-      // × ~150 players ≈ 2,800 rows). Without pagination the response is silently
-      // truncated, so later tournaments' picks never match and show "—". Page
-      // through in 1000-row windows until exhausted.
       const leaderboardData: any[] = [];
       const PAGE = 1000;
       for (let from = 0; ; from += PAGE) {
@@ -192,23 +217,19 @@ export function useIntelligenceHistoricalPicks() {
           status: row.status ?? null,
           score: (row as any).score ?? null,
         };
-        // predictions[].playerId === sr_players.id === sr_leaderboards.player_id (UUID).
-        // UUID match is primary; sr_id + name are fallbacks for older rows.
         if (playerId) maps.byPlayerId.set(playerId, entry);
         if (srId) maps.bySrId.set(srId, entry);
         if (fullName) maps.byName.set(fullName.toLowerCase(), entry);
       }
 
-      // Step 3: build per-tournament structures with all 3 picks.
       const tournaments: IntelligenceHistoricalTournament[] = [];
 
       for (const row of predRows) {
         const t = (row as any).sr_tournaments;
         if (!t?.start_date || !t?.end_date) continue;
 
-        // For EURO season tournaments, only include majors (e.g. The Masters).
-        // Cross-tour majors fold-back so card + sheet stay scope-aligned.
-        if (euroSeasonIds.includes(t.season_id) && !isMajor(t.name || '')) continue;
+        // PGA path only: drop non-major EURO rows so majors fold back cleanly.
+        if (euroFoldback.length && euroFoldback.includes(t.season_id) && !isMajor(t.name || '')) continue;
 
         const rawPredictions = (row.predictions as any[]) ?? [];
         const maps = lbByTournament.get(row.tournament_id);
@@ -216,7 +237,6 @@ export function useIntelligenceHistoricalPicks() {
 
         const picks: IntelligenceHistoricalPick[] = [];
 
-        // Defensive iteration — skip ranks where the prediction or its data is missing.
         for (const rank of [1, 2, 3] as const) {
           const pick = rawPredictions.find(p => (p?.rank ?? p?.predictedRank) === rank);
           if (!pick) continue;
@@ -235,7 +255,7 @@ export function useIntelligenceHistoricalPicks() {
             rank,
             playerName,
             playerId,
-            tourCode: 'pga',
+            tourCode: normalizedSlug,
             actualPosition,
             actualPositionTied,
             status,
@@ -248,7 +268,6 @@ export function useIntelligenceHistoricalPicks() {
 
         const bestPick = picks.reduce<IntelligenceHistoricalPick | null>((best, p) => {
           if (best === null) return p;
-          // Null positions (MC/WD) treated as worst.
           if (p.actualPosition === null) return best;
           if (best.actualPosition === null) return p;
           return p.actualPosition < best.actualPosition ? p : best;
@@ -260,7 +279,7 @@ export function useIntelligenceHistoricalPicks() {
           shortName: getShortName(t.name ?? ''),
           startDate: t.start_date,
           endDate: t.end_date,
-          tour: 'PGA',
+          tour: tourLabel,
           isMajor: isMajor(t.name ?? ''),
           outcome: classifyOutcome(picks),
           picks,
@@ -270,10 +289,6 @@ export function useIntelligenceHistoricalPicks() {
         });
       }
 
-      // Same-week dedup: when two PGA events share a Sun→Sat week, only the
-      // highest-purse event's picks were ever shown on Tournament Intelligence.
-      // Keep that one; drop the lower-purse opposite-field event. Cross-tour
-      // majors are always retained.
       const byWeek = new Map<string, IntelligenceHistoricalTournament>();
       const keep: IntelligenceHistoricalTournament[] = [];
       for (const tourn of tournaments) {
