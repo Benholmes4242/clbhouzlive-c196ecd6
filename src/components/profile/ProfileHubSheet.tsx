@@ -13,7 +13,7 @@
 
 import React, { memo, useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import { Pressable } from '@/components/ui/Pressable';
-import { AnimatedEchoWave } from '@/features/echo/components/ui/AnimatedEchoWave';
+import { AnimatedEchoWave } from '@/features/echo-v2/components/AnimatedEchoWave';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { overlayOpen, overlayMark } from '@/perf/overlayTiming';
 import { createPortal } from 'react-dom';
