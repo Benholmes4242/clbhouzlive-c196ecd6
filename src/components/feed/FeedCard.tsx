@@ -295,7 +295,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   }, [liked, onLike, post, effectiveActor]);
 
   const reviewCourseId = post.review?.courseId ?? post.courseId;
-  const reviewId = post.review?.reviewId;
   const openReviewSheet = useReviewSheetStore((s) => s.open);
   const { data: reviewerStats } = useReviewerStats(post.userId);
   const handleReadReview = (e: React.MouseEvent) => {
