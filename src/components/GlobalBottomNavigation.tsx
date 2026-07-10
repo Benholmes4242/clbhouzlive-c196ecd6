@@ -107,6 +107,8 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const liveTournamentCount = tournamentsCache?.live?.length ?? 0;
   const isTourHubLive = liveTournamentCount > 0;
   const openPostStudio = usePostStudioStore((s) => s.openPostStudio);
+  void openPostStudio;
+  const [createSheetOpen, setCreateSheetOpen] = useState(false);
 
   const theme = useNavTheme();
   const tokens = theme === 'dark' ? DARK_TOKENS : LIGHT_TOKENS;
