@@ -4,7 +4,7 @@ import { useBusinessDirectory, BusinessDirectoryItem } from '@/hooks/useBusiness
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Building2, MapPin, Search, CheckCircle2, ChevronLeft, Plus, Pencil } from 'lucide-react';
+import { Building2, MapPin, Search, ChevronLeft, Plus, Pencil } from 'lucide-react';
 import { BUSINESS_CATEGORIES } from '@/types/profile';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileData } from '@/hooks/useProfileData';
