@@ -29,14 +29,13 @@ export const EchoMessageList: React.FC<Props> = ({
   return (
     <div
       style={{
-        flex: 1,
-        overflowY: 'auto',
         display: 'flex',
         flexDirection: 'column',
         gap: 4,
-        padding: '12px 0 16px',
+        padding: '12px 0 4px',
       }}
     >
+
       {messages.map((m) => (
         <EchoBubble key={m.id} role={m.role} content={m.content} meta={m.meta} />
       ))}
