@@ -34,6 +34,7 @@ import { FeedFollowPill } from '@/components/feed/FeedFollowPill';
 import MapPinIcon from '@/components/icons/MapPinIcon';
 import { Z } from '@/config/zIndex';
 import { formatRatingValue } from '@/utils/formatters';
+import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 const AMBER = '#F7931E';
