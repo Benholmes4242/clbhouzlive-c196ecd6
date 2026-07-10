@@ -45,7 +45,7 @@ const COL_THRU = 30;
 const COL_TODAY = 32;
 
 const FALLBACK_GRADIENT = 'linear-gradient(180deg,#1E4D38,#0F172A)';
-const IMAGE_FOCAL = 'center 40%';
+const IMAGE_FOCAL = '50% 72%';
 
 // ---- helpers --------------------------------------------------------------
 
@@ -536,12 +536,16 @@ export function CinematicHeroFullBleed({
     ? [venueName, datesString].filter(Boolean).join(' · ')
     : '';
 
+  // Cinematic photo variant (upcoming/results): shorter clamp height biases
+  // toward course architecture, not sky. Live keeps the taller frame so the
+  // in-hero leaderboard band has room to breathe.
+  const heroHeight = isLive ? '78vh' : 'clamp(420px, 52dvh, 560px)';
   return (
     <div
       style={{
         position: 'relative',
         width: '100%',
-        minHeight: '78vh',
+        minHeight: heroHeight,
         background,
         backgroundColor: INK_BASE,
         display: 'flex',
@@ -550,7 +554,8 @@ export function CinematicHeroFullBleed({
       }}
     >
       {/* Spacer */}
-      <div style={{ flex: 1, minHeight: 220 }} />
+      <div style={{ flex: 1, minHeight: isLive ? 220 : 140 }} />
+
 
       {/* Title block */}
       <div
