@@ -197,24 +197,27 @@ async function runVideo(job: InternalJob, item: StageMediaItem, displayOrder: nu
 
 async function runJob(job: InternalJob): Promise<void> {
   const { ctx, items } = job;
+  const offset = ctx.displayOrderOffset ?? 0;
 
-  uploadEventBus.emit('post:shell-created', {
-    type: 'post:shell-created',
-    jobId: ctx.jobId,
-    postId: ctx.postId,
-    actorType: ctx.actorType,
-    actorId: ctx.actorId,
-    hasMedia: items.length > 0,
-  });
+  if (!ctx.skipFinalize) {
+    uploadEventBus.emit('post:shell-created', {
+      type: 'post:shell-created',
+      jobId: ctx.jobId,
+      postId: ctx.postId,
+      actorType: ctx.actorType,
+      actorId: ctx.actorId,
+      hasMedia: items.length > 0,
+    });
+  }
 
   const failedIndices: number[] = [];
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
     try {
       if (item.type === 'video') {
-        await runVideo(job, item, i);
+        await runVideo(job, item, offset + i);
       } else {
-        await runImage(job, item, i);
+        await runImage(job, item, offset + i);
       }
       job.snapshot.completedFiles++;
       emitSnapshot(job);
@@ -245,8 +248,10 @@ async function runJob(job: InternalJob): Promise<void> {
     });
   }
 
-  const { error } = await supabase.rpc('finalize_post_v2', { p_post_id: ctx.postId });
-  if (error) throw error;
+  if (!ctx.skipFinalize) {
+    const { error } = await supabase.rpc('finalize_post_v2', { p_post_id: ctx.postId });
+    if (error) throw error;
+  }
 
   uploadEventBus.emit('upload:complete', {
     type: 'upload:complete',
@@ -259,6 +264,7 @@ async function runJob(job: InternalJob): Promise<void> {
     scheduledAt: ctx.scheduledAt,
   });
 }
+
 
 /**
  * Start an upload job. Returns synchronously with the job snapshot; the
