@@ -4,6 +4,8 @@ import { useConversations } from '@/hooks/messaging/useConversations';
 import { ConversationRow } from './ConversationRow';
 import NewConversationSheet from './NewConversationSheet';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
+import { useMessagingActor } from '@/hooks/messaging/useMessagingActor';
+import { safeLocalStorage } from '@/utils/safeLocalStorage';
 
 
 const CANVAS = '#F8FAFC';
