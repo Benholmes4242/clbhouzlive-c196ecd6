@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { toast } from 'sonner';
 import BottomSheet from './BottomSheet';
+import { formatScheduleDay, formatScheduleTime } from '../lib/formatSchedule';
 
 interface Props {
   open: boolean;
@@ -27,12 +28,8 @@ function startOfDay(d: Date) {
 function sameDay(a: Date, b: Date) {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 }
-function fmtSummaryDay(target: Date, now: Date) {
-  if (sameDay(target, now)) return 'today';
-  const tmr = new Date(now); tmr.setDate(tmr.getDate() + 1);
-  if (sameDay(target, tmr)) return 'tomorrow';
-  return `${DAY_LABELS[target.getDay()][0] + DAY_LABELS[target.getDay()].slice(1).toLowerCase()} ${target.getDate()} ${MONTH_LABELS[target.getMonth()]}`;
-}
+
+
 
 export default function ScheduleSheetV2({ open, onClose, value, onChange, onOpenScheduled, scheduledCount }: Props) {
   const now = useMemo(() => new Date(), [open]);
@@ -153,7 +150,7 @@ export default function ScheduleSheetV2({ open, onClose, value, onChange, onOpen
         <div style={{ marginTop: 4, padding: '12px 14px', borderRadius: 12, background: '#FFFFFF', border: '1px solid rgba(15,23,42,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ fontSize: 13, color: isPast ? '#B00020' : '#0F172A' }}>
             {isPast ? 'Pick a future time.' : (
-              <>Goes live <span style={{ fontWeight: 700 }}>{fmtSummaryDay(selDate, now)}</span> - <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{String(hour).padStart(2, '0')}:{String(minute).padStart(2, '0')}</span></>
+              <>Goes live <span style={{ fontWeight: 700 }}>{formatScheduleDay(finalDate, now)}</span> - <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{formatScheduleTime(finalDate)}</span></>
             )}
           </div>
         </div>
