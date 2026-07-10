@@ -536,19 +536,19 @@ export function CinematicHeroFullBleed({
     ? [venueName, datesString].filter(Boolean).join(' · ')
     : '';
 
-  // Cinematic photo variant: clamped height biases toward course
-  // architecture, not sky. Live is slightly taller (56dvh vs 52dvh) because
-  // it carries the in-hero leaderboard band, but both share the same
-  // discipline: TI eyebrow reachable at the fold.
-  const heroHeight = isLive
-    ? 'clamp(480px, 56dvh, 620px)'
-    : 'clamp(420px, 52dvh, 560px)';
+  // Cinematic photo variant: single unified height clamp across all three
+  // states (live / upcoming / results). Uses fixed `height` (not minHeight)
+  // with overflow:hidden so state-specific child stacks (leaderboard rows,
+  // runners-up rows, champion strip) cannot push the container past the
+  // shared floor. Spacer is equalized so title/eyebrow rest position matches.
+  const heroHeight = 'clamp(460px, 54dvh, 600px)';
   return (
     <div
       style={{
         position: 'relative',
         width: '100%',
-        minHeight: heroHeight,
+        height: heroHeight,
+        overflow: 'hidden',
         background,
         backgroundColor: INK_BASE,
         display: 'flex',
@@ -557,7 +557,8 @@ export function CinematicHeroFullBleed({
       }}
     >
       {/* Spacer */}
-      <div style={{ flex: 1, minHeight: isLive ? 170 : 140 }} />
+      <div style={{ flex: 1, minHeight: 150 }} />
+
 
 
       {/* Title block */}
