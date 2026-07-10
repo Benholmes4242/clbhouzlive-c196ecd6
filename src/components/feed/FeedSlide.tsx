@@ -1398,6 +1398,8 @@ const FullscreenPagerPage: React.FC<{
             transform: 'scale(1.2)',
           }}
         />
+        {/* Dim the surround (near-black); media sits above at zIndex 1. */}
+        <div aria-hidden="true" className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.55)' }} />
         <div
           ref={zoomRef}
           style={{
