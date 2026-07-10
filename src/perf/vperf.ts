@@ -677,9 +677,21 @@ interface KindStat {
   slow: number;
   timeout: number;
   superseded: number;
-  totals: number[]; // durations for p50/p95/worst
+  totals: number[];  // fixed-size ring; length ≤ TOTALS_CAP, order not meaningful
+  totalsIdx: number; // next write index once full
 }
 
+// PHASE-2: bounded rings for always-on collection. push+shift was O(n) and
+// caused GC churn under load; ring push is O(1). p50/p95/worst are computed
+// only at flush time (scorecard emit / telemetry snapshot), never on the
+// hot path.
+const TOTALS_CAP = 500;
+const STARTLEVELS_CAP = 500;
+function ringPush(arr: number[], idx: number, cap: number, v: number): number {
+  if (arr.length < cap) { arr.push(v); return arr.length === cap ? 0 : idx; }
+  arr[idx] = v;
+  return (idx + 1) % cap;
+}
 
 const scorecardBuckets = new Map<string, KindStat>();      // key = `${kind}|${page}`
 const sessionHealth = {
@@ -696,13 +708,14 @@ const feedRollup = new Map<string, { scrolls: number; longFrames: number; frames
 
 // [PREDICT] scorecard extras — per-lane-class start levels (median target)
 // and prefetch counters (issued / aborted / hit-rate).
-const startLevelsByLane = new Map<string, number[]>(); // laneId → startLevels
+const startLevelsByLane = new Map<string, { arr: number[]; idx: number }>();
 const prefetchStats = {
   issued: 0,
   aborted: new Map<string, number>(),
   activationsWithPrefetch: 0,
   activationsWithPrefetchWarm: 0,
 };
+
 
 
 function bucketKey(kind: string, page: string): string { return `${kind}|${page}`; }
