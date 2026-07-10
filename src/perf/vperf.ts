@@ -210,8 +210,43 @@ export function vperfEnd(
   const rec = spans.get(spanId);
   if (!rec) return;
   spans.delete(spanId);
+  clearLaneArmsBySpan(spanId);
   finish(rec, 'PASS', extraMeta);
 }
+
+/** Close an in-flight span as SUPERSEDED — reports actual elapsed time but
+ *  is excluded from PASS/SLOW/TIMEOUT verdict rollups (flicked-past posts
+ *  and abandoned opens are not slow, they were superseded). No-op if the
+ *  span is not currently in the map. */
+export function vperfSupersede(
+  spanId: string,
+  extraMeta: Record<string, unknown> = {},
+): void {
+  if (!on()) return;
+  const rec = spans.get(spanId);
+  if (!rec) return;
+  spans.delete(spanId);
+  clearLaneArmsBySpan(spanId);
+  clearTimeout(rec.timer);
+  const totalMs = Math.round(performance.now() - rec.t0);
+  emit(rec.kind, {
+    totalMs,
+    phases: rec.phases,
+    budgetMs: rec.budgetMs,
+    verdict: 'SUPERSEDED' as Verdict,
+    ...rec.meta,
+    ...extraMeta,
+  });
+}
+
+function clearLaneArmsBySpan(spanId: string): void {
+  for (const [laneId, list] of laneArms) {
+    const filtered = list.filter((a) => a.spanId !== spanId);
+    if (filtered.length === 0) laneArms.delete(laneId);
+    else if (filtered.length !== list.length) laneArms.set(laneId, filtered);
+  }
+}
+
 
 /** Adjust the budget for an in-flight span (e.g. once you know whether the
  *  open path is borrow vs cold-lane). No-op if the span has already ended. */
