@@ -1109,8 +1109,8 @@ export function CinematicHeroFullBleed({
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 12,
-                padding: '14px 18px',
+                gap: 10,
+                padding: '10px 18px',
               }}
             >
               <SquircleAvatar
@@ -1120,7 +1120,7 @@ export function CinematicHeroFullBleed({
                 hairlineRing
                 ringColor={GOLD_RING}
               />
-              <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 1 }}>
                 <span
                   style={{
                     fontSize: 9.5,
