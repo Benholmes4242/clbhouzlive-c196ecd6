@@ -505,7 +505,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     borderRadius: 10,
                     background: AMBER,
                     border: 'none',
-                    color: '#0A0E14',
+                    color: 'rgba(255,255,255,0.95)',
                     fontSize: 12,
                     fontWeight: 700,
                     cursor: courseId ? 'pointer' : 'default',

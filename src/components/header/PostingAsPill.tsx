@@ -83,17 +83,20 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
           {badgeCount > 0 && (
             <span
               className={cn(
-                "absolute -top-1 -right-1 flex items-center justify-center rounded-full bg-[#F7931E] font-bold",
+                "absolute -top-1 -right-1 inline-flex items-center justify-center rounded-full bg-[#F7931E] font-bold leading-none",
                 badgeCount > 9
                   ? "h-[18px] min-w-[18px] px-[4px] text-[10px]"
                   : "h-[18px] w-[18px] text-[10px]"
               )}
-              style={{ color: 'rgba(255,255,255,0.95)', boxShadow: '0 0 0 0.5px rgba(255,255,255,0.95)' }}
+              style={{
+                color: 'rgba(255,255,255,0.95)',
+                boxShadow: '0 0 0 0.5px rgba(255,255,255,0.95)',
+                fontVariantNumeric: 'tabular-nums',
+                textAlign: 'center',
+              }}
               aria-label={`${badgeCount} unread`}
             >
-              <span style={{ lineHeight: 1 }}>
-                {badgeCount > 99 ? '99+' : badgeCount}
-              </span>
+              {badgeCount > 99 ? '99+' : badgeCount}
             </span>
           )}
         </button>
@@ -197,16 +200,15 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
           {badgeCount > 0 && (
             <span
               className={cn(
-                "absolute -top-1 -right-1 flex items-center justify-center rounded-full bg-[#F7931E] font-bold text-white",
+                "absolute -top-1 -right-1 inline-flex items-center justify-center rounded-full bg-[#F7931E] font-bold text-white leading-none",
                 badgeCount > 9
                   ? "h-[16px] min-w-[16px] px-[3px] text-[8px]"
                   : "h-[14px] w-[14px] text-[8px]"
               )}
+              style={{ fontVariantNumeric: 'tabular-nums', textAlign: 'center' }}
               aria-label={`${badgeCount} unread`}
             >
-              <span style={{ lineHeight: 1 }}>
-                {badgeCount > 99 ? '99+' : badgeCount}
-              </span>
+              {badgeCount > 99 ? '99+' : badgeCount}
             </span>
           )}
         </div>
