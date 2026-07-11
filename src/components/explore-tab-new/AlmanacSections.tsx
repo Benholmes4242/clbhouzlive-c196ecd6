@@ -1,9 +1,12 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { FeatCard } from './FeatCard';
 import { useRegionFeats, type FeatTier } from './hooks/useRegionFeats';
 import { AMBER, INK, INK_TINT_06 } from '@/features/courses/_shared/tokens';
+import { TierSeeAllSheet } from './TierSeeAllSheet';
+
+const RAIL_CAP = 12;
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
