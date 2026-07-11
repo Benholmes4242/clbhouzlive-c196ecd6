@@ -69,12 +69,20 @@ function LoadingBlock() {
   );
 }
 
-export function SearchOverlayV2({ isOpen, onClose, mode = 'default' }: Props) {
+export function SearchOverlayV2({
+  isOpen,
+  onClose,
+  mode = 'default',
+  placeholder,
+  onCommit,
+}: Props) {
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
   const [inputValue, setInputValue] = useState('');
-  const [scope, setScope] = useState<Scope>(mode === 'videos' ? 'videos' : 'all');
-  const { items: recents, save, clear } = useRecentSearchesV2();
+  const initialScope: Scope =
+    mode === 'videos' || mode === 'commit' ? 'videos' : 'all';
+  const [scope, setScope] = useState<Scope>(initialScope);
+  const { items: recents, save, clear, remove } = useRecentSearchesV2();
 
   useEffect(() => {
     if (isOpen) {
@@ -82,8 +90,8 @@ export function SearchOverlayV2({ isOpen, onClose, mode = 'default' }: Props) {
       return () => clearTimeout(t);
     }
     setInputValue('');
-    setScope(mode === 'videos' ? 'videos' : 'all');
-  }, [isOpen, mode]);
+    setScope(initialScope);
+  }, [isOpen, initialScope]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -114,7 +122,20 @@ export function SearchOverlayV2({ isOpen, onClose, mode = 'default' }: Props) {
     [q, save, onClose],
   );
 
-  const showChips = mode !== 'videos';
+  const commitTerm = useCallback(
+    (term: string) => {
+      const t = term.trim();
+      if (!t) return;
+      save(t);
+      onCommit?.(t);
+      setInputValue('');
+      onClose();
+    },
+    [save, onCommit, onClose],
+  );
+
+  const showChips = mode === 'default';
+  const isCommit = mode === 'commit';
 
   const totalHits =
     data.people.length +
