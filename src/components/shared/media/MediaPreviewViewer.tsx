@@ -27,6 +27,19 @@ export function MediaPreviewViewer({
   const isZoomed = scale > 1;
   const item = items[currentIndex];
 
+  const swipeRef = useSwipeGesture({
+    onSwipeLeft: () => {
+      if (!isZoomed && currentIndex < items.length - 1) setCurrentIndex(currentIndex + 1);
+    },
+    onSwipeRight: () => {
+      if (!isZoomed && currentIndex > 0) setCurrentIndex(currentIndex - 1);
+    },
+    onSwipeDown: () => {
+      if (!isZoomed) onClose();
+    },
+    threshold: 60,
+  });
+
   // Reset zoom on slide change
   useEffect(() => {
     resetZoom();
