@@ -11,6 +11,7 @@ export type EmptyStateEvent = {
   id: string;
   name: string;
   is_live: boolean;
+  tour_slug?: string | null;
 };
 
 export type EmptyStatePlayer = {
