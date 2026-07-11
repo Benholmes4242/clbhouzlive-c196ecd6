@@ -94,7 +94,7 @@ export const FullscreenScrubber: React.FC<Props> = ({ activePost }) => {
     const tick = () => {
       if (!alive) return;
       try {
-        const s = VideoEngine.snapshot(LANE_ID);
+        const s = VideoEngine.snapshot(laneId);
         if (ownerMatches(s.postId, expectedKey)) {
           if (!dragging) setCurrentTime(s.currentTime);
           setDuration(s.duration);
@@ -109,7 +109,7 @@ export const FullscreenScrubber: React.FC<Props> = ({ activePost }) => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
     };
-  }, [isVideo, expectedKey, dragging]);
+  }, [isVideo, expectedKey, laneId, dragging]);
 
   // Reset displayed position when active media changes.
   useEffect(() => {
@@ -122,12 +122,13 @@ export const FullscreenScrubber: React.FC<Props> = ({ activePost }) => {
   const applySeek = useCallback((sec: number) => {
     if (!expectedKey) return;
     try {
-      const s = VideoEngine.snapshot(LANE_ID);
+      const s = VideoEngine.snapshot(laneId);
       if (!ownerMatches(s.postId, expectedKey)) return; // stale owner — reject
       const target = Math.max(0, Math.min(sec, duration > 0 ? duration : sec));
-      VideoEngine.seek(LANE_ID, target);
+      VideoEngine.seek(laneId, target);
     } catch { /* noop */ }
-  }, [expectedKey, duration]);
+  }, [expectedKey, laneId, duration]);
+
 
   // Bar drag handlers.
   const seekFromClientX = useCallback((clientX: number): number | null => {
