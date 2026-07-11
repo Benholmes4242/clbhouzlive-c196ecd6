@@ -4,8 +4,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import PageRoot from '@/components/layout/PageRoot';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
-import SearchOverlay from '@/components/shared/SearchOverlay';
-import { useRecentSearches } from '@/hooks/useRecentSearches';
+import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import ShellSlot from '@/components/header/ShellSlot';
 
 import { useVideosMood } from '@/components/watch/videos/hooks/useVideosMood';
@@ -13,10 +12,6 @@ import { VideosMoodChips } from '@/components/watch/videos/VideosMoodChips';
 import { VideosFullFeed } from '@/components/watch/videos/VideosFullFeed';
 
 const CREAM = '#F8FAFC';
-
-const TRENDING = [
-  'Course Vlogs', 'Coaching', 'Rory', 'Masters', 'Wedge Play', 'Putting',
-];
 
 export default function VideosSubpage() {
   const navigationType = useNavigationType();
