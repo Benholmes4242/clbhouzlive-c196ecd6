@@ -29,7 +29,9 @@ export default function WatchHubV2() {
         >
           <div
             style={{
-              font: '800 24px/1.1 inherit',
+              fontWeight: 800,
+              fontSize: 24,
+              lineHeight: 1.1,
               letterSpacing: '-0.02em',
               color: '#0F172A',
               fontFamily: FONT_FAMILY,
