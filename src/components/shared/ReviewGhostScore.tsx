@@ -11,7 +11,7 @@
  * the label above it.
  */
 import React from 'react';
-import { getRatingTier, getRatingTierLabel, type RatingTier } from '@/lib/ratingTier';
+import { getRatingTier, getRatingTierLabel, ratingTextColor, type RatingTier } from '@/lib/ratingTier';
 import { formatRatingValue } from '@/utils/formatters';
 
 export const REVIEW_GHOST_COLOR: Record<RatingTier, string> = {
@@ -90,22 +90,35 @@ interface ReviewVerdictLabelProps {
   /** Optional click handler — wraps the label in a bare button when provided. */
   onClick?: (e: React.MouseEvent) => void;
   ariaLabel?: string;
+  /**
+   * Surface behind the label. 'dark' preserves the original low-alpha white
+   * for FAIR/POOR (used on charcoal feed cards / dark review sheets).
+   * 'light' uses the opaque tier colours from `ratingTextColor` so the label
+   * remains legible on white cards such as the Review Wizard preview.
+   */
+  surface?: 'light' | 'dark';
 }
 
 /**
  * The tier verdict word (EXCEPTIONAL / EXCELLENT / GOOD / FAIR / POOR).
- * Amber-family for higher tiers; low-alpha white for FAIR/POOR.
- * EXCEPTIONAL gets the gold shimmer sweep.
+ * On dark surfaces FAIR/POOR stay low-alpha white; on light surfaces they use
+ * the same opaque ember/amber colours as the profile feed.
+ * EXCEPTIONAL gets the gold shimmer sweep on both surfaces.
  */
 export const ReviewVerdictLabel: React.FC<ReviewVerdictLabelProps> = ({
   rating,
   fontSize = 12.5,
   onClick,
   ariaLabel,
+  surface = 'dark',
 }) => {
   const tierKey = getRatingTier(rating);
   const tierLabel = getRatingTierLabel(rating);
   const isExceptional = tierKey === 'EXCEPTIONAL';
+  const labelColor =
+    surface === 'light' && !isExceptional
+      ? ratingTextColor(rating)
+      : REVIEW_LABEL_COLOR[tierKey];
   const labelSpan = (
     <span
       className={isExceptional ? 'clbhouz-gold-shimmer' : undefined}
@@ -115,7 +128,7 @@ export const ReviewVerdictLabel: React.FC<ReviewVerdictLabelProps> = ({
         letterSpacing: '0.14em',
         textTransform: 'uppercase',
         whiteSpace: 'nowrap',
-        ...(isExceptional ? {} : { color: REVIEW_LABEL_COLOR[tierKey] }),
+        ...(isExceptional ? {} : { color: labelColor }),
       }}
     >
       {tierLabel}
