@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { X, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
+import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import type { OrderedMediaItem } from './types';
 
 interface MediaPreviewViewerProps {
