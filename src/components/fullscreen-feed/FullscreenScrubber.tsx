@@ -220,20 +220,25 @@ export const FullscreenScrubber: React.FC<Props> = ({ activePost }) => {
       armed = false;
       const dt = performance.now() - startT;
       if (moved || dt > 300) return;
-      // Clean tap — toggle play/pause via engine, owner-guarded.
+      // Clean tap — toggle play/pause via engine, owner-guarded. viaViewer
+      // bypasses the borrow-swallow guard in VideoEngine so tap-pause works
+      // while playback is still on the borrowed rail lane.
       try {
-        const s = VideoEngine.snapshot(LANE_ID);
+        const s = VideoEngine.snapshot(laneId);
         if (!ownerMatches(s.postId, expectedKey)) return;
         if (s.state === 'playing') {
-          VideoEngine.pause(LANE_ID, { callerPostId: expectedKey });
+          VideoEngine.pause(laneId, { callerPostId: expectedKey, viaViewer: true });
+          addPausedOwnerKey(expectedKey);
           setFlashIcon('pause');
         } else {
-          void VideoEngine.play(LANE_ID, { callerPostId: expectedKey });
+          removePausedOwnerKey(expectedKey);
+          void VideoEngine.play(laneId, { callerPostId: expectedKey, viaViewer: true });
           setFlashIcon('play');
         }
         if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
         flashTimerRef.current = setTimeout(() => setFlashIcon(null), 400);
       } catch { /* noop */ }
+
     };
     const onCancel = () => {
       armed = false;
