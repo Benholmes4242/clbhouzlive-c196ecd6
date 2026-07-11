@@ -4,6 +4,7 @@
 import { Plus, Play } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { StageMediaItem, FrameId } from '../hooks/useStageComposer';
+import CroppedImage from './CroppedImage';
 
 const FRAME_RATIO: Record<FrameId, number | null> = {
   original: null,
@@ -212,7 +213,7 @@ export default function MediaStageV2({ item, index, total, onOpenAdjust, onOpenT
         {item.type === 'video' ? (
           <video src={item.previewUrl} playsInline muted loop autoPlay style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         ) : (
-          <img src={item.previewUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <CroppedImage item={item} />
         )}
       </div>
       {total > 1 && (
