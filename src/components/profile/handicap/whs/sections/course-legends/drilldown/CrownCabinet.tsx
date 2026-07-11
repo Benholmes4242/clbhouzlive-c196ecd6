@@ -28,6 +28,7 @@ export const CrownCabinet: React.FC<CrownCabinetProps> = ({
   onWindowChange,
 }) => {
   const cols = slots.length || 6;
+  const orderedSlots = [...slots].sort((a, b) => Number(b.held) - Number(a.held));
 
   return (
     <div
@@ -39,21 +40,27 @@ export const CrownCabinet: React.FC<CrownCabinetProps> = ({
         padding: '14px 16px',
       }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, marginBottom: 6 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginBottom: 6 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <SectionHeader role="section" kicker="YOUR CROWN CABINET" />
         </div>
         <span
           style={{
-            fontSize: 12.5,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 5,
+            fontSize: 11,
             fontWeight: 800,
-            color: INK,
+            color: 'var(--hcp-gold-text)',
+            background: 'rgba(251,188,46,0.16)',
+            borderRadius: 999,
+            padding: '4px 10px',
             fontVariantNumeric: 'tabular-nums',
-            lineHeight: 1,
-            paddingTop: 2,
             whiteSpace: 'nowrap',
+            lineHeight: 1,
           }}
         >
+          <Crown size={11} strokeWidth={2.6} />
           {heldCount} / {slots.length}
         </span>
       </div>
@@ -71,7 +78,7 @@ export const CrownCabinet: React.FC<CrownCabinetProps> = ({
           scrollbarWidth: 'none',
         }}
       >
-        {slots.map((slot) => {
+        {orderedSlots.map((slot) => {
           const SlotIcon = slot.icon;
           return (
             <div
