@@ -236,24 +236,10 @@ const ClubhouseContent = () => {
   const { handleLike, getActiveLikeState, resetLikes } = useClubhouseLikes({ userId: user?.id, activeActor });
   const activeLikeState = getActiveLikeState(activePost);
 
-  // ── Editorial card like count for CommentsSheet ──
-  const editorialCardId = ['course_of_week_card'].includes(activePost?.postType ?? '')
-    ? (activePost as any)?.cardData?.cardId
-    : null;
+  // Editorial like-count query removed in C4 — CommentsSheetV2 owns its own
+  // counts and the editorial mount no longer needs likesCount plumbing.
 
-  const { data: editorialLikeCount } = useQuery({
-    queryKey: ['editorial-card-likes-count', editorialCardId],
-    queryFn: async () => {
-      if (!editorialCardId) return 0;
-      const { count } = await supabase
-        .from('editorial_card_likes')
-        .select('*', { count: 'exact', head: true })
-        .eq('card_id', editorialCardId);
-      return count ?? 0;
-    },
-    enabled: !!editorialCardId,
-    staleTime: 0,
-  });
+
   
   // ── Optimistic follow state ──
   const { followOverrides, handleFollow, handleFollowChange, getFollowState, resetFollows } = useClubhouseFollows({ userId: user?.id });
