@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { ThumbsUp, ThumbsDown } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, MoreHorizontal } from "lucide-react";
+import { ThumbsUp, ThumbsDown, MoreHorizontal } from 'lucide-react';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
@@ -39,6 +40,7 @@ interface ReviewBlockFlatProps {
   onMediaClick?: (index: number, el: HTMLElement | null) => void;
   onUserClick?: () => void;
   onEditClick?: () => void;
+  onReportClick?: () => void;
   disabled?: boolean;
 }
 
@@ -121,7 +123,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
   onToggleHelpful,
   onMediaClick,
   onUserClick,
-  onEditClick,
+  { onEditClick, onReportClick }
   disabled,
 }) => {
   const { user, score, text, createdAt, isHelpful, isUnhelpful, helpfulCount, isMock, media } = review;
