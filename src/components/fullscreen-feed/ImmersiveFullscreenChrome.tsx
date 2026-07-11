@@ -230,33 +230,46 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
               textAlign: 'right',
             }}
           >
-            <span
-              title={courseName}
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); handleCourseTap(); }}
+              aria-label={`Open ${courseName}`}
               style={{
-                fontSize: 15, fontWeight: 600, color: '#fff', lineHeight: 1.2,
-                textShadow: TEXT_SHADOW,
-                maxWidth: '100%', overflow: 'hidden',
-                textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                display: 'flex', flexDirection: 'column', alignItems: 'flex-end',
+                gap: 4, maxWidth: '100%', minWidth: 0, textAlign: 'right',
+                background: 'transparent', border: 'none', padding: 0, margin: 0,
+                cursor: 'pointer', pointerEvents: 'auto', fontFamily: 'inherit',
+                color: 'inherit',
               }}
             >
-              {courseName}
-            </span>
-            {courseLocation && (
               <span
+                title={courseName}
                 style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 4,
-                  fontSize: 12, color: '#fff', opacity: 0.8, lineHeight: 1.1,
+                  fontSize: 15, fontWeight: 600, color: '#fff', lineHeight: 1.2,
                   textShadow: TEXT_SHADOW,
                   maxWidth: '100%', overflow: 'hidden',
                   textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                 }}
               >
-                <MapPinIcon width={12} height={12} style={{ flexShrink: 0 }} />
-                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {courseLocation}
-                </span>
+                {courseName}
               </span>
-            )}
+              {courseLocation && (
+                <span
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 4,
+                    fontSize: 12, color: '#fff', opacity: 0.8, lineHeight: 1.1,
+                    textShadow: TEXT_SHADOW,
+                    maxWidth: '100%', overflow: 'hidden',
+                    textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  }}
+                >
+                  <MapPinIcon width={12} height={12} style={{ flexShrink: 0 }} />
+                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {courseLocation}
+                  </span>
+                </span>
+              )}
+            </button>
             {showCourseChip && (
               <button
                 type="button"
