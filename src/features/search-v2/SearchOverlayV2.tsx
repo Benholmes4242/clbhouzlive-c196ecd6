@@ -164,8 +164,21 @@ export function SearchOverlayV2({
             value={inputValue}
             onChange={setInputValue}
             onCancel={handleClose}
-            onSubmit={() => q && save(q)}
-            placeholder={mode === 'videos' ? 'Search videos' : 'Search clbhouz'}
+            onSubmit={() => {
+              if (isCommit) {
+                commitTerm(inputValue);
+              } else if (q) {
+                save(q);
+              }
+            }}
+            placeholder={
+              placeholder ??
+              (mode === 'videos'
+                ? 'Search videos'
+                : isCommit
+                  ? 'Search videos…'
+                  : 'Search clbhouz')
+            }
           />
 
           {showChips && <ScopeChips scope={scope} onChange={setScope} />}
@@ -180,7 +193,10 @@ export function SearchOverlayV2({
             {!hasQuery && (
               <RecentsList
                 items={recents}
-                onPick={(qq) => setInputValue(qq)}
+                onPick={(qq) => {
+                  if (isCommit) commitTerm(qq);
+                  else setInputValue(qq);
+                }}
                 onClear={clear}
               />
             )}
