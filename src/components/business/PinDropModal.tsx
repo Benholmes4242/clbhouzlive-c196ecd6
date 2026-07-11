@@ -7,9 +7,11 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { AddressValue } from './AddressAutocomplete';
 import { AppLog } from '@/lib/logger';
+import { MAP_CONFIG } from '@/config/maps';
 
-// Mapbox public token
-const MAPBOX_TOKEN = 'pk.eyJ1IjoiY2xiaG91eiIsImEiOiJjbTVyejIzMXcxemx2MmpzZDU3YjkxNjNkIn0.H_w9d-UAvvMRkJ_9DoVQ-A';
+// Route through shared MAP_CONFIG so the workerClass override in maps.ts
+// is installed before this modal constructs a map.
+const MAPBOX_TOKEN = MAP_CONFIG.TOKEN;
 
 interface PinDropModalProps {
   open: boolean;
