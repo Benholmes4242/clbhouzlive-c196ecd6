@@ -63,6 +63,15 @@ const Divider = () => (
   <div style={{ height: '0.5px', background: HAIRLINE_INK_7 }} />
 );
 
+const TIER_ROWS: { key: ScoreTier; label: string }[] = [
+  { key: 'exceptional', label: 'Exceptional' },
+  { key: 'excellent',  label: 'Excellent' },
+  { key: 'good',       label: 'Good' },
+  { key: 'fair',       label: 'Fair' },
+  { key: 'poor',       label: 'Poor' },
+];
+
+
 const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   courseId,
   courseName,
