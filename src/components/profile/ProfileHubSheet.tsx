@@ -196,7 +196,7 @@ function QuickActionTile({
               height: 16,
               padding: '0 4px',
               borderRadius: 8,
-              background: INK,
+              background: AMBER,
               color: '#FFFFFF',
               fontSize: 9.5,
               fontWeight: 700,
