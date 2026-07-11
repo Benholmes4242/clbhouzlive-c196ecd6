@@ -162,7 +162,7 @@ export default function ScheduleSheetV2({ open, onClose, value, onChange, onOpen
             style={{
               flex: 2,
               background: isPast ? 'rgba(247,147,30,0.4)' : '#F7931E',
-              color: '#15171F',
+              color: '#FFFFFF',
               border: 0,
               borderRadius: 12,
               padding: '12px',
