@@ -1051,8 +1051,17 @@ const FullscreenMediaPager: React.FC<{
 }> = ({ post, media, openIdx, isSlideActive, isSuggestedFeed, onFirstFrameReady, onZoomChange }) => {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [activePagerIdx, setActivePagerIdx] = useState(openIdx);
+  const setStoreActivePagerIdx = useFullscreenFeedStore((s) => s.setActivePagerIdx);
   const borrow = useFullscreenFeedStore((s) => s.borrow);
   const demotedRef = useRef(false);
+
+  // Publish the initial page index and every settle so <FullscreenScrubber/>
+  // computes the correct ownerKey (broken previously — it read from
+  // clubhouseStore.carouselPositions which lags this pager).
+  useEffect(() => {
+    setStoreActivePagerIdx(activePagerIdx);
+  }, [activePagerIdx, setStoreActivePagerIdx]);
+
 
   // [FSPAGER] HTTP warm — request i±1 video neighbours through the
   // PrefetchController on mount and on every page transition. Lane-free:
