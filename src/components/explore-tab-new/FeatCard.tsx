@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { INK, INK_MUTE, HAIRLINE_INK_8, INK_TINT_06 } from '@/features/courses/_shared/tokens';
 import { TIER_ICON } from './AlmanacSections';
@@ -84,11 +85,34 @@ export function FeatCard({ row, tier, onTap }: Props) {
   const chipLabel = isRecord
     ? RECORD_CATEGORY_LABEL[row.category ?? ''] ?? 'Course record'
     : TIER_LABEL[tier];
-  const value = isRecord
-    ? row.value != null
-      ? String(row.value)
-      : ''
-    : row.feat_value ?? '';
+  const value = useMemo(() => {
+    if (isRecord) {
+      if (row.value == null) return '';
+      const v = Number(row.value);
+      switch (row.category) {
+        case 'most_eagles_all_time':
+        case 'most_eagles_90d':
+          return `${v} eagle${v === 1 ? '' : 's'}`;
+        case 'most_birdies_all_time':
+        case 'most_birdies_90d':
+          return `${v} birdie${v === 1 ? '' : 's'}`;
+        case 'most_aces_all_time':
+        case 'most_aces_90d':
+          return `${v} ace${v === 1 ? '' : 's'}`;
+        case 'lowest_gross_all_time':
+        case 'lowest_gross_90d':
+          return `Gross ${v}`;
+        case 'best_stableford_all_time':
+        case 'best_stableford_90d':
+          return `${v} pts`;
+        case 'best_score_diff_all_time':
+        case 'best_score_diff_90d':
+        default:
+          return String(row.value);
+      }
+    }
+    return row.feat_value ?? '';
+  }, [isRecord, row.category, row.feat_value, row.value]);
   const when = relDate(row.play_date ?? row.attained_at ?? null);
 
   // Palette
@@ -98,9 +122,10 @@ export function FeatCard({ row, tier, onTap }: Props) {
   const border = isLegendary ? '1px solid rgba(251,188,46,0.24)' : `1px solid ${HAIRLINE_INK_8}`;
   const nameColor = isLegendary ? '#FFFFFF' : INK;
   const courseColor = isLegendary ? 'rgba(255,255,255,0.72)' : INK_MUTE;
-  const valueColor = isLegendary ? '#FBBC2E' : ringColor;
+  const valueColor = isLegendary ? '#F8F4E8' : INK;
   const chipBg = isLegendary ? 'rgba(251,188,46,0.14)' : 'rgba(15,23,42,0.05)';
   const chipText = isLegendary ? '#FBBC2E' : INK;
+  
   
 
   return (
@@ -230,7 +255,7 @@ export function FeatCard({ row, tier, onTap }: Props) {
             style={{
               margin: '2px 0 0',
               fontSize: 13,
-              fontWeight: 800,
+              fontWeight: 700,
               color: valueColor,
               lineHeight: 1.15,
               fontVariantNumeric: 'tabular-nums',

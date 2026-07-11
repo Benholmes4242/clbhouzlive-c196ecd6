@@ -6,13 +6,10 @@ import {
   useCircleActivity,
   type CircleActivityRow,
   type CircleFeatType,
-  type CircleFeatTone,
 } from './hooks/useCircleActivity';
 import {
-  AMBER,
   INK,
   INK_MUTE,
-  INK_FAINT,
   HAIRLINE_INK_8,
   INK_TINT_06,
 } from '@/features/courses/_shared/tokens';
@@ -32,11 +29,6 @@ const FEAT_META: Record<CircleFeatType, { emoji: string; label: string }> = {
   birdie_haul: { emoji: '🐦', label: 'BIRDIE HAUL' },
   stableford: { emoji: '🔥', label: 'STABLEFORD' },
 };
-
-
-function valueColor(tone: CircleFeatTone): string {
-  return tone === 'plain' ? INK_MUTE : AMBER_TEXT;
-}
 
 function formatFriendName(raw: string): string {
   const s = (raw ?? '').trim();
@@ -294,8 +286,8 @@ function CircleActivityCard({ row, onTap }: CardProps) {
             style={{
               margin: '2px 0 0',
               fontSize: 14,
-              fontWeight: 800,
-              color: valueColor(row.feat_tone),
+              fontWeight: 700,
+              color: INK,
               lineHeight: 1.15,
               letterSpacing: '-0.005em',
               overflow: 'hidden',
