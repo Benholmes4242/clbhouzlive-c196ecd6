@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useCourseClaim, useCourseClaimStatus } from '@/hooks/useCourseClaim';
 import { supabase } from '@/integrations/supabase/client';
-import { ExternalLink, Pencil, BookOpen, BarChart3, MapPin } from 'lucide-react';
+import { ExternalLink, Pencil, BookOpen, BarChart3, MapPin, Quote } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import AboutMediaStrip from './AboutMediaStrip';
 import { useCourseCoordinates } from '@/hooks/useCourseCoordinates';
@@ -25,8 +25,6 @@ import { ConnectHandicapCue } from './ConnectHandicapCue';
 import { CourseTop100Spotlight } from './CourseTop100Spotlight';
 import { PersonalSection } from '@/components/courses/phase5';
 import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
-import { useBusinessClaimForCourse } from '@/hooks/useBusinessClaimForCourse';
-import SuggestEditModal from './SuggestEditModal';
 import ClaimCourseCTA from './ClaimCourseCTA';
 import ClaimUnderReviewNotice from './ClaimUnderReviewNotice';
 import ClaimedCourseProfileLink from './ClaimedCourseProfileLink';
@@ -77,11 +75,9 @@ const Divider = () => (
 const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [showWebsiteSheet, setShowWebsiteSheet] = useState(false);
-  const [showSuggestEdit, setShowSuggestEdit] = useState(false);
   const { user } = useSupabaseSession();
   
   const navigate = useNavigate();
-  const { data: businessClaim } = useBusinessClaimForCourse(course.id);
   const { data: courseClaim } = useCourseClaim(course.id);
   const { data: claimStatus } = useCourseClaimStatus(course.id);
 
@@ -187,50 +183,59 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       {/* 4. Friends Who've Played */}
       <CourseFriendsStrip courseId={course.id} courseName={course.name} />
 
-      {/* 5. About */}
+      {/* 5. About - quiet notes card */}
       {course.description && (
         <>
           <div style={{ marginTop: 24 }}>
             <SectionHeader role="section" kicker="ABOUT" paddingX={16} />
-            <div style={{ padding: '0 16px' }}>
+            <div
+              style={{
+                margin: '0 16px',
+                background: '#FFFFFF',
+                border: `1px solid ${HAIRLINE_INK_7}`,
+                borderRadius: 16,
+                padding: 16,
+              }}
+            >
+              {/* Amber quote-mark motif */}
+              <div
+                style={{
+                  width: 28, height: 28, borderRadius: 9,
+                  background: 'rgba(247,147,30,0.10)', color: AMBER,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  marginBottom: 10,
+                }}
+              >
+                <Quote size={14} fill="currentColor" strokeWidth={0} />
+              </div>
+              {/* Prose - same type, fade now matches the WHITE card bg */}
               <div style={{ fontSize: 14, color: SLATE_600, lineHeight: 1.7, position: 'relative' }}>
                 {formatDescription(displayDescription)}
                 {!showFullDescription && shouldShowReadMore && (
-                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 40, background: `linear-gradient(to top, ${SLATE_50}, transparent)`, pointerEvents: 'none' }} />
+                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 44, background: 'linear-gradient(to top, #FFFFFF, transparent)', pointerEvents: 'none' }} />
                 )}
               </div>
+              {/* Footer rail - amber ghost pill */}
               {shouldShowReadMore && (
-                <button
-                  onClick={() => setShowFullDescription(!showFullDescription)}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, color: INK_FAINT, padding: '8px 0 0', display: 'flex', alignItems: 'center', gap: 4 }}
-                >
-                  {showFullDescription ? 'Show less ↑' : 'Read more ↓'}
-                </button>
-              )}
-              {businessClaim?.isVerified && (
-                <button
-                  type="button"
-                  onClick={() => setShowSuggestEdit(true)}
-                  style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 8, background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, color: INK_FAINT }}
-                >
-                  <Pencil className="h-3 w-3" />
-                  Suggest an edit
-                </button>
+                <div style={{ marginTop: 12, paddingTop: 12, borderTop: `0.5px solid ${HAIRLINE_INK_7}` }}>
+                  <button
+                    onClick={() => setShowFullDescription(!showFullDescription)}
+                    style={{
+                      background: 'rgba(247,147,30,0.10)',
+                      border: 'none', borderRadius: 999,
+                      padding: '7px 14px',
+                      fontSize: 12, fontWeight: 700, color: AMBER,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {showFullDescription ? 'Show less' : 'Read more'}
+                  </button>
+                </div>
               )}
             </div>
           </div>
           <div style={{ margin: '24px 0' }}><Divider /></div>
         </>
-      )}
-
-      {businessClaim?.isVerified && (
-        <SuggestEditModal
-          open={showSuggestEdit}
-          onClose={() => setShowSuggestEdit(false)}
-          courseId={course.id}
-          businessId={businessClaim.businessId}
-          currentData={{ description: course.description, website_url: course.website_url }}
-        />
       )}
 
       {/* 6. Top 100 Spotlight — CourseTop100Spotlight renders its own header internally, no SectionLabel */}
