@@ -167,15 +167,21 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
     return (
       <div>
         <Header photoCount={0} videoCount={0} />
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4, padding: '0 16px' }}>
+        <div
+          style={
+            isMobile
+              ? { display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 5, padding: '0 16px' }
+              : { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4, padding: '0 16px' }
+          }
+        >
           {Array.from({ length: maxItems }).map((_, i) => (
             <div
               key={i}
-              style={{
-                aspectRatio: '1',
-                borderRadius: 10,
-                background: 'rgba(15,23,42,0.06)',
-              }}
+              style={
+                isMobile && i === 0
+                  ? { gridRow: '1 / span 2', height: '100%', borderRadius: 14, background: 'rgba(15,23,42,0.06)' }
+                  : { aspectRatio: '1', borderRadius: isMobile ? 12 : 10, background: 'rgba(15,23,42,0.06)' }
+              }
             />
           ))}
         </div>
