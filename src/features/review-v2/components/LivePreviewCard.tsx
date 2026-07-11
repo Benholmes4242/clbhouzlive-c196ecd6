@@ -40,6 +40,13 @@ interface Props {
 const T_INK = '#0F172A';
 const T_MUTE = 'rgba(15,23,42,0.55)';
 
+const REVIEW_FONT_SIZE = 14;
+const REVIEW_LINE_HEIGHT = 1.4;
+const REVIEW_CLAMP_LINES = 3;
+const REVIEW_BODY_MIN_HEIGHT =
+  REVIEW_FONT_SIZE * REVIEW_LINE_HEIGHT * REVIEW_CLAMP_LINES; // 58.8px
+
+
 const CAT_LABELS: { key: CategoryKey; label: string }[] = [
   { key: 'design', label: 'Design' },
   { key: 'condition', label: 'Condition' },
