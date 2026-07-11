@@ -71,7 +71,7 @@ function Card({ row, onOpen }: { row: any; onOpen: () => void }) {
             style={{
               width: 30,
               height: 30,
-              borderRadius: 999,
+              borderRadius: '34%',
               objectFit: 'cover',
               flexShrink: 0,
             }}
