@@ -4,6 +4,7 @@
 import { useRef } from 'react';
 import { toast } from 'sonner';
 import { MAX_MEDIA, type StageMediaItem } from '../hooks/useStageComposer';
+import CroppedImage from './CroppedImage';
 
 interface Props {
   media: StageMediaItem[];
@@ -53,7 +54,7 @@ export default function MediaTray({ media, activeIndex, onSelect, onRemove, onRe
             {m.type === 'video' ? (
               <video src={m.previewUrl} muted style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : (
-              <img src={m.previewUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <CroppedImage item={m} />
             )}
             <button
               onClick={(e) => { e.stopPropagation(); onRemove(i); }}

@@ -97,9 +97,14 @@ async function runImage(job: InternalJob, item: StageMediaItem, displayOrder: nu
 
   if (!item.file) throw new Error('Image item missing file');
   let sourceFile: File = item.file;
-  if (item.frame && item.frame !== 'original') {
+  const crop = item.crop;
+  const hasCropAdjust = !!crop && (crop.scale !== 1 || crop.x !== 50 || crop.y !== 50);
+  const shouldBake = (item.frame && item.frame !== 'original') || hasCropAdjust;
+  if (shouldBake) {
     try {
-      sourceFile = await bakeFrameCrop(item.file, item.frame as '4:5' | '1:1' | '9:16', { x: 50, y: 50 });
+      const pos = crop ? { x: crop.x, y: crop.y } : { x: 50, y: 50 };
+      const scale = crop?.scale ?? 1;
+      sourceFile = await bakeFrameCrop(item.file, item.frame, pos, scale);
     } catch (err) {
       console.warn('[post-v2] frame bake failed, falling back to original', err);
     }
