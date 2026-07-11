@@ -1,6 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { HAIRLINE_INK_7, INK, INK_LIGHT } from '@/features/courses/_shared/tokens';
+import { MapPin, Trophy } from 'lucide-react';
+import { HAIRLINE_INK_7, INK } from '@/features/courses/_shared/tokens';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import {
   dbValueToRegionKey,
   normalizeLabel,
@@ -27,6 +29,14 @@ interface CourseExploreLinksProps {
   course: Course;
 }
 
+const SHORT_LIST_LABELS: Record<string, string> = {
+  'gb-i': 'GB&I',
+  usa: 'USA',
+  europe: 'Europe',
+  global: 'World',
+  rest: 'Rest of World',
+};
+
 const CourseExploreLinks: React.FC<CourseExploreLinksProps> = ({ course }) => {
   const navigate = useNavigate();
 
@@ -39,7 +49,6 @@ const CourseExploreLinks: React.FC<CourseExploreLinksProps> = ({ course }) => {
 
   const membership = course.course_top100_memberships?.[0];
   const primaryListSlug = membership?.top100_lists?.slug ?? 'global-top-100';
-  const primaryListName = membership?.top100_lists?.name ?? 'Worldwide';
 
   const normalizeListSlug = (dbSlug: string): string => {
     const slug = dbSlug.toLowerCase();
@@ -51,69 +60,85 @@ const CourseExploreLinks: React.FC<CourseExploreLinksProps> = ({ course }) => {
     return 'global';
   };
 
-  const links: { label: React.ReactNode; onClick: () => void }[] = [];
-
-  if (subCountryLabel) {
-    links.push({
-      label: (
-        <>
-          More <span style={{ fontWeight: 700 }}>{subCountryLabel}</span> courses
-        </>
-      ),
-      onClick: () => {
-        const params = new URLSearchParams({
-          tab: 'explore',
-          region: primaryRegionKey,
-          sub: subKey || '',
-        });
-        navigate(`/courses?${params.toString()}`);
-      },
-    });
-  }
-
-  links.push({
-    label: (
-      <>
-        Explore{' '}
-        <span style={{ fontWeight: 700 }}>
-          {primaryListName.includes('Top 100') ? primaryListName : `${primaryListName} Top 100`}
-        </span>
-      </>
-    ),
-    onClick: () => {
-      const params = new URLSearchParams({
-        tab: 'top100',
-        list: normalizeListSlug(primaryListSlug),
-      });
-      navigate(`/courses?${params.toString()}`);
-    },
-  });
+  const shortListLabel = SHORT_LIST_LABELS[normalizeListSlug(primaryListSlug)] ?? 'World';
 
   return (
     <div>
-      {links.map((l, i) => (
-        <div key={i}>
+      <SectionHeader role="section" kicker="KEEP EXPLORING" paddingX={16} />
+      <div style={{ display: 'flex', gap: 12, padding: '9px 16px 0' }}>
+        {subCountryLabel && (
           <button
             type="button"
-            onClick={l.onClick}
+            onClick={() => {
+              const params = new URLSearchParams({
+                tab: 'explore',
+                region: primaryRegionKey,
+                sub: subKey || '',
+              });
+              navigate(`/courses?${params.toString()}`);
+            }}
             style={{
-              width: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '14px 28px',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              textAlign: 'left',
+              flex: 1, minWidth: 0, textAlign: 'left', cursor: 'pointer',
+              background: '#FFFFFF', border: `1px solid ${HAIRLINE_INK_7}`,
+              borderRadius: 16, padding: 14,
+              display: 'flex', flexDirection: 'column', gap: 9,
             }}
           >
-            <span style={{ fontSize: 13, fontWeight: 600, color: INK }}>{l.label}</span>
-            <span style={{ fontSize: 16, color: INK_LIGHT }}>›</span>
+            <div
+              style={{
+                width: 32, height: 32, borderRadius: 9,
+                background: 'rgba(247,147,30,0.10)', color: '#F7931E',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}
+            >
+              <MapPin size={16} />
+            </div>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: INK, lineHeight: 1.25 }}>
+                {subCountryLabel}
+              </div>
+              <div style={{ fontSize: 11, fontWeight: 500, color: 'rgba(15,23,42,0.55)', marginTop: 2 }}>
+                More courses nearby
+              </div>
+            </div>
           </button>
-          <div style={{ height: '0.5px', background: HAIRLINE_INK_7, margin: '0 16px' }} />
-        </div>
-      ))}
+        )}
+
+        <button
+          type="button"
+          onClick={() => {
+            const params = new URLSearchParams({
+              tab: 'top100',
+              list: normalizeListSlug(primaryListSlug),
+            });
+            navigate(`/courses?${params.toString()}`);
+          }}
+          style={{
+            flex: 1, minWidth: 0, textAlign: 'left', cursor: 'pointer',
+            background: '#FFFFFF', border: `1px solid ${HAIRLINE_INK_7}`,
+            borderRadius: 16, padding: 14,
+            display: 'flex', flexDirection: 'column', gap: 9,
+          }}
+        >
+          <div
+            style={{
+              width: 32, height: 32, borderRadius: 9,
+              background: 'rgba(247,147,30,0.10)', color: '#F7931E',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
+          >
+            <Trophy size={16} />
+          </div>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: INK, lineHeight: 1.25 }}>
+              {shortListLabel} Top 100
+            </div>
+            <div style={{ fontSize: 11, fontWeight: 500, color: 'rgba(15,23,42,0.55)', marginTop: 2 }}>
+              Explore the full list
+            </div>
+          </div>
+        </button>
+      </div>
     </div>
   );
 };
