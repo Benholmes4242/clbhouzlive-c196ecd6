@@ -354,7 +354,7 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
             >
               <Sparkles size={16} color={AMBER} />
               <span style={{ color: '#B45309', fontSize: 12.5, lineHeight: 1.4 }}>
-                Free during early access - business message limits are coming soon.
+                
               </span>
             </div>
           </div>

@@ -1081,6 +1081,7 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({
   
   const navigate = useNavigate();
   const isSelf = currentUserId === user.id;
+  const { blockUser } = useBlockActions({ currentUserId: currentUserId || '' });
 
   const { followUser, unfollowUser, loading: followLoading } = useFollowUser();
   const {
@@ -1420,9 +1421,18 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({
               icon={<Ban className="w-4 h-4" />}
               label="Block"
               destructive
-              onClick={() => {
+              onClick={async () => {
                 setShowKebabSheet(false);
-                toast.success('Block coming soon');
+                try {
+                  const success = await blockUser(user.id);
+                  if (success) {
+                    toast.success(`Blocked ${user.displayName}`);
+                  } else {
+                    toast.error("Could not block. Try again.");
+                  }
+                } catch (err) {
+                  toast.error("Could not block. Try again.");
+                }
               }}
             />
           </div>

@@ -79,7 +79,7 @@ export const LiveNowModule = memo(function LiveNowModule({
                   </div>
                 </div>
 
-                {/* Mini Leaderboard or Coming Soon state */}
+                {/* Mini Leaderboard or No coverage state */}
                 {hasLeaderboard ? (
                   <div className="space-y-2">
                     {leaders.map((leader, i) => (
