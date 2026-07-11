@@ -67,21 +67,15 @@ export default function VideosSubpage() {
 
         <ScrollToTopGlass />
 
-        <SearchOverlay
+        <SearchOverlayV2
           isOpen={searchOpen}
           onClose={() => setSearchOpen(false)}
-          placeholder="Search videos..."
-          onSearch={() => { /* input-only sheet; commit filters the page */ }}
+          mode="commit"
+          placeholder="Search videos…"
           onCommit={(term) => {
-            addSearch(term);
             setCommittedQuery(term);
             setSearchOpen(false);
           }}
-          recentSearches={recentSearches}
-          onClearRecent={clearAll}
-          onRemoveRecent={removeSearch}
-          trendingItems={TRENDING}
-          userId={userId}
         />
       </PageRoot>
   );
