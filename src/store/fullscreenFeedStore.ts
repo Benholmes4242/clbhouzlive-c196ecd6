@@ -350,8 +350,12 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
   setActiveIndex: (idx) => {
     const prev = get().activeIndex;
     if (prev === idx) return;
-    set({ activeIndex: idx });
+    // Reset the pager index — the incoming post's pager will re-write it on
+    // mount. Prevents the scrubber from computing an ownerKey against the
+    // outgoing post's page during the swipe.
+    set({ activeIndex: idx, activePagerIdx: 0 });
   },
+
   consumeOpenCommentsInitially: () => set({ openCommentsInitially: false }),
   consumeInitialCommentId: () => set({ initialCommentId: null }),
   setPaginationState: ({ hasNextPage, isFetchingNextPage }) => {
