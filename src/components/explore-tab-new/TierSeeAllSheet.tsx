@@ -104,19 +104,72 @@ interface Props {
   rows: FeatRow[];
 }
 
+type SortMode = 'latest' | 'top';
+
+const ASC_CATEGORIES = new Set([
+  'lowest_gross_all_time',
+  'lowest_gross_90d',
+  'best_score_diff_all_time',
+  'best_score_diff_90d',
+]);
+
+function isAscending(category?: string | null): boolean {
+  return !!category && ASC_CATEGORIES.has(category);
+}
+
+function parseLeadingInt(s?: string | null): number {
+  if (!s) return 0;
+  const m = String(s).match(/-?\d+/);
+  return m ? parseInt(m[0], 10) : 0;
+}
+
+function tsOf(row: FeatRow): number {
+  const iso = row.play_date ?? row.attained_at;
+  if (!iso) return 0;
+  const t = new Date(iso).getTime();
+  return Number.isFinite(t) ? t : 0;
+}
+
 export function TierSeeAllSheet({ open, onClose, tier, region, rows }: Props) {
   const [visible, setVisible] = useState(PAGE);
+  const [sort, setSort] = useState<SortMode>('latest');
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const scrollerRef = useRef<HTMLDivElement | null>(null);
+
+  const hasToggle = tier === 'birdie_hauls' || tier === 'records';
 
   useEffect(() => {
     if (!open) return;
     lockBodyScroll();
     setVisible(PAGE);
+    setSort('latest');
     return () => {
       unlockBodyScroll();
     };
   }, [open]);
+
+  const sortedRows = useMemo(() => {
+    if (sort === 'latest' || !hasToggle) return rows;
+    const arr = rows.slice();
+    if (tier === 'birdie_hauls') {
+      arr.sort((a, b) => {
+        const va = parseLeadingInt(a.feat_value);
+        const vb = parseLeadingInt(b.feat_value);
+        if (vb !== va) return vb - va;
+        return tsOf(b) - tsOf(a);
+      });
+    } else if (tier === 'records') {
+      arr.sort((a, b) => {
+        const va = Number(a.value ?? 0);
+        const vb = Number(b.value ?? 0);
+        const ka = isAscending(a.category) ? va : -va;
+        const kb = isAscending(b.category) ? vb : -vb;
+        if (ka !== kb) return ka - kb;
+        return tsOf(b) - tsOf(a);
+      });
+    }
+    return arr;
+  }, [rows, sort, tier, hasToggle]);
 
   useEffect(() => {
     if (!open) return;
@@ -125,14 +178,19 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows }: Props) {
     const io = new IntersectionObserver(
       (entries) => {
         if (entries.some((e) => e.isIntersecting)) {
-          setVisible((v) => Math.min(v + PAGE, rows.length));
+          setVisible((v) => Math.min(v + PAGE, sortedRows.length));
         }
       },
       { root: scrollerRef.current, rootMargin: '200px 0px' },
     );
     io.observe(node);
     return () => io.disconnect();
-  }, [open, rows.length]);
+  }, [open, sortedRows.length]);
+
+  useEffect(() => {
+    setVisible(PAGE);
+    if (scrollerRef.current) scrollerRef.current.scrollTop = 0;
+  }, [sort]);
 
   const recentLabel = useMemo(() => {
     const thirtyAgo = Date.now() - 30 * 86400000;
@@ -150,7 +208,8 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows }: Props) {
 
   if (!open) return null;
 
-  const shown = rows.slice(0, visible);
+  const shown = sortedRows.slice(0, visible);
+  const showRanks = hasToggle && sort === 'top';
 
   return createPortal(
     <div
