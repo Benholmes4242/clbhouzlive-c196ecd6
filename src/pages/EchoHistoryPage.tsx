@@ -470,7 +470,7 @@ const EchoHistoryPage: React.FC = () => {
           </div>
         </div>
       ) : null}
-    </PageRoot>
+    </div>
   );
 };
 
