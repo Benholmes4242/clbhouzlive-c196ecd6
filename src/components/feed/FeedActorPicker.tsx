@@ -3,7 +3,6 @@ import { ChevronDown, Check } from 'lucide-react';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { SquircleAvatar, LIGHT_HAIRLINE, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { SectionHeader } from '@/components/ui/SectionHeader';
 import type { ActiveActor } from '@/types/actor';
 
 const PALETTE = {
@@ -108,7 +107,20 @@ export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChang
           onClick={(e) => e.stopPropagation()}
           style={{ padding: '4px 8px 8px' }}
         >
-          <SectionHeader role="prime" kicker="POST AS" surface={c.sheetVariant === 'dark' ? 'dark' : 'light'} paddingX={12} />
+          <div
+            style={{
+              padding: '12px 12px 8px',
+              fontFamily: 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              fontSize: 11,
+              fontWeight: 800,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              color: c.rowText,
+              fontFeatureSettings: '"kern" 1, "liga" 1',
+            }}
+          >
+            POST AS
+          </div>
           {availableActors.map((a) => {
             const isActive = a.id === current.id && a.type === current.type;
             return (
