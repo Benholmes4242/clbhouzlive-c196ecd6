@@ -166,12 +166,6 @@ interface TierProps {
   title: string;
 }
 
-const TIER_EMPTY_LABEL: Record<FeatTier, string> = {
-  legendary: 'legendary feats',
-  eagles: 'eagles',
-  birdie_hauls: 'birdie hauls',
-  records: 'course records',
-};
 
 function FeatTierRailInner({ region, tier, title }: TierProps) {
   const navigate = useNavigate();
