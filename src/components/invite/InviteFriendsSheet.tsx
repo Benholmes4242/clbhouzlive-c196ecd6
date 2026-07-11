@@ -92,7 +92,7 @@ export function InviteFriendsSheet({ open, onClose, source }: Props) {
               letterSpacing: '-0.005em',
             }}
           >
-            Golf's better with your circle on here
+            Golf's better with your circle
           </h2>
         </div>
 
