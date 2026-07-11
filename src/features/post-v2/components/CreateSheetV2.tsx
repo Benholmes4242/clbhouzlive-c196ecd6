@@ -58,6 +58,7 @@ export default function CreateSheetV2({ open, onClose, returnPath }: Props) {
         onClose={() => { setCourseOpen(false); onClose(); }}
         current={null}
         userId={profile?.id ?? null}
+        excludeReviewedForUserId={profile?.id ?? null}
         onSelect={(c) => {
           if (!c) return;
           setCourseOpen(false);
@@ -65,6 +66,7 @@ export default function CreateSheetV2({ open, onClose, returnPath }: Props) {
           navigate(`/courses/${c.id}/rate`);
         }}
       />
+
     </>
   );
 }
