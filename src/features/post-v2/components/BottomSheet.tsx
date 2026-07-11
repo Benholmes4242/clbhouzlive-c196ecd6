@@ -63,7 +63,7 @@ export default function BottomSheet({ open, title, onClose, children, fullHeight
             </button>
           </div>
         )}
-        <div style={{ flex: fullHeight ? 1 : '0 1 auto', overflow: 'auto', minHeight: 0 }}>{children}</div>
+        <div style={{ flex: (fullHeight || fixedHeight) ? 1 : '0 1 auto', overflow: 'auto', minHeight: 0 }}>{children}</div>
       </div>
     </div>
   );
