@@ -353,14 +353,14 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           onClick={(e) => { e.stopPropagation(); onViewProfile(); }}
           aria-label={`View ${activePost.displayName}'s profile`}
           style={{
-            width: 32, height: 32, padding: 0, background: 'transparent',
+            width: 40, height: 40, padding: 0, background: 'transparent',
             border: 'none', cursor: 'pointer', pointerEvents: 'auto',
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
             flexShrink: 0, filter: ICON_SHADOW,
           }}
         >
           <SquircleAvatar
-            size={32}
+            size={40}
             src={activePost.avatarUrl}
             alt={activePost.displayName}
             fallback={activePost.displayName?.[0] ?? '?'}
@@ -370,7 +370,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
 
         <div
           style={{
-            display: 'flex', flexDirection: 'column', minWidth: 0, gap: 2, flex: 1,
+            display: 'flex', flexDirection: 'column', minWidth: 0, gap: 3, flex: 1,
           }}
         >
           {/* Name row — name ellipses first, follow never pushed off */}
@@ -378,7 +378,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             <span
               onClick={(e) => { e.stopPropagation(); onViewProfile(); }}
               style={{
-                fontSize: 12, fontWeight: 500, color: '#fff', lineHeight: 1.2,
+                fontSize: 15, fontWeight: 600, color: '#fff', lineHeight: 1.2,
                 textShadow: TEXT_SHADOW,
                 overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                 minWidth: 0, flex: '0 1 auto', pointerEvents: 'auto', cursor: 'pointer',
@@ -389,11 +389,11 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           </div>
 
           {/* Sub-row: timeAgo · Follow pill */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minHeight: 18 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minHeight: 20 }}>
             {timeLabel && (
               <span
                 style={{
-                  fontSize: 9, color: '#fff', opacity: 0.7, lineHeight: 1,
+                  fontSize: 12, color: '#fff', opacity: 0.75, lineHeight: 1,
                   textShadow: TEXT_SHADOW, flexShrink: 0,
                 }}
               >
@@ -416,16 +416,17 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
               onClick={(e) => { e.stopPropagation(); onReviewTap(); }}
               aria-label="Read review"
               style={{
-                alignSelf: 'flex-start', marginTop: 2, background: 'transparent',
+                alignSelf: 'flex-start', marginTop: 3, background: 'transparent',
                 border: 'none', padding: 0, cursor: 'pointer', pointerEvents: 'auto',
-                fontFamily: 'inherit', fontSize: 10, fontWeight: 500, color: '#fff',
-                opacity: 0.62, lineHeight: 1, textShadow: TEXT_SHADOW,
+                fontFamily: 'inherit', fontSize: 13, fontWeight: 500, color: '#fff',
+                opacity: 0.7, lineHeight: 1, textShadow: TEXT_SHADOW,
               }}
             >
               read review ›
             </button>
           )}
         </div>
+
       </div>
 
       {/* Bottom-RIGHT — vertical action rail (no avatar) */}
