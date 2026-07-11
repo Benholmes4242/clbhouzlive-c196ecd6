@@ -18,7 +18,7 @@ export function SubmitBar({
   submitting,
   onSubmit,
   isEditMode,
-  disabledLabel = 'Finish your card first',
+  disabledLabel = 'Continue with your verdict.',
 }: Props) {
   const enabled = canSubmit && !submitting;
   return (
