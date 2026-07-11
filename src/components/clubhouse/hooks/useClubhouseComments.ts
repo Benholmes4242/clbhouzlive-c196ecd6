@@ -1,22 +1,15 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { useClubhouseStore } from '@/store/clubhouseStore';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 /**
- * Manages comments sheet state and optimistic comment counts.
- * Actor selection is GLOBAL (session-wide) — comments always post as the
- * current activeActor, no per-card override.
+ * Manages comments sheet open/close state and exposes a comment-count
+ * accessor. Optimistic bumps are owned by comments-v2 (useCommentsV2 +
+ * DB triggers) — the old handleCommentPosted / handleCommentDeleted
+ * bumpers are gone.
  */
-export function useClubhouseComments(activeActor?: { type: string; id: string } | null) {
+export function useClubhouseComments(_activeActor?: { type: string; id: string } | null) {
   const [commentsOpen, setCommentsOpen] = useState(false);
-  const [commentCountOverrides, setCommentCountOverrides] = useState<Map<string, number>>(new Map());
-
-  useEffect(() => {
-    setCommentCountOverrides(new Map());
-  }, [activeActor?.id, activeActor?.type]);
-
-  // [VIDEO-TEARDOWN] activeVideoElement pause/resume block removed — poster-only chassis.
 
   const openComments = useCallback((_post?: FeedPost | null) => {
     setCommentsOpen(true);
@@ -26,36 +19,16 @@ export function useClubhouseComments(activeActor?: { type: string; id: string } 
     setCommentsOpen(false);
   }, []);
 
-  const handleCommentPosted = useCallback((post: FeedPost | null) => {
-    if (!post) return;
-    setCommentCountOverrides(prev => {
-      const next = new Map(prev);
-      const current = next.get(post.id) ?? post.commentCount;
-      next.set(post.id, current + 1);
-      return next;
-    });
-  }, []);
-
-  const handleCommentDeleted = useCallback((postId: string, currentCount: number) => {
-    setCommentCountOverrides(prev => {
-      const next = new Map(prev);
-      const current = next.get(postId) ?? currentCount;
-      next.set(postId, Math.max(0, current - 1));
-      return next;
-    });
-  }, []);
-
   const getCommentCount = useCallback((post: FeedPost | null): number => {
     if (!post) return 0;
-    return commentCountOverrides.get(post.id) ?? post.commentCount;
-  }, [commentCountOverrides, activeActor?.id, activeActor?.type]);
+    return post.commentCount;
+  }, []);
 
   const resetComments = useCallback(() => {
     setCommentsOpen(false);
-    setCommentCountOverrides(new Map());
   }, []);
 
   const overlayVisible = !commentsOpen;
 
-  return { commentsOpen, overlayVisible, openComments, closeComments, handleCommentPosted, handleCommentDeleted, getCommentCount, resetComments };
+  return { commentsOpen, overlayVisible, openComments, closeComments, getCommentCount, resetComments };
 }

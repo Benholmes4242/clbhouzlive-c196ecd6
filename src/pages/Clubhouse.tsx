@@ -246,7 +246,7 @@ const ClubhouseContent = () => {
   const isActivePostFollowed = getFollowState(activePost);
   
   // ── Comments state ──
-  const { commentsOpen, overlayVisible, openComments, closeComments, handleCommentPosted, handleCommentDeleted, getCommentCount, resetComments } = useClubhouseComments(activeActor);
+  const { commentsOpen, overlayVisible, openComments, closeComments, getCommentCount, resetComments } = useClubhouseComments(activeActor);
 
   // Conditionally mount CommentsSheet so its hooks/subtrees don't exist while closed.
   // Keep it mounted through the exit animation (~500ms spring) so close still animates.
