@@ -265,7 +265,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   {/* Amber eyebrow */}
                   <div
                     style={{
-                      fontSize: 9,
+                      fontSize: 11,
                       fontWeight: 700,
                       letterSpacing: '0.14em',
                       color: AMBER,
