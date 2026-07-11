@@ -167,15 +167,21 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
     return (
       <div>
         <Header photoCount={0} videoCount={0} />
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4, padding: '0 16px' }}>
+        <div
+          style={
+            isMobile
+              ? { display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 5, padding: '0 16px' }
+              : { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4, padding: '0 16px' }
+          }
+        >
           {Array.from({ length: maxItems }).map((_, i) => (
             <div
               key={i}
-              style={{
-                aspectRatio: '1',
-                borderRadius: 10,
-                background: 'rgba(15,23,42,0.06)',
-              }}
+              style={
+                isMobile && i === 0
+                  ? { gridRow: '1 / span 2', height: '100%', borderRadius: 14, background: 'rgba(15,23,42,0.06)' }
+                  : { aspectRatio: '1', borderRadius: isMobile ? 12 : 10, background: 'rgba(15,23,42,0.06)' }
+              }
             />
           ))}
         </div>
@@ -270,8 +276,15 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
     <div>
       <Header photoCount={photoCount} videoCount={videoCount} onSeeAll={onSeeAllClick} />
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4, padding: '0 16px' }}>
+      <div
+        style={
+          isMobile
+            ? { display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 5, padding: '0 16px' }
+            : { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4, padding: '0 16px' }
+        }
+      >
         {mediaTiles.map((media, index) => {
+          const isHero = isMobile && index === 0 && mediaTiles.length >= 3;
           const isLastTile = index === mediaTiles.length - 1;
           const showOverflow = isLastTile && overflowCount > 0;
           const btnRef = React.createRef<HTMLButtonElement>();
@@ -306,8 +319,9 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
               }}
               style={{
                 position: 'relative',
-                aspectRatio: '1',
-                borderRadius: 10,
+                ...(isHero
+                  ? { gridRow: '1 / span 2', height: '100%', borderRadius: 14 }
+                  : { aspectRatio: '1', borderRadius: isMobile ? 12 : 10 }),
                 overflow: 'hidden',
                 padding: 0,
                 border: 'none',
@@ -356,7 +370,10 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
                     justifyContent: 'center',
                   }}
                 >
-                  <span style={{ color: '#fff', fontSize: 18, fontWeight: 700 }}>+{overflowCount}</span>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                    <span style={{ color: '#fff', fontSize: 19, fontWeight: 800 }}>+{overflowCount}</span>
+                    <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 10, fontWeight: 600 }}>See all</span>
+                  </div>
                 </div>
               )}
             </button>
