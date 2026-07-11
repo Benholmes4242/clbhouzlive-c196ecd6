@@ -47,7 +47,7 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
   const { people, businesses, isLoading } = useEntityPickerSearch({
     query: debounced,
     enabled: open && debounced.trim().length > 0,
-    limits: { people: 8, businesses: 8 },
+    limit: 8,
   });
 
   const candidates: Candidate[] = useMemo(() => {
