@@ -255,7 +255,7 @@ export function FeatCard({ row, tier, onTap }: Props) {
             style={{
               margin: '2px 0 0',
               fontSize: 13,
-              fontWeight: 800,
+              fontWeight: 700,
               color: valueColor,
               lineHeight: 1.15,
               fontVariantNumeric: 'tabular-nums',
