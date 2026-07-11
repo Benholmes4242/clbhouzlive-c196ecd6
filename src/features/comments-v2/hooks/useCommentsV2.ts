@@ -64,6 +64,7 @@ export function useCommentsV2({
   const { activeActor } = useActiveActor();
   const actorType = activeActor?.type ?? 'personal';
   const actorId = activeActor?.id ?? user?.id ?? '';
+  const blockedIds = useBlockedUserIds(user?.id ?? null);
 
   const keyRoot = ['comments-v2', targetType, targetId, targetSecondaryId ?? null] as const;
 
