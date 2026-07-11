@@ -212,6 +212,7 @@ export const MessageBubble: React.FC<Props> = ({
                     key={att.path ?? att.localUrl ?? i}
                     attachment={att}
                     isOutgoing={isOutgoing}
+                    onOpen={(url) => openViewer(i, url)}
                   />
                 ))}
               </div>
