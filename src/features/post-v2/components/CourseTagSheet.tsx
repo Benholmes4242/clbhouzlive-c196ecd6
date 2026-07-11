@@ -1,4 +1,4 @@
-// CourseTagSheet - search + "courses you play" empty state.
+// CourseTagSheet - search + "popular on clbhouz" empty state.
 // Header styled as an eyebrow (icon + uppercase label) to match the
 // shared @mention sheet chrome.
 
@@ -7,7 +7,7 @@ import { MapPin, Search, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import BottomSheet from './BottomSheet';
 import type { StageCourse } from '../hooks/useStageComposer';
-import { useRecentCourses } from '../hooks/useRecentCourses';
+import { usePopularCourses } from '../hooks/usePopularCourses';
 import useKeyboardHeight from '@/hooks/messaging/useKeyboardHeight';
 
 
@@ -18,18 +18,54 @@ interface Props {
   current: StageCourse | null;
   userId?: string | null;
   title?: string;
+  /**
+   * Review-flow only. When set:
+   *  - popular suggestions exclude courses this user has already reviewed
+   *  - search results still include them, with a small amber REVIEWED badge
+   */
+  excludeReviewedForUserId?: string | null;
 }
 
-interface RecentRow extends StageCourse {
+interface Row extends StageCourse {
   sub_country?: string | null;
   isHomeClub?: boolean;
 }
 
-export default function CourseTagSheet({ open, onClose, onSelect, current, userId, title = 'Tag a course' }: Props) {
+export default function CourseTagSheet({
+  open,
+  onClose,
+  onSelect,
+  current,
+  userId,
+  title = 'Tag a course',
+  excludeReviewedForUserId = null,
+}: Props) {
   const [q, setQ] = useState('');
-  const [rows, setRows] = useState<RecentRow[]>([]);
-  const { rows: recents } = useRecentCourses(open, userId ?? null);
+  const [rows, setRows] = useState<Row[]>([]);
+  const { rows: popular } = usePopularCourses(open, {
+    excludeReviewedForUserId,
+  });
+  const [reviewedIds, setReviewedIds] = useState<Set<string>>(new Set());
   const keyboardHeight = useKeyboardHeight();
+
+  // Pull the user's reviewed course ids so search results can be badged.
+  useEffect(() => {
+    if (!open || !excludeReviewedForUserId) { setReviewedIds(new Set()); return; }
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from('course_ratings')
+        .select('course_id')
+        .eq('user_id', excludeReviewedForUserId);
+      if (cancelled) return;
+      setReviewedIds(new Set(
+        ((data ?? []) as Array<{ course_id: string | null }>)
+          .map((r) => r.course_id)
+          .filter((v): v is string => !!v),
+      ));
+    })();
+    return () => { cancelled = true; };
+  }, [open, excludeReviewedForUserId]);
 
   useEffect(() => {
     if (!open) return;
@@ -40,12 +76,12 @@ export default function CourseTagSheet({ open, onClose, onSelect, current, userI
         .select('id, name, country, sub_country')
         .ilike('name', `%${q.trim()}%`)
         .limit(20);
-      setRows((data ?? []) as RecentRow[]);
+      setRows((data ?? []) as Row[]);
     }, 180);
     return () => clearTimeout(t);
   }, [q, open]);
 
-  const showRecents = q.trim().length === 0;
+  const showPopular = q.trim().length === 0;
 
   return (
     <BottomSheet open={open} onClose={onClose} bottomOffset={keyboardHeight}>
@@ -103,17 +139,17 @@ export default function CourseTagSheet({ open, onClose, onSelect, current, userI
         </button>
       )}
 
-      {showRecents ? (
+      {showPopular ? (
         <>
-          {recents.length > 0 ? (
+          {popular.length > 0 ? (
             <>
               <div style={{ padding: '10px 16px 6px', fontSize: 10, fontWeight: 800, letterSpacing: 1, color: '#94A3B8' }}>
-                COURSES YOU PLAY
+                POPULAR ON CLBHOUZ
               </div>
-              {recents.map(r => (
+              {popular.map(r => (
                 <CourseRow
                   key={r.id}
-                  row={{ id: r.id, name: r.name, country: r.country, sub_country: r.sub_country, isHomeClub: r.isHomeClub }}
+                  row={{ id: r.id, name: r.name, country: r.country, sub_country: r.sub_country }}
                   onSelect={(c) => { onSelect(c); onClose(); }}
                 />
               ))}
@@ -129,14 +165,19 @@ export default function CourseTagSheet({ open, onClose, onSelect, current, userI
         </>
       ) : (
         rows.map(r => (
-          <CourseRow key={r.id} row={r} onSelect={(c) => { onSelect(c); onClose(); }} />
+          <CourseRow
+            key={r.id}
+            row={r}
+            reviewed={reviewedIds.has(r.id)}
+            onSelect={(c) => { onSelect(c); onClose(); }}
+          />
         ))
       )}
     </BottomSheet>
   );
 }
 
-function CourseRow({ row, onSelect }: { row: RecentRow; onSelect: (c: StageCourse) => void }) {
+function CourseRow({ row, onSelect, reviewed = false }: { row: Row; onSelect: (c: StageCourse) => void; reviewed?: boolean }) {
   const locality = row.isHomeClub ? 'Your home club' : (row.sub_country || row.country || null);
   return (
     <button onClick={() => onSelect({ id: row.id, name: row.name, country: row.country ?? null })} style={rowBtn}>
@@ -148,6 +189,22 @@ function CourseRow({ row, onSelect }: { row: RecentRow; onSelect: (c: StageCours
           <div style={{ fontSize: 14, color: '#0F172A', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.name}</div>
           {locality && <div style={{ fontSize: 12, color: row.isHomeClub ? '#F7931E' : '#94A3B8', fontWeight: row.isHomeClub ? 700 : 400 }}>{locality}</div>}
         </div>
+        {reviewed && (
+          <div
+            style={{
+              flex: 'none',
+              padding: '3px 8px',
+              borderRadius: 999,
+              background: 'rgba(247,147,30,0.12)',
+              color: '#B45309',
+              fontSize: 9.5,
+              fontWeight: 800,
+              letterSpacing: '0.08em',
+            }}
+          >
+            REVIEWED
+          </div>
+        )}
       </div>
     </button>
   );
