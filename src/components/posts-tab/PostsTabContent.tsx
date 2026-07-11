@@ -333,22 +333,14 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
 
       {/* ═══ COMMENTS + MORE OPTIONS overlays ═══ */}
       {selectedCommentPost && commentsMounted && (
-        <CommentsSheet
+        <CommentsSheetV2
           isOpen={commentsOpen}
           onClose={closeComments}
-          postId={selectedCommentPost.id}
-          currentUserId={user?.id}
-          creatorUserId={selectedCommentPost.userId}
-          creatorName={selectedCommentPost.displayName}
-          creatorAvatar={selectedCommentPost.avatarUrl}
-          caption={selectedCommentPost.caption}
-          theme="light"
-          likesCount={getActiveLikeState(selectedCommentPost)?.count ?? selectedCommentPost.likeCount ?? null}
-          likeSource="post"
-          onCommentPosted={() => handleCommentPosted(selectedCommentPost)}
-          onCommentDeleted={() => handleCommentDeleted(selectedCommentPost.id, selectedCommentPost.commentCount)}
+          targetType="post"
+          targetId={selectedCommentPost.id}
         />
       )}
+
       {activePost && filteredPosts.length > 0 && (
         <>
           <Drawer open={moreOptionsOpen} onOpenChange={setMoreOptionsOpen}>
