@@ -11,6 +11,8 @@ import { useNavigate } from 'react-router-dom';
 import { useDebounce } from '@/hooks/useDebounce';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { overlayOpen, overlayMark } from '@/perf/overlayTiming';
+import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
+import { applyRouteChrome } from '@/lib/routeChrome';
 import {
   useGlobalEntitySearch,
   saveRecentSearch,
@@ -230,6 +232,16 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
     if (!isOpen) return;
     lockBodyScroll();
     return () => unlockBodyScroll();
+  }, [isOpen]);
+
+  // Native status bar: light overlay -> light bar + dark icons while open,
+  // then restore the underlying route's chrome on close.
+  useEffect(() => {
+    if (!isOpen) return;
+    try { setStatusBarStyleColor('dark', 'FFF8FAFC'); } catch {}
+    return () => {
+      try { applyRouteChrome(window.location.pathname, true); } catch {}
+    };
   }, [isOpen]);
 
   // Overlay timing: open-start / close-start
