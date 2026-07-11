@@ -73,7 +73,9 @@ function Door({ title, count, loading, suffix, onClick, tone }: DoorProps) {
       ) : (
         <div
           style={{
-            font: '600 11.5px/1.2 inherit',
+            fontWeight: 600,
+            fontSize: 11.5,
+            lineHeight: 1.2,
             opacity: countOpacity,
             marginTop: 2,
           }}
