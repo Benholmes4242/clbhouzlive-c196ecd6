@@ -37,6 +37,11 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
     [posts],
   );
 
+  const feedRegionLabel = useMemo(
+    () => REGION_TABS.find((tab) => tab.slug === activeRegion)?.label ?? 'Worldwide',
+    [activeRegion],
+  );
+
   const handleRegionChange = useCallback(
     (slug: string | null) => {
       setRegion(slug);
@@ -63,19 +68,28 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
       <FeatTierRail region={activeRegion} tier="eagles" title="Eagles" />
       <FeatTierRail region={activeRegion} tier="birdie_hauls" title="Birdie hauls" />
 
-      <ExploreGrid
-        posts={posts}
-        coursePosts={coursePosts}
-        isLoading={isLoading}
-        isError={isError}
-        hasNextPage={hasNextPage}
-        isFetchingNextPage={isFetchingNextPage}
-        fetchNextPage={fetchNextPage}
-        refetch={refetch}
-        gridRef={gridRef}
-        activeRegion={activeRegion}
-        onRegionChange={handleRegionChange}
-      />
+      <div
+        style={{
+          marginTop: 20,
+          borderTop: '1px solid rgba(15,23,42,0.06)',
+          paddingTop: 18,
+        }}
+      >
+        <AlmanacHead icon="📍" title={`The feed · ${feedRegionLabel}`} />
+        <ExploreGrid
+          posts={posts}
+          coursePosts={coursePosts}
+          isLoading={isLoading}
+          isError={isError}
+          hasNextPage={hasNextPage}
+          isFetchingNextPage={isFetchingNextPage}
+          fetchNextPage={fetchNextPage}
+          refetch={refetch}
+          gridRef={gridRef}
+          activeRegion={activeRegion}
+          onRegionChange={handleRegionChange}
+        />
+      </div>
     </div>
   );
 }
