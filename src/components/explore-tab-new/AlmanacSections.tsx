@@ -178,7 +178,7 @@ function FeatTierRailInner({ region, tier, title }: TierProps) {
       <AlmanacHead title={title} icon={TIER_ICON[tier]} />
 
       {isLoading ? (
-        <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
+        <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 6 }}>
           {[0, 1].map((i) => (
             <div
               key={i}
