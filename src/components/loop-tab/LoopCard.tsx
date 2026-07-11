@@ -391,6 +391,8 @@ export const LoopCard = React.memo(function LoopCard({
           <LoopCardMenu
             postId={post.id}
             userId={userId}
+            authorUserId={post.userId}
+            authorUsername={post.username}
             onShare={handleShare}
             isOwnPost={isOwnPost}
             onDelete={onDelete}
