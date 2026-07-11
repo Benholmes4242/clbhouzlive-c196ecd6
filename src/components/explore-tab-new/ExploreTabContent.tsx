@@ -2,19 +2,13 @@ import { useCallback, useRef, useMemo } from 'react';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExploreFeed } from './hooks/useExploreFeed';
-import { useExploreMood } from './hooks/useExploreMood';
 import { useExploreRegion } from './hooks/useExploreRegion';
-// ExploreHero removed — the standout card now lives in CoursesPageHero.
 import ConnectHandicapCue from '@/components/courses/course-detail/ConnectHandicapCue';
-import { ExploreEchoCTA } from './ExploreEchoCTA';
 import { ExploreDestinations } from './ExploreDestinations';
-import { WhereYoudRank } from './WhereYoudRank';
-import { ToughestCoursesStrip } from './ToughestCoursesStrip';
-import { LatestRecordsStrip } from './LatestRecordsStrip';
 import { CircleActivityStrip } from './CircleActivityStrip';
+import { AlmanacRegionTabs, FeatTierRail } from './AlmanacSections';
 
 import ExploreGrid from './ExploreGrid';
-
 
 import { SLATE_50 } from '@/features/courses/_shared/tokens';
 
@@ -27,8 +21,6 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
   const userId = user?.id;
   const gridRef = useRef<HTMLDivElement | null>(null);
 
-  // URL-backed filter state — also read by Discover.tsx for the shell row.
-  const { mood } = useExploreMood();
   const { region: activeRegion, setRegion } = useExploreRegion();
 
   const {
@@ -41,35 +33,39 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
     refetch,
   } = useExploreFeed({ userId, region: activeRegion });
 
-  const coursePosts = useMemo(() => {
-    return posts.filter(post => !!(post.courseName || post.review?.courseName));
-  }, [posts]);
+  const coursePosts = useMemo(
+    () => posts.filter((post) => !!(post.courseName || post.review?.courseName)),
+    [posts],
+  );
 
-  const handleRegionChange = useCallback((slug: string | null) => {
-    setRegion(slug);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [setRegion]);
+  const handleRegionChange = useCallback(
+    (slug: string | null) => {
+      setRegion(slug);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+    [setRegion],
+  );
 
   return (
     <div style={{ background: SLATE_50, minHeight: '100vh' }}>
-      {/* NOTE: Standout course card is now rendered by CoursesPageHero above
-          the shared tab row. Do not re-add ExploreHero here. */}
-
-
-
-      {/* Connect cue — self-pads; trim its outer wrapper to no h-padding */}
       <div style={{ paddingTop: 0, paddingBottom: 4 }}>
         <ConnectHandicapCue variant="discover" />
       </div>
 
-      {activeRegion === null && <CircleActivityStrip userId={userId} />}
-      {activeRegion === null && <LatestRecordsStrip userId={userId} />}
-      {activeRegion === null && <WhereYoudRank userId={userId} />}
-      {activeRegion === null && <ToughestCoursesStrip userId={userId} />}
-      <ExploreEchoCTA mood={mood} />
-      <ExploreDestinations activeRegion={activeRegion} onRegionSelect={handleRegionChange} />
+      {/* Friends rail — region-INDEPENDENT, always visible */}
+      <CircleActivityStrip userId={userId} />
 
-      
+      {/* Region tabs — shared control driving tiers, destinations, and grid */}
+      <AlmanacRegionTabs region={activeRegion} onRegionChange={handleRegionChange} />
+
+      {/* The four tiers */}
+      <FeatTierRail region={activeRegion} tier="legendary" title="Aces & Albatrosses" />
+      <FeatTierRail region={activeRegion} tier="records" title="Course records" />
+      <FeatTierRail region={activeRegion} tier="eagles" title="Eagles" />
+      <FeatTierRail region={activeRegion} tier="birdie_hauls" title="Birdie hauls" />
+
+      {/* Destinations (still drives the SAME region control) */}
+      <ExploreDestinations activeRegion={activeRegion} onRegionSelect={handleRegionChange} />
 
       <ExploreGrid
         posts={posts}
@@ -84,8 +80,6 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
         activeRegion={activeRegion}
         onRegionChange={handleRegionChange}
       />
-
-
     </div>
   );
 }
