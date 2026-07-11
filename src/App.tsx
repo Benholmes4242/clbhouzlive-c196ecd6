@@ -423,9 +423,11 @@ function AppRoutes() {
     // transitions only update style + color — never re-send `overlay`. This
     // is what keeps 100dvh stable through fs.open (the fix that eliminated
     // the fs.open jolt on 2026-07-07).
-    const statusBar = immersive
-      ? { style: 'dark' as const, color: '00000000' }
-      : { style: 'light' as const, color: darkChrome ? 'FF15171F' : 'FFF8FAFC' };
+    const statusBar = darkChrome
+      ? { style: 'light' as const, color: 'FF15171F' }
+      : immersive
+        ? { style: 'dark' as const, color: '00000000' }
+        : { style: 'light' as const, color: 'FFF8FAFC' };
 
     // Idempotency: cache the last-applied values on the effect's module scope.
     // If nothing changed (very common between similar routes) skip every write.
