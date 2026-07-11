@@ -3,7 +3,7 @@
  *
  * A single entry point tile openers call at tap time. It synchronously:
  *   1) Snapshots the origin element geometry (rect, radius, aspect, poster).
- *   2) Locks body scroll (ref-counted so it composes with CommentsSheet).
+ *   2) Locks body scroll (ref-counted so it composes with CommentsSheetV2).
  *   3) Flips the WebView status bar to viewer chrome.
  *   4) Hands off the tile's HLS instance to the pool (so the viewer inherits
  *      the buffered segments and lands playing instantly).
