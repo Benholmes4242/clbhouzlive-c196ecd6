@@ -973,6 +973,23 @@ export function FullscreenFeedOverlay() {
         />
       )}
 
+      {!readOnly && activePost && (
+        <MoreOptionsDrawer
+          open={moreOptionsOpen}
+          onOpenChange={setMoreOptionsOpen}
+          post={activePost}
+          currentUserId={userId}
+          onReport={() => handleReport(activePost)}
+          onNotInterested={() => handleNotInterested(activePost)}
+          onCopyLink={() => {
+            navigator.clipboard.writeText(`${window.location.origin}/post/${activePost.id}`);
+            toast.success('Link copied');
+            setMoreOptionsOpen(false);
+          }}
+          onAfterBlock={handleClose}
+        />
+      )}
+
 
       {/* ReviewBottomSheet now renders via root-level ReviewBottomSheetPortal */}
     </>
