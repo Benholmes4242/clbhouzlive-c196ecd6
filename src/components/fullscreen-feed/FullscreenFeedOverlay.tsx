@@ -12,7 +12,7 @@ import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 
 import { ImmersiveFullscreenChrome } from '@/components/fullscreen-feed/ImmersiveFullscreenChrome';
 import { FullscreenScrubber } from '@/components/fullscreen-feed/FullscreenScrubber';
-import CommentsSheet from '@/components/comments/CommentsSheet';
+import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { buildReviewSheetPayload } from '@/components/posts/buildReviewSheetPayload';
 import { useReviewerStats } from '@/hooks/useReviewerStats';
