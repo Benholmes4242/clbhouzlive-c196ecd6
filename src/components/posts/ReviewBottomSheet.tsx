@@ -353,20 +353,21 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                       key={key}
                       style={{
                         background: 'rgba(255,255,255,0.08)',
-                        borderRadius: 8,
-                        padding: '6px 9px',
+                        borderRadius: 10,
+                        padding: '10px 12px',
+                        minHeight: 52,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        gap: 6,
+                        gap: 8,
                         minWidth: 0,
                       }}
                     >
                       <span
                         style={{
-                          fontSize: 7,
+                          fontSize: 10.5,
                           fontWeight: 600,
-                          letterSpacing: '0.08em',
+                          letterSpacing: '0.12em',
                           color: '#F8FAFC',
                           opacity: 0.6,
                           textTransform: 'uppercase',
@@ -379,8 +380,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                       </span>
                       <span
                         style={{
-                          fontSize: 11,
-                          fontWeight: 500,
+                          fontSize: 19,
+                          fontWeight: 300,
                           color: '#F8FAFC',
                           fontVariantNumeric: 'tabular-nums',
                           flexShrink: 0,
