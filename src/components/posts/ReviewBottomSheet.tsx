@@ -466,8 +466,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div
                     style={{
-                      fontSize: 11,
-                      fontWeight: 500,
+                      fontSize: 14,
+                      fontWeight: 600,
                       color: '#F8FAFC',
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
@@ -479,8 +479,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   {metaSeg && (
                     <div
                       style={{
-                        marginTop: 1,
-                        fontSize: 8,
+                        marginTop: 2,
+                        fontSize: 11.5,
                         color: '#F8FAFC',
                         opacity: 0.6,
                         whiteSpace: 'nowrap',
