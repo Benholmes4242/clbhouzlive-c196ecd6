@@ -147,7 +147,7 @@ export function LivePreviewCard({
         {/* Right chip — verdict label sits over the ghost numeral, parity with FeedCard */}
         {overall != null && (
           <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-            <ReviewVerdictLabel rating={overall} fontSize={11} />
+            <ReviewVerdictLabel rating={overall} fontSize={11} surface="light" />
           </div>
         )}
       </div>
