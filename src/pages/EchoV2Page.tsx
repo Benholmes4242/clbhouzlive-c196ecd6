@@ -79,7 +79,7 @@ const EchoV2Page: React.FC = () => {
   // reserve is needed here — safe-area is handled by the composer itself.
 
   return (
-    <PageRoot fixedHeight hasBottomNav={false} style={{ background: CANVAS }}>
+    <div className="echo-root" style={{ background: CANVAS }}>
       <div
         style={{
           display: 'flex',
@@ -138,8 +138,9 @@ const EchoV2Page: React.FC = () => {
           onHeightChange={setComposerHeight}
         />
       </div>
-    </PageRoot>
+    </div>
   );
+
 };
 
 export default EchoV2Page;
