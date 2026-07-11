@@ -267,7 +267,6 @@ export function FeatCard({ row, tier, onTap }: Props) {
             style={{
               fontSize: 10.5,
               fontWeight: 700,
-              color: metaColor,
               letterSpacing: '0.03em',
               padding: '3px 7px',
               borderRadius: 999,
