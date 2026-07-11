@@ -62,7 +62,7 @@ export const PlanningSignals: React.FC<PlanningSignalsProps> = ({
             "font-medium",
             isWantToPlay ? "text-amber-700" : "text-gray-700"
           )}>
-            Want to Play
+            Add to bucket list
           </span>
         </div>
         {isWantToPlay && (
@@ -74,7 +74,7 @@ export const PlanningSignals: React.FC<PlanningSignalsProps> = ({
 
       {/* Subtle helper text */}
       <p className="text-xs text-gray-500 mt-3 text-center">
-        Only you can see your Want to Play list.
+        Only you can see your bucket list.
       </p>
     </div>
   );

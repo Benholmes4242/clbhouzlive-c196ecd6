@@ -104,7 +104,7 @@ export function useCoursePersonalStatus(courseId: string | undefined) {
       }
     },
     onSuccess: (_, wantToPlay) => {
-      toast.success(wantToPlay ? 'Added to Want to Play' : 'Removed from list');
+      toast.success(wantToPlay ? 'Added to bucket list' : 'Removed from bucket list');
       // Invalidate all related queries using predicate
       queryClient.invalidateQueries({ 
         predicate: q => Array.isArray(q.queryKey) && q.queryKey[0] === 'course-personal-status' 

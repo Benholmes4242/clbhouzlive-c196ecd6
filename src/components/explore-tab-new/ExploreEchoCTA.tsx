@@ -98,7 +98,7 @@ const MOOD_PROMPTS: Record<ExploreMoodId, MoodConfig> = {
       },
       {
         quote: '"An early tee somewhere worth the drive"',
-        prompt: 'Find an early weekend tee time somewhere worth the drive. Ask my location, how early I want to play, and how far I will go.',
+        prompt: 'Find an early weekend tee time somewhere worth the drive. Ask my location, how early I want to tee off, and how far I will go.',
       },
     ],
     chips: [
