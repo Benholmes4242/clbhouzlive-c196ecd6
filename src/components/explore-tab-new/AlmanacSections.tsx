@@ -30,13 +30,20 @@ interface Props {
   onRegionChange: (slug: string | null) => void;
 }
 
+export const TIER_ICON: Record<FeatTier, string> = {
+  legendary: '⛳',
+  records: '🏆',
+  eagles: '🦅',
+  birdie_hauls: '🐦',
+};
+
 export function AlmanacHead({
   title,
-  dot,
+  icon,
   onSeeAll,
 }: {
   title: string;
-  dot?: string;
+  icon?: string;
   onSeeAll?: () => void;
 }) {
   return (
@@ -48,16 +55,10 @@ export function AlmanacHead({
         padding: '0 16px 9px',
       }}
     >
-      {dot && (
-        <span
-          style={{
-            width: 7,
-            height: 7,
-            borderRadius: 2,
-            background: dot,
-            flexShrink: 0,
-          }}
-        />
+      {icon && (
+        <span aria-hidden style={{ fontSize: 13, lineHeight: 1 }}>
+          {icon}
+        </span>
       )}
       <span
         style={{
@@ -70,14 +71,7 @@ export function AlmanacHead({
       >
         {title}
       </span>
-      <span
-        style={{
-          flex: 1,
-          height: 1,
-          background: 'rgba(15,23,42,0.07)',
-          marginLeft: 4,
-        }}
-      />
+      <span style={{ flex: 1 }} />
       {onSeeAll && (
         <button
           type="button"
