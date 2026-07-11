@@ -369,27 +369,10 @@ export const MessageBubble: React.FC<Props> = ({
       {viewer
         ? createPortal(
             <MediaPreviewViewer
-      {!isOutgoing && !isDeleted && (
-        <ReportSheet
-          open={showReport}
-          onOpenChange={setShowReport}
-          reportType="message"
-          reportedUserId={message.sender_id}
-          reportedConversationId={message.conversation_id}
-          reportedMessageId={message.id}
-        />
-      )}
+      {viewer
+        ? createPortal(
+            <MediaPreviewViewer
               items={viewer.items}
-      {!isOutgoing && !isDeleted && (
-        <ReportSheet
-          open={showReport}
-          onOpenChange={setShowReport}
-          reportType="message"
-          reportedUserId={message.sender_id}
-          reportedConversationId={message.conversation_id}
-          reportedMessageId={message.id}
-        />
-      )}
               initialIndex={viewer.index}
               onClose={() => setViewer(null)}
             />,
