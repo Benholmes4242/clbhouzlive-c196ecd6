@@ -18859,6 +18859,41 @@ export type Database = {
           video_count: number
         }[]
       }
+      get_watch_mixed_grid: {
+        Args: {
+          p_cursor?: string
+          p_filter?: string
+          p_page_size?: number
+          p_seen_ids?: string[]
+          p_user_id: string
+          p_viewer_actor_id?: string
+          p_viewer_actor_type?: string
+        }
+        Returns: {
+          business_logo_url: string
+          business_name: string
+          comment_count: number
+          course_id: string
+          course_name: string
+          creator_avatar_url: string
+          creator_display_name: string
+          creator_is_verified: boolean
+          creator_username: string
+          derived_format: string
+          duration_seconds: number
+          height: number
+          hls_url: string
+          is_liked_by_me: boolean
+          like_count: number
+          media_url: string
+          post_content: string
+          post_created_at: string
+          post_id: string
+          poster_url: string
+          stream_id: string
+          width: number
+        }[]
+      }
       get_watch_most_loved_this_week: {
         Args: {
           p_format?: string
