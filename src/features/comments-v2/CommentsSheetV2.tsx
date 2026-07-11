@@ -226,7 +226,7 @@ function CommentsSheetV2Inner({
                   fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em',
                   textTransform: 'uppercase', color: AMBER, lineHeight: 1,
                 }}>
-                  CLUBHOUSE CHAT
+                  CLBHOUZ CHAT
                 </div>
                 <div style={{ marginTop: 4, fontSize: 17, fontWeight: 800, color: INK, letterSpacing: '-0.01em' }}>
                   {totalCount} {totalCount === 1 ? 'comment' : 'comments'}
