@@ -84,7 +84,7 @@ export default function CourseTagSheet({
   const showPopular = q.trim().length === 0;
 
   return (
-    <BottomSheet open={open} onClose={onClose} bottomOffset={keyboardHeight} fixedHeight="75dvh">
+    <BottomSheet open={open} onClose={onClose} bottomOffset={keyboardHeight} fixedHeight="60dvh">
       {/* Fixed-height column: header + search stay pinned, list scrolls internally. */}
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
         {/* Eyebrow header — mirrors the shared @mention sheet chrome */}
