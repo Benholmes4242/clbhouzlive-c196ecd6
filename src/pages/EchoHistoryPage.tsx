@@ -128,7 +128,7 @@ const EchoHistoryPage: React.FC = () => {
   }, [sheetChat, patchList, closeSheet, qc]);
 
   return (
-    <PageRoot fixedHeight hasBottomNav={false} style={{ background: CANVAS }}>
+    <div className="echo-root" style={{ background: CANVAS }}>
       <div
         style={{
           display: 'flex',
