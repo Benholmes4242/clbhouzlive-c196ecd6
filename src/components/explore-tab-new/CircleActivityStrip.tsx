@@ -289,8 +289,8 @@ function CircleActivityCard({ row, onTap }: CardProps) {
             style={{
               margin: '2px 0 0',
               fontSize: 14,
-              fontWeight: 800,
-              color: valueColor(row.feat_tone),
+              fontWeight: 700,
+              color: INK,
               lineHeight: 1.15,
               letterSpacing: '-0.005em',
               overflow: 'hidden',
