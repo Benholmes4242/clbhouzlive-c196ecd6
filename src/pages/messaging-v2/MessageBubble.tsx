@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Check, AlertCircle, Clock } from 'lucide-react';
 import type { ThreadMessage, MessageReaction, MessageAttachment } from '@/types/messaging';
 import { MessageImage } from './MessageImage';
 import { VoiceNote } from './VoiceNote';
+import { MediaPreviewViewer } from '@/components/shared/media/MediaPreviewViewer';
+import { getSignedUrl } from '@/hooks/messaging/useSignedUrl';
+import type { OrderedMediaItem } from '@/components/shared/media/types';
 
 const INK = '#1F2428';
 const SUB = '#8A9099';
