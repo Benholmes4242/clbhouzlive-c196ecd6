@@ -381,7 +381,7 @@ export function useCommentsV2({
       // this user), and reports feeds the moderation queue.
       const [{ error: hideErr }, { error: repErr }] = await Promise.all([
         supabase.from('hidden_comments').insert({
-          comment_id: id, post_id: targetId, user_id: user.id, reason, details: details ?? null,
+          comment_id: id, target_id: targetId, user_id: user.id, reason, details: details ?? null,
         }),
         supabase.from('reports').insert({
           reporter_id: user.id,
