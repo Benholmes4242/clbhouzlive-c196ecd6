@@ -13,20 +13,11 @@ const RING: Record<FeatTier, string> = {
   birdie_hauls: '#F7931E',
 };
 
-const DOT: Record<FeatTier, string> = RING;
-
 const TIER_LABEL: Record<FeatTier, string> = {
   legendary: 'LEGENDARY',
   records: 'COURSE RECORD',
   eagles: 'EAGLE',
   birdie_hauls: 'BIRDIE HAUL',
-};
-
-const TIER_ICON: Record<FeatTier, string> = {
-  legendary: '🕳️',
-  records: '🏆',
-  eagles: '🦅',
-  birdie_hauls: '🐦',
 };
 
 const RECORD_CATEGORY_LABEL: Record<string, string> = {
