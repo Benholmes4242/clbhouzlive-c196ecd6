@@ -367,8 +367,6 @@ export const MessageBubble: React.FC<Props> = ({
         />
       )}
       {viewer
-        ? createPortal(
-            <MediaPreviewViewer
       {viewer
         ? createPortal(
             <MediaPreviewViewer
