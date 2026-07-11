@@ -276,7 +276,13 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
     <div>
       <Header photoCount={photoCount} videoCount={videoCount} onSeeAll={onSeeAllClick} />
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4, padding: '0 16px' }}>
+      <div
+        style={
+          isMobile
+            ? { display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 5, padding: '0 16px' }
+            : { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4, padding: '0 16px' }
+        }
+      >
         {mediaTiles.map((media, index) => {
           const isLastTile = index === mediaTiles.length - 1;
           const showOverflow = isLastTile && overflowCount > 0;
