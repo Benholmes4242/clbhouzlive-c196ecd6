@@ -64,70 +64,134 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
   const hasNoSelection = status.status === 'none';
 
   return (
-    <div className={cn("space-y-7", className)}>
-      <div style={{ display: 'flex', gap: 8 }}>
-        {/* Mark Played — amber ghost (matches Official Course Website button) */}
+    <div className={cn('space-y-3', className)}>
+      {/* HERO — Played / Rate (amber-star language from the reviews page) */}
+      {isPlayed ? (
         <button
           onClick={handlePlayedClick}
-          disabled={isUpdating}
           style={{
-            flex: 1,
-            padding: '12px 0',
-            borderRadius: 12,
-            fontSize: 13,
-            fontWeight: 700,
-            cursor: 'pointer',
+            width: '100%',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            gap: 6,
-            background: isPlayed
-              ? 'rgba(247,147,30,0.06)'
-              : '#ffffff',
-            color: isPlayed ? '#F7931E' : '#0F172A',
-            border: isPlayed
-              ? '1.5px solid rgba(247,147,30,0.2)'
-              : '1.5px solid rgba(15,23,42,0.12)',
-            boxShadow: 'none',
-            transition: 'all 0.18s ease',
+            gap: 14,
+            padding: 16,
+            borderRadius: 18,
+            cursor: 'pointer',
+            textAlign: 'left',
+            background: 'linear-gradient(135deg, rgba(247,147,30,0.07), rgba(247,147,30,0.02))',
+            border: '1.5px solid rgba(247,147,30,0.15)',
           }}
         >
-          {isPlayed && <Check className="h-4 w-4" />}
-          {isPlayed ? 'Played' : 'Mark as Played'}
+          <div style={{
+            width: 46, height: 46, borderRadius: 13, flexShrink: 0,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'linear-gradient(135deg, #F7931E, #FBBC2E)',
+          }}>
+            <Star size={22} color="#fff" fill="#fff" strokeWidth={0} />
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 15, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.01em' }}>
+              You've played here
+            </div>
+            <div style={{ fontSize: 12.5, color: '#64748B', marginTop: 2 }}>
+              Tap to view or edit your review
+            </div>
+          </div>
+          <span style={{
+            flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 5,
+            padding: '7px 13px', borderRadius: 999,
+            background: 'rgba(247,147,30,0.12)', color: '#F7931E',
+            fontSize: 12.5, fontWeight: 700,
+          }}>
+            <Check size={15} strokeWidth={2.5} /> Played
+          </span>
         </button>
+      ) : (
+        <div
+          style={{
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 14,
+            padding: 16,
+            borderRadius: 18,
+            background: 'linear-gradient(135deg, rgba(247,147,30,0.07), rgba(247,147,30,0.02))',
+            border: '1.5px solid rgba(247,147,30,0.15)',
+          }}
+        >
+          <div style={{
+            width: 46, height: 46, borderRadius: 13, flexShrink: 0,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'linear-gradient(135deg, #F7931E, #FBBC2E)',
+          }}>
+            <Star size={22} color="#fff" fill="#fff" strokeWidth={0} />
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 15, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.01em' }}>
+              Played here?
+            </div>
+            <div style={{ fontSize: 12.5, color: '#64748B', marginTop: 2 }}>
+              Your rating helps golfers worldwide
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handlePlayedClick}
+            disabled={isUpdating}
+            style={{
+              flexShrink: 0, padding: '9px 18px', borderRadius: 999,
+              fontSize: 13, fontWeight: 700, color: '#fff', border: 'none',
+              background: '#F7931E', boxShadow: '0 4px 14px rgba(247,147,30,0.3)',
+              cursor: 'pointer',
+            }}
+          >
+            Rate
+          </button>
+        </div>
+      )}
 
-        {/* Want to Play — dark when active */}
+      {/* WANT TO PLAY — subtle toggle row; hidden once played */}
+      {!isPlayed && (
         <button
           onClick={handleWantToPlayClick}
-          disabled={isUpdating || isPlayed}
+          disabled={isUpdating}
           style={{
-            flex: 1,
-            padding: '12px 0',
-            borderRadius: 12,
-            fontSize: 13,
-            fontWeight: 700,
-            cursor: isPlayed ? 'not-allowed' : 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 6,
-            background: isWantToPlay ? '#0F172A' : '#ffffff',
-            color: isWantToPlay ? '#ffffff' : '#0F172A',
-            border: isWantToPlay ? 'none' : '1.5px solid rgba(15,23,42,0.12)',
-            opacity: isPlayed ? 0.35 : 1,
-            transition: 'all 0.18s ease',
+            width: '100%',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '12px 14px', borderRadius: 14, cursor: 'pointer',
+            background: '#fff', border: '1px solid rgba(15,23,42,0.07)',
           }}
         >
+          <span style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13.5, fontWeight: 600, color: '#0F172A' }}>
+            <Bookmark
+              size={19}
+              strokeWidth={2}
+              color={isWantToPlay ? '#F7931E' : '#64748B'}
+              fill={isWantToPlay ? '#F7931E' : 'none'}
+            />
+            {isWantToPlay ? 'On your want-to-play list' : 'Want to play'}
+          </span>
           {isUpdating ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Loader2 className="h-4 w-4 animate-spin" style={{ color: '#94A3B8' }} />
           ) : (
-            isWantToPlay ? '🔖 Saved' : 'Want to Play'
+            <span style={{
+              width: 44, height: 26, borderRadius: 999, position: 'relative', flexShrink: 0,
+              background: isWantToPlay ? '#F7931E' : '#E2E8F0',
+              transition: 'background 0.18s ease',
+            }}>
+              <span style={{
+                position: 'absolute', top: 3, left: isWantToPlay ? 21 : 3,
+                width: 20, height: 20, borderRadius: '50%', background: '#fff',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.2)', transition: 'left 0.18s ease',
+              }} />
+            </span>
           )}
         </button>
-      </div>
+      )}
 
+      {/* Footnote — only when nothing marked yet */}
       {hasNoSelection && (
-        <p style={{ fontSize: 11, color: '#94A3B8', lineHeight: 1.5, margin: 0, marginTop: 16 }}>
+        <p style={{ fontSize: 11, color: '#94A3B8', lineHeight: 1.5, margin: '4px 0 0' }}>
           Every course you mark becomes part of your journey — view them anytime on your{' '}
           <Link to="/map" style={{ color: '#64748B', textDecoration: 'underline', textUnderlineOffset: 2 }}>
             map
