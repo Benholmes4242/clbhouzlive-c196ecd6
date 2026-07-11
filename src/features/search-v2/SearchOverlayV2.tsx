@@ -188,7 +188,16 @@ export function SearchOverlayV2({
             }
           />
 
-          {showChips && <ScopeChips scope={scope} onChange={setScope} />}
+          {mode === 'default' && (
+            <motion.div
+              initial={false}
+              animate={{ height: showChips ? 'auto' : 0, opacity: showChips ? 1 : 0 }}
+              transition={{ duration: 0.18, ease: 'easeOut' }}
+              style={{ overflow: 'hidden', width: '100%' }}
+            >
+              <ScopeChips scope={scope} onChange={setScope} />
+            </motion.div>
+          )}
 
           <div
             className="flex-1 overflow-y-auto overscroll-contain w-full md:max-w-[560px]"
