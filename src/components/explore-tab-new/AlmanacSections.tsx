@@ -1,8 +1,7 @@
 import { memo } from 'react';
-import SectionHeader from '@/components/ui/SectionHeader';
 import { FeatCard } from './FeatCard';
 import { useRegionFeats, type FeatTier } from './hooks/useRegionFeats';
-import { AMBER, INK, INK_MUTE, INK_FAINT, HAIRLINE_INK_8, INK_TINT_06 } from '@/features/courses/_shared/tokens';
+import { AMBER, INK, INK_MUTE, HAIRLINE_INK_8, INK_TINT_06 } from '@/features/courses/_shared/tokens';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
