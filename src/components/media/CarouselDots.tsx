@@ -7,8 +7,9 @@
  */
 import React, { useEffect, useState } from 'react';
 
-const WINDOW = 7; // max dots rendered at once
-const DOT = 6;    // dot diameter (px)
+const WINDOW = 7;        // max dots rendered at once
+const DOT_ACTIVE = 6;    // active dot diameter (px)
+const DOT_INACTIVE = 5;  // inactive dot diameter (px)
 const GAP = 5;
 
 function computeWindow(count: number, active: number) {
