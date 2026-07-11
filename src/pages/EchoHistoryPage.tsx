@@ -156,7 +156,12 @@ const EchoHistoryPage: React.FC = () => {
           <button
             type="button"
             aria-label="Back"
-            onClick={() => navigate('/echo')}
+            onClick={() => {
+              // Prefer real back so we don't push a duplicate /echo entry,
+              // which would trap the user in an /echo ↔ /echo/history loop.
+              if (window.history.length > 1) navigate(-1);
+              else navigate('/echo', { replace: true });
+            }}
             className="active:opacity-60"
             style={{
               width: 40,
