@@ -117,10 +117,9 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
     commentsOpen,
     openComments,
     closeComments,
-    handleCommentPosted,
-    handleCommentDeleted,
     getCommentCount,
   } = useClubhouseComments(activeActor);
+
   // Profile hosts don't drive activeIndex from a scroll-snap feed reliably, so
   // remember the exact post the user tapped for the CommentsSheet. Without this
   // the sheet would gate on `activePost` which can flip to null mid-open (the
