@@ -28,8 +28,20 @@ import {
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  /** Watch scope mode locks scope to videos and hides chips. */
-  mode?: 'default' | 'videos';
+  /**
+   * Overlay behaviour:
+   * - 'default' — Directory (all scopes + chips, tapping a row navigates).
+   * - 'videos'  — Directory locked to videos scope, chips hidden.
+   * - 'commit'  — Watch commit mode: input + recents + LIVE video preview
+   *               rail from RPC while typing. Committing (Enter or the
+   *               "Search '<term>'" row) calls onCommit(term), saves the
+   *               recent, and closes. Tapping a preview video navigates.
+   */
+  mode?: 'default' | 'videos' | 'commit';
+  /** Placeholder for the input; defaults per mode. */
+  placeholder?: string;
+  /** Required for 'commit' mode; called with the committed term. */
+  onCommit?: (term: string) => void;
 }
 
 function RowSkeleton() {
