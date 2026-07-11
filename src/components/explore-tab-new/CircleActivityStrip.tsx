@@ -6,13 +6,10 @@ import {
   useCircleActivity,
   type CircleActivityRow,
   type CircleFeatType,
-  type CircleFeatTone,
 } from './hooks/useCircleActivity';
 import {
-  AMBER,
   INK,
   INK_MUTE,
-  INK_FAINT,
   HAIRLINE_INK_8,
   INK_TINT_06,
 } from '@/features/courses/_shared/tokens';
