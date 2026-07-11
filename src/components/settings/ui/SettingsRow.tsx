@@ -61,7 +61,7 @@ export function SettingsRow({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <span className="text-[15px] font-medium text-foreground truncate">{title}</span>
-            {isBeta && <SettingsBadge>Beta</SettingsBadge>}
+            
             {isLocked && <Lock className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />}
           </div>
           {subtitle && (

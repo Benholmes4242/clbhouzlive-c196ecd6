@@ -3,7 +3,7 @@
  * Compact tiles with leaderboard delta, top player, momentum indicator
  * 
  * WIRING: leaderboards prop is optional. When not available:
- * - Shows "Live scoring coming soon" instead of empty "updating..."
+ * - Shows "No live coverage right now" instead of empty "updating..."
  * - Still renders live event tiles with available info
  */
 
@@ -79,7 +79,7 @@ export const LiveNowModule = memo(function LiveNowModule({
                   </div>
                 </div>
 
-                {/* Mini Leaderboard or Coming Soon state */}
+                {/* Mini Leaderboard or No coverage state */}
                 {hasLeaderboard ? (
                   <div className="space-y-2">
                     {leaders.map((leader, i) => (
@@ -120,7 +120,7 @@ export const LiveNowModule = memo(function LiveNowModule({
                 ) : (
                   <div className="py-4 flex items-center justify-center gap-2 text-sm text-slate-400 bg-slate-50 rounded-lg">
                     <Lock className="w-3.5 h-3.5" />
-                    <span>Live scoring coming soon</span>
+                    <span>No live coverage right now</span>
                   </div>
                 )}
 

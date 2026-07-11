@@ -28,6 +28,7 @@ import { useSuggestedCreators, type SuggestedCreator } from '@/components/watch/
 import { ChevronRight } from 'lucide-react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 
+import { useBlockActions } from '@/hooks/useBlockActions';
 import { toast } from 'sonner';
 import type { SocialUser } from '@/hooks/useSocialLists';
 import { getProfilePathById } from '@/lib/profileRoutes';
@@ -1077,8 +1078,10 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({
   isOwnProfile,
   isFirst = false,
 }) => {
+  
   const navigate = useNavigate();
   const isSelf = currentUserId === user.id;
+  const { blockUser } = useBlockActions({ currentUserId: currentUserId || '' });
 
   const { followUser, unfollowUser, loading: followLoading } = useFollowUser();
   const {
@@ -1383,14 +1386,7 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({
                 }}
               />
             )}
-            <KebabAction
-              icon={<BellOff className="w-4 h-4" />}
-              label="Mute notifications"
-              onClick={() => {
-                setShowKebabSheet(false);
-                toast.success('Mute coming soon');
-              }}
-            />
+            
             {uiState === 'following' && (
               <KebabAction
                 icon={<UserMinus className="w-4 h-4" />}
@@ -1425,9 +1421,18 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({
               icon={<Ban className="w-4 h-4" />}
               label="Block"
               destructive
-              onClick={() => {
+              onClick={async () => {
                 setShowKebabSheet(false);
-                toast.success('Block coming soon');
+                try {
+                  const success = await blockUser(user.id);
+                  if (success) {
+                    toast.success(`Blocked ${user.displayName}`);
+                  } else {
+                    toast.error("Could not block. Try again.");
+                  }
+                } catch (err) {
+                  toast.error("Could not block. Try again.");
+                }
               }}
             />
           </div>

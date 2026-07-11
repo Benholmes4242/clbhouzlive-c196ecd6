@@ -17,7 +17,7 @@ export const LearnEmptyState: React.FC<LearnEmptyStateProps> = ({ className }) =
   return (
     <div className={cn("px-5 py-16 text-center", className)}>
       <p className="text-secondary text-body-md leading-relaxed max-w-sm mx-auto mb-6">
-        We're building learning paths tailored to your game. More coming soon.
+        Learning paths tailored to your game will appear here.
       </p>
       <Button
         variant="outline"

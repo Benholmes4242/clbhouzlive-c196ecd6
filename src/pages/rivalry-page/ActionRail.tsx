@@ -8,25 +8,22 @@ import {
 import { FONT, BG_1, T80, T100, LINE } from './_shared/tokens';
 
 interface Props {
-  onMessage: () => void;
   onProfile: () => void;
   onShare: () => void;
 }
 
 export const ActionRail: React.FC<Props> = ({
-  onMessage,
   onProfile,
   onShare,
 }) => (
   <div
     style={{
       display: 'grid',
-      gridTemplateColumns: '1fr 1fr 1fr',
+      gridTemplateColumns: '1fr 1fr',
       gap: 8,
       padding: '0 16px',
     }}
   >
-    <ActionButton Icon={MessageCircle} label="Message" onClick={onMessage} />
     <ActionButton Icon={UserIcon} label="Profile" onClick={onProfile} />
     <ActionButton Icon={Share2} label="Share" onClick={onShare} />
   </div>

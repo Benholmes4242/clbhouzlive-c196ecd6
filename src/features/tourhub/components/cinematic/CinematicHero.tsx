@@ -41,7 +41,7 @@ function MiniLeaderboardGlass({ leaders }: { leaders: LeaderEntry[] }) {
   if (!leaders || leaders.length === 0) {
     return (
       <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
-        <p className="text-white/50 text-sm text-center">Leaderboard coming soon</p>
+        <p className="text-white/50 text-sm text-center">Leaderboard not available</p>
       </div>
     );
   }

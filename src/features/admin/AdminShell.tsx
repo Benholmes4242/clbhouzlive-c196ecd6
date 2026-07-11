@@ -18,7 +18,7 @@ const SystemPage = lazy(() => import('./pages/SystemPage'));
 const ModerationPage = lazy(() => import('./pages/ModerationPage'));
 const ApprovalsPage = lazy(() => import('./pages/ApprovalsPage'));
 const AppealsPage = lazy(() => import('./pages/AppealsPage'));
-const WaitlistPage = lazy(() => import('./pages/WaitlistPage'));
+
 const SupportPage = lazy(() => import('./pages/SupportPage'));
 const VerificationsPage = lazy(() => import('./pages/VerificationsPage'));
 const VideoPerfPage = lazy(() => import('./pages/VideoPerfPage'));
@@ -34,7 +34,7 @@ const SECTION_TITLES: Record<string, string> = {
   content:    'Content',
   analytics:  'Analytics',
   system:     'System',
-  waitlist:   'Handicap demand',
+  
   support:    'Support',
   verifications: 'Verifications',
   'video-perf': 'Video Perf',
@@ -122,7 +122,7 @@ export default function AdminShell() {
                 <Route path="content/*"   element={<ContentPage />} />
                 <Route path="analytics/*" element={can.manageAdmins ? <AnalyticsPage /> : <AdminAccessDenied />} />
                 <Route path="system/*"    element={<SystemPage />} />
-                <Route path="waitlist/*"  element={can.viewModeration ? <WaitlistPage /> : <AdminAccessDenied />} />
+                
                 <Route path="support/*"   element={can.viewModeration ? <SupportPage /> : <AdminAccessDenied />} />
                 <Route path="verifications/*" element={can.viewUsers ? <VerificationsPage /> : <AdminAccessDenied />} />
                 <Route path="video-perf/*" element={<VideoPerfPage />} />

@@ -337,7 +337,7 @@ export function LeaderboardBand({
     } else {
       const placeholderText = firstYearEvent
         ? 'INAUGURAL EVENT · NO PRIOR RESULTS'
-        : 'Tournament preview coming soon.';
+        : 'Tournament preview not available.';
       body = (
         <div
           style={{

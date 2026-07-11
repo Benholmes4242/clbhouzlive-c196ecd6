@@ -111,92 +111,21 @@ import { KeepAliveOutlet } from '@/components/keep-alive/KeepAliveOutlet';
 
 // Import wrapped components with explicit variants
 import ClubhouseWrapped from "./pages/ClubhouseWrapped";
-import BetaGatePage from "./pages/BetaGatePage";
+
 
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
 import { useSuspensionStatus } from "@/hooks/useSuspensionStatus";
 import SuspendedScreen from "@/components/SuspendedScreen";
 
-// Gate is platform-based: native app or approved preview only. Desktop/mobile web → coming-soon.
-const PREVIEW_BYPASS_KEY = 'clbhouz_preview_bypass';
-const PREVIEW_BYPASS_TOKEN = 'clbhouz'; // the secret value: ?preview=clbhouz
-
-function isLovablePreviewHost(): boolean {
-  try {
-    const h = window.location.hostname;
-    return (
-      h.endsWith('.lovableproject.com') ||
-      h.endsWith('.lovable.app') ||
-      h.endsWith('.lovable.dev') ||
-      h === 'localhost' ||
-      h === '127.0.0.1'
-    );
-  } catch {
-    return false;
-  }
-}
-
-function usePreviewBypass(): boolean {
-  try {
-    // 1) Always unlock inside the Lovable editor/preview (and local dev).
-    if (isLovablePreviewHost()) return true;
-
-    // 2) Secret token bypass for any other browser (persisted).
-    const params = new URLSearchParams(window.location.search);
-    const param = params.get('preview');
-    if (param === PREVIEW_BYPASS_TOKEN) {
-      localStorage.setItem(PREVIEW_BYPASS_KEY, '1');
-      return true;
-    }
-    return localStorage.getItem(PREVIEW_BYPASS_KEY) === '1';
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Synchronous Median detection — Median injects window.median and UA markers
- * (MedianApp / GoNativeApp / median) at webview creation, so they're available
- * on the very first React render. No poll required: web resolves to BetaGate
- * on first commit; native resolves to the app shell on first commit.
- */
-function detectIsMedianAppSync(): boolean {
-  try {
-    const w = window as any;
-    if (w.median || w.gonern) return true;
-    const ua = (navigator.userAgent || '').toLowerCase();
-    return /medianapp|gonativeapp|median|gonative/.test(ua);
-  } catch {
-    return false;
-  }
-}
-
 const RootGate: React.FC = () => {
-  const isMedianApp = detectIsMedianAppSync();
-  const previewBypass = usePreviewBypass();
   const { user, loading: authLoading } = useSupabaseSession();
 
   // Suspension gate hook must be called unconditionally to respect hooks order.
-  // It internally no-ops until a user id is present, and fails OPEN on error.
   const suspension = useSuspensionStatus(user?.id);
 
-  // App-only product: only the native app or an approved preview sees the app; everyone else → coming-soon.
-  if (!isMedianApp && !previewBypass) return <BetaGatePage />;
-
-  // While the session is resolving we do NOT yet know if there's a user. Render a
-  // neutral charcoal hold matching index.html's pre-React shell (#15171F) so the
-  // boot stays seamless. Without this, a logged-out cold launch falls through to
-  // <ClubhouseWrapped/> and flashes the feed skeletons before redirecting to /auth.
-  // Also prevents the keep-alive cache from mounting a phantom Clubhouse instance
-  // (with its queries/realtime/timers) under /auth for logged-out users.
   if (authLoading) return <BootHold />;
-
-  // Logged-out: straight to auth (no Clubhouse paint).
   if (!user) return <Navigate to="/auth" replace />;
 
-  // Suspension gate — FAIL OPEN. 'loading' falls through to the app (option (a)
-  // in the brief): a suspended user seeing one frame of the app before the gate
-  // flips is harmless, and we NEVER hold the whole app on this check.
   if (suspension.status === 'suspended') {
     return <SuspendedScreen suspension={suspension.suspension} />;
   }

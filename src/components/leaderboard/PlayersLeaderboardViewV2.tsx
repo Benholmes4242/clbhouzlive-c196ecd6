@@ -473,7 +473,7 @@ export function PlayersLeaderboardViewV2() {
     }
     if (arenaMode === 'climbers' && displayedEntries.length === 0 && !fastClimbersLoading) {
       // No recent activity - show empty state
-      return <LeaderboardEmptyState type="rising-coming-soon" />;
+      return <LeaderboardEmptyState type="rising-empty" />;
     }
     if (playersFrom !== 'worldwide' && displayedEntries.length === 0) {
       const countryName = playersFrom === 'my-country' 

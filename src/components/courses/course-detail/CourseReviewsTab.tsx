@@ -39,6 +39,7 @@ import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { PullToRefreshContainer } from '@/components/ui/pull-to-refresh';
 import { AlertCircle } from 'lucide-react';
 import { getProfilePathById } from '@/lib/profileRoutes';
+import { ReportSheet } from "@/components/moderation/ReportSheet";
 import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, INK, INK_FAINT, INK_LIGHT, INK_MUTE, INK_TINT_02, INK_TINT_06, SLATE_50, SURFACE } from '@/features/courses/_shared/tokens';
 
 export type SortOption = ReviewsSortBy;
@@ -96,6 +97,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     : ratingFilter === 'excellent' ? '8.9-7.5'
     : ratingFilter === 'good' ? '7.4-5'
     : 'all';
+  const [reportingReview, setReportingReview] = useState<CourseReview | null>(null);
 
   const [searchOpen, setSearchOpen] = useState(false);
 
@@ -493,6 +495,13 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           />
         </div>
         <ScrollToTopGlass />
+      <ReportSheet
+        open={!!reportingReview}
+        onOpenChange={(open) => !open && setReportingReview(null)}
+        reportType="review"
+        reportedUserId={reportingReview?.user_id}
+        reportedReviewId={reportingReview?.id}
+      />
       </div>
     );
   }
@@ -639,6 +648,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       {filteredMyReview && (
         <div style={{ padding: '6px 16px 0', borderBottom: `0.5px solid ${INK_TINT_06}` }}>
           <ReviewBlockFlat
+                onReportClick={() => setReportingReview(review)}
             review={transformReview(filteredMyReview, isJustSubmittedOrUpdated)}
             isMine
             isHighlighted={isJustSubmittedOrUpdated}
@@ -684,6 +694,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
             <div key={review.id} style={{ borderBottom: `0.5px solid ${INK_TINT_06}` }}>
               <div style={{ padding: '2px 16px 0' }}>
                 <ReviewBlockFlat
+                onReportClick={() => setReportingReview(review)}
                   review={transformReview(review, isDeepLinked)}
                   isHighlighted={isDeepLinked}
                   onToggleHelpful={handleToggleHelpful}
@@ -747,6 +758,13 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       )}
 
       <ScrollToTopGlass />
+      <ReportSheet
+        open={!!reportingReview}
+        onOpenChange={(open) => !open && setReportingReview(null)}
+        reportType="review"
+        reportedUserId={reportingReview?.user_id}
+        reportedReviewId={reportingReview?.id}
+      />
     </div>
     </PullToRefreshContainer>
   );

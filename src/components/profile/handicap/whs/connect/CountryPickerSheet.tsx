@@ -221,7 +221,7 @@ export const CountryPickerSheet: React.FC<Props> = ({ open, onClose, onSelect })
                   textTransform: 'uppercase',
                 }}
               >
-                Coming soon
+                Not yet supported
               </div>
 
               <div style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 8 }}>

@@ -861,8 +861,7 @@ export default function BusinessProfileEditor() {
           {/* 5. PRIMARY BUTTON */}
           <PrimaryActionSection value={primaryAction} onChange={setPrimaryAction} />
 
-          {/* 6. BOOKING — coming soon */}
-          <BookingComingSoonSection />
+          
 
           {/* 7. OPENING HOURS with master toggle */}
           <OpeningHoursSection

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 // Chrome owned solely by AppRoutes (/auth + /signup are darkChrome routes).
 import { Loader2, ArrowRight } from 'lucide-react';
@@ -103,7 +104,8 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
   };
 
   const trimmed = loginEmail.trim();
-  const canContinue = trimmed.length > 0 && !submitting;
+  const [agreed, setAgreed] = useState(false);
+  const canContinue = trimmed.length > 0 && !submitting && agreed;
   const inMedian = useMemo(() => isMedianApp(), []);
   const showApple = inMedian && !!onAppleSignIn;
   const showGoogle = inMedian && !!onGoogleSignIn;

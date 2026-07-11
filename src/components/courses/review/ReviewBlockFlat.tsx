@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ThumbsUp, ThumbsDown } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, MoreHorizontal } from 'lucide-react';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
@@ -39,6 +39,7 @@ interface ReviewBlockFlatProps {
   onMediaClick?: (index: number, el: HTMLElement | null) => void;
   onUserClick?: () => void;
   onEditClick?: () => void;
+  onReportClick?: () => void;
   disabled?: boolean;
 }
 
@@ -122,6 +123,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
   onMediaClick,
   onUserClick,
   onEditClick,
+  onReportClick,
   disabled,
 }) => {
   const { user, score, text, createdAt, isHelpful, isUnhelpful, helpfulCount, isMock, media } = review;
@@ -153,9 +155,6 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
           className="mb-[10px]"
         />
       )}
-
-
-
 
       {/* Header row */}
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 10 }}>
@@ -217,7 +216,30 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
           <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 1 }}>{formatDate(createdAt)}</div>
         </div>
 
-        <ScoreRing score={score} size={46} />
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+          <ScoreRing score={score} size={46} />
+          {!isMine && onReportClick && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onReportClick();
+              }}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                padding: '4px',
+                cursor: 'pointer',
+                color: '#94A3B8',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              aria-label="Report review"
+            >
+              <MoreHorizontal size={18} />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Sub-scores chips */}

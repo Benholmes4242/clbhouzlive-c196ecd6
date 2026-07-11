@@ -53,11 +53,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
           ))}
         </div>
         
-        <div className="mt-3 pt-3 border-t border-gray-100">
-          <p className="text-xs text-gray-500 text-center">
-            More emojis coming soon!
-          </p>
-        </div>
+        
       </div>
     </>
   );

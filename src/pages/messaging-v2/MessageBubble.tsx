@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Check, AlertCircle, Clock } from 'lucide-react';
+import { Check, AlertCircle, Clock, Flag } from 'lucide-react';
+import { ReportSheet } from "@/components/moderation/ReportSheet";
 import type { ThreadMessage, MessageReaction, MessageAttachment } from '@/types/messaging';
 import { MessageImage } from './MessageImage';
 import { VoiceNote } from './VoiceNote';
@@ -43,7 +44,7 @@ function groupReactions(rs: MessageReaction[]): { emoji: string; count: number }
 /** Double-check (read ticks) rendered in monochrome grey. */
 const DoubleCheck: React.FC<{ color: string }> = ({ color }) => (
   <span
-    style={{
+    style={{ position: "relative", 
       display: 'inline-flex',
       alignItems: 'center',
       color,
@@ -52,7 +53,7 @@ const DoubleCheck: React.FC<{ color: string }> = ({ color }) => (
     aria-label="Sent"
   >
     <Check size={12} strokeWidth={2.5} />
-    <Check size={12} strokeWidth={2.5} style={{ marginLeft: -6 }} />
+    <Check size={12} strokeWidth={2.5} style={{ position: "relative",  marginLeft: -6 }} />
   </span>
 );
 
@@ -96,6 +97,7 @@ export const MessageBubble: React.FC<Props> = ({
   const replyName = isOutgoing ? 'rgba(245,246,247,0.9)' : SUB;
   const replySnippet = isOutgoing ? 'rgba(245,246,247,0.6)' : SUB;
 
+  const [showReport, setShowReport] = useState(false);
   const [viewer, setViewer] = useState<{ items: OrderedMediaItem[]; index: number } | null>(null);
 
   const openViewer = async (tappedIndex: number, fallbackUrl: string) => {
@@ -126,13 +128,21 @@ export const MessageBubble: React.FC<Props> = ({
   return (
     <div
       className="w-full flex flex-col"
-      style={{
+      style={{ position: "relative", 
         alignItems: isOutgoing ? 'flex-end' : 'flex-start',
         marginTop: isFirstOfRun ? 10 : 3,
       }}
     >
       <div
-        style={{
+        style={{ position: "relative", 
+        {!isOutgoing && !isDeleted && (
+          <button 
+            onClick={() => setShowReport(true)}
+            style={{ position: "relative",  background: "transparent", border: "none", padding: "4px", color: HINT, cursor: "pointer", position: "absolute", left: "-28px", top: "50%", transform: "translateY(-50%)" }}
+          >
+            <Flag size={14} />
+          </button>
+        )}
           maxWidth: '78%',
           background: isDeleted ? 'transparent' : bg,
           color: fg,
@@ -148,7 +158,7 @@ export const MessageBubble: React.FC<Props> = ({
       >
         {isDeleted ? (
           <span
-            style={{
+            style={{ position: "relative", 
               padding: '8px 12px',
               fontSize: 14,
               lineHeight: 1.4,
@@ -162,7 +172,7 @@ export const MessageBubble: React.FC<Props> = ({
           <>
             {reply ? (
               <div
-                style={{
+                style={{ position: "relative", 
                   borderLeft: `2px solid ${replyRule}`,
                   paddingLeft: 8,
                   marginBottom: 2,
@@ -173,7 +183,7 @@ export const MessageBubble: React.FC<Props> = ({
                 }}
               >
                 <span
-                  style={{
+                  style={{ position: "relative", 
                     fontSize: 12,
                     fontWeight: 500,
                     color: replyName,
@@ -184,7 +194,7 @@ export const MessageBubble: React.FC<Props> = ({
                 </span>
                 <span
                   className="truncate"
-                  style={{
+                  style={{ position: "relative", 
                     fontSize: 12,
                     color: replySnippet,
                     lineHeight: 1.3,
@@ -200,7 +210,7 @@ export const MessageBubble: React.FC<Props> = ({
 
             {images.length > 0 ? (
               <div
-                style={{
+                style={{ position: "relative", 
                   display: 'flex',
                   flexDirection: 'column',
                   gap: 4,
@@ -221,7 +231,7 @@ export const MessageBubble: React.FC<Props> = ({
 
             {voices.length > 0 ? (
               <div
-                style={{
+                style={{ position: "relative", 
                   display: 'flex',
                   flexDirection: 'column',
                   gap: 4,
@@ -242,7 +252,7 @@ export const MessageBubble: React.FC<Props> = ({
             message.type === 'text' ||
             message.type === 'system' ? (
               <span
-                style={{
+                style={{ position: "relative", 
                   fontSize: 14,
                   lineHeight: 1.4,
                   whiteSpace: 'pre-wrap',
@@ -255,7 +265,7 @@ export const MessageBubble: React.FC<Props> = ({
                   : message.body ?? ''}
                 {message.edited_at ? (
                   <span
-                    style={{
+                    style={{ position: "relative", 
                       color: isOutgoing ? 'rgba(245,246,247,0.55)' : HINT,
                       fontSize: 11,
                       marginLeft: 6,
@@ -274,7 +284,7 @@ export const MessageBubble: React.FC<Props> = ({
       {reactions.length > 0 && !isDeleted ? (
         <div
           className="flex flex-wrap gap-1"
-          style={{
+          style={{ position: "relative", 
             marginTop: 4,
             justifyContent: isOutgoing ? 'flex-end' : 'flex-start',
           }}
@@ -283,7 +293,7 @@ export const MessageBubble: React.FC<Props> = ({
             <span
               key={r.emoji}
               className="inline-flex items-center"
-              style={{
+              style={{ position: "relative", 
                 background: '#FFFFFF',
                 border: '0.5px solid rgba(0,0,0,0.08)',
                 borderRadius: 11,
@@ -295,7 +305,7 @@ export const MessageBubble: React.FC<Props> = ({
               }}
             >
               <span>{r.emoji}</span>
-              {r.count > 1 ? <span style={{ color: SUB }}>{r.count}</span> : null}
+              {r.count > 1 ? <span style={{ position: "relative",  color: SUB }}>{r.count}</span> : null}
             </span>
           ))}
         </div>
@@ -304,7 +314,7 @@ export const MessageBubble: React.FC<Props> = ({
       {isLastOfRun ? (
         <div
           className="flex items-center gap-1.5"
-          style={{
+          style={{ position: "relative", 
             marginTop: 4,
             paddingLeft: isOutgoing ? 0 : 4,
             paddingRight: isOutgoing ? 4 : 0,
@@ -317,7 +327,7 @@ export const MessageBubble: React.FC<Props> = ({
                 if (onRetry && message.client_id) onRetry(message.client_id);
               }}
               className="inline-flex items-center gap-1 active:opacity-60"
-              style={{
+              style={{ position: "relative", 
                 color: '#DC2626',
                 fontSize: 10.5,
                 fontWeight: 500,
@@ -332,9 +342,9 @@ export const MessageBubble: React.FC<Props> = ({
               Failed — tap to retry
             </button>
           ) : isSending ? (
-            <Clock size={11} style={{ color: HINT }} />
+            <Clock size={11} style={{ position: "relative",  color: HINT }} />
           ) : null}
-          <span style={{ color: HINT, fontSize: 10.5, lineHeight: 1 }}>
+          <span style={{ position: "relative",  color: HINT, fontSize: 10.5, lineHeight: 1 }}>
             {formatTime(message.created_at)}
           </span>
           {showTicks && !isFailed && !isSending ? (
@@ -343,10 +353,40 @@ export const MessageBubble: React.FC<Props> = ({
         </div>
       ) : null}
 
+      {!isOutgoing && !isDeleted && (
+        <ReportSheet
+          open={showReport}
+          onOpenChange={setShowReport}
+          reportType="message"
+          reportedUserId={message.sender_id}
+          reportedConversationId={message.conversation_id}
+          reportedMessageId={message.id}
+        />
+      )}
       {viewer
         ? createPortal(
             <MediaPreviewViewer
+      {!isOutgoing && !isDeleted && (
+        <ReportSheet
+          open={showReport}
+          onOpenChange={setShowReport}
+          reportType="message"
+          reportedUserId={message.sender_id}
+          reportedConversationId={message.conversation_id}
+          reportedMessageId={message.id}
+        />
+      )}
               items={viewer.items}
+      {!isOutgoing && !isDeleted && (
+        <ReportSheet
+          open={showReport}
+          onOpenChange={setShowReport}
+          reportType="message"
+          reportedUserId={message.sender_id}
+          reportedConversationId={message.conversation_id}
+          reportedMessageId={message.id}
+        />
+      )}
               initialIndex={viewer.index}
               onClose={() => setViewer(null)}
             />,
