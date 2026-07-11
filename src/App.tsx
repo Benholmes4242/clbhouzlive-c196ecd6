@@ -175,7 +175,7 @@ const Signup = lazy(() => import("./pages/Signup"));
 const Clubhouse = lazy(() => import("./pages/Clubhouse"));
 
 const HomeLanding = lazy(() => import("./pages/HomeLanding"));
-const WatchHub = lazy(() => import("./pages/WatchHub"));
+
 const ClipsSubpageWrapped = lazy(() => import("./components/watch/ClipsSubpage"));
 const VideosSubpageWrapped = lazy(() => import("./components/watch/VideosSubpage"));
 const WatchHubV2 = lazy(() => import("./features/watch-v2/WatchHubV2"));
