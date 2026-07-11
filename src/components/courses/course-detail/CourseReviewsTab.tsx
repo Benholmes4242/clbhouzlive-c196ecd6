@@ -406,25 +406,17 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   if (isLoading) {
     return (
       <div style={{ background: SLATE_50, minHeight: '100%', paddingBottom: 40 }}>
-        {/* Community score skeleton — stacked */}
-        <div style={{ padding: '18px 16px 14px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-          <Skeleton className="h-3 w-28" />
-          <Skeleton className="h-12 w-20" />
-          <Skeleton className="h-3 w-24" />
-          <Skeleton className="h-3 w-20" />
+        {/* Distribution card skeleton */}
+        <div style={{ padding: '14px 16px 12px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <Skeleton className="h-[128px] w-full rounded-[16px]" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Skeleton className="h-[34px] w-[34px] rounded-full" />
+            <Skeleton className="h-[34px] w-[110px] rounded-full" />
+            <Skeleton className="h-[34px] w-[96px] rounded-full" style={{ marginLeft: 'auto' }} />
+          </div>
         </div>
         <Divider />
-        {/* Search skeleton */}
-        <div style={{ padding: '10px 16px 0' }}>
-          <Skeleton className="h-10 w-full rounded-[10px]" />
-        </div>
-        {/* Compressed control bar skeleton — single row */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px 12px' }}>
-          <Skeleton className="h-7 w-28 rounded-full" />
-          <div style={{ width: 1, height: 20, background: HAIRLINE_INK_10 }} />
-          <Skeleton className="h-7 w-24 rounded-full" />
-          <Skeleton className="h-7 w-28 rounded-full" />
-        </div>
+
         <Divider />
         {/* Review row skeletons */}
         {[1, 2, 3].map((i) => (
