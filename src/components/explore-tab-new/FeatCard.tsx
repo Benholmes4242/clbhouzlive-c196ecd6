@@ -98,7 +98,7 @@ export function FeatCard({ row, tier, onTap }: Props) {
   const border = isLegendary ? '1px solid rgba(251,188,46,0.24)' : `1px solid ${HAIRLINE_INK_8}`;
   const nameColor = isLegendary ? '#FFFFFF' : INK;
   const courseColor = isLegendary ? 'rgba(255,255,255,0.72)' : INK_MUTE;
-  const valueColor = isLegendary ? '#FBBC2E' : dotColor;
+  const valueColor = isLegendary ? '#FBBC2E' : ringColor;
   const chipBg = isLegendary ? 'rgba(251,188,46,0.14)' : 'rgba(15,23,42,0.05)';
   const chipText = isLegendary ? '#FBBC2E' : INK;
   
