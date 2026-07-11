@@ -14,7 +14,7 @@ import { useReviewResponses, useSubmitReviewResponse } from '@/hooks/useReviewRe
 import { useBusinessClaimForCourse } from '@/hooks/useBusinessClaimForCourse';
 import { ReviewBlockFlat } from '../review/ReviewBlockFlat';
 import { ResponseDisplay, ReplyForm, VerifyToRespondPrompt } from '../review/ReviewResponseBlock';
-import { RatingFilterChips, RatingFilterValue } from '../review/RatingFilterChips';
+import type { RatingFilterValue } from '../review/RatingFilterChips';
 import { WriteReviewPrompt } from '../review/WriteReviewPrompt';
 import { SegmentedTabOption } from '@/components/ui/SegmentedTabs';
 import { Search, X, Pencil, ArrowUpDown, ListChecks, MessageSquarePlus, Flag, Map, Building2, Tag } from 'lucide-react';
