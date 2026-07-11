@@ -340,6 +340,20 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows }: Props) {
                   background: '#FFFFFF',
                 }}
               >
+                {showRanks && (
+                  <div
+                    style={{
+                      width: 20,
+                      flexShrink: 0,
+                      textAlign: 'right',
+                      fontSize: 12,
+                      fontVariantNumeric: 'tabular-nums',
+                      color: 'rgba(15,23,42,0.35)',
+                    }}
+                  >
+                    {i + 1}
+                  </div>
+                )}
                 <SquircleAvatar
                   size={36}
                   src={row.holder_avatar}
@@ -347,6 +361,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows }: Props) {
                   fallback={initials(holder)}
                   thinRing
                 />
+
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div
                     style={{
