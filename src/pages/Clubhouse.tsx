@@ -41,7 +41,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 // buildSuggestedFeed/buildFriendsFeed are called inside the feed hooks — not here
 
 // ── Clubhouse UI overlays ──
-import CommentsSheet from '@/components/comments/CommentsSheet';
+import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { SuggestedCreatorsShelf } from '@/components/shared/SuggestedCreatorsShelf';
 
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
@@ -236,24 +236,10 @@ const ClubhouseContent = () => {
   const { handleLike, getActiveLikeState, resetLikes } = useClubhouseLikes({ userId: user?.id, activeActor });
   const activeLikeState = getActiveLikeState(activePost);
 
-  // ── Editorial card like count for CommentsSheet ──
-  const editorialCardId = ['course_of_week_card'].includes(activePost?.postType ?? '')
-    ? (activePost as any)?.cardData?.cardId
-    : null;
+  // Editorial like-count query removed in C4 — CommentsSheetV2 owns its own
+  // counts and the editorial mount no longer needs likesCount plumbing.
 
-  const { data: editorialLikeCount } = useQuery({
-    queryKey: ['editorial-card-likes-count', editorialCardId],
-    queryFn: async () => {
-      if (!editorialCardId) return 0;
-      const { count } = await supabase
-        .from('editorial_card_likes')
-        .select('*', { count: 'exact', head: true })
-        .eq('card_id', editorialCardId);
-      return count ?? 0;
-    },
-    enabled: !!editorialCardId,
-    staleTime: 0,
-  });
+
   
   // ── Optimistic follow state ──
   const { followOverrides, handleFollow, handleFollowChange, getFollowState, resetFollows } = useClubhouseFollows({ userId: user?.id });
@@ -659,42 +645,19 @@ const ClubhouseContent = () => {
       {/* ═══ COMMENTS + MORE OPTIONS ═══ */}
       {activePost && posts.length > 0 && commentsMounted && (
         <>
-          <CommentsSheet
-            isOpen={commentsOpen}
-            onClose={closeComments}
-            postId={
-              activePost.postType === 'course_of_week_card'
-                ? (activePost as any).cardData.cardId
-                : activePost.id
-            }
-            currentUserId={user?.id}
-            creatorUserId={activePost.userId}
-            creatorName={
-              ['pga_card', 'course_of_week_card'].includes(activePost.postType ?? '')
-                ? 'Clbhouz'
-                : activePost.displayName
-            }
-            creatorAvatar={activePost.avatarUrl}
-            caption={activePost.caption}
-            theme="light"
-            likesCount={
-              activePost.postType === 'course_of_week_card'
-                ? (editorialLikeCount ?? 0)
-                : activeLikeState?.count ?? null
-            }
-            likeSource={
-              activePost.postType === 'course_of_week_card'
-                ? 'editorial'
-                : 'post'
-            }
-            editorialCardId={
-              activePost.postType === 'course_of_week_card'
-                ? (activePost as any).cardData.cardId
-                : undefined
-            }
-            onCommentPosted={() => handleCommentPosted(activePost)}
-            onCommentDeleted={() => activePost && handleCommentDeleted(activePost.id, activePost.commentCount)}
-          />
+          {(() => {
+            const isEditorial = activePost.postType === 'course_of_week_card';
+            const editorialId = isEditorial ? (activePost as any).cardData?.cardId : null;
+            return (
+              <CommentsSheetV2
+                isOpen={commentsOpen}
+                onClose={closeComments}
+                targetType={isEditorial ? 'editorial' : 'post'}
+                targetId={isEditorial ? (editorialId ?? '') : activePost.id}
+              />
+            );
+          })()}
+
           <MoreOptionsDrawer
             open={moreOptionsOpen}
             onOpenChange={setMoreOptionsOpen}

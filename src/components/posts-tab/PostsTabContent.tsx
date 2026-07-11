@@ -26,7 +26,7 @@ import { useClubhouseFollows } from '@/components/clubhouse/hooks/useClubhouseFo
 import { useClubhouseComments } from '@/components/clubhouse/hooks/useClubhouseComments';
 import { useClubhouseShare } from '@/components/clubhouse/hooks/useClubhouseShare';
 import { useActivePostDerived } from '@/components/clubhouse/hooks/useActivePostDerived';
-import CommentsSheet from '@/components/comments/CommentsSheet';
+import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 
 import { getActorRouteByType } from '@/types/actor';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
@@ -333,22 +333,14 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
 
       {/* ═══ COMMENTS + MORE OPTIONS overlays ═══ */}
       {selectedCommentPost && commentsMounted && (
-        <CommentsSheet
+        <CommentsSheetV2
           isOpen={commentsOpen}
           onClose={closeComments}
-          postId={selectedCommentPost.id}
-          currentUserId={user?.id}
-          creatorUserId={selectedCommentPost.userId}
-          creatorName={selectedCommentPost.displayName}
-          creatorAvatar={selectedCommentPost.avatarUrl}
-          caption={selectedCommentPost.caption}
-          theme="light"
-          likesCount={getActiveLikeState(selectedCommentPost)?.count ?? selectedCommentPost.likeCount ?? null}
-          likeSource="post"
-          onCommentPosted={() => handleCommentPosted(selectedCommentPost)}
-          onCommentDeleted={() => handleCommentDeleted(selectedCommentPost.id, selectedCommentPost.commentCount)}
+          targetType="post"
+          targetId={selectedCommentPost.id}
         />
       )}
+
       {activePost && filteredPosts.length > 0 && (
         <>
           <Drawer open={moreOptionsOpen} onOpenChange={setMoreOptionsOpen}>

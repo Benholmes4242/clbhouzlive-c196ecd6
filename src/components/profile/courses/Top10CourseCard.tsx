@@ -18,7 +18,7 @@ import { cn } from '@/lib/utils';
 import { TopTenCourse } from '@/hooks/useUserTopTenCourses';
 import { getScoreTier } from '@/utils/getScoreTier';
 import { useTopTenReactions, REACTION_CONFIG, ReactionType } from '@/hooks/useTopTenReactions';
-import { TopTenCardComments } from './TopTenCardComments';
+import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 interface Top10CourseCardProps {
@@ -244,17 +244,15 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
       </motion.div>
       
       {/* Comments sheet */}
-      <TopTenCardComments
+      <CommentsSheetV2
         isOpen={commentsOpen}
         onClose={() => setCommentsOpen(false)}
-        targetUserId={targetUserId}
-        courseId={course.course_id}
-        courseName={course.name}
-        isOwnProfile={isOwnProfile ?? true}
-        privacySetting={privacySetting ?? 'followers'}
+        targetType="top_ten"
+        targetId={targetUserId}
+        targetSecondaryId={course.course_id}
         initialCommentId={initialCommentId}
-        initialParentCommentId={initialParentCommentId}
       />
+
     </>
   );
 };

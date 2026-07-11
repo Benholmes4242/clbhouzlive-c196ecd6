@@ -19,7 +19,7 @@ import PostFeedCarousel from '@/components/feed/PostFeedCarousel';
 import { supabase } from '@/integrations/supabase/client';
 import { removeGolfCourseFromContent, extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { toast } from 'sonner';
-import CommentsSheet from '@/components/comments/CommentsSheet';
+import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { SquircleAvatar, LIGHT_HAIRLINE} from '@/components/ui/SquircleAvatar';
 import { LoopCardMenu } from './LoopCardMenu';
 
@@ -617,21 +617,13 @@ export const LoopCard = React.memo(function LoopCard({
       </article>
 
       {/* Comments bottom sheet */}
-      <CommentsSheet
+      <CommentsSheetV2
         isOpen={showComments}
         onClose={() => setShowComments(false)}
-        postId={post.id}
-        currentUserId={userId}
-        creatorName={post.displayName}
-        creatorAvatar={post.avatarUrl}
-        creatorUserId={post.userId}
-        caption={post.caption}
-        videoThumbnail={thumbnailUrl}
-        theme="light"
-        likesCount={likeCount}
-        isReview={post.isReview}
-        reviewRating={post.review?.rating}
+        targetType="post"
+        targetId={post.id}
       />
+
     </>
   );
 });
