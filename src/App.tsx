@@ -69,7 +69,7 @@ import { CoursesListSkeleton } from '@/components/skeletons/CoursesListSkeleton'
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
 import { HandicapPageSkeleton } from '@/components/skeletons/HandicapPageSkeleton';
 import { DiscoverSkeleton } from '@/components/skeletons/DiscoverSkeleton';
-import WatchGridSkeleton from '@/components/watch/WatchGridSkeleton';
+
 
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
 import { AchievementsSkeleton } from '@/components/skeletons/AchievementsSkeleton';
