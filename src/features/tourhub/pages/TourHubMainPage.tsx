@@ -137,7 +137,7 @@ export function TourHubMainPage() {
               onMenuTap={() => setMenuOpen(true)}
               onSearchTap={() => setSearchOpen(true)}
             />
-            <GlobalSearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+            <SearchOverlayV2 isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
 
             <TourSideMenu
               open={menuOpen}
