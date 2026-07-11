@@ -48,8 +48,42 @@ export default function CourseTagSheet({ open, onClose, onSelect, current, userI
   const showRecents = q.trim().length === 0;
 
   return (
-    <BottomSheet open={open} title={title} onClose={onClose} bottomOffset={keyboardHeight}>
-      <div style={{ padding: '4px 16px 12px' }}>
+    <BottomSheet open={open} onClose={onClose} bottomOffset={keyboardHeight}>
+      {/* Eyebrow header — mirrors the shared @mention sheet chrome */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '2px 14px 8px',
+          borderBottom: '1px solid rgba(15,23,42,0.08)',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            fontSize: 10.5,
+            fontWeight: 700,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            color: 'rgba(15,23,42,0.55)',
+          }}
+        >
+          <MapPin size={11} strokeWidth={2.25} color="rgba(15,23,42,0.55)" />
+          {title ?? 'Tag a course'}
+        </div>
+        <button
+          onClick={onClose}
+          aria-label="Close"
+          style={{ background: 'transparent', border: 0, color: '#1F2428', cursor: 'pointer', padding: 4 }}
+        >
+          <X size={18} />
+        </button>
+      </div>
+
+      <div style={{ padding: '10px 16px 12px' }}>
         <div style={{ position: 'relative' }}>
           <Search size={16} color="#94A3B8" style={{ position: 'absolute', top: 12, left: 12 }} />
           <input
@@ -61,6 +95,7 @@ export default function CourseTagSheet({ open, onClose, onSelect, current, userI
           />
         </div>
       </div>
+
 
       {current && (
         <button onClick={() => { onSelect(null); onClose(); }} style={rowBtn}>
