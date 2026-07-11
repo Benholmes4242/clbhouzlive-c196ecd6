@@ -140,7 +140,7 @@ export function RequestCourseCTA({
     );
   }
 
-  // Row variant — matches the course rows in GlobalSearchOverlay
+  // Row variant — matches the course rows in SearchOverlayV2
   return (
     <button
       type="button"
