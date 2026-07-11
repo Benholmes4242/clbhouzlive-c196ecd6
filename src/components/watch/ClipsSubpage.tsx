@@ -24,8 +24,6 @@ export default function ClipsSubpage() {
   const [committedQuery, setCommittedQuery] = useState('');
   const isSearching = committedQuery.length > 0;
 
-  const { recentSearches, addSearch, removeSearch, clearAll } =
-    useRecentSearches('clips-recent-searches');
 
   const handleSearchOpen = () => {
     setSearchOpen(true);
