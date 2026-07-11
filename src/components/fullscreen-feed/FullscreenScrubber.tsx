@@ -259,7 +259,7 @@ export const FullscreenScrubber: React.FC<Props> = ({ activePost }) => {
         flashTimerRef.current = null;
       }
     };
-  }, [isVideo, expectedKey]);
+  }, [isVideo, expectedKey, laneId, addPausedOwnerKey, removePausedOwnerKey]);
 
   const progress = duration > 0 ? Math.max(0, Math.min(1, currentTime / duration)) : 0;
   const barHeight = dragging ? 6 : 3;
