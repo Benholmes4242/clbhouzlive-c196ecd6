@@ -14,6 +14,7 @@ import { VideoRailCard } from './components/VideoRailCard';
 import { PostRow } from './components/PostRow';
 import { RecentsList } from './components/RecentsList';
 import { RequestCourseCTAV2 } from './components/RequestCourseCTAV2';
+import { SearchEmptyState } from './components/SearchEmptyState';
 import { useGlobalSearchV2, type Scope } from './hooks/useGlobalSearchV2';
 import { useRecentSearchesV2 } from './hooks/useRecentSearchesV2';
 import {
@@ -191,14 +192,19 @@ export function SearchOverlayV2({
             }}
           >
             {!hasQuery && (
-              <RecentsList
-                items={recents}
-                onPick={(qq) => {
-                  if (isCommit) commitTerm(qq);
-                  else setInputValue(qq);
-                }}
-                onClear={clear}
-              />
+              <>
+                <RecentsList
+                  items={recents}
+                  onPick={(qq) => {
+                    if (isCommit) commitTerm(qq);
+                    else setInputValue(qq);
+                  }}
+                  onClear={clear}
+                />
+                {mode === 'default' && (
+                  <SearchEmptyState onSelect={onClose} />
+                )}
+              </>
             )}
 
             {hasQuery && isLoading && (
