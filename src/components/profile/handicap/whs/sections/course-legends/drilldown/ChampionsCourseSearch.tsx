@@ -17,11 +17,11 @@ interface Props {
 
 /**
  * Compact in-tab search for hopping to another course's Champions tab.
- * Always rendered (synced + non-synced). Non-synced users additionally
- * see a small inline "Connect your handicap" cue beneath.
+ * Collapsed by default; taps expand into the search input.
  */
 export const ChampionsCourseSearch: React.FC<Props> = ({ currentCourseId }) => {
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const debounced = useDebounce(query, 250);
   const { data: results, isLoading } = useCourseSearch(debounced);
@@ -34,36 +34,81 @@ export const ChampionsCourseSearch: React.FC<Props> = ({ currentCourseId }) => {
 
   return (
     <div style={{ padding: '14px 16px 4px' }}>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 10,
-          background: 'var(--hcp-tint-1)',
-          border: '1px solid var(--hcp-line)',
-          borderRadius: 12,
-          padding: '10px 14px',
-        }}
-      >
-        <Search size={16} color="var(--hcp-t-40)" strokeWidth={2.2} />
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search another course's champions…"
+      {!open ? (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
           style={{
-            flex: 1,
-            background: 'transparent',
-            border: 'none',
-            outline: 'none',
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            background: 'var(--hcp-tint-1)',
+            border: '1px solid var(--hcp-line)',
+            borderRadius: 12,
+            padding: '11px 13px',
+            cursor: 'pointer',
             fontFamily: FONT,
-            fontSize: 14,
-            color: 'var(--hcp-t-100)',
+            textAlign: 'left',
           }}
-        />
-      </div>
+        >
+          <Search size={15} color="var(--hcp-t-40)" strokeWidth={2.2} />
+          <span style={{ flex: 1, fontSize: 12.5, fontWeight: 600, color: 'var(--hcp-t-50)' }}>
+            Search another course's champions
+          </span>
+          <ChevronRight size={15} color="var(--hcp-t-40)" />
+        </button>
+      ) : (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            background: 'var(--hcp-tint-1)',
+            border: '1px solid var(--hcp-line)',
+            borderRadius: 12,
+            padding: '10px 14px',
+          }}
+        >
+          <Search size={16} color="var(--hcp-t-40)" strokeWidth={2.2} />
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search another course's champions…"
+            autoFocus
+            style={{
+              flex: 1,
+              background: 'transparent',
+              border: 'none',
+              outline: 'none',
+              fontFamily: FONT,
+              fontSize: 14,
+              color: 'var(--hcp-t-100)',
+              minWidth: 0,
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => { setQuery(''); setOpen(false); }}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              fontFamily: FONT,
+              fontSize: 12,
+              fontWeight: 700,
+              color: 'var(--hcp-gold-text)',
+              padding: 0,
+              flexShrink: 0,
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      )}
 
-      {showConnectCue && (
+      {open && showConnectCue && (
         <button
           type="button"
           onClick={() => navigate('/handicap')}
@@ -88,7 +133,7 @@ export const ChampionsCourseSearch: React.FC<Props> = ({ currentCourseId }) => {
         </button>
       )}
 
-      {showResults && (
+      {open && showResults && (
         <div
           style={{
             marginTop: 10,
