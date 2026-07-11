@@ -269,7 +269,7 @@ function CommentsSheetV2Inner({
                   ))}
                   {hasNextPage && (
                     <button
-                      ref={(el) => { sentinelRef.current = el as HTMLDivElement | null; }}
+                      ref={(el) => { sentinelRef.current = (el as unknown as HTMLDivElement | null); }}
                       type="button"
                       onClick={() => fetchNextPage()}
                       disabled={isFetchingNextPage}
