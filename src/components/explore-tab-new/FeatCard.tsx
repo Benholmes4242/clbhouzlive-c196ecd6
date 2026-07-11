@@ -84,11 +84,34 @@ export function FeatCard({ row, tier, onTap }: Props) {
   const chipLabel = isRecord
     ? RECORD_CATEGORY_LABEL[row.category ?? ''] ?? 'Course record'
     : TIER_LABEL[tier];
-  const value = isRecord
-    ? row.value != null
-      ? String(row.value)
-      : ''
-    : row.feat_value ?? '';
+  const value = useMemo(() => {
+    if (isRecord) {
+      if (row.value == null) return '';
+      const v = Number(row.value);
+      switch (row.category) {
+        case 'most_eagles_all_time':
+        case 'most_eagles_90d':
+          return `${v} eagle${v === 1 ? '' : 's'}`;
+        case 'most_birdies_all_time':
+        case 'most_birdies_90d':
+          return `${v} birdie${v === 1 ? '' : 's'}`;
+        case 'most_aces_all_time':
+        case 'most_aces_90d':
+          return `${v} ace${v === 1 ? '' : 's'}`;
+        case 'lowest_gross_all_time':
+        case 'lowest_gross_90d':
+          return `Gross ${v}`;
+        case 'best_stableford_all_time':
+        case 'best_stableford_90d':
+          return `${v} pts`;
+        case 'best_score_diff_all_time':
+        case 'best_score_diff_90d':
+        default:
+          return String(row.value);
+      }
+    }
+    return row.feat_value ?? '';
+  }, [isRecord, row.category, row.feat_value, row.value]);
   const when = relDate(row.play_date ?? row.attained_at ?? null);
 
   // Palette
