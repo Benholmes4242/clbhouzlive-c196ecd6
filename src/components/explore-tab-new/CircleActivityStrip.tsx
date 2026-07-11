@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
-import { SectionHeader } from '@/components/ui/SectionHeader';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { AlmanacHead } from './AlmanacSections';
 import { LinkedRingsMark } from './DiscoverMarks';
 import {
   useCircleActivity,
@@ -78,16 +78,7 @@ export function CircleActivityStrip({ userId }: Props) {
 
   const rows = useMemo(() => data ?? [], [data]);
 
-  const Header = (
-    <SectionHeader
-      role="section"
-      kicker="YOUR CIRCLE"
-      title="Your friends"
-      sub="What your circle's been pulling off"
-      paddingTop={10}
-      paddingX={16}
-    />
-  );
+  const Header = <AlmanacHead title="Your friends" />;
 
   if (isLoading) {
     return (

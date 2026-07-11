@@ -1,8 +1,7 @@
 import { memo } from 'react';
-import SectionHeader from '@/components/ui/SectionHeader';
 import { FeatCard } from './FeatCard';
 import { useRegionFeats, type FeatTier } from './hooks/useRegionFeats';
-import { AMBER, INK, INK_MUTE, INK_FAINT, HAIRLINE_INK_8, INK_TINT_06 } from '@/features/courses/_shared/tokens';
+import { AMBER, INK, INK_MUTE, HAIRLINE_INK_8, INK_TINT_06 } from '@/features/courses/_shared/tokens';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
@@ -31,17 +30,78 @@ interface Props {
   onRegionChange: (slug: string | null) => void;
 }
 
+export function AlmanacHead({
+  title,
+  dot,
+  onSeeAll,
+}: {
+  title: string;
+  dot?: string;
+  onSeeAll?: () => void;
+}) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 7,
+        padding: '0 16px 9px',
+      }}
+    >
+      {dot && (
+        <span
+          style={{
+            width: 7,
+            height: 7,
+            borderRadius: 2,
+            background: dot,
+            flexShrink: 0,
+          }}
+        />
+      )}
+      <span
+        style={{
+          fontSize: 11.5,
+          fontWeight: 800,
+          letterSpacing: '0.13em',
+          textTransform: 'uppercase',
+          color: 'rgba(15,23,42,0.6)',
+        }}
+      >
+        {title}
+      </span>
+      <span
+        style={{
+          flex: 1,
+          height: 1,
+          background: 'rgba(15,23,42,0.07)',
+          marginLeft: 4,
+        }}
+      />
+      {onSeeAll && (
+        <button
+          type="button"
+          onClick={onSeeAll}
+          style={{
+            border: 'none',
+            background: 'none',
+            fontSize: 11.5,
+            fontWeight: 700,
+            letterSpacing: '0.06em',
+            color: AMBER,
+            cursor: 'pointer',
+          }}
+        >
+          ALL
+        </button>
+      )}
+    </div>
+  );
+}
+
 function AlmanacRegionTabsInner({ region, onRegionChange }: Props) {
   return (
     <section style={{ fontFamily: FONT }}>
-      <SectionHeader
-        role="section"
-        kicker="THE REGISTER"
-        title="Global feats"
-        sub="What's been happening on the fairways"
-        paddingX={16}
-        paddingTop={12}
-      />
       <div
         className="flex gap-4 px-4 overflow-x-auto scrollbar-hide"
         style={{
@@ -67,7 +127,7 @@ function AlmanacRegionTabsInner({ region, onRegionChange }: Props) {
                 fontFamily: FONT,
                 fontSize: 13,
                 fontWeight: active ? 800 : 600,
-                color: active ? INK : INK_FAINT,
+                color: active ? INK : 'rgba(15,23,42,0.35)',
                 letterSpacing: '-0.005em',
                 whiteSpace: 'nowrap',
                 cursor: 'pointer',
@@ -102,48 +162,15 @@ function FeatTierRailInner({ region, tier, title }: TierProps) {
   const { data, isLoading } = useRegionFeats(region, tier);
   const rows = data ?? [];
 
+  const tierDot =
+    tier === 'legendary' ? '#FBBC2E'
+    : tier === 'records' ? '#7DD3FC'
+    : tier === 'eagles' ? '#22C55E'
+    : '#F7931E';
+
   return (
     <section style={{ fontFamily: FONT, paddingTop: 4 }}>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          padding: '10px 16px 8px',
-        }}
-      >
-        <span
-          aria-hidden
-          style={{
-            width: 8,
-            height: 8,
-            borderRadius: 999,
-            background:
-              tier === 'legendary' ? '#FBBC2E'
-              : tier === 'records' ? '#3B82F6'
-              : tier === 'eagles' ? '#10B981'
-              : '#F7931E',
-          }}
-        />
-        <h3
-          style={{
-            margin: 0,
-            fontFamily: FONT,
-            fontSize: 16,
-            fontWeight: 800,
-            color: INK,
-            letterSpacing: '-0.01em',
-            flex: 1,
-          }}
-        >
-          {title}
-        </h3>
-        {rows.length > 0 && (
-          <span style={{ fontSize: 12, fontWeight: 700, color: INK_MUTE }}>
-            {rows.length}
-          </span>
-        )}
-      </div>
+      <AlmanacHead title={title} dot={tierDot} />
 
       {isLoading ? (
         <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
