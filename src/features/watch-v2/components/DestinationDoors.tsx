@@ -88,7 +88,9 @@ function Door({ title, count, loading, suffix, onClick, tone }: DoorProps) {
           position: 'absolute',
           right: 10,
           bottom: 8,
-          font: '800 18px/1 inherit',
+          fontWeight: 800,
+          fontSize: 18,
+          lineHeight: 1,
           opacity: chevronOpacity,
         }}
       >
