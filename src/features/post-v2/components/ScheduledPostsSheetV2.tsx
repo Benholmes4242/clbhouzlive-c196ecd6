@@ -61,7 +61,15 @@ export default function ScheduledPostsSheetV2({ open, onClose, userId, onCountCh
   return (
     <BottomSheet open={open} title="Scheduled posts" onClose={onClose} fullHeight>
       {rows.length === 0 && (
-        <div style={{ padding: 24, color: '#8A9099', fontSize: 13 }}>Nothing scheduled.</div>
+        <div style={{ padding: '32px 24px 40px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
+          <div style={{ width: 56, height: 56, borderRadius: 18, background: '#0F172A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <CalendarClock size={22} color="#F8FAFC" />
+          </div>
+          <div style={{ fontSize: 16, fontWeight: 700, color: '#0F172A' }}>Nothing scheduled yet</div>
+          <div style={{ fontSize: 13, color: '#94A3B8', textAlign: 'center', maxWidth: 280, lineHeight: 1.45 }}>
+            Line up a post for the perfect tee time - we'll publish it on the dot.
+          </div>
+        </div>
       )}
       {rows.map(r => (
         <div key={r.id} style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '12px 16px', borderTop: '1px solid rgba(0,0,0,0.07)' }}>
