@@ -133,6 +133,20 @@ interface FullscreenFeedState {
   closeAnim: 'idle' | 'borrow' | 'nonborrow';
   closeAnimDone: boolean;
 
+  /** Fullscreen media pager active-page index. Written by
+   *  <FullscreenMediaPager/> on mount + on scroll-snap settle. Consumed by
+   *  <FullscreenScrubber/> to derive the correct expectedOwnerKey per page
+   *  (broken previously — clubhouseStore.carouselPositions was consulted). */
+  activePagerIdx: number;
+  setActivePagerIdx: (idx: number) => void;
+
+  /** Session-scoped viewer pause intent — ownerKeys the user actively paused
+   *  from the scrubber. While a key is here, fullscreen slots for that media
+   *  MUST skip their default auto-play on mount/remount. Cleared on close. */
+  pausedOwnerKeys: Set<string>;
+  addPausedOwnerKey: (k: string) => void;
+  removePausedOwnerKey: (k: string) => void;
+
   open: (posts: FeedPost[], startIndex?: number, options?: OpenOptions) => void;
   close: () => void;
   appendPosts: (newPosts: FeedPost[]) => void;
@@ -155,6 +169,7 @@ interface FullscreenFeedState {
    *  underlying query progresses (e.g. hasNextPage flips false on last page,
    *  isFetchingNextPage toggles during a fetch). */
   setPaginationState: (state: { hasNextPage: boolean; isFetchingNextPage: boolean }) => void;
+
 }
 
 export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => ({
