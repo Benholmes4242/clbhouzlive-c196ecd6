@@ -1,0 +1,132 @@
+import { useNavigate } from 'react-router-dom';
+import { useWatchHubCounts } from '../hooks/useWatchHubCounts';
+import { formatCount } from '../utils/formatCount';
+
+const FONT_FAMILY =
+  'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
+interface DoorProps {
+  title: string;
+  count: number | null;
+  loading: boolean;
+  suffix: string;
+  onClick: () => void;
+  tone: 'amber' | 'ink';
+}
+
+function Door({ title, count, loading, suffix, onClick, tone }: DoorProps) {
+  const isAmber = tone === 'amber';
+  const bg = isAmber
+    ? 'linear-gradient(135deg,#F7931E,#e07d0a)'
+    : '#0F172A';
+  const color = isAmber ? '#0b0d12' : '#fff';
+  const countOpacity = isAmber ? 0.75 : 0.65;
+  const chevronOpacity = isAmber ? 0.55 : 0.5;
+  const circleBg = isAmber
+    ? 'rgba(255,255,255,0.18)'
+    : 'rgba(255,255,255,0.08)';
+  const skeletonBg = isAmber
+    ? 'rgba(0,0,0,0.12)'
+    : 'rgba(255,255,255,0.25)';
+
+  return (
+    <div
+      onClick={onClick}
+      role="button"
+      tabIndex={0}
+      style={{
+        flex: 1,
+        borderRadius: 14,
+        padding: '14px 14px 12px',
+        position: 'relative',
+        overflow: 'hidden',
+        cursor: 'pointer',
+        background: bg,
+        color,
+        fontFamily: FONT_FAMILY,
+      }}
+    >
+      <div
+        style={{
+          position: 'absolute',
+          right: -8,
+          top: -10,
+          width: 54,
+          height: 54,
+          borderRadius: 999,
+          background: circleBg,
+        }}
+      />
+      <div style={{ font: '800 17px/1.1 inherit', letterSpacing: '-0.01em' }}>
+        {title}
+      </div>
+      {loading || count == null ? (
+        <div
+          style={{
+            marginTop: 6,
+            height: 8,
+            width: 56,
+            borderRadius: 4,
+            background: skeletonBg,
+          }}
+        />
+      ) : (
+        <div
+          style={{
+            font: '600 11.5px/1.2 inherit',
+            opacity: countOpacity,
+            marginTop: 2,
+          }}
+        >
+          {formatCount(count)} · {suffix}
+        </div>
+      )}
+      <div
+        style={{
+          position: 'absolute',
+          right: 10,
+          bottom: 8,
+          font: '800 18px/1 inherit',
+          opacity: chevronOpacity,
+        }}
+      >
+        {'>'}
+      </div>
+    </div>
+  );
+}
+
+export function DestinationDoors() {
+  const navigate = useNavigate();
+  const { data, isLoading } = useWatchHubCounts();
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'row',
+        gap: 10,
+        padding: '4px 16px 6px',
+      }}
+    >
+      <Door
+        title="Clips"
+        tone="amber"
+        loading={isLoading}
+        count={data?.clip_count ?? null}
+        suffix="under 90s"
+        onClick={() => navigate('/watch/clips')}
+      />
+      <Door
+        title="Videos"
+        tone="ink"
+        loading={isLoading}
+        count={data?.video_count ?? null}
+        suffix="full length"
+        onClick={() => navigate('/watch/videos')}
+      />
+    </div>
+  );
+}
+
+export default DestinationDoors;
