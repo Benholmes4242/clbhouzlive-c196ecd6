@@ -4518,6 +4518,17 @@ html[data-immersive="true"] .app-shell--topSpacer {
   display: none !important;
 }
 
+/* Immersive map sheet: drop zoom controls below the floating header card */
+.immersive-map-sheet .mapboxgl-ctrl-top-right {
+  top: 84px;
+}
+
+/* And keep any bottom-anchored ctrl clear of the launch dock */
+.immersive-map-sheet .mapboxgl-ctrl-bottom-right,
+.immersive-map-sheet .mapboxgl-ctrl-bottom-left {
+  bottom: 84px;
+}
+
 /* Center zoom controls vertically on Top 100 Map */
 .top100-map-shell .mapboxgl-ctrl-bottom-right {
   bottom: auto !important;
