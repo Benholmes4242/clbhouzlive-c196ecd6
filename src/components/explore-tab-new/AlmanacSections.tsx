@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { FeatCard } from './FeatCard';
 import { useRegionFeats, type FeatTier } from './hooks/useRegionFeats';
-import { AMBER, INK_TINT_06 } from '@/features/courses/_shared/tokens';
+import { AMBER, INK, INK_TINT_06 } from '@/features/courses/_shared/tokens';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
