@@ -133,6 +133,20 @@ interface FullscreenFeedState {
   closeAnim: 'idle' | 'borrow' | 'nonborrow';
   closeAnimDone: boolean;
 
+  /** Fullscreen media pager active-page index. Written by
+   *  <FullscreenMediaPager/> on mount + on scroll-snap settle. Consumed by
+   *  <FullscreenScrubber/> to derive the correct expectedOwnerKey per page
+   *  (broken previously — clubhouseStore.carouselPositions was consulted). */
+  activePagerIdx: number;
+  setActivePagerIdx: (idx: number) => void;
+
+  /** Session-scoped viewer pause intent — ownerKeys the user actively paused
+   *  from the scrubber. While a key is here, fullscreen slots for that media
+   *  MUST skip their default auto-play on mount/remount. Cleared on close. */
+  pausedOwnerKeys: Set<string>;
+  addPausedOwnerKey: (k: string) => void;
+  removePausedOwnerKey: (k: string) => void;
+
   open: (posts: FeedPost[], startIndex?: number, options?: OpenOptions) => void;
   close: () => void;
   appendPosts: (newPosts: FeedPost[]) => void;
@@ -155,6 +169,7 @@ interface FullscreenFeedState {
    *  underlying query progresses (e.g. hasNextPage flips false on last page,
    *  isFetchingNextPage toggles during a fetch). */
   setPaginationState: (state: { hasNextPage: boolean; isFetchingNextPage: boolean }) => void;
+
 }
 
 export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => ({
@@ -178,6 +193,28 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
   borrowDemoteRequested: false,
   closeAnim: 'idle',
   closeAnimDone: false,
+  activePagerIdx: 0,
+  pausedOwnerKeys: new Set<string>(),
+
+  setActivePagerIdx: (idx) => {
+    if (get().activePagerIdx === idx) return;
+    set({ activePagerIdx: idx });
+  },
+  addPausedOwnerKey: (k) => {
+    const cur = get().pausedOwnerKeys;
+    if (cur.has(k)) return;
+    const next = new Set(cur);
+    next.add(k);
+    set({ pausedOwnerKeys: next });
+  },
+  removePausedOwnerKey: (k) => {
+    const cur = get().pausedOwnerKeys;
+    if (!cur.has(k)) return;
+    const next = new Set(cur);
+    next.delete(k);
+    set({ pausedOwnerKeys: next });
+  },
+
 
   open: (posts, startIndex = 0, options) => {
     const openingPost: any = posts[startIndex];
@@ -212,7 +249,10 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       openedFrom: options?.openedFrom ?? null,
       borrow: options?.borrow ?? null,
       borrowDemoteRequested: false,
+      activePagerIdx: options?.mediaIndex ?? 0,
+      pausedOwnerKeys: new Set<string>(),
     });
+
   },
   close: () => {
     const cb = get().onCloseCallback;
@@ -274,7 +314,10 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       borrowDemoteRequested: false,
       closeAnim: 'idle',
       closeAnimDone: false,
+      activePagerIdx: 0,
+      pausedOwnerKeys: new Set<string>(),
     });
+
     if (cb) {
       try { cb(); } catch {}
     }
@@ -307,8 +350,12 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
   setActiveIndex: (idx) => {
     const prev = get().activeIndex;
     if (prev === idx) return;
-    set({ activeIndex: idx });
+    // Reset the pager index — the incoming post's pager will re-write it on
+    // mount. Prevents the scrubber from computing an ownerKey against the
+    // outgoing post's page during the swipe.
+    set({ activeIndex: idx, activePagerIdx: 0 });
   },
+
   consumeOpenCommentsInitially: () => set({ openCommentsInitially: false }),
   consumeInitialCommentId: () => set({ initialCommentId: null }),
   setPaginationState: ({ hasNextPage, isFetchingNextPage }) => {

@@ -803,9 +803,14 @@ class VideoEngineImpl {
   }
 
 
-  play(laneId: LaneId, opts: { callerPostId?: string | null } = {}): Promise<void> {
+  play(laneId: LaneId, opts: { callerPostId?: string | null; viaViewer?: boolean } = {}): Promise<void> {
     const lane = this.getLane(laneId);
     const caller = opts.callerPostId ?? null;
+    // Trace viewer-sourced play so device captures show the path.
+    if (opts.viaViewer) {
+      DBG(laneId, 'play.viaViewer', { caller, lanePostId: lane.postId });
+    }
+
     // Ownership: the moment a card issues play() it becomes the lane owner.
     // Guarantees pause() owner-guard below can reject stale outgoing cards
     // even if load() hasn't yet updated lane.postId for this caller.
@@ -869,7 +874,7 @@ class VideoEngineImpl {
     }
   }
 
-  pause(laneId: LaneId, opts: { callerPostId?: string | null } = {}): void {
+  pause(laneId: LaneId, opts: { callerPostId?: string | null; viaViewer?: boolean } = {}): void {
     const lane = this.getLane(laneId);
     // GUARD (paused-frame accuracy): capture the TRUE currentTime BEFORE any
     // early-return below. The borrow/owner guards correctly refuse to PAUSE
@@ -878,11 +883,17 @@ class VideoEngineImpl {
     // from surviving into resume. Only the pause ACTION is guarded.
     this.captureLastPos(laneId);
     const caller = opts.callerPostId ?? null;
+    // Trace viewer-sourced pause so device captures show the path.
+    if (opts.viaViewer) {
+      DBG(laneId, 'pause.viaViewer', { caller, lanePostId: lane.postId });
+    }
     // BORROW GUARD (Stage-7 PR-1 fix): while a lane is borrowed by the
     // fullscreen viewer, ignore owner-caller pauses — the ex-owner tile is
     // no longer driving playback. Null-caller engine-wide pauses (pauseAll,
-    // document.hidden) MUST still pause borrowed lanes.
-    if (this.borrowedLanes.has(laneId) && caller != null) {
+    // document.hidden) MUST still pause borrowed lanes. viewer-sourced pauses
+    // (viaViewer:true) also bypass the swallow — that's the scrubber's own
+    // control acting on the borrowed lane.
+    if (this.borrowedLanes.has(laneId) && caller != null && !opts.viaViewer) {
       // PERMANENT REGRESSION TRIPWIRE — do not remove.
       DBG('pause.borrowed', { laneId, caller, lanePostId: lane.postId });
       return;
@@ -890,18 +901,18 @@ class VideoEngineImpl {
     // OWNER GUARD: only the current lane owner may pause it. Stale outgoing
     // cards (caller != lane.postId) must NOT pause the incoming card that
     // already took the lane. Null caller = engine-wide (pauseAll/visibility/
-    // release) — always allowed.
-    // INVARIANT: callers MUST pass ownerKey-form (ownerKey ?? postId). Bare
-    // pauses on ownerKey-owned lanes are rejected as stale by design — this
-    // preserves per-slide granularity for carousel media. Do not soften the
-    // strict compare here; reconcile shapes at the caller boundary instead.
-
-    if (caller != null && lane.postId != null && caller !== lane.postId) {
+    // release) — always allowed. Normalize both sides so bare postId ≡
+    // `${postId}:0` (matches the play() normalisation above; the strict !==
+    // trap that bit detectRoleForMatch is disarmed here for all callers).
+    const normPause = (k: string | null): string | null =>
+      k == null ? null : (k.includes(':') ? k : `${k}:0`);
+    if (caller != null && lane.postId != null && normPause(caller) !== normPause(lane.postId)) {
       return;
     }
     lane.wantPlay = false;
     if (!lane.el.paused) lane.el.pause();
   }
+
 
 
   pauseAll(): void {

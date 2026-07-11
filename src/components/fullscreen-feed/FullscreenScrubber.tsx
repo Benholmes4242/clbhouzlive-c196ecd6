@@ -19,11 +19,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Pause, Play } from 'lucide-react';
 import { VideoEngine } from '@/video/VideoEngine';
-import { useClubhouseStore } from '@/store/clubhouseStore';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { Z } from '@/config/zIndex';
 import type { FeedPost } from '@/components/media-system/types/media';
-
-const LANE_ID = 'fullscreen' as const;
+import type { LaneId } from '@/video/lanePolicy';
 
 function fmtTime(sec: number): string {
   if (!isFinite(sec) || sec <= 0) return '0:00';
@@ -54,11 +53,28 @@ interface Props {
   activeIndex: number;
 }
 
-export const FullscreenScrubber: React.FC<Props> = ({ activePost, activeIndex }) => {
-  const carouselSlide = useClubhouseStore((s) => s.carouselPositions.get(activeIndex) ?? 0);
-  const activeMedia = activePost?.mediaItems?.[carouselSlide];
+export const FullscreenScrubber: React.FC<Props> = ({ activePost }) => {
+  // Pager-idx and borrow live in the fullscreen store — the ONLY sources of
+  // truth for which media is currently active + which lane it's playing on.
+  // clubhouseStore.carouselPositions is NOT consulted here (it lags the
+  // fullscreen pager and produced the k>0 dead-tap bug).
+  const activePagerIdx = useFullscreenFeedStore((s) => s.activePagerIdx);
+  const borrow = useFullscreenFeedStore((s) => s.borrow);
+  const addPausedOwnerKey = useFullscreenFeedStore((s) => s.addPausedOwnerKey);
+  const removePausedOwnerKey = useFullscreenFeedStore((s) => s.removePausedOwnerKey);
+
+  const activeMedia = activePost?.mediaItems?.[activePagerIdx];
   const isVideo = !!(activeMedia && (activeMedia as any).type === 'video');
-  const expectedKey = expectedOwnerKey(activePost?.id, carouselSlide);
+  const expectedKey = expectedOwnerKey(activePost?.id, activePagerIdx);
+
+  // Lane-aware: while borrow is live for this post the media is still on the
+  // borrowed rail lane; otherwise (cold/non-borrow, post-demote, other pager
+  // pages) it's on 'fullscreen'. borrow becomes null on demote/close/route.
+  const laneId: LaneId = useMemo(() => {
+    if (borrow && activePost && borrow.postId === activePost.id) return borrow.laneId;
+    return 'fullscreen' as LaneId;
+  }, [borrow, activePost?.id]);
+
 
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -78,7 +94,7 @@ export const FullscreenScrubber: React.FC<Props> = ({ activePost, activeIndex })
     const tick = () => {
       if (!alive) return;
       try {
-        const s = VideoEngine.snapshot(LANE_ID);
+        const s = VideoEngine.snapshot(laneId);
         if (ownerMatches(s.postId, expectedKey)) {
           if (!dragging) setCurrentTime(s.currentTime);
           setDuration(s.duration);
@@ -93,7 +109,7 @@ export const FullscreenScrubber: React.FC<Props> = ({ activePost, activeIndex })
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
     };
-  }, [isVideo, expectedKey, dragging]);
+  }, [isVideo, expectedKey, laneId, dragging]);
 
   // Reset displayed position when active media changes.
   useEffect(() => {
@@ -106,12 +122,13 @@ export const FullscreenScrubber: React.FC<Props> = ({ activePost, activeIndex })
   const applySeek = useCallback((sec: number) => {
     if (!expectedKey) return;
     try {
-      const s = VideoEngine.snapshot(LANE_ID);
+      const s = VideoEngine.snapshot(laneId);
       if (!ownerMatches(s.postId, expectedKey)) return; // stale owner — reject
       const target = Math.max(0, Math.min(sec, duration > 0 ? duration : sec));
-      VideoEngine.seek(LANE_ID, target);
+      VideoEngine.seek(laneId, target);
     } catch { /* noop */ }
-  }, [expectedKey, duration]);
+  }, [expectedKey, laneId, duration]);
+
 
   // Bar drag handlers.
   const seekFromClientX = useCallback((clientX: number): number | null => {
@@ -203,20 +220,25 @@ export const FullscreenScrubber: React.FC<Props> = ({ activePost, activeIndex })
       armed = false;
       const dt = performance.now() - startT;
       if (moved || dt > 300) return;
-      // Clean tap — toggle play/pause via engine, owner-guarded.
+      // Clean tap — toggle play/pause via engine, owner-guarded. viaViewer
+      // bypasses the borrow-swallow guard in VideoEngine so tap-pause works
+      // while playback is still on the borrowed rail lane.
       try {
-        const s = VideoEngine.snapshot(LANE_ID);
+        const s = VideoEngine.snapshot(laneId);
         if (!ownerMatches(s.postId, expectedKey)) return;
         if (s.state === 'playing') {
-          VideoEngine.pause(LANE_ID, { callerPostId: expectedKey });
+          VideoEngine.pause(laneId, { callerPostId: expectedKey, viaViewer: true });
+          addPausedOwnerKey(expectedKey);
           setFlashIcon('pause');
         } else {
-          void VideoEngine.play(LANE_ID, { callerPostId: expectedKey });
+          removePausedOwnerKey(expectedKey);
+          void VideoEngine.play(laneId, { callerPostId: expectedKey, viaViewer: true });
           setFlashIcon('play');
         }
         if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
         flashTimerRef.current = setTimeout(() => setFlashIcon(null), 400);
       } catch { /* noop */ }
+
     };
     const onCancel = () => {
       armed = false;
@@ -237,7 +259,7 @@ export const FullscreenScrubber: React.FC<Props> = ({ activePost, activeIndex })
         flashTimerRef.current = null;
       }
     };
-  }, [isVideo, expectedKey]);
+  }, [isVideo, expectedKey, laneId, addPausedOwnerKey, removePausedOwnerKey]);
 
   const progress = duration > 0 ? Math.max(0, Math.min(1, currentTime / duration)) : 0;
   const barHeight = dragging ? 6 : 3;

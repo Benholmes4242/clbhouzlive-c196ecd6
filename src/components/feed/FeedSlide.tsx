@@ -411,6 +411,37 @@ const FullscreenVideoSlot: React.FC<{
     VideoEngine.setObjectFit('fullscreen', settledRect.fit);
   }, [isBorrowSlide, settledRect.fit]);
 
+  // Viewer pause intent — if the user paused this media earlier in the same
+  // fullscreen session, the slot must NOT auto-play on mount/remount. The
+  // useVideoLane auto-play effect fires unconditionally; we counter it with a
+  // matching viaViewer pause immediately after (and again once firstFrame
+  // lands, in case the auto-play was still in-flight).
+  const pausedIntent = useFullscreenFeedStore(
+    (s) => s.pausedOwnerKeys.has(resumeKey),
+  );
+  React.useEffect(() => {
+    if (isBorrowSlide || !isActive || !pausedIntent) return;
+    let cancelled = false;
+    const enforce = () => {
+      if (cancelled) return;
+      try {
+        VideoEngine.pause('fullscreen', {
+          callerPostId: resumeKey,
+          viaViewer: true,
+        });
+      } catch { /* noop */ }
+    };
+    enforce();
+    const t1 = setTimeout(enforce, 60);
+    const t2 = setTimeout(enforce, 260);
+    return () => {
+      cancelled = true;
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, [isBorrowSlide, isActive, pausedIntent, resumeKey]);
+
+
   // [DECIDE] slot.bind — one line when the non-borrow fullscreen lane
   // binds. Lets us compare what the lane believed at bind-time vs what the
   // ladder chose in openWithOrigin.
@@ -774,10 +805,18 @@ const BorrowedFullscreenSlot: React.FC<{
     VideoEngine.mountLane(borrow.laneId, el);
     // Assert play-intent post-mount (Stage-7 PR-1 fix): sets wantPlay and
     // recovers any owner-caller pause that raced between pin + markBorrowed.
-    // Belt-and-braces with the engine's borrow guard.
-    void VideoEngine.play(borrow.laneId, { callerPostId: borrow.ownerKey });
+    // Belt-and-braces with the engine's borrow guard. Honors viewer pause
+    // intent — if the user paused this media in a prior fullscreen session
+    // for the same borrowed key, we do NOT re-assert play here.
+    const hasPauseIntent = useFullscreenFeedStore
+      .getState()
+      .pausedOwnerKeys.has(borrow.ownerKey);
+    if (!hasPauseIntent) {
+      void VideoEngine.play(borrow.laneId, { callerPostId: borrow.ownerKey });
+    }
     // Ensure cover for Phase 1.
     VideoEngine.setObjectFit(borrow.laneId, 'cover');
+
     if (isPerfEnabled() || (typeof window !== 'undefined' && (window as any).__VIDEO_ENGINE_DBG__)) {
       // eslint-disable-next-line no-console
       console.info('[BORROW]', 'mount', { laneId: borrow.laneId, ownerKey: borrow.ownerKey, postId: borrow.postId });
@@ -1051,8 +1090,17 @@ const FullscreenMediaPager: React.FC<{
 }> = ({ post, media, openIdx, isSlideActive, isSuggestedFeed, onFirstFrameReady, onZoomChange }) => {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [activePagerIdx, setActivePagerIdx] = useState(openIdx);
+  const setStoreActivePagerIdx = useFullscreenFeedStore((s) => s.setActivePagerIdx);
   const borrow = useFullscreenFeedStore((s) => s.borrow);
   const demotedRef = useRef(false);
+
+  // Publish the initial page index and every settle so <FullscreenScrubber/>
+  // computes the correct ownerKey (broken previously — it read from
+  // clubhouseStore.carouselPositions which lags this pager).
+  useEffect(() => {
+    setStoreActivePagerIdx(activePagerIdx);
+  }, [activePagerIdx, setStoreActivePagerIdx]);
+
 
   // [FSPAGER] HTTP warm — request i±1 video neighbours through the
   // PrefetchController on mount and on every page transition. Lane-free:
