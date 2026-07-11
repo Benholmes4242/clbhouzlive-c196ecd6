@@ -11,6 +11,7 @@ import { useInfiniteQuery, useMutation, useQueryClient, useQuery } from '@tansta
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
+import { useBlockedUserIds } from '@/hooks/useBlockedUserIds';
 
 export type TargetType = 'post' | 'top_ten' | 'editorial';
 
