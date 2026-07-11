@@ -491,7 +491,7 @@ const RailButton: React.FC<RailButtonProps> = ({ onClick, ariaLabel, count, acce
     onClick={(e) => { e.stopPropagation(); onClick(); }}
     aria-label={ariaLabel}
     style={{
-      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
+      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
       background: 'transparent', border: 'none', padding: 0, cursor: 'pointer',
       pointerEvents: 'auto', filter: ICON_SHADOW,
       fontFamily: 'Geist, system-ui, sans-serif',
@@ -503,13 +503,14 @@ const RailButton: React.FC<RailButtonProps> = ({ onClick, ariaLabel, count, acce
     {count && (
       <span
         style={{
-          fontSize: 10, fontWeight: 700, color: accent ? AMBER : '#fff',
+          fontSize: 13, fontWeight: 700, color: accent ? AMBER : '#fff',
           lineHeight: 1, fontVariantNumeric: 'tabular-nums', textShadow: TEXT_SHADOW,
         }}
       >
         {count}
       </span>
     )}
+
   </button>
 );
 
