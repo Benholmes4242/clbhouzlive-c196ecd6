@@ -96,7 +96,7 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
         const isActive = index === safeActive;
         const size = isActive ? DOT_ACTIVE : DOT_INACTIVE * scale;
         const activeColor = tone === 'dark' ? '#0F172A' : '#FFFFFF';
-        const baseColor = tone === 'dark' ? '15,23,42' : '255,255,42';
+        const baseColor = tone === 'dark' ? '15,23,42' : '255,255,255';
         return (
           <div
             key={index}
