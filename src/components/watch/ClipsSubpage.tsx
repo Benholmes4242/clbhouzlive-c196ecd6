@@ -4,8 +4,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import PageRoot from '@/components/layout/PageRoot';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import ShellSlot from '@/components/header/ShellSlot';
-import SearchOverlay from '@/components/shared/SearchOverlay';
-import { useRecentSearches } from '@/hooks/useRecentSearches';
+import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import { useWatchFeed } from './hooks/useWatchFeed';
 import WatchGrid from './WatchGrid';
 
@@ -13,11 +12,6 @@ import { ClipsMoodChips } from './clips/ClipsMoodChips';
 import { useClipsMood, clipsMoodToWatchMood, clipsMoodLabel } from './clips/hooks/useClipsMood';
 
 const CREAM = '#F8FAFC';
-
-const TRENDING = [
-  'Course Vlogs', 'Hole in One', 'Range Sessions',
-  'Round Highlights', 'Swing Tips', 'Links Golf',
-];
 
 export default function ClipsSubpage() {
   const navigationType = useNavigationType();
