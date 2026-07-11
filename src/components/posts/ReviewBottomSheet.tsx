@@ -309,16 +309,16 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   {locationStr && (
                     <div
                       style={{
-                        marginTop: 3,
-                        fontSize: 9,
+                        marginTop: 5,
+                        fontSize: 12.5,
                         color: '#F8FAFC',
                         opacity: 0.7,
                         display: 'inline-flex',
                         alignItems: 'center',
-                        gap: 3,
+                        gap: 4,
                       }}
                     >
-                      <MapPin size={9} strokeWidth={2} />
+                      <MapPin size={12} strokeWidth={2} />
                       <span
                         style={{
                           whiteSpace: 'nowrap',
