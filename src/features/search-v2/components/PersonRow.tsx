@@ -14,7 +14,9 @@ export function PersonRow({ person, query, onSelect }: Props) {
     >
       <SquircleAvatar
         src={person.profile_photo_url ?? undefined}
-        fallbackText={name}
+        alt={name}
+        fallback={name}
+        userId={person.id}
         size={42}
       />
       <div className="flex-1 min-w-0">
