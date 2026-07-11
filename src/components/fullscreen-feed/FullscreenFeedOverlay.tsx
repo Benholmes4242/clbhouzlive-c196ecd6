@@ -36,6 +36,7 @@ import { RailLanePool } from '@/video/railLanePool';
 import { originHostRegistry } from '@/video/originHostRegistry';
 import type { BorrowDescriptor } from '@/store/fullscreenFeedStore';
 import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
+import { applyRouteChrome } from '@/lib/routeChrome';
 import { resolveRestingRect, getCurrentViewport } from '@/lib/media/resolveRestingRect';
 import { FS_TRANSITION_MODE, FS_CUT_FADE_MS } from '@/lib/media/transitionMode';
 import { FS_OVERLAY_Z } from '@/lib/zLayers';
@@ -490,15 +491,12 @@ export function FullscreenFeedOverlay() {
         document.documentElement.style.backgroundColor = '';
         document.body.style.backgroundColor = '';
 
-        // Overlay is not a route change, so App.tsx's chrome effect never
-        // re-fires on close. Re-assert the Clubhouse dark-chrome status bar
-        // (white icons over the #15171F notch) directly, and invalidate the
-        // chrome cache so the next real navigation re-applies from truth
-        // rather than short-circuiting on a stale sbKey.
-        try {
-          setStatusBarStyleColor('light', 'FF15171F');
-        } catch {}
-        try { delete (window as any).__lvChromeCache; } catch {}
+        // Overlay open/close is not a route change, so AppRoutes' chrome effect
+        // never re-fires. Re-resolve chrome for whatever route we're returning
+        // to (Clubhouse -> dark notch/white icons, Watch -> light notch/dark
+        // icons). force=true because the overlay mutated chrome behind the
+        // idempotency cache's back.
+        try { applyRouteChrome(window.location.pathname, true); } catch {}
 
 
         // Restore #root scroll position on the next frame so the feed's scroll

@@ -105,8 +105,7 @@ const Discover = lazy(() => import("./pages/Discover"));
 import ErrorLogPage from "./pages/ErrorLogPage";
 import { HeaderProvider } from '@/contexts/GlobalHeaderContext';
 import GlobalHeader from '@/components/header/GlobalHeader';
-import { isImmersiveRoute, isDarkChromeRoute } from '@/components/header/globalHeaderRules';
-import { applyShieldColor, ensureStatusBarOverlayBooted, setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
+import { applyRouteChrome } from '@/lib/routeChrome';
 import { KeepAliveOutlet } from '@/components/keep-alive/KeepAliveOutlet';
 
 
@@ -407,87 +406,9 @@ function AppRoutes() {
   // makes unchanged navs skip every DOM + bridge call — most navs share chrome.
   useLayoutEffect(() => {
     // Safety net: release any stranded body scroll-lock from an overlay that
-    // didn't unmount cleanly before route change. Prevents a stuck `position:
-    // fixed` body from freezing the next page.
+    // didn't unmount cleanly before route change.
     forceUnlockBodyScroll();
-
-    const darkChrome = isDarkChromeRoute(location.pathname);
-    const immersive = isImmersiveRoute(location.pathname);
-    const isAuth = location.pathname.startsWith('/auth');
-    // Immersive routes (course/profile/business) get a DARK ink fallback so
-    // any pre-paint glimpse in the notch/safe-area is cinematic, not grey.
-    const surface = darkChrome ? '#15171F' : immersive ? '#0F172A' : '#F8FAFC';
-    const shieldColor = immersive ? 'transparent' : (darkChrome ? '#15171F' : '#F8FAFC');
-    // NOTE: `overlay` flag is boot-locked ONCE at app startup via
-    // ensureStatusBarOverlayBooted() (see useMedianStatusBar.ts). Route
-    // transitions only update style + color — never re-send `overlay`. This
-    // is what keeps 100dvh stable through fs.open (the fix that eliminated
-    // the fs.open jolt on 2026-07-07).
-    const statusBar = darkChrome
-      ? { style: 'light' as const, color: 'FF15171F' }
-      : immersive
-        ? { style: 'dark' as const, color: '00000000' }
-        : { style: 'light' as const, color: 'FFF8FAFC' };
-
-    // Idempotency: cache the last-applied values on the effect's module scope.
-    // If nothing changed (very common between similar routes) skip every write.
-    const prev = (window as any).__lvChromeCache as
-      | { surface: string; darkChrome: boolean; isAuth: boolean; immersive: boolean; shieldColor: string; sbKey: string }
-      | undefined;
-    const sbKey = `${statusBar.style}|${statusBar.color}`;
-
-    if (
-      prev &&
-      prev.surface === surface &&
-      prev.darkChrome === darkChrome &&
-      prev.isAuth === isAuth &&
-      prev.immersive === immersive &&
-      prev.shieldColor === shieldColor &&
-      prev.sbKey === sbKey
-    ) {
-      return;
-    }
-
-    // html/body surface — only rewrite when it actually changed.
-    if (!prev || prev.surface !== surface) {
-      document.documentElement.style.backgroundColor = surface;
-      document.body.style.backgroundColor = surface;
-    }
-
-    // Body route classes — only toggle when they actually changed.
-    if (!prev || prev.darkChrome !== darkChrome) {
-      document.body.classList.toggle('route-clubhouse', darkChrome);
-    }
-    if (!prev || prev.isAuth !== isAuth) {
-      document.body.classList.toggle('route-auth', isAuth);
-    }
-
-    // Immersive marker — only flip when it changed.
-    if (!prev || prev.immersive !== immersive) {
-      if (immersive) {
-        document.documentElement.setAttribute('data-immersive-route', 'true');
-      } else {
-        document.documentElement.removeAttribute('data-immersive-route');
-      }
-    }
-
-    // Shield colour — only rewrite when it changed. Under permanent overlay
-    // mode the shield IS the visible chrome behind the transparent status bar
-    // on non-immersive routes, so its color must match the intended surface.
-    if (!prev || prev.shieldColor !== shieldColor) {
-      try { applyShieldColor(shieldColor); } catch {}
-    }
-
-    // Native status bar bridge — style/color only. Boot-locked overlay flag
-    // is preserved (no viewport resize on any transition).
-    if (!prev || prev.sbKey !== sbKey) {
-      try {
-        ensureStatusBarOverlayBooted();
-        setStatusBarStyleColor(statusBar.style, statusBar.color);
-      } catch {}
-    }
-
-    (window as any).__lvChromeCache = { surface, darkChrome, isAuth, immersive, shieldColor, sbKey };
+    applyRouteChrome(location.pathname);
   }, [location.pathname]);
 
   
