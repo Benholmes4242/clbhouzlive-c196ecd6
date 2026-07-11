@@ -4,7 +4,6 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExploreFeed } from './hooks/useExploreFeed';
 import { useExploreRegion } from './hooks/useExploreRegion';
 import ConnectHandicapCue from '@/components/courses/course-detail/ConnectHandicapCue';
-import { ExploreDestinations } from './ExploreDestinations';
 import { CircleActivityStrip } from './CircleActivityStrip';
 import { AlmanacRegionTabs, FeatTierRail } from './AlmanacSections';
 
