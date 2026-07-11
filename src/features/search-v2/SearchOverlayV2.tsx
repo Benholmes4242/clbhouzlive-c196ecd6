@@ -224,7 +224,16 @@ export function SearchOverlayV2({
               </div>
             )}
 
-            {hasQuery && !isLoading && !error && (
+            {hasQuery && !isLoading && !error && isCommit && (
+              <CommitResults
+                query={q}
+                videos={data.videos}
+                onCommit={commitTerm}
+                onSelectVideo={(v) => commit(() => navVideo(navigate, v))}
+              />
+            )}
+
+            {hasQuery && !isLoading && !error && !isCommit && (
               <>
                 {scope === 'all' ? (
                   <>
