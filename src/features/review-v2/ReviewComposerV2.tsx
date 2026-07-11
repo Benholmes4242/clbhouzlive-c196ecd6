@@ -284,14 +284,16 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
         flexDirection: 'column',
       }}
     >
-      {/* Header */}
-      <div
+      {/* Header — pinned under the notch like Echo/Messages */}
+      <header
         style={{
           position: 'sticky',
           top: 0,
           zIndex: 5,
+          flexShrink: 0,
           background: RV2.canvas,
-          paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+          borderBottom: `0.5px solid ${RV2.hairline}`,
+          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 8px)',
         }}
       >
         <div
@@ -373,7 +375,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
             }}
           />
         </div>
-      </div>
+      </header>
 
       {/* Live preview */}
       <div style={{ padding: '14px 16px 8px' }}>
