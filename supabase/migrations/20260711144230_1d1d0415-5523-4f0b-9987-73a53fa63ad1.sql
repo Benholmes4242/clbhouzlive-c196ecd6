@@ -1,0 +1,1 @@
+ALTER TABLE public.hidden_comments RENAME COLUMN post_id TO target_id;

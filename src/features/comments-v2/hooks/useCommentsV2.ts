@@ -362,7 +362,7 @@ export function useCommentsV2({
       if (!user?.id) throw new Error('Not signed in');
       const { error } = await supabase.from('hidden_comments').insert({
         comment_id: id,
-        post_id: targetId, // schema requires post_id — for polymorphic targets we store target_id here.
+        target_id: targetId,
         user_id: user.id,
         reason: 'user_hidden',
       });
