@@ -11,17 +11,16 @@ import { HubChipBar } from './components/HubChipBar';
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
-export default function WatchHubV2() {
+export default function WatchHubV2({ embedded = false }: { embedded?: boolean }) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [filter, setFilter] = useState('all');
 
-
-  return (
-    <PageRoot className="min-h-screen text-foreground bg-background">
+  const content = (
+    <>
       <main
         style={{
           paddingBottom: 80,
-          paddingTop: 'var(--chrome-total-h, 0px)',
+          ...(embedded ? {} : { paddingTop: 'var(--chrome-total-h, 0px)' }),
         }}
       >
         <div
@@ -87,6 +86,14 @@ export default function WatchHubV2() {
         isOpen={searchOpen}
         onClose={() => setSearchOpen(false)}
       />
+    </>
+  );
+
+  if (embedded) return content;
+
+  return (
+    <PageRoot className="min-h-screen text-foreground bg-background">
+      {content}
     </PageRoot>
   );
 }
