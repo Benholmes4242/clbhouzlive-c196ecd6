@@ -67,7 +67,9 @@ export default function WatchHubV2() {
         <div style={{ paddingTop: 16 }}>
           <HubVideoRow />
         </div>
-        {/* W2.3: clips row mounts here */}
+        <div style={{ paddingTop: 22 }}>
+          <HubClipsRow />
+        </div>
         {/* W2.4: mixed grid mounts here */}
         {/* W2.5: chip bar mounts here */}
       </main>
