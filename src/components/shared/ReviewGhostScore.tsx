@@ -11,7 +11,7 @@
  * the label above it.
  */
 import React from 'react';
-import { getRatingTier, getRatingTierLabel, type RatingTier } from '@/lib/ratingTier';
+import { getRatingTier, getRatingTierLabel, ratingTextColor, type RatingTier } from '@/lib/ratingTier';
 import { formatRatingValue } from '@/utils/formatters';
 
 export const REVIEW_GHOST_COLOR: Record<RatingTier, string> = {
