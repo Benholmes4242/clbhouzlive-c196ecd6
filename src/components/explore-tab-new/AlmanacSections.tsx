@@ -200,24 +200,81 @@ function FeatTierRailInner({ region, tier, title }: TierProps) {
           ))}
         </div>
       ) : rows.length === 0 ? (
-        <div style={{ padding: '0 16px 4px' }}>
-          <div
+        <div style={{ padding: '0 16px' }}>
+          <button
+            type="button"
+            onClick={goToClaim}
             style={{
-              background: '#FFFFFF',
-              border: `1px solid ${HAIRLINE_INK_8}`,
-              borderRadius: 16,
-              padding: '16px 16px',
-              fontSize: 13.5,
-              color: INK_MUTE,
-              lineHeight: 1.45,
-              fontWeight: 600,
+              width: 250,
+              borderRadius: 14,
+              padding: 14,
+              border: '1.5px dashed rgba(15,23,42,0.18)',
+              background: 'rgba(255,255,255,0.6)',
+              cursor: 'pointer',
+              textAlign: 'left',
+              fontFamily: FONT,
             }}
           >
-            No {TIER_EMPTY_LABEL[tier]} in {regionLabel(region)} yet —{' '}
-            <span style={{ color: AMBER, fontWeight: 800 }}>
-              be the first. Log a round and you'll headline this register.
-            </span>
-          </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+              <div
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: '34%',
+                  border: '1.5px dashed rgba(15,23,42,0.2)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 15,
+                  opacity: 0.6,
+                  flexShrink: 0,
+                }}
+              >
+                {TIER_ICON[tier]}
+              </div>
+              <div>
+                <div
+                  style={{
+                    fontSize: 13.5,
+                    fontWeight: 700,
+                    color: 'rgba(15,23,42,0.45)',
+                  }}
+                >
+                  Unclaimed
+                </div>
+                <div style={{ fontSize: 11, color: 'rgba(15,23,42,0.35)' }}>
+                  {CLAIM_LABEL[tier]} {regionLabel(region)}
+                </div>
+              </div>
+            </div>
+            <div
+              style={{
+                paddingTop: 9,
+                borderTop: '1px dashed rgba(15,23,42,0.12)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'flex-start',
+                gap: 8,
+              }}
+            >
+              <span
+                style={{
+                  fontSize: 11.5,
+                  fontWeight: 700,
+                  color: AMBER,
+                  lineHeight: 1.4,
+                }}
+              >
+                Claim it with an official WHS round — first verified {FEAT_NOUN[tier]} takes the
+                plinth.
+              </span>
+              <ChevronRight
+                size={13}
+                color="rgba(15,23,42,0.3)"
+                style={{ flexShrink: 0, marginTop: 2 }}
+              />
+            </div>
+          </button>
         </div>
       ) : (
         <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
