@@ -521,6 +521,9 @@ function AppRoutes() {
         
         <Route path="/messages" element={<Suspense fallback={<GenericPageSkeleton />}><InboxV2Page /></Suspense>} />
         <Route path="/messages/:conversationId" element={<Suspense fallback={<GenericPageSkeleton />}><ThreadV2Page /></Suspense>} />
+        <Route path="/comments-v2-test" element={<Suspense fallback={<GenericPageSkeleton />}><CommentsV2Test /></Suspense>} />
+
+
 
         <Route path="/notificationmessages" element={<Suspense fallback={<ActivityPageSkeleton />}><ActivityPageWrapped /></Suspense>} />
         <Route path="/golferstofollow" element={<Suspense fallback={<GenericPageSkeleton />}><GolfersToFollowPage /></Suspense>} />
