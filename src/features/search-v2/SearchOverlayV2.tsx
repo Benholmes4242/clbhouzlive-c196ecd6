@@ -135,7 +135,13 @@ export function SearchOverlayV2({
     [save, onCommit, onClose],
   );
 
-  const showChips = mode === 'default';
+  const hasInput = inputValue.trim().length >= 1;
+  const showChips = mode === 'default' && hasInput;
+
+  // Reset scope to 'all' whenever the query clears back to empty.
+  useEffect(() => {
+    if (!hasInput && scope !== 'all') setScope('all');
+  }, [hasInput, scope]);
   const isCommit = mode === 'commit';
 
   const totalHits =
