@@ -21,10 +21,10 @@ import { SheetHeader } from '@/components/ui/SheetHeader';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import {
-  useGlobalEntitySearch,
+  useEntityPickerSearch,
   type PersonResult,
   type BusinessResult,
-} from '@/hooks/useGlobalEntitySearch';
+} from '@/hooks/useEntityPickerSearch';
 import { useMessagingActor } from '@/hooks/messaging/useMessagingActor';
 import { useConversationDetail } from '@/hooks/messaging/useConversationDetail';
 import { useConversations } from '@/hooks/messaging/useConversations';
@@ -694,7 +694,7 @@ const AddPeopleSheet: React.FC<AddPeopleSheetProps> = ({
   const debounced = useDebouncedValue(query, 250);
   const [selected, setSelected] = useState<Candidate[]>([]);
 
-  const { people, businesses } = useGlobalEntitySearch({
+  const { people, businesses } = useEntityPickerSearch({
     query: debounced,
     enabled: open && debounced.trim().length > 0,
     limits: { people: 8, businesses: 8 },

@@ -44,7 +44,7 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
   const [title, setTitle] = useState('');
   const [busy, setBusy] = useState(false);
 
-  const { people, businesses, isLoading } = useGlobalEntitySearch({
+  const { people, businesses, isLoading } = useEntityPickerSearch({
     query: debounced,
     enabled: open && debounced.trim().length > 0,
     limits: { people: 8, businesses: 8 },
