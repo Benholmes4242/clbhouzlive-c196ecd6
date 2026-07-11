@@ -370,7 +370,10 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
                     justifyContent: 'center',
                   }}
                 >
-                  <span style={{ color: '#fff', fontSize: 18, fontWeight: 700 }}>+{overflowCount}</span>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                    <span style={{ color: '#fff', fontSize: 19, fontWeight: 800 }}>+{overflowCount}</span>
+                    <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 10, fontWeight: 600 }}>See all</span>
+                  </div>
                 </div>
               )}
             </button>
