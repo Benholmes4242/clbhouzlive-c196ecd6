@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Check, AlertCircle, Clock } from 'lucide-react';
 import type { ThreadMessage, MessageReaction, MessageAttachment } from '@/types/messaging';
 import { MessageImage } from './MessageImage';
 import { VoiceNote } from './VoiceNote';
+import { MediaPreviewViewer } from '@/components/shared/media/MediaPreviewViewer';
+import { getSignedUrl } from '@/hooks/messaging/useSignedUrl';
+import type { OrderedMediaItem } from '@/components/shared/media/types';
 
 const INK = '#1F2428';
 const SUB = '#8A9099';
@@ -91,6 +94,33 @@ export const MessageBubble: React.FC<Props> = ({
   const replyRule = isOutgoing ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.25)';
   const replyName = isOutgoing ? 'rgba(245,246,247,0.9)' : SUB;
   const replySnippet = isOutgoing ? 'rgba(245,246,247,0.6)' : SUB;
+
+  const [viewer, setViewer] = useState<{ items: OrderedMediaItem[]; index: number } | null>(null);
+
+  const openViewer = async (tappedIndex: number, fallbackUrl: string) => {
+    // Resolve signed URLs (or reuse localUrl) for every image in this message.
+    const resolved = await Promise.all(
+      images.map(async (att, i): Promise<OrderedMediaItem | null> => {
+        let url: string | null = att.localUrl ?? null;
+        if (!url && att.path) url = await getSignedUrl(att.path);
+        if (!url && i === tappedIndex) url = fallbackUrl;
+        if (!url) return null;
+        return {
+          id: att.path ?? att.localUrl ?? `img-${i}`,
+          type: 'image',
+          previewUrl: url,
+          order: i,
+        };
+      }),
+    );
+    const items = resolved.filter((x): x is OrderedMediaItem => x !== null);
+    if (items.length === 0) return;
+    const adjustedIndex = Math.max(
+      0,
+      items.findIndex((it) => it.order === tappedIndex),
+    );
+    setViewer({ items, index: adjustedIndex === -1 ? 0 : adjustedIndex });
+  };
 
   return (
     <div
@@ -182,6 +212,7 @@ export const MessageBubble: React.FC<Props> = ({
                     key={att.path ?? att.localUrl ?? i}
                     attachment={att}
                     isOutgoing={isOutgoing}
+                    onOpen={(url) => openViewer(i, url)}
                   />
                 ))}
               </div>
@@ -309,6 +340,14 @@ export const MessageBubble: React.FC<Props> = ({
             <DoubleCheck color={HINT} />
           ) : null}
         </div>
+      ) : null}
+
+      {viewer ? (
+        <MediaPreviewViewer
+          items={viewer.items}
+          initialIndex={viewer.index}
+          onClose={() => setViewer(null)}
+        />
       ) : null}
     </div>
   );

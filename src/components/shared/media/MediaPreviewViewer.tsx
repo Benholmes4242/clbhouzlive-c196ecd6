@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { X, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
+import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import type { OrderedMediaItem } from './types';
 
 interface MediaPreviewViewerProps {
@@ -25,6 +26,19 @@ export function MediaPreviewViewer({
   const { ref: zoomRef, imgRef, style: zoomStyle, scale, reset: resetZoom } = usePinchZoomPointer();
   const isZoomed = scale > 1;
   const item = items[currentIndex];
+
+  const swipeRef = useSwipeGesture({
+    onSwipeLeft: () => {
+      if (!isZoomed && currentIndex < items.length - 1) setCurrentIndex(currentIndex + 1);
+    },
+    onSwipeRight: () => {
+      if (!isZoomed && currentIndex > 0) setCurrentIndex(currentIndex - 1);
+    },
+    onSwipeDown: () => {
+      if (!isZoomed) onClose();
+    },
+    threshold: 60,
+  });
 
   // Reset zoom on slide change
   useEffect(() => {
@@ -99,13 +113,20 @@ export function MediaPreviewViewer({
       </div>
 
       {/* Media */}
-      <div className="flex-1 flex items-center justify-center relative" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)' }}>
+      <div
+        ref={swipeRef}
+        className="flex-1 flex items-center justify-center relative"
+        style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)', touchAction: isZoomed ? 'none' : 'pan-y' }}
+      >
         {item.type === 'video' ? (
-          <img
+          <video
+            key={item.id}
             src={item.previewUrl}
-            alt=""
+            poster={item.thumbnailUrl}
+            controls
+            playsInline
+            autoPlay
             className="w-full h-full object-contain"
-            draggable={false}
           />
         ) : (
           <div ref={zoomRef} style={zoomStyle}>
