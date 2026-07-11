@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MapPin } from 'lucide-react';
+import { MapPin, Navigation } from 'lucide-react';
 import { MapPreview } from './MapPreview';
 import { MapExpandedView } from './MapExpandedView';
 
@@ -49,30 +49,71 @@ export const LocationMapCard: React.FC<LocationMapCardProps> = ({
 
   return (
     <>
-      <div 
-        role="button"
-        tabIndex={0}
+      <div
         key={`map-${lat}-${lng}`}
-        className="relative w-full rounded-sq-md overflow-hidden border border-border shadow-sm cursor-pointer group text-left active:scale-[0.99]"
-        onClick={() => setExpanded(true)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            setExpanded(true);
-          }
+        style={{
+          background: '#FFFFFF',
+          border: '1px solid rgba(15,23,42,0.07)',
+          borderRadius: 16,
+          overflow: 'hidden',
         }}
-        aria-label={`Expand map for ${name}`}
       >
-        <MapPreview
-          lat={lat}
-          lng={lng}
-          name={name}
-          height={200}
-          showExpandButton={true}
-          onExpand={() => setExpanded(true)}
-          colorful={colorful}
-          locationText={locationText}
-        />
+        {/* Map - overlays removed; tap to expand */}
+        <div
+          role="button"
+          tabIndex={0}
+          aria-label={`Expand map for ${name}`}
+          onClick={() => setExpanded(true)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setExpanded(true);
+            }
+          }}
+          style={{ cursor: 'pointer' }}
+          className="active:opacity-[0.96]"
+        >
+          <MapPreview
+            lat={lat}
+            lng={lng}
+            name={name}
+            height={170}
+            showExpandButton={false}
+            colorful={colorful}
+          />
+        </div>
+        {/* Footer rail */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '12px 14px' }}>
+          <div style={{
+            width: 34, height: 34, borderRadius: 11, flexShrink: 0,
+rs
+            background: 'rgba(247,147,30,0.10)', color: '#F7931E',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <MapPin size={16} strokeWidth={2} />
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {locationText}
+            </div>
+            <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 1 }}>
+              Tap map to explore
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setExpanded(true)}
+            style={{
+              flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 5,
+              background: 'rgba(247,147,30,0.10)', color: '#F7931E',
+              border: 'none', borderRadius: 999, padding: '8px 14px',
+              fontSize: 12, fontWeight: 700, cursor: 'pointer',
+            }}
+          >
+            <Navigation size={13} strokeWidth={2.2} />
+            Directions
+          </button>
+        </div>
       </div>
 
       <MapExpandedView
