@@ -774,10 +774,18 @@ const BorrowedFullscreenSlot: React.FC<{
     VideoEngine.mountLane(borrow.laneId, el);
     // Assert play-intent post-mount (Stage-7 PR-1 fix): sets wantPlay and
     // recovers any owner-caller pause that raced between pin + markBorrowed.
-    // Belt-and-braces with the engine's borrow guard.
-    void VideoEngine.play(borrow.laneId, { callerPostId: borrow.ownerKey });
+    // Belt-and-braces with the engine's borrow guard. Honors viewer pause
+    // intent — if the user paused this media in a prior fullscreen session
+    // for the same borrowed key, we do NOT re-assert play here.
+    const hasPauseIntent = useFullscreenFeedStore
+      .getState()
+      .pausedOwnerKeys.has(borrow.ownerKey);
+    if (!hasPauseIntent) {
+      void VideoEngine.play(borrow.laneId, { callerPostId: borrow.ownerKey });
+    }
     // Ensure cover for Phase 1.
     VideoEngine.setObjectFit(borrow.laneId, 'cover');
+
     if (isPerfEnabled() || (typeof window !== 'undefined' && (window as any).__VIDEO_ENGINE_DBG__)) {
       // eslint-disable-next-line no-console
       console.info('[BORROW]', 'mount', { laneId: borrow.laneId, ownerKey: borrow.ownerKey, postId: borrow.postId });
