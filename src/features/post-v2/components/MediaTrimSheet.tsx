@@ -42,10 +42,10 @@ export default function MediaTrimSheet({ open, onClose, item, onApply }: Props) 
           style={{ width: '100%', maxHeight: 240, background: '#15171F', borderRadius: 10 }}
         />
         <label style={label}>Start: {start.toFixed(2)}s
-          <input type="range" min={0} max={Math.max(duration, 0.01)} step={0.05} value={start} onChange={(e) => setStart(Math.min(Number(e.target.value), end))} />
+          <input type="range" min={0} max={Math.max(duration, 0.01)} step={0.05} value={start} onChange={(e) => setStart(Math.min(Number(e.target.value), end))} style={rangeInput} />
         </label>
         <label style={label}>End: {end.toFixed(2)}s
-          <input type="range" min={0} max={Math.max(duration, 0.01)} step={0.05} value={end} onChange={(e) => setEnd(Math.max(Number(e.target.value), start))} />
+          <input type="range" min={0} max={Math.max(duration, 0.01)} step={0.05} value={end} onChange={(e) => setEnd(Math.max(Number(e.target.value), start))} style={rangeInput} />
         </label>
         <div style={{ display: 'flex', gap: 8 }}>
           <button onClick={onClose} style={btnGhost}>Cancel</button>
