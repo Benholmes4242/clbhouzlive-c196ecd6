@@ -469,7 +469,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className, hidden = false
       )}
 
       {/* Search Overlay - full-screen, covers header */}
-      <GlobalSearchOverlay
+      <SearchOverlayV2
         isOpen={searchOpen}
         onClose={() => setSearchOpen(false)}
       />
