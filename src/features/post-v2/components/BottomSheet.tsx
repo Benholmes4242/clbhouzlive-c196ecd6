@@ -10,11 +10,13 @@ interface Props {
   onClose: () => void;
   children: React.ReactNode;
   fullHeight?: boolean;
+  /** Fixed height (e.g. '75dvh'). Sheet won't grow/shrink with content. */
+  fixedHeight?: string;
   /** Extra bottom padding on the backdrop; lifts the sheet above the iOS keyboard. */
   bottomOffset?: number;
 }
 
-export default function BottomSheet({ open, title, onClose, children, fullHeight, bottomOffset }: Props) {
+export default function BottomSheet({ open, title, onClose, children, fullHeight, fixedHeight, bottomOffset }: Props) {
   if (!open) return null;
   return (
     <div
@@ -34,8 +36,8 @@ export default function BottomSheet({ open, title, onClose, children, fullHeight
         onClick={(e) => e.stopPropagation()}
         style={{
           width: '100%',
-          maxHeight: fullHeight ? '92vh' : '85dvh',
-          height: fullHeight ? '92vh' : 'auto',
+          maxHeight: fixedHeight ?? (fullHeight ? '92vh' : '85dvh'),
+          height: fixedHeight ?? (fullHeight ? '92vh' : 'auto'),
           background: '#F8FAFC',
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
@@ -43,7 +45,7 @@ export default function BottomSheet({ open, title, onClose, children, fullHeight
           flexDirection: 'column',
           overflow: 'hidden',
           boxShadow: '0 -8px 24px rgba(15,17,23,0.18)',
-          paddingBottom: fullHeight ? undefined : 'env(safe-area-inset-bottom, 0px)',
+          paddingBottom: (fullHeight || fixedHeight) ? undefined : 'env(safe-area-inset-bottom, 0px)',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '8px 0 4px' }}>
@@ -61,7 +63,7 @@ export default function BottomSheet({ open, title, onClose, children, fullHeight
             </button>
           </div>
         )}
-        <div style={{ flex: fullHeight ? 1 : '0 1 auto', overflow: 'auto', minHeight: 0 }}>{children}</div>
+        <div style={{ flex: (fullHeight || fixedHeight) ? 1 : '0 1 auto', overflow: 'auto', minHeight: 0 }}>{children}</div>
       </div>
     </div>
   );
