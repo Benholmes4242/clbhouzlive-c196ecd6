@@ -1,10 +1,9 @@
 import React from 'react';
-import { Camera, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { cn } from '@/lib/utils';
 import type { MediaCounts } from './hooks/useCourseMedia';
 import type { CourseMediaFilter } from './hooks/useCourseMedia';
-import { INK, INK_FAINT, INK_MUTE, INK_TINT_05 } from '@/features/courses/_shared/tokens';
+import { INK, INK_FAINT } from '@/features/courses/_shared/tokens';
 
 
 interface CourseMediaHeaderProps {
@@ -28,82 +27,65 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  return (
-    <div style={{ padding: '14px 0 10px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-      {/* Count row + Add media */}
-      {(mediaCounts.photos > 0 || mediaCounts.videos > 0) && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: INK_MUTE }}>
-            <Camera className="w-3.5 h-3.5" />
-            <span>
-              <b style={{ color: INK }}>{mediaCounts.photos}</b> photos
-              {' · '}
-              <b style={{ color: INK }}>{mediaCounts.videos}</b> videos
-            </span>
-          </div>
-          <button
-            onClick={() => navigate(`/courses/${courseId}/rate`)}
-            style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '6px 12px', borderRadius: 8, background: INK_TINT_05, border: 'none', fontSize: 12, fontWeight: 700, color: INK, cursor: 'pointer' }}
-          >
-            <Plus className="w-3.5 h-3.5" />
-            Add media
-          </button>
-        </div>
-      )}
+  const hasMedia = mediaCounts.total > 0;
 
-      {/* Filter tabs — underline style (matches player profile) */}
-      <div
-        role="tablist"
-        aria-label="Media filter"
-        style={{
-          display: 'flex',
-          gap: 8,
-          justifyContent: 'flex-start',
-          paddingLeft: 12,
-          fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
-        }}
-      >
-        {FILTERS.map(({ key, label }) => {
-          const isActive = activeFilter === key;
-          return (
-            <button
-              key={key}
-              role="tab"
-              aria-selected={isActive}
-              onClick={() => onFilterChange(key)}
-              style={{
-                flex: '0 0 auto',
-                height: 44,
-                padding: '0 8px',
-                borderRadius: 0,
-                border: 'none',
-                background: 'transparent',
-                color: isActive ? INK : INK_FAINT,
-                fontFamily: 'inherit',
-                fontSize: 14,
-                fontWeight: isActive ? 700 : 600,
-                letterSpacing: '-0.005em',
-                whiteSpace: 'nowrap',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                position: 'relative',
-                transition: 'color 0.15s',
-              }}
-            >
-              <span
-                style={{
-                  display: 'inline-block',
-                  paddingBottom: 4,
-                  borderBottom: isActive ? `1.5px solid ${INK}` : '1.5px solid transparent',
-                }}
-              >
-                {label}
+  const countFor = (key: CourseMediaFilter) =>
+    key === 'all' ? mediaCounts.total : key === 'photos' ? mediaCounts.photos : mediaCounts.videos;
+
+  return (
+    <div
+      role="tablist"
+      aria-label="Media filter"
+      style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '14px 16px 12px' }}
+    >
+      {FILTERS.map(({ key, label }) => {
+        const isActive = activeFilter === key;
+        const count = countFor(key);
+
+        return (
+          <button
+            key={key}
+            role="tab"
+            aria-selected={isActive}
+            onClick={() => onFilterChange(key)}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 5,
+              height: 34, padding: '0 13px', borderRadius: 17,
+              background: isActive ? INK : '#FFFFFF',
+              border: isActive ? `1px solid ${INK}` : '1px solid rgba(15,23,42,0.12)',
+              fontSize: 12.5, fontWeight: isActive ? 700 : 600,
+              color: isActive ? '#FFFFFF' : INK,
+              cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
+            }}
+          >
+            {label}
+            {hasMedia && (
+              <span style={{
+                fontSize: 11, fontWeight: 800, fontVariantNumeric: 'tabular-nums',
+                color: isActive ? 'rgba(255,255,255,0.6)' : INK_FAINT,
+              }}>
+                {count}
               </span>
-            </button>
-          );
-        })}
-      </div>
+            )}
+          </button>
+        );
+      })}
+
+      {hasMedia && (
+        <button
+          onClick={() => navigate(`/courses/${courseId}/rate`)}
+          aria-label="Add media"
+          style={{
+            marginLeft: 'auto', width: 34, height: 34, borderRadius: 17,
+            background: '#F7931E', color: '#FFFFFF', border: 'none',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer', flexShrink: 0,
+            boxShadow: '0 3px 10px rgba(247,147,30,0.28)',
+          }}
+        >
+          <Plus className="w-4 h-4" strokeWidth={2.4} />
+        </button>
+      )}
     </div>
   );
 };
