@@ -275,9 +275,9 @@ export function usePostEngagement(postId: string | null) {
 
       if (error) throw error;
 
-      // Comment notification to post owner is written by the
-      // `trg_post_comments_create_notification` DB trigger. Client-side
-      // insert removed 2026-07-08 (see useCommentsWithReplies.ts note).
+      // Comment notification to post owner is written by DB triggers
+      // owned by comments-v2 (comments_v2 + comment_likes_v2). Client-side
+      // insert removed 2026-07-08.
 
 
 

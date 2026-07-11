@@ -3,7 +3,7 @@
  *
  * A single entry point tile openers call at tap time. It synchronously:
  *   1) Snapshots the origin element geometry (rect, radius, aspect, poster).
- *   2) Locks body scroll (ref-counted so it composes with CommentsSheet).
+ *   2) Locks body scroll (ref-counted so it composes with CommentsSheetV2).
  *   3) Flips the WebView status bar to viewer chrome.
  *   4) Hands off the tile's HLS instance to the pool (so the viewer inherits
  *      the buffered segments and lands playing instantly).
@@ -488,7 +488,7 @@ export function openWithOrigin({
 
   // Chrome flip at TAP time (not effect time) to kill the strobe. Scroll
   // lock is owned by the overlay's isOpen effect (ref-counted so it composes
-  // cleanly with CommentsSheet stacking on top).
+  // cleanly with CommentsSheetV2 stacking on top).
   //
   // NOTE: overlay flag is boot-locked (see ensureStatusBarOverlayBooted in
   // useMedianStatusBar.ts). We only push style + color here to avoid the

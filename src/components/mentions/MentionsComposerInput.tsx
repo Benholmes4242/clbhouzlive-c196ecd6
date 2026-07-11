@@ -2,7 +2,7 @@
  * MentionsComposerInput — canonical composer input for mentions v2.
  *
  * Suggestions panel architecture (single source; four consumers:
- * PostComposer, ReviewComposerV2, CommentsSheet, TopTenCardComments):
+ * PostComposer, ReviewComposerV2, CommentsSheetV2, CommentComposer):
  *
  *   • react-mentions' own overlay shell (`.suggestions`) is styled
  *     0x0 / pointer-transparent — it exists only as an open/closed

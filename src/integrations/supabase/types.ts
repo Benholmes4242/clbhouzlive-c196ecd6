@@ -6334,8 +6334,8 @@ export type Database = {
           created_at: string
           details: string | null
           id: string
-          post_id: string
           reason: string
+          target_id: string
           user_id: string
         }
         Insert: {
@@ -6343,8 +6343,8 @@ export type Database = {
           created_at?: string
           details?: string | null
           id?: string
-          post_id: string
           reason: string
+          target_id: string
           user_id: string
         }
         Update: {
@@ -6352,8 +6352,8 @@ export type Database = {
           created_at?: string
           details?: string | null
           id?: string
-          post_id?: string
           reason?: string
+          target_id?: string
           user_id?: string
         }
         Relationships: []

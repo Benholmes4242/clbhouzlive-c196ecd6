@@ -36,7 +36,7 @@ export const Z = {
   dropdownMenu: 60,
 
   // Mention suggestions panel — portals to <body>; must clear sheet (12003)
-  // because composers live inside CommentsSheet / TopTenCardComments / etc.
+  // because composers live inside CommentsSheetV2 / etc.
   mentionsPanel: 12010,
 
   // LogHud floating button + panel — portals to <body>; must clear wizard
