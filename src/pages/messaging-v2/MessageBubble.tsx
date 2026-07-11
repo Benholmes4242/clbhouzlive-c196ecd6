@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Check, AlertCircle, Clock } from 'lucide-react';
 import type { ThreadMessage, MessageReaction, MessageAttachment } from '@/types/messaging';
 import { MessageImage } from './MessageImage';
@@ -342,13 +343,16 @@ export const MessageBubble: React.FC<Props> = ({
         </div>
       ) : null}
 
-      {viewer ? (
-        <MediaPreviewViewer
-          items={viewer.items}
-          initialIndex={viewer.index}
-          onClose={() => setViewer(null)}
-        />
-      ) : null}
+      {viewer
+        ? createPortal(
+            <MediaPreviewViewer
+              items={viewer.items}
+              initialIndex={viewer.index}
+              onClose={() => setViewer(null)}
+            />,
+            document.body,
+          )
+        : null}
     </div>
   );
 };
