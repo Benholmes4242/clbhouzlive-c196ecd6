@@ -1,4 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
+
+const CLUBHOUSE_CHARCOAL = '#15171F';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { Check } from 'lucide-react';
