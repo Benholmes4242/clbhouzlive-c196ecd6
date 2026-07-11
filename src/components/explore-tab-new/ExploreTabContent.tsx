@@ -54,7 +54,7 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
       {/* Friends rail — region-INDEPENDENT, always visible */}
       <CircleActivityStrip userId={userId} />
 
-      {/* Region tabs — shared control driving tiers, destinations, and grid */}
+      {/* Region tabs — shared control driving tiers and grid */}
       <AlmanacRegionTabs region={activeRegion} onRegionChange={handleRegionChange} />
 
       {/* The four tiers */}
