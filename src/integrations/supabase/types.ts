@@ -2685,6 +2685,32 @@ export type Database = {
           },
         ]
       }
+      comment_likes_v2: {
+        Row: {
+          comment_id: string
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          comment_id: string
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          comment_id?: string
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comment_likes_v2_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "comments_v2"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       comment_notifications: {
         Row: {
           actor_user_id: string
@@ -2749,6 +2775,65 @@ export type Database = {
             columns: ["comment_id"]
             isOneToOne: false
             referencedRelation: "post_comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      comments_v2: {
+        Row: {
+          actor_id: string | null
+          actor_type: string
+          content: string | null
+          created_at: string
+          id: string
+          is_edited: boolean
+          media_type: string | null
+          media_url: string | null
+          parent_id: string | null
+          target_id: string
+          target_secondary_id: string | null
+          target_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          actor_type?: string
+          content?: string | null
+          created_at?: string
+          id?: string
+          is_edited?: boolean
+          media_type?: string | null
+          media_url?: string | null
+          parent_id?: string | null
+          target_id: string
+          target_secondary_id?: string | null
+          target_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          actor_type?: string
+          content?: string | null
+          created_at?: string
+          id?: string
+          is_edited?: boolean
+          media_type?: string | null
+          media_url?: string | null
+          parent_id?: string | null
+          target_id?: string
+          target_secondary_id?: string | null
+          target_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_v2_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "comments_v2"
             referencedColumns: ["id"]
           },
         ]
@@ -16330,6 +16415,20 @@ export type Database = {
         Args: { p_evidence_url?: string; p_note?: string; p_request_id: string }
         Returns: undefined
       }
+      add_comment_v2: {
+        Args: {
+          p_actor_id?: string
+          p_actor_type?: string
+          p_content?: string
+          p_media_type?: string
+          p_media_url?: string
+          p_parent_id?: string
+          p_target_id: string
+          p_target_secondary_id?: string
+          p_target_type: string
+        }
+        Returns: Json
+      }
       addauth: { Args: { "": string }; Returns: boolean }
       addgeometrycolumn:
         | {
@@ -16573,6 +16672,7 @@ export type Database = {
         Args: { p_business_id: string; p_user_profile_id: string }
         Returns: boolean
       }
+      delete_comment_v2: { Args: { p_id: string }; Returns: Json }
       delete_course_review_v2: { Args: { p_rating_id: string }; Returns: Json }
       delete_message_for_me: {
         Args: { p_message_id: string }
@@ -16627,6 +16727,10 @@ export type Database = {
       }
       echo_get_tournament_context: { Args: never; Returns: Json }
       echo_get_user_context: { Args: { p_user_id: string }; Returns: Json }
+      edit_comment_v2: {
+        Args: { p_content: string; p_id: string }
+        Returns: Json
+      }
       emit_championship_dispatch: {
         Args: {
           p_body: string
@@ -20488,6 +20592,7 @@ export type Database = {
         Args: { p_friend_id: string; p_new_status: string; p_user_id: string }
         Returns: undefined
       }
+      toggle_comment_like_v2: { Args: { p_comment_id: string }; Returns: Json }
       toggle_whs_round_reaction: {
         Args: { p_reaction_type?: string; p_score_id: string }
         Returns: {
