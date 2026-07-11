@@ -40,6 +40,13 @@ interface Props {
 const T_INK = '#0F172A';
 const T_MUTE = 'rgba(15,23,42,0.55)';
 
+const REVIEW_FONT_SIZE = 14;
+const REVIEW_LINE_HEIGHT = 1.4;
+const REVIEW_CLAMP_LINES = 3;
+const REVIEW_BODY_MIN_HEIGHT =
+  REVIEW_FONT_SIZE * REVIEW_LINE_HEIGHT * REVIEW_CLAMP_LINES; // 58.8px
+
+
 const CAT_LABELS: { key: CategoryKey; label: string }[] = [
   { key: 'design', label: 'Design' },
   { key: 'condition', label: 'Condition' },
@@ -73,7 +80,60 @@ function Ghost({
   );
 }
 
+function ClampedReviewText({ text }: { text: string }) {
+  const textRef = React.useRef<HTMLDivElement | null>(null);
+  const [isClamped, setIsClamped] = React.useState(false);
+
+  React.useLayoutEffect(() => {
+    const el = textRef.current;
+    if (!el) return;
+    setIsClamped(el.scrollHeight > el.clientHeight + 1);
+  }, [text]);
+
+  return (
+    <div style={{ position: 'relative', minHeight: REVIEW_BODY_MIN_HEIGHT }}>
+      <div
+        ref={textRef}
+        style={{
+          fontSize: REVIEW_FONT_SIZE,
+          lineHeight: REVIEW_LINE_HEIGHT,
+          color: T_INK,
+          display: '-webkit-box',
+          WebkitLineClamp: REVIEW_CLAMP_LINES,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden',
+          wordBreak: 'break-word',
+        }}
+      >
+        <MentionText text={text} />
+      </div>
+      {isClamped && (
+        <span
+          aria-hidden
+          style={{
+            position: 'absolute',
+            right: 0,
+            bottom: 0,
+            paddingLeft: 64,
+            background:
+              'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 38%)',
+            color: T_MUTE,
+            fontSize: 13,
+            fontWeight: 600,
+            lineHeight: REVIEW_LINE_HEIGHT,
+            whiteSpace: 'nowrap',
+            pointerEvents: 'none',
+          }}
+        >
+          Read review &gt;
+        </span>
+      )}
+    </div>
+  );
+}
+
 export function LivePreviewCard({
+
   course,
   author,
   overall,
@@ -156,24 +216,24 @@ export function LivePreviewCard({
       {/* Review body */}
       <div style={{ padding: '4px 14px 10px', position: 'relative', zIndex: 2 }}>
         {reviewText.trim().length > 0 ? (
-          <MentionText
-            text={reviewText}
-            style={{
-              fontSize: 14,
-              color: T_INK,
-              lineHeight: 1.45,
-              whiteSpace: 'pre-wrap',
-              wordBreak: 'break-word',
-            }}
-          />
+          <ClampedReviewText text={reviewText} />
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <Ghost width="100%" height={12} />
-            <Ghost width="88%" height={12} />
-            <Ghost width="62%" height={12} />
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 6,
+              minHeight: REVIEW_BODY_MIN_HEIGHT,
+              justifyContent: 'center',
+            }}
+          >
+            <Ghost width="100%" height={16} />
+            <Ghost width="88%" height={16} />
+            <Ghost width="62%" height={16} />
           </div>
         )}
       </div>
+
 
       {/* Media strip — only when media added */}
       {media.length > 0 && (
