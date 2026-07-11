@@ -96,8 +96,11 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     : ratingFilter === 'excellent' ? '8.9-7.5'
     : ratingFilter === 'good' ? '7.4-5'
     : 'all';
-  
+
+  const [searchOpen, setSearchOpen] = useState(false);
+
   const [highlightedReviewId, setHighlightedReviewId] = useState<string | null>(externalHighlightReviewId || null);
+
 
   const sortOptions: SegmentedTabOption[] = [
     { value: 'recent', label: 'Most recent' },
