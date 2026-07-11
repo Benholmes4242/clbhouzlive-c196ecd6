@@ -83,7 +83,7 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
       className={`flex items-center justify-center ${className}`}
       style={{
         gap: GAP,
-        height: DOT + 4,
+        height: Math.max(DOT_ACTIVE, DOT_INACTIVE) + 4,
         opacity: isVisible ? 1 : 0,
         transition: 'opacity 300ms ease',
         pointerEvents: 'none',
@@ -94,9 +94,9 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
       </span>
       {dots.map(({ index, scale, opacity }) => {
         const isActive = index === safeActive;
-        const size = DOT * scale;
+        const size = isActive ? DOT_ACTIVE : DOT_INACTIVE * scale;
         const activeColor = tone === 'dark' ? '#0F172A' : '#FFFFFF';
-        const baseColor = tone === 'dark' ? '15,23,42' : '255,255,255';
+        const baseColor = tone === 'dark' ? '15,23,42' : '255,255,42';
         return (
           <div
             key={index}
@@ -108,6 +108,7 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
               background: isActive
                 ? activeColor
                 : `rgba(${baseColor},${0.45 * opacity})`,
+              boxShadow: isActive ? '0 1px 4px rgba(0,0,0,0.35)' : 'none',
               transition: 'all 260ms cubic-bezier(0.22,0.61,0.36,1)',
             }}
           />
