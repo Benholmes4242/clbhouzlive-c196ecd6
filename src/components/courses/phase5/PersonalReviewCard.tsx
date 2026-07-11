@@ -7,11 +7,13 @@ import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { getScoreRingColors } from '@/hooks/useTierStyles';
+import { MentionText } from '@/components/mentions/MentionText';
+import { stripMentionMarkup } from '@/lib/mentions/format';
 
 // ReviewText component with line clamping
 const ReviewText: React.FC<{ text: string }> = ({ text }) => {
   const [expanded, setExpanded] = useState(false);
-  const needsClamp = text.length > 180;
+  const needsClamp = stripMentionMarkup(text).length > 180;
 
   return (
     <div style={{ paddingTop: 14, borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
@@ -29,7 +31,7 @@ const ReviewText: React.FC<{ text: string }> = ({ text }) => {
           overflow: !expanded && needsClamp ? 'hidden' : 'visible',
         }}
       >
-        "{text}"
+        "<MentionText as="span" text={text} />"
       </p>
       {needsClamp && (
         <button
