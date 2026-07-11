@@ -3,7 +3,7 @@
  * and editorial cards. Fetches via useCommentsV2 (RPC-only writes); realtime
  * merges via useCommentsRealtimeV2.
  *
- * Design: light canvas #F8FAFC, amber eyebrow "CLUBHOUSE CHAT", conversation
+ * Design: light canvas #F8FAFC, amber eyebrow "CLBHOUZ CHAT", conversation
  * cards on white with hairline borders. Keyboard-aware via useKeyboardHeight.
  */
 import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
