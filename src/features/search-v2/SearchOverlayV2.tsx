@@ -14,6 +14,7 @@ import { VideoRailCard } from './components/VideoRailCard';
 import { PostRow } from './components/PostRow';
 import { RecentsList } from './components/RecentsList';
 import { RequestCourseCTAV2 } from './components/RequestCourseCTAV2';
+import { SearchEmptyState } from './components/SearchEmptyState';
 import { useGlobalSearchV2, type Scope } from './hooks/useGlobalSearchV2';
 import { useRecentSearchesV2 } from './hooks/useRecentSearchesV2';
 import {
