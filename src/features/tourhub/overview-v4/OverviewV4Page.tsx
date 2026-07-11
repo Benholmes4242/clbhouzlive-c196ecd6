@@ -15,8 +15,7 @@ import { CollegeFranchiseSection } from './sections/CollegeFranchiseSection';
 import { CourseOfTheWeekV4 } from './sections/CourseOfTheWeekV4';
 import { ConnectHandicapCTA } from './sections/ConnectHandicapCTA';
 import { V4 } from './tokens';
-import type { TourId } from './hooks/useOverviewData' assert { 'resolution-mode': 'import' };
-// ^ fallback below
+import type { TourId } from '../hooks/useOverviewData';
 
 export function OverviewV4Page() {
   const [tour, setTour] = useState<TourId>('pga');
