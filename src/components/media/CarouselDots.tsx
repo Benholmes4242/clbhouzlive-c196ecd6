@@ -2,8 +2,10 @@
  * CarouselDots — Instagram-style sliding-window dot indicator.
  *
  * ≤7 dots: all shown. >7: a 7-dot window with edge dots shrinking/fading
- * to imply "more beyond". No "+N" overflow (the n/total chip handles count).
- * Plain white. Non-interactive (parent owns gesture/index). Returns null when count <= 1.
+ * to imply "more beyond". No "+N" overflow and no counter pill — dots are
+ * the sole indicator everywhere in-feed.
+ * Active dot is 6px white with a soft shadow; inactive is 5px white at 0.45 opacity.
+ * Non-interactive (parent owns gesture/index). Returns null when count <= 1.
  */
 import React, { useEffect, useState } from 'react';
 
