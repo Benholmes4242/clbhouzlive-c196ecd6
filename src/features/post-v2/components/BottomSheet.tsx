@@ -26,7 +26,7 @@ export default function BottomSheet({ open, title, onClose, children, fullHeight
         zIndex: Z.sheet ?? 12003,
         display: 'flex',
         alignItems: 'flex-end',
-        background: 'rgba(15,17,23,0.45)',
+        background: 'linear-gradient(to bottom, rgba(15,17,23,0.62) 0px, rgba(15,17,23,0.45) calc(env(safe-area-inset-top, 47px) + 8px), rgba(15,17,23,0.45) 100%)',
         paddingBottom: bottomOffset ? `${bottomOffset}px` : undefined,
         transition: 'padding-bottom 180ms cubic-bezier(.2,.8,.2,1)',
       }}
