@@ -26,7 +26,7 @@ import { useClubhouseFollows } from '@/components/clubhouse/hooks/useClubhouseFo
 import { useClubhouseComments } from '@/components/clubhouse/hooks/useClubhouseComments';
 import { useClubhouseShare } from '@/components/clubhouse/hooks/useClubhouseShare';
 import { useActivePostDerived } from '@/components/clubhouse/hooks/useActivePostDerived';
-import CommentsSheet from '@/components/comments/CommentsSheet';
+import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 
 import { getActorRouteByType } from '@/types/actor';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
