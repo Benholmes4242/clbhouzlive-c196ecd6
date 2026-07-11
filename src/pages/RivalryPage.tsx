@@ -456,7 +456,6 @@ const RivalryPage: React.FC = () => {
 
           <div style={{ marginTop: 16 }}>
             <ActionRail
-              onMessage={handleMessage}
               onProfile={handleProfile}
               onShare={handleShare}
             />

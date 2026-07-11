@@ -28,6 +28,7 @@ import { useSuggestedCreators, type SuggestedCreator } from '@/components/watch/
 import { ChevronRight } from 'lucide-react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 
+import { useBlockActions } from '@/hooks/useBlockActions';
 import { toast } from 'sonner';
 import type { SocialUser } from '@/hooks/useSocialLists';
 import { getProfilePathById } from '@/lib/profileRoutes';
@@ -1070,6 +1071,7 @@ interface UserRowFlatProps {
 
 const UserRowFlat: React.FC<UserRowFlatProps> = ({
   user,
+  const { blockUser } = useBlockActions({ currentUserId: currentUserId || '' });
   currentUserId,
   mode: _mode,
   onUserRemoved,
@@ -1383,14 +1385,7 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({
                 }}
               />
             )}
-            <KebabAction
-              icon={<BellOff className="w-4 h-4" />}
-              label="Mute notifications"
-              onClick={() => {
-                setShowKebabSheet(false);
-                toast.success('Mute coming soon');
-              }}
-            />
+            
             {uiState === 'following' && (
               <KebabAction
                 icon={<UserMinus className="w-4 h-4" />}

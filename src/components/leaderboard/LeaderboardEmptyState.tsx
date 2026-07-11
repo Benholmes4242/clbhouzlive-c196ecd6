@@ -10,7 +10,7 @@ type EmptyStateType =
   | 'friends-no-activity'
   | 'around-you-no-rank'
   | 'rising-no-data'
-  | 'rising-coming-soon'
+  | 'rising-empty'
   | 'courses-friends-no-friends'
   | 'courses-friends-no-activity'
   | 'courses-trending'
@@ -54,7 +54,7 @@ const EMPTY_STATES: Record<EmptyStateType, {
     title: 'Most Active',
     body: 'Not enough recent activity to show movers yet. Check back soon!',
   },
-  'rising-coming-soon': {
+  'rising-empty': {
     icon: Flame,
     iconColor: 'text-orange-500',
     title: 'Most Active This Month',

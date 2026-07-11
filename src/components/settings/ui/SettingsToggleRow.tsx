@@ -1,7 +1,6 @@
 import React from 'react';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
-import { SettingsBadge } from './SettingsRow';
 import { IconTheme, iconThemeStyles } from '../settingsTheme';
 
 interface SettingsToggleRowProps {
@@ -60,7 +59,7 @@ export function SettingsToggleRow({
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <span className="text-[15px] font-medium text-foreground truncate">{title}</span>
-              {isBeta && <SettingsBadge>Beta</SettingsBadge>}
+              
             </div>
             {subtitle && (
               <p className="text-[13px] text-muted-foreground line-clamp-2 mt-1">{subtitle}</p>
