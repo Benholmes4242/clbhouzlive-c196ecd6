@@ -173,7 +173,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
 
       {/* Search Overlay */}
       {!hideSearch && (
-        <GlobalSearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+        <SearchOverlayV2 isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
       )}
     </>
   );
