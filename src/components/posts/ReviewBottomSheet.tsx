@@ -410,8 +410,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               {paragraphs.length === 0 ? (
                 <div
                   style={{
-                    fontSize: 10,
-                    lineHeight: 1.5,
+                    fontSize: 15,
+                    lineHeight: 1.6,
                     color: '#F8FAFC',
                     opacity: 0.6,
                     padding: '6px 0',
@@ -426,12 +426,12 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     as="p"
                     text={para}
                     style={{
-                      fontSize: 10,
-                      lineHeight: 1.5,
+                      fontSize: 15,
+                      lineHeight: 1.6,
                       color: '#F8FAFC',
-                      opacity: 0.85,
+                      opacity: 0.9,
                       margin: 0,
-                      marginBottom: i === paragraphs.length - 1 ? 0 : 12,
+                      marginBottom: i === paragraphs.length - 1 ? 0 : 14,
                     }}
                   />
                 ))
