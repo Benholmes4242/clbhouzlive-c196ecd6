@@ -244,17 +244,15 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
       </motion.div>
       
       {/* Comments sheet */}
-      <TopTenCardComments
+      <CommentsSheetV2
         isOpen={commentsOpen}
         onClose={() => setCommentsOpen(false)}
-        targetUserId={targetUserId}
-        courseId={course.course_id}
-        courseName={course.name}
-        isOwnProfile={isOwnProfile ?? true}
-        privacySetting={privacySetting ?? 'followers'}
+        targetType="top_ten"
+        targetId={targetUserId}
+        targetSecondaryId={course.course_id}
         initialCommentId={initialCommentId}
-        initialParentCommentId={initialParentCommentId}
       />
+
     </>
   );
 };
