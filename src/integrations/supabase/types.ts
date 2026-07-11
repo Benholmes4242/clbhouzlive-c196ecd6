@@ -18887,6 +18887,15 @@ export type Database = {
         }[]
       }
       gettransactionid: { Args: never; Returns: unknown }
+      global_search_v2: {
+        Args: {
+          p_limit?: number
+          p_offset?: number
+          p_query: string
+          p_scope?: string
+        }
+        Returns: Json
+      }
       has_recently_nudged_whs: {
         Args: { p_recipient_id: string }
         Returns: boolean
