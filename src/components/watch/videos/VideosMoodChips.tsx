@@ -1,42 +1,26 @@
 import { memo } from 'react';
 import { VIDEOS_MOODS, type VideosMoodId } from './hooks/useVideosMood';
-import { ChipRowSearchField, ChipRowSearchTrigger } from '@/components/watch/shared/ChipRowSearchField';
+import { ChipRowSearchTrigger } from '@/components/watch/shared/ChipRowSearchField';
 
 interface VideosMoodChipsProps {
   active: VideosMoodId;
   onChange: (id: VideosMoodId) => void;
-  searchOpen: boolean;
-  searchValue: string;
   onSearchOpen: () => void;
-  onSearchChange: (v: string) => void;
-  onSearchClose: () => void;
 }
 
-function VideosMoodChipsInner({
-  active, onChange, searchOpen, searchValue, onSearchOpen, onSearchChange, onSearchClose,
-}: VideosMoodChipsProps) {
+function VideosMoodChipsInner({ active, onChange, onSearchOpen }: VideosMoodChipsProps) {
   return (
     <div
       className="relative"
       style={{
         background: '#F8FAFC',
       }}
-
     >
       <div
         className="flex items-center gap-1.5"
         style={{ padding: '8.5px 16px 8.5px 12px' }}
       >
-        {searchOpen ? (
-          <ChipRowSearchField
-            value={searchValue}
-            onChange={onSearchChange}
-            onClose={onSearchClose}
-            placeholder="Search videos..."
-          />
-        ) : (
-          <ChipRowSearchTrigger onOpen={onSearchOpen} />
-        )}
+        <ChipRowSearchTrigger onOpen={onSearchOpen} />
 
         <div
           role="tablist"

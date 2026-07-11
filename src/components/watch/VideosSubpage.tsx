@@ -4,8 +4,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import PageRoot from '@/components/layout/PageRoot';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
-import { useDebouncedValue } from '@/hooks/useDebouncedValue';
-
+import SearchOverlay from '@/components/shared/SearchOverlay';
+import { useRecentSearches } from '@/hooks/useRecentSearches';
 import ShellSlot from '@/components/header/ShellSlot';
 
 import { useVideosMood } from '@/components/watch/videos/hooks/useVideosMood';
@@ -14,6 +14,10 @@ import { VideosFullFeed } from '@/components/watch/videos/VideosFullFeed';
 
 const CREAM = '#F8FAFC';
 
+const TRENDING = [
+  'Course Vlogs', 'Coaching', 'Rory', 'Masters', 'Wedge Play', 'Putting',
+];
+
 export default function VideosSubpage() {
   const navigationType = useNavigationType();
   const { session } = useSupabaseSession();
@@ -21,17 +25,15 @@ export default function VideosSubpage() {
   const { mood, setMood } = useVideosMood();
 
   const [searchOpen, setSearchOpen] = useState(false);
-  const [searchRaw, setSearchRaw] = useState('');
-  const searchQuery = useDebouncedValue(searchRaw.trim(), 180);
-  const isSearching = searchQuery.length > 0;
+  const [committedQuery, setCommittedQuery] = useState('');
+  const isSearching = committedQuery.length > 0;
+
+  const { recentSearches, addSearch, removeSearch, clearAll } =
+    useRecentSearches('videos-recent-searches');
 
   const handleSearchOpen = () => {
     setSearchOpen(true);
     if (mood !== 'for_you') setMood('for_you');
-  };
-  const handleSearchClose = () => {
-    setSearchOpen(false);
-    setSearchRaw('');
   };
 
   useEffect(() => {
@@ -49,11 +51,7 @@ export default function VideosSubpage() {
           <VideosMoodChips
             active={mood}
             onChange={setMood}
-            searchOpen={searchOpen}
-            searchValue={searchRaw}
             onSearchOpen={handleSearchOpen}
-            onSearchChange={setSearchRaw}
-            onSearchClose={handleSearchClose}
           />
         </ShellSlot>
 
@@ -62,8 +60,8 @@ export default function VideosSubpage() {
             <VideosFullFeed
               userId={userId}
               mood="for_you"
-              searchQuery={searchQuery}
-              onClearSearch={handleSearchClose}
+              searchQuery={committedQuery}
+              onClearSearch={() => setCommittedQuery('')}
             />
           ) : (
             <VideosFullFeed
@@ -75,6 +73,23 @@ export default function VideosSubpage() {
         </div>
 
         <ScrollToTopGlass />
+
+        <SearchOverlay
+          isOpen={searchOpen}
+          onClose={() => setSearchOpen(false)}
+          placeholder="Search videos..."
+          onSearch={() => { /* input-only sheet; commit filters the page */ }}
+          onCommit={(term) => {
+            addSearch(term);
+            setCommittedQuery(term);
+            setSearchOpen(false);
+          }}
+          recentSearches={recentSearches}
+          onClearRecent={clearAll}
+          onRemoveRecent={removeSearch}
+          trendingItems={TRENDING}
+          userId={userId}
+        />
       </PageRoot>
   );
 }
