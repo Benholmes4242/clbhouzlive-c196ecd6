@@ -10,6 +10,8 @@ interface Props {
   onClose: () => void;
   children: React.ReactNode;
   fullHeight?: boolean;
+  /** Fixed height (e.g. '75dvh'). Sheet won't grow/shrink with content. */
+  fixedHeight?: string;
   /** Extra bottom padding on the backdrop; lifts the sheet above the iOS keyboard. */
   bottomOffset?: number;
 }
