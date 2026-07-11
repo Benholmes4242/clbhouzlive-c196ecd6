@@ -213,7 +213,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             pointerEvents: 'auto', padding: 0, flexShrink: 0,
           }}
         >
-          <ChevronLeft size={26} stroke="#fff" strokeWidth={2.5} />
+          <ChevronLeft size={26} stroke="#fff" strokeWidth={2.5} style={{ display: 'block', marginLeft: -2 }} />
         </button>
 
 
