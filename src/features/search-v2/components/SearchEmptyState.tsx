@@ -11,8 +11,10 @@
  */
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { Check } from 'lucide-react';
+import { Check, Zap } from 'lucide-react';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { PlayerInitialAvatar } from '@/features/tourhub/components/shared/PlayerInitialAvatar';
+import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useFollowState } from '@/hooks/useFollowState';
@@ -72,6 +74,7 @@ export function SearchEmptyState({ onSelect }: Props) {
             <PlayerCard
               key={p.id}
               player={p}
+              tourSlug={event?.tour_slug ?? 'pga'}
               onTap={() => {
                 onSelect();
                 navigate(`/tourhub/player/${p.id}`);
@@ -174,27 +177,21 @@ function SectionEyebrow({
 function LiveChip() {
   return (
     <span
+      className="animate-pulse"
       style={{
         display: 'inline-flex',
         alignItems: 'center',
-        gap: 4,
-        padding: '2px 7px',
+        gap: 6,
+        padding: '4px 10px',
         borderRadius: 999,
-        background: '#DC2626',
+        background: '#22C55E',
         color: '#fff',
-        fontSize: 9.5,
-        fontWeight: 800,
-        letterSpacing: '0.1em',
+        fontSize: 11,
+        fontWeight: 600,
+        letterSpacing: '0.02em',
       }}
     >
-      <span
-        style={{
-          width: 5,
-          height: 5,
-          borderRadius: '50%',
-          background: '#fff',
-        }}
-      />
+      <Zap style={{ width: 12, height: 12 }} />
       LIVE
     </span>
   );
@@ -203,17 +200,18 @@ function LiveChip() {
 // ─── Player card ───────────────────────────────────────────────────────
 function PlayerCard({
   player,
+  tourSlug,
   onTap,
 }: {
   player: EmptyStatePlayer;
+  tourSlug: string;
   onTap: () => void;
 }) {
-  const initials = (player.abbr_name || player.full_name || '?')
-    .split(/\s+/)
-    .map((w) => w[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
+  const candidates = getPlayerHeadshotCandidates(
+    player.full_name,
+    tourSlug,
+    player.headshot_override,
+  );
   return (
     <button
       type="button"
@@ -221,12 +219,11 @@ function PlayerCard({
       className="flex flex-col items-center shrink-0 text-left"
       style={{ width: 84 }}
     >
-      <SquircleAvatar
+      <PlayerInitialAvatar
+        name={player.full_name}
+        srcCandidates={candidates}
         size={64}
-        src={player.headshot_override ?? undefined}
-        alt={player.full_name}
-        fallback={initials}
-        hairlineRing
+        radius="34%"
         ringColor={LIGHT_HAIRLINE}
       />
       <p
