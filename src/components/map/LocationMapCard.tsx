@@ -86,7 +86,6 @@ export const LocationMapCard: React.FC<LocationMapCardProps> = ({
         <div style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '12px 14px' }}>
           <div style={{
             width: 34, height: 34, borderRadius: 11, flexShrink: 0,
-rs
             background: 'rgba(247,147,30,0.10)', color: '#F7931E',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
