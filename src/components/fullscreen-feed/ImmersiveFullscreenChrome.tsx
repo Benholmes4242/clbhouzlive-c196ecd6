@@ -434,11 +434,11 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
         <div
           style={{
             position: 'fixed',
-            right: 'max(10px, env(safe-area-inset-right, 0px))',
-            bottom: 'calc(max(env(safe-area-inset-bottom, 0px), 24px) + 22px)',
+            right: 'max(12px, env(safe-area-inset-right, 0px))',
+            bottom: 'calc(max(env(safe-area-inset-bottom, 0px), 24px) + 26px)',
             zIndex: Z.echo,
             display: 'flex', flexDirection: 'column', alignItems: 'center',
-            gap: 14, pointerEvents: 'none',
+            gap: 20, pointerEvents: 'none',
             fontFamily: 'Geist, system-ui, sans-serif',
           }}
         >
@@ -449,7 +449,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             accent={likeState.isLiked}
           >
             <Heart
-              size={25}
+              size={32}
               fill={likeState.isLiked ? AMBER : 'transparent'}
               stroke={likeState.isLiked ? AMBER : '#fff'}
               strokeWidth={2}
@@ -457,22 +457,23 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           </RailButton>
 
           <RailButton onClick={onComment} ariaLabel="Comments" count={commentStr}>
-            <MessageCircle size={25} stroke="#fff" strokeWidth={2} />
+            <MessageCircle size={32} stroke="#fff" strokeWidth={2} />
           </RailButton>
 
           <RailButton onClick={() => onShare(activePost)} ariaLabel="Share">
-            <Send size={25} stroke="#fff" strokeWidth={2} />
+            <Send size={32} stroke="#fff" strokeWidth={2} />
           </RailButton>
 
           {ownerMenu ? (
             <div style={{ filter: ICON_SHADOW, pointerEvents: 'auto' }}>{ownerMenu}</div>
           ) : (
             <RailButton onClick={onMore} ariaLabel="More options">
-              <MoreHorizontal size={25} stroke="#fff" strokeWidth={2} />
+              <MoreHorizontal size={32} stroke="#fff" strokeWidth={2} />
             </RailButton>
           )}
         </div>
       )}
+
     </div>
   );
 });
