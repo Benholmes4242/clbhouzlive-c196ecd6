@@ -795,7 +795,7 @@ export function FullscreenFeedOverlay() {
                     onLike={handleLike}
                     onComment={safeOpenComments}
                     onShare={handleShare}
-                    onMore={() => {}}
+                    onMore={() => setMoreOptionsOpen(true)}
                     getLikeState={getActiveLikeState}
                     getCommentCount={getCommentCount}
                     getFollowState={getFollowState}
