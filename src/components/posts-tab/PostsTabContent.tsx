@@ -341,43 +341,19 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
       )}
 
       {activePost && filteredPosts.length > 0 && (
-        <>
-          <Drawer open={moreOptionsOpen} onOpenChange={setMoreOptionsOpen}>
-            <DrawerContent
-              className="rounded-t-[20px]"
-              style={{ background: '#F8FAFC', border: 'none' }}
-            >
-              <div style={{ padding: '4px 0 0' }}>
-                <button
-                  onClick={() => handleReport(activePost)}
-                  style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', background: 'transparent', border: 'none', borderBottom: '0.5px solid rgba(15,23,42,0.07)', cursor: 'pointer', textAlign: 'left' }}
-                >
-                  <Flag className="w-5 h-5" style={{ color: 'rgba(15,23,42,0.35)' }} />
-                  <span style={{ fontSize: 15, color: '#0F172A', fontWeight: 500 }}>Report this post</span>
-                </button>
-                <button
-                  onClick={() => handleNotInterested(activePost)}
-                  style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', background: 'transparent', border: 'none', borderBottom: '0.5px solid rgba(15,23,42,0.07)', cursor: 'pointer', textAlign: 'left' }}
-                >
-                  <EyeOff className="w-5 h-5" style={{ color: 'rgba(15,23,42,0.35)' }} />
-                  <span style={{ fontSize: 15, color: '#0F172A', fontWeight: 500 }}>Not interested</span>
-                </button>
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(`${window.location.origin}/post/${activePost.id}`);
-                    toast.success('Link copied');
-                    setMoreOptionsOpen(false);
-                  }}
-                  style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left' }}
-                >
-                  <LinkIcon className="w-5 h-5" style={{ color: 'rgba(15,23,42,0.35)' }} />
-                  <span style={{ fontSize: 15, color: '#0F172A', fontWeight: 500 }}>Copy link</span>
-                </button>
-              </div>
-              <div className="h-[env(safe-area-inset-bottom,0px)]" style={{ minHeight: 16 }} />
-            </DrawerContent>
-          </Drawer>
-        </>
+        <MoreOptionsDrawer
+          open={moreOptionsOpen}
+          onOpenChange={setMoreOptionsOpen}
+          post={activePost}
+          currentUserId={user?.id}
+          onReport={() => handleReport(activePost)}
+          onNotInterested={() => handleNotInterested(activePost)}
+          onCopyLink={() => {
+            navigator.clipboard.writeText(`${window.location.origin}/post/${activePost.id}`);
+            toast.success('Link copied');
+            setMoreOptionsOpen(false);
+          }}
+        />
       )}
     </div>
   );
