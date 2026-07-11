@@ -201,7 +201,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                 {showGoogle && (
                   <button
                     type="button"
-                    onClick={onGoogleSignIn}
+                    onClick={requireAgreement(onGoogleSignIn)}
                     disabled={submitting}
                     aria-label="Continue with Google"
                     className="w-full flex items-center justify-center gap-2 rounded-[14px] transition-opacity active:opacity-85 disabled:opacity-60"
