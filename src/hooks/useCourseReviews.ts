@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useBlockedUserIds } from './useBlockedUserIds';
 
 export interface ReviewMediaItem {
   id: string;
@@ -60,9 +61,10 @@ export function useCourseReviews(
   currentUserId?: string
 ) {
   const filtersKey = filters ? JSON.stringify(filters) : 'none';
+  const blockedIds = useBlockedUserIds(currentUserId);
 
   return useQuery({
-    queryKey: ['course-reviews-full', courseId, sortBy, ratingFilter, filtersKey],
+    queryKey: ['course-reviews-full', courseId, sortBy, ratingFilter, filtersKey, blockedIds.size],
     enabled: Boolean(courseId),
     queryFn: async (): Promise<CourseReview[]> => {
       if (!courseId) return [];
@@ -172,7 +174,7 @@ export function useCourseReviews(
       if (error) throw error;
 
       // Transform to include media array with proper typing
-      const reviews = ((data as any) ?? []).map((review: any) => ({
+      const rawReviews = ((data as any) ?? []).map((review: any) => ({
         ...review,
         is_mock: review.is_mock ?? false,
         media: (review.course_review_media || []).map((m: any) => ({
@@ -180,6 +182,12 @@ export function useCourseReviews(
           media_type: m.media_type as 'image' | 'video',
         })),
       })) as CourseReview[];
+
+      // B3: hide reviews by blocked users (or users blocking me).
+      const reviews = blockedIds.size
+        ? rawReviews.filter((r) => !blockedIds.has(r.user_id))
+        : rawReviews;
+
 
       // If user is logged in, fetch their votes for these reviews
       if (currentUserId && reviews.length > 0) {

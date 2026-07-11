@@ -18,9 +18,17 @@ export const useBlockActions = ({ currentUserId }: UseBlockActionsProps) => {
     queryClient.invalidateQueries({ queryKey: ['following-list'] });
     queryClient.invalidateQueries({ queryKey: ['friends-list'] });
     queryClient.invalidateQueries({ queryKey: ['nearby-users'] });
-    // blockedIds is bidirectional in the discovery-exclusions bag; refresh
-    // so a just-(un)blocked user reappears/disappears from search + tabs.
     queryClient.invalidateQueries({ queryKey: ['discovery-exclusions'] });
+    // B3: blocking must instantly remove the blocked user's content across
+    // feed / comments / reviews / messages surfaces.
+    queryClient.invalidateQueries({ queryKey: ['blocked-user-ids'] });
+    queryClient.invalidateQueries({ queryKey: ['feed'] });
+    queryClient.invalidateQueries({ queryKey: ['suggested-feed'] });
+    queryClient.invalidateQueries({ queryKey: ['friends-feed'] });
+    queryClient.invalidateQueries({ queryKey: ['comments-v2'] });
+    queryClient.invalidateQueries({ queryKey: ['course-reviews'] });
+    queryClient.invalidateQueries({ queryKey: ['inbox-v2'] });
+    queryClient.invalidateQueries({ queryKey: ['thread-v2'] });
   };
 
   const blockUser = async (targetUserId: string) => {

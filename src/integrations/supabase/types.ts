@@ -2650,41 +2650,6 @@ export type Database = {
         }
         Relationships: []
       }
-      comment_likes: {
-        Row: {
-          actor_id: string
-          actor_type: string
-          comment_id: string
-          created_at: string
-          id: string
-          user_id: string
-        }
-        Insert: {
-          actor_id: string
-          actor_type: string
-          comment_id: string
-          created_at?: string
-          id?: string
-          user_id: string
-        }
-        Update: {
-          actor_id?: string
-          actor_type?: string
-          comment_id?: string
-          created_at?: string
-          id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "comment_likes_comment_id_fkey"
-            columns: ["comment_id"]
-            isOneToOne: false
-            referencedRelation: "post_comments"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       comment_likes_v2: {
         Row: {
           comment_id: string
@@ -2707,74 +2672,6 @@ export type Database = {
             columns: ["comment_id"]
             isOneToOne: false
             referencedRelation: "comments_v2"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      comment_notifications: {
-        Row: {
-          actor_user_id: string
-          comment_id: string
-          created_at: string
-          id: string
-          parent_comment_id: string | null
-          post_id: string
-          read_at: string | null
-          recipient_user_id: string
-          type: string
-        }
-        Insert: {
-          actor_user_id: string
-          comment_id: string
-          created_at?: string
-          id?: string
-          parent_comment_id?: string | null
-          post_id: string
-          read_at?: string | null
-          recipient_user_id: string
-          type: string
-        }
-        Update: {
-          actor_user_id?: string
-          comment_id?: string
-          created_at?: string
-          id?: string
-          parent_comment_id?: string | null
-          post_id?: string
-          read_at?: string | null
-          recipient_user_id?: string
-          type?: string
-        }
-        Relationships: []
-      }
-      comment_reactions: {
-        Row: {
-          comment_id: string
-          created_at: string
-          id: string
-          reaction_type: string
-          user_id: string
-        }
-        Insert: {
-          comment_id: string
-          created_at?: string
-          id?: string
-          reaction_type: string
-          user_id: string
-        }
-        Update: {
-          comment_id?: string
-          created_at?: string
-          id?: string
-          reaction_type?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "comment_reactions_comment_id_fkey"
-            columns: ["comment_id"]
-            isOneToOne: false
-            referencedRelation: "post_comments"
             referencedColumns: ["id"]
           },
         ]
@@ -4099,111 +3996,6 @@ export type Database = {
           route?: string
         }
         Relationships: []
-      }
-      editorial_card_comment_likes: {
-        Row: {
-          comment_id: string
-          created_at: string
-          id: string
-          user_id: string
-        }
-        Insert: {
-          comment_id: string
-          created_at?: string
-          id?: string
-          user_id: string
-        }
-        Update: {
-          comment_id?: string
-          created_at?: string
-          id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "editorial_card_comment_likes_comment_id_fkey"
-            columns: ["comment_id"]
-            isOneToOne: false
-            referencedRelation: "editorial_card_comments"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "editorial_card_comment_likes_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "gam_friend_handicap_leaderboard_view"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "editorial_card_comment_likes_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "public_golfer_blurbs"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "editorial_card_comment_likes_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "editorial_card_comment_likes_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      editorial_card_comments: {
-        Row: {
-          card_id: string
-          content: string
-          created_at: string
-          deleted_at: string | null
-          id: string
-          parent_id: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          card_id: string
-          content: string
-          created_at?: string
-          deleted_at?: string | null
-          id?: string
-          parent_id?: string | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          card_id?: string
-          content?: string
-          created_at?: string
-          deleted_at?: string | null
-          id?: string
-          parent_id?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "editorial_card_comments_card_id_fkey"
-            columns: ["card_id"]
-            isOneToOne: false
-            referencedRelation: "editorial_feed_cards"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "editorial_card_comments_parent_id_fkey"
-            columns: ["parent_id"]
-            isOneToOne: false
-            referencedRelation: "editorial_card_comments"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       editorial_card_likes: {
         Row: {
@@ -6841,6 +6633,30 @@ export type Database = {
         }
         Relationships: []
       }
+      moderation_banned_terms: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          severity: string
+          term: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          severity?: string
+          term: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          severity?: string
+          term?: string
+        }
+        Relationships: []
+      }
       news_articles: {
         Row: {
           created_at: string
@@ -7337,72 +7153,6 @@ export type Database = {
           },
         ]
       }
-      post_comments: {
-        Row: {
-          actor_id: string
-          actor_type: string
-          content: string
-          created_at: string
-          deleted_at: string | null
-          id: string
-          is_edited: boolean | null
-          media_type: string | null
-          media_url: string | null
-          parent_id: string | null
-          post_id: string
-          updated_at: string
-          user_id: string
-          voice_duration_seconds: number | null
-        }
-        Insert: {
-          actor_id: string
-          actor_type?: string
-          content: string
-          created_at?: string
-          deleted_at?: string | null
-          id?: string
-          is_edited?: boolean | null
-          media_type?: string | null
-          media_url?: string | null
-          parent_id?: string | null
-          post_id: string
-          updated_at?: string
-          user_id: string
-          voice_duration_seconds?: number | null
-        }
-        Update: {
-          actor_id?: string
-          actor_type?: string
-          content?: string
-          created_at?: string
-          deleted_at?: string | null
-          id?: string
-          is_edited?: boolean | null
-          media_type?: string | null
-          media_url?: string | null
-          parent_id?: string | null
-          post_id?: string
-          updated_at?: string
-          user_id?: string
-          voice_duration_seconds?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "post_comments_parent_id_fkey"
-            columns: ["parent_id"]
-            isOneToOne: false
-            referencedRelation: "post_comments"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "post_comments_post_id_fkey"
-            columns: ["post_id"]
-            isOneToOne: false
-            referencedRelation: "posts"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       post_courses: {
         Row: {
           course_id: string
@@ -7864,7 +7614,6 @@ export type Database = {
           audio_mode: string | null
           auto_hidden: boolean
           badges: string[]
-          caddie_pick_comment_id: string | null
           categories: string[]
           comment_count: number
           content: string | null
@@ -7899,7 +7648,6 @@ export type Database = {
           audio_mode?: string | null
           auto_hidden?: boolean
           badges?: string[]
-          caddie_pick_comment_id?: string | null
           categories?: string[]
           comment_count?: number
           content?: string | null
@@ -7934,7 +7682,6 @@ export type Database = {
           audio_mode?: string | null
           auto_hidden?: boolean
           badges?: string[]
-          caddie_pick_comment_id?: string | null
           categories?: string[]
           comment_count?: number
           content?: string | null
@@ -7975,13 +7722,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_achievements_view"
             referencedColumns: ["achievement_id"]
-          },
-          {
-            foreignKeyName: "posts_caddie_pick_comment_id_fkey"
-            columns: ["caddie_pick_comment_id"]
-            isOneToOne: false
-            referencedRelation: "post_comments"
-            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "posts_course_id_fkey"
@@ -8605,6 +8345,8 @@ export type Database = {
           is_high_priority: boolean
           reason: string
           reported_conversation_id: string | null
+          reported_message_id: string | null
+          reported_review_id: string | null
           reported_user_id: string | null
           reporter_id: string
           resolution_note: string | null
@@ -8619,6 +8361,8 @@ export type Database = {
           is_high_priority?: boolean
           reason: string
           reported_conversation_id?: string | null
+          reported_message_id?: string | null
+          reported_review_id?: string | null
           reported_user_id?: string | null
           reporter_id: string
           resolution_note?: string | null
@@ -8633,6 +8377,8 @@ export type Database = {
           is_high_priority?: boolean
           reason?: string
           reported_conversation_id?: string | null
+          reported_message_id?: string | null
+          reported_review_id?: string | null
           reported_user_id?: string | null
           reporter_id?: string
           resolution_note?: string | null
@@ -8640,7 +8386,22 @@ export type Database = {
           reviewed_by?: string | null
           status?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "reports_reported_message_id_fkey"
+            columns: ["reported_message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_reported_review_id_fkey"
+            columns: ["reported_review_id"]
+            isOneToOne: false
+            referencedRelation: "course_ratings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       review_responses: {
         Row: {
@@ -11178,110 +10939,6 @@ export type Database = {
           tournament_id?: string
         }
         Relationships: []
-      }
-      top_ten_comments: {
-        Row: {
-          body: string
-          commenter_id: string
-          course_id: string
-          created_at: string | null
-          id: string
-          is_deleted: boolean | null
-          parent_id: string | null
-          target_user_id: string
-        }
-        Insert: {
-          body: string
-          commenter_id: string
-          course_id: string
-          created_at?: string | null
-          id?: string
-          is_deleted?: boolean | null
-          parent_id?: string | null
-          target_user_id: string
-        }
-        Update: {
-          body?: string
-          commenter_id?: string
-          course_id?: string
-          created_at?: string | null
-          id?: string
-          is_deleted?: boolean | null
-          parent_id?: string | null
-          target_user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "top_ten_comments_commenter_id_profiles_fkey"
-            columns: ["commenter_id"]
-            isOneToOne: false
-            referencedRelation: "gam_friend_handicap_leaderboard_view"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "top_ten_comments_commenter_id_profiles_fkey"
-            columns: ["commenter_id"]
-            isOneToOne: false
-            referencedRelation: "public_golfer_blurbs"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "top_ten_comments_commenter_id_profiles_fkey"
-            columns: ["commenter_id"]
-            isOneToOne: false
-            referencedRelation: "public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "top_ten_comments_commenter_id_profiles_fkey"
-            columns: ["commenter_id"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "top_ten_comments_course_id_fkey"
-            columns: ["course_id"]
-            isOneToOne: false
-            referencedRelation: "golf_courses"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "top_ten_comments_parent_id_fkey"
-            columns: ["parent_id"]
-            isOneToOne: false
-            referencedRelation: "top_ten_comments"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "top_ten_comments_target_user_id_profiles_fkey"
-            columns: ["target_user_id"]
-            isOneToOne: false
-            referencedRelation: "gam_friend_handicap_leaderboard_view"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "top_ten_comments_target_user_id_profiles_fkey"
-            columns: ["target_user_id"]
-            isOneToOne: false
-            referencedRelation: "public_golfer_blurbs"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "top_ten_comments_target_user_id_profiles_fkey"
-            columns: ["target_user_id"]
-            isOneToOne: false
-            referencedRelation: "public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "top_ten_comments_target_user_id_profiles_fkey"
-            columns: ["target_user_id"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       top_ten_reactions: {
         Row: {
@@ -15470,44 +15127,6 @@ export type Database = {
           },
         ]
       }
-      creator_quality_scores: {
-        Row: {
-          last_post_at: string | null
-          post_count: number | null
-          quality_score: number | null
-          user_id: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "posts_user_profile_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "gam_friend_handicap_leaderboard_view"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "posts_user_profile_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "public_golfer_blurbs"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "posts_user_profile_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "posts_user_profile_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       explore_moments: {
         Row: {
           aspect_ratio: number | null
@@ -16627,6 +16246,7 @@ export type Database = {
         Returns: undefined
       }
       compute_player_ratings: { Args: never; Returns: undefined }
+      contains_banned_term: { Args: { _text: string }; Returns: boolean }
       count_orphan_posts: { Args: never; Returns: number }
       create_business_account: {
         Args: {
@@ -16995,6 +16615,12 @@ export type Database = {
           profile_created_at: string
           role: Database["public"]["Enums"]["app_role"]
           username: string
+        }[]
+      }
+      get_blocked_user_ids: {
+        Args: { _user_id: string }
+        Returns: {
+          blocked_id: string
         }[]
       }
       get_business_access_level: {

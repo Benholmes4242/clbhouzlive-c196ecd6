@@ -133,16 +133,19 @@ export const MessageBubble: React.FC<Props> = ({
         marginTop: isFirstOfRun ? 10 : 3,
       }}
     >
+      {!isOutgoing && !isDeleted && (
+        <button
+          type="button"
+          onClick={() => setShowReport(true)}
+          aria-label="Report message"
+          style={{ position: "absolute", left: -28, top: "50%", transform: "translateY(-50%)", background: "transparent", border: "none", padding: 4, color: HINT, cursor: "pointer" }}
+        >
+          <Flag size={14} />
+        </button>
+      )}
       <div
-        style={{ position: "relative", 
-        {!isOutgoing && !isDeleted && (
-          <button 
-            onClick={() => setShowReport(true)}
-            style={{ position: "relative",  background: "transparent", border: "none", padding: "4px", color: HINT, cursor: "pointer", position: "absolute", left: "-28px", top: "50%", transform: "translateY(-50%)" }}
-          >
-            <Flag size={14} />
-          </button>
-        )}
+        style={{
+          position: "relative",
           maxWidth: '78%',
           background: isDeleted ? 'transparent' : bg,
           color: fg,
@@ -358,7 +361,7 @@ export const MessageBubble: React.FC<Props> = ({
           open={showReport}
           onOpenChange={setShowReport}
           reportType="message"
-          reportedUserId={message.sender_id}
+          reportedUserId={message.sender_user_id ?? undefined}
           reportedConversationId={message.conversation_id}
           reportedMessageId={message.id}
         />
@@ -366,27 +369,7 @@ export const MessageBubble: React.FC<Props> = ({
       {viewer
         ? createPortal(
             <MediaPreviewViewer
-      {!isOutgoing && !isDeleted && (
-        <ReportSheet
-          open={showReport}
-          onOpenChange={setShowReport}
-          reportType="message"
-          reportedUserId={message.sender_id}
-          reportedConversationId={message.conversation_id}
-          reportedMessageId={message.id}
-        />
-      )}
               items={viewer.items}
-      {!isOutgoing && !isDeleted && (
-        <ReportSheet
-          open={showReport}
-          onOpenChange={setShowReport}
-          reportType="message"
-          reportedUserId={message.sender_id}
-          reportedConversationId={message.conversation_id}
-          reportedMessageId={message.id}
-        />
-      )}
               initialIndex={viewer.index}
               onClose={() => setViewer(null)}
             />,
