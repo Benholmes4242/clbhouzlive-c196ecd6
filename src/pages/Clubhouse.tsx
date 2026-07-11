@@ -659,42 +659,19 @@ const ClubhouseContent = () => {
       {/* ═══ COMMENTS + MORE OPTIONS ═══ */}
       {activePost && posts.length > 0 && commentsMounted && (
         <>
-          <CommentsSheet
-            isOpen={commentsOpen}
-            onClose={closeComments}
-            postId={
-              activePost.postType === 'course_of_week_card'
-                ? (activePost as any).cardData.cardId
-                : activePost.id
-            }
-            currentUserId={user?.id}
-            creatorUserId={activePost.userId}
-            creatorName={
-              ['pga_card', 'course_of_week_card'].includes(activePost.postType ?? '')
-                ? 'Clbhouz'
-                : activePost.displayName
-            }
-            creatorAvatar={activePost.avatarUrl}
-            caption={activePost.caption}
-            theme="light"
-            likesCount={
-              activePost.postType === 'course_of_week_card'
-                ? (editorialLikeCount ?? 0)
-                : activeLikeState?.count ?? null
-            }
-            likeSource={
-              activePost.postType === 'course_of_week_card'
-                ? 'editorial'
-                : 'post'
-            }
-            editorialCardId={
-              activePost.postType === 'course_of_week_card'
-                ? (activePost as any).cardData.cardId
-                : undefined
-            }
-            onCommentPosted={() => handleCommentPosted(activePost)}
-            onCommentDeleted={() => activePost && handleCommentDeleted(activePost.id, activePost.commentCount)}
-          />
+          {(() => {
+            const isEditorial = activePost.postType === 'course_of_week_card';
+            const editorialId = isEditorial ? (activePost as any).cardData?.cardId : null;
+            return (
+              <CommentsSheetV2
+                isOpen={commentsOpen}
+                onClose={closeComments}
+                targetType={isEditorial ? 'editorial' : 'post'}
+                targetId={isEditorial ? (editorialId ?? '') : activePost.id}
+              />
+            );
+          })()}
+
           <MoreOptionsDrawer
             open={moreOptionsOpen}
             onOpenChange={setMoreOptionsOpen}
