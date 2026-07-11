@@ -3,7 +3,7 @@
  * and editorial cards. Fetches via useCommentsV2 (RPC-only writes); realtime
  * merges via useCommentsRealtimeV2.
  *
- * Design: light canvas #F8FAFC, amber eyebrow "CLUBHOUSE CHAT", conversation
+ * Design: light canvas #F8FAFC, amber eyebrow "CLBHOUZ CHAT", conversation
  * cards on white with hairline borders. Keyboard-aware via useKeyboardHeight.
  */
 import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
@@ -226,7 +226,7 @@ function CommentsSheetV2Inner({
                   fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em',
                   textTransform: 'uppercase', color: AMBER, lineHeight: 1,
                 }}>
-                  CLUBHOUSE CHAT
+                  CLBHOUZ CHAT
                 </div>
                 <div style={{ marginTop: 4, fontSize: 17, fontWeight: 800, color: INK, letterSpacing: '-0.01em' }}>
                   {totalCount} {totalCount === 1 ? 'comment' : 'comments'}
