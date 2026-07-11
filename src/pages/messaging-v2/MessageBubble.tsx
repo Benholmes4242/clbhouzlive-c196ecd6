@@ -343,13 +343,16 @@ export const MessageBubble: React.FC<Props> = ({
         </div>
       ) : null}
 
-      {viewer ? (
-        <MediaPreviewViewer
-          items={viewer.items}
-          initialIndex={viewer.index}
-          onClose={() => setViewer(null)}
-        />
-      ) : null}
+      {viewer
+        ? createPortal(
+            <MediaPreviewViewer
+              items={viewer.items}
+              initialIndex={viewer.index}
+              onClose={() => setViewer(null)}
+            />,
+            document.body,
+          )
+        : null}
     </div>
   );
 };
