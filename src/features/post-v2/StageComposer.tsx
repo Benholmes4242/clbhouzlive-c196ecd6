@@ -38,6 +38,7 @@ import DraftsSheetV2 from './components/DraftsSheetV2';
 import ScheduledPostsSheetV2 from './components/ScheduledPostsSheetV2';
 import MediaTrimSheet from './components/MediaTrimSheet';
 import CoverFrameSheet from './components/CoverFrameSheet';
+import AdjustSheet from './components/AdjustSheet';
 import PostSuccessV2 from './components/PostSuccessV2';
 import BottomSheet from './components/BottomSheet';
 
@@ -142,7 +143,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
     return () => { cancelled = true; };
   }, [draftId, isEditMode, profile?.id, restoreDraft]);
 
-  const [sheet, setSheet] = useState<null | 'course' | 'actor' | 'schedule' | 'drafts' | 'scheduled' | 'trim' | 'cover' | 'close-guard'>(null);
+  const [sheet, setSheet] = useState<null | 'course' | 'actor' | 'schedule' | 'drafts' | 'scheduled' | 'trim' | 'cover' | 'adjust' | 'close-guard'>(null);
   const [success, setSuccess] = useState<SubmitResult | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [scheduledCount, setScheduledCount] = useState<number>(0);
@@ -391,7 +392,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
           item={active}
           index={state.activeIndex}
           total={state.media.length}
-          onOpenAdjust={() => toast('Adjust: crop/reposition (P3)')}
+          onOpenAdjust={() => setSheet('adjust')}
           onOpenTrim={() => setSheet('trim')}
           onOpenCover={() => setSheet('cover')}
           onRequestAdd={handleStageAdd}
@@ -462,6 +463,12 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
         onClose={() => setSheet(null)}
         item={active}
         onApply={(ts) => updateActive({ posterTimestamp: ts })}
+      />
+      <AdjustSheet
+        open={sheet === 'adjust'}
+        onClose={() => setSheet(null)}
+        item={active}
+        onApply={(crop) => updateActive({ crop })}
       />
 
       {/* Close guard */}
