@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Users } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useFriendsWhoPlayedCourse } from '@/hooks/useFriendsWhoPlayedCourse';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -30,10 +31,6 @@ export const CourseFriendsStrip: React.FC<CourseFriendsStripProps> = ({ courseId
         ).toFixed(1)
       : null;
 
-  const subtitle = friendsAvgScore
-    ? `${totalFriends} friends played · Avg ${friendsAvgScore}`
-    : `${totalFriends} ${totalFriends === 1 ? 'friend' : 'friends'} played here`;
-
   return (
     <button
       type="button"
@@ -41,79 +38,92 @@ export const CourseFriendsStrip: React.FC<CourseFriendsStripProps> = ({ courseId
       style={{
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '14px 16px',
-        background: '#ffffff',
-        border: '1px solid rgba(15,23,42,0.07)',
-        borderRadius: 12,
+        gap: 14,
+        padding: 16,
+        borderRadius: 18,
         margin: '0 16px',
-        boxShadow: '0 1px 4px rgba(15,23,42,0.04)',
+        width: 'calc(100% - 32px)',
         cursor: 'pointer',
         textAlign: 'left',
-        width: 'calc(100% - 32px)',
+        background: 'linear-gradient(135deg, rgba(247,147,30,0.07), rgba(247,147,30,0.02))',
+        border: '1.5px solid rgba(247,147,30,0.15)',
       }}
     >
-      <div style={{ minWidth: 0, flex: 1 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: '#0F172A' }}>
-          Friends who've played here
-        </div>
-        <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 2 }}>{subtitle}</div>
+      {/* Amber gradient icon square (journey-hero language) */}
+      <div style={{
+        width: 46, height: 46, borderRadius: 13, flexShrink: 0,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: 'linear-gradient(135deg, #F7931E, #FBBC2E)', color: '#fff',
+      }}>
+        <Users size={22} strokeWidth={2} />
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+      {/* Copy */}
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <div style={{ fontSize: 15, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.01em' }}>
+          Friends who've played here
+        </div>
+        <div style={{ fontSize: 12.5, color: '#64748B', marginTop: 2 }}>
+          {totalFriends} {totalFriends === 1 ? 'friend' : 'friends'} played this course
+        </div>
+      </div>
+
+      {/* Right cluster: facepile + avg badge */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
         <div style={{ display: 'flex' }}>
-          {/* Facepile: solid surface-colour ring for overlap separation -- deliberate exception to the hairlineRing canon. */}
           {visibleFriends.map((friend, index) => {
             const displayName = friend.profile.display_name || friend.profile.username || '?';
             const initial = displayName[0]?.toUpperCase() || '?';
-
             return friend.profile.profile_photo_url ? (
               <SquircleAvatar
                 key={friend.user_id}
                 src={friend.profile.profile_photo_url}
                 alt={displayName}
-                size={28}
-                ringColor="#FFFFFF"
-                className={index > 0 ? '-ml-1.5' : ''}
+                size={30}
+                ringColor="#FEF7EE"
+                className={index > 0 ? '-ml-2' : ''}
               />
             ) : (
               <SquircleAvatar
                 key={friend.user_id}
-                size={28}
+                size={30}
                 alt={displayName}
                 fallback={initial}
-                ringColor="#FFFFFF"
-                className={index > 0 ? '-ml-1.5' : ''}
+                ringColor="#FEF7EE"
+                className={index > 0 ? '-ml-2' : ''}
               />
             );
           })}
-
-
           {overflowCount > 0 && (
             <div
-              className="-ml-1.5"
+              className="-ml-2"
               style={{
-                minWidth: 28,
-                height: 28,
-                borderRadius: '50%',
-                background: 'rgba(15,23,42,0.06)',
-                color: '#64748B',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 10,
-                fontWeight: 700,
-                padding: '0 6px',
-                border: '1px solid #F8FAFC',
-                flexShrink: 0,
+                minWidth: 30, height: 30, borderRadius: '34%',
+                background: 'rgba(247,147,30,0.14)',
+                border: '2px solid #FEF7EE',
+                color: '#F7931E',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 10.5, fontWeight: 800, padding: '0 6px', flexShrink: 0,
               }}
             >
               +{overflowCount}
             </div>
           )}
         </div>
-
-        <span style={{ fontSize: 16, color: '#CBD5E1', marginLeft: 4 }}>›</span>
+        {friendsAvgScore && (
+          <div style={{
+            display: 'flex', flexDirection: 'column', alignItems: 'center',
+            padding: '6px 11px', borderRadius: 12,
+            background: 'rgba(247,147,30,0.12)',
+          }}>
+            <span style={{ fontSize: 15, fontWeight: 800, color: '#F7931E', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+              {friendsAvgScore}
+            </span>
+            <span style={{ fontSize: 8.5, fontWeight: 700, letterSpacing: '0.06em', color: '#F7931E', opacity: 0.75, marginTop: 2, textTransform: 'uppercase' }}>
+              Avg
+            </span>
+          </div>
+        )}
       </div>
     </button>
   );
