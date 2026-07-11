@@ -117,11 +117,40 @@ import { useSupabaseSession } from "@/hooks/useSupabaseSession";
 import { useSuspensionStatus } from "@/hooks/useSuspensionStatus";
 import SuspendedScreen from "@/components/SuspendedScreen";
 
+import { isNativeAppSync, isPreviewHost, waitForNativeBridge } from '@/utils/native/isNativeApp';
+import AppDownloadGate from '@/pages/AppDownloadGate';
+
 const RootGate: React.FC = () => {
   const { user, loading: authLoading } = useSupabaseSession();
-
-  // Suspension gate hook must be called unconditionally to respect hooks order.
   const suspension = useSuspensionStatus(user?.id);
+
+  // Native / preview status is decided ONCE per session.
+  // - 'native' or 'preview' → full app flow (existing behavior).
+  // - 'web' → AppDownloadGate.
+  // - 'pending' → BootHold while we wait up to ~2s for a late-injecting
+  //   Median bridge (iPad); this covers the reviewer's failure mode.
+  const [envStatus, setEnvStatus] = React.useState<'pending' | 'native' | 'preview' | 'web'>(
+    () => {
+      if (isNativeAppSync()) return 'native';
+      if (isPreviewHost()) return 'preview';
+      return 'pending';
+    },
+  );
+
+  React.useEffect(() => {
+    if (envStatus !== 'pending') return;
+    let cancelled = false;
+    waitForNativeBridge(2000).then((isNative) => {
+      if (cancelled) return;
+      setEnvStatus(isNative ? 'native' : 'web');
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [envStatus]);
+
+  if (envStatus === 'pending') return <BootHold />;
+  if (envStatus === 'web') return <AppDownloadGate />;
 
   if (authLoading) return <BootHold />;
   if (!user) return <Navigate to="/auth" replace />;
