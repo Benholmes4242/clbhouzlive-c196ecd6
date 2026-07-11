@@ -78,16 +78,7 @@ export function CircleActivityStrip({ userId }: Props) {
 
   const rows = useMemo(() => data ?? [], [data]);
 
-  const Header = (
-    <SectionHeader
-      role="section"
-      kicker="YOUR CIRCLE"
-      title="Your friends"
-      sub="What your circle's been pulling off"
-      paddingTop={10}
-      paddingX={16}
-    />
-  );
+  const Header = <AlmanacHead title="Your friends" />;
 
   if (isLoading) {
     return (

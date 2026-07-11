@@ -162,48 +162,15 @@ function FeatTierRailInner({ region, tier, title }: TierProps) {
   const { data, isLoading } = useRegionFeats(region, tier);
   const rows = data ?? [];
 
+  const tierDot =
+    tier === 'legendary' ? '#FBBC2E'
+    : tier === 'records' ? '#7DD3FC'
+    : tier === 'eagles' ? '#22C55E'
+    : '#F7931E';
+
   return (
     <section style={{ fontFamily: FONT, paddingTop: 4 }}>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          padding: '10px 16px 8px',
-        }}
-      >
-        <span
-          aria-hidden
-          style={{
-            width: 8,
-            height: 8,
-            borderRadius: 999,
-            background:
-              tier === 'legendary' ? '#FBBC2E'
-              : tier === 'records' ? '#3B82F6'
-              : tier === 'eagles' ? '#10B981'
-              : '#F7931E',
-          }}
-        />
-        <h3
-          style={{
-            margin: 0,
-            fontFamily: FONT,
-            fontSize: 16,
-            fontWeight: 800,
-            color: INK,
-            letterSpacing: '-0.01em',
-            flex: 1,
-          }}
-        >
-          {title}
-        </h3>
-        {rows.length > 0 && (
-          <span style={{ fontSize: 12, fontWeight: 700, color: INK_MUTE }}>
-            {rows.length}
-          </span>
-        )}
-      </div>
+      <AlmanacHead title={title} dot={tierDot} />
 
       {isLoading ? (
         <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
