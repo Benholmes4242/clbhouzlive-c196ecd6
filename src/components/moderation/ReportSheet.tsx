@@ -1,9 +1,9 @@
 /**
- * ReportSheet - Report a user or group
+ * ReportSheet - Report a user, group, review, or message
  */
 
 import { useState } from 'react';
-import { Flag, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -23,7 +23,9 @@ interface ReportSheetProps {
   onOpenChange: (open: boolean) => void;
   reportedUserId?: string;
   reportedConversationId?: string;
-  reportType: 'user' | 'group';
+  reportedReviewId?: string;
+  reportedMessageId?: string;
+  reportType: 'user' | 'group' | 'review' | 'message';
 }
 
 const REPORT_REASONS = [
@@ -39,6 +41,8 @@ export function ReportSheet({
   onOpenChange,
   reportedUserId,
   reportedConversationId,
+  reportedReviewId,
+  reportedMessageId,
   reportType,
 }: ReportSheetProps) {
   const [selectedReason, setSelectedReason] = useState<string | null>(null);
@@ -51,12 +55,19 @@ export function ReportSheet({
     haptic('light');
     setSubmitting(true);
 
+    let finalDetails = details.trim() || null;
+    if (reportedReviewId) {
+      finalDetails = `[REVIEW:${reportedReviewId}] ${finalDetails || ''}`.trim();
+    } else if (reportedMessageId) {
+      finalDetails = `[MSG:${reportedMessageId}] ${finalDetails || ''}`.trim();
+    }
+
     try {
       const { error } = await supabase.rpc('submit_report', {
         p_reported_user_id: reportedUserId || null,
         p_reported_conversation_id: reportedConversationId || null,
         p_reason: selectedReason,
-        p_details: details.trim() || null,
+        p_details: finalDetails,
       });
 
       if (error) throw error;
@@ -76,12 +87,17 @@ export function ReportSheet({
     }
   };
 
+  const typeLabel = 
+    reportType === 'group' ? 'Group' : 
+    reportType === 'review' ? 'Review' :
+    reportType === 'message' ? 'Message' : 'User';
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8 max-h-[80vh] overflow-y-auto">
         <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.12)', margin: '10px auto 0' }} />
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 16px 14px', borderBottom: `0.5px solid ${HAIRLINE_INK_7}` }}>
-          <SectionHeader tier="standard" kicker={`Report ${reportType === 'group' ? 'Group' : 'User'}`} tone="danger" />
+          <SectionHeader tier="standard" kicker={`Report ${typeLabel}`} tone="danger" />
         </div>
 
         <div className="space-y-4">
@@ -94,7 +110,7 @@ export function ReportSheet({
             {REPORT_REASONS.map((reason) => (
               <button
                 key={reason.id}
-              onClick={() => {
+                onClick={() => {
                   haptic('light');
                   setSelectedReason(reason.id);
                 }}
