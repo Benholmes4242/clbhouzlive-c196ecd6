@@ -290,19 +290,8 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
 
       </div>
 
-      {/* ─── BOTTOM scrim ──────────────────────────────────────── */}
-      <div
-        aria-hidden
-        style={{
-          position: 'fixed',
-          left: 0, right: 0, bottom: 0,
-          height: 'calc(max(env(safe-area-inset-bottom, 0px), 24px) + 130px)',
-          background:
-            'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.72) 45%, rgba(0,0,0,0.55) 100%)',
-          pointerEvents: 'none',
-          zIndex: 0,
-        }}
-      />
+      {/* Bottom scrim removed — author strip + action rail sit on the
+          blurred backdrop; each element carries its own drop-shadow. */}
 
       {/* Carousel dots — bottom-center, above scrubber (~16px from bottom) */}
       {mediaCount > 1 && (
