@@ -20,10 +20,10 @@ interface Props {
 export default function DetailRows({ course, onOpenCourse, actor, onOpenActor, scheduledAt, onOpenSchedule, actorLocked, showSchedule = true }: Props) {
   return (
     <div style={{ background: '#F8FAFC' }}>
-      <Row icon={<MapPin size={16} />} label="Tag a course" value={course?.name ?? null} onClick={onOpenCourse} />
-      <Row icon={<User2 size={16} />} label="Posting as" value={actor?.name ?? null} onClick={onOpenActor} disabled={actorLocked} />
+      <Row icon={<MapPin size={16} color="#F7931E" />} label="Tag a course" value={course?.name ?? null} onClick={onOpenCourse} />
+      <Row icon={<User2 size={16} color="#F7931E" />} label="Posting as" value={actor?.name ?? null} onClick={onOpenActor} disabled={actorLocked} />
       {showSchedule && (
-        <Row icon={<Clock size={16} />} label="Schedule for later" value={scheduledAt ? formatSchedule(scheduledAt) : null} onClick={onOpenSchedule} />
+        <Row icon={<Clock size={16} color="#F7931E" />} label="Schedule for later" value={scheduledAt ? formatSchedule(scheduledAt) : null} onClick={onOpenSchedule} />
       )}
     </div>
   );
