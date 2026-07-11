@@ -177,27 +177,21 @@ function SectionEyebrow({
 function LiveChip() {
   return (
     <span
+      className="animate-pulse"
       style={{
         display: 'inline-flex',
         alignItems: 'center',
-        gap: 4,
-        padding: '2px 7px',
+        gap: 6,
+        padding: '4px 10px',
         borderRadius: 999,
-        background: '#DC2626',
+        background: '#22C55E',
         color: '#fff',
-        fontSize: 9.5,
-        fontWeight: 800,
-        letterSpacing: '0.1em',
+        fontSize: 11,
+        fontWeight: 600,
+        letterSpacing: '0.02em',
       }}
     >
-      <span
-        style={{
-          width: 5,
-          height: 5,
-          borderRadius: '50%',
-          background: '#fff',
-        }}
-      />
+      <Zap style={{ width: 12, height: 12 }} />
       LIVE
     </span>
   );
