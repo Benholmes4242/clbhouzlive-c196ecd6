@@ -16,8 +16,11 @@ function Tile({ row }: { row: MixedGridRow }) {
   const navigate = useNavigate();
   const isClip = row.derived_format === 'clip';
   const aspect = isClip ? '9 / 14' : '16 / 9';
+  const stripped = row.post_content
+    ? stripMentionMarkup(String(row.post_content)).trim()
+    : '';
   const title =
-    row.post_content?.trim() ||
+    stripped ||
     row.course_name?.trim() ||
     (isClip ? 'Clip' : 'Video');
   const duration = formatDuration(row.duration_seconds);
