@@ -37,7 +37,7 @@ export function CollegeFranchiseSection() {
     <SectionShell eyebrow="College franchise" linkLabel="Franchise" onLinkClick={() => navigate('/tourhub/college-golf')}>
       <div style={{ margin: '0 16px 4px', background: V4.surface, border: `0.5px solid ${V4.hairline}`, borderRadius: 14, padding: 14 }}>
         <div style={{ fontSize: 14, fontWeight: 800, color: V4.ink, letterSpacing: '-0.01em', marginBottom: 10 }}>
-          {a?.college_name} vs {b?.college_name}
+          {a?.normalized_name} vs {b?.normalized_name}
         </div>
         {/* Tug bar */}
         <div style={{ position: 'relative', height: 8, borderRadius: 999, background: V4.hairline, overflow: 'hidden' }}>
@@ -46,15 +46,15 @@ export function CollegeFranchiseSection() {
         </div>
         <div style={{ marginTop: 12 }}>
           {top5.map((c: any, i: number) => (
-            <div key={c.college_id ?? i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0', borderTop: i === 0 ? 'none' : `0.5px solid ${V4.hairline}` }}>
+            <div key={c.id ?? i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0', borderTop: i === 0 ? 'none' : `0.5px solid ${V4.hairline}` }}>
               <div style={{ width: 20, textAlign: 'center', fontSize: 11, fontWeight: 800, color: V4.ink, fontVariantNumeric: 'tabular-nums' }}>
                 {i + 1}
               </div>
               <div style={{ flex: 1, fontSize: 13, fontWeight: 700, color: V4.ink }}>
-                {c.college_name}
+                {c.normalized_name}
               </div>
               <div style={{ fontSize: 12, color: V4.inkSoft, fontVariantNumeric: 'tabular-nums' }}>
-                {c.total_wins ?? c.wins ?? 0} W
+                {c.wins_total ?? 0} W
               </div>
             </div>
           ))}
