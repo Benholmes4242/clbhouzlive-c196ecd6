@@ -110,7 +110,7 @@ export function FeatCard({ row, tier, onTap }: Props) {
   const valueColor = isLegendary ? '#FBBC2E' : dotColor;
   const chipBg = isLegendary ? 'rgba(251,188,46,0.14)' : 'rgba(15,23,42,0.05)';
   const chipText = isLegendary ? '#FBBC2E' : INK;
-  const metaColor = isLegendary ? 'rgba(255,255,255,0.55)' : INK_MUTE;
+  
 
   return (
     <button
