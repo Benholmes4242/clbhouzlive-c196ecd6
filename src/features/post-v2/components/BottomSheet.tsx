@@ -45,7 +45,7 @@ export default function BottomSheet({ open, title, onClose, children, fullHeight
           flexDirection: 'column',
           overflow: 'hidden',
           boxShadow: '0 -8px 24px rgba(15,17,23,0.18)',
-          paddingBottom: fullHeight ? undefined : 'env(safe-area-inset-bottom, 0px)',
+          paddingBottom: (fullHeight || fixedHeight) ? undefined : 'env(safe-area-inset-bottom, 0px)',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '8px 0 4px' }}>
