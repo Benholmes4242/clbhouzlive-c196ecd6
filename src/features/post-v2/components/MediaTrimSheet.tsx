@@ -57,5 +57,6 @@ export default function MediaTrimSheet({ open, onClose, item, onApply }: Props) 
 }
 
 const label: React.CSSProperties = { display: 'flex', flexDirection: 'column', gap: 6, fontSize: 12, color: '#1F2428' };
+const rangeInput: React.CSSProperties = { width: '100%', accentColor: '#15171F', cursor: 'pointer' };
 const btnGhost: React.CSSProperties = { flex: 1, background: '#fff', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 12, padding: '10px', fontSize: 14, cursor: 'pointer' };
 const btnDark: React.CSSProperties = { flex: 1, background: '#15171F', color: '#F5F6F7', border: 0, borderRadius: 12, padding: '10px', fontSize: 14, fontWeight: 600, cursor: 'pointer' };
