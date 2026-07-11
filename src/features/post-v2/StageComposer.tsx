@@ -19,6 +19,8 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
+import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
+import { applyRouteChrome } from '@/lib/routeChrome';
 
 import { useStageComposer, type StageMediaItem } from './hooks/useStageComposer';
 import { usePostSubmit, type SubmitResult } from './hooks/usePostSubmit';
