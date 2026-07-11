@@ -319,8 +319,9 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
               }}
               style={{
                 position: 'relative',
-                aspectRatio: '1',
-                borderRadius: 10,
+                ...(isHero
+                  ? { gridRow: '1 / span 2', height: '100%', borderRadius: 14 }
+                  : { aspectRatio: '1', borderRadius: isMobile ? 12 : 10 }),
                 overflow: 'hidden',
                 padding: 0,
                 border: 'none',
