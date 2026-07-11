@@ -341,6 +341,14 @@ export const MessageBubble: React.FC<Props> = ({
           ) : null}
         </div>
       ) : null}
+
+      {viewer ? (
+        <MediaPreviewViewer
+          items={viewer.items}
+          initialIndex={viewer.index}
+          onClose={() => setViewer(null)}
+        />
+      ) : null}
     </div>
   );
 };
