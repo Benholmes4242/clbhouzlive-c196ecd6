@@ -18,7 +18,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Search } from 'lucide-react';
 // Shield writes owned solely by AppRoutes; no direct applyShieldColor here.
 import { setFloatingHeaderActive } from '@/features/tourhub/_shared/floatingHeaderSignal';
-import GlobalSearchOverlay from '@/components/search/GlobalSearchOverlay';
+import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import { PostingAsPill } from './PostingAsPill';
 import { PostingAsMenu } from './PostingAsMenu';
 import { HandicapChip } from './HandicapChip';
@@ -183,7 +183,7 @@ export const FloatingPageHeader: React.FC<FloatingPageHeaderProps> = ({
         </div>
       </div>
 
-      <GlobalSearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+      <SearchOverlayV2 isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
       <PostingAsMenu
         isOpen={menuOpen}
         onClose={() => setMenuOpen(false)}

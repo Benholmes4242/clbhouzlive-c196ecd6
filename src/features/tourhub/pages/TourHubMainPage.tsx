@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import GlobalSearchOverlay from '@/components/search/GlobalSearchOverlay';
+import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import { TourHubShell } from '../components/TourHubShell';
 import { TourHubShellTabs } from '../components/TourHubShellTabs';
 import { ShellSlot } from '@/components/header/ShellSlot';
@@ -137,7 +137,7 @@ export function TourHubMainPage() {
               onMenuTap={() => setMenuOpen(true)}
               onSearchTap={() => setSearchOpen(true)}
             />
-            <GlobalSearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+            <SearchOverlayV2 isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
 
             <TourSideMenu
               open={menuOpen}

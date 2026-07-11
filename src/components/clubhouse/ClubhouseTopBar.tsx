@@ -13,7 +13,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { PostingAsPill } from '@/components/header/PostingAsPill';
 import { PostingAsMenu } from '@/components/header/PostingAsMenu';
-import GlobalSearchOverlay from '@/components/search/GlobalSearchOverlay';
+import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import { ClubhouseTabToggle, type ClubhouseTab } from '@/components/clubhouse/ClubhouseTabToggle';
 import { HandicapChip } from '@/components/header/HandicapChip';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
@@ -173,7 +173,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
 
       {/* Search Overlay */}
       {!hideSearch && (
-        <GlobalSearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+        <SearchOverlayV2 isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
       )}
     </>
   );

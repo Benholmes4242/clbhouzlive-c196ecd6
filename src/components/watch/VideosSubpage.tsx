@@ -4,8 +4,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import PageRoot from '@/components/layout/PageRoot';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
-import SearchOverlay from '@/components/shared/SearchOverlay';
-import { useRecentSearches } from '@/hooks/useRecentSearches';
+import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import ShellSlot from '@/components/header/ShellSlot';
 
 import { useVideosMood } from '@/components/watch/videos/hooks/useVideosMood';
@@ -13,10 +12,6 @@ import { VideosMoodChips } from '@/components/watch/videos/VideosMoodChips';
 import { VideosFullFeed } from '@/components/watch/videos/VideosFullFeed';
 
 const CREAM = '#F8FAFC';
-
-const TRENDING = [
-  'Course Vlogs', 'Coaching', 'Rory', 'Masters', 'Wedge Play', 'Putting',
-];
 
 export default function VideosSubpage() {
   const navigationType = useNavigationType();
@@ -28,8 +23,6 @@ export default function VideosSubpage() {
   const [committedQuery, setCommittedQuery] = useState('');
   const isSearching = committedQuery.length > 0;
 
-  const { recentSearches, addSearch, removeSearch, clearAll } =
-    useRecentSearches('videos-recent-searches');
 
   const handleSearchOpen = () => {
     setSearchOpen(true);
@@ -74,21 +67,15 @@ export default function VideosSubpage() {
 
         <ScrollToTopGlass />
 
-        <SearchOverlay
+        <SearchOverlayV2
           isOpen={searchOpen}
           onClose={() => setSearchOpen(false)}
-          placeholder="Search videos..."
-          onSearch={() => { /* input-only sheet; commit filters the page */ }}
+          mode="commit"
+          placeholder="Search videos…"
           onCommit={(term) => {
-            addSearch(term);
             setCommittedQuery(term);
             setSearchOpen(false);
           }}
-          recentSearches={recentSearches}
-          onClearRecent={clearAll}
-          onRemoveRecent={removeSearch}
-          trendingItems={TRENDING}
-          userId={userId}
         />
       </PageRoot>
   );

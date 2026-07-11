@@ -28,8 +28,20 @@ import {
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  /** Watch scope mode locks scope to videos and hides chips. */
-  mode?: 'default' | 'videos';
+  /**
+   * Overlay behaviour:
+   * - 'default' — Directory (all scopes + chips, tapping a row navigates).
+   * - 'videos'  — Directory locked to videos scope, chips hidden.
+   * - 'commit'  — Watch commit mode: input + recents + LIVE video preview
+   *               rail from RPC while typing. Committing (Enter or the
+   *               "Search '<term>'" row) calls onCommit(term), saves the
+   *               recent, and closes. Tapping a preview video navigates.
+   */
+  mode?: 'default' | 'videos' | 'commit';
+  /** Placeholder for the input; defaults per mode. */
+  placeholder?: string;
+  /** Required for 'commit' mode; called with the committed term. */
+  onCommit?: (term: string) => void;
 }
 
 function RowSkeleton() {
@@ -57,11 +69,19 @@ function LoadingBlock() {
   );
 }
 
-export function SearchOverlayV2({ isOpen, onClose, mode = 'default' }: Props) {
+export function SearchOverlayV2({
+  isOpen,
+  onClose,
+  mode = 'default',
+  placeholder,
+  onCommit,
+}: Props) {
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
   const [inputValue, setInputValue] = useState('');
-  const [scope, setScope] = useState<Scope>(mode === 'videos' ? 'videos' : 'all');
+  const initialScope: Scope =
+    mode === 'videos' || mode === 'commit' ? 'videos' : 'all';
+  const [scope, setScope] = useState<Scope>(initialScope);
   const { items: recents, save, clear } = useRecentSearchesV2();
 
   useEffect(() => {
@@ -70,8 +90,8 @@ export function SearchOverlayV2({ isOpen, onClose, mode = 'default' }: Props) {
       return () => clearTimeout(t);
     }
     setInputValue('');
-    setScope(mode === 'videos' ? 'videos' : 'all');
-  }, [isOpen, mode]);
+    setScope(initialScope);
+  }, [isOpen, initialScope]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -102,7 +122,20 @@ export function SearchOverlayV2({ isOpen, onClose, mode = 'default' }: Props) {
     [q, save, onClose],
   );
 
-  const showChips = mode !== 'videos';
+  const commitTerm = useCallback(
+    (term: string) => {
+      const t = term.trim();
+      if (!t) return;
+      save(t);
+      onCommit?.(t);
+      setInputValue('');
+      onClose();
+    },
+    [save, onCommit, onClose],
+  );
+
+  const showChips = mode === 'default';
+  const isCommit = mode === 'commit';
 
   const totalHits =
     data.people.length +
@@ -131,8 +164,21 @@ export function SearchOverlayV2({ isOpen, onClose, mode = 'default' }: Props) {
             value={inputValue}
             onChange={setInputValue}
             onCancel={handleClose}
-            onSubmit={() => q && save(q)}
-            placeholder={mode === 'videos' ? 'Search videos' : 'Search clbhouz'}
+            onSubmit={() => {
+              if (isCommit) {
+                commitTerm(inputValue);
+              } else if (q) {
+                save(q);
+              }
+            }}
+            placeholder={
+              placeholder ??
+              (mode === 'videos'
+                ? 'Search videos'
+                : isCommit
+                  ? 'Search videos…'
+                  : 'Search clbhouz')
+            }
           />
 
           {showChips && <ScopeChips scope={scope} onChange={setScope} />}
@@ -147,7 +193,10 @@ export function SearchOverlayV2({ isOpen, onClose, mode = 'default' }: Props) {
             {!hasQuery && (
               <RecentsList
                 items={recents}
-                onPick={(qq) => setInputValue(qq)}
+                onPick={(qq) => {
+                  if (isCommit) commitTerm(qq);
+                  else setInputValue(qq);
+                }}
                 onClear={clear}
               />
             )}
@@ -175,7 +224,16 @@ export function SearchOverlayV2({ isOpen, onClose, mode = 'default' }: Props) {
               </div>
             )}
 
-            {hasQuery && !isLoading && !error && (
+            {hasQuery && !isLoading && !error && isCommit && (
+              <CommitResults
+                query={q}
+                videos={data.videos}
+                onCommit={commitTerm}
+                onSelectVideo={(v) => commit(() => navVideo(navigate, v))}
+              />
+            )}
+
+            {hasQuery && !isLoading && !error && !isCommit && (
               <>
                 {scope === 'all' ? (
                   <>
@@ -468,6 +526,83 @@ function EmptyScope({ label }: { label: string }) {
       <p className="text-[13.5px]" style={{ color: '#64748B' }}>
         {label}
       </p>
+    </div>
+  );
+}
+
+function CommitResults({
+  query,
+  videos,
+  onCommit,
+  onSelectVideo,
+}: {
+  query: string;
+  videos: ReturnType<typeof useGlobalSearchV2>['data']['videos'];
+  onCommit: (term: string) => void;
+  onSelectVideo: (video: ReturnType<typeof useGlobalSearchV2>['data']['videos'][number]) => void;
+}) {
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={() => onCommit(query)}
+        className="w-full flex items-center gap-3 px-4 min-h-[56px] text-left active:opacity-70"
+        style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}
+      >
+        <div
+          className="flex items-center justify-center rounded-full shrink-0"
+          style={{
+            width: 32,
+            height: 32,
+            background: '#0F172A',
+            color: '#F8FAFC',
+            fontSize: 14,
+            fontWeight: 800,
+          }}
+          aria-hidden="true"
+        >
+          ⌕
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="text-[14px] font-extrabold truncate" style={{ color: '#0F172A' }}>
+            Search “{query}”
+          </div>
+          <div className="text-[11.5px]" style={{ color: '#64748B' }}>
+            Filter the grid to matching clips
+          </div>
+        </div>
+      </button>
+
+      {videos.length > 0 ? (
+        <>
+          <div style={{ padding: '18px 16px 6px' }}>
+            <span
+              className="text-[11px] font-extrabold tracking-[0.08em] uppercase"
+              style={{ color: '#64748B' }}
+            >
+              Previews
+            </span>
+          </div>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+              gap: 12,
+              padding: '4px 16px 16px',
+            }}
+          >
+            {videos.map((v) => (
+              <VideoRailCard key={v.id} video={v} onSelect={() => onSelectVideo(v)} />
+            ))}
+          </div>
+        </>
+      ) : (
+        <div style={{ padding: '28px 16px', textAlign: 'center' }}>
+          <p className="text-[13px]" style={{ color: '#64748B' }}>
+            No preview clips yet — tap “Search” to filter the grid.
+          </p>
+        </div>
+      )}
     </div>
   );
 }

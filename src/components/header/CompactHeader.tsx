@@ -7,7 +7,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import HeaderNavigation from './HeaderNavigation';
 import { PostingAsPill } from './PostingAsPill';
 import { PostingAsMenu } from './PostingAsMenu';
-import GlobalSearchOverlay from '@/components/search/GlobalSearchOverlay';
+import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import { ActingAsIndicator } from './ActingAsIndicator';
 
 import { HandicapChip } from './HandicapChip';
@@ -469,7 +469,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className, hidden = false
       )}
 
       {/* Search Overlay - full-screen, covers header */}
-      <GlobalSearchOverlay
+      <SearchOverlayV2
         isOpen={searchOpen}
         onClose={() => setSearchOpen(false)}
       />
