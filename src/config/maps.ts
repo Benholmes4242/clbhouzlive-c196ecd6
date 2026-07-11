@@ -10,7 +10,7 @@ import mapboxgl from 'mapbox-gl';
 // vector-tile decoding — maps render only the style background + DOM markers.
 // Use the standalone CSP worker bundle instead (Mapbox-documented escape hatch).
 // Vite's ?worker import returns a Worker constructor.
-// @ts-expect-error - vite ?worker import has no type declaration here
+// @ts-ignore - vite ?worker import has no type declaration here
 import MapboxWorker from 'mapbox-gl/dist/mapbox-gl-csp-worker?worker';
 
 (mapboxgl as unknown as { workerClass: unknown }).workerClass = MapboxWorker;
