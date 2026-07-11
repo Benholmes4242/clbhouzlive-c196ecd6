@@ -19458,6 +19458,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      search_empty_state_v2: { Args: never; Returns: Json }
       search_golf_clubs: {
         Args: { p_limit?: number; p_query: string }
         Returns: {

@@ -11,9 +11,8 @@ import { SeasonRecapModal } from '@/components/achievements/SeasonRecapModal';
 import { ProfileCompleteNudge } from '@/components/clubhouse/ProfileCompleteNudge';
 import { useSeasonRecap } from '@/hooks/useSeasonRecap';
 
-import { Compass, Flag, EyeOff, Link as LinkIcon, Users } from 'lucide-react';
+import { Compass, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Drawer, DrawerContent } from '@/components/ui/drawer';
 // Chrome owned solely by AppRoutes; no local status-bar imports.
 
 import { logRouteClubhouse } from '@/utils/bootTimeline';
@@ -29,7 +28,7 @@ import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 // ── New feed components ──
 import { CardFeed, type CardFeedHandle } from '@/components/feed/CardFeed';
 import type { StateSnapshot } from 'react-virtuoso';
-import { FeedOverlayLayer } from '@/components/feed/FeedOverlayLayer';
+
 import { FullscreenCarouselOverlay } from '@/components/media/FullscreenCarouselOverlay';
 import { CarouselDots } from '@/components/media/CarouselDots';
 import { useClubhouseStore } from '@/store/clubhouseStore';
@@ -63,54 +62,8 @@ import { useClubhouseComments } from '@/components/clubhouse/hooks/useClubhouseC
 import { useClubhouseShare } from '@/components/clubhouse/hooks/useClubhouseShare';
 import { useClubhouseFeedNav } from '@/components/clubhouse/hooks/useClubhouseFeedNav';
 
-/** Shared More Options Drawer */
-interface MoreOptionsDrawerProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onReport: () => void;
-  onNotInterested: () => void;
-  onCopyLink: () => void;
-}
+import { MoreOptionsDrawer } from '@/components/clubhouse/MoreOptionsDrawer';
 
-const MoreOptionsDrawer: React.FC<MoreOptionsDrawerProps> = ({
-  open, onOpenChange, onReport, onNotInterested, onCopyLink
-}) => (
-  <Drawer open={open} onOpenChange={onOpenChange}>
-    <DrawerContent
-      className="rounded-t-[20px]"
-      style={{
-        background: '#F8FAFC',
-        border: 'none',
-      }}
-    >
-      {/* Flat rows */}
-      <div style={{ padding: '4px 0 0' }}>
-        <button
-          onClick={onReport}
-          style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', background: 'transparent', border: 'none', borderBottom: '0.5px solid rgba(15,23,42,0.07)', cursor: 'pointer', textAlign: 'left' as const }}
-        >
-          <Flag className="w-5 h-5" style={{ color: 'rgba(15,23,42,0.35)' }} />
-          <span style={{ fontSize: 15, color: '#0F172A', fontWeight: 500 }}>Report this post</span>
-        </button>
-        <button
-          onClick={onNotInterested}
-          style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', background: 'transparent', border: 'none', borderBottom: '0.5px solid rgba(15,23,42,0.07)', cursor: 'pointer', textAlign: 'left' as const }}
-        >
-          <EyeOff className="w-5 h-5" style={{ color: 'rgba(15,23,42,0.35)' }} />
-          <span style={{ fontSize: 15, color: '#0F172A', fontWeight: 500 }}>Not interested</span>
-        </button>
-        <button
-          onClick={onCopyLink}
-          style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left' as const }}
-        >
-          <LinkIcon className="w-5 h-5" style={{ color: 'rgba(15,23,42,0.35)' }} />
-          <span style={{ fontSize: 15, color: '#0F172A', fontWeight: 500 }}>Copy link</span>
-        </button>
-      </div>
-      <div className="h-[env(safe-area-inset-bottom,0px)]" style={{ minHeight: 16 }} />
-    </DrawerContent>
-  </Drawer>
-);
 
 
 const ClubhouseContent = () => {
@@ -661,6 +614,8 @@ const ClubhouseContent = () => {
           <MoreOptionsDrawer
             open={moreOptionsOpen}
             onOpenChange={setMoreOptionsOpen}
+            post={activePost}
+            currentUserId={user?.id}
             onReport={() => handleReport(activePost)}
             onNotInterested={() => handleNotInterested(activePost)}
             onCopyLink={() => {

@@ -1,5 +1,7 @@
 import React, { useEffect, useLayoutEffect, useCallback, useState, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { toast } from 'sonner';
+import { MoreOptionsDrawer } from '@/components/clubhouse/MoreOptionsDrawer';
 
 import { useNavigate } from 'react-router-dom';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
@@ -355,7 +357,13 @@ export function FullscreenFeedOverlay() {
   const { followOverrides, handleFollowChange, getFollowState } = useClubhouseFollows({ userId });
   const { commentsOpen, overlayVisible, openComments, closeComments, getCommentCount } = useClubhouseComments();
   const safeOpenComments = useCallback(() => { if (!readOnly) openComments(); }, [readOnly, openComments]);
-  const { handleShare } = useClubhouseShare(userId);
+  const {
+    handleShare,
+    handleReport,
+    handleNotInterested,
+    moreOptionsOpen,
+    setMoreOptionsOpen,
+  } = useClubhouseShare(userId);
   const { activePost, golfCourse } = useActivePostDerived(posts, activeIndex);
   const manageableBusinessIds = useManageableBusinessIds(userId);
   const isOwnPost = canManagePost(
@@ -789,7 +797,7 @@ export function FullscreenFeedOverlay() {
                     onLike={handleLike}
                     onComment={safeOpenComments}
                     onShare={handleShare}
-                    onMore={() => {}}
+                    onMore={() => setMoreOptionsOpen(true)}
                     getLikeState={getActiveLikeState}
                     getCommentCount={getCommentCount}
                     getFollowState={getFollowState}
@@ -964,6 +972,23 @@ export function FullscreenFeedOverlay() {
           targetType="post"
           targetId={activePost?.id ?? ""}
           initialCommentId={initialCommentId}
+        />
+      )}
+
+      {!readOnly && activePost && (
+        <MoreOptionsDrawer
+          open={moreOptionsOpen}
+          onOpenChange={setMoreOptionsOpen}
+          post={activePost}
+          currentUserId={userId}
+          onReport={() => handleReport(activePost)}
+          onNotInterested={() => handleNotInterested(activePost)}
+          onCopyLink={() => {
+            navigator.clipboard.writeText(`${window.location.origin}/post/${activePost.id}`);
+            toast.success('Link copied');
+            setMoreOptionsOpen(false);
+          }}
+          onAfterBlock={handleClose}
         />
       )}
 
