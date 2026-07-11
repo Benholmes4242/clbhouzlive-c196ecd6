@@ -75,11 +75,9 @@ const Divider = () => (
 const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [showWebsiteSheet, setShowWebsiteSheet] = useState(false);
-  const [showSuggestEdit, setShowSuggestEdit] = useState(false);
   const { user } = useSupabaseSession();
   
   const navigate = useNavigate();
-  const { data: businessClaim } = useBusinessClaimForCourse(course.id);
   const { data: courseClaim } = useCourseClaim(course.id);
   const { data: claimStatus } = useCourseClaimStatus(course.id);
 
