@@ -5,7 +5,7 @@ import { useExploreFeed } from './hooks/useExploreFeed';
 import { useExploreRegion } from './hooks/useExploreRegion';
 import ConnectHandicapCue from '@/components/courses/course-detail/ConnectHandicapCue';
 import { CircleActivityStrip } from './CircleActivityStrip';
-import { AlmanacRegionTabs, FeatTierRail } from './AlmanacSections';
+import { AlmanacRegionTabs, FeatTierRail, AlmanacHead, REGION_TABS } from './AlmanacSections';
 
 import ExploreGrid from './ExploreGrid';
 

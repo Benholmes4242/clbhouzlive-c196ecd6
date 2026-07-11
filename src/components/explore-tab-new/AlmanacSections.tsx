@@ -7,7 +7,7 @@ import { AMBER, INK, INK_TINT_06 } from '@/features/courses/_shared/tokens';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
-const REGION_TABS: Array<{ slug: string | null; label: string }> = [
+export const REGION_TABS: Array<{ slug: string | null; label: string }> = [
   { slug: null, label: 'Worldwide' },
   { slug: 'uk-ireland', label: 'GB&I' },
   { slug: 'usa', label: 'USA' },
