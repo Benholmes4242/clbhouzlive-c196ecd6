@@ -1,13 +1,12 @@
 /**
- * HeroV4 — full-bleed hero with three states (live / upcoming / completed).
- * Sits under the safe area at the same height as course-details.
- * The tour picker sits in the top-right and is the ONLY control on the hero.
+ * HeroV4 — dark full-bleed hero with three states + optional quiet-week
+ * countdown band. Spec ref: Brief O2.1 section 1.
  */
 
 import { Zap, MapPin } from 'lucide-react';
-import { V4, HERO_HEIGHT_CSS } from '../tokens';
+import { V4, HERO_HEIGHT_CSS, heroGradient, NUMERAL_THIN } from '../tokens';
 import { TourPicker } from './TourPicker';
-import { useHeroLeaderboard } from '../data/useHeroLeaderboard';
+import { useHeroLeaderboard, type HeroLeaderboardEntry } from '../data/useHeroLeaderboard';
 import { useCountdown } from '@/hooks/useCountdown';
 import type { TourEventContext } from '../data/useTourEventContext';
 import type { TourId } from '../../hooks/useOverviewData';
@@ -18,10 +17,17 @@ interface Props {
   onTourChange: (t: TourId) => void;
 }
 
+const FROST_BG = 'rgba(10,14,20,0.66)';
+const FROST_BORDER = 'rgba(255,255,255,0.10)';
+const WHITE = '#FFFFFF';
+const WHITE_SOFT = 'rgba(255,255,255,0.72)';
+const WHITE_FAINT = 'rgba(255,255,255,0.55)';
+
 export function HeroV4({ ctx, tour, onTourChange }: Props) {
   const state = ctx?.state ?? 'upcoming';
   const isLive = state === 'live';
   const board = useHeroLeaderboard(ctx?.event?.id, { live: isLive });
+  const showBand = state !== 'live' && ctx?.nextMajor && !ctx?.isMajor;
 
   return (
     <section
@@ -29,52 +35,62 @@ export function HeroV4({ ctx, tour, onTourChange }: Props) {
         position: 'relative',
         minHeight: HERO_HEIGHT_CSS,
         paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
-        background:
-          'radial-gradient(circle at 20% 10%, rgba(247,147,30,0.08), transparent 55%), linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)',
-        borderBottom: `0.5px solid ${V4.hairline}`,
+        background: heroGradient(tour),
         overflow: 'hidden',
+        color: WHITE,
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
-      {/* Tour picker top-right */}
+      {/* Ambient glow overlays */}
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background:
+            'radial-gradient(circle at 12% 8%, rgba(247,147,30,0.18), transparent 42%), radial-gradient(circle at 92% 100%, rgba(255,255,255,0.06), transparent 50%)',
+          pointerEvents: 'none',
+        }}
+      />
+
       <div style={{ position: 'absolute', top: 'max(env(safe-area-inset-top, 0px), 47px)', right: 14, marginTop: 6, zIndex: 5 }}>
         <TourPicker tour={tour} onChange={onTourChange} />
       </div>
 
-      <div style={{ padding: '18px 18px 24px' }}>
+      <div style={{ position: 'relative', padding: '20px 20px 20px', flex: 1, display: 'flex', flexDirection: 'column' }}>
         <StateEyebrow state={state} isMajor={ctx?.isMajor ?? false} />
         <h1
           style={{
-            marginTop: 6,
-            fontSize: 26,
-            lineHeight: 1.1,
+            marginTop: 8,
+            fontSize: 28,
+            lineHeight: 1.06,
             fontWeight: 800,
-            color: V4.ink,
-            letterSpacing: '-0.02em',
-            maxWidth: '80%',
+            letterSpacing: '-0.025em',
+            maxWidth: '82%',
           }}
         >
           {ctx?.event?.name ?? 'No tournament scheduled'}
         </h1>
-        <div style={{ marginTop: 6, fontSize: 13, color: V4.inkSoft, fontWeight: 500 }}>
+        <div style={{ marginTop: 6, fontSize: 12.5, color: WHITE_SOFT, fontWeight: 500 }}>
           {ctx?.event?.venue_course_name || ctx?.event?.venue_name || '—'}
           {ctx?.event?.venue_city ? ` · ${ctx.event.venue_city}` : ''}
         </div>
 
         {state === 'live' && ctx?.event ? (
-          <LiveMiniBoard rows={board.data ?? []} isLive />
-        ) : null}
-
-        {state === 'completed' && ctx?.event ? (
-          <LiveMiniBoard rows={board.data ?? []} isLive={false} />
+          <FrostedMiniBoard rows={board.data ?? []} showThru />
         ) : null}
 
         {state === 'upcoming' && ctx?.event ? (
-          <UpcomingBlock startDate={ctx.event.start_date} defending={ctx.event.defending_champion} />
+          <UpcomingCells startDate={ctx.event.start_date} defending={ctx.event.defending_champion} isMajor={ctx?.isMajor ?? false} />
+        ) : null}
+
+        {state === 'completed' && ctx?.event ? (
+          <ChampionStrip rows={board.data ?? []} />
         ) : null}
       </div>
 
-      {/* Countdown band — quiet weeks only (upcoming or completed states) */}
-      {state !== 'live' && ctx?.nextMajor ? <CountdownBand major={ctx.nextMajor} /> : null}
+      {showBand && ctx?.nextMajor ? <CountdownBand major={ctx.nextMajor} /> : null}
     </section>
   );
 }
@@ -86,75 +102,82 @@ function StateEyebrow({ state, isMajor }: { state: string; isMajor: boolean }) {
         style={{
           display: 'inline-flex',
           alignItems: 'center',
-          gap: 6,
+          gap: 7,
           padding: '4px 10px',
           background: V4.live,
-          color: '#fff',
+          color: WHITE,
           borderRadius: 999,
           fontSize: 10.5,
           fontWeight: 800,
-          letterSpacing: '0.12em',
+          letterSpacing: '0.14em',
           textTransform: 'uppercase',
         }}
-        className="animate-pulse"
       >
-        <Zap size={11} strokeWidth={2.4} /> Live now
+        <span style={{ width: 6, height: 6, borderRadius: '50%', background: WHITE }} className="animate-pulse" />
+        <Zap size={11} strokeWidth={2.6} /> Live · Round 3
       </span>
     );
   }
-  const label = state === 'completed' ? 'Final results' : isMajor ? 'Major week' : 'This week';
-  const color = isMajor ? V4.gold : V4.amber;
-  const bg = isMajor ? V4.goldSoft : V4.amberSoft;
+  if (state === 'completed') {
+    return <Eyebrow label="Final · Champion" color={V4.gold} />;
+  }
+  return <Eyebrow label={isMajor ? 'Major week' : 'Next up'} color={isMajor ? V4.gold : V4.amber} />;
+}
+
+function Eyebrow({ label, color }: { label: string; color: string }) {
   return (
-    <span
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 6,
-        padding: '4px 10px',
-        background: bg,
-        color,
-        borderRadius: 999,
-        fontSize: 10.5,
-        fontWeight: 800,
-        letterSpacing: '0.12em',
-        textTransform: 'uppercase',
-      }}
-    >
+    <span style={{ fontSize: 10.5, fontWeight: 800, color, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
       {label}
     </span>
   );
 }
 
-function LiveMiniBoard({ rows, isLive }: { rows: { position: number; playerName: string; scoreDisplay: string; thru: number | null; isWinner: boolean }[]; isLive: boolean }) {
+function scoreColor(display: string): string {
+  if (!display || display === 'E' || display === '—') return WHITE_FAINT;
+  if (display.startsWith('-')) return V4.live;
+  if (display.startsWith('+')) return WHITE_SOFT;
+  return WHITE;
+}
+
+function FrostedMiniBoard({ rows, showThru }: { rows: HeroLeaderboardEntry[]; showThru: boolean }) {
   return (
-    <div style={{ marginTop: 18, background: V4.surface, borderRadius: 14, border: `0.5px solid ${V4.hairline}`, overflow: 'hidden' }}>
+    <div
+      style={{
+        marginTop: 18,
+        background: FROST_BG,
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
+        borderRadius: 14,
+        border: `1px solid ${FROST_BORDER}`,
+        overflow: 'hidden',
+      }}
+    >
       {rows.length === 0 ? (
-        <div style={{ padding: 14, fontSize: 12, color: V4.inkFaint }}>Awaiting scoring…</div>
+        <div style={{ padding: 14, fontSize: 12, color: WHITE_FAINT }}>Awaiting scoring…</div>
       ) : (
-        rows.map((r, i) => (
+        rows.slice(0, 3).map((r, i) => (
           <div
             key={r.playerName + i}
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: 12,
-              padding: '10px 12px',
-              borderTop: i === 0 ? 'none' : `0.5px solid ${V4.hairline}`,
-              background: r.isWinner ? V4.amberSoft : 'transparent',
+              padding: '11px 14px',
+              borderTop: i === 0 ? 'none' : `0.5px solid ${FROST_BORDER}`,
             }}
           >
-            <div style={{ width: 22, textAlign: 'center', fontSize: 12, fontWeight: 800, color: V4.ink, fontVariantNumeric: 'tabular-nums' }}>
+            <div style={{ width: 22, textAlign: 'center', fontSize: 15, color: V4.gold, ...NUMERAL_THIN }}>
               {r.position}
             </div>
-            <div style={{ flex: 1, fontSize: 14, fontWeight: 700, color: V4.ink }}>
+            <div style={{ flex: 1, fontSize: 13.5, fontWeight: 700, color: WHITE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {r.playerName}
-              {r.isWinner ? <span style={{ marginLeft: 6, fontSize: 10, fontWeight: 800, color: V4.amber, letterSpacing: '0.1em' }}>WINNER</span> : null}
             </div>
-            <div style={{ fontSize: 13, fontWeight: 800, color: V4.ink, fontVariantNumeric: 'tabular-nums' }}>{r.scoreDisplay}</div>
-            {isLive ? (
-              <div style={{ marginLeft: 10, fontSize: 11, color: V4.inkFaint, minWidth: 34, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
-                {r.thru != null ? (r.thru >= 18 ? 'F' : `thru ${r.thru}`) : ''}
+            <div style={{ fontSize: 13.5, fontWeight: 800, color: scoreColor(r.scoreDisplay), fontVariantNumeric: 'tabular-nums' }}>
+              {r.scoreDisplay}
+            </div>
+            {showThru ? (
+              <div style={{ minWidth: 34, textAlign: 'right', fontSize: 10.5, color: WHITE_FAINT, fontVariantNumeric: 'tabular-nums' }}>
+                {r.thru != null ? (r.thru >= 18 ? 'F' : `t${r.thru}`) : ''}
               </div>
             ) : null}
           </div>
@@ -164,32 +187,126 @@ function LiveMiniBoard({ rows, isLive }: { rows: { position: number; playerName:
   );
 }
 
-function UpcomingBlock({ startDate, defending }: { startDate: string; defending: string | null }) {
-  const cd = useCountdown(startDate);
+function Cell({ label, value }: { label: string; value: string }) {
   return (
-    <div style={{ marginTop: 18, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
-      {(['days', 'hours', 'minutes', 'seconds'] as const).map((k) => (
-        <div
-          key={k}
-          style={{
-            background: V4.surface,
-            border: `0.5px solid ${V4.hairline}`,
-            borderRadius: 12,
-            padding: '10px 6px',
-            textAlign: 'center',
-          }}
-        >
-          <div style={{ fontSize: 24, fontWeight: 800, color: V4.ink, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em' }}>
-            {cd ? String(cd[k]).padStart(2, '0') : '--'}
-          </div>
-          <div style={{ marginTop: 2, fontSize: 9.5, color: V4.inkFaint, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' }}>{k}</div>
-        </div>
-      ))}
-      {defending ? (
-        <div style={{ gridColumn: '1 / -1', marginTop: 4, fontSize: 12, color: V4.inkSoft }}>
-          <span style={{ fontWeight: 700, color: V4.ink }}>Defending:</span> {defending}
+    <div
+      style={{
+        flex: 1,
+        background: FROST_BG,
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
+        border: `1px solid ${FROST_BORDER}`,
+        borderRadius: 12,
+        padding: '10px 8px',
+        textAlign: 'center',
+      }}
+    >
+      <div style={{ fontSize: 12.5, fontWeight: 800, color: WHITE, letterSpacing: '-0.01em' }}>{value}</div>
+      <div style={{ marginTop: 3, fontSize: 8, fontWeight: 800, color: WHITE_FAINT, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+        {label}
+      </div>
+    </div>
+  );
+}
+
+function UpcomingCells({ startDate, defending, isMajor }: { startDate: string; defending: string | null; isMajor: boolean }) {
+  const cd = useCountdown(startDate);
+  const dt = new Date(startDate);
+  const day = dt.toLocaleDateString(undefined, { weekday: 'short' }).toUpperCase();
+  const dayNum = dt.getDate();
+  const mon = dt.toLocaleDateString(undefined, { month: 'short' }).toUpperCase();
+  const startsLabel = cd && cd.days > 0 ? `${cd.days}D ${String(cd.hours).padStart(2, '0')}H` : `${day} ${dayNum} ${mon}`;
+  return (
+    <div style={{ marginTop: 20 }}>
+      <div style={{ display: 'flex', gap: 9 }}>
+        <Cell label="Starts" value={startsLabel} />
+        <Cell label="First tee" value="07:15" />
+        <Cell label="Defends" value={defending ? shortName(defending) : '—'} />
+      </div>
+      {isMajor ? (
+        <div style={{ marginTop: 12, fontSize: 10.5, fontWeight: 800, color: V4.gold, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+          Season's fourth major
         </div>
       ) : null}
+    </div>
+  );
+}
+
+function shortName(full: string): string {
+  const parts = full.trim().split(/\s+/);
+  if (parts.length <= 1) return full;
+  return `${parts[0][0]}. ${parts[parts.length - 1]}`;
+}
+
+function ChampionStrip({ rows }: { rows: HeroLeaderboardEntry[] }) {
+  const winner = rows.find((r) => r.isWinner) ?? rows[0];
+  if (!winner) return null;
+  return (
+    <div style={{ marginTop: 18 }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 14,
+          padding: '14px 14px',
+          background: 'linear-gradient(100deg, rgba(201,162,39,0.30) 0%, rgba(201,162,39,0.08) 100%)',
+          border: '1px solid rgba(201,162,39,0.40)',
+          borderRadius: 15,
+        }}
+      >
+        <div
+          style={{
+            width: 44,
+            height: 44,
+            borderRadius: '34%',
+            background: '#15171F',
+            border: `1.5px solid ${V4.gold}`,
+            backgroundImage: winner.photoUrl ? `url(${winner.photoUrl})` : 'none',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            flexShrink: 0,
+          }}
+        />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 16.5, fontWeight: 800, color: WHITE, letterSpacing: '-0.015em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {winner.playerName}
+          </div>
+          <div style={{ marginTop: 2, fontSize: 11, color: WHITE_FAINT, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+            Champion
+          </div>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <div style={{ fontSize: 26, color: V4.gold, lineHeight: 1, ...NUMERAL_THIN }}>{winner.scoreDisplay}</div>
+          <div style={{ marginTop: 3, fontSize: 8, fontWeight: 800, color: WHITE_FAINT, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+            Final
+          </div>
+        </div>
+      </div>
+
+      <div
+        style={{
+          marginTop: 10,
+          background: FROST_BG,
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          border: `1px solid ${FROST_BORDER}`,
+          borderRadius: 14,
+          overflow: 'hidden',
+        }}
+      >
+        {rows.slice(0, 3).map((r, i) => (
+          <div
+            key={r.playerName + i}
+            style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderTop: i === 0 ? 'none' : `0.5px solid ${FROST_BORDER}` }}
+          >
+            <div style={{ width: 22, textAlign: 'center', fontSize: 14, color: V4.gold, ...NUMERAL_THIN }}>{r.position}</div>
+            <div style={{ flex: 1, fontSize: 13, fontWeight: 700, color: WHITE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {r.playerName}
+            </div>
+            <div style={{ fontSize: 13, fontWeight: 800, color: scoreColor(r.scoreDisplay), fontVariantNumeric: 'tabular-nums' }}>{r.scoreDisplay}</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -200,22 +317,26 @@ function CountdownBand({ major }: { major: { name: string; days_away: number; ve
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: 8,
-        padding: '10px 18px',
-        borderTop: `0.5px solid ${V4.hairline}`,
-        background: V4.goldSoft,
+        gap: 10,
+        padding: '12px 18px',
+        borderTop: '1px solid rgba(201,162,39,0.40)',
+        background: 'linear-gradient(90deg, rgba(201,162,39,0.28) 0%, rgba(201,162,39,0.10) 100%)',
       }}
     >
       <MapPin size={12} color={V4.gold} strokeWidth={2.4} />
-      <div style={{ fontSize: 11, fontWeight: 800, color: V4.gold, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-        Next major
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 9.5, fontWeight: 800, color: V4.gold, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+          {major.name}
+        </div>
+        {major.venue ? (
+          <div style={{ marginTop: 1, fontSize: 11, color: WHITE_SOFT, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {major.venue}
+          </div>
+        ) : null}
       </div>
-      <div style={{ marginLeft: 4, fontSize: 12, fontWeight: 700, color: V4.ink, flex: 1 }}>
-        {major.name}
-        {major.venue ? <span style={{ color: V4.inkSoft, fontWeight: 500 }}> · {major.venue}</span> : null}
-      </div>
-      <div style={{ fontSize: 12, fontWeight: 800, color: V4.gold, fontVariantNumeric: 'tabular-nums' }}>
-        {major.days_away}d
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+        <span style={{ fontSize: 22, color: V4.gold, ...NUMERAL_THIN }}>{major.days_away}</span>
+        <span style={{ fontSize: 8.5, fontWeight: 800, color: V4.gold, letterSpacing: '0.14em' }}>DAYS</span>
       </div>
     </div>
   );

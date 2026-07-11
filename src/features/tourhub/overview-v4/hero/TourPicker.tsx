@@ -1,6 +1,5 @@
 /**
- * TourPicker — top-right tour switcher on HeroV4. Independent of the
- * WorldRankings board chips.
+ * TourPicker — frosted dark pill on hero imagery.
  */
 
 import { useState } from 'react';
@@ -20,19 +19,21 @@ export function TourPicker({ tour, onChange }: { tour: TourId; onChange: (t: Tou
           display: 'inline-flex',
           alignItems: 'center',
           gap: 6,
-          padding: '6px 12px',
-          background: 'rgba(255,255,255,0.92)',
-          border: `0.5px solid ${V4.hairline}`,
-          borderRadius: 999,
+          padding: '7px 14px',
+          background: 'rgba(10,14,20,0.55)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255,255,255,0.18)',
+          borderRadius: 14,
           fontSize: 11,
           fontWeight: 800,
-          color: V4.ink,
-          letterSpacing: '0.08em',
+          color: '#FFFFFF',
+          letterSpacing: '0.1em',
           textTransform: 'uppercase',
         }}
       >
-        {TOUR_LABEL[tour]}
-        <span style={{ opacity: 0.55, fontSize: 9 }}>▾</span>
+        <span style={{ color: V4.amber }}>{TOUR_LABEL[tour]}</span>
+        <span style={{ opacity: 0.7, fontSize: 9 }}>▾</span>
       </button>
       {open ? (
         <div
@@ -41,33 +42,33 @@ export function TourPicker({ tour, onChange }: { tour: TourId; onChange: (t: Tou
             position: 'absolute',
             top: 'calc(100% + 6px)',
             right: 0,
-            background: V4.surface,
-            border: `0.5px solid ${V4.hairline}`,
+            background: 'rgba(10,14,20,0.9)',
+            backdropFilter: 'blur(14px)',
+            WebkitBackdropFilter: 'blur(14px)',
+            border: '1px solid rgba(255,255,255,0.14)',
             borderRadius: 12,
             padding: 4,
-            boxShadow: '0 8px 20px rgba(15,23,42,0.12)',
+            boxShadow: '0 10px 24px rgba(0,0,0,0.35)',
             zIndex: 20,
-            minWidth: 140,
+            minWidth: 152,
           }}
         >
           {TOURS.map((t) => (
             <button
               key={t}
-              onClick={() => {
-                onChange(t);
-                setOpen(false);
-              }}
+              onClick={() => { onChange(t); setOpen(false); }}
               style={{
                 display: 'block',
                 width: '100%',
                 textAlign: 'left',
                 padding: '8px 10px',
-                background: t === tour ? V4.amberSoft : 'transparent',
+                background: 'transparent',
                 border: 'none',
                 borderRadius: 8,
                 fontSize: 12,
                 fontWeight: 700,
-                color: V4.ink,
+                color: t === tour ? V4.amber : '#FFFFFF',
+                letterSpacing: '0.06em',
               }}
             >
               {TOUR_LABEL[t]}

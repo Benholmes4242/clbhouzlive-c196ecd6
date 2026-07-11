@@ -1,7 +1,7 @@
 /**
- * OnTheCourse — live only. Renders featured groups from get_featured_groups RPC.
- * Rail is horizontally scrollable. When the RPC returns an unexpected shape,
- * the section is silently skipped (best-effort, non-blocking).
+ * OnTheCourse — live-only horizontal rail of featured groups.
+ * Card min 218; header TEE {time} · THRU {n}; row = 24px squircle + name + score
+ * (falls back to formatted total, CUT/WD as muted tag).
  */
 
 import { useFeaturedGroups } from '../data/useFeaturedGroups';
@@ -18,12 +18,15 @@ interface GroupPlayerShape {
   name?: string;
   photo_url?: string | null;
   score?: number | string | null;
+  today?: number | string | null;
   thru?: number | null;
+  status?: string | null;
 }
 
 interface GroupShape {
   group_id?: string;
   tee_time?: string;
+  thru?: number | null;
   players?: GroupPlayerShape[];
 }
 
@@ -31,10 +34,36 @@ function parseGroups(raw: unknown): GroupShape[] {
   if (!raw) return [];
   if (Array.isArray(raw)) return raw as GroupShape[];
   if (typeof raw === 'object' && raw !== null) {
-    const groups = (raw as Record<string, unknown>).groups;
-    if (Array.isArray(groups)) return groups as GroupShape[];
+    const g = (raw as Record<string, unknown>).groups;
+    if (Array.isArray(g)) return g as GroupShape[];
   }
   return [];
+}
+
+function initials(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+function formatScore(v: number | string | null | undefined): string | null {
+  if (v == null || v === '') return null;
+  const n = typeof v === 'number' ? v : Number(v);
+  if (Number.isNaN(n)) return String(v);
+  if (n === 0) return 'E';
+  return n < 0 ? String(n) : `+${n}`;
+}
+
+function scoreColor(s: string | null): string {
+  if (!s || s === 'E') return V4.scoreEven;
+  if (s.startsWith('-')) return V4.scoreUnder;
+  return V4.scoreOver;
+}
+
+function groupThru(g: GroupShape): number | null {
+  if (typeof g.thru === 'number') return g.thru;
+  const first = g.players?.find((p) => typeof p.thru === 'number')?.thru;
+  return typeof first === 'number' ? first : null;
 }
 
 export function OnTheCourse({ tournamentId, live }: Props) {
@@ -45,47 +74,68 @@ export function OnTheCourse({ tournamentId, live }: Props) {
 
   return (
     <SectionShell eyebrow="On the course">
-      <div
-        style={{
-          display: 'flex',
-          gap: 10,
-          overflowX: 'auto',
-          padding: '0 16px 4px',
-          scrollSnapType: 'x mandatory',
-        }}
-      >
-        {groups.map((g, gi) => (
-          <div
-            key={g.group_id ?? gi}
-            style={{
-              flex: '0 0 232px',
-              scrollSnapAlign: 'start',
-              background: V4.surface,
-              border: `0.5px solid ${V4.hairline}`,
-              borderRadius: 14,
-              padding: 12,
-            }}
-          >
-            {g.tee_time ? (
-              <div style={{ fontSize: 10.5, fontWeight: 800, color: V4.amber, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 6 }}>
-                {new Date(g.tee_time).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+      <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 20px 6px', scrollSnapType: 'x mandatory' }}>
+        {groups.map((g, gi) => {
+          const thru = groupThru(g);
+          const time = g.tee_time ? new Date(g.tee_time).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toUpperCase() : '';
+          return (
+            <div
+              key={g.group_id ?? gi}
+              style={{
+                minWidth: 218,
+                flexShrink: 0,
+                scrollSnapAlign: 'start',
+                background: V4.surface,
+                border: `0.5px solid ${V4.cardBorder}`,
+                boxShadow: V4.cardShadow,
+                borderRadius: 14,
+                padding: '12px 12px 10px',
+              }}
+            >
+              <div style={{ fontSize: 9.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>
+                {time ? `TEE ${time}` : ''}
+                {time && thru != null ? ' · ' : ''}
+                {thru != null ? `THRU ${thru >= 18 ? 'F' : thru}` : ''}
               </div>
-            ) : null}
-            {(g.players ?? []).slice(0, 3).map((p, pi) => (
-              <div key={pi} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', borderTop: pi === 0 ? 'none' : `0.5px solid ${V4.hairline}` }}>
-                <div style={{ flex: 1, fontSize: 13, fontWeight: 700, color: V4.ink }}>{p.full_name || p.name}</div>
-                <div style={{ fontSize: 12, fontWeight: 800, color: V4.ink, fontVariantNumeric: 'tabular-nums' }}>
-                  {p.score != null ? String(p.score) : '—'}
-                </div>
-                {p.thru != null ? (
-                  <div style={{ fontSize: 10, color: V4.inkFaint, minWidth: 30, textAlign: 'right' }}>
-                    {p.thru >= 18 ? 'F' : `t${p.thru}`}
+              {(g.players ?? []).slice(0, 3).map((p, pi) => {
+                const name = p.full_name || p.name || '';
+                const status = (p.status || '').toUpperCase();
+                const isCut = status === 'CUT' || status === 'WD' || status === 'DQ';
+                const display = formatScore(p.today) ?? formatScore(p.score) ?? '—';
+                return (
+                  <div key={pi} style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '6px 0', borderTop: pi === 0 ? 'none' : `0.5px solid ${V4.hairline}` }}>
+                    <div
+                      style={{
+                        width: 24,
+                        height: 24,
+                        borderRadius: '34%',
+                        background: '#15171F',
+                        color: V4.amber,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: 9,
+                        fontWeight: 800,
+                        letterSpacing: '0.02em',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {initials(name)}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0, fontSize: 12, fontWeight: 700, color: V4.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {name}
+                    </div>
+                    {isCut ? (
+                      <span style={{ fontSize: 9.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em' }}>{status}</span>
+                    ) : (
+                      <span style={{ fontSize: 12.5, fontWeight: 800, color: scoreColor(display), fontVariantNumeric: 'tabular-nums' }}>{display}</span>
+                    )}
                   </div>
-                ) : null}
-              </div>
-            ))}
-          </div>
-        ))}
+                );
+              })}
+            </div>
+          );
+        })}
       </div>
     </SectionShell>
   );
