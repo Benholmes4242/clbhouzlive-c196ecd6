@@ -28,7 +28,7 @@ import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 // ── New feed components ──
 import { CardFeed, type CardFeedHandle } from '@/components/feed/CardFeed';
 import type { StateSnapshot } from 'react-virtuoso';
-import { FeedOverlayLayer } from '@/components/feed/FeedOverlayLayer';
+
 import { FullscreenCarouselOverlay } from '@/components/media/FullscreenCarouselOverlay';
 import { CarouselDots } from '@/components/media/CarouselDots';
 import { useClubhouseStore } from '@/store/clubhouseStore';
