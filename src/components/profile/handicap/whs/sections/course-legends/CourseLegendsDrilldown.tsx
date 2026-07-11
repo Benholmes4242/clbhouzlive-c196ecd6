@@ -213,23 +213,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
 
   const youOwnedCount = Object.values(yourRanks).filter((r) => r === 1).length;
 
-  const navCategories = useMemo(
-    () =>
-      visibleCategories.map((cat) => ({
-        key: cat,
-        short: SHORT_LABELS[cat],
-        icon: legendCategoryIcon[cat],
-        yourRank: yourRanks[cat] ?? null,
-      })),
-    [yourRanks, visibleCategories],
-  );
-
   const containerRef = useRef<HTMLDivElement>(null);
-
-  const handleNavSelect = (key: LegendCategory) => {
-    const el = containerRef.current?.querySelector(`[data-category="${key}"]`);
-    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
 
   const sheetCategoryDescriptors = useMemo(
     () =>
