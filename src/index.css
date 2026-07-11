@@ -1877,6 +1877,26 @@ html.overlay-open .clubhouse-progress {
   .clubhouse-root { height: 100vh; }
 }
 
+/* Echo shell — pinned viewport box, no document-level scroll.
+   Matches the .clubhouse-root pattern: `position: fixed; inset: 0` removes
+   the shell from document flow so header + composer can't be scrolled by
+   any ancestor, regardless of dvh rounding or Capacitor keyboard resize. */
+.echo-root {
+  position: fixed;
+  inset: 0;
+  height: 100svh;
+  width: 100%;
+  background: #F8FAFC;
+  overflow: hidden;
+}
+@supports (height: 100dvh) {
+  .echo-root { height: 100dvh; }
+}
+@supports not (height: 100svh) {
+  .echo-root { height: 100vh; }
+}
+
+
 /* Video fills container like TikTok/IG */
 .clubhouse-root .clubhouse-video {
   width: 100%;

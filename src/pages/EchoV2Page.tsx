@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { PageRoot } from '@/components/layout/PageRoot';
+
 import { EchoV2Header } from '@/features/echo-v2/components/EchoV2Header';
 import { EchoWelcome } from '@/features/echo-v2/components/EchoWelcome';
 import { EchoMessageList } from '@/features/echo-v2/components/EchoMessageList';
@@ -79,7 +79,7 @@ const EchoV2Page: React.FC = () => {
   // reserve is needed here — safe-area is handled by the composer itself.
 
   return (
-    <PageRoot fixedHeight hasBottomNav={false} style={{ background: CANVAS }}>
+    <div className="echo-root" style={{ background: CANVAS }}>
       <div
         style={{
           display: 'flex',
@@ -138,8 +138,9 @@ const EchoV2Page: React.FC = () => {
           onHeightChange={setComposerHeight}
         />
       </div>
-    </PageRoot>
+    </div>
   );
+
 };
 
 export default EchoV2Page;

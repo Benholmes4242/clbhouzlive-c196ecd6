@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { ChevronLeft, MoreHorizontal, Pin, X } from 'lucide-react';
-import { PageRoot } from '@/components/layout/PageRoot';
+
 import { supabase } from '@/integrations/supabase/client';
 import { useEchoChats, type EchoChatRow } from '@/features/echo-v2/hooks/useEchoChats';
 import { AnimatedEchoWave } from '@/features/echo-v2/components/AnimatedEchoWave';
@@ -128,7 +128,7 @@ const EchoHistoryPage: React.FC = () => {
   }, [sheetChat, patchList, closeSheet, qc]);
 
   return (
-    <PageRoot fixedHeight hasBottomNav={false} style={{ background: CANVAS }}>
+    <div className="echo-root" style={{ background: CANVAS }}>
       <div
         style={{
           display: 'flex',
@@ -470,7 +470,7 @@ const EchoHistoryPage: React.FC = () => {
           </div>
         </div>
       ) : null}
-    </PageRoot>
+    </div>
   );
 };
 
