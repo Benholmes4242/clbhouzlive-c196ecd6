@@ -57,7 +57,7 @@ function Door({ title, count, loading, suffix, onClick, tone }: DoorProps) {
           background: circleBg,
         }}
       />
-      <div style={{ font: '800 17px/1.1 inherit', letterSpacing: '-0.01em' }}>
+      <div style={{ fontWeight: 800, fontSize: 17, lineHeight: 1.1, letterSpacing: '-0.01em' }}>
         {title}
       </div>
       {loading || count == null ? (
@@ -73,7 +73,9 @@ function Door({ title, count, loading, suffix, onClick, tone }: DoorProps) {
       ) : (
         <div
           style={{
-            font: '600 11.5px/1.2 inherit',
+            fontWeight: 600,
+            fontSize: 11.5,
+            lineHeight: 1.2,
             opacity: countOpacity,
             marginTop: 2,
           }}
@@ -86,7 +88,9 @@ function Door({ title, count, loading, suffix, onClick, tone }: DoorProps) {
           position: 'absolute',
           right: 10,
           bottom: 8,
-          font: '800 18px/1 inherit',
+          fontWeight: 800,
+          fontSize: 18,
+          lineHeight: 1,
           opacity: chevronOpacity,
         }}
       >

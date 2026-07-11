@@ -3,6 +3,7 @@ import { Search } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import { DestinationDoors } from './components/DestinationDoors';
+import { HubVideoRow } from './components/HubVideoRow';
 
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
@@ -29,7 +30,9 @@ export default function WatchHubV2() {
         >
           <div
             style={{
-              font: '800 24px/1.1 inherit',
+              fontWeight: 800,
+              fontSize: 24,
+              lineHeight: 1.1,
               letterSpacing: '-0.02em',
               color: '#0F172A',
               fontFamily: FONT_FAMILY,
@@ -60,7 +63,9 @@ export default function WatchHubV2() {
 
         <DestinationDoors />
 
-        {/* W2.2: video row mounts here */}
+        <div style={{ paddingTop: 16 }}>
+          <HubVideoRow />
+        </div>
         {/* W2.3: clips row mounts here */}
         {/* W2.4: mixed grid mounts here */}
         {/* W2.5: chip bar mounts here */}
