@@ -347,8 +347,8 @@ export function useCommentsV2({
       const count = Number((res as any).count ?? 0);
       qc.setQueryData([...keyRoot, 'enrichment', rowIds, actorType, actorId], (old: any) => {
         if (!old) return old;
-        const myLikes = new Set(old.myLikes);
-        const likeCounts = new Map(old.likeCounts);
+        const myLikes = new Set<string>(old.myLikes);
+        const likeCounts = new Map<string, number>(old.likeCounts);
         if (liked) myLikes.add(id); else myLikes.delete(id);
         likeCounts.set(id, count);
         return { ...old, myLikes, likeCounts };
