@@ -284,6 +284,7 @@ const LegalDocumentPage = lazy(() => import("./pages/legal/LegalDocumentPage"));
 // PostsTabTestPage removed — Posts tab now integrated into profiles
 // CreateMomentPage removed — PostStudio is now the sole creation flow
 const PostDeepLinkPage = lazy(() => import("./pages/PostDeepLinkPage"));
+const SearchV2TestPage = lazy(() => import("./pages/SearchV2TestPage"));
 const CommentDeepLinkPage = lazy(() => import("./features/comments-v2/CommentDeepLinkV2"));
 
 // Import season wrap modal
@@ -434,6 +435,7 @@ function AppRoutes() {
         {/* Post deep link for notifications */}
         <Route path="/post/:postId" element={<Suspense fallback={<GenericPageSkeleton />}><PostDeepLinkPage /></Suspense>} />
         <Route path="/post/:postId/comment/:commentId" element={<Suspense fallback={<GenericPageSkeleton />}><CommentDeepLinkPage /></Suspense>} />
+        <Route path="/search-v2-test" element={<Suspense fallback={<GenericPageSkeleton />}><SearchV2TestPage /></Suspense>} />
         
         
         {/* /video/:videoId route removed in PR-5 — :videoId is a post id (shared by VideoCardMenu & AutoplayVideoCard), so preserve deep links via the unified /post viewer. */}

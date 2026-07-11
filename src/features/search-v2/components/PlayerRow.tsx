@@ -1,0 +1,44 @@
+import type { PlayerHit } from '../lib/searchNavigation';
+import { Highlight } from './Highlight';
+
+interface Props { player: PlayerHit; query: string; onSelect: () => void }
+
+function initials(name: string) {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0]?.toUpperCase() ?? '')
+    .join('');
+}
+
+export function PlayerRow({ player, query, onSelect }: Props) {
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-black/[0.02] text-left"
+    >
+      <div
+        className="w-[42px] h-[42px] rounded-[12px] flex items-center justify-center shrink-0"
+        style={{
+          background: '#0F172A',
+          color: '#fff',
+          fontSize: 13,
+          fontWeight: 700,
+          letterSpacing: '0.02em',
+        }}
+      >
+        {initials(player.full_name)}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-[14px] font-medium truncate" style={{ color: '#0F172A' }}>
+          <Highlight text={player.full_name} query={query} />
+        </p>
+        <p className="text-[12px] truncate" style={{ color: '#475569' }}>
+          {player.country ?? 'Tour player'}
+        </p>
+      </div>
+    </button>
+  );
+}
