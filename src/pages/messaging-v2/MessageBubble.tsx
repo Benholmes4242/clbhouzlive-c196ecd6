@@ -95,6 +95,33 @@ export const MessageBubble: React.FC<Props> = ({
   const replyName = isOutgoing ? 'rgba(245,246,247,0.9)' : SUB;
   const replySnippet = isOutgoing ? 'rgba(245,246,247,0.6)' : SUB;
 
+  const [viewer, setViewer] = useState<{ items: OrderedMediaItem[]; index: number } | null>(null);
+
+  const openViewer = async (tappedIndex: number, fallbackUrl: string) => {
+    // Resolve signed URLs (or reuse localUrl) for every image in this message.
+    const resolved = await Promise.all(
+      images.map(async (att, i): Promise<OrderedMediaItem | null> => {
+        let url: string | null = att.localUrl ?? null;
+        if (!url && att.path) url = await getSignedUrl(att.path);
+        if (!url && i === tappedIndex) url = fallbackUrl;
+        if (!url) return null;
+        return {
+          id: att.path ?? att.localUrl ?? `img-${i}`,
+          type: 'image',
+          previewUrl: url,
+          order: i,
+        };
+      }),
+    );
+    const items = resolved.filter((x): x is OrderedMediaItem => x !== null);
+    if (items.length === 0) return;
+    const adjustedIndex = Math.max(
+      0,
+      items.findIndex((it) => it.order === tappedIndex),
+    );
+    setViewer({ items, index: adjustedIndex === -1 ? 0 : adjustedIndex });
+  };
+
   return (
     <div
       className="w-full flex flex-col"
