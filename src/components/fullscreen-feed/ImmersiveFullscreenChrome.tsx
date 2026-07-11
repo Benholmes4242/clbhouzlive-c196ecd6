@@ -219,14 +219,15 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           onClick={(e) => { e.stopPropagation(); onClose(); }}
           aria-label="Back"
           style={{
-            width: 38, height: 38, borderRadius: '50%', background: CHEVRON_BG,
+            width: 44, height: 44, borderRadius: '50%', background: CHEVRON_BG,
             border: 'none', display: 'inline-flex', alignItems: 'center',
             justifyContent: 'center', color: '#fff', cursor: 'pointer',
             pointerEvents: 'auto', padding: 0, flexShrink: 0,
           }}
         >
-          <ChevronLeft size={22} stroke="#fff" strokeWidth={2.5} />
+          <ChevronLeft size={26} stroke="#fff" strokeWidth={2.5} />
         </button>
+
 
         {/* RIGHT — course block */}
         {courseName && (
