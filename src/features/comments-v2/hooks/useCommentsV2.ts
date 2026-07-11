@@ -222,15 +222,17 @@ export function useCommentsV2({
 
   const threads = useMemo<CommentV2[]>(() => {
     if (!parents.length) return [];
+    const isBlocked = (r: any) => blockedIds.has(r.user_id) || (r.actor_type !== 'business' && r.actor_id && blockedIds.has(r.actor_id));
     const byParent = new Map<string, any[]>();
     for (const r of replies) {
       if (hiddenIds.has(r.id)) continue;
+      if (isBlocked(r)) continue;
       const list = byParent.get(r.parent_id) ?? [];
       list.push(r);
       byParent.set(r.parent_id, list);
     }
     return parents
-      .filter(p => !hiddenIds.has(p.id))
+      .filter(p => !hiddenIds.has(p.id) && !isBlocked(p))
       .map(p => {
         const shaped = shape(p);
         const rlist = (byParent.get(p.id) ?? []).map(shape);
@@ -238,7 +240,7 @@ export function useCommentsV2({
         shaped.reply_count = rlist.length;
         return shaped;
       });
-  }, [parents, replies, hiddenIds, shape]);
+  }, [parents, replies, hiddenIds, blockedIds, shape]);
 
   // Header total (top-level count for the current target).
   const { data: totalCount = 0 } = useQuery({
