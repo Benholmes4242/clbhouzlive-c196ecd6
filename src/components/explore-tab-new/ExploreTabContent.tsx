@@ -63,9 +63,6 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
       <FeatTierRail region={activeRegion} tier="eagles" title="Eagles" />
       <FeatTierRail region={activeRegion} tier="birdie_hauls" title="Birdie hauls" />
 
-      {/* Destinations (still drives the SAME region control) */}
-      <ExploreDestinations activeRegion={activeRegion} onRegionSelect={handleRegionChange} />
-
       <ExploreGrid
         posts={posts}
         coursePosts={coursePosts}
