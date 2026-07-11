@@ -5,6 +5,16 @@
 
 import mapboxgl from 'mapbox-gl';
 
+// PRODUCTION FIX: esbuild minification breaks mapbox-gl's inline web worker
+// ("error parsing the WebWorker bundle" / "g is not defined"), which kills all
+// vector-tile decoding — maps render only the style background + DOM markers.
+// Use the standalone CSP worker bundle instead (Mapbox-documented escape hatch).
+// Vite's ?worker import returns a Worker constructor.
+// @ts-ignore - vite ?worker import has no type declaration here
+import MapboxWorker from 'mapbox-gl/dist/mapbox-gl-csp-worker?worker';
+
+(mapboxgl as unknown as { workerClass: unknown }).workerClass = MapboxWorker;
+
 export const MAP_CONFIG = {
   /** Clean minimal base — roads/POIs stripped at runtime */
   STYLE_URL: 'mapbox://styles/mapbox/light-v11',
