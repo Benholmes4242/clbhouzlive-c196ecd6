@@ -11,9 +11,8 @@ import { SeasonRecapModal } from '@/components/achievements/SeasonRecapModal';
 import { ProfileCompleteNudge } from '@/components/clubhouse/ProfileCompleteNudge';
 import { useSeasonRecap } from '@/hooks/useSeasonRecap';
 
-import { Compass, Flag, EyeOff, Link as LinkIcon, Users } from 'lucide-react';
+import { Compass, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Drawer, DrawerContent } from '@/components/ui/drawer';
 // Chrome owned solely by AppRoutes; no local status-bar imports.
 
 import { logRouteClubhouse } from '@/utils/bootTimeline';
