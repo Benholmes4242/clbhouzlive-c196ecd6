@@ -219,14 +219,15 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           onClick={(e) => { e.stopPropagation(); onClose(); }}
           aria-label="Back"
           style={{
-            width: 38, height: 38, borderRadius: '50%', background: CHEVRON_BG,
+            width: 44, height: 44, borderRadius: '50%', background: CHEVRON_BG,
             border: 'none', display: 'inline-flex', alignItems: 'center',
             justifyContent: 'center', color: '#fff', cursor: 'pointer',
             pointerEvents: 'auto', padding: 0, flexShrink: 0,
           }}
         >
-          <ChevronLeft size={22} stroke="#fff" strokeWidth={2.5} />
+          <ChevronLeft size={26} stroke="#fff" strokeWidth={2.5} />
         </button>
+
 
         {/* RIGHT — course block */}
         {courseName && (
@@ -235,7 +236,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'flex-end',
-              gap: 3,
+              gap: 4,
               maxWidth: '60%',
               minWidth: 0,
               textAlign: 'right',
@@ -244,7 +245,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             <span
               title={courseName}
               style={{
-                fontSize: 12, fontWeight: 500, color: '#fff', lineHeight: 1.2,
+                fontSize: 15, fontWeight: 600, color: '#fff', lineHeight: 1.2,
                 textShadow: TEXT_SHADOW,
                 maxWidth: '100%', overflow: 'hidden',
                 textOverflow: 'ellipsis', whiteSpace: 'nowrap',
@@ -255,14 +256,14 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             {courseLocation && (
               <span
                 style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 3,
-                  fontSize: 9, color: '#fff', opacity: 0.75, lineHeight: 1.1,
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
+                  fontSize: 12, color: '#fff', opacity: 0.8, lineHeight: 1.1,
                   textShadow: TEXT_SHADOW,
                   maxWidth: '100%', overflow: 'hidden',
                   textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                 }}
               >
-                <MapPinIcon width={9} height={9} style={{ flexShrink: 0 }} />
+                <MapPinIcon width={12} height={12} style={{ flexShrink: 0 }} />
                 <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {courseLocation}
                 </span>
@@ -274,11 +275,11 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
                 onClick={(e) => { e.stopPropagation(); handleCourseTap(); }}
                 aria-label={`Community rating ${formatRatingValue(courseRating!)}`}
                 style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 5, flexShrink: 0,
+                  display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0,
                   background: 'rgba(255,255,255,0.08)',
                   border: '1px solid rgba(255,255,255,0.12)',
-                  padding: '3px 9px 3px 4px', borderRadius: 999,
-                  cursor: 'pointer', marginTop: 2,
+                  padding: '5px 12px 5px 6px', borderRadius: 999,
+                  cursor: 'pointer', marginTop: 3,
                   backdropFilter: 'blur(8px)',
                   WebkitBackdropFilter: 'blur(8px)',
                   pointerEvents: 'auto', fontFamily: 'inherit',
@@ -288,9 +289,9 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
                   src="/lovable-uploads/2b0e2d79-6b26-4b6b-a27b-8dd5f8cc5aad.png"
                   alt=""
                   aria-hidden="true"
-                  style={{ width: 16, height: 16, flexShrink: 0, objectFit: 'contain' }}
+                  style={{ width: 20, height: 20, flexShrink: 0, objectFit: 'contain' }}
                 />
-                <span style={{ fontSize: 11, fontWeight: 800, color: '#F8FAFC', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+                <span style={{ fontSize: 14, fontWeight: 800, color: '#F8FAFC', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
                   {formatRatingValue(courseRating!)}
                 </span>
               </button>
@@ -298,6 +299,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
 
           </div>
         )}
+
       </div>
 
       {/* ─── BOTTOM scrim ──────────────────────────────────────── */}
@@ -351,14 +353,14 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           onClick={(e) => { e.stopPropagation(); onViewProfile(); }}
           aria-label={`View ${activePost.displayName}'s profile`}
           style={{
-            width: 32, height: 32, padding: 0, background: 'transparent',
+            width: 40, height: 40, padding: 0, background: 'transparent',
             border: 'none', cursor: 'pointer', pointerEvents: 'auto',
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
             flexShrink: 0, filter: ICON_SHADOW,
           }}
         >
           <SquircleAvatar
-            size={32}
+            size={40}
             src={activePost.avatarUrl}
             alt={activePost.displayName}
             fallback={activePost.displayName?.[0] ?? '?'}
@@ -368,7 +370,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
 
         <div
           style={{
-            display: 'flex', flexDirection: 'column', minWidth: 0, gap: 2, flex: 1,
+            display: 'flex', flexDirection: 'column', minWidth: 0, gap: 3, flex: 1,
           }}
         >
           {/* Name row — name ellipses first, follow never pushed off */}
@@ -376,7 +378,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             <span
               onClick={(e) => { e.stopPropagation(); onViewProfile(); }}
               style={{
-                fontSize: 12, fontWeight: 500, color: '#fff', lineHeight: 1.2,
+                fontSize: 15, fontWeight: 600, color: '#fff', lineHeight: 1.2,
                 textShadow: TEXT_SHADOW,
                 overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                 minWidth: 0, flex: '0 1 auto', pointerEvents: 'auto', cursor: 'pointer',
@@ -387,11 +389,11 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           </div>
 
           {/* Sub-row: timeAgo · Follow pill */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minHeight: 18 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minHeight: 20 }}>
             {timeLabel && (
               <span
                 style={{
-                  fontSize: 9, color: '#fff', opacity: 0.7, lineHeight: 1,
+                  fontSize: 12, color: '#fff', opacity: 0.75, lineHeight: 1,
                   textShadow: TEXT_SHADOW, flexShrink: 0,
                 }}
               >
@@ -414,16 +416,17 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
               onClick={(e) => { e.stopPropagation(); onReviewTap(); }}
               aria-label="Read review"
               style={{
-                alignSelf: 'flex-start', marginTop: 2, background: 'transparent',
+                alignSelf: 'flex-start', marginTop: 3, background: 'transparent',
                 border: 'none', padding: 0, cursor: 'pointer', pointerEvents: 'auto',
-                fontFamily: 'inherit', fontSize: 10, fontWeight: 500, color: '#fff',
-                opacity: 0.62, lineHeight: 1, textShadow: TEXT_SHADOW,
+                fontFamily: 'inherit', fontSize: 13, fontWeight: 500, color: '#fff',
+                opacity: 0.7, lineHeight: 1, textShadow: TEXT_SHADOW,
               }}
             >
               read review ›
             </button>
           )}
         </div>
+
       </div>
 
       {/* Bottom-RIGHT — vertical action rail (no avatar) */}
@@ -431,11 +434,11 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
         <div
           style={{
             position: 'fixed',
-            right: 'max(10px, env(safe-area-inset-right, 0px))',
-            bottom: 'calc(max(env(safe-area-inset-bottom, 0px), 24px) + 22px)',
+            right: 'max(12px, env(safe-area-inset-right, 0px))',
+            bottom: 'calc(max(env(safe-area-inset-bottom, 0px), 24px) + 26px)',
             zIndex: Z.echo,
             display: 'flex', flexDirection: 'column', alignItems: 'center',
-            gap: 14, pointerEvents: 'none',
+            gap: 20, pointerEvents: 'none',
             fontFamily: 'Geist, system-ui, sans-serif',
           }}
         >
@@ -446,7 +449,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             accent={likeState.isLiked}
           >
             <Heart
-              size={25}
+              size={32}
               fill={likeState.isLiked ? AMBER : 'transparent'}
               stroke={likeState.isLiked ? AMBER : '#fff'}
               strokeWidth={2}
@@ -454,22 +457,23 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           </RailButton>
 
           <RailButton onClick={onComment} ariaLabel="Comments" count={commentStr}>
-            <MessageCircle size={25} stroke="#fff" strokeWidth={2} />
+            <MessageCircle size={32} stroke="#fff" strokeWidth={2} />
           </RailButton>
 
           <RailButton onClick={() => onShare(activePost)} ariaLabel="Share">
-            <Send size={25} stroke="#fff" strokeWidth={2} />
+            <Send size={32} stroke="#fff" strokeWidth={2} />
           </RailButton>
 
           {ownerMenu ? (
             <div style={{ filter: ICON_SHADOW, pointerEvents: 'auto' }}>{ownerMenu}</div>
           ) : (
             <RailButton onClick={onMore} ariaLabel="More options">
-              <MoreHorizontal size={25} stroke="#fff" strokeWidth={2} />
+              <MoreHorizontal size={32} stroke="#fff" strokeWidth={2} />
             </RailButton>
           )}
         </div>
       )}
+
     </div>
   );
 });
@@ -487,7 +491,7 @@ const RailButton: React.FC<RailButtonProps> = ({ onClick, ariaLabel, count, acce
     onClick={(e) => { e.stopPropagation(); onClick(); }}
     aria-label={ariaLabel}
     style={{
-      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
+      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
       background: 'transparent', border: 'none', padding: 0, cursor: 'pointer',
       pointerEvents: 'auto', filter: ICON_SHADOW,
       fontFamily: 'Geist, system-ui, sans-serif',
@@ -499,13 +503,14 @@ const RailButton: React.FC<RailButtonProps> = ({ onClick, ariaLabel, count, acce
     {count && (
       <span
         style={{
-          fontSize: 10, fontWeight: 700, color: accent ? AMBER : '#fff',
+          fontSize: 13, fontWeight: 700, color: accent ? AMBER : '#fff',
           lineHeight: 1, fontVariantNumeric: 'tabular-nums', textShadow: TEXT_SHADOW,
         }}
       >
         {count}
       </span>
     )}
+
   </button>
 );
 
