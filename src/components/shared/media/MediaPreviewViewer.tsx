@@ -54,15 +54,32 @@ export function MediaPreviewViewer({
 
   if (!item) return null;
 
+  const backdropUrl = item.type === 'video' ? item.thumbnailUrl : item.previewUrl;
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[9999] bg-black flex flex-col"
+      className="fixed inset-0 z-[9999] bg-black"
     >
-      {/* Header */}
-      <div className="flex items-center justify-between shrink-0" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)', paddingLeft: 16, paddingRight: 16, paddingBottom: 12 }}>
+      {/* Blurred self-backdrop — matches canonical fullscreen viewer treatment */}
+      {backdropUrl && (
+        <div
+          aria-hidden
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: `url(${backdropUrl})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            filter: 'blur(40px) brightness(0.5) saturate(1.2)',
+            transform: 'scale(1.15)',
+          }}
+        />
+      )}
+
+      {/* Header — absolute so backdrop bleeds under the notch */}
+      <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)', paddingLeft: 16, paddingRight: 16, paddingBottom: 12 }}>
         <button
           onClick={onClose}
           style={{
@@ -112,12 +129,13 @@ export function MediaPreviewViewer({
         {(!onSetCover || currentIndex === coverIndex) && <div className="w-11" />}
       </div>
 
-      {/* Media */}
+      {/* Media — absolute inset so image centers in the full viewport (bleeds under the notch) */}
       <div
         ref={swipeRef}
-        className="flex-1 flex items-center justify-center relative"
-        style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)', touchAction: isZoomed ? 'none' : 'pan-y' }}
+        className="absolute inset-0 flex items-center justify-center"
+        style={{ touchAction: isZoomed ? 'none' : 'pan-y' }}
       >
+
         {item.type === 'video' ? (
           <video
             key={item.id}
