@@ -304,7 +304,12 @@ const ThreadV2Page: React.FC = () => {
         <button
           type="button"
           aria-label="Back"
-          onClick={() => navigate('/messages')}
+          onClick={() => {
+            // Prefer real back so we don't push a duplicate /messages entry
+            // and trap the user in an inbox ↔ thread loop.
+            if (window.history.length > 1) navigate(-1);
+            else navigate('/messages', { replace: true });
+          }}
           className="active:opacity-60"
           style={{
             width: 40,
