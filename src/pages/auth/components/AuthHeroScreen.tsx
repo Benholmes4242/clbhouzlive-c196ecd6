@@ -105,11 +105,21 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
 
   const trimmed = loginEmail.trim();
   const [agreed, setAgreed] = useState(false);
+  const [nudgeAgreement, setNudgeAgreement] = useState(false);
   const canContinue = trimmed.length > 0 && !submitting && agreed;
   const inMedian = useMemo(() => isMedianApp(), []);
   const showApple = inMedian && !!onAppleSignIn;
   const showGoogle = inMedian && !!onGoogleSignIn;
   const showSocial = showApple || showGoogle;
+
+  const requireAgreement = (fn?: () => void) => () => {
+    if (!agreed) {
+      setNudgeAgreement(true);
+      toast.error('Please agree to the Terms first.');
+      return;
+    }
+    fn?.();
+  };
 
 
   return (
