@@ -38,13 +38,13 @@ export default function CreateSheetV2({ open, onClose, returnPath }: Props) {
       <BottomSheet open={open && !courseOpen} title="Create" onClose={onClose}>
         <div style={{ padding: '4px 12px 20px', display: 'flex', flexDirection: 'column', gap: 8 }}>
           <OptionRow
-            glyph={<ImageIcon size={22} color="#0F172A" />}
+            glyph={<ImageIcon size={22} color="#F7931E" />}
             title="Post"
             subtitle="Share photos, clips or words to your feed"
             onClick={handlePost}
           />
           <OptionRow
-            glyph={<Star size={22} color="#0F172A" />}
+            glyph={<Star size={22} color="#F7931E" />}
             title="Course review"
             subtitle="Rate and review a course you've played"
             onClick={handleReview}
