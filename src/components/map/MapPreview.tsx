@@ -145,7 +145,9 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
       style={{ height }}
     >
       <div ref={mapContainerRef} className={`w-full h-full bg-muted ${mapInitialized ? '' : 'animate-pulse'}`} aria-hidden="true" />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+      {(locationText || (showExpandButton && onExpand)) && (
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+      )}
 
       {showExpandButton && onExpand && (
         <button
