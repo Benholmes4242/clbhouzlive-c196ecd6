@@ -81,7 +81,7 @@ function Card({ row, onOpen }: { row: any; onOpen: () => void }) {
             style={{
               width: 30,
               height: 30,
-              borderRadius: 999,
+              borderRadius: '34%',
               background: 'linear-gradient(135deg,#F7931E,#d97a10)',
               color: '#fff',
               fontWeight: 700,
