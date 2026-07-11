@@ -14,7 +14,7 @@ import { useReviewResponses, useSubmitReviewResponse } from '@/hooks/useReviewRe
 import { useBusinessClaimForCourse } from '@/hooks/useBusinessClaimForCourse';
 import { ReviewBlockFlat } from '../review/ReviewBlockFlat';
 import { ResponseDisplay, ReplyForm, VerifyToRespondPrompt } from '../review/ReviewResponseBlock';
-import { RatingFilterChips, RatingFilterValue } from '../review/RatingFilterChips';
+import type { RatingFilterValue } from '../review/RatingFilterChips';
 import { WriteReviewPrompt } from '../review/WriteReviewPrompt';
 import { SegmentedTabOption } from '@/components/ui/SegmentedTabs';
 import { Search, X, Pencil, ArrowUpDown, ListChecks, MessageSquarePlus, Flag, Map, Building2, Tag } from 'lucide-react';
@@ -63,6 +63,15 @@ const Divider = () => (
   <div style={{ height: '0.5px', background: HAIRLINE_INK_7 }} />
 );
 
+const TIER_ROWS: { key: ScoreTier; label: string }[] = [
+  { key: 'exceptional', label: 'Exceptional' },
+  { key: 'excellent',  label: 'Excellent' },
+  { key: 'good',       label: 'Good' },
+  { key: 'fair',       label: 'Fair' },
+  { key: 'poor',       label: 'Poor' },
+];
+
+
 const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   courseId,
   courseName,
@@ -87,8 +96,11 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     : ratingFilter === 'excellent' ? '8.9-7.5'
     : ratingFilter === 'good' ? '7.4-5'
     : 'all';
-  
+
+  const [searchOpen, setSearchOpen] = useState(false);
+
   const [highlightedReviewId, setHighlightedReviewId] = useState<string | null>(externalHighlightReviewId || null);
+
 
   const sortOptions: SegmentedTabOption[] = [
     { value: 'recent', label: 'Most recent' },
@@ -394,25 +406,17 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   if (isLoading) {
     return (
       <div style={{ background: SLATE_50, minHeight: '100%', paddingBottom: 40 }}>
-        {/* Community score skeleton — stacked */}
-        <div style={{ padding: '18px 16px 14px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-          <Skeleton className="h-3 w-28" />
-          <Skeleton className="h-12 w-20" />
-          <Skeleton className="h-3 w-24" />
-          <Skeleton className="h-3 w-20" />
+        {/* Distribution card skeleton */}
+        <div style={{ padding: '14px 16px 12px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <Skeleton className="h-[128px] w-full rounded-[16px]" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Skeleton className="h-[34px] w-[34px] rounded-full" />
+            <Skeleton className="h-[34px] w-[110px] rounded-full" />
+            <Skeleton className="h-[34px] w-[96px] rounded-full" style={{ marginLeft: 'auto' }} />
+          </div>
         </div>
         <Divider />
-        {/* Search skeleton */}
-        <div style={{ padding: '10px 16px 0' }}>
-          <Skeleton className="h-10 w-full rounded-[10px]" />
-        </div>
-        {/* Compressed control bar skeleton — single row */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px 12px' }}>
-          <Skeleton className="h-7 w-28 rounded-full" />
-          <div style={{ width: 1, height: 20, background: HAIRLINE_INK_10 }} />
-          <Skeleton className="h-7 w-24 rounded-full" />
-          <Skeleton className="h-7 w-28 rounded-full" />
-        </div>
+
         <Divider />
         {/* Review row skeletons */}
         {[1, 2, 3].map((i) => (
@@ -496,86 +500,138 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   return (
     <PullToRefreshContainer onRefresh={handlePullToRefresh}>
     <div style={{ paddingBottom: 40, background: SLATE_50, minHeight: '100%' }}>
-      {/* Community score header — horizontal (matches About Option B) */}
       {(() => {
         const isExceptional = getScoreTier(communityScore).isExceptional;
+        const tierColor = ratingTextColor(communityScore);
+        const maxTierCount = Math.max(...TIER_ROWS.map(t => reviewCountsByTier[t.key] ?? 0), 1);
         return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, padding: '18px 16px 14px' }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 2, flexShrink: 0 }}>
-          <span
-            className={isExceptional ? 'clbhouz-gold-shimmer-light' : undefined}
-            style={{ fontSize: 58, ...HERO_NUMBER_STYLE, ...(isExceptional ? {} : { color: ratingTextColor(communityScore) }), lineHeight: 1 }}
-          >
-            {communityScore.toFixed(1)}
-          </span>
-          <span style={{ fontSize: 19, fontWeight: 800, color: 'rgba(15,23,42,0.25)', letterSpacing: '-0.02em' }}>/10</span>
-        </div>
-        <div style={{ minWidth: 0 }}>
-          <div
-            className={isExceptional ? 'clbhouz-gold-shimmer-light' : undefined}
-            style={{ fontSize: 12, ...TIER_LABEL_STYLE, ...(isExceptional ? {} : { color: ratingTextColor(communityScore) }) }}
-          >
-            {getScoreTier(communityScore).label}
-          </div>
-          <div style={{ fontSize: 11.5, color: INK_FAINT, marginTop: 3, display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-            <span>{ratingCount} {ratingCount === 1 ? 'rating' : 'ratings'}</span>
-            {myReview && (
-              <button onClick={handleRateClick} style={{ background: 'none', border: 'none', color: AMBER, fontSize: 11, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4, padding: 0 }}>
-                <Pencil className="w-3.5 h-3.5" /> Edit yours
-              </button>
+          <div style={{ padding: '14px 16px 12px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {/* Distribution card */}
+            <div
+              style={{
+                background: '#FFFFFF',
+                border: `1px solid ${HAIRLINE_INK_10}`,
+                borderRadius: 16,
+                padding: '16px 16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 18,
+              }}
+            >
+              {/* Score block */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 4, flexShrink: 0, minWidth: 88 }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 2 }}>
+                  <span
+                    className={isExceptional ? 'clbhouz-gold-shimmer-light' : undefined}
+                    style={{ fontSize: 44, ...HERO_NUMBER_STYLE, ...(isExceptional ? {} : { color: tierColor }), lineHeight: 1 }}
+                  >
+                    {communityScore.toFixed(1)}
+                  </span>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: 'rgba(15,23,42,0.25)', letterSpacing: '-0.02em' }}>/10</span>
+                </div>
+                <div
+                  className={isExceptional ? 'clbhouz-gold-shimmer-light' : undefined}
+                  style={{ fontSize: 11, ...TIER_LABEL_STYLE, ...(isExceptional ? {} : { color: tierColor }) }}
+                >
+                  {getScoreTier(communityScore).label}
+                </div>
+                <div style={{ fontSize: 11, color: INK_FAINT }}>
+                  {ratingCount} {ratingCount === 1 ? 'rating' : 'ratings'}
+                </div>
+              </div>
+
+              {/* Tappable tier distribution */}
+              <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {TIER_ROWS.map(({ key, label }) => {
+                  const count = reviewCountsByTier[key] ?? 0;
+                  const selected = ratingFilter === key;
+                  const pct = Math.round((count / maxTierCount) * 100);
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => setRatingFilter(selected ? null : key)}
+                      aria-pressed={selected}
+                      aria-label={`Filter reviews: ${label} (${count})`}
+                      style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'none', border: 'none', padding: 0, cursor: 'pointer', width: '100%' }}
+                    >
+                      <span style={{ fontSize: 10.5, fontWeight: selected ? 800 : 600, color: selected ? INK : INK_MUTE, letterSpacing: '0.02em', textTransform: 'uppercase', width: 62, textAlign: 'left', flexShrink: 0 }}>
+                        {label}
+                      </span>
+                      <span style={{ flex: 1, minWidth: 0, height: 6, borderRadius: 999, background: INK_TINT_06, overflow: 'hidden' }}>
+                        <span style={{ display: 'block', height: '100%', width: `${pct}%`, background: selected ? AMBER : 'rgba(15,23,42,0.35)', borderRadius: 999, transition: 'width 220ms ease, background 160ms ease' }} />
+                      </span>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: selected ? INK : INK_MUTE, fontVariantNumeric: 'tabular-nums', width: 22, textAlign: 'right', flexShrink: 0 }}>
+                        {count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Control row / expanding search */}
+            {searchOpen ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, height: 34, padding: '0 12px', borderRadius: 17, background: '#FFFFFF', border: `1px solid ${HAIRLINE_INK_10}` }}>
+                <Search className="h-4 w-4 text-muted-foreground" style={{ flexShrink: 0 }} />
+                <input
+                  type="text"
+                  placeholder="Search reviews…"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  autoFocus
+                  style={{ flex: 1, minWidth: 0, border: 'none', outline: 'none', fontSize: 13, color: INK, background: 'transparent' }}
+                />
+                {searchQuery && (
+                  <button type="button" onClick={handleClearSearch} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, flexShrink: 0 }}>
+                    <X className="h-4 w-4 text-muted-foreground" />
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => { handleClearSearch(); setSearchOpen(false); }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: AMBER, padding: 0, flexShrink: 0 }}
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <button
+                  type="button"
+                  onClick={() => setSearchOpen(true)}
+                  aria-label="Search reviews"
+                  style={{ width: 34, height: 34, borderRadius: 17, background: '#FFFFFF', border: `1px solid ${HAIRLINE_INK_10}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}
+                >
+                  <Search className="h-4 w-4 text-muted-foreground" />
+                </button>
+
+                <AppSelect
+                  value={sortBy}
+                  onChange={(v) => setSortBy(v as ReviewsSortBy)}
+                  options={sortOptions.map((o) => ({ value: o.value as string, label: o.label }))}
+                  ariaLabel="Sort reviews"
+                  icon={<ArrowUpDown className="h-3 w-3 mr-1" />}
+                  triggerClassName="!h-[34px] !py-0 !px-3 !text-xs !font-semibold !rounded-full !bg-white !border !border-input !text-foreground hover:!bg-accent gap-0 [&>span]:text-foreground"
+                />
+
+                {myReview && (
+                  <button
+                    type="button"
+                    onClick={handleRateClick}
+                    style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 6, height: 34, padding: '0 14px', borderRadius: 17, background: AMBER, color: '#FFFFFF', fontSize: 12, fontWeight: 800, border: 'none', cursor: 'pointer', flexShrink: 0 }}
+                  >
+                    <Pencil className="w-3.5 h-3.5" /> Edit yours
+                  </button>
+                )}
+              </div>
             )}
           </div>
-        </div>
-      </div>
         );
       })()}
 
-
       <Divider />
 
-      {/* Search */}
-      <div style={{ padding: '10px 16px 0' }}>
-        <div style={{ position: 'relative' }}>
-          <Search className="h-4 w-4 text-muted-foreground" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
-          <input
-            type="text"
-            placeholder="Search reviews…"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ width: '100%', height: 40, paddingLeft: 36, paddingRight: searchQuery ? 36 : 16, borderRadius: 10, border: `1px solid ${HAIRLINE_INK_10}`, background: INK_TINT_02, fontSize: 13, color: INK, outline: 'none', boxSizing: 'border-box' as const }}
-          />
-          {searchQuery && (
-            <button type="button" onClick={handleClearSearch} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}>
-              <X className="h-4 w-4 text-muted-foreground" />
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Toolbar: sort dropdown + filter sheet trigger (single row, no overflow) */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          padding: '12px 16px 12px',
-        }}
-      >
-        <AppSelect
-          value={sortBy}
-          onChange={(v) => setSortBy(v as ReviewsSortBy)}
-          options={sortOptions.map((o) => ({ value: o.value as string, label: o.label }))}
-          ariaLabel="Sort reviews"
-          icon={<ArrowUpDown className="h-3 w-3 mr-1" />}
-          triggerClassName="!h-auto !py-1 !px-2 !text-xs !font-medium !rounded-md !bg-background !border !border-input !text-foreground hover:!bg-accent hover:!text-accent-foreground gap-0 [&>span]:text-foreground"
-        />
-
-        <RatingFilterChips
-          value={ratingFilter}
-          onChange={setRatingFilter}
-          counts={reviewCountsByTier}
-        />
-      </div>
 
       <Divider />
 
