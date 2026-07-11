@@ -234,6 +234,16 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
     return () => unlockBodyScroll();
   }, [isOpen]);
 
+  // Native status bar: light overlay -> light bar + dark icons while open,
+  // then restore the underlying route's chrome on close.
+  useEffect(() => {
+    if (!isOpen) return;
+    try { setStatusBarStyleColor('dark', 'FFF8FAFC'); } catch {}
+    return () => {
+      try { applyRouteChrome(window.location.pathname, true); } catch {}
+    };
+  }, [isOpen]);
+
   // Overlay timing: open-start / close-start
   const ovlId = useRef<number>(-1);
   if (isOpen && ovlId.current < 0) {
