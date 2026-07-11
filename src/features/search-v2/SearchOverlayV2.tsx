@@ -82,7 +82,7 @@ export function SearchOverlayV2({
   const initialScope: Scope =
     mode === 'videos' || mode === 'commit' ? 'videos' : 'all';
   const [scope, setScope] = useState<Scope>(initialScope);
-  const { items: recents, save, clear, remove } = useRecentSearchesV2();
+  const { items: recents, save, clear } = useRecentSearchesV2();
 
   useEffect(() => {
     if (isOpen) {
