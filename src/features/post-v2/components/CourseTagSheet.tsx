@@ -178,6 +178,18 @@ export default function CourseTagSheet({
             ))
           )}
         </div>
+
+        {/* Thin footer band — latches onto the top of the keyboard so list
+            content scrolls under it rather than under the keyboard itself.
+            Mirrors the shared @mention sheet chrome. */}
+        <div
+          style={{
+            flexShrink: 0,
+            height: 6,
+            borderTop: '1px solid rgba(15,23,42,0.08)',
+            background: '#FFFFFF',
+          }}
+        />
       </div>
     </BottomSheet>
   );
