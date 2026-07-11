@@ -243,6 +243,8 @@ function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderR
           <VideoCardMenu
             postId={post.id}
             userId={userId}
+            authorUserId={post.userId}
+            authorUsername={post.username}
             onShare={handleShare}
             className={metaPadX === 0 ? '!mr-0' : undefined}
           />
