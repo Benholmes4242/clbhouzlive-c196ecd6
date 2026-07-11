@@ -3,7 +3,6 @@ import { ChevronDown, Check } from 'lucide-react';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { SquircleAvatar, LIGHT_HAIRLINE, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { SectionHeader } from '@/components/ui/SectionHeader';
 import type { ActiveActor } from '@/types/actor';
 
 const PALETTE = {
