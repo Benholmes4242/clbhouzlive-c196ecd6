@@ -1078,7 +1078,7 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({
   isOwnProfile,
   isFirst = false,
 }) => {
-  const { blockUser } = useBlockActions({ currentUserId: currentUserId || '' });
+  
   const navigate = useNavigate();
   const isSelf = currentUserId === user.id;
 
