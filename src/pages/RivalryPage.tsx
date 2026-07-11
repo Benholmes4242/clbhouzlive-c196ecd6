@@ -324,16 +324,7 @@ const RivalryPage: React.FC = () => {
   };
 
   // v1: messaging falls back to profile sheet
-  const handleMessage = () => {
-    if (rivalIsClbhouzUser && rivalUserId) {
-      openHybridSheet({
-        targetUserId: rivalUserId,
-        source: 'rivalry_page_message' as never,
-      });
-    } else {
-      toast('Messaging coming soon');
-    }
-  };
+  
 
   const handleShare = async () => {
     if (!row) return;
