@@ -100,13 +100,20 @@ export function MediaPreviewViewer({
       </div>
 
       {/* Media */}
-      <div className="flex-1 flex items-center justify-center relative" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)' }}>
+      <div
+        ref={swipeRef}
+        className="flex-1 flex items-center justify-center relative"
+        style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)', touchAction: isZoomed ? 'none' : 'pan-y' }}
+      >
         {item.type === 'video' ? (
-          <img
+          <video
+            key={item.id}
             src={item.previewUrl}
-            alt=""
+            poster={item.thumbnailUrl}
+            controls
+            playsInline
+            autoPlay
             className="w-full h-full object-contain"
-            draggable={false}
           />
         ) : (
           <div ref={zoomRef} style={zoomStyle}>
