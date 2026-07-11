@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
 import { MapPin, X } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { createGlassyMarkerElement } from './MapMarker';
@@ -135,70 +134,93 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent 
-        side="bottom" 
-        className="h-[85vh] sm:h-[80vh] flex flex-col p-0 !rounded-t-2xl"
+      <SheetContent
+        side="bottom"
+        className="h-[92vh] p-0 !rounded-t-2xl overflow-hidden immersive-map-sheet expanded-map-glass-controls"
         hideCloseButton
       >
-        {/* Drag handle */}
-        <div className="flex justify-center pt-3 pb-1">
-          <div className="w-8 h-1 rounded-full bg-muted-foreground/30" />
-        </div>
+        {/* Map IS the sheet */}
+        <div ref={mapContainerRef} className="absolute inset-0" />
 
-        {/* Custom close button with 44px tap target */}
-        <button
-          type="button"
-          onClick={() => onOpenChange(false)}
-          className="absolute right-2 top-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-sm opacity-70 hover:opacity-100 transition-opacity"
-          aria-label="Close"
+        {/* Floating grabber (affordance only) */}
+        <div className="pointer-events-none absolute top-2.5 left-1/2 -translate-x-1/2 w-9 h-1 rounded-full bg-black/25" />
+
+        {/* Floating header card - swipe down here closes */}
+        <div
+          {...swipeHandlers}
+          className="absolute top-[18px] left-3 right-3 flex items-center gap-3 rounded-2xl px-3.5 py-3"
+          style={{
+            background: 'rgba(255,255,255,0.92)',
+            backdropFilter: 'blur(14px)',
+            WebkitBackdropFilter: 'blur(14px)',
+            border: '1px solid rgba(15,23,42,0.08)',
+            boxShadow: '0 8px 24px rgba(15,23,42,0.15)',
+          }}
         >
-          <X className="h-4 w-4" />
-        </button>
-
-        {/* Header - swipe to close area */}
-        <div {...swipeHandlers} className="px-4 pt-1">
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <h2 className="text-base font-semibold flex items-center gap-2">
-                <MapPin className="h-4 w-4" />
-                {name}
-              </h2>
-              {locationText && (
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {locationText}
-                </p>
-              )}
+          <div style={{
+            width: 34, height: 34, borderRadius: 11, flexShrink: 0,
+            background: 'rgba(247,147,30,0.12)', color: '#F7931E',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <MapPin size={16} strokeWidth={2} />
+          </div>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div style={{ fontSize: 14, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.01em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {name}
             </div>
-          </div>
-        </div>
-        
-        <div className="flex flex-col flex-1 pb-[calc(max(20px,env(safe-area-inset-bottom,0px))+8px)] gap-4">
-          {/* Map - full bleed on mobile, rounded on desktop */}
-          <div 
-            className="relative h-[calc(100vh-300px)] max-h-[52vh] rounded-none overflow-hidden border border-border/60 sm:border-border/40 bg-surface-alt w-[100vw] left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 sm:rounded-2xl sm:mx-4 expanded-map-glass-controls" 
-            style={{ minHeight: `${MAP_CONFIG.HEIGHT.EXPANDED_MIN}px` }}
-          >
-            <div ref={mapContainerRef} className="w-full h-full" />
-          </div>
-
-          {/* Navigation CTAs */}
-          <div className="flex flex-col sm:flex-row gap-3 px-4">
-            {isIOS && (
-              <Button
-                className="flex-1 bg-[#f59e0b] text-white hover:bg-[#e8920f] shadow-none"
-                onClick={() => openExternalUrl(appleMapsUrl)}
-              >
-                Open in Apple Maps
-              </Button>
+            {locationText && (
+              <div style={{ fontSize: 10.5, color: '#64748B', marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {locationText}
+              </div>
             )}
-            <Button
-              className={isIOS ? "flex-1" : "flex-1 bg-[#f59e0b] text-white hover:bg-[#e8920f]"}
-              variant={isIOS ? 'outline' : 'default'}
-              onClick={() => openExternalUrl(googleMapsUrl)}
-            >
-              Open in Google Maps
-            </Button>
           </div>
+          <button
+            type="button"
+            onClick={() => onOpenChange(false)}
+            aria-label="Close"
+            className="shrink-0 flex items-center justify-center"
+            style={{ width: 30, height: 30, borderRadius: 15, background: 'rgba(15,23,42,0.06)', border: 'none', color: '#64748B', cursor: 'pointer' }}
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        {/* Floating launch dock */}
+        <div
+          className="pointer-events-none absolute left-3 right-3 flex gap-2.5"
+          style={{ bottom: 'calc(max(16px, env(safe-area-inset-bottom, 0px)) + 4px)' }}
+        >
+          {isIOS && (
+            <button
+              type="button"
+              onClick={() => openExternalUrl(appleMapsUrl)}
+              className="pointer-events-auto flex-1"
+              style={{
+                height: 50, borderRadius: 999, border: 'none', cursor: 'pointer',
+                background: '#F7931E', color: '#fff',
+                fontSize: 13.5, fontWeight: 700,
+                boxShadow: '0 8px 24px rgba(15,23,42,0.2)',
+              }}
+            >
+              Open in Apple Maps
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => openExternalUrl(googleMapsUrl)}
+            className="pointer-events-auto flex-1"
+            style={{
+              height: 50, borderRadius: 999, cursor: 'pointer',
+              background: isIOS ? 'rgba(255,255,255,0.92)' : '#F7931E',
+              color: isIOS ? '#0F172A' : '#fff',
+              border: isIOS ? '1px solid rgba(15,23,42,0.08)' : 'none',
+              backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)',
+              fontSize: 13.5, fontWeight: 700,
+              boxShadow: '0 8px 24px rgba(15,23,42,0.2)',
+            }}
+          >
+            {isIOS ? 'Google Maps' : 'Open in Google Maps'}
+          </button>
         </div>
       </SheetContent>
     </Sheet>
