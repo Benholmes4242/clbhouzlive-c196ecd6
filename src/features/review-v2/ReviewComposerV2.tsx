@@ -31,6 +31,8 @@ import { SubmitBar } from './components/SubmitBar';
 import { SuccessScreenV2 } from './components/SuccessScreenV2';
 import { RemoveReviewSheetV2 } from './components/RemoveReviewSheetV2';
 import type { ExistingMedia, ExistingReview, ReviewV2Course } from './types';
+import { setStatusBarStyleColor, applyShieldColor } from '@/hooks/useMedianStatusBar';
+import { applyRouteChrome } from '@/lib/routeChrome';
 
 function Section({ eyebrow, children }: { eyebrow: string; children: React.ReactNode }) {
   return (
@@ -57,6 +59,27 @@ function InnerComposer() {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const userId = user?.id ?? null;
+  // Force LIGHT chrome for the review composer even though /courses/ is
+  // classed as immersive by App.tsx (which serves course hero pages).
+  useEffect(() => {
+    try {
+      setStatusBarStyleColor('dark', 'FFF8FAFC');
+      applyShieldColor('#F8FAFC');
+    } catch {}
+    const hadImmersive = document.documentElement.getAttribute('data-immersive-route');
+    document.documentElement.removeAttribute('data-immersive-route');
+    const prevHtmlBg = document.documentElement.style.backgroundColor;
+    const prevBodyBg = document.body.style.backgroundColor;
+    document.documentElement.style.backgroundColor = '#F8FAFC';
+    document.body.style.backgroundColor = '#F8FAFC';
+    return () => {
+      if (hadImmersive) document.documentElement.setAttribute('data-immersive-route', hadImmersive);
+      document.documentElement.style.backgroundColor = prevHtmlBg;
+      document.body.style.backgroundColor = prevBodyBg;
+      try { applyRouteChrome(window.location.pathname, true); } catch {}
+    };
+  }, []);
+
 
   const courseQ = useQuery({
     queryKey: ['rv2-course', courseId],
