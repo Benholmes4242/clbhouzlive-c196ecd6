@@ -461,8 +461,9 @@ export function FullscreenFeedOverlay() {
       // overlay flag is boot-locked (ensureStatusBarOverlayBooted). We only
       // push style + color here — no viewport resize during open animation.
       try {
-        setStatusBarStyleColor('dark', '00000000');
+        setStatusBarStyleColor('light', '00000000');
       } catch {}
+
 
       return () => {
         // Route-change guard: if the overlay is unmounting without an explicit
@@ -488,6 +489,17 @@ export function FullscreenFeedOverlay() {
         if (shield) shield.style.backgroundColor = 'transparent';
         document.documentElement.style.backgroundColor = '';
         document.body.style.backgroundColor = '';
+
+        // Overlay is not a route change, so App.tsx's chrome effect never
+        // re-fires on close. Re-assert the Clubhouse dark-chrome status bar
+        // (white icons over the #15171F notch) directly, and invalidate the
+        // chrome cache so the next real navigation re-applies from truth
+        // rather than short-circuiting on a stale sbKey.
+        try {
+          setStatusBarStyleColor('light', 'FF15171F');
+        } catch {}
+        try { delete (window as any).__lvChromeCache; } catch {}
+
 
         // Restore #root scroll position on the next frame so the feed's scroll
         // height is settled after the overlay unmounts.
