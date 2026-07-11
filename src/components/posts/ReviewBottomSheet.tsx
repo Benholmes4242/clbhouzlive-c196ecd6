@@ -292,10 +292,10 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   <h1
                     id="review-sheet-title"
                     style={{
-                      margin: '4px 0 0',
-                      fontSize: 15,
-                      fontWeight: 500,
-                      lineHeight: 1.2,
+                      margin: '6px 0 0',
+                      fontSize: 22,
+                      fontWeight: 800,
+                      lineHeight: 1.15,
                       color: '#F8FAFC',
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
