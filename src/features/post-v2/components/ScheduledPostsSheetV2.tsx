@@ -7,7 +7,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import BottomSheet from './BottomSheet';
-import { Trash2 } from 'lucide-react';
+import { CalendarClock, Trash2 } from 'lucide-react';
 import { formatSchedule } from '../lib/formatSchedule';
 
 interface Row {
