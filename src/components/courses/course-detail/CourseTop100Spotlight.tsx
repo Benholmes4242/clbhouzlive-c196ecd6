@@ -124,45 +124,57 @@ export const CourseTop100Spotlight: React.FC<CourseTop100SpotlightProps> = ({
         </div>
       </div>
 
-      {/* Stat tiles — user progress through each Top 100 list this course appears in */}
+      {/* Stat tiles — course rank leads, user progress demoted to a chip */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, position: 'relative' }}>
-        {data.list_memberships.map((list) => {
-          const progress = progressBySlug.get(list.list_slug);
-          // Logged-in (progress data exists): show played count + "of N played" caption
-          // Logged-out (no progress): show em-dash + "Tap to view list" CTA hint
-          const bigValue = progress ? `${progress.played}` : '—';
-          const caption = progress
-            ? `of ${progress.total} played`
-            : 'Tap to view list';
-
-          return (
-            <button
-              key={list.list_slug}
-              type="button"
-              onClick={() => handleChipTap(list.list_slug)}
-              style={{
-                flex: '1 1 calc(50% - 4px)',
-                minWidth: 0,
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(247,147,30,0.18)',
-                borderRadius: 10,
-                padding: '10px 12px',
-                textAlign: 'left',
-                cursor: 'pointer',
-              }}
-            >
-              <div style={{ fontSize: 20, fontWeight: 900, color: '#F7931E', fontVariantNumeric: 'tabular-nums', lineHeight: 1.1 }}>
-                {bigValue}
-              </div>
-              <div style={{ fontSize: 10, fontWeight: 600, color: '#94A3B8', marginTop: 3, lineHeight: 1.3, fontVariantNumeric: 'tabular-nums' }}>
-                {caption}
-              </div>
-              <div style={{ fontSize: 10, fontWeight: 600, color: '#CBD5E1', marginTop: 4, lineHeight: 1.3 }}>
-                {list.list_name}
-              </div>
-            </button>
-          );
-        })}
+        {data.list_memberships.map((list) => (
+          <button
+            key={list.list_slug}
+            type="button"
+            onClick={() => handleChipTap(list.list_slug)}
+            style={{
+              flex: '1 1 calc(50% - 4px)',
+              minWidth: 0,
+              background: 'rgba(255,255,255,0.05)',
+              border: '1px solid rgba(247,147,30,0.18)',
+              borderRadius: 12,
+              padding: 12,
+              textAlign: 'left',
+              cursor: 'pointer',
+            }}
+          >
+            {/* Course rank - the headline */}
+            <div style={{ fontSize: 26, fontWeight: 900, color: '#F7931E', fontVariantNumeric: 'tabular-nums', lineHeight: 1, letterSpacing: '-0.02em' }}>
+              {list.rank != null ? `#${list.rank}` : '—'}
+            </div>
+            <div style={{ fontSize: 10.5, fontWeight: 700, color: '#E2E8F0', marginTop: 5, lineHeight: 1.3 }}>
+              {list.list_name}
+            </div>
+            {/* Your progress - demoted to a chip */}
+            {(() => {
+              const progress = progressBySlug.get(list.list_slug);
+              if (!progress) {
+                return (
+                  <div style={{ display: 'inline-flex', alignItems: 'center', marginTop: 8, fontSize: 9.5, fontWeight: 700, color: '#94A3B8', background: 'rgba(255,255,255,0.06)', borderRadius: 999, padding: '3px 8px' }}>
+                    Tap to view list
+                  </div>
+                );
+              }
+              const playedThis = data.user_has_played;
+              return (
+                <div style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 4, marginTop: 8,
+                  fontSize: 9.5, fontWeight: 700, fontVariantNumeric: 'tabular-nums',
+                  borderRadius: 999, padding: '3px 8px',
+                  color: playedThis ? '#F7931E' : '#94A3B8',
+                  background: playedThis ? 'rgba(247,147,30,0.14)' : 'rgba(255,255,255,0.06)',
+                }}>
+                  {playedThis && <Check size={9} strokeWidth={3} />}
+                  You've played {progress.played}/{progress.total}
+                </div>
+              );
+            })()}
+          </button>
+        ))}
       </div>
 
       {/* Progress strip */}
