@@ -174,8 +174,10 @@ const TIER_EMPTY_LABEL: Record<FeatTier, string> = {
 };
 
 function FeatTierRailInner({ region, tier, title }: TierProps) {
+  const navigate = useNavigate();
   const { data, isLoading } = useRegionFeats(region, tier);
   const rows = data ?? [];
+  const goToClaim = () => navigate('/handicap');
 
   return (
     <section style={{ fontFamily: FONT, paddingTop: 4 }}>
