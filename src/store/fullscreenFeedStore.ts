@@ -193,6 +193,28 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
   borrowDemoteRequested: false,
   closeAnim: 'idle',
   closeAnimDone: false,
+  activePagerIdx: 0,
+  pausedOwnerKeys: new Set<string>(),
+
+  setActivePagerIdx: (idx) => {
+    if (get().activePagerIdx === idx) return;
+    set({ activePagerIdx: idx });
+  },
+  addPausedOwnerKey: (k) => {
+    const cur = get().pausedOwnerKeys;
+    if (cur.has(k)) return;
+    const next = new Set(cur);
+    next.add(k);
+    set({ pausedOwnerKeys: next });
+  },
+  removePausedOwnerKey: (k) => {
+    const cur = get().pausedOwnerKeys;
+    if (!cur.has(k)) return;
+    const next = new Set(cur);
+    next.delete(k);
+    set({ pausedOwnerKeys: next });
+  },
+
 
   open: (posts, startIndex = 0, options) => {
     const openingPost: any = posts[startIndex];
