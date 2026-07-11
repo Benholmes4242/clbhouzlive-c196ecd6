@@ -42,10 +42,10 @@ export default function MediaTrimSheet({ open, onClose, item, onApply }: Props) 
           style={{ width: '100%', maxHeight: 240, background: '#15171F', borderRadius: 10 }}
         />
         <label style={label}>Start: {start.toFixed(2)}s
-          <input type="range" min={0} max={Math.max(duration, 0.01)} step={0.05} value={start} onChange={(e) => setStart(Math.min(Number(e.target.value), end))} />
+          <input type="range" min={0} max={Math.max(duration, 0.01)} step={0.05} value={start} onChange={(e) => setStart(Math.min(Number(e.target.value), end))} style={rangeInput} />
         </label>
         <label style={label}>End: {end.toFixed(2)}s
-          <input type="range" min={0} max={Math.max(duration, 0.01)} step={0.05} value={end} onChange={(e) => setEnd(Math.max(Number(e.target.value), start))} />
+          <input type="range" min={0} max={Math.max(duration, 0.01)} step={0.05} value={end} onChange={(e) => setEnd(Math.max(Number(e.target.value), start))} style={rangeInput} />
         </label>
         <div style={{ display: 'flex', gap: 8 }}>
           <button onClick={onClose} style={btnGhost}>Cancel</button>
@@ -57,5 +57,6 @@ export default function MediaTrimSheet({ open, onClose, item, onApply }: Props) 
 }
 
 const label: React.CSSProperties = { display: 'flex', flexDirection: 'column', gap: 6, fontSize: 12, color: '#1F2428' };
+const rangeInput: React.CSSProperties = { width: '100%', accentColor: '#15171F', cursor: 'pointer' };
 const btnGhost: React.CSSProperties = { flex: 1, background: '#fff', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 12, padding: '10px', fontSize: 14, cursor: 'pointer' };
 const btnDark: React.CSSProperties = { flex: 1, background: '#15171F', color: '#F5F6F7', border: 0, borderRadius: 12, padding: '10px', fontSize: 14, fontWeight: 600, cursor: 'pointer' };

@@ -46,6 +46,7 @@ export default function CoverFrameSheet({ open, onClose, item, onApply }: Props)
               setTs(v);
               if (videoRef.current) videoRef.current.currentTime = v;
             }}
+            style={{ width: '100%', accentColor: '#15171F', cursor: 'pointer' }}
           />
         </label>
         <div style={{ display: 'flex', gap: 8 }}>
