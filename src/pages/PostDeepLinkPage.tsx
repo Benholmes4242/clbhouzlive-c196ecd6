@@ -202,7 +202,7 @@ const PostDeepLinkPage: React.FC = () => {
 
     loadPost();
     if (postId) recordPostViewOnce(postId);
-  }, [postId]);
+  }, [postId, user?.id]);
 
   // Logged-in users: open the global fullscreen viewer with the loaded post
   // and the comments sheet open. Closing the viewer navigates back.
