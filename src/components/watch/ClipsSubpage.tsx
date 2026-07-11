@@ -106,21 +106,15 @@ export default function ClipsSubpage() {
 
         <ScrollToTopGlass />
 
-        <SearchOverlay
+        <SearchOverlayV2
           isOpen={searchOpen}
           onClose={() => setSearchOpen(false)}
-          placeholder="Search clips..."
-          onSearch={() => { /* live-typing preview handled by sheet only */ }}
+          mode="commit"
+          placeholder="Search clips…"
           onCommit={(term) => {
-            addSearch(term);
             setCommittedQuery(term);
             setSearchOpen(false);
           }}
-          recentSearches={recentSearches}
-          onClearRecent={clearAll}
-          onRemoveRecent={removeSearch}
-          trendingItems={TRENDING}
-          userId={userId}
         />
       </PageRoot>
   );
