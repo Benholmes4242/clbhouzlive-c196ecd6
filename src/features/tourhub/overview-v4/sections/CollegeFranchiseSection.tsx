@@ -4,13 +4,30 @@
  */
 
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { SectionShell } from './SectionShell';
 import { V4 } from '../tokens';
-import { useCollegeStats } from '../../hooks/useCollegeStats';
+
+function useCollegeTopWins() {
+  return useQuery({
+    queryKey: ['overview-v4', 'college-top-wins'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('college_season_stats')
+        .select('id, normalized_name, wins_total, top10_total')
+        .order('wins_total', { ascending: false })
+        .limit(5);
+      if (error) throw error;
+      return (data as any[]) ?? [];
+    },
+    staleTime: 60 * 60 * 1000,
+  });
+}
 
 export function CollegeFranchiseSection() {
   const navigate = useNavigate();
-  const { data } = useCollegeStats();
+  const { data } = useCollegeTopWins();
   const top5 = ((data ?? []) as any[]).slice(0, 5);
   if (top5.length === 0) return null;
 
