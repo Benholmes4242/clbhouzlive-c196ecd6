@@ -80,7 +80,60 @@ function Ghost({
   );
 }
 
+function ClampedReviewText({ text }: { text: string }) {
+  const textRef = React.useRef<HTMLDivElement | null>(null);
+  const [isClamped, setIsClamped] = React.useState(false);
+
+  React.useLayoutEffect(() => {
+    const el = textRef.current;
+    if (!el) return;
+    setIsClamped(el.scrollHeight > el.clientHeight + 1);
+  }, [text]);
+
+  return (
+    <div style={{ position: 'relative', minHeight: REVIEW_BODY_MIN_HEIGHT }}>
+      <div
+        ref={textRef}
+        style={{
+          fontSize: REVIEW_FONT_SIZE,
+          lineHeight: REVIEW_LINE_HEIGHT,
+          color: T_INK,
+          display: '-webkit-box',
+          WebkitLineClamp: REVIEW_CLAMP_LINES,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden',
+          wordBreak: 'break-word',
+        }}
+      >
+        <MentionText text={text} />
+      </div>
+      {isClamped && (
+        <span
+          aria-hidden
+          style={{
+            position: 'absolute',
+            right: 0,
+            bottom: 0,
+            paddingLeft: 64,
+            background:
+              'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 38%)',
+            color: T_MUTE,
+            fontSize: 13,
+            fontWeight: 600,
+            lineHeight: REVIEW_LINE_HEIGHT,
+            whiteSpace: 'nowrap',
+            pointerEvents: 'none',
+          }}
+        >
+          Read review &gt;
+        </span>
+      )}
+    </div>
+  );
+}
+
 export function LivePreviewCard({
+
   course,
   author,
   overall,
