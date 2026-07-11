@@ -1,4 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
+
+const CLUBHOUSE_CHARCOAL = '#15171F';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { Check } from 'lucide-react';
@@ -191,10 +193,10 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
           ...(following
             ? isDark
               ? { background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.5)', border: 'none' }
-              : { background: 'transparent', color: 'rgba(15,23,42,0.50)', border: '1px solid rgba(15,23,42,0.10)' }
+              : { background: 'transparent', color: 'rgba(21,23,31,0.50)', border: '1px solid rgba(21,23,31,0.10)' }
             : isDark
               ? { background: '#ffffff', color: '#000000', border: 'none' }
-              : { background: '#0F172A', color: '#ffffff', border: 'none' }),
+              : { background: CLUBHOUSE_CHARCOAL, color: '#ffffff', border: 'none' }),
         }}
       >
         {following ? 'Following' : 'Follow'}
