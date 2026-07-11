@@ -7,7 +7,7 @@
  *  - Per-slide no-crop ambient fill: a blurred, scaled copy of the slide
  *    fills the frame behind it, then the slide is `object-fit: contain`
  *    on top. Wide and tall in the same post both show whole, no bars.
- *  - Dots overlay bottom-centre (`CarouselDots`), `n/total` chip top-right.
+ *  - Dots overlay bottom-centre (`CarouselDots`) are the sole indicator.
  *  - Swipe + tap a dot navigates. Active index persisted in
  *    `clubhouseStore.carouselPositions` keyed by post index.
  *  - Inline video lifecycle: only the active slide may autoplay.
