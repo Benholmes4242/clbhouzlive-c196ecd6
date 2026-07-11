@@ -71,7 +71,7 @@ export default function CourseTagSheet({ open, onClose, onSelect, current, userI
             color: 'rgba(15,23,42,0.55)',
           }}
         >
-          <MapPin size={11} strokeWidth={2.25} color="rgba(15,23,42,0.55)" />
+          <MapPin size={11} strokeWidth={2.25} color="#F7931E" />
           {title ?? 'Tag a course'}
         </div>
         <button
@@ -142,7 +142,7 @@ function CourseRow({ row, onSelect }: { row: RecentRow; onSelect: (c: StageCours
     <button onClick={() => onSelect({ id: row.id, name: row.name, country: row.country ?? null })} style={rowBtn}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <div style={{ width: 34, height: 34, borderRadius: 12, background: '#F1F5F9', border: '1px solid rgba(15,23,42,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <MapPin size={16} color="#0F172A" />
+          <MapPin size={16} color="#F7931E" />
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 14, color: '#0F172A', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.name}</div>
