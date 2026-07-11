@@ -4,7 +4,6 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExploreFeed } from './hooks/useExploreFeed';
 import { useExploreRegion } from './hooks/useExploreRegion';
 import ConnectHandicapCue from '@/components/courses/course-detail/ConnectHandicapCue';
-import { ExploreDestinations } from './ExploreDestinations';
 import { CircleActivityStrip } from './CircleActivityStrip';
 import { AlmanacRegionTabs, FeatTierRail } from './AlmanacSections';
 
@@ -55,7 +54,7 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
       {/* Friends rail — region-INDEPENDENT, always visible */}
       <CircleActivityStrip userId={userId} />
 
-      {/* Region tabs — shared control driving tiers, destinations, and grid */}
+      {/* Region tabs — shared control driving tiers and grid */}
       <AlmanacRegionTabs region={activeRegion} onRegionChange={handleRegionChange} />
 
       {/* The four tiers */}
@@ -63,9 +62,6 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
       <FeatTierRail region={activeRegion} tier="records" title="Course records" />
       <FeatTierRail region={activeRegion} tier="eagles" title="Eagles" />
       <FeatTierRail region={activeRegion} tier="birdie_hauls" title="Birdie hauls" />
-
-      {/* Destinations (still drives the SAME region control) */}
-      <ExploreDestinations activeRegion={activeRegion} onRegionSelect={handleRegionChange} />
 
       <ExploreGrid
         posts={posts}
