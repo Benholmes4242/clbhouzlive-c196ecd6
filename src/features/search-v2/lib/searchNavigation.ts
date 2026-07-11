@@ -1,5 +1,5 @@
-// Per-entity navigation for Search v2. Faithfully mirrors the old
-// GlobalSearchOverlay handlers (see src/components/search/GlobalSearchOverlay.tsx):
+// Per-entity navigation for Search v2. Mirrors the historical navigation
+// contract from the deprecated global search overlay:
 //   person   -> `/profile/${username}`
 //   course   -> `/courses/${id}`
 //   club     -> `/business/${slug ?? id}` (state: { source: 'search' })

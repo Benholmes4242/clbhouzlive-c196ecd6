@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { VIDEOS_MOODS, type VideosMoodId } from './hooks/useVideosMood';
-import { ChipRowSearchTrigger } from '@/components/watch/shared/ChipRowSearchField';
+import { ChipRowSearchTrigger } from '@/components/watch/shared/ChipRowSearchTrigger';
 
 interface VideosMoodChipsProps {
   active: VideosMoodId;
