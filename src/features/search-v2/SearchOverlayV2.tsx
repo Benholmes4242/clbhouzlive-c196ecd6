@@ -135,7 +135,13 @@ export function SearchOverlayV2({
     [save, onCommit, onClose],
   );
 
-  const showChips = mode === 'default';
+  const hasInput = inputValue.trim().length >= 1;
+  const showChips = mode === 'default' && hasInput;
+
+  // Reset scope to 'all' whenever the query clears back to empty.
+  useEffect(() => {
+    if (!hasInput && scope !== 'all') setScope('all');
+  }, [hasInput, scope]);
   const isCommit = mode === 'commit';
 
   const totalHits =
@@ -182,7 +188,16 @@ export function SearchOverlayV2({
             }
           />
 
-          {showChips && <ScopeChips scope={scope} onChange={setScope} />}
+          {mode === 'default' && (
+            <motion.div
+              initial={false}
+              animate={{ height: showChips ? 'auto' : 0, opacity: showChips ? 1 : 0 }}
+              transition={{ duration: 0.18, ease: 'easeOut' }}
+              style={{ overflow: 'hidden', width: '100%' }}
+            >
+              <ScopeChips scope={scope} onChange={setScope} />
+            </motion.div>
+          )}
 
           <div
             className="flex-1 overflow-y-auto overscroll-contain w-full md:max-w-[560px]"
