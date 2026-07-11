@@ -6,12 +6,15 @@ import { DestinationDoors } from './components/DestinationDoors';
 import { HubVideoRow } from './components/HubVideoRow';
 import { HubClipsRow } from './components/HubClipsRow';
 import { HubMixedGrid } from './components/HubMixedGrid';
+import { HubChipBar } from './components/HubChipBar';
 
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
 export default function WatchHubV2() {
   const [searchOpen, setSearchOpen] = useState(false);
+  const [filter, setFilter] = useState('all');
+
 
   return (
     <PageRoot className="min-h-screen text-foreground bg-background">
@@ -65,6 +68,10 @@ export default function WatchHubV2() {
 
         <DestinationDoors />
 
+        <div style={{ paddingTop: 12 }}>
+          <HubChipBar active={filter} onChange={setFilter} />
+        </div>
+
         <div style={{ paddingTop: 16 }}>
           <HubVideoRow />
         </div>
@@ -72,9 +79,8 @@ export default function WatchHubV2() {
           <HubClipsRow />
         </div>
         <div style={{ paddingTop: 24, paddingBottom: 30 }}>
-          <HubMixedGrid />
+          <HubMixedGrid filter={filter} />
         </div>
-        {/* W2.5: chip bar mounts here */}
       </main>
 
       <SearchOverlayV2

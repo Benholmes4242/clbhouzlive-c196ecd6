@@ -5,6 +5,7 @@ import { useHubMixedGrid, type MixedGridRow } from '../hooks/useHubMixedGrid';
 import { formatCount } from '../utils/formatCount';
 import { formatDuration } from '../utils/formatDuration';
 import { FormatBadge } from './FormatBadge';
+import { stripMentionMarkup } from '@/lib/mentions/format';
 
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
@@ -15,8 +16,11 @@ function Tile({ row }: { row: MixedGridRow }) {
   const navigate = useNavigate();
   const isClip = row.derived_format === 'clip';
   const aspect = isClip ? '9 / 14' : '16 / 9';
+  const stripped = row.post_content
+    ? stripMentionMarkup(String(row.post_content)).trim()
+    : '';
   const title =
-    row.post_content?.trim() ||
+    stripped ||
     row.course_name?.trim() ||
     (isClip ? 'Clip' : 'Video');
   const duration = formatDuration(row.duration_seconds);
@@ -127,7 +131,7 @@ function SkeletonTile({ aspect }: { aspect: string }) {
   );
 }
 
-export function HubMixedGrid() {
+export function HubMixedGrid({ filter = 'all' }: { filter?: string } = {}) {
   const { user } = useSupabaseSession();
   const {
     data,
@@ -136,7 +140,7 @@ export function HubMixedGrid() {
     isFetching,
     isFetchingNextPage,
     isLoading,
-  } = useHubMixedGrid(user?.id, 'all');
+  } = useHubMixedGrid(user?.id, filter);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
 
