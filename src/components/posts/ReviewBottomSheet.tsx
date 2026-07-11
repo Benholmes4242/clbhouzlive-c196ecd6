@@ -217,7 +217,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               bottom: 0,
               zIndex: REVIEW_SHEET_Z + 1,
               width: '100%',
-              height: '72dvh',
+              maxHeight: 'min(88dvh, 100%)',
               display: 'flex',
               flexDirection: 'column',
               overflow: 'hidden',
