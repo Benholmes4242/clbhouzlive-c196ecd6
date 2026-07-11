@@ -2,13 +2,16 @@
  * CarouselDots — Instagram-style sliding-window dot indicator.
  *
  * ≤7 dots: all shown. >7: a 7-dot window with edge dots shrinking/fading
- * to imply "more beyond". No "+N" overflow (the n/total chip handles count).
- * Plain white. Non-interactive (parent owns gesture/index). Returns null when count <= 1.
+ * to imply "more beyond". No "+N" overflow and no counter pill — dots are
+ * the sole indicator everywhere in-feed.
+ * Active dot is 6px white with a soft shadow; inactive is 5px white at 0.45 opacity.
+ * Non-interactive (parent owns gesture/index). Returns null when count <= 1.
  */
 import React, { useEffect, useState } from 'react';
 
-const WINDOW = 7; // max dots rendered at once
-const DOT = 6;    // dot diameter (px)
+const WINDOW = 7;        // max dots rendered at once
+const DOT_ACTIVE = 6;    // active dot diameter (px)
+const DOT_INACTIVE = 5;  // inactive dot diameter (px)
 const GAP = 5;
 
 function computeWindow(count: number, active: number) {
@@ -82,7 +85,7 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
       className={`flex items-center justify-center ${className}`}
       style={{
         gap: GAP,
-        height: DOT + 4,
+        height: Math.max(DOT_ACTIVE, DOT_INACTIVE) + 4,
         opacity: isVisible ? 1 : 0,
         transition: 'opacity 300ms ease',
         pointerEvents: 'none',
@@ -93,7 +96,7 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
       </span>
       {dots.map(({ index, scale, opacity }) => {
         const isActive = index === safeActive;
-        const size = DOT * scale;
+        const size = isActive ? DOT_ACTIVE : DOT_INACTIVE * scale;
         const activeColor = tone === 'dark' ? '#0F172A' : '#FFFFFF';
         const baseColor = tone === 'dark' ? '15,23,42' : '255,255,255';
         return (
@@ -107,6 +110,7 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
               background: isActive
                 ? activeColor
                 : `rgba(${baseColor},${0.45 * opacity})`,
+              boxShadow: isActive ? '0 1px 4px rgba(0,0,0,0.35)' : 'none',
               transition: 'all 260ms cubic-bezier(0.22,0.61,0.36,1)',
             }}
           />

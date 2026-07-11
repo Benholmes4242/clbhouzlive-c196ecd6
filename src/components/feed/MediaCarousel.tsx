@@ -7,7 +7,7 @@
  *  - Per-slide no-crop ambient fill: a blurred, scaled copy of the slide
  *    fills the frame behind it, then the slide is `object-fit: contain`
  *    on top. Wide and tall in the same post both show whole, no bars.
- *  - Dots overlay bottom-centre (`CarouselDots`), `n/total` chip top-right.
+ *  - Dots overlay bottom-centre (`CarouselDots`) are the sole indicator.
  *  - Swipe + tap a dot navigates. Active index persisted in
  *    `clubhouseStore.carouselPositions` keyed by post index.
  *  - Inline video lifecycle: only the active slide may autoplay.
@@ -496,27 +496,6 @@ export const MediaCarousel: React.FC<Props> = ({
             </button>
           );
         })}
-      </div>
-
-      {/* n/total chip */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 10,
-          right: 10,
-          background: 'rgba(5,8,16,0.55)',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
-          color: '#fff',
-          fontSize: 11,
-          fontWeight: 600,
-          padding: '3px 8px',
-          borderRadius: 999,
-          fontVariantNumeric: 'tabular-nums',
-          pointerEvents: 'none',
-        }}
-      >
-        {active + 1}/{items.length}
       </div>
 
       {/* Dots */}
