@@ -168,16 +168,6 @@ export function FeatCard({ row, tier, onTap }: Props) {
             textTransform: 'uppercase',
           }}
         >
-          <span
-            aria-hidden
-            style={{
-              width: 6,
-              height: 6,
-              borderRadius: 999,
-              background: dotColor,
-              display: 'inline-block',
-            }}
-          />
           <span aria-hidden style={{ fontSize: 11, lineHeight: 1 }}>{TIER_ICON[tier]}</span>
           <span>{chipLabel}</span>
         </div>
