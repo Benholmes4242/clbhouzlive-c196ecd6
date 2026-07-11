@@ -375,7 +375,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
             }}
           />
         </div>
-      </div>
+      </header>
 
       {/* Live preview */}
       <div style={{ padding: '14px 16px 8px' }}>
