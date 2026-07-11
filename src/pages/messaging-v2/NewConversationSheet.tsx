@@ -7,10 +7,10 @@ import { SheetHeader } from '@/components/ui/SheetHeader';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import {
-  useGlobalEntitySearch,
+  useEntityPickerSearch,
   type PersonResult,
   type BusinessResult,
-} from '@/hooks/useGlobalEntitySearch';
+} from '@/features/search-v2/hooks/useEntityPickerSearch';
 import { useMessagingActor } from '@/hooks/messaging/useMessagingActor';
 import { canActorMessage } from '@/hooks/messaging/canActorMessage';
 import { supabase } from '@/integrations/supabase/client';
