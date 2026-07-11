@@ -192,14 +192,19 @@ export function SearchOverlayV2({
             }}
           >
             {!hasQuery && (
-              <RecentsList
-                items={recents}
-                onPick={(qq) => {
-                  if (isCommit) commitTerm(qq);
-                  else setInputValue(qq);
-                }}
-                onClear={clear}
-              />
+              <>
+                <RecentsList
+                  items={recents}
+                  onPick={(qq) => {
+                    if (isCommit) commitTerm(qq);
+                    else setInputValue(qq);
+                  }}
+                  onClear={clear}
+                />
+                {mode === 'default' && (
+                  <SearchEmptyState onSelect={onClose} />
+                )}
+              </>
             )}
 
             {hasQuery && isLoading && (
