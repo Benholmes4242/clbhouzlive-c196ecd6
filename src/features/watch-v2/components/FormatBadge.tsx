@@ -19,8 +19,10 @@ export function FormatBadge({ format }: Props) {
         fontSize: 8.5,
         letterSpacing: '0.09em',
         fontFamily: FONT_FAMILY,
-        background: isClip ? 'rgba(247,147,30,0.94)' : 'rgba(15,23,42,0.82)',
-        color: isClip ? '#0b0d12' : '#fff',
+        background: 'rgba(0,0,0,0.45)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        color: isClip ? '#F7931E' : '#fff',
       }}
     >
       {isClip ? 'CLIP' : 'VIDEO'}
