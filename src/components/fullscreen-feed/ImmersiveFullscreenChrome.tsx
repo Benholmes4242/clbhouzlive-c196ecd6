@@ -236,7 +236,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'flex-end',
-              gap: 3,
+              gap: 4,
               maxWidth: '60%',
               minWidth: 0,
               textAlign: 'right',
@@ -245,7 +245,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             <span
               title={courseName}
               style={{
-                fontSize: 12, fontWeight: 500, color: '#fff', lineHeight: 1.2,
+                fontSize: 15, fontWeight: 600, color: '#fff', lineHeight: 1.2,
                 textShadow: TEXT_SHADOW,
                 maxWidth: '100%', overflow: 'hidden',
                 textOverflow: 'ellipsis', whiteSpace: 'nowrap',
@@ -256,14 +256,14 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             {courseLocation && (
               <span
                 style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 3,
-                  fontSize: 9, color: '#fff', opacity: 0.75, lineHeight: 1.1,
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
+                  fontSize: 12, color: '#fff', opacity: 0.8, lineHeight: 1.1,
                   textShadow: TEXT_SHADOW,
                   maxWidth: '100%', overflow: 'hidden',
                   textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                 }}
               >
-                <MapPinIcon width={9} height={9} style={{ flexShrink: 0 }} />
+                <MapPinIcon width={12} height={12} style={{ flexShrink: 0 }} />
                 <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {courseLocation}
                 </span>
@@ -275,11 +275,11 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
                 onClick={(e) => { e.stopPropagation(); handleCourseTap(); }}
                 aria-label={`Community rating ${formatRatingValue(courseRating!)}`}
                 style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 5, flexShrink: 0,
+                  display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0,
                   background: 'rgba(255,255,255,0.08)',
                   border: '1px solid rgba(255,255,255,0.12)',
-                  padding: '3px 9px 3px 4px', borderRadius: 999,
-                  cursor: 'pointer', marginTop: 2,
+                  padding: '5px 12px 5px 6px', borderRadius: 999,
+                  cursor: 'pointer', marginTop: 3,
                   backdropFilter: 'blur(8px)',
                   WebkitBackdropFilter: 'blur(8px)',
                   pointerEvents: 'auto', fontFamily: 'inherit',
@@ -289,9 +289,9 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
                   src="/lovable-uploads/2b0e2d79-6b26-4b6b-a27b-8dd5f8cc5aad.png"
                   alt=""
                   aria-hidden="true"
-                  style={{ width: 16, height: 16, flexShrink: 0, objectFit: 'contain' }}
+                  style={{ width: 20, height: 20, flexShrink: 0, objectFit: 'contain' }}
                 />
-                <span style={{ fontSize: 11, fontWeight: 800, color: '#F8FAFC', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+                <span style={{ fontSize: 14, fontWeight: 800, color: '#F8FAFC', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
                   {formatRatingValue(courseRating!)}
                 </span>
               </button>
@@ -299,6 +299,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
 
           </div>
         )}
+
       </div>
 
       {/* ─── BOTTOM scrim ──────────────────────────────────────── */}
