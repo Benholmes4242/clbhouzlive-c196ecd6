@@ -3,15 +3,16 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useHubLongFormVideos } from '../hooks/useHubLongFormVideos';
 import { formatDuration } from '../utils/formatDuration';
 import { FormatBadge } from './FormatBadge';
+import { stripMentionMarkup } from '@/lib/mentions/format';
 
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
 function Card({ row, onOpen }: { row: any; onOpen: () => void }) {
-  const title =
-    (row.post_content && String(row.post_content).trim()) ||
-    row.course_name ||
-    'Untitled video';
+  const stripped = row.post_content
+    ? stripMentionMarkup(String(row.post_content)).trim()
+    : '';
+  const title = stripped || row.course_name || 'Untitled video';
   const initial =
     (row.creator_display_name || row.creator_username || '?')
       .toString()

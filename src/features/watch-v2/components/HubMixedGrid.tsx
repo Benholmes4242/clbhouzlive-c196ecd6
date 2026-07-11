@@ -5,6 +5,7 @@ import { useHubMixedGrid, type MixedGridRow } from '../hooks/useHubMixedGrid';
 import { formatCount } from '../utils/formatCount';
 import { formatDuration } from '../utils/formatDuration';
 import { FormatBadge } from './FormatBadge';
+import { stripMentionMarkup } from '@/lib/mentions/format';
 
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
