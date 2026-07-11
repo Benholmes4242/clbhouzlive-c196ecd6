@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShieldCheck, X } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -8,6 +8,7 @@ import { SectionHeader } from '@/components/ui/SectionHeader';
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 const KEY_EXPLAINER = 'champions_explainer_dismissed_v1';
 const KEY_PROVENANCE = 'champions_provenance_dismissed_v1';
+const KEY_INFO_V2 = 'champions_info_dismissed_v2';
 
 const read = (k: string) => {
   try { return localStorage.getItem(k) === '1'; } catch { return false; }
@@ -37,7 +38,6 @@ const CardShell: React.FC<CardShellProps> = ({ onDismiss, background, border, ch
       borderRadius: 14,
       fontFamily: FONT,
       boxSizing: 'border-box',
-      height: '100%',
     }}
   >
     <button
@@ -56,138 +56,62 @@ const CardShell: React.FC<CardShellProps> = ({ onDismiss, background, border, ch
   </div>
 );
 
-const ExplainerContent: React.FC<{ window: 'all_time' | '90d' }> = ({ window }) => (
-  <>
-    <SectionHeader role="section" kicker="WHAT ARE CHAMPIONS" />
-    <p style={{ fontSize: 12, fontWeight: 500, color: 'var(--hcp-t-60)', lineHeight: 1.55, margin: 0 }}>
-      The clubhouse records board, digitalised. Lowest gross, best stableford, most birdies
-      and more - ranked from{' '}
-      <b style={{ color: 'var(--hcp-t-100)', fontWeight: 700 }}>official WHS scores</b>{' '}
-      at this course, {window === 'all_time' ? 'all time' : 'over the last 90 days'}.
-    </p>
-  </>
-);
-
-const ProvenanceContent: React.FC<{ onSync: () => void; isSynced: boolean }> = ({ onSync, isSynced }) => (
-  <>
-    <SectionHeader role="section" kicker="OFFICIAL SCORES ONLY" inlineIcon icon={ShieldCheck} />
-    <p style={{ fontSize: 12, fontWeight: 500, color: 'var(--hcp-t-60)', lineHeight: 1.55, margin: 0 }}>
-      That ace only counts if it's on your{' '}
-      <b style={{ color: 'var(--hcp-t-100)', fontWeight: 700 }}>official handicap record</b>.
-      Log every round with your club or golf union to register it on your WHS record - no logged rounds, no crowns.
-      {!isSynced && (
-        <>{' '}
-          <b
-            role="button"
-            onClick={onSync}
-            style={{ color: 'var(--hcp-gold-text)', fontWeight: 700, whiteSpace: 'nowrap', cursor: 'pointer' }}
-          >
-            Sync your handicap ›
-          </b>
-        </>
-      )}
-    </p>
-  </>
-);
-
 export const ChampionsInfoCarousel: React.FC<Props> = ({ window }) => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const { data: whsConnection } = useWhsConnection(user?.id);
   const isSynced = !!whsConnection;
-  const [gone1, setGone1] = useState(() => read(KEY_EXPLAINER));
-  const [gone2, setGone2] = useState(() => read(KEY_PROVENANCE));
-  const scrollerRef = useRef<HTMLDivElement>(null);
-  const [activeDot, setActiveDot] = useState(0);
-
-  const dismissExplainer = () => { setGone1(true); write(KEY_EXPLAINER); };
-  const dismissProvenance = () => { setGone2(true); write(KEY_PROVENANCE); };
-
-  const bothVisible = !gone1 && !gone2;
-
-  useEffect(() => {
-    if (!bothVisible) return;
-    const el = scrollerRef.current;
-    if (!el) return;
-    const onScroll = () => {
-      const cardWidth = el.clientWidth - 24 + 8; // card width + gap approx
-      const idx = Math.round(el.scrollLeft / Math.max(1, cardWidth));
-      setActiveDot(Math.max(0, Math.min(1, idx)));
-    };
-    el.addEventListener('scroll', onScroll, { passive: true });
-    return () => el.removeEventListener('scroll', onScroll);
-  }, [bothVisible]);
-
-  if (gone1 && gone2) return null;
-
-  const explainerCard = (
-    <CardShell
-      onDismiss={dismissExplainer}
-      background="var(--hcp-bg-1)"
-      border="0.5px solid var(--hcp-line)"
-    >
-      <ExplainerContent window={window} />
-    </CardShell>
+  const [gone, setGone] = useState(() =>
+    read(KEY_INFO_V2) || (read(KEY_EXPLAINER) && read(KEY_PROVENANCE))
   );
 
-  const provenanceCard = (
-    <CardShell
-      onDismiss={dismissProvenance}
-      background="linear-gradient(180deg, rgba(251,188,46,0.09), rgba(251,188,46,0.03))"
-      border="0.5px solid rgba(251,188,46,0.35)"
-    >
-      <ProvenanceContent onSync={() => navigate('/handicap')} isSynced={isSynced} />
-    </CardShell>
-  );
+  const dismiss = () => { setGone(true); write(KEY_INFO_V2); };
 
-  if (bothVisible) {
-    return (
-      <div style={{ margin: '12px 0 0' }}>
-        <div
-          ref={scrollerRef}
-          className="hcp-info-carousel-scroller"
-          style={{
-            padding: '0 16px',
-            overflowX: 'auto',
-            display: 'flex',
-            gap: 8,
-            scrollSnapType: 'x mandatory',
-            scrollPaddingLeft: 16,
-            alignItems: 'stretch',
-            WebkitOverflowScrolling: 'touch',
-            scrollbarWidth: 'none',
-          }}
-        >
-          <style>{`.hcp-info-carousel-scroller::-webkit-scrollbar{display:none}`}</style>
-          <div style={{ flexShrink: 0, width: 'calc(100% - 24px)', scrollSnapAlign: 'start' }}>
-            {explainerCard}
-          </div>
-          <div style={{ flexShrink: 0, width: 'calc(100% - 24px)', scrollSnapAlign: 'start' }}>
-            {provenanceCard}
-          </div>
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 5, marginTop: 7 }}>
-          {[0, 1].map((i) => (
-            <span
-              key={i}
-              style={{
-                width: 5,
-                height: 5,
-                borderRadius: 999,
-                background: activeDot === i ? 'var(--hcp-t-60)' : 'var(--hcp-tint-1)',
-                transition: 'background 160ms ease',
-              }}
-            />
-          ))}
-        </div>
-      </div>
-    );
-  }
+  if (gone) return null;
 
-  // Single card full-width
   return (
     <div style={{ margin: '12px 16px 0' }}>
-      {!gone1 ? explainerCard : provenanceCard}
+      <CardShell
+        onDismiss={dismiss}
+        background="linear-gradient(180deg, rgba(251,188,46,0.09), rgba(251,188,46,0.03))"
+        border="0.5px solid rgba(251,188,46,0.35)"
+      >
+        <SectionHeader role="section" kicker="CHAMPIONS · OFFICIAL WHS SCORES" inlineIcon icon={ShieldCheck} />
+        <p style={{ fontSize: 12, fontWeight: 500, color: 'var(--hcp-t-60)', lineHeight: 1.55, margin: 0 }}>
+          The clubhouse records board, digitalised - lowest gross, best stableford,
+          most birdies and more, ranked from{' '}
+          <b style={{ color: 'var(--hcp-t-100)', fontWeight: 700 }}>official WHS scores</b>{' '}
+          at this course, {window === 'all_time' ? 'all time' : 'over the last 90 days'}.
+          Only rounds logged on your{' '}
+          <b style={{ color: 'var(--hcp-t-100)', fontWeight: 700 }}>official handicap record</b>{' '}
+          count: no logged rounds, no crowns.
+        </p>
+        {!isSynced && (
+          <button
+            type="button"
+            onClick={() => navigate('/handicap')}
+            style={{
+              marginTop: 11,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              minHeight: 36,
+              padding: '0 16px',
+              borderRadius: 999,
+              border: 'none',
+              background: 'rgba(251,188,46,0.18)',
+              color: 'var(--hcp-gold-text)',
+              fontSize: 12,
+              fontWeight: 800,
+              letterSpacing: '0.01em',
+              cursor: 'pointer',
+              fontFamily: FONT,
+            }}
+          >
+            Sync your handicap ›
+          </button>
+        )}
+      </CardShell>
     </div>
   );
 };
