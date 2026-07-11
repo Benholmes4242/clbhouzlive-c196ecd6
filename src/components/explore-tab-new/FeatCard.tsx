@@ -1,5 +1,6 @@
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { INK, INK_MUTE, HAIRLINE_INK_8, INK_TINT_06 } from '@/features/courses/_shared/tokens';
+import { TIER_ICON } from './AlmanacSections';
 import type { FeatRow, FeatTier } from './hooks/useRegionFeats';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
@@ -12,20 +13,11 @@ const RING: Record<FeatTier, string> = {
   birdie_hauls: '#F7931E',
 };
 
-const DOT: Record<FeatTier, string> = RING;
-
 const TIER_LABEL: Record<FeatTier, string> = {
   legendary: 'LEGENDARY',
   records: 'COURSE RECORD',
   eagles: 'EAGLE',
   birdie_hauls: 'BIRDIE HAUL',
-};
-
-const TIER_ICON: Record<FeatTier, string> = {
-  legendary: '🕳️',
-  records: '🏆',
-  eagles: '🦅',
-  birdie_hauls: '🐦',
 };
 
 const RECORD_CATEGORY_LABEL: Record<string, string> = {
@@ -89,7 +81,6 @@ export function FeatCard({ row, tier, onTap }: Props) {
   const image = row.course_image ?? row.thumbnail_image ?? null;
   const holder = formatHolderName(row.holder_name);
   const ringColor = RING[tier];
-  const dotColor = DOT[tier];
   const chipLabel = isRecord
     ? RECORD_CATEGORY_LABEL[row.category ?? ''] ?? 'Course record'
     : TIER_LABEL[tier];
@@ -107,7 +98,7 @@ export function FeatCard({ row, tier, onTap }: Props) {
   const border = isLegendary ? '1px solid rgba(251,188,46,0.24)' : `1px solid ${HAIRLINE_INK_8}`;
   const nameColor = isLegendary ? '#FFFFFF' : INK;
   const courseColor = isLegendary ? 'rgba(255,255,255,0.72)' : INK_MUTE;
-  const valueColor = isLegendary ? '#FBBC2E' : dotColor;
+  const valueColor = isLegendary ? '#FBBC2E' : ringColor;
   const chipBg = isLegendary ? 'rgba(251,188,46,0.14)' : 'rgba(15,23,42,0.05)';
   const chipText = isLegendary ? '#FBBC2E' : INK;
   
@@ -177,16 +168,6 @@ export function FeatCard({ row, tier, onTap }: Props) {
             textTransform: 'uppercase',
           }}
         >
-          <span
-            aria-hidden
-            style={{
-              width: 6,
-              height: 6,
-              borderRadius: 999,
-              background: dotColor,
-              display: 'inline-block',
-            }}
-          />
           <span aria-hidden style={{ fontSize: 11, lineHeight: 1 }}>{TIER_ICON[tier]}</span>
           <span>{chipLabel}</span>
         </div>
