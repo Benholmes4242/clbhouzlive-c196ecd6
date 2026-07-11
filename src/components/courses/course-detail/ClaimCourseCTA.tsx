@@ -14,46 +14,53 @@ const ClaimCourseCTA: React.FC<ClaimCourseCTAProps> = ({ clubId, clubName, sourc
 
   return (
     <>
-      <div style={{ padding: '8px 16px', textAlign: 'center' }}>
+      <div style={{ padding: '0 16px' }}>
         <div
-          style={{
-            width: 36,
-            height: 36,
-            borderRadius: '50%',
-            background: 'rgba(247,147,30,0.12)',
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginBottom: 10,
-          }}
-        >
-          <BadgeCheck size={20} strokeWidth={2} color={AMBER} />
-        </div>
-        <div style={{ fontSize: 13, fontWeight: 800, color: INK, marginBottom: 4 }}>
-          Own or manage this course?
-        </div>
-        <p style={{ fontSize: 12, color: INK_FAINT, margin: '0 0 14px', lineHeight: 1.5 }}>
-          Claim this listing to respond to reviews and update information.
-        </p>
-        <button
-          type="button"
+          role="button"
+          tabIndex={0}
           onClick={() => setOpen(true)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpen(true); }
+          }}
           style={{
-            display: 'inline-flex',
+            display: 'flex',
             alignItems: 'center',
-            gap: 6,
-            padding: '10px 22px',
-            borderRadius: 20,
-            background: 'transparent',
-            border: `1.5px solid ${AMBER}`,
-            fontSize: 13,
-            fontWeight: 700,
-            color: AMBER,
+            gap: 12,
+            padding: '13px 14px',
+            background: '#FFFFFF',
+            border: '1px solid rgba(15,23,42,0.07)',
+            borderRadius: 16,
             cursor: 'pointer',
           }}
         >
-          Claim this course
-        </button>
+          <div style={{
+            width: 36, height: 36, borderRadius: 11, flexShrink: 0,
+            background: 'rgba(247,147,30,0.10)', color: AMBER,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <BadgeCheck size={18} strokeWidth={2} />
+          </div>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: INK }}>
+              Own or manage this course?
+            </div>
+            <div style={{ fontSize: 11, color: INK_FAINT, marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              Claim it to respond to reviews and update info
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); setOpen(true); }}
+            style={{
+              flexShrink: 0,
+              background: 'rgba(247,147,30,0.10)', color: AMBER,
+              border: 'none', borderRadius: 999, padding: '8px 14px',
+              fontSize: 12, fontWeight: 700, cursor: 'pointer',
+            }}
+          >
+            Claim
+          </button>
+        </div>
       </div>
 
       <ClaimCourseSheet
