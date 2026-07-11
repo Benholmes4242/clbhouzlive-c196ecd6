@@ -10,9 +10,6 @@ import type { StageCourse } from '../hooks/useStageComposer';
 import { useRecentCourses } from '../hooks/useRecentCourses';
 import useKeyboardHeight from '@/hooks/messaging/useKeyboardHeight';
 
-import type { StageCourse } from '../hooks/useStageComposer';
-import { useRecentCourses } from '../hooks/useRecentCourses';
-import useKeyboardHeight from '@/hooks/messaging/useKeyboardHeight';
 
 interface Props {
   open: boolean;
