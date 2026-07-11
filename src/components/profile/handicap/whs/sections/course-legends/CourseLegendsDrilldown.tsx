@@ -19,7 +19,7 @@ import { DrilldownHeader } from './drilldown/DrilldownHeader';
 import { CrownCabinet } from './drilldown/CrownCabinet';
 import { ChampionsDuelCard } from './drilldown/ChampionsDuelCard';
 import { ChampionsUnclaimedCard } from './drilldown/ChampionsUnclaimedCard';
-import { CategoryNavRail } from './drilldown/CategoryNavRail';
+
 import { FullCourseLeaderboardSheet } from './drilldown/FullCourseLeaderboardSheet';
 import { WindowToggle } from './CourseLegendsSection';
 import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHandicapCue';
