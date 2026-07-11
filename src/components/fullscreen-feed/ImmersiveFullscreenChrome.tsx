@@ -180,20 +180,8 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
 
   return (
     <div className="fixed inset-0" style={{ zIndex: 30, pointerEvents: 'none' }} data-immersive-chrome>
-      {/* ─── TOP scrim ─────────────────────────────────────────── */}
-      <div
-        aria-hidden
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 78px)',
-          background: 'linear-gradient(to bottom, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.55) 100%)',
-          pointerEvents: 'none',
-          zIndex: 0,
-        }}
-      />
+      {/* Top scrim removed — chrome sits directly on the blurred media
+          backdrop. Text/icons carry their own drop-shadow for legibility. */}
       <div
         style={{
           position: 'fixed',
@@ -302,19 +290,8 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
 
       </div>
 
-      {/* ─── BOTTOM scrim ──────────────────────────────────────── */}
-      <div
-        aria-hidden
-        style={{
-          position: 'fixed',
-          left: 0, right: 0, bottom: 0,
-          height: 'calc(max(env(safe-area-inset-bottom, 0px), 24px) + 130px)',
-          background:
-            'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.72) 45%, rgba(0,0,0,0.55) 100%)',
-          pointerEvents: 'none',
-          zIndex: 0,
-        }}
-      />
+      {/* Bottom scrim removed — author strip + action rail sit on the
+          blurred backdrop; each element carries its own drop-shadow. */}
 
       {/* Carousel dots — bottom-center, above scrubber (~16px from bottom) */}
       {mediaCount > 1 && (

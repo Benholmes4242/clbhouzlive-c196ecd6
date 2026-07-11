@@ -23,6 +23,8 @@ import { useReviewerStats } from '@/hooks/useReviewerStats';
 import { MentionText } from '@/components/mentions/MentionText';
 import { REVIEW_SHEET_Z } from '@/lib/zLayers';
 import { ReviewGhostNumeral, ReviewVerdictLabel } from '@/components/shared/ReviewGhostScore';
+import { getPublicProfilePath } from '@/lib/profileRoutes';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 
 const AMBER = '#F7931E';
 const FONT_GEIST =
@@ -116,21 +118,31 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   // Scope drag to header only so the middle scrolls without dismissing.
   const dragControls = useDragControls();
 
+  // Also dismiss the fullscreen viewer (if this sheet was opened from it)
+  // so the destination route is actually visible.
+  const closeFullscreen = useCallback(() => {
+    try {
+      const fs = useFullscreenFeedStore.getState();
+      if (fs.isOpen) fs.close();
+    } catch {}
+  }, []);
+
   const handleGoToProfile = useCallback(() => {
     if (!user.id) return;
     onClose();
-    const handle = user.username || user.id;
-    navigate(`/profile/${handle}`);
-  }, [user.id, user.username, navigate, onClose]);
+    closeFullscreen();
+    navigate(getPublicProfilePath({ id: user.id, username: user.username }));
+  }, [user.id, user.username, navigate, onClose, closeFullscreen]);
 
   const handleGoToReview = useCallback(() => {
     if (!courseId) return;
     onClose();
+    closeFullscreen();
     const url = reviewId
       ? `/courses/${courseId}?tab=reviews&review=${reviewId}`
       : `/courses/${courseId}?tab=reviews`;
     navigate(url);
-  }, [courseId, reviewId, navigate, onClose]);
+  }, [courseId, reviewId, navigate, onClose, closeFullscreen]);
 
   const locationStr = [courseSubCountry || courseRegion, courseCountry]
     .filter(Boolean)
