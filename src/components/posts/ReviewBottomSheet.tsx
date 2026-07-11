@@ -502,12 +502,13 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   disabled={!courseId}
                   style={{
                     flex: 1,
-                    padding: '11px 12px',
+                    minHeight: 48,
+                    padding: '14px 12px',
                     borderRadius: 10,
                     background: AMBER,
                     border: 'none',
                     color: 'rgba(255,255,255,0.95)',
-                    fontSize: 12,
+                    fontSize: 15,
                     fontWeight: 700,
                     cursor: courseId ? 'pointer' : 'default',
                     opacity: courseId ? 1 : 0.5,
@@ -522,13 +523,14 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   onClick={handleGoToProfile}
                   style={{
                     flex: 1,
-                    padding: '11px 12px',
+                    minHeight: 48,
+                    padding: '14px 12px',
                     borderRadius: 10,
                     background: 'rgba(255,255,255,0.12)',
                     border: '0.5px solid rgba(255,255,255,0.2)',
                     color: '#F8FAFC',
-                    fontSize: 12,
-                    fontWeight: 600,
+                    fontSize: 15,
+                    fontWeight: 700,
                     cursor: 'pointer',
                     fontFamily: 'inherit',
                     letterSpacing: '0.01em',
