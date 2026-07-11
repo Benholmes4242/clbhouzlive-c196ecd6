@@ -2,7 +2,7 @@ import React from 'react';
 import { useTop100CourseInsights } from '@/hooks/useTop100CourseInsights';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { Trophy } from 'lucide-react';
+import { Trophy, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 type CourseTop100SpotlightProps = {
@@ -23,7 +23,7 @@ export const CourseTop100Spotlight: React.FC<CourseTop100SpotlightProps> = ({
     return (
       <div
         style={{
-          background: 'linear-gradient(135deg, #0F172A 0%, #1e293b 100%)',
+          background: '#15171F',
           borderRadius: 16,
           padding: 18,
           margin: '0 16px',
@@ -67,7 +67,7 @@ export const CourseTop100Spotlight: React.FC<CourseTop100SpotlightProps> = ({
     <div
       style={{
         position: 'relative',
-        background: 'linear-gradient(135deg, #0F172A 0%, #1e293b 100%)',
+        background: '#15171F',
         borderRadius: 16,
         padding: 18,
         margin: '0 16px',
