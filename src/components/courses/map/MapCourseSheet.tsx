@@ -107,7 +107,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
       }
     },
     onSuccess: () => {
-      toast.success(isWantToPlay ? 'Removed from Want to Play' : 'Added to Want to Play');
+      toast.success(isWantToPlay ? 'Removed from bucket list' : 'Added to bucket list');
       queryClient.invalidateQueries({ 
         predicate: q => Array.isArray(q.queryKey) && q.queryKey[0] === 'course-shortlist-status' 
       });
@@ -155,7 +155,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
     }
     if (isWantToPlay) {
       return { 
-        text: 'Want to Play', 
+        text: 'Bucket list', 
         className: 'text-white',
         style: { background: '#22c55e', boxShadow: '0 2px 8px rgba(34,197,94,0.3)' },
         icon: <Bookmark className="h-3 w-3 mr-1 fill-current" />
@@ -365,7 +365,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
                     ) : (
                       <Bookmark className={cn('h-4 w-4', isWantToPlay && 'fill-current')} />
                     )}
-                    {isWantToPlay ? '✓ Want to Play' : 'Want to Play'}
+                    {isWantToPlay ? '✓ On your bucket list' : 'Add to bucket list'}
                   </button>
                 </div>
               )}

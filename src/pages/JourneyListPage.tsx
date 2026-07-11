@@ -172,7 +172,7 @@ const JourneyListPage: React.FC = () => {
       case 'played':
         return 'No courses played yet. Rate a course to add it here.';
       case 'want_to_play':
-        return 'Courses you want to play will appear here.';
+        return 'Courses on your bucket list will appear here.';
     }
   };
 
@@ -227,7 +227,7 @@ const JourneyListPage: React.FC = () => {
             <TabsTrigger value="want_to_play" className={tabTriggerClass}>
               <span className="flex items-center gap-1.5">
                 {getTabIcon('want_to_play')}
-                Want to Play
+                Bucket list
                 {journeyCourses?.want_to_play?.length ? (
                   <span className="text-xs text-slate-400">({journeyCourses.want_to_play.length})</span>
                 ) : null}
