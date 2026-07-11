@@ -33,11 +33,6 @@ const FEAT_META: Record<CircleFeatType, { emoji: string; label: string }> = {
   stableford: { emoji: '🔥', label: 'STABLEFORD' },
 };
 
-
-function valueColor(tone: CircleFeatTone): string {
-  return tone === 'plain' ? INK_MUTE : AMBER_TEXT;
-}
-
 function formatFriendName(raw: string): string {
   const s = (raw ?? '').trim();
   if (!s) return 'A friend';
