@@ -958,22 +958,15 @@ export function FullscreenFeedOverlay() {
       </AnimatePresence>
 
       {!readOnly && (
-        <CommentsSheet
+        <CommentsSheetV2
           isOpen={commentsOpen}
           onClose={closeComments}
-          postId={activePost?.id ?? ""}
-          currentUserId={userId}
-          creatorUserId={activePost?.userId}
-          creatorActorType={activePost?.actorType === 'business' ? 'business' : 'personal'}
-          creatorActorId={activePost?.actorId}
-          creatorName={activePost?.displayName}
-          creatorAvatar={activePost?.avatarUrl}
-          caption={activePost?.caption}
-          theme="dark"
-          likesCount={getActiveLikeState(activePost!)?.count ?? null}
+          targetType="post"
+          targetId={activePost?.id ?? ""}
           initialCommentId={initialCommentId}
         />
       )}
+
 
       {/* ReviewBottomSheet now renders via root-level ReviewBottomSheetPortal */}
     </>
