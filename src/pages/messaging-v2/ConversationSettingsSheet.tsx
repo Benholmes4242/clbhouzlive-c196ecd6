@@ -24,7 +24,7 @@ import {
   useEntityPickerSearch,
   type PersonResult,
   type BusinessResult,
-} from '@/hooks/useEntityPickerSearch';
+} from '@/features/search-v2/hooks/useEntityPickerSearch';
 import { useMessagingActor } from '@/hooks/messaging/useMessagingActor';
 import { useConversationDetail } from '@/hooks/messaging/useConversationDetail';
 import { useConversations } from '@/hooks/messaging/useConversations';
@@ -697,7 +697,7 @@ const AddPeopleSheet: React.FC<AddPeopleSheetProps> = ({
   const { people, businesses } = useEntityPickerSearch({
     query: debounced,
     enabled: open && debounced.trim().length > 0,
-    limits: { people: 8, businesses: 8 },
+    limit: 8,
   });
 
   const results: Candidate[] = useMemo(() => {
