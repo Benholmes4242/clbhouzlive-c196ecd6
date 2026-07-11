@@ -18,7 +18,7 @@ import { cn } from '@/lib/utils';
 import { TopTenCourse } from '@/hooks/useUserTopTenCourses';
 import { getScoreTier } from '@/utils/getScoreTier';
 import { useTopTenReactions, REACTION_CONFIG, ReactionType } from '@/hooks/useTopTenReactions';
-import { TopTenCardComments } from './TopTenCardComments';
+import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 interface Top10CourseCardProps {
