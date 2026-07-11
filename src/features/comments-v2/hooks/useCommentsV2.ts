@@ -327,8 +327,8 @@ export function useCommentsV2({
       // Optimistic like toggle for the row cache — we mutate enrichment directly.
       qc.setQueryData([...keyRoot, 'enrichment', rowIds, actorType, actorId], (old: any) => {
         if (!old) return old;
-        const myLikes = new Set(old.myLikes);
-        const likeCounts = new Map(old.likeCounts);
+        const myLikes = new Set<string>(old.myLikes);
+        const likeCounts = new Map<string, number>(old.likeCounts);
         const current = likeCounts.get(id) ?? 0;
         if (myLikes.has(id)) {
           myLikes.delete(id);
