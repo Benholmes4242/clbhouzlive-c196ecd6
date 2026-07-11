@@ -443,11 +443,10 @@ function AppRoutes() {
         <Route path="/profile/:username/reviews" element={<Suspense fallback={<ProfileSkeleton />}><UserReviewsPage /></Suspense>} />
         
         
-        <Route path="/watch" element={<Suspense fallback={<main className="pb-20 bg-background min-h-screen" style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}><WatchGridSkeleton /></main>}><WatchHub /></Suspense>} />
+        <Route path="/watch" element={<Suspense fallback={<GenericPageSkeleton />}><WatchHubV2 /></Suspense>} />
         <Route path="/videos" element={<Navigate to="/watch" replace />} />
         <Route path="/watch/clips" element={<Suspense fallback={<GenericPageSkeleton />}><ClipsSubpageWrapped /></Suspense>} />
         <Route path="/watch/videos" element={<Suspense fallback={<GenericPageSkeleton />}><VideosSubpageWrapped /></Suspense>} />
-        <Route path="/watch-v2-test" element={<Suspense fallback={<GenericPageSkeleton />}><WatchHubV2 /></Suspense>} />
         <Route path="/explore" element={<Navigate to="/courses?tab=discover" replace />} />
         <Route path="/courses" element={<Suspense fallback={<CoursesListSkeleton />}><CoursesWrapped /></Suspense>} />
         <Route path="/courses/:courseId" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseDetailPage /></Suspense>} />
