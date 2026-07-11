@@ -10,7 +10,7 @@ import { useNavigationHandlers } from './bottom-navigation/useNavigationHandlers
 import { navigationTabs } from './bottom-navigation/navigationTabs';
 import { useUnseenFriendReviews } from '@/hooks/useUnseenFriendReviews';
 import { useTournamentsCache } from '@/hooks/useTournamentsCache';
-import { isMedianApp } from '@/utils/median/isMedianApp';
+
 import { useNavTheme } from '@/hooks/useNavTheme';
 import { useNavScrollState, pushForceExpand, resetToExpanded } from '@/hooks/useScrollDirection';
 import { cn } from '@/lib/utils';
