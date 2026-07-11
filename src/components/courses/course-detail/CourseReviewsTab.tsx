@@ -648,7 +648,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       {filteredMyReview && (
         <div style={{ padding: '6px 16px 0', borderBottom: `0.5px solid ${INK_TINT_06}` }}>
           <ReviewBlockFlat
-                onReportClick={() => setReportingReview(review)}
+            onReportClick={() => setReportingReview(filteredMyReview)}
             review={transformReview(filteredMyReview, isJustSubmittedOrUpdated)}
             isMine
             isHighlighted={isJustSubmittedOrUpdated}

@@ -361,7 +361,7 @@ export const MessageBubble: React.FC<Props> = ({
           open={showReport}
           onOpenChange={setShowReport}
           reportType="message"
-          reportedUserId={message.sender_id}
+          reportedUserId={message.sender_user_id ?? undefined}
           reportedConversationId={message.conversation_id}
           reportedMessageId={message.id}
         />
