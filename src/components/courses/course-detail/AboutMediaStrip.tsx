@@ -284,6 +284,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
         }
       >
         {mediaTiles.map((media, index) => {
+          const isHero = isMobile && index === 0 && mediaTiles.length >= 3;
           const isLastTile = index === mediaTiles.length - 1;
           const showOverflow = isLastTile && overflowCount > 0;
           const btnRef = React.createRef<HTMLButtonElement>();
