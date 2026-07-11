@@ -90,6 +90,16 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
     return () => { cancelled = true; };
   }, [editPostId]);
 
+  // Composer is a light #F8FAFC surface -> dark status-bar icons.
+  // On unmount, re-resolve chrome for the route underneath (Clubhouse dark,
+  // Watch light, profile immersive, etc.) because overlay close is not a route change.
+  useEffect(() => {
+    try { setStatusBarStyleColor('dark', 'FFF8FAFC'); } catch {}
+    return () => {
+      try { applyRouteChrome(window.location.pathname, true); } catch {}
+    };
+  }, []);
+
   // Prefill state once the editable post lands.
   useEffect(() => {
     if (!isEditMode) return;
