@@ -8,6 +8,10 @@ const config: CapacitorConfig = {
     Camera: {
       presentationStyle: 'fullScreen',
     },
+    Keyboard: {
+      resize: 'none',
+      resizeOnFullScreen: true,
+    },
   },
 };
 

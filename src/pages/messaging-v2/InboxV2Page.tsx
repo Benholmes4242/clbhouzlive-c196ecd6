@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Flag, PencilLine, Sparkles, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ChevronLeft, Flag, PencilLine, Sparkles, X } from 'lucide-react';
 import { useConversations } from '@/hooks/messaging/useConversations';
 import { ConversationRow } from './ConversationRow';
 import NewConversationSheet from './NewConversationSheet';
-import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { useMessagingActor } from '@/hooks/messaging/useMessagingActor';
 import { safeLocalStorage } from '@/utils/safeLocalStorage';
 
@@ -12,6 +12,7 @@ const CANVAS = '#F8FAFC';
 const INK = '#1F2428';
 const SUB = '#8A9099';
 const HAIRLINE = 'rgba(0,0,0,0.07)';
+const SLATE = '#0F172A';
 
 const SkeletonRow: React.FC = () => (
   <div
@@ -53,6 +54,7 @@ const Spinner: React.FC = () => (
 );
 
 const InboxV2Page: React.FC = () => {
+  const navigate = useNavigate();
   const [composeOpen, setComposeOpen] = useState(false);
   const { conversations, isLoading, error, refetch, hasActor } = useConversations();
   const actor = useMessagingActor();
@@ -89,7 +91,63 @@ const InboxV2Page: React.FC = () => {
   );
 
   return (
-    <ManagePageShell title="Messages" right={composeButton}>
+    <div className="messages-root" style={{ background: CANVAS, color: INK }}>
+      <div className="flex h-full w-full flex-col" style={{ background: CANVAS }}>
+        <header
+          className="z-30 flex-shrink-0"
+          style={{
+            background: CANVAS,
+            borderBottom: `0.5px solid ${HAIRLINE}`,
+          }}
+        >
+          <div
+            className="flex items-center justify-between px-4"
+            style={{
+              paddingTop: 'calc(env(safe-area-inset-top, 0px) + 8px)',
+              paddingBottom: 12,
+              minHeight: 56,
+            }}
+          >
+            <div className="flex min-w-0 flex-1 items-center gap-3">
+              <button
+                type="button"
+                onClick={() => navigate(-1)}
+                aria-label="Back"
+                className="active:opacity-60"
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: '50%',
+                  background: '#FFFFFF',
+                  border: '1px solid rgba(15,23,42,0.10)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  color: SLATE,
+                }}
+              >
+                <ChevronLeft size={18} strokeWidth={2.5} />
+              </button>
+              <h1
+                style={{
+                  fontSize: 18,
+                  fontWeight: 600,
+                  color: SLATE,
+                  margin: 0,
+                }}
+              >
+                Messages
+              </h1>
+            </div>
+            {composeButton}
+          </div>
+        </header>
+
+        <div
+          className="flex-1 overflow-y-auto"
+          style={{ WebkitOverflowScrolling: 'touch', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+        >
       <div style={{ background: CANVAS, color: INK, minHeight: '100%' }}>
         <style>{`@keyframes msg-spin { to { transform: rotate(360deg); } }`}</style>
 
@@ -299,9 +357,11 @@ const InboxV2Page: React.FC = () => {
           </div>
         )}
       </div>
+        </div>
 
       <NewConversationSheet open={composeOpen} onClose={() => setComposeOpen(false)} />
-    </ManagePageShell>
+      </div>
+    </div>
   );
 };
 

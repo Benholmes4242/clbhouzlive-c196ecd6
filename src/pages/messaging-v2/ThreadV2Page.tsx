@@ -280,11 +280,10 @@ const ThreadV2Page: React.FC = () => {
 
   return (
     <div
-      className="flex flex-col"
+      className="messages-root flex flex-col"
       style={{
         background: CANVAS,
         color: INK,
-        height: '100dvh',
         width: '100%',
       }}
     >
