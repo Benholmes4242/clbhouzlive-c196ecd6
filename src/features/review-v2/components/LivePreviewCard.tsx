@@ -163,24 +163,24 @@ export function LivePreviewCard({
       {/* Review body */}
       <div style={{ padding: '4px 14px 10px', position: 'relative', zIndex: 2 }}>
         {reviewText.trim().length > 0 ? (
-          <MentionText
-            text={reviewText}
-            style={{
-              fontSize: 14,
-              color: T_INK,
-              lineHeight: 1.45,
-              whiteSpace: 'pre-wrap',
-              wordBreak: 'break-word',
-            }}
-          />
+          <ClampedReviewText text={reviewText} />
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <Ghost width="100%" height={12} />
-            <Ghost width="88%" height={12} />
-            <Ghost width="62%" height={12} />
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 6,
+              minHeight: REVIEW_BODY_MIN_HEIGHT,
+              justifyContent: 'center',
+            }}
+          >
+            <Ghost width="100%" height={16} />
+            <Ghost width="88%" height={16} />
+            <Ghost width="62%" height={16} />
           </div>
         )}
       </div>
+
 
       {/* Media strip — only when media added */}
       {media.length > 0 && (
