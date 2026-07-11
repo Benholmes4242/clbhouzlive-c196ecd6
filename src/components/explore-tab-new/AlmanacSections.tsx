@@ -174,11 +174,11 @@ function FeatTierRailInner({ region, tier, title }: TierProps) {
   const goToClaim = () => navigate('/handicap');
 
   return (
-    <section style={{ fontFamily: FONT, paddingTop: 4 }}>
+    <section style={{ fontFamily: FONT, paddingTop: 24 }}>
       <AlmanacHead title={title} icon={TIER_ICON[tier]} />
 
       {isLoading ? (
-        <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
+        <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 6 }}>
           {[0, 1].map((i) => (
             <div
               key={i}
@@ -271,7 +271,7 @@ function FeatTierRailInner({ region, tier, title }: TierProps) {
           </button>
         </div>
       ) : (
-        <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
+        <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 6 }}>
           {rows.map((row, i) => (
             <FeatCard key={`${row.score_id ?? row.course_id ?? i}-${i}`} row={row} tier={tier} />
           ))}
