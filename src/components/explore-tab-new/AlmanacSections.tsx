@@ -113,22 +113,27 @@ function AlmanacRegionTabsInner({ region, onRegionChange }: Props) {
               key={t.label}
               type="button"
               onClick={() => onRegionChange(t.slug)}
+              className="flex items-center bg-transparent border-0 cursor-pointer"
               style={{
                 position: 'relative',
-                padding: '10px 2px 12px',
-                background: 'transparent',
-                border: 'none',
+                padding: '10px 2px 6px',
                 fontFamily: FONT,
                 fontSize: 13,
                 fontWeight: active ? 800 : 600,
                 color: active ? INK : 'rgba(15,23,42,0.35)',
                 letterSpacing: '-0.005em',
                 whiteSpace: 'nowrap',
-                cursor: 'pointer',
                 flexShrink: 0,
               }}
             >
-              {t.label}
+              <span
+                style={{
+                  paddingBottom: 4,
+                  borderBottom: active ? '1.5px solid #0F172A' : '1.5px solid transparent',
+                }}
+              >
+                {t.label}
+              </span>
             </button>
           );
         })}
