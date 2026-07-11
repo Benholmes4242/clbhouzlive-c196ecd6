@@ -69,7 +69,7 @@ import { CoursesListSkeleton } from '@/components/skeletons/CoursesListSkeleton'
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
 import { HandicapPageSkeleton } from '@/components/skeletons/HandicapPageSkeleton';
 import { DiscoverSkeleton } from '@/components/skeletons/DiscoverSkeleton';
-import WatchGridSkeleton from '@/components/watch/WatchGridSkeleton';
+
 
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
 import { AchievementsSkeleton } from '@/components/skeletons/AchievementsSkeleton';
@@ -175,7 +175,7 @@ const Signup = lazy(() => import("./pages/Signup"));
 const Clubhouse = lazy(() => import("./pages/Clubhouse"));
 
 const HomeLanding = lazy(() => import("./pages/HomeLanding"));
-const WatchHub = lazy(() => import("./pages/WatchHub"));
+
 const ClipsSubpageWrapped = lazy(() => import("./components/watch/ClipsSubpage"));
 const VideosSubpageWrapped = lazy(() => import("./components/watch/VideosSubpage"));
 const WatchHubV2 = lazy(() => import("./features/watch-v2/WatchHubV2"));
@@ -443,11 +443,10 @@ function AppRoutes() {
         <Route path="/profile/:username/reviews" element={<Suspense fallback={<ProfileSkeleton />}><UserReviewsPage /></Suspense>} />
         
         
-        <Route path="/watch" element={<Suspense fallback={<main className="pb-20 bg-background min-h-screen" style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}><WatchGridSkeleton /></main>}><WatchHub /></Suspense>} />
+        <Route path="/watch" element={<Suspense fallback={<GenericPageSkeleton />}><WatchHubV2 /></Suspense>} />
         <Route path="/videos" element={<Navigate to="/watch" replace />} />
         <Route path="/watch/clips" element={<Suspense fallback={<GenericPageSkeleton />}><ClipsSubpageWrapped /></Suspense>} />
         <Route path="/watch/videos" element={<Suspense fallback={<GenericPageSkeleton />}><VideosSubpageWrapped /></Suspense>} />
-        <Route path="/watch-v2-test" element={<Suspense fallback={<GenericPageSkeleton />}><WatchHubV2 /></Suspense>} />
         <Route path="/explore" element={<Navigate to="/courses?tab=discover" replace />} />
         <Route path="/courses" element={<Suspense fallback={<CoursesListSkeleton />}><CoursesWrapped /></Suspense>} />
         <Route path="/courses/:courseId" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseDetailPage /></Suspense>} />

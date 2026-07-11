@@ -18,7 +18,7 @@
 export const routeChunkLoaders: Record<string, () => Promise<unknown>> = {
   '/': () => import('@/pages/Clubhouse'),
   '/clubhouse': () => import('@/pages/Clubhouse'),
-  '/watch': () => import('@/pages/WatchHub'),
+  '/watch': () => import('@/features/watch-v2/WatchHubV2'),
   '/tourhub': () => import('@/features/tourhub/pages'),
   '/notificationmessages': () => import('@/pages/ActivityPageWrapped'),
 };
