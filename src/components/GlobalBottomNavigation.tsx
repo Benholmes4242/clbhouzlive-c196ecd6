@@ -57,6 +57,8 @@ const HIDDEN_ROUTE_PATTERNS: RegExp[] = [
   // Hide inside a conversation thread (composer would otherwise sit behind the pill),
   // but keep the nav on the inbox (/messages).
   /^\/messages\/[^/]+$/,
+  // Review Wizard (e.g. /courses/:courseId/rate) — composer has its own chrome.
+  /^\/courses\/[^/]+\/rate/,
 ];
 
 interface GlobalBottomNavigationProps {
