@@ -411,6 +411,37 @@ const FullscreenVideoSlot: React.FC<{
     VideoEngine.setObjectFit('fullscreen', settledRect.fit);
   }, [isBorrowSlide, settledRect.fit]);
 
+  // Viewer pause intent — if the user paused this media earlier in the same
+  // fullscreen session, the slot must NOT auto-play on mount/remount. The
+  // useVideoLane auto-play effect fires unconditionally; we counter it with a
+  // matching viaViewer pause immediately after (and again once firstFrame
+  // lands, in case the auto-play was still in-flight).
+  const pausedIntent = useFullscreenFeedStore(
+    (s) => s.pausedOwnerKeys.has(resumeKey),
+  );
+  React.useEffect(() => {
+    if (isBorrowSlide || !isActive || !pausedIntent) return;
+    let cancelled = false;
+    const enforce = () => {
+      if (cancelled) return;
+      try {
+        VideoEngine.pause('fullscreen', {
+          callerPostId: resumeKey,
+          viaViewer: true,
+        });
+      } catch { /* noop */ }
+    };
+    enforce();
+    const t1 = setTimeout(enforce, 60);
+    const t2 = setTimeout(enforce, 260);
+    return () => {
+      cancelled = true;
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, [isBorrowSlide, isActive, pausedIntent, resumeKey]);
+
+
   // [DECIDE] slot.bind — one line when the non-borrow fullscreen lane
   // binds. Lets us compare what the lane believed at bind-time vs what the
   // ladder chose in openWithOrigin.
