@@ -314,7 +314,10 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       borrowDemoteRequested: false,
       closeAnim: 'idle',
       closeAnimDone: false,
+      activePagerIdx: 0,
+      pausedOwnerKeys: new Set<string>(),
     });
+
     if (cb) {
       try { cb(); } catch {}
     }
