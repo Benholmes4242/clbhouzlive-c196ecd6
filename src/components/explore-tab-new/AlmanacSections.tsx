@@ -45,7 +45,6 @@ function AlmanacRegionTabsInner({ region, onRegionChange }: Props) {
       <div
         className="flex gap-4 px-4 overflow-x-auto scrollbar-hide"
         style={{
-          borderBottom: `1px solid ${HAIRLINE_INK_8}`,
           paddingBottom: 0,
           position: 'sticky',
           top: 'var(--chrome-total-h, 0px)',
@@ -76,20 +75,6 @@ function AlmanacRegionTabsInner({ region, onRegionChange }: Props) {
               }}
             >
               {t.label}
-              {active && (
-                <span
-                  aria-hidden
-                  style={{
-                    position: 'absolute',
-                    left: 0,
-                    right: 0,
-                    bottom: -1,
-                    height: 2,
-                    background: AMBER,
-                    borderRadius: 2,
-                  }}
-                />
-              )}
             </button>
           );
         })}
