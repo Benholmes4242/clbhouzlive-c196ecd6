@@ -16,7 +16,7 @@ export default function CaptionField({ value, onChange, currentUserId }: Props) 
         onChange={onChange}
         placeholder="Write a caption... @mention friends or businesses"
         currentUserId={currentUserId}
-        textStyle={{ fontSize: 15, lineHeight: '22px', color: '#1F2428', minHeight: 48, maxHeight: 200, padding: '4px 0' }}
+        textStyle={{ fontSize: 15, lineHeight: '22px', color: '#1F2428', minHeight: 96, maxHeight: 96, padding: '4px 0' }}
       />
     </div>
   );
