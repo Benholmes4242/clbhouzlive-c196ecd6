@@ -31,7 +31,7 @@ const ReviewText: React.FC<{ text: string }> = ({ text }) => {
           overflow: !expanded && needsClamp ? 'hidden' : 'visible',
         }}
       >
-        "{text}"
+        "<MentionText as="span" text={text} />"
       </p>
       {needsClamp && (
         <button
