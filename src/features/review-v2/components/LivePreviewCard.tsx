@@ -141,10 +141,17 @@ export function LivePreviewCard({
             }}
           >
             <span style={{ fontSize: 11, color: T_MUTE }}>Just now</span>
-            {overall != null && <ReviewVerdictLabel rating={overall} fontSize={11} />}
           </div>
         </div>
+
+        {/* Right chip — verdict label sits over the ghost numeral, parity with FeedCard */}
+        {overall != null && (
+          <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+            <ReviewVerdictLabel rating={overall} fontSize={11} />
+          </div>
+        )}
       </div>
+
 
       {/* Review body */}
       <div style={{ padding: '4px 14px 10px', position: 'relative', zIndex: 2 }}>
