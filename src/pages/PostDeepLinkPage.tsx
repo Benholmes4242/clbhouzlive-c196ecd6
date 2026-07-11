@@ -117,6 +117,20 @@ const PostDeepLinkPage: React.FC = () => {
         return;
       }
 
+      // Block filter — hide posts by users the viewer has blocked (or been blocked by).
+      if (user?.id && (data as any).user_id && (data as any).user_id !== user.id) {
+        const { data: blockRow } = await supabase
+          .from('user_blocks')
+          .select('id')
+          .or(`and(blocker_id.eq.${user.id},blocked_id.eq.${(data as any).user_id}),and(blocker_id.eq.${(data as any).user_id},blocked_id.eq.${user.id})`)
+          .maybeSingle();
+        if (blockRow) {
+          setNotFound(true);
+          setIsLoading(false);
+          return;
+        }
+      }
+
       const row = data as any;
       const profileRow = row.user_profiles ?? {};
       const courseRow = row.golf_courses ?? null;
