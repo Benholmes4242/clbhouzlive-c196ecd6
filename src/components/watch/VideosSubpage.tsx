@@ -23,8 +23,6 @@ export default function VideosSubpage() {
   const [committedQuery, setCommittedQuery] = useState('');
   const isSearching = committedQuery.length > 0;
 
-  const { recentSearches, addSearch, removeSearch, clearAll } =
-    useRecentSearches('videos-recent-searches');
 
   const handleSearchOpen = () => {
     setSearchOpen(true);
