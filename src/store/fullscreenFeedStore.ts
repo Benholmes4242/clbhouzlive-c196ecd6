@@ -249,7 +249,10 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       openedFrom: options?.openedFrom ?? null,
       borrow: options?.borrow ?? null,
       borrowDemoteRequested: false,
+      activePagerIdx: options?.mediaIndex ?? 0,
+      pausedOwnerKeys: new Set<string>(),
     });
+
   },
   close: () => {
     const cb = get().onCloseCallback;
