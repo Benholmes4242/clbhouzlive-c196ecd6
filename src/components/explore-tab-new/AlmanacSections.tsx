@@ -156,15 +156,9 @@ function FeatTierRailInner({ region, tier, title }: TierProps) {
   const { data, isLoading } = useRegionFeats(region, tier);
   const rows = data ?? [];
 
-  const tierDot =
-    tier === 'legendary' ? '#FBBC2E'
-    : tier === 'records' ? '#7DD3FC'
-    : tier === 'eagles' ? '#22C55E'
-    : '#F7931E';
-
   return (
     <section style={{ fontFamily: FONT, paddingTop: 4 }}>
-      <AlmanacHead title={title} dot={tierDot} />
+      <AlmanacHead title={title} icon={TIER_ICON[tier]} />
 
       {isLoading ? (
         <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
