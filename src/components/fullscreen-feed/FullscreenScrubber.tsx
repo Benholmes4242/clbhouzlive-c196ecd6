@@ -19,11 +19,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Pause, Play } from 'lucide-react';
 import { VideoEngine } from '@/video/VideoEngine';
-import { useClubhouseStore } from '@/store/clubhouseStore';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { Z } from '@/config/zIndex';
 import type { FeedPost } from '@/components/media-system/types/media';
-
-const LANE_ID = 'fullscreen' as const;
+import type { LaneId } from '@/video/lanePolicy';
 
 function fmtTime(sec: number): string {
   if (!isFinite(sec) || sec <= 0) return '0:00';
@@ -54,11 +53,28 @@ interface Props {
   activeIndex: number;
 }
 
-export const FullscreenScrubber: React.FC<Props> = ({ activePost, activeIndex }) => {
-  const carouselSlide = useClubhouseStore((s) => s.carouselPositions.get(activeIndex) ?? 0);
-  const activeMedia = activePost?.mediaItems?.[carouselSlide];
+export const FullscreenScrubber: React.FC<Props> = ({ activePost }) => {
+  // Pager-idx and borrow live in the fullscreen store — the ONLY sources of
+  // truth for which media is currently active + which lane it's playing on.
+  // clubhouseStore.carouselPositions is NOT consulted here (it lags the
+  // fullscreen pager and produced the k>0 dead-tap bug).
+  const activePagerIdx = useFullscreenFeedStore((s) => s.activePagerIdx);
+  const borrow = useFullscreenFeedStore((s) => s.borrow);
+  const addPausedOwnerKey = useFullscreenFeedStore((s) => s.addPausedOwnerKey);
+  const removePausedOwnerKey = useFullscreenFeedStore((s) => s.removePausedOwnerKey);
+
+  const activeMedia = activePost?.mediaItems?.[activePagerIdx];
   const isVideo = !!(activeMedia && (activeMedia as any).type === 'video');
-  const expectedKey = expectedOwnerKey(activePost?.id, carouselSlide);
+  const expectedKey = expectedOwnerKey(activePost?.id, activePagerIdx);
+
+  // Lane-aware: while borrow is live for this post the media is still on the
+  // borrowed rail lane; otherwise (cold/non-borrow, post-demote, other pager
+  // pages) it's on 'fullscreen'. borrow becomes null on demote/close/route.
+  const laneId: LaneId = useMemo(() => {
+    if (borrow && activePost && borrow.postId === activePost.id) return borrow.laneId;
+    return 'fullscreen' as LaneId;
+  }, [borrow, activePost?.id]);
+
 
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
