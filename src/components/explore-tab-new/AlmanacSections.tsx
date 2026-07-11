@@ -174,11 +174,18 @@ function FeatTierRailInner({ region, tier, title }: TierProps) {
   const navigate = useNavigate();
   const { data, isLoading } = useRegionFeats(region, tier);
   const rows = data ?? [];
+  const displayRows = rows.slice(0, RAIL_CAP);
+  const hasOverflow = rows.length > RAIL_CAP;
+  const [sheetOpen, setSheetOpen] = useState(false);
   const goToClaim = () => navigate('/handicap');
 
   return (
     <section style={{ fontFamily: FONT, paddingTop: 24 }}>
-      <AlmanacHead title={title} icon={TIER_ICON[tier]} />
+      <AlmanacHead
+        title={title}
+        icon={TIER_ICON[tier]}
+        onSeeAll={hasOverflow ? () => setSheetOpen(true) : undefined}
+      />
 
       {isLoading ? (
         <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 6 }}>
@@ -275,11 +282,19 @@ function FeatTierRailInner({ region, tier, title }: TierProps) {
         </div>
       ) : (
         <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 6 }}>
-          {rows.map((row, i) => (
+          {displayRows.map((row, i) => (
             <FeatCard key={`${row.score_id ?? row.course_id ?? i}-${i}`} row={row} tier={tier} />
           ))}
         </div>
       )}
+
+      <TierSeeAllSheet
+        open={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        tier={tier}
+        region={region}
+        rows={rows}
+      />
     </section>
   );
 }
