@@ -155,21 +155,11 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const isOnboardingEditProfile =
     location.pathname === '/edit-profile' &&
     new URLSearchParams(location.search).get('onboarding') === '1';
-  const isPreviewBypass = (() => {
-    try {
-      const h = window.location.hostname;
-      const onPreviewHost = h.endsWith('.lovableproject.com') || h.endsWith('.lovable.app') || h.endsWith('.lovable.dev') || h === 'localhost' || h === '127.0.0.1';
-      if (onPreviewHost) return true;
-      return localStorage.getItem('clbhouz_preview_bypass') === '1';
-    } catch { return false; }
-  })();
-  const isBetaGateRoute = location.pathname === '/' && !isMedianApp() && !isPreviewBypass;
   const shouldHideForRoute =
     HIDDEN_ROUTES.includes(location.pathname) ||
     HIDDEN_ROUTE_PREFIXES.some(prefix => location.pathname.startsWith(prefix)) ||
     HIDDEN_ROUTE_PATTERNS.some(re => re.test(location.pathname)) ||
-    isOnboardingEditProfile ||
-    isBetaGateRoute;
+    isOnboardingEditProfile;
   const showNavigation = isVisible && !shouldHideForRoute;
 
   // Keep the global --bottom-nav-height CSS var mapped to NAV_CLEARANCE so

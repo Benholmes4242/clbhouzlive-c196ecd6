@@ -5,7 +5,7 @@ import React from 'react';
  * on cold start. Mirrors index.html's pre-React shell (#15171F) and the
  * native splash, so splash -> hold -> (auth | clubhouse) has zero color jump.
  *
- * Returned as the FIRST branch of RootGate (after BetaGate) so a logged-out
+ * Returned as the FIRST branch of RootGate so a logged-out
  * cold launch never falls through to <ClubhouseWrapped/> and flashes feed
  * skeletons before the /auth redirect.
  */
