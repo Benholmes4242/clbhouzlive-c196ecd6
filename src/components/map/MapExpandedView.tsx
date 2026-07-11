@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
 import { MapPin, X } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { createGlassyMarkerElement } from './MapMarker';
