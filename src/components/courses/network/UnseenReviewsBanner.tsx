@@ -45,7 +45,8 @@ export function UnseenReviewsBanner() {
           src={latest.reviewer_avatar}
           alt={latest.reviewer_name}
           fallback={latest.reviewer_name.slice(0, 2).toUpperCase()}
-          ringColor={AMBER}
+          hairlineRing
+          ringColor={LIGHT_HAIRLINE}
         />
       </div>
 
