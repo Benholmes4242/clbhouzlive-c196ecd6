@@ -16,7 +16,7 @@ interface Props {
   bottomOffset?: number;
 }
 
-export default function BottomSheet({ open, title, onClose, children, fullHeight, bottomOffset }: Props) {
+export default function BottomSheet({ open, title, onClose, children, fullHeight, fixedHeight, bottomOffset }: Props) {
   if (!open) return null;
   return (
     <div
