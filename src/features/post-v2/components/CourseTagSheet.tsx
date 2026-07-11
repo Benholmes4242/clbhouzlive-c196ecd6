@@ -1,9 +1,15 @@
 // CourseTagSheet - search + "courses you play" empty state.
+// Header styled as an eyebrow (icon + uppercase label) to match the
+// shared @mention sheet chrome.
 
 import { useEffect, useState } from 'react';
-import { MapPin, Search } from 'lucide-react';
+import { MapPin, Search, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import BottomSheet from './BottomSheet';
+import type { StageCourse } from '../hooks/useStageComposer';
+import { useRecentCourses } from '../hooks/useRecentCourses';
+import useKeyboardHeight from '@/hooks/messaging/useKeyboardHeight';
+
 import type { StageCourse } from '../hooks/useStageComposer';
 import { useRecentCourses } from '../hooks/useRecentCourses';
 import useKeyboardHeight from '@/hooks/messaging/useKeyboardHeight';
