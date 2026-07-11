@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import {
   FONT,
@@ -13,6 +14,7 @@ import {
   SC_DOUBLE,
 } from './_constants';
 import { INK_MUTE } from '@/features/courses/_shared/tokens';
+import { HoleDistributionBar } from './HoleDistributionBar';
 
 interface Props {
   h: CourseHole;
@@ -83,11 +85,17 @@ const BUCKETS: Array<{ key: keyof CourseHole['dist']; label: string; color: stri
 ];
 
 export const HoleRow: React.FC<Props> = ({ h, isHardest, isEasiest }) => {
+  const [expanded, setExpanded] = useState(false);
   const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
+    if (!expanded) {
+      setMounted(false);
+      return;
+    }
     const id = requestAnimationFrame(() => setMounted(true));
     return () => cancelAnimationFrame(id);
-  }, []);
+  }, [expanded]);
 
   const avgColor = avgColorFor(h.avg_to_par);
   const tag = isHardest
@@ -123,8 +131,21 @@ export const HoleRow: React.FC<Props> = ({ h, isHardest, isEasiest }) => {
         gap: 12,
       }}
     >
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      {/* Header = the toggle */}
+      <div
+        role="button"
+        tabIndex={0}
+        aria-expanded={expanded}
+        aria-label={`Hole ${h.hole_no} details`}
+        onClick={() => setExpanded((v) => !v)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setExpanded((v) => !v);
+          }
+        }}
+        style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }}
+      >
         <div
           style={{
             width: 38,
@@ -184,6 +205,11 @@ export const HoleRow: React.FC<Props> = ({ h, isHardest, isEasiest }) => {
               {tag.label}
             </div>
           )}
+          {!expanded && (
+            <div style={{ marginTop: 7, display: 'flex', alignItems: 'center' }}>
+              <HoleDistributionBar dist={h.dist} height={5} />
+            </div>
+          )}
         </div>
         <div style={{ textAlign: 'right' }}>
           <div
@@ -211,156 +237,172 @@ export const HoleRow: React.FC<Props> = ({ h, isHardest, isEasiest }) => {
             AVG TO PAR
           </div>
         </div>
+        <ChevronDown
+          size={16}
+          strokeWidth={2.2}
+          style={{
+            flexShrink: 0,
+            color: '#94A3B8',
+            marginLeft: 2,
+            transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
+            transition: 'transform 180ms ease',
+          }}
+        />
       </div>
 
-      {/* Summary stats */}
-      <div style={{ display: 'flex', gap: 8 }}>
-        <Stat label="Sub-par" value={`${subPar.toFixed(1)}%`} color={SC_BIRDIE} />
-        <Stat label="Par"     value={`${parPct.toFixed(1)}%`} color={SC_PAR} />
-        <Stat label="Over-par" value={`${overPar.toFixed(1)}%`} color={SC_DOUBLE} />
-      </div>
+      {/* Expanded detail */}
+      {expanded && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 2 }}>
+          {/* Summary stats */}
+          <div style={{ display: 'flex', gap: 8 }}>
+            <Stat label="Sub-par" value={`${subPar.toFixed(1)}%`} color={SC_BIRDIE} />
+            <Stat label="Par"     value={`${parPct.toFixed(1)}%`} color={SC_PAR} />
+            <Stat label="Over-par" value={`${overPar.toFixed(1)}%`} color={SC_DOUBLE} />
+          </div>
 
-      {/* 7-bucket histogram */}
-      <div style={{ position: 'relative', paddingTop: 14 }}>
-        {/* Gridlines */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: '14px 0 18px 0',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            pointerEvents: 'none',
-          }}
-        >
-          {[0, 1, 2, 3].map((i) => (
+          {/* 7-bucket histogram */}
+          <div style={{ position: 'relative', paddingTop: 14 }}>
+            {/* Gridlines */}
             <div
-              key={i}
-              style={{ height: 1, background: 'rgba(15,23,42,0.05)' }}
-            />
-          ))}
-        </div>
-        <div
-          style={{
-            position: 'relative',
-            display: 'grid',
-            gridTemplateColumns: `repeat(${BUCKETS.length}, 1fr)`,
-            gap: 6,
-            alignItems: 'end',
-            height: 64,
-          }}
-        >
-          {BUCKETS.map((b, i) => {
-            const v = bucketVals[i];
-            const isZero = v <= 0;
-            const targetH = isZero ? 2 : Math.max(3, (v / peak) * 58);
-            return (
-              <div
-                key={b.key}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'flex-end',
-                  height: '100%',
-                  gap: 3,
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: 9,
-                    fontWeight: 700,
-                    color: isZero ? 'rgba(15,23,42,0.28)' : INK,
-                    fontFamily: MONO,
-                    fontVariantNumeric: 'tabular-nums',
-                    lineHeight: 1,
-                  }}
-                >
-                  {isZero ? '·' : `${v < 1 ? v.toFixed(1) : v.toFixed(0)}%`}
-                </div>
-                <div
-                  style={{
-                    width: '100%',
-                    height: mounted ? targetH : 0,
-                    background: isZero ? 'rgba(15,23,42,0.10)' : b.color,
-                    borderRadius: 3,
-                    transition: 'height 360ms cubic-bezier(.22,.61,.36,1)',
-                    transitionDelay: `${i * 28}ms`,
-                  }}
-                />
-              </div>
-            );
-          })}
-        </div>
-        {/* Labels */}
-        <div
-          style={{
-            marginTop: 6,
-            display: 'grid',
-            gridTemplateColumns: `repeat(${BUCKETS.length}, 1fr)`,
-            gap: 6,
-          }}
-        >
-          {BUCKETS.map((b) => (
-            <div
-              key={`${b.key}-lbl`}
               style={{
-                fontSize: 8.5,
-                fontWeight: 800,
-                letterSpacing: '0.1em',
-                textAlign: 'center',
-                color: INK_MUTE,
+                position: 'absolute',
+                inset: '14px 0 18px 0',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                pointerEvents: 'none',
               }}
             >
-              {b.label}
+              {[0, 1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  style={{ height: 1, background: 'rgba(15,23,42,0.05)' }}
+                />
+              ))}
             </div>
-          ))}
-        </div>
-      </div>
+            <div
+              style={{
+                position: 'relative',
+                display: 'grid',
+                gridTemplateColumns: `repeat(${BUCKETS.length}, 1fr)`,
+                gap: 6,
+                alignItems: 'end',
+                height: 64,
+              }}
+            >
+              {BUCKETS.map((b, i) => {
+                const v = bucketVals[i];
+                const isZero = v <= 0;
+                const targetH = isZero ? 2 : Math.max(3, (v / peak) * 58);
+                return (
+                  <div
+                    key={b.key}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'flex-end',
+                      height: '100%',
+                      gap: 3,
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 9,
+                        fontWeight: 700,
+                        color: isZero ? 'rgba(15,23,42,0.28)' : INK,
+                        fontFamily: MONO,
+                        fontVariantNumeric: 'tabular-nums',
+                        lineHeight: 1,
+                      }}
+                    >
+                      {isZero ? '·' : `${v < 1 ? v.toFixed(1) : v.toFixed(0)}%`}
+                    </div>
+                    <div
+                      style={{
+                        width: '100%',
+                        height: mounted ? targetH : 0,
+                        background: isZero ? 'rgba(15,23,42,0.10)' : b.color,
+                        borderRadius: 3,
+                        transition: 'height 360ms cubic-bezier(.22,.61,.36,1)',
+                        transitionDelay: `${i * 28}ms`,
+                      }}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+            {/* Labels */}
+            <div
+              style={{
+                marginTop: 6,
+                display: 'grid',
+                gridTemplateColumns: `repeat(${BUCKETS.length}, 1fr)`,
+                gap: 6,
+              }}
+            >
+              {BUCKETS.map((b) => (
+                <div
+                  key={`${b.key}-lbl`}
+                  style={{
+                    fontSize: 8.5,
+                    fontWeight: 800,
+                    letterSpacing: '0.1em',
+                    textAlign: 'center',
+                    color: INK_MUTE,
+                  }}
+                >
+                  {b.label}
+                </div>
+              ))}
+            </div>
+          </div>
 
-      {/* Footer */}
-      <div
-        style={{
-          marginTop: 2,
-          paddingTop: 10,
-          borderTop: '1px solid rgba(15,23,42,0.06)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          fontSize: 10.5,
-          fontWeight: 700,
-          letterSpacing: '0.04em',
-          color: INK_MUTE,
-        }}
-      >
-        <span
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 5,
-            fontSize: 10,
-            fontWeight: 700,
-            letterSpacing: '0.03em',
-            color: INK_MUTE,
-            background: 'rgba(15,23,42,0.05)',
-            padding: '3px 9px',
-            borderRadius: 20,
-            fontVariantNumeric: 'tabular-nums',
-          }}
-        >
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <circle cx="9" cy="7" r="3" stroke="currentColor" strokeWidth="2" opacity="0.55" />
-            <path d="M3 19c0-3 2.7-5 6-5s6 2 6 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.55" />
-          </svg>
-          {h.rounds.toLocaleString()} {h.rounds === 1 ? 'round' : 'rounds'}
-        </span>
-        <span>
-          PLAYS TO{' '}
-          <span style={{ fontFamily: MONO, fontVariantNumeric: 'tabular-nums', color: INK }}>
-            {playsTo}
-          </span>
-        </span>
-      </div>
+          {/* Footer */}
+          <div
+            style={{
+              marginTop: 2,
+              paddingTop: 10,
+              borderTop: '1px solid rgba(15,23,42,0.06)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              fontSize: 10.5,
+              fontWeight: 700,
+              letterSpacing: '0.04em',
+              color: INK_MUTE,
+            }}
+          >
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5,
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: '0.03em',
+                color: INK_MUTE,
+                background: 'rgba(15,23,42,0.05)',
+                padding: '3px 9px',
+                borderRadius: 20,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="9" cy="7" r="3" stroke="currentColor" strokeWidth="2" opacity="0.55" />
+                <path d="M3 19c0-3 2.7-5 6-5s6 2 6 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.55" />
+              </svg>
+              {h.rounds.toLocaleString()} {h.rounds === 1 ? 'round' : 'rounds'}
+            </span>
+            <span>
+              PLAYS TO{' '}
+              <span style={{ fontFamily: MONO, fontVariantNumeric: 'tabular-nums', color: INK }}>
+                {playsTo}
+              </span>
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
