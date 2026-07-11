@@ -39,6 +39,20 @@ export const TIER_ICON: Record<FeatTier, string> = {
   birdie_hauls: '🐦',
 };
 
+const CLAIM_LABEL: Record<FeatTier, string> = {
+  legendary: 'First ace in',
+  records: 'First record in',
+  eagles: 'First eagle in',
+  birdie_hauls: 'First haul in',
+};
+
+const FEAT_NOUN: Record<FeatTier, string> = {
+  legendary: 'ace',
+  records: 'record',
+  eagles: 'eagle',
+  birdie_hauls: 'haul',
+};
+
 export function AlmanacHead({
   title,
   icon,
