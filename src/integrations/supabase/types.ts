@@ -2674,6 +2674,13 @@ export type Database = {
             referencedRelation: "comments_v2"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "comment_likes_v2_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "post_comments"
+            referencedColumns: ["id"]
+          },
         ]
       }
       comments_v2: {
@@ -2731,6 +2738,13 @@ export type Database = {
             columns: ["parent_id"]
             isOneToOne: false
             referencedRelation: "comments_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_v2_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "post_comments"
             referencedColumns: ["id"]
           },
         ]
@@ -15350,6 +15364,66 @@ export type Database = {
         }
         Relationships: []
       }
+      post_comments: {
+        Row: {
+          actor_id: string | null
+          actor_type: string | null
+          content: string | null
+          created_at: string | null
+          id: string | null
+          is_edited: boolean | null
+          media_type: string | null
+          media_url: string | null
+          parent_comment_id: string | null
+          post_id: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          actor_id?: string | null
+          actor_type?: string | null
+          content?: string | null
+          created_at?: string | null
+          id?: string | null
+          is_edited?: boolean | null
+          media_type?: string | null
+          media_url?: string | null
+          parent_comment_id?: string | null
+          post_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          actor_id?: string | null
+          actor_type?: string | null
+          content?: string | null
+          created_at?: string | null
+          id?: string | null
+          is_edited?: boolean | null
+          media_type?: string | null
+          media_url?: string | null
+          parent_comment_id?: string | null
+          post_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_v2_parent_id_fkey"
+            columns: ["parent_comment_id"]
+            isOneToOne: false
+            referencedRelation: "comments_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_v2_parent_id_fkey"
+            columns: ["parent_comment_id"]
+            isOneToOne: false
+            referencedRelation: "post_comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       public_golfer_blurbs: {
         Row: {
           handicap: number | null
@@ -17200,6 +17274,10 @@ export type Database = {
           user_id: string
           username: string
         }[]
+      }
+      get_featured_groups: {
+        Args: { p_round?: number; p_tournament_id: string }
+        Returns: Json
       }
       get_friend_course_activity: {
         Args: { p_course_ids: string[]; p_user_id: string }

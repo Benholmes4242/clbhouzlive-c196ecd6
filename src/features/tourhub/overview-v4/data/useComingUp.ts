@@ -1,0 +1,76 @@
+/**
+ * useComingUp — Overview V4 upcoming rail. Next 4 upcoming tournaments
+ * for the given tour, including days_away and defending champion. Majors
+ * from other tours also surface for 'pga'.
+ */
+
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { mapTourSlug } from '../../_shared/tourOrder';
+import { isMajor } from '../../utils/majorScope';
+import type { TourId } from '../../hooks/useOverviewData';
+
+const DAY = 86_400_000;
+
+export interface ComingUpRow {
+  id: string;
+  name: string;
+  start_date: string;
+  end_date: string;
+  venue: string | null;
+  days_away: number;
+  defending_champion: string | null;
+  isMajor: boolean;
+  isPlayoff: boolean;
+  tour_slug: TourId;
+}
+
+function isPlayoffName(name: string): boolean {
+  const l = name.toLowerCase();
+  return l.includes('playoff') || l.includes('fedex st') || l.includes('tour championship');
+}
+
+export function useComingUp(tour: TourId, limit = 4) {
+  return useQuery({
+    queryKey: ['overview-v4', 'coming-up', tour, limit],
+    queryFn: async (): Promise<ComingUpRow[]> => {
+      const today = new Date().toISOString().slice(0, 10);
+      const { data, error } = await supabase
+        .from('sr_tournaments')
+        .select(`
+          id, name, start_date, end_date,
+          venue_course_name, venue_name, venue_city, venue_country,
+          defending_champion,
+          season:sr_seasons(tour_name)
+        `)
+        .in('status', ['scheduled', 'created'])
+        .gte('start_date', today)
+        .order('start_date', { ascending: true })
+        .limit(limit * 6);
+      if (error) throw error;
+      const now = Date.now();
+      const rows = ((data as any[]) ?? []).map((r) => {
+        const slug = mapTourSlug(r.season?.tour_name);
+        return { r, slug };
+      });
+      const filtered = rows.filter(({ r, slug }) => {
+        if (slug === tour) return true;
+        if (tour === 'pga' && isMajor(r.name)) return true;
+        return false;
+      });
+      return filtered.slice(0, limit).map(({ r, slug }) => ({
+        id: r.id,
+        name: r.name,
+        start_date: r.start_date,
+        end_date: r.end_date,
+        venue: r.venue_course_name || r.venue_name || [r.venue_city, r.venue_country].filter(Boolean).join(', ') || null,
+        days_away: Math.max(0, Math.ceil((new Date(r.start_date).getTime() - now) / DAY)),
+        defending_champion: r.defending_champion ?? null,
+        isMajor: isMajor(r.name),
+        isPlayoff: isPlayoffName(r.name),
+        tour_slug: slug,
+      }));
+    },
+    staleTime: 60 * 60 * 1000,
+  });
+}
