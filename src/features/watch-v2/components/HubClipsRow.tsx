@@ -1,34 +1,23 @@
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useHubLongFormVideos } from '../hooks/useHubLongFormVideos';
+import { useHubQuickClips } from '../hooks/useHubQuickClips';
 import { formatDuration } from '../utils/formatDuration';
-import { FormatBadge } from './FormatBadge';
 
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
-function Card({ row, onOpen }: { row: any; onOpen: () => void }) {
-  const title =
-    (row.post_content && String(row.post_content).trim()) ||
-    row.course_name ||
-    'Untitled video';
-  const initial =
-    (row.creator_display_name || row.creator_username || '?')
-      .toString()
-      .trim()
-      .charAt(0)
-      .toUpperCase() || '?';
-
+function Tile({ row, onOpen }: { row: any; onOpen: () => void }) {
+  const title = row.review_course_name || 'Clip';
   return (
     <div
       role="button"
       tabIndex={0}
       onClick={onOpen}
-      style={{ width: 288, flexShrink: 0, cursor: 'pointer', fontFamily: FONT_FAMILY }}
+      style={{ width: 110, flexShrink: 0, cursor: 'pointer', fontFamily: FONT_FAMILY }}
     >
       <div
         style={{
-          aspectRatio: '16 / 9',
+          aspectRatio: '9 / 14',
           borderRadius: 12,
           background: '#e5e9ef',
           position: 'relative',
@@ -39,22 +28,21 @@ function Card({ row, onOpen }: { row: any; onOpen: () => void }) {
           <img
             src={row.poster_url}
             alt=""
-            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
             loading="lazy"
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
           />
         ) : null}
-        <FormatBadge format="video" />
         {row.duration_seconds ? (
           <div
             style={{
               position: 'absolute',
-              bottom: 7,
-              right: 7,
-              background: 'rgba(0,0,0,0.72)',
+              bottom: 6,
+              right: 6,
+              background: 'rgba(0,0,0,0.6)',
               color: '#fff',
               fontWeight: 600,
-              fontSize: 10,
-              padding: '2px 6px',
+              fontSize: 9.5,
+              padding: '2px 5px',
               borderRadius: 5,
             }}
           >
@@ -62,78 +50,44 @@ function Card({ row, onOpen }: { row: any; onOpen: () => void }) {
           </div>
         ) : null}
       </div>
-
-      <div style={{ display: 'flex', gap: 9, marginTop: 8 }}>
-        {row.creator_avatar_url ? (
-          <img
-            src={row.creator_avatar_url}
-            alt=""
-            style={{
-              width: 30,
-              height: 30,
-              borderRadius: '34%',
-              objectFit: 'cover',
-              flexShrink: 0,
-            }}
-          />
-        ) : (
-          <div
-            style={{
-              width: 30,
-              height: 30,
-              borderRadius: '34%',
-              background: 'linear-gradient(135deg,#F7931E,#d97a10)',
-              color: '#fff',
-              fontWeight: 700,
-              fontSize: 12,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-          >
-            {initial}
-          </div>
-        )}
-        <div style={{ minWidth: 0, flex: 1 }}>
-          <div
-            style={{
-              fontWeight: 700,
-              fontSize: 13.5,
-              lineHeight: 1.28,
-              color: '#0F172A',
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-            }}
-          >
-            {title}
-          </div>
-          {row.creator_username ? (
-            <div
-              style={{
-                fontWeight: 500,
-                fontSize: 11.5,
-                color: '#64748B',
-                marginTop: 3,
-              }}
-            >
-              @{row.creator_username}
-            </div>
-          ) : null}
-        </div>
+      <div
+        style={{
+          fontWeight: 700,
+          fontSize: 11.5,
+          color: '#0F172A',
+          marginTop: 6,
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+        }}
+      >
+        {title}
       </div>
+      {row.creator_username ? (
+        <div
+          style={{
+            fontWeight: 500,
+            fontSize: 10.5,
+            color: '#64748B',
+            marginTop: 1,
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
+          @{row.creator_username}
+        </div>
+      ) : null}
     </div>
   );
 }
 
-function SkeletonCard() {
+function SkeletonTile() {
   return (
-    <div style={{ width: 288, flexShrink: 0 }}>
+    <div style={{ width: 110, flexShrink: 0 }}>
       <div
         style={{
-          aspectRatio: '16 / 9',
+          aspectRatio: '9 / 14',
           borderRadius: 12,
           background: 'rgba(0,0,0,0.06)',
         }}
@@ -142,10 +96,10 @@ function SkeletonCard() {
   );
 }
 
-export function HubVideoRow() {
+export function HubClipsRow() {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
-  const { data, isLoading } = useHubLongFormVideos(user?.id);
+  const { data, isLoading } = useHubQuickClips(user?.id);
 
   const rows = (data ?? []) as any[];
   if (!isLoading && rows.length === 0) return null;
@@ -170,7 +124,7 @@ export function HubVideoRow() {
               color: '#c97a10',
             }}
           >
-            LONG FORM
+            UNDER 90 SECONDS
           </div>
           <div
             style={{
@@ -181,12 +135,12 @@ export function HubVideoRow() {
               letterSpacing: '-0.01em',
             }}
           >
-            New videos
+            Quick clips
           </div>
         </div>
         <button
           type="button"
-          onClick={() => navigate('/watch/videos?sort=latest')}
+          onClick={() => navigate('/watch/clips')}
           style={{
             background: 'transparent',
             border: 'none',
@@ -205,7 +159,7 @@ export function HubVideoRow() {
       <div
         style={{
           display: 'flex',
-          gap: 12,
+          gap: 10,
           overflowX: 'auto',
           padding: '0 16px 4px',
           WebkitOverflowScrolling: 'touch',
@@ -215,13 +169,14 @@ export function HubVideoRow() {
       >
         {isLoading && rows.length === 0 ? (
           <>
-            <SkeletonCard />
-            <SkeletonCard />
+            <SkeletonTile />
+            <SkeletonTile />
+            <SkeletonTile />
           </>
         ) : (
           <>
             {rows.map((r) => (
-              <Card
+              <Tile
                 key={r.post_id}
                 row={r}
                 onOpen={() => navigate('/post/' + r.post_id)}
@@ -230,11 +185,11 @@ export function HubVideoRow() {
             <div
               role="button"
               tabIndex={0}
-              onClick={() => navigate('/watch/videos')}
+              onClick={() => navigate('/watch/clips')}
               style={{
-                width: 120,
+                width: 110,
                 flexShrink: 0,
-                aspectRatio: '16 / 11',
+                aspectRatio: '9 / 14',
                 borderRadius: 12,
                 border: '1.5px dashed rgba(0,0,0,0.14)',
                 display: 'flex',
@@ -249,7 +204,7 @@ export function HubVideoRow() {
                 {'\u203A'}
               </div>
               <div style={{ fontWeight: 600, fontSize: 11, color: '#64748B' }}>
-                All videos
+                All clips
               </div>
             </div>
           </>
@@ -259,4 +214,4 @@ export function HubVideoRow() {
   );
 }
 
-export default HubVideoRow;
+export default HubClipsRow;

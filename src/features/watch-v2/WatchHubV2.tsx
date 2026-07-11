@@ -4,6 +4,7 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import { DestinationDoors } from './components/DestinationDoors';
 import { HubVideoRow } from './components/HubVideoRow';
+import { HubClipsRow } from './components/HubClipsRow';
 
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
@@ -66,7 +67,9 @@ export default function WatchHubV2() {
         <div style={{ paddingTop: 16 }}>
           <HubVideoRow />
         </div>
-        {/* W2.3: clips row mounts here */}
+        <div style={{ paddingTop: 22 }}>
+          <HubClipsRow />
+        </div>
         {/* W2.4: mixed grid mounts here */}
         {/* W2.5: chip bar mounts here */}
       </main>
