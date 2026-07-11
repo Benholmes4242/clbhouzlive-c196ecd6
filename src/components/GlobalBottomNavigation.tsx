@@ -32,6 +32,7 @@ const HIDDEN_ROUTES = [
   '/following',
   '/messages',
   '/join',
+  '/post-v2',
 ];
 
 const HIDDEN_ROUTE_PREFIXES = [
