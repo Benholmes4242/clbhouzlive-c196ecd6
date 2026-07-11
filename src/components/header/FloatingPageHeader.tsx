@@ -183,7 +183,7 @@ export const FloatingPageHeader: React.FC<FloatingPageHeaderProps> = ({
         </div>
       </div>
 
-      <GlobalSearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+      <SearchOverlayV2 isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
       <PostingAsMenu
         isOpen={menuOpen}
         onClose={() => setMenuOpen(false)}
