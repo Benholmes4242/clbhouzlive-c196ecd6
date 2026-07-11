@@ -14,9 +14,9 @@ const Card: React.FC<{
   label: string;
   hole: CourseHole;
 }> = ({ tone, label, hole }) => {
-  // Diverging palette: Hardest → red/navy accent, Easiest → teal accent
-  const tint = tone === 'hard' ? 'rgba(220,38,38,0.05)' : 'rgba(45,212,191,0.07)';
-  const border = tone === 'hard' ? 'rgba(220,38,38,0.20)' : 'rgba(14,124,123,0.22)';
+  // Tint derived from the actual scoring palette
+  const tint = tone === 'hard' ? 'rgba(155,71,34,0.06)' : 'rgba(47,107,79,0.06)';
+  const border = tone === 'hard' ? 'rgba(155,71,34,0.20)' : 'rgba(47,107,79,0.20)';
   const eyebrow = tone === 'hard' ? SC_DOUBLE : SC_BIRDIE;
   const playsTo = (hole.par + hole.avg_to_par).toFixed(1);
   return (
@@ -69,6 +69,20 @@ const Card: React.FC<{
         >
           Plays to {playsTo}
         </div>
+      </div>
+      <div
+        style={{
+          fontSize: 10,
+          fontWeight: 700,
+          color: INK_MUTE,
+          letterSpacing: '0.04em',
+          textTransform: 'uppercase',
+          marginTop: -2,
+          fontFamily: MONO,
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
+        Par {hole.par}{hole.stroke_index != null ? ` · SI ${hole.stroke_index}` : ''}
       </div>
       <HoleDistributionBar dist={hole.dist} height={5} />
     </div>
