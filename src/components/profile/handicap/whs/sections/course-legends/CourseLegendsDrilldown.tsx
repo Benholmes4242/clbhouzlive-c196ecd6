@@ -359,10 +359,6 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
           />
 
 
-          <CategoryNavRail
-            categories={navCategories}
-            onSelect={handleNavSelect}
-          />
 
           <div>
           {visibleCategories.map((cat) => {
