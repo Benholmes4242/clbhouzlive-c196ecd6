@@ -18852,6 +18852,13 @@ export type Database = {
           post_count: number
         }[]
       }
+      get_watch_hub_counts: {
+        Args: never
+        Returns: {
+          clip_count: number
+          video_count: number
+        }[]
+      }
       get_watch_most_loved_this_week: {
         Args: {
           p_format?: string
