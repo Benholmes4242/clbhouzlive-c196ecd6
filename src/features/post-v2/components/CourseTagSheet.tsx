@@ -84,98 +84,105 @@ export default function CourseTagSheet({
   const showPopular = q.trim().length === 0;
 
   return (
-    <BottomSheet open={open} onClose={onClose} bottomOffset={keyboardHeight}>
-      {/* Eyebrow header — mirrors the shared @mention sheet chrome */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '2px 14px 8px',
-          borderBottom: '1px solid rgba(15,23,42,0.08)',
-        }}
-      >
+    <BottomSheet open={open} onClose={onClose} bottomOffset={keyboardHeight} fullHeight>
+      {/* Fixed-height column: header + search stay pinned, list scrolls internally. */}
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
+        {/* Eyebrow header — mirrors the shared @mention sheet chrome */}
         <div
           style={{
+            flex: 'none',
             display: 'flex',
             alignItems: 'center',
-            gap: 6,
-            fontSize: 10.5,
-            fontWeight: 700,
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            color: 'rgba(15,23,42,0.55)',
+            justifyContent: 'space-between',
+            padding: '2px 14px 8px',
+            borderBottom: '1px solid rgba(15,23,42,0.08)',
           }}
         >
-          <MapPin size={11} strokeWidth={2.25} color="#F7931E" />
-          {title ?? 'Tag a course'}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              fontSize: 10.5,
+              fontWeight: 700,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              color: 'rgba(15,23,42,0.55)',
+            }}
+          >
+            <MapPin size={11} strokeWidth={2.25} color="#F7931E" />
+            {title ?? 'Tag a course'}
+          </div>
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            style={{ background: 'transparent', border: 0, color: '#1F2428', cursor: 'pointer', padding: 4 }}
+          >
+            <X size={18} />
+          </button>
         </div>
-        <button
-          onClick={onClose}
-          aria-label="Close"
-          style={{ background: 'transparent', border: 0, color: '#1F2428', cursor: 'pointer', padding: 4 }}
-        >
-          <X size={18} />
-        </button>
-      </div>
 
-      <div style={{ padding: '10px 16px 12px' }}>
-        <div style={{ position: 'relative' }}>
-          <Search size={16} color="#94A3B8" style={{ position: 'absolute', top: 12, left: 12 }} />
-          <input
-            autoFocus
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Search any of 40,000+ courses"
-            style={{ width: '100%', padding: '10px 12px 10px 34px', border: '1px solid rgba(15,23,42,0.1)', borderRadius: 12, fontSize: 14, background: '#fff', color: '#0F172A' }}
-          />
+        <div style={{ flex: 'none', padding: '10px 16px 12px' }}>
+          <div style={{ position: 'relative' }}>
+            <Search size={16} color="#94A3B8" style={{ position: 'absolute', top: 12, left: 12 }} />
+            <input
+              autoFocus
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Search any of 40,000+ courses"
+              style={{ width: '100%', padding: '10px 12px 10px 34px', border: '1px solid rgba(15,23,42,0.1)', borderRadius: 12, fontSize: 14, background: '#fff', color: '#0F172A' }}
+            />
+          </div>
         </div>
-      </div>
 
+        {/* Scrolling list region — the only part that grows */}
+        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}>
+          {current && (
+            <button onClick={() => { onSelect(null); onClose(); }} style={rowBtn}>
+              <div style={{ color: '#8A9099', fontSize: 13 }}>Remove current tag ({current.name})</div>
+            </button>
+          )}
 
-      {current && (
-        <button onClick={() => { onSelect(null); onClose(); }} style={rowBtn}>
-          <div style={{ color: '#8A9099', fontSize: 13 }}>Remove current tag ({current.name})</div>
-        </button>
-      )}
-
-      {showPopular ? (
-        <>
-          {popular.length > 0 ? (
+          {showPopular ? (
             <>
-              <div style={{ padding: '10px 16px 6px', fontSize: 10, fontWeight: 800, letterSpacing: 1, color: '#94A3B8' }}>
-                POPULAR ON CLBHOUZ
-              </div>
-              {popular.map(r => (
-                <CourseRow
-                  key={r.id}
-                  row={{ id: r.id, name: r.name, country: r.country, sub_country: r.sub_country }}
-                  onSelect={(c) => { onSelect(c); onClose(); }}
-                />
-              ))}
-              <div style={{ padding: '16px', fontSize: 12, color: '#94A3B8' }}>
-                Can't see it? Search any of 40,000+ courses above.
-              </div>
+              {popular.length > 0 ? (
+                <>
+                  <div style={{ padding: '10px 16px 6px', fontSize: 10, fontWeight: 800, letterSpacing: 1, color: '#94A3B8' }}>
+                    POPULAR ON CLBHOUZ
+                  </div>
+                  {popular.map(r => (
+                    <CourseRow
+                      key={r.id}
+                      row={{ id: r.id, name: r.name, country: r.country, sub_country: r.sub_country }}
+                      onSelect={(c) => { onSelect(c); onClose(); }}
+                    />
+                  ))}
+                  <div style={{ padding: '16px', fontSize: 12, color: '#94A3B8' }}>
+                    Can't see it? Search any of 40,000+ courses above.
+                  </div>
+                </>
+              ) : (
+                <div style={{ padding: '24px 16px', fontSize: 13, color: '#94A3B8', textAlign: 'center' }}>
+                  Search any of 40,000+ courses above.
+                </div>
+              )}
             </>
           ) : (
-            <div style={{ padding: '24px 16px', fontSize: 13, color: '#94A3B8', textAlign: 'center' }}>
-              Search any of 40,000+ courses above.
-            </div>
+            rows.map(r => (
+              <CourseRow
+                key={r.id}
+                row={r}
+                reviewed={reviewedIds.has(r.id)}
+                onSelect={(c) => { onSelect(c); onClose(); }}
+              />
+            ))
           )}
-        </>
-      ) : (
-        rows.map(r => (
-          <CourseRow
-            key={r.id}
-            row={r}
-            reviewed={reviewedIds.has(r.id)}
-            onSelect={(c) => { onSelect(c); onClose(); }}
-          />
-        ))
-      )}
+        </div>
+      </div>
     </BottomSheet>
   );
 }
+
 
 function CourseRow({ row, onSelect, reviewed = false }: { row: Row; onSelect: (c: StageCourse) => void; reviewed?: boolean }) {
   const locality = row.isHomeClub ? 'Your home club' : (row.sub_country || row.country || null);
