@@ -81,7 +81,6 @@ export function FeatCard({ row, tier, onTap }: Props) {
   const image = row.course_image ?? row.thumbnail_image ?? null;
   const holder = formatHolderName(row.holder_name);
   const ringColor = RING[tier];
-  const dotColor = DOT[tier];
   const chipLabel = isRecord
     ? RECORD_CATEGORY_LABEL[row.category ?? ''] ?? 'Course record'
     : TIER_LABEL[tier];
