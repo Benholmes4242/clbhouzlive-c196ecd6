@@ -244,7 +244,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows }: Props) {
         </div>
 
         {/* Header */}
-        <div style={{ padding: '6px 16px 10px', borderBottom: `0.5px solid ${HAIRLINE_INK_8}` }}>
+        <div style={{ padding: '6px 16px 10px', borderBottom: `0.5px solid ${HAIRLINE_INK_8}`, background: '#F8FAFC' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span aria-hidden style={{ fontSize: 15, lineHeight: 1 }}>{TIER_ICON[tier]}</span>
             <span
@@ -287,7 +287,37 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows }: Props) {
           <div style={{ marginTop: 4, fontSize: 12, color: 'rgba(15,23,42,0.5)' }}>
             {recentLabel}
           </div>
+          {hasToggle && (
+            <div style={{ marginTop: 10, display: 'flex', gap: 6 }}>
+              {(['latest', 'top'] as const).map((mode) => {
+                const active = sort === mode;
+                return (
+                  <button
+                    key={mode}
+                    type="button"
+                    onClick={() => setSort(mode)}
+                    style={{
+                      appearance: 'none',
+                      border: 0,
+                      padding: '5px 12px',
+                      borderRadius: 999,
+                      fontFamily: FONT,
+                      fontSize: 12,
+                      fontWeight: 700,
+                      letterSpacing: '0.02em',
+                      cursor: 'pointer',
+                      background: active ? INK : 'transparent',
+                      color: active ? '#FFFFFF' : 'rgba(15,23,42,0.55)',
+                    }}
+                  >
+                    {mode === 'latest' ? 'Latest' : 'Top'}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
+
 
         {/* List */}
         <div
