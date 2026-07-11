@@ -41,7 +41,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 // buildSuggestedFeed/buildFriendsFeed are called inside the feed hooks — not here
 
 // ── Clubhouse UI overlays ──
-import CommentsSheet from '@/components/comments/CommentsSheet';
+import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { SuggestedCreatorsShelf } from '@/components/shared/SuggestedCreatorsShelf';
 
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
