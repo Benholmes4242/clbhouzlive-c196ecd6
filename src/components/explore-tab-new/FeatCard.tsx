@@ -231,9 +231,10 @@ export function FeatCard({ row, tier, onTap }: Props) {
             src={row.holder_avatar}
             alt={holder}
             fallback={initials(holder)}
-            ringColor={ringColor}
-            thinRing
+            hairlineRing
+            ringColor={LIGHT_HAIRLINE}
           />
+
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <p
