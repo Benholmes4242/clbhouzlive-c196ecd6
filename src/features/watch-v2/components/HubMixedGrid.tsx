@@ -131,7 +131,7 @@ function SkeletonTile({ aspect }: { aspect: string }) {
   );
 }
 
-export function HubMixedGrid() {
+export function HubMixedGrid({ filter = 'all' }: { filter?: string } = {}) {
   const { user } = useSupabaseSession();
   const {
     data,
@@ -140,7 +140,7 @@ export function HubMixedGrid() {
     isFetching,
     isFetchingNextPage,
     isLoading,
-  } = useHubMixedGrid(user?.id, 'all');
+  } = useHubMixedGrid(user?.id, filter);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
 
