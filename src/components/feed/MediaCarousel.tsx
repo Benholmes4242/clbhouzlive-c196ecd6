@@ -498,27 +498,6 @@ export const MediaCarousel: React.FC<Props> = ({
         })}
       </div>
 
-      {/* n/total chip */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 10,
-          right: 10,
-          background: 'rgba(5,8,16,0.55)',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
-          color: '#fff',
-          fontSize: 11,
-          fontWeight: 600,
-          padding: '3px 8px',
-          borderRadius: 999,
-          fontVariantNumeric: 'tabular-nums',
-          pointerEvents: 'none',
-        }}
-      >
-        {active + 1}/{items.length}
-      </div>
-
       {/* Dots */}
       <div
         style={{
