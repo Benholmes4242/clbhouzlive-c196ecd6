@@ -12,47 +12,15 @@ export function useDeleteBusiness() {
 
   return useMutation({
     mutationFn: async ({ businessId, userId }: { businessId: string; userId: string }) => {
-      // Check if user is owner
-      const { data: membership, error: membershipError } = await supabase
-        .from('business_members')
-        .select('role')
-        .eq('business_id', businessId)
-        .eq('user_profile_id', userId)
-        .single();
-
-      if (membershipError || !membership) {
-        throw new Error('You do not have permission to delete this business');
-      }
-
-      if (membership.role !== 'owner') {
-        throw new Error('Only the owner can delete this business');
-      }
-
-      // Soft delete the business
-      const { error: deleteError } = await supabase
-        .from('business_accounts')
-        .update({
-          is_deleted: true,
-          deleted_at: new Date().toISOString(),
-        })
-        .eq('id', businessId);
-
-      if (deleteError) throw deleteError;
-
-      // Remove all memberships
-      const { error: membershipDeleteError } = await supabase
-        .from('business_members')
-        .delete()
-        .eq('business_id', businessId);
-
-      if (membershipDeleteError) {
-        console.error('Error removing memberships:', membershipDeleteError);
-      }
-
+      const { error } = await supabase.rpc('soft_delete_business', {
+        _business_id: businessId,
+      });
+      if (error) throw error;
       return { businessId };
     },
     onSuccess: () => {
       // Invalidate all business-related queries
+      queryClient.invalidateQueries({ queryKey: ['course-claim'] });
       queryClient.invalidateQueries({ queryKey: ['my-businesses'] });
       queryClient.invalidateQueries({ queryKey: ['business-profile'] });
 

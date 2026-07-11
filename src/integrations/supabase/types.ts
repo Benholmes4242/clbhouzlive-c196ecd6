@@ -19589,6 +19589,7 @@ export type Database = {
       }
       refresh_college_season_stats_auto: { Args: never; Returns: undefined }
       refresh_college_weekly_movers: { Args: never; Returns: undefined }
+      refresh_discover_feats: { Args: never; Returns: undefined }
       refresh_expired_course_mood_blurbs: { Args: never; Returns: number }
       refresh_gam_league_standings: { Args: never; Returns: undefined }
       refresh_latest_records_cache: {
@@ -19809,6 +19810,10 @@ export type Database = {
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
       snapshot_daily_ranks: { Args: never; Returns: undefined }
+      soft_delete_business: {
+        Args: { _business_id: string }
+        Returns: undefined
+      }
       st_3dclosestpoint: {
         Args: { geom1: unknown; geom2: unknown }
         Returns: unknown
