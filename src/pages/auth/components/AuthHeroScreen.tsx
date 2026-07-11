@@ -172,7 +172,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                 {showApple && (
                   <button
                     type="button"
-                    onClick={onAppleSignIn}
+                    onClick={requireAgreement(onAppleSignIn)}
                     disabled={submitting}
                     aria-label="Continue with Apple"
                     className="w-full flex items-center justify-center gap-2 rounded-[14px] transition-opacity active:opacity-85 disabled:opacity-60"
