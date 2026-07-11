@@ -30,7 +30,7 @@ import ClaimUnderReviewNotice from './ClaimUnderReviewNotice';
 import ClaimedCourseProfileLink from './ClaimedCourseProfileLink';
 
 import { SectionHeader } from '@/components/ui/SectionHeader';
-import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_8, INK_FAINT, SLATE_50, SLATE_600 } from '@/features/courses/_shared/tokens';
+import { AMBER, HAIRLINE_INK_7, INK_FAINT, SLATE_50, SLATE_600 } from '@/features/courses/_shared/tokens';
 
 interface Course {
   id: string;
@@ -249,32 +249,6 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         </>
       )}
 
-      {/* 7. Course stats grid — only shown if rank data exists */}
-      {(course.global_rank || course.usa_rank || course.country_rank || course.regional_rank) && (() => {
-        const stats = [
-          course.global_rank ? { label: 'Global Rank', value: `#${course.global_rank}` } : null,
-          course.usa_rank ? { label: 'USA Rank', value: `#${course.usa_rank}` } : null,
-          course.regional_rank ? { label: 'Regional Rank', value: `#${course.regional_rank}` } : null,
-          course.country_rank ? { label: 'Country Rank', value: `#${course.country_rank}` } : null,
-        ].filter(Boolean) as { label: string; value: string }[];
-
-        return (
-          <>
-            <div>
-              <SectionHeader role="section" kicker="COURSE DETAILS" paddingX={16} />
-              <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(stats.length, 4)}, 1fr)`, padding: '0 16px' }}>
-                {stats.slice(0, 4).map((s, i, arr) => (
-                  <div key={s.label} style={{ textAlign: 'center', padding: '4px 0', borderRight: i < arr.length - 1 ? `0.5px solid ${HAIRLINE_INK_8}` : 'none' }}>
-                    <div style={{ fontSize: 22, fontWeight: 900, color: AMBER, letterSpacing: '-0.04em' }}>{s.value}</div>
-                    <div style={{ fontSize: 8, fontWeight: 700, color: INK_FAINT, letterSpacing: '0.08em', textTransform: 'uppercase' as const, marginTop: 3 }}>{s.label}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div style={{ margin: '24px 0' }}><Divider /></div>
-          </>
-        );
-      })()}
 
       {/* 8. Location */}
       <section>
