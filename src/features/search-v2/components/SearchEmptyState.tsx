@@ -74,6 +74,7 @@ export function SearchEmptyState({ onSelect }: Props) {
             <PlayerCard
               key={p.id}
               player={p}
+              tourSlug={event?.tour_slug ?? 'pga'}
               onTap={() => {
                 onSelect();
                 navigate(`/tourhub/player/${p.id}`);
