@@ -110,10 +110,15 @@ export const ReviewVerdictLabel: React.FC<ReviewVerdictLabelProps> = ({
   fontSize = 12.5,
   onClick,
   ariaLabel,
+  surface = 'dark',
 }) => {
   const tierKey = getRatingTier(rating);
   const tierLabel = getRatingTierLabel(rating);
   const isExceptional = tierKey === 'EXCEPTIONAL';
+  const labelColor =
+    surface === 'light' && !isExceptional
+      ? ratingTextColor(rating)
+      : REVIEW_LABEL_COLOR[tierKey];
   const labelSpan = (
     <span
       className={isExceptional ? 'clbhouz-gold-shimmer' : undefined}
@@ -123,7 +128,7 @@ export const ReviewVerdictLabel: React.FC<ReviewVerdictLabelProps> = ({
         letterSpacing: '0.14em',
         textTransform: 'uppercase',
         whiteSpace: 'nowrap',
-        ...(isExceptional ? {} : { color: REVIEW_LABEL_COLOR[tierKey] }),
+        ...(isExceptional ? {} : { color: labelColor }),
       }}
     >
       {tierLabel}
