@@ -105,11 +105,21 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
 
   const trimmed = loginEmail.trim();
   const [agreed, setAgreed] = useState(false);
+  const [nudgeAgreement, setNudgeAgreement] = useState(false);
   const canContinue = trimmed.length > 0 && !submitting && agreed;
   const inMedian = useMemo(() => isMedianApp(), []);
   const showApple = inMedian && !!onAppleSignIn;
   const showGoogle = inMedian && !!onGoogleSignIn;
   const showSocial = showApple || showGoogle;
+
+  const requireAgreement = (fn?: () => void) => () => {
+    if (!agreed) {
+      setNudgeAgreement(true);
+      toast.error('Please agree to the Terms first.');
+      return;
+    }
+    fn?.();
+  };
 
 
   return (
@@ -162,7 +172,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                 {showApple && (
                   <button
                     type="button"
-                    onClick={onAppleSignIn}
+                    onClick={requireAgreement(onAppleSignIn)}
                     disabled={submitting}
                     aria-label="Continue with Apple"
                     className="w-full flex items-center justify-center gap-2 rounded-[14px] transition-opacity active:opacity-85 disabled:opacity-60"
@@ -191,7 +201,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                 {showGoogle && (
                   <button
                     type="button"
-                    onClick={onGoogleSignIn}
+                    onClick={requireAgreement(onGoogleSignIn)}
                     disabled={submitting}
                     aria-label="Continue with Google"
                     className="w-full flex items-center justify-center gap-2 rounded-[14px] transition-opacity active:opacity-85 disabled:opacity-60"
@@ -290,6 +300,73 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
             >
               We'll email you a 6-digit code. No password needed.
             </p>
+
+            {/* Legal / EULA block — Apple Guideline 1.2 + 2.2 */}
+            <div style={{ marginTop: 8 }}>
+              <button
+                type="button"
+                role="checkbox"
+                aria-checked={agreed}
+                onClick={() => {
+                  setAgreed((v) => !v);
+                  if (nudgeAgreement) setNudgeAgreement(false);
+                }}
+                className="w-full flex items-start gap-3 rounded-[12px] px-3 py-2.5 text-left transition-colors active:opacity-80"
+                style={{
+                  background: 'rgba(255,255,255,0.04)',
+                  border: `1px solid ${
+                    nudgeAgreement && !agreed
+                      ? 'rgba(247,147,30,0.55)'
+                      : 'rgba(255,255,255,0.10)'
+                  }`,
+                }}
+              >
+                <span
+                  aria-hidden="true"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: 20,
+                    height: 20,
+                    marginTop: 1,
+                    borderRadius: 6,
+                    background: agreed ? '#F7931E' : 'transparent',
+                    border: agreed
+                      ? '1px solid #F7931E'
+                      : '1.5px solid rgba(255,255,255,0.45)',
+                    flexShrink: 0,
+                    transition: 'all 120ms ease',
+                  }}
+                >
+                  {agreed && (
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M5 12l4 4L19 7" stroke="#FFFFFF" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  )}
+                </span>
+                <span style={{ fontSize: 12, lineHeight: 1.45, color: 'rgba(255,255,255,0.78)' }}>
+                  I agree to the{' '}
+                  <Link
+                    to="/terms"
+                    onClick={(e) => e.stopPropagation()}
+                    style={{ color: '#F7931E', fontWeight: 600, textDecoration: 'underline' }}
+                  >
+                    Terms of Service
+                  </Link>{' '}
+                  and{' '}
+                  <Link
+                    to="/privacy"
+                    onClick={(e) => e.stopPropagation()}
+                    style={{ color: '#F7931E', fontWeight: 600, textDecoration: 'underline' }}
+                  >
+                    Privacy Policy
+                  </Link>
+                  . clbhouz has zero tolerance for objectionable content and abusive
+                  behavior. Reports are reviewed within 24 hours.
+                </span>
+              </button>
+            </div>
           </div>
         </div>
       </div>

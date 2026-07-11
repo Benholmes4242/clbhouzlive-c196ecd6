@@ -11,6 +11,7 @@ import { useInfiniteQuery, useMutation, useQueryClient, useQuery } from '@tansta
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
+import { useBlockedUserIds } from '@/hooks/useBlockedUserIds';
 
 export type TargetType = 'post' | 'top_ten' | 'editorial';
 
@@ -63,6 +64,7 @@ export function useCommentsV2({
   const { activeActor } = useActiveActor();
   const actorType = activeActor?.type ?? 'personal';
   const actorId = activeActor?.id ?? user?.id ?? '';
+  const blockedIds = useBlockedUserIds(user?.id ?? null);
 
   const keyRoot = ['comments-v2', targetType, targetId, targetSecondaryId ?? null] as const;
 
@@ -220,15 +222,17 @@ export function useCommentsV2({
 
   const threads = useMemo<CommentV2[]>(() => {
     if (!parents.length) return [];
+    const isBlocked = (r: any) => blockedIds.has(r.user_id) || (r.actor_type !== 'business' && r.actor_id && blockedIds.has(r.actor_id));
     const byParent = new Map<string, any[]>();
     for (const r of replies) {
       if (hiddenIds.has(r.id)) continue;
+      if (isBlocked(r)) continue;
       const list = byParent.get(r.parent_id) ?? [];
       list.push(r);
       byParent.set(r.parent_id, list);
     }
     return parents
-      .filter(p => !hiddenIds.has(p.id))
+      .filter(p => !hiddenIds.has(p.id) && !isBlocked(p))
       .map(p => {
         const shaped = shape(p);
         const rlist = (byParent.get(p.id) ?? []).map(shape);
@@ -236,7 +240,7 @@ export function useCommentsV2({
         shaped.reply_count = rlist.length;
         return shaped;
       });
-  }, [parents, replies, hiddenIds, shape]);
+  }, [parents, replies, hiddenIds, blockedIds, shape]);
 
   // Header total (top-level count for the current target).
   const { data: totalCount = 0 } = useQuery({
