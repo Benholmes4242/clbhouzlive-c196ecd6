@@ -52,12 +52,21 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
 
   return (
     <div style={{ background: SLATE_50, minHeight: '100vh' }}>
-      <div style={{ paddingTop: 0, paddingBottom: 4 }}>
+      <div style={{ paddingTop: 0, paddingBottom: 16 }}>
         <ConnectHandicapCue variant="discover" />
       </div>
 
       {/* Friends rail — region-INDEPENDENT, always visible */}
       <CircleActivityStrip userId={userId} />
+
+      {/* Zone seam: friends → register tabs */}
+      <div
+        style={{
+          marginTop: 20,
+          borderTop: '1px solid rgba(15,23,42,0.06)',
+          paddingTop: 18,
+        }}
+      />
 
       {/* Region tabs — shared control driving tiers and grid */}
       <AlmanacRegionTabs region={activeRegion} onRegionChange={handleRegionChange} />
