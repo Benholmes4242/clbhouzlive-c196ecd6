@@ -530,4 +530,81 @@ function EmptyScope({ label }: { label: string }) {
   );
 }
 
+function CommitResults({
+  query,
+  videos,
+  onCommit,
+  onSelectVideo,
+}: {
+  query: string;
+  videos: ReturnType<typeof useGlobalSearchV2>['data']['videos'];
+  onCommit: (term: string) => void;
+  onSelectVideo: (video: ReturnType<typeof useGlobalSearchV2>['data']['videos'][number]) => void;
+}) {
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={() => onCommit(query)}
+        className="w-full flex items-center gap-3 px-4 min-h-[56px] text-left active:opacity-70"
+        style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}
+      >
+        <div
+          className="flex items-center justify-center rounded-full shrink-0"
+          style={{
+            width: 32,
+            height: 32,
+            background: '#0F172A',
+            color: '#F8FAFC',
+            fontSize: 14,
+            fontWeight: 800,
+          }}
+          aria-hidden="true"
+        >
+          ⌕
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="text-[14px] font-extrabold truncate" style={{ color: '#0F172A' }}>
+            Search “{query}”
+          </div>
+          <div className="text-[11.5px]" style={{ color: '#64748B' }}>
+            Filter the grid to matching clips
+          </div>
+        </div>
+      </button>
+
+      {videos.length > 0 ? (
+        <>
+          <div style={{ padding: '18px 16px 6px' }}>
+            <span
+              className="text-[11px] font-extrabold tracking-[0.08em] uppercase"
+              style={{ color: '#64748B' }}
+            >
+              Previews
+            </span>
+          </div>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+              gap: 12,
+              padding: '4px 16px 16px',
+            }}
+          >
+            {videos.map((v) => (
+              <VideoRailCard key={v.id} video={v} onSelect={() => onSelectVideo(v)} />
+            ))}
+          </div>
+        </>
+      ) : (
+        <div style={{ padding: '28px 16px', textAlign: 'center' }}>
+          <p className="text-[13px]" style={{ color: '#64748B' }}>
+            No preview clips yet — tap “Search” to filter the grid.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default SearchOverlayV2;
