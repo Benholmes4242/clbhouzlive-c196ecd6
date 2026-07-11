@@ -244,7 +244,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
             >
               {/* Ghost numeral — huge watermark, top-right, clipped by header edge */}
               {rating != null && (
-                <ReviewGhostNumeral rating={rating} fontSize={86} right={-7} top={54} />
+                <ReviewGhostNumeral rating={rating} fontSize={110} right={-10} top={40} />
               )}
 
               {/* Drag handle */}
