@@ -200,17 +200,18 @@ function LiveChip() {
 // ─── Player card ───────────────────────────────────────────────────────
 function PlayerCard({
   player,
+  tourSlug,
   onTap,
 }: {
   player: EmptyStatePlayer;
+  tourSlug: string;
   onTap: () => void;
 }) {
-  const initials = (player.abbr_name || player.full_name || '?')
-    .split(/\s+/)
-    .map((w) => w[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
+  const candidates = getPlayerHeadshotCandidates(
+    player.full_name,
+    tourSlug,
+    player.headshot_override,
+  );
   return (
     <button
       type="button"
@@ -218,12 +219,11 @@ function PlayerCard({
       className="flex flex-col items-center shrink-0 text-left"
       style={{ width: 84 }}
     >
-      <SquircleAvatar
+      <PlayerInitialAvatar
+        name={player.full_name}
+        srcCandidates={candidates}
         size={64}
-        src={player.headshot_override ?? undefined}
-        alt={player.full_name}
-        fallback={initials}
-        hairlineRing
+        radius="34%"
         ringColor={LIGHT_HAIRLINE}
       />
       <p
