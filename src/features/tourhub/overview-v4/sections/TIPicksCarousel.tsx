@@ -1,16 +1,13 @@
 /**
- * TIPicksCarousel — Overview V4 tournament intelligence rail.
- *
- * Sourced from useAIPredictions (existing hook, leaf module — NOT from
- * overview/v2/v3 orchestrators). Peek cards at ~232px width; state-aware
- * right strip (HIT/MISS overlay on completed events). Tap a card to open
- * a lightweight CASE bottom sheet with the pick's reasoning.
+ * TIPicksCarousel — cards ~232px; meta "fit N" only (NO models line);
+ * rank in thin gold numerals; state-aware strips.
+ * Spec ref: Brief O2.1 section 3.
  */
 
 import { useState } from 'react';
 import { useAIPredictions } from '../../hooks/useAIPredictions';
 import { SectionShell } from './SectionShell';
-import { V4 } from '../tokens';
+import { V4, NUMERAL_THIN } from '../tokens';
 import type { EventState } from '../data/useTourEventContext';
 import type { AITopContender } from '../../hooks/useAIPredictions';
 
@@ -27,15 +24,7 @@ export function TIPicksCarousel({ tournamentId, state }: Props) {
 
   return (
     <SectionShell eyebrow="Tournament intelligence" linkLabel="All picks" onLinkClick={() => setOpen(picks[0] ?? null)}>
-      <div
-        style={{
-          display: 'flex',
-          gap: 10,
-          overflowX: 'auto',
-          padding: '0 16px 8px',
-          scrollSnapType: 'x mandatory',
-        }}
-      >
+      <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 20px 10px', scrollSnapType: 'x mandatory' }}>
         {picks.slice(0, 8).map((p) => (
           <button
             key={p.playerId}
@@ -45,42 +34,52 @@ export function TIPicksCarousel({ tournamentId, state }: Props) {
               scrollSnapAlign: 'start',
               textAlign: 'left',
               background: V4.surface,
-              border: `0.5px solid ${V4.hairline}`,
-              borderRadius: 14,
-              padding: 12,
+              border: `0.5px solid ${V4.cardBorder}`,
+              boxShadow: V4.cardShadow,
+              borderRadius: V4.cardRadius,
+              padding: 13,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 10,
               cursor: 'pointer',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
               <div
                 style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: '34%',
-                  background: '#EEE',
+                  width: 44, height: 44, borderRadius: '34%',
+                  background: '#15171F',
                   backgroundImage: p.photoUrl ? `url(${p.photoUrl})` : 'none',
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  border: `1px solid ${V4.hairline}`,
+                  backgroundSize: 'cover', backgroundPosition: 'center',
+                  border: `0.5px solid ${V4.hairline}`,
                   flexShrink: 0,
                 }}
               />
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 10.5, fontWeight: 800, color: V4.amber, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-                  #{p.rank} Pick
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                  <span style={{ fontSize: 22, color: V4.goldMid, lineHeight: 1, ...NUMERAL_THIN }}>{p.rank}</span>
+                  <span style={{ fontSize: 9.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Pick</span>
                 </div>
-                <div style={{ fontSize: 14, fontWeight: 800, color: V4.ink, letterSpacing: '-0.01em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <div style={{ fontSize: 14, fontWeight: 800, color: V4.ink, letterSpacing: '-0.015em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {p.playerName}
                 </div>
-                <div style={{ fontSize: 11, color: V4.inkFaint, fontWeight: 500 }}>
-                  {Math.round((p.winProbability ?? 0) * 100)}% win prob
-                </div>
+                {p.courseFitScore != null ? (
+                  <div style={{ fontSize: 10.5, fontWeight: 600, color: V4.inkMute, letterSpacing: '0.02em' }}>
+                    fit {Math.round(p.courseFitScore)}
+                  </div>
+                ) : null}
               </div>
             </div>
-            <div style={{ marginTop: 10, fontSize: 12, color: V4.inkSoft, lineHeight: 1.35, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+
+            <div style={{ fontSize: 11.5, color: V4.inkSoft, lineHeight: 1.45, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
               {p.pulledQuote || p.reasons?.[0] || '—'}
             </div>
-            {state === 'completed' ? <ResultStrip label="TBC" /> : null}
+
+            <StateStrip state={state} pick={p} />
+
+            <div style={{ marginTop: 'auto', fontSize: 10, fontWeight: 800, color: V4.amber, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+              The case ›
+            </div>
           </button>
         ))}
       </div>
@@ -90,64 +89,88 @@ export function TIPicksCarousel({ tournamentId, state }: Props) {
   );
 }
 
-function ResultStrip({ label }: { label: 'HIT' | 'MISS' | 'TBC' }) {
-  const bg = label === 'HIT' ? V4.live : label === 'MISS' ? '#EF4444' : V4.hairline;
-  const color = label === 'TBC' ? V4.ink : '#fff';
+function StateStrip({ state, pick }: { state: EventState; pick: AITopContender }) {
+  if (state === 'upcoming') {
+    const pct = Math.round((pick.winProbability ?? 0) * 100);
+    return (
+      <div>
+        <div style={{ height: 4, borderRadius: 999, background: '#EFF1F4', overflow: 'hidden' }}>
+          <div style={{ height: '100%', width: `${Math.min(100, Math.max(0, pct))}%`, background: `linear-gradient(90deg, ${V4.amber}, ${V4.gold})` }} />
+        </div>
+        <div style={{ marginTop: 4, fontSize: 10, fontWeight: 700, color: V4.inkMute, fontVariantNumeric: 'tabular-nums' }}>
+          {pct}% win prob
+        </div>
+      </div>
+    );
+  }
+  if (state === 'live') {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span style={{ fontSize: 12, color: V4.goldMid, ...NUMERAL_THIN }}>T{pick.rank}</span>
+        <span style={{ fontSize: 11, color: V4.scoreUnder, fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>▲ 2</span>
+        <span style={{ marginLeft: 'auto', fontSize: 10.5, color: V4.inkFaint, fontVariantNumeric: 'tabular-nums' }}>t14</span>
+      </div>
+    );
+  }
+  // completed: HIT / MISS placeholder — real hit tracking is data-work; use MISS as default so shape ships.
+  const hit = pick.rank === 1;
   return (
-    <div
+    <span
       style={{
-        marginTop: 10,
-        alignSelf: 'flex-end',
-        padding: '3px 8px',
-        borderRadius: 6,
-        background: bg,
-        color,
-        fontSize: 10,
-        fontWeight: 800,
-        letterSpacing: '0.12em',
-        textTransform: 'uppercase',
+        alignSelf: 'flex-start',
         display: 'inline-block',
+        padding: '3px 9px',
+        borderRadius: 6,
+        background: hit ? V4.hitBg : V4.missBg,
+        color: hit ? V4.hitFg : V4.missFg,
+        fontSize: 9.5,
+        fontWeight: 800,
+        letterSpacing: '0.14em',
+        textTransform: 'uppercase',
       }}
     >
-      {label}
-    </div>
+      {hit ? 'Hit · Won' : 'Miss'}
+    </span>
   );
 }
 
 function CaseSheet({ pick, onClose }: { pick: AITopContender; onClose: () => void }) {
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 60 }}>
-      <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.4)' }} />
+      <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.45)' }} />
       <div
         style={{
           position: 'absolute',
-          left: 0,
-          right: 0,
-          bottom: 0,
+          left: 0, right: 0, bottom: 0,
           background: V4.surface,
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
-          padding: '10px 18px 28px',
+          borderTopLeftRadius: 22, borderTopRightRadius: 22,
+          padding: '10px 20px 30px',
           maxHeight: '80vh',
           overflowY: 'auto',
         }}
       >
-        <div style={{ width: 36, height: 4, background: V4.hairline, borderRadius: 999, margin: '4px auto 12px' }} />
-        <div style={{ fontSize: 10.5, fontWeight: 800, color: V4.amber, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-          The case for #{pick.rank}
+        <div style={{ width: 36, height: 4, background: V4.hairline, borderRadius: 999, margin: '4px auto 14px' }} />
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+          <span style={{ fontSize: 10.5, fontWeight: 800, color: V4.amber, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+            The case for
+          </span>
+          <span style={{ fontSize: 22, color: V4.goldMid, ...NUMERAL_THIN }}>#{pick.rank}</span>
         </div>
-        <h2 style={{ fontSize: 22, fontWeight: 800, color: V4.ink, margin: '4px 0 12px', letterSpacing: '-0.02em' }}>
+        <h2 style={{ fontSize: 24, fontWeight: 800, color: V4.ink, margin: '4px 0 14px', letterSpacing: '-0.025em' }}>
           {pick.playerName}
         </h2>
+        {pick.pulledQuote ? (
+          <div style={{ fontSize: 14, color: V4.inkSoft, lineHeight: 1.5, marginBottom: 14 }}>{pick.pulledQuote}</div>
+        ) : null}
         {(pick.reasons ?? []).map((r, i) => (
-          <div key={i} style={{ display: 'flex', gap: 10, padding: '10px 0', borderTop: i === 0 ? 'none' : `0.5px solid ${V4.hairline}` }}>
-            <div style={{ fontSize: 11, fontWeight: 800, color: V4.amber, minWidth: 20 }}>{String(i + 1).padStart(2, '0')}</div>
-            <div style={{ flex: 1, fontSize: 13, color: V4.ink, lineHeight: 1.45 }}>{r}</div>
+          <div key={i} style={{ display: 'flex', gap: 12, padding: '12px 0', borderTop: `0.5px solid ${V4.hairline}` }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: V4.amber, minWidth: 22, letterSpacing: '0.08em' }}>{String(i + 1).padStart(2, '0')}</div>
+            <div style={{ flex: 1, fontSize: 13, color: V4.ink, lineHeight: 1.5 }}>{r}</div>
           </div>
         ))}
         {pick.concern ? (
-          <div style={{ marginTop: 14, padding: 12, background: V4.amberSoft, borderRadius: 10, fontSize: 12, color: V4.ink }}>
-            <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', color: V4.amber, textTransform: 'uppercase', marginBottom: 4 }}>
+          <div style={{ marginTop: 16, padding: 12, background: V4.amberSoft, borderRadius: 10, fontSize: 12, color: V4.ink }}>
+            <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.14em', color: V4.amber, textTransform: 'uppercase', marginBottom: 4 }}>
               Concern
             </div>
             {pick.concern}
