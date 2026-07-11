@@ -50,7 +50,7 @@ export function useRegionFeats(region: string | null, tier: FeatTier) {
         .eq('rail_key', railKey)
         .maybeSingle();
       if (error) throw error;
-      return (data?.payload ?? []) as FeatRow[];
+      return (data?.payload ?? []) as unknown as FeatRow[];
     },
   });
 }
