@@ -742,10 +742,17 @@ function CommentsSheet({
 
           {/* Panel */}
           <motion.div
+            layout="size"
+            layoutDependency={activeTab}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+            transition={{
+              type: 'spring',
+              damping: 28,
+              stiffness: 300,
+              layout: { type: 'spring', damping: 30, stiffness: 350 },
+            }}
             drag="y"
             dragConstraints={{ top: 0, bottom: 0 }}
             dragElastic={{ top: 0, bottom: 0.4 }}
