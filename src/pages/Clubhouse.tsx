@@ -615,6 +615,8 @@ const ClubhouseContent = () => {
           <MoreOptionsDrawer
             open={moreOptionsOpen}
             onOpenChange={setMoreOptionsOpen}
+            post={activePost}
+            currentUserId={user?.id}
             onReport={() => handleReport(activePost)}
             onNotInterested={() => handleNotInterested(activePost)}
             onCopyLink={() => {
