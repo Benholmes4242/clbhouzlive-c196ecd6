@@ -238,7 +238,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
           ))}
         </div>
 
-        <p style={{ fontSize: 12, color: '#94A3B8', margin: '0 16px 14px', lineHeight: 1.5, textAlign: 'center' as const }}>
+        <p style={{ fontSize: 12, color: '#94A3B8', margin: '0 16px 12px', lineHeight: 1.5, textAlign: 'center' as const }}>
           Help fellow golfers discover this course — share your experience.
         </p>
 
@@ -252,7 +252,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
               alignItems: 'center',
               justifyContent: 'center',
               gap: 8,
-              padding: '13px 0',
+              padding: '12px 0',
               borderRadius: 13,
               background: AMBER,
               color: '#fff',
