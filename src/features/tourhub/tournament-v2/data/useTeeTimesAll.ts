@@ -21,10 +21,11 @@ export interface TeeGroup {
 export function useTeeTimesAll(
   tournamentId: string | null | undefined,
   round: number = 1,
+  options?: { enabled?: boolean },
 ) {
   return useQuery<TeeGroup[]>({
     queryKey: ['tournament-v2', 'tee-times-all', tournamentId, round],
-    enabled: !!tournamentId,
+    enabled: !!tournamentId && (options?.enabled ?? true),
     staleTime: 5 * 60_000,
     queryFn: async () => {
       if (!tournamentId) return [];
