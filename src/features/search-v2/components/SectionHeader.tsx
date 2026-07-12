@@ -14,7 +14,7 @@ export function SectionHeader({ label, onSeeAll }: Props) {
         display: 'flex',
         alignItems: 'baseline',
         justifyContent: 'space-between',
-        padding: '18px 16px 8px',
+        padding: '16px 16px 12px',
       }}
     >
       <span
