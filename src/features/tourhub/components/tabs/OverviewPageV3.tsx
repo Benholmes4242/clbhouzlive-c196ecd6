@@ -78,9 +78,6 @@ export function OverviewPageV3() {
             <LazySection minHeight={400}>
               <ComingUpSlot />
             </LazySection>
-            <LazySection minHeight={260}>
-              <HomeCourseOfWeekModule />
-            </LazySection>
             <LazySection minHeight={400}>
               <WorldRankingsSlot />
             </LazySection>
@@ -88,7 +85,8 @@ export function OverviewPageV3() {
               <StatWatchSlot />
             </LazySection>
             <LazySection minHeight={350}>
-              <CollegeRivalry />
+              <CollegeFranchise />
+            </LazySection>
             </LazySection>
           </div>
         </div>
