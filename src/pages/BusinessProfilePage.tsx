@@ -302,11 +302,11 @@ const BusinessProfilePage: React.FC = () => {
             We couldn&apos;t find what you were looking for
           </h1>
 
-          <p className="text-muted-foreground text-[15px] leading-relaxed mb-7">
+          <p className="text-muted-foreground text-[15px] leading-relaxed mb-6">
             We couldn&apos;t find this business. It may have been removed, renamed, or the link
             you followed is out of date.
           </p>
-          <div className="flex flex-col gap-2.5">
+          <div className="flex flex-col gap-3">
             <Button onClick={() => navigate('/')} className="w-full h-12 text-[15px] font-semibold">
               Back to home
             </Button>
@@ -525,7 +525,7 @@ const BusinessProfilePage: React.FC = () => {
       </div>
 
       {/* ───── Identity ───── */}
-      <div className="pt-[68px] px-5 text-left relative z-10 pointer-events-auto">
+      <div className="pt-[68px] px-4 text-left relative z-10 pointer-events-auto">
         <h1 className="text-[28px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.03em' }}>
           {business.name}
           {business.is_verified && (
@@ -663,7 +663,7 @@ const BusinessProfilePage: React.FC = () => {
         return (
           <>
             {/* Primary row */}
-            <div className="mt-4 px-5 flex items-center gap-2 relative z-10 pointer-events-auto">
+            <div className="mt-4 px-4 flex items-center gap-2 relative z-10 pointer-events-auto">
               {isOwner ? (
                 <>
                   <button
@@ -769,7 +769,7 @@ const BusinessProfilePage: React.FC = () => {
 
             {/* Secondary row (visitor only, hidden when empty) */}
             {!isOwner && secondary.length > 0 && (
-              <div className="mt-2 px-5 flex items-center gap-2 relative z-10 pointer-events-auto">
+              <div className="mt-2 px-4 flex items-center gap-2 relative z-10 pointer-events-auto">
                 {secondary.map((k) => (
                   <OutlineBtn
                     key={k}
@@ -790,7 +790,7 @@ const BusinessProfilePage: React.FC = () => {
         <button
           type="button"
           onClick={() => navigate(`/courses/${homeCourse.id}`)}
-          className="mt-4 mx-5 flex items-center gap-3 rounded-2xl px-4 py-3 text-left active:scale-[0.99] transition-transform"
+          className="mt-4 mx-4 flex items-center gap-3 rounded-2xl px-4 py-3 text-left active:scale-[0.99] transition-transform"
           style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
         >
           <div className="flex-1 min-w-0">
@@ -838,7 +838,7 @@ const BusinessProfilePage: React.FC = () => {
                   background: 'none',
                   border: 'none',
                   cursor: 'pointer',
-                  padding: '11px 2px 9px',
+                  padding: '12px 2px 8px',
                   fontSize: 16,
                   fontWeight: isActive ? 700 : 500,
                   color: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',
@@ -858,7 +858,7 @@ const BusinessProfilePage: React.FC = () => {
       </section>
 
       {/* ───── Tab content ───── */}
-      <div className="pt-3 px-5 min-h-[60vh]">
+      <div className="pt-4 px-4 min-h-[60vh]">
         {renderTab()}
       </div>
 
