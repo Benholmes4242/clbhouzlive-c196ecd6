@@ -581,7 +581,7 @@ const ClubhouseContent = () => {
             initialState={virtuosoSnapshots.current[activeTab]}
             onSnapshot={(s) => { virtuosoSnapshots.current[activeTab] = s; }}
             posts={posts}
-            topPadding={'calc(env(safe-area-inset-top, 0px) + 59px)'}
+            topPadding={'calc(env(safe-area-inset-top, 0px) + 70px)'}
             onNearEnd={handleNearEnd}
             hasNextPage={hasNextPage}
             onLike={(post) => handleLike(post)}
