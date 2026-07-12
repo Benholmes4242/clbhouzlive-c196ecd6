@@ -83,7 +83,15 @@ export function TournamentPage() {
   }, [meta]);
   const { courseImage } = useSingleCourseImage(venueInput);
 
-  const { data: teeGroups = [] } = useTeeTimesAll(tournamentId, 1);
+  // Round awareness: upcoming events show round 1; live/completed use
+  // the tournament's current_round so the tab=tee-times deep link never
+  // shows Thursday's times on Sunday (Brief F-TD-3 §3).
+  const currentRound = pulse.state === 'upcoming' ? 1 : (meta?.current_round ?? 1);
+  // Lazy fetch: skip the sr_tee_times request on completed events unless
+  // the tab=tee-times deep link is present (Brief F-TD-3 §4).
+  const teeTimesRequested = searchParams.get('tab') === 'tee-times';
+  const teeGroupsEnabled = pulse.state !== 'completed' || teeTimesRequested;
+  const { data: teeGroups = [] } = useTeeTimesAll(tournamentId, currentRound, { enabled: teeGroupsEnabled });
   const { data: field } = useFieldTop3(pulse.state === 'upcoming' ? tournamentId : null);
 
   const [teeTimesOpen, setTeeTimesOpen] = useState(false);
@@ -177,7 +185,9 @@ export function TournamentPage() {
                   <MiniBoard tournamentId={tournamentId!} entries={leaderboardRows as any} />
                 </>
               )}
-              <OnCourseAct tournamentId={tournamentId!} tourCode={tourCode} />
+              {/* Rail owns its 'On the Course' eyebrow — self-hides when
+                  featured groups are absent (Brief F-TD-3 §1). */}
+              <FeaturedGroupsRail tournamentId={tournamentId!} live tourCode={tourCode} />
             </>
           )}
 
@@ -218,6 +228,7 @@ export function TournamentPage() {
         onClose={() => setTeeTimesOpen(false)}
         groups={teeGroups}
         tournamentName={meta.name}
+        round={currentRound}
       />
       <FullBoardSheet
         open={fullBoardOpen}
@@ -227,22 +238,6 @@ export function TournamentPage() {
         entries={leaderboardRows as any}
       />
     </TourHubShell>
-  );
-}
-
-function OnCourseAct({ tournamentId, tourCode }: { tournamentId: string; tourCode: string }) {
-  // The rail self-hides when empty; when it renders, show the eyebrow.
-  // We render optimistically (both eyebrow + rail) and let the rail
-  // return null on empty data. The eyebrow itself is cheap chrome; when
-  // followed by null the section reads as a live-loading affordance. To
-  // guarantee a clean self-hide, we branch: query cache is warmed by the
-  // rail's own useFeaturedGroups; we mirror it here with a lightweight
-  // presence check.
-  return (
-    <>
-      <SectionEyebrow kicker="On the Course" />
-      <FeaturedGroupsRail tournamentId={tournamentId} live tourCode={tourCode} />
-    </>
   );
 }
 
@@ -301,6 +296,17 @@ function UpcomingAct({
           <SectionEyebrow kicker="Tee Times" actionLabel="All times" onAction={onOpenAllTimes} />
           <TeeTimesFirstGroups groups={teeGroups} limit={5} />
         </>
+      )}
+
+      {/* Empty fallback (Brief F-TD-3 §2): pre-sync upcoming events (no
+          field yet, no tee times yet) get one always-on line so the act
+          isn't silent under the hero. */}
+      {!hasField && !hasTimes && (
+        <div style={{ padding: '8px 16px 4px' }}>
+          <div style={{ fontSize: 12.5, fontWeight: 600, color: INK_MUTE, lineHeight: 1.5 }}>
+            The field and tee times will appear here closer to the start.
+          </div>
+        </div>
       )}
     </>
   );

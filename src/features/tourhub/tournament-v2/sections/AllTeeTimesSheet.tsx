@@ -5,16 +5,18 @@
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import type { TeeGroup } from '../data/useTeeTimesAll';
 import { TeeTimesFirstGroups } from './TeeTimesFirstGroups';
-import { FONT, INK, SLATE_50 } from '../../_shared/tokens';
+import { FONT, INK, INK_MUTE, SLATE_50 } from '../../_shared/tokens';
 
 interface Props {
   open: boolean;
   onClose: () => void;
   groups: TeeGroup[];
   tournamentName: string | null;
+  /** Round the sheet is showing — labels the subtitle so the round is never ambiguous. */
+  round?: number;
 }
 
-export function AllTeeTimesSheet({ open, onClose, groups, tournamentName }: Props) {
+export function AllTeeTimesSheet({ open, onClose, groups, tournamentName, round }: Props) {
   return (
     <BottomSheet open={open} onClose={onClose} variant="light" surfaceColor={SLATE_50}>
       <div style={{ background: SLATE_50, fontFamily: FONT, maxHeight: 'calc(90vh - 24px)', display: 'flex', flexDirection: 'column' }}>
@@ -25,6 +27,11 @@ export function AllTeeTimesSheet({ open, onClose, groups, tournamentName }: Prop
           {tournamentName && (
             <div style={{ fontSize: 15, fontWeight: 800, color: INK, marginTop: 4, letterSpacing: '-0.01em' }}>
               {tournamentName}
+            </div>
+          )}
+          {round != null && (
+            <div style={{ fontSize: 11, fontWeight: 600, color: INK_MUTE, marginTop: 2 }}>
+              Round {round}
             </div>
           )}
         </div>
