@@ -613,7 +613,7 @@ function CommitResults({
 
       {videos.length > 0 ? (
         <>
-          <div style={{ padding: '18px 16px 6px' }}>
+          <div style={{ padding: '16px 16px 12px' }}>
             <span
               className="text-[11px] font-extrabold tracking-[0.08em] uppercase"
               style={{ color: '#64748B' }}
