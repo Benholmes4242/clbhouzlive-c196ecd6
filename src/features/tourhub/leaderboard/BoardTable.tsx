@@ -320,7 +320,7 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
             style={{
               display: 'flex',
               alignItems: 'baseline',
-              gap: 6,
+              gap: 5,
               minWidth: 0,
             }}
           >
