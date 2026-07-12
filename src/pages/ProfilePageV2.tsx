@@ -1291,7 +1291,7 @@ const ProfilePageV2Content: React.FC = () => {
         </section>
 
         {/* Tab Content */}
-        <div className={cn(activeSection === 'activity' ? 'pt-0 px-0' : activeSection === 'courses' || activeSection === 'stats' ? 'pt-3.5 px-2.5' : 'pt-3.5 px-5')}>
+        <div className={cn(activeSection === 'activity' ? 'pt-0 px-0' : activeSection === 'courses' || activeSection === 'stats' ? 'pt-4 px-2.5' : 'pt-4 px-4')}>
           {getCurrentContent()}
         </div>
         </>
