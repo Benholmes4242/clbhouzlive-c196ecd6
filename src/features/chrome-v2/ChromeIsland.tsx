@@ -367,18 +367,22 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
   const [searchParams] = useSearchParams();
   const { user } = useSupabaseSession();
   const spec = resolveChrome(location.pathname, searchParams);
+  const leftOverride = useChromeLeftOverride();
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const avatarRef = useRef<HTMLButtonElement>(null);
 
   const suppressed = hidden || spec.chrome === 'none';
+  // bleed island routes let the page own top padding — publish 0 so content
+  // flows under the island rather than being pushed down another 64px.
+  const headerH =
+    suppressed ? 0 : spec.bleed && spec.chrome === 'island' ? 0 : HEADER_H;
 
   // Publish --header-h just like CompactHeader does.
   useLayoutEffect(() => {
-    const value = suppressed ? 0 : HEADER_H;
-    document.documentElement.style.setProperty('--header-h', `${value}px`);
-  }, [suppressed]);
+    document.documentElement.style.setProperty('--header-h', `${headerH}px`);
+  }, [headerH]);
 
   if (suppressed) return null;
 
@@ -403,7 +407,8 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
         }}
       >
         {/* LEFT capsule */}
-        <LeftCapsule spec={spec} />
+        <LeftCapsule spec={spec} override={leftOverride} />
+
 
         {/* RIGHT capsule */}
         <div
