@@ -7,7 +7,7 @@
  *   friend's name in the title, hides the sync pill / more menu, and
  *   threads `readOnly` into HandicapDashboard.
  *
- * Reached from the ProfileHubSheet 2×2 grid (own) or from a friend's row
+ * Reached from the profile sheet (own) or from a friend's row
  * in the leaderboard / a legacy ?tab=stats redirect (friend).
  */
 
