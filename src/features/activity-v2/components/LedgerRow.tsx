@@ -1,0 +1,352 @@
+/**
+ * LedgerRow — universal Activity V2 row.
+ * Flex, gap 11, padding '9px 18px'. Left visual (40px squircle) ->
+ * body column -> optional right element -> unread dot.
+ */
+
+import React, { useRef } from 'react';
+import { ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { relativeTime } from '@/utils/relativeTime';
+import { useFollowState } from '@/hooks/useFollowState';
+import { useToggleFollow } from '@/hooks/useToggleFollow';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useActiveActor } from '@/context/ActiveActorContext';
+import { ratingTextColor } from '@/lib/ratingTier';
+import type { ActivityFeedRowV2 } from '../hooks/useActivityFeedV2';
+import { getActivityLink } from '../utils/activityLinks';
+import { resolveKind, T, type KindSpec } from './ledgerKinds';
+
+const GEIST =
+  'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+
+interface Props {
+  row: ActivityFeedRowV2;
+  onMarkRead: (id: string) => void;
+  onLongPress: (row: ActivityFeedRowV2) => void;
+}
+
+function initialsOf(name?: string | null): string {
+  if (!name) return '?';
+  const p = name.trim().split(/\s+/);
+  return ((p[0]?.[0] ?? '') + (p[1]?.[0] ?? '')).toUpperCase() || '?';
+}
+
+/** Bold the leading actor_display_name in a raw body string (prefix match). */
+function renderBody(text: string, actorName: string | null | undefined): React.ReactNode {
+  if (!actorName || !text.startsWith(actorName)) return text;
+  const rest = text.slice(actorName.length);
+  return (
+    <>
+      <span style={{ fontWeight: 700 }}>{actorName}</span>
+      {rest}
+    </>
+  );
+}
+
+const AvatarSquircle: React.FC<{
+  url?: string | null;
+  name?: string | null;
+  size?: number;
+}> = ({ url, name, size = 40 }) => (
+  <div
+    style={{
+      width: size,
+      height: size,
+      borderRadius: '34%',
+      background: url ? `url(${url}) center/cover` : 'linear-gradient(135deg,#F7931E,#C97A10)',
+      border: `1px solid ${T.HAIR}`,
+      color: '#fff',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontSize: size * 0.36,
+      fontWeight: 700,
+      flexShrink: 0,
+    }}
+  >
+    {!url && initialsOf(name)}
+  </div>
+);
+
+const StackedLikers: React.FC<{ urls: string[]; actorUrl?: string | null; actorName?: string | null }> = ({
+  urls,
+  actorUrl,
+  actorName,
+}) => {
+  const list = urls.filter(Boolean).slice(0, 2);
+  const front = list[0] ?? actorUrl ?? null;
+  const back = list[1] ?? null;
+  return (
+    <div style={{ position: 'relative', width: 46, height: 40, flexShrink: 0 }}>
+      {back && (
+        <div
+          style={{
+            position: 'absolute',
+            left: 12,
+            top: 3,
+            width: 34,
+            height: 34,
+            borderRadius: '34%',
+            background: `url(${back}) center/cover, #F1F5F9`,
+            border: '2px solid #F8FAFC',
+          }}
+        />
+      )}
+      <div style={{ position: 'absolute', left: 0, top: 6 }}>
+        <AvatarSquircle url={front} name={actorName} size={34} />
+      </div>
+    </div>
+  );
+};
+
+const IconTile: React.FC<{ spec: NonNullable<KindSpec['tile']> }> = ({ spec }) => {
+  const Icon = spec.icon;
+  return (
+    <div
+      style={{
+        width: 40,
+        height: 40,
+        borderRadius: 12,
+        background: spec.bg,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexShrink: 0,
+      }}
+    >
+      <Icon size={18} color={spec.fg} strokeWidth={2.2} />
+    </div>
+  );
+};
+
+// -- Follow-back pill (reuses useFollowState / useToggleFollow) --------
+const FollowBackPill: React.FC<{ targetUserId: string; name: string }> = ({
+  targetUserId,
+  name,
+}) => {
+  const { user } = useSupabaseSession();
+  const { activeActor } = useActiveActor();
+  const viewerActorType: 'personal' | 'business' = activeActor?.type ?? 'personal';
+  const viewerActorId = activeActor?.id ?? user?.id;
+  const toggle = useToggleFollow();
+  const { isFollowing: cached } = useFollowState({
+    targetActorType: 'personal',
+    targetActorId: targetUserId,
+    viewerActorType,
+    viewerActorId,
+  });
+  if (cached) return null;
+  return (
+    <button
+      onClick={async (e) => {
+        e.stopPropagation();
+        if (!user?.id || !viewerActorId) return;
+        try {
+          await toggle.mutateAsync({
+            targetActorType: 'personal',
+            targetActorId: targetUserId,
+            targetUserId,
+            viewerActorType,
+            viewerActorId,
+            viewerUserId: user.id,
+            isFollowing: false,
+          });
+        } catch {
+          /* swallow */
+        }
+      }}
+      disabled={toggle.isPending}
+      style={{
+        padding: '7px 12px',
+        borderRadius: 20,
+        background: T.INK,
+        color: '#fff',
+        fontSize: 12,
+        fontWeight: 700,
+        border: 'none',
+        cursor: 'pointer',
+        fontFamily: GEIST,
+        opacity: toggle.isPending ? 0.6 : 1,
+      }}
+      aria-label={`Follow back ${name}`}
+    >
+      {toggle.isPending ? '…' : 'Follow back'}
+    </button>
+  );
+};
+
+const ResolvePill: React.FC = () => (
+  <span
+    style={{
+      padding: '6px 10px',
+      borderRadius: 20,
+      border: `1px solid ${T.AMBER}`,
+      color: T.AMBER_DEEP,
+      fontSize: 11.5,
+      fontWeight: 700,
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: 3,
+      fontFamily: GEIST,
+    }}
+  >
+    Resolve <ChevronRight size={12} strokeWidth={2.5} />
+  </span>
+);
+
+// ---------------------------------------------------------------------
+
+export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => {
+  const navigate = useNavigate();
+  const spec = resolveKind(row);
+  const isUnread = !row.is_read;
+  const body = row.message ?? row.title ?? '';
+  const data: any = row.data && typeof row.data === 'object' ? row.data : {};
+
+  const holdTimer = useRef<number | null>(null);
+  const heldRef = useRef(false);
+
+  const startHold = () => {
+    heldRef.current = false;
+    if (holdTimer.current) window.clearTimeout(holdTimer.current);
+    holdTimer.current = window.setTimeout(() => {
+      heldRef.current = true;
+      onLongPress(row);
+    }, 500);
+  };
+  const cancelHold = () => {
+    if (holdTimer.current) window.clearTimeout(holdTimer.current);
+    holdTimer.current = null;
+  };
+
+  const handleClick = () => {
+    if (heldRef.current) return;
+    if (isUnread) onMarkRead(row.notif_id);
+    const url = getActivityLink(row);
+    if (url) navigate(url);
+  };
+
+  // ------- Left visual -------
+  let leftVisual: React.ReactNode = null;
+  if (spec.left === 'tile' && spec.tile) {
+    leftVisual = <IconTile spec={spec.tile} />;
+  } else if (spec.left === 'stacked_likers') {
+    const urls = Array.isArray(row.liker_avatar_urls) ? (row.liker_avatar_urls as string[]) : [];
+    leftVisual = <StackedLikers urls={urls} actorUrl={row.actor_avatar_url} actorName={row.actor_display_name} />;
+  } else {
+    leftVisual = <AvatarSquircle url={row.actor_avatar_url} name={row.actor_display_name} />;
+  }
+
+  // ------- Right element -------
+  let rightEl: React.ReactNode = null;
+  if (spec.right === 'thumb') {
+    const src = row.target_poster_url || row.target_course_image || null;
+    if (src) {
+      rightEl = (
+        <div
+          style={{
+            width: 44,
+            height: 44,
+            borderRadius: 10,
+            background: `url(${src}) center/cover, #E2E8F0`,
+            border: `1px solid ${T.HAIR}`,
+            flexShrink: 0,
+          }}
+        />
+      );
+    }
+  } else if (spec.right === 'follow_back' && row.actor_user_id) {
+    rightEl = <FollowBackPill targetUserId={row.actor_user_id} name={row.actor_display_name || 'them'} />;
+  } else if (spec.right === 'resolve') {
+    rightEl = <ResolvePill />;
+  } else if (spec.right === 'rating' && row.target_review_rating != null) {
+    rightEl = (
+      <span
+        className="tabular-nums"
+        style={{
+          fontSize: 15,
+          fontWeight: 800,
+          color: ratingTextColor(row.target_review_rating),
+          fontFamily: GEIST,
+        }}
+      >
+        {row.target_review_rating.toFixed(1)}
+      </span>
+    );
+  }
+
+  // ------- Body text rendering with bold accents -------
+  let bodyNode: React.ReactNode = renderBody(body, row.actor_display_name);
+  if (spec.bold === 'achievement_name' && data.achievement_name) {
+    bodyNode = (
+      <>
+        {bodyNode}{' '}
+        <span style={{ fontWeight: 700, color: T.GOLD }}>{data.achievement_name}</span>
+      </>
+    );
+  } else if (spec.bold === 'course_name' && data.course_name && !body.includes(data.course_name)) {
+    bodyNode = (
+      <>
+        {bodyNode} <span style={{ fontWeight: 700 }}>{data.course_name}</span>
+      </>
+    );
+  }
+
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={handleClick}
+      onPointerDown={startHold}
+      onPointerUp={cancelHold}
+      onPointerLeave={cancelHold}
+      onPointerCancel={cancelHold}
+      style={{
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: 11,
+        padding: '9px 18px',
+        background: isUnread ? 'rgba(247,147,30,0.045)' : 'transparent',
+        opacity: isUnread ? 1 : 0.75,
+        cursor: 'pointer',
+        fontFamily: GEIST,
+        borderBottom: `0.5px solid ${T.HAIR}`,
+        userSelect: 'none',
+      }}
+    >
+      {leftVisual}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div
+          style={{
+            fontSize: 13.5,
+            fontWeight: 500,
+            color: T.INK,
+            lineHeight: 1.35,
+            wordBreak: 'break-word',
+          }}
+        >
+          {bodyNode}
+        </div>
+        <div style={{ fontSize: 11, fontWeight: 500, color: T.INK_45, marginTop: 2 }}>
+          {relativeTime(row.created_at)}
+        </div>
+      </div>
+      {rightEl && <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>{rightEl}</div>}
+      {isUnread && (
+        <div
+          style={{
+            width: 7,
+            height: 7,
+            borderRadius: '50%',
+            background: T.AMBER,
+            marginTop: 8,
+            flexShrink: 0,
+          }}
+        />
+      )}
+    </div>
+  );
+};
+
+export default LedgerRow;

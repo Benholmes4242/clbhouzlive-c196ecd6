@@ -1,8 +1,9 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CheckCheck } from 'lucide-react';
+import { CheckCheck, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
+import { startOfDay, startOfWeek, subDays } from 'date-fns';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
@@ -16,11 +17,14 @@ import {
 } from './hooks/useActivityFeedV2';
 import { FeaturedMomentCard, pickFeaturedRow } from './components/FeaturedMomentCard';
 import { FriendRequestsRail } from './components/FriendRequestsRail';
+import { LedgerRow } from './components/LedgerRow';
+import { ActivityActionsSheet } from './components/ActivityActionsSheet';
 
 const GEIST =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const INK = '#0F172A';
 const INK_60 = '#475569';
+const AMBER = '#F7931E';
 const AMBER_SOFT = 'rgba(247,147,30,0.10)';
 const AMBER_DEEP = '#C97A10';
 const HAIR2 = 'rgba(15,23,42,0.10)';
@@ -33,9 +37,16 @@ const CHIPS: { key: ChipKey; label: string }[] = [
   { key: 'mentions', label: 'Mentions' },
   { key: 'friends', label: 'Friends' },
 ];
-
 const chipToFilter = (c: ChipKey): ActivityFilterV2 =>
   c === 'all' ? null : (c as ActivityFilterV2);
+
+// -- Empty copy per chip ------------------------------------------------
+const EMPTY_COPY: Record<ChipKey, { title: string; sub: string }> = {
+  all: { title: 'No activity yet', sub: 'When people react, reply, or follow you, it lands here.' },
+  new: { title: 'All caught up', sub: 'Nothing new since your last visit.' },
+  mentions: { title: 'No mentions yet', sub: 'When someone @-mentions you, it shows up here.' },
+  friends: { title: 'No friend activity yet', sub: 'Follow people and their moves will appear here.' },
+};
 
 interface ChipProps {
   active: boolean;
@@ -79,6 +90,64 @@ const ChipButton: React.FC<ChipProps> = ({ active, label, count, onClick }) => (
   </button>
 );
 
+// -- Section header (dispatch caps) ------------------------------------
+const SectionHeader: React.FC<{ label: string; tone?: 'new' | 'date' }> = ({ label, tone = 'date' }) => (
+  <div
+    style={{
+      padding: '18px 18px 8px',
+      fontSize: 10.5,
+      fontWeight: 700,
+      letterSpacing: '0.14em',
+      textTransform: 'uppercase',
+      color: tone === 'new' ? AMBER_DEEP : INK_60,
+      fontFamily: GEIST,
+    }}
+  >
+    {label}
+  </div>
+);
+
+// -- Bucket labels (legacy: new / today / yesterday / thisWeek / earlier)
+// From groupNotificationsByDateBucket in src/hooks/useActivityFeed.ts.
+const BUCKET_LABELS: Record<'new' | 'today' | 'yesterday' | 'thisWeek' | 'earlier', string> = {
+  new: 'New',
+  today: 'Today',
+  yesterday: 'Yesterday',
+  thisWeek: 'This week',
+  earlier: 'Earlier',
+};
+
+function bucketise(rows: ActivityFeedRowV2[]) {
+  const now = new Date();
+  const todayStart = startOfDay(now);
+  const yesterdayStart = subDays(todayStart, 1);
+  const weekStart = startOfWeek(now, { weekStartsOn: 1 });
+
+  const newBucket: ActivityFeedRowV2[] = [];
+  const today: ActivityFeedRowV2[] = [];
+  const yesterday: ActivityFeedRowV2[] = [];
+  const thisWeek: ActivityFeedRowV2[] = [];
+  const earlier: ActivityFeedRowV2[] = [];
+
+  const seen = new Set<string>();
+  for (const r of rows) {
+    if (!r.is_read) {
+      newBucket.push(r);
+      seen.add(r.notif_id);
+    }
+  }
+  for (const r of rows) {
+    if (seen.has(r.notif_id)) continue;
+    const created = new Date(r.created_at);
+    if (created >= todayStart) today.push(r);
+    else if (created >= yesterdayStart) yesterday.push(r);
+    else if (created >= weekStart) thisWeek.push(r);
+    else earlier.push(r);
+  }
+
+  return { new: newBucket, today, yesterday, thisWeek, earlier };
+}
+
 export const ActivityPageV2: React.FC = () => {
   useHideBottomNav();
   useHideHeader();
@@ -92,25 +161,78 @@ export const ActivityPageV2: React.FC = () => {
   const filter = chipToFilter(chip);
   const feed = useActivityFeedV2(filter);
 
+  const [sheetRow, setSheetRow] = useState<ActivityFeedRowV2 | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
+
   const firstPage = feed.data?.pages?.[0] ?? [];
   const allRows: ActivityFeedRowV2[] = useMemo(
     () => (feed.data?.pages ?? []).flat(),
     [feed.data],
   );
   const featured = useMemo(() => pickFeaturedRow(firstPage), [firstPage]);
+  const buckets = useMemo(() => bucketise(allRows), [allRows]);
 
-  // Mark-all-read — mirrors legacy ActivityPage.handleMarkAllRead write path.
+  // Optimistic single-row mark-read ----
+  const markRead = async (notifId: string) => {
+    qc.setQueriesData({ queryKey: ['activity-v2'] }, (old: any) => {
+      if (!old?.pages) return old;
+      return {
+        ...old,
+        pages: old.pages.map((p: ActivityFeedRowV2[]) =>
+          p.map((r) => (r.notif_id === notifId ? { ...r, is_read: true } : r)),
+        ),
+      };
+    });
+    qc.setQueryData(['activity-unread-count'], (n: any) =>
+      typeof n === 'number' && n > 0 ? n - 1 : n,
+    );
+    await supabase.from('notifications').update({ is_read: true }).eq('id', notifId);
+    qc.invalidateQueries({ queryKey: ['activity-unread-count'] });
+  };
+
+  const openSheet = (row: ActivityFeedRowV2) => {
+    setSheetRow(row);
+    setSheetOpen(true);
+  };
+
+  // -- Mark-all-read (legacy write path) ------------------------------
   const handleMarkAllRead = async () => {
     if (!user?.id) return;
     const now = new Date().toISOString();
     qc.setQueryData(['activity-unread-count'], 0);
-    await supabase.from('notifications').update({ is_read: true }).eq('user_id', user.id).lte('created_at', now);
-    await supabase.from('user_profiles').update({ last_notifications_seen_at: now }).eq('id', user.id);
+    await supabase
+      .from('notifications')
+      .update({ is_read: true })
+      .eq('user_id', user.id)
+      .lte('created_at', now);
+    await supabase
+      .from('user_profiles')
+      .update({ last_notifications_seen_at: now })
+      .eq('id', user.id);
     qc.invalidateQueries({ queryKey: ['activity-v2'] });
     qc.invalidateQueries({ queryKey: ['activity-feed'] });
     qc.invalidateQueries({ queryKey: ['activity-unread-count'] });
     toast.success('All caught up');
   };
+
+  // -- Infinite sentinel ----------------------------------------------
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting && feed.hasNextPage && !feed.isFetchingNextPage) {
+            feed.fetchNextPage();
+          }
+        }
+      },
+      { rootMargin: '400px' },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [feed.hasNextPage, feed.isFetchingNextPage, feed.fetchNextPage]);
 
   const chips = (
     <div className="px-4 flex gap-2 overflow-x-auto scrollbar-none" style={{ paddingBottom: 12 }}>
@@ -147,6 +269,26 @@ export const ActivityPageV2: React.FC = () => {
     </button>
   ) : undefined;
 
+  const renderBucket = (
+    label: string,
+    rows: ActivityFeedRowV2[],
+    tone: 'new' | 'date' = 'date',
+  ) => {
+    if (rows.length === 0) return null;
+    return (
+      <section key={label}>
+        <SectionHeader label={label} tone={tone} />
+        <div>
+          {rows.map((r) => (
+            <LedgerRow key={r.notif_id} row={r} onMarkRead={markRead} onLongPress={openSheet} />
+          ))}
+        </div>
+      </section>
+    );
+  };
+
+  const isEmpty = !feed.isLoading && allRows.length === 0;
+
   return (
     <ManagePageShell
       title="Activity"
@@ -158,43 +300,44 @@ export const ActivityPageV2: React.FC = () => {
         {featured && <FeaturedMomentCard row={featured} />}
         <FriendRequestsRail />
 
-        {/* N3: ledger */}
-        <div style={{ padding: '20px 16px 40px' }}>
-          <div
-            style={{
-              fontSize: 10.5,
-              fontWeight: 800,
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-              color: INK_60,
-              marginBottom: 10,
-            }}
-          >
-            Feed (dev preview)
+        {feed.isLoading && (
+          <div style={{ padding: 24, color: INK_60, fontSize: 13, textAlign: 'center' }}>
+            Loading…
           </div>
-          {feed.isLoading ? (
-            <div style={{ color: INK_60, fontSize: 13 }}>Loading…</div>
-          ) : allRows.length === 0 ? (
-            <div style={{ color: INK_60, fontSize: 13 }}>No activity yet.</div>
-          ) : (
-            <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-              {allRows.slice(0, 30).map((r) => (
-                <li
-                  key={r.notif_id}
-                  style={{
-                    padding: '10px 0',
-                    borderBottom: `1px solid ${HAIR2}`,
-                    color: INK,
-                    fontSize: 13,
-                    fontWeight: r.is_read ? 500 : 700,
-                  }}
-                >
-                  {r.title || r.message || `${r.notif_type} · ${r.notif_id.slice(0, 6)}`}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+        )}
+
+        {isEmpty && (
+          <div style={{ padding: '60px 24px', textAlign: 'center', color: INK_60 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: INK, marginBottom: 6 }}>
+              {EMPTY_COPY[chip].title}
+            </div>
+            <div style={{ fontSize: 12, fontWeight: 500, color: INK_60 }}>
+              {EMPTY_COPY[chip].sub}
+            </div>
+          </div>
+        )}
+
+        {!isEmpty && !feed.isLoading && (
+          <div style={{ paddingBottom: 40 }}>
+            {renderBucket(BUCKET_LABELS.new, buckets.new, 'new')}
+            {renderBucket(BUCKET_LABELS.today, buckets.today)}
+            {renderBucket(BUCKET_LABELS.yesterday, buckets.yesterday)}
+            {renderBucket(BUCKET_LABELS.thisWeek, buckets.thisWeek)}
+            {renderBucket(BUCKET_LABELS.earlier, buckets.earlier)}
+            <div ref={sentinelRef} style={{ height: 1 }} />
+            {feed.isFetchingNextPage && (
+              <div style={{ padding: 20, display: 'flex', justifyContent: 'center' }}>
+                <Loader2 size={18} color={AMBER} className="animate-spin" />
+              </div>
+            )}
+          </div>
+        )}
+
+        <ActivityActionsSheet
+          open={sheetOpen}
+          row={sheetRow}
+          onClose={() => setSheetOpen(false)}
+        />
       </div>
     </ManagePageShell>
   );
