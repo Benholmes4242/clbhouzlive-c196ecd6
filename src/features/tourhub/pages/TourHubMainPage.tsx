@@ -4,10 +4,10 @@ import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import { TourHubShell } from '../components/TourHubShell';
 import { ShellSlot } from '@/components/header/ShellSlot';
 import type { TourHubTab } from '../components/types';
-import { OverviewTab, PlayersTab, LeadersTab } from '../components/tabs';
+import { OverviewTab, LeadersTab } from '../components/tabs';
+import { PlayersTab as PlayersTabV2 } from '@/features/tourhub/players-v2/PlayersTab';
 import { ScheduleTab as ScheduleTabV2 } from '@/features/tourhub/schedule-v2/ScheduleTab';
 import { LeaderboardTab } from '@/features/tourhub/leaderboard/LeaderboardTab';
-import { PlayersShellRow } from '../components/shell/PlayersShellRow';
 import { LeadersShellRow } from '../components/shell/LeadersShellRow';
 import { useTournamentStatusRealtime } from '../hooks/useTournamentStatusRealtime';
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
@@ -145,7 +145,7 @@ export function TourHubMainPage() {
       case 'schedule':
         return <ScheduleTabV2 />;
       case 'players':
-        return <PlayersTab />;
+        return <PlayersTabV2 />;
       case 'leaderboards':
         return <LeadersTab />;
       default:
@@ -155,7 +155,6 @@ export function TourHubMainPage() {
 
   const renderShellRow = () => {
     switch (activeTab) {
-      case 'players':     return <PlayersShellRow />;
       case 'leaderboards':return <LeadersShellRow />;
       default:            return null;
     }
