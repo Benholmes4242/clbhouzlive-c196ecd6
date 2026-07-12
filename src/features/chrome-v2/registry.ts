@@ -228,8 +228,8 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   },
 
   // Tour Hub top-level (logo + editorial geometry; cinematic overlay on overview).
-  { match: { exact: '/tourhub' },                 spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark',  bleed: true,  hideHcp: true, note: EDITORIAL_NOTE } },
-  { match: { exact: '/tour' },                    spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark',  bleed: true,  hideHcp: true, note: EDITORIAL_NOTE } },
+  { match: { exact: '/tourhub' },                 spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark',  bleed: true,  note: EDITORIAL_NOTE } },
+  { match: { exact: '/tour' },                    spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark',  bleed: true,  note: EDITORIAL_NOTE } },
   // Remaining /tourhub/* sub-tabs and /tour/* aliases (not deep) — page owns
   // chrome today (isConditionallyExcluded); only the exact hubs above stay island.
   { match: { prefix: '/tourhub/' },               spec: { chrome: 'none', tone: 'light', bleed: true, note: 'other tour subpages immersive/page-owned today (isConditionallyExcluded)' } },
