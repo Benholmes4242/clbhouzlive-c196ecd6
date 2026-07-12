@@ -155,7 +155,6 @@ export function TourHubMainPage() {
 
   const renderShellRow = () => {
     switch (activeTab) {
-      case 'schedule':    return <ScheduleShellRow />;
       case 'players':     return <PlayersShellRow />;
       case 'leaderboards':return <LeadersShellRow />;
       default:            return null;
