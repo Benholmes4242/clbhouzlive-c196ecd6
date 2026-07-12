@@ -434,27 +434,10 @@ const ClubhouseContent = () => {
         surface="card"
       />
 
-      {/* Floating top bar — hidden when PGA card active */}
-      <ClubhouseTopBar
-        activeTab={activeTab}
-        onTabChange={(tab) => {
-          if (tab === activeTab) return;
-          // Capture the OUTGOING feed's scroll state while it's still
-          // mounted, into its own slot. onSnapshot's closure reads
-          // activeTab at call-time — the flip hasn't happened yet, so
-          // the snapshot lands in the correct (outgoing) slot.
-          cardFeedRef.current?.captureSnapshot();
-          // Skeleton reset is owned by onTabSwitch (post-commit) in
-          // useClubhouseFeedNav, where activeFeed.hasEverLoaded is fresh.
-          // Do NOT gate skeleton here — query state is stale at tap time.
-          setActiveTab(tab);
-        }}
-        isBusinessActor={isBusinessActor}
-        user={user}
-        carouselCount={posts[activeIndex]?.mediaItems?.length ?? 0}
-        carouselIndex={currentMediaIndex}
-        hidden={isTournamentCardActive}
-      />
+      {/* Chrome island slot + suppression — replaces ClubhouseTopBar (H4b).
+       * Slot registered only while this route is active so keep-alive
+       * doesn't leak the Clubhouse tabs onto other pages. */}
+
 
 
       {/* Offline indicator — hidden on editorial cards */}
