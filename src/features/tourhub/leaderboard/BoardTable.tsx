@@ -238,11 +238,13 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
         role="button"
         tabIndex={0}
         onClick={() => {
+          if (onRowClick) return onRowClick(e);
           if (e.player?.id) navigate(`/tourhub/player/${e.player.id}`);
         }}
         onKeyDown={(k) => {
-          if ((k.key === 'Enter' || k.key === ' ') && e.player?.id) {
-            navigate(`/tourhub/player/${e.player.id}`);
+          if (k.key === 'Enter' || k.key === ' ') {
+            if (onRowClick) return onRowClick(e);
+            if (e.player?.id) navigate(`/tourhub/player/${e.player.id}`);
           }
         }}
         style={{
