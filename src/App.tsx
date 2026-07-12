@@ -259,7 +259,7 @@ const EchoHistoryPage = lazy(() => import("./pages/EchoHistoryPage"));
 
 // Tour Hub pages
 const TourHubMainPage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TourHubMainPage })));
-const OverviewV4Page = lazy(() => import("./features/tourhub/overview-v4/OverviewV4Page").then(m => ({ default: m.OverviewV4Page })));
+
 const TournamentDetailPage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TournamentDetailPage })));
 const PlayerProfilePage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.PlayerProfilePage })));
 const CollegeGolfHubPage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.CollegeGolfHubPage })));
