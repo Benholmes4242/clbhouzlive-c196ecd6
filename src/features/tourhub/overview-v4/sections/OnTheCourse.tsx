@@ -56,11 +56,6 @@ function parseRoundNumber(raw: unknown): number | null {
   return null;
 }
 
-function initials(name: string): string {
-  const parts = name.trim().split(/\s+/);
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-}
 
 function formatScore(v: number | string | null | undefined): string | null {
   if (v == null || v === '') return null;
