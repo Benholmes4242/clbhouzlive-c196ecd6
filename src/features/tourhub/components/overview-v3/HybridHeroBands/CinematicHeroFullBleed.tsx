@@ -26,7 +26,6 @@ import {
   type HeroState,
   type TopTie,
 } from '../HybridHero.utils';
-import { roundLabel } from '../HybridHero.utils';
 import { NUMERIC_STYLE, AMBER } from '../HybridHero.constants';
 import type { DefendingChampData } from '../../../hooks/useTournamentDefendingChamp';
 
@@ -330,10 +329,8 @@ export function CinematicHeroFullBleed({
   // Pseudo-major slides never render a tour name (e.g. "DP WORLD TOUR").
   const tourSuffix = tourLabel && !isPseudoMajor ? ` · ${tourLabel.toUpperCase()}` : '';
   if (isLive) {
-    eyebrowText = isPseudoMajor
-      ? `LIVE · MAJOR CHAMPIONSHIP`
-      : `LIVE · ${roundLabel(state.round, state.totalRounds).toUpperCase()}${tourSuffix}`;
-    if (isPseudoMajor) eyebrowGold = true;
+    // Live state: tour name only, no "LIVE", round label, or major tag.
+    eyebrowText = tourLabel ? tourLabel.toUpperCase() : '';
   } else if (awaitingPlayoff) {
     eyebrowText = `PLAYOFF${tourSuffix}`;
     eyebrowGold = true;
@@ -482,20 +479,6 @@ export function CinematicHeroFullBleed({
   // ----- Shared eyebrow span -----
   const EyebrowSpan = (
     <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-      {isLive && (
-        <span
-          aria-hidden
-          className="hybrid-live-pulse"
-          style={{
-            width: 7,
-            height: 7,
-            borderRadius: '50%',
-            background: LEADER_GREEN,
-            boxShadow: '0 0 10px rgba(91,214,160,0.7)',
-            display: 'inline-block',
-          }}
-        />
-      )}
       <span
         style={{
           fontSize: 11,
@@ -507,7 +490,7 @@ export function CinematicHeroFullBleed({
       >
         {eyebrowText}
       </span>
-      {showMajorTag && (
+      {!isLive && showMajorTag && (
         <span
           aria-label="Major championship"
           style={{
