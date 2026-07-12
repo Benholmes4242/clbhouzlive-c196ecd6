@@ -6,7 +6,8 @@ import SheetHeader from '@/components/ui/SheetHeader';
 import { useTourSeason, useTourTournaments } from '../../hooks/useTourHubData';
 import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
 import { getTourMeta } from '../../constants/tourMap';
-import type { ScheduleFilterType, TourFilterCode } from '../schedule';
+type ScheduleFilterType = 'all' | 'completed' | 'live' | 'upcoming';
+type TourFilterCode = 'all' | 'pga' | 'EURO' | 'LPGA' | 'CHAMP' | 'PGAD' | 'LIV';
 import {
   AMBER_TINT_04,
   INK,
