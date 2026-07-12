@@ -1111,13 +1111,13 @@ export function CinematicHeroFullBleed({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 10,
-                padding: '10px 18px',
+                padding: '8px 18px',
               }}
             >
               <SquircleAvatar
                 srcCandidates={defChampAvatars}
                 alt={defendingChamp.name}
-                size={40}
+                size={34}
                 hairlineRing
                 ringColor={GOLD_RING}
               />
