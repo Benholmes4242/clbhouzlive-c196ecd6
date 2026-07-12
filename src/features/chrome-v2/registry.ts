@@ -246,8 +246,8 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   // Friends activity — back arrow, history.
   { match: { exact: '/friends-activity' },        spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history' }, tone: 'light', bleed: false } },
 
-  // /profile/quest — treated as achievements family (back, history).
-  { match: { exact: '/profile/quest' },           spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history' }, tone: 'light', bleed: false } },
+  // /profile/quest — declared earlier alongside the /profile family.
+
 
   // Discover sub-pages (region/theme lists, video sections). Prefix rules for
   // discover/explore region already emitted as chrome:'none' above; theme routes
