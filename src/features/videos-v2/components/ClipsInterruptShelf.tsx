@@ -183,8 +183,8 @@ export function ClipsInterruptShelf({ clips, shelfIndex }: Props) {
   return (
     <section
       style={{
-        margin: '4px -16px 20px',
-        padding: '14px 16px',
+        margin: '0 -16px 16px',
+        padding: '12px 16px',
         background: 'rgba(247,147,30,0.06)',
         borderTop: '1px solid rgba(0,0,0,0.07)',
         borderBottom: '1px solid rgba(0,0,0,0.07)',
@@ -196,7 +196,7 @@ export function ClipsInterruptShelf({ clips, shelfIndex }: Props) {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'baseline',
-          marginBottom: 10,
+          marginBottom: 12,
         }}
       >
         <span
@@ -233,7 +233,7 @@ export function ClipsInterruptShelf({ clips, shelfIndex }: Props) {
         className="scrollbar-hide"
         style={{
           display: 'flex',
-          gap: 10,
+          gap: 12,
           overflowX: 'auto',
           WebkitOverflowScrolling: 'touch',
         }}

@@ -35,7 +35,7 @@ interface Props {
 
 function SkeletonCard() {
   return (
-    <div style={{ marginBottom: 20 }}>
+    <div style={{ marginBottom: 16 }}>
       <div
         style={{
           aspectRatio: '16 / 9',
@@ -169,7 +169,7 @@ export function VideosFeedV2({ sort, category }: Props) {
       )}
 
       {isLoading && rows.length === 0 ? (
-        <div style={{ padding: '12px 16px 30px' }}>
+        <div style={{ padding: '12px 16px 0' }}>
           <SkeletonCard />
           <SkeletonCard />
           <SkeletonCard />
@@ -191,7 +191,7 @@ export function VideosFeedV2({ sort, category }: Props) {
           </div>
         </div>
       ) : (
-        <div ref={railRef} style={{ padding: '12px 16px 30px' }}>
+        <div ref={railRef} style={{ padding: '12px 16px 0' }}>
           {rows.map((r, i) => {
             const card = (
               <VideoFeedCard
@@ -229,7 +229,7 @@ export function VideosFeedV2({ sort, category }: Props) {
           <div ref={sentinelRef} style={{ height: 1 }} />
 
           {isFetchingNextPage && (
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '18px 0' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0' }}>
               <Spinner />
             </div>
           )}
