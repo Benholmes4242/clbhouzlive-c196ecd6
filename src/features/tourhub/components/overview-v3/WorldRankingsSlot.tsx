@@ -4,7 +4,7 @@
  * unsupported tours (liv/pgad/champ) or empty data.
  */
 import { useTourSelection } from '@/features/tourhub/context/TourSelectionContext';
-import { WorldRankings } from '@/features/tourhub/overview-v4/sections/WorldRankings';
+import { WorldRankings } from '@/features/tourhub/overview/sections/WorldRankings';
 import type { TourId } from '@/features/tourhub/hooks/useOverviewData';
 
 export function WorldRankingsSlot() {

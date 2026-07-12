@@ -7,8 +7,8 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { ComingUpSlot } from '../overview-v3/ComingUpSlot';
-import { CollegeFranchise } from '../../overview-v4/sections/CollegeFranchise';
-import { ConnectHandicapTile } from '../../overview-v4/sections/ConnectHandicapTile';
+import { CollegeFranchise } from '../../overview/sections/CollegeFranchise';
+import { ConnectHandicapTile } from '../../overview/sections/ConnectHandicapTile';
 import { LazySection } from '../overview-v3/LazySection';
 
 import { TISlot } from '../overview-v3/TISlot';

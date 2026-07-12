@@ -5,7 +5,7 @@
  * Liveness is delegated to useTournamentPulse (shared with TISlot).
  */
 import { useTourSelection } from '@/features/tourhub/context/TourSelectionContext';
-import { OnTheCourse } from '@/features/tourhub/overview-v4/sections/OnTheCourse';
+import { OnTheCourse } from '@/features/tourhub/overview/sections/OnTheCourse';
 import { useTournamentPulse } from './useTournamentPulse';
 
 export function OnTheCourseSlot() {

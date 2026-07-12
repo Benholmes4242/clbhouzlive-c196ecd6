@@ -11,7 +11,7 @@ import type {
   TrackedPrediction,
   AccuracyMetrics,
   PredictionTrackerData,
-} from '../components/tournament-insights/types';
+} from './aiPredictionTypes';
 import type { AIPredictionData } from './useAIPredictions';
 import { getCurrentRound } from '../utils/formatThruDisplay';
 

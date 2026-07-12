@@ -20,8 +20,6 @@ export * from './useLiveArena';
 export * from './useTournamentPredictions';
 export * from './useAIPredictions';
 
-// Unified Season Leaderboards (merges Skill Trees + Season Stats)
-export * from './useSeasonLeaderboards';
 
 // Tournament Schedule
 export * from './useTournamentSchedule';

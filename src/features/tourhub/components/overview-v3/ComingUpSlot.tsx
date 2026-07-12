@@ -11,7 +11,7 @@
  * so this slot renders unconditionally without leaving a stub card.
  */
 import { useTourSelection } from '@/features/tourhub/context/TourSelectionContext';
-import { ComingUp } from '@/features/tourhub/overview-v4/sections/ComingUp';
+import { ComingUp } from '@/features/tourhub/overview/sections/ComingUp';
 import type { TourId } from '@/features/tourhub/hooks/useOverviewData';
 
 export function ComingUpSlot() {

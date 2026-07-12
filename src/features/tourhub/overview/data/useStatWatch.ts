@@ -119,7 +119,7 @@ async function resolveSeasonIds(tour: TourId): Promise<string[]> {
 
 export function useStatWatch(tour: TourId) {
   return useQuery({
-    queryKey: ['overview-v4', 'stat-watch', tour],
+    queryKey: ['overview', 'stat-watch', tour],
     staleTime: 60 * 60 * 1000,
     queryFn: async (): Promise<{ categories: StatCategory[] }> => {
       const candidates = await resolveSeasonIds(tour);

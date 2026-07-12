@@ -32,7 +32,7 @@ function isPlayoffName(name: string): boolean {
 
 export function useComingUp(tour: TourId, limit = 4) {
   return useQuery({
-    queryKey: ['overview-v4', 'coming-up', tour, limit],
+    queryKey: ['overview', 'coming-up', tour, limit],
     queryFn: async (): Promise<ComingUpRow[]> => {
       const today = new Date().toISOString().slice(0, 10);
       const { data, error } = await supabase
