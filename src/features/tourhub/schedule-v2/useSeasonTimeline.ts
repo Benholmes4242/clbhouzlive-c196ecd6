@@ -299,10 +299,12 @@ export function useSeasonTimeline(tour: TourId): {
       .sort((a, b) => a.start_date.localeCompare(b.start_date));
   }, [rawRows, tour]);
 
-  // 3. Split by state for the enrichment queries.
-  const liveIds = events.filter((e) => e.status === 'inprogress').map((e) => e.id);
+  // 3. Split by state for the enrichment queries — use the house pulse sets.
+  const liveIds = events
+    .filter((e) => LIVE_STATUSES.has((e.status ?? '').toLowerCase()))
+    .map((e) => e.id);
   const completedIds = events
-    .filter((e) => e.status === 'closed' || e.status === 'complete')
+    .filter((e) => COMPLETED_STATUSES.has((e.status ?? '').toLowerCase()) || endDateInPast(e.end_date))
     .map((e) => e.id);
 
   const { data: leadersWinnersMap } = useTournamentLeadersWinners([
