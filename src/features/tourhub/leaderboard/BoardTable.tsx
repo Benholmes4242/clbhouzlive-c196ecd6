@@ -26,6 +26,7 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { movementFromRounds } from './movementFromRounds';
+import { countryFlag } from './countryFlag';
 
 const INK = '#0F172A';
 const SECONDARY = '#4B5563';
