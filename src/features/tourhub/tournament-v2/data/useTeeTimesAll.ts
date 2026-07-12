@@ -32,7 +32,8 @@ export function useTeeTimesAll(
         .from('sr_tee_times')
         .select(`
           tee_time,
-          starting_hole,
+          tee_number,
+          back_nine,
           players:sr_tee_time_players(
             player:sr_players!sr_tee_time_players_player_id_fkey(
               id, full_name, first_name, last_name, country, country_code, photo_url
@@ -51,7 +52,7 @@ export function useTeeTimesAll(
       return ((data ?? []) as any[])
         .map((row): TeeGroup => ({
           teeTime: row.tee_time,
-          startingHole: row.starting_hole ?? 1,
+          startingHole: row.back_nine ? 10 : (row.tee_number ?? 1),
           players: (row.players ?? []).map((tp: any): TeeGroupPlayer => {
             const p = tp.player;
             if (!p) return { id: null, name: 'TBA' };

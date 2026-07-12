@@ -32,6 +32,7 @@ import { useSingleCourseImage } from '../hooks/useCourseImageResolver';
 import { useTournamentPulse } from '../components/overview-v3/useTournamentPulse';
 import { useLeaderboardRealtime } from '../hooks/useLeaderboardRealtime';
 import { useTournamentStatusRealtime } from '../hooks/useTournamentStatusRealtime';
+import { useLiveTournaments } from '../hooks/useLiveTournaments';
 
 import { HeroSection } from './sections/HeroSection';
 import { SectionEyebrow } from './sections/SectionEyebrow';
@@ -41,9 +42,13 @@ import { TeeTimesFirstGroups } from './sections/TeeTimesFirstGroups';
 import { AllTeeTimesSheet } from './sections/AllTeeTimesSheet';
 import { CourseSection } from './sections/CourseSection';
 import { MomentsSection } from './sections/MomentsSection';
+import { EventInfoSection } from './sections/EventInfoSection';
+import { StorySection } from './sections/StorySection';
+import { FullBoardSheet } from './sections/FullBoardSheet';
 
 import { useTeeTimesAll } from './data/useTeeTimesAll';
 import { useFieldTop3 } from './data/useFieldTop3';
+import { useTournamentStory } from './data/useTournamentStory';
 
 import {
   FONT, INK, INK_MUTE, INK_FAINT, SLATE_50, HAIRLINE_INK_8, INK_TINT_06, SURFACE,
@@ -60,6 +65,7 @@ export function TournamentPage() {
 
   const { data: meta, isLoading } = useTournamentMeta(tournamentId);
   const { data: leaderboard } = useTourLeaderboard(tournamentId ?? '');
+  const { data: liveList = [] } = useLiveTournaments();
   const pulse = useTournamentPulse(tournamentId);
 
   // Realtime (equivalent to legacy TournamentDetailPage): board + status.
@@ -81,6 +87,9 @@ export function TournamentPage() {
   const { data: field } = useFieldTop3(pulse.state === 'upcoming' ? tournamentId : null);
 
   const [teeTimesOpen, setTeeTimesOpen] = useState(false);
+  const [fullBoardOpen, setFullBoardOpen] = useState(false);
+
+  const { data: story } = useTournamentStory(tournamentId);
 
   const tourCode = (meta?.tour_code ?? 'pga').toLowerCase();
 
@@ -129,7 +138,22 @@ export function TournamentPage() {
     );
   }
 
-  const goFullBoard = () => navigate(`/tourhub?tab=live&event=${tournamentId}`);
+  const leaderboardRows = (leaderboard as any[] | undefined) ?? [];
+  const hasBoard = leaderboardRows.length > 0;
+
+  // Live: deep-link to the richer Leaderboards tab when this event is in
+  // the live list; otherwise fall back to the house full-board sheet.
+  // Completed: always open the sheet in place.
+  const openFullBoard = () => {
+    if (pulse.state === 'live') {
+      const inLiveList = liveList.some((t: any) => t?.id === tournamentId);
+      if (inLiveList) {
+        navigate(`/tourhub?tab=live&event=${tournamentId}`);
+        return;
+      }
+    }
+    setFullBoardOpen(true);
+  };
 
 
   return (
@@ -147,10 +171,10 @@ export function TournamentPage() {
         <section id="the-act">
           {pulse.state === 'live' && (
             <>
-              {(leaderboard && leaderboard.length > 0) && (
+              {hasBoard && (
                 <>
-                  <SectionEyebrow kicker="The Board" actionLabel="Full leaderboard" onAction={goFullBoard} />
-                  <MiniBoard tournamentId={tournamentId!} entries={leaderboard as any} />
+                  <SectionEyebrow kicker="The Board" actionLabel="Full leaderboard" onAction={openFullBoard} />
+                  <MiniBoard tournamentId={tournamentId!} entries={leaderboardRows as any} />
                 </>
               )}
               <OnCourseAct tournamentId={tournamentId!} tourCode={tourCode} />
@@ -166,13 +190,19 @@ export function TournamentPage() {
             />
           )}
 
-          {pulse.state === 'completed' && leaderboard && leaderboard.length > 0 && (
+          {pulse.state === 'completed' && hasBoard && (
             <>
-              <SectionEyebrow kicker="Final Leaderboard" actionLabel="Full board" onAction={goFullBoard} />
-              <MiniBoard tournamentId={tournamentId!} entries={leaderboard as any} />
+              <SectionEyebrow kicker="Final Leaderboard" actionLabel="Full board" onAction={openFullBoard} />
+              <MiniBoard tournamentId={tournamentId!} entries={leaderboardRows as any} />
             </>
           )}
         </section>
+
+        {/* THE STORY — completed events only, self-hides w/o text */}
+        {pulse.state === 'completed' && <StorySection story={story?.story ?? null} />}
+
+        {/* EVENT INFO — always-on */}
+        <EventInfoSection meta={meta} broadcast={story?.broadcast ?? null} />
 
         {/* THE COURSE */}
         <CourseSection tournamentId={tournamentId!} />
@@ -188,6 +218,13 @@ export function TournamentPage() {
         onClose={() => setTeeTimesOpen(false)}
         groups={teeGroups}
         tournamentName={meta.name}
+      />
+      <FullBoardSheet
+        open={fullBoardOpen}
+        onClose={() => setFullBoardOpen(false)}
+        tournamentId={tournamentId!}
+        meta={meta}
+        entries={leaderboardRows as any}
       />
     </TourHubShell>
   );
