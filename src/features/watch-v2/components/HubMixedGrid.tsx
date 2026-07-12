@@ -236,10 +236,12 @@ export function HubMixedGrid({ filter = 'all' }: { filter?: string } = {}) {
     maxActive: 3,
   });
 
-  // Split columns for layout only — data-watch-tile-index remains the FLAT index.
-  const leftIdx: number[] = [];
-  const rightIdx: number[] = [];
-  rows.forEach((_, i) => (i % 2 === 0 ? leftIdx : rightIdx).push(i));
+  // Height-balanced packing — data-watch-tile-index remains the FLAT index.
+  const packed = packColumns(rows, (r) => {
+    const w = Number(r?.width) || 0;
+    const h = Number(r?.height) || 0;
+    return w > 0 && h > 0 && w > h ? 16 / 9 : 9 / 14;
+  });
 
   return (
     <section style={{ fontFamily: FONT_FAMILY }}>
