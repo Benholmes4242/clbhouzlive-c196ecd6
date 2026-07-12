@@ -228,11 +228,13 @@ function CaseSheet({
   pick,
   state,
   live,
+  tourCode,
   onClose,
 }: {
   pick: AITopContender;
   state: EventState;
   live: PickLiveState | undefined;
+  tourCode: string;
   onClose: () => void;
 }) {
   return (
@@ -251,16 +253,7 @@ function CaseSheet({
       >
         <div style={{ width: 36, height: 4, background: V4.hairline, borderRadius: 999, margin: '4px auto 14px' }} />
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
-          <div
-            style={{
-              width: 48, height: 48, borderRadius: '34%',
-              background: '#15171F',
-              backgroundImage: pick.photoUrl ? `url(${pick.photoUrl})` : 'none',
-              backgroundSize: 'cover', backgroundPosition: 'center',
-              border: `0.5px solid ${V4.hairline}`,
-              flexShrink: 0,
-            }}
-          />
+          <Avatar name={pick.playerName} tourCode={tourCode} size={48} />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
               <span style={{ fontSize: 10.5, fontWeight: 800, color: V4.amber, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
