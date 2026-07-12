@@ -228,10 +228,10 @@ const ActivityPageV2 = lazy(() => import("./features/activity-v2/ActivityPageV2"
 const GolfersToFollowPage = lazy(() => import("./pages/GolfersToFollowPage"));
 const GolfersSharedCoursesPage = lazy(() => import("./pages/GolfersSharedCoursesPage"));
 const OwnProfileSocialRedirect = lazy(() => import("./components/profile/OwnProfileSocialRedirect"));
-const FollowersListPage = lazy(() => import("./pages/FollowersListPage"));
-const FollowingListPage = lazy(() => import("./pages/FollowingListPage"));
 const FriendsRedirectToFollowing = lazy(() => import("./pages/FriendsRedirectToFollowing"));
-const SocialListV2TestPage = lazy(() => import("./features/social-lists-v2/SocialListV2TestPage"));
+const ProfileSocialListRoute = lazy(() => import("./features/social-lists-v2/ProfileSocialListRoute"));
+const BusinessSocialListRoute = lazy(() => import("./features/social-lists-v2/BusinessSocialListRoute"));
+
 
 const CreateProfileRedirect = lazy(() => import("./components/redirects/CreateProfileRedirect"));
 
