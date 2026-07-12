@@ -228,6 +228,7 @@ export function TournamentPage() {
         onClose={() => setTeeTimesOpen(false)}
         groups={teeGroups}
         tournamentName={meta.name}
+        round={currentRound}
       />
       <FullBoardSheet
         open={fullBoardOpen}
