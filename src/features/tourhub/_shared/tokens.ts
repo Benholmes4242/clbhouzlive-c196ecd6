@@ -188,6 +188,12 @@ export const NAVY_HIGH = '#15203A';
 // ============================================================================
 export const SHELL_BG = '#0A0E14';                           // Tour Hub shell/chrome dark bg — 11 cross-app files (5 shell rows + tabs + pages)
 
+// ============================================================================
+// CHARCOAL (shared Clubhouse / player hero / live-card surface)
+// ============================================================================
+export const CHARCOAL = '#15171F';                           // canonical charcoal — Clubhouse feed, player hero gradient end, live-now card
+
+
 
 
 // ============================================================================

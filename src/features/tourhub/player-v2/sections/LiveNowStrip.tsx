@@ -9,7 +9,8 @@ import { ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { PlayerLiveData } from '../../hooks/usePlayerState';
 import { tournamentRoute } from '../../routes';
-import { LIVE_DOT, SCORE_UNDER_PAR_DARK, WHITE_ALPHA_55 } from '../../_shared/tokens';
+import { CHARCOAL, LIVE_DOT, SCORE_UNDER_PAR_DARK, WHITE_ALPHA_55 } from '../../_shared/tokens';
+
 
 interface LiveNowStripProps {
   liveData: PlayerLiveData;
@@ -54,11 +55,12 @@ export function LiveNowStrip({ liveData, playerName }: LiveNowStripProps) {
           alignItems: 'center',
           gap: 12,
           padding: '12px 14px',
-          background: '#15171F',
+          background: CHARCOAL,
           borderRadius: 14,
           textDecoration: 'none',
           color: '#FFFFFF',
         }}
+
         className="active:opacity-80 transition-opacity"
       >
         {/* LIVE pill */}
