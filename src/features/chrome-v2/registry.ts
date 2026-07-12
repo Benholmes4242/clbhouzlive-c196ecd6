@@ -26,13 +26,21 @@ export type ChromeTone = 'light' | 'dark';
 
 export type LeftCell =
   | { kind: 'logo' }
-  | { kind: 'back'; title: string | null; backTarget: string | 'history' };
+  | {
+      kind: 'back';
+      title: string | null;
+      backTarget: string | 'history';
+      /** When backTarget === 'history', used as safeGoBack fallback path. */
+      backFallback?: string;
+    };
 
 export interface ChromeSpec {
   chrome: 'island' | 'none';
   left?: LeftCell;
   tone: ChromeTone;
   bleed: boolean;
+  /** Hide the HCP cell in the right capsule (e.g. handicap/rivalry). */
+  hideHcp?: boolean;
   note?: string;
 }
 
