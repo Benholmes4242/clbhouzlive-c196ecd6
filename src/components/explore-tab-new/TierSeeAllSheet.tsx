@@ -244,7 +244,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows }: Props) {
         </div>
 
         {/* Header */}
-        <div style={{ padding: '6px 16px 10px', borderBottom: `0.5px solid ${HAIRLINE_INK_8}`, background: '#F8FAFC' }}>
+        <div style={{ padding: '8px 16px 12px', borderBottom: `0.5px solid ${HAIRLINE_INK_8}`, background: '#F8FAFC' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span aria-hidden style={{ fontSize: 15, lineHeight: 1 }}>{TIER_ICON[tier]}</span>
             <span
@@ -288,7 +288,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows }: Props) {
             {recentLabel}
           </div>
           {hasToggle && (
-            <div style={{ marginTop: 10, display: 'flex', gap: 6 }}>
+            <div style={{ marginTop: 12, display: 'flex', gap: 6 }}>
               {(['latest', 'top'] as const).map((mode) => {
                 const active = sort === mode;
                 return (
