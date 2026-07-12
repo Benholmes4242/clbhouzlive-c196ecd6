@@ -84,7 +84,7 @@ export function PickerSheet({ open, onClose, target, standings, otherSlug }: Pro
       }}
     >
       {/* Header */}
-      <div style={{ padding: '10px 16px 12px', borderBottom: `0.5px solid ${HAIRLINE_INK_10}`, background: SLATE_50 }}>
+      <div style={{ padding: '8px 16px 12px', borderBottom: `0.5px solid ${HAIRLINE_INK_10}`, background: SLATE_50 }}>
         <div
           style={{
             fontSize: 8.5,
@@ -104,7 +104,7 @@ export function PickerSheet({ open, onClose, target, standings, otherSlug }: Pro
             color: INK,
             letterSpacing: '-0.01em',
             lineHeight: 1.1,
-            marginBottom: 10,
+            marginBottom: 12,
           }}
         >
           Pick a college
@@ -143,7 +143,7 @@ export function PickerSheet({ open, onClose, target, standings, otherSlug }: Pro
       {/* List */}
       <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', background: SURFACE }}>
         {filtered.length === 0 ? (
-          <div style={{ padding: '28px 16px', textAlign: 'center', color: INK_MUTE, fontSize: 12, fontWeight: 600 }}>
+          <div style={{ padding: '32px 16px', textAlign: 'center', color: INK_MUTE, fontSize: 12, fontWeight: 600 }}>
             No colleges match "{debounced}".
           </div>
         ) : (
@@ -161,7 +161,7 @@ export function PickerSheet({ open, onClose, target, standings, otherSlug }: Pro
                   alignItems: 'center',
                   width: '100%',
                   gap: 12,
-                  padding: '10px 16px',
+                  padding: '12px 16px',
                   background: 'transparent',
                   border: 'none',
                   borderBottom: `0.5px solid ${HAIRLINE_INK_10}`,

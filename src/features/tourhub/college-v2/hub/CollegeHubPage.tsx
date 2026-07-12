@@ -72,7 +72,7 @@ export function CollegeHubPage() {
         }}
       >
         {/* Header */}
-        <header style={{ padding: '20px 16px 14px', background: SLATE_50 }}>
+        <header style={{ padding: '16px 16px 12px', background: SLATE_50 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 }}>
             <div style={{ minWidth: 0 }}>
               <div
@@ -210,7 +210,7 @@ export function CollegeHubPage() {
           ) : filtered.length === 0 ? (
             <div
               style={{
-                padding: '48px 24px',
+                padding: '40px 24px',
                 textAlign: 'center',
                 color: INK_FAINT,
                 fontSize: 13,

@@ -102,7 +102,7 @@ export function ComparePage() {
             style={{
               background: CHARCOAL,
               paddingTop: 'calc(env(safe-area-inset-top, 0px) + 58px)',
-              paddingBottom: 20,
+              paddingBottom: 16,
               paddingLeft: 12,
               paddingRight: 12,
               display: 'flex',
@@ -133,7 +133,7 @@ export function ComparePage() {
           {isLoading && !left && !right ? (
             <div>
               {[0, 1, 2, 3].map((i) => (
-                <div key={i} style={{ padding: '14px 16px 12px' }}>
+                <div key={i} style={{ padding: '12px 16px 12px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                     <div style={{ height: 14, width: 60, background: 'rgba(15,23,42,0.06)', borderRadius: 3 }} />
                     <div style={{ height: 10, width: 70, background: 'rgba(15,23,42,0.05)', borderRadius: 3 }} />
@@ -177,7 +177,7 @@ export function ComparePage() {
         </section>
 
         {/* Classes */}
-        <section style={{ background: SURFACE, marginTop: 10 }}>
+        <section style={{ background: SURFACE, marginTop: 12 }}>
           <div
             style={{
               display: 'grid',
@@ -244,7 +244,7 @@ function ClassColumn({ headerCode, roster, liveMap, alignRight }: ClassColumnPro
           textTransform: 'uppercase',
           color: AMBER,
           textAlign: alignRight ? 'right' : 'left',
-          marginBottom: 10,
+          marginBottom: 12,
         }}
       >
         {headerCode} Leads

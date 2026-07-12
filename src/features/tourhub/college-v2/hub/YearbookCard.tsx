@@ -207,7 +207,7 @@ function YearbookCardInner({ standing, liveCount }: Props) {
             display: 'flex',
             alignItems: 'center',
             gap: 10,
-            marginTop: 10,
+            marginTop: 12,
             paddingLeft: 34,
           }}
         >

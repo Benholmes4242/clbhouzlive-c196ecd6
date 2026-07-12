@@ -69,7 +69,7 @@ export function CollegeProfilePage() {
               paddingTop: 'calc(env(safe-area-inset-top, 0px) + 62px)',
               paddingLeft: 16,
               paddingRight: 16,
-              paddingBottom: 20,
+              paddingBottom: 16,
               display: 'flex',
               gap: 14,
               alignItems: 'center',
@@ -97,7 +97,7 @@ export function CollegeProfilePage() {
 
         {/* Not found */}
         {notFound && (
-          <div style={{ textAlign: 'center', padding: '48px 24px' }}>
+          <div style={{ textAlign: 'center', padding: '40px 24px' }}>
             <div
               style={{
                 width: 44,

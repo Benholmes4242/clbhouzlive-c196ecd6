@@ -66,7 +66,7 @@ export function Masthead({ slug, displayName, rank, pointsTotal, alumniCount, pl
         paddingTop: 'calc(env(safe-area-inset-top, 0px) + 62px)',
         paddingLeft: 16,
         paddingRight: 16,
-        paddingBottom: 18,
+        paddingBottom: 16,
         fontFamily: FONT,
       }}
     >
@@ -189,7 +189,7 @@ export function Masthead({ slug, displayName, rank, pointsTotal, alumniCount, pl
       <div
         aria-hidden
         style={{
-          marginTop: 18,
+          marginTop: 16,
           height: 0.5,
           background: WHITE_ALPHA_10,
         }}
