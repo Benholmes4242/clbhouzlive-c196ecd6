@@ -16,7 +16,7 @@ export const Z = {
   toast: 12000,
   
   // Search overlay
-  searchOverlay: 10100,  // Above header/nav and ProfileHubSheet
+  searchOverlay: 10100,  // Above header/nav and the profile sheet
   
   // Modal & overlay layers (ordered by priority)
   hub: 12000,           // Hub modal shell
