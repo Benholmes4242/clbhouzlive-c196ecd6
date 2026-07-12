@@ -567,7 +567,7 @@ export function CinematicHeroFullBleed({
         style={{
           position: 'relative',
           zIndex: 2,
-          padding: '0 18px 10px',
+          padding: '0 18px 8px',
           display: 'flex',
           flexDirection: 'column',
           gap: 6,
@@ -579,7 +579,7 @@ export function CinematicHeroFullBleed({
           style={{
             margin: 0,
             fontFamily: "'Geist', -apple-system, BlinkMacSystemFont, sans-serif",
-            fontSize: 'clamp(24px, 7.8vw, 30px)',
+            fontSize: 'clamp(20px, 6.6vw, 26px)',
             fontWeight: 800,
             lineHeight: 0.98,
             letterSpacing: '-0.01em',
