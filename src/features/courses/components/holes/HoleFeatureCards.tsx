@@ -26,7 +26,7 @@ const Card: React.FC<{
         background: tint,
         border: `1px solid ${border}`,
         borderRadius: 14,
-        padding: '14px 14px 12px',
+        padding: '12px 14px',
         fontFamily: FONT,
         display: 'flex',
         flexDirection: 'column',
@@ -92,9 +92,9 @@ const Card: React.FC<{
 export const HoleFeatureCards: React.FC<Props> = ({ hardest, easiest }) => (
   <div
     style={{
-      padding: '14px 18px 18px',
+      padding: '16px 16px',
       display: 'flex',
-      gap: 10,
+      gap: 12,
     }}
   >
     <Card tone="hard" label="Hardest" hole={hardest} />

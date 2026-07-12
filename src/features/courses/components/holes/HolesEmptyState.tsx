@@ -7,7 +7,7 @@ import { HAIRLINE_INK_8, INK_TINT_06 } from '@/features/courses/_shared/tokens';
 const SLATE = 'var(--hcp-t-60, #64748b)';
 
 export const HolesEmptyState: React.FC<{ courseName: string | null }> = ({ courseName }) => (
-  <div style={{ padding: '40px 28px 48px', textAlign: 'center', fontFamily: FONT }}>
+  <div style={{ padding: '40px 24px 0', textAlign: 'center', fontFamily: FONT }}>
     <EmptyStateTile tint="amber">
       <Flag size={28} color={AMBER} strokeWidth={1.8} />
     </EmptyStateTile>
@@ -47,7 +47,7 @@ export const HolesEmptyState: React.FC<{ courseName: string | null }> = ({ cours
     >
       Hole insights are coming
     </div>
-    <div style={{ fontSize: 13.5, color: SLATE, lineHeight: 1.55, maxWidth: 310, margin: '0 auto 22px' }}>
+    <div style={{ fontSize: 13.5, color: SLATE, lineHeight: 1.55, maxWidth: 310, margin: '0 auto 24px' }}>
       When global golfers holding official WHS handicaps log rounds with hole scores at{' '}
       <strong style={{ color: INK, fontWeight: 700 }}>{courseName ?? 'this course'}</strong>, we'll
       break down every hole — average score, hardest and easiest, and the full birdie-to-double spread.

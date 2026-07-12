@@ -39,7 +39,7 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
 
   if (isLoading) {
     return (
-      <div style={{ padding: '20px 18px', display: 'flex', flexDirection: 'column', gap: 12, fontFamily: FONT }}>
+      <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 12, fontFamily: FONT }}>
         {[0, 1, 2, 3].map((i) => (
           <div
             key={i}
@@ -59,7 +59,7 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
 
   if (isError) {
     return (
-      <div style={{ padding: '40px 18px', textAlign: 'center', fontFamily: FONT }}>
+      <div style={{ padding: '40px 16px', textAlign: 'center', fontFamily: FONT }}>
         <div style={{ fontSize: 14, fontWeight: 600, color: INK_MUTE }}>
           Couldn't load hole analysis.
         </div>
@@ -85,7 +85,7 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
       )}
       <div
         style={{
-          padding: '4px 18px 8px',
+          padding: '0 16px 12px',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
