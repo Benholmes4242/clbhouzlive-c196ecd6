@@ -104,7 +104,13 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
   };
 
   const trimmed = loginEmail.trim();
-  const [agreed, setAgreed] = useState(false);
+  const [agreed, setAgreed] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    try { return window.sessionStorage.getItem('auth:agreed') === '1'; } catch { return false; }
+  });
+  useEffect(() => {
+    try { window.sessionStorage.setItem('auth:agreed', agreed ? '1' : '0'); } catch {}
+  }, [agreed]);
   const [nudgeAgreement, setNudgeAgreement] = useState(false);
   const canContinue = trimmed.length > 0 && !submitting && agreed;
   const inMedian = useMemo(() => isMedianApp(), []);
