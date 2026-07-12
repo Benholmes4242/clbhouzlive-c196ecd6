@@ -19,6 +19,7 @@ import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import { useTourLeaderboard } from '../hooks/useTourHubData';
 import { useTournamentMeta } from './useTournamentMeta';
 import { BoardTable, type BoardEntry, type CutState } from './BoardTable';
+import { ScorecardSheet, type ScorecardSheetTarget } from './ScorecardSheet';
 import { EditorialEmpty } from '../components/tournament-detail/EditorialEmpty';
 import { tourPriorityIndex } from '../_shared/tourOrder';
 
@@ -27,7 +28,7 @@ const INK = '#0F172A';
 const SECONDARY = '#4B5563';
 const MUTED = '#94A3B8';
 const HAIRLINE = 'rgba(0,0,0,0.08)';
-const SURFACE = '#FFFFFF';
+const SURFACE = '#F8FAFC';
 const STATUS_LIVE_GREEN = '#189A55';
 
 function fmtDateRange(start: string | null, end: string | null): string | null {
@@ -123,6 +124,7 @@ export function LeaderboardTab() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
+  const [sheetTarget, setSheetTarget] = useState<ScorecardSheetTarget | null>(null);
 
   const liveTournaments = useMemo(() => {
     return [...rawLive].sort((a, b) => {
@@ -454,7 +456,33 @@ export function LeaderboardTab() {
           }
         />
       ) : (
-        <BoardTable entries={filteredEntries} cutState={cutState} currentRound={currentRound} />
+        <BoardTable
+          entries={filteredEntries}
+          cutState={cutState}
+          currentRound={currentRound}
+          onRowClick={(row) => {
+            if (!row.player?.id) return;
+            setSheetTarget({
+              playerId: row.player.id,
+              playerName: row.player.full_name || 'Unknown',
+              countryCode: row.player.country_code ?? row.player.country ?? null,
+              position: row.position,
+              positionTied: row.position_tied ?? false,
+              total: row.score,
+              today:
+                row.today != null
+                  ? row.today
+                  : (() => {
+                      const rs = [row.round_1, row.round_2, row.round_3, row.round_4].filter(
+                        (r) => r != null,
+                      );
+                      return rs.length ? (rs[rs.length - 1] as number) : null;
+                    })(),
+              thru: row.thru,
+              status: row.status ?? null,
+            });
+          }}
+        />
       )}
 
       {/* FOOTNOTE */}
@@ -468,6 +496,13 @@ export function LeaderboardTab() {
       >
         {footnote}
       </div>
+
+      <ScorecardSheet
+        open={sheetTarget != null}
+        onClose={() => setSheetTarget(null)}
+        tournamentId={selected?.id ?? null}
+        target={sheetTarget}
+      />
     </div>
   );
 }

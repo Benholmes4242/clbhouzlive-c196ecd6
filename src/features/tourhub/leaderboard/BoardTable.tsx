@@ -31,7 +31,8 @@ const INK = '#0F172A';
 const SECONDARY = '#4B5563';
 const MUTED = '#94A3B8';
 const HAIRLINE = 'rgba(0,0,0,0.08)';
-const BAND = '#F8FAFC';
+const BAND = 'rgba(31,36,40,0.03)';
+const CANVAS = '#F8FAFC';
 
 const SCORE_UNDER = '#189A55';
 const SCORE_OVER = '#C24A4A';
@@ -74,6 +75,7 @@ interface Props {
   entries: BoardEntry[];
   cutState: CutState;
   currentRound?: number | null;
+  onRowClick?: (entry: BoardEntry) => void;
 }
 
 function houseColor(score: number | null | undefined): string {
@@ -137,7 +139,7 @@ function statusWord(s?: string | null): string {
   return u || '-';
 }
 
-export function BoardTable({ entries, cutState, currentRound }: Props) {
+export function BoardTable({ entries, cutState, currentRound, onRowClick }: Props) {
   const navigate = useNavigate();
 
   // Computed round-start deltas (empty in R1 / when unavailable).
@@ -236,11 +238,13 @@ export function BoardTable({ entries, cutState, currentRound }: Props) {
         role="button"
         tabIndex={0}
         onClick={() => {
+          if (onRowClick) return onRowClick(e);
           if (e.player?.id) navigate(`/tourhub/player/${e.player.id}`);
         }}
         onKeyDown={(k) => {
-          if ((k.key === 'Enter' || k.key === ' ') && e.player?.id) {
-            navigate(`/tourhub/player/${e.player.id}`);
+          if (k.key === 'Enter' || k.key === ' ') {
+            if (onRowClick) return onRowClick(e);
+            if (e.player?.id) navigate(`/tourhub/player/${e.player.id}`);
           }
         }}
         style={{
@@ -248,7 +252,7 @@ export function BoardTable({ entries, cutState, currentRound }: Props) {
           alignItems: 'center',
           padding: '8.5px 16px',
           borderBottom: `1px solid ${HAIRLINE}`,
-          background: '#fff',
+          background: CANVAS,
           opacity: demotedRow ? 0.55 : 1,
           cursor: 'pointer',
           fontFamily: F,
