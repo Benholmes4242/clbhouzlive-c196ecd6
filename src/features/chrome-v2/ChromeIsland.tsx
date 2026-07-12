@@ -343,7 +343,7 @@ const AvatarCell: React.FC<{
 // ---------------------------------------------------------------------------
 // ChromeIsland (root)
 // ---------------------------------------------------------------------------
-export const ChromeIsland: React.FC = () => {
+export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false }) => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const { user } = useSupabaseSession();
@@ -353,13 +353,15 @@ export const ChromeIsland: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const avatarRef = useRef<HTMLButtonElement>(null);
 
+  const suppressed = hidden || spec.chrome === 'none';
+
   // Publish --header-h just like CompactHeader does.
   useLayoutEffect(() => {
-    const value = spec.chrome === 'none' ? 0 : HEADER_H;
+    const value = suppressed ? 0 : HEADER_H;
     document.documentElement.style.setProperty('--header-h', `${value}px`);
-  }, [spec.chrome]);
+  }, [suppressed]);
 
-  if (spec.chrome === 'none') return null;
+  if (suppressed) return null;
 
   const tone = spec.tone;
   const dividerColor =
