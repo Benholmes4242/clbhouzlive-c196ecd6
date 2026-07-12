@@ -105,7 +105,7 @@ export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChang
               fontWeight: 800,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
-              color: c.rowText,
+              color: '#0F172A',
               fontFeatureSettings: '"kern" 1, "liga" 1',
             }}
           >
@@ -127,12 +127,12 @@ export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChang
                   alignItems: 'center',
                   gap: 12,
                   width: '100%',
-                  background: isActive ? c.activeRowBg : 'transparent',
+                  background: isActive ? 'rgba(15, 23, 42, 0.05)' : 'transparent',
                   border: 'none',
                   padding: 12,
                   borderRadius: 12,
                   cursor: 'pointer',
-                  color: c.rowText,
+                  color: '#0F172A',
                   textAlign: 'left',
                 }}
               >
@@ -142,7 +142,7 @@ export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChang
                   alt={a.name}
                   userId={a.type === 'personal' ? a.id : null}
                   hairlineRing
-                  ringColor={theme === 'dark' ? DARK_HAIRLINE : LIGHT_HAIRLINE}
+                  ringColor={LIGHT_HAIRLINE}
                 />
 
                 <span style={{ fontSize: 15, fontWeight: 600, flex: 1 }}>{a.name}</span>
