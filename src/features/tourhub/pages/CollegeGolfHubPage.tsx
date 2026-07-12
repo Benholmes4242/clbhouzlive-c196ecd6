@@ -153,7 +153,6 @@ export function CollegeGolfHubPage() {
   return (
     <TourHubShell showBack={false}>
       <ShellSlot>
-        <TourHubShellTabs />
         <CollegeShellRow />
       </ShellSlot>
 
