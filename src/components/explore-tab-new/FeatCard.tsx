@@ -102,8 +102,8 @@ export function FeatCard({ row, tier, onTap }: Props) {
   const when = relDate(row.play_date ?? row.attained_at ?? null);
 
   const boxShadow = isLegendary
-    ? '0 0 0 1px #FBBC2E55, 0 10px 28px rgba(0,0,0,0.35)'
-    : 'inset 0 1px 0 rgba(255,255,255,0.06), 0 8px 24px rgba(0,0,0,0.28)';
+    ? '0 0 0 1px #FBBC2E55, 0 4px 12px rgba(0,0,0,0.20)'
+    : 'inset 0 1px 0 rgba(255,255,255,0.06), 0 3px 10px rgba(15,23,42,0.14)';
 
   const fallbackBg = 'linear-gradient(135deg, #0F172A 0%, #1e293b 100%)';
 

@@ -95,7 +95,9 @@ export function CircleActivityStrip({ userId }: Props) {
     return (
       <section style={{ fontFamily: FONT }}>
         {Header}
-        <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 6 }}>
+      <div
+        className="flex gap-3 px-4 overflow-x-auto scrollbar-hide"
+        style={{ paddingTop: 4, marginTop: -4, paddingBottom: 14, marginBottom: -8 }}>
           {Array.from({ length: 2 }).map((_v, i) => (
             <div
               key={i}
@@ -142,7 +144,9 @@ export function CircleActivityStrip({ userId }: Props) {
   return (
     <section style={{ fontFamily: FONT }}>
       {Header}
-      <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 6 }}>
+      <div
+        className="flex gap-3 px-4 overflow-x-auto scrollbar-hide"
+        style={{ paddingTop: 4, marginTop: -4, paddingBottom: 14, marginBottom: -8 }}>
         {rows.map((r, i) => (
           <CircleActivityCard
             key={`${r.score_id}-${i}`}
@@ -178,8 +182,8 @@ function CircleActivityCard({ row, onTap }: CardProps) {
   const when = row.play_date ? relDate(row.play_date) : '';
 
   const boxShadow = legendary
-    ? '0 0 0 1px #FBBC2E55, 0 10px 28px rgba(0,0,0,0.35)'
-    : 'inset 0 1px 0 rgba(255,255,255,0.06), 0 8px 24px rgba(0,0,0,0.28)';
+    ? '0 0 0 1px #FBBC2E55, 0 4px 12px rgba(0,0,0,0.20)'
+    : 'inset 0 1px 0 rgba(255,255,255,0.06), 0 3px 10px rgba(15,23,42,0.14)';
 
   const fallbackBg = 'linear-gradient(135deg, #0F172A 0%, #1e293b 100%)';
 
