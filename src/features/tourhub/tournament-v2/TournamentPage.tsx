@@ -24,7 +24,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { format, differenceInCalendarDays } from 'date-fns';
 import { TourHubShell } from '../components/TourHubShell';
-import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
+import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 
 import { useTournamentMeta } from '../leaderboard/useTournamentMeta';
 import { useTourLeaderboard } from '../hooks/useTourHubData';
@@ -58,8 +58,7 @@ export function TournamentPage() {
   const { tournamentId } = useParams<{ tournamentId: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { setVisible } = useBottomNavigation();
-  useEffect(() => { setVisible(true); }, [setVisible]);
+  useHideBottomNav();
 
 
 
@@ -227,7 +226,7 @@ export function TournamentPage() {
         {/* MOMENTS */}
         <MomentsSection tournamentId={tournamentId!} tourCode={tourCode} />
 
-        <div style={{ height: 'calc(env(safe-area-inset-bottom, 0px) + 96px)' }} />
+        <div style={{ height: 'calc(env(safe-area-inset-bottom, 0px) + 16px)' }} />
       </div>
 
       <AllTeeTimesSheet
