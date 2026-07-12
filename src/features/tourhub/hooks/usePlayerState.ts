@@ -142,6 +142,10 @@ export function usePlayerState(playerId: string | undefined): PlayerStateData {
         tournamentName: liveRow.tournament.name,
         currentRound: liveRow.tournament.current_round,
         scoreText: formatScoreText(liveRow.score, liveRow.thru),
+        score: liveRow.score,
+        thru: liveRow.thru,
+        position: liveRow.position,
+        positionTied: liveRow.position_tied,
       },
       eventsLast12mo: 0, // not relevant in live state; consumer reads liveData
     };
