@@ -181,14 +181,7 @@ export function TourHubMainPage() {
             <SearchOverlayV2 isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
           </>
         ) : (
-          <>
-            <ShellSlot>
-              {renderShellRow()}
-            </ShellSlot>
-            <div style={{ paddingTop: 'calc(var(--chrome-total-h, 0px) - 1px)' }}>
-              {renderTab()}
-            </div>
-          </>
+          <div>{renderTab()}</div>
         )}
       </TourHubShell>
     </TourSelectionProvider>
