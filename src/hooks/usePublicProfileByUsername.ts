@@ -16,7 +16,7 @@ export function usePublicProfileByUsername(username?: string) {
       if (!username) return null;
 
       const { data, error } = await supabase
-        .from('user_profiles' as any)
+        .from('public_profiles' as any)
         .select('id, username, display_name, profile_photo_url')
         .eq('username', username)
         .single();
