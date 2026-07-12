@@ -87,15 +87,17 @@ interface StatRow {
 async function resolveSeasonIds(tour: TourId): Promise<string[]> {
   const { data, error } = await supabase
     .from('sr_seasons')
-    .select('id, tour_full_name, year')
+    .select('id, tour_full_name, year, created_at')
     .order('year', { ascending: false })
-    .limit(50);
+    .order('created_at', { ascending: false })
+    .limit(200);
   if (error) {
     // eslint-disable-next-line no-console
     console.error('[stat-watch] sr_seasons fetch failed:', error);
     throw error;
   }
-  const matches = (data ?? []).filter((r: any) => mapTourSlug(r.tour_full_name) === tour);
+  const rows = (data ?? []) as any[];
+  const matches = rows.filter((r: any) => mapTourSlug(r.tour_full_name) === tour);
   // For pga, prefer exact-name matches over fallback-mapped rows (year order
   // preserved within each group) — mapTourSlug's default returns 'pga' for
   // any unrecognized tour_full_name, which lets DP World / LIV / etc. rows
@@ -109,6 +111,15 @@ async function resolveSeasonIds(tour: TourId): Promise<string[]> {
       })
     : matches;
   const ids = sorted.slice(0, 6).map((r: any) => r.id);
+  if (matches.length === 0) {
+    const distinctTours = Array.from(
+      new Set(rows.map((r) => r.tour_full_name ?? '(null)')),
+    );
+    // eslint-disable-next-line no-console
+    console.warn('[stat-watch] empty season candidates for tour:', tour,
+      '| fetched rows:', rows.length,
+      '| distinct tour_full_name seen:', distinctTours);
+  }
   if (tour === 'pga') {
     // eslint-disable-next-line no-console
     console.log('[stat-watch] pga season candidates (probe order):',
@@ -116,6 +127,7 @@ async function resolveSeasonIds(tour: TourId): Promise<string[]> {
   }
   return ids;
 }
+
 
 export function useStatWatch(tour: TourId) {
   return useQuery({
