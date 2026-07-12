@@ -59,7 +59,7 @@ export function ComingUp({ tour }: { tour: TourId }) {
                   </div>
                 </div>
                 <div style={{ width: 44, textAlign: 'right', flexShrink: 0 }}>
-                  <div style={{ fontSize: 16, color: soon ? V4.amberDeep : V4.ink, lineHeight: 1, ...NUMERAL_THIN }}>{r.days_away}</div>
+                  <div style={{ fontSize: 16, color: r.isMajor && soon ? V4.amberDeep : r.isMajor ? V4.ink : V4.inkMute, lineHeight: 1, ...NUMERAL_THIN }}>{r.days_away}</div>
                   <div style={{ marginTop: 4, fontSize: 7.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.12em' }}>DAYS</div>
                 </div>
               </button>
