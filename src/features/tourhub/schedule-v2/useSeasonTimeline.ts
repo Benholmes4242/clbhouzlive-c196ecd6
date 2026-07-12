@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { mapTourSlug } from '../_shared/tourOrder';
+import { LIVE_STATUSES, COMPLETED_STATUSES, endDateInPast } from '../components/overview-v3/useTournamentPulse';
 import type { TourId } from '../hooks/useOverviewData';
 import { getContextLabel } from '../utils/tournamentClassification';
 import {
@@ -298,10 +299,12 @@ export function useSeasonTimeline(tour: TourId): {
       .sort((a, b) => a.start_date.localeCompare(b.start_date));
   }, [rawRows, tour]);
 
-  // 3. Split by state for the enrichment queries.
-  const liveIds = events.filter((e) => e.status === 'inprogress').map((e) => e.id);
+  // 3. Split by state for the enrichment queries — use the house pulse sets.
+  const liveIds = events
+    .filter((e) => LIVE_STATUSES.has((e.status ?? '').toLowerCase()))
+    .map((e) => e.id);
   const completedIds = events
-    .filter((e) => e.status === 'closed' || e.status === 'complete')
+    .filter((e) => COMPLETED_STATUSES.has((e.status ?? '').toLowerCase()) || endDateInPast(e.end_date))
     .map((e) => e.id);
 
   const { data: leadersWinnersMap } = useTournamentLeadersWinners([
@@ -336,8 +339,9 @@ export function useSeasonTimeline(tour: TourId): {
     const decorated: SeasonEvent[] = events.map((r, idx) => {
       const startMs = new Date(`${r.start_date}T12:00:00Z`).getTime();
       const endMs = new Date(`${r.end_date}T12:00:00Z`).getTime();
-      const isDone = r.status === 'closed' || r.status === 'complete';
-      const isLive = r.status === 'inprogress';
+      const statusLc = (r.status ?? '').toLowerCase();
+      const isDone = COMPLETED_STATUSES.has(statusLc) || endDateInPast(r.end_date);
+      const isLive = !isDone && LIVE_STATUSES.has(statusLc);
       const state: EventState = isDone
         ? 'completed'
         : isLive
@@ -417,11 +421,15 @@ export function useSeasonTimeline(tour: TourId): {
       return evt;
     });
 
-    // Anchor: first this-week row; else first upcoming.
+    // Anchor priority: live row, then this-week row, then first upcoming.
     let anchorId: string | null = null;
     let currentEventNumber: number | null = null;
+    const liveIdx = decorated.findIndex((e) => e.state === 'live');
     const thisWeekIdx = decorated.findIndex((e) => e.isThisWeek);
-    if (thisWeekIdx !== -1) {
+    if (liveIdx !== -1) {
+      anchorId = decorated[liveIdx].id;
+      currentEventNumber = decorated[liveIdx].eventNumber;
+    } else if (thisWeekIdx !== -1) {
       anchorId = decorated[thisWeekIdx].id;
       currentEventNumber = decorated[thisWeekIdx].eventNumber;
     } else {
