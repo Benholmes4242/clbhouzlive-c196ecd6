@@ -21,7 +21,9 @@ import { toFeedPosts } from '@/features/watch-v2/utils/toFeedPost';
 import type { VideosSortId } from './SortSegment';
 import type { VideosV2CategoryId } from './CategoryChips';
 import { useVideosFeedV2, type VideosFeedV2Row } from '../hooks/useVideosFeedV2';
+import { useInterruptClips } from '../hooks/useInterruptClips';
 import { VideoFeedCard } from './VideoFeedCard';
+import { ClipsInterruptShelf } from './ClipsInterruptShelf';
 
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
