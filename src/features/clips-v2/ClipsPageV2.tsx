@@ -31,8 +31,6 @@ function parseMood(raw: string | null): ClipsV2Mood {
 export default function ClipsPageV2() {
   const [params, setParams] = useSearchParams();
   const [searchOpen, setSearchOpen] = React.useState(false);
-  const { user } = useSupabaseSession();
-  const userId = user?.id;
 
   const mood = useMemo(() => parseMood(params.get('mood')), [params]);
 
@@ -45,9 +43,6 @@ export default function ClipsPageV2() {
     },
     [params, setParams],
   );
-
-  const feed = useClipsWallFeed({ userId, mood });
-  const firstPageCount = feed.data?.pages?.[0]?.length ?? 0;
 
   return (
     <PageRoot className="min-h-screen text-foreground bg-background">
