@@ -55,9 +55,14 @@ function verdict(live: PickLiveState | undefined): { hit: boolean; label: string
   return { hit, label: `${hit ? 'HIT' : 'MISS'} · ${posText} · ${scoreText}` };
 }
 
+type SheetState =
+  | null
+  | { kind: 'index' }
+  | { kind: 'case'; pick: AITopContender; from: 'index' | 'card' };
+
 export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props) {
   const { data } = useAIPredictions(tournamentId ?? null);
-  const [open, setOpen] = useState<AITopContender | null>(null);
+  const [sheet, setSheet] = useState<SheetState>(null);
   const picks = data?.topContenders ?? [];
 
   const playerIds = useMemo(() => picks.map((p) => p.playerId).filter(Boolean), [picks]);
@@ -68,13 +73,21 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
 
   if (!tournamentId || picks.length === 0) return null;
 
+  const closeCase = () => {
+    if (sheet?.kind === 'case' && sheet.from === 'index') {
+      setSheet({ kind: 'index' });
+    } else {
+      setSheet(null);
+    }
+  };
+
   return (
-    <SectionShell eyebrow="Tournament intelligence" linkLabel="All picks" onLinkClick={() => setOpen(picks[0] ?? null)}>
+    <SectionShell eyebrow="Tournament intelligence" linkLabel="All picks" onLinkClick={() => setSheet({ kind: 'index' })}>
       <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 16px 10px', scrollPaddingLeft: 16, scrollSnapType: 'x mandatory' }}>
         {picks.slice(0, 8).map((p) => (
           <button
             key={p.playerId}
-            onClick={() => setOpen(p)}
+            onClick={() => setSheet({ kind: 'case', pick: p, from: 'card' })}
             style={{
               flex: '0 0 232px',
               scrollSnapAlign: 'start',
@@ -121,13 +134,24 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
         ))}
       </div>
 
-      {open ? (
-        <CaseSheet
-          pick={open}
+      {sheet?.kind === 'index' ? (
+        <AllPicksSheet
+          picks={picks}
           state={state}
-          live={liveMap?.get(open.playerId)}
           tourCode={tourCode}
-          onClose={() => setOpen(null)}
+          liveMap={liveMap}
+          onPick={(p) => setSheet({ kind: 'case', pick: p, from: 'index' })}
+          onClose={() => setSheet(null)}
+        />
+      ) : null}
+
+      {sheet?.kind === 'case' ? (
+        <CaseSheet
+          pick={sheet.pick}
+          state={state}
+          live={liveMap?.get(sheet.pick.playerId)}
+          tourCode={tourCode}
+          onClose={closeCase}
         />
       ) : null}
     </SectionShell>
