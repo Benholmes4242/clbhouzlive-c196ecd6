@@ -33,8 +33,17 @@ export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
   if (actorType === 'business') return null;
 
   const { data: connection } = useWhsConnection(actorId);
-  const { data: trend } = useHandicapTrend(connection?.id, 90);
+  const { data: trend } = useHandicapTrend(connection?.id);
+  const { data: history90 } = useHandicapHistory(connection?.id, 90);
   const { data: scores } = useAllScores(connection?.id);
+
+  // 90-day delta: replicate HeroHandicapCardDark exactly —
+  //   history90[last].handicap_index - history90[0].handicap_index
+  // (see src/components/profile/handicap/whs/sections/HeroHandicapCardDark.tsx)
+  const delta90 = useMemo<number | null>(() => {
+    if (!history90 || history90.length < 2) return null;
+    return history90[history90.length - 1].handicap_index - history90[0].handicap_index;
+  }, [history90]);
 
   const rounds90d = useMemo(() => {
     if (!scores) return null;
