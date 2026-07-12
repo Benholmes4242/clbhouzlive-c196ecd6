@@ -312,9 +312,9 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
         <div
           style={{
             display: 'flex',
-            gap: 7,
+            gap: 8,
             overflowX: 'auto',
-            padding: '0 16px 14px',
+            padding: '0 16px 12px',
             background: SURFACE,
             borderBottom: `0.5px solid ${HAIRLINE}`,
             scrollbarWidth: 'none',
