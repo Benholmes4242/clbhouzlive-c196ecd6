@@ -31,8 +31,7 @@ import {
 
 export const whsKeys = {
   connection: (userId: string) => ['whs-connection', userId] as const,
-  trend: (connectionId: string, windowDays: number = 30) =>
-    ['whs-handicap-trend', connectionId, windowDays] as const,
+  trend: (connectionId: string) => ['whs-handicap-trend', connectionId] as const,
   lastRound: (connectionId: string) => ['whs-last-round', connectionId] as const,
   counters: (connectionId: string) => ['whs-counters', connectionId] as const,
   allScores: (connectionId: string) => ['whs-all-scores', connectionId] as const,
