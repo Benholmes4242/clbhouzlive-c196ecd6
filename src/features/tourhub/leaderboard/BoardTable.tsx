@@ -137,8 +137,27 @@ function statusWord(s?: string | null): string {
   return u || '-';
 }
 
-export function BoardTable({ entries, cutState }: Props) {
+export function BoardTable({ entries, cutState, currentRound }: Props) {
   const navigate = useNavigate();
+
+  // Computed round-start deltas (empty in R1 / when unavailable).
+  const movementMap = useMemo(
+    () =>
+      movementFromRounds(
+        entries.map((e) => ({
+          id: e.id,
+          playerId: e.player?.id ?? null,
+          position: e.position,
+          status: e.status ?? null,
+          round_1: e.round_1 ?? null,
+          round_2: e.round_2 ?? null,
+          round_3: e.round_3 ?? null,
+          round_4: e.round_4 ?? null,
+        })),
+        currentRound ?? null,
+      ),
+    [entries, currentRound],
+  );
 
   // Partition: active rows first (in incoming order), demoted after.
   const { active, demoted, insertionIndex } = useMemo(() => {
