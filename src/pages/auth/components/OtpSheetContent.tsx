@@ -154,7 +154,7 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       {/* Subtitle */}
       <div className="space-y-2 text-center">
         <p className="text-[13px]" style={{ color: 'rgba(255,255,255,0.72)' }}>

@@ -76,7 +76,7 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
       >
         
         {/* Handle bar */}
-        <div style={{ display: 'flex', justifyContent: 'center', padding: '10px 0 4px' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '8px 0 4px' }}>
           <div style={{ width: 36, height: 4, borderRadius: 99, background: 'rgba(255,255,255,0.20)' }} />
         </div>
         
@@ -85,18 +85,17 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
           <div className="flex-1 pr-4">
             {title && (
               <div>
-                <h2 
-                  style={{ 
+                <h2
+                  style={{
                     fontSize: 20,
                     fontWeight: 800,
                     color: 'rgba(255,255,255,0.96)',
                     letterSpacing: '-0.03em',
-                    marginBottom: 4,
                   }}
                 >
                   {title}
                 </h2>
-                <div style={{ width: 28, height: 3, borderRadius: 99, background: '#F7931E', marginTop: 8 }} />
+                <div style={{ width: 28, height: 3, borderRadius: 99, background: '#F7931E', marginTop: 12 }} />
               </div>
             )}
             {subtitle && (
@@ -123,7 +122,7 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
         </div>
         
         {/* Content */}
-        <div className="px-6 pb-8 pt-2">
+        <div className="px-6 pb-8">
           {children}
         </div>
       </div>

@@ -142,7 +142,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
           className="flex flex-col justify-center items-center gap-3 auth-logo-animate"
           style={{
             paddingTop: 'clamp(32px, 12vh, 100px)',
-            paddingBottom: '2rem',
+            paddingBottom: 16,
           }}
         >
           <img
@@ -156,7 +156,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
         </div>
 
         {/* Tagline */}
-        <div className="flex-1 flex flex-col justify-center items-center text-center -mt-4">
+        <div className="flex-1 flex flex-col justify-center items-center text-center">
           <h1
             className="text-[38px] md:text-[44px] font-semibold leading-tight auth-tagline-animate"
             style={{ letterSpacing: '-0.02em', color: 'rgba(255,255,255,0.96)' }}
@@ -167,9 +167,10 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
 
         {/* Bottom action panel */}
         <div
-          className="pb-8 pt-6 -mx-6 px-6"
+          className="pt-6 -mx-6 px-6"
           style={{
             background: '#15171F',
+            paddingBottom: 'calc(32px + env(safe-area-inset-bottom, 0px))',
           }}
         >
           <div className="auth-button-6 space-y-3">
@@ -201,8 +202,6 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                     )}
                   </button>
                 )}
-
-                {showApple && showGoogle && <div style={{ height: 10 }} aria-hidden="true" />}
 
                 {showGoogle && (
                   <button
@@ -311,7 +310,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                 Links MUST NOT be nested inside a <button> (invalid HTML +
                 webviews swallow the tap). Toggle is its own button; the
                 legal copy with links is a sibling. */}
-            <div style={{ marginTop: 8 }}>
+            <div>
               <div
                 className="w-full flex items-start gap-3 rounded-[12px] px-3 py-2.5 transition-colors"
                 style={{
