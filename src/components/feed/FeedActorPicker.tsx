@@ -1,28 +1,19 @@
 import React, { useState } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
 import { useActiveActor } from '@/context/ActiveActorContext';
-import { SquircleAvatar, LIGHT_HAIRLINE, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import type { ActiveActor } from '@/types/actor';
 
+// Only the trigger chevron is theme-dependent; the sheet is always light.
 const PALETTE = {
   dark: {
     // FeedCard footer is NOT inside .hcp-dark scope, so we can't rely on
     // var(--hcp-t-60) here — resolve to a concrete color.
     chevron: 'rgba(255, 255, 255, 0.7)',
-    rowText: 'var(--hcp-t-100)',
-    activeRowBg: 'var(--hcp-bg-2)',
-    sheetVariant: 'dark' as const,
-    hcpScope: 'hcp-dark',
-    sheetBg: 'var(--hcp-bg-0)',
   },
   light: {
     chevron: '#64748B',
-    rowText: 'var(--hcp-t-100)',
-    activeRowBg: 'var(--hcp-bg-2)',
-    sheetVariant: 'light' as const,
-    hcpScope: 'hcp-light',
-    sheetBg: 'var(--hcp-bg-0)',
   },
 };
 
