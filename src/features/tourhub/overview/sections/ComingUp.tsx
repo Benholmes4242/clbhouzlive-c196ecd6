@@ -17,7 +17,7 @@ export function ComingUp({ tour }: { tour: TourId }) {
 
   return (
     <SectionShell eyebrow="What's coming up" linkLabel="Full schedule" onLinkClick={() => navigate('/tourhub?tab=schedule')}>
-      <div style={{ margin: '0 20px' }}>
+      <div style={{ margin: '0 16px' }}>
         <V4Card style={{ overflow: 'hidden' }}>
           {rows.map((r, i) => {
             const soon = r.days_away <= 7;

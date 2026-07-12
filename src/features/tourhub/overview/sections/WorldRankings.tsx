@@ -42,12 +42,12 @@ export function WorldRankings({ tour }: { tour: TourId }) {
 
   return (
     <SectionShell eyebrow="World rankings" linkLabel="Full rankings" onLinkClick={() => navigate('/tourhub?tab=leaderboards')}>
-      <div style={{ padding: '0 16px 10px', fontSize: 11, fontWeight: 600, color: V4.inkMute, marginTop: -6 }}>
+      <div style={{ padding: '0 16px 10px', fontSize: 11, fontWeight: 600, color: V4.inkMute }}>
         {mapping.label}
       </div>
 
       {/* No.1 spotlight — cardless, scale does the work. */}
-      <div style={{ padding: '4px 16px 14px' }}>
+      <div style={{ padding: '4px 16px 12px' }}>
         <SpotlightRow
           row={top}
           tourCode={mapping.tourCode}
