@@ -37,7 +37,8 @@ const SCORE_UNDER = '#189A55';
 const SCORE_OVER = '#C24A4A';
 const SCORE_EVEN = '#8A9099';
 
-const POS_W = 46;
+const POS_NUM_W = 26;
+const POS_MOVE_W = 20;
 const NUM_W = 44;
 
 const F = 'Geist, system-ui, sans-serif';
