@@ -49,6 +49,9 @@ function toFeedCardRow(post: FeedPost): FeedCardRow {
     (media?.type === 'video'
       ? (duration != null && duration <= 90 ? 'clip' : 'video')
       : 'clip');
+  const mAny = media as any;
+  const width = Number(mAny?.width) || null;
+  const height = Number(mAny?.height) || null;
   return {
     post_id: post.id,
     post_content: post.caption ?? null,
@@ -58,6 +61,8 @@ function toFeedCardRow(post: FeedPost): FeedCardRow {
     creator_username: post.username ?? null,
     like_count: Number(post.likeCount ?? 0),
     course_name: post.courseName ?? post.review?.courseName ?? null,
+    width,
+    height,
   };
 }
 
