@@ -52,7 +52,7 @@ function StatBoardInner({ category, liveMap, onOpen }: StatBoardProps) {
           display: 'flex',
           alignItems: 'baseline',
           justifyContent: 'space-between',
-          padding: '11px 14px 8px',
+          padding: '12px 14px 8px',
           background: 'transparent',
           border: 'none',
           borderBottom: `0.5px solid ${HAIRLINE_INK_10}`,

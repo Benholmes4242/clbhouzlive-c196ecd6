@@ -159,10 +159,10 @@ export function LeadersTab() {
         <div
           style={{
             display: 'flex',
-            gap: 6,
+            gap: 8,
             overflowX: 'auto',
             paddingBottom: 4,
-            marginBottom: 6,
+            marginBottom: 12,
             scrollbarWidth: 'none',
           }}
         >
@@ -212,7 +212,7 @@ export function LeadersTab() {
       ) : categories.length === 0 ? (
         <TourHubEmptyState variant="leaderboard" />
       ) : (
-        <div style={{ paddingBottom: 40 }}>
+        <div style={{ paddingBottom: 32 }}>
           {categories.map((cat) => (
             <StatBoard
               key={cat.key}
@@ -223,7 +223,7 @@ export function LeadersTab() {
           ))}
           <div
             style={{
-              padding: '4px 16px 24px',
+              padding: '4px 16px 0',
               fontSize: 10.5,
               fontWeight: 500,
               color: INK_MUTE,
