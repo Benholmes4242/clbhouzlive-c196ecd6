@@ -86,7 +86,7 @@ export default function ActorCards({
       >
         <style>{`.ps2-no-scrollbar::-webkit-scrollbar{display:none}`}</style>
 
-        {profiles.map((p) => {
+        {orderedProfiles.map((p) => {
           const active = p.id === currentActor.id;
           const unread = countFor(p.type, p.id);
           const sub = p.type === 'personal'
