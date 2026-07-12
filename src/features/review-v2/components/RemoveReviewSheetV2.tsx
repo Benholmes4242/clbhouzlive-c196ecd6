@@ -40,16 +40,16 @@ export function RemoveReviewSheetV2({ open, submitting, onCancel, onConfirm }: P
           background: '#FFFFFF',
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
-          padding: '18px 18px calc(env(safe-area-inset-bottom, 0px) + 18px)',
+          padding: '16px 16px calc(env(safe-area-inset-bottom, 0px) + 16px)',
           display: 'flex',
           flexDirection: 'column',
-          gap: 14,
+          gap: 12,
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <div style={{ width: 36, height: 4, borderRadius: 999, background: 'rgba(15,23,42,0.16)' }} />
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <div
             style={{
               width: 40,
@@ -96,7 +96,7 @@ export function RemoveReviewSheetV2({ open, submitting, onCancel, onConfirm }: P
             disabled={submitting}
             style={{
               flex: 1,
-              padding: 13,
+              padding: 12,
               borderRadius: 12,
               background: '#FFFFFF',
               border: `1px solid ${RV2.hairline}`,
@@ -114,7 +114,7 @@ export function RemoveReviewSheetV2({ open, submitting, onCancel, onConfirm }: P
             disabled={submitting}
             style={{
               flex: 1,
-              padding: 13,
+              padding: 12,
               borderRadius: 12,
               background: '#EF4444',
               border: 'none',
