@@ -163,6 +163,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
           live={liveMap?.get(sheet.pick.playerId)}
           tourCode={tourCode}
           onClose={closeCase}
+          onNavigatePlayer={goToPlayer}
         />
       ) : null}
     </SectionShell>
