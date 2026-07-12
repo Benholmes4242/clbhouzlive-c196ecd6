@@ -123,6 +123,7 @@ export function FeaturedGroupsRail({ tournamentId, live, tourCode }: Props) {
           </div>
         );
       })}
-    </div>
+      </div>
+    </>
   );
 }
