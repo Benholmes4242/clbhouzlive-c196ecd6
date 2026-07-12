@@ -97,7 +97,7 @@ export function CircleActivityStrip({ userId }: Props) {
         {Header}
       <div
         className="flex gap-3 px-4 overflow-x-auto scrollbar-hide"
-        style={{ paddingTop: 4, marginTop: -4, paddingBottom: 14, marginBottom: -8 }}
+        style={{ paddingTop: 4, marginTop: -4, paddingBottom: 14, marginBottom: -8 }}>
           {Array.from({ length: 2 }).map((_v, i) => (
             <div
               key={i}
@@ -146,7 +146,7 @@ export function CircleActivityStrip({ userId }: Props) {
       {Header}
       <div
         className="flex gap-3 px-4 overflow-x-auto scrollbar-hide"
-        style={{ paddingTop: 4, marginTop: -4, paddingBottom: 14, marginBottom: -8 }}
+        style={{ paddingTop: 4, marginTop: -4, paddingBottom: 14, marginBottom: -8 }}>
         {rows.map((r, i) => (
           <CircleActivityCard
             key={`${r.score_id}-${i}`}
