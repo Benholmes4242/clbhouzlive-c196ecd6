@@ -55,10 +55,14 @@ export function LeadersTab() {
     }
   }, [searchParams, selectTour, selectedTourSlug, viewingTourSlug]);
 
-  const activeTour: TourId =
+  // Champions is intentionally omitted on this page (insufficient stat coverage
+  // for a leaders board). If the app-wide selection is 'champ', fall back to
+  // rendering PGA boards without fighting the global TourSelectionContext.
+  const rawTour =
     ((viewingTourSlug ?? selectedTourSlug ?? 'pga') as string) in TOUR_CONFIG
       ? ((viewingTourSlug ?? selectedTourSlug ?? 'pga') as TourId)
       : 'pga';
+  const activeTour: TourId = rawTour === 'champ' ? 'pga' : rawTour;
 
   const { data: result, isLoading } = useLeaderCategories(activeTour);
   const { data: liveMap } = useLivePlayerIds();
