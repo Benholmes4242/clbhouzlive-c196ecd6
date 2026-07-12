@@ -470,7 +470,7 @@ function AppRoutes() {
         <Route path="/search-v2-test" element={<Suspense fallback={<GenericPageSkeleton />}><SearchV2TestPage /></Suspense>} />
         
         
-        {/* /video/:videoId route removed in PR-5 — :videoId is a post id (shared by VideoCardMenu & AutoplayVideoCard), so preserve deep links via the unified /post viewer. */}
+        {/* /video/:videoId route removed in PR-5 — :videoId is a post id (shared across video surfaces), so preserve deep links via the unified /post viewer. */}
         <Route path="/video/:videoId" element={<VideoIdToPostRedirect />} />
 
 

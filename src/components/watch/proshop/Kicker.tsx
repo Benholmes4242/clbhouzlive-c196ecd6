@@ -6,7 +6,7 @@ interface KickerProps {
 }
 
 // Canonical kickers default to slate-500. amber + emerald variants kept for
-// intentional tone shifts (e.g. ClipOfTheWeekHero uses emerald to signal
+// intentional tone shifts (e.g. curated hero cards use emerald to signal
 // curated content). amber kept available for explicit one-off editorial
 // moments — should be rare. light is for dark mastheads.
 const COLOR_MAP: Record<NonNullable<KickerProps['color']>, string> = {

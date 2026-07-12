@@ -2,7 +2,7 @@
  * useWatchAutoplay — single, engine-native activation policy for the Watch
  * surface (rails + grid). Replaces the old useRailAutoplay hook and every
  * DIY IntersectionObserver / local active-tile state that used to live in
- * individual watch components (LatestVideosRail, CarouselRow, etc.).
+ * individual watch components that used their own observers.
  *
  * One hook, one IntersectionObserver per surface. Mirrors the PROVEN feed
  * activation model (see CardFeed.tsx / LightCardFeed.tsx) so the whole app
