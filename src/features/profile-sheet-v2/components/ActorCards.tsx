@@ -191,8 +191,8 @@ export default function ActorCards({
                   aria-label={`${unread} unread`}
                   style={{
                     position: 'absolute',
-                    top: -4,
-                    right: -4,
+                    top: 8,
+                    right: 8,
                     minWidth: 17,
                     height: 17,
                     padding: '0 5px',
