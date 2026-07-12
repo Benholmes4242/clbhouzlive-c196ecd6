@@ -52,7 +52,6 @@ interface SrTournamentRow {
   venue_country: string | null;
   purse: number | null;
   defending_champion: string | null;
-  winner_score: number | string | null;
   season?: { tour_name: string | null; tour_full_name: string | null } | null;
 }
 
@@ -124,7 +123,7 @@ async function probeAndFetchTournaments(
     const { data, error } = await supabase
       .from('sr_tournaments')
       .select(
-        'id, season_id, name, status, start_date, end_date, venue_name, venue_city, venue_country, purse, defending_champion, winner_score, season:sr_seasons(tour_name, tour_full_name)',
+        'id, season_id, name, status, start_date, end_date, venue_name, venue_city, venue_country, purse, defending_champion, season:sr_seasons(tour_name, tour_full_name)',
       )
       .in('season_id', idsToQuery)
       .order('start_date', { ascending: true });
@@ -133,7 +132,7 @@ async function probeAndFetchTournaments(
       console.error('[schedule-v2] sr_tournaments fetch failed:', error);
       throw error;
     }
-    return { season: cand, rows: (data ?? []) as SrTournamentRow[] };
+    return { season: cand, rows: (data ?? []) as unknown as SrTournamentRow[] };
   }
   return { season: null, rows: [] };
 }
