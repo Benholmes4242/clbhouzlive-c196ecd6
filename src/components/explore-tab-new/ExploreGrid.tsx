@@ -7,6 +7,7 @@ import { useWatchAutoplay } from '@/video/useWatchAutoplay';
 import { Loader2 } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { FeedCard, type FeedCardRow } from '@/components/feed-cards/FeedCard';
+import { packColumns } from '@/components/feed-cards/packColumns';
 import ExploreGridSkeleton from './ExploreGridSkeleton';
 
 
