@@ -1,28 +1,19 @@
 import React, { useState } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
 import { useActiveActor } from '@/context/ActiveActorContext';
-import { SquircleAvatar, LIGHT_HAIRLINE, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import type { ActiveActor } from '@/types/actor';
 
+// Only the trigger chevron is theme-dependent; the sheet is always light.
 const PALETTE = {
   dark: {
     // FeedCard footer is NOT inside .hcp-dark scope, so we can't rely on
     // var(--hcp-t-60) here — resolve to a concrete color.
     chevron: 'rgba(255, 255, 255, 0.7)',
-    rowText: 'var(--hcp-t-100)',
-    activeRowBg: 'var(--hcp-bg-2)',
-    sheetVariant: 'dark' as const,
-    hcpScope: 'hcp-dark',
-    sheetBg: 'var(--hcp-bg-0)',
   },
   light: {
     chevron: '#64748B',
-    rowText: 'var(--hcp-t-100)',
-    activeRowBg: 'var(--hcp-bg-2)',
-    sheetVariant: 'light' as const,
-    hcpScope: 'hcp-light',
-    sheetBg: 'var(--hcp-bg-0)',
   },
 };
 
@@ -99,9 +90,8 @@ export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChang
       <BottomSheet
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
-        variant={c.sheetVariant}
-        className={c.hcpScope}
-        style={{ background: c.sheetBg }}
+        variant="light"
+        style={{ background: '#F8FAFC' }}
       >
         <div
           onClick={(e) => e.stopPropagation()}
@@ -115,7 +105,7 @@ export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChang
               fontWeight: 800,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
-              color: c.rowText,
+              color: '#0F172A',
               fontFeatureSettings: '"kern" 1, "liga" 1',
             }}
           >
@@ -137,12 +127,12 @@ export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChang
                   alignItems: 'center',
                   gap: 12,
                   width: '100%',
-                  background: isActive ? c.activeRowBg : 'transparent',
+                  background: isActive ? 'rgba(15, 23, 42, 0.05)' : 'transparent',
                   border: 'none',
                   padding: 12,
                   borderRadius: 12,
                   cursor: 'pointer',
-                  color: c.rowText,
+                  color: '#0F172A',
                   textAlign: 'left',
                 }}
               >
@@ -152,7 +142,7 @@ export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChang
                   alt={a.name}
                   userId={a.type === 'personal' ? a.id : null}
                   hairlineRing
-                  ringColor={theme === 'dark' ? DARK_HAIRLINE : LIGHT_HAIRLINE}
+                  ringColor={LIGHT_HAIRLINE}
                 />
 
                 <span style={{ fontSize: 15, fontWeight: 600, flex: 1 }}>{a.name}</span>
