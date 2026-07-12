@@ -867,7 +867,7 @@ export function CinematicHeroFullBleed({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 10,
-                padding: '0 18px 4px',
+                padding: '0 18px 3px',
               }}
             >
               <span style={{ width: RANK_W, flexShrink: 0 }} />
