@@ -106,7 +106,7 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
             </div>
           </div>
           <div style={{ overflowY: 'auto', flex: 1, minHeight: 0, background: SURFACE, borderTop: `1px solid ${HAIRLINE_INK_8}`, borderBottom: `1px solid ${HAIRLINE_INK_8}` }}>
-            {moments.map((m, i) => {
+            {list.map((m, i) => {
               const cfg = MOMENT_TYPE_CONFIG[m.moment_type as MomentType] ?? MOMENT_TYPE_CONFIG.highlight;
               return (
                 <div
@@ -114,7 +114,7 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
                   style={{
                     display: 'flex', alignItems: 'flex-start', gap: 10,
                     padding: '11px 18px',
-                    borderBottom: i === moments.length - 1 ? 'none' : `0.5px solid ${HAIRLINE_INK_8}`,
+                    borderBottom: i === list.length - 1 ? 'none' : `0.5px solid ${HAIRLINE_INK_8}`,
                   }}
                 >
                   <div style={{ width: 30, height: 30, borderRadius: 10, background: 'rgba(15,23,42,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 15 }}>
