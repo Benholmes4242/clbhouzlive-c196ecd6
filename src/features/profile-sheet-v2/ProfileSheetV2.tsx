@@ -265,7 +265,7 @@ export default function ProfileSheetV2({
               />
               <SheetNavGroup
                 currentActor={{ id: currentActor.id, type: currentActor.type }}
-                isAdmin={_isAdmin}
+                isAdmin={isAdmin}
                 onNavigate={onNavigate}
               />
               <SignOutRow onNavigate={onNavigate} />
