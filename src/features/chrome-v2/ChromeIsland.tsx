@@ -28,7 +28,7 @@ import React, { useState, useRef, useLayoutEffect } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Search, ArrowLeft, TrendingDown, TrendingUp } from 'lucide-react';
 import { resolveChrome, type ChromeSpec, type ChromeTone } from './registry';
-import { useChromeLeftOverride, useChromeLeftSlot } from './leftOverride';
+import { useChromeLeftOverride, useChromeLeftSlot, useChromeSuppressed } from './leftOverride';
 import { Z } from '@/config/zIndex';
 import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import { PostingAsMenu } from '@/components/header/PostingAsMenu';
