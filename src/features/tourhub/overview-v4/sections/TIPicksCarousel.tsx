@@ -401,7 +401,7 @@ function SheetStateStrip({ state, pick, live }: { state: EventState; pick: AITop
     const thruText = formatThru(live.thru);
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, fontWeight: 700 }}>
-        <span style={{ color: V4.goldMid, ...NUMERAL_THIN, fontSize: 14 }}>{pos}</span>
+        <span style={{ color: V4.inkFaint, fontWeight: 700, fontVariantNumeric: 'tabular-nums', fontSize: 14 }}>{pos}</span>
         <span style={{ color: todayCol, fontVariantNumeric: 'tabular-nums' }}>{todayText}</span>
         {thruText ? <span style={{ color: V4.inkFaint, fontVariantNumeric: 'tabular-nums' }}>· {thruText}</span> : null}
       </div>
