@@ -55,9 +55,14 @@ function verdict(live: PickLiveState | undefined): { hit: boolean; label: string
   return { hit, label: `${hit ? 'HIT' : 'MISS'} · ${posText} · ${scoreText}` };
 }
 
+type SheetState =
+  | null
+  | { kind: 'index' }
+  | { kind: 'case'; pick: AITopContender; from: 'index' | 'card' };
+
 export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props) {
   const { data } = useAIPredictions(tournamentId ?? null);
-  const [open, setOpen] = useState<AITopContender | null>(null);
+  const [sheet, setSheet] = useState<SheetState>(null);
   const picks = data?.topContenders ?? [];
 
   const playerIds = useMemo(() => picks.map((p) => p.playerId).filter(Boolean), [picks]);
@@ -68,13 +73,21 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
 
   if (!tournamentId || picks.length === 0) return null;
 
+  const closeCase = () => {
+    if (sheet?.kind === 'case' && sheet.from === 'index') {
+      setSheet({ kind: 'index' });
+    } else {
+      setSheet(null);
+    }
+  };
+
   return (
-    <SectionShell eyebrow="Tournament intelligence" linkLabel="All picks" onLinkClick={() => setOpen(picks[0] ?? null)}>
+    <SectionShell eyebrow="Tournament intelligence" linkLabel="All picks" onLinkClick={() => setSheet({ kind: 'index' })}>
       <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 16px 10px', scrollPaddingLeft: 16, scrollSnapType: 'x mandatory' }}>
         {picks.slice(0, 8).map((p) => (
           <button
             key={p.playerId}
-            onClick={() => setOpen(p)}
+            onClick={() => setSheet({ kind: 'case', pick: p, from: 'card' })}
             style={{
               flex: '0 0 232px',
               scrollSnapAlign: 'start',
@@ -121,13 +134,24 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
         ))}
       </div>
 
-      {open ? (
-        <CaseSheet
-          pick={open}
+      {sheet?.kind === 'index' ? (
+        <AllPicksSheet
+          picks={picks}
           state={state}
-          live={liveMap?.get(open.playerId)}
           tourCode={tourCode}
-          onClose={() => setOpen(null)}
+          liveMap={liveMap}
+          onPick={(p) => setSheet({ kind: 'case', pick: p, from: 'index' })}
+          onClose={() => setSheet(null)}
+        />
+      ) : null}
+
+      {sheet?.kind === 'case' ? (
+        <CaseSheet
+          pick={sheet.pick}
+          state={state}
+          live={liveMap?.get(sheet.pick.playerId)}
+          tourCode={tourCode}
+          onClose={closeCase}
         />
       ) : null}
     </SectionShell>
@@ -194,6 +218,28 @@ function StateStrip({ state, pick, live }: { state: EventState; pick: AITopConte
   );
 }
 
+function SheetShell({ onClose, maxHeight = '80vh', children }: { onClose: () => void; maxHeight?: string; children: React.ReactNode }) {
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 60 }}>
+      <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.45)' }} />
+      <div
+        style={{
+          position: 'absolute',
+          left: 0, right: 0, bottom: 0,
+          background: V4.surface,
+          borderTopLeftRadius: 22, borderTopRightRadius: 22,
+          padding: '10px 20px 30px',
+          maxHeight,
+          overflowY: 'auto',
+        }}
+      >
+        <div style={{ width: 36, height: 4, background: V4.hairline, borderRadius: 999, margin: '4px auto 14px' }} />
+        {children}
+      </div>
+    </div>
+  );
+}
+
 function CaseSheet({
   pick,
   state,
@@ -208,56 +254,98 @@ function CaseSheet({
   onClose: () => void;
 }) {
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 60 }}>
-      <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.45)' }} />
-      <div
-        style={{
-          position: 'absolute',
-          left: 0, right: 0, bottom: 0,
-          background: V4.surface,
-          borderTopLeftRadius: 22, borderTopRightRadius: 22,
-          padding: '10px 20px 30px',
-          maxHeight: '80vh',
-          overflowY: 'auto',
-        }}
-      >
-        <div style={{ width: 36, height: 4, background: V4.hairline, borderRadius: 999, margin: '4px auto 14px' }} />
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
-          <PlayerAvatar playerId={pick.playerId} playerName={pick.playerName} tourCode={tourCode} photoUrl={pick.photoUrl} size="md" ringColor={LIGHT_HAIRLINE} />
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-              <span style={{ fontSize: 10.5, fontWeight: 800, color: V4.amber, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-                The case for
-              </span>
-              <span style={{ fontSize: 22, color: V4.goldMid, ...NUMERAL_THIN }}>#{pick.rank}</span>
-            </div>
-            <h2 style={{ fontSize: 22, fontWeight: 800, color: V4.ink, margin: '2px 0 0', letterSpacing: '-0.025em' }}>
-              {pick.playerName}
-            </h2>
-            <div style={{ marginTop: 6 }}>
-              <SheetStateStrip state={state} pick={pick} live={live} />
-            </div>
+    <SheetShell onClose={onClose}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
+        <PlayerAvatar playerId={pick.playerId} playerName={pick.playerName} tourCode={tourCode} photoUrl={pick.photoUrl} size="md" ringColor={LIGHT_HAIRLINE} />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+            <span style={{ fontSize: 10.5, fontWeight: 800, color: V4.amber, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+              The case for
+            </span>
+            <span style={{ fontSize: 22, color: V4.goldMid, ...NUMERAL_THIN }}>#{pick.rank}</span>
+          </div>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: V4.ink, margin: '2px 0 0', letterSpacing: '-0.025em' }}>
+            {pick.playerName}
+          </h2>
+          <div style={{ marginTop: 6 }}>
+            <SheetStateStrip state={state} pick={pick} live={live} />
           </div>
         </div>
-        {pick.pulledQuote ? (
-          <div style={{ fontSize: 14, color: V4.inkSoft, lineHeight: 1.5, marginBottom: 14 }}>{pick.pulledQuote}</div>
-        ) : null}
-        {(pick.reasons ?? []).map((r, i) => (
-          <div key={i} style={{ display: 'flex', gap: 12, padding: '12px 0', borderTop: `0.5px solid ${V4.hairline}` }}>
-            <div style={{ fontSize: 11, fontWeight: 800, color: V4.amber, minWidth: 22, letterSpacing: '0.08em' }}>{String(i + 1).padStart(2, '0')}</div>
-            <div style={{ flex: 1, fontSize: 13, color: V4.ink, lineHeight: 1.5 }}>{r}</div>
-          </div>
-        ))}
-        {pick.concern ? (
-          <div style={{ marginTop: 16, padding: 12, background: V4.amberSoft, borderRadius: 10, fontSize: 12, color: V4.ink }}>
-            <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.14em', color: V4.amber, textTransform: 'uppercase', marginBottom: 4 }}>
-              Concern
-            </div>
-            {pick.concern}
-          </div>
-        ) : null}
       </div>
-    </div>
+      {pick.pulledQuote ? (
+        <div style={{ fontSize: 14, color: V4.inkSoft, lineHeight: 1.5, marginBottom: 14 }}>{pick.pulledQuote}</div>
+      ) : null}
+      {(pick.reasons ?? []).map((r, i) => (
+        <div key={i} style={{ display: 'flex', gap: 12, padding: '12px 0', borderTop: `0.5px solid ${V4.hairline}` }}>
+          <div style={{ fontSize: 11, fontWeight: 800, color: V4.amber, minWidth: 22, letterSpacing: '0.08em' }}>{String(i + 1).padStart(2, '0')}</div>
+          <div style={{ flex: 1, fontSize: 13, color: V4.ink, lineHeight: 1.5 }}>{r}</div>
+        </div>
+      ))}
+      {pick.concern ? (
+        <div style={{ marginTop: 16, padding: 12, background: V4.amberSoft, borderRadius: 10, fontSize: 12, color: V4.ink }}>
+          <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.14em', color: V4.amber, textTransform: 'uppercase', marginBottom: 4 }}>
+            Concern
+          </div>
+          {pick.concern}
+        </div>
+      ) : null}
+    </SheetShell>
+  );
+}
+
+function AllPicksSheet({
+  picks,
+  state,
+  tourCode,
+  liveMap,
+  onPick,
+  onClose,
+}: {
+  picks: AITopContender[];
+  state: EventState;
+  tourCode: string;
+  liveMap: Map<string, PickLiveState> | undefined;
+  onPick: (p: AITopContender) => void;
+  onClose: () => void;
+}) {
+  return (
+    <SheetShell onClose={onClose} maxHeight="70vh">
+      <div style={{ marginBottom: 10 }}>
+        <div style={{ fontSize: 15.5, fontWeight: 800, color: V4.ink, letterSpacing: '-0.015em' }}>The board</div>
+        <div style={{ fontSize: 10.5, fontWeight: 700, color: V4.inkMute, letterSpacing: '0.04em', marginTop: 2 }}>
+          {picks.length} picks · tap for the case
+        </div>
+      </div>
+      <div>
+        {picks.map((p, i) => (
+          <button
+            key={p.playerId}
+            onClick={() => onPick(p)}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              padding: '10px 0',
+              borderTop: i === 0 ? 'none' : `0.5px solid ${V4.hairline}`,
+              background: 'transparent',
+              border: 'none',
+              textAlign: 'left',
+              cursor: 'pointer',
+            }}
+          >
+            <span style={{ fontSize: 18, color: V4.goldMid, ...NUMERAL_THIN, minWidth: 22, textAlign: 'right' }}>{p.rank}</span>
+            <PlayerAvatar playerId={p.playerId} playerName={p.playerName} tourCode={tourCode} photoUrl={p.photoUrl} size="sm" ringColor={LIGHT_HAIRLINE} />
+            <div style={{ flex: 1, minWidth: 0, fontSize: 13.5, fontWeight: 700, color: V4.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {p.playerName}
+            </div>
+            <div style={{ flexShrink: 0 }}>
+              <SheetStateStrip state={state} pick={p} live={liveMap?.get(p.playerId)} />
+            </div>
+          </button>
+        ))}
+      </div>
+    </SheetShell>
   );
 }
 
