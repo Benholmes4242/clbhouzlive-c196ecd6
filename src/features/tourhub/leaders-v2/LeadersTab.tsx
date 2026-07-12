@@ -206,7 +206,7 @@ export function LeadersTab() {
           ))}
         </div>
       ) : categories.length === 0 ? (
-        <TourHubEmptyState variant="leaders" />
+        <TourHubEmptyState variant="leaderboard" />
       ) : (
         <div style={{ paddingBottom: 40 }}>
           {categories.map((cat) => (
