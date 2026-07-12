@@ -3,7 +3,7 @@ export * from './TourSwitcherPills';
 export * from './StatusChip';
 export * from './LastUpdatedPill';
 export * from './EventCard';
-export * from './MiniLeaderboard';
+
 export * from './PremiumEmptyState';
 export * from './ErrorState';
 export * from './skeletons';
