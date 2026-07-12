@@ -115,15 +115,12 @@ export const CHROME_REGISTRY: ChromeRule[] = [
     spec: { chrome: 'none', tone: 'light', bleed: false },
   },
 
-  // Course detail: /courses/:courseId (exactly 3 segments) — FloatingPageHeader owns it.
+  // All courses sub-routes are page-owned today (isConditionallyExcluded).
+  // The detail page renders its own FloatingPageHeader; other sub-pages are
+  // similarly excluded from the global chrome.
   {
-    match: {
-      test: (p) => p.startsWith('/courses/') && p.split('/').length === 3,
-    },
-    // Legacy CompactHeader would treat this as a back-arrow route with editorial
-    // geometry — but globalHeaderRules excludes it (page owns chrome). Encode as
-    // 'none' + immersive to match today's runtime.
-    spec: { chrome: 'none', tone: 'light', bleed: true, note: EDITORIAL_NOTE },
+    match: { prefix: '/courses/' },
+    spec: { chrome: 'none', tone: 'light', bleed: true, note: 'all courses subroutes excluded today (isConditionallyExcluded); detail page owns FloatingPageHeader' },
   },
 
   // ── ISLAND routes ────────────────────────────────────────────────────────
@@ -177,9 +174,10 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   // Tour Hub top-level (logo + editorial geometry; cinematic overlay on overview).
   { match: { exact: '/tourhub' },                 spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'light', bleed: true,  note: EDITORIAL_NOTE } },
   { match: { exact: '/tour' },                    spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'light', bleed: true,  note: EDITORIAL_NOTE } },
-  // Remaining /tourhub/* sub-tabs and /tour/* aliases (not deep) — logo + editorial.
-  { match: { prefix: '/tourhub/' },               spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'light', bleed: true,  note: EDITORIAL_NOTE } },
-  { match: { prefix: '/tour/' },                  spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'light', bleed: true,  note: EDITORIAL_NOTE } },
+  // Remaining /tourhub/* sub-tabs and /tour/* aliases (not deep) — page owns
+  // chrome today (isConditionallyExcluded); only the exact hubs above stay island.
+  { match: { prefix: '/tourhub/' },               spec: { chrome: 'none', tone: 'light', bleed: true, note: 'other tour subpages immersive/page-owned today (isConditionallyExcluded)' } },
+  { match: { prefix: '/tour/' },                  spec: { chrome: 'none', tone: 'light', bleed: true, note: 'other tour subpages immersive/page-owned today (isConditionallyExcluded)' } },
 
   // Watch sub-pages: back to /watch's caller.
   { match: { exact: '/watch/videos' },            spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history' }, tone: 'light', bleed: false } },
