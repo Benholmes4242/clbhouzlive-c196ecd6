@@ -59,7 +59,11 @@ export function useSocialListV2({
   pageSize = PAGE_SIZE,
 }: SocialListParams) {
   return useInfiniteQuery({
-    queryKey: ['social-list-v2', actorType, actorId, direction, filter],
+    // viewerId is part of the key: get_social_list emits per-viewer
+    // friend_status / viewer_follows / mutuals, so caches from a different
+    // viewer (or from a pre-session render where viewerId was undefined)
+    // must NEVER be reused when the session user resolves.
+    queryKey: ['social-list-v2', viewerId ?? null, actorType, actorId, direction, filter],
     enabled: !!actorId,
     initialPageParam: 0,
     staleTime: 60_000,
@@ -69,6 +73,7 @@ export function useSocialListV2({
         p_profile_actor_type: actorType,
         p_profile_actor_id: actorId,
         p_direction: direction,
+        // Session user only — never the profile owner, never a business actor.
         p_viewer_id: viewerId ?? null,
         p_filter: filter,
         p_page_size: pageSize,
@@ -84,6 +89,7 @@ export function useSocialListV2({
   });
 }
 
+
 /**
  * Two page-size-1 reads for the tab counts. We can't derive them from
  * page 0 of the primary query alone because that hook only knows one
@@ -95,9 +101,13 @@ export function useSocialListCounts(
   viewerId: string | undefined,
 ) {
   return useQuery({
-    queryKey: ['social-list-v2-counts', actorType, actorId],
+    // viewerId in the key — mutual_count in the count row is viewer-scoped
+    // even though totals are not, and this guarantees we never serve a
+    // pre-session cached zero after login.
+    queryKey: ['social-list-v2-counts', viewerId ?? null, actorType, actorId],
     enabled: !!actorId,
     staleTime: 60_000,
+
     queryFn: async () => {
       if (!actorId) return { followers: 0, following: 0 };
       const [f, g] = await Promise.all([
