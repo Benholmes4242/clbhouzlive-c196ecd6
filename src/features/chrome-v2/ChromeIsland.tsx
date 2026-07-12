@@ -28,7 +28,7 @@ import React, { useState, useRef, useLayoutEffect } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Search, ArrowLeft, TrendingDown, TrendingUp } from 'lucide-react';
 import { resolveChrome, type ChromeSpec, type ChromeTone } from './registry';
-import { useChromeLeftOverride } from './leftOverride';
+import { useChromeLeftOverride, useChromeLeftSlot } from './leftOverride';
 import { Z } from '@/config/zIndex';
 import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import { PostingAsMenu } from '@/components/header/PostingAsMenu';
@@ -82,9 +82,24 @@ function canvasFor(tone: ChromeTone): string {
 const LeftCapsule: React.FC<{
   spec: ChromeSpec;
   override: ReturnType<typeof useChromeLeftOverride>;
-}> = ({ spec, override }) => {
+  slot: ReturnType<typeof useChromeLeftSlot>;
+}> = ({ spec, override, slot }) => {
   const navigate = useNavigate();
   const tone = spec.tone;
+
+  // Slot wins over back-override AND the registry rule.
+  if (slot) {
+    return (
+      <div
+        style={{
+          ...glassStyle(tone),
+          padding: '0 14px 0 13px',
+        }}
+      >
+        {slot}
+      </div>
+    );
+  }
 
   // Override wins over the registry rule (when non-null).
   if (spec.left?.kind === 'back' || override) {
