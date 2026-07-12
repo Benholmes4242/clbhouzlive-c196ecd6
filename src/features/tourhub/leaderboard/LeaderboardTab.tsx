@@ -71,7 +71,7 @@ function StatusChip({
           aria-hidden
           style={{ width: 5, height: 5, borderRadius: '50%', background: '#fff' }}
         />
-        R{currentRound ?? 1} \u00B7 IN PROGRESS
+        {`R${currentRound ?? 1} \u00B7 IN PROGRESS`}
       </span>
     );
   }
