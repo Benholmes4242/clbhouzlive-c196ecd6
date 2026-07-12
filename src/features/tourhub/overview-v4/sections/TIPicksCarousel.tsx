@@ -10,10 +10,44 @@ import { V4, NUMERAL_THIN } from '../tokens';
 import type { EventState } from '../data/useTourEventContext';
 import type { AITopContender } from '../../hooks/useAIPredictions';
 import { usePickLiveState, type PickLiveState } from '../data/usePickLiveState';
+import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 
 interface Props {
   tournamentId: string | undefined;
   state: EventState;
+  tourCode?: string;
+}
+
+function Avatar({ name, tourCode, size }: { name: string; tourCode: string; size: number }) {
+  const url = name ? getPlayerHeadshotUrl(name, tourCode) : null;
+  const parts = (name || '').trim().split(/\s+/);
+  const inits = parts.length === 0
+    ? '?'
+    : (parts.length === 1 ? parts[0].slice(0, 2) : parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  return (
+    <div
+      style={{
+        position: 'relative',
+        width: size, height: size, borderRadius: '34%',
+        background: '#15171F',
+        border: `0.5px solid ${V4.hairline}`,
+        flexShrink: 0,
+        overflow: 'hidden',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        color: V4.amber, fontSize: Math.max(9, Math.round(size * 0.32)), fontWeight: 800, letterSpacing: '0.02em',
+      }}
+    >
+      <span>{inits}</span>
+      {url ? (
+        <img
+          src={url}
+          alt=""
+          onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+        />
+      ) : null}
+    </div>
+  );
 }
 
 // ---- Shared formatting helpers ----
