@@ -308,7 +308,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
       <ConnectHandicapCue variant="champions" courseName={ctx.courseName} />
 
       {autoSwitchedToAllTime && window === 'all_time' && (
-        <div style={{ padding: '0 16px 8px' }}>
+        <div style={{ padding: '0 16px 12px' }}>
           <span style={{ fontFamily: 'Geist, system-ui, sans-serif', fontSize: 11.5, fontWeight: 600, color: 'var(--hcp-t-60)', letterSpacing: '-0.005em' }}>
             No rounds in the last 90 days — showing all-time legends.
           </span>
@@ -316,7 +316,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
       )}
 
       {isLoading && (
-        <div style={{ padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
           {[0, 1, 2].map((i) => (
             <Skeleton key={i} height={120} radius={12} />
           ))}
@@ -324,7 +324,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
       )}
 
       {isError && (
-        <div style={{ padding: '20px 16px' }}>
+        <div style={{ padding: '16px' }}>
           <RetryStub message="Couldn't load Course Legends" onRetry={() => refetch()} />
         </div>
       )}
@@ -335,7 +335,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
 
       {!isLoading && !isError && (data ?? []).length > 0 && !activeWindowHasData && (
         <>
-          <div style={{ padding: '14px 16px 4px' }}>
+          <div style={{ padding: '16px 16px 4px' }}>
             <WindowToggle window={window} setWindow={handleWindowChange} />
           </div>
           <ChampionsWindowEmptyState

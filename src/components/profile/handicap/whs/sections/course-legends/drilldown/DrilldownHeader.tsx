@@ -64,6 +64,7 @@ export const DrilldownHeader: React.FC<Props> = ({
           alignItems: 'center',
           gap: 5,
           padding: '5px 11px',
+          marginBottom: 6,
           borderRadius: 999,
           background: 'rgba(0,0,0,0.45)',
           border: '1px solid rgba(255,255,255,0.12)',
@@ -91,7 +92,7 @@ export const DrilldownHeader: React.FC<Props> = ({
       />
       <h1
         className="text-[22px] md:text-[28px] font-extrabold tracking-[-0.3px] text-white drop-shadow-2xl"
-        style={{ lineHeight: 1.15, marginTop: 5, marginBottom: 4 }}
+        style={{ lineHeight: 1.15, marginBottom: 6 }}
       >
         {state.courseName}
       </h1>

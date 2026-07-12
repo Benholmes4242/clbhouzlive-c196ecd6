@@ -258,8 +258,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
               alignItems: 'center',
               gap: 8,
               padding: '0 16px',
-              marginTop: -4,
-              marginBottom: 13,
+              marginBottom: 12,
               flexShrink: 0,
               flexWrap: 'wrap',
             }}
@@ -313,9 +312,9 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
         <div
           style={{
             display: 'flex',
-            gap: 7,
+            gap: 8,
             overflowX: 'auto',
-            padding: '0 16px 14px',
+            padding: '0 16px 12px',
             background: SURFACE,
             borderBottom: `0.5px solid ${HAIRLINE}`,
             scrollbarWidth: 'none',
@@ -527,7 +526,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
           ) : standsAlone ? (
             <div
               style={{
-                padding: '26px 18px',
+                padding: '24px 16px',
                 textAlign: 'center',
                 color: INK_55,
                 fontSize: 12.5,
@@ -570,7 +569,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
           {totalForActive > 0 && (
             <div
               style={{
-                padding: '12px 18px 20px',
+                padding: '12px 16px',
                 paddingBottom: 'calc(20px + env(safe-area-inset-bottom, 0px))',
                 textAlign: 'center',
                 fontSize: 10.5,

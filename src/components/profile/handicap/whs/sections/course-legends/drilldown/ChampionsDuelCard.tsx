@@ -248,8 +248,8 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
         border: '0.5px solid var(--hcp-line)',
         borderTop: defending ? `2px solid ${GOLD}` : '0.5px solid var(--hcp-line)',
         borderRadius: 16,
-        padding: '14px 16px',
-        margin: '0 16px 10px',
+        padding: '12px 16px',
+        margin: '0 16px 12px',
         boxShadow: '0 1px 3px rgba(15,23,42,0.04)',
       }}
     >

@@ -8,7 +8,7 @@ const SLATE = 'var(--hcp-t-60)';
 
 /** No legends in ANY window — the true empty. */
 export const ChampionsEmptyState: React.FC<{ courseName: string | null }> = ({ courseName }) => (
-  <div style={{ padding: '44px 28px 48px', textAlign: 'center', fontFamily: GAM.FONT_GEIST }}>
+  <div style={{ padding: '40px 24px 32px', textAlign: 'center', fontFamily: GAM.FONT_GEIST }}>
     <EmptyStateTile tint="amber">
       <Crown size={30} color={GAM.AMBER} strokeWidth={1.8} />
     </EmptyStateTile>
@@ -49,7 +49,7 @@ export const ChampionsWindowEmptyState: React.FC<{
   window: '90d' | 'all_time';
   onSwitch: () => void;
 }> = ({ window, onSwitch }) => (
-  <div style={{ padding: '40px 28px 44px', textAlign: 'center', fontFamily: GAM.FONT_GEIST }}>
+  <div style={{ padding: '40px 24px 32px', textAlign: 'center', fontFamily: GAM.FONT_GEIST }}>
     <EmptyStateTile tint="slate">
       <Crown size={30} color="var(--hcp-t-60)" strokeWidth={1.8} />
     </EmptyStateTile>
@@ -65,7 +65,7 @@ export const ChampionsWindowEmptyState: React.FC<{
     >
       {window === '90d' ? 'No legends in the last 90 days' : 'No all-time legends yet'}
     </div>
-    <div style={{ fontSize: 13.5, color: SLATE, lineHeight: 1.55, maxWidth: 290, margin: '0 auto 18px' }}>
+    <div style={{ fontSize: 13.5, color: SLATE, lineHeight: 1.55, maxWidth: 290, margin: '0 auto 16px' }}>
       {window === '90d'
         ? 'No rounds posted here recently — but the all-time leaderboards are stacked.'
         : 'Nothing in this window yet.'}

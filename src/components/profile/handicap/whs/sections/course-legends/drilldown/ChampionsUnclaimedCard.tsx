@@ -26,7 +26,7 @@ export const ChampionsUnclaimedCard: React.FC<ChampionsUnclaimedCardProps> = ({
         border: '1.5px dashed var(--hcp-dash)',
         borderRadius: 16,
         padding: 16,
-        margin: '0 16px 10px',
+        margin: '0 16px 12px',
         background: 'var(--hcp-tint-3)',
         textAlign: 'center',
       }}
