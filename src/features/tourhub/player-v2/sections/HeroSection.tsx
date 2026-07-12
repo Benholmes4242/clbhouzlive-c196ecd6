@@ -1,7 +1,7 @@
 /**
  * HeroSection — dark cinematic identity band.
  *
- * ~210px tall (+ safe-area). Gradient #2a3542 → #0a0e14. The identity IS
+ * ~210px tall (+ safe-area). Gradient #262B33 → #15171F. The identity IS
  * the image — no course photo. 74px avatar squircle w/ white-alpha ring,
  * eyebrow "{TOUR} · {flag} {COUNTRY}", name 23/800, meta row surfaces
  * only what actually exists on the DB row (world_rank, fedex_rank).
@@ -13,9 +13,10 @@ import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar
 import { titleCaseCountry } from '../../utils/countryFlags';
 import { TOUR_LABEL } from '../../_shared/tourOrder';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
-import { WHITE_ALPHA_18, WHITE_ALPHA_55, WHITE_ALPHA_65 } from '../../_shared/tokens';
+import { CHARCOAL, WHITE_ALPHA_18, WHITE_ALPHA_55, WHITE_ALPHA_65 } from '../../_shared/tokens';
 
 interface HeroSectionProps {
+
   player: TourPlayer;
   playerStats: TourPlayerStatistics | null;
 }
@@ -42,10 +43,11 @@ export function HeroSection({ player, playerStats }: HeroSectionProps) {
   return (
     <div
       style={{
-        background: 'linear-gradient(180deg, #2a3542 0%, #0a0e14 100%)',
+        background: `linear-gradient(180deg, #262B33 0%, ${CHARCOAL} 100%)`,
         paddingTop: 'calc(var(--chrome-total-h, 0px) + 8px)',
         paddingBottom: 22,
       }}
+
     >
       <div style={{ padding: '10px 20px 0', display: 'flex', gap: 16, alignItems: 'flex-end' }}>
         <SquircleAvatar
