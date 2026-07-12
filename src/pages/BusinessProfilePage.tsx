@@ -42,7 +42,7 @@ import { BusinessTeamTab } from '@/components/business/BusinessTeamTab';
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
 
 import PostsTabContent from '@/components/posts-tab/PostsTabContent';
-import FloatingPageHeader from '@/components/header/FloatingPageHeader';
+// FloatingPageHeader removed (H3) — chrome now driven by ChromeIsland registry.
 
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
@@ -449,11 +449,7 @@ const BusinessProfilePage: React.FC = () => {
 
 
 
-        {/* Floating header — canonical glass control row under the notch */}
-        <FloatingPageHeader
-          onBack={() => navigate('/clubhouse')}
-          showHandicap={!!user}
-        />
+        {/* H3: header rendered globally by ChromeIsland (business 3-seg → back '/clubhouse'). */}
 
         {/* Avatar (squircle) — owner: tap to upload; visitor: tap to lightbox */}
         {/* Canon exception: 2px bg-background die-cut ring over the cover photo — */}

@@ -25,7 +25,7 @@ import { useWhsConnection } from '@/lib/whs/hooks';
 import WhsHandicapTab from '@/components/profile/handicap/whs/WhsHandicapTab';
 import HandicapDashboard from '@/components/profile/handicap/whs/HandicapDashboard';
 
-import FloatingPageHeader from '@/components/header/FloatingPageHeader';
+// FloatingPageHeader removed (H3) — chrome now driven by ChromeIsland registry.
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { safeGoBack } from '@/utils/navigation';
 import SegmentedControl from '@/components/discover/SegmentedControl';
@@ -470,7 +470,7 @@ const HandicapPage: React.FC = () => {
 
   return (
     <PageRoot dark={true} style={{ background: 'var(--hcp-bg-0)' }}>
-      <FloatingPageHeader onBack={() => safeGoBack(navigate, '/profile')} showHandicap={false} />
+      {/* H3: header rendered globally by ChromeIsland (dark, hideHcp, /profile fallback). */}
       <main style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 56px)' }}>
         <HandicapPageHeader
           ownerUserId={ownerUserId}
