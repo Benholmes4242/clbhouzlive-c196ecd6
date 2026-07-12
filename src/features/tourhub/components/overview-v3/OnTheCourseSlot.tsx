@@ -11,7 +11,7 @@
  */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useTourSelection } from '@/features/tourhub/hooks/useTourSelection';
+import { useTourSelection } from '@/features/tourhub/context/TourSelectionContext';
 import { OnTheCourse } from '@/features/tourhub/overview-v4/sections/OnTheCourse';
 
 const LIVE_STATUSES = new Set([
