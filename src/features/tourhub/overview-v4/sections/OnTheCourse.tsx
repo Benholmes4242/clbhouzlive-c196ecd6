@@ -40,6 +40,18 @@ function parseGroups(raw: unknown): GroupShape[] {
   return [];
 }
 
+function parseRoundNumber(raw: unknown): number | null {
+  if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+    const r = (raw as Record<string, unknown>).round_number;
+    if (typeof r === 'number' && Number.isFinite(r)) return r;
+    if (typeof r === 'string') {
+      const n = Number(r);
+      if (Number.isFinite(n)) return n;
+    }
+  }
+  return null;
+}
+
 function initials(name: string): string {
   const parts = name.trim().split(/\s+/);
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
