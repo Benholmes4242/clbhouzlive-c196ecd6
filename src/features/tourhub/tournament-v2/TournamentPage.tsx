@@ -24,7 +24,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { format, differenceInCalendarDays } from 'date-fns';
 import { TourHubShell } from '../components/TourHubShell';
-import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
+import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 
 import { useTournamentMeta } from '../leaderboard/useTournamentMeta';
 import { useTourLeaderboard } from '../hooks/useTourHubData';
