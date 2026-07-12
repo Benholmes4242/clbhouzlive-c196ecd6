@@ -97,26 +97,24 @@ export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
     );
   }
 
+  // current-index from useHandicapTrend (default 30d window) — mirrors the
+  // page: the hero shows the trend row deltas from history90, but the current
+  // index is the authoritative value from the trend hook.
   const current = trend?.current;
-  const prev = (trend as any)?.previousHandicap ?? null;
   let trendNode: React.ReactNode = null;
-  if (typeof current === 'number' && typeof prev === 'number') {
-    const delta = Math.round((current - prev) * 10) / 10;
-    if (delta < 0) {
-      trendNode = (
-        <span style={{ fontWeight: 700, fontSize: 11.5, color: GREEN, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
-          <span style={{ fontSize: 9 }}>{'\u25BC'}</span>
-          {Math.abs(delta).toFixed(1)}
-        </span>
-      );
-    } else if (delta > 0) {
-      trendNode = (
-        <span style={{ fontWeight: 700, fontSize: 11.5, color: RED, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
-          <span style={{ fontSize: 9 }}>{'\u25B2'}</span>
-          {delta.toFixed(1)}
-        </span>
-      );
-    }
+  // Thresholds match HeroHandicapCardDark TrendRow: improved < -0.05 (green),
+  // drifted > 0.05 (red), else neutral/omitted.
+  const improved = delta90 != null && delta90 < -0.05;
+  const drifted = delta90 != null && delta90 > 0.05;
+  if (improved || drifted) {
+    const sign = delta90! < 0 ? '-' : '+';
+    const formatted = `${sign}${Math.abs(delta90!).toFixed(1)}`;
+    trendNode = (
+      <span style={{ fontWeight: 700, fontSize: 11.5, color: improved ? GREEN : RED, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+        <span style={{ fontSize: 9 }}>{improved ? '\u25BC' : '\u25B2'}</span>
+        {formatted}
+      </span>
+    );
   }
 
   const indexText = typeof current === 'number'
