@@ -37,7 +37,7 @@ export const CrownCabinet: React.FC<CrownCabinetProps> = ({
         background: 'var(--hcp-bg-1)',
         border: '0.5px solid var(--hcp-line)',
         borderRadius: 16,
-        padding: '14px 16px',
+        padding: '12px 16px',
       }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginBottom: 6 }}>
