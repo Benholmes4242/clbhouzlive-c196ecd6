@@ -182,7 +182,7 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId, viewMode = 'ow
       />
 
 
-      <div style={{ padding: '0 20px' }}>
+      <div style={{ padding: '0 16px' }}>
       {!isLoading && rounds.length > 0 && (
         <FilterChips
           filter={filter}
@@ -322,7 +322,7 @@ const FilterChips: React.FC<FilterChipsProps> = ({
 }) => (
   <div
     style={{
-      marginTop: 14,
+      marginTop: 12,
       display: 'flex',
       gap: 6,
       overflowX: 'auto',
@@ -468,9 +468,9 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap }) => {
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: 13,
+        gap: 12,
         width: '100%',
-        padding: '11px 13px',
+        padding: '12px 14px',
         background: T.cardBg,
         border: '1px solid var(--hcp-line)',
         borderRadius: 14,
@@ -619,7 +619,7 @@ const EmptyState: React.FC<{ viewMode?: 'owner' | 'friend'; ownerFirstName?: str
     <div
       style={{
         marginTop: 24,
-        padding: '28px 16px',
+        padding: '32px 16px',
         textAlign: 'center',
       }}
     >

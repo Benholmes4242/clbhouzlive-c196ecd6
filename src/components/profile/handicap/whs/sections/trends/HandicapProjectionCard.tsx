@@ -74,7 +74,7 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
   if (prediction.insufficientData) {
     return (
       <div style={SECTION_STYLE}>
-        <div style={{ padding: '24px 20px 28px', textAlign: 'center' }}>
+        <div style={{ padding: '24px 16px 24px', textAlign: 'center' }}>
           <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: T.ink, fontFamily: FONT }}>
             Add a few more rounds
           </p>
@@ -90,17 +90,17 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
 
   return (
     <div style={SECTION_STYLE}>
-      <div style={{ padding: '0 20px' }}>
+      <div style={{ padding: '0 16px' }}>
         {/* CHART CARD with verdict halo */}
         <div
           style={{
             position: 'relative',
-            padding: '20px 16px 16px',
+            padding: '16px',
             background: 'var(--hcp-bg-1)',
             border: '1px solid var(--hcp-line-2)',
             borderRadius: 12,
             overflow: 'hidden',
-            marginBottom: 14,
+            marginBottom: 12,
           }}
         >
           {/* Verdict halo backdrop */}
@@ -294,7 +294,7 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
 
 
 const SECTION_STYLE: React.CSSProperties = {
-  marginBottom: 28,
+  marginBottom: 24,
   fontFamily: FONT,
 };
 

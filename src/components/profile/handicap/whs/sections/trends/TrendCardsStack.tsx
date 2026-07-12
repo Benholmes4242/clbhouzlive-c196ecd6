@@ -60,7 +60,7 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, userId, current
   return (
     <section style={{ padding: '0 16px', marginTop: 32, fontFamily: FONT }}>
       {splitAt !== 'rest' && (showHero ? (
-        <div style={{ padding: '0 0 10px' }}>
+        <div style={{ padding: '0 0 12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 6 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span
@@ -245,7 +245,7 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, userId, current
               height: h,
               background: 'var(--hcp-bg-2)',
               borderRadius: 16,
-              marginBottom: 14,
+              marginBottom: 12,
             }}
           />
         ))

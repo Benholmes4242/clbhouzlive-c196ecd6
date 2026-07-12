@@ -101,7 +101,7 @@ const ViewToggle: React.FC<{
     style={{
       display: 'flex',
       padding: 4,
-      marginTop: 14,
+      marginTop: 12,
       marginBottom: 4,
       background: T.slateTint,
       borderRadius: 10,
@@ -206,7 +206,7 @@ const CourseRow: React.FC<{
         }}
       >
         {/* Header row: rank + thumb + name/meta + value */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <span
             style={{
               fontSize: 13, fontWeight: 800, color: T.ink40,
@@ -296,7 +296,7 @@ const CourseRow: React.FC<{
             background: 'var(--hcp-bg-2)',
             borderRadius: 5,
             overflow: 'hidden',
-            marginTop: 10,
+            marginTop: 12,
           }}
           aria-label={
             isMostPlayed
@@ -340,7 +340,7 @@ const CourseRow: React.FC<{
       style={{
         display: 'flex',
         gap: 10,
-        padding: '10px 10px 10px 13px',
+        padding: '10px 10px 10px 12px',
         background: T.cardBg,
         border: `1px solid ${T.hairline}`,
         borderRadius: 12,
@@ -531,7 +531,7 @@ const CourseList: React.FC<{ courses: CourseForm[]; view: ViewKey; emptyCopy?: s
         ? `Need at least ${MIN_ROUNDS_FOR_TOUGHEST} rounds at a course to identify your toughest. Play a few more.`
         : 'Add a few rounds to see this view.';
     return (
-      <div style={{ padding: '24px 16px 28px', textAlign: 'center' }}>
+      <div style={{ padding: '24px 16px 24px', textAlign: 'center' }}>
         <p style={{ margin: 0, fontSize: 12, color: T.inkMute, lineHeight: 1.55, fontFamily: FONT }}>
           {emptyCopy ?? fallback}
         </p>
@@ -620,19 +620,19 @@ export const CourseFormCard: React.FC<Props> = ({
   if (isLoading) {
     return (
       <section style={sectionStyle}>
-        <SectionHeader surface="dark" kicker="COURSE FORM" title={courseTitle} paddingX={20} />
-        <div style={{ padding: '0 20px' }}>
+        <SectionHeader surface="dark" kicker="COURSE FORM" title={courseTitle} paddingX={16} />
+        <div style={{ padding: '0 16px' }}>
           <div
             className="animate-pulse"
             style={{
-              marginTop: 14,
+              marginTop: 12,
               marginBottom: 4,
               height: 36,
               background: T.slateTint,
               borderRadius: 10,
             }}
           />
-          <div style={{ paddingTop: 14, paddingBottom: 16 }}>
+          <div style={{ paddingTop: 12, paddingBottom: 16 }}>
             {Array.from({ length: 3 }).map((_, i) => (
               <div
                 key={i}
@@ -658,9 +658,9 @@ export const CourseFormCard: React.FC<Props> = ({
           surface="dark"
           kicker="COURSE FORM"
           title={courseTitle}
-          paddingX={20}
+          paddingX={16}
         />
-        <div style={{ padding: '24px 20px 28px', textAlign: 'center' }}>
+        <div style={{ padding: '24px 16px 24px', textAlign: 'center' }}>
           <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: T.ink, fontFamily: FONT }}>
             Add some rounds to get started
           </p>
@@ -674,8 +674,8 @@ export const CourseFormCard: React.FC<Props> = ({
 
   return (
     <section style={sectionStyle}>
-      <SectionHeader surface="dark" kicker="COURSE FORM" title={courseTitle} paddingX={20} />
-      <div style={{ padding: '0 20px' }}>
+      <SectionHeader surface="dark" kicker="COURSE FORM" title={courseTitle} paddingX={16} />
+      <div style={{ padding: '0 16px' }}>
         <ViewToggle activeView={activeView} onChange={setActiveView} />
         <CourseList
           courses={courses}
@@ -716,7 +716,7 @@ export const CourseFormCard: React.FC<Props> = ({
               style={{
                 marginTop: 4,
                 marginBottom: 16,
-                padding: '10px 12px',
+                padding: '12px',
                 background: T.slateTint,
                 borderRadius: 10,
               }}
