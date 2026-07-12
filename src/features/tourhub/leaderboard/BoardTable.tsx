@@ -1,21 +1,23 @@
 /**
  * BoardTable — Tour Book leaderboard rows.
  *
- * Columns: POS(46, left) | PLAYER(flex) | TOT(44, center) | THRU(44, center) | TODAY(44, center)
- * Header rendered by parent (LeaderboardTab); this component renders only rows.
+ * Columns: POS(26) + MOVE(20) = 46 left | PLAYER(flex) | TOT(44) | THRU(44) | TODAY(44)
+ * Header rendered by parent (LeaderboardTab) with a single 46px POS
+ * label; the delta lives inside that footprint so the outer layout
+ * is unchanged.
  *
  * House score colors:
  *   under par -> #189A55
  *   over par  -> #C24A4A
  *   E/level   -> #8A9099
  *
- * MOVEMENT COLUMN (v1: OMITTED — no data source).
- * When prior_position lands on sr_leaderboards, a movement delta
- * sub-column will be reintroduced as a FIXED-WIDTH slot immediately
- * to the right of POS. The slot must be sized independently of POS
- * so that deltas (▲2, ▼1, —) are vertically aligned across all
- * rows regardless of position width (single digit, double digit,
- * or T-prefixed). Do NOT bake the delta into the POS column.
+ * MOVEMENT COLUMN (live — computed round-start deltas).
+ * POS is a two-slot cell: position (T-prefixed) in a 26px slot,
+ * delta in an adjacent 20px slot. That guarantees deltas ('UP N' /
+ * 'DN N') sit on the same vertical line whether the position is '1'
+ * or 'T44'. Deltas come from movementFromRounds using standard-
+ * competition ranking on prior-round strokes. Zero delta / no delta
+ * renders empty (quiet board). CUT/WD/DQ rows never show a delta.
  *
  * CUT sentence and CUT/WD/DQ demoted rows are inserted inline by
  * this component; the parent supplies cut state via props.
@@ -23,6 +25,7 @@
 
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { movementFromRounds } from './movementFromRounds';
 
 const INK = '#0F172A';
 const SECONDARY = '#4B5563';
