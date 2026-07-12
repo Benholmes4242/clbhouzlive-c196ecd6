@@ -1,32 +1,43 @@
 /**
- * SocialListV2TestPage — test route host for the Circle rebuild.
+ * ProfileSocialListRoute — prod route host for the Circle (F3).
  *
  * Resolves :username → profile row via useUserByUsername and mounts
- * SocialListPage. Cutover happens in F3 (not registered in chunkLoaders
- * yet, per Brief F2 §5).
+ * SocialListPage. Direction is driven by the `direction` prop; the
+ * legacy `?tab=followers|following` search param is honored as a
+ * fallback override for old deep links.
  */
 
+import { useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useUserByUsername } from '@/hooks/useUserByUsername';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import SocialListPage from './SocialListPage';
 
-export default function SocialListV2TestPage() {
+interface Props {
+  direction: 'followers' | 'following';
+}
+
+export default function ProfileSocialListRoute({ direction }: Props) {
   const { username } = useParams<{ username: string }>();
   const [search] = useSearchParams();
-  const tab = search.get('tab') === 'following' ? 'following' : 'followers';
+  const searchTab = search.get('tab');
+  const initialTab: 'followers' | 'following' =
+    searchTab === 'followers' || searchTab === 'following' ? searchTab : direction;
   const { data: profile, isLoading } = useUserByUsername(username);
+
+  useEffect(() => {
+    if (profile?.id) {
+      analyticsEvents.social.listViewed({
+        type: initialTab === 'following' ? 'following' : 'followers',
+        profileUserId: profile.id,
+        from: 'profile_stats',
+      });
+    }
+  }, [profile?.id, initialTab]);
 
   if (isLoading) {
     return (
-      <div
-        style={{
-          minHeight: '100dvh',
-          background: '#F8FAFC',
-          padding: '80px 16px',
-          color: '#64748B',
-          fontSize: 13,
-        }}
-      >
+      <div style={{ minHeight: '100dvh', background: '#F8FAFC', padding: '80px 16px', color: '#64748B', fontSize: 13 }}>
         Loading…
       </div>
     );
@@ -34,15 +45,7 @@ export default function SocialListV2TestPage() {
 
   if (!profile) {
     return (
-      <div
-        style={{
-          minHeight: '100dvh',
-          background: '#F8FAFC',
-          padding: '80px 16px',
-          color: '#64748B',
-          fontSize: 13,
-        }}
-      >
+      <div style={{ minHeight: '100dvh', background: '#F8FAFC', padding: '80px 16px', color: '#64748B', fontSize: 13 }}>
         User not found.
       </div>
     );
@@ -54,7 +57,7 @@ export default function SocialListV2TestPage() {
       profileActorId={profile.id}
       profileUsername={profile.username}
       profileDisplayName={profile.display_name}
-      initialTab={tab}
+      initialTab={initialTab}
     />
   );
 }
