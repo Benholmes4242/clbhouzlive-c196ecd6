@@ -18,7 +18,7 @@ import { useFriendRivalries, useWhsConnection } from '@/lib/whs/hooks';
 import { fetchPrimaryRivalryWithOwner, fetchAdHocRivalry } from '@/lib/whs/friendViewRivalries';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 import { PageRoot } from '@/components/layout/PageRoot';
-import FloatingPageHeader from '@/components/header/FloatingPageHeader';
+// FloatingPageHeader removed (H3) — chrome now driven by ChromeIsland registry.
 import { useRivalryDimension } from '@/lib/whs/utils/useRivalryDimension';
 import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
 
@@ -369,7 +369,7 @@ const RivalryPage: React.FC = () => {
         paddingTop: 'calc(env(safe-area-inset-top, 0px) + 56px)',
       }}
     >
-      <FloatingPageHeader onBack={() => navigate(-1)} showHandicap={false} />
+      {/* H3: header rendered globally by ChromeIsland (dark, hideHcp, history back). */}
 
 
       {!viewerId && (

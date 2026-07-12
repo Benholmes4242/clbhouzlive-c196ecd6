@@ -26,13 +26,21 @@ export type ChromeTone = 'light' | 'dark';
 
 export type LeftCell =
   | { kind: 'logo' }
-  | { kind: 'back'; title: string | null; backTarget: string | 'history' };
+  | {
+      kind: 'back';
+      title: string | null;
+      backTarget: string | 'history';
+      /** When backTarget === 'history', used as safeGoBack fallback path. */
+      backFallback?: string;
+    };
 
 export interface ChromeSpec {
   chrome: 'island' | 'none';
   left?: LeftCell;
   tone: ChromeTone;
   bleed: boolean;
+  /** Hide the HCP cell in the right capsule (e.g. handicap/rivalry). */
+  hideHcp?: boolean;
   note?: string;
 }
 
@@ -62,12 +70,34 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   { match: { exact: '/create-moment' },           spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { exact: '/business/intro' },          spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { exact: '/messages' },                spec: { chrome: 'none', tone: 'light', bleed: false } },
-  { match: { exact: '/profile' },                 spec: { chrome: 'none', tone: 'light', bleed: true  } },
+  // ── /profile family — ISLAND (H3): back with fallback '/'. Own profile
+  // sets a leftOverride to route back to '/edit-profile?tab=settings'.
+  // /profile/quest keeps its history-back island rule (declared first so it
+  // wins before the /profile/ prefix rule below).
+  { match: { exact: '/profile/quest' },           spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history' }, tone: 'light', bleed: false } },
+  { match: { exact: '/profile' },                 spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/' }, tone: 'light', bleed: true } },
   { match: { exact: '/achievements' },            spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { exact: '/golferstofollow' },         spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { exact: '/notificationmessages' },    spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { exact: '/edit-profile' },            spec: { chrome: 'none', tone: 'light', bleed: false } },
-  { match: { exact: '/handicap' },                spec: { chrome: 'none', tone: 'dark',  bleed: false } },
+  // ── /handicap family — ISLAND (H3): dark tone, back fallback '/profile',
+  // HCP cell hidden. Rivalry sub-routes declared first so they win before the
+  // /handicap/ prefix.
+  {
+    match: {
+      test: (p) =>
+        /^\/handicap\/rivalry\/[^/]+$/.test(p) ||
+        /^\/handicap\/[^/]+\/rivalry\/[^/]+$/.test(p),
+    },
+    spec: {
+      chrome: 'island',
+      left: { kind: 'back', title: null, backTarget: 'history' },
+      tone: 'dark',
+      bleed: true,
+      hideHcp: true,
+    },
+  },
+  { match: { exact: '/handicap' },                spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/profile' }, tone: 'dark',  bleed: true, hideHcp: true } },
   { match: { exact: '/followers' },               spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { exact: '/following' },               spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { exact: '/join' },                    spec: { chrome: 'none', tone: 'light', bleed: false } },
@@ -78,11 +108,13 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   { match: { prefix: '/admin' },                  spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { prefix: '/hub' },                    spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { prefix: '/echo' },                   spec: { chrome: 'none', tone: 'light', bleed: false } },
-  { match: { prefix: '/profile/' },               spec: { chrome: 'none', tone: 'light', bleed: true  } },
+  // /profile/ prefix — ISLAND (H3). Sits after /profile/quest above.
+  { match: { prefix: '/profile/' },               spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/' }, tone: 'light', bleed: true } },
   { match: { prefix: '/top100/' },                spec: { chrome: 'none', tone: 'light', bleed: true  } },
   { match: { prefix: '/discover/explore/region/' },spec:{ chrome: 'none', tone: 'light', bleed: true  } },
   { match: { prefix: '/achievements/' },          spec: { chrome: 'none', tone: 'light', bleed: false } },
-  { match: { prefix: '/handicap/' },              spec: { chrome: 'none', tone: 'dark',  bleed: false } },
+  // /handicap/ prefix — ISLAND (H3). Rivalry sub-routes handled above.
+  { match: { prefix: '/handicap/' },              spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/profile' }, tone: 'dark',  bleed: true, hideHcp: true } },
   { match: { prefix: '/manage/' },                spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { prefix: '/support/' },               spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { prefix: '/legal' },                  spec: { chrome: 'none', tone: 'light', bleed: false } },
@@ -94,9 +126,9 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   { match: { prefix: '/i/' },                     spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { prefix: '/rate-course-v2/' },        spec: { chrome: 'none', tone: 'light', bleed: false } },
 
-  // Business profile: /business/:idOrSlug (exactly 3 segments) — page owns chrome, immersive.
-  // Managed sub-pages (/business/:id/edit|verification|insights|team|activity|followers|following)
-  // — page owns chrome, non-immersive.
+  // Business profile: /business/:idOrSlug (exactly 3 segments) — ISLAND (H3),
+  // back to '/clubhouse' explicit. Managed sub-pages (edit/verification/etc.)
+  // remain page-owned, non-immersive.
   {
     match: {
       test: (p) => {
@@ -105,7 +137,12 @@ export const CHROME_REGISTRY: ChromeRule[] = [
         return segs.length === 3; // profile
       },
     },
-    spec: { chrome: 'none', tone: 'light', bleed: true },
+    spec: {
+      chrome: 'island',
+      left: { kind: 'back', title: null, backTarget: '/clubhouse' },
+      tone: 'light',
+      bleed: true,
+    },
   },
   {
     match: {
@@ -113,6 +150,25 @@ export const CHROME_REGISTRY: ChromeRule[] = [
         /^\/business\/[^/]+\/(verification|edit|insights|team|activity|followers|following)(\/.*)?$/.test(p),
     },
     spec: { chrome: 'none', tone: 'light', bleed: false },
+  },
+
+  // Course detail: /courses/:id (exactly 3 segments) — ISLAND (H3),
+  // back with fallback '/courses'. Deeper /courses/:id/* subroutes fall
+  // through to the prefix rule below (chrome:'none') and remain page-owned.
+  {
+    match: {
+      test: (p) => {
+        if (!p.startsWith('/courses/')) return false;
+        const segs = p.replace(/\/$/, '').split('/');
+        return segs.length === 3;
+      },
+    },
+    spec: {
+      chrome: 'island',
+      left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/courses' },
+      tone: 'light',
+      bleed: true,
+    },
   },
 
   // All courses sub-routes are page-owned today (isConditionallyExcluded).
@@ -190,8 +246,8 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   // Friends activity — back arrow, history.
   { match: { exact: '/friends-activity' },        spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history' }, tone: 'light', bleed: false } },
 
-  // /profile/quest — treated as achievements family (back, history).
-  { match: { exact: '/profile/quest' },           spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history' }, tone: 'light', bleed: false } },
+  // /profile/quest — declared earlier alongside the /profile family.
+
 
   // Discover sub-pages (region/theme lists, video sections). Prefix rules for
   // discover/explore region already emitted as chrome:'none' above; theme routes

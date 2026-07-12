@@ -28,6 +28,7 @@ import React, { useState, useRef, useLayoutEffect } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Search, ArrowLeft, TrendingDown, TrendingUp } from 'lucide-react';
 import { resolveChrome, type ChromeSpec, type ChromeTone } from './registry';
+import { useChromeLeftOverride } from './leftOverride';
 import { Z } from '@/config/zIndex';
 import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import { PostingAsMenu } from '@/components/header/PostingAsMenu';
@@ -37,6 +38,7 @@ import { useActorUnreadCounts } from '@/hooks/useActorUnreadCounts';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection, useHandicapTrend } from '@/lib/whs/hooks';
 import { useHandicapTrend90d } from '@/hooks/useHandicapTrend90d';
+import { safeGoBack } from '@/utils/navigation';
 
 const ISLAND_H = 44;
 const TOP_GAP = 10;
@@ -77,20 +79,36 @@ function canvasFor(tone: ChromeTone): string {
 // ---------------------------------------------------------------------------
 // Left capsule
 // ---------------------------------------------------------------------------
-const LeftCapsule: React.FC<{ spec: ChromeSpec }> = ({ spec }) => {
+const LeftCapsule: React.FC<{
+  spec: ChromeSpec;
+  override: ReturnType<typeof useChromeLeftOverride>;
+}> = ({ spec, override }) => {
   const navigate = useNavigate();
   const tone = spec.tone;
 
-  if (spec.left?.kind === 'back') {
-    const title = spec.left.title;
-    const backTarget = spec.left.backTarget;
+  // Override wins over the registry rule (when non-null).
+  if (spec.left?.kind === 'back' || override) {
+    const registryLeft =
+      spec.left?.kind === 'back' ? spec.left : null;
+    const title = registryLeft?.title ?? null;
+    const backTarget =
+      override?.backTarget ?? registryLeft?.backTarget ?? 'history';
+    const backFallback =
+      override?.backFallback ?? registryLeft?.backFallback;
+
+    const onBack = () => {
+      if (backTarget === 'history') {
+        if (backFallback) safeGoBack(navigate, backFallback);
+        else navigate(-1);
+      } else {
+        navigate(backTarget);
+      }
+    };
+
     return (
       <button
         type="button"
-        onClick={() => {
-          if (backTarget === 'history') navigate(-1);
-          else navigate(backTarget);
-        }}
+        onClick={onBack}
         aria-label={title ? `Back to ${title}` : 'Go back'}
         style={{
           ...glassStyle(tone),
@@ -117,6 +135,7 @@ const LeftCapsule: React.FC<{ spec: ChromeSpec }> = ({ spec }) => {
       </button>
     );
   }
+
 
   // Default: logo. Match CompactHeader.handleLogoClick non-back branch:
   // navigate('/clubhouse'). (Brief said '/watch'; the source of truth is
@@ -348,18 +367,22 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
   const [searchParams] = useSearchParams();
   const { user } = useSupabaseSession();
   const spec = resolveChrome(location.pathname, searchParams);
+  const leftOverride = useChromeLeftOverride();
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const avatarRef = useRef<HTMLButtonElement>(null);
 
   const suppressed = hidden || spec.chrome === 'none';
+  // bleed island routes let the page own top padding — publish 0 so content
+  // flows under the island rather than being pushed down another 64px.
+  const headerH =
+    suppressed ? 0 : spec.bleed && spec.chrome === 'island' ? 0 : HEADER_H;
 
   // Publish --header-h just like CompactHeader does.
   useLayoutEffect(() => {
-    const value = suppressed ? 0 : HEADER_H;
-    document.documentElement.style.setProperty('--header-h', `${value}px`);
-  }, [suppressed]);
+    document.documentElement.style.setProperty('--header-h', `${headerH}px`);
+  }, [headerH]);
 
   if (suppressed) return null;
 
@@ -384,7 +407,8 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
         }}
       >
         {/* LEFT capsule */}
-        <LeftCapsule spec={spec} />
+        <LeftCapsule spec={spec} override={leftOverride} />
+
 
         {/* RIGHT capsule */}
         <div
@@ -411,17 +435,21 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
             <Search size={14} color={inkFor(tone)} strokeWidth={2.4} />
           </button>
 
-          <span
-            aria-hidden
-            style={{
-              width: 1,
-              height: 18,
-              background: dividerColor,
-              flexShrink: 0,
-            }}
-          />
+          {!spec.hideHcp && (
+            <>
+              <span
+                aria-hidden
+                style={{
+                  width: 1,
+                  height: 18,
+                  background: dividerColor,
+                  flexShrink: 0,
+                }}
+              />
+              <HcpCell tone={tone} />
+            </>
+          )}
 
-          <HcpCell tone={tone} />
 
           <AvatarCell
             tone={tone}

@@ -41,7 +41,8 @@ import { FavouritesCarousel } from '@/components/profile/courses/FavouritesCarou
 import { AddCourseModal } from '@/components/profile/courses/AddCourseModal';
 import { PrivateProfileGate } from '@/components/profile/PrivateProfileGate';
 import { CoverPhotoFallback } from '@/components/ui/CoverPhotoFallback';
-import FloatingPageHeader from '@/components/header/FloatingPageHeader';
+// FloatingPageHeader removed (H3) — chrome now driven by ChromeIsland registry.
+import { useSetChromeLeftOverride } from '@/features/chrome-v2/leftOverride';
 
 
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
@@ -181,6 +182,14 @@ const ProfilePageV2Content: React.FC = () => {
   //                  on the owner's personal profile, isOwnAccount=true but isSelfView=false.
   const isOwnAccount = user?.id === profileUserId;
   const isSelf = isOwnAccount; // legacy alias - preserves personal-identity-owned UI below
+
+  // H3: on own profile, route the island back button to settings (matches
+  // the prior FloatingPageHeader onBack behavior). Visitor profiles rely on
+  // the registry's '/' fallback.
+  useSetChromeLeftOverride(
+    isSelf ? { backTarget: '/edit-profile?tab=settings' } : null,
+  );
+
 
 
   const followToggle = useToggleFollow();
@@ -623,11 +632,10 @@ const ProfilePageV2Content: React.FC = () => {
           )}
         </div>
 
-        {/* Floating header — transparent control row under the notch */}
-        <FloatingPageHeader
-          onBack={isSelf ? () => navigate('/edit-profile?tab=settings') : undefined}
-          showHandicap={!!user}
-        />
+        {/* H3: header rendered globally by ChromeIsland.
+            Own profile: leftOverride routes back to settings; visitor: registry
+            fallback '/'. See useSetChromeLeftOverride call above. */}
+
 
 
         {/* Avatar - squircle, left-aligned */}

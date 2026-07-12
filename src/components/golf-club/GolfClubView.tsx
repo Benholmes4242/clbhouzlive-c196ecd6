@@ -11,7 +11,7 @@ import CourseMediaTabNew from '@/components/course-media-tab/CourseMediaTabNew';
 import CourseRankBadges from '@/components/courses/CourseRankBadges';
 import { CourseTabs } from '@/components/courses/course-detail/CourseTabs';
 import CourseDetailShellTabs from '@/features/courses/components/CourseDetailShellTabs';
-import FloatingPageHeader from '@/components/header/FloatingPageHeader';
+// FloatingPageHeader removed (H3) — chrome now driven by ChromeIsland registry.
 import { safeGoBack } from '@/utils/navigation';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
@@ -347,7 +347,7 @@ const StandaloneCourseDetail: React.FC<StandaloneCourseDetailProps> = ({
       className="min-h-screen w-full bg-background"
       style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}
     >
-      <FloatingPageHeader onBack={() => safeGoBack(navigate, '/courses')} />
+      {/* H3: header rendered globally by ChromeIsland (bleed=true, /courses fallback). */}
       {cinematicHero}
       <div
         className="sticky bg-[#F8FAFC]"
