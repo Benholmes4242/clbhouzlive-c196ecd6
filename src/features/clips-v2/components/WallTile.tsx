@@ -72,7 +72,7 @@ export function WallTile({ row, post, flatIndex, posts, isAutoplayActive }: Wall
       onClick={handlePress}
       onPointerDown={onPrerouteArm}
       onPointerUp={onPreroute}
-      onPointerCancel={onPrerouteCancel}
+      onPointerCancel={() => onPrerouteCancel('pointercancel')}
       style={{
         position: 'relative',
         width: '100%',
