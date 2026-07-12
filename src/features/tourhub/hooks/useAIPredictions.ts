@@ -11,7 +11,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
-import type { TournamentPhase, NextTournamentPreview } from '../components/tournament-insights/types';
+import type { TournamentPhase, NextTournamentPreview } from './aiPredictionTypes';
 
 // =============================================
 // TYPES
