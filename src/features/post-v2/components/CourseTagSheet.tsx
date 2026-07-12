@@ -94,7 +94,7 @@ export default function CourseTagSheet({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '2px 14px 8px',
+            padding: '4px 16px 8px',
             borderBottom: '1px solid rgba(15,23,42,0.08)',
           }}
         >
@@ -122,7 +122,7 @@ export default function CourseTagSheet({
           </button>
         </div>
 
-        <div style={{ flex: 'none', padding: '10px 16px 12px' }}>
+        <div style={{ flex: 'none', padding: '8px 16px 12px' }}>
           <div style={{ position: 'relative' }}>
             <Search size={16} color="#94A3B8" style={{ position: 'absolute', top: 12, left: 12 }} />
             <input
@@ -162,7 +162,7 @@ export default function CourseTagSheet({
                   </div>
                 </>
               ) : (
-                <div style={{ padding: '24px 16px', fontSize: 13, color: '#94A3B8', textAlign: 'center' }}>
+                <div style={{ padding: '32px 16px', fontSize: 13, color: '#94A3B8', textAlign: 'center' }}>
                   Search any of 40,000+ courses above.
                 </div>
               )}
@@ -234,7 +234,7 @@ const rowBtn: React.CSSProperties = {
   display: 'block',
   width: '100%',
   textAlign: 'left',
-  padding: '10px 16px',
+  padding: '12px 16px',
   border: 0,
   borderTop: '1px solid rgba(15,23,42,0.06)',
   background: 'transparent',

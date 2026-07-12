@@ -164,7 +164,7 @@ export default function AdjustSheet({ open, onClose, item, onApply }: Props) {
 
   return (
     <BottomSheet open={open} title="Adjust" onClose={onClose}>
-      <div style={{ padding: '4px 16px 16px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div style={{ padding: '4px 16px 16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
         {/* Frame stage */}
         <div style={{ background: '#0F172A', borderRadius: 14, height: STAGE_H, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
           <div

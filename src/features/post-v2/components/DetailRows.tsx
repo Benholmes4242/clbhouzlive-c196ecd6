@@ -41,7 +41,7 @@ function Row({ icon, label, value, onClick, disabled }: { icon: React.ReactNode;
         width: '100%',
         background: 'transparent',
         border: 0,
-        padding: '14px 16px',
+        padding: '12px 16px',
         borderTop: '1px solid rgba(0,0,0,0.07)',
         cursor: disabled ? 'default' : 'pointer',
         textAlign: 'left',

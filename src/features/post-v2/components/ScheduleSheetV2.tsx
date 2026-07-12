@@ -94,7 +94,7 @@ export default function ScheduleSheetV2({ open, onClose, value, onChange, onOpen
 
   return (
     <BottomSheet open={open} title="Schedule" onClose={onClose}>
-      <div style={{ padding: '4px 16px 16px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+      <div style={{ padding: '4px 16px 16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
         {/* Preset chips */}
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <Preset onClick={() => setPreset('1h')}>In 1 hour</Preset>
@@ -103,7 +103,7 @@ export default function ScheduleSheetV2({ open, onClose, value, onChange, onOpen
         </div>
 
         <SectionLabel>Date</SectionLabel>
-        <div ref={stripRef} style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, margin: '0 -16px', padding: '0 16px 4px' }}>
+        <div ref={stripRef} style={{ display: 'flex', gap: 8, overflowX: 'auto', margin: '0 -16px', padding: '0 16px 4px' }}>
           {days.map((d, i) => {
             const selected = sameDay(d, selDate);
             const isToday = i === 0;
@@ -144,7 +144,7 @@ export default function ScheduleSheetV2({ open, onClose, value, onChange, onOpen
         </div>
 
         {/* Summary */}
-        <div style={{ marginTop: 4, padding: '12px 14px', borderRadius: 12, background: '#FFFFFF', border: '1px solid rgba(15,23,42,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ padding: '12px 14px', borderRadius: 12, background: '#FFFFFF', border: '1px solid rgba(15,23,42,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ fontSize: 13, color: isPast ? '#B00020' : '#0F172A' }}>
             {isPast ? 'Pick a future time.' : (
               <>Goes live <span style={{ fontWeight: 700 }}>{formatScheduleDay(finalDate, now)}</span> - <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{formatScheduleTime(finalDate)}</span></>
@@ -178,7 +178,7 @@ export default function ScheduleSheetV2({ open, onClose, value, onChange, onOpen
 
       <button
         onClick={onOpenScheduled}
-        style={{ display: 'block', width: '100%', border: 0, borderTop: '1px solid rgba(15,23,42,0.07)', background: 'transparent', padding: '14px 16px', textAlign: 'left', fontSize: 13, color: '#0F172A', cursor: 'pointer' }}
+        style={{ display: 'block', width: '100%', border: 0, borderTop: '1px solid rgba(15,23,42,0.07)', background: 'transparent', padding: '12px 16px', textAlign: 'left', fontSize: 13, color: '#0F172A', cursor: 'pointer' }}
       >
         View scheduled - <span style={{ fontWeight: 700 }}>{scheduledCount}</span>
       </button>

@@ -36,7 +36,7 @@ export default function CreateSheetV2({ open, onClose, returnPath }: Props) {
   return (
     <>
       <BottomSheet open={open && !courseOpen} title="Create" onClose={onClose}>
-        <div style={{ padding: '4px 12px 20px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ padding: '4px 12px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
           <OptionRow
             glyph={<ImageIcon size={22} color="#F7931E" />}
             title="Post"

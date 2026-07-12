@@ -50,8 +50,8 @@ export default function CoverFrameSheet({ open, onClose, item, onApply }: Props)
           />
         </label>
         <div style={{ display: 'flex', gap: 8 }}>
-          <button onClick={onClose} style={{ flex: 1, background: '#fff', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 12, padding: '10px', fontSize: 14, cursor: 'pointer' }}>Cancel</button>
-          <button onClick={() => { onApply(ts); onClose(); }} style={{ flex: 1, background: '#15171F', color: '#F5F6F7', border: 0, borderRadius: 12, padding: '10px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Apply</button>
+          <button onClick={onClose} style={{ flex: 1, background: '#fff', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer' }}>Cancel</button>
+          <button onClick={() => { onApply(ts); onClose(); }} style={{ flex: 1, background: '#15171F', color: '#F5F6F7', border: 0, borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Apply</button>
         </div>
       </div>
     </BottomSheet>

@@ -381,7 +381,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
   return (
     <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: '#F8FAFC', display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 12000 }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', paddingTop: 'max(env(safe-area-inset-top), 12px)', background: '#F8FAFC', borderBottom: '1px solid rgba(0,0,0,0.07)', flex: 'none' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', paddingTop: 'max(env(safe-area-inset-top), 12px)', background: '#F8FAFC', borderBottom: '1px solid rgba(0,0,0,0.07)', flex: 'none' }}>
         <button onClick={handleClose} aria-label="Close" style={{ background: 'transparent', border: 0, color: '#1F2428', cursor: 'pointer', padding: 8 }}>
           <X size={22} />
         </button>
@@ -485,7 +485,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
 
       {/* Close guard */}
       <BottomSheet open={sheet === 'close-guard'} onClose={() => setSheet(null)} title="Unsaved changes">
-        <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
           <button onClick={saveAsDraft} style={{ background: '#15171F', color: '#F5F6F7', border: 0, borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Save draft</button>
           <button onClick={() => { setSheet(null); reset(); onClose(); }} style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer', color: '#B00020' }}>Discard</button>
         </div>
