@@ -475,7 +475,7 @@ const ClubhouseContent = () => {
       {!isOnline && !isTournamentCardActive && (
         <div style={{
           position: 'fixed',
-          top: 'calc(env(safe-area-inset-top, 0px) + 50px)',
+          top: 'calc(env(safe-area-inset-top, 0px) + 70px)',
           left: 16,
           right: 16,
           zIndex: 200,
