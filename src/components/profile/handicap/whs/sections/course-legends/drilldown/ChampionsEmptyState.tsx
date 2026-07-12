@@ -65,7 +65,7 @@ export const ChampionsWindowEmptyState: React.FC<{
     >
       {window === '90d' ? 'No legends in the last 90 days' : 'No all-time legends yet'}
     </div>
-    <div style={{ fontSize: 13.5, color: SLATE, lineHeight: 1.55, maxWidth: 290, margin: '0 auto 18px' }}>
+    <div style={{ fontSize: 13.5, color: SLATE, lineHeight: 1.55, maxWidth: 290, margin: '0 auto 16px' }}>
       {window === '90d'
         ? 'No rounds posted here recently — but the all-time leaderboards are stacked.'
         : 'Nothing in this window yet.'}
