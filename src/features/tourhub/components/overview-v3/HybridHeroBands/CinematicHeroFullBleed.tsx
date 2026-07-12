@@ -26,7 +26,6 @@ import {
   type HeroState,
   type TopTie,
 } from '../HybridHero.utils';
-import { roundLabel } from '../HybridHero.utils';
 import { NUMERIC_STYLE, AMBER } from '../HybridHero.constants';
 import type { DefendingChampData } from '../../../hooks/useTournamentDefendingChamp';
 
