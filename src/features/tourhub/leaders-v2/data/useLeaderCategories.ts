@@ -132,11 +132,10 @@ const PGA_CATS: PgaCatSpec[] = [
   { key: 'drive_avg',                label: 'Driving Distance',      short: 'DRIVING',       unit: 'YDS',    dir: 'desc', accessor: (s) => s.driving_distance,         format: fmtYds },
   { key: 'drive_acc',                label: 'Driving Accuracy',      short: 'ACCURACY',      unit: '%',      dir: 'desc', accessor: (s) => s.driving_accuracy,         format: fmtPct },
   { key: 'gir_pct',                  label: 'Greens in Regulation',  short: 'GIR',           unit: '%',      dir: 'desc', accessor: (s) => s.greens_in_reg,            format: fmtPct },
-  { key: 'scrambling_pct',           label: 'Scrambling',            short: 'SCRAMBLING',    unit: '%',      dir: 'desc', accessor: (s) => s.scrambling,               format: fmtPct },
-  { key: 'putt_avg',                 label: 'Putting Average',       short: 'PUTTING',       unit: 'PUTTS',  dir: 'asc',  accessor: (s) => s.putting_average,          format: fmtAvg3 },
   { key: 'sand_saves_pct',           label: 'Sand Saves',            short: 'SAND SAVES',    unit: '%',      dir: 'desc', accessor: (s) => s.sand_saves,               format: fmtPct },
-  { key: 'strokes_gained_total',     label: 'Strokes Gained Total',  short: 'SG TOTAL',      unit: 'SG',     dir: 'desc', accessor: (s) => s.strokes_gained_total,     format: fmtSG },
+  { key: 'putt_avg',                 label: 'Putting Average',       short: 'PUTTING',       unit: 'PUTTS',  dir: 'asc',  accessor: (s) => s.putting_average,          format: fmtAvg3 },
   { key: 'strokes_gained_tee_green', label: 'Strokes Gained T2G',    short: 'SG T2G',        unit: 'SG',     dir: 'desc', accessor: (s) => s.strokes_gained_tee_green, format: fmtSG },
+  { key: 'strokes_gained_putting',   label: 'Strokes Gained Putting',short: 'SG PUTT',       unit: 'SG',     dir: 'desc', accessor: (s) => s.strokes_gained_putting,   format: fmtSG },
 ];
 
 type PlayerRec = {
