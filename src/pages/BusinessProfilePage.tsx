@@ -299,8 +299,9 @@ const BusinessProfilePage: React.FC = () => {
             <Flag className="h-9 w-9" style={{ color: '#F7931E' }} strokeWidth={2.2} />
           </div>
           <h1 className="text-[22px] font-semibold tracking-tight mb-2">
-            This club isn&apos;t on the course
+            We couldn&apos;t find what you were looking for
           </h1>
+
           <p className="text-muted-foreground text-[15px] leading-relaxed mb-7">
             We couldn&apos;t find this business. It may have been removed, renamed, or the link
             you followed is out of date.
