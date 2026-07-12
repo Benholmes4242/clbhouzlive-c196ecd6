@@ -83,7 +83,15 @@ export function TournamentPage() {
   }, [meta]);
   const { courseImage } = useSingleCourseImage(venueInput);
 
-  const { data: teeGroups = [] } = useTeeTimesAll(tournamentId, 1);
+  // Round awareness: upcoming events show round 1; live/completed use
+  // the tournament's current_round so the tab=tee-times deep link never
+  // shows Thursday's times on Sunday (Brief F-TD-3 §3).
+  const currentRound = pulse.state === 'upcoming' ? 1 : (meta?.current_round ?? 1);
+  // Lazy fetch: skip the sr_tee_times request on completed events unless
+  // the tab=tee-times deep link is present (Brief F-TD-3 §4).
+  const teeTimesRequested = searchParams.get('tab') === 'tee-times';
+  const teeGroupsEnabled = pulse.state !== 'completed' || teeTimesRequested;
+  const { data: teeGroups = [] } = useTeeTimesAll(tournamentId, currentRound, { enabled: teeGroupsEnabled });
   const { data: field } = useFieldTop3(pulse.state === 'upcoming' ? tournamentId : null);
 
   const [teeTimesOpen, setTeeTimesOpen] = useState(false);
