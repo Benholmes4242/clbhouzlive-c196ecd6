@@ -233,7 +233,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
             onClose={() => setUploadCenterOpen(false)} 
           />
         )}
-        <ProfileHubSheet
+        <ProfileSheetV2
           open={isOpen}
           onClose={onClose}
           currentActor={currentActorData}
