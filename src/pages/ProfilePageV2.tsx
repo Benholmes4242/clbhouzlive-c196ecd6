@@ -105,7 +105,7 @@ const ClubsSectionWrapper: React.FC<{
 
   return (
     // Reduced mb: mb-6 → mb-4 (16px from clubs to tabs)
-    <section className="px-5 mb-4">
+    <section className="px-4 mb-4">
       <ClubsCard
         homeClub={homeClub}
         secondaryClubs={secondaryClubs}
@@ -760,7 +760,7 @@ const ProfilePageV2Content: React.FC = () => {
       )}
 
       {/* Identity Stack - adjusted for left-aligned avatar */}
-      <div className="pt-[68px] px-5 text-left relative z-10 pointer-events-auto">
+      <div className="pt-[68px] px-4 text-left relative z-10 pointer-events-auto">
         {/* Name */}
         <div className="flex items-center gap-2">
           <h1 className="text-[28px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.03em' }}>
@@ -770,7 +770,7 @@ const ProfilePageV2Content: React.FC = () => {
       </div>
 
       {/* Action Buttons - different for self vs other */}
-      <div className="mt-3 px-5 flex items-center gap-1.5 sm:gap-2 relative z-10 pointer-events-auto">
+      <div className="mt-3 px-4 flex items-center gap-1.5 sm:gap-2 relative z-10 pointer-events-auto">
         {isSelfView ? (
           /* ── Self-profile: prominent Edit Profile + overflow menu ── */
           <div className="flex items-center gap-3 w-full">
@@ -998,7 +998,7 @@ const ProfilePageV2Content: React.FC = () => {
       </div>
 
       {/* Mini-nav row: Posts | Followers | Friends */}
-      <div className="mt-3 px-5 relative z-10 pointer-events-auto">
+      <div className="mt-3 px-4 relative z-10 pointer-events-auto">
         <motion.div 
           className="flex items-center justify-evenly"
           initial="hidden"
@@ -1109,7 +1109,7 @@ const ProfilePageV2Content: React.FC = () => {
         <>
         {/* About section */}
         {profile?.bio ? (
-          <section className="px-5 mb-4">
+          <section className="px-4 mb-4">
             <div 
               className={cn(
                 "text-base text-foreground leading-relaxed whitespace-pre-wrap",
@@ -1150,7 +1150,7 @@ const ProfilePageV2Content: React.FC = () => {
             )}
           </section>
         ) : isSelf ? (
-          <section className="px-5 mb-4">
+          <section className="px-4 mb-4">
             <button
               onClick={() => navigate(editRoute)}
               className="text-sm font-medium italic min-h-[44px] flex items-center active:opacity-70 transition-opacity"
@@ -1178,7 +1178,7 @@ const ProfilePageV2Content: React.FC = () => {
             )}
           </section>
         ) : websites.length > 0 ? (
-          <section className="px-5 mb-4">
+          <section className="px-4 mb-4">
             <div className="flex flex-wrap gap-2">
               {websites.map((website, index) => (
                 <a
@@ -1230,7 +1230,7 @@ const ProfilePageV2Content: React.FC = () => {
         )}
 
         {/* Divider above Clubs section */}
-        <div className="px-5 mb-3">
+        <div className="px-4 mb-3">
           <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }} />
         </div>
 
