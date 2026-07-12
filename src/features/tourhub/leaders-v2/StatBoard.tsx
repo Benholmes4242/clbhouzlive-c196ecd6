@@ -18,10 +18,7 @@ import {
   SURFACE,
 } from '../_shared/tokens';
 import type { LeaderCategoryDef } from './data/useLeaderCategories';
-import type { LivePlayerMap } from './data/useLivePlayerIds' with { 'resolution-mode': 'import' };
-
-// Local import (module has no side effects on type-only above).
-import type {} from './data/useLivePlayerIds';
+import type { LivePlayerMap } from '../players-v2/data/useLivePlayerIds';
 
 const LIVE_GREEN = '#10B981';
 
