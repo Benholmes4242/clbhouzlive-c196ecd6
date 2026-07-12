@@ -27,6 +27,8 @@ export interface ClipsWallRow {
   creator_display_name: string | null;
   creator_avatar_url: string | null;
   course_name: string | null;
+  width: number | null;
+  height: number | null;
   [key: string]: unknown;
 }
 
