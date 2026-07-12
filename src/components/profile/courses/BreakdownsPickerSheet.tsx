@@ -51,8 +51,8 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
           style={{
             display: 'flex',
             justifyContent: 'center',
-            paddingTop: 10,
-            paddingBottom: 6,
+            paddingTop: 8,
+            paddingBottom: 4,
             flexShrink: 0,
           }}
         >
@@ -67,7 +67,7 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
         </div>
 
         {/* Header */}
-        <SheetHeader className="px-5 pt-2 pb-3 flex-shrink-0">
+        <SheetHeader className="px-4 pt-2 pb-3 flex-shrink-0">
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
               <SheetTitle
@@ -151,7 +151,7 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
                   display: 'flex',
                   alignItems: 'center',
                   gap: 12,
-                  padding: '14px 20px',
+                  padding: '12px 16px',
                   background: '#FFFFFF',
                   borderBottom: '1px solid #F1F5F9',
                   border: 0,
