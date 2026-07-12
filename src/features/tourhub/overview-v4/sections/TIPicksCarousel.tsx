@@ -121,16 +121,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
-              <div
-                style={{
-                  width: 44, height: 44, borderRadius: '34%',
-                  background: '#15171F',
-                  backgroundImage: p.photoUrl ? `url(${p.photoUrl})` : 'none',
-                  backgroundSize: 'cover', backgroundPosition: 'center',
-                  border: `0.5px solid ${V4.hairline}`,
-                  flexShrink: 0,
-                }}
-              />
+              <Avatar name={p.playerName} tourCode={tourCode} size={44} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
                   <span style={{ fontSize: 22, color: V4.goldMid, lineHeight: 1, ...NUMERAL_THIN }}>{p.rank}</span>
