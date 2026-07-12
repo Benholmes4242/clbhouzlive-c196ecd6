@@ -1,6 +1,6 @@
 export { TournamentHero } from './TournamentHero';
 export { LeaderboardCard } from './LeaderboardCard';
-export { FullLeaderboard } from './FullLeaderboard';
+
 export { CourseInfoCard } from './CourseInfoCard';
 export { TournamentInfoGrid } from './TournamentInfoGrid';
 export { TournamentDetailTabs, type TournamentTab } from './TournamentDetailTabs';
