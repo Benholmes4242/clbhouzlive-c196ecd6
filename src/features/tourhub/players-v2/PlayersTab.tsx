@@ -298,10 +298,10 @@ export function PlayersTab() {
         <div
           style={{
             display: 'flex',
-            gap: 6,
+            gap: 8,
             overflowX: 'auto',
             paddingBottom: 4,
-            marginBottom: editorial ? 10 : 14,
+            marginBottom: 12,
             scrollbarWidth: 'none',
           }}
           className="segmented-scroller"
@@ -361,7 +361,7 @@ export function PlayersTab() {
       )}
 
       {/* THE FIELD */}
-      <div style={{ padding: '4px 16px 6px', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+      <div style={{ padding: '4px 16px 4px', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
         <span
           style={{
             fontSize: 10.5,
