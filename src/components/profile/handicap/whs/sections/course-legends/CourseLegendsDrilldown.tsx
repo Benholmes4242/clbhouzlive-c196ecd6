@@ -413,17 +413,31 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
         </>
       )}
 
-      <FullCourseLeaderboardSheet
-        open={fullLeaderboardCategory !== null}
-        onClose={() => setFullLeaderboardCategory(null)}
-        courseName={ctx.courseName}
-        groupedRows={groupedWithTotals}
-        visibleCategories={sheetCategoryDescriptors}
-        initialCategory={fullLeaderboardCategory ?? visibleCategories[0]}
-        window={window}
-        yourRanks={yourRanks}
-        theme={theme}
-      />
+      {theme === 'light' ? (
+        <FullCourseLeaderboardSheetDispatch
+          open={fullLeaderboardCategory !== null}
+          onClose={() => setFullLeaderboardCategory(null)}
+          courseName={ctx.courseName}
+          groupedRows={groupedWithTotals}
+          visibleCategories={sheetCategoryDescriptors}
+          initialCategory={fullLeaderboardCategory ?? visibleCategories[0]}
+          window={window}
+          yourRanks={yourRanks}
+          theme={theme}
+        />
+      ) : (
+        <FullCourseLeaderboardSheet
+          open={fullLeaderboardCategory !== null}
+          onClose={() => setFullLeaderboardCategory(null)}
+          courseName={ctx.courseName}
+          groupedRows={groupedWithTotals}
+          visibleCategories={sheetCategoryDescriptors}
+          initialCategory={fullLeaderboardCategory ?? visibleCategories[0]}
+          window={window}
+          yourRanks={yourRanks}
+          theme={theme}
+        />
+      )}
     </div>
   );
 };
