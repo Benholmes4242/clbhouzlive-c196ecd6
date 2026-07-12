@@ -244,7 +244,7 @@ export function LeaderboardTab() {
   return (
     <div style={{ background: SURFACE, minHeight: '60vh', fontFamily: F }}>
       {/* MASTHEAD */}
-      <div style={{ padding: '14px 16px 12px', background: SURFACE }}>
+      <div style={{ padding: '16px 16px 12px', background: SURFACE }}>
         <div
           style={{
             display: 'flex',
@@ -321,7 +321,7 @@ export function LeaderboardTab() {
 
         <h1
           style={{
-            margin: '10px 0 0',
+            margin: '12px 0 0',
             fontFamily: F,
             fontSize: 17,
             fontWeight: 800,
@@ -366,7 +366,7 @@ export function LeaderboardTab() {
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: 18,
+            gap: 16,
             overflowX: 'auto',
             padding: '2px 16px 0',
             borderBottom: `1px solid ${HAIRLINE}`,
@@ -477,7 +477,7 @@ export function LeaderboardTab() {
       {/* FOOTNOTE */}
       <div
         style={{
-          padding: '10px 16px 16px',
+          padding: '12px 16px 16px',
           fontFamily: F,
           fontSize: 8.5,
           color: MUTED,
