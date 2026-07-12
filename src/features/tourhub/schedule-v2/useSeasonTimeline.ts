@@ -339,8 +339,9 @@ export function useSeasonTimeline(tour: TourId): {
     const decorated: SeasonEvent[] = events.map((r, idx) => {
       const startMs = new Date(`${r.start_date}T12:00:00Z`).getTime();
       const endMs = new Date(`${r.end_date}T12:00:00Z`).getTime();
-      const isDone = r.status === 'closed' || r.status === 'complete';
-      const isLive = r.status === 'inprogress';
+      const statusLc = (r.status ?? '').toLowerCase();
+      const isDone = COMPLETED_STATUSES.has(statusLc) || endDateInPast(r.end_date);
+      const isLive = !isDone && LIVE_STATUSES.has(statusLc);
       const state: EventState = isDone
         ? 'completed'
         : isLive
