@@ -279,7 +279,7 @@ export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
           }}
         >
           {/* HEADER */}
-          <div style={{ padding: '4px 18px 10px', background: CANVAS }}>
+          <div style={{ padding: '4px 16px 10px', background: CANVAS }}>
             <div
               style={{
                 display: 'flex',
@@ -387,8 +387,8 @@ export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: 18,
-              padding: '2px 18px 0',
+              gap: 16,
+              padding: '2px 16px 0',
               borderBottom: `1px solid ${HAIRLINE}`,
               background: CANVAS,
               overflowX: 'auto',
@@ -442,7 +442,7 @@ export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
           {selectedRound != null && (
             <div
               style={{
-                padding: '14px 18px 10px',
+                padding: '12px 16px 12px',
                 background: CANVAS,
                 display: 'flex',
                 alignItems: 'baseline',
@@ -501,7 +501,7 @@ export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
                 zIndex: 2,
                 display: 'flex',
                 alignItems: 'center',
-                padding: '8px 18px',
+                padding: '8px 16px',
                 background: CANVAS,
                 borderTop: `1px solid ${HAIRLINE}`,
                 borderBottom: `1px solid ${HAIRLINE}`,
@@ -559,7 +559,7 @@ function renderHoleRows(
         style={{
           display: 'flex',
           alignItems: 'center',
-          padding: '8.5px 18px',
+          padding: '8.5px 16px',
           borderBottom: `1px solid ${HAIRLINE}`,
           background: CANVAS,
           fontFamily: F,
@@ -637,7 +637,7 @@ function renderHoleRows(
       style={{
         display: 'flex',
         alignItems: 'center',
-        padding: '8px 18px',
+        padding: '8px 16px',
         borderBottom: `1px solid ${HAIRLINE}`,
         background: BAND,
         fontFamily: F,
@@ -679,7 +679,7 @@ function renderHoleRows(
       style={{
         display: 'flex',
         alignItems: 'center',
-        padding: '10px 18px',
+        padding: '10px 16px',
         borderBottom: `1px solid ${HAIRLINE}`,
         background: BAND,
         fontFamily: F,
