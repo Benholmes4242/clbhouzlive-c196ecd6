@@ -20,7 +20,7 @@ import { useTourLeaderboard } from '../hooks/useTourHubData';
 import { useTournamentMeta } from './useTournamentMeta';
 import { BoardTable, type BoardEntry, type CutState } from './BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from './ScorecardSheet';
-import { EditorialEmpty } from '../components/tournament-detail/EditorialEmpty';
+import { EditorialEmpty } from '../components/EditorialEmpty';
 import { tourPriorityIndex } from '../_shared/tourOrder';
 
 const F = 'Geist, system-ui, sans-serif';
