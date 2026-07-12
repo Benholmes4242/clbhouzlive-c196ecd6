@@ -4,9 +4,10 @@
  */
 
 import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAIPredictions } from '../../hooks/useAIPredictions';
 import { SectionShell } from './SectionShell';
-import { V4, NUMERAL_THIN } from '../tokens';
+import { V4 } from '../tokens';
 import type { EventState } from '../data/useTourEventContext';
 import type { AITopContender } from '../../hooks/useAIPredictions';
 import { usePickLiveState, type PickLiveState } from '../data/usePickLiveState';
@@ -61,6 +62,7 @@ type SheetState =
   | { kind: 'case'; pick: AITopContender; from: 'index' | 'card' };
 
 export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props) {
+  const navigate = useNavigate();
   const { data } = useAIPredictions(tournamentId ?? null);
   const [sheet, setSheet] = useState<SheetState>(null);
   const picks = data?.topContenders ?? [];
@@ -79,6 +81,11 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
     } else {
       setSheet(null);
     }
+  };
+
+  const goToPlayer = (playerId: string) => {
+    setSheet(null);
+    navigate(`/tourhub/player/${playerId}`);
   };
 
   return (
