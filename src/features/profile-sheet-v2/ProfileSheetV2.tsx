@@ -1,0 +1,263 @@
+/**
+ * ProfileSheetV2 — Switchboard redesign of the profile hub bottom sheet.
+ *
+ * Stage 1 (PS1): frame + actor cards + HCP strip. Body carries PS2
+ * placeholder comments where the action row / nav group / sign-out land.
+ *
+ * Prop contract intentionally matches src/components/profile/ProfileHubSheet.tsx
+ * verbatim so the eventual cutover in PostingAsMenu is a one-line import
+ * swap. This file must not import from that old sheet or HandicapMasthead.
+ */
+
+import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { AnimatePresence, motion, useMotionValue, animate } from 'framer-motion';
+import type { PanInfo } from 'framer-motion';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
+import { overlayOpen, overlayMark } from '@/perf/overlayTiming';
+import ActorCards from './components/ActorCards';
+import HcpStrip from './components/HcpStrip';
+
+interface Profile {
+  id: string;
+  type: 'personal' | 'business';
+  name: string;
+  avatarUrl?: string;
+  subtitle?: string;
+  username?: string | null;
+}
+
+interface CurrentActor {
+  type: 'personal' | 'business';
+  id: string;
+  name: string;
+  avatarUrl?: string;
+  subtitle?: string;
+}
+
+export interface ProfileSheetV2Props {
+  open: boolean;
+  onClose: () => void;
+  currentActor: CurrentActor;
+  profiles: Profile[];
+  onSwitchProfile: (profileId: string) => Promise<void> | void;
+  onNavigate: (route: string) => void;
+  isAdmin: boolean;
+  isLoading?: boolean;
+}
+
+const SHEET_BG = '#F8FAFC';
+const SKELETON_TILE = 'rgba(0,0,0,0.06)';
+
+function SheetSkeleton() {
+  const bar = (h: number, w: string, mt = 0) => (
+    <div
+      style={{
+        height: h,
+        width: w,
+        marginTop: mt,
+        background: SKELETON_TILE,
+        borderRadius: 12,
+      }}
+    />
+  );
+  return (
+    <div style={{ padding: '18px 20px 24px' }}>
+      {bar(64, '100%')}
+      {bar(52, 'calc(100% - 8px)', 14)}
+      <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+        {bar(72, '33%')}
+        {bar(72, '33%')}
+        {bar(72, '33%')}
+      </div>
+    </div>
+  );
+}
+
+export default function ProfileSheetV2({
+  open,
+  onClose,
+  currentActor,
+  profiles,
+  onSwitchProfile,
+  onNavigate,
+  isAdmin: _isAdmin,
+  isLoading,
+}: ProfileSheetV2Props) {
+  void _isAdmin; // reserved for PS2 admin section
+  const sheetY = useMotionValue(0);
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  const openTweenRef = useRef<ReturnType<typeof animate> | null>(null);
+  const ovlId = useRef<number>(-1);
+  const [mounted, setMounted] = useState(false);
+
+  // Body scroll lock while open.
+  useEffect(() => {
+    if (!open) return;
+    lockBodyScroll();
+    return () => unlockBodyScroll();
+  }, [open]);
+
+  // Overlay perf timing.
+  useEffect(() => {
+    if (open) {
+      ovlId.current = overlayOpen('profile-sheet-v2');
+    } else if (ovlId.current >= 0) {
+      overlayMark(ovlId.current, 'close-start');
+    }
+  }, [open]);
+
+  // Open: mount, seed offscreen, slide to 0.
+  useEffect(() => {
+    if (!open) return;
+    const fallbackH = typeof window !== 'undefined' ? window.innerHeight : 1000;
+    sheetY.set(fallbackH);
+    setMounted(true);
+    const raf = requestAnimationFrame(() => {
+      const h = panelRef.current?.offsetHeight ?? fallbackH;
+      sheetY.set(h);
+      if (ovlId.current >= 0) overlayMark(ovlId.current, 'animation-start');
+      openTweenRef.current?.stop();
+      openTweenRef.current = animate(sheetY, 0, {
+        type: 'tween',
+        duration: 0.25,
+        ease: [0.32, 0.72, 0, 1],
+      });
+      openTweenRef.current.finished
+        .then(() => { if (ovlId.current >= 0) overlayMark(ovlId.current, 'animation-done'); })
+        .catch(() => {});
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [open, sheetY]);
+
+  // Close: slide down then unmount.
+  useEffect(() => {
+    if (open || !mounted) return;
+    openTweenRef.current?.stop();
+    const h = panelRef.current?.offsetHeight ?? window.innerHeight;
+    const t = animate(sheetY, h, {
+      type: 'tween',
+      duration: 0.22,
+      ease: [0.32, 0.72, 0, 1],
+    });
+    t.finished
+      .then(() => {
+        setMounted(false);
+        if (ovlId.current >= 0) overlayMark(ovlId.current, 'closed');
+      })
+      .catch(() => {});
+    return () => { t.stop(); };
+  }, [open, mounted, sheetY]);
+
+  // Escape closes.
+  useEffect(() => {
+    if (!open) return;
+    const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', h);
+    return () => document.removeEventListener('keydown', h);
+  }, [open, onClose]);
+
+  const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    if (info.offset.y > 100 || info.velocity.y > 500) {
+      onClose();
+    } else {
+      animate(sheetY, 0, { type: 'spring', damping: 25, stiffness: 300 });
+    }
+  };
+
+  if (typeof document === 'undefined') return null;
+
+  const content = (
+    <>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            key="ps2-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={onClose}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0,0,0,0.4)',
+              zIndex: 9998,
+            }}
+          />
+        )}
+      </AnimatePresence>
+
+      {mounted && (
+        <motion.div
+          ref={panelRef}
+          drag="y"
+          dragConstraints={{ top: 0, bottom: 0 }}
+          dragElastic={{ top: 0, bottom: 0.4 }}
+          onDragStart={() => { openTweenRef.current?.stop(); }}
+          onDragEnd={handleDragEnd}
+          style={{
+            y: sheetY,
+            position: 'fixed',
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 9999,
+            background: SHEET_BG,
+            borderRadius: '24px 24px 0 0',
+            boxShadow: '0 -12px 40px rgba(0,0,0,0.3)',
+            maxHeight: '85dvh',
+            overflowY: 'auto',
+            paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              paddingTop: 9,
+              paddingBottom: 4,
+              flexShrink: 0,
+              touchAction: 'none',
+              cursor: 'grab',
+            }}
+          >
+            <div
+              style={{
+                width: 40,
+                height: 4.5,
+                borderRadius: 999,
+                background: 'rgba(15,23,42,0.15)',
+              }}
+            />
+          </div>
+
+          {isLoading ? (
+            <SheetSkeleton />
+          ) : (
+            <div style={{ paddingTop: 14, paddingBottom: 20 }}>
+              <ActorCards
+                currentActor={currentActor}
+                profiles={profiles}
+                onSwitchProfile={onSwitchProfile}
+                onNavigate={onNavigate}
+              />
+              <HcpStrip
+                actorType={currentActor.type}
+                actorId={currentActor.id}
+                onNavigate={onNavigate}
+              />
+              {/* PS2: action row */}
+              {/* PS2: nav group */}
+              {/* PS2: sign out */}
+            </div>
+          )}
+        </motion.div>
+      )}
+    </>
+  );
+
+  return createPortal(content, document.body);
+}
