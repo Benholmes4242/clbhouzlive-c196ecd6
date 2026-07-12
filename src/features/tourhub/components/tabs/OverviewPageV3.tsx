@@ -10,7 +10,7 @@ import { ComingUpCalendar } from '../ComingUpCalendar';
 import { CollegeRivalry } from '../CollegeRivalry';
 import { LazySection } from '../overview-v3/LazySection';
 
-import { IntelligenceHero } from '../IntelligenceHero';
+import { TISlot } from '../overview-v3/TISlot';
 import { WorldRankingsHero } from '../WorldRankingsHero';
 import { StatOfTheWeek } from '../StatOfTheWeek';
 import { HomeCourseOfWeekModule } from '../home/HomeCourseOfWeekModule';
@@ -73,7 +73,7 @@ export function OverviewPageV3() {
             </LazySection>
             <LazySection minHeight={500}>
               <div style={{ marginTop: 16 }}>
-                <IntelligenceHero />
+                <TISlot />
               </div>
             </LazySection>
             <LazySection minHeight={400}>
