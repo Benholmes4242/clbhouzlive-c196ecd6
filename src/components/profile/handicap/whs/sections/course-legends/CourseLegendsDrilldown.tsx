@@ -308,7 +308,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
       <ConnectHandicapCue variant="champions" courseName={ctx.courseName} />
 
       {autoSwitchedToAllTime && window === 'all_time' && (
-        <div style={{ padding: '0 16px 8px' }}>
+        <div style={{ padding: '0 16px 12px' }}>
           <span style={{ fontFamily: 'Geist, system-ui, sans-serif', fontSize: 11.5, fontWeight: 600, color: 'var(--hcp-t-60)', letterSpacing: '-0.005em' }}>
             No rounds in the last 90 days — showing all-time legends.
           </span>
