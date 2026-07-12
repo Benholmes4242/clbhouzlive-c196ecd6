@@ -18102,6 +18102,36 @@ export type Database = {
           username: string
         }[]
       }
+      get_social_list: {
+        Args: {
+          p_direction: string
+          p_filter?: string
+          p_offset?: number
+          p_page_size?: number
+          p_profile_actor_id: string
+          p_profile_actor_type: string
+          p_viewer_id: string
+        }
+        Returns: {
+          actor_id: string
+          actor_type: string
+          avatar_url: string
+          business_category: string
+          business_location: string
+          business_slug: string
+          display_name: string
+          followed_at: string
+          friend_status: string
+          handicap_index: number
+          home_club: string
+          mutual_count: number
+          mutual_usernames: Json
+          profile_type: string
+          total_count: number
+          username: string
+          viewer_follows: boolean
+        }[]
+      }
       get_suggested_creators: {
         Args: { p_limit?: number; p_user_id: string }
         Returns: {
