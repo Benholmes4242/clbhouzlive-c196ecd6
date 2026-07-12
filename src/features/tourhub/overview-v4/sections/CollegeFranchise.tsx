@@ -184,6 +184,7 @@ export function CollegeFranchise() {
           name={leaderShort}
           logo={leaderLogo}
           fullName={leaderFull}
+          color={leaderColor}
           captain={leaderCap ? { name: abbreviate(leaderCap.fullName), photoCandidates: getPlayerHeadshotCandidates(leaderCap.fullName, leaderCap.tourCode), id: leaderCap.playerId } : null}
           align="left"
           onClick={() => goCollege(leader.normalized_name)}
@@ -194,6 +195,7 @@ export function CollegeFranchise() {
           name={chaserShort}
           logo={chaserLogo}
           fullName={chaserFull}
+          color={chaserColor}
           captain={chaserCap ? { name: abbreviate(chaserCap.fullName), photoCandidates: getPlayerHeadshotCandidates(chaserCap.fullName, chaserCap.tourCode), id: chaserCap.playerId } : null}
           align="right"
           onClick={() => goCollege(chaser.normalized_name)}
@@ -212,17 +214,17 @@ export function CollegeFranchise() {
             background: V4.hairline,
           }}
         >
-          <div style={{ width: `${leaderPct}%`, background: V4.ink }} />
-          <div style={{ width: `${chaserPct}%`, background: V4.ink, opacity: 0.35 }} />
+          <div style={{ width: `${leaderPct}%`, background: leaderColor }} />
+          <div style={{ width: `${chaserPct}%`, background: chaserColor, opacity: 0.85 }} />
         </div>
         <div style={{ marginTop: 6, display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'baseline' }}>
-          <span style={{ fontSize: 11.5, fontWeight: 800, color: V4.ink, fontVariantNumeric: 'tabular-nums' }}>
+          <span style={{ fontSize: 11.5, fontWeight: 800, color: leaderColor, fontVariantNumeric: 'tabular-nums' }}>
             {formatCurrency(leader.earnings_total)}
           </span>
           <span style={{ fontSize: 9, fontWeight: 700, color: V4.inkFaint, letterSpacing: '0.14em', textAlign: 'center' }}>
             SEASON ALUMNI EARNINGS
           </span>
-          <span style={{ fontSize: 11.5, fontWeight: 800, color: V4.inkMute, fontVariantNumeric: 'tabular-nums', textAlign: 'right' }}>
+          <span style={{ fontSize: 11.5, fontWeight: 800, color: chaserColor, fontVariantNumeric: 'tabular-nums', textAlign: 'right' }}>
             {formatCurrency(chaser.earnings_total)}
           </span>
         </div>
