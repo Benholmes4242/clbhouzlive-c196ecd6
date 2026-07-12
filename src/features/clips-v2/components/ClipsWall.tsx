@@ -3,6 +3,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toFeedPosts } from '@/features/watch-v2/utils/toFeedPost';
 import { useWatchAutoplay } from '@/video/useWatchAutoplay';
 import { FeedCard, type FeedCardRow } from '@/components/feed-cards/FeedCard';
+import { packColumns } from '@/components/feed-cards/packColumns';
 import { useClipsWallFeed, type ClipsV2Mood, type ClipsWallRow } from '../hooks/useClipsWallFeed';
 
 const FONT_FAMILY =
