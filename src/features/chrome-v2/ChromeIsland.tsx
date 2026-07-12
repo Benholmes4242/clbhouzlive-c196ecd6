@@ -445,7 +445,13 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
             }}
           />
 
-          <HcpCell tone={tone} />
+          {!spec.hideHcp && <HcpCell tone={tone} />}
+          {!spec.hideHcp && (
+            <span
+              aria-hidden
+              style={{ width: 0 }}
+            />
+          )}
 
           <AvatarCell
             tone={tone}
