@@ -153,3 +153,14 @@ export function countryFlag(code: string | null | undefined): string | null {
 
   return toRegionalIndicator(mapped);
 }
+
+/**
+ * countryFallback — short, stable text for rows that have no emoji flag.
+ * Known flagless nations map to their official 3-letter code; everything
+ * else falls back to the first three characters uppercased.
+ */
+export function countryFallback(code: string): string {
+  const key = code.trim().toUpperCase().replace(/\s+/g, ' ');
+  if (key === 'NORTHERN IRELAND' || key === 'NIR') return 'NIR';
+  return key.slice(0, 3);
+}
