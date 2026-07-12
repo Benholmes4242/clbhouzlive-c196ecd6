@@ -129,9 +129,9 @@ export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
         {indexText}
       </span>
       {trendNode}
-      {rounds30d != null && (
+      {rounds90d != null && (
         <span style={{ fontWeight: 500, fontSize: 11, color: MUTED }}>
-          {DOT} {rounds30d} rounds {DOT} 30d
+          {DOT} {rounds90d} rounds {DOT} 90d
         </span>
       )}
       {chevron}
