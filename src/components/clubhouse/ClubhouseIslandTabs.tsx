@@ -8,7 +8,8 @@
  */
 import React from 'react';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import type { ClubhouseTab } from '@/components/clubhouse/ClubhouseTabToggle';
+
+export type ClubhouseTab = 'foryou' | 'friends';
 
 export interface ClubhouseIslandTabsProps {
   activeTab: ClubhouseTab;

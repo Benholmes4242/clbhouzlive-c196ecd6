@@ -103,7 +103,7 @@ const BusinessProfilePage: React.FC = () => {
   const { user, loading: authLoading } = useSupabaseSession();
 
   useHideHeader();
-  // Status bar transparency is owned by FloatingPageHeader (single owner).
+  // Status bar transparency is owned by AppRoutes/applyRouteChrome (single owner).
 
   const { data: business, isLoading, error } = useBusinessProfile(idOrSlug);
   const { data: membership } = useBusinessMembership(business?.id);
