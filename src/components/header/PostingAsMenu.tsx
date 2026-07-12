@@ -222,7 +222,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   };
 
   // ===========================================
-  // MOBILE: ProfileHubSheet bottom sheet
+  // MOBILE: ProfileSheetV2 bottom sheet
   // ===========================================
   if (isMobile) {
     return (
