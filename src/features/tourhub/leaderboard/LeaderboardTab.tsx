@@ -124,6 +124,7 @@ export function LeaderboardTab() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
+  const [sheetTarget, setSheetTarget] = useState<ScorecardSheetTarget | null>(null);
 
   const liveTournaments = useMemo(() => {
     return [...rawLive].sort((a, b) => {
