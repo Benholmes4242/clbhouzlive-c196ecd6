@@ -85,6 +85,9 @@ export function TournamentPage() {
   const { data: field } = useFieldTop3(pulse.state === 'upcoming' ? tournamentId : null);
 
   const [teeTimesOpen, setTeeTimesOpen] = useState(false);
+  const [fullBoardOpen, setFullBoardOpen] = useState(false);
+
+  const { data: story } = useTournamentStory(tournamentId);
 
   const tourCode = (meta?.tour_code ?? 'pga').toLowerCase();
 
