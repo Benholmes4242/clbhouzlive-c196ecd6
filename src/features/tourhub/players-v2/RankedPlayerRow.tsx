@@ -159,7 +159,7 @@ function RankedPlayerRowInner({
       </div>
 
       {/* Stat column */}
-      {stat != null && (
+      {(statFormatted != null || stat != null) && (
         <div style={{ textAlign: 'right', flexShrink: 0 }}>
           <div
             style={{
@@ -170,7 +170,7 @@ function RankedPlayerRowInner({
               lineHeight: 1,
             }}
           >
-            {formatStat(stat)}
+            {statFormatted ?? (stat != null ? formatStat(stat) : '')}
           </div>
           {statLabel && (
             <div
