@@ -87,13 +87,13 @@ export const StablefordDetailSheet: React.FC<Props> = ({ open, onClose, dist }) 
         </button>
       </div>
 
-      <div style={{ overflowY: 'auto', padding: '16px 18px 24px', maxHeight: '70vh' }}>
+      <div style={{ overflowY: 'auto', padding: '16px 16px 24px', maxHeight: '70vh' }}>
         <SectionLabel>What is Stableford</SectionLabel>
         <p style={BODY_STYLE}>
           Stableford is a points-based scoring system that rewards good holes and limits the damage of bad ones. Birdies score big; blow-up holes are capped. A round of <strong>36 points</strong> means you played exactly to your handicap — the baseline for your level.
         </p>
 
-        <SectionLabel style={{ marginTop: 20 }}>How the bands work</SectionLabel>
+        <SectionLabel style={{ marginTop: 24 }}>How the bands work</SectionLabel>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <BandRow
             color={T.green}
@@ -115,7 +115,7 @@ export const StablefordDetailSheet: React.FC<Props> = ({ open, onClose, dist }) 
           />
         </div>
 
-        <SectionLabel style={{ marginTop: 20 }}>Why this matters</SectionLabel>
+        <SectionLabel style={{ marginTop: 24 }}>Why this matters</SectionLabel>
         <p style={BODY_STYLE}>
           Your handicap moves based on your <strong>best 8 of 20</strong> differentials. Stableford is a different lens on the same rounds — but the visual distribution tells you something the handicap number alone hides: how often you produce the rounds that move your handicap, vs how often you have weak rounds that don't.
         </p>
@@ -125,8 +125,8 @@ export const StablefordDetailSheet: React.FC<Props> = ({ open, onClose, dist }) 
 
         {!dist.insufficientData && (
           <>
-            <SectionLabel style={{ marginTop: 20 }}>Your distribution</SectionLabel>
-            <div style={{ background: T.neutralTint, padding: '14px 16px', borderRadius: 10 }}>
+            <SectionLabel style={{ marginTop: 24 }}>Your distribution</SectionLabel>
+            <div style={{ background: T.neutralTint, padding: '12px 16px', borderRadius: 10 }}>
               <p style={{ margin: 0, fontSize: 13, lineHeight: 1.55, color: T.ink, fontFamily: FONT }}>
                 {dist.inZoneCount} of your last {dist.total} rounds were in the zone — these became your handicap counters. {dist.solidCount} were solid, sitting just below your level. {dist.offDayCount} were off days.
               </p>

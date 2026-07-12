@@ -30,11 +30,11 @@ const LastFiveTokens: React.FC<Props> = ({ diffs, avg, accent, accentInk }) => {
         alignItems: 'center',
         justifyContent: 'space-between',
         gap: 12,
-        padding: '14px 16px',
+        padding: '12px 16px',
         background: 'var(--hcp-bg-1)',
         border: '1px solid var(--hcp-line-2)',
         borderRadius: 12,
-        marginBottom: 14,
+        marginBottom: 12,
         fontFamily: FONT,
       }}
     >

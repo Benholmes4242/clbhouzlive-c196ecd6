@@ -48,7 +48,7 @@ const HOLE_C = {
 };
 
 const SECTION_STYLE: React.CSSProperties = {
-  marginBottom: 14,
+  marginBottom: 12,
   fontFamily: FONT,
 };
 
@@ -157,7 +157,7 @@ export const StablefordCard: React.FC<Props> = ({ scores, userId, connectionId }
       {/* Scope toggle + meta count */}
       <div
         style={{
-          padding: '10px 16px 0',
+          padding: '12px 16px 0',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -328,7 +328,7 @@ interface PointsBodyProps {
 const PointsBody: React.FC<PointsBodyProps> = ({ dist, scope, scoringRange }) => {
   if (dist.insufficientData) {
     return (
-      <div style={{ padding: '24px 20px 28px', textAlign: 'center' }}>
+      <div style={{ padding: '24px 16px 24px', textAlign: 'center' }}>
         <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: T.ink, fontFamily: FONT }}>
           Add a few more rounds
         </p>
@@ -366,7 +366,7 @@ const PointsBody: React.FC<PointsBodyProps> = ({ dist, scope, scoringRange }) =>
       {/* Header micro-row */}
       <div
         style={{
-          padding: '10px 20px 0',
+          padding: '12px 16px 0',
           display: 'flex',
           alignItems: 'baseline',
           justifyContent: 'space-between',
@@ -412,7 +412,7 @@ const PointsBody: React.FC<PointsBodyProps> = ({ dist, scope, scoringRange }) =>
       </div>
 
       {/* Band chips */}
-      <div style={{ padding: '0 18px', display: 'flex', gap: 7 }}>
+      <div style={{ padding: '0 16px', display: 'flex', gap: 8 }}>
         {[
           { label: 'IN THE ZONE', range: '36+ PTS', count: dist.inZoneCount, color: POINTS_GOOD },
           { label: 'SOLID', range: '33–35 PTS', count: dist.solidCount, color: POINTS_AMBER },
@@ -474,7 +474,7 @@ const PointsBody: React.FC<PointsBodyProps> = ({ dist, scope, scoringRange }) =>
 
       {/* Scoring range strip */}
       {scoringRange && (
-        <div style={{ padding: '0 20px 16px' }}>
+        <div style={{ padding: '0 16px 16px' }}>
           <ScoringRangeBlock range={scoringRange} />
         </div>
       )}
@@ -784,7 +784,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
   // 1. Loading skeleton
   if (shotsLoading) {
     return (
-      <div style={{ padding: '16px 20px 20px' }}>
+      <div style={{ padding: '16px' }}>
         <div
           className="animate-pulse"
           style={{
@@ -817,7 +817,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
   // 2. No hole data at all
   if (!hs || roundsWithHoles === 0) {
     return (
-      <div style={{ padding: '24px 20px 28px', textAlign: 'center' }}>
+      <div style={{ padding: '24px 16px 24px', textAlign: 'center' }}>
         <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: T.ink, fontFamily: FONT }}>
           Hole data needed
         </p>
@@ -831,7 +831,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
   // 3. Not enough rounds with holes
   if (roundsWithHoles < 3) {
     return (
-      <div style={{ padding: '24px 20px 28px', textAlign: 'center' }}>
+      <div style={{ padding: '24px 16px 24px', textAlign: 'center' }}>
         <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: T.ink, fontFamily: FONT }}>
           Add a few more rounds with hole data
         </p>
@@ -892,7 +892,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
       {/* Header micro-row */}
       <div
         style={{
-          padding: '10px 20px 0',
+          padding: '12px 16px 0',
           display: 'flex',
           alignItems: 'baseline',
           justifyContent: 'space-between',
@@ -936,7 +936,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
       </div>
 
       {/* Band chips */}
-      <div style={{ padding: '0 18px', display: 'flex', gap: 6 }}>
+      <div style={{ padding: '0 16px', display: 'flex', gap: 6 }}>
         {[
           { label: 'BIRDIE+', count: birdiesOrBetter, color: SC_BIRDIE_DARK, isPar: false },
           { label: 'PAR', count: pars, color: SC_PAR_DARK, isPar: true },
@@ -1002,7 +1002,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
       </div>
 
       {/* Career milestones ladder */}
-      <div style={{ padding: '16px 18px 18px' }}>
+      <div style={{ padding: '16px' }}>
         <MilestoneLadder
           aces={aces}
           albatross={albatross}
@@ -1232,7 +1232,7 @@ const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
           display: 'flex',
           alignItems: 'baseline',
           justifyContent: 'space-between',
-          marginBottom: 10,
+          marginBottom: 12,
           padding: '0 2px',
         }}
       >
