@@ -166,7 +166,7 @@ export function LeadersTab() {
             scrollbarWidth: 'none',
           }}
         >
-          {TOUR_PRIORITY.map((slug) => {
+          {TOUR_PRIORITY.filter((s) => s !== 'champ').map((slug) => {
             const isActive = slug === activeTour;
             return (
               <button
