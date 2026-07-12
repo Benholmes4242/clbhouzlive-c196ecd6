@@ -81,9 +81,9 @@ export function LeadersTab() {
 
   // If tour changes and the currently open sheet is not in the new tour, close it.
   useEffect(() => {
-    if (openKey && !categories.some((c) => c.key === openKey)) {
-      setOpenKey(null);
-    }
+    if (!openKey) return;
+    if (!categories.length) return;
+    if (!categories.some((c) => c.key === openKey)) setOpenKey(null);
   }, [openKey, categories]);
 
   const openCategory = useCallback(
