@@ -57,6 +57,10 @@ export function OverviewPageV3() {
             landing slide, all three states eligible). See OverviewHero.tsx. */}
         <OverviewHero />
 
+        {/* Live-only featured groups rail (renders null off-live). Locked
+            composition: hero -> ON THE COURSE -> TI. */}
+        <OnTheCourseSlot />
+
 
 
         <div
