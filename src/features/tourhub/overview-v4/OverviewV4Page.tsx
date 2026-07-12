@@ -28,7 +28,7 @@ export function OverviewV4Page() {
       <HeroV4 ctx={ctx} tour={tour} onTourChange={setTour} />
       {isLive ? <OnTheCourse tournamentId={ctx?.event?.id} live={isLive} /> : null}
       <TIPicksCarousel tournamentId={ctx?.event?.id} state={state} />
-      <WorldRankings />
+      <WorldRankings tour={tour} />
       <StatOfTheWeekV4 />
       <ComingUp tour={tour} />
       <CollegeFranchiseSection />
