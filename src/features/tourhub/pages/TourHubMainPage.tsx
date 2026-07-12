@@ -145,7 +145,7 @@ export function TourHubMainPage() {
       case 'schedule':
         return <ScheduleTabV2 />;
       case 'players':
-        return <PlayersTab />;
+        return <PlayersTabV2 />;
       case 'leaderboards':
         return <LeadersTab />;
       default:
@@ -155,7 +155,6 @@ export function TourHubMainPage() {
 
   const renderShellRow = () => {
     switch (activeTab) {
-      case 'players':     return <PlayersShellRow />;
       case 'leaderboards':return <LeadersShellRow />;
       default:            return null;
     }
