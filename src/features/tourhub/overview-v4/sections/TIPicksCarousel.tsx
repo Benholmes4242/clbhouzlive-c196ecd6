@@ -473,7 +473,9 @@ function SheetStateStrip({ state, pick, live }: { state: EventState; pick: AITop
       </div>
     );
   }
+  const cut = cutStatus(live);
   if (state === 'live') {
+    if (cut) return <CutTag label={cut} />;
     if (!live || live.position == null) {
       const pct = Math.round((pick.winProbability ?? 0) * 100);
       return <div style={{ fontSize: 11, fontWeight: 700, color: V4.inkMute, fontVariantNumeric: 'tabular-nums' }}>{pct}% win prob · not on board yet</div>;
@@ -491,9 +493,12 @@ function SheetStateStrip({ state, pick, live }: { state: EventState; pick: AITop
     );
   }
   const v = verdict(live);
-  const finalLine = live && live.position != null
-    ? `${formatPosition(live.position, live.positionTied)} · ${formatScore(live.score)}`
-    : '—';
+  const isWon = !cut && live?.position === 1;
+  const finalLine = cut
+    ? null
+    : live && live.position != null
+      ? `${formatPosition(live.position, live.positionTied)} · ${formatScore(live.score)}`
+      : '—';
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
       <span
@@ -508,9 +513,11 @@ function SheetStateStrip({ state, pick, live }: { state: EventState; pick: AITop
           textTransform: 'uppercase',
         }}
       >
-        {v.hit ? (live?.position === 1 ? 'Won' : 'Hit') : 'Miss'}
+        {v.hit ? (isWon ? 'Won' : 'Hit') : cut ? `Miss · ${cut}` : 'Miss'}
       </span>
-      <span style={{ fontSize: 11.5, fontWeight: 700, color: V4.inkMute, fontVariantNumeric: 'tabular-nums' }}>{finalLine}</span>
+      {finalLine ? (
+        <span style={{ fontSize: 11.5, fontWeight: 700, color: V4.inkMute, fontVariantNumeric: 'tabular-nums' }}>{finalLine}</span>
+      ) : null}
     </div>
   );
 }
