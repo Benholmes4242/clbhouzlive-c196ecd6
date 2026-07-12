@@ -36,9 +36,9 @@ export const ProBenchmarkBand: React.FC<Props> = ({ pro, value, sub, base }) => 
         style={{
           display: 'grid',
           gridTemplateColumns: 'auto 1fr auto',
-          gap: 10,
+          gap: 12,
           alignItems: 'center',
-          padding: '10px 13px',
+          padding: '12px',
           background: 'var(--hcp-tour-dim)',
           border: '1px dashed var(--hcp-tour-border)',
           borderRadius: 12,
