@@ -1,8 +1,8 @@
 /**
  * BoardTable — Tour Book leaderboard rows.
  *
- * Columns: POS(26) + MOVE(20) = 46 left | PLAYER(flex) | TOT(44) | THRU(44) | TODAY(44)
- * Header rendered by parent (LeaderboardTab) with a single 46px POS
+ * Columns: POS(32) + MOVE(20) = 52 left | PLAYER(flex) | TOT(44) | THRU(44) | TODAY(44)
+ * Header rendered by parent (LeaderboardTab) with a single 52px POS
  * label; the delta lives inside that footprint so the outer layout
  * is unchanged.
  *
@@ -39,7 +39,7 @@ const SCORE_UNDER = '#189A55';
 const SCORE_OVER = '#C24A4A';
 const SCORE_EVEN = '#8A9099';
 
-const POS_NUM_W = 26;
+const POS_NUM_W = 32;
 const POS_MOVE_W = 20;
 const NUM_W = 44;
 
@@ -315,7 +315,7 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
 
 
         {/* PLAYER — two lines */}
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ flex: 1, minWidth: 0, paddingLeft: 8 }}>
           <div
             style={{
               display: 'flex',
