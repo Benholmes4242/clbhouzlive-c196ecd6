@@ -264,10 +264,12 @@ function ClassColumn({ headerCode, roster, liveMap, alignRight }: ClassColumnPro
       ) : (
         roster.map((a) => {
           const isLive = Boolean(liveMap[a.id]);
+          const nav = playerRoute(a.id, { kind: 'college', collegeName: headerCode });
           return (
             <Link
               key={a.id}
-              to={playerRoute(a.id)}
+              to={nav.to}
+              state={nav.state}
               style={{
                 display: 'flex',
                 flexDirection: alignRight ? 'row-reverse' : 'row',
