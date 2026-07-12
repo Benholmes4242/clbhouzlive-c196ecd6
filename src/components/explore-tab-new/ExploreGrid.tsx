@@ -6,7 +6,7 @@ import { useInView } from 'react-intersection-observer';
 import { useWatchAutoplay } from '@/video/useWatchAutoplay';
 import { Loader2 } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { ExploreTile } from './ExploreTile';
+import { FeedCard, type FeedCardRow } from '@/components/feed-cards/FeedCard';
 import ExploreGridSkeleton from './ExploreGridSkeleton';
 
 
@@ -24,26 +24,40 @@ interface ExploreGridProps {
   onRegionChange: (slug: string | null) => void;
 }
 
-const GAP = 1;
-const COLS = 2;
-const RADIUS = 0;
-const FALLBACK_RATIO = 1; // square fallback for courses grid
-
-function cornerRadius(ci: number) {
-  const isLeft = ci === 0;
-  const isRight = ci === COLS - 1;
+/**
+ * FeedPost → FeedCardRow mapping (Brief U3R).
+ *
+ * Explore feeds emit FeedPost-shaped rows (no MixedGridRow RPC), so we
+ * synthesize the row context FeedCard reads:
+ *   - derived_format: prefers explicit media.format when present;
+ *     otherwise `duration <= 90 ? 'clip' : 'video'` (falls back to
+ *     'video' when duration is unknown).
+ *   - post_content:  post.caption
+ *   - poster_url:    mediaItem.thumbnailUrl ?? imageUrl
+ *   - duration_seconds: mediaItem.duration
+ *   - creator_username: post.username
+ *   - like_count:    post.likeCount
+ *   - course_name:   post.courseName ?? post.review.courseName
+ */
+function toFeedCardRow(post: FeedPost): FeedCardRow {
+  const media = post.mediaItems[0];
+  const explicit = (media as any)?.format as ('clip' | 'video' | undefined);
+  const duration = media?.duration ?? null;
+  const derived: 'clip' | 'video' =
+    explicit ??
+    (media?.type === 'video'
+      ? (duration != null && duration <= 90 ? 'clip' : 'video')
+      : 'clip');
   return {
-    borderTopLeftRadius: isLeft ? 0 : RADIUS,
-    borderBottomLeftRadius: isLeft ? 0 : RADIUS,
-    borderTopRightRadius: isRight ? 0 : RADIUS,
-    borderBottomRightRadius: isRight ? 0 : RADIUS,
+    post_id: post.id,
+    post_content: post.caption ?? null,
+    derived_format: derived,
+    poster_url: media?.thumbnailUrl ?? media?.imageUrl ?? null,
+    duration_seconds: duration,
+    creator_username: post.username ?? null,
+    like_count: Number(post.likeCount ?? 0),
+    course_name: post.courseName ?? post.review?.courseName ?? null,
   };
-}
-
-interface PlacedTile {
-  post: FeedPost;
-  index: number;
-  ratio: number;
 }
 
 export default function ExploreGrid({
@@ -84,7 +98,6 @@ export default function ExploreGrid({
   const isViewerOwnedHere = useIsViewerOwnedBy('explore');
   const appendPosts = useFullscreenFeedStore((s) => s.appendPosts);
 
-
   useEffect(() => {
     if (!isViewerOwnedHere) return;
     if (coursePosts.length > 0) {
@@ -92,36 +105,19 @@ export default function ExploreGrid({
     }
   }, [coursePosts.length, isViewerOwnedHere, appendPosts, coursePosts]);
 
-  // Autoplay: one active tile per viewport region, driven off data-watch-tile-index.
-  const { activeIdx, railRef: autoplayRef } = useWatchAutoplay({ railId: 'explore-grid', posts });
+  const { activeIndices, railRef: autoplayRef } = useWatchAutoplay({
+    railId: 'explore-grid',
+    posts: coursePosts,
+    maxActive: 3,
+  });
   const setGridRef = useCallback((el: HTMLDivElement | null) => {
     autoplayRef(el);
     if (gridRef) (gridRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
   }, [autoplayRef, gridRef]);
 
+  const cardRows = useMemo(() => coursePosts.map(toFeedCardRow), [coursePosts]);
 
-  // Shortest-column masonry distribution.
-  const columns = useMemo<PlacedTile[][]>(() => {
-    const cols: PlacedTile[][] = Array.from({ length: COLS }, () => []);
-    const heights = new Array(COLS).fill(0);
-    coursePosts.forEach((post, i) => {
-      const w = post.mediaItems?.[0]?.width;
-      const h = post.mediaItems?.[0]?.height;
-      const ratio = w && h && w > 0 && h > 0 ? w / h : FALLBACK_RATIO;
-      const tileH = 1 / ratio;
-      let target = 0;
-      for (let c = 1; c < COLS; c++) {
-        if (heights[c] < heights[target]) target = c;
-      }
-      cols[target].push({ post, index: i, ratio });
-      heights[target] += tileH;
-    });
-    return cols;
-  }, [coursePosts]);
-
-  if (isLoading) {
-    return <ExploreGridSkeleton />;
-  }
+  if (isLoading) return <ExploreGridSkeleton />;
 
   if (isError) {
     return (
@@ -151,55 +147,37 @@ export default function ExploreGrid({
     );
   }
 
+  const leftIdx: number[] = [];
+  const rightIdx: number[] = [];
+  coursePosts.forEach((_, i) => (i % 2 === 0 ? leftIdx : rightIdx).push(i));
+
   return (
-    <div ref={setGridRef} style={{ display: 'flex', flexDirection: 'column', gap: GAP }}>
-
-
-      <div
-        style={{
-          display: 'flex',
-          gap: GAP,
-          alignItems: 'flex-start',
-          paddingInline: 0,
-          marginTop: 0,
-        }}
-      >
-        {columns.map((col, ci) => (
-          <div
-            key={ci}
-            style={{
-              flex: 1,
-              minWidth: 0,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: GAP,
-            }}
-          >
-            {col.map(({ post, index, ratio }) => (
-              <div
-                key={post.id}
-                style={{
-                  position: 'relative',
-                  width: '100%',
-                  aspectRatio: `${ratio}`,
-                  ...cornerRadius(ci),
-                  overflow: 'hidden',
-                }}
-              >
-                <ExploreTile
-                  post={post}
-                  index={index}
-                  allPosts={coursePosts}
-                  fetchNextPage={fetchNextPage}
-                  hasNextPage={hasNextPage}
-                  isFetchingNextPage={isFetchingNextPage}
-                  active={activeIdx === index}
-                />
-              </div>
-            ))}
-
-          </div>
-        ))}
+    <div ref={setGridRef}>
+      <div style={{ display: 'flex', gap: 12, padding: '0 16px' }}>
+        <div style={{ flex: 1 }}>
+          {leftIdx.map((i) => (
+            <FeedCard
+              key={coursePosts[i].id}
+              row={cardRows[i]}
+              feedPost={coursePosts[i]}
+              posts={coursePosts}
+              flatIndex={i}
+              isAutoplayActive={activeIndices.has(i)}
+            />
+          ))}
+        </div>
+        <div style={{ flex: 1 }}>
+          {rightIdx.map((i) => (
+            <FeedCard
+              key={coursePosts[i].id}
+              row={cardRows[i]}
+              feedPost={coursePosts[i]}
+              posts={coursePosts}
+              flatIndex={i}
+              isAutoplayActive={activeIndices.has(i)}
+            />
+          ))}
+        </div>
       </div>
 
       <div ref={sentinelRef} style={{ height: 1, width: '100%' }} />
