@@ -145,6 +145,8 @@ export function useFranchiseStandings() {
         logoUrl: mediaByName[s.normalized_name]?.logo_url ?? null,
         pointsTotal: Math.round(s.earnings_total ?? 0),
         alumniCount: s.player_count ?? 0,
+        winsTotal: s.wins_total ?? 0,
+        top10Total: s.top10_total ?? 0,
         rankChange: rankChangeByName[s.normalized_name] ?? null,
         topAlumni: alumniByCollege[s.normalized_name] ?? [],
       }));
