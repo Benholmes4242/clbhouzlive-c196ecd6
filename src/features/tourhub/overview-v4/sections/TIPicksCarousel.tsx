@@ -46,7 +46,15 @@ function formatThru(thru: number | null | undefined): string {
   return thru >= 18 ? 'F' : `thru ${thru}`;
 }
 
+const CUT_STATUSES = new Set(['CUT', 'WD', 'DQ']);
+function cutStatus(live: PickLiveState | undefined): string | null {
+  const s = (live?.status ?? '').toUpperCase();
+  return CUT_STATUSES.has(s) ? s : null;
+}
+
 function verdict(live: PickLiveState | undefined): { hit: boolean; label: string } {
+  const cut = cutStatus(live);
+  if (cut) return { hit: false, label: `MISS · ${cut}` };
   if (!live || live.position == null) {
     return { hit: false, label: 'MISS' };
   }
@@ -55,6 +63,40 @@ function verdict(live: PickLiveState | undefined): { hit: boolean; label: string
   if (live.position === 1) return { hit: true, label: `WON · ${scoreText}` };
   const hit = live.position <= 10;
   return { hit, label: `${hit ? 'HIT' : 'MISS'} · ${posText} · ${scoreText}` };
+}
+
+/**
+ * Board-ordered picks for live/completed states:
+ *   1) active players with a position — ascending position
+ *   2) players with no leaderboard row — original pick-rank order
+ *   3) CUT/WD/DQ — last, pick-rank order among themselves
+ * Upcoming state keeps the original pick-rank order (no board exists).
+ */
+function orderPicksByBoard(
+  picks: AITopContender[],
+  state: EventState,
+  liveMap: Map<string, PickLiveState> | undefined,
+): AITopContender[] {
+  if (state !== 'live' && state !== 'completed') return picks;
+  const withIdx = picks.map((p, i) => ({ p, i }));
+  const active: typeof withIdx = [];
+  const missing: typeof withIdx = [];
+  const cut: typeof withIdx = [];
+  for (const row of withIdx) {
+    const live = liveMap?.get(row.p.playerId);
+    if (cutStatus(live)) cut.push(row);
+    else if (live && live.position != null) active.push(row);
+    else missing.push(row);
+  }
+  active.sort((a, b) => {
+    const pa = liveMap?.get(a.p.playerId)?.position ?? Number.POSITIVE_INFINITY;
+    const pb = liveMap?.get(b.p.playerId)?.position ?? Number.POSITIVE_INFINITY;
+    if (pa !== pb) return pa - pb;
+    return a.i - b.i;
+  });
+  missing.sort((a, b) => a.i - b.i);
+  cut.sort((a, b) => a.i - b.i);
+  return [...active, ...missing, ...cut].map((r) => r.p);
 }
 
 type SheetState =
@@ -89,10 +131,12 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
     navigate(`/tourhub/player/${playerId}`);
   };
 
+  const orderedPicks = orderPicksByBoard(picks, state, liveMap);
+
   return (
     <SectionShell eyebrow="Tournament intelligence" linkLabel="All picks" onLinkClick={() => setSheet({ kind: 'index' })}>
       <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 16px 10px', scrollPaddingLeft: 16, scrollSnapType: 'x mandatory' }}>
-        {picks.slice(0, 8).map((p) => (
+        {orderedPicks.slice(0, 8).map((p) => (
           <button
             key={p.playerId}
             onClick={() => setSheet({ kind: 'case', pick: p, from: 'card' })}
@@ -154,7 +198,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
 
       {sheet?.kind === 'index' ? (
         <AllPicksSheet
-          picks={picks}
+          picks={orderedPicks}
           state={state}
           tourCode={tourCode}
           liveMap={liveMap}
@@ -188,6 +232,10 @@ function InlineStateValue({ state, pick, live }: { state: EventState; pick: AITo
       </span>
     );
   }
+  const cut = cutStatus(live);
+  if (state === 'live' && cut) {
+    return <CutTag label={cut} />;
+  }
   if (state === 'live') {
     if (!live || live.position == null) {
       const pct = Math.round((pick.winProbability ?? 0) * 100);
@@ -209,7 +257,9 @@ function InlineStateValue({ state, pick, live }: { state: EventState; pick: AITo
       </span>
     );
   }
+  // completed
   const v = verdict(live);
+  const isWon = !cut && live?.position === 1;
   return (
     <span
       style={{
@@ -225,7 +275,28 @@ function InlineStateValue({ state, pick, live }: { state: EventState; pick: AITo
         textTransform: 'uppercase',
       }}
     >
-      {v.hit ? (live?.position === 1 ? 'Won' : 'Hit') : 'Miss'}
+      {v.hit ? (isWon ? 'Won' : 'Hit') : cut ? `Miss · ${cut}` : 'Miss'}
+    </span>
+  );
+}
+
+function CutTag({ label }: { label: string }) {
+  return (
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        padding: '2px 6px',
+        borderRadius: 5,
+        background: 'rgba(15,23,42,0.06)',
+        color: V4.inkMute,
+        fontSize: 9.5,
+        fontWeight: 800,
+        letterSpacing: '0.06em',
+        textTransform: 'uppercase',
+      }}
+    >
+      {label}
     </span>
   );
 }
@@ -402,7 +473,9 @@ function SheetStateStrip({ state, pick, live }: { state: EventState; pick: AITop
       </div>
     );
   }
+  const cut = cutStatus(live);
   if (state === 'live') {
+    if (cut) return <CutTag label={cut} />;
     if (!live || live.position == null) {
       const pct = Math.round((pick.winProbability ?? 0) * 100);
       return <div style={{ fontSize: 11, fontWeight: 700, color: V4.inkMute, fontVariantNumeric: 'tabular-nums' }}>{pct}% win prob · not on board yet</div>;
@@ -420,9 +493,12 @@ function SheetStateStrip({ state, pick, live }: { state: EventState; pick: AITop
     );
   }
   const v = verdict(live);
-  const finalLine = live && live.position != null
-    ? `${formatPosition(live.position, live.positionTied)} · ${formatScore(live.score)}`
-    : '—';
+  const isWon = !cut && live?.position === 1;
+  const finalLine = cut
+    ? null
+    : live && live.position != null
+      ? `${formatPosition(live.position, live.positionTied)} · ${formatScore(live.score)}`
+      : '—';
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
       <span
@@ -437,9 +513,11 @@ function SheetStateStrip({ state, pick, live }: { state: EventState; pick: AITop
           textTransform: 'uppercase',
         }}
       >
-        {v.hit ? (live?.position === 1 ? 'Won' : 'Hit') : 'Miss'}
+        {v.hit ? (isWon ? 'Won' : 'Hit') : cut ? `Miss · ${cut}` : 'Miss'}
       </span>
-      <span style={{ fontSize: 11.5, fontWeight: 700, color: V4.inkMute, fontVariantNumeric: 'tabular-nums' }}>{finalLine}</span>
+      {finalLine ? (
+        <span style={{ fontSize: 11.5, fontWeight: 700, color: V4.inkMute, fontVariantNumeric: 'tabular-nums' }}>{finalLine}</span>
+      ) : null}
     </div>
   );
 }
