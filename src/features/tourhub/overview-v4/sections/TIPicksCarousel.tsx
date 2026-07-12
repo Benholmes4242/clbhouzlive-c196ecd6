@@ -232,6 +232,10 @@ function InlineStateValue({ state, pick, live }: { state: EventState; pick: AITo
       </span>
     );
   }
+  const cut = cutStatus(live);
+  if ((state === 'live' || state === 'completed') && cut && state === 'live') {
+    return <CutTag label={cut} />;
+  }
   if (state === 'live') {
     if (!live || live.position == null) {
       const pct = Math.round((pick.winProbability ?? 0) * 100);
@@ -253,7 +257,9 @@ function InlineStateValue({ state, pick, live }: { state: EventState; pick: AITo
       </span>
     );
   }
+  // completed
   const v = verdict(live);
+  const isWon = !cut && live?.position === 1;
   return (
     <span
       style={{
@@ -269,7 +275,28 @@ function InlineStateValue({ state, pick, live }: { state: EventState; pick: AITo
         textTransform: 'uppercase',
       }}
     >
-      {v.hit ? (live?.position === 1 ? 'Won' : 'Hit') : 'Miss'}
+      {v.hit ? (isWon ? 'Won' : 'Hit') : cut ? `Miss · ${cut}` : 'Miss'}
+    </span>
+  );
+}
+
+function CutTag({ label }: { label: string }) {
+  return (
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        padding: '2px 6px',
+        borderRadius: 5,
+        background: 'rgba(15,23,42,0.06)',
+        color: V4.inkMute,
+        fontSize: 9.5,
+        fontWeight: 800,
+        letterSpacing: '0.06em',
+        textTransform: 'uppercase',
+      }}
+    >
+      {label}
     </span>
   );
 }
