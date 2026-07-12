@@ -123,6 +123,34 @@ const ClubhouseContent = () => {
     setStoreActiveTab(activeTab);
   }, [activeTab, setStoreActiveTab]);
 
+  // H4b — ChromeIsland integration.
+  // The page is keep-alive-mounted, so slot + suppress registrations are
+  // gated by pathname to avoid leaking Clubhouse chrome onto other routes
+  // when the user navigates away.
+  const isClubhouseRoute = pathname === '/' || pathname === '/clubhouse';
+  const handleIslandTabChange = useCallback((tab: 'foryou' | 'friends') => {
+    if (tab === activeTab) return;
+    // Preserve outgoing tab's Virtuoso snapshot before the keyed remount.
+    cardFeedRef.current?.captureSnapshot();
+    setActiveTab(tab);
+  }, [activeTab, setActiveTab]);
+  const islandSlot = useMemo(
+    () =>
+      isClubhouseRoute ? (
+        <ClubhouseIslandTabs
+          activeTab={activeTab}
+          onTabChange={handleIslandTabChange}
+          isBusinessActor={isBusinessActor}
+        />
+      ) : null,
+    [isClubhouseRoute, activeTab, handleIslandTabChange, isBusinessActor],
+  );
+  useSetChromeLeftSlot(islandSlot);
+  // PGA "This Week" card takeover — suppress both island capsules while active.
+  useSetChromeSuppressed(isClubhouseRoute && isTournamentCardActive);
+
+
+
   // Per-tab Virtuoso snapshots — captured on switch-AWAY (CardFeed unmount)
   // and restored on switch-BACK so each tab retains its exact scroll offset.
   const virtuosoSnapshots = useRef<Record<string, StateSnapshot | undefined>>({});
