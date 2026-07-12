@@ -234,12 +234,6 @@ function fmtScore(score: number | null | undefined): string {
   return `${score}`;
 }
 
-function fmtWinnerScore(v: number | string | null | undefined): string {
-  if (v === null || v === undefined) return '';
-  if (typeof v === 'number') return fmtScore(v);
-  const trimmed = String(v).trim();
-  return trimmed;
-}
 
 const MONTH_NAMES = [
   'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE',
@@ -389,7 +383,7 @@ export function useSeasonTimeline(tour: TourId): {
             photoUrl: w.photoUrl,
             tourCode: w.tourCode,
             scoreText:
-              w.displayScore || fmtWinnerScore(r.winner_score) || '',
+              w.displayScore || '',
           };
         } else {
           evt.champion = null;

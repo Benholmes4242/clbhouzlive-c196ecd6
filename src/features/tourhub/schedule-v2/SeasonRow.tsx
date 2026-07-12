@@ -156,7 +156,7 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
 
           {isDone && event.champion && (
             <ChampionStrip
-              name={event.champion.displayName || event.champion.name}
+  
               scoreText={event.champion.scoreText}
               photoCandidates={resolvePlayerAvatarCandidates({
                 name: event.champion.name,
@@ -168,7 +168,7 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
 
           {isLive && event.leader && (
             <LeaderStrip
-              name={event.leader.displayName || event.leader.name}
+  
               totalText={event.leader.totalText}
               photoCandidates={resolvePlayerAvatarCandidates({
                 name: event.leader.name,
