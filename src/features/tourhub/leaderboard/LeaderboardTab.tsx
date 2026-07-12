@@ -398,17 +398,6 @@ export function LeaderboardTab() {
                 aria-pressed={active}
               >
                 {t.name}
-                <span
-                  style={{
-                    marginLeft: 6,
-                    fontSize: 9,
-                    fontWeight: 700,
-                    color: MUTED,
-                    letterSpacing: '0.04em',
-                  }}
-                >
-                  {i + 1} OF {liveTournaments.length}
-                </span>
               </button>
             );
           })}
