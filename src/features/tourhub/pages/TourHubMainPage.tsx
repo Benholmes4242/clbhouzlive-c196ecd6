@@ -5,7 +5,7 @@ import { TourHubShell } from '../components/TourHubShell';
 import { TourHubShellTabs } from '../components/TourHubShellTabs';
 import { ShellSlot } from '@/components/header/ShellSlot';
 import type { TourHubTab } from '../components/types';
-import { OverviewTab, ScheduleTab, PlayersTab, LeadersTab, LiveLeaderboardTab } from '../components/tabs';
+import { OverviewTab, ScheduleTab, PlayersTab, LeadersTab } from '../components/tabs';
 import { LeaderboardTab } from '@/features/tourhub/leaderboard/LeaderboardTab';
 import { ScheduleShellRow } from '../components/shell/ScheduleShellRow';
 import { PlayersShellRow } from '../components/shell/PlayersShellRow';
