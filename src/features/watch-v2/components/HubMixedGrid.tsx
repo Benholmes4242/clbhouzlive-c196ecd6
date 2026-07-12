@@ -144,24 +144,24 @@ export function HubMixedGrid({ filter = 'all' }: { filter?: string } = {}) {
         <div ref={railRef} style={{ display: 'flex', gap: 12, padding: '0 16px' }}>
           <div style={{ flex: 1 }}>
             {packed.left.map(({ item, flatIndex: i }) => (
-              <Tile
+              <FeedCard
                 key={item.post_id}
                 row={item}
-                post={feedPosts[i]}
-                index={i}
+                feedPost={feedPosts[i]}
                 posts={feedPosts}
+                flatIndex={i}
                 isAutoplayActive={activeIndices.has(i)}
               />
             ))}
           </div>
           <div style={{ flex: 1 }}>
             {packed.right.map(({ item, flatIndex: i }) => (
-              <Tile
+              <FeedCard
                 key={item.post_id}
                 row={item}
-                post={feedPosts[i]}
-                index={i}
+                feedPost={feedPosts[i]}
                 posts={feedPosts}
+                flatIndex={i}
                 isAutoplayActive={activeIndices.has(i)}
               />
             ))}
