@@ -4,7 +4,7 @@
  * requested tour has no sr_player_statistics coverage (currently non-PGA).
  */
 import { useTourSelection } from '@/features/tourhub/context/TourSelectionContext';
-import { StatWatch } from '@/features/tourhub/overview-v4/sections/StatWatch';
+import { StatWatch } from '@/features/tourhub/overview/sections/StatWatch';
 import type { TourId } from '@/features/tourhub/hooks/useOverviewData';
 
 export function StatWatchSlot() {

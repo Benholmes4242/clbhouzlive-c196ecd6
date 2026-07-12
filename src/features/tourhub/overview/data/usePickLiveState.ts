@@ -23,7 +23,7 @@ export function usePickLiveState(
 ) {
   const idsKey = [...playerIds].sort().join(',');
   return useQuery({
-    queryKey: ['overview-v4', 'pick-live-state', tournamentId, idsKey],
+    queryKey: ['overview', 'pick-live-state', tournamentId, idsKey],
     queryFn: async (): Promise<Map<string, PickLiveState>> => {
       if (!tournamentId || playerIds.length === 0) return new Map();
       const { data, error } = await supabase

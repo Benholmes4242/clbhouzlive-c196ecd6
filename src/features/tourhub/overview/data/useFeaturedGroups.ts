@@ -8,7 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 export function useFeaturedGroups(tournamentId: string | undefined, opts: { live: boolean }) {
   return useQuery({
-    queryKey: ['overview-v4', 'featured-groups', tournamentId],
+    queryKey: ['overview', 'featured-groups', tournamentId],
     queryFn: async () => {
       if (!tournamentId) return null;
       const { data, error } = await supabase.rpc('get_featured_groups', {

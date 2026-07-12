@@ -3,7 +3,7 @@
  * keyed to viewingTournamentId (matches hero + On-the-Course rail).
  */
 import { useTourSelection } from '@/features/tourhub/context/TourSelectionContext';
-import { TIPicksCarousel } from '@/features/tourhub/overview-v4/sections/TIPicksCarousel';
+import { TIPicksCarousel } from '@/features/tourhub/overview/sections/TIPicksCarousel';
 import { useTournamentPulse } from './useTournamentPulse';
 
 export function TISlot() {

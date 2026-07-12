@@ -113,7 +113,7 @@ async function fetchSeasonBoard(tourCode: 'euro' | 'lpga'): Promise<RankingsRow[
 
 export function useRankingsBoards(board: RankingsBoard) {
   return useQuery({
-    queryKey: ['overview-v4', 'rankings', board],
+    queryKey: ['overview', 'rankings', board],
     queryFn: async (): Promise<RankingsRow[]> => {
       if (board === 'owgr') return fetchOwgr();
       if (board === 'r2d') return fetchSeasonBoard('euro');
