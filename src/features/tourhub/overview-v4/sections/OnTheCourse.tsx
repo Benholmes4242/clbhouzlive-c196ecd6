@@ -7,10 +7,12 @@
 import { useFeaturedGroups } from '../data/useFeaturedGroups';
 import { SectionShell } from './SectionShell';
 import { V4 } from '../tokens';
+import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 
 interface Props {
   tournamentId: string | undefined;
   live: boolean;
+  tourCode?: string;
 }
 
 interface GroupPlayerShape {
