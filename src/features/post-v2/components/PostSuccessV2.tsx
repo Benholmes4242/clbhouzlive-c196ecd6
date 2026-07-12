@@ -61,7 +61,7 @@ function UploadingState({ result, onDone }: Props) {
 
   return (
     <div style={{ flex: 1, background: '#F8FAFC', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14, padding: '0 28px', textAlign: 'center', maxWidth: 340 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '0 24px', textAlign: 'center', maxWidth: 340 }}>
         <ProgressRing size={64} progress={progress} />
         <div style={{ fontSize: 16, fontWeight: 600, color: '#1F2428' }}>
           {isScheduled ? 'Scheduled' : 'Posting...'}
