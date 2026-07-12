@@ -292,7 +292,7 @@ const ChallengesPage = lazy(() => import("./pages/ChallengesPage"));
 const BusinessDirectoryPage = lazy(() => import("./pages/BusinessDirectoryPage"));
 const BusinessInsightsPageV2 = lazy(() => import("./pages/BusinessInsightsPageV2"));
 const BusinessProfilePage = lazy(() => import("./pages/BusinessProfilePage"));
-const BusinessFollowersPage = lazy(() => import("./pages/BusinessFollowersPage"));
+
 const MyBusinessesPage = lazy(() => import("./pages/MyBusinessesPage"));
 const BusinessProfileEditor = lazy(() => import("./pages/BusinessProfileEditor"));
 
