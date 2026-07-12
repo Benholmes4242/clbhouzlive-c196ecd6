@@ -1,21 +1,23 @@
 /**
  * BoardTable — Tour Book leaderboard rows.
  *
- * Columns: POS(46, left) | PLAYER(flex) | TOT(44, center) | THRU(44, center) | TODAY(44, center)
- * Header rendered by parent (LeaderboardTab); this component renders only rows.
+ * Columns: POS(26) + MOVE(20) = 46 left | PLAYER(flex) | TOT(44) | THRU(44) | TODAY(44)
+ * Header rendered by parent (LeaderboardTab) with a single 46px POS
+ * label; the delta lives inside that footprint so the outer layout
+ * is unchanged.
  *
  * House score colors:
  *   under par -> #189A55
  *   over par  -> #C24A4A
  *   E/level   -> #8A9099
  *
- * MOVEMENT COLUMN (v1: OMITTED — no data source).
- * When prior_position lands on sr_leaderboards, a movement delta
- * sub-column will be reintroduced as a FIXED-WIDTH slot immediately
- * to the right of POS. The slot must be sized independently of POS
- * so that deltas (▲2, ▼1, —) are vertically aligned across all
- * rows regardless of position width (single digit, double digit,
- * or T-prefixed). Do NOT bake the delta into the POS column.
+ * MOVEMENT COLUMN (live — computed round-start deltas).
+ * POS is a two-slot cell: position (T-prefixed) in a 26px slot,
+ * delta in an adjacent 20px slot. That guarantees deltas ('UP N' /
+ * 'DN N') sit on the same vertical line whether the position is '1'
+ * or 'T44'. Deltas come from movementFromRounds using standard-
+ * competition ranking on prior-round strokes. Zero delta / no delta
+ * renders empty (quiet board). CUT/WD/DQ rows never show a delta.
  *
  * CUT sentence and CUT/WD/DQ demoted rows are inserted inline by
  * this component; the parent supplies cut state via props.
@@ -23,6 +25,7 @@
 
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { movementFromRounds } from './movementFromRounds';
 
 const INK = '#0F172A';
 const SECONDARY = '#4B5563';
@@ -34,7 +37,8 @@ const SCORE_UNDER = '#189A55';
 const SCORE_OVER = '#C24A4A';
 const SCORE_EVEN = '#8A9099';
 
-const POS_W = 46;
+const POS_NUM_W = 26;
+const POS_MOVE_W = 20;
 const NUM_W = 44;
 
 const F = 'Geist, system-ui, sans-serif';
@@ -69,6 +73,7 @@ export interface CutState {
 interface Props {
   entries: BoardEntry[];
   cutState: CutState;
+  currentRound?: number | null;
 }
 
 function houseColor(score: number | null | undefined): string {
@@ -132,8 +137,27 @@ function statusWord(s?: string | null): string {
   return u || '-';
 }
 
-export function BoardTable({ entries, cutState }: Props) {
+export function BoardTable({ entries, cutState, currentRound }: Props) {
   const navigate = useNavigate();
+
+  // Computed round-start deltas (empty in R1 / when unavailable).
+  const movementMap = useMemo(
+    () =>
+      movementFromRounds(
+        entries.map((e) => ({
+          id: e.id,
+          playerId: e.player?.id ?? null,
+          position: e.position,
+          status: e.status ?? null,
+          round_1: e.round_1 ?? null,
+          round_2: e.round_2 ?? null,
+          round_3: e.round_3 ?? null,
+          round_4: e.round_4 ?? null,
+        })),
+        currentRound ?? null,
+      ),
+    [entries, currentRound],
+  );
 
   // Partition: active rows first (in incoming order), demoted after.
   const { active, demoted, insertionIndex } = useMemo(() => {
@@ -230,10 +254,10 @@ export function BoardTable({ entries, cutState }: Props) {
           fontFamily: F,
         }}
       >
-        {/* POS */}
+        {/* POS + MOVE — two fixed sub-slots so deltas align across all rows */}
         <div
           style={{
-            width: POS_W,
+            width: POS_NUM_W,
             flexShrink: 0,
             fontSize: demotedRow ? 9 : 12.5,
             fontWeight: demotedRow ? 800 : 700,
@@ -244,6 +268,46 @@ export function BoardTable({ entries, cutState }: Props) {
         >
           {posText}
         </div>
+        <div
+          style={{
+            width: POS_MOVE_W,
+            flexShrink: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-start',
+          }}
+        >
+          {(() => {
+            if (demotedRow) return null;
+            const pid = e.player?.id;
+            const d = pid ? movementMap.get(pid) : undefined;
+            if (d == null || d === 0) return null;
+            const climbed = d > 0;
+            const n = Math.abs(d);
+            return (
+              <span
+                aria-label={climbed ? `Up ${n}` : `Down ${n}`}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 2,
+                  fontFamily: F,
+                  fontSize: 8.5,
+                  fontWeight: 800,
+                  color: climbed ? SCORE_UNDER : SCORE_OVER,
+                  fontVariantNumeric: 'tabular-nums',
+                  letterSpacing: '0.02em',
+                }}
+              >
+                <span aria-hidden style={{ fontSize: 8 }}>
+                  {climbed ? '\u25B2' : '\u25BC'}
+                </span>
+                {n}
+              </span>
+            );
+          })()}
+        </div>
+
 
         {/* PLAYER — two lines */}
         <div style={{ flex: 1, minWidth: 0 }}>

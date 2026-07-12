@@ -454,7 +454,7 @@ export function LeaderboardTab() {
           }
         />
       ) : (
-        <BoardTable entries={filteredEntries} cutState={cutState} />
+        <BoardTable entries={filteredEntries} cutState={cutState} currentRound={currentRound} />
       )}
 
       {/* FOOTNOTE */}
