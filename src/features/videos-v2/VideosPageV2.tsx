@@ -182,7 +182,7 @@ export default function VideosPageV2() {
           <CategoryChips value={category} onChange={setCategory} />
         </div>
 
-        {/* V2.2: feed mounts here */}
+        <VideosFeedV2 sort={sort} category={category} />
       </main>
 
       <SearchOverlayV2 isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
