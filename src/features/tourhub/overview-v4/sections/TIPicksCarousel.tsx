@@ -85,7 +85,7 @@ function verdict(live: PickLiveState | undefined): { hit: boolean; label: string
   return { hit, label: `${hit ? 'HIT' : 'MISS'} · ${posText} · ${scoreText}` };
 }
 
-export function TIPicksCarousel({ tournamentId, state }: Props) {
+export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props) {
   const { data } = useAIPredictions(tournamentId ?? null);
   const [open, setOpen] = useState<AITopContender | null>(null);
   const picks = data?.topContenders ?? [];
