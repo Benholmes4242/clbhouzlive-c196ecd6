@@ -220,7 +220,7 @@ function CommentsSheetV2Inner({
             </div>
 
             {/* Header */}
-            <div className="flex items-start justify-between px-5 pt-2 pb-3 shrink-0">
+            <div className="flex items-start justify-between px-5 pb-3 shrink-0">
               <div>
                 <div style={{
                   fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em',
