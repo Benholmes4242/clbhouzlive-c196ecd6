@@ -156,7 +156,8 @@ async function fetchPlayers(ids: string[]): Promise<Map<string, PlayerRec>> {
   return new Map(((data ?? []) as PlayerRec[]).map((p) => [p.id, p]));
 }
 
-async function fetchWorldRankingCat(tour: TourId): Promise<LeaderCategoryDef | null> {
+async function fetchWorldRankingCat(): Promise<LeaderCategoryDef | null> {
+  // World ranking (OWGR) is PGA-centric / male-tour — restricted to PGA only.
   const { data } = await supabase
     .from('sr_world_rankings')
     .select('player_id, rank, points, ranking_date')
@@ -166,35 +167,29 @@ async function fetchWorldRankingCat(tour: TourId): Promise<LeaderCategoryDef | n
   if (!data?.length) return null;
   const latestDate = data[0].ranking_date;
   const latest = data.filter((r) => r.ranking_date === latestDate);
-  // de-dupe by player
   const seen = new Set<string>();
   const dedup = latest.filter((r) => (seen.has(r.player_id) ? false : (seen.add(r.player_id), true)));
 
   const pmap = await fetchPlayers(dedup.map((r) => r.player_id));
 
-  // Tour scoping — champ shows CHAMP tour only; other tours use full OWGR top-50.
-  const filtered = dedup.filter((r) => {
-    const p = pmap.get(r.player_id);
-    if (!p) return false;
-    if (tour === 'champ') return (p.tour_codes ?? []).includes('CHAMP');
-    return true;
-  });
-
-  const rows: LeaderRow[] = filtered.slice(0, 50).map((r, i) => {
-    const p = pmap.get(r.player_id)!;
-    const pts = r.points != null ? Number(r.points) : 0;
-    return {
-      playerId: r.player_id,
-      rank: i + 1,
-      name: p.full_name,
-      country: p.country ?? null,
-      countryCode: p.country_code ?? null,
-      photoUrl: p.photo_url ?? null,
-      tourCode: p.tour_codes?.[0] ?? tour,
-      value: pts,
-      valueFormatted: pts > 0 ? `${pts.toLocaleString(undefined, { maximumFractionDigits: 2 })}` : `#${i + 1}`,
-    };
-  });
+  const rows: LeaderRow[] = dedup
+    .filter((r) => pmap.has(r.player_id))
+    .slice(0, 50)
+    .map((r, i) => {
+      const p = pmap.get(r.player_id)!;
+      const pts = r.points != null ? Number(r.points) : 0;
+      return {
+        playerId: r.player_id,
+        rank: i + 1,
+        name: p.full_name,
+        country: p.country ?? null,
+        countryCode: p.country_code ?? null,
+        photoUrl: p.photo_url ?? null,
+        tourCode: p.tour_codes?.[0] ?? 'pga',
+        value: pts,
+        valueFormatted: pts > 0 ? `${pts.toLocaleString(undefined, { maximumFractionDigits: 2 })}` : `#${i + 1}`,
+      };
+    });
 
   return {
     key: 'world_rank',
@@ -208,13 +203,13 @@ async function fetchWorldRankingCat(tour: TourId): Promise<LeaderCategoryDef | n
 async function fetchPgaCategories(): Promise<LeaderCategoriesResult> {
   const seasonId = await resolvePgaSeasonId();
   if (!seasonId) {
-    const world = await fetchWorldRankingCat('pga');
+    const world = await fetchWorldRankingCat();
     return { synced: false, categories: world ? [world] : [], year: currentSeasonYear() };
   }
   const { data: stats } = await supabase
     .from('sr_player_statistics')
     .select(
-      'player_id, earnings, scoring_average, wins, top_10s, driving_distance, driving_accuracy, greens_in_reg, scrambling, putting_average, sand_saves, strokes_gained_total, strokes_gained_tee_green'
+      'player_id, earnings, scoring_average, wins, top_10s, driving_distance, driving_accuracy, greens_in_reg, sand_saves, putting_average, strokes_gained_tee_green, strokes_gained_putting'
     )
     .eq('season_id', seasonId)
     .limit(500);
