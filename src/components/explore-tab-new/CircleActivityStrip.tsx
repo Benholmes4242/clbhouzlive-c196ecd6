@@ -15,7 +15,7 @@ import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/rou
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const CARD_W = 226;
-const CARD_H = 240;
+const CARD_H = 215;
 const AMBER_TEXT = '#c97a10';
 
 // Label per feat_type — cards are emoji-free; FEAT_META (with emojis) is
@@ -225,7 +225,7 @@ function CircleActivityCard({ row, onTap }: CardProps) {
           position: 'absolute',
           inset: 0,
           background:
-            'linear-gradient(180deg, rgba(7,8,12,0.25) 0%, rgba(7,8,12,0.05) 30%, rgba(7,8,12,0.55) 62%, rgba(7,8,12,0.92) 100%)',
+            'linear-gradient(180deg, rgba(7,8,12,0.28) 0%, rgba(7,8,12,0.10) 22%, rgba(7,8,12,0.00) 38%, rgba(7,8,12,0.06) 50%, rgba(7,8,12,0.18) 60%, rgba(7,8,12,0.34) 70%, rgba(7,8,12,0.52) 79%, rgba(7,8,12,0.70) 87%, rgba(7,8,12,0.86) 94%, rgba(7,8,12,0.94) 100%)',
         }}
       />
 
@@ -289,7 +289,7 @@ function CircleActivityCard({ row, onTap }: CardProps) {
           position: 'absolute',
           left: 14,
           right: 14,
-          bottom: 56,
+          bottom: 50,
           display: 'flex',
           flexDirection: 'column',
           gap: 4,
@@ -298,7 +298,7 @@ function CircleActivityCard({ row, onTap }: CardProps) {
         {heroValue ? (
           <div
             style={{
-              fontSize: 30,
+              fontSize: 27,
               fontWeight: 900,
               letterSpacing: '-0.015em',
               lineHeight: 1,
@@ -335,8 +335,8 @@ function CircleActivityCard({ row, onTap }: CardProps) {
           left: 0,
           right: 0,
           bottom: 0,
-          padding: '9px 14px 11px',
-          borderTop: '1px solid rgba(255,255,255,0.12)',
+          padding: '8px 14px 10px',
+          borderTop: '1px solid rgba(255,255,255,0.08)',
           display: 'flex',
           alignItems: 'center',
           gap: 10,
