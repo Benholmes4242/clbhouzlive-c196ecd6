@@ -114,13 +114,14 @@ export function VideosFeedV2({ sort, category }: Props) {
 
   const feedPosts = useMemo(() => toFeedPosts(rows), [rows]);
 
-  // Autoplay across the feed container. maxActive:2 - tall full-width cards
-  // mean ~1 per viewport; a second slot lets the entering card start playing
-  // at the bottom edge instead of waiting to out-rank the exiting incumbent.
+  // Autoplay across the feed container. maxActive:3 - viewport fits ~2 tall
+  // cards, so 2 slots were usually both held by visible cards and the entering
+  // card still had to win a steal; a third slot guarantees the entering card
+  // activates at the viewport edge.
   const { activeIndices, railRef } = useWatchAutoplay({
     railId: 'videos-v2-feed',
     posts: feedPosts,
-    maxActive: 2,
+    maxActive: 3,
   });
 
   // Pending uploads (video-kind only) — same semantics as VideosFullFeed.
