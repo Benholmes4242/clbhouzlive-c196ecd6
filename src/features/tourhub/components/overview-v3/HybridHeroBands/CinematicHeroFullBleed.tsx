@@ -330,10 +330,8 @@ export function CinematicHeroFullBleed({
   // Pseudo-major slides never render a tour name (e.g. "DP WORLD TOUR").
   const tourSuffix = tourLabel && !isPseudoMajor ? ` · ${tourLabel.toUpperCase()}` : '';
   if (isLive) {
-    eyebrowText = isPseudoMajor
-      ? `LIVE · MAJOR CHAMPIONSHIP`
-      : `LIVE · ${roundLabel(state.round, state.totalRounds).toUpperCase()}${tourSuffix}`;
-    if (isPseudoMajor) eyebrowGold = true;
+    // Live state: tour name only, no "LIVE", round label, or major tag.
+    eyebrowText = tourLabel ? tourLabel.toUpperCase() : '';
   } else if (awaitingPlayoff) {
     eyebrowText = `PLAYOFF${tourSuffix}`;
     eyebrowGold = true;
