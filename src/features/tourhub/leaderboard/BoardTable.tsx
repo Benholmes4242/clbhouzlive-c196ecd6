@@ -139,7 +139,7 @@ function statusWord(s?: string | null): string {
   return u || '-';
 }
 
-export function BoardTable({ entries, cutState, currentRound }: Props) {
+export function BoardTable({ entries, cutState, currentRound, onRowClick }: Props) {
   const navigate = useNavigate();
 
   // Computed round-start deltas (empty in R1 / when unavailable).
