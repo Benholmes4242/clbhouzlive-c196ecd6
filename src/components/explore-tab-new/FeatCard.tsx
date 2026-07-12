@@ -1,16 +1,16 @@
 import { useMemo } from 'react';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
-import { INK, INK_MUTE, HAIRLINE_INK_8, INK_TINT_06 } from '@/features/courses/_shared/tokens';
-import { TIER_ICON } from './AlmanacSections';
 import type { FeatRow, FeatTier } from './hooks/useRegionFeats';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
-const CARD_W = 244;
+const CARD_W = 226;
+const CARD_H = 240;
 
-const RING: Record<FeatTier, string> = {
+// Tier accents (drives tick, WHS mark, legendary glow + avatar ring).
+const ACCENT: Record<FeatTier, string> = {
   legendary: '#FBBC2E',
-  records: '#3B82F6',
-  eagles: '#10B981',
+  records: '#7DD3FC',
+  eagles: '#22C55E',
   birdie_hauls: '#F7931E',
 };
 
@@ -22,8 +22,8 @@ const TIER_LABEL: Record<FeatTier, string> = {
 };
 
 const RECORD_CATEGORY_LABEL: Record<string, string> = {
-  lowest_gross_all_time: 'Course record',
-  best_stableford_all_time: 'Stableford record',
+  lowest_gross_all_time: 'COURSE RECORD',
+  best_stableford_all_time: 'STABLEFORD RECORD',
 };
 
 function formatHolderName(raw?: string | null): string {
@@ -52,12 +52,12 @@ function relDate(iso?: string | null): string {
   const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
   const that = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
   const days = Math.round((startToday - that) / 86400000);
-  if (days <= 0) return 'today';
-  if (days === 1) return 'yesterday';
-  if (days < 7) return `${days}d ago`;
-  if (days < 30) return `${Math.floor(days / 7)}w ago`;
-  if (days < 365) return `${Math.floor(days / 30)}mo ago`;
-  return `${Math.floor(days / 365)}y ago`;
+  if (days <= 0) return 'TODAY';
+  if (days === 1) return 'YESTERDAY';
+  if (days < 7) return `${days}D AGO`;
+  if (days < 30) return `${Math.floor(days / 7)}W AGO`;
+  if (days < 365) return `${Math.floor(days / 30)}MO AGO`;
+  return `${Math.floor(days / 365)}Y AGO`;
 }
 
 interface Props {
@@ -71,9 +71,10 @@ export function FeatCard({ row, tier, onTap }: Props) {
   const isRecord = tier === 'records';
   const image = row.course_image ?? row.thumbnail_image ?? null;
   const holder = formatHolderName(row.holder_name);
-  const ringColor = RING[tier];
+  const accent = ACCENT[tier];
+
   const chipLabel = isRecord
-    ? (RECORD_CATEGORY_LABEL[row.category ?? ''] ?? 'Course record')
+    ? (RECORD_CATEGORY_LABEL[row.category ?? ''] ?? 'COURSE RECORD')
     : isLegendary
       ? (row.feat_type === 'albatross'
           ? 'ALBATROSS'
@@ -81,35 +82,30 @@ export function FeatCard({ row, tier, onTap }: Props) {
             ? 'HOLE-IN-ONE'
             : 'LEGENDARY')
       : TIER_LABEL[tier];
-  const value = useMemo(() => {
+
+  const heroValue = useMemo(() => {
     if (isRecord) {
       if (row.value == null) return '';
       const v = Number(row.value);
       switch (row.category) {
         case 'lowest_gross_all_time':
-          return `Gross ${v}`;
+          return `GROSS ${v}`;
         case 'best_stableford_all_time':
-          return `${v} pts`;
+          return `${v} PTS`;
         default:
-          return String(row.value);
+          return String(row.value).toUpperCase();
       }
     }
-    return row.feat_value ?? '';
+    return (row.feat_value ?? '').toUpperCase();
   }, [isRecord, row.category, row.feat_value, row.value]);
+
   const when = relDate(row.play_date ?? row.attained_at ?? null);
 
-  // Palette
-  const cardBg = isLegendary
-    ? 'linear-gradient(160deg, #0F172A 0%, #1e1b13 60%, #2a1e08 100%)'
-    : '#FFFFFF';
-  const border = isLegendary ? '1px solid rgba(251,188,46,0.24)' : `1px solid ${HAIRLINE_INK_8}`;
-  const nameColor = isLegendary ? '#FFFFFF' : INK;
-  const courseColor = isLegendary ? 'rgba(255,255,255,0.72)' : INK_MUTE;
-  const valueColor = isLegendary ? '#F8F4E8' : INK;
-  const chipBg = isLegendary ? 'rgba(251,188,46,0.14)' : 'rgba(15,23,42,0.05)';
-  const chipText = isLegendary ? '#FBBC2E' : INK;
-  
-  
+  const boxShadow = isLegendary
+    ? '0 0 0 1px #FBBC2E55, 0 10px 28px rgba(0,0,0,0.35)'
+    : 'inset 0 1px 0 rgba(255,255,255,0.06), 0 8px 24px rgba(0,0,0,0.28)';
+
+  const fallbackBg = 'linear-gradient(135deg, #0F172A 0%, #1e293b 100%)';
 
   return (
     <button
@@ -117,79 +113,137 @@ export function FeatCard({ row, tier, onTap }: Props) {
       onClick={onTap}
       className="text-left active:scale-[0.98] transition-transform"
       style={{
+        position: 'relative',
         flexShrink: 0,
         width: CARD_W,
-        background: cardBg,
-        border,
+        height: CARD_H,
+        background: image ? '#07080C' : fallbackBg,
         borderRadius: 16,
         overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
         padding: 0,
         cursor: 'pointer',
         fontFamily: FONT,
+        boxShadow,
+        border: 'none',
       }}
     >
-      {/* Image */}
-      <div
-        style={{
-          position: 'relative',
-          width: '100%',
-          height: 116,
-          background: image ? INK_TINT_06 : 'linear-gradient(135deg, #0F172A 0%, #1e293b 100%)',
-        }}
-      >
-        {image ? (
-          <img
-            src={image}
-            alt=""
-            loading="lazy"
-            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-          />
-        ) : null}
-        <div
+      {/* Full-bleed image */}
+      {image ? (
+        <img
+          src={image}
+          alt=""
+          loading="lazy"
           style={{
             position: 'absolute',
             inset: 0,
-            background:
-              'linear-gradient(180deg, rgba(15,23,42,0) 40%, rgba(15,23,42,0.82) 100%)',
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            display: 'block',
           }}
         />
-        <div
+      ) : null}
+
+      {/* Obsidian scrim */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background:
+            'linear-gradient(180deg, rgba(7,8,12,0.25) 0%, rgba(7,8,12,0.05) 30%, rgba(7,8,12,0.55) 62%, rgba(7,8,12,0.92) 100%)',
+        }}
+      />
+
+      {/* Top-left: tick + typographic label */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 12,
+          left: 12,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+        }}
+      >
+        <span
+          aria-hidden
           style={{
-            position: 'absolute',
-            top: 8,
-            left: 8,
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 5,
-            padding: '4px 8px',
-            borderRadius: 999,
-            background: 'rgba(15,23,42,0.55)',
-            backdropFilter: 'blur(6px)',
-            WebkitBackdropFilter: 'blur(6px)',
-            color: '#FFFFFF',
+            display: 'block',
+            width: 3,
+            height: 12,
+            borderRadius: 1,
+            background: accent,
+          }}
+        />
+        <span
+          style={{
             fontSize: 10,
             fontWeight: 800,
-            letterSpacing: '0.08em',
-            lineHeight: 1.2,
+            letterSpacing: '0.16em',
             textTransform: 'uppercase',
+            color: 'rgba(248,244,232,0.92)',
+            lineHeight: 1,
           }}
         >
-          <span aria-hidden style={{ fontSize: 11, lineHeight: 1 }}>{TIER_ICON[tier]}</span>
-          <span>{chipLabel}</span>
-        </div>
+          {chipLabel}
+        </span>
+      </div>
+
+      {/* Top-right: when */}
+      {when ? (
         <div
           style={{
             position: 'absolute',
-            left: 10,
-            right: 10,
-            bottom: 8,
-            color: '#FFFFFF',
-            fontSize: 12.5,
+            top: 12,
+            right: 12,
+            fontSize: 10,
             fontWeight: 700,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            color: 'rgba(248,244,232,0.55)',
+            lineHeight: 1,
+          }}
+        >
+          {when}
+        </div>
+      ) : null}
+
+      {/* Hero value + course name (above lower-third strip) */}
+      <div
+        style={{
+          position: 'absolute',
+          left: 14,
+          right: 14,
+          bottom: 56,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 4,
+        }}
+      >
+        {heroValue ? (
+          <div
+            style={{
+              fontSize: 30,
+              fontWeight: 900,
+              letterSpacing: '-0.015em',
+              lineHeight: 1,
+              color: '#F8F4E8',
+              fontVariantNumeric: 'tabular-nums',
+              textTransform: 'uppercase',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {heroValue}
+          </div>
+        ) : null}
+        <div
+          style={{
+            fontSize: 11.5,
+            fontWeight: 600,
+            color: 'rgba(248,244,232,0.75)',
             lineHeight: 1.2,
-            textShadow: '0 1px 2px rgba(0,0,0,0.5)',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
@@ -199,10 +253,15 @@ export function FeatCard({ row, tier, onTap }: Props) {
         </div>
       </div>
 
-      {/* Body */}
+      {/* Lower-third holder strip */}
       <div
         style={{
-          padding: '10px 12px 12px',
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          padding: '9px 14px 11px',
+          borderTop: '1px solid rgba(255,255,255,0.12)',
           display: 'flex',
           alignItems: 'center',
           gap: 10,
@@ -210,64 +269,42 @@ export function FeatCard({ row, tier, onTap }: Props) {
       >
         <div style={{ flexShrink: 0 }}>
           <SquircleAvatar
-            size={32}
+            size={26}
             src={row.holder_avatar}
             alt={holder}
             fallback={initials(holder)}
             hairlineRing
-            ringColor={LIGHT_HAIRLINE}
+            ringColor={isLegendary ? accent : 'rgba(255,255,255,0.22)'}
           />
-
         </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <p
-            style={{
-              margin: 0,
-              fontSize: 13.5,
-              fontWeight: 700,
-              color: nameColor,
-              lineHeight: 1.15,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-              fontFamily: FONT,
-            }}
-          >
-            {holder}
-          </p>
-          <p
-            style={{
-              margin: '2px 0 0',
-              fontSize: 13,
-              fontWeight: 700,
-              color: valueColor,
-              lineHeight: 1.15,
-              fontVariantNumeric: 'tabular-nums',
-              fontFamily: FONT,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {value}
-          </p>
+        <div
+          style={{
+            flex: 1,
+            minWidth: 0,
+            fontSize: 12.5,
+            fontWeight: 700,
+            color: '#F8F4E8',
+            lineHeight: 1.15,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            fontFamily: FONT,
+          }}
+        >
+          {holder}
         </div>
-        {when && (
-          <span
-            style={{
-              fontSize: 10.5,
-              fontWeight: 700,
-              letterSpacing: '0.03em',
-              padding: '3px 7px',
-              borderRadius: 999,
-              background: chipBg,
-              color: chipText,
-              flexShrink: 0,
-            }}
-          >
-            {when}
-          </span>
-        )}
+        <span
+          style={{
+            fontSize: 9.5,
+            fontWeight: 800,
+            letterSpacing: '0.12em',
+            color: accent,
+            flexShrink: 0,
+            lineHeight: 1,
+          }}
+        >
+          WHS
+        </span>
       </div>
     </button>
   );
