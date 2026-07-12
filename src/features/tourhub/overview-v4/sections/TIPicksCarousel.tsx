@@ -156,6 +156,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
           pick={open}
           state={state}
           live={liveMap?.get(open.playerId)}
+          tourCode={tourCode}
           onClose={() => setOpen(null)}
         />
       ) : null}
