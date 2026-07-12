@@ -246,7 +246,7 @@ export default function ProfileSheetV2({
           {isLoading ? (
             <SheetSkeleton />
           ) : (
-            <div style={{ paddingTop: 14, paddingBottom: 20 }}>
+            <div style={{ paddingTop: 16, paddingBottom: 32 }}>
               <ActorCards
                 currentActor={currentActor}
                 profiles={profiles}
