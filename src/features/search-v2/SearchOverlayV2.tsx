@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { setStatusBarStyleColor, applyShieldColor } from '@/hooks/useMedianStatusBar';
+import { applyRouteChrome } from '@/lib/routeChrome';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { SearchField } from './components/SearchField';
 import { ScopeChips } from './components/ScopeChips';
@@ -98,6 +100,18 @@ export function SearchOverlayV2({
     if (!isOpen) return;
     lockBodyScroll();
     return () => unlockBodyScroll();
+  }, [isOpen]);
+
+  // Search overlay is always a light surface: force light chrome while open,
+  // restore the underlying route's chrome on close.
+  useEffect(() => {
+    if (!isOpen) return;
+    setStatusBarStyleColor('dark', 'FFF8FAFC'); // dark icons on light bg
+    applyShieldColor('#F8FAFC');
+    return () => {
+      // Runs when isOpen flips false OR on unmount while open.
+      applyRouteChrome(window.location.pathname, true);
+    };
   }, [isOpen]);
 
   const { data, isLoading, error, debouncedQuery } = useGlobalSearchV2({
