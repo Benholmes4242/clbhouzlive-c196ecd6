@@ -1,14 +1,12 @@
 import { useState, useMemo } from 'react';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { AlmanacHead } from './AlmanacSections';
-import { LinkedRingsMark } from './DiscoverMarks';
 import {
   useCircleActivity,
   type CircleActivityRow,
   type CircleFeatType,
 } from './hooks/useCircleActivity';
 import {
-  INK,
   INK_MUTE,
   HAIRLINE_INK_8,
   INK_TINT_06,
@@ -16,19 +14,40 @@ import {
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
-const CARD_W = 244;
+const CARD_W = 226;
+const CARD_H = 240;
 const AMBER_TEXT = '#c97a10';
 
-const FEAT_META: Record<CircleFeatType, { emoji: string; label: string }> = {
-  ace: { emoji: '🕳️', label: 'HOLE-IN-ONE' },
-  albatross: { emoji: '🦅', label: 'ALBATROSS' },
-  under_par: { emoji: '🏌️', label: 'UNDER PAR' },
-  eagle: { emoji: '🦅', label: 'EAGLE' },
-  pb_gross: { emoji: '💎', label: 'PERSONAL BEST' },
-  pb_stableford: { emoji: '💎', label: 'PERSONAL BEST' },
-  birdie_haul: { emoji: '🐦', label: 'BIRDIE HAUL' },
-  stableford: { emoji: '🔥', label: 'STABLEFORD' },
+// Label per feat_type — cards are emoji-free; FEAT_META (with emojis) is
+// preserved elsewhere for other consumers, but broadcast tiles use text only.
+const FEAT_LABEL: Record<CircleFeatType, string> = {
+  ace: 'HOLE-IN-ONE',
+  albatross: 'ALBATROSS',
+  eagle: 'EAGLE',
+  birdie_haul: 'BIRDIE HAUL',
+  under_par: 'UNDER PAR',
+  pb_gross: 'PERSONAL BEST',
+  pb_stableford: 'PERSONAL BEST',
+  stableford: 'STABLEFORD',
 };
+
+// Accent per feat_type — drives tick, WHS mark, legendary glow + avatar ring.
+const FEAT_ACCENT: Record<CircleFeatType, string> = {
+  ace: '#FBBC2E',
+  albatross: '#FBBC2E',
+  eagle: '#22C55E',
+  birdie_haul: '#F7931E',
+  under_par: '#22C55E',
+  pb_gross: '#7DD3FC',
+  pb_stableford: '#7DD3FC',
+  stableford: '#F7931E',
+};
+const FALLBACK_LABEL = 'HIGHLIGHT';
+const FALLBACK_ACCENT = '#F7931E';
+
+function isLegendaryFeat(t: CircleFeatType | undefined): boolean {
+  return t === 'ace' || t === 'albatross';
+}
 
 function formatFriendName(raw: string): string {
   const s = (raw ?? '').trim();
@@ -52,12 +71,12 @@ function relDate(iso: string): string {
   const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
   const that = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
   const days = Math.round((startToday - that) / 86400000);
-  if (days <= 0) return 'today';
-  if (days === 1) return 'yesterday';
-  if (days < 7) return `${days}d ago`;
-  if (days < 30) return `${Math.floor(days / 7)}w ago`;
-  if (days < 365) return `${Math.floor(days / 30)}mo ago`;
-  return `${Math.floor(days / 365)}y ago`;
+  if (days <= 0) return 'TODAY';
+  if (days === 1) return 'YESTERDAY';
+  if (days < 7) return `${days}D AGO`;
+  if (days < 30) return `${Math.floor(days / 7)}W AGO`;
+  if (days < 365) return `${Math.floor(days / 30)}MO AGO`;
+  return `${Math.floor(days / 365)}Y AGO`;
 }
 
 interface Props {
@@ -84,7 +103,7 @@ export function CircleActivityStrip({ userId }: Props) {
               style={{
                 flexShrink: 0,
                 width: CARD_W,
-                height: 180,
+                height: CARD_H,
                 borderRadius: 16,
                 background: INK_TINT_06,
               }}
@@ -150,8 +169,19 @@ interface CardProps {
 }
 
 function CircleActivityCard({ row, onTap }: CardProps) {
-  const meta = FEAT_META[row.feat_type] ?? { emoji: '⛳', label: 'HIGHLIGHT' };
+  const label = FEAT_LABEL[row.feat_type] ?? FALLBACK_LABEL;
+  const accent = FEAT_ACCENT[row.feat_type] ?? FALLBACK_ACCENT;
+  const legendary = isLegendaryFeat(row.feat_type);
   const friend = formatFriendName(row.friend_name);
+  const image = row.course_image ?? null;
+  const heroValue = (row.feat_value ?? '').toUpperCase();
+  const when = row.play_date ? relDate(row.play_date) : '';
+
+  const boxShadow = legendary
+    ? '0 0 0 1px #FBBC2E55, 0 10px 28px rgba(0,0,0,0.35)'
+    : 'inset 0 1px 0 rgba(255,255,255,0.06), 0 8px 24px rgba(0,0,0,0.28)';
+
+  const fallbackBg = 'linear-gradient(135deg, #0F172A 0%, #1e293b 100%)';
 
   return (
     <button
@@ -159,85 +189,136 @@ function CircleActivityCard({ row, onTap }: CardProps) {
       onClick={onTap}
       className="text-left active:scale-[0.98] transition-transform"
       style={{
+        position: 'relative',
         flexShrink: 0,
         width: CARD_W,
-        background: '#FFFFFF',
-        border: `1px solid ${HAIRLINE_INK_8}`,
+        height: CARD_H,
+        background: image ? '#07080C' : fallbackBg,
         borderRadius: 16,
         overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
         padding: 0,
         cursor: 'pointer',
-        fontFamily: 'inherit',
+        fontFamily: FONT,
+        boxShadow,
+        border: 'none',
       }}
     >
-      {/* Top image strip */}
-      <div
-        style={{
-          position: 'relative',
-          width: '100%',
-          height: 116,
-          background: row.course_image
-            ? INK_TINT_06
-            : 'linear-gradient(135deg, #0F172A 0%, #1e293b 100%)',
-        }}
-      >
-        {row.course_image ? (
-          <img
-            src={row.course_image}
-            alt=""
-            loading="lazy"
-            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-          />
-        ) : null}
-        <div
+      {image ? (
+        <img
+          src={image}
+          alt=""
+          loading="lazy"
           style={{
             position: 'absolute',
             inset: 0,
-            background:
-              'linear-gradient(180deg, rgba(15,23,42,0) 40%, rgba(15,23,42,0.78) 100%)',
-            pointerEvents: 'none',
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            display: 'block',
           }}
         />
-        {/* Feat badge — glass */}
-        <div
+      ) : null}
+
+      {/* Obsidian scrim */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background:
+            'linear-gradient(180deg, rgba(7,8,12,0.25) 0%, rgba(7,8,12,0.05) 30%, rgba(7,8,12,0.55) 62%, rgba(7,8,12,0.92) 100%)',
+        }}
+      />
+
+      {/* Top-left: tick + typographic label */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 12,
+          left: 12,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+        }}
+      >
+        <span
+          aria-hidden
           style={{
-            position: 'absolute',
-            top: 8,
-            left: 8,
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 4,
-            padding: '4px 8px',
-            borderRadius: 999,
-            background: 'rgba(15,23,42,0.55)',
-            backdropFilter: 'blur(6px)',
-            WebkitBackdropFilter: 'blur(6px)',
-            color: '#FFFFFF',
+            display: 'block',
+            width: 3,
+            height: 12,
+            borderRadius: 1,
+            background: accent,
+          }}
+        />
+        <span
+          style={{
             fontSize: 10,
             fontWeight: 800,
-            letterSpacing: '0.08em',
-            lineHeight: 1.2,
+            letterSpacing: '0.16em',
             textTransform: 'uppercase',
+            color: 'rgba(248,244,232,0.92)',
+            lineHeight: 1,
           }}
         >
-          <span aria-hidden style={{ fontSize: 11, lineHeight: 1 }}>{meta.emoji}</span>
-          <span>{meta.label}</span>
-        </div>
-        {/* Course name */}
+          {label}
+        </span>
+      </div>
+
+      {/* Top-right: when */}
+      {when ? (
         <div
           style={{
             position: 'absolute',
-            left: 10,
-            right: 10,
-            bottom: 8,
-            color: '#FFFFFF',
-            fontSize: 12.5,
+            top: 12,
+            right: 12,
+            fontSize: 10,
             fontWeight: 700,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            color: 'rgba(248,244,232,0.55)',
+            lineHeight: 1,
+          }}
+        >
+          {when}
+        </div>
+      ) : null}
+
+      {/* Hero value + course name */}
+      <div
+        style={{
+          position: 'absolute',
+          left: 14,
+          right: 14,
+          bottom: 56,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 4,
+        }}
+      >
+        {heroValue ? (
+          <div
+            style={{
+              fontSize: 30,
+              fontWeight: 900,
+              letterSpacing: '-0.015em',
+              lineHeight: 1,
+              color: '#F8F4E8',
+              fontVariantNumeric: 'tabular-nums',
+              textTransform: 'uppercase',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {heroValue}
+          </div>
+        ) : null}
+        <div
+          style={{
+            fontSize: 11.5,
+            fontWeight: 600,
+            color: 'rgba(248,244,232,0.75)',
             lineHeight: 1.2,
-            letterSpacing: '-0.005em',
-            textShadow: '0 1px 2px rgba(0,0,0,0.5)',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
@@ -247,57 +328,58 @@ function CircleActivityCard({ row, onTap }: CardProps) {
         </div>
       </div>
 
-      {/* Body row — fixed 56px meta band */}
+      {/* Lower-third holder strip */}
       <div
         style={{
-          height: 56,
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          padding: '9px 14px 11px',
+          borderTop: '1px solid rgba(255,255,255,0.12)',
           display: 'flex',
           alignItems: 'center',
           gap: 10,
-          padding: '0 12px',
         }}
       >
         <div style={{ flexShrink: 0 }}>
           <SquircleAvatar
-            size={32}
+            size={26}
             src={row.friend_avatar}
-            alt={row.friend_name}
+            alt={friend}
             fallback={initials(row.friend_name)}
             hairlineRing
-            ringColor={LIGHT_HAIRLINE}
+            ringColor={legendary ? accent : 'rgba(255,255,255,0.22)'}
           />
         </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <p
-            style={{
-              margin: 0,
-              fontSize: 14,
-              fontWeight: 700,
-              color: INK,
-              lineHeight: 1.15,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {friend}
-          </p>
-          <p
-            style={{
-              margin: '2px 0 0',
-              fontSize: 14,
-              fontWeight: 700,
-              color: INK,
-              lineHeight: 1.15,
-              letterSpacing: '-0.005em',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {row.feat_value}
-          </p>
+        <div
+          style={{
+            flex: 1,
+            minWidth: 0,
+            fontSize: 12.5,
+            fontWeight: 700,
+            color: '#F8F4E8',
+            lineHeight: 1.15,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            fontFamily: FONT,
+          }}
+        >
+          {friend}
         </div>
+        <span
+          style={{
+            fontSize: 9.5,
+            fontWeight: 800,
+            letterSpacing: '0.12em',
+            color: accent,
+            flexShrink: 0,
+            lineHeight: 1,
+          }}
+        >
+          WHS
+        </span>
       </div>
     </button>
   );
