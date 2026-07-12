@@ -372,7 +372,7 @@ export function useSeasonTimeline(tour: TourId): {
       };
 
       if (state === 'completed') {
-        const w = leadersWinnersMap?.get(r.id) as
+        const w = leadersWinnersMap?.[r.id] as
           | TournamentLeaderWinner
           | undefined;
         if (w) {
@@ -389,7 +389,7 @@ export function useSeasonTimeline(tour: TourId): {
           evt.champion = null;
         }
       } else if (state === 'live') {
-        const l = leadersWinnersMap?.get(r.id) as
+        const l = leadersWinnersMap?.[r.id] as
           | TournamentLeaderWinner
           | undefined;
         if (l) {

@@ -97,7 +97,7 @@ export function useTournamentLeadersWinners(tournamentIds: string[]) {
 
       if (error) {
         console.error('[useTournamentLeadersWinners]', error.message);
-        return new Map();
+        return {};
       }
 
       // Group by tournament_id, take the first 3 people (not first 3 positions)
@@ -158,18 +158,18 @@ export function useTournamentLeadersWinners(tournamentIds: string[]) {
         });
       }
 
-      const result = new Map<string, TournamentLeaderWinner>();
+      const result: Record<string, TournamentLeaderWinner> = {};
 
       for (const [tid, finishers] of byTournament) {
         const sorted = finishers.sort((a, b) => a.position - b.position);
         const leader = sorted[0];
         if (!leader) continue;
 
-        result.set(tid, {
+        result[tid] = {
           ...leader,
-          topFinishers: sorted.slice(0, 3),  // first 3 people shown on card
-          allFetched: sorted,                 // all rows for tie overflow counting
-        });
+          topFinishers: sorted.slice(0, 3),
+          allFetched: sorted,
+        };
       }
 
       return result;
