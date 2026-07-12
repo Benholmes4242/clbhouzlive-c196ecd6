@@ -117,9 +117,13 @@ export function CollegeFranchise() {
   const chaser = sorted[1];
   const top5 = sorted.slice(0, 5);
 
+  // Captain-for-each: query all top-5 colleges in a single IN() call
+  // (useFranchiseCaptains groups client-side by college and takes the
+  // first row per college, which is the highest earner because the RPC
+  // orders earnings DESC).
   const captainNames = useMemo(
-    () => [leader?.normalized_name, chaser?.normalized_name].filter((n): n is string => !!n),
-    [leader, chaser],
+    () => top5.map((s) => s.normalized_name).filter((n): n is string => !!n),
+    [top5],
   );
   const { data: captainMap } = useFranchiseCaptains(captainNames);
 
