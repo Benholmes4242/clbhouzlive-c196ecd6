@@ -17,7 +17,7 @@ import { postingAsCopy } from '@/lib/postingAsCopy';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useLogout } from '@/hooks/useLogout';
-import ProfileHubSheet from '@/components/profile/ProfileHubSheet';
+import ProfileSheetV2 from '@/features/profile-sheet-v2/ProfileSheetV2';
 import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
 import { getActorRoute } from '@/types/actor';
 
@@ -233,7 +233,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
             onClose={() => setUploadCenterOpen(false)} 
           />
         )}
-        <ProfileHubSheet
+        <ProfileSheetV2
           open={isOpen}
           onClose={onClose}
           currentActor={currentActorData}
