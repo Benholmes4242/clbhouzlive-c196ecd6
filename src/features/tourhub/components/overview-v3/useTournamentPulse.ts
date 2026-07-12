@@ -21,13 +21,22 @@ import { supabase } from '@/integrations/supabase/client';
  */
 export type EventState = 'live' | 'upcoming' | 'completed';
 
-const LIVE_STATUSES = new Set([
+export const LIVE_STATUSES = new Set([
   'inprogress', 'in_progress',
   'playoff', 'inplayoff', 'in_playoff',
   'suspended', 'delayed', 'weather', 'holdup',
 ]);
 
-const COMPLETED_STATUSES = new Set(['closed', 'complete']);
+export const COMPLETED_STATUSES = new Set(['closed', 'complete', 'completed']);
+
+export function endDateInPast(endISO: string | null): boolean {
+  if (!endISO) return false;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const end = new Date(endISO);
+  end.setHours(23, 59, 59, 999);
+  return end.getTime() < today.getTime();
+}
 
 interface PulseRow {
   id: string;
