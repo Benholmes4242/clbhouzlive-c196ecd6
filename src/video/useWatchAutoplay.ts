@@ -30,7 +30,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
-import { useWatchRevealed } from '@/components/watch/WatchRevealContext';
+import { useWatchRevealed } from './WatchRevealContext';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { PrefetchController } from './PrefetchController';
 import type { FeedPost } from '@/components/media-system/types/media';
