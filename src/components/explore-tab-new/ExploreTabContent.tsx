@@ -62,9 +62,9 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
       {/* Zone seam: friends → register tabs */}
       <div
         style={{
-          marginTop: 20,
+          marginTop: 16,
           borderTop: '1px solid rgba(15,23,42,0.06)',
-          paddingTop: 18,
+          paddingTop: 16,
         }}
       />
 
@@ -79,9 +79,9 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
 
       <div
         style={{
-          marginTop: 20,
+          marginTop: 16,
           borderTop: '1px solid rgba(15,23,42,0.06)',
-          paddingTop: 18,
+          paddingTop: 16,
         }}
       >
         <AlmanacHead icon="📍" title={`The feed · ${feedRegionLabel}`} />
