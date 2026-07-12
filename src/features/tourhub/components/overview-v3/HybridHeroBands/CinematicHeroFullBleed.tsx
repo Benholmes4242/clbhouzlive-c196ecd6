@@ -1167,7 +1167,7 @@ export function CinematicHeroFullBleed({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 18,
-                padding: '10px 18px',
+                padding: '8px 18px',
               }}
             >
               {courseStats.par != null && (
