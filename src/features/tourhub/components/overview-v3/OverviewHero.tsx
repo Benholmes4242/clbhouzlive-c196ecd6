@@ -14,8 +14,6 @@ import { useHeroCarouselData, type HeroSlide } from '../../hooks/useHeroCarousel
 import { HybridHero } from './HybridHero';
 import { useTourSelection } from '../../context/TourSelectionContext';
 import { INK_TINT_06 } from '../../_shared/tokens';
-import { TourSwitcherAffordance } from '../TourSwitcherAffordance';
-import { HandicapChip } from '@/components/header/HandicapChip';
 
 function shuffle<T>(input: T[]): T[] {
   const a = [...input];
@@ -108,10 +106,6 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
 
   return (
     <div style={{ position: 'relative', width: '100%' }} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
-      <div style={{ position: 'absolute', top: 'calc(env(safe-area-inset-top) + 8px)', right: 14, zIndex: 65, display: 'flex', alignItems: 'center', gap: 8 }}>
-        <HandicapChip pill />
-        <TourSwitcherAffordance variant="glass" />
-      </div>
       <AnimatePresence mode="wait">
         <motion.div key={active.tournament.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>
           <HybridHero

@@ -11,8 +11,9 @@
 import React from 'react';
 import { ChevronDown, Menu } from 'lucide-react';
 
-const DIVIDER = 'rgba(255,255,255,0.14)';
-const CHEVRON = 'rgba(255,255,255,0.60)';
+const INK = '#0F172A';
+const DIVIDER = 'rgba(15,23,42,0.14)';
+const CHEVRON = 'rgba(15,23,42,0.55)';
 
 export interface TourIslandLeftProps {
   label: string;
@@ -49,7 +50,7 @@ export const TourIslandLeft: React.FC<TourIslandLeftProps> = ({
         }}
         className="active:scale-[0.94]"
       >
-        <Menu size={15} color="#FFFFFF" strokeWidth={2.2} />
+        <Menu size={15} color={INK} strokeWidth={2.2} />
       </button>
 
       <span
@@ -84,7 +85,7 @@ export const TourIslandLeft: React.FC<TourIslandLeftProps> = ({
             fontSize: 12.5,
             fontWeight: 700,
             letterSpacing: '0.02em',
-            color: '#FFFFFF',
+            color: INK,
             whiteSpace: 'nowrap',
           }}
         >

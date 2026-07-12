@@ -3,7 +3,7 @@
  * cinematic overview. Owns its own backdrop, panel, slide animation.
  * Does NOT depend on any shared drawer/sheet component.
  */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import {
   Compass,
@@ -16,11 +16,6 @@ import {
   User,
   LogOut,
 } from 'lucide-react';
-import { HandicapChip } from '@/components/header/HandicapChip';
-import { PostingAsPill } from '@/components/header/PostingAsPill';
-import { PostingAsMenu } from '@/components/header/PostingAsMenu';
-import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 
 export interface TourSideMenuProps {
@@ -143,11 +138,8 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
           willChange: 'transform',
         }}
       >
-        {/* Top: logo + handicap chip + identity pill */}
-        <TopBar />
-
         {/* Primary group header */}
-        <div style={{ marginTop: 16 }}>
+        <div style={{ marginTop: 'max(20px, env(safe-area-inset-top, 0px))', paddingTop: 16 }}>
           <GroupHeader>Tour</GroupHeader>
         </div>
 
@@ -256,62 +248,6 @@ function SecondaryLink({
   );
 }
 
-/**
- * Top bar: clbhouz logo on the left, then the canonical CompactHeader
- * HandicapChip and identity (PostingAsPill) dropdown on the right.
- * The avatar pill's rounded-square shape is overridden here to a full
- * pill so it matches the handicap chip's geometry.
- */
-function TopBar() {
-  const { user } = useSupabaseSession();
-  const { hasUnread, unreadCount } = useUnreadNotifications();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const pillRef = useRef<HTMLButtonElement>(null);
-
-  return (
-    <>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '20px 20px 0',
-          gap: 8,
-        }}
-      >
-        <img
-          src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
-          alt="clbhouz"
-          style={{ height: 30, width: 30, objectFit: 'contain' }}
-        />
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-          <HandicapChip light pill />
-          {user && (
-            <div className="[&_button]:!rounded-full">
-              <PostingAsPill
-                ref={pillRef}
-                onClick={() => setMenuOpen((v) => !v)}
-                isOpen={menuOpen}
-                hasUnreadNotifications={hasUnread}
-                notificationCount={unreadCount}
-                useLightTheme
-                compact
-              />
-            </div>
-          )}
-        </div>
-      </div>
-      {user && (
-        <PostingAsMenu
-          isOpen={menuOpen}
-          onClose={() => setMenuOpen(false)}
-          useLightTheme
-          anchorRef={pillRef}
-        />
-      )}
-    </>
-  );
-}
 
 export default TourSideMenu;
 
