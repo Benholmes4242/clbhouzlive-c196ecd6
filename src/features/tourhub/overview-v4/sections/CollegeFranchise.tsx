@@ -294,6 +294,7 @@ function DuelSide({
   name,
   logo,
   fullName,
+  color,
   captain,
   align,
   onClick,
@@ -302,6 +303,7 @@ function DuelSide({
   name: string;
   logo: string | null;
   fullName: string;
+  color: string;
   captain: { name: string; photoCandidates: string[]; id: string } | null;
   align: 'left' | 'right';
   onClick: () => void;
@@ -311,25 +313,28 @@ function DuelSide({
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
       <button
         onClick={onClick}
-        style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}
+        style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}
       >
         <div style={{ position: 'relative' }}>
           <SchoolSquircle size={44} logo={logo} name={fullName} />
         </div>
-        <div
-          style={{
-            fontSize: 14,
-            fontWeight: 800,
-            color: V4.ink,
-            letterSpacing: '-0.01em',
-            textAlign: 'center',
-            maxWidth: 130,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {name}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+          <div
+            style={{
+              fontSize: 14,
+              fontWeight: 800,
+              color: V4.ink,
+              letterSpacing: '-0.01em',
+              textAlign: 'center',
+              maxWidth: 130,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {name}
+          </div>
+          <div style={{ height: 2.5, width: 22, background: color, borderRadius: 1 }} />
         </div>
       </button>
       {captain ? (
@@ -343,6 +348,7 @@ function DuelSide({
             alignItems: 'center',
             gap: 6,
             cursor: onCaptainClick ? 'pointer' : 'default',
+            maxWidth: 160,
           }}
         >
           <SquircleAvatar
@@ -353,8 +359,11 @@ function DuelSide({
             hairlineRing
             ringColor={LIGHT_HAIRLINE}
           />
-          <span style={{ fontSize: 10, fontWeight: 600, color: V4.inkMute, letterSpacing: '-0.005em' }}>
+          <span style={{ fontSize: 10, fontWeight: 600, color: V4.inkMute, letterSpacing: '-0.005em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {captain.name}
+          </span>
+          <span style={{ fontSize: 7.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em', whiteSpace: 'nowrap' }}>
+            · CAPTAIN
           </span>
         </button>
       ) : (
