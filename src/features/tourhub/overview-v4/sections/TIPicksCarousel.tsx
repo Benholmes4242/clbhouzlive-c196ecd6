@@ -270,8 +270,9 @@ function CaseSheet({
             <h2 style={{ fontSize: 22, fontWeight: 800, color: V4.ink, margin: '2px 0 0', letterSpacing: '-0.025em' }}>
               {pick.playerName}
             </h2>
-            <div style={{ marginTop: 6 }}>
+            <div style={{ marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4 }}>
               <SheetStateStrip state={state} pick={pick} live={live} />
+              <CaseHeaderMeta pick={pick} />
             </div>
           </div>
         </div>
