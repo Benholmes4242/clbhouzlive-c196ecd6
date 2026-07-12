@@ -70,24 +70,16 @@ function PodiumCard({
       }}
     >
       <div style={{ position: 'relative' }}>
-        <div
-          style={{
-            borderRadius: '34%',
-            overflow: 'hidden',
-            border: center ? `2px solid ${GOLD}` : `1px solid ${HAIRLINE_INK_10}`,
-            boxShadow: center ? '0 4px 12px rgba(179,107,0,0.20)' : 'none',
-          }}
-        >
-          <SquircleAvatar
-            size={size}
-            srcCandidates={candidates}
-            alt={row.name}
-            userId={row.playerId}
-            hairlineRing={!center}
-            ringColor={LIGHT_HAIRLINE}
-          />
-        </div>
+        <SquircleAvatar
+          size={size}
+          srcCandidates={candidates}
+          alt={row.name}
+          userId={row.playerId}
+          hairlineRing
+          ringColor={LIGHT_HAIRLINE}
+        />
       </div>
+
 
       <div style={{ minWidth: 0, width: '100%' }}>
         <div
