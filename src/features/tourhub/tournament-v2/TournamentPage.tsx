@@ -52,8 +52,11 @@ import {
 export function TournamentPage() {
   const { tournamentId } = useParams<{ tournamentId: string }>();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const { setVisible } = useBottomNavigation();
   useEffect(() => { setVisible(true); }, [setVisible]);
+
+
 
   const { data: meta, isLoading } = useTournamentMeta(tournamentId);
   const { data: leaderboard } = useTourLeaderboard(tournamentId ?? '');
