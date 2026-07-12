@@ -2,13 +2,12 @@ import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import { TourHubShell } from '../components/TourHubShell';
-import { ShellSlot } from '@/components/header/ShellSlot';
 import type { TourHubTab } from '../components/types';
-import { OverviewTab, LeadersTab } from '../components/tabs';
+import { OverviewTab } from '../components/tabs';
+import { LeadersTab as LeadersTabV2 } from '@/features/tourhub/leaders-v2/LeadersTab';
 import { PlayersTab as PlayersTabV2 } from '@/features/tourhub/players-v2/PlayersTab';
 import { ScheduleTab as ScheduleTabV2 } from '@/features/tourhub/schedule-v2/ScheduleTab';
 import { LeaderboardTab } from '@/features/tourhub/leaderboard/LeaderboardTab';
-import { LeadersShellRow } from '../components/shell/LeadersShellRow';
 import { useTournamentStatusRealtime } from '../hooks/useTournamentStatusRealtime';
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import { TourSelectionProvider } from '../context/TourSelectionContext';
@@ -147,18 +146,12 @@ export function TourHubMainPage() {
       case 'players':
         return <PlayersTabV2 />;
       case 'leaderboards':
-        return <LeadersTab />;
+        return <LeadersTabV2 />;
       default:
         return <OverviewTab />;
     }
   };
 
-  const renderShellRow = () => {
-    switch (activeTab) {
-      case 'leaderboards':return <LeadersShellRow />;
-      default:            return null;
-    }
-  };
 
   const handleSelectTab = (id: string) => {
     if (id === 'college') {
@@ -188,14 +181,7 @@ export function TourHubMainPage() {
             <SearchOverlayV2 isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
           </>
         ) : (
-          <>
-            <ShellSlot>
-              {renderShellRow()}
-            </ShellSlot>
-            <div style={{ paddingTop: 'calc(var(--chrome-total-h, 0px) - 1px)' }}>
-              {renderTab()}
-            </div>
-          </>
+          <div>{renderTab()}</div>
         )}
       </TourHubShell>
     </TourSelectionProvider>
