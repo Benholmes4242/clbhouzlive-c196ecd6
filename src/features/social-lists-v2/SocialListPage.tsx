@@ -100,11 +100,8 @@ export default function SocialListPage({
     [filtered, showPending],
   );
   const friends = useMemo(
-    () =>
-      filtered.filter(
-        (r) => r.friend_status === 'friend' && !(showPending && r.friend_status === 'pending_sent'),
-      ),
-    [filtered, showPending],
+    () => filtered.filter((r) => r.friend_status === 'friend'),
+    [filtered],
   );
   const everyone = useMemo(
     () =>
