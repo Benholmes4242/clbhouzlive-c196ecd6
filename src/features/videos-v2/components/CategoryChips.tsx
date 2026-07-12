@@ -39,9 +39,9 @@ export function CategoryChips({ value, onChange }: Props) {
       className="scrollbar-hide"
       style={{
         display: 'flex',
-        gap: 7,
+        gap: 8,
         overflowX: 'auto',
-        paddingTop: 9,
+        paddingTop: 8,
       }}
     >
       {chips.map((c) => {
