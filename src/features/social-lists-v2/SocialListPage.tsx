@@ -69,13 +69,18 @@ export default function SocialListPage({
   const [search, setSearch] = useState('');
   const [friendsExpanded, setFriendsExpanded] = useState(false);
 
+  // p_viewer_id is ALWAYS the session user — never profileActorId, never
+  // an activeActor id (a business actor would produce wildly wrong
+  // friend_status / viewer_follows / mutuals from the RPC).
+  const viewerId = viewer?.id;
   const list = useSocialListV2({
     actorType: profileActorType,
     actorId: profileActorId,
     direction,
-    viewerId: viewer?.id,
+    viewerId,
   });
-  const counts = useSocialListCounts(profileActorType, profileActorId, viewer?.id);
+  const counts = useSocialListCounts(profileActorType, profileActorId, viewerId);
+
 
   const rows: SocialListRow[] = useMemo(
     () => list.data?.pages.flatMap((p) => p.rows) ?? [],
