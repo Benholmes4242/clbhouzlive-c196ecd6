@@ -4,6 +4,7 @@
  * (falls back to formatted total, CUT/WD as muted tag).
  */
 
+import { useNavigate } from 'react-router-dom';
 import { useFeaturedGroups } from '../data/useFeaturedGroups';
 import { SectionShell } from './SectionShell';
 import { V4 } from '../tokens';
@@ -17,6 +18,7 @@ interface Props {
 }
 
 interface GroupPlayerShape {
+  player_id?: string;
   full_name?: string;
   name?: string;
   photo_url?: string | null;
@@ -78,6 +80,7 @@ function groupThru(g: GroupShape): number | null {
 }
 
 export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
+  const navigate = useNavigate();
   const { data } = useFeaturedGroups(tournamentId, { live });
   if (!live) return null;
   const groups = parseGroups(data);
@@ -115,7 +118,25 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                 const isCut = status === 'CUT' || status === 'WD' || status === 'DQ';
                 const display = formatScore(p.today) ?? formatScore(p.score) ?? '—';
                 return (
-                  <div key={pi} style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '6px 0', borderTop: pi === 0 ? 'none' : `0.5px solid ${V4.hairline}` }}>
+                  <button
+                    key={pi}
+                    type="button"
+                    onClick={() => { if (p.player_id) navigate(`/tourhub/player/${p.player_id}`); }}
+                    disabled={!p.player_id}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 9,
+                      padding: '6px 0',
+                      minHeight: 40,
+                      width: '100%',
+                      background: 'transparent',
+                      border: 'none',
+                      borderTop: pi === 0 ? 'none' : `0.5px solid ${V4.hairline}`,
+                      textAlign: 'left',
+                      cursor: p.player_id ? 'pointer' : 'default',
+                    }}
+                  >
                     <PlayerAvatar
                       playerId={name}
                       playerName={name}
@@ -132,7 +153,7 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                     ) : (
                       <span style={{ fontSize: 12.5, fontWeight: 800, color: scoreColor(display), fontVariantNumeric: 'tabular-nums' }}>{display}</span>
                     )}
-                  </div>
+                  </button>
                 );
               })}
             </div>
