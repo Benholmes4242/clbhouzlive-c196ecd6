@@ -199,6 +199,25 @@ async function fetchScopedTournamentPredictions(
   }
 
   const predictions = await fetchPredictionsForTournament(tournament);
+  // Enrich topContenders with photo_url from sr_players when the AI payload lacks it.
+  if (predictions && predictions.topContenders.length > 0) {
+    const missingIds = predictions.topContenders
+      .filter((p) => !p.photoUrl && p.playerId)
+      .map((p) => p.playerId);
+    if (missingIds.length > 0) {
+      const { data: playerRows } = await supabase
+        .from('sr_players')
+        .select('id, photo_url, headshot_override')
+        .in('id', missingIds);
+      const photoMap = new Map<string, string | null>();
+      (playerRows ?? []).forEach((r: any) => {
+        photoMap.set(r.id, r.headshot_override || r.photo_url || null);
+      });
+      predictions.topContenders = predictions.topContenders.map((p) =>
+        p.photoUrl ? p : { ...p, photoUrl: photoMap.get(p.playerId) ?? null },
+      );
+    }
+  }
   const status = (tournament as any).status;
   let tournamentPhase: TournamentPhase = 'pre-tournament';
   if (status === 'inprogress' || status === 'in_progress') {
