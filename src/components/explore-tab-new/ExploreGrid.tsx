@@ -7,6 +7,7 @@ import { useWatchAutoplay } from '@/video/useWatchAutoplay';
 import { Loader2 } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { FeedCard, type FeedCardRow } from '@/components/feed-cards/FeedCard';
+import { packColumns } from '@/components/feed-cards/packColumns';
 import ExploreGridSkeleton from './ExploreGridSkeleton';
 
 
@@ -48,6 +49,9 @@ function toFeedCardRow(post: FeedPost): FeedCardRow {
     (media?.type === 'video'
       ? (duration != null && duration <= 90 ? 'clip' : 'video')
       : 'clip');
+  const mAny = media as any;
+  const width = Number(mAny?.width) || null;
+  const height = Number(mAny?.height) || null;
   return {
     post_id: post.id,
     post_content: post.caption ?? null,
@@ -57,6 +61,8 @@ function toFeedCardRow(post: FeedPost): FeedCardRow {
     creator_username: post.username ?? null,
     like_count: Number(post.likeCount ?? 0),
     course_name: post.courseName ?? post.review?.courseName ?? null,
+    width,
+    height,
   };
 }
 
@@ -147,18 +153,20 @@ export default function ExploreGrid({
     );
   }
 
-  const leftIdx: number[] = [];
-  const rightIdx: number[] = [];
-  coursePosts.forEach((_, i) => (i % 2 === 0 ? leftIdx : rightIdx).push(i));
+  const packed = packColumns(cardRows, (r) => {
+    const w = Number(r?.width) || 0;
+    const h = Number(r?.height) || 0;
+    return w > 0 && h > 0 && w > h ? 16 / 9 : 9 / 14;
+  });
 
   return (
     <div ref={setGridRef}>
       <div style={{ display: 'flex', gap: 12, padding: '0 16px' }}>
         <div style={{ flex: 1 }}>
-          {leftIdx.map((i) => (
+          {packed.left.map(({ item, flatIndex: i }) => (
             <FeedCard
               key={coursePosts[i].id}
-              row={cardRows[i]}
+              row={item}
               feedPost={coursePosts[i]}
               posts={coursePosts}
               flatIndex={i}
@@ -167,10 +175,10 @@ export default function ExploreGrid({
           ))}
         </div>
         <div style={{ flex: 1 }}>
-          {rightIdx.map((i) => (
+          {packed.right.map(({ item, flatIndex: i }) => (
             <FeedCard
               key={coursePosts[i].id}
-              row={cardRows[i]}
+              row={item}
               feedPost={coursePosts[i]}
               posts={coursePosts}
               flatIndex={i}

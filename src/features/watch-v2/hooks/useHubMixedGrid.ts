@@ -10,6 +10,8 @@ export interface MixedGridRow {
   creator_username: string | null;
   like_count: number;
   course_name: string | null;
+  width?: number | null;
+  height?: number | null;
 }
 
 const PAGE_SIZE = 20;

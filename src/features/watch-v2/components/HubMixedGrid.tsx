@@ -12,6 +12,7 @@ import { useRailLane } from '@/video/useRailLane';
 import { usePreroutePrefetch } from '@/video/usePreroutePrefetch';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { packColumns } from '@/components/feed-cards/packColumns';
 
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
@@ -33,7 +34,9 @@ function Tile({
 }) {
   const rootRef = useRef<HTMLElement>(null);
   const isClip = row.derived_format === 'clip';
-  const aspect = isClip ? '9 / 14' : '16 / 9';
+  const w = Number(row?.width) || 0;
+  const h = Number(row?.height) || 0;
+  const aspect = (w > 0 && h > 0 && w > h) ? '16 / 9' : '9 / 14';
   const stripped = row.post_content
     ? stripMentionMarkup(String(row.post_content)).trim()
     : '';
@@ -234,10 +237,12 @@ export function HubMixedGrid({ filter = 'all' }: { filter?: string } = {}) {
     maxActive: 3,
   });
 
-  // Split columns for layout only — data-watch-tile-index remains the FLAT index.
-  const leftIdx: number[] = [];
-  const rightIdx: number[] = [];
-  rows.forEach((_, i) => (i % 2 === 0 ? leftIdx : rightIdx).push(i));
+  // Height-balanced packing — data-watch-tile-index remains the FLAT index.
+  const packed = packColumns(rows, (r) => {
+    const w = Number(r?.width) || 0;
+    const h = Number(r?.height) || 0;
+    return w > 0 && h > 0 && w > h ? 16 / 9 : 9 / 14;
+  });
 
   return (
     <section style={{ fontFamily: FONT_FAMILY }}>
@@ -312,10 +317,10 @@ export function HubMixedGrid({ filter = 'all' }: { filter?: string } = {}) {
       ) : (
         <div ref={railRef} style={{ display: 'flex', gap: 12, padding: '0 16px' }}>
           <div style={{ flex: 1 }}>
-            {leftIdx.map((i) => (
+            {packed.left.map(({ item, flatIndex: i }) => (
               <Tile
-                key={rows[i].post_id}
-                row={rows[i]}
+                key={item.post_id}
+                row={item}
                 post={feedPosts[i]}
                 index={i}
                 posts={feedPosts}
@@ -324,10 +329,10 @@ export function HubMixedGrid({ filter = 'all' }: { filter?: string } = {}) {
             ))}
           </div>
           <div style={{ flex: 1 }}>
-            {rightIdx.map((i) => (
+            {packed.right.map(({ item, flatIndex: i }) => (
               <Tile
-                key={rows[i].post_id}
-                row={rows[i]}
+                key={item.post_id}
+                row={item}
                 post={feedPosts[i]}
                 index={i}
                 posts={feedPosts}

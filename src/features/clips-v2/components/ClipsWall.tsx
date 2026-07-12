@@ -3,6 +3,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toFeedPosts } from '@/features/watch-v2/utils/toFeedPost';
 import { useWatchAutoplay } from '@/video/useWatchAutoplay';
 import { FeedCard, type FeedCardRow } from '@/components/feed-cards/FeedCard';
+import { packColumns } from '@/components/feed-cards/packColumns';
 import { useClipsWallFeed, type ClipsV2Mood, type ClipsWallRow } from '../hooks/useClipsWallFeed';
 
 const FONT_FAMILY =
@@ -55,6 +56,8 @@ export function ClipsWall({ mood }: { mood: ClipsV2Mood }) {
         creator_username: r.creator_username ?? null,
         like_count: Number((r as any).like_count ?? 0),
         course_name: r.course_name ?? null,
+        width: r.width ?? null,
+        height: r.height ?? null,
       })),
     [rows],
   );
@@ -105,19 +108,21 @@ export function ClipsWall({ mood }: { mood: ClipsV2Mood }) {
     );
   }
 
-  const leftIdx: number[] = [];
-  const rightIdx: number[] = [];
-  rows.forEach((_, i) => (i % 2 === 0 ? leftIdx : rightIdx).push(i));
+  const packed = packColumns(cardRows, (r) => {
+    const w = Number(r?.width) || 0;
+    const h = Number(r?.height) || 0;
+    return w > 0 && h > 0 && w > h ? 16 / 9 : 9 / 14;
+  });
 
   return (
     <div style={{ padding: '12px 0 30px', fontFamily: FONT_FAMILY }}>
       <style>{spinKeyframes}</style>
       <div ref={railRef} style={{ display: 'flex', gap: 12, padding: '0 16px' }}>
         <div style={{ flex: 1 }}>
-          {leftIdx.map((i) => (
+          {packed.left.map(({ item, flatIndex: i }) => (
             <FeedCard
-              key={cardRows[i].post_id}
-              row={cardRows[i]}
+              key={item.post_id}
+              row={item}
               feedPost={feedPosts[i]}
               posts={feedPosts}
               flatIndex={i}
@@ -126,10 +131,10 @@ export function ClipsWall({ mood }: { mood: ClipsV2Mood }) {
           ))}
         </div>
         <div style={{ flex: 1 }}>
-          {rightIdx.map((i) => (
+          {packed.right.map(({ item, flatIndex: i }) => (
             <FeedCard
-              key={cardRows[i].post_id}
-              row={cardRows[i]}
+              key={item.post_id}
+              row={item}
               feedPost={feedPosts[i]}
               posts={feedPosts}
               flatIndex={i}

@@ -41,6 +41,8 @@ export interface FeedCardRow {
   creator_username: string | null;
   like_count: number;
   course_name: string | null;
+  width?: number | null;
+  height?: number | null;
 }
 
 export function FeedCard({
@@ -58,7 +60,9 @@ export function FeedCard({
 }) {
   const rootRef = useRef<HTMLElement>(null);
   const isClip = row.derived_format === 'clip';
-  const aspect = isClip ? '9 / 14' : '16 / 9';
+  const w = Number(row?.width) || 0;
+  const h = Number(row?.height) || 0;
+  const aspect = (w > 0 && h > 0 && w > h) ? '16 / 9' : '9 / 14';
   const stripped = row.post_content
     ? stripMentionMarkup(String(row.post_content)).trim()
     : '';
