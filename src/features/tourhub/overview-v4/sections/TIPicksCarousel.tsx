@@ -96,7 +96,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
             key={p.playerId}
             onClick={() => setSheet({ kind: 'case', pick: p, from: 'card' })}
             style={{
-              flex: '0 0 232px',
+              flex: '0 0 218px',
               scrollSnapAlign: 'start',
               textAlign: 'left',
               background: V4.surface,
@@ -110,33 +110,27 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
               cursor: 'pointer',
             }}
           >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+              <span style={{ fontSize: 9, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                Pick {p.rank}
+              </span>
+              <CardStateValue state={state} pick={p} live={liveMap?.get(p.playerId)} />
+            </div>
+
             <div
               role="link"
               onClick={(e) => { e.stopPropagation(); goToPlayer(p.playerId); }}
               style={{ display: 'flex', alignItems: 'center', gap: 11, cursor: 'pointer' }}
             >
               <PlayerAvatar playerId={p.playerId} playerName={p.playerName} tourCode={tourCode} photoUrl={p.photoUrl} size="md" ringColor={LIGHT_HAIRLINE} />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-                  <span style={{ fontSize: 22, color: V4.inkFaint, lineHeight: 1, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{p.rank}</span>
-                  <span style={{ fontSize: 9.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Pick</span>
-                </div>
-                <div style={{ fontSize: 14, fontWeight: 800, color: V4.ink, letterSpacing: '-0.015em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {p.playerName}
-                </div>
-                {p.courseFitScore != null ? (
-                  <div style={{ fontSize: 10.5, fontWeight: 600, color: V4.inkMute, letterSpacing: '0.02em' }}>
-                    fit {Math.round(p.courseFitScore)}
-                  </div>
-                ) : null}
+              <div style={{ flex: 1, minWidth: 0, fontSize: 13.5, fontWeight: 800, color: V4.ink, letterSpacing: '-0.015em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {p.playerName}
               </div>
             </div>
 
             <div style={{ fontSize: 11.5, color: V4.inkSoft, lineHeight: 1.45, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
               {p.pulledQuote || p.reasons?.[0] || '—'}
             </div>
-
-            <StateStrip state={state} pick={p} live={liveMap?.get(p.playerId)} />
 
             <div style={{ marginTop: 'auto', fontSize: 10, fontWeight: 800, color: V4.amber, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
               The case ›
