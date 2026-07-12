@@ -2,11 +2,11 @@
  * ProfileSheetV2 · HcpStrip
  *
  * Slim tappable handicap strip. Two states:
- *   - Connected: HCP eyebrow + index + trend arrow + rounds-30d + chevron
+ *   - Connected: HCP eyebrow + index + trend arrow + rounds-90d + chevron
  *   - Disconnected: HCP eyebrow + "Connect England Golf" + chevron
  * Hidden for business actors. Both states tap to /handicap.
  *
- * rounds-30d is computed locally by scanning useAllScores by play_date,
+ * rounds-90d is computed locally by scanning useAllScores by play_date,
  * mirroring src/hooks/useProfileSheetStats.ts (which dies with the old
  * sheet).
  */
@@ -36,9 +36,9 @@ export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
   const { data: trend } = useHandicapTrend(connection?.id);
   const { data: scores } = useAllScores(connection?.id);
 
-  const rounds30d = useMemo(() => {
+  const rounds90d = useMemo(() => {
     if (!scores) return null;
-    const cutoff = Date.now() - 30 * 86_400_000;
+    const cutoff = Date.now() - 90 * 86_400_000;
     return scores.filter(
       (s: any) => s.play_date && new Date(s.play_date).getTime() >= cutoff,
     ).length;
@@ -129,9 +129,9 @@ export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
         {indexText}
       </span>
       {trendNode}
-      {rounds30d != null && (
+      {rounds90d != null && (
         <span style={{ fontWeight: 500, fontSize: 11, color: MUTED }}>
-          {DOT} {rounds30d} rounds {DOT} 30d
+          {DOT} {rounds90d} rounds {DOT} 90d
         </span>
       )}
       {chevron}
