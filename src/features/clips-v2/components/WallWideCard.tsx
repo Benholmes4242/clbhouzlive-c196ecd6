@@ -72,7 +72,7 @@ export function WallWideCard({ row, post, flatIndex, posts, isAutoplayActive }: 
       onClick={handlePress}
       onPointerDown={onPrerouteArm}
       onPointerUp={onPreroute}
-      onPointerCancel={() => onPrerouteCancel('pointercancel')}
+      onPointerCancel={() => onPrerouteCancel('moved')}
       style={{
         position: 'relative',
         width: '100%',
