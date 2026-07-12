@@ -211,10 +211,10 @@ const Top100CoursesHubPanel = () => {
     listSummaries.find(l => l.slug === selectedList)?.total_courses ?? allCourses.length;
 
   return (
-    <div className="space-y-[14px]">
+    <div className="space-y-4">
       {/* Editorial header — eyebrow + title + optional progress sub-line.
           Parent already supplies px-4 — don't double-pad. */}
-      <div className="pt-1">
+      <div>
         <SectionHeader
           role="prime"
           kicker="TOP 100"
@@ -226,7 +226,7 @@ const Top100CoursesHubPanel = () => {
               fontSize: 13,
               fontWeight: 500,
               color: SLATE_600,
-              margin: '8px 0 0',
+              margin: '6px 0 0',
               letterSpacing: '-0.005em',
               fontFamily: "'Geist', sans-serif",
             }}
@@ -332,7 +332,7 @@ const Top100CoursesHubPanel = () => {
 
       {/* Meta row — small-caps tracked label + sort selector, mirrors Explore */}
       {!isLoading && allCourses.length > 0 && (
-        <div className="flex items-center justify-between gap-3 pt-2 px-4">
+        <div className="flex items-center justify-between gap-3">
           <span style={{
             fontSize: 13, color: INK_MUTE, flex: 1, lineHeight: 1.35,
             fontWeight: 500,
@@ -354,7 +354,7 @@ const Top100CoursesHubPanel = () => {
       )}
 
       {/* Rankings List */}
-      <div className="px-4">
+      <div>
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-fade-in">
           {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -373,7 +373,7 @@ const Top100CoursesHubPanel = () => {
         </div>
       ) : allCourses.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center gap-4 animate-fade-in">
-          <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-1">
+          <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto">
             {searchTerm ? (
               <Search className="w-5 h-5 text-muted-foreground" />
             ) : (
@@ -393,7 +393,7 @@ const Top100CoursesHubPanel = () => {
           {searchTerm ? (
             <button
               onClick={() => setSearchTerm('')}
-              className="mt-2 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium active:scale-[0.97] transition-transform"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium active:scale-[0.97] transition-transform"
               style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
 
             >
@@ -403,7 +403,7 @@ const Top100CoursesHubPanel = () => {
           ) : (
             <button
               onClick={handleResetFilters}
-              className="mt-2 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium active:scale-[0.97] transition-transform"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium active:scale-[0.97] transition-transform"
               style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
             >
               Reset filters
