@@ -29,9 +29,7 @@ export function OverviewV4Page() {
       <WorldRankings tour={tour} />
       <StatWatch tour={tour} />
       <ComingUp tour={tour} />
-      <CollegeFranchiseSection />
-      <CourseOfTheWeekV4 />
-      <ConnectHandicapCTA />
+      <CollegeFranchise />
     </main>
   );
 }
