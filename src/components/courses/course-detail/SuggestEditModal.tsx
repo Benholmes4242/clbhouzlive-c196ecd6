@@ -88,7 +88,7 @@ const SuggestEditModal: React.FC<SuggestEditModalProps> = ({
         <DialogHeader>
           <DialogTitle>Suggest an edit</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4 mt-2">
+        <div className="space-y-4 mt-3">
           {edits.map((field, i) => (
             <div key={field.fieldName}>
               <label className="text-sm font-medium text-foreground mb-1 block">{field.label}</label>

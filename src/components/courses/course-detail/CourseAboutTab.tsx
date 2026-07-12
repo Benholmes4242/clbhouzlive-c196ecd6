@@ -125,13 +125,13 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   return (
     <div
       className="animate-in fade-in duration-200"
-      style={{ paddingBottom: 34, background: SLATE_50 }}
+      style={{ paddingBottom: 32, background: SLATE_50 }}
     >
       {/* 1. Location breadcrumb pills */}
       <CourseLocationPills course={course} />
 
       {/* 2. Community Rating — CommunityScoreCard renders its own header internally, no SectionLabel */}
-      <div style={{ padding: '24px 16px 0' }}>
+      <div style={{ padding: '16px 16px 0' }}>
         <CommunityScoreCard
           courseId={course.id}
           courseName={course.name}
@@ -168,7 +168,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       </div>
 
 
-      <div style={{ margin: '24px 0' }}><Divider /></div>
+      <div style={{ margin: '16px 0' }}><Divider /></div>
 
       {/* 3. Your Journey — PersonalSection renders its own canonical SectionLabel internally */}
       {user && (
@@ -176,7 +176,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           <section>
             <PersonalSection courseId={course.id} courseName={course.name} />
           </section>
-          <div style={{ margin: '24px 0' }}><Divider /></div>
+          <div style={{ margin: '16px 0' }}><Divider /></div>
         </>
       )}
 
@@ -203,7 +203,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
                   width: 28, height: 28, borderRadius: 9,
                   background: 'rgba(247,147,30,0.10)', color: AMBER,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  marginBottom: 10,
+                  marginBottom: 12,
                 }}
               >
                 <Quote size={14} fill="currentColor" strokeWidth={0} />
@@ -234,7 +234,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
               )}
             </div>
           </div>
-          <div style={{ margin: '24px 0' }}><Divider /></div>
+          <div style={{ margin: '16px 0' }}><Divider /></div>
         </>
       )}
 
@@ -245,7 +245,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             <CourseTop100Spotlight courseId={course.id} courseName={course.name} />
           </div>
           <CourseTop100Summary />
-          <div style={{ margin: '24px 0' }}><Divider /></div>
+          <div style={{ margin: '16px 0' }}><Divider /></div>
         </>
       )}
 
@@ -270,7 +270,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         </div>
       </section>
 
-      <div style={{ margin: '24px 0' }}><Divider /></div>
+      <div style={{ margin: '16px 0' }}><Divider /></div>
 
       {/* 9. Claim Course — tri-state: unclaimed / pending / claimed */}
       {course.club_id && claimStatus && (
@@ -286,7 +286,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           {claimStatus.state === 'claimed' && claimStatus.business && (
             <ClaimedCourseProfileLink business={claimStatus.business} />
           )}
-          <div style={{ margin: '24px 0' }}><Divider /></div>
+          <div style={{ margin: '16px 0' }}><Divider /></div>
         </>
       )}
 
@@ -295,7 +295,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         <AboutMediaStrip clubId={course.id} onSeeAllClick={() => onTabChange?.('media')} />
       </section>
 
-      <div style={{ margin: '24px 0' }}><Divider /></div>
+      <div style={{ margin: '16px 0' }}><Divider /></div>
 
       {/* 11. Explore More — CourseExploreLinks renders its own heading internally, no SectionLabel */}
       <CourseExploreLinks course={course} />
@@ -305,7 +305,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         <div style={{ padding: '12px 16px 0' }}>
           <button
             onClick={handleWebsiteClick}
-            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '13px 0', borderRadius: 14, background: 'rgba(247,147,30,0.06)', border: '1.5px solid rgba(247,147,30,0.2)', fontSize: 13, fontWeight: 700, color: AMBER, cursor: 'pointer' }}
+            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px 0', borderRadius: 14, background: 'rgba(247,147,30,0.06)', border: '1.5px solid rgba(247,147,30,0.2)', fontSize: 13, fontWeight: 700, color: AMBER, cursor: 'pointer' }}
           >
             <ExternalLink className="h-4 w-4" />
             Official Course Website

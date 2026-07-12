@@ -136,7 +136,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
 
   // --- Render ---
   const renderHeader = () => (
-    <div style={{ padding: '4px 0 14px' }}>
+    <div style={{ padding: '4px 0 12px' }}>
       <div
         style={{
           width: 40,
@@ -146,7 +146,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
           display: 'inline-flex',
           alignItems: 'center',
           justifyContent: 'center',
-          marginBottom: 10,
+          marginBottom: 12,
         }}
       >
         <BadgeCheck size={20} color={AMBER} strokeWidth={2.2} />
@@ -185,11 +185,11 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
     if (claimable.length > 0) {
       return (
         <>
-          <p style={{ fontSize: 14, color: INK_FAINT, lineHeight: 1.5, marginBottom: 14 }}>
+          <p style={{ fontSize: 14, color: INK_FAINT, lineHeight: 1.5, marginBottom: 12 }}>
             Claim this course for your golf club profile. We will review it before it goes live.
           </p>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 12 }}>
             {claimable.map((m) => {
               const selected = selectedId === m.business.id;
               return (
@@ -199,7 +199,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
                   onClick={() => setSelectedId(m.business.id)}
                   className="w-full flex items-center gap-3 text-left transition-all active:scale-[0.99]"
                   style={{
-                    padding: '12px 14px',
+                    padding: '12px 16px',
                     borderRadius: 14,
                     background: '#FFFFFF',
                     border: `1.5px solid ${selected ? AMBER : HAIRLINE}`,
