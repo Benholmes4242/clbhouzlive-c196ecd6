@@ -3,12 +3,11 @@ import { useSearchParams } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import {
   CLIPS_V2_MOODS,
-  useClipsWallFeed,
   type ClipsV2Mood,
 } from './hooks/useClipsWallFeed';
+import { ClipsWall } from './components/ClipsWall';
 
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
@@ -127,16 +126,7 @@ export default function ClipsPageV2() {
           </div>
         </div>
 
-        {/* C9.3: wall mounts here */}
-        <div
-          style={{
-            padding: '12px 16px',
-            fontSize: 12,
-            color: '#64748B',
-          }}
-        >
-          mood={mood} · first page rows={firstPageCount}
-        </div>
+        <ClipsWall mood={mood} />
       </main>
 
       <SearchOverlayV2 isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
