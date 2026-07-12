@@ -27,6 +27,14 @@ export interface PlayerLiveData {
   currentRound: number | null;
   /** e.g. "-8 thru 14" or "-8 F" or just "-8" if no thru data */
   scoreText: string;
+  /** Raw score-to-par (negative = under). Null when unavailable. */
+  score: number | null;
+  /** Holes played this round (0-18). Null when unavailable. */
+  thru: number | null;
+  /** Current position on leaderboard. Null when unavailable. */
+  position: number | null;
+  /** Whether the player is tied at that position. */
+  positionTied: boolean | null;
 }
 
 export interface PlayerRecentData {
