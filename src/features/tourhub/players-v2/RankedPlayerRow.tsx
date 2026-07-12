@@ -28,6 +28,8 @@ export interface RankedPlayerRowProps {
   rank: number;
   player: RankedPlayer;
   stat?: number | null;
+  /** Pre-formatted string override for `stat` (e.g. "$30.1M", "72.3%"). */
+  statFormatted?: string;
   statLabel?: string | null;
   live?: boolean;
   sub?: string | null;
