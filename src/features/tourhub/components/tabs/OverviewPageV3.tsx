@@ -83,7 +83,7 @@ export function OverviewPageV3() {
               <HomeCourseOfWeekModule />
             </LazySection>
             <LazySection minHeight={400}>
-              <WorldRankingsHero />
+              <WorldRankingsSlot />
             </LazySection>
             <LazySection minHeight={400}>
               <StatOfTheWeek />
