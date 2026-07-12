@@ -127,10 +127,9 @@ export function useGolfersDiscovery() {
       const query = searchQuery.trim().toLowerCase();
       
       let baseQuery = supabase
-        .from('user_profiles')
+        .from('public_profiles')
         .select('id, display_name, username, profile_photo_url, home_club, primary_club_id, eg_handicap_index, is_verified_golfer, created_at')
         .neq('id', user!.id)
-        .is('deleted_at', null)
         .or(`display_name.ilike.%${query}%,username.ilike.%${query}%,home_club.ilike.%${query}%`);
 
       // Apply tab-specific filters to search
@@ -183,10 +182,9 @@ export function useGolfersDiscovery() {
     enabled: searchQuery.trim().length === 0 && !!user && (activeTab !== 'home_club' || !!viewerPrimaryClubId),
     queryFn: async () => {
       let query = supabase
-        .from('user_profiles')
+        .from('public_profiles')
         .select('id, display_name, username, profile_photo_url, home_club, primary_club_id, eg_handicap_index, is_verified_golfer, created_at', { count: 'exact' })
-        .neq('id', user!.id)
-        .is('deleted_at', null);
+        .neq('id', user!.id);
 
       // Apply tab-specific filters
       // Use primary_club_id ONLY (canonical) - no text fallback

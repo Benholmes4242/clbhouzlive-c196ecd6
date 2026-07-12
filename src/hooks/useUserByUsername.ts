@@ -17,7 +17,7 @@ export const useUserByUsername = (username: string | undefined) => {
       if (!username) return null;
 
       const { data, error } = await supabase
-        .from('user_profiles')
+        .from('public_profiles')
         .select('id, username, display_name, profile_photo_url, home_club, eg_handicap_index')
         .eq('username', username)
         .single();
