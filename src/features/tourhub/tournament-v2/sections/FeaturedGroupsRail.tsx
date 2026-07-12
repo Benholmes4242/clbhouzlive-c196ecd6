@@ -6,6 +6,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useFeaturedGroups } from '../../overview/data/useFeaturedGroups';
 import { PlayerAvatar } from '../../components/PlayerAvatar';
+import { SectionEyebrow } from './SectionEyebrow';
 import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import {
   FONT, INK, INK_MUTE, INK_FAINT, SURFACE, HAIRLINE_INK_8,
@@ -44,16 +45,21 @@ export function FeaturedGroupsRail({ tournamentId, live, tourCode }: Props) {
   const navigate = useNavigate();
   const { data } = useFeaturedGroups(tournamentId, { live });
   const groups = parseGroups(data);
+  // Self-hide when there are no featured groups. Eyebrow lives INSIDE
+  // the rail so a live event without groups shows no floating chrome
+  // (Brief F-TD-3 §1).
   if (groups.length === 0) return null;
 
   return (
-    <div
-      style={{
-        display: 'flex', gap: 10, overflowX: 'auto',
-        padding: '0 16px 8px', scrollSnapType: 'x mandatory',
-        fontFamily: FONT,
-      }}
-    >
+    <>
+      <SectionEyebrow kicker="On the Course" />
+      <div
+        style={{
+          display: 'flex', gap: 10, overflowX: 'auto',
+          padding: '0 16px 8px', scrollSnapType: 'x mandatory',
+          fontFamily: FONT,
+        }}
+      >
       {groups.map((g: any, gi: number) => {
         const thru = typeof g.thru === 'number' ? g.thru : null;
         return (
