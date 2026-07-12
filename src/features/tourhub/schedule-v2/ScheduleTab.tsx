@@ -210,17 +210,17 @@ export function ScheduleTab() {
         </div>
 
         {/* Tour chips */}
-        <div
-          style={{
-            display: 'flex',
-            gap: 6,
-            overflowX: 'auto',
-            paddingBottom: 4,
-            marginBottom: 14,
-            scrollbarWidth: 'none',
-          }}
-          className="segmented-scroller"
-        >
+          <div
+            style={{
+              display: 'flex',
+              gap: 8,
+              overflowX: 'auto',
+              paddingBottom: 4,
+              marginBottom: 12,
+              scrollbarWidth: 'none',
+            }}
+            className="segmented-scroller"
+          >
           {TOUR_PRIORITY.map((slug) => {
             const isActive = slug === activeTour;
             return (
@@ -313,10 +313,12 @@ export function ScheduleTab() {
             <div
               style={{
                 position: 'sticky',
-                top: 0,
+                // Bleed route: --header-h is 0 here, so compose island geometry
+                // directly (sat + 54 island bottom + 16 canon clearance).
+                top: 'calc(var(--sat, 0px) + 70px)',
                 zIndex: 2,
                 background: SLATE_50,
-                padding: '10px 16px 6px',
+                padding: '12px 16px 6px',
                 fontSize: 10.5,
                 fontWeight: 800,
                 letterSpacing: '0.14em',

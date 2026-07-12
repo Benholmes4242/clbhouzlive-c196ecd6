@@ -56,8 +56,8 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
   const rowStyle: React.CSSProperties = {
     display: 'flex',
     alignItems: 'stretch',
-    gap: 14,
-    padding: '14px 16px',
+    gap: 12,
+    padding: '12px 16px',
     background: isLive ? AMBER_WASH : 'transparent',
     borderRadius: isLive ? 12 : 0,
     borderBottom: `0.5px solid ${HAIRLINE_INK_10}`,
