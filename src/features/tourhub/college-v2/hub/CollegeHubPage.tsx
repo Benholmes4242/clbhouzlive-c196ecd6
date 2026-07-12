@@ -72,7 +72,7 @@ export function CollegeHubPage() {
         }}
       >
         {/* Header */}
-        <header style={{ padding: '20px 16px 14px', background: SLATE_50 }}>
+        <header style={{ padding: '16px 16px 12px', background: SLATE_50 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 }}>
             <div style={{ minWidth: 0 }}>
               <div

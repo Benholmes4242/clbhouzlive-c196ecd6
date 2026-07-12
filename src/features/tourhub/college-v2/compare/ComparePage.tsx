@@ -102,7 +102,7 @@ export function ComparePage() {
             style={{
               background: CHARCOAL,
               paddingTop: 'calc(env(safe-area-inset-top, 0px) + 58px)',
-              paddingBottom: 20,
+              paddingBottom: 16,
               paddingLeft: 12,
               paddingRight: 12,
               display: 'flex',

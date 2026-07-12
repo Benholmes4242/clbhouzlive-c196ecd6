@@ -84,7 +84,7 @@ export function PickerSheet({ open, onClose, target, standings, otherSlug }: Pro
       }}
     >
       {/* Header */}
-      <div style={{ padding: '10px 16px 12px', borderBottom: `0.5px solid ${HAIRLINE_INK_10}`, background: SLATE_50 }}>
+      <div style={{ padding: '8px 16px 12px', borderBottom: `0.5px solid ${HAIRLINE_INK_10}`, background: SLATE_50 }}>
         <div
           style={{
             fontSize: 8.5,

@@ -65,7 +65,7 @@ export function TheClass({ slug, collegeName }: Props) {
       {/* Section head + compare action */}
       <header
         style={{
-          padding: '16px 16px 10px',
+          padding: '16px 16px 12px',
           display: 'flex',
           alignItems: 'baseline',
           justifyContent: 'space-between',
