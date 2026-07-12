@@ -241,22 +241,6 @@ export function TournamentPage() {
   );
 }
 
-function OnCourseAct({ tournamentId, tourCode }: { tournamentId: string; tourCode: string }) {
-  // The rail self-hides when empty; when it renders, show the eyebrow.
-  // We render optimistically (both eyebrow + rail) and let the rail
-  // return null on empty data. The eyebrow itself is cheap chrome; when
-  // followed by null the section reads as a live-loading affordance. To
-  // guarantee a clean self-hide, we branch: query cache is warmed by the
-  // rail's own useFeaturedGroups; we mirror it here with a lightweight
-  // presence check.
-  return (
-    <>
-      <SectionEyebrow kicker="On the Course" />
-      <FeaturedGroupsRail tournamentId={tournamentId} live tourCode={tourCode} />
-    </>
-  );
-}
-
 function UpcomingAct({
   meta, field, teeGroups, onOpenAllTimes,
 }: {
