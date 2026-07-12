@@ -268,6 +268,37 @@ export function resolveKind(row: {
   return { left: 'actor', right: 'none' };
 }
 
+/**
+ * For comment/reply kinds where `message` holds the raw comment body,
+ * compose `<b>{actor}</b> replied: "…"` (or `commented:` for non-replies).
+ * Returns null when the row should render via the default body path
+ * (i.e. plain comments whose message already starts with the actor name).
+ */
+export function composeCommentBody(row: {
+  notif_type: string;
+  message?: string | null;
+  actor_display_name?: string | null;
+}): React.ReactNode | null {
+  const t = row.notif_type;
+  const isReply = t === 'comment_reply' || t === 'top_ten_reply';
+  const isComment = t === 'comment' || t === 'comment_post' || t === 'top_ten_comment';
+  if (!isReply && !isComment) return null;
+  const msg = (row.message ?? '').trim();
+  if (!msg) return null;
+  const actor = row.actor_display_name ?? '';
+  // Plain comments whose message already leads with the actor name are
+  // rendered by the default bold-prefix path — untouched.
+  if (isComment && actor && msg.startsWith(actor)) return null;
+  const verb = isReply ? ' replied: ' : ' commented: ';
+  return (
+    <>
+      <span style={{ fontWeight: 700 }}>{actor || 'Someone'}</span>
+      {verb}
+      <span style={{ color: T.INK_45, fontStyle: 'italic' }}>{`\u201C${msg}\u201D`}</span>
+    </>
+  );
+}
+
 // icons that some rows expose to callers (e.g. verification tiles)
 export const KindIcons = {
   Heart, MessageSquare, UserPlus, Users, Building2, Bell, Star, Reply, AtSign,
