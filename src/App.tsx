@@ -228,10 +228,10 @@ const ActivityPageV2 = lazy(() => import("./features/activity-v2/ActivityPageV2"
 const GolfersToFollowPage = lazy(() => import("./pages/GolfersToFollowPage"));
 const GolfersSharedCoursesPage = lazy(() => import("./pages/GolfersSharedCoursesPage"));
 const OwnProfileSocialRedirect = lazy(() => import("./components/profile/OwnProfileSocialRedirect"));
-const FollowersListPage = lazy(() => import("./pages/FollowersListPage"));
-const FollowingListPage = lazy(() => import("./pages/FollowingListPage"));
 const FriendsRedirectToFollowing = lazy(() => import("./pages/FriendsRedirectToFollowing"));
-const SocialListV2TestPage = lazy(() => import("./features/social-lists-v2/SocialListV2TestPage"));
+const ProfileSocialListRoute = lazy(() => import("./features/social-lists-v2/ProfileSocialListRoute"));
+const BusinessSocialListRoute = lazy(() => import("./features/social-lists-v2/BusinessSocialListRoute"));
+
 
 const CreateProfileRedirect = lazy(() => import("./components/redirects/CreateProfileRedirect"));
 
@@ -292,7 +292,7 @@ const ChallengesPage = lazy(() => import("./pages/ChallengesPage"));
 const BusinessDirectoryPage = lazy(() => import("./pages/BusinessDirectoryPage"));
 const BusinessInsightsPageV2 = lazy(() => import("./pages/BusinessInsightsPageV2"));
 const BusinessProfilePage = lazy(() => import("./pages/BusinessProfilePage"));
-const BusinessFollowersPage = lazy(() => import("./pages/BusinessFollowersPage"));
+
 const MyBusinessesPage = lazy(() => import("./pages/MyBusinessesPage"));
 const BusinessProfileEditor = lazy(() => import("./pages/BusinessProfileEditor"));
 
@@ -498,10 +498,10 @@ function AppRoutes() {
         
         <Route path="/followers" element={<Suspense fallback={<GenericPageSkeleton />}><OwnProfileSocialRedirect tab="followers" /></Suspense>} />
         <Route path="/following" element={<Suspense fallback={<GenericPageSkeleton />}><OwnProfileSocialRedirect tab="following" /></Suspense>} />
-        <Route path="/profile/:username/followers" element={<Suspense fallback={<GenericPageSkeleton />}><FollowersListPage /></Suspense>} />
-        <Route path="/profile/:username/following" element={<Suspense fallback={<GenericPageSkeleton />}><FollowingListPage /></Suspense>} />
+        <Route path="/profile/:username/followers" element={<Suspense fallback={<GenericPageSkeleton />}><ProfileSocialListRoute direction="followers" /></Suspense>} />
+        <Route path="/profile/:username/following" element={<Suspense fallback={<GenericPageSkeleton />}><ProfileSocialListRoute direction="following" /></Suspense>} />
         <Route path="/profile/:username/friends" element={<Suspense fallback={<GenericPageSkeleton />}><FriendsRedirectToFollowing /></Suspense>} />
-        <Route path="/social-v2-test/:username" element={<Suspense fallback={<GenericPageSkeleton />}><SocialListV2TestPage /></Suspense>} />
+
         
         {/* Business routes */}
         <Route path="/businesses/manage" element={<Suspense fallback={<GenericPageSkeleton />}><MyBusinessesPage /></Suspense>} />
@@ -517,8 +517,9 @@ function AppRoutes() {
         <Route path="/business/invite/accept" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessInviteAcceptPage /></Suspense>} />
         <Route path="/business/:businessId/activity" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessActivityPage /></Suspense>} />
         <Route path="/business/:id/reviews" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessReviewsPage /></Suspense>} />
-        <Route path="/business/:idOrSlug/followers" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessFollowersPage /></Suspense>} />
-        <Route path="/business/:idOrSlug/following" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessFollowersPage initialTab="following" /></Suspense>} />
+        <Route path="/business/:idOrSlug/followers" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessSocialListRoute direction="followers" /></Suspense>} />
+        <Route path="/business/:idOrSlug/following" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessSocialListRoute direction="following" /></Suspense>} />
+
         <Route path="/business/:idOrSlug" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessProfilePage /></Suspense>} />
         
         
