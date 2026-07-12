@@ -61,6 +61,7 @@ export interface PlayerStateData {
 interface LiveRow {
   tournament_id: string;
   position: number | null;
+  position_tied: boolean | null;
   score: number | null;
   thru: number | null;
   status: string | null;
