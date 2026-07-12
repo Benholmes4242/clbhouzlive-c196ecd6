@@ -8,7 +8,7 @@ const SLATE = 'var(--hcp-t-60)';
 
 /** No legends in ANY window — the true empty. */
 export const ChampionsEmptyState: React.FC<{ courseName: string | null }> = ({ courseName }) => (
-  <div style={{ padding: '44px 28px 48px', textAlign: 'center', fontFamily: GAM.FONT_GEIST }}>
+  <div style={{ padding: '40px 24px 32px', textAlign: 'center', fontFamily: GAM.FONT_GEIST }}>
     <EmptyStateTile tint="amber">
       <Crown size={30} color={GAM.AMBER} strokeWidth={1.8} />
     </EmptyStateTile>
