@@ -57,7 +57,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5 }: Props) {
         <div
           style={{
             display: 'flex', alignItems: 'center',
-            padding: '7px 16px',
+            padding: '8px 16px',
             borderBottom: `0.5px solid ${HAIRLINE_INK_8}`,
             fontSize: 8.5, fontWeight: 800, letterSpacing: '0.10em',
             color: INK_FAINT, textTransform: 'uppercase',

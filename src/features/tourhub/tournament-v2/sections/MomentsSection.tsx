@@ -30,7 +30,7 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
     return (
       <>
         <SectionEyebrow kicker="Moments" />
-        <div style={{ padding: '0 16px 8px', display: 'flex', gap: 10, fontFamily: FONT }}>
+        <div style={{ padding: '0 16px 8px', display: 'flex', gap: 12, fontFamily: FONT }}>
           {[0, 1, 2].map((i) => (
             <div key={i} style={{
               minWidth: 108, width: 108, height: 148, flexShrink: 0,
@@ -52,7 +52,7 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
         <div style={{ padding: '0 16px 8px', fontFamily: FONT }}>
           <div style={{
             background: SURFACE, border: `0.5px solid ${HAIRLINE_INK_8}`,
-            borderRadius: 16, padding: 18,
+            borderRadius: 16, padding: 16,
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12,
             textAlign: 'center',
           }}>
@@ -89,7 +89,7 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
       />
       <div
         style={{
-          display: 'flex', gap: 10, overflowX: 'auto',
+          display: 'flex', gap: 12, overflowX: 'auto',
           padding: '0 16px 8px', scrollSnapType: 'x mandatory',
           fontFamily: FONT,
         }}

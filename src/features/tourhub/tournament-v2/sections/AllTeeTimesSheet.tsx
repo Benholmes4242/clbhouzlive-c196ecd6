@@ -20,7 +20,7 @@ export function AllTeeTimesSheet({ open, onClose, groups, tournamentName, round 
   return (
     <BottomSheet open={open} onClose={onClose} variant="light" surfaceColor={SLATE_50}>
       <div style={{ background: SLATE_50, fontFamily: FONT, maxHeight: 'calc(90vh - 24px)', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ padding: '4px 18px 12px' }}>
+        <div style={{ padding: '4px 16px 12px' }}>
           <div style={{ fontSize: 9, fontWeight: 800, color: INK, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
             All Tee Times
           </div>

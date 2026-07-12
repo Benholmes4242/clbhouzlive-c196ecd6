@@ -93,7 +93,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
       style={{
         position: 'relative',
         minHeight: `calc(${HERO_MIN_H}px + env(safe-area-inset-top, 0px))`,
-        paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+        paddingTop: 'max(env(safe-area-inset-top, 0px), 48px)',
         background: bg,
         fontFamily: FONT,
         color: '#fff',
@@ -102,7 +102,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
         justifyContent: 'flex-end',
       }}
     >
-      <div style={{ padding: '14px 16px 16px' }}>
+      <div style={{ padding: '16px' }}>
         {statusChip && (
           <div
             style={{
@@ -111,7 +111,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
               background: statusChip.bg, border: `1px solid ${statusChip.border}`,
               fontSize: 9.5, fontWeight: 800, color: statusChip.color,
               letterSpacing: '0.10em', textTransform: 'uppercase',
-              marginBottom: 10,
+              marginBottom: 12,
             }}
           >
             {statusChip.label}
@@ -139,7 +139,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
         {/* STATE PANEL */}
         <div
           style={{
-            marginTop: 14,
+            marginTop: 12,
             background: 'rgba(0,0,0,0.30)',
             backdropFilter: 'blur(8px) saturate(140%)',
             WebkitBackdropFilter: 'blur(8px) saturate(140%)',

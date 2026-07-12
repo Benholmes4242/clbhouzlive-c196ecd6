@@ -15,7 +15,7 @@ export function SectionEyebrow({ kicker, actionLabel, onAction }: Props) {
     <div
       style={{
         display: 'flex', alignItems: 'center', gap: 8,
-        padding: '14px 16px 8px', fontFamily: FONT,
+        padding: '16px 16px 12px', fontFamily: FONT,
       }}
     >
       <div style={{ width: 3, height: 12, background: INK, borderRadius: 1, flexShrink: 0 }} />

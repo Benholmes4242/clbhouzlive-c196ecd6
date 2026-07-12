@@ -62,7 +62,7 @@ export function EventInfoSection({ meta, broadcast, onTeeTimesTap, teeTimesRound
             key={label}
             style={{
               display: 'flex', alignItems: 'baseline', gap: 12,
-              padding: '11px 16px',
+              padding: '12px 16px',
               borderTop: i === 0 ? `0.5px solid ${HAIRLINE_INK_8}` : 'none',
               borderBottom: `0.5px solid ${HAIRLINE_INK_8}`,
             }}
@@ -97,7 +97,7 @@ export function EventInfoSection({ meta, broadcast, onTeeTimesTap, teeTimesRound
             style={{
               display: 'flex', alignItems: 'baseline', gap: 12,
               width: '100%',
-              padding: '11px 16px',
+              padding: '12px 16px',
               borderTop: rows.length === 0 ? `0.5px solid ${HAIRLINE_INK_8}` : 'none',
               borderBottom: `0.5px solid ${HAIRLINE_INK_8}`,
               background: 'transparent',
