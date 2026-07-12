@@ -26,10 +26,10 @@ export function PlayerSkeleton() {
         style={{
           background: 'linear-gradient(180deg, #2a3542 0%, #0a0e14 100%)',
           paddingTop: 'calc(var(--chrome-total-h, 0px) + 8px)',
-          paddingBottom: 22,
+          paddingBottom: 16,
         }}
       >
-        <div style={{ padding: '10px 20px 0', display: 'flex', gap: 16, alignItems: 'flex-end' }}>
+        <div style={{ padding: '10px 16px 0', display: 'flex', gap: 16, alignItems: 'flex-end' }}>
           <div style={{ width: 74, height: 74, borderRadius: '34%', background: WHITE_ALPHA_08 }} />
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
             <Bone w={100} h={10} dark />
@@ -40,7 +40,7 @@ export function PlayerSkeleton() {
       </div>
 
       {/* Season cards bone */}
-      <div style={{ padding: '18px 16px 14px' }}>
+      <div style={{ padding: '16px 16px 12px' }}>
         <Bone w={90} h={10} />
         <div style={{ marginTop: 12, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
           {[0, 1, 2, 3].map((i) => (
@@ -58,7 +58,7 @@ export function PlayerSkeleton() {
       </div>
 
       {/* Tournaments bone */}
-      <div style={{ padding: '18px 16px 0', background: SURFACE }}>
+      <div style={{ padding: '16px 16px 0', background: SURFACE }}>
         <Bone w={110} h={10} />
         <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 12 }}>
           {[0, 1, 2, 3, 4].map((i) => (

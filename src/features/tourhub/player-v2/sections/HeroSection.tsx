@@ -45,11 +45,11 @@ export function HeroSection({ player, playerStats }: HeroSectionProps) {
       style={{
         background: `linear-gradient(180deg, #262B33 0%, ${CHARCOAL} 100%)`,
         paddingTop: 'calc(var(--chrome-total-h, 0px) + 8px)',
-        paddingBottom: 22,
+        paddingBottom: 16,
       }}
 
     >
-      <div style={{ padding: '10px 20px 0', display: 'flex', gap: 16, alignItems: 'flex-end' }}>
+      <div style={{ padding: '10px 16px 0', display: 'flex', gap: 16, alignItems: 'flex-end' }}>
         <SquircleAvatar
           size={74}
           srcCandidates={avatarCandidates}
@@ -107,15 +107,15 @@ export function HeroSection({ player, playerStats }: HeroSectionProps) {
           {(worldRank || (isPga && fedexRank)) && (
             <div
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 10,
-                marginTop: 8,
-                fontSize: 11.5,
-                fontWeight: 700,
-                color: WHITE_ALPHA_65,
-                fontVariantNumeric: 'tabular-nums',
-              }}
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              marginTop: 12,
+              fontSize: 11.5,
+              fontWeight: 700,
+              color: WHITE_ALPHA_65,
+              fontVariantNumeric: 'tabular-nums',
+            }}
             >
               {worldRank && <span>World No. {worldRank}</span>}
               {worldRank && isPga && fedexRank && (
