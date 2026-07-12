@@ -152,12 +152,6 @@ export function TourHubMainPage() {
     }
   };
 
-  const renderShellRow = () => {
-    switch (activeTab) {
-      case 'leaderboards':return <LeadersShellRow />;
-      default:            return null;
-    }
-  };
 
   const handleSelectTab = (id: string) => {
     if (id === 'college') {
