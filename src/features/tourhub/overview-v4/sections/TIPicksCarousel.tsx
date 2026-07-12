@@ -46,7 +46,15 @@ function formatThru(thru: number | null | undefined): string {
   return thru >= 18 ? 'F' : `thru ${thru}`;
 }
 
+const CUT_STATUSES = new Set(['CUT', 'WD', 'DQ']);
+function cutStatus(live: PickLiveState | undefined): string | null {
+  const s = (live?.status ?? '').toUpperCase();
+  return CUT_STATUSES.has(s) ? s : null;
+}
+
 function verdict(live: PickLiveState | undefined): { hit: boolean; label: string } {
+  const cut = cutStatus(live);
+  if (cut) return { hit: false, label: `MISS · ${cut}` };
   if (!live || live.position == null) {
     return { hit: false, label: 'MISS' };
   }
@@ -55,6 +63,40 @@ function verdict(live: PickLiveState | undefined): { hit: boolean; label: string
   if (live.position === 1) return { hit: true, label: `WON · ${scoreText}` };
   const hit = live.position <= 10;
   return { hit, label: `${hit ? 'HIT' : 'MISS'} · ${posText} · ${scoreText}` };
+}
+
+/**
+ * Board-ordered picks for live/completed states:
+ *   1) active players with a position — ascending position
+ *   2) players with no leaderboard row — original pick-rank order
+ *   3) CUT/WD/DQ — last, pick-rank order among themselves
+ * Upcoming state keeps the original pick-rank order (no board exists).
+ */
+function orderPicksByBoard(
+  picks: AITopContender[],
+  state: EventState,
+  liveMap: Map<string, PickLiveState> | undefined,
+): AITopContender[] {
+  if (state !== 'live' && state !== 'completed') return picks;
+  const withIdx = picks.map((p, i) => ({ p, i }));
+  const active: typeof withIdx = [];
+  const missing: typeof withIdx = [];
+  const cut: typeof withIdx = [];
+  for (const row of withIdx) {
+    const live = liveMap?.get(row.p.playerId);
+    if (cutStatus(live)) cut.push(row);
+    else if (live && live.position != null) active.push(row);
+    else missing.push(row);
+  }
+  active.sort((a, b) => {
+    const pa = liveMap?.get(a.p.playerId)?.position ?? Number.POSITIVE_INFINITY;
+    const pb = liveMap?.get(b.p.playerId)?.position ?? Number.POSITIVE_INFINITY;
+    if (pa !== pb) return pa - pb;
+    return a.i - b.i;
+  });
+  missing.sort((a, b) => a.i - b.i);
+  cut.sort((a, b) => a.i - b.i);
+  return [...active, ...missing, ...cut].map((r) => r.p);
 }
 
 type SheetState =
