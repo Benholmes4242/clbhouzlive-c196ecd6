@@ -4,6 +4,7 @@
  * Does NOT depend on any shared drawer/sheet component.
  */
 import React, { useEffect, useState } from 'react';
+import { Z } from '@/config/zIndex';
 import type { LucideIcon } from 'lucide-react';
 import {
   Compass,
@@ -98,7 +99,7 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
       style={{
         position: 'fixed',
         inset: 0,
-        zIndex: 200,
+        zIndex: Z.sideMenu,
         fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
       }}
     >

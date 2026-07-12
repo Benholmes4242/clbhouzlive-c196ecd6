@@ -44,6 +44,13 @@ export const Z = {
   // LOG button remains tappable on-device while wizards are open.
   logHud: 13000,
 
+  // Side drawers (TourSideMenu) — above header (1000) and Echo page layers,
+  // below aiOverlay (11100). Scrim blocks the island's search button, so
+  // sideMenu and searchOverlay (10100) cannot be open simultaneously.
+  sideMenu: 11000,
+
+
+
   
   // Utility classes for inline styles
   asStyle: {
@@ -64,6 +71,7 @@ export const Z = {
     dropdownMenu: { zIndex: 60 },
     mentionsPanel: { zIndex: 12010 },
     logHud: { zIndex: 13000 },
+    sideMenu: { zIndex: 11000 },
   }
 
 
