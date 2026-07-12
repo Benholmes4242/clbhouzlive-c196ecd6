@@ -28,6 +28,8 @@ export function TourHubShell({ children, immersive = false, immersiveStatusBar =
     return (
       <PageRoot
         className="min-h-screen w-full"
+        style={{ background: '#F8FAFC' }}
+        dark={false}
         immersive
         immersiveStatusBar
       >
