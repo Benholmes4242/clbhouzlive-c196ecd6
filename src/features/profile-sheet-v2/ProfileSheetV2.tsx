@@ -73,7 +73,7 @@ function SheetSkeleton() {
       {/* hcp strip */}
       {block(46, { margin: '12px 20px 0' })}
       {/* quick action tiles */}
-      <div style={{ display: 'flex', gap: 8, padding: '14px 20px 0' }}>
+      <div style={{ display: 'flex', gap: 8, padding: '12px 20px 0' }}>
         {block(58, { flex: 1 })}
         {block(58, { flex: 1 })}
         {block(58, { flex: 1 })}
