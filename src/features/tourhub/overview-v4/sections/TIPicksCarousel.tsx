@@ -237,7 +237,7 @@ function SheetShell({ onClose, maxHeight = '80vh', children }: { onClose: () => 
         style={{
           position: 'absolute',
           left: 0, right: 0, bottom: 0,
-          background: V4.surface,
+          background: V4.bg,
           borderTopLeftRadius: 22, borderTopRightRadius: 22,
           padding: '10px 20px 30px',
           maxHeight,
@@ -257,29 +257,37 @@ function CaseSheet({
   live,
   tourCode,
   onClose,
+  onNavigatePlayer,
 }: {
   pick: AITopContender;
   state: EventState;
   live: PickLiveState | undefined;
   tourCode: string;
   onClose: () => void;
+  onNavigatePlayer: (playerId: string) => void;
 }) {
   return (
     <SheetShell onClose={onClose}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
-        <PlayerAvatar playerId={pick.playerId} playerName={pick.playerName} tourCode={tourCode} photoUrl={pick.photoUrl} size="md" ringColor={LIGHT_HAIRLINE} />
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-            <span style={{ fontSize: 10.5, fontWeight: 800, color: V4.amber, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-              The case for
-            </span>
-            <span style={{ fontSize: 22, color: V4.goldMid, ...NUMERAL_THIN }}>#{pick.rank}</span>
-          </div>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: V4.ink, margin: '2px 0 0', letterSpacing: '-0.025em' }}>
-            {pick.playerName}
-          </h2>
-          <div style={{ marginTop: 6 }}>
-            <SheetStateStrip state={state} pick={pick} live={live} />
+        <div
+          role="link"
+          onClick={() => onNavigatePlayer(pick.playerId)}
+          style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 0, cursor: 'pointer' }}
+        >
+          <PlayerAvatar playerId={pick.playerId} playerName={pick.playerName} tourCode={tourCode} photoUrl={pick.photoUrl} size="md" ringColor={LIGHT_HAIRLINE} />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+              <span style={{ fontSize: 10.5, fontWeight: 800, color: V4.amber, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+                The case for
+              </span>
+              <span style={{ fontSize: 22, color: V4.inkFaint, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>#{pick.rank}</span>
+            </div>
+            <h2 style={{ fontSize: 22, fontWeight: 800, color: V4.ink, margin: '2px 0 0', letterSpacing: '-0.025em' }}>
+              {pick.playerName}
+            </h2>
+            <div style={{ marginTop: 6 }}>
+              <SheetStateStrip state={state} pick={pick} live={live} />
+            </div>
           </div>
         </div>
       </div>
