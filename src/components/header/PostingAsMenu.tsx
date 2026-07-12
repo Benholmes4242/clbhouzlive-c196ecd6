@@ -212,7 +212,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
     } else if (route === '/settings/profile') {
       navigate(editProfileRoute);
     } else if (route === `/profile/${currentActorData.id}`) {
-      // ProfileHubSheet "View profile" → actor-aware target
+      // Profile sheet "View profile" → actor-aware target
       handleNavigate(viewProfileRoute);
     } else if (route === '/edit-profile?tab=settings') {
       handleNavigate(settingsRoute);
