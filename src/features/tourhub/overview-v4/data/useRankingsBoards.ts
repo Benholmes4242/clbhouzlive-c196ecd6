@@ -61,26 +61,47 @@ async function fetchSeasonBoard(tourCode: 'euro' | 'lpga'): Promise<RankingsRow[
   const year = new Date().getFullYear();
   const { data, error } = await supabase
     .from('tour_season_rankings' as any)
-    .select(`
-      position, position_change, points, player_name, country,
-      player_id, manual_player_id,
-      player:sr_players!tour_season_rankings_player_id_fkey ( id, full_name, photo_url, country )
-    `)
+    .select('position, position_change, points, player_name, country, player_id, manual_player_id')
     .eq('tour_code', tourCode)
     .eq('season_year', year)
     .order('position', { ascending: true })
     .limit(5);
   if (error) throw error;
-  return ((data as any[]) ?? []).map((r) => {
+  const rows = (data as any[]) ?? [];
+
+  // No FK from tour_season_rankings.player_id -> sr_players.id, so we
+  // resolve headshots + canonical names in a second query. sr_players'
+  // full_name follows the "Firstname Lastname" convention the R2
+  // headshot chain expects; player_name in the rankings table is often
+  // uppercased ("MCILROY, Rory") which never matches the file naming.
+  const playerIds = rows
+    .map((r) => r.player_id ?? r.manual_player_id ?? null)
+    .filter((v): v is string => !!v);
+  const playerMap = new Map<string, { full_name: string; photo_url: string | null; country: string | null }>();
+  if (playerIds.length > 0) {
+    const { data: players, error: pErr } = await supabase
+      .from('sr_players')
+      .select('id, full_name, photo_url, country')
+      .in('id', playerIds);
+    if (!pErr) {
+      (players ?? []).forEach((p: any) =>
+        playerMap.set(p.id, {
+          full_name: p.full_name,
+          photo_url: p.photo_url ?? null,
+          country: p.country ?? null,
+        }),
+      );
+    }
+  }
+
+  return rows.map((r) => {
     const change = r.position_change ? parseInt(String(r.position_change), 10) : null;
-    // Prefer the joined sr_players record: its full_name follows the
-    // "Firstname Lastname" convention the R2 headshot chain expects,
-    // and it may carry a photo_url the rankings row lacks.
-    const joined = r.player ?? null;
+    const pid = r.player_id ?? r.manual_player_id ?? null;
+    const joined = pid ? playerMap.get(pid) : null;
     return {
       rank: r.position,
       priorRank: change != null && !Number.isNaN(change) ? r.position + change : null,
-      playerId: joined?.id ?? r.player_id ?? r.manual_player_id ?? null,
+      playerId: pid,
       playerName: joined?.full_name ?? r.player_name,
       country: joined?.country ?? r.country ?? null,
       photoUrl: joined?.photo_url ?? null,
