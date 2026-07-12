@@ -1,19 +1,37 @@
-import { useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useRef } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useHubMixedGrid, type MixedGridRow } from '../hooks/useHubMixedGrid';
 import { formatCount } from '../utils/formatCount';
 import { formatDuration } from '../utils/formatDuration';
 import { FormatBadge } from './FormatBadge';
 import { stripMentionMarkup } from '@/lib/mentions/format';
+import { toFeedPosts } from '../utils/toFeedPost';
+import Pressable from '@/components/ui/Pressable';
+import { useWatchAutoplay } from '@/video/useWatchAutoplay';
+import { useRailLane } from '@/video/useRailLane';
+import { usePreroutePrefetch } from '@/video/usePreroutePrefetch';
+import { openWithOrigin } from '@/lib/openWithOrigin';
+import type { FeedPost } from '@/components/media-system/types/media';
 
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
 const spinKeyframes = `@keyframes hub-mixed-spin { to { transform: rotate(360deg); } }`;
 
-function Tile({ row }: { row: MixedGridRow }) {
-  const navigate = useNavigate();
+function Tile({
+  row,
+  post,
+  index,
+  posts,
+  isAutoplayActive,
+}: {
+  row: MixedGridRow;
+  post: FeedPost;
+  index: number;
+  posts: FeedPost[];
+  isAutoplayActive: boolean;
+}) {
+  const rootRef = useRef<HTMLElement>(null);
   const isClip = row.derived_format === 'clip';
   const aspect = isClip ? '9 / 14' : '16 / 9';
   const stripped = row.post_content
@@ -25,18 +43,51 @@ function Tile({ row }: { row: MixedGridRow }) {
     (isClip ? 'Clip' : 'Video');
   const duration = formatDuration(row.duration_seconds);
 
+  const hlsUrl = post.mediaItems[0]?.hlsUrl ?? null;
+  const isVideo = !!hlsUrl;
+  const ownerKey = isVideo ? `${post.id}:0` : null;
+  const posterUrl = row.poster_url ?? post.mediaItems[0]?.thumbnailUrl ?? null;
+
+  const { hostRef, ready } = useRailLane({
+    ownerKey,
+    active: isAutoplayActive && isVideo,
+    hlsUrl,
+    posterUrl,
+    postId: post.id,
+  });
+
+  const { onPrerouteArm, onPreroute, onPrerouteCancel } = usePreroutePrefetch({
+    ownerKey,
+    hlsUrl,
+    enabled: isVideo && !isAutoplayActive,
+  });
+
+  const handlePress = () => {
+    openWithOrigin({
+      openedFrom: 'watch',
+      posts,
+      index,
+      originEl: rootRef.current as HTMLElement | null,
+      posterUrl,
+      railOwnerKey: ownerKey,
+    });
+  };
+
   return (
-    <button
-      type="button"
-      onClick={() => navigate(`/post/${row.post_id}`)}
+    <Pressable
+      ref={rootRef}
+      as="div"
+      variant="media"
+      onPress={handlePress}
+      onPrerouteArm={onPrerouteArm}
+      onPreroute={onPreroute}
+      onPrerouteCancel={onPrerouteCancel}
+      data-watch-tile-index={index}
+      data-post-id={post.id}
       style={{
         display: 'block',
         width: '100%',
         marginBottom: 14,
-        padding: 0,
-        border: 0,
-        background: 'transparent',
-        textAlign: 'left',
         cursor: 'pointer',
         fontFamily: FONT_FAMILY,
       }}
@@ -64,6 +115,20 @@ function Tile({ row }: { row: MixedGridRow }) {
             }}
           />
         ) : null}
+        {isVideo ? (
+          <div
+            ref={hostRef}
+            aria-hidden
+            style={{
+              position: 'absolute',
+              inset: 0,
+              zIndex: 1,
+              opacity: ready ? 1 : 0,
+              transition: 'opacity 140ms linear',
+              pointerEvents: 'none',
+            }}
+          />
+        ) : null}
         <FormatBadge format={row.derived_format} />
         {duration ? (
           <div
@@ -71,6 +136,7 @@ function Tile({ row }: { row: MixedGridRow }) {
               position: 'absolute',
               bottom: 6,
               right: 6,
+              zIndex: 2,
               background: 'rgba(0,0,0,0.72)',
               color: '#fff',
               fontWeight: 600,
@@ -112,7 +178,7 @@ function Tile({ row }: { row: MixedGridRow }) {
           ? ` \u00B7 ${formatCount(row.like_count)} ${row.like_count === 1 ? 'like' : 'likes'}`
           : ''}
       </div>
-    </button>
+    </Pressable>
   );
 }
 
@@ -161,9 +227,17 @@ export function HubMixedGrid({ filter = 'all' }: { filter?: string } = {}) {
   }, [fetchNextPage, hasNextPage, isFetching]);
 
   const rows: MixedGridRow[] = (data?.pages ?? []).flat() as MixedGridRow[];
-  const left: MixedGridRow[] = [];
-  const right: MixedGridRow[] = [];
-  rows.forEach((r, i) => (i % 2 === 0 ? left : right).push(r));
+  const feedPosts = useMemo(() => toFeedPosts(rows as any[]), [rows]);
+  const { activeIndices, railRef } = useWatchAutoplay({
+    railId: 'hub-mixed-grid',
+    posts: feedPosts,
+    maxActive: 3,
+  });
+
+  // Split columns for layout only — data-watch-tile-index remains the FLAT index.
+  const leftIdx: number[] = [];
+  const rightIdx: number[] = [];
+  rows.forEach((_, i) => (i % 2 === 0 ? leftIdx : rightIdx).push(i));
 
   return (
     <section style={{ fontFamily: FONT_FAMILY }}>
@@ -236,15 +310,29 @@ export function HubMixedGrid({ filter = 'all' }: { filter?: string } = {}) {
           </div>
         </div>
       ) : (
-        <div style={{ display: 'flex', gap: 12, padding: '0 16px' }}>
+        <div ref={railRef} style={{ display: 'flex', gap: 12, padding: '0 16px' }}>
           <div style={{ flex: 1 }}>
-            {left.map((r) => (
-              <Tile key={r.post_id} row={r} />
+            {leftIdx.map((i) => (
+              <Tile
+                key={rows[i].post_id}
+                row={rows[i]}
+                post={feedPosts[i]}
+                index={i}
+                posts={feedPosts}
+                isAutoplayActive={activeIndices.has(i)}
+              />
             ))}
           </div>
           <div style={{ flex: 1 }}>
-            {right.map((r) => (
-              <Tile key={r.post_id} row={r} />
+            {rightIdx.map((i) => (
+              <Tile
+                key={rows[i].post_id}
+                row={rows[i]}
+                post={feedPosts[i]}
+                index={i}
+                posts={feedPosts}
+                isAutoplayActive={activeIndices.has(i)}
+              />
             ))}
           </div>
         </div>
