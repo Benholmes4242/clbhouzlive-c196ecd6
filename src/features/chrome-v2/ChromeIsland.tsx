@@ -383,6 +383,7 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
   const { user } = useSupabaseSession();
   const spec = resolveChrome(location.pathname, searchParams);
   const leftOverride = useChromeLeftOverride();
+  const leftSlot = useChromeLeftSlot();
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -422,7 +423,7 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
         }}
       >
         {/* LEFT capsule */}
-        <LeftCapsule spec={spec} override={leftOverride} />
+        <LeftCapsule spec={spec} override={leftOverride} slot={leftSlot} />
 
 
         {/* RIGHT capsule */}
