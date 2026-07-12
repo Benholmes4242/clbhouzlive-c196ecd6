@@ -249,7 +249,7 @@ export function BoardTable({ entries, cutState, currentRound }: Props) {
           alignItems: 'center',
           padding: '8.5px 16px',
           borderBottom: `1px solid ${HAIRLINE}`,
-          background: '#fff',
+          background: CANVAS,
           opacity: demotedRow ? 0.55 : 1,
           cursor: 'pointer',
           fontFamily: F,
