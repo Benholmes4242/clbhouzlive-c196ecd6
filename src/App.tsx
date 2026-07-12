@@ -448,6 +448,7 @@ function AppRoutes() {
         <Route path="/videos" element={<Navigate to="/watch" replace />} />
         <Route path="/watch/clips" element={<Suspense fallback={<GenericPageSkeleton />}><ClipsSubpageWrapped /></Suspense>} />
         <Route path="/watch/videos" element={<Suspense fallback={<GenericPageSkeleton />}><VideosSubpageWrapped /></Suspense>} />
+        <Route path="/videos-v2-test" element={<Suspense fallback={<GenericPageSkeleton />}><VideosPageV2 /></Suspense>} />
         <Route path="/explore" element={<Navigate to="/courses?tab=discover" replace />} />
         <Route path="/courses" element={<Suspense fallback={<CoursesListSkeleton />}><CoursesWrapped /></Suspense>} />
         <Route path="/courses/:courseId" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseDetailPage /></Suspense>} />
