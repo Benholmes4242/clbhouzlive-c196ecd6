@@ -36,7 +36,7 @@ export function CategoryChips({ value, onChange }: Props) {
 
   return (
     <div
-      className="scrollbar-hidden"
+      className="scrollbar-hide"
       style={{
         display: 'flex',
         gap: 7,
