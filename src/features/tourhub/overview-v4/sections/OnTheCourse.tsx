@@ -83,9 +83,10 @@ export function OnTheCourse({ tournamentId, live }: Props) {
   if (!live) return null;
   const groups = parseGroups(data);
   if (groups.length === 0) return null;
+  const round = parseRoundNumber(data);
 
   return (
-    <SectionShell eyebrow="On the course">
+    <SectionShell eyebrow="On the course" rightMeta={round != null ? `R${round}` : undefined}>
       <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 20px 6px', scrollSnapType: 'x mandatory' }}>
         {groups.map((g, gi) => {
           const thru = groupThru(g);
