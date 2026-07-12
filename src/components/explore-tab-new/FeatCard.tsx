@@ -22,18 +22,8 @@ const TIER_LABEL: Record<FeatTier, string> = {
 };
 
 const RECORD_CATEGORY_LABEL: Record<string, string> = {
-  lowest_gross_all_time: 'Gross record',
+  lowest_gross_all_time: 'Course record',
   best_stableford_all_time: 'Stableford record',
-  best_score_diff_all_time: 'Net record',
-  most_birdies_all_time: 'Most birdies',
-  most_eagles_all_time: 'Most eagles',
-  most_aces_all_time: 'Most aces',
-  lowest_gross_90d: 'Gross record',
-  best_stableford_90d: 'Stableford record',
-  best_score_diff_90d: 'Net record',
-  most_birdies_90d: 'Most birdies',
-  most_eagles_90d: 'Most eagles',
-  most_aces_90d: 'Most aces',
 };
 
 function formatHolderName(raw?: string | null): string {
@@ -90,23 +80,10 @@ export function FeatCard({ row, tier, onTap }: Props) {
       if (row.value == null) return '';
       const v = Number(row.value);
       switch (row.category) {
-        case 'most_eagles_all_time':
-        case 'most_eagles_90d':
-          return `${v} eagle${v === 1 ? '' : 's'}`;
-        case 'most_birdies_all_time':
-        case 'most_birdies_90d':
-          return `${v} birdie${v === 1 ? '' : 's'}`;
-        case 'most_aces_all_time':
-        case 'most_aces_90d':
-          return `${v} ace${v === 1 ? '' : 's'}`;
         case 'lowest_gross_all_time':
-        case 'lowest_gross_90d':
           return `Gross ${v}`;
         case 'best_stableford_all_time':
-        case 'best_stableford_90d':
           return `${v} pts`;
-        case 'best_score_diff_all_time':
-        case 'best_score_diff_90d':
         default:
           return String(row.value);
       }
