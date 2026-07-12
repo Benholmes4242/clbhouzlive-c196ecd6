@@ -14,12 +14,13 @@ export default function WatchHubV2({ embedded = false }: { embedded?: boolean })
       <main
         style={{
           paddingBottom: 80,
-          // .app-shell already pads by var(--sat); --chrome-total-h also
-          // includes --sat, which stacks a second safe-area gap on device
-          // (invisible in browser preview where sat=0). Subtract it out.
+          // .app-shell already pads by var(--sat); pad by --header-h ONLY so
+          // we clear CompactHeader without inheriting --shell-extra-h from a
+          // keep-alive page (Clubhouse tab bar) that's still mounted in the
+          // background. This surface has no ShellSlot of its own.
           ...(embedded
             ? {}
-            : { paddingTop: 'calc(var(--chrome-total-h, 0px) - var(--sat, 0px))' }),
+            : { paddingTop: 'var(--header-h, 55px)' }),
         }}
       >
         {/* DestinationDoors are the first content — CompactHeader owns the

@@ -49,7 +49,11 @@ export default function ClipsPageV2() {
       <main
         style={{
           paddingBottom: 80,
-          paddingTop: 'calc(var(--chrome-total-h, 0px) - var(--sat, 0px))',
+          // Pad by --header-h ONLY, not --chrome-total-h. The latter includes
+          // --shell-extra-h, which leaks in from a keep-alive Clubhouse
+          // ShellSlot mounted in the background and creates a growing gap on
+          // return visits. This page has no ShellSlot of its own.
+          paddingTop: 'var(--header-h, 55px)',
           fontFamily: FONT_FAMILY,
         }}
       >
