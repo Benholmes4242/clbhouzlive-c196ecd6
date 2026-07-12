@@ -307,12 +307,6 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
               We'll email you a 6-digit code. No password needed.
             </p>
 
-            {/* Legal / EULA block — Apple Guideline 1.2 + 2.2 */}
-            <div style={{ marginTop: 8 }}>
-              <button
-                type="button"
-                role="checkbox"
-                aria-checked={agreed}
             {/* Legal / EULA block — Apple Guideline 1.2 + 2.2
                 Links MUST NOT be nested inside a <button> (invalid HTML +
                 webviews swallow the tap). Toggle is its own button; the
