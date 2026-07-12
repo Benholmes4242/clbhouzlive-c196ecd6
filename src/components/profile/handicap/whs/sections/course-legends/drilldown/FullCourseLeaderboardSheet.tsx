@@ -258,8 +258,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
               alignItems: 'center',
               gap: 8,
               padding: '0 16px',
-              marginTop: -4,
-              marginBottom: 13,
+              marginBottom: 12,
               flexShrink: 0,
               flexWrap: 'wrap',
             }}
