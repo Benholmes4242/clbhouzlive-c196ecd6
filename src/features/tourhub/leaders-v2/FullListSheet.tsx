@@ -124,7 +124,7 @@ export function FullListSheet({
                 fontVariantNumeric: 'tabular-nums',
               }}
             >
-              {tourLabel} \u00B7 {year} \u00B7 {category.rows.length} PLAYERS
+              {tourLabel} {'\u00B7'} {year} {'\u00B7'} {category.rows.length} PLAYERS
             </div>
           </div>
         </div>
@@ -183,7 +183,7 @@ export function FullListSheet({
                   marginBottom: 3,
                 }}
               >
-                No.1 \u00B7 {category.short}
+                No.1 {'\u00B7'} {category.short}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
                 <span

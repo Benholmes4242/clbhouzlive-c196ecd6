@@ -151,7 +151,7 @@ export function LeadersTab() {
               fontVariantNumeric: 'tabular-nums',
             }}
           >
-            {tourLabel} \u00B7 {year}
+            {tourLabel} {'\u00B7'} {year}
           </span>
         </div>
 
@@ -231,7 +231,7 @@ export function LeadersTab() {
               textAlign: 'center',
             }}
           >
-            Season boards \u00B7 live dot = on the course right now
+            Season boards {'\u00B7'} live dot = on the course right now
           </div>
         </div>
       )}
