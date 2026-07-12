@@ -32,6 +32,7 @@ import { useSingleCourseImage } from '../hooks/useCourseImageResolver';
 import { useTournamentPulse } from '../components/overview-v3/useTournamentPulse';
 import { useLeaderboardRealtime } from '../hooks/useLeaderboardRealtime';
 import { useTournamentStatusRealtime } from '../hooks/useTournamentStatusRealtime';
+import { useLiveTournaments } from '../hooks/useLiveTournaments';
 
 import { HeroSection } from './sections/HeroSection';
 import { SectionEyebrow } from './sections/SectionEyebrow';
