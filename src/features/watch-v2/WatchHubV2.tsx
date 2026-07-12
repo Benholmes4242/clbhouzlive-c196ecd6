@@ -23,11 +23,9 @@ export default function WatchHubV2({ embedded = false }: { embedded?: boolean })
         }}
       >
         {/* DestinationDoors are the first content — CompactHeader owns the
-            page chrome (title + global search). 10px breathing room below
-            the fixed chrome. */}
-        <div style={{ padding: '10px 16px 6px' }}>
-          <DestinationDoors />
-        </div>
+            page chrome (title + global search). Doors row provides its own
+            10px top padding to sit under the fixed chrome. */}
+        <DestinationDoors />
 
         <div style={{ paddingTop: 12 }}>
           <HubChipBar active={filter} onChange={setFilter} />
