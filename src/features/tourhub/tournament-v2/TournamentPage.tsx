@@ -129,8 +129,8 @@ export function TournamentPage() {
     );
   }
 
-  const navigate = useNavigate();
   const goFullBoard = () => navigate(`/tourhub?tab=live&event=${tournamentId}`);
+
 
   return (
     <TourHubShell immersive immersiveStatusBar>
