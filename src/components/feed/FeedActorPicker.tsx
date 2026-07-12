@@ -90,9 +90,8 @@ export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChang
       <BottomSheet
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
-        variant={c.sheetVariant}
-        className={c.hcpScope}
-        style={{ background: c.sheetBg }}
+        variant="light"
+        style={{ background: '#F8FAFC' }}
       >
         <div
           onClick={(e) => e.stopPropagation()}
