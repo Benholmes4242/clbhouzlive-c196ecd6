@@ -253,7 +253,7 @@ async function fetchPgaCategories(): Promise<LeaderCategoriesResult> {
     })
     .filter((c): c is LeaderCategoryDef => !!c);
 
-  const world = await fetchWorldRankingCat('pga');
+  const world = await fetchWorldRankingCat();
   if (world) categories.unshift(world);
 
   return { synced: true, categories, year: currentSeasonYear() };
