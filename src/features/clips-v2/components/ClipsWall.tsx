@@ -13,7 +13,7 @@ const spinKeyframes = `@keyframes clips-v2-spin { to { transform: rotate(360deg)
 
 function SkeletonTile() {
   return (
-    <div style={{ marginBottom: 14 }}>
+    <div style={{ marginBottom: 12 }}>
       <div
         style={{
           width: '100%',
@@ -81,7 +81,7 @@ export function ClipsWall({ mood }: { mood: ClipsV2Mood }) {
 
   if (isLoading) {
     return (
-      <div style={{ padding: '12px 16px 30px', fontFamily: FONT_FAMILY }}>
+      <div style={{ padding: '12px 16px 0', fontFamily: FONT_FAMILY }}>
         <style>{spinKeyframes}</style>
         <div style={{ display: 'flex', gap: 12 }}>
           <div style={{ flex: 1 }}>
@@ -115,7 +115,7 @@ export function ClipsWall({ mood }: { mood: ClipsV2Mood }) {
   });
 
   return (
-    <div style={{ padding: '12px 0 30px', fontFamily: FONT_FAMILY }}>
+    <div style={{ padding: '12px 0 0', fontFamily: FONT_FAMILY }}>
       <style>{spinKeyframes}</style>
       <div ref={railRef} style={{ display: 'flex', gap: 12, padding: '0 16px' }}>
         <div style={{ flex: 1 }}>
