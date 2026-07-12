@@ -27,6 +27,14 @@ export interface PlayerLiveData {
   currentRound: number | null;
   /** e.g. "-8 thru 14" or "-8 F" or just "-8" if no thru data */
   scoreText: string;
+  /** Raw score-to-par (negative = under). Null when unavailable. */
+  score: number | null;
+  /** Holes played this round (0-18). Null when unavailable. */
+  thru: number | null;
+  /** Current position on leaderboard. Null when unavailable. */
+  position: number | null;
+  /** Whether the player is tied at that position. */
+  positionTied: boolean | null;
 }
 
 export interface PlayerRecentData {
@@ -53,6 +61,7 @@ export interface PlayerStateData {
 interface LiveRow {
   tournament_id: string;
   position: number | null;
+  position_tied: boolean | null;
   score: number | null;
   thru: number | null;
   status: string | null;
@@ -89,6 +98,7 @@ function useLivePlayerRow(playerId: string | undefined) {
         .select(`
           tournament_id,
           position,
+          position_tied,
           score,
           thru,
           status,
@@ -132,6 +142,10 @@ export function usePlayerState(playerId: string | undefined): PlayerStateData {
         tournamentName: liveRow.tournament.name,
         currentRound: liveRow.tournament.current_round,
         scoreText: formatScoreText(liveRow.score, liveRow.thru),
+        score: liveRow.score,
+        thru: liveRow.thru,
+        position: liveRow.position,
+        positionTied: liveRow.position_tied,
       },
       eventsLast12mo: 0, // not relevant in live state; consumer reads liveData
     };

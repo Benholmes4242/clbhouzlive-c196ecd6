@@ -1,0 +1,119 @@
+/**
+ * AboutSection — 2-col grid of biographical facts.
+ * Per-field null discipline; whole section hides when < 2 fields exist.
+ */
+
+import { Link } from 'react-router-dom';
+import type { TourPlayer } from '../../hooks/useTourHubData';
+import { INK, INK_FAINT, INK_TINT_06, INK_TINT_07, SURFACE } from '../../_shared/tokens';
+
+interface AboutSectionProps {
+  player: TourPlayer;
+}
+
+function fmtHeight(inches: string | number | null | undefined): string | null {
+  if (!inches) return null;
+  const n = typeof inches === 'string' ? parseInt(inches, 10) : inches;
+  if (isNaN(n)) return null;
+  return `${Math.floor(n / 12)}'${n % 12}"`;
+}
+
+function ageOf(iso: string | null): number | null {
+  if (!iso) return null;
+  const yrs = Math.floor((Date.now() - new Date(iso).getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+  return isNaN(yrs) ? null : yrs;
+}
+
+interface Field {
+  label: string;
+  value: React.ReactNode;
+}
+
+export function AboutSection({ player }: AboutSectionProps) {
+  const fields: Field[] = [];
+
+  if (player.birth_date) {
+    fields.push({
+      label: 'Born',
+      value: new Date(player.birth_date).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      }),
+    });
+  }
+  const age = ageOf(player.birth_date);
+  if (age !== null) fields.push({ label: 'Age', value: String(age) });
+  if (player.turned_pro) fields.push({ label: 'Turned Pro', value: String(player.turned_pro) });
+  const height = fmtHeight(player.height);
+  if (height) fields.push({ label: 'Height', value: height });
+  if (player.college) {
+    fields.push({
+      label: 'College',
+      value: player.college_normalized ? (
+        <Link
+          to={`/tourhub/college-golf/${player.college_normalized}`}
+          style={{ color: INK, textDecoration: 'none', borderBottom: `1px solid ${INK_TINT_07}` }}
+          className="active:opacity-60 transition-opacity"
+        >
+          {player.college}
+        </Link>
+      ) : (
+        player.college
+      ),
+    });
+  }
+  if (player.residence) fields.push({ label: 'Residence', value: player.residence });
+
+  if (fields.length < 2) return null;
+
+  return (
+    <section
+      style={{
+        background: SURFACE,
+        borderTop: `0.5px solid ${INK_TINT_07}`,
+        padding: '18px 16px 6px',
+      }}
+    >
+      <p
+        style={{
+          margin: '0 0 12px',
+          fontSize: 10,
+          fontWeight: 800,
+          color: INK_FAINT,
+          letterSpacing: '0.14em',
+          textTransform: 'uppercase',
+        }}
+      >
+        About
+      </p>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
+        {fields.map((f) => (
+          <div
+            key={f.label}
+            style={{
+              padding: '11px 0',
+              borderBottom: `0.5px solid ${INK_TINT_06}`,
+            }}
+          >
+            <div
+              style={{
+                fontSize: 8,
+                fontWeight: 800,
+                color: INK_FAINT,
+                letterSpacing: '0.16em',
+                textTransform: 'uppercase',
+                marginBottom: 4,
+              }}
+            >
+              {f.label}
+            </div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: INK, letterSpacing: '-0.005em' }}>
+              {f.value}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
