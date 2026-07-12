@@ -18,6 +18,7 @@ import { HomeCourseOfWeekModule } from '../home/HomeCourseOfWeekModule';
 import { HomeConnectHandicapModule } from '../home/HomeConnectHandicapModule';
 
 import { OverviewHero } from '../overview-v3/OverviewHero';
+import { OnTheCourseSlot } from '../overview-v3/OnTheCourseSlot';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { WifiOff } from 'lucide-react';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
