@@ -48,6 +48,17 @@ export default function ActorCards({
 }: Props) {
   const { countFor } = useActorUnreadCounts();
   const hasBusiness = profiles.some(p => p.type === 'business');
+  // Active actor first; preserve original order for the rest (stable sort).
+  const orderedProfiles = React.useMemo(() => {
+    const indexed = profiles.map((p, i) => ({ p, i }));
+    indexed.sort((a, b) => {
+      const aActive = a.p.id === currentActor.id ? 0 : 1;
+      const bActive = b.p.id === currentActor.id ? 0 : 1;
+      if (aActive !== bActive) return aActive - bActive;
+      return a.i - b.i;
+    });
+    return indexed.map(x => x.p);
+  }, [profiles, currentActor.id]);
 
   return (
     <div>
@@ -75,7 +86,7 @@ export default function ActorCards({
       >
         <style>{`.ps2-no-scrollbar::-webkit-scrollbar{display:none}`}</style>
 
-        {profiles.map((p) => {
+        {orderedProfiles.map((p) => {
           const active = p.id === currentActor.id;
           const unread = countFor(p.type, p.id);
           const sub = p.type === 'personal'
@@ -180,8 +191,8 @@ export default function ActorCards({
                   aria-label={`${unread} unread`}
                   style={{
                     position: 'absolute',
-                    top: -4,
-                    right: -4,
+                    top: 8,
+                    right: 8,
                     minWidth: 17,
                     height: 17,
                     padding: '0 5px',
