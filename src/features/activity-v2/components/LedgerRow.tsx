@@ -15,7 +15,7 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { ratingTextColor } from '@/lib/ratingTier';
 import type { ActivityFeedRowV2 } from '../hooks/useActivityFeedV2';
 import { getActivityLink } from '../utils/activityLinks';
-import { resolveKind, T, type KindSpec } from './ledgerKinds';
+import { resolveKind, composeCommentBody, T, type KindSpec } from './ledgerKinds';
 
 const GEIST =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -277,7 +277,8 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
   }
 
   // ------- Body text rendering with bold accents -------
-  let bodyNode: React.ReactNode = renderBody(body, row.actor_display_name);
+  const quoted = composeCommentBody(row);
+  let bodyNode: React.ReactNode = quoted ?? renderBody(body, row.actor_display_name);
   if (spec.bold === 'achievement_name' && data.achievement_name) {
     bodyNode = (
       <>

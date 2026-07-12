@@ -20,7 +20,7 @@ export const routeChunkLoaders: Record<string, () => Promise<unknown>> = {
   '/clubhouse': () => import('@/pages/Clubhouse'),
   '/watch': () => import('@/features/watch-v2/WatchHubV2'),
   '/tourhub': () => import('@/features/tourhub/pages'),
-  '/notificationmessages': () => import('@/pages/ActivityPageWrapped'),
+  '/notificationmessages': () => import('@/features/activity-v2/ActivityPageV2'),
 };
 
 /** Safe fire-and-forget: never throws, never blocks the caller. */
