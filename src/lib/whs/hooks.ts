@@ -89,13 +89,10 @@ export function useWhsConnection(userId: string | undefined) {
   });
 }
 
-export function useHandicapTrend(
-  connectionId: string | undefined,
-  windowDays: number = 30,
-) {
+export function useHandicapTrend(connectionId: string | undefined) {
   return useQuery({
-    queryKey: whsKeys.trend(connectionId ?? '', windowDays),
-    queryFn: () => fetchHandicapTrend(connectionId as string, windowDays),
+    queryKey: whsKeys.trend(connectionId ?? ''),
+    queryFn: () => fetchHandicapTrend(connectionId as string),
     enabled: !!connectionId,
     staleTime: 60_000,
   });
