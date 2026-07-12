@@ -8,13 +8,12 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { ComingUpSlot } from '../overview-v3/ComingUpSlot';
 import { CollegeFranchise } from '../../overview-v4/sections/CollegeFranchise';
+import { ConnectHandicapTile } from '../../overview-v4/sections/ConnectHandicapTile';
 import { LazySection } from '../overview-v3/LazySection';
 
 import { TISlot } from '../overview-v3/TISlot';
 import { WorldRankingsSlot } from '../overview-v3/WorldRankingsSlot';
 import { StatWatchSlot } from '../overview-v3/StatWatchSlot';
-
-import { HomeConnectHandicapModule } from '../home/HomeConnectHandicapModule';
 
 import { OverviewHero } from '../overview-v3/OverviewHero';
 import { OnTheCourseSlot } from '../overview-v3/OnTheCourseSlot';
@@ -67,9 +66,6 @@ export function OverviewPageV3() {
           className="relative z-10"
         >
           <div className="bg-background" style={{ display: 'flex', flexDirection: 'column', gap: 24, paddingTop: 16, paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}>
-            <LazySection minHeight={160}>
-              <HomeConnectHandicapModule />
-            </LazySection>
             <LazySection minHeight={500}>
               <div style={{ marginTop: 16 }}>
                 <TISlot />
@@ -86,6 +82,9 @@ export function OverviewPageV3() {
             </LazySection>
             <LazySection minHeight={350}>
               <CollegeFranchise />
+            </LazySection>
+            <LazySection minHeight={90}>
+              <ConnectHandicapTile />
             </LazySection>
           </div>
         </div>
