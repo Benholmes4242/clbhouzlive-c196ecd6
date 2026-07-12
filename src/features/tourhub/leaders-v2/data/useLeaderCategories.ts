@@ -357,11 +357,8 @@ export function useLeaderCategories(tour: TourId) {
     gcTime: 30 * 60_000,
     queryFn: async () => {
       if (tour === 'pga') return fetchPgaCategories();
-      if (tour === 'champ') {
-        // champ: world ranking only (points/wins not tracked in tour_season_rankings)
-        const world = await fetchWorldRankingCat('champ');
-        return { synced: false, categories: world ? [world] : [], year: currentSeasonYear() };
-      }
+      // champ is not offered on the leaders page — hook coerces to pga just in case.
+      if (tour === 'champ') return fetchPgaCategories();
       return fetchSeasonRankingsCategories(tour);
     },
   });
