@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import { TourHubShell } from '../components/TourHubShell';
@@ -14,29 +14,84 @@ import { useTournamentStatusRealtime } from '../hooks/useTournamentStatusRealtim
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import { TourSelectionProvider } from '../context/TourSelectionContext';
 import { useHeroFullBleed } from '../_shared/heroFullBleedSignal';
-import { setFloatingHeaderActive } from '../_shared/floatingHeaderSignal';
-import { FloatingTourHeader } from '../components/FloatingTourHeader';
 import { TourSideMenu } from '../components/TourSideMenu';
+import { TourIslandLeft } from '../components/TourIslandLeft';
+import { TourPickerSheet, useTourShortLabel } from '../components/TourPickerSheet';
+import { useSetChromeLeftSlot } from '@/features/chrome-v2/leftOverride';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection, useHandicapTrend } from '@/lib/whs/hooks';
 import { useLogout } from '@/hooks/useLogout';
+
+/**
+ * TourHubChromeBridge — registers the ChromeIsland left-capsule slot with
+ * a burger + short tour label. Mounted inside TourSelectionProvider so
+ * useTourShortLabel resolves. Owns the menu + picker sheet state so the
+ * slot node stays a stable, prop-driven element.
+ */
+function TourHubChromeBridge({
+  activeTab,
+  onSelectTab,
+  handicapValue,
+  onSettings,
+  onProfile,
+  onSignOut,
+}: {
+  activeTab: TourHubTab;
+  onSelectTab: (tabId: string) => void;
+  handicapValue: string;
+  onSettings: () => void;
+  onProfile: () => void;
+  onSignOut: () => void;
+}) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const label = useTourShortLabel();
+
+  const slot = useMemo(
+    () => (
+      <TourIslandLeft
+        label={label}
+        onMenuTap={() => setMenuOpen(true)}
+        onPickerTap={() => setPickerOpen(true)}
+      />
+    ),
+    [label],
+  );
+  useSetChromeLeftSlot(slot);
+
+  return (
+    <>
+      <TourSideMenu
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        activeTab={activeTab}
+        onSelectTab={(id) => {
+          onSelectTab(id);
+          setMenuOpen(false);
+        }}
+        handicapValue={handicapValue}
+        onSettings={onSettings}
+        onProfile={onProfile}
+        onSignOut={onSignOut}
+      />
+      <TourPickerSheet open={pickerOpen} onClose={() => setPickerOpen(false)} />
+    </>
+  );
+}
 
 export function TourHubMainPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const tabParam = searchParams.get('tab') as TourHubTab | null;
   const [activeTab, setActiveTab] = useState<TourHubTab>(tabParam || 'overview');
-  const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
-  // Subscribe to tournament status changes (live/completed transitions)
   useTournamentStatusRealtime();
 
   const { data: liveTournaments, isFetched: liveFetched } = useLiveTournaments();
   const showLive = (liveTournaments?.length ?? 0) > 0;
 
-  // Sync tab with URL + redirect legacy player-stats to leaderboards
   useEffect(() => {
     if (tabParam === ('player-stats' as string)) {
       setSearchParams({ tab: 'leaderboards' }, { replace: true });
@@ -50,7 +105,6 @@ export function TourHubMainPage() {
     }
   }, [tabParam]);
 
-  // Dead-tab guard: if the user lands on `?tab=live` but no events are live, bounce to overview.
   useEffect(() => {
     if (activeTab === 'live' && liveFetched && !showLive) {
       setSearchParams({ tab: 'overview' }, { replace: true });
@@ -58,7 +112,6 @@ export function TourHubMainPage() {
     }
   }, [activeTab, liveFetched, showLive, setSearchParams]);
 
-  // Reset to default tab when bottom-nav icon is re-tapped on this route
   useEffect(() => {
     const onRetap = (e: Event) => {
       if ((e as CustomEvent).detail?.tabId !== 'tourhub') return;
@@ -70,17 +123,12 @@ export function TourHubMainPage() {
     return () => window.removeEventListener('clbhouz-active-tab-retap', onRetap);
   }, [setSearchParams]);
 
-  // Cinematic full-bleed hero is on iff Overview tab AND hero is in cinematic mode.
   const heroIsCinematic = useHeroFullBleed();
   const fullBleedHero = activeTab === 'overview' && heroIsCinematic;
 
-  // Tell GlobalHeader to suppress CompactHeader on this surface.
-  useEffect(() => {
-    setFloatingHeaderActive(fullBleedHero);
-    return () => setFloatingHeaderActive(false);
-  }, [fullBleedHero]);
+  // H4a: no longer suppress the global island on cinematic overview — the
+  // ChromeIsland paints with a page-provided left capsule (see TourHubChromeBridge).
 
-  // Handicap value for the floating row + side menu.
   const { user } = useSupabaseSession();
   const { data: connection } = useWhsConnection(user?.id);
   const { data: trendData } = useHandicapTrend(connection?.id);
@@ -129,27 +177,18 @@ export function TourHubMainPage() {
   return (
     <TourSelectionProvider>
       <TourHubShell showBack={false} immersiveStatusBar={fullBleedHero}>
+        <TourHubChromeBridge
+          activeTab={activeTab}
+          onSelectTab={handleSelectTab}
+          handicapValue={handicapValue}
+          onSettings={() => navigate('/edit-profile?tab=settings')}
+          onProfile={() => navigate('/profile')}
+          onSignOut={() => { void logout(); }}
+        />
         {fullBleedHero ? (
-          // Cinematic overview: hero bleeds into the notch behind the floating
-          // pill row. No ShellSlot tabs — destinations live in the side menu.
           <>
             <div>{renderTab()}</div>
-            <FloatingTourHeader
-              onMenuTap={() => setMenuOpen(true)}
-              onSearchTap={() => setSearchOpen(true)}
-            />
             <SearchOverlayV2 isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
-
-            <TourSideMenu
-              open={menuOpen}
-              onClose={() => setMenuOpen(false)}
-              activeTab={activeTab}
-              onSelectTab={handleSelectTab}
-              handicapValue={handicapValue}
-              onSettings={() => navigate('/edit-profile?tab=settings')}
-              onProfile={() => navigate('/profile')}
-              onSignOut={() => { void logout(); }}
-            />
           </>
         ) : (
           <>
