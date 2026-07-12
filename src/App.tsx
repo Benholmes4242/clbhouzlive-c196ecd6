@@ -492,6 +492,7 @@ function AppRoutes() {
 
 
         <Route path="/notificationmessages" element={<Suspense fallback={<ActivityPageSkeleton />}><ActivityPageWrapped /></Suspense>} />
+        <Route path="/activity-v2-test" element={<Suspense fallback={<ActivityPageSkeleton />}><ActivityPageV2 /></Suspense>} />
         <Route path="/golferstofollow" element={<Suspense fallback={<GenericPageSkeleton />}><GolfersToFollowPage /></Suspense>} />
         <Route path="/golferssharedcourses" element={<Suspense fallback={<GenericPageSkeleton />}><GolfersSharedCoursesPage /></Suspense>} />
         <Route path="/friends" element={<Suspense fallback={<GenericPageSkeleton />}><OwnProfileSocialRedirect tab="friends" /></Suspense>} />
