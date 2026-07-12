@@ -569,7 +569,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
           {totalForActive > 0 && (
             <div
               style={{
-                padding: '12px 18px 20px',
+                padding: '12px 16px',
                 paddingBottom: 'calc(20px + env(safe-area-inset-bottom, 0px))',
                 textAlign: 'center',
                 fontSize: 10.5,
