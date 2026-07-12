@@ -56,14 +56,6 @@ function withinWindow(startISO: string | null, endISO: string | null): boolean {
   return today >= start && today <= end;
 }
 
-function endDateInPast(endISO: string | null): boolean {
-  if (!endISO) return false;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const end = new Date(endISO);
-  end.setHours(23, 59, 59, 999);
-  return end.getTime() < today.getTime();
-}
 
 export type TournamentPulseState = 'live' | 'upcoming' | 'completed';
 
