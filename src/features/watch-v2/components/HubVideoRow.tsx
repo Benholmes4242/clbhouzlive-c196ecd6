@@ -234,7 +234,7 @@ export function HubVideoRow() {
     <section style={{ fontFamily: FONT_FAMILY }}>
       <div
         style={{
-          padding: '0 16px 10px',
+          padding: '0 16px 12px',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'flex-end',
