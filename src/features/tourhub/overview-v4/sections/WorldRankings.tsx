@@ -13,7 +13,7 @@
 import { useNavigate } from 'react-router-dom';
 import { SectionShell } from './SectionShell';
 import { V4 } from '../tokens';
-import { useRankingsBoards, type RankingsBoard } from '../data/useRankingsBoards';
+import { useRankingsBoards, type RankingsBoard, type RankingsRow } from '../data/useRankingsBoards';
 import type { TourId } from '../../hooks/useOverviewData';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { PlayerAvatar } from '../../components/PlayerAvatar';
@@ -119,7 +119,7 @@ function SpotlightRow({
   tourCode,
   onNavigate,
 }: {
-  row: ReturnType<typeof pickRow>;
+  row: RankingsRow;
   tourCode: string;
   onNavigate: (playerId: string | null) => void;
 }) {
@@ -164,18 +164,4 @@ function SpotlightRow({
       ) : null}
     </div>
   );
-}
-
-// Type helper — RankingsRow shape from useRankingsBoards without importing the alias again.
-function pickRow(_?: unknown) {
-  return null as unknown as {
-    rank: number;
-    priorRank: number | null;
-    playerId: string | null;
-    playerName: string;
-    country: string | null;
-    photoUrl: string | null;
-    points: number | null;
-    movement: number | null;
-  };
 }
