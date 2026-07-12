@@ -15,8 +15,8 @@ import { TOUR_LABEL } from '../../_shared/tourOrder';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
 import { CHARCOAL, WHITE_ALPHA_18, WHITE_ALPHA_55, WHITE_ALPHA_65 } from '../../_shared/tokens';
 
-
 interface HeroSectionProps {
+
   player: TourPlayer;
   playerStats: TourPlayerStatistics | null;
 }

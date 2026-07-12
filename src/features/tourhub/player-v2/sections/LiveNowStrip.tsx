@@ -11,8 +11,8 @@ import type { PlayerLiveData } from '../../hooks/usePlayerState';
 import { tournamentRoute } from '../../routes';
 import { CHARCOAL, LIVE_DOT, SCORE_UNDER_PAR_DARK, WHITE_ALPHA_55 } from '../../_shared/tokens';
 
-
 interface LiveNowStripProps {
+
   liveData: PlayerLiveData;
   playerName: string;
 }
