@@ -108,19 +108,21 @@ export function ClipsWall({ mood }: { mood: ClipsV2Mood }) {
     );
   }
 
-  const leftIdx: number[] = [];
-  const rightIdx: number[] = [];
-  rows.forEach((_, i) => (i % 2 === 0 ? leftIdx : rightIdx).push(i));
+  const packed = packColumns(cardRows, (r) => {
+    const w = Number(r?.width) || 0;
+    const h = Number(r?.height) || 0;
+    return w > 0 && h > 0 && w > h ? 16 / 9 : 9 / 14;
+  });
 
   return (
     <div style={{ padding: '12px 0 30px', fontFamily: FONT_FAMILY }}>
       <style>{spinKeyframes}</style>
       <div ref={railRef} style={{ display: 'flex', gap: 12, padding: '0 16px' }}>
         <div style={{ flex: 1 }}>
-          {leftIdx.map((i) => (
+          {packed.left.map(({ item, flatIndex: i }) => (
             <FeedCard
-              key={cardRows[i].post_id}
-              row={cardRows[i]}
+              key={item.post_id}
+              row={item}
               feedPost={feedPosts[i]}
               posts={feedPosts}
               flatIndex={i}
@@ -129,10 +131,10 @@ export function ClipsWall({ mood }: { mood: ClipsV2Mood }) {
           ))}
         </div>
         <div style={{ flex: 1 }}>
-          {rightIdx.map((i) => (
+          {packed.right.map(({ item, flatIndex: i }) => (
             <FeedCard
-              key={cardRows[i].post_id}
-              row={cardRows[i]}
+              key={item.post_id}
+              row={item}
               feedPost={feedPosts[i]}
               posts={feedPosts}
               flatIndex={i}
