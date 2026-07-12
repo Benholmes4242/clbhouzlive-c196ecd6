@@ -73,8 +73,14 @@ export function FeatCard({ row, tier, onTap }: Props) {
   const holder = formatHolderName(row.holder_name);
   const ringColor = RING[tier];
   const chipLabel = isRecord
-    ? RECORD_CATEGORY_LABEL[row.category ?? ''] ?? 'Course record'
-    : TIER_LABEL[tier];
+    ? (RECORD_CATEGORY_LABEL[row.category ?? ''] ?? 'Course record')
+    : isLegendary
+      ? (row.feat_type === 'albatross'
+          ? 'ALBATROSS'
+          : row.feat_type === 'ace'
+            ? 'HOLE-IN-ONE'
+            : 'LEGENDARY')
+      : TIER_LABEL[tier];
   const value = useMemo(() => {
     if (isRecord) {
       if (row.value == null) return '';
