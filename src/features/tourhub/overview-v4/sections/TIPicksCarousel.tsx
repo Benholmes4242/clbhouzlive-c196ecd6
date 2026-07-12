@@ -10,7 +10,8 @@ import { V4, NUMERAL_THIN } from '../tokens';
 import type { EventState } from '../data/useTourEventContext';
 import type { AITopContender } from '../../hooks/useAIPredictions';
 import { usePickLiveState, type PickLiveState } from '../data/usePickLiveState';
-import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
+import { PlayerAvatar } from '../../components/PlayerAvatar';
+import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 interface Props {
   tournamentId: string | undefined;
@@ -18,37 +19,6 @@ interface Props {
   tourCode?: string;
 }
 
-function Avatar({ name, tourCode, size }: { name: string; tourCode: string; size: number }) {
-  const url = name ? getPlayerHeadshotUrl(name, tourCode) : null;
-  const parts = (name || '').trim().split(/\s+/);
-  const inits = parts.length === 0
-    ? '?'
-    : (parts.length === 1 ? parts[0].slice(0, 2) : parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-  return (
-    <div
-      style={{
-        position: 'relative',
-        width: size, height: size, borderRadius: '34%',
-        background: '#15171F',
-        border: `0.5px solid ${V4.hairline}`,
-        flexShrink: 0,
-        overflow: 'hidden',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        color: V4.amber, fontSize: Math.max(9, Math.round(size * 0.32)), fontWeight: 800, letterSpacing: '0.02em',
-      }}
-    >
-      <span>{inits}</span>
-      {url ? (
-        <img
-          src={url}
-          alt=""
-          onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-        />
-      ) : null}
-    </div>
-  );
-}
 
 // ---- Shared formatting helpers ----
 
@@ -121,7 +91,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
-              <Avatar name={p.playerName} tourCode={tourCode} size={44} />
+              <PlayerAvatar playerId={p.playerId} playerName={p.playerName} tourCode={tourCode} photoUrl={p.photoUrl} size="md" ringColor={LIGHT_HAIRLINE} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
                   <span style={{ fontSize: 22, color: V4.goldMid, lineHeight: 1, ...NUMERAL_THIN }}>{p.rank}</span>
@@ -253,7 +223,7 @@ function CaseSheet({
       >
         <div style={{ width: 36, height: 4, background: V4.hairline, borderRadius: 999, margin: '4px auto 14px' }} />
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
-          <Avatar name={pick.playerName} tourCode={tourCode} size={48} />
+          <PlayerAvatar playerId={pick.playerId} playerName={pick.playerName} tourCode={tourCode} photoUrl={pick.photoUrl} size="md" ringColor={LIGHT_HAIRLINE} />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
               <span style={{ fontSize: 10.5, fontWeight: 800, color: V4.amber, letterSpacing: '0.14em', textTransform: 'uppercase' }}>

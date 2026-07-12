@@ -7,7 +7,8 @@
 import { useFeaturedGroups } from '../data/useFeaturedGroups';
 import { SectionShell } from './SectionShell';
 import { V4 } from '../tokens';
-import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
+import { PlayerAvatar } from '../../components/PlayerAvatar';
+import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 interface Props {
   tournamentId: string | undefined;
@@ -55,11 +56,6 @@ function parseRoundNumber(raw: unknown): number | null {
   return null;
 }
 
-function initials(name: string): string {
-  const parts = name.trim().split(/\s+/);
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-}
 
 function formatScore(v: number | string | null | undefined): string | null {
   if (v == null || v === '') return null;
@@ -118,39 +114,16 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                 const status = (p.status || '').toUpperCase();
                 const isCut = status === 'CUT' || status === 'WD' || status === 'DQ';
                 const display = formatScore(p.today) ?? formatScore(p.score) ?? '—';
-                const photo = name
-                  ? getPlayerHeadshotUrl(name, tourCode, p.headshot_override ?? null)
-                  : null;
                 return (
                   <div key={pi} style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '6px 0', borderTop: pi === 0 ? 'none' : `0.5px solid ${V4.hairline}` }}>
-                    <div
-                      style={{
-                        position: 'relative',
-                        width: 24,
-                        height: 24,
-                        borderRadius: '34%',
-                        background: '#15171F',
-                        color: V4.amber,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: 9,
-                        fontWeight: 800,
-                        letterSpacing: '0.02em',
-                        flexShrink: 0,
-                        overflow: 'hidden',
-                      }}
-                    >
-                      <span>{initials(name)}</span>
-                      {photo ? (
-                        <img
-                          src={photo}
-                          alt=""
-                          onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
-                          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-                        />
-                      ) : null}
-                    </div>
+                    <PlayerAvatar
+                      playerId={name}
+                      playerName={name}
+                      tourCode={tourCode}
+                      photoUrl={p.photo_url ?? null}
+                      size="xs"
+                      ringColor={LIGHT_HAIRLINE}
+                    />
                     <div style={{ flex: 1, minWidth: 0, fontSize: 12, fontWeight: 700, color: V4.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {name}
                     </div>
