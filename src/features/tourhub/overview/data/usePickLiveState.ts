@@ -23,25 +23,25 @@ export function usePickLiveState(
 ) {
   const idsKey = [...playerIds].sort().join(',');
   return useQuery({
-    queryKey: ['overview', 'pick-live-state', tournamentId, idsKey],
-    queryFn: async (): Promise<Map<string, PickLiveState>> => {
-      if (!tournamentId || playerIds.length === 0) return new Map();
+    queryKey: ['overview', 'pick-live-state-v3', tournamentId, idsKey],
+    queryFn: async (): Promise<Record<string, PickLiveState>> => {
+      if (!tournamentId || playerIds.length === 0) return {};
       const { data, error } = await supabase
         .from('sr_leaderboards')
         .select('player_id, position, position_tied, today, thru, score, status')
         .eq('tournament_id', tournamentId)
         .in('player_id', playerIds);
       if (error) throw error;
-      const map = new Map<string, PickLiveState>();
+      const map: Record<string, PickLiveState> = {};
       (data ?? []).forEach((row: any) => {
-        map.set(row.player_id, {
+        map[row.player_id] = {
           position: typeof row.position === 'number' ? row.position : row.position != null ? Number(row.position) : null,
           positionTied: !!row.position_tied,
           today: row.today != null ? Number(row.today) : null,
           thru: row.thru != null ? Number(row.thru) : null,
           score: row.score != null ? Number(row.score) : null,
           status: row.status ?? null,
-        });
+        };
       });
       return map;
     },

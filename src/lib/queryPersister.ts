@@ -17,7 +17,7 @@ export const queryPersister = createAsyncStoragePersister({
     setItem: (key, value) => set(key, value),
     removeItem: (key) => del(key),
   },
-  key: 'clbhouz-query-cache',
+  key: 'clbhouz-query-cache-v2',
   throttleTime: 1000,
   // First-page trim for infinite queries — persist only pages[0]/pageParams[0]
   // so IDB stays in single-digit MB. Rest refetches on mount.
@@ -81,10 +81,25 @@ const PERSIST_PREFIXES = [
   'profile-clubs',
 ];
 
-export const shouldPersistQuery = (query: { queryKey: readonly unknown[] }): boolean => {
+const _skippedKeysLogged = new Set<string>();
+
+export const shouldPersistQuery = (query: { queryKey: readonly unknown[]; state?: { data?: unknown } }): boolean => {
   const root = query.queryKey?.[0];
   if (typeof root !== 'string') return false;
-  return PERSIST_PREFIXES.some((p) => root.startsWith(p));
+  if (!PERSIST_PREFIXES.some((p) => root.startsWith(p))) return false;
+
+  // GUARDRAIL: skip any query whose data is a Map or Set — they don't
+  // survive JSON round-tripping and rehydrate as plain objects, causing
+  // `.get is not a function` crashes on cold start.
+  const data = query.state?.data;
+  if (data instanceof Map || data instanceof Set) {
+    if (import.meta.env.DEV && !_skippedKeysLogged.has(root)) {
+      _skippedKeysLogged.add(root);
+      console.log('[queryPersister] skipping Map/Set query:', query.queryKey);
+    }
+    return false;
+  }
+  return true;
 };
 
 /**
@@ -94,6 +109,7 @@ export const shouldPersistQuery = (query: { queryKey: readonly unknown[] }): boo
 export async function removePersistedQueryCache(): Promise<void> {
   try {
     await del('clbhouz-query-cache');
+    await del('clbhouz-query-cache-v2');
   } catch {
     /* noop */
   }
