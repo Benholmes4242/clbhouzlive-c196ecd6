@@ -146,7 +146,7 @@ export function TourHubMainPage() {
       case 'players':
         return <PlayersTabV2 />;
       case 'leaderboards':
-        return <LeadersTab />;
+        return <LeadersTabV2 />;
       default:
         return <OverviewTab />;
     }
