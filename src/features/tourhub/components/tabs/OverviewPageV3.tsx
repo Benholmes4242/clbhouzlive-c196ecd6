@@ -18,6 +18,7 @@ import { HomeCourseOfWeekModule } from '../home/HomeCourseOfWeekModule';
 import { HomeConnectHandicapModule } from '../home/HomeConnectHandicapModule';
 
 import { OverviewHero } from '../overview-v3/OverviewHero';
+import { OnTheCourseSlot } from '../overview-v3/OnTheCourseSlot';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { WifiOff } from 'lucide-react';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
@@ -55,6 +56,10 @@ export function OverviewPageV3() {
         {/* Tour Hub hero — self-contained carousel (single-owner index, random
             landing slide, all three states eligible). See OverviewHero.tsx. */}
         <OverviewHero />
+
+        {/* Live-only featured groups rail (renders null off-live). Locked
+            composition: hero -> ON THE COURSE -> TI. */}
+        <OnTheCourseSlot />
 
 
 

@@ -40,6 +40,18 @@ function parseGroups(raw: unknown): GroupShape[] {
   return [];
 }
 
+function parseRoundNumber(raw: unknown): number | null {
+  if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+    const r = (raw as Record<string, unknown>).round_number;
+    if (typeof r === 'number' && Number.isFinite(r)) return r;
+    if (typeof r === 'string') {
+      const n = Number(r);
+      if (Number.isFinite(n)) return n;
+    }
+  }
+  return null;
+}
+
 function initials(name: string): string {
   const parts = name.trim().split(/\s+/);
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
@@ -71,9 +83,10 @@ export function OnTheCourse({ tournamentId, live }: Props) {
   if (!live) return null;
   const groups = parseGroups(data);
   if (groups.length === 0) return null;
+  const round = parseRoundNumber(data);
 
   return (
-    <SectionShell eyebrow="On the course">
+    <SectionShell eyebrow="On the course" rightMeta={round != null ? `R${round}` : undefined}>
       <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 20px 6px', scrollSnapType: 'x mandatory' }}>
         {groups.map((g, gi) => {
           const thru = groupThru(g);
