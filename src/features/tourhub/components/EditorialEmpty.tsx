@@ -12,7 +12,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { EmptyStateTile } from '@/components/profile/handicap/gam/_shared/EmptyStateTile';
-import { AMBER_TINT_10, FONT, INK, INK_SOFT } from '../../_shared/tokens';
+import { AMBER_TINT_10, FONT, INK, INK_SOFT } from '../_shared/tokens';
 
 const DEEP_AMBER = '#B45309';
 
