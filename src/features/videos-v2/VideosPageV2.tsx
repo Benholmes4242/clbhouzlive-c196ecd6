@@ -11,6 +11,7 @@ import {
   VIDEOS_V2_CATEGORY_IDS,
   type VideosV2CategoryId,
 } from './components/CategoryChips';
+import { VideosFeedV2 } from './components/VideosFeedV2';
 
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
