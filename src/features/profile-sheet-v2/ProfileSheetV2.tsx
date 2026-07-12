@@ -226,7 +226,7 @@ export default function ProfileSheetV2({
             style={{
               display: 'flex',
               justifyContent: 'center',
-              paddingTop: 9,
+              paddingTop: 8,
               paddingBottom: 4,
               flexShrink: 0,
               touchAction: 'none',
