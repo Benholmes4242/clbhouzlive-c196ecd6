@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Camera } from 'lucide-react';
 import { useCourseMedia, type CourseMediaFilter } from './hooks/useCourseMedia';
 import { CourseMediaHeader } from './CourseMediaHeader';
-import { CourseMediaGrid } from './CourseMediaGrid';
+import { CourseMediaCanonGrid } from './CourseMediaCanonGrid';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { SLATE_50 } from '@/features/courses/_shared/tokens';
 
@@ -73,7 +73,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
         onFilterChange={handleFilterChange}
         courseId={courseId}
       />
-      <CourseMediaGrid
+      <CourseMediaCanonGrid
         ref={gridRef}
         posts={posts}
         postsForFullscreen={postsForFullscreen}
