@@ -58,7 +58,7 @@ export function TournamentPage() {
   const { tournamentId } = useParams<{ tournamentId: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  useHideBottomNav();
+  
 
 
 
