@@ -214,6 +214,18 @@ function CardStateValue({ state, pick, live }: { state: EventState; pick: AITopC
   );
 }
 
+function CaseHeaderMeta({ pick }: { pick: AITopContender }) {
+  const parts: string[] = [];
+  if (pick.courseFitScore != null) parts.push(`course fit ${Math.round(pick.courseFitScore)}`);
+  if (pick.winProbability != null) parts.push(`${Math.round(pick.winProbability * 100)}% win prob`);
+  if (parts.length === 0) return null;
+  return (
+    <div style={{ fontSize: 11, fontWeight: 700, color: V4.inkMute, fontVariantNumeric: 'tabular-nums', letterSpacing: '0.02em' }}>
+      {parts.join(' · ')}
+    </div>
+  );
+}
+
 function SheetShell({ onClose, maxHeight = '80vh', children }: { onClose: () => void; maxHeight?: string; children: React.ReactNode }) {
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 60 }}>
