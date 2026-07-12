@@ -109,13 +109,13 @@ function RankedPlayerRowInner({
           <span
             style={{
               position: 'absolute',
-              bottom: -1,
-              right: -1,
-              width: 9,
-              height: 9,
+              top: 2,
+              right: 2,
+              width: 8,
+              height: 8,
               borderRadius: '50%',
               background: LIVE_GREEN,
-              border: '1.5px solid #FFFFFF',
+              boxShadow: '0 0 0 1.5px #FFFFFF',
             }}
           />
         )}

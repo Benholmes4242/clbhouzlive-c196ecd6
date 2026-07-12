@@ -161,13 +161,13 @@ export function FullListSheet({
                 <span
                   style={{
                     position: 'absolute',
-                    bottom: -1,
-                    right: -1,
-                    width: 11,
-                    height: 11,
+                    top: 3,
+                    right: 3,
+                    width: 10,
+                    height: 10,
                     borderRadius: '50%',
                     background: LIVE_GREEN,
-                    border: '2px solid #FFFFFF',
+                    boxShadow: '0 0 0 2px #FFFFFF',
                   }}
                 />
               )}
