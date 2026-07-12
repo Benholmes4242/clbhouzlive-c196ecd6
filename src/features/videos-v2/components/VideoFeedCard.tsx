@@ -95,7 +95,7 @@ export function VideoFeedCard({ row, post, index, posts, isAutoplayActive }: Pro
       data-post-id={post.id}
       style={{
         width: '100%',
-        marginBottom: 20,
+        marginBottom: 16,
         cursor: 'pointer',
         fontFamily: FONT_FAMILY,
       }}
