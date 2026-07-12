@@ -24,7 +24,7 @@ export function StatWatch({ tour }: { tour: TourId }) {
       linkLabel="All stats"
       onLinkClick={() => navigate('/tourhub?tab=leaderboards')}
     >
-      <div style={{ padding: '0 16px 6px', fontSize: 11, fontWeight: 600, color: V4.inkMute, marginTop: -6 }}>
+      <div style={{ padding: '0 16px 6px', fontSize: 11, fontWeight: 600, color: V4.inkMute }}>
         Season leaders · {TOUR_LABEL[tour] ?? tour.toUpperCase()}
       </div>
       <div
@@ -65,7 +65,7 @@ function StatCard({
         border: `0.5px solid ${V4.cardBorder}`,
         boxShadow: V4.cardShadow,
         borderRadius: 16,
-        padding: 13,
+        padding: 12,
         display: 'flex',
         flexDirection: 'column',
       }}
