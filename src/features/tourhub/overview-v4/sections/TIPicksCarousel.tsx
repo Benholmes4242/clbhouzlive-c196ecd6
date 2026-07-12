@@ -233,7 +233,7 @@ function InlineStateValue({ state, pick, live }: { state: EventState; pick: AITo
     );
   }
   const cut = cutStatus(live);
-  if ((state === 'live' || state === 'completed') && cut && state === 'live') {
+  if (state === 'live' && cut) {
     return <CutTag label={cut} />;
   }
   if (state === 'live') {
