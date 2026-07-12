@@ -110,7 +110,7 @@ export function DestinationDoors() {
         display: 'flex',
         flexDirection: 'row',
         gap: 10,
-        padding: '10px 16px 6px',
+        padding: '0 16px',
       }}
     >
       <Door

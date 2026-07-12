@@ -42,7 +42,7 @@ import { safeGoBack } from '@/utils/navigation';
 
 const ISLAND_H = 44;
 const TOP_GAP = 10;
-const HEADER_H = 64; // 10 gap + 44 island + 10 breathing
+const HEADER_H = 70; // 10 gap + 44 island + 16 canon islandClearance
 
 const LOGO_SRC = '/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png';
 

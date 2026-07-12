@@ -78,7 +78,7 @@ export default function VideosPageV2() {
             zIndex: 10,
             background: '#F8FAFC',
             borderBottom: '1px solid rgba(0,0,0,0.07)',
-            padding: '10px 16px 10px',
+            padding: '0 16px 12px',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

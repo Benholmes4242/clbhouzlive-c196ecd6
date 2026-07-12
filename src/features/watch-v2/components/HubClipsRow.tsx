@@ -187,7 +187,7 @@ export function HubClipsRow() {
     <section style={{ fontFamily: FONT_FAMILY }}>
       <div
         style={{
-          padding: '0 16px 10px',
+          padding: '0 16px 12px',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'flex-end',
@@ -241,7 +241,7 @@ export function HubClipsRow() {
           display: 'flex',
           gap: 10,
           overflowX: 'auto',
-          padding: '0 16px 4px',
+          padding: '0 16px',
           WebkitOverflowScrolling: 'touch',
           scrollbarWidth: 'none',
         }}

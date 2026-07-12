@@ -22,7 +22,7 @@ export function HubChipBar({ active, onChange }: Props) {
         top: 0,
         zIndex: 10,
         background: '#F8FAFC',
-        padding: '8px 0 10px',
+        padding: 0,
         borderBottom: '1px solid rgba(0,0,0,0.07)',
         fontFamily: FONT_FAMILY,
       }}

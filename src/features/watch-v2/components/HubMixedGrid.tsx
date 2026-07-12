@@ -13,7 +13,7 @@ const spinKeyframes = `@keyframes hub-mixed-spin { to { transform: rotate(360deg
 
 function SkeletonTile({ aspect }: { aspect: string }) {
   return (
-    <div style={{ marginBottom: 14 }}>
+    <div style={{ marginBottom: 12 }}>
       <div
         style={{
           width: '100%',
