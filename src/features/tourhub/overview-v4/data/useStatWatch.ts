@@ -84,15 +84,37 @@ interface StatRow {
   scoring_average: number | null;
 }
 
-async function resolveSeasonId(tour: TourId): Promise<string | null> {
+async function resolveSeasonIds(tour: TourId): Promise<string[]> {
   const { data, error } = await supabase
     .from('sr_seasons')
     .select('id, tour_full_name, year')
     .order('year', { ascending: false })
     .limit(50);
-  if (error) throw error;
-  const row = (data ?? []).find((r: any) => mapTourSlug(r.tour_full_name) === tour);
-  return row?.id ?? null;
+  if (error) {
+    // eslint-disable-next-line no-console
+    console.error('[stat-watch] sr_seasons fetch failed:', error);
+    throw error;
+  }
+  const matches = (data ?? []).filter((r: any) => mapTourSlug(r.tour_full_name) === tour);
+  // For pga, prefer exact-name matches over fallback-mapped rows (year order
+  // preserved within each group) — mapTourSlug's default returns 'pga' for
+  // any unrecognized tour_full_name, which lets DP World / LIV / etc. rows
+  // masquerade as pga and take the top slot.
+  const sorted = tour === 'pga'
+    ? [...matches].sort((a: any, b: any) => {
+        const aExact = /pga/.test((a.tour_full_name ?? '').toLowerCase()) ? 0 : 1;
+        const bExact = /pga/.test((b.tour_full_name ?? '').toLowerCase()) ? 0 : 1;
+        if (aExact !== bExact) return aExact - bExact;
+        return (b.year ?? 0) - (a.year ?? 0);
+      })
+    : matches;
+  const ids = sorted.slice(0, 6).map((r: any) => r.id);
+  if (tour === 'pga') {
+    // eslint-disable-next-line no-console
+    console.log('[stat-watch] pga season candidates (probe order):',
+      sorted.slice(0, 6).map((r: any) => ({ id: r.id, tour: r.tour_full_name, year: r.year })));
+  }
+  return ids;
 }
 
 export function useStatWatch(tour: TourId) {
@@ -100,8 +122,32 @@ export function useStatWatch(tour: TourId) {
     queryKey: ['overview-v4', 'stat-watch', tour],
     staleTime: 60 * 60 * 1000,
     queryFn: async (): Promise<{ categories: StatCategory[] }> => {
-      const seasonId = await resolveSeasonId(tour);
+      const candidates = await resolveSeasonIds(tour);
+      if (candidates.length === 0) return { categories: [] };
+
+      // Probe candidates in order — first with any sr_player_statistics row wins.
+      let seasonId: string | null = null;
+      for (const id of candidates) {
+        const { data: probe, error: probeErr } = await supabase
+          .from('sr_player_statistics')
+          .select('player_id')
+          .eq('season_id', id)
+          .limit(1);
+        if (probeErr) {
+          // eslint-disable-next-line no-console
+          console.error('[stat-watch] probe failed for season', id, probeErr);
+          throw probeErr;
+        }
+        if ((probe ?? []).length > 0) {
+          seasonId = id;
+          break;
+        }
+      }
       if (!seasonId) return { categories: [] };
+      if (tour === 'pga') {
+        // eslint-disable-next-line no-console
+        console.log('[stat-watch] pga winning season id:', seasonId);
+      }
 
       const { data: stats, error: sErr } = await supabase
         .from('sr_player_statistics')
@@ -109,9 +155,14 @@ export function useStatWatch(tour: TourId) {
           'player_id, strokes_gained_putting, strokes_gained_tee_green, driving_distance, scoring_average',
         )
         .eq('season_id', seasonId);
-      if (sErr) throw sErr;
+      if (sErr) {
+        // eslint-disable-next-line no-console
+        console.error('[stat-watch] sr_player_statistics fetch failed:', sErr);
+        throw sErr;
+      }
       const rows = (stats ?? []) as StatRow[];
       if (rows.length === 0) return { categories: [] };
+
 
       // Rank per category, keep top 3.
       const perCategory: Array<{ cfg: (typeof CATEGORIES)[number]; ranked: Array<{ playerId: string; value: number }> }> =
@@ -136,7 +187,10 @@ export function useStatWatch(tour: TourId) {
           .from('sr_players')
           .select('id, full_name, photo_url, headshot_override')
           .in('id', playerIds);
-        if (!pErr) {
+        if (pErr) {
+          // eslint-disable-next-line no-console
+          console.error('[stat-watch] sr_players fetch failed:', pErr);
+        } else {
           (players ?? []).forEach((p: any) =>
             playerMap.set(p.id, {
               name: p.full_name,
