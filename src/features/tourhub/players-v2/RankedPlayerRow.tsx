@@ -49,6 +49,7 @@ function RankedPlayerRowInner({
   rank,
   player,
   stat,
+  statFormatted,
   statLabel,
   live,
   sub,
