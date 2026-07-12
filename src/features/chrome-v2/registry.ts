@@ -110,8 +110,13 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   { match: { prefix: '/admin' },                  spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { prefix: '/hub' },                    spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { prefix: '/echo' },                   spec: { chrome: 'none', tone: 'light', bleed: false } },
+  // Social lists (F3): /profile/:username/(followers|following) — ISLAND, padded (no bleed).
+  // Declared BEFORE the /profile/ prefix rule so it wins.
+  { match: { test: (p) => /^\/profile\/[^/]+\/(followers|following)$/.test(p) },
+    spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/' }, tone: 'light', bleed: false, note: 'social lists - padded island (F3)' } },
   // /profile/ prefix — ISLAND (H3). Sits after /profile/quest above.
   { match: { prefix: '/profile/' },               spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/' }, tone: 'light', bleed: true } },
+
   { match: { prefix: '/top100/' },                spec: { chrome: 'none', tone: 'light', bleed: true  } },
   { match: { prefix: '/discover/explore/region/' },spec:{ chrome: 'none', tone: 'light', bleed: true  } },
   { match: { prefix: '/achievements/' },          spec: { chrome: 'none', tone: 'light', bleed: false } },
