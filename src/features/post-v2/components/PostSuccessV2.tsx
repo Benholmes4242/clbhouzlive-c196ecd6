@@ -126,7 +126,7 @@ const doneBtn: React.CSSProperties = {
   fontSize: 14,
   fontWeight: 600,
   cursor: 'pointer',
-  marginTop: 4,
+  
 };
 
 
