@@ -61,7 +61,7 @@ export default function SheetNavGroup({ currentActor, isAdmin, onNavigate }: Pro
   return (
     <div
       style={{
-        margin: '14px 20px 0',
+        margin: '12px 20px 0',
         background: '#fff',
         border: `1px solid ${HAIRLINE}`,
         borderRadius: 16,
