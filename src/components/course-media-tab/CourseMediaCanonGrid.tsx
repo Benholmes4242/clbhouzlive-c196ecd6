@@ -1,0 +1,322 @@
+/**
+ * CourseMediaCanonGrid — canonical FeedCard + packColumns grid, mounted
+ * inside the course detail Media tab. Data still comes from
+ * useCourseMedia (get_course_media RPC + posts/postsForFullscreen
+ * dual-shape). The old CourseMediaGrid/Tile/LandscapeCard/Skeleton
+ * family is retired.
+ *
+ * Card attribution: hideCourseAttribution — the page IS the course.
+ * Orientation frames: FeedCard's canonical rule (w > h → 16/9, else
+ * 9/14) via packColumns.
+ *
+ * Tap wiring (canonical) — openWithOrigin({ openedFrom: 'watch', ... })
+ * emitted by FeedCard directly. The previous grid used
+ * openedFrom: 'course-media' with readOnly:true and pagination
+ * options threaded into the fullscreen store; both wirings opened
+ * the SAME fullscreen viewer for photos and videos alike (no split
+ * lightbox path), and the pagination callbacks are still mirrored
+ * into the fullscreen store below.
+ */
+
+import { forwardRef, useCallback, useEffect, useMemo, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Loader2, AlertCircle, Camera, Film, Flag, Sunrise, Building2 } from 'lucide-react';
+import type { FeedPost } from '@/components/media-system/types/media';
+import { groupMultiMedia } from '@/components/media-system/utils/feedMapper';
+import { FeedCard, type FeedCardRow } from '@/components/feed-cards/FeedCard';
+import { packColumns } from '@/components/feed-cards/packColumns';
+import { useFullscreenFeedStore, useIsViewerOwnedBy } from '@/store/fullscreenFeedStore';
+import { useWatchAutoplay } from '@/video/useWatchAutoplay';
+import { PrimaryAmberCTA } from '@/components/ui/PrimaryAmberCTA';
+import { EmptyStateGuide } from '@/components/ui/EmptyStateGuide';
+import {
+  AMBER,
+  HAIRLINE_INK_7,
+  HAIRLINE_INK_10,
+  INK,
+  INK_FAINT,
+} from '@/features/courses/_shared/tokens';
+
+const FONT_FAMILY =
+  'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
+interface CourseMediaCanonGridProps {
+  posts: FeedPost[];
+  postsForFullscreen?: FeedPost[];
+  isLoading: boolean;
+  isError: boolean;
+  hasNextPage: boolean;
+  isFetchingNextPage: boolean;
+  fetchNextPage: () => void;
+  refetch: () => void;
+  courseName?: string;
+  courseId?: string;
+}
+
+// Same FeedPost → FeedCardRow projection ExploreGrid uses (Brief U3R).
+function toFeedCardRow(post: FeedPost): FeedCardRow {
+  const media = post.mediaItems[0];
+  const explicit = (media as any)?.format as ('clip' | 'video' | undefined);
+  const duration = media?.duration ?? null;
+  const derived: 'clip' | 'video' =
+    explicit ??
+    (media?.type === 'video'
+      ? (duration != null && duration <= 90 ? 'clip' : 'video')
+      : 'clip');
+  const mAny = media as any;
+  const width = Number(mAny?.width) || null;
+  const height = Number(mAny?.height) || null;
+  return {
+    post_id: post.id,
+    post_content: post.caption ?? null,
+    derived_format: derived,
+    poster_url: media?.thumbnailUrl ?? media?.imageUrl ?? null,
+    duration_seconds: duration,
+    creator_username: post.username ?? null,
+    like_count: Number(post.likeCount ?? 0),
+    course_name: post.courseName ?? post.review?.courseName ?? null,
+    width,
+    height,
+  };
+}
+
+function SkeletonTile() {
+  return (
+    <div style={{ marginBottom: 14 }}>
+      <div
+        style={{
+          width: '100%',
+          aspectRatio: '9 / 14',
+          borderRadius: 12,
+          background: 'rgba(0,0,0,0.06)',
+        }}
+      />
+    </div>
+  );
+}
+
+export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonGridProps>(({
+  posts,
+  postsForFullscreen,
+  isLoading,
+  isError,
+  hasNextPage,
+  isFetchingNextPage,
+  fetchNextPage,
+  refetch,
+  courseName,
+  courseId,
+}, ref) => {
+  const navigate = useNavigate();
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  const { activeIndices, railRef: autoplayRef } = useWatchAutoplay({
+    railId: 'course-media',
+    posts,
+    maxActive: 3,
+  });
+  const setGridRef = useCallback((el: HTMLDivElement | null) => {
+    autoplayRef(el);
+    if (typeof ref === 'function') ref(el);
+    else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = el;
+  }, [autoplayRef, ref]);
+
+  // Infinite scroll — same IntersectionObserver rootMargin the other canon
+  // consumers use.
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel || !hasNextPage) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { rootMargin: '400px' },
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  // Mirror pagination + append grouped posts into the fullscreen store when
+  // this surface owns it (preserves infinite scroll inside the viewer).
+  const isViewerOwnedHere = useIsViewerOwnedBy('course-media');
+  const setPaginationState = useFullscreenFeedStore((s) => s.setPaginationState);
+
+  useEffect(() => {
+    if (!isViewerOwnedHere) return;
+    setPaginationState({
+      hasNextPage: hasNextPage ?? false,
+      isFetchingNextPage: isFetchingNextPage ?? false,
+    });
+  }, [isViewerOwnedHere, hasNextPage, isFetchingNextPage, setPaginationState]);
+
+  const groupedForViewer = useMemo(
+    () => postsForFullscreen ?? groupMultiMedia(posts),
+    [postsForFullscreen, posts],
+  );
+
+  useEffect(() => {
+    if (!isViewerOwnedHere) return;
+    useFullscreenFeedStore.getState().appendPosts(groupedForViewer);
+  }, [isViewerOwnedHere, groupedForViewer]);
+
+  const cardRows = useMemo(() => posts.map(toFeedCardRow), [posts]);
+
+  if (isLoading) {
+    return (
+      <div style={{ padding: '12px 16px 30px', fontFamily: FONT_FAMILY }}>
+        <div style={{ display: 'flex', gap: 12 }}>
+          <div style={{ flex: 1 }}>
+            <SkeletonTile />
+            <SkeletonTile />
+          </div>
+          <div style={{ flex: 1 }}>
+            <SkeletonTile />
+            <SkeletonTile />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 gap-3">
+        <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+          <AlertCircle className="w-6 h-6 text-muted-foreground/40" />
+        </div>
+        <p className="text-base font-semibold text-foreground">Couldn't load media</p>
+        <p className="text-sm text-muted-foreground">Please check your connection and try again.</p>
+        <button
+          onClick={() => refetch()}
+          className="px-5 py-2.5 rounded-full text-sm font-semibold bg-[#f59e0b] text-white hover:bg-[#e8920f] active:scale-[0.97] transition-all min-h-[44px]"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  if (posts.length === 0) {
+    return (
+      <div style={{ paddingBottom: 40 }}>
+        <div style={{ padding: '44px 24px 28px', textAlign: 'center' }}>
+          <div
+            style={{
+              width: 72,
+              height: 72,
+              borderRadius: 18,
+              background: 'rgba(247,147,30,0.07)',
+              border: '1.5px solid rgba(247,147,30,0.18)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 18px',
+            }}
+          >
+            <Camera size={30} strokeWidth={1.8} color={AMBER} />
+          </div>
+          <div style={{ fontSize: 19, fontWeight: 900, color: INK, letterSpacing: '-0.03em', marginBottom: 6 }}>
+            No media yet
+          </div>
+          <p style={{ fontSize: 13, color: INK_FAINT, lineHeight: 1.6, maxWidth: 270, margin: '0 auto 24px' }}>
+            Be the first to capture {courseName || 'this course'} — photos and videos from your round help fellow golfers discover it.
+          </p>
+          <PrimaryAmberCTA
+            onClick={() => courseId && navigate(`/courses/${courseId}/rate`)}
+            leadingIcon={<Camera size={15} strokeWidth={2} />}
+            style={{ marginBottom: 10 }}
+          >
+            Share your experience
+          </PrimaryAmberCTA>
+          <button
+            type="button"
+            onClick={() => navigate('/share')}
+            style={{
+              width: '100%',
+              padding: '12px 0',
+              borderRadius: 12,
+              background: 'transparent',
+              color: INK,
+              fontSize: 13,
+              fontWeight: 700,
+              border: `1.5px solid ${HAIRLINE_INK_10}`,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 7,
+            }}
+          >
+            <Film size={15} strokeWidth={2} />
+            Upload a video
+          </button>
+        </div>
+
+        <div style={{ height: '0.5px', background: HAIRLINE_INK_7, margin: '0 16px 24px' }} />
+
+        <EmptyStateGuide
+          kicker="What to share"
+          items={[
+            { icon: Flag, label: 'Signature holes', sub: 'Show the world what makes this course special' },
+            { icon: Film, label: 'Shots from your round', sub: 'Short clips of your best moments on the course' },
+            { icon: Sunrise, label: 'Views & atmosphere', sub: 'Sunsets, landscapes, the feeling of being there' },
+            { icon: Building2, label: 'Clubhouse & facilities', sub: 'Help others know what to expect before they visit' },
+          ]}
+        />
+      </div>
+    );
+  }
+
+  const packed = packColumns(cardRows, (r) => {
+    const w = Number(r?.width) || 0;
+    const h = Number(r?.height) || 0;
+    return w > 0 && h > 0 && w > h ? 16 / 9 : 9 / 14;
+  });
+
+  return (
+    <div ref={setGridRef} style={{ fontFamily: FONT_FAMILY, padding: '12px 0 30px' }}>
+      <div style={{ display: 'flex', gap: 12, padding: '0 16px' }}>
+        <div style={{ flex: 1 }}>
+          {packed.left.map(({ item, flatIndex: i }) => (
+            <FeedCard
+              key={item.post_id}
+              row={item}
+              feedPost={posts[i]}
+              posts={posts}
+              flatIndex={i}
+              isAutoplayActive={activeIndices.has(i)}
+              hideCourseAttribution
+            />
+          ))}
+        </div>
+        <div style={{ flex: 1 }}>
+          {packed.right.map(({ item, flatIndex: i }) => (
+            <FeedCard
+              key={item.post_id}
+              row={item}
+              feedPost={posts[i]}
+              posts={posts}
+              flatIndex={i}
+              isAutoplayActive={activeIndices.has(i)}
+              hideCourseAttribution
+            />
+          ))}
+        </div>
+      </div>
+
+      <div ref={sentinelRef} style={{ height: 1, width: '100%' }} />
+
+      {isFetchingNextPage && (
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0' }}>
+          <Loader2 className="w-5 h-5 animate-spin text-[#f59e0b]" />
+        </div>
+      )}
+    </div>
+  );
+});
+
+CourseMediaCanonGrid.displayName = 'CourseMediaCanonGrid';
+
+export default CourseMediaCanonGrid;
