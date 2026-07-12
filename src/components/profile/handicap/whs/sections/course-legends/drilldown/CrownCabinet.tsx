@@ -131,7 +131,7 @@ export const CrownCabinet: React.FC<CrownCabinetProps> = ({
           );
         })}
       </div>
-      <div style={{ marginTop: 10, display: 'flex', justifyContent: 'flex-start' }}>
+      <div style={{ marginTop: 12, display: 'flex', justifyContent: 'flex-start' }}>
         <WindowToggle window={window} setWindow={onWindowChange} />
       </div>
     </div>
