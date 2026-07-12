@@ -21,6 +21,4 @@ export * from './useTournamentPredictions';
 export * from './useAIPredictions';
 
 
-// Tournament Schedule
-export * from './useTournamentSchedule';
 export * from './useSeasonTournaments';
