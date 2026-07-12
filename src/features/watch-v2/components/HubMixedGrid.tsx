@@ -317,10 +317,10 @@ export function HubMixedGrid({ filter = 'all' }: { filter?: string } = {}) {
       ) : (
         <div ref={railRef} style={{ display: 'flex', gap: 12, padding: '0 16px' }}>
           <div style={{ flex: 1 }}>
-            {leftIdx.map((i) => (
+            {packed.left.map(({ item, flatIndex: i }) => (
               <Tile
-                key={rows[i].post_id}
-                row={rows[i]}
+                key={item.post_id}
+                row={item}
                 post={feedPosts[i]}
                 index={i}
                 posts={feedPosts}
@@ -329,10 +329,10 @@ export function HubMixedGrid({ filter = 'all' }: { filter?: string } = {}) {
             ))}
           </div>
           <div style={{ flex: 1 }}>
-            {rightIdx.map((i) => (
+            {packed.right.map(({ item, flatIndex: i }) => (
               <Tile
-                key={rows[i].post_id}
-                row={rows[i]}
+                key={item.post_id}
+                row={item}
                 post={feedPosts[i]}
                 index={i}
                 posts={feedPosts}
