@@ -1,0 +1,234 @@
+/**
+ * ProfileSheetV2 · ActorCards
+ *
+ * Horizontal rail of "posting as" actor cards. Active card gets an amber
+ * ring + trailing check; inactive cards tap to switch. Per-actor unread
+ * badges (notifications + DMs) via useActorUnreadCounts. A trailing
+ * dashed "+ Business" door is rendered ONLY when the user has no
+ * business actors yet.
+ */
+
+import React from 'react';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { useActorUnreadCounts } from '@/hooks/useActorUnreadCounts';
+
+const AMBER = '#F7931E';
+const AMBER_DEEP = '#c97a10';
+const INK = '#0F172A';
+const MUTED = '#94A3B8';
+const HAIRLINE = 'rgba(15,23,42,0.08)';
+const DOT = '\u00B7';
+
+export interface ActorCardsProfile {
+  id: string;
+  type: 'personal' | 'business';
+  name: string;
+  avatarUrl?: string;
+  subtitle?: string;
+  username?: string | null;
+}
+
+export interface ActorCardsCurrent {
+  id: string;
+  type: 'personal' | 'business';
+}
+
+interface Props {
+  currentActor: ActorCardsCurrent;
+  profiles: ActorCardsProfile[];
+  onSwitchProfile: (id: string) => void | Promise<void>;
+  onNavigate: (route: string) => void;
+}
+
+export default function ActorCards({
+  currentActor,
+  profiles,
+  onSwitchProfile,
+  onNavigate,
+}: Props) {
+  const { countFor } = useActorUnreadCounts();
+  const hasBusiness = profiles.some(p => p.type === 'business');
+
+  return (
+    <div>
+      <div
+        style={{
+          fontWeight: 700,
+          fontSize: 10,
+          letterSpacing: '0.16em',
+          textTransform: 'uppercase',
+          color: AMBER_DEEP,
+          padding: '0 20px 8px',
+        }}
+      >
+        POSTING AS
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          gap: 10,
+          overflowX: 'auto',
+          padding: '0 20px 2px',
+          scrollbarWidth: 'none',
+        }}
+        className="ps2-no-scrollbar"
+      >
+        <style>{`.ps2-no-scrollbar::-webkit-scrollbar{display:none}`}</style>
+
+        {profiles.map((p) => {
+          const active = p.id === currentActor.id;
+          const unread = countFor(p.type, p.id);
+          const sub = p.type === 'personal'
+            ? [p.username ? `@${p.username}` : (p.subtitle || ''), 'personal']
+                .filter(Boolean).join(` ${DOT} `)
+            : ['business', unread > 0 ? `${unread} unread` : null]
+                .filter(Boolean).join(` ${DOT} `);
+          const initial = (p.name?.[0] || '?').toUpperCase();
+
+          return (
+            <div
+              key={`${p.type}-${p.id}`}
+              onClick={() => { if (!active) void onSwitchProfile(p.id); }}
+              role="button"
+              tabIndex={0}
+              style={{
+                position: 'relative',
+                flexShrink: 0,
+                width: 220,
+                background: '#fff',
+                borderRadius: 16,
+                padding: '13px 14px',
+                display: 'flex',
+                flexDirection: 'row',
+                gap: 11,
+                alignItems: 'center',
+                cursor: active ? 'default' : 'pointer',
+                border: active
+                  ? `2px solid ${AMBER}`
+                  : `1px solid ${HAIRLINE}`,
+              }}
+            >
+              <div style={{ position: 'relative', flexShrink: 0 }}>
+                {p.avatarUrl ? (
+                  <SquircleAvatar
+                    size={42}
+                    src={p.avatarUrl}
+                    alt={p.name}
+                    hairlineRing
+                    ringColor={LIGHT_HAIRLINE}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: 42,
+                      height: 42,
+                      borderRadius: '34%',
+                      background: 'linear-gradient(135deg,#F7931E,#d97a10)',
+                      color: '#fff',
+                      fontWeight: 800,
+                      fontSize: 16,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {initial}
+                  </div>
+                )}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    fontWeight: 700,
+                    fontSize: 14,
+                    color: INK,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {p.name}
+                </div>
+                <div
+                  style={{
+                    fontWeight: 500,
+                    fontSize: 11,
+                    color: MUTED,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    marginTop: 2,
+                  }}
+                >
+                  {sub}
+                </div>
+              </div>
+              {active && (
+                <div
+                  style={{
+                    fontWeight: 800,
+                    fontSize: 14,
+                    color: AMBER,
+                    flexShrink: 0,
+                  }}
+                >
+                  {'\u2713'}
+                </div>
+              )}
+              {unread > 0 && (
+                <div
+                  aria-label={`${unread} unread`}
+                  style={{
+                    position: 'absolute',
+                    top: -4,
+                    right: -4,
+                    minWidth: 17,
+                    height: 17,
+                    padding: '0 5px',
+                    borderRadius: 999,
+                    background: AMBER,
+                    color: '#fff',
+                    fontWeight: 700,
+                    fontSize: 10,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {unread > 99 ? '99+' : unread}
+                </div>
+              )}
+            </div>
+          );
+        })}
+
+        {!hasBusiness && (
+          <div
+            onClick={() => onNavigate('/businesses/manage')}
+            role="button"
+            tabIndex={0}
+            style={{
+              flexShrink: 0,
+              width: 92,
+              border: '1.5px dashed rgba(15,23,42,0.15)',
+              borderRadius: 16,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              padding: '13px 8px',
+            }}
+          >
+            <div style={{ fontWeight: 800, fontSize: 16, color: AMBER_DEEP, lineHeight: 1 }}>
+              +
+            </div>
+            <div style={{ fontWeight: 600, fontSize: 10, color: MUTED, marginTop: 4 }}>
+              Business
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

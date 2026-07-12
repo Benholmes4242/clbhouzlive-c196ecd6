@@ -252,6 +252,7 @@ const AdminShell = lazy(() => import('./features/admin/AdminShell'));
 
 // Echo v2 full-page experience
 const EchoV2Page = lazy(() => import("./pages/EchoV2Page"));
+const ProfileSheetV2TestPage = lazy(() => import("./features/profile-sheet-v2/ProfileSheetV2TestPage"));
 const EchoHistoryPage = lazy(() => import("./pages/EchoHistoryPage"));
 
 // Removed: DiscoverGamesPage lazy import — /games/discover now redirects to /clubhouse
@@ -589,6 +590,8 @@ function AppRoutes() {
         {/* Public invite landings — logged-out, no header/nav chrome */}
         <Route path="/join" element={<Suspense fallback={<GenericPageSkeleton />}><JoinLandingPage /></Suspense>} />
         <Route path="/i/:inviteCode" element={<Suspense fallback={<GenericPageSkeleton />}><InviteLandingPage /></Suspense>} />
+
+        <Route path="/profile-sheet-v2-test" element={<Suspense fallback={<GenericPageSkeleton />}><ProfileSheetV2TestPage /></Suspense>} />
 
         <Route path="*" element={<Suspense fallback={<GenericPageSkeleton />}><NotFound /></Suspense>} />
       </Routes>
