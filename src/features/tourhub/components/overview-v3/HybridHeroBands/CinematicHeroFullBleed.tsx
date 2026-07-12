@@ -537,17 +537,18 @@ export function CinematicHeroFullBleed({
     : '';
 
   // Cinematic photo variant: single unified height clamp across all three
-  // states (live / upcoming / results). Uses fixed `height` (not minHeight)
-  // with overflow:hidden so state-specific child stacks (leaderboard rows,
-  // runners-up rows, champion strip) cannot push the container past the
-  // shared floor. Spacer is equalized so title/eyebrow rest position matches.
-  const heroHeight = 'clamp(460px, 54dvh, 600px)';
+  // states (live / upcoming / results). Mirrors the course-hero pattern —
+  // `minHeight` with env(safe-area-inset-top) added ON TOP so the notch
+  // does not eat content space. Overflow hidden still guards against any
+  // state-specific child stack pushing past the shared floor visually.
+  const heroHeight =
+    'calc(clamp(380px, 44dvh, 460px) + env(safe-area-inset-top, 0px))';
   return (
     <div
       style={{
         position: 'relative',
         width: '100%',
-        height: heroHeight,
+        minHeight: heroHeight,
         overflow: 'hidden',
         background,
         backgroundColor: INK_BASE,
@@ -557,7 +558,7 @@ export function CinematicHeroFullBleed({
       }}
     >
       {/* Spacer */}
-      <div style={{ flex: 1, minHeight: 150 }} />
+      <div style={{ flex: 1, minHeight: 128 }} />
 
 
 
