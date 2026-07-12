@@ -28,6 +28,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import { countryFlag } from './countryFlag';
 
 const F = 'Geist, system-ui, sans-serif';
 
@@ -291,7 +292,7 @@ export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
                 style={{
                   display: 'flex',
                   alignItems: 'baseline',
-                  gap: 8,
+                  gap: 5,
                   minWidth: 0,
                 }}
               >
@@ -308,18 +309,28 @@ export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
                 >
                   {target.playerName}
                 </span>
-                {target.countryCode && (
-                  <span
-                    style={{
-                      fontSize: 9,
-                      fontWeight: 700,
-                      color: MUTED,
-                      letterSpacing: '0.04em',
-                    }}
-                  >
-                    {target.countryCode.toUpperCase()}
-                  </span>
-                )}
+                {target.countryCode && (() => {
+                  const flag = countryFlag(target.countryCode);
+                  return flag ? (
+                    <span
+                      style={{ fontSize: 11, flexShrink: 0, lineHeight: 1 }}
+                      aria-label={target.countryCode}
+                    >
+                      {flag}
+                    </span>
+                  ) : (
+                    <span
+                      style={{
+                        fontSize: 9,
+                        fontWeight: 700,
+                        color: MUTED,
+                        letterSpacing: '0.04em',
+                      }}
+                    >
+                      {target.countryCode.toUpperCase()}
+                    </span>
+                  );
+                })()}
               </div>
               <button
                 type="button"

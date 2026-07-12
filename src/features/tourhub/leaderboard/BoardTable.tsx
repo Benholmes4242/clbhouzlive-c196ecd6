@@ -26,6 +26,7 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { movementFromRounds } from './movementFromRounds';
+import { countryFlag } from './countryFlag';
 
 const INK = '#0F172A';
 const SECONDARY = '#4B5563';
@@ -319,7 +320,7 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
             style={{
               display: 'flex',
               alignItems: 'baseline',
-              gap: 6,
+              gap: 5,
               minWidth: 0,
             }}
           >
@@ -335,19 +336,33 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
             >
               {e.player?.full_name || 'Unknown'}
             </span>
-            {cc && (
-              <span
-                style={{
-                  fontSize: 8,
-                  fontWeight: 700,
-                  color: MUTED,
-                  flexShrink: 0,
-                  letterSpacing: '0.04em',
-                }}
-              >
-                {cc.toUpperCase()}
-              </span>
-            )}
+            {cc && (() => {
+              const flag = countryFlag(cc);
+              return flag ? (
+                <span
+                  style={{
+                    fontSize: 11,
+                    flexShrink: 0,
+                    lineHeight: 1,
+                  }}
+                  aria-label={cc}
+                >
+                  {flag}
+                </span>
+              ) : (
+                <span
+                  style={{
+                    fontSize: 8,
+                    fontWeight: 700,
+                    color: MUTED,
+                    flexShrink: 0,
+                    letterSpacing: '0.04em',
+                  }}
+                >
+                  {cc.toUpperCase()}
+                </span>
+              );
+            })()}
           </div>
           {rounds && (
             <div
