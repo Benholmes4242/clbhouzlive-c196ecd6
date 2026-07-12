@@ -19,6 +19,7 @@ import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import { useTourLeaderboard } from '../hooks/useTourHubData';
 import { useTournamentMeta } from './useTournamentMeta';
 import { BoardTable, type BoardEntry, type CutState } from './BoardTable';
+import { ScorecardSheet, type ScorecardSheetTarget } from './ScorecardSheet';
 import { EditorialEmpty } from '../components/tournament-detail/EditorialEmpty';
 import { tourPriorityIndex } from '../_shared/tourOrder';
 
