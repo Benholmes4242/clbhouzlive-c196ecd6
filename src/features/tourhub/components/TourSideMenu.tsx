@@ -3,7 +3,7 @@
  * cinematic overview. Owns its own backdrop, panel, slide animation.
  * Does NOT depend on any shared drawer/sheet component.
  */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import {
   Compass,
@@ -16,11 +16,6 @@ import {
   User,
   LogOut,
 } from 'lucide-react';
-import { HandicapChip } from '@/components/header/HandicapChip';
-import { PostingAsPill } from '@/components/header/PostingAsPill';
-import { PostingAsMenu } from '@/components/header/PostingAsMenu';
-import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 
 export interface TourSideMenuProps {
@@ -143,11 +138,8 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
           willChange: 'transform',
         }}
       >
-        {/* Top: logo + handicap chip + identity pill */}
-        <TopBar />
-
         {/* Primary group header */}
-        <div style={{ marginTop: 16 }}>
+        <div style={{ marginTop: 'max(20px, env(safe-area-inset-top, 0px))', paddingTop: 16 }}>
           <GroupHeader>Tour</GroupHeader>
         </div>
 
