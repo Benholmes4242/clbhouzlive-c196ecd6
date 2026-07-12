@@ -7,13 +7,12 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { ComingUpSlot } from '../overview-v3/ComingUpSlot';
-import { CollegeRivalry } from '../CollegeRivalry';
+import { CollegeFranchise } from '../../overview-v4/sections/CollegeFranchise';
 import { LazySection } from '../overview-v3/LazySection';
 
 import { TISlot } from '../overview-v3/TISlot';
 import { WorldRankingsSlot } from '../overview-v3/WorldRankingsSlot';
 import { StatWatchSlot } from '../overview-v3/StatWatchSlot';
-import { HomeCourseOfWeekModule } from '../home/HomeCourseOfWeekModule';
 
 import { HomeConnectHandicapModule } from '../home/HomeConnectHandicapModule';
 
@@ -79,9 +78,6 @@ export function OverviewPageV3() {
             <LazySection minHeight={400}>
               <ComingUpSlot />
             </LazySection>
-            <LazySection minHeight={260}>
-              <HomeCourseOfWeekModule />
-            </LazySection>
             <LazySection minHeight={400}>
               <WorldRankingsSlot />
             </LazySection>
@@ -89,7 +85,7 @@ export function OverviewPageV3() {
               <StatWatchSlot />
             </LazySection>
             <LazySection minHeight={350}>
-              <CollegeRivalry />
+              <CollegeFranchise />
             </LazySection>
           </div>
         </div>
