@@ -210,7 +210,7 @@ export function CollegeHubPage() {
           ) : filtered.length === 0 ? (
             <div
               style={{
-                padding: '48px 24px',
+                padding: '40px 24px',
                 textAlign: 'center',
                 color: INK_FAINT,
                 fontSize: 13,

@@ -189,7 +189,7 @@ export function Masthead({ slug, displayName, rank, pointsTotal, alumniCount, pl
       <div
         aria-hidden
         style={{
-          marginTop: 18,
+          marginTop: 16,
           height: 0.5,
           background: WHITE_ALPHA_10,
         }}

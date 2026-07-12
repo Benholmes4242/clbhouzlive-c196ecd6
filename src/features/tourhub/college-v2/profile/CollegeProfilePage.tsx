@@ -97,7 +97,7 @@ export function CollegeProfilePage() {
 
         {/* Not found */}
         {notFound && (
-          <div style={{ textAlign: 'center', padding: '48px 24px' }}>
+          <div style={{ textAlign: 'center', padding: '40px 24px' }}>
             <div
               style={{
                 width: 44,

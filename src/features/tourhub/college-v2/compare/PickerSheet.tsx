@@ -104,7 +104,7 @@ export function PickerSheet({ open, onClose, target, standings, otherSlug }: Pro
             color: INK,
             letterSpacing: '-0.01em',
             lineHeight: 1.1,
-            marginBottom: 10,
+            marginBottom: 12,
           }}
         >
           Pick a college
