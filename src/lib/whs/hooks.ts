@@ -31,8 +31,7 @@ import {
 
 export const whsKeys = {
   connection: (userId: string) => ['whs-connection', userId] as const,
-  trend: (connectionId: string, windowDays: number = 30) =>
-    ['whs-handicap-trend', connectionId, windowDays] as const,
+  trend: (connectionId: string) => ['whs-handicap-trend', connectionId] as const,
   lastRound: (connectionId: string) => ['whs-last-round', connectionId] as const,
   counters: (connectionId: string) => ['whs-counters', connectionId] as const,
   allScores: (connectionId: string) => ['whs-all-scores', connectionId] as const,
@@ -90,13 +89,10 @@ export function useWhsConnection(userId: string | undefined) {
   });
 }
 
-export function useHandicapTrend(
-  connectionId: string | undefined,
-  windowDays: number = 30,
-) {
+export function useHandicapTrend(connectionId: string | undefined) {
   return useQuery({
-    queryKey: whsKeys.trend(connectionId ?? '', windowDays),
-    queryFn: () => fetchHandicapTrend(connectionId as string, windowDays),
+    queryKey: whsKeys.trend(connectionId ?? ''),
+    queryFn: () => fetchHandicapTrend(connectionId as string),
     enabled: !!connectionId,
     staleTime: 60_000,
   });

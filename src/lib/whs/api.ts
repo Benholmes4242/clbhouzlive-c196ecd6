@@ -48,14 +48,11 @@ export async function fetchWhsConnection(userId: string): Promise<WhsConnection 
   return (data as unknown as WhsConnection) ?? null;
 }
 
-export async function fetchHandicapTrend(
-  connectionId: string,
-  windowDays: number = 30,
-): Promise<WhsHandicapTrend> {
+export async function fetchHandicapTrend(connectionId: string): Promise<WhsHandicapTrend> {
   // Source of truth: whs_handicap_snapshots (post-round, authoritative).
   // Fall back to whs_scores.handicap_index_at_time (pre-round) only when no
   // snapshot exists — true for users connected before the snapshot logic shipped.
-  const thirtyDaysAgoIso = new Date(Date.now() - windowDays * 86_400_000).toISOString();
+  const thirtyDaysAgoIso = new Date(Date.now() - 30 * 86_400_000).toISOString();
   const thirtyDaysAgoDate = thirtyDaysAgoIso.slice(0, 10);
 
   const { count: roundCount } = await supabase
