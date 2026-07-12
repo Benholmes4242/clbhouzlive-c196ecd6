@@ -731,7 +731,7 @@ export function CinematicHeroFullBleed({
               display: 'flex',
               alignItems: 'center',
               gap: 10,
-              padding: '5px 18px',
+              padding: '4px 18px',
               borderTop: 'none',
             };
             if (row.kind === 'solo') {
