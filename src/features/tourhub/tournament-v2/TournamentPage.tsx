@@ -65,6 +65,7 @@ export function TournamentPage() {
 
   const { data: meta, isLoading } = useTournamentMeta(tournamentId);
   const { data: leaderboard } = useTourLeaderboard(tournamentId ?? '');
+  const { data: liveList = [] } = useLiveTournaments();
   const pulse = useTournamentPulse(tournamentId);
 
   // Realtime (equivalent to legacy TournamentDetailPage): board + status.
