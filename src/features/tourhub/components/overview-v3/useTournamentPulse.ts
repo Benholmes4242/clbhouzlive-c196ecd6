@@ -14,6 +14,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
+/**
+ * EventState — shared vocabulary for the tour-event lifecycle. Rescued
+ * from overview-v4/data/useTourEventContext.ts ahead of the O5 nuke so
+ * TIPicksCarousel keeps typing after that file is deleted.
+ */
+export type EventState = 'live' | 'upcoming' | 'completed';
+
 const LIVE_STATUSES = new Set([
   'inprogress', 'in_progress',
   'playoff', 'inplayoff', 'in_playoff',
