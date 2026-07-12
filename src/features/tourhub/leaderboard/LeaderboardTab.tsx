@@ -435,7 +435,7 @@ export function LeaderboardTab() {
           textTransform: 'uppercase',
         }}
       >
-        <div style={{ width: 46, flexShrink: 0 }}>POS</div>
+        <div style={{ width: 52, flexShrink: 0 }}>POS</div>
         <div style={{ flex: 1, minWidth: 0 }}>PLAYER</div>
         <div style={{ width: 44, flexShrink: 0, textAlign: 'center' }}>TOT</div>
         <div style={{ width: 44, flexShrink: 0, textAlign: 'center' }}>THRU</div>
