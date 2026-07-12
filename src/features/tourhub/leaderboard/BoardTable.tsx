@@ -75,6 +75,7 @@ interface Props {
   entries: BoardEntry[];
   cutState: CutState;
   currentRound?: number | null;
+  onRowClick?: (entry: BoardEntry) => void;
 }
 
 function houseColor(score: number | null | undefined): string {
