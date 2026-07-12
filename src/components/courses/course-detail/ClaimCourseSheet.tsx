@@ -258,7 +258,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
           </div>
 
           {errorMessage && (
-            <p style={{ fontSize: 13, color: '#DC2626', marginBottom: 10, textAlign: 'center' }}>
+            <p style={{ fontSize: 13, color: '#DC2626', marginBottom: 12, textAlign: 'center' }}>
               {errorMessage}
             </p>
           )}
