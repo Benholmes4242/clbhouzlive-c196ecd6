@@ -1,0 +1,47 @@
+/**
+ * BusinessSocialListRoute — prod route host for business social lists (F3).
+ *
+ * Resolves :idOrSlug via useBusinessProfile (the same hook the legacy
+ * BusinessFollowersPage used) and mounts SocialListPage with the business
+ * actor. For business context, friend_status is NULL so PENDING/FRIENDS
+ * sections naturally do not populate; EVERYONE + mutual context still work.
+ */
+
+import { useParams } from 'react-router-dom';
+import { useBusinessProfile } from '@/hooks/useBusinessProfile';
+import SocialListPage from './SocialListPage';
+
+interface Props {
+  direction: 'followers' | 'following';
+}
+
+export default function BusinessSocialListRoute({ direction }: Props) {
+  const { idOrSlug } = useParams<{ idOrSlug: string }>();
+  const { data: business, isLoading } = useBusinessProfile(idOrSlug);
+
+  if (isLoading) {
+    return (
+      <div style={{ minHeight: '100dvh', background: '#F8FAFC', padding: '80px 16px', color: '#64748B', fontSize: 13 }}>
+        Loading…
+      </div>
+    );
+  }
+
+  if (!business) {
+    return (
+      <div style={{ minHeight: '100dvh', background: '#F8FAFC', padding: '80px 16px', color: '#64748B', fontSize: 13 }}>
+        Business not found.
+      </div>
+    );
+  }
+
+  return (
+    <SocialListPage
+      profileActorType="business"
+      profileActorId={business.id}
+      profileUsername={business.slug ?? null}
+      profileDisplayName={business.name ?? null}
+      initialTab={direction}
+    />
+  );
+}
