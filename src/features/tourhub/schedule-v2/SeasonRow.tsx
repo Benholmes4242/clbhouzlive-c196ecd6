@@ -335,7 +335,6 @@ const ChampionStrip: React.FC<{
       size={16}
       srcCandidates={photoCandidates}
       alt={name}
-      name={name}
     />
     <span
       style={{
@@ -396,7 +395,7 @@ const LeaderStrip: React.FC<{
       size={16}
       srcCandidates={photoCandidates}
       alt={name}
-      name={name}
+      
     />
     <span
       style={{
