@@ -136,7 +136,7 @@ export function PodiumCards({ rows, statLabel }: Props) {
         display: 'flex',
         alignItems: 'stretch',
         gap: 8,
-        padding: '0 16px 14px',
+        padding: '0 16px 12px',
       }}
     >
       <PodiumCard row={second} size={38} center={false} statLabel={statLabel} onClick={() => go(second.playerId)} />
