@@ -29,7 +29,7 @@ export default function PostSuccessV2({ result, onDone }: Props) {
 
   return (
     <div style={{ flex: 1, background: '#F8FAFC', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14, padding: '0 24px', textAlign: 'center' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '0 24px', textAlign: 'center' }}>
         <div style={{ width: 64, height: 64, background: '#15171F', borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {isScheduled
             ? <Clock size={28} color="#F5F6F7" strokeWidth={2.5} />
