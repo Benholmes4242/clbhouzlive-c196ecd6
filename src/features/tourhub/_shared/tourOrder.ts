@@ -38,11 +38,14 @@ export function shortTournamentToken(name: string): string {
 /** Normalise a raw `tour_name` string from the DB into a canonical TourId. */
 export function mapTourSlug(tourName: string | null | undefined): TourId {
   const normalized = (tourName ?? '').toLowerCase().trim();
-  if (normalized === 'pga' || normalized === 'pga tour') return 'pga';
-  if (normalized === 'euro' || normalized === 'dp world' || normalized === 'european tour') return 'euro';
-  if (normalized === 'lpga' || normalized === 'lpga tour') return 'lpga';
-  if (normalized === 'liv' || normalized === 'liv golf') return 'liv';
-  if (normalized === 'pgad' || normalized === 'korn ferry') return 'pgad';
-  if (normalized === 'champ' || normalized === 'champions') return 'champ';
+  // Inclusion-based matching so multi-word DB strings map cleanly.
+  // Order matters: 'pga tour champions' must resolve to 'champ', not 'pga',
+  // so the pga branch is the LAST specific check before the fallback.
+  if (normalized.includes('dp world') || normalized.includes('european tour') || normalized === 'euro') return 'euro';
+  if (normalized.includes('korn ferry') || normalized === 'pgad') return 'pgad';
+  if (normalized.includes('liv')) return 'liv';
+  if (normalized.includes('champions') || normalized === 'champ') return 'champ';
+  if (normalized.includes('lpga')) return 'lpga';
+  if (normalized.includes('pga')) return 'pga';
   return 'pga';
 }
