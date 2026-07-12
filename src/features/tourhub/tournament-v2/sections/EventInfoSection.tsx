@@ -3,6 +3,9 @@
  * (never self-hides) since Dates + Venue always exist. Individual
  * rows omit only when their field is null. Overview grammar: eyebrow
  * + hairline rows on canvas.
+ *
+ * Live events with tee-time coverage gain a tappable row that opens
+ * the full tee-times sheet (Brief F-TD-4).
  */
 import { format, isSameMonth } from 'date-fns';
 import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
@@ -13,6 +16,8 @@ import { FONT, INK, INK_MUTE, INK_FAINT, HAIRLINE_INK_8, SURFACE } from '../../_
 interface Props {
   meta: TournamentMeta;
   broadcast?: string | null;
+  onTeeTimesTap?: (() => void) | null;
+  teeTimesRound?: number | null;
 }
 
 function fmtRange(start: string | null, end: string | null): string | null {
@@ -24,7 +29,7 @@ function fmtRange(start: string | null, end: string | null): string | null {
   return `${format(s, 'MMM d')} – ${format(e, 'MMM d, yyyy')}`;
 }
 
-export function EventInfoSection({ meta, broadcast }: Props) {
+export function EventInfoSection({ meta, broadcast, onTeeTimesTap, teeTimesRound }: Props) {
   const rows: Array<[string, string]> = [];
 
   const dates = fmtRange(meta.start_date, meta.end_date);
@@ -45,6 +50,8 @@ export function EventInfoSection({ meta, broadcast }: Props) {
   if (meta.purse != null) rows.push(['Purse', formatPurse(meta.purse)]);
   if (meta.defending_champion) rows.push(['Defending', meta.defending_champion]);
   if (broadcast) rows.push(['TV', broadcast]);
+
+  const showTeeTimes = !!onTeeTimesTap && teeTimesRound != null;
 
   return (
     <section style={{ fontFamily: FONT }}>
@@ -81,7 +88,46 @@ export function EventInfoSection({ meta, broadcast }: Props) {
             </div>
           </div>
         ))}
+
+        {showTeeTimes && (
+          <button
+            type="button"
+            onClick={onTeeTimesTap}
+            className="active:bg-slate-100 transition-colors"
+            style={{
+              display: 'flex', alignItems: 'baseline', gap: 12,
+              width: '100%',
+              padding: '11px 16px',
+              borderTop: rows.length === 0 ? `0.5px solid ${HAIRLINE_INK_8}` : 'none',
+              borderBottom: `0.5px solid ${HAIRLINE_INK_8}`,
+              background: 'transparent',
+              borderLeft: 'none', borderRight: 'none',
+              cursor: 'pointer', textAlign: 'left',
+            }}
+          >
+            <div
+              style={{
+                width: 104, flexShrink: 0,
+                fontSize: 9, fontWeight: 800, color: INK_FAINT,
+                letterSpacing: '0.14em', textTransform: 'uppercase',
+              }}
+            >
+              Tee times
+            </div>
+            <div
+              style={{
+                flex: 1, minWidth: 0,
+                fontSize: 13, fontWeight: 700, color: INK,
+                lineHeight: 1.4,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              Round {teeTimesRound} <span style={{ color: INK }}>›</span>
+            </div>
+          </button>
+        )}
       </div>
     </section>
   );
 }
+
