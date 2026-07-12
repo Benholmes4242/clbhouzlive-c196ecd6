@@ -51,12 +51,21 @@ export function FeedCard({
   posts,
   flatIndex,
   isAutoplayActive,
+  hideCourseAttribution = false,
 }: {
   row: FeedCardRow;
   feedPost: FeedPost;
   posts: FeedPost[];
   flatIndex: number;
   isAutoplayActive: boolean;
+  /**
+   * When true, the course-name element does not render — the title falls
+   * through to caption or the format-based fallback (Clip / Video). The
+   * page is expected to already communicate the course (e.g. the course
+   * detail Media tab IS the course). Default false — three existing
+   * consumers (HubMixedGrid, ClipsWall, ExploreGrid) are pixel-unchanged.
+   */
+  hideCourseAttribution?: boolean;
 }) {
   const rootRef = useRef<HTMLElement>(null);
   const isClip = row.derived_format === 'clip';
@@ -66,11 +75,13 @@ export function FeedCard({
   const stripped = row.post_content
     ? stripMentionMarkup(String(row.post_content)).trim()
     : '';
+  const courseTitle = hideCourseAttribution ? '' : (row.course_name?.trim() ?? '');
   const title =
     stripped ||
-    row.course_name?.trim() ||
+    courseTitle ||
     (isClip ? 'Clip' : 'Video');
   const duration = formatDuration(row.duration_seconds);
+
 
   const hlsUrl = feedPost.mediaItems[0]?.hlsUrl ?? null;
   const isVideo = !!hlsUrl;
