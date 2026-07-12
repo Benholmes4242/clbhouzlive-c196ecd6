@@ -4,7 +4,7 @@ import { Search, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { TourHubShell } from '../components';
-import { TourHubShellTabs } from '../components/TourHubShellTabs';
+
 import { ShellSlot } from '@/components/header/ShellSlot';
 import { CollegeShellRow } from '../components/shell/CollegeShellRow';
 import { FranchiseLeaderboard } from '../components/college';
