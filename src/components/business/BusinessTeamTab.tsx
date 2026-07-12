@@ -27,7 +27,7 @@ export const BusinessTeamTab: React.FC<BusinessTeamTabProps> = ({ businessId }) 
 
   if (isLoading) {
     return (
-      <div className="px-1 pt-2">
+      <div className="px-0 pt-2">
         {[0, 1, 2].map(i => (
           <div key={i} className="flex items-center gap-3 py-3">
             <div className="w-11 h-11 rounded-[34%] animate-pulse" style={{ background: 'rgba(15,23,42,0.06)' }} />
@@ -44,7 +44,7 @@ export const BusinessTeamTab: React.FC<BusinessTeamTabProps> = ({ businessId }) 
   if (publicMembers.length === 0) return null;
 
   return (
-    <div className="px-1 pt-2 pb-6">
+    <div className="px-0 pt-2 pb-6">
       {publicMembers.map((m) => {
         const name = m.user_profile?.display_name || m.user_profile?.username || 'Team member';
         const key = m.user_profile?.username || m.user_profile?.id || m.user_profile_id;

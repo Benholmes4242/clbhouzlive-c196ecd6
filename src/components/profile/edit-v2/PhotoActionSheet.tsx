@@ -25,8 +25,8 @@ function RowBtn({
         width: '100%',
         display: 'flex',
         alignItems: 'center',
-        gap: 14,
-        padding: '14px 18px',
+        gap: 12,
+        padding: '12px 16px',
         background: 'transparent',
         border: 'none',
         cursor: 'pointer',
@@ -59,7 +59,7 @@ export function PhotoActionSheet({
             fontSize: 12,
             fontWeight: 600,
             color: INK_45,
-            padding: '4px 0 10px',
+            padding: '4px 0 12px',
             letterSpacing: '-0.005em',
           }}
         >
@@ -85,7 +85,7 @@ export function PhotoActionSheet({
             display: 'block',
             width: 'calc(100% - 32px)',
             margin: '0 16px',
-            padding: '14px 0',
+            padding: '12px 0',
             background: FIELD_FILL,
             border: `1px solid ${HAIR}`,
             borderRadius: 12,

@@ -35,7 +35,7 @@ function SectionDivider() {
 /* ── Facilities chips ── */
 function FacilitiesSection({ amenities }: { amenities: string[] }) {
   return (
-    <section className="px-6 py-5">
+    <section className="px-4 py-4">
       <SectionKicker>Facilities</SectionKicker>
       <div className="flex flex-wrap gap-2">
         {amenities.map((a) => (
@@ -114,7 +114,7 @@ function OpeningHoursSection({
 }) {
   const openNow = isOpenNow(hours);
   return (
-    <section className="px-6 py-5">
+    <section className="px-4 py-4">
       <SectionKicker>Opening hours</SectionKicker>
       {openNow && (
         <div
@@ -219,7 +219,7 @@ export function BusinessProfileInfo({ business, userId }: BusinessProfileInfoPro
   const hasSocials = socials.length > 0;
 
   return (
-    <div className="-mx-5 px-0 pb-24 bg-background">
+    <div className="-mx-4 px-0 pb-24 bg-background">
       {hasAmenities && (
         <>
           <FacilitiesSection amenities={amenities} />
@@ -229,7 +229,7 @@ export function BusinessProfileInfo({ business, userId }: BusinessProfileInfoPro
 
       {hasContact && (
         <>
-          <section className="px-6 py-5">
+          <section className="px-4 py-4">
             <SectionKicker>Contact</SectionKicker>
             <div className="flex flex-col [&>*+*]:border-t" style={{ ['--tw-border-opacity' as any]: 1 }}>
               {business.website && (
@@ -262,7 +262,7 @@ export function BusinessProfileInfo({ business, userId }: BusinessProfileInfoPro
 
       {shortLocation && (
         <>
-          <section className="px-6 py-5">
+          <section className="px-4 py-4">
             <SectionKicker>Location</SectionKicker>
             <div className="flex items-start gap-3">
               <MapPin className="h-4 w-4 mt-0.5 shrink-0" style={{ color: INK_45 }} />
@@ -285,7 +285,7 @@ export function BusinessProfileInfo({ business, userId }: BusinessProfileInfoPro
       )}
 
       {hasSocials && (
-        <section className="px-6 py-5">
+        <section className="px-4 py-4">
           <SectionKicker>Follow us</SectionKicker>
           <div className="flex items-center gap-2 flex-wrap">
             {socials.map(({ key, Icon, label }) => (
