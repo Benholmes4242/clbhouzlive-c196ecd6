@@ -31,7 +31,8 @@ export function useTournamentTeeTimes(tournamentId: string | null | undefined, e
         .from('sr_tee_times')
         .select(`
           tee_time,
-          starting_hole,
+          tee_number,
+          back_nine,
           players:sr_tee_time_players(
             player:sr_players(full_name, first_name, last_name)
           )
@@ -56,9 +57,10 @@ export function useTournamentTeeTimes(tournamentId: string | null | undefined, e
               return pl.full_name || `${pl.first_name ?? ''} ${pl.last_name ?? ''}`.trim();
             })
             .filter(Boolean);
+          const start = row.back_nine ? 10 : (row.tee_number ?? 1);
           return {
             time,
-            holeStart: row.starting_hole === 10 ? 'TEE 10' : 'TEE 1',
+            holeStart: start === 10 ? 'TEE 10' : 'TEE 1',
             players,
             isMarquee: false,
           };
