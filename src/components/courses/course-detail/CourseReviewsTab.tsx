@@ -407,9 +407,9 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   if (isLoading) {
     return (
-      <div style={{ background: SLATE_50, minHeight: '100%', paddingBottom: 40 }}>
+      <div style={{ background: SLATE_50, minHeight: '100%', paddingBottom: 32 }}>
         {/* Distribution card skeleton */}
-        <div style={{ padding: '14px 16px 12px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ padding: '16px 16px 12px', display: 'flex', flexDirection: 'column', gap: 12 }}>
           <Skeleton className="h-[128px] w-full rounded-[16px]" />
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <Skeleton className="h-[34px] w-[34px] rounded-full" />
@@ -422,8 +422,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         <Divider />
         {/* Review row skeletons */}
         {[1, 2, 3].map((i) => (
-          <div key={i} style={{ padding: '14px 16px 16px', borderBottom: `0.5px solid ${INK_TINT_06}` }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 10 }}>
+          <div key={i} style={{ padding: '12px 16px 16px', borderBottom: `0.5px solid ${INK_TINT_06}` }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 12 }}>
               <Skeleton className="w-10 h-10 rounded-[10px]" />
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
                 <Skeleton className="h-3.5 w-28" />
@@ -467,23 +467,23 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   // Empty state
   if (!hasRatings) {
     return (
-      <div style={{ paddingBottom: 40 }}>
+      <div style={{ paddingBottom: 32 }}>
         {/* Hero */}
-        <div style={{ padding: '40px 24px 28px', textAlign: 'center' }}>
+        <div style={{ padding: '40px 24px 0', textAlign: 'center' }}>
           <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(247,147,30,0.07)', border: '1.5px solid rgba(247,147,30,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
             <MessageSquarePlus size={26} strokeWidth={2} color={AMBER} />
           </div>
           <div style={{ fontSize: 19, fontWeight: 900, color: INK, letterSpacing: '-0.03em', marginBottom: 6 }}>No reviews yet</div>
-          <p style={{ fontSize: 13, color: INK_FAINT, lineHeight: 1.6, maxWidth: 260, margin: '0 auto 22px' }}>
+          <p style={{ fontSize: 13, color: INK_FAINT, lineHeight: 1.6, maxWidth: 260, margin: '0 auto 24px' }}>
             Be the first to share your experience at {courseName}.
           </p>
           <PrimaryAmberCTA onClick={handleRateClick}>
             Write the first review
           </PrimaryAmberCTA>
         </div>
-        <div style={{ margin: '0 16px' }}><Divider /></div>
+        <div style={{ margin: '16px' }}><Divider /></div>
         {/* What to include guide */}
-        <div style={{ padding: '20px 0 0' }}>
+        <div style={{ padding: 0 }}>
           <EmptyStateGuide
             kicker="WHAT TO INCLUDE"
             items={[
@@ -508,13 +508,13 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   return (
     <PullToRefreshContainer onRefresh={handlePullToRefresh}>
-    <div style={{ paddingBottom: 40, background: SLATE_50, minHeight: '100%' }}>
+    <div style={{ paddingBottom: 32, background: SLATE_50, minHeight: '100%' }}>
       {(() => {
         const isExceptional = getScoreTier(communityScore).isExceptional;
         const tierColor = ratingTextColor(communityScore);
         const maxTierCount = Math.max(...TIER_ROWS.map(t => reviewCountsByTier[t.key] ?? 0), 1);
         return (
-          <div style={{ padding: '14px 16px 12px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ padding: '16px 16px 12px', display: 'flex', flexDirection: 'column', gap: 12 }}>
             {/* Distribution card */}
             <div
               style={{
@@ -524,7 +524,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                 padding: '16px 16px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: 18,
+                gap: 16,
               }}
             >
               {/* Score block */}
@@ -646,7 +646,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
       {/* Your review — pinned first */}
       {filteredMyReview && (
-        <div style={{ padding: '6px 16px 0', borderBottom: `0.5px solid ${INK_TINT_06}` }}>
+        <div style={{ padding: '8px 16px 0', borderBottom: `0.5px solid ${INK_TINT_06}` }}>
           <ReviewBlockFlat
             onReportClick={() => setReportingReview(filteredMyReview)}
             review={transformReview(filteredMyReview, isJustSubmittedOrUpdated)}
@@ -663,7 +663,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           />
           {(() => {
             const response = reviewResponses?.find(r => r.review_id === filteredMyReview.id);
-            if (response) return <div style={{ paddingBottom: 14 }}><ResponseDisplay response={response} courseId={courseId} viewerClaim={businessClaim} /></div>;
+            if (response) return <div style={{ paddingBottom: 12 }}><ResponseDisplay response={response} courseId={courseId} viewerClaim={businessClaim} /></div>;
             return null;
           })()}
         </div>
@@ -671,7 +671,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
       {/* Write prompt if no review */}
       {!myReview && (
-        <div style={{ padding: '14px 16px', borderBottom: `0.5px solid ${INK_TINT_06}` }}>
+        <div style={{ padding: '12px 16px', borderBottom: `0.5px solid ${INK_TINT_06}` }}>
           <button
             type="button"
             onClick={handleRateClick}

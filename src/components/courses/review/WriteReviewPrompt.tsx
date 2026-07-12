@@ -13,7 +13,7 @@ export const WriteReviewPrompt: React.FC<WriteReviewPromptProps> = ({
 }) => {
   return (
     <div
-      className="flex items-center gap-3.5 p-4 rounded-2xl"
+      className="flex items-center gap-3 p-4 rounded-2xl"
       style={{
         background: 'linear-gradient(135deg, rgba(247,147,30,0.06), rgba(247,147,30,0.02))',
         border: '1.5px solid rgba(247,147,30,0.15)',

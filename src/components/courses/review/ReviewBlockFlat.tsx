@@ -144,7 +144,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
     <article
       data-review-id={review.id}
       className={cn('transition-all', isHighlighted && 'animate-soft-pulse')}
-      style={{ padding: '14px 0 16px' }}
+      style={{ padding: '12px 0 16px' }}
     >
       {/* "YOUR REVIEW" section header + Edit (only for own review) */}
       {isMine && (
@@ -152,12 +152,12 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
           role="section"
           kicker="YOUR REVIEW"
           action={onEditClick ? { label: 'Edit', onClick: onEditClick } : undefined}
-          className="mb-[10px]"
+          className="mb-3"
         />
       )}
 
       {/* Header row */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 10 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 12 }}>
         {onUserClick ? (
           <button
             type="button"
@@ -244,7 +244,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
 
       {/* Sub-scores chips */}
       {subscores.length > 0 && (
-        <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 6, marginBottom: 12, flexWrap: 'wrap' }}>
           {subscores.map((s) => (
             <div
               key={s.label}
@@ -296,7 +296,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
                 fontWeight: 600,
                 cursor: 'pointer',
                 padding: 0,
-                marginBottom: 10,
+                marginBottom: 12,
               }}
             >
               {showFull ? 'Show less ↑' : 'Read more ↓'}
@@ -307,7 +307,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
 
       {/* Media */}
       {media && media.length > 0 && onMediaClick && (
-        <div style={{ marginTop: 4, marginBottom: 10 }}>
+        <div style={{ marginBottom: 12 }}>
           <ReviewMediaStrip media={media} onMediaClick={onMediaClick} variant="compact" />
         </div>
       )}
