@@ -79,7 +79,7 @@ function SheetSkeleton() {
         {block(58, { flex: 1 })}
       </div>
       {/* nav group */}
-      {block(168, { margin: '14px 20px 0' })}
+      {block(168, { margin: '12px 20px 0' })}
     </div>
   );
 }
