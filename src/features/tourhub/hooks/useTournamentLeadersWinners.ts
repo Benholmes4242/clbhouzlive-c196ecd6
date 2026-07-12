@@ -61,9 +61,9 @@ function formatDisplayName(firstName: string | null, lastName: string | null): s
 
 export function useTournamentLeadersWinners(tournamentIds: string[]) {
   return useQuery({
-    queryKey: ['tourhub', 'tournament-leaders-winners-v2', tournamentIds.sort().join(',')],
-    queryFn: async (): Promise<Map<string, TournamentLeaderWinner>> => {
-      if (tournamentIds.length === 0) return new Map();
+    queryKey: ['tourhub', 'tournament-leaders-winners-v3', tournamentIds.sort().join(',')],
+    queryFn: async (): Promise<Record<string, TournamentLeaderWinner>> => {
+      if (tournamentIds.length === 0) return {};
 
       const { data, error } = await supabase
         .from('sr_leaderboards')
