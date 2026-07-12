@@ -12,7 +12,8 @@ import type { EventState } from '../data/useTourEventContext';
 import type { AITopContender } from '../../hooks/useAIPredictions';
 import { usePickLiveState, type PickLiveState } from '../data/usePickLiveState';
 import { PlayerAvatar } from '../../components/PlayerAvatar';
-import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 
 interface Props {
   tournamentId: string | undefined;
@@ -106,34 +107,46 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
               padding: 13,
               display: 'flex',
               flexDirection: 'column',
-              gap: 10,
+              gap: 0,
               cursor: 'pointer',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-              <span style={{ fontSize: 9, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                Pick {p.rank}
-              </span>
-              <CardStateValue state={state} pick={p} live={liveMap?.get(p.playerId)} />
-            </div>
-
-            <div
-              role="link"
-              onClick={(e) => { e.stopPropagation(); goToPlayer(p.playerId); }}
-              style={{ display: 'flex', alignItems: 'center', gap: 11, cursor: 'pointer' }}
-            >
-              <PlayerAvatar playerId={p.playerId} playerName={p.playerName} tourCode={tourCode} photoUrl={p.photoUrl} size="md" ringColor={LIGHT_HAIRLINE} />
-              <div style={{ flex: 1, minWidth: 0, fontSize: 13.5, fontWeight: 800, color: V4.ink, letterSpacing: '-0.015em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {p.playerName}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+              <div
+                role="link"
+                onClick={(e) => { e.stopPropagation(); goToPlayer(p.playerId); }}
+                style={{ display: 'flex', alignItems: 'center', gap: 9, cursor: 'pointer', flex: 1, minWidth: 0 }}
+              >
+                <SquircleAvatar
+                  size={34}
+                  srcCandidates={p.photoUrl ? [p.photoUrl, ...getPlayerHeadshotCandidates(p.playerName, tourCode)] : getPlayerHeadshotCandidates(p.playerName, tourCode)}
+                  alt={p.playerName}
+                  userId={p.playerId}
+                  hairlineRing
+                  ringColor={LIGHT_HAIRLINE}
+                />
+                <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  <div style={{ fontSize: 13.5, fontWeight: 800, color: V4.ink, letterSpacing: '-0.015em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.2 }}>
+                    {p.playerName}
+                  </div>
+                  <div style={{ marginTop: 2, fontSize: 11.5, fontWeight: 800, lineHeight: 1.2 }}>
+                    <InlineStateValue state={state} pick={p} live={liveMap?.get(p.playerId)} />
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div style={{ fontSize: 11.5, color: V4.inkSoft, lineHeight: 1.45, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+            <div style={{ fontSize: 11.5, color: V4.inkSoft, lineHeight: 1.45, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', margin: '8px 0' }}>
               {p.pulledQuote || p.reasons?.[0] || '—'}
             </div>
 
-            <div style={{ marginTop: 'auto', fontSize: 10, fontWeight: 800, color: V4.amber, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-              The case ›
+            <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: 10, fontWeight: 800, color: V4.amber, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                The case ›
+              </span>
+              <span style={{ fontSize: 9, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                Pick {p.rank}
+              </span>
             </div>
           </button>
         ))}
@@ -165,12 +178,13 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
   );
 }
 
-function CardStateValue({ state, pick, live }: { state: EventState; pick: AITopContender; live: PickLiveState | undefined }) {
+function InlineStateValue({ state, pick, live }: { state: EventState; pick: AITopContender; live: PickLiveState | undefined }) {
   if (state === 'upcoming') {
     const pct = Math.round((pick.winProbability ?? 0) * 100);
     return (
-      <span style={{ fontSize: 13, fontWeight: 800, color: V4.ink, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.01em' }}>
-        {pct}%
+      <span style={{ fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.01em' }}>
+        <span style={{ color: V4.ink }}>{pct}%</span>
+        <span style={{ color: V4.inkFaint }}> win prob</span>
       </span>
     );
   }
@@ -178,8 +192,9 @@ function CardStateValue({ state, pick, live }: { state: EventState; pick: AITopC
     if (!live || live.position == null) {
       const pct = Math.round((pick.winProbability ?? 0) * 100);
       return (
-        <span style={{ fontSize: 13, fontWeight: 800, color: V4.ink, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.01em' }}>
-          {pct}%
+        <span style={{ fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.01em' }}>
+          <span style={{ color: V4.ink }}>{pct}%</span>
+          <span style={{ color: V4.inkFaint }}> win prob</span>
         </span>
       );
     }
@@ -187,10 +202,10 @@ function CardStateValue({ state, pick, live }: { state: EventState; pick: AITopC
     const todayText = live.today != null ? formatScore(live.today) : formatScore(live.score);
     const todayCol = scoreColor(live.today ?? live.score);
     return (
-      <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 5 }}>
-        <span style={{ fontSize: 13, color: V4.inkFaint, fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>{pos}</span>
-        <span style={{ fontSize: 11, color: V4.inkFaint, fontWeight: 700 }}>·</span>
-        <span style={{ fontSize: 13, color: todayCol, fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>{todayText}</span>
+      <span style={{ fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.01em' }}>
+        <span style={{ color: V4.inkFaint }}>{pos}</span>
+        <span style={{ color: V4.inkFaint, margin: '0 4px' }}>·</span>
+        <span style={{ color: todayCol }}>{todayText}</span>
       </span>
     );
   }
@@ -198,14 +213,15 @@ function CardStateValue({ state, pick, live }: { state: EventState; pick: AITopC
   return (
     <span
       style={{
-        display: 'inline-block',
-        padding: '3px 8px',
-        borderRadius: 6,
+        display: 'inline-flex',
+        alignItems: 'center',
+        padding: '2px 6px',
+        borderRadius: 5,
         background: v.hit ? V4.hitBg : V4.missBg,
         color: v.hit ? V4.hitFg : V4.missFg,
-        fontSize: 9.5,
+        fontSize: 9,
         fontWeight: 800,
-        letterSpacing: '0.14em',
+        letterSpacing: '0.12em',
         textTransform: 'uppercase',
       }}
     >
