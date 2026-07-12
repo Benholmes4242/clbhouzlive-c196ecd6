@@ -70,12 +70,12 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
         }}
       >
         {/* Drag handle */}
-        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 10, paddingBottom: 4 }}>
+        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8, paddingBottom: 4 }}>
           <div style={{ width: 36, height: 4, borderRadius: 2, background: HAIRLINE_INK_12 }} />
         </div>
 
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 16px 10px', borderBottom: `0.5px solid ${HAIRLINE_INK_7}` }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px 12px', borderBottom: `0.5px solid ${HAIRLINE_INK_7}` }}>
           <div>
             <SectionHeader tier="standard" kicker="Rate a Course" tone="amber" className="mb-0.5" />
             <p style={{ fontSize: 12, color: INK_MUTE, margin: 0 }}>Search any course you've played</p>
@@ -86,7 +86,7 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
         </div>
 
         {/* Search input */}
-        <div style={{ padding: '0 16px 10px', position: 'relative' }}>
+        <div style={{ padding: '0 16px 12px', position: 'relative' }}>
           <Search size={15} style={{ position: 'absolute', left: 28, top: 11, color: 'hsl(var(--muted-foreground))' }} />
           <input
             type="text"
@@ -113,11 +113,11 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
               <p style={{ fontSize: 13, margin: 0 }}>Type a course name to get started</p>
             </div>
           ) : isLoading ? (
-            <div style={{ padding: '24px 16px', textAlign: 'center', color: 'hsl(var(--muted-foreground))' }}>
+            <div style={{ padding: '32px 16px', textAlign: 'center', color: 'hsl(var(--muted-foreground))' }}>
               <p style={{ fontSize: 13, margin: 0 }}>Searching…</p>
             </div>
           ) : results.length === 0 ? (
-            <div style={{ padding: '24px 16px', textAlign: 'center', color: 'hsl(var(--muted-foreground))' }}>
+            <div style={{ padding: '32px 16px', textAlign: 'center', color: 'hsl(var(--muted-foreground))' }}>
               <p style={{ fontSize: 13, margin: 0 }}>No courses found for "{query}"</p>
             </div>
           ) : (
@@ -127,7 +127,7 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
                 onClick={() => { onClose(); navigate(`/courses/${course.id}/rate`); }}
                 style={{
                   width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  padding: '13px 16px',
+                  padding: '12px 16px',
                   borderBottom: i < results.length - 1 ? `0.5px solid ${HAIRLINE_INK_7}` : 'none',
                   background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left',
                 }}
@@ -312,7 +312,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
           <div
             className="sticky bg-[#F8FAFC]"
             style={{
-              top: 'calc(var(--header-h, 55px) + var(--sat, 0px))',
+              top: 'calc(var(--header-h, 55px) + var(--sat, 0px) - 1px)',
               zIndex: 30,
               borderBottom: '0.5px solid rgba(15,23,42,0.07)',
             }}
