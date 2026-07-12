@@ -82,6 +82,9 @@ const ClubhouseContent = () => {
   }, []);
 
   useHeaderVariant('solid-light');
+  // NOTE: useHeaderVariant('solid-light') targets the legacy GlobalHeader
+  // (CompactHeader) variant + status-bar coordination. Left in place —
+  // ChromeIsland ignores it, but other consumers still read the variant.
   // Chrome (shield + status bar) owned solely by AppRoutes. Do not write here.
 
   
