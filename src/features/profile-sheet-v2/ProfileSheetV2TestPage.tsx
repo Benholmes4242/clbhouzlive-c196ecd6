@@ -24,6 +24,22 @@ export default function ProfileSheetV2TestPage() {
   const { activeActor, setActiveActor, availableActors } = useActiveActor();
 
   const email = user?.email || '';
+
+  // Mirror PostingAsMenu admin derivation.
+  const { data: adminStatus } = useQuery({
+    queryKey: ['adminStatus', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return { isAdmin: false, isLimitedAdmin: false };
+      const { data: isAdmin } = await supabase.rpc('is_admin');
+      const { data: isLimitedAdmin } = await supabase.rpc('has_role', {
+        _user_id: user.id,
+        _role: 'limited_admin',
+      });
+      return { isAdmin: isAdmin || false, isLimitedAdmin: isLimitedAdmin || false };
+    },
+    enabled: !!user?.id,
+  });
+  const hasAdminAccess = !!(adminStatus?.isAdmin || adminStatus?.isLimitedAdmin);
   const displayName = userProfile?.display_name || user?.user_metadata?.full_name || 'User';
 
   const profiles = availableActors.map((a) => ({
