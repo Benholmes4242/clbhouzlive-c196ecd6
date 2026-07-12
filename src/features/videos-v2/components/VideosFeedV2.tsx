@@ -114,11 +114,13 @@ export function VideosFeedV2({ sort, category }: Props) {
 
   const feedPosts = useMemo(() => toFeedPosts(rows), [rows]);
 
-  // Autoplay across the feed container. maxActive:1 per brief.
+  // Autoplay across the feed container. maxActive:2 - tall full-width cards
+  // mean ~1 per viewport; a second slot lets the entering card start playing
+  // at the bottom edge instead of waiting to out-rank the exiting incumbent.
   const { activeIndices, railRef } = useWatchAutoplay({
     railId: 'videos-v2-feed',
     posts: feedPosts,
-    maxActive: 1,
+    maxActive: 2,
   });
 
   // Pending uploads (video-kind only) — same semantics as VideosFullFeed.
