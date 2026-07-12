@@ -199,7 +199,7 @@ function StateStrip({ state, pick, live }: { state: EventState; pick: AITopConte
     const thruText = formatThru(live.thru);
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ fontSize: 12, color: V4.goldMid, ...NUMERAL_THIN }}>{pos}</span>
+        <span style={{ fontSize: 12, color: V4.inkFaint, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{pos}</span>
         <span style={{ fontSize: 11, color: todayCol, fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>{todayText}</span>
         {thruText ? (
           <span style={{ marginLeft: 'auto', fontSize: 10.5, color: V4.inkFaint, fontVariantNumeric: 'tabular-nums' }}>{thruText}</span>
