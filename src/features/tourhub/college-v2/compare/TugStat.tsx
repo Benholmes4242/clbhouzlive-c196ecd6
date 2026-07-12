@@ -54,7 +54,7 @@ function TugStatInner({ label, leftValue, rightValue, format }: Props) {
   const rightColor = bothZero ? INK : rightWinning ? GOLD : INK;
 
   return (
-    <div style={{ padding: '14px 16px 12px', fontFamily: FONT }}>
+    <div style={{ padding: '12px 16px 12px', fontFamily: FONT }}>
       <div
         style={{
           display: 'grid',

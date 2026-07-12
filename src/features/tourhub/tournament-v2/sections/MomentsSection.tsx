@@ -100,7 +100,7 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
       </div>
       <BottomSheet open={open} onClose={() => setOpen(false)} variant="light" surfaceColor={SLATE_50}>
         <div style={{ background: SLATE_50, fontFamily: FONT, maxHeight: 'calc(90vh - 24px)', display: 'flex', flexDirection: 'column' }}>
-          <div style={{ padding: '4px 18px 12px' }}>
+          <div style={{ padding: '4px 16px 12px' }}>
             <div style={{ fontSize: 9, fontWeight: 800, color: INK, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
               All Moments
             </div>
@@ -113,7 +113,7 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
                   key={m.id}
                   style={{
                     display: 'flex', alignItems: 'flex-start', gap: 10,
-                    padding: '11px 18px',
+                    padding: '12px 16px',
                     borderBottom: i === list.length - 1 ? 'none' : `0.5px solid ${HAIRLINE_INK_8}`,
                   }}
                 >
