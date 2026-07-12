@@ -87,7 +87,7 @@ export function OnTheCourse({ tournamentId, live }: Props) {
 
   return (
     <SectionShell eyebrow="On the course" rightMeta={round != null ? `R${round}` : undefined}>
-      <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 20px 6px', scrollSnapType: 'x mandatory' }}>
+      <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 16px 6px', scrollPaddingLeft: 16, scrollSnapType: 'x mandatory' }}>
         {groups.map((g, gi) => {
           const thru = groupThru(g);
           const time = g.tee_time ? new Date(g.tee_time).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toUpperCase() : '';

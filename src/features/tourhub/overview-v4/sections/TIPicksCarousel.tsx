@@ -17,14 +17,14 @@ interface Props {
 }
 
 export function TIPicksCarousel({ tournamentId, state }: Props) {
-  const { data } = useAIPredictions();
+  const { data } = useAIPredictions(tournamentId ?? null);
   const [open, setOpen] = useState<AITopContender | null>(null);
   const picks = data?.topContenders ?? [];
   if (!tournamentId || picks.length === 0) return null;
 
   return (
     <SectionShell eyebrow="Tournament intelligence" linkLabel="All picks" onLinkClick={() => setOpen(picks[0] ?? null)}>
-      <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 20px 10px', scrollSnapType: 'x mandatory' }}>
+      <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 16px 10px', scrollPaddingLeft: 16, scrollSnapType: 'x mandatory' }}>
         {picks.slice(0, 8).map((p) => (
           <button
             key={p.playerId}
