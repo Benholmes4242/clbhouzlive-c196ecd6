@@ -9,7 +9,7 @@ interface Props {
 
 export const HolesCredibilityHeader: React.FC<Props> = ({ totalRounds }) => {
   return (
-    <div style={{ padding: '20px 18px 18px', fontFamily: FONT }}>
+    <div style={{ padding: '16px 16px', fontFamily: FONT }}>
       <SectionHeader
         role="section"
         kicker="OFFICIAL HOLE DATA"
@@ -19,7 +19,7 @@ export const HolesCredibilityHeader: React.FC<Props> = ({ totalRounds }) => {
         style={{
           display: 'inline-flex',
           alignItems: 'center',
-          gap: 7,
+          gap: 8,
           marginTop: 2,
           padding: '7px 12px',
           borderRadius: 999,

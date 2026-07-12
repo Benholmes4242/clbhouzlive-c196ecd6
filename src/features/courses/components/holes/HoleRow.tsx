@@ -120,11 +120,11 @@ export const HoleRow: React.FC<Props> = ({ h, isHardest, isEasiest }) => {
   return (
     <div
       style={{
-        margin: '10px 14px 0',
+        margin: '12px 16px 0',
         background: '#ffffff',
         border: '1px solid rgba(15,23,42,0.07)',
         borderRadius: 14,
-        padding: '14px 14px 12px',
+        padding: '12px 14px',
         fontFamily: FONT,
         display: 'flex',
         flexDirection: 'column',
@@ -206,7 +206,7 @@ export const HoleRow: React.FC<Props> = ({ h, isHardest, isEasiest }) => {
             </div>
           )}
           {!expanded && (
-            <div style={{ marginTop: 7, display: 'flex', alignItems: 'center' }}>
+            <div style={{ marginTop: 8, display: 'flex', alignItems: 'center' }}>
               <HoleDistributionBar dist={h.dist} height={5} />
             </div>
           )}
@@ -252,7 +252,7 @@ export const HoleRow: React.FC<Props> = ({ h, isHardest, isEasiest }) => {
 
       {/* Expanded detail */}
       {expanded && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 2 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {/* Summary stats */}
           <div style={{ display: 'flex', gap: 8 }}>
             <Stat label="Sub-par" value={`${subPar.toFixed(1)}%`} color={SC_BIRDIE} />
@@ -361,8 +361,7 @@ export const HoleRow: React.FC<Props> = ({ h, isHardest, isEasiest }) => {
           {/* Footer */}
           <div
             style={{
-              marginTop: 2,
-              paddingTop: 10,
+              paddingTop: 12,
               borderTop: '1px solid rgba(15,23,42,0.06)',
               display: 'flex',
               alignItems: 'center',
