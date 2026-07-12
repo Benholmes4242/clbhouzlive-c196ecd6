@@ -480,20 +480,6 @@ export function CinematicHeroFullBleed({
   // ----- Shared eyebrow span -----
   const EyebrowSpan = (
     <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-      {isLive && (
-        <span
-          aria-hidden
-          className="hybrid-live-pulse"
-          style={{
-            width: 7,
-            height: 7,
-            borderRadius: '50%',
-            background: LEADER_GREEN,
-            boxShadow: '0 0 10px rgba(91,214,160,0.7)',
-            display: 'inline-block',
-          }}
-        />
-      )}
       <span
         style={{
           fontSize: 11,
@@ -505,7 +491,7 @@ export function CinematicHeroFullBleed({
       >
         {eyebrowText}
       </span>
-      {showMajorTag && (
+      {!isLive && showMajorTag && (
         <span
           aria-label="Major championship"
           style={{
