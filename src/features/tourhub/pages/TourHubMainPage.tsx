@@ -191,7 +191,6 @@ export function TourHubMainPage() {
         ) : (
           <>
             <ShellSlot>
-              <TourHubShellTabs />
               {renderShellRow()}
             </ShellSlot>
             <div style={{ paddingTop: 'calc(var(--chrome-total-h, 0px) - 1px)' }}>
