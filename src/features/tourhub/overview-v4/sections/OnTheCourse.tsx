@@ -17,6 +17,7 @@ interface GroupPlayerShape {
   full_name?: string;
   name?: string;
   photo_url?: string | null;
+  headshot_override?: string | null;
   score?: number | string | null;
   today?: number | string | null;
   thru?: number | null;
