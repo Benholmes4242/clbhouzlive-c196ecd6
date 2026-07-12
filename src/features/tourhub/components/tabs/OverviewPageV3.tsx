@@ -87,7 +87,6 @@ export function OverviewPageV3() {
             <LazySection minHeight={350}>
               <CollegeFranchise />
             </LazySection>
-            </LazySection>
           </div>
         </div>
         <ScrollToTopGlass />
