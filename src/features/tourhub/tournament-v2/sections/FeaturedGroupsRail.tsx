@@ -55,7 +55,7 @@ export function FeaturedGroupsRail({ tournamentId, live, tourCode }: Props) {
       <SectionEyebrow kicker="On the Course" />
       <div
         style={{
-          display: 'flex', gap: 10, overflowX: 'auto',
+          display: 'flex', gap: 12, overflowX: 'auto',
           padding: '0 16px 8px', scrollSnapType: 'x mandatory',
           fontFamily: FONT,
         }}
@@ -68,7 +68,7 @@ export function FeaturedGroupsRail({ tournamentId, live, tourCode }: Props) {
             style={{
               minWidth: 218, flexShrink: 0, scrollSnapAlign: 'start',
               background: SURFACE, border: `0.5px solid ${HAIRLINE_INK_8}`,
-              borderRadius: 12, padding: '10px 12px',
+              borderRadius: 12, padding: '12px',
             }}
           >
             <div

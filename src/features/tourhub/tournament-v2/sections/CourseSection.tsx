@@ -72,7 +72,7 @@ export function CourseSection({ tournamentId }: Props) {
   return (
     <>
       <SectionEyebrow kicker="The Course" actionLabel="All 18 holes" onAction={() => setOpen(true)} />
-      <div style={{ display: 'flex', gap: 10, padding: '0 16px 4px' }}>
+      <div style={{ display: 'flex', gap: 12, padding: '0 16px 4px' }}>
         <Card label="Hardest" h={hardest} />
         <Card label="Easiest" h={easiest} />
       </div>
@@ -84,17 +84,17 @@ export function CourseSection({ tournamentId }: Props) {
 function HolesSheet({ open, onClose, aggs }: { open: boolean; onClose: () => void; aggs: HoleAgg[] }) {
   return (
     <BottomSheet open={open} onClose={onClose} variant="light" surfaceColor={SLATE_50}>
-      <div style={{ background: SLATE_50, fontFamily: FONT, maxHeight: 'calc(90vh - 24px)', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ padding: '4px 18px 10px' }}>
-          <div style={{ fontSize: 9, fontWeight: 800, color: INK, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-            All 18 Holes
+        <div style={{ background: SLATE_50, fontFamily: FONT, maxHeight: 'calc(90vh - 24px)', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ padding: '4px 16px 10px' }}>
+            <div style={{ fontSize: 9, fontWeight: 800, color: INK, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+              All 18 Holes
+            </div>
           </div>
-        </div>
-        <div
-          style={{
-            position: 'sticky', top: 0, zIndex: 2,
-            display: 'flex', alignItems: 'center',
-            padding: '8px 18px', background: SLATE_50,
+          <div
+            style={{
+              position: 'sticky', top: 0, zIndex: 2,
+              display: 'flex', alignItems: 'center',
+              padding: '8px 16px', background: SLATE_50,
             borderTop: `1px solid ${HAIRLINE_INK_8}`, borderBottom: `1px solid ${HAIRLINE_INK_8}`,
             fontSize: 8, fontWeight: 800, letterSpacing: '0.08em',
             color: INK_MUTE, textTransform: 'uppercase',
@@ -112,7 +112,7 @@ function HolesSheet({ open, onClose, aggs }: { open: boolean; onClose: () => voi
               key={h.hole}
               style={{
                 display: 'flex', alignItems: 'center',
-                padding: '9px 18px', borderBottom: `1px solid ${HAIRLINE_INK_8}`,
+                padding: '9px 16px', borderBottom: `1px solid ${HAIRLINE_INK_8}`,
                 background: SLATE_50,
               }}
             >
