@@ -240,6 +240,7 @@ export function FullListSheet({
                   tourCode: r.tourCode,
                 }}
                 stat={r.value}
+                statFormatted={r.valueFormatted}
                 live={live}
                 onClick={() => handleRowTap(r.playerId)}
               />
