@@ -226,7 +226,7 @@ export function TournamentPage() {
         {/* MOMENTS */}
         <MomentsSection tournamentId={tournamentId!} tourCode={tourCode} />
 
-        <div style={{ height: 'calc(env(safe-area-inset-bottom, 0px) + 96px)' }} />
+        <div style={{ height: 'calc(env(safe-area-inset-bottom, 0px) + 16px)' }} />
       </div>
 
       <AllTeeTimesSheet
