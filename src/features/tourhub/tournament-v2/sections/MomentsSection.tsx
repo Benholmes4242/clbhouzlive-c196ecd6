@@ -55,7 +55,7 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
             borderRadius: 16, padding: 16,
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12,
             textAlign: 'center',
-          }}
+          }}>
             <div style={{
               fontSize: 12.5, fontWeight: 600, color: INK_MUTE, lineHeight: 1.45,
             }}>
