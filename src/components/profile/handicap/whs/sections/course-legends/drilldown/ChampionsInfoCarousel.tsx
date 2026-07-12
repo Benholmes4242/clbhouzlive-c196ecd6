@@ -32,7 +32,7 @@ const CardShell: React.FC<CardShellProps> = ({ onDismiss, background, border, ch
   <div
     style={{
       position: 'relative',
-      padding: '13px 38px 13px 14px',
+      padding: '12px 38px 12px 16px',
       background,
       border,
       borderRadius: 14,
