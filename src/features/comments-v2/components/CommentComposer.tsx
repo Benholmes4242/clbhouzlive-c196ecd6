@@ -103,7 +103,7 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
       style={{
         background: '#FFFFFF',
         borderTop: `1px solid ${HAIRLINE}`,
-        padding: '10px 12px',
+        padding: '12px',
       }}
     >
       {replyingTo && (
