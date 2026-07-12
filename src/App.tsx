@@ -176,7 +176,7 @@ const Clubhouse = lazy(() => import("./pages/Clubhouse"));
 
 const HomeLanding = lazy(() => import("./pages/HomeLanding"));
 
-const ClipsSubpageWrapped = lazy(() => import("./components/watch/ClipsSubpage"));
+
 const WatchHubV2 = lazy(() => import("./features/watch-v2/WatchHubV2"));
 const VideosPageV2 = lazy(() => import("./features/videos-v2/VideosPageV2"));
 const ClipsPageV2 = lazy(() => import("./features/clips-v2/ClipsPageV2"));
@@ -446,9 +446,8 @@ function AppRoutes() {
         
         <Route path="/watch" element={<Suspense fallback={<GenericPageSkeleton />}><WatchHubV2 /></Suspense>} />
         <Route path="/videos" element={<Navigate to="/watch" replace />} />
-        <Route path="/watch/clips" element={<Suspense fallback={<GenericPageSkeleton />}><ClipsSubpageWrapped /></Suspense>} />
+        <Route path="/watch/clips" element={<Suspense fallback={<GenericPageSkeleton />}><ClipsPageV2 /></Suspense>} />
         <Route path="/watch/videos" element={<Suspense fallback={<GenericPageSkeleton />}><VideosPageV2 /></Suspense>} />
-        <Route path="/clips-v2-test" element={<Suspense fallback={<GenericPageSkeleton />}><ClipsPageV2 /></Suspense>} />
         <Route path="/explore" element={<Navigate to="/courses?tab=discover" replace />} />
         <Route path="/courses" element={<Suspense fallback={<CoursesListSkeleton />}><CoursesWrapped /></Suspense>} />
         <Route path="/courses/:courseId" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseDetailPage /></Suspense>} />
