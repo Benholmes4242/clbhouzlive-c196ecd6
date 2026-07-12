@@ -73,6 +73,7 @@ export interface CutState {
 interface Props {
   entries: BoardEntry[];
   cutState: CutState;
+  currentRound?: number | null;
 }
 
 function houseColor(score: number | null | undefined): string {
