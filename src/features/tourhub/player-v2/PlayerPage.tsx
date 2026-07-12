@@ -1,0 +1,110 @@
+/**
+ * PlayerPage (v2) — "The Feature".
+ *
+ * Cinematic dark hero + one continuous light scroll of Overview-grammar
+ * sections. No ShellSlot identity chrome, no tabs, no framer-motion.
+ *
+ * Route repoints at P2. Currently reachable directly via the section
+ * hooks so it can be verified in isolation.
+ */
+
+import { useEffect } from 'react';
+import { AlertCircle } from 'lucide-react';
+import { useParams } from 'react-router-dom';
+import { TourHubShell } from '../components/TourHubShell';
+import { useTourPlayer, useSinglePlayerStatistics } from '../hooks/useTourHubData';
+import { usePlayerResults } from '../hooks/usePlayerResults';
+import { usePlayerState } from '../hooks/usePlayerState';
+import { HeroSection } from './sections/HeroSection';
+import { LiveNowStrip } from './sections/LiveNowStrip';
+import { SeasonCards } from './sections/SeasonCards';
+import { FormSection } from './sections/FormSection';
+import { TournamentsSection } from './sections/TournamentsSection';
+import { AboutSection } from './sections/AboutSection';
+import { PlayerSkeleton } from './sections/PlayerSkeleton';
+import { SLATE_50 } from '../_shared/tokens';
+
+export function PlayerPage() {
+  const { playerId } = useParams<{ playerId: string }>();
+
+  const { data: player, isLoading: playerLoading, refetch } = useTourPlayer(playerId || '');
+  const { data: playerStats } = useSinglePlayerStatistics(playerId);
+  const { data: results } = usePlayerResults(playerId, 30);
+  const playerState = usePlayerState(playerId);
+
+  // Scroll-to-top on player switch (ported from PlayerProfilePage).
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [playerId]);
+
+  if (playerLoading) {
+    return (
+      <TourHubShell>
+        <PlayerSkeleton />
+      </TourHubShell>
+    );
+  }
+
+  if (!player) {
+    return (
+      <TourHubShell>
+        <div
+          style={{
+            paddingTop: 'var(--chrome-total-h, 0px)',
+            background: SLATE_50,
+            minHeight: '60vh',
+          }}
+          className="px-5"
+        >
+          <div className="text-center py-20 flex flex-col items-center gap-3">
+            <AlertCircle className="w-10 h-10 text-muted-foreground" />
+            <p className="text-muted-foreground text-lg font-medium">Couldn't load player data</p>
+            <button
+              onClick={() => refetch()}
+              className="mt-2 px-5 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium active:opacity-70 transition-opacity"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </TourHubShell>
+    );
+  }
+
+  const liveTournamentId =
+    playerState.state === 'live' ? playerState.liveData?.tournamentId ?? null : null;
+
+  return (
+    <TourHubShell>
+      <div style={{ background: SLATE_50, minHeight: '100vh' }}>
+        <HeroSection player={player} playerStats={playerStats ?? null} />
+
+        {playerState.state === 'live' && playerState.liveData && (
+          <LiveNowStrip liveData={playerState.liveData} playerName={player.full_name} />
+        )}
+
+        <SeasonCards
+          playerStats={playerStats ?? null}
+          results={results ?? []}
+          player={player}
+        />
+
+        <FormSection results={results ?? []} />
+
+        <TournamentsSection
+          results={results ?? []}
+          playerName={player.full_name}
+          liveTournamentId={liveTournamentId}
+        />
+
+        <AboutSection player={player} />
+
+        <div
+          style={{
+            paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 96px)',
+          }}
+        />
+      </div>
+    </TourHubShell>
+  );
+}
