@@ -94,7 +94,7 @@ export default function ProfileSheetV2TestPage() {
         profiles={profiles}
         onSwitchProfile={handleSwitchProfile}
         onNavigate={(route) => { setOpen(false); navigate(route); }}
-        isAdmin={false}
+        isAdmin={hasAdminAccess}
         isLoading={isLoading}
       />
     </div>
