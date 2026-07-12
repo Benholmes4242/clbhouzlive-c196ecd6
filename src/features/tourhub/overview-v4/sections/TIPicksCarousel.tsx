@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAIPredictions } from '../../hooks/useAIPredictions';
 import { SectionShell } from './SectionShell';
 import { V4 } from '../tokens';
-import type { EventState } from '../data/useTourEventContext';
+import type { EventState } from '@/features/tourhub/components/overview-v3/useTournamentPulse';
 import type { AITopContender } from '../../hooks/useAIPredictions';
 import { usePickLiveState, type PickLiveState } from '../data/usePickLiveState';
 import { PlayerAvatar } from '../../components/PlayerAvatar';
