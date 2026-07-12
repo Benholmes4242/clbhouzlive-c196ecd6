@@ -143,7 +143,7 @@ export function PickerSheet({ open, onClose, target, standings, otherSlug }: Pro
       {/* List */}
       <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', background: SURFACE }}>
         {filtered.length === 0 ? (
-          <div style={{ padding: '28px 16px', textAlign: 'center', color: INK_MUTE, fontSize: 12, fontWeight: 600 }}>
+          <div style={{ padding: '32px 16px', textAlign: 'center', color: INK_MUTE, fontSize: 12, fontWeight: 600 }}>
             No colleges match "{debounced}".
           </div>
         ) : (

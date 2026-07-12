@@ -177,7 +177,7 @@ export function ComparePage() {
         </section>
 
         {/* Classes */}
-        <section style={{ background: SURFACE, marginTop: 10 }}>
+        <section style={{ background: SURFACE, marginTop: 12 }}>
           <div
             style={{
               display: 'grid',
