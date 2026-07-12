@@ -143,7 +143,7 @@ function DuelMastheadInner({ left, right, liveLeft, liveRight, onChangeLeft, onC
         paddingTop: 'calc(env(safe-area-inset-top, 0px) + 58px)',
         paddingLeft: 12,
         paddingRight: 12,
-        paddingBottom: 18,
+        paddingBottom: 16,
         fontFamily: FONT,
       }}
     >
