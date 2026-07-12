@@ -20,7 +20,7 @@ interface ConnectHandicapCardProps {
  * ConnectHandicapCard — the single shared "connect your WHS handicap" conversion
  * card. Light "ghost index preview" design: copy + amber CTA on the left, a
  * dashed empty index slot + ghost sparkline on the right. Used by the avatar
- * dropdown (HandicapMasthead) and Tour Hub home (HomeConnectHandicapModule).
+ * dropdown (ProfileSheetV2's HcpStrip) and Tour Hub home (HomeConnectHandicapModule).
  */
 export const ConnectHandicapCard = forwardRef<HTMLButtonElement, ConnectHandicapCardProps>(
   ({ headline, sub, microcopy, onTap }, ref) => (

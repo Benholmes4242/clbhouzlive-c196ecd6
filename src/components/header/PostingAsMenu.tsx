@@ -160,7 +160,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   const displayName = userProfile?.display_name || user?.user_metadata?.full_name || 'User';
   const email = user?.email || '';
 
-  // Build profiles array for ProfileHubSheet
+  // Build profiles array for ProfileSheetV2
   const profiles = availableActors.map(actor => ({
     id: actor.id,
     type: actor.type as 'personal' | 'business',
@@ -169,7 +169,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
     subtitle: actor.type === 'personal' ? email : 'Business',
   }));
 
-  // Current actor for ProfileHubSheet
+  // Current actor for ProfileSheetV2
   const currentActorData = {
     type: (activeActor?.type || 'personal') as 'personal' | 'business',
     id: activeActor?.id || user?.id || '',
@@ -178,7 +178,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
     subtitle: email,
   };
 
-  // Handle profile switch in ProfileHubSheet
+  // Handle profile switch in ProfileSheetV2
   const handleSwitchProfile = async (profileId: string) => {
     const actor = availableActors.find(a => a.id === profileId);
     if (actor && (activeActor?.id !== actor.id)) {
@@ -201,7 +201,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
     ? `/business/${activeActor.id}/edit`
     : '/edit-profile?tab=settings';
 
-  // Handle navigation from ProfileHubSheet
+  // Handle navigation from ProfileSheetV2
   const handleAccountHubNavigate = (route: string) => {
     if (route === '/upload') {
       setUploadCenterOpen(true);
@@ -212,7 +212,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
     } else if (route === '/settings/profile') {
       navigate(editProfileRoute);
     } else if (route === `/profile/${currentActorData.id}`) {
-      // ProfileHubSheet "View profile" → actor-aware target
+      // Profile sheet "View profile" → actor-aware target
       handleNavigate(viewProfileRoute);
     } else if (route === '/edit-profile?tab=settings') {
       handleNavigate(settingsRoute);
@@ -222,7 +222,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   };
 
   // ===========================================
-  // MOBILE: ProfileHubSheet bottom sheet
+  // MOBILE: ProfileSheetV2 bottom sheet
   // ===========================================
   if (isMobile) {
     return (

@@ -1,6 +1,6 @@
 /**
  * ProfileSwitcherPopover — anchored popover replacing the always-visible
- * Switch Profile carousel inside ProfileHubSheet.
+ * Switch Profile carousel inside the profile sheet.
  *
  * Closes on: outside-tap, ESC, profile selection.
  */
