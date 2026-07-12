@@ -121,8 +121,8 @@ export const ProBenchmarkBand: React.FC<Props> = ({ pro, value, sub, base }) => 
 
       {explainerOpen && (
         <div style={{
-          marginTop: 10,
-          padding: '10px 12px',
+          marginTop: 12,
+          padding: '12px',
           background: 'var(--hcp-tint-2)',
           borderRadius: 10,
           fontSize: 11,
