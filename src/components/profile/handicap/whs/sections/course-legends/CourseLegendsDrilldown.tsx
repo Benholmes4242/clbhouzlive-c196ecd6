@@ -335,7 +335,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
 
       {!isLoading && !isError && (data ?? []).length > 0 && !activeWindowHasData && (
         <>
-          <div style={{ padding: '14px 16px 4px' }}>
+          <div style={{ padding: '16px 16px 4px' }}>
             <WindowToggle window={window} setWindow={handleWindowChange} />
           </div>
           <ChampionsWindowEmptyState
