@@ -254,10 +254,10 @@ export function BoardTable({ entries, cutState, currentRound }: Props) {
           fontFamily: F,
         }}
       >
-        {/* POS */}
+        {/* POS + MOVE — two fixed sub-slots so deltas align across all rows */}
         <div
           style={{
-            width: POS_W,
+            width: POS_NUM_W,
             flexShrink: 0,
             fontSize: demotedRow ? 9 : 12.5,
             fontWeight: demotedRow ? 800 : 700,
@@ -268,6 +268,46 @@ export function BoardTable({ entries, cutState, currentRound }: Props) {
         >
           {posText}
         </div>
+        <div
+          style={{
+            width: POS_MOVE_W,
+            flexShrink: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-start',
+          }}
+        >
+          {(() => {
+            if (demotedRow) return null;
+            const pid = e.player?.id;
+            const d = pid ? movementMap.get(pid) : undefined;
+            if (d == null || d === 0) return null;
+            const climbed = d > 0;
+            const n = Math.abs(d);
+            return (
+              <span
+                aria-label={climbed ? `Up ${n}` : `Down ${n}`}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 2,
+                  fontFamily: F,
+                  fontSize: 8.5,
+                  fontWeight: 800,
+                  color: climbed ? SCORE_UNDER : SCORE_OVER,
+                  fontVariantNumeric: 'tabular-nums',
+                  letterSpacing: '0.02em',
+                }}
+              >
+                <span aria-hidden style={{ fontSize: 8 }}>
+                  {climbed ? '\u25B2' : '\u25BC'}
+                </span>
+                {n}
+              </span>
+            );
+          })()}
+        </div>
+
 
         {/* PLAYER — two lines */}
         <div style={{ flex: 1, minWidth: 0 }}>
