@@ -36,9 +36,9 @@ export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
   const { data: trend } = useHandicapTrend(connection?.id);
   const { data: scores } = useAllScores(connection?.id);
 
-  const rounds30d = useMemo(() => {
+  const rounds90d = useMemo(() => {
     if (!scores) return null;
-    const cutoff = Date.now() - 30 * 86_400_000;
+    const cutoff = Date.now() - 90 * 86_400_000;
     return scores.filter(
       (s: any) => s.play_date && new Date(s.play_date).getTime() >= cutoff,
     ).length;
