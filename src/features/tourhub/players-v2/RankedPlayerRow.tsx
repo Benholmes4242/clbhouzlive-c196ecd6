@@ -28,6 +28,8 @@ export interface RankedPlayerRowProps {
   rank: number;
   player: RankedPlayer;
   stat?: number | null;
+  /** Pre-formatted string override for `stat` (e.g. "$30.1M", "72.3%"). */
+  statFormatted?: string;
   statLabel?: string | null;
   live?: boolean;
   sub?: string | null;
@@ -47,6 +49,7 @@ function RankedPlayerRowInner({
   rank,
   player,
   stat,
+  statFormatted,
   statLabel,
   live,
   sub,
@@ -156,7 +159,7 @@ function RankedPlayerRowInner({
       </div>
 
       {/* Stat column */}
-      {stat != null && (
+      {(statFormatted != null || stat != null) && (
         <div style={{ textAlign: 'right', flexShrink: 0 }}>
           <div
             style={{
@@ -167,7 +170,7 @@ function RankedPlayerRowInner({
               lineHeight: 1,
             }}
           >
-            {formatStat(stat)}
+            {statFormatted ?? (stat != null ? formatStat(stat) : '')}
           </div>
           {statLabel && (
             <div
