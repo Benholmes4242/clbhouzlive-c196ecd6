@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { mapTourSlug } from '../_shared/tourOrder';
+import { LIVE_STATUSES, COMPLETED_STATUSES, endDateInPast } from '../components/overview-v3/useTournamentPulse';
 import type { TourId } from '../hooks/useOverviewData';
 import { getContextLabel } from '../utils/tournamentClassification';
 import {
