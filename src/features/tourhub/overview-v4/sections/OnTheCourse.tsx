@@ -17,6 +17,7 @@ interface GroupPlayerShape {
   full_name?: string;
   name?: string;
   photo_url?: string | null;
+  headshot_override?: string | null;
   score?: number | string | null;
   today?: number | string | null;
   thru?: number | null;
@@ -115,6 +116,7 @@ export function OnTheCourse({ tournamentId, live }: Props) {
                 const status = (p.status || '').toUpperCase();
                 const isCut = status === 'CUT' || status === 'WD' || status === 'DQ';
                 const display = formatScore(p.today) ?? formatScore(p.score) ?? '—';
+                const photo = p.headshot_override || p.photo_url || null;
                 return (
                   <div key={pi} style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '6px 0', borderTop: pi === 0 ? 'none' : `0.5px solid ${V4.hairline}` }}>
                     <div
@@ -123,6 +125,9 @@ export function OnTheCourse({ tournamentId, live }: Props) {
                         height: 24,
                         borderRadius: '34%',
                         background: '#15171F',
+                        backgroundImage: photo ? `url(${photo})` : 'none',
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
                         color: V4.amber,
                         display: 'flex',
                         alignItems: 'center',
@@ -133,7 +138,7 @@ export function OnTheCourse({ tournamentId, live }: Props) {
                         flexShrink: 0,
                       }}
                     >
-                      {initials(name)}
+                      {photo ? '' : initials(name)}
                     </div>
                     <div style={{ flex: 1, minWidth: 0, fontSize: 12, fontWeight: 700, color: V4.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {name}
