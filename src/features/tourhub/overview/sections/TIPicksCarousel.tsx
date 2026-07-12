@@ -75,7 +75,7 @@ function verdict(live: PickLiveState | undefined): { hit: boolean; label: string
 function orderPicksByBoard(
   picks: AITopContender[],
   state: EventState,
-  liveMap: Map<string, PickLiveState> | undefined,
+  liveMap: Record<string, PickLiveState> | undefined,
 ): AITopContender[] {
   if (state !== 'live' && state !== 'completed') return picks;
   const withIdx = picks.map((p, i) => ({ p, i }));
@@ -83,14 +83,14 @@ function orderPicksByBoard(
   const missing: typeof withIdx = [];
   const cut: typeof withIdx = [];
   for (const row of withIdx) {
-    const live = liveMap?.get(row.p.playerId);
+    const live = liveMap?.[row.p.playerId];
     if (cutStatus(live)) cut.push(row);
     else if (live && live.position != null) active.push(row);
     else missing.push(row);
   }
   active.sort((a, b) => {
-    const pa = liveMap?.get(a.p.playerId)?.position ?? Number.POSITIVE_INFINITY;
-    const pb = liveMap?.get(b.p.playerId)?.position ?? Number.POSITIVE_INFINITY;
+    const pa = liveMap?.[a.p.playerId]?.position ?? Number.POSITIVE_INFINITY;
+    const pb = liveMap?.[b.p.playerId]?.position ?? Number.POSITIVE_INFINITY;
     if (pa !== pb) return pa - pb;
     return a.i - b.i;
   });
@@ -174,7 +174,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                     {p.playerName}
                   </div>
                   <div style={{ marginTop: 2, fontSize: 11.5, fontWeight: 800, lineHeight: 1.2 }}>
-                    <InlineStateValue state={state} pick={p} live={liveMap?.get(p.playerId)} />
+                    <InlineStateValue state={state} pick={p} live={liveMap?.[p.playerId]} />
                   </div>
                 </div>
               </div>
@@ -212,7 +212,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
         <CaseSheet
           pick={sheet.pick}
           state={state}
-          live={liveMap?.get(sheet.pick.playerId)}
+          live={liveMap?.[sheet.pick.playerId]}
           tourCode={tourCode}
           onClose={closeCase}
           onNavigatePlayer={goToPlayer}
@@ -409,7 +409,7 @@ function AllPicksSheet({
   picks: AITopContender[];
   state: EventState;
   tourCode: string;
-  liveMap: Map<string, PickLiveState> | undefined;
+  liveMap: Record<string, PickLiveState> | undefined;
   onPick: (p: AITopContender) => void;
   onClose: () => void;
   onNavigatePlayer: (playerId: string) => void;
@@ -453,7 +453,7 @@ function AllPicksSheet({
               </div>
             </div>
             <div style={{ flexShrink: 0 }}>
-              <SheetStateStrip state={state} pick={p} live={liveMap?.get(p.playerId)} />
+              <SheetStateStrip state={state} pick={p} live={liveMap?.[p.playerId]} />
             </div>
           </div>
         ))}
