@@ -187,7 +187,10 @@ export function useStatWatch(tour: TourId) {
           .from('sr_players')
           .select('id, full_name, photo_url, headshot_override')
           .in('id', playerIds);
-        if (!pErr) {
+        if (pErr) {
+          // eslint-disable-next-line no-console
+          console.error('[stat-watch] sr_players fetch failed:', pErr);
+        } else {
           (players ?? []).forEach((p: any) =>
             playerMap.set(p.id, {
               name: p.full_name,
