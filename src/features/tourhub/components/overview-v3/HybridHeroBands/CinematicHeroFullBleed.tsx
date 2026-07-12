@@ -924,7 +924,7 @@ export function CinematicHeroFullBleed({
               display: 'flex',
               alignItems: 'center',
               gap: 10,
-              padding: isLive ? '4px 18px' : '9px 18px',
+              padding: isLive ? '3px 18px' : '8px 18px',
               borderTop: 'none',
             };
             if (row.kind === 'solo') {
