@@ -41,9 +41,13 @@ import { TeeTimesFirstGroups } from './sections/TeeTimesFirstGroups';
 import { AllTeeTimesSheet } from './sections/AllTeeTimesSheet';
 import { CourseSection } from './sections/CourseSection';
 import { MomentsSection } from './sections/MomentsSection';
+import { EventInfoSection } from './sections/EventInfoSection';
+import { StorySection } from './sections/StorySection';
+import { FullBoardSheet } from './sections/FullBoardSheet';
 
 import { useTeeTimesAll } from './data/useTeeTimesAll';
 import { useFieldTop3 } from './data/useFieldTop3';
+import { useTournamentStory } from './data/useTournamentStory';
 
 import {
   FONT, INK, INK_MUTE, INK_FAINT, SLATE_50, HAIRLINE_INK_8, INK_TINT_06, SURFACE,
