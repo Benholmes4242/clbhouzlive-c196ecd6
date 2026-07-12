@@ -79,7 +79,7 @@ export function NotificationsSection({ businessId }: Props) {
         <Bell size={16} className="text-foreground/70" />
         <h3 className="text-[15px] font-semibold text-foreground">Notifications</h3>
       </div>
-      <p className="text-[12.5px] text-muted-foreground mb-3 -mt-1">
+      <p className="text-[12.5px] text-muted-foreground mb-3">
         These apply to every manager of this business — turn off to mute that type in the business inbox and push.
       </p>
 

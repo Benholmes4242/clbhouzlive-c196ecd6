@@ -711,7 +711,7 @@ export default function BusinessProfileEditor() {
         title={mode === 'create' ? 'Create a business' : 'Edit business'}
         onBack={handleClose}
       >
-        <div className="flex-1 overflow-y-auto pb-12" style={{ background: BIZ.pageBg }}>
+        <div className="flex-1 overflow-y-auto" style={{ background: BIZ.pageBg }}>
 
           {/* 1. HERO — cover + squircle logo at top (matches personal edit-v2) */}
           <div className="px-4 pt-2 pb-4">
@@ -729,7 +729,7 @@ export default function BusinessProfileEditor() {
                 onFileChange={(file) => { if (file) onCoverFile(file); }}
                 onRemove={onCoverRemove}
               />
-              <div style={{ position: 'relative', padding: '0 16px 14px', marginTop: -34 }}>
+              <div style={{ position: 'relative', padding: '0 16px 12px', marginTop: -34 }}>
                 <ProfilePhotoCard
                   variant="bare"
                   currentUrl={effectiveLogoUrl}
