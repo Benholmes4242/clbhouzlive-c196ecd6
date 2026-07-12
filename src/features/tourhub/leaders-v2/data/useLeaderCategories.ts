@@ -345,8 +345,7 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
     }
   }
 
-  const world = await fetchWorldRankingCat(tour);
-  if (world) categories.push(world);
+  // World ranking is PGA-only per editorial policy — not appended to other tours.
 
   return { synced: categories.length > 0, categories, year };
 }
