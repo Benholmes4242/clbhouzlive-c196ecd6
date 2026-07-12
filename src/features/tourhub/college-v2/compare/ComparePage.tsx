@@ -244,7 +244,7 @@ function ClassColumn({ headerCode, roster, liveMap, alignRight }: ClassColumnPro
           textTransform: 'uppercase',
           color: AMBER,
           textAlign: alignRight ? 'right' : 'left',
-          marginBottom: 10,
+          marginBottom: 12,
         }}
       >
         {headerCode} Leads

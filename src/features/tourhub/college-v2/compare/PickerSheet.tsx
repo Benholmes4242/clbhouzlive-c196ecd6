@@ -161,7 +161,7 @@ export function PickerSheet({ open, onClose, target, standings, otherSlug }: Pro
                   alignItems: 'center',
                   width: '100%',
                   gap: 12,
-                  padding: '10px 16px',
+                  padding: '12px 16px',
                   background: 'transparent',
                   border: 'none',
                   borderBottom: `0.5px solid ${HAIRLINE_INK_10}`,
