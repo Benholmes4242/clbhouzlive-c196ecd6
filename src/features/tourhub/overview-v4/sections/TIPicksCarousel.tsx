@@ -4,9 +4,10 @@
  */
 
 import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAIPredictions } from '../../hooks/useAIPredictions';
 import { SectionShell } from './SectionShell';
-import { V4, NUMERAL_THIN } from '../tokens';
+import { V4 } from '../tokens';
 import type { EventState } from '../data/useTourEventContext';
 import type { AITopContender } from '../../hooks/useAIPredictions';
 import { usePickLiveState, type PickLiveState } from '../data/usePickLiveState';
@@ -61,6 +62,7 @@ type SheetState =
   | { kind: 'case'; pick: AITopContender; from: 'index' | 'card' };
 
 export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props) {
+  const navigate = useNavigate();
   const { data } = useAIPredictions(tournamentId ?? null);
   const [sheet, setSheet] = useState<SheetState>(null);
   const picks = data?.topContenders ?? [];
@@ -79,6 +81,11 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
     } else {
       setSheet(null);
     }
+  };
+
+  const goToPlayer = (playerId: string) => {
+    setSheet(null);
+    navigate(`/tourhub/player/${playerId}`);
   };
 
   return (
@@ -103,11 +110,15 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
               cursor: 'pointer',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
+            <div
+              role="link"
+              onClick={(e) => { e.stopPropagation(); goToPlayer(p.playerId); }}
+              style={{ display: 'flex', alignItems: 'center', gap: 11, cursor: 'pointer' }}
+            >
               <PlayerAvatar playerId={p.playerId} playerName={p.playerName} tourCode={tourCode} photoUrl={p.photoUrl} size="md" ringColor={LIGHT_HAIRLINE} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-                  <span style={{ fontSize: 22, color: V4.goldMid, lineHeight: 1, ...NUMERAL_THIN }}>{p.rank}</span>
+                  <span style={{ fontSize: 22, color: V4.inkFaint, lineHeight: 1, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{p.rank}</span>
                   <span style={{ fontSize: 9.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Pick</span>
                 </div>
                 <div style={{ fontSize: 14, fontWeight: 800, color: V4.ink, letterSpacing: '-0.015em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -142,6 +153,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
           liveMap={liveMap}
           onPick={(p) => setSheet({ kind: 'case', pick: p, from: 'index' })}
           onClose={() => setSheet(null)}
+          onNavigatePlayer={goToPlayer}
         />
       ) : null}
 
@@ -152,6 +164,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
           live={liveMap?.get(sheet.pick.playerId)}
           tourCode={tourCode}
           onClose={closeCase}
+          onNavigatePlayer={goToPlayer}
         />
       ) : null}
     </SectionShell>
@@ -188,7 +201,7 @@ function StateStrip({ state, pick, live }: { state: EventState; pick: AITopConte
     const thruText = formatThru(live.thru);
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ fontSize: 12, color: V4.goldMid, ...NUMERAL_THIN }}>{pos}</span>
+        <span style={{ fontSize: 12, color: V4.inkFaint, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{pos}</span>
         <span style={{ fontSize: 11, color: todayCol, fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>{todayText}</span>
         {thruText ? (
           <span style={{ marginLeft: 'auto', fontSize: 10.5, color: V4.inkFaint, fontVariantNumeric: 'tabular-nums' }}>{thruText}</span>
@@ -226,7 +239,7 @@ function SheetShell({ onClose, maxHeight = '80vh', children }: { onClose: () => 
         style={{
           position: 'absolute',
           left: 0, right: 0, bottom: 0,
-          background: V4.surface,
+          background: V4.bg,
           borderTopLeftRadius: 22, borderTopRightRadius: 22,
           padding: '10px 20px 30px',
           maxHeight,
@@ -246,29 +259,37 @@ function CaseSheet({
   live,
   tourCode,
   onClose,
+  onNavigatePlayer,
 }: {
   pick: AITopContender;
   state: EventState;
   live: PickLiveState | undefined;
   tourCode: string;
   onClose: () => void;
+  onNavigatePlayer: (playerId: string) => void;
 }) {
   return (
     <SheetShell onClose={onClose}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
-        <PlayerAvatar playerId={pick.playerId} playerName={pick.playerName} tourCode={tourCode} photoUrl={pick.photoUrl} size="md" ringColor={LIGHT_HAIRLINE} />
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-            <span style={{ fontSize: 10.5, fontWeight: 800, color: V4.amber, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-              The case for
-            </span>
-            <span style={{ fontSize: 22, color: V4.goldMid, ...NUMERAL_THIN }}>#{pick.rank}</span>
-          </div>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: V4.ink, margin: '2px 0 0', letterSpacing: '-0.025em' }}>
-            {pick.playerName}
-          </h2>
-          <div style={{ marginTop: 6 }}>
-            <SheetStateStrip state={state} pick={pick} live={live} />
+        <div
+          role="link"
+          onClick={() => onNavigatePlayer(pick.playerId)}
+          style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 0, cursor: 'pointer' }}
+        >
+          <PlayerAvatar playerId={pick.playerId} playerName={pick.playerName} tourCode={tourCode} photoUrl={pick.photoUrl} size="md" ringColor={LIGHT_HAIRLINE} />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+              <span style={{ fontSize: 10.5, fontWeight: 800, color: V4.amber, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+                The case for
+              </span>
+              <span style={{ fontSize: 22, color: V4.inkFaint, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>#{pick.rank}</span>
+            </div>
+            <h2 style={{ fontSize: 22, fontWeight: 800, color: V4.ink, margin: '2px 0 0', letterSpacing: '-0.025em' }}>
+              {pick.playerName}
+            </h2>
+            <div style={{ marginTop: 6 }}>
+              <SheetStateStrip state={state} pick={pick} live={live} />
+            </div>
           </div>
         </div>
       </div>
@@ -300,6 +321,7 @@ function AllPicksSheet({
   liveMap,
   onPick,
   onClose,
+  onNavigatePlayer,
 }: {
   picks: AITopContender[];
   state: EventState;
@@ -307,6 +329,7 @@ function AllPicksSheet({
   liveMap: Map<string, PickLiveState> | undefined;
   onPick: (p: AITopContender) => void;
   onClose: () => void;
+  onNavigatePlayer: (playerId: string) => void;
 }) {
   return (
     <SheetShell onClose={onClose} maxHeight="70vh">
@@ -318,8 +341,9 @@ function AllPicksSheet({
       </div>
       <div>
         {picks.map((p, i) => (
-          <button
+          <div
             key={p.playerId}
+            role="button"
             onClick={() => onPick(p)}
             style={{
               width: '100%',
@@ -334,15 +358,21 @@ function AllPicksSheet({
               cursor: 'pointer',
             }}
           >
-            <span style={{ fontSize: 18, color: V4.goldMid, ...NUMERAL_THIN, minWidth: 22, textAlign: 'right' }}>{p.rank}</span>
-            <PlayerAvatar playerId={p.playerId} playerName={p.playerName} tourCode={tourCode} photoUrl={p.photoUrl} size="sm" ringColor={LIGHT_HAIRLINE} />
-            <div style={{ flex: 1, minWidth: 0, fontSize: 13.5, fontWeight: 700, color: V4.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {p.playerName}
+            <span style={{ fontSize: 18, color: V4.inkFaint, fontWeight: 700, fontVariantNumeric: 'tabular-nums', minWidth: 22, textAlign: 'right' }}>{p.rank}</span>
+            <div
+              role="link"
+              onClick={(e) => { e.stopPropagation(); onNavigatePlayer(p.playerId); }}
+              style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 0, cursor: 'pointer' }}
+            >
+              <PlayerAvatar playerId={p.playerId} playerName={p.playerName} tourCode={tourCode} photoUrl={p.photoUrl} size="sm" ringColor={LIGHT_HAIRLINE} />
+              <div style={{ flex: 1, minWidth: 0, fontSize: 13.5, fontWeight: 700, color: V4.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {p.playerName}
+              </div>
             </div>
             <div style={{ flexShrink: 0 }}>
               <SheetStateStrip state={state} pick={p} live={liveMap?.get(p.playerId)} />
             </div>
-          </button>
+          </div>
         ))}
       </div>
     </SheetShell>
@@ -371,7 +401,7 @@ function SheetStateStrip({ state, pick, live }: { state: EventState; pick: AITop
     const thruText = formatThru(live.thru);
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, fontWeight: 700 }}>
-        <span style={{ color: V4.goldMid, ...NUMERAL_THIN, fontSize: 14 }}>{pos}</span>
+        <span style={{ color: V4.inkFaint, fontWeight: 700, fontVariantNumeric: 'tabular-nums', fontSize: 14 }}>{pos}</span>
         <span style={{ color: todayCol, fontVariantNumeric: 'tabular-nums' }}>{todayText}</span>
         {thruText ? <span style={{ color: V4.inkFaint, fontVariantNumeric: 'tabular-nums' }}>· {thruText}</span> : null}
       </div>
