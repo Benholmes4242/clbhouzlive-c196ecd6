@@ -20,9 +20,15 @@ export default function WatchHubV2({ embedded = false }: { embedded?: boolean })
       <main
         style={{
           paddingBottom: 80,
-          ...(embedded ? {} : { paddingTop: 'var(--chrome-total-h, 0px)' }),
+          // .app-shell already pads by var(--sat); --chrome-total-h also
+          // includes --sat, which stacks a second safe-area gap on device
+          // (invisible in browser preview where sat=0). Subtract it out.
+          ...(embedded
+            ? {}
+            : { paddingTop: 'calc(var(--chrome-total-h, 0px) - var(--sat, 0px))' }),
         }}
       >
+
         <div
           style={{
             padding: '4px 16px 8px',
