@@ -31,12 +31,12 @@ export function FormSection({ results }: FormSectionProps) {
       style={{
         background: SLATE_50,
         borderTop: `0.5px solid ${INK_TINT_07}`,
-        padding: '18px 0 14px',
+        padding: '16px 0 14px',
       }}
     >
       <p
         style={{
-          margin: '0 16px 10px',
+          margin: '0 16px 12px',
           fontSize: 8,
           fontWeight: 700,
           color: INK_FAINT,
@@ -50,7 +50,7 @@ export function FormSection({ results }: FormSectionProps) {
         style={{
           padding: '0 16px',
           display: 'flex',
-          gap: 6,
+          gap: 8,
           overflowX: 'auto',
           scrollbarWidth: 'none',
           WebkitOverflowScrolling: 'touch',

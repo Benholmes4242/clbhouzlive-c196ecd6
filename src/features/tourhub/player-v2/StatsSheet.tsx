@@ -57,7 +57,7 @@ function Cell({ row }: { row: Row }) {
   return (
     <div
       style={{
-        padding: '10px 0',
+        padding: '8px 0',
         borderBottom: `0.5px solid ${INK_TINT_07}`,
       }}
     >
@@ -91,7 +91,7 @@ function Cell({ row }: { row: Row }) {
 function SubSection({ label, rows }: { label: string; rows: Row[] }) {
   if (rows.length === 0) return null;
   return (
-    <div style={{ marginTop: 22 }}>
+    <div style={{ marginTop: 24 }}>
       <p
         style={{
           margin: '0 0 6px',
@@ -120,7 +120,7 @@ function SGBar({ label, value }: { label: string; value: number | null | undefin
   const formatted =
     value === 0 ? '0.00' : value > 0 ? `+${value.toFixed(2)}` : value.toFixed(2);
   return (
-    <div style={{ padding: '11px 0', borderBottom: `0.5px solid ${INK_TINT_07}` }}>
+    <div style={{ padding: '12px 0', borderBottom: `0.5px solid ${INK_TINT_07}` }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
         <span
           style={{
@@ -212,7 +212,7 @@ export function StatsSheet({ open, onClose, playerStats, playerName }: StatsShee
     <BottomSheet open={open} onClose={onClose} ariaLabelledBy="stats-sheet-title">
       <div
         style={{
-          padding: '4px 20px 24px',
+          padding: '4px 16px 24px',
           background: SURFACE,
           maxHeight: 'calc(90vh - 20px)',
           overflowY: 'auto',
@@ -248,7 +248,7 @@ export function StatsSheet({ open, onClose, playerStats, playerName }: StatsShee
         <SubSection label="Short Game" rows={shortGame} />
 
         {hasSG && (
-          <div style={{ marginTop: 22 }}>
+          <div style={{ marginTop: 24 }}>
             <p
               style={{
                 margin: '0 0 6px',

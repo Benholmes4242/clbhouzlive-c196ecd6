@@ -70,12 +70,12 @@ export function TournamentsSection({
       style={{
         background: SURFACE,
         borderTop: `0.5px solid ${INK_TINT_07}`,
-        padding: '18px 0 6px',
+        padding: '16px 0 6px',
       }}
     >
       <p
         style={{
-          margin: '0 16px 8px',
+          margin: '0 16px 12px',
           fontSize: 10,
           fontWeight: 800,
           color: INK_FAINT,
@@ -254,7 +254,7 @@ export function TournamentsSection({
           onClick={() => setExpanded(true)}
           style={{
             width: '100%',
-            padding: '13px 0',
+            padding: '12px 0',
             marginTop: 0,
             fontSize: 11.5,
             fontWeight: 800,

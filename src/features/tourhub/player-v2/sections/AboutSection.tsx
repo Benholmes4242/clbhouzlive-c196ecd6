@@ -72,7 +72,7 @@ export function AboutSection({ player }: AboutSectionProps) {
       style={{
         background: SURFACE,
         borderTop: `0.5px solid ${INK_TINT_07}`,
-        padding: '18px 16px 6px',
+        padding: '16px 16px 6px',
       }}
     >
       <p
@@ -92,7 +92,7 @@ export function AboutSection({ player }: AboutSectionProps) {
           <div
             key={f.label}
             style={{
-              padding: '11px 0',
+              padding: '12px 0',
               borderBottom: `0.5px solid ${INK_TINT_06}`,
             }}
           >

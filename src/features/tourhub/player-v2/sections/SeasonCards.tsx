@@ -90,7 +90,7 @@ export function SeasonCards({ playerStats, results, player }: SeasonCardsProps) 
     <section
       style={{
         background: SLATE_50,
-        padding: '18px 0 14px',
+        padding: '16px 0 14px',
         borderTop: `0.5px solid ${INK_TINT_07}`,
       }}
     >
@@ -148,7 +148,7 @@ export function SeasonCards({ playerStats, results, player }: SeasonCardsProps) 
             style={{
               background: SURFACE,
               borderRadius: 12,
-              padding: '14px 10px 12px',
+              padding: '12px 10px 12px',
               border: `0.5px solid ${HAIRLINE_INK_8}`,
               minWidth: 0,
             }}
