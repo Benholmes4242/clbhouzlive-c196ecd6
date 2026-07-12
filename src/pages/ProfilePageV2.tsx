@@ -128,7 +128,7 @@ const ProfilePageV2Content: React.FC = () => {
   
   // Hide global header for full-bleed immersive profile
   useHideHeader();
-  // Status bar transparency is owned by FloatingPageHeader (single owner).
+  // Status bar transparency is owned by AppRoutes/applyRouteChrome (single owner).
   
   // If viewing via /profile/:username, fetch that profile; otherwise show own profile
   // Resolve profileUserId — cached query for username routes, synchronous for own profile
