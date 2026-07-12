@@ -362,9 +362,9 @@ export function SearchOverlayV2({
                         <div
                           className="flex scrollbar-hide"
                           style={{
-                            gap: 10,
+                            gap: 12,
                             overflowX: 'auto',
-                            padding: '4px 16px 8px',
+                            padding: '0 16px 16px',
                             WebkitOverflowScrolling: 'touch',
                           }}
                         >
