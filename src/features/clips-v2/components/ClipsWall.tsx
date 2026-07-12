@@ -3,7 +3,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toFeedPosts } from '@/features/watch-v2/utils/toFeedPost';
 import { useWatchAutoplay } from '@/video/useWatchAutoplay';
 import { useClipsWallFeed, type ClipsV2Mood, type ClipsWallRow } from '../hooks/useClipsWallFeed';
-import { segmentWall } from '@/components/feed-cards/segmentWall';
+import { segmentWall } from '../utils/segmentWall';
 import { WallTile } from './WallTile';
 import { WallWideCard } from './WallWideCard';
 
