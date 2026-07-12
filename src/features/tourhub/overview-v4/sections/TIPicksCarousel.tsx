@@ -131,10 +131,12 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
     navigate(`/tourhub/player/${playerId}`);
   };
 
+  const orderedPicks = orderPicksByBoard(picks, state, liveMap);
+
   return (
     <SectionShell eyebrow="Tournament intelligence" linkLabel="All picks" onLinkClick={() => setSheet({ kind: 'index' })}>
       <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 16px 10px', scrollPaddingLeft: 16, scrollSnapType: 'x mandatory' }}>
-        {picks.slice(0, 8).map((p) => (
+        {orderedPicks.slice(0, 8).map((p) => (
           <button
             key={p.playerId}
             onClick={() => setSheet({ kind: 'case', pick: p, from: 'card' })}
@@ -196,7 +198,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
 
       {sheet?.kind === 'index' ? (
         <AllPicksSheet
-          picks={picks}
+          picks={orderedPicks}
           state={state}
           tourCode={tourCode}
           liveMap={liveMap}
