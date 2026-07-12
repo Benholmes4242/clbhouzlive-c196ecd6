@@ -16637,6 +16637,48 @@ export type Database = {
           start_date: string
         }[]
       }
+      get_activity_feed: {
+        Args: {
+          p_actor_id?: string
+          p_actor_type?: string
+          p_cursor?: string
+          p_filter?: string
+          p_page_size?: number
+          p_user_id: string
+        }
+        Returns: {
+          actor_avatar_url: string
+          actor_display_name: string
+          actor_user_id: string
+          actor_username: string
+          created_at: string
+          data: Json
+          entity_id: string
+          entity_type: string
+          is_read: boolean
+          liker_avatar_urls: Json
+          message: string
+          notif_id: string
+          notif_type: string
+          target_course_image: string
+          target_course_name: string
+          target_poster_url: string
+          target_review_rating: number
+          title: string
+        }[]
+      }
+      get_activity_friend_requests: {
+        Args: { p_user_id: string }
+        Returns: {
+          mutual_friend_count: number
+          request_id: string
+          requested_at: string
+          requester_avatar_url: string
+          requester_display_name: string
+          requester_user_id: string
+          requester_username: string
+        }[]
+      }
       get_actor_dm_unread_counts: {
         Args: never
         Returns: {

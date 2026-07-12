@@ -2,13 +2,11 @@ import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import { TourHubShell } from '../components/TourHubShell';
-import { TourHubShellTabs } from '../components/TourHubShellTabs';
 import { ShellSlot } from '@/components/header/ShellSlot';
 import type { TourHubTab } from '../components/types';
 import { OverviewTab, PlayersTab, LeadersTab } from '../components/tabs';
 import { ScheduleTab as ScheduleTabV2 } from '@/features/tourhub/schedule-v2/ScheduleTab';
 import { LeaderboardTab } from '@/features/tourhub/leaderboard/LeaderboardTab';
-import { ScheduleShellRow } from '../components/shell/ScheduleShellRow';
 import { PlayersShellRow } from '../components/shell/PlayersShellRow';
 import { LeadersShellRow } from '../components/shell/LeadersShellRow';
 import { useTournamentStatusRealtime } from '../hooks/useTournamentStatusRealtime';
@@ -157,7 +155,6 @@ export function TourHubMainPage() {
 
   const renderShellRow = () => {
     switch (activeTab) {
-      case 'schedule':    return <ScheduleShellRow />;
       case 'players':     return <PlayersShellRow />;
       case 'leaderboards':return <LeadersShellRow />;
       default:            return null;
@@ -194,7 +191,6 @@ export function TourHubMainPage() {
         ) : (
           <>
             <ShellSlot>
-              <TourHubShellTabs />
               {renderShellRow()}
             </ShellSlot>
             <div style={{ paddingTop: 'calc(var(--chrome-total-h, 0px) - 1px)' }}>
