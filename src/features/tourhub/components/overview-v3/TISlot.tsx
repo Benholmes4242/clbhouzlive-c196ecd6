@@ -7,11 +7,11 @@ import { TIPicksCarousel } from '@/features/tourhub/overview-v4/sections/TIPicks
 import { useTournamentPulse } from './useTournamentPulse';
 
 export function TISlot() {
-  const { viewingTournamentId } = useTourSelection();
+  const { viewingTournamentId, viewingTourSlug } = useTourSelection();
   const tournamentId = viewingTournamentId ?? undefined;
   const { state } = useTournamentPulse(tournamentId);
 
-  return <TIPicksCarousel tournamentId={tournamentId} state={state} />;
+  return <TIPicksCarousel tournamentId={tournamentId} state={state} tourCode={viewingTourSlug ?? 'pga'} />;
 }
 
 export default TISlot;

@@ -10,10 +10,44 @@ import { V4, NUMERAL_THIN } from '../tokens';
 import type { EventState } from '../data/useTourEventContext';
 import type { AITopContender } from '../../hooks/useAIPredictions';
 import { usePickLiveState, type PickLiveState } from '../data/usePickLiveState';
+import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 
 interface Props {
   tournamentId: string | undefined;
   state: EventState;
+  tourCode?: string;
+}
+
+function Avatar({ name, tourCode, size }: { name: string; tourCode: string; size: number }) {
+  const url = name ? getPlayerHeadshotUrl(name, tourCode) : null;
+  const parts = (name || '').trim().split(/\s+/);
+  const inits = parts.length === 0
+    ? '?'
+    : (parts.length === 1 ? parts[0].slice(0, 2) : parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  return (
+    <div
+      style={{
+        position: 'relative',
+        width: size, height: size, borderRadius: '34%',
+        background: '#15171F',
+        border: `0.5px solid ${V4.hairline}`,
+        flexShrink: 0,
+        overflow: 'hidden',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        color: V4.amber, fontSize: Math.max(9, Math.round(size * 0.32)), fontWeight: 800, letterSpacing: '0.02em',
+      }}
+    >
+      <span>{inits}</span>
+      {url ? (
+        <img
+          src={url}
+          alt=""
+          onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+        />
+      ) : null}
+    </div>
+  );
 }
 
 // ---- Shared formatting helpers ----
@@ -51,7 +85,7 @@ function verdict(live: PickLiveState | undefined): { hit: boolean; label: string
   return { hit, label: `${hit ? 'HIT' : 'MISS'} · ${posText} · ${scoreText}` };
 }
 
-export function TIPicksCarousel({ tournamentId, state }: Props) {
+export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props) {
   const { data } = useAIPredictions(tournamentId ?? null);
   const [open, setOpen] = useState<AITopContender | null>(null);
   const picks = data?.topContenders ?? [];
@@ -87,16 +121,7 @@ export function TIPicksCarousel({ tournamentId, state }: Props) {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
-              <div
-                style={{
-                  width: 44, height: 44, borderRadius: '34%',
-                  background: '#15171F',
-                  backgroundImage: p.photoUrl ? `url(${p.photoUrl})` : 'none',
-                  backgroundSize: 'cover', backgroundPosition: 'center',
-                  border: `0.5px solid ${V4.hairline}`,
-                  flexShrink: 0,
-                }}
-              />
+              <Avatar name={p.playerName} tourCode={tourCode} size={44} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
                   <span style={{ fontSize: 22, color: V4.goldMid, lineHeight: 1, ...NUMERAL_THIN }}>{p.rank}</span>
@@ -131,6 +156,7 @@ export function TIPicksCarousel({ tournamentId, state }: Props) {
           pick={open}
           state={state}
           live={liveMap?.get(open.playerId)}
+          tourCode={tourCode}
           onClose={() => setOpen(null)}
         />
       ) : null}
@@ -202,11 +228,13 @@ function CaseSheet({
   pick,
   state,
   live,
+  tourCode,
   onClose,
 }: {
   pick: AITopContender;
   state: EventState;
   live: PickLiveState | undefined;
+  tourCode: string;
   onClose: () => void;
 }) {
   return (
@@ -225,16 +253,7 @@ function CaseSheet({
       >
         <div style={{ width: 36, height: 4, background: V4.hairline, borderRadius: 999, margin: '4px auto 14px' }} />
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
-          <div
-            style={{
-              width: 48, height: 48, borderRadius: '34%',
-              background: '#15171F',
-              backgroundImage: pick.photoUrl ? `url(${pick.photoUrl})` : 'none',
-              backgroundSize: 'cover', backgroundPosition: 'center',
-              border: `0.5px solid ${V4.hairline}`,
-              flexShrink: 0,
-            }}
-          />
+          <Avatar name={pick.playerName} tourCode={tourCode} size={48} />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
               <span style={{ fontSize: 10.5, fontWeight: 800, color: V4.amber, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
