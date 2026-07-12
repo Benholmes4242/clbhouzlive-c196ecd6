@@ -421,11 +421,15 @@ export function useSeasonTimeline(tour: TourId): {
       return evt;
     });
 
-    // Anchor: first this-week row; else first upcoming.
+    // Anchor priority: live row, then this-week row, then first upcoming.
     let anchorId: string | null = null;
     let currentEventNumber: number | null = null;
+    const liveIdx = decorated.findIndex((e) => e.state === 'live');
     const thisWeekIdx = decorated.findIndex((e) => e.isThisWeek);
-    if (thisWeekIdx !== -1) {
+    if (liveIdx !== -1) {
+      anchorId = decorated[liveIdx].id;
+      currentEventNumber = decorated[liveIdx].eventNumber;
+    } else if (thisWeekIdx !== -1) {
       anchorId = decorated[thisWeekIdx].id;
       currentEventNumber = decorated[thisWeekIdx].eventNumber;
     } else {
