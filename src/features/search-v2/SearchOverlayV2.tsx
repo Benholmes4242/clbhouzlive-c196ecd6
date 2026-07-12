@@ -626,7 +626,7 @@ function CommitResults({
               display: 'grid',
               gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
               gap: 12,
-              padding: '4px 16px 16px',
+              padding: '0 16px 16px',
             }}
           >
             {videos.map((v) => (
