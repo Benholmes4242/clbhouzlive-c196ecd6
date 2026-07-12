@@ -179,6 +179,7 @@ const HomeLanding = lazy(() => import("./pages/HomeLanding"));
 const ClipsSubpageWrapped = lazy(() => import("./components/watch/ClipsSubpage"));
 const VideosSubpageWrapped = lazy(() => import("./components/watch/VideosSubpage"));
 const WatchHubV2 = lazy(() => import("./features/watch-v2/WatchHubV2"));
+const VideosPageV2 = lazy(() => import("./features/videos-v2/VideosPageV2"));
 const AccountTypeOnboarding = lazy(() => import("./pages/onboarding/AccountTypeOnboarding"));
 
 
