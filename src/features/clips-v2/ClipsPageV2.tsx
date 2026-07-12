@@ -1,0 +1,145 @@
+import React, { useCallback, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { Search } from 'lucide-react';
+import { PageRoot } from '@/components/layout/PageRoot';
+import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import {
+  CLIPS_V2_MOODS,
+  useClipsWallFeed,
+  type ClipsV2Mood,
+} from './hooks/useClipsWallFeed';
+
+const FONT_FAMILY =
+  'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
+const DEFAULT_MOOD: ClipsV2Mood = 'for_you';
+
+const MOOD_LABELS: Record<ClipsV2Mood, string> = {
+  for_you: 'For you',
+  lightning: 'Lightning',
+  friends: 'Friends',
+  your_courses: 'Your courses',
+  trending: 'Trending',
+};
+
+function parseMood(raw: string | null): ClipsV2Mood {
+  return raw && (CLIPS_V2_MOODS as readonly string[]).includes(raw)
+    ? (raw as ClipsV2Mood)
+    : DEFAULT_MOOD;
+}
+
+export default function ClipsPageV2() {
+  const [params, setParams] = useSearchParams();
+  const [searchOpen, setSearchOpen] = React.useState(false);
+  const { user } = useSupabaseSession();
+  const userId = user?.id;
+
+  const mood = useMemo(() => parseMood(params.get('mood')), [params]);
+
+  const setMood = useCallback(
+    (next: ClipsV2Mood) => {
+      const p = new URLSearchParams(params);
+      if (next === DEFAULT_MOOD) p.delete('mood');
+      else p.set('mood', next);
+      setParams(p, { replace: true });
+    },
+    [params, setParams],
+  );
+
+  const feed = useClipsWallFeed({ userId, mood });
+  const firstPageCount = feed.data?.pages?.[0]?.length ?? 0;
+
+  return (
+    <PageRoot className="min-h-screen text-foreground bg-background">
+      <main
+        style={{
+          paddingBottom: 80,
+          paddingTop: 'calc(var(--chrome-total-h, 0px) - var(--sat, 0px))',
+          fontFamily: FONT_FAMILY,
+        }}
+      >
+        <div
+          style={{
+            position: 'sticky',
+            top: 0,
+            zIndex: 10,
+            background: '#F8FAFC',
+            borderBottom: '1px solid rgba(0,0,0,0.07)',
+            padding: '10px 16px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div
+              className="scrollbar-hide"
+              style={{
+                flex: 1,
+                minWidth: 0,
+                display: 'flex',
+                gap: 8,
+                overflowX: 'auto',
+              }}
+            >
+              {CLIPS_V2_MOODS.map((id) => {
+                const active = id === mood;
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setMood(id)}
+                    style={{
+                      flexShrink: 0,
+                      fontWeight: 600,
+                      fontSize: 12.5,
+                      padding: '7px 14px',
+                      borderRadius: 999,
+                      background: active ? '#0F172A' : '#fff',
+                      color: active ? '#fff' : '#0F172A',
+                      border: active ? 'none' : '1px solid rgba(0,0,0,0.07)',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {MOOD_LABELS[id]}
+                  </button>
+                );
+              })}
+            </div>
+            <button
+              type="button"
+              aria-label="Search"
+              onClick={() => setSearchOpen(true)}
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 999,
+                border: '1px solid rgba(0,0,0,0.07)',
+                background: '#fff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: 0,
+                cursor: 'pointer',
+                flexShrink: 0,
+              }}
+            >
+              <Search size={15} color="#0F172A" />
+            </button>
+          </div>
+        </div>
+
+        {/* C9.3: wall mounts here */}
+        <div
+          style={{
+            padding: '12px 16px',
+            fontSize: 12,
+            color: '#64748B',
+          }}
+        >
+          mood={mood} · first page rows={firstPageCount}
+        </div>
+      </main>
+
+      <SearchOverlayV2 isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+    </PageRoot>
+  );
+}

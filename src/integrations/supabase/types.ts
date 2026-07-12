@@ -18950,6 +18950,7 @@ export type Database = {
         Args: {
           p_category?: string
           p_cursor?: string
+          p_filter?: string
           p_max_duration?: number
           p_mode?: string
           p_page_size?: number
