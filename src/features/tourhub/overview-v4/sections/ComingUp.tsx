@@ -16,7 +16,7 @@ export function ComingUp({ tour }: { tour: TourId }) {
   if (rows.length === 0) return null;
 
   return (
-    <SectionShell eyebrow="What's coming up" linkLabel="Full schedule" onLinkClick={() => navigate('/tourhub')}>
+    <SectionShell eyebrow="What's coming up" linkLabel="Full schedule" onLinkClick={() => navigate('/tourhub?tab=schedule')}>
       <div style={{ margin: '0 20px' }}>
         <V4Card style={{ overflow: 'hidden' }}>
           {rows.map((r, i) => {

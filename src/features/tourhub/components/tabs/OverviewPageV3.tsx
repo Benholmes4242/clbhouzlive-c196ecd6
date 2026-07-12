@@ -6,7 +6,7 @@
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { ComingUpCalendar } from '../ComingUpCalendar';
+import { ComingUpSlot } from '../overview-v3/ComingUpSlot';
 import { CollegeRivalry } from '../CollegeRivalry';
 import { LazySection } from '../overview-v3/LazySection';
 
@@ -77,7 +77,7 @@ export function OverviewPageV3() {
               </div>
             </LazySection>
             <LazySection minHeight={400}>
-              <ComingUpCalendar />
+              <ComingUpSlot />
             </LazySection>
             <LazySection minHeight={260}>
               <HomeCourseOfWeekModule />
