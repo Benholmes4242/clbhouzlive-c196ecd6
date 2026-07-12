@@ -12,7 +12,7 @@ import { LazySection } from '../overview-v3/LazySection';
 
 import { TISlot } from '../overview-v3/TISlot';
 import { WorldRankingsSlot } from '../overview-v3/WorldRankingsSlot';
-import { StatOfTheWeek } from '../StatOfTheWeek';
+import { StatWatchSlot } from '../overview-v3/StatWatchSlot';
 import { HomeCourseOfWeekModule } from '../home/HomeCourseOfWeekModule';
 
 import { HomeConnectHandicapModule } from '../home/HomeConnectHandicapModule';
@@ -86,7 +86,7 @@ export function OverviewPageV3() {
               <WorldRankingsSlot />
             </LazySection>
             <LazySection minHeight={400}>
-              <StatOfTheWeek />
+              <StatWatchSlot />
             </LazySection>
             <LazySection minHeight={350}>
               <CollegeRivalry />

@@ -9,7 +9,7 @@ import { HeroV4 } from './hero/HeroV4';
 import { OnTheCourse } from './sections/OnTheCourse';
 import { TIPicksCarousel } from './sections/TIPicksCarousel';
 import { WorldRankings } from './sections/WorldRankings';
-import { StatOfTheWeekV4 } from './sections/StatOfTheWeekV4';
+import { StatWatch } from './sections/StatWatch';
 import { ComingUp } from './sections/ComingUp';
 import { CollegeFranchiseSection } from './sections/CollegeFranchiseSection';
 import { CourseOfTheWeekV4 } from './sections/CourseOfTheWeekV4';
@@ -29,7 +29,7 @@ export function OverviewV4Page() {
       {isLive ? <OnTheCourse tournamentId={ctx?.event?.id} live={isLive} /> : null}
       <TIPicksCarousel tournamentId={ctx?.event?.id} state={state} />
       <WorldRankings tour={tour} />
-      <StatOfTheWeekV4 />
+      <StatWatch tour={tour} />
       <ComingUp tour={tour} />
       <CollegeFranchiseSection />
       <CourseOfTheWeekV4 />
