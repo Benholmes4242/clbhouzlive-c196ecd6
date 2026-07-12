@@ -501,6 +501,7 @@ function AppRoutes() {
         <Route path="/profile/:username/followers" element={<Suspense fallback={<GenericPageSkeleton />}><FollowersListPage /></Suspense>} />
         <Route path="/profile/:username/following" element={<Suspense fallback={<GenericPageSkeleton />}><FollowingListPage /></Suspense>} />
         <Route path="/profile/:username/friends" element={<Suspense fallback={<GenericPageSkeleton />}><FriendsRedirectToFollowing /></Suspense>} />
+        <Route path="/social-v2-test/:username" element={<Suspense fallback={<GenericPageSkeleton />}><SocialListV2TestPage /></Suspense>} />
         
         {/* Business routes */}
         <Route path="/businesses/manage" element={<Suspense fallback={<GenericPageSkeleton />}><MyBusinessesPage /></Suspense>} />
