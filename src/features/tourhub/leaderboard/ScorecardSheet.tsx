@@ -468,7 +468,7 @@ export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
                   marginLeft: 4,
                 }}
               >
-                {roundAgg.birdies} birdies \u00B7 {roundAgg.bogeys} bogeys
+                {roundAgg.birdies} birdies {'\u00B7'} {roundAgg.bogeys} bogeys
               </span>
             </div>
           )}
