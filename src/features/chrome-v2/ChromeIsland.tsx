@@ -79,20 +79,36 @@ function canvasFor(tone: ChromeTone): string {
 // ---------------------------------------------------------------------------
 // Left capsule
 // ---------------------------------------------------------------------------
-const LeftCapsule: React.FC<{ spec: ChromeSpec }> = ({ spec }) => {
+const LeftCapsule: React.FC<{
+  spec: ChromeSpec;
+  override: ReturnType<typeof useChromeLeftOverride>;
+}> = ({ spec, override }) => {
   const navigate = useNavigate();
   const tone = spec.tone;
 
-  if (spec.left?.kind === 'back') {
-    const title = spec.left.title;
-    const backTarget = spec.left.backTarget;
+  // Override wins over the registry rule (when non-null).
+  if (spec.left?.kind === 'back' || override) {
+    const registryLeft =
+      spec.left?.kind === 'back' ? spec.left : null;
+    const title = registryLeft?.title ?? null;
+    const backTarget =
+      override?.backTarget ?? registryLeft?.backTarget ?? 'history';
+    const backFallback =
+      override?.backFallback ?? registryLeft?.backFallback;
+
+    const onBack = () => {
+      if (backTarget === 'history') {
+        if (backFallback) safeGoBack(navigate, backFallback);
+        else navigate(-1);
+      } else {
+        navigate(backTarget);
+      }
+    };
+
     return (
       <button
         type="button"
-        onClick={() => {
-          if (backTarget === 'history') navigate(-1);
-          else navigate(backTarget);
-        }}
+        onClick={onBack}
         aria-label={title ? `Back to ${title}` : 'Go back'}
         style={{
           ...glassStyle(tone),
@@ -119,6 +135,7 @@ const LeftCapsule: React.FC<{ spec: ChromeSpec }> = ({ spec }) => {
       </button>
     );
   }
+
 
   // Default: logo. Match CompactHeader.handleLogoClick non-back branch:
   // navigate('/clubhouse'). (Brief said '/watch'; the source of truth is
