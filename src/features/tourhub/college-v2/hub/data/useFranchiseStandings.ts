@@ -36,6 +36,8 @@ export interface YearbookStanding {
   logoUrl: string | null;
   pointsTotal: number;
   alumniCount: number;
+  winsTotal: number;
+  top10Total: number;
   /** Positive = rose in rank; negative = fell; null = no data. */
   rankChange: number | null;
   topAlumni: YearbookAlumnus[];
