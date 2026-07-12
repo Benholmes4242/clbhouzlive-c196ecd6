@@ -81,7 +81,7 @@ function groupThru(g: GroupShape): number | null {
   return typeof first === 'number' ? first : null;
 }
 
-export function OnTheCourse({ tournamentId, live }: Props) {
+export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
   const { data } = useFeaturedGroups(tournamentId, { live });
   if (!live) return null;
   const groups = parseGroups(data);
