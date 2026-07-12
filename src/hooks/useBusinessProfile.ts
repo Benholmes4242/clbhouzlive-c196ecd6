@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AppLog } from '@/lib/logger';
+import { isUuid } from '@/utils/isUuid';
+
 
 export type LocationPrecision = 'address' | 'poi' | 'postcode' | 'city' | 'region' | 'country' | 'pin';
 
@@ -57,7 +59,7 @@ export function useBusinessProfile(idOrSlug: string | undefined) {
       if (!idOrSlug) throw new Error('No business ID or slug provided');
 
       // Fetch business with joined golf_clubs and golf_courses for coords fallback chain
-      const { data, error } = await supabase
+      let query = supabase
         .from('business_accounts')
         .select(`
           *,
@@ -66,10 +68,16 @@ export function useBusinessProfile(idOrSlug: string | undefined) {
             latitude,
             longitude
           )
-        `)
-        .or(`id.eq.${idOrSlug},slug.eq.${idOrSlug}`)
+        `);
+
+      query = isUuid(idOrSlug)
+        ? query.eq('id', idOrSlug)
+        : query.eq('slug', idOrSlug);
+
+      const { data, error } = await query
         .eq('is_deleted', false)
         .maybeSingle();
+
 
       if (error) {
         AppLog.error('[useBusinessProfile]', 'query error', error);
