@@ -17,6 +17,9 @@ import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { overlayOpen, overlayMark } from '@/perf/overlayTiming';
 import ActorCards from './components/ActorCards';
 import HcpStrip from './components/HcpStrip';
+import QuickActionsRow from './components/QuickActionsRow';
+import SheetNavGroup from './components/SheetNavGroup';
+import SignOutRow from './components/SignOutRow';
 
 interface Profile {
   id: string;
@@ -50,26 +53,33 @@ const SHEET_BG = '#F8FAFC';
 const SKELETON_TILE = 'rgba(0,0,0,0.06)';
 
 function SheetSkeleton() {
-  const bar = (h: number, w: string, mt = 0) => (
+  const block = (h: number, style: React.CSSProperties = {}) => (
     <div
       style={{
         height: h,
-        width: w,
-        marginTop: mt,
         background: SKELETON_TILE,
-        borderRadius: 12,
+        borderRadius: 14,
+        ...style,
       }}
     />
   );
   return (
-    <div style={{ padding: '18px 20px 24px' }}>
-      {bar(64, '100%')}
-      {bar(52, 'calc(100% - 8px)', 14)}
-      <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
-        {bar(72, '33%')}
-        {bar(72, '33%')}
-        {bar(72, '33%')}
+    <div style={{ padding: '4px 0 24px' }}>
+      {/* actor card rail */}
+      <div style={{ display: 'flex', gap: 10, padding: '10px 20px 0', overflow: 'hidden' }}>
+        {block(68, { flex: '0 0 220px' })}
+        {block(68, { flex: '0 0 220px', opacity: 0.6 })}
       </div>
+      {/* hcp strip */}
+      {block(46, { margin: '12px 20px 0' })}
+      {/* quick action tiles */}
+      <div style={{ display: 'flex', gap: 8, padding: '14px 20px 0' }}>
+        {block(58, { flex: 1 })}
+        {block(58, { flex: 1 })}
+        {block(58, { flex: 1 })}
+      </div>
+      {/* nav group */}
+      {block(168, { margin: '14px 20px 0' })}
     </div>
   );
 }
