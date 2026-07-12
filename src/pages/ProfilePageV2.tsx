@@ -183,6 +183,14 @@ const ProfilePageV2Content: React.FC = () => {
   const isOwnAccount = user?.id === profileUserId;
   const isSelf = isOwnAccount; // legacy alias - preserves personal-identity-owned UI below
 
+  // H3: on own profile, route the island back button to settings (matches
+  // the prior FloatingPageHeader onBack behavior). Visitor profiles rely on
+  // the registry's '/' fallback.
+  useSetChromeLeftOverride(
+    isSelf ? { backTarget: '/edit-profile?tab=settings' } : null,
+  );
+
+
 
   const followToggle = useToggleFollow();
   const { activeActor } = useActiveActor();
