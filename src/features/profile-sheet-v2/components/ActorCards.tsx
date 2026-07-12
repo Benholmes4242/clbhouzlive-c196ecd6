@@ -129,21 +129,35 @@ export default function ActorCards({
                     ringColor={LIGHT_HAIRLINE}
                   />
                 ) : (
-                  <div
-                    style={{
-                      width: 42,
-                      height: 42,
-                      borderRadius: '34%',
-                      background: 'linear-gradient(135deg,#F7931E,#d97a10)',
-                      color: '#fff',
-                      fontWeight: 800,
-                      fontSize: 16,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    {initial}
+                  <div style={{ position: 'relative', width: 42, height: 42, flexShrink: 0 }}>
+                    <div
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        borderRadius: '34%',
+                        overflow: 'hidden',
+                        background: 'linear-gradient(135deg,#F7931E,#d97a10)',
+                        color: '#fff',
+                        fontWeight: 800,
+                        fontSize: 16,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      {initial}
+                    </div>
+                    {/* Canonical 1px traced hairline (light surface) */}
+                    <div
+                      aria-hidden
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        borderRadius: '34%',
+                        border: '1px solid rgba(15,23,42,0.12)',
+                        pointerEvents: 'none',
+                      }}
+                    />
                   </div>
                 )}
               </div>
