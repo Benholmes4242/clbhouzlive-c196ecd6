@@ -101,9 +101,13 @@ export function useSocialListCounts(
   viewerId: string | undefined,
 ) {
   return useQuery({
-    queryKey: ['social-list-v2-counts', actorType, actorId],
+    // viewerId in the key — mutual_count in the count row is viewer-scoped
+    // even though totals are not, and this guarantees we never serve a
+    // pre-session cached zero after login.
+    queryKey: ['social-list-v2-counts', viewerId ?? null, actorType, actorId],
     enabled: !!actorId,
     staleTime: 60_000,
+
     queryFn: async () => {
       if (!actorId) return { followers: 0, following: 0 };
       const [f, g] = await Promise.all([
