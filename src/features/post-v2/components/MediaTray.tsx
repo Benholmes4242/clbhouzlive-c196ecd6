@@ -30,7 +30,7 @@ export default function MediaTray({ media, activeIndex, onSelect, onRemove, onRe
   };
 
   return (
-    <div style={{ padding: '10px 12px', background: '#F8FAFC', borderTop: '1px solid rgba(0,0,0,0.07)', display: 'flex', gap: 8, alignItems: 'center', overflowX: 'auto' }}>
+    <div style={{ padding: '12px', background: '#F8FAFC', borderTop: '1px solid rgba(0,0,0,0.07)', display: 'flex', gap: 8, alignItems: 'center', overflowX: 'auto' }}>
       <button
         onClick={handleAdd}
         style={{ minWidth: 56, height: 56, borderRadius: 12, border: '1px dashed rgba(0,0,0,0.2)', background: '#fff', color: '#1F2428', fontSize: 22, cursor: 'pointer' }}

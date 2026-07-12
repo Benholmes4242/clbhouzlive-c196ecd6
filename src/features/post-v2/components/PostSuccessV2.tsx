@@ -29,7 +29,7 @@ export default function PostSuccessV2({ result, onDone }: Props) {
 
   return (
     <div style={{ flex: 1, background: '#F8FAFC', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14, padding: '0 24px', textAlign: 'center' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '0 24px', textAlign: 'center' }}>
         <div style={{ width: 64, height: 64, background: '#15171F', borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {isScheduled
             ? <Clock size={28} color="#F5F6F7" strokeWidth={2.5} />
@@ -61,7 +61,7 @@ function UploadingState({ result, onDone }: Props) {
 
   return (
     <div style={{ flex: 1, background: '#F8FAFC', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14, padding: '0 28px', textAlign: 'center', maxWidth: 340 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '0 24px', textAlign: 'center', maxWidth: 340 }}>
         <ProgressRing size={64} progress={progress} />
         <div style={{ fontSize: 16, fontWeight: 600, color: '#1F2428' }}>
           {isScheduled ? 'Scheduled' : 'Posting...'}
@@ -126,7 +126,7 @@ const doneBtn: React.CSSProperties = {
   fontSize: 14,
   fontWeight: 600,
   cursor: 'pointer',
-  marginTop: 4,
+  
 };
 
 

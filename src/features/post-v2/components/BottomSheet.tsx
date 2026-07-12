@@ -52,7 +52,7 @@ export default function BottomSheet({ open, title, onClose, children, fullHeight
           <div style={{ width: 36, height: 4, borderRadius: 999, background: 'rgba(0,0,0,0.14)' }} />
         </div>
         {title && (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 16px 12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px 12px' }}>
             <div style={{ fontSize: 17, fontWeight: 800, color: '#0F172A', letterSpacing: -0.2 }}>{title}</div>
             <button
               onClick={onClose}
