@@ -1,10 +1,8 @@
 import React, { useCallback, useMemo } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
-import { useWatchHubCounts } from '@/features/watch-v2/hooks/useWatchHubCounts';
-import { formatCount } from '@/features/watch-v2/utils/formatCount';
 import { SortSegment, type VideosSortId } from './components/SortSegment';
 import {
   CategoryChips,
@@ -32,7 +30,6 @@ function parseCategory(raw: string | null): VideosV2CategoryId | null {
 }
 
 export default function VideosPageV2() {
-  const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const [searchOpen, setSearchOpen] = React.useState(false);
 
@@ -59,10 +56,6 @@ export default function VideosPageV2() {
     [params, setParams],
   );
 
-  const { data: counts, isLoading: countsLoading } = useWatchHubCounts();
-  const showCount = !countsLoading && counts != null;
-  const countText = showCount ? `\u00B7 ${formatCount(counts!.video_count)}` : '';
-
   return (
     <PageRoot className="min-h-screen text-foreground bg-background">
       <main
@@ -72,102 +65,8 @@ export default function VideosPageV2() {
           fontFamily: FONT_FAMILY,
         }}
       >
-        {/* Header */}
-        <div
-          style={{
-            padding: '2px 16px 8px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-          }}
-        >
-          <button
-            type="button"
-            aria-label="Back"
-            onClick={() => navigate(-1)}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              padding: 0,
-              cursor: 'pointer',
-              fontWeight: 600,
-              fontSize: 20,
-              lineHeight: 1,
-              color: '#0F172A',
-              fontFamily: FONT_FAMILY,
-            }}
-          >
-            {'\u2039'}
-          </button>
-
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div
-              style={{
-                fontWeight: 700,
-                fontSize: 10.5,
-                letterSpacing: '0.16em',
-                color: '#c97a10',
-                textTransform: 'uppercase',
-                fontFamily: FONT_FAMILY,
-              }}
-            >
-              FULL LENGTH
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'baseline',
-                gap: 6,
-                fontFamily: FONT_FAMILY,
-              }}
-            >
-              <span
-                style={{
-                  fontWeight: 800,
-                  fontSize: 22,
-                  letterSpacing: '-0.02em',
-                  color: '#0F172A',
-                }}
-              >
-                Videos
-              </span>
-              {showCount && (
-                <span
-                  style={{
-                    fontWeight: 600,
-                    fontSize: 13,
-                    color: '#64748B',
-                  }}
-                >
-                  {countText}
-                </span>
-              )}
-            </div>
-          </div>
-
-          <button
-            type="button"
-            aria-label="Search"
-            onClick={() => setSearchOpen(true)}
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: 999,
-              border: '1px solid rgba(0,0,0,0.07)',
-              background: '#fff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: 0,
-              cursor: 'pointer',
-              flexShrink: 0,
-            }}
-          >
-            <Search size={15} color="#0F172A" />
-          </button>
-        </div>
-
-        {/* Sticky control block */}
+        {/* Sticky control block — CompactHeader supplies the back-arrow
+            chrome; this is the first content on the page. */}
         <div
           style={{
             position: 'sticky',
@@ -175,10 +74,34 @@ export default function VideosPageV2() {
             zIndex: 10,
             background: '#F8FAFC',
             borderBottom: '1px solid rgba(0,0,0,0.07)',
-            padding: '4px 16px 10px',
+            padding: '10px 16px 10px',
           }}
         >
-          <SortSegment value={sort} onChange={setSort} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <SortSegment value={sort} onChange={setSort} />
+            </div>
+            <button
+              type="button"
+              aria-label="Search"
+              onClick={() => setSearchOpen(true)}
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 999,
+                border: '1px solid rgba(0,0,0,0.07)',
+                background: '#fff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: 0,
+                cursor: 'pointer',
+                flexShrink: 0,
+              }}
+            >
+              <Search size={15} color="#0F172A" />
+            </button>
+          </div>
           <CategoryChips value={category} onChange={setCategory} />
         </div>
 
