@@ -11,9 +11,7 @@ import { TIPicksCarousel } from './sections/TIPicksCarousel';
 import { WorldRankings } from './sections/WorldRankings';
 import { StatWatch } from './sections/StatWatch';
 import { ComingUp } from './sections/ComingUp';
-import { CollegeFranchiseSection } from './sections/CollegeFranchiseSection';
-import { CourseOfTheWeekV4 } from './sections/CourseOfTheWeekV4';
-import { ConnectHandicapCTA } from './sections/ConnectHandicapCTA';
+import { CollegeFranchise } from './sections/CollegeFranchise';
 import { V4 } from './tokens';
 import type { TourId } from '../hooks/useOverviewData';
 
