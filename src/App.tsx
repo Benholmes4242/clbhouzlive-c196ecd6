@@ -224,7 +224,6 @@ const InboxV2Page = lazy(() => import("./pages/messaging-v2/InboxV2Page"));
 const CommentsV2Test = lazy(() => import("./pages/CommentsV2Test"));
 const ThreadV2Page = lazy(() => import("./pages/messaging-v2/ThreadV2Page"));
 
-const ActivityPageWrapped = lazy(() => import("./pages/ActivityPageWrapped"));
 const ActivityPageV2 = lazy(() => import("./features/activity-v2/ActivityPageV2"));
 const GolfersToFollowPage = lazy(() => import("./pages/GolfersToFollowPage"));
 const GolfersSharedCoursesPage = lazy(() => import("./pages/GolfersSharedCoursesPage"));
@@ -491,8 +490,7 @@ function AppRoutes() {
 
 
 
-        <Route path="/notificationmessages" element={<Suspense fallback={<ActivityPageSkeleton />}><ActivityPageWrapped /></Suspense>} />
-        <Route path="/activity-v2-test" element={<Suspense fallback={<ActivityPageSkeleton />}><ActivityPageV2 /></Suspense>} />
+        <Route path="/notificationmessages" element={<Suspense fallback={<ActivityPageSkeleton />}><ActivityPageV2 /></Suspense>} />
         <Route path="/golferstofollow" element={<Suspense fallback={<GenericPageSkeleton />}><GolfersToFollowPage /></Suspense>} />
         <Route path="/golferssharedcourses" element={<Suspense fallback={<GenericPageSkeleton />}><GolfersSharedCoursesPage /></Suspense>} />
         <Route path="/friends" element={<Suspense fallback={<GenericPageSkeleton />}><OwnProfileSocialRedirect tab="friends" /></Suspense>} />
