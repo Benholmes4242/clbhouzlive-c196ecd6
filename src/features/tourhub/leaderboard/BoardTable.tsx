@@ -31,7 +31,8 @@ const INK = '#0F172A';
 const SECONDARY = '#4B5563';
 const MUTED = '#94A3B8';
 const HAIRLINE = 'rgba(0,0,0,0.08)';
-const BAND = '#F8FAFC';
+const BAND = 'rgba(31,36,40,0.03)';
+const CANVAS = '#F8FAFC';
 
 const SCORE_UNDER = '#189A55';
 const SCORE_OVER = '#C24A4A';
