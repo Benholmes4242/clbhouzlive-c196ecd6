@@ -104,7 +104,7 @@ export const VisibilityDropdown: React.FC<VisibilityDropdownProps> = ({
                         type="button"
                         onClick={() => handleSelect(option.value)}
                         className={cn(
-                          'w-full flex items-center gap-3 px-5 py-3.5 text-left transition-colors active:bg-muted min-h-[52px]',
+                          'w-full flex items-center gap-3 px-4 py-3 text-left transition-colors active:bg-muted min-h-[52px]',
                           isSelected && 'bg-muted/60'
                         )}
                       >
