@@ -141,6 +141,8 @@ export function CollegeFranchise() {
   const total = leader.earnings_total + chaser.earnings_total;
   const leaderPct = total > 0 ? (leader.earnings_total / total) * 100 : 50;
   const chaserPct = 100 - leaderPct;
+  const leaderColor = getCollegeColor(leader.normalized_name);
+  const chaserColor = getCollegeColor(chaser.normalized_name);
 
   // Headline chain: DB > data-driven > generic fallback
   const headline = (() => {
