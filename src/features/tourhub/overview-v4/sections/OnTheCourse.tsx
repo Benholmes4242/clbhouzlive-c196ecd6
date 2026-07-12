@@ -7,7 +7,8 @@
 import { useFeaturedGroups } from '../data/useFeaturedGroups';
 import { SectionShell } from './SectionShell';
 import { V4 } from '../tokens';
-import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
+import { PlayerAvatar } from '../../components/PlayerAvatar';
+import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 interface Props {
   tournamentId: string | undefined;
