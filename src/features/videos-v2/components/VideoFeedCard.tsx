@@ -1,0 +1,220 @@
+/**
+ * VideoFeedCard — full-width video card for /videos-v2-test.
+ * Autoplay + fullscreen handoff replicates the W6 rail-lane pattern
+ * (see src/features/watch-v2/components/HubVideoRow.tsx as the source
+ * of truth). No imports from src/components/watch/.
+ */
+import { useRef } from 'react';
+import Pressable from '@/components/ui/Pressable';
+import { FormatBadge } from '@/features/watch-v2/components/FormatBadge';
+import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
+import { formatCount } from '@/features/watch-v2/utils/formatCount';
+import { stripMentionMarkup } from '@/lib/mentions/format';
+import { useRailLane } from '@/video/useRailLane';
+import { usePreroutePrefetch } from '@/video/usePreroutePrefetch';
+import { openWithOrigin } from '@/lib/openWithOrigin';
+import { relativeTime } from '@/utils/relativeTime';
+import type { FeedPost } from '@/components/media-system/types/media';
+import type { VideosFeedV2Row } from '../hooks/useVideosFeedV2';
+
+const FONT_FAMILY =
+  'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
+interface Props {
+  row: VideosFeedV2Row;
+  post: FeedPost;
+  index: number;
+  posts: FeedPost[];
+  isAutoplayActive: boolean;
+}
+
+export function VideoFeedCard({ row, post, index, posts, isAutoplayActive }: Props) {
+  const rootRef = useRef<HTMLElement>(null);
+
+  const stripped = row.post_content
+    ? stripMentionMarkup(String(row.post_content)).trim()
+    : '';
+  const title = stripped || row.course_name || 'Untitled video';
+
+  const initial =
+    (row.creator_display_name || row.creator_username || '?')
+      .toString()
+      .trim()
+      .charAt(0)
+      .toUpperCase() || '?';
+
+  const hlsUrl = post.mediaItems[0]?.hlsUrl ?? null;
+  const isVideo = !!hlsUrl;
+  const ownerKey = isVideo ? `${post.id}:0` : null;
+  const posterUrl = row.poster_url ?? post.mediaItems[0]?.thumbnailUrl ?? null;
+
+  const { hostRef, ready } = useRailLane({
+    ownerKey,
+    active: isAutoplayActive && isVideo,
+    hlsUrl,
+    posterUrl,
+    postId: post.id,
+  });
+
+  const { onPrerouteArm, onPreroute, onPrerouteCancel } = usePreroutePrefetch({
+    ownerKey,
+    hlsUrl,
+    enabled: isVideo && !isAutoplayActive,
+  });
+
+  const handlePress = () => {
+    openWithOrigin({
+      openedFrom: 'watch',
+      posts,
+      index,
+      originEl: rootRef.current as HTMLElement | null,
+      posterUrl,
+      railOwnerKey: ownerKey,
+    });
+  };
+
+  const likeCount = typeof row.like_count === 'number' ? row.like_count : 0;
+  const metaParts: string[] = [];
+  if (row.creator_username) metaParts.push(`@${row.creator_username}`);
+  if (likeCount > 0) {
+    metaParts.push(`${formatCount(likeCount)} ${likeCount === 1 ? 'like' : 'likes'}`);
+  }
+  if (row.post_created_at) metaParts.push(relativeTime(row.post_created_at));
+  const metaLine = metaParts.join(' \u00B7 ');
+
+  return (
+    <Pressable
+      ref={rootRef}
+      as="div"
+      variant="media"
+      onPress={handlePress}
+      onPrerouteArm={onPrerouteArm}
+      onPreroute={onPreroute}
+      onPrerouteCancel={onPrerouteCancel}
+      data-watch-tile-index={index}
+      data-post-id={post.id}
+      style={{
+        width: '100%',
+        marginBottom: 20,
+        cursor: 'pointer',
+        fontFamily: FONT_FAMILY,
+      }}
+    >
+      <div
+        style={{
+          aspectRatio: '16 / 9',
+          borderRadius: 12,
+          background: '#e5e9ef',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        {row.poster_url ? (
+          <img
+            src={row.poster_url}
+            alt=""
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+            loading="lazy"
+          />
+        ) : null}
+        {isVideo ? (
+          <div
+            ref={hostRef}
+            aria-hidden
+            style={{
+              position: 'absolute',
+              inset: 0,
+              zIndex: 1,
+              opacity: ready ? 1 : 0,
+              transition: 'opacity 140ms linear',
+              pointerEvents: 'none',
+            }}
+          />
+        ) : null}
+        <FormatBadge format="video" />
+        {row.duration_seconds ? (
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 7,
+              right: 7,
+              zIndex: 2,
+              background: 'rgba(0,0,0,0.72)',
+              color: '#fff',
+              fontWeight: 600,
+              fontSize: 10,
+              padding: '2px 6px',
+              borderRadius: 5,
+            }}
+          >
+            {formatDuration(row.duration_seconds)}
+          </div>
+        ) : null}
+      </div>
+
+      <div style={{ display: 'flex', gap: 9, marginTop: 8, alignItems: 'flex-start' }}>
+        {row.creator_avatar_url ? (
+          <img
+            src={row.creator_avatar_url}
+            alt=""
+            style={{
+              width: 30,
+              height: 30,
+              borderRadius: '34%',
+              objectFit: 'cover',
+              flexShrink: 0,
+            }}
+          />
+        ) : (
+          <div
+            style={{
+              width: 30,
+              height: 30,
+              borderRadius: '34%',
+              background: 'linear-gradient(135deg,#F7931E,#d97a10)',
+              color: '#fff',
+              fontWeight: 700,
+              fontSize: 12,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}
+          >
+            {initial}
+          </div>
+        )}
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <div
+            style={{
+              fontWeight: 700,
+              fontSize: 13.5,
+              lineHeight: 1.28,
+              color: '#0F172A',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            }}
+          >
+            {title}
+          </div>
+          {metaLine ? (
+            <div
+              style={{
+                fontWeight: 500,
+                fontSize: 11.5,
+                color: '#64748B',
+                marginTop: 3,
+              }}
+            >
+              {metaLine}
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </Pressable>
+  );
+}
+
+export default VideoFeedCard;

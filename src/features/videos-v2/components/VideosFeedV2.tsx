@@ -1,0 +1,210 @@
+/**
+ * VideosFeedV2 — infinite feed body for /videos-v2-test.
+ *
+ * Pending uploads integration replicates VideosFullFeed's semantics:
+ *   - usePendingPostsForActor keyed to the active actor (business or
+ *     personal), with the current feed's real post_ids passed in so the
+ *     hook can drop entries once they've landed as real posts.
+ *   - Filter to entries whose media includes at least one video kind
+ *     (this is the videos surface — audio/photo-only pending posts
+ *     surface elsewhere).
+ * Reference (READ, do not import): src/components/watch/videos/VideosFullFeed.tsx.
+ */
+import { useEffect, useMemo, useRef } from 'react';
+import { useInView } from 'react-intersection-observer';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useActiveActor } from '@/context/ActiveActorContext';
+import { usePendingPostsForActor } from '@/uploads/usePendingPostsForActor';
+import { PendingPostCard } from '@/components/posts-tab/PendingPostCard';
+import { useWatchAutoplay } from '@/video/useWatchAutoplay';
+import { toFeedPosts } from '@/features/watch-v2/utils/toFeedPost';
+import type { VideosSortId } from './SortSegment';
+import type { VideosV2CategoryId } from './CategoryChips';
+import { useVideosFeedV2, type VideosFeedV2Row } from '../hooks/useVideosFeedV2';
+import { VideoFeedCard } from './VideoFeedCard';
+
+const FONT_FAMILY =
+  'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
+interface Props {
+  sort: VideosSortId;
+  category: VideosV2CategoryId | null;
+}
+
+function SkeletonCard() {
+  return (
+    <div style={{ marginBottom: 20 }}>
+      <div
+        style={{
+          aspectRatio: '16 / 9',
+          borderRadius: 12,
+          background: 'rgba(0,0,0,0.06)',
+        }}
+      />
+      <div style={{ display: 'flex', gap: 9, marginTop: 8 }}>
+        <div
+          style={{
+            width: 30,
+            height: 30,
+            borderRadius: '34%',
+            background: 'rgba(0,0,0,0.06)',
+            flexShrink: 0,
+          }}
+        />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ height: 12, borderRadius: 4, background: 'rgba(0,0,0,0.06)' }} />
+          <div
+            style={{
+              marginTop: 6,
+              height: 10,
+              width: '60%',
+              borderRadius: 4,
+              background: 'rgba(0,0,0,0.06)',
+            }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Spinner() {
+  return (
+    <>
+      <style>{`@keyframes videosV2Spin{to{transform:rotate(360deg)}}`}</style>
+      <div
+        aria-label="Loading"
+        style={{
+          width: 26,
+          height: 26,
+          borderRadius: '50%',
+          border: '3px solid rgba(0,0,0,0.08)',
+          borderTopColor: '#F7931E',
+          animation: 'videosV2Spin 0.9s linear infinite',
+        }}
+      />
+    </>
+  );
+}
+
+export function VideosFeedV2({ sort, category }: Props) {
+  const { user } = useSupabaseSession();
+  const userId = user?.id;
+
+  const {
+    data,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useVideosFeedV2({ userId, sort, category });
+
+  const rows: VideosFeedV2Row[] = useMemo(() => {
+    const pages = (data?.pages ?? []) as VideosFeedV2Row[][];
+    const flat: VideosFeedV2Row[] = [];
+    for (const p of pages) for (const r of p) flat.push(r);
+    return flat;
+  }, [data]);
+
+  const feedPosts = useMemo(() => toFeedPosts(rows), [rows]);
+
+  // Autoplay across the feed container. maxActive:1 per brief.
+  const { activeIndices, railRef } = useWatchAutoplay({
+    railId: 'videos-v2-feed',
+    posts: feedPosts,
+    maxActive: 1,
+  });
+
+  // Pending uploads (video-kind only) — same semantics as VideosFullFeed.
+  const { activeActor } = useActiveActor();
+  const realPostIds = useMemo(() => rows.map((r) => r.post_id), [rows]);
+  const pendingEntries = usePendingPostsForActor({
+    authorActorType: activeActor?.type === 'business' ? 'business' : 'personal',
+    authorActorId: activeActor?.id ?? userId ?? '',
+    viewerActorType: activeActor?.type === 'business' ? 'business' : 'personal',
+    viewerActorId: activeActor?.id ?? userId ?? '',
+    realPostIds,
+  });
+  const visiblePending = useMemo(
+    () => pendingEntries.filter((e) => e.media.some((m) => m.kind === 'video')),
+    [pendingEntries],
+  );
+
+  // Infinite scroll sentinel.
+  const fetchGuard = useRef(false);
+  const { ref: sentinelRef, inView } = useInView({ rootMargin: '400px' });
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage && !fetchGuard.current) {
+      fetchGuard.current = true;
+      fetchNextPage();
+      window.setTimeout(() => {
+        fetchGuard.current = false;
+      }, 200);
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  // Empty state.
+  const isEmpty = !isLoading && rows.length === 0 && visiblePending.length === 0;
+  const nonDefault = sort !== 'latest' || category != null;
+
+  return (
+    <div style={{ fontFamily: FONT_FAMILY }}>
+      {visiblePending.length > 0 && (
+        <div style={{ padding: '12px 16px 0' }}>
+          {visiblePending.map((p) => (
+            <div key={p.jobId} style={{ marginBottom: 12 }}>
+              <PendingPostCard entry={p} theme="light" />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {isLoading && rows.length === 0 ? (
+        <div style={{ padding: '12px 16px 30px' }}>
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+        </div>
+      ) : isEmpty ? (
+        <div style={{ padding: '40px 16px', textAlign: 'center' }}>
+          <div style={{ fontWeight: 700, fontSize: 14, color: '#0F172A' }}>
+            No videos yet
+          </div>
+          <div
+            style={{
+              marginTop: 6,
+              fontWeight: 500,
+              fontSize: 12,
+              color: '#64748B',
+            }}
+          >
+            {nonDefault ? 'Try a different filter' : 'Check back soon'}
+          </div>
+        </div>
+      ) : (
+        <div ref={railRef} style={{ padding: '12px 16px 30px' }}>
+          {rows.map((r, i) => (
+            <VideoFeedCard
+              key={r.post_id}
+              row={r}
+              post={feedPosts[i]}
+              index={i}
+              posts={feedPosts}
+              isAutoplayActive={activeIndices.has(i)}
+            />
+          ))}
+
+          <div ref={sentinelRef} style={{ height: 1 }} />
+
+          {isFetchingNextPage && (
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '18px 0' }}>
+              <Spinner />
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default VideosFeedV2;

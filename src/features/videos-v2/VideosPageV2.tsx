@@ -11,6 +11,7 @@ import {
   VIDEOS_V2_CATEGORY_IDS,
   type VideosV2CategoryId,
 } from './components/CategoryChips';
+import { VideosFeedV2 } from './components/VideosFeedV2';
 
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
@@ -181,7 +182,7 @@ export default function VideosPageV2() {
           <CategoryChips value={category} onChange={setCategory} />
         </div>
 
-        {/* V2.2: feed mounts here */}
+        <VideosFeedV2 sort={sort} category={category} />
       </main>
 
       <SearchOverlayV2 isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
