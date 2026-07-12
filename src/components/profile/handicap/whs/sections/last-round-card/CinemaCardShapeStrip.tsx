@@ -53,7 +53,7 @@ export const CinemaCardShapeStrip: React.FC<Props> = ({ holes }) => {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 7 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
         <span style={labelStyle}>HOLE 1</span>
         <span style={labelStyle}>SHAPE OF THE ROUND</span>
         <span style={labelStyle}>18</span>

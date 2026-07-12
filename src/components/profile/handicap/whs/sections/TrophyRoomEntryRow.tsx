@@ -108,10 +108,10 @@ const GhostMedallion: React.FC<{ z: number; first: boolean }> = ({ z, first }) =
 const rowStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
-  gap: 13,
+  gap: 12,
   width: '100%',
   textAlign: 'left',
-  padding: '14px 16px',
+  padding: '12px 16px',
   borderRadius: 16,
   background: 'var(--hcp-bg-1)',
   border: '1px solid var(--hcp-line)',
@@ -188,7 +188,7 @@ const TrophyRoomEntryRow: React.FC<Props> = ({
 
     if (isFriend) {
       return (
-        <div style={{ padding: '0 20px 4px', fontFamily: FONT }}>
+        <div style={{ padding: '0 16px 4px', fontFamily: FONT }}>
           <div style={rowStyle}>
             {ghostShelf}
             <div style={{ flex: 1, minWidth: 0 }}>
@@ -205,7 +205,7 @@ const TrophyRoomEntryRow: React.FC<Props> = ({
     }
 
     return (
-      <div style={{ padding: '0 20px 4px', fontFamily: FONT }}>
+      <div style={{ padding: '0 16px 4px', fontFamily: FONT }}>
         <button
           type="button"
           onClick={() => openGamAchievements()}
@@ -245,7 +245,7 @@ const TrophyRoomEntryRow: React.FC<Props> = ({
       : 'See them all';
 
   return (
-    <div style={{ padding: '0 20px 4px', fontFamily: FONT }}>
+    <div style={{ padding: '0 16px 4px', fontFamily: FONT }}>
       <button
         type="button"
         onClick={() => openGamAchievements()}

@@ -279,7 +279,7 @@ const LastRoundHeroCard: React.FC<Props> = ({ round, onClick }) => {
           }}
         >
           {/* stats row */}
-          <div style={{ display: 'flex', padding: '13px 14px', alignItems: 'flex-end' }}>
+          <div style={{ display: 'flex', padding: '12px 14px', alignItems: 'flex-end' }}>
             {(
               [
                 ['Score diff', diffDisplay, diffColor, 1.2, 22],

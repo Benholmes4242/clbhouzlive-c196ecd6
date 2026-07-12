@@ -96,7 +96,7 @@ export const PulseCard: React.FC<Props> = ({ friend }) => {
         position: 'relative',
         width: 132,
         flexShrink: 0,
-        padding: 11,
+        padding: 12,
         background: 'var(--hcp-bg-1)',
         border: '1px solid var(--hcp-line)',
         borderRadius: 13,

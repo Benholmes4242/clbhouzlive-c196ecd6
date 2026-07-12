@@ -30,7 +30,7 @@ const PlayerRow: React.FC<{ p: PlayerSearchResult; onTap: () => void }> = ({ p, 
         background: 'var(--hcp-bg-1)',
         border: '1px solid var(--hcp-line)',
         borderRadius: 12,
-        padding: 14,
+        padding: 16,
         cursor: 'pointer',
         display: 'flex',
         alignItems: 'center',
@@ -139,7 +139,7 @@ export const PlayerSearchSheet: React.FC<Props> = ({ open, onClose }) => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '14px 20px 10px',
+          padding: '12px 16px 12px',
           borderBottom: '0.5px solid var(--hcp-line)',
           fontFamily: FONT,
         }}
@@ -171,7 +171,7 @@ export const PlayerSearchSheet: React.FC<Props> = ({ open, onClose }) => {
 
       {/* Scrollable body */}
       <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', paddingBottom: 24 }}>
-        <div style={{ padding: '20px 16px 0' }}>
+        <div style={{ padding: '16px 16px 0' }}>
           <div
             style={{
               display: 'flex',
@@ -180,7 +180,7 @@ export const PlayerSearchSheet: React.FC<Props> = ({ open, onClose }) => {
               background: 'var(--hcp-bg-1)',
               border: '1px solid var(--hcp-line)',
               borderRadius: 12,
-              padding: '10px 14px',
+              padding: '12px 14px',
             }}
           >
             <Search size={16} color="var(--hcp-t-60)" />
@@ -206,7 +206,7 @@ export const PlayerSearchSheet: React.FC<Props> = ({ open, onClose }) => {
         {q.length >= 2 ? (
           <>
             <div style={{ marginTop: 24 }}><SectionHeader tier="standard" surface="dark" kicker="SEARCH RESULTS" paddingX={16} /></div>
-            <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
               {isLoading && <Skeleton height={68} radius={12} />}
               {isError && <RetryStub message="Couldn't search players" onRetry={() => refetch()} />}
               {!isLoading && !isError && results.length === 0 && (
@@ -218,9 +218,9 @@ export const PlayerSearchSheet: React.FC<Props> = ({ open, onClose }) => {
             </div>
           </>
         ) : (
-          <div style={{ padding: '40px 28px 32px', textAlign: 'center' }}>
+          <div style={{ padding: '40px 24px 32px', textAlign: 'center' }}>
             {/* rivalry mark: Swords in an amber-tint square + small Pin badge */}
-            <div style={{ position: 'relative', display: 'inline-flex', marginBottom: 22 }}>
+            <div style={{ position: 'relative', display: 'inline-flex', marginBottom: 24 }}>
               <div style={{ width: 64, height: 64, borderRadius: 18, background: 'var(--hcp-amber-tint)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Swords size={28} color="var(--hcp-amber)" strokeWidth={2} />
               </div>
@@ -231,7 +231,7 @@ export const PlayerSearchSheet: React.FC<Props> = ({ open, onClose }) => {
             <div style={{ fontSize: 19, fontWeight: 800, color: 'var(--hcp-t-100)', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
               Every handicap is a rivalry waiting to happen
             </div>
-            <div style={{ fontSize: 13.5, color: 'var(--hcp-t-60)', marginTop: 10, lineHeight: 1.5, maxWidth: 300, marginLeft: 'auto', marginRight: 'auto' }}>
+            <div style={{ fontSize: 13.5, color: 'var(--hcp-t-60)', marginTop: 12, lineHeight: 1.5, maxWidth: 300, marginLeft: 'auto', marginRight: 'auto' }}>
               Search for a player and pin them to your Pulse to watch your handicaps battle it out, round by round.
             </div>
           </div>

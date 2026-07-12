@@ -8,17 +8,17 @@ interface Props {
 }
 
 export const PulseEmpty: React.FC<Props> = ({ onOpenSearch }) => (
-  <div style={{ padding: '16px 20px 0', fontFamily: FONT }}>
+  <div style={{ padding: '16px 16px 0', fontFamily: FONT }}>
     <div
       style={{
         background: 'var(--hcp-bg-1)',
         border: '1px solid var(--hcp-line)',
         borderRadius: 13,
-        padding: 20,
+        padding: 16,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: 14,
+        gap: 12,
         textAlign: 'center',
       }}
     >

@@ -8,14 +8,14 @@ interface Props {
 }
 
 export const FindPlayerRow: React.FC<Props> = ({ onOpen }) => (
-  <div style={{ padding: '10px 20px 0', fontFamily: FONT }}>
+  <div style={{ padding: '12px 16px 0', fontFamily: FONT }}>
     <button
       onClick={onOpen}
       style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 7,
+        gap: 8,
         width: '100%',
         background: 'transparent',
         border: 'none',
