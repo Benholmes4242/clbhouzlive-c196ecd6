@@ -526,7 +526,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
           ) : standsAlone ? (
             <div
               style={{
-                padding: '26px 18px',
+                padding: '24px 16px',
                 textAlign: 'center',
                 color: INK_55,
                 fontSize: 12.5,
