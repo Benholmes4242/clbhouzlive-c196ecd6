@@ -127,7 +127,7 @@ export function FeedCard({
       style={{
         display: 'block',
         width: '100%',
-        marginBottom: 14,
+        marginBottom: 12,
         cursor: 'pointer',
         fontFamily: FONT_FAMILY,
       }}

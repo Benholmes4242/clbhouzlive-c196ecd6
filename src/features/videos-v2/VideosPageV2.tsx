@@ -74,7 +74,7 @@ export default function VideosPageV2() {
         <div
           style={{
             position: 'sticky',
-            top: 0,
+            top: 'calc(var(--header-h, 55px) + var(--sat, 0px) - 1px)',
             zIndex: 10,
             background: '#F8FAFC',
             borderBottom: '1px solid rgba(0,0,0,0.07)',
