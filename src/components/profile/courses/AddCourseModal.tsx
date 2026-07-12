@@ -141,7 +141,7 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
         borderRadius: 14,
         padding: '12px 14px',
         boxShadow: isDragging ? '0 4px 12px rgba(0,0,0,0.08)' : '0 1px 2px rgba(15,23,42,0.04)',
-        marginBottom: 10,
+        marginBottom: 12,
         cursor: 'grab',
         touchAction: 'none',
       }}
@@ -320,7 +320,7 @@ const CourseRow: React.FC<CourseRowProps> = ({
     display: 'flex',
     alignItems: 'flex-start',
     gap: 12,
-    padding: '14px 16px',
+    padding: '12px 16px',
     background: '#FFFFFF',
     borderBottom: `1px solid ${BORDER}`,
     opacity: isAtLimit ? 0.4 : 1,

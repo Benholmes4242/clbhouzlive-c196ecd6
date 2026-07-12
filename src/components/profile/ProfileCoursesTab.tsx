@@ -61,7 +61,7 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
         </div>
         {/* Course history skeleton */}
         <div className="mt-6 px-4 space-y-2">
-          <div className="h-5 w-32 bg-muted rounded mb-3" />
+          <div className="h-5 w-32 bg-muted rounded" />
           {[1, 2, 3].map((i) => (
             <div key={i} className="h-[200px] bg-muted rounded" />
           ))}
