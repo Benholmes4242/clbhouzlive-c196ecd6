@@ -313,11 +313,13 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                 type="button"
                 role="checkbox"
                 aria-checked={agreed}
-                onClick={() => {
-                  setAgreed((v) => !v);
-                  if (nudgeAgreement) setNudgeAgreement(false);
-                }}
-                className="w-full flex items-start gap-3 rounded-[12px] px-3 py-2.5 text-left transition-colors active:opacity-80"
+            {/* Legal / EULA block — Apple Guideline 1.2 + 2.2
+                Links MUST NOT be nested inside a <button> (invalid HTML +
+                webviews swallow the tap). Toggle is its own button; the
+                legal copy with links is a sibling. */}
+            <div style={{ marginTop: 8 }}>
+              <div
+                className="w-full flex items-start gap-3 rounded-[12px] px-3 py-2.5 transition-colors"
                 style={{
                   background: 'rgba(255,255,255,0.04)',
                   border: `1px solid ${
@@ -327,8 +329,16 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                   }`,
                 }}
               >
-                <span
-                  aria-hidden="true"
+                <button
+                  type="button"
+                  role="checkbox"
+                  aria-checked={agreed}
+                  aria-label={agreed ? 'Unagree to terms' : 'Agree to terms'}
+                  onClick={() => {
+                    setAgreed((v) => !v);
+                    if (nudgeAgreement) setNudgeAgreement(false);
+                  }}
+                  className="active:opacity-80"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -336,12 +346,14 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                     width: 20,
                     height: 20,
                     marginTop: 1,
+                    padding: 0,
                     borderRadius: 6,
                     background: agreed ? '#F7931E' : 'transparent',
                     border: agreed
                       ? '1px solid #F7931E'
                       : '1.5px solid rgba(255,255,255,0.45)',
                     flexShrink: 0,
+                    cursor: 'pointer',
                     transition: 'all 120ms ease',
                   }}
                 >
@@ -350,12 +362,28 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                       <path d="M5 12l4 4L19 7" stroke="#FFFFFF" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   )}
-                </span>
+                </button>
                 <span style={{ fontSize: 12, lineHeight: 1.45, color: 'rgba(255,255,255,0.78)' }}>
-                  I agree to the{' '}
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => {
+                      setAgreed((v) => !v);
+                      if (nudgeAgreement) setNudgeAgreement(false);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setAgreed((v) => !v);
+                        if (nudgeAgreement) setNudgeAgreement(false);
+                      }
+                    }}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    I agree to the
+                  </span>{' '}
                   <Link
                     to="/terms"
-                    onClick={(e) => e.stopPropagation()}
                     style={{ color: '#F7931E', fontWeight: 600, textDecoration: 'underline' }}
                   >
                     Terms of Service
@@ -363,7 +391,6 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                   and{' '}
                   <Link
                     to="/privacy"
-                    onClick={(e) => e.stopPropagation()}
                     style={{ color: '#F7931E', fontWeight: 600, textDecoration: 'underline' }}
                   >
                     Privacy Policy
@@ -371,7 +398,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                   . clbhouz has zero tolerance for objectionable content and abusive
                   behavior. Reports are reviewed within 24 hours.
                 </span>
-              </button>
+              </div>
             </div>
           </div>
         </div>
