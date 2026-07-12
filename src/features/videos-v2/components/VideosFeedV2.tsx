@@ -21,7 +21,9 @@ import { toFeedPosts } from '@/features/watch-v2/utils/toFeedPost';
 import type { VideosSortId } from './SortSegment';
 import type { VideosV2CategoryId } from './CategoryChips';
 import { useVideosFeedV2, type VideosFeedV2Row } from '../hooks/useVideosFeedV2';
+import { useInterruptClips } from '../hooks/useInterruptClips';
 import { VideoFeedCard } from './VideoFeedCard';
+import { ClipsInterruptShelf } from './ClipsInterruptShelf';
 
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
@@ -98,6 +100,10 @@ export function VideosFeedV2({ sort, category }: Props) {
     hasNextPage,
     fetchNextPage,
   } = useVideosFeedV2({ userId, sort, category });
+
+  // Shared trending-clips pool for every interrupt shelf on the page.
+  const { data: interruptClipsData } = useInterruptClips(userId);
+  const interruptClips = interruptClipsData ?? [];
 
   const rows: VideosFeedV2Row[] = useMemo(() => {
     const pages = (data?.pages ?? []) as VideosFeedV2Row[][];
@@ -183,16 +189,39 @@ export function VideosFeedV2({ sort, category }: Props) {
         </div>
       ) : (
         <div ref={railRef} style={{ padding: '12px 16px 30px' }}>
-          {rows.map((r, i) => (
-            <VideoFeedCard
-              key={r.post_id}
-              row={r}
-              post={feedPosts[i]}
-              index={i}
-              posts={feedPosts}
-              isAutoplayActive={activeIndices.has(i)}
-            />
-          ))}
+          {rows.map((r, i) => {
+            const card = (
+              <VideoFeedCard
+                key={r.post_id}
+                row={r}
+                post={feedPosts[i]}
+                index={i}
+                posts={feedPosts}
+                isAutoplayActive={activeIndices.has(i)}
+              />
+            );
+            // Insert a clips interrupt shelf after flat index (6 + 12k) - 1
+            // = 5 + 12k, i.e. after the 6th, 18th, 30th video. Gated on
+            // having at least 7 loaded videos and a non-empty clips pool.
+            // Shelves are NOT tiles of the feed rail: they carry no
+            // data-watch-tile-index and never enter feedPosts.
+            const shouldInsertShelf =
+              rows.length >= 7 &&
+              interruptClips.length > 0 &&
+              i >= 5 &&
+              (i - 5) % 12 === 0;
+            if (!shouldInsertShelf) return card;
+            const shelfIndex = (i - 5) / 12;
+            return (
+              <span key={r.post_id}>
+                {card}
+                <ClipsInterruptShelf
+                  clips={interruptClips}
+                  shelfIndex={shelfIndex}
+                />
+              </span>
+            );
+          })}
 
           <div ref={sentinelRef} style={{ height: 1 }} />
 
