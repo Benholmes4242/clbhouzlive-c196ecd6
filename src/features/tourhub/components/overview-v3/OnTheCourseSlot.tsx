@@ -9,12 +9,12 @@ import { OnTheCourse } from '@/features/tourhub/overview-v4/sections/OnTheCourse
 import { useTournamentPulse } from './useTournamentPulse';
 
 export function OnTheCourseSlot() {
-  const { viewingTournamentId } = useTourSelection();
+  const { viewingTournamentId, viewingTourSlug } = useTourSelection();
   const tournamentId = viewingTournamentId ?? undefined;
   const { isLive } = useTournamentPulse(tournamentId);
 
   if (!tournamentId || !isLive) return null;
-  return <OnTheCourse tournamentId={tournamentId} live={isLive} />;
+  return <OnTheCourse tournamentId={tournamentId} live={isLive} tourCode={viewingTourSlug ?? 'pga'} />;
 }
 
 export default OnTheCourseSlot;
