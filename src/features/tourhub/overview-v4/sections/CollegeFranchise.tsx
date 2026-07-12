@@ -240,6 +240,7 @@ export function CollegeFranchise() {
           const name = displayName(s, media);
           const fname = fullName(s, media);
           const logo = getCollegeLogoUrl(fname);
+          const color = getCollegeColor(s.normalized_name);
           const cap = captainMap?.get(s.normalized_name);
           const capName = cap ? abbreviate(cap.fullName) : null;
           return (
@@ -249,10 +250,10 @@ export function CollegeFranchise() {
               style={{
                 width: '100%',
                 display: 'grid',
-                gridTemplateColumns: '28px 30px 1fr auto',
+                gridTemplateColumns: '28px 26px 1fr auto',
                 alignItems: 'center',
                 gap: 12,
-                padding: '11px 12px',
+                padding: '7px 12px',
                 background: 'transparent',
                 border: 'none',
                 borderBottom: i < top5.length - 1 ? `0.5px solid ${V4.hairline}` : 'none',
@@ -263,13 +264,19 @@ export function CollegeFranchise() {
               <span style={{ fontSize: 13, fontWeight: 700, color: V4.inkFaint, fontVariantNumeric: 'tabular-nums', textAlign: 'center' }}>
                 {i + 1}
               </span>
-              <SchoolSquircle size={30} logo={logo} name={name} />
+              <SchoolSquircle size={26} logo={logo} name={name} />
               <div style={{ minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: V4.ink, letterSpacing: '-0.005em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {name}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+                  <span
+                    aria-hidden
+                    style={{ width: 3, height: 3, borderRadius: '50%', background: color, flexShrink: 0 }}
+                  />
+                  <span style={{ fontSize: 13, fontWeight: 700, color: V4.ink, letterSpacing: '-0.005em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {name}
+                  </span>
                 </div>
-                <div style={{ fontSize: 10, fontWeight: 600, color: V4.inkFaint, marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {s.player_count} on tour{capName ? ` · ${capName}` : ''}
+                <div style={{ fontSize: 9.5, fontWeight: 600, color: V4.inkFaint, marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {s.player_count} on tour{capName ? ` · ${capName} captains` : ''}
                 </div>
               </div>
               <span style={{ fontSize: 12, fontWeight: 700, color: V4.ink, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.01em' }}>
