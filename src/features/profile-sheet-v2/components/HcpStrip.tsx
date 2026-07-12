@@ -2,11 +2,11 @@
  * ProfileSheetV2 · HcpStrip
  *
  * Slim tappable handicap strip. Two states:
- *   - Connected: HCP eyebrow + index + trend arrow + rounds-30d + chevron
+ *   - Connected: HCP eyebrow + index + trend arrow + rounds-90d + chevron
  *   - Disconnected: HCP eyebrow + "Connect England Golf" + chevron
  * Hidden for business actors. Both states tap to /handicap.
  *
- * rounds-30d is computed locally by scanning useAllScores by play_date,
+ * rounds-90d is computed locally by scanning useAllScores by play_date,
  * mirroring src/hooks/useProfileSheetStats.ts (which dies with the old
  * sheet).
  */
