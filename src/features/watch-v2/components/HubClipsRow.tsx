@@ -1,18 +1,75 @@
-import { useNavigate } from 'react-router-dom';
+import { useMemo, useRef } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useHubQuickClips } from '../hooks/useHubQuickClips';
 import { formatDuration } from '../utils/formatDuration';
+import { toFeedPosts } from '../utils/toFeedPost';
+import Pressable from '@/components/ui/Pressable';
+import { useWatchAutoplay } from '@/video/useWatchAutoplay';
+import { useRailLane } from '@/video/useRailLane';
+import { usePreroutePrefetch } from '@/video/usePreroutePrefetch';
+import { openWithOrigin } from '@/lib/openWithOrigin';
+import type { FeedPost } from '@/components/media-system/types/media';
+import { useNavigate } from 'react-router-dom';
 
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
-function Tile({ row, onOpen }: { row: any; onOpen: () => void }) {
+function Tile({
+  row,
+  post,
+  index,
+  posts,
+  isAutoplayActive,
+}: {
+  row: any;
+  post: FeedPost;
+  index: number;
+  posts: FeedPost[];
+  isAutoplayActive: boolean;
+}) {
+  const rootRef = useRef<HTMLElement>(null);
   const title = row.review_course_name || 'Clip';
+  const hlsUrl = post.mediaItems[0]?.hlsUrl ?? null;
+  const isVideo = !!hlsUrl;
+  const ownerKey = isVideo ? `${post.id}:0` : null;
+  const posterUrl = row.poster_url ?? post.mediaItems[0]?.thumbnailUrl ?? null;
+
+  const { hostRef, ready } = useRailLane({
+    ownerKey,
+    active: isAutoplayActive && isVideo,
+    hlsUrl,
+    posterUrl,
+    postId: post.id,
+  });
+
+  const { onPrerouteArm, onPreroute, onPrerouteCancel } = usePreroutePrefetch({
+    ownerKey,
+    hlsUrl,
+    enabled: isVideo && !isAutoplayActive,
+  });
+
+  const handlePress = () => {
+    openWithOrigin({
+      openedFrom: 'watch',
+      posts,
+      index,
+      originEl: rootRef.current as HTMLElement | null,
+      posterUrl,
+      railOwnerKey: ownerKey,
+    });
+  };
+
   return (
-    <div
-      role="button"
-      tabIndex={0}
-      onClick={onOpen}
+    <Pressable
+      ref={rootRef}
+      as="div"
+      variant="media"
+      onPress={handlePress}
+      onPrerouteArm={onPrerouteArm}
+      onPreroute={onPreroute}
+      onPrerouteCancel={onPrerouteCancel}
+      data-watch-tile-index={index}
+      data-post-id={post.id}
       style={{ width: 110, flexShrink: 0, cursor: 'pointer', fontFamily: FONT_FAMILY }}
     >
       <div
@@ -32,12 +89,27 @@ function Tile({ row, onOpen }: { row: any; onOpen: () => void }) {
             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
           />
         ) : null}
+        {isVideo ? (
+          <div
+            ref={hostRef}
+            aria-hidden
+            style={{
+              position: 'absolute',
+              inset: 0,
+              zIndex: 1,
+              opacity: ready ? 1 : 0,
+              transition: 'opacity 140ms linear',
+              pointerEvents: 'none',
+            }}
+          />
+        ) : null}
         {row.duration_seconds ? (
           <div
             style={{
               position: 'absolute',
               bottom: 6,
               right: 6,
+              zIndex: 2,
               background: 'rgba(0,0,0,0.6)',
               color: '#fff',
               fontWeight: 600,
@@ -78,7 +150,7 @@ function Tile({ row, onOpen }: { row: any; onOpen: () => void }) {
           @{row.creator_username}
         </div>
       ) : null}
-    </div>
+    </Pressable>
   );
 }
 
@@ -102,6 +174,13 @@ export function HubClipsRow() {
   const { data, isLoading } = useHubQuickClips(user?.id);
 
   const rows = (data ?? []) as any[];
+  const feedPosts = useMemo(() => toFeedPosts(rows), [rows]);
+  const { activeIndices, railRef } = useWatchAutoplay({
+    railId: 'hub-clips-row',
+    posts: feedPosts,
+    maxActive: 1,
+  });
+
   if (!isLoading && rows.length === 0) return null;
 
   return (
@@ -157,6 +236,7 @@ export function HubClipsRow() {
       </div>
 
       <div
+        ref={railRef}
         style={{
           display: 'flex',
           gap: 10,
@@ -175,11 +255,14 @@ export function HubClipsRow() {
           </>
         ) : (
           <>
-            {rows.map((r) => (
+            {rows.map((r, i) => (
               <Tile
                 key={r.post_id}
                 row={r}
-                onOpen={() => navigate('/post/' + r.post_id)}
+                post={feedPosts[i]}
+                index={i}
+                posts={feedPosts}
+                isAutoplayActive={activeIndices.has(i)}
               />
             ))}
             <div

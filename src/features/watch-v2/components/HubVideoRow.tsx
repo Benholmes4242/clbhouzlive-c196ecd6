@@ -1,14 +1,35 @@
+import { useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useHubLongFormVideos } from '../hooks/useHubLongFormVideos';
 import { formatDuration } from '../utils/formatDuration';
 import { FormatBadge } from './FormatBadge';
 import { stripMentionMarkup } from '@/lib/mentions/format';
+import { toFeedPosts } from '../utils/toFeedPost';
+import Pressable from '@/components/ui/Pressable';
+import { useWatchAutoplay } from '@/video/useWatchAutoplay';
+import { useRailLane } from '@/video/useRailLane';
+import { usePreroutePrefetch } from '@/video/usePreroutePrefetch';
+import { openWithOrigin } from '@/lib/openWithOrigin';
+import type { FeedPost } from '@/components/media-system/types/media';
 
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
-function Card({ row, onOpen }: { row: any; onOpen: () => void }) {
+function Card({
+  row,
+  post,
+  index,
+  posts,
+  isAutoplayActive,
+}: {
+  row: any;
+  post: FeedPost;
+  index: number;
+  posts: FeedPost[];
+  isAutoplayActive: boolean;
+}) {
+  const rootRef = useRef<HTMLElement>(null);
   const stripped = row.post_content
     ? stripMentionMarkup(String(row.post_content)).trim()
     : '';
@@ -20,11 +41,47 @@ function Card({ row, onOpen }: { row: any; onOpen: () => void }) {
       .charAt(0)
       .toUpperCase() || '?';
 
+  const hlsUrl = post.mediaItems[0]?.hlsUrl ?? null;
+  const isVideo = !!hlsUrl;
+  const ownerKey = isVideo ? `${post.id}:0` : null;
+  const posterUrl = row.poster_url ?? post.mediaItems[0]?.thumbnailUrl ?? null;
+
+  const { hostRef, ready } = useRailLane({
+    ownerKey,
+    active: isAutoplayActive && isVideo,
+    hlsUrl,
+    posterUrl,
+    postId: post.id,
+  });
+
+  const { onPrerouteArm, onPreroute, onPrerouteCancel } = usePreroutePrefetch({
+    ownerKey,
+    hlsUrl,
+    enabled: isVideo && !isAutoplayActive,
+  });
+
+  const handlePress = () => {
+    openWithOrigin({
+      openedFrom: 'watch',
+      posts,
+      index,
+      originEl: rootRef.current as HTMLElement | null,
+      posterUrl,
+      railOwnerKey: ownerKey,
+    });
+  };
+
   return (
-    <div
-      role="button"
-      tabIndex={0}
-      onClick={onOpen}
+    <Pressable
+      ref={rootRef}
+      as="div"
+      variant="media"
+      onPress={handlePress}
+      onPrerouteArm={onPrerouteArm}
+      onPreroute={onPreroute}
+      onPrerouteCancel={onPrerouteCancel}
+      data-watch-tile-index={index}
+      data-post-id={post.id}
       style={{ width: 288, flexShrink: 0, cursor: 'pointer', fontFamily: FONT_FAMILY }}
     >
       <div
@@ -44,6 +101,20 @@ function Card({ row, onOpen }: { row: any; onOpen: () => void }) {
             loading="lazy"
           />
         ) : null}
+        {isVideo ? (
+          <div
+            ref={hostRef}
+            aria-hidden
+            style={{
+              position: 'absolute',
+              inset: 0,
+              zIndex: 1,
+              opacity: ready ? 1 : 0,
+              transition: 'opacity 140ms linear',
+              pointerEvents: 'none',
+            }}
+          />
+        ) : null}
         <FormatBadge format="video" />
         {row.duration_seconds ? (
           <div
@@ -51,6 +122,7 @@ function Card({ row, onOpen }: { row: any; onOpen: () => void }) {
               position: 'absolute',
               bottom: 7,
               right: 7,
+              zIndex: 2,
               background: 'rgba(0,0,0,0.72)',
               color: '#fff',
               fontWeight: 600,
@@ -125,7 +197,7 @@ function Card({ row, onOpen }: { row: any; onOpen: () => void }) {
           ) : null}
         </div>
       </div>
-    </div>
+    </Pressable>
   );
 }
 
@@ -149,6 +221,13 @@ export function HubVideoRow() {
   const { data, isLoading } = useHubLongFormVideos(user?.id);
 
   const rows = (data ?? []) as any[];
+  const feedPosts = useMemo(() => toFeedPosts(rows), [rows]);
+  const { activeIndices, railRef } = useWatchAutoplay({
+    railId: 'hub-video-row',
+    posts: feedPosts,
+    maxActive: 1,
+  });
+
   if (!isLoading && rows.length === 0) return null;
 
   return (
@@ -204,6 +283,7 @@ export function HubVideoRow() {
       </div>
 
       <div
+        ref={railRef}
         style={{
           display: 'flex',
           gap: 12,
@@ -221,11 +301,14 @@ export function HubVideoRow() {
           </>
         ) : (
           <>
-            {rows.map((r) => (
+            {rows.map((r, i) => (
               <Card
                 key={r.post_id}
                 row={r}
-                onOpen={() => navigate('/post/' + r.post_id)}
+                post={feedPosts[i]}
+                index={i}
+                posts={feedPosts}
+                isAutoplayActive={activeIndices.has(i)}
               />
             ))}
             <div
