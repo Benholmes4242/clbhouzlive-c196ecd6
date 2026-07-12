@@ -259,9 +259,17 @@ export default function ProfileSheetV2({
                 actorId={currentActor.id}
                 onNavigate={onNavigate}
               />
-              {/* PS2: action row */}
-              {/* PS2: nav group */}
-              {/* PS2: sign out */}
+              <QuickActionsRow
+                actorType={currentActor.type}
+                actorId={currentActor.id}
+                onNavigate={onNavigate}
+              />
+              <SheetNavGroup
+                currentActor={{ id: currentActor.id, type: currentActor.type }}
+                isAdmin={_isAdmin}
+                onNavigate={onNavigate}
+              />
+              <SignOutRow onNavigate={onNavigate} />
             </div>
           )}
         </motion.div>
