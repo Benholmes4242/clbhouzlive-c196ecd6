@@ -101,6 +101,10 @@ export function VideosFeedV2({ sort, category }: Props) {
     fetchNextPage,
   } = useVideosFeedV2({ userId, sort, category });
 
+  // Shared trending-clips pool for every interrupt shelf on the page.
+  const { data: interruptClipsData } = useInterruptClips(userId);
+  const interruptClips = interruptClipsData ?? [];
+
   const rows: VideosFeedV2Row[] = useMemo(() => {
     const pages = (data?.pages ?? []) as VideosFeedV2Row[][];
     const flat: VideosFeedV2Row[] = [];
