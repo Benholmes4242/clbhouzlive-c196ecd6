@@ -28,6 +28,7 @@ import React, { useState, useRef, useLayoutEffect } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Search, ArrowLeft, TrendingDown, TrendingUp } from 'lucide-react';
 import { resolveChrome, type ChromeSpec, type ChromeTone } from './registry';
+import { useChromeLeftOverride } from './leftOverride';
 import { Z } from '@/config/zIndex';
 import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import { PostingAsMenu } from '@/components/header/PostingAsMenu';
@@ -37,6 +38,7 @@ import { useActorUnreadCounts } from '@/hooks/useActorUnreadCounts';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection, useHandicapTrend } from '@/lib/whs/hooks';
 import { useHandicapTrend90d } from '@/hooks/useHandicapTrend90d';
+import { safeGoBack } from '@/utils/navigation';
 
 const ISLAND_H = 44;
 const TOP_GAP = 10;
