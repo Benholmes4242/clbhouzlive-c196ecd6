@@ -70,8 +70,8 @@ export function AlmanacHead({
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: 7,
-        padding: '0 16px 9px',
+        gap: 8,
+        padding: '0 16px 8px',
       }}
     >
       {icon && (
@@ -190,7 +190,7 @@ function FeatTierRailInner({ region, tier, title }: TierProps) {
       {isLoading ? (
         <div
           className="flex gap-3 px-4 overflow-x-auto scrollbar-hide"
-          style={{ paddingTop: 4, marginTop: -4, paddingBottom: 14, marginBottom: -8 }}>
+          style={{ paddingTop: 4, marginTop: -4, paddingBottom: 16, marginBottom: -16 }}>
           {[0, 1].map((i) => (
             <div
               key={i}
@@ -213,7 +213,7 @@ function FeatTierRailInner({ region, tier, title }: TierProps) {
             style={{
               width: 250,
               borderRadius: 14,
-              padding: 14,
+              padding: 12,
               border: '1.5px dashed rgba(15,23,42,0.18)',
               background: 'rgba(255,255,255,0.6)',
               cursor: 'pointer',
@@ -221,7 +221,7 @@ function FeatTierRailInner({ region, tier, title }: TierProps) {
               fontFamily: FONT,
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
               <div
                 style={{
                   width: 36,
@@ -255,7 +255,7 @@ function FeatTierRailInner({ region, tier, title }: TierProps) {
             </div>
             <div
               style={{
-                paddingTop: 9,
+                paddingTop: 8,
                 borderTop: '1px dashed rgba(15,23,42,0.12)',
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -285,7 +285,7 @@ function FeatTierRailInner({ region, tier, title }: TierProps) {
       ) : (
         <div
           className="flex gap-3 px-4 overflow-x-auto scrollbar-hide"
-          style={{ paddingTop: 4, marginTop: -4, paddingBottom: 14, marginBottom: -8 }}>
+          style={{ paddingTop: 4, marginTop: -4, paddingBottom: 16, marginBottom: -16 }}>
           {displayRows.map((row, i) => (
             <FeatCard key={`${row.score_id ?? row.course_id ?? i}-${i}`} row={row} tier={tier} />
           ))}
