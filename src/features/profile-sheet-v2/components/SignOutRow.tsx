@@ -41,7 +41,7 @@ export default function SignOutRow({ onNavigate }: Props) {
       style={{
         display: 'flex',
         justifyContent: 'center',
-        padding: '14px 0 26px',
+        padding: '12px 0 0',
       }}
     >
       {confirming ? (

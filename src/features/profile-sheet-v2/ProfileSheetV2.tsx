@@ -73,13 +73,13 @@ function SheetSkeleton() {
       {/* hcp strip */}
       {block(46, { margin: '12px 20px 0' })}
       {/* quick action tiles */}
-      <div style={{ display: 'flex', gap: 8, padding: '14px 20px 0' }}>
+      <div style={{ display: 'flex', gap: 8, padding: '12px 20px 0' }}>
         {block(58, { flex: 1 })}
         {block(58, { flex: 1 })}
         {block(58, { flex: 1 })}
       </div>
       {/* nav group */}
-      {block(168, { margin: '14px 20px 0' })}
+      {block(168, { margin: '12px 20px 0' })}
     </div>
   );
 }
@@ -226,7 +226,7 @@ export default function ProfileSheetV2({
             style={{
               display: 'flex',
               justifyContent: 'center',
-              paddingTop: 9,
+              paddingTop: 8,
               paddingBottom: 4,
               flexShrink: 0,
               touchAction: 'none',
@@ -246,7 +246,7 @@ export default function ProfileSheetV2({
           {isLoading ? (
             <SheetSkeleton />
           ) : (
-            <div style={{ paddingTop: 14, paddingBottom: 20 }}>
+            <div style={{ paddingTop: 16, paddingBottom: 32 }}>
               <ActorCards
                 currentActor={currentActor}
                 profiles={profiles}

@@ -91,7 +91,7 @@ export default function QuickActionsRow({ actorType, actorId, onNavigate }: Prop
   const badge = actorTotal;
 
   return (
-    <div style={{ display: 'flex', gap: 8, padding: '14px 20px 0' }}>
+    <div style={{ display: 'flex', gap: 8, padding: '12px 20px 0' }}>
       <Tile
         label="Echo"
         icon={<Sparkles size={17} color={INK} />}

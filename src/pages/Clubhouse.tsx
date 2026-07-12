@@ -368,7 +368,7 @@ const ClubhouseContent = () => {
     return activeTab === 'friends' ? (
       <div
         className="flex flex-col w-full min-h-screen"
-        style={{ background: '#15171F', paddingTop: 'calc(env(safe-area-inset-top, 0px) + 78px)' }}
+        style={{ background: '#15171F', paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)' }}
       >
         <div className="flex flex-col items-center px-8 text-center pb-6">
           <div className="w-14 h-14 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(255,255,255,0.06)' }}>
@@ -409,15 +409,15 @@ const ClubhouseContent = () => {
     ) : (
       <div
         className="flex flex-col items-center justify-center min-h-screen px-8 text-center"
-        style={{ background: '#15171F', paddingTop: 'calc(env(safe-area-inset-top, 0px) + 78px)' }}
+        style={{ background: '#15171F', paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)' }}
       >
         <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(255,255,255,0.06)' }}>
           <Compass className="w-8 h-8" style={{ color: 'rgba(255,255,255,0.5)' }} />
         </div>
-        <p className="text-lg font-semibold" style={{ color: '#FFFFFF' }}>
+        <p className="text-lg font-semibold mb-1" style={{ color: '#FFFFFF' }}>
           {!user ? 'Sign in to see your feed' : (activeFeed.isError ? 'Couldn’t load your feed' : 'No posts to show')}
         </p>
-        <p className="text-sm mt-2 mb-4" style={{ color: 'rgba(255,255,255,0.7)' }}>
+        <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,0.7)' }}>
           {!user ? 'Create an account or sign in to get started.' : (activeFeed.isError ? 'Tap retry to try again.' : 'Check back soon for new content')}
         </p>
         {!user ? (
@@ -475,7 +475,7 @@ const ClubhouseContent = () => {
       {!isOnline && !isTournamentCardActive && (
         <div style={{
           position: 'fixed',
-          top: 'calc(env(safe-area-inset-top, 0px) + 50px)',
+          top: 'calc(env(safe-area-inset-top, 0px) + 70px)',
           left: 16,
           right: 16,
           zIndex: 200,
@@ -503,7 +503,7 @@ const ClubhouseContent = () => {
         activeTab === 'friends' ? (
           <div
             className="flex flex-col w-full min-h-screen"
-            style={{ background: '#15171F', paddingTop: 'calc(env(safe-area-inset-top, 0px) + 78px)' }}
+            style={{ background: '#15171F', paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)' }}
           >
             <div className="flex flex-col items-center px-8 text-center pb-6">
               <div className="w-14 h-14 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(255,255,255,0.06)' }}>
@@ -544,15 +544,15 @@ const ClubhouseContent = () => {
         ) : (
           <div
             className="flex flex-col items-center justify-center min-h-screen px-8 text-center"
-            style={{ background: '#15171F', paddingTop: 'calc(env(safe-area-inset-top, 0px) + 78px)' }}
+            style={{ background: '#15171F', paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)' }}
           >
             <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(255,255,255,0.06)' }}>
               <Compass className="w-8 h-8" style={{ color: 'rgba(255,255,255,0.5)' }} />
             </div>
-            <p className="text-lg font-semibold" style={{ color: '#FFFFFF' }}>
+            <p className="text-lg font-semibold mb-1" style={{ color: '#FFFFFF' }}>
               {!user ? 'Sign in to see your feed' : (activeFeed.isError ? 'Couldn’t load your feed' : 'No posts to show')}
             </p>
-            <p className="text-sm mt-2 mb-4" style={{ color: 'rgba(255,255,255,0.7)' }}>
+            <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,0.7)' }}>
               {!user ? 'Create an account or sign in to get started.' : (activeFeed.isError ? 'Tap retry to try again.' : 'Check back soon for new content')}
             </p>
             {!user ? (
@@ -581,7 +581,7 @@ const ClubhouseContent = () => {
             initialState={virtuosoSnapshots.current[activeTab]}
             onSnapshot={(s) => { virtuosoSnapshots.current[activeTab] = s; }}
             posts={posts}
-            topPadding={'calc(env(safe-area-inset-top, 0px) + 59px)'}
+            topPadding={'calc(env(safe-area-inset-top, 0px) + 70px)'}
             onNearEnd={handleNearEnd}
             hasNextPage={hasNextPage}
             onLike={(post) => handleLike(post)}

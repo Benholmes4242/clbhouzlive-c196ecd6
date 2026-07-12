@@ -62,7 +62,7 @@ function RowSkeleton() {
 function LoadingBlock() {
   return (
     <div>
-      <div style={{ padding: '18px 16px 8px' }}>
+      <div style={{ padding: '16px 16px 12px' }}>
         <div className="h-3 w-16 rounded clb-shimmer-light" />
       </div>
       <RowSkeleton />
@@ -362,9 +362,9 @@ export function SearchOverlayV2({
                         <div
                           className="flex scrollbar-hide"
                           style={{
-                            gap: 10,
+                            gap: 12,
                             overflowX: 'auto',
-                            padding: '4px 16px 8px',
+                            padding: '0 16px 16px',
                             WebkitOverflowScrolling: 'touch',
                           }}
                         >
@@ -526,7 +526,7 @@ function SingleScope({
           display: 'grid',
           gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
           gap: 12,
-          padding: '10px 16px 16px',
+          padding: '8px 16px 16px',
         }}
       >
         {data.videos.map((v) => (
@@ -613,7 +613,7 @@ function CommitResults({
 
       {videos.length > 0 ? (
         <>
-          <div style={{ padding: '18px 16px 6px' }}>
+          <div style={{ padding: '16px 16px 12px' }}>
             <span
               className="text-[11px] font-extrabold tracking-[0.08em] uppercase"
               style={{ color: '#64748B' }}
@@ -626,7 +626,7 @@ function CommitResults({
               display: 'grid',
               gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
               gap: 12,
-              padding: '4px 16px 16px',
+              padding: '0 16px 16px',
             }}
           >
             {videos.map((v) => (
@@ -635,7 +635,7 @@ function CommitResults({
           </div>
         </>
       ) : (
-        <div style={{ padding: '28px 16px', textAlign: 'center' }}>
+        <div style={{ padding: '32px 16px', textAlign: 'center' }}>
           <p className="text-[13px]" style={{ color: '#64748B' }}>
             No preview clips yet — tap “Search” to filter the grid.
           </p>
