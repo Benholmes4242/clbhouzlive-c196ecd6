@@ -27,7 +27,7 @@ export function SubmitBar({
         position: 'sticky',
         bottom: 0,
         background: 'linear-gradient(180deg, rgba(248,250,252,0) 0%, #F8FAFC 30%)',
-        padding: '16px 16px calc(env(safe-area-inset-bottom, 0px) + 14px)',
+        padding: '16px 16px calc(env(safe-area-inset-bottom, 0px) + 16px)',
       }}
     >
       <button
@@ -36,7 +36,7 @@ export function SubmitBar({
         onClick={onSubmit}
         style={{
           width: '100%',
-          padding: '15px 16px',
+          padding: '16px',
           borderRadius: 14,
           border: 'none',
           background: enabled ? RV2.amber : 'rgba(15,23,42,0.10)',

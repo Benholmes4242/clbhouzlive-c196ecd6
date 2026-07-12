@@ -109,7 +109,7 @@ export function OverallScrubber({ value, onChange }: Props) {
         style={{
           position: 'relative',
           height: 44,
-          padding: '18px 0',
+          padding: '16px 0',
           cursor: 'pointer',
           touchAction: 'none',
           outline: 'none',

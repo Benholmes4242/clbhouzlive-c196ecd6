@@ -36,7 +36,7 @@ import { applyRouteChrome } from '@/lib/routeChrome';
 
 function Section({ eyebrow, children }: { eyebrow: string; children: React.ReactNode }) {
   return (
-    <section style={{ padding: '4px 16px 4px' }}>
+    <section style={{ padding: '0 16px 12px' }}>
       <div
         style={{
           fontSize: 10.5,
@@ -44,7 +44,7 @@ function Section({ eyebrow, children }: { eyebrow: string; children: React.React
           color: RV2.amber,
           textTransform: 'uppercase',
           letterSpacing: '0.14em',
-          marginBottom: 10,
+          marginBottom: 12,
         }}
       >
         {eyebrow}
@@ -378,7 +378,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
       </header>
 
       {/* Live preview */}
-      <div style={{ padding: '14px 16px 8px' }}>
+      <div style={{ padding: '16px 16px 12px' }}>
         <LivePreviewCard
           course={course}
           author={author}
@@ -397,7 +397,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
             background: '#FFFFFF',
             border: `1px solid ${RV2.hairline}`,
             borderRadius: RV2.panelRadius,
-            padding: '14px 16px 12px',
+            padding: '12px 16px 12px',
           }}
         >
           <OverallScrubber value={composer.state.overall} onChange={composer.setOverall} />
@@ -410,13 +410,13 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
       </Section>
 
       {/* Words */}
-      <section style={{ padding: '4px 16px 4px' }}>
+      <section style={{ padding: '0 16px 12px' }}>
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            marginBottom: 10,
+            marginBottom: 12,
           }}
         >
           <div
@@ -484,11 +484,11 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
       </Section>
 
       {/* Share toggle */}
-      <div style={{ padding: '10px 16px 8px' }}>
+      <div style={{ padding: '0 16px 12px' }}>
         <ShareToggle value={composer.state.shareToFeed} onChange={composer.setShareToFeed} />
       </div>
 
-      <div style={{ flex: 1, minHeight: 20 }} />
+      <div style={{ flex: 1, minHeight: 16 }} />
 
       <SubmitBar
         canSubmit={composer.canSubmit}

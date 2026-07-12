@@ -52,15 +52,15 @@ export function SuccessScreenV2({
         overflowY: 'auto',
       }}
     >
-      <div style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }} />
+      <div style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 48px)' }} />
 
       <div
         style={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          padding: '18px 16px 12px',
-          gap: 10,
+          padding: '16px 16px 12px',
+          gap: 12,
         }}
       >
         <div
@@ -102,7 +102,7 @@ export function SuccessScreenV2({
         </p>
       </div>
 
-      <div style={{ padding: '4px 16px 20px' }}>
+      <div style={{ padding: '4px 16px 16px' }}>
         <LivePreviewCard
           course={course}
           author={author}
@@ -121,7 +121,7 @@ export function SuccessScreenV2({
           display: 'flex',
           flexDirection: 'column',
           gap: 8,
-          padding: '10px 16px calc(env(safe-area-inset-bottom, 0px) + 18px)',
+          padding: '12px 16px calc(env(safe-area-inset-bottom, 0px) + 16px)',
         }}
       >
         <button
@@ -133,7 +133,7 @@ export function SuccessScreenV2({
             justifyContent: 'center',
             gap: 8,
             width: '100%',
-            padding: 14,
+            padding: 12,
             borderRadius: 12,
             border: 'none',
             background: RV2.amber,

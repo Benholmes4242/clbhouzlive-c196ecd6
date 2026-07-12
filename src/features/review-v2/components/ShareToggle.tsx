@@ -25,7 +25,7 @@ export function ShareToggle({ value, onChange }: Props) {
         alignItems: 'center',
         gap: 12,
         width: '100%',
-        padding: '12px 14px',
+        padding: '12px 16px',
         background: '#FFFFFF',
         border: `1px solid ${RV2.hairline}`,
         borderRadius: RV2.panelRadius,

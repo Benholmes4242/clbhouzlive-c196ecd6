@@ -87,7 +87,7 @@ function MiniScrub({
         background: '#FFFFFF',
         border: `1px solid ${RV2.hairline}`,
         borderRadius: RV2.panelRadius,
-        padding: '12px 12px 10px',
+        padding: '12px',
         display: 'flex',
         flexDirection: 'column',
         gap: 6,
@@ -140,7 +140,7 @@ function MiniScrub({
         style={{
           position: 'relative',
           height: 30,
-          padding: '13px 0',
+          padding: '12px 0',
           cursor: 'pointer',
           touchAction: 'none',
           outline: 'none',
