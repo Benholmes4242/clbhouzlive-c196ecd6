@@ -69,7 +69,7 @@ export function RequestCourseSheet({ open, onOpenChange, prefillName, zIndexBase
 
   return (
     <BottomSheet open={open} onClose={close} ariaLabelledBy="request-course-title" zIndexBase={zIndexBase}>
-      <div className="px-5 pt-2 pb-5">
+      <div className="px-5 pt-2 pb-4">
         {status === 'success' ? (
           <div className="flex flex-col items-center text-center pt-6 pb-2">
             <div
@@ -102,7 +102,7 @@ export function RequestCourseSheet({ open, onOpenChange, prefillName, zIndexBase
               </p>
             </div>
 
-            <div className="space-y-3.5">
+            <div className="space-y-3">
               <div>
                 <label className={labelCls} htmlFor="rc-name">
                   Course name
@@ -149,7 +149,7 @@ export function RequestCourseSheet({ open, onOpenChange, prefillName, zIndexBase
               type="button"
               onClick={handleSubmit}
               disabled={!canSubmit}
-              className="w-full h-11 mt-5 rounded-[12px] text-[15px] font-semibold text-white flex items-center justify-center gap-2 transition-opacity disabled:opacity-50"
+              className="w-full h-11 mt-4 rounded-[12px] text-[15px] font-semibold text-white flex items-center justify-center gap-2 transition-opacity disabled:opacity-50"
               style={{ background: '#F7931E' }}
             >
               {status === 'submitting' ? (

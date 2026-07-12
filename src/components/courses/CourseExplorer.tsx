@@ -204,7 +204,7 @@ const InlineLoadingSkeleton = () => (
     {[1, 2, 3].map((i) => (
       <div key={i} className="bg-card sm:border sm:border-border/60 sm:rounded-sq-md overflow-hidden">
         <Skeleton className="w-full aspect-[16/9] rounded-none" />
-        <div className="px-4 py-3.5 space-y-2">
+        <div className="px-4 py-3 space-y-2">
           <Skeleton className="h-4 w-3/4" />
           <Skeleton className="h-3 w-1/2" />
         </div>
@@ -215,7 +215,7 @@ const InlineLoadingSkeleton = () => (
 
 const ErrorState = ({ onRetry }: { onRetry: () => void }) => (
   <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
-    <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-destructive/10 flex items-center justify-center">
+    <div className="w-12 h-12 mx-auto rounded-full bg-destructive/10 flex items-center justify-center">
       <AlertCircle className="w-6 h-6 text-destructive" />
     </div>
     <h3 className="text-sm font-semibold">Unable to load courses</h3>
@@ -224,7 +224,7 @@ const ErrorState = ({ onRetry }: { onRetry: () => void }) => (
     </p>
     <button
       onClick={onRetry}
-      className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium active:scale-[0.98] transition-transform"
+      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium active:scale-[0.98] transition-transform"
       style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
     >
       <ChevronDown className="h-4 w-4 rotate-180" />
@@ -471,15 +471,15 @@ const CourseExplorer = () => {
 
 
   return (
-    <div className="w-full space-y-5">
+    <div className="w-full space-y-4">
       {/* Unseen friend reviews banner */}
       <UnseenReviewsBanner />
 
       {/* Your Network Section - Shows activity from friends */}
-      <YourNetworkSection className="mt-2" />
+      <YourNetworkSection />
 
       <div
-        className="pb-3 space-y-5 -mx-4 px-4"
+        className="pb-3 space-y-4 -mx-4 px-4"
         style={{
           background: SLATE_50,
           borderBottom: 'none',
@@ -571,7 +571,7 @@ const CourseExplorer = () => {
 
       {/* Context row with sort — scrolls with content */}
       {!isLoading && totalCount > 0 && (
-        <div className="flex items-center justify-between gap-3 pt-2 px-4">
+        <div className="flex items-center justify-between gap-3 px-4">
           <span style={{
             fontSize: 13, color: INK_MUTE, flex: 1, lineHeight: 1.35,
             fontWeight: 500,
@@ -608,7 +608,7 @@ const CourseExplorer = () => {
           {hasActiveFilters && (
             <button
               onClick={handleResetFilters}
-              className="mt-1 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium active:scale-[0.98] transition-transform"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium active:scale-[0.98] transition-transform"
               style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
             >
               Reset filters
@@ -642,7 +642,7 @@ const CourseExplorer = () => {
 
           {/* "Request a course" row — always present when a search is active */}
           {(debouncedSearch || searchTerm).trim().length > 0 && !hasNextPage && (
-            <div className="mt-2 -mx-4 border-t border-slate-100">
+            <div className="mt-3 -mx-4 border-t border-slate-100">
               <RequestCourseCTA variant="row" prefillName={debouncedSearch || searchTerm} />
             </div>
           )}

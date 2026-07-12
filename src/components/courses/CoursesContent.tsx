@@ -326,7 +326,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
           {activeTab === 'discover' ? (
             <ExploreTabContent embedded />
           ) : (
-            <div className="px-4">
+            <div className="px-4 pt-3">
               {/* Rate a Course nudge — data-driven (played-but-unrated) */}
               {user && (
                 <RateNudge

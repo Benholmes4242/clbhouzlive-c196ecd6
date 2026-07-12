@@ -31,9 +31,9 @@ export function UnseenReviewsBanner() {
   return (
     <div
       onClick={handleTap}
-      className="relative mx-4 mt-2 mb-1 flex items-center gap-3 rounded-2xl border cursor-pointer active:scale-[0.98] transition-transform"
+      className="relative mx-4 flex items-center gap-3 rounded-2xl border cursor-pointer active:scale-[0.98] transition-transform"
       style={{
-        padding: '12px 14px',
+        padding: '12px 16px',
         borderColor: `${AMBER}40`,
         background: `linear-gradient(135deg, ${AMBER}12 0%, ${AMBER}06 100%)`,
       }}

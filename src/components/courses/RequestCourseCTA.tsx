@@ -49,7 +49,7 @@ export function RequestCourseCTA({
         <div
           style={{
             background: HERO_BAND_BG,
-            padding: '22px 20px 20px',
+            padding: '24px 20px 20px',
             textAlign: 'center',
           }}
         >
@@ -60,7 +60,7 @@ export function RequestCourseCTA({
               height: 52,
               borderRadius: 15,
               background: '#fff',
-              marginBottom: 14,
+              marginBottom: 12,
             }}
           >
             <MapPinPlus size={26} color={HERO_ACCENT} strokeWidth={2.25} />
@@ -91,7 +91,7 @@ export function RequestCourseCTA({
         </div>
 
         {/* Body */}
-        <div style={{ padding: '16px 20px 18px' }}>
+        <div style={{ padding: '16px 20px' }}>
           <div className="flex flex-col gap-2.5 mb-4">
             <div className="flex items-center gap-2.5">
               <Zap size={17} color={HERO_ACCENT} strokeWidth={2.25} />
