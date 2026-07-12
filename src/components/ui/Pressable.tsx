@@ -49,7 +49,7 @@ interface VariantSpec {
 }
 
 const VARIANTS: Record<PressableVariant, VariantSpec> = {
-  // Large card / tile — FeedCard, WatchTile, WatchRailTile, hero, course cards.
+  // Large card / tile — feed cards, media tiles, hero, course cards.
   card: {
     pressedScale: 0.97,
     pressedBg: null,
@@ -344,7 +344,7 @@ const Pressable = forwardRef<HTMLElement, PressableProps>(function Pressable(
 
   const innerMergedStyle: React.CSSProperties = {
     // Inner wrapper owns the transform so a <video> appended to outerRef
-    // (WatchRailTile pattern) is unaffected and never jitters.
+    // (media-tile pattern) is unaffected and never jitters.
     display: 'contents',
     transition: spec.transition,
     ...innerStyle,

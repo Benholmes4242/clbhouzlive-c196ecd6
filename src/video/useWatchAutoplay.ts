@@ -2,7 +2,7 @@
  * useWatchAutoplay — single, engine-native activation policy for the Watch
  * surface (rails + grid). Replaces the old useRailAutoplay hook and every
  * DIY IntersectionObserver / local active-tile state that used to live in
- * individual watch components (LatestVideosRail, CarouselRow, etc.).
+ * individual watch components that used their own observers.
  *
  * One hook, one IntersectionObserver per surface. Mirrors the PROVEN feed
  * activation model (see CardFeed.tsx / LightCardFeed.tsx) so the whole app
@@ -30,7 +30,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
-import { useWatchRevealed } from '@/components/watch/WatchRevealContext';
+import { useWatchRevealed } from './WatchRevealContext';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { PrefetchController } from './PrefetchController';
 import type { FeedPost } from '@/components/media-system/types/media';
