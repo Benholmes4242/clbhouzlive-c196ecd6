@@ -36,7 +36,7 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
     <div
       role="tablist"
       aria-label="Media filter"
-      style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '14px 16px 12px' }}
+      style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '16px 16px 12px' }}
     >
       {FILTERS.map(({ key, label }) => {
         const isActive = activeFilter === key;

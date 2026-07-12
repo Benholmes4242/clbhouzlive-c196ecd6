@@ -50,7 +50,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
         </div>
         <div>
           <p className="text-base font-semibold text-foreground">Sign in to view media</p>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             See photos and videos from golfers who've played here.
           </p>
         </div>

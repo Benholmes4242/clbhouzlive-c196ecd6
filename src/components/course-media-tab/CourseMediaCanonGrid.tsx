@@ -82,7 +82,7 @@ function toFeedCardRow(post: FeedPost): FeedCardRow {
 
 function SkeletonTile() {
   return (
-    <div style={{ marginBottom: 14 }}>
+    <div style={{ marginBottom: 12 }}>
       <div
         style={{
           width: '100%',
@@ -165,7 +165,7 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
 
   if (isLoading) {
     return (
-      <div style={{ padding: '12px 16px 30px', fontFamily: FONT_FAMILY }}>
+      <div style={{ padding: '12px 16px 0', fontFamily: FONT_FAMILY }}>
         <div style={{ display: 'flex', gap: 12 }}>
           <div style={{ flex: 1 }}>
             <SkeletonTile />
@@ -200,8 +200,8 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
 
   if (posts.length === 0) {
     return (
-      <div style={{ paddingBottom: 40 }}>
-        <div style={{ padding: '44px 24px 28px', textAlign: 'center' }}>
+      <div style={{ paddingBottom: 0 }}>
+        <div style={{ padding: '40px 24px 16px', textAlign: 'center' }}>
           <div
             style={{
               width: 72,
@@ -212,7 +212,7 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              margin: '0 auto 18px',
+              margin: '0 auto 16px',
             }}
           >
             <Camera size={30} strokeWidth={1.8} color={AMBER} />
@@ -226,7 +226,7 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
           <PrimaryAmberCTA
             onClick={() => courseId && navigate(`/courses/${courseId}/rate`)}
             leadingIcon={<Camera size={15} strokeWidth={2} />}
-            style={{ marginBottom: 10 }}
+            style={{ marginBottom: 12 }}
           >
             Share your experience
           </PrimaryAmberCTA>
@@ -246,7 +246,7 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: 7,
+              gap: 8,
             }}
           >
             <Film size={15} strokeWidth={2} />
@@ -254,7 +254,7 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
           </button>
         </div>
 
-        <div style={{ height: '0.5px', background: HAIRLINE_INK_7, margin: '0 16px 24px' }} />
+        <div style={{ height: '0.5px', background: HAIRLINE_INK_7, margin: '0 16px 16px' }} />
 
         <EmptyStateGuide
           kicker="What to share"
@@ -276,7 +276,7 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
   });
 
   return (
-    <div ref={setGridRef} style={{ fontFamily: FONT_FAMILY, padding: '12px 0 30px' }}>
+    <div ref={setGridRef} style={{ fontFamily: FONT_FAMILY, padding: '12px 0 0' }}>
       <div style={{ display: 'flex', gap: 12, padding: '0 16px' }}>
         <div style={{ flex: 1 }}>
           {packed.left.map(({ item, flatIndex: i }) => (
