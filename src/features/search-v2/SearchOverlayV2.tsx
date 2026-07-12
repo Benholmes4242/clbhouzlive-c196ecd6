@@ -2,8 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { setStatusBarStyleColor, applyShieldColor } from '@/hooks/useMedianStatusBar';
-import { applyRouteChrome } from '@/lib/routeChrome';
+import { claimOverlayChrome, releaseOverlayChrome } from '@/lib/routeChrome';
+
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { SearchField } from './components/SearchField';
 import { ScopeChips } from './components/ScopeChips';
