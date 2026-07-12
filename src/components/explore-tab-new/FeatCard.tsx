@@ -4,7 +4,7 @@ import type { FeatRow, FeatTier } from './hooks/useRegionFeats';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const CARD_W = 226;
-const CARD_H = 240;
+const CARD_H = 215;
 
 // Tier accents (drives tick, WHS mark, legendary glow + avatar ring).
 const ACCENT: Record<FeatTier, string> = {
@@ -144,13 +144,14 @@ export function FeatCard({ row, tier, onTap }: Props) {
         />
       ) : null}
 
-      {/* Obsidian scrim */}
+      {/* Obsidian scrim — smooth eased ramp (many small alpha deltas to
+          avoid mobile-OLED banding). */}
       <div
         style={{
           position: 'absolute',
           inset: 0,
           background:
-            'linear-gradient(180deg, rgba(7,8,12,0.25) 0%, rgba(7,8,12,0.05) 30%, rgba(7,8,12,0.55) 62%, rgba(7,8,12,0.92) 100%)',
+            'linear-gradient(180deg, rgba(7,8,12,0.28) 0%, rgba(7,8,12,0.10) 22%, rgba(7,8,12,0.00) 38%, rgba(7,8,12,0.06) 50%, rgba(7,8,12,0.18) 60%, rgba(7,8,12,0.34) 70%, rgba(7,8,12,0.52) 79%, rgba(7,8,12,0.70) 87%, rgba(7,8,12,0.86) 94%, rgba(7,8,12,0.94) 100%)',
         }}
       />
 
@@ -214,7 +215,7 @@ export function FeatCard({ row, tier, onTap }: Props) {
           position: 'absolute',
           left: 14,
           right: 14,
-          bottom: 56,
+          bottom: 50,
           display: 'flex',
           flexDirection: 'column',
           gap: 4,
@@ -223,7 +224,7 @@ export function FeatCard({ row, tier, onTap }: Props) {
         {heroValue ? (
           <div
             style={{
-              fontSize: 30,
+              fontSize: 27,
               fontWeight: 900,
               letterSpacing: '-0.015em',
               lineHeight: 1,
@@ -260,8 +261,8 @@ export function FeatCard({ row, tier, onTap }: Props) {
           left: 0,
           right: 0,
           bottom: 0,
-          padding: '9px 14px 11px',
-          borderTop: '1px solid rgba(255,255,255,0.12)',
+          padding: '8px 14px 10px',
+          borderTop: '1px solid rgba(255,255,255,0.08)',
           display: 'flex',
           alignItems: 'center',
           gap: 10,
