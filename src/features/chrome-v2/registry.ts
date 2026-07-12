@@ -151,13 +151,17 @@ export const CHROME_REGISTRY: ChromeRule[] = [
       bleed: true,
     },
   },
+  // Business social lists (F3): ISLAND, padded. Declared BEFORE the managed-subpage rule.
+  { match: { test: (p) => /^\/business\/[^/]+\/(followers|following)$/.test(p) },
+    spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/clubhouse' }, tone: 'light', bleed: false, note: 'business social lists (F3)' } },
   {
     match: {
       test: (p) =>
-        /^\/business\/[^/]+\/(verification|edit|insights|team|activity|followers|following)(\/.*)?$/.test(p),
+        /^\/business\/[^/]+\/(verification|edit|insights|team|activity)(\/.*)?$/.test(p),
     },
     spec: { chrome: 'none', tone: 'light', bleed: false },
   },
+
 
   // Course detail: /courses/:id (exactly 3 segments) — ISLAND (H3),
   // back with fallback '/courses'. Deeper /courses/:id/* subroutes fall
