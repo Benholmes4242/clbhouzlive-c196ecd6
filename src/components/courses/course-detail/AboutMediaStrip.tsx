@@ -203,7 +203,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
             gridTemplateColumns: 'repeat(3, 1fr)',
             gap: 6,
             padding: '0 16px',
-            marginBottom: 14,
+            marginBottom: 12,
           }}
         >
           {[0, 1, 2].map((i) => (
