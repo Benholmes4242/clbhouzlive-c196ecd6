@@ -537,17 +537,18 @@ export function CinematicHeroFullBleed({
     : '';
 
   // Cinematic photo variant: single unified height clamp across all three
-  // states (live / upcoming / results). Uses fixed `height` (not minHeight)
-  // with overflow:hidden so state-specific child stacks (leaderboard rows,
-  // runners-up rows, champion strip) cannot push the container past the
-  // shared floor. Spacer is equalized so title/eyebrow rest position matches.
-  const heroHeight = 'clamp(460px, 54dvh, 600px)';
+  // states (live / upcoming / results). Mirrors the course-hero pattern —
+  // `minHeight` with env(safe-area-inset-top) added ON TOP so the notch
+  // does not eat content space. Overflow hidden still guards against any
+  // state-specific child stack pushing past the shared floor visually.
+  const heroHeight =
+    'calc(clamp(380px, 44dvh, 460px) + env(safe-area-inset-top, 0px))';
   return (
     <div
       style={{
         position: 'relative',
         width: '100%',
-        height: heroHeight,
+        minHeight: heroHeight,
         overflow: 'hidden',
         background,
         backgroundColor: INK_BASE,
@@ -557,7 +558,7 @@ export function CinematicHeroFullBleed({
       }}
     >
       {/* Spacer */}
-      <div style={{ flex: 1, minHeight: 150 }} />
+      <div style={{ flex: 1, minHeight: 128 }} />
 
 
 
@@ -566,7 +567,7 @@ export function CinematicHeroFullBleed({
         style={{
           position: 'relative',
           zIndex: 2,
-          padding: '0 18px 10px',
+          padding: '0 18px 8px',
           display: 'flex',
           flexDirection: 'column',
           gap: 6,
@@ -578,7 +579,7 @@ export function CinematicHeroFullBleed({
           style={{
             margin: 0,
             fontFamily: "'Geist', -apple-system, BlinkMacSystemFont, sans-serif",
-            fontSize: 'clamp(24px, 7.8vw, 30px)',
+            fontSize: 'clamp(20px, 6.6vw, 26px)',
             fontWeight: 800,
             lineHeight: 0.98,
             letterSpacing: '-0.01em',
@@ -619,7 +620,7 @@ export function CinematicHeroFullBleed({
           style={{
             position: 'relative',
             zIndex: 2,
-            padding: '10px 18px 10px',
+            padding: '8px 18px 8px',
             borderTop: '0.5px solid rgba(255,255,255,0.10)',
             background:
               'linear-gradient(180deg, rgba(232,194,106,0.06) 0%, rgba(232,194,106,0) 100%)',
@@ -631,7 +632,7 @@ export function CinematicHeroFullBleed({
           <SquircleAvatar
             srcCandidates={champion.avatarCandidates ?? (champion.avatarUrl ? [champion.avatarUrl] : [])}
             alt={champion.name}
-            size={56}
+            size={48}
             hairlineRing
             ringColor={GOLD_RING}
           />
@@ -649,7 +650,7 @@ export function CinematicHeroFullBleed({
             </span>
             <span
               style={{
-                fontSize: 22,
+                fontSize: 19,
                 fontWeight: 800,
                 color: 'white',
                 lineHeight: 1.05,
@@ -665,7 +666,7 @@ export function CinematicHeroFullBleed({
               <span
                 style={{
                   ...NUMERIC_STYLE,
-                  fontSize: 18,
+                  fontSize: 15,
                   fontWeight: 800,
                   letterSpacing: '-0.02em',
                   color: LEADER_GREEN,
@@ -730,7 +731,7 @@ export function CinematicHeroFullBleed({
               display: 'flex',
               alignItems: 'center',
               gap: 10,
-              padding: '5px 18px',
+              padding: '4px 18px',
               borderTop: 'none',
             };
             if (row.kind === 'solo') {
@@ -866,7 +867,7 @@ export function CinematicHeroFullBleed({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 10,
-                padding: '0 18px 4px',
+                padding: '0 18px 3px',
               }}
             >
               <span style={{ width: RANK_W, flexShrink: 0 }} />
@@ -923,7 +924,7 @@ export function CinematicHeroFullBleed({
               display: 'flex',
               alignItems: 'center',
               gap: 10,
-              padding: isLive ? '4px 18px' : '9px 18px',
+              padding: isLive ? '3px 18px' : '8px 18px',
               borderTop: 'none',
             };
             if (row.kind === 'solo') {
@@ -1110,13 +1111,13 @@ export function CinematicHeroFullBleed({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 10,
-                padding: '10px 18px',
+                padding: '8px 18px',
               }}
             >
               <SquircleAvatar
                 srcCandidates={defChampAvatars}
                 alt={defendingChamp.name}
-                size={40}
+                size={34}
                 hairlineRing
                 ringColor={GOLD_RING}
               />
@@ -1166,7 +1167,7 @@ export function CinematicHeroFullBleed({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 18,
-                padding: '10px 18px',
+                padding: '8px 18px',
               }}
             >
               {courseStats.par != null && (
@@ -1194,7 +1195,7 @@ function Footer({ leftText, isLive, noBorder }: { leftText: string; isLive: bool
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '7px 18px 10px',
+        padding: '6px 18px 8px',
         borderTop: noBorder ? 'none' : '0.5px solid rgba(255,255,255,0.12)',
       }}
     >
