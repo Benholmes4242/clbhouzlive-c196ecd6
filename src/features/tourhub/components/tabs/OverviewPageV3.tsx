@@ -11,7 +11,7 @@ import { CollegeRivalry } from '../CollegeRivalry';
 import { LazySection } from '../overview-v3/LazySection';
 
 import { TISlot } from '../overview-v3/TISlot';
-import { WorldRankingsHero } from '../WorldRankingsHero';
+import { WorldRankingsSlot } from '../overview-v3/WorldRankingsSlot';
 import { StatOfTheWeek } from '../StatOfTheWeek';
 import { HomeCourseOfWeekModule } from '../home/HomeCourseOfWeekModule';
 
