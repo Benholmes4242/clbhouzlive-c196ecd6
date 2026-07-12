@@ -28,7 +28,7 @@ import React, { useState, useRef, useLayoutEffect } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Search, ArrowLeft, TrendingDown, TrendingUp } from 'lucide-react';
 import { resolveChrome, type ChromeSpec, type ChromeTone } from './registry';
-import { useChromeLeftOverride, useChromeLeftSlot } from './leftOverride';
+import { useChromeLeftOverride, useChromeLeftSlot, useChromeSuppressed } from './leftOverride';
 import { Z } from '@/config/zIndex';
 import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import { PostingAsMenu } from '@/components/header/PostingAsMenu';
@@ -384,12 +384,13 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
   const spec = resolveChrome(location.pathname, searchParams);
   const leftOverride = useChromeLeftOverride();
   const leftSlot = useChromeLeftSlot();
+  const runtimeSuppressed = useChromeSuppressed();
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const avatarRef = useRef<HTMLButtonElement>(null);
 
-  const suppressed = hidden || spec.chrome === 'none';
+  const suppressed = hidden || runtimeSuppressed || spec.chrome === 'none';
   // bleed island routes let the page own top padding — publish 0 so content
   // flows under the island rather than being pushed down another 64px.
   const headerH =

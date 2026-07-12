@@ -83,3 +83,38 @@ export function useSetChromeLeftSlot(node: ReactNode | null): void {
     return () => setChromeLeftSlot(null);
   }, [node]);
 }
+
+// ── Runtime suppression signal ──────────────────────────────────────────
+// Third hidden-input to ChromeIsland (alongside shouldHideHeader and the
+// legacy floatingHeaderSignal). When true, the island renders nothing AND
+// publishes --header-h: 0, matching chrome:'none' semantics without a
+// registry flip. Pages toggle this for transient chrome takeover states
+// (e.g. Clubhouse's PGA "This Week" card).
+let currentSuppressed = false;
+const suppressSubs = new Set<(v: boolean) => void>();
+
+export function setChromeSuppressed(v: boolean): void {
+  if (currentSuppressed === v) return;
+  currentSuppressed = v;
+  suppressSubs.forEach((s) => s(v));
+}
+
+export function useChromeSuppressed(): boolean {
+  const [v, setV] = useState<boolean>(currentSuppressed);
+  useEffect(() => {
+    suppressSubs.add(setV);
+    setV(currentSuppressed);
+    return () => {
+      suppressSubs.delete(setV);
+    };
+  }, []);
+  return v;
+}
+
+/** Set suppression for the lifetime + value of the calling component. */
+export function useSetChromeSuppressed(v: boolean): void {
+  useEffect(() => {
+    setChromeSuppressed(v);
+    return () => setChromeSuppressed(false);
+  }, [v]);
+}

@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ClubhouseTopBar } from '@/components/clubhouse/ClubhouseTopBar';
+import { ClubhouseIslandTabs } from '@/components/clubhouse/ClubhouseIslandTabs';
+import { useSetChromeLeftSlot, useSetChromeSuppressed } from '@/features/chrome-v2/leftOverride';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHeaderVariant } from '@/hooks/useHeaderVisibility';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -81,6 +82,9 @@ const ClubhouseContent = () => {
   }, []);
 
   useHeaderVariant('solid-light');
+  // NOTE: useHeaderVariant('solid-light') targets the legacy GlobalHeader
+  // (CompactHeader) variant + status-bar coordination. Left in place —
+  // ChromeIsland ignores it, but other consumers still read the variant.
   // Chrome (shield + status bar) owned solely by AppRoutes. Do not write here.
 
   
@@ -118,6 +122,34 @@ const ClubhouseContent = () => {
   useEffect(() => {
     setStoreActiveTab(activeTab);
   }, [activeTab, setStoreActiveTab]);
+
+  // H4b — ChromeIsland integration.
+  // The page is keep-alive-mounted, so slot + suppress registrations are
+  // gated by pathname to avoid leaking Clubhouse chrome onto other routes
+  // when the user navigates away.
+  const isClubhouseRoute = pathname === '/' || pathname === '/clubhouse';
+  const handleIslandTabChange = useCallback((tab: 'foryou' | 'friends') => {
+    if (tab === activeTab) return;
+    // Preserve outgoing tab's Virtuoso snapshot before the keyed remount.
+    cardFeedRef.current?.captureSnapshot();
+    setActiveTab(tab);
+  }, [activeTab, setActiveTab]);
+  const islandSlot = useMemo(
+    () =>
+      isClubhouseRoute ? (
+        <ClubhouseIslandTabs
+          activeTab={activeTab}
+          onTabChange={handleIslandTabChange}
+          isBusinessActor={isBusinessActor}
+        />
+      ) : null,
+    [isClubhouseRoute, activeTab, handleIslandTabChange, isBusinessActor],
+  );
+  useSetChromeLeftSlot(islandSlot);
+  // PGA "This Week" card takeover — suppress both island capsules while active.
+  useSetChromeSuppressed(isClubhouseRoute && isTournamentCardActive);
+
+
 
   // Per-tab Virtuoso snapshots — captured on switch-AWAY (CardFeed unmount)
   // and restored on switch-BACK so each tab retains its exact scroll offset.
@@ -433,27 +465,10 @@ const ClubhouseContent = () => {
         surface="card"
       />
 
-      {/* Floating top bar — hidden when PGA card active */}
-      <ClubhouseTopBar
-        activeTab={activeTab}
-        onTabChange={(tab) => {
-          if (tab === activeTab) return;
-          // Capture the OUTGOING feed's scroll state while it's still
-          // mounted, into its own slot. onSnapshot's closure reads
-          // activeTab at call-time — the flip hasn't happened yet, so
-          // the snapshot lands in the correct (outgoing) slot.
-          cardFeedRef.current?.captureSnapshot();
-          // Skeleton reset is owned by onTabSwitch (post-commit) in
-          // useClubhouseFeedNav, where activeFeed.hasEverLoaded is fresh.
-          // Do NOT gate skeleton here — query state is stale at tap time.
-          setActiveTab(tab);
-        }}
-        isBusinessActor={isBusinessActor}
-        user={user}
-        carouselCount={posts[activeIndex]?.mediaItems?.length ?? 0}
-        carouselIndex={currentMediaIndex}
-        hidden={isTournamentCardActive}
-      />
+      {/* Chrome island slot + suppression — replaces ClubhouseTopBar (H4b).
+       * Slot registered only while this route is active so keep-alive
+       * doesn't leak the Clubhouse tabs onto other pages. */}
+
 
 
       {/* Offline indicator — hidden on editorial cards */}

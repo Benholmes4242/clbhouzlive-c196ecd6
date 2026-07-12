@@ -61,8 +61,10 @@ const EDITORIAL_NOTE = 'editorial 52px today';
 export const CHROME_REGISTRY: ChromeRule[] = [
   // ── chrome:'none' EXACT routes (from GLOBAL_HEADER_EXCLUDED_ROUTES) ──────
   // '/' is Clubhouse landing — dark, immersive, page owns chrome.
-  { match: { exact: '/' },                        spec: { chrome: 'none', tone: 'dark',  bleed: true  } },
-  { match: { exact: '/clubhouse' },               spec: { chrome: 'none', tone: 'dark',  bleed: true  } },
+  // H4b: Clubhouse feed. Island paints; page provides left slot
+  // (Suggested/Friends toggle). No logo (slot overrides), no HCP.
+  { match: { exact: '/' },                        spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark',  bleed: true, hideHcp: true } },
+  { match: { exact: '/clubhouse' },               spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark',  bleed: true, hideHcp: true } },
   { match: { exact: '/auth' },                    spec: { chrome: 'none', tone: 'dark',  bleed: false } },
   { match: { exact: '/auth/callback' },           spec: { chrome: 'none', tone: 'dark',  bleed: false } },
   { match: { exact: '/signup' },                  spec: { chrome: 'none', tone: 'dark',  bleed: false } },
