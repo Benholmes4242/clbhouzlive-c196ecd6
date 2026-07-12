@@ -12,7 +12,7 @@
  */
 
 import React, { useMemo } from 'react';
-import { useWhsConnection, useHandicapTrend, useAllScores } from '@/lib/whs/hooks';
+import { useWhsConnection, useHandicapTrend, useHandicapHistory, useAllScores } from '@/lib/whs/hooks';
 
 const AMBER_DEEP = '#c97a10';
 const INK = '#0F172A';
