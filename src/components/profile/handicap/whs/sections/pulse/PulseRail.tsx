@@ -16,15 +16,15 @@ export const PulseRail: React.FC<Props> = ({ userId, onOpenSearch }) => {
 
   if (isLoading) {
     return (
-      <div style={{ marginTop: 18 }}>
-        <SectionHeader surface="dark" role="section" kicker="PULSE" paddingX={20} />
+      <div style={{ marginTop: 16 }}>
+        <SectionHeader surface="dark" role="section" kicker="PULSE" paddingX={16} />
         <div
           style={{
             display: 'flex',
             gap: 10,
             overflowX: 'auto',
             scrollbarWidth: 'none',
-            padding: '0 20px 4px',
+            padding: '0 16px 4px',
           }}
         >
           {[0, 1, 2].map((i) => (
@@ -50,12 +50,12 @@ export const PulseRail: React.FC<Props> = ({ userId, onOpenSearch }) => {
   }
 
   return (
-    <div style={{ marginTop: 18 }}>
+    <div style={{ marginTop: 16 }}>
       <SectionHeader
         surface="dark"
         role="section"
         kicker="PULSE"
-        paddingX={20}
+        paddingX={16}
         count={friends.length}
         sub="Friends who've played recently"
       />
@@ -65,7 +65,7 @@ export const PulseRail: React.FC<Props> = ({ userId, onOpenSearch }) => {
           gap: 10,
           overflowX: 'auto',
           scrollbarWidth: 'none',
-          padding: '0 20px 4px',
+          padding: '0 16px 4px',
         }}
       >
         {friends.map((f) => (

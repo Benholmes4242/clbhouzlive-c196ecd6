@@ -83,7 +83,7 @@ export const CinemaCardGlass: React.FC<Props> = ({
         right: 14,
         bottom: 64,
         zIndex: 3,
-        padding: '16px 18px',
+        padding: '16px',
         borderRadius: 16,
         background: 'rgba(255,255,255,0.08)',
         border: '0.5px solid rgba(255,255,255,0.18)',
@@ -121,7 +121,7 @@ export const CinemaCardGlass: React.FC<Props> = ({
         </div>
       )}
 
-      <div style={{ ...HAIR, margin: '14px 0' }} />
+      <div style={{ ...HAIR, margin: '12px 0' }} />
 
       {/* Stat triad */}
       <div
