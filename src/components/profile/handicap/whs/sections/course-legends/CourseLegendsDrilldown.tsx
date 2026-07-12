@@ -324,7 +324,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
       )}
 
       {isError && (
-        <div style={{ padding: '20px 16px' }}>
+        <div style={{ padding: '16px' }}>
           <RetryStub message="Couldn't load Course Legends" onRetry={() => refetch()} />
         </div>
       )}
