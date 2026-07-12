@@ -201,7 +201,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
     ? `/business/${activeActor.id}/edit`
     : '/edit-profile?tab=settings';
 
-  // Handle navigation from ProfileHubSheet
+  // Handle navigation from ProfileSheetV2
   const handleAccountHubNavigate = (route: string) => {
     if (route === '/upload') {
       setUploadCenterOpen(true);
