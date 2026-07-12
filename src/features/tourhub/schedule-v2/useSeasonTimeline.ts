@@ -61,14 +61,16 @@ async function resolveSeasonCandidates(
 ): Promise<SrSeasonRow[]> {
   const { data, error } = await supabase
     .from('sr_seasons')
-    .select('id, tour_full_name, tour_name, year, name')
+    .select('id, tour_full_name, tour_name, year, name, created_at')
     .order('year', { ascending: false })
-    .limit(50);
+    .order('created_at', { ascending: false })
+    .limit(200);
   if (error) {
     console.error('[schedule-v2] sr_seasons fetch failed:', error);
     throw error;
   }
-  const matches = (data ?? []).filter(
+  const rows = (data ?? []) as any[];
+  const matches = rows.filter(
     (r: any) => mapTourSlug(r.tour_full_name) === tour,
   ) as SrSeasonRow[];
 
@@ -84,6 +86,20 @@ async function resolveSeasonCandidates(
         })
       : matches;
 
+  if (matches.length === 0) {
+    const distinctTours = Array.from(
+      new Set(rows.map((r) => r.tour_full_name ?? '(null)')),
+    );
+    console.warn(
+      '[schedule-v2] empty season candidates for tour:',
+      tour,
+      '| fetched rows:',
+      rows.length,
+      '| distinct tour_full_name seen:',
+      distinctTours,
+    );
+  }
+
   if (tour === 'pga') {
     console.log(
       '[schedule-v2] pga season candidates (probe order):',
@@ -96,6 +112,7 @@ async function resolveSeasonCandidates(
   }
   return sorted.slice(0, 8);
 }
+
 
 async function probeAndFetchTournaments(
   tour: TourId,
