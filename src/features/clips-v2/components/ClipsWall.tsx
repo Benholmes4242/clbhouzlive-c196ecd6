@@ -2,41 +2,26 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toFeedPosts } from '@/features/watch-v2/utils/toFeedPost';
 import { useWatchAutoplay } from '@/video/useWatchAutoplay';
+import { FeedCard, type FeedCardRow } from '@/components/feed-cards/FeedCard';
 import { useClipsWallFeed, type ClipsV2Mood, type ClipsWallRow } from '../hooks/useClipsWallFeed';
-import { segmentWall } from '../utils/segmentWall';
-import { WallTile } from './WallTile';
-import { WallWideCard } from './WallWideCard';
 
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
 const spinKeyframes = `@keyframes clips-v2-spin { to { transform: rotate(360deg); } }`;
 
-function PortraitSkeleton() {
+function SkeletonTile() {
   return (
-    <div
-      style={{
-        width: '100%',
-        aspectRatio: '0.72',
-        borderRadius: 12,
-        background: 'rgba(0,0,0,0.06)',
-        marginBottom: 12,
-      }}
-    />
-  );
-}
-
-function WideSkeleton() {
-  return (
-    <div
-      style={{
-        width: '100%',
-        aspectRatio: '1.78',
-        borderRadius: 13,
-        background: 'rgba(0,0,0,0.06)',
-        marginBottom: 12,
-      }}
-    />
+    <div style={{ marginBottom: 14 }}>
+      <div
+        style={{
+          width: '100%',
+          aspectRatio: '9 / 14',
+          borderRadius: 12,
+          background: 'rgba(0,0,0,0.06)',
+        }}
+      />
+    </div>
   );
 }
 
@@ -57,7 +42,22 @@ export function ClipsWall({ mood }: { mood: ClipsV2Mood }) {
     maxActive: 3,
   });
 
-  const segments = useMemo(() => segmentWall(rows), [rows]);
+  // Every clips-wall row is a clip; synthesize the FeedCardRow the shared
+  // FeedCard reads.
+  const cardRows: FeedCardRow[] = useMemo(
+    () =>
+      rows.map((r) => ({
+        post_id: r.post_id,
+        post_content: r.post_content ?? null,
+        derived_format: 'clip',
+        poster_url: r.poster_url ?? null,
+        duration_seconds: r.duration_seconds ?? null,
+        creator_username: r.creator_username ?? null,
+        like_count: Number((r as any).like_count ?? 0),
+        course_name: r.course_name ?? null,
+      })),
+    [rows],
+  );
 
   const sentinelRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -82,15 +82,14 @@ export function ClipsWall({ mood }: { mood: ClipsV2Mood }) {
         <style>{spinKeyframes}</style>
         <div style={{ display: 'flex', gap: 12 }}>
           <div style={{ flex: 1 }}>
-            <PortraitSkeleton />
-            <PortraitSkeleton />
+            <SkeletonTile />
+            <SkeletonTile />
           </div>
           <div style={{ flex: 1 }}>
-            <PortraitSkeleton />
-            <PortraitSkeleton />
+            <SkeletonTile />
+            <SkeletonTile />
           </div>
         </div>
-        <WideSkeleton />
       </div>
     );
   }
@@ -106,57 +105,39 @@ export function ClipsWall({ mood }: { mood: ClipsV2Mood }) {
     );
   }
 
+  const leftIdx: number[] = [];
+  const rightIdx: number[] = [];
+  rows.forEach((_, i) => (i % 2 === 0 ? leftIdx : rightIdx).push(i));
+
   return (
-    <div ref={railRef} style={{ padding: '12px 16px 30px', fontFamily: FONT_FAMILY }}>
+    <div style={{ padding: '12px 0 30px', fontFamily: FONT_FAMILY }}>
       <style>{spinKeyframes}</style>
-      {segments.map((seg, sIdx) => {
-        if (seg.kind === 'wide') {
-          const { row, flatIndex } = seg.item;
-          return (
-            <div key={`w-${row.post_id}`} style={{ marginBottom: 12 }}>
-              <WallWideCard
-                row={row}
-                post={feedPosts[flatIndex]}
-                flatIndex={flatIndex}
-                posts={feedPosts}
-                isAutoplayActive={activeIndices.has(flatIndex)}
-              />
-            </div>
-          );
-        }
-        // pack: split by position within the pack (even = left, odd = right)
-        const left: typeof seg.items = [];
-        const right: typeof seg.items = [];
-        seg.items.forEach((it, i) => (i % 2 === 0 ? left : right).push(it));
-        return (
-          <div key={`p-${sIdx}`} style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {left.map(({ row, flatIndex }) => (
-                <WallTile
-                  key={row.post_id}
-                  row={row}
-                  post={feedPosts[flatIndex]}
-                  flatIndex={flatIndex}
-                  posts={feedPosts}
-                  isAutoplayActive={activeIndices.has(flatIndex)}
-                />
-              ))}
-            </div>
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {right.map(({ row, flatIndex }) => (
-                <WallTile
-                  key={row.post_id}
-                  row={row}
-                  post={feedPosts[flatIndex]}
-                  flatIndex={flatIndex}
-                  posts={feedPosts}
-                  isAutoplayActive={activeIndices.has(flatIndex)}
-                />
-              ))}
-            </div>
-          </div>
-        );
-      })}
+      <div ref={railRef} style={{ display: 'flex', gap: 12, padding: '0 16px' }}>
+        <div style={{ flex: 1 }}>
+          {leftIdx.map((i) => (
+            <FeedCard
+              key={cardRows[i].post_id}
+              row={cardRows[i]}
+              feedPost={feedPosts[i]}
+              posts={feedPosts}
+              flatIndex={i}
+              isAutoplayActive={activeIndices.has(i)}
+            />
+          ))}
+        </div>
+        <div style={{ flex: 1 }}>
+          {rightIdx.map((i) => (
+            <FeedCard
+              key={cardRows[i].post_id}
+              row={cardRows[i]}
+              feedPost={feedPosts[i]}
+              posts={feedPosts}
+              flatIndex={i}
+              isAutoplayActive={activeIndices.has(i)}
+            />
+          ))}
+        </div>
+      </div>
 
       <div ref={sentinelRef} style={{ height: 1 }} />
 
