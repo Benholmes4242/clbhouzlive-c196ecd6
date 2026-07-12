@@ -320,6 +320,7 @@ function AllPicksSheet({
   liveMap,
   onPick,
   onClose,
+  onNavigatePlayer,
 }: {
   picks: AITopContender[];
   state: EventState;
@@ -327,6 +328,7 @@ function AllPicksSheet({
   liveMap: Map<string, PickLiveState> | undefined;
   onPick: (p: AITopContender) => void;
   onClose: () => void;
+  onNavigatePlayer: (playerId: string) => void;
 }) {
   return (
     <SheetShell onClose={onClose} maxHeight="70vh">
@@ -338,8 +340,9 @@ function AllPicksSheet({
       </div>
       <div>
         {picks.map((p, i) => (
-          <button
+          <div
             key={p.playerId}
+            role="button"
             onClick={() => onPick(p)}
             style={{
               width: '100%',
@@ -354,15 +357,21 @@ function AllPicksSheet({
               cursor: 'pointer',
             }}
           >
-            <span style={{ fontSize: 18, color: V4.goldMid, ...NUMERAL_THIN, minWidth: 22, textAlign: 'right' }}>{p.rank}</span>
-            <PlayerAvatar playerId={p.playerId} playerName={p.playerName} tourCode={tourCode} photoUrl={p.photoUrl} size="sm" ringColor={LIGHT_HAIRLINE} />
-            <div style={{ flex: 1, minWidth: 0, fontSize: 13.5, fontWeight: 700, color: V4.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {p.playerName}
+            <span style={{ fontSize: 18, color: V4.inkFaint, fontWeight: 700, fontVariantNumeric: 'tabular-nums', minWidth: 22, textAlign: 'right' }}>{p.rank}</span>
+            <div
+              role="link"
+              onClick={(e) => { e.stopPropagation(); onNavigatePlayer(p.playerId); }}
+              style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 0, cursor: 'pointer' }}
+            >
+              <PlayerAvatar playerId={p.playerId} playerName={p.playerName} tourCode={tourCode} photoUrl={p.photoUrl} size="sm" ringColor={LIGHT_HAIRLINE} />
+              <div style={{ flex: 1, minWidth: 0, fontSize: 13.5, fontWeight: 700, color: V4.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {p.playerName}
+              </div>
             </div>
             <div style={{ flexShrink: 0 }}>
               <SheetStateStrip state={state} pick={p} live={liveMap?.get(p.playerId)} />
             </div>
-          </button>
+          </div>
         ))}
       </div>
     </SheetShell>
