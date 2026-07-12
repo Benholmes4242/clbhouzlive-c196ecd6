@@ -108,10 +108,10 @@ export default function ActorCards({
                 width: 220,
                 background: '#fff',
                 borderRadius: 16,
-                padding: '13px 14px',
+                padding: '12px 14px',
                 display: 'flex',
                 flexDirection: 'row',
-                gap: 11,
+                gap: 12,
                 alignItems: 'center',
                 cursor: active ? 'default' : 'pointer',
                 border: active
