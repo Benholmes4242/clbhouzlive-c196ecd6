@@ -94,7 +94,7 @@ export function TourHubMainPage() {
       case 'overview':
         return <OverviewTab />;
       case 'live':
-        return <LiveLeaderboardTab />;
+        return <LeaderboardTab />;
       case 'schedule':
         return <ScheduleTab />;
       case 'players':
