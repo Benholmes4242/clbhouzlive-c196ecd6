@@ -22,15 +22,70 @@ interface Props {
 
 export function MomentsSection({ tournamentId, tourCode }: Props) {
   const [open, setOpen] = useState(false);
-  const { data: moments = [] } = useEventMoments(tournamentId);
-  if (!moments || moments.length === 0) return null;
+  const navigate = useNavigate();
+  const { data: moments, isLoading } = useEventMoments(tournamentId);
+
+  // Loading: skeleton — never flash the empty panel before data arrives.
+  if (isLoading) {
+    return (
+      <>
+        <SectionEyebrow kicker="Moments" />
+        <div style={{ padding: '0 16px 8px', display: 'flex', gap: 10, fontFamily: FONT }}>
+          {[0, 1, 2].map((i) => (
+            <div key={i} style={{
+              minWidth: 108, width: 108, height: 148, flexShrink: 0,
+              borderRadius: 12, background: HAIRLINE_INK_8,
+            }} />
+          ))}
+        </div>
+      </>
+    );
+  }
+
+  const list = moments ?? [];
+
+  // Empty: invite panel — the one section where emptiness invites.
+  if (list.length === 0) {
+    return (
+      <>
+        <SectionEyebrow kicker="Moments" />
+        <div style={{ padding: '0 16px 8px', fontFamily: FONT }}>
+          <div style={{
+            background: SURFACE, border: `0.5px solid ${HAIRLINE_INK_8}`,
+            borderRadius: 16, padding: 18,
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12,
+            textAlign: 'center',
+          }}>
+            <div style={{
+              fontSize: 12.5, fontWeight: 600, color: INK_MUTE, lineHeight: 1.45,
+            }}>
+              Moments from this tournament will appear here as members share them.
+            </div>
+            <button
+              type="button"
+              onClick={() => navigate('/post-v2')}
+              style={{
+                background: INK, color: '#FFFFFF',
+                fontSize: 12, fontWeight: 800, fontFamily: FONT,
+                border: 'none', borderRadius: 14,
+                padding: '10px 16px', cursor: 'pointer',
+              }}
+              className="active:opacity-80 transition-opacity"
+            >
+              Share a moment
+            </button>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
       <SectionEyebrow
         kicker="Moments"
-        actionLabel={moments.length > 4 ? 'All moments' : undefined}
-        onAction={moments.length > 4 ? () => setOpen(true) : undefined}
+        actionLabel={list.length > 4 ? 'All moments' : undefined}
+        onAction={list.length > 4 ? () => setOpen(true) : undefined}
       />
       <div
         style={{
@@ -39,7 +94,7 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
           fontFamily: FONT,
         }}
       >
-        {moments.map((m) => (
+        {list.map((m) => (
           <MomentCard key={m.id} moment={m} tourCode={tourCode} />
         ))}
       </div>
@@ -51,7 +106,7 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
             </div>
           </div>
           <div style={{ overflowY: 'auto', flex: 1, minHeight: 0, background: SURFACE, borderTop: `1px solid ${HAIRLINE_INK_8}`, borderBottom: `1px solid ${HAIRLINE_INK_8}` }}>
-            {moments.map((m, i) => {
+            {list.map((m, i) => {
               const cfg = MOMENT_TYPE_CONFIG[m.moment_type as MomentType] ?? MOMENT_TYPE_CONFIG.highlight;
               return (
                 <div
@@ -59,7 +114,7 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
                   style={{
                     display: 'flex', alignItems: 'flex-start', gap: 10,
                     padding: '11px 18px',
-                    borderBottom: i === moments.length - 1 ? 'none' : `0.5px solid ${HAIRLINE_INK_8}`,
+                    borderBottom: i === list.length - 1 ? 'none' : `0.5px solid ${HAIRLINE_INK_8}`,
                   }}
                 >
                   <div style={{ width: 30, height: 30, borderRadius: 10, background: 'rgba(15,23,42,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 15 }}>
