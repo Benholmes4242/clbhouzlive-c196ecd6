@@ -62,7 +62,7 @@ function CoursesPageHeroInner() {
       <div
         style={{
           marginTop: 'auto',
-          padding: '0 16px 22px',
+          padding: '0 16px 24px',
           position: 'relative',
           zIndex: 1,
         }}
@@ -75,7 +75,7 @@ function CoursesPageHeroInner() {
             />
             <div
               className="animate-pulse"
-              style={{ height: 44, width: '70%', background: 'rgba(255,255,255,0.28)', borderRadius: 6, marginBottom: 10 }}
+              style={{ height: 44, width: '70%', background: 'rgba(255,255,255,0.28)', borderRadius: 6, marginBottom: 12 }}
             />
             <div
               className="animate-pulse"
