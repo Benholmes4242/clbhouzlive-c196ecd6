@@ -62,7 +62,7 @@ function RowSkeleton() {
 function LoadingBlock() {
   return (
     <div>
-      <div style={{ padding: '18px 16px 8px' }}>
+      <div style={{ padding: '16px 16px 12px' }}>
         <div className="h-3 w-16 rounded clb-shimmer-light" />
       </div>
       <RowSkeleton />
