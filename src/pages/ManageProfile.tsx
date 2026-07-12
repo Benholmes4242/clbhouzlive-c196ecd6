@@ -276,7 +276,7 @@ export default function ManageProfile() {
                       onClick={() => onTabChange(t)}
                       style={{
                         position: 'relative',
-                        padding: '10px 2px 14px',
+                        padding: '12px 2px 12px',
                         background: 'none', border: 'none', cursor: 'pointer',
                         fontFamily: GEIST,
                         fontSize: 15,
@@ -307,7 +307,7 @@ export default function ManageProfile() {
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto pt-4" style={{ paddingBottom: 24 }}>
+        <div className="flex-1 overflow-y-auto pt-4" style={{ paddingBottom: 32 }}>
           {renderProfile ? (
             <ProfileTabBody
               form={form}
@@ -427,7 +427,7 @@ function ProfileTabBody({
                 }}
               />
             </div>
-            <div style={{ paddingTop: 12, paddingBottom: 14 }}>
+            <div style={{ paddingTop: 12, paddingBottom: 12 }}>
               {!hasAvatar ? (
                 <Nudge icon={<Sparkles size={12} strokeWidth={2.25} />}>
                   Golfers with a photo get 3x more friend requests
@@ -753,7 +753,7 @@ function HandicapRow({
           style={{
             marginTop: 12,
             width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-            padding: '13px 16px', borderRadius: 12,
+            padding: '12px 16px', borderRadius: 12,
             background: INK, color: '#fff', border: 'none',
             fontSize: 14, fontWeight: 600, fontFamily: GEIST, cursor: 'pointer',
           }}
@@ -775,7 +775,7 @@ function HandicapRow({
         onClick={onOpenConnect}
         style={{
           width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-          padding: '14px 16px', borderRadius: 12,
+          padding: '12px 16px', borderRadius: 12,
           background: INK, color: '#fff', border: 'none',
           fontSize: 15, fontWeight: 700, fontFamily: GEIST, cursor: 'pointer',
         }}

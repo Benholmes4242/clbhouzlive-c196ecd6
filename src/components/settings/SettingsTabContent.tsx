@@ -112,7 +112,7 @@ export function SettingsTabContent() {
       <div className="px-4 pb-4">
         <button
           onClick={() => navigate(`/profile/${p?.username}`)}
-          className="w-full flex items-center gap-3.5 p-3.5 rounded-2xl text-left active:opacity-70"
+          className="w-full flex items-center gap-3 p-4 rounded-2xl text-left active:opacity-70"
           style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
         >
           <SquircleAvatar

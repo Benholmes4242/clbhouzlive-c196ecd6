@@ -41,11 +41,11 @@ export default function DeleteAllDataConfirmSheet({ open, onClose, onConfirm, is
           paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
         }}
       >
-        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8, paddingBottom: 8 }}>
+        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8, paddingBottom: 4 }}>
           <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.18)' }} />
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: '4px 20px 12px' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: '4px 16px 12px' }}>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ marginBottom: 6 }}>
               <SectionHeader tier="standard" kicker="Permanent" tone="danger" />
@@ -68,11 +68,11 @@ export default function DeleteAllDataConfirmSheet({ open, onClose, onConfirm, is
           </button>
         </div>
 
-        <div style={{ padding: '4px 20px 8px' }}>
+        <div style={{ padding: '4px 16px 8px' }}>
           <p style={{ fontSize: 15, lineHeight: 1.5, color: INK_55, margin: '0 0 12px' }}>
             This will permanently delete your synced handicap, all round history, hole-by-hole data, and your friends list from England Golf. This cannot be undone.
           </p>
-          <p style={{ fontSize: 14, lineHeight: 1.5, color: INK_55, margin: '0 0 20px' }}>
+          <p style={{ fontSize: 14, lineHeight: 1.5, color: INK_55, margin: '0 0 16px' }}>
             Your friends on clbhouz will still see your last-known data, but no new updates.
           </p>
 

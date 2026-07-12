@@ -30,12 +30,12 @@ export default function DisconnectConfirmSheet({ open, onClose, onConfirm, isWor
         }}
       >
         {/* Drag handle */}
-        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8, paddingBottom: 8 }}>
+        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8, paddingBottom: 4 }}>
           <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.18)' }} />
         </div>
 
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: '4px 20px 12px' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: '4px 16px 12px' }}>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ marginBottom: 6 }}>
               <SectionHeader tier="standard" kicker="Disconnect" tone="danger" />
@@ -59,8 +59,8 @@ export default function DisconnectConfirmSheet({ open, onClose, onConfirm, isWor
         </div>
 
         {/* Body */}
-        <div style={{ padding: '4px 20px 8px' }}>
-          <p style={{ fontSize: 15, lineHeight: 1.5, color: INK_55, margin: '0 0 20px' }}>
+        <div style={{ padding: '4px 16px 8px' }}>
+          <p style={{ fontSize: 15, lineHeight: 1.5, color: INK_55, margin: '0 0 16px' }}>
             Your handicap and round history will be kept. You can reconnect any time to resume daily syncing.
           </p>
 

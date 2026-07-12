@@ -35,7 +35,7 @@ export function SettingsSkeleton({
       {/* Profile hero card skeleton — mirrors hero layout */}
       <div className="px-4 pb-4">
         <div
-          className="w-full flex items-center gap-3.5 p-3.5 rounded-2xl"
+          className="w-full flex items-center gap-3 p-4 rounded-2xl"
           style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
         >
           <Skeleton style={{ width: 52, height: 52, borderRadius: 16, flexShrink: 0 }} />

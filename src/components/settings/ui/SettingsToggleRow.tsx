@@ -82,7 +82,7 @@ export function SettingsToggleRow({
       </div>
 
       {showHelper && (
-        <div className={cn('px-4 pb-3 -mt-1', isIndented && 'pl-6')}>
+        <div className={cn('px-4 pb-3', isIndented && 'pl-6')}>
           <p className="text-[12px] text-muted-foreground ml-[52px]">{helperNote}</p>
           {showDivider && !isLast && (
             <div style={{ position: 'absolute', bottom: 0, left: 64, right: 0, height: '0.5px', background: 'rgba(15,23,42,0.06)' }} />
