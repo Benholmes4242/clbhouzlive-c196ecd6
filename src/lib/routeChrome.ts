@@ -17,6 +17,45 @@ type ChromeCache = {
   sbKey: string;
 };
 
+export type ChromeClaim = {
+  id: string;
+  statusBarStyle: 'light' | 'dark';  // 'dark' = DARK icons (light bg)
+  statusBarColor: string;            // AARRGGBB, e.g. 'FFF8FAFC'
+  shieldColor: string;               // CSS color for #safe-area-shield
+};
+
+const chromeClaims: ChromeClaim[] = [];
+
+function applyClaim(c: ChromeClaim): void {
+  try {
+    ensureStatusBarOverlayBooted();
+    setStatusBarStyleColor(c.statusBarStyle, c.statusBarColor);
+    applyShieldColor(c.shieldColor);
+  } catch {}
+  // Chrome no longer matches the route - invalidate the idempotency cache
+  // so the next route apply cannot be skipped as "unchanged".
+  (window as any).__lvChromeCache = undefined;
+}
+
+/** Persistent overlays (e.g. the search overlay) claim their chrome while
+ *  open. The top claim wins over route chrome until released. Re-claiming
+ *  the same id moves it to the top. */
+export function claimOverlayChrome(claim: ChromeClaim): void {
+  const idx = chromeClaims.findIndex((c) => c.id === claim.id);
+  if (idx !== -1) chromeClaims.splice(idx, 1);
+  chromeClaims.push(claim);
+  applyClaim(claim);
+}
+
+export function releaseOverlayChrome(id: string): void {
+  const idx = chromeClaims.findIndex((c) => c.id === id);
+  if (idx === -1) return;
+  chromeClaims.splice(idx, 1);
+  const top = chromeClaims[chromeClaims.length - 1];
+  if (top) applyClaim(top);
+  else applyRouteChrome(window.location.pathname, true);
+}
+
 /**
  * Single source of truth for route chrome (html/body bg, shield, body route
  * classes, native status bar). Called by AppRoutes on every navigation AND by
@@ -27,6 +66,16 @@ type ChromeCache = {
  * the cache's back, so the values must be re-asserted even if "unchanged").
  */
 export function applyRouteChrome(pathname: string, force = false): void {
+  // An open overlay owns the chrome: re-assert its claim instead of the
+  // route. (Overlay teardowns call applyRouteChrome unconditionally - this
+  // is what makes returning from fullscreen/immersive land on the claim.)
+  const topClaim = chromeClaims[chromeClaims.length - 1];
+  if (topClaim) {
+    applyClaim(topClaim);
+    return;
+  }
+
+
   const darkChrome = isDarkChromeRoute(pathname);
   const immersive = isImmersiveRoute(pathname);
   const isAuth = pathname.startsWith('/auth');
