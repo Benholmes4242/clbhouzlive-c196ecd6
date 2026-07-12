@@ -37,6 +37,7 @@ import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { COLLEGE_RIVALRY_FALLBACK } from '../../utils/editorialFallbacks';
 import { SectionShell } from './SectionShell';
 import { V4 } from '../tokens';
+import { getCollegeColor } from '../data/collegeColors';
 
 function displayName(stats: CollegeSeasonStats, media: CollegeMedia | undefined): string {
   return media?.short_name || media?.college_name || stats.normalized_name;
@@ -140,6 +141,8 @@ export function CollegeFranchise() {
   const total = leader.earnings_total + chaser.earnings_total;
   const leaderPct = total > 0 ? (leader.earnings_total / total) * 100 : 50;
   const chaserPct = 100 - leaderPct;
+  const leaderColor = getCollegeColor(leader.normalized_name);
+  const chaserColor = getCollegeColor(chaser.normalized_name);
 
   // Headline chain: DB > data-driven > generic fallback
   const headline = (() => {
@@ -181,6 +184,7 @@ export function CollegeFranchise() {
           name={leaderShort}
           logo={leaderLogo}
           fullName={leaderFull}
+          color={leaderColor}
           captain={leaderCap ? { name: abbreviate(leaderCap.fullName), photoCandidates: getPlayerHeadshotCandidates(leaderCap.fullName, leaderCap.tourCode), id: leaderCap.playerId } : null}
           align="left"
           onClick={() => goCollege(leader.normalized_name)}
@@ -191,6 +195,7 @@ export function CollegeFranchise() {
           name={chaserShort}
           logo={chaserLogo}
           fullName={chaserFull}
+          color={chaserColor}
           captain={chaserCap ? { name: abbreviate(chaserCap.fullName), photoCandidates: getPlayerHeadshotCandidates(chaserCap.fullName, chaserCap.tourCode), id: chaserCap.playerId } : null}
           align="right"
           onClick={() => goCollege(chaser.normalized_name)}
@@ -209,17 +214,17 @@ export function CollegeFranchise() {
             background: V4.hairline,
           }}
         >
-          <div style={{ width: `${leaderPct}%`, background: V4.ink }} />
-          <div style={{ width: `${chaserPct}%`, background: V4.ink, opacity: 0.35 }} />
+          <div style={{ width: `${leaderPct}%`, background: leaderColor }} />
+          <div style={{ width: `${chaserPct}%`, background: chaserColor, opacity: 0.85 }} />
         </div>
         <div style={{ marginTop: 6, display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'baseline' }}>
-          <span style={{ fontSize: 11.5, fontWeight: 800, color: V4.ink, fontVariantNumeric: 'tabular-nums' }}>
+          <span style={{ fontSize: 11.5, fontWeight: 800, color: leaderColor, fontVariantNumeric: 'tabular-nums' }}>
             {formatCurrency(leader.earnings_total)}
           </span>
           <span style={{ fontSize: 9, fontWeight: 700, color: V4.inkFaint, letterSpacing: '0.14em', textAlign: 'center' }}>
             SEASON ALUMNI EARNINGS
           </span>
-          <span style={{ fontSize: 11.5, fontWeight: 800, color: V4.inkMute, fontVariantNumeric: 'tabular-nums', textAlign: 'right' }}>
+          <span style={{ fontSize: 11.5, fontWeight: 800, color: chaserColor, fontVariantNumeric: 'tabular-nums', textAlign: 'right' }}>
             {formatCurrency(chaser.earnings_total)}
           </span>
         </div>
@@ -235,6 +240,7 @@ export function CollegeFranchise() {
           const name = displayName(s, media);
           const fname = fullName(s, media);
           const logo = getCollegeLogoUrl(fname);
+          const color = getCollegeColor(s.normalized_name);
           const cap = captainMap?.get(s.normalized_name);
           const capName = cap ? abbreviate(cap.fullName) : null;
           return (
@@ -244,10 +250,10 @@ export function CollegeFranchise() {
               style={{
                 width: '100%',
                 display: 'grid',
-                gridTemplateColumns: '28px 30px 1fr auto',
+                gridTemplateColumns: '28px 26px 1fr auto',
                 alignItems: 'center',
                 gap: 12,
-                padding: '11px 12px',
+                padding: '7px 12px',
                 background: 'transparent',
                 border: 'none',
                 borderBottom: i < top5.length - 1 ? `0.5px solid ${V4.hairline}` : 'none',
@@ -258,13 +264,19 @@ export function CollegeFranchise() {
               <span style={{ fontSize: 13, fontWeight: 700, color: V4.inkFaint, fontVariantNumeric: 'tabular-nums', textAlign: 'center' }}>
                 {i + 1}
               </span>
-              <SchoolSquircle size={30} logo={logo} name={name} />
+              <SchoolSquircle size={26} logo={logo} name={name} />
               <div style={{ minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: V4.ink, letterSpacing: '-0.005em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {name}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+                  <span
+                    aria-hidden
+                    style={{ width: 3, height: 3, borderRadius: '50%', background: color, flexShrink: 0 }}
+                  />
+                  <span style={{ fontSize: 13, fontWeight: 700, color: V4.ink, letterSpacing: '-0.005em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {name}
+                  </span>
                 </div>
-                <div style={{ fontSize: 10, fontWeight: 600, color: V4.inkFaint, marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {s.player_count} on tour{capName ? ` · ${capName}` : ''}
+                <div style={{ fontSize: 9.5, fontWeight: 600, color: V4.inkFaint, marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {s.player_count} on tour{capName ? ` · ${capName} captains` : ''}
                 </div>
               </div>
               <span style={{ fontSize: 12, fontWeight: 700, color: V4.ink, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.01em' }}>
@@ -282,6 +294,7 @@ function DuelSide({
   name,
   logo,
   fullName,
+  color,
   captain,
   align,
   onClick,
@@ -290,6 +303,7 @@ function DuelSide({
   name: string;
   logo: string | null;
   fullName: string;
+  color: string;
   captain: { name: string; photoCandidates: string[]; id: string } | null;
   align: 'left' | 'right';
   onClick: () => void;
@@ -299,25 +313,28 @@ function DuelSide({
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
       <button
         onClick={onClick}
-        style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}
+        style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}
       >
         <div style={{ position: 'relative' }}>
           <SchoolSquircle size={44} logo={logo} name={fullName} />
         </div>
-        <div
-          style={{
-            fontSize: 14,
-            fontWeight: 800,
-            color: V4.ink,
-            letterSpacing: '-0.01em',
-            textAlign: 'center',
-            maxWidth: 130,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {name}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+          <div
+            style={{
+              fontSize: 14,
+              fontWeight: 800,
+              color: V4.ink,
+              letterSpacing: '-0.01em',
+              textAlign: 'center',
+              maxWidth: 130,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {name}
+          </div>
+          <div style={{ height: 2.5, width: 22, background: color, borderRadius: 1 }} />
         </div>
       </button>
       {captain ? (
@@ -331,6 +348,7 @@ function DuelSide({
             alignItems: 'center',
             gap: 6,
             cursor: onCaptainClick ? 'pointer' : 'default',
+            maxWidth: 160,
           }}
         >
           <SquircleAvatar
@@ -341,8 +359,11 @@ function DuelSide({
             hairlineRing
             ringColor={LIGHT_HAIRLINE}
           />
-          <span style={{ fontSize: 10, fontWeight: 600, color: V4.inkMute, letterSpacing: '-0.005em' }}>
+          <span style={{ fontSize: 10, fontWeight: 600, color: V4.inkMute, letterSpacing: '-0.005em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {captain.name}
+          </span>
+          <span style={{ fontSize: 7.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em', whiteSpace: 'nowrap' }}>
+            · CAPTAIN
           </span>
         </button>
       ) : (
