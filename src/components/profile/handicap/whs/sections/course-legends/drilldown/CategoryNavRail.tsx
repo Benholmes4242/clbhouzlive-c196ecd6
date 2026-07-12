@@ -23,7 +23,7 @@ export const CategoryNavRail: React.FC<Props> = ({ categories, onSelect }) => (
       marginTop: 12,
     }}
   >
-    <div style={{ display: 'flex', gap: 7, overflowX: 'auto', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+    <div style={{ display: 'flex', gap: 8, overflowX: 'auto', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
       {categories.map((cat) => {
         const CatIcon = cat.icon;
         const r = cat.yourRank;
