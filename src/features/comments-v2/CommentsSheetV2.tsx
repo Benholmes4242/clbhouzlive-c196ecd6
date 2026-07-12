@@ -215,7 +215,7 @@ function CommentsSheetV2Inner({
             }}
           >
             {/* Grabber */}
-            <div className="flex justify-center pt-2.5 pb-1 shrink-0">
+            <div className="flex justify-center pt-2 pb-1 shrink-0">
               <div style={{ width: 36, height: 4, borderRadius: 999, background: 'rgba(0,0,0,0.14)' }} />
             </div>
 
