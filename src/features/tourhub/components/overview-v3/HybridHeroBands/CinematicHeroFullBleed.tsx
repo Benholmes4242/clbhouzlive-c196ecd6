@@ -1195,7 +1195,7 @@ function Footer({ leftText, isLive, noBorder }: { leftText: string; isLive: bool
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '7px 18px 10px',
+        padding: '6px 18px 8px',
         borderTop: noBorder ? 'none' : '0.5px solid rgba(255,255,255,0.12)',
       }}
     >
