@@ -78,7 +78,7 @@ const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
   return (
     <div
       style={{
-        padding: '8px 16px 10px',
+        padding: '8px 16px 12px',
         display: 'flex',
         flexDirection: 'column',
         gap: 2,
@@ -210,7 +210,7 @@ const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
               alignItems: 'center',
               justifyContent: 'space-between',
               gap: 12,
-              marginBottom: 10,
+              marginBottom: 12,
             }}
           >
             <span

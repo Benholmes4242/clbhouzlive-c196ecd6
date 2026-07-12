@@ -59,21 +59,21 @@ function fmtDateEyebrow(iso: string | null | undefined): string {
 }
 
 const SheetSkeleton: React.FC = () => (
-  <div style={{ padding: '14px 20px 20px' }} className="animate-pulse">
+  <div style={{ padding: '14px 16px 16px' }} className="animate-pulse">
     <div style={{ height: 12, width: 140, background: 'rgba(255,255,255,0.06)', borderRadius: 4 }} />
-    <div style={{ height: 22, width: '70%', background: 'rgba(255,255,255,0.06)', borderRadius: 4, marginTop: 10 }} />
-    <div style={{ height: 88, background: 'rgba(255,255,255,0.06)', borderRadius: 10, marginTop: 18 }} />
-    <div style={{ height: 140, background: 'rgba(255,255,255,0.06)', borderRadius: 10, marginTop: 14 }} />
+    <div style={{ height: 22, width: '70%', background: 'rgba(255,255,255,0.06)', borderRadius: 4, marginTop: 12 }} />
+    <div style={{ height: 88, background: 'rgba(255,255,255,0.06)', borderRadius: 10, marginTop: 16 }} />
+    <div style={{ height: 140, background: 'rgba(255,255,255,0.06)', borderRadius: 10, marginTop: 12 }} />
   </div>
 );
 
 const SheetEmpty: React.FC<{ onClose: () => void }> = ({ onClose }) => (
-  <div style={{ padding: '60px 20px', textAlign: 'center', fontFamily: GEIST }}>
+  <div style={{ padding: '60px 16px', textAlign: 'center', fontFamily: GEIST }}>
     <p style={{ margin: '0 0 8px', fontSize: 14, color: T.dim }}>No round to show yet.</p>
     <button
       onClick={onClose}
       style={{
-        marginTop: 16, padding: '10px 20px', borderRadius: 999,
+        marginTop: 16, padding: '10px 16px', borderRadius: 999,
         background: '#F7931E', color: '#fff', border: 'none',
         fontSize: 13, fontWeight: 700, cursor: 'pointer',
       }}
@@ -164,7 +164,7 @@ export const RoundDetailSheet: React.FC<Props> = ({ open, onClose, scoreId, hand
       ) : (
         <>
           {/* HEADER — three-row identity column with centred avatar */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 13, padding: '10px 20px 14px', borderBottom: `1px solid ${T.line}` }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px 12px', borderBottom: `1px solid ${T.line}` }}>
             {/* Avatar — same tap target as the name */}
             <button
               type="button"
@@ -299,7 +299,7 @@ export const RoundDetailSheet: React.FC<Props> = ({ open, onClose, scoreId, hand
           </div>
 
           {/* Mini stats */}
-          <div style={{ display: 'flex', gap: 22, padding: '14px 20px 0' }}>
+          <div style={{ display: 'flex', gap: 24, padding: '14px 16px 0' }}>
             {[
               { label: 'GROSS', value: userData.adjusted_gross ?? null, color: T.ink },
               { label: 'STBL', value: userData.stableford_points ?? null, color: T.ink },
@@ -335,10 +335,10 @@ export const RoundDetailSheet: React.FC<Props> = ({ open, onClose, scoreId, hand
             <div style={{
               padding: '12px 16px 16px',
               borderTop: `1px solid ${T.line}`,
-              marginTop: 10,
+              marginTop: 12,
               display: 'flex',
               flexDirection: 'column',
-              gap: 15,
+              gap: 16,
             }}>
               <NineGrid holes={front9T} label="OUT" startAt={1} surface="dark" theme={T} />
               {!userData.is_nine_hole && back9.length > 0 && (
@@ -347,8 +347,8 @@ export const RoundDetailSheet: React.FC<Props> = ({ open, onClose, scoreId, hand
             </div>
           ) : (
             <div style={{
-              padding: '30px 20px 40px', textAlign: 'center', color: T.dim,
-              fontSize: 13, fontFamily: GEIST, borderTop: `1px solid ${T.line}`, marginTop: 10,
+              padding: '30px 16px 40px', textAlign: 'center', color: T.dim,
+              fontSize: 13, fontFamily: GEIST, borderTop: `1px solid ${T.line}`, marginTop: 12,
             }}>
               <div style={{ fontWeight: 700, marginBottom: 4, color: T.dim }}>
                 {userData.hole_by_hole_fetched
@@ -363,7 +363,7 @@ export const RoundDetailSheet: React.FC<Props> = ({ open, onClose, scoreId, hand
 
           {/* FOOTER */}
           <div style={{
-            padding: '15px 20px calc(22px + env(safe-area-inset-bottom, 0px))',
+            padding: '16px 16px calc(16px + env(safe-area-inset-bottom, 0px))',
             borderTop: `1px solid ${T.line}`,
             display: 'flex',
             alignItems: 'center',
@@ -393,7 +393,7 @@ export const RoundDetailSheet: React.FC<Props> = ({ open, onClose, scoreId, hand
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
-                  padding: '11px 18px',
+                  padding: '12px 16px',
                   borderRadius: 999,
                   background: 'rgba(255,255,255,0.08)',
                   border: `1px solid ${T.line}`,

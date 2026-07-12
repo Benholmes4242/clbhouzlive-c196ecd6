@@ -81,7 +81,7 @@ export const FriendRoundCardV2: React.FC<Props> = ({
         }
       }}
       style={{
-        margin: '0 16px 8px',
+        margin: '0 16px 12px',
         background: 'var(--hcp-bg-1)',
         border: '1px solid var(--hcp-line-2)',
         borderRadius: 14,
@@ -129,7 +129,7 @@ export const FriendRoundCardV2: React.FC<Props> = ({
         style={{
           flex: 1,
           minWidth: 0,
-          padding: '10px 12px',
+          padding: '12px',
           display: 'flex',
           flexDirection: 'column',
           gap: 6,

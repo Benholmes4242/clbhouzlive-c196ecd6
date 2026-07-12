@@ -75,7 +75,7 @@ export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
       />
 
       {isLoading ? (
-        <div style={{ padding: '0 20px' }}>
+        <div style={{ padding: '0 16px' }}>
           {Array.from({ length: 3 }).map((_, i) => (
             <div
               key={i}
@@ -92,7 +92,7 @@ export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
       ) : items.length === 0 ? (
         <p
           style={{
-            padding: '0 20px',
+            padding: '0 16px',
             fontSize: 13,
             color: INK_MUTE,
             lineHeight: 1.5,
