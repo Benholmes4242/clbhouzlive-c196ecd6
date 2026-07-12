@@ -98,6 +98,7 @@ function useLivePlayerRow(playerId: string | undefined) {
         .select(`
           tournament_id,
           position,
+          position_tied,
           score,
           thru,
           status,
