@@ -635,7 +635,7 @@ function CommitResults({
           </div>
         </>
       ) : (
-        <div style={{ padding: '28px 16px', textAlign: 'center' }}>
+        <div style={{ padding: '32px 16px', textAlign: 'center' }}>
           <p className="text-[13px]" style={{ color: '#64748B' }}>
             No preview clips yet — tap “Search” to filter the grid.
           </p>
