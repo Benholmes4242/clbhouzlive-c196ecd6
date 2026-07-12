@@ -91,10 +91,9 @@ export default function ProfileSheetV2({
   profiles,
   onSwitchProfile,
   onNavigate,
-  isAdmin: _isAdmin,
+  isAdmin,
   isLoading,
 }: ProfileSheetV2Props) {
-  void _isAdmin; // reserved for PS2 admin section
   const sheetY = useMotionValue(0);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const openTweenRef = useRef<ReturnType<typeof animate> | null>(null);
