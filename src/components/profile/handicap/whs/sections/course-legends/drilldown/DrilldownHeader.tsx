@@ -64,6 +64,7 @@ export const DrilldownHeader: React.FC<Props> = ({
           alignItems: 'center',
           gap: 5,
           padding: '5px 11px',
+          marginBottom: 6,
           borderRadius: 999,
           background: 'rgba(0,0,0,0.45)',
           border: '1px solid rgba(255,255,255,0.12)',
