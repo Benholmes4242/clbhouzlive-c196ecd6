@@ -1,0 +1,328 @@
+/**
+ * ComparePage — "The Duel".
+ *
+ * /tourhub/college-golf/compare?c1=<slug>&c2=<slug>
+ *
+ * Route-param contract (ported verbatim from the old CollegeComparePage):
+ *   - Both params present   → render the duel.
+ *   - c1 present, c2 missing → redirect to /tourhub/college-golf/<c1>.
+ *   - Both missing           → renders empty duel (both columns "—") with
+ *                              Change buttons wired to the PickerSheet.
+ *   - Unknown/invalid slug   → column renders as "—" (no standings match);
+ *                              tug bars show both-zero neutrals; Classes
+ *                              hides for that side. This mirrors the old
+ *                              page's silent-empty behaviour.
+ *
+ * Reuse:
+ *   - useFranchiseStandings   → ONE source for both sides' rank/points/
+ *                               alumni/wins/top10 (matches the hub exactly).
+ *   - useLiveAlumni + useLivePlayerIds → live counts + row live dots.
+ *   - useCollegeRoster        → both classes' top alumni (already sorted
+ *                               by earnings; we slice 5).
+ *
+ * No framer.
+ */
+
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { TourHubShell } from '@/features/tourhub/components/TourHubShell';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { collegeProfileRoute, playerRoute } from '@/features/tourhub/routes';
+import { formatCurrency } from '@/lib/utils/formatCurrency';
+import {
+  AMBER,
+  CHARCOAL,
+  FONT,
+  HAIRLINE_INK_10,
+  INK,
+  INK_MUTE,
+  SLATE_50,
+  STATUS_LIVE,
+  SURFACE,
+} from '@/features/tourhub/_shared/tokens';
+import { useFranchiseStandings } from '@/features/tourhub/college-v2/hub/data/useFranchiseStandings';
+import { useLiveAlumni } from '@/features/tourhub/college-v2/hub/data/useLiveAlumni';
+import { useCollegeRoster } from '@/features/tourhub/college-v2/profile/data/useCollegeRoster';
+import { useLivePlayerIds } from '@/features/tourhub/players-v2/data/useLivePlayerIds';
+import { DuelMasthead } from './DuelMasthead';
+import { TugStat } from './TugStat';
+import { PickerSheet } from './PickerSheet';
+
+const CLASS_CAP = 5;
+const fmtInt = (n: number) => n.toLocaleString();
+
+export function ComparePage() {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const c1 = searchParams.get('c1') || '';
+  const c2 = searchParams.get('c2') || '';
+
+  // Old contract: c1 present with no c2 → redirect to profile.
+  useEffect(() => {
+    if (c1 && !c2) navigate(collegeProfileRoute(c1), { replace: true });
+  }, [c1, c2, navigate]);
+
+  const { data, isLoading } = useFranchiseStandings();
+  const { data: liveAlumni } = useLiveAlumni();
+  const { data: leftRoster = [] } = useCollegeRoster(c1 || undefined);
+  const { data: rightRoster = [] } = useCollegeRoster(c2 || undefined);
+  const { data: liveMap = {} } = useLivePlayerIds();
+
+  const [pickerTarget, setPickerTarget] = useState<'c1' | 'c2' | null>(null);
+
+  const standings = data?.standings ?? [];
+  const left = useMemo(() => standings.find((s) => s.normalizedName === c1) ?? null, [standings, c1]);
+  const right = useMemo(() => standings.find((s) => s.normalizedName === c2) ?? null, [standings, c2]);
+
+  const liveLeft = liveAlumni?.byCollege?.[c1] ?? 0;
+  const liveRight = liveAlumni?.byCollege?.[c2] ?? 0;
+
+  const leftClass = leftRoster.slice(0, CLASS_CAP);
+  const rightClass = rightRoster.slice(0, CLASS_CAP);
+
+  const leftCode = left?.shortName || left?.collegeName?.slice(0, 4).toUpperCase() || 'LEFT';
+  const rightCode = right?.shortName || right?.collegeName?.slice(0, 4).toUpperCase() || 'RIGHT';
+
+  // c1 && !c2 → we're about to redirect; render nothing.
+  if (c1 && !c2) return null;
+
+  return (
+    <TourHubShell immersiveStatusBar>
+      <div
+        style={{
+          background: SLATE_50,
+          minHeight: '100vh',
+          fontFamily: FONT,
+          paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)',
+        }}
+      >
+        {/* Masthead — always renders (skeleton state below if loading) */}
+        {isLoading && !left && !right ? (
+          <div
+            style={{
+              background: CHARCOAL,
+              paddingTop: 'calc(env(safe-area-inset-top, 0px) + 58px)',
+              paddingBottom: 20,
+              paddingLeft: 12,
+              paddingRight: 12,
+              display: 'flex',
+              gap: 10,
+            }}
+          >
+            {[0, 1].map((i) => (
+              <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                <div style={{ width: 54, height: 54, borderRadius: '34%', background: 'rgba(255,255,255,0.06)' }} />
+                <div style={{ height: 10, width: 80, background: 'rgba(255,255,255,0.10)' }} />
+                <div style={{ height: 8, width: 60, background: 'rgba(255,255,255,0.06)' }} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <DuelMasthead
+            left={left}
+            right={right}
+            liveLeft={liveLeft}
+            liveRight={liveRight}
+            onChangeLeft={() => setPickerTarget('c1')}
+            onChangeRight={() => setPickerTarget('c2')}
+          />
+        )}
+
+        {/* Stats */}
+        <section style={{ background: SURFACE, borderTop: `0.5px solid ${HAIRLINE_INK_10}` }}>
+          {isLoading && !left && !right ? (
+            <div>
+              {[0, 1, 2, 3].map((i) => (
+                <div key={i} style={{ padding: '14px 16px 12px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                    <div style={{ height: 14, width: 60, background: 'rgba(15,23,42,0.06)', borderRadius: 3 }} />
+                    <div style={{ height: 10, width: 70, background: 'rgba(15,23,42,0.05)', borderRadius: 3 }} />
+                    <div style={{ height: 14, width: 60, background: 'rgba(15,23,42,0.06)', borderRadius: 3 }} />
+                  </div>
+                  <div style={{ height: 4, background: 'rgba(15,23,42,0.05)', borderRadius: 2 }} />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <>
+              <TugStat
+                label="Franchise Points"
+                leftValue={left?.pointsTotal ?? 0}
+                rightValue={right?.pointsTotal ?? 0}
+                format={formatCurrency}
+              />
+              <div style={{ height: 0.5, background: HAIRLINE_INK_10, margin: '0 16px' }} />
+              <TugStat
+                label="Alumni on Tour"
+                leftValue={left?.alumniCount ?? 0}
+                rightValue={right?.alumniCount ?? 0}
+                format={fmtInt}
+              />
+              <div style={{ height: 0.5, background: HAIRLINE_INK_10, margin: '0 16px' }} />
+              <TugStat
+                label="Wins"
+                leftValue={left?.winsTotal ?? 0}
+                rightValue={right?.winsTotal ?? 0}
+                format={fmtInt}
+              />
+              <div style={{ height: 0.5, background: HAIRLINE_INK_10, margin: '0 16px' }} />
+              <TugStat
+                label="Top 10s"
+                leftValue={left?.top10Total ?? 0}
+                rightValue={right?.top10Total ?? 0}
+                format={fmtInt}
+              />
+            </>
+          )}
+        </section>
+
+        {/* Classes */}
+        <section style={{ background: SURFACE, marginTop: 10 }}>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: 0,
+              borderTop: `0.5px solid ${HAIRLINE_INK_10}`,
+            }}
+          >
+            <ClassColumn
+              headerCode={leftCode}
+              roster={leftClass}
+              liveMap={liveMap}
+              alignRight={false}
+            />
+            <ClassColumn
+              headerCode={rightCode}
+              roster={rightClass}
+              liveMap={liveMap}
+              alignRight
+            />
+          </div>
+        </section>
+      </div>
+
+      <PickerSheet
+        open={pickerTarget !== null}
+        onClose={() => setPickerTarget(null)}
+        target={pickerTarget}
+        standings={standings}
+        otherSlug={pickerTarget === 'c1' ? c2 : c1}
+      />
+    </TourHubShell>
+  );
+}
+
+// ---------------------------------------------------------------------------
+
+interface ClassColumnProps {
+  headerCode: string;
+  roster: Array<{
+    id: string;
+    fullName: string;
+    photoUrl: string | null;
+    firstName: string;
+    lastName: string;
+  }>;
+  liveMap: Record<string, unknown>;
+  alignRight: boolean;
+}
+
+function ClassColumn({ headerCode, roster, liveMap, alignRight }: ClassColumnProps) {
+  return (
+    <div
+      style={{
+        padding: '12px 12px 16px',
+        borderLeft: alignRight ? `0.5px solid ${HAIRLINE_INK_10}` : 'none',
+      }}
+    >
+      <div
+        style={{
+          fontSize: 8.5,
+          fontWeight: 800,
+          letterSpacing: '0.16em',
+          textTransform: 'uppercase',
+          color: AMBER,
+          textAlign: alignRight ? 'right' : 'left',
+          marginBottom: 10,
+        }}
+      >
+        {headerCode} Leads
+      </div>
+      {roster.length === 0 ? (
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 600,
+            color: INK_MUTE,
+            textAlign: alignRight ? 'right' : 'left',
+            paddingTop: 4,
+          }}
+        >
+          —
+        </div>
+      ) : (
+        roster.map((a) => {
+          const isLive = Boolean(liveMap[a.id]);
+          const nav = playerRoute(a.id, { kind: 'college', collegeName: headerCode });
+          return (
+            <Link
+              key={a.id}
+              to={nav.to}
+              state={nav.state}
+              style={{
+                display: 'flex',
+                flexDirection: alignRight ? 'row-reverse' : 'row',
+                alignItems: 'center',
+                gap: 8,
+                padding: '6px 0',
+                textDecoration: 'none',
+                color: 'inherit',
+              }}
+            >
+              <div style={{ position: 'relative', flexShrink: 0 }}>
+                <SquircleAvatar
+                  size={22}
+                  srcCandidates={a.photoUrl ? [a.photoUrl] : []}
+                  alt={a.fullName}
+                />
+                {isLive && (
+                  <span
+                    aria-hidden
+                    style={{
+                      position: 'absolute',
+                      top: 1,
+                      right: 1,
+                      width: 6,
+                      height: 6,
+                      borderRadius: '50%',
+                      background: STATUS_LIVE,
+                      boxShadow: '0 0 0 1.5px #FFFFFF',
+                    }}
+                  />
+                )}
+              </div>
+              <div
+                style={{
+                  flex: 1,
+                  minWidth: 0,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: INK,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  textAlign: alignRight ? 'right' : 'left',
+                }}
+              >
+                {a.fullName}
+              </div>
+            </Link>
+          );
+        })
+      )}
+    </div>
+  );
+}
+
+export default ComparePage;
