@@ -16,8 +16,26 @@ import {
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
-const CARD_W = 244;
+const CARD_W = 226;
+const CARD_H = 240;
 const AMBER_TEXT = '#c97a10';
+
+// Accent per feat_type — drives tick, WHS mark, legendary glow + avatar ring.
+const FEAT_ACCENT: Record<CircleFeatType, string> = {
+  ace: '#FBBC2E',
+  albatross: '#FBBC2E',
+  eagle: '#22C55E',
+  birdie_haul: '#F7931E',
+  under_par: '#22C55E',
+  pb_gross: '#7DD3FC',
+  pb_stableford: '#7DD3FC',
+  stableford: '#F7931E',
+};
+const FALLBACK_ACCENT = '#F7931E';
+
+function isLegendaryFeat(t: CircleFeatType): boolean {
+  return t === 'ace' || t === 'albatross';
+}
 
 const FEAT_META: Record<CircleFeatType, { emoji: string; label: string }> = {
   ace: { emoji: '🕳️', label: 'HOLE-IN-ONE' },
