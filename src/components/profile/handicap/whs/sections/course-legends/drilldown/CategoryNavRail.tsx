@@ -19,8 +19,8 @@ export const CategoryNavRail: React.FC<Props> = ({ categories, onSelect }) => (
   <div
     style={{
       background: 'var(--hcp-bg-0)',
-      padding: '10px 14px',
-      marginTop: 14,
+      padding: '12px 16px',
+      marginTop: 12,
     }}
   >
     <div style={{ display: 'flex', gap: 7, overflowX: 'auto', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
