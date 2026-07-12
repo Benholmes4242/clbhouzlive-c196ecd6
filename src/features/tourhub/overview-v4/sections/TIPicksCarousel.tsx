@@ -110,11 +110,15 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
               cursor: 'pointer',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
+            <div
+              role="link"
+              onClick={(e) => { e.stopPropagation(); goToPlayer(p.playerId); }}
+              style={{ display: 'flex', alignItems: 'center', gap: 11, cursor: 'pointer' }}
+            >
               <PlayerAvatar playerId={p.playerId} playerName={p.playerName} tourCode={tourCode} photoUrl={p.photoUrl} size="md" ringColor={LIGHT_HAIRLINE} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-                  <span style={{ fontSize: 22, color: V4.goldMid, lineHeight: 1, ...NUMERAL_THIN }}>{p.rank}</span>
+                  <span style={{ fontSize: 22, color: V4.inkFaint, lineHeight: 1, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{p.rank}</span>
                   <span style={{ fontSize: 9.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Pick</span>
                 </div>
                 <div style={{ fontSize: 14, fontWeight: 800, color: V4.ink, letterSpacing: '-0.015em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
