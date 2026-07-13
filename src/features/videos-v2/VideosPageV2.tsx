@@ -7,6 +7,7 @@ import { UnderlineTabs } from '@/components/ui/UnderlineTabs';
 import { FilterChips } from '@/components/ui/FilterChips';
 import type { VideosSortId } from './components/SortSegment';
 import { VideosFeedV2 } from './components/VideosFeedV2';
+import { VIDEOS_V2_CATEGORY_IDS, type VideosV2CategoryId } from './categories';
 
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
@@ -20,23 +21,15 @@ const SORT_OPTS: ReadonlyArray<{ id: VideosSortId; label: string }> = [
   { id: 'following', label: 'Following' },
 ];
 
-// Category ids replicated (NOT imported) from the legacy mood system in
-// src/components/watch/videos/hooks/useVideosMood.ts. Videos v2 uses the
-// MOMENT_CATEGORIES ids directly as its ?cat= values.
-const VIDEOS_V2_CATEGORY_IDS = [
-  'all',
-  'course-vlog',
-  'tips-coaching',
-  'tournament',
-] as const;
-type VideosV2CategoryId = typeof VIDEOS_V2_CATEGORY_IDS[number];
+type CategoryFilterId = 'all' | VideosV2CategoryId;
 
-const CATEGORY_OPTS: ReadonlyArray<{ id: VideosV2CategoryId; label: string }> = [
+const CATEGORY_OPTS: ReadonlyArray<{ id: CategoryFilterId; label: string }> = [
   { id: 'all', label: 'All' },
   { id: 'course-vlog', label: 'Course vlogs' },
   { id: 'tips-coaching', label: 'Coaching' },
   { id: 'tournament', label: 'Tournaments' },
 ];
+
 
 function parseSort(raw: string | null): VideosSortId {
   return raw && (VALID_SORTS as readonly string[]).includes(raw)
