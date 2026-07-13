@@ -17,6 +17,7 @@ const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage'));
 const SystemPage = lazy(() => import('./pages/SystemPage'));
 const ModerationPage = lazy(() => import('./pages/ModerationPage'));
 const ApprovalsPage = lazy(() => import('./pages/ApprovalsPage'));
+const MatchRequestsPage = lazy(() => import('./pages/MatchRequestsPage'));
 const AppealsPage = lazy(() => import('./pages/AppealsPage'));
 
 const SupportPage = lazy(() => import('./pages/SupportPage'));
