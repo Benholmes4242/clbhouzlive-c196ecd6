@@ -390,7 +390,6 @@ export interface ReviewOfWeekCardFeedPost extends Omit<FeedPost, 'mediaItems' | 
 
 export interface VideoSessionState {
   currentTime: number;
-  wasMuted: boolean;
   duration: number;
 }
 

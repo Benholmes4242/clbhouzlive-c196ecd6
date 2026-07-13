@@ -33,6 +33,7 @@ import { getActorRouteByType } from '@/types/actor';
 import { isPerfEnabled } from '@/perf/navTiming';
 import { coldOpenRevealSample, coldOpenIsActive } from '@/perf/coldOpen';
 import { VideoEngine } from '@/video/VideoEngine';
+import { useSessionAudio } from '@/audio/sessionAudioStore';
 import { feedLaneRoles } from '@/video/feedLaneRoles';
 import { RailLanePool } from '@/video/railLanePool';
 import { originHostRegistry } from '@/video/originHostRegistry';
@@ -88,9 +89,11 @@ function returnBorrow(borrow: BorrowDescriptor, reason: 'close' | 'route' | 'dem
   const viewportChanged =
     typeof window !== 'undefined' &&
     (window.innerWidth !== borrow.viewportW || window.innerHeight !== borrow.viewportH);
-  // Mute policy: rails force-mute; feed-active restores pre-borrow mute.
+  // Mute policy: rails force-mute; feed-active follows the current session
+  // mute (B2 — unmute in fullscreen now travels back to the feed via the
+  // session store rather than being clobbered by a pre-borrow snapshot).
   try {
-    const targetMuted = isRail ? true : (borrow.wasMuted ?? true);
+    const targetMuted = isRail ? true : useSessionAudio.getState().isMuted;
     VideoEngine.setMuted(borrow.laneId, targetMuted);
   } catch {}
   // Reset object-fit to cover for the tile's aspect.

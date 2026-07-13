@@ -331,8 +331,8 @@ export function openWithOrigin({
             posterUrl: posterUrl ?? null,
             viewportW: typeof window !== 'undefined' ? window.innerWidth : 0,
             viewportH: typeof window !== 'undefined' ? window.innerHeight : 0,
-            wasMuted: snap.muted,
           };
+
           VideoEngine.markBorrowed(activeLaneId);
           feedLaneRoles.freeze(activeLaneId);
           BORROW_DBG('mount', {
@@ -340,7 +340,6 @@ export function openWithOrigin({
             activeLaneId,
             ownerKey: borrow.ownerKey,
             postId,
-            wasMuted: snap.muted,
           });
         }
       }

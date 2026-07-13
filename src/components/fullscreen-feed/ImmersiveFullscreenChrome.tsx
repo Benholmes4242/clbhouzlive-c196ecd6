@@ -24,9 +24,13 @@ import {
   MessageCircle,
   Send,
   MoreHorizontal,
+  Volume2,
+  VolumeX,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useClubhouseStore } from '@/store/clubhouseStore';
+import { useSessionAudio } from '@/audio/sessionAudioStore';
+import { triggerHaptic } from '@/lib/ui/haptics';
 import { CarouselDots } from '@/components/media/CarouselDots';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
@@ -111,6 +115,12 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   const navigate = useNavigate();
   const carouselPositions = useClubhouseStore((s) => s.carouselPositions);
   const isTournamentCardActive = useClubhouseStore((s) => s.isTournamentCardActive);
+  const isAudioMuted = useSessionAudio((s) => s.isMuted);
+
+  const handleMuteTap = useCallback(() => {
+    try { triggerHaptic('light'); } catch {}
+    useSessionAudio.getState().toggle();
+  }, []);
 
   const activePost = posts[activeIndex] ?? null;
   const carouselSlide = carouselPositions.get(activeIndex) ?? 0;
@@ -432,6 +442,17 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             fontFamily: 'Geist, system-ui, sans-serif',
           }}
         >
+          <RailButton
+            onClick={handleMuteTap}
+            ariaLabel={isAudioMuted ? 'Unmute' : 'Mute'}
+          >
+            {isAudioMuted ? (
+              <VolumeX size={32} stroke="#fff" strokeWidth={2} />
+            ) : (
+              <Volume2 size={32} stroke="#fff" strokeWidth={2} />
+            )}
+          </RailButton>
+
           <RailButton
             onClick={() => onLike(activePost)}
             ariaLabel={likeState.isLiked ? 'Unlike' : 'Like'}
