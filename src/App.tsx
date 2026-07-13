@@ -18,7 +18,7 @@ import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client
 import { queryPersister, shouldPersistQuery, PERSIST_MAX_AGE_MS } from "@/lib/queryPersister";
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { BrowserRouter, Routes, Route, useLocation, Navigate, useParams, useNavigate } from "react-router-dom";
-import { setNavigateRef } from '@/utils/navigation';
+import { setNavigateRef, appNavigate } from '@/utils/navigation';
 import ScrollToTop from '@/components/ScrollToTop';
 import { ScrollRestoration } from '@/components/ScrollRestoration';
 import { LockAnchorSync } from '@/components/LockAnchorSync';
@@ -120,6 +120,35 @@ import SuspendedScreen from "@/components/SuspendedScreen";
 import { isNativeAppSync, isPreviewHost, waitForNativeBridge } from '@/utils/native/isNativeApp';
 import AppDownloadGate from '@/pages/AppDownloadGate';
 import { useEnvStatus, isAppShellVisible } from '@/utils/native/envStatus';
+
+// ── Median push deep-link bridge ────────────────────────────────────────
+// Median's JS Bridge calls this global function when a push notification is
+// opened, passing the OneSignal Additional Data. Registered at module scope
+// so it exists on `window` BEFORE any cold-start tap dispatches - the
+// listener must be ready regardless of OneSignal registration timing.
+if (typeof window !== 'undefined') {
+  (window as any).median_onesignal_push_opened = (payload: any) => {
+    try {
+      const d =
+        payload?.additionalData ??
+        payload?.notification?.additionalData ??
+        payload?.data ??
+        payload ??
+        {};
+      const target =
+        (typeof d?.route === 'string' && d.route) ||
+        (typeof d?.targetUrl === 'string' && d.targetUrl) ||
+        null;
+      if (!target) return;
+      const path = target.startsWith('http')
+        ? new URL(target).pathname + new URL(target).search + new URL(target).hash
+        : target;
+      // Defer a tick so router is ready on cold start.
+      setTimeout(() => { appNavigate(path); }, 0);
+    } catch { /* swallow */ }
+  };
+}
+
 
 const RootGate: React.FC = () => {
   const { user, loading: authLoading } = useSupabaseSession();
@@ -737,33 +766,13 @@ const AppInner: React.FC = () => {
         try { os.User?.addAlias?.('external_id', userId); } catch {}
 
         // ── Deep-link on notification tap ──────────────────────────────
-        // Every push we send carries data.route (see process-push-queue).
-        // Route reads work across bridge shapes; guard all accesses.
-        const handleOpen = (payload: any) => {
-          try {
-            const d =
-              payload?.notification?.additionalData ??
-              payload?.result?.notification?.additionalData ??
-              payload?.notification?.rawPayload?.custom?.a ??
-              payload?.additionalData ??
-              payload?.data ??
-              {};
-            const route = typeof d?.route === 'string' ? d.route : null;
-            if (!route) return;
-            // Defer a tick so the router is ready on cold start.
-            setTimeout(() => { window.location.assign(route); }, 0);
-          } catch {}
-        };
-        try { os.Notifications?.addEventListener?.('click', handleOpen); } catch {}
-        try { os.setNotificationOpenedHandler?.(handleOpen); } catch {}
-        // Cold-start replay: if launched BY a tap, the click may have fired
-        // before this listener registered. Consume any pending opened notif.
-        try {
-          const pending =
-            os.Notifications?.getClickedNotification?.() ??
-            os.getLastNotificationOpened?.();
-          if (pending) handleOpen(pending);
-        } catch {}
+        // The OneSignal v5 web SDK event API does NOT exist in Median's
+        // bridge (Median wires the WebView to the NATIVE OneSignal SDKs via
+        // JS Bridge). We rely on:
+        //   1) Server-side `targetUrl` in Additional Data (Median auto-nav).
+        //   2) Global `median_onesignal_push_opened(payload)` defined at
+        //      module scope below (Median calls it on every open).
+        // No listeners registered here.
 
         // Clear iOS app icon badge on cold open + on every foreground.
         import('@/utils/pushBadge').then((m) => m.clearAppBadge());
