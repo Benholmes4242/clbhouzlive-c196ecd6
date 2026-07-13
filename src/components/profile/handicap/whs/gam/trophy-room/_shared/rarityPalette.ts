@@ -16,6 +16,14 @@ export const FORGE = {
 
 export const FORGE_GOLD = '#FBBC2E';
 
+export const MATERIAL_HEX: Record<string, string> = {
+  bronze: FORGE.bronze,
+  silver: FORGE.silver,
+  emerald: FORGE.emerald,
+  diamond: FORGE.diamond,
+  obsidian: '#2A2F36',
+};
+
 export interface RarityPalette {
   color: string;
   tint: string;

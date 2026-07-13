@@ -11,6 +11,7 @@ import { TrophyDetailSheet } from './TrophyDetailSheet';
 import { normalizeBadge, normalizeLegend, type TrophyItem } from './_shared/normalizeTrophyItem';
 import { isShowpiece, LIFETIME_ORDER } from './_shared/showpieces';
 import { MATERIAL_PALETTES, FORGE_GOLD, materialNameForTier } from './_shared/rarityPalette';
+import { TrophyRoomSpine } from './TrophyRoomSpine';
 import { rarityColor } from '@/lib/gam/visuals';
 import type { BadgeCategory } from '@/lib/gam/types';
 
@@ -286,6 +287,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
   );
 
   const allLegends = legendItems;
+  const items = useMemo(() => [...achievementItems, ...legendItems], [achievementItems, legendre, legendItems]);
   const earnedTotal = earnedAchievements.length + allLegends.length;
 
   const openDetail = useCallback(
