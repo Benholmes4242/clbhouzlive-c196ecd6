@@ -122,18 +122,10 @@ interface Props {
   ownerFirstName?: string | null;
 }
 
-type Tab = 'all' | 'earned' | 'locked';
-
 interface DetailContext {
   items: TrophyItem[];
   index: number;
 }
-
-const TAB_LABEL: Record<Tab, string> = {
-  all: 'All',
-  earned: 'Earned',
-  locked: 'Locked',
-};
 
 const Eyebrow: React.FC<{ ownerFirstName?: string | null; isFriendView?: boolean }> = ({
   ownerFirstName,
@@ -158,8 +150,9 @@ const TrophyGroupLabel: React.FC<{
   Icon?: LucideIcon | null;
   iconColor?: string;
   label: string;
-  count: number;
-}> = ({ Icon, iconColor, label, count }) => (
+  earned: number;
+  total: number;
+}> = ({ Icon, iconColor, label, earned, total }) => (
   <div
     style={{
       display: 'flex',
@@ -176,9 +169,23 @@ const TrophyGroupLabel: React.FC<{
   >
     {Icon && <Icon size={12} color={iconColor ?? 'currentColor'} strokeWidth={2.4} />}
     <span>{label}</span>
-    <span style={{ color: 'rgba(255,255,255,0.55)', ...GAM.TABULAR, fontWeight: 700 }}>({count})</span>
+    <span
+      style={{
+        marginLeft: 'auto',
+        fontSize: 11.5,
+        fontWeight: 400,
+        letterSpacing: '0.02em',
+        textTransform: 'none',
+        color: 'rgba(255,255,255,0.45)',
+        ...GAM.TABULAR,
+      }}
+    >
+      <b style={{ fontWeight: 800, color: 'rgba(255,255,255,0.75)' }}>{earned}</b> of{' '}
+      <b style={{ fontWeight: 800, color: 'rgba(255,255,255,0.75)' }}>{total}</b> earned
+    </span>
   </div>
 );
+
 
 const Grid: React.FC<{
   items: TrophyItem[];
