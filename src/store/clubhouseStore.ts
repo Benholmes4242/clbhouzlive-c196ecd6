@@ -1,19 +1,8 @@
 import { create } from 'zustand';
+import { useSessionAudio, getLastUnmuteGestureTs } from '@/audio/sessionAudioStore';
 
-const SESSION_MUTE_KEY = 'clbhouz-feed-muted';
-
-function getInitialMuted(): boolean {
-  try {
-    const saved = sessionStorage.getItem(SESSION_MUTE_KEY);
-    if (saved !== null) return JSON.parse(saved);
-  } catch {}
-  // One-time cleanup of orphaned key from removed GlobalAudioContext mute state
-  try { sessionStorage.removeItem('globalAudioState'); } catch {}
-  return true; // default muted on fresh session
-}
-
-// Tracks recent user gesture for autoplay policy compliance
-let _userGestureUnmuteTs = 0;
+// One-time cleanup of orphaned key from removed GlobalAudioContext mute state.
+try { sessionStorage.removeItem('globalAudioState'); } catch {}
 
 export type TabKey = string; // 'foryou' | 'friends' | other surfaces (LightCardFeed etc use 'default')
 
