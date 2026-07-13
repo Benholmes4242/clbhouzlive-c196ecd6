@@ -142,23 +142,6 @@ export function LegendaryFeatHero({ region }: Props) {
     pointerRef.current = null;
   };
 
-  // Fade transition on content when index changes
-  const contentRef = useRef<HTMLDivElement | null>(null);
-  const prevIndexRef = useRef(safeIndex);
-  useEffect(() => {
-    if (prevIndexRef.current === safeIndex) return;
-    prevIndexRef.current = safeIndex;
-    const node = contentRef.current;
-    if (!node) return;
-    if (prefersReduced()) return;
-    node.style.transition = 'none';
-    node.style.opacity = '0';
-    // force reflow
-    void node.offsetWidth;
-    node.style.transition = 'opacity 160ms linear';
-    node.style.opacity = '1';
-  }, [safeIndex]);
-
   return (
     <div style={{ padding: '0 16px' }}>
       <button
