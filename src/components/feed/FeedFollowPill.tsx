@@ -9,10 +9,10 @@ interface FeedFollowPillProps {
 }
 
 const BASE_STYLE: React.CSSProperties = {
-  fontSize: 10,
+  fontSize: 9,
   fontWeight: 700,
-  letterSpacing: 0.5,
-  padding: '3px 9px',
+  letterSpacing: 0.4,
+  padding: '2px 8px',
   borderRadius: 999,
   cursor: 'pointer',
   transition: 'all 220ms ease',
