@@ -421,7 +421,12 @@ export function useHeroCarouselData() {
             liveSlides.push({ tournament, type: 'live' });
           }
         } else if (completed.length > 0) {
-          completedSlides.push({ tournament: completed[0], type: 'completed' });
+          // Concurrent completed events (e.g. two DPWT events the same week)
+          // each get a slide - mirrors the live branch. The completed cache
+          // is bounded to the recent window, so this cannot flood.
+          for (const tournament of completed) {
+            completedSlides.push({ tournament, type: 'completed' });
+          }
         } else if (upcoming.length > 0) {
           // Skip co-sanctioned majors on non-PGA tours (already excluded from PGA
           // slot when active via the eviction above).
@@ -429,6 +434,21 @@ export function useHeroCarouselData() {
             ? upcoming[0]
             : upcoming.find(t => getMajorType(t.name || '') !== 'mens') ?? upcoming[0];
           upcomingSlides.push({ tournament: nextTrueEvent, type: 'upcoming' });
+
+          // Concurrent siblings: other upcoming events on this tour whose
+          // date ranges OVERLAP the primary (co-hosted weeks) also slide.
+          // Overlap - not "push all" - because the upcoming cache spans
+          // multiple weeks and later weeks must not leak in.
+          const pStart = new Date(nextTrueEvent.startDate).getTime();
+          const pEnd = new Date(nextTrueEvent.endDate || nextTrueEvent.startDate).getTime();
+          upcoming
+            .filter(t => t.id !== nextTrueEvent.id)
+            .filter(t => {
+              const s = new Date(t.startDate).getTime();
+              const e = new Date(t.endDate || t.startDate).getTime();
+              return s <= pEnd && e >= pStart;
+            })
+            .forEach(t => upcomingSlides.push({ tournament: t, type: 'upcoming' }));
         }
       });
 
