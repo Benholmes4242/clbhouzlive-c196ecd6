@@ -15,7 +15,15 @@
  * or transforms. If older Android WebViews jank, downgrade to opaque:
  *   background: '#F8FAFC'; remove both backdrop-filter declarations.
  */
-export function GlassHeaderPlate({ visible = true }: { visible?: boolean }) {
+export function GlassHeaderPlate({
+  visible = true,
+  heightPx = 62,
+}: {
+  visible?: boolean;
+  /** Non-safe-area portion of the plate. 62 for watch/courses (island 54 + gap);
+   *  70 for tour hub (island 70). */
+  heightPx?: number;
+}) {
   if (!visible) return null;
   return (
     <div
@@ -25,7 +33,7 @@ export function GlassHeaderPlate({ visible = true }: { visible?: boolean }) {
         top: 0,
         left: 0,
         right: 0,
-        height: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 62px)',
+        height: `calc(var(--sat, env(safe-area-inset-top, 0px)) + ${heightPx}px)`,
         background: 'rgba(248,250,252,0.72)',
         backdropFilter: 'blur(14px)',
         WebkitBackdropFilter: 'blur(14px)',
