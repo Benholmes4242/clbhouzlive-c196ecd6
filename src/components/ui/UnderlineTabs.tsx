@@ -11,7 +11,7 @@ import React from 'react';
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
-const DEFAULT_UNDERLINE = 'linear-gradient(90deg,#F59E0B,#F7931E)';
+const DEFAULT_UNDERLINE = '#0A0E14';
 
 export interface UnderlineTabsOption<T extends string> {
   id: T;
@@ -24,7 +24,7 @@ export interface UnderlineTabsProps<T extends string> {
   onChange: (id: T) => void;
   size?: 'sm' | 'md' | 'lg';
   align?: 'center' | 'left';
-  /** Underline colour or gradient. Defaults to the amber gradient. */
+  /** Underline colour or gradient. Defaults to ink. */
   underlineColor?: string;
   className?: string;
   ariaLabel?: string;
