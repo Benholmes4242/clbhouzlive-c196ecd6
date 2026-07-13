@@ -157,6 +157,29 @@ class VideoEngineImpl {
    */
   private borrowedLanes = new Set<LaneId>();
 
+  /**
+   * Autoplay-blocked signal — fires when a 'session' lane's unmuted play()
+   * is rejected by the browser and we degrade THIS lane to muted so playback
+   * continues. Consumers (feed slide, fullscreen overlay) show a
+   * "Tap for sound" pill in response. We deliberately do NOT write the
+   * session store here — the user's session intent stays "unmuted"; the
+   * pill's tap re-asserts it with a fresh user gesture.
+   */
+  private autoplayBlockedListeners = new Set<(laneId: LaneId) => void>();
+
+  onAutoplayBlocked(fn: (laneId: LaneId) => void): () => void {
+    this.autoplayBlockedListeners.add(fn);
+    return () => {
+      this.autoplayBlockedListeners.delete(fn);
+    };
+  }
+
+  private emitAutoplayBlocked(laneId: LaneId): void {
+    this.autoplayBlockedListeners.forEach((fn) => {
+      try { fn(laneId); } catch {}
+    });
+  }
+
   markBorrowed(laneId: LaneId): void {
     this.borrowedLanes.add(laneId);
     DBG('markBorrowed', { laneId });
