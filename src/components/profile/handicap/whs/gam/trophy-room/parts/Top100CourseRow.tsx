@@ -145,6 +145,33 @@ export const Top100CourseRow: React.FC<Props> = ({ row, isFriendView, onNavigate
         </div>
       )}
 
+      {showRequestChip && (
+        <span
+          role="button"
+          tabIndex={0}
+          onClick={(e) => {
+            e.stopPropagation();
+            onRequestMatch!(row.course_id, row.course_name);
+          }}
+          style={{
+            flexShrink: 0,
+            fontSize: 10,
+            fontWeight: 800,
+            color: GAM.AMBER,
+            padding: '4px 9px',
+            borderRadius: 999,
+            border: `1px solid ${GAM.AMBER}66`,
+            background: 'transparent',
+            fontFamily: GAM.FONT_GEIST,
+            letterSpacing: '0.02em',
+            cursor: 'pointer',
+            marginLeft: 4,
+          }}
+        >
+          Played it?
+        </span>
+      )}
+
       {isFriendView && viewerAlsoPlayed && (
         <div
           aria-label="You have also played here"
