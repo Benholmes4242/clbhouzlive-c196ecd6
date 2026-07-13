@@ -256,8 +256,8 @@ const CourseLegendsCollapsibleSection: React.FC<{
 
 export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFirstName }) => {
   const [open, setOpen] = useState(false);
-  const [tab, setTab] = useState<Tab>('all');
   const [detailCtx, setDetailCtx] = useState<DetailContext | null>(null);
+
 
   useEffect(() => gamAchievementsBus.subscribe(() => setOpen(true)), []);
 
