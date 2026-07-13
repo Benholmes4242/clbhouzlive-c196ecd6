@@ -9,12 +9,10 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 import { Share2 } from 'lucide-react';
-import { format } from 'date-fns';
 import { renderBadgeIcon } from '../../badgeIcons';
 import { GAM } from '../../tokens';
-import { paletteFor } from './DetailHero';
-import { materialNameForTier } from '../_shared/rarityPalette';
 import { SHOWPIECE_LOCKED_HINT } from '../_shared/showpieces';
+import { deriveDetailView } from '../_shared/deriveDetailView';
 import { GemLadder } from './GemLadder';
 import { useFriendsWhoEarnedBadge } from '@/hooks/gam/useFriendsWhoEarnedBadge';
 import { getFirstName } from '@/components/friend-sheet/parts/_shared/formatName';
