@@ -4,6 +4,7 @@ import { GAM } from '../../tokens';
 import { relativeTime } from '@/lib/gam/visuals';
 import { TierRow } from './TierRow';
 import { FriendsBlock } from './FriendsBlock';
+import { GemLadder } from './GemLadder';
 import { isShowpiece } from '../_shared/showpieces';
 import { MATERIAL_PALETTES } from '../_shared/rarityPalette';
 import type { TrophyItem } from '../_shared/normalizeTrophyItem';
@@ -111,6 +112,7 @@ export const AchievementBody: React.FC<Props> = ({ item, viewerUserId }) => {
       {item.tiers.length > 1 && (
         <div>
           <Eyebrow>THE FORGE</Eyebrow>
+          <GemLadder tiers={item.tiers} />
           <div>
             {item.tiers.map((t) => (
               <TierRow
