@@ -165,6 +165,7 @@ export function LegendaryFeatHero({ region }: Props) {
           touchAction: 'pan-y',
         }}
       >
+        <div ref={contentRef} style={{ position: 'absolute', inset: 0, opacity: 1 }}>
         {image ? (
           <img
             src={image}
