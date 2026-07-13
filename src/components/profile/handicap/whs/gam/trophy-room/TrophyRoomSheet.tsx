@@ -287,7 +287,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
   );
 
   const allLegends = legendItems;
-  const items = useMemo(() => [...achievementItems, ...legendItems], [achievementItems, legendre, legendItems]);
+  const items = useMemo(() => [...achievementItems, ...legendItems], [achievementItems, legendItems]);
   const earnedTotal = earnedAchievements.length + allLegends.length;
 
   const openDetail = useCallback(
