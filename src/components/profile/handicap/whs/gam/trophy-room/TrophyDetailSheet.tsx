@@ -98,6 +98,7 @@ export const TrophyDetailSheet: React.FC<Props> = ({ items, initialIndex, ownerU
       <AchievementImmersive
         item={current}
         viewerUserId={viewerUserId}
+        currentIndex={currentIndex}
         onClose={onClose}
         onShare={handleShare}
       />
