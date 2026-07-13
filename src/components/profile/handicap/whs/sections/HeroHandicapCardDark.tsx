@@ -95,13 +95,13 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
   const isLoading = trendLoading || history90Loading;
 
   return (
-    <section style={{ padding: '16px 16px 22px', fontFamily: FONT }}>
+    <section style={{ padding: '16px 16px 16px', fontFamily: FONT }}>
       <div
         style={{
           background: 'var(--hcp-bg-1)',
           border: '1px solid var(--hcp-line)',
           borderRadius: 16,
-          padding: 18,
+          padding: 16,
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
         }}

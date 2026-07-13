@@ -130,7 +130,7 @@ const EyebrowRow: React.FC<{
       display: 'flex',
       alignItems: 'baseline',
       justifyContent: 'space-between',
-      padding: '14px 18px 6px',
+      padding: '14px 16px 6px',
       gap: 8,
     }}
   >
@@ -174,7 +174,7 @@ const Headline: React.FC<{
       alignItems: 'flex-end',
       justifyContent: 'space-between',
       gap: 12,
-      padding: '0 18px 14px',
+      padding: '0 16px 14px',
     }}
   >
     <span
@@ -225,7 +225,7 @@ const CounterStrip: React.FC<{
         gap: 5,
         height: 36,
         alignItems: 'flex-end',
-        padding: '0 18px',
+        padding: '0 16px',
       }}
     >
       {cells.map((cell) => {
@@ -336,14 +336,14 @@ const CounterDetailPanel: React.FC<{ cell: CounterCell }> = ({ cell }) => {
   return (
     <div
       style={{
-        margin: '10px 18px 0',
+        margin: '10px 16px 0',
         padding: '10px 12px',
         border: `1px solid ${T.divider}`,
         borderRadius: 10,
         background: 'var(--hcp-bg-2)',
         display: 'grid',
         gridTemplateColumns: 'auto 1fr auto auto',
-        gap: 14,
+        gap: 12,
         alignItems: 'center',
       }}
     >
@@ -379,7 +379,7 @@ const StripBand: React.FC<{ f: Forecast }> = ({ f }) => {
     >
       <div
         style={{
-          padding: '0 18px 8px',
+          padding: '0 16px 8px',
           textTransform: 'uppercase',
           fontSize: 9.5,
           letterSpacing: '0.18em',
@@ -398,7 +398,7 @@ const StripBand: React.FC<{ f: Forecast }> = ({ f }) => {
         style={{
           display: 'flex',
           justifyContent: 'space-between',
-          padding: '8px 18px 0',
+          padding: '8px 16px 0',
           fontSize: 10,
           fontWeight: 700,
           letterSpacing: '0.08em',
@@ -429,7 +429,7 @@ const ActionFooter: React.FC<{
       display: 'flex',
       alignItems: 'center',
       gap: 12,
-      padding: '12px 18px 14px',
+      padding: '12px 16px 14px',
       borderTop: `1px solid ${T.divider}`,
       background: footerBg ?? 'transparent',
     }}
@@ -469,7 +469,7 @@ const ActionFooter: React.FC<{
 const CalmActionLine: React.FC<{ prose: React.ReactNode }> = ({ prose }) => (
   <div
     style={{
-      padding: '12px 18px 14px',
+      padding: '12px 16px 14px',
       borderTop: `1px solid ${T.divider}`,
       fontSize: 12.5,
       lineHeight: 1.4,
@@ -668,7 +668,7 @@ const BuildingCard: React.FC<{ f: Forecast; ctx: CopyCtx }> = ({ f, ctx }) => {
   const have = f.validRoundCount;
   return (
     <CardShell>
-      <div style={{ padding: '18px 18px 20px' }}>
+      <div style={{ padding: '16px 16px 20px' }}>
         <div
           style={{
             textTransform: 'uppercase',
@@ -693,7 +693,7 @@ const BuildingCard: React.FC<{ f: Forecast; ctx: CopyCtx }> = ({ f, ctx }) => {
           {ctx.possessiveLower} last 20. {ctx.subjectCap} {ctx.hasVerb}{' '}
           <strong style={{ color: T.textHi, fontWeight: 700 }}>{have}</strong> so far — keep playing.
         </p>
-        <div style={{ display: 'flex', gap: 6, marginTop: 14 }}>
+        <div style={{ display: 'flex', gap: 6, marginTop: 12 }}>
           {Array.from({ length: need }).map((_, i) => (
             <span
               key={i}
@@ -715,7 +715,7 @@ const BuildingCard: React.FC<{ f: Forecast; ctx: CopyCtx }> = ({ f, ctx }) => {
 
 const BrandNewCard: React.FC<{ ctx: CopyCtx }> = ({ ctx }) => (
   <CardShell>
-    <div style={{ padding: '18px 18px 20px' }}>
+    <div style={{ padding: '16px 16px 20px' }}>
       <div
         style={{
           textTransform: 'uppercase',

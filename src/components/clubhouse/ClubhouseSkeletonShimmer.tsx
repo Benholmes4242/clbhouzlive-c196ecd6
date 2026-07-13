@@ -395,7 +395,7 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
               <div
                 className="absolute left-0 right-0 flex items-center justify-center"
                 style={{
-                  top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 6px)',
+                  top: 'calc(max(env(safe-area-inset-top, 0px), 48px) + 6px)',
                   padding: '0 16px',
                   height: 44,
                 }}

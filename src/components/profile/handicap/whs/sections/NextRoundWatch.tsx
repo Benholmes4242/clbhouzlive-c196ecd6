@@ -78,7 +78,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
           background: 'var(--hcp-bg-1)',
           border: '1px solid var(--hcp-line)',
           borderRadius: 16,
-          padding: 18,
+          padding: 16,
           fontFamily: FONT,
         }}
       >
@@ -99,7 +99,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
             fontSize: 15,
             fontWeight: 700,
             color: 'var(--hcp-t-100)',
-            margin: '6px 0 14px',
+            margin: '6px 0 12px',
             lineHeight: 1.3,
           }}
         >
@@ -156,7 +156,7 @@ const Row: React.FC<{
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
-      padding: '11px 0',
+      padding: '12px 0',
       borderTop: first ? 'none' : '1px solid var(--hcp-line)',
     }}
   >

@@ -44,7 +44,7 @@ export const LastRoundCard: React.FC<Props> = ({
     return (
       <section style={{ marginTop: 32 }}>
         <DarkSectionHeader eyebrow="Last Round" />
-        <div style={{ padding: '0 20px' }}>
+        <div style={{ padding: '0 16px' }}>
           <CinemaCardSkeleton />
         </div>
       </section>
@@ -59,7 +59,7 @@ export const LastRoundCard: React.FC<Props> = ({
     return (
       <section style={{ marginTop: 32 }}>
         <DarkSectionHeader eyebrow="Last Round" />
-        <div style={{ padding: '0 20px' }}>
+        <div style={{ padding: '0 16px' }}>
           <p style={{ fontSize: 14, color: 'var(--hcp-t-60)', fontFamily: FONT_GEIST }}>
             {emptyCopy}
           </p>

@@ -77,7 +77,7 @@ const DistributionChart: React.FC<{
   const maxPct = Math.max(...orderedBuckets.map((b) => b.pct), 1);
 
   return (
-    <div style={{ marginTop: 18, position: 'relative' }}>
+    <div style={{ marginTop: 16, position: 'relative' }}>
       {/* Scratch-zone marker — soft tint + dashed top edge (no full frame) */}
       {/* Tint */}
       <div
@@ -329,11 +329,11 @@ const AvailableCard: React.FC<{
 
       <div
         style={{
-          margin: '14px 16px 0',
+          margin: '12px 16px 0',
           background: 'var(--hcp-bg-1)',
           border: '1px solid var(--hcp-line-2)',
           borderRadius: 14,
-          padding: 14,
+          padding: 12,
         }}
       >
         <DistributionChart
@@ -348,7 +348,7 @@ const AvailableCard: React.FC<{
             justifyContent: 'space-between',
             alignItems: 'center',
             gap: 12,
-            marginTop: 14,
+            marginTop: 12,
             paddingTop: 12,
             borderTop: `0.5px solid ${INK_06}`,
             fontFamily: FONT_GEIST,
@@ -435,7 +435,7 @@ const UnavailableCard: React.FC<{ reason: 'cohort_unavailable' }> = () => (
   <div
     style={{
       margin: '0 16px',
-      padding: '20px',
+      padding: '16px',
       borderRadius: 14,
       background: 'var(--hcp-bg-2)',
       border: '1px solid var(--hcp-line-2)',

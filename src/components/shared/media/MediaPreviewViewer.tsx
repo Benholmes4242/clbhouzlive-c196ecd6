@@ -117,7 +117,7 @@ export function MediaPreviewViewer({
       <div
         className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between"
         style={{
-          paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+          paddingTop: 'max(env(safe-area-inset-top, 0px), 48px)',
           paddingLeft: 16,
           paddingRight: 16,
           paddingBottom: 12,

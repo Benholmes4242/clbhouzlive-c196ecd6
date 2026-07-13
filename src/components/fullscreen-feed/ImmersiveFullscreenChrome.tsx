@@ -190,7 +190,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           right: 0,
           zIndex: Z.echo + 2,
           pointerEvents: 'none',
-          paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 8px)',
+          paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 48px) + 8px)',
           paddingLeft: 'max(14px, env(safe-area-inset-left, 0px))',
           paddingRight: 'max(14px, env(safe-area-inset-right, 0px))',
           paddingBottom: 10,

@@ -65,10 +65,10 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
     return (
       <section style={{ marginTop: 32 }}>
         <DarkSectionHeader eyebrow="INDEX HISTORY" right={<RangePills value={range} onChange={setRange} />} />
-        <div style={{ padding: '0 20px' }}>
+        <div style={{ padding: '0 16px' }}>
           <div style={{
             background: 'var(--hcp-bg-1)', border: `1px solid ${LINE}`,
-            borderRadius: 18, padding: '16px 14px 13px',
+            borderRadius: 18, padding: '16px 14px 12px',
           }}>
             <div style={{ height: 10, background: 'var(--hcp-bg-3)', borderRadius: 2 }} />
             <div style={{ height: 26, background: 'var(--hcp-bg-3)', borderRadius: 4, margin: '12px 0 8px' }} />
@@ -84,10 +84,10 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
     return (
       <section style={{ marginTop: 32 }}>
         <DarkSectionHeader eyebrow="INDEX HISTORY" right={<RangePills value={range} onChange={setRange} />} />
-        <div style={{ padding: '0 20px' }}>
+        <div style={{ padding: '0 16px' }}>
           <div style={{
             background: 'var(--hcp-bg-1)', border: `1px solid ${LINE}`,
-            borderRadius: 18, padding: '20px 14px', textAlign: 'center',
+            borderRadius: 18, padding: '16px 14px', textAlign: 'center',
             color: DIM, fontFamily: FONT, fontSize: 12,
           }}>
             Not enough snapshots in this period yet.
@@ -154,12 +154,12 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
         eyebrow="INDEX HISTORY"
         right={<RangePills value={range} onChange={setRange} />}
       />
-      <div style={{ padding: '0 20px' }}>
+      <div style={{ padding: '0 16px' }}>
         <div style={{
           background: 'var(--hcp-bg-1)',
           border: `1px solid ${LINE}`,
           borderRadius: 18,
-          padding: '16px 14px 13px',
+          padding: '16px 14px 12px',
           fontFamily: FONT,
         }}>
           {/* 1. Header row */}
