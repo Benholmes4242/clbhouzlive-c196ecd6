@@ -165,8 +165,8 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
 
   if (isLoading) {
     return (
-      <div style={{ padding: '12px 16px 0', fontFamily: FONT_FAMILY }}>
-        <div style={{ display: 'flex', gap: 12 }}>
+      <div style={{ padding: '12px 4px 0', fontFamily: FONT_FAMILY }}>
+        <div style={{ display: 'flex', gap: 4 }}>
           <div style={{ flex: 1 }}>
             <SkeletonTile />
             <SkeletonTile />
@@ -277,7 +277,7 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
 
   return (
     <div ref={setGridRef} style={{ fontFamily: FONT_FAMILY, padding: '12px 0 0' }}>
-      <div style={{ display: 'flex', gap: 12, padding: '0 16px' }}>
+      <div style={{ display: 'flex', gap: 4, padding: '0 4px' }}>
         <div style={{ flex: 1 }}>
           {packed.left.map(({ item, flatIndex: i }) => (
             <FeedCard

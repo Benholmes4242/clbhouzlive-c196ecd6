@@ -109,7 +109,7 @@ export function HubMixedGrid({ filter = 'all' }: { filter?: string } = {}) {
       </div>
 
       {isLoading ? (
-        <div style={{ display: 'flex', gap: 12, padding: '0 16px' }}>
+        <div style={{ display: 'flex', gap: 4, padding: '0 4px' }}>
           <div style={{ flex: 1 }}>
             <SkeletonTile aspect="9 / 14" />
             <SkeletonTile aspect="16 / 9" />
@@ -141,7 +141,7 @@ export function HubMixedGrid({ filter = 'all' }: { filter?: string } = {}) {
           </div>
         </div>
       ) : (
-        <div ref={railRef} style={{ display: 'flex', gap: 12, padding: '0 16px' }}>
+        <div ref={railRef} style={{ display: 'flex', gap: 4, padding: '0 4px' }}>
           <div style={{ flex: 1 }}>
             {packed.left.map(({ item, flatIndex: i }) => (
               <FeedCard
