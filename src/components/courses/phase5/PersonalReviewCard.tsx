@@ -67,6 +67,7 @@ const ScoreRing: React.FC<{ score: number; size?: number }> = ({ score, size = 8
   const circumference = 2 * Math.PI * radius;
   const progress = (score / 10) * circumference;
   const gradientId = `scoreGradient-${Math.random().toString(36).slice(2)}`;
+  const isExceptional = getRatingTier(score) === 'EXCEPTIONAL';
 
   return (
     <div style={{ position: 'relative', width: size, height: size, flexShrink: 0 }}>
@@ -82,11 +83,29 @@ const ScoreRing: React.FC<{ score: number; size?: number }> = ({ score, size = 8
           <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor={from} />
             <stop offset="100%" stopColor={to} />
+            {isExceptional && !prefersReducedMotion && (
+              <animateTransform
+                attributeName="gradientTransform"
+                type="rotate"
+                from="0 0.5 0.5"
+                to="360 0.5 0.5"
+                dur="6s"
+                repeatCount="indefinite"
+              />
+            )}
           </linearGradient>
         </defs>
       </svg>
       <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <span style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
+        <span
+          className={isExceptional ? 'clbhouz-gold-shimmer-light' : undefined}
+          style={{
+            fontSize: 22,
+            fontWeight: 800,
+            fontVariantNumeric: 'tabular-nums',
+            ...(isExceptional ? {} : { color: ratingTextColor(score) }),
+          }}
+        >
           {score.toFixed(1)}
         </span>
       </div>
