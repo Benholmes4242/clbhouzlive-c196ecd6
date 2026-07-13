@@ -26,7 +26,7 @@ export const RecordsView: React.FC<Props> = ({
       role="tabpanel"
       id="handicap-panel-records"
       aria-labelledby="handicap-tab-records"
-      style={{ paddingTop: 34 }}
+      style={{ paddingTop: 32 }}
     >
       {/* 1. Personal Bests */}
       <PersonalBests

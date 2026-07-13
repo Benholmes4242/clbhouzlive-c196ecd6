@@ -163,8 +163,8 @@ const TrophyGroupLabel: React.FC<{
       display: 'flex',
       alignItems: 'center',
       gap: 6,
-      marginTop: 20,
-      marginBottom: 10,
+      marginTop: 24,
+      marginBottom: 12,
       fontSize: 10,
       fontWeight: 800,
       letterSpacing: '0.18em',
@@ -204,8 +204,8 @@ const CourseLegendsCollapsibleSection: React.FC<{
           display: 'flex',
           alignItems: 'center',
           gap: 6,
-          marginTop: 20,
-          marginBottom: 10,
+          marginTop: 24,
+          marginBottom: 12,
           padding: 0,
           background: 'transparent',
           border: 'none',
@@ -392,7 +392,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
           style={{
             display: 'flex',
             gap: 8,
-            padding: '10px 16px',
+            padding: '12px 16px',
             flexShrink: 0,
             fontFamily: GAM.FONT_GEIST,
             overflowX: 'auto',
@@ -469,7 +469,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
           {/* Header block (was pinned in the previous layout) */}
           <div style={{ padding: '12px 4px 12px', fontFamily: GAM.FONT_GEIST }}>
             <Eyebrow ownerFirstName={ownerFirstName} isFriendView={isFriendView} />
-            <div style={{ width: 34, height: 3, borderRadius: 99, background: AMBER, marginTop: 9 }} />
+            <div style={{ width: 34, height: 3, borderRadius: 99, background: AMBER, marginTop: 8 }} />
             <div
               style={{
                 fontSize: 38,
@@ -694,7 +694,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                 ))}
               </div>
               {/* Category skeleton — 3-up matches every other section. */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginTop: 20 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginTop: 24 }}>
                 {Array.from({ length: 6 }).map((_, i) => (
                   <div
                     key={`sk-cat-${i}`}
@@ -827,7 +827,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
 const EmptyState: React.FC<{ message: string }> = ({ message }) => (
   <div
     style={{
-      padding: '40px 20px',
+      padding: '40px 16px',
       textAlign: 'center',
       fontSize: 13,
       color: 'rgba(255,255,255,0.55)',

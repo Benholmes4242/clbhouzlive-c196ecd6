@@ -369,7 +369,7 @@ export const DetailHero: React.FC<Props> = ({ item, index, total, onPrev, onNext
         style={{
           position: 'relative',
           zIndex: 2,
-          padding: '9px 18px',
+          padding: '9px 16px',
           borderTop: '1px solid rgba(255,255,255,0.10)',
           display: 'flex',
           alignItems: 'center',

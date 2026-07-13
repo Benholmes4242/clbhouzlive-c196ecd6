@@ -48,7 +48,7 @@ export const Top100Body: React.FC<Props> = ({ item, ownerUserId, viewerUserId, o
 
   if (!slug) {
     return (
-      <div style={{ padding: '20px 20px', color: 'rgba(255,255,255,0.55)', fontFamily: GAM.FONT_GEIST }}>
+      <div style={{ padding: '16px', color: 'rgba(255,255,255,0.55)', fontFamily: GAM.FONT_GEIST }}>
         Unknown Top 100 list.
       </div>
     );
@@ -69,7 +69,7 @@ export const Top100Body: React.FC<Props> = ({ item, ownerUserId, viewerUserId, o
       {isFriendView && (
         <div
           style={{
-            padding: '0 20px 12px',
+            padding: '0 16px 12px',
             fontSize: 12,
             color: 'rgba(255,255,255,0.55)',
             ...GAM.TABULAR,
@@ -81,7 +81,7 @@ export const Top100Body: React.FC<Props> = ({ item, ownerUserId, viewerUserId, o
       )}
 
       {/* THE COURSES — Top-100's unique value: played/unplayed tabs + list. */}
-      <div style={{ padding: '4px 20px 6px' }}>
+      <div style={{ padding: '4px 16px 6px' }}>
         <div
           style={{
             fontSize: 10,
@@ -99,7 +99,7 @@ export const Top100Body: React.FC<Props> = ({ item, ownerUserId, viewerUserId, o
         style={{
           display: 'flex',
           gap: 4,
-          padding: '10px 16px',
+          padding: '12px 16px',
           borderBottom: '0.5px solid rgba(255,255,255,0.06)',
           marginBottom: 8,
         }}
@@ -179,7 +179,7 @@ export const Top100Body: React.FC<Props> = ({ item, ownerUserId, viewerUserId, o
 };
 
 const EmptyState: React.FC<{ message: string }> = ({ message }) => (
-  <div style={{ padding: '32px 20px', textAlign: 'center', fontSize: 13, color: 'rgba(255,255,255,0.55)' }}>
+  <div style={{ padding: '32px 16px', textAlign: 'center', fontSize: 13, color: 'rgba(255,255,255,0.55)' }}>
     {message}
   </div>
 );

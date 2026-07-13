@@ -173,7 +173,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
           style={{
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
-            gap: 10,
+            gap: 12,
           }}
         >
           {(isLoading ? Array.from({ length: 5 }) : tiles).map((t, i) => {
@@ -192,7 +192,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
                   background: D_BG,
                   border: `1px solid ${D_LINE}`,
                   borderRadius: 16,
-                  padding: 14,
+                  padding: 12,
                   position: 'relative',
                   overflow: 'hidden',
                   minWidth: 0,

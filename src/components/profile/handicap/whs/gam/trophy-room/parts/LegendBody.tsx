@@ -60,12 +60,12 @@ export const LegendBody: React.FC<Props> = ({ item, viewerUserId, onNavigateClos
   return (
     <div
       style={{
-        padding: '20px 20px 24px',
+        padding: '16px 16px 24px',
         fontFamily: GAM.FONT_GEIST,
         color: 'rgba(255,255,255,0.96)',
         display: 'flex',
         flexDirection: 'column',
-        gap: 20,
+        gap: 16,
       }}
     >
       <div>
@@ -85,7 +85,7 @@ export const LegendBody: React.FC<Props> = ({ item, viewerUserId, onNavigateClos
           type="button"
           onClick={handleCourseTap}
           style={{
-            marginTop: 10,
+            marginTop: 12,
             display: 'inline-flex',
             alignItems: 'center',
             gap: 6,
