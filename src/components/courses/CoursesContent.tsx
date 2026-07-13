@@ -323,16 +323,23 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
       ) : (
         /* Main courses page - shared cinematic hero + sticky tab row above content */
         <div>
+          <GlassHeaderPlate visible={tabsStuck} />
           <CoursesPageHero />
 
+          <div ref={sentinelRef} style={{ height: 1 }} aria-hidden />
+
           <div
-            className="sticky bg-[#F8FAFC]"
+            className="sticky"
             style={{
-              top: 'calc(var(--header-h, 55px) + var(--sat, 0px) - 1px)',
+              top: 'calc(var(--sat, 0px) + 61px)',
               zIndex: 30,
+              background: 'rgba(248,250,252,0.72)',
+              backdropFilter: 'blur(14px)',
+              WebkitBackdropFilter: 'blur(14px)',
               borderBottom: '0.5px solid rgba(15,23,42,0.07)',
             }}
           >
+
             <CoursesShellTabs
               activeTab={activeTab as 'explore' | 'top100' | 'discover'}
               onTabChange={handleTabChange}
