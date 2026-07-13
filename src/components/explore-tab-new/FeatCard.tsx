@@ -4,7 +4,7 @@ import type { FeatRow, FeatTier } from './hooks/useRegionFeats';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const CARD_W = 226;
-const CARD_H = 215;
+const CARD_H = 183;
 
 // Tier accents (drives tick, WHS mark, legendary glow + avatar ring).
 const ACCENT: Record<FeatTier, string> = {
@@ -205,7 +205,7 @@ export function FeatCard({ row, tier, onTap }: Props) {
           position: 'absolute',
           left: 14,
           right: 14,
-          bottom: 50,
+          bottom: 43,
           display: 'flex',
           flexDirection: 'column',
           gap: 4,
