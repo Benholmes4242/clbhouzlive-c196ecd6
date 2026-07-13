@@ -3,7 +3,7 @@ import { useCallback, useRef, useMemo } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExploreFeed } from './hooks/useExploreFeed';
 import { useExploreRegion } from './hooks/useExploreRegion';
-import ConnectHandicapCue from '@/components/courses/course-detail/ConnectHandicapCue';
+import DiscoverWhsMasthead from './DiscoverWhsMasthead';
 import { CircleActivityStrip } from './CircleActivityStrip';
 import { AlmanacRegionTabs, FeatTierRail, AlmanacHead, REGION_TABS } from './AlmanacSections';
 
