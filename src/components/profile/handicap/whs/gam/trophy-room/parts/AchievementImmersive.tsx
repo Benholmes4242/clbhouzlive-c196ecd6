@@ -276,6 +276,21 @@ export const AchievementImmersive: React.FC<Props> = ({ item, viewerUserId, curr
           {sCopy ? sCopy.subline : summary}
         </div>
 
+        {/* Description -- persistent one-liner explaining what earns the badge. */}
+        {descriptionLine && (
+          <div
+            style={{
+              fontSize: 12.5,
+              color: 'rgba(255,255,255,0.4)',
+              maxWidth: 280,
+              lineHeight: 1.5,
+              marginTop: 6,
+              textAlign: 'center',
+            }}
+          >
+            {descriptionLine}
+          </div>
+        )}
 
         {/* Gem ladder (tiered) */}
         {isTiered && (
