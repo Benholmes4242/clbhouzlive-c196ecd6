@@ -1,4 +1,5 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+import GlassHeaderPlate from '@/components/chrome/GlassHeaderPlate';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocation, useSearchParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -342,18 +343,36 @@ const StandaloneCourseDetail: React.FC<StandaloneCourseDetailProps> = ({
   tabContent,
 }) => {
   const navigate = useNavigate();
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const [tabsStuck, setTabsStuck] = useState(false);
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    setTabsStuck(window.scrollY > 200);
+    const io = new IntersectionObserver(
+      ([entry]) => setTabsStuck(!entry.isIntersecting),
+      { threshold: 0 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
   return (
     <div
       className="min-h-screen w-full bg-background"
       style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}
     >
       {/* H3: header rendered globally by ChromeIsland (bleed=true, /courses fallback). */}
+      <GlassHeaderPlate visible={tabsStuck} />
       {cinematicHero}
+      <div ref={sentinelRef} style={{ height: 1 }} aria-hidden />
       <div
-        className="sticky bg-[#F8FAFC]"
+        className="sticky"
         style={{
-          top: 0,
+          top: 'calc(var(--sat, 0px) + 61px)',
           zIndex: 30,
+          background: 'rgba(248,250,252,0.72)',
+          backdropFilter: 'blur(14px)',
+          WebkitBackdropFilter: 'blur(14px)',
           borderBottom: '0.5px solid rgba(15,23,42,0.07)',
         }}
       >

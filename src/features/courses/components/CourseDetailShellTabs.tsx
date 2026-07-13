@@ -56,7 +56,7 @@ export const CourseDetailShellTabs: React.FC<CourseDetailShellTabsProps> = ({
           justifyContent: overflowing ? 'flex-start' : 'space-evenly',
           gap: overflowing ? 8 : 0,
           padding: overflowing ? '0 16px' : 0,
-          background: '#F8FAFC',
+          background: 'transparent',
           overflowX: 'auto',
           overflowY: 'hidden',
           WebkitOverflowScrolling: 'touch',
