@@ -14,6 +14,7 @@ import { MATERIAL_HEX } from './_shared/rarityPalette';
 import { MATERIAL_LADDER, materialForTier } from './_shared/levels';
 import { renderBadgeIcon } from '../badgeIcons';
 import { LegendCard } from './parts/LegendCard';
+import { statusFor, statusCopy } from './_shared/statusBadges';
 
 const FONT = "'Geist', -apple-system, sans-serif";
 const OBSIDIAN_EDGE = '#D4A017';
@@ -30,9 +31,13 @@ function matName(mat: string): string {
 interface Props {
   item: TrophyItem;
   onTap: (item: TrophyItem) => void;
+  /** Owner's current WHS handicap index -- powers LOSABLE STATUS layer
+   *  for single_figures / scratch. null for every other badge or when the
+   *  owner has no index recorded yet. */
+  currentIndex?: number | null;
 }
 
-export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap }) => {
+export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = null }) => {
   if (item.kind !== 'achievement') {
     return <LegendCard item={item} onTap={onTap} />;
   }
@@ -46,6 +51,17 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap }) => {
   const inProgress = tiered && !earned && (item.currentValue ?? 0) > 0;
   const mat = tiered && reached > 0 ? materialForTier(reached) : null;
   const accent = earned || inProgress ? (mat ? matColor(mat) : '#F7931E') : 'rgba(255,255,255,0.35)';
+
+  // LOSABLE STATUS -- single_figures / scratch only, derived from live index.
+  const status = statusFor(item.badgeId, currentIndex);
+  const sCopy = status && status !== 'held' && currentIndex != null
+    ? statusCopy(item.badgeId, status, currentIndex)
+    : null;
+  // "Milestone kept but status lost": user has earned it before, live status
+  // dropped. Render a small "EARNED" tick on the plaque rail so the medal
+  // record is never invisible.
+  const milestoneKeptStatusLost = status === 'lost' && earned;
+
   
 
   const nextThreshold = tiered ? item.nextThreshold : null;
