@@ -24,9 +24,13 @@ import {
   MessageCircle,
   Send,
   MoreHorizontal,
+  Volume2,
+  VolumeX,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useClubhouseStore } from '@/store/clubhouseStore';
+import { useSessionAudio } from '@/audio/sessionAudioStore';
+import { triggerHaptic } from '@/lib/ui/haptics';
 import { CarouselDots } from '@/components/media/CarouselDots';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
