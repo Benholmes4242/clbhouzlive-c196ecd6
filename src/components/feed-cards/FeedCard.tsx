@@ -52,6 +52,7 @@ export function FeedCard({
   flatIndex,
   isAutoplayActive,
   hideCourseAttribution = false,
+  hideFormatBadge = false,
 }: {
   row: FeedCardRow;
   feedPost: FeedPost;
