@@ -112,12 +112,13 @@ export default function VideosPageV2() {
             <div style={{ flex: 1, minWidth: 0 }}>
               <UnderlineTabs
                 size="md"
-                align="left"
+                align="center"
                 options={SORT_OPTS}
                 value={sort}
                 onChange={setSort}
                 ariaLabel="Sort videos"
               />
+
             </div>
             <button
               type="button"
