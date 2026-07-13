@@ -76,29 +76,12 @@ const FriendAvatar: React.FC<{ name: string; url: string | null; size: number }>
 };
 
 export const AchievementImmersive: React.FC<Props> = ({ item, viewerUserId, onClose, onShare }) => {
-  const palette = paletteFor(item);
-  const materialColor = palette.color;
+  const view = deriveDetailView(item);
+  if (view.kind !== 'achievement') return null;
+  const { isTiered, materialColor, summaryLine, counterText, progressPct, progressLabel, nextThreshold: next, remaining } = view;
   const rgb = hexToRgb(materialColor.startsWith('#') ? materialColor : '#94A3B8');
 
-  const isTiered = item.tiers.length > 1;
-  const earnedTiers = item.tiers.filter((t) => t.earned).length;
-  const totalTiers = item.tiers.length;
-  const materialName = isTiered ? materialNameForTier(item.reachedTier) : '';
-  const currentValue = item.currentValue ?? 0;
-  const next = item.nextThreshold;
-  const remaining = next != null ? Math.max(0, next - currentValue) : null;
-  const progressPct = next != null ? Math.min(100, Math.round((currentValue / Math.max(1, next)) * 100)) : 0;
-
-  const summary = (() => {
-    if (isTiered) {
-      const base = `${earnedTiers} of ${totalTiers} medals earned`;
-      return item.reachedTier > 0 ? `${base} · ${materialName}` : base;
-    }
-    if (item.earned && item.earnedAt) {
-      return `Earned ${format(new Date(item.earnedAt), 'MMM d, yyyy')}`;
-    }
-    return SHOWPIECE_LOCKED_HINT[item.badgeId] ?? item.description;
-  })();
+  const summary = summaryLine ?? (SHOWPIECE_LOCKED_HINT[item.badgeId] ?? item.description);
 
   const friends = useFriendsWhoEarnedBadge(item.badgeId, viewerUserId, 5);
   const friendRows = friends.data ?? [];
