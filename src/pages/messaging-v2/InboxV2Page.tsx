@@ -18,7 +18,7 @@ const SkeletonRow: React.FC = () => (
   <div
     className="flex items-center gap-3"
     style={{
-      padding: '11px 14px',
+      padding: '12px 14px',
       minHeight: 72,
       borderBottom: `0.5px solid ${HAIRLINE}`,
       background: 'transparent',
@@ -154,7 +154,7 @@ const InboxV2Page: React.FC = () => {
         {!hasActor ? (
           <div
             className="flex items-center justify-center"
-            style={{ padding: '96px 24px' }}
+            style={{ padding: '80px 24px' }}
           >
             <Spinner />
           </div>
@@ -191,7 +191,7 @@ const InboxV2Page: React.FC = () => {
         ) : conversations.length === 0 ? (
           <div
             className="flex flex-col items-center justify-center text-center"
-            style={{ padding: '72px 24px', gap: 22, flex: 1, position: 'relative', overflow: 'hidden' }}
+            style={{ padding: '80px 24px', gap: 24, flex: 1, position: 'relative', overflow: 'hidden' }}
           >
             <style>{`
               @keyframes inbox-ripple {

@@ -224,7 +224,7 @@ export const ConversationRow: React.FC<Props> = ({ conversation }) => {
         }}
         className="w-full text-left flex items-center gap-3 active:bg-black/[0.03] transition-colors cursor-pointer"
         style={{
-          padding: '11px 14px',
+          padding: '12px 14px',
           minHeight: 72,
           borderBottom: `0.5px solid ${HAIRLINE}`,
           background: 'transparent',
