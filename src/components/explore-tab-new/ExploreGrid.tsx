@@ -161,7 +161,7 @@ export default function ExploreGrid({
 
   return (
     <div ref={setGridRef}>
-      <div style={{ display: 'flex', gap: 12, padding: '0 16px' }}>
+      <div style={{ display: 'flex', gap: 4, padding: '0 4px' }}>
         <div style={{ flex: 1 }}>
           {packed.left.map(({ item, flatIndex: i }) => (
             <FeedCard
