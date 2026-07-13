@@ -443,6 +443,7 @@ export function SearchOverlayV2({
             )}
           </div>
         </motion.div>
+        </>
       )}
     </AnimatePresence>,
     document.body,
