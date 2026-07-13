@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { prefersReduced } from '@/lib/ui/motion';
 import { useRegionFeats } from './hooks/useRegionFeats';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
