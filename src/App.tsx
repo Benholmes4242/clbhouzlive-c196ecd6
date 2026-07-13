@@ -18,7 +18,7 @@ import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client
 import { queryPersister, shouldPersistQuery, PERSIST_MAX_AGE_MS } from "@/lib/queryPersister";
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { BrowserRouter, Routes, Route, useLocation, Navigate, useParams, useNavigate } from "react-router-dom";
-import { setNavigateRef } from '@/utils/navigation';
+import { setNavigateRef, appNavigate } from '@/utils/navigation';
 import ScrollToTop from '@/components/ScrollToTop';
 import { ScrollRestoration } from '@/components/ScrollRestoration';
 import { LockAnchorSync } from '@/components/LockAnchorSync';
