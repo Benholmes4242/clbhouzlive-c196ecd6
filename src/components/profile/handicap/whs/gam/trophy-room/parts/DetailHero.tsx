@@ -10,11 +10,10 @@ import {
   FORGE_GOLD,
   materialNameForTier,
   RARITY_PALETTE,
+  rgbaOf,
   type RarityPalette,
 } from '../_shared/rarityPalette';
-import { materialForTier } from '../_shared/levels';
 import { rarityColor } from '@/lib/gam/visuals';
-import { rgbaOf } from '../TrophyCard';
 import type { TrophyItem } from '../_shared/normalizeTrophyItem';
 import { isShowpiece } from '../_shared/showpieces';
 

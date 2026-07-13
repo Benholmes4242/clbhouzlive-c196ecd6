@@ -8,7 +8,6 @@ export const SHOWPIECE_BADGE_IDS = new Set<string>([
   // Lifetime accumulation showpieces (counter is unbounded)
   'first_birdie',
   'first_eagle',
-  'first_albatross',
   'hole_in_one',
   // Bounded-set showpieces (counter capped at 100)
   'top_100_worldwide',
@@ -26,7 +25,6 @@ export function isShowpiece(badgeId: string | undefined): boolean {
 export const LIFETIME_ORDER: string[] = [
   'first_birdie',
   'first_eagle',
-  'first_albatross',
   'hole_in_one',
   'top_100_worldwide',
   'top_100_gbni',
@@ -41,7 +39,6 @@ export const LIFETIME_ORDER: string[] = [
 export const SHOWPIECE_COUNTER_LABEL: Record<string, string> = {
   first_birdie: 'Lifetime birdies',
   first_eagle: 'Lifetime eagles',
-  first_albatross: 'Lifetime albatrosses',
   // hole_in_one intentionally omitted — card label derives from
   // gam_badge_catalogue.title like every other badge.
   top_100_worldwide: 'of World Top 100 played',
@@ -60,7 +57,6 @@ export function shortenShowpieceCaption(caption: string): string {
 export const SHOWPIECE_LOCKED_HINT: Record<string, string> = {
   first_birdie: 'First birdie unlocks this',
   first_eagle: 'First eagle unlocks this',
-  first_albatross: 'First albatross unlocks this',
   hole_in_one: 'First ace unlocks this',
   top_100_worldwide: 'Play your first World Top 100 course',
   top_100_usa: 'Play your first USA Top 100 course',

@@ -13,7 +13,7 @@ import type { TrophyItem } from './_shared/normalizeTrophyItem';
 import { MATERIAL_HEX } from './_shared/rarityPalette';
 import { MATERIAL_LADDER, materialForTier } from './_shared/levels';
 import { renderBadgeIcon } from '../badgeIcons';
-import { TrophyCard as LegacyTrophyCard } from './TrophyCard';
+import { LegendCard } from './parts/LegendCard';
 
 const FONT = "'Geist', -apple-system, sans-serif";
 const OBSIDIAN_EDGE = '#D4A017';
@@ -34,7 +34,7 @@ interface Props {
 
 export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap }) => {
   if (item.kind !== 'achievement') {
-    return <LegacyTrophyCard item={item} onTap={onTap} />;
+    return <LegendCard item={item} onTap={onTap} />;
   }
 
   const tiered = item.tiers.length > 0;
