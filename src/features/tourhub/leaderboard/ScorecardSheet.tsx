@@ -130,10 +130,9 @@ function fmtScoreSigned(n: number | null | undefined): string {
 
 function houseColor(n: number | null | undefined): string {
   if (n == null) return INK;
-  if (n < 0) return HOUSE_UNDER;
-  if (n > 0) return HOUSE_OVER;
-  return HOUSE_EVEN;
+  return getScoreColor(n, 'light');
 }
+
 
 // SCORE cell rendering uses the shared ScoreMark chip system (World Feed
 // palette). Per-hole chips are surface-agnostic; par is bare ink.
