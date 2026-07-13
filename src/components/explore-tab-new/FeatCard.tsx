@@ -140,10 +140,10 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
       style={{
         position: 'relative',
         flexShrink: 0,
-        width: CARD_W,
-        height: CARD_H,
+        width: S.w,
+        height: S.h,
         background: image ? '#07080C' : fallbackBg,
-        borderRadius: 16,
+        borderRadius: size === 'compact' ? 12 : 16,
         overflow: 'hidden',
         padding: 0,
         cursor: 'pointer',
