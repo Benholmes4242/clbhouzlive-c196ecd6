@@ -48,7 +48,9 @@ export const PersonalSection: React.FC<PersonalSectionProps> = ({
     <section style={{ padding: '20px 0', display: 'flex', flexDirection: 'column', gap: 20 }}>
       {/* Section header — canonical SectionHeader */}
       <div style={{ marginBottom: -14 }}>
-        <SectionHeader role="section" kicker="YOUR JOURNEY" paddingX={16} />
+        <SectionHeader role="section" kicker="YOUR JOURNEY" paddingX={16}
+        cutLine={false}
+      />
       </div>
 
       {/* Status toggle */}

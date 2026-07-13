@@ -83,6 +83,7 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
         sub="The course worth your attention right now"
         paddingTop={20}
         paddingX={16}
+        cutLine={false}
       />
       <div style={{ padding: '0 16px' }}>
 

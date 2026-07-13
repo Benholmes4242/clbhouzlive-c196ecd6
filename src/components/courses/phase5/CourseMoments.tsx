@@ -88,6 +88,7 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
         role="section"
         kicker="YOUR MOMENTS"
         count={moments.length}
+        cutLine={false}
       />
 
       {/* Gallery */}

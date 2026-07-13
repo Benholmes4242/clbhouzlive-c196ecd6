@@ -40,6 +40,7 @@ export const YourNetworkSection: React.FC<YourNetworkSectionProps> = ({ classNam
         title="Courses played by friends"
         paddingX={16}
         className="mb-2"
+        cutLine={false}
       />
 
       <NetworkHighlightCarousel highlights={data.highlights} />
