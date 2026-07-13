@@ -5,6 +5,7 @@ import { FeatCard } from './FeatCard';
 import { useRegionFeats, type FeatTier } from './hooks/useRegionFeats';
 import { AMBER, INK, INK_TINT_06 } from '@/features/courses/_shared/tokens';
 import { TierSeeAllSheet } from './TierSeeAllSheet';
+import { UnderlineTabs } from '@/components/ui/UnderlineTabs';
 
 const RAIL_CAP = 12;
 
