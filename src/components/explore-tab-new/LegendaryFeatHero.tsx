@@ -114,8 +114,6 @@ export function LegendaryFeatHero({ region }: Props) {
     if (total > 1) setIndex((i) => (i - 1 + total) % total);
   };
 
-  const pointerRef = useRef<{ x: number; y: number; t: number } | null>(null);
-
   const onPointerDown = (e: React.PointerEvent) => {
     pointerRef.current = { x: e.clientX, y: e.clientY, t: Date.now() };
   };
