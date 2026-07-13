@@ -185,7 +185,7 @@ function CircleActivityCard({ row, onTap }: CardProps) {
     ? '0 0 0 1px #FBBC2E55, 0 4px 12px rgba(0,0,0,0.20)'
     : 'inset 0 1px 0 rgba(255,255,255,0.06), 0 3px 10px rgba(15,23,42,0.14)';
 
-  const fallbackBg = 'linear-gradient(135deg, #0F172A 0%, #1e293b 100%)';
+  const fallbackBg = '#0A0C10';
 
   return (
     <button
@@ -223,34 +223,33 @@ function CircleActivityCard({ row, onTap }: CardProps) {
         />
       ) : null}
 
-      {/* Obsidian scrim */}
+      {/* Heavy dark veil - photo becomes texture */}
       <div
         style={{
           position: 'absolute',
           inset: 0,
           background:
-            'linear-gradient(180deg, rgba(7,8,12,0.28) 0%, rgba(7,8,12,0.10) 22%, rgba(7,8,12,0.00) 38%, rgba(7,8,12,0.06) 50%, rgba(7,8,12,0.18) 60%, rgba(7,8,12,0.34) 70%, rgba(7,8,12,0.52) 79%, rgba(7,8,12,0.70) 87%, rgba(7,8,12,0.86) 94%, rgba(7,8,12,0.94) 100%)',
+            'linear-gradient(155deg, rgba(10,12,16,0.72), rgba(10,12,16,0.90))',
         }}
       />
 
-      {/* Top-left: tick + typographic label */}
+      {/* Top-left: feat label (accent color) */}
       <div
         style={{
           position: 'absolute',
-          top: 12,
-          left: 12,
+          top: 14,
+          left: 14,
           display: 'flex',
           alignItems: 'center',
-          gap: 8,
         }}
       >
         <span
           style={{
-            fontSize: 10,
+            fontSize: 9.5,
             fontWeight: 800,
-            letterSpacing: '0.16em',
+            letterSpacing: '0.12em',
             textTransform: 'uppercase',
-            color: 'rgba(248,244,232,0.92)',
+            color: legendary ? accent : '#F7931E',
             lineHeight: 1,
           }}
         >
@@ -263,13 +262,13 @@ function CircleActivityCard({ row, onTap }: CardProps) {
         <div
           style={{
             position: 'absolute',
-            top: 12,
-            right: 12,
-            fontSize: 10,
+            top: 14,
+            right: 14,
+            fontSize: 9.5,
             fontWeight: 700,
             letterSpacing: '0.08em',
             textTransform: 'uppercase',
-            color: 'rgba(248,244,232,0.55)',
+            color: 'rgba(255,255,255,0.45)',
             lineHeight: 1,
           }}
         >
@@ -277,26 +276,25 @@ function CircleActivityCard({ row, onTap }: CardProps) {
         </div>
       ) : null}
 
-      {/* Hero value + course name */}
+      {/* Hero stat + course name (sits above footer) */}
       <div
         style={{
           position: 'absolute',
           left: 14,
           right: 14,
-          bottom: 43,
+          bottom: 54,
           display: 'flex',
           flexDirection: 'column',
-          gap: 4,
         }}
       >
         {heroValue ? (
           <div
             style={{
-              fontSize: 27,
+              fontSize: 34,
               fontWeight: 900,
-              letterSpacing: '-0.015em',
-              lineHeight: 1,
-              color: '#F8F4E8',
+              letterSpacing: '-0.03em',
+              lineHeight: 0.95,
+              color: '#ffffff',
               fontVariantNumeric: 'tabular-nums',
               textTransform: 'uppercase',
               overflow: 'hidden',
@@ -309,9 +307,10 @@ function CircleActivityCard({ row, onTap }: CardProps) {
         ) : null}
         <div
           style={{
-            fontSize: 11.5,
+            marginTop: 4,
+            fontSize: 11,
             fontWeight: 600,
-            color: 'rgba(248,244,232,0.75)',
+            color: 'rgba(255,255,255,0.6)',
             lineHeight: 1.2,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
