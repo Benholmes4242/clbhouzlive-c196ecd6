@@ -76,7 +76,9 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = 
         ? 'IN PROGRESS'
         : `T0/${item.tiers.length}`
     : earned
-      ? 'EARNED'
+      ? earnedDate
+        ? earnedDate.toUpperCase()
+        : 'EARNED'
       : 'LOCKED';
 
   const earnedDate = item.earnedAt
@@ -88,9 +90,7 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = 
       ? `NEXT: ${nextThreshold.toLocaleString()} -> ${nextMat?.toUpperCase()}`
       : 'ALL TIERS EARNED'
     : earned
-      ? earnedDate
-        ? `EARNED ${earnedDate.toUpperCase()}`
-        : 'EARNED'
+      ? item.description
       : 'LOCKED';
   // Status subline (at_risk / lost) overrides the base subline so the live
   // state is what the user reads first. Held keeps the base subline.
