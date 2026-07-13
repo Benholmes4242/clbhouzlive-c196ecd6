@@ -26,7 +26,7 @@ import { VideoEngine, type LaneId, type LaneSnapshot } from '@/video/VideoEngine
 import { feedLaneRoles, type FeedRole } from '@/video/feedLaneRoles';
 import { originHostRegistry } from '@/video/originHostRegistry';
 import { useClubhouseStore } from '@/store/clubhouseStore';
-import { MuteToggle } from '@/components/feed/MuteToggle';
+import { MuteButton } from '@/audio/MuteButton';
 import {
   vperfMarkEarlyStarted,
   vperfCardFraction,
