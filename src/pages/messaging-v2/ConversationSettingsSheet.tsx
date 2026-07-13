@@ -321,7 +321,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                       color: '#FFF',
                       border: 'none',
                       borderRadius: 10,
-                      padding: '12px 14px',
+                      padding: '8px 14px',
                       fontSize: 14,
                       fontWeight: 600,
                     }}
@@ -789,7 +789,7 @@ const AddPeopleSheet: React.FC<AddPeopleSheetProps> = ({
               background: '#FFF',
               border: `1px solid ${HAIRLINE}`,
               borderRadius: 12,
-              padding: '10px 14px',
+              padding: '12px 14px',
               fontSize: 15,
               color: INK,
               outline: 'none',
