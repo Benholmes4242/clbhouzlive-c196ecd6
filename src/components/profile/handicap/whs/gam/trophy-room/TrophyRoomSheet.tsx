@@ -695,7 +695,10 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                   );
                 })}
                 {anyLegends && (
-                  <CourseLegendsCollapsibleSection items={allLegends} onTap={openDetail} />
+                  <CourseLegendsCollapsibleSection
+                    items={allLegends}
+                    onOpenGroup={(records) => setDetailCtx({ items: records, index: 0 })}
+                  />
                 )}
               </>
             );
