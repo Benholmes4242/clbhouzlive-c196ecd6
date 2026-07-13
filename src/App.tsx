@@ -736,6 +736,35 @@ const AppInner: React.FC = () => {
         try { os.login?.(userId); } catch {}
         try { os.User?.addAlias?.('external_id', userId); } catch {}
 
+        // ── Deep-link on notification tap ──────────────────────────────
+        // Every push we send carries data.route (see process-push-queue).
+        // Route reads work across bridge shapes; guard all accesses.
+        const handleOpen = (payload: any) => {
+          try {
+            const d =
+              payload?.notification?.additionalData ??
+              payload?.result?.notification?.additionalData ??
+              payload?.notification?.rawPayload?.custom?.a ??
+              payload?.additionalData ??
+              payload?.data ??
+              {};
+            const route = typeof d?.route === 'string' ? d.route : null;
+            if (!route) return;
+            // Defer a tick so the router is ready on cold start.
+            setTimeout(() => { window.location.assign(route); }, 0);
+          } catch {}
+        };
+        try { os.Notifications?.addEventListener?.('click', handleOpen); } catch {}
+        try { os.setNotificationOpenedHandler?.(handleOpen); } catch {}
+        // Cold-start replay: if launched BY a tap, the click may have fired
+        // before this listener registered. Consume any pending opened notif.
+        try {
+          const pending =
+            os.Notifications?.getClickedNotification?.() ??
+            os.getLastNotificationOpened?.();
+          if (pending) handleOpen(pending);
+        } catch {}
+
         // Clear iOS app icon badge on cold open + on every foreground.
         import('@/utils/pushBadge').then((m) => m.clearAppBadge());
 
@@ -744,6 +773,7 @@ const AppInner: React.FC = () => {
 
         const ok = await registerWithRetry(platform);
         if (ok) console.log('[Push] Registered:', userId);
+
       } catch (e: any) {
         console.error('[Push] Error:', e?.name, e?.message);
       }
