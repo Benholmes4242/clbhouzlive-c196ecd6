@@ -288,7 +288,7 @@ export function HubVideoRow() {
           display: 'flex',
           gap: 12,
           overflowX: 'auto',
-          padding: '0 16px',
+          padding: '0 4px',
           WebkitOverflowScrolling: 'touch',
           scrollbarWidth: 'none',
         }}

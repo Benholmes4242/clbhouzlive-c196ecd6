@@ -184,7 +184,7 @@ export function ClipsInterruptShelf({ clips, shelfIndex }: Props) {
     <section
       style={{
         margin: '0 -16px 16px',
-        padding: '12px 16px',
+        padding: '12px 0',
         background: 'rgba(247,147,30,0.06)',
         borderTop: '1px solid rgba(0,0,0,0.07)',
         borderBottom: '1px solid rgba(0,0,0,0.07)',
@@ -197,6 +197,7 @@ export function ClipsInterruptShelf({ clips, shelfIndex }: Props) {
           justifyContent: 'space-between',
           alignItems: 'baseline',
           marginBottom: 12,
+          padding: '0 16px',
         }}
       >
         <span
@@ -236,6 +237,7 @@ export function ClipsInterruptShelf({ clips, shelfIndex }: Props) {
           gap: 12,
           overflowX: 'auto',
           WebkitOverflowScrolling: 'touch',
+          padding: '0 4px',
         }}
       >
         {shelfClips.map((clip, i) => (
