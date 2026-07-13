@@ -46,7 +46,7 @@ const AppDownloadGate: React.FC = () => {
         }}
       >
         <img
-          src="/brand/clbhouz-mark-amber.svg"
+          src="/brand/clbhouz-mark-amber.png"
           alt=""
           style={{ width: 76, height: 76, display: 'block', margin: '0 auto' }}
           draggable={false}

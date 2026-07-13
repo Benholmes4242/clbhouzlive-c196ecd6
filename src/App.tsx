@@ -119,6 +119,7 @@ import SuspendedScreen from "@/components/SuspendedScreen";
 
 import { isNativeAppSync, isPreviewHost, waitForNativeBridge } from '@/utils/native/isNativeApp';
 import AppDownloadGate from '@/pages/AppDownloadGate';
+import { useEnvStatus, isAppShellVisible } from '@/utils/native/envStatus';
 
 const RootGate: React.FC = () => {
   const { user, loading: authLoading } = useSupabaseSession();
@@ -126,30 +127,11 @@ const RootGate: React.FC = () => {
   const location = useLocation();
   const isActive = location.pathname === '/';
 
-  // Native / preview status is decided ONCE per session.
-  // - 'native' or 'preview' → full app flow (existing behavior).
-  // - 'web' → AppDownloadGate.
-  // - 'pending' → BootHold while we wait up to ~2s for a late-injecting
-  //   Median bridge (iPad); this covers the reviewer's failure mode.
-  const [envStatus, setEnvStatus] = React.useState<'pending' | 'native' | 'preview' | 'web'>(
-    () => {
-      if (isNativeAppSync()) return 'native';
-      if (isPreviewHost()) return 'preview';
-      return 'pending';
-    },
-  );
-
-  React.useEffect(() => {
-    if (envStatus !== 'pending') return;
-    let cancelled = false;
-    waitForNativeBridge(2000).then((isNative) => {
-      if (cancelled) return;
-      setEnvStatus(isNative ? 'native' : 'web');
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [envStatus]);
+  // Native / preview status is decided ONCE per session (shared store —
+  // `useEnvStatus` above). RootGate reflects it here; GlobalHeader and
+  // GlobalBottomNavigation read the same store to skip mounting while the
+  // gate holds or the web gate is showing.
+  const envStatus = useEnvStatus();
 
   if (envStatus === 'pending') return <BootHold />;
   if (envStatus === 'web') return <AppDownloadGate />;
@@ -162,6 +144,15 @@ const RootGate: React.FC = () => {
   }
 
   return <ClubhouseWrapped />;
+};
+
+/** Renders app chrome (header/bottom-nav) only when the gate has resolved
+ *  to the real app shell. Prevents chrome from flashing under BootHold or
+ *  the AppDownloadGate on cold web loads. */
+const AppShellOnly: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const envStatus = useEnvStatus();
+  if (!isAppShellVisible(envStatus)) return null;
+  return <>{children}</>;
 };
 import DiscoverWrapped from "./pages/DiscoverWrapped";
 import CoursesWrapped from "./pages/CoursesWrapped";
@@ -889,7 +880,7 @@ const AppInner: React.FC = () => {
                                             <Suspense fallback={null}>
                                               <div className="app-depth">
                                                 {/* Global header for all pages except Clubhouse/Auth/Admin */}
-                                                <GlobalHeader />
+                                                <AppShellOnly><GlobalHeader /></AppShellOnly>
                                                 <AppRoutes />
                                                 
                                               </div>
@@ -909,7 +900,7 @@ const AppInner: React.FC = () => {
                                         </AuthWrapper>
 
                                         <Sonner />
-                                        <GlobalBottomNavigation />
+                                        <AppShellOnly><GlobalBottomNavigation /></AppShellOnly>
                                         <GlobalPostComposer />
                                       </ErrorBoundary>
                                   </VideoPlaybackProvider>
