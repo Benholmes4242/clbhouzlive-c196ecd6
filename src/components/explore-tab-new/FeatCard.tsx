@@ -3,8 +3,31 @@ import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import type { FeatRow, FeatTier } from './hooks/useRegionFeats';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
-const CARD_W = 226;
-const CARD_H = 183;
+
+export type FeatCardSize = 'default' | 'compact';
+
+const SIZE_MAP: Record<FeatCardSize, {
+  w: number; h: number;
+  value: number; label: number; avatar: number;
+  padX: number; padY: number;
+  heroBottom: number; footerBottom: number; footerPadTop: number;
+  courseFs: number; holderFs: number; whenFs: number;
+}> = {
+  default: {
+    w: 226, h: 183,
+    value: 34, label: 9.5, avatar: 24,
+    padX: 14, padY: 14,
+    heroBottom: 54, footerBottom: 12, footerPadTop: 10,
+    courseFs: 11, holderFs: 12, whenFs: 9.5,
+  },
+  compact: {
+    w: 158, h: 112,
+    value: 19, label: 8.5, avatar: 16,
+    padX: 10, padY: 10,
+    heroBottom: 34, footerBottom: 8, footerPadTop: 6,
+    courseFs: 9.5, holderFs: 10.5, whenFs: 8.5,
+  },
+};
 
 // Tier accents (drives tick, WHS mark, legendary glow + avatar ring).
 const ACCENT: Record<FeatTier, string> = {
