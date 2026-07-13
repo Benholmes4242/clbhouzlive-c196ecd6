@@ -46,10 +46,14 @@ export const WALL_LEVELS: readonly WallLevel[] = [
 
 /** Medals owned by one badge: earned tiers for tiered items, 1/0 for binary. */
 export function medalsForItem(item: TrophyItem): number {
-  if ('tiers' in item && Array.isArray(item.tiers) && item.tiers.length > 0) {
-    return item.tiers.filter((t) => t.earned).length;
+  if (item.kind === 'achievement') {
+    if (Array.isArray(item.tiers) && item.tiers.length > 0) {
+      return item.tiers.filter((t) => t.earned).length;
+    }
+    return item.earned ? 1 : 0;
   }
-  return item.earned ? 1 : 0;
+  // Legends are always awarded rows -> 1 medal each.
+  return 1;
 }
 
 /** Total medals across the wall. */
