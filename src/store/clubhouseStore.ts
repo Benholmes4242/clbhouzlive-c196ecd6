@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { useSessionAudio, getLastUnmuteGestureTs } from '@/audio/sessionAudioStore';
 
 export type TabKey = string; // 'foryou' | 'friends' | other surfaces (LightCardFeed etc use 'default')
 
@@ -16,8 +15,6 @@ interface ClubhouseState {
   // FullscreenCarouselOverlay, LightCardFeed, FeedImageCarousel, etc.).
   activeIndex: number;
   carouselPositions: Map<number, number>;
-
-  isMuted: boolean;
   userPaused: boolean;
   // [VIDEO-TEARDOWN] activeVideoElement / activeVideoRef removed — poster-only chassis.
   isTournamentCardActive: boolean;
@@ -25,13 +22,9 @@ interface ClubhouseState {
   setActiveTab: (tab: TabKey) => void;
   setActiveIndex: (idx: number, tab?: TabKey) => void;
   setCarouselPosition: (feedIdx: number, mediaIdx: number, tab?: TabKey) => void;
-  setIsMuted: (v: boolean) => void;
-  toggleMute: () => void;
   setUserPaused: (v: boolean) => void;
   // [VIDEO-TEARDOWN] setActiveVideoElement removed — engine severed.
   setIsTournamentCardActive: (v: boolean) => void;
-  markUserGestureUnmute: () => void;
-  isRecentUserGesture: () => boolean;
   /** Per-tab warmer — CardFeed registers a callback that prefetches the tab's
    *  active-index HLS first segment. Fired on setActiveTab so tab-restore
    *  doesn't stall on the cold segment fetch (manifest is already pooled). */
