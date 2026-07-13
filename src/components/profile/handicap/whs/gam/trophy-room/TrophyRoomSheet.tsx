@@ -66,6 +66,7 @@ function groupAchievementsByCategory(
     handicap: [],
     consistency: [],
     courses: [],
+    travel: [],
     seasonal: [],
   };
   for (const item of items) {
