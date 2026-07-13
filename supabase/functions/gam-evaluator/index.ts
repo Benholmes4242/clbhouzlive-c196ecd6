@@ -209,10 +209,16 @@ async function processSingle(whsScoreId: string) {
   // Idempotency guard for counter-style state changes
   const alreadyAtVersion = (scoreRow.evaluator_version_last ?? 0) >= EVALUATOR_VERSION;
 
+  // Transient per-round stats used by binary badge matchers but not persisted
+  // to gam_round_stats (no column). max_birdie_streak mirrors longest_birdie_run.
+  (stats as any).max_birdie_streak = stats.longest_birdie_run ?? 0;
+
   let earned: string[] = [];
   if (!alreadyAtVersion) {
     await applyMilestones(userId, stats);
     await recomputeTop100Milestones(userId);
+    await recomputeTravelMilestones(userId);
+    (stats as any).seasons_played = await recomputeSeasonsPlayed(userId);
     earned = await applyBadges(userId, stats, whsScoreId);
     await applyStatusTransitions(userId, stats, whsScoreId);
     await applyStreaks(userId, stats);
