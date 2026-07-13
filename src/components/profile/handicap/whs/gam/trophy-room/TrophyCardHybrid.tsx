@@ -175,7 +175,7 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap }) => {
           marginTop: 5,
         }}
       >
-        {(secretLocked ? 'HIDDEN AWARD' : item.name).toUpperCase()}
+        {item.name.toUpperCase()}
       </div>
       <div
         style={{
