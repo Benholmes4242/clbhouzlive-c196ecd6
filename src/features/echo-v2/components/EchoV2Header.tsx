@@ -24,7 +24,7 @@ export const EchoV2Header: React.FC<Props> = ({ streaming, onHistoryClick, showB
         paddingTop: showBack
           ? 'calc(env(safe-area-inset-top, 0px) + 8px)'
           : 'max(env(safe-area-inset-top, 0px), 47px)',
-        paddingBottom: 10,
+        paddingBottom: 12,
         paddingLeft: showBack ? 6 : 14,
         paddingRight: showBack ? 6 : 14,
         background: CANVAS,
