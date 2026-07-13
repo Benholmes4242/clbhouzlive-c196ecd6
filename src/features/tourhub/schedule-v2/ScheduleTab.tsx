@@ -196,51 +196,6 @@ export function ScheduleTab() {
           </span>
         </div>
 
-        {/* Tour chips */}
-          <div
-            style={{
-              display: 'flex',
-              gap: 8,
-              overflowX: 'auto',
-              paddingBottom: 4,
-              marginBottom: 12,
-              scrollbarWidth: 'none',
-            }}
-            className="segmented-scroller"
-          >
-          {TOUR_PRIORITY.map((slug) => {
-            const isActive = slug === activeTour;
-            return (
-              <button
-                key={slug}
-                type="button"
-                onClick={() => selectTour(slug)}
-                aria-pressed={isActive}
-                style={{
-                  flex: '0 0 auto',
-                  padding: '7px 12px',
-                  borderRadius: 14,
-                  border: isActive
-                    ? 'none'
-                    : `0.5px solid ${HAIRLINE_INK_10}`,
-                  background: isActive ? INK : '#FFFFFF',
-                  color: isActive ? '#FFFFFF' : INK,
-                  fontFamily: 'inherit',
-                  fontSize: 10.5,
-                  fontWeight: 800,
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                  lineHeight: 1,
-                }}
-              >
-                {CHIP_SHORT_LABEL[slug]}
-              </button>
-            );
-          })}
-        </div>
-
         {/* Progress strip */}
         <div>
           <div
