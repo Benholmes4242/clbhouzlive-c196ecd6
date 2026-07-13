@@ -247,9 +247,9 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   { match: { prefix: '/tour/' },                  spec: { chrome: 'none', tone: 'light', bleed: true, note: 'other tour subpages immersive/page-owned today (isConditionallyExcluded)' } },
 
   // Watch sub-pages: back to /watch's caller.
-  { match: { exact: '/watch/videos' },            spec: { chrome: 'island', left: { kind: 'back', title: 'Videos', backTarget: 'history' }, tone: 'light', bleed: false } },
-  { match: { exact: '/watch/clips' },             spec: { chrome: 'island', left: { kind: 'back', title: 'Clips',  backTarget: 'history' }, tone: 'light', bleed: false } },
-  { match: { exact: '/watch' },                   spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'light', bleed: false } },
+  { match: { exact: '/watch/videos' },            spec: { chrome: 'island', left: { kind: 'back', title: 'Videos', backTarget: 'history' }, tone: 'light', bleed: true } },
+  { match: { exact: '/watch/clips' },             spec: { chrome: 'island', left: { kind: 'back', title: 'Clips',  backTarget: 'history' }, tone: 'light', bleed: true } },
+  { match: { exact: '/watch' },                   spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'light', bleed: true } },
 
   // Courses landing (editorial geometry; cinematic hero → glass overlay).
   { match: { exact: '/courses' },                 spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'light', bleed: true,  note: EDITORIAL_NOTE } },
