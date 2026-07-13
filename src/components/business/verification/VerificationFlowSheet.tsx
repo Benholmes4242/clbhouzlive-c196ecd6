@@ -521,7 +521,7 @@ export default function VerificationFlowSheet({
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto px-4 py-5 pb-32">
+        <main className="flex-1 overflow-y-auto px-4 py-4 pb-32">
           {showDomainMode ? (
             <DomainStep businessId={businessId} onDone={() => onOpenChange(false)} />
           ) : confirmation ? (
@@ -600,7 +600,7 @@ export default function VerificationFlowSheet({
                       setOtpCode('');
                     }
                   }}
-                  className="space-y-2.5"
+                  className="space-y-3"
                 >
                   {PROOF_OPTIONS.map((option) => {
                     const isSelected = selectedProof === option.id;
@@ -1089,7 +1089,7 @@ function DetailRow({
 }) {
   return (
     <div
-      className="flex items-start gap-3 py-2.5"
+      className="flex items-start gap-3 py-3"
       style={last ? undefined : { borderBottom: `0.5px solid ${BIZ.hair}` }}
     >
       <span className="text-[13px] shrink-0 w-[110px]" style={{ color: BIZ.inkMute }}>
