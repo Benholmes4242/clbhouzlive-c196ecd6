@@ -203,11 +203,43 @@ const Grid: React.FC<{
   </div>
 );
 
+type LegendItem = Extract<TrophyItem, { kind: 'legend' }>;
+
+interface CourseGroup {
+  key: string;
+  courseName: string;
+  records: LegendItem[];
+}
+
+/** Group legends by courseId when present, else by courseName. All items
+ *  in this section are guaranteed kind === 'legend'. */
+function groupLegendsByCourse(items: TrophyItem[]): CourseGroup[] {
+  const map = new Map<string, CourseGroup>();
+  for (const it of items) {
+    if (it.kind !== 'legend') continue;
+    const key = it.courseId || `name:${it.courseName}`;
+    const existing = map.get(key);
+    if (existing) {
+      existing.records.push(it);
+    } else {
+      map.set(key, { key, courseName: it.courseName, records: [it] });
+    }
+  }
+  const groups = Array.from(map.values());
+  groups.sort((a, b) => {
+    if (b.records.length !== a.records.length) return b.records.length - a.records.length;
+    return a.courseName.localeCompare(b.courseName);
+  });
+  return groups;
+}
+
 const CourseLegendsCollapsibleSection: React.FC<{
   items: TrophyItem[];
-  onTap: (item: TrophyItem) => void;
-}> = ({ items, onTap }) => {
+  onOpenGroup: (records: LegendItem[]) => void;
+}> = ({ items, onOpenGroup }) => {
   const [expanded, setExpanded] = useState(false);
+  const groups = useMemo(() => groupLegendsByCourse(items), [items]);
+  const totalRecords = groups.reduce((n, g) => n + g.records.length, 0);
   return (
     <>
       <button
@@ -236,7 +268,7 @@ const CourseLegendsCollapsibleSection: React.FC<{
           Course legends
         </span>
         <span style={{ color: 'rgba(255,255,255,0.55)', ...GAM.TABULAR, fontWeight: 700, fontSize: 10, letterSpacing: '0.18em' }}>
-          ({items.length})
+          ({groups.length} {groups.length === 1 ? 'course' : 'courses'} · {totalRecords} {totalRecords === 1 ? 'record' : 'records'})
         </span>
         <ChevronDown
           size={14}
@@ -250,8 +282,18 @@ const CourseLegendsCollapsibleSection: React.FC<{
         />
       </button>
       {expanded && (
-        <div id="trophy-course-legends-grid">
-          <Grid items={items} onTap={onTap} />
+        <div
+          id="trophy-course-legends-grid"
+          style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}
+        >
+          {groups.map((g) => (
+            <LegendCard
+              key={g.key}
+              courseName={g.courseName}
+              records={g.records}
+              onTap={onOpenGroup}
+            />
+          ))}
         </div>
       )}
     </>
