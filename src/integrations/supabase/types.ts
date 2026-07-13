@@ -14365,6 +14365,36 @@ export type Database = {
           },
         ]
       }
+      whs_course_match_requests: {
+        Row: {
+          created_at: string
+          golf_course_id: string
+          id: string
+          resolved_at: string | null
+          status: string
+          user_id: string
+          whs_course_name: string | null
+        }
+        Insert: {
+          created_at?: string
+          golf_course_id: string
+          id?: string
+          resolved_at?: string | null
+          status?: string
+          user_id: string
+          whs_course_name?: string | null
+        }
+        Update: {
+          created_at?: string
+          golf_course_id?: string
+          id?: string
+          resolved_at?: string | null
+          status?: string
+          user_id?: string
+          whs_course_name?: string | null
+        }
+        Relationships: []
+      }
       whs_courses: {
         Row: {
           country_code: string | null
