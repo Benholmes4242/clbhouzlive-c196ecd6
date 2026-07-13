@@ -374,81 +374,8 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
           <div style={{ width: 36, height: 4, borderRadius: 99, background: LINE }} />
         </div>
 
-        {/* Filter pills — pinned. Hairline border-bottom marks the pinned edge once
-            content scrolls beneath it. The header block below (moved into the
-            scrollable body in this PR) carries its own top border only when
-            visible, so no double hairline at top-of-scroll. */}
-        {/* Filter pills — pinned. Hairline border-bottom marks the pinned edge
-            once content scrolls beneath it. The header block (eyebrow + 179 hero
-            + split + completion rail) and the NEXT UNLOCK spotlight moved into
-            the scrollable body in this PR — pinned region trims from ~247px to
-            ~62px so ~40% more content shows on open. */}
-        <div
-          style={{
-            display: 'flex',
-            gap: 8,
-            padding: '12px 16px',
-            flexShrink: 0,
-            fontFamily: GAM.FONT_GEIST,
-            overflowX: 'auto',
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-            borderBottom: `0.5px solid ${LINE}`,
-          }}
-          className="hcp-tab-row"
-          role="tablist"
-        >
-          {(['all', 'earned', 'locked'] as Tab[]).map((key) => {
-            const active = tab === key;
-            const count =
-              key === 'all'
-                ? allAchievements.length
-                : key === 'earned'
-                  ? earnedAchievements.length
-                  : lockedAchievements.length;
-            return (
-              <button
-                key={key}
-                type="button"
-                onClick={() => setTab(key)}
-                role="tab"
-                aria-selected={active}
-                style={{
-                  flex: '0 0 auto',
-                  height: 30,
-                  padding: '0 12px',
-                  borderRadius: 999,
-                  border: `1px solid ${active ? 'rgba(255,255,255,0.14)' : LINE}`,
-                  background: active ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.045)',
-                  color: active ? INK : DIM,
-                  fontFamily: 'inherit',
-                  fontSize: 12,
-                  fontWeight: 800,
-                  letterSpacing: '0.06em',
-                  whiteSpace: 'nowrap',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  transition: 'background 150ms ease, color 150ms ease',
-                }}
-              >
-                {TAB_LABEL[key]}
-                <span
-                  style={{
-                    ...GAM.TABULAR,
-                    fontWeight: 800,
-                    fontSize: 11,
-                    color: FAINT,
-                  }}
-                >
-                  {count}
-                </span>
-              </button>
-            );
-          })}
-          <style>{`.hcp-tab-row::-webkit-scrollbar { display: none; }`}</style>
-        </div>
+        {/* Filter chips retired — sheet always renders everything. */}
+
 
         {/* Body — scrolls the header block, spotlight, and category sections. */}
         <div
