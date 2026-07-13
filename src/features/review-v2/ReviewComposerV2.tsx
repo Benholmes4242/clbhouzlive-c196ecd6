@@ -57,7 +57,7 @@ function Section({ eyebrow, children }: { eyebrow: string; children: React.React
 function InnerComposer() {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
-  const { user } = useSupabaseSession();
+  const { user, loading: sessionLoading } = useSupabaseSession();
   const userId = user?.id ?? null;
 
 
@@ -118,8 +118,10 @@ function InnerComposer() {
 
   const ready =
     !!courseQ.data &&
-    !existingQ.isLoading &&
-    (!existingQ.data || !existingMediaQ.isLoading);
+    !sessionLoading &&
+    (!userId
+      ? true // signed-out: nothing to prefill
+      : !existingQ.isLoading && (!existingQ.data || !existingMediaQ.isLoading));
 
   if (!ready) {
     return (
@@ -141,6 +143,7 @@ function InnerComposer() {
 
   return (
     <Composer
+      key={`${courseId}:${existingQ.data?.id ?? 'new'}`}
       course={courseQ.data!}
       userId={userId}
       existing={existingQ.data}
