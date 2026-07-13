@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { formatRatingValue } from '@/utils/formatters';
 import { getScoreRingColors } from '@/hooks/useTierStyles';
+import { getRatingTier } from '@/lib/ratingTier';
 import { ReviewMediaStrip, ReviewMediaItem } from './ReviewMediaStrip';
 import { MentionText } from '@/components/mentions/MentionText';
 import { stripMentionMarkup } from '@/lib/mentions/format';
