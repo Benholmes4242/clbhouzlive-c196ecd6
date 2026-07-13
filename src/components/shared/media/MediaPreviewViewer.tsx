@@ -6,12 +6,14 @@
 //   • immersive status-bar bleed via body.route-fullscreen-overlay + shield
 //     transparency + Median status-bar style push
 //   • edge-to-edge chrome sitting directly on the blurred backdrop
-import React, { useState, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
+import { MuteButton, TapForSoundPill } from '@/audio/MuteButton';
+import { useSessionAudio } from '@/audio/sessionAudioStore';
 import type { OrderedMediaItem } from './types';
 
 interface MediaPreviewViewerProps {
