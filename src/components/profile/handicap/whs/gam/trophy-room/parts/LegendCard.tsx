@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { renderBadgeIcon } from '../../badgeIcons';
+import { Crown } from 'lucide-react';
 import { GAM } from '../../tokens';
 import type { TrophyItem } from '../_shared/normalizeTrophyItem';
 import { rgbaOf } from '../_shared/rarityPalette';
+
+type LegendItem = Extract<TrophyItem, { kind: 'legend' }>;
 
 const T = {
   card: '#1B1E27',
@@ -24,57 +26,66 @@ const CARD_BASE: React.CSSProperties = {
   cursor: 'pointer',
   textAlign: 'left',
   color: T.ink,
+  width: '100%',
 };
 
-const Watermark: React.FC<{ iconKey: string; color: string; opacity: number }> = ({
-  iconKey,
-  color,
-  opacity,
-}) => (
-  <div
-    aria-hidden
-    style={{
-      position: 'absolute',
-      right: -18,
-      bottom: -18,
-      color,
-      opacity,
-      pointerEvents: 'none',
-      zIndex: 0,
-    }}
-  >
-    {renderBadgeIcon(iconKey, 96, 'currentColor', 1.6)}
-  </div>
-);
-
-interface Props {
-  item: TrophyItem;
-  onTap: (item: TrophyItem) => void;
+/** Short chip label for a legend category. Trims the leading "Most " /
+ *  "Best " / "Lowest " noise so multiple chips fit on one line. */
+function chipLabelFor(name: string): string {
+  const trimmed = name.replace(/^(Most|Best|Lowest)\s+/i, '').trim();
+  return trimmed.toUpperCase();
 }
 
-export const LegendCard: React.FC<Props> = ({ item, onTap }) => {
-  if (item.kind !== 'legend') return null;
+interface Props {
+  courseName: string;
+  records: LegendItem[];
+  onTap: (records: LegendItem[]) => void;
+}
+
+export const LegendCard: React.FC<Props> = ({ courseName, records, onTap }) => {
   const [pressed, setPressed] = useState(false);
   const c = AMBER;
+  const count = records.length;
+  const pillLabel = count > 1 ? `${count}x #1` : '#1';
+
+  const visibleChips = records.slice(0, 2);
+  const overflow = Math.max(0, records.length - visibleChips.length);
+  const chipsText = visibleChips
+    .map((r) => `${chipLabelFor(r.name)} ${r.formattedValue}`)
+    .join(' · ') + (overflow > 0 ? ` · +${overflow} more` : '');
 
   return (
     <button
       type="button"
-      onClick={() => onTap(item)}
+      onClick={() => onTap(records)}
       onTouchStart={() => setPressed(true)}
       onTouchEnd={() => setPressed(false)}
       onTouchCancel={() => setPressed(false)}
       style={{
         ...CARD_BASE,
         background: `linear-gradient(180deg, ${rgbaOf(c, 0.09)}, ${rgbaOf(c, 0.02)}), ${T.card}`,
-        border: `1px solid ${rgbaOf(c, 0.40)}`,
+        border: `1px solid ${rgbaOf(c, 0.4)}`,
         transform: pressed ? 'scale(0.985)' : 'scale(1)',
         transition: 'transform 120ms ease',
       }}
     >
-      <Watermark iconKey={item.iconKey} color={c} opacity={0.09} />
+      {/* Ghost watermark: crown */}
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          right: -18,
+          bottom: -18,
+          color: c,
+          opacity: 0.09,
+          pointerEvents: 'none',
+          zIndex: 0,
+        }}
+      >
+        <Crown size={96} strokeWidth={1.6} />
+      </div>
 
-      {/* Top row: icon chip + #rank pill */}
+      {/* Top row: crown chip + count pill */}
       <div
         style={{
           position: 'relative',
@@ -98,7 +109,7 @@ export const LegendCard: React.FC<Props> = ({ item, onTap }) => {
             flexShrink: 0,
           }}
         >
-          {renderBadgeIcon(item.iconKey, 14, 'currentColor')}
+          <Crown size={14} strokeWidth={2.2} />
         </div>
         <span
           style={{
@@ -112,11 +123,11 @@ export const LegendCard: React.FC<Props> = ({ item, onTap }) => {
             ...GAM.TABULAR,
           }}
         >
-          #{item.rank}
+          {pillLabel}
         </span>
       </div>
 
-      {/* Bottom: course name (two lines) + category */}
+      {/* Middle: course name (two lines) */}
       <div style={{ position: 'relative', zIndex: 1, marginTop: 'auto', paddingTop: 12 }}>
         <div
           style={{
@@ -131,8 +142,9 @@ export const LegendCard: React.FC<Props> = ({ item, onTap }) => {
             overflow: 'hidden',
           }}
         >
-          {item.courseName}
+          {courseName}
         </div>
+        {/* Bottom: record chips inline */}
         <div
           style={{
             marginTop: 5,
@@ -147,7 +159,7 @@ export const LegendCard: React.FC<Props> = ({ item, onTap }) => {
             ...GAM.TABULAR,
           }}
         >
-          {item.name} · {item.formattedValue}
+          {chipsText}
         </div>
       </div>
     </button>
