@@ -44,7 +44,25 @@ const CHIP_SHORT_LABEL: Record<TourId, string> = {
 export function ScheduleTab() {
   const navigate = useNavigate();
   const anchorRef = useRef<HTMLDivElement | null>(null);
+  const chipsRef = useRef<HTMLDivElement | null>(null);
   const [anchorVisible, setAnchorVisible] = useState(true);
+
+  // Publish real chips-row outer height so month headers can stack flush.
+  useEffect(() => {
+    const el = chipsRef.current;
+    if (!el) return;
+    const publish = () => {
+      document.documentElement.style.setProperty(
+        '--tour-chips-h',
+        `${Math.round(el.offsetHeight)}px`,
+      );
+    };
+    publish();
+    const ro = new ResizeObserver(publish);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
 
   // ── Tour selection (app-wide brain) ────────────────────────────────────
   const {
