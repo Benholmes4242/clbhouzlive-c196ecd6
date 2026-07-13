@@ -288,16 +288,18 @@ function SectionHeaderInner(props: SectionHeaderProps) {
         </div>
       )}
 
-      <div
-        aria-hidden="true"
-        style={{
-          marginTop: 7,
-          width: cutWidth,
-          height: cutHeight,
-          background: cutColor,
-          borderRadius: cutHeight,
-        }}
-      />
+      {cutLine && (
+        <div
+          aria-hidden="true"
+          style={{
+            marginTop: 7,
+            width: cutWidth,
+            height: cutHeight,
+            background: cutColor,
+            borderRadius: cutHeight,
+          }}
+        />
+      )}
       {sub && (
         <p
           style={{
