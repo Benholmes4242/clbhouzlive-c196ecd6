@@ -138,6 +138,17 @@ body.lightbox-open {
   .clbhouz-gold-shimmer-light { animation: none !important; }
 }
 
+/* ===== Gold shimmer — FILL variant for bars/underlines (background-image) ===== */
+.clbhouz-gold-shimmer-bar {
+  background-image: linear-gradient(110deg,
+    #E8800C 18%, #FFCB45 38%, #FFE08A 50%, #FFCB45 62%, #E8800C 82%);
+  background-size: 200% auto;
+  animation: clbhouzGoldShimmer 6s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .clbhouz-gold-shimmer-bar { animation: none !important; }
+}
+
 
 html.lightbox-open {
   overflow: hidden;
