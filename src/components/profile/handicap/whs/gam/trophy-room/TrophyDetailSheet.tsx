@@ -1,13 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { GamSheet } from '../../../gam/_shared/GamSheet';
-import { DetailHero } from './parts/DetailHero';
-import { AchievementBody } from './parts/AchievementBody';
-import { LegendBody } from './parts/LegendBody';
-import { DetailFooter } from './parts/DetailFooter';
-import { Top100Body } from './parts/Top100Body';
 import { AchievementImmersive } from './parts/AchievementImmersive';
 import { LegendImmersive } from './parts/LegendImmersive';
+import { Top100Immersive } from './parts/Top100Immersive';
 import { isTop100Achievement } from './_shared/showpieces';
 import type { TrophyItem } from './_shared/normalizeTrophyItem';
 
