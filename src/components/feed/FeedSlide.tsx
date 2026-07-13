@@ -394,7 +394,7 @@ const FullscreenVideoSlot: React.FC<{
     posterUrl: posterSrc || null,
     startPosition,
     active: isActive && !isBorrowSlide,
-    muted: isMuted,
+    audioPolicy: 'session',
     postId: resumeKey,
   });
 
