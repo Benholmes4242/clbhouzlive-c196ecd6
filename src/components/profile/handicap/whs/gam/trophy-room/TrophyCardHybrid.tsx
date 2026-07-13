@@ -19,6 +19,8 @@ import { statusForEarned, statusCopy } from './_shared/statusBadges';
 
 const FONT = "'Geist', -apple-system, sans-serif";
 const OBSIDIAN_EDGE = '#D4A017';
+const EARNED_GOLD = '#F5C842';
+const IN_PROGRESS_BLUE = '#8CA3B8';
 
 function matColor(mat: string): string {
   if (mat === 'obsidian') return OBSIDIAN_EDGE;
@@ -49,7 +51,11 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = 
   const reached = tiered ? item.reachedTier : earned ? 1 : 0;
   const inProgress = tiered && !earned && (item.currentValue ?? 0) > 0;
   const mat = tiered && reached > 0 ? materialForTier(reached) : null;
-  const accent = earned || inProgress ? (mat ? matColor(mat) : '#F7931E') : 'rgba(255,255,255,0.35)';
+  const accent = earned
+    ? (mat ? matColor(mat) : EARNED_GOLD)
+    : inProgress
+      ? IN_PROGRESS_BLUE
+      : 'rgba(255,255,255,0.35)';
 
   // LOSABLE STATUS -- single_figures / scratch only, derived from live index.
   // Gated on milestoneEarned: a user who never earned the badge shows no

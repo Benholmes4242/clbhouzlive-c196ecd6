@@ -18,6 +18,9 @@ import { useFriendsWhoEarnedBadge } from '@/hooks/gam/useFriendsWhoEarnedBadge';
 import { getFirstName } from '@/components/friend-sheet/parts/_shared/formatName';
 import type { TrophyItem } from '../_shared/normalizeTrophyItem';
 
+const EARNED_GOLD = '#F5C842';
+const IN_PROGRESS_BLUE = '#8CA3B8';
+
 interface Props {
   item: Extract<TrophyItem, { kind: 'achievement' }>;
   viewerUserId: string;
