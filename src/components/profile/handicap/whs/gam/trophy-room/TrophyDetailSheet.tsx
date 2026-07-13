@@ -7,6 +7,7 @@ import { LegendBody } from './parts/LegendBody';
 import { DetailFooter } from './parts/DetailFooter';
 import { Top100Body } from './parts/Top100Body';
 import { AchievementImmersive } from './parts/AchievementImmersive';
+import { LegendImmersive } from './parts/LegendImmersive';
 import { isTop100Achievement } from './_shared/showpieces';
 import type { TrophyItem } from './_shared/normalizeTrophyItem';
 
@@ -100,6 +101,16 @@ export const TrophyDetailSheet: React.FC<Props> = ({ items, initialIndex, ownerU
       <AchievementImmersive
         item={current}
         viewerUserId={viewerUserId}
+        onClose={onClose}
+        onShare={handleShare}
+      />
+    );
+  }
+
+  if (current.kind === 'legend') {
+    return (
+      <LegendImmersive
+        item={current}
         onClose={onClose}
         onShare={handleShare}
       />

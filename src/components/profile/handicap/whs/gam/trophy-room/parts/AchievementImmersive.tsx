@@ -7,6 +7,7 @@
  */
 
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { Share2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { renderBadgeIcon } from '../../badgeIcons';
@@ -116,7 +117,7 @@ export const AchievementImmersive: React.FC<Props> = ({ item, viewerUserId, onCl
     e.stopPropagation();
   };
 
-  return (
+  const overlay = (
     <div
       role="dialog"
       aria-label={item.name}
@@ -328,6 +329,8 @@ export const AchievementImmersive: React.FC<Props> = ({ item, viewerUserId, onCl
       </div>
     </div>
   );
+
+  return typeof window !== 'undefined' ? createPortal(overlay, document.body) : null;
 };
 
 export default AchievementImmersive;
