@@ -354,7 +354,7 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = 
               fontSize: 8.5,
               fontWeight: 800,
               letterSpacing: '0.1em',
-              color: '#F7931E',
+              color: EARNED_GOLD,
             }}
             aria-label="Milestone earned"
           >
