@@ -5,6 +5,7 @@ import { useTop100ListProgress, type Top100CourseProgress } from '@/hooks/gam/us
 import { top100BadgeIdToListSlug } from '../_shared/showpieces';
 import { Top100CourseRow } from './Top100CourseRow';
 import { AchievementBody } from './AchievementBody';
+import { MatchRequestSheet } from './MatchRequestSheet';
 import type { TrophyItem } from '../_shared/normalizeTrophyItem';
 
 interface Props {
@@ -40,6 +41,7 @@ export const Top100Body: React.FC<Props> = ({ item, ownerUserId, viewerUserId, o
   }, [rows]);
 
   const [tab, setTab] = useState<Tab>(isFriendView ? 'unplayed' : 'played');
+  const [matchRequest, setMatchRequest] = useState<{ courseId: string; courseName: string } | null>(null);
 
   const handleNavigate = (courseId: string) => {
     onClose();
@@ -167,6 +169,11 @@ export const Top100Body: React.FC<Props> = ({ item, ownerUserId, viewerUserId, o
                 row={row}
                 isFriendView={isFriendView}
                 onNavigate={handleNavigate}
+                onRequestMatch={
+                  isFriendView
+                    ? undefined
+                    : (id, name) => setMatchRequest({ courseId: id, courseName: name })
+                }
               />
             ))}
           </div>
@@ -174,6 +181,14 @@ export const Top100Body: React.FC<Props> = ({ item, ownerUserId, viewerUserId, o
           <EmptyState message="Every course played. The list is complete." />
         )}
       </div>
+
+      {matchRequest && (
+        <MatchRequestSheet
+          courseId={matchRequest.courseId}
+          courseName={matchRequest.courseName}
+          onClose={() => setMatchRequest(null)}
+        />
+      )}
     </div>
   );
 };

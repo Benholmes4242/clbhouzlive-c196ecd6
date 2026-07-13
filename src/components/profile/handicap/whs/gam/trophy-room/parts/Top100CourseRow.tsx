@@ -9,11 +9,16 @@ interface Props {
   isFriendView: boolean;
   /** Called when row tapped — closes the sheet and navigates to course detail */
   onNavigate: (courseId: string) => void;
+  /** Optional: opens the "Played it?" match-request sheet. Only wired for
+   *  unplayed rows in the owner's own view. */
+  onRequestMatch?: (courseId: string, courseName: string) => void;
 }
 
-export const Top100CourseRow: React.FC<Props> = ({ row, isFriendView, onNavigate }) => {
+export const Top100CourseRow: React.FC<Props> = ({ row, isFriendView, onNavigate, onRequestMatch }) => {
   const played = row.is_owner_played;
   const viewerAlsoPlayed = row.is_viewer_played;
+  const showRequestChip = !played && !isFriendView && !!onRequestMatch;
+
 
   return (
     <button
@@ -138,6 +143,33 @@ export const Top100CourseRow: React.FC<Props> = ({ row, isFriendView, onNavigate
         >
           <Check size={12} strokeWidth={3} />
         </div>
+      )}
+
+      {showRequestChip && (
+        <span
+          role="button"
+          tabIndex={0}
+          onClick={(e) => {
+            e.stopPropagation();
+            onRequestMatch!(row.course_id, row.course_name);
+          }}
+          style={{
+            flexShrink: 0,
+            fontSize: 10,
+            fontWeight: 800,
+            color: GAM.AMBER,
+            padding: '4px 9px',
+            borderRadius: 999,
+            border: `1px solid ${GAM.AMBER}66`,
+            background: 'transparent',
+            fontFamily: GAM.FONT_GEIST,
+            letterSpacing: '0.02em',
+            cursor: 'pointer',
+            marginLeft: 4,
+          }}
+        >
+          Played it?
+        </span>
       )}
 
       {isFriendView && viewerAlsoPlayed && (
