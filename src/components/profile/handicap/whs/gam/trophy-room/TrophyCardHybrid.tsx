@@ -34,7 +34,7 @@ interface Props {
 
 export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap }) => {
   if (item.kind !== 'achievement') {
-    return <LegacyTrophyCard item={item} onTap={onTap} />;
+    return <LegendCard item={item} onTap={onTap} />;
   }
 
   const tiered = item.tiers.length > 0;
