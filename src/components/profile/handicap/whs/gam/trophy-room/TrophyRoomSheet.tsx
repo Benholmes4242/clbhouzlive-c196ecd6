@@ -5,7 +5,7 @@ import { GAM } from '../tokens';
 import { gamAchievementsBus } from '../events';
 import { useUserAchievements } from '@/hooks/gam/useUserAchievements';
 import { useUserTopLegends } from '@/hooks/gam/useUserTopLegends';
-import { TrophyCard } from './TrophyCard';
+import { TrophyCardHybrid } from './TrophyCardHybrid';
 import { renderBadgeIcon } from '../badgeIcons';
 import { TrophyDetailSheet } from './TrophyDetailSheet';
 import { normalizeBadge, normalizeLegend, type TrophyItem } from './_shared/normalizeTrophyItem';
@@ -186,7 +186,7 @@ const Grid: React.FC<{
 }> = ({ items, onTap, columns = 3 }) => (
   <div style={{ display: 'grid', gridTemplateColumns: `repeat(${columns}, 1fr)`, gap: 8 }}>
     {items.map((item) => (
-      <TrophyCard key={item.id} item={item} onTap={onTap} />
+      <TrophyCardHybrid key={item.id} item={item} onTap={onTap} />
     ))}
   </div>
 );
