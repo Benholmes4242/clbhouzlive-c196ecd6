@@ -12,6 +12,7 @@ import {
   RARITY_PALETTE,
   type RarityPalette,
 } from '../_shared/rarityPalette';
+import { materialForTier } from '../_shared/levels';
 import { rarityColor } from '@/lib/gam/visuals';
 import { rgbaOf } from '../TrophyCard';
 import type { TrophyItem } from '../_shared/normalizeTrophyItem';
@@ -40,7 +41,11 @@ function paletteFor(item: TrophyItem): RarityPalette {
   const hasProgress = item.earned || (item.currentValue != null && item.currentValue > 0);
   if (!hasProgress) return LOCKED_PALETTE;
   if (isShowpiece(item.badgeId)) return paletteForShowpiece(item.reachedTier, item.badgeId);
-  // One-shot & non-showpiece tiered — use rarity palette.
+  // Forge route: all tiered achievements with reachedTier > 0 tint by current material.
+  if (item.kind === 'achievement' && item.tiers.length > 1 && item.reachedTier > 0) {
+    return paletteForShowpiece(item.reachedTier); // material selected via materialForTier(reachedTier)
+  }
+  // One-shot & binary non-showpiece — use rarity palette.
   return RARITY_PALETTE[item.rarity];
 }
 
