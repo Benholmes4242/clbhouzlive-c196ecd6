@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { Crown, ChevronDown, ChevronRight, type LucideIcon } from 'lucide-react';
 import { GamSheet } from '../../../gam/_shared/GamSheet';
 import { GAM } from '../tokens';
@@ -401,7 +402,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
 
 
   const isLoading = badgesLoading || legendsLoading;
-  const isFriendView = viewerUserId !== undefined && viewerUserId !== userId;
+
 
   const totalAchievements = allAchievements.length;
   const earnedAchCount = earnedAchievements.length;
