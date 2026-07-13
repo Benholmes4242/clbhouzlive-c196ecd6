@@ -14,6 +14,7 @@
 import { useMemo, useRef, useState, useEffect } from 'react';
 import { Search, X } from 'lucide-react';
 import { TourHubShell } from '@/features/tourhub/components';
+import { GlassHeaderPlate } from '@/components/chrome/GlassHeaderPlate';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import {
   AMBER,
