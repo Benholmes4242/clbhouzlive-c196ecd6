@@ -116,6 +116,3 @@ export const useClubhouseStore = create<ClubhouseState>()((set) => ({
     else _tabWarmers.delete(tab);
   },
 }));
-
-  useClubhouseStore.setState({ isMuted: s.isMuted });
-});
