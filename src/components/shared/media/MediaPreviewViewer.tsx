@@ -66,21 +66,13 @@ export function MediaPreviewViewer({
     const el = videoRef.current;
     if (!el) return;
     el.muted = useSessionAudio.getState().isMuted;
-    const p = el.play();
-    Promise.resolve(p).catch(() => {
-      if (!el.muted) return;
-      // already muted attempt failed — nothing else to do
+    Promise.resolve(el.play()).catch(() => {
+      if (!el.muted) {
+        el.muted = true;
+        setShowPill(true);
+        Promise.resolve(el.play()).catch(() => {});
+      }
     });
-    if (!el.muted) {
-      // If the initial attempt above rejected, retry muted with pill.
-      Promise.resolve(el.play()).catch(() => {
-        if (!el.muted) {
-          el.muted = true;
-          setShowPill(true);
-          Promise.resolve(el.play()).catch(() => {});
-        }
-      });
-    }
   }, [item?.id, item?.type]);
 
   // Session store → element sync while open (both directions of change).
