@@ -5,6 +5,7 @@ import { useTop100ListProgress, type Top100CourseProgress } from '@/hooks/gam/us
 import { top100BadgeIdToListSlug } from '../_shared/showpieces';
 import { Top100CourseRow } from './Top100CourseRow';
 import { AchievementBody } from './AchievementBody';
+import { MatchRequestSheet } from './MatchRequestSheet';
 import type { TrophyItem } from '../_shared/normalizeTrophyItem';
 
 interface Props {
