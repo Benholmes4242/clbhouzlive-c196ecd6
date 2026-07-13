@@ -291,7 +291,7 @@ const ThreadV2Page: React.FC = () => {
         style={{
           background: CANVAS,
           paddingTop: 'calc(env(safe-area-inset-top, 0px) + 8px)',
-          paddingBottom: 10,
+          paddingBottom: 12,
           paddingLeft: 6,
           paddingRight: 6,
           borderBottom: `0.5px solid ${HAIRLINE}`,
@@ -423,7 +423,7 @@ const ThreadV2Page: React.FC = () => {
             return (
               <div
                 className="flex flex-col items-center justify-center text-center"
-                style={{ padding: '96px 24px', gap: 14 }}
+                style={{ padding: '80px 24px', gap: 12 }}
               >
                 <div
                   className="thread-empty-squircle"

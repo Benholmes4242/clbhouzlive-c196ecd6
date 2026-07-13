@@ -280,7 +280,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                 flexDirection: 'column',
                 alignItems: 'center',
                 gap: 12,
-                padding: '20px 16px 24px',
+                padding: '16px 16px 24px',
                 borderBottom: `0.5px solid ${HAIRLINE}`,
               }}
             >
@@ -373,7 +373,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
               <div style={{ borderBottom: `0.5px solid ${HAIRLINE}` }}>
                 <div
                   style={{
-                    padding: '14px 16px 8px',
+                    padding: '16px 16px 12px',
                     fontSize: 11,
                     fontWeight: 600,
                     letterSpacing: 0.6,
@@ -392,7 +392,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                       display: 'flex',
                       alignItems: 'center',
                       gap: 12,
-                      padding: '10px 16px',
+                      padding: '12px 16px',
                       width: '100%',
                       background: 'transparent',
                       border: 'none',
@@ -436,7 +436,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                         display: 'flex',
                         alignItems: 'center',
                         gap: 12,
-                        padding: '8px 16px',
+                        padding: '12px 16px',
                         position: 'relative',
                       }}
                     >
@@ -807,7 +807,7 @@ const AddPeopleSheet: React.FC<AddPeopleSheetProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 12,
-                padding: '10px 16px',
+                padding: '12px 16px',
                 width: '100%',
                 background: 'transparent',
                 border: 'none',

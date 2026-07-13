@@ -176,7 +176,7 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
               display: 'flex',
               gap: 8,
               flexWrap: 'wrap',
-              padding: '10px 16px 4px',
+              padding: '12px 16px 4px',
             }}
           >
             {selected.map((s) => (
@@ -206,7 +206,7 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
         )}
 
         {/* Search input */}
-        <div style={{ padding: '10px 16px' }}>
+        <div style={{ padding: '12px 16px' }}>
           <input
             type="text"
             value={query}
@@ -215,7 +215,7 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
             autoFocus
             style={{
               width: '100%',
-              padding: '10px 14px',
+              padding: '12px 14px',
               borderRadius: 12,
               background: '#FFFFFF',
               border: `0.5px solid ${HAIRLINE}`,
@@ -228,7 +228,7 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
 
         {/* Group title (only when 2+ selected) */}
         {selected.length >= 2 && (
-          <div style={{ padding: '0 16px 10px' }}>
+          <div style={{ padding: '0 16px 12px' }}>
             <input
               type="text"
               value={title}
@@ -236,7 +236,7 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
               placeholder="Group name (optional)"
               style={{
                 width: '100%',
-                padding: '10px 14px',
+                padding: '12px 14px',
                 borderRadius: 12,
                 background: '#FFFFFF',
                 border: `0.5px solid ${HAIRLINE}`,
@@ -257,15 +257,15 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
           }}
         >
           {debounced.trim().length === 0 ? (
-            <div style={{ padding: '24px 16px', color: SUB, fontSize: 14, textAlign: 'center' }}>
+            <div style={{ padding: '32px 16px', color: SUB, fontSize: 14, textAlign: 'center' }}>
               Search for someone to message.
             </div>
           ) : isLoading ? (
-            <div style={{ padding: '24px 16px', color: SUB, fontSize: 14, textAlign: 'center' }}>
+            <div style={{ padding: '32px 16px', color: SUB, fontSize: 14, textAlign: 'center' }}>
               Searching…
             </div>
           ) : candidates.length === 0 ? (
-            <div style={{ padding: '24px 16px', color: SUB, fontSize: 14, textAlign: 'center' }}>
+            <div style={{ padding: '32px 16px', color: SUB, fontSize: 14, textAlign: 'center' }}>
               No results.
             </div>
           ) : (
@@ -346,8 +346,8 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 9,
-                padding: '10px 12px',
+                gap: 8,
+                padding: '12px',
                 background: 'rgba(247,147,30,0.08)',
                 borderRadius: 11,
               }}
@@ -381,7 +381,7 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
                 color: '#FFFFFF',
                 fontSize: 14,
                 fontWeight: 500,
-                padding: '10px 18px',
+                padding: '12px 16px',
                 borderRadius: 999,
                 border: 'none',
                 opacity: selected.length !== 1 || busy ? 0.4 : 1,
@@ -399,7 +399,7 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
                 color: '#FFFFFF',
                 fontSize: 14,
                 fontWeight: 500,
-                padding: '10px 18px',
+                padding: '12px 16px',
                 borderRadius: 999,
                 border: 'none',
                 opacity: busy ? 0.4 : 1,
