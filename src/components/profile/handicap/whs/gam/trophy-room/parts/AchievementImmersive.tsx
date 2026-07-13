@@ -173,7 +173,7 @@ export const AchievementImmersive: React.FC<Props> = ({ item, viewerUserId, curr
           textAlign: 'center',
         }}
       >
-        {/* Glyph */}
+        {/* Glyph -- dims when status is lost */}
         <div
           style={{
             width: 96,
@@ -181,12 +181,59 @@ export const AchievementImmersive: React.FC<Props> = ({ item, viewerUserId, curr
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: materialColor,
-            filter: `drop-shadow(0 0 24px ${materialColor}66) drop-shadow(0 0 8px ${materialColor}88)`,
+            color: glyphColor,
+            filter: glyphFilter,
+            opacity: sCopy?.dimmed ? 0.55 : 1,
           }}
         >
-          {renderBadgeIcon(item.iconKey, 96, materialColor, 1.4)}
+          {renderBadgeIcon(item.iconKey, 96, glyphColor, 1.4)}
         </div>
+
+        {/* Status chip (at_risk / lost only). Milestone-kept-but-status-lost
+            also renders a persistent "EARNED" tick alongside, so the medal
+            record is never invisible. */}
+        {sCopy && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
+            <span
+              style={{
+                fontSize: 10.5,
+                fontWeight: 800,
+                letterSpacing: '0.12em',
+                color: sCopy.chipColor,
+                background: sCopy.chipBg,
+                border: `1px solid ${sCopy.chipBorder}`,
+                borderRadius: 999,
+                padding: '4px 10px',
+                textTransform: 'uppercase',
+                animation: sCopy.pulse ? 'gamPulse 1.8s ease-in-out infinite' : undefined,
+              }}
+            >
+              {sCopy.chipLabel}
+            </span>
+            {milestoneKeptStatusLost && (
+              <span
+                aria-label="Milestone earned"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  fontSize: 10.5,
+                  fontWeight: 800,
+                  letterSpacing: '0.12em',
+                  color: '#F7931E',
+                  background: 'rgba(247,147,30,0.14)',
+                  border: '1px solid rgba(247,147,30,0.45)',
+                  borderRadius: 999,
+                  padding: '4px 10px',
+                  textTransform: 'uppercase',
+                }}
+              >
+                <span style={{ fontSize: 11 }}>{'\u2713'}</span>
+                Earned
+              </span>
+            )}
+          </div>
+        )}
 
         {/* Counter (tiered only) */}
         {isTiered && (
@@ -216,17 +263,18 @@ export const AchievementImmersive: React.FC<Props> = ({ item, viewerUserId, curr
           {item.name}
         </div>
 
-        {/* Summary */}
+        {/* Summary -- status subline overrides when at_risk / lost. */}
         <div
           style={{
             fontSize: 13,
-            color: 'rgba(255,255,255,0.55)',
+            color: sCopy ? sCopy.chipColor : 'rgba(255,255,255,0.55)',
             lineHeight: 1.4,
             ...GAM.TABULAR,
           }}
         >
-          {summary}
+          {sCopy ? sCopy.subline : summary}
         </div>
+
 
         {/* Gem ladder (tiered) */}
         {isTiered && (
