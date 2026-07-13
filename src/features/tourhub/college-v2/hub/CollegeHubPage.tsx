@@ -64,6 +64,8 @@ export function CollegeHubPage() {
 
   return (
     <TourHubShell showBack={false}>
+      {/* Always-on glass plate (island 70px). */}
+      <GlassHeaderPlate heightPx={70} />
       <div
         className="pb-22"
         style={{
@@ -101,29 +103,6 @@ export function CollegeHubPage() {
                 {year}
               </h1>
             </div>
-            <button
-              type="button"
-              onClick={() => setSearchExpanded((v) => !v)}
-              aria-label="Search colleges"
-              style={{
-                width: 28,
-                height: 28,
-                borderRadius: 999,
-                background: SURFACE,
-                border: `0.5px solid ${HAIRLINE_INK_10}`,
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                flexShrink: 0,
-              }}
-            >
-              {searchExpanded ? (
-                <X size={14} color={INK} strokeWidth={2.4} />
-              ) : (
-                <Search size={13} color={INK} strokeWidth={2.4} />
-              )}
-            </button>
           </div>
 
           <div
@@ -138,58 +117,74 @@ export function CollegeHubPage() {
           >
             {editorialLine}
           </div>
-
-          {searchExpanded && (
-            <div style={{ marginTop: 12, position: 'relative' }}>
-              <Search
-                size={13}
-                color={AMBER}
-                strokeWidth={2.5}
-                style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)' }}
-              />
-              <input
-                ref={searchInputRef}
-                type="text"
-                placeholder="Search colleges…"
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-                style={{
-                  width: '100%',
-                  height: 34,
-                  paddingLeft: 30,
-                  paddingRight: 30,
-                  borderRadius: 8,
-                  background: SURFACE,
-                  border: `1px solid ${HAIRLINE_INK_10}`,
-                  fontFamily: FONT,
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: INK,
-                  outline: 'none',
-                }}
-              />
-              {searchValue && (
-                <button
-                  type="button"
-                  aria-label="Clear search"
-                  onClick={() => setSearchValue('')}
-                  style={{
-                    position: 'absolute',
-                    right: 8,
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'transparent',
-                    border: 'none',
-                    padding: 4,
-                    cursor: 'pointer',
-                  }}
-                >
-                  <X size={12} color={INK_MUTE} />
-                </button>
-              )}
-            </div>
-          )}
         </header>
+
+        {/* Sticky glass search row — locks under island band; filters the feed. */}
+        <div
+          style={{
+            position: 'sticky',
+            top: 'calc(var(--sat, 0px) + 69px)',
+            zIndex: 10,
+            background: 'rgba(248,250,252,0.72)',
+            backdropFilter: 'blur(14px)',
+            WebkitBackdropFilter: 'blur(14px)',
+            borderBottom: '1px solid rgba(0,0,0,0.07)',
+            padding: '8px 16px 10px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+          }}
+        >
+          <div style={{ position: 'relative', flex: 1 }}>
+            <Search
+              size={13}
+              color={AMBER}
+              strokeWidth={2.5}
+              style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)' }}
+            />
+            <input
+              ref={searchInputRef}
+              type="text"
+              placeholder="Search colleges…"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              onFocus={() => setSearchExpanded(true)}
+              style={{
+                width: '100%',
+                height: 34,
+                paddingLeft: 30,
+                paddingRight: 30,
+                borderRadius: 8,
+                background: SURFACE,
+                border: `1px solid ${HAIRLINE_INK_10}`,
+                fontFamily: FONT,
+                fontSize: 13,
+                fontWeight: 600,
+                color: INK,
+                outline: 'none',
+              }}
+            />
+            {searchValue && (
+              <button
+                type="button"
+                aria-label="Clear search"
+                onClick={() => setSearchValue('')}
+                style={{
+                  position: 'absolute',
+                  right: 8,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'transparent',
+                  border: 'none',
+                  padding: 4,
+                  cursor: 'pointer',
+                }}
+              >
+                <X size={12} color={INK_MUTE} />
+              </button>
+            )}
+          </div>
+        </div>
 
         {/* Feed */}
         <div style={{ background: SURFACE }}>
