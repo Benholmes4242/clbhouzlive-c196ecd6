@@ -220,6 +220,7 @@ const Top100CoursesHubPanel = () => {
           role="prime"
           kicker="TOP 100"
           title="The world's best"
+          cutLine={false}
         />
         {crossListProgress && (
           <p
