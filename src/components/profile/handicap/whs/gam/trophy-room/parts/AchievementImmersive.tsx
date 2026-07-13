@@ -190,7 +190,7 @@ export const AchievementImmersive: React.FC<Props> = ({ item, viewerUserId, onCl
               ...GAM.TABULAR,
             }}
           >
-            {currentValue.toLocaleString()}
+            {counterText}
           </div>
         )}
 
