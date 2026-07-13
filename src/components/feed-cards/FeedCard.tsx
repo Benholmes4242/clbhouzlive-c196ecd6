@@ -66,6 +66,12 @@ export function FeedCard({
    * consumers (HubMixedGrid, ClipsWall, ExploreGrid) are pixel-unchanged.
    */
   hideCourseAttribution?: boolean;
+  /**
+   * When true, the top-left Clip/Video format badge is not rendered.
+   * Use on pages whose context already tells the user the format
+   * (e.g. the dedicated Clips subpage). Default false.
+   */
+  hideFormatBadge?: boolean;
 }) {
   const rootRef = useRef<HTMLElement>(null);
   const isClip = row.derived_format === 'clip';
