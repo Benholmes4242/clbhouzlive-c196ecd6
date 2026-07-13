@@ -1,4 +1,3 @@
-import { WHITE_ALPHA_55 } from './tokens';
 /**
  * Canonical round-level score-to-par colour helper.
  *
@@ -7,21 +6,25 @@ import { WHITE_ALPHA_55 } from './tokens';
  * Convention (US leaderboard convention — aligned across hero, leaderboard,
  * schedule, and player history):
  * - Under-par (score < 0) → RED   (good in golf; deep on light, bright on dark)
- * - Over-par  (score > 0) → DARK  (ink on light, pale-white on dark)
+ * - Over-par  (score > 0) → INK / muted white on dark
  * - Even par / null       → neutral muted (ink-faint on light, white-alpha on dark)
  *
  * Leader emphasis variant: replaces under-par red with maximum-contrast monochrome
  * (white on dark, ink on light) for the #1 leader row.
  *
- * For HOLE-BY-HOLE scoring (eagle/birdie/par/bogey/etc.) see utils/scoreColors.ts —
- * that's a different semantic surface.
+ * For HOLE-BY-HOLE scoring (eagle/birdie/par/bogey/etc.) see the SC_* World
+ * Feed tokens in features/courses/components/holes/_constants — that's a
+ * different semantic surface (per-hole chips, not round to-par colour).
  */
 
 import {
   INK,
-  INK_FAINT,
-  SCORE_OVER_PAR_LIGHT,
-  SCORE_OVER_PAR_DARK,
+  TOPAR_UNDER_LIGHT,
+  TOPAR_UNDER_DARK,
+  TOPAR_OVER_LIGHT,
+  TOPAR_OVER_DARK,
+  TOPAR_EVEN_LIGHT,
+  TOPAR_EVEN_DARK,
 } from './tokens';
 
 export type ScoreTheme = 'light' | 'dark';
@@ -40,15 +43,13 @@ export function getScoreColor(
   emphasis: ScoreEmphasis = 'standard',
 ): string {
   if (score == null || score === 0) {
-    return theme === 'light' ? INK_FAINT : WHITE_ALPHA_55;
+    return theme === 'light' ? TOPAR_EVEN_LIGHT : TOPAR_EVEN_DARK;
   }
   if (score < 0) {
     if (emphasis === 'leader') {
       return theme === 'light' ? INK : '#FFFFFF';
     }
-    // under-par now RED (aligns with leaderboard "good = red")
-    return theme === 'light' ? SCORE_OVER_PAR_LIGHT : SCORE_OVER_PAR_DARK;
+    return theme === 'light' ? TOPAR_UNDER_LIGHT : TOPAR_UNDER_DARK;
   }
-  // over-par now DARK
-  return theme === 'light' ? INK : WHITE_ALPHA_55;
+  return theme === 'light' ? TOPAR_OVER_LIGHT : TOPAR_OVER_DARK;
 }
