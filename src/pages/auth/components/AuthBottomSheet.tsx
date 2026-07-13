@@ -68,7 +68,7 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
             : "translate-y-full opacity-0"
         )}
         style={{
-          background: '#1B1E27',
+          background: 'rgba(21,23,31,0.92)',
           backdropFilter: 'blur(28px)',
           WebkitBackdropFilter: 'blur(28px)',
           borderTop: '1px solid rgba(255,255,255,0.06)',
@@ -81,7 +81,7 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
         </div>
         
         {/* Header with close button */}
-        <div className="flex items-start justify-between px-6 pb-3">
+        <div className="flex items-start justify-between px-6 pb-2">
           <div className="flex-1 pr-4">
             {title && (
               <div>
@@ -95,7 +95,6 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
                 >
                   {title}
                 </h2>
-                <div style={{ width: 28, height: 3, borderRadius: 99, background: '#F7931E', marginTop: 12 }} />
               </div>
             )}
             {subtitle && (
