@@ -7,6 +7,8 @@ import DiscoverWhsMasthead from './DiscoverWhsMasthead';
 import { CircleActivityStrip } from './CircleActivityStrip';
 import { AlmanacRegionTabs, FeatTierRail, AlmanacHead, REGION_TABS } from './AlmanacSections';
 import { LegendaryFeatHero } from './LegendaryFeatHero';
+import { WhereYoudRank } from './WhereYoudRank';
+import { ToughestCoursesStrip } from './ToughestCoursesStrip';
 import { useRegionFeats } from './hooks/useRegionFeats';
 
 import ExploreGrid from './ExploreGrid';
@@ -70,8 +72,19 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
       <LegendarySection region={activeRegion} />
 
       <FeatTierRail region={activeRegion} tier="records" title="Course records" />
+      <FeatTierRail region={activeRegion} tier="records" title="Course records" />
+
+      {/* Rhythm break 1 - personal (silent if not signed in / no WHS / no picks) */}
+      <WhereYoudRank userId={userId} />
+
       <FeatTierRail region={activeRegion} tier="eagles" title="Eagles" variant="compact" />
+
+      {/* Rhythm break 2 - platform-wide toughest courses */}
+      <ToughestCoursesStrip userId={userId} />
+
       <FeatTierRail region={activeRegion} tier="birdie_hauls" title="Birdie hauls" variant="list" />
+
+
 
 
       <div
