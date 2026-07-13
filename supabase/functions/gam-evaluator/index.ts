@@ -1299,6 +1299,8 @@ function dedupKey(type: string, userId: string, payload: any): string {
     case "streak_broken": return `streak_broken:${userId}:${payload.streak_type}:${new Date().toISOString().slice(0, 10)}`;
     case "rival_played": return `rival:${userId}:${payload.rival_user_id}:${payload.course_id}:${payload.play_date}`;
     case "streak_freeze_applied": return `streak_freeze:${userId}:${payload.streak_type}:${new Date().toISOString().slice(0, 10)}`;
+    case "status_at_risk": return `status_risk:${userId}:${payload.badge_id}`;
+    case "status_reclaimed": return `status_reclaimed:${userId}:${payload.badge_id}:${new Date().toISOString().slice(0, 10)}`;
     default: return `${type}:${userId}`;
   }
 }
