@@ -99,7 +99,7 @@ const LEGEND_PALETTE_SHIM: RarityPalette = {
   metaColor: GAM.AMBER,
 };
 
-export function deriveDetailView(item: TrophyItem): DetailView {
+export function deriveDetailView(item: TrophyItem, currentIndex: number | null = null): DetailView {
   if (item.kind === 'legend') {
     const label = LEGEND_CATEGORY_LABEL[item.category] ?? item.name;
     let heldSince = '';
@@ -152,6 +152,12 @@ export function deriveDetailView(item: TrophyItem): DetailView {
       ? `${remaining.toLocaleString()} more until your next medal`
       : null;
 
+  const status = statusFor(item.badgeId, currentIndex);
+  const copy = status && status !== 'held' && currentIndex != null
+    ? statusCopy(item.badgeId, status, currentIndex)
+    : null;
+  const milestoneKeptStatusLost = status === 'lost' && earnedDerived;
+
   return {
     kind: 'achievement',
     isTiered,
@@ -165,5 +171,9 @@ export function deriveDetailView(item: TrophyItem): DetailView {
     progressPct,
     counterText,
     progressLabel,
+    status,
+    statusCopy: copy,
+    milestoneKeptStatusLost,
   };
 }
+
