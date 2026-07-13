@@ -160,6 +160,21 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
             </span>
           )}
           {hero.list_label && (
+            <div
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                bottom: 0,
+                height: 28,
+                background:
+                  'linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,0.72))',
+                pointerEvents: 'none',
+              }}
+            />
+          )}
+          {hero.list_label && (
             <span
               style={{
                 position: 'absolute',
