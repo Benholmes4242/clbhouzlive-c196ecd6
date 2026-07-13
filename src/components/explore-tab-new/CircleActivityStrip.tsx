@@ -362,18 +362,6 @@ function CircleActivityCard({ row, onTap }: CardProps) {
         >
           {friend}
         </div>
-        <span
-          style={{
-            fontSize: 9.5,
-            fontWeight: 800,
-            letterSpacing: '0.12em',
-            color: accent,
-            flexShrink: 0,
-            lineHeight: 1,
-          }}
-        >
-          WHS
-        </span>
       </div>
     </button>
   );
