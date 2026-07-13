@@ -53,6 +53,7 @@ const ScoreRing: React.FC<{ score: number; size?: number }> = ({ score, size = 5
   const circ = 2 * Math.PI * r;
   const fill = circ * (Math.max(0, Math.min(10, score)) / 10);
   const gradientId = `scoreGradient-${Math.random().toString(36).slice(2)}`;
+  const isExceptional = getRatingTier(score) === 'EXCEPTIONAL';
   return (
     <div style={{ position: 'relative', width: size, height: size, margin: '0 auto' }}>
       <svg
@@ -65,6 +66,16 @@ const ScoreRing: React.FC<{ score: number; size?: number }> = ({ score, size = 5
           <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor={from} />
             <stop offset="100%" stopColor={to} />
+            {isExceptional && !prefersReducedMotion && (
+              <animateTransform
+                attributeName="gradientTransform"
+                type="rotate"
+                from="0 0.5 0.5"
+                to="360 0.5 0.5"
+                dur="6s"
+                repeatCount="indefinite"
+              />
+            )}
           </linearGradient>
         </defs>
         <circle
