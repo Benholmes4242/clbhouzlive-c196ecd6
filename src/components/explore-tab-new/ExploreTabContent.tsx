@@ -59,14 +59,9 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
       {/* Friends rail — region-INDEPENDENT, always visible */}
       <CircleActivityStrip userId={userId} />
 
-      {/* Zone seam: friends → register tabs */}
-      <div
-        style={{
-          marginTop: 16,
-          borderTop: '1px solid rgba(15,23,42,0.06)',
-          paddingTop: 16,
-        }}
-      />
+      {/* Spacer between friends rail and region tabs */}
+      <div style={{ height: 16 }} />
+
 
       {/* Region tabs — shared control driving tiers and grid */}
       <AlmanacRegionTabs region={activeRegion} onRegionChange={handleRegionChange} />
