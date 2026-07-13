@@ -125,7 +125,10 @@ export const AchievementImmersive: React.FC<Props> = ({ item, viewerUserId, onCl
       style={{
         position: 'fixed',
         inset: 0,
-        zIndex: 260,
+        // Must clear: BottomSheet surface (~1401, from src/components/ui/BottomSheet.tsx),
+        // Z.sheet (12003), Z.toast (12000), and Z.header (1000, ChromeIsland).
+        // Kept below Z.logHud (13000) so the perf debug pill still overlays.
+        zIndex: 12500,
         background: `radial-gradient(ellipse 120% 90% at 50% 16%, rgba(${rgb},0.12) 0%, rgba(${rgb},0.04) 32%, #0A0B0D 62%), #0A0B0D`,
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
