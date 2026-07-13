@@ -12,11 +12,9 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 import { X, Share2 } from 'lucide-react';
-import { format } from 'date-fns';
 import { renderBadgeIcon } from '../../badgeIcons';
 import { GAM } from '../../tokens';
-import { paletteFor } from './DetailHero';
-import { materialNameForTier } from '../_shared/rarityPalette';
+import { deriveDetailView } from '../_shared/deriveDetailView';
 import { GemLadder } from './GemLadder';
 import { Top100Body } from './Top100Body';
 import type { TrophyItem } from '../_shared/normalizeTrophyItem';
@@ -45,36 +43,16 @@ export const Top100Immersive: React.FC<Props> = ({
   onClose,
   onShare,
 }) => {
-  const palette = paletteFor(item);
-  const materialColor = palette.color;
+  const view = deriveDetailView(item);
+  if (view.kind !== 'achievement') return null;
+  const { isTiered, materialColor, summaryLine, counterText, progressPct, nextThreshold: next, remaining, earnedDerived } = view;
   const rgb = hexToRgb(materialColor.startsWith('#') ? materialColor : '#94A3B8');
 
-  const isTiered = item.tiers.length > 1;
-  const earnedTiers = item.tiers.filter((t) => t.earned).length;
-  const totalTiers = item.tiers.length;
-  const materialName = isTiered ? materialNameForTier(item.reachedTier) : '';
-  const currentValue = item.currentValue ?? 0;
-  const next = item.nextThreshold;
-  const remaining = next != null ? Math.max(0, next - currentValue) : null;
-  const progressPct = next != null ? Math.min(100, Math.round((currentValue / Math.max(1, next)) * 100)) : 0;
+  // earnedDerived normalises stale rows (reachedTier 0, count 0) to unearned
+  // so AchievementBody's progress module renders consistently across regions.
+  const displayItem = { ...item, earned: earnedDerived };
 
-  // Derive the earned flag for tiered badges from live tier state so that a
-  // stale row (reachedTier 0, count 0) behaves exactly like an unearned badge.
-  // This mirrors TrophyCardHybrid (FIX-8) and keeps AchievementBody's progress
-  // module from flipping on/off between regions with the same live tier state.
-  const displayEarned = isTiered ? item.reachedTier > 0 : item.earned;
-  const displayItem = { ...item, earned: displayEarned };
-
-  const summary = (() => {
-    if (isTiered) {
-      const base = `${earnedTiers} of ${totalTiers} medals earned`;
-      return item.reachedTier > 0 ? `${base} · ${materialName}` : base;
-    }
-    if (item.earned && item.earnedAt) {
-      return `Earned ${format(new Date(item.earnedAt), 'MMM d, yyyy')}`;
-    }
-    return item.description;
-  })();
+  const summary = summaryLine ?? item.description;
 
   const stop = (e: React.MouseEvent | React.TouchEvent) => e.stopPropagation();
 
@@ -178,7 +156,7 @@ export const Top100Immersive: React.FC<Props> = ({
               ...GAM.TABULAR,
             }}
           >
-            {currentValue.toLocaleString()}
+            {counterText}
           </div>
 
           <div

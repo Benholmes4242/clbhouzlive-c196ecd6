@@ -9,12 +9,10 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 import { Share2 } from 'lucide-react';
-import { format } from 'date-fns';
 import { renderBadgeIcon } from '../../badgeIcons';
 import { GAM } from '../../tokens';
-import { paletteFor } from './DetailHero';
-import { materialNameForTier } from '../_shared/rarityPalette';
 import { SHOWPIECE_LOCKED_HINT } from '../_shared/showpieces';
+import { deriveDetailView } from '../_shared/deriveDetailView';
 import { GemLadder } from './GemLadder';
 import { useFriendsWhoEarnedBadge } from '@/hooks/gam/useFriendsWhoEarnedBadge';
 import { getFirstName } from '@/components/friend-sheet/parts/_shared/formatName';
@@ -78,29 +76,12 @@ const FriendAvatar: React.FC<{ name: string; url: string | null; size: number }>
 };
 
 export const AchievementImmersive: React.FC<Props> = ({ item, viewerUserId, onClose, onShare }) => {
-  const palette = paletteFor(item);
-  const materialColor = palette.color;
+  const view = deriveDetailView(item);
+  if (view.kind !== 'achievement') return null;
+  const { isTiered, materialColor, summaryLine, counterText, progressPct, progressLabel, nextThreshold: next, remaining } = view;
   const rgb = hexToRgb(materialColor.startsWith('#') ? materialColor : '#94A3B8');
 
-  const isTiered = item.tiers.length > 1;
-  const earnedTiers = item.tiers.filter((t) => t.earned).length;
-  const totalTiers = item.tiers.length;
-  const materialName = isTiered ? materialNameForTier(item.reachedTier) : '';
-  const currentValue = item.currentValue ?? 0;
-  const next = item.nextThreshold;
-  const remaining = next != null ? Math.max(0, next - currentValue) : null;
-  const progressPct = next != null ? Math.min(100, Math.round((currentValue / Math.max(1, next)) * 100)) : 0;
-
-  const summary = (() => {
-    if (isTiered) {
-      const base = `${earnedTiers} of ${totalTiers} medals earned`;
-      return item.reachedTier > 0 ? `${base} · ${materialName}` : base;
-    }
-    if (item.earned && item.earnedAt) {
-      return `Earned ${format(new Date(item.earnedAt), 'MMM d, yyyy')}`;
-    }
-    return SHOWPIECE_LOCKED_HINT[item.badgeId] ?? item.description;
-  })();
+  const summary = summaryLine ?? (SHOWPIECE_LOCKED_HINT[item.badgeId] ?? item.description);
 
   const friends = useFriendsWhoEarnedBadge(item.badgeId, viewerUserId, 5);
   const friendRows = friends.data ?? [];
@@ -209,7 +190,7 @@ export const AchievementImmersive: React.FC<Props> = ({ item, viewerUserId, onCl
               ...GAM.TABULAR,
             }}
           >
-            {currentValue.toLocaleString()}
+            {counterText}
           </div>
         )}
 
