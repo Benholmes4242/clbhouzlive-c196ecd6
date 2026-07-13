@@ -117,7 +117,6 @@ export const AchievementImmersive: React.FC<Props> = ({ item, viewerUserId, onCl
     e.stopPropagation();
   };
 
-  return (
   const overlay = (
     <div
       role="dialog"
