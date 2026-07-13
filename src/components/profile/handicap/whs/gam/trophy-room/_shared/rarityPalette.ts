@@ -2,6 +2,25 @@ import { rarityColor, rarityColorSoft } from '@/lib/gam/visuals';
 import { RARITY_DARK } from '../../tokens';
 import type { BadgeRarity } from '@/lib/gam/types';
 
+// rgba helper
+// Accepts '#RRGGBB' or 'rgb[a](r,g,b[,a])'. Applying a new alpha to an
+// rgba() input REPLACES its alpha - this prevents high-alpha palette
+// entries (e.g. common='rgba(148,163,184,0.6)') from leaking as a solid
+// light slab when passed through a "wash" stop.
+export function rgbaOf(input: string, a: number): string {
+  if (!input) return input;
+  if (input.startsWith('#')) {
+    const h = input.replace('#', '');
+    const r = parseInt(h.slice(0, 2), 16);
+    const g = parseInt(h.slice(2, 4), 16);
+    const b = parseInt(h.slice(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, ${a})`;
+  }
+  const m = input.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
+  if (m) return `rgba(${m[1]}, ${m[2]}, ${m[3]}, ${a})`;
+  return input;
+}
+
 /**
  * THE FORGE — single source of truth for material hues used on tiered cards.
  * Obsidian is a treatment (black-glass + gold edge), not a hue — it uses
