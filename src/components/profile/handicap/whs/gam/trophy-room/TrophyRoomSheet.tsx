@@ -5,6 +5,7 @@ import { GAM } from '../tokens';
 import { gamAchievementsBus } from '../events';
 import { useUserAchievements } from '@/hooks/gam/useUserAchievements';
 import { useUserTopLegends } from '@/hooks/gam/useUserTopLegends';
+import { useUserProfile } from '@/hooks/useUserProfile';
 import { TrophyCardHybrid } from './TrophyCardHybrid';
 import { renderBadgeIcon } from '../badgeIcons';
 import { TrophyDetailSheet } from './TrophyDetailSheet';
