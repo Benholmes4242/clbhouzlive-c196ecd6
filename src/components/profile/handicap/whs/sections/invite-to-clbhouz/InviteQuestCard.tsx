@@ -41,11 +41,11 @@ export const InviteQuestCard: React.FC<Props> = ({ sentCount, onClick }) => {
       <div
         {...tappableProps}
         style={{
-          marginTop: 10,
+          marginTop: 12,
           borderRadius: 20,
           overflow: 'hidden',
           background: 'linear-gradient(135deg, #1a3c2a 0%, #0f172a 100%)',
-          padding: 18,
+          padding: 16,
           position: 'relative',
           fontFamily: FONT,
           cursor,
@@ -73,7 +73,7 @@ export const InviteQuestCard: React.FC<Props> = ({ sentCount, onClick }) => {
         </div>
 
         {/* Rolling progress to the next milestone */}
-        <div style={{ position: 'relative', marginTop: 14 }}>
+        <div style={{ position: 'relative', marginTop: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
             <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.7)' }}>
               {sentCount} invited · next at {nextMark}
@@ -107,12 +107,12 @@ export const InviteQuestCard: React.FC<Props> = ({ sentCount, onClick }) => {
     <div
       {...tappableProps}
       style={{
-        marginTop: 10,
+        marginTop: 12,
         borderRadius: 20,
         overflow: 'hidden',
         background: 'var(--hcp-bg-1)',
         border: '1px solid var(--hcp-line-2)',
-        padding: 18,
+        padding: 16,
         fontFamily: FONT,
         cursor,
       }}

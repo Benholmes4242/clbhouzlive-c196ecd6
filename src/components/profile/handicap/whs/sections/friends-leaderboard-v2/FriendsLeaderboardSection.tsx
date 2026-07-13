@@ -154,7 +154,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
             style={{
               display: 'flex',
               alignItems: 'center',
-              padding: '10px 16px 8px',
+              padding: '12px 16px 8px',
               background: 'var(--hcp-bg-2)',
               borderTop: '1px solid var(--hcp-line-2)',
             }}
@@ -235,7 +235,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
               justifyContent: 'center',
               gap: 6,
               width: '100%',
-              padding: '13px 16px',
+              padding: '12px 16px',
               background: 'var(--hcp-bg-1)',
               border: 'none',
               borderTop: '1px solid var(--hcp-line-2)',
@@ -258,7 +258,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
         <>
           {showInactive ? (
             <>
-              <div style={{ padding: '16px 20px 8px' }}>
+              <div style={{ padding: '16px 16px 8px' }}>
                 <p style={LABEL_STYLE}>INACTIVE · {cohorts.totalInactive}</p>
               </div>
               {cohorts.inactive.map((entry) => {
@@ -287,7 +287,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
                 justifyContent: 'center',
                 gap: 5,
                 width: 'calc(100% - 40px)',
-                margin: '4px 20px 16px',
+                margin: '4px 16px 16px',
                 padding: '8px 16px',
                 background: 'transparent',
                 border: 'none',
