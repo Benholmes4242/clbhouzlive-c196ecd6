@@ -192,10 +192,11 @@ const Grid: React.FC<{
   items: TrophyItem[];
   onTap: (item: TrophyItem) => void;
   columns?: number;
-}> = ({ items, onTap, columns = 3 }) => (
+  currentIndex?: number | null;
+}> = ({ items, onTap, columns = 3, currentIndex = null }) => (
   <div style={{ display: 'grid', gridTemplateColumns: `repeat(${columns}, 1fr)`, gap: 8 }}>
     {items.map((item) => (
-      <TrophyCardHybrid key={item.id} item={item} onTap={onTap} />
+      <TrophyCardHybrid key={item.id} item={item} onTap={onTap} currentIndex={currentIndex} />
     ))}
   </div>
 );
