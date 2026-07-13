@@ -151,6 +151,37 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = 
         {renderBadgeIcon(item.iconKey, 92, earned || inProgress ? accent : '#FFFFFF', 1.5)}
       </div>
 
+      {/* one-shot sheen for newly-earned badges (isNew) */}
+      {item.isNew && (
+        <div
+          aria-hidden
+          className="trophy-sheen-layer"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            overflow: 'hidden',
+            pointerEvents: 'none',
+            borderRadius: 16,
+            zIndex: 2,
+          }}
+        >
+          <div
+            style={{
+              position: 'absolute',
+              top: '-20%',
+              bottom: '-20%',
+              left: 0,
+              width: '45%',
+              background:
+                'linear-gradient(115deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0) 100%)',
+              transform: 'translateX(-110%) skewX(-18deg)',
+              animation: 'trophySheen 1.4s ease-out 1 both',
+              animationDelay: '120ms',
+            }}
+          />
+        </div>
+      )}
+
       {/* top row: icon chip (tiered only) + tier chip (status chip overrides when present) */}
       <div
         style={{
