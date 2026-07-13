@@ -675,7 +675,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                 ))}
               </div>
               {/* Category skeleton — 3-up matches every other section. */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginTop: 24 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginTop: 32 }}>
                 {Array.from({ length: 6 }).map((_, i) => (
                   <div
                     key={`sk-cat-${i}`}
