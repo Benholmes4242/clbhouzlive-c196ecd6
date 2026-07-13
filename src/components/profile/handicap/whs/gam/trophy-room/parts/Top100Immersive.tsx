@@ -156,7 +156,7 @@ export const Top100Immersive: React.FC<Props> = ({
               ...GAM.TABULAR,
             }}
           >
-            {currentValue.toLocaleString()}
+            {counterText}
           </div>
 
           <div
