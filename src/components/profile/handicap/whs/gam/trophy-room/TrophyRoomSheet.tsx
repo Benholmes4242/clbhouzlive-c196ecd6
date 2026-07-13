@@ -309,6 +309,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
   useEffect(() => gamAchievementsBus.subscribe(() => setOpen(true)), []);
 
   const effectiveViewerId = viewerUserId ?? userId;
+  const isFriendView = viewerUserId !== undefined && viewerUserId !== userId;
   const { data: badges = [], isLoading: badgesLoading } = useUserAchievements(open ? userId : undefined);
   const { data: legends = [], isLoading: legendsLoading } = useUserTopLegends(open ? userId : undefined, {
     limit: 500,
@@ -322,6 +323,36 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
 
   const achievementItems = useMemo(() => badges.map(normalizeBadge), [badges]);
   const legendItems = useMemo(() => legends.map(normalizeLegend), [legends]);
+
+  // Mark newly-earned badges as seen once per open, self-view only, AFTER the
+  // sheen animates on this visit. gam_mark_badge_seen is per-badge, so we
+  // snapshot the unseen ids as soon as badges load and fire the writes on
+  // sheet close (guarantees the sheen has fully played -- 1.4s + 120ms delay).
+  // The next open will re-fetch with seen_by_user = true, so isNew is false
+  // and no sheen replays.
+  const unseenIdsRef = useRef<string[]>([]);
+  useEffect(() => {
+    if (!open || isFriendView) {
+      unseenIdsRef.current = [];
+      return;
+    }
+    unseenIdsRef.current = badges
+      .filter((b) => b.is_earned && b.seen_by_user === false)
+      .map((b) => b.badge_id);
+  }, [open, isFriendView, badges]);
+  useEffect(() => {
+    if (open) return;
+    const ids = unseenIdsRef.current;
+    if (ids.length === 0) return;
+    unseenIdsRef.current = [];
+    // Fire and forget -- per-badge writes; failures are harmless (sheen
+    // simply replays next open).
+    void Promise.all(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ids.map((id) => (supabase.rpc as any)('gam_mark_badge_seen', { p_badge_id: id })),
+    );
+  }, [open]);
+
 
   const earnedAchievements = useMemo(
     () =>
