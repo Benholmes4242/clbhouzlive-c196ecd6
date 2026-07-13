@@ -292,8 +292,8 @@ const InboxV2Page: React.FC = () => {
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 11,
-                    padding: '12px 13px',
+                    gap: 12,
+                    padding: '12px',
                     borderRadius: 14,
                     background: 'linear-gradient(135deg, rgba(247,147,30,0.09), rgba(247,147,30,0.05))',
                     border: '0.5px solid rgba(247,147,30,0.22)',
