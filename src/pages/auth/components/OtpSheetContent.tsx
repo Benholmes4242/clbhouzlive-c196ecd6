@@ -155,24 +155,26 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
 
   return (
     <div className="space-y-4">
-      {/* Subtitle */}
-      <div className="space-y-2 text-center">
-        <p className="text-[13px]" style={{ color: 'rgba(255,255,255,0.72)' }}>
-          We sent a code to{' '}
-          <span style={{ color: 'rgba(255,255,255,0.96)', fontWeight: 600 }}>{email}</span>
+      {/* Sent-to */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <p className="text-[13px]" style={{ color: 'rgba(255,255,255,0.60)', margin: 0 }}>
+          We sent a 6-digit code to
         </p>
-        <button
-          type="button"
-          onClick={onUseDifferentEmail}
-          className="text-[13px] underline underline-offset-2"
-          style={{ color: 'rgba(255,255,255,0.55)' }}
-        >
-          Use a different email
-        </button>
+        <p className="text-[14px]" style={{ margin: 0, display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
+          <span style={{ color: 'rgba(255,255,255,0.96)', fontWeight: 650 }}>{email}</span>
+          <button
+            type="button"
+            onClick={onUseDifferentEmail}
+            className="text-[13px]"
+            style={{ color: '#F7931E', fontWeight: 600, background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+          >
+            Change
+          </button>
+        </p>
       </div>
 
       {/* Code boxes */}
-      <div className="flex items-center justify-center gap-2">
+      <div className="flex items-center justify-center gap-2.5">
         {digits.map((d, i) => (
           <input
             key={i}
@@ -184,26 +186,28 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
             inputMode="numeric"
             // eslint-disable-next-line jsx-a11y/no-autofocus
             autoComplete={i === 0 ? 'one-time-code' : 'off'}
-            
+
             disabled={submitting}
             aria-label={`Digit ${i + 1}`}
             className="text-center focus:outline-none transition-colors"
             style={{
-              width: 44,
-              height: 52,
-              borderRadius: 12,
+              flex: '1 1 0',
+              maxWidth: 52,
+              height: 56,
+              borderRadius: 14,
               background: '#272C37',
-              border: `1px solid ${d ? '#F7931E' : 'rgba(255,255,255,0.10)'}`,
+              border: `1px solid ${d ? 'rgba(255,255,255,0.16)' : 'rgba(255,255,255,0.10)'}`,
+              transition: 'border-color 150ms ease',
               color: 'rgba(255,255,255,0.96)',
-              fontSize: 20,
-              fontWeight: 600,
+              fontSize: 21,
+              fontWeight: 650,
               caretColor: '#F7931E',
             }}
             onFocus={(e) => {
               e.currentTarget.style.borderColor = '#F7931E';
             }}
             onBlur={(e) => {
-              e.currentTarget.style.borderColor = d ? '#F7931E' : 'rgba(255,255,255,0.10)';
+              e.currentTarget.style.borderColor = d ? 'rgba(255,255,255,0.16)' : 'rgba(255,255,255,0.10)';
             }}
           />
         ))}
@@ -211,7 +215,7 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
 
       {/* Error / Info */}
       {errorMessage && (
-        <p className="text-[13px] text-center" style={{ color: '#DC2626' }}>
+        <p className="text-[13px] text-center" style={{ color: '#F87171' }}>
           {errorMessage}
         </p>
       )}
@@ -227,9 +231,10 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
         onClick={handleManualSubmit}
         disabled={!canSubmit}
         aria-label="Verify code"
-        className="w-full h-[54px] flex items-center justify-center gap-2 rounded-[14px] font-bold text-[15px] transition-all duration-150 active:scale-[0.98]"
+        className="w-full h-[54px] flex items-center justify-center gap-2 rounded-[16px] font-bold text-[15px] transition-all duration-150 active:scale-[0.98]"
         style={{
           background: canSubmit ? '#F7931E' : 'rgba(255,255,255,0.06)',
+          boxShadow: canSubmit ? '0 6px 20px rgba(247,147,30,0.30)' : 'none',
           color: canSubmit ? '#FFFFFF' : 'rgba(255,255,255,0.38)',
           border: canSubmit ? 'none' : '1px solid rgba(255,255,255,0.10)',
           cursor: canSubmit ? 'pointer' : 'not-allowed',
@@ -247,14 +252,12 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
           className="text-[13px]"
           style={{
             color: resendCooldown > 0 ? 'rgba(255,255,255,0.38)' : 'rgba(255,255,255,0.55)',
-            textDecoration: resendCooldown > 0 ? 'none' : 'underline',
-            textUnderlineOffset: 2,
             cursor: resendCooldown > 0 ? 'default' : 'pointer',
           }}
         >
           {resendCooldown > 0
-            ? `You can resend in ${resendCooldown}s. Your code stays valid for 1 hour.`
-            : "Didn't get it? Resend code, or check your spam folder."}
+            ? `Resend in ${resendCooldown}s · code valid for 1 hour`
+            : <>Didn't get it? <span style={{ color: '#F7931E', fontWeight: 600 }}>Resend code</span></>}
         </button>
       </div>
     </div>
