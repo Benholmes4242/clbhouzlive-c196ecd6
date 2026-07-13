@@ -135,11 +135,7 @@ export const MiniPlayer: React.FC = () => {
     setHasError(false);
   }, []);
 
-  const handleMuteToggle = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (isMuted) markUserGestureUnmute();
-    toggleMute();
-  }, [toggleMute, isMuted, markUserGestureUnmute]);
+  // Mute is owned by MuteButton (session store) — no local handler needed.
 
   const isVisible = !!activeVideoId && isMiniOpen;
 
