@@ -163,7 +163,7 @@ const TrophyGroupLabel: React.FC<{
       display: 'flex',
       alignItems: 'center',
       gap: 6,
-      marginTop: 24,
+      marginTop: 32,
       marginBottom: 12,
       fontSize: 10,
       fontWeight: 800,
