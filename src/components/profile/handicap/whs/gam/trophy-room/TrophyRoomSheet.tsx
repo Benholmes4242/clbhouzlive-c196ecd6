@@ -122,18 +122,10 @@ interface Props {
   ownerFirstName?: string | null;
 }
 
-type Tab = 'all' | 'earned' | 'locked';
-
 interface DetailContext {
   items: TrophyItem[];
   index: number;
 }
-
-const TAB_LABEL: Record<Tab, string> = {
-  all: 'All',
-  earned: 'Earned',
-  locked: 'Locked',
-};
 
 const Eyebrow: React.FC<{ ownerFirstName?: string | null; isFriendView?: boolean }> = ({
   ownerFirstName,
@@ -158,8 +150,9 @@ const TrophyGroupLabel: React.FC<{
   Icon?: LucideIcon | null;
   iconColor?: string;
   label: string;
-  count: number;
-}> = ({ Icon, iconColor, label, count }) => (
+  earned: number;
+  total: number;
+}> = ({ Icon, iconColor, label, earned, total }) => (
   <div
     style={{
       display: 'flex',
@@ -176,9 +169,23 @@ const TrophyGroupLabel: React.FC<{
   >
     {Icon && <Icon size={12} color={iconColor ?? 'currentColor'} strokeWidth={2.4} />}
     <span>{label}</span>
-    <span style={{ color: 'rgba(255,255,255,0.55)', ...GAM.TABULAR, fontWeight: 700 }}>({count})</span>
+    <span
+      style={{
+        marginLeft: 'auto',
+        fontSize: 11.5,
+        fontWeight: 400,
+        letterSpacing: '0.02em',
+        textTransform: 'none',
+        color: 'rgba(255,255,255,0.45)',
+        ...GAM.TABULAR,
+      }}
+    >
+      <b style={{ fontWeight: 800, color: 'rgba(255,255,255,0.75)' }}>{earned}</b> of{' '}
+      <b style={{ fontWeight: 800, color: 'rgba(255,255,255,0.75)' }}>{total}</b> earned
+    </span>
   </div>
 );
+
 
 const Grid: React.FC<{
   items: TrophyItem[];
@@ -249,8 +256,8 @@ const CourseLegendsCollapsibleSection: React.FC<{
 
 export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFirstName }) => {
   const [open, setOpen] = useState(false);
-  const [tab, setTab] = useState<Tab>('all');
   const [detailCtx, setDetailCtx] = useState<DetailContext | null>(null);
+
 
   useEffect(() => gamAchievementsBus.subscribe(() => setOpen(true)), []);
 
@@ -298,12 +305,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
   const openDetail = useCallback(
     (item: TrophyItem) => {
       if (item.kind === 'achievement') {
-        const list =
-          tab === 'all'
-            ? allAchievements
-            : tab === 'earned'
-              ? earnedAchievements
-              : lockedAchievements;
+        const list = allAchievements;
         const index = list.findIndex((i) => i.id === item.id);
         setDetailCtx({ items: list, index: Math.max(0, index) });
       } else {
@@ -311,8 +313,9 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
         setDetailCtx({ items: allLegends, index: Math.max(0, index) });
       }
     },
-    [tab, earnedAchievements, allAchievements, lockedAchievements, allLegends],
+    [allAchievements, allLegends],
   );
+
 
   const isLoading = badgesLoading || legendsLoading;
   const isFriendView = viewerUserId !== undefined && viewerUserId !== userId;
@@ -371,81 +374,8 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
           <div style={{ width: 36, height: 4, borderRadius: 99, background: LINE }} />
         </div>
 
-        {/* Filter pills — pinned. Hairline border-bottom marks the pinned edge once
-            content scrolls beneath it. The header block below (moved into the
-            scrollable body in this PR) carries its own top border only when
-            visible, so no double hairline at top-of-scroll. */}
-        {/* Filter pills — pinned. Hairline border-bottom marks the pinned edge
-            once content scrolls beneath it. The header block (eyebrow + 179 hero
-            + split + completion rail) and the NEXT UNLOCK spotlight moved into
-            the scrollable body in this PR — pinned region trims from ~247px to
-            ~62px so ~40% more content shows on open. */}
-        <div
-          style={{
-            display: 'flex',
-            gap: 8,
-            padding: '12px 16px',
-            flexShrink: 0,
-            fontFamily: GAM.FONT_GEIST,
-            overflowX: 'auto',
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-            borderBottom: `0.5px solid ${LINE}`,
-          }}
-          className="hcp-tab-row"
-          role="tablist"
-        >
-          {(['all', 'earned', 'locked'] as Tab[]).map((key) => {
-            const active = tab === key;
-            const count =
-              key === 'all'
-                ? allAchievements.length
-                : key === 'earned'
-                  ? earnedAchievements.length
-                  : lockedAchievements.length;
-            return (
-              <button
-                key={key}
-                type="button"
-                onClick={() => setTab(key)}
-                role="tab"
-                aria-selected={active}
-                style={{
-                  flex: '0 0 auto',
-                  height: 30,
-                  padding: '0 12px',
-                  borderRadius: 999,
-                  border: `1px solid ${active ? 'rgba(255,255,255,0.14)' : LINE}`,
-                  background: active ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.045)',
-                  color: active ? INK : DIM,
-                  fontFamily: 'inherit',
-                  fontSize: 12,
-                  fontWeight: 800,
-                  letterSpacing: '0.06em',
-                  whiteSpace: 'nowrap',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  transition: 'background 150ms ease, color 150ms ease',
-                }}
-              >
-                {TAB_LABEL[key]}
-                <span
-                  style={{
-                    ...GAM.TABULAR,
-                    fontWeight: 800,
-                    fontSize: 11,
-                    color: FAINT,
-                  }}
-                >
-                  {count}
-                </span>
-              </button>
-            );
-          })}
-          <style>{`.hcp-tab-row::-webkit-scrollbar { display: none; }`}</style>
-        </div>
+        {/* Filter chips retired — sheet always renders everything. */}
+
 
         {/* Body — scrolls the header block, spotlight, and category sections. */}
         <div
@@ -678,42 +608,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
           )}
 
 
-          {!isLoading && tab === 'earned' && (() => {
-            const lifetime = selectLifetime(earnedAchievements);
-            const earnedGroups = groupAchievementsByCategory(earnedAchievements);
-            const anyEarnedAchievements = earnedAchievements.length > 0;
-            const anyLegends = allLegends.length > 0;
-            if (!anyEarnedAchievements && !anyLegends) {
-              return (
-                <EmptyState message={isFriendView ? 'No trophies earned yet.' : "You haven't earned any trophies yet."} />
-              );
-            }
-            return (
-              <>
-                {lifetime.length > 0 && (
-                  <>
-                    <TrophyGroupLabel label="Lifetime" count={lifetime.length} />
-                    <Grid items={lifetime} onTap={openDetail} columns={2} />
-                  </>
-                )}
-                {CATEGORY_ORDER.map((cat) => {
-                  const items = earnedGroups[cat];
-                  if (!items || items.length === 0) return null;
-                  return (
-                    <React.Fragment key={`earned-${cat}`}>
-                      <TrophyGroupLabel label={CATEGORY_LABEL[cat]} count={items.length} />
-                      <Grid items={items} onTap={openDetail} columns={2} />
-                    </React.Fragment>
-                  );
-                })}
-                {anyLegends && (
-                  <CourseLegendsCollapsibleSection items={allLegends} onTap={openDetail} />
-                )}
-              </>
-            );
-          })()}
-
-          {!isLoading && tab === 'all' && (() => {
+          {!isLoading && (() => {
             const lifetime = selectLifetime(allAchievements);
             const allGroups = groupAchievementsByCategory(allAchievements);
             const anyAchievements = allAchievements.length > 0;
@@ -723,20 +618,26 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                 <EmptyState message={isFriendView ? 'No trophies yet.' : "You don't have any trophies yet."} />
               );
             }
+            const lifetimeEarned = lifetime.filter((a) => a.earned).length;
             return (
               <>
                 {lifetime.length > 0 && (
                   <>
-                    <TrophyGroupLabel label="Lifetime" count={lifetime.length} />
+                    <TrophyGroupLabel label="Lifetime" earned={lifetimeEarned} total={lifetime.length} />
                     <Grid items={lifetime} onTap={openDetail} columns={2} />
                   </>
                 )}
                 {CATEGORY_ORDER.map((cat) => {
                   const items = allGroups[cat];
                   if (!items || items.length === 0) return null;
+                  const earnedCount = items.filter((a) => a.earned).length;
                   return (
                     <React.Fragment key={`all-${cat}`}>
-                      <TrophyGroupLabel label={CATEGORY_LABEL[cat]} count={items.length} />
+                      <TrophyGroupLabel
+                        label={CATEGORY_LABEL[cat]}
+                        earned={earnedCount}
+                        total={items.length}
+                      />
                       <Grid items={items} onTap={openDetail} columns={2} />
                     </React.Fragment>
                   );
@@ -748,33 +649,6 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
             );
           })()}
 
-          {!isLoading && tab === 'locked' && (() => {
-            const lifetime = selectLifetime(lockedAchievements);
-            const lockedGroups = groupAchievementsByCategory(lockedAchievements);
-            if (lockedAchievements.length === 0) {
-              return <EmptyState message="No locked achievements." />;
-            }
-            return (
-              <>
-                {lifetime.length > 0 && (
-                  <>
-                    <TrophyGroupLabel label="Lifetime" count={lifetime.length} />
-                    <Grid items={lifetime} onTap={openDetail} columns={2} />
-                  </>
-                )}
-                {CATEGORY_ORDER.map((cat) => {
-                  const items = lockedGroups[cat];
-                  if (!items || items.length === 0) return null;
-                  return (
-                    <React.Fragment key={`locked-${cat}`}>
-                      <TrophyGroupLabel label={CATEGORY_LABEL[cat]} count={items.length} />
-                      <Grid items={items} onTap={openDetail} columns={2} />
-                    </React.Fragment>
-                  );
-                })}
-              </>
-            );
-          })()}
         </div>
       </GamSheet>
 
