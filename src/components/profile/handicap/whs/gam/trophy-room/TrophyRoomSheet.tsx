@@ -10,7 +10,8 @@ import { renderBadgeIcon } from '../badgeIcons';
 import { TrophyDetailSheet } from './TrophyDetailSheet';
 import { normalizeBadge, normalizeLegend, type TrophyItem } from './_shared/normalizeTrophyItem';
 import { isShowpiece, LIFETIME_ORDER } from './_shared/showpieces';
-import { MATERIAL_PALETTES, FORGE_GOLD, materialNameForTier } from './_shared/rarityPalette';
+import { medalsOwned } from './_shared/levels';
+import { MATERIAL_PALETTES, FORGE_GOLD } from './_shared/rarityPalette';
 import { TrophyRoomSpine } from './TrophyRoomSpine';
 import { rarityColor } from '@/lib/gam/visuals';
 import type { BadgeCategory } from '@/lib/gam/types';
@@ -288,7 +289,11 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
 
   const allLegends = legendItems;
   const items = useMemo(() => [...achievementItems, ...legendItems], [achievementItems, legendItems]);
-  const earnedTotal = earnedAchievements.length + allLegends.length;
+
+  const badgesEarned = earnedAchievements.length;
+  const medals = medalsOwned(items);
+  const legendTitles = allLegends.length;
+  const total = badgesEarned + legendTitles;
 
   const openDetail = useCallback(
     (item: TrophyItem) => {
@@ -351,21 +356,6 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
 
     return withProgress[0] ?? null;
   }, [allAchievements]);
-
-  // FORGE INVENTORY — chip count per material the user currently holds.
-  // Counts each earned tiered badge at its current reachedTier material.
-  const forgeInventory = useMemo(() => {
-    const counts: Record<1 | 2 | 3 | 4 | 5, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-    for (const a of earnedAchievements) {
-      if (a.tiers.length <= 1) continue;
-      const t = a.reachedTier;
-      if (t >= 1 && t <= 5) counts[t as 1 | 2 | 3 | 4 | 5]++;
-    }
-    // Material rank desc: obsidian>diamond>emerald>silver>bronze
-    return [5, 4, 3, 2, 1]
-      .map((k) => ({ tier: k as 1 | 2 | 3 | 4 | 5, count: counts[k as 1 | 2 | 3 | 4 | 5] }))
-      .filter((r) => r.count > 0);
-  }, [earnedAchievements]);
 
   // NEXT FORGE — destination material for the spotlight (tier the user is chasing).
   const nextForgeDestTier = nextUnlock
@@ -471,75 +461,48 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
           {/* Header block (was pinned in the previous layout) */}
           <div style={{ padding: '12px 4px 12px', fontFamily: GAM.FONT_GEIST }}>
             <Eyebrow ownerFirstName={ownerFirstName} isFriendView={isFriendView} />
-            <div style={{ width: 34, height: 3, borderRadius: 99, background: AMBER, marginTop: 8 }} />
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginTop: 10 }}>
+              <span
+                style={{
+                  fontSize: 44,
+                  fontWeight: 800,
+                  letterSpacing: '-0.03em',
+                  color: INK,
+                  lineHeight: 1,
+                  ...GAM.TABULAR,
+                }}
+              >
+                {total}
+              </span>
+              <span style={{ fontSize: 15, fontWeight: 600, color: 'rgba(255,255,255,0.55)' }}>
+                trophies earned
+              </span>
+            </div>
             <div
               style={{
-                fontSize: 38,
-                fontWeight: 800,
-                letterSpacing: '-0.03em',
-                color: INK,
-                marginTop: 6,
-                lineHeight: 0.95,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 7,
+                marginTop: 10,
+                fontSize: 12.5,
+                color: 'rgba(255,255,255,0.55)',
                 ...GAM.TABULAR,
               }}
             >
-              {earnedTotal}
-              <span
-                style={{
-                  fontSize: 15,
-                  fontWeight: 700,
-                  color: DIM,
-                  letterSpacing: '0.01em',
-                  marginLeft: 8,
-                }}
-              >
-                earned
+              <span>
+                <b style={{ color: 'rgba(255,255,255,0.85)', fontWeight: 800 }}>{badgesEarned}</b>{' '}
+                badges
+              </span>
+              <span style={{ opacity: 0.4 }}>·</span>
+              <span>
+                <b style={{ color: 'rgba(255,255,255,0.85)', fontWeight: 800 }}>{medals}</b> medals
+              </span>
+              <span style={{ opacity: 0.4 }}>·</span>
+              <span>
+                <b style={{ color: 'rgba(255,255,255,0.85)', fontWeight: 800 }}>{legendTitles}</b>{' '}
+                legend titles
               </span>
             </div>
-
-            {/* Split line + completion rail removed per amendment: filter pills
-                (All 27 / Earned 15 / Locked 12) already carry these counts. */}
-
-
-            {/* FORGE INVENTORY — chip per material the user holds. */}
-            {forgeInventory.length > 0 && (
-              <div
-                style={{
-                  marginTop: 12,
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: 6,
-                }}
-              >
-                {forgeInventory.map(({ tier, count }) => {
-                  const p = MATERIAL_PALETTES[tier];
-                  const chipColor = tier === 5 ? FORGE_GOLD : p.color;
-                  return (
-                    <span
-                      key={tier}
-                      style={{
-                        padding: '4px 8px',
-                        borderRadius: 999,
-                        fontSize: 9,
-                        fontWeight: 800,
-                        letterSpacing: '0.10em',
-                        color: chipColor,
-                        border: `1px solid ${
-                          tier === 5 ? 'rgba(251,188,46,0.38)' : `rgba(${hexToRgb(p.color)},0.38)`
-                        }`,
-                        background:
-                          tier === 5
-                            ? 'rgba(251,188,46,0.08)'
-                            : `rgba(${hexToRgb(p.color)},0.08)`,
-                        ...GAM.TABULAR,
-                      }}
-                    >
-                      {count}× {p.label}
-                    </span>
-                  );
-                })}
-              </div>
-            )}
           </div>
 
           <TrophyRoomSpine items={items} />
