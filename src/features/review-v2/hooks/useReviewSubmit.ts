@@ -48,6 +48,22 @@ export function useReviewSubmit() {
       });
       if (error) throw error;
 
+      // Award regional Top 100 badges immediately if this rating
+      // completed a milestone -- fire and forget, never block the
+      // review UX.
+      try {
+        const { data: authData } = await supabase.auth.getUser();
+        const uid = authData?.user?.id;
+        if (uid) {
+          void supabase.functions.invoke('gam-evaluator', {
+            body: { user_id: uid, top100_only: true },
+          });
+        }
+      } catch (e) {
+        console.warn('[review] top100 badge refresh failed', e);
+      }
+
+
       // RPC returns Json — accept { rating_id } or { id } or a bare uuid.
       const anyData = data as any;
       const ratingId: string | undefined =
