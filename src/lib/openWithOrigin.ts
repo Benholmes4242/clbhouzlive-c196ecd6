@@ -340,7 +340,6 @@ export function openWithOrigin({
             activeLaneId,
             ownerKey: borrow.ownerKey,
             postId,
-            wasMuted: snap.muted,
           });
         }
       }
