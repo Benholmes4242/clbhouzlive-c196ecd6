@@ -599,7 +599,10 @@ function matchesBinary(badge: any, stats: any): boolean {
     case "beat_par": return stats.beat_par;
     case "first_index": return stats.hcp_at_time != null;
     default: return false;
+  }
 }
+
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // status_transitions (single_figures, scratch)
