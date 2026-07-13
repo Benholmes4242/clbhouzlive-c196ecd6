@@ -168,6 +168,27 @@ export function FullscreenFeedOverlay() {
   const beginCloseAnim = useFullscreenFeedStore(s => s.beginCloseAnim);
   const signalCloseAnimDone = useFullscreenFeedStore(s => s.signalCloseAnimDone);
 
+  // Autoplay-blocked → "Tap for sound" pill above the scrubber. Fires when
+  // the engine's unmuted play() is rejected on the 'fullscreen' lane (or
+  // the borrowed rail lane) and we degrade to muted playback. Any unmute
+  // (from this pill, MuteButton, MediaPreviewViewer) clears it.
+  const [showSoundPill, setShowSoundPill] = useState(false);
+  useEffect(() => {
+    if (!isOpen) setShowSoundPill(false);
+  }, [isOpen, activeIndex]);
+  useEffect(() => {
+    const unsub = VideoEngine.onAutoplayBlocked(() => {
+      if (isOpen) setShowSoundPill(true);
+    });
+    return unsub;
+  }, [isOpen]);
+  useEffect(() => {
+    const unsub = useSessionAudio.subscribe((s) => {
+      if (!s.isMuted) setShowSoundPill(false);
+    });
+    return unsub;
+  }, []);
+
   // Snapshot borrow so the isOpen-cleanup path can run the return even after
   // close() has cleared the store's borrow field synchronously.
   const borrowRef = useRef<BorrowDescriptor | null>(null);
