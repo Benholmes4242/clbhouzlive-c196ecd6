@@ -159,7 +159,7 @@ export const InlineVideo: React.FC<Props> = ({
     posterUrl: posterUrl || null,
     startPosition,
     active: playbackIntent,
-    muted: isMuted,
+    audioPolicy: 'session',
     postId: resolvedOwnerKey,
 
     ownerKey: resolvedOwnerKey,
