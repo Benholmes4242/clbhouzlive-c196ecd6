@@ -15,6 +15,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Button } from '@/components/ui/button';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
+import GlassHeaderPlate from '@/components/chrome/GlassHeaderPlate';
+
 import CoursesErrorBoundary from './CoursesErrorBoundary';
 import { Search, X, Star, ChevronRight } from 'lucide-react';
 import CoursesShellTabs from '@/features/courses/components/CoursesShellTabs';
