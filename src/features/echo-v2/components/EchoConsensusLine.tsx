@@ -97,7 +97,7 @@ export const EchoConsensusLine: React.FC<Props> = ({ meta }) => {
         <div
           style={{
             marginTop: 8,
-            padding: '10px 12px',
+            padding: '12px',
             background: '#F8FAFC',
             borderRadius: 10,
             display: 'flex',

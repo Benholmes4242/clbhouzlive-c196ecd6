@@ -13,7 +13,7 @@ const SUB = '#8A9099';
 const MUTED = '#AEB4BC';
 const AMBER = '#F7931E';
 const HAIRLINE = 'rgba(0,0,0,0.07)';
-const BOTTOM_NAV_CLEAR = 94;
+const BOTTOM_NAV_CLEAR = 'calc(env(safe-area-inset-bottom, 0px) + 32px)';
 
 function relativeTime(iso: string | null): string {
   if (!iso) return '';
@@ -145,7 +145,7 @@ const EchoHistoryPage: React.FC = () => {
             alignItems: 'center',
             gap: 4,
             paddingTop: 'calc(env(safe-area-inset-top, 0px) + 8px)',
-            paddingBottom: 10,
+            paddingBottom: 12,
             paddingLeft: 6,
             paddingRight: 6,
             background: CANVAS,
@@ -194,8 +194,8 @@ const EchoHistoryPage: React.FC = () => {
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                padding: '96px 24px',
-                gap: 14,
+                padding: '80px 24px',
+                gap: 12,
                 textAlign: 'center',
               }}
             >
@@ -239,7 +239,7 @@ const EchoHistoryPage: React.FC = () => {
                       display: 'flex',
                       alignItems: 'center',
                       gap: 10,
-                      padding: '14px 14px',
+                      padding: '12px 14px',
                       borderBottom: `0.5px solid ${HAIRLINE}`,
                     }}
                   >
@@ -334,7 +334,7 @@ const EchoHistoryPage: React.FC = () => {
               background: '#FFFFFF',
               borderTopLeftRadius: 20,
               borderTopRightRadius: 20,
-              padding: '10px 16px 24px',
+              padding: '12px 16px',
               paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)',
               boxShadow: '0 -8px 24px rgba(15,23,42,0.12)',
             }}
@@ -345,7 +345,7 @@ const EchoHistoryPage: React.FC = () => {
                 height: 4,
                 borderRadius: 999,
                 background: '#E2E8F0',
-                margin: '0 auto 14px',
+                margin: '0 auto 16px',
               }}
             />
 
@@ -398,7 +398,7 @@ const EchoHistoryPage: React.FC = () => {
                   placeholder="Chat title"
                   style={{
                     width: '100%',
-                    padding: '10px 12px',
+                    padding: '12px',
                     borderRadius: 10,
                     background: '#EDEFF2',
                     border: 'none',
@@ -413,7 +413,7 @@ const EchoHistoryPage: React.FC = () => {
                   onClick={handleRenameSave}
                   style={{
                     width: '100%',
-                    padding: '11px 14px',
+                    padding: '12px 14px',
                     borderRadius: 12,
                     background: '#15171F',
                     color: '#F5F6F7',
@@ -440,7 +440,7 @@ const EchoHistoryPage: React.FC = () => {
                     onClick={closeSheet}
                     style={{
                       flex: 1,
-                      padding: '11px 14px',
+                      padding: '12px 14px',
                       borderRadius: 12,
                       background: '#EDEFF2',
                       color: INK,
@@ -457,7 +457,7 @@ const EchoHistoryPage: React.FC = () => {
                     onClick={handleDeleteConfirm}
                     style={{
                       flex: 1,
-                      padding: '11px 14px',
+                      padding: '12px 14px',
                       borderRadius: 12,
                       background: '#B42318',
                       color: '#FFFFFF',
@@ -490,7 +490,7 @@ const SheetRow: React.FC<{
     className="active:opacity-70"
     style={{
       width: '100%',
-      padding: '14px 4px',
+      padding: '12px 4px',
       background: 'transparent',
       border: 'none',
       borderBottom: `0.5px solid ${HAIRLINE}`,

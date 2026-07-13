@@ -25,7 +25,7 @@ export const EchoWelcome: React.FC<Props> = ({ onPick, disabled }) => {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 18,
+        gap: 16,
         padding: '32px 24px',
       }}
     >
@@ -62,7 +62,7 @@ export const EchoWelcome: React.FC<Props> = ({ onPick, disabled }) => {
               background: '#FFFFFF',
               border: `0.5px solid ${HAIRLINE}`,
               borderRadius: 14,
-              padding: '11px 14px',
+              padding: '12px 14px',
               fontSize: 12.5,
               color: INK,
               textAlign: 'left',
