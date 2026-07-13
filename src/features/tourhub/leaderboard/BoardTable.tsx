@@ -6,10 +6,8 @@
  * label; the delta lives inside that footprint so the outer layout
  * is unchanged.
  *
- * House score colors:
- *   under par -> #189A55
- *   over par  -> #C24A4A
- *   E/level   -> #8A9099
+ * Score colours resolved via getScoreColor (canonical to-par grammar:
+ * red under par, ink over par, muted-gray even).
  *
  * MOVEMENT COLUMN (live — computed round-start deltas).
  * POS is a two-slot cell: position (T-prefixed) in a 26px slot,
@@ -27,6 +25,8 @@ import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { movementFromRounds } from './movementFromRounds';
 import { countryFlag, countryFallback } from './countryFlag';
+import { getScoreColor } from '../_shared/scoreColor';
+import { TREND_UP, TREND_DOWN } from '../_shared/tokens';
 
 const INK = '#0F172A';
 const SECONDARY = '#4B5563';
@@ -35,15 +35,12 @@ const HAIRLINE = 'rgba(0,0,0,0.08)';
 const BAND = 'rgba(31,36,40,0.03)';
 const CANVAS = '#F8FAFC';
 
-const SCORE_UNDER = '#189A55';
-const SCORE_OVER = '#C24A4A';
-const SCORE_EVEN = '#8A9099';
-
 const POS_NUM_W = 32;
 const POS_MOVE_W = 20;
 const NUM_W = 44;
 
 const F = 'Geist, system-ui, sans-serif';
+
 
 export interface BoardEntry {
   id: string;
