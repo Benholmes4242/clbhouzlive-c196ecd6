@@ -532,8 +532,9 @@ function renderHoleRows(
     let fieldColor = SECONDARY;
     if (h.fieldAvg != null && h.par != null) {
       const d = h.fieldAvg - h.par;
-      if (d < -0.005) fieldColor = HOUSE_UNDER;
-      else if (d > 0.005) fieldColor = HOUSE_OVER;
+      if (d < -0.005) fieldColor = getScoreColor(-1, 'light');
+      else if (d > 0.005) fieldColor = getScoreColor(1, 'light');
+
       else fieldColor = SECONDARY;
     }
     return (
