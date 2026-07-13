@@ -30,7 +30,7 @@ const SECONDARY = '#4B5563';
 const MUTED = '#94A3B8';
 const HAIRLINE = 'rgba(0,0,0,0.08)';
 const SURFACE = '#F8FAFC';
-const STATUS_LIVE_GREEN = '#189A55';
+const STATUS_LIVE_GREEN = '#22C55E';
 
 function fmtDateRange(start: string | null, end: string | null): string | null {
   if (!start) return null;
