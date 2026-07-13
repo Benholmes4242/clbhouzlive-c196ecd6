@@ -183,15 +183,15 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
       <div
         style={{
           position: 'absolute',
-          top: 14,
-          left: 14,
+          top: S.padY,
+          left: S.padX,
           display: 'flex',
           alignItems: 'center',
         }}
       >
         <span
           style={{
-            fontSize: 9.5,
+            fontSize: S.label,
             fontWeight: 800,
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
@@ -208,9 +208,9 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
         <div
           style={{
             position: 'absolute',
-            top: 14,
-            right: 14,
-            fontSize: 9.5,
+            top: S.padY,
+            right: S.padX,
+            fontSize: S.whenFs,
             fontWeight: 700,
             letterSpacing: '0.08em',
             textTransform: 'uppercase',
@@ -226,9 +226,9 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
       <div
         style={{
           position: 'absolute',
-          left: 14,
-          right: 14,
-          bottom: 54,
+          left: S.padX,
+          right: S.padX,
+          bottom: S.heroBottom,
           display: 'flex',
           flexDirection: 'column',
         }}
@@ -236,7 +236,7 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
         {heroValue ? (
           <div
             style={{
-              fontSize: 34,
+              fontSize: S.value,
               fontWeight: 900,
               letterSpacing: '-0.03em',
               lineHeight: 0.95,
@@ -254,7 +254,7 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
         <div
           style={{
             marginTop: 4,
-            fontSize: 11,
+            fontSize: S.courseFs,
             fontWeight: 600,
             color: 'rgba(255,255,255,0.6)',
             lineHeight: 1.2,
@@ -271,19 +271,19 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
       <div
         style={{
           position: 'absolute',
-          left: 14,
-          right: 14,
-          bottom: 12,
-          paddingTop: 10,
+          left: S.padX,
+          right: S.padX,
+          bottom: S.footerBottom,
+          paddingTop: S.footerPadTop,
           borderTop: '1px solid rgba(255,255,255,0.12)',
           display: 'flex',
           alignItems: 'center',
-          gap: 10,
+          gap: size === 'compact' ? 6 : 10,
         }}
       >
         <div style={{ flexShrink: 0 }}>
           <SquircleAvatar
-            size={24}
+            size={S.avatar}
             src={row.holder_avatar}
             alt={holder}
             fallback={initials(holder)}
@@ -295,7 +295,7 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
           style={{
             flex: 1,
             minWidth: 0,
-            fontSize: 12,
+            fontSize: S.holderFs,
             fontWeight: 700,
             color: '#ffffff',
             lineHeight: 1.15,
