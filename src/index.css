@@ -4678,6 +4678,17 @@ em-emoji-picker input:focus {
   50% { opacity: 0.7; }
 }
 
+/* Trophy card sheen — single diagonal sweep on newly-earned badges. */
+@keyframes trophySheen {
+  0%   { transform: translateX(-110%) skewX(-18deg); opacity: 0; }
+  15%  { opacity: 1; }
+  85%  { opacity: 1; }
+  100% { transform: translateX(210%) skewX(-18deg); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .trophy-sheen-layer { display: none !important; }
+}
+
 .gam-no-scrollbar::-webkit-scrollbar {
   display: none;
 }
