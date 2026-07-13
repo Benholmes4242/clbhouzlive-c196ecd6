@@ -73,6 +73,8 @@ interface SectionHeaderProps {
    * See docs/canonical/section-titles.md "Accent exception".
    */
   accent?: string;
+  /** When false, suppresses the coloured cut-line under the title. Defaults to true. */
+  cutLine?: boolean;
 }
 
 function ActionAffordance({
