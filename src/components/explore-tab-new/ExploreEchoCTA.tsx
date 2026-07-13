@@ -252,6 +252,7 @@ function ExploreEchoCTAInner({ mood }: ExploreEchoCTAProps) {
         sub="Describe what you want. She'll find it."
         paddingTop={32}
         paddingX={16}
+        cutLine={false}
       />
 
       <div style={{ padding: '0 16px' }}>
