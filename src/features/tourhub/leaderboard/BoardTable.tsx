@@ -295,7 +295,7 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
                   fontFamily: F,
                   fontSize: 8.5,
                   fontWeight: 800,
-                  color: climbed ? SCORE_UNDER : SCORE_OVER,
+                  color: climbed ? TREND_UP : TREND_DOWN,
                   fontVariantNumeric: 'tabular-nums',
                   letterSpacing: '0.02em',
                 }}
