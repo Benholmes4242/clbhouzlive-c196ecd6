@@ -8,7 +8,7 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { VideosSortId } from '../components/SortSegment';
-import type { VideosV2CategoryId } from '../components/CategoryChips';
+import type { VideosV2CategoryId } from '../categories';
 
 const PAGE_SIZE = 12;
 
