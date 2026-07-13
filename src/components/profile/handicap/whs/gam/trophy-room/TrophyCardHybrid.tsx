@@ -14,7 +14,7 @@ import { MATERIAL_HEX } from './_shared/rarityPalette';
 import { MATERIAL_LADDER, materialForTier } from './_shared/levels';
 import { renderBadgeIcon } from '../badgeIcons';
 import { LegendCard } from './parts/LegendCard';
-import { statusFor, statusCopy } from './_shared/statusBadges';
+import { statusForEarned, statusCopy } from './_shared/statusBadges';
 
 const FONT = "'Geist', -apple-system, sans-serif";
 const OBSIDIAN_EDGE = '#D4A017';
@@ -53,7 +53,9 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = 
   const accent = earned || inProgress ? (mat ? matColor(mat) : '#F7931E') : 'rgba(255,255,255,0.35)';
 
   // LOSABLE STATUS -- single_figures / scratch only, derived from live index.
-  const status = statusFor(item.badgeId, currentIndex);
+  // Gated on milestoneEarned: a user who never earned the badge shows no
+  // status chrome (renders as plain LOCKED like any other locked binary).
+  const status = statusForEarned(item.badgeId, currentIndex, earned);
   const sCopy = status && status !== 'held' && currentIndex != null
     ? statusCopy(item.badgeId, status, currentIndex)
     : null;

@@ -18,7 +18,7 @@ import { materialNameForTier, type RarityPalette } from './rarityPalette';
 import { GAM } from '../../tokens';
 import type { LegendCategory } from '@/lib/gam/types';
 import type { TrophyItem } from './normalizeTrophyItem';
-import { statusFor, statusCopy, type BadgeStatus, type StatusCopy } from './statusBadges';
+import { statusForEarned, statusCopy, type BadgeStatus, type StatusCopy } from './statusBadges';
 
 export interface DetailViewAchievement {
   kind: 'achievement';
@@ -152,7 +152,10 @@ export function deriveDetailView(item: TrophyItem, currentIndex: number | null =
       ? `${remaining.toLocaleString()} more until your next medal`
       : null;
 
-  const status = statusFor(item.badgeId, currentIndex);
+  // Status decoration is gated on the milestone having been earned. A user
+  // who never earned Scratch and is currently at 2.2 must render as plain
+  // LOCKED, not "LOST / RECLAIM IT".
+  const status = statusForEarned(item.badgeId, currentIndex, earnedDerived);
   const copy = status && status !== 'held' && currentIndex != null
     ? statusCopy(item.badgeId, status, currentIndex)
     : null;
