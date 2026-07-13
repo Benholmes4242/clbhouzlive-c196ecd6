@@ -15,6 +15,8 @@ import { trace, traceLookup } from '@/perf/trace';
 import { PrefetchController } from '@/video/PrefetchController';
 import { resolveRestingRect, getCurrentViewport, type RestingRect } from '@/lib/media/resolveRestingRect';
 import { FS_TRANSITION_MODE } from '@/lib/media/transitionMode';
+import { TapForSoundPill } from '@/audio/MuteButton';
+import { useSessionAudio } from '@/audio/sessionAudioStore';
 
 
 import { usePostViewTracker } from '@/hooks/usePostViewTracker';
