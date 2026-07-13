@@ -266,8 +266,8 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
   const effectiveViewerId = viewerUserId ?? userId;
   const { data: badges = [], isLoading: badgesLoading } = useUserAchievements(open ? userId : undefined);
   const { data: legends = [], isLoading: legendsLoading } = useUserTopLegends(open ? userId : undefined, {
-    limit: 200,
-    maxRank: 100,
+    limit: 500,
+    maxRank: 1,
   });
   // Owner's current WHS handicap index -- drives the LOSABLE STATUS overlay
   // for single_figures / scratch. Friend-view uses the owner's index (userId),
