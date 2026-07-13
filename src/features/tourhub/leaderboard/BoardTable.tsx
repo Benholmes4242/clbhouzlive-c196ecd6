@@ -78,10 +78,9 @@ interface Props {
 
 function houseColor(score: number | null | undefined): string {
   if (score == null) return INK;
-  if (score < 0) return SCORE_UNDER;
-  if (score > 0) return SCORE_OVER;
-  return SCORE_EVEN;
+  return getScoreColor(score, 'light');
 }
+
 
 function fmtScore(score: number | null | undefined): string {
   if (score == null) return '-';
