@@ -3,6 +3,9 @@ import { create } from 'zustand';
 const KEY = 'clbhouz-audio-muted';
 const LEGACY_KEY = 'clbhouz-feed-muted';
 
+// One-time cleanup of orphaned key from removed GlobalAudioContext mute state.
+try { sessionStorage.removeItem('globalAudioState'); } catch {}
+
 function initialMuted(): boolean {
   try {
     const v = sessionStorage.getItem(KEY);
