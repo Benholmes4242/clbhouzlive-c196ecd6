@@ -757,6 +757,53 @@ async function upsertBadgeTiered(userId: string, badgeId: string, counterValue: 
   }
 }
 
+// Authoritative recompute of a single user's current rank-1 legend count.
+// Writes to gam_user_milestones (metric='legend_titles') — this is the value
+// the trophy card reads via get_user_achievements_for_viewer's COALESCE on
+// counter_metric — and keeps the gam_user_badges row's tier in sync. Called
+// on BOTH the gain and loss sides of every rank-1 change so counts never drift.
+async function recomputeLegendTitles(userId: string) {
+  const { count: rawCount } = await supabase
+    .from("gam_course_legends")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", userId).eq("rank", 1).eq("is_current", true);
+  const count = rawCount ?? 0;
+  const nowIso = new Date().toISOString();
+
+  // Milestone is the source of truth for the card.
+  await supabase.from("gam_user_milestones").upsert(
+    {
+      user_id: userId,
+      metric: "legend_titles",
+      count,
+      last_at: nowIso,
+      updated_at: nowIso,
+    },
+    { onConflict: "user_id,metric" }
+  );
+
+  // Keep the badge row's tier in sync — never gate on tier > 0, always reflect
+  // current state.
+  const { data: badge } = await supabase
+    .from("gam_badge_catalogue")
+    .select("counter_tiers")
+    .eq("id", "legend_at_course").maybeSingle();
+  const tiers = badge?.counter_tiers ?? null;
+  const tier = tiers ? computeTier(count, tiers) : 0;
+
+  if (count > 0) {
+    // upsertBadgeTiered handles the row + tier progression + notification.
+    await upsertBadgeTiered(userId, "legend_at_course", count, tier, null);
+  } else {
+    // count === 0: user holds no rank-1 legends. Remove any stale badge row
+    // so the trophy card falls back to the locked state cleanly.
+    await supabase
+      .from("gam_user_badges")
+      .delete()
+      .eq("user_id", userId).eq("badge_id", "legend_at_course");
+  }
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // apply_streaks
 // ─────────────────────────────────────────────────────────────────────────────
