@@ -117,7 +117,7 @@ export function ClipsWall({ mood }: { mood: ClipsV2Mood }) {
   return (
     <div style={{ padding: '12px 0 0', fontFamily: FONT_FAMILY }}>
       <style>{spinKeyframes}</style>
-      <div ref={railRef} style={{ display: 'flex', gap: 12, padding: '0 16px' }}>
+      <div ref={railRef} style={{ display: 'flex', gap: 4, padding: '0 4px' }}>
         <div style={{ flex: 1 }}>
           {packed.left.map(({ item, flatIndex: i }) => (
             <FeedCard
