@@ -21,7 +21,20 @@ export const IMMERSIVE_EXACT_ROUTES = [
   '/',
   '/clubhouse',
   '/courses',
+  '/watch',
+  '/watch/clips',
+  '/watch/videos',
 ] as const;
+
+export const LIGHT_IMMERSIVE_EXACT_ROUTES = [
+  '/watch',
+  '/watch/clips',
+  '/watch/videos',
+] as const;
+
+export function isLightImmersiveRoute(pathname: string): boolean {
+  return (LIGHT_IMMERSIVE_EXACT_ROUTES as readonly string[]).includes(pathname);
+}
 
 export function isImmersiveRoute(pathname: string): boolean {
   const exactMatch = (IMMERSIVE_EXACT_ROUTES as readonly string[]).some(
