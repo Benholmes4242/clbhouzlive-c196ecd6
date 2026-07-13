@@ -121,21 +121,25 @@ export const useClubhouseStore = create<ClubhouseState>()((set) => ({
   }),
 
   setIsMuted: (v) => {
-    try { sessionStorage.setItem(SESSION_MUTE_KEY, JSON.stringify(v)); } catch {}
-    set({ isMuted: v });
+    useSessionAudio.getState().setMuted(v);
   },
-  toggleMute: () => set((s) => {
-    const next = !s.isMuted;
-    try { sessionStorage.setItem(SESSION_MUTE_KEY, JSON.stringify(next)); } catch {}
-    return { isMuted: next };
-  }),
+  toggleMute: () => {
+    useSessionAudio.getState().toggle();
+  },
   setUserPaused: (v) => set({ userPaused: v }),
   // [VIDEO-TEARDOWN] setActiveVideoElement setter removed.
   setIsTournamentCardActive: (v) => set({ isTournamentCardActive: v }),
-  markUserGestureUnmute: () => { _userGestureUnmuteTs = Date.now(); },
-  isRecentUserGesture: () => Date.now() - _userGestureUnmuteTs < 2000,
+  // NO-OP shim: gesture timestamp is now stamped by sessionAudio.setMuted(false).
+  markUserGestureUnmute: () => { /* no-op */ },
+  isRecentUserGesture: () => Date.now() - getLastUnmuteGestureTs() < 2000,
   registerTabWarmer: (tab, fn) => {
     if (fn) _tabWarmers.set(tab, fn);
     else _tabWarmers.delete(tab);
   },
 }));
+
+// Mirror sessionAudio.isMuted into clubhouseStore so components selecting
+// clubhouseStore.isMuted stay live without changes.
+useSessionAudio.subscribe((s) => {
+  useClubhouseStore.setState({ isMuted: s.isMuted });
+});
