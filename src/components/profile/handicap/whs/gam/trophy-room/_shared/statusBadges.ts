@@ -38,6 +38,21 @@ export function isStatusBadge(badgeId: string): boolean {
   return badgeId in STATUS_BADGES;
 }
 
+/**
+ * Gated status: status decoration (held/at_risk/lost) is only meaningful
+ * for a badge the user has EARNED at least once. Never-earned badges
+ * always return null so they render as plain LOCKED targets -- you
+ * cannot lose what you never earned.
+ */
+export function statusForEarned(
+  badgeId: string,
+  index: number | null,
+  milestoneEarned: boolean,
+): BadgeStatus {
+  if (!milestoneEarned) return null;
+  return statusFor(badgeId, index);
+}
+
 export interface StatusCopy {
   chipLabel: string;
   chipColor: string;
