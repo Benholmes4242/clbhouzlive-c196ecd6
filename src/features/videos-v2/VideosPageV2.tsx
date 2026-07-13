@@ -37,7 +37,7 @@ function parseSort(raw: string | null): VideosSortId {
     : DEFAULT_SORT;
 }
 
-function parseCategory(raw: string | null): VideosV2CategoryId {
+function parseCategory(raw: string | null): CategoryFilterId {
   return raw && (VIDEOS_V2_CATEGORY_IDS as readonly string[]).includes(raw)
     ? (raw as VideosV2CategoryId)
     : 'all';
@@ -48,7 +48,10 @@ export default function VideosPageV2() {
   const [searchOpen, setSearchOpen] = React.useState(false);
 
   const sort = useMemo(() => parseSort(params.get('sort')), [params]);
-  const category = useMemo(() => parseCategory(params.get('cat')), [params]);
+  const category = useMemo<CategoryFilterId>(
+    () => parseCategory(params.get('cat')),
+    [params],
+  );
 
   const setSort = useCallback(
     (next: VideosSortId) => {
@@ -61,7 +64,7 @@ export default function VideosPageV2() {
   );
 
   const setCategory = useCallback(
-    (next: VideosV2CategoryId) => {
+    (next: CategoryFilterId) => {
       const p = new URLSearchParams(params);
       if (next === 'all') p.delete('cat');
       else p.set('cat', next);
@@ -71,7 +74,9 @@ export default function VideosPageV2() {
   );
 
   // VideosFeedV2 expects `null` for the "All" state (unfiltered).
-  const feedCategory = category === 'all' ? null : category;
+  const feedCategory: VideosV2CategoryId | null =
+    category === 'all' ? null : category;
+
 
   return (
     <PageRoot className="min-h-screen text-foreground bg-background">
