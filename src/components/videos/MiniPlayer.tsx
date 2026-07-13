@@ -24,9 +24,6 @@ type MiniVideo = {
 
 export const MiniPlayer: React.FC = () => {
   const context = useVideoPlaybackSafe();
-  const isMuted = useClubhouseStore(s => s.isMuted);
-  const toggleMute = useClubhouseStore(s => s.toggleMute);
-  const markUserGestureUnmute = useClubhouseStore(s => s.markUserGestureUnmute);
 
   const { fetchPostWithDetails } = usePostData();
 
