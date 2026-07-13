@@ -228,7 +228,6 @@ const ThreadV2Page = lazy(() => import("./pages/messaging-v2/ThreadV2Page"));
 
 const ActivityPageV2 = lazy(() => import("./features/activity-v2/ActivityPageV2"));
 const GolfersToFollowPage = lazy(() => import("./pages/GolfersToFollowPage"));
-const GolfersSharedCoursesPage = lazy(() => import("./pages/GolfersSharedCoursesPage"));
 const OwnProfileSocialRedirect = lazy(() => import("./components/profile/OwnProfileSocialRedirect"));
 const FriendsRedirectToFollowing = lazy(() => import("./pages/FriendsRedirectToFollowing"));
 const ProfileSocialListRoute = lazy(() => import("./features/social-lists-v2/ProfileSocialListRoute"));
