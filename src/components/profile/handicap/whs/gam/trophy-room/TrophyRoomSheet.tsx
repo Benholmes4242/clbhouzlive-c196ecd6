@@ -608,42 +608,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
           )}
 
 
-          {!isLoading && tab === 'earned' && (() => {
-            const lifetime = selectLifetime(earnedAchievements);
-            const earnedGroups = groupAchievementsByCategory(earnedAchievements);
-            const anyEarnedAchievements = earnedAchievements.length > 0;
-            const anyLegends = allLegends.length > 0;
-            if (!anyEarnedAchievements && !anyLegends) {
-              return (
-                <EmptyState message={isFriendView ? 'No trophies earned yet.' : "You haven't earned any trophies yet."} />
-              );
-            }
-            return (
-              <>
-                {lifetime.length > 0 && (
-                  <>
-                    <TrophyGroupLabel label="Lifetime" count={lifetime.length} />
-                    <Grid items={lifetime} onTap={openDetail} columns={2} />
-                  </>
-                )}
-                {CATEGORY_ORDER.map((cat) => {
-                  const items = earnedGroups[cat];
-                  if (!items || items.length === 0) return null;
-                  return (
-                    <React.Fragment key={`earned-${cat}`}>
-                      <TrophyGroupLabel label={CATEGORY_LABEL[cat]} count={items.length} />
-                      <Grid items={items} onTap={openDetail} columns={2} />
-                    </React.Fragment>
-                  );
-                })}
-                {anyLegends && (
-                  <CourseLegendsCollapsibleSection items={allLegends} onTap={openDetail} />
-                )}
-              </>
-            );
-          })()}
-
-          {!isLoading && tab === 'all' && (() => {
+          {!isLoading && (() => {
             const lifetime = selectLifetime(allAchievements);
             const allGroups = groupAchievementsByCategory(allAchievements);
             const anyAchievements = allAchievements.length > 0;
@@ -653,20 +618,26 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                 <EmptyState message={isFriendView ? 'No trophies yet.' : "You don't have any trophies yet."} />
               );
             }
+            const lifetimeEarned = lifetime.filter((a) => a.earned).length;
             return (
               <>
                 {lifetime.length > 0 && (
                   <>
-                    <TrophyGroupLabel label="Lifetime" count={lifetime.length} />
+                    <TrophyGroupLabel label="Lifetime" earned={lifetimeEarned} total={lifetime.length} />
                     <Grid items={lifetime} onTap={openDetail} columns={2} />
                   </>
                 )}
                 {CATEGORY_ORDER.map((cat) => {
                   const items = allGroups[cat];
                   if (!items || items.length === 0) return null;
+                  const earnedCount = items.filter((a) => a.earned).length;
                   return (
                     <React.Fragment key={`all-${cat}`}>
-                      <TrophyGroupLabel label={CATEGORY_LABEL[cat]} count={items.length} />
+                      <TrophyGroupLabel
+                        label={CATEGORY_LABEL[cat]}
+                        earned={earnedCount}
+                        total={items.length}
+                      />
                       <Grid items={items} onTap={openDetail} columns={2} />
                     </React.Fragment>
                   );
@@ -678,33 +649,6 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
             );
           })()}
 
-          {!isLoading && tab === 'locked' && (() => {
-            const lifetime = selectLifetime(lockedAchievements);
-            const lockedGroups = groupAchievementsByCategory(lockedAchievements);
-            if (lockedAchievements.length === 0) {
-              return <EmptyState message="No locked achievements." />;
-            }
-            return (
-              <>
-                {lifetime.length > 0 && (
-                  <>
-                    <TrophyGroupLabel label="Lifetime" count={lifetime.length} />
-                    <Grid items={lifetime} onTap={openDetail} columns={2} />
-                  </>
-                )}
-                {CATEGORY_ORDER.map((cat) => {
-                  const items = lockedGroups[cat];
-                  if (!items || items.length === 0) return null;
-                  return (
-                    <React.Fragment key={`locked-${cat}`}>
-                      <TrophyGroupLabel label={CATEGORY_LABEL[cat]} count={items.length} />
-                      <Grid items={items} onTap={openDetail} columns={2} />
-                    </React.Fragment>
-                  );
-                })}
-              </>
-            );
-          })()}
         </div>
       </GamSheet>
 
