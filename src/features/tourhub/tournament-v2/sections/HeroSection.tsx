@@ -13,8 +13,10 @@ import { formatPurse } from '../../components/shared/TourHeroHelpers';
 import { isAnyMajor } from '../../utils/majorScope';
 import {
   FONT, GOLD, WHITE_ALPHA_10, WHITE_ALPHA_30, WHITE_ALPHA_65,
-  STATUS_LIVE, SCORE_UNDER_PAR_DARK,
+  STATUS_LIVE,
 } from '../../_shared/tokens';
+import { getScoreColor } from '../../_shared/scoreColor';
+
 import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
 import type { EventState } from '../../components/overview-v3/useTournamentPulse';
 
