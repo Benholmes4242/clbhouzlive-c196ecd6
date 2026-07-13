@@ -631,7 +631,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                 {lifetime.length > 0 && (
                   <>
                     <TrophyGroupLabel label="Lifetime" earned={lifetimeEarned} total={lifetime.length} />
-                    <Grid items={lifetime} onTap={openDetail} columns={2} />
+                    <Grid items={lifetime} onTap={openDetail} columns={2} currentIndex={currentIndex} />
                   </>
                 )}
                 {CATEGORY_ORDER.map((cat) => {
@@ -645,7 +645,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                         earned={earnedCount}
                         total={items.length}
                       />
-                      <Grid items={items} onTap={openDetail} columns={2} />
+                      <Grid items={items} onTap={openDetail} columns={2} currentIndex={currentIndex} />
                     </React.Fragment>
                   );
                 })}
@@ -665,6 +665,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
           initialIndex={detailCtx.index}
           ownerUserId={userId}
           viewerUserId={effectiveViewerId}
+          currentIndex={currentIndex}
           onClose={() => setDetailCtx(null)}
         />
       )}
