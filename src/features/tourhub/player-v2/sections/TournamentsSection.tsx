@@ -24,8 +24,8 @@ import {
   INK_MUTE,
   INK_TINT_07,
   LIVE_DOT,
-  SCORE_OVER_PAR_LIGHT,
-  SCORE_UNDER_PAR_LIGHT,
+  TOPAR_OVER_LIGHT,
+  TOPAR_UNDER_LIGHT,
   SLATE_50,
   SURFACE,
 } from '../../_shared/tokens';
@@ -105,9 +105,9 @@ export function TournamentsSection({
           const scoreColor = isMissed
             ? INK_FAINT
             : typeof r.score === 'number' && r.score < 0
-            ? SCORE_UNDER_PAR_LIGHT
+            ? TOPAR_UNDER_LIGHT
             : typeof r.score === 'number' && r.score > 0
-            ? SCORE_OVER_PAR_LIGHT
+            ? TOPAR_OVER_LIGHT
             : INK_MUTE;
 
           return (

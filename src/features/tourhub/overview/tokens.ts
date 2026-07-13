@@ -34,10 +34,11 @@ export const V4 = {
   violet: '#5E4DA8',
   violetSoft: '#EDEAF7',
 
-  // Score colors (round score-to-par convention)
-  scoreUnder: '#189A55',
+  // Score colours resolve through the canonical getScoreColor helper
+  // (features/tourhub/_shared/scoreColor). Even/null stays here for
+  // muted-neutral fallbacks used by non-score numeric surfaces.
   scoreEven: '#8A9099',
-  scoreOver: '#C24A4A',
+
 
   // Live
   live: '#22C55E',

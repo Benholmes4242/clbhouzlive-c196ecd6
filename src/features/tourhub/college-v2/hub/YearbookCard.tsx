@@ -24,8 +24,8 @@ import {
   INK,
   INK_FAINT,
   INK_MUTE,
-  SCORE_UNDER_PAR_LIGHT,
-  SCORE_OVER_PAR_LIGHT,
+  TOPAR_UNDER_LIGHT,
+  TOPAR_OVER_LIGHT,
   STATUS_LIVE,
   SURFACE,
 } from '@/features/tourhub/_shared/tokens';
@@ -67,8 +67,8 @@ function YearbookCardInner({ standing, liveCount }: Props) {
     move == null || move === 0
       ? INK_FAINT
       : move > 0
-      ? SCORE_UNDER_PAR_LIGHT
-      : SCORE_OVER_PAR_LIGHT;
+      ? TOPAR_UNDER_LIGHT
+      : TOPAR_OVER_LIGHT;
 
   const alumni = standing.topAlumni.slice(0, 3);
   const surnamesLine = alumni.map((a) => surnameOf(a.name)).join(', ');

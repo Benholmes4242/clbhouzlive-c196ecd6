@@ -135,18 +135,19 @@ export const LEADER_GOLD_TINT_7 = 'rgba(251,188,46,0.07)';   // soft leader tint
 export const LEADER_GOLD_TINT_10 = 'rgba(251,188,46,0.10)';  // medium leader tint (results state)
 
 // ============================================================================
-// SCORE (verdict — under/over par; theme-aware)
+// TO-PAR (verdict — under/over par; theme-aware)
 // ============================================================================
-export const SCORE_UNDER_PAR_LIGHT = '#2F6B4F';            // refined pine (unified scoring palette)
-export const SCORE_UNDER_PAR_LIGHT_TINT = 'rgba(47,107,79,0.14)';
-export const SCORE_OVER_PAR_LIGHT = '#9F1D1D';
-export const SCORE_OVER_PAR_LIGHT_TINT = 'rgba(159,29,29,0.14)';
-export const SCORE_UNDER_PAR_DARK = '#4ADE80';
-export const SCORE_OVER_PAR_DARK = '#F87171';
-// Pale variants for use on heavier-dark backgrounds (e.g. ticker marquee) where
-// the standard DARK variants don't lift enough. Tailwind green-300 / red-300.
-export const SCORE_UNDER_PAR_DARK_PALE = '#86EFAC';          // Tailwind green-300 — pale under-par on heavy-dark bg
-export const SCORE_OVER_PAR_DARK_PALE = '#FCA5A5';           // Tailwind red-300 — pale over-par on heavy-dark bg
+// Canonical: RED under par (good), INK/muted-white over par, muted gray even.
+// Aligned with the World Feed hole-by-hole birdie family so red-good is one
+// red across every golf surface (leaderboard, hero, schedule, player history,
+// college, TI). All prior SCORE_* tokens have been removed in favour of these.
+export const TOPAR_UNDER_LIGHT = '#D2222D';
+export const TOPAR_UNDER_DARK  = '#FF6B5E';
+export const TOPAR_OVER_LIGHT  = '#0F172A';                  // INK
+export const TOPAR_OVER_DARK   = 'rgba(242,244,247,0.62)';
+export const TOPAR_EVEN_LIGHT  = '#8A9099';
+export const TOPAR_EVEN_DARK   = 'rgba(242,244,247,0.42)';
+
 
 
 

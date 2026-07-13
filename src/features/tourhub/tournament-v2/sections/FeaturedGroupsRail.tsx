@@ -10,7 +10,7 @@ import { SectionEyebrow } from './SectionEyebrow';
 import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import {
   FONT, INK, INK_MUTE, INK_FAINT, SURFACE, HAIRLINE_INK_8,
-  SCORE_UNDER_PAR_LIGHT, SCORE_OVER_PAR_LIGHT,
+  TOPAR_UNDER_LIGHT, TOPAR_OVER_LIGHT,
 } from '../../_shared/tokens';
 
 interface Props {
@@ -37,8 +37,8 @@ function fmtScore(v: any): string | null {
 }
 function scoreColor(s: string | null): string {
   if (!s || s === 'E') return INK;
-  if (s.startsWith('-')) return SCORE_UNDER_PAR_LIGHT;
-  return SCORE_OVER_PAR_LIGHT;
+  if (s.startsWith('-')) return TOPAR_UNDER_LIGHT;
+  return TOPAR_OVER_LIGHT;
 }
 
 export function FeaturedGroupsRail({ tournamentId, live, tourCode }: Props) {

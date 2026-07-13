@@ -8,7 +8,7 @@ import { countryFlag, countryFallback } from '../../leaderboard/countryFlag';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import {
   FONT, INK, INK_MUTE, INK_FAINT, HAIRLINE_INK_8, SURFACE,
-  SCORE_UNDER_PAR_LIGHT, SCORE_OVER_PAR_LIGHT,
+  TOPAR_UNDER_LIGHT, TOPAR_OVER_LIGHT,
 } from '../../_shared/tokens';
 
 interface Row {
@@ -35,8 +35,8 @@ function fmt(n: number | null | undefined): string {
 }
 function color(n: number | null | undefined): string {
   if (n == null) return INK;
-  if (n < 0) return SCORE_UNDER_PAR_LIGHT;
-  if (n > 0) return SCORE_OVER_PAR_LIGHT;
+  if (n < 0) return TOPAR_UNDER_LIGHT;
+  if (n > 0) return TOPAR_OVER_LIGHT;
   return INK;
 }
 function thruLabel(row: Row): string {

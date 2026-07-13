@@ -6,7 +6,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import type { WinnerStats } from '../../hooks/useWinnerScorecardStats';
 import type { WinnerSeasonStats } from '../../hooks/useWinnerSeasonStats';
-import { SCORE_COLORS } from '../../utils/scoreColors';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import type { TournamentFinisher } from '../../hooks/useTournamentLeadersWinners';
@@ -14,6 +13,7 @@ import { useCountdown } from '@/hooks/useCountdown';
 import { getScoreColor as getScoreColorCanonical } from '../../_shared/scoreColor';
 
 import { WHITE_ALPHA_12, WHITE_ALPHA_30 } from '../../_shared/tokens';
+import { SC_EAGLE_DARK, SC_BIRDIE_DARK, SC_BOGEY_DARK } from '@/features/courses/components/holes/_constants';
 
 export function formatPurse(purse: number | null): string {
   if (!purse) return '';
@@ -455,27 +455,27 @@ export function WinnerStatsPanel({
               <StatChip
                 value={tournamentStats!.holesInOne}
                 label={tournamentStats!.holesInOne === 1 ? 'Hole-in-1' : 'Holes-in-1'}
-                color={SCORE_COLORS.eagle.text}
+                color={SC_EAGLE_DARK}
               />
             )}
             {tournamentStats!.eagles > 0 && (
               <StatChip
                 value={tournamentStats!.eagles}
                 label={tournamentStats!.eagles === 1 ? 'Eagle' : 'Eagles'}
-                color={SCORE_COLORS.eagle.text}
+                color={SC_EAGLE_DARK}
               />
             )}
             <StatChip
               value={tournamentStats!.birdies}
               label="Birdies"
-              color={SCORE_COLORS.birdie.text}
+              color={SC_BIRDIE_DARK}
             />
             <StatChip value={tournamentStats!.pars} label="Pars" />
             {tournamentStats!.bogeys > 0 && (
               <StatChip
                 value={tournamentStats!.bogeys}
                 label="Bogeys"
-                color={SCORE_COLORS.bogey.text}
+                color={SC_BOGEY_DARK}
               />
             )}
           </div>

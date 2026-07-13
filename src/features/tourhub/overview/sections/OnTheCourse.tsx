@@ -8,6 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import { useFeaturedGroups } from '../data/useFeaturedGroups';
 import { SectionShell } from './SectionShell';
 import { V4 } from '../tokens';
+import { getScoreColor } from '../../_shared/scoreColor';
+
 import { PlayerAvatar } from '../../components/PlayerAvatar';
 import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
@@ -69,9 +71,10 @@ function formatScore(v: number | string | null | undefined): string | null {
 
 function scoreColor(s: string | null): string {
   if (!s || s === 'E') return V4.scoreEven;
-  if (s.startsWith('-')) return V4.scoreUnder;
-  return V4.scoreOver;
+  const n = s.startsWith('-') ? -1 : 1;
+  return getScoreColor(n, 'light');
 }
+
 
 function groupThru(g: GroupShape): number | null {
   if (typeof g.thru === 'number') return g.thru;

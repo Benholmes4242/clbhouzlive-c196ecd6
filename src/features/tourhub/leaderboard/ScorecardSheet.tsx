@@ -4,10 +4,10 @@
  * Opens on row tap from BoardTable. Shows the tapped player's round,
  * hole by hole, with field difficulty (sr_hole_statistics scoring_average)
  * as context. Visual grammar matches the leaderboard: #F8FAFC canvas,
- * tab-rule round selector, 8/800/0.08em column header, tabular nums,
- * house color palette (under #189A55, over #C24A4A, even #8A9099) with
- * two extended cases for score cells (eagle-or-better #B36B00, double+
- * #8A2C2C).
+ * tab-rule round selector, 8/800/0.08em column header, tabular nums.
+ * Per-hole SCORE cells render as World Feed chips via ScoreMark; round
+ * to-par colours (aggregates, field diff) resolve through the canonical
+ * getScoreColor (red under par, ink over par, muted-gray even).
  *
  * Data — never silent, always logged on error:
  *   useScorecard(tournamentId, playerId): sr_scorecards select
@@ -31,6 +31,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { countryFlag, countryFallback } from './countryFlag';
 
 import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
+import { getScoreColor } from '../_shared/scoreColor';
 
 const F = 'Geist, system-ui, sans-serif';
 
@@ -41,9 +42,6 @@ const HAIRLINE = 'rgba(0,0,0,0.08)';
 const CANVAS = '#F8FAFC';
 const BAND = 'rgba(31,36,40,0.03)';
 
-const HOUSE_UNDER = '#189A55';
-const HOUSE_OVER = '#C24A4A';
-const HOUSE_EVEN = '#8A9099';
 
 interface ScorecardRow {
   round_number: number;
@@ -132,10 +130,9 @@ function fmtScoreSigned(n: number | null | undefined): string {
 
 function houseColor(n: number | null | undefined): string {
   if (n == null) return INK;
-  if (n < 0) return HOUSE_UNDER;
-  if (n > 0) return HOUSE_OVER;
-  return HOUSE_EVEN;
+  return getScoreColor(n, 'light');
 }
+
 
 // SCORE cell rendering uses the shared ScoreMark chip system (World Feed
 // palette). Per-hole chips are surface-agnostic; par is bare ink.
@@ -535,8 +532,9 @@ function renderHoleRows(
     let fieldColor = SECONDARY;
     if (h.fieldAvg != null && h.par != null) {
       const d = h.fieldAvg - h.par;
-      if (d < -0.005) fieldColor = HOUSE_UNDER;
-      else if (d > 0.005) fieldColor = HOUSE_OVER;
+      if (d < -0.005) fieldColor = getScoreColor(-1, 'light');
+      else if (d > 0.005) fieldColor = getScoreColor(1, 'light');
+
       else fieldColor = SECONDARY;
     }
     return (
