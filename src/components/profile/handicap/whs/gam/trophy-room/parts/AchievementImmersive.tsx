@@ -93,8 +93,8 @@ export const AchievementImmersive: React.FC<Props> = ({ item, viewerUserId, onCl
 
   const summary = (() => {
     if (isTiered) {
-      const mat = materialName || 'Bronze';
-      return `${earnedTiers} of ${totalTiers} medals earned . ${mat}`;
+      const base = `${earnedTiers} of ${totalTiers} medals earned`;
+      return item.reachedTier > 0 ? `${base} · ${materialName}` : base;
     }
     if (item.earned && item.earnedAt) {
       return `Earned ${format(new Date(item.earnedAt), 'MMM d, yyyy')}`;
