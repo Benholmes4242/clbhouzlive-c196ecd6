@@ -72,7 +72,6 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
       <LegendarySection region={activeRegion} />
 
       <FeatTierRail region={activeRegion} tier="records" title="Course records" />
-      <FeatTierRail region={activeRegion} tier="records" title="Course records" />
 
       {/* Rhythm break 1 - personal (silent if not signed in / no WHS / no picks) */}
       <WhereYoudRank userId={userId} />
