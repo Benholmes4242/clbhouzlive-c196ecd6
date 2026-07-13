@@ -183,7 +183,7 @@ export function ClipsInterruptShelf({ clips, shelfIndex }: Props) {
   return (
     <section
       style={{
-        margin: '0 -16px 16px',
+        margin: '0 -4px 16px',
         padding: '12px 0',
         background: 'rgba(247,147,30,0.06)',
         borderTop: '1px solid rgba(0,0,0,0.07)',
