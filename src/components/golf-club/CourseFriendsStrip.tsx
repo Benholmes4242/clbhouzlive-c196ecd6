@@ -1,5 +1,4 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Users } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useFriendsWhoPlayedCourse } from '@/hooks/useFriendsWhoPlayedCourse';
@@ -12,7 +11,6 @@ interface CourseFriendsStripProps {
 
 export const CourseFriendsStrip: React.FC<CourseFriendsStripProps> = ({ courseId }) => {
   const { user } = useSupabaseSession();
-  const navigate = useNavigate();
 
   const { data: friends = [] } = useFriendsWhoPlayedCourse(user?.id, courseId);
 
@@ -32,9 +30,7 @@ export const CourseFriendsStrip: React.FC<CourseFriendsStripProps> = ({ courseId
       : null;
 
   return (
-    <button
-      type="button"
-      onClick={() => navigate('/golferssharedcourses')}
+    <div
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -43,7 +39,6 @@ export const CourseFriendsStrip: React.FC<CourseFriendsStripProps> = ({ courseId
         borderRadius: 18,
         margin: '0 16px',
         width: 'calc(100% - 32px)',
-        cursor: 'pointer',
         textAlign: 'left',
         background: 'linear-gradient(135deg, rgba(247,147,30,0.07), rgba(247,147,30,0.02))',
         border: '1.5px solid rgba(247,147,30,0.15)',
@@ -125,6 +120,6 @@ export const CourseFriendsStrip: React.FC<CourseFriendsStripProps> = ({ courseId
           </div>
         )}
       </div>
-    </button>
+    </div>
   );
 };
