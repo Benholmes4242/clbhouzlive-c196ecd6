@@ -87,9 +87,11 @@ interface Props {
   row: FeatRow;
   tier: FeatTier;
   onTap?: () => void;
+  size?: FeatCardSize;
 }
 
-export function FeatCard({ row, tier, onTap }: Props) {
+export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
+  const S = SIZE_MAP[size];
   const isLegendary = tier === 'legendary';
   const isRecord = tier === 'records';
   const image = row.course_image ?? row.thumbnail_image ?? null;
