@@ -266,18 +266,23 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
         flexDirection: 'column',
       }}
     >
-      {/* Header — pinned under the notch like Echo/Messages */}
+      {/* Header — pinned under the notch (fixed, so no --sat race) */}
       <header
         style={{
-          position: 'sticky',
+          position: 'fixed',
           top: 0,
-          zIndex: 5,
-          flexShrink: 0,
+          left: 0,
+          right: 0,
+          margin: '0 auto',
+          width: '100%',
+          maxWidth: 480,
+          zIndex: 50,
           background: RV2.canvas,
           borderBottom: `0.5px solid ${RV2.hairline}`,
           paddingTop: 'calc(env(safe-area-inset-top, 0px) + 8px)',
         }}
       >
+
         <div
           style={{
             display: 'flex',
