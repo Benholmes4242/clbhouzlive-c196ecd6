@@ -7,7 +7,7 @@ import {
 } from './computeStablefordDistribution';
 import StablefordDetailSheet from './StablefordDetailSheet';
 import { DarkSectionHeader } from '../_shared/darkAtoms';
-import { SC_BIRDIE, SC_ALBATROSS, SC_PAR, SC_BOGEY, SC_DOUBLE, SC_BIRDIE_DARK, SC_PAR_DARK, SC_BOGEY_DARK, SC_DOUBLE_DARK } from '@/features/courses/components/holes/_constants';
+import { SC_BIRDIE, SC_ALBATROSS, SC_PAR, SC_BOGEY, SC_DOUBLE, SC_ACE_DARK, SC_ALBATROSS_DARK, SC_EAGLE_DARK, SC_BIRDIE_DARK, SC_PAR_DARK, SC_BOGEY_DARK, SC_DOUBLE_DARK } from '@/features/courses/components/holes/_constants';
 import { useTrophyAggregates } from '@/lib/whs/hooks';
 
 interface Props {
