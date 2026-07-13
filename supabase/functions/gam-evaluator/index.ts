@@ -588,6 +588,7 @@ function matchesBinary(badge: any, stats: any): boolean {
     case "clean_card": return stats.clean_card;
     case "spring_2026_active": return stats.is_counter;
     case "beat_par": return stats.beat_par;
+    case "first_index": return stats.hcp_at_time != null;
     default: return false;
   }
 }

@@ -35,8 +35,8 @@ function hexToRgb(hex: string): string {
 const CATEGORY_ORDER: BadgeCategory[] = [
   'scoring',
   'handicap',
-  'consistency',
   'courses',
+  'consistency',
   'community',
   'seasonal',
 ];
@@ -47,7 +47,7 @@ const CATEGORY_LABEL: Record<BadgeCategory, string> = {
   consistency: 'Consistency',
   courses: 'Courses',
   community: 'Community',
-  seasonal: 'Seasonal',
+  seasonal: 'Limited Edition',
 };
 
 const COURSES_ORDER: string[] = [
