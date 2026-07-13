@@ -264,7 +264,6 @@ const Top100CoursesHubPanel = () => {
           ariaLabel="Top 100 lists"
         />
       </div>
-      </div>
 
 
       {/* Search bar — scrolls with content (no sticky behaviour) */}
