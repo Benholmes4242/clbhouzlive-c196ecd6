@@ -241,7 +241,7 @@ export function HubClipsRow() {
           display: 'flex',
           gap: 10,
           overflowX: 'auto',
-          padding: '0 16px',
+          padding: '0 4px',
           WebkitOverflowScrolling: 'touch',
           scrollbarWidth: 'none',
         }}

@@ -159,7 +159,7 @@ export function VideosFeedV2({ sort, category }: Props) {
   return (
     <div style={{ fontFamily: FONT_FAMILY }}>
       {visiblePending.length > 0 && (
-        <div style={{ padding: '12px 16px 0' }}>
+        <div style={{ padding: '12px 4px 0' }}>
           {visiblePending.map((p) => (
             <div key={p.jobId} style={{ marginBottom: 12 }}>
               <PendingPostCard entry={p} theme="light" />
@@ -169,7 +169,7 @@ export function VideosFeedV2({ sort, category }: Props) {
       )}
 
       {isLoading && rows.length === 0 ? (
-        <div style={{ padding: '12px 16px 0' }}>
+        <div style={{ padding: '12px 4px 0' }}>
           <SkeletonCard />
           <SkeletonCard />
           <SkeletonCard />
@@ -191,7 +191,7 @@ export function VideosFeedV2({ sort, category }: Props) {
           </div>
         </div>
       ) : (
-        <div ref={railRef} style={{ padding: '12px 16px 0' }}>
+        <div ref={railRef} style={{ padding: '12px 4px 0' }}>
           {rows.map((r, i) => {
             const card = (
               <VideoFeedCard
