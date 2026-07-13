@@ -70,8 +70,9 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
       <LegendarySection region={activeRegion} />
 
       <FeatTierRail region={activeRegion} tier="records" title="Course records" />
-      <FeatTierRail region={activeRegion} tier="eagles" title="Eagles" />
-      <FeatTierRail region={activeRegion} tier="birdie_hauls" title="Birdie hauls" />
+      <FeatTierRail region={activeRegion} tier="eagles" title="Eagles" variant="compact" />
+      <FeatTierRail region={activeRegion} tier="birdie_hauls" title="Birdie hauls" variant="list" />
+
 
       <div
         style={{
