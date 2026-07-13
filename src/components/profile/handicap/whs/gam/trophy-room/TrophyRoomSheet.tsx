@@ -34,21 +34,21 @@ function hexToRgb(hex: string): string {
 }
 
 
-const CATEGORY_ORDER: BadgeCategory[] = [
+type RenderCategory = Exclude<BadgeCategory, 'community'>;
+
+const CATEGORY_ORDER: RenderCategory[] = [
   'scoring',
   'handicap',
   'courses',
   'consistency',
-  'community',
   'seasonal',
 ];
 
-const CATEGORY_LABEL: Record<BadgeCategory, string> = {
+const CATEGORY_LABEL: Record<RenderCategory, string> = {
   scoring: 'Scoring',
   handicap: 'Handicap',
   consistency: 'Consistency',
   courses: 'Courses',
-  community: 'Community',
   seasonal: 'Limited Edition',
 };
 
@@ -58,13 +58,12 @@ const COURSES_ORDER: string[] = [
 
 function groupAchievementsByCategory(
   items: Extract<TrophyItem, { kind: 'achievement' }>[],
-): Record<BadgeCategory, Extract<TrophyItem, { kind: 'achievement' }>[]> {
-  const groups: Record<BadgeCategory, Extract<TrophyItem, { kind: 'achievement' }>[]> = {
+): Record<RenderCategory, Extract<TrophyItem, { kind: 'achievement' }>[]> {
+  const groups: Record<RenderCategory, Extract<TrophyItem, { kind: 'achievement' }>[]> = {
     scoring: [],
     handicap: [],
     consistency: [],
     courses: [],
-    community: [],
     seasonal: [],
   };
   for (const item of items) {
