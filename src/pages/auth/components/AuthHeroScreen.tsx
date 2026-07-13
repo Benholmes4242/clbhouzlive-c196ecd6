@@ -143,7 +143,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
             className="text-[30px] md:text-[36px] font-bold leading-[1.25] auth-tagline-animate"
             style={{ letterSpacing: '-0.02em', color: 'rgba(255,255,255,0.96)', textWrap: 'balance' as any, padding: '0 8px' }}
           >
-            the home of golf courses<span style={{ color: '#F7931E' }}>.</span>
+            the home of golf courses<span aria-hidden="true" style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', backgroundColor: '#F7931E', verticalAlign: 'middle', marginLeft: 2 }} />
           </h1>
         </div>
 
