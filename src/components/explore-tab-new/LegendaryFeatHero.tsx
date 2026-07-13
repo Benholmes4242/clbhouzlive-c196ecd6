@@ -295,6 +295,8 @@ export function LegendaryFeatHero({ region }: Props) {
           </span>
         </div>
 
+        </div>
+
         {/* Bottom-right pager */}
         {showPager ? (
           <div
@@ -313,6 +315,7 @@ export function LegendaryFeatHero({ region }: Props) {
             {safeIndex + 1} OF {total} ›
           </div>
         ) : null}
+        </div>
       </button>
     </div>
   );
