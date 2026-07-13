@@ -67,6 +67,25 @@ export function LegendaryFeatHero({ region }: Props) {
   const chip = labelFor(row?.feat_type);
   const value = (row?.feat_value ?? '').toUpperCase();
 
+  // Pointer + fade-transition refs must be declared before any early return.
+  const pointerRef = useRef<{ x: number; y: number; t: number } | null>(null);
+  const contentRef = useRef<HTMLDivElement | null>(null);
+  const prevIndexRef = useRef(safeIndex);
+
+  useEffect(() => {
+    if (prevIndexRef.current === safeIndex) return;
+    prevIndexRef.current = safeIndex;
+    const node = contentRef.current;
+    if (!node) return;
+    if (prefersReduced()) return;
+    node.style.transition = 'none';
+    node.style.opacity = '0';
+    // force reflow
+    void node.offsetWidth;
+    node.style.transition = 'opacity 160ms linear';
+    node.style.opacity = '1';
+  }, [safeIndex]);
+
   if (isLoading) {
     return (
       <div style={{ padding: '0 16px' }}>
@@ -95,8 +114,6 @@ export function LegendaryFeatHero({ region }: Props) {
     if (total > 1) setIndex((i) => (i - 1 + total) % total);
   };
 
-  const pointerRef = useRef<{ x: number; y: number; t: number } | null>(null);
-
   const onPointerDown = (e: React.PointerEvent) => {
     pointerRef.current = { x: e.clientX, y: e.clientY, t: Date.now() };
   };
@@ -124,23 +141,6 @@ export function LegendaryFeatHero({ region }: Props) {
   const onPointerCancel = () => {
     pointerRef.current = null;
   };
-
-  // Fade transition on content when index changes
-  const contentRef = useRef<HTMLDivElement | null>(null);
-  const prevIndexRef = useRef(safeIndex);
-  useEffect(() => {
-    if (prevIndexRef.current === safeIndex) return;
-    prevIndexRef.current = safeIndex;
-    const node = contentRef.current;
-    if (!node) return;
-    if (prefersReduced()) return;
-    node.style.transition = 'none';
-    node.style.opacity = '0';
-    // force reflow
-    void node.offsetWidth;
-    node.style.transition = 'opacity 160ms linear';
-    node.style.opacity = '1';
-  }, [safeIndex]);
 
   return (
     <div style={{ padding: '0 16px' }}>
