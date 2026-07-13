@@ -274,10 +274,13 @@ export function regionPaletteForBadge(badgeId: string): RarityPalette | null {
 /**
  * Returns palette for a showpiece. All showpieces (including regional Top 100)
  * now resolve to the user's CURRENT MATERIAL tier — region is expressed via
- * badge label/name, not via card colour. Locked (tier 0) handled caller-side.
+ * badge label/name, not via card colour. Defensive: if reachedTier <= 0 we
+ * return LOCKED_PALETTE so no caller can accidentally leak a bronze tint for
+ * zero-progress items (previous contract trusted callers; it no longer does).
  */
 export function paletteForShowpiece(reachedTier: number, _badgeId?: string): RarityPalette {
-  const clamped = Math.max(1, Math.min(5, reachedTier || 1)) as 1 | 2 | 3 | 4 | 5;
+  if (reachedTier <= 0) return LOCKED_PALETTE;
+  const clamped = Math.max(1, Math.min(5, reachedTier)) as 1 | 2 | 3 | 4 | 5;
   return MATERIAL_PALETTES[clamped];
 }
 
