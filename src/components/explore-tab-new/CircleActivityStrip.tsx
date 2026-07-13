@@ -337,21 +337,21 @@ function CircleActivityCard({ row, onTap }: CardProps) {
       >
         <div style={{ flexShrink: 0 }}>
           <SquircleAvatar
-            size={26}
+            size={24}
             src={row.friend_avatar}
             alt={friend}
             fallback={initials(row.friend_name)}
             hairlineRing
-            ringColor={legendary ? accent : 'rgba(255,255,255,0.22)'}
+            ringColor={legendary ? accent : 'rgba(255,255,255,0.25)'}
           />
         </div>
         <div
           style={{
             flex: 1,
             minWidth: 0,
-            fontSize: 12.5,
+            fontSize: 12,
             fontWeight: 700,
-            color: '#F8F4E8',
+            color: '#ffffff',
             lineHeight: 1.15,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
