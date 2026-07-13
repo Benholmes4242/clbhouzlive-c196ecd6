@@ -6,6 +6,8 @@ import { useExploreRegion } from './hooks/useExploreRegion';
 import DiscoverWhsMasthead from './DiscoverWhsMasthead';
 import { CircleActivityStrip } from './CircleActivityStrip';
 import { AlmanacRegionTabs, FeatTierRail, AlmanacHead, REGION_TABS } from './AlmanacSections';
+import { LegendaryFeatHero } from './LegendaryFeatHero';
+import { useRegionFeats } from './hooks/useRegionFeats';
 
 import ExploreGrid from './ExploreGrid';
 
