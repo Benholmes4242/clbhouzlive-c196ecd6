@@ -400,6 +400,27 @@ const FullscreenVideoSlot: React.FC<{
     postId: resumeKey,
   });
 
+  // Autoplay-blocked → show "Tap for sound" pill. The engine's unmuted
+  // rejection path muted THIS lane to keep playback going but did NOT
+  // touch the session store. Tapping the pill re-asserts unmute with a
+  // fresh gesture; unmuting via any other surface clears the pill too.
+  const [showSoundPill, setShowSoundPill] = useState(false);
+  useEffect(() => {
+    setShowSoundPill(false);
+  }, [resumeKey, isBorrowSlide]);
+  useEffect(() => {
+    const unsub = VideoEngine.onAutoplayBlocked((id) => {
+      if (id === 'fullscreen') setShowSoundPill(true);
+    });
+    return unsub;
+  }, []);
+  useEffect(() => {
+    const unsub = useSessionAudio.subscribe((s) => {
+      if (!s.isMuted) setShowSoundPill(false);
+    });
+    return unsub;
+  }, []);
+
   // Resolve the settled rect from intrinsic media dims — MUST match the
   // clone's expand target (both consume resolveRestingRect). Prevents the
   // clone-retire → settled-paint size delta that produced the visible
