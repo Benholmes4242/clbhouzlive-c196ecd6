@@ -249,6 +249,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
           const count = distCounts[key] || 0;
           const pct = (count / maxCount) * 100;
           const has = count > 0;
+          const isExceptionalRow = key === 'exceptional' && has;
           return (
             <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
               <span
@@ -272,15 +273,18 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
                 }}
               >
                 <div
+                  className={isExceptionalRow ? 'clbhouz-gold-shimmer-bar' : undefined}
                   style={{
                     height: '100%',
                     width: `${pct}%`,
-                    background: has
-                      ? (() => {
-                          const ramp = rampForRating(TIER_REP_SCORE[key as string] ?? 0);
-                          return `linear-gradient(90deg, ${ramp.lo}, ${ramp.hi})`;
-                        })()
-                      : 'transparent',
+                    background: isExceptionalRow
+                      ? undefined
+                      : has
+                        ? (() => {
+                            const ramp = rampForRating(TIER_REP_SCORE[key as string] ?? 0);
+                            return `linear-gradient(90deg, ${ramp.lo}, ${ramp.hi})`;
+                          })()
+                        : 'transparent',
                     borderRadius: 4,
                     transition: 'width 0.5s ease',
                   }}
