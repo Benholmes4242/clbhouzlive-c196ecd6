@@ -8,6 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAIPredictions } from '../../hooks/useAIPredictions';
 import { SectionShell } from './SectionShell';
 import { V4 } from '../tokens';
+import { getScoreColor } from '../../_shared/scoreColor';
+
 import type { EventState } from '@/features/tourhub/components/overview-v3/useTournamentPulse';
 import type { AITopContender } from '../../hooks/useAIPredictions';
 import { usePickLiveState, type PickLiveState } from '../data/usePickLiveState';
