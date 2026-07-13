@@ -3,7 +3,7 @@ import { useCallback, useRef, useMemo } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExploreFeed } from './hooks/useExploreFeed';
 import { useExploreRegion } from './hooks/useExploreRegion';
-import ConnectHandicapCue from '@/components/courses/course-detail/ConnectHandicapCue';
+import DiscoverWhsMasthead from './DiscoverWhsMasthead';
 import { CircleActivityStrip } from './CircleActivityStrip';
 import { AlmanacRegionTabs, FeatTierRail, AlmanacHead, REGION_TABS } from './AlmanacSections';
 
@@ -52,9 +52,7 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
 
   return (
     <div style={{ background: SLATE_50, minHeight: '100vh' }}>
-      <div style={{ paddingTop: 0, paddingBottom: 16 }}>
-        <ConnectHandicapCue variant="discover" />
-      </div>
+      <DiscoverWhsMasthead />
 
       {/* Friends rail — region-INDEPENDENT, always visible */}
       <CircleActivityStrip userId={userId} />
