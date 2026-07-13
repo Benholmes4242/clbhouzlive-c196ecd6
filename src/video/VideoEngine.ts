@@ -85,6 +85,7 @@ interface Lane {
   wantPlay: boolean;
   listeners: Set<LaneListener>;
   detachFns: Array<() => void>;
+  audioPolicy: LaneAudioPolicy;
 }
 
 
