@@ -195,9 +195,9 @@ export function ScheduleTab() {
           WebkitBackdropFilter: 'blur(14px)',
           borderBottom: '1px solid rgba(0,0,0,0.07)',
           padding: '8px 16px 10px',
-          marginTop: 'calc(var(--sat, 0px) * -1 - 69px)',
         }}
       >
+
         <div
           style={{
             display: 'flex',
