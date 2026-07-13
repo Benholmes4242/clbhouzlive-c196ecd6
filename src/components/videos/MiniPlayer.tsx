@@ -227,18 +227,7 @@ export const MiniPlayer: React.FC = () => {
 
           {/* Controls (inert shells) */}
           <div className="flex items-center gap-1">
-            <button
-              onClick={handleMuteToggle}
-              className={cn(
-                "w-8 h-8 rounded-full",
-                "bg-background/10 hover:bg-background/20",
-                "text-foreground flex items-center justify-center transition"
-              )}
-              aria-label={isMuted ? "Unmute" : "Mute"}
-              type="button"
-            >
-              {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
-            </button>
+            <MuteButton size="sm" />
 
             <button
               onClick={handleTogglePlay}
