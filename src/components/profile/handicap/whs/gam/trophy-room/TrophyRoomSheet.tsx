@@ -39,7 +39,6 @@ const CATEGORY_ORDER: BadgeCategory[] = [
   'handicap',
   'courses',
   'consistency',
-  'community',
   'seasonal',
 ];
 
@@ -48,7 +47,6 @@ const CATEGORY_LABEL: Record<BadgeCategory, string> = {
   handicap: 'Handicap',
   consistency: 'Consistency',
   courses: 'Courses',
-  community: 'Community',
   seasonal: 'Limited Edition',
 };
 
@@ -64,7 +62,6 @@ function groupAchievementsByCategory(
     handicap: [],
     consistency: [],
     courses: [],
-    community: [],
     seasonal: [],
   };
   for (const item of items) {
