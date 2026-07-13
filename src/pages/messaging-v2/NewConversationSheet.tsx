@@ -286,7 +286,7 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
                     alignItems: 'center',
                     gap: 12,
                     width: '100%',
-                    padding: '10px 16px',
+                    padding: '12px 16px',
                     background: 'transparent',
                     border: 'none',
                     borderBottom: `0.5px solid ${HAIRLINE}`,
