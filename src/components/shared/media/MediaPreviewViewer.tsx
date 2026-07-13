@@ -213,13 +213,18 @@ export function MediaPreviewViewer({
       >
 
         {item.type === 'video' ? (
+          // NOTE: play() is driven imperatively via useEffect so an unmuted
+          // rejection is catchable (no autoPlay attribute). The native
+          // <controls> volume acts on the element only and does not write
+          // the session store — acceptable for the local scrub UX; the
+          // MuteButton overlay is the canonical session writer.
           <video
             key={item.id}
+            ref={videoRef}
             src={item.previewUrl}
             poster={item.thumbnailUrl}
             controls
             playsInline
-            autoPlay
             className="w-full h-full object-contain"
           />
         ) : (
