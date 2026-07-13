@@ -262,7 +262,7 @@ export const Top100Immersive: React.FC<Props> = ({
         {/* SCROLL BODY - Top100Body unchanged; taps do NOT close */}
         <div onClick={stop} onTouchStart={stop}>
           <Top100Body
-            item={item}
+            item={displayItem}
             ownerUserId={ownerUserId}
             viewerUserId={viewerUserId}
             onClose={onClose}
