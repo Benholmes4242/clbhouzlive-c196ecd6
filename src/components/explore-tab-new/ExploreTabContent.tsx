@@ -52,9 +52,7 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
 
   return (
     <div style={{ background: SLATE_50, minHeight: '100vh' }}>
-      <div style={{ paddingTop: 0, paddingBottom: 16 }}>
-        <ConnectHandicapCue variant="discover" />
-      </div>
+      <DiscoverWhsMasthead />
 
       {/* Friends rail — region-INDEPENDENT, always visible */}
       <CircleActivityStrip userId={userId} />
