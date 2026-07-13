@@ -6,6 +6,8 @@ import { useExploreRegion } from './hooks/useExploreRegion';
 import DiscoverWhsMasthead from './DiscoverWhsMasthead';
 import { CircleActivityStrip } from './CircleActivityStrip';
 import { AlmanacRegionTabs, FeatTierRail, AlmanacHead, REGION_TABS } from './AlmanacSections';
+import { LegendaryFeatHero } from './LegendaryFeatHero';
+import { useRegionFeats } from './hooks/useRegionFeats';
 
 import ExploreGrid from './ExploreGrid';
 
@@ -64,8 +66,9 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
       {/* Region tabs — shared control driving tiers and grid */}
       <AlmanacRegionTabs region={activeRegion} onRegionChange={handleRegionChange} />
 
-      {/* The four tiers */}
-      <FeatTierRail region={activeRegion} tier="legendary" title="Aces & Albatrosses" />
+      {/* Legendary hero (aces & albatrosses) */}
+      <LegendarySection region={activeRegion} />
+
       <FeatTierRail region={activeRegion} tier="records" title="Course records" />
       <FeatTierRail region={activeRegion} tier="eagles" title="Eagles" />
       <FeatTierRail region={activeRegion} tier="birdie_hauls" title="Birdie hauls" />
@@ -95,3 +98,31 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
     </div>
   );
 }
+
+function LegendarySection({ region }: { region: string | null }) {
+  const { data, isLoading } = useRegionFeats(region, 'legendary');
+  const hasAny = (data?.length ?? 0) > 0;
+  if (!isLoading && !hasAny) return null;
+  const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+  return (
+    <section style={{ fontFamily: FONT, paddingTop: 24 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 16px 8px' }}>
+        <span aria-hidden style={{ fontSize: 13, lineHeight: 1 }}>⛳</span>
+        <span
+          style={{
+            fontSize: 11.5,
+            fontWeight: 800,
+            letterSpacing: '0.13em',
+            textTransform: 'uppercase',
+            color: '#8A6400',
+          }}
+        >
+          Aces &amp; Albatrosses
+        </span>
+      </div>
+      <LegendaryFeatHero region={region} />
+    </section>
+  );
+}
+
+
