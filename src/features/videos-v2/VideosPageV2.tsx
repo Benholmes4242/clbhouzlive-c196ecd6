@@ -81,6 +81,7 @@ export default function VideosPageV2() {
 
   return (
     <PageRoot className="min-h-screen text-foreground bg-background">
+      <GlassHeaderPlate />
       <main
         style={{
           paddingBottom: 88,
@@ -90,15 +91,15 @@ export default function VideosPageV2() {
           fontFamily: FONT_FAMILY,
         }}
       >
-        {/* Sticky control block. UnderlineTabs owns its own hairline; the
-            outer container has no borderBottom to avoid doubling. FilterChips
-            row provides the visual break to the feed. */}
+        {/* Sticky control block. Glass treatment matches Clips + Watch. */}
         <div
           style={{
             position: 'sticky',
             top: 'calc(var(--sat, 0px) + 61px)',
             zIndex: 10,
-            background: '#F8FAFC',
+            background: 'rgba(248,250,252,0.72)',
+            backdropFilter: 'blur(14px)',
+            WebkitBackdropFilter: 'blur(14px)',
             borderBottom: '1px solid rgba(0,0,0,0.07)',
           }}
         >
