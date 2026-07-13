@@ -7,6 +7,7 @@
  */
 
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { Share2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { renderBadgeIcon } from '../../badgeIcons';
