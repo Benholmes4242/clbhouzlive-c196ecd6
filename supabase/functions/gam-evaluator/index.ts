@@ -1286,6 +1286,8 @@ const URGENCY: Record<string, string> = {
   streak_broken: "low",
   streak_freeze_applied: "medium",
   rival_played: "medium",
+  status_at_risk: "high",
+  status_reclaimed: "medium",
 };
 
 function dedupKey(type: string, userId: string, payload: any): string {
