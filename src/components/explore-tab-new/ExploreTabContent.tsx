@@ -114,9 +114,12 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
 
 function LegendarySection({ region }: { region: string | null }) {
   const { data, isLoading } = useRegionFeats(region, 'legendary');
-  const hasAny = (data?.length ?? 0) > 0;
+  const rows = data ?? [];
+  const hasAny = rows.length > 0;
+  const [sheetOpen, setSheetOpen] = useState(false);
   if (!isLoading && !hasAny) return null;
   const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+  const hasOverflow = rows.length > 12;
   return (
     <section style={{ fontFamily: FONT, paddingTop: 24 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 16px 8px' }}>
@@ -132,8 +135,33 @@ function LegendarySection({ region }: { region: string | null }) {
         >
           Aces &amp; Albatrosses
         </span>
+        <span style={{ flex: 1 }} />
+        {hasOverflow && (
+          <button
+            type="button"
+            onClick={() => setSheetOpen(true)}
+            style={{
+              border: 'none',
+              background: 'none',
+              fontSize: 11.5,
+              fontWeight: 700,
+              letterSpacing: '0.06em',
+              color: '#F7931E',
+              cursor: 'pointer',
+            }}
+          >
+            ALL
+          </button>
+        )}
       </div>
       <LegendaryFeatHero region={region} />
+      <TierSeeAllSheet
+        open={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        tier="legendary"
+        region={region}
+        rows={rows}
+      />
     </section>
   );
 }
