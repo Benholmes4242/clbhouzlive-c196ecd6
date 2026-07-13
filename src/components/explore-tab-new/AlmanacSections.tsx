@@ -144,10 +144,11 @@ interface TierProps {
   region: string | null;
   tier: FeatTier;
   title: string;
+  variant?: 'standard' | 'compact' | 'list';
 }
 
 
-function FeatTierRailInner({ region, tier, title }: TierProps) {
+function FeatTierRailInner({ region, tier, title, variant = 'standard' }: TierProps) {
   const navigate = useNavigate();
   const { data, isLoading } = useRegionFeats(region, tier);
   const rows = data ?? [];
