@@ -3,12 +3,9 @@ import { useSearchParams } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
-import { SortSegment, type VideosSortId } from './components/SortSegment';
-import {
-  CategoryChips,
-  VIDEOS_V2_CATEGORY_IDS,
-  type VideosV2CategoryId,
-} from './components/CategoryChips';
+import { UnderlineTabs } from '@/components/ui/UnderlineTabs';
+import { FilterChips } from '@/components/ui/FilterChips';
+import type { VideosSortId } from './components/SortSegment';
 import { VideosFeedV2 } from './components/VideosFeedV2';
 
 const FONT_FAMILY =
@@ -17,16 +14,40 @@ const FONT_FAMILY =
 const VALID_SORTS: readonly VideosSortId[] = ['latest', 'popular', 'following'];
 const DEFAULT_SORT: VideosSortId = 'latest';
 
+const SORT_OPTS: ReadonlyArray<{ id: VideosSortId; label: string }> = [
+  { id: 'latest', label: 'Latest' },
+  { id: 'popular', label: 'Popular' },
+  { id: 'following', label: 'Following' },
+];
+
+// Category ids replicated (NOT imported) from the legacy mood system in
+// src/components/watch/videos/hooks/useVideosMood.ts. Videos v2 uses the
+// MOMENT_CATEGORIES ids directly as its ?cat= values.
+const VIDEOS_V2_CATEGORY_IDS = [
+  'all',
+  'course-vlog',
+  'tips-coaching',
+  'tournament',
+] as const;
+type VideosV2CategoryId = typeof VIDEOS_V2_CATEGORY_IDS[number];
+
+const CATEGORY_OPTS: ReadonlyArray<{ id: VideosV2CategoryId; label: string }> = [
+  { id: 'all', label: 'All' },
+  { id: 'course-vlog', label: 'Course vlogs' },
+  { id: 'tips-coaching', label: 'Coaching' },
+  { id: 'tournament', label: 'Tournaments' },
+];
+
 function parseSort(raw: string | null): VideosSortId {
   return raw && (VALID_SORTS as readonly string[]).includes(raw)
     ? (raw as VideosSortId)
     : DEFAULT_SORT;
 }
 
-function parseCategory(raw: string | null): VideosV2CategoryId | null {
+function parseCategory(raw: string | null): VideosV2CategoryId {
   return raw && (VIDEOS_V2_CATEGORY_IDS as readonly string[]).includes(raw)
     ? (raw as VideosV2CategoryId)
-    : null;
+    : 'all';
 }
 
 export default function VideosPageV2() {
@@ -47,14 +68,17 @@ export default function VideosPageV2() {
   );
 
   const setCategory = useCallback(
-    (next: VideosV2CategoryId | null) => {
+    (next: VideosV2CategoryId) => {
       const p = new URLSearchParams(params);
-      if (next == null) p.delete('cat');
+      if (next === 'all') p.delete('cat');
       else p.set('cat', next);
       setParams(p, { replace: true });
     },
     [params, setParams],
   );
+
+  // VideosFeedV2 expects `null` for the "All" state (unfiltered).
+  const feedCategory = category === 'all' ? null : category;
 
   return (
     <PageRoot className="min-h-screen text-foreground bg-background">
@@ -67,8 +91,9 @@ export default function VideosPageV2() {
           fontFamily: FONT_FAMILY,
         }}
       >
-        {/* Sticky control block — CompactHeader supplies the back-arrow
-            chrome; this is the first content on the page. */}
+        {/* Sticky control block. UnderlineTabs owns its own hairline; the
+            outer container has no borderBottom to avoid doubling. FilterChips
+            row provides the visual break to the feed. */}
         <div
           style={{
             position: 'sticky',
@@ -76,12 +101,25 @@ export default function VideosPageV2() {
             zIndex: 10,
             background: '#F8FAFC',
             borderBottom: '1px solid rgba(0,0,0,0.07)',
-            padding: '0 16px 12px',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '0 4px',
+            }}
+          >
             <div style={{ flex: 1, minWidth: 0 }}>
-              <SortSegment value={sort} onChange={setSort} />
+              <UnderlineTabs
+                size="md"
+                align="left"
+                options={SORT_OPTS}
+                value={sort}
+                onChange={setSort}
+                ariaLabel="Sort videos"
+              />
             </div>
             <button
               type="button"
@@ -99,15 +137,23 @@ export default function VideosPageV2() {
                 padding: 0,
                 cursor: 'pointer',
                 flexShrink: 0,
+                marginBottom: 6,
               }}
             >
               <Search size={15} color="#0F172A" />
             </button>
           </div>
-          <CategoryChips value={category} onChange={setCategory} />
+          <div style={{ padding: '8px 0 10px' }}>
+            <FilterChips
+              options={CATEGORY_OPTS}
+              value={category}
+              onChange={setCategory}
+              ariaLabel="Video category filter"
+            />
+          </div>
         </div>
 
-        <VideosFeedV2 sort={sort} category={category} />
+        <VideosFeedV2 sort={sort} category={feedCategory} />
       </main>
 
       <SearchOverlayV2 isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
