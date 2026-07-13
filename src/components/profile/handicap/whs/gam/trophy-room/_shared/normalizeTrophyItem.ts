@@ -29,6 +29,9 @@ export type TrophyItem =
       tiers: TrophyTier[];
       /** Tier index reached so far (0 if none). */
       reachedTier: number;
+      /** Earned but the owner has not opened the trophy room since. Drives
+       *  the one-shot sheen on the card. False for locked/seen badges. */
+      isNew: boolean;
     }
   | {
       kind: 'legend';
@@ -129,6 +132,7 @@ export function normalizeBadge(b: UserBadge): TrophyItem {
     counterMetric: b.counter_metric,
     tiers,
     reachedTier: reached,
+    isNew: earned && b.seen_by_user === false,
   };
 }
 
