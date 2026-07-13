@@ -66,8 +66,9 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
       {/* Region tabs — shared control driving tiers and grid */}
       <AlmanacRegionTabs region={activeRegion} onRegionChange={handleRegionChange} />
 
-      {/* The four tiers */}
-      <FeatTierRail region={activeRegion} tier="legendary" title="Aces & Albatrosses" />
+      {/* Legendary hero (aces & albatrosses) */}
+      <LegendarySection region={activeRegion} />
+
       <FeatTierRail region={activeRegion} tier="records" title="Course records" />
       <FeatTierRail region={activeRegion} tier="eagles" title="Eagles" />
       <FeatTierRail region={activeRegion} tier="birdie_hauls" title="Birdie hauls" />
