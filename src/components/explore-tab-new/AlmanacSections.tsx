@@ -260,15 +260,31 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard' }: TierPr
             </div>
           </button>
         </div>
+      ) : variant === 'list' ? (
+        <div style={{ padding: '0 16px' }}>
+          {displayRows.map((row, i) => (
+            <FeatListRow
+              key={`${row.score_id ?? row.course_id ?? i}-${i}`}
+              row={row}
+              tier={tier}
+            />
+          ))}
+        </div>
       ) : (
         <div
           className="flex gap-3 px-4 overflow-x-auto scrollbar-hide"
           style={{ paddingTop: 4, marginTop: -4, paddingBottom: 16, marginBottom: -16 }}>
           {displayRows.map((row, i) => (
-            <FeatCard key={`${row.score_id ?? row.course_id ?? i}-${i}`} row={row} tier={tier} />
+            <FeatCard
+              key={`${row.score_id ?? row.course_id ?? i}-${i}`}
+              row={row}
+              tier={tier}
+              size={variant === 'compact' ? 'compact' : 'default'}
+            />
           ))}
         </div>
       )}
+
 
       <TierSeeAllSheet
         open={sheetOpen}
