@@ -197,7 +197,7 @@ export function ClipsInterruptShelf({ clips, shelfIndex }: Props) {
           justifyContent: 'space-between',
           alignItems: 'baseline',
           marginBottom: 12,
-          padding: '0 16px',
+          padding: '0 12px',
         }}
       >
         <span
