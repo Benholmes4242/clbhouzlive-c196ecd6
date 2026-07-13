@@ -60,6 +60,14 @@ Deno.serve(async (req) => {
       return json({ ok: true, replay: true, data });
     }
 
+    // Top-100-only mode: recompute regional milestones and award
+    // the four regional badges. Fired after a course rating is
+    // written; cheap and idempotent, safe to over-call.
+    if (body?.user_id && body?.top100_only) {
+      const res = await processTop100Only(body.user_id);
+      return json({ ok: true, top100_only: true, result: res });
+    }
+
     // Cron drain
     const rows = await fetchQueueBatch(BATCH_SIZE);
     const results: any[] = [];
