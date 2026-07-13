@@ -599,6 +599,78 @@ function matchesBinary(badge: any, stats: any): boolean {
     case "beat_par": return stats.beat_par;
     case "first_index": return stats.hcp_at_time != null;
     default: return false;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// status_transitions (single_figures, scratch)
+// Mirrors frontend statusBadges.ts. Lower index is better.
+//   single_figures: hold 9.9, risk 9.5
+//   scratch:        hold 0.0, risk 0.5
+//   held: index <= risk | at_risk: risk < index <= hold | lost: index > hold
+// ─────────────────────────────────────────────────────────────────────────────
+const STATUS_BANDS: Record<string, { hold: number; risk: number }> = {
+  single_figures: { hold: 9.9, risk: 9.5 },
+  scratch:        { hold: 0.0, risk: 0.5 },
+};
+
+function statusZone(badgeId: string, index: number | null): 'held' | 'at_risk' | 'lost' | null {
+  const band = STATUS_BANDS[badgeId];
+  if (!band || index == null) return null;
+  if (index <= band.risk) return 'held';
+  if (index <= band.hold) return 'at_risk';
+  return 'lost';
+}
+
+async function applyStatusTransitions(userId: string, stats: any, whsScoreId: string) {
+  const newIndex: number | null = stats.hcp_at_time;
+  if (newIndex == null) return;
+
+  // Source prevIndex from the user's most recent whs_score BEFORE this one,
+  // by (play_date desc, created_at desc), excluding whsScoreId. This is the
+  // last index the evaluator would have observed. Fallback: if no prior score,
+  // there is no transition to fire (skip).
+  const { data: priorRow } = await supabase
+    .from("whs_scores")
+    .select("handicap_index_at_time, play_date, created_at, whs_connections!inner(user_id)")
+    .eq("whs_connections.user_id", userId)
+    .neq("id", whsScoreId)
+    .not("handicap_index_at_time", "is", null)
+    .order("play_date", { ascending: false })
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const prevIndex: number | null = priorRow?.handicap_index_at_time ?? null;
+  if (prevIndex == null) return;
+
+  for (const badgeId of Object.keys(STATUS_BANDS)) {
+    // Gate on milestone-earned: only fire transitions when the user actually
+    // holds the binary badge row. Never-earned badges have no status to lose
+    // or reclaim.
+    const { data: earnedRow } = await supabase
+      .from("gam_user_badges")
+      .select("badge_id")
+      .eq("user_id", userId).eq("badge_id", badgeId).maybeSingle();
+    if (!earnedRow) continue;
+
+    const prevZone = statusZone(badgeId, prevIndex);
+    const newZone = statusZone(badgeId, newIndex);
+    const band = STATUS_BANDS[badgeId];
+
+    if (prevZone === 'held' && newZone === 'at_risk') {
+      await enqueueNotification(userId, 'status_at_risk', {
+        badge_id: badgeId,
+        index: newIndex,
+        cutoff: band.hold,
+        whs_score_id: whsScoreId,
+      });
+    } else if (prevZone === 'lost' && newZone === 'held') {
+      await enqueueNotification(userId, 'status_reclaimed', {
+        badge_id: badgeId,
+        index: newIndex,
+        whs_score_id: whsScoreId,
+      });
+    }
   }
 }
 
