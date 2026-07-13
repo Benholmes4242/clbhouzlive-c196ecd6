@@ -40,7 +40,7 @@ function formatScore(v: number | null | undefined): string {
 function scoreColor(v: number | null | undefined): string {
   if (v == null || !Number.isFinite(v)) return V4.inkFaint;
   if (v === 0) return V4.scoreEven;
-  return v < 0 ? V4.scoreUnder : V4.scoreOver;
+  return getScoreColor(v, 'light');
 }
 
 function formatThru(thru: number | null | undefined): string {
