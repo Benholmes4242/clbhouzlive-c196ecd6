@@ -105,7 +105,10 @@ export function SearchOverlayV2({
   // Search overlay is always a light surface: claim light chrome while open.
   // The claim stack ensures returning from immersive overlays (fullscreen
   // viewer, etc.) restores the light chrome instead of the underlying route.
-  useEffect(() => {
+  // Claim light chrome SYNCHRONOUSLY at commit (useLayoutEffect) so the
+  // native status bar repaint is dispatched one frame ahead of the slide
+  // animation, preventing a visible recolour mid-slide on device.
+  useLayoutEffect(() => {
     if (!isOpen) return;
     claimOverlayChrome({
       id: 'search-overlay-v2',
