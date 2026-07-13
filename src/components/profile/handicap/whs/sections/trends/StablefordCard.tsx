@@ -7,7 +7,7 @@ import {
 } from './computeStablefordDistribution';
 import StablefordDetailSheet from './StablefordDetailSheet';
 import { DarkSectionHeader } from '../_shared/darkAtoms';
-import { SC_BIRDIE, SC_ALBATROSS, SC_PAR, SC_BOGEY, SC_DOUBLE, SC_BIRDIE_DARK, SC_PAR_DARK, SC_BOGEY_DARK, SC_DOUBLE_DARK } from '@/features/courses/components/holes/_constants';
+import { SC_BIRDIE, SC_ALBATROSS, SC_PAR, SC_BOGEY, SC_DOUBLE, SC_ACE_DARK, SC_ALBATROSS_DARK, SC_EAGLE_DARK, SC_BIRDIE_DARK, SC_PAR_DARK, SC_BOGEY_DARK, SC_DOUBLE_DARK } from '@/features/courses/components/holes/_constants';
 import { useTrophyAggregates } from '@/lib/whs/hooks';
 
 interface Props {
@@ -1181,6 +1181,15 @@ interface MilestoneLadderProps {
 
 const GOOD = 'var(--hcp-good, #55BD8B)';
 
+// Convert #RRGGBB to rgba() with given alpha for row tint / soft accents
+const hexToRgba = (hex: string, a: number) => {
+  const h = hex.replace('#', '');
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  return `rgba(${r},${g},${b},${a})`;
+};
+
 const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
   aces,
   albatross,
@@ -1192,7 +1201,8 @@ const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
   const perRound = (count: number) =>
     totalRoundsWithHoles > 0 ? (count / totalRoundsWithHoles).toFixed(2) : '0.00';
 
-  // Rarest first
+  // Rarest first. Each row carries its own color from the scorecard dark palette
+  // (matches RoundDetailSheet / scorecard bottom sheet).
   const rows = [
     {
       key: 'hio',
@@ -1200,6 +1210,7 @@ const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
       count: aces,
       tier: 'ULTRA RARE',
       odds: '1-in-12,500',
+      color: SC_ACE_DARK,
     },
     {
       key: 'albatross',
@@ -1207,6 +1218,7 @@ const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
       count: albatross,
       tier: 'ULTRA RARE',
       odds: '1-in-6M',
+      color: SC_ALBATROSS_DARK,
     },
     {
       key: 'eagles',
@@ -1214,6 +1226,7 @@ const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
       count: eagles,
       tier: 'RARE',
       odds: null as string | null,
+      color: SC_EAGLE_DARK,
     },
     {
       key: 'birdies',
@@ -1221,8 +1234,12 @@ const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
       count: birdies,
       tier: 'FREQUENT',
       odds: birdies > 0 || totalRoundsWithHoles > 0 ? `${perRound(birdies)}/round` : null,
+      color: SC_BIRDIE_DARK,
     },
   ];
+
+  // Ink for badge text on the (light gold / warm red) dark-palette swatches.
+  const BADGE_INK = 'rgba(0,0,0,0.85)';
 
   return (
     <div>
@@ -1260,7 +1277,7 @@ const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
           <span
             style={{
               fontSize: 10,
-              color: unlockedCount > 0 ? GOOD : T.inkMute,
+              color: unlockedCount > 0 ? SC_BIRDIE_DARK : T.inkMute,
             }}
           >
             {unlockedCount}
@@ -1289,7 +1306,7 @@ const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
                 gap: 12,
                 padding: '12px 14px',
                 borderTop: i === 0 ? 'none' : '1px solid var(--hcp-line)',
-                background: unlocked ? 'rgba(85,189,139,0.05)' : 'transparent',
+                background: unlocked ? hexToRgba(row.color, 0.06) : 'transparent',
                 fontFamily: FONT,
               }}
             >
@@ -1306,8 +1323,8 @@ const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
                   fontWeight: 800,
                   fontVariantNumeric: 'tabular-nums',
                   flexShrink: 0,
-                  background: unlocked ? GOOD : 'transparent',
-                  color: unlocked ? '#12331F' : T.ink40,
+                  background: unlocked ? row.color : 'transparent',
+                  color: unlocked ? BADGE_INK : T.ink40,
                   border: unlocked ? 'none' : '1.5px dashed rgba(242,244,247,0.25)',
                 }}
               >
@@ -1336,7 +1353,7 @@ const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
                 >
                   <span
                     style={{
-                      color: unlocked ? GOOD : 'rgba(242,244,247,0.45)',
+                      color: unlocked ? row.color : 'rgba(242,244,247,0.45)',
                     }}
                   >
                     {row.tier}
@@ -1354,7 +1371,7 @@ const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
                 style={{
                   fontSize: 17,
                   fontWeight: 800,
-                  color: unlocked ? GOOD : 'rgba(242,244,247,0.22)',
+                  color: unlocked ? row.color : 'rgba(242,244,247,0.22)',
                   fontVariantNumeric: 'tabular-nums',
                   letterSpacing: '-0.01em',
                 }}
