@@ -113,49 +113,28 @@ export function AlmanacHead({
 }
 
 function AlmanacRegionTabsInner({ region, onRegionChange }: Props) {
+  const options = REGION_TABS.map((t) => ({ id: t.slug ?? '__ww__', label: t.label }));
+  const value = region ?? '__ww__';
   return (
     <section style={{ fontFamily: FONT }}>
       <div
-        className="flex gap-4 px-4 overflow-x-auto scrollbar-hide"
         style={{
-          paddingBottom: 0,
           position: 'sticky',
           top: 'var(--chrome-total-h, 0px)',
           zIndex: 5,
           background: '#F8FAFC',
+          padding: '0 4px',
         }}
       >
-        {REGION_TABS.map((t) => {
-          const active = t.slug === region;
-          return (
-            <button
-              key={t.label}
-              type="button"
-              onClick={() => onRegionChange(t.slug)}
-              className="flex items-center bg-transparent border-0 cursor-pointer"
-              style={{
-                position: 'relative',
-                padding: '10px 2px 6px',
-                fontFamily: FONT,
-                fontSize: 13,
-                fontWeight: active ? 800 : 600,
-                color: active ? INK : 'rgba(15,23,42,0.35)',
-                letterSpacing: '-0.005em',
-                whiteSpace: 'nowrap',
-                flexShrink: 0,
-              }}
-            >
-              <span
-                style={{
-                  paddingBottom: 4,
-                  borderBottom: active ? '1.5px solid #0F172A' : '1.5px solid transparent',
-                }}
-              >
-                {t.label}
-              </span>
-            </button>
-          );
-        })}
+        <UnderlineTabs
+          options={options}
+          value={value}
+          onChange={(id) => onRegionChange(id === '__ww__' ? null : id)}
+          size="sm"
+          align="left"
+          underlineColor="#0F172A"
+          ariaLabel="Region"
+        />
       </div>
     </section>
   );
