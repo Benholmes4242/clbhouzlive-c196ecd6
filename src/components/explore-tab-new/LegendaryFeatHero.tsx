@@ -295,7 +295,7 @@ export function LegendaryFeatHero({ region }: Props) {
           </span>
         </div>
 
-        </div>
+
 
         {/* Bottom-right pager */}
         {showPager ? (
