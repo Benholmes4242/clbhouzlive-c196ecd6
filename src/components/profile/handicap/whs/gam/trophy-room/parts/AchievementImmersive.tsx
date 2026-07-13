@@ -329,6 +329,8 @@ export const AchievementImmersive: React.FC<Props> = ({ item, viewerUserId, onCl
       </div>
     </div>
   );
+
+  return typeof window !== 'undefined' ? createPortal(overlay, document.body) : null;
 };
 
 export default AchievementImmersive;
