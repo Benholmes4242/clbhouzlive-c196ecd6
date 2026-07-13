@@ -50,7 +50,7 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap }) => {
 
   const chipText = tiered
     ? reached > 0
-      ? `${matName(mat as string).toUpperCase()} \u00b7 T${reached}/${item.tiers.length}`
+      ? `${matName(mat as string).toUpperCase()} · T${reached}/${item.tiers.length}`
       : inProgress
         ? 'IN PROGRESS'
         : `T0/${item.tiers.length}`
