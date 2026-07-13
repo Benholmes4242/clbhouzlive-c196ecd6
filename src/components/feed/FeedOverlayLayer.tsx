@@ -78,15 +78,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   const clubhouseActiveIndex = useClubhouseStore((s) => s.activeIndex);
   const activeIndex = activeIndexOverride ?? clubhouseActiveIndex;
   // [VIDEO-TEARDOWN] activeVideoElement removed from store — scrubber suppressed.
-  const isMuted = useClubhouseStore((s) => s.isMuted);
-  const toggleMute = useClubhouseStore((s) => s.toggleMute);
-  const markUserGestureUnmute = useClubhouseStore((s) => s.markUserGestureUnmute);
   const carouselPositions = useClubhouseStore((s) => s.carouselPositions);
-
-  const handleToggleMute = useCallback(() => {
-    if (isMuted) markUserGestureUnmute();
-    toggleMute();
-  }, [isMuted, markUserGestureUnmute, toggleMute]);
 
   const activePost = posts[activeIndex] ?? null;
   const isTournamentCardActive = useClubhouseStore((s) => s.isTournamentCardActive);
