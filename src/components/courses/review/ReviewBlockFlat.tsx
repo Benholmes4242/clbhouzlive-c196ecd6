@@ -10,6 +10,10 @@ import { ReviewMediaStrip, ReviewMediaItem } from './ReviewMediaStrip';
 import { MentionText } from '@/components/mentions/MentionText';
 import { stripMentionMarkup } from '@/lib/mentions/format';
 
+const prefersReducedMotion =
+  typeof window !== 'undefined' &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 interface Review {
   id: string;
   user: {
