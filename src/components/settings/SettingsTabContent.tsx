@@ -135,7 +135,7 @@ export function SettingsTabContent() {
         </button>
       </div>
 
-      <div className="px-4 pb-32 space-y-6">
+      <div className="px-4 pb-0 space-y-6">
         {/* Account */}
         <SettingsSection title="Account">
           <SettingsChevronRow

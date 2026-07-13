@@ -1097,7 +1097,7 @@ const ProfilePageV2Content: React.FC = () => {
       </div>
 
       {/* White content sheet */}
-      <div className="pt-4 pb-32 min-h-[60vh] relative z-10 pointer-events-auto">
+      <div className="pt-4 pb-22 min-h-[60vh] relative z-10 pointer-events-auto">
         {isPrivateAndLocked ? (
           <PrivateProfileGate
             friendshipStatus={friendshipStatus}

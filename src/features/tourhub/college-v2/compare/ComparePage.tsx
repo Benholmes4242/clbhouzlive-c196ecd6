@@ -93,7 +93,7 @@ export function ComparePage() {
           background: SLATE_50,
           minHeight: '100vh',
           fontFamily: FONT,
-          paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)',
+          paddingBottom: 88,
         }}
       >
         {/* Masthead — always renders (skeleton state below if loading) */}

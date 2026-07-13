@@ -58,7 +58,7 @@ export function CollegeProfilePage() {
           background: SLATE_50,
           minHeight: '100vh',
           fontFamily: FONT,
-          paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)',
+          paddingBottom: 88,
         }}
       >
         {/* Masthead skeleton while standings load */}

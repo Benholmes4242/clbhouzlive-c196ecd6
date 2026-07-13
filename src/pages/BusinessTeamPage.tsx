@@ -180,7 +180,7 @@ export default function BusinessTeamPage() {
 
   return (
     <ManagePageShell title="Manage team">
-      <main className="px-4 pt-4 pb-32 max-w-lg mx-auto">
+      <main className="px-4 pt-4 pb-22 max-w-lg mx-auto">
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
           <p className="text-[13px] leading-relaxed mb-5" style={{ color: INK_45 }}>
             Invite people to help manage this business. Public members appear on your profile's Team tab.

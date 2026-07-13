@@ -461,7 +461,7 @@ export function PlayersTab() {
       {/* Footer caption */}
       <div
         style={{
-          padding: '16px 16px 32px',
+          padding: '16px 16px 88px',
           fontSize: 10.5,
           fontWeight: 500,
           color: INK_MUTE,

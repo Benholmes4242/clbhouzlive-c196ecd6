@@ -348,7 +348,7 @@ export function ScheduleTab() {
             </div>
           </section>
         ))}
-        <div style={{ paddingBottom: 'calc(var(--sab, 30px) + 24px)' }} />
+        <div style={{ paddingBottom: 88 }} />
       </div>
 
       {/* Floating "This week" chip */}

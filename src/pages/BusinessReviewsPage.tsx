@@ -445,7 +445,7 @@ export default function BusinessReviewsPage() {
   if (!profileLoading && businessProfile && !businessProfile.club_id) {
     return (
       <ManagePageShell title="Reviews">
-        <main className="px-4 pt-16 pb-32 max-w-lg mx-auto text-center">
+        <main className="px-4 pt-16 pb-22 max-w-lg mx-auto text-center">
           <div
             className="mx-auto mb-4 flex items-center justify-center"
             style={{ width: 56, height: 56, borderRadius: 16, background: AMBER_SOFT }}
@@ -467,7 +467,7 @@ export default function BusinessReviewsPage() {
 
   return (
     <ManagePageShell title="Reviews">
-      <main className="px-4 pt-4 pb-32 max-w-lg mx-auto">
+      <main className="px-4 pt-4 pb-22 max-w-lg mx-auto">
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
           {/* SUMMARY */}
           <section

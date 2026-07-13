@@ -64,7 +64,7 @@ export function CollegeHubPage() {
   return (
     <TourHubShell showBack={false}>
       <div
-        className="pb-24"
+        className="pb-22"
         style={{
           background: SLATE_50,
           minHeight: '100vh',

@@ -468,7 +468,7 @@ const QuestIndexView: React.FC = () => {
       </div>
 
       {/* Course list */}
-      <div className="px-4 pb-32">
+      <div className="px-4 pb-22">
         <div className="dgp-glass rounded-xl p-4">
           {filteredCourses.length > 0 ? (
             filteredCourses.map((course) => (
