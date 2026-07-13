@@ -159,6 +159,7 @@ export const LIVE_INK = '#047857';                           // readable LIVE gr
 export const STATUS_LIVE_TINT_10 = 'rgba(16,185,129,0.10)';  // LIVE pill faint green fill — 3 cross-app sites
 export const STATUS_LIVE_BORDER = 'rgba(16,185,129,0.32)';   // LIVE pill border — 2 cross-app sites
 export const LIVE_DOT = '#22C55E';                            // bright pulse-dot green (green-500) — animated LIVE indicators on light bg — 7 cross-app files
+export const STATUS_NEGATIVE = '#C24A4A';                     // cancelled/warning — distinct from TOPAR_UNDER red (good) and from live green
 
 
 // ============================================================================

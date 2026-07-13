@@ -35,8 +35,6 @@ export {
   INK_MUTE as SLATE_500,
   LEADER_GOLD as GOLD,
   LEADER_GOLD_DARK as GOLD_DARK,
-  TOPAR_UNDER_DARK as GREEN_LIGHT,
-  TOPAR_OVER_DARK as RED_LIGHT,
 
 } from '../../_shared/tokens';
 
