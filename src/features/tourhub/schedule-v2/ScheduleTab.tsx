@@ -171,7 +171,6 @@ export function ScheduleTab() {
     return <TourHubEmptyState variant="schedule" />;
   }
 
-  // ── Chrome ─────────────────────────────────────────────────────────────
   return (
     <div
       style={{
@@ -179,10 +178,69 @@ export function ScheduleTab() {
         minHeight: '100vh',
         fontFamily: FONT,
         position: 'relative',
+        // Rest position of chips row == stuck position (zero-travel).
+        paddingTop: 'calc(var(--sat, 0px) + 69px)',
       }}
     >
-      {/* HEADER */}
-      <div style={{ padding: '16px 16px 12px', background: SLATE_50 }}>
+      {/* Tour chips — canonical sticky glass row (locks under island band).
+          Rendered FIRST so its rest offset matches its stuck offset. */}
+      <div
+        ref={chipsRef}
+        style={{
+          position: 'sticky',
+          top: 'calc(var(--sat, 0px) + 69px)',
+          zIndex: 10,
+          background: 'rgba(248,250,252,0.72)',
+          backdropFilter: 'blur(14px)',
+          WebkitBackdropFilter: 'blur(14px)',
+          borderBottom: '1px solid rgba(0,0,0,0.07)',
+          padding: '8px 16px 10px',
+          marginTop: 'calc(var(--sat, 0px) * -1 - 69px)',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            gap: 8,
+            overflowX: 'auto',
+            scrollbarWidth: 'none',
+          }}
+          className="segmented-scroller"
+        >
+          {TOUR_PRIORITY.map((slug) => {
+            const isActive = slug === activeTour;
+            return (
+              <button
+                key={slug}
+                type="button"
+                onClick={() => selectTour(slug)}
+                aria-pressed={isActive}
+                style={{
+                  flex: '0 0 auto',
+                  padding: '7px 12px',
+                  borderRadius: 14,
+                  border: isActive ? 'none' : `0.5px solid ${HAIRLINE_INK_10}`,
+                  background: isActive ? INK : '#FFFFFF',
+                  color: isActive ? '#FFFFFF' : INK,
+                  fontFamily: 'inherit',
+                  fontSize: 10.5,
+                  fontWeight: 800,
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  lineHeight: 1,
+                }}
+              >
+                {CHIP_SHORT_LABEL[slug]}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* HEADER — scrolls under the chips row like any content. */}
+      <div style={{ padding: '16px 16px 12px' }}>
         <div
           style={{
             display: 'flex',
@@ -258,60 +316,6 @@ export function ScheduleTab() {
         </div>
       </div>
 
-      {/* Tour chips — canonical sticky glass row (locks under island band). */}
-      <div
-        style={{
-          position: 'sticky',
-          top: 'calc(var(--sat, 0px) + 69px)',
-          zIndex: 10,
-          background: 'rgba(248,250,252,0.72)',
-          backdropFilter: 'blur(14px)',
-          WebkitBackdropFilter: 'blur(14px)',
-          borderBottom: '1px solid rgba(0,0,0,0.07)',
-          padding: '8px 16px 10px',
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            gap: 8,
-            overflowX: 'auto',
-            scrollbarWidth: 'none',
-          }}
-          className="segmented-scroller"
-        >
-          {TOUR_PRIORITY.map((slug) => {
-            const isActive = slug === activeTour;
-            return (
-              <button
-                key={slug}
-                type="button"
-                onClick={() => selectTour(slug)}
-                aria-pressed={isActive}
-                style={{
-                  flex: '0 0 auto',
-                  padding: '7px 12px',
-                  borderRadius: 14,
-                  border: isActive ? 'none' : `0.5px solid ${HAIRLINE_INK_10}`,
-                  background: isActive ? INK : '#FFFFFF',
-                  color: isActive ? '#FFFFFF' : INK,
-                  fontFamily: 'inherit',
-                  fontSize: 10.5,
-                  fontWeight: 800,
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                  lineHeight: 1,
-                }}
-              >
-                {CHIP_SHORT_LABEL[slug]}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
       {/* TIMELINE — page owns the scroll (no inner scroller). */}
       <div style={{ position: 'relative' }}>
         {timeline.months.map((group) => (
@@ -319,10 +323,12 @@ export function ScheduleTab() {
             <div
               style={{
                 position: 'sticky',
-                // Stack below sticky chip row: island (sat+70) + chip row (~46).
-                top: 'calc(var(--sat, 0px) + 116px)',
+                // Stack flush below sticky chip row (measured); -1px overlap.
+                top: 'calc(var(--sat, 0px) + 69px + var(--tour-chips-h, 47px) - 1px)',
                 zIndex: 2,
-                background: SLATE_50,
+                background: 'rgba(248,250,252,0.72)',
+                backdropFilter: 'blur(14px)',
+                WebkitBackdropFilter: 'blur(14px)',
                 padding: '12px 16px 6px',
                 fontSize: 10.5,
                 fontWeight: 800,
@@ -332,6 +338,7 @@ export function ScheduleTab() {
                 borderBottom: `0.5px solid ${HAIRLINE_INK_10}`,
               }}
             >
+
               {group.label}
             </div>
             <div>
