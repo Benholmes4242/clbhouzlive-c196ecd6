@@ -9,12 +9,14 @@
  * Button state derived from useIsCollegeFollowed.
  */
 
+import { useEffect, useState } from 'react';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import {
   useFollowCollegeMutations,
   useIsCollegeFollowed,
 } from '@/features/tourhub/hooks/useCollegeMovers';
+import { dominantColorFromImage, darkenTowardCharcoal } from '@/lib/dominantColor';
 import {
   AMBER,
   CHARCOAL,
