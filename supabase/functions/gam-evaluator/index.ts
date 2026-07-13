@@ -321,8 +321,6 @@ function computeRoundStats(score: any, holes: any[], meta: any) {
     triple_plus: 0,
     longest_par_or_better_run: 0,
     longest_birdie_run: 0,
-    max_birdie_streak: 0,
-    seasons_played: 0,
     beat_par: is18 && grossScore != null && par != null ? grossScore < par : false,
     sub_70: is18 && grossScore != null ? grossScore < 70 : false,
     sub_80: is18 && grossScore != null ? grossScore < 80 : false,
