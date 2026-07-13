@@ -123,6 +123,8 @@ import AppDownloadGate from '@/pages/AppDownloadGate';
 const RootGate: React.FC = () => {
   const { user, loading: authLoading } = useSupabaseSession();
   const suspension = useSuspensionStatus(user?.id);
+  const location = useLocation();
+  const isActive = location.pathname === '/';
 
   // Native / preview status is decided ONCE per session.
   // - 'native' or 'preview' → full app flow (existing behavior).
@@ -153,7 +155,7 @@ const RootGate: React.FC = () => {
   if (envStatus === 'web') return <AppDownloadGate />;
 
   if (authLoading) return <BootHold />;
-  if (!user) return <Navigate to="/auth" replace />;
+  if (!user) return isActive ? <Navigate to="/auth" replace /> : null;
 
   if (suspension.status === 'suspended') {
     return <SuspendedScreen suspension={suspension.suspension} />;
