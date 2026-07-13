@@ -845,6 +845,26 @@ export function FullscreenFeedOverlay() {
                     activePost={activePost}
                     activeIndex={activeIndex}
                   />
+
+                  {showSoundPill && (
+                    <div
+                      style={{
+                        position: 'fixed',
+                        left: '50%',
+                        bottom: 'calc(env(safe-area-inset-bottom, 0px) + 96px)',
+                        transform: 'translateX(-50%)',
+                        zIndex: FS_OVERLAY_Z + 2,
+                        pointerEvents: 'auto',
+                      }}
+                    >
+                      <TapForSoundPill
+                        onClick={() => {
+                          useSessionAudio.getState().unmute();
+                          setShowSoundPill(false);
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
 
                 {/* ── Blurred self-backdrop (surround) ──
