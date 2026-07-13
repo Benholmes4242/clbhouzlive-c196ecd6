@@ -69,6 +69,10 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = 
   const nextThreshold = tiered ? item.nextThreshold : null;
   const nextMat = tiered && nextThreshold != null ? matName(MATERIAL_LADDER[Math.min(reached, MATERIAL_LADDER.length - 1)]) : null;
 
+  const earnedDate = item.earnedAt
+    ? new Date(item.earnedAt).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
+    : null;
+
   const chipText = tiered
     ? reached > 0
       ? `${matName(mat as string).toUpperCase()} · T${reached}/${item.tiers.length}`
@@ -76,21 +80,17 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = 
         ? 'IN PROGRESS'
         : `T0/${item.tiers.length}`
     : earned
-      ? 'EARNED'
+      ? earnedDate
+        ? earnedDate.toUpperCase()
+        : 'EARNED'
       : 'LOCKED';
-
-  const earnedDate = item.earnedAt
-    ? new Date(item.earnedAt).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
-    : null;
 
   const baseSubline = tiered
     ? nextThreshold != null
       ? `NEXT: ${nextThreshold.toLocaleString()} -> ${nextMat?.toUpperCase()}`
       : 'ALL TIERS EARNED'
     : earned
-      ? earnedDate
-        ? `EARNED ${earnedDate.toUpperCase()}`
-        : 'EARNED'
+      ? item.description
       : 'LOCKED';
   // Status subline (at_risk / lost) overrides the base subline so the live
   // state is what the user reads first. Held keeps the base subline.
@@ -152,7 +152,7 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = 
         {renderBadgeIcon(item.iconKey, 92, earned || inProgress ? accent : '#FFFFFF', 1.5)}
       </div>
 
-      {/* top row: icon chip + tier chip (status chip overrides when present) */}
+      {/* top row: icon chip (tiered only) + tier chip (status chip overrides when present) */}
       <div
         style={{
           display: 'flex',
@@ -161,20 +161,22 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = 
           marginBottom: 10,
         }}
       >
-        <div
-          style={{
-            width: 30,
-            height: 30,
-            borderRadius: 9,
-            background: `${accent}1E`,
-            border: `1px solid ${accent}44`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          {renderBadgeIcon(item.iconKey, 15, accent, 2.2)}
-        </div>
+        {tiered && (
+          <div
+            style={{
+              width: 30,
+              height: 30,
+              borderRadius: 9,
+              background: `${accent}1E`,
+              border: `1px solid ${accent}44`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            {renderBadgeIcon(item.iconKey, 15, accent, 2.2)}
+          </div>
+        )}
         {sCopy ? (
           <span
             style={{
@@ -209,18 +211,32 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = 
         )}
       </div>
 
-      {/* counter / check */}
+      {/* counter (tiered) or badge icon (binary) */}
       <div
         style={{
-          fontSize: 30,
-          fontWeight: 800,
-          letterSpacing: '-0.02em',
-          color: earned || inProgress ? accent : 'rgba(255,255,255,0.35)',
-          fontVariantNumeric: 'tabular-nums',
-          lineHeight: 1,
+          height: 30,
+          display: 'flex',
+          alignItems: 'center',
         }}
       >
-        {tiered ? (item.currentValue ?? 0).toLocaleString() : earned ? '\u2713' : '\u2014'}
+        {tiered ? (
+          <span
+            style={{
+              fontSize: 30,
+              fontWeight: 800,
+              letterSpacing: '-0.02em',
+              color: earned || inProgress ? accent : 'rgba(255,255,255,0.35)',
+              fontVariantNumeric: 'tabular-nums',
+              lineHeight: 1,
+            }}
+          >
+            {(item.currentValue ?? 0).toLocaleString()}
+          </span>
+        ) : earned ? (
+          renderBadgeIcon(item.iconKey, 34, accent, 1.8)
+        ) : (
+          renderBadgeIcon(item.iconKey, 34, 'rgba(255,255,255,0.25)', 1.8)
+        )}
       </div>
       <div
         style={{
@@ -233,16 +249,22 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = 
       >
         {item.name.toUpperCase()}
       </div>
-      <div
-        style={{
-          fontSize: 9.5,
-          color: sCopy ? sCopy.chipColor : 'rgba(255,255,255,0.45)',
-          marginTop: 3,
-          fontVariantNumeric: 'tabular-nums',
-        }}
-      >
-        {subline}
-      </div>
+      {subline && (
+        <div
+          style={{
+            fontSize: 9.5,
+            color: sCopy ? sCopy.chipColor : 'rgba(255,255,255,0.45)',
+            marginTop: 3,
+            fontVariantNumeric: 'tabular-nums',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+          } as React.CSSProperties}
+        >
+          {subline}
+        </div>
+      )}
 
       {/* progress hairline */}
       {progressPct != null && (
