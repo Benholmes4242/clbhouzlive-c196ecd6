@@ -275,6 +275,41 @@ export function MediaPreviewViewer({
           </button>
         )}
       </div>
+
+      {/* Session mute — top-right, video only. Sits below the close chip so
+          it doesn't compete with the "Set as Cover" affordance. */}
+      {item.type === 'video' && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 'calc(max(env(safe-area-inset-top, 0px), 48px) + 60px)',
+            right: 12,
+            zIndex: 12,
+          }}
+        >
+          <MuteButton size="md" />
+        </div>
+      )}
+
+      {/* Autoplay-blocked pill — bottom-centre. */}
+      {item.type === 'video' && showPill && (
+        <div
+          style={{
+            position: 'absolute',
+            left: '50%',
+            bottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)',
+            transform: 'translateX(-50%)',
+            zIndex: 12,
+          }}
+        >
+          <TapForSoundPill
+            onClick={() => {
+              useSessionAudio.getState().unmute();
+              setShowPill(false);
+            }}
+          />
+        </div>
+      )}
     </motion.div>
   );
 }
