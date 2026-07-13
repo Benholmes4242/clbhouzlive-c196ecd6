@@ -227,7 +227,7 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap }) => {
             color: 'rgba(255,255,255,0.45)',
           }}
         >
-          RARITY \u00b7 {item.rarity.toUpperCase()}
+          RARITY · {item.rarity.toUpperCase()}
         </span>
       </div>
     </button>
