@@ -169,6 +169,11 @@ export const Top100Body: React.FC<Props> = ({ item, ownerUserId, viewerUserId, o
                 row={row}
                 isFriendView={isFriendView}
                 onNavigate={handleNavigate}
+                onRequestMatch={
+                  isFriendView
+                    ? undefined
+                    : (id, name) => setMatchRequest({ courseId: id, courseName: name })
+                }
               />
             ))}
           </div>
