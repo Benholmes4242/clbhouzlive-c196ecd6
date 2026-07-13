@@ -121,6 +121,35 @@ import { isNativeAppSync, isPreviewHost, waitForNativeBridge } from '@/utils/nat
 import AppDownloadGate from '@/pages/AppDownloadGate';
 import { useEnvStatus, isAppShellVisible } from '@/utils/native/envStatus';
 
+// ── Median push deep-link bridge ────────────────────────────────────────
+// Median's JS Bridge calls this global function when a push notification is
+// opened, passing the OneSignal Additional Data. Registered at module scope
+// so it exists on `window` BEFORE any cold-start tap dispatches - the
+// listener must be ready regardless of OneSignal registration timing.
+if (typeof window !== 'undefined') {
+  (window as any).median_onesignal_push_opened = (payload: any) => {
+    try {
+      const d =
+        payload?.additionalData ??
+        payload?.notification?.additionalData ??
+        payload?.data ??
+        payload ??
+        {};
+      const target =
+        (typeof d?.route === 'string' && d.route) ||
+        (typeof d?.targetUrl === 'string' && d.targetUrl) ||
+        null;
+      if (!target) return;
+      const path = target.startsWith('http')
+        ? new URL(target).pathname + new URL(target).search + new URL(target).hash
+        : target;
+      // Defer a tick so router is ready on cold start.
+      setTimeout(() => { appNavigate(path); }, 0);
+    } catch { /* swallow */ }
+  };
+}
+
+
 const RootGate: React.FC = () => {
   const { user, loading: authLoading } = useSupabaseSession();
   const suspension = useSuspensionStatus(user?.id);
