@@ -33,7 +33,7 @@ function ExploreDestinationsInner({ activeRegion, onRegionSelect }: ExploreDesti
 
   return (
     <section style={{ padding: '0 0 0' }}>
-      <SectionHeader role="section" kicker="EXPLORE" title="Destinations" sub="Pick a region to filter the feed" paddingX={16} />
+      <SectionHeader role="section" kicker="EXPLORE" title="Destinations" sub="Pick a region to filter the feed" paddingX={16} cutLine={false} />
       <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
         {/* Worldwide — resets to all regions (activeRegion === null) */}
         <button
