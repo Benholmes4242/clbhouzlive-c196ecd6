@@ -6,12 +6,14 @@
 //   • immersive status-bar bleed via body.route-fullscreen-overlay + shield
 //     transparency + Median status-bar style push
 //   • edge-to-edge chrome sitting directly on the blurred backdrop
-import React, { useState, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
+import { MuteButton, TapForSoundPill } from '@/audio/MuteButton';
+import { useSessionAudio } from '@/audio/sessionAudioStore';
 import type { OrderedMediaItem } from './types';
 
 interface MediaPreviewViewerProps {
@@ -34,6 +36,8 @@ export function MediaPreviewViewer({
   const { ref: zoomRef, imgRef, style: zoomStyle, scale, reset: resetZoom } = usePinchZoomPointer();
   const isZoomed = scale > 1;
   const item = items[currentIndex];
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [showPill, setShowPill] = useState(false);
 
   const swipeRef = useSwipeGesture({
     onSwipeLeft: () => {
@@ -52,6 +56,34 @@ export function MediaPreviewViewer({
   useEffect(() => {
     resetZoom();
   }, [currentIndex, resetZoom]);
+
+  // Session-wired playback for video items. We drive play() imperatively so
+  // an unmuted rejection is catchable — degrade this element to muted and
+  // show the "Tap for sound" pill (does NOT touch the session store).
+  useEffect(() => {
+    if (!item || item.type !== 'video') return;
+    setShowPill(false);
+    const el = videoRef.current;
+    if (!el) return;
+    el.muted = useSessionAudio.getState().isMuted;
+    Promise.resolve(el.play()).catch(() => {
+      if (!el.muted) {
+        el.muted = true;
+        setShowPill(true);
+        Promise.resolve(el.play()).catch(() => {});
+      }
+    });
+  }, [item?.id, item?.type]);
+
+  // Session store → element sync while open (both directions of change).
+  useEffect(() => {
+    const unsub = useSessionAudio.subscribe((s) => {
+      const el = videoRef.current;
+      if (el) el.muted = s.isMuted;
+      if (!s.isMuted) setShowPill(false);
+    });
+    return unsub;
+  }, []);
 
   // Immersive shield — mirrors FullscreenFeedOverlay's open/close hooks so the
   // notch/status bar bleeds under the blurred backdrop. useLayoutEffect so the
@@ -181,13 +213,18 @@ export function MediaPreviewViewer({
       >
 
         {item.type === 'video' ? (
+          // NOTE: play() is driven imperatively via useEffect so an unmuted
+          // rejection is catchable (no autoPlay attribute). The native
+          // <controls> volume acts on the element only and does not write
+          // the session store — acceptable for the local scrub UX; the
+          // MuteButton overlay is the canonical session writer.
           <video
             key={item.id}
+            ref={videoRef}
             src={item.previewUrl}
             poster={item.thumbnailUrl}
             controls
             playsInline
-            autoPlay
             className="w-full h-full object-contain"
           />
         ) : (
@@ -238,6 +275,41 @@ export function MediaPreviewViewer({
           </button>
         )}
       </div>
+
+      {/* Session mute — top-right, video only. Sits below the close chip so
+          it doesn't compete with the "Set as Cover" affordance. */}
+      {item.type === 'video' && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 'calc(max(env(safe-area-inset-top, 0px), 48px) + 60px)',
+            right: 12,
+            zIndex: 12,
+          }}
+        >
+          <MuteButton size="md" />
+        </div>
+      )}
+
+      {/* Autoplay-blocked pill — bottom-centre. */}
+      {item.type === 'video' && showPill && (
+        <div
+          style={{
+            position: 'absolute',
+            left: '50%',
+            bottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)',
+            transform: 'translateX(-50%)',
+            zIndex: 12,
+          }}
+        >
+          <TapForSoundPill
+            onClick={() => {
+              useSessionAudio.getState().unmute();
+              setShowPill(false);
+            }}
+          />
+        </div>
+      )}
     </motion.div>
   );
 }

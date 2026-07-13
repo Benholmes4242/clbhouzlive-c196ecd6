@@ -15,6 +15,8 @@ import { trace, traceLookup } from '@/perf/trace';
 import { PrefetchController } from '@/video/PrefetchController';
 import { resolveRestingRect, getCurrentViewport, type RestingRect } from '@/lib/media/resolveRestingRect';
 import { FS_TRANSITION_MODE } from '@/lib/media/transitionMode';
+import { TapForSoundPill } from '@/audio/MuteButton';
+import { useSessionAudio } from '@/audio/sessionAudioStore';
 
 
 import { usePostViewTracker } from '@/hooks/usePostViewTracker';
@@ -398,6 +400,27 @@ const FullscreenVideoSlot: React.FC<{
     postId: resumeKey,
   });
 
+  // Autoplay-blocked → show "Tap for sound" pill. The engine's unmuted
+  // rejection path muted THIS lane to keep playback going but did NOT
+  // touch the session store. Tapping the pill re-asserts unmute with a
+  // fresh gesture; unmuting via any other surface clears the pill too.
+  const [showSoundPill, setShowSoundPill] = useState(false);
+  useEffect(() => {
+    setShowSoundPill(false);
+  }, [resumeKey, isBorrowSlide]);
+  useEffect(() => {
+    const unsub = VideoEngine.onAutoplayBlocked((id) => {
+      if (id === 'fullscreen') setShowSoundPill(true);
+    });
+    return unsub;
+  }, []);
+  useEffect(() => {
+    const unsub = useSessionAudio.subscribe((s) => {
+      if (!s.isMuted) setShowSoundPill(false);
+    });
+    return unsub;
+  }, []);
+
   // Resolve the settled rect from intrinsic media dims — MUST match the
   // clone's expand target (both consume resolveRestingRect). Prevents the
   // clone-retire → settled-paint size delta that produced the visible
@@ -703,6 +726,24 @@ const FullscreenVideoSlot: React.FC<{
         }}
       />
 
+      {showSoundPill && !isBorrowSlide && (
+        <div
+          style={{
+            position: 'absolute',
+            left: 12,
+            bottom: 12,
+            zIndex: 20,
+            pointerEvents: 'auto',
+          }}
+        >
+          <TapForSoundPill
+            onClick={() => {
+              useSessionAudio.getState().unmute();
+              setShowSoundPill(false);
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 };
