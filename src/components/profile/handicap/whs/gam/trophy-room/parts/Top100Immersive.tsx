@@ -53,6 +53,7 @@ export const Top100Immersive: React.FC<Props> = ({
   const displayItem = { ...item, earned: earnedDerived };
 
   const summary = summaryLine ?? item.description;
+  const descriptionLine = summary === item.description ? null : item.description;
 
   const stop = (e: React.MouseEvent | React.TouchEvent) => e.stopPropagation();
 
