@@ -58,9 +58,23 @@ export const Top100Immersive: React.FC<Props> = ({
   const remaining = next != null ? Math.max(0, next - currentValue) : null;
   const progressPct = next != null ? Math.min(100, Math.round((currentValue / Math.max(1, next)) * 100)) : 0;
 
-  const summary = isTiered
-    ? `${earnedTiers} of ${totalTiers} medals earned . ${materialName || 'Bronze'}`
-    : item.description;
+  // Derive the earned flag for tiered badges from live tier state so that a
+  // stale row (reachedTier 0, count 0) behaves exactly like an unearned badge.
+  // This mirrors TrophyCardHybrid (FIX-8) and keeps AchievementBody's progress
+  // module from flipping on/off between regions with the same live tier state.
+  const displayEarned = isTiered ? item.reachedTier > 0 : item.earned;
+  const displayItem = { ...item, earned: displayEarned };
+
+  const summary = (() => {
+    if (isTiered) {
+      const base = `${earnedTiers} of ${totalTiers} medals earned`;
+      return item.reachedTier > 0 ? `${base} · ${materialName}` : base;
+    }
+    if (item.earned && item.earnedAt) {
+      return `Earned ${format(new Date(item.earnedAt), 'MMM d, yyyy')}`;
+    }
+    return item.description;
+  })();
 
   const stop = (e: React.MouseEvent | React.TouchEvent) => e.stopPropagation();
 
