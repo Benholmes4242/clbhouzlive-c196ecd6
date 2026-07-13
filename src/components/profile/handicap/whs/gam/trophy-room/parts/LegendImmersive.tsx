@@ -9,10 +9,9 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 import { Share2 } from 'lucide-react';
-import { format } from 'date-fns';
 import { renderBadgeIcon } from '../../badgeIcons';
 import { GAM } from '../../tokens';
-import type { LegendCategory } from '@/lib/gam/types';
+import { deriveDetailView } from '../_shared/deriveDetailView';
 import type { TrophyItem } from '../_shared/normalizeTrophyItem';
 
 interface Props {
@@ -33,35 +32,11 @@ function hexToRgb(hex: string): string {
   return `${r},${g},${b}`;
 }
 
-const LEGEND_CATEGORY_LABEL: Record<LegendCategory, string> = {
-  lowest_gross_90d: 'Lowest gross (90d)',
-  lowest_gross_all_time: 'Lowest gross',
-  best_score_diff_90d: 'Best differential (90d)',
-  best_score_diff_all_time: 'Best differential',
-  most_birdies_90d: 'Most birdies (90d)',
-  most_birdies_all_time: 'Most birdies',
-  best_stableford_90d: 'Best Stableford (90d)',
-  best_stableford_all_time: 'Best Stableford',
-  most_eagles_90d: 'Most eagles (90d)',
-  most_eagles_all_time: 'Most eagles',
-  most_aces_90d: 'Most hole-in-ones (90d)',
-  most_aces_all_time: 'Most hole-in-ones',
-  most_albatrosses_90d: 'Most albatrosses (90d)',
-  most_albatrosses_all_time: 'Most albatrosses',
-  most_rounds_90d: 'Most rounds (90d)',
-  most_rounds_all_time: 'Most rounds',
-};
-
 export const LegendImmersive: React.FC<Props> = ({ item, onClose, onShare }) => {
+  const view = deriveDetailView(item);
+  if (view.kind !== 'legend') return null;
+  const { label, formattedValue, rankLine, heldSince: held } = view;
   const rgb = hexToRgb(LEGEND_COLOR);
-  const label = LEGEND_CATEGORY_LABEL[item.category] ?? item.name;
-  const held = (() => {
-    try {
-      return format(new Date(item.attainedAt), 'MMM d, yyyy');
-    } catch {
-      return '';
-    }
-  })();
 
   const overlay = (
     <div
