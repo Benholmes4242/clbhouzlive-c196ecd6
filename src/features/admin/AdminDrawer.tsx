@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Users, MapPin, BarChart3, Settings, Shield, ShieldAlert, ShieldCheck, LifeBuoy, ArrowLeft,
-  ClipboardList, MessagesSquare, BadgeCheck, Gauge, Activity, Bell,
+  ClipboardList, MessagesSquare, BadgeCheck, Gauge, Activity, Bell, Link2,
   type LucideIcon,
 } from 'lucide-react';
 import { adminTheme as t } from './theme';
@@ -20,6 +20,7 @@ const NAV: NavItem[] = [
   { to: '/admin-v2/dashboard',  label: 'Dashboard',  icon: LayoutDashboard },
   { to: '/admin-v2/moderation', label: 'Moderation', icon: ShieldAlert, moderatorAllowed: true },
   { to: '/admin-v2/approvals',  label: 'Approvals',  icon: ShieldCheck, requireFull: true },
+  { to: '/admin-v2/match-requests', label: 'Match Requests', icon: Link2 },
   { to: '/admin-v2/appeals',    label: 'Appeals',    icon: LifeBuoy, moderatorAllowed: true },
   { to: '/admin-v2/verifications', label: 'Verifications', icon: BadgeCheck },
   { to: '/admin-v2/users',      label: 'Users',      icon: Users },

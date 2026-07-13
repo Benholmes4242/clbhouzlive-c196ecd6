@@ -30,17 +30,51 @@ export function MatchRequestSheet({ courseId, courseName, onClose }: Props) {
       setState('error');
       return;
     }
+
+    // Only email support the FIRST time this user files a match
+    // request for this course; silent resubmits keep the row fresh.
+    const { data: existing } = await supabase
+      .from('whs_course_match_requests')
+      .select('id')
+      .eq('user_id', uid)
+      .eq('golf_course_id', courseId)
+      .maybeSingle();
+    const isFresh = !existing;
+
+    const trimmedWhs = whsName.trim();
     const { error } = await supabase.from('whs_course_match_requests').upsert(
       {
         user_id: uid,
         golf_course_id: courseId,
-        whs_course_name: whsName.trim() || null,
+        whs_course_name: trimmedWhs || null,
         status: 'pending',
       },
       { onConflict: 'user_id,golf_course_id' },
     );
-    setState(error ? 'error' : 'sent');
+
+    if (error) {
+      setState('error');
+      return;
+    }
+
+    if (isFresh) {
+      try {
+        void supabase.functions.invoke('notify-match-request', {
+          body: {
+            course_name: courseName,
+            whs_course_name: trimmedWhs || undefined,
+            course_id: courseId,
+            user_email: auth.user.email || undefined,
+          },
+        });
+      } catch (e) {
+        console.warn('[match-request] notify failed', e);
+      }
+    }
+
+    setState('sent');
   };
+
 
   return (
     <div
