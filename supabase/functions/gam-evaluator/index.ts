@@ -626,38 +626,93 @@ async function applyBadges(userId: string, stats: any, whsScoreId: string): Prom
     }
 
     if (badge.kind === "counter" || badge.kind === "tiered") {
-      if (!badge.counter_metric) continue;
-      const lifetime = await getMilestone(userId, badge.counter_metric);
-      const tiers = badge.counter_tiers;
-      const existing = currentById.get(badge.id);
-
-      if (Array.isArray(tiers) && tiers.length > 0) {
-        const tier = computeTier(lifetime, tiers);
-        if (tier > 0 && (!existing || (existing.counter_tier ?? 0) < tier)) {
-          await upsertBadgeTiered(userId, badge.id, lifetime, tier, whsScoreId);
-          earned.push(badge.id);
-        } else if (existing) {
-          await supabase
-            .from("gam_user_badges")
-            .update({ counter_value: lifetime, updated_at: new Date().toISOString() })
-            .eq("user_id", userId).eq("badge_id", badge.id);
-        }
-      } else {
-        // Plain counter without tiers
-        if (lifetime > 0 && !existing) {
-          const did = await upsertBadgeEarned(userId, badge.id, whsScoreId);
-          if (did) earned.push(badge.id);
-        } else if (existing) {
-          await supabase
-            .from("gam_user_badges")
-            .update({ counter_value: lifetime, updated_at: new Date().toISOString() })
-            .eq("user_id", userId).eq("badge_id", badge.id);
-        }
-      }
+      const result = await evaluateCounterBadge(userId, badge, whsScoreId, currentById.get(badge.id));
+      if (result) earned.push(result);
     }
     // streaks handled in applyStreaks
   }
   return earned;
+}
+
+/**
+ * Shared counter/tiered badge evaluator. Reads the current lifetime metric
+ * from gam_user_milestones and upserts the badge if a new tier is reached
+ * (tiered) or the badge is first earned (plain counter). Returns the
+ * badge_id if newly earned / tier-bumped, otherwise null.
+ *
+ * Called from BOTH applyBadges (per-round main loop) and processTop100Only
+ * (post-rating regional refresh). whsScoreId is null in the rating path.
+ */
+async function evaluateCounterBadge(
+  userId: string,
+  badge: any,
+  whsScoreId: string | null,
+  existingIn?: any,
+): Promise<string | null> {
+  if (!badge.counter_metric) return null;
+  const lifetime = await getMilestone(userId, badge.counter_metric);
+  const tiers = badge.counter_tiers;
+
+  let existing = existingIn;
+  if (existing === undefined) {
+    const { data } = await supabase
+      .from("gam_user_badges")
+      .select("badge_id, counter_value, counter_tier")
+      .eq("user_id", userId).eq("badge_id", badge.id).maybeSingle();
+    existing = data ?? null;
+  }
+
+  if (Array.isArray(tiers) && tiers.length > 0) {
+    const tier = computeTier(lifetime, tiers);
+    if (tier > 0 && (!existing || (existing.counter_tier ?? 0) < tier)) {
+      await upsertBadgeTiered(userId, badge.id, lifetime, tier, whsScoreId);
+      return badge.id;
+    } else if (existing) {
+      await supabase
+        .from("gam_user_badges")
+        .update({ counter_value: lifetime, updated_at: new Date().toISOString() })
+        .eq("user_id", userId).eq("badge_id", badge.id);
+    }
+    return null;
+  }
+
+  // Plain counter without tiers
+  if (lifetime > 0 && !existing) {
+    const did = await upsertBadgeEarned(userId, badge.id, whsScoreId);
+    return did ? badge.id : null;
+  } else if (existing) {
+    await supabase
+      .from("gam_user_badges")
+      .update({ counter_value: lifetime, updated_at: new Date().toISOString() })
+      .eq("user_id", userId).eq("badge_id", badge.id);
+  }
+  return null;
+}
+
+/**
+ * Top-100-only path: recompute the four regional distinct-course
+ * milestones, then run each of the four regional badges through the
+ * shared counter/tiered evaluator. Idempotent; whsScoreId is null.
+ */
+async function processTop100Only(userId: string): Promise<{ earned: string[] }> {
+  await recomputeTop100Milestones(userId);
+
+  const { data: badges, error } = await supabase
+    .from("gam_badge_catalogue")
+    .select("*")
+    .in("id", ["top_100_worldwide", "top_100_usa", "top_100_gbni", "top_100_europe"])
+    .eq("is_active", true);
+  if (error) {
+    console.error("[processTop100Only] catalogue query error", error);
+    return { earned: [] };
+  }
+
+  const earned: string[] = [];
+  for (const badge of badges ?? []) {
+    const result = await evaluateCounterBadge(userId, badge, null);
+    if (result) earned.push(result);
+  }
+  return { earned };
 }
 
 async function upsertBadgeEarned(userId: string, badgeId: string, whsScoreId: string | null): Promise<boolean> {
