@@ -103,7 +103,7 @@ export default function BusinessInvitePage() {
 
   return (
     <ManagePageShell title="Invite to team">
-      <main className="px-4 pt-4 pb-32 max-w-lg mx-auto">
+      <main className="px-4 pt-4 pb-22 max-w-lg mx-auto">
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
           <p className="text-[13px] leading-relaxed mb-5" style={{ color: INK_45 }}>
             They'll get an email and a clbhouz notification to accept. You can change their role or remove access anytime.

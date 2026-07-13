@@ -75,7 +75,7 @@ export function ManagePageShell({ title, children, right, onBack, belowTitle }: 
           {belowTitle}
         </div>
 
-        <div className="flex-1 pb-32">
+        <div className="flex-1 pb-0" style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 32px)' }}>
           {children}
         </div>
       </div>

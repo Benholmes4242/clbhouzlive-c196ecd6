@@ -195,7 +195,7 @@ const QuestReplayView: React.FC = () => {
       </div>
 
       {/* Content */}
-      <div className="px-4 pb-32 space-y-8">
+      <div className="px-4 pb-22 space-y-8">
         {/* Hero */}
         <section className="text-center py-8">
           <div className="flex justify-center mb-4">

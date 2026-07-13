@@ -863,7 +863,7 @@ const BusinessProfilePage: React.FC = () => {
       </div>
 
       {/* Bottom spacer */}
-      <div style={{ height: 'max(env(safe-area-inset-bottom, 0px), 20px)', paddingBottom: 80 }} />
+      <div style={{ height: 88 }} />
 
       <ScrollToTopGlass />
 

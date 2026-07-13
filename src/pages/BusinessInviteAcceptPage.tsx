@@ -82,7 +82,7 @@ export default function BusinessInviteAcceptPage() {
 
   return (
     <ManagePageShell title="Team invite">
-      <main className="px-4 pt-6 pb-32 max-w-lg mx-auto">
+      <main className="px-4 pt-6 pb-8 max-w-lg mx-auto">
         {loading ? (
           <div className="flex items-center justify-center py-16" style={{ color: INK_45 }}>
             <Loader2 size={24} className="animate-spin" />

@@ -167,7 +167,7 @@ const ReviewBottomSkeleton: React.FC<{ isStatic?: boolean }> = ({ isStatic }) =>
       }}
     />
 
-    <div style={{ padding: '18px 18px 0', position: 'relative' }}>
+    <div style={{ padding: '16px 16px 0', position: 'relative' }}>
       {/* Title row — title (1 line) + score on right */}
       <div className="flex items-end justify-between" style={{ gap: 12 }}>
         <div className="flex flex-col gap-1.5 flex-1 min-w-0">
@@ -221,7 +221,7 @@ const ReviewBottomSkeleton: React.FC<{ isStatic?: boolean }> = ({ isStatic }) =>
     {/* "READ FULL REVIEW →" amber band placeholder (edge-to-edge) */}
     <div
       style={{
-        padding: '10px 18px',
+        padding: '10px 16px',
         background: 'rgba(247, 147, 30, 0.08)',
         borderTop: '1px solid rgba(247, 147, 30, 0.35)',
         display: 'flex',

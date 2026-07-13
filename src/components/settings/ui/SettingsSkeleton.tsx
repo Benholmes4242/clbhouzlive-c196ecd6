@@ -48,7 +48,7 @@ export function SettingsSkeleton({
       </div>
 
       {/* Section list skeleton */}
-      <div className="px-4 pb-32 space-y-6">
+      <div className="px-4 pb-0 space-y-6">
         {sections.map((section, sectionIdx) => (
           <div key={sectionIdx}>
             {/* Eyebrow — canonical caps label skeleton */}

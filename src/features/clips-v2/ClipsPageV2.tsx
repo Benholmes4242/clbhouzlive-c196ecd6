@@ -48,7 +48,7 @@ export default function ClipsPageV2() {
     <PageRoot className="min-h-screen text-foreground bg-background">
       <main
         style={{
-          paddingBottom: 80,
+          paddingBottom: 88,
           // Pad by --header-h ONLY, not --chrome-total-h. The latter includes
           // --shell-extra-h, which leaks in from a keep-alive Clubhouse
           // ShellSlot mounted in the background and creates a growing gap on
