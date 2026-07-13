@@ -363,8 +363,12 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
           />
         </div>
       </header>
+      {/* Spacer: reserves the fixed header's content height in flow.
+          (.app-shell's own --sat padding covers the safe area.) */}
+      <div aria-hidden style={{ height: 54, flexShrink: 0 }} />
 
       {/* Live preview */}
+
       <div style={{ padding: '16px 16px 12px' }}>
         <LivePreviewCard
           course={course}
