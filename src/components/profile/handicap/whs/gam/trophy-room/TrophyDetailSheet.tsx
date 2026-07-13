@@ -117,40 +117,20 @@ export const TrophyDetailSheet: React.FC<Props> = ({ items, initialIndex, ownerU
     );
   }
 
-  return (
-    <GamSheet open onClose={onClose}>
-      <DetailHero
+  // Top-100 achievement: last flow moved off the sheet.
+  if (current.kind === 'achievement' && isTop100Achievement(current.badgeId)) {
+    return (
+      <Top100Immersive
         item={current}
-        index={index}
-        total={items.length}
-        onPrev={canPrev ? goPrev : null}
-        onNext={canNext ? goNext : null}
+        ownerUserId={ownerUserId}
+        viewerUserId={viewerUserId}
         onClose={onClose}
+        onShare={handleShare}
       />
-      <div
-        ref={scrollRef}
-        onTouchStart={onTouchStart}
-        onTouchEnd={onTouchEnd}
-        style={{ flex: 1, minHeight: 0, overflowY: 'auto', willChange: 'transform' }}
-      >
-        {current.kind === 'achievement' ? (
-          isTop100Achievement(current.badgeId) ? (
-            <Top100Body
-              item={current}
-              ownerUserId={ownerUserId}
-              viewerUserId={viewerUserId}
-              onClose={onClose}
-            />
-          ) : (
-            <AchievementBody item={current} viewerUserId={viewerUserId} />
-          )
-        ) : (
-          <LegendBody item={current} viewerUserId={viewerUserId} onNavigateClose={onClose} />
-        )}
-      </div>
-      <DetailFooter item={current} onShare={handleShare} onOpenCourse={handleOpenCourse} />
-    </GamSheet>
-  );
+    );
+  }
+
+  return null;
 };
 
 export default TrophyDetailSheet;
