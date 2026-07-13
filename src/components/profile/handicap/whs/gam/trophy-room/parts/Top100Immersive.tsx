@@ -12,6 +12,7 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 import { X, Share2 } from 'lucide-react';
+import { format } from 'date-fns';
 import { renderBadgeIcon } from '../../badgeIcons';
 import { GAM } from '../../tokens';
 import { paletteFor } from './DetailHero';
