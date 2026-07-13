@@ -181,6 +181,14 @@ export const Top100Body: React.FC<Props> = ({ item, ownerUserId, viewerUserId, o
           <EmptyState message="Every course played. The list is complete." />
         )}
       </div>
+
+      {matchRequest && (
+        <MatchRequestSheet
+          courseId={matchRequest.courseId}
+          courseName={matchRequest.courseName}
+          onClose={() => setMatchRequest(null)}
+        />
+      )}
     </div>
   );
 };
