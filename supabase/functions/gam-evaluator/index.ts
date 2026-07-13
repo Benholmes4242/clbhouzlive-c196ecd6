@@ -209,10 +209,16 @@ async function processSingle(whsScoreId: string) {
   // Idempotency guard for counter-style state changes
   const alreadyAtVersion = (scoreRow.evaluator_version_last ?? 0) >= EVALUATOR_VERSION;
 
+  // Transient per-round stats used by binary badge matchers but not persisted
+  // to gam_round_stats (no column). max_birdie_streak mirrors longest_birdie_run.
+  (stats as any).max_birdie_streak = stats.longest_birdie_run ?? 0;
+
   let earned: string[] = [];
   if (!alreadyAtVersion) {
     await applyMilestones(userId, stats);
     await recomputeTop100Milestones(userId);
+    await recomputeTravelMilestones(userId);
+    (stats as any).seasons_played = await recomputeSeasonsPlayed(userId);
     earned = await applyBadges(userId, stats, whsScoreId);
     await applyStatusTransitions(userId, stats, whsScoreId);
     await applyStreaks(userId, stats);
@@ -549,6 +555,138 @@ async function recomputeTop100Milestones(userId: string) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// recomputeTravelMilestones
+// Distinct country + continent counts across the user's rated/played courses.
+// Feeds globetrotter (distinct_countries) and continental (distinct_continents)
+// tiered badges via the shared counter/tiered evaluator.
+// ─────────────────────────────────────────────────────────────────────────────
+async function recomputeTravelMilestones(userId: string) {
+  const courseIds = new Set<string>();
+
+  // (a) RATED courses
+  const { data: ratedRows, error: ratedErr } = await supabase
+    .from("course_ratings")
+    .select("course_id")
+    .eq("user_id", userId)
+    .not("rating", "is", null);
+  if (ratedErr) {
+    console.error("[recomputeTravelMilestones] rated query error", ratedErr);
+  }
+  for (const r of ratedRows ?? []) {
+    if ((r as any).course_id) courseIds.add((r as any).course_id);
+  }
+
+  // (b) WHS-PLAYED courses (bridged via whs_courses + whs_course_aliases)
+  const { data: playedRows, error: playedErr } = await supabase.rpc(
+    "user_whs_played_golf_course_ids",
+    { p_user_id: userId },
+  );
+  if (playedErr) {
+    console.error("[recomputeTravelMilestones] whs-played query error", playedErr);
+  }
+  for (const r of playedRows ?? []) {
+    if ((r as any).course_id) courseIds.add((r as any).course_id);
+  }
+
+  const countries = new Set<string>();
+  const continents = new Set<string>();
+
+  if (courseIds.size > 0) {
+    const ids = Array.from(courseIds);
+    const { data: courseRows, error: courseErr } = await supabase
+      .from("golf_courses")
+      .select("id, country, continent")
+      .in("id", ids);
+    if (courseErr) {
+      console.error("[recomputeTravelMilestones] course lookup error", courseErr);
+    }
+    for (const c of courseRows ?? []) {
+      if ((c as any).country) countries.add((c as any).country);
+      if ((c as any).continent) continents.add((c as any).continent);
+    }
+  }
+
+  const nowIso = new Date().toISOString();
+  for (const [metric, count] of [
+    ["distinct_countries", countries.size],
+    ["distinct_continents", continents.size],
+  ] as Array<[string, number]>) {
+    const { data: existing } = await supabase
+      .from("gam_user_milestones")
+      .select("count")
+      .eq("user_id", userId)
+      .eq("metric", metric)
+      .maybeSingle();
+    if (existing && existing.count === count) continue;
+    await supabase.from("gam_user_milestones").upsert(
+      {
+        user_id: userId,
+        metric,
+        count,
+        first_at: existing ? undefined : (count > 0 ? nowIso : null),
+        last_at: nowIso,
+        updated_at: nowIso,
+      },
+      { onConflict: "user_id,metric" }
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// recomputeSeasonsPlayed
+// Distinct meteorological seasons across all play_dates in the user's
+// whs_scores. Returns the count so the caller can stash it on stats for the
+// four_seasons binary-badge matcher.
+// spring Mar-May, summer Jun-Aug, autumn Sep-Nov, winter Dec-Feb.
+// ─────────────────────────────────────────────────────────────────────────────
+async function recomputeSeasonsPlayed(userId: string): Promise<number> {
+  const { data: rows, error } = await supabase
+    .from("whs_scores")
+    .select("play_date, whs_connections!inner(user_id)")
+    .eq("whs_connections.user_id", userId)
+    .not("play_date", "is", null);
+  if (error) {
+    console.error("[recomputeSeasonsPlayed] query error", error);
+    return 0;
+  }
+  const seasons = new Set<string>();
+  for (const r of rows ?? []) {
+    const pd = (r as any).play_date as string | null;
+    if (!pd) continue;
+    const month = Number(pd.slice(5, 7));
+    if (!month) continue;
+    if (month >= 3 && month <= 5) seasons.add("spring");
+    else if (month >= 6 && month <= 8) seasons.add("summer");
+    else if (month >= 9 && month <= 11) seasons.add("autumn");
+    else seasons.add("winter");
+  }
+  const count = seasons.size;
+  const nowIso = new Date().toISOString();
+  const { data: existing } = await supabase
+    .from("gam_user_milestones")
+    .select("count")
+    .eq("user_id", userId)
+    .eq("metric", "seasons_played")
+    .maybeSingle();
+  if (!existing || existing.count !== count) {
+    await supabase.from("gam_user_milestones").upsert(
+      {
+        user_id: userId,
+        metric: "seasons_played",
+        count,
+        first_at: existing ? undefined : (count > 0 ? nowIso : null),
+        last_at: nowIso,
+        updated_at: nowIso,
+      },
+      { onConflict: "user_id,metric" }
+    );
+  }
+  return count;
+}
+
+
+
+// ─────────────────────────────────────────────────────────────────────────────
 // apply_badges
 // ─────────────────────────────────────────────────────────────────────────────
 /**
@@ -594,6 +732,9 @@ function matchesBinary(badge: any, stats: any): boolean {
     case "first_eagle": return stats.eagles > 0;
     case "first_albatross": return stats.albatrosses > 0;
     case "five_birdie_round": return stats.birdies >= 5;
+    case "two_eagles": return stats.eagles >= 2;
+    case "birdie_train": return (stats.max_birdie_streak ?? 0) >= 3;
+    case "four_seasons": return (stats.seasons_played ?? 0) >= 4;
     case "clean_card": return stats.clean_card;
     case "spring_2026_active": return stats.is_counter;
     case "beat_par": return stats.beat_par;
@@ -772,6 +913,7 @@ async function evaluateCounterBadge(
  */
 async function processTop100Only(userId: string): Promise<{ earned: string[] }> {
   await recomputeTop100Milestones(userId);
+  await recomputeTravelMilestones(userId);
 
   const { data: badges, error } = await supabase
     .from("gam_badge_catalogue")
