@@ -119,11 +119,11 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
           {/* ── SUMMARY STRIP ──────────────────────── */}
           <div
             style={{
-              padding: '14px 16px 12px',
+              padding: '12px 16px 12px',
               borderBottom: '1px solid var(--hcp-line-2)',
               display: 'flex',
               alignItems: 'center',
-              gap: 18,
+              gap: 16,
             }}
           >
             <SummaryStat value={counts.better} label="Better" color="var(--hcp-good-2)" />
@@ -144,7 +144,7 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
           </div>
 
           {/* ── MAIN HEATMAP ──────────────────────── */}
-          <div style={{ padding: '20px 16px 14px' }}>
+          <div style={{ padding: '16px 16px 12px' }}>
             <div
               style={{
                 position: 'relative',
@@ -221,7 +221,7 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
           {olderRounds.length > 0 && (
             <div
               style={{
-                padding: '12px 16px 14px',
+                padding: '12px 16px 12px',
                 borderTop: '1px solid var(--hcp-line-2)',
               }}
             >

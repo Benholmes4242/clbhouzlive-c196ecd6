@@ -46,13 +46,13 @@ const fmtDate = (iso: string) => {
 const Skeleton: React.FC = () => (
   <section style={{ marginTop: 32 }}>
     <DarkSectionHeader eyebrow="ROUNDS THAT COUNT" title="" />
-    <div style={{ padding: '0 20px' }}>
+    <div style={{ padding: '0 16px' }}>
       <div
         style={{
           background: 'var(--hcp-bg-1)',
           border: `1px solid ${LINE}`,
           borderRadius: 18,
-          padding: '16px 14px 13px',
+          padding: '16px 14px 12px',
         }}
       >
         <div style={{ height: 10, background: 'var(--hcp-bg-3)', borderRadius: 2 }} />
@@ -131,7 +131,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
     return (
       <section style={{ marginTop: 32 }}>
         <DarkSectionHeader eyebrow="ROUNDS THAT COUNT" title="" />
-        <div style={{ padding: '0 20px' }}>
+        <div style={{ padding: '0 16px' }}>
           <div
             style={{
               background: 'var(--hcp-bg-1)',
@@ -243,13 +243,13 @@ export const RoundsThatCountCard: React.FC<Props> = ({
     <>
       <section style={{ marginTop: 32 }}>
         <DarkSectionHeader eyebrow="ROUNDS THAT COUNT" title="" />
-        <div style={{ padding: '0 20px' }}>
+        <div style={{ padding: '0 16px' }}>
           <div
             style={{
               background: 'var(--hcp-bg-1)',
               border: `1px solid ${LINE}`,
               borderRadius: 18,
-              padding: '16px 14px 13px',
+              padding: '16px 14px 12px',
               fontFamily: FONT_GEIST,
             }}
           >

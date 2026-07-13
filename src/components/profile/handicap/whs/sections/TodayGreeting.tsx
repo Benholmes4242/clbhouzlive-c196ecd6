@@ -184,7 +184,7 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
   return (
     <div
       style={{
-        padding: '0 20px 16px',
+        padding: '0 16px 16px',
         fontFamily: FONT,
         color: 'var(--hcp-t-100)',
       }}
@@ -206,7 +206,7 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
       {showMeta && homeCourseName && (
         <div
           style={{
-            marginTop: 10,
+            marginTop: 12,
             display: 'flex',
             alignItems: 'center',
             flexWrap: 'wrap',
