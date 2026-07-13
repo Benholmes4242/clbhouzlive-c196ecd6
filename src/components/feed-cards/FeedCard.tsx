@@ -52,6 +52,7 @@ export function FeedCard({
   flatIndex,
   isAutoplayActive,
   hideCourseAttribution = false,
+  hideFormatBadge = false,
 }: {
   row: FeedCardRow;
   feedPost: FeedPost;
@@ -66,6 +67,12 @@ export function FeedCard({
    * consumers (HubMixedGrid, ClipsWall, ExploreGrid) are pixel-unchanged.
    */
   hideCourseAttribution?: boolean;
+  /**
+   * When true, the top-left Clip/Video format badge is not rendered.
+   * Use on pages whose context already tells the user the format
+   * (e.g. the dedicated Clips subpage). Default false.
+   */
+  hideFormatBadge?: boolean;
 }) {
   const rootRef = useRef<HTMLElement>(null);
   const isClip = row.derived_format === 'clip';
@@ -169,7 +176,7 @@ export function FeedCard({
             }}
           />
         ) : null}
-        <FormatBadge format={row.derived_format} />
+        {!hideFormatBadge ? <FormatBadge format={row.derived_format} /> : null}
         {duration ? (
           <div
             style={{

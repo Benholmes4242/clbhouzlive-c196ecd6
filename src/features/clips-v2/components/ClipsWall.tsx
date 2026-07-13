@@ -127,6 +127,7 @@ export function ClipsWall({ mood }: { mood: ClipsV2Mood }) {
               posts={feedPosts}
               flatIndex={i}
               isAutoplayActive={activeIndices.has(i)}
+              hideFormatBadge
             />
           ))}
         </div>
@@ -139,6 +140,7 @@ export function ClipsWall({ mood }: { mood: ClipsV2Mood }) {
               posts={feedPosts}
               flatIndex={i}
               isAutoplayActive={activeIndices.has(i)}
+              hideFormatBadge
             />
           ))}
         </div>
