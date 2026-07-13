@@ -179,13 +179,24 @@ export function SearchOverlayV2({
   return createPortal(
     <AnimatePresence>
       {isOpen && (
-        <motion.div
-          className="fixed inset-0 z-[10100] bg-[#F8FAFC] flex flex-col md:items-center"
-          initial={{ y: '100%' }}
-          animate={{ y: 0 }}
-          exit={{ y: '100%' }}
-          transition={{ duration: 0.25, ease: 'easeOut' }}
-        >
+        <>
+          {/* Static safe-area cap: present immediately so the sliding
+              panel never reveals an uncovered notch band mid-animation. */}
+          <motion.div
+            className="fixed inset-x-0 top-0 z-[10099] bg-[#F8FAFC]"
+            style={{ height: 'max(var(--safe-top, env(safe-area-inset-top, 0px)), 0px)' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.12, ease: 'easeOut' }}
+          />
+          <motion.div
+            className="fixed inset-0 z-[10100] bg-[#F8FAFC] flex flex-col md:items-center"
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
+          >
           <SearchField
             ref={inputRef}
             value={inputValue}
