@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { PageRoot } from '@/components/layout/PageRoot';
+import { GlassHeaderPlate } from '@/components/chrome/GlassHeaderPlate';
 import { DestinationDoors } from './components/DestinationDoors';
 import { HubVideoRow } from './components/HubVideoRow';
 import { HubClipsRow } from './components/HubClipsRow';
@@ -11,6 +12,7 @@ export default function WatchHubV2({ embedded = false }: { embedded?: boolean })
 
   const content = (
     <>
+      {!embedded && <GlassHeaderPlate />}
       <main
         style={{
           paddingBottom: 88,

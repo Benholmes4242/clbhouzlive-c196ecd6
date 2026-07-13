@@ -21,9 +21,11 @@ export function HubChipBar({ active, onChange }: Props) {
     <div
       style={{
         position: 'sticky',
-        top: 0,
+        top: 'calc(var(--sat, 0px) + 61px)',
         zIndex: 10,
-        background: '#F8FAFC',
+        background: 'rgba(248,250,252,0.72)',
+        backdropFilter: 'blur(14px)',
+        WebkitBackdropFilter: 'blur(14px)',
         padding: '8px 0 10px',
         borderBottom: '1px solid rgba(0,0,0,0.07)',
         fontFamily: FONT_FAMILY,

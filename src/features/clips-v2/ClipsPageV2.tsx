@@ -2,6 +2,7 @@ import React, { useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
+import { GlassHeaderPlate } from '@/components/chrome/GlassHeaderPlate';
 import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import { FilterChips } from '@/components/ui/FilterChips';
 import {
@@ -54,6 +55,7 @@ export default function ClipsPageV2() {
 
   return (
     <PageRoot className="min-h-screen text-foreground bg-background">
+      <GlassHeaderPlate />
       <main
         style={{
           paddingBottom: 88,
@@ -68,7 +70,9 @@ export default function ClipsPageV2() {
             position: 'sticky',
             top: 'calc(var(--sat, 0px) + 61px)',
             zIndex: 10,
-            background: '#F8FAFC',
+            background: 'rgba(248,250,252,0.72)',
+            backdropFilter: 'blur(14px)',
+            WebkitBackdropFilter: 'blur(14px)',
             borderBottom: '1px solid rgba(0,0,0,0.07)',
             padding: '8px 4px 10px 0',
           }}
