@@ -410,8 +410,8 @@ const ActionRow: React.FC<ActionRowProps> = ({ icon, label, onClick, disabled, d
     style={{
       display: 'flex',
       alignItems: 'center',
-      gap: 14,
-      padding: '14px 16px',
+      gap: 12,
+      padding: '12px 16px',
       width: '100%',
       background: 'transparent',
       border: 'none',
