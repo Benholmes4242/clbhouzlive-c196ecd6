@@ -150,6 +150,7 @@ function SectionHeaderInner(props: SectionHeaderProps) {
     className,
     accent,
     surface = 'light',
+    cutLine = true,
   } = props;
 
   const role: Role = roleProp ?? TIER_TO_ROLE[tierProp ?? 'standard'];
