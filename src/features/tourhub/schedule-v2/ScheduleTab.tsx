@@ -43,7 +43,6 @@ const CHIP_SHORT_LABEL: Record<TourId, string> = {
 
 export function ScheduleTab() {
   const navigate = useNavigate();
-  const scrollRootRef = useRef<HTMLDivElement | null>(null);
   const anchorRef = useRef<HTMLDivElement | null>(null);
   const [anchorVisible, setAnchorVisible] = useState(true);
 
@@ -63,23 +62,17 @@ export function ScheduleTab() {
   const { data: timeline, isLoading, error } = useSeasonTimeline(activeTour);
 
   // ── Auto-land on this-week/next row on mount + tour flip ───────────────
+  // Scrolls the WINDOW (page owns the scroll now — no inner scroller).
   const anchorId = timeline?.anchorEventId ?? null;
   useEffect(() => {
     if (!anchorId) return;
-    // Two rAFs to ensure the row is mounted after Suspense/paint.
     let cancelled = false;
     const doScroll = () => {
       if (cancelled) return;
       const el = document.getElementById(`sv2-row-${anchorId}`);
-      const root = scrollRootRef.current;
-      if (!el || !root) return;
-      const rootRect = root.getBoundingClientRect();
-      const elRect = el.getBoundingClientRect();
-      const offsetInScroller = elRect.top - rootRect.top + root.scrollTop;
-      root.scrollTo({
-        top: Math.max(0, offsetInScroller - 150),
-        behavior: 'auto',
-      });
+      if (!el) return;
+      const top = el.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo({ top: Math.max(0, top - 200), behavior: 'auto' });
     };
     const r1 = requestAnimationFrame(() =>
       requestAnimationFrame(doScroll),
@@ -90,17 +83,16 @@ export function ScheduleTab() {
     };
   }, [anchorId, activeTour]);
 
-  // ── Floating "This week" chip visibility (IntersectionObserver) ────────
+  // ── Floating "This week" chip visibility (IntersectionObserver on viewport)
   useEffect(() => {
     const el = anchorRef.current;
-    const root = scrollRootRef.current;
-    if (!el || !root || !anchorId) {
+    if (!el || !anchorId) {
       setAnchorVisible(true);
       return;
     }
     const io = new IntersectionObserver(
       ([entry]) => setAnchorVisible(entry.isIntersecting),
-      { root, threshold: 0.1 },
+      { threshold: 0.1 },
     );
     io.observe(el);
     return () => io.disconnect();
@@ -109,16 +101,11 @@ export function ScheduleTab() {
   const scrollToAnchor = useCallback(() => {
     if (!anchorId) return;
     const el = document.getElementById(`sv2-row-${anchorId}`);
-    const root = scrollRootRef.current;
-    if (!el || !root) return;
-    const rootRect = root.getBoundingClientRect();
-    const elRect = el.getBoundingClientRect();
-    const offsetInScroller = elRect.top - rootRect.top + root.scrollTop;
-    root.scrollTo({
-      top: Math.max(0, offsetInScroller - 150),
-      behavior: 'smooth',
-    });
+    if (!el) return;
+    const top = el.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({ top: Math.max(0, top - 200), behavior: 'smooth' });
   }, [anchorId]);
+
 
   // ── Row navigation ─────────────────────────────────────────────────────
   const onSelectEvent = useCallback(
@@ -209,51 +196,6 @@ export function ScheduleTab() {
           </span>
         </div>
 
-        {/* Tour chips */}
-          <div
-            style={{
-              display: 'flex',
-              gap: 8,
-              overflowX: 'auto',
-              paddingBottom: 4,
-              marginBottom: 12,
-              scrollbarWidth: 'none',
-            }}
-            className="segmented-scroller"
-          >
-          {TOUR_PRIORITY.map((slug) => {
-            const isActive = slug === activeTour;
-            return (
-              <button
-                key={slug}
-                type="button"
-                onClick={() => selectTour(slug)}
-                aria-pressed={isActive}
-                style={{
-                  flex: '0 0 auto',
-                  padding: '7px 12px',
-                  borderRadius: 14,
-                  border: isActive
-                    ? 'none'
-                    : `0.5px solid ${HAIRLINE_INK_10}`,
-                  background: isActive ? INK : '#FFFFFF',
-                  color: isActive ? '#FFFFFF' : INK,
-                  fontFamily: 'inherit',
-                  fontSize: 10.5,
-                  fontWeight: 800,
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                  lineHeight: 1,
-                }}
-              >
-                {CHIP_SHORT_LABEL[slug]}
-              </button>
-            );
-          })}
-        </div>
-
         {/* Progress strip */}
         <div>
           <div
@@ -298,24 +240,69 @@ export function ScheduleTab() {
         </div>
       </div>
 
-      {/* TIMELINE */}
+      {/* Tour chips — canonical sticky glass row (locks under island band). */}
       <div
-        ref={scrollRootRef}
         style={{
-          maxHeight: 'calc(100vh - 240px)',
-          overflowY: 'auto',
-          WebkitOverflowScrolling: 'touch',
-          position: 'relative',
+          position: 'sticky',
+          top: 'calc(var(--sat, 0px) + 69px)',
+          zIndex: 10,
+          background: 'rgba(248,250,252,0.72)',
+          backdropFilter: 'blur(14px)',
+          WebkitBackdropFilter: 'blur(14px)',
+          borderBottom: '1px solid rgba(0,0,0,0.07)',
+          padding: '8px 16px 10px',
         }}
       >
+        <div
+          style={{
+            display: 'flex',
+            gap: 8,
+            overflowX: 'auto',
+            scrollbarWidth: 'none',
+          }}
+          className="segmented-scroller"
+        >
+          {TOUR_PRIORITY.map((slug) => {
+            const isActive = slug === activeTour;
+            return (
+              <button
+                key={slug}
+                type="button"
+                onClick={() => selectTour(slug)}
+                aria-pressed={isActive}
+                style={{
+                  flex: '0 0 auto',
+                  padding: '7px 12px',
+                  borderRadius: 14,
+                  border: isActive ? 'none' : `0.5px solid ${HAIRLINE_INK_10}`,
+                  background: isActive ? INK : '#FFFFFF',
+                  color: isActive ? '#FFFFFF' : INK,
+                  fontFamily: 'inherit',
+                  fontSize: 10.5,
+                  fontWeight: 800,
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  lineHeight: 1,
+                }}
+              >
+                {CHIP_SHORT_LABEL[slug]}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* TIMELINE — page owns the scroll (no inner scroller). */}
+      <div style={{ position: 'relative' }}>
         {timeline.months.map((group) => (
           <section key={group.key}>
             <div
               style={{
                 position: 'sticky',
-                // Bleed route: --header-h is 0 here, so compose island geometry
-                // directly (sat + 54 island bottom + 16 canon clearance).
-                top: 'calc(var(--sat, 0px) + 70px)',
+                // Stack below sticky chip row: island (sat+70) + chip row (~46).
+                top: 'calc(var(--sat, 0px) + 116px)',
                 zIndex: 2,
                 background: SLATE_50,
                 padding: '12px 16px 6px',

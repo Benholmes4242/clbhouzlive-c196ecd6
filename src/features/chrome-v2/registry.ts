@@ -213,6 +213,16 @@ export const CHROME_REGISTRY: ChromeRule[] = [
     },
   },
   {
+    match: { exact: '/tourhub/college-golf' },
+    spec: {
+      chrome: 'island',
+      left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub' },
+      tone: 'light',
+      bleed: false,
+      note: EDITORIAL_NOTE,
+    },
+  },
+  {
     match: { exact: '/tourhub/college-golf/compare' },
     spec: {
       chrome: 'island',

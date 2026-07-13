@@ -16,6 +16,7 @@ import { TourSideMenu } from '../components/TourSideMenu';
 import { TourIslandLeft } from '../components/TourIslandLeft';
 import { TourPickerSheet, useTourShortLabel } from '../components/TourPickerSheet';
 import { useSetChromeLeftSlot } from '@/features/chrome-v2/leftOverride';
+import { GlassHeaderPlate } from '@/components/chrome/GlassHeaderPlate';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection, useHandicapTrend } from '@/lib/whs/hooks';
@@ -175,6 +176,10 @@ export function TourHubMainPage() {
           onProfile={() => navigate('/profile')}
           onSignOut={() => { void logout(); }}
         />
+        {/* Glass plate: mounted for every non-overview tab. Overview keeps
+            its own cinematic hero overlay chrome. Height 70 matches tour
+            island HEADER_H (see ChromeIsland.tsx). */}
+        <GlassHeaderPlate visible={activeTab !== 'overview'} heightPx={70} />
         {fullBleedHero ? (
           <>
             <div>{renderTab()}</div>
