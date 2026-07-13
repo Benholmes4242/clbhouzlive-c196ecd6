@@ -96,7 +96,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
     <div
       style={{
         position: 'relative',
-        minHeight: `calc(${HERO_MIN_H}px + env(safe-area-inset-top, 0px))`,
+        minHeight: HERO_MIN_H,
         paddingTop: 'max(env(safe-area-inset-top, 0px), 48px)',
         background: bg,
         fontFamily: FONT,
