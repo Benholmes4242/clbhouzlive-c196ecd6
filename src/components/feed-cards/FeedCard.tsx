@@ -176,7 +176,7 @@ export function FeedCard({
             }}
           />
         ) : null}
-        <FormatBadge format={row.derived_format} />
+        {!hideFormatBadge ? <FormatBadge format={row.derived_format} /> : null}
         {duration ? (
           <div
             style={{
