@@ -1,26 +1,25 @@
 /**
  * LegendImmersive
  *
- * Minimal full-screen detail view for legend rows. Same presentation
- * grammar as AchievementImmersive: portalled overlay, radial bloom,
- * blur, tap anywhere to close.
+ * Course-scoped legend view. Renders one card per course, listing
+ * every #1 record the user holds at that course.
  */
 
 import React from 'react';
 import { createPortal } from 'react-dom';
-import { Share2 } from 'lucide-react';
-import { renderBadgeIcon } from '../../badgeIcons';
+import { Share2, Crown } from 'lucide-react';
+import { format } from 'date-fns';
 import { GAM } from '../../tokens';
-import { deriveDetailView } from '../_shared/deriveDetailView';
 import type { TrophyItem } from '../_shared/normalizeTrophyItem';
 
+type LegendItem = Extract<TrophyItem, { kind: 'legend' }>;
+
 interface Props {
-  item: Extract<TrophyItem, { kind: 'legend' }>;
+  records: LegendItem[];
   onClose: () => void;
   onShare: () => void;
 }
 
-// Reuse the amber legendary treatment used by LegendCard.
 const LEGEND_COLOR = GAM.AMBER;
 
 function hexToRgb(hex: string): string {
@@ -32,23 +31,29 @@ function hexToRgb(hex: string): string {
   return `${r},${g},${b}`;
 }
 
-export const LegendImmersive: React.FC<Props> = ({ item, onClose, onShare }) => {
-  const view = deriveDetailView(item);
-  if (view.kind !== 'legend') return null;
-  const { label, formattedValue, rankLine, heldSince: held } = view;
+function fmtDate(iso: string): string {
+  try {
+    return format(new Date(iso), 'MMM d, yyyy');
+  } catch {
+    return '';
+  }
+}
+
+export const LegendImmersive: React.FC<Props> = ({ records, onClose, onShare }) => {
+  if (!records || records.length === 0) return null;
+  const first = records[0];
+  const courseName = first.courseName;
+  const count = records.length;
   const rgb = hexToRgb(LEGEND_COLOR);
 
   const overlay = (
     <div
       role="dialog"
-      aria-label={label}
+      aria-label={`${courseName} legends`}
       onClick={onClose}
       style={{
         position: 'fixed',
         inset: 0,
-        // Must clear: BottomSheet surface (~1401, from src/components/ui/BottomSheet.tsx),
-        // Z.sheet (12003), Z.toast (12000), and Z.header (1000, ChromeIsland).
-        // Kept below Z.logHud (13000) so the perf debug pill still overlays.
         zIndex: 12500,
         background: `radial-gradient(ellipse 120% 90% at 50% 16%, rgba(${rgb},0.14) 0%, rgba(${rgb},0.05) 32%, #0A0B0D 62%), #0A0B0D`,
         backdropFilter: 'blur(20px)',
@@ -58,9 +63,8 @@ export const LegendImmersive: React.FC<Props> = ({ item, onClose, onShare }) => 
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center',
-        padding: '32px 24px',
-        overflow: 'hidden',
+        padding: '72px 24px 60px',
+        overflowY: 'auto',
       }}
     >
       <button
@@ -95,12 +99,14 @@ export const LegendImmersive: React.FC<Props> = ({ item, onClose, onShare }) => 
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: 20,
-          maxWidth: 360,
+          gap: 18,
+          maxWidth: 420,
           width: '100%',
           textAlign: 'center',
+          marginTop: 'auto',
         }}
       >
+        {/* Crown hero */}
         <div
           style={{
             width: 96,
@@ -112,12 +118,13 @@ export const LegendImmersive: React.FC<Props> = ({ item, onClose, onShare }) => 
             filter: `drop-shadow(0 0 24px ${LEGEND_COLOR}66) drop-shadow(0 0 8px ${LEGEND_COLOR}88)`,
           }}
         >
-          {renderBadgeIcon(item.iconKey, 96, LEGEND_COLOR, 1.4)}
+          <Crown size={96} strokeWidth={1.4} />
         </div>
 
+        {/* Big number: count */}
         <div
           style={{
-            fontSize: 54,
+            fontSize: 72,
             fontWeight: 200,
             lineHeight: 1,
             color: 'rgba(255,255,255,0.98)',
@@ -125,42 +132,109 @@ export const LegendImmersive: React.FC<Props> = ({ item, onClose, onShare }) => 
             ...GAM.TABULAR,
           }}
         >
-          {formattedValue}
+          {count}
         </div>
 
+        {/* Course name */}
         <div
           style={{
             fontSize: 20,
             fontWeight: 800,
             letterSpacing: '-0.01em',
             color: 'rgba(255,255,255,0.96)',
+            padding: '0 8px',
           }}
         >
-          {label}
+          {courseName}
         </div>
 
+        {/* Subline */}
         <div
           style={{
-            fontSize: 13,
+            fontSize: 11,
+            fontWeight: 800,
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
             color: 'rgba(255,255,255,0.55)',
-            lineHeight: 1.4,
-            ...GAM.TABULAR,
           }}
         >
-          {rankLine}
+          {count === 1 ? 'Course record held' : 'Course records held'}
         </div>
+      </div>
 
-        {held && (
-          <div
-            style={{
-              fontSize: 12,
-              color: 'rgba(255,255,255,0.45)',
-              ...GAM.TABULAR,
-            }}
-          >
-            Held since {held}
-          </div>
-        )}
+      {/* Records list */}
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          marginTop: 28,
+          marginBottom: 'auto',
+          width: '100%',
+          maxWidth: 420,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 1,
+          background: 'rgba(255,255,255,0.04)',
+          borderRadius: 12,
+          border: '1px solid rgba(255,255,255,0.06)',
+          overflow: 'hidden',
+        }}
+      >
+        {records.map((r) => {
+          const held = fmtDate(r.attainedAt);
+          return (
+            <div
+              key={r.id}
+              style={{
+                display: 'flex',
+                alignItems: 'baseline',
+                justifyContent: 'space-between',
+                gap: 10,
+                padding: '12px 14px',
+                background: '#0A0B0D',
+              }}
+            >
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 800,
+                    letterSpacing: '0.12em',
+                    textTransform: 'uppercase',
+                    color: 'rgba(255,255,255,0.85)',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
+                  {r.name}
+                </div>
+                {held && (
+                  <div
+                    style={{
+                      marginTop: 3,
+                      fontSize: 10.5,
+                      color: 'rgba(255,255,255,0.45)',
+                      ...GAM.TABULAR,
+                    }}
+                  >
+                    Held since {held}
+                  </div>
+                )}
+              </div>
+              <div
+                style={{
+                  fontSize: 20,
+                  fontWeight: 700,
+                  color: LEGEND_COLOR,
+                  ...GAM.TABULAR,
+                  flexShrink: 0,
+                }}
+              >
+                {r.formattedValue}
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       <div
