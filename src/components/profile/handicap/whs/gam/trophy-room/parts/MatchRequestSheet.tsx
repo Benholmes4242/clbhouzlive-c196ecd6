@@ -278,6 +278,8 @@ export function MatchRequestSheet({ courseId, courseName, onClose }: Props) {
       </div>
     </div>
   );
+
+  return typeof window !== 'undefined' ? createPortal(content, document.body) : null;
 }
 
 export default MatchRequestSheet;
