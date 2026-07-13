@@ -142,7 +142,13 @@ serve(async (req) => {
           data,
           actor_user_id: data.actor_user_id ?? null,
         });
-        const outgoingData = { ...data, route };
+        // Median's documented behaviour: a push whose Additional Data contains
+        // targetUrl is auto-navigated in-app on tap (works cold/warm/background,
+        // no JS required). Origin MUST match the app's WebView Initial URL /
+        // AASA host so taps stay inside the WebView.
+        const APP_ORIGIN = (Deno.env.get('APP_WEBVIEW_ORIGIN') ?? 'https://clbhouz.co.uk').replace(/\/$/, '');
+        const targetUrl = route.startsWith('http') ? route : `${APP_ORIGIN}${route}`;
+        const outgoingData = { ...data, route, targetUrl };
 
         const result = await sendPush(
           externalId,
