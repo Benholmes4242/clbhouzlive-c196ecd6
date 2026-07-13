@@ -80,7 +80,8 @@ export function LatestRecordsStrip(_: Props = {}) {
           sub="Recent course records from official WHS data"
           paddingTop={32}
           paddingX={16}
-        />
+        cutLine={false}
+      />
         <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
           {Array.from({ length: 2 }).map((_v, i) => (
             <div
@@ -112,6 +113,7 @@ export function LatestRecordsStrip(_: Props = {}) {
         sub="Recent course records from official WHS data"
         paddingTop={32}
         paddingX={16}
+        cutLine={false}
       />
       <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
         {records.map((r, i) => (

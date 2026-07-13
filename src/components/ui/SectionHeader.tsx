@@ -73,6 +73,8 @@ interface SectionHeaderProps {
    * See docs/canonical/section-titles.md "Accent exception".
    */
   accent?: string;
+  /** When false, suppresses the coloured cut-line under the title. Defaults to true. */
+  cutLine?: boolean;
 }
 
 function ActionAffordance({
@@ -148,6 +150,7 @@ function SectionHeaderInner(props: SectionHeaderProps) {
     className,
     accent,
     surface = 'light',
+    cutLine = true,
   } = props;
 
   const role: Role = roleProp ?? TIER_TO_ROLE[tierProp ?? 'standard'];
@@ -285,16 +288,18 @@ function SectionHeaderInner(props: SectionHeaderProps) {
         </div>
       )}
 
-      <div
-        aria-hidden="true"
-        style={{
-          marginTop: 7,
-          width: cutWidth,
-          height: cutHeight,
-          background: cutColor,
-          borderRadius: cutHeight,
-        }}
-      />
+      {cutLine && (
+        <div
+          aria-hidden="true"
+          style={{
+            marginTop: 7,
+            width: cutWidth,
+            height: cutHeight,
+            background: cutColor,
+            borderRadius: cutHeight,
+          }}
+        />
+      )}
       {sub && (
         <p
           style={{

@@ -226,6 +226,7 @@ function WhereYoudRankInner({ userId }: WhereYoudRankProps) {
         sub="Courses you've played, where you're close to the lead"
         paddingTop={32}
         paddingX={16}
+        cutLine={false}
       />
       <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
         {picks.map(row => (

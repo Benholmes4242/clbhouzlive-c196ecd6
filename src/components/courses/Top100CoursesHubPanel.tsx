@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import VirtualizedCourseList from './VirtualizedCourseList';
 import { AppSelect, type AppSelectOption } from '@/components/ui/AppSelect';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { UnderlineTabs } from '@/components/ui/UnderlineTabs';
 import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, INK, INK_FAINT, INK_MUTE, SLATE_600, SURFACE } from '@/features/courses/_shared/tokens';
 
 type Top100SortOption = 'official' | 'user_rating';
@@ -219,6 +220,7 @@ const Top100CoursesHubPanel = () => {
           role="prime"
           kicker="TOP 100"
           title="The world's best"
+          cutLine={false}
         />
         {crossListProgress && (
           <p
@@ -247,61 +249,20 @@ const Top100CoursesHubPanel = () => {
         )}
       </div>
 
-      {/* List filter — underline tab row, matches Courses shell tabs but in ink color */}
-      <div className="-mx-4 px-4 overflow-x-auto" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
-        <style>{`.top100-pill-row::-webkit-scrollbar { display: none; }`}</style>
-        <div
-          className="top100-pill-row"
-          role="tablist"
-          aria-label="Top 100 lists"
-          style={{
-            display: 'flex',
-            justifyContent: 'space-evenly',
-            fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
-          }}
-        >
-          {listOptions.map((option) => {
-            const isActive = option.value === selectedList;
-            const pillLabel = option.label.replace(/\s*Top 100\s*$/, '').trim() || option.label;
-            return (
-              <button
-                key={option.value}
-                type="button"
-                role="tab"
-                onClick={() => setSelectedList(option.value)}
-                aria-selected={isActive}
-                aria-pressed={isActive}
-                style={{
-                  flex: '0 0 auto',
-                  height: 44,
-                  padding: '0 4px',
-                  background: 'transparent',
-                  border: 'none',
-                  fontSize: 14,
-                  fontWeight: isActive ? 700 : 600,
-                  color: isActive ? INK : INK_FAINT,
-                  cursor: 'pointer',
-                  letterSpacing: '-0.005em',
-                  whiteSpace: 'nowrap',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  transition: 'color 150ms',
-                }}
-                className="active:opacity-70"
-              >
-                <span
-                  style={{
-                    display: 'inline-block',
-                    paddingBottom: 4,
-                    borderBottom: isActive ? `1.5px solid ${INK}` : '1.5px solid transparent',
-                  }}
-                >
-                  {pillLabel}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+      {/* List filter — canonical ink underline tabs (shared primitive) */}
+      <div style={{ padding: '0 4px' }}>
+        <UnderlineTabs
+          options={listOptions.map((o) => ({
+            id: o.value,
+            label: o.label.replace(/\s*Top 100\s*$/, '').trim() || o.label,
+          }))}
+          value={selectedList}
+          onChange={(id) => setSelectedList(id)}
+          size="sm"
+          align="left"
+          underlineColor="#0F172A"
+          ariaLabel="Top 100 lists"
+        />
       </div>
 
 
