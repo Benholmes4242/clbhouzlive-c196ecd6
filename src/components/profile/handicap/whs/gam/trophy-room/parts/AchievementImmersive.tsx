@@ -77,13 +77,21 @@ const FriendAvatar: React.FC<{ name: string; url: string | null; size: number }>
   );
 };
 
-export const AchievementImmersive: React.FC<Props> = ({ item, viewerUserId, onClose, onShare }) => {
-  const view = deriveDetailView(item);
+export const AchievementImmersive: React.FC<Props> = ({ item, viewerUserId, currentIndex = null, onClose, onShare }) => {
+  const view = deriveDetailView(item, currentIndex);
   if (view.kind !== 'achievement') return null;
-  const { isTiered, materialColor, summaryLine, counterText, progressPct, progressLabel, nextThreshold: next, remaining } = view;
+  const {
+    isTiered, materialColor, summaryLine, counterText, progressPct,
+    progressLabel, nextThreshold: next, remaining,
+    status, statusCopy: sCopy, milestoneKeptStatusLost,
+  } = view;
   const rgb = hexToRgb(materialColor.startsWith('#') ? materialColor : '#94A3B8');
 
   const summary = summaryLine ?? (SHOWPIECE_LOCKED_HINT[item.badgeId] ?? item.description);
+  const glyphColor = sCopy?.dimmed ? 'rgba(255,255,255,0.35)' : materialColor;
+  const glyphFilter = sCopy?.dimmed
+    ? 'none'
+    : `drop-shadow(0 0 24px ${materialColor}66) drop-shadow(0 0 8px ${materialColor}88)`;
 
   const friends = useFriendsWhoEarnedBadge(item.badgeId, viewerUserId, 5);
   const friendRows = friends.data ?? [];
