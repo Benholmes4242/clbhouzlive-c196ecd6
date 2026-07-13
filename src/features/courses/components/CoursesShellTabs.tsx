@@ -22,17 +22,15 @@ export const CoursesShellTabs: React.FC<CoursesShellTabsProps> = ({
   activeTab,
   onTabChange,
 }) => (
-  <div style={{ background: '#F8FAFC' }}>
-    <UnderlineTabs
-      options={TABS}
-      value={activeTab}
-      onChange={onTabChange}
-      size="md"
-      align="center"
-      underlineColor="#0A0E14"
-      ariaLabel="Courses Sections"
-    />
-  </div>
+  <UnderlineTabs
+    options={TABS}
+    value={activeTab}
+    onChange={onTabChange}
+    size="md"
+    align="center"
+    underlineColor="#0A0E14"
+    ariaLabel="Courses Sections"
+  />
 );
 
 export default CoursesShellTabs;
