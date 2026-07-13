@@ -12,11 +12,9 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 import { X, Share2 } from 'lucide-react';
-import { format } from 'date-fns';
 import { renderBadgeIcon } from '../../badgeIcons';
 import { GAM } from '../../tokens';
-import { paletteFor } from './DetailHero';
-import { materialNameForTier } from '../_shared/rarityPalette';
+import { deriveDetailView } from '../_shared/deriveDetailView';
 import { GemLadder } from './GemLadder';
 import { Top100Body } from './Top100Body';
 import type { TrophyItem } from '../_shared/normalizeTrophyItem';
