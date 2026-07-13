@@ -436,7 +436,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                         display: 'flex',
                         alignItems: 'center',
                         gap: 12,
-                        padding: '8px 16px',
+                        padding: '12px 16px',
                         position: 'relative',
                       }}
                     >
