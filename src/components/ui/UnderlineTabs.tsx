@@ -3,13 +3,15 @@ import React from 'react';
 /**
  * TIER 1 canonical primary-nav primitive.
  *
- * Ink-active underline tabs with amber gradient marker. Extracted from the
- * course-detail tabs pattern and parameterised so sub-pages (e.g. Videos)
- * can use the 'md' size while course-detail keeps the larger 'lg'.
+ * Ink-active underline tabs with a configurable underline colour. Extracted
+ * from the course-detail pattern and parameterised so sub-pages (Videos,
+ * Courses shell, region rows) can share one component.
  */
 
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
+const DEFAULT_UNDERLINE = 'linear-gradient(90deg,#F59E0B,#F7931E)';
 
 export interface UnderlineTabsOption<T extends string> {
   id: T;
@@ -20,11 +22,19 @@ export interface UnderlineTabsProps<T extends string> {
   options: ReadonlyArray<UnderlineTabsOption<T>>;
   value: T;
   onChange: (id: T) => void;
-  size?: 'lg' | 'md';
+  size?: 'sm' | 'md' | 'lg';
   align?: 'center' | 'left';
+  /** Underline colour or gradient. Defaults to the amber gradient. */
+  underlineColor?: string;
   className?: string;
   ariaLabel?: string;
 }
+
+const SIZES = {
+  sm: { gap: 20, padding: '10px 4px 8px', fontSize: 13, underline: 1.5 },
+  md: { gap: 28, padding: '12px 6px 10px', fontSize: 16, underline: 2 },
+  lg: { gap: 34, padding: '14px 7px 12px', fontSize: 19, underline: 3 },
+} as const;
 
 export function UnderlineTabs<T extends string>({
   options,
@@ -32,10 +42,11 @@ export function UnderlineTabs<T extends string>({
   onChange,
   size = 'md',
   align = 'center',
+  underlineColor = DEFAULT_UNDERLINE,
   className,
   ariaLabel,
 }: UnderlineTabsProps<T>) {
-  const isLg = size === 'lg';
+  const s = SIZES[size];
 
   return (
     <div
@@ -44,7 +55,7 @@ export function UnderlineTabs<T extends string>({
       className={className}
       style={{
         display: 'flex',
-        gap: isLg ? 34 : 28,
+        gap: s.gap,
         justifyContent: align === 'center' ? 'center' : 'flex-start',
         borderBottom: '1px solid rgba(15,23,42,0.07)',
         fontFamily: FONT_FAMILY,
@@ -64,13 +75,14 @@ export function UnderlineTabs<T extends string>({
               background: 'none',
               border: 'none',
               cursor: 'pointer',
-              padding: isLg ? '14px 7px 12px' : '12px 6px 10px',
+              padding: s.padding,
               minHeight: 44,
-              fontSize: isLg ? 19 : 16,
+              fontSize: s.fontSize,
               fontWeight: active ? 700 : 500,
               color: active ? '#0F172A' : '#94A3B8',
               letterSpacing: active ? '-0.02em' : undefined,
               fontFamily: FONT_FAMILY,
+              whiteSpace: 'nowrap',
             }}
           >
             {opt.label}
@@ -82,9 +94,9 @@ export function UnderlineTabs<T extends string>({
                   left: 6,
                   right: 6,
                   bottom: 4,
-                  height: isLg ? 3 : 2,
+                  height: s.underline,
                   borderRadius: 2,
-                  background: 'linear-gradient(90deg,#F59E0B,#F7931E)',
+                  background: underlineColor,
                 }}
               />
             ) : null}
