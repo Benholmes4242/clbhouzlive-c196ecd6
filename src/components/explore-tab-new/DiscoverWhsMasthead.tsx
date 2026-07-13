@@ -18,7 +18,7 @@ export default function DiscoverWhsMasthead() {
           fontWeight: 800,
           letterSpacing: '0.14em',
           textTransform: 'uppercase',
-          color: '#0e8a57',
+          color: '#c97a10',
           marginBottom: 6,
         }}
       >
@@ -34,23 +34,14 @@ export default function DiscoverWhsMasthead() {
           margin: 0,
         }}
       >
-        A level playing field for real handicaps
+        Earn your place on the board
       </h2>
-      <div
-        aria-hidden
-        style={{
-          width: 28,
-          height: 3,
-          borderRadius: 3,
-          background: '#10b981',
-          margin: '10px 0 11px',
-        }}
-      />
       <div
         style={{
           fontSize: 12.5,
           color: '#64748B',
           lineHeight: 1.55,
+          marginTop: 11,
         }}
       >
         Every score here comes from an official World Handicap System handicap - verified rounds only, from players worldwide. Nothing manual, no inflated numbers.
