@@ -26,7 +26,6 @@ import {
   INK_MUTE,
   SLATE_50,
   SURFACE,
-  WHITE_ALPHA_55,
   WHITE_ALPHA_65,
 } from '@/features/tourhub/_shared/tokens';
 import { useFranchiseStandings } from './data/useFranchiseStandings';
