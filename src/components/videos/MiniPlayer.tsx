@@ -4,14 +4,14 @@
 // (play/pause toggle only flips local state) until the new video engine lands.
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { X, Play, Pause, Maximize2, Volume2, VolumeX, AlertTriangle } from "lucide-react";
+import { X, Play, Pause, Maximize2, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useVideoPlaybackSafe } from "@/context/VideoPlaybackContext";
 import { usePostData } from "@/hooks/usePostData";
 import { uidFromNode, generateHlsUrl, generateThumbnailUrl } from "@/utils/cloudflareStreamTransform";
 import { trackVideoCloseMini } from "@/lib/analytics/videoAnalytics";
-import { useClubhouseStore } from '@/store/clubhouseStore';
 import { VideoEngine } from '@/video/VideoEngine';
+import { MuteButton } from '@/audio/MuteButton';
 
 type MiniVideo = {
   id: string;
@@ -24,9 +24,6 @@ type MiniVideo = {
 
 export const MiniPlayer: React.FC = () => {
   const context = useVideoPlaybackSafe();
-  const isMuted = useClubhouseStore(s => s.isMuted);
-  const toggleMute = useClubhouseStore(s => s.toggleMute);
-  const markUserGestureUnmute = useClubhouseStore(s => s.markUserGestureUnmute);
 
   const { fetchPostWithDetails } = usePostData();
 
@@ -138,11 +135,7 @@ export const MiniPlayer: React.FC = () => {
     setHasError(false);
   }, []);
 
-  const handleMuteToggle = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (isMuted) markUserGestureUnmute();
-    toggleMute();
-  }, [toggleMute, isMuted, markUserGestureUnmute]);
+  // Mute is owned by MuteButton (session store) — no local handler needed.
 
   const isVisible = !!activeVideoId && isMiniOpen;
 
@@ -234,18 +227,7 @@ export const MiniPlayer: React.FC = () => {
 
           {/* Controls (inert shells) */}
           <div className="flex items-center gap-1">
-            <button
-              onClick={handleMuteToggle}
-              className={cn(
-                "w-8 h-8 rounded-full",
-                "bg-background/10 hover:bg-background/20",
-                "text-foreground flex items-center justify-center transition"
-              )}
-              aria-label={isMuted ? "Unmute" : "Mute"}
-              type="button"
-            >
-              {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
-            </button>
+            <MuteButton size="sm" />
 
             <button
               onClick={handleTogglePlay}

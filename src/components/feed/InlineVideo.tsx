@@ -26,7 +26,7 @@ import { VideoEngine, type LaneId, type LaneSnapshot } from '@/video/VideoEngine
 import { feedLaneRoles, type FeedRole } from '@/video/feedLaneRoles';
 import { originHostRegistry } from '@/video/originHostRegistry';
 import { useClubhouseStore } from '@/store/clubhouseStore';
-import { MuteToggle } from '@/components/feed/MuteToggle';
+import { MuteButton } from '@/audio/MuteButton';
 import {
   vperfMarkEarlyStarted,
   vperfCardFraction,
@@ -320,7 +320,11 @@ export const InlineVideo: React.FC<Props> = ({
         }}
       />
 
-      {isActive && <MuteToggle />}
+      {isActive && (
+        <div style={{ position: 'absolute', right: 6, bottom: 6, zIndex: 30 }}>
+          <MuteButton size="sm" />
+        </div>
+      )}
     </div>
   );
 };

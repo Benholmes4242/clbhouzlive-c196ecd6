@@ -1,5 +1,5 @@
 import React, { memo, useState, useEffect, useCallback, useMemo } from 'react';
-import { Volume2, VolumeX } from 'lucide-react';
+import { MuteButton } from '@/audio/MuteButton';
 import { useNavigate } from 'react-router-dom';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { BreathingRoomBottomBar } from './BreathingRoomBottomBar';
@@ -78,15 +78,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   const clubhouseActiveIndex = useClubhouseStore((s) => s.activeIndex);
   const activeIndex = activeIndexOverride ?? clubhouseActiveIndex;
   // [VIDEO-TEARDOWN] activeVideoElement removed from store — scrubber suppressed.
-  const isMuted = useClubhouseStore((s) => s.isMuted);
-  const toggleMute = useClubhouseStore((s) => s.toggleMute);
-  const markUserGestureUnmute = useClubhouseStore((s) => s.markUserGestureUnmute);
   const carouselPositions = useClubhouseStore((s) => s.carouselPositions);
-
-  const handleToggleMute = useCallback(() => {
-    if (isMuted) markUserGestureUnmute();
-    toggleMute();
-  }, [isMuted, markUserGestureUnmute, toggleMute]);
 
   const activePost = posts[activeIndex] ?? null;
   const isTournamentCardActive = useClubhouseStore((s) => s.isTournamentCardActive);
@@ -232,8 +224,6 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
         <FeedTopActionBar
           onClose={onClose}
           isVideo={isVideo}
-          isMuted={isMuted}
-          onToggleMute={handleToggleMute}
           hasLiked={likeState.isLiked}
           likesCount={likeState.count}
           commentsCount={commentCount}
@@ -310,8 +300,6 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
           bottomOffset={bottomOffset}
           readOnly={readOnly}
           isVideo={isVideo}
-          isMuted={isMuted}
-          onToggleMute={handleToggleMute}
         />
       )}
 
@@ -320,37 +308,19 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
 
       {/* Bottom-right floating mute — Clubhouse only (fullscreen mute lives in top bar) */}
       {isVideo && bottomOffset === undefined && !topActionBar && (
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleToggleMute();
-          }}
-          aria-label={isMuted ? 'Unmute video' : 'Mute video'}
+        <div
           style={{
             position: 'fixed',
             right: 16,
             bottom: 'calc(var(--bottom-nav-height, 88px) + 48px)',
             zIndex: Z.echo,
-            width: 40,
-            height: 40,
-            borderRadius: 999,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'rgba(0,0,0,0.45)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
-            border: '0.5px solid rgba(255,255,255,0.25)',
-            color: '#fff',
-            cursor: 'pointer',
             opacity: overlayVisible ? 1 : 0,
             transition: 'opacity 0.2s',
             pointerEvents: overlayVisible ? 'auto' : 'none',
           }}
         >
-          {isMuted ? <VolumeX size={20} stroke="#fff" /> : <Volume2 size={20} stroke="#fff" />}
-        </button>
+          <MuteButton size="sm" />
+        </div>
       )}
     </div>
   );

@@ -15,7 +15,8 @@
  */
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Heart, MessageCircle, Send, MoreHorizontal, Volume2, VolumeX, Plus, Check } from 'lucide-react';
+import { Heart, MessageCircle, Send, MoreHorizontal, Plus, Check } from 'lucide-react';
+import { MuteButton } from '@/audio/MuteButton';
 import { Z } from '@/config/zIndex';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
@@ -186,34 +187,8 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
   const showFollowPlus = !readOnly && !isOwnPost && !isFollowing && !!creator;
   const showJustFollowed = !readOnly && !isOwnPost && justFollowed && !!creator;
 
-  const muteButton = isVideo && onToggleMute ? (
-    <button
-      type="button"
-      onClick={(e) => {
-        e.stopPropagation();
-        onToggleMute();
-      }}
-      aria-label={isMuted ? 'Unmute video' : 'Mute video'}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'none',
-        border: 'none',
-        padding: 0,
-        color: '#fff',
-        cursor: 'pointer',
-        filter: FLOAT_SHADOW,
-        pointerEvents: 'auto',
-        touchAction: 'pan-y',
-      }}
-    >
-      {isMuted ? (
-        <VolumeX size={28} stroke="#fff" strokeWidth={FLOAT_STROKE} />
-      ) : (
-        <Volume2 size={28} stroke="#fff" strokeWidth={FLOAT_STROKE} />
-      )}
-    </button>
+  const muteButton = isVideo ? (
+    <MuteButton size="md" />
   ) : null;
 
   // Heart pop animation key — bumps when transitioning to liked
