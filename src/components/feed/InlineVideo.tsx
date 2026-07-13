@@ -87,7 +87,7 @@ export const InlineVideo: React.FC<Props> = ({
   const hlsUrl = (item as any).hlsUrl as string | undefined;
   const firedRef = useRef(false);
   const posterElRef = useRef<HTMLImageElement | null>(null);
-  const isMuted = useClubhouseStore((s) => s.isMuted);
+  // Mute state now owned by VideoEngine via 'session' audioPolicy — no local read.
 
   const resolvedOwnerKey = ownerKey ?? (postId ? `${postId}:0` : null);
 
@@ -159,7 +159,7 @@ export const InlineVideo: React.FC<Props> = ({
     posterUrl: posterUrl || null,
     startPosition,
     active: playbackIntent,
-    muted: isMuted,
+    audioPolicy: 'session',
     postId: resolvedOwnerKey,
 
     ownerKey: resolvedOwnerKey,

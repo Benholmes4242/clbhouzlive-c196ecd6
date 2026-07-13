@@ -16,7 +16,7 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
-import { VideoEngine, type LaneId, type LaneSnapshot } from './VideoEngine';
+import { VideoEngine, type LaneId, type LaneSnapshot, type LaneAudioPolicy } from './VideoEngine';
 import { useCreationOverlayStore } from '@/stores/creationOverlayStore';
 import { trace, traceLookup, elIdOf } from '@/perf/trace';
 
@@ -25,7 +25,12 @@ export interface UseVideoLaneOptions {
   posterUrl?: string | null;
   startPosition?: number;
   active?: boolean;
-  muted?: boolean;
+  /**
+   * Audio policy for this lane. Defaults to 'session' — engine mirrors the
+   * session mute store onto the element automatically. Consumers no longer
+   * push mute values through the hook.
+   */
+  audioPolicy?: LaneAudioPolicy;
   postId?: string | null;
   /**
    * Media-level ownership key (e.g. `${postId}:${mediaIndex}`). When present,
@@ -180,13 +185,12 @@ export function useVideoLane(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [creationClosedAt]);
 
-  // Apply mute.
+  // AUDIO POLICY: declare this lane's policy to the engine. Engine handles
+  // mute state from the session store; consumers do NOT push mute values.
   useEffect(() => {
     if (!laneId) return;
-    if (typeof opts.muted === 'boolean') {
-      VideoEngine.setMuted(laneId, opts.muted);
-    }
-  }, [laneId, opts.muted]);
+    VideoEngine.setAudioPolicy(laneId, opts.audioPolicy ?? 'session');
+  }, [laneId, opts.audioPolicy]);
 
   return {
     hostRef,

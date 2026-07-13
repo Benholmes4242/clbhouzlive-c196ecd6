@@ -364,7 +364,7 @@ const FullscreenVideoSlot: React.FC<{
   mediaW?: number;
   mediaH?: number;
 }> = ({ postId, hlsUrl, posterSrc, isActive, onFirstFrameReady, ownerKey, allowBorrow = true, mediaW = 0, mediaH = 0 }) => {
-  const isMuted = useClubhouseStore((s) => s.isMuted);
+  // Mute state now owned by VideoEngine via 'session' audioPolicy — no local read.
   const storedStart = useFullscreenFeedStore((s) => s.startPosition);
   const borrow = useFullscreenFeedStore((s) => s.borrow);
   const origin = useFullscreenFeedStore((s) => s.origin);
@@ -394,7 +394,7 @@ const FullscreenVideoSlot: React.FC<{
     posterUrl: posterSrc || null,
     startPosition,
     active: isActive && !isBorrowSlide,
-    muted: isMuted,
+    audioPolicy: 'session',
     postId: resumeKey,
   });
 

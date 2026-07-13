@@ -42,6 +42,9 @@ import { readSeededBandwidth } from './bandwidthMemory';
 import { coldOpenAttach, coldOpenFirstFrame } from '@/perf/coldOpen';
 import { trace, traceLookup, elIdOf, traceGenElId } from '@/perf/trace';
 import { feedLaneRoles } from './feedLaneRoles';
+import { useSessionAudio } from '@/audio/sessionAudioStore';
+
+export type LaneAudioPolicy = 'session' | 'always-muted' | 'local';
 
 
 
@@ -82,6 +85,7 @@ interface Lane {
   wantPlay: boolean;
   listeners: Set<LaneListener>;
   detachFns: Array<() => void>;
+  audioPolicy: LaneAudioPolicy;
 }
 
 
@@ -185,6 +189,7 @@ class VideoEngineImpl {
         wantPlay: false,
         listeners: new Set(),
         detachFns: [],
+        audioPolicy: 'always-muted',
       });
     }
     if (PAUSE_ON_HIDDEN && typeof document !== 'undefined') {
@@ -270,6 +275,9 @@ class VideoEngineImpl {
       DBG(laneId, 'mounted');
     }
     lane.mountedHost = hostEl;
+    // AUDIO POLICY: apply on mount so a lane's element muted state reflects
+    // its policy the moment it's parented into a surface host.
+    this.applyAudioPolicy(lane);
     // If play-intent is set (from a pre-mount play() or a still-loading source),
     // kick it off now — wantPlay persists through source changes.
     if (lane.wantPlay && lane.el.paused) {
@@ -278,6 +286,34 @@ class VideoEngineImpl {
         (p as Promise<void>).catch(() => { /* autoplay reject — safe */ });
       }
     }
+  }
+
+  /**
+   * Declare a lane's audio policy. 'session' lanes follow useSessionAudio;
+   * 'always-muted' lanes stay muted regardless; 'local' lanes are left alone
+   * (only setMuted controls them). Applied immediately.
+   */
+  setAudioPolicy(laneId: LaneId, policy: LaneAudioPolicy): void {
+    const lane = this.getLane(laneId);
+    if (lane.audioPolicy === policy) return;
+    lane.audioPolicy = policy;
+    this.applyAudioPolicy(lane);
+  }
+
+  private applyAudioPolicy(lane: Lane): void {
+    if (lane.audioPolicy === 'always-muted') {
+      if (!lane.el.muted) { lane.el.muted = true; this.emit(lane); }
+      return;
+    }
+    if (lane.audioPolicy === 'session') {
+      const desired = useSessionAudio.getState().isMuted;
+      if (lane.el.muted !== desired) {
+        // Respect ONE_UNMUTED_LANE on unmute.
+        this.setMuted(lane.id, desired);
+      }
+      return;
+    }
+    // 'local' → leave alone.
   }
 
   /** Return the lane's element to the hidden host (does not release source). */
@@ -834,6 +870,9 @@ class VideoEngineImpl {
 
     // Persistent intent: set now, honored on mount + on canplay after (re)load.
     lane.wantPlay = true;
+    // AUDIO POLICY: on activation, re-consult session store so an earlier
+    // unmute carries to the NEXT video (inheritance on activation).
+    this.applyAudioPolicy(lane);
     if (!lane.mountedHost) {
       DBG(laneId, 'play() queued — no mounted host');
       return Promise.resolve();
@@ -1129,3 +1168,22 @@ class VideoEngineImpl {
 
 export const VideoEngine = new VideoEngineImpl();
 export type { LaneId } from './lanePolicy';
+
+// LIVE SUBSCRIPTION: reflect session audio flips onto every 'session' lane.
+// - Mute: every session lane is silenced.
+// - Unmute: only session lanes with active play-intent (wantPlay) are
+//   unmuted. ONE_UNMUTED_LANE exclusivity still enforces a single voice.
+useSessionAudio.subscribe(({ isMuted }) => {
+  const impl = VideoEngine as unknown as {
+    lanes: Map<LaneId, Lane>;
+    setMuted: (id: LaneId, m: boolean) => void;
+  };
+  impl.lanes.forEach((lane) => {
+    if (lane.audioPolicy !== 'session') return;
+    if (isMuted) {
+      if (!lane.el.muted) impl.setMuted(lane.id, true);
+    } else if (lane.wantPlay) {
+      if (lane.el.muted) impl.setMuted(lane.id, false);
+    }
+  });
+});
