@@ -22,7 +22,7 @@ export function HubChipBar({ active, onChange }: Props) {
         top: 0,
         zIndex: 10,
         background: '#F8FAFC',
-        padding: 0,
+        padding: '8px 0 0',
         borderBottom: '1px solid rgba(0,0,0,0.07)',
         fontFamily: FONT_FAMILY,
       }}
@@ -33,7 +33,7 @@ export function HubChipBar({ active, onChange }: Props) {
           display: 'flex',
           gap: 8,
           overflowX: 'auto',
-          padding: '0 16px',
+          padding: '0 16px 10px',
           scrollbarWidth: 'none',
           WebkitOverflowScrolling: 'touch',
         }}
