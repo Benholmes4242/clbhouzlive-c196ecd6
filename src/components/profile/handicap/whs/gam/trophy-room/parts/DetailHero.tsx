@@ -85,7 +85,9 @@ export const DetailHero: React.FC<Props> = ({ item, index, total, onPrev, onNext
   const reachedTier = isAch ? item.reachedTier : 0;
   const totalTiers = isAch ? item.tiers.length : 0;
   const locked =
-    item.kind === 'achievement' && !item.earned && (item.currentValue == null || item.currentValue === 0);
+    item.kind === 'achievement' &&
+    (isTiered ? item.reachedTier <= 0 : !item.earned) &&
+    (item.currentValue == null || item.currentValue === 0);
   // Pre-bronze "started": tiered, not locked, count > 0 but reachedTier still 0.
   const started =
     isTiered && !locked && reachedTier === 0 && ((item as any).currentValue ?? 0) > 0;
