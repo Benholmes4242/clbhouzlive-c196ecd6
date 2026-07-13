@@ -1,5 +1,5 @@
 // Badge catalogue
-export type BadgeCategory = 'scoring' | 'handicap' | 'consistency' | 'courses' | 'community' | 'seasonal';
+export type BadgeCategory = 'scoring' | 'handicap' | 'consistency' | 'courses' | 'community' | 'seasonal' | 'travel';
 export type BadgeRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 export type BadgeKind = 'binary' | 'counter' | 'tiered' | 'streak';
 
