@@ -1,8 +1,9 @@
 /**
  * useSearchEmptyStateV2 — one RPC call powering the SearchOverlayV2
  * default (no-query) state: in-action players, people-to-follow, popular
- * courses. Cached for the session (staleTime: Infinity), so a fresh cold
- * open re-fetches while re-opens within the session hit cache.
+ * courses. Live-event headline freshness matters, so the cache expires
+ * after 5 minutes; people/courses change slowly enough that window-focus
+ * refetch is disabled.
  */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -60,7 +61,8 @@ export function useSearchEmptyStateV2(enabled: boolean) {
   return useQuery({
     queryKey: ['search-empty-state-v2'],
     enabled,
-    staleTime: Infinity,
+    staleTime: 5 * 60_000,
+    refetchOnWindowFocus: false,
     gcTime: 30 * 60 * 1000,
     queryFn: async (): Promise<EmptyStatePayload> => {
       const { data, error } = await (supabase.rpc as any)('search_empty_state_v2');

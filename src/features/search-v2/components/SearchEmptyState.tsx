@@ -45,43 +45,49 @@ export function SearchEmptyState({ onSelect }: Props) {
   const people = data?.suggested_people ?? [];
   const courses = data?.popular_courses ?? [];
 
-  const eyebrowLabel = event
-    ? `IN ACTION AT ${event.name.toUpperCase()}`
+  const liveEvent = event?.is_live ? event : null;
+  const eyebrowLabel = liveEvent
+    ? `IN ACTION AT ${liveEvent.name.toUpperCase()}`
     : 'TOUR PLAYERS';
-  const isMajorEvent = event ? isAnyMajor(event.name) : false;
+  const isMajorEvent = liveEvent ? isAnyMajor(liveEvent.name) : false;
+  const showPlayersRail = isLoading || players.length > 0;
 
   return (
     <div>
       {/* ============ IN ACTION rail ============ */}
-      <SectionEyebrow
-        label={eyebrowLabel}
-        gold={isMajorEvent}
-        rightChip={event?.is_live ? <LiveChip /> : null}
-      />
-      {isLoading && players.length === 0 ? (
-        <PlayerRailSkeleton />
-      ) : (
-        <div
-          className="flex scrollbar-hide"
-          style={{
-            gap: 14,
-            overflowX: 'auto',
-            padding: '4px 16px 12px',
-            WebkitOverflowScrolling: 'touch',
-          }}
-        >
-          {players.map((p) => (
-            <PlayerCard
-              key={p.id}
-              player={p}
-              tourSlug={event?.tour_slug ?? 'pga'}
-              onTap={() => {
-                onSelect();
-                navigate(`/tourhub/player/${p.id}`);
+      {showPlayersRail && (
+        <>
+          <SectionEyebrow
+            label={eyebrowLabel}
+            gold={isMajorEvent}
+            rightChip={liveEvent ? <LiveChip /> : null}
+          />
+          {isLoading && players.length === 0 ? (
+            <PlayerRailSkeleton />
+          ) : (
+            <div
+              className="flex scrollbar-hide"
+              style={{
+                gap: 14,
+                overflowX: 'auto',
+                padding: '4px 16px 12px',
+                WebkitOverflowScrolling: 'touch',
               }}
-            />
-          ))}
-        </div>
+            >
+              {players.map((p) => (
+                <PlayerCard
+                  key={p.id}
+                  player={p}
+                  tourSlug={liveEvent?.tour_slug ?? event?.tour_slug ?? 'pga'}
+                  onTap={() => {
+                    onSelect();
+                    navigate(`/tourhub/player/${p.id}`);
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </>
       )}
 
       {/* ============ PEOPLE TO FOLLOW ============ */}
