@@ -7,8 +7,15 @@ import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { getScoreRingColors } from '@/hooks/useTierStyles';
+import { getRatingTier, rampForRating, ratingTextColor } from '@/lib/ratingTier';
 import { MentionText } from '@/components/mentions/MentionText';
 import { stripMentionMarkup } from '@/lib/mentions/format';
+
+// Computed once — reduced-motion users get static gold rings/bars.
+const prefersReducedMotion =
+  typeof window !== 'undefined' &&
+  typeof window.matchMedia === 'function' &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // ReviewText component with line clamping
 const ReviewText: React.FC<{ text: string }> = ({ text }) => {
