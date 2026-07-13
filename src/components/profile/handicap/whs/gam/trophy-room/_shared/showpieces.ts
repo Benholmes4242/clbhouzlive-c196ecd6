@@ -25,7 +25,6 @@ export function isShowpiece(badgeId: string | undefined): boolean {
 export const LIFETIME_ORDER: string[] = [
   'first_birdie',
   'first_eagle',
-  'first_albatross',
   'hole_in_one',
   'top_100_worldwide',
   'top_100_gbni',
