@@ -36,6 +36,8 @@ export function MediaPreviewViewer({
   const { ref: zoomRef, imgRef, style: zoomStyle, scale, reset: resetZoom } = usePinchZoomPointer();
   const isZoomed = scale > 1;
   const item = items[currentIndex];
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [showPill, setShowPill] = useState(false);
 
   const swipeRef = useSwipeGesture({
     onSwipeLeft: () => {
@@ -54,6 +56,42 @@ export function MediaPreviewViewer({
   useEffect(() => {
     resetZoom();
   }, [currentIndex, resetZoom]);
+
+  // Session-wired playback for video items. We drive play() imperatively so
+  // an unmuted rejection is catchable — degrade this element to muted and
+  // show the "Tap for sound" pill (does NOT touch the session store).
+  useEffect(() => {
+    if (!item || item.type !== 'video') return;
+    setShowPill(false);
+    const el = videoRef.current;
+    if (!el) return;
+    el.muted = useSessionAudio.getState().isMuted;
+    const p = el.play();
+    Promise.resolve(p).catch(() => {
+      if (!el.muted) return;
+      // already muted attempt failed — nothing else to do
+    });
+    if (!el.muted) {
+      // If the initial attempt above rejected, retry muted with pill.
+      Promise.resolve(el.play()).catch(() => {
+        if (!el.muted) {
+          el.muted = true;
+          setShowPill(true);
+          Promise.resolve(el.play()).catch(() => {});
+        }
+      });
+    }
+  }, [item?.id, item?.type]);
+
+  // Session store → element sync while open (both directions of change).
+  useEffect(() => {
+    const unsub = useSessionAudio.subscribe((s) => {
+      const el = videoRef.current;
+      if (el) el.muted = s.isMuted;
+      if (!s.isMuted) setShowPill(false);
+    });
+    return unsub;
+  }, []);
 
   // Immersive shield — mirrors FullscreenFeedOverlay's open/close hooks so the
   // notch/status bar bleeds under the blurred backdrop. useLayoutEffect so the
