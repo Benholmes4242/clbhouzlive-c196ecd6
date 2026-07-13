@@ -39,7 +39,6 @@ export const LIFETIME_ORDER: string[] = [
 export const SHOWPIECE_COUNTER_LABEL: Record<string, string> = {
   first_birdie: 'Lifetime birdies',
   first_eagle: 'Lifetime eagles',
-  first_albatross: 'Lifetime albatrosses',
   // hole_in_one intentionally omitted — card label derives from
   // gam_badge_catalogue.title like every other badge.
   top_100_worldwide: 'of World Top 100 played',
