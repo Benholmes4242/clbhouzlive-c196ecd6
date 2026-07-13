@@ -320,7 +320,11 @@ export const InlineVideo: React.FC<Props> = ({
         }}
       />
 
-      {isActive && <MuteToggle />}
+      {isActive && (
+        <div style={{ position: 'absolute', right: 6, bottom: 6, zIndex: 30 }}>
+          <MuteButton size="sm" />
+        </div>
+      )}
     </div>
   );
 };
