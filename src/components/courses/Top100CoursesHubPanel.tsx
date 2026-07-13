@@ -259,7 +259,7 @@ const Top100CoursesHubPanel = () => {
           value={selectedList}
           onChange={(id) => setSelectedList(id)}
           size="sm"
-          align="left"
+          align="center"
           underlineColor="#0F172A"
           ariaLabel="Top 100 lists"
         />
