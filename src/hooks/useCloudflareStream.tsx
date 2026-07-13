@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { edgePost } from '@/utils/callEdge';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl, CLOUDFLARE_STREAM_CONFIG } from '@/config/cloudflareStream';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 
 interface CloudflareStreamUploadResult {
   success: boolean;

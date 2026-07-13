@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Flag, EyeOff, Link as LinkIcon, Ban } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { Drawer, DrawerContent } from '@/components/ui/drawer';
 import {
   AlertDialog,

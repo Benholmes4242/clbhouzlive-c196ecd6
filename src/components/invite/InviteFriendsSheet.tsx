@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { UserPlus, Copy, Share2, Send } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { BottomSheet } from '@/components/ui/BottomSheet';

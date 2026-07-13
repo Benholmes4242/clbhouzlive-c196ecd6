@@ -15,7 +15,7 @@ import { createPost } from '@/services/posts/createPost';
 
 import { pollStreamMetadata, updatePostMediaMetadata } from '@/utils/pollStreamMetadata';
 import { queueImageProcessing } from '@/services/imageProcessing';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { generateStreamThumbnailUrl, generateStreamHlsUrl } from '@/config/cloudflareStream';
 import type { UploadJobInput } from './types';
 import { POST_LIMITS } from '@/constants/postLimits';

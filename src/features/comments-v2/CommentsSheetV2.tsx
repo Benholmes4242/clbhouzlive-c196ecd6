@@ -10,7 +10,7 @@ import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from 
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';

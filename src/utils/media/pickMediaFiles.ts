@@ -7,7 +7,7 @@
  * All size/type limits defer to POST_LIMITS as the single source of truth.
  */
 
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { POST_LIMITS } from '@/constants/postLimits';
 
 interface PickMediaOptions {

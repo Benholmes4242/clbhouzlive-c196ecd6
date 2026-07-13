@@ -14,7 +14,7 @@ import { useActorUnreadCounts } from '@/hooks/useActorUnreadCounts';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { cn } from '@/lib/utils';
 import { postingAsCopy } from '@/lib/postingAsCopy';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useLogout } from '@/hooks/useLogout';
 import ProfileSheetV2 from '@/features/profile-sheet-v2/ProfileSheetV2';

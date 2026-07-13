@@ -4,7 +4,7 @@ import React from "react";
 import { Course, useTopTen } from "@/context/TopTenContext";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from '@/lib/toast';
 
 export const CourseCardDraggable: React.FC<{ 
   course: Course; 

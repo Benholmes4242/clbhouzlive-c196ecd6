@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { triggerHaptic } from '@/lib/ui/haptics';
 import { patchFollow } from '@/lib/followCache';
 import { whsKeys } from '@/lib/whs/hooks';

@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import { useCoursePersonalStatus } from '@/hooks/useCoursePersonalStatus';
 import { useNavigate, Link } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 
 interface CourseStatusToggleProps {
   courseId: string;

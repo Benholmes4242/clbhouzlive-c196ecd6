@@ -2,7 +2,7 @@
 // Enforces MAX_MEDIA=10 with a soft toast when exceeded.
 
 import { useRef } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { MAX_MEDIA, type StageMediaItem } from '../hooks/useStageComposer';
 import CroppedImage from './CroppedImage';
 

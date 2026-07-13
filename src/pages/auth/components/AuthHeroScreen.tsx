@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 // Chrome owned solely by AppRoutes (/auth + /signup are darkChrome routes).
 import { Loader2, ArrowRight } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { z } from 'zod';
 import { safeLocalStorage } from '@/utils/safeLocalStorage';
 import { isMedianApp } from '@/utils/median/isMedianApp';

@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { formatDistanceToNow, format } from 'date-fns';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import {
   MapPin, Plus, Search, RefreshCw, Image as ImageIcon,
   Trash2, Upload, Loader2, Zap, Users as UsersIcon,

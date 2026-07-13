@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { Plus, Pencil, Eye, EyeOff, Trash2 } from 'lucide-react';
 import { adminTheme as t } from '../theme';
 import StatusPill from './StatusPill';

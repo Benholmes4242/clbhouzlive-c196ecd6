@@ -41,7 +41,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { BIZ } from '@/components/business/businessTokens';
 import DomainStep from './steps/DomainStep';
 import {

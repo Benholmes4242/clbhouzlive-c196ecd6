@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 
 export function useTop100XpNotifications() {
   const { user } = useSupabaseSession();

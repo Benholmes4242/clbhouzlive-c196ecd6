@@ -17,7 +17,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Search, X, Star, Plus, Trash2, ChevronUp, ChevronDown, Trophy, RotateCcw } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import SheetHeader from '@/components/ui/SheetHeader';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import {
   DndContext,
   closestCenter,

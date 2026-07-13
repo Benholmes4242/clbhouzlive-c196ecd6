@@ -5,7 +5,7 @@
 
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { ArrowLeft, Search, MapPin, CheckCircle, Star, ChevronDown, Bookmark, BookmarkCheck } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { Input } from '@/components/ui/input';

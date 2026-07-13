@@ -6,7 +6,7 @@ import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { Button } from '@/components/ui/button';
 import { User, Building2, Megaphone, Sparkles, ArrowLeft } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { PageRoot } from '@/components/layout/PageRoot';
 import CollegeSearchDropdown from '@/components/profile/CollegeSearchDropdown';
 import { CollegeMediaResult } from '@/hooks/useCollegeMediaSearch';

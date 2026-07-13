@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { ChevronDown, Film, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {

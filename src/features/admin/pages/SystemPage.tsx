@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import {
   Activity, AlertCircle, ArrowLeft, ChevronDown, ChevronRight, LogOut,
   MapPin, RefreshCw, Wrench,
