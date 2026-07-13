@@ -273,6 +273,24 @@ function renderPush(r: OutboxRow, badgeMap: Map<string, any>) {
         body: "See how you compare.",
         data: { route: `/handicap/rivalry/${p.rival_user_id}` },
       };
+    case "status_at_risk": {
+      const b = badgeMap.get(p.badge_id);
+      const name = b?.title ?? "Your status";
+      return {
+        title: `⚠️ ${name} at risk`,
+        body: `You're at ${p.index}, cut-off ${p.cutoff}. Time to play.`,
+        data: { route: "/handicap?sheet=achievements", badge_id: p.badge_id },
+      };
+    }
+    case "status_reclaimed": {
+      const b = badgeMap.get(p.badge_id);
+      const name = b?.title ?? "Status";
+      return {
+        title: `🎉 ${name} reclaimed`,
+        body: `Back to ${p.index}. Welcome back.`,
+        data: { route: "/handicap?sheet=achievements", badge_id: p.badge_id },
+      };
+    }
     default:
       return null;
   }
