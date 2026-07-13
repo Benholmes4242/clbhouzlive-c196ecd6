@@ -171,6 +171,10 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
   const [tabsStuck, setTabsStuck] = useState(false);
 
   useEffect(() => {
+    // Cold-load / restored-scroll guard: seed tabsStuck from scroll position
+    // before the observer takes over, so a permanently-absent plate can't
+    // happen if the sentinel ref hasn't mounted yet on back-navigation.
+    setTabsStuck(window.scrollY > 200);
     const el = sentinelRef.current;
     if (!el) return;
     const io = new IntersectionObserver(
