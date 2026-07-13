@@ -118,6 +118,9 @@ export function useRailLane(opts: UseRailLaneOptions): UseRailLaneResult {
     vperfMark(autoSpanId, 'laneAcquire');
 
     VideoEngine.mountLane(laneId, host);
+    // Declare rails as always-muted; engine enforces. Belt-and-braces setMuted
+    // remains for immediate effect on first paint.
+    VideoEngine.setAudioPolicy(laneId, 'always-muted');
     VideoEngine.setMuted(laneId, true);
     // Resume at the engine's lastPos for this post — kept fresh by every lane
     // (feed-active/fullscreen/rail-*) via onTime. Means closing fullscreen at
