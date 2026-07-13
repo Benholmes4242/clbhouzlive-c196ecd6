@@ -900,7 +900,7 @@ const AppInner: React.FC = () => {
                                         </AuthWrapper>
 
                                         <Sonner />
-                                        <GlobalBottomNavigation />
+                                        <AppShellOnly><GlobalBottomNavigation /></AppShellOnly>
                                         <GlobalPostComposer />
                                       </ErrorBoundary>
                                   </VideoPlaybackProvider>
