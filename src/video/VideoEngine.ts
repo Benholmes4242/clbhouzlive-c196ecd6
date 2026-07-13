@@ -189,6 +189,7 @@ class VideoEngineImpl {
         wantPlay: false,
         listeners: new Set(),
         detachFns: [],
+        audioPolicy: 'always-muted',
       });
     }
     if (PAUSE_ON_HIDDEN && typeof document !== 'undefined') {
