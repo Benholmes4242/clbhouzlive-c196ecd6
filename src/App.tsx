@@ -27,7 +27,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { SecurityHeaders } from "@/components/security/SecurityHeaders";
 import AuthWrapper from "@/components/auth/AuthWrapper";
 import BootHold from "@/components/BootHold";
-import { GlobalAudioProvider } from './contexts/GlobalAudioContext';
+
 // REMOVED: FullscreenPlayerProvider — Phase 5 fullscreen system deleted
 import { RehydrationProvider } from './contexts/RehydrationContext';
 // RETIRED: VideoManagerProvider, VideoPlaybackManagerProvider, MediaSystemProvider.
@@ -796,10 +796,6 @@ const AppInner: React.FC = () => {
   
   // Real-time course ratings listener for instant card updates
   useCourseRatingsRealtime();
-  
-  // Bidirectional audio mute sync between MediaStore ↔ GlobalAudioContext
-  // TODO: re-wire audio bridge in Brief 3
-  
   // TODO Brief 3: re-wire media cache service worker
   // NOTE: useOnboardingEnforcer moved inside BrowserRouter (see OnboardingEnforcerWrapper below)
   
@@ -865,7 +861,7 @@ const AppInner: React.FC = () => {
                           <ScrollToTop />
                           <ScrollRestoration />
                           <LockAnchorSync />
-                          <GlobalAudioProvider>
+                          
                               {/* REMOVED: FullscreenPlayerProvider — Phase 5 fullscreen system deleted */}
                                 <TopTenProvider>
                                   <VideoPlaybackProvider>
@@ -906,7 +902,7 @@ const AppInner: React.FC = () => {
                                   </VideoPlaybackProvider>
                                 </TopTenProvider>
                               {/* END REMOVED FullscreenPlayerProvider */}
-                            </GlobalAudioProvider>
+                            
 
                         </ActiveActorProvider>
                     

@@ -1,5 +1,4 @@
 import { useState, useRef, useCallback } from 'react';
-import { useExclusiveVideoAudio } from './useExclusiveVideoAudio';
 
 interface UseDiscoverMediaPreviewProps {
   itemId: string;
@@ -17,9 +16,6 @@ export const useDiscoverMediaPreview = ({
   const hoverTimer = useRef<NodeJS.Timeout | null>(null);
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
   const isLongPress = useRef(false);
-  
-  // Use exclusive video audio for videos only
-  const { isMuted, toggleMute } = useExclusiveVideoAudio(itemId);
 
   const clearTimers = useCallback(() => {
     if (hoverTimer.current) {
