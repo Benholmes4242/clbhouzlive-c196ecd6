@@ -20,7 +20,9 @@ import { getScoreColor } from '../../_shared/scoreColor';
 import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
 import type { EventState } from '../../components/overview-v3/useTournamentPulse';
 
-const HERO_MIN_H = 240;
+// Canonical hero height (matches GolfClubView / course detail hero).
+const HERO_MIN_H =
+  'calc(clamp(380px, 44dvh, 460px) + env(safe-area-inset-top, 0px))';
 
 interface LbEntry {
   position: number | null;
