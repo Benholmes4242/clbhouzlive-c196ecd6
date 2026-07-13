@@ -542,6 +542,8 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
             )}
           </div>
 
+          <TrophyRoomSpine items={items} />
+
           {/* NEXT UNLOCK banner — muted three-line stack. */}
           {nextUnlock && (
             <div style={{ padding: '4px 0 12px' }}>
