@@ -781,6 +781,7 @@ async function evaluateCounterBadge(
  */
 async function processTop100Only(userId: string): Promise<{ earned: string[] }> {
   await recomputeTop100Milestones(userId);
+  await recomputeTravelMilestones(userId);
 
   const { data: badges, error } = await supabase
     .from("gam_badge_catalogue")
