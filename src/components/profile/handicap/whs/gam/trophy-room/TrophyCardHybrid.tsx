@@ -13,7 +13,7 @@ import type { TrophyItem } from './_shared/normalizeTrophyItem';
 import { MATERIAL_HEX } from './_shared/rarityPalette';
 import { MATERIAL_LADDER, materialForTier } from './_shared/levels';
 import { renderBadgeIcon } from '../badgeIcons';
-import { TrophyCard as LegacyTrophyCard } from './TrophyCard';
+import { LegendCard } from './parts/LegendCard';
 
 const FONT = "'Geist', -apple-system, sans-serif";
 const OBSIDIAN_EDGE = '#D4A017';
