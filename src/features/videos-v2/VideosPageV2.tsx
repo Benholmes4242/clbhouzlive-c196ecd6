@@ -2,6 +2,7 @@ import React, { useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
+import { GlassHeaderPlate } from '@/components/chrome/GlassHeaderPlate';
 import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import { UnderlineTabs } from '@/components/ui/UnderlineTabs';
 import { FilterChips } from '@/components/ui/FilterChips';
