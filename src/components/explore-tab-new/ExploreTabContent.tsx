@@ -7,6 +7,8 @@ import DiscoverWhsMasthead from './DiscoverWhsMasthead';
 import { CircleActivityStrip } from './CircleActivityStrip';
 import { AlmanacRegionTabs, FeatTierRail, AlmanacHead, REGION_TABS } from './AlmanacSections';
 import { LegendaryFeatHero } from './LegendaryFeatHero';
+import { WhereYoudRank } from './WhereYoudRank';
+import { ToughestCoursesStrip } from './ToughestCoursesStrip';
 import { useRegionFeats } from './hooks/useRegionFeats';
 
 import ExploreGrid from './ExploreGrid';
