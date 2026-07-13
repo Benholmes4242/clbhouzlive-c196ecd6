@@ -107,6 +107,16 @@ export const TrophyDetailSheet: React.FC<Props> = ({ items, initialIndex, ownerU
     );
   }
 
+  if (current.kind === 'legend') {
+    return (
+      <LegendImmersive
+        item={current}
+        onClose={onClose}
+        onShare={handleShare}
+      />
+    );
+  }
+
   return (
     <GamSheet open onClose={onClose}>
       <DetailHero
