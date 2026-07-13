@@ -118,6 +118,7 @@ export const AchievementImmersive: React.FC<Props> = ({ item, viewerUserId, onCl
   };
 
   return (
+  const overlay = (
     <div
       role="dialog"
       aria-label={item.name}
