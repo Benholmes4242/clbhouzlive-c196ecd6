@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { useSessionAudio, getLastUnmuteGestureTs } from '@/audio/sessionAudioStore';
 
 export type TabKey = string; // 'foryou' | 'friends' | other surfaces (LightCardFeed etc use 'default')
 
@@ -16,8 +15,6 @@ interface ClubhouseState {
   // FullscreenCarouselOverlay, LightCardFeed, FeedImageCarousel, etc.).
   activeIndex: number;
   carouselPositions: Map<number, number>;
-
-  isMuted: boolean;
   userPaused: boolean;
   // [VIDEO-TEARDOWN] activeVideoElement / activeVideoRef removed — poster-only chassis.
   isTournamentCardActive: boolean;
@@ -25,13 +22,9 @@ interface ClubhouseState {
   setActiveTab: (tab: TabKey) => void;
   setActiveIndex: (idx: number, tab?: TabKey) => void;
   setCarouselPosition: (feedIdx: number, mediaIdx: number, tab?: TabKey) => void;
-  setIsMuted: (v: boolean) => void;
-  toggleMute: () => void;
   setUserPaused: (v: boolean) => void;
   // [VIDEO-TEARDOWN] setActiveVideoElement removed — engine severed.
   setIsTournamentCardActive: (v: boolean) => void;
-  markUserGestureUnmute: () => void;
-  isRecentUserGesture: () => boolean;
   /** Per-tab warmer — CardFeed registers a callback that prefetches the tab's
    *  active-index HLS first segment. Fired on setActiveTab so tab-restore
    *  doesn't stall on the cold segment fetch (manifest is already pooled). */
@@ -69,7 +62,6 @@ export const useClubhouseStore = create<ClubhouseState>()((set) => ({
   activeIndex: 0,
   carouselPositions: new Map(),
 
-  isMuted: useSessionAudio.getState().isMuted,
   userPaused: false,
   // [VIDEO-TEARDOWN] activeVideoElement / activeVideoRef initial values removed.
   isTournamentCardActive: false,
@@ -116,27 +108,11 @@ export const useClubhouseStore = create<ClubhouseState>()((set) => ({
     const mirror = target === s.activeTab ? { carouselPositions: next } : {};
     return { carouselPositionsByTab: nextByTab, ...mirror };
   }),
-
-  setIsMuted: (v) => {
-    useSessionAudio.getState().setMuted(v);
-  },
-  toggleMute: () => {
-    useSessionAudio.getState().toggle();
-  },
   setUserPaused: (v) => set({ userPaused: v }),
   // [VIDEO-TEARDOWN] setActiveVideoElement setter removed.
   setIsTournamentCardActive: (v) => set({ isTournamentCardActive: v }),
-  // NO-OP shim: gesture timestamp is now stamped by sessionAudio.setMuted(false).
-  markUserGestureUnmute: () => { /* no-op */ },
-  isRecentUserGesture: () => Date.now() - getLastUnmuteGestureTs() < 2000,
   registerTabWarmer: (tab, fn) => {
     if (fn) _tabWarmers.set(tab, fn);
     else _tabWarmers.delete(tab);
   },
 }));
-
-// Mirror sessionAudio.isMuted into clubhouseStore so components selecting
-// clubhouseStore.isMuted stay live without changes.
-useSessionAudio.subscribe((s) => {
-  useClubhouseStore.setState({ isMuted: s.isMuted });
-});
