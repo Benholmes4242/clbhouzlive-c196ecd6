@@ -274,8 +274,8 @@ const DotPager: React.FC<{ count: number; active: number }> = ({ count, active }
       justifyContent: 'center',
       alignItems: 'center',
       gap: 6,
-      marginTop: 10,
-      marginBottom: 20,
+      marginTop: 12,
+      marginBottom: 16,
     }}
   >
     {Array.from({ length: count }).map((_, i) => {

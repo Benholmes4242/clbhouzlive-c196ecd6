@@ -85,7 +85,7 @@ export const HeroPositionCard: React.FC<Props> = ({
         display: 'flex',
         alignItems: 'center',
         gap: 12,
-        padding: '14px 16px',
+        padding: '12px 16px',
         fontFamily: FONT,
       }}
     >

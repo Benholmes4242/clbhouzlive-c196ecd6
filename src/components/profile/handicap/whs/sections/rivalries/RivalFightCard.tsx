@@ -127,7 +127,7 @@ export const RivalFightCard: React.FC<Props> = ({
       <div
         style={{
           position: 'relative',
-          padding: '14px 16px 16px',
+          padding: '12px 16px 16px',
           background: heroPhoto
             ? `linear-gradient(180deg, rgba(15,23,42,0.72), rgba(15,23,42,0.86)), url(${heroPhoto}) center/cover`
             : 'linear-gradient(135deg, #1a3c2a, #0f172a)',
@@ -135,7 +135,7 @@ export const RivalFightCard: React.FC<Props> = ({
         }}
       >
         {/* Top row: RIVAL badge + rank */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 9px 4px 7px', borderRadius: 999, background: 'rgba(255,255,255,0.14)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}>
             <Star size={10} strokeWidth={2.4} color="#FFFFFF" />
             <span style={{ fontSize: 9, fontWeight: 900, letterSpacing: '0.16em', color: '#FFFFFF' }}>RIVAL</span>
@@ -231,7 +231,7 @@ export const RivalFightCard: React.FC<Props> = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 12,
-                padding: '11px 16px',
+                padding: '12px 16px',
                 borderBottom: i < crownInfos.length - 1 ? '1px solid var(--hcp-line)' : 'none',
               }}
             >

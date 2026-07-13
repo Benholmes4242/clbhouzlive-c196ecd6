@@ -80,7 +80,7 @@ export const FullLeaderboardSheet: React.FC<FullLeaderboardSheetProps> = ({
           style={{
             display: 'flex',
             alignItems: 'center',
-            padding: '12px 20px 8px',
+            padding: '12px 16px 8px',
           }}
         >
           <p style={{ ...LABEL_STYLE, flex: 1 }}>ALL ACTIVE · {cohorts.totalActive}</p>
@@ -109,7 +109,7 @@ export const FullLeaderboardSheet: React.FC<FullLeaderboardSheetProps> = ({
           <>
             {showInactive ? (
               <>
-                <div style={{ padding: '20px 20px 8px' }}>
+                <div style={{ padding: '16px 16px 8px' }}>
                   <p style={LABEL_STYLE}>INACTIVE · {cohorts.totalInactive}</p>
                 </div>
                 {cohorts.inactive.map((entry) => {
@@ -138,7 +138,7 @@ export const FullLeaderboardSheet: React.FC<FullLeaderboardSheetProps> = ({
                   justifyContent: 'center',
                   gap: 5,
                   width: 'calc(100% - 40px)',
-                  margin: '12px 20px 16px',
+                  margin: '12px 16px 16px',
                   padding: '10px 16px',
                   background: 'transparent',
                   border: 'none',

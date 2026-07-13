@@ -69,7 +69,7 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
         <>
           <div
             style={{
-              padding: '18px 16px 10px',
+              padding: '16px 16px 12px',
               fontFamily: FONT,
               fontSize: 11,
               fontWeight: 800,

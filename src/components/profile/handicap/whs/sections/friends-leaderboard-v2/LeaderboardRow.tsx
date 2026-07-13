@@ -129,7 +129,7 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onCli
     : {
         border: 'none',
         borderBottom: `1px solid ${T.hairlineSoft}`,
-        padding: '10px 20px',
+        padding: '10px 16px',
       };
 
   return (
