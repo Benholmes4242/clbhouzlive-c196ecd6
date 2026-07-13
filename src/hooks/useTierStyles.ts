@@ -1,38 +1,20 @@
-import { courseDetailTokens } from '@/styles/course-detail-tokens';
-import { getRatingTier } from '@/lib/ratingTier';
+import { rampForRating } from '@/lib/ratingTier';
 
 /**
- * Score ring color helpers — the only surviving export of this module.
+ * Score ring color helpers — derived from canonical RATING_RAMPS to prevent
+ * hex drift. Consumers: CommunityScoreCard, PersonalReviewCard.
  *
- * History: this file previously housed bucketing helpers (useTierStyles,
- * getTierKeyFromScore, getTierLabel, getTierFromLabel) that duplicated
- * canonical tier logic. They had zero consumers and were silently broken
- * for scores ≥ 9.5 (capped at "Outstanding" under the legacy 6-tier system). Deleted Apr 2026.
- *
- * For score → tier mapping, use canonical helpers from `@/lib/ratingTier`
- * (`getRatingTier`, `getRatingTierLabel`) directly. Do NOT reintroduce
- * bucketing helpers here.
+ * History: previously read hand-copied hexes from course-detail-tokens.ts
+ * scoreRing (e.g. #FFC23D vs canon #FFCB45). Now single-sourced from
+ * `@/lib/ratingTier` via `rampForRating`. See ratingTier.ts for tier bands.
  */
-
-// Local mapping from canonical RatingTier strings → the keys used by
-// courseDetailTokens.scoreRing. Keeping this explicit gives us TypeScript
-// exhaustiveness checking and a single edit point if scoreRing keys change.
-const RATING_TIER_TO_RING_KEY: Record<
-  ReturnType<typeof getRatingTier>,
-  keyof typeof courseDetailTokens.scoreRing
-> = {
-  EXCEPTIONAL: 'exceptional',
-  EXCELLENT: 'excellent',
-  GOOD: 'good',
-  FAIR: 'fair',
-  POOR: 'poor',
-};
 
 /**
  * Get score ring gradient colors (from/to) for SVG rendering.
- * Consumed by PersonalReviewCard.tsx.
+ * `from` = ramp.mid (deeper), `to` = ramp.hi (brighter) — preserves the
+ * previous visual weighting while sourcing from the canon.
  */
 export const getScoreRingColors = (score: number) => {
-  const key = RATING_TIER_TO_RING_KEY[getRatingTier(score)];
-  return courseDetailTokens.scoreRing[key];
+  const ramp = rampForRating(score);
+  return { from: ramp.mid, to: ramp.hi };
 };
