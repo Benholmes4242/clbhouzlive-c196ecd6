@@ -21,6 +21,8 @@ import type { TrophyItem } from '../_shared/normalizeTrophyItem';
 interface Props {
   item: Extract<TrophyItem, { kind: 'achievement' }>;
   viewerUserId: string;
+  /** Owner's current WHS handicap index -- powers LOSABLE STATUS overlay. */
+  currentIndex?: number | null;
   onClose: () => void;
   onShare: () => void;
 }
