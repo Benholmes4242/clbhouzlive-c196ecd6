@@ -346,8 +346,8 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 9,
-                padding: '10px 12px',
+                gap: 8,
+                padding: '12px',
                 background: 'rgba(247,147,30,0.08)',
                 borderRadius: 11,
               }}
