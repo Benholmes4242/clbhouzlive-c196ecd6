@@ -5,7 +5,7 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import { UnderlineTabs } from '@/components/ui/UnderlineTabs';
 import { FilterChips } from '@/components/ui/FilterChips';
-import type { VideosSortId } from './components/SortSegment';
+import type { VideosSortId } from './types';
 import { VideosFeedV2 } from './components/VideosFeedV2';
 import { VIDEOS_V2_CATEGORY_IDS, type VideosV2CategoryId } from './categories';
 

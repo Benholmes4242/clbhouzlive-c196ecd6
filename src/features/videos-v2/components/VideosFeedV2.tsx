@@ -18,7 +18,7 @@ import { usePendingPostsForActor } from '@/uploads/usePendingPostsForActor';
 import { PendingPostCard } from '@/components/posts-tab/PendingPostCard';
 import { useWatchAutoplay } from '@/video/useWatchAutoplay';
 import { toFeedPosts } from '@/features/watch-v2/utils/toFeedPost';
-import type { VideosSortId } from './SortSegment';
+import type { VideosSortId } from '../types';
 import type { VideosV2CategoryId } from '../categories';
 import { useVideosFeedV2, type VideosFeedV2Row } from '../hooks/useVideosFeedV2';
 import { useInterruptClips } from '../hooks/useInterruptClips';
