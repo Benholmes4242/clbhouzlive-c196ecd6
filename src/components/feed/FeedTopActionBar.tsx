@@ -18,10 +18,9 @@ import {
   MessageCircle,
   Send,
   MoreHorizontal,
-  Volume2,
-  VolumeX,
 } from 'lucide-react';
 import { Z } from '@/config/zIndex';
+import { MuteButton } from '@/audio/MuteButton';
 
 interface FeedTopActionBarProps {
   onClose?: () => void;
