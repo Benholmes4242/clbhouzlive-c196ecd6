@@ -103,11 +103,26 @@ function LegendarySection({ region }: { region: string | null }) {
   const { data, isLoading } = useRegionFeats(region, 'legendary');
   const hasAny = (data?.length ?? 0) > 0;
   if (!isLoading && !hasAny) return null;
+  const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
   return (
-    <section style={{ fontFamily: 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif', paddingTop: 24 }}>
-      <AlmanacHead title="Aces & Albatrosses" icon="⛳" />
+    <section style={{ fontFamily: FONT, paddingTop: 24 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 16px 8px' }}>
+        <span aria-hidden style={{ fontSize: 13, lineHeight: 1 }}>⛳</span>
+        <span
+          style={{
+            fontSize: 11.5,
+            fontWeight: 800,
+            letterSpacing: '0.13em',
+            textTransform: 'uppercase',
+            color: '#8A6400',
+          }}
+        >
+          Aces &amp; Albatrosses
+        </span>
+      </div>
       <LegendaryFeatHero region={region} />
     </section>
   );
 }
+
 
