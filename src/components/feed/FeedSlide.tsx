@@ -726,6 +726,24 @@ const FullscreenVideoSlot: React.FC<{
         }}
       />
 
+      {showSoundPill && !isBorrowSlide && (
+        <div
+          style={{
+            position: 'absolute',
+            left: 12,
+            bottom: 12,
+            zIndex: 20,
+            pointerEvents: 'auto',
+          }}
+        >
+          <TapForSoundPill
+            onClick={() => {
+              useSessionAudio.getState().unmute();
+              setShowSoundPill(false);
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 };
