@@ -6,6 +6,7 @@ import { AchievementBody } from './parts/AchievementBody';
 import { LegendBody } from './parts/LegendBody';
 import { DetailFooter } from './parts/DetailFooter';
 import { Top100Body } from './parts/Top100Body';
+import { AchievementImmersive } from './parts/AchievementImmersive';
 import { isTop100Achievement } from './_shared/showpieces';
 import type { TrophyItem } from './_shared/normalizeTrophyItem';
 
@@ -91,6 +92,19 @@ export const TrophyDetailSheet: React.FC<Props> = ({ items, initialIndex, ownerU
     onClose();
     setTimeout(() => navigate(`/courses/${courseId}`), 100);
   };
+
+  // Non-Top-100 achievement badges render as a minimal immersive overlay
+  // instead of the sheet flow. Top-100 badges and legend rows keep the sheet.
+  if (current.kind === 'achievement' && !isTop100Achievement(current.badgeId)) {
+    return (
+      <AchievementImmersive
+        item={current}
+        viewerUserId={viewerUserId}
+        onClose={onClose}
+        onShare={handleShare}
+      />
+    );
+  }
 
   return (
     <GamSheet open onClose={onClose}>

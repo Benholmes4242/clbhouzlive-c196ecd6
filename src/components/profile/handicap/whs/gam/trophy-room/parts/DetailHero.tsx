@@ -35,7 +35,7 @@ function hexToRgb(hex: string): string {
   return `${r},${g},${b}`;
 }
 
-function paletteFor(item: TrophyItem): RarityPalette {
+export function paletteFor(item: TrophyItem): RarityPalette {
   if (item.kind === 'legend') return LEGEND_PALETTE;
   const hasProgress = item.earned || (item.currentValue != null && item.currentValue > 0);
   if (!hasProgress) return LOCKED_PALETTE;
