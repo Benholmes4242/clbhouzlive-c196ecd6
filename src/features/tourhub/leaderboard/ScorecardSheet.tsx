@@ -531,7 +531,6 @@ function renderHoleRows(
 
   const row = (h: (typeof roundHoles)[number]) => {
     const played = h.strokes != null;
-    const scoreColor = scoreCellColor(h.strokes, h.par);
     // FIELD color relative to par
     let fieldColor = SECONDARY;
     if (h.fieldAvg != null && h.par != null) {
@@ -592,14 +591,31 @@ function renderHoleRows(
           style={{
             width: 52,
             flexShrink: 0,
-            textAlign: 'center',
-            fontSize: 12.5,
-            fontWeight: 800,
-            color: played ? scoreColor : MUTED,
-            fontVariantNumeric: 'tabular-nums',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
-          {played ? h.strokes : '-'}
+          {played ? (
+            <ScoreMark
+              strokes={h.strokes}
+              par={h.par ?? 4}
+              size={20}
+              surface="light"
+              fontFamily={F}
+            />
+          ) : (
+            <span
+              style={{
+                fontSize: 12.5,
+                fontWeight: 800,
+                color: MUTED,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              -
+            </span>
+          )}
         </div>
         <div
           style={{
