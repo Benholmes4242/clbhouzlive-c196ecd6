@@ -177,7 +177,7 @@ function ReplySheet({
           </div>
         </div>
 
-        <div className="px-4 pt-3 pb-5" style={{ borderTop: `1px solid ${HAIR}`, paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)' }}>
+        <div className="px-4 pt-3 pb-0" style={{ borderTop: `1px solid ${HAIR}`, paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)' }}>
           <button
             onClick={handleSubmit}
             disabled={disabled}

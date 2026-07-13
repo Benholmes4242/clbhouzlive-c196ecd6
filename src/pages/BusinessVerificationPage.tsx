@@ -73,7 +73,7 @@ export default function BusinessVerificationPage() {
 
   return (
     <ManagePageShell title="Verification">
-      <main className="px-4 py-6 max-w-lg mx-auto pb-20">
+      <main className="px-4 py-6 max-w-lg mx-auto pb-22">
         {isLoading ? (
           <div className="space-y-3">
             <div className="h-24 animate-pulse rounded-xl" style={{ background: 'rgba(15,23,42,0.08)' }} />
@@ -139,7 +139,7 @@ function NoneState({ onStart }: { onStart: () => void }) {
       {/* Scrollable content */}
       <div className="flex-1" style={{ paddingBottom: 24 }}>
         {/* Badge Hero */}
-        <div className="flex flex-col items-center" style={{ paddingTop: 8, gap: 14 }}>
+        <div className="flex flex-col items-center" style={{ paddingTop: 8, gap: 12 }}>
           <div
             className="flex items-center justify-center"
             style={{
@@ -180,7 +180,7 @@ function NoneState({ onStart }: { onStart: () => void }) {
         </div>
 
         {/* Benefit Cards */}
-        <div className="flex flex-col" style={{ gap: 10, marginTop: 28 }}>
+        <div className="flex flex-col" style={{ gap: 10, marginTop: 24 }}>
           {[
             { title: 'Build trust', desc: 'A verified badge shows golfers your business is legitimate.' },
             { title: 'Stand out in search', desc: 'Verified businesses are more visible in search and discovery.' },
@@ -193,7 +193,7 @@ function NoneState({ onStart }: { onStart: () => void }) {
                 background: '#FFFFFF',
                 border: `1px solid ${BIZ.hair}`,
                 borderRadius: 14,
-                padding: '14px 15px',
+                padding: '12px 16px',
                 gap: 12,
               }}
             >

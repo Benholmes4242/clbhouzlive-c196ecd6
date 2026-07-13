@@ -182,7 +182,7 @@ export default function BusinessTeamPage() {
     <ManagePageShell title="Manage team">
       <main className="px-4 pt-4 pb-22 max-w-lg mx-auto">
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-          <p className="text-[13px] leading-relaxed mb-5" style={{ color: INK_45 }}>
+          <p className="text-[13px] leading-relaxed mb-4" style={{ color: INK_45 }}>
             Invite people to help manage this business. Public members appear on your profile's Team tab.
           </p>
 
@@ -200,7 +200,7 @@ export default function BusinessTeamPage() {
               background: CARD_BG,
               border: `1px solid ${HAIR}`,
               borderRadius: 14,
-              padding: '4px 14px',
+              padding: '4px 16px',
             }}
           >
             <div className="pt-3 pb-1 flex items-center justify-between">
@@ -244,7 +244,7 @@ export default function BusinessTeamPage() {
                 background: CARD_BG,
                 border: `1px solid ${HAIR}`,
                 borderRadius: 14,
-                padding: '4px 14px',
+                padding: '4px 16px',
               }}
             >
               <div className="pt-3 pb-1 flex items-center justify-between">
