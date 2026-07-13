@@ -36,6 +36,11 @@ export default function ClipsPageV2() {
 
   const mood = useMemo(() => parseMood(params.get('mood')), [params]);
 
+  const moodOptions = useMemo(
+    () => CLIPS_V2_MOODS.map((id) => ({ id, label: MOOD_LABELS[id] })),
+    [],
+  );
+
   const setMood = useCallback(
     (next: ClipsV2Mood) => {
       const p = new URLSearchParams(params);
@@ -45,6 +50,7 @@ export default function ClipsPageV2() {
     },
     [params, setParams],
   );
+
 
   return (
     <PageRoot className="min-h-screen text-foreground bg-background">
