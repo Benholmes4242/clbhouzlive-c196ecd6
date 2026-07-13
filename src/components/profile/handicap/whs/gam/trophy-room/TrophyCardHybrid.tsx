@@ -152,7 +152,7 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = 
         {renderBadgeIcon(item.iconKey, 92, earned || inProgress ? accent : '#FFFFFF', 1.5)}
       </div>
 
-      {/* top row: icon chip + tier chip (status chip overrides when present) */}
+      {/* top row: icon chip (tiered only) + tier chip (status chip overrides when present) */}
       <div
         style={{
           display: 'flex',
@@ -161,20 +161,22 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = 
           marginBottom: 10,
         }}
       >
-        <div
-          style={{
-            width: 30,
-            height: 30,
-            borderRadius: 9,
-            background: `${accent}1E`,
-            border: `1px solid ${accent}44`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          {renderBadgeIcon(item.iconKey, 15, accent, 2.2)}
-        </div>
+        {tiered && (
+          <div
+            style={{
+              width: 30,
+              height: 30,
+              borderRadius: 9,
+              background: `${accent}1E`,
+              border: `1px solid ${accent}44`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            {renderBadgeIcon(item.iconKey, 15, accent, 2.2)}
+          </div>
+        )}
         {sCopy ? (
           <span
             style={{
@@ -209,18 +211,32 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = 
         )}
       </div>
 
-      {/* counter / check */}
+      {/* counter (tiered) or badge icon (binary) */}
       <div
         style={{
-          fontSize: 30,
-          fontWeight: 800,
-          letterSpacing: '-0.02em',
-          color: earned || inProgress ? accent : 'rgba(255,255,255,0.35)',
-          fontVariantNumeric: 'tabular-nums',
-          lineHeight: 1,
+          height: 30,
+          display: 'flex',
+          alignItems: 'center',
         }}
       >
-        {tiered ? (item.currentValue ?? 0).toLocaleString() : earned ? '\u2713' : '\u2014'}
+        {tiered ? (
+          <span
+            style={{
+              fontSize: 30,
+              fontWeight: 800,
+              letterSpacing: '-0.02em',
+              color: earned || inProgress ? accent : 'rgba(255,255,255,0.35)',
+              fontVariantNumeric: 'tabular-nums',
+              lineHeight: 1,
+            }}
+          >
+            {(item.currentValue ?? 0).toLocaleString()}
+          </span>
+        ) : earned ? (
+          renderBadgeIcon(item.iconKey, 34, accent, 1.8)
+        ) : (
+          renderBadgeIcon(item.iconKey, 34, 'rgba(255,255,255,0.25)', 1.8)
+        )}
       </div>
       <div
         style={{
