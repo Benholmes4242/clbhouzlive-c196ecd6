@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
+import { useSetChromeSuppressed } from '@/features/chrome-v2/leftOverride';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { MomentPost } from './types';
@@ -30,6 +31,10 @@ export const MomentFullscreenViewer: React.FC<MomentFullscreenViewerProps> = ({
   onOpenChange,
   onIndexChange,
 }) => {
+  // The profile moments viewer sits below the chrome island z-layer;
+  // suppress the island while this fullscreen takeover is mounted.
+  useSetChromeSuppressed(true);
+
   const currentMoment = moments[currentIndex];
 
   const goToPrev = useCallback(() => {

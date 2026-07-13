@@ -39,6 +39,7 @@ import { originHostRegistry } from '@/video/originHostRegistry';
 import type { BorrowDescriptor } from '@/store/fullscreenFeedStore';
 import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
 import { applyRouteChrome } from '@/lib/routeChrome';
+import { useSetChromeSuppressed } from '@/features/chrome-v2/leftOverride';
 import { resolveRestingRect, getCurrentViewport } from '@/lib/media/resolveRestingRect';
 import { FS_TRANSITION_MODE, FS_CUT_FADE_MS } from '@/lib/media/transitionMode';
 import { FS_OVERLAY_Z } from '@/lib/zLayers';
@@ -144,6 +145,11 @@ export function FullscreenFeedOverlay() {
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
   const { isOpen, posts, startIndex, activeIndex, close, setActiveIndex, openCommentsInitially, consumeOpenCommentsInitially, initialCommentId, consumeInitialCommentId } = useFullscreenFeedStore();
+
+  // Fullscreen viewer owns the whole screen: unmount the chrome island
+  // (top-left capsule + top-right cluster) while open. Restores on close/
+  // unmount automatically (the hook resets to false on cleanup).
+  useSetChromeSuppressed(isOpen);
   const hasNextPage = useFullscreenFeedStore(s => s.hasNextPage);
   const fetchNextPage = useFullscreenFeedStore(s => s.fetchNextPage);
   const isFetchingNextPage = useFullscreenFeedStore(s => s.isFetchingNextPage);
