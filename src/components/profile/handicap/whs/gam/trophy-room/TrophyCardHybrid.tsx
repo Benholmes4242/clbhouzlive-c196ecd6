@@ -81,7 +81,7 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = 
     ? new Date(item.earnedAt).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
     : null;
 
-  const subline = tiered
+  const baseSubline = tiered
     ? nextThreshold != null
       ? `NEXT: ${nextThreshold.toLocaleString()} -> ${nextMat?.toUpperCase()}`
       : 'ALL TIERS EARNED'
@@ -90,11 +90,32 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = 
         ? `EARNED ${earnedDate.toUpperCase()}`
         : 'EARNED'
       : 'LOCKED';
+  // Status subline (at_risk / lost) overrides the base subline so the live
+  // state is what the user reads first. Held keeps the base subline.
+  const subline = sCopy ? sCopy.subline.toUpperCase() : baseSubline;
 
   const progressPct =
     tiered && nextThreshold != null
       ? Math.min(100, Math.max(0, ((item.currentValue ?? 0) / nextThreshold) * 100))
       : null;
+
+  // Card border + fill treatment. 'lost' status dims the whole card even if
+  // the milestone was earned; 'at_risk' keeps it lit and adds an amber pulse.
+  const isLostDimmed = sCopy?.dimmed === true;
+  const isAtRiskPulse = sCopy?.pulse === true;
+  const cardBorderColor = isLostDimmed
+    ? 'rgba(255,255,255,0.10)'
+    : isAtRiskPulse
+      ? sCopy!.chipBorder
+      : earned || inProgress
+        ? `${accent}55`
+        : 'rgba(255,255,255,0.07)';
+  const cardOpacity = isLostDimmed ? 0.55 : earned || inProgress ? 1 : 0.6;
+  const cardBackground = isLostDimmed
+    ? 'rgba(255,255,255,0.025)'
+    : earned || inProgress
+      ? `linear-gradient(165deg, ${accent}14, rgba(255,255,255,0.02))`
+      : 'rgba(255,255,255,0.025)';
 
   return (
     <button
@@ -109,12 +130,11 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = 
         width: '100%',
         borderRadius: 16,
         padding: '13px 13px 0',
-        background:
-          earned || inProgress
-            ? `linear-gradient(165deg, ${accent}14, rgba(255,255,255,0.02))`
-            : 'rgba(255,255,255,0.025)',
-        border: `1px solid ${earned || inProgress ? `${accent}55` : 'rgba(255,255,255,0.07)'}`,
-        opacity: earned || inProgress ? 1 : 0.6,
+        background: cardBackground,
+        border: `1px solid ${cardBorderColor}`,
+        opacity: cardOpacity,
+        boxShadow: isAtRiskPulse ? `0 0 0 2px ${sCopy!.chipBg}` : undefined,
+        animation: isAtRiskPulse ? 'gamPulse 1.8s ease-in-out infinite' : undefined,
       }}
     >
       {/* ghost watermark */}
@@ -130,7 +150,7 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = 
         {renderBadgeIcon(item.iconKey, 92, earned || inProgress ? accent : '#FFFFFF', 1.5)}
       </div>
 
-      {/* top row: icon chip + tier chip */}
+      {/* top row: icon chip + tier chip (status chip overrides when present) */}
       <div
         style={{
           display: 'flex',
@@ -153,20 +173,38 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = 
         >
           {renderBadgeIcon(item.iconKey, 15, accent, 2.2)}
         </div>
-        <span
-          style={{
-            fontSize: 9,
-            fontWeight: 800,
-            letterSpacing: '0.08em',
-            color: earned || inProgress ? accent : 'rgba(255,255,255,0.4)',
-            border: `1px solid ${earned || inProgress ? `${accent}55` : 'rgba(255,255,255,0.12)'}`,
-            borderRadius: 999,
-            padding: '3px 8px',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {chipText}
-        </span>
+        {sCopy ? (
+          <span
+            style={{
+              fontSize: 9,
+              fontWeight: 800,
+              letterSpacing: '0.08em',
+              color: sCopy.chipColor,
+              background: sCopy.chipBg,
+              border: `1px solid ${sCopy.chipBorder}`,
+              borderRadius: 999,
+              padding: '3px 8px',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {sCopy.chipLabel}
+          </span>
+        ) : (
+          <span
+            style={{
+              fontSize: 9,
+              fontWeight: 800,
+              letterSpacing: '0.08em',
+              color: earned || inProgress ? accent : 'rgba(255,255,255,0.4)',
+              border: `1px solid ${earned || inProgress ? `${accent}55` : 'rgba(255,255,255,0.12)'}`,
+              borderRadius: 999,
+              padding: '3px 8px',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {chipText}
+          </span>
+        )}
       </div>
 
       {/* counter / check */}
@@ -196,7 +234,7 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = 
       <div
         style={{
           fontSize: 9.5,
-          color: 'rgba(255,255,255,0.45)',
+          color: sCopy ? sCopy.chipColor : 'rgba(255,255,255,0.45)',
           marginTop: 3,
           fontVariantNumeric: 'tabular-nums',
         }}
@@ -219,7 +257,9 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = 
         </div>
       )}
 
-      {/* rarity plaque rail -- owns the card bottom */}
+      {/* rarity plaque rail -- owns the card bottom. Persistent EARNED tick
+          appears when the milestone was ever achieved but the live status is
+          now lost, so the medal record stays visible. */}
       <div
         style={{
           margin: '10px -13px 0',
@@ -244,7 +284,26 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = 
         >
           RARITY · {item.rarity.toUpperCase()}
         </span>
+        {milestoneKeptStatusLost && (
+          <span
+            style={{
+              marginLeft: 'auto',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 3,
+              fontSize: 8.5,
+              fontWeight: 800,
+              letterSpacing: '0.1em',
+              color: '#F7931E',
+            }}
+            aria-label="Milestone earned"
+          >
+            <span style={{ fontSize: 9 }}>{'\u2713'}</span>
+            EARNED
+          </span>
+        )}
       </div>
     </button>
   );
 };
+
