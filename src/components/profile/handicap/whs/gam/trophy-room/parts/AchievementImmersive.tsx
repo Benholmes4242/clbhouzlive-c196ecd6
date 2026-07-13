@@ -88,6 +88,7 @@ export const AchievementImmersive: React.FC<Props> = ({ item, viewerUserId, curr
   const rgb = hexToRgb(materialColor.startsWith('#') ? materialColor : '#94A3B8');
 
   const summary = summaryLine ?? (SHOWPIECE_LOCKED_HINT[item.badgeId] ?? item.description);
+  const descriptionLine = summary === item.description ? null : item.description;
   const glyphColor = sCopy?.dimmed ? 'rgba(255,255,255,0.35)' : materialColor;
   const glyphFilter = sCopy?.dimmed
     ? 'none'
@@ -275,6 +276,21 @@ export const AchievementImmersive: React.FC<Props> = ({ item, viewerUserId, curr
           {sCopy ? sCopy.subline : summary}
         </div>
 
+        {/* Description -- persistent one-liner explaining what earns the badge. */}
+        {descriptionLine && (
+          <div
+            style={{
+              fontSize: 12.5,
+              color: 'rgba(255,255,255,0.4)',
+              maxWidth: 280,
+              lineHeight: 1.5,
+              marginTop: 6,
+              textAlign: 'center',
+            }}
+          >
+            {descriptionLine}
+          </div>
+        )}
 
         {/* Gem ladder (tiered) */}
         {isTiered && (
