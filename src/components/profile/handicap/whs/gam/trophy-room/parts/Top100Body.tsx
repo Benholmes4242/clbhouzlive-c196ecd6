@@ -41,6 +41,7 @@ export const Top100Body: React.FC<Props> = ({ item, ownerUserId, viewerUserId, o
   }, [rows]);
 
   const [tab, setTab] = useState<Tab>(isFriendView ? 'unplayed' : 'played');
+  const [matchRequest, setMatchRequest] = useState<{ courseId: string; courseName: string } | null>(null);
 
   const handleNavigate = (courseId: string) => {
     onClose();
