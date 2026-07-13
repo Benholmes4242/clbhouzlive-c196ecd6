@@ -14,11 +14,7 @@
 
 import { format } from 'date-fns';
 import { paletteFor } from '../parts/DetailHero';
-import {
-  materialNameForTier,
-  type RarityPalette,
-  GAM_AMBER_LEGEND_HEX_FALLBACK,
-} from './rarityPalette';
+import { materialNameForTier, type RarityPalette } from './rarityPalette';
 import { GAM } from '../../tokens';
 import type { LegendCategory } from '@/lib/gam/types';
 import type { TrophyItem } from './normalizeTrophyItem';
