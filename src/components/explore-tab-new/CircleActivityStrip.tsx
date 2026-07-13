@@ -15,7 +15,7 @@ import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/rou
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const CARD_W = 226;
-const CARD_H = 215;
+const CARD_H = 183;
 const AMBER_TEXT = '#c97a10';
 
 // Label per feat_type — cards are emoji-free; FEAT_META (with emojis) is
@@ -283,7 +283,7 @@ function CircleActivityCard({ row, onTap }: CardProps) {
           position: 'absolute',
           left: 14,
           right: 14,
-          bottom: 50,
+          bottom: 43,
           display: 'flex',
           flexDirection: 'column',
           gap: 4,
