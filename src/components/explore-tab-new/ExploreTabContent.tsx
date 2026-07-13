@@ -98,3 +98,16 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
     </div>
   );
 }
+
+function LegendarySection({ region }: { region: string | null }) {
+  const { data, isLoading } = useRegionFeats(region, 'legendary');
+  const hasAny = (data?.length ?? 0) > 0;
+  if (!isLoading && !hasAny) return null;
+  return (
+    <section style={{ fontFamily: 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif', paddingTop: 24 }}>
+      <AlmanacHead title="Aces & Albatrosses" icon="⛳" />
+      <LegendaryFeatHero region={region} />
+    </section>
+  );
+}
+
