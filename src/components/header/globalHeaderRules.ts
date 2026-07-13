@@ -37,6 +37,9 @@ export function isLightImmersiveRoute(pathname: string): boolean {
 }
 
 export function isImmersiveRoute(pathname: string): boolean {
+  // The review composer is a plain light page, not a hero page — it must
+  // never mount immersive (the post-mount flip caused device paint bugs).
+  if (/^\/courses\/[^/]+\/rate\/?$/.test(pathname)) return false;
   const exactMatch = (IMMERSIVE_EXACT_ROUTES as readonly string[]).some(
     (r) => pathname === r
   );
@@ -45,6 +48,7 @@ export function isImmersiveRoute(pathname: string): boolean {
   );
   return exactMatch || prefixMatch;
 }
+
 
 /**
  * Dark-chrome routes = the charcoal launch/landing surfaces (Clubhouse).
