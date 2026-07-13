@@ -72,7 +72,7 @@ export const useClubhouseStore = create<ClubhouseState>()((set) => ({
   activeIndex: 0,
   carouselPositions: new Map(),
 
-  isMuted: getInitialMuted(),
+  isMuted: useSessionAudio.getState().isMuted,
   userPaused: false,
   // [VIDEO-TEARDOWN] activeVideoElement / activeVideoRef initial values removed.
   isTournamentCardActive: false,
