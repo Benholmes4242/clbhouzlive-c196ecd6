@@ -57,12 +57,11 @@ export const CINEMATIC_SCRIM =
   'linear-gradient(to top, rgba(7,12,20,0.82) 0%, rgba(7,12,20,0.34) 30%, rgba(7,12,20,0.04) 54%, rgba(7,12,20,0.10) 100%)';
 
 /**
- * Diverging score colour scale (mirrors Holes tab SC_* tokens).
- * Under par = good (teal); over par = warm (orange).
- * NEVER use red for under-par scores — that's the banned good=red antipattern.
+ * Diverging score colour scale - re-exported from the canonical
+ * holes/_constants tokens so hero consumers cannot drift out of sync.
+ * (Under section 3h of the World Feed scorecard cutover brief.)
  */
-export const SC_BIRDIE = '#2F6B4F'; // refined pine — keep in sync with holes/_constants SC_BIRDIE
-export const SC_BOGEY = '#B5703C';  // muted clay — keep in sync with holes/_constants SC_BOGEY
+export { SC_BIRDIE, SC_BOGEY } from '@/features/courses/components/holes/_constants';
 
 export const CINEMATIC_FRAME_HEIGHT = 480;
 export const CINEMATIC_FRAME_HEIGHT_RESULTS = 480;

@@ -3,29 +3,61 @@ import {
   FONT,
   INK,
   SC_ACCENT,
-  SC_ACE,
-  SC_ALBATROSS,
-  SC_EAGLE,
-  SC_BIRDIE,
+  SC_FILL_GOLD,
+  SC_FILL_BIRDIE,
+  SC_FILL_BOGEY,
+  SC_FILL_DOUBLE,
   SC_PAR,
-  SC_BOGEY,
-  SC_DOUBLE,
 } from './_constants';
 
-// Holes histogram is a COLOUR-bar distribution (proportion of field per
-// score-type per hole), so its key is a colour swatch legend — one swatch
-// per bucket, matching the bar colours exactly. This is intentionally
-// distinct from the scorecard key (shape marks), because a personal
-// scorecard shows one score per hole while the histogram shows a spectrum.
-const KEY: Array<{ label: string; color: string }> = [
-  { label: 'Ace',       color: SC_ACE },
-  { label: 'Albatross', color: SC_ALBATROSS },
-  { label: 'Eagle',     color: SC_EAGLE },
-  { label: 'Birdie',    color: SC_BIRDIE },
-  { label: 'Par',       color: SC_PAR },
-  { label: 'Bogey',     color: SC_BOGEY },
-  { label: 'Dbl+',      color: SC_DOUBLE },
+// World Feed scoring key: swatches mirror the ScoreMark chip shapes exactly.
+// Gold disc = ace / albatross / eagle. Red disc = birdie. Small gray dot = par.
+// Blue square = bogey. Navy square = double-plus.
+type KeyShape = 'circle' | 'square' | 'dot';
+interface KeyItem { label: string; color: string; shape: KeyShape; ink?: string; }
+
+const KEY: KeyItem[] = [
+  { label: 'Ace',       color: SC_FILL_GOLD,   shape: 'circle', ink: INK },
+  { label: 'Albatross', color: SC_FILL_GOLD,   shape: 'circle', ink: INK },
+  { label: 'Eagle',     color: SC_FILL_GOLD,   shape: 'circle', ink: INK },
+  { label: 'Birdie',    color: SC_FILL_BIRDIE, shape: 'circle' },
+  { label: 'Par',       color: SC_PAR,         shape: 'dot' },
+  { label: 'Bogey',     color: SC_FILL_BOGEY,  shape: 'square' },
+  { label: 'Dbl+',      color: SC_FILL_DOUBLE, shape: 'square' },
 ];
+
+const Swatch: React.FC<{ item: KeyItem }> = ({ item }) => {
+  if (item.shape === 'dot') {
+    return (
+      <span
+        aria-hidden
+        style={{
+          width: 6,
+          height: 6,
+          borderRadius: '50%',
+          background: item.color,
+          display: 'inline-block',
+          flexShrink: 0,
+          marginLeft: 3,
+          marginRight: 3,
+        }}
+      />
+    );
+  }
+  return (
+    <span
+      aria-hidden
+      style={{
+        width: 12,
+        height: 12,
+        borderRadius: item.shape === 'square' ? 3 : '50%',
+        background: item.color,
+        display: 'inline-block',
+        flexShrink: 0,
+      }}
+    />
+  );
+};
 
 export const HolesScoringKey: React.FC = () => (
   <div
@@ -57,17 +89,7 @@ export const HolesScoringKey: React.FC = () => (
     >
       {KEY.map((it) => (
         <div key={it.label} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-          <span
-            aria-hidden
-            style={{
-              width: 12,
-              height: 12,
-              borderRadius: 3,
-              background: it.color,
-              display: 'inline-block',
-              flexShrink: 0,
-            }}
-          />
+          <Swatch item={it} />
           <span style={{ fontSize: 12, fontWeight: 600, color: INK }}>{it.label}</span>
         </div>
       ))}

@@ -30,6 +30,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { countryFlag, countryFallback } from './countryFlag';
 
+import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
+
 const F = 'Geist, system-ui, sans-serif';
 
 const INK = '#0F172A';
@@ -38,11 +40,6 @@ const MUTED = '#94A3B8';
 const HAIRLINE = 'rgba(0,0,0,0.08)';
 const CANVAS = '#F8FAFC';
 const BAND = 'rgba(31,36,40,0.03)';
-
-const SCORE_EAGLE = '#B36B00';
-const SCORE_BIRDIE = '#189A55';
-const SCORE_BOGEY = '#C24A4A';
-const SCORE_DOUBLE = '#8A2C2C';
 
 const HOUSE_UNDER = '#189A55';
 const HOUSE_OVER = '#C24A4A';
@@ -140,18 +137,8 @@ function houseColor(n: number | null | undefined): string {
   return HOUSE_EVEN;
 }
 
-// SCORE cell color mapping — extended palette (matches spec).
-// eagle-or-better -> gold, birdie -> green, par -> ink, bogey -> red,
-// double+ -> darker red. Missing par or strokes -> INK.
-function scoreCellColor(strokes: number | null, par: number | null): string {
-  if (strokes == null || par == null) return INK;
-  const d = strokes - par;
-  if (d <= -2) return SCORE_EAGLE;
-  if (d === -1) return SCORE_BIRDIE;
-  if (d === 0) return INK;
-  if (d === 1) return SCORE_BOGEY;
-  return SCORE_DOUBLE;
-}
+// SCORE cell rendering uses the shared ScoreMark chip system (World Feed
+// palette). Per-hole chips are surface-agnostic; par is bare ink.
 
 function isDemotedStatus(s?: string | null): boolean {
   if (!s) return false;
@@ -544,7 +531,6 @@ function renderHoleRows(
 
   const row = (h: (typeof roundHoles)[number]) => {
     const played = h.strokes != null;
-    const scoreColor = scoreCellColor(h.strokes, h.par);
     // FIELD color relative to par
     let fieldColor = SECONDARY;
     if (h.fieldAvg != null && h.par != null) {
@@ -605,14 +591,31 @@ function renderHoleRows(
           style={{
             width: 52,
             flexShrink: 0,
-            textAlign: 'center',
-            fontSize: 12.5,
-            fontWeight: 800,
-            color: played ? scoreColor : MUTED,
-            fontVariantNumeric: 'tabular-nums',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
-          {played ? h.strokes : '-'}
+          {played ? (
+            <ScoreMark
+              strokes={h.strokes}
+              par={h.par ?? 4}
+              size={20}
+              surface="light"
+              fontFamily={F}
+            />
+          ) : (
+            <span
+              style={{
+                fontSize: 12.5,
+                fontWeight: 800,
+                color: MUTED,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              -
+            </span>
+          )}
         </div>
         <div
           style={{

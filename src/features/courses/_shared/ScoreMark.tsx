@@ -1,31 +1,33 @@
 import React from 'react';
 import {
-  SC_ACE,
-  SC_ALBATROSS,
-  SC_EAGLE,
-  SC_BIRDIE,
+  INK,
+  SC_FILL_GOLD,
+  SC_FILL_BIRDIE,
+  SC_FILL_BOGEY,
+  SC_FILL_DOUBLE,
   SC_PAR,
-  SC_BOGEY,
-  SC_DOUBLE,
-  SC_ACE_DARK,
-  SC_ALBATROSS_DARK,
-  SC_EAGLE_DARK,
-  SC_BIRDIE_DARK,
   SC_PAR_DARK,
-  SC_BOGEY_DARK,
-  SC_DOUBLE_DARK,
 } from '@/features/courses/components/holes/_constants';
 
 /**
- * ScoreMark — the universal scoring-mark renderer.
+ * ScoreMark - the universal scoring-mark renderer.
  *
- * Refined-outline shape system, shared across:
- *  • Tour scorecard sheet (PlayerScorecardSheet)
- *  • Handicap personal scorecard (RoundHoleCell)
- *  • Champions/Holes badges (where applicable)
+ * "World Feed" filled-chip system, shared across:
+ *  - Tour scorecard sheet (PlayerScorecardSheet / leaderboard ScorecardSheet)
+ *  - Handicap personal scorecard (RoundHoleCell / RoundDetailSheet)
+ *  - Course Holes tab
  *
- * Shapes encode the tier, depth (rings) encodes severity, colour comes from
- * the refined SC_* palette. Par is bare ink in muted slate — nearly invisible.
+ * Grammar:
+ *  - birdie: solid red disc, white numeral
+ *  - eagle:  solid gold disc, INK numeral
+ *  - alba / hio: solid gold disc, INK numeral, + one outer gold ring (rarity)
+ *  - bogey:  solid blue rounded square, white numeral
+ *  - doub / triple: solid navy rounded square, white numeral, + one outer navy frame
+ *  - par:    bare numeral, no chip
+ *  - empty:  bare dot
+ *
+ * Fills are shared across light and dark surfaces. Only the par numeral ink
+ * and the outer ring "gap" colour (surface bg) differ by surface.
  */
 
 type Variant =
@@ -52,83 +54,24 @@ const variantFor = (strokes: number | null | undefined, par: number): Variant =>
   return 'triple';
 };
 
-interface VariantSpec {
-  shape: 'circle' | 'square' | 'triangle' | null;
-  depth: 0 | 1 | 2 | 3;
-  colour: string;
+interface ChipSpec {
+  shape: 'circle' | 'square' | null;
+  fill: string;
+  ink: string;   // numeral colour on chip
+  ring: boolean; // outer rarity ring (alba/hio for gold, doub/triple for navy)
+  ringStroke: string;
 }
 
-const SPECS: Record<Variant, VariantSpec> = {
-  empty:  { shape: null,       depth: 0, colour: '#CBD5E1' },
-  par:    { shape: null,       depth: 0, colour: SC_PAR },
-  birdie: { shape: 'circle',   depth: 1, colour: SC_BIRDIE },
-  eagle:  { shape: 'circle',   depth: 2, colour: SC_EAGLE },
-  alba:   { shape: 'circle',   depth: 3, colour: SC_ALBATROSS },
-  hio:    { shape: 'circle',   depth: 3, colour: SC_ACE },
-  bogey:  { shape: 'square',   depth: 1, colour: SC_BOGEY },
-  doub:   { shape: 'square',   depth: 2, colour: SC_DOUBLE },
-  triple: { shape: 'square',   depth: 3, colour: SC_DOUBLE },
-};
-
-const SPECS_DARK: Record<Variant, VariantSpec> = {
-  empty:  { shape: null,       depth: 0, colour: 'rgba(242,244,247,0.20)' },
-  par:    { shape: null,       depth: 0, colour: SC_PAR_DARK },
-  birdie: { shape: 'circle',   depth: 1, colour: SC_BIRDIE_DARK },
-  eagle:  { shape: 'circle',   depth: 2, colour: SC_EAGLE_DARK },
-  alba:   { shape: 'circle',   depth: 3, colour: SC_ALBATROSS_DARK },
-  hio:    { shape: 'circle',   depth: 3, colour: SC_ACE_DARK },
-  bogey:  { shape: 'square',   depth: 1, colour: SC_BOGEY_DARK },
-  doub:   { shape: 'square',   depth: 2, colour: SC_DOUBLE_DARK },
-  triple: { shape: 'square',   depth: 3, colour: SC_DOUBLE_DARK },
-};
-
-const Shape: React.FC<{
-  kind: 'circle' | 'square' | 'triangle';
-  insetVB: number;
-  stroke: string;
-  strokeVB: number;
-}> = ({ kind, insetVB, stroke, strokeVB }) => {
-  const half = strokeVB / 2;
-  const common = {
-    position: 'absolute' as const,
-    inset: 0,
-    width: '100%',
-    height: '100%',
-    pointerEvents: 'none' as const,
-    overflow: 'visible' as const,
-  };
-
-  if (kind === 'circle') {
-    const r = 50 - insetVB - half;
-    return (
-      <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" style={common} aria-hidden>
-        <circle cx={50} cy={50} r={r} fill="none" stroke={stroke} strokeWidth={strokeVB} />
-      </svg>
-    );
-  }
-
-  if (kind === 'triangle') {
-    const m = insetVB + half;
-    return (
-      <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" style={common} aria-hidden>
-        <polygon
-          points={`50,${m} ${m},${100 - m} ${100 - m},${100 - m}`}
-          fill="none"
-          stroke={stroke}
-          strokeWidth={strokeVB}
-          strokeLinejoin="round"
-        />
-      </svg>
-    );
-  }
-
-  const origin = insetVB + half;
-  const dim = 100 - 2 * insetVB - strokeVB;
-  return (
-    <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" style={common} aria-hidden>
-      <rect x={origin} y={origin} width={dim} height={dim} fill="none" stroke={stroke} strokeWidth={strokeVB} />
-    </svg>
-  );
+const CHIP: Record<Variant, ChipSpec> = {
+  empty:  { shape: null,     fill: 'transparent',   ink: '#CBD5E1', ring: false, ringStroke: 'transparent' },
+  par:    { shape: null,     fill: 'transparent',   ink: SC_PAR,    ring: false, ringStroke: 'transparent' },
+  birdie: { shape: 'circle', fill: SC_FILL_BIRDIE,  ink: '#FFFFFF', ring: false, ringStroke: 'transparent' },
+  eagle:  { shape: 'circle', fill: SC_FILL_GOLD,    ink: INK,       ring: false, ringStroke: 'transparent' },
+  alba:   { shape: 'circle', fill: SC_FILL_GOLD,    ink: INK,       ring: true,  ringStroke: SC_FILL_GOLD },
+  hio:    { shape: 'circle', fill: SC_FILL_GOLD,    ink: INK,       ring: true,  ringStroke: SC_FILL_GOLD },
+  bogey:  { shape: 'square', fill: SC_FILL_BOGEY,   ink: '#FFFFFF', ring: false, ringStroke: 'transparent' },
+  doub:   { shape: 'square', fill: SC_FILL_DOUBLE,  ink: '#FFFFFF', ring: true,  ringStroke: SC_FILL_DOUBLE },
+  triple: { shape: 'square', fill: SC_FILL_DOUBLE,  ink: '#FFFFFF', ring: true,  ringStroke: SC_FILL_DOUBLE },
 };
 
 export interface ScoreMarkProps {
@@ -138,11 +81,11 @@ export interface ScoreMarkProps {
   size?: number;
   /** Render the stroke numeral inside the mark. Defaults to true. */
   showStroke?: boolean;
-  /** Override colour resolution (e.g. monochrome contexts). */
+  /** Override colour resolution (rarely used - forces numeral colour). */
   colourOverride?: string;
   /** Custom font for the numeral. */
   fontFamily?: string;
-  /** Surface the mark lives on. Defaults to 'light'. */
+  /** Surface the mark lives on. Defaults to 'light'. Affects par ink only. */
   surface?: 'light' | 'dark';
 }
 
@@ -158,25 +101,27 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
   surface = 'light',
 }) => {
   const variant = variantFor(strokes, par);
-  const spec = surface === 'dark' ? SPECS_DARK[variant] : SPECS[variant];
-  const colour = colourOverride ?? spec.colour;
+  const chip = CHIP[variant];
 
-  // Stroke calibrated so at size=38 the line is ~1.5px; scales with size.
-  const STROKE_PX = Math.max(1.1, size * (1.5 / 38));
-  const STROKE_VB = STROKE_PX * (100 / size);
-  // Inset depths in viewBox units (tuned for refined-outline rings).
-  const INSET_2 = 12;
-  const INSET_3 = 22;
+  // Chip inset from tile edge (leaves room for the outer rarity ring).
+  // With ring: leave ~4.5px total (2px stroke + 2.5px gap) at size=38.
+  const RING_STROKE = Math.max(1.4, size * (2 / 38));
+  const RING_GAP    = Math.max(1.6, size * (2.5 / 38));
+  const CHIP_INSET  = chip.ring ? RING_STROKE + RING_GAP : 0;
+  const chipSize    = size - CHIP_INSET * 2;
 
-  const numeral = strokes == null ? '·' : strokes;
+  const numeral = strokes == null ? '\u00B7' : strokes;
+
+  const parInk = surface === 'dark' ? SC_PAR_DARK : SC_PAR;
   const emptyInk = surface === 'dark' ? 'rgba(242,244,247,0.35)' : '#CBD5E1';
-  const parInk = surface === 'dark' ? 'rgba(242,244,247,0.80)' : SC_PAR;
-  const numColour =
-    strokes == null
-      ? emptyInk
-      : variant === 'par'
-      ? parInk
-      : colour;
+
+  let numColour: string;
+  if (colourOverride) numColour = colourOverride;
+  else if (variant === 'empty') numColour = emptyInk;
+  else if (variant === 'par') numColour = parInk;
+  else numColour = chip.ink;
+
+  const numWeight = variant === 'par' || variant === 'empty' ? 700 : 800;
 
   return (
     <div
@@ -188,26 +133,43 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
         alignItems: 'center',
         justifyContent: 'center',
         flexShrink: 0,
+        overflow: 'visible',
       }}
     >
-      {spec.shape && (
-        <>
-          <Shape kind={spec.shape} insetVB={0} stroke={colour} strokeVB={STROKE_VB} />
-          {spec.depth >= 2 && (
-            <Shape kind={spec.shape} insetVB={INSET_2} stroke={colour} strokeVB={STROKE_VB} />
-          )}
-          {spec.depth >= 3 && (
-            <Shape kind={spec.shape} insetVB={INSET_3} stroke={colour} strokeVB={STROKE_VB} />
-          )}
-        </>
+      {chip.ring && (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: chip.shape === 'square' ? Math.round(size * 0.22) : '50%',
+            border: `${RING_STROKE}px solid ${chip.ringStroke}`,
+            pointerEvents: 'none',
+          }}
+        />
+      )}
+      {chip.shape && (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            left: CHIP_INSET,
+            top: CHIP_INSET,
+            width: chipSize,
+            height: chipSize,
+            borderRadius: chip.shape === 'square' ? Math.round(chipSize * 0.22) : '50%',
+            background: chip.fill,
+            pointerEvents: 'none',
+          }}
+        />
       )}
       {showStroke && (
         <span
           style={{
             position: 'relative',
             fontFamily,
-            fontSize: Math.round(size * 0.38),
-            fontWeight: 700,
+            fontSize: Math.round(size * 0.42),
+            fontWeight: numWeight,
             lineHeight: 1,
             letterSpacing: '-0.02em',
             fontVariantNumeric: 'tabular-nums',
