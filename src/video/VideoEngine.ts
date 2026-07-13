@@ -1168,3 +1168,22 @@ class VideoEngineImpl {
 
 export const VideoEngine = new VideoEngineImpl();
 export type { LaneId } from './lanePolicy';
+
+// LIVE SUBSCRIPTION: reflect session audio flips onto every 'session' lane.
+// - Mute: every session lane is silenced.
+// - Unmute: only session lanes with active play-intent (wantPlay) are
+//   unmuted. ONE_UNMUTED_LANE exclusivity still enforces a single voice.
+useSessionAudio.subscribe(({ isMuted }) => {
+  const impl = VideoEngine as unknown as {
+    lanes: Map<LaneId, Lane>;
+    setMuted: (id: LaneId, m: boolean) => void;
+  };
+  impl.lanes.forEach((lane) => {
+    if (lane.audioPolicy !== 'session') return;
+    if (isMuted) {
+      if (!lane.el.muted) impl.setMuted(lane.id, true);
+    } else if (lane.wantPlay) {
+      if (lane.el.muted) impl.setMuted(lane.id, false);
+    }
+  });
+});
