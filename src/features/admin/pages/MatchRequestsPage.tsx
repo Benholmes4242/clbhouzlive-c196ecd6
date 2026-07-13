@@ -154,30 +154,14 @@ function RequestRow({ row, onRefresh }: RequestRowProps) {
     setBusy(true);
     setErrText(null);
 
-    // Insert alias first; if it fails we still allow status flip but surface the error.
-    const { error: aliasErr } = await supabase.from('whs_course_aliases').insert({
-      course_id: row.golf_course_id,
-      whs_name: val,
-      whs_name_norm: val.toLowerCase().trim(),
-      match_method: 'manual_request',
-    } as any);
-
-    const { error: statusErr } = await supabase
-      .from('whs_course_match_requests')
-      .update({ status: 'matched', resolved_at: new Date().toISOString() })
-      .eq('id', row.id);
+    const { data, error } = await supabase.functions.invoke('admin-resolve-match-request', {
+      body: { request_id: row.id, action: 'match', whs_name: val },
+    });
 
     setBusy(false);
-    if (aliasErr || statusErr) {
-      const parts = [
-        aliasErr ? `Alias insert failed: ${aliasErr.message}` : null,
-        statusErr ? `Status update failed: ${statusErr.message}` : null,
-      ].filter(Boolean);
-      setErrText(parts.join(' '));
-      if (!statusErr) {
-        setConfirming(false);
-        onRefresh();
-      }
+    const errMsg = (error as any)?.message || (data as any)?.error;
+    if (errMsg) {
+      setErrText(String(errMsg));
       return;
     }
     setConfirming(false);
@@ -187,13 +171,13 @@ function RequestRow({ row, onRefresh }: RequestRowProps) {
   const doReject = async () => {
     setBusy(true);
     setErrText(null);
-    const { error } = await supabase
-      .from('whs_course_match_requests')
-      .update({ status: 'rejected', resolved_at: new Date().toISOString() })
-      .eq('id', row.id);
+    const { data, error } = await supabase.functions.invoke('admin-resolve-match-request', {
+      body: { request_id: row.id, action: 'reject' },
+    });
     setBusy(false);
-    if (error) {
-      setErrText(`Reject failed: ${error.message}`);
+    const errMsg = (error as any)?.message || (data as any)?.error;
+    if (errMsg) {
+      setErrText(`Reject failed: ${String(errMsg)}`);
       return;
     }
     onRefresh();
