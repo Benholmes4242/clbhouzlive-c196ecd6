@@ -30,6 +30,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { countryFlag, countryFallback } from './countryFlag';
 
+import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
+
 const F = 'Geist, system-ui, sans-serif';
 
 const INK = '#0F172A';
@@ -38,11 +40,6 @@ const MUTED = '#94A3B8';
 const HAIRLINE = 'rgba(0,0,0,0.08)';
 const CANVAS = '#F8FAFC';
 const BAND = 'rgba(31,36,40,0.03)';
-
-const SCORE_EAGLE = '#B36B00';
-const SCORE_BIRDIE = '#189A55';
-const SCORE_BOGEY = '#C24A4A';
-const SCORE_DOUBLE = '#8A2C2C';
 
 const HOUSE_UNDER = '#189A55';
 const HOUSE_OVER = '#C24A4A';
