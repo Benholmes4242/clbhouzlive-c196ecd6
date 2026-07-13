@@ -224,8 +224,6 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
         <FeedTopActionBar
           onClose={onClose}
           isVideo={isVideo}
-          isMuted={isMuted}
-          onToggleMute={handleToggleMute}
           hasLiked={likeState.isLiked}
           likesCount={likeState.count}
           commentsCount={commentCount}
