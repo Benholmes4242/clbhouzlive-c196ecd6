@@ -70,43 +70,17 @@ export default function ClipsPageV2() {
             zIndex: 10,
             background: '#F8FAFC',
             borderBottom: '1px solid rgba(0,0,0,0.07)',
-            padding: '8px 16px 10px',
+            padding: '8px 4px 10px 0',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div
-              className="scrollbar-hide"
-              style={{
-                flex: 1,
-                minWidth: 0,
-                display: 'flex',
-                gap: 8,
-                overflowX: 'auto',
-              }}
-            >
-              {CLIPS_V2_MOODS.map((id) => {
-                const active = id === mood;
-                return (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => setMood(id)}
-                    style={{
-                      flexShrink: 0,
-                      fontWeight: 600,
-                      fontSize: 12.5,
-                      padding: '7px 14px',
-                      borderRadius: 999,
-                      background: active ? '#0F172A' : '#fff',
-                      color: active ? '#fff' : '#0F172A',
-                      border: active ? 'none' : '1px solid rgba(0,0,0,0.07)',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {MOOD_LABELS[id]}
-                  </button>
-                );
-              })}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <FilterChips
+                options={moodOptions}
+                value={mood}
+                onChange={setMood}
+                ariaLabel="Clips mood filter"
+              />
             </div>
             <button
               type="button"
@@ -130,6 +104,7 @@ export default function ClipsPageV2() {
             </button>
           </div>
         </div>
+
 
         <ClipsWall mood={mood} />
       </main>
