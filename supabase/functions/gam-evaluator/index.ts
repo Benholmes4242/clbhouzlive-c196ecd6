@@ -594,6 +594,9 @@ function matchesBinary(badge: any, stats: any): boolean {
     case "first_eagle": return stats.eagles > 0;
     case "first_albatross": return stats.albatrosses > 0;
     case "five_birdie_round": return stats.birdies >= 5;
+    case "two_eagles": return stats.eagles >= 2;
+    case "birdie_train": return (stats.max_birdie_streak ?? 0) >= 3;
+    case "four_seasons": return (stats.seasons_played ?? 0) >= 4;
     case "clean_card": return stats.clean_card;
     case "spring_2026_active": return stats.is_counter;
     case "beat_par": return stats.beat_par;
