@@ -49,18 +49,16 @@ export default function ClipsPageV2() {
       <main
         style={{
           paddingBottom: 88,
-          // Pad by --header-h ONLY, not --chrome-total-h. The latter includes
-          // --shell-extra-h, which leaks in from a keep-alive Clubhouse
-          // ShellSlot mounted in the background and creates a growing gap on
-          // return visits. This page has no ShellSlot of its own.
-          paddingTop: 'var(--header-h, 55px)',
+          // Bleed route: --header-h publishes 0 and .app-shell no longer pads
+          // --sat, so the page owns clearance for the floating island (62px).
+          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 62px)',
           fontFamily: FONT_FAMILY,
         }}
       >
         <div
           style={{
             position: 'sticky',
-            top: 'calc(var(--header-h, 55px) + var(--sat, 0px) - 1px)',
+            top: 'calc(var(--sat, 0px) + 61px)',
             zIndex: 10,
             background: '#F8FAFC',
             borderBottom: '1px solid rgba(0,0,0,0.07)',
