@@ -880,7 +880,7 @@ const AppInner: React.FC = () => {
                                             <Suspense fallback={null}>
                                               <div className="app-depth">
                                                 {/* Global header for all pages except Clubhouse/Auth/Admin */}
-                                                <GlobalHeader />
+                                                <AppShellOnly><GlobalHeader /></AppShellOnly>
                                                 <AppRoutes />
                                                 
                                               </div>
