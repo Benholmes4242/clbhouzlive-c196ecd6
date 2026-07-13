@@ -88,6 +88,7 @@ export const AchievementImmersive: React.FC<Props> = ({ item, viewerUserId, curr
   const rgb = hexToRgb(materialColor.startsWith('#') ? materialColor : '#94A3B8');
 
   const summary = summaryLine ?? (SHOWPIECE_LOCKED_HINT[item.badgeId] ?? item.description);
+  const descriptionLine = summary === item.description ? null : item.description;
   const glyphColor = sCopy?.dimmed ? 'rgba(255,255,255,0.35)' : materialColor;
   const glyphFilter = sCopy?.dimmed
     ? 'none'
