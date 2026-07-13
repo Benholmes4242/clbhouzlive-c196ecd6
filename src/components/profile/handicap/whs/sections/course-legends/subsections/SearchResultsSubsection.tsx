@@ -32,7 +32,7 @@ const SearchRow: React.FC<{
       background: 'var(--hcp-bg-1)',
       border: '1px solid var(--hcp-line)',
       borderRadius: 12,
-      padding: 14,
+      padding: 12,
       cursor: 'pointer',
       display: 'flex',
       alignItems: 'center',
@@ -86,7 +86,7 @@ export const SearchResultsSubsection: React.FC<Props> = ({
   return (
     <>
       <div style={{ marginTop: 24 }}><SectionHeader tier="standard" kicker="SEARCH RESULTS" paddingX={16} /></div>
-      <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
         {isLoading && <Skeleton height={68} radius={12} />}
         {isError && <RetryStub message="Couldn't search courses" onRetry={onRetry} />}
         {!isLoading && !isError && results.length === 0 && (

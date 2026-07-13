@@ -93,7 +93,7 @@ const SectionHero: React.FC<{
         borderRadius: 18,
         background: 'var(--hcp-bg-1)',
         border: '1px solid var(--hcp-line)',
-        padding: '16px 18px 15px',
+        padding: '16px',
         fontFamily: FONT,
       }}
     >
@@ -156,7 +156,7 @@ const SearchRow: React.FC<{
   onOpen: () => void;
   inputRef: React.RefObject<HTMLInputElement>;
 }> = ({ open, query, setQuery, onOpen, inputRef }) => (
-  <div style={{ margin: '0 16px', padding: '14px 4px 0' }}>
+  <div style={{ margin: '0 16px', padding: '12px 4px 0' }}>
     {open ? (
       <div style={{
         display: 'flex', alignItems: 'center', gap: 10,
