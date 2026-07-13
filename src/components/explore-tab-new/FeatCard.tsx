@@ -105,7 +105,7 @@ export function FeatCard({ row, tier, onTap }: Props) {
     ? '0 0 0 1px #FBBC2E55, 0 4px 12px rgba(0,0,0,0.20)'
     : 'inset 0 1px 0 rgba(255,255,255,0.06), 0 3px 10px rgba(15,23,42,0.14)';
 
-  const fallbackBg = 'linear-gradient(135deg, #0F172A 0%, #1e293b 100%)';
+  const fallbackBg = '#0A0C10';
 
   return (
     <button
@@ -144,35 +144,33 @@ export function FeatCard({ row, tier, onTap }: Props) {
         />
       ) : null}
 
-      {/* Obsidian scrim — smooth eased ramp (many small alpha deltas to
-          avoid mobile-OLED banding). */}
+      {/* Heavy dark veil - photo becomes texture */}
       <div
         style={{
           position: 'absolute',
           inset: 0,
           background:
-            'linear-gradient(180deg, rgba(7,8,12,0.28) 0%, rgba(7,8,12,0.10) 22%, rgba(7,8,12,0.00) 38%, rgba(7,8,12,0.06) 50%, rgba(7,8,12,0.18) 60%, rgba(7,8,12,0.34) 70%, rgba(7,8,12,0.52) 79%, rgba(7,8,12,0.70) 87%, rgba(7,8,12,0.86) 94%, rgba(7,8,12,0.94) 100%)',
+            'linear-gradient(155deg, rgba(10,12,16,0.72), rgba(10,12,16,0.90))',
         }}
       />
 
-      {/* Top-left: tick + typographic label */}
+      {/* Top-left: feat label (accent color) */}
       <div
         style={{
           position: 'absolute',
-          top: 12,
-          left: 12,
+          top: 14,
+          left: 14,
           display: 'flex',
           alignItems: 'center',
-          gap: 8,
         }}
       >
         <span
           style={{
-            fontSize: 10,
+            fontSize: 9.5,
             fontWeight: 800,
-            letterSpacing: '0.16em',
+            letterSpacing: '0.12em',
             textTransform: 'uppercase',
-            color: 'rgba(248,244,232,0.92)',
+            color: isLegendary ? accent : '#F7931E',
             lineHeight: 1,
           }}
         >
@@ -185,13 +183,13 @@ export function FeatCard({ row, tier, onTap }: Props) {
         <div
           style={{
             position: 'absolute',
-            top: 12,
-            right: 12,
-            fontSize: 10,
+            top: 14,
+            right: 14,
+            fontSize: 9.5,
             fontWeight: 700,
             letterSpacing: '0.08em',
             textTransform: 'uppercase',
-            color: 'rgba(248,244,232,0.55)',
+            color: 'rgba(255,255,255,0.45)',
             lineHeight: 1,
           }}
         >
@@ -199,26 +197,25 @@ export function FeatCard({ row, tier, onTap }: Props) {
         </div>
       ) : null}
 
-      {/* Hero value + course name (above lower-third strip) */}
+      {/* Hero stat + course name (above footer) */}
       <div
         style={{
           position: 'absolute',
           left: 14,
           right: 14,
-          bottom: 43,
+          bottom: 54,
           display: 'flex',
           flexDirection: 'column',
-          gap: 4,
         }}
       >
         {heroValue ? (
           <div
             style={{
-              fontSize: 27,
+              fontSize: 34,
               fontWeight: 900,
-              letterSpacing: '-0.015em',
-              lineHeight: 1,
-              color: '#F8F4E8',
+              letterSpacing: '-0.03em',
+              lineHeight: 0.95,
+              color: '#ffffff',
               fontVariantNumeric: 'tabular-nums',
               textTransform: 'uppercase',
               overflow: 'hidden',
@@ -231,9 +228,10 @@ export function FeatCard({ row, tier, onTap }: Props) {
         ) : null}
         <div
           style={{
-            fontSize: 11.5,
+            marginTop: 4,
+            fontSize: 11,
             fontWeight: 600,
-            color: 'rgba(248,244,232,0.75)',
+            color: 'rgba(255,255,255,0.6)',
             lineHeight: 1.2,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -244,15 +242,15 @@ export function FeatCard({ row, tier, onTap }: Props) {
         </div>
       </div>
 
-      {/* Lower-third holder strip */}
+      {/* Footer holder strip */}
       <div
         style={{
           position: 'absolute',
-          left: 0,
-          right: 0,
-          bottom: 0,
-          padding: '8px 14px 10px',
-          borderTop: '1px solid rgba(255,255,255,0.08)',
+          left: 14,
+          right: 14,
+          bottom: 12,
+          paddingTop: 10,
+          borderTop: '1px solid rgba(255,255,255,0.12)',
           display: 'flex',
           alignItems: 'center',
           gap: 10,
@@ -260,21 +258,21 @@ export function FeatCard({ row, tier, onTap }: Props) {
       >
         <div style={{ flexShrink: 0 }}>
           <SquircleAvatar
-            size={26}
+            size={24}
             src={row.holder_avatar}
             alt={holder}
             fallback={initials(holder)}
             hairlineRing
-            ringColor={isLegendary ? accent : 'rgba(255,255,255,0.22)'}
+            ringColor={isLegendary ? accent : 'rgba(255,255,255,0.25)'}
           />
         </div>
         <div
           style={{
             flex: 1,
             minWidth: 0,
-            fontSize: 12.5,
+            fontSize: 12,
             fontWeight: 700,
-            color: '#F8F4E8',
+            color: '#ffffff',
             lineHeight: 1.15,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
