@@ -31,9 +31,9 @@ export const CollapsibleSubsection: React.FC<Props> = ({
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: 11,
+          gap: 12,
           width: '100%',
-          padding: '13px 14px',
+          padding: '12px 14px',
           background: 'var(--hcp-bg-1)',
           border: '1px solid var(--hcp-line-2)',
           borderRadius: open ? '14px 14px 0 0' : 14,

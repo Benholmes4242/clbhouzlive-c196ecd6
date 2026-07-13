@@ -115,7 +115,7 @@ export const LegendPulseTicker: React.FC<Props> = ({
   if (rows.length === 0) return null;
 
   return (
-    <div style={{ marginTop: 20, marginBottom: 20 }}>
+    <div style={{ marginTop: 16, marginBottom: 16 }}>
       <DarkSectionHeader
         eyebrow={`THE CHASE · ${rows.length} LIVE`}
         right={

@@ -26,7 +26,7 @@ const DiscoveryFramingCard: React.FC<{ onTap: () => void }> = ({ onTap }) => (
     }}
     style={{
       margin: '0 16px 16px',
-      padding: 18,
+      padding: 16,
       borderRadius: 14,
       background: `linear-gradient(135deg, ${GOLD_TINT} 0%, var(--hcp-bg-1) 70%)`,
       border: '1px solid rgba(251,188,46,0.25)',
@@ -86,7 +86,7 @@ const DiscoveryFramingCard: React.FC<{ onTap: () => void }> = ({ onTap }) => (
           fontSize: 12.5,
           color: 'var(--hcp-t-60)',
           lineHeight: 1.45,
-          marginBottom: 14,
+          marginBottom: 12,
         }}
       >
         Play your way onto the leaderboard.
@@ -174,7 +174,7 @@ export const HomeClubSubsection: React.FC<Props> = ({
   return (
     <>
       <div style={{ marginTop: 24 }}><DarkSectionHeader eyebrow={`HOME CLUB · ${(homeClubName || '').toUpperCase()}`} /></div>
-      <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
         {populatedCourses.map((c) => (
           <CourseLegendsCard
             key={c.course_id}
