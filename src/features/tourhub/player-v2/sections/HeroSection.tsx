@@ -44,8 +44,14 @@ export function HeroSection({ player, playerStats }: HeroSectionProps) {
     <div
       style={{
         background: `linear-gradient(180deg, #262B33 0%, ${CHARCOAL} 100%)`,
+        // Canonical hero height — matches course-detail / tournament hero.
+        minHeight:
+          'calc(clamp(380px, 44dvh, 460px) + env(safe-area-inset-top, 0px))',
         paddingTop: 'calc(var(--chrome-total-h, 0px) + 8px)',
         paddingBottom: 16,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'flex-end',
       }}
 
     >

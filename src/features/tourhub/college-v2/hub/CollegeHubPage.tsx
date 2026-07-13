@@ -18,6 +18,7 @@ import { GlassHeaderPlate } from '@/components/chrome/GlassHeaderPlate';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import {
   AMBER,
+  CHARCOAL,
   FONT,
   HAIRLINE_INK_10,
   INK,
@@ -25,6 +26,7 @@ import {
   INK_MUTE,
   SLATE_50,
   SURFACE,
+  WHITE_ALPHA_65,
 } from '@/features/tourhub/_shared/tokens';
 import { useFranchiseStandings } from './data/useFranchiseStandings';
 import { useLiveAlumni } from './data/useLiveAlumni';
@@ -74,48 +76,60 @@ export function CollegeHubPage() {
           fontFamily: FONT,
         }}
       >
-        {/* Header */}
-        <header style={{ padding: '16px 16px 12px', background: SLATE_50 }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 }}>
-            <div style={{ minWidth: 0 }}>
-              <div
-                style={{
-                  fontSize: 8.5,
-                  fontWeight: 800,
-                  letterSpacing: '0.16em',
-                  textTransform: 'uppercase',
-                  color: AMBER,
-                  marginBottom: 4,
-                }}
-              >
-                The Franchise
-              </div>
-              <h1
-                style={{
-                  fontSize: 24,
-                  fontWeight: 800,
-                  color: INK,
-                  letterSpacing: '-0.02em',
-                  lineHeight: 1,
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {year}
-              </h1>
+        {/* Hero — charcoal editorial head at canonical height, bottom-anchored. */}
+        <header
+          style={{
+            background: `linear-gradient(180deg, #262B33 0%, ${CHARCOAL} 100%)`,
+            minHeight:
+              'calc(clamp(380px, 44dvh, 460px) + env(safe-area-inset-top, 0px))',
+            paddingTop: 'calc(env(safe-area-inset-top, 0px) + 62px)',
+            paddingLeft: 16,
+            paddingRight: 16,
+            paddingBottom: 20,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'flex-end',
+            color: '#FFFFFF',
+          }}
+        >
+          <div>
+            <div
+              style={{
+                fontSize: 9.5,
+                fontWeight: 800,
+                letterSpacing: '0.16em',
+                textTransform: 'uppercase',
+                color: AMBER,
+                marginBottom: 6,
+              }}
+            >
+              The Franchise
             </div>
-          </div>
-
-          <div
-            style={{
-              fontSize: 11.5,
-              fontWeight: 600,
-              color: INK_MUTE,
-              marginTop: 8,
-              letterSpacing: '-0.005em',
-              lineHeight: 1.45,
-            }}
-          >
-            {editorialLine}
+            <h1
+              style={{
+                margin: 0,
+                fontSize: 32,
+                fontWeight: 800,
+                color: '#FFFFFF',
+                letterSpacing: '-0.02em',
+                lineHeight: 1,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {year}
+            </h1>
+            <div
+              style={{
+                fontSize: 12,
+                fontWeight: 600,
+                color: WHITE_ALPHA_65,
+                marginTop: 10,
+                letterSpacing: '-0.005em',
+                lineHeight: 1.45,
+              }}
+            >
+              {editorialLine}
+            </div>
           </div>
         </header>
 

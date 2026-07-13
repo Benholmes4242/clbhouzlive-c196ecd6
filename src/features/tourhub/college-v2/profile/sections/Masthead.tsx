@@ -9,12 +9,14 @@
  * Button state derived from useIsCollegeFollowed.
  */
 
+import { useEffect, useState } from 'react';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import {
   useFollowCollegeMutations,
   useIsCollegeFollowed,
 } from '@/features/tourhub/hooks/useCollegeMovers';
+import { dominantColorFromImage, darkenTowardCharcoal } from '@/lib/dominantColor';
 import {
   AMBER,
   CHARCOAL,
@@ -53,6 +55,25 @@ export function Masthead({ slug, displayName, rank, pointsTotal, alumniCount, pl
   const isRankOne = rank === 1;
   const logoUrl = getCollegeLogoUrl(displayName);
 
+  // Brand gradient — sampled from the logo, mixed toward charcoal so white
+  // text + gold accents keep AA contrast. Falls back to the charcoal gradient
+  // if sampling fails (CORS taint, decode error, empty result).
+  const [brand, setBrand] = useState<string | null>(null);
+  useEffect(() => {
+    if (!logoUrl) return;
+    let cancelled = false;
+    dominantColorFromImage(logoUrl).then((c) => {
+      if (!cancelled) setBrand(c);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [logoUrl]);
+
+  const heroBackground = brand
+    ? `linear-gradient(180deg, ${darkenTowardCharcoal(brand, 0.4)} 0%, ${CHARCOAL} 100%)`
+    : `linear-gradient(180deg, #262B33 0%, ${CHARCOAL} 100%)`;
+
   const handleFollow = () => {
     if (!user) return;
     if (isFollowed) unfollow.mutate(slug);
@@ -62,12 +83,18 @@ export function Masthead({ slug, displayName, rank, pointsTotal, alumniCount, pl
   return (
     <div
       style={{
-        background: `linear-gradient(180deg, #262B33 0%, ${CHARCOAL} 100%)`,
+        background: heroBackground,
+        transition: 'background 240ms ease-out',
+        minHeight:
+          'calc(clamp(380px, 44dvh, 460px) + env(safe-area-inset-top, 0px))',
         paddingTop: 'calc(env(safe-area-inset-top, 0px) + 62px)',
         paddingLeft: 16,
         paddingRight: 16,
-        paddingBottom: 16,
+        paddingBottom: 20,
         fontFamily: FONT,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'flex-end',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
