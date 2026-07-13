@@ -93,6 +93,19 @@ export const TrophyDetailSheet: React.FC<Props> = ({ items, initialIndex, ownerU
     setTimeout(() => navigate(`/courses/${courseId}`), 100);
   };
 
+  // Non-Top-100 achievement badges render as a minimal immersive overlay
+  // instead of the sheet flow. Top-100 badges and legend rows keep the sheet.
+  if (current.kind === 'achievement' && !isTop100Achievement(current.badgeId)) {
+    return (
+      <AchievementImmersive
+        item={current}
+        viewerUserId={viewerUserId}
+        onClose={onClose}
+        onShare={handleShare}
+      />
+    );
+  }
+
   return (
     <GamSheet open onClose={onClose}>
       <DetailHero
