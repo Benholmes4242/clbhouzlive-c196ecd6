@@ -33,6 +33,7 @@ import { getActorRouteByType } from '@/types/actor';
 import { isPerfEnabled } from '@/perf/navTiming';
 import { coldOpenRevealSample, coldOpenIsActive } from '@/perf/coldOpen';
 import { VideoEngine } from '@/video/VideoEngine';
+import { useSessionAudio } from '@/audio/sessionAudioStore';
 import { feedLaneRoles } from '@/video/feedLaneRoles';
 import { RailLanePool } from '@/video/railLanePool';
 import { originHostRegistry } from '@/video/originHostRegistry';
