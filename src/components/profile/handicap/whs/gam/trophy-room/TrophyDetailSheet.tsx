@@ -13,6 +13,8 @@ interface Props {
   ownerUserId: string;
   /** The currently-logged-in user (may equal ownerUserId for self-view) */
   viewerUserId: string;
+  /** Owner's current WHS handicap index -- powers LOSABLE STATUS overlay. */
+  currentIndex?: number | null;
   onClose: () => void;
 }
 
@@ -20,7 +22,7 @@ interface Props {
  * Stacked detail sheet — opens on top of TrophyRoomSheet.
  * Horizontal swipe paginates through the same-group `items`.
  */
-export const TrophyDetailSheet: React.FC<Props> = ({ items, initialIndex, ownerUserId, viewerUserId, onClose }) => {
+export const TrophyDetailSheet: React.FC<Props> = ({ items, initialIndex, ownerUserId, viewerUserId, currentIndex = null, onClose }) => {
   const navigate = useNavigate();
   const [index, setIndex] = useState(Math.max(0, Math.min(initialIndex, items.length - 1)));
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -96,6 +98,7 @@ export const TrophyDetailSheet: React.FC<Props> = ({ items, initialIndex, ownerU
       <AchievementImmersive
         item={current}
         viewerUserId={viewerUserId}
+        currentIndex={currentIndex}
         onClose={onClose}
         onShare={handleShare}
       />

@@ -18,6 +18,7 @@ import { materialNameForTier, type RarityPalette } from './rarityPalette';
 import { GAM } from '../../tokens';
 import type { LegendCategory } from '@/lib/gam/types';
 import type { TrophyItem } from './normalizeTrophyItem';
+import { statusFor, statusCopy, type BadgeStatus, type StatusCopy } from './statusBadges';
 
 export interface DetailViewAchievement {
   kind: 'achievement';
@@ -41,7 +42,16 @@ export interface DetailViewAchievement {
   counterText: string | null;
   /** "{x} more until your next medal" -- tiered, incomplete only. */
   progressLabel: string | null;
+  /** LOSABLE STATUS (single_figures / scratch). null for every other badge. */
+  status: BadgeStatus;
+  /** Chip + subline copy when status is 'at_risk' or 'lost'. null otherwise. */
+  statusCopy: StatusCopy | null;
+  /** True when the milestone medal was ever achieved but the live status is
+   *  now 'lost' -- caller renders a small persistent "EARNED" marker so it
+   *  never looks like the user never earned it. */
+  milestoneKeptStatusLost: boolean;
 }
+
 
 export interface DetailViewLegend {
   kind: 'legend';
@@ -89,7 +99,7 @@ const LEGEND_PALETTE_SHIM: RarityPalette = {
   metaColor: GAM.AMBER,
 };
 
-export function deriveDetailView(item: TrophyItem): DetailView {
+export function deriveDetailView(item: TrophyItem, currentIndex: number | null = null): DetailView {
   if (item.kind === 'legend') {
     const label = LEGEND_CATEGORY_LABEL[item.category] ?? item.name;
     let heldSince = '';
@@ -142,6 +152,12 @@ export function deriveDetailView(item: TrophyItem): DetailView {
       ? `${remaining.toLocaleString()} more until your next medal`
       : null;
 
+  const status = statusFor(item.badgeId, currentIndex);
+  const copy = status && status !== 'held' && currentIndex != null
+    ? statusCopy(item.badgeId, status, currentIndex)
+    : null;
+  const milestoneKeptStatusLost = status === 'lost' && earnedDerived;
+
   return {
     kind: 'achievement',
     isTiered,
@@ -155,5 +171,9 @@ export function deriveDetailView(item: TrophyItem): DetailView {
     progressPct,
     counterText,
     progressLabel,
+    status,
+    statusCopy: copy,
+    milestoneKeptStatusLost,
   };
 }
+

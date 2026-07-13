@@ -14,6 +14,7 @@ import { MATERIAL_HEX } from './_shared/rarityPalette';
 import { MATERIAL_LADDER, materialForTier } from './_shared/levels';
 import { renderBadgeIcon } from '../badgeIcons';
 import { LegendCard } from './parts/LegendCard';
+import { statusFor, statusCopy } from './_shared/statusBadges';
 
 const FONT = "'Geist', -apple-system, sans-serif";
 const OBSIDIAN_EDGE = '#D4A017';
@@ -30,9 +31,13 @@ function matName(mat: string): string {
 interface Props {
   item: TrophyItem;
   onTap: (item: TrophyItem) => void;
+  /** Owner's current WHS handicap index -- powers LOSABLE STATUS layer
+   *  for single_figures / scratch. null for every other badge or when the
+   *  owner has no index recorded yet. */
+  currentIndex?: number | null;
 }
 
-export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap }) => {
+export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = null }) => {
   if (item.kind !== 'achievement') {
     return <LegendCard item={item} onTap={onTap} />;
   }
@@ -46,6 +51,17 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap }) => {
   const inProgress = tiered && !earned && (item.currentValue ?? 0) > 0;
   const mat = tiered && reached > 0 ? materialForTier(reached) : null;
   const accent = earned || inProgress ? (mat ? matColor(mat) : '#F7931E') : 'rgba(255,255,255,0.35)';
+
+  // LOSABLE STATUS -- single_figures / scratch only, derived from live index.
+  const status = statusFor(item.badgeId, currentIndex);
+  const sCopy = status && status !== 'held' && currentIndex != null
+    ? statusCopy(item.badgeId, status, currentIndex)
+    : null;
+  // "Milestone kept but status lost": user has earned it before, live status
+  // dropped. Render a small "EARNED" tick on the plaque rail so the medal
+  // record is never invisible.
+  const milestoneKeptStatusLost = status === 'lost' && earned;
+
   
 
   const nextThreshold = tiered ? item.nextThreshold : null;
@@ -65,7 +81,7 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap }) => {
     ? new Date(item.earnedAt).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
     : null;
 
-  const subline = tiered
+  const baseSubline = tiered
     ? nextThreshold != null
       ? `NEXT: ${nextThreshold.toLocaleString()} -> ${nextMat?.toUpperCase()}`
       : 'ALL TIERS EARNED'
@@ -74,11 +90,32 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap }) => {
         ? `EARNED ${earnedDate.toUpperCase()}`
         : 'EARNED'
       : 'LOCKED';
+  // Status subline (at_risk / lost) overrides the base subline so the live
+  // state is what the user reads first. Held keeps the base subline.
+  const subline = sCopy ? sCopy.subline.toUpperCase() : baseSubline;
 
   const progressPct =
     tiered && nextThreshold != null
       ? Math.min(100, Math.max(0, ((item.currentValue ?? 0) / nextThreshold) * 100))
       : null;
+
+  // Card border + fill treatment. 'lost' status dims the whole card even if
+  // the milestone was earned; 'at_risk' keeps it lit and adds an amber pulse.
+  const isLostDimmed = sCopy?.dimmed === true;
+  const isAtRiskPulse = sCopy?.pulse === true;
+  const cardBorderColor = isLostDimmed
+    ? 'rgba(255,255,255,0.10)'
+    : isAtRiskPulse
+      ? sCopy!.chipBorder
+      : earned || inProgress
+        ? `${accent}55`
+        : 'rgba(255,255,255,0.07)';
+  const cardOpacity = isLostDimmed ? 0.55 : earned || inProgress ? 1 : 0.6;
+  const cardBackground = isLostDimmed
+    ? 'rgba(255,255,255,0.025)'
+    : earned || inProgress
+      ? `linear-gradient(165deg, ${accent}14, rgba(255,255,255,0.02))`
+      : 'rgba(255,255,255,0.025)';
 
   return (
     <button
@@ -93,12 +130,11 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap }) => {
         width: '100%',
         borderRadius: 16,
         padding: '13px 13px 0',
-        background:
-          earned || inProgress
-            ? `linear-gradient(165deg, ${accent}14, rgba(255,255,255,0.02))`
-            : 'rgba(255,255,255,0.025)',
-        border: `1px solid ${earned || inProgress ? `${accent}55` : 'rgba(255,255,255,0.07)'}`,
-        opacity: earned || inProgress ? 1 : 0.6,
+        background: cardBackground,
+        border: `1px solid ${cardBorderColor}`,
+        opacity: cardOpacity,
+        boxShadow: isAtRiskPulse ? `0 0 0 2px ${sCopy!.chipBg}` : undefined,
+        animation: isAtRiskPulse ? 'gamPulse 1.8s ease-in-out infinite' : undefined,
       }}
     >
       {/* ghost watermark */}
@@ -114,7 +150,7 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap }) => {
         {renderBadgeIcon(item.iconKey, 92, earned || inProgress ? accent : '#FFFFFF', 1.5)}
       </div>
 
-      {/* top row: icon chip + tier chip */}
+      {/* top row: icon chip + tier chip (status chip overrides when present) */}
       <div
         style={{
           display: 'flex',
@@ -137,20 +173,38 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap }) => {
         >
           {renderBadgeIcon(item.iconKey, 15, accent, 2.2)}
         </div>
-        <span
-          style={{
-            fontSize: 9,
-            fontWeight: 800,
-            letterSpacing: '0.08em',
-            color: earned || inProgress ? accent : 'rgba(255,255,255,0.4)',
-            border: `1px solid ${earned || inProgress ? `${accent}55` : 'rgba(255,255,255,0.12)'}`,
-            borderRadius: 999,
-            padding: '3px 8px',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {chipText}
-        </span>
+        {sCopy ? (
+          <span
+            style={{
+              fontSize: 9,
+              fontWeight: 800,
+              letterSpacing: '0.08em',
+              color: sCopy.chipColor,
+              background: sCopy.chipBg,
+              border: `1px solid ${sCopy.chipBorder}`,
+              borderRadius: 999,
+              padding: '3px 8px',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {sCopy.chipLabel}
+          </span>
+        ) : (
+          <span
+            style={{
+              fontSize: 9,
+              fontWeight: 800,
+              letterSpacing: '0.08em',
+              color: earned || inProgress ? accent : 'rgba(255,255,255,0.4)',
+              border: `1px solid ${earned || inProgress ? `${accent}55` : 'rgba(255,255,255,0.12)'}`,
+              borderRadius: 999,
+              padding: '3px 8px',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {chipText}
+          </span>
+        )}
       </div>
 
       {/* counter / check */}
@@ -180,7 +234,7 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap }) => {
       <div
         style={{
           fontSize: 9.5,
-          color: 'rgba(255,255,255,0.45)',
+          color: sCopy ? sCopy.chipColor : 'rgba(255,255,255,0.45)',
           marginTop: 3,
           fontVariantNumeric: 'tabular-nums',
         }}
@@ -203,7 +257,9 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap }) => {
         </div>
       )}
 
-      {/* rarity plaque rail -- owns the card bottom */}
+      {/* rarity plaque rail -- owns the card bottom. Persistent EARNED tick
+          appears when the milestone was ever achieved but the live status is
+          now lost, so the medal record stays visible. */}
       <div
         style={{
           margin: '10px -13px 0',
@@ -228,7 +284,26 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap }) => {
         >
           RARITY · {item.rarity.toUpperCase()}
         </span>
+        {milestoneKeptStatusLost && (
+          <span
+            style={{
+              marginLeft: 'auto',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 3,
+              fontSize: 8.5,
+              fontWeight: 800,
+              letterSpacing: '0.1em',
+              color: '#F7931E',
+            }}
+            aria-label="Milestone earned"
+          >
+            <span style={{ fontSize: 9 }}>{'\u2713'}</span>
+            EARNED
+          </span>
+        )}
       </div>
     </button>
   );
 };
+

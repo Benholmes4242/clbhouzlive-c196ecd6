@@ -5,6 +5,7 @@ import { GAM } from '../tokens';
 import { gamAchievementsBus } from '../events';
 import { useUserAchievements } from '@/hooks/gam/useUserAchievements';
 import { useUserTopLegends } from '@/hooks/gam/useUserTopLegends';
+import { useUserProfile } from '@/hooks/useUserProfile';
 import { TrophyCardHybrid } from './TrophyCardHybrid';
 import { renderBadgeIcon } from '../badgeIcons';
 import { TrophyDetailSheet } from './TrophyDetailSheet';
@@ -191,10 +192,11 @@ const Grid: React.FC<{
   items: TrophyItem[];
   onTap: (item: TrophyItem) => void;
   columns?: number;
-}> = ({ items, onTap, columns = 3 }) => (
+  currentIndex?: number | null;
+}> = ({ items, onTap, columns = 3, currentIndex = null }) => (
   <div style={{ display: 'grid', gridTemplateColumns: `repeat(${columns}, 1fr)`, gap: 8 }}>
     {items.map((item) => (
-      <TrophyCardHybrid key={item.id} item={item} onTap={onTap} />
+      <TrophyCardHybrid key={item.id} item={item} onTap={onTap} currentIndex={currentIndex} />
     ))}
   </div>
 );
@@ -267,6 +269,11 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
     limit: 200,
     maxRank: 100,
   });
+  // Owner's current WHS handicap index -- drives the LOSABLE STATUS overlay
+  // for single_figures / scratch. Friend-view uses the owner's index (userId),
+  // not the viewer's, so friend cards reflect the owner's live status.
+  const { data: ownerProfile } = useUserProfile(open ? userId : undefined);
+  const currentIndex: number | null = ownerProfile?.eg_handicap_index ?? null;
 
   const achievementItems = useMemo(() => badges.map(normalizeBadge), [badges]);
   const legendItems = useMemo(() => legends.map(normalizeLegend), [legends]);
@@ -624,7 +631,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                 {lifetime.length > 0 && (
                   <>
                     <TrophyGroupLabel label="Lifetime" earned={lifetimeEarned} total={lifetime.length} />
-                    <Grid items={lifetime} onTap={openDetail} columns={2} />
+                    <Grid items={lifetime} onTap={openDetail} columns={2} currentIndex={currentIndex} />
                   </>
                 )}
                 {CATEGORY_ORDER.map((cat) => {
@@ -638,7 +645,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                         earned={earnedCount}
                         total={items.length}
                       />
-                      <Grid items={items} onTap={openDetail} columns={2} />
+                      <Grid items={items} onTap={openDetail} columns={2} currentIndex={currentIndex} />
                     </React.Fragment>
                   );
                 })}
@@ -658,6 +665,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
           initialIndex={detailCtx.index}
           ownerUserId={userId}
           viewerUserId={effectiveViewerId}
+          currentIndex={currentIndex}
           onClose={() => setDetailCtx(null)}
         />
       )}
