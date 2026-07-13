@@ -69,6 +69,10 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = 
   const nextThreshold = tiered ? item.nextThreshold : null;
   const nextMat = tiered && nextThreshold != null ? matName(MATERIAL_LADDER[Math.min(reached, MATERIAL_LADDER.length - 1)]) : null;
 
+  const earnedDate = item.earnedAt
+    ? new Date(item.earnedAt).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
+    : null;
+
   const chipText = tiered
     ? reached > 0
       ? `${matName(mat as string).toUpperCase()} · T${reached}/${item.tiers.length}`
@@ -80,10 +84,6 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = 
         ? earnedDate.toUpperCase()
         : 'EARNED'
       : 'LOCKED';
-
-  const earnedDate = item.earnedAt
-    ? new Date(item.earnedAt).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
-    : null;
 
   const baseSubline = tiered
     ? nextThreshold != null
