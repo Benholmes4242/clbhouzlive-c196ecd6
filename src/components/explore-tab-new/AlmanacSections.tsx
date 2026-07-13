@@ -132,7 +132,7 @@ function AlmanacRegionTabsInner({ region, onRegionChange }: Props) {
           value={value}
           onChange={(id) => onRegionChange(id === '__ww__' ? null : id)}
           size="sm"
-          align="left"
+          align="center"
           underlineColor="#0F172A"
           ariaLabel="Region"
         />
