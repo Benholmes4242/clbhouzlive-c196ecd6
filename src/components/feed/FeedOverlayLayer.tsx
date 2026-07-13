@@ -300,8 +300,6 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
           bottomOffset={bottomOffset}
           readOnly={readOnly}
           isVideo={isVideo}
-          isMuted={isMuted}
-          onToggleMute={handleToggleMute}
         />
       )}
 
