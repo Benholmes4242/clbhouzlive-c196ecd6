@@ -167,16 +167,6 @@ export function FeatCard({ row, tier, onTap }: Props) {
         }}
       >
         <span
-          aria-hidden
-          style={{
-            display: 'block',
-            width: 3,
-            height: 12,
-            borderRadius: 1,
-            background: accent,
-          }}
-        />
-        <span
           style={{
             fontSize: 10,
             fontWeight: 800,
