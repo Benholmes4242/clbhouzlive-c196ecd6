@@ -13,7 +13,7 @@ export default function WatchHubV2({ embedded = false }: { embedded?: boolean })
     <>
       <main
         style={{
-          paddingBottom: 80,
+          paddingBottom: 88,
           // .app-shell already pads by var(--sat); pad by --header-h ONLY so
           // we clear CompactHeader without inheriting --shell-extra-h from a
           // keep-alive page (Clubhouse tab bar) that's still mounted in the
