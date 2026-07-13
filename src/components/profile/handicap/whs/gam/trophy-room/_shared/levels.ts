@@ -44,16 +44,17 @@ export const WALL_LEVELS: readonly WallLevel[] = [
   { level: 10, medalsRequired: 55, material: 'obsidian', sub: 'II', label: 'Obsidian II' },
 ] as const;
 
-/** Medals owned by one badge: earned tiers for tiered items, 1/0 for binary. */
+/** Medals owned by one badge: earned tiers for tiered
+    achievements, 1/0 for binary. Legend showcase rows carry no
+    medals -- legend_at_course's tiers own that metric. */
 export function medalsForItem(item: TrophyItem): number {
-  if (item.kind === 'achievement') {
-    if (Array.isArray(item.tiers) && item.tiers.length > 0) {
-      return item.tiers.filter((t) => t.earned).length;
-    }
-    return item.earned ? 1 : 0;
+  if (item.kind !== 'achievement') return 0;
+
+  if (item.tiers.length > 0) {
+    return item.tiers.filter((t) => t.earned).length;
   }
-  // Legends are always awarded rows -> 1 medal each.
-  return 1;
+
+  return item.earned ? 1 : 0;
 }
 
 /** Total medals across the wall. */
