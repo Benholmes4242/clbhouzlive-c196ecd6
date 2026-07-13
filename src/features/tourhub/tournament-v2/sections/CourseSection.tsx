@@ -9,15 +9,15 @@ import { SectionEyebrow } from './SectionEyebrow';
 import { useHoleAggregates, type HoleAgg } from '../data/useHoleAggregates';
 import {
   FONT, INK, INK_MUTE, INK_FAINT, SURFACE, HAIRLINE_INK_8, SLATE_50,
-  SCORE_UNDER_PAR_LIGHT, SCORE_OVER_PAR_LIGHT,
+  TOPAR_UNDER_LIGHT, TOPAR_OVER_LIGHT,
 } from '../../_shared/tokens';
 
 interface Props { tournamentId: string }
 
 function diffColor(diff: number | null): string {
   if (diff == null) return INK;
-  if (diff > 0.05) return SCORE_OVER_PAR_LIGHT;
-  if (diff < -0.05) return SCORE_UNDER_PAR_LIGHT;
+  if (diff > 0.05) return TOPAR_OVER_LIGHT;
+  if (diff < -0.05) return TOPAR_UNDER_LIGHT;
   return INK_MUTE;
 }
 function fmtDiff(diff: number | null): string {

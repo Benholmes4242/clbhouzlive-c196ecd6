@@ -23,7 +23,7 @@ import {
   INK_MUTE,
   LIVE_DOT,
   LIVE_INK,
-  SCORE_UNDER_PAR_LIGHT,
+  TOPAR_UNDER_LIGHT,
 } from '../_shared/tokens';
 
 const MONTHS_SHORT = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
@@ -355,7 +355,7 @@ const ChampionStrip: React.FC<{
         style={{
           fontSize: 10,
           fontWeight: 800,
-          color: SCORE_UNDER_PAR_LIGHT,
+          color: TOPAR_UNDER_LIGHT,
           fontVariantNumeric: 'tabular-nums',
         }}
       >
