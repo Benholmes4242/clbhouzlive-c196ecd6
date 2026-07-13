@@ -6,10 +6,11 @@
  * the approved Tour Book mockup. Not yet registered — L3 does the
  * cutover.
  *
- * Colors are the app-standard house scoring palette (not broadcast
- * red): under #189A55, over #C24A4A, E #8A9099. See BoardTable for
- * the omitted movement column spec.
+/**
+ * Score colours resolved via the canonical getScoreColor (red under par,
+ * ink over par, muted-gray even). See BoardTable for the movement column.
  */
+
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
