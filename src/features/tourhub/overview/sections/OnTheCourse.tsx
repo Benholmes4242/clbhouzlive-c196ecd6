@@ -69,9 +69,10 @@ function formatScore(v: number | string | null | undefined): string | null {
 
 function scoreColor(s: string | null): string {
   if (!s || s === 'E') return V4.scoreEven;
-  if (s.startsWith('-')) return V4.scoreUnder;
-  return V4.scoreOver;
+  const n = s.startsWith('-') ? -1 : 1;
+  return getScoreColor(n, 'light');
 }
+
 
 function groupThru(g: GroupShape): number | null {
   if (typeof g.thru === 'number') return g.thru;
