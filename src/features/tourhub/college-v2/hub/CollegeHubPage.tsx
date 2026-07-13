@@ -18,6 +18,7 @@ import { GlassHeaderPlate } from '@/components/chrome/GlassHeaderPlate';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import {
   AMBER,
+  CHARCOAL,
   FONT,
   HAIRLINE_INK_10,
   INK,
@@ -25,6 +26,8 @@ import {
   INK_MUTE,
   SLATE_50,
   SURFACE,
+  WHITE_ALPHA_55,
+  WHITE_ALPHA_65,
 } from '@/features/tourhub/_shared/tokens';
 import { useFranchiseStandings } from './data/useFranchiseStandings';
 import { useLiveAlumni } from './data/useLiveAlumni';
