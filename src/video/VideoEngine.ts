@@ -42,6 +42,9 @@ import { readSeededBandwidth } from './bandwidthMemory';
 import { coldOpenAttach, coldOpenFirstFrame } from '@/perf/coldOpen';
 import { trace, traceLookup, elIdOf, traceGenElId } from '@/perf/trace';
 import { feedLaneRoles } from './feedLaneRoles';
+import { useSessionAudio } from '@/audio/sessionAudioStore';
+
+export type LaneAudioPolicy = 'session' | 'always-muted' | 'local';
 
 
 
