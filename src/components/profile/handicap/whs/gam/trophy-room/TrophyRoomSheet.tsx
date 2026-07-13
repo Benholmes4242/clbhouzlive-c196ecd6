@@ -357,21 +357,6 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
     return withProgress[0] ?? null;
   }, [allAchievements]);
 
-  // FORGE INVENTORY — chip count per material the user currently holds.
-  // Counts each earned tiered badge at its current reachedTier material.
-  const forgeInventory = useMemo(() => {
-    const counts: Record<1 | 2 | 3 | 4 | 5, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-    for (const a of earnedAchievements) {
-      if (a.tiers.length <= 1) continue;
-      const t = a.reachedTier;
-      if (t >= 1 && t <= 5) counts[t as 1 | 2 | 3 | 4 | 5]++;
-    }
-    // Material rank desc: obsidian>diamond>emerald>silver>bronze
-    return [5, 4, 3, 2, 1]
-      .map((k) => ({ tier: k as 1 | 2 | 3 | 4 | 5, count: counts[k as 1 | 2 | 3 | 4 | 5] }))
-      .filter((r) => r.count > 0);
-  }, [earnedAchievements]);
-
   // NEXT FORGE — destination material for the spotlight (tier the user is chasing).
   const nextForgeDestTier = nextUnlock
     ? Math.max(1, Math.min(5, (nextUnlock.item.reachedTier || 0) + 1)) as 1 | 2 | 3 | 4 | 5
