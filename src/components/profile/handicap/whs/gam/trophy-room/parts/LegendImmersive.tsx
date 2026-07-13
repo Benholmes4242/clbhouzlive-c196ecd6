@@ -125,7 +125,7 @@ export const LegendImmersive: React.FC<Props> = ({ item, onClose, onShare }) => 
             ...GAM.TABULAR,
           }}
         >
-          {item.formattedValue}
+          {formattedValue}
         </div>
 
         <div
@@ -147,7 +147,7 @@ export const LegendImmersive: React.FC<Props> = ({ item, onClose, onShare }) => 
             ...GAM.TABULAR,
           }}
         >
-          #{item.rank} at {item.courseName}
+          {rankLine}
         </div>
 
         {held && (
