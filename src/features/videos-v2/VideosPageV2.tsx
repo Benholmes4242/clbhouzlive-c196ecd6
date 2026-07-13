@@ -94,6 +94,47 @@ export default function VideosPageV2() {
         {/* Sticky control block. Glass treatment matches Clips + Watch. */}
         <div
           style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            padding: '0 4px',
+          }}
+        >
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <UnderlineTabs
+              size="md"
+              align="center"
+              options={SORT_OPTS}
+              value={sort}
+              onChange={setSort}
+              ariaLabel="Sort videos"
+            />
+          </div>
+          <button
+            type="button"
+            aria-label="Search"
+            onClick={() => setSearchOpen(true)}
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: 999,
+              border: '1px solid rgba(0,0,0,0.07)',
+              background: '#fff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 0,
+              cursor: 'pointer',
+              flexShrink: 0,
+              marginBottom: 6,
+            }}
+          >
+            <Search size={15} color="#0F172A" />
+          </button>
+        </div>
+
+        <div
+          style={{
             position: 'sticky',
             top: 'calc(var(--sat, 0px) + 61px)',
             zIndex: 10,
@@ -101,57 +142,15 @@ export default function VideosPageV2() {
             backdropFilter: 'blur(14px)',
             WebkitBackdropFilter: 'blur(14px)',
             borderBottom: '1px solid rgba(0,0,0,0.07)',
+            padding: '8px 0 10px',
           }}
         >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '0 4px',
-            }}
-          >
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <UnderlineTabs
-                size="md"
-                align="center"
-                options={SORT_OPTS}
-                value={sort}
-                onChange={setSort}
-                ariaLabel="Sort videos"
-              />
-
-            </div>
-            <button
-              type="button"
-              aria-label="Search"
-              onClick={() => setSearchOpen(true)}
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: 999,
-                border: '1px solid rgba(0,0,0,0.07)',
-                background: '#fff',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: 0,
-                cursor: 'pointer',
-                flexShrink: 0,
-                marginBottom: 6,
-              }}
-            >
-              <Search size={15} color="#0F172A" />
-            </button>
-          </div>
-          <div style={{ padding: '8px 0 10px' }}>
-            <FilterChips
-              options={CATEGORY_OPTS}
-              value={category}
-              onChange={setCategory}
-              ariaLabel="Video category filter"
-            />
-          </div>
+          <FilterChips
+            options={CATEGORY_OPTS}
+            value={category}
+            onChange={setCategory}
+            ariaLabel="Video category filter"
+          />
         </div>
 
         <VideosFeedV2 sort={sort} category={feedCategory} />
