@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CoursesPageHero from './CoursesPageHero';
 import CourseExplorer from './CourseExplorer';
@@ -15,6 +15,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Button } from '@/components/ui/button';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
+import GlassHeaderPlate from '@/components/chrome/GlassHeaderPlate';
+
 import CoursesErrorBoundary from './CoursesErrorBoundary';
 import { Search, X, Star, ChevronRight } from 'lucide-react';
 import CoursesShellTabs from '@/features/courses/components/CoursesShellTabs';
@@ -165,6 +167,20 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
   const [rateSheetOpen, setRateSheetOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const [tabsStuck, setTabsStuck] = useState(false);
+
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => setTabsStuck(!entry.isIntersecting),
+      { threshold: 0 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   
   
   // Default to 'discover' for the main courses page
@@ -307,16 +323,23 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
       ) : (
         /* Main courses page - shared cinematic hero + sticky tab row above content */
         <div>
+          <GlassHeaderPlate visible={tabsStuck} />
           <CoursesPageHero />
 
+          <div ref={sentinelRef} style={{ height: 1 }} aria-hidden />
+
           <div
-            className="sticky bg-[#F8FAFC]"
+            className="sticky"
             style={{
-              top: 'calc(var(--header-h, 55px) + var(--sat, 0px) - 1px)',
+              top: 'calc(var(--sat, 0px) + 61px)',
               zIndex: 30,
+              background: 'rgba(248,250,252,0.72)',
+              backdropFilter: 'blur(14px)',
+              WebkitBackdropFilter: 'blur(14px)',
               borderBottom: '0.5px solid rgba(15,23,42,0.07)',
             }}
           >
+
             <CoursesShellTabs
               activeTab={activeTab as 'explore' | 'top100' | 'discover'}
               onTabChange={handleTabChange}

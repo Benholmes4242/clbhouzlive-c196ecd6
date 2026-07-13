@@ -120,10 +120,6 @@ function AlmanacRegionTabsInner({ region, onRegionChange }: Props) {
     <section style={{ fontFamily: FONT }}>
       <div
         style={{
-          position: 'sticky',
-          top: 'var(--chrome-total-h, 0px)',
-          zIndex: 5,
-          background: '#F8FAFC',
           padding: '0 4px',
         }}
       >
