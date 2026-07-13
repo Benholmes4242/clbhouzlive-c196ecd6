@@ -37,7 +37,7 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap }) => {
     return <LegendCard item={item} onTap={onTap} />;
   }
 
-  const tiered = item.tiers.length > 0;
+  const tiered = item.tiers.length > 1;
   const earned = item.earned;
   const reached = tiered ? item.reachedTier : earned ? 1 : 0;
   const inProgress = tiered && !earned && (item.currentValue ?? 0) > 0;

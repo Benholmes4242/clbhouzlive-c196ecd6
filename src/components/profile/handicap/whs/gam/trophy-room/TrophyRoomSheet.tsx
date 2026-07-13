@@ -739,7 +739,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                   return (
                     <React.Fragment key={`earned-${cat}`}>
                       <TrophyGroupLabel label={CATEGORY_LABEL[cat]} count={items.length} />
-                      <Grid items={items} onTap={openDetail} />
+                      <Grid items={items} onTap={openDetail} columns={2} />
                     </React.Fragment>
                   );
                 })}
@@ -774,7 +774,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                   return (
                     <React.Fragment key={`all-${cat}`}>
                       <TrophyGroupLabel label={CATEGORY_LABEL[cat]} count={items.length} />
-                      <Grid items={items} onTap={openDetail} />
+                      <Grid items={items} onTap={openDetail} columns={2} />
                     </React.Fragment>
                   );
                 })}
@@ -805,7 +805,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                   return (
                     <React.Fragment key={`locked-${cat}`}>
                       <TrophyGroupLabel label={CATEGORY_LABEL[cat]} count={items.length} />
-                      <Grid items={items} onTap={openDetail} />
+                      <Grid items={items} onTap={openDetail} columns={2} />
                     </React.Fragment>
                   );
                 })}
