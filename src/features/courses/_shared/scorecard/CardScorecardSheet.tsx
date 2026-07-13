@@ -48,6 +48,7 @@ export interface CardScorecardSheetProps {
   headerRight?: React.ReactNode;
   footerExtra?: React.ReactNode;
   emptyMessage?: string;
+  heroMuted?: boolean;
 }
 
 function fmtRel(n: number | null): string {
@@ -166,7 +167,7 @@ const NineGrid: React.FC<{
 // ─── Sheet ───────────────────────────────────────────────────────────────
 export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   open, onClose, eyebrowText, name, avatarUrl, onIdentityTap, subLine,
-  holes, nineHole, rounds, headerRight, footerExtra, emptyMessage,
+  holes, nineHole, rounds, headerRight, footerExtra, emptyMessage, heroMuted,
 }) => {
   const totals = useMemo(() => {
     let gross = 0;
@@ -229,7 +230,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
             </div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, flexShrink: 0 }}>
-            <span style={{ ...NUM, fontSize: 40, fontWeight: 200, letterSpacing: '-0.02em', lineHeight: 0.9, color: heroColor }}>
+            <span style={{ ...NUM, fontSize: 40, fontWeight: 200, letterSpacing: '-0.02em', lineHeight: 0.9, color: heroMuted ? '#8A9099' : heroColor }}>
               {totals.played ? fmtRel(totals.toPar) : '\u2014'}
             </span>
             {headerRight}
