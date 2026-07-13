@@ -89,7 +89,7 @@ export default function ContactPage() {
             <h3 className="text-[17px] font-semibold mb-1" style={{ color: INK }}>
               Request received
             </h3>
-            <p className="text-[14px] leading-relaxed mb-5" style={{ color: INK_55 }}>
+            <p className="text-[14px] leading-relaxed mb-4" style={{ color: INK_55 }}>
               Thanks - we've received your request and will reply soon. You can view it in
               My requests.
             </p>
@@ -121,7 +121,7 @@ export default function ContactPage() {
 
   return (
     <ManagePageShell title="Contact support">
-      <div className="px-4 pt-4 space-y-4 pb-10">
+      <div className="px-4 pt-4 space-y-4 pb-0">
         <div
           className="rounded-2xl p-4"
           style={{ background: '#fff', border: `1px solid ${CARD_BORDER}` }}

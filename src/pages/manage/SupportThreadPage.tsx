@@ -123,7 +123,7 @@ export default function SupportThreadPage() {
           </div>
         )}
 
-        <div ref={scrollRef} className="space-y-2.5">
+        <div ref={scrollRef} className="space-y-3">
           {isLoading && (
             <div className="text-[13px]" style={{ color: INK_55 }}>Loading conversation...</div>
           )}

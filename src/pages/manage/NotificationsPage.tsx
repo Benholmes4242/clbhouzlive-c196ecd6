@@ -122,7 +122,7 @@ export default function NotificationsPage() {
 
   return (
     <ManagePageShell title="Notifications">
-      <div className="px-4 pt-4 space-y-5">
+      <div className="px-4 pt-4 space-y-6">
         {/* Push (global) */}
         <div
           className="rounded-2xl px-4 py-3 flex items-center justify-between"

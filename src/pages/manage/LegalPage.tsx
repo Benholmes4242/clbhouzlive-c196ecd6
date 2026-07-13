@@ -11,7 +11,7 @@ export default function LegalPage() {
 
   return (
     <ManagePageShell title="Legal & policies">
-      <div className="px-4 pt-4 pb-16">
+      <div className="px-4 pt-4 pb-0">
 
         <div
           className="rounded-2xl overflow-hidden"
@@ -31,7 +31,7 @@ export default function LegalPage() {
             <Link
               key={doc.slug}
               to={`/legal/${doc.slug}`}
-              className="flex items-center justify-between px-4 py-3.5"
+              className="flex items-center justify-between px-4 py-3"
               style={{
                 borderTop: i === 0 ? 'none' : '1px solid rgba(15,23,42,0.06)',
                 textDecoration: 'none',

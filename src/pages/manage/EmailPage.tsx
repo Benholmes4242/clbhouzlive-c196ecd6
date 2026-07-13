@@ -116,7 +116,7 @@ export default function EmailPage() {
 
   return (
     <ManagePageShell title="Email">
-      <div className="px-4 pt-4 space-y-4 pb-8">
+      <div className="px-4 pt-4 space-y-4 pb-0">
         {step === 'email' && (
           <>
             {/* Current email */}
@@ -164,7 +164,7 @@ export default function EmailPage() {
         )}
 
         {step === 'code' && (
-          <div className="rounded-2xl p-6 space-y-5" style={{ background: CARD_BG, border: HAIRLINE }}>
+          <div className="rounded-2xl p-6 space-y-4" style={{ background: CARD_BG, border: HAIRLINE }}>
             <div className="flex flex-col items-center text-center gap-3">
               <div
                 className="flex items-center justify-center rounded-2xl"
@@ -235,7 +235,7 @@ export default function EmailPage() {
         )}
 
         {step === 'success' && (
-          <div className="rounded-2xl p-6 space-y-5" style={{ background: CARD_BG, border: HAIRLINE }}>
+          <div className="rounded-2xl p-6 space-y-4" style={{ background: CARD_BG, border: HAIRLINE }}>
             <div className="flex flex-col items-center text-center gap-3">
               <div
                 className="flex items-center justify-center rounded-2xl"

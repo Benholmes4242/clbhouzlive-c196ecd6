@@ -36,7 +36,7 @@ export default function MyRequestsPage() {
 
   return (
     <ManagePageShell title="My requests">
-      <div className="px-4 pt-4 pb-10 space-y-3">
+      <div className="px-4 pt-4 pb-0 space-y-3">
         {isLoading && (
           <div className="text-[13px]" style={{ color: INK_55 }}>Loading your requests...</div>
         )}
@@ -80,7 +80,7 @@ export default function MyRequestsPage() {
                   key={t.id}
                   type="button"
                   onClick={() => navigate(`/support/thread/${t.id}`)}
-                  className="w-full text-left flex items-start gap-3 px-4 py-3.5"
+                  className="w-full text-left flex items-start gap-3 px-4 py-3"
                   style={{ borderTop: i === 0 ? 'none' : `0.5px solid ${HAIR}` }}
                 >
                   <div className="mt-1.5 shrink-0" style={{ width: 8, height: 8 }}>
