@@ -6,6 +6,7 @@ import { AchievementBody } from './parts/AchievementBody';
 import { LegendBody } from './parts/LegendBody';
 import { DetailFooter } from './parts/DetailFooter';
 import { Top100Body } from './parts/Top100Body';
+import { AchievementImmersive } from './parts/AchievementImmersive';
 import { isTop100Achievement } from './_shared/showpieces';
 import type { TrophyItem } from './_shared/normalizeTrophyItem';
 
