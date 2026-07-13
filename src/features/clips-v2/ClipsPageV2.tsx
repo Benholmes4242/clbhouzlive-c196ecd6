@@ -3,11 +3,13 @@ import { useSearchParams } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
+import { FilterChips } from '@/components/ui/FilterChips';
 import {
   CLIPS_V2_MOODS,
   type ClipsV2Mood,
 } from './hooks/useClipsWallFeed';
 import { ClipsWall } from './components/ClipsWall';
+
 
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
