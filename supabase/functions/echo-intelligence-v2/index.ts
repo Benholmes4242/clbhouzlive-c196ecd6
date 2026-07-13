@@ -821,7 +821,7 @@ serve(async (req: Request) => {
   const routeLevel: ConsensusLevel = consensusLevel;
 
   // 7) Cache lookup (single/dual/full only — NEVER live).
-  const queryHash = await sha256Hex(normalizeQuery(message));
+  const queryHash = await sha256Hex(`${userId}|${normalizeQuery(message)}`);
   const cacheRoute: "single" | "dual" | "full" | null =
     routeLevel === "live" ? null : (routeLevel as "single" | "dual" | "full");
 
