@@ -10,7 +10,7 @@
  */
 import { useEffect, useState } from 'react';
 import { Bell, Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { supabase } from '@/integrations/supabase/client';
 import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
 

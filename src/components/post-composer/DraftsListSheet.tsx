@@ -4,7 +4,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { X, Image as ImageIcon, MapPin, Trash2, FileText, Play } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { fetchUserDrafts, deleteDraft } from '@/services/drafts/draftService';
 import type { DraftWithMedia } from '@/services/drafts/types';
 import WatchEmptyState from '@/components/watch/shared/WatchEmptyState';

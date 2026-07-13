@@ -1,4 +1,4 @@
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 
 export async function shareInvite(invite: {
   share_url: string;

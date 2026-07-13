@@ -13,7 +13,7 @@ import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { relativeTime } from '@/utils/relativeTime';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import {
   useBusinessReviews,
   usePostReviewReply,

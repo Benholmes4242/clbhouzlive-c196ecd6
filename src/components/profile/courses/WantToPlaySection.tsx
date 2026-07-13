@@ -9,7 +9,7 @@ import { SectionHeader } from '@/components/ui/SectionHeader';
 import { cn } from '@/lib/utils';
 import { useUserWantToPlay, WantToPlayCourse } from '@/hooks/useUserWantToPlay';
 import { formatDistanceToNow } from 'date-fns';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 
 interface WantToPlaySectionProps {
   userId: string;

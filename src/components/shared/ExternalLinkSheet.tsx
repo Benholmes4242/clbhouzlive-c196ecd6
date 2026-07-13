@@ -5,7 +5,7 @@ import {
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Globe, Copy, ExternalLink, Check } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { motion } from 'framer-motion';
 import { openExternalUrl } from '@/utils/median/openExternalUrl';
 

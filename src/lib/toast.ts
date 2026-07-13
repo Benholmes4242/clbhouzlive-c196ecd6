@@ -1,30 +1,45 @@
-import { toast } from "sonner";
+import { toast as sonnerToast, type ExternalToast } from 'sonner';
 
-/**
- * Single-toast helper that dismisses any existing toast before showing a new one.
- * Ensures only one toast is ever visible at a time.
- */
-export function toastSingle(message: string, opts?: Parameters<typeof toast>[1]) {
-  toast.dismiss();
-  return toast(message, opts);
+const DEFAULT_DURATION = 2500;
+const ERROR_DURATION = 4000;
+
+/** Stable id from the message so identical toasts REPLACE instead of stack. */
+function idFor(message: unknown): string | undefined {
+  return typeof message === 'string' ? `t:${message}` : undefined;
 }
 
-toastSingle.success = (message: string, opts?: Parameters<typeof toast.success>[1]) => {
-  toast.dismiss();
-  return toast.success(message, opts);
-};
+function withDefaults(
+  message: unknown,
+  opts: ExternalToast | undefined,
+  duration: number,
+): ExternalToast {
+  return {
+    id: idFor(message),
+    duration,
+    ...opts, // explicit call-site id/duration still wins
+  };
+}
 
-toastSingle.error = (message: string, opts?: Parameters<typeof toast.error>[1]) => {
-  toast.dismiss();
-  return toast.error(message, opts);
-};
+type Msg = Parameters<typeof sonnerToast>[0];
 
-toastSingle.info = (message: string, opts?: Parameters<typeof toast.info>[1]) => {
-  toast.dismiss();
-  return toast.info(message, opts);
-};
+function base(message: Msg, opts?: ExternalToast) {
+  return sonnerToast(message, withDefaults(message, opts, DEFAULT_DURATION));
+}
 
-toastSingle.warning = (message: string, opts?: Parameters<typeof toast.warning>[1]) => {
-  toast.dismiss();
-  return toast.warning(message, opts);
-};
+export const toast = Object.assign(base, {
+  success: (m: Msg, o?: ExternalToast) =>
+    sonnerToast.success(m, withDefaults(m, o, DEFAULT_DURATION)),
+  error: (m: Msg, o?: ExternalToast) =>
+    sonnerToast.error(m, withDefaults(m, o, ERROR_DURATION)),
+  info: (m: Msg, o?: ExternalToast) =>
+    sonnerToast.info(m, withDefaults(m, o, DEFAULT_DURATION)),
+  warning: (m: Msg, o?: ExternalToast) =>
+    sonnerToast.warning(m, withDefaults(m, o, ERROR_DURATION)),
+  message: (m: Msg, o?: ExternalToast) =>
+    sonnerToast.message(m, withDefaults(m, o, DEFAULT_DURATION)),
+  // Pass-throughs (no defaults injected):
+  dismiss: sonnerToast.dismiss,
+  promise: sonnerToast.promise,
+  loading: sonnerToast.loading,
+  custom: sonnerToast.custom,
+});

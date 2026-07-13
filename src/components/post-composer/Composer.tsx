@@ -25,7 +25,7 @@ import {
   Clock,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 

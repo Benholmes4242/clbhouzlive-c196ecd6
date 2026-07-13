@@ -8,7 +8,7 @@
  */
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useActiveActor } from '@/context/ActiveActorContext';
 

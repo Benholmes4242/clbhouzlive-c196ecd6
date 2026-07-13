@@ -3,7 +3,7 @@
 
 import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { uploadEventBus } from './uploadEventBus';
 import { postKeys } from '@/queryKeys/posts';
 import { deleteDraft } from '@/services/drafts/draftService';

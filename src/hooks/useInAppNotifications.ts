@@ -4,7 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 
 interface NotificationData {
   conversation_id?: string;

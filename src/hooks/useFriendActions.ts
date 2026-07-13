@@ -10,7 +10,7 @@
  */
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { AppLog } from '@/lib/logger';
 import { patchFollow } from '@/lib/followCache';

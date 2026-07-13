@@ -12,7 +12,7 @@ import type { Top100MapCourse } from '@/hooks/useTop100MapCourses';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 
 interface MapCourseSheetProps {
   course: Top100MapCourse | null;

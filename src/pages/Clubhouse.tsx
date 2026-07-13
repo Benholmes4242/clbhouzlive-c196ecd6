@@ -6,7 +6,7 @@ import { useSetChromeLeftSlot, useSetChromeSuppressed } from '@/features/chrome-
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHeaderVariant } from '@/hooks/useHeaderVisibility';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { supabase } from '@/integrations/supabase/client';
 import { SeasonRecapModal } from '@/components/achievements/SeasonRecapModal';
 import { ProfileCompleteNudge } from '@/components/clubhouse/ProfileCompleteNudge';

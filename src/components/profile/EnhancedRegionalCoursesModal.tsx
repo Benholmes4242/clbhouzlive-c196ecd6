@@ -9,7 +9,7 @@ import { useModalState } from '@/hooks/useModalDetector';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { useNavigate } from 'react-router-dom';
 import { InlineSpinner } from '@/components/ui/InlineSpinner';
 import { AnimatePresence, motion } from 'framer-motion';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Send } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { callCreateInvite } from '@/lib/whs/api';
 import { shareInvite } from '@/lib/whs/share';
 import { firstName, displayName } from '@/lib/whs/utils/initials';

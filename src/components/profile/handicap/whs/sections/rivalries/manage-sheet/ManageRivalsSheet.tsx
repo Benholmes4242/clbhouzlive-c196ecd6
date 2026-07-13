@@ -11,7 +11,7 @@ import {
   useClearRivalDismissal,
 } from '@/lib/whs/hooks';
 import { firstName } from '@/lib/whs/utils/initials';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { PinnedRivalRow } from './PinnedRivalRow';
 import { AutoPickedRow } from './AutoPickedRow';
 import { CandidateRow } from './CandidateRow';

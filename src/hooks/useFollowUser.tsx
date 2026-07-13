@@ -4,7 +4,7 @@
  */
 import { useState } from 'react';
 import { useSupabaseSession } from './useSupabaseSession';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { AppLog } from '@/lib/logger';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useActiveActor } from '@/context/ActiveActorContext';

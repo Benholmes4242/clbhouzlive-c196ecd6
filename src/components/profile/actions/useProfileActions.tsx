@@ -4,7 +4,7 @@
  * Internals now route through the canonical `useToggleFollow`.
  */
 import { useState } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRelationshipStatus } from '@/hooks/useRelationshipStatus';
 import { useToggleFollow } from '@/hooks/useToggleFollow';

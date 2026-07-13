@@ -21,7 +21,7 @@ export { RadioGroup, RadioGroupItem } from './ui/radio-group';
 export { Switch } from './ui/switch';
 
 // Feedback Components
-export { toast } from 'sonner';
+export { toast } from '@/lib/toast';
 export { Skeleton } from './ui/skeleton';
 
 // Overlay Components

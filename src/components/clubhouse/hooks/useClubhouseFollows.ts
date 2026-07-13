@@ -1,5 +1,5 @@
 import { useCallback, useRef } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFollowMutation } from '@/components/media-system/hooks/useFollowMutation';
 import { analyticsEvents } from '@/utils/analyticsEvents';

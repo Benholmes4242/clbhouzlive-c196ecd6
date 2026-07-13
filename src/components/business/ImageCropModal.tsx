@@ -10,7 +10,7 @@ import { Slider } from '@/components/ui/slider';
 import { Loader2, ZoomIn, RotateCcw } from 'lucide-react';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { AppLog } from '@/lib/logger';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 
 interface ImageCropModalProps {
   open: boolean;

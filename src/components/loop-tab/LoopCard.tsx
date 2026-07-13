@@ -18,7 +18,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import PostFeedCarousel from '@/components/feed/PostFeedCarousel';
 import { supabase } from '@/integrations/supabase/client';
 import { removeGolfCourseFromContent, extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { SquircleAvatar, LIGHT_HAIRLINE} from '@/components/ui/SquircleAvatar';
 import { LoopCardMenu } from './LoopCardMenu';

@@ -7,7 +7,7 @@ import { useFollowUser } from '@/hooks/useFollowUser';
 import { useFriendActions } from '@/hooks/useFriendActions';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useDebounce } from '@/hooks/useDebounce';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { cn } from '@/lib/utils';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';

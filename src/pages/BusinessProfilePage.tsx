@@ -13,7 +13,7 @@ import {
   Instagram, Facebook, Youtube, Linkedin, Twitter, Music2,
   Star, ChevronRight, Navigation, Calendar,
 } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { PageRoot } from '@/components/layout/PageRoot';

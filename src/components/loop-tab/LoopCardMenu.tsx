@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { MoreHorizontal, Bookmark, Link2, Share2, EyeOff, Flag, Trash2, Ban } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { supabase } from '@/integrations/supabase/client';
 import {
   DropdownMenu,

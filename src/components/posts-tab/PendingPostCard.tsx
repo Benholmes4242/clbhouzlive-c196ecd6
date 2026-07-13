@@ -4,7 +4,7 @@
 
 import React, { useCallback, useMemo, useState } from 'react';
 import { Loader2, AlertCircle, X, RotateCcw } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { usePendingPostsStore, aggregatePendingProgress, type PendingPost } from '@/uploads/pendingPostsStore';
 import { uploadManager } from '@/uploads/UploadManager';
 import { retryJob, retryFailedItems, enqueuePostUpload, cancelJob } from '@/uploads/uploadPipeline';

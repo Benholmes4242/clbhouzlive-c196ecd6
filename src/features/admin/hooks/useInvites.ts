@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { revokeBulkInvites } from '@/lib/adminBulkApi';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 
 export interface InviteRow {
   id: string;

@@ -6,7 +6,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 
 export interface QuestCourse {
   id: string;

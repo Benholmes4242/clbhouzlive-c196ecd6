@@ -9,7 +9,7 @@
 import React, { useMemo } from 'react';
 import { Drawer as DrawerPrimitive } from 'vaul';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import {
   X,
   MessageCircle,
