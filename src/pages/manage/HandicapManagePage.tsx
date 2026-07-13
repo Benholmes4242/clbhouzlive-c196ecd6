@@ -88,7 +88,7 @@ export default function HandicapManagePage() {
 
   return (
     <ManagePageShell title={connection ? bodyNameForProvider(connection.provider) : 'Connect your official WHS handicap'}>
-      <div className="px-4 pt-4 pb-8">
+      <div className="px-4 pt-4 pb-0">
         {connection ? (
           <SyncedBody
             connection={connection}
@@ -140,7 +140,7 @@ const SyncedBody: React.FC<{
   ];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 14, fontFamily: FONT }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, fontFamily: FONT }}>
       {/* Facts card */}
       <div style={{ background: '#fff', border: `1px solid ${HAIR}`, borderRadius: 16, padding: '4px 16px' }}>
         {rows.map((r, i) => (
@@ -150,7 +150,7 @@ const SyncedBody: React.FC<{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              padding: '14px 0',
+              padding: '12px 0',
               borderBottom: i === rows.length - 1 ? 'none' : `1px solid ${HAIR}`,
             }}
           >
@@ -223,7 +223,7 @@ const SyncedBody: React.FC<{
           justifyContent: 'center',
           gap: 8,
           minHeight: 52,
-          padding: '13px 16px',
+          padding: '12px 16px',
           borderRadius: 14,
           background: '#fff',
           color: INK,

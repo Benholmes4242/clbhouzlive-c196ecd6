@@ -101,14 +101,14 @@ export default function HelpPage() {
 
   return (
     <ManagePageShell title="Help centre" belowTitle={searchBar}>
-      <div className="px-4 pt-2 pb-8 space-y-5">
+      <div className="px-4 pt-2 pb-0 space-y-6">
         {isLoading && (
           <div className="text-[13px]" style={{ color: INK_55 }}>Loading articles...</div>
         )}
 
         {!isLoading && searching && matches.length === 0 && (
           <div
-            className="rounded-2xl p-5 text-center"
+            className="rounded-2xl p-4 text-center"
             style={{ background: '#fff', border: `1px solid ${CARD_BORDER}` }}
           >
             <p className="text-[14px]" style={{ color: INK_55 }}>
@@ -136,7 +136,7 @@ export default function HelpPage() {
         )}
 
         {!isLoading && !searching && data && (
-          <div className="space-y-5">
+          <div className="space-y-6">
             {categoryOrder.map((cat) => (
               <section key={cat}>
                 <h3
@@ -166,7 +166,7 @@ export default function HelpPage() {
 
         {/* Still need help footer */}
         <div
-          className="rounded-2xl p-5 mt-2"
+          className="rounded-2xl p-4 mt-2"
           style={{ background: '#fff', border: `1px solid ${CARD_BORDER}` }}
         >
           <div className="flex items-center gap-2 mb-1">
