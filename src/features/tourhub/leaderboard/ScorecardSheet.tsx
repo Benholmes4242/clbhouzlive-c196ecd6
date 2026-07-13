@@ -137,18 +137,8 @@ function houseColor(n: number | null | undefined): string {
   return HOUSE_EVEN;
 }
 
-// SCORE cell color mapping — extended palette (matches spec).
-// eagle-or-better -> gold, birdie -> green, par -> ink, bogey -> red,
-// double+ -> darker red. Missing par or strokes -> INK.
-function scoreCellColor(strokes: number | null, par: number | null): string {
-  if (strokes == null || par == null) return INK;
-  const d = strokes - par;
-  if (d <= -2) return SCORE_EAGLE;
-  if (d === -1) return SCORE_BIRDIE;
-  if (d === 0) return INK;
-  if (d === 1) return SCORE_BOGEY;
-  return SCORE_DOUBLE;
-}
+// SCORE cell rendering uses the shared ScoreMark chip system (World Feed
+// palette). Per-hole chips are surface-agnostic; par is bare ink.
 
 function isDemotedStatus(s?: string | null): boolean {
   if (!s) return false;
