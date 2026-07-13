@@ -40,6 +40,7 @@ const CATEGORY_ORDER: RenderCategory[] = [
   'scoring',
   'handicap',
   'courses',
+  'travel',
   'consistency',
   'seasonal',
 ];
@@ -49,6 +50,7 @@ const CATEGORY_LABEL: Record<RenderCategory, string> = {
   handicap: 'Handicap',
   consistency: 'Consistency',
   courses: 'Courses',
+  travel: 'Travel',
   seasonal: 'Limited Edition',
 };
 
