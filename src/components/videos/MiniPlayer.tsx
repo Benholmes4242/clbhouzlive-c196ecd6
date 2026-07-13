@@ -4,14 +4,14 @@
 // (play/pause toggle only flips local state) until the new video engine lands.
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { X, Play, Pause, Maximize2, Volume2, VolumeX, AlertTriangle } from "lucide-react";
+import { X, Play, Pause, Maximize2, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useVideoPlaybackSafe } from "@/context/VideoPlaybackContext";
 import { usePostData } from "@/hooks/usePostData";
 import { uidFromNode, generateHlsUrl, generateThumbnailUrl } from "@/utils/cloudflareStreamTransform";
 import { trackVideoCloseMini } from "@/lib/analytics/videoAnalytics";
-import { useClubhouseStore } from '@/store/clubhouseStore';
 import { VideoEngine } from '@/video/VideoEngine';
+import { MuteButton } from '@/audio/MuteButton';
 
 type MiniVideo = {
   id: string;
