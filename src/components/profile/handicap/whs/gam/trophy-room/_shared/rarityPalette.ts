@@ -28,7 +28,7 @@ export function rgbaOf(input: string, a: number): string {
  */
 export const FORGE = {
   bronze: '#C97B4A',
-  silver: '#CDD3DE',
+  silver: '#D7DCE5',
   emerald: '#12B784',
   diamond: '#7DD3FC',
 } as const;
@@ -148,15 +148,15 @@ export const MATERIAL_PALETTES: Record<1 | 2 | 3 | 4 | 5, RarityPalette> = {
   },
   2: {
     color: FORGE.silver,
-    tint: 'rgba(205,211,222,0.14)',
-    border: 'rgba(205,211,222,0.45)',
+    tint: 'rgba(215,220,229,0.14)',
+    border: 'rgba(215,220,229,0.45)',
     label: 'SILVER',
     material: 'Silver',
     hero1: '#13161C',
     hero2: '#0A0C10',
     heroGradient:
-      'radial-gradient(120% 90% at 20% 0%, rgba(205,211,222,0.30) 0%, rgba(205,211,222,0.07) 55%, transparent 100%), linear-gradient(180deg, #13161C, #0A0C10)',
-    cardSweep: 'linear-gradient(180deg, rgba(205,211,222,0.13), rgba(205,211,222,0.02) 70%)',
+      'radial-gradient(120% 90% at 20% 0%, rgba(215,220,229,0.30) 0%, rgba(215,220,229,0.07) 55%, transparent 100%), linear-gradient(180deg, #13161C, #0A0C10)',
+    cardSweep: 'linear-gradient(180deg, rgba(215,220,229,0.13), rgba(215,220,229,0.02) 70%)',
     topStripe: RARITY_DARK.silver.topStripe,
     outerGlow: RARITY_DARK.silver.outerGlow,
     metaColor: FORGE.silver,
