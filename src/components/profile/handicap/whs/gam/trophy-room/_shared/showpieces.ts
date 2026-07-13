@@ -57,7 +57,6 @@ export function shortenShowpieceCaption(caption: string): string {
 export const SHOWPIECE_LOCKED_HINT: Record<string, string> = {
   first_birdie: 'First birdie unlocks this',
   first_eagle: 'First eagle unlocks this',
-  first_albatross: 'First albatross unlocks this',
   hole_in_one: 'First ace unlocks this',
   top_100_worldwide: 'Play your first World Top 100 course',
   top_100_usa: 'Play your first USA Top 100 course',
