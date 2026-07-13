@@ -80,18 +80,26 @@ export function applyRouteChrome(pathname: string, force = false): void {
   const darkChrome = isDarkChromeRoute(pathname);
   const immersive = isImmersiveRoute(pathname);
   const isAuth = pathname.startsWith('/auth');
+  const lightImmersive = isLightImmersiveRoute(pathname);
 
-  const surface = darkChrome ? '#15171F' : immersive ? '#0F172A' : '#F8FAFC';
+  const surface = darkChrome
+    ? '#15171F'
+    : immersive
+      ? (lightImmersive ? '#F8FAFC' : '#0F172A')
+      : '#F8FAFC';
   const shieldColor = immersive ? 'transparent' : (darkChrome ? '#15171F' : '#F8FAFC');
 
   // Status bar icon intent (see useMedianStatusBar for the inverted mapping):
   //   'dark'  intent = DARK icons  (for a LIGHT background)
   //   'light' intent = WHITE icons (for a DARK background)
-  // - darkChrome (#15171F notch)  -> white icons -> 'light'
-  // - immersive (transparent, hero photo behind) -> dark icons -> 'dark'
-  // - default light (#F8FAFC notch) -> dark icons -> 'dark'
+  // - darkChrome + immersive (Clubhouse feed) -> transparent bar, white icons
+  // - darkChrome only (auth/signup/handicap)  -> opaque charcoal, white icons
+  // - immersive light/dark (hero photo behind) -> transparent, dark icons
+  // - default light (#F8FAFC notch)            -> opaque light, dark icons
   const statusBar = darkChrome
-    ? { style: 'light' as const, color: 'FF15171F' }
+    ? (immersive
+        ? { style: 'light' as const, color: '00000000' }
+        : { style: 'light' as const, color: 'FF15171F' })
     : immersive
       ? { style: 'dark' as const, color: '00000000' }
       : { style: 'dark' as const, color: 'FFF8FAFC' };
