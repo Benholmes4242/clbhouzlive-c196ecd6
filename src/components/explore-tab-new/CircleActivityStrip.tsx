@@ -321,15 +321,15 @@ function CircleActivityCard({ row, onTap }: CardProps) {
         </div>
       </div>
 
-      {/* Lower-third holder strip */}
+      {/* Footer holder strip */}
       <div
         style={{
           position: 'absolute',
-          left: 0,
-          right: 0,
-          bottom: 0,
-          padding: '8px 14px 10px',
-          borderTop: '1px solid rgba(255,255,255,0.08)',
+          left: 14,
+          right: 14,
+          bottom: 12,
+          paddingTop: 10,
+          borderTop: '1px solid rgba(255,255,255,0.12)',
           display: 'flex',
           alignItems: 'center',
           gap: 10,
