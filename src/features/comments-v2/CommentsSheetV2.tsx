@@ -222,13 +222,7 @@ function CommentsSheetV2Inner({
             {/* Header */}
             <div className="flex items-start justify-between px-5 pb-3 shrink-0">
               <div>
-                <div style={{
-                  fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em',
-                  textTransform: 'uppercase', color: AMBER, lineHeight: 1,
-                }}>
-                  CLBHOUZ CHAT
-                </div>
-                <div style={{ marginTop: 4, fontSize: 17, fontWeight: 800, color: INK, letterSpacing: '-0.01em' }}>
+                <div style={{ fontSize: 17, fontWeight: 800, color: INK, letterSpacing: '-0.01em' }}>
                   {totalCount} {totalCount === 1 ? 'comment' : 'comments'}
                 </div>
               </div>
