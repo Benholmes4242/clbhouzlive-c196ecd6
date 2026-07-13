@@ -25,12 +25,12 @@ interface AuthHeroScreenProps {
   errorNonce?: number;
 }
 
-const AppleLogo: React.FC<{ size?: number }> = ({ size = 17 }) => (
+const AppleLogo: React.FC<{ size?: number; color?: string }> = ({ size = 17, color = '#0B0D12' }) => (
   <svg
     width={size}
     height={size}
     viewBox="0 0 24 24"
-    fill="#FFFFFF"
+    fill={color}
     aria-hidden="true"
     focusable="false"
   >
@@ -104,28 +104,11 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
   };
 
   const trimmed = loginEmail.trim();
-  const [agreed, setAgreed] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false;
-    try { return window.sessionStorage.getItem('auth:agreed') === '1'; } catch { return false; }
-  });
-  useEffect(() => {
-    try { window.sessionStorage.setItem('auth:agreed', agreed ? '1' : '0'); } catch {}
-  }, [agreed]);
-  const [nudgeAgreement, setNudgeAgreement] = useState(false);
-  const canContinue = trimmed.length > 0 && !submitting && agreed;
+  const canContinue = trimmed.length > 0 && !submitting;
   const inMedian = useMemo(() => isMedianApp(), []);
   const showApple = inMedian && !!onAppleSignIn;
   const showGoogle = inMedian && !!onGoogleSignIn;
   const showSocial = showApple || showGoogle;
-
-  const requireAgreement = (fn?: () => void) => () => {
-    if (!agreed) {
-      setNudgeAgreement(true);
-      toast.error('Please agree to the Terms first.');
-      return;
-    }
-    fn?.();
-  };
 
 
   return (
@@ -137,33 +120,34 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
       />
 
       <div className="relative flex-1 flex flex-col px-6 pt-safe overflow-y-auto">
-        {/* Logo */}
+        {/* Brand block: logo + tagline */}
         <div
           className="flex flex-col justify-center items-center gap-3 auth-logo-animate"
           style={{
-            paddingTop: 'clamp(32px, 12vh, 100px)',
-            paddingBottom: 16,
+            paddingTop: 'clamp(24px, 7vh, 56px)',
+            paddingBottom: 0,
           }}
         >
           <img
             src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
             alt="clbhouz"
-            className="h-[90px] md:h-[100px] w-auto relative z-10"
+            className="h-[72px] md:h-[80px] w-auto relative z-10"
           />
           {SHOW_WORDMARK && (
             <span className="text-[24px] font-medium tracking-tight" style={{ color: 'rgba(255,255,255,0.96)' }}>clbhouz</span>
           )}
         </div>
 
-        {/* Tagline */}
-        <div className="flex-1 flex flex-col justify-center items-center text-center">
+        <div className="flex flex-col items-center text-center" style={{ marginTop: 18 }}>
           <h1
-            className="text-[38px] md:text-[44px] font-semibold leading-tight auth-tagline-animate"
-            style={{ letterSpacing: '-0.02em', color: 'rgba(255,255,255,0.96)' }}
+            className="text-[30px] md:text-[36px] font-bold leading-[1.25] auth-tagline-animate"
+            style={{ letterSpacing: '-0.02em', color: 'rgba(255,255,255,0.96)', textWrap: 'balance' as any, padding: '0 8px' }}
           >
-            stay in play.
+            the home of golf courses<span style={{ color: '#F7931E' }}>.</span>
           </h1>
         </div>
+
+        <div className="flex-1" />
 
         {/* Bottom action panel */}
         <div
@@ -179,24 +163,24 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                 {showApple && (
                   <button
                     type="button"
-                    onClick={requireAgreement(onAppleSignIn)}
+                    onClick={onAppleSignIn}
                     disabled={submitting}
                     aria-label="Continue with Apple"
-                    className="w-full flex items-center justify-center gap-2 rounded-[14px] transition-opacity active:opacity-85 disabled:opacity-60"
+                    className="w-full flex items-center justify-center gap-2 rounded-[16px] transition-opacity active:opacity-85 disabled:opacity-60"
                     style={{
                       minHeight: 52,
-                      background: '#000000',
+                      background: '#FFFFFF',
                       border: 'none',
-                      color: '#FFFFFF',
+                      color: '#0B0D12',
                       fontSize: 15,
                       fontWeight: 600,
                     }}
                   >
                     {submitting ? (
-                      <Loader2 size={18} className="animate-spin" style={{ color: '#FFFFFF' }} />
+                      <Loader2 size={18} className="animate-spin" style={{ color: '#0B0D12' }} />
                     ) : (
                       <>
-                        <AppleLogo size={17} />
+                        <AppleLogo size={17} color="#0B0D12" />
                         <span>Continue with Apple</span>
                       </>
                     )}
@@ -206,10 +190,10 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                 {showGoogle && (
                   <button
                     type="button"
-                    onClick={requireAgreement(onGoogleSignIn)}
+                    onClick={onGoogleSignIn}
                     disabled={submitting}
                     aria-label="Continue with Google"
-                    className="w-full flex items-center justify-center gap-2 rounded-[14px] transition-opacity active:opacity-85 disabled:opacity-60"
+                    className="w-full flex items-center justify-center gap-2 rounded-[16px] transition-opacity active:opacity-85 disabled:opacity-60"
                     style={{
                       minHeight: 52,
                       background: '#FFFFFF',
@@ -249,9 +233,11 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                   setHasEditedSinceError(true);
                 }}
                 onKeyDown={handleEmailKeyDown}
+                onFocus={(e) => { e.currentTarget.style.borderColor = '#F7931E'; }}
+                onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.10)'; }}
                 placeholder="Email address"
                 disabled={submitting}
-                className="auth-email-input w-full h-[54px] px-6 rounded-[14px] font-medium text-[15px] text-center focus:outline-none transition-all disabled:opacity-50"
+                className="auth-email-input w-full h-[54px] px-5 rounded-[16px] font-medium text-[15px] text-left focus:outline-none transition-all disabled:opacity-50"
                 style={{
                   background: '#20242E',
                   border: '1px solid rgba(255,255,255,0.10)',
@@ -263,14 +249,14 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
             </div>
 
             {emailError && (
-              <p className="text-[13px] text-center" style={{ color: '#DC2626' }}>{emailError}</p>
+              <p className="text-[13px] text-center" style={{ color: '#F87171' }}>{emailError}</p>
             )}
 
             {errorMessage && !hasEditedSinceError && (
               <p
                 key={errorNonce}
                 className="text-[13px] text-center auth-error-fade"
-                style={{ color: '#DC2626' }}
+                style={{ color: '#F87171' }}
               >
                 {errorMessage}
               </p>
@@ -280,12 +266,12 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
               onClick={handleContinue}
               disabled={!canContinue}
               aria-label="Continue"
-              className="w-full h-[54px] flex items-center justify-center gap-2 rounded-[14px] font-bold text-[15px] transition-all duration-150 active:scale-[0.98]"
+              className="w-full h-[54px] flex items-center justify-center gap-2 rounded-[16px] font-bold text-[15px] transition-all duration-150 active:scale-[0.98]"
               style={{
                 background: canContinue ? '#F7931E' : 'rgba(255,255,255,0.06)',
                 color: canContinue ? '#FFFFFF' : 'rgba(255,255,255,0.38)',
                 border: canContinue ? 'none' : '1px solid rgba(255,255,255,0.10)',
-                boxShadow: 'none',
+                boxShadow: canContinue ? '0 6px 20px rgba(247,147,30,0.30)' : 'none',
                 cursor: !canContinue ? 'not-allowed' : 'pointer',
               }}
             >
@@ -306,93 +292,22 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
               We'll email you a 6-digit code. No password needed.
             </p>
 
-            {/* Legal / EULA block — Apple Guideline 1.2 + 2.2
-                Links MUST NOT be nested inside a <button> (invalid HTML +
-                webviews swallow the tap). Toggle is its own button; the
-                legal copy with links is a sibling. */}
-            <div>
-              <div
-                className="w-full flex items-start gap-3 rounded-[12px] px-3 py-2.5 transition-colors"
-                style={{
-                  background: 'rgba(255,255,255,0.04)',
-                  border: `1px solid ${
-                    nudgeAgreement && !agreed
-                      ? 'rgba(247,147,30,0.55)'
-                      : 'rgba(255,255,255,0.10)'
-                  }`,
-                }}
-              >
-                <button
-                  type="button"
-                  role="checkbox"
-                  aria-checked={agreed}
-                  aria-label={agreed ? 'Unagree to terms' : 'Agree to terms'}
-                  onClick={() => {
-                    setAgreed((v) => !v);
-                    if (nudgeAgreement) setNudgeAgreement(false);
-                  }}
-                  className="active:opacity-80"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: 20,
-                    height: 20,
-                    marginTop: 1,
-                    padding: 0,
-                    borderRadius: 6,
-                    background: agreed ? '#F7931E' : 'transparent',
-                    border: agreed
-                      ? '1px solid #F7931E'
-                      : '1.5px solid rgba(255,255,255,0.45)',
-                    flexShrink: 0,
-                    cursor: 'pointer',
-                    transition: 'all 120ms ease',
-                  }}
-                >
-                  {agreed && (
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path d="M5 12l4 4L19 7" stroke="#FFFFFF" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  )}
-                </button>
-                <span style={{ fontSize: 12, lineHeight: 1.45, color: 'rgba(255,255,255,0.78)' }}>
-                  <span
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => {
-                      setAgreed((v) => !v);
-                      if (nudgeAgreement) setNudgeAgreement(false);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        setAgreed((v) => !v);
-                        if (nudgeAgreement) setNudgeAgreement(false);
-                      }
-                    }}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    I agree to the
-                  </span>{' '}
-                  <Link
-                    to="/terms"
-                    style={{ color: '#F7931E', fontWeight: 600, textDecoration: 'underline' }}
-                  >
-                    Terms of Service
-                  </Link>{' '}
-                  and{' '}
-                  <Link
-                    to="/privacy"
-                    style={{ color: '#F7931E', fontWeight: 600, textDecoration: 'underline' }}
-                  >
-                    Privacy Policy
-                  </Link>
-                  . clbhouz has zero tolerance for objectionable content and abusive
-                  behavior. Reports are reviewed within 24 hours.
-                </span>
-              </div>
-            </div>
+            <p
+              style={{
+                margin: '14px 4px 0',
+                fontSize: 11.5,
+                lineHeight: 1.55,
+                color: 'rgba(255,255,255,0.45)',
+                textAlign: 'center',
+              }}
+            >
+              By continuing, you agree to our{' '}
+              <Link to="/terms" style={{ color: '#F7931E', fontWeight: 600, textDecoration: 'none' }}>Terms of Service</Link>
+              {' '}and{' '}
+              <Link to="/privacy" style={{ color: '#F7931E', fontWeight: 600, textDecoration: 'none' }}>Privacy Policy</Link>
+              . clbhouz has zero tolerance for objectionable content and abusive
+              behavior. Reports are reviewed within 24 hours.
+            </p>
           </div>
         </div>
       </div>
