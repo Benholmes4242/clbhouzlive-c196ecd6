@@ -33,7 +33,7 @@ import {
   MOCK_CYPRESS_POINT_REVIEWS 
 } from '@/features/courses/config';
 import { getScoreTier } from '@/utils/getScoreTier';
-import { HERO_NUMBER_STYLE, TIER_LABEL_STYLE, ratingTextColor } from '@/lib/ratingTier';
+import { HERO_NUMBER_STYLE, TIER_LABEL_STYLE, ratingTextColor, rampForRating } from '@/lib/ratingTier';
 import type { FeedPost, MediaItem as MediaItemType } from '@/components/media-system/types/media';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { PullToRefreshContainer } from '@/components/ui/pull-to-refresh';
@@ -71,6 +71,15 @@ const TIER_ROWS: { key: ScoreTier; label: string }[] = [
   { key: 'fair',       label: 'Fair' },
   { key: 'poor',       label: 'Poor' },
 ];
+
+// Representative score per tier — drives distribution bar fill via rampForRating.
+const TIER_REP_SCORE: Record<ScoreTier, number> = {
+  exceptional: 9.5,
+  excellent: 8.0,
+  good: 6.5,
+  fair: 5.0,
+  poor: 2.0,
+};
 
 
 const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
@@ -555,6 +564,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                   const count = reviewCountsByTier[key] ?? 0;
                   const selected = ratingFilter === key;
                   const pct = Math.round((count / maxTierCount) * 100);
+                  const ramp = rampForRating(TIER_REP_SCORE[key]);
+                  const isExceptionalRow = key === 'exceptional' && count > 0;
                   return (
                     <button
                       key={key}
@@ -564,11 +575,21 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                       aria-label={`Filter reviews: ${label} (${count})`}
                       style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'none', border: 'none', padding: 0, cursor: 'pointer', width: '100%' }}
                     >
-                      <span style={{ fontSize: 10.5, fontWeight: selected ? 800 : 600, color: selected ? INK : INK_MUTE, letterSpacing: '0.02em', textTransform: 'uppercase', width: 62, textAlign: 'left', flexShrink: 0 }}>
+                      <span style={{ fontSize: 10.5, fontWeight: selected ? 800 : 600, color: selected ? INK : INK_MUTE, letterSpacing: '0.02em', textTransform: 'uppercase', width: 92, textAlign: 'left', flexShrink: 0 }}>
                         {label}
                       </span>
-                      <span style={{ flex: 1, minWidth: 0, height: 6, borderRadius: 999, background: INK_TINT_06, overflow: 'hidden' }}>
-                        <span style={{ display: 'block', height: '100%', width: `${pct}%`, background: selected ? AMBER : 'rgba(15,23,42,0.35)', borderRadius: 999, transition: 'width 220ms ease, background 160ms ease' }} />
+                      <span style={{ flex: 1, minWidth: 0, height: 6, borderRadius: 999, background: INK_TINT_06, overflow: 'hidden', boxShadow: selected ? `0 0 0 1.5px ${AMBER}` : 'none', transition: 'box-shadow 160ms ease' }}>
+                        <span
+                          className={isExceptionalRow ? 'clbhouz-gold-shimmer-bar' : undefined}
+                          style={{
+                            display: 'block',
+                            height: '100%',
+                            width: `${pct}%`,
+                            background: isExceptionalRow ? undefined : `linear-gradient(90deg, ${ramp.lo}, ${ramp.hi})`,
+                            borderRadius: 999,
+                            transition: 'width 220ms ease',
+                          }}
+                        />
                       </span>
                       <span style={{ fontSize: 11, fontWeight: 700, color: selected ? INK : INK_MUTE, fontVariantNumeric: 'tabular-nums', width: 22, textAlign: 'right', flexShrink: 0 }}>
                         {count}

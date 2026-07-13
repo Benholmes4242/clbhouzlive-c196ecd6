@@ -7,8 +7,15 @@ import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { getScoreRingColors } from '@/hooks/useTierStyles';
+import { getRatingTier, rampForRating, ratingTextColor } from '@/lib/ratingTier';
 import { MentionText } from '@/components/mentions/MentionText';
 import { stripMentionMarkup } from '@/lib/mentions/format';
+
+// Computed once — reduced-motion users get static gold rings/bars.
+const prefersReducedMotion =
+  typeof window !== 'undefined' &&
+  typeof window.matchMedia === 'function' &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // ReviewText component with line clamping
 const ReviewText: React.FC<{ text: string }> = ({ text }) => {
@@ -60,6 +67,7 @@ const ScoreRing: React.FC<{ score: number; size?: number }> = ({ score, size = 8
   const circumference = 2 * Math.PI * radius;
   const progress = (score / 10) * circumference;
   const gradientId = `scoreGradient-${Math.random().toString(36).slice(2)}`;
+  const isExceptional = getRatingTier(score) === 'EXCEPTIONAL';
 
   return (
     <div style={{ position: 'relative', width: size, height: size, flexShrink: 0 }}>
@@ -75,11 +83,29 @@ const ScoreRing: React.FC<{ score: number; size?: number }> = ({ score, size = 8
           <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor={from} />
             <stop offset="100%" stopColor={to} />
+            {isExceptional && !prefersReducedMotion && (
+              <animateTransform
+                attributeName="gradientTransform"
+                type="rotate"
+                from="0 0.5 0.5"
+                to="360 0.5 0.5"
+                dur="6s"
+                repeatCount="indefinite"
+              />
+            )}
           </linearGradient>
         </defs>
       </svg>
       <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <span style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
+        <span
+          className={isExceptional ? 'clbhouz-gold-shimmer-light' : undefined}
+          style={{
+            fontSize: 22,
+            fontWeight: 800,
+            fontVariantNumeric: 'tabular-nums',
+            ...(isExceptional ? {} : { color: ratingTextColor(score) }),
+          }}
+        >
           {score.toFixed(1)}
         </span>
       </div>
@@ -191,26 +217,33 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
         <ScoreRing score={rating.rating} size={80} />
         {categories.length > 0 && (
           <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', columnGap: 14, rowGap: 8 }}>
-            {categories.map(cat => (
-              <div key={cat.label}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 4 }}>
-                  <span style={{ color: '#94A3B8' }}>{cat.label}</span>
-                  <span style={{ fontWeight: 700, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
-                    {cat.score.toFixed(1)}
-                  </span>
+            {categories.map(cat => {
+              const catRamp = rampForRating(cat.score);
+              const catExceptional = getRatingTier(cat.score) === 'EXCEPTIONAL';
+              return (
+                <div key={cat.label}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 4 }}>
+                    <span style={{ color: '#94A3B8' }}>{cat.label}</span>
+                    <span style={{ fontWeight: 700, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
+                      {cat.score.toFixed(1)}
+                    </span>
+                  </div>
+                  <div style={{ height: 4, borderRadius: 999, overflow: 'hidden', background: 'rgba(245,158,11,0.08)' }}>
+                    <div
+                      className={catExceptional ? 'clbhouz-gold-shimmer-bar' : undefined}
+                      style={{
+                        height: '100%',
+                        borderRadius: 999,
+                        width: `${(cat.score / 10) * 100}%`,
+                        background: catExceptional
+                          ? undefined
+                          : `linear-gradient(90deg, ${catRamp.lo}, ${catRamp.hi})`,
+                      }}
+                    />
+                  </div>
                 </div>
-                <div style={{ height: 4, borderRadius: 999, overflow: 'hidden', background: 'rgba(245,158,11,0.08)' }}>
-                  <div
-                    style={{
-                      height: '100%',
-                      borderRadius: 999,
-                      width: `${(cat.score / 10) * 100}%`,
-                      background: 'linear-gradient(to right, #F59E0B, #F7931E)',
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

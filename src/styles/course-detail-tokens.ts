@@ -99,6 +99,7 @@ export const courseDetailTokens = {
   },
 
   // Score ring gradient colors — graduated grey → amber → gold ramp
+  // DEPRECATED — rings now derive from RATING_RAMPS via getScoreRingColors.
   scoreRing: {
     exceptional: { from: '#FFC23D', to: '#FFE08A' },
     excellent: { from: '#F7931E', to: '#FAC775' },
@@ -109,6 +110,7 @@ export const courseDetailTokens = {
 } as const;
 
 // Tier gradient mapping for distribution bars — graduated grey → amber → gold ramp
+// DEPRECATED — distribution bars now derive from RATING_RAMPS via rampForRating.
 export const tierGradients: Record<string, string> = {
   Exceptional: 'bg-gradient-to-r from-[#FFC23D] to-[#FFE08A]',
   Excellent: 'bg-gradient-to-r from-[#F7931E] to-[#FAC775]',
