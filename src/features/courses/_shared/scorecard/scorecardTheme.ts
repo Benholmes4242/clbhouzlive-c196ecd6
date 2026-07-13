@@ -12,7 +12,7 @@ export const SCORECARD_LIGHT: ScorecardTheme = {
   ink: '#0F172A', dim: '#64748B', faint: '#94A3B8', ghost: '#CBD5E1',
   cellBg: '#F8FAFC', cellLine: '#E2E8F0',
   accent: '#c97a10',
-  under: '#2F6B4F', over: '#B5703C',
+  under: '#D2222D', over: '#1D5DBF',
 };
 
 export const SCORECARD_DARK: ScorecardTheme = {
@@ -23,5 +23,5 @@ export const SCORECARD_DARK: ScorecardTheme = {
   faint: 'rgba(242,244,247,0.38)', ghost: 'rgba(242,244,247,0.20)',
   cellBg: 'rgba(255,255,255,0.04)', cellLine: 'rgba(255,255,255,0.10)',
   accent: '#F7931E',
-  under: '#55BD8B', over: '#DE9A62',
+  under: '#FF6B5E', over: '#7AA6EC',
 };
