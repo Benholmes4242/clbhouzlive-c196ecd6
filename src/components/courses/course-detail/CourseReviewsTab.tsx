@@ -72,6 +72,15 @@ const TIER_ROWS: { key: ScoreTier; label: string }[] = [
   { key: 'poor',       label: 'Poor' },
 ];
 
+// Representative score per tier — drives distribution bar fill via rampForRating.
+const TIER_REP_SCORE: Record<ScoreTier, number> = {
+  exceptional: 9.5,
+  excellent: 8.0,
+  good: 6.5,
+  fair: 5.0,
+  poor: 2.0,
+};
+
 
 const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   courseId,
