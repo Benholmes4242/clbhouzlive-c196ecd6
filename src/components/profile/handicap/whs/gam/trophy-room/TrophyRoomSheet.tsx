@@ -9,6 +9,7 @@ import { useUserProfile } from '@/hooks/useUserProfile';
 import { TrophyCardHybrid } from './TrophyCardHybrid';
 import { renderBadgeIcon } from '../badgeIcons';
 import { TrophyDetailSheet } from './TrophyDetailSheet';
+import { LegendCard } from './parts/LegendCard';
 import { normalizeBadge, normalizeLegend, type TrophyItem } from './_shared/normalizeTrophyItem';
 import { isShowpiece, LIFETIME_ORDER } from './_shared/showpieces';
 import { medalsOwned } from './_shared/levels';
