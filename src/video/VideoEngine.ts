@@ -870,6 +870,9 @@ class VideoEngineImpl {
 
     // Persistent intent: set now, honored on mount + on canplay after (re)load.
     lane.wantPlay = true;
+    // AUDIO POLICY: on activation, re-consult session store so an earlier
+    // unmute carries to the NEXT video (inheritance on activation).
+    this.applyAudioPolicy(lane);
     if (!lane.mountedHost) {
       DBG(laneId, 'play() queued — no mounted host');
       return Promise.resolve();
