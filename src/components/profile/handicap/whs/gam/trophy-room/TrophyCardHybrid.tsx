@@ -46,7 +46,7 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap }) => {
   const inProgress = tiered && !earned && (item.currentValue ?? 0) > 0;
   const mat = tiered && reached > 0 ? materialForTier(reached) : null;
   const accent = earned || inProgress ? (mat ? matColor(mat) : '#F7931E') : 'rgba(255,255,255,0.35)';
-  const secretLocked = !earned && !tiered && (item.rarity === 'epic' || item.rarity === 'legendary');
+  
 
   const nextThreshold = tiered ? item.nextThreshold : null;
   const nextMat = tiered && nextThreshold != null ? matName(MATERIAL_LADDER[Math.min(reached, MATERIAL_LADDER.length - 1)]) : null;
@@ -59,9 +59,7 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap }) => {
         : `T0/${item.tiers.length}`
     : earned
       ? 'EARNED'
-      : secretLocked
-        ? '???'
-        : 'LOCKED';
+      : 'LOCKED';
 
   const earnedDate = item.earnedAt
     ? new Date(item.earnedAt).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
@@ -75,9 +73,7 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap }) => {
       ? earnedDate
         ? `EARNED ${earnedDate.toUpperCase()}`
         : 'EARNED'
-      : secretLocked
-        ? 'KEEP PLAYING'
-        : 'LOCKED';
+      : 'LOCKED';
 
   const progressPct =
     tiered && nextThreshold != null
