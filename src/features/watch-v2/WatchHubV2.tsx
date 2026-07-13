@@ -14,13 +14,11 @@ export default function WatchHubV2({ embedded = false }: { embedded?: boolean })
       <main
         style={{
           paddingBottom: 88,
-          // .app-shell already pads by var(--sat); pad by --header-h ONLY so
-          // we clear CompactHeader without inheriting --shell-extra-h from a
-          // keep-alive page (Clubhouse tab bar) that's still mounted in the
-          // background. This surface has no ShellSlot of its own.
+          // Bleed route: --header-h publishes 0 and .app-shell no longer pads
+          // --sat, so the page owns top clearance for the floating island.
           ...(embedded
             ? {}
-            : { paddingTop: 'var(--header-h, 55px)' }),
+            : { paddingTop: 'calc(env(safe-area-inset-top, 0px) + 62px)' }),
         }}
       >
         {/* DestinationDoors are the first content — CompactHeader owns the
