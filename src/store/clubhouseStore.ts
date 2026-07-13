@@ -1,9 +1,6 @@
 import { create } from 'zustand';
 import { useSessionAudio, getLastUnmuteGestureTs } from '@/audio/sessionAudioStore';
 
-// One-time cleanup of orphaned key from removed GlobalAudioContext mute state.
-try { sessionStorage.removeItem('globalAudioState'); } catch {}
-
 export type TabKey = string; // 'foryou' | 'friends' | other surfaces (LightCardFeed etc use 'default')
 
 const DEFAULT_TAB: TabKey = 'foryou';
