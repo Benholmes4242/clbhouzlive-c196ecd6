@@ -3,7 +3,8 @@
 // Composer card and the focused MediaEditor stage. Charcoal #0F172A surface.
 
 import React, { useLayoutEffect, useRef, useState } from 'react';
-import { Volume2, VolumeX, Play } from 'lucide-react';
+import { Play } from 'lucide-react';
+import { MuteButton } from '@/audio/MuteButton';
 import type { FrameId } from './FrameChooser';
 import { FRAMES } from './FrameChooser';
 
