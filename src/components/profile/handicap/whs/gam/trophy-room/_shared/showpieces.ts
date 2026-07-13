@@ -8,7 +8,6 @@ export const SHOWPIECE_BADGE_IDS = new Set<string>([
   // Lifetime accumulation showpieces (counter is unbounded)
   'first_birdie',
   'first_eagle',
-  'first_albatross',
   'hole_in_one',
   // Bounded-set showpieces (counter capped at 100)
   'top_100_worldwide',
