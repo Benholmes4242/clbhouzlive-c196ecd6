@@ -38,7 +38,10 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap }) => {
   }
 
   const tiered = item.tiers.length > 1;
-  const earned = item.earned;
+  // For tiered badges, "active" derives from live tier state --
+  // item.earned is raw row existence and can be stale after
+  // threshold reworks (see normalizeTrophyItem ghost-forward note).
+  const earned = tiered ? item.reachedTier > 0 : item.earned;
   const reached = tiered ? item.reachedTier : earned ? 1 : 0;
   const inProgress = tiered && !earned && (item.currentValue ?? 0) > 0;
   const mat = tiered && reached > 0 ? materialForTier(reached) : null;
