@@ -443,6 +443,17 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           }}
         >
           <RailButton
+            onClick={handleMuteTap}
+            ariaLabel={isAudioMuted ? 'Unmute' : 'Mute'}
+          >
+            {isAudioMuted ? (
+              <VolumeX size={32} stroke="#fff" strokeWidth={2} />
+            ) : (
+              <Volume2 size={32} stroke="#fff" strokeWidth={2} />
+            )}
+          </RailButton>
+
+          <RailButton
             onClick={() => onLike(activePost)}
             ariaLabel={likeState.isLiked ? 'Unlike' : 'Like'}
             count={likeStr}
