@@ -249,16 +249,22 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = 
       >
         {item.name.toUpperCase()}
       </div>
-      <div
-        style={{
-          fontSize: 9.5,
-          color: sCopy ? sCopy.chipColor : 'rgba(255,255,255,0.45)',
-          marginTop: 3,
-          fontVariantNumeric: 'tabular-nums',
-        }}
-      >
-        {subline}
-      </div>
+      {subline && (
+        <div
+          style={{
+            fontSize: 9.5,
+            color: sCopy ? sCopy.chipColor : 'rgba(255,255,255,0.45)',
+            marginTop: 3,
+            fontVariantNumeric: 'tabular-nums',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+          } as React.CSSProperties}
+        >
+          {subline}
+        </div>
+      )}
 
       {/* progress hairline */}
       {progressPct != null && (
