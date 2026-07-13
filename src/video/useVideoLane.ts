@@ -185,13 +185,12 @@ export function useVideoLane(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [creationClosedAt]);
 
-  // Apply mute.
+  // AUDIO POLICY: declare this lane's policy to the engine. Engine handles
+  // mute state from the session store; consumers do NOT push mute values.
   useEffect(() => {
     if (!laneId) return;
-    if (typeof opts.muted === 'boolean') {
-      VideoEngine.setMuted(laneId, opts.muted);
-    }
-  }, [laneId, opts.muted]);
+    VideoEngine.setAudioPolicy(laneId, opts.audioPolicy ?? 'session');
+  }, [laneId, opts.audioPolicy]);
 
   return {
     hostRef,
