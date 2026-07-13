@@ -214,6 +214,7 @@ async function processSingle(whsScoreId: string) {
     await applyMilestones(userId, stats);
     await recomputeTop100Milestones(userId);
     earned = await applyBadges(userId, stats, whsScoreId);
+    await applyStatusTransitions(userId, stats, whsScoreId);
     await applyStreaks(userId, stats);
     await applyCourseLegends(stats);
     await applyRivalryResults(userId, stats, whsScoreId);
