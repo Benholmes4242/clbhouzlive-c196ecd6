@@ -99,7 +99,7 @@ export function ComposerChooser({
           padding: '12px 16px',
           borderBottom: `0.5px solid ${HAIR}`,
           background: PAGE,
-          paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+          paddingTop: 'max(env(safe-area-inset-top, 0px), 48px)',
         }}
       >
         <button
