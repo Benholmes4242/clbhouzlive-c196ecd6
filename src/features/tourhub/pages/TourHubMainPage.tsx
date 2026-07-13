@@ -176,6 +176,10 @@ export function TourHubMainPage() {
           onProfile={() => navigate('/profile')}
           onSignOut={() => { void logout(); }}
         />
+        {/* Glass plate: mounted for every non-overview tab. Overview keeps
+            its own cinematic hero overlay chrome. Height 70 matches tour
+            island HEADER_H (see ChromeIsland.tsx). */}
+        <GlassHeaderPlate visible={activeTab !== 'overview'} heightPx={70} />
         {fullBleedHero ? (
           <>
             <div>{renderTab()}</div>
