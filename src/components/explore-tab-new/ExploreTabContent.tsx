@@ -1,4 +1,4 @@
-import { useCallback, useRef, useMemo } from 'react';
+import { useCallback, useRef, useMemo, useState } from 'react';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExploreFeed } from './hooks/useExploreFeed';
@@ -10,6 +10,7 @@ import { LegendaryFeatHero } from './LegendaryFeatHero';
 import { WhereYoudRank } from './WhereYoudRank';
 import { ToughestCoursesStrip } from './ToughestCoursesStrip';
 import { useRegionFeats } from './hooks/useRegionFeats';
+import { TierSeeAllSheet } from './TierSeeAllSheet';
 
 import ExploreGrid from './ExploreGrid';
 
