@@ -43,7 +43,6 @@ const CHIP_SHORT_LABEL: Record<TourId, string> = {
 
 export function ScheduleTab() {
   const navigate = useNavigate();
-  const scrollRootRef = useRef<HTMLDivElement | null>(null);
   const anchorRef = useRef<HTMLDivElement | null>(null);
   const [anchorVisible, setAnchorVisible] = useState(true);
 
@@ -63,23 +62,17 @@ export function ScheduleTab() {
   const { data: timeline, isLoading, error } = useSeasonTimeline(activeTour);
 
   // ── Auto-land on this-week/next row on mount + tour flip ───────────────
+  // Scrolls the WINDOW (page owns the scroll now — no inner scroller).
   const anchorId = timeline?.anchorEventId ?? null;
   useEffect(() => {
     if (!anchorId) return;
-    // Two rAFs to ensure the row is mounted after Suspense/paint.
     let cancelled = false;
     const doScroll = () => {
       if (cancelled) return;
       const el = document.getElementById(`sv2-row-${anchorId}`);
-      const root = scrollRootRef.current;
-      if (!el || !root) return;
-      const rootRect = root.getBoundingClientRect();
-      const elRect = el.getBoundingClientRect();
-      const offsetInScroller = elRect.top - rootRect.top + root.scrollTop;
-      root.scrollTo({
-        top: Math.max(0, offsetInScroller - 150),
-        behavior: 'auto',
-      });
+      if (!el) return;
+      const top = el.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo({ top: Math.max(0, top - 200), behavior: 'auto' });
     };
     const r1 = requestAnimationFrame(() =>
       requestAnimationFrame(doScroll),
@@ -90,17 +83,16 @@ export function ScheduleTab() {
     };
   }, [anchorId, activeTour]);
 
-  // ── Floating "This week" chip visibility (IntersectionObserver) ────────
+  // ── Floating "This week" chip visibility (IntersectionObserver on viewport)
   useEffect(() => {
     const el = anchorRef.current;
-    const root = scrollRootRef.current;
-    if (!el || !root || !anchorId) {
+    if (!el || !anchorId) {
       setAnchorVisible(true);
       return;
     }
     const io = new IntersectionObserver(
       ([entry]) => setAnchorVisible(entry.isIntersecting),
-      { root, threshold: 0.1 },
+      { threshold: 0.1 },
     );
     io.observe(el);
     return () => io.disconnect();
@@ -109,16 +101,11 @@ export function ScheduleTab() {
   const scrollToAnchor = useCallback(() => {
     if (!anchorId) return;
     const el = document.getElementById(`sv2-row-${anchorId}`);
-    const root = scrollRootRef.current;
-    if (!el || !root) return;
-    const rootRect = root.getBoundingClientRect();
-    const elRect = el.getBoundingClientRect();
-    const offsetInScroller = elRect.top - rootRect.top + root.scrollTop;
-    root.scrollTo({
-      top: Math.max(0, offsetInScroller - 150),
-      behavior: 'smooth',
-    });
+    if (!el) return;
+    const top = el.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({ top: Math.max(0, top - 200), behavior: 'smooth' });
   }, [anchorId]);
+
 
   // ── Row navigation ─────────────────────────────────────────────────────
   const onSelectEvent = useCallback(
