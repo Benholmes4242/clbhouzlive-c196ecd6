@@ -130,15 +130,30 @@ serve(async (req) => {
         }
 
         const externalId = item.device_id || item.user_id;
+
+        // Compute a client route so tapping the push deep-links correctly.
+        // If the enqueuer already supplied data.route (e.g. gam dispatcher),
+        // preserve it; otherwise derive it from notif_type + entity_* + data.
+        const existingRoute = typeof data.route === 'string' ? data.route : null;
+        const route = existingRoute ?? routeForNotif({
+          notif_type: data.type ?? data.notif_type ?? null,
+          entity_type: data.entity_type ?? null,
+          entity_id: data.entity_id ?? null,
+          data,
+          actor_user_id: data.actor_user_id ?? null,
+        });
+        const outgoingData = { ...data, route };
+
         const result = await sendPush(
           externalId,
           item.title,
           item.body || '',
-          item.data || {},
+          outgoingData,
           ONESIGNAL_APP_ID,
           ONESIGNAL_API_KEY,
           item.id
         );
+
 
         if (result.success) {
           await supabase
