@@ -294,14 +294,26 @@ export function PlayersTab() {
           )}
         </div>
 
-        {/* Tour chips */}
+      </div>
+
+      {/* Tour chips — canonical sticky glass row (locks under island band). */}
+      <div
+        style={{
+          position: 'sticky',
+          top: 'calc(var(--sat, 0px) + 69px)',
+          zIndex: 10,
+          background: 'rgba(248,250,252,0.72)',
+          backdropFilter: 'blur(14px)',
+          WebkitBackdropFilter: 'blur(14px)',
+          borderBottom: '1px solid rgba(0,0,0,0.07)',
+          padding: '8px 16px 10px',
+        }}
+      >
         <div
           style={{
             display: 'flex',
             gap: 8,
             overflowX: 'auto',
-            paddingBottom: 4,
-            marginBottom: 12,
             scrollbarWidth: 'none',
           }}
           className="segmented-scroller"
@@ -336,6 +348,9 @@ export function PlayersTab() {
             );
           })}
         </div>
+      </div>
+
+      <div style={{ padding: '12px 16px 0' }}>
 
         {editorial && (
           <div
