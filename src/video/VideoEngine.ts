@@ -903,6 +903,17 @@ class VideoEngineImpl {
     const p = lane.el.play();
     return Promise.resolve(p).catch((err) => {
       DBG(laneId, 'play() rejected', err);
+      // Unmuted-rejection fallback for 'session' lanes: WebKit rejects
+      // unmuted autoplay in cold contexts. Degrade THIS lane to muted so
+      // playback continues, and signal the pill layer. Do NOT touch the
+      // session store — the pill's tap re-asserts unmute with a gesture.
+      if (!lane.el.muted && lane.audioPolicy === 'session') {
+        lane.el.muted = true;
+        const p2 = lane.el.play();
+        Promise.resolve(p2).catch(() => { /* muted retry rejected — safe */ });
+        this.emitAutoplayBlocked(lane.id);
+        return;
+      }
       // Belt-and-braces retry: muted lanes rarely reject, but one deferred
       // retry removes the stuck-paused edge case where an autoplay-policy
       // rejection would otherwise leave wantPlay=true with no recovery.
