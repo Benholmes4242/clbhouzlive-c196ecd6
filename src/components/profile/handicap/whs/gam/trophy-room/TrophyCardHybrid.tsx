@@ -13,7 +13,8 @@ import type { TrophyItem } from './_shared/normalizeTrophyItem';
 import { MATERIAL_HEX } from './_shared/rarityPalette';
 import { MATERIAL_LADDER, materialForTier } from './_shared/levels';
 import { renderBadgeIcon } from '../badgeIcons';
-import { LegendCard } from './parts/LegendCard';
+// Legend cards are grouped by course in TrophyRoomSheet and render
+// LegendCard directly. TrophyCardHybrid only handles achievements.
 import { statusForEarned, statusCopy } from './_shared/statusBadges';
 
 const FONT = "'Geist', -apple-system, sans-serif";
@@ -38,9 +39,7 @@ interface Props {
 }
 
 export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = null }) => {
-  if (item.kind !== 'achievement') {
-    return <LegendCard item={item} onTap={onTap} />;
-  }
+  if (item.kind !== 'achievement') return null;
 
   const tiered = item.tiers.length > 1;
   // For tiered badges, "active" derives from live tier state --

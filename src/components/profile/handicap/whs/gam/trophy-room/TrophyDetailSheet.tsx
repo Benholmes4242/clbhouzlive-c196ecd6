@@ -106,9 +106,14 @@ export const TrophyDetailSheet: React.FC<Props> = ({ items, initialIndex, ownerU
   }
 
   if (current.kind === 'legend') {
+    // items[] is the full course group when opened from LegendCard.
+    const records = items.filter(
+      (i): i is Extract<TrophyItem, { kind: 'legend' }> =>
+        i.kind === 'legend' && i.courseId === current.courseId,
+    );
     return (
       <LegendImmersive
-        item={current}
+        records={records.length > 0 ? records : [current]}
         onClose={onClose}
         onShare={handleShare}
       />
