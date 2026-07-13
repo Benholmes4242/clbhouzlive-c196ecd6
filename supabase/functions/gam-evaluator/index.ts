@@ -918,7 +918,7 @@ async function processTop100Only(userId: string): Promise<{ earned: string[] }> 
   const { data: badges, error } = await supabase
     .from("gam_badge_catalogue")
     .select("*")
-    .in("id", ["top_100_worldwide", "top_100_usa", "top_100_gbni", "top_100_europe"])
+    .in("id", ["top_100_worldwide", "top_100_usa", "top_100_gbni", "top_100_europe", "globetrotter", "continental"])
     .eq("is_active", true);
   if (error) {
     console.error("[processTop100Only] catalogue query error", error);
