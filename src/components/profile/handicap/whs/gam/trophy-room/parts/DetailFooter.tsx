@@ -38,7 +38,7 @@ export const DetailFooter: React.FC<Props> = ({ item, onShare, onOpenCourse }) =
     <div
       style={{
         flexShrink: 0,
-        padding: '10px 16px 14px',
+        padding: '12px 16px 16px',
         borderTop: '0.5px solid rgba(255,255,255,0.06)',
         background: '#15171F',
         display: 'flex',

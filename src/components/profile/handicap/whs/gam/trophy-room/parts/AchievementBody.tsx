@@ -37,7 +37,7 @@ export const AchievementBody: React.FC<Props> = ({ item, viewerUserId }) => {
   return (
     <div
       style={{
-        padding: '16px 20px 18px',
+        padding: '16px',
         fontFamily: GAM.FONT_GEIST,
         color: 'rgba(255,255,255,0.96)',
         display: 'flex',
@@ -76,7 +76,7 @@ export const AchievementBody: React.FC<Props> = ({ item, viewerUserId }) => {
             background: '#1B1E27',
             border: '1px solid rgba(255,255,255,0.06)',
             borderRadius: 12,
-            padding: 14,
+            padding: 12,
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
@@ -154,7 +154,7 @@ const TierKey: React.FC = () => {
   return (
     <div
       style={{
-        marginTop: 14,
+        marginTop: 12,
         padding: '12px 14px',
         background: '#1B1E27',
         border: '1px solid rgba(255,255,255,0.06)',
@@ -166,7 +166,7 @@ const TierKey: React.FC = () => {
           fontSize: 11,
           color: 'rgba(255,255,255,0.55)',
           lineHeight: 1.45,
-          marginBottom: 10,
+          marginBottom: 12,
         }}
       >
         Tiered achievements climb through five materials as you progress:
@@ -176,7 +176,7 @@ const TierKey: React.FC = () => {
           const p = MATERIAL_PALETTES[n];
           const name = p.label.charAt(0) + p.label.slice(1).toLowerCase();
           return (
-            <div key={n} style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
+            <div key={n} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               {/* faceted gem swatch (rotated square w/ gradient + soft glow) */}
               <span
                 aria-hidden

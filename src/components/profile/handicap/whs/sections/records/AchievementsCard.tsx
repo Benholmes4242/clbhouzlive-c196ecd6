@@ -72,7 +72,7 @@ export const AchievementsCard: React.FC<Props> = ({ userId, viewMode = 'owner', 
             background: D_BG,
             border: `1px solid ${D_LINE}`,
             borderRadius: 18,
-            padding: 18,
+            padding: 16,
             cursor: 'pointer',
             fontFamily: FONT,
           }}
