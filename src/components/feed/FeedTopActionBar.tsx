@@ -144,23 +144,7 @@ export const FeedTopActionBar: React.FC<FeedTopActionBarProps> = ({
             </button>
           )}
 
-          {isVideo && onToggleMute && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleMute();
-              }}
-              aria-label={isMuted ? 'Unmute video' : 'Mute video'}
-              style={chipBase}
-            >
-              {isMuted ? (
-                <VolumeX size={22} stroke="#fff" strokeWidth={2} />
-              ) : (
-                <Volume2 size={22} stroke="#fff" strokeWidth={2} />
-              )}
-            </button>
-          )}
+          {isVideo && <MuteButton size="sm" />}
         </div>
 
         {/* RIGHT cluster — hidden in read-only (gallery) mode. */}
