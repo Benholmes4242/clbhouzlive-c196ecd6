@@ -217,26 +217,33 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
         <ScoreRing score={rating.rating} size={80} />
         {categories.length > 0 && (
           <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', columnGap: 14, rowGap: 8 }}>
-            {categories.map(cat => (
-              <div key={cat.label}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 4 }}>
-                  <span style={{ color: '#94A3B8' }}>{cat.label}</span>
-                  <span style={{ fontWeight: 700, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
-                    {cat.score.toFixed(1)}
-                  </span>
+            {categories.map(cat => {
+              const catRamp = rampForRating(cat.score);
+              const catExceptional = getRatingTier(cat.score) === 'EXCEPTIONAL';
+              return (
+                <div key={cat.label}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 4 }}>
+                    <span style={{ color: '#94A3B8' }}>{cat.label}</span>
+                    <span style={{ fontWeight: 700, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
+                      {cat.score.toFixed(1)}
+                    </span>
+                  </div>
+                  <div style={{ height: 4, borderRadius: 999, overflow: 'hidden', background: 'rgba(245,158,11,0.08)' }}>
+                    <div
+                      className={catExceptional ? 'clbhouz-gold-shimmer-bar' : undefined}
+                      style={{
+                        height: '100%',
+                        borderRadius: 999,
+                        width: `${(cat.score / 10) * 100}%`,
+                        background: catExceptional
+                          ? undefined
+                          : `linear-gradient(90deg, ${catRamp.lo}, ${catRamp.hi})`,
+                      }}
+                    />
+                  </div>
                 </div>
-                <div style={{ height: 4, borderRadius: 999, overflow: 'hidden', background: 'rgba(245,158,11,0.08)' }}>
-                  <div
-                    style={{
-                      height: '100%',
-                      borderRadius: 999,
-                      width: `${(cat.score / 10) * 100}%`,
-                      background: 'linear-gradient(to right, #F59E0B, #F7931E)',
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
