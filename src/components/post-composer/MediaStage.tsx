@@ -284,28 +284,13 @@ export function MediaStage({
       )}
 
       {isVideo && showMuteToggle && (
-        <button
-          onClick={() => setMuted((m) => !m)}
-          aria-label={muted ? 'Unmute' : 'Mute'}
-          style={{
-            position: 'absolute',
-            bottom: 10,
-            right: 10,
-            width: 34,
-            height: 34,
-            borderRadius: '50%',
-            background: 'rgba(0,0,0,0.45)',
-            border: '1px solid rgba(255,255,255,0.24)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            color: '#fff',
-            zIndex: 3,
-          }}
-        >
-          {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-        </button>
+        <div style={{ position: 'absolute', bottom: 4, right: 4, zIndex: 3 }}>
+          <MuteButton
+            size="sm"
+            muted={muted}
+            onToggle={() => setMuted((m) => !m)}
+          />
+        </div>
       )}
     </div>
   );
