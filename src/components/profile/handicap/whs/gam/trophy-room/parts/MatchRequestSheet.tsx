@@ -5,6 +5,7 @@
  */
 
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -76,13 +77,15 @@ export function MatchRequestSheet({ courseId, courseName, onClose }: Props) {
   };
 
 
-  return (
+  const content = (
     <div
       onClick={onClose}
       style={{
         position: 'fixed',
         inset: 0,
-        zIndex: 9999,
+        // Anchor: immersive overlays (AchievementImmersive/LegendImmersive/
+        // Top100Immersive) sit at 12500. This sheet must clear them.
+        zIndex: 12600,
         background: 'rgba(0,0,0,0.55)',
         display: 'flex',
         alignItems: 'flex-end',
@@ -275,6 +278,8 @@ export function MatchRequestSheet({ courseId, courseName, onClose }: Props) {
       </div>
     </div>
   );
+
+  return typeof window !== 'undefined' ? createPortal(content, document.body) : null;
 }
 
 export default MatchRequestSheet;
