@@ -183,6 +183,21 @@ export const Top100Immersive: React.FC<Props> = ({
             {summary}
           </div>
 
+          {descriptionLine && (
+            <div
+              style={{
+                fontSize: 12.5,
+                color: 'rgba(255,255,255,0.4)',
+                maxWidth: 280,
+                lineHeight: 1.5,
+                marginTop: 6,
+                textAlign: 'center',
+              }}
+            >
+              {descriptionLine}
+            </div>
+          )}
+
           {isTiered && (
             <div style={{ width: '100%', maxWidth: 360 }}>
               <GemLadder tiers={item.tiers} />
