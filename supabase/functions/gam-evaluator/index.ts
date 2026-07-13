@@ -1077,26 +1077,20 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg) {
   }
 
   const newTopUser = arr[0]?.user_id ?? null;
-  if (newTopUser && newTopUser !== prevTopUser) {
+  if (newTopUser !== prevTopUser) {
     if (prevTopUser) {
-      await enqueueNotification(prevTopUser, "legend_lost", {
-        course_id: courseId, category: cfg.category, taken_by: newTopUser,
-      });
+      if (newTopUser) {
+        await enqueueNotification(prevTopUser, "legend_lost", {
+          course_id: courseId, category: cfg.category, taken_by: newTopUser,
+        });
+      }
+      // Loser side: their rank-1 count went down — recompute authoritatively.
+      await recomputeLegendTitles(prevTopUser);
     }
-    await enqueueNotification(newTopUser, "legend_earned", { course_id: courseId, category: cfg.category });
-
-    // Update legend_at_course tiered badge by count of #1s
-    const { count } = await supabase
-      .from("gam_course_legends")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", newTopUser).eq("rank", 1).eq("is_current", true);
-    const { data: badge } = await supabase
-      .from("gam_badge_catalogue")
-      .select("counter_tiers")
-      .eq("id", "legend_at_course").maybeSingle();
-    if (badge?.counter_tiers) {
-      const tier = computeTier(count ?? 0, badge.counter_tiers);
-      if (tier > 0) await upsertBadgeTiered(newTopUser, "legend_at_course", count ?? 0, tier, null);
+    if (newTopUser) {
+      await enqueueNotification(newTopUser, "legend_earned", { course_id: courseId, category: cfg.category });
+      // Gainer side: single code path for the tiered badge + milestone.
+      await recomputeLegendTitles(newTopUser);
     }
   }
 }
