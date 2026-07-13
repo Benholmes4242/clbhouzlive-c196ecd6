@@ -21,6 +21,12 @@ const TIER_REP_SCORE: Record<string, number> = {
   poor: 2.0,
 };
 
+// Computed once — reduced-motion users get static gold rings/bars.
+const prefersReducedMotion =
+  typeof window !== 'undefined' &&
+  typeof window.matchMedia === 'function' &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 interface CommunityScoreCardProps {
   courseId: string;
   courseName?: string;
