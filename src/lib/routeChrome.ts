@@ -1,6 +1,7 @@
 import {
   isDarkChromeRoute,
   isImmersiveRoute,
+  isLightImmersiveRoute,
 } from '@/components/header/globalHeaderRules';
 import {
   applyShieldColor,
