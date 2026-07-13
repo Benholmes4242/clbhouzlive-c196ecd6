@@ -3,11 +3,13 @@ import { useSearchParams } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
+import { FilterChips } from '@/components/ui/FilterChips';
 import {
   CLIPS_V2_MOODS,
   type ClipsV2Mood,
 } from './hooks/useClipsWallFeed';
 import { ClipsWall } from './components/ClipsWall';
+
 
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
@@ -34,6 +36,11 @@ export default function ClipsPageV2() {
 
   const mood = useMemo(() => parseMood(params.get('mood')), [params]);
 
+  const moodOptions = useMemo(
+    () => CLIPS_V2_MOODS.map((id) => ({ id, label: MOOD_LABELS[id] })),
+    [],
+  );
+
   const setMood = useCallback(
     (next: ClipsV2Mood) => {
       const p = new URLSearchParams(params);
@@ -43,6 +50,7 @@ export default function ClipsPageV2() {
     },
     [params, setParams],
   );
+
 
   return (
     <PageRoot className="min-h-screen text-foreground bg-background">
@@ -62,43 +70,17 @@ export default function ClipsPageV2() {
             zIndex: 10,
             background: '#F8FAFC',
             borderBottom: '1px solid rgba(0,0,0,0.07)',
-            padding: '8px 16px 10px',
+            padding: '8px 4px 10px 0',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div
-              className="scrollbar-hide"
-              style={{
-                flex: 1,
-                minWidth: 0,
-                display: 'flex',
-                gap: 8,
-                overflowX: 'auto',
-              }}
-            >
-              {CLIPS_V2_MOODS.map((id) => {
-                const active = id === mood;
-                return (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => setMood(id)}
-                    style={{
-                      flexShrink: 0,
-                      fontWeight: 600,
-                      fontSize: 12.5,
-                      padding: '7px 14px',
-                      borderRadius: 999,
-                      background: active ? '#0F172A' : '#fff',
-                      color: active ? '#fff' : '#0F172A',
-                      border: active ? 'none' : '1px solid rgba(0,0,0,0.07)',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {MOOD_LABELS[id]}
-                  </button>
-                );
-              })}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <FilterChips
+                options={moodOptions}
+                value={mood}
+                onChange={setMood}
+                ariaLabel="Clips mood filter"
+              />
             </div>
             <button
               type="button"
@@ -122,6 +104,7 @@ export default function ClipsPageV2() {
             </button>
           </div>
         </div>
+
 
         <ClipsWall mood={mood} />
       </main>
