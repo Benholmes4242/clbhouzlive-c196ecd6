@@ -18,6 +18,9 @@ import { useFriendsWhoEarnedBadge } from '@/hooks/gam/useFriendsWhoEarnedBadge';
 import { getFirstName } from '@/components/friend-sheet/parts/_shared/formatName';
 import type { TrophyItem } from '../_shared/normalizeTrophyItem';
 
+const EARNED_GOLD = '#F5C842';
+const IN_PROGRESS_BLUE = '#8CA3B8';
+
 interface Props {
   item: Extract<TrophyItem, { kind: 'achievement' }>;
   viewerUserId: string;
@@ -221,9 +224,9 @@ export const AchievementImmersive: React.FC<Props> = ({ item, viewerUserId, curr
                   fontSize: 10.5,
                   fontWeight: 800,
                   letterSpacing: '0.12em',
-                  color: '#F7931E',
-                  background: 'rgba(247,147,30,0.14)',
-                  border: '1px solid rgba(247,147,30,0.45)',
+                  color: EARNED_GOLD,
+                  background: 'rgba(245,200,66,0.14)',
+                  border: '1px solid rgba(245,200,66,0.45)',
                   borderRadius: 999,
                   padding: '4px 10px',
                   textTransform: 'uppercase',
