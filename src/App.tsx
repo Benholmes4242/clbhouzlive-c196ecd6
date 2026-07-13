@@ -966,7 +966,7 @@ const App: React.FC = () => {
                     dehydrateOptions: { shouldDehydrateQuery: shouldPersistQuery },
                   }}
                 >
-                  <Suspense fallback={<div style={{ background: '#0A0E14', minHeight: '100dvh' }} />}>
+                  <Suspense fallback={<div style={{ background: '#F8FAFC', minHeight: '100dvh' }} />}>
                     <AppPrefetchProvider delay={2000} enabled={true}>
                       <RehydrationProvider>
                         <PostEventsBridge>
