@@ -251,7 +251,7 @@ const CourseLegendsCollapsibleSection: React.FC<{
           display: 'flex',
           alignItems: 'center',
           gap: 6,
-          marginTop: 24,
+          marginTop: 32,
           marginBottom: 12,
           padding: 0,
           background: 'transparent',
