@@ -14,13 +14,21 @@ const AppleGlyph: React.FC = () => (
   </svg>
 );
 
-const PlayGlyph: React.FC = () => (
-  <svg width="20" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path d="M4 3.5v17l13.5-8.5L4 3.5z" stroke="rgba(255,255,255,0.55)" strokeWidth="1.8" strokeLinejoin="round" />
-  </svg>
-);
+function deriveContextLabel(pathname: string): string | null {
+  if (pathname === '/' || pathname === '') return null;
+  if (pathname.startsWith('/post/')) return 'a post';
+  if (pathname.startsWith('/profile/')) return 'a profile';
+  if (pathname.startsWith('/courses/')) return 'a course';
+  return 'something';
+}
 
-const AppDownloadGate: React.FC = () => (
+const AppDownloadGate: React.FC = () => {
+  const contextLabel = React.useMemo(
+    () => (typeof window !== 'undefined' ? deriveContextLabel(window.location.pathname) : null),
+    [],
+  );
+
+  return (
   <div
     style={{
       position: 'fixed', inset: 0, zIndex: 2147483000,
@@ -48,13 +56,25 @@ const AppDownloadGate: React.FC = () => (
           clbhouz
         </div>
 
-        <h1 style={{ margin: '10px 0 0', fontSize: 30, lineHeight: 1.15, fontWeight: 800, letterSpacing: '-0.02em', color: '#FFFFFF' }}>
-          The home of golf courses.
-        </h1>
-
-        <p style={{ margin: '13px auto 0', fontSize: 15.5, lineHeight: 1.55, color: 'rgba(255,255,255,0.66)', maxWidth: 320 }}>
-          Every course in the world, gathered into one place, rated and brought to life.
-        </p>
+        {contextLabel ? (
+          <>
+            <h1 style={{ margin: '10px 0 0', fontSize: 26, lineHeight: 1.2, fontWeight: 800, letterSpacing: '-0.02em', color: '#FFFFFF' }}>
+              You've been invited to view {contextLabel} on Clbhouz.
+            </h1>
+            <p style={{ margin: '13px auto 0', fontSize: 15.5, lineHeight: 1.55, color: 'rgba(255,255,255,0.66)', maxWidth: 320 }}>
+              Get the app to see it.
+            </p>
+          </>
+        ) : (
+          <>
+            <h1 style={{ margin: '10px 0 0', fontSize: 30, lineHeight: 1.15, fontWeight: 800, letterSpacing: '-0.02em', color: '#FFFFFF' }}>
+              The home of golf courses.
+            </h1>
+            <p style={{ margin: '13px auto 0', fontSize: 15.5, lineHeight: 1.55, color: 'rgba(255,255,255,0.66)', maxWidth: 320 }}>
+              Every course in the world, gathered into one place, rated and brought to life.
+            </p>
+          </>
+        )}
 
         <div style={{ marginTop: 30 }}>
           <a
@@ -75,23 +95,8 @@ const AppDownloadGate: React.FC = () => (
           </a>
         </div>
 
-        <div style={{ marginTop: 12 }}>
-          <div
-            aria-disabled="true"
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 12,
-              background: 'transparent', color: 'rgba(255,255,255,0.55)',
-              border: '1px solid rgba(255,255,255,0.22)', borderRadius: 14,
-              padding: '12px 26px 12px 22px', cursor: 'default', userSelect: 'none',
-              minWidth: 220, justifyContent: 'center',
-            }}
-          >
-            <PlayGlyph />
-            <span style={{ textAlign: 'left', lineHeight: 1.15 }}>
-              <span style={{ display: 'block', fontSize: 11, fontWeight: 500, opacity: 0.75 }}>Coming soon</span>
-              <span style={{ display: 'block', fontSize: 19, fontWeight: 700, letterSpacing: '-0.01em' }}>Google Play</span>
-            </span>
-          </div>
+        <div style={{ marginTop: 14, fontSize: 12, color: 'rgba(255,255,255,0.45)' }}>
+          Coming soon to Android
         </div>
 
       </div>
@@ -106,6 +111,7 @@ const AppDownloadGate: React.FC = () => (
       </div>
     </footer>
   </div>
-);
+  );
+};
 
 export default AppDownloadGate;
