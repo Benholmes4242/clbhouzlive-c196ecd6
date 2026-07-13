@@ -15,7 +15,8 @@
  */
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Heart, MessageCircle, Send, MoreHorizontal, Volume2, VolumeX, Plus, Check } from 'lucide-react';
+import { Heart, MessageCircle, Send, MoreHorizontal, Plus, Check } from 'lucide-react';
+import { MuteButton } from '@/audio/MuteButton';
 import { Z } from '@/config/zIndex';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
