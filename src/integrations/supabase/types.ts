@@ -18667,6 +18667,7 @@ export type Database = {
           is_earned: boolean
           kind: string
           rarity: string
+          seen_by_user: boolean
           title: string
         }[]
       }

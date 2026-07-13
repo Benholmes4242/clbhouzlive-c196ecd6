@@ -21,6 +21,9 @@ export interface UserBadge extends BadgeDefinition {
   counter_tier: number | null;
   earned_at: string | null;
   first_seen_at?: string | null;
+  /** Owner has not yet acknowledged this badge (RPC returns TRUE when
+   *  no user row exists, so unearned badges default to "seen"). */
+  seen_by_user?: boolean | null;
   is_earned: boolean;
   display_order: number;
 }
