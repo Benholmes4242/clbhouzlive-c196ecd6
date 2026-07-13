@@ -2,6 +2,7 @@ import { memo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { FeatCard } from './FeatCard';
+import { FeatListRow } from './FeatListRow';
 import { useRegionFeats, type FeatTier } from './hooks/useRegionFeats';
 import { AMBER, INK, INK_TINT_06 } from '@/features/courses/_shared/tokens';
 import { TierSeeAllSheet } from './TierSeeAllSheet';
@@ -143,10 +144,11 @@ interface TierProps {
   region: string | null;
   tier: FeatTier;
   title: string;
+  variant?: 'standard' | 'compact' | 'list';
 }
 
 
-function FeatTierRailInner({ region, tier, title }: TierProps) {
+function FeatTierRailInner({ region, tier, title, variant = 'standard' }: TierProps) {
   const navigate = useNavigate();
   const { data, isLoading } = useRegionFeats(region, tier);
   const rows = data ?? [];
@@ -258,15 +260,31 @@ function FeatTierRailInner({ region, tier, title }: TierProps) {
             </div>
           </button>
         </div>
+      ) : variant === 'list' ? (
+        <div style={{ padding: '0 16px' }}>
+          {displayRows.map((row, i) => (
+            <FeatListRow
+              key={`${row.score_id ?? row.course_id ?? i}-${i}`}
+              row={row}
+              tier={tier}
+            />
+          ))}
+        </div>
       ) : (
         <div
           className="flex gap-3 px-4 overflow-x-auto scrollbar-hide"
           style={{ paddingTop: 4, marginTop: -4, paddingBottom: 16, marginBottom: -16 }}>
           {displayRows.map((row, i) => (
-            <FeatCard key={`${row.score_id ?? row.course_id ?? i}-${i}`} row={row} tier={tier} />
+            <FeatCard
+              key={`${row.score_id ?? row.course_id ?? i}-${i}`}
+              row={row}
+              tier={tier}
+              size={variant === 'compact' ? 'compact' : 'default'}
+            />
           ))}
         </div>
       )}
+
 
       <TierSeeAllSheet
         open={sheetOpen}
