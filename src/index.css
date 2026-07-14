@@ -662,6 +662,10 @@ html.lightbox-open {
   /* .bg-black was forcing dark backgrounds - now removed to allow global pastel base */
 }
 
+.app-depth {
+  position: relative;
+}
+
 /* Optional depth wash behind pages - lightened for seamless footer flow */
 .app-depth::before {
   content: "";
