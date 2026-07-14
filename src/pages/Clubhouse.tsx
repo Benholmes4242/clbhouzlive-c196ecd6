@@ -158,6 +158,13 @@ const ClubhouseContent = () => {
   // snapshot BEFORE flipping activeTab (the keyed remount tears down the
   // instance, which makes a post-flip capture impossible).
   const cardFeedRef = useRef<CardFeedHandle | null>(null);
+  // Per-tab last-known posts length. When a feed shrinks (PTR trims, cache
+  // eviction, refetch resets) below the snapshot's referenced ranges,
+  // restoring the snapshot crashes Virtuoso. Evict the snapshot in that
+  // case so the tab remounts fresh.
+  const lastPostsLenRef = useRef<Record<string, number>>({});
+  // Bumped on error-boundary recovery to force a fresh CardFeed remount.
+  const [feedResetKey, setFeedResetKey] = useState(0);
 
 
 
