@@ -156,7 +156,12 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard' }: TierPr
   const displayRows = rows.slice(0, RAIL_CAP);
   const hasOverflow = rows.length > RAIL_CAP;
   const [sheetOpen, setSheetOpen] = useState(false);
-  const goToClaim = () => navigate('/handicap');
+
+  // Self-hiding: empty tier renders zero trace (no header, no gap).
+  // AlmanacEmptyCard covers the all-tiers-empty case at the page level.
+  if (!isLoading && rows.length === 0) return null;
+  // silence unused
+  void navigate;
 
   return (
     <section style={{ fontFamily: FONT, paddingTop: SPACE.sectionSection }}>
@@ -165,6 +170,7 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard' }: TierPr
         icon={TIER_ICON[tier]}
         onSeeAll={hasOverflow ? () => setSheetOpen(true) : undefined}
       />
+
 
       {isLoading ? (
         <div
