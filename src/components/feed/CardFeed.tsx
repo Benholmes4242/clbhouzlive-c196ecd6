@@ -111,7 +111,7 @@ const PTR_THRESHOLD = 64;
 const PTR_MAX_PULL = 96;
 
 export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardFeed({
-  posts,
+  posts = [],
   onLike,
   onComment,
   onShare,
