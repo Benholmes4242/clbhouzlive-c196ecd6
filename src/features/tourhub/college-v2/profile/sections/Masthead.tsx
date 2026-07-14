@@ -10,8 +10,11 @@
  */
 
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Swords } from 'lucide-react';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { collegeHubRoute } from '@/features/tourhub/routes';
 import {
   useFollowCollegeMutations,
   useIsCollegeFollowed,
