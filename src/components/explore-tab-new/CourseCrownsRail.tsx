@@ -8,7 +8,7 @@ import { SPACE } from '@/lib/spacing';
 import { formatHcp } from '@/lib/formatHcp';
 import { FONT } from './gamingLightTokens';
 
-const CARD_BG = '#171E28';
+const CARD_BG = '#141A22';
 const GOLD = '#FBBC2E';
 
 const REGION_HUMAN: Record<string, string> = {
