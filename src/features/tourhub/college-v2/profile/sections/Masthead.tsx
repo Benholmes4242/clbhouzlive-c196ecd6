@@ -195,29 +195,62 @@ export function Masthead({ slug, displayName, rank, pointsTotal, alumniCount, pl
         {user && (
           <button
             type="button"
-            onClick={handleFollow}
-            disabled={pending}
+        {/* Compare + Follow actions */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+          <button
+            type="button"
+            onClick={handleCompare}
             style={{
               flexShrink: 0,
               fontFamily: FONT,
               height: 30,
-              padding: '0 12px',
+              padding: '0 10px',
               borderRadius: 999,
               fontSize: 11,
               fontWeight: 800,
               letterSpacing: '0.04em',
               textTransform: 'uppercase',
-              border: `0.75px solid ${isFollowed ? GOLD_DEEP : WHITE_ALPHA_18}`,
-              background: isFollowed ? GOLD : 'transparent',
-              color: isFollowed ? CHARCOAL : '#FFFFFF',
-              cursor: pending ? 'default' : 'pointer',
-              opacity: pending ? 0.7 : 1,
+              border: `0.75px solid ${WHITE_ALPHA_18}`,
+              background: 'rgba(255,255,255,0.06)',
+              color: '#FFFFFF',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
               transition: 'all 120ms ease',
             }}
+            aria-label="Compare vs another school"
           >
-            {isFollowed ? 'Following' : 'Follow'}
+            <Swords size={12} strokeWidth={2.4} />
+            Compare
           </button>
-        )}
+          {user && (
+            <button
+              type="button"
+              onClick={handleFollow}
+              disabled={pending}
+              style={{
+                flexShrink: 0,
+                fontFamily: FONT,
+                height: 30,
+                padding: '0 12px',
+                borderRadius: 999,
+                fontSize: 11,
+                fontWeight: 800,
+                letterSpacing: '0.04em',
+                textTransform: 'uppercase',
+                border: `0.75px solid ${isFollowed ? GOLD_DEEP : WHITE_ALPHA_18}`,
+                background: isFollowed ? GOLD : 'transparent',
+                color: isFollowed ? CHARCOAL : '#FFFFFF',
+                cursor: pending ? 'default' : 'pointer',
+                opacity: pending ? 0.7 : 1,
+                transition: 'all 120ms ease',
+              }}
+            >
+              {isFollowed ? 'Following' : 'Follow'}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* subtle hairline base */}
