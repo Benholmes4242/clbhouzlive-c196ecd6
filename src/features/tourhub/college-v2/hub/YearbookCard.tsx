@@ -86,22 +86,24 @@ function YearbookCardInner({ standing, liveCount, onSelect, selected }: Props) {
   const alumni = standing.topAlumni.slice(0, 3);
   const surnamesLine = alumni.map((a) => surnameOf(a.name)).join(', ');
 
-  return (
-    <Link
-      to={`/tourhub/college-golf/${standing.normalizedName}`}
-      style={{
-        display: 'block',
-        padding: '12px 16px',
-        borderBottom: `0.5px solid ${HAIRLINE_INK_10}`,
-        background: cardBg,
-        border: cardBorder,
-        borderRadius: isTop ? 10 : 0,
-        margin: isTop ? '8px 8px 0' : 0,
-        textDecoration: 'none',
-        color: 'inherit',
-        fontFamily: FONT,
-      }}
-    >
+  const wrapperStyle = {
+    display: 'block',
+    width: '100%',
+    textAlign: 'left' as const,
+    padding: '12px 16px',
+    borderBottom: `0.5px solid ${HAIRLINE_INK_10}`,
+    background: cardBg,
+    border: cardBorder,
+    borderRadius: isTop || selected ? 10 : 0,
+    margin: isTop || selected ? '8px 8px 0' : 0,
+    textDecoration: 'none',
+    color: 'inherit',
+    fontFamily: FONT,
+    cursor: 'pointer',
+  };
+
+  const content = (
+    <>
       {/* Top row: rank | crest | name+sub | points */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <div
