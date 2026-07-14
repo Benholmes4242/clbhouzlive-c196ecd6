@@ -271,25 +271,7 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
             </span>
           </div>
 
-          {/* BOTTOM-RIGHT: green -2 chip */}
-          <div
-            style={{
-              position: 'absolute',
-              right: 10,
-              bottom: 10,
-              padding: '3px 9px',
-              borderRadius: 9,
-              background: '#22C55E',
-              fontSize: 13,
-              fontWeight: 900,
-              color: '#fff',
-              lineHeight: 1,
-              fontVariantNumeric: 'tabular-nums',
-              letterSpacing: '-0.01em',
-            }}
-          >
-            -2
-          </div>
+          {/* eagle badge removed - section title already conveys tier */}
         </div>
 
         {/* LIGHT FOOTER: avatar + name + hcp */}
