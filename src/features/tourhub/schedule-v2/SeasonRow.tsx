@@ -352,7 +352,7 @@ const ChampionStrip: React.FC<{
     }}
   >
     <SquircleAvatar
-      size={16}
+      size={20}
       srcCandidates={photoCandidates}
       alt={name}
       hairlineRing
@@ -414,7 +414,7 @@ const LeaderStrip: React.FC<{
     }}
   >
     <SquircleAvatar
-      size={16}
+      size={20}
       srcCandidates={photoCandidates}
       alt={name}
       hairlineRing
