@@ -337,6 +337,8 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
     onClose();
   };
 
+  // No hooks below this point - early returns above.
+
   if (saveSuccess) {
     return (
       <div style={{ position: 'fixed', inset: 0, background: '#F8FAFC', display: 'flex', flexDirection: 'column', zIndex: 12000 }}>
@@ -356,7 +358,6 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
     );
   }
 
-  const stageAddInputRef = useRef<HTMLInputElement>(null);
   const handleStageAdd = () => stageAddInputRef.current?.click();
   const handleStageAddFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
