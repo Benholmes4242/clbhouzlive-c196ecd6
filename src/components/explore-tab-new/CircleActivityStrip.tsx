@@ -330,7 +330,6 @@ function CircleActivityCard({ row, onTap }: CardProps) {
           right: 14,
           bottom: 12,
           paddingTop: 10,
-          borderTop: '1px solid rgba(255,255,255,0.12)',
           display: 'flex',
           alignItems: 'center',
           gap: 10,
