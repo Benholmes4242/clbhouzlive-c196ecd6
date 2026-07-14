@@ -12,7 +12,8 @@ import {
   REGION_TABS,
 } from './AlmanacSections';
 import { LegendaryFeatHero } from './LegendaryFeatHero';
-import { useRegionFeats, type FeatRow } from './hooks/useRegionFeats';
+import { LegendaryLeadersBoards } from './LegendaryLeadersBoards';
+import { useRegionFeats, type FeatRow, type RecordsMode } from './hooks/useRegionFeats';
 import { TierSeeAllSheet } from './TierSeeAllSheet';
 import { scrollPageToTop } from '@/lib/getScrollParent';
 
@@ -193,9 +194,10 @@ function LegendarySection({
   const rows = data ?? [];
   const hasAny = rows.length > 0;
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [mode, setMode] = useState<RecordsMode>('latest');
   if (!isLoading && !hasAny) return null;
   const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
-  const hasOverflow = rows.length > 12;
+  const hasOverflow = mode === 'latest' && rows.length > 12;
   return (
     <section style={{ fontFamily: FONT, paddingTop: SPACE.sectionSection }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: `0 ${SPACE.pagePadX}px ${SPACE.sectionHeaderContent}px` }}>
@@ -212,6 +214,7 @@ function LegendarySection({
           Aces &amp; Albatrosses
         </span>
         <span style={{ flex: 1 }} />
+        <LegendaryModeToggle mode={mode} setMode={setMode} />
         {hasOverflow && (
           <button
             type="button"
@@ -224,13 +227,18 @@ function LegendarySection({
               letterSpacing: '0.06em',
               color: '#F7931E',
               cursor: 'pointer',
+              marginLeft: 6,
             }}
           >
             ALL
           </button>
         )}
       </div>
-      <LegendaryFeatHero region={region} onRowTap={onRowTap} />
+      {mode === 'latest' ? (
+        <LegendaryFeatHero region={region} onRowTap={onRowTap} />
+      ) : (
+        <LegendaryLeadersBoards region={region} />
+      )}
       <TierSeeAllSheet
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
@@ -240,6 +248,49 @@ function LegendarySection({
         onRowTap={onRowTap}
       />
     </section>
+  );
+}
+
+function LegendaryModeToggle({
+  mode,
+  setMode,
+}: {
+  mode: RecordsMode;
+  setMode: (m: RecordsMode) => void;
+}) {
+  const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+  return (
+    <div style={{ display: 'inline-flex', flexShrink: 0, gap: 6 }}>
+      {([
+        { v: 'latest', label: 'LATEST' },
+        { v: 'alltime', label: 'ALL TIME' },
+      ] as const).map((o) => {
+        const active = mode === o.v;
+        return (
+          <button
+            key={o.v}
+            type="button"
+            onClick={() => setMode(o.v)}
+            style={{
+              padding: '6px 13px',
+              borderRadius: 999,
+              background: active ? '#15171F' : 'transparent',
+              color: active ? '#FFFFFF' : 'rgba(15,23,42,0.65)',
+              border: 'none',
+              fontFamily: FONT,
+              fontSize: 11.5,
+              fontWeight: 700,
+              cursor: 'pointer',
+              letterSpacing: '0.01em',
+              whiteSpace: 'nowrap',
+              transition: 'all .15s',
+            }}
+          >
+            {o.label}
+          </button>
+        );
+      })}
+    </div>
   );
 }
 
