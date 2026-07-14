@@ -1,4 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
+import { INK, INK_MUTE } from '@/features/courses/_shared/tokens';
+
 
 type CourseDetailTab = 'about' | 'reviews' | 'media' | 'holes' | 'legends';
 
