@@ -32,11 +32,12 @@ import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/rou
 
 interface ExploreTabContentProps {
   embedded?: boolean;
+  shellTabs?: React.ReactNode;
 }
 
 
 
-export default function ExploreTabContent({ embedded: _embedded = false }: ExploreTabContentProps) {
+export default function ExploreTabContent({ embedded: _embedded = false, shellTabs }: ExploreTabContentProps) {
   const { user } = useSupabaseSession();
   const userId = user?.id;
   const gridRef = useRef<HTMLDivElement | null>(null);
