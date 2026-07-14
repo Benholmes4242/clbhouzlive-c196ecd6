@@ -139,6 +139,23 @@ export function PlayersTab() {
     return rows.filter((r) => r.name.toLowerCase().includes(q));
   }, [ranking?.rows, debouncedSearch]);
 
+  // ── Live count from the current filtered view (tour + search)
+  const liveCount = useMemo(
+    () => filteredRows.filter((r) => (liveMap ?? {})[r.playerId]).length,
+    [filteredRows, liveMap],
+  );
+
+  // ── Sort options: hide "Playing now" when nobody is live
+  const sortOptions = useMemo<SortKey[]>(
+    () => (liveCount > 0 ? ['ranking', 'live'] : ['ranking']),
+    [liveCount],
+  );
+
+  // ── Safety: if live filter becomes empty, revert to ranking
+  useEffect(() => {
+    if (liveCount === 0 && sort === 'live') setSort('ranking');
+  }, [liveCount, sort, setSort]);
+
   // ── Ordering when "Playing now" active
   const orderedRows = useMemo<RankedRow[]>(() => {
     if (sort !== 'live') return filteredRows;
