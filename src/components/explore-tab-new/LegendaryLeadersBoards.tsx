@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { SPACE } from '@/lib/spacing';
 import { FONT } from './gamingLightTokens';
 import {
@@ -127,6 +127,9 @@ function Board({ title, accent, rows, metric }: BoardProps) {
                   srcCandidates={r.holder_avatar ? [r.holder_avatar] : []}
                   alt={name}
                   fallback={initials(name)}
+                  userId={r.user_id}
+                  hairlineRing
+                  ringColor={LIGHT_HAIRLINE}
                 />
                 <div
                   style={{
