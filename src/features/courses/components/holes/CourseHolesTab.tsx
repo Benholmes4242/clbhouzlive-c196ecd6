@@ -122,37 +122,33 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
           accent={SC_ACCENT}
           className="!mb-0"
         />
-        <div
-          style={{
-            display: 'inline-flex',
-            gap: 2,
-            background: '#F1F5F9',
-            border: `1px solid ${HAIRLINE_INK_8}`,
-            borderRadius: 999,
-            padding: 3,
-          }}
-        >
-          {([['hole', 'By hole'], ['difficulty', 'By difficulty']] as const).map(([k, l]) => (
-            <button
-              key={k}
-              onClick={() => setSort(k)}
-              style={{
-                padding: '5px 12px',
-                borderRadius: 999,
-                border: 'none',
-                fontSize: 10.5,
-                fontWeight: 800,
-                letterSpacing: '0.03em',
-                textTransform: 'uppercase',
-                cursor: 'pointer',
-                background: sort === k ? INK : 'transparent',
-                color: sort === k ? SURFACE : INK_MUTE,
-                fontFamily: FONT,
-              }}
-            >
-              {l}
-            </button>
-          ))}
+        <div style={{ display: 'inline-flex', flexShrink: 0, gap: 6 }}>
+          {([['hole', 'By hole'], ['difficulty', 'By difficulty']] as const).map(([k, l]) => {
+            const active = sort === k;
+            return (
+              <button
+                key={k}
+                type="button"
+                onClick={() => setSort(k)}
+                style={{
+                  padding: '6px 13px',
+                  borderRadius: 999,
+                  background: active ? '#15171F' : 'transparent',
+                  color: active ? '#FFFFFF' : 'rgba(15,23,42,0.65)',
+                  border: 'none',
+                  fontFamily: FONT,
+                  fontSize: 11.5,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  letterSpacing: '0.01em',
+                  whiteSpace: 'nowrap',
+                  transition: 'all .15s',
+                }}
+              >
+                {l}
+              </button>
+            );
+          })}
         </div>
       </div>
       {sorted.map((h) => (
