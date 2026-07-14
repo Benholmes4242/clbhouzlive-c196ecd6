@@ -118,13 +118,12 @@ export const RoundDetailSheet: React.FC<Props> = ({
       playerUserId={profileUserId ?? null}
       onViewProfile={onViewProfile}
       onViewCourse={onViewCourse}
-      emptyMessage={
-        userData?.hole_by_hole_fetched
-          ? 'No hole-by-hole data for this round.'
-          : 'Hole data is still syncing. Check back in a few hours.'
-      }
+      emptyVariant={emptyVariant}
+      emptyGross={grossVal}
+      emptyToPar={toParVal}
     />
   );
 };
+
 
 export default RoundDetailSheet;
