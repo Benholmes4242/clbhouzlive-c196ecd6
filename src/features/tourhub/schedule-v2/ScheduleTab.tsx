@@ -57,17 +57,21 @@ export function ScheduleTab() {
   }, []);
 
 
-  // ── Per-section tour lens (local state, All Tours allowed) ─────────────
-  // NOTE: useSeasonTimeline takes a single TourId and internally calls
-  // useQuery + enrichment hooks per tour. A cross-tour merge would require
-  // either running that hook once per tour (violates rules of hooks) or a
-  // new batch hook that fans out under a single useQuery. Both are out of
-  // scope for Phase 4, so All Tours falls back to PGA for now.
+  // Per-section tour lens (local state, All Tours allowed).
+  // Both hooks run unconditionally; we pick which result to render based on
+  // the lens value. useMergedSchedule runs ONE query across all tours and
+  // chronologically merges (Phase 5B); useSeasonTimeline keeps the single-
+  // tour path unchanged.
   const [tourLens, setTourLens] = useState<TourId | null>(null);
-  const activeTour: TourId = tourLens ?? 'pga';
+  const singleTour: TourId = tourLens ?? 'pga';
 
-  // ── Data ───────────────────────────────────────────────────────────────
-  const { data: timeline, isLoading, error } = useSeasonTimeline(activeTour);
+  const singleQuery = useSeasonTimeline(singleTour);
+  const mergedQuery = useMergedSchedule({ enabled: tourLens === null });
+  const { data: timeline, isLoading, error } =
+    tourLens === null ? mergedQuery : singleQuery;
+
+  const activeTour: TourId | 'all' = tourLens ?? 'all';
+
 
 
   // ── Auto-land on this-week/next row on mount + tour flip ───────────────
