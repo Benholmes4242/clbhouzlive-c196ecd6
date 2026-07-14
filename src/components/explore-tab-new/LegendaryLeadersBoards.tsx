@@ -127,6 +127,9 @@ function Board({ title, accent, rows, metric }: BoardProps) {
                   srcCandidates={r.holder_avatar ? [r.holder_avatar] : []}
                   alt={name}
                   fallback={initials(name)}
+                  userId={r.user_id}
+                  hairlineRing
+                  ringColor={LIGHT_HAIRLINE}
                 />
                 <div
                   style={{
