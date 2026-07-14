@@ -12,7 +12,8 @@
  */
 
 import { useMemo, useRef, useState, useEffect } from 'react';
-import { Search, X } from 'lucide-react';
+import { Search, X, Swords } from 'lucide-react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { TourHubShell } from '@/features/tourhub/components';
 import { GlassHeaderPlate } from '@/components/chrome/GlassHeaderPlate';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
@@ -28,6 +29,7 @@ import {
   SURFACE,
   WHITE_ALPHA_65,
 } from '@/features/tourhub/_shared/tokens';
+import { collegeH2HRoute } from '@/features/tourhub/routes';
 import { useFranchiseStandings } from './data/useFranchiseStandings';
 import { useLiveAlumni } from './data/useLiveAlumni';
 import { YearbookCard } from './YearbookCard';
