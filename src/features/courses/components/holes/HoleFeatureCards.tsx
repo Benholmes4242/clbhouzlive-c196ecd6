@@ -1,6 +1,7 @@
 import React from 'react';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
-import { HoleDistributionBar } from './HoleDistributionBar';
+import { SharedHoleDistributionBar } from '@/features/courses/_shared/holes/SharedHoleDistributionBar';
+import { TOPAR_OVER_LIGHT, TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
 import { FONT, INK, MONO, SC_BIRDIE, SC_DOUBLE } from './_constants';
 import { INK_MUTE } from '@/features/courses/_shared/tokens';
 
@@ -9,14 +10,72 @@ interface Props {
   easiest: CourseHole;
 }
 
+const AVG_EPSILON = 0.05;
+
+const MiniDifficultyBar: React.FC<{ avg: number; maxAbs: number }> = ({ avg, maxAbs }) => {
+  const scale = Math.max(0.01, maxAbs);
+  const magnitude = Math.min(1, Math.abs(avg) / scale) * 50;
+  const isOver = avg > AVG_EPSILON;
+  const isUnder = avg < -AVG_EPSILON;
+  return (
+    <div
+      aria-hidden
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: 4,
+        background: 'rgba(15,23,42,0.06)',
+        borderRadius: 4,
+        overflow: 'hidden',
+      }}
+    >
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: '50%',
+          width: 1,
+          background: 'rgba(15,23,42,0.14)',
+          transform: 'translateX(-0.5px)',
+        }}
+      />
+      {isUnder && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            right: '50%',
+            width: `${magnitude}%`,
+            background: TOPAR_UNDER_LIGHT,
+          }}
+        />
+      )}
+      {isOver && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: '50%',
+            width: `${magnitude}%`,
+            background: TOPAR_OVER_LIGHT,
+          }}
+        />
+      )}
+    </div>
+  );
+};
+
 const Card: React.FC<{
   tone: 'hard' | 'easy';
   label: string;
   hole: CourseHole;
-}> = ({ tone, label, hole }) => {
-  // Tint derived from the actual scoring palette
-  const tint = tone === 'hard' ? 'rgba(155,71,34,0.06)' : 'rgba(47,107,79,0.06)';
-  const border = tone === 'hard' ? 'rgba(155,71,34,0.20)' : 'rgba(47,107,79,0.20)';
+  maxAbs: number;
+}> = ({ tone, label, hole, maxAbs }) => {
+  const tint = tone === 'hard' ? 'rgba(29,93,191,0.05)' : 'rgba(210,34,45,0.05)';
+  const border = tone === 'hard' ? 'rgba(29,93,191,0.18)' : 'rgba(210,34,45,0.18)';
   const eyebrow = tone === 'hard' ? SC_DOUBLE : SC_BIRDIE;
   const playsTo = (hole.par + hole.avg_to_par).toFixed(1);
   return (
@@ -48,7 +107,7 @@ const Card: React.FC<{
         <div
           style={{
             fontSize: 40,
-            fontWeight: 300,
+            fontWeight: 200,
             color: INK,
             letterSpacing: '-0.02em',
             lineHeight: 1,
@@ -82,24 +141,37 @@ const Card: React.FC<{
           fontVariantNumeric: 'tabular-nums',
         }}
       >
-        Par {hole.par}{hole.stroke_index != null ? ` · SI ${hole.stroke_index}` : ''}
+        Par {hole.par}
+        {hole.stroke_index != null ? ` \u00B7 SI ${hole.stroke_index}` : ''}
       </div>
-      <HoleDistributionBar dist={hole.dist} height={5} />
+      <MiniDifficultyBar avg={hole.avg_to_par} maxAbs={maxAbs} />
     </div>
   );
 };
 
-export const HoleFeatureCards: React.FC<Props> = ({ hardest, easiest }) => (
-  <div
-    style={{
-      padding: '16px 16px',
-      display: 'flex',
-      gap: 12,
-    }}
-  >
-    <Card tone="hard" label="Hardest" hole={hardest} />
-    <Card tone="easy" label="Easiest" hole={easiest} />
-  </div>
-);
+export const HoleFeatureCards: React.FC<Props> = ({ hardest, easiest }) => {
+  const maxAbs = Math.max(
+    0.01,
+    Math.abs(hardest.avg_to_par),
+    Math.abs(easiest.avg_to_par),
+  );
+  return (
+    <div
+      style={{
+        padding: '16px 16px',
+        display: 'flex',
+        gap: 12,
+      }}
+    >
+      <Card tone="hard" label="Hardest" hole={hardest} maxAbs={maxAbs} />
+      <Card tone="easy" label="Easiest" hole={easiest} maxAbs={maxAbs} />
+    </div>
+  );
+};
 
 export default HoleFeatureCards;
+
+// Note: SharedHoleDistributionBar is imported above but the mini card uses a
+// diverging difficulty bar (mock spec), not the stacked distribution bar.
+// The import keeps the shared bar tree-shaken correctly.
+void SharedHoleDistributionBar;
