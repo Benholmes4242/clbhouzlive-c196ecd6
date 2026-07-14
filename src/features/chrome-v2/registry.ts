@@ -41,6 +41,13 @@ export interface ChromeSpec {
   bleed: boolean;
   /** Hide the HCP cell in the right capsule (e.g. handicap/rivalry). */
   hideHcp?: boolean;
+  /**
+   * When true, the island capsules render with `position: absolute` instead
+   * of `fixed` — they ride away with the page on scroll (TikTok/Instagram
+   * top-chrome model). The page's single sticky row (chips/tabs) locks at
+   * the notch and becomes the entire stuck header.
+   */
+  scrollAway?: boolean;
   note?: string;
 }
 

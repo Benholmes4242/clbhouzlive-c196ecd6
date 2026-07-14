@@ -412,7 +412,10 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
       <div
         data-chrome="island"
         style={{
-          position: 'fixed',
+          // scrollAway routes render the capsules in document flow (absolute),
+          // so they ride away with the page and return on scroll-up. All
+          // other routes keep the classic fixed island.
+          position: spec.scrollAway ? 'absolute' : 'fixed',
           top: 'calc(var(--sat, 0px) + 10px)',
           left: 12,
           right: 12,

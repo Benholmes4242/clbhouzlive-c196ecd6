@@ -17,11 +17,12 @@
  */
 export function GlassHeaderPlate({
   visible = true,
-  heightPx = 62,
+  heightPx = 1,
 }: {
   visible?: boolean;
-  /** Non-safe-area portion of the plate. 62 for watch/courses (island 54 + gap);
-   *  70 for tour hub (island 70). */
+  /** Non-safe-area portion of the plate. Default 1px — the plate is now a
+   *  NOTCH VEIL only; the page's single sticky row (chips/tabs) locks at
+   *  var(--sat) and owns the rest of the stuck-header footprint. */
   heightPx?: number;
 }) {
   if (!visible) return null;
