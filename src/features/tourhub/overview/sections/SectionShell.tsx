@@ -5,6 +5,7 @@
 
 import type { ReactNode } from 'react';
 import { V4 } from '../tokens';
+import { SPACE } from '@/lib/spacing';
 
 export function SectionShell({
   eyebrow,
