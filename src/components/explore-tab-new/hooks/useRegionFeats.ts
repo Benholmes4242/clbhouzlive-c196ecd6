@@ -44,12 +44,16 @@ export function useRegionFeats(
   mode: RecordsMode = 'latest',
 ) {
   const cacheRegion = toCacheRegion(region);
+  const isAllTime = mode === 'alltime';
   const railKey =
     tier === 'records'
-      ? mode === 'alltime'
+      ? isAllTime
         ? `records_alltime:${cacheRegion}`
         : `records:${cacheRegion}`
-      : `feats:${cacheRegion}:${tier}`;
+      : tier === 'birdie_hauls' && isAllTime
+        ? `feats_alltime:${cacheRegion}:birdie_hauls`
+        : `feats:${cacheRegion}:${tier}`;
+
 
   return useQuery<FeatRow[]>({
     queryKey: ['discover-rail-cache', railKey],
