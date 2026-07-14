@@ -28,6 +28,8 @@ import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 
 // ── New feed components ──
 import { CardFeed, type CardFeedHandle } from '@/components/feed/CardFeed';
+import { FeedErrorBoundary } from '@/components/feed/FeedErrorBoundary';
+import { safeInitialState } from '@/components/feed/feedSnapshot';
 import type { StateSnapshot } from 'react-virtuoso';
 
 import { FullscreenCarouselOverlay } from '@/components/media/FullscreenCarouselOverlay';
