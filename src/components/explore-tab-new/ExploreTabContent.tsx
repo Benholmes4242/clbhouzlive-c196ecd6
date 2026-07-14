@@ -91,7 +91,9 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
       <RankIdentityCard userId={userId} />
 
       {/* 3. Friends rail (region-independent) — rail owns its header */}
-      <CircleActivityStrip userId={userId} />
+      <div style={{ marginTop: SPACE.sectionSection }}>
+        <CircleActivityStrip userId={userId} />
+      </div>
 
       {/* 4. Region tabs */}
       <div style={{ marginTop: SPACE.sectionSection }}>
