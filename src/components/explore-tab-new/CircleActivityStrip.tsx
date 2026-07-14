@@ -12,6 +12,7 @@ import {
   INK_TINT_06,
 } from '@/features/courses/_shared/tokens';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
+import { useScorecardOpener } from './useScorecardOpener';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const CARD_W = 226;
