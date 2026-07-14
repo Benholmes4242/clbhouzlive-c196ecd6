@@ -147,10 +147,11 @@ interface TierProps {
   tier: FeatTier;
   title: string;
   variant?: 'standard' | 'compact' | 'list';
+  onRowTap?: (row: import('./hooks/useRegionFeats').FeatRow) => void;
 }
 
 
-function FeatTierRailInner({ region, tier, title, variant = 'standard' }: TierProps) {
+function FeatTierRailInner({ region, tier, title, variant = 'standard', onRowTap }: TierProps) {
   const navigate = useNavigate();
   const { data, isLoading } = useRegionFeats(region, tier);
   const rawRows = data ?? [];
