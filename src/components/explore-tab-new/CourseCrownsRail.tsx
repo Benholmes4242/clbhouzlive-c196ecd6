@@ -314,20 +314,26 @@ function RecordsModeToggle({
 }
 
 export function CourseCrownsRail({ region, opener }: Props) {
-  const navigate = useNavigate();
   const [mode, setMode] = useState<RecordsMode>('latest');
+  const [sheetOpen, setSheetOpen] = useState(false);
   const { data } = useRegionFeats(region, 'records', mode);
-  const rows = useMemo(() => (data ?? []).slice(0, 15), [data]);
+  const allRows = useMemo(() => data ?? [], [data]);
+  const rows = useMemo(() => allRows.slice(0, 15), [allRows]);
 
   if (rows.length === 0) return null;
+
+  const handleRowTap = (row: FeatRow) => {
+    if (row.score_id) opener?.openByScore(row.score_id, null, row.user_id);
+    else if (row.user_id) opener?.openProfile(row.user_id);
+  };
 
   return (
     <section style={{ marginTop: SPACE.sectionSection }}>
       <DiscoverSectionHeader
         eyebrow={`\u{1F451} Course Crowns \u00B7 ${regionUpperFor(region)}`}
         title="Course records"
-        linkLabel="All"
-        onLinkClick={() => navigate('/courses')}
+        linkLabel="View all"
+        onLinkClick={() => setSheetOpen(true)}
       />
       <div
         style={{
@@ -346,6 +352,14 @@ export function CourseCrownsRail({ region, opener }: Props) {
           <CrownCard key={`${row.course_id ?? i}-${i}`} row={row} opener={opener} />
         ))}
       </div>
+      <TierSeeAllSheet
+        open={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        tier="records"
+        region={region}
+        rows={allRows}
+        onRowTap={handleRowTap}
+      />
     </section>
   );
 }
