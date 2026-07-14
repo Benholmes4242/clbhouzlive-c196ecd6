@@ -224,6 +224,7 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard', onRowTap
               row={row}
               tier={tier}
               index={i}
+              medals={row.user_id ? medalsMap?.get(row.user_id) ?? null : null}
               onTap={onRowTap ? () => onRowTap(row) : undefined}
             />
           ))}
