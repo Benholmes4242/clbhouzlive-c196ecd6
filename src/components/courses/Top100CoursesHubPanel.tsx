@@ -217,173 +217,190 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
     listSummaries.find(l => l.slug === selectedList)?.total_courses ?? allCourses.length;
 
   return (
-    <div className="space-y-4">
-      {/* Editorial header — eyebrow + title + optional progress sub-line.
-          Parent already supplies px-4 — don't double-pad. */}
-      <div>
-        <SectionHeader
-          role="prime"
-          kicker="TOP 100"
-          title="The world's best"
-          cutLine={false}
-        />
-        {crossListProgress && (
-          <p
-            style={{
-              fontSize: 13,
-              fontWeight: 500,
-              color: SLATE_600,
-              margin: '6px 0 0',
-              letterSpacing: '-0.005em',
-              fontFamily: "'Geist', sans-serif",
-            }}
-          >
-            You've rated{' '}
-            <span
+    <div>
+      {/* SCOPE 1 — non-sticky: shell tabs + editorial header */}
+      <div style={{ paddingBottom: 16 }}>
+        {shellTabs}
+        <div className="px-4 pt-3">
+          {rateNudge}
+          <SectionHeader
+            role="prime"
+            kicker="TOP 100"
+            title="The world's best"
+            cutLine={false}
+          />
+          {crossListProgress && (
+            <p
               style={{
-                color: AMBER,
-                fontWeight: 700,
-                fontVariantNumeric: 'tabular-nums',
-                fontFeatureSettings: '"zero" 0',
+                fontSize: 13,
+                fontWeight: 500,
+                color: SLATE_600,
+                margin: '6px 0 0',
+                letterSpacing: '-0.005em',
+                fontFamily: "'Geist', sans-serif",
               }}
             >
-              {crossListProgress.totalRated} of {crossListProgress.totalInStartedLists}
-            </span>{' '}
-            across {crossListProgress.listsStarted} {crossListProgress.listsStarted === 1 ? 'list' : 'lists'}
-          </p>
-        )}
-      </div>
-
-      {/* List filter — canonical ink underline tabs (shared primitive) */}
-      <div style={{ padding: '0 4px' }}>
-        <UnderlineTabs
-          options={listOptions.map((o) => ({
-            id: o.value,
-            label: o.label.replace(/\s*Top 100\s*$/, '').trim() || o.label,
-          }))}
-          value={selectedList}
-          onChange={(id) => setSelectedList(id)}
-          size="sm"
-          align="center"
-          underlineColor="#15171F"
-          ariaLabel="Top 100 lists"
-        />
-      </div>
-
-
-      {/* Search bar — scrolls with content (no sticky behaviour) */}
-      <div className="-mx-4 px-4">
-        <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder={`Search the ${activeListShortLabel} Top 100`}
-            aria-label="Search within Top 100 list"
-            className="pl-10 pr-10 h-12 rounded-2xl text-base focus-visible:ring-2 focus-visible:ring-[#F7931E]/30 focus-visible:outline-none"
-            style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}` }}
-          />
-          {searchTerm && (
-            <button
-              type="button"
-              onClick={() => setSearchTerm('')}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-2.5 text-muted-foreground active:scale-[0.9] active:opacity-70 transition-all"
-              aria-label="Clear search"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Meta row — small-caps tracked label + sort selector, mirrors Explore */}
-      {!isLoading && allCourses.length > 0 && (
-        <div className="flex items-center justify-between gap-3">
-          <span style={{
-            fontSize: 13, color: INK_MUTE, flex: 1, lineHeight: 1.35,
-            fontWeight: 500,
-          }}>
-            {searchTerm ? (
-              <><strong style={{ color: INK, fontWeight: 700 }}>{allCourses.length}</strong> {allCourses.length === 1 ? 'result' : 'results'}</>
-            ) : (
-              <><strong style={{ color: INK, fontWeight: 700 }}>{totalCoursesInActiveList}</strong> courses · {activeListShortLabel}</>
-            )}
-          </span>
-          <AppSelect
-            value={sortOption}
-            onChange={(v) => setSortOption(v as Top100SortOption)}
-            options={sortOptions}
-            ariaLabel="Sort courses"
-            triggerClassName="h-8 text-[12px] px-3 active:scale-[0.98]"
-          />
-        </div>
-      )}
-
-      {/* Rankings List */}
-      <div>
-      {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-fade-in">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="space-y-3 rounded-2xl overflow-hidden" style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_7}` }}>
-              <Skeleton className="h-40 w-full rounded-xl" />
-              <div className="space-y-2">
-                <Skeleton className="h-5 w-3/4" />
-                <Skeleton className="h-4 w-1/2" />
-                <div className="flex gap-2 pt-1">
-                  <Skeleton className="h-5 w-14 rounded-lg" />
-                  <Skeleton className="h-5 w-14 rounded-lg" />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : allCourses.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-center gap-4 animate-fade-in">
-          <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto">
-            {searchTerm ? (
-              <Search className="w-5 h-5 text-muted-foreground" />
-            ) : (
-              <Award className="w-5 h-5 text-muted-foreground" />
-            )}
-          </div>
-          <div className="space-y-1">
-            <h3 className="text-sm font-semibold text-foreground">
-              {searchTerm ? 'No courses found' : 'No courses match your filters'}
-            </h3>
-            <p className="text-sm text-muted-foreground max-w-xs">
-              {searchTerm 
-                ? `No courses matching "${searchTerm}" in this Top 100 list.`
-                : 'Try choosing a different Top 100 list.'}
+              You've rated{' '}
+              <span
+                style={{
+                  color: AMBER,
+                  fontWeight: 700,
+                  fontVariantNumeric: 'tabular-nums',
+                  fontFeatureSettings: '"zero" 0',
+                }}
+              >
+                {crossListProgress.totalRated} of {crossListProgress.totalInStartedLists}
+              </span>{' '}
+              across {crossListProgress.listsStarted} {crossListProgress.listsStarted === 1 ? 'list' : 'lists'}
             </p>
-          </div>
-          {searchTerm ? (
-            <button
-              onClick={() => setSearchTerm('')}
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium active:scale-[0.97] transition-transform"
-              style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
-
-            >
-              <X className="h-3.5 w-3.5" />
-              Clear search
-            </button>
-          ) : (
-            <button
-              onClick={handleResetFilters}
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium active:scale-[0.97] transition-transform"
-              style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
-            >
-              Reset filters
-            </button>
           )}
         </div>
-      ) : (
-        <VirtualizedCourseList 
-          courses={allCourses}
-          onCourseClick={handleCourseClick}
-          activeListSlug={selectedList}
-          showGhostRank={true}
-        />
-      )}
+      </div>
+
+      {/* SCOPE 2 — sticky pills row + rest */}
+      <div>
+        {/* Sticky list filter pills — full-bleed glass row */}
+        <div
+          className="sticky -mx-4"
+          style={{
+            top: 'var(--sat, 0px)',
+            zIndex: 10,
+            background: 'rgba(248,250,252,0.72)',
+            backdropFilter: 'blur(14px)',
+            WebkitBackdropFilter: 'blur(14px)',
+            borderBottom: '1px solid rgba(0,0,0,0.07)',
+            padding: '8px 0 10px',
+            marginTop: -1,
+          }}
+        >
+          <div className="px-4">
+            <FilterChips
+              options={listOptions.map((o) => ({
+                id: o.value,
+                label: o.label.replace(/\s*Top 100\s*$/, '').trim() || o.label,
+              }))}
+              value={selectedList}
+              onChange={(id) => setSelectedList(id)}
+              ariaLabel="Top 100 lists"
+            />
+          </div>
+        </div>
+
+        <div className="px-4 space-y-4 pt-4">
+          {/* Search bar — non-sticky */}
+          <div className="-mx-4 px-4">
+            <div className="relative">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder={`Search the ${activeListShortLabel} Top 100`}
+                aria-label="Search within Top 100 list"
+                className="pl-10 pr-10 h-12 rounded-2xl text-base focus-visible:ring-2 focus-visible:ring-[#F7931E]/30 focus-visible:outline-none"
+                style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}` }}
+              />
+              {searchTerm && (
+                <button
+                  type="button"
+                  onClick={() => setSearchTerm('')}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2.5 text-muted-foreground active:scale-[0.9] active:opacity-70 transition-all"
+                  aria-label="Clear search"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Meta row */}
+          {!isLoading && allCourses.length > 0 && (
+            <div className="flex items-center justify-between gap-3">
+              <span style={{
+                fontSize: 13, color: INK_MUTE, flex: 1, lineHeight: 1.35,
+                fontWeight: 500,
+              }}>
+                {searchTerm ? (
+                  <><strong style={{ color: INK, fontWeight: 700 }}>{allCourses.length}</strong> {allCourses.length === 1 ? 'result' : 'results'}</>
+                ) : (
+                  <><strong style={{ color: INK, fontWeight: 700 }}>{totalCoursesInActiveList}</strong> courses · {activeListShortLabel}</>
+                )}
+              </span>
+              <AppSelect
+                value={sortOption}
+                onChange={(v) => setSortOption(v as Top100SortOption)}
+                options={sortOptions}
+                ariaLabel="Sort courses"
+                triggerClassName="h-8 text-[12px] px-3 active:scale-[0.98]"
+              />
+            </div>
+          )}
+
+          {/* Rankings List */}
+          <div>
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-fade-in">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="space-y-3 rounded-2xl overflow-hidden" style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_7}` }}>
+                  <Skeleton className="h-40 w-full rounded-xl" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-5 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                    <div className="flex gap-2 pt-1">
+                      <Skeleton className="h-5 w-14 rounded-lg" />
+                      <Skeleton className="h-5 w-14 rounded-lg" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : allCourses.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center gap-4 animate-fade-in">
+              <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto">
+                {searchTerm ? (
+                  <Search className="w-5 h-5 text-muted-foreground" />
+                ) : (
+                  <Award className="w-5 h-5 text-muted-foreground" />
+                )}
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-sm font-semibold text-foreground">
+                  {searchTerm ? 'No courses found' : 'No courses match your filters'}
+                </h3>
+                <p className="text-sm text-muted-foreground max-w-xs">
+                  {searchTerm
+                    ? `No courses matching "${searchTerm}" in this Top 100 list.`
+                    : 'Try choosing a different Top 100 list.'}
+                </p>
+              </div>
+              {searchTerm ? (
+                <button
+                  onClick={() => setSearchTerm('')}
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium active:scale-[0.97] transition-transform"
+                  style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
+                >
+                  <X className="h-3.5 w-3.5" />
+                  Clear search
+                </button>
+              ) : (
+                <button
+                  onClick={handleResetFilters}
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium active:scale-[0.97] transition-transform"
+                  style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
+                >
+                  Reset filters
+                </button>
+              )}
+            </div>
+          ) : (
+            <VirtualizedCourseList
+              courses={allCourses}
+              onCourseClick={handleCourseClick}
+              activeListSlug={selectedList}
+              showGhostRank={true}
+            />
+          )}
+          </div>
+        </div>
       </div>
     </div>
   );
