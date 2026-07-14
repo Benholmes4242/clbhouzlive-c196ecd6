@@ -169,7 +169,7 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard' }: TierPr
       {isLoading ? (
         <div
           className="flex gap-3 px-4 overflow-x-auto scrollbar-hide"
-          style={{ paddingTop: 4, marginTop: -4, paddingBottom: 16, marginBottom: -16 }}>
+          style={{ paddingBottom: SPACE.sectionSection }}>
           {[0, 1].map((i) => (
             <div
               key={i}
@@ -274,7 +274,7 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard' }: TierPr
       ) : (
         <div
           className="flex gap-3 px-4 overflow-x-auto scrollbar-hide"
-          style={{ paddingTop: 4, marginTop: -4, paddingBottom: 16, marginBottom: -16 }}>
+          style={{ paddingBottom: SPACE.sectionSection }}>
           {displayRows.map((row, i) => (
             <FeatCard
               key={`${row.score_id ?? row.course_id ?? i}-${i}`}
