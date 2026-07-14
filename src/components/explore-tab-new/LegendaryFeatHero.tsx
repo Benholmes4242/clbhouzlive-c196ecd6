@@ -57,12 +57,15 @@ interface Props {
 export function LegendaryFeatHero({ region, onRowTap }: Props) {
   const { data, isLoading } = useRegionFeats(region, 'legendary');
   const rows = data ?? [];
+  const total = rows.length;
   const [index, setIndex] = useState(0);
 
-  const safeIndex = rows.length ? index % rows.length : 0;
+  const safeIndex = total ? index % total : 0;
   const row = rows[safeIndex];
+  const nextRow = total > 1 ? rows[(safeIndex + 1) % total] : null;
 
   const image = row?.course_image ?? row?.thumbnail_image ?? null;
+  const nextImage = nextRow?.course_image ?? nextRow?.thumbnail_image ?? null;
   const holder = useMemo(() => formatHolderName(row?.holder_name), [row?.holder_name]);
   const when = relDate(row?.play_date ?? row?.attained_at ?? null);
   const chip = labelFor(row?.feat_type);
