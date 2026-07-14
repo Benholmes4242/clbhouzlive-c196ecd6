@@ -61,7 +61,7 @@ interface CardProps {
   onTap: () => void;
 }
 
-function HeroCard({ row, isSolo, showPager, indexLabel, onTap }: CardProps) {
+function HeroCard({ row, showPager, indexLabel, onTap }: CardProps) {
   const image = row.course_image ?? row.thumbnail_image ?? null;
   const holder = formatHolderName(row.holder_name);
   const when = relDate(row.play_date ?? row.attained_at ?? null);
@@ -74,10 +74,7 @@ function HeroCard({ row, isSolo, showPager, indexLabel, onTap }: CardProps) {
       onClick={onTap}
       className="text-left active:scale-[0.995] transition-transform"
       style={{
-        flex: '0 0 auto',
-        width: isSolo ? '100%' : '90%',
-        scrollSnapAlign: 'start',
-        scrollSnapStop: 'always',
+        width: '100%',
         position: 'relative',
         height: HERO_H,
         borderRadius: 18,
