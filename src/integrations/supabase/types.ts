@@ -2361,6 +2361,7 @@ export type Database = {
       }
       college_media: {
         Row: {
+          brand_hex: string | null
           college_name: string
           country: string | null
           created_at: string | null
@@ -2372,6 +2373,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          brand_hex?: string | null
           college_name: string
           country?: string | null
           created_at?: string | null
@@ -2383,6 +2385,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          brand_hex?: string | null
           college_name?: string
           country?: string | null
           created_at?: string | null

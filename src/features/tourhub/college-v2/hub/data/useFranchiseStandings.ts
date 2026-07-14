@@ -34,6 +34,7 @@ export interface YearbookStanding {
   collegeName: string;
   shortName: string | null;
   logoUrl: string | null;
+  brandHex: string | null;
   pointsTotal: number;
   alumniCount: number;
   winsTotal: number;
