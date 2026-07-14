@@ -64,9 +64,14 @@ export function CrownCard({ row, opener }: { row: FeatRow; opener?: ScorecardOpe
   const showDelta =
     !isStableford && row.course_par != null && numericValue != null;
   const delta = showDelta ? numericValue! - (row.course_par as number) : 0;
-  const deltaLabel =
-    delta === 0 ? 'E' : delta < 0 ? `-${Math.abs(delta)}` : `+${delta}`;
+  const deltaText =
+    delta === 0
+      ? 'even par'
+      : delta < 0
+        ? `${Math.abs(delta)} under par`
+        : `${delta} over par`;
   const deltaColor = delta < 0 ? '#D2222D' : '#FFFFFF';
+
 
   return (
     <button
@@ -138,43 +143,57 @@ export function CrownCard({ row, opener }: { row: FeatRow; opener?: ScorecardOpe
         >
           {scoreValue}
         </div>
-      </div>
-
-      <div
-        style={{
-          marginTop: 6,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          minWidth: 0,
-        }}
-      >
-        <div
-          style={{
-            fontSize: 12,
-            fontWeight: 700,
-            color: 'rgba(255,255,255,0.5)',
-            lineHeight: 1,
-            letterSpacing: '0.02em',
-          }}
-        >
-          {isStableford ? 'STABLEFORD' : null}
-        </div>
         {showDelta ? (
           <div
             style={{
-              fontSize: 14,
-              fontWeight: 800,
-              color: deltaColor,
-              lineHeight: 1,
-              letterSpacing: '-0.02em',
-              fontVariantNumeric: 'tabular-nums',
+              flex: delta === 0 ? 1 : 0,
+              display: 'flex',
+              justifyContent: delta === 0 ? 'center' : 'flex-end',
+              alignItems: 'baseline',
+              minWidth: 0,
             }}
           >
-            {deltaLabel}
+            <span
+              style={{
+                fontSize: 13,
+                fontWeight: 800,
+                color: deltaColor,
+                lineHeight: 1,
+                letterSpacing: '-0.02em',
+                fontVariantNumeric: 'tabular-nums',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {deltaText}
+            </span>
           </div>
         ) : null}
       </div>
+
+      {isStableford ? (
+        <div
+          style={{
+            marginTop: 6,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            minWidth: 0,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 12,
+              fontWeight: 700,
+              color: 'rgba(255,255,255,0.5)',
+              lineHeight: 1,
+              letterSpacing: '0.02em',
+            }}
+          >
+            STABLEFORD
+          </div>
+        </div>
+      ) : null}
+
 
       <div
         style={{
