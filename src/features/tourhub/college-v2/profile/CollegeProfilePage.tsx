@@ -27,6 +27,7 @@ import { useLiveAlumni } from '@/features/tourhub/college-v2/hub/data/useLiveAlu
 import { Masthead } from './sections/Masthead';
 import { ThisWeek } from './sections/ThisWeek';
 import { TheClass } from './sections/TheClass';
+import { scrollPageToTop } from '@/lib/getScrollParent';
 
 export function CollegeProfilePage() {
   const { collegeSlug } = useParams<{ collegeSlug: string }>();
@@ -37,7 +38,7 @@ export function CollegeProfilePage() {
 
   // Scroll to top when slug changes.
   useEffect(() => {
-    if (typeof window !== 'undefined') window.scrollTo(0, 0);
+    scrollPageToTop('auto');
   }, [slug]);
 
   const standing = useMemo(
