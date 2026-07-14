@@ -95,6 +95,7 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
   const S = SIZE_MAP[size];
   const isLegendary = tier === 'legendary';
   const isRecord = tier === 'records';
+  const isCompactEagle = size === 'compact' && tier === 'eagles';
   const image = row.course_image ?? row.thumbnail_image ?? null;
   const holder = formatHolderName(row.holder_name);
   const accent = ACCENT[tier];
@@ -126,6 +127,99 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
   }, [isRecord, row.category, row.feat_value, row.value]);
 
   const when = relDate(row.play_date ?? row.attained_at ?? null);
+
+  // Eagles compact variant now renders on a light editorial card per the
+  // gaming-light Discover rebuild (Part 3E).
+  if (isCompactEagle) {
+    const LAUREL_INK = '#0e8a57';
+    return (
+      <button
+        type="button"
+        onClick={onTap}
+        className="text-left active:scale-[0.99] transition-transform"
+        style={{
+          position: 'relative',
+          flexShrink: 0,
+          width: 170,
+          borderRadius: 14,
+          background: '#fff',
+          border: '1px solid rgba(15,23,42,0.07)',
+          padding: 12,
+          cursor: 'pointer',
+          fontFamily: FONT,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 4,
+        }}
+      >
+        <span
+          style={{
+            fontSize: 8.5,
+            fontWeight: 800,
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            color: LAUREL_INK,
+            lineHeight: 1,
+          }}
+        >
+          EAGLE
+        </span>
+        <div
+          style={{
+            fontSize: 20,
+            fontWeight: 900,
+            color: '#0F172A',
+            letterSpacing: '-0.02em',
+            fontVariantNumeric: 'tabular-nums',
+            lineHeight: 1,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {heroValue || '—'}
+        </div>
+        <div
+          style={{
+            fontSize: 9.5,
+            color: '#94A3B8',
+            lineHeight: 1.2,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {row.course_name}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
+          <SquircleAvatar
+            size={15}
+            src={row.holder_avatar}
+            alt={holder}
+            fallback={initials(holder)}
+            hairlineRing
+          />
+          <div
+            style={{
+              flex: 1,
+              minWidth: 0,
+              fontSize: 10,
+              fontWeight: 700,
+              color: '#334155',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {holder}
+            {when ? (
+              <span style={{ color: '#94A3B8', fontWeight: 500 }}> · {when.toLowerCase()}</span>
+            ) : null}
+          </div>
+        </div>
+      </button>
+    );
+  }
 
   const boxShadow = isLegendary
     ? '0 0 0 1px #FBBC2E55, 0 4px 12px rgba(0,0,0,0.20)'
