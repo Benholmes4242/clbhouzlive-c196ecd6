@@ -21,11 +21,12 @@ const SIZE_MAP: Record<FeatCardSize, {
     courseFs: 11, holderFs: 12, whenFs: 9.5,
   },
   compact: {
-    w: 158, h: 112,
-    value: 19, label: 8.5, avatar: 16,
-    padX: 10, padY: 10,
-    heroBottom: 34, footerBottom: 8, footerPadTop: 6,
-    courseFs: 9.5, holderFs: 10.5, whenFs: 8.5,
+    // Eagles rail — bumped 15% from prior compact spec (w158/h112).
+    w: 182, h: 129,
+    value: 22, label: 9.8, avatar: 18,
+    padX: 12, padY: 12,
+    heroBottom: 39, footerBottom: 9, footerPadTop: 7,
+    courseFs: 11, holderFs: 12, whenFs: 10,
   },
 };
 
