@@ -297,24 +297,13 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
         )}
 
         {loading ? (
-          <div style={{ padding: '28px 16px 40px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <div style={{ height: 12, width: '40%', borderRadius: 6, background: 'rgba(15,23,42,0.06)' }} />
-            <div style={{ display: 'flex', gap: 3 }}>
-              {[...Array(9)].map((_, i) => (
-                <div key={i} style={{ flex: 1, height: 58, borderRadius: 8, background: 'rgba(15,23,42,0.06)' }} />
-              ))}
-            </div>
-            <div style={{ display: 'flex', gap: 3 }}>
-              {[...Array(9)].map((_, i) => (
-                <div key={i} style={{ flex: 1, height: 58, borderRadius: 8, background: 'rgba(15,23,42,0.06)' }} />
-              ))}
-            </div>
-          </div>
+          <SkeletonMiddle nineHole={!!nineHole} />
+        ) : holes.length === 0 && emptyVariant === 'nohbh' ? (
+          <NohbhMiddle gross={emptyGross ?? null} toPar={emptyToPar ?? null} />
         ) : holes.length === 0 ? (
-          <div style={{ padding: '30px 16px 40px', textAlign: 'center', color: SECONDARY, fontSize: 13 }}>
-            {emptyMessage ?? 'No hole-by-hole data yet.'}
-          </div>
+          <SyncingMiddle nineHole={!!nineHole} />
         ) : (
+
           <>
             {showTrajectory && (
               <div style={{ margin: 16, padding: '12px 12px 6px', background: '#FFFFFF', borderRadius: 14, border: `1px solid ${HAIRLINE}` }}>
