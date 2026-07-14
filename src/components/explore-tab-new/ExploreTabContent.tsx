@@ -63,7 +63,7 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
       <CircleActivityStrip userId={userId} />
 
       {/* Spacer between friends rail and region tabs */}
-      <div style={{ height: 16 }} />
+      <div style={{ height: 32 }} />
 
 
       {/* Region tabs — shared control driving tiers and grid */}
