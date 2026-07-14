@@ -212,6 +212,7 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard', onRowTap
               row={row}
               tier={tier}
               index={i}
+              onTap={onRowTap ? () => onRowTap(row) : undefined}
             />
           ))}
         </div>
@@ -225,6 +226,7 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard', onRowTap
               row={row}
               tier={tier}
               size={variant === 'compact' ? 'compact' : 'default'}
+              onTap={onRowTap ? () => onRowTap(row) : undefined}
             />
           ))}
         </div>
@@ -237,7 +239,9 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard', onRowTap
         tier={tier}
         region={region}
         rows={rows}
+        onRowTap={onRowTap}
       />
+
     </section>
   );
 }
