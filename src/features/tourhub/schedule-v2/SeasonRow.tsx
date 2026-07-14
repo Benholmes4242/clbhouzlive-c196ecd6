@@ -9,7 +9,7 @@
  * reserved for majors only.
  */
 import React from 'react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '../_shared/resolvePlayerAvatar';
 import type { SeasonEvent } from './useSeasonTimeline';
 import { TOUR_LABEL } from '../_shared/tourOrder';
@@ -355,6 +355,8 @@ const ChampionStrip: React.FC<{
       size={16}
       srcCandidates={photoCandidates}
       alt={name}
+      hairlineRing
+      ringColor={LIGHT_HAIRLINE}
     />
     <span
       style={{
@@ -415,7 +417,8 @@ const LeaderStrip: React.FC<{
       size={16}
       srcCandidates={photoCandidates}
       alt={name}
-      
+      hairlineRing
+      ringColor={LIGHT_HAIRLINE}
     />
     <span
       style={{
