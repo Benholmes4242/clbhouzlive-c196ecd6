@@ -409,7 +409,7 @@ export function LeaderboardTab() {
       <div
         style={{
           position: 'sticky',
-          top: 0,
+          top: 'var(--sat, 0px)',
           zIndex: 2,
           display: 'flex',
           alignItems: 'center',

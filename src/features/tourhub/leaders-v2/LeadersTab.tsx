@@ -154,7 +154,7 @@ export function LeadersTab() {
       <div
         style={{
           position: 'sticky',
-          top: 'calc(var(--sat, 0px) + 69px)',
+          top: 'var(--sat, 0px)',
           zIndex: 10,
           background: 'rgba(248,250,252,0.72)',
           backdropFilter: 'blur(14px)',

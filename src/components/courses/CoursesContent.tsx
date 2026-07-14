@@ -335,7 +335,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
           <div
             className="sticky"
             style={{
-              top: 'calc(var(--sat, 0px) + 61px)',
+              top: 'var(--sat, 0px)',
               zIndex: 30,
               background: 'rgba(248,250,252,0.72)',
               backdropFilter: 'blur(14px)',
