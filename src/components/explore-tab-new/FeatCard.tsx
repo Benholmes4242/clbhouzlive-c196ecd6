@@ -204,7 +204,7 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
             fontWeight: 800,
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
-            color: isLegendary ? accent : '#F7931E',
+            color: isLegendary ? accent : isEagle ? '#FFFFFF' : '#F7931E',
             lineHeight: 1,
           }}
         >
