@@ -200,7 +200,7 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
               gap: 4,
             }}
           >
-            {null}
+            
             <div
               style={{
                 fontSize: 12.5,
