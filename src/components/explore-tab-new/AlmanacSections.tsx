@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { FeatCard } from './FeatCard';
 import { FeatListRow } from './FeatListRow';
-import { useRegionFeats, type FeatTier } from './hooks/useRegionFeats';
+import { useRegionFeats, type FeatTier, type RecordsMode } from './hooks/useRegionFeats';
 import { useWallLevels } from '@/hooks/gam/useWallLevels';
 import { AMBER, INK, INK_TINT_06 } from '@/features/courses/_shared/tokens';
 import { TierSeeAllSheet } from './TierSeeAllSheet';
@@ -158,9 +158,60 @@ interface TierProps {
 }
 
 
+function BirdieHaulsModeToggle({
+  mode,
+  setMode,
+}: {
+  mode: RecordsMode;
+  setMode: (m: RecordsMode) => void;
+}) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'flex-end',
+        padding: `0 ${SPACE.pagePadX}px 10px`,
+      }}
+    >
+      <div style={{ display: 'inline-flex', flexShrink: 0, gap: 6 }}>
+        {([
+          { v: 'latest', label: 'LATEST' },
+          { v: 'alltime', label: 'ALL TIME' },
+        ] as const).map((o) => {
+          const active = mode === o.v;
+          return (
+            <button
+              key={o.v}
+              type="button"
+              onClick={() => setMode(o.v)}
+              style={{
+                padding: '6px 13px',
+                borderRadius: 999,
+                background: active ? '#15171F' : 'transparent',
+                color: active ? '#FFFFFF' : 'rgba(15,23,42,0.65)',
+                border: 'none',
+                fontFamily: FONT,
+                fontSize: 11.5,
+                fontWeight: 700,
+                cursor: 'pointer',
+                letterSpacing: '0.01em',
+                whiteSpace: 'nowrap',
+                transition: 'all .15s',
+              }}
+            >
+              {o.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function FeatTierRailInner({ region, tier, title, variant = 'standard', onRowTap }: TierProps) {
   const navigate = useNavigate();
-  const { data, isLoading } = useRegionFeats(region, tier);
+  const [mode, setMode] = useState<RecordsMode>('latest');
+  const { data, isLoading } = useRegionFeats(region, tier, mode);
   const rawRows = data ?? [];
   const rows = variant === 'list'
     ? [...rawRows].sort((a, b) => {
@@ -194,6 +245,8 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard', onRowTap
   // silence unused
   void navigate;
 
+  const showModeToggle = tier === 'birdie_hauls';
+
   return (
     <section style={{ fontFamily: FONT, paddingTop: SPACE.sectionSection }}>
       <AlmanacHead
@@ -201,6 +254,12 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard', onRowTap
         icon={TIER_ICON[tier]}
         onSeeAll={hasOverflow ? () => setSheetOpen(true) : undefined}
       />
+
+      {showModeToggle ? (
+        <BirdieHaulsModeToggle mode={mode} setMode={setMode} />
+      ) : null}
+
+
 
 
       {isLoading ? (
