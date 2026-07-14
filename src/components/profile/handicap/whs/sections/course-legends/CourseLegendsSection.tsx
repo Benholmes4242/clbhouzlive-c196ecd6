@@ -28,52 +28,66 @@ interface Props {
   friendName?: string | null;
 }
 
+export type WindowToggleVariant = 'dark' | 'light';
+
 export const WindowToggle: React.FC<{
   window: LegendWindow;
   setWindow: (w: LegendWindow) => void;
-}> = ({ window, setWindow }) => (
-  <div
-    style={{
-      display: 'inline-flex',
-      flexShrink: 0,
-      gap: 2,
-      background: 'rgba(255,255,255,0.04)',
-      border: '1px solid var(--hcp-line)',
-      borderRadius: 999,
-      padding: 2,
-    }}
-  >
-    {([
-      { v: 'all_time', label: 'ALL TIME' },
-      { v: '90d', label: '90D' },
-    ] as const).map((o) => {
-      const active = window === o.v;
-      return (
-        <button
-          key={o.v}
-          type="button"
-          onClick={() => setWindow(o.v)}
-          style={{
-            padding: '4px 10px',
-            borderRadius: 999,
-            background: active ? 'rgba(255,255,255,0.12)' : 'transparent',
-            color: active ? 'var(--hcp-t-100)' : 'var(--hcp-t-60)',
-            border: 'none',
-            fontFamily: FONT,
-            fontSize: 10.5,
-            fontWeight: 800,
-            cursor: 'pointer',
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {o.label}
-        </button>
-      );
-    })}
-  </div>
-);
+  variant?: WindowToggleVariant;
+}> = ({ window, setWindow, variant = 'dark' }) => {
+  const isLight = variant === 'light';
+  return (
+    <div
+      style={{
+        display: 'inline-flex',
+        flexShrink: 0,
+        gap: 6,
+      }}
+    >
+      {([
+        { v: 'all_time', label: 'ALL TIME' },
+        { v: '90d', label: '90D' },
+      ] as const).map((o) => {
+        const active = window === o.v;
+        const background = active
+          ? isLight
+            ? '#15171F'
+            : 'rgba(255,255,255,0.92)'
+          : 'transparent';
+        const color = active
+          ? isLight
+            ? '#FFFFFF'
+            : '#0F172A'
+          : isLight
+            ? 'rgba(15,23,42,0.65)'
+            : 'rgba(255,255,255,0.75)';
+        return (
+          <button
+            key={o.v}
+            type="button"
+            onClick={() => setWindow(o.v)}
+            style={{
+              padding: '6px 13px',
+              borderRadius: 999,
+              background,
+              color,
+              border: 'none',
+              fontFamily: FONT,
+              fontSize: 11.5,
+              fontWeight: 700,
+              cursor: 'pointer',
+              letterSpacing: '0.01em',
+              whiteSpace: 'nowrap',
+              transition: 'all .15s',
+            }}
+          >
+            {o.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+};
 
 
 const SectionHero: React.FC<{

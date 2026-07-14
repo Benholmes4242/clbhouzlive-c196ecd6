@@ -1,7 +1,7 @@
 import React from 'react';
 import { Crown, type LucideIcon } from 'lucide-react';
 import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
-import { WindowToggle } from '../CourseLegendsSection';
+import { WindowToggle, type WindowToggleVariant } from '../CourseLegendsSection';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 
 export interface CabinetSlot {
@@ -16,6 +16,7 @@ interface CrownCabinetProps {
   heldCount: number;
   window: LegendWindow;
   onWindowChange: (w: LegendWindow) => void;
+  toggleVariant?: WindowToggleVariant;
 }
 
 const HELD_LABEL = 'var(--hcp-gold-text)';
@@ -26,6 +27,7 @@ export const CrownCabinet: React.FC<CrownCabinetProps> = ({
   heldCount,
   window,
   onWindowChange,
+  toggleVariant = 'dark',
 }) => {
   const cols = slots.length || 6;
   const orderedSlots = [...slots].sort((a, b) => Number(b.held) - Number(a.held));
@@ -132,7 +134,7 @@ export const CrownCabinet: React.FC<CrownCabinetProps> = ({
         })}
       </div>
       <div style={{ marginTop: 12, display: 'flex', justifyContent: 'flex-start' }}>
-        <WindowToggle window={window} setWindow={onWindowChange} />
+        <WindowToggle window={window} setWindow={onWindowChange} variant={toggleVariant} />
       </div>
     </div>
   );

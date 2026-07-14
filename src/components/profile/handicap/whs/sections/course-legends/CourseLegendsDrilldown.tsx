@@ -336,7 +336,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
       {!isLoading && !isError && (data ?? []).length > 0 && !activeWindowHasData && (
         <>
           <div style={{ padding: '16px 16px 4px' }}>
-            <WindowToggle window={window} setWindow={handleWindowChange} />
+            <WindowToggle window={window} setWindow={handleWindowChange} variant={theme === 'light' ? 'light' : 'dark'} />
           </div>
           <ChampionsWindowEmptyState
             window={window}
@@ -357,6 +357,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
             heldCount={youOwnedCount}
             window={window}
             onWindowChange={handleWindowChange}
+            toggleVariant={theme === 'light' ? 'light' : 'dark'}
           />
 
 
