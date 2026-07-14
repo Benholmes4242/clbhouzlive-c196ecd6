@@ -126,18 +126,7 @@ function Board({ title, accent, rows, metric }: BoardProps) {
                   size={26}
                   srcCandidates={r.holder_avatar ? [r.holder_avatar] : []}
                   alt={name}
-                  fallback={
-                    <span
-                      style={{
-                        fontSize: 9,
-                        fontWeight: 800,
-                        color: INK,
-                        letterSpacing: '0.04em',
-                      }}
-                    >
-                      {initials(name)}
-                    </span>
-                  }
+                  fallback={initials(name)}
                 />
                 <div
                   style={{
