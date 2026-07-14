@@ -28,6 +28,8 @@ import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 
 // ── New feed components ──
 import { CardFeed, type CardFeedHandle } from '@/components/feed/CardFeed';
+import { FeedErrorBoundary } from '@/components/feed/FeedErrorBoundary';
+import { safeInitialState } from '@/components/feed/feedSnapshot';
 import type { StateSnapshot } from 'react-virtuoso';
 
 import { FullscreenCarouselOverlay } from '@/components/media/FullscreenCarouselOverlay';
@@ -156,6 +158,13 @@ const ClubhouseContent = () => {
   // snapshot BEFORE flipping activeTab (the keyed remount tears down the
   // instance, which makes a post-flip capture impossible).
   const cardFeedRef = useRef<CardFeedHandle | null>(null);
+  // Per-tab last-known posts length. When a feed shrinks (PTR trims, cache
+  // eviction, refetch resets) below the snapshot's referenced ranges,
+  // restoring the snapshot crashes Virtuoso. Evict the snapshot in that
+  // case so the tab remounts fresh.
+  const lastPostsLenRef = useRef<Record<string, number>>({});
+  // Bumped on error-boundary recovery to force a fresh CardFeed remount.
+  const [feedResetKey, setFeedResetKey] = useState(0);
 
 
 
@@ -211,6 +220,20 @@ const ClubhouseContent = () => {
 
   // ── Lifecycle ──
   useClubhouseLifecycle();
+
+  // ── Snapshot integrity ──
+  // If the active tab's posts array shrinks materially between renders,
+  // the previously captured Virtuoso snapshot may reference indices that
+  // no longer exist. Restoring it would iterate an undefined item and
+  // crash on `.index`. Evict on shrink so the next mount is fresh.
+  useEffect(() => {
+    const last = lastPostsLenRef.current[activeTab] ?? 0;
+    const curr = posts.length;
+    if (curr < last) {
+      virtuosoSnapshots.current[activeTab] = undefined;
+    }
+    lastPostsLenRef.current[activeTab] = curr;
+  }, [activeTab, posts.length]);
   
   // ── Active post derivation ──
   const { activePost, golfCourse, activeReview, isActiveReview, isActiveVideo } = useActivePostDerived(posts, activeIndex);
@@ -572,34 +595,49 @@ const ClubhouseContent = () => {
         )
       ) : posts.length > 0 ? (
         <>
-          <CardFeed
-            ref={cardFeedRef}
-            key={activeTab}
-            tab={activeTab}
-            initialState={virtuosoSnapshots.current[activeTab]}
-            onSnapshot={(s) => { virtuosoSnapshots.current[activeTab] = s; }}
-            posts={posts}
-            topPadding={'calc(env(safe-area-inset-top, 0px) + 70px)'}
-            onNearEnd={handleNearEnd}
-            hasNextPage={hasNextPage}
-            onLike={(post) => handleLike(post)}
-            onComment={(post) => openComments(post)}
-            onShare={(post) => handleShare(post)}
-            onProfile={(post) => navigate(getActorRouteByType(post.actorType, post.actorId), { state: post.actorType === 'business' ? { source: 'feed' } : undefined })}
-            onCourse={(post) => post.courseId && navigate(`/courses/${post.courseId}`)}
-            onReviewTap={(post) => handleReviewTap(post)}
-            getLikeState={(post) => {
-              const s = getActiveLikeState(post);
-              if (!s) return null;
-              return { liked: s.isLiked, count: s.count ?? post.likeCount ?? 0 };
+          <FeedErrorBoundary
+            resetKey={`${activeTab}:${feedResetKey}`}
+            onRecover={() => {
+              // Evict the offending snapshot and force a fresh remount.
+              virtuosoSnapshots.current[activeTab] = undefined;
+              setFeedResetKey((k) => k + 1);
             }}
-            getCommentCount={(post) => getCommentCount(post)}
-            onFollow={handleFollow}
-            currentUserId={user?.id}
-            onRefresh={handleRefresh}
-            isRefreshing={activeFeed.isRefetching}
-            onFirstContentReady={signalFirstContentReady}
-          />
+          >
+            <CardFeed
+              ref={cardFeedRef}
+              key={`${activeTab}:${feedResetKey}`}
+              tab={activeTab}
+              initialState={safeInitialState(virtuosoSnapshots.current[activeTab], posts.length)}
+              onSnapshot={(s) => { virtuosoSnapshots.current[activeTab] = s; }}
+              posts={posts}
+              topPadding={'calc(env(safe-area-inset-top, 0px) + 70px)'}
+              onNearEnd={handleNearEnd}
+              hasNextPage={hasNextPage}
+              onLike={(post) => handleLike(post)}
+              onComment={(post) => openComments(post)}
+              onShare={(post) => handleShare(post)}
+              onProfile={(post) => navigate(getActorRouteByType(post.actorType, post.actorId), { state: post.actorType === 'business' ? { source: 'feed' } : undefined })}
+              onCourse={(post) => post.courseId && navigate(`/courses/${post.courseId}`)}
+              onReviewTap={(post) => handleReviewTap(post)}
+              getLikeState={(post) => {
+                const s = getActiveLikeState(post);
+                if (!s) return null;
+                return { liked: s.isLiked, count: s.count ?? post.likeCount ?? 0 };
+              }}
+              getCommentCount={(post) => getCommentCount(post)}
+              onFollow={handleFollow}
+              currentUserId={user?.id}
+              onRefresh={() => {
+                // PTR — the list may be trimmed/rebuilt. Drop the active
+                // tab's snapshot so we don't restore stale ranges after
+                // the refetch resolves.
+                virtuosoSnapshots.current[activeTab] = undefined;
+                return handleRefresh();
+              }}
+              isRefreshing={activeFeed.isRefetching}
+              onFirstContentReady={signalFirstContentReady}
+            />
+          </FeedErrorBoundary>
         </>
       ) : (
         // Guard: only render skeleton while feed is actually loading.
