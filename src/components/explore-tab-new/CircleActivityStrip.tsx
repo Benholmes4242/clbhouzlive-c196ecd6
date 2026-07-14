@@ -86,7 +86,7 @@ interface Props {
 
 export function CircleActivityStrip({ userId }: Props) {
   const { data, isLoading } = useCircleActivity(userId);
-  const [sheet, setSheet] = useState<{ scoreId: string; connectionId: string } | null>(null);
+  const { target, openByScore, close } = useScorecardOpener();
 
   const rows = useMemo(() => data ?? [], [data]);
 
