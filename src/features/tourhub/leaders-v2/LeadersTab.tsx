@@ -131,7 +131,7 @@ export function LeadersTab() {
               fontVariantNumeric: 'tabular-nums',
             }}
           >
-            {tourLabel} {'\u00B7'} {year}
+            {tourLabel}
           </span>
         </div>
 
