@@ -51,6 +51,7 @@ function CrownCard({ row }: { row: FeatRow }) {
     row.value != null ? String(row.value) : row.feat_value ?? '--';
   const hasHcp = row.holder_hcp != null;
   const club = (row.holder_club ?? '').trim();
+  const avatarSrc = row.holder_avatar ?? null;
 
   return (
     <button
@@ -61,156 +62,190 @@ function CrownCard({ row }: { row: FeatRow }) {
       className="text-left active:scale-[0.99] transition-transform"
       style={{
         flexShrink: 0,
-        width: 300,
-        minHeight: 168,
+        width: 230,
         borderRadius: 18,
         background: CARD_BG,
         border: 'none',
         cursor: 'pointer',
         fontFamily: FONT,
-        display: 'flex',
         overflow: 'hidden',
         boxShadow: '0 4px 16px rgba(15,23,42,0.12)',
-        padding: 0,
+        padding: '16px 17px 15px',
       }}
     >
-      {/* LEFT: course + score */}
       <div
         style={{
-          flex: 1.4,
-          padding: '14px 14px 14px 16px',
+          fontSize: 9.5,
+          fontWeight: 800,
+          letterSpacing: '0.1em',
+          color: GOLD,
+          lineHeight: 1,
+        }}
+      >
+        {'\u{1F451} COURSE RECORD'}
+      </div>
+
+      <div
+        style={{
+          marginTop: 8,
+          fontSize: 13,
+          fontWeight: 700,
+          color: 'rgba(255,255,255,0.75)',
+          lineHeight: 1.2,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {row.course_name}
+      </div>
+
+      <div
+        style={{
+          marginTop: 10,
           display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
+          alignItems: 'baseline',
+          gap: 6,
           minWidth: 0,
         }}
       >
-        <div style={{ minWidth: 0 }}>
-          <div
-            style={{
-              fontSize: 9.5,
-              fontWeight: 800,
-              letterSpacing: '0.1em',
-              color: GOLD,
-              lineHeight: 1,
-            }}
-          >
-            {'\u{1F451} COURSE RECORD'}
-          </div>
-          <div
-            style={{
-              marginTop: 6,
-              fontSize: 12.5,
-              fontWeight: 700,
-              color: 'rgba(255,255,255,0.75)',
-              lineHeight: 1.2,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {row.course_name}
-          </div>
+        <div
+          style={{
+            fontSize: 52,
+            fontWeight: 900,
+            color: '#fff',
+            letterSpacing: '-0.03em',
+            lineHeight: 1,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {scoreValue}
         </div>
-        <div style={{ minWidth: 0 }}>
-          <div
-            style={{
-              fontSize: 60,
-              fontWeight: 900,
-              color: '#fff',
-              letterSpacing: '-0.04em',
-              lineHeight: 0.9,
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            {scoreValue}
-          </div>
-          <div
-            style={{
-              marginTop: 4,
-              fontSize: 11,
-              fontWeight: 700,
-              color: 'rgba(255,255,255,0.5)',
-              letterSpacing: '0.08em',
-              lineHeight: 1,
-            }}
-          >
-            {scoreLabel}
-          </div>
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            color: 'rgba(255,255,255,0.5)',
+            lineHeight: 1,
+          }}
+        >
+          {scoreLabel}
         </div>
       </div>
 
-      {/* RIGHT: player rail */}
       <div
         style={{
-          flex: 0.85,
-          background:
-            'linear-gradient(180deg, #FBBC2E18, rgba(255,255,255,0.02))',
-          borderLeft: '1px solid #FBBC2E33',
-          padding: '14px 10px',
+          marginTop: 14,
+          paddingTop: 13,
+          borderTop: '1px solid rgba(255,255,255,0.08)',
           display: 'flex',
-          flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'center',
-          gap: 8,
+          gap: 12,
           minWidth: 0,
         }}
       >
-        <SquircleAvatar
-          size={56}
-          src={row.holder_avatar ?? null}
-          alt={holder}
-          fallback={initials(holder)}
-          hairlineRing
-          ringColor={GOLD}
-        />
         <div
           style={{
-            fontSize: 14,
-            fontWeight: 800,
-            color: '#fff',
-            textAlign: 'center',
-            lineHeight: 1.15,
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
+            width: 36,
+            height: 36,
+            borderRadius: 12,
             overflow: 'hidden',
-            wordBreak: 'break-word',
-            width: '100%',
+            flexShrink: 0,
+            boxShadow: '0 0 0 2px #FBBC2E',
           }}
         >
-          {holder}
+          {avatarSrc ? (
+            <SquircleAvatar
+              size={36}
+              src={avatarSrc}
+              alt={holder}
+              fallback={initials(holder)}
+              hideRing
+            />
+          ) : (
+            <div
+              style={{
+                width: '100%',
+                height: '100%',
+                background: 'rgba(255,255,255,0.12)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 12,
+                fontWeight: 700,
+                color: 'rgba(255,255,255,0.6)',
+              }}
+            >
+              {initials(holder)}
+            </div>
+          )}
         </div>
-        {hasHcp ? (
+
+        <div
+          style={{
+            minWidth: 0,
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+            justifyContent: 'center',
+          }}
+        >
           <div
             style={{
-              fontSize: 12,
-              fontWeight: 800,
-              color: GOLD,
-              lineHeight: 1,
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            {formatHcp(row.holder_hcp)}
-          </div>
-        ) : null}
-        {club ? (
-          <div
-            style={{
-              fontSize: 10,
-              fontWeight: 500,
-              color: 'rgba(255,255,255,0.5)',
-              lineHeight: 1.1,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
+              display: 'flex',
+              alignItems: 'baseline',
+              gap: 6,
               whiteSpace: 'nowrap',
-              width: '100%',
-              textAlign: 'center',
+              minWidth: 0,
             }}
           >
-            {club}
+            <span
+              style={{
+                fontSize: 13.5,
+                fontWeight: 800,
+                color: '#fff',
+                lineHeight: 1.2,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                minWidth: 0,
+              }}
+            >
+              {holder}
+            </span>
+            {hasHcp ? (
+              <span
+                style={{
+                  fontSize: 13.5,
+                  fontWeight: 800,
+                  color: GOLD,
+                  lineHeight: 1.2,
+                  flexShrink: 0,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {formatHcp(row.holder_hcp)}
+              </span>
+            ) : null}
           </div>
-        ) : null}
+          {club ? (
+            <div
+              style={{
+                fontSize: 10.5,
+                fontWeight: 500,
+                color: 'rgba(255,255,255,0.5)',
+                lineHeight: 1.2,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                minWidth: 0,
+              }}
+            >
+              {club}
+            </div>
+          ) : null}
+        </div>
       </div>
     </button>
   );
