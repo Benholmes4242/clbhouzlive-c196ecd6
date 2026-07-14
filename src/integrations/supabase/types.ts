@@ -17632,6 +17632,14 @@ export type Database = {
           poster_url: string
         }[]
       }
+      get_global_medal_rank: {
+        Args: { p_user_id: string }
+        Returns: {
+          global_rank: number
+          medals: number
+          total_players: number
+        }[]
+      }
       get_handicap_improvement_leaderboard: {
         Args: {
           p_club_id?: string
