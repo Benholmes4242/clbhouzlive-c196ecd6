@@ -20,6 +20,7 @@ import { OnTheCourseSlot } from '../overview-v3/OnTheCourseSlot';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { WifiOff } from 'lucide-react';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
+import { SPACE } from '@/lib/spacing';
 
 
 export function OverviewPageV3() {
