@@ -83,7 +83,7 @@ function HeroCard({ row, showPager, indexLabel, onTap }: CardProps) {
         background: image ? '#07080C' : '#0A0C10',
         cursor: 'pointer',
         fontFamily: FONT,
-        boxShadow: `0 0 0 1px ${GOLD}66, 0 6px 20px rgba(0,0,0,0.3)`,
+        boxShadow: '0 4px 16px rgba(15,23,42,0.12)',
       }}
     >
       {image ? (
@@ -106,14 +106,14 @@ function HeroCard({ row, showPager, indexLabel, onTap }: CardProps) {
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'linear-gradient(155deg, rgba(10,12,16,0.72), rgba(10,12,16,0.90))',
+          background: 'linear-gradient(155deg, rgba(10,12,16,0.35), rgba(10,12,16,0.72))',
         }}
       />
       <div
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'radial-gradient(ellipse at 85% 20%, #FBBC2E26, transparent 55%)',
+          background: 'radial-gradient(ellipse at 85% 20%, #FBBC2E1F, transparent 55%)',
           pointerEvents: 'none',
         }}
       />
@@ -292,18 +292,8 @@ export function LegendaryFeatHero({ region, onRowTap }: Props) {
     <div>
       <div
         ref={trackRef}
-        style={{
-          display: 'flex',
-          gap: 9,
-          overflowX: isSolo ? 'hidden' : 'auto',
-          scrollSnapType: isSolo ? 'none' : 'x mandatory',
-          WebkitOverflowScrolling: 'touch',
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-          paddingLeft: 16,
-          paddingRight: 16,
-        }}
-        className="[&::-webkit-scrollbar]:hidden"
+        className="flex overflow-x-auto scrollbar-hide [&::-webkit-scrollbar]:hidden"
+        style={{ padding: '0 16px', gap: 9 }}
       >
         {rows.map((row, i) => (
           <div
@@ -313,10 +303,9 @@ export function LegendaryFeatHero({ region, onRowTap }: Props) {
               cardRefs.current[i] = el;
             }}
             style={{
-              flex: '0 0 auto',
-              width: isSolo ? '100%' : '90%',
-              scrollSnapAlign: 'start',
-              scrollSnapStop: 'always',
+              flexShrink: 0,
+              width: isSolo ? 'calc(100% - 0px)' : '86%',
+              maxWidth: isSolo ? undefined : 340,
             }}
           >
             <HeroCard
