@@ -98,11 +98,13 @@ const CAT_LABELS: { key: CategoryKey; label: string }[] = [
 function Ghost({
   width,
   height,
+  pal,
   radius = RV2.ghostRadius,
   style,
 }: {
   width: number | string;
   height: number;
+  pal: Palette;
   radius?: number;
   style?: React.CSSProperties;
 }) {
@@ -114,14 +116,15 @@ function Ghost({
         width,
         height,
         borderRadius: radius,
-        background: RV2.ghost,
+        background: pal.ghost,
+        border: pal.ghostBorder ? `1px solid ${pal.ghostBorder}` : undefined,
         ...style,
       }}
     />
   );
 }
 
-function ClampedReviewText({ text }: { text: string }) {
+function ClampedReviewText({ text, pal }: { text: string; pal: Palette }) {
   const textRef = React.useRef<HTMLDivElement | null>(null);
   const [isClamped, setIsClamped] = React.useState(false);
 
@@ -138,7 +141,7 @@ function ClampedReviewText({ text }: { text: string }) {
         style={{
           fontSize: REVIEW_FONT_SIZE,
           lineHeight: REVIEW_LINE_HEIGHT,
-          color: T_INK,
+          color: pal.ink,
           display: '-webkit-box',
           WebkitLineClamp: REVIEW_CLAMP_LINES,
           WebkitBoxOrient: 'vertical',
@@ -156,9 +159,8 @@ function ClampedReviewText({ text }: { text: string }) {
             right: 0,
             bottom: 0,
             paddingLeft: 64,
-            background:
-              'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 38%)',
-            color: T_MUTE,
+            background: `linear-gradient(90deg, ${pal.clampFadeStart} 0%, ${pal.clampFadeEnd} 38%)`,
+            color: pal.mute,
             fontSize: 13,
             fontWeight: 600,
             lineHeight: REVIEW_LINE_HEIGHT,
@@ -172,6 +174,8 @@ function ClampedReviewText({ text }: { text: string }) {
     </div>
   );
 }
+
+
 
 export function LivePreviewCard({
 
