@@ -22,6 +22,7 @@ export interface FeatRow {
   value?: number | string;
   attained_at?: string;
   thumbnail_image?: string | null;
+  course_par?: number | null;
 }
 
 const CACHE_REGION: Record<string, string> = {
