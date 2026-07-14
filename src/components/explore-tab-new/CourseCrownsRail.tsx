@@ -144,42 +144,14 @@ function CrownCard({ row }: { row: FeatRow }) {
           minWidth: 0,
         }}
       >
-        <div
-          style={{
-            width: 36,
-            height: 36,
-            borderRadius: 12,
-            overflow: 'hidden',
-            flexShrink: 0,
-            boxShadow: '0 0 0 2px #FBBC2E',
-          }}
-        >
-          {avatarSrc ? (
-            <SquircleAvatar
-              size={36}
-              src={avatarSrc}
-              alt={holder}
-              fallback={initials(holder)}
-              hideRing
-            />
-          ) : (
-            <div
-              style={{
-                width: '100%',
-                height: '100%',
-                background: 'rgba(255,255,255,0.12)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 12,
-                fontWeight: 700,
-                color: 'rgba(255,255,255,0.6)',
-              }}
-            >
-              {initials(holder)}
-            </div>
-          )}
-        </div>
+        <SquircleAvatar
+          size={36}
+          src={avatarSrc}
+          alt={holder}
+          fallback={initials(holder)}
+          hairlineRing
+          ringColor={GOLD}
+        />
 
         <div
           style={{
