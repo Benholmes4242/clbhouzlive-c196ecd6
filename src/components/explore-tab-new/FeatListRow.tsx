@@ -51,7 +51,7 @@ interface Props {
 }
 
 // Birdie hauls leaderboard row - gaming-light Discover rebuild spec 3F.
-export function FeatListRow({ row, onTap, index = 0 }: Props) {
+export function FeatListRow({ row, onTap, index = 0, medals }: Props) {
   const holder = useMemo(() => formatHolderName(row.holder_name), [row.holder_name]);
   const value = (row.feat_value ?? (row.value != null ? String(row.value) : '')).replace(/[^\d.]/g, '') || '—';
   const when = relDate(row.play_date ?? row.attained_at ?? null);
