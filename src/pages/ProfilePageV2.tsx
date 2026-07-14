@@ -46,6 +46,8 @@ import { useSetChromeLeftOverride } from '@/features/chrome-v2/leftOverride';
 
 
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
+import { useWallLevels } from '@/hooks/gam/useWallLevels';
+import { TierGem } from '@/components/shared/TierGem';
 import {
   DropdownMenu,
   DropdownMenuContent,
