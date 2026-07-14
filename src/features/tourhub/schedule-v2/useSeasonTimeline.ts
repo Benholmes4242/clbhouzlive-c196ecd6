@@ -161,6 +161,10 @@ export type EventState = 'completed' | 'live' | 'upcoming';
 
 export interface SeasonEvent {
   id: string;
+  /** Canonical tour slug for the row. Populated only in All Tours (merged)
+   *  mode so SeasonRow can render a per-row tour chip. Undefined in single-
+   *  tour mode where the header/context already communicates the tour. */
+  tourSlug?: TourId;
   name: string;
   venueName: string | null;
   venueCity: string | null;
