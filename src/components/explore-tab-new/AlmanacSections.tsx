@@ -158,7 +158,7 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard' }: TierPr
   const goToClaim = () => navigate('/handicap');
 
   return (
-    <section style={{ fontFamily: FONT, paddingTop: 24 }}>
+    <section style={{ fontFamily: FONT, paddingTop: 32 }}>
       <AlmanacHead
         title={title}
         icon={TIER_ICON[tier]}
