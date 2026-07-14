@@ -130,18 +130,6 @@ export function LeadersTab() {
             gap: 8,
           }}
         >
-          <span
-            style={{
-              fontSize: 11,
-              fontWeight: 700,
-              color: INK_MUTE,
-              letterSpacing: '0.02em',
-              textTransform: 'uppercase',
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            {tourLabel}
-          </span>
         </div>
 
       </div>
