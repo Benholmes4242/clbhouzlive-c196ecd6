@@ -23,8 +23,8 @@ export function SectionShell({
   rightMeta?: ReactNode;
 }) {
   return (
-    <section style={{ padding: '24px 0 4px' }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', padding: '0 16px', marginBottom: 12 }}>
+    <section style={{ padding: '0 0 4px' }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', padding: `0 ${SPACE.pagePadX}px`, marginBottom: SPACE.sectionHeaderContent }}>
         <span style={{ fontSize: 10.5, fontWeight: 800, color: eyebrowColor ?? V4.amber, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
           {eyebrow}
         </span>
