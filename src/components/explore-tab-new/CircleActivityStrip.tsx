@@ -224,13 +224,14 @@ function CircleActivityCard({ row, onTap }: CardProps) {
         />
       ) : null}
 
-      {/* Heavy dark veil - photo becomes texture */}
+      {/* Light dark veil - matches Aces & Albatrosses card scrim so the
+          course photo stays legible instead of being crushed. */}
       <div
         style={{
           position: 'absolute',
           inset: 0,
           background:
-            'linear-gradient(155deg, rgba(10,12,16,0.72), rgba(10,12,16,0.90))',
+            'linear-gradient(155deg, rgba(10,12,16,0.35), rgba(10,12,16,0.72))',
         }}
       />
 

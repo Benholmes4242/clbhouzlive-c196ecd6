@@ -129,201 +129,8 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
 
   const when = relDate(row.play_date ?? row.attained_at ?? null);
 
-  // Eagles-only: "Photo-crest" card. Photo hero + light footer.
-  if (isEagle) {
-    const heroText = (heroValue || '').trim();
-    const holeDigits = /\d+/.exec(heroText);
-    const holeNumber = holeDigits ? holeDigits[0] : '';
-    const hcpVal = row.holder_hcp;
-    const hasHcp = hcpVal !== null && hcpVal !== undefined && Number.isFinite(Number(hcpVal));
-    return (
-      <button
-        type="button"
-        onClick={onTap}
-        className="text-left active:scale-[0.99] transition-transform"
-        style={{
-          position: 'relative',
-          flexShrink: 0,
-          width: 220,
-          borderRadius: 18,
-          background: '#fff',
-          overflow: 'hidden',
-          padding: 0,
-          cursor: 'pointer',
-          fontFamily: FONT,
-          boxShadow: '0 2px 14px rgba(15,23,42,0.09)',
-          border: 'none',
-        }}
-      >
-        {/* PHOTO HERO */}
-        <div
-          style={{
-            position: 'relative',
-            width: '100%',
-            height: 116,
-            background: image ? undefined : 'linear-gradient(150deg, #6b8a5a, #3a4a2f)',
-          }}
-        >
-          {image ? (
-            <img
-              src={image}
-              alt=""
-              loading="lazy"
-              style={{
-                position: 'absolute',
-                inset: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                display: 'block',
-              }}
-            />
-          ) : null}
-          {/* Dark scrim for legibility */}
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              background: 'linear-gradient(180deg, rgba(0,0,0,0.15), rgba(0,0,0,0.4))',
-            }}
-          />
+  // Eagles now share the Aces & Albatrosses full-bleed photo card below.
 
-          {/* TOP-LEFT: crest pill + course + timestamp */}
-          <div
-            style={{
-              position: 'absolute',
-              top: 10,
-              left: 10,
-              right: 10,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 4,
-            }}
-          >
-            
-            <div
-              style={{
-                fontSize: 12.5,
-                fontWeight: 700,
-                color: '#fff',
-                lineHeight: 1.2,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                textShadow: '0 1px 2px rgba(0,0,0,0.35)',
-              }}
-            >
-              {row.course_name}
-            </div>
-            {when ? (
-              <div
-                style={{
-                  fontSize: 10.5,
-                  fontWeight: 600,
-                  color: 'rgba(255,255,255,0.75)',
-                  lineHeight: 1,
-                  letterSpacing: '0.04em',
-                  textTransform: 'uppercase',
-                  textShadow: '0 1px 2px rgba(0,0,0,0.35)',
-                }}
-              >
-                {when}
-              </div>
-            ) : null}
-          </div>
-
-          {/* BOTTOM-LEFT: HOLE label + big hole number */}
-          <div
-            style={{
-              position: 'absolute',
-              left: 10,
-              bottom: 8,
-              display: 'flex',
-              alignItems: 'baseline',
-              gap: 6,
-            }}
-          >
-            <span
-              style={{
-                fontSize: 9.5,
-                fontWeight: 700,
-                letterSpacing: '0.12em',
-                color: 'rgba(255,255,255,0.8)',
-                textTransform: 'uppercase',
-                lineHeight: 1,
-                textShadow: '0 1px 2px rgba(0,0,0,0.35)',
-              }}
-            >
-              HOLE
-            </span>
-            <span
-              style={{
-                fontSize: 30,
-                fontWeight: 900,
-                color: '#fff',
-                lineHeight: 1,
-                fontVariantNumeric: 'tabular-nums',
-                letterSpacing: '-0.02em',
-                textShadow: '0 2px 6px rgba(0,0,0,0.45)',
-              }}
-            >
-              {holeNumber || '-'}
-            </span>
-          </div>
-
-          {/* eagle badge removed - section title already conveys tier */}
-        </div>
-
-        {/* LIGHT FOOTER: avatar + name + hcp */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 9,
-            padding: '11px 13px',
-            background: '#fff',
-          }}
-        >
-          <SquircleAvatar
-            size={26}
-            src={row.holder_avatar}
-            alt={holder}
-            fallback={initials(holder)}
-            hairlineRing
-          />
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div
-              style={{
-                fontSize: 12.5,
-                fontWeight: 800,
-                color: '#0F172A',
-                lineHeight: 1.2,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {holder}
-            </div>
-            {hasHcp ? (
-              <div
-                style={{
-                  marginTop: 2,
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: '#64748B',
-                  lineHeight: 1.1,
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {formatHcp(hcpVal)}
-              </div>
-            ) : null}
-          </div>
-        </div>
-      </button>
-    );
-  }
 
 
 
@@ -370,13 +177,14 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
         />
       ) : null}
 
-      {/* Heavy dark veil - photo becomes texture */}
+      {/* Light dark veil - matches Aces & Albatrosses scrim so the course
+          photo stays visible. */}
       <div
         style={{
           position: 'absolute',
           inset: 0,
           background:
-            'linear-gradient(155deg, rgba(10,12,16,0.72), rgba(10,12,16,0.90))',
+            'linear-gradient(155deg, rgba(10,12,16,0.35), rgba(10,12,16,0.72))',
         }}
       />
 
