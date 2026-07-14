@@ -118,6 +118,24 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
         {/* Identity column ─ flex */}
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+            {event.tourSlug && (
+              <span
+                style={{
+                  fontSize: 8.5,
+                  fontWeight: 800,
+                  letterSpacing: '0.16em',
+                  color: INK_MUTE,
+                  padding: '2px 6px',
+                  borderRadius: 4,
+                  background: 'rgba(15,23,42,0.05)',
+                  textTransform: 'uppercase',
+                  lineHeight: 1,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {TOUR_LABEL[event.tourSlug] ?? event.tourSlug}
+              </span>
+            )}
             <span
               style={{
                 fontSize: 13,
@@ -132,6 +150,7 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
             {event.isMajor && <MajorChip />}
             {event.isPlayoff && !event.isMajor && <PlayoffChip />}
           </div>
+
 
           {(event.venueName || event.venueCity) && (
             <div
