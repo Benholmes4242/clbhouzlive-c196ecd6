@@ -19,12 +19,15 @@ export interface TourIslandLeftProps {
   label: string;
   onMenuTap: () => void;
   onPickerTap: () => void;
+  /** When false, the tour label/picker trigger is hidden; only the menu remains. */
+  showPicker?: boolean;
 }
 
 export const TourIslandLeft: React.FC<TourIslandLeftProps> = ({
   label,
   onMenuTap,
   onPickerTap,
+  showPicker = true,
 }) => {
   return (
     <div
@@ -53,46 +56,50 @@ export const TourIslandLeft: React.FC<TourIslandLeftProps> = ({
         <Menu size={15} color={INK} strokeWidth={2.2} />
       </button>
 
-      <span
-        aria-hidden
-        style={{
-          width: 1,
-          height: 18,
-          background: DIVIDER,
-          flexShrink: 0,
-        }}
-      />
+      {showPicker && (
+        <>
+          <span
+            aria-hidden
+            style={{
+              width: 1,
+              height: 18,
+              background: DIVIDER,
+              flexShrink: 0,
+            }}
+          />
 
-      <button
-        type="button"
-        aria-label={`Switch tour — current ${label}`}
-        aria-haspopup="dialog"
-        onClick={onPickerTap}
-        style={{
-          background: 'none',
-          border: 'none',
-          padding: 0,
-          cursor: 'pointer',
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 5,
-          fontFamily: 'Geist, system-ui, sans-serif',
-        }}
-        className="active:scale-[0.96]"
-      >
-        <span
-          style={{
-            fontSize: 12.5,
-            fontWeight: 700,
-            letterSpacing: '0.02em',
-            color: INK,
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {label}
-        </span>
-        <ChevronDown size={10} color={CHEVRON} strokeWidth={2.4} aria-hidden />
-      </button>
+          <button
+            type="button"
+            aria-label={`Switch tour — current ${label}`}
+            aria-haspopup="dialog"
+            onClick={onPickerTap}
+            style={{
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+              fontFamily: 'Geist, system-ui, sans-serif',
+            }}
+            className="active:scale-[0.96]"
+          >
+            <span
+              style={{
+                fontSize: 12.5,
+                fontWeight: 700,
+                letterSpacing: '0.02em',
+                color: INK,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {label}
+            </span>
+            <ChevronDown size={10} color={CHEVRON} strokeWidth={2.4} aria-hidden />
+          </button>
+        </>
+      )}
     </div>
   );
 };

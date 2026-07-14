@@ -46,16 +46,26 @@ function TourHubChromeBridge({
   const [menuOpen, setMenuOpen] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const label = useTourShortLabel();
+  const isOverview = activeTab === 'overview';
+
+  // Auto-close the picker if the user leaves the overview tab while it is open.
+  useEffect(() => {
+    if (!isOverview && pickerOpen) setPickerOpen(false);
+  }, [isOverview, pickerOpen]);
 
   const slot = useMemo(
     () => (
       <TourIslandLeft
         label={label}
         onMenuTap={() => setMenuOpen(true)}
-        onPickerTap={() => setPickerOpen(true)}
+        onPickerTap={() => {
+          // Picker is scoped to the overview tab only.
+          if (isOverview) setPickerOpen(true);
+        }}
+        showPicker={isOverview}
       />
     ),
-    [label],
+    [label, isOverview],
   );
   useSetChromeLeftSlot(slot);
 
@@ -74,7 +84,9 @@ function TourHubChromeBridge({
         onProfile={onProfile}
         onSignOut={onSignOut}
       />
-      <TourPickerSheet open={pickerOpen} onClose={() => setPickerOpen(false)} />
+      {isOverview && (
+        <TourPickerSheet open={pickerOpen} onClose={() => setPickerOpen(false)} />
+      )}
     </>
   );
 }
