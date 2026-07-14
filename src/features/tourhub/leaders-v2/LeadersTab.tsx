@@ -164,7 +164,7 @@ export function LeadersTab() {
 
       {/* Boards feed */}
       {isLoading ? (
-        <div>
+        <div style={{ padding: '16px 0 88px' }}>
           {Array.from({ length: 3 }).map((_, i) => (
             <Skeleton
               key={i}
