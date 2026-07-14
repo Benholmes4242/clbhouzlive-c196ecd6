@@ -31,10 +31,11 @@ export interface UnderlineTabsProps<T extends string> {
 }
 
 const SIZES = {
-  sm: { gap: 20, padding: '10px 4px 8px', fontSize: 13, underline: 1.5 },
-  md: { gap: 28, padding: '12px 6px 10px', fontSize: 16, underline: 2 },
-  lg: { gap: 34, padding: '14px 7px 12px', fontSize: 19, underline: 3 },
+  sm: { gap: 20, padding: '10px 4px 8px', fontSize: 13 },
+  md: { gap: 28, padding: '12px 6px 10px', fontSize: 16 },
+  lg: { gap: 34, padding: '14px 7px 12px', fontSize: 19 },
 } as const;
+
 
 export function UnderlineTabs<T extends string>({
   options,
