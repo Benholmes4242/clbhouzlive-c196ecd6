@@ -31,6 +31,8 @@ import {
 import { useFranchiseStandings } from './data/useFranchiseStandings';
 import { useLiveAlumni } from './data/useLiveAlumni';
 import { YearbookCard } from './YearbookCard';
+import { useHeroTint } from './logoColor';
+
 
 export function CollegeHubPage() {
   const { data, isLoading } = useFranchiseStandings();
