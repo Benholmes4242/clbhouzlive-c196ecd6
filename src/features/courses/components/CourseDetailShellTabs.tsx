@@ -1,4 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
+import { INK, INK_MUTE } from '@/features/courses/_shared/tokens';
+
 
 type CourseDetailTab = 'about' | 'reviews' | 'media' | 'holes' | 'legends';
 
@@ -22,8 +24,9 @@ interface CourseDetailShellTabsProps {
 
 /**
  * CourseDetailShellTabs — Canonical 4-tab strip for /courses/:courseId.
- * Mirrors TourHubShellTabs / CoursesShellTabs spec: dark #0A0E14 surface,
- * 44px tall, 14px Geist text, weight 600/700, label-width 1.5px white
+ * Mirrors shared UnderlineTabs spec: ink active text (#0F172A),
+ * muted inactive (#64748B). Charcoal (#15171F) reserved for underline bar.
+
  * underline, tabs distributed evenly across the row.
  */
 export const CourseDetailShellTabs: React.FC<CourseDetailShellTabsProps> = ({
@@ -82,7 +85,7 @@ export const CourseDetailShellTabs: React.FC<CourseDetailShellTabsProps> = ({
                 padding: '0 4px',
                 fontSize: 14,
                 fontWeight: isActive ? 700 : 600,
-                color: isActive ? '#0A0E14' : '#64748B',
+                color: isActive ? INK : INK_MUTE,
                 background: 'transparent',
                 border: 'none',
                 letterSpacing: '-0.005em',
