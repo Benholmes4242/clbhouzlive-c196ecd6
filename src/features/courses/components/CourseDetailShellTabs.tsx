@@ -24,8 +24,9 @@ interface CourseDetailShellTabsProps {
 
 /**
  * CourseDetailShellTabs — Canonical 4-tab strip for /courses/:courseId.
- * Mirrors TourHubShellTabs / CoursesShellTabs spec: dark #0A0E14 surface,
- * 44px tall, 14px Geist text, weight 600/700, label-width 1.5px white
+ * Mirrors shared UnderlineTabs spec: ink active text (#0F172A),
+ * muted inactive (#64748B). Charcoal (#15171F) reserved for underline bar.
+
  * underline, tabs distributed evenly across the row.
  */
 export const CourseDetailShellTabs: React.FC<CourseDetailShellTabsProps> = ({
