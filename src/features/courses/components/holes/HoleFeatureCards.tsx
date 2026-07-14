@@ -1,6 +1,5 @@
 import React from 'react';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
-import { SharedHoleDistributionBar } from '@/features/courses/_shared/holes/SharedHoleDistributionBar';
 import { TOPAR_OVER_LIGHT, TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
 import { FONT, INK, MONO, SC_BIRDIE, SC_DOUBLE } from './_constants';
 import { INK_MUTE } from '@/features/courses/_shared/tokens';
