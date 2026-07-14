@@ -97,22 +97,29 @@ export function ToughestCoursesRail() {
   const rows = data ?? [];
   if (rows.length === 0) return null;
   return (
-    <div
-      className="flex overflow-x-auto scrollbar-hide"
-      style={{ padding: '0 16px', gap: 9 }}
-    >
-      {rows.map((c, i) => (
-        <ToughCard
-          key={c.course_id}
-          rank={i + 1}
-          courseId={c.course_id}
-          courseName={c.course_name}
-          avgOverPar={c.avg_over_par}
-          totalRounds={c.total_rounds}
-        />
-      ))}
-    </div>
+    <section style={{ marginTop: SPACE.sectionSection }}>
+      <DiscoverSectionHeader
+        eyebrow="Toughest courses"
+        title="Where scores go to die"
+      />
+      <div
+        className="flex overflow-x-auto scrollbar-hide"
+        style={{ padding: '0 16px', gap: 9 }}
+      >
+        {rows.map((c, i) => (
+          <ToughCard
+            key={c.course_id}
+            rank={i + 1}
+            courseId={c.course_id}
+            courseName={c.course_name}
+            avgOverPar={c.avg_over_par}
+            totalRounds={c.total_rounds}
+          />
+        ))}
+      </div>
+    </section>
   );
 }
 
 export default ToughestCoursesRail;
+
