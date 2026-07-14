@@ -291,6 +291,25 @@ function YearbookCardInner({ standing, liveCount, onSelect, selected }: Props) {
       )}
       {/* Suppress unused-var lint noise for AMBER/GOLD imports used in future variants. */}
       <span style={{ display: 'none' }} aria-hidden data-a={AMBER} data-g={GOLD} />
+    </>
+  );
+
+  if (onSelect) {
+    return (
+      <button
+        type="button"
+        onClick={() => onSelect(standing.normalizedName)}
+        aria-pressed={selected ? true : false}
+        style={{ ...wrapperStyle, appearance: 'none' }}
+      >
+        {content}
+      </button>
+    );
+  }
+
+  return (
+    <Link to={`/tourhub/college-golf/${standing.normalizedName}`} style={wrapperStyle}>
+      {content}
     </Link>
   );
 }
