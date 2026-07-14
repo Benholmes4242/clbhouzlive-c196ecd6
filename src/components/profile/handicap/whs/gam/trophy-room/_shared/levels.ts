@@ -41,8 +41,21 @@ export const WALL_LEVELS: readonly WallLevel[] = [
   { level: 7, medalsRequired: 33, material: 'diamond', sub: 'I', label: 'Diamond I' },
   { level: 8, medalsRequired: 40, material: 'diamond', sub: 'II', label: 'Diamond II' },
   { level: 9, medalsRequired: 47, material: 'obsidian', sub: 'I', label: 'Obsidian I' },
-  { level: 10, medalsRequired: 55, material: 'obsidian', sub: 'II', label: 'Obsidian II' },
+  { level: 10, medalsRequired: 55, material: 'obsidian', sub: 'II', label: 'Clubhouse Legend' },
 ] as const;
+
+/**
+ * Display string for a wall level. At the summit (level 10) we append the
+ * live medal count so the ladder gains infinite headroom past 55 medals:
+ *   'Clubhouse Legend · 61 medals'
+ * Below the summit we render the label verbatim (e.g. 'Diamond I').
+ * Null level (zero medals) falls back to the first rung's label.
+ */
+export function levelDisplay(level: WallLevel | null, medals: number): string {
+  if (!level) return WALL_LEVELS[0].label;
+  if (level.level === 10) return `${level.label} · ${medals} medals`;
+  return level.label;
+}
 
 /** Medals owned by one badge: earned tiers for tiered
     achievements, 1/0 for binary. Legend showcase rows carry no
@@ -72,7 +85,7 @@ export function levelForMedals(count: number): WallLevel | null {
   return current;
 }
 
-/** Next wall level, or null at Obsidian II. */
+/** Next wall level, or null at Clubhouse Legend. */
 export function nextLevelForMedals(count: number): WallLevel | null {
   return WALL_LEVELS.find((lvl) => lvl.medalsRequired > count) ?? null;
 }

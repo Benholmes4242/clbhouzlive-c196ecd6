@@ -291,6 +291,20 @@ function renderPush(r: OutboxRow, badgeMap: Map<string, any>) {
         data: { route: "/handicap?sheet=achievements", badge_id: p.badge_id },
       };
     }
+    case "level_up":
+      return {
+        title: "Level up",
+        body: `You reached ${p.label}. ${p.medals} medals and climbing.`,
+        data: { route: "/handicap", level: p.level, label: p.label },
+      };
+    case "level_near": {
+      const gap = typeof p.gap === "number" ? p.gap : 1;
+      return {
+        title: "Almost there",
+        body: `${gap} medal${gap === 1 ? "" : "s"} from ${p.label}.`,
+        data: { route: "/handicap", level: p.level, label: p.label },
+      };
+    }
     default:
       return null;
   }

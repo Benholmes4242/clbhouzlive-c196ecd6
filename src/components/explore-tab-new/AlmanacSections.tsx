@@ -1,9 +1,10 @@
-import { memo, useState } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { FeatCard } from './FeatCard';
 import { FeatListRow } from './FeatListRow';
 import { useRegionFeats, type FeatTier } from './hooks/useRegionFeats';
+import { useWallLevels } from '@/hooks/gam/useWallLevels';
 import { AMBER, INK, INK_TINT_06 } from '@/features/courses/_shared/tokens';
 import { TierSeeAllSheet } from './TierSeeAllSheet';
 import { UnderlineTabs } from '@/components/ui/UnderlineTabs';
@@ -170,6 +171,17 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard', onRowTap
   const hasOverflow = rows.length > cap;
   const [sheetOpen, setSheetOpen] = useState(false);
 
+  // Batch medal counts for the visible list-variant holders. Rails and
+  // cards do not surface a gem slot yet -- keep the RPC scoped.
+  const listHolderIds = useMemo(
+    () =>
+      variant === 'list'
+        ? displayRows.map((r) => r.user_id).filter((v): v is string => typeof v === 'string')
+        : [],
+    [variant, displayRows],
+  );
+  const { data: medalsMap } = useWallLevels(listHolderIds);
+
   // Self-hiding: empty tier renders zero trace (no header, no gap).
   // AlmanacEmptyCard covers the all-tiers-empty case at the page level.
   if (!isLoading && rows.length === 0) return null;
@@ -212,6 +224,7 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard', onRowTap
               row={row}
               tier={tier}
               index={i}
+              medals={row.user_id ? medalsMap?.get(row.user_id) ?? null : null}
               onTap={onRowTap ? () => onRowTap(row) : undefined}
             />
           ))}
