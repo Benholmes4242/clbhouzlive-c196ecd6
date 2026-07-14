@@ -214,7 +214,6 @@ function LegendarySection({
           Aces &amp; Albatrosses
         </span>
         <span style={{ flex: 1 }} />
-        <LegendaryModeToggle mode={mode} setMode={setMode} />
         {hasOverflow && (
           <button
             type="button"
@@ -227,12 +226,20 @@ function LegendarySection({
               letterSpacing: '0.06em',
               color: '#F7931E',
               cursor: 'pointer',
-              marginLeft: 6,
             }}
           >
-            ALL
+            View all
           </button>
         )}
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          padding: `0 ${SPACE.pagePadX}px 10px`,
+        }}
+      >
+        <LegendaryModeToggle mode={mode} setMode={setMode} />
       </div>
       {mode === 'latest' ? (
         <LegendaryFeatHero region={region} onRowTap={onRowTap} />
