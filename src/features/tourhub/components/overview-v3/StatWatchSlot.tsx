@@ -1,28 +1,13 @@
 /**
- * StatWatchSlot — mounts the v4 StatWatch section on the live Overview
- * with a per-section tour lens.
+ * StatWatchSlot — mounts the v4 StatWatch section on the live Overview.
  *
- * All Tours (tourLens === null): renders StatWatch per tour stacked in the
- * canonical order; each instance self-hides when its tour has no
- * sr_player_statistics coverage (currently only PGA has coverage).
+ * Fixed to PGA: SG stats coverage is PGA-only, so the lens is removed and
+ * this slot renders a single PGA instance. Self-hides when PGA has no data.
  */
-import { useState } from 'react';
 import { StatWatch } from '@/features/tourhub/overview/sections/StatWatch';
-import { SectionTourLens } from '@/features/tourhub/overview/sections/SectionTourLens';
-import type { TourId } from '@/features/tourhub/hooks/useOverviewData';
-
-const TOUR_ORDER: TourId[] = ['pga', 'lpga', 'euro', 'liv', 'champ', 'pgad'];
 
 export function StatWatchSlot() {
-  const [tourLens, setTourLens] = useState<TourId | null>(null);
-  return (
-    <>
-      <SectionTourLens value={tourLens} onChange={setTourLens} />
-      {tourLens === null
-        ? TOUR_ORDER.map((t) => <StatWatch key={t} tour={t} />)
-        : <StatWatch tour={tourLens} />}
-    </>
-  );
+  return <StatWatch tour="pga" />;
 }
 
 export default StatWatchSlot;
