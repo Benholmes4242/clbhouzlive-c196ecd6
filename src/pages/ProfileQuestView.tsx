@@ -23,6 +23,7 @@ import { useQuestCourses } from '@/hooks/useQuestCourses';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useQuestRewards } from '@/hooks/useQuestRewards';
 import { useQuestOnboarding } from '@/hooks/useQuestOnboarding';
+import { scrollElementIntoView, scrollPageToTop } from '@/lib/getScrollParent';
 
 import { QuestFirstCourseSheet } from '@/components/profile-v2/QuestFirstCourseSheet';
 
@@ -81,12 +82,7 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
   
   // Scroll to top on mount - immediate, no animation
   useEffect(() => {
-    const shell = document.querySelector('.app-shell');
-    if (shell) {
-      shell.scrollTop = 0;
-    } else {
-      window.scrollTo(0, 0);
-    }
+    scrollPageToTop('auto');
   }, []);
   
   // Use the SAME hook as Top 100 list page for ALL progress data (single source of truth)
@@ -277,7 +273,7 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
 
   // Continue Journey scroll handler
   const handleContinueJourney = () => {
-    journeyMapRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (journeyMapRef.current) scrollElementIntoView(journeyMapRef.current, { behavior: 'smooth' });
   };
 
   if (isLoading) {
