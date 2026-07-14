@@ -1,13 +1,14 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { useRegionFeats, type FeatRow } from './hooks/useRegionFeats';
+import { useRegionFeats, type FeatRow, type RecordsMode } from './hooks/useRegionFeats';
 import { DiscoverSectionHeader } from './DiscoverSectionHeader';
 import { SPACE } from '@/lib/spacing';
 import { formatHcp } from '@/lib/formatHcp';
 import { FONT } from './gamingLightTokens';
 import type { ScorecardOpener } from './useScorecardOpener';
+
 
 const CARD_BG = '#141A22';
 const GOLD = '#FBBC2E';
