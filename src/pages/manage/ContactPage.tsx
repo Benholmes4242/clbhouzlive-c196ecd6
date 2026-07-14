@@ -5,6 +5,7 @@ import { toast } from '@/lib/toast';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { scrollPageToTop } from '@/lib/getScrollParent';
 
 const INK = '#0F172A';
 const INK_55 = '#64748B';
@@ -32,7 +33,7 @@ export default function ContactPage() {
   const [submittedId, setSubmittedId] = useState<string | null>(null);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    scrollPageToTop('auto');
   }, []);
 
   const canSubmit =
