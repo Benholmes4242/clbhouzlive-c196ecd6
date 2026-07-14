@@ -70,3 +70,33 @@ export function useRegionFeats(
   });
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Legendary leaders (aces & albatrosses all-time)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface LegendaryLeaderRow {
+  user_id: string | null;
+  holder_name: string | null;
+  holder_avatar: string | null;
+  aces: number;
+  albatrosses: number;
+}
+
+export function useRegionLegendaryLeaders(region: string | null) {
+  const cacheRegion = toCacheRegion(region);
+  const railKey = `legendary_leaders:${cacheRegion}`;
+  return useQuery<LegendaryLeaderRow[]>({
+    queryKey: ['discover-rail-cache', railKey],
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('discover_rail_cache')
+        .select('payload')
+        .eq('rail_key', railKey)
+        .maybeSingle();
+      if (error) throw error;
+      return (data?.payload ?? []) as unknown as LegendaryLeaderRow[];
+    },
+  });
+}
+
