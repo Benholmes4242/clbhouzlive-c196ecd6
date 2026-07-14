@@ -115,7 +115,7 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
         <LegendarySection region={activeRegion} onRowTap={handleFeatRowTap} />
 
         {/* 7. Course Crowns -- self-hiding, owns its header */}
-        <CourseCrownsRail region={activeRegion} />
+        <CourseCrownsRail region={activeRegion} opener={opener} />
 
         {/* 8. Next Conquests -- self-hiding, owns its header */}
         <NextConquestsRail userId={userId} />

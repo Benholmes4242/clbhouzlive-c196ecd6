@@ -7,6 +7,7 @@ import { DiscoverSectionHeader } from './DiscoverSectionHeader';
 import { SPACE } from '@/lib/spacing';
 import { formatHcp } from '@/lib/formatHcp';
 import { FONT } from './gamingLightTokens';
+import type { ScorecardOpener } from './useScorecardOpener';
 
 const CARD_BG = '#141A22';
 const GOLD = '#FBBC2E';
@@ -42,7 +43,7 @@ function initials(name: string): string {
   );
 }
 
-function CrownCard({ row }: { row: FeatRow }) {
+function CrownCard({ row, opener }: { row: FeatRow; opener?: ScorecardOpener }) {
   const navigate = useNavigate();
   const holder = formatHolderName(row.holder_name);
   const isStableford = row.category === 'best_stableford_all_time';
@@ -57,7 +58,8 @@ function CrownCard({ row }: { row: FeatRow }) {
     <button
       type="button"
       onClick={() => {
-        if (row.course_id) navigate(`/courses/${row.course_id}`);
+        if (row.score_id) opener?.openByScore(row.score_id, null, row.user_id);
+        else if (row.course_id) navigate(`/courses/${row.course_id}`);
       }}
       className="text-left active:scale-[0.99] transition-transform"
       style={{
@@ -225,24 +227,21 @@ function CrownCard({ row }: { row: FeatRow }) {
 
 interface Props {
   region: string | null;
+  opener?: ScorecardOpener;
 }
 
-export function CourseCrownsRail({ region }: Props) {
+export function CourseCrownsRail({ region, opener }: Props) {
   const navigate = useNavigate();
   const { data } = useRegionFeats(region, 'records');
   const rows = useMemo(() => (data ?? []).slice(0, 8), [data]);
 
   if (rows.length === 0) return null;
 
-  const firstHolder = rows[0]?.holder_name
-    ? formatHolderName(rows[0].holder_name)
-    : null;
-
   return (
     <section style={{ marginTop: SPACE.sectionSection }}>
       <DiscoverSectionHeader
         eyebrow={`\u{1F451} Course Crowns \u00B7 ${regionUpperFor(region)}`}
-        title={firstHolder ? `Held by ${firstHolder}` : 'Course crowns'}
+        title="Course records"
         linkLabel="All"
         onLinkClick={() => navigate('/courses')}
       />
@@ -251,7 +250,7 @@ export function CourseCrownsRail({ region }: Props) {
         style={{ padding: '0 16px', gap: 9 }}
       >
         {rows.map((row, i) => (
-          <CrownCard key={`${row.course_id ?? i}-${i}`} row={row} />
+          <CrownCard key={`${row.course_id ?? i}-${i}`} row={row} opener={opener} />
         ))}
       </div>
     </section>
