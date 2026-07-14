@@ -354,6 +354,18 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
 
               {activeTab === 'discover' ? (
                 <ExploreTabContent embedded shellTabs={shellTabsNode} />
+              ) : activeTab === 'top100' ? (
+                <Top100CoursesHubPanel
+                  shellTabs={shellTabsNode}
+                  rateNudge={
+                    user ? (
+                      <RateNudge
+                        userId={user.id}
+                        onEmptyFallback={() => setRateSheetOpen(true)}
+                      />
+                    ) : null
+                  }
+                />
               ) : (
                 <>
                   {shellTabsNode}
@@ -364,9 +376,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
                         onEmptyFallback={() => setRateSheetOpen(true)}
                       />
                     )}
-
-                    {activeTab === 'explore' && <CourseExplorer />}
-                    {activeTab === 'top100' && <Top100CoursesHubPanel />}
+                    <CourseExplorer />
                   </div>
                 </>
               )}
