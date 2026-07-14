@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { AlmanacHead } from './AlmanacSections';
 import {
