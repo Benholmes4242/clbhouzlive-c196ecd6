@@ -32,14 +32,6 @@ import {
   SLATE_50,
 } from '../_shared/tokens';
 
-const CHIP_SHORT_LABEL: Record<TourId, string> = {
-  pga: 'PGA',
-  lpga: 'LPGA',
-  euro: 'DP WORLD',
-  pgad: 'KORN FERRY',
-  champ: 'CHAMPIONS',
-  liv: 'LIV',
-};
 
 export function ScheduleTab() {
   const navigate = useNavigate();
