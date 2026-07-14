@@ -110,7 +110,7 @@ export function AlmanacHead({
             cursor: 'pointer',
           }}
         >
-          ALL
+          View all
         </button>
       )}
     </div>
