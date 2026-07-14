@@ -200,23 +200,7 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
               gap: 4,
             }}
           >
-            <div
-              style={{
-                alignSelf: 'flex-start',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 4,
-                padding: '4px 10px',
-                borderRadius: 20,
-                background: 'rgba(255,255,255,0.92)',
-                fontSize: 10,
-                fontWeight: 800,
-                color: '#22C55E',
-                lineHeight: 1,
-              }}
-            >
-              {'🦅 EAGLE'}
-            </div>
+            {null}
             <div
               style={{
                 fontSize: 12.5,
