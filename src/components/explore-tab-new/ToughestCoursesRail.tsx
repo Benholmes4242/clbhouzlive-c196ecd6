@@ -142,7 +142,6 @@ export function ToughestCoursesRail() {
             courseName={c.course_name}
             avgOverPar={c.avg_over_par}
             totalRounds={c.total_rounds}
-            thumbnail={c.thumbnail_image ?? null}
           />
         ))}
       </div>
