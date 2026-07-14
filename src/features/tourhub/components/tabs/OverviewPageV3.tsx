@@ -66,7 +66,7 @@ export function OverviewPageV3() {
           id="content-below-hero"
           className="relative z-10"
         >
-          <div className="bg-background" style={{ display: 'flex', flexDirection: 'column', gap: 24, paddingTop: 32, paddingBottom: 88 }}>
+          <div className="bg-background" style={{ display: 'flex', flexDirection: 'column', gap: SPACE.sectionSection, paddingTop: SPACE.sectionSection, paddingBottom: 88 }}>
             <LazySection minHeight={500}>
               <TISlot />
             </LazySection>
