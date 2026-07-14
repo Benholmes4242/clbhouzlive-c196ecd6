@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { TierSeeAllSheet } from './TierSeeAllSheet';
 
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useRegionFeats, type FeatRow, type RecordsMode } from './hooks/useRegionFeats';
@@ -290,16 +291,16 @@ function RecordsModeToggle({
             type="button"
             onClick={() => setMode(o.v)}
             style={{
-              padding: '6px 13px',
+              padding: '4px 9px',
               borderRadius: 999,
               background: active ? '#15171F' : 'transparent',
               color: active ? '#FFFFFF' : 'rgba(15,23,42,0.65)',
               border: 'none',
               fontFamily: FONT,
-              fontSize: 11.5,
+              fontSize: 10,
               fontWeight: 700,
               cursor: 'pointer',
-              letterSpacing: '0.01em',
+              letterSpacing: '0.02em',
               whiteSpace: 'nowrap',
               transition: 'all .15s',
             }}
@@ -313,20 +314,26 @@ function RecordsModeToggle({
 }
 
 export function CourseCrownsRail({ region, opener }: Props) {
-  const navigate = useNavigate();
   const [mode, setMode] = useState<RecordsMode>('latest');
+  const [sheetOpen, setSheetOpen] = useState(false);
   const { data } = useRegionFeats(region, 'records', mode);
-  const rows = useMemo(() => (data ?? []).slice(0, 15), [data]);
+  const allRows = useMemo(() => data ?? [], [data]);
+  const rows = useMemo(() => allRows.slice(0, 15), [allRows]);
 
   if (rows.length === 0) return null;
+
+  const handleRowTap = (row: FeatRow) => {
+    if (row.score_id) opener?.openByScore(row.score_id, null, row.user_id);
+    else if (row.user_id) opener?.openProfile(row.user_id);
+  };
 
   return (
     <section style={{ marginTop: SPACE.sectionSection }}>
       <DiscoverSectionHeader
         eyebrow={`\u{1F451} Course Crowns \u00B7 ${regionUpperFor(region)}`}
         title="Course records"
-        linkLabel="All"
-        onLinkClick={() => navigate('/courses')}
+        linkLabel="View all"
+        onLinkClick={() => setSheetOpen(true)}
       />
       <div
         style={{
@@ -345,6 +352,14 @@ export function CourseCrownsRail({ region, opener }: Props) {
           <CrownCard key={`${row.course_id ?? i}-${i}`} row={row} opener={opener} />
         ))}
       </div>
+      <TierSeeAllSheet
+        open={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        tier="records"
+        region={region}
+        rows={allRows}
+        onRowTap={handleRowTap}
+      />
     </section>
   );
 }
