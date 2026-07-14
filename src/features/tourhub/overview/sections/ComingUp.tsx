@@ -8,12 +8,14 @@ import { SectionShell, V4Card } from './SectionShell';
 import { V4, NUMERAL_THIN } from '../tokens';
 import { useComingUp } from '../data/useComingUp';
 import type { TourId } from '../../hooks/useOverviewData';
+import { TOUR_LABEL } from '../../_shared/tourOrder';
 
-export function ComingUp({ tour }: { tour: TourId }) {
+export function ComingUp({ tour }: { tour: TourId | null }) {
   const navigate = useNavigate();
   const { data } = useComingUp(tour, 4);
   const rows = data ?? [];
   if (rows.length === 0) return null;
+  const showTourTag = tour === null;
 
   return (
     <SectionShell eyebrow="What's coming up" linkLabel="Full schedule" onLinkClick={() => navigate('/tourhub?tab=schedule')}>
