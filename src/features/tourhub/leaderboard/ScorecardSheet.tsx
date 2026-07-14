@@ -1,11 +1,10 @@
 /**
- * ScorecardSheet -- tour leaderboard drill-in.
+ * ScorecardSheet — tour leaderboard drill-in.
  *
  * Thin wrapper around the canonical CardScorecardSheet ("The Card").
- * Public surface is intentionally unchanged: consumers (LeaderboardTab,
- * FullBoardSheet, MiniBoard) import ScorecardSheet + ScorecardSheetTarget
- * and pass { open, onClose, tournamentId, target }. Reads the same
- * sr_scorecards select as before; no new columns.
+ * Public surface unchanged: consumers (LeaderboardTab, FullBoardSheet,
+ * MiniBoard) import ScorecardSheet + ScorecardSheetTarget and pass
+ * { open, onClose, tournamentId, target }.
  */
 
 import { useMemo, useState, useEffect } from 'react';
@@ -103,57 +102,42 @@ export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
     }));
   }, [scRows, selectedRound]);
 
-  const grossPar = useMemo(() => {
-    let gross = 0;
-    let par = 0;
-    let played = false;
-    for (const h of roundHoles) {
-      if (h.strokes != null && h.par != null) {
-        gross += h.strokes;
-        par += h.par;
-        played = true;
-      }
-    }
-    return { gross, par, played };
-  }, [roundHoles]);
-
   if (!target) {
     return (
       <CardScorecardSheet
         open={open}
         onClose={onClose}
         eyebrowText=""
-        name=""
-        subLine=""
+        courseName=""
         holes={[]}
+        playerName=""
       />
     );
   }
 
   const demoted = isDemotedStatus(target.status);
-  const tournamentName = meta.data?.name?.trim() || null;
   const roundLabel = selectedRound != null ? `ROUND ${selectedRound}` : 'SCORECARD';
   const eyebrowText = demoted
     ? `${roundLabel} ${'\u00B7'} ${(target.status || 'CUT').toUpperCase()}`
-    : tournamentName
-      ? `${roundLabel} ${'\u00B7'} ${tournamentName}`
-      : roundLabel;
+    : roundLabel;
 
-  const subLine = grossPar.played
-    ? `Gross ${grossPar.gross} ${'\u00B7'} Par ${grossPar.par}`
-    : `Par ${grossPar.par || '\u2014'}`;
+  const courseName =
+    meta.data?.venue_course_name
+    ?? meta.data?.venue_name
+    ?? (meta.data?.name?.trim() || 'Scorecard');
+  const courseLocation =
+    [meta.data?.venue_city, meta.data?.venue_country].filter(Boolean).join(', ') || null;
+  const coursePar = meta.data?.venue_par ?? null;
 
   return (
     <CardScorecardSheet
       open={open}
       onClose={onClose}
       eyebrowText={eyebrowText}
-      name={target.playerName}
-      onIdentityTap={() => {
-        onClose();
-        navigate(`/tourhub/player/${target.playerId}`);
-      }}
-      subLine={subLine}
+      courseName={courseName}
+      courseLocation={courseLocation}
+      coursePar={coursePar}
+      courseSlope={null}
       holes={roundHoles}
       heroMuted={demoted}
       rounds={availableRounds.length > 1 && selectedRound != null ? {
@@ -161,6 +145,16 @@ export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
         active: selectedRound,
         onSelect: setSelectedRound,
       } : undefined}
+      playerName={target.playerName}
+      playerAvatarUrl={null}
+      playerHcp={null}
+      playerHcpDelta={null}
+      playerUserId={target.playerId}
+      onViewProfile={() => {
+        onClose();
+        navigate(`/tourhub/player/${target.playerId}`);
+      }}
+      onViewCourse={undefined}
     />
   );
 }
