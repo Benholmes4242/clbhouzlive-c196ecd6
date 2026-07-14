@@ -61,7 +61,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
   const [otpInfo, setOtpInfo] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
 
-  const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
   const sendStartRef = useRef<number>(0);
 
   // Resend cooldown ticker
