@@ -138,6 +138,7 @@ export function PlayersTab() {
   const filteredRows = useMemo<RankedRow[]>(() => {
     const rows = ranking?.rows ?? [];
     const q = debouncedSearch.trim().toLowerCase();
+    console.log('[PlayersTab] filteredRows rows.length=', rows.length, 'q=', JSON.stringify(q), 'sameRef=', rows === ranking?.rows);
     if (!q) return rows;
     return rows.filter((r) => r.name.toLowerCase().includes(q));
   }, [ranking?.rows, debouncedSearch]);
@@ -161,6 +162,7 @@ export function PlayersTab() {
 
   // ── Ordering when "Playing now" active
   const orderedRows = useMemo<RankedRow[]>(() => {
+    console.log('[PlayersTab] orderedRows sort=', sort, 'filteredRows.length=', filteredRows.length, 'first=', filteredRows[0]?.name);
     if (sort !== 'live') return filteredRows;
     const live: RankedRow[] = [];
     const rest: RankedRow[] = [];
