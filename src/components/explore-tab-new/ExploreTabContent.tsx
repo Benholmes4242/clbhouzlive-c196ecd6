@@ -32,11 +32,12 @@ import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/rou
 
 interface ExploreTabContentProps {
   embedded?: boolean;
+  shellTabs?: React.ReactNode;
 }
 
 
 
-export default function ExploreTabContent({ embedded: _embedded = false }: ExploreTabContentProps) {
+export default function ExploreTabContent({ embedded: _embedded = false, shellTabs }: ExploreTabContentProps) {
   const { user } = useSupabaseSession();
   const userId = user?.id;
   const gridRef = useRef<HTMLDivElement | null>(null);
@@ -84,79 +85,87 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
 
   return (
     <div style={{ background: SLATE_50, minHeight: '100vh' }}>
-      {/* 1. Season strip */}
-      <SeasonStrip />
+      {/* SCOPE 1 — ends where the almanac begins; shell tabs sticky here */}
+      <div>
+        {shellTabs}
 
-      {/* 2. Rank identity card (dark) */}
-      <RankIdentityCard userId={userId} />
+        {/* 1. Season strip */}
+        <SeasonStrip />
 
-      {/* 3. Friends rail (region-independent) — rail owns its header */}
-      <div style={{ marginTop: SPACE.sectionSection }}>
-        <CircleActivityStrip userId={userId} />
+        {/* 2. Rank identity card (dark) */}
+        <RankIdentityCard userId={userId} />
+
+        {/* 3. Friends rail (region-independent) — rail owns its header */}
+        <div style={{ marginTop: SPACE.sectionSection }}>
+          <CircleActivityStrip userId={userId} />
+        </div>
       </div>
 
-      {/* 4. Region tabs */}
-      <div style={{ marginTop: SPACE.sectionSection }}>
+      {/* SCOPE 2 — spans the almanac + everything below; region chips sticky here */}
+      <div>
+        {/* pre-chips spacer (chips must be a direct child of SCOPE 2 for sticky bounds) */}
+        <div style={{ height: SPACE.sectionSection }} aria-hidden />
+        {/* 4. Region tabs (sticky within this scope) */}
         <AlmanacRegionTabs region={activeRegion} onRegionChange={handleRegionChange} />
-      </div>
 
-      {/* 5. Empty-region editorial card (only when all four tiers are empty) */}
-      <AlmanacEmptyCard region={activeRegion} />
+        {/* 5. Empty-region editorial card (only when all four tiers are empty) */}
+        <AlmanacEmptyCard region={activeRegion} />
 
-      {/* 6. Legendary hero (aces & albatrosses) */}
-      <LegendarySection region={activeRegion} onRowTap={handleFeatRowTap} />
+        {/* 6. Legendary hero (aces & albatrosses) */}
+        <LegendarySection region={activeRegion} onRowTap={handleFeatRowTap} />
 
-      {/* 7. Course Crowns -- self-hiding, owns its header */}
-      <CourseCrownsRail region={activeRegion} />
+        {/* 7. Course Crowns -- self-hiding, owns its header */}
+        <CourseCrownsRail region={activeRegion} />
 
-      {/* 8. Next Conquests -- self-hiding, owns its header */}
-      <NextConquestsRail userId={userId} />
+        {/* 8. Next Conquests -- self-hiding, owns its header */}
+        <NextConquestsRail userId={userId} />
 
-      {/* 9. Eagles rail -- FeatTierRail returns null when empty */}
-      <FeatTierRail
-        region={activeRegion}
-        tier="eagles"
-        title={`Eagles · ${regionUpper}`}
-        variant="compact"
-        onRowTap={handleFeatRowTap}
-      />
-
-      {/* 10. Toughest courses -- self-hiding, owns its header */}
-      <ToughestCoursesRail />
-
-      {/* 11. Birdie hauls -- FeatTierRail returns null when empty */}
-      <FeatTierRail
-        region={activeRegion}
-        tier="birdie_hauls"
-        title={`Birdie hauls · ${regionUpper}`}
-        variant="list"
-        onRowTap={handleFeatRowTap}
-      />
-
-
-      {/* 11. Feed block */}
-      <div
-        style={{
-          marginTop: SPACE.sectionSection,
-          borderTop: '1px solid rgba(15,23,42,0.06)',
-          paddingTop: SPACE.sectionSection,
-          paddingBottom: SPACE.pageBottom,
-        }}
-      >
-        <AlmanacHead icon="📍" title={`The feed · ${feedRegionLabel}`} />
-        <ExploreGrid
-          posts={posts}
-          coursePosts={coursePosts}
-          isLoading={isLoading}
-          isError={isError}
-          hasNextPage={hasNextPage}
-          isFetchingNextPage={isFetchingNextPage}
-          fetchNextPage={fetchNextPage}
-          refetch={refetch}
-          gridRef={gridRef}
-          activeRegion={activeRegion}
-          onRegionChange={handleRegionChange}
+        {/* 9. Eagles rail -- FeatTierRail returns null when empty */}
+        <FeatTierRail
+          region={activeRegion}
+          tier="eagles"
+          title={`Eagles · ${regionUpper}`}
+          variant="compact"
+          onRowTap={handleFeatRowTap}
         />
+
+        {/* 10. Toughest courses -- self-hiding, owns its header */}
+        <ToughestCoursesRail />
+
+        {/* 11. Birdie hauls -- FeatTierRail returns null when empty */}
+        <FeatTierRail
+          region={activeRegion}
+          tier="birdie_hauls"
+          title={`Birdie hauls · ${regionUpper}`}
+          variant="list"
+          onRowTap={handleFeatRowTap}
+        />
+
+
+        {/* 11. Feed block */}
+        <div
+          style={{
+            marginTop: SPACE.sectionSection,
+            borderTop: '1px solid rgba(15,23,42,0.06)',
+            paddingTop: SPACE.sectionSection,
+            paddingBottom: SPACE.pageBottom,
+          }}
+        >
+          <AlmanacHead icon="📍" title={`The feed · ${feedRegionLabel}`} />
+          <ExploreGrid
+            posts={posts}
+            coursePosts={coursePosts}
+            isLoading={isLoading}
+            isError={isError}
+            hasNextPage={hasNextPage}
+            isFetchingNextPage={isFetchingNextPage}
+            fetchNextPage={fetchNextPage}
+            refetch={refetch}
+            gridRef={gridRef}
+            activeRegion={activeRegion}
+            onRegionChange={handleRegionChange}
+          />
+        </div>
       </div>
 
       {/* Single shared scorecard sheet for all feat/legendary/see-all rows */}

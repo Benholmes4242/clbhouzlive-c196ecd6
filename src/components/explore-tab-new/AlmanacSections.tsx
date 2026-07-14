@@ -121,7 +121,22 @@ function AlmanacRegionTabsInner({ region, onRegionChange }: Props) {
   const options = REGION_TABS.map((t) => ({ id: t.slug ?? '__ww__', label: t.label }));
   const value = region ?? '__ww__';
   return (
-    <section style={{ fontFamily: FONT }}>
+    <section
+      style={{
+        fontFamily: FONT,
+        position: 'sticky',
+        top: 'var(--sat, 0px)',
+        zIndex: 10,
+        background: 'rgba(248,250,252,0.72)',
+        backdropFilter: 'blur(14px)',
+        WebkitBackdropFilter: 'blur(14px)',
+        borderBottom: '1px solid rgba(0,0,0,0.07)',
+        paddingTop: 8,
+        paddingBottom: 8,
+        // 1px overlap kills any seam with the shell tabs during handoff
+        marginTop: -1,
+      }}
+    >
       <FilterChips
         options={options}
         value={value}

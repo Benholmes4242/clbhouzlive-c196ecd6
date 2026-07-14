@@ -326,48 +326,53 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
         </Tabs>
       ) : (
         /* Main courses page - shared cinematic hero + sticky tab row above content */
-        <div>
-          <GlassHeaderPlate visible={tabsStuck} />
-          <CoursesPageHero />
-
-          <div ref={sentinelRef} style={{ height: 1 }} aria-hidden />
-
-          <div
-            className="sticky"
-            style={{
-              top: 'var(--sat, 0px)',
-              zIndex: 30,
-              background: 'rgba(248,250,252,0.72)',
-              backdropFilter: 'blur(14px)',
-              WebkitBackdropFilter: 'blur(14px)',
-              borderBottom: '0.5px solid rgba(15,23,42,0.07)',
-            }}
-          >
-
-            <CoursesShellTabs
-              activeTab={activeTab as 'explore' | 'top100' | 'discover'}
-              onTabChange={handleTabChange}
-            />
-          </div>
-
-          {activeTab === 'discover' ? (
-            <ExploreTabContent embedded />
-          ) : (
-            <div className="px-4 pt-3">
-              {/* Rate a Course nudge — data-driven (played-but-unrated) */}
-              {user && (
-                <RateNudge
-                  userId={user.id}
-                  onEmptyFallback={() => setRateSheetOpen(true)}
-                />
-              )}
-
-              {activeTab === 'explore' && <CourseExplorer />}
-              {activeTab === 'top100' && <Top100CoursesHubPanel />}
+        (() => {
+          const shellTabsNode = (
+            <div
+              className="sticky"
+              style={{
+                top: 'var(--sat, 0px)',
+                zIndex: 30,
+                background: 'rgba(248,250,252,0.72)',
+                backdropFilter: 'blur(14px)',
+                WebkitBackdropFilter: 'blur(14px)',
+                borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+              }}
+            >
+              <CoursesShellTabs
+                activeTab={activeTab as 'explore' | 'top100' | 'discover'}
+                onTabChange={handleTabChange}
+              />
             </div>
-          )}
+          );
+          return (
+            <div>
+              <GlassHeaderPlate visible={tabsStuck} />
+              <CoursesPageHero />
 
-        </div>
+              <div ref={sentinelRef} style={{ height: 1 }} aria-hidden />
+
+              {activeTab === 'discover' ? (
+                <ExploreTabContent embedded shellTabs={shellTabsNode} />
+              ) : (
+                <>
+                  {shellTabsNode}
+                  <div className="px-4 pt-3">
+                    {user && (
+                      <RateNudge
+                        userId={user.id}
+                        onEmptyFallback={() => setRateSheetOpen(true)}
+                      />
+                    )}
+
+                    {activeTab === 'explore' && <CourseExplorer />}
+                    {activeTab === 'top100' && <Top100CoursesHubPanel />}
+                  </div>
+                </>
+              )}
+            </div>
+          );
+        })()
       )}
 
         {/* Global scroll-to-top button */}
