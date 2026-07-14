@@ -133,232 +133,72 @@ export function CollegeHubPage() {
         }}
       >
         {/* Hero — leader takes the hero (or charcoal fallback when no standings). */}
-        <header
-          style={{
-            background: `linear-gradient(160deg, ${tint} 0%, ${CHARCOAL} 100%)`,
-            minHeight:
-              'calc(clamp(380px, 44dvh, 460px) + env(safe-area-inset-top, 0px))',
-            paddingTop: 'calc(env(safe-area-inset-top, 0px) + 62px)',
-            paddingLeft: 16,
-            paddingRight: 16,
-            paddingBottom: 20,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'flex-end',
-            color: '#FFFFFF',
-            position: 'relative',
-          }}
-        >
-          {leader ? (
-            <>
-              {/* Top row: logo tile (left) + rank badge (right). */}
-              <div
-                style={{
-                  position: 'absolute',
-                  top: 'calc(env(safe-area-inset-top, 0px) + 62px)',
-                  left: 16,
-                  right: 16,
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  justifyContent: 'space-between',
-                  gap: 12,
-                }}
-              >
-                <div
-                  style={{
-                    width: 80,
-                    height: 80,
-                    borderRadius: 20,
-                    background: 'rgba(255,255,255,0.12)',
-                    border: '1px solid rgba(255,255,255,0.25)',
-                    padding: 10,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxSizing: 'border-box',
-                    overflow: 'hidden',
-                  }}
-                >
-                  {leader.logoUrl && !logoErrored ? (
-                    <img
-                      src={leader.logoUrl}
-                      alt=""
-                      onError={() => setLogoErrored(true)}
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'contain',
-                        display: 'block',
-                      }}
-                    />
-                  ) : (
-                    <span
-                      style={{
-                        fontSize: 30,
-                        fontWeight: 900,
-                        color: '#FFFFFF',
-                        letterSpacing: '-0.02em',
-                        lineHeight: 1,
-                      }}
-                    >
-                      {(leader.shortName ?? leader.collegeName ?? '?')
-                        .trim()
-                        .charAt(0)
-                        .toUpperCase()}
-                    </span>
-                  )}
-                </div>
-                <div
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 800,
-                    letterSpacing: '0.1em',
-                    textTransform: 'uppercase',
-                    color: 'rgba(255,255,255,0.7)',
-                    paddingTop: 4,
-                  }}
-                >
-                  #1 · Franchise
-                </div>
-              </div>
-
-              <div>
-                <div
-                  style={{
-                    fontSize: 9.5,
-                    fontWeight: 800,
-                    letterSpacing: '0.16em',
-                    textTransform: 'uppercase',
-                    color: AMBER,
-                    marginBottom: 6,
-                  }}
-                >
-                  The Franchise · {year}
-                </div>
-                <h1
-                  style={{
-                    margin: 0,
-                    fontSize: 26,
-                    fontWeight: 800,
-                    color: '#FFFFFF',
-                    letterSpacing: '-0.02em',
-                    lineHeight: 1.02,
-                  }}
-                >
-                  {leader.collegeName}
-                </h1>
-                <div
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: WHITE_ALPHA_65,
-                    marginTop: 10,
-                    letterSpacing: '-0.005em',
-                    lineHeight: 1.45,
-                  }}
-                >
-                  Leads the franchise board — {leader.topAlumni.length}{' '}
-                  {leader.topAlumni.length === 1 ? 'alumnus' : 'alumni'} on tour
-                </div>
-
-                {/* Stat row */}
-                <div
-                  style={{
-                    marginTop: 18,
-                    display: 'flex',
-                    gap: 28,
-                  }}
-                >
-                  {[
-                    {
-                      label: 'Alumni',
-                      value: String(leader.topAlumni.length),
-                    },
-                    {
-                      label: 'Pts',
-                      value: leader.pointsTotal.toLocaleString(),
-                    },
-                    {
-                      label: 'Trend',
-                      value:
-                        leader.rankChange == null || leader.rankChange === 0
-                          ? '—'
-                          : leader.rankChange > 0
-                          ? `▲${leader.rankChange}`
-                          : `▼${Math.abs(leader.rankChange)}`,
-                    },
-                  ].map((stat) => (
-                    <div key={stat.label} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                      <span
-                        style={{
-                          fontSize: 9,
-                          fontWeight: 800,
-                          letterSpacing: '0.14em',
-                          textTransform: 'uppercase',
-                          color: 'rgba(255,255,255,0.55)',
-                        }}
-                      >
-                        {stat.label}
-                      </span>
-                      <span
-                        style={{
-                          fontSize: 17,
-                          fontWeight: 900,
-                          color: '#FFFFFF',
-                          letterSpacing: '-0.01em',
-                          fontVariantNumeric: 'tabular-nums',
-                          lineHeight: 1,
-                        }}
-                      >
-                        {stat.value}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </>
-          ) : (
-            <div>
-              <div
-                style={{
-                  fontSize: 9.5,
-                  fontWeight: 800,
-                  letterSpacing: '0.16em',
-                  textTransform: 'uppercase',
-                  color: AMBER,
-                  marginBottom: 6,
-                }}
-              >
-                The Franchise
-              </div>
-              <h1
-                style={{
-                  margin: 0,
-                  fontSize: 32,
-                  fontWeight: 800,
-                  color: '#FFFFFF',
-                  letterSpacing: '-0.02em',
-                  lineHeight: 1,
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {year}
-              </h1>
-              <div
-                style={{
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: WHITE_ALPHA_65,
-                  marginTop: 10,
-                  letterSpacing: '-0.005em',
-                  lineHeight: 1.45,
-                }}
-              >
-                {editorialLine}
-              </div>
+        {leader ? (
+          <CollegeHeroMasthead
+            displayName={leader.collegeName}
+            logoUrl={leader.logoUrl}
+            brandHex={leader.brandHex}
+            rank={leader.rank}
+            pointsTotal={leader.pointsTotal}
+            alumniCount={leader.alumniCount}
+            playingNow={leaderPlayingNow}
+            rankChange={leader.rankChange}
+          />
+        ) : (
+          <header
+            style={{
+              background: `linear-gradient(180deg, #262B33 0%, ${CHARCOAL} 100%)`,
+              minHeight:
+                'calc(clamp(380px, 44dvh, 460px) + env(safe-area-inset-top, 0px))',
+              paddingTop: 'calc(env(safe-area-inset-top, 0px) + 62px)',
+              paddingLeft: 16,
+              paddingRight: 16,
+              paddingBottom: 20,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'flex-end',
+              color: '#FFFFFF',
+            }}
+          >
+            <div
+              style={{
+                fontSize: 9.5,
+                fontWeight: 800,
+                letterSpacing: '0.16em',
+                textTransform: 'uppercase',
+                color: AMBER,
+                marginBottom: 6,
+              }}
+            >
+              The Franchise
             </div>
-          )}
-        </header>
+            <h1
+              style={{
+                margin: 0,
+                fontSize: 32,
+                fontWeight: 800,
+                color: '#FFFFFF',
+                letterSpacing: '-0.02em',
+                lineHeight: 1,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {year}
+            </h1>
+            <div
+              style={{
+                fontSize: 12,
+                fontWeight: 600,
+                color: WHITE_ALPHA_65,
+                marginTop: 10,
+                letterSpacing: '-0.005em',
+                lineHeight: 1.45,
+              }}
+            >
+              {editorialLine}
+            </div>
+          </header>
+        )}
 
 
         {/* Sticky glass search row — locks under island band; filters the feed. */}
