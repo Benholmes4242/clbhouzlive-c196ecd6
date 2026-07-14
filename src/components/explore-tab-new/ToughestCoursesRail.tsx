@@ -125,7 +125,7 @@ export function ToughestCoursesRail() {
   const rows = data ?? [];
   if (rows.length === 0) return null;
   return (
-    <section style={{ marginTop: SPACE.sectionSection }}>
+    <section style={{ marginTop: 16 }}>
       <DiscoverSectionHeader
         eyebrow="Toughest courses"
         title="Where scores go to die"
