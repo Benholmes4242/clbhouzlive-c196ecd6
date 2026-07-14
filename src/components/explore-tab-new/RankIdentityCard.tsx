@@ -20,14 +20,13 @@ import {
   type WallMaterial,
 } from '@/components/profile/handicap/whs/gam/trophy-room/_shared/levels';
 import { openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
-import { GemVisual } from '@/components/shared/TierGem';
+import { MATERIAL_HEX } from '@/components/profile/handicap/whs/gam/trophy-room/_shared/rarityPalette';
 
-import { GOLD, AMBER, SCOREBOARD_BG, FONT } from './gamingLightTokens';
+import { FONT } from './gamingLightTokens';
 
 interface Props {
   userId: string | undefined;
 }
-
 
 // Global medal rank RPC is not yet in prod - feature-detect and omit the
 // segment on error/absent (no zeros, no placeholders).
@@ -65,8 +64,37 @@ function useGlobalMedalRank(userId: string | undefined) {
   });
 }
 
-function Gem({ material, size = 62 }: { material: WallMaterial; size?: number }) {
-  return <GemVisual material={material} size={size} />;
+// Complementary hue per tier for the second aurora blob. Picked to give
+// each material a two-tone mesh that reads as ambient light, not a swatch:
+//   bronze  -> cool cyan (warm/cool balance)
+//   silver  -> muted slate-blue (keeps the neutral cool)
+//   emerald -> teal/cyan (per brief)
+//   diamond -> violet (icy blue + violet, aurora borealis)
+//   obsidian-> forge gold (only accent that fits the black-glass treatment)
+const TIER_SECONDARY: Record<WallMaterial, string> = {
+  bronze: '#4AA8C9',
+  silver: '#8FA6C4',
+  emerald: '#0891B2',
+  diamond: '#C084FC',
+  obsidian: '#FBBC2E',
+};
+
+// Very dark tier-tinted base for the card body.
+const TIER_BASE: Record<WallMaterial, string> = {
+  bronze: '#120A06',
+  silver: '#0A0C10',
+  emerald: '#06120D',
+  diamond: '#070E14',
+  obsidian: '#07080C',
+};
+
+function splitLevelLabel(label: string, sub: 'I' | 'II'): { name: string; roman: string } {
+  // Level 10 is "Clubhouse Legend" (no roman in label).
+  const suffix = ` ${sub}`;
+  if (label.endsWith(suffix)) {
+    return { name: label.slice(0, -suffix.length), roman: sub };
+  }
+  return { name: label, roman: '' };
 }
 
 export function RankIdentityCard({ userId }: Props) {
@@ -101,7 +129,6 @@ export function RankIdentityCard({ userId }: Props) {
     ? WALL_LEVELS[1]
     : nextLevelForMedals(medals);
 
-  // progress % across the current segment
   const floor = currentLevel.medalsRequired;
   const ceiling = nextLevel?.medalsRequired ?? currentLevel.medalsRequired;
   const span = Math.max(1, ceiling - floor);
@@ -113,94 +140,186 @@ export function RankIdentityCard({ userId }: Props) {
   const hcp = profile?.eg_handicap_index ?? null;
   const hasHcp = !!connection && hcp != null;
 
-  const noteText = showBootstrap
-    ? 'Play a verified round to start the climb'
-    : nextLevel
-      ? `${Math.max(0, nextLevel.medalsRequired - medals)} medals to ${nextLevel.label} · earn medals from verified rounds`
-      : 'Top of the ladder · Clubhouse Legend';
+  const material = currentLevel.material;
+  const tierHex = MATERIAL_HEX[material] ?? '#12B784';
+  const tierSecondary = TIER_SECONDARY[material];
+  const baseColor = TIER_BASE[material];
 
-  const line1 = isSignedInUnsynced
-    ? 'Start the climb'
-    : showBootstrap
-      ? currentLevel.label
-      : globalRank != null
-        ? `${currentLevel.label} · #${globalRank} worldwide`
-        : currentLevel.label;
+  const { name: tierName, roman: tierRoman } = splitLevelLabel(
+    currentLevel.label,
+    currentLevel.sub,
+  );
+
+  const medalsToNext = nextLevel
+    ? Math.max(0, nextLevel.medalsRequired - medals)
+    : 0;
 
   const onOpen = () => {
     if (isSignedInUnsynced) {
       navigate('/handicap');
       return;
     }
-    // Trophy Room sheet mounts under /handicap; navigate there and emit the
-    // open event so the sheet opens on arrival.
     navigate('/handicap');
     setTimeout(() => openGamAchievements(), 0);
   };
 
-  const gemOpacity = isSignedInUnsynced ? 0.85 : 1;
-
   return (
-    <div style={{ padding: `12px 16px 0` }}>
+    <div style={{ padding: '12px 16px 0' }}>
       <button
         type="button"
         onClick={onOpen}
         className="w-full text-left active:scale-[0.995] transition-transform"
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 14,
-          padding: 16,
-          borderRadius: 18,
-          background: SCOREBOARD_BG,
+          position: 'relative',
+          overflow: 'hidden',
+          display: 'block',
+          padding: '18px 20px 17px',
+          minHeight: 150,
+          borderRadius: 20,
+          background: baseColor,
           color: '#fff',
           border: 'none',
           cursor: 'pointer',
           fontFamily: FONT,
+          boxShadow: '0 6px 22px rgba(0,0,0,0.3)',
         }}
       >
-        <div style={{ opacity: gemOpacity, display: 'flex' }}>
-          <Gem material={currentLevel.material} />
-        </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
+        {/* Aurora blob A -- tier hue, top-left */}
+        <div
+          className="rank-aurora-blob"
+          aria-hidden
+          style={{
+            position: 'absolute',
+            top: '-20%',
+            left: '-15%',
+            width: '80%',
+            height: '120%',
+            background: `radial-gradient(circle, ${tierHex}88, transparent 60%)`,
+            filter: 'blur(30px)',
+            pointerEvents: 'none',
+            zIndex: 0,
+          }}
+        />
+        {/* Aurora blob B -- complementary hue, bottom-right, out of sync */}
+        <div
+          className="rank-aurora-blob"
+          aria-hidden
+          style={{
+            position: 'absolute',
+            bottom: '-25%',
+            right: '-15%',
+            width: '80%',
+            height: '120%',
+            background: `radial-gradient(circle, ${tierSecondary}88, transparent 60%)`,
+            filter: 'blur(30px)',
+            animationDelay: '-4s',
+            pointerEvents: 'none',
+            zIndex: 0,
+          }}
+        />
+
+        {/* Content sits above the blobs */}
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          {/* Eyebrow row */}
           <div
             style={{
-              fontSize: 17,
-              fontWeight: 900,
-              color: GOLD,
-              letterSpacing: '-0.01em',
-              lineHeight: 1.15,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 12,
             }}
           >
-            {line1}
+            <div
+              style={{
+                fontSize: 10.5,
+                fontWeight: 800,
+                letterSpacing: '0.12em',
+                color: 'rgba(255,255,255,0.6)',
+                textTransform: 'uppercase',
+              }}
+            >
+              Your Standing
+            </div>
+            {globalRank != null && (
+              <div
+                style={{
+                  fontSize: 10,
+                  fontWeight: 800,
+                  letterSpacing: '0.08em',
+                  color: 'rgba(255,255,255,0.6)',
+                  textTransform: 'uppercase',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <span style={{ color: '#fff', fontWeight: 800 }}>#{globalRank}</span>
+                {' '}Worldwide
+              </div>
+            )}
           </div>
+
+          {/* Tier line */}
           <div
             style={{
-              marginTop: 4,
-              fontSize: 10,
-              fontWeight: 700,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              color: 'rgba(255,255,255,0.5)',
-              lineHeight: 1.2,
+              marginTop: 10,
+              display: 'flex',
+              alignItems: 'baseline',
+              gap: 8,
+              lineHeight: 1.05,
+              overflow: 'hidden',
+              whiteSpace: 'nowrap',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            <span
+              style={{
+                fontSize: 30,
+                fontWeight: 900,
+                color: '#fff',
+                letterSpacing: '-0.02em',
+                textShadow: '0 2px 12px rgba(0,0,0,0.3)',
+              }}
+            >
+              {isSignedInUnsynced ? 'Start the climb' : tierName}
+            </span>
+            {tierRoman && !isSignedInUnsynced && (
+              <span
+                style={{
+                  fontSize: 16,
+                  fontWeight: 800,
+                  color: tierHex,
+                  letterSpacing: '0.02em',
+                  textShadow: '0 1px 6px rgba(0,0,0,0.35)',
+                }}
+              >
+                {tierRoman}
+              </span>
+            )}
+          </div>
+
+          {/* Identity */}
+          <div
+            style={{
+              marginTop: 6,
+              fontSize: 11.5,
+              fontWeight: 600,
+              color: 'rgba(255,255,255,0.72)',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
+              textShadow: '0 1px 6px rgba(0,0,0,0.3)',
             }}
           >
             {displayName}
             {hasHcp ? ` · WHS ${hcp?.toFixed(1)}` : ''}
           </div>
-          {/* progress bar */}
+
+          {/* Progress bar */}
           <div
             style={{
-              marginTop: 10,
-              height: 6,
+              marginTop: 14,
+              height: 5,
               borderRadius: 3,
-              background: 'rgba(255,255,255,0.1)',
+              background: 'rgba(255,255,255,0.2)',
               overflow: 'hidden',
             }}
           >
@@ -208,43 +327,39 @@ export function RankIdentityCard({ userId }: Props) {
               style={{
                 width: `${barPct}%`,
                 height: '100%',
-                background: 'linear-gradient(90deg, #E8800C, #FFCB45)',
+                background: '#fff',
                 borderRadius: 3,
               }}
             />
           </div>
-          {isSignedInUnsynced ? (
-            <div
-              style={{
-                marginTop: 6,
-                fontSize: 11,
-                fontWeight: 800,
-                color: AMBER,
-                lineHeight: 1.3,
-                letterSpacing: '0.01em',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              Sync your WHS handicap ›
-            </div>
-          ) : (
-            <div
-              style={{
-                marginTop: 6,
-                fontSize: 9.5,
-                fontWeight: 700,
-                color: 'rgba(255,255,255,0.45)',
-                lineHeight: 1.3,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {noteText}
-            </div>
-          )}
+
+          {/* Progress caption */}
+          <div
+            style={{
+              marginTop: 6,
+              fontSize: 10.5,
+              fontWeight: 500,
+              color: 'rgba(255,255,255,0.5)',
+              lineHeight: 1.3,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              textShadow: '0 1px 4px rgba(0,0,0,0.3)',
+            }}
+          >
+            {isSignedInUnsynced ? (
+              'Sync your WHS handicap to start earning medals'
+            ) : showBootstrap ? (
+              'Play a verified round to start the climb'
+            ) : nextLevel ? (
+              <>
+                <span style={{ color: '#fff', fontWeight: 700 }}>{medalsToNext}</span>
+                {' medals to '}{nextLevel.label}
+              </>
+            ) : (
+              'Top of the ladder · Clubhouse Legend'
+            )}
+          </div>
         </div>
       </button>
     </div>
@@ -252,4 +367,3 @@ export function RankIdentityCard({ userId }: Props) {
 }
 
 export default RankIdentityCard;
-
