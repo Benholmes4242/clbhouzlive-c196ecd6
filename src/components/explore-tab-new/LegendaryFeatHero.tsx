@@ -292,18 +292,8 @@ export function LegendaryFeatHero({ region, onRowTap }: Props) {
     <div>
       <div
         ref={trackRef}
-        style={{
-          display: 'flex',
-          gap: 9,
-          overflowX: isSolo ? 'hidden' : 'auto',
-          scrollSnapType: isSolo ? 'none' : 'x mandatory',
-          WebkitOverflowScrolling: 'touch',
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-          paddingLeft: 16,
-          paddingRight: 16,
-        }}
-        className="[&::-webkit-scrollbar]:hidden"
+        className="flex overflow-x-auto scrollbar-hide [&::-webkit-scrollbar]:hidden"
+        style={{ padding: '0 16px', gap: 9 }}
       >
         {rows.map((row, i) => (
           <div
@@ -313,10 +303,9 @@ export function LegendaryFeatHero({ region, onRowTap }: Props) {
               cardRefs.current[i] = el;
             }}
             style={{
-              flex: '0 0 auto',
-              width: isSolo ? '100%' : '90%',
-              scrollSnapAlign: 'start',
-              scrollSnapStop: 'always',
+              flexShrink: 0,
+              width: isSolo ? 'calc(100% - 0px)' : '86%',
+              maxWidth: isSolo ? undefined : 340,
             }}
           >
             <HeroCard
