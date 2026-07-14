@@ -72,23 +72,6 @@ function toParColor(n: number | null): string {
   return getScoreColor(n, 'light');
 }
 
-function summarizeBirdiesOrBetter(holes: CardScorecardHole[]): string {
-  let eagles = 0;
-  let birdies = 0;
-  let aces = 0;
-  for (const h of holes) {
-    if (h.par == null || h.strokes == null || h.strokes <= 0) continue;
-    if (h.strokes === 1) { aces++; continue; }
-    const d = h.strokes - h.par;
-    if (d <= -2) eagles++;
-    else if (d === -1) birdies++;
-  }
-  const parts: string[] = [];
-  if (aces) parts.push(`${aces} ace${aces > 1 ? 's' : ''}`);
-  if (eagles) parts.push(`${eagles} eagle${eagles > 1 ? 's' : ''}`);
-  if (birdies) parts.push(`${birdies} birdie${birdies > 1 ? 's' : ''}`);
-  return parts.join(` ${'\u00B7'} `);
-}
 
 const CELL_SIZE = 31;
 
@@ -217,12 +200,10 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
 
   const trajectoryCount = holes.filter((h) => h.par != null && h.strokes != null && h.strokes > 0).length;
   const showTrajectory = trajectoryCount >= 2;
-  const footerNote = summarizeBirdiesOrBetter(holes);
-  const heroColor = totals.played ? toParColor(totals.toPar) : MUTED;
 
   const hasPar = coursePar != null;
   const hasSlope = courseSlope != null;
-  const showStatLine = hasPar || hasSlope;
+  const showStatLine = hasPar || hasSlope || totals.played;
 
   const showChip = playerHcpDelta != null && Math.abs(playerHcpDelta) >= 0.05;
   const showIdentity = !!playerName;
@@ -251,23 +232,30 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
               </div>
             )}
             {showStatLine && (
-              <div style={{ ...NUM, fontSize: 12, fontWeight: 700, color: MUTED, marginTop: 5, display: 'flex', gap: 12, alignItems: 'center' }}>
-                {hasPar && (
-                  <span>PAR <span style={{ color: INK }}>{coursePar}</span></span>
-                )}
-                {hasPar && hasSlope && (
-                  <span style={{ color: 'rgba(15,23,42,0.18)' }}>|</span>
-                )}
-                {hasSlope && (
-                  <span>SLOPE <span style={{ color: INK }}>{courseSlope}</span></span>
-                )}
+              <div style={{ ...NUM, fontSize: 12, fontWeight: 700, color: MUTED, marginTop: 5, display: 'flex', gap: 12, alignItems: 'baseline', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center', minWidth: 0 }}>
+                  {hasPar && (
+                    <span>PAR <span style={{ color: INK }}>{coursePar}</span></span>
+                  )}
+                  {hasPar && hasSlope && (
+                    <span style={{ color: 'rgba(15,23,42,0.18)' }}>|</span>
+                  )}
+                  {hasSlope && (
+                    <span>SLOPE <span style={{ color: INK }}>{courseSlope}</span></span>
+                  )}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, flexShrink: 0 }}>
+                  <span style={{ ...NUM, fontSize: 22, fontWeight: 200, color: INK, letterSpacing: '-0.02em', lineHeight: 1 }}>
+                    {totals.played ? totals.gross : '\u2014'}
+                  </span>
+                  {totals.played && (
+                    <span style={{ ...NUM, fontSize: 14, fontWeight: 800, color: heroMuted ? '#8A9099' : toParColor(totals.toPar) }}>
+                      {fmtRel(totals.toPar)}
+                    </span>
+                  )}
+                </div>
               </div>
             )}
-          </div>
-          <div style={{ flexShrink: 0 }}>
-            <span style={{ ...NUM, fontSize: 42, fontWeight: 200, letterSpacing: '-0.02em', lineHeight: 1, color: heroMuted ? '#8A9099' : heroColor }}>
-              {totals.played ? fmtRel(totals.toPar) : '\u2014'}
-            </span>
           </div>
         </div>
 
@@ -334,31 +322,6 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
           </>
         )}
 
-        {/* TOTAL row */}
-        <div style={{
-          padding: '14px 16px',
-          borderTop: `1px solid ${HAIRLINE}`,
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
-        }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, minWidth: 0 }}>
-            <span style={{ fontFamily: GEIST, fontSize: 10.5, fontWeight: 800, letterSpacing: '0.1em', color: SECONDARY }}>
-              TOTAL
-            </span>
-            <span style={{ ...NUM, fontSize: 26, fontWeight: 200, color: INK, letterSpacing: '-0.02em', lineHeight: 1 }}>
-              {totals.played ? totals.gross : '\u2014'}
-            </span>
-            {totals.played && (
-              <span style={{ ...NUM, fontSize: 15, fontWeight: 800, color: toParColor(totals.toPar) }}>
-                {fmtRel(totals.toPar)}
-              </span>
-            )}
-          </div>
-          {footerNote && (
-            <div style={{ ...NUM, fontSize: 11, fontWeight: 600, color: SECONDARY, textAlign: 'right' }}>
-              {footerNote}
-            </div>
-          )}
-        </div>
 
         {/* IDENTITY BLOCK */}
         {showIdentity && (
