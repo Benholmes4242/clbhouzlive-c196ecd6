@@ -45,7 +45,7 @@ function initials(name: string): string {
   );
 }
 
-function CrownCard({ row, opener }: { row: FeatRow; opener?: ScorecardOpener }) {
+export function CrownCard({ row, opener }: { row: FeatRow; opener?: ScorecardOpener }) {
   const navigate = useNavigate();
   const holder = formatHolderName(row.holder_name);
   const isStableford = row.category === 'best_stableford_all_time';
