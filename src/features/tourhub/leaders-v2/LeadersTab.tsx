@@ -176,7 +176,7 @@ export function LeadersTab() {
       ) : categories.length === 0 ? (
         <TourHubEmptyState variant="leaderboard" />
       ) : (
-        <div style={{ paddingBottom: 88 }}>
+        <div style={{ padding: '16px 0 88px' }}>
           {categories.map((cat) => (
             <StatBoard
               key={cat.key}
