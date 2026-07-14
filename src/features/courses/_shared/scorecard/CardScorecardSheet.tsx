@@ -232,23 +232,30 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
               </div>
             )}
             {showStatLine && (
-              <div style={{ ...NUM, fontSize: 12, fontWeight: 700, color: MUTED, marginTop: 5, display: 'flex', gap: 12, alignItems: 'center' }}>
-                {hasPar && (
-                  <span>PAR <span style={{ color: INK }}>{coursePar}</span></span>
-                )}
-                {hasPar && hasSlope && (
-                  <span style={{ color: 'rgba(15,23,42,0.18)' }}>|</span>
-                )}
-                {hasSlope && (
-                  <span>SLOPE <span style={{ color: INK }}>{courseSlope}</span></span>
-                )}
+              <div style={{ ...NUM, fontSize: 12, fontWeight: 700, color: MUTED, marginTop: 5, display: 'flex', gap: 12, alignItems: 'baseline', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center', minWidth: 0 }}>
+                  {hasPar && (
+                    <span>PAR <span style={{ color: INK }}>{coursePar}</span></span>
+                  )}
+                  {hasPar && hasSlope && (
+                    <span style={{ color: 'rgba(15,23,42,0.18)' }}>|</span>
+                  )}
+                  {hasSlope && (
+                    <span>SLOPE <span style={{ color: INK }}>{courseSlope}</span></span>
+                  )}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, flexShrink: 0 }}>
+                  <span style={{ ...NUM, fontSize: 22, fontWeight: 200, color: INK, letterSpacing: '-0.02em', lineHeight: 1 }}>
+                    {totals.played ? totals.gross : '\u2014'}
+                  </span>
+                  {totals.played && (
+                    <span style={{ ...NUM, fontSize: 14, fontWeight: 800, color: heroMuted ? '#8A9099' : toParColor(totals.toPar) }}>
+                      {fmtRel(totals.toPar)}
+                    </span>
+                  )}
+                </div>
               </div>
             )}
-          </div>
-          <div style={{ flexShrink: 0 }}>
-            <span style={{ ...NUM, fontSize: 42, fontWeight: 200, letterSpacing: '-0.02em', lineHeight: 1, color: heroMuted ? '#8A9099' : heroColor }}>
-              {totals.played ? fmtRel(totals.toPar) : '\u2014'}
-            </span>
           </div>
         </div>
 
