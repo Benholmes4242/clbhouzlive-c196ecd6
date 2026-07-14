@@ -186,6 +186,7 @@ export const CHROME_REGISTRY: ChromeRule[] = [
       left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/courses' },
       tone: 'light',
       bleed: true,
+      scrollAway: true,
     },
   },
 
