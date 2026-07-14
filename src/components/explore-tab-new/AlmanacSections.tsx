@@ -9,7 +9,8 @@ import { TierSeeAllSheet } from './TierSeeAllSheet';
 import { UnderlineTabs } from '@/components/ui/UnderlineTabs';
 import { SPACE } from '@/lib/spacing';
 
-const RAIL_CAP = 12;
+const RAIL_CAP = 12;      // horizontal rails (default, compact)
+const LIST_CAP = 5;       // vertical list variant (birdie hauls)
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
