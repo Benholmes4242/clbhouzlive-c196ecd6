@@ -1,0 +1,1 @@
+ALTER TABLE public.college_media ADD COLUMN IF NOT EXISTS brand_hex text;

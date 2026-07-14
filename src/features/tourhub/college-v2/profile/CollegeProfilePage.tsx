@@ -93,6 +93,8 @@ export function CollegeProfilePage() {
             pointsTotal={standing.pointsTotal}
             alumniCount={standing.alumniCount}
             playingNow={playingNow}
+            brandHex={standing.brandHex}
+            rankChange={standing.rankChange}
           />
         )}
 
