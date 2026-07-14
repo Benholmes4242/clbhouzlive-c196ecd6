@@ -766,10 +766,15 @@ const ProfilePageV2Content: React.FC = () => {
       {/* Identity Stack - adjusted for left-aligned avatar */}
       <div className="pt-[68px] px-4 text-left relative z-10 pointer-events-auto">
         {/* Name */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <h1 className="text-[28px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.03em' }}>
             {displayName}
           </h1>
+          {profileMedals != null && profileMedals > 0 ? (
+            <span style={{ display: 'inline-flex', alignItems: 'center', marginLeft: 6 }}>
+              <TierGem medals={profileMedals} size="md" />
+            </span>
+          ) : null}
         </div>
       </div>
 
