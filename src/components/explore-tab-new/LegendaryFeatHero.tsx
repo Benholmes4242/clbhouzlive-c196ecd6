@@ -57,12 +57,15 @@ interface Props {
 export function LegendaryFeatHero({ region, onRowTap }: Props) {
   const { data, isLoading } = useRegionFeats(region, 'legendary');
   const rows = data ?? [];
+  const total = rows.length;
   const [index, setIndex] = useState(0);
 
-  const safeIndex = rows.length ? index % rows.length : 0;
+  const safeIndex = total ? index % total : 0;
   const row = rows[safeIndex];
+  const nextRow = total > 1 ? rows[(safeIndex + 1) % total] : null;
 
   const image = row?.course_image ?? row?.thumbnail_image ?? null;
+  const nextImage = nextRow?.course_image ?? nextRow?.thumbnail_image ?? null;
   const holder = useMemo(() => formatHolderName(row?.holder_name), [row?.holder_name]);
   const when = relDate(row?.play_date ?? row?.attained_at ?? null);
   const chip = labelFor(row?.feat_type);
@@ -105,7 +108,6 @@ export function LegendaryFeatHero({ region, onRowTap }: Props) {
 
   if (!row) return null;
 
-  const total = rows.length;
   const showPager = total > 1;
 
   const cycleNext = () => {
@@ -147,27 +149,28 @@ export function LegendaryFeatHero({ region, onRowTap }: Props) {
 
   return (
     <div style={{ padding: '0 16px' }}>
-      <button
-        type="button"
-        onPointerDown={onPointerDown}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerCancel}
-        className="text-left active:scale-[0.995] transition-transform"
-        style={{
-          position: 'relative',
-          width: '100%',
-          height: HERO_H,
-          borderRadius: 18,
-          overflow: 'hidden',
-          padding: 0,
-          border: 'none',
-          background: image ? '#07080C' : '#0A0C10',
-          cursor: 'pointer',
-          fontFamily: FONT,
-          boxShadow: `0 0 0 1px ${GOLD}66, 0 6px 20px rgba(0,0,0,0.3)`,
-          touchAction: 'pan-y',
-        }}
-      >
+      <div style={{ position: 'relative', width: '100%', height: HERO_H }}>
+        <button
+          type="button"
+          onPointerDown={onPointerDown}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerCancel}
+          className="text-left active:scale-[0.995] transition-transform"
+          style={{
+            position: 'relative',
+            width: total > 1 ? 'calc(100% - 14px)' : '100%',
+            height: HERO_H,
+            borderRadius: 18,
+            overflow: 'hidden',
+            padding: 0,
+            border: 'none',
+            background: image ? '#07080C' : '#0A0C10',
+            cursor: 'pointer',
+            fontFamily: FONT,
+            boxShadow: `0 0 0 1px ${GOLD}66, 0 6px 20px rgba(0,0,0,0.3)`,
+            touchAction: 'pan-y',
+          }}
+        >
         <div ref={contentRef} style={{ position: 'absolute', inset: 0, opacity: 1 }}>
         {image ? (
           <img
@@ -320,6 +323,47 @@ export function LegendaryFeatHero({ region, onRowTap }: Props) {
         ) : null}
         </div>
       </button>
+      {total > 1 ? (
+        <div
+          style={{
+            position: 'absolute',
+            right: 0,
+            top: 0,
+            width: 14,
+            height: '100%',
+            borderRadius: 18,
+            overflow: 'hidden',
+            pointerEvents: 'none',
+            opacity: 0.5,
+            background: '#0A0C10',
+          }}
+          aria-hidden="true"
+        >
+          {nextImage ? (
+            <img
+              src={nextImage}
+              alt=""
+              loading="lazy"
+              style={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                display: 'block',
+              }}
+            />
+          ) : null}
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'rgba(10,12,16,0.55)',
+            }}
+          />
+        </div>
+      ) : null}
+      </div>
     </div>
   );
 }
