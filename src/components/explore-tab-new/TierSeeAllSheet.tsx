@@ -194,6 +194,14 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap }:
   const topHolder = top ? formatHolderName(top.holder_name) : '';
   const topValue = top ? humanizedValue(top, tier) : '';
 
+  // Close-then-open: dismiss the see-all sheet first so RoundDetailSheet
+  // is not trapped underneath, then open the target 60ms later.
+  const handleRowTap = (row: FeatRow) => {
+    if (!onRowTap) return;
+    onClose();
+    setTimeout(() => onRowTap(row), 60);
+  };
+
   return (
     <BottomSheet
       open={open}
