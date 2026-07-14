@@ -51,9 +51,10 @@ function labelFor(featType?: string): string {
 
 interface Props {
   region: string | null;
+  onRowTap?: (row: import('./hooks/useRegionFeats').FeatRow) => void;
 }
 
-export function LegendaryFeatHero({ region }: Props) {
+export function LegendaryFeatHero({ region, onRowTap }: Props) {
   const { data, isLoading } = useRegionFeats(region, 'legendary');
   const rows = data ?? [];
   const [index, setIndex] = useState(0);
@@ -120,22 +121,24 @@ export function LegendaryFeatHero({ region }: Props) {
   const onPointerUp = (e: React.PointerEvent) => {
     const start = pointerRef.current;
     pointerRef.current = null;
-    if (!start || total <= 1) {
-      cycleNext();
+    if (!start) {
+      if (onRowTap && row) onRowTap(row);
+      else cycleNext();
       return;
     }
     const dx = e.clientX - start.x;
     const dy = e.clientY - start.y;
     const absX = Math.abs(dx);
     const absY = Math.abs(dy);
-    if (absX >= 40 && absX > absY * 1.5) {
+    if (total > 1 && absX >= 40 && absX > absY * 1.5) {
       if (dx < 0) cycleNext();
       else cyclePrev();
       return;
     }
     // treat as tap only if small movement in both axes
     if (absX < 10 && absY < 10) {
-      cycleNext();
+      if (onRowTap && row) onRowTap(row);
+      else cycleNext();
     }
   };
   const onPointerCancel = () => {

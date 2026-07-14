@@ -12,7 +12,7 @@ import {
   REGION_TABS,
 } from './AlmanacSections';
 import { LegendaryFeatHero } from './LegendaryFeatHero';
-import { useRegionFeats } from './hooks/useRegionFeats';
+import { useRegionFeats, type FeatRow } from './hooks/useRegionFeats';
 import { TierSeeAllSheet } from './TierSeeAllSheet';
 
 import { SeasonStrip } from './SeasonStrip';
@@ -27,6 +27,8 @@ import ExploreGrid from './ExploreGrid';
 
 import { SLATE_50 } from '@/features/courses/_shared/tokens';
 import { SPACE } from '@/lib/spacing';
+import { useScorecardOpener } from './useScorecardOpener';
+import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 
 interface ExploreTabContentProps {
   embedded?: boolean;
@@ -71,6 +73,15 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
 
   const regionUpper = feedRegionLabel.toUpperCase();
 
+  const opener = useScorecardOpener();
+  const handleFeatRowTap = useCallback(
+    (row: FeatRow) => {
+      if (row.score_id) opener.openByScore(row.score_id, null, row.user_id);
+      else if (row.user_id) opener.openProfile(row.user_id);
+    },
+    [opener],
+  );
+
   return (
     <div style={{ background: SLATE_50, minHeight: '100vh' }}>
       {/* 1. Season strip */}
@@ -91,7 +102,7 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
       <AlmanacEmptyCard region={activeRegion} />
 
       {/* 6. Legendary hero (aces & albatrosses) */}
-      <LegendarySection region={activeRegion} />
+      <LegendarySection region={activeRegion} onRowTap={handleFeatRowTap} />
 
       {/* 7. Course Crowns -- self-hiding, owns its header */}
       <CourseCrownsRail region={activeRegion} />
@@ -105,6 +116,7 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
         tier="eagles"
         title={`Eagles · ${regionUpper}`}
         variant="compact"
+        onRowTap={handleFeatRowTap}
       />
 
       {/* 10. Toughest courses -- self-hiding, owns its header */}
@@ -116,6 +128,7 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
         tier="birdie_hauls"
         title={`Birdie hauls · ${regionUpper}`}
         variant="list"
+        onRowTap={handleFeatRowTap}
       />
 
 
@@ -143,11 +156,27 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
           onRegionChange={handleRegionChange}
         />
       </div>
+
+      {/* Single shared scorecard sheet for all feat/legendary/see-all rows */}
+      <RoundDetailSheet
+        open={!!opener.target}
+        onClose={opener.close}
+        scoreId={opener.target?.scoreId ?? null}
+        connectionId={opener.target?.connectionId ?? null}
+        profileUserId={opener.target?.profileUserId ?? null}
+      />
     </div>
   );
 }
 
-function LegendarySection({ region }: { region: string | null }) {
+
+function LegendarySection({
+  region,
+  onRowTap,
+}: {
+  region: string | null;
+  onRowTap?: (row: FeatRow) => void;
+}) {
   const { data, isLoading } = useRegionFeats(region, 'legendary');
   const rows = data ?? [];
   const hasAny = rows.length > 0;
@@ -189,14 +218,16 @@ function LegendarySection({ region }: { region: string | null }) {
           </button>
         )}
       </div>
-      <LegendaryFeatHero region={region} />
+      <LegendaryFeatHero region={region} onRowTap={onRowTap} />
       <TierSeeAllSheet
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
         tier="legendary"
         region={region}
         rows={rows}
+        onRowTap={onRowTap}
       />
     </section>
   );
 }
+

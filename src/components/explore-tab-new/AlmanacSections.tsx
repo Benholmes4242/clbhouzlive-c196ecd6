@@ -147,10 +147,11 @@ interface TierProps {
   tier: FeatTier;
   title: string;
   variant?: 'standard' | 'compact' | 'list';
+  onRowTap?: (row: import('./hooks/useRegionFeats').FeatRow) => void;
 }
 
 
-function FeatTierRailInner({ region, tier, title, variant = 'standard' }: TierProps) {
+function FeatTierRailInner({ region, tier, title, variant = 'standard', onRowTap }: TierProps) {
   const navigate = useNavigate();
   const { data, isLoading } = useRegionFeats(region, tier);
   const rawRows = data ?? [];
@@ -211,6 +212,7 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard' }: TierPr
               row={row}
               tier={tier}
               index={i}
+              onTap={onRowTap ? () => onRowTap(row) : undefined}
             />
           ))}
         </div>
@@ -224,6 +226,7 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard' }: TierPr
               row={row}
               tier={tier}
               size={variant === 'compact' ? 'compact' : 'default'}
+              onTap={onRowTap ? () => onRowTap(row) : undefined}
             />
           ))}
         </div>
@@ -236,7 +239,9 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard' }: TierPr
         tier={tier}
         region={region}
         rows={rows}
+        onRowTap={onRowTap}
       />
+
     </section>
   );
 }

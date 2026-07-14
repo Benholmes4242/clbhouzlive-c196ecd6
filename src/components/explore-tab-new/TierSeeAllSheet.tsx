@@ -101,6 +101,7 @@ interface Props {
   tier: FeatTier;
   region: string | null;
   rows: FeatRow[];
+  onRowTap?: (row: FeatRow) => void;
 }
 
 type SortMode = 'latest' | 'top';
@@ -129,7 +130,7 @@ function tsOf(row: FeatRow): number {
   return Number.isFinite(t) ? t : 0;
 }
 
-export function TierSeeAllSheet({ open, onClose, tier, region, rows }: Props) {
+export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap }: Props) {
   const [visible, setVisible] = useState(PAGE);
   const [sort, setSort] = useState<SortMode>('latest');
   const sentinelRef = useRef<HTMLDivElement | null>(null);
@@ -192,6 +193,14 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows }: Props) {
   const total = rows.length;
   const topHolder = top ? formatHolderName(top.holder_name) : '';
   const topValue = top ? humanizedValue(top, tier) : '';
+
+  // Close-then-open: dismiss the see-all sheet first so RoundDetailSheet
+  // is not trapped underneath, then open the target 60ms later.
+  const handleRowTap = (row: FeatRow) => {
+    if (!onRowTap) return;
+    onClose();
+    setTimeout(() => onRowTap(row), 60);
+  };
 
   return (
     <BottomSheet
@@ -290,6 +299,9 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows }: Props) {
         {/* No.1 masthead */}
         {top && (
           <div
+            onClick={onRowTap ? () => handleRowTap(top) : undefined}
+            role={onRowTap ? 'button' : undefined}
+            tabIndex={onRowTap ? 0 : undefined}
             style={{
               marginTop: 12,
               padding: '12px 14px',
@@ -300,6 +312,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows }: Props) {
               alignItems: 'center',
               gap: 12,
               boxShadow: '0 1px 3px rgba(255,184,0,0.10)',
+              cursor: onRowTap ? 'pointer' : 'default',
             }}
           >
             <div style={{ position: 'relative', flexShrink: 0 }}>
@@ -405,6 +418,9 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows }: Props) {
             return (
               <div
                 key={`${row.score_id ?? row.course_id ?? i}-${i}`}
+                onClick={onRowTap ? () => handleRowTap(row) : undefined}
+                role={onRowTap ? 'button' : undefined}
+                tabIndex={onRowTap ? 0 : undefined}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -413,6 +429,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows }: Props) {
                   padding: '12px 16px',
                   borderBottom: `0.5px solid ${HAIRLINE_INK_10}`,
                   background: 'transparent',
+                  cursor: onRowTap ? 'pointer' : 'default',
                 }}
               >
                 <div

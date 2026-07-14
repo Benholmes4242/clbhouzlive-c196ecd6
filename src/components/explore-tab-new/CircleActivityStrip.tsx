@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { AlmanacHead } from './AlmanacSections';
 import {
@@ -12,6 +12,7 @@ import {
   INK_TINT_06,
 } from '@/features/courses/_shared/tokens';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
+import { useScorecardOpener } from './useScorecardOpener';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const CARD_W = 226;
@@ -85,7 +86,7 @@ interface Props {
 
 export function CircleActivityStrip({ userId }: Props) {
   const { data, isLoading } = useCircleActivity(userId);
-  const [sheet, setSheet] = useState<{ scoreId: string; connectionId: string } | null>(null);
+  const { target, openByScore, close } = useScorecardOpener();
 
   const rows = useMemo(() => data ?? [], [data]);
 
@@ -151,17 +152,17 @@ export function CircleActivityStrip({ userId }: Props) {
           <CircleActivityCard
             key={`${r.score_id}-${i}`}
             row={r}
-            onTap={() => setSheet({ scoreId: r.score_id, connectionId: r.connection_id })}
+            onTap={() => openByScore(r.score_id, r.connection_id, r.friend_user_id)}
           />
         ))}
       </div>
 
       <RoundDetailSheet
-        open={!!sheet}
-        onClose={() => setSheet(null)}
-        scoreId={sheet?.scoreId ?? null}
-        connectionId={sheet?.connectionId ?? null}
-        variant="light"
+        open={!!target}
+        onClose={close}
+        scoreId={target?.scoreId ?? null}
+        connectionId={target?.connectionId ?? null}
+        profileUserId={target?.profileUserId ?? null}
       />
     </section>
   );
