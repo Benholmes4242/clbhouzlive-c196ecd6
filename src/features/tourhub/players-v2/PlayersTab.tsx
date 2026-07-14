@@ -181,7 +181,16 @@ export function PlayersTab() {
   const goPlayer = useCallback((id: string) => id && navigate(`/tourhub/player/${id}`), [navigate]);
 
   return (
-    <div style={{ background: SLATE_50, minHeight: '100vh', fontFamily: FONT }}>
+    <div
+      style={{
+        background: SLATE_50,
+        minHeight: '100vh',
+        fontFamily: FONT,
+        // Islands overlay the top band at rest; on scroll they ride away and
+        // the chips row locks at the notch. Matches ScheduleTab.
+        paddingTop: 'calc(var(--sat, 0px) + 69px)',
+      }}
+    >
       {/* HEADER — search icon only */}
       <div style={{ padding: '16px 16px 12px' }}>
         <div
