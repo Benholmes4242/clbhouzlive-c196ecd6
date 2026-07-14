@@ -175,7 +175,7 @@ function BirdieHaulsModeToggle({
     >
       <div style={{ display: 'inline-flex', flexShrink: 0, gap: 6 }}>
         {([
-          { v: 'latest', label: 'LATEST' },
+          { v: 'latest', label: 'RECENT' },
           { v: 'alltime', label: 'ALL TIME' },
         ] as const).map((o) => {
           const active = mode === o.v;
