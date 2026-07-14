@@ -156,14 +156,14 @@ function CrownCard({ row }: { row: FeatRow }) {
           minWidth: 0,
         }}
       >
-        <div style={{ boxShadow: `0 0 0 2px ${GOLD}`, borderRadius: '34%' }}>
-          <SquircleAvatar
-            size={56}
-            src={row.holder_avatar ?? null}
-            alt={holder}
-            fallback={initials(holder)}
-          />
-        </div>
+        <SquircleAvatar
+          size={56}
+          src={row.holder_avatar ?? null}
+          alt={holder}
+          fallback={initials(holder)}
+          hairlineRing
+          ringColor={GOLD}
+        />
         <div
           style={{
             fontSize: 14,
