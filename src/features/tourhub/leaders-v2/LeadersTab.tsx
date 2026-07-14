@@ -44,26 +44,16 @@ const CHIP_LABEL: Record<TourId, string> = {
 export function LeadersTab() {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Tour selection
-  const { selectedTourSlug, viewingTourSlug, selectTour } = useTourSelection();
-  const inboundHonoredRef = useRef(false);
-  useEffect(() => {
-    if (inboundHonoredRef.current) return;
-    inboundHonoredRef.current = true;
-    const inbound = searchParams.get('tour');
-    if (inbound && inbound in TOUR_CONFIG && inbound !== (selectedTourSlug ?? viewingTourSlug)) {
-      selectTour(inbound);
-    }
-  }, [searchParams, selectTour, selectedTourSlug, viewingTourSlug]);
-
-  // Champions is intentionally omitted on this page (insufficient stat coverage
-  // for a leaders board). If the app-wide selection is 'champ', fall back to
-  // rendering PGA boards without fighting the global TourSelectionContext.
-  const rawTour =
-    ((viewingTourSlug ?? selectedTourSlug ?? 'pga') as string) in TOUR_CONFIG
-      ? ((viewingTourSlug ?? selectedTourSlug ?? 'pga') as TourId)
+  // Per-section tour lens (local state, NO All Tours, PGA default).
+  // Champions is intentionally omitted here (insufficient stat coverage);
+  // if the URL passes ?tour=champ we fall through to PGA.
+  const inboundTour = searchParams.get('tour');
+  const initialTour: TourId =
+    inboundTour && inboundTour in TOUR_CONFIG && inboundTour !== 'champ'
+      ? (inboundTour as TourId)
       : 'pga';
-  const activeTour: TourId = rawTour === 'champ' ? 'pga' : rawTour;
+  const [activeTour, setActiveTour] = useState<TourId>(initialTour);
+
 
   const { data: result, isLoading } = useLeaderCategories(activeTour);
   const { data: liveMap } = useLivePlayerIds();
