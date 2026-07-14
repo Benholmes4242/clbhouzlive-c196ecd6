@@ -202,6 +202,23 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
           >
             <div
               style={{
+                alignSelf: 'flex-start',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+                padding: '4px 10px',
+                borderRadius: 20,
+                background: 'rgba(255,255,255,0.92)',
+                fontSize: 10,
+                fontWeight: 800,
+                color: '#22C55E',
+                lineHeight: 1,
+              }}
+            >
+              {'🦅 EAGLE'}
+            </div>
+            <div
+              style={{
                 fontSize: 12.5,
                 fontWeight: 700,
                 color: '#fff',
@@ -266,7 +283,7 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
                 textShadow: '0 2px 6px rgba(0,0,0,0.45)',
               }}
             >
-              {holeNumber || '—'}
+              {holeNumber || '-'}
             </span>
           </div>
 
@@ -333,7 +350,7 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
                   fontVariantNumeric: 'tabular-nums',
                 }}
               >
-                HCP {formatHcp(hcpVal)}
+                {formatHcp(hcpVal)}
               </div>
             ) : null}
           </div>
