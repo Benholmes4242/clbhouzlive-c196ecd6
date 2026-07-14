@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { TierGem } from '@/components/shared/TierGem';
 import type { FeatRow, FeatTier } from './hooks/useRegionFeats';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
