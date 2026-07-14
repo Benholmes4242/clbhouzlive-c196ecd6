@@ -40,6 +40,7 @@ const CHIP_LABEL: Record<TourId, string> = {
   liv: 'LIV',
 };
 
+
 export function LeadersTab() {
   const [searchParams, setSearchParams] = useSearchParams();
 
