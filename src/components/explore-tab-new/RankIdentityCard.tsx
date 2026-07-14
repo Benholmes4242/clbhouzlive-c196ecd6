@@ -88,14 +88,6 @@ const TIER_BASE: Record<WallMaterial, string> = {
   obsidian: '#07080C',
 };
 
-function splitLevelLabel(label: string, sub: 'I' | 'II'): { name: string; roman: string } {
-  // Level 10 is "Clubhouse Legend" (no roman in label).
-  const suffix = ` ${sub}`;
-  if (label.endsWith(suffix)) {
-    return { name: label.slice(0, -suffix.length), roman: sub };
-  }
-  return { name: label, roman: '' };
-}
 
 export function RankIdentityCard({ userId }: Props) {
   const navigate = useNavigate();
@@ -145,10 +137,7 @@ export function RankIdentityCard({ userId }: Props) {
   const tierSecondary = TIER_SECONDARY[material];
   const baseColor = TIER_BASE[material];
 
-  const { name: tierName, roman: tierRoman } = splitLevelLabel(
-    currentLevel.label,
-    currentLevel.sub,
-  );
+  const tierName = currentLevel.label.replace(/\s+(I|II)$/, '');
 
   const medalsToNext = nextLevel
     ? Math.max(0, nextLevel.medalsRequired - medals)
@@ -281,17 +270,17 @@ export function RankIdentityCard({ userId }: Props) {
             >
               {isSignedInUnsynced ? 'Start the climb' : tierName}
             </span>
-            {tierRoman && !isSignedInUnsynced && (
+            {!isSignedInUnsynced && (
               <span
                 style={{
-                  fontSize: 16,
+                  fontSize: 12.5,
                   fontWeight: 800,
                   color: tierHex,
                   letterSpacing: '0.02em',
                   textShadow: '0 1px 6px rgba(0,0,0,0.35)',
                 }}
               >
-                {tierRoman}
+                Level {currentLevel.level}
               </span>
             )}
           </div>
