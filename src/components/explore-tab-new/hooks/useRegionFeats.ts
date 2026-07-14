@@ -36,11 +36,19 @@ export function toCacheRegion(r: string | null): string {
   return r ? CACHE_REGION[r] ?? 'worldwide' : 'worldwide';
 }
 
-export function useRegionFeats(region: string | null, tier: FeatTier) {
+export type RecordsMode = 'latest' | 'alltime';
+
+export function useRegionFeats(
+  region: string | null,
+  tier: FeatTier,
+  mode: RecordsMode = 'latest',
+) {
   const cacheRegion = toCacheRegion(region);
   const railKey =
     tier === 'records'
-      ? `records:${cacheRegion}`
+      ? mode === 'alltime'
+        ? `records_alltime:${cacheRegion}`
+        : `records:${cacheRegion}`
       : `feats:${cacheRegion}:${tier}`;
 
   return useQuery<FeatRow[]>({
@@ -57,3 +65,4 @@ export function useRegionFeats(region: string | null, tier: FeatTier) {
     },
   });
 }
+
