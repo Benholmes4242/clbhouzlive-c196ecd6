@@ -47,7 +47,6 @@ function CrownCard({ row, opener }: { row: FeatRow; opener?: ScorecardOpener }) 
   const navigate = useNavigate();
   const holder = formatHolderName(row.holder_name);
   const isStableford = row.category === 'best_stableford_all_time';
-  const scoreLabel = isStableford ? 'STABLEFORD' : 'GROSS';
   const scoreValue =
     row.value != null ? String(row.value) : row.feat_value ?? '--';
   const hasHcp = row.holder_hcp != null;
