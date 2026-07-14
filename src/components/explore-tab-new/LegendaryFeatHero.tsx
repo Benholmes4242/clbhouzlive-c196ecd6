@@ -298,7 +298,7 @@ export function LegendaryFeatHero({ region, onRowTap }: Props) {
         ref={trackRef}
         style={{
           display: 'flex',
-          gap: 10,
+          gap: 9,
           overflowX: isSolo ? 'hidden' : 'auto',
           scrollSnapType: isSolo ? 'none' : 'x mandatory',
           WebkitOverflowScrolling: 'touch',
