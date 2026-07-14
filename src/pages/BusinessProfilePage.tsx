@@ -825,7 +825,7 @@ const BusinessProfilePage: React.FC = () => {
 
       {/* ───── Tabs ───── */}
       <section className="px-4 bg-background">
-        <div style={{ display: 'flex', gap: 20, justifyContent: 'center' }}>
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'center', padding: '10px 0' }}>
           {tabs.map(tab => {
             const isActive = activeTab === tab.id;
             return (
@@ -835,19 +835,20 @@ const BusinessProfilePage: React.FC = () => {
                 aria-selected={isActive}
                 onClick={() => setActiveTab(tab.id)}
                 style={{
-                  background: 'none',
-                  border: 'none',
                   cursor: 'pointer',
-                  padding: '12px 2px 8px',
-                  fontSize: 16,
-                  fontWeight: isActive ? 700 : 500,
-                  color: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',
-                  letterSpacing: isActive ? '-0.025em' : '0',
-                  position: 'relative',
-                  minHeight: 44,
-                  display: 'flex',
+                  padding: '8px 14px',
+                  borderRadius: 999,
+                  border: 'none',
+                  background: isActive ? '#15171F' : 'transparent',
+                  color: isActive ? '#FFFFFF' : 'rgba(15,23,42,0.65)',
+                  fontSize: 13,
+                  fontWeight: 700,
+                  letterSpacing: '0.01em',
+                  minHeight: 36,
+                  display: 'inline-flex',
                   alignItems: 'center',
-                  transition: 'color 0.18s',
+                  whiteSpace: 'nowrap',
+                  transition: 'all 0.15s',
                 }}
               >
                 {tab.label}

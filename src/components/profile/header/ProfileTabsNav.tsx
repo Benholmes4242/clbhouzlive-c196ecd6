@@ -34,7 +34,7 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
 
   return (
     <section className="px-4 bg-background" onPointerDown={handlePointerDown}>
-      <div style={{ borderBottom: '1px solid hsl(var(--border))', display: 'flex', gap: 20, justifyContent: 'center' }}>
+      <div style={{ display: 'flex', gap: 8, justifyContent: 'center', padding: '10px 0' }}>
         {tabs.map((tab) => {
           const isActive = activeSection === tab.id;
           return (
@@ -45,34 +45,24 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
               onClick={() => handleTabClick(tab.id)}
               disabled={disabled}
               style={{
-                background: 'none',
-                border: 'none',
                 cursor: disabled ? 'default' : 'pointer',
-                padding: '11px 2px 9px',
-                fontSize: 16,
-                fontWeight: isActive ? 700 : 500,
-                color: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',
-                letterSpacing: isActive ? '-0.025em' : '0',
-                position: 'relative',
-                minHeight: 44,
-                display: 'flex',
+                padding: '8px 14px',
+                borderRadius: 999,
+                border: 'none',
+                background: isActive ? '#15171F' : 'transparent',
+                color: isActive ? '#FFFFFF' : 'rgba(15,23,42,0.65)',
+                fontSize: 13,
+                fontWeight: 700,
+                letterSpacing: '0.01em',
+                minHeight: 36,
+                display: 'inline-flex',
                 alignItems: 'center',
+                whiteSpace: 'nowrap',
                 opacity: disabled ? 0.5 : 1,
-                transition: 'color 0.18s',
+                transition: 'all 0.15s',
               }}
             >
               {tab.label}
-              {isActive && (
-                <div style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  height: 2.5,
-                  borderRadius: 2,
-                  background: 'linear-gradient(90deg, #F59E0B, #F7931E)',
-                }} />
-              )}
             </button>
           );
         })}
