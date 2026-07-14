@@ -83,6 +83,11 @@ export function Masthead({ slug, displayName, rank, pointsTotal, alumniCount, pl
     else follow.mutate(slug);
   };
 
+  const navigate = useNavigate();
+  const handleCompare = () => {
+    navigate(`${collegeHubRoute()}?compare=${encodeURIComponent(slug)}`);
+  };
+
   return (
     <div
       style={{
