@@ -19622,6 +19622,7 @@ export type Database = {
         Args: { p_limit?: number }
         Returns: undefined
       }
+      refresh_legendary_leaders: { Args: never; Returns: undefined }
       refresh_toughest_courses_cache: {
         Args: { p_limit?: number; p_min_rounds?: number }
         Returns: undefined
