@@ -1,7 +1,7 @@
 import React from 'react';
 import { Crown, type LucideIcon } from 'lucide-react';
 import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
-import { WindowToggle } from '../CourseLegendsSection';
+import { WindowToggle, type WindowToggleVariant } from '../CourseLegendsSection';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 
 export interface CabinetSlot {
