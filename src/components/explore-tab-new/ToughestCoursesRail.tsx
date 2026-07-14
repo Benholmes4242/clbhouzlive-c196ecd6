@@ -13,117 +13,108 @@ function ToughCard({
   courseName,
   avgOverPar,
   totalRounds,
-  thumbnail,
 }: {
   rank: number;
   courseId: string;
   courseName: string;
   avgOverPar: number;
   totalRounds: number;
-  thumbnail: string | null;
 }) {
   const navigate = useNavigate();
   const label = rank === 1 ? '#1 TOUGHEST' : `#${rank}`;
+  const watermarkSize = rank >= 10 ? 84 : 104;
   return (
     <button
       type="button"
       onClick={() => navigate(`/courses/${courseId}`, { state: { activeTab: 'holes' } })}
       className="text-left active:scale-[0.99] transition-transform"
       style={{
+        position: 'relative',
         flexShrink: 0,
         width: 210,
+        height: 150,
         borderRadius: 16,
         background: '#fff',
         border: '1px solid rgba(15,23,42,0.07)',
-        padding: 0,
         overflow: 'hidden',
+        padding: '13px 14px',
         cursor: 'pointer',
         fontFamily: FONT,
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
       <div
+        aria-hidden
         style={{
-          position: 'relative',
-          width: '100%',
-          height: 72,
-          background: thumbnail
-            ? undefined
-            : 'linear-gradient(150deg, #6b8a5a, #3a4a2f)',
+          position: 'absolute',
+          top: -18,
+          right: -6,
+          fontSize: watermarkSize,
+          fontWeight: 900,
+          color: 'rgba(220,38,38,0.07)',
+          letterSpacing: '-0.05em',
+          lineHeight: 1,
+          fontVariantNumeric: 'tabular-nums',
+          pointerEvents: 'none',
         }}
       >
-        {thumbnail ? (
-          <img
-            src={thumbnail}
-            alt=""
-            loading="lazy"
-            style={{
-              position: 'absolute',
-              inset: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              display: 'block',
-            }}
-          />
-        ) : null}
-        <div
-          style={{
-            position: 'absolute',
-            left: 8,
-            bottom: 8,
-            padding: '3px 8px',
-            borderRadius: 6,
-            background: 'rgba(10,12,16,0.65)',
-            fontSize: 9,
-            fontWeight: 800,
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            color: '#fff',
-            lineHeight: 1,
-          }}
-        >
-          {label}
-        </div>
+        {rank}
       </div>
-      <div style={{ padding: '11px 14px 13px' }}>
-        <div
-          style={{
-            fontSize: 13,
-            fontWeight: 800,
-            color: '#0F172A',
-            letterSpacing: '-0.01em',
-            lineHeight: 1.25,
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-          }}
-        >
-          {courseName}
-        </div>
-        <div
-          style={{
-            marginTop: 7,
-            fontSize: 23,
-            fontWeight: 900,
-            fontVariantNumeric: 'tabular-nums',
-            letterSpacing: '-0.02em',
-            color: '#dc2626',
-            lineHeight: 1,
-          }}
-        >
-          +{numFmt(avgOverPar, 1)}
-        </div>
-        <div
-          style={{
-            marginTop: 4,
-            fontSize: 10,
-            color: '#94A3B8',
-            lineHeight: 1.3,
-          }}
-        >
-          avg per round · {totalRounds} rounds
-        </div>
+      <div
+        style={{
+          position: 'relative',
+          fontSize: 9.5,
+          fontWeight: 800,
+          letterSpacing: '0.1em',
+          textTransform: 'uppercase',
+          color: '#94A3B8',
+          lineHeight: 1,
+        }}
+      >
+        {label}
+      </div>
+      <div
+        style={{
+          position: 'relative',
+          marginTop: 4,
+          fontSize: 13.5,
+          fontWeight: 800,
+          color: '#0F172A',
+          letterSpacing: '-0.01em',
+          lineHeight: 1.25,
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden',
+        }}
+      >
+        {courseName}
+      </div>
+      <div
+        style={{
+          position: 'relative',
+          marginTop: 'auto',
+          fontSize: 24,
+          fontWeight: 900,
+          fontVariantNumeric: 'tabular-nums',
+          letterSpacing: '-0.02em',
+          color: '#dc2626',
+          lineHeight: 1,
+        }}
+      >
+        +{numFmt(avgOverPar, 1)}
+      </div>
+      <div
+        style={{
+          position: 'relative',
+          marginTop: 2,
+          fontSize: 10,
+          color: '#94A3B8',
+          lineHeight: 1.3,
+        }}
+      >
+        avg per round · {totalRounds} rounds
       </div>
     </button>
   );
@@ -151,7 +142,6 @@ export function ToughestCoursesRail() {
             courseName={c.course_name}
             avgOverPar={c.avg_over_par}
             totalRounds={c.total_rounds}
-            thumbnail={c.thumbnail_image ?? null}
           />
         ))}
       </div>
