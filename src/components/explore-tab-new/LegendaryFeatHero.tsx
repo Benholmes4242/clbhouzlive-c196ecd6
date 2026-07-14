@@ -51,9 +51,10 @@ function labelFor(featType?: string): string {
 
 interface Props {
   region: string | null;
+  onRowTap?: (row: import('./hooks/useRegionFeats').FeatRow) => void;
 }
 
-export function LegendaryFeatHero({ region }: Props) {
+export function LegendaryFeatHero({ region, onRowTap }: Props) {
   const { data, isLoading } = useRegionFeats(region, 'legendary');
   const rows = data ?? [];
   const [index, setIndex] = useState(0);
