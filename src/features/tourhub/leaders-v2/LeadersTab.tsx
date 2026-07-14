@@ -121,16 +121,6 @@ export function LeadersTab() {
     >
       {/* Header */}
       <div style={{ padding: '16px 16px 12px' }}>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: 12,
-            gap: 8,
-          }}
-        >
-        </div>
 
       </div>
 
