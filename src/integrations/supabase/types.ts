@@ -5558,6 +5558,39 @@ export type Database = {
           },
         ]
       }
+      gam_user_level_events: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          label: string
+          level: number
+          medals: number
+          seen_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: string
+          label: string
+          level: number
+          medals: number
+          seen_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          label?: string
+          level?: number
+          medals?: number
+          seen_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       gam_user_milestones: {
         Row: {
           count: number
@@ -18814,6 +18847,7 @@ export type Database = {
           top_10_positions: number
         }[]
       }
+      get_user_medal_count: { Args: { p_user_id: string }; Returns: number }
       get_user_mention_signals_30d: {
         Args: { p_since: string; p_user_id: string }
         Returns: {
@@ -18968,6 +19002,13 @@ export type Database = {
           already_joined: boolean
           show_count: boolean
           total: number
+        }[]
+      }
+      get_wall_medals: {
+        Args: { p_user_ids: string[] }
+        Returns: {
+          medals: number
+          user_id: string
         }[]
       }
       get_watch_category_counts: {
