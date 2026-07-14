@@ -91,7 +91,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap }:
   }, [mode]);
 
   useEffect(() => {
-    if (!open || showBoards) return;
+    if (!open || false) return;
     const node = sentinelRef.current;
     if (!node) return;
     const io = new IntersectionObserver(
@@ -104,7 +104,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap }:
     );
     io.observe(node);
     return () => io.disconnect();
-  }, [open, displayRows.length, showBoards]);
+  }, [open, displayRows.length, false]);
 
   // Own scorecard opener so ALL TIME rows (not present in the caller's list)
   // still open cleanly. Fall back to caller's onRowTap if provided.
@@ -120,7 +120,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap }:
   };
 
   const visibleRows = displayRows.slice(0, visible);
-  const total = showBoards ? 0 : displayRows.length;
+  const total = false ? 0 : displayRows.length;
 
   return (
     <BottomSheet
@@ -183,7 +183,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap }:
             }}
           >
             {regionLabel(region)} {'\u00B7'} WHS
-            {showBoards
+            {false
               ? ` \u00B7 LEADERBOARDS`
               : ` \u00B7 ${total} ${total === 1 ? 'ENTRY' : 'ENTRIES'}`}
           </div>
@@ -233,7 +233,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap }:
           overflowY: 'auto',
           WebkitOverflowScrolling: 'touch',
           background: SURFACE,
-          padding: showBoards ? '16px 0' : '12px 0',
+          padding: false ? '16px 0' : '12px 0',
         }}
       >
         {visibleRows.length === 0 ? (
@@ -262,7 +262,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap }:
           </div>
         )}
 
-        {!showBoards && visible < displayRows.length && (
+        {!false && visible < displayRows.length && (
           <div ref={sentinelRef} style={{ height: 40 }} />
         )}
         <div style={{ height: 24 }} />
