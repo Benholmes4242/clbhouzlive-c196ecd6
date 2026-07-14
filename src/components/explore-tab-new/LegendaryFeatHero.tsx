@@ -106,14 +106,14 @@ function HeroCard({ row, showPager, indexLabel, onTap }: CardProps) {
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'linear-gradient(155deg, rgba(10,12,16,0.72), rgba(10,12,16,0.90))',
+          background: 'linear-gradient(155deg, rgba(10,12,16,0.35), rgba(10,12,16,0.72))',
         }}
       />
       <div
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'radial-gradient(ellipse at 85% 20%, #FBBC2E26, transparent 55%)',
+          background: 'radial-gradient(ellipse at 85% 20%, #FBBC2E1F, transparent 55%)',
           pointerEvents: 'none',
         }}
       />
