@@ -913,6 +913,7 @@ const AppInner: React.FC = () => {
                                             <InviteSheetProvider>
                                             <SeasonWrapModal />
                                             <AchievementToastWrapper />
+                                            <LevelUpGate />
                                             <Suspense fallback={null}>
                                               <div className="app-depth">
                                                 {/* Global header for all pages except Clubhouse/Auth/Admin */}
