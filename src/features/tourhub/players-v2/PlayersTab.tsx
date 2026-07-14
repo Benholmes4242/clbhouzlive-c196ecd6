@@ -38,14 +38,6 @@ import { useLivePlayerIds } from './data/useLivePlayerIds';
 import { PodiumCards } from './PodiumCards';
 import { RankedPlayerRow } from './RankedPlayerRow';
 
-const CHIP_LABEL: Record<TourId, string> = {
-  pga: 'PGA',
-  lpga: 'LPGA',
-  euro: 'DP WORLD',
-  pgad: 'KORN FERRY',
-  champ: 'CHAMPIONS',
-  liv: 'LIV',
-};
 
 type SortKey = 'ranking' | 'live';
 
