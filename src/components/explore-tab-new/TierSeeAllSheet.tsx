@@ -1,14 +1,21 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { X } from 'lucide-react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { INK, INK_MUTE, HAIRLINE_INK_8, INK_TINT_06 } from '@/features/courses/_shared/tokens';
-import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
-import { Z } from '@/config/zIndex';
-import { TIER_ICON, REGION_TABS } from './AlmanacSections';
+
+import { BottomSheet } from '@/components/ui/BottomSheet';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import {
+  AMBER,
+  FONT,
+  GOLD_DEEP,
+  GOLD_BORDER,
+  HAIRLINE_INK_10,
+  INK,
+  INK_MUTE,
+  SLATE_50,
+  SURFACE,
+} from '@/features/tourhub/_shared/tokens';
+import { REGION_TABS } from './AlmanacSections';
 import type { FeatRow, FeatTier } from './hooks/useRegionFeats';
 
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const PAGE = 20;
 
 const TIER_TITLE: Record<FeatTier, string> = {
@@ -18,19 +25,11 @@ const TIER_TITLE: Record<FeatTier, string> = {
   birdie_hauls: 'Birdie hauls',
 };
 
-const RECORD_CATEGORY_LABEL: Record<string, string> = {
-  lowest_gross_all_time: 'Gross record',
-  best_stableford_all_time: 'Stableford record',
-  best_score_diff_all_time: 'Net record',
-  most_birdies_all_time: 'Most birdies',
-  most_eagles_all_time: 'Most eagles',
-  most_aces_all_time: 'Most aces',
-  lowest_gross_90d: 'Gross record',
-  best_stableford_90d: 'Stableford record',
-  best_score_diff_90d: 'Net record',
-  most_birdies_90d: 'Most birdies',
-  most_eagles_90d: 'Most eagles',
-  most_aces_90d: 'Most aces',
+const TIER_SHORT: Record<FeatTier, string> = {
+  legendary: 'LEGENDARY',
+  records: 'COURSE RECORDS',
+  eagles: 'EAGLES',
+  birdie_hauls: 'BIRDIE HAULS',
 };
 
 function formatHolderName(raw?: string | null): string {
@@ -140,12 +139,8 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows }: Props) {
 
   useEffect(() => {
     if (!open) return;
-    lockBodyScroll();
     setVisible(PAGE);
     setSort('latest');
-    return () => {
-      unlockBodyScroll();
-    };
   }, [open]);
 
   const sortedRows = useMemo(() => {
@@ -192,142 +187,221 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows }: Props) {
     if (scrollerRef.current) scrollerRef.current.scrollTop = 0;
   }, [sort]);
 
-  const recentLabel = useMemo(() => {
-    const thirtyAgo = Date.now() - 30 * 86400000;
-    const oldest = rows.reduce<number>((min, r) => {
-      const iso = r.play_date ?? r.attained_at;
-      if (!iso) return min;
-      const t = new Date(iso).getTime();
-      return Number.isFinite(t) ? Math.min(min, t) : min;
-    }, Number.POSITIVE_INFINITY);
-    if (!Number.isFinite(oldest)) return 'Recent · verified WHS rounds';
-    return oldest >= thirtyAgo
-      ? 'Last 30 days · verified WHS rounds'
-      : 'Recent · verified WHS rounds';
-  }, [rows]);
+  const top = sortedRows[0];
+  const rest = sortedRows.slice(1, visible);
+  const total = rows.length;
+  const topHolder = top ? formatHolderName(top.holder_name) : '';
+  const topValue = top ? humanizedValue(top, tier) : '';
 
-  if (!open) return null;
-
-  const shown = sortedRows.slice(0, visible);
-  const showRanks = hasToggle && sort === 'top';
-
-  return createPortal(
-    <div
+  return (
+    <BottomSheet
+      open={open}
+      onClose={onClose}
+      ariaLabelledBy="tier-see-all-title"
+      variant="light"
+      surfaceColor={SLATE_50}
       style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: Z.sheet,
+        height: '90vh',
+        maxHeight: '90vh',
         display: 'flex',
-        alignItems: 'flex-end',
-        background: 'rgba(15,17,23,0.5)',
+        flexDirection: 'column',
+        fontFamily: FONT,
+        background: SLATE_50,
       }}
-      onClick={onClose}
     >
+      {/* Header */}
       <div
-        onClick={(e) => e.stopPropagation()}
         style={{
-          width: '100%',
-          height: '86dvh',
-          background: '#F8FAFC',
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden',
-          boxShadow: '0 -8px 24px rgba(15,17,23,0.18)',
-          fontFamily: FONT,
+          padding: '10px 16px 12px',
+          borderBottom: `0.5px solid ${HAIRLINE_INK_10}`,
+          background: SLATE_50,
         }}
       >
-        {/* Grab handle */}
-        <div style={{ display: 'flex', justifyContent: 'center', padding: '8px 0 4px' }}>
-          <div style={{ width: 36, height: 4, borderRadius: 999, background: 'rgba(0,0,0,0.14)' }} />
+        <div style={{ minWidth: 0 }}>
+          <div
+            style={{
+              fontSize: 8.5,
+              fontWeight: 800,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              color: AMBER,
+              marginBottom: 4,
+            }}
+          >
+            {TIER_SHORT[tier]}
+          </div>
+          <div
+            id="tier-see-all-title"
+            style={{
+              fontSize: 18,
+              fontWeight: 800,
+              color: INK,
+              letterSpacing: '-0.01em',
+              lineHeight: 1.1,
+            }}
+          >
+            {TIER_TITLE[tier]}
+          </div>
+          <div
+            style={{
+              fontSize: 10.5,
+              fontWeight: 700,
+              color: INK_MUTE,
+              letterSpacing: '0.04em',
+              textTransform: 'uppercase',
+              marginTop: 3,
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            {regionLabel(region)} {'\u00B7'} WHS {'\u00B7'} {total} {total === 1 ? 'ENTRY' : 'ENTRIES'}
+          </div>
         </div>
 
-        {/* Header */}
-        <div style={{ padding: '8px 16px 12px', borderBottom: `0.5px solid ${HAIRLINE_INK_8}`, background: '#F8FAFC' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span aria-hidden style={{ fontSize: 15, lineHeight: 1 }}>{TIER_ICON[tier]}</span>
-            <span
-              style={{
-                fontSize: 12,
-                fontWeight: 800,
-                letterSpacing: '0.13em',
-                textTransform: 'uppercase',
-                color: INK,
-                flex: 1,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {TIER_TITLE[tier]} · {regionLabel(region)}
-            </span>
-            <span
-              style={{
-                fontSize: 11,
-                fontWeight: 700,
-                padding: '3px 8px',
-                borderRadius: 999,
-                background: 'rgba(15,23,42,0.06)',
-                color: INK,
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {rows.length}
-            </span>
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label="Close"
-              style={{ background: 'transparent', border: 0, padding: 4, cursor: 'pointer', color: INK }}
-            >
-              <X size={20} />
-            </button>
+        {hasToggle && (
+          <div style={{ marginTop: 12, display: 'flex', gap: 6 }}>
+            {(['latest', 'top'] as const).map((mode) => {
+              const active = sort === mode;
+              return (
+                <button
+                  key={mode}
+                  type="button"
+                  onClick={() => setSort(mode)}
+                  style={{
+                    appearance: 'none',
+                    border: 0,
+                    padding: '5px 12px',
+                    borderRadius: 999,
+                    fontFamily: FONT,
+                    fontSize: 12,
+                    fontWeight: 700,
+                    letterSpacing: '0.02em',
+                    cursor: 'pointer',
+                    background: active ? INK : 'transparent',
+                    color: active ? '#FFFFFF' : 'rgba(15,23,42,0.55)',
+                  }}
+                >
+                  {mode === 'latest' ? 'Latest' : 'Top'}
+                </button>
+              );
+            })}
           </div>
-          <div style={{ marginTop: 4, fontSize: 12, color: 'rgba(15,23,42,0.5)' }}>
-            {recentLabel}
-          </div>
-          {hasToggle && (
-            <div style={{ marginTop: 12, display: 'flex', gap: 6 }}>
-              {(['latest', 'top'] as const).map((mode) => {
-                const active = sort === mode;
-                return (
-                  <button
-                    key={mode}
-                    type="button"
-                    onClick={() => setSort(mode)}
-                    style={{
-                      appearance: 'none',
-                      border: 0,
-                      padding: '5px 12px',
-                      borderRadius: 999,
-                      fontFamily: FONT,
-                      fontSize: 12,
-                      fontWeight: 700,
-                      letterSpacing: '0.02em',
-                      cursor: 'pointer',
-                      background: active ? INK : 'transparent',
-                      color: active ? '#FFFFFF' : 'rgba(15,23,42,0.55)',
-                    }}
-                  >
-                    {mode === 'latest' ? 'Latest' : 'Top'}
-                  </button>
-                );
-              })}
+        )}
+
+        {/* No.1 masthead */}
+        {top && (
+          <div
+            style={{
+              marginTop: 12,
+              padding: '12px 14px',
+              background: SURFACE,
+              border: `1px solid ${GOLD_BORDER}`,
+              borderRadius: 14,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              boxShadow: '0 1px 3px rgba(255,184,0,0.10)',
+            }}
+          >
+            <div style={{ position: 'relative', flexShrink: 0 }}>
+              <SquircleAvatar
+                size={52}
+                src={top.holder_avatar}
+                alt={topHolder}
+                fallback={initials(topHolder)}
+                hairlineRing
+                ringColor={GOLD_DEEP}
+              />
             </div>
-          )}
-        </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div
+                style={{
+                  fontSize: 7.5,
+                  fontWeight: 800,
+                  letterSpacing: '0.16em',
+                  textTransform: 'uppercase',
+                  color: GOLD_DEEP,
+                  marginBottom: 3,
+                }}
+              >
+                No.1 {'\u00B7'} {TIER_SHORT[tier]}
+              </div>
+              <div
+                style={{
+                  fontSize: 16,
+                  fontWeight: 800,
+                  color: INK,
+                  letterSpacing: '-0.01em',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {topHolder}
+              </div>
+              {top.course_name && (
+                <div
+                  style={{
+                    marginTop: 2,
+                    fontSize: 11.5,
+                    fontWeight: 600,
+                    color: INK_MUTE,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {top.course_name}
+                </div>
+              )}
+            </div>
+            {topValue && (
+              <div
+                style={{
+                  fontSize: 22,
+                  fontWeight: 200,
+                  color: GOLD_DEEP,
+                  fontVariantNumeric: 'tabular-nums',
+                  letterSpacing: '-0.02em',
+                  flexShrink: 0,
+                  textTransform: 'uppercase',
+                }}
+              >
+                {topValue}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
-
-        {/* List */}
-        <div
-          ref={scrollerRef}
-          style={{ flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}
-        >
-          {shown.map((row, i) => {
+      {/* Ledger 2..N */}
+      <div
+        ref={scrollerRef}
+        style={{
+          flex: 1,
+          minHeight: 0,
+          overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch',
+          background: SURFACE,
+        }}
+      >
+        {rest.length === 0 ? (
+          <div
+            style={{
+              padding: '28px 16px',
+              textAlign: 'center',
+              color: INK_MUTE,
+              fontSize: 12,
+              fontWeight: 600,
+            }}
+          >
+            The champion stands alone. Be the first to challenge.
+          </div>
+        ) : (
+          rest.map((row, i) => {
             const holder = formatHolderName(row.holder_name);
             const value = humanizedValue(row, tier);
             const when = relDate(row.play_date ?? row.attained_at ?? null);
+            const rank = i + 2;
             return (
               <div
                 key={`${row.score_id ?? row.course_id ?? i}-${i}`}
@@ -335,40 +409,42 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows }: Props) {
                   display: 'flex',
                   alignItems: 'center',
                   gap: 12,
+                  width: '100%',
                   padding: '12px 16px',
-                  borderBottom: `0.5px solid ${HAIRLINE_INK_8}`,
-                  background: '#FFFFFF',
+                  borderBottom: `0.5px solid ${HAIRLINE_INK_10}`,
+                  background: 'transparent',
                 }}
               >
-                {showRanks && (
-                  <div
-                    style={{
-                      width: 20,
-                      flexShrink: 0,
-                      textAlign: 'right',
-                      fontSize: 12,
-                      fontVariantNumeric: 'tabular-nums',
-                      color: 'rgba(15,23,42,0.35)',
-                    }}
-                  >
-                    {i + 1}
-                  </div>
-                )}
-                <SquircleAvatar
-                  size={36}
-                  src={row.holder_avatar}
-                  alt={holder}
-                  fallback={initials(holder)}
-                  thinRing
-                />
-
+                <div
+                  style={{
+                    width: 28,
+                    fontSize: 15,
+                    fontWeight: 200,
+                    color: INK,
+                    fontVariantNumeric: 'tabular-nums',
+                    textAlign: 'right',
+                    flexShrink: 0,
+                  }}
+                >
+                  {rank}
+                </div>
+                <div style={{ position: 'relative', flexShrink: 0 }}>
+                  <SquircleAvatar
+                    size={34}
+                    src={row.holder_avatar}
+                    alt={holder}
+                    fallback={initials(holder)}
+                    hairlineRing
+                    ringColor={LIGHT_HAIRLINE}
+                  />
+                </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div
                     style={{
-                      fontSize: 14,
+                      fontSize: 13,
                       fontWeight: 700,
                       color: INK,
-                      lineHeight: 1.2,
+                      letterSpacing: '-0.01em',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
@@ -376,39 +452,44 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows }: Props) {
                   >
                     {holder}
                   </div>
-                  <div
-                    style={{
-                      fontSize: 12.5,
-                      color: INK_MUTE,
-                      lineHeight: 1.25,
-                      marginTop: 2,
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {row.course_name}
-                  </div>
+                  {row.course_name && (
+                    <div
+                      style={{
+                        marginTop: 2,
+                        fontSize: 11.5,
+                        fontWeight: 500,
+                        color: INK_MUTE,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        lineHeight: 1.2,
+                      }}
+                    >
+                      {row.course_name}
+                    </div>
+                  )}
                 </div>
                 <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                  <div
-                    style={{
-                      fontSize: 13,
-                      fontWeight: 700,
-                      color: INK,
-                      fontVariantNumeric: 'tabular-nums',
-                      lineHeight: 1.2,
-                    }}
-                  >
-                    {value}
-                  </div>
+                  {value && (
+                    <div
+                      style={{
+                        fontSize: 14,
+                        fontWeight: 200,
+                        color: INK,
+                        fontVariantNumeric: 'tabular-nums',
+                        lineHeight: 1.1,
+                      }}
+                    >
+                      {value}
+                    </div>
+                  )}
                   {when && (
                     <div
                       style={{
                         marginTop: 2,
-                        fontSize: 11,
+                        fontSize: 10.5,
                         color: 'rgba(15,23,42,0.5)',
-                        lineHeight: 1.2,
+                        lineHeight: 1.1,
                       }}
                     >
                       {when}
@@ -417,15 +498,14 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows }: Props) {
                 </div>
               </div>
             );
-          })}
-          {visible < rows.length && (
-            <div ref={sentinelRef} style={{ height: 40, background: INK_TINT_06, opacity: 0 }} />
-          )}
-          <div style={{ height: 'env(safe-area-inset-bottom, 0px)' }} />
-        </div>
+          })
+        )}
+        {visible < sortedRows.length && (
+          <div ref={sentinelRef} style={{ height: 40 }} />
+        )}
+        <div style={{ height: 24 }} />
       </div>
-    </div>,
-    document.body,
+    </BottomSheet>
   );
 }
 
