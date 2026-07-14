@@ -73,6 +73,15 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
 
   const regionUpper = feedRegionLabel.toUpperCase();
 
+  const opener = useScorecardOpener();
+  const handleFeatRowTap = useCallback(
+    (row: FeatRow) => {
+      if (row.score_id) opener.openByScore(row.score_id, null, row.user_id);
+      else if (row.user_id) opener.openProfile(row.user_id);
+    },
+    [opener],
+  );
+
   return (
     <div style={{ background: SLATE_50, minHeight: '100vh' }}>
       {/* 1. Season strip */}
@@ -93,7 +102,7 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
       <AlmanacEmptyCard region={activeRegion} />
 
       {/* 6. Legendary hero (aces & albatrosses) */}
-      <LegendarySection region={activeRegion} />
+      <LegendarySection region={activeRegion} onRowTap={handleFeatRowTap} />
 
       {/* 7. Course Crowns -- self-hiding, owns its header */}
       <CourseCrownsRail region={activeRegion} />
@@ -107,6 +116,7 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
         tier="eagles"
         title={`Eagles · ${regionUpper}`}
         variant="compact"
+        onRowTap={handleFeatRowTap}
       />
 
       {/* 10. Toughest courses -- self-hiding, owns its header */}
@@ -118,6 +128,7 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
         tier="birdie_hauls"
         title={`Birdie hauls · ${regionUpper}`}
         variant="list"
+        onRowTap={handleFeatRowTap}
       />
 
 
@@ -145,9 +156,19 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
           onRegionChange={handleRegionChange}
         />
       </div>
+
+      {/* Single shared scorecard sheet for all feat/legendary/see-all rows */}
+      <RoundDetailSheet
+        open={!!opener.target}
+        onClose={opener.close}
+        scoreId={opener.target?.scoreId ?? null}
+        connectionId={opener.target?.connectionId ?? null}
+        profileUserId={opener.target?.profileUserId ?? null}
+      />
     </div>
   );
 }
+
 
 function LegendarySection({ region }: { region: string | null }) {
   const { data, isLoading } = useRegionFeats(region, 'legendary');
