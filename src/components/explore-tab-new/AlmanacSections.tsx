@@ -268,6 +268,7 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard' }: TierPr
               key={`${row.score_id ?? row.course_id ?? i}-${i}`}
               row={row}
               tier={tier}
+              index={i}
             />
           ))}
         </div>

@@ -17123,6 +17123,16 @@ export type Database = {
           region_name: string
         }[]
       }
+      get_course_regulars: {
+        Args: { p_course_ids?: string[] }
+        Returns: {
+          course_id: string
+          holder_avatar: string
+          holder_id: string
+          holder_name: string
+          rounds_90d: number
+        }[]
+      }
       get_course_sub_regions: {
         Args: { p_region: string }
         Returns: {
