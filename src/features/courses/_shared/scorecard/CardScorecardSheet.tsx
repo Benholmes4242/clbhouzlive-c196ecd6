@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
-import { User, MapPin } from 'lucide-react';
+import { User, MapPin, RefreshCw, Table } from 'lucide-react';
+
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
