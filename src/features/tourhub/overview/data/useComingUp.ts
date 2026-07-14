@@ -30,8 +30,8 @@ function isPlayoffName(name: string): boolean {
   return l.includes('playoff') || l.includes('fedex st') || l.includes('tour championship');
 }
 
-export function useComingUp(tour: TourId | null, limit = 4) {
-  const effectiveLimit = tour === null ? Math.max(limit, 8) : limit;
+export function useComingUp(tour: TourId | null, limit = 12) {
+  const effectiveLimit = Math.max(limit, 12);
   return useQuery({
     queryKey: ['overview', 'coming-up', tour ?? 'all', effectiveLimit],
     queryFn: async (): Promise<ComingUpRow[]> => {
