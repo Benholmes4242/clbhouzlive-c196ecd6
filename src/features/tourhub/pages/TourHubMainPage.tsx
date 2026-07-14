@@ -84,7 +84,9 @@ function TourHubChromeBridge({
         onProfile={onProfile}
         onSignOut={onSignOut}
       />
-      <TourPickerSheet open={pickerOpen} onClose={() => setPickerOpen(false)} />
+      {isOverview && (
+        <TourPickerSheet open={pickerOpen} onClose={() => setPickerOpen(false)} />
+      )}
     </>
   );
 }
