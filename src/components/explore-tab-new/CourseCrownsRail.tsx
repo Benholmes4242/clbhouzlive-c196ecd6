@@ -139,12 +139,14 @@ function CrownCard({ row, opener }: { row: FeatRow; opener?: ScorecardOpener }) 
         {showDelta ? (
           <div
             style={{
-              fontSize: 21,
+              fontSize: 14,
               fontWeight: 800,
               color: deltaColor,
               lineHeight: 1,
               letterSpacing: '-0.02em',
               fontVariantNumeric: 'tabular-nums',
+              alignSelf: 'flex-start',
+              marginTop: 4,
             }}
           >
             {deltaLabel}
