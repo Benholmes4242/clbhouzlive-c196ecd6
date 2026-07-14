@@ -94,6 +94,7 @@ import { AdminGatedPerfPill, AdminGatedBootTimelinePill, AdminGatedPerfHud, Admi
 
 import { AchievementToastContainer } from '@/components/achievements/AchievementToastContainer';
 import { LevelUpToastContainer } from '@/components/achievements/LevelUpToastContainer';
+import { LevelUpGate } from '@/components/achievements/LevelUpGate';
 import { useAchievementSharing } from '@/hooks/useAchievementSharing';
 import { useTop100XpNotifications } from '@/hooks/useTop100XpNotifications';
 import { useCourseRatingsRealtime } from '@/hooks/useCourseRatingsRealtime';
