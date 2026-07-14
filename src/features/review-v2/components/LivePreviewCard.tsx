@@ -186,18 +186,20 @@ export function LivePreviewCard({
   reviewText,
   scores,
   media,
+  surface = 'light',
 }: Props) {
   void verdict;
+  const pal = surface === 'dark' ? DARK_PAL : LIGHT_PAL;
 
   return (
     <article
       style={{
         position: 'relative',
-        background: RV2.cardBg,
+        background: pal.cardBg,
         borderRadius: RV2.cardRadius,
-        border: `1px solid ${RV2.hairline}`,
+        border: `1px solid ${pal.hairline}`,
         overflow: 'hidden',
-        boxShadow: '0 1px 3px rgba(15,23,42,0.04)',
+        boxShadow: pal.cardShadow,
       }}
     >
       {/* Ghost numeral — shared component ensures parity with feed/clubhouse. */}
@@ -228,7 +230,7 @@ export function LivePreviewCard({
             style={{
               fontSize: 14,
               fontWeight: 700,
-              color: T_INK,
+              color: pal.ink,
               lineHeight: 1.15,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
@@ -245,14 +247,14 @@ export function LivePreviewCard({
               marginTop: 2,
             }}
           >
-            <span style={{ fontSize: 11, color: T_MUTE }}>Just now</span>
+            <span style={{ fontSize: 11, color: pal.mute }}>Just now</span>
           </div>
         </div>
 
         {/* Right chip — verdict label sits over the ghost numeral, parity with FeedCard */}
         {overall != null && (
           <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-            <ReviewVerdictLabel rating={overall} fontSize={11} surface="light" />
+            <ReviewVerdictLabel rating={overall} fontSize={11} surface={pal.verdictSurface} />
           </div>
         )}
       </div>
@@ -261,7 +263,7 @@ export function LivePreviewCard({
       {/* Review body */}
       <div style={{ padding: '4px 14px 10px', position: 'relative', zIndex: 2 }}>
         {reviewText.trim().length > 0 ? (
-          <ClampedReviewText text={reviewText} />
+          <ClampedReviewText text={reviewText} pal={pal} />
         ) : (
           <div
             style={{
@@ -272,9 +274,9 @@ export function LivePreviewCard({
               justifyContent: 'center',
             }}
           >
-            <Ghost width="100%" height={16} />
-            <Ghost width="88%" height={16} />
-            <Ghost width="62%" height={16} />
+            <Ghost width="100%" height={16} pal={pal} />
+            <Ghost width="88%" height={16} pal={pal} />
+            <Ghost width="62%" height={16} pal={pal} />
           </div>
         )}
       </div>
@@ -300,9 +302,9 @@ export function LivePreviewCard({
                 height: 96,
                 borderRadius: 10,
                 overflow: 'hidden',
-                background: RV2.ghost,
+                background: pal.ghost,
                 flexShrink: 0,
-                border: `1px solid ${RV2.hairline}`,
+                border: `1px solid ${pal.hairline}`,
               }}
             >
               {m.type === 'image' ? (
@@ -337,7 +339,7 @@ export function LivePreviewCard({
           alignItems: 'center',
           gap: 8,
           padding: '10px 14px 14px',
-          borderTop: `1px solid ${RV2.hairline}`,
+          borderTop: `1px solid ${pal.hairline}`,
           position: 'relative',
           zIndex: 2,
         }}
@@ -347,7 +349,7 @@ export function LivePreviewCard({
             style={{
               fontSize: 9.5,
               fontWeight: 700,
-              color: T_MUTE,
+              color: pal.mute,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
             }}
@@ -358,7 +360,7 @@ export function LivePreviewCard({
             style={{
               fontSize: 13,
               fontWeight: 700,
-              color: T_INK,
+              color: pal.ink,
               marginTop: 1,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
@@ -377,7 +379,7 @@ export function LivePreviewCard({
             return (
               <div key={key} style={{ textAlign: 'center', minWidth: 34 }}>
                 {v == null ? (
-                  <Ghost width={22} height={14} style={{ margin: '0 auto' }} />
+                  <Ghost width={22} height={14} pal={pal} style={{ margin: '0 auto' }} />
                 ) : (
                   <span
                     className={catGold ? 'clbhouz-gold-shimmer-light' : undefined}
@@ -396,7 +398,7 @@ export function LivePreviewCard({
                   style={{
                     fontSize: 8,
                     fontWeight: 700,
-                    color: T_MUTE,
+                    color: pal.mute,
                     letterSpacing: '0.1em',
                     textTransform: 'uppercase',
                     marginTop: 3,
