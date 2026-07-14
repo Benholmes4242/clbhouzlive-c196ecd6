@@ -299,6 +299,9 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap }:
         {/* No.1 masthead */}
         {top && (
           <div
+            onClick={onRowTap ? () => handleRowTap(top) : undefined}
+            role={onRowTap ? 'button' : undefined}
+            tabIndex={onRowTap ? 0 : undefined}
             style={{
               marginTop: 12,
               padding: '12px 14px',
@@ -309,6 +312,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap }:
               alignItems: 'center',
               gap: 12,
               boxShadow: '0 1px 3px rgba(255,184,0,0.10)',
+              cursor: onRowTap ? 'pointer' : 'default',
             }}
           >
             <div style={{ position: 'relative', flexShrink: 0 }}>
