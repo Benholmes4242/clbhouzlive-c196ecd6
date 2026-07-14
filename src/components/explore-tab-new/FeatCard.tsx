@@ -200,24 +200,6 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
               gap: 4,
             }}
           >
-            <span
-              style={{
-                alignSelf: 'flex-start',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 4,
-                padding: '4px 10px',
-                borderRadius: 20,
-                background: 'rgba(255,255,255,0.92)',
-                fontSize: 10,
-                fontWeight: 800,
-                letterSpacing: '0.08em',
-                color: '#22C55E',
-                lineHeight: 1,
-              }}
-            >
-              <span aria-hidden>🦅</span> EAGLE
-            </span>
             <div
               style={{
                 fontSize: 12.5,
