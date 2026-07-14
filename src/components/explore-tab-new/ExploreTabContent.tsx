@@ -21,28 +21,18 @@ import { CourseCrownsRail } from './CourseCrownsRail';
 import { NextConquestsRail } from './NextConquestsRail';
 import { ToughestCoursesRail } from './ToughestCoursesRail';
 import { DiscoverSectionHeader } from './DiscoverSectionHeader';
+import { AlmanacEmptyCard } from './AlmanacEmptyCard';
 
 import ExploreGrid from './ExploreGrid';
 
 import { SLATE_50 } from '@/features/courses/_shared/tokens';
 import { SPACE } from '@/lib/spacing';
-import { useNavigate } from 'react-router-dom';
 
 interface ExploreTabContentProps {
   embedded?: boolean;
 }
 
-const REGION_HUMAN: Record<string, string> = {
-  worldwide: 'Worldwide',
-  'uk-ireland': 'GB&I',
-  usa: 'USA',
-  'continental-europe': 'Europe',
-  'rest-of-world': 'Rest of World',
-};
 
-function regionLabel(slug: string | null): string {
-  return slug ? REGION_HUMAN[slug] ?? 'Region' : REGION_HUMAN.worldwide;
-}
 
 export default function ExploreTabContent({ embedded: _embedded = false }: ExploreTabContentProps) {
   const { user } = useSupabaseSession();
