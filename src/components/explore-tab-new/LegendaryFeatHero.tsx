@@ -149,27 +149,28 @@ export function LegendaryFeatHero({ region, onRowTap }: Props) {
 
   return (
     <div style={{ padding: '0 16px' }}>
-      <button
-        type="button"
-        onPointerDown={onPointerDown}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerCancel}
-        className="text-left active:scale-[0.995] transition-transform"
-        style={{
-          position: 'relative',
-          width: '100%',
-          height: HERO_H,
-          borderRadius: 18,
-          overflow: 'hidden',
-          padding: 0,
-          border: 'none',
-          background: image ? '#07080C' : '#0A0C10',
-          cursor: 'pointer',
-          fontFamily: FONT,
-          boxShadow: `0 0 0 1px ${GOLD}66, 0 6px 20px rgba(0,0,0,0.3)`,
-          touchAction: 'pan-y',
-        }}
-      >
+      <div style={{ position: 'relative', width: '100%', height: HERO_H }}>
+        <button
+          type="button"
+          onPointerDown={onPointerDown}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerCancel}
+          className="text-left active:scale-[0.995] transition-transform"
+          style={{
+            position: 'relative',
+            width: total > 1 ? 'calc(100% - 14px)' : '100%',
+            height: HERO_H,
+            borderRadius: 18,
+            overflow: 'hidden',
+            padding: 0,
+            border: 'none',
+            background: image ? '#07080C' : '#0A0C10',
+            cursor: 'pointer',
+            fontFamily: FONT,
+            boxShadow: `0 0 0 1px ${GOLD}66, 0 6px 20px rgba(0,0,0,0.3)`,
+            touchAction: 'pan-y',
+          }}
+        >
         <div ref={contentRef} style={{ position: 'absolute', inset: 0, opacity: 1 }}>
         {image ? (
           <img
