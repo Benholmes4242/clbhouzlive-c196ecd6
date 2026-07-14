@@ -224,7 +224,7 @@ function HeroCard({ row, showPager, indexLabel, onTap }: CardProps) {
             fontVariantNumeric: 'tabular-nums',
           }}
         >
-          {indexLabel} \u203A
+          {indexLabel} {'\u203A'}
         </div>
       ) : null}
     </button>
