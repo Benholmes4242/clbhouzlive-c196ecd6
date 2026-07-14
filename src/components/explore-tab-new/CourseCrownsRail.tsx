@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { TierSeeAllSheet } from './TierSeeAllSheet';
 
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useRegionFeats, type FeatRow, type RecordsMode } from './hooks/useRegionFeats';
