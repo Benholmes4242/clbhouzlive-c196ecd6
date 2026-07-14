@@ -220,6 +220,20 @@ const ClubhouseContent = () => {
 
   // ── Lifecycle ──
   useClubhouseLifecycle();
+
+  // ── Snapshot integrity ──
+  // If the active tab's posts array shrinks materially between renders,
+  // the previously captured Virtuoso snapshot may reference indices that
+  // no longer exist. Restoring it would iterate an undefined item and
+  // crash on `.index`. Evict on shrink so the next mount is fresh.
+  useEffect(() => {
+    const last = lastPostsLenRef.current[activeTab] ?? 0;
+    const curr = posts.length;
+    if (curr < last) {
+      virtuosoSnapshots.current[activeTab] = undefined;
+    }
+    lastPostsLenRef.current[activeTab] = curr;
+  }, [activeTab, posts.length]);
   
   // ── Active post derivation ──
   const { activePost, golfCourse, activeReview, isActiveReview, isActiveVideo } = useActivePostDerived(posts, activeIndex);
