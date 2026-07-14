@@ -191,7 +191,7 @@ export function TourHubMainPage() {
         {/* Glass plate: mounted for every non-overview tab. Overview keeps
             its own cinematic hero overlay chrome. Height 70 matches tour
             island HEADER_H (see ChromeIsland.tsx). */}
-        <GlassHeaderPlate visible={activeTab !== 'overview'} heightPx={70} />
+        <GlassHeaderPlate visible={activeTab !== 'overview'} />
         {fullBleedHero ? (
           <>
             <div>{renderTab()}</div>
