@@ -73,7 +73,7 @@ export function AlmanacHead({
         display: 'flex',
         alignItems: 'center',
         gap: 8,
-        padding: '0 16px 8px',
+        padding: '0 16px 12px',
       }}
     >
       {icon && (
