@@ -53,6 +53,10 @@ export interface CardScorecardSheetProps {
   heroMuted?: boolean;
   emptyMessage?: string;
   loading?: boolean;
+  emptyVariant?: 'syncing' | 'nohbh';
+  emptyGross?: number | null;
+  emptyToPar?: number | null;
+
   // IDENTITY BLOCK (below scorecard)
   playerName: string;
   playerAvatarUrl?: string | null;
