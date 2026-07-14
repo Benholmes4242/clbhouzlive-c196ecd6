@@ -348,7 +348,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
 
         if (data?.session?.user) {
           trackLoginSuccess('google');
-          setShowSuccessAnimation(true);
+          setStep('hero');
+          navigate('/', { replace: true });
         }
       } finally {
         setSubmitting(false);
