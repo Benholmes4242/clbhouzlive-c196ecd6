@@ -119,32 +119,6 @@ export function LeadersTab() {
         paddingTop: 'calc(var(--sat, 0px) + 69px)',
       }}
     >
-      {/* Header */}
-      <div style={{ padding: '16px 16px 12px' }}>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: 12,
-            gap: 8,
-          }}
-        >
-          <span
-            style={{
-              fontSize: 11,
-              fontWeight: 700,
-              color: INK_MUTE,
-              letterSpacing: '0.02em',
-              textTransform: 'uppercase',
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            {tourLabel}
-          </span>
-        </div>
-
-      </div>
 
       {/* Tour lens — sticky glass wrapper; chips from SectionTourLens
           (no All Tours; PGA default). CHAMP taps are ignored — no board
