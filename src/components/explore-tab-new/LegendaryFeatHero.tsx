@@ -83,7 +83,7 @@ function HeroCard({ row, showPager, indexLabel, onTap }: CardProps) {
         background: image ? '#07080C' : '#0A0C10',
         cursor: 'pointer',
         fontFamily: FONT,
-        boxShadow: `0 0 0 1px ${GOLD}66, 0 6px 20px rgba(0,0,0,0.3)`,
+        boxShadow: '0 4px 16px rgba(15,23,42,0.12)',
       }}
     >
       {image ? (
