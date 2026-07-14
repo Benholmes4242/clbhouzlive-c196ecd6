@@ -55,7 +55,6 @@ interface Props {
 
 interface CardProps {
   row: FeatRow;
-  isSolo: boolean;
   showPager: boolean;
   indexLabel: string;
   onTap: () => void;
