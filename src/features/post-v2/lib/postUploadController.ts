@@ -78,7 +78,7 @@ async function insertMediaRow(
   const { error } = await supabase.from('post_media').insert({
     post_id: postId,
     display_order: displayOrder,
-    upload_status: 'complete',
+    upload_status: 'completed',
     processing_status: 'ready',
     ...patch,
   } as never);
