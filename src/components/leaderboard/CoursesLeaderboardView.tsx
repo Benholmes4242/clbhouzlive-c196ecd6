@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
 import { RefreshCw, WifiOff } from 'lucide-react';
+import { getPageScrollTop, scrollPageTo } from '@/lib/getScrollParent';
 
 const PAGE_SIZE = 20;
 const STORAGE_KEY_FILTERS = 'courses-leaderboard-filters';
@@ -376,8 +377,7 @@ export function CoursesLeaderboardView() {
 
   // ─── Scroll save/restore ───────────────────────────────────────────
   const handleCourseClick = useCallback((courseId: string) => {
-    const rootEl = document.getElementById('root');
-    const scrollY = (rootEl && rootEl.scrollTop > 0) ? rootEl.scrollTop : window.scrollY;
+    const scrollY = getPageScrollTop();
     sessionStorage.setItem(STORAGE_KEY_SCROLL, scrollY.toString());
     navigate(`/courses/${courseId}`);
   }, [navigate]);
@@ -389,10 +389,8 @@ export function CoursesLeaderboardView() {
     if (saved) {
       hasRestoredScroll.current = true;
       requestAnimationFrame(() => {
-        const rootEl = document.getElementById('root');
         const target = parseInt(saved, 10);
-        if (rootEl) rootEl.scrollTop = target;
-        window.scrollTo({ top: target, behavior: 'instant' as ScrollBehavior });
+        scrollPageTo(target, 'instant');
         sessionStorage.removeItem(STORAGE_KEY_SCROLL);
       });
     }
