@@ -9,7 +9,7 @@
  * reserved for majors only.
  */
 import React from 'react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '../_shared/resolvePlayerAvatar';
 import type { SeasonEvent } from './useSeasonTimeline';
 import { TOUR_LABEL } from '../_shared/tourOrder';
