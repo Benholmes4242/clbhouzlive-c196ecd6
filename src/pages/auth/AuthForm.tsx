@@ -375,14 +375,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
 
   return (
     <>
-      {showSuccessAnimation && (
-        <AuthSuccessAnimation
-          message="Welcome to clbhouz"
-          onComplete={handleSuccessAnimationComplete}
-          duration={800}
-        />
-      )}
-
       <div
         {...(isSheetOpen ? { inert: '' } : {})}
         style={isSheetOpen ? { pointerEvents: 'none' as const } : undefined}
