@@ -154,8 +154,9 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard' }: TierPr
   const navigate = useNavigate();
   const { data, isLoading } = useRegionFeats(region, tier);
   const rows = data ?? [];
-  const displayRows = rows.slice(0, RAIL_CAP);
-  const hasOverflow = rows.length > RAIL_CAP;
+  const cap = variant === 'list' ? LIST_CAP : RAIL_CAP;
+  const displayRows = rows.slice(0, cap);
+  const hasOverflow = rows.length > cap;
   const [sheetOpen, setSheetOpen] = useState(false);
 
   // Self-hiding: empty tier renders zero trace (no header, no gap).
