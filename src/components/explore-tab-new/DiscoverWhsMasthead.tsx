@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
+import { SPACE } from '@/lib/spacing';
 
 export default function DiscoverWhsMasthead() {
   const navigate = useNavigate();
@@ -11,7 +12,7 @@ export default function DiscoverWhsMasthead() {
   const showSyncLink = !isLoading && !isSynced;
 
   return (
-    <div style={{ padding: '20px 16px 16px' }}>
+    <div style={{ padding: `20px ${SPACE.pagePadX}px 16px` }}>
       <div
         style={{
           fontSize: 11,
@@ -19,7 +20,7 @@ export default function DiscoverWhsMasthead() {
           letterSpacing: '0.14em',
           textTransform: 'uppercase',
           color: '#c97a10',
-          marginBottom: 6,
+          marginBottom: SPACE.eyebrowTitle,
         }}
       >
         OFFICIAL WHS · GLOBAL

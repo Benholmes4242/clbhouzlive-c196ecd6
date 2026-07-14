@@ -7,6 +7,7 @@ import { useRegionFeats, type FeatTier } from './hooks/useRegionFeats';
 import { AMBER, INK, INK_TINT_06 } from '@/features/courses/_shared/tokens';
 import { TierSeeAllSheet } from './TierSeeAllSheet';
 import { UnderlineTabs } from '@/components/ui/UnderlineTabs';
+import { SPACE } from '@/lib/spacing';
 
 const RAIL_CAP = 12;
 
@@ -73,7 +74,7 @@ export function AlmanacHead({
         display: 'flex',
         alignItems: 'center',
         gap: 8,
-        padding: '0 16px 12px',
+        padding: `0 ${SPACE.pagePadX}px ${SPACE.sectionHeaderContent}px`,
       }}
     >
       {icon && (
@@ -158,7 +159,7 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard' }: TierPr
   const goToClaim = () => navigate('/handicap');
 
   return (
-    <section style={{ fontFamily: FONT, paddingTop: 32 }}>
+    <section style={{ fontFamily: FONT, paddingTop: SPACE.sectionSection }}>
       <AlmanacHead
         title={title}
         icon={TIER_ICON[tier]}
@@ -184,7 +185,7 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard' }: TierPr
           ))}
         </div>
       ) : rows.length === 0 ? (
-        <div style={{ padding: '0 16px' }}>
+        <div style={{ padding: `0 ${SPACE.pagePadX}px` }}>
           <button
             type="button"
             onClick={goToClaim}
@@ -261,7 +262,7 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard' }: TierPr
           </button>
         </div>
       ) : variant === 'list' ? (
-        <div style={{ padding: '0 16px' }}>
+        <div style={{ padding: `0 ${SPACE.pagePadX}px` }}>
           {displayRows.map((row, i) => (
             <FeatListRow
               key={`${row.score_id ?? row.course_id ?? i}-${i}`}
