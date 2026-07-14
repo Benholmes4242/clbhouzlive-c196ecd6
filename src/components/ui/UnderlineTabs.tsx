@@ -31,10 +31,11 @@ export interface UnderlineTabsProps<T extends string> {
 }
 
 const SIZES = {
-  sm: { gap: 20, padding: '10px 4px 8px', fontSize: 13, underline: 1.5 },
-  md: { gap: 28, padding: '12px 6px 10px', fontSize: 16, underline: 2 },
-  lg: { gap: 34, padding: '14px 7px 12px', fontSize: 19, underline: 3 },
+  sm: { gap: 20, padding: '10px 4px 8px', fontSize: 13 },
+  md: { gap: 28, padding: '12px 6px 10px', fontSize: 16 },
+  lg: { gap: 34, padding: '14px 7px 12px', fontSize: 19 },
 } as const;
+
 
 export function UnderlineTabs<T extends string>({
   options,
@@ -85,21 +86,24 @@ export function UnderlineTabs<T extends string>({
               whiteSpace: 'nowrap',
             }}
           >
-            {opt.label}
-            {active ? (
-              <span
-                aria-hidden
-                style={{
-                  position: 'absolute',
-                  left: 6,
-                  right: 6,
-                  bottom: 4,
-                  height: s.underline,
-                  borderRadius: 2,
-                  background: underlineColor,
-                }}
-              />
-            ) : null}
+            <span style={{ position: 'relative', display: 'inline-block' }}>
+              {opt.label}
+              {active ? (
+                <span
+                  aria-hidden
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    right: 0,
+                    bottom: -4,
+                    height: 2,
+                    borderRadius: 2,
+                    background: underlineColor,
+                  }}
+                />
+              ) : null}
+            </span>
+
           </button>
         );
       })}
