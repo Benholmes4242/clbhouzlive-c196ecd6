@@ -62,7 +62,7 @@ export function FilterChips<T extends string>({
               fontSize: 12.5,
               padding: '7px 14px',
               borderRadius: 999,
-              background: active ? '#0F172A' : '#fff',
+              background: active ? '#15171F' : '#fff',
               color: active ? '#fff' : '#0F172A',
               border: active ? 'none' : '1px solid rgba(0,0,0,0.07)',
               fontFamily: FONT_FAMILY,
