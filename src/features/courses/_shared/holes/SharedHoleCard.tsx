@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
-import { INK, INK_MUTE, TOPAR_OVER_LIGHT, TOPAR_UNDER_LIGHT } from '@/features/courses/_shared/tokens';
+import { INK, INK_MUTE } from '@/features/courses/_shared/tokens';
+import { TOPAR_OVER_LIGHT, TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
 import {
   FONT,
   MONO,
