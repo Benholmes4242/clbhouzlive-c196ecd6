@@ -15,8 +15,10 @@ import {
   levelForMedals,
   nextLevelForMedals,
   levelProgress,
+  levelDisplay,
   type WallMaterial,
 } from './_shared/levels';
+import { TierGem } from '@/components/shared/TierGem';
 
 const FONT = "'Geist', -apple-system, sans-serif";
 const OBSIDIAN_BODY = '#2A2F36';

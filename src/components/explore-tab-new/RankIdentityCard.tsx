@@ -19,21 +19,15 @@ import {
   WALL_LEVELS,
   type WallMaterial,
 } from '@/components/profile/handicap/whs/gam/trophy-room/_shared/levels';
-import { MATERIAL_HEX } from '@/components/profile/handicap/whs/gam/trophy-room/_shared/rarityPalette';
 import { openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
+import { GemVisual } from '@/components/shared/TierGem';
 
 import { GOLD, AMBER, SCOREBOARD_BG, FONT } from './gamingLightTokens';
-
-const OBSIDIAN_EDGE = '#D4A017';
 
 interface Props {
   userId: string | undefined;
 }
 
-function materialColor(m: WallMaterial): string {
-  if (m === 'obsidian') return '#2A2F36';
-  return (MATERIAL_HEX as Record<string, string>)[m] ?? '#C97B4A';
-}
 
 // Global medal rank RPC is not yet in prod - feature-detect and omit the
 // segment on error/absent (no zeros, no placeholders).
@@ -72,40 +66,7 @@ function useGlobalMedalRank(userId: string | undefined) {
 }
 
 function Gem({ material, size = 62 }: { material: WallMaterial; size?: number }) {
-  const c = materialColor(material);
-  const isObsidian = material === 'obsidian';
-  return (
-    <div
-      style={{
-        width: size,
-        height: size,
-        flexShrink: 0,
-        borderRadius: 16,
-        background: isObsidian
-          ? `radial-gradient(120% 90% at 20% 0%, ${OBSIDIAN_EDGE}55 0%, transparent 55%), linear-gradient(160deg, #12151C 0%, #07080C 100%)`
-          : `radial-gradient(120% 90% at 20% 0%, ${c}55 0%, transparent 55%), linear-gradient(160deg, ${c} 0%, ${c}33 100%)`,
-        border: `1px solid ${isObsidian ? OBSIDIAN_EDGE + '59' : c + '59'}`,
-        boxShadow: `0 0 28px ${isObsidian ? OBSIDIAN_EDGE : c}2E, inset 0 1px 0 rgba(255,255,255,0.12)`,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      {/* Gem glyph -- the six-sided facet shape used across the Trophy Room */}
-      <div
-        style={{
-          width: size * 0.5,
-          height: size * 0.58,
-          background: isObsidian
-            ? `linear-gradient(135deg, ${OBSIDIAN_EDGE}, ${OBSIDIAN_EDGE}55 55%, ${OBSIDIAN_EDGE}CC)`
-            : `linear-gradient(135deg, ${c}, ${c}55 55%, ${c}CC)`,
-          clipPath:
-            'polygon(50% 0, 100% 28%, 100% 72%, 50% 100%, 0 72%, 0 28%)',
-          boxShadow: `0 0 12px ${isObsidian ? OBSIDIAN_EDGE : c}88`,
-        }}
-      />
-    </div>
-  );
+  return <GemVisual material={material} size={size} />;
 }
 
 export function RankIdentityCard({ userId }: Props) {
@@ -156,7 +117,7 @@ export function RankIdentityCard({ userId }: Props) {
     ? 'Play a verified round to start the climb'
     : nextLevel
       ? `${Math.max(0, nextLevel.medalsRequired - medals)} medals to ${nextLevel.label} · earn medals from verified rounds`
-      : 'Top of the ladder · Obsidian II';
+      : 'Top of the ladder · Clubhouse Legend';
 
   const line1 = isSignedInUnsynced
     ? 'Start the climb'
