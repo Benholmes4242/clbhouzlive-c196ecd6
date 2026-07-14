@@ -137,10 +137,8 @@ export function RankIdentityCard({ userId }: Props) {
   const tierSecondary = TIER_SECONDARY[material];
   const baseColor = TIER_BASE[material];
 
-  const { name: tierName, roman: tierRoman } = splitLevelLabel(
-    currentLevel.label,
-    currentLevel.sub,
-  );
+  const tierName = currentLevel.label.replace(/\s+(I|II)$/, '');
+
 
   const medalsToNext = nextLevel
     ? Math.max(0, nextLevel.medalsRequired - medals)
