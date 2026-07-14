@@ -156,7 +156,7 @@ function CrownCard({ row, opener }: { row: FeatRow; opener?: ScorecardOpener }) 
             letterSpacing: '0.02em',
           }}
         >
-          {isStableford ? 'STABLEFORD' : `Par ${row.course_par ?? '--'}`}
+          {isStableford ? 'STABLEFORD' : null}
         </div>
         {showDelta ? (
           <div
