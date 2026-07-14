@@ -34,6 +34,13 @@ import type { YearbookStanding } from './data/useFranchiseStandings';
 interface Props {
   standing: YearbookStanding;
   liveCount: number;
+  /**
+   * When provided, the card behaves as a picker button (compare pick mode)
+   * instead of navigating to the profile. Receives the college normalizedName.
+   */
+  onSelect?: (slug: string) => void;
+  /** Visual "chosen" state during compare pick mode. */
+  selected?: boolean;
 }
 
 function formatPoints(n: number): string {
