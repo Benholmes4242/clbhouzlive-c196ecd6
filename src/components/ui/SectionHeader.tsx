@@ -288,7 +288,8 @@ function SectionHeaderInner(props: SectionHeaderProps) {
         </div>
       )}
 
-      {cutLine && (
+      {/* Amber cut-line removed app-wide per design directive. */}
+      {false && cutLine && (
         <div
           aria-hidden="true"
           style={{
