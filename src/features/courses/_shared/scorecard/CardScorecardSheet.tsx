@@ -187,9 +187,12 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   open, onClose, eyebrowText,
   courseName, courseLocation, coursePar, courseSlope,
   holes, nineHole, rounds, heroMuted, emptyMessage, loading,
+  emptyVariant, emptyGross, emptyToPar,
   playerName, playerAvatarUrl, playerHcp, playerHcpDelta, playerUserId,
   onViewProfile, onViewCourse,
 }) => {
+  void emptyMessage;
+
   const totals = useMemo(() => {
     let gross = 0;
     let toPar = 0;
