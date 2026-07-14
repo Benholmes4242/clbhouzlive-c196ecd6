@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { useTitlesInReach, type TitleInReach } from '@/hooks/gam/useTitlesInReach';
+import { DiscoverSectionHeader } from './DiscoverSectionHeader';
+import { SPACE } from '@/lib/spacing';
 
 import {
   SCOREBOARD_BG,
