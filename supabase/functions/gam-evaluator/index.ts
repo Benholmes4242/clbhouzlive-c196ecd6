@@ -224,6 +224,17 @@ async function processSingle(whsScoreId: string) {
     await applyStreaks(userId, stats);
     await applyCourseLegends(stats);
     await applyRivalryResults(userId, stats, whsScoreId);
+
+    // Ascent -- wall level up / near-miss detection. Wrapped in its own
+    // try/catch: badge processing above must complete regardless of
+    // level RPC/insert failures.
+    if (earned.length > 0) {
+      try {
+        await evaluateLevelTransition(userId, whsScoreId);
+      } catch (e) {
+        console.warn("[level_eval]", (e as Error).message);
+      }
+    }
   } else {
     // Refresh course legends — idempotent recompute, safe to re-run
     await applyCourseLegends(stats);
