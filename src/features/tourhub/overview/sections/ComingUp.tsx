@@ -1,6 +1,6 @@
 /**
  * ComingUp — date-block rows with MAJOR/PLAYOFFS chips and right-side
- * thin days-away column. Fetches up to 15 events; displays 5 per page
+ * thin days-away column. Fetches up to 12 events; displays 3 per page
  * with horizontal snap paging and page dots.
  */
 
@@ -12,11 +12,11 @@ import { useComingUp, type ComingUpRow } from '../data/useComingUp';
 import type { TourId } from '../../hooks/useOverviewData';
 import { TOUR_LABEL } from '../../_shared/tourOrder';
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 3;
 
 export function ComingUp({ tour }: { tour: TourId | null }) {
   const navigate = useNavigate();
-  const { data } = useComingUp(tour, 15);
+  const { data } = useComingUp(tour, 12);
   const rows = data ?? [];
   const showTourTag = tour === null;
 

@@ -329,7 +329,7 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
             fontWeight: 800,
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
-            color: '#94A3B8',
+            color: isLegendary ? accent : '#F7931E',
             lineHeight: 1,
           }}
         >
