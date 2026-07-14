@@ -332,11 +332,11 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
               className="sticky"
               style={{
                 top: 'var(--sat, 0px)',
-                zIndex: 30,
+                zIndex: 10,
                 background: 'rgba(248,250,252,0.72)',
                 backdropFilter: 'blur(14px)',
                 WebkitBackdropFilter: 'blur(14px)',
-                borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+                borderBottom: '1px solid rgba(0,0,0,0.07)',
               }}
             >
               <CoursesShellTabs
