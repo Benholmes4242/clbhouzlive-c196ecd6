@@ -12,6 +12,7 @@ import { useDailyEditorial } from '@/hooks/championship';
 import { supabase } from '@/integrations/supabase/client';
 import { getProfilePathById } from '@/lib/profileRoutes';
 import { continentForCountry } from '@/lib/countryContinent';
+import { getPageScrollTop, scrollElementIntoView, scrollPageTo } from '@/lib/getScrollParent';
 import {
   EXPLORER_TIERS,
   getUserTier,
@@ -219,10 +220,7 @@ export function ExplorationTab() {
       JSON.stringify({ scope, selectedClubId, selectedClubName, selectedCountry, viewMode }),
     );
     isFilterChangeRef.current = true;
-    scrollPositionRef.current = (() => {
-      const rootEl = document.getElementById('root');
-      return (rootEl && rootEl.scrollTop > 0) ? rootEl.scrollTop : window.scrollY;
-    })();
+    scrollPositionRef.current = getPageScrollTop();
   }, [scope, selectedClubId, selectedClubName, selectedCountry, viewMode]);
 
   // Preserve scroll on filter change
@@ -231,9 +229,7 @@ export function ExplorationTab() {
       isFilterChangeRef.current = false;
       const scrollTarget = scrollPositionRef.current;
       if (scrollTarget > 0) {
-        const rootEl = document.getElementById('root');
-        if (rootEl) rootEl.scrollTop = scrollTarget;
-        window.scrollTo({ top: scrollTarget, behavior: 'instant' as ScrollBehavior });
+        scrollPageTo(scrollTarget, 'instant');
       }
     }
   });
@@ -407,7 +403,7 @@ export function ExplorationTab() {
   const handleJumpToUser = useCallback(() => {
     const el = document.querySelector('[data-user-row="self"]') as HTMLElement | null;
     if (!el) return;
-    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    scrollElementIntoView(el, { behavior: 'smooth' });
   }, []);
 
   // ---- Editorial eyebrow (personalised) ----
@@ -438,10 +434,8 @@ export function ExplorationTab() {
     if (savedScroll) {
       hasRestoredScroll.current = true;
       requestAnimationFrame(() => {
-        const rootEl = document.getElementById('root');
         const scrollTarget = parseInt(savedScroll);
-        if (rootEl) rootEl.scrollTop = scrollTarget;
-        window.scrollTo({ top: scrollTarget, behavior: 'instant' as ScrollBehavior });
+        scrollPageTo(scrollTarget, 'instant');
         sessionStorage.removeItem(STORAGE_KEY_SCROLL);
       });
     }
@@ -470,8 +464,7 @@ export function ExplorationTab() {
   }, [viewMode, hasNextPage, countryHasNext, fetchNextPage, countryFetchNext]);
 
   const handleEntryClick = useCallback(() => {
-    const rootEl = document.getElementById('root');
-    const scrollY = (rootEl && rootEl.scrollTop > 0) ? rootEl.scrollTop : window.scrollY;
+    const scrollY = getPageScrollTop();
     sessionStorage.setItem(STORAGE_KEY_SCROLL, scrollY.toString());
   }, []);
 
