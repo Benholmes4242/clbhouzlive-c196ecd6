@@ -102,6 +102,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
       courseSlope={courseSlope}
       holes={cardHoles}
       nineHole={!!userData?.is_nine_hole}
+      loading={isRoundLoading}
       playerName={displayName}
       playerAvatarUrl={profile?.profile_photo_url ?? null}
       playerHcp={playerHcp}
