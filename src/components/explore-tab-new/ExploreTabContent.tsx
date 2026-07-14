@@ -12,7 +12,8 @@ import {
   REGION_TABS,
 } from './AlmanacSections';
 import { LegendaryFeatHero } from './LegendaryFeatHero';
-import { useRegionFeats, type FeatRow } from './hooks/useRegionFeats';
+import { LegendaryLeadersBoards } from './LegendaryLeadersBoards';
+import { useRegionFeats, type FeatRow, type RecordsMode } from './hooks/useRegionFeats';
 import { TierSeeAllSheet } from './TierSeeAllSheet';
 import { scrollPageToTop } from '@/lib/getScrollParent';
 
