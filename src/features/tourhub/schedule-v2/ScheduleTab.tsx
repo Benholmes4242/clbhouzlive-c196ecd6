@@ -20,6 +20,7 @@ import { TOUR_CONFIG, type TourId } from '../hooks/useOverviewData';
 import { tournamentRoute } from '../routes';
 import { TourHubEmptyState } from '../components/TourHubEmptyState';
 import { useSeasonTimeline, type SeasonEvent } from './useSeasonTimeline';
+import { useMergedSchedule } from './useMergedSchedule';
 import { SeasonRow } from './SeasonRow';
 import {
   AMBER,
