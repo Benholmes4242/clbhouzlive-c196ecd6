@@ -1456,6 +1456,8 @@ function dedupKey(type: string, userId: string, payload: any): string {
     case "streak_freeze_applied": return `streak_freeze:${userId}:${payload.streak_type}:${new Date().toISOString().slice(0, 10)}`;
     case "status_at_risk": return `status_risk:${userId}:${payload.badge_id}`;
     case "status_reclaimed": return `status_reclaimed:${userId}:${payload.badge_id}:${new Date().toISOString().slice(0, 10)}`;
+    case "level_up": return `level_up:${userId}:${payload.level}`;
+    case "level_near": return `level_near:${userId}:${payload.level}`;
     default: return `${type}:${userId}`;
   }
 }
