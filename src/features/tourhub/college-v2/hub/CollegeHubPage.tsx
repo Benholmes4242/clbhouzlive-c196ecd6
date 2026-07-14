@@ -54,12 +54,7 @@ export function CollegeHubPage() {
   const totalLive = liveAlumni?.totalLive ?? 0;
   const liveByCollege = liveAlumni?.byCollege ?? {};
   const leader = standings[0];
-  const { tint } = useHeroTint(leader?.logoUrl ?? null);
-  const [logoErrored, setLogoErrored] = useState(false);
-
-  useEffect(() => {
-    setLogoErrored(false);
-  }, [leader?.logoUrl]);
+  const leaderPlayingNow = leader ? liveByCollege[leader.normalizedName] ?? 0 : 0;
 
   // ── Compare pick mode ────────────────────────────────────────────────
   const [searchParams, setSearchParams] = useSearchParams();
