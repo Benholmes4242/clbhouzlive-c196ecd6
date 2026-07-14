@@ -386,7 +386,7 @@ export function PlayersTab() {
             const goldRank = synced && r.rank === 1 && !podiumRows.length;
             return (
               <RankedPlayerRow
-                key={r.playerId || `rank-${r.rank}`}
+                key={`${r.playerId || 'none'}-${r.rank}-${r.name}`}
                 rank={r.rank}
                 player={{
                   playerId: r.playerId,

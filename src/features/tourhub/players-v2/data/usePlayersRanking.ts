@@ -106,7 +106,7 @@ export function usePlayersRanking(tour: TourId) {
           .select('id, full_name, first_name, last_name, country, country_code, photo_url, tour_codes')
           .in('id', playerIds);
         const pmap = new Map((players ?? []).map((p) => [p.id, p]));
-        const rows: RankedRow[] = stats.map((s, i) => {
+        let rows: RankedRow[] = stats.map((s, i) => {
           const p = pmap.get(s.player_id);
           return {
             playerId: s.player_id,
@@ -124,7 +124,7 @@ export function usePlayersRanking(tour: TourId) {
             tournamentsPlayed: s.events_played ?? null,
           };
         });
-        rows.sort((a, b) => a.rank - b.rank);
+        rows = [...rows].sort((a, b) => a.rank - b.rank);
         return { synced: true, statLabel: STAT_LABEL.pga, rows };
       }
 
@@ -202,7 +202,7 @@ export function usePlayersRanking(tour: TourId) {
         .select('id, full_name, first_name, last_name, country, country_code, photo_url, tour_codes')
         .in('id', dedup.map((r) => r.player_id));
       const pmap = new Map((players ?? []).map((p) => [p.id, p]));
-      const rows: RankedRow[] = dedup
+      const rows: RankedRow[] = [...dedup
         .map((r) => {
           const p = pmap.get(r.player_id);
           if (!p?.tour_codes?.includes('CHAMP')) return null;
@@ -222,7 +222,7 @@ export function usePlayersRanking(tour: TourId) {
             tournamentsPlayed: null,
           } as RankedRow;
         })
-        .filter((r): r is RankedRow => !!r)
+        .filter((r): r is RankedRow => !!r)]
         .sort((a, b) => a.rank - b.rank);
       return { synced: false, statLabel: null, rows };
     },
