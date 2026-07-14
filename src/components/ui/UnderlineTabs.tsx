@@ -11,7 +11,7 @@ import React from 'react';
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
-const DEFAULT_UNDERLINE = '#0A0E14';
+const DEFAULT_UNDERLINE = '#15171F';
 
 export interface UnderlineTabsOption<T extends string> {
   id: T;
