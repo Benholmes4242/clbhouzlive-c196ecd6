@@ -129,11 +129,13 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
 
   const when = relDate(row.play_date ?? row.attained_at ?? null);
 
-  // Eagles compact variant: light card with course-image strip (Option B).
-  if (isCompactEagle) {
+  // Eagles-only: "Photo-crest" card. Photo hero + light footer.
+  if (isEagle) {
     const heroText = (heroValue || '').trim();
-    const holeMatch = /HOLE\s*\d+/i.exec(heroText);
-    const holeText = holeMatch ? holeMatch[0].toUpperCase() : (heroText || '—');
+    const holeDigits = /\d+/.exec(heroText);
+    const holeNumber = holeDigits ? holeDigits[0] : '';
+    const hcpVal = row.holder_hcp;
+    const hasHcp = hcpVal !== null && hcpVal !== undefined && Number.isFinite(Number(hcpVal));
     return (
       <button
         type="button"
@@ -142,21 +144,23 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
         style={{
           position: 'relative',
           flexShrink: 0,
-          width: 190,
-          borderRadius: 14,
+          width: 220,
+          borderRadius: 18,
           background: '#fff',
-          border: '1px solid rgba(15,23,42,0.07)',
           overflow: 'hidden',
           padding: 0,
           cursor: 'pointer',
           fontFamily: FONT,
+          boxShadow: '0 2px 14px rgba(15,23,42,0.09)',
+          border: 'none',
         }}
       >
+        {/* PHOTO HERO */}
         <div
           style={{
             position: 'relative',
             width: '100%',
-            height: 64,
+            height: 116,
             background: image ? undefined : 'linear-gradient(150deg, #6b8a5a, #3a4a2f)',
           }}
         >
@@ -175,91 +179,188 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
               }}
             />
           ) : null}
+          {/* Dark scrim for legibility */}
           <div
             style={{
               position: 'absolute',
-              left: 8,
-              bottom: 8,
-              padding: '3px 7px',
-              borderRadius: 6,
-              background: 'rgba(10,12,16,0.65)',
-              fontSize: 8,
-              fontWeight: 800,
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-              color: '#fff',
-              lineHeight: 1,
+              inset: 0,
+              background: 'linear-gradient(180deg, rgba(0,0,0,0.15), rgba(0,0,0,0.4))',
             }}
-          >
-            EAGLE
-          </div>
-        </div>
-        <div style={{ padding: '9px 12px 12px' }}>
+          />
+
+          {/* TOP-LEFT: crest pill + course + timestamp */}
           <div
             style={{
-              fontSize: 18,
-              fontWeight: 900,
-              color: '#0F172A',
-              letterSpacing: '-0.02em',
-              lineHeight: 1,
-              fontVariantNumeric: 'tabular-nums',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {holeText}
-          </div>
-          <div
-            style={{
-              marginTop: 2,
-              fontSize: 9.5,
-              color: '#94A3B8',
-              lineHeight: 1.2,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {row.course_name}
-          </div>
-          <div
-            style={{
-              marginTop: 8,
+              position: 'absolute',
+              top: 10,
+              left: 10,
+              right: 10,
               display: 'flex',
-              alignItems: 'center',
+              flexDirection: 'column',
+              gap: 4,
+            }}
+          >
+            <span
+              style={{
+                alignSelf: 'flex-start',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                padding: '4px 10px',
+                borderRadius: 20,
+                background: 'rgba(255,255,255,0.92)',
+                fontSize: 10,
+                fontWeight: 800,
+                letterSpacing: '0.08em',
+                color: '#22C55E',
+                lineHeight: 1,
+              }}
+            >
+              <span aria-hidden>🦅</span> EAGLE
+            </span>
+            <div
+              style={{
+                fontSize: 12.5,
+                fontWeight: 700,
+                color: '#fff',
+                lineHeight: 1.2,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                textShadow: '0 1px 2px rgba(0,0,0,0.35)',
+              }}
+            >
+              {row.course_name}
+            </div>
+            {when ? (
+              <div
+                style={{
+                  fontSize: 10.5,
+                  fontWeight: 600,
+                  color: 'rgba(255,255,255,0.75)',
+                  lineHeight: 1,
+                  letterSpacing: '0.04em',
+                  textTransform: 'uppercase',
+                  textShadow: '0 1px 2px rgba(0,0,0,0.35)',
+                }}
+              >
+                {when}
+              </div>
+            ) : null}
+          </div>
+
+          {/* BOTTOM-LEFT: HOLE label + big hole number */}
+          <div
+            style={{
+              position: 'absolute',
+              left: 10,
+              bottom: 8,
+              display: 'flex',
+              alignItems: 'baseline',
               gap: 6,
             }}
           >
-            <SquircleAvatar
-              size={15}
-              src={row.holder_avatar}
-              alt={holder}
-              fallback={initials(holder)}
-              hairlineRing
-            />
+            <span
+              style={{
+                fontSize: 9.5,
+                fontWeight: 700,
+                letterSpacing: '0.12em',
+                color: 'rgba(255,255,255,0.8)',
+                textTransform: 'uppercase',
+                lineHeight: 1,
+                textShadow: '0 1px 2px rgba(0,0,0,0.35)',
+              }}
+            >
+              HOLE
+            </span>
+            <span
+              style={{
+                fontSize: 30,
+                fontWeight: 900,
+                color: '#fff',
+                lineHeight: 1,
+                fontVariantNumeric: 'tabular-nums',
+                letterSpacing: '-0.02em',
+                textShadow: '0 2px 6px rgba(0,0,0,0.45)',
+              }}
+            >
+              {holeNumber || '—'}
+            </span>
+          </div>
+
+          {/* BOTTOM-RIGHT: green -2 chip */}
+          <div
+            style={{
+              position: 'absolute',
+              right: 10,
+              bottom: 10,
+              padding: '3px 9px',
+              borderRadius: 9,
+              background: '#22C55E',
+              fontSize: 13,
+              fontWeight: 900,
+              color: '#fff',
+              lineHeight: 1,
+              fontVariantNumeric: 'tabular-nums',
+              letterSpacing: '-0.01em',
+            }}
+          >
+            -2
+          </div>
+        </div>
+
+        {/* LIGHT FOOTER: avatar + name + hcp */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 9,
+            padding: '11px 13px',
+            background: '#fff',
+          }}
+        >
+          <SquircleAvatar
+            size={26}
+            src={row.holder_avatar}
+            alt={holder}
+            fallback={initials(holder)}
+            hairlineRing
+          />
+          <div style={{ flex: 1, minWidth: 0 }}>
             <div
               style={{
-                flex: 1,
-                minWidth: 0,
-                fontSize: 10,
-                fontWeight: 700,
-                color: '#334155',
+                fontSize: 12.5,
+                fontWeight: 800,
+                color: '#0F172A',
+                lineHeight: 1.2,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
               }}
             >
               {holder}
-              {when ? (
-                <span style={{ color: '#94A3B8', fontWeight: 500 }}> · {when.toLowerCase()}</span>
-              ) : null}
             </div>
+            {hasHcp ? (
+              <div
+                style={{
+                  marginTop: 2,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: '#64748B',
+                  lineHeight: 1.1,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                HCP {formatHcp(hcpVal)}
+              </div>
+            ) : null}
           </div>
         </div>
       </button>
     );
   }
+
+
 
   const boxShadow = isLegendary
     ? '0 0 0 1px #FBBC2E55, 0 4px 12px rgba(0,0,0,0.20)'
