@@ -20,7 +20,7 @@ import {
   type WallMaterial,
 } from '@/components/profile/handicap/whs/gam/trophy-room/_shared/levels';
 import { MATERIAL_HEX } from '@/components/profile/handicap/whs/gam/trophy-room/_shared/rarityPalette';
-import { openTrophyRoom } from '@/components/profile/handicap/whs/gam/trophy-room/openTrophyRoom';
+import { openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
 
 import { GOLD, SCOREBOARD_BG, FONT } from './gamingLightTokens';
 
