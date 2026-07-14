@@ -22,7 +22,7 @@ import {
 import { MATERIAL_HEX } from '@/components/profile/handicap/whs/gam/trophy-room/_shared/rarityPalette';
 import { openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
 
-import { GOLD, SCOREBOARD_BG, FONT } from './gamingLightTokens';
+import { GOLD, AMBER, SCOREBOARD_BG, FONT } from './gamingLightTokens';
 
 const OBSIDIAN_EDGE = '#D4A017';
 
