@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useNotableDifficultCourses } from '@/hooks/gam/useNotableDifficultCourses';
 import { DiscoverSectionHeader } from './DiscoverSectionHeader';
 import { SPACE } from '@/lib/spacing';
-import { CARD_BORDER, CARD_RADIUS, FONT } from './gamingLightTokens';
+import { FONT } from './gamingLightTokens';
 
 const numFmt = (n: number | null | undefined, digits = 1) =>
   n == null || Number.isNaN(Number(n)) ? '–' : Number(n).toFixed(digits);
