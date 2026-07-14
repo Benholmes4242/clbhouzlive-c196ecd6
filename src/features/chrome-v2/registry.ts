@@ -227,6 +227,7 @@ export const CHROME_REGISTRY: ChromeRule[] = [
       left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub' },
       tone: 'light',
       bleed: false,
+      scrollAway: true,
       note: EDITORIAL_NOTE,
     },
   },
@@ -257,20 +258,20 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   },
 
   // Tour Hub top-level (logo + editorial geometry; cinematic overlay on overview).
-  { match: { exact: '/tourhub' },                 spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'light', bleed: true,  note: EDITORIAL_NOTE } },
-  { match: { exact: '/tour' },                    spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'light', bleed: true,  note: EDITORIAL_NOTE } },
+  { match: { exact: '/tourhub' },                 spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'light', bleed: true,  scrollAway: true, note: EDITORIAL_NOTE } },
+  { match: { exact: '/tour' },                    spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'light', bleed: true,  scrollAway: true, note: EDITORIAL_NOTE } },
   // Remaining /tourhub/* sub-tabs and /tour/* aliases (not deep) — page owns
   // chrome today (isConditionallyExcluded); only the exact hubs above stay island.
   { match: { prefix: '/tourhub/' },               spec: { chrome: 'none', tone: 'light', bleed: true, note: 'other tour subpages immersive/page-owned today (isConditionallyExcluded)' } },
   { match: { prefix: '/tour/' },                  spec: { chrome: 'none', tone: 'light', bleed: true, note: 'other tour subpages immersive/page-owned today (isConditionallyExcluded)' } },
 
   // Watch sub-pages: back to /watch's caller.
-  { match: { exact: '/watch/videos' },            spec: { chrome: 'island', left: { kind: 'back', title: 'Videos', backTarget: 'history' }, tone: 'light', bleed: true } },
-  { match: { exact: '/watch/clips' },             spec: { chrome: 'island', left: { kind: 'back', title: 'Clips',  backTarget: 'history' }, tone: 'light', bleed: true } },
-  { match: { exact: '/watch' },                   spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'light', bleed: true } },
+  { match: { exact: '/watch/videos' },            spec: { chrome: 'island', left: { kind: 'back', title: 'Videos', backTarget: 'history' }, tone: 'light', bleed: true, scrollAway: true } },
+  { match: { exact: '/watch/clips' },             spec: { chrome: 'island', left: { kind: 'back', title: 'Clips',  backTarget: 'history' }, tone: 'light', bleed: true, scrollAway: true } },
+  { match: { exact: '/watch' },                   spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'light', bleed: true, scrollAway: true } },
 
   // Courses landing (editorial geometry; cinematic hero → glass overlay).
-  { match: { exact: '/courses' },                 spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'light', bleed: true,  note: EDITORIAL_NOTE } },
+  { match: { exact: '/courses' },                 spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'light', bleed: true,  scrollAway: true, note: EDITORIAL_NOTE } },
 
   // Friends activity — back arrow, history.
   { match: { exact: '/friends-activity' },        spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history' }, tone: 'light', bleed: false } },
