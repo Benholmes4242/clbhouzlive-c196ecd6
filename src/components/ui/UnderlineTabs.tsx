@@ -86,21 +86,24 @@ export function UnderlineTabs<T extends string>({
               whiteSpace: 'nowrap',
             }}
           >
-            {opt.label}
-            {active ? (
-              <span
-                aria-hidden
-                style={{
-                  position: 'absolute',
-                  left: 6,
-                  right: 6,
-                  bottom: 4,
-                  height: s.underline,
-                  borderRadius: 2,
-                  background: underlineColor,
-                }}
-              />
-            ) : null}
+            <span style={{ position: 'relative', display: 'inline-block' }}>
+              {opt.label}
+              {active ? (
+                <span
+                  aria-hidden
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    right: 0,
+                    bottom: -4,
+                    height: 2,
+                    borderRadius: 2,
+                    background: underlineColor,
+                  }}
+                />
+              ) : null}
+            </span>
+
           </button>
         );
       })}
