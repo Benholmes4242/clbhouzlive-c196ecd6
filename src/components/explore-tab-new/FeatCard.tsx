@@ -128,7 +128,7 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
 
   const when = relDate(row.play_date ?? row.attained_at ?? null);
 
-  // Eagles compact variant: mini dark feat card, part of the scoreboard family.
+  // Eagles compact variant: light card with course-image strip (Option B).
   if (isCompactEagle) {
     const heroText = (heroValue || '').trim();
     const holeMatch = /HOLE\s*\d+/i.exec(heroText);
@@ -137,92 +137,71 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
       <button
         type="button"
         onClick={onTap}
-        className="text-left active:scale-[0.98] transition-transform"
+        className="text-left active:scale-[0.99] transition-transform"
         style={{
           position: 'relative',
           flexShrink: 0,
           width: 190,
-          height: 150,
           borderRadius: 14,
+          background: '#fff',
+          border: '1px solid rgba(15,23,42,0.07)',
           overflow: 'hidden',
           padding: 0,
-          background: image ? '#07080C' : '#0A0C10',
-          border: 'none',
           cursor: 'pointer',
           fontFamily: FONT,
-          color: '#fff',
         }}
       >
-        {image ? (
-          <img
-            src={image}
-            alt=""
-            loading="lazy"
-            style={{
-              position: 'absolute',
-              inset: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              display: 'block',
-            }}
-          />
-        ) : null}
         <div
           style={{
-            position: 'absolute',
-            inset: 0,
-            background:
-              'linear-gradient(155deg, rgba(10,12,16,0.72), rgba(10,12,16,0.90))',
-          }}
-        />
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            padding: 12,
-            display: 'flex',
-            flexDirection: 'column',
+            position: 'relative',
+            width: '100%',
+            height: 64,
+            background: image ? undefined : 'linear-gradient(150deg, #6b8a5a, #3a4a2f)',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <span
+          {image ? (
+            <img
+              src={image}
+              alt=""
+              loading="lazy"
               style={{
-                fontSize: 8.5,
-                fontWeight: 800,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                color: '#22C55E',
-                lineHeight: 1,
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                display: 'block',
               }}
-            >
-              EAGLE
-            </span>
-            <span style={{ flex: 1 }} />
-            {when ? (
-              <span
-                style={{
-                  fontSize: 8.5,
-                  fontWeight: 700,
-                  textTransform: 'uppercase',
-                  color: 'rgba(255,255,255,0.45)',
-                  lineHeight: 1,
-                }}
-              >
-                {when}
-              </span>
-            ) : null}
-          </div>
-          <div style={{ flex: 1 }} />
+            />
+          ) : null}
           <div
             style={{
-              fontSize: 21,
+              position: 'absolute',
+              left: 8,
+              bottom: 8,
+              padding: '3px 7px',
+              borderRadius: 6,
+              background: 'rgba(10,12,16,0.65)',
+              fontSize: 8,
+              fontWeight: 800,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              color: '#fff',
+              lineHeight: 1,
+            }}
+          >
+            EAGLE
+          </div>
+        </div>
+        <div style={{ padding: '9px 12px 12px' }}>
+          <div
+            style={{
+              fontSize: 18,
               fontWeight: 900,
+              color: '#0F172A',
               letterSpacing: '-0.02em',
               lineHeight: 1,
-              color: '#fff',
               fontVariantNumeric: 'tabular-nums',
-              textTransform: 'uppercase',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -232,9 +211,9 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
           </div>
           <div
             style={{
-              marginTop: 3,
+              marginTop: 2,
               fontSize: 9.5,
-              color: 'rgba(255,255,255,0.55)',
+              color: '#94A3B8',
               lineHeight: 1.2,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -246,8 +225,6 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
           <div
             style={{
               marginTop: 8,
-              paddingTop: 7,
-              borderTop: '1px solid rgba(255,255,255,0.12)',
               display: 'flex',
               alignItems: 'center',
               gap: 6,
@@ -259,7 +236,6 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
               alt={holder}
               fallback={initials(holder)}
               hairlineRing
-              ringColor="rgba(255,255,255,0.25)"
             />
             <div
               style={{
@@ -267,13 +243,16 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
                 minWidth: 0,
                 fontSize: 10,
                 fontWeight: 700,
-                color: '#fff',
+                color: '#334155',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
               }}
             >
               {holder}
+              {when ? (
+                <span style={{ color: '#94A3B8', fontWeight: 500 }}> · {when.toLowerCase()}</span>
+              ) : null}
             </div>
           </div>
         </div>
