@@ -73,11 +73,19 @@ export const RoundDetailSheet: React.FC<Props> = ({
 
   const totalPar = sortedHoles.reduce((a, h) => a + (h.par ?? 0), 0);
 
+  const grossVal = userData
+    ? (userData.adjusted_gross ?? userData.actual_gross ?? null)
+    : null;
+  const toParVal = (grossVal != null && totalPar > 0) ? grossVal - totalPar : null;
+  const emptyVariant: 'syncing' | 'nohbh' =
+    userData?.hole_by_hole_fetched ? 'nohbh' : 'syncing';
+
   const eyebrowText = fmtDateEyebrow(userData?.play_date);
   const courseName = userData?.course?.name ?? '';
   const courseLocation = (userData?.course as any)?.country_name ?? null;
   const coursePar = totalPar > 0 ? totalPar : null;
   const courseSlope = (userData as any)?.slope_rating ?? null;
+
 
   const displayName = profile?.display_name ?? profile?.username ?? '';
   const playerHcp = profile?.show_handicap === false
@@ -110,13 +118,12 @@ export const RoundDetailSheet: React.FC<Props> = ({
       playerUserId={profileUserId ?? null}
       onViewProfile={onViewProfile}
       onViewCourse={onViewCourse}
-      emptyMessage={
-        userData?.hole_by_hole_fetched
-          ? 'No hole-by-hole data for this round.'
-          : 'Hole data is still syncing. Check back in a few hours.'
-      }
+      emptyVariant={emptyVariant}
+      emptyGross={grossVal}
+      emptyToPar={toParVal}
     />
   );
 };
+
 
 export default RoundDetailSheet;
