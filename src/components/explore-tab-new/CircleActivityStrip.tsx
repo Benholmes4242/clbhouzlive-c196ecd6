@@ -250,7 +250,7 @@ function CircleActivityCard({ row, onTap }: CardProps) {
             fontWeight: 800,
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
-            color: legendary ? accent : '#F7931E',
+            color: '#ffffff',
             lineHeight: 1,
           }}
         >
