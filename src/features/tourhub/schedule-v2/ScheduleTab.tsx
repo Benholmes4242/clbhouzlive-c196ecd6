@@ -172,8 +172,8 @@ export function ScheduleTab() {
         paddingTop: 'calc(var(--sat, 0px) + 69px)',
       }}
     >
-      {/* Tour chips — canonical sticky glass row (locks under island band).
-          Rendered FIRST so its rest offset matches its stuck offset. */}
+      {/* Tour lens — sticky glass wrapper preserves --tour-chips-h; chips
+          themselves come from the canonical SectionTourLens primitive. */}
       <div
         ref={chipsRef}
         style={{
@@ -184,50 +184,11 @@ export function ScheduleTab() {
           backdropFilter: 'blur(14px)',
           WebkitBackdropFilter: 'blur(14px)',
           borderBottom: '1px solid rgba(0,0,0,0.07)',
-          padding: '8px 16px 10px',
         }}
       >
-
-        <div
-          style={{
-            display: 'flex',
-            gap: 8,
-            overflowX: 'auto',
-            scrollbarWidth: 'none',
-          }}
-          className="segmented-scroller"
-        >
-          {TOUR_PRIORITY.map((slug) => {
-            const isActive = slug === activeTour;
-            return (
-              <button
-                key={slug}
-                type="button"
-                onClick={() => selectTour(slug)}
-                aria-pressed={isActive}
-                style={{
-                  flex: '0 0 auto',
-                  padding: '7px 12px',
-                  borderRadius: 14,
-                  border: isActive ? 'none' : `0.5px solid ${HAIRLINE_INK_10}`,
-                  background: isActive ? INK : '#FFFFFF',
-                  color: isActive ? '#FFFFFF' : INK,
-                  fontFamily: 'inherit',
-                  fontSize: 10.5,
-                  fontWeight: 800,
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                  lineHeight: 1,
-                }}
-              >
-                {CHIP_SHORT_LABEL[slug]}
-              </button>
-            );
-          })}
-        </div>
+        <SectionTourLens value={tourLens} onChange={setTourLens} showAllTours />
       </div>
+
 
       {/* HEADER — scrolls under the chips row like any content. */}
       <div style={{ padding: '16px 16px 12px' }}>
