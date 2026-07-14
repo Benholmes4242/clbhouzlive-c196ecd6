@@ -271,17 +271,17 @@ export function RankIdentityCard({ userId }: Props) {
             >
               {isSignedInUnsynced ? 'Start the climb' : tierName}
             </span>
-            {tierRoman && !isSignedInUnsynced && (
+            {!isSignedInUnsynced && (
               <span
                 style={{
-                  fontSize: 16,
+                  fontSize: 12.5,
                   fontWeight: 800,
                   color: tierHex,
                   letterSpacing: '0.02em',
                   textShadow: '0 1px 6px rgba(0,0,0,0.35)',
                 }}
               >
-                {tierRoman}
+                Level {currentLevel.level}
               </span>
             )}
           </div>
