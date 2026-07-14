@@ -3,28 +3,52 @@ import { useCallback, useRef, useMemo, useState } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExploreFeed } from './hooks/useExploreFeed';
 import { useExploreRegion } from './hooks/useExploreRegion';
-import DiscoverWhsMasthead from './DiscoverWhsMasthead';
+
 import { CircleActivityStrip } from './CircleActivityStrip';
-import { AlmanacRegionTabs, FeatTierRail, AlmanacHead, REGION_TABS } from './AlmanacSections';
+import {
+  AlmanacRegionTabs,
+  FeatTierRail,
+  AlmanacHead,
+  REGION_TABS,
+} from './AlmanacSections';
 import { LegendaryFeatHero } from './LegendaryFeatHero';
-import { WhereYoudRank } from './WhereYoudRank';
-import { ToughestCoursesStrip } from './ToughestCoursesStrip';
 import { useRegionFeats } from './hooks/useRegionFeats';
 import { TierSeeAllSheet } from './TierSeeAllSheet';
+
+import { SeasonStrip } from './SeasonStrip';
+import { RankIdentityCard } from './RankIdentityCard';
+import { CourseCrownsRail } from './CourseCrownsRail';
+import { NextConquestsRail } from './NextConquestsRail';
+import { ToughestCoursesRail } from './ToughestCoursesRail';
+import { DiscoverSectionHeader } from './DiscoverSectionHeader';
 
 import ExploreGrid from './ExploreGrid';
 
 import { SLATE_50 } from '@/features/courses/_shared/tokens';
 import { SPACE } from '@/lib/spacing';
+import { useNavigate } from 'react-router-dom';
 
 interface ExploreTabContentProps {
   embedded?: boolean;
+}
+
+const REGION_HUMAN: Record<string, string> = {
+  worldwide: 'Worldwide',
+  'uk-ireland': 'GB&I',
+  usa: 'USA',
+  'continental-europe': 'Europe',
+  'rest-of-world': 'Rest of World',
+};
+
+function regionLabel(slug: string | null): string {
+  return slug ? REGION_HUMAN[slug] ?? 'Region' : REGION_HUMAN.worldwide;
 }
 
 export default function ExploreTabContent({ embedded: _embedded = false }: ExploreTabContentProps) {
   const { user } = useSupabaseSession();
   const userId = user?.id;
   const gridRef = useRef<HTMLDivElement | null>(null);
+  const navigate = useNavigate();
 
   const { region: activeRegion, setRegion } = useExploreRegion();
 
@@ -56,38 +80,76 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
     [setRegion],
   );
 
+  const regionUpper = regionLabel(activeRegion).toUpperCase();
+
   return (
     <div style={{ background: SLATE_50, minHeight: '100vh' }}>
-      <DiscoverWhsMasthead />
+      {/* 1. Season strip */}
+      <SeasonStrip />
 
-      {/* Friends rail — region-INDEPENDENT, always visible */}
-      <CircleActivityStrip userId={userId} />
+      {/* 2. Rank identity card (dark) */}
+      <RankIdentityCard userId={userId} />
 
-      {/* Spacer between friends rail and region tabs */}
-      <div style={{ height: SPACE.sectionSection }} />
+      {/* 3. Friends rail (region-independent) */}
+      <div style={{ marginTop: SPACE.sectionSection }}>
+        <DiscoverSectionHeader eyebrow="Your friends" />
+        <CircleActivityStrip userId={userId} />
+      </div>
 
+      {/* 4. Region tabs */}
+      <div style={{ marginTop: SPACE.sectionSection }}>
+        <AlmanacRegionTabs region={activeRegion} onRegionChange={handleRegionChange} />
+      </div>
 
-      {/* Region tabs — shared control driving tiers and grid */}
-      <AlmanacRegionTabs region={activeRegion} onRegionChange={handleRegionChange} />
-
-      {/* Legendary hero (aces & albatrosses) */}
+      {/* 5. Legendary hero (aces & albatrosses) */}
       <LegendarySection region={activeRegion} />
 
-      <FeatTierRail region={activeRegion} tier="records" title="Course records" />
+      {/* 6. Course Crowns */}
+      <div style={{ marginTop: SPACE.sectionSection }}>
+        <DiscoverSectionHeader
+          eyebrow={`👑 Course Crowns · ${regionUpper}`}
+          title="Two ways to own a course"
+          linkLabel="All"
+          onLinkClick={() => navigate('/courses')}
+        />
+        <CourseCrownsRail region={activeRegion} />
+      </div>
 
-      {/* Rhythm break 1 - personal (silent if not signed in / no WHS / no picks) */}
-      <WhereYoudRank userId={userId} />
+      {/* 7. Next Conquests (silent when signed out / no WHS / no titles) */}
+      <div style={{ marginTop: SPACE.sectionSection }}>
+        <DiscoverSectionHeader
+          eyebrow="Your next conquests"
+          title="Records within reach"
+        />
+        <NextConquestsRail userId={userId} />
+      </div>
 
-      <FeatTierRail region={activeRegion} tier="eagles" title="Eagles" variant="compact" />
+      {/* 8. Eagles rail (restyled compact variant) */}
+      <FeatTierRail
+        region={activeRegion}
+        tier="eagles"
+        title={`Eagles · ${regionUpper}`}
+        variant="compact"
+      />
 
-      {/* Rhythm break 2 - platform-wide toughest courses */}
-      <ToughestCoursesStrip userId={userId} />
+      {/* 9. Toughest courses (light) */}
+      <div style={{ marginTop: SPACE.sectionSection }}>
+        <DiscoverSectionHeader
+          eyebrow="Toughest courses"
+          title="Where scores go to die"
+        />
+        <ToughestCoursesRail />
+      </div>
 
-      <FeatTierRail region={activeRegion} tier="birdie_hauls" title="Birdie hauls" variant="list" />
+      {/* 10. Birdie hauls (light leaderboard) */}
+      <FeatTierRail
+        region={activeRegion}
+        tier="birdie_hauls"
+        title={`Birdie hauls · ${regionUpper}`}
+        variant="list"
+      />
 
-
-
-
+      {/* 11. Feed block */}
       <div
         style={{
           marginTop: SPACE.sectionSection,
@@ -168,5 +230,3 @@ function LegendarySection({ region }: { region: string | null }) {
     </section>
   );
 }
-
-
