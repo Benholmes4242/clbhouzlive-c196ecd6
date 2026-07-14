@@ -37,9 +37,8 @@ function gapCopy(category: string, gap: number): string {
   const meta = CATEGORY_META[base];
   const n = Math.max(0, Math.round(gap));
   if (!meta) return `${n} off the record`;
-  return meta.style === 'off'
-    ? `${n} ${meta.unit}`
-    : `${n} ${meta.unit}`;
+  const unit = n === 1 ? meta.unitSingular : meta.unit;
+  return `${n} ${unit}`;
 }
 
 function categoryLabel(category: string): string {
