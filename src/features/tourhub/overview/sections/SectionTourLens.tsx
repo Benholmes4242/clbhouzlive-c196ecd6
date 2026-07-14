@@ -1,5 +1,6 @@
-import { memo, useRef } from 'react';
+import { memo, useMemo, useRef } from 'react';
 import { useEdgeFades } from '@/components/watch/shared/useEdgeFades';
+import { FilterChips } from '@/components/ui/FilterChips';
 import { TOUR_CONFIG, type TourId } from '../../hooks/useOverviewData';
 
 interface SectionTourLensProps {
@@ -15,18 +16,32 @@ interface SectionTourLensProps {
 
 const TOUR_ORDER: TourId[] = ['pga', 'lpga', 'euro', 'liv', 'champ', 'pgad'];
 
+type LensId = '__all__' | TourId;
+
 /**
  * SectionTourLens — per-section tour filter primitive.
  *
  * A horizontally-scrolling chip row defaulting to "All Tours" (unless
  * showAllTours=false). Controlled by the parent section; no internal
  * state, no auto-scroll. Right-edge fade appears only when the row
- * overflows.
+ * overflows. Uses the canonical FilterChips pill language.
  */
 function SectionTourLensInner({ value, onChange, showAllTours = true }: SectionTourLensProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
   useEdgeFades(scrollerRef, wrapperRef);
+
+  const options = useMemo(() => {
+    const list: { id: LensId; label: string }[] = [];
+    if (showAllTours) {
+      list.push({ id: '__all__', label: 'All Tours' });
+    }
+    TOUR_ORDER.forEach((id) => {
+      const config = TOUR_CONFIG[id];
+      list.push({ id, label: `${config.emoji} ${config.name}` });
+    });
+    return list;
+  }, [showAllTours]);
 
   return (
     <div
@@ -38,29 +53,16 @@ function SectionTourLensInner({ value, onChange, showAllTours = true }: SectionT
         ref={scrollerRef}
         role="tablist"
         aria-label="Filter section by tour"
-        className="flex gap-1.5 overflow-x-auto scrollbar-hide"
+        className="overflow-x-auto scrollbar-hide"
         style={{ padding: '8.5px 16px' }}
       >
-        {showAllTours && (
-          <Chip
-            id={null}
-            label="All Tours"
-            active={value === null}
-            onClick={() => onChange(null)}
-          />
-        )}
-        {TOUR_ORDER.map((id) => {
-          const config = TOUR_CONFIG[id];
-          return (
-            <Chip
-              key={id}
-              id={id}
-              label={`${config.emoji} ${config.name}`}
-              active={value === id}
-              onClick={() => onChange(id)}
-            />
-          );
-        })}
+        <FilterChips
+          options={options}
+          value={value ?? '__all__'}
+          onChange={(id) => onChange(id === '__all__' ? null : (id as TourId))}
+          ariaLabel="Filter section by tour"
+          className="!overflow-visible !p-0"
+        />
       </div>
 
       {/* Right-edge fade (only when scrollable) */}
@@ -75,40 +77,6 @@ function SectionTourLensInner({ value, onChange, showAllTours = true }: SectionT
         }}
       />
     </div>
-  );
-}
-
-interface ChipProps {
-  id: TourId | null;
-  label: string;
-  active: boolean;
-  onClick: () => void;
-}
-
-function Chip({ id, label, active, onClick }: ChipProps) {
-  return (
-    <button
-      key={id ?? 'all'}
-      type="button"
-      role="tab"
-      aria-selected={active}
-      onClick={onClick}
-      className="shrink-0 transition-colors active:scale-[0.97] flex items-center"
-      style={{
-        height: 30,
-        padding: '0 11px',
-        fontSize: 12,
-        fontWeight: 600,
-        borderRadius: 15,
-        background: active ? 'rgba(247,147,30,0.12)' : 'transparent',
-        border: active ? '1px solid #F7931E' : '1.5px solid hsl(var(--border))',
-        color: active ? '#c97a10' : 'hsl(var(--muted-foreground))',
-        letterSpacing: '-0.01em',
-        gap: 5,
-      }}
-    >
-      <span>{label}</span>
-    </button>
   );
 }
 
