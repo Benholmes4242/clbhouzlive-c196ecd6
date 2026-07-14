@@ -47,6 +47,7 @@ interface Props {
   tier: FeatTier;
   onTap?: () => void;
   index?: number;
+  medals?: number | null;
 }
 
 // Birdie hauls leaderboard row - gaming-light Discover rebuild spec 3F.
