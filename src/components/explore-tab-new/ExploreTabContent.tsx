@@ -89,9 +89,10 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
 
       <div
         style={{
-          marginTop: 16,
+          marginTop: 32,
           borderTop: '1px solid rgba(15,23,42,0.06)',
-          paddingTop: 16,
+          paddingTop: 32,
+          paddingBottom: 32,
         }}
       >
         <AlmanacHead icon="📍" title={`The feed · ${feedRegionLabel}`} />
