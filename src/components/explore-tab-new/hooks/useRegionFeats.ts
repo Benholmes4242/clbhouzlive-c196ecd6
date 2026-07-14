@@ -9,6 +9,8 @@ export interface FeatRow {
   holder_name: string | null;
   holder_username?: string | null;
   holder_avatar: string | null;
+  holder_hcp?: number | null;
+  holder_club?: string | null;
   feat_type?: string;
   feat_value?: string;
   play_date?: string;
