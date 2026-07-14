@@ -39,7 +39,6 @@ export function FilterChips<T extends string>({
       aria-label={ariaLabel}
       style={{
         display: 'flex',
-        justifyContent: 'center',
         gap: 8,
         overflowX: 'auto',
         padding: '0 4px',
