@@ -101,6 +101,7 @@ interface Props {
   tier: FeatTier;
   region: string | null;
   rows: FeatRow[];
+  onRowTap?: (row: FeatRow) => void;
 }
 
 type SortMode = 'latest' | 'top';
@@ -129,7 +130,7 @@ function tsOf(row: FeatRow): number {
   return Number.isFinite(t) ? t : 0;
 }
 
-export function TierSeeAllSheet({ open, onClose, tier, region, rows }: Props) {
+export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap }: Props) {
   const [visible, setVisible] = useState(PAGE);
   const [sort, setSort] = useState<SortMode>('latest');
   const sentinelRef = useRef<HTMLDivElement | null>(null);
