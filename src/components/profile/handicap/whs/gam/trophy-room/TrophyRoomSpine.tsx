@@ -6,7 +6,7 @@
  * no fetching, no state.
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import type { TrophyItem } from './_shared/normalizeTrophyItem';
 import { MATERIAL_HEX } from './_shared/rarityPalette';
 import {
@@ -19,6 +19,7 @@ import {
   type WallMaterial,
 } from './_shared/levels';
 import { TierGem } from '@/components/shared/TierGem';
+import { LadderSheet } from './LadderSheet';
 
 const FONT = "'Geist', -apple-system, sans-serif";
 const OBSIDIAN_BODY = '#2A2F36';
@@ -60,9 +61,11 @@ const STREAK_DEFS: Array<{ badgeId: string; label: string; unit?: string; color:
 
 interface Props {
   items: TrophyItem[];
+  userId?: string | null;
 }
 
-export function TrophyRoomSpine({ items }: Props) {
+export function TrophyRoomSpine({ items, userId }: Props) {
+  const [ladderOpen, setLadderOpen] = useState(false);
   const achievements = items.filter(
     (i): i is Extract<TrophyItem, { kind: 'achievement' }> => i.kind === 'achievement',
   );
@@ -79,15 +82,40 @@ export function TrophyRoomSpine({ items }: Props) {
 
   return (
     <div style={{ fontFamily: FONT, marginBottom: 12 }}>
-      {/* level card */}
-      <div
+      {/* level card -- tap to open the Ladder */}
+      <button
+        type="button"
+        onClick={() => setLadderOpen(true)}
         style={{
+          all: 'unset',
+          display: 'block',
+          width: '100%',
           borderRadius: 18,
           padding: 16,
           background: 'linear-gradient(170deg, rgba(255,255,255,0.055), rgba(255,255,255,0.015))',
           border: '1px solid rgba(255,255,255,0.08)',
+          boxSizing: 'border-box',
+          cursor: 'pointer',
+          transition: 'transform 120ms ease',
+          position: 'relative',
         }}
+        onPointerDown={(e) => { (e.currentTarget as HTMLElement).style.transform = 'scale(0.985)'; }}
+        onPointerUp={(e) => { (e.currentTarget as HTMLElement).style.transform = ''; }}
+        onPointerLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = ''; }}
       >
+        <span
+          aria-hidden
+          style={{
+            position: 'absolute',
+            top: 12,
+            right: 14,
+            fontSize: 15,
+            color: 'rgba(255,255,255,0.4)',
+            lineHeight: 1,
+          }}
+        >
+          ›
+        </span>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 17, fontWeight: 800, color: '#FFFFFF' }}>
             {level ? <TierGem medals={owned} size="md" /> : null}
@@ -147,7 +175,7 @@ export function TrophyRoomSpine({ items }: Props) {
             ? `${next.medalsRequired - owned} ${next.medalsRequired - owned === 1 ? 'medal' : 'medals'} to Level ${next.level} · ${next.label}`
             : 'Every level earned. The wall is yours.'}
         </div>
-      </div>
+      </button>
 
       {/* streaks strip */}
       <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
@@ -191,6 +219,14 @@ export function TrophyRoomSpine({ items }: Props) {
           );
         })}
       </div>
+
+      <LadderSheet
+        open={ladderOpen}
+        onClose={() => setLadderOpen(false)}
+        owned={owned}
+        items={items}
+        userId={userId ?? null}
+      />
     </div>
   );
 }

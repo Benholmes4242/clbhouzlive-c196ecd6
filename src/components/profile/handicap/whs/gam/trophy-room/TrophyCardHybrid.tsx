@@ -16,6 +16,8 @@ import { renderBadgeIcon } from '../badgeIcons';
 // Legend cards are grouped by course in TrophyRoomSheet and render
 // LegendCard directly. TrophyCardHybrid only handles achievements.
 import { statusForEarned, statusCopy } from './_shared/statusBadges';
+import { seasonDisplayForBadgeId } from '@/lib/gam/seasonClock';
+import { useViewerHemisphere } from '@/hooks/gam/useViewerHemisphere';
 
 const FONT = "'Geist', -apple-system, sans-serif";
 const OBSIDIAN_EDGE = '#D4A017';
@@ -41,7 +43,9 @@ interface Props {
 }
 
 export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = null }) => {
+  const hemi = useViewerHemisphere();
   if (item.kind !== 'achievement') return null;
+  const displayName = seasonDisplayForBadgeId(item.badgeId, hemi) ?? item.name;
 
   const tiered = item.tiers.length > 1;
   // For tiered badges, "active" derives from live tier state --
@@ -283,7 +287,7 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = 
           marginTop: 5,
         }}
       >
-        {item.name.toUpperCase()}
+        {displayName.toUpperCase()}
       </div>
       {subline && (
         <div

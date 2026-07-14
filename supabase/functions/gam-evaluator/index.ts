@@ -225,6 +225,16 @@ async function processSingle(whsScoreId: string) {
     await applyCourseLegends(stats);
     await applyRivalryResults(userId, stats, whsScoreId);
 
+    // Seasonal medal award. Own try/catch: never breaks round processing.
+    // MUST MATCH the frontend threshold in src/lib/gam/seasonClock.ts
+    // (SEASON_ROUNDS_REQUIRED = 5).
+    try {
+      const seasonAwardedId = await evaluateSeasonMedal(userId, stats, whsScoreId);
+      if (seasonAwardedId) earned.push(seasonAwardedId);
+    } catch (e) {
+      console.warn("[season_medal]", (e as Error).message);
+    }
+
     // Ascent -- wall level up / near-miss detection. Wrapped in its own
     // try/catch: badge processing above must complete regardless of
     // level RPC/insert failures.
@@ -1585,4 +1595,70 @@ async function evaluateLevelTransition(userId: string, whsScoreId: string) {
     gap,
     whs_score_id: whsScoreId,
   });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// evaluateSeasonMedal
+//
+// Awards the season_{year}_q{quarter} binary badge when the user has played
+// >= SEASON_ROUNDS_REQUIRED verified rounds within the current round's
+// quarter. Idempotent: skips silently when the catalogue row is missing,
+// inactive, or already earned.
+//
+// MUST MATCH the frontend threshold in src/lib/gam/seasonClock.ts.
+// ─────────────────────────────────────────────────────────────────────────────
+const SEASON_ROUNDS_REQUIRED = 5;
+
+function quarterOfDate(playDate: string): { year: number; quarter: number; startIso: string; endIso: string } {
+  const d = new Date(playDate + "T00:00:00Z");
+  const y = d.getUTCFullYear();
+  const m = d.getUTCMonth();
+  const q = Math.floor(m / 3) + 1;
+  const startMonth = (q - 1) * 3;
+  const start = new Date(Date.UTC(y, startMonth, 1));
+  const end = new Date(Date.UTC(y, startMonth + 3, 1));
+  return {
+    year: y,
+    quarter: q,
+    startIso: start.toISOString().slice(0, 10),
+    endIso: end.toISOString().slice(0, 10),
+  };
+}
+
+async function evaluateSeasonMedal(
+  userId: string,
+  stats: any,
+  whsScoreId: string,
+): Promise<string | null> {
+  const playDate: string | null = stats?.play_date ?? null;
+  if (!playDate) return null;
+  const { year, quarter, startIso, endIso } = quarterOfDate(playDate);
+  const badgeId = `season_${year}_q${quarter}`;
+
+  const { data: cat } = await supabase
+    .from("gam_badge_catalogue")
+    .select("id,is_active")
+    .eq("id", badgeId)
+    .maybeSingle();
+  if (!cat || cat.is_active !== true) return null;
+
+  const { data: existing } = await supabase
+    .from("gam_user_badges")
+    .select("badge_id")
+    .eq("user_id", userId)
+    .eq("badge_id", badgeId)
+    .maybeSingle();
+  if (existing) return null;
+
+  const { count, error: countErr } = await supabase
+    .from("gam_round_stats")
+    .select("whs_score_id", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .gte("play_date", startIso)
+    .lt("play_date", endIso);
+  if (countErr) throw countErr;
+  if ((count ?? 0) < SEASON_ROUNDS_REQUIRED) return null;
+
+  const did = await upsertBadgeEarned(userId, badgeId, whsScoreId);
+  return did ? badgeId : null;
 }
