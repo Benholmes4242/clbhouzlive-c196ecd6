@@ -325,7 +325,7 @@ export function PlayersTab() {
           THE FIELD
         </span>
         <div style={{ display: 'flex', gap: 4 }}>
-          {(['ranking', 'live'] as SortKey[]).map((k) => {
+          {sortOptions.map((k) => {
             const active = k === sort;
             return (
               <button
