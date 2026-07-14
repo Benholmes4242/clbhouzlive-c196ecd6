@@ -273,7 +273,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
             marginTop: -1,
           }}
         >
-          <div className="px-4">
+          <div className="px-4 flex justify-center">
             <FilterChips
               options={listOptions.map((o) => ({
                 id: o.value,
