@@ -83,7 +83,7 @@ export const CourseDetailShellTabs: React.FC<CourseDetailShellTabsProps> = ({
                 position: 'relative',
                 flex: '0 0 auto',
                 height: 44,
-                padding: '0 4px',
+                padding: '12px 4px 10px',
                 fontSize: 14,
                 fontWeight: isActive ? 700 : 600,
                 color: isActive ? INK : INK_MUTE,
@@ -93,7 +93,8 @@ export const CourseDetailShellTabs: React.FC<CourseDetailShellTabsProps> = ({
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
                 display: 'inline-flex',
-                alignItems: 'center',
+                alignItems: 'flex-end',
+
               }}
             >
               <span style={{ position: 'relative', display: 'inline-block' }}>
