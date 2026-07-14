@@ -6,7 +6,7 @@
  * no fetching, no state.
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import type { TrophyItem } from './_shared/normalizeTrophyItem';
 import { MATERIAL_HEX } from './_shared/rarityPalette';
 import {
@@ -19,6 +19,7 @@ import {
   type WallMaterial,
 } from './_shared/levels';
 import { TierGem } from '@/components/shared/TierGem';
+import { LadderSheet } from './LadderSheet';
 
 const FONT = "'Geist', -apple-system, sans-serif";
 const OBSIDIAN_BODY = '#2A2F36';
@@ -60,10 +61,14 @@ const STREAK_DEFS: Array<{ badgeId: string; label: string; unit?: string; color:
 
 interface Props {
   items: TrophyItem[];
+  userId?: string | null;
 }
 
-export function TrophyRoomSpine({ items }: Props) {
+export function TrophyRoomSpine({ items, userId }: Props) {
+  const [ladderOpen, setLadderOpen] = useState(false);
   const achievements = items.filter(
+    (i): i is Extract<TrophyItem, { kind: 'achievement' }> => i.kind === 'achievement',
+  );
     (i): i is Extract<TrophyItem, { kind: 'achievement' }> => i.kind === 'achievement',
   );
   const owned = medalsOwned(items);

@@ -17,6 +17,8 @@ import { GemLadder } from './GemLadder';
 import { useFriendsWhoEarnedBadge } from '@/hooks/gam/useFriendsWhoEarnedBadge';
 import { getFirstName } from '@/components/friend-sheet/parts/_shared/formatName';
 import type { TrophyItem } from '../_shared/normalizeTrophyItem';
+import { seasonDisplayForBadgeId } from '@/lib/gam/seasonClock';
+import { useViewerHemisphere } from '@/hooks/gam/useViewerHemisphere';
 
 const EARNED_GOLD = '#F5C842';
 const IN_PROGRESS_BLUE = '#8CA3B8';
@@ -81,6 +83,8 @@ const FriendAvatar: React.FC<{ name: string; url: string | null; size: number }>
 };
 
 export const AchievementImmersive: React.FC<Props> = ({ item, viewerUserId, currentIndex = null, onClose, onShare }) => {
+  const hemi = useViewerHemisphere();
+  const displayName = seasonDisplayForBadgeId(item.badgeId, hemi) ?? item.name;
   const view = deriveDetailView(item, currentIndex);
   if (view.kind !== 'achievement') return null;
   const {
@@ -264,7 +268,7 @@ export const AchievementImmersive: React.FC<Props> = ({ item, viewerUserId, curr
             color: 'rgba(255,255,255,0.96)',
           }}
         >
-          {item.name}
+          {displayName}
         </div>
 
         {/* Summary -- status subline overrides when at_risk / lost. */}
