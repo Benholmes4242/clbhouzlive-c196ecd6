@@ -51,12 +51,34 @@ interface Props {
 }
 
 // Birdie hauls leaderboard row - gaming-light Discover rebuild spec 3F.
-export function FeatListRow({ row, onTap, index = 0, medals }: Props) {
+export function FeatListRow({ row, tier, onTap, index = 0, medals }: Props) {
   const holder = useMemo(() => formatHolderName(row.holder_name), [row.holder_name]);
-  const value = (row.feat_value ?? (row.value != null ? String(row.value) : '')).replace(/[^\d.]/g, '') || '—';
   const when = relDate(row.play_date ?? row.attained_at ?? null);
   const rank = index + 1;
   const isTop = rank === 1;
+
+  // Value + label vary by tier.
+  // - records: gross score / GROSS
+  // - eagles: hole number (extracted from feat_value) / HOLE
+  // - legendary (aces + albatrosses): hole number / HOLE
+  // - birdie_hauls: birdie count / BIRDIES
+  const { value, label } = useMemo(() => {
+    const digits = (s: string | null | undefined): string => {
+      const m = (s ?? '').match(/\d+/);
+      return m ? m[0] : '';
+    };
+    if (tier === 'records') {
+      const v = row.value != null ? String(row.value) : digits(row.feat_value);
+      return { value: v || '—', label: 'GROSS' };
+    }
+    if (tier === 'eagles' || tier === 'legendary') {
+      const v = digits(row.feat_value) || (row.value != null ? String(row.value) : '');
+      return { value: v || '—', label: 'HOLE' };
+    }
+    // birdie_hauls
+    const v = (row.feat_value ?? (row.value != null ? String(row.value) : '')).replace(/[^\d.]/g, '');
+    return { value: v || '—', label: 'BIRDIES' };
+  }, [tier, row.feat_value, row.value]);
 
   return (
     <button
@@ -101,7 +123,7 @@ export function FeatListRow({ row, onTap, index = 0, medals }: Props) {
           hairlineRing
         />
       </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         <div
           style={{
             fontSize: 13,
@@ -118,8 +140,9 @@ export function FeatListRow({ row, onTap, index = 0, medals }: Props) {
         <div
           style={{
             marginTop: 2,
-            fontSize: 10.5,
-            color: '#94A3B8',
+            fontSize: 11.5,
+            fontWeight: 700,
+            color: '#64748B',
             lineHeight: 1.2,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -127,8 +150,20 @@ export function FeatListRow({ row, onTap, index = 0, medals }: Props) {
           }}
         >
           {row.course_name}
-          {when ? ` · ${when}` : ''}
         </div>
+        {when ? (
+          <div
+            style={{
+              marginTop: 2,
+              fontSize: 11,
+              fontWeight: 700,
+              color: '#94A3B8',
+              lineHeight: 1.2,
+            }}
+          >
+            {when}
+          </div>
+        ) : null}
       </div>
       {/* Tier gems intentionally hidden in birdie haul rows. */}
 
@@ -138,6 +173,7 @@ export function FeatListRow({ row, onTap, index = 0, medals }: Props) {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'flex-end',
+          justifyContent: 'center',
           minWidth: 42,
         }}
       >
@@ -163,7 +199,7 @@ export function FeatListRow({ row, onTap, index = 0, medals }: Props) {
             lineHeight: 1,
           }}
         >
-          BIRDIES
+          {label}
         </div>
       </div>
     </button>
