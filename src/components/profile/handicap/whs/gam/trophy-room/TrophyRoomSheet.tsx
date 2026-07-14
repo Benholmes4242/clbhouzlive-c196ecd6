@@ -519,7 +519,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
             </div>
           </div>
 
-          <TrophyRoomSpine items={items} />
+          <TrophyRoomSpine items={items} userId={userId} />
 
           {/* NEXT UNLOCK banner — muted three-line stack. */}
           {nextUnlock && (
