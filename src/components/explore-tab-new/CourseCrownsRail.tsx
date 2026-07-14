@@ -270,10 +270,53 @@ interface Props {
   opener?: ScorecardOpener;
 }
 
+function RecordsModeToggle({
+  mode,
+  setMode,
+}: {
+  mode: RecordsMode;
+  setMode: (m: RecordsMode) => void;
+}) {
+  return (
+    <div style={{ display: 'inline-flex', flexShrink: 0, gap: 6 }}>
+      {([
+        { v: 'latest', label: 'LATEST' },
+        { v: 'alltime', label: 'ALL TIME' },
+      ] as const).map((o) => {
+        const active = mode === o.v;
+        return (
+          <button
+            key={o.v}
+            type="button"
+            onClick={() => setMode(o.v)}
+            style={{
+              padding: '6px 13px',
+              borderRadius: 999,
+              background: active ? '#15171F' : 'transparent',
+              color: active ? '#FFFFFF' : 'rgba(15,23,42,0.65)',
+              border: 'none',
+              fontFamily: FONT,
+              fontSize: 11.5,
+              fontWeight: 700,
+              cursor: 'pointer',
+              letterSpacing: '0.01em',
+              whiteSpace: 'nowrap',
+              transition: 'all .15s',
+            }}
+          >
+            {o.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 export function CourseCrownsRail({ region, opener }: Props) {
   const navigate = useNavigate();
-  const { data } = useRegionFeats(region, 'records');
-  const rows = useMemo(() => (data ?? []).slice(0, 8), [data]);
+  const [mode, setMode] = useState<RecordsMode>('latest');
+  const { data } = useRegionFeats(region, 'records', mode);
+  const rows = useMemo(() => (data ?? []).slice(0, 15), [data]);
 
   if (rows.length === 0) return null;
 
@@ -286,6 +329,15 @@ export function CourseCrownsRail({ region, opener }: Props) {
         onLinkClick={() => navigate('/courses')}
       />
       <div
+        style={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          padding: `0 ${SPACE.pagePadX}px 10px`,
+        }}
+      >
+        <RecordsModeToggle mode={mode} setMode={setMode} />
+      </div>
+      <div
         className="flex overflow-x-auto scrollbar-hide"
         style={{ padding: '0 16px', gap: 9 }}
       >
@@ -296,5 +348,6 @@ export function CourseCrownsRail({ region, opener }: Props) {
     </section>
   );
 }
+
 
 export default CourseCrownsRail;
