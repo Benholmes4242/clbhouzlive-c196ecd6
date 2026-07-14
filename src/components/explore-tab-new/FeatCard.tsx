@@ -96,7 +96,7 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
   const S = SIZE_MAP[size];
   const isLegendary = tier === 'legendary';
   const isRecord = tier === 'records';
-  const isCompactEagle = size === 'compact' && tier === 'eagles';
+  const isEagle = tier === 'eagles';
   const image = row.course_image ?? row.thumbnail_image ?? null;
   const holder = formatHolderName(row.holder_name);
   const accent = ACCENT[tier];
