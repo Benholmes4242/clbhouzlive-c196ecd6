@@ -30,7 +30,12 @@ function readSavedFilters(): { list?: string; sort?: string; searchTerm?: string
   }
 }
 
-const Top100CoursesHubPanel = () => {
+interface Top100CoursesHubPanelProps {
+  shellTabs?: React.ReactNode;
+  rateNudge?: React.ReactNode;
+}
+
+const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs, rateNudge }) => {
   const { user } = useSupabaseSession();
   
   // State — initialised from sessionStorage when available
