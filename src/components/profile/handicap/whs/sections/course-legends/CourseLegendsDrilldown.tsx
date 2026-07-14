@@ -357,6 +357,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
             heldCount={youOwnedCount}
             window={window}
             onWindowChange={handleWindowChange}
+            toggleVariant={theme === 'light' ? 'light' : 'dark'}
           />
 
 
