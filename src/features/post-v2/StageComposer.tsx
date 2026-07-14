@@ -70,6 +70,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
   const [hydrated, setHydrated] = useState(false);
   const [removedExistingIds, setRemovedExistingIds] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
+  const stageAddInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch the post's status + scheduled_at (useEditablePost doesn't return them).
   useEffect(() => {
