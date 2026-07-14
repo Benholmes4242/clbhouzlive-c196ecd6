@@ -51,6 +51,7 @@ export interface CardScorecardSheetProps {
   rounds?: CardScorecardRounds;
   heroMuted?: boolean;
   emptyMessage?: string;
+  loading?: boolean;
   // IDENTITY BLOCK (below scorecard)
   playerName: string;
   playerAvatarUrl?: string | null;
