@@ -133,7 +133,7 @@ function CrownTile({
             lineHeight: 1.25,
           }}
         >
-          {sub ?? 'first laurel being counted'}
+          {sub ?? 'No regular yet · 3 rounds in 90 days claims it'}
         </div>
       ) : (
         <div
