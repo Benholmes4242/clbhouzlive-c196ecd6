@@ -130,11 +130,8 @@ export function FeatListRow({ row, onTap, index = 0, medals }: Props) {
           {when ? ` · ${when}` : ''}
         </div>
       </div>
-      {medals != null && medals > 0 ? (
-        <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', marginRight: 2 }}>
-          <TierGem medals={medals} size="sm" />
-        </div>
-      ) : null}
+      {/* Tier gems intentionally hidden in birdie haul rows. */}
+
       <div
         style={{
           flexShrink: 0,
