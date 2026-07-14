@@ -30,9 +30,10 @@ function isPlayoffName(name: string): boolean {
   return l.includes('playoff') || l.includes('fedex st') || l.includes('tour championship');
 }
 
-export function useComingUp(tour: TourId, limit = 4) {
+export function useComingUp(tour: TourId | null, limit = 4) {
+  const effectiveLimit = tour === null ? Math.max(limit, 8) : limit;
   return useQuery({
-    queryKey: ['overview', 'coming-up', tour, limit],
+    queryKey: ['overview', 'coming-up', tour ?? 'all', effectiveLimit],
     queryFn: async (): Promise<ComingUpRow[]> => {
       const today = new Date().toISOString().slice(0, 10);
       const { data, error } = await supabase
@@ -46,19 +47,21 @@ export function useComingUp(tour: TourId, limit = 4) {
         .in('status', ['scheduled', 'created'])
         .gte('start_date', today)
         .order('start_date', { ascending: true })
-        .limit(limit * 6);
+        .limit(effectiveLimit * 6);
       if (error) throw error;
       const now = Date.now();
       const rows = ((data as any[]) ?? []).map((r) => {
         const slug = mapTourSlug(r.season?.tour_name);
         return { r, slug };
       });
-      const filtered = rows.filter(({ r, slug }) => {
-        if (slug === tour) return true;
-        if (tour === 'pga' && isMajor(r.name)) return true;
-        return false;
-      });
-      return filtered.slice(0, limit).map(({ r, slug }) => ({
+      const filtered = tour === null
+        ? rows
+        : rows.filter(({ r, slug }) => {
+            if (slug === tour) return true;
+            if (tour === 'pga' && isMajor(r.name)) return true;
+            return false;
+          });
+      return filtered.slice(0, effectiveLimit).map(({ r, slug }) => ({
         id: r.id,
         name: r.name,
         start_date: r.start_date,

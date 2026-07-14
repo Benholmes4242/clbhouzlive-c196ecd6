@@ -8,12 +8,14 @@ import { SectionShell, V4Card } from './SectionShell';
 import { V4, NUMERAL_THIN } from '../tokens';
 import { useComingUp } from '../data/useComingUp';
 import type { TourId } from '../../hooks/useOverviewData';
+import { TOUR_LABEL } from '../../_shared/tourOrder';
 
-export function ComingUp({ tour }: { tour: TourId }) {
+export function ComingUp({ tour }: { tour: TourId | null }) {
   const navigate = useNavigate();
   const { data } = useComingUp(tour, 4);
   const rows = data ?? [];
   if (rows.length === 0) return null;
+  const showTourTag = tour === null;
 
   return (
     <SectionShell eyebrow="What's coming up" linkLabel="Full schedule" onLinkClick={() => navigate('/tourhub?tab=schedule')}>
@@ -47,6 +49,7 @@ export function ComingUp({ tour }: { tour: TourId }) {
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+                    {showTourTag ? <Chip label={TOUR_LABEL[r.tour_slug] ?? r.tour_slug} fg={V4.inkMute} gradient={V4.hairline} /> : null}
                     {r.isMajor ? <Chip label="Major" fg={V4.goldDeep} gradient={`linear-gradient(90deg, ${V4.goldSoftA}, ${V4.goldSoftB})`} /> : null}
                     {r.isPlayoff ? <Chip label="Playoffs" fg={V4.violet} gradient={V4.violetSoft} /> : null}
                   </div>
