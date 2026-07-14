@@ -25,7 +25,7 @@ const SIZE_MAP: Record<FeatCardSize, {
     w: 182, h: 129,
     value: 22, label: 9.8, avatar: 18,
     padX: 12, padY: 12,
-    heroBottom: 39, footerBottom: 9, footerPadTop: 7,
+    heroBottom: 42, footerBottom: 9, footerPadTop: 7,
     courseFs: 11, holderFs: 12, whenFs: 10,
   },
 };
