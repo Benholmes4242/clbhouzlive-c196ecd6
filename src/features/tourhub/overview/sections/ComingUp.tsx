@@ -49,6 +49,7 @@ export function ComingUp({ tour }: { tour: TourId | null }) {
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+                    {showTourTag ? <Chip label={TOUR_LABEL[r.tour_slug] ?? r.tour_slug} fg={V4.inkMute} gradient={V4.hairline} /> : null}
                     {r.isMajor ? <Chip label="Major" fg={V4.goldDeep} gradient={`linear-gradient(90deg, ${V4.goldSoftA}, ${V4.goldSoftB})`} /> : null}
                     {r.isPlayoff ? <Chip label="Playoffs" fg={V4.violet} gradient={V4.violetSoft} /> : null}
                   </div>
