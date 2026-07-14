@@ -171,9 +171,14 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   // recompute, scroll resets to 0. So drive scrollTop ourselves, with a
   // short rAF retry loop to absorb the post-measure shift.
   // Guard `> 0` skips PTR rubber-band negative "top" snapshots.
+  // Validate snapshot against the current posts array before restoring —
+  // a snapshot captured at length N must not be applied to a list with
+  // fewer items than its recorded ranges reference (crashes Virtuoso with
+  // "Cannot read properties of undefined (reading 'index')").
+  const validatedInitialState = safeInitialState(initialState, posts.length);
   const restoreScrollTopRef = useRef<number | null>(
-    initialState && typeof (initialState as any).scrollTop === 'number' && (initialState as any).scrollTop > 0
-      ? (initialState as any).scrollTop
+    validatedInitialState && typeof (validatedInitialState as any).scrollTop === 'number' && (validatedInitialState as any).scrollTop > 0
+      ? (validatedInitialState as any).scrollTop
       : null
   );
 
