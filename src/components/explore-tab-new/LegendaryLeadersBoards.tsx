@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { SPACE } from '@/lib/spacing';
 import { FONT } from './gamingLightTokens';
 import {
