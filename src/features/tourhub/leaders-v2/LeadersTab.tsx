@@ -148,7 +148,9 @@ export function LeadersTab() {
 
       </div>
 
-      {/* Tour chips — canonical sticky glass row (locks under island band). */}
+      {/* Tour lens — sticky glass wrapper; chips from SectionTourLens
+          (no All Tours; PGA default). CHAMP taps are ignored — no board
+          coverage for that tour. */}
       <div
         style={{
           position: 'sticky',
@@ -158,48 +160,18 @@ export function LeadersTab() {
           backdropFilter: 'blur(14px)',
           WebkitBackdropFilter: 'blur(14px)',
           borderBottom: '1px solid rgba(0,0,0,0.07)',
-          padding: '8px 16px 10px',
         }}
       >
-        <div
-          style={{
-            display: 'flex',
-            gap: 8,
-            overflowX: 'auto',
-            scrollbarWidth: 'none',
+        <SectionTourLens
+          value={activeTour}
+          onChange={(t) => {
+            if (!t || t === 'champ') return;
+            setActiveTour(t);
           }}
-        >
-          {TOUR_PRIORITY.filter((s) => s !== 'champ').map((slug) => {
-            const isActive = slug === activeTour;
-            return (
-              <button
-                key={slug}
-                type="button"
-                aria-pressed={isActive}
-                onClick={() => selectTour(slug)}
-                style={{
-                  flex: '0 0 auto',
-                  padding: '7px 12px',
-                  borderRadius: 14,
-                  border: isActive ? 'none' : `0.5px solid ${HAIRLINE_INK_10}`,
-                  background: isActive ? INK : '#FFFFFF',
-                  color: isActive ? '#FFFFFF' : INK,
-                  fontFamily: 'inherit',
-                  fontSize: 10.5,
-                  fontWeight: 800,
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                  lineHeight: 1,
-                }}
-              >
-                {CHIP_LABEL[slug]}
-              </button>
-            );
-          })}
-        </div>
+          showAllTours={false}
+        />
       </div>
+
 
       {/* Boards feed */}
       {isLoading ? (
