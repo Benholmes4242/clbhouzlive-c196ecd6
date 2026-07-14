@@ -73,7 +73,7 @@ export function AlmanacHead({
         display: 'flex',
         alignItems: 'center',
         gap: 8,
-        padding: '0 16px 8px',
+        padding: '0 16px 12px',
       }}
     >
       {icon && (
@@ -158,7 +158,7 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard' }: TierPr
   const goToClaim = () => navigate('/handicap');
 
   return (
-    <section style={{ fontFamily: FONT, paddingTop: 24 }}>
+    <section style={{ fontFamily: FONT, paddingTop: 32 }}>
       <AlmanacHead
         title={title}
         icon={TIER_ICON[tier]}

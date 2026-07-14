@@ -63,7 +63,7 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
       <CircleActivityStrip userId={userId} />
 
       {/* Spacer between friends rail and region tabs */}
-      <div style={{ height: 16 }} />
+      <div style={{ height: 32 }} />
 
 
       {/* Region tabs — shared control driving tiers and grid */}
@@ -89,9 +89,10 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
 
       <div
         style={{
-          marginTop: 16,
+          marginTop: 32,
           borderTop: '1px solid rgba(15,23,42,0.06)',
-          paddingTop: 16,
+          paddingTop: 32,
+          paddingBottom: 32,
         }}
       >
         <AlmanacHead icon="📍" title={`The feed · ${feedRegionLabel}`} />
@@ -122,8 +123,8 @@ function LegendarySection({ region }: { region: string | null }) {
   const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
   const hasOverflow = rows.length > 12;
   return (
-    <section style={{ fontFamily: FONT, paddingTop: 24 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 16px 8px' }}>
+    <section style={{ fontFamily: FONT, paddingTop: 32 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 16px 12px' }}>
         <span aria-hidden style={{ fontSize: 13, lineHeight: 1 }}>⛳</span>
         <span
           style={{
