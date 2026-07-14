@@ -311,7 +311,7 @@ export function LegendaryFeatHero({ region, onRowTap }: Props) {
       >
         {rows.map((row, i) => (
           <div
-            key={row.id ?? `${row.course_id ?? 'c'}-${i}`}
+            key={`${row.course_id ?? 'c'}-${i}`}
             data-idx={i}
             ref={(el) => {
               cardRefs.current[i] = el;
