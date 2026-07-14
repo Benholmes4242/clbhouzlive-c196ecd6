@@ -1,9 +1,11 @@
 import React, { useMemo } from 'react';
+import { User, MapPin } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
 import { TrajectoryLine } from './TrajectoryLine';
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
+import { TREND_UP, TREND_DOWN } from '@/features/tourhub/_shared/tokens';
 
 const GEIST = "'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
 const CANVAS = '#F8FAFC';
@@ -37,18 +39,27 @@ export interface CardScorecardRounds {
 export interface CardScorecardSheetProps {
   open: boolean;
   onClose: () => void;
+  // HEADER (course-first)
   eyebrowText: string;
-  name: string;
-  avatarUrl?: string | null;
-  onIdentityTap?: () => void;
-  subLine: string;
+  courseName: string;
+  courseLocation?: string | null;
+  coursePar?: number | null;
+  courseSlope?: number | null;
+  // MIDDLE (unchanged)
   holes: CardScorecardHole[];
   nineHole?: boolean;
   rounds?: CardScorecardRounds;
-  headerRight?: React.ReactNode;
-  footerExtra?: React.ReactNode;
-  emptyMessage?: string;
   heroMuted?: boolean;
+  emptyMessage?: string;
+  // IDENTITY BLOCK (below scorecard)
+  playerName: string;
+  playerAvatarUrl?: string | null;
+  playerHcp?: number | null;
+  playerHcpDelta?: number | null;
+  playerUserId?: string | null;
+  // FOOTER
+  onViewProfile?: () => void;
+  onViewCourse?: () => void;
 }
 
 function fmtRel(n: number | null): string {
@@ -79,14 +90,13 @@ function summarizeBirdiesOrBetter(holes: CardScorecardHole[]): string {
   return parts.join(` ${'\u00B7'} `);
 }
 
-// ─── Grid ────────────────────────────────────────────────────────────────
 const CELL_SIZE = 31;
 
 const NineGrid: React.FC<{
   holes: CardScorecardHole[];
   label: string;
   startAt: number;
-  span: number; // 9 for OUT/IN
+  span: number;
 }> = ({ holes, label, startAt, span }) => {
   const cells: CardScorecardHole[] = [];
   for (let i = 0; i < span; i++) {
@@ -164,10 +174,32 @@ const NineGrid: React.FC<{
   );
 };
 
-// ─── Sheet ───────────────────────────────────────────────────────────────
+const HandicapChip: React.FC<{ delta: number }> = ({ delta }) => {
+  const cut = delta < 0;
+  const color = cut ? TREND_UP : TREND_DOWN;
+  const bg = cut ? 'rgba(22,163,74,0.08)' : 'rgba(220,38,38,0.07)';
+  const border = cut ? 'rgba(22,163,74,0.20)' : 'rgba(220,38,38,0.18)';
+  const arrow = cut ? '\u25BC' : '\u25B2';
+  const value = `${cut ? '\u2212' : '+'}${Math.abs(delta).toFixed(1)}`;
+  return (
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', gap: 4,
+      padding: '3px 8px', borderRadius: 999,
+      background: bg, border: `1px solid ${border}`,
+      ...NUM, fontSize: 10.5, fontWeight: 800, color,
+    }}>
+      <span style={{ fontSize: 8 }}>{arrow}</span>
+      {value}
+    </span>
+  );
+};
+
 export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
-  open, onClose, eyebrowText, name, avatarUrl, onIdentityTap, subLine,
-  holes, nineHole, rounds, headerRight, footerExtra, emptyMessage, heroMuted,
+  open, onClose, eyebrowText,
+  courseName, courseLocation, coursePar, courseSlope,
+  holes, nineHole, rounds, heroMuted, emptyMessage,
+  playerName, playerAvatarUrl, playerHcp, playerHcpDelta, playerUserId,
+  onViewProfile, onViewCourse,
 }) => {
   const totals = useMemo(() => {
     let gross = 0;
@@ -188,52 +220,54 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   const footerNote = summarizeBirdiesOrBetter(holes);
   const heroColor = totals.played ? toParColor(totals.toPar) : MUTED;
 
+  const hasPar = coursePar != null;
+  const hasSlope = courseSlope != null;
+  const showStatLine = hasPar || hasSlope;
+
+  const showChip = playerHcpDelta != null && Math.abs(playerHcpDelta) >= 0.05;
+  const showIdentity = !!playerName;
+  const showFooter = !!onViewProfile || !!onViewCourse;
+
   return (
     <BottomSheet open={open} onClose={onClose} variant="light" surfaceColor={CANVAS} style={{ background: CANVAS }}>
       <div style={{ display: 'flex', flexDirection: 'column', fontFamily: GEIST, background: CANVAS, maxHeight: 'calc(90vh - 24px)', overflowY: 'auto' }}>
-        {/* HEADER */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px 12px', borderBottom: `1px solid ${HAIRLINE}` }}>
-          <button
-            type="button"
-            disabled={!onIdentityTap}
-            onClick={onIdentityTap}
-            style={{
-              padding: 0, background: 'none', border: 'none', flexShrink: 0,
-              cursor: onIdentityTap ? 'pointer' : 'default',
-              WebkitTapHighlightColor: 'transparent',
-            }}
-            aria-label="View profile"
-          >
-            <SquircleAvatar src={avatarUrl ?? null} alt={name} size={44} hairlineRing />
-          </button>
+        {/* HEADER — course-first */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '10px 16px 12px', borderBottom: `1px solid ${HAIRLINE}` }}>
           <div style={{ minWidth: 0, flex: 1 }}>
             <div style={{ ...NUM, fontSize: 10.5, fontWeight: 800, color: EYEBROW, letterSpacing: '0.14em', textTransform: 'uppercase', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {eyebrowText}
             </div>
-            <button
-              type="button"
-              disabled={!onIdentityTap}
-              onClick={onIdentityTap}
-              style={{
-                padding: 0, background: 'none', border: 'none', display: 'block',
-                maxWidth: '100%', textAlign: 'left',
-                cursor: onIdentityTap ? 'pointer' : 'default',
-                WebkitTapHighlightColor: 'transparent',
-              }}
-            >
-              <span style={{ fontSize: 16.5, fontWeight: 800, color: INK, letterSpacing: '-0.01em', display: 'block', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {name}
-              </span>
-            </button>
-            <div style={{ ...NUM, fontSize: 11.5, fontWeight: 600, color: SECONDARY, marginTop: 2 }}>
-              {subLine}
+            <div style={{
+              fontSize: 18, fontWeight: 800, color: INK,
+              letterSpacing: '-0.01em', lineHeight: 1.15, marginTop: 2,
+              display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+              overflow: 'hidden', textOverflow: 'ellipsis',
+            }}>
+              {courseName}
             </div>
+            {courseLocation && (
+              <div style={{ fontSize: 12.5, fontWeight: 600, color: SECONDARY, marginTop: 2 }}>
+                {courseLocation}
+              </div>
+            )}
+            {showStatLine && (
+              <div style={{ ...NUM, fontSize: 12, fontWeight: 700, color: MUTED, marginTop: 5, display: 'flex', gap: 12, alignItems: 'center' }}>
+                {hasPar && (
+                  <span>PAR <span style={{ color: INK }}>{coursePar}</span></span>
+                )}
+                {hasPar && hasSlope && (
+                  <span style={{ color: 'rgba(15,23,42,0.18)' }}>|</span>
+                )}
+                {hasSlope && (
+                  <span>SLOPE <span style={{ color: INK }}>{courseSlope}</span></span>
+                )}
+              </div>
+            )}
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, flexShrink: 0 }}>
-            <span style={{ ...NUM, fontSize: 40, fontWeight: 200, letterSpacing: '-0.02em', lineHeight: 0.9, color: heroMuted ? '#8A9099' : heroColor }}>
+          <div style={{ flexShrink: 0 }}>
+            <span style={{ ...NUM, fontSize: 42, fontWeight: 200, letterSpacing: '-0.02em', lineHeight: 1, color: heroMuted ? '#8A9099' : heroColor }}>
               {totals.played ? fmtRel(totals.toPar) : '\u2014'}
             </span>
-            {headerRight}
           </div>
         </div>
 
@@ -271,7 +305,6 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
           </div>
         ) : (
           <>
-            {/* TRAJECTORY */}
             {showTrajectory && (
               <div style={{ margin: 16, padding: '12px 12px 6px', background: '#FFFFFF', borderRadius: 14, border: `1px solid ${HAIRLINE}` }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 4 }}>
@@ -288,7 +321,6 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
               </div>
             )}
 
-            {/* GRIDS */}
             <div style={{ padding: '4px 16px 16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
               {nineHole ? (
                 <NineGrid holes={holes.filter((h) => h.holeNo <= 9)} label="HOLES 1-9" startAt={1} span={9} />
@@ -302,9 +334,9 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
           </>
         )}
 
-        {/* FOOTER */}
+        {/* TOTAL row */}
         <div style={{
-          padding: '14px 16px calc(14px + env(safe-area-inset-bottom, 0px))',
+          padding: '14px 16px',
           borderTop: `1px solid ${HAIRLINE}`,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
         }}>
@@ -328,7 +360,81 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
           )}
         </div>
 
-        {footerExtra}
+        {/* IDENTITY BLOCK */}
+        {showIdentity && (
+          <div style={{
+            margin: '12px 16px 0',
+            background: '#FFFFFF',
+            border: `1px solid ${HAIRLINE}`,
+            borderRadius: 14,
+            padding: '12px 16px',
+            display: 'flex', alignItems: 'center', gap: 11,
+          }}>
+            <SquircleAvatar
+              src={playerAvatarUrl ?? null}
+              alt={playerName}
+              userId={playerUserId ?? undefined}
+              size={44}
+              hairlineRing
+            />
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: INK, letterSpacing: '-0.01em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {playerName}
+              </div>
+              {(playerHcp != null || showChip) && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 1 }}>
+                  {playerHcp != null && (
+                    <span style={{ ...NUM, fontSize: 12.5, fontWeight: 600, color: SECONDARY }}>
+                      HCP {playerHcp.toFixed(1)}
+                    </span>
+                  )}
+                  {showChip && <HandicapChip delta={playerHcpDelta as number} />}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* FOOTER — two buttons */}
+        {showFooter && (
+          <div style={{
+            display: 'flex', gap: 8,
+            padding: '12px 16px calc(env(safe-area-inset-bottom, 0px) + 16px)',
+          }}>
+            {onViewProfile && (
+              <button
+                type="button"
+                onClick={onViewProfile}
+                style={{
+                  flex: 1, background: '#FFFFFF', border: '1px solid #E2E8F0',
+                  borderRadius: 13, padding: '12px 14px',
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+                  fontFamily: GEIST, fontSize: 13.5, fontWeight: 800, color: INK,
+                  cursor: 'pointer', WebkitTapHighlightColor: 'transparent',
+                }}
+              >
+                <User size={16} strokeWidth={2} />
+                View profile
+              </button>
+            )}
+            {onViewCourse && (
+              <button
+                type="button"
+                onClick={onViewCourse}
+                style={{
+                  flex: 1, background: INK, border: `1px solid ${INK}`,
+                  borderRadius: 13, padding: '12px 14px',
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+                  fontFamily: GEIST, fontSize: 13.5, fontWeight: 800, color: '#FFFFFF',
+                  cursor: 'pointer', WebkitTapHighlightColor: 'transparent',
+                }}
+              >
+                <MapPin size={16} strokeWidth={2} />
+                View course
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </BottomSheet>
   );
