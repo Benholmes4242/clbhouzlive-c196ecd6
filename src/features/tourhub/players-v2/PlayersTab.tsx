@@ -19,9 +19,9 @@ import { Search, X } from 'lucide-react';
 
 import { Skeleton } from '@/components/ui/skeleton';
 import { TourHubEmptyState } from '../components/TourHubEmptyState';
-import { useTourSelection } from '../context/TourSelectionContext';
+import { SectionTourLens } from '../overview/sections/SectionTourLens';
 import { TOUR_CONFIG, type TourId } from '../hooks/useOverviewData';
-import { TOUR_PRIORITY } from '../_shared/tourOrder';
+
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import {
   AMBER,
