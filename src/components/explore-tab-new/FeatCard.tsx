@@ -22,12 +22,12 @@ const SIZE_MAP: Record<FeatCardSize, {
     courseFs: 11, holderFs: 12, whenFs: 9.5,
   },
   compact: {
-    // Eagles rail — bumped 15% from prior compact spec (w158/h112).
-    w: 182, h: 129,
-    value: 22, label: 9.8, avatar: 18,
-    padX: 12, padY: 12,
-    heroBottom: 42, footerBottom: 9, footerPadTop: 7,
-    courseFs: 11, holderFs: 12, whenFs: 10,
+    // Eagles rail — bumped a further 15% from the already-upped compact spec.
+    w: 210, h: 148,
+    value: 25, label: 11, avatar: 21,
+    padX: 14, padY: 14,
+    heroBottom: 48, footerBottom: 10, footerPadTop: 8,
+    courseFs: 13, holderFs: 14, whenFs: 11,
   },
 };
 
@@ -204,7 +204,7 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
             fontWeight: 800,
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
-            color: isLegendary ? accent : '#F7931E',
+            color: isLegendary ? accent : isEagle ? '#FFFFFF' : '#F7931E',
             lineHeight: 1,
           }}
         >
