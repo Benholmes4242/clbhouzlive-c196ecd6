@@ -288,7 +288,21 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
           </div>
         )}
 
-        {holes.length === 0 ? (
+        {loading ? (
+          <div style={{ padding: '28px 16px 40px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div style={{ height: 12, width: '40%', borderRadius: 6, background: 'rgba(15,23,42,0.06)' }} />
+            <div style={{ display: 'flex', gap: 3 }}>
+              {[...Array(9)].map((_, i) => (
+                <div key={i} style={{ flex: 1, height: 58, borderRadius: 8, background: 'rgba(15,23,42,0.06)' }} />
+              ))}
+            </div>
+            <div style={{ display: 'flex', gap: 3 }}>
+              {[...Array(9)].map((_, i) => (
+                <div key={i} style={{ flex: 1, height: 58, borderRadius: 8, background: 'rgba(15,23,42,0.06)' }} />
+              ))}
+            </div>
+          </div>
+        ) : holes.length === 0 ? (
           <div style={{ padding: '30px 16px 40px', textAlign: 'center', color: SECONDARY, fontSize: 13 }}>
             {emptyMessage ?? 'No hole-by-hole data yet.'}
           </div>
