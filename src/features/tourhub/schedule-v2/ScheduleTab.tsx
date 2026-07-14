@@ -178,12 +178,14 @@ export function ScheduleTab() {
       }}
     >
       {/* Tour lens — sticky glass wrapper preserves --tour-chips-h; chips
-          themselves come from the canonical SectionTourLens primitive. */}
+          themselves come from the canonical SectionTourLens primitive.
+          Locks under the notch as the floating islands ride away with the
+          page (TikTok/Instagram top-chrome model). */}
       <div
         ref={chipsRef}
         style={{
           position: 'sticky',
-          top: 'calc(var(--sat, 0px) + 69px)',
+          top: 'var(--sat, 0px)',
           zIndex: 10,
           background: 'rgba(248,250,252,0.72)',
           backdropFilter: 'blur(14px)',
@@ -280,7 +282,7 @@ export function ScheduleTab() {
               style={{
                 position: 'sticky',
                 // Stack flush below sticky chip row (measured); -1px overlap.
-                top: 'calc(var(--sat, 0px) + 69px + var(--tour-chips-h, 47px) - 1px)',
+                top: 'calc(var(--sat, 0px) + var(--tour-chips-h, 47px) - 1px)',
                 zIndex: 2,
                 background: 'rgba(248,250,252,0.72)',
                 backdropFilter: 'blur(14px)',
