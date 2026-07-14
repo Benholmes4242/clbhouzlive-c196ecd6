@@ -35,10 +35,51 @@ interface Props {
   reviewText: string;
   scores: Record<CategoryKey, number | null>;
   media: MediaItem[];
+  /** 'light' (default) preserves composer preview; 'dark' remaps for the immersive success screen. */
+  surface?: 'light' | 'dark';
 }
 
-const T_INK = '#0F172A';
-const T_MUTE = 'rgba(15,23,42,0.55)';
+// Palette per surface. Dark remaps card bg, hairlines, ink, mute, and ghost
+// slots for legibility over the immersive #0A0B0D base. Rating text colours
+// and catGold shimmer are unchanged (amber reads on dark).
+type Palette = {
+  cardBg: string;
+  hairline: string;
+  ink: string;
+  mute: string;
+  ghost: string;
+  ghostBorder: string | null;
+  clampFadeStart: string;
+  clampFadeEnd: string;
+  cardShadow: string;
+  verdictSurface: 'light' | 'dark';
+};
+
+const LIGHT_PAL: Palette = {
+  cardBg: RV2.cardBg,
+  hairline: RV2.hairline,
+  ink: '#0F172A',
+  mute: 'rgba(15,23,42,0.55)',
+  ghost: RV2.ghost,
+  ghostBorder: null,
+  clampFadeStart: 'rgba(255,255,255,0)',
+  clampFadeEnd: 'rgba(255,255,255,1)',
+  cardShadow: '0 1px 3px rgba(15,23,42,0.04)',
+  verdictSurface: 'light',
+};
+
+const DARK_PAL: Palette = {
+  cardBg: 'rgba(255,255,255,0.05)',
+  hairline: 'rgba(255,255,255,0.09)',
+  ink: 'rgba(255,255,255,0.96)',
+  mute: 'rgba(255,255,255,0.62)',
+  ghost: 'rgba(255,255,255,0.05)',
+  ghostBorder: 'rgba(255,255,255,0.08)',
+  clampFadeStart: 'rgba(10,11,13,0)',
+  clampFadeEnd: 'rgba(10,11,13,0.92)',
+  cardShadow: '0 1px 3px rgba(0,0,0,0.35)',
+  verdictSurface: 'dark',
+};
 
 const REVIEW_FONT_SIZE = 14;
 const REVIEW_LINE_HEIGHT = 1.4;
