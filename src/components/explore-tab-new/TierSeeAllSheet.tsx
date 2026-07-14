@@ -418,6 +418,9 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap }:
             return (
               <div
                 key={`${row.score_id ?? row.course_id ?? i}-${i}`}
+                onClick={onRowTap ? () => handleRowTap(row) : undefined}
+                role={onRowTap ? 'button' : undefined}
+                tabIndex={onRowTap ? 0 : undefined}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -426,6 +429,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap }:
                   padding: '12px 16px',
                   borderBottom: `0.5px solid ${HAIRLINE_INK_10}`,
                   background: 'transparent',
+                  cursor: onRowTap ? 'pointer' : 'default',
                 }}
               >
                 <div
