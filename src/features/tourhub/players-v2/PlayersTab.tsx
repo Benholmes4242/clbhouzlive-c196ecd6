@@ -61,22 +61,13 @@ export function PlayersTab() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // ── Tour selection (app-wide brain) — honor ?tour= once on mount.
-  const { selectedTourSlug, viewingTourSlug, selectTour } = useTourSelection();
-  const inboundHonoredRef = useRef(false);
-  useEffect(() => {
-    if (inboundHonoredRef.current) return;
-    inboundHonoredRef.current = true;
-    const inbound = searchParams.get('tour');
-    if (inbound && inbound in TOUR_CONFIG && inbound !== (selectedTourSlug ?? viewingTourSlug)) {
-      selectTour(inbound);
-    }
-  }, [searchParams, selectTour, selectedTourSlug, viewingTourSlug]);
+  // ── Per-section tour lens (local state, NO All Tours, PGA default).
+  // ?tour= is honored once on mount for deep-link parity.
+  const inboundTour = searchParams.get('tour');
+  const initialTour: TourId =
+    inboundTour && inboundTour in TOUR_CONFIG ? (inboundTour as TourId) : 'pga';
+  const [activeTour, setActiveTour] = useState<TourId>(initialTour);
 
-  const activeTour: TourId =
-    ((viewingTourSlug ?? selectedTourSlug ?? 'pga') as string) in TOUR_CONFIG
-      ? ((viewingTourSlug ?? selectedTourSlug ?? 'pga') as TourId)
-      : 'pga';
 
   // ── Sort (honor inbound ?sort=)
   const inboundSort = searchParams.get('sort');
