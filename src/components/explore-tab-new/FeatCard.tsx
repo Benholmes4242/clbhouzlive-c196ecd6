@@ -177,13 +177,14 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
         />
       ) : null}
 
-      {/* Heavy dark veil - photo becomes texture */}
+      {/* Light dark veil - matches Aces & Albatrosses scrim so the course
+          photo stays visible. */}
       <div
         style={{
           position: 'absolute',
           inset: 0,
           background:
-            'linear-gradient(155deg, rgba(10,12,16,0.72), rgba(10,12,16,0.90))',
+            'linear-gradient(155deg, rgba(10,12,16,0.35), rgba(10,12,16,0.72))',
         }}
       />
 
