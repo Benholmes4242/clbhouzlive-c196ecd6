@@ -28,7 +28,7 @@ export const CoursesShellTabs: React.FC<CoursesShellTabsProps> = ({
     onChange={onTabChange}
     size="md"
     align="center"
-    underlineColor="#0A0E14"
+    underlineColor="#15171F"
     ariaLabel="Courses Sections"
   />
 );
