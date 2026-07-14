@@ -13,7 +13,6 @@ import {
 import AuthHeroScreen from './components/AuthHeroScreen';
 import AuthBottomSheet from './components/AuthBottomSheet';
 import OtpSheetContent from './components/OtpSheetContent';
-import { AuthSuccessAnimation } from '@/components/auth/AuthSuccessAnimation';
 
 type AuthNotice = {
   type: 'success' | 'error';
@@ -62,7 +61,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
   const [otpInfo, setOtpInfo] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
 
-  const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
   const sendStartRef = useRef<number>(0);
 
   // Resend cooldown ticker
@@ -171,7 +169,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
 
       if (data?.session?.user) {
         trackLoginSuccess('email', Date.now() - start);
-        setShowSuccessAnimation(true);
+        // Session is set synchronously on the client here; navigate immediately.
+        // Close the OTP sheet before nav so it does not freeze mid-transition.
+        setStep('hero');
+        navigate('/', { replace: true });
       } else {
         setOtpError('Could not start session. Please try again.');
         setOtpErrorNonce((n) => n + 1);
@@ -184,12 +185,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
       setOtpErrorNonce((n) => n + 1);
       setSubmitting(false);
     }
-  };
-
-  const handleSuccessAnimationComplete = () => {
-    setShowSuccessAnimation(false);
-    // AuthWrapper's onboarding gate will bounce new users to /edit-profile.
-    navigate('/', { replace: true });
   };
 
   // ---- Native Apple Sign-In (Median bridge) -------------------------------
@@ -258,7 +253,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
 
         if (data?.session?.user) {
           trackLoginSuccess('apple');
-          setShowSuccessAnimation(true);
+          setStep('hero');
+          navigate('/', { replace: true });
         }
       } finally {
         setSubmitting(false);
@@ -352,7 +348,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
 
         if (data?.session?.user) {
           trackLoginSuccess('google');
-          setShowSuccessAnimation(true);
+          setStep('hero');
+          navigate('/', { replace: true });
         }
       } finally {
         setSubmitting(false);
@@ -378,14 +375,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
 
   return (
     <>
-      {showSuccessAnimation && (
-        <AuthSuccessAnimation
-          message="Welcome to clbhouz"
-          onComplete={handleSuccessAnimationComplete}
-          duration={800}
-        />
-      )}
-
       <div
         {...(isSheetOpen ? { inert: '' } : {})}
         style={isSheetOpen ? { pointerEvents: 'none' as const } : undefined}
