@@ -61,6 +61,55 @@ export function CollegeHubPage() {
     setLogoErrored(false);
   }, [leader?.logoUrl]);
 
+  // ── Compare pick mode ────────────────────────────────────────────────
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const compareParam = searchParams.get('compare');
+  const [pickMode, setPickMode] = useState<boolean>(Boolean(compareParam));
+  const [pickC1, setPickC1] = useState<string | null>(compareParam);
+  const [pickC2, setPickC2] = useState<string | null>(null);
+
+  // If ?compare=slug arrives later, sync into state.
+  useEffect(() => {
+    if (compareParam) {
+      setPickMode(true);
+      setPickC1((prev) => prev ?? compareParam);
+    }
+  }, [compareParam]);
+
+  const nameForSlug = useMemo(() => {
+    const map: Record<string, string> = {};
+    for (const s of standings) map[s.normalizedName] = s.collegeName;
+    return map;
+  }, [standings]);
+
+  const enterPickMode = () => {
+    setPickMode(true);
+    setPickC1(null);
+    setPickC2(null);
+  };
+
+  const exitPickMode = () => {
+    setPickMode(false);
+    setPickC1(null);
+    setPickC2(null);
+    if (searchParams.has('compare')) {
+      const next = new URLSearchParams(searchParams);
+      next.delete('compare');
+      setSearchParams(next, { replace: true });
+    }
+  };
+
+  const handleSelectForCompare = (slug: string) => {
+    if (!pickC1) {
+      setPickC1(slug);
+      return;
+    }
+    if (slug === pickC1) return; // ignore same pick
+    // Both chosen → route to duel.
+    navigate(collegeH2HRoute(pickC1, slug));
+  };
+
 
   const filtered = useMemo(() => {
     const q = debouncedSearch.trim().toLowerCase();
