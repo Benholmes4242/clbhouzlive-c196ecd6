@@ -13,7 +13,6 @@ import {
 import AuthHeroScreen from './components/AuthHeroScreen';
 import AuthBottomSheet from './components/AuthBottomSheet';
 import OtpSheetContent from './components/OtpSheetContent';
-import { AuthSuccessAnimation } from '@/components/auth/AuthSuccessAnimation';
 
 type AuthNotice = {
   type: 'success' | 'error';
