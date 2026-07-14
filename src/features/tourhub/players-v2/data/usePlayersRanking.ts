@@ -90,7 +90,6 @@ export function usePlayersRanking(tour: TourId) {
     staleTime: 5 * 60_000,
     gcTime: 30 * 60_000,
     queryFn: async () => {
-      console.log('[usePlayersRanking] queryFn start tour=', tour);
       if (tour === 'pga') {
         const seasonId = await resolvePgaSeasonId();
         if (!seasonId) return { synced: false, statLabel: null, rows: [] };
@@ -126,7 +125,6 @@ export function usePlayersRanking(tour: TourId) {
           };
         });
         rows = [...rows].sort((a, b) => a.rank - b.rank);
-        console.log('[usePlayersRanking] pga rows length=', rows.length, 'first=', rows[0]?.name, 'last=', rows[rows.length - 1]?.name);
         return { synced: true, statLabel: STAT_LABEL.pga, rows };
       }
 
