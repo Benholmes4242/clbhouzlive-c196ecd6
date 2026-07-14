@@ -88,10 +88,11 @@ export function TrophyRoomSpine({ items }: Props) {
           border: '1px solid rgba(255,255,255,0.08)',
         }}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-          <span style={{ fontSize: 17, fontWeight: 800, color: '#FFFFFF' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 17, fontWeight: 800, color: '#FFFFFF' }}>
+            {level ? <TierGem medals={owned} size="md" /> : null}
             {level ? (
-              <>
+              <span>
                 Level {level.level} &middot;{' '}
                 <span
                   style={{
@@ -99,9 +100,9 @@ export function TrophyRoomSpine({ items }: Props) {
                       level.material === 'obsidian' ? OBSIDIAN_EDGE : gemColor(level.material),
                   }}
                 >
-                  {level.label}
+                  {levelDisplay(level, owned)}
                 </span>
-              </>
+              </span>
             ) : (
               'Earn your first medal'
             )}
