@@ -123,17 +123,6 @@ export function LeadersTab() {
         >
           <span
             style={{
-              fontSize: 10.5,
-              fontWeight: 800,
-              letterSpacing: '0.14em',
-              color: AMBER,
-              textTransform: 'uppercase',
-            }}
-          >
-            STAT WATCH
-          </span>
-          <span
-            style={{
               fontSize: 11,
               fontWeight: 700,
               color: INK_MUTE,
