@@ -122,21 +122,12 @@ function AlmanacRegionTabsInner({ region, onRegionChange }: Props) {
   const value = region ?? '__ww__';
   return (
     <section style={{ fontFamily: FONT }}>
-      <div
-        style={{
-          padding: '0 4px',
-        }}
-      >
-        <UnderlineTabs
-          options={options}
-          value={value}
-          onChange={(id) => onRegionChange(id === '__ww__' ? null : id)}
-          size="sm"
-          align="center"
-          underlineColor="#15171F"
-          ariaLabel="Region"
-        />
-      </div>
+      <FilterChips
+        options={options}
+        value={value}
+        onChange={(id) => onRegionChange(id === '__ww__' ? null : id)}
+        ariaLabel="Region"
+      />
     </section>
   );
 }
