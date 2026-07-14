@@ -88,14 +88,6 @@ const TIER_BASE: Record<WallMaterial, string> = {
   obsidian: '#07080C',
 };
 
-function splitLevelLabel(label: string, sub: 'I' | 'II'): { name: string; roman: string } {
-  // Level 10 is "Clubhouse Legend" (no roman in label).
-  const suffix = ` ${sub}`;
-  if (label.endsWith(suffix)) {
-    return { name: label.slice(0, -suffix.length), roman: sub };
-  }
-  return { name: label, roman: '' };
-}
 
 export function RankIdentityCard({ userId }: Props) {
   const navigate = useNavigate();
