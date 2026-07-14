@@ -12,7 +12,7 @@ import {
   REGION_TABS,
 } from './AlmanacSections';
 import { LegendaryFeatHero } from './LegendaryFeatHero';
-import { useRegionFeats } from './hooks/useRegionFeats';
+import { useRegionFeats, type FeatRow } from './hooks/useRegionFeats';
 import { TierSeeAllSheet } from './TierSeeAllSheet';
 
 import { SeasonStrip } from './SeasonStrip';
@@ -27,6 +27,8 @@ import ExploreGrid from './ExploreGrid';
 
 import { SLATE_50 } from '@/features/courses/_shared/tokens';
 import { SPACE } from '@/lib/spacing';
+import { useScorecardOpener } from './useScorecardOpener';
+import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 
 interface ExploreTabContentProps {
   embedded?: boolean;
