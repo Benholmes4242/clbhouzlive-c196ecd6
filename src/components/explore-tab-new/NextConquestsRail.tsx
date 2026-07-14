@@ -16,14 +16,14 @@ import {
 } from './gamingLightTokens';
 
 // Reused from the old WhereYoudRank component (copied verbatim before deletion).
-const CATEGORY_META: Record<string, { label: string; unit: string; style: 'off' | 'back' }> = {
-  lowest_gross: { label: 'Gross', unit: 'strokes', style: 'off' },
-  best_score_diff: { label: 'Score', unit: 'strokes', style: 'off' },
-  most_birdies: { label: 'Birdies', unit: 'birdies', style: 'back' },
-  best_stableford: { label: 'Stableford', unit: 'points', style: 'back' },
-  most_eagles: { label: 'Eagles', unit: 'eagles', style: 'back' },
-  most_aces: { label: 'Hole-in-one', unit: 'aces', style: 'back' },
-  most_rounds: { label: 'Most rounds', unit: 'rounds', style: 'back' },
+const CATEGORY_META: Record<string, { label: string; unit: string; unitSingular: string; style: 'off' | 'back' }> = {
+  lowest_gross: { label: 'Gross', unit: 'strokes', unitSingular: 'stroke', style: 'off' },
+  best_score_diff: { label: 'Score', unit: 'strokes', unitSingular: 'stroke', style: 'off' },
+  most_birdies: { label: 'Birdies', unit: 'birdies', unitSingular: 'birdie', style: 'back' },
+  best_stableford: { label: 'Stableford', unit: 'points', unitSingular: 'point', style: 'back' },
+  most_eagles: { label: 'Eagles', unit: 'eagles', unitSingular: 'eagle', style: 'back' },
+  most_aces: { label: 'Hole-in-one', unit: 'aces', unitSingular: 'ace', style: 'back' },
+  most_rounds: { label: 'Most rounds', unit: 'rounds', unitSingular: 'round', style: 'back' },
 };
 
 const LOWER_IS_BETTER = new Set(['lowest_gross', 'best_score_diff']);
