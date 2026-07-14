@@ -884,9 +884,9 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
           increaseViewportBy={{ top: 800, bottom: 800 }}
           overscan={{ main: 400, reverse: 400 }}
           components={components}
-          restoreStateFrom={initialState}
+          restoreStateFrom={validatedInitialState}
           initialScrollTop={restoreScrollTopRef.current ?? 0}
-          initialTopMostItemIndex={initialState ? undefined : 0}
+          initialTopMostItemIndex={validatedInitialState ? undefined : 0}
           style={{ height: '100%', width: '100%' }}
         />
       </div>
