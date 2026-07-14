@@ -200,12 +200,10 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
 
   const trajectoryCount = holes.filter((h) => h.par != null && h.strokes != null && h.strokes > 0).length;
   const showTrajectory = trajectoryCount >= 2;
-  const footerNote = summarizeBirdiesOrBetter(holes);
-  const heroColor = totals.played ? toParColor(totals.toPar) : MUTED;
 
   const hasPar = coursePar != null;
   const hasSlope = courseSlope != null;
-  const showStatLine = hasPar || hasSlope;
+  const showStatLine = hasPar || hasSlope || totals.played;
 
   const showChip = playerHcpDelta != null && Math.abs(playerHcpDelta) >= 0.05;
   const showIdentity = !!playerName;
