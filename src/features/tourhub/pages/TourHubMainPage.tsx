@@ -14,6 +14,7 @@ import { TourSelectionProvider } from '../context/TourSelectionContext';
 import { useHeroFullBleed } from '../_shared/heroFullBleedSignal';
 import { TourSideMenu } from '../components/TourSideMenu';
 import { TourIslandLeft } from '../components/TourIslandLeft';
+import { TourPickerSheet, useTourShortLabel } from '../components/TourPickerSheet';
 import { useSetChromeLeftSlot } from '@/features/chrome-v2/leftOverride';
 import { GlassHeaderPlate } from '@/components/chrome/GlassHeaderPlate';
 
@@ -23,8 +24,9 @@ import { useLogout } from '@/hooks/useLogout';
 
 /**
  * TourHubChromeBridge — registers the ChromeIsland left-capsule slot with
- * just the burger menu. The tour picker has been retired in favour of
- * per-section tour lenses; the island no longer exposes a picker trigger.
+ * a burger + short tour label. Mounted inside TourSelectionProvider so
+ * useTourShortLabel resolves. Owns the menu + picker sheet state so the
+ * slot node stays a stable, prop-driven element.
  */
 function TourHubChromeBridge({
   activeTab,
@@ -42,37 +44,52 @@ function TourHubChromeBridge({
   onSignOut: () => void;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const label = useTourShortLabel();
+  const isOverview = activeTab === 'overview';
+
+  // Auto-close the picker if the user leaves the overview tab while it is open.
+  useEffect(() => {
+    if (!isOverview && pickerOpen) setPickerOpen(false);
+  }, [isOverview, pickerOpen]);
 
   const slot = useMemo(
     () => (
       <TourIslandLeft
-        label=""
+        label={label}
         onMenuTap={() => setMenuOpen(true)}
-        onPickerTap={() => {}}
-        showPicker={false}
+        onPickerTap={() => {
+          // Picker is scoped to the overview tab only.
+          if (isOverview) setPickerOpen(true);
+        }}
+        showPicker={isOverview}
       />
     ),
-    [activeTab],
+    [label, isOverview],
   );
   useSetChromeLeftSlot(slot);
 
   return (
-    <TourSideMenu
-      open={menuOpen}
-      onClose={() => setMenuOpen(false)}
-      activeTab={activeTab}
-      onSelectTab={(id) => {
-        onSelectTab(id);
-        setMenuOpen(false);
-      }}
-      handicapValue={handicapValue}
-      onSettings={onSettings}
-      onProfile={onProfile}
-      onSignOut={onSignOut}
-    />
+    <>
+      <TourSideMenu
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        activeTab={activeTab}
+        onSelectTab={(id) => {
+          onSelectTab(id);
+          setMenuOpen(false);
+        }}
+        handicapValue={handicapValue}
+        onSettings={onSettings}
+        onProfile={onProfile}
+        onSignOut={onSignOut}
+      />
+      {isOverview && (
+        <TourPickerSheet open={pickerOpen} onClose={() => setPickerOpen(false)} />
+      )}
+    </>
   );
 }
-
 
 export function TourHubMainPage() {
   const [searchParams, setSearchParams] = useSearchParams();
