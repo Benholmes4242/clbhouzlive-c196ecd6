@@ -54,14 +54,20 @@ function surnameOf(name: string): string {
   return parts[parts.length - 1] ?? name;
 }
 
-function YearbookCardInner({ standing, liveCount }: Props) {
+function YearbookCardInner({ standing, liveCount, onSelect, selected }: Props) {
   const isTop = standing.rank === 1;
   const rankColor = isTop ? GOLD_DEEP : INK;
   const pointsColor = isTop ? GOLD_DEEP : INK;
-  const cardBg = isTop
+  const cardBg = selected
+    ? 'rgba(247,147,30,0.10)'
+    : isTop
     ? `linear-gradient(180deg, ${GOLD_TINT_10} 0%, ${SURFACE} 68%)`
     : SURFACE;
-  const cardBorder = isTop ? `1px solid ${GOLD_BORDER}` : 'none';
+  const cardBorder = selected
+    ? `1px solid ${AMBER}`
+    : isTop
+    ? `1px solid ${GOLD_BORDER}`
+    : 'none';
 
   const move = standing.rankChange;
   const moveText =
