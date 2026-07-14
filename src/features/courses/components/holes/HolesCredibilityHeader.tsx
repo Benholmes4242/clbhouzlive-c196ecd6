@@ -23,11 +23,11 @@ export const HolesCredibilityHeader: React.FC<Props> = ({ totalRounds }) => {
           marginTop: 2,
           padding: '7px 12px',
           borderRadius: 999,
-          background: 'rgba(47,107,79,0.07)',
-          border: '1px solid rgba(47,107,79,0.18)',
+          background: 'rgba(247,147,30,0.08)',
+          border: '1px solid rgba(247,147,30,0.18)',
           fontSize: 11.5,
           fontWeight: 600,
-          color: SC_ACCENT,
+          color: '#B8720E',
         }}
       >
         <ShieldCheck size={13} strokeWidth={2.2} />
@@ -35,7 +35,7 @@ export const HolesCredibilityHeader: React.FC<Props> = ({ totalRounds }) => {
           <span style={{ fontWeight: 800 }}>
             {totalRounds.toLocaleString()} round{totalRounds === 1 ? '' : 's'}
           </span>
-          {' · Official WHS · Gross scoring'}
+          {' \u00B7 Official WHS \u00B7 Gross scoring'}
         </span>
       </div>
     </div>

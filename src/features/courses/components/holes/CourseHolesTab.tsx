@@ -3,22 +3,36 @@ import { useCourseHoleAnalysis, type CourseHole } from '@/hooks/gam/useCourseHol
 import { useCourseMeta } from '@/hooks/gam/useCourseMeta';
 import { HolesCredibilityHeader } from './HolesCredibilityHeader';
 import { HoleFeatureCards } from './HoleFeatureCards';
-import { HoleRow } from './HoleRow';
-
 import { HolesEmptyState } from './HolesEmptyState';
 import { FONT, INK, SC_ACCENT } from './_constants';
 import { HAIRLINE_INK_8, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
 import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHandicapCue';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { SharedHoleCard } from '@/features/courses/_shared/holes/SharedHoleCard';
+import type { SharedHole } from '@/features/courses/_shared/holes/types';
 
 interface Props {
   courseId: string | undefined;
+}
+
+function toShared(h: CourseHole): SharedHole {
+  return {
+    hole_no: h.hole_no,
+    par: h.par,
+    yards: h.yards,
+    stroke_index: h.stroke_index,
+    rounds: h.rounds,
+    avg_to_par: h.avg_to_par,
+    avg_gross: h.avg_gross,
+    dist: h.dist,
+  };
 }
 
 export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
   const { data, isLoading, isError } = useCourseHoleAnalysis(courseId);
   const { data: meta } = useCourseMeta(courseId);
   const [sort, setSort] = useState<'hole' | 'difficulty'>('hole');
+  const [expanded, setExpanded] = useState<Set<number>>(new Set());
 
   const holes = data?.holes ?? [];
 
@@ -35,7 +49,18 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
     () => holes.reduce<CourseHole | null>((m, h) => (!m || h.avg_to_par < m.avg_to_par ? h : m), null),
     [holes],
   );
-  const maxAvg = useMemo(() => Math.max(0.01, ...holes.map((h) => h.avg_to_par)), [holes]);
+  const maxAbs = useMemo(
+    () => Math.max(0.01, ...holes.map((h) => Math.abs(h.avg_to_par))),
+    [holes],
+  );
+
+  const toggle = (holeNo: number) =>
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(holeNo)) next.delete(holeNo);
+      else next.add(holeNo);
+      return next;
+    });
 
   if (isLoading) {
     return (
@@ -131,17 +156,25 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
         </div>
       </div>
       {sorted.map((h) => (
-        <HoleRow
+        <SharedHoleCard
           key={h.hole_no}
-          h={h}
-          maxAvg={maxAvg}
-          isHardest={h.hole_no === hardest?.hole_no}
-          isEasiest={h.hole_no === easiest?.hole_no}
+          hole={toShared(h)}
+          maxAbs={maxAbs}
+          countLabel="rounds"
+          expanded={expanded.has(h.hole_no)}
+          onToggle={() => toggle(h.hole_no)}
+          tag={
+            hardest && h.hole_no === hardest.hole_no
+              ? 'hardest'
+              : easiest && h.hole_no === easiest.hole_no
+              ? 'easiest'
+              : null
+          }
         />
       ))}
-      
     </div>
   );
 };
 
 export default CourseHolesTab;
+
