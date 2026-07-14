@@ -191,10 +191,6 @@ export function Masthead({ slug, displayName, rank, pointsTotal, alumniCount, pl
           </div>
         </div>
 
-        {/* Follow */}
-        {user && (
-          <button
-            type="button"
         {/* Compare + Follow actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
           <button
