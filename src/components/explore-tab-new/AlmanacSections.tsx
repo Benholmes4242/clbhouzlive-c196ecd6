@@ -7,7 +7,7 @@ import { useRegionFeats, type FeatTier } from './hooks/useRegionFeats';
 import { useWallLevels } from '@/hooks/gam/useWallLevels';
 import { AMBER, INK, INK_TINT_06 } from '@/features/courses/_shared/tokens';
 import { TierSeeAllSheet } from './TierSeeAllSheet';
-import { UnderlineTabs } from '@/components/ui/UnderlineTabs';
+import { FilterChips } from '@/components/ui/FilterChips';
 import { SPACE } from '@/lib/spacing';
 
 const RAIL_CAP = 12;      // horizontal rails (default, compact)
@@ -122,21 +122,12 @@ function AlmanacRegionTabsInner({ region, onRegionChange }: Props) {
   const value = region ?? '__ww__';
   return (
     <section style={{ fontFamily: FONT }}>
-      <div
-        style={{
-          padding: '0 4px',
-        }}
-      >
-        <UnderlineTabs
-          options={options}
-          value={value}
-          onChange={(id) => onRegionChange(id === '__ww__' ? null : id)}
-          size="sm"
-          align="center"
-          underlineColor="#15171F"
-          ariaLabel="Region"
-        />
-      </div>
+      <FilterChips
+        options={options}
+        value={value}
+        onChange={(id) => onRegionChange(id === '__ww__' ? null : id)}
+        ariaLabel="Region"
+      />
     </section>
   );
 }
