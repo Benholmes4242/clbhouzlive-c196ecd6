@@ -17,10 +17,7 @@ import {
   type FeatTier,
   type RecordsMode,
 } from './hooks/useRegionFeats';
-import { FeatCard } from './FeatCard';
 import { FeatListRow } from './FeatListRow';
-import { CrownCard } from './CourseCrownsRail';
-import { LegendaryLeadersBoards } from './LegendaryLeadersBoards';
 import { useScorecardOpener } from './useScorecardOpener';
 
 const PAGE = 20;
