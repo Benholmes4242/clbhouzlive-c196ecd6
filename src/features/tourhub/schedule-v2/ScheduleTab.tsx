@@ -14,9 +14,9 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertCircle } from 'lucide-react';
-import { useTourSelection } from '../context/TourSelectionContext';
+import { SectionTourLens } from '../overview/sections/SectionTourLens';
 import { TOUR_CONFIG, type TourId } from '../hooks/useOverviewData';
-import { TOUR_PRIORITY } from '../_shared/tourOrder';
+
 import { tournamentRoute } from '../routes';
 import { TourHubEmptyState } from '../components/TourHubEmptyState';
 import { useSeasonTimeline, type SeasonEvent } from './useSeasonTimeline';
