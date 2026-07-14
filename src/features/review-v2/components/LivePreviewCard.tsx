@@ -35,10 +35,51 @@ interface Props {
   reviewText: string;
   scores: Record<CategoryKey, number | null>;
   media: MediaItem[];
+  /** 'light' (default) preserves composer preview; 'dark' remaps for the immersive success screen. */
+  surface?: 'light' | 'dark';
 }
 
-const T_INK = '#0F172A';
-const T_MUTE = 'rgba(15,23,42,0.55)';
+// Palette per surface. Dark remaps card bg, hairlines, ink, mute, and ghost
+// slots for legibility over the immersive #0A0B0D base. Rating text colours
+// and catGold shimmer are unchanged (amber reads on dark).
+type Palette = {
+  cardBg: string;
+  hairline: string;
+  ink: string;
+  mute: string;
+  ghost: string;
+  ghostBorder: string | null;
+  clampFadeStart: string;
+  clampFadeEnd: string;
+  cardShadow: string;
+  verdictSurface: 'light' | 'dark';
+};
+
+const LIGHT_PAL: Palette = {
+  cardBg: RV2.cardBg,
+  hairline: RV2.hairline,
+  ink: '#0F172A',
+  mute: 'rgba(15,23,42,0.55)',
+  ghost: RV2.ghost,
+  ghostBorder: null,
+  clampFadeStart: 'rgba(255,255,255,0)',
+  clampFadeEnd: 'rgba(255,255,255,1)',
+  cardShadow: '0 1px 3px rgba(15,23,42,0.04)',
+  verdictSurface: 'light',
+};
+
+const DARK_PAL: Palette = {
+  cardBg: 'rgba(255,255,255,0.05)',
+  hairline: 'rgba(255,255,255,0.09)',
+  ink: 'rgba(255,255,255,0.96)',
+  mute: 'rgba(255,255,255,0.62)',
+  ghost: 'rgba(255,255,255,0.05)',
+  ghostBorder: 'rgba(255,255,255,0.08)',
+  clampFadeStart: 'rgba(10,11,13,0)',
+  clampFadeEnd: 'rgba(10,11,13,0.92)',
+  cardShadow: '0 1px 3px rgba(0,0,0,0.35)',
+  verdictSurface: 'dark',
+};
 
 const REVIEW_FONT_SIZE = 14;
 const REVIEW_LINE_HEIGHT = 1.4;
@@ -57,11 +98,13 @@ const CAT_LABELS: { key: CategoryKey; label: string }[] = [
 function Ghost({
   width,
   height,
+  pal,
   radius = RV2.ghostRadius,
   style,
 }: {
   width: number | string;
   height: number;
+  pal: Palette;
   radius?: number;
   style?: React.CSSProperties;
 }) {
@@ -73,14 +116,15 @@ function Ghost({
         width,
         height,
         borderRadius: radius,
-        background: RV2.ghost,
+        background: pal.ghost,
+        border: pal.ghostBorder ? `1px solid ${pal.ghostBorder}` : undefined,
         ...style,
       }}
     />
   );
 }
 
-function ClampedReviewText({ text }: { text: string }) {
+function ClampedReviewText({ text, pal }: { text: string; pal: Palette }) {
   const textRef = React.useRef<HTMLDivElement | null>(null);
   const [isClamped, setIsClamped] = React.useState(false);
 
@@ -97,7 +141,7 @@ function ClampedReviewText({ text }: { text: string }) {
         style={{
           fontSize: REVIEW_FONT_SIZE,
           lineHeight: REVIEW_LINE_HEIGHT,
-          color: T_INK,
+          color: pal.ink,
           display: '-webkit-box',
           WebkitLineClamp: REVIEW_CLAMP_LINES,
           WebkitBoxOrient: 'vertical',
@@ -115,9 +159,8 @@ function ClampedReviewText({ text }: { text: string }) {
             right: 0,
             bottom: 0,
             paddingLeft: 64,
-            background:
-              'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 38%)',
-            color: T_MUTE,
+            background: `linear-gradient(90deg, ${pal.clampFadeStart} 0%, ${pal.clampFadeEnd} 38%)`,
+            color: pal.mute,
             fontSize: 13,
             fontWeight: 600,
             lineHeight: REVIEW_LINE_HEIGHT,
@@ -132,6 +175,8 @@ function ClampedReviewText({ text }: { text: string }) {
   );
 }
 
+
+
 export function LivePreviewCard({
 
   course,
@@ -141,18 +186,20 @@ export function LivePreviewCard({
   reviewText,
   scores,
   media,
+  surface = 'light',
 }: Props) {
   void verdict;
+  const pal = surface === 'dark' ? DARK_PAL : LIGHT_PAL;
 
   return (
     <article
       style={{
         position: 'relative',
-        background: RV2.cardBg,
+        background: pal.cardBg,
         borderRadius: RV2.cardRadius,
-        border: `1px solid ${RV2.hairline}`,
+        border: `1px solid ${pal.hairline}`,
         overflow: 'hidden',
-        boxShadow: '0 1px 3px rgba(15,23,42,0.04)',
+        boxShadow: pal.cardShadow,
       }}
     >
       {/* Ghost numeral — shared component ensures parity with feed/clubhouse. */}
@@ -183,7 +230,7 @@ export function LivePreviewCard({
             style={{
               fontSize: 14,
               fontWeight: 700,
-              color: T_INK,
+              color: pal.ink,
               lineHeight: 1.15,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
@@ -200,14 +247,14 @@ export function LivePreviewCard({
               marginTop: 2,
             }}
           >
-            <span style={{ fontSize: 11, color: T_MUTE }}>Just now</span>
+            <span style={{ fontSize: 11, color: pal.mute }}>Just now</span>
           </div>
         </div>
 
         {/* Right chip — verdict label sits over the ghost numeral, parity with FeedCard */}
         {overall != null && (
           <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-            <ReviewVerdictLabel rating={overall} fontSize={11} surface="light" />
+            <ReviewVerdictLabel rating={overall} fontSize={11} surface={pal.verdictSurface} />
           </div>
         )}
       </div>
@@ -216,7 +263,7 @@ export function LivePreviewCard({
       {/* Review body */}
       <div style={{ padding: '4px 14px 10px', position: 'relative', zIndex: 2 }}>
         {reviewText.trim().length > 0 ? (
-          <ClampedReviewText text={reviewText} />
+          <ClampedReviewText text={reviewText} pal={pal} />
         ) : (
           <div
             style={{
@@ -227,9 +274,9 @@ export function LivePreviewCard({
               justifyContent: 'center',
             }}
           >
-            <Ghost width="100%" height={16} />
-            <Ghost width="88%" height={16} />
-            <Ghost width="62%" height={16} />
+            <Ghost width="100%" height={16} pal={pal} />
+            <Ghost width="88%" height={16} pal={pal} />
+            <Ghost width="62%" height={16} pal={pal} />
           </div>
         )}
       </div>
@@ -255,9 +302,9 @@ export function LivePreviewCard({
                 height: 96,
                 borderRadius: 10,
                 overflow: 'hidden',
-                background: RV2.ghost,
+                background: pal.ghost,
                 flexShrink: 0,
-                border: `1px solid ${RV2.hairline}`,
+                border: `1px solid ${pal.hairline}`,
               }}
             >
               {m.type === 'image' ? (
@@ -292,7 +339,7 @@ export function LivePreviewCard({
           alignItems: 'center',
           gap: 8,
           padding: '10px 14px 14px',
-          borderTop: `1px solid ${RV2.hairline}`,
+          borderTop: `1px solid ${pal.hairline}`,
           position: 'relative',
           zIndex: 2,
         }}
@@ -302,7 +349,7 @@ export function LivePreviewCard({
             style={{
               fontSize: 9.5,
               fontWeight: 700,
-              color: T_MUTE,
+              color: pal.mute,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
             }}
@@ -313,7 +360,7 @@ export function LivePreviewCard({
             style={{
               fontSize: 13,
               fontWeight: 700,
-              color: T_INK,
+              color: pal.ink,
               marginTop: 1,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
@@ -332,7 +379,7 @@ export function LivePreviewCard({
             return (
               <div key={key} style={{ textAlign: 'center', minWidth: 34 }}>
                 {v == null ? (
-                  <Ghost width={22} height={14} style={{ margin: '0 auto' }} />
+                  <Ghost width={22} height={14} pal={pal} style={{ margin: '0 auto' }} />
                 ) : (
                   <span
                     className={catGold ? 'clbhouz-gold-shimmer-light' : undefined}
@@ -351,7 +398,7 @@ export function LivePreviewCard({
                   style={{
                     fontSize: 8,
                     fontWeight: 700,
-                    color: T_MUTE,
+                    color: pal.mute,
                     letterSpacing: '0.1em',
                     textTransform: 'uppercase',
                     marginTop: 3,
