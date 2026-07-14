@@ -81,14 +81,15 @@ export function useFranchiseStandings() {
       // --- 3. Media (crest + name) ---
       const { data: mediaRows } = await supabase
         .from('college_media')
-        .select('normalized_name, college_name, short_name, logo_url')
+        .select('normalized_name, college_name, short_name, logo_url, brand_hex')
         .in('normalized_name', slugs);
-      const mediaByName: Record<string, { college_name: string; short_name: string | null; logo_url: string | null }> = {};
+      const mediaByName: Record<string, { college_name: string; short_name: string | null; logo_url: string | null; brand_hex: string | null }> = {};
       for (const m of mediaRows ?? []) {
         mediaByName[m.normalized_name] = {
           college_name: m.college_name,
           short_name: m.short_name,
           logo_url: m.logo_url,
+          brand_hex: (m as { brand_hex?: string | null }).brand_hex ?? null,
         };
       }
 
