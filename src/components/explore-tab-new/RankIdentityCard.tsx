@@ -164,12 +164,10 @@ export function RankIdentityCard({ userId }: Props) {
       : currentLevel.label;
 
   const onOpen = () => {
-    // Trophy Room is a sheet triggered from profile; fall back to /profile.
-    try {
-      openTrophyRoom();
-    } catch {
-      navigate('/profile');
-    }
+    // Trophy Room sheet mounts under /handicap; navigate there and emit the
+    // open event so the sheet opens on arrival.
+    navigate('/handicap');
+    setTimeout(() => openGamAchievements(), 0);
   };
 
   return (
