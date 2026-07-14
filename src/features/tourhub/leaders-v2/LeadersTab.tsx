@@ -109,7 +109,16 @@ export function LeadersTab() {
   const tourLabel = CHIP_LABEL[activeTour];
 
   return (
-    <div style={{ background: SLATE_50, minHeight: '100vh', fontFamily: FONT }}>
+    <div
+      style={{
+        background: SLATE_50,
+        minHeight: '100vh',
+        fontFamily: FONT,
+        // Islands overlay the top band at rest; on scroll they ride away and
+        // the chips row locks at the notch. Matches ScheduleTab.
+        paddingTop: 'calc(var(--sat, 0px) + 69px)',
+      }}
+    >
       {/* Header */}
       <div style={{ padding: '16px 16px 12px' }}>
         <div
