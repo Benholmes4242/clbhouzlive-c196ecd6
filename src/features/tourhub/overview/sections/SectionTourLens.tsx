@@ -47,7 +47,6 @@ function SectionTourLensInner({ value, onChange, showAllTours = true }: SectionT
     <div
       ref={wrapperRef}
       className="relative hrail-edge-fade"
-      style={{ background: '#F8FAFC' }}
     >
       <div
         ref={scrollerRef}
@@ -71,7 +70,7 @@ function SectionTourLensInner({ value, onChange, showAllTours = true }: SectionT
         className="pointer-events-none absolute top-0 right-0 h-full hrail-fade hrail-fade-right"
         style={{
           width: 5,
-          background: 'linear-gradient(to left, rgba(248,250,252,0) 0%, #F8FAFC 100%)',
+          background: 'linear-gradient(to left, rgba(248,250,252,0) 0%, rgba(248,250,252,0) 100%)',
           opacity: 0,
           transition: 'opacity 150ms ease',
         }}

@@ -104,12 +104,6 @@ export function PlayersTab() {
   const { data: liveMap } = useLivePlayerIds();
   const { data: liveTournaments } = useLiveTournaments();
 
-  // ── Year label
-  const yearLabel = useMemo(() => {
-    const now = new Date();
-    return now.getMonth() >= 9 ? now.getFullYear() + 1 : now.getFullYear();
-  }, []);
-
   // ── Editorial line (live leader → then upcoming day)
   const editorial = useMemo<string | null>(() => {
     const tours = (liveTournaments ?? []).filter((t) => t.tourSlug === activeTour);
@@ -171,40 +165,16 @@ export function PlayersTab() {
 
   return (
     <div style={{ background: SLATE_50, minHeight: '100vh', fontFamily: FONT }}>
-      {/* HEADER — THE PLAYERS · YEAR · search icon */}
+      {/* HEADER — search icon only */}
       <div style={{ padding: '16px 16px 12px' }}>
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: 12,
+            justifyContent: 'flex-end',
             gap: 8,
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, minWidth: 0 }}>
-            <span
-              style={{
-                fontSize: 10.5,
-                fontWeight: 800,
-                letterSpacing: '0.14em',
-                color: AMBER,
-                textTransform: 'uppercase',
-              }}
-            >
-              THE PLAYERS
-            </span>
-            <span
-              style={{
-                fontSize: 11,
-                fontWeight: 700,
-                color: INK_MUTE,
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {yearLabel}
-            </span>
-          </div>
           {!searchExpanded ? (
             <button
               type="button"
@@ -276,7 +246,6 @@ export function PlayersTab() {
             </div>
           )}
         </div>
-
       </div>
 
       {/* Tour lens — sticky glass wrapper; chips from SectionTourLens
