@@ -183,6 +183,142 @@ const HandicapChip: React.FC<{ delta: number }> = ({ delta }) => {
   );
 };
 
+const SKEL_BG = '#EEF2F6';
+const KEYFRAMES = `
+@keyframes cardsheetPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.45; } }
+@keyframes cardsheetSpin { to { transform: rotate(360deg); } }
+`;
+
+const SkelCell: React.FC<{ delay: number }> = ({ delay }) => (
+  <div style={{
+    flex: 1, height: CELL_SIZE, borderRadius: 8, background: SKEL_BG,
+    animation: `cardsheetPulse 1.4s ease-in-out ${delay}s infinite`,
+  }} />
+);
+
+const SkelNine: React.FC<{ base: number }> = ({ base }) => (
+  <div style={{ display: 'flex', gap: 3 }}>
+    {Array.from({ length: 9 }).map((_, i) => (
+      <SkelCell key={i} delay={(base + i) * 0.05} />
+    ))}
+  </div>
+);
+
+const SkeletonMiddle: React.FC<{ nineHole: boolean }> = ({ nineHole }) => (
+  <div aria-hidden style={{ padding: '4px 16px 16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <style>{KEYFRAMES}</style>
+    <div style={{
+      margin: '0 0 0', height: 84, borderRadius: 14, background: SKEL_BG,
+      animation: 'cardsheetPulse 1.4s ease-in-out infinite',
+    }} />
+    <SkelNine base={0} />
+    {!nineHole && <SkelNine base={9} />}
+  </div>
+);
+
+const SyncingMiddle: React.FC<{ nineHole: boolean }> = ({ nineHole }) => (
+  <div style={{ position: 'relative', padding: '4px 16px 24px' }}>
+    <style>{KEYFRAMES}</style>
+    <div style={{ opacity: 0.35, pointerEvents: 'none', display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ display: 'flex', gap: 3 }}>
+        {Array.from({ length: 9 }).map((_, i) => (
+          <div key={i} style={{ flex: 1, height: CELL_SIZE, borderRadius: 8, background: SKEL_BG }} />
+        ))}
+      </div>
+      {!nineHole && (
+        <div style={{ display: 'flex', gap: 3 }}>
+          {Array.from({ length: 9 }).map((_, i) => (
+            <div key={i} style={{ flex: 1, height: CELL_SIZE, borderRadius: 8, background: SKEL_BG }} />
+          ))}
+        </div>
+      )}
+    </div>
+    <div style={{
+      position: 'absolute', inset: 0,
+      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+      gap: 10, textAlign: 'center', padding: '0 16px',
+    }}>
+      <div style={{ position: 'relative', width: 52, height: 52 }}>
+        <div style={{
+          position: 'absolute', inset: 0, borderRadius: '50%',
+          border: '3px solid rgba(247,147,30,0.18)',
+        }} />
+        <div style={{
+          position: 'absolute', inset: 0, borderRadius: '50%',
+          border: '3px solid transparent', borderTopColor: '#F7931E',
+          animation: 'cardsheetSpin 0.9s linear infinite',
+        }} />
+        <div style={{
+          position: 'absolute', inset: 0, display: 'flex',
+          alignItems: 'center', justifyContent: 'center', color: '#F7931E',
+        }}>
+          <RefreshCw size={18} strokeWidth={2.2} />
+        </div>
+      </div>
+      <div style={{ fontFamily: GEIST, fontSize: 14.5, fontWeight: 800, color: INK }}>
+        Scorecard on the way
+      </div>
+      <div style={{
+        fontFamily: GEIST, fontSize: 12.5, fontWeight: 500, color: SECONDARY,
+        maxWidth: 240, lineHeight: 1.4,
+      }}>
+        Hole-by-hole data is syncing from England Golf. It usually lands within a few hours.
+      </div>
+    </div>
+  </div>
+);
+
+const NohbhMiddle: React.FC<{ gross: number | null; toPar: number | null }> = ({ gross, toPar }) => (
+  <div style={{
+    padding: '20px 16px 24px',
+    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, textAlign: 'center',
+  }}>
+    <div style={{
+      width: 54, height: 54, borderRadius: 14, background: SKEL_BG,
+      display: 'flex', alignItems: 'center', justifyContent: 'center', color: SECONDARY,
+    }}>
+      <Table size={24} strokeWidth={1.6} />
+    </div>
+    <div style={{ fontFamily: GEIST, fontSize: 14.5, fontWeight: 800, color: INK }}>
+      Gross score only
+    </div>
+    <div style={{
+      fontFamily: GEIST, fontSize: 12.5, fontWeight: 500, color: SECONDARY,
+      maxWidth: 250, lineHeight: 1.4,
+    }}>
+      This round was logged as a total, without hole-by-hole scores.
+    </div>
+    {gross != null && (
+      <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
+        <div style={{
+          background: '#FFFFFF', border: `1px solid ${HAIRLINE}`, borderRadius: 12,
+          padding: '10px 18px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+        }}>
+          <div style={{ ...NUM, fontSize: 9.5, fontWeight: 800, letterSpacing: '0.1em', color: MUTED }}>
+            GROSS
+          </div>
+          <div style={{ ...NUM, fontSize: 24, fontWeight: 200, color: INK, lineHeight: 1 }}>
+            {gross}
+          </div>
+        </div>
+        <div style={{
+          background: '#FFFFFF', border: `1px solid ${HAIRLINE}`, borderRadius: 12,
+          padding: '10px 18px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+        }}>
+          <div style={{ ...NUM, fontSize: 9.5, fontWeight: 800, letterSpacing: '0.1em', color: MUTED }}>
+            TO PAR
+          </div>
+          <div style={{ ...NUM, fontSize: 24, fontWeight: 200, color: toPar == null ? INK : toParColor(toPar), lineHeight: 1 }}>
+            {fmtRel(toPar)}
+          </div>
+        </div>
+      </div>
+    )}
+  </div>
+);
+
+
+
 export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   open, onClose, eyebrowText,
   courseName, courseLocation, coursePar, courseSlope,
