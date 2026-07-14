@@ -66,11 +66,11 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap }:
   const scrollerRef = useRef<HTMLDivElement | null>(null);
 
   const hasToggle = tierHasToggle(tier);
-  const isLegendary = tier === 'legendary';
-  const isRecords = tier === 'records';
-  const isEagles = tier === 'eagles';
   const isBirdieHauls = tier === 'birdie_hauls';
-  const showBoards = isLegendary && mode === 'alltime';
+  const isEagles = tier === 'eagles';
+  const isRecords = tier === 'records';
+  const isLegendary = tier === 'legendary';
+  const showBoards = false;
 
   // Fetch the mode-appropriate cache. Records / birdie_hauls / legendary use
   // useRegionFeats with the mode; eagles is latest-only.
