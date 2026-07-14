@@ -108,7 +108,6 @@ export function LegendaryFeatHero({ region, onRowTap }: Props) {
 
   if (!row) return null;
 
-  const total = rows.length;
   const showPager = total > 1;
 
   const cycleNext = () => {
