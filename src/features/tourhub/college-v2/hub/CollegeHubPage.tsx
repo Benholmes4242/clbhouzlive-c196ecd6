@@ -51,6 +51,14 @@ export function CollegeHubPage() {
   const year = data?.year ?? new Date().getFullYear();
   const totalLive = liveAlumni?.totalLive ?? 0;
   const liveByCollege = liveAlumni?.byCollege ?? {};
+  const leader = standings[0];
+  const { tint } = useHeroTint(leader?.logoUrl ?? null);
+  const [logoErrored, setLogoErrored] = useState(false);
+
+  useEffect(() => {
+    setLogoErrored(false);
+  }, [leader?.logoUrl]);
+
 
   const filtered = useMemo(() => {
     const q = debouncedSearch.trim().toLowerCase();
