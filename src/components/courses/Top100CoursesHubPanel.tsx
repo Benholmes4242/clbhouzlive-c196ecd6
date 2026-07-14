@@ -261,7 +261,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
       <div>
         {/* Sticky list filter pills — full-bleed glass row */}
         <div
-          className="sticky -mx-4"
+          className="sticky"
           style={{
             top: 'var(--sat, 0px)',
             zIndex: 10,
