@@ -127,7 +127,7 @@ export function ToughestCoursesRail() {
     <section style={{ marginTop: 4 }}>
       <DiscoverSectionHeader
         eyebrow="Toughest courses"
-        title="Where scores go to die"
+        title="The sternest tests in golf"
       />
       <div
         className="flex overflow-x-auto scrollbar-hide"
