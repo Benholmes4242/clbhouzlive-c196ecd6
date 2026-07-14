@@ -46,6 +46,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
   const navigate = useNavigate();
   const userQuery = useRoundDetail(scoreId, open);
   const userData = userQuery.data;
+  const isRoundLoading = userQuery.isLoading;
 
   const profileQuery = useUserProfile(profileUserId ?? undefined);
   const profile = profileQuery.data;
