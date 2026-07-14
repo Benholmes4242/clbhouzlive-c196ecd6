@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { FeatRow, FeatTier } from './hooks/useRegionFeats';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
@@ -128,93 +128,153 @@ export function FeatCard({ row, tier, onTap, size = 'default' }: Props) {
 
   const when = relDate(row.play_date ?? row.attained_at ?? null);
 
-  // Eagles compact variant now renders on a light editorial card per the
-  // gaming-light Discover rebuild (Part 3E).
+  // Eagles compact variant: mini dark feat card, part of the scoreboard family.
   if (isCompactEagle) {
-    const LAUREL_INK = '#0e8a57';
+    const heroText = (heroValue || '').trim();
+    const holeMatch = /HOLE\s*\d+/i.exec(heroText);
+    const holeText = holeMatch ? holeMatch[0].toUpperCase() : (heroText || '—');
     return (
       <button
         type="button"
         onClick={onTap}
-        className="text-left active:scale-[0.99] transition-transform"
+        className="text-left active:scale-[0.98] transition-transform"
         style={{
           position: 'relative',
           flexShrink: 0,
-          width: 170,
+          width: 190,
+          height: 150,
           borderRadius: 14,
-          background: '#fff',
-          border: '1px solid rgba(15,23,42,0.07)',
-          padding: 12,
+          overflow: 'hidden',
+          padding: 0,
+          background: image ? '#07080C' : '#0A0C10',
+          border: 'none',
           cursor: 'pointer',
           fontFamily: FONT,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 4,
+          color: '#fff',
         }}
       >
-        <span
-          style={{
-            fontSize: 8.5,
-            fontWeight: 800,
-            letterSpacing: '0.12em',
-            textTransform: 'uppercase',
-            color: LAUREL_INK,
-            lineHeight: 1,
-          }}
-        >
-          EAGLE
-        </span>
-        <div
-          style={{
-            fontSize: 20,
-            fontWeight: 900,
-            color: '#0F172A',
-            letterSpacing: '-0.02em',
-            fontVariantNumeric: 'tabular-nums',
-            lineHeight: 1,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {heroValue || '—'}
-        </div>
-        <div
-          style={{
-            fontSize: 9.5,
-            color: '#94A3B8',
-            lineHeight: 1.2,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {row.course_name}
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
-          <SquircleAvatar
-            size={15}
-            src={row.holder_avatar}
-            alt={holder}
-            fallback={initials(holder)}
-            hairlineRing
+        {image ? (
+          <img
+            src={image}
+            alt=""
+            loading="lazy"
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              display: 'block',
+            }}
           />
+        ) : null}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background:
+              'linear-gradient(155deg, rgba(10,12,16,0.72), rgba(10,12,16,0.90))',
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            padding: 12,
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <span
+              style={{
+                fontSize: 8.5,
+                fontWeight: 800,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                color: '#22C55E',
+                lineHeight: 1,
+              }}
+            >
+              EAGLE
+            </span>
+            <span style={{ flex: 1 }} />
+            {when ? (
+              <span
+                style={{
+                  fontSize: 8.5,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  color: 'rgba(255,255,255,0.45)',
+                  lineHeight: 1,
+                }}
+              >
+                {when}
+              </span>
+            ) : null}
+          </div>
+          <div style={{ flex: 1 }} />
           <div
             style={{
-              flex: 1,
-              minWidth: 0,
-              fontSize: 10,
-              fontWeight: 700,
-              color: '#334155',
+              fontSize: 21,
+              fontWeight: 900,
+              letterSpacing: '-0.02em',
+              lineHeight: 1,
+              color: '#fff',
+              fontVariantNumeric: 'tabular-nums',
+              textTransform: 'uppercase',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
             }}
           >
-            {holder}
-            {when ? (
-              <span style={{ color: '#94A3B8', fontWeight: 500 }}> · {when.toLowerCase()}</span>
-            ) : null}
+            {holeText}
+          </div>
+          <div
+            style={{
+              marginTop: 3,
+              fontSize: 9.5,
+              color: 'rgba(255,255,255,0.55)',
+              lineHeight: 1.2,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {row.course_name}
+          </div>
+          <div
+            style={{
+              marginTop: 8,
+              paddingTop: 7,
+              borderTop: '1px solid rgba(255,255,255,0.12)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+            }}
+          >
+            <SquircleAvatar
+              size={15}
+              src={row.holder_avatar}
+              alt={holder}
+              fallback={initials(holder)}
+              hairlineRing
+              ringColor="rgba(255,255,255,0.25)"
+            />
+            <div
+              style={{
+                flex: 1,
+                minWidth: 0,
+                fontSize: 10,
+                fontWeight: 700,
+                color: '#fff',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {holder}
+            </div>
           </div>
         </div>
       </button>
