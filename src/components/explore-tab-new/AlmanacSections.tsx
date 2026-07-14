@@ -171,6 +171,17 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard', onRowTap
   const hasOverflow = rows.length > cap;
   const [sheetOpen, setSheetOpen] = useState(false);
 
+  // Batch medal counts for the visible list-variant holders. Rails and
+  // cards do not surface a gem slot yet -- keep the RPC scoped.
+  const listHolderIds = useMemo(
+    () =>
+      variant === 'list'
+        ? displayRows.map((r) => r.user_id).filter((v): v is string => typeof v === 'string')
+        : [],
+    [variant, displayRows],
+  );
+  const { data: medalsMap } = useWallLevels(listHolderIds);
+
   // Self-hiding: empty tier renders zero trace (no header, no gap).
   // AlmanacEmptyCard covers the all-tiers-empty case at the page level.
   if (!isLoading && rows.length === 0) return null;
