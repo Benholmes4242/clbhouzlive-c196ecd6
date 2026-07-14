@@ -143,43 +143,57 @@ export function CrownCard({ row, opener }: { row: FeatRow; opener?: ScorecardOpe
         >
           {scoreValue}
         </div>
-      </div>
-
-      <div
-        style={{
-          marginTop: 6,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          minWidth: 0,
-        }}
-      >
-        <div
-          style={{
-            fontSize: 12,
-            fontWeight: 700,
-            color: 'rgba(255,255,255,0.5)',
-            lineHeight: 1,
-            letterSpacing: '0.02em',
-          }}
-        >
-          {isStableford ? 'STABLEFORD' : null}
-        </div>
         {showDelta ? (
           <div
             style={{
-              fontSize: 14,
-              fontWeight: 800,
-              color: deltaColor,
-              lineHeight: 1,
-              letterSpacing: '-0.02em',
-              fontVariantNumeric: 'tabular-nums',
+              flex: delta === 0 ? 1 : 0,
+              display: 'flex',
+              justifyContent: delta === 0 ? 'center' : 'flex-end',
+              alignItems: 'baseline',
+              minWidth: 0,
             }}
           >
-            {deltaLabel}
+            <span
+              style={{
+                fontSize: 13,
+                fontWeight: 800,
+                color: deltaColor,
+                lineHeight: 1,
+                letterSpacing: '-0.02em',
+                fontVariantNumeric: 'tabular-nums',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {deltaText}
+            </span>
           </div>
         ) : null}
       </div>
+
+      {isStableford ? (
+        <div
+          style={{
+            marginTop: 6,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            minWidth: 0,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 12,
+              fontWeight: 700,
+              color: 'rgba(255,255,255,0.5)',
+              lineHeight: 1,
+              letterSpacing: '0.02em',
+            }}
+          >
+            STABLEFORD
+          </div>
+        </div>
+      ) : null}
+
 
       <div
         style={{
