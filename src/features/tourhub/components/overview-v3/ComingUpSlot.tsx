@@ -1,10 +1,10 @@
 /**
  * ComingUpSlot - adapter that mounts the v4 ComingUp section on the live
- * Overview with a per-section tour lens (local state, defaults to All Tours).
+ * Overview with a per-section tour lens (local state, defaults to PGA).
  *
- * All Tours (tourLens === null): ComingUp renders a single chronological
- * merged list across all tours (soonest first). A selected tour filters
- * to that tour only.
+ * The "All Tours" pill is intentionally omitted here -- tour is always a
+ * concrete TourId. ComingUp's merged all-tours path is unused from this
+ * slot (the useComingUp null path remains in the hook, just unused here).
  */
 import { useState } from 'react';
 import { ComingUp } from '@/features/tourhub/overview/sections/ComingUp';
@@ -12,11 +12,11 @@ import { SectionTourLens } from '@/features/tourhub/overview/sections/SectionTou
 import type { TourId } from '@/features/tourhub/hooks/useOverviewData';
 
 export function ComingUpSlot() {
-  const [tourLens, setTourLens] = useState<TourId | null>(null);
+  const [tour, setTour] = useState<TourId>('pga');
   return (
     <>
-      <SectionTourLens value={tourLens} onChange={setTourLens} />
-      <ComingUp tour={tourLens} />
+      <SectionTourLens value={tour} onChange={(t) => t && setTour(t)} showAllTours={false} />
+      <ComingUp tour={tour} />
     </>
   );
 }
