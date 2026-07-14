@@ -145,6 +145,7 @@ export function useFranchiseStandings() {
         collegeName: mediaByName[s.normalized_name]?.college_name ?? s.normalized_name,
         shortName: mediaByName[s.normalized_name]?.short_name ?? null,
         logoUrl: mediaByName[s.normalized_name]?.logo_url ?? null,
+        brandHex: mediaByName[s.normalized_name]?.brand_hex ?? null,
         pointsTotal: Math.round(s.earnings_total ?? 0),
         alumniCount: s.player_count ?? 0,
         winsTotal: s.wins_total ?? 0,
