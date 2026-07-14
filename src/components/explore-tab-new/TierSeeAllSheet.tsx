@@ -243,9 +243,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap }:
           padding: showBoards ? '16px 0' : '12px 0',
         }}
       >
-        {showBoards ? (
-          <LegendaryLeadersBoards region={region} />
-        ) : visibleRows.length === 0 ? (
+        {visibleRows.length === 0 ? (
           <div
             style={{
               padding: '28px 16px',
@@ -257,66 +255,13 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap }:
           >
             None yet.
           </div>
-        ) : isRecords ? (
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))',
-              gap: 10,
-              padding: '0 12px',
-            }}
-          >
-            {visibleRows.map((row, i) => (
-              <div
-                key={`${row.score_id ?? row.course_id ?? i}-${i}`}
-                style={{ display: 'flex' }}
-              >
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <CrownCard
-                    row={row}
-                    opener={{
-                      target: null,
-                      openByScore: (sid, cid, uid) => handleRowTap({ ...row, score_id: sid ?? row.score_id, user_id: uid ?? row.user_id }),
-                      openProfile: (uid) => handleRowTap({ ...row, user_id: uid }),
-                      close: () => {},
-                    } as any}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : isEagles ? (
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-              gap: 10,
-              padding: '0 12px',
-            }}
-          >
-            {visibleRows.map((row, i) => (
-              <div
-                key={`${row.score_id ?? row.course_id ?? i}-${i}`}
-                style={{ display: 'flex' }}
-              >
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <FeatCard
-                    row={row}
-                    tier="eagles"
-                    onTap={() => handleRowTap(row)}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
         ) : (
-          // birdie_hauls + legendary RECENT: reuse FeatListRow
           <div style={{ padding: '0 16px' }}>
             {visibleRows.map((row, i) => (
               <FeatListRow
                 key={`${row.score_id ?? row.course_id ?? i}-${i}`}
                 row={row}
-                tier={isBirdieHauls ? 'birdie_hauls' : 'legendary'}
+                tier={tier}
                 index={i}
                 onTap={() => handleRowTap(row)}
               />
