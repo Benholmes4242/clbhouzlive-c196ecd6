@@ -170,7 +170,13 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
 }
 
 
-function LegendarySection({ region }: { region: string | null }) {
+function LegendarySection({
+  region,
+  onRowTap,
+}: {
+  region: string | null;
+  onRowTap?: (row: FeatRow) => void;
+}) {
   const { data, isLoading } = useRegionFeats(region, 'legendary');
   const rows = data ?? [];
   const hasAny = rows.length > 0;
@@ -212,14 +218,16 @@ function LegendarySection({ region }: { region: string | null }) {
           </button>
         )}
       </div>
-      <LegendaryFeatHero region={region} />
+      <LegendaryFeatHero region={region} onRowTap={onRowTap} />
       <TierSeeAllSheet
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
         tier="legendary"
         region={region}
         rows={rows}
+        onRowTap={onRowTap}
       />
     </section>
   );
 }
+
