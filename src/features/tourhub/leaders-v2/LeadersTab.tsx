@@ -14,9 +14,9 @@ import { useSearchParams } from 'react-router-dom';
 
 import { Skeleton } from '@/components/ui/skeleton';
 import { TourHubEmptyState } from '../components/TourHubEmptyState';
-import { useTourSelection } from '../context/TourSelectionContext';
+import { SectionTourLens } from '../overview/sections/SectionTourLens';
 import { TOUR_CONFIG, type TourId } from '../hooks/useOverviewData';
-import { TOUR_PRIORITY } from '../_shared/tourOrder';
+
 import { useLivePlayerIds } from '../players-v2/data/useLivePlayerIds';
 import {
   AMBER,
@@ -40,29 +40,20 @@ const CHIP_LABEL: Record<TourId, string> = {
   liv: 'LIV',
 };
 
+
 export function LeadersTab() {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Tour selection
-  const { selectedTourSlug, viewingTourSlug, selectTour } = useTourSelection();
-  const inboundHonoredRef = useRef(false);
-  useEffect(() => {
-    if (inboundHonoredRef.current) return;
-    inboundHonoredRef.current = true;
-    const inbound = searchParams.get('tour');
-    if (inbound && inbound in TOUR_CONFIG && inbound !== (selectedTourSlug ?? viewingTourSlug)) {
-      selectTour(inbound);
-    }
-  }, [searchParams, selectTour, selectedTourSlug, viewingTourSlug]);
-
-  // Champions is intentionally omitted on this page (insufficient stat coverage
-  // for a leaders board). If the app-wide selection is 'champ', fall back to
-  // rendering PGA boards without fighting the global TourSelectionContext.
-  const rawTour =
-    ((viewingTourSlug ?? selectedTourSlug ?? 'pga') as string) in TOUR_CONFIG
-      ? ((viewingTourSlug ?? selectedTourSlug ?? 'pga') as TourId)
+  // Per-section tour lens (local state, NO All Tours, PGA default).
+  // Champions is intentionally omitted here (insufficient stat coverage);
+  // if the URL passes ?tour=champ we fall through to PGA.
+  const inboundTour = searchParams.get('tour');
+  const initialTour: TourId =
+    inboundTour && inboundTour in TOUR_CONFIG && inboundTour !== 'champ'
+      ? (inboundTour as TourId)
       : 'pga';
-  const activeTour: TourId = rawTour === 'champ' ? 'pga' : rawTour;
+  const [activeTour, setActiveTour] = useState<TourId>(initialTour);
+
 
   const { data: result, isLoading } = useLeaderCategories(activeTour);
   const { data: liveMap } = useLivePlayerIds();
@@ -157,7 +148,9 @@ export function LeadersTab() {
 
       </div>
 
-      {/* Tour chips — canonical sticky glass row (locks under island band). */}
+      {/* Tour lens — sticky glass wrapper; chips from SectionTourLens
+          (no All Tours; PGA default). CHAMP taps are ignored — no board
+          coverage for that tour. */}
       <div
         style={{
           position: 'sticky',
@@ -167,48 +160,18 @@ export function LeadersTab() {
           backdropFilter: 'blur(14px)',
           WebkitBackdropFilter: 'blur(14px)',
           borderBottom: '1px solid rgba(0,0,0,0.07)',
-          padding: '8px 16px 10px',
         }}
       >
-        <div
-          style={{
-            display: 'flex',
-            gap: 8,
-            overflowX: 'auto',
-            scrollbarWidth: 'none',
+        <SectionTourLens
+          value={activeTour}
+          onChange={(t) => {
+            if (!t || t === 'champ') return;
+            setActiveTour(t);
           }}
-        >
-          {TOUR_PRIORITY.filter((s) => s !== 'champ').map((slug) => {
-            const isActive = slug === activeTour;
-            return (
-              <button
-                key={slug}
-                type="button"
-                aria-pressed={isActive}
-                onClick={() => selectTour(slug)}
-                style={{
-                  flex: '0 0 auto',
-                  padding: '7px 12px',
-                  borderRadius: 14,
-                  border: isActive ? 'none' : `0.5px solid ${HAIRLINE_INK_10}`,
-                  background: isActive ? INK : '#FFFFFF',
-                  color: isActive ? '#FFFFFF' : INK,
-                  fontFamily: 'inherit',
-                  fontSize: 10.5,
-                  fontWeight: 800,
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                  lineHeight: 1,
-                }}
-              >
-                {CHIP_LABEL[slug]}
-              </button>
-            );
-          })}
-        </div>
+          showAllTours={false}
+        />
       </div>
+
 
       {/* Boards feed */}
       {isLoading ? (

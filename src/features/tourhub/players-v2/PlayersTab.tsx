@@ -19,9 +19,9 @@ import { Search, X } from 'lucide-react';
 
 import { Skeleton } from '@/components/ui/skeleton';
 import { TourHubEmptyState } from '../components/TourHubEmptyState';
-import { useTourSelection } from '../context/TourSelectionContext';
+import { SectionTourLens } from '../overview/sections/SectionTourLens';
 import { TOUR_CONFIG, type TourId } from '../hooks/useOverviewData';
-import { TOUR_PRIORITY } from '../_shared/tourOrder';
+
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import {
   AMBER,
@@ -38,14 +38,6 @@ import { useLivePlayerIds } from './data/useLivePlayerIds';
 import { PodiumCards } from './PodiumCards';
 import { RankedPlayerRow } from './RankedPlayerRow';
 
-const CHIP_LABEL: Record<TourId, string> = {
-  pga: 'PGA',
-  lpga: 'LPGA',
-  euro: 'DP WORLD',
-  pgad: 'KORN FERRY',
-  champ: 'CHAMPIONS',
-  liv: 'LIV',
-};
 
 type SortKey = 'ranking' | 'live';
 
@@ -69,22 +61,13 @@ export function PlayersTab() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // ── Tour selection (app-wide brain) — honor ?tour= once on mount.
-  const { selectedTourSlug, viewingTourSlug, selectTour } = useTourSelection();
-  const inboundHonoredRef = useRef(false);
-  useEffect(() => {
-    if (inboundHonoredRef.current) return;
-    inboundHonoredRef.current = true;
-    const inbound = searchParams.get('tour');
-    if (inbound && inbound in TOUR_CONFIG && inbound !== (selectedTourSlug ?? viewingTourSlug)) {
-      selectTour(inbound);
-    }
-  }, [searchParams, selectTour, selectedTourSlug, viewingTourSlug]);
+  // ── Per-section tour lens (local state, NO All Tours, PGA default).
+  // ?tour= is honored once on mount for deep-link parity.
+  const inboundTour = searchParams.get('tour');
+  const initialTour: TourId =
+    inboundTour && inboundTour in TOUR_CONFIG ? (inboundTour as TourId) : 'pga';
+  const [activeTour, setActiveTour] = useState<TourId>(initialTour);
 
-  const activeTour: TourId =
-    ((viewingTourSlug ?? selectedTourSlug ?? 'pga') as string) in TOUR_CONFIG
-      ? ((viewingTourSlug ?? selectedTourSlug ?? 'pga') as TourId)
-      : 'pga';
 
   // ── Sort (honor inbound ?sort=)
   const inboundSort = searchParams.get('sort');
@@ -296,7 +279,8 @@ export function PlayersTab() {
 
       </div>
 
-      {/* Tour chips — canonical sticky glass row (locks under island band). */}
+      {/* Tour lens — sticky glass wrapper; chips from SectionTourLens
+          (no All Tours; PGA default). */}
       <div
         style={{
           position: 'sticky',
@@ -306,49 +290,15 @@ export function PlayersTab() {
           backdropFilter: 'blur(14px)',
           WebkitBackdropFilter: 'blur(14px)',
           borderBottom: '1px solid rgba(0,0,0,0.07)',
-          padding: '8px 16px 10px',
         }}
       >
-        <div
-          style={{
-            display: 'flex',
-            gap: 8,
-            overflowX: 'auto',
-            scrollbarWidth: 'none',
-          }}
-          className="segmented-scroller"
-        >
-          {TOUR_PRIORITY.map((slug) => {
-            const isActive = slug === activeTour;
-            return (
-              <button
-                key={slug}
-                type="button"
-                aria-pressed={isActive}
-                onClick={() => selectTour(slug)}
-                style={{
-                  flex: '0 0 auto',
-                  padding: '7px 12px',
-                  borderRadius: 14,
-                  border: isActive ? 'none' : `0.5px solid ${HAIRLINE_INK_10}`,
-                  background: isActive ? INK : '#FFFFFF',
-                  color: isActive ? '#FFFFFF' : INK,
-                  fontFamily: 'inherit',
-                  fontSize: 10.5,
-                  fontWeight: 800,
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                  lineHeight: 1,
-                }}
-              >
-                {CHIP_LABEL[slug]}
-              </button>
-            );
-          })}
-        </div>
+        <SectionTourLens
+          value={activeTour}
+          onChange={(t) => t && setActiveTour(t)}
+          showAllTours={false}
+        />
       </div>
+
 
       <div style={{ padding: '12px 16px 0' }}>
 

@@ -5,6 +5,12 @@ import { TOUR_CONFIG, type TourId } from '../../hooks/useOverviewData';
 interface SectionTourLensProps {
   value: TourId | null;
   onChange: (t: TourId | null) => void;
+  /**
+   * When false, the "All Tours" chip is omitted entirely. Callers using
+   * showAllTours={false} should treat `value` as always a TourId.
+   * Defaults to true — existing callers are unchanged.
+   */
+  showAllTours?: boolean;
 }
 
 const TOUR_ORDER: TourId[] = ['pga', 'lpga', 'euro', 'liv', 'champ', 'pgad'];
@@ -12,11 +18,12 @@ const TOUR_ORDER: TourId[] = ['pga', 'lpga', 'euro', 'liv', 'champ', 'pgad'];
 /**
  * SectionTourLens — per-section tour filter primitive.
  *
- * A horizontally-scrolling chip row defaulting to "All Tours".
- * Controlled by the parent section; no internal state, no auto-scroll.
- * Right-edge fade appears only when the row overflows.
+ * A horizontally-scrolling chip row defaulting to "All Tours" (unless
+ * showAllTours=false). Controlled by the parent section; no internal
+ * state, no auto-scroll. Right-edge fade appears only when the row
+ * overflows.
  */
-function SectionTourLensInner({ value, onChange }: SectionTourLensProps) {
+function SectionTourLensInner({ value, onChange, showAllTours = true }: SectionTourLensProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
   useEdgeFades(scrollerRef, wrapperRef);
@@ -34,12 +41,14 @@ function SectionTourLensInner({ value, onChange }: SectionTourLensProps) {
         className="flex gap-1.5 overflow-x-auto scrollbar-hide"
         style={{ padding: '8.5px 16px' }}
       >
-        <Chip
-          id={null}
-          label="All Tours"
-          active={value === null}
-          onClick={() => onChange(null)}
-        />
+        {showAllTours && (
+          <Chip
+            id={null}
+            label="All Tours"
+            active={value === null}
+            onClick={() => onChange(null)}
+          />
+        )}
         {TOUR_ORDER.map((id) => {
           const config = TOUR_CONFIG[id];
           return (
