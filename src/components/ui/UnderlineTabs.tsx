@@ -96,7 +96,7 @@ export function UnderlineTabs<T extends string>({
                     left: 0,
                     right: 0,
                     bottom: -4,
-                    height: 2,
+                    height: 1,
                     borderRadius: 2,
                     background: underlineColor,
                   }}
