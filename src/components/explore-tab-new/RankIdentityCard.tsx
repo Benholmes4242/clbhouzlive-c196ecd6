@@ -139,7 +139,6 @@ export function RankIdentityCard({ userId }: Props) {
 
   const tierName = currentLevel.label.replace(/\s+(I|II)$/, '');
 
-
   const medalsToNext = nextLevel
     ? Math.max(0, nextLevel.medalsRequired - medals)
     : 0;
