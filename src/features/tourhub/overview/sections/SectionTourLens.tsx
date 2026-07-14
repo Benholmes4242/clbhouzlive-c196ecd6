@@ -38,7 +38,7 @@ function SectionTourLensInner({ value, onChange, showAllTours = true }: SectionT
     }
     TOUR_ORDER.forEach((id) => {
       const config = TOUR_CONFIG[id];
-      list.push({ id, label: `${config.emoji} ${config.name}` });
+      list.push({ id, label: config.name });
     });
     return list;
   }, [showAllTours]);
