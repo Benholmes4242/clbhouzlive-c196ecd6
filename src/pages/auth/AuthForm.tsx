@@ -169,7 +169,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
 
       if (data?.session?.user) {
         trackLoginSuccess('email', Date.now() - start);
-        setShowSuccessAnimation(true);
+        // Session is set synchronously on the client here; navigate immediately.
+        // Close the OTP sheet before nav so it does not freeze mid-transition.
+        setStep('hero');
+        navigate('/', { replace: true });
       } else {
         setOtpError('Could not start session. Please try again.');
         setOtpErrorNonce((n) => n + 1);
@@ -182,12 +185,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
       setOtpErrorNonce((n) => n + 1);
       setSubmitting(false);
     }
-  };
-
-  const handleSuccessAnimationComplete = () => {
-    setShowSuccessAnimation(false);
-    // AuthWrapper's onboarding gate will bounce new users to /edit-profile.
-    navigate('/', { replace: true });
   };
 
   // ---- Native Apple Sign-In (Median bridge) -------------------------------
