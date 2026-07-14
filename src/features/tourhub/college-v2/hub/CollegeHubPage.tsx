@@ -33,7 +33,7 @@ import { collegeH2HRoute } from '@/features/tourhub/routes';
 import { useFranchiseStandings } from './data/useFranchiseStandings';
 import { useLiveAlumni } from './data/useLiveAlumni';
 import { YearbookCard } from './YearbookCard';
-import { useHeroTint } from './logoColor';
+import { CollegeHeroMasthead } from '../_shared/CollegeHeroMasthead';
 
 
 export function CollegeHubPage() {
