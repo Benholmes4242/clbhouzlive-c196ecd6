@@ -355,6 +355,8 @@ const ChampionStrip: React.FC<{
       size={16}
       srcCandidates={photoCandidates}
       alt={name}
+      hairlineRing
+      ringColor={LIGHT_HAIRLINE}
     />
     <span
       style={{
