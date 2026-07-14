@@ -323,6 +323,47 @@ export function LegendaryFeatHero({ region, onRowTap }: Props) {
         ) : null}
         </div>
       </button>
+      {total > 1 ? (
+        <div
+          style={{
+            position: 'absolute',
+            right: 0,
+            top: 0,
+            width: 14,
+            height: '100%',
+            borderRadius: 18,
+            overflow: 'hidden',
+            pointerEvents: 'none',
+            opacity: 0.5,
+            background: '#0A0C10',
+          }}
+          aria-hidden="true"
+        >
+          {nextImage ? (
+            <img
+              src={nextImage}
+              alt=""
+              loading="lazy"
+              style={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                display: 'block',
+              }}
+            />
+          ) : null}
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'rgba(10,12,16,0.55)',
+            }}
+          />
+        </div>
+      ) : null}
+      </div>
     </div>
   );
 }
