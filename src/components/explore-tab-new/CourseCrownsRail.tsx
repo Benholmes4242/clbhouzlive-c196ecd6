@@ -47,7 +47,6 @@ function CrownCard({ row, opener }: { row: FeatRow; opener?: ScorecardOpener }) 
   const navigate = useNavigate();
   const holder = formatHolderName(row.holder_name);
   const isStableford = row.category === 'best_stableford_all_time';
-  const scoreLabel = isStableford ? 'STABLEFORD' : 'GROSS';
   const scoreValue =
     row.value != null ? String(row.value) : row.feat_value ?? '--';
   const hasHcp = row.holder_hcp != null;
@@ -120,6 +119,7 @@ function CrownCard({ row, opener }: { row: FeatRow; opener?: ScorecardOpener }) 
           marginTop: 10,
           display: 'flex',
           alignItems: 'baseline',
+          justifyContent: 'space-between',
           gap: 6,
           minWidth: 0,
         }}
@@ -136,6 +136,28 @@ function CrownCard({ row, opener }: { row: FeatRow; opener?: ScorecardOpener }) 
         >
           {scoreValue}
         </div>
+      </div>
+
+      <div
+        style={{
+          marginTop: 6,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          minWidth: 0,
+        }}
+      >
+        <div
+          style={{
+            fontSize: 12,
+            fontWeight: 700,
+            color: 'rgba(255,255,255,0.5)',
+            lineHeight: 1,
+            letterSpacing: '0.02em',
+          }}
+        >
+          {isStableford ? 'STABLEFORD' : `Par ${row.course_par ?? '--'}`}
+        </div>
         {showDelta ? (
           <div
             style={{
@@ -145,23 +167,11 @@ function CrownCard({ row, opener }: { row: FeatRow; opener?: ScorecardOpener }) 
               lineHeight: 1,
               letterSpacing: '-0.02em',
               fontVariantNumeric: 'tabular-nums',
-              alignSelf: 'flex-start',
-              marginTop: 4,
             }}
           >
             {deltaLabel}
           </div>
         ) : null}
-        <div
-          style={{
-            fontSize: 11,
-            fontWeight: 700,
-            color: 'rgba(255,255,255,0.5)',
-            lineHeight: 1,
-          }}
-        >
-          {scoreLabel}
-        </div>
       </div>
 
       <div
