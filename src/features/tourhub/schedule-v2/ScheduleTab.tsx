@@ -76,23 +76,57 @@ export function ScheduleTab() {
 
   // ── Auto-land on this-week/next row on mount + tour flip ───────────────
   // Scrolls the WINDOW (page owns the scroll now — no inner scroller).
+  //
+  // Hardened: bounded rAF retry loop (~1500ms) until the anchor row exists,
+  // then re-asserts once more after the router's ScrollRestoration effect
+  // may fire scrollTo(0) on PUSH navigation. Offset is derived from the
+  // sticky chips row (safe-area-inset + --tour-chips-h + breathing room)
+  // instead of a hardcoded 200.
   const anchorId = timeline?.anchorEventId ?? null;
+  const computeOffset = () => {
+    const rootStyles = getComputedStyle(document.documentElement);
+    const chipsH =
+      parseInt(rootStyles.getPropertyValue('--tour-chips-h'), 10) || 47;
+    // env(safe-area-inset-top) isn't queryable directly; read the --sat var
+    // if present, else fall back to the chips top offset. 24 = breathing.
+    const sat = parseInt(rootStyles.getPropertyValue('--sat'), 10) || 0;
+    return sat + chipsH + 24;
+  };
   useEffect(() => {
     if (!anchorId) return;
     let cancelled = false;
-    const doScroll = () => {
+    let rafId = 0;
+    const start = performance.now();
+    const DEADLINE = 1500;
+    const tryScroll = () => {
       if (cancelled) return;
       const el = document.getElementById(`sv2-row-${anchorId}`);
-      if (!el) return;
-      const top = el.getBoundingClientRect().top + window.scrollY;
-      window.scrollTo({ top: Math.max(0, top - 200), behavior: 'auto' });
+      if (!el) {
+        if (performance.now() - start < DEADLINE) {
+          rafId = requestAnimationFrame(tryScroll);
+        }
+        return;
+      }
+      const doScroll = () => {
+        const top = el.getBoundingClientRect().top + window.scrollY;
+        window.scrollTo({
+          top: Math.max(0, top - computeOffset()),
+          behavior: 'auto',
+        });
+      };
+      doScroll();
+      // Re-assert next frame in case ScrollRestoration or WebView reset
+      // stomps our scroll after the fact.
+      rafId = requestAnimationFrame(() => {
+        if (cancelled) return;
+        doScroll();
+      });
     };
-    const r1 = requestAnimationFrame(() =>
-      requestAnimationFrame(doScroll),
-    );
+    // Wait a frame so rows have laid out.
+    rafId = requestAnimationFrame(() => requestAnimationFrame(tryScroll));
     return () => {
       cancelled = true;
-      cancelAnimationFrame(r1);
+      cancelAnimationFrame(rafId);
     };
   }, [anchorId, activeTour]);
 
@@ -116,7 +150,10 @@ export function ScheduleTab() {
     const el = document.getElementById(`sv2-row-${anchorId}`);
     if (!el) return;
     const top = el.getBoundingClientRect().top + window.scrollY;
-    window.scrollTo({ top: Math.max(0, top - 200), behavior: 'smooth' });
+    window.scrollTo({
+      top: Math.max(0, top - computeOffset()),
+      behavior: 'smooth',
+    });
   }, [anchorId]);
 
 
