@@ -181,7 +181,7 @@ const HandicapChip: React.FC<{ delta: number }> = ({ delta }) => {
 export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   open, onClose, eyebrowText,
   courseName, courseLocation, coursePar, courseSlope,
-  holes, nineHole, rounds, heroMuted, emptyMessage,
+  holes, nineHole, rounds, heroMuted, emptyMessage, loading,
   playerName, playerAvatarUrl, playerHcp, playerHcpDelta, playerUserId,
   onViewProfile, onViewCourse,
 }) => {
