@@ -72,23 +72,6 @@ function toParColor(n: number | null): string {
   return getScoreColor(n, 'light');
 }
 
-function summarizeBirdiesOrBetter(holes: CardScorecardHole[]): string {
-  let eagles = 0;
-  let birdies = 0;
-  let aces = 0;
-  for (const h of holes) {
-    if (h.par == null || h.strokes == null || h.strokes <= 0) continue;
-    if (h.strokes === 1) { aces++; continue; }
-    const d = h.strokes - h.par;
-    if (d <= -2) eagles++;
-    else if (d === -1) birdies++;
-  }
-  const parts: string[] = [];
-  if (aces) parts.push(`${aces} ace${aces > 1 ? 's' : ''}`);
-  if (eagles) parts.push(`${eagles} eagle${eagles > 1 ? 's' : ''}`);
-  if (birdies) parts.push(`${birdies} birdie${birdies > 1 ? 's' : ''}`);
-  return parts.join(` ${'\u00B7'} `);
-}
 
 const CELL_SIZE = 31;
 
