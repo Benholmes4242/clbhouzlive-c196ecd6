@@ -64,9 +64,14 @@ export function CrownCard({ row, opener }: { row: FeatRow; opener?: ScorecardOpe
   const showDelta =
     !isStableford && row.course_par != null && numericValue != null;
   const delta = showDelta ? numericValue! - (row.course_par as number) : 0;
-  const deltaLabel =
-    delta === 0 ? 'E' : delta < 0 ? `-${Math.abs(delta)}` : `+${delta}`;
+  const deltaText =
+    delta === 0
+      ? 'even par'
+      : delta < 0
+        ? `${Math.abs(delta)} under par`
+        : `${delta} over par`;
   const deltaColor = delta < 0 ? '#D2222D' : '#FFFFFF';
+
 
   return (
     <button
