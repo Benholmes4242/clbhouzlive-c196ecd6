@@ -26,6 +26,7 @@ import { SEASON_ORDER, getSeasonConfig, getChipStatus, type SeasonId } from '@/l
 import type { ChampionshipArenaMode, DivisionSlug } from '@/types/championship';
 import { abbreviateDivision } from '@/types/championship';
 import { supabase } from '@/integrations/supabase/client';
+import { getPageScrollTop, scrollPageTo } from '@/lib/getScrollParent';
 
 // ─── Persistence helpers ────────────────────────────────────────────
 const STORAGE_KEY_FILTERS = 'championship-leaderboard-filters';
@@ -679,8 +680,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
   // ─── Scroll save/restore ─────────────────────────────────────────
   const handleEntryClick = useCallback((clickedUserId: string) => {
-    const rootEl = document.getElementById('root');
-    const scrollY = (rootEl && rootEl.scrollTop > 0) ? rootEl.scrollTop : window.scrollY;
+    const scrollY = getPageScrollTop();
     sessionStorage.setItem(STORAGE_KEY_SCROLL, scrollY.toString());
     navigate(getProfilePathById(clickedUserId) + '?tab=top100');
   }, [navigate]);
@@ -702,10 +702,8 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     if (savedScroll) {
       hasRestoredScroll.current = true;
       requestAnimationFrame(() => {
-        const rootEl = document.getElementById('root');
         const scrollTarget = parseInt(savedScroll, 10);
-        if (rootEl) rootEl.scrollTop = scrollTarget;
-        window.scrollTo({ top: scrollTarget, behavior: 'instant' as ScrollBehavior });
+        scrollPageTo(scrollTarget, 'instant');
         sessionStorage.removeItem(STORAGE_KEY_SCROLL);
       });
     }
@@ -713,31 +711,22 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
   // ─── Filter handlers (preserve scroll) ───────────────────────────
   const handleArenaModeChange = useCallback((mode: ChampionshipArenaMode) => {
-    const rootEl = document.getElementById('root');
-    if (rootEl) {
-      scrollPositionRef.current = rootEl.scrollTop;
-      isFilterChangeRef.current = true;
-    }
+    scrollPositionRef.current = getPageScrollTop();
+    isFilterChangeRef.current = true;
     setArenaMode(mode);
   }, []);
 
   const handleDivisionFilterChange = useCallback((filter: DivisionSlug | 'all') => {
-    const rootEl = document.getElementById('root');
-    if (rootEl) {
-      scrollPositionRef.current = rootEl.scrollTop;
-      isFilterChangeRef.current = true;
-    }
+    scrollPositionRef.current = getPageScrollTop();
+    isFilterChangeRef.current = true;
     setDivisionFilter(filter);
   }, []);
 
   useLayoutEffect(() => {
     if (isFilterChangeRef.current) {
-      const rootEl = document.getElementById('root');
-      if (rootEl) {
-        requestAnimationFrame(() => {
-          rootEl.scrollTop = scrollPositionRef.current;
-        });
-      }
+      requestAnimationFrame(() => {
+        scrollPageTo(scrollPositionRef.current, 'instant');
+      });
       isFilterChangeRef.current = false;
     }
   }, [arenaMode, divisionFilter, allEntries]);
