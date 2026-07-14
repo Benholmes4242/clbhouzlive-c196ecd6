@@ -23,6 +23,7 @@ import {
 } from '@/components/top100/list';
 import type { Top100SortMode } from '@/components/top100/list/Top100ListFilterChips';
 import { getRegionTheme } from '@/lib/regionTheme';
+import { getPageScrollTop, scrollPageTo, scrollPageToTop } from '@/lib/getScrollParent';
 
 /**
  * Canonical slug → rank field mapping (LOCKED).
@@ -107,7 +108,7 @@ const Top100List = () => {
 
   // Scroll to top on mount / slug change
   useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    scrollPageToTop('auto');
   }, [slug]);
 
   // Restore scroll from sessionStorage on mount
@@ -116,11 +117,7 @@ const Top100List = () => {
 
     if (savedScrollY) {
       requestAnimationFrame(() => {
-        window.scrollTo({
-          top: Number(savedScrollY),
-          left: 0,
-          behavior: 'auto',
-        });
+        scrollPageTo(Number(savedScrollY), 'auto');
       });
     }
 
@@ -369,7 +366,7 @@ const Top100List = () => {
 
   // Save scroll before navigating to course detail
   const handleOpenCourse = useCallback((courseId: string) => {
-    sessionStorage.setItem('top100:list:scrollY', String(window.scrollY));
+    sessionStorage.setItem('top100:list:scrollY', String(getPageScrollTop()));
     navigate(`/courses/${courseId}`);
   }, [navigate]);
 

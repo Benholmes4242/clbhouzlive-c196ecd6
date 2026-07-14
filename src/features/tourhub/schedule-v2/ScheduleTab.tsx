@@ -22,6 +22,7 @@ import { TourHubEmptyState } from '../components/TourHubEmptyState';
 import { useSeasonTimeline, type SeasonEvent } from './useSeasonTimeline';
 import { useMergedSchedule } from './useMergedSchedule';
 import { SeasonRow } from './SeasonRow';
+import { getScrollAncestor, scrollElementIntoView } from '@/lib/getScrollParent';
 import {
   AMBER,
   FONT,
@@ -75,7 +76,7 @@ export function ScheduleTab() {
 
 
   // ── Auto-land on this-week/next row on mount + tour flip ───────────────
-  // Scrolls the WINDOW (page owns the scroll now — no inner scroller).
+  // Scrolls the row's real scroll ancestor; the app shell may own page scroll.
   //
   // Hardened: bounded rAF retry loop (~1500ms) until the anchor row exists,
   // then re-asserts once more after the router's ScrollRestoration effect
@@ -108,11 +109,7 @@ export function ScheduleTab() {
         return;
       }
       const doScroll = () => {
-        const top = el.getBoundingClientRect().top + window.scrollY;
-        window.scrollTo({
-          top: Math.max(0, top - computeOffset()),
-          behavior: 'auto',
-        });
+        scrollElementIntoView(el, { offset: computeOffset(), behavior: 'auto' });
       };
       doScroll();
       // Re-assert next frame in case ScrollRestoration or WebView reset
@@ -130,16 +127,17 @@ export function ScheduleTab() {
     };
   }, [anchorId, activeTour]);
 
-  // ── Floating "This week" chip visibility (IntersectionObserver on viewport)
+  // ── Floating "This week" chip visibility (IntersectionObserver on row scroller)
   useEffect(() => {
     const el = anchorRef.current;
     if (!el || !anchorId) {
       setAnchorVisible(true);
       return;
     }
+    const scroller = getScrollAncestor(el);
     const io = new IntersectionObserver(
       ([entry]) => setAnchorVisible(entry.isIntersecting),
-      { threshold: 0.1 },
+      { root: scroller ?? null, threshold: 0.1 },
     );
     io.observe(el);
     return () => io.disconnect();
@@ -149,11 +147,7 @@ export function ScheduleTab() {
     if (!anchorId) return;
     const el = document.getElementById(`sv2-row-${anchorId}`);
     if (!el) return;
-    const top = el.getBoundingClientRect().top + window.scrollY;
-    window.scrollTo({
-      top: Math.max(0, top - computeOffset()),
-      behavior: 'smooth',
-    });
+    scrollElementIntoView(el, { offset: computeOffset(), behavior: 'smooth' });
   }, [anchorId]);
 
 

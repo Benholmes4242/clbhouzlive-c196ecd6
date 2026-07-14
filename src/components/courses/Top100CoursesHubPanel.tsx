@@ -14,6 +14,7 @@ import { AppSelect, type AppSelectOption } from '@/components/ui/AppSelect';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { FilterChips } from '@/components/ui/FilterChips';
 import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, INK, INK_FAINT, INK_MUTE, SLATE_600, SURFACE } from '@/features/courses/_shared/tokens';
+import { getPageScrollTop, scrollPageTo } from '@/lib/getScrollParent';
 
 type Top100SortOption = 'official' | 'user_rating';
 
@@ -155,10 +156,8 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
     if (savedScroll) {
       hasRestoredScroll.current = true;
       requestAnimationFrame(() => {
-        const rootEl = document.getElementById('root');
         const scrollTarget = parseInt(savedScroll);
-        if (rootEl) rootEl.scrollTop = scrollTarget;
-        window.scrollTo({ top: scrollTarget, behavior: 'instant' as ScrollBehavior });
+        scrollPageTo(scrollTarget, 'instant');
         sessionStorage.removeItem('top100-scroll');
       });
     }
@@ -166,8 +165,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
 
   // Save scroll position before navigating to a course detail
   const handleCourseClick = () => {
-    const rootEl = document.getElementById('root');
-    const scrollY = (rootEl && rootEl.scrollTop > 0) ? rootEl.scrollTop : window.scrollY;
+    const scrollY = getPageScrollTop();
     sessionStorage.setItem('top100-scroll', scrollY.toString());
   };
 

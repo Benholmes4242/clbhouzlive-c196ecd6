@@ -21,7 +21,7 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { isPerfEnabled } from '@/perf/navTiming';
 import { useClubhouseStore } from '@/store/clubhouseStore';
-import { getDocumentScrollParent } from '@/lib/getScrollParent';
+import { getPrimaryScrollElement } from '@/lib/getScrollParent';
 import { VideoEngine } from '@/video/VideoEngine';
 import { feedLaneRoles } from '@/video/feedLaneRoles';
 import { isPerfEnabled as _isPerfEnabledForRotate } from '@/perf/navTiming';
@@ -124,9 +124,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   useEffect(() => { postsRef.current = posts; }, [posts]);
 
   useEffect(() => {
-    // On this app, #root is the actual scroll container (see ScrollToTopGlass).
-    const root = document.getElementById('root');
-    setScrollParent(root ?? undefined);
+    setScrollParent(getPrimaryScrollElement());
   }, []);
 
 

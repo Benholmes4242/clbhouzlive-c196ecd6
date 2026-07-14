@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import type { LoopMode } from '@/components/loop-tab/types';
+import { scrollPageToTop } from '@/lib/getScrollParent';
 
 interface ChipDef {
   id: LoopMode;
@@ -49,7 +50,7 @@ function DiscoverFriendsShellRowInner({
               aria-selected={isActive}
               onClick={() => {
                 onModeChange(m.id);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                scrollPageToTop('smooth');
               }}
               className="shrink-0 transition-colors active:scale-[0.97] flex items-center"
               style={{

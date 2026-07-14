@@ -7,6 +7,7 @@ import { resolveUsernameToId } from '@/utils/username';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { scrollPageToTop } from '@/lib/getScrollParent';
 
 export const useNavigationHandlers = () => {
   const navigate = useNavigate();
@@ -53,7 +54,7 @@ export const useNavigationHandlers = () => {
           navigate(tab.path, { replace: true });
         }
         setTimeout(() => {
-          window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+          scrollPageToTop('smooth');
         }, 50);
       } else {
         // Tours tab: if already on a sub-route, navigate back to overview
@@ -64,7 +65,7 @@ export const useNavigationHandlers = () => {
         }
         // Only scroll to top when navigating to different pages, not when staying on profile or hub
         setTimeout(() => {
-          window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+          scrollPageToTop('smooth');
           // Clubhouse feed (CardFeed/Virtuoso) listens for this event to scroll to top.
           if (tab.id === 'clubhouse') {
             window.dispatchEvent(new CustomEvent('clbhouz-active-tab-retap', { detail: { tabId: 'clubhouse' } }));

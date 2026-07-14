@@ -6,6 +6,7 @@
  * and leave the body stuck `position: fixed` (which freezes the whole page).
  */
 import { scrollPositions } from '@/components/ScrollRestoration';
+import { getPageScrollTop, scrollPageTo } from '@/lib/getScrollParent';
 
 let lockCount = 0;
 let lockOwnerPath: string | null = null;
@@ -26,7 +27,7 @@ export function lockBodyScroll() {
   // scrollY so the final unlock can restore something sensible.
   const bodyIsFixed = document.body.style.position === 'fixed';
   if (lockCount === 0 || !bodyIsFixed) {
-    const scrollY = window.scrollY;
+    const scrollY = getPageScrollTop();
     saved = {
       overflow: document.body.style.overflow,
       position: document.body.style.position,
@@ -89,7 +90,7 @@ export function unlockBodyScroll() {
       : scrollY;
     saved = null;
     lockOwnerPath = null;
-    window.scrollTo(0, target);
+    scrollPageTo(target, 'auto');
   }
 }
 

@@ -2,6 +2,7 @@ import { memo, useState } from 'react';
 import { EXPLORE_MOODS, type ExploreMoodId } from '@/components/explore-tab-new/hooks/useExploreMood';
 import RegionSheet from '@/components/explore-tab-new/RegionSheet';
 import { useExploreRegionChips } from '@/components/explore-tab-new/hooks/useExploreRegionChips';
+import { scrollPageToTop } from '@/lib/getScrollParent';
 
 interface DiscoverExploreShellRowProps {
   activeMood: ExploreMoodId;
@@ -53,7 +54,7 @@ function DiscoverExploreShellRowInner({
               aria-selected={isActive}
               onClick={() => {
                 onMoodChange(m.id);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                scrollPageToTop('smooth');
               }}
               className="shrink-0 transition-colors active:scale-[0.97] flex items-center"
               style={{

@@ -40,6 +40,7 @@ import {
   T60,
   LINE_2,
 } from './rivalry-page/_shared/tokens';
+import { scrollElementIntoView } from '@/lib/getScrollParent';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -224,10 +225,7 @@ const RivalryPage: React.FC = () => {
   const handleCoursePick = (id: string) => {
     setCourseFilter(id);
     requestAnimationFrame(() => {
-      timelineRef.current?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
+      if (timelineRef.current) scrollElementIntoView(timelineRef.current, { behavior: 'smooth' });
     });
   };
 

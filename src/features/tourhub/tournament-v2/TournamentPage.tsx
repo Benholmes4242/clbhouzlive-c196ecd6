@@ -49,6 +49,7 @@ import { FullBoardSheet } from './sections/FullBoardSheet';
 import { useTeeTimesAll } from './data/useTeeTimesAll';
 import { useFieldTop3 } from './data/useFieldTop3';
 import { useTournamentStory } from './data/useTournamentStory';
+import { scrollElementIntoView } from '@/lib/getScrollParent';
 
 import {
   FONT, INK, INK_MUTE, INK_FAINT, SLATE_50, HAIRLINE_INK_8, INK_TINT_06, SURFACE,
@@ -110,12 +111,14 @@ export function TournamentPage() {
     if (!tab) return;
     if (tab === 'leaderboard') {
       requestAnimationFrame(() => {
-        document.getElementById('the-act')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const el = document.getElementById('the-act');
+        if (el) scrollElementIntoView(el, { behavior: 'smooth' });
       });
     } else if (tab === 'tee-times') {
       if (pulse.state === 'upcoming') {
         requestAnimationFrame(() => {
-          document.getElementById('the-act')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          const el = document.getElementById('the-act');
+          if (el) scrollElementIntoView(el, { behavior: 'smooth' });
         });
       } else if (teeGroups.length > 0) {
         setTeeTimesOpen(true);
