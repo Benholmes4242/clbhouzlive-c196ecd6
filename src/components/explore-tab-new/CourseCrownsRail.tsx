@@ -5,6 +5,8 @@ import { supabase } from '@/integrations/supabase/client';
 
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useRegionFeats, type FeatRow } from './hooks/useRegionFeats';
+import { DiscoverSectionHeader } from './DiscoverSectionHeader';
+import { SPACE } from '@/lib/spacing';
 import {
   SCOREBOARD_BG,
   GOLD,
@@ -13,6 +15,16 @@ import {
   INNER_RADIUS,
   CARD_RADIUS,
 } from './gamingLightTokens';
+
+const REGION_HUMAN: Record<string, string> = {
+  'uk-ireland': 'GB&I',
+  usa: 'USA',
+  'continental-europe': 'EUROPE',
+  'rest-of-world': 'REST OF WORLD',
+};
+function regionUpperFor(slug: string | null): string {
+  return slug ? REGION_HUMAN[slug] ?? 'REGION' : 'WORLDWIDE';
+}
 
 interface Regular {
   course_id: string;
