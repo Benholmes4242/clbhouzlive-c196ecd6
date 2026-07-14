@@ -334,8 +334,7 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
         }}
       >
         <Eyebrow />
-        {/* canonical amber cut-line */}
-        <div style={{ width: 34, height: 3, borderRadius: 99, background: '#F7931E', marginTop: 9 }} />
+        {/* amber cut-line removed app-wide per design directive */}
         <div
           style={{
             fontSize: 34,
