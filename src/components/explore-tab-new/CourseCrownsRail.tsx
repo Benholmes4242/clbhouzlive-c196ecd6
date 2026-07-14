@@ -261,6 +261,7 @@ interface Props {
 }
 
 export function CourseCrownsRail({ region }: Props) {
+  const navigate = useNavigate();
   const { data } = useRegionFeats(region, 'records');
   const rows = useMemo(() => (data ?? []).slice(0, 8), [data]);
   const courseIds = useMemo(
@@ -272,19 +273,28 @@ export function CourseCrownsRail({ region }: Props) {
   if (rows.length === 0) return null;
 
   return (
-    <div
-      className="flex overflow-x-auto scrollbar-hide"
-      style={{ padding: '0 16px', gap: 9 }}
-    >
-      {rows.map((row, i) => (
-        <CrownCard
-          key={`${row.course_id ?? i}-${i}`}
-          row={row}
-          regular={row.course_id ? regulars?.[row.course_id] : undefined}
-        />
-      ))}
-    </div>
+    <section style={{ marginTop: SPACE.sectionSection }}>
+      <DiscoverSectionHeader
+        eyebrow={`👑 Course Crowns · ${regionUpperFor(region)}`}
+        title="Two ways to own a course"
+        linkLabel="All"
+        onLinkClick={() => navigate('/courses')}
+      />
+      <div
+        className="flex overflow-x-auto scrollbar-hide"
+        style={{ padding: '0 16px', gap: 9 }}
+      >
+        {rows.map((row, i) => (
+          <CrownCard
+            key={`${row.course_id ?? i}-${i}`}
+            row={row}
+            regular={row.course_id ? regulars?.[row.course_id] : undefined}
+          />
+        ))}
+      </div>
+    </section>
   );
 }
+
 
 export default CourseCrownsRail;
