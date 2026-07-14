@@ -353,7 +353,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
   if (success) {
     return (
       <div style={{ position: 'fixed', inset: 0, background: '#F8FAFC', display: 'flex', flexDirection: 'column', zIndex: 12000 }}>
-        <PostSuccessV2 result={success} onDone={() => { setSuccess(null); onPosted?.(); }} />
+        <PostSuccessV2 result={success} onDone={() => { setSuccess(null); onPosted?.(); onClose(); }} />
       </div>
     );
   }

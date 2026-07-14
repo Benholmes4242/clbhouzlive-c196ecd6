@@ -1,11 +1,12 @@
 /**
- * SuccessScreenV2 — dark squircle tick + "Review posted" + the real card.
- * No confetti.
+ * SuccessScreenV2 - immersive amber-tinted overlay confirming a posted review.
+ * Uses ImmersiveSuccessShell (shared with PostSuccessV2) so tap-anywhere
+ * closes; review-specific actions live inside the stop-guarded island.
  */
 
 import React from 'react';
 import { Check, Share2, Eye, Home } from 'lucide-react';
-import { RV2 } from '../tokens';
+import { ImmersiveSuccessShell } from '@/features/post-v2/components/ImmersiveSuccessShell';
 import { LivePreviewCard } from './LivePreviewCard';
 import type { CategoryKey, MediaItem, ReviewV2Course } from '../types';
 import type { VerdictSlug } from '../tokens';
@@ -40,69 +41,48 @@ export function SuccessScreenV2({
   const subtitle = shareToFeed
     ? "Live on the course page and in your friends' feeds."
     : 'Live on the course page.';
-  return (
-    <div
-      style={{
-        position: 'fixed',
-        inset: 0,
-        background: RV2.canvas,
-        zIndex: 9999,
-        display: 'flex',
-        flexDirection: 'column',
-        overflowY: 'auto',
-      }}
-    >
-      <div style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 48px)' }} />
 
+  return (
+    <ImmersiveSuccessShell onClose={onDone}>
       <div
         style={{
+          width: 64,
+          height: 64,
+          borderRadius: 20,
+          background: 'rgba(255,255,255,0.06)',
+          border: '1px solid rgba(255,255,255,0.10)',
           display: 'flex',
-          flexDirection: 'column',
           alignItems: 'center',
-          padding: '16px 16px 12px',
-          gap: 12,
+          justifyContent: 'center',
         }}
       >
-        <div
-          style={{
-            width: 56,
-            height: 56,
-            borderRadius: 18,
-            background: RV2.dark,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 8px 22px -8px rgba(21,23,31,0.45)',
-          }}
-        >
-          <Check size={26} color="#F5F6F7" strokeWidth={3} />
-        </div>
-        <h1
-          style={{
-            margin: 0,
-            fontSize: 22,
-            fontWeight: 800,
-            color: RV2.ink,
-            letterSpacing: '-0.02em',
-          }}
-        >
-          Review posted
-        </h1>
-        <p
-          style={{
-            margin: 0,
-            fontSize: 13,
-            color: RV2.secondary,
-            textAlign: 'center',
-            lineHeight: 1.4,
-            maxWidth: 300,
-          }}
-        >
-          {subtitle}
-        </p>
+        <Check size={30} color="#F5F6F7" strokeWidth={2.75} />
       </div>
 
-      <div style={{ padding: '4px 16px 16px' }}>
+      <h1
+        style={{
+          margin: 0,
+          fontSize: 22,
+          fontWeight: 800,
+          letterSpacing: '-0.02em',
+          color: 'rgba(255,255,255,0.96)',
+        }}
+      >
+        Review posted
+      </h1>
+      <p
+        style={{
+          margin: 0,
+          fontSize: 13,
+          color: 'rgba(255,255,255,0.6)',
+          lineHeight: 1.45,
+          maxWidth: 300,
+        }}
+      >
+        {subtitle}
+      </p>
+
+      <div style={{ width: '100%', marginTop: 4 }}>
         <LivePreviewCard
           course={course}
           author={author}
@@ -114,16 +94,7 @@ export function SuccessScreenV2({
         />
       </div>
 
-      <div style={{ flex: 1 }} />
-
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 8,
-          padding: '12px 16px calc(env(safe-area-inset-bottom, 0px) + 16px)',
-        }}
-      >
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%', marginTop: 4 }}>
         <button
           type="button"
           onClick={onViewReview}
@@ -136,7 +107,7 @@ export function SuccessScreenV2({
             padding: 12,
             borderRadius: 12,
             border: 'none',
-            background: RV2.amber,
+            background: '#F7931E',
             color: '#FFFFFF',
             fontSize: 14.5,
             fontWeight: 700,
@@ -151,21 +122,7 @@ export function SuccessScreenV2({
           <button
             type="button"
             onClick={onShare}
-            style={{
-              flex: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 6,
-              padding: 12,
-              borderRadius: 12,
-              background: '#FFFFFF',
-              border: `1px solid ${RV2.hairline}`,
-              fontSize: 13,
-              fontWeight: 600,
-              color: RV2.ink,
-              cursor: 'pointer',
-            }}
+            style={ghostBtn}
           >
             <Share2 size={14} />
             Share
@@ -173,27 +130,29 @@ export function SuccessScreenV2({
           <button
             type="button"
             onClick={onDone}
-            style={{
-              flex: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 6,
-              padding: 12,
-              borderRadius: 12,
-              background: '#FFFFFF',
-              border: `1px solid ${RV2.hairline}`,
-              fontSize: 13,
-              fontWeight: 600,
-              color: RV2.secondary,
-              cursor: 'pointer',
-            }}
+            style={ghostBtn}
           >
             <Home size={14} />
             Done
           </button>
         </div>
       </div>
-    </div>
+    </ImmersiveSuccessShell>
   );
 }
+
+const ghostBtn: React.CSSProperties = {
+  flex: 1,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: 6,
+  padding: 12,
+  borderRadius: 12,
+  background: 'rgba(255,255,255,0.06)',
+  border: '1px solid rgba(255,255,255,0.14)',
+  fontSize: 13,
+  fontWeight: 600,
+  color: 'rgba(255,255,255,0.9)',
+  cursor: 'pointer',
+};
