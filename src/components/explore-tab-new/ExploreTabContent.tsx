@@ -103,10 +103,10 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
 
       {/* SCOPE 2 — spans the almanac + everything below; region chips sticky here */}
       <div>
+        {/* pre-chips spacer (chips must be a direct child of SCOPE 2 for sticky bounds) */}
+        <div style={{ height: SPACE.sectionSection }} aria-hidden />
         {/* 4. Region tabs (sticky within this scope) */}
-        <div style={{ marginTop: SPACE.sectionSection }}>
-          <AlmanacRegionTabs region={activeRegion} onRegionChange={handleRegionChange} />
-        </div>
+        <AlmanacRegionTabs region={activeRegion} onRegionChange={handleRegionChange} />
 
         {/* 5. Empty-region editorial card (only when all four tiers are empty) */}
         <AlmanacEmptyCard region={activeRegion} />
