@@ -80,6 +80,7 @@ export const CourseDetailShellTabs: React.FC<CourseDetailShellTabsProps> = ({
               }}
               className="active:opacity-70 transition-opacity"
               style={{
+                position: 'relative',
                 flex: '0 0 auto',
                 height: 44,
                 padding: '0 4px',
@@ -98,6 +99,21 @@ export const CourseDetailShellTabs: React.FC<CourseDetailShellTabsProps> = ({
               <span style={{ display: 'inline-block' }}>
                 {tab.label}
               </span>
+              {isActive ? (
+                <span
+                  aria-hidden
+                  style={{
+                    position: 'absolute',
+                    left: 4,
+                    right: 4,
+                    bottom: 4,
+                    height: 1.5,
+                    borderRadius: 2,
+                    background: '#15171F',
+                  }}
+                />
+              ) : null}
+
             </button>
           );
         })}
