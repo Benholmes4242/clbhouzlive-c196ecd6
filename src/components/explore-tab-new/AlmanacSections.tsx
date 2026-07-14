@@ -7,7 +7,7 @@ import { useRegionFeats, type FeatTier } from './hooks/useRegionFeats';
 import { useWallLevels } from '@/hooks/gam/useWallLevels';
 import { AMBER, INK, INK_TINT_06 } from '@/features/courses/_shared/tokens';
 import { TierSeeAllSheet } from './TierSeeAllSheet';
-import { UnderlineTabs } from '@/components/ui/UnderlineTabs';
+import { FilterChips } from '@/components/ui/FilterChips';
 import { SPACE } from '@/lib/spacing';
 
 const RAIL_CAP = 12;      // horizontal rails (default, compact)
