@@ -169,8 +169,3 @@ export const HoleFeatureCards: React.FC<Props> = ({ hardest, easiest }) => {
 };
 
 export default HoleFeatureCards;
-
-// Note: SharedHoleDistributionBar is imported above but the mini card uses a
-// diverging difficulty bar (mock spec), not the stacked distribution bar.
-// The import keeps the shared bar tree-shaken correctly.
-void SharedHoleDistributionBar;
