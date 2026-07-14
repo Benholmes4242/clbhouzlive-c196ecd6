@@ -433,6 +433,123 @@ export function CollegeHubPage() {
           </div>
         </div>
 
+        {/* Compare entry / pick-mode banner */}
+        {pickMode ? (
+          <div
+            style={{
+              padding: '10px 16px 12px',
+              background: 'rgba(247,147,30,0.06)',
+              borderBottom: `0.5px solid ${HAIRLINE_INK_10}`,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              fontFamily: FONT,
+            }}
+          >
+            <Swords size={14} color={AMBER} strokeWidth={2.4} />
+            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <div
+                style={{
+                  fontSize: 10,
+                  fontWeight: 800,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  color: AMBER,
+                }}
+              >
+                {pickC1 ? 'Pick one more school' : 'Pick two schools to compare'}
+              </div>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                {pickC1 && (
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 4,
+                      padding: '3px 8px',
+                      borderRadius: 999,
+                      background: SURFACE,
+                      border: `1px solid ${HAIRLINE_INK_10}`,
+                      fontSize: 11,
+                      fontWeight: 700,
+                      color: INK,
+                    }}
+                  >
+                    {nameForSlug[pickC1] ?? pickC1}
+                    <button
+                      type="button"
+                      aria-label="Remove school"
+                      onClick={() => setPickC1(null)}
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        padding: 0,
+                        display: 'inline-flex',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <X size={11} color={INK_MUTE} />
+                    </button>
+                  </span>
+                )}
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={exitPickMode}
+              style={{
+                fontFamily: FONT,
+                background: 'transparent',
+                border: 'none',
+                color: INK_MUTE,
+                fontSize: 11,
+                fontWeight: 800,
+                letterSpacing: '0.04em',
+                textTransform: 'uppercase',
+                cursor: 'pointer',
+                padding: '4px 6px',
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        ) : (
+          <div
+            style={{
+              padding: '8px 16px',
+              display: 'flex',
+              justifyContent: 'flex-end',
+              background: SURFACE,
+              borderBottom: `0.5px solid ${HAIRLINE_INK_10}`,
+            }}
+          >
+            <button
+              type="button"
+              onClick={enterPickMode}
+              style={{
+                fontFamily: FONT,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5,
+                height: 26,
+                padding: '0 10px',
+                borderRadius: 999,
+                border: `1px solid ${HAIRLINE_INK_10}`,
+                background: SURFACE,
+                color: INK,
+                fontSize: 10.5,
+                fontWeight: 800,
+                letterSpacing: '0.04em',
+                textTransform: 'uppercase',
+                cursor: 'pointer',
+              }}
+            >
+              <Swords size={12} color={AMBER} strokeWidth={2.4} />
+              Compare schools
+            </button>
+          </div>
+        )}
+
         {/* Feed */}
         <div style={{ background: SURFACE }}>
           {isLoading ? (
@@ -470,6 +587,8 @@ export function CollegeHubPage() {
                 key={s.normalizedName}
                 standing={s}
                 liveCount={liveByCollege[s.normalizedName] ?? 0}
+                onSelect={pickMode ? handleSelectForCompare : undefined}
+                selected={pickMode && pickC1 === s.normalizedName}
               />
             ))
           )}
