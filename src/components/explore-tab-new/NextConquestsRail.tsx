@@ -78,6 +78,23 @@ function ConquestCard({ row }: { row: TitleInReach }) {
     >
       <div
         style={{
+          fontSize: 12,
+          fontWeight: 700,
+          letterSpacing: '-0.01em',
+          color: '#fff',
+          lineHeight: 1.25,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical',
+        }}
+      >
+        {row.course_name}
+      </div>
+      <div
+        style={{
+          marginTop: 3,
           fontSize: 9.5,
           fontWeight: 800,
           letterSpacing: '0.12em',
@@ -89,7 +106,7 @@ function ConquestCard({ row }: { row: TitleInReach }) {
           whiteSpace: 'nowrap',
         }}
       >
-        {categoryLabel(row.category)} · {row.course_name}
+        {categoryLabel(row.category)}
       </div>
       <div
         style={{
