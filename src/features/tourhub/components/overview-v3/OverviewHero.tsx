@@ -47,21 +47,7 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const count = slides.length;
 
-  const { selectedTourSlug, selectedTournamentId, selectionNonce, setViewingTourSlug, setViewingTournamentId } = useTourSelection();
-
-  useEffect(() => {
-    if (!selectedTourSlug || count === 0) return;
-    // Prefer exact tournament match (multi-event tours), fall back to first slide for tour.
-    let idx = -1;
-    if (selectedTournamentId) {
-      idx = slides.findIndex((s) => s.tournament.id === selectedTournamentId);
-    }
-    if (idx < 0) {
-      idx = slides.findIndex((s) => s.tournament.tourSlug === selectedTourSlug);
-    }
-    if (idx >= 0) setActiveIndex(idx);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectionNonce]);
+  const { setViewingTourSlug, setViewingTournamentId } = useTourSelection();
 
   const touchStartRef = useRef(0);
   const touchDeltaRef = useRef(0);
