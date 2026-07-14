@@ -101,6 +101,9 @@ export function PlayersTab() {
 
   // ── Data
   const { data: ranking, isLoading: rankingLoading } = usePlayersRanking(activeTour);
+  useEffect(() => {
+    console.log('[PlayersTab] activeTour=', activeTour, 'rows.length=', ranking?.rows.length, 'first=', ranking?.rows[0]?.name, 'tourCodes=', ranking?.rows.slice(0, 5).map(r => r.tourCode));
+  }, [activeTour, ranking?.rows]);
   const { data: liveMap } = useLivePlayerIds();
   const { data: liveTournaments } = useLiveTournaments();
 
