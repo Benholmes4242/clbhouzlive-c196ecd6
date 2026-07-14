@@ -85,7 +85,7 @@ export const CourseDetailShellTabs: React.FC<CourseDetailShellTabsProps> = ({
                 padding: '0 4px',
                 fontSize: 14,
                 fontWeight: isActive ? 700 : 600,
-                color: isActive ? '#0A0E14' : '#64748B',
+                color: isActive ? INK : INK_MUTE,
                 background: 'transparent',
                 border: 'none',
                 letterSpacing: '-0.005em',
