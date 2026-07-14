@@ -69,8 +69,6 @@ export function TrophyRoomSpine({ items, userId }: Props) {
   const achievements = items.filter(
     (i): i is Extract<TrophyItem, { kind: 'achievement' }> => i.kind === 'achievement',
   );
-    (i): i is Extract<TrophyItem, { kind: 'achievement' }> => i.kind === 'achievement',
-  );
   const owned = medalsOwned(items);
   const level = levelForMedals(owned);
   const next = nextLevelForMedals(owned);
