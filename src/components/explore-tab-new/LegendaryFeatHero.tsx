@@ -321,7 +321,6 @@ export function LegendaryFeatHero({ region, onRowTap }: Props) {
           >
             <HeroCard
               row={row}
-              isSolo={isSolo}
               showPager={!isSolo}
               indexLabel={indexLabels[i]}
               onTap={() => onRowTap?.(row)}
