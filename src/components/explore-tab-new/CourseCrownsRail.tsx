@@ -54,6 +54,19 @@ function CrownCard({ row, opener }: { row: FeatRow; opener?: ScorecardOpener }) 
   const club = (row.holder_club ?? '').trim();
   const avatarSrc = row.holder_avatar ?? null;
 
+  const numericValue =
+    typeof row.value === 'number'
+      ? row.value
+      : typeof row.value === 'string' && row.value.trim() !== '' && !isNaN(Number(row.value))
+      ? Number(row.value)
+      : null;
+  const showDelta =
+    !isStableford && row.course_par != null && numericValue != null;
+  const delta = showDelta ? numericValue! - (row.course_par as number) : 0;
+  const deltaLabel =
+    delta === 0 ? 'E' : delta < 0 ? `-${Math.abs(delta)}` : `+${delta}`;
+  const deltaColor = delta < 0 ? '#D2222D' : '#FFFFFF';
+
   return (
     <button
       type="button"
@@ -123,6 +136,20 @@ function CrownCard({ row, opener }: { row: FeatRow; opener?: ScorecardOpener }) 
         >
           {scoreValue}
         </div>
+        {showDelta ? (
+          <div
+            style={{
+              fontSize: 21,
+              fontWeight: 800,
+              color: deltaColor,
+              lineHeight: 1,
+              letterSpacing: '-0.02em',
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            {deltaLabel}
+          </div>
+        ) : null}
         <div
           style={{
             fontSize: 11,
