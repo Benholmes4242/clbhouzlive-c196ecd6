@@ -20,3 +20,78 @@ export function getDocumentScrollParent(): HTMLElement | undefined {
   if (document.body instanceof HTMLElement) return document.body;
   return undefined;
 }
+
+export type ScrollBehaviorLike = ScrollBehavior | 'instant';
+
+function isScrollableY(element: HTMLElement): boolean {
+  const { overflowY } = window.getComputedStyle(element);
+  const canScroll = overflowY === 'auto' || overflowY === 'scroll' || overflowY === 'overlay';
+  return canScroll && element.scrollHeight > element.clientHeight;
+}
+
+/**
+ * Resolve the real vertical scroll owner for a rendered element by walking up
+ * from that element. This avoids assuming that document/window owns page scroll.
+ */
+export function getScrollAncestor(element: Element | null): HTMLElement | undefined {
+  if (typeof document === 'undefined' || typeof window === 'undefined') return undefined;
+
+  let current = element?.parentElement ?? null;
+  while (current) {
+    if (isScrollableY(current)) return current;
+    current = current.parentElement;
+  }
+
+  return getDocumentScrollParent();
+}
+
+/**
+ * Resolve the primary page scroller when there is no target element to anchor
+ * from. Prefer the first real scrollable element in DOM order, then fall back
+ * to document.scrollingElement.
+ */
+export function getPrimaryScrollElement(): HTMLElement | undefined {
+  if (typeof document === 'undefined' || typeof window === 'undefined') return undefined;
+
+  const root = document.body ?? document.documentElement;
+  const candidates: HTMLElement[] = [];
+  if (document.documentElement) candidates.push(document.documentElement);
+  if (document.body) candidates.push(document.body);
+  candidates.push(...Array.from(root.querySelectorAll<HTMLElement>('*')));
+
+  return candidates.find(isScrollableY) ?? getDocumentScrollParent();
+}
+
+export function getPageScrollTop(): number {
+  const scroller = getPrimaryScrollElement();
+  return scroller?.scrollTop ?? window.scrollY ?? 0;
+}
+
+export function scrollPageToTop(behavior: ScrollBehaviorLike = 'auto') {
+  const scroller = getPrimaryScrollElement();
+  scroller?.scrollTo({ top: 0, left: 0, behavior: behavior as ScrollBehavior });
+}
+
+export function scrollPageTo(top: number, behavior: ScrollBehaviorLike = 'auto') {
+  const scroller = getPrimaryScrollElement();
+  scroller?.scrollTo({ top: Math.max(0, top), left: 0, behavior: behavior as ScrollBehavior });
+}
+
+export function scrollElementIntoView(
+  element: Element,
+  options: { offset?: number; behavior?: ScrollBehaviorLike } = {},
+) {
+  const scroller = getScrollAncestor(element);
+  if (!scroller) return;
+
+  const offset = options.offset ?? 0;
+  const rowRect = element.getBoundingClientRect();
+  const scrollerRect = scroller.getBoundingClientRect();
+  const targetTop = scroller.scrollTop + rowRect.top - scrollerRect.top - offset;
+
+  scroller.scrollTo({
+    top: Math.max(0, targetTop),
+    left: 0,
+    behavior: (options.behavior ?? 'auto') as ScrollBehavior,
+  });
+}

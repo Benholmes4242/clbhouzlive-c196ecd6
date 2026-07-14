@@ -14,6 +14,7 @@ import { useTournamentsCache } from '@/hooks/useTournamentsCache';
 import { useNavTheme } from '@/hooks/useNavTheme';
 import { useNavScrollState, pushForceExpand, resetToExpanded } from '@/hooks/useScrollDirection';
 import { cn } from '@/lib/utils';
+import { scrollPageToTop } from '@/lib/getScrollParent';
 import CreateSheetV2 from '@/features/post-v2/components/CreateSheetV2';
 
 // ---- Public token: total vertical space to reserve at the bottom of any
@@ -194,7 +195,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
       return;
     }
     if (tab.path && location.pathname === tab.path) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      scrollPageToTop('smooth');
       window.dispatchEvent(new CustomEvent('clbhouz-active-tab-retap', { detail: { tabId: tab.id } }));
       return;
     }

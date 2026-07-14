@@ -17,6 +17,7 @@ import { TourIslandLeft } from '../components/TourIslandLeft';
 import { TourPickerSheet, useTourShortLabel } from '../components/TourPickerSheet';
 import { useSetChromeLeftSlot } from '@/features/chrome-v2/leftOverride';
 import { GlassHeaderPlate } from '@/components/chrome/GlassHeaderPlate';
+import { scrollPageToTop } from '@/lib/getScrollParent';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection, useHandicapTrend } from '@/lib/whs/hooks';
@@ -112,7 +113,7 @@ export function TourHubMainPage() {
 
     if (tabParam && tabParam !== activeTab) {
       setActiveTab(tabParam);
-      window.scrollTo(0, 0);
+      scrollPageToTop('auto');
     }
   }, [tabParam]);
 
@@ -128,7 +129,7 @@ export function TourHubMainPage() {
       if ((e as CustomEvent).detail?.tabId !== 'tourhub') return;
       setActiveTab('overview');
       setSearchParams({}, { replace: true });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      scrollPageToTop('smooth');
     };
     window.addEventListener('clbhouz-active-tab-retap', onRetap);
     return () => window.removeEventListener('clbhouz-active-tab-retap', onRetap);
@@ -174,7 +175,7 @@ export function TourHubMainPage() {
     const tab = id as TourHubTab;
     setActiveTab(tab);
     setSearchParams({ tab: id }, { replace: true });
-    window.scrollTo(0, 0);
+    scrollPageToTop('auto');
   };
 
   return (

@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigationType } from 'react-router-dom';
+import { scrollPageToTop } from '@/lib/getScrollParent';
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -10,9 +11,7 @@ const ScrollToTop = () => {
     // Skip on POP (back/forward) so ScrollRestoration can restore position
     // Skip on REPLACE as well (tab changes, redirects)
     if (navigationType === 'PUSH') {
-      window.scrollTo(0, 0);
-      document.body.scrollTop = 0;
-      document.documentElement.scrollTop = 0;
+      scrollPageToTop('auto');
     }
   }, [pathname, navigationType]);
 

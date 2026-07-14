@@ -23,6 +23,7 @@ import {
 import { AppSelect, AppSelectOption } from '@/components/ui/AppSelect';
 import { EXPLORE_PAGE_SIZE } from '@/config/pagination';
 import { HAIRLINE_INK_10, INK, INK_MUTE, SLATE_50, SURFACE } from '@/features/courses/_shared/tokens';
+import { getPageScrollTop, getPrimaryScrollElement, scrollPageTo } from '@/lib/getScrollParent';
 
 type SortOption = 'official_rating' | 'community_rating' | 'recently_added' | 'name_asc' | 'name_desc';
 
@@ -296,31 +297,10 @@ const CourseExplorer = () => {
   // On engines where #root is the scroller, window.scrollY stays at 0,
   // so we resolve the actual scroll element first and fall back to window.
   useEffect(() => {
-    const resolveScroller = (): HTMLElement | Window => {
-      const root = document.getElementById('root');
-      if (root) {
-        const style = window.getComputedStyle(root);
-        if ((style.overflowY === 'scroll' || style.overflowY === 'auto') && root.scrollHeight > root.clientHeight) {
-          return root;
-        }
-      }
-      // Walk ancestors for any other auto/scroll container — matches VCL fallback
-      let element: HTMLElement | null = document.body;
-      while (element) {
-        const style = window.getComputedStyle(element);
-        const hasScroll = style.overflowY === 'scroll' || style.overflowY === 'auto';
-        if (hasScroll && element.scrollHeight > element.clientHeight) return element;
-        element = element.parentElement;
-      }
-      return window;
-    };
-
-    const scroller = resolveScroller();
+    const scroller = getPrimaryScrollElement();
+    if (!scroller) return;
     const onScroll = () => {
-      const y = scroller instanceof Window
-        ? (window.scrollY || document.documentElement.scrollTop || 0)
-        : (scroller as HTMLElement).scrollTop;
-      setIsScrolled(y > 8);
+      setIsScrolled(scroller.scrollTop > 8);
     };
     scroller.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
@@ -402,9 +382,7 @@ const CourseExplorer = () => {
       hasRestoredScroll.current = true;
       requestAnimationFrame(() => {
         const scrollTarget = parseInt(savedScroll);
-        const rootEl = document.getElementById('root');
-        if (rootEl) rootEl.scrollTop = scrollTarget;
-        window.scrollTo({ top: scrollTarget, behavior: 'instant' as ScrollBehavior });
+        scrollPageTo(scrollTarget, 'instant');
         sessionStorage.removeItem('explore-scroll');
       });
     }
@@ -456,8 +434,7 @@ const CourseExplorer = () => {
 
   // Capture scroll position when clicking a course card
   const handleCourseClick = () => {
-    const rootEl = document.getElementById('root');
-    const scrollY = (rootEl && rootEl.scrollTop > 0) ? rootEl.scrollTop : window.scrollY;
+    const scrollY = getPageScrollTop();
     sessionStorage.setItem('explore-scroll', scrollY.toString());
   };
 

@@ -23,6 +23,7 @@ import { TournamentsSection } from './sections/TournamentsSection';
 import { AboutSection } from './sections/AboutSection';
 import { PlayerSkeleton } from './sections/PlayerSkeleton';
 import { SLATE_50 } from '../_shared/tokens';
+import { scrollPageToTop } from '@/lib/getScrollParent';
 
 export function PlayerPage() {
   const { playerId } = useParams<{ playerId: string }>();
@@ -34,7 +35,7 @@ export function PlayerPage() {
 
   // Scroll-to-top on player switch (ported from PlayerProfilePage).
   useEffect(() => {
-    window.scrollTo(0, 0);
+    scrollPageToTop('auto');
   }, [playerId]);
 
   if (playerLoading) {

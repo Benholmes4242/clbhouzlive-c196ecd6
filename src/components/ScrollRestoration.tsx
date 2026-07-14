@@ -5,6 +5,7 @@
 
 import { useEffect } from 'react';
 import { useLocation, useNavigationType } from 'react-router-dom';
+import { getPageScrollTop, getPrimaryScrollElement, scrollPageTo, scrollPageToTop } from '@/lib/getScrollParent';
 
 export const scrollPositions = new Map<string, number>();
 
@@ -19,7 +20,7 @@ export const ScrollRestoration = () => {
     return () => {
       if (!isCourseDetail) {
         const currentPath = location.pathname + location.search;
-        scrollPositions.set(currentPath, window.scrollY);
+        scrollPositions.set(currentPath, getPageScrollTop());
       }
     };
   }, [location]);
@@ -36,11 +37,12 @@ export const ScrollRestoration = () => {
       const savedPosition = scrollPositions.get(currentPath);
       if (savedPosition !== undefined) {
         const timeoutId = setTimeout(() => {
-          if (document.body.scrollHeight > savedPosition) {
-            window.scrollTo({ top: savedPosition, behavior: 'instant' });
+          const pageHeight = getPrimaryScrollElement()?.scrollHeight ?? Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+          if (pageHeight > savedPosition) {
+            scrollPageTo(savedPosition, 'instant');
           } else {
             requestAnimationFrame(() => {
-              window.scrollTo({ top: savedPosition, behavior: 'instant' });
+              scrollPageTo(savedPosition, 'instant');
             });
           }
         }, 100);
@@ -49,7 +51,7 @@ export const ScrollRestoration = () => {
     } else {
       // PUSH or REPLACE — clear stale position and scroll to top
       scrollPositions.delete(currentPath);
-      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      scrollPageToTop('instant');
     }
   }, [location, navigationType]);
 

@@ -14,6 +14,7 @@ import {
 import { LegendaryFeatHero } from './LegendaryFeatHero';
 import { useRegionFeats, type FeatRow } from './hooks/useRegionFeats';
 import { TierSeeAllSheet } from './TierSeeAllSheet';
+import { scrollPageToTop } from '@/lib/getScrollParent';
 
 import { SeasonStrip } from './SeasonStrip';
 import { RankIdentityCard } from './RankIdentityCard';
@@ -67,7 +68,7 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
   const handleRegionChange = useCallback(
     (slug: string | null) => {
       setRegion(slug);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      scrollPageToTop('smooth');
     },
     [setRegion],
   );

@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronUp } from 'lucide-react';
+import { getPrimaryScrollElement, scrollPageToTop } from '@/lib/getScrollParent';
 
 const ScrollToTopGlass = () => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    // On this app, #root is the scroll container. Fall back to window only
-    // if #root isn't present (defensive — shouldn't happen at runtime).
-    const target: HTMLElement | Window = document.getElementById('root') ?? window;
+    const target = getPrimaryScrollElement();
+    if (!target) return;
     let ticking = false;
 
     const computeVisible = () => {
@@ -17,9 +17,7 @@ const ScrollToTopGlass = () => {
         setVisible(false);
         return;
       }
-      const scrollTop =
-        target instanceof Window ? window.scrollY : (target as HTMLElement).scrollTop;
-      setVisible(scrollTop > 400);
+      setVisible(target.scrollTop > 400);
     };
 
     const onScroll = () => {
@@ -47,12 +45,7 @@ const ScrollToTopGlass = () => {
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const rootEl = document.getElementById('root');
-    if (rootEl && rootEl.scrollTop > 0) {
-      rootEl.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-    } else {
-      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-    }
+    scrollPageToTop('smooth');
   };
 
   return createPortal(

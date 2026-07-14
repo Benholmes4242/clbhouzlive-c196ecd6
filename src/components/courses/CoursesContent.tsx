@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import GlassHeaderPlate from '@/components/chrome/GlassHeaderPlate';
+import { scrollPageToTop } from '@/lib/getScrollParent';
 
 import CoursesErrorBoundary from './CoursesErrorBoundary';
 import { Search, X, Star, ChevronRight } from 'lucide-react';
@@ -216,10 +217,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
 
   // Scroll to top on mount — prevents page opening halfway down from previous visit
   useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
-    document.getElementById('root')?.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
+    scrollPageToTop('instant');
   }, []);
 
   const handleTabChange = (value: string) => {
@@ -243,7 +241,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
       params.delete('tab');
       setSearchParams(params, { replace: true });
       setActiveTab('discover');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      scrollPageToTop('smooth');
     };
     window.addEventListener('clbhouz-active-tab-retap', onRetap);
     return () => window.removeEventListener('clbhouz-active-tab-retap', onRetap);
