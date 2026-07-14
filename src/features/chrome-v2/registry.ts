@@ -258,6 +258,10 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   },
 
   // Tour Hub top-level (logo + editorial geometry; cinematic overlay on overview).
+  // Overview tab keeps fixed islands over the cinematic hero; every other tab
+  // gets scrollAway islands (chips lock at the notch on scroll).
+  { match: { test: (p, s) => (p === '/tourhub' || p === '/tour') && (s.get('tab') ?? 'overview') === 'overview' },
+    spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'light', bleed: true, note: EDITORIAL_NOTE } },
   { match: { exact: '/tourhub' },                 spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'light', bleed: true,  scrollAway: true, note: EDITORIAL_NOTE } },
   { match: { exact: '/tour' },                    spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'light', bleed: true,  scrollAway: true, note: EDITORIAL_NOTE } },
   // Remaining /tourhub/* sub-tabs and /tour/* aliases (not deep) — page owns
