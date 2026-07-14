@@ -219,6 +219,14 @@ export function TrophyRoomSpine({ items, userId }: Props) {
           );
         })}
       </div>
+
+      <LadderSheet
+        open={ladderOpen}
+        onClose={() => setLadderOpen(false)}
+        owned={owned}
+        items={items}
+        userId={userId ?? null}
+      />
     </div>
   );
 }
