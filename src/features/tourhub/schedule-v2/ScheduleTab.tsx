@@ -173,7 +173,8 @@ export function ScheduleTab() {
         minHeight: '100vh',
         fontFamily: FONT,
         position: 'relative',
-        // Rest position of chips row == stuck position (zero-travel).
+        // Islands overlay the top band at rest; on scroll they ride away and
+        // the chips row locks at the notch.
         paddingTop: 'calc(var(--sat, 0px) + 69px)',
       }}
     >
