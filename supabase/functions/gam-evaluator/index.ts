@@ -1441,6 +1441,8 @@ const URGENCY: Record<string, string> = {
   rival_played: "medium",
   status_at_risk: "high",
   status_reclaimed: "medium",
+  level_up: "medium",
+  level_near: "low",
 };
 
 function dedupKey(type: string, userId: string, payload: any): string {
