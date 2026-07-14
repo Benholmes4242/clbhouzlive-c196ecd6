@@ -152,17 +152,17 @@ export function CircleActivityStrip({ userId }: Props) {
           <CircleActivityCard
             key={`${r.score_id}-${i}`}
             row={r}
-            onTap={() => setSheet({ scoreId: r.score_id, connectionId: r.connection_id })}
+            onTap={() => openByScore(r.score_id, r.connection_id, r.friend_user_id)}
           />
         ))}
       </div>
 
       <RoundDetailSheet
-        open={!!sheet}
-        onClose={() => setSheet(null)}
-        scoreId={sheet?.scoreId ?? null}
-        connectionId={sheet?.connectionId ?? null}
-        variant="light"
+        open={!!target}
+        onClose={close}
+        scoreId={target?.scoreId ?? null}
+        connectionId={target?.connectionId ?? null}
+        profileUserId={target?.profileUserId ?? null}
       />
     </section>
   );
