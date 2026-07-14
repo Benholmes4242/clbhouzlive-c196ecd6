@@ -4747,3 +4747,17 @@ em-emoji-picker input:focus {
   -webkit-text-fill-color: #F7931E !important;
   font-weight: 400 !important;
 }
+
+/* Rank Identity aurora blobs -- slow drifting mesh gradient */
+@keyframes rankAuroraFlow {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33%      { transform: translate(-8%, 6%) rotate(8deg); }
+  66%      { transform: translate(6%, -4%) rotate(-6deg); }
+}
+.rank-aurora-blob {
+  animation: rankAuroraFlow 12s ease-in-out infinite;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rank-aurora-blob { animation: none; }
+}
