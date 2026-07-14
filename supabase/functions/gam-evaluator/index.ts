@@ -1479,3 +1479,110 @@ async function enqueueNotification(userId: string, type: string, payload: any) {
     console.warn("[enqueueNotification]", type, (e as Error).message);
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Ascent -- wall level up / near-miss detection.
+//
+// MUST match trophy-room levels.ts WALL_LEVELS. Any change to the client
+// ladder needs the equivalent edit here and a fresh evaluator deploy.
+// ─────────────────────────────────────────────────────────────────────────────
+interface WallLevelDef { level: number; medalsRequired: number; label: string; }
+const WALL_LEVELS_DEF: WallLevelDef[] = [
+  { level: 1,  medalsRequired: 1,  label: "Bronze I"        },
+  { level: 2,  medalsRequired: 4,  label: "Bronze II"       },
+  { level: 3,  medalsRequired: 8,  label: "Silver I"        },
+  { level: 4,  medalsRequired: 13, label: "Silver II"       },
+  { level: 5,  medalsRequired: 19, label: "Emerald I"       },
+  { level: 6,  medalsRequired: 26, label: "Emerald II"      },
+  { level: 7,  medalsRequired: 33, label: "Diamond I"       },
+  { level: 8,  medalsRequired: 40, label: "Diamond II"      },
+  { level: 9,  medalsRequired: 47, label: "Obsidian I"      },
+  { level: 10, medalsRequired: 55, label: "Clubhouse Legend"},
+];
+
+function levelForMedalsSrv(medals: number): WallLevelDef | null {
+  let cur: WallLevelDef | null = null;
+  for (const l of WALL_LEVELS_DEF) {
+    if (medals >= l.medalsRequired) cur = l;
+    else break;
+  }
+  return cur;
+}
+
+function nextLevelForMedalsSrv(medals: number): WallLevelDef | null {
+  return WALL_LEVELS_DEF.find((l) => l.medalsRequired > medals) ?? null;
+}
+
+async function evaluateLevelTransition(userId: string, whsScoreId: string) {
+  // 1. live medal count via RPC
+  const { data: medalsData, error: medalsErr } = await supabase.rpc(
+    "get_user_medal_count",
+    { p_user_id: userId },
+  );
+  if (medalsErr) throw new Error(`get_user_medal_count: ${medalsErr.message}`);
+  const medals = typeof medalsData === "number" ? medalsData : 0;
+
+  const current = levelForMedalsSrv(medals);
+
+  // 2. latest recorded level (any kind) for this user
+  const { data: lastRow } = await supabase
+    .from("gam_user_level_events")
+    .select("level,kind")
+    .eq("user_id", userId)
+    .eq("kind", "up")
+    .order("level", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const lastLevel = lastRow?.level ?? 0;
+
+  // 3. level-up path
+  if (current && current.level > lastLevel) {
+    const { error: insErr } = await supabase.from("gam_user_level_events").insert({
+      user_id: userId,
+      kind: "up",
+      level: current.level,
+      label: current.label,
+      medals,
+    });
+    if (insErr) {
+      console.warn("[level_eval up insert]", insErr.message);
+    } else {
+      await enqueueNotification(userId, "level_up", {
+        level: current.level,
+        label: current.label,
+        medals,
+        whs_score_id: whsScoreId,
+      });
+    }
+    return;
+  }
+
+  // 4. near-miss path: within 2 medals of the next threshold
+  const next = nextLevelForMedalsSrv(medals);
+  if (!next) return;
+  const gap = next.medalsRequired - medals;
+  if (gap > 2 || gap <= 0) return;
+
+  // dedupe via unique (user_id, level) partial index where kind='near'
+  const { error: nearErr } = await supabase.from("gam_user_level_events").insert({
+    user_id: userId,
+    kind: "near",
+    level: next.level,
+    label: next.label,
+    medals,
+  });
+  if (nearErr) {
+    // unique-violation is expected on repeat rounds at the same gap
+    if (!/duplicate|unique/i.test(nearErr.message)) {
+      console.warn("[level_eval near insert]", nearErr.message);
+    }
+    return;
+  }
+  await enqueueNotification(userId, "level_near", {
+    level: next.level,
+    label: next.label,
+    medals,
+    gap,
+    whs_score_id: whsScoreId,
+  });
+}
