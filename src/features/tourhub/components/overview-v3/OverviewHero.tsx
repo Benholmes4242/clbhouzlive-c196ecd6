@@ -2,8 +2,9 @@
  * OverviewHero — self-contained hero for the Tour Hub Overview tab.
  * All states (live / results / upcoming / cancelled) route through HybridHero,
  * which derives the visual state internally via deriveHeroState and renders
- * the unified CinematicFrame capsule. Random landing, fixed (no auto-rotate),
- * swipe + dots, tour-switcher tap-jump.
+ * the unified CinematicFrame capsule. Filter mode: the tour picker locks the
+ * carousel to a single tour's slides (never drifts across tours). Default
+ * selection is 'pga' so the hero opens on PGA. Swipe + dots, tap-jump.
  *
  * ALL hooks run unconditionally before any early return (React #310 safety).
  */
@@ -33,28 +34,51 @@ interface OverviewHeroProps {
 export function OverviewHero({ height = 528 }: OverviewHeroProps) {
   const { data: rawSlides = [], isLoading } = useHeroCarouselData();
 
+  const { selectedTourSlug, selectedTournamentId, selectionNonce, setViewingTourSlug, setViewingTournamentId } = useTourSelection();
+
+  // Filter mode: carousel is scoped to the selected tour's slides only. If the
+  // picker has no selection yet (null), fall back to all raw slides so the
+  // hero has something to paint during the initial paint.
+  const filteredSlides = useMemo<HeroSlide[]>(() => {
+    if (!Array.isArray(rawSlides) || rawSlides.length === 0) return [];
+    if (!selectedTourSlug) return rawSlides;
+    return rawSlides.filter((s) => s.tournament.tourSlug === selectedTourSlug);
+  }, [rawSlides, selectedTourSlug]);
+
   const idSignature = useMemo(
-    () => (Array.isArray(rawSlides) ? rawSlides.map((s) => s.tournament.id).join('|') : ''),
-    [rawSlides],
+    () => filteredSlides.map((s) => s.tournament.id).join('|'),
+    [filteredSlides],
   );
 
   const slides = useMemo<HeroSlide[]>(() => {
-    if (!Array.isArray(rawSlides) || rawSlides.length === 0) return [];
-    return shuffle(rawSlides);
+    if (filteredSlides.length === 0) return [];
+    return shuffle(filteredSlides);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idSignature]);
 
   const [activeIndex, setActiveIndex] = useState(0);
   const count = slides.length;
 
-  const { setViewingTourSlug, setViewingTournamentId } = useTourSelection();
-
-  const touchStartRef = useRef(0);
-  const touchDeltaRef = useRef(0);
-
+  // Reset to 0 whenever the filtered set changes (e.g. tour switch).
   useEffect(() => {
     setActiveIndex(0);
   }, [idSignature]);
+
+  // Command jump: on every selectTour call (selectionNonce bump), jump to the
+  // exact tournament if provided, otherwise the first slide of the tour.
+  useEffect(() => {
+    if (count === 0) return;
+    let idx = -1;
+    if (selectedTournamentId) {
+      idx = slides.findIndex((s) => s.tournament.id === selectedTournamentId);
+    }
+    if (idx < 0) idx = 0;
+    setActiveIndex(idx);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectionNonce]);
+
+  const touchStartRef = useRef(0);
+  const touchDeltaRef = useRef(0);
 
   const activeSlide = count > 0 ? slides[Math.min(activeIndex, count - 1)] : undefined;
   const viewingSlug = activeSlide?.tournament.tourSlug;
