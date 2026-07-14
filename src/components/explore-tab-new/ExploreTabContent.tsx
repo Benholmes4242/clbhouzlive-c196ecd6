@@ -21,34 +21,23 @@ import { CourseCrownsRail } from './CourseCrownsRail';
 import { NextConquestsRail } from './NextConquestsRail';
 import { ToughestCoursesRail } from './ToughestCoursesRail';
 import { DiscoverSectionHeader } from './DiscoverSectionHeader';
+import { AlmanacEmptyCard } from './AlmanacEmptyCard';
 
 import ExploreGrid from './ExploreGrid';
 
 import { SLATE_50 } from '@/features/courses/_shared/tokens';
 import { SPACE } from '@/lib/spacing';
-import { useNavigate } from 'react-router-dom';
 
 interface ExploreTabContentProps {
   embedded?: boolean;
 }
 
-const REGION_HUMAN: Record<string, string> = {
-  worldwide: 'Worldwide',
-  'uk-ireland': 'GB&I',
-  usa: 'USA',
-  'continental-europe': 'Europe',
-  'rest-of-world': 'Rest of World',
-};
 
-function regionLabel(slug: string | null): string {
-  return slug ? REGION_HUMAN[slug] ?? 'Region' : REGION_HUMAN.worldwide;
-}
 
 export default function ExploreTabContent({ embedded: _embedded = false }: ExploreTabContentProps) {
   const { user } = useSupabaseSession();
   const userId = user?.id;
   const gridRef = useRef<HTMLDivElement | null>(null);
-  const navigate = useNavigate();
 
   const { region: activeRegion, setRegion } = useExploreRegion();
 
@@ -80,7 +69,7 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
     [setRegion],
   );
 
-  const regionUpper = regionLabel(activeRegion).toUpperCase();
+  const regionUpper = feedRegionLabel.toUpperCase();
 
   return (
     <div style={{ background: SLATE_50, minHeight: '100vh' }}>
@@ -101,30 +90,19 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
         <AlmanacRegionTabs region={activeRegion} onRegionChange={handleRegionChange} />
       </div>
 
-      {/* 5. Legendary hero (aces & albatrosses) */}
+      {/* 5. Empty-region editorial card (only when all four tiers are empty) */}
+      <AlmanacEmptyCard region={activeRegion} />
+
+      {/* 6. Legendary hero (aces & albatrosses) */}
       <LegendarySection region={activeRegion} />
 
-      {/* 6. Course Crowns */}
-      <div style={{ marginTop: SPACE.sectionSection }}>
-        <DiscoverSectionHeader
-          eyebrow={`👑 Course Crowns · ${regionUpper}`}
-          title="Two ways to own a course"
-          linkLabel="All"
-          onLinkClick={() => navigate('/courses')}
-        />
-        <CourseCrownsRail region={activeRegion} />
-      </div>
+      {/* 7. Course Crowns -- self-hiding, owns its header */}
+      <CourseCrownsRail region={activeRegion} />
 
-      {/* 7. Next Conquests (silent when signed out / no WHS / no titles) */}
-      <div style={{ marginTop: SPACE.sectionSection }}>
-        <DiscoverSectionHeader
-          eyebrow="Your next conquests"
-          title="Records within reach"
-        />
-        <NextConquestsRail userId={userId} />
-      </div>
+      {/* 8. Next Conquests -- self-hiding, owns its header */}
+      <NextConquestsRail userId={userId} />
 
-      {/* 8. Eagles rail (restyled compact variant) */}
+      {/* 9. Eagles rail -- FeatTierRail returns null when empty */}
       <FeatTierRail
         region={activeRegion}
         tier="eagles"
@@ -132,22 +110,17 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
         variant="compact"
       />
 
-      {/* 9. Toughest courses (light) */}
-      <div style={{ marginTop: SPACE.sectionSection }}>
-        <DiscoverSectionHeader
-          eyebrow="Toughest courses"
-          title="Where scores go to die"
-        />
-        <ToughestCoursesRail />
-      </div>
+      {/* 10. Toughest courses -- self-hiding, owns its header */}
+      <ToughestCoursesRail />
 
-      {/* 10. Birdie hauls (light leaderboard) */}
+      {/* 11. Birdie hauls -- FeatTierRail returns null when empty */}
       <FeatTierRail
         region={activeRegion}
         tier="birdie_hauls"
         title={`Birdie hauls · ${regionUpper}`}
         variant="list"
       />
+
 
       {/* 11. Feed block */}
       <div

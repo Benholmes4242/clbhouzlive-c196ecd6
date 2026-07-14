@@ -156,7 +156,12 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard' }: TierPr
   const displayRows = rows.slice(0, RAIL_CAP);
   const hasOverflow = rows.length > RAIL_CAP;
   const [sheetOpen, setSheetOpen] = useState(false);
-  const goToClaim = () => navigate('/handicap');
+
+  // Self-hiding: empty tier renders zero trace (no header, no gap).
+  // AlmanacEmptyCard covers the all-tiers-empty case at the page level.
+  if (!isLoading && rows.length === 0) return null;
+  // silence unused
+  void navigate;
 
   return (
     <section style={{ fontFamily: FONT, paddingTop: SPACE.sectionSection }}>
@@ -165,6 +170,7 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard' }: TierPr
         icon={TIER_ICON[tier]}
         onSeeAll={hasOverflow ? () => setSheetOpen(true) : undefined}
       />
+
 
       {isLoading ? (
         <div
@@ -184,84 +190,8 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard' }: TierPr
             />
           ))}
         </div>
-      ) : rows.length === 0 ? (
-        <div style={{ padding: `0 ${SPACE.pagePadX}px` }}>
-          <button
-            type="button"
-            onClick={goToClaim}
-            style={{
-              width: 250,
-              borderRadius: 14,
-              padding: 12,
-              border: '1.5px dashed rgba(15,23,42,0.18)',
-              background: 'rgba(255,255,255,0.6)',
-              cursor: 'pointer',
-              textAlign: 'left',
-              fontFamily: FONT,
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-              <div
-                style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: '34%',
-                  border: '1.5px dashed rgba(15,23,42,0.2)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 15,
-                  opacity: 0.6,
-                  flexShrink: 0,
-                }}
-              >
-                {TIER_ICON[tier]}
-              </div>
-              <div>
-                <div
-                  style={{
-                    fontSize: 13.5,
-                    fontWeight: 700,
-                    color: 'rgba(15,23,42,0.45)',
-                  }}
-                >
-                  Unclaimed
-                </div>
-                <div style={{ fontSize: 11, color: 'rgba(15,23,42,0.35)' }}>
-                  {CLAIM_LABEL[tier]} {regionLabel(region)}
-                </div>
-              </div>
-            </div>
-            <div
-              style={{
-                paddingTop: 8,
-                borderTop: '1px dashed rgba(15,23,42,0.12)',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'flex-start',
-                gap: 8,
-              }}
-            >
-              <span
-                style={{
-                  fontSize: 11.5,
-                  fontWeight: 700,
-                  color: AMBER,
-                  lineHeight: 1.4,
-                }}
-              >
-                Claim it with an official WHS round — first verified {FEAT_NOUN[tier]} takes the
-                plinth.
-              </span>
-              <ChevronRight
-                size={13}
-                color="rgba(15,23,42,0.3)"
-                style={{ flexShrink: 0, marginTop: 2 }}
-              />
-            </div>
-          </button>
-        </div>
       ) : variant === 'list' ? (
+
         <div style={{ padding: `0 ${SPACE.pagePadX}px` }}>
           {displayRows.map((row, i) => (
             <FeatListRow

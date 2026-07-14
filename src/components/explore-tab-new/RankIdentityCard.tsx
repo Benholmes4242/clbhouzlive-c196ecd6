@@ -22,7 +22,7 @@ import {
 import { MATERIAL_HEX } from '@/components/profile/handicap/whs/gam/trophy-room/_shared/rarityPalette';
 import { openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
 
-import { GOLD, SCOREBOARD_BG, FONT } from './gamingLightTokens';
+import { GOLD, AMBER, SCOREBOARD_BG, FONT } from './gamingLightTokens';
 
 const OBSIDIAN_EDGE = '#D4A017';
 
@@ -130,6 +130,7 @@ export function RankIdentityCard({ userId }: Props) {
   const medals = medalsOwned(items);
 
   const isSignedOut = !effectiveUserId;
+  const isSignedInUnsynced = !isSignedOut && !connection;
   const showBootstrap = isSignedOut || medals === 0;
 
   const currentLevel = showBootstrap
@@ -157,18 +158,26 @@ export function RankIdentityCard({ userId }: Props) {
       ? `${Math.max(0, nextLevel.medalsRequired - medals)} medals to ${nextLevel.label} · earn medals from verified rounds`
       : 'Top of the ladder · Obsidian II';
 
-  const line1 = showBootstrap
-    ? currentLevel.label
-    : globalRank != null
-      ? `${currentLevel.label} · #${globalRank} worldwide`
-      : currentLevel.label;
+  const line1 = isSignedInUnsynced
+    ? 'Start the climb'
+    : showBootstrap
+      ? currentLevel.label
+      : globalRank != null
+        ? `${currentLevel.label} · #${globalRank} worldwide`
+        : currentLevel.label;
 
   const onOpen = () => {
+    if (isSignedInUnsynced) {
+      navigate('/handicap');
+      return;
+    }
     // Trophy Room sheet mounts under /handicap; navigate there and emit the
     // open event so the sheet opens on arrival.
     navigate('/handicap');
     setTimeout(() => openGamAchievements(), 0);
   };
+
+  const gemOpacity = isSignedInUnsynced ? 0.85 : 1;
 
   return (
     <div style={{ padding: `12px 16px 0` }}>
@@ -189,7 +198,9 @@ export function RankIdentityCard({ userId }: Props) {
           fontFamily: FONT,
         }}
       >
-        <Gem material={currentLevel.material} />
+        <div style={{ opacity: gemOpacity, display: 'flex' }}>
+          <Gem material={currentLevel.material} />
+        </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div
             style={{
@@ -241,20 +252,38 @@ export function RankIdentityCard({ userId }: Props) {
               }}
             />
           </div>
-          <div
-            style={{
-              marginTop: 6,
-              fontSize: 9.5,
-              fontWeight: 700,
-              color: 'rgba(255,255,255,0.45)',
-              lineHeight: 1.3,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {noteText}
-          </div>
+          {isSignedInUnsynced ? (
+            <div
+              style={{
+                marginTop: 6,
+                fontSize: 11,
+                fontWeight: 800,
+                color: AMBER,
+                lineHeight: 1.3,
+                letterSpacing: '0.01em',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Sync your WHS handicap ›
+            </div>
+          ) : (
+            <div
+              style={{
+                marginTop: 6,
+                fontSize: 9.5,
+                fontWeight: 700,
+                color: 'rgba(255,255,255,0.45)',
+                lineHeight: 1.3,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {noteText}
+            </div>
+          )}
         </div>
       </button>
     </div>
@@ -262,3 +291,4 @@ export function RankIdentityCard({ userId }: Props) {
 }
 
 export default RankIdentityCard;
+

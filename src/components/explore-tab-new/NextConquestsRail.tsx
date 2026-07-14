@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { useTitlesInReach, type TitleInReach } from '@/hooks/gam/useTitlesInReach';
+import { DiscoverSectionHeader } from './DiscoverSectionHeader';
+import { SPACE } from '@/lib/spacing';
 
 import {
   SCOREBOARD_BG,
@@ -176,14 +178,20 @@ export function NextConquestsRail({ userId }: Props) {
   if (picks.length === 0) return null;
 
   return (
-    <div
-      className="flex overflow-x-auto scrollbar-hide"
-      style={{ padding: '0 16px', gap: 9 }}
-    >
-      {picks.map((row) => (
-        <ConquestCard key={`${row.course_id}-${row.category}`} row={row} />
-      ))}
-    </div>
+    <section style={{ marginTop: SPACE.sectionSection }}>
+      <DiscoverSectionHeader
+        eyebrow="Your next conquests"
+        title="Records within reach"
+      />
+      <div
+        className="flex overflow-x-auto scrollbar-hide"
+        style={{ padding: '0 16px', gap: 9 }}
+      >
+        {picks.map((row) => (
+          <ConquestCard key={`${row.course_id}-${row.category}`} row={row} />
+        ))}
+      </div>
+    </section>
   );
 }
 
