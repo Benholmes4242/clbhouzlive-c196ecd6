@@ -13,12 +13,11 @@
  */
 
 import { Link } from 'react-router-dom';
-import { ChevronRight } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { countryFlag, countryFallback } from '@/features/tourhub/leaderboard/countryFlag';
-import { collegeH2HRoute, playerRoute } from '@/features/tourhub/routes';
+import { playerRoute } from '@/features/tourhub/routes';
 import { useLivePlayerIds } from '@/features/tourhub/players-v2/data/useLivePlayerIds';
 import {
   AMBER,
