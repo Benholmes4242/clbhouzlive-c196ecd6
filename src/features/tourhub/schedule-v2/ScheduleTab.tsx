@@ -56,20 +56,18 @@ export function ScheduleTab() {
   }, []);
 
 
-  // ── Tour selection (app-wide brain) ────────────────────────────────────
-  const {
-    selectedTourSlug,
-    viewingTourSlug,
-    selectTour,
-  } = useTourSelection();
-  const activeTour: TourId = (
-    (viewingTourSlug ?? selectedTourSlug ?? 'pga') as string
-  ) in TOUR_CONFIG
-    ? ((viewingTourSlug ?? selectedTourSlug ?? 'pga') as TourId)
-    : 'pga';
+  // ── Per-section tour lens (local state, All Tours allowed) ─────────────
+  // NOTE: useSeasonTimeline takes a single TourId and internally calls
+  // useQuery + enrichment hooks per tour. A cross-tour merge would require
+  // either running that hook once per tour (violates rules of hooks) or a
+  // new batch hook that fans out under a single useQuery. Both are out of
+  // scope for Phase 4, so All Tours falls back to PGA for now.
+  const [tourLens, setTourLens] = useState<TourId | null>(null);
+  const activeTour: TourId = tourLens ?? 'pga';
 
   // ── Data ───────────────────────────────────────────────────────────────
   const { data: timeline, isLoading, error } = useSeasonTimeline(activeTour);
+
 
   // ── Auto-land on this-week/next row on mount + tour flip ───────────────
   // Scrolls the WINDOW (page owns the scroll now — no inner scroller).
