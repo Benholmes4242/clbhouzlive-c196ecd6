@@ -175,7 +175,7 @@ export function TrophyRoomSpine({ items, userId }: Props) {
             ? `${next.medalsRequired - owned} ${next.medalsRequired - owned === 1 ? 'medal' : 'medals'} to Level ${next.level} · ${next.label}`
             : 'Every level earned. The wall is yours.'}
         </div>
-      </div>
+      </button>
 
       {/* streaks strip */}
       <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
