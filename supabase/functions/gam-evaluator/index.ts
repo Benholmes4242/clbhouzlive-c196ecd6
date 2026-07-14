@@ -225,6 +225,16 @@ async function processSingle(whsScoreId: string) {
     await applyCourseLegends(stats);
     await applyRivalryResults(userId, stats, whsScoreId);
 
+    // Seasonal medal award. Own try/catch: never breaks round processing.
+    // MUST MATCH the frontend threshold in src/lib/gam/seasonClock.ts
+    // (SEASON_ROUNDS_REQUIRED = 5).
+    try {
+      const seasonAwardedId = await evaluateSeasonMedal(userId, stats, whsScoreId);
+      if (seasonAwardedId) earned.push(seasonAwardedId);
+    } catch (e) {
+      console.warn("[season_medal]", (e as Error).message);
+    }
+
     // Ascent -- wall level up / near-miss detection. Wrapped in its own
     // try/catch: badge processing above must complete regardless of
     // level RPC/insert failures.
