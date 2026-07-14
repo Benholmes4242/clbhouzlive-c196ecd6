@@ -123,8 +123,8 @@ function LegendarySection({ region }: { region: string | null }) {
   const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
   const hasOverflow = rows.length > 12;
   return (
-    <section style={{ fontFamily: FONT, paddingTop: 24 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 16px 8px' }}>
+    <section style={{ fontFamily: FONT, paddingTop: 32 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 16px 12px' }}>
         <span aria-hidden style={{ fontSize: 13, lineHeight: 1 }}>⛳</span>
         <span
           style={{
