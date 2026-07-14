@@ -83,22 +83,6 @@ export function TheClass({ slug, collegeName }: Props) {
         >
           The Class
         </div>
-        <Link
-          to={collegeH2HRoute(slug)}
-          style={{
-            fontSize: 10,
-            fontWeight: 700,
-            color: INK_MUTE,
-            letterSpacing: '0.02em',
-            textDecoration: 'none',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 3,
-          }}
-        >
-          Compare vs another school
-          <ChevronRight size={12} strokeWidth={2.5} color={INK_MUTE} />
-        </Link>
       </header>
 
       {/* Column header */}
