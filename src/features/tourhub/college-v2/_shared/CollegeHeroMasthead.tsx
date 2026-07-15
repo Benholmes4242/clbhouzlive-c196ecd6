@@ -111,158 +111,171 @@ export function CollegeHeroMasthead({
       style={{
         background: heroBackground,
         minHeight:
-          'calc(clamp(380px, 44dvh, 460px) + env(safe-area-inset-top, 0px))',
+          'calc(clamp(280px, 34dvh, 360px) + env(safe-area-inset-top, 0px))',
         paddingTop: 'calc(env(safe-area-inset-top, 0px) + 62px)',
         paddingLeft: 16,
         paddingRight: 16,
-        paddingBottom: 20,
+        paddingBottom: 24,
         fontFamily: FONT,
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'flex-end',
+        justifyContent: 'center',
+        alignItems: 'center',
+        textAlign: 'center',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-        {/* Crest 66 */}
+      {/* Crest 92 — stacked above name */}
+      <div
+        style={{
+          position: 'relative',
+          width: 92,
+          height: 92,
+          flexShrink: 0,
+          marginBottom: 14,
+          boxShadow: isRankOne ? '0 4px 12px rgba(255,184,0,0.20)' : 'none',
+        }}
+        aria-hidden
+      >
         <div
           style={{
-            position: 'relative',
-            width: 66,
-            height: 66,
-            flexShrink: 0,
-            boxShadow: isRankOne ? '0 4px 12px rgba(255,184,0,0.20)' : 'none',
+            position: 'absolute',
+            inset: 0,
+            borderRadius: '34%',
+            overflow: 'hidden',
+            background: 'rgba(255,255,255,0.06)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 10,
           }}
-          aria-hidden
         >
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              borderRadius: '34%',
-              overflow: 'hidden',
-              background: 'rgba(255,255,255,0.06)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: 8,
-            }}
-          >
-            {logoUrl ? (
-              <img
-                src={logoUrl}
-                alt=""
-                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-              />
-            ) : (
-              <span style={{ fontSize: 15, fontWeight: 900, color: GOLD, letterSpacing: '0.04em' }}>
-                {displayName.slice(0, 3).toUpperCase()}
-              </span>
-            )}
-          </div>
-          {/* Traced canonical hairline (dark hero). Rank-1 keeps its gold status ring. */}
-          <div
-            aria-hidden
-            style={{
-              position: 'absolute',
-              inset: 0,
-              borderRadius: '34%',
-              border: isRankOne ? `1.5px solid ${GOLD}` : '1px solid rgba(255,255,255,0.22)',
-              pointerEvents: 'none',
-            }}
-          />
-        </div>
-
-        {/* Name + meta */}
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div
-            style={{
-              fontSize: 9.5,
-              fontWeight: 800,
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-              color: WHITE_ALPHA_55,
-              marginBottom: 4,
-            }}
-          >
-            THE FRANCHISE {rank ? `\u00B7 No.${rank}` : ''}
-          </div>
-          <h1
-            style={{
-              margin: 0,
-              fontSize: 22,
-              fontWeight: 800,
-              color: '#FFFFFF',
-              letterSpacing: '-0.02em',
-              lineHeight: 1.1,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {displayName}
-          </h1>
-          <div
-            style={{
-              marginTop: 6,
-              fontSize: 11,
-              fontWeight: 600,
-              color: WHITE_ALPHA_65,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              flexWrap: 'wrap',
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            <span style={{ color: isRankOne ? GOLD : AMBER, fontWeight: 800 }}>
-              {formatPoints(pointsTotal)}
+          {logoUrl ? (
+            <img
+              src={logoUrl}
+              alt=""
+              style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+            />
+          ) : (
+            <span style={{ fontSize: 20, fontWeight: 900, color: GOLD, letterSpacing: '0.04em' }}>
+              {displayName.slice(0, 3).toUpperCase()}
             </span>
-            <span style={{ color: WHITE_ALPHA_55 }}>{'\u00B7'}</span>
-            <span>{alumniCount} alumni on tour</span>
-            {trend && (
-              <>
-                <span style={{ color: WHITE_ALPHA_55 }}>{'\u00B7'}</span>
-                <span
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    padding: '2px 6px',
-                    borderRadius: 999,
-                    background: 'rgba(255,255,255,0.08)',
-                    border: `0.5px solid ${WHITE_ALPHA_18}`,
-                    color: trend.color,
-                    fontWeight: 800,
-                    fontSize: 10,
-                    letterSpacing: '0.02em',
-                  }}
-                >
-                  {trend.label}
-                </span>
-              </>
-            )}
-            {playingNow > 0 && (
-              <>
-                <span style={{ color: WHITE_ALPHA_55 }}>{'\u00B7'}</span>
-                <span style={{ color: STATUS_LIVE, fontWeight: 700 }}>
-                  {playingNow} playing now
-                </span>
-              </>
-            )}
-          </div>
+          )}
         </div>
-
-        {actions && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-            {actions}
-          </div>
-        )}
+        {/* Traced canonical hairline (dark hero). Rank-1 keeps its gold status ring. */}
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: '34%',
+            border: isRankOne ? `1.5px solid ${GOLD}` : '1px solid rgba(255,255,255,0.22)',
+            pointerEvents: 'none',
+          }}
+        />
       </div>
+
+      {/* Name + meta (centred) */}
+      <div style={{ width: '100%', minWidth: 0 }}>
+        <div
+          style={{
+            fontSize: 9.5,
+            fontWeight: 800,
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            color: WHITE_ALPHA_55,
+            marginBottom: 4,
+          }}
+        >
+          THE FRANCHISE {rank ? `\u00B7 No.${rank}` : ''}
+        </div>
+        <h1
+          style={{
+            margin: 0,
+            fontSize: 22,
+            fontWeight: 800,
+            color: '#FFFFFF',
+            letterSpacing: '-0.02em',
+            lineHeight: 1.1,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {displayName}
+        </h1>
+        <div
+          style={{
+            marginTop: 6,
+            fontSize: 11,
+            fontWeight: 600,
+            color: WHITE_ALPHA_65,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            columnGap: 6,
+            rowGap: 4,
+            flexWrap: 'wrap',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          <span style={{ color: isRankOne ? GOLD : AMBER, fontWeight: 800 }}>
+            {formatPoints(pointsTotal)}
+          </span>
+          <span style={{ color: WHITE_ALPHA_55 }}>{'\u00B7'}</span>
+          <span>{alumniCount} alumni on tour</span>
+          {trend && (
+            <>
+              <span style={{ color: WHITE_ALPHA_55 }}>{'\u00B7'}</span>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  padding: '2px 6px',
+                  borderRadius: 999,
+                  background: 'rgba(255,255,255,0.08)',
+                  border: `0.5px solid ${WHITE_ALPHA_18}`,
+                  color: trend.color,
+                  fontWeight: 800,
+                  fontSize: 10,
+                  letterSpacing: '0.02em',
+                }}
+              >
+                {trend.label}
+              </span>
+            </>
+          )}
+          {playingNow > 0 && (
+            <>
+              <span style={{ color: WHITE_ALPHA_55 }}>{'\u00B7'}</span>
+              <span style={{ color: STATUS_LIVE, fontWeight: 700 }}>
+                {playingNow} playing now
+              </span>
+            </>
+          )}
+        </div>
+      </div>
+
+      {actions && (
+        <div
+          style={{
+            marginTop: 16,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+            flexShrink: 0,
+          }}
+        >
+          {actions}
+        </div>
+      )}
 
       {/* subtle hairline base */}
       <div
         aria-hidden
         style={{
           marginTop: 16,
+          alignSelf: 'stretch',
           height: 0.5,
           background: WHITE_ALPHA_10,
         }}
