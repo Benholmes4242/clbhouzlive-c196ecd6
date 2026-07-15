@@ -119,6 +119,9 @@ export interface LegendaryLeaderRow {
   user_id: string | null;
   holder_name: string | null;
   holder_avatar: string | null;
+  holder_hcp?: number | null;
+  holder_club?: string | null;
+  first_feat?: string | null;
   aces: number;
   albatrosses: number;
 }

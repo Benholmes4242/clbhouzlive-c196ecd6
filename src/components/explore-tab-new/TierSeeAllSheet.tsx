@@ -11,6 +11,7 @@ import {
 } from '@/features/tourhub/_shared/tokens';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { SC_ACE, SC_ALBATROSS, SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
+import { formatHcp } from '@/lib/formatHcp';
 import { REGION_TABS } from './AlmanacSections';
 import {
   useRegionFeats,
@@ -433,8 +434,8 @@ function LegendaryLeaderRow({ row, index, metric, metricAccent, max, onTap }: Le
     metric === 'aces'
       ? `+${other} ${other === 1 ? 'albatross' : 'albatrosses'}`
       : `+${other} ${other === 1 ? 'ace' : 'aces'}`;
-  const hcp = (row as unknown as { holder_hcp?: number | null }).holder_hcp;
-  const club = (row as unknown as { holder_club?: string | null }).holder_club;
+  const hcp = row.holder_hcp;
+  const club = row.holder_club;
   const pct = Math.max(0.08, Math.min(1, count / (max || 1)));
 
   const barGradient =
@@ -524,7 +525,7 @@ function LegendaryLeaderRow({ row, index, metric, metricAccent, max, onTap }: Le
             >
               {name}
             </span>
-            {typeof hcp === 'number' ? (
+            {hcp != null ? (
               <span
                 style={{
                   flexShrink: 0,
@@ -534,7 +535,7 @@ function LegendaryLeaderRow({ row, index, metric, metricAccent, max, onTap }: Le
                   fontVariantNumeric: 'tabular-nums',
                 }}
               >
-                {hcp > 0 ? `+${hcp}` : hcp}
+                {formatHcp(hcp)}
               </span>
             ) : null}
           </div>
