@@ -51,27 +51,46 @@ interface Props {
   medals?: number | null;
   mode?: RecordsMode;
   bestToPar?: number | null;
+  maxCount?: number | null;
 }
 
 // Birdie hauls leaderboard row - gaming-light Discover rebuild spec 3F.
-export function FeatListRow({ row, tier, onTap, index = 0, medals, mode = 'latest', bestToPar = null }: Props) {
+export function FeatListRow({ row, tier, onTap, index = 0, medals, mode = 'latest', bestToPar = null, maxCount = null }: Props) {
   const holder = useMemo(() => formatHolderName(row.holder_name), [row.holder_name]);
   const when = relDate(row.play_date ?? row.attained_at ?? null);
   const rank = index + 1;
   const isTop = rank === 1;
   const isRecordsRow = tier === 'records';
+  const isBirdieHauls = tier === 'birdie_hauls';
   const isStableford = row.category === 'best_stableford_all_time';
   const d = isRecordsRow ? rowToPar(row) : null;
   const showToParPrimary = isRecordsRow && d != null && !isStableford;
-  const showBar = showToParPrimary;
   const grossStr = row.value != null ? String(row.value) : (row.feat_value ?? '').match(/\d+/)?.[0] ?? '';
 
   const WORST = 15;
   const anchor = bestToPar ?? 0;
   const span = WORST - anchor;
-  const barPct = showBar && d != null
+  const recordsBarPct = showToParPrimary && d != null
     ? Math.max(0.06, Math.min(1, (WORST - d) / (span || 1)))
     : 0;
+
+  // Birdie hauls: count-proportional bar with 8% floor.
+  const birdieCount = isBirdieHauls
+    ? parseFloat(String(row.feat_value ?? row.value ?? '').replace(/[^\d.]/g, '')) || 0
+    : 0;
+  const birdieBarPct = isBirdieHauls && maxCount && maxCount > 0
+    ? Math.max(0.08, Math.min(1, birdieCount / maxCount))
+    : 0;
+
+  const showRecordsBar = showToParPrimary;
+  const showBirdieBar = isBirdieHauls && maxCount != null && maxCount > 0;
+  const showBar = showRecordsBar || showBirdieBar;
+  const barPct = showRecordsBar ? recordsBarPct : birdieBarPct;
+  const barGradient = showBirdieBar
+    ? 'linear-gradient(90deg, #F7931E, #FBBC2E)'
+    : 'linear-gradient(90deg, #F7931E, #FBBC2E)';
+  // Hide date line for records (existing) and birdie_hauls (new spec).
+  const showDate = !!when && !isRecordsRow && !isBirdieHauls;
 
   // Value + label vary by tier.
   // - records: gross score / GROSS
@@ -198,7 +217,7 @@ export function FeatListRow({ row, tier, onTap, index = 0, medals, mode = 'lates
           >
             {row.course_name}
           </div>
-          {when && !isRecordsRow ? (
+          {showDate ? (
             <div
               style={{
                 marginTop: 2,
@@ -326,7 +345,7 @@ export function FeatListRow({ row, tier, onTap, index = 0, medals, mode = 'lates
                 width: `${barPct * 100}%`,
                 height: '100%',
                 borderRadius: 999,
-                background: 'linear-gradient(90deg, #F7931E, #FBBC2E)',
+                background: barGradient,
                 transition: 'width .35s cubic-bezier(.2,.8,.2,1)',
               }}
             />

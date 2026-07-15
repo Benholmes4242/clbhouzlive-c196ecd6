@@ -79,6 +79,30 @@ export function sortRecordsAllTime(rows: FeatRow[]): FeatRow[] {
   return [...stroke, ...noPar, ...stableford];
 }
 
+// Shared birdie-haul sort. alltime: haul count desc, tiebreak earliest date
+// ASC (first to the haul keeps precedence, matching the records convention).
+// latest: date desc.
+export function sortBirdieHauls(rows: FeatRow[], mode: RecordsMode): FeatRow[] {
+  const parseCount = (r: FeatRow): number =>
+    parseFloat(String(r.feat_value ?? r.value ?? '').replace(/[^\d.]/g, '')) || 0;
+  const dateOf = (r: FeatRow): string => r.play_date ?? r.attained_at ?? '';
+  const out = [...rows];
+  if (mode === 'alltime') {
+    out.sort((a, b) => {
+      const bv = parseCount(b);
+      const av = parseCount(a);
+      if (bv !== av) return bv - av;
+      // earliest first on tie
+      const ad = dateOf(a);
+      const bd = dateOf(b);
+      return ad.localeCompare(bd);
+    });
+  } else {
+    out.sort((a, b) => dateOf(b).localeCompare(dateOf(a)));
+  }
+  return out;
+}
+
 export function useRegionFeats(
   region: string | null,
   tier: FeatTier,

@@ -19,6 +19,7 @@ import {
   useRegionEagleLeaders,
   rowToPar,
   sortRecordsAllTime,
+  sortBirdieHauls,
   type FeatRow,
   type FeatTier,
   type LegendaryLeaderRow,
@@ -96,6 +97,9 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
     if (tier === 'records' && mode === 'alltime') {
       return sortRecordsAllTime(base);
     }
+    if (tier === 'birdie_hauls') {
+      return sortBirdieHauls(base, mode);
+    }
     return base;
   }, [fetched, mode, rows, initialMode, tier, isLeaderView]);
 
@@ -125,6 +129,16 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
       if (best == null || d < best) best = d;
     }
     return best;
+  }, [tier, displayRows]);
+
+  const birdieMaxCount: number | null = useMemo(() => {
+    if (tier !== 'birdie_hauls') return null;
+    let max = 0;
+    for (const r of displayRows) {
+      const n = parseFloat(String(r.feat_value ?? r.value ?? '').replace(/[^\d.]/g, '')) || 0;
+      if (n > max) max = n;
+    }
+    return max > 0 ? max : null;
   }, [tier, displayRows]);
 
   useEffect(() => {
@@ -447,6 +461,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
                 onTap={() => handleRowTap(row)}
                 mode={mode}
                 bestToPar={bestToPar}
+                maxCount={birdieMaxCount}
               />
             ))}
           </div>
