@@ -456,15 +456,18 @@ function AllPicksSheet({
   onClose: () => void;
   onNavigatePlayer: (playerId: string) => void;
 }) {
-  return (
-    <SheetShell onClose={onClose} maxHeight="70vh">
-      <div style={{ marginBottom: 10 }}>
-        <div style={{ fontSize: 15.5, fontWeight: 800, color: V4.ink, letterSpacing: '-0.015em' }}>The board</div>
-        <div style={{ fontSize: 10.5, fontWeight: 700, color: V4.inkMute, letterSpacing: '0.04em', marginTop: 2 }}>
-          {picks.length} picks · tap for the case
-        </div>
+  const header = (
+    <div style={{ marginBottom: 12 }}>
+      <div style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: V4.amber, marginBottom: 4, fontVariantNumeric: 'tabular-nums' }}>
+        {picks.length} PICKS {'\u00B7'} TAP FOR THE CASE
       </div>
+      <div style={{ fontSize: 18, fontWeight: 800, color: V4.ink, letterSpacing: '-0.01em', lineHeight: 1.1 }}>The board</div>
+    </div>
+  );
+  return (
+    <SheetShell onClose={onClose} header={header}>
       <div>
+
         {picks.map((p, i) => (
           <div
             key={p.playerId}
