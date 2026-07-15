@@ -49,7 +49,7 @@ interface ChampionsDuelCardProps {
 
 const INK = 'var(--hcp-t-100)';
 const INK_55 = 'var(--hcp-t-60)';
-const DEEP_AMBER = 'var(--hcp-gold-text)';
+const DEEP_AMBER = 'var(--hcp-amber)';
 const GOLD = '#FBBC2E';
 
 const SQUIRCLE_MASK_URL =
