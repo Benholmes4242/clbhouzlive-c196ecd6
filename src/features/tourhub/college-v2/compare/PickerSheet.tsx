@@ -172,27 +172,40 @@ export function PickerSheet({ open, onClose, target, standings, otherSlug }: Pro
                 }}
               >
                 <div
-                  style={{
-                    width: 28,
-                    height: 28,
-                    flexShrink: 0,
-                    borderRadius: '34%',
-                    overflow: 'hidden',
-                    background: isTop ? 'rgba(255,184,0,0.10)' : 'rgba(15,23,42,0.04)',
-                    border: isTop ? `1px solid ${GOLD_DEEP}` : `0.5px solid ${HAIRLINE_INK_10}`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
+                  style={{ position: 'relative', width: 28, height: 28, flexShrink: 0 }}
                   aria-hidden
                 >
-                  {s.logoUrl ? (
-                    <img src={s.logoUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                  ) : (
-                    <span style={{ fontSize: 9, fontWeight: 800, color: isTop ? GOLD_DEEP : INK }}>
-                      {(s.shortName ?? s.collegeName).slice(0, 3).toUpperCase()}
-                    </span>
-                  )}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      borderRadius: '34%',
+                      overflow: 'hidden',
+                      background: isTop ? 'rgba(255,184,0,0.10)' : 'rgba(15,23,42,0.04)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {s.logoUrl ? (
+                      <img src={s.logoUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                    ) : (
+                      <span style={{ fontSize: 9, fontWeight: 800, color: isTop ? GOLD_DEEP : INK }}>
+                        {(s.shortName ?? s.collegeName).slice(0, 3).toUpperCase()}
+                      </span>
+                    )}
+                  </div>
+                  {/* Traced canonical hairline (light surface). */}
+                  <div
+                    aria-hidden
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      borderRadius: '34%',
+                      border: isTop ? `1px solid ${GOLD_DEEP}` : '1px solid rgba(15,23,42,0.12)',
+                      pointerEvents: 'none',
+                    }}
+                  />
                 </div>
                 <div
                   style={{
