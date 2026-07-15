@@ -11,22 +11,30 @@ import { useUserTopLegends } from '@/hooks/gam/useUserTopLegends';
 import {
   normalizeBadge,
   normalizeLegend,
+  type TrophyItem,
 } from '@/components/profile/handicap/whs/gam/trophy-room/_shared/normalizeTrophyItem';
 import {
   medalsOwned,
   levelForMedals,
   nextLevelForMedals,
   WALL_LEVELS,
-  type WallMaterial,
 } from '@/components/profile/handicap/whs/gam/trophy-room/_shared/levels';
 import { openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
 import { MATERIAL_HEX } from '@/components/profile/handicap/whs/gam/trophy-room/_shared/rarityPalette';
+import { renderBadgeIcon } from '@/components/profile/handicap/whs/gam/badgeIcons';
+import { formatHcp } from '@/lib/formatHcp';
+import { relativeTime } from '@/utils/relativeTime';
 
 import { FONT } from './gamingLightTokens';
 
 interface Props {
   userId: string | undefined;
 }
+
+const INK = '#0F172A';
+const AMBER = '#F7931E';
+const GOLD = '#FBBC2E';
+const HAIRLINE = 'rgba(15,23,42,0.08)';
 
 // Global medal rank RPC is not yet in prod - feature-detect and omit the
 // segment on error/absent (no zeros, no placeholders).
@@ -64,30 +72,34 @@ function useGlobalMedalRank(userId: string | undefined) {
   });
 }
 
-// Complementary hue per tier for the second aurora blob. Picked to give
-// each material a two-tone mesh that reads as ambient light, not a swatch:
-//   bronze  -> cool cyan (warm/cool balance)
-//   silver  -> muted slate-blue (keeps the neutral cool)
-//   emerald -> teal/cyan (per brief)
-//   diamond -> violet (icy blue + violet, aurora borealis)
-//   obsidian-> forge gold (only accent that fits the black-glass treatment)
-const TIER_SECONDARY: Record<WallMaterial, string> = {
-  bronze: '#4AA8C9',
-  silver: '#8FA6C4',
-  emerald: '#0891B2',
-  diamond: '#C084FC',
-  obsidian: '#FBBC2E',
-};
+interface ChipData {
+  key: string;
+  iconKey: string;
+  label: string;
+  sub: string;
+  attainedAt: string;
+}
 
-// Very dark tier-tinted base for the card body.
-const TIER_BASE: Record<WallMaterial, string> = {
-  bronze: '#120A06',
-  silver: '#0A0C10',
-  emerald: '#06120D',
-  diamond: '#070E14',
-  obsidian: '#07080C',
-};
-
+function toChip(item: TrophyItem): ChipData | null {
+  if (item.kind === 'achievement') {
+    if (!item.earned || !item.earnedAt) return null;
+    return {
+      key: item.id,
+      iconKey: item.iconKey,
+      label: item.name,
+      sub: item.description ?? '',
+      attainedAt: item.earnedAt,
+    };
+  }
+  if (!item.attainedAt) return null;
+  return {
+    key: item.id,
+    iconKey: item.iconKey,
+    label: item.name,
+    sub: item.courseName ?? '',
+    attainedAt: item.attainedAt,
+  };
+}
 
 export function RankIdentityCard({ userId }: Props) {
   const navigate = useNavigate();
@@ -110,6 +122,14 @@ export function RankIdentityCard({ userId }: Props) {
   }, [badges, legends]);
   const medals = medalsOwned(items);
 
+  const recentChips = useMemo<ChipData[]>(() => {
+    return items
+      .map(toChip)
+      .filter((c): c is ChipData => c !== null)
+      .sort((a, b) => (a.attainedAt < b.attainedAt ? 1 : -1))
+      .slice(0, 3);
+  }, [items]);
+
   const isSignedOut = !effectiveUserId;
   const isSignedInUnsynced = !isSignedOut && !connection;
   const showBootstrap = isSignedOut || medals === 0;
@@ -125,7 +145,9 @@ export function RankIdentityCard({ userId }: Props) {
   const ceiling = nextLevel?.medalsRequired ?? currentLevel.medalsRequired;
   const span = Math.max(1, ceiling - floor);
   const raw = showBootstrap ? 0.04 : (medals - floor) / span;
-  const barPct = Math.max(4, Math.min(100, Math.round(raw * 100)));
+  const barPct = nextLevel
+    ? Math.max(4, Math.min(100, Math.round(raw * 100)))
+    : 100;
 
   const displayName =
     profile?.display_name ?? profile?.username ?? 'Golfer';
@@ -134,8 +156,6 @@ export function RankIdentityCard({ userId }: Props) {
 
   const material = currentLevel.material;
   const tierHex = MATERIAL_HEX[material] ?? '#12B784';
-  const tierSecondary = TIER_SECONDARY[material];
-  const baseColor = TIER_BASE[material];
 
   const tierName = currentLevel.label.replace(/\s+(I|II)$/, '');
 
@@ -159,156 +179,233 @@ export function RankIdentityCard({ userId }: Props) {
         onClick={onOpen}
         className="w-full text-left active:scale-[0.995] transition-transform"
         style={{
-          position: 'relative',
-          overflow: 'hidden',
           display: 'block',
-          padding: '18px 20px 17px',
-          minHeight: 150,
-          borderRadius: 20,
-          background: baseColor,
-          color: '#fff',
-          border: 'none',
+          padding: '16px 16px 14px',
+          borderRadius: 18,
+          background: '#FFFFFF',
+          border: `0.5px solid ${HAIRLINE}`,
+          boxShadow: '0 2px 14px rgba(15,23,42,0.06)',
+          color: INK,
           cursor: 'pointer',
           fontFamily: FONT,
-          boxShadow: '0 6px 22px rgba(0,0,0,0.3)',
         }}
       >
-        {/* Aurora blob A -- tier hue, top-left */}
+        {/* Header row */}
         <div
-          className="rank-aurora-blob"
-          aria-hidden
           style={{
-            position: 'absolute',
-            top: '-20%',
-            left: '-15%',
-            width: '80%',
-            height: '120%',
-            background: `radial-gradient(circle, ${tierHex}88, transparent 60%)`,
-            filter: 'blur(30px)',
-            pointerEvents: 'none',
-            zIndex: 0,
+            display: 'flex',
+            alignItems: 'baseline',
+            justifyContent: 'space-between',
+            gap: 12,
           }}
-        />
-        {/* Aurora blob B -- complementary hue, bottom-right, out of sync */}
-        <div
-          className="rank-aurora-blob"
-          aria-hidden
-          style={{
-            position: 'absolute',
-            bottom: '-25%',
-            right: '-15%',
-            width: '80%',
-            height: '120%',
-            background: `radial-gradient(circle, ${tierSecondary}88, transparent 60%)`,
-            filter: 'blur(30px)',
-            animationDelay: '-4s',
-            pointerEvents: 'none',
-            zIndex: 0,
-          }}
-        />
-
-        {/* Content sits above the blobs */}
-        <div style={{ position: 'relative', zIndex: 1 }}>
-          {/* Eyebrow row */}
+        >
           <div
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: 12,
+              fontSize: 12.5,
+              fontWeight: 800,
+              color: INK,
+              letterSpacing: '-0.005em',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              minWidth: 0,
+              flex: 1,
             }}
           >
-            <div
-              style={{
-                fontSize: 10.5,
-                fontWeight: 800,
-                letterSpacing: '0.12em',
-                color: 'rgba(255,255,255,0.6)',
-                textTransform: 'uppercase',
-              }}
-            >
-              Your Standing
-            </div>
-            {globalRank != null && (
-              <div
-                style={{
-                  fontSize: 10,
-                  fontWeight: 800,
-                  letterSpacing: '0.08em',
-                  color: 'rgba(255,255,255,0.6)',
-                  textTransform: 'uppercase',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                <span style={{ color: '#fff', fontWeight: 800 }}>#{globalRank}</span>
-                {' '}Worldwide
-              </div>
+            {displayName}
+            {hasHcp && (
+              <>
+                {' '}
+                <span style={{ color: AMBER, fontWeight: 800 }}>
+                  {formatHcp(hcp)}
+                </span>
+              </>
             )}
           </div>
+          {globalRank != null && (
+            <div
+              style={{
+                fontSize: 10,
+                fontWeight: 800,
+                letterSpacing: '0.08em',
+                color: 'rgba(15,23,42,0.5)',
+                textTransform: 'uppercase',
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
+              }}
+            >
+              #{globalRank} Worldwide
+            </div>
+          )}
+        </div>
 
-          {/* Tier line */}
+        {/* Hero row */}
+        <div style={{ display: 'flex', gap: 16, marginTop: 12 }}>
+          <div style={{ flexShrink: 0, minWidth: 56 }}>
+            <div
+              className="tabular-nums"
+              style={{
+                fontSize: 44,
+                fontWeight: 900,
+                letterSpacing: '-0.03em',
+                color: INK,
+                lineHeight: 1,
+              }}
+            >
+              {medals}
+            </div>
+            <div
+              style={{
+                marginTop: 4,
+                fontSize: 9,
+                fontWeight: 800,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                color: 'rgba(15,23,42,0.45)',
+              }}
+            >
+              Medals
+            </div>
+          </div>
+
           <div
             style={{
-              marginTop: 10,
+              flex: 1,
               display: 'flex',
-              alignItems: 'baseline',
-              gap: 8,
-              lineHeight: 1.05,
-              overflow: 'hidden',
-              whiteSpace: 'nowrap',
-              textOverflow: 'ellipsis',
+              flexDirection: 'column',
+              gap: 6,
+              minWidth: 0,
+            }}
+          >
+            {recentChips.length === 0 ? (
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: 'rgba(15,23,42,0.45)',
+                  alignSelf: 'center',
+                }}
+              >
+                Your first medal awaits.
+              </div>
+            ) : (
+              recentChips.map((chip) => (
+                <div
+                  key={chip.key}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    background: 'rgba(251,188,46,0.08)',
+                    border: '0.5px solid rgba(251,188,46,0.35)',
+                    borderRadius: 10,
+                    padding: '6px 9px',
+                    minWidth: 0,
+                  }}
+                >
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      flexShrink: 0,
+                      color: AMBER,
+                    }}
+                  >
+                    {renderBadgeIcon(chip.iconKey, 14, AMBER, 2)}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: 11.5,
+                      fontWeight: 800,
+                      color: INK,
+                      whiteSpace: 'nowrap',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {chip.label}
+                  </span>
+                  {chip.sub && (
+                    <span
+                      style={{
+                        fontSize: 10.5,
+                        fontWeight: 600,
+                        color: 'rgba(15,23,42,0.5)',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        minWidth: 0,
+                        flex: 1,
+                      }}
+                    >
+                      {chip.sub}
+                    </span>
+                  )}
+                  <span
+                    style={{
+                      fontSize: 9.5,
+                      fontWeight: 700,
+                      color: 'rgba(15,23,42,0.35)',
+                      flexShrink: 0,
+                      marginLeft: 'auto',
+                    }}
+                  >
+                    {relativeTime(chip.attainedAt)}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Progress line */}
+        <div
+          style={{
+            marginTop: 14,
+            paddingTop: 12,
+            borderTop: `0.5px solid ${HAIRLINE}`,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+          }}
+        >
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              flexShrink: 0,
+              border: '0.5px solid rgba(15,23,42,0.12)',
+              borderRadius: 999,
+              padding: '4px 10px 4px 7px',
             }}
           >
             <span
               style={{
-                fontSize: 30,
-                fontWeight: 900,
-                color: '#fff',
-                letterSpacing: '-0.02em',
-                textShadow: '0 2px 12px rgba(0,0,0,0.3)',
+                width: 8,
+                height: 8,
+                borderRadius: 999,
+                background: tierHex,
+                boxShadow: `0 0 6px ${tierHex}66`,
+                flexShrink: 0,
+              }}
+            />
+            <span
+              style={{
+                fontSize: 10.5,
+                fontWeight: 800,
+                color: INK,
+                whiteSpace: 'nowrap',
               }}
             >
-              {isSignedInUnsynced ? 'Start the climb' : tierName}
+              {tierName} {currentLevel.level}
             </span>
-            {!isSignedInUnsynced && (
-              <span
-                style={{
-                  fontSize: 12.5,
-                  fontWeight: 800,
-                  color: tierHex,
-                  letterSpacing: '0.02em',
-                  textShadow: '0 1px 6px rgba(0,0,0,0.35)',
-                }}
-              >
-                Level {currentLevel.level}
-              </span>
-            )}
           </div>
 
-          {/* Identity */}
           <div
             style={{
-              marginTop: 6,
-              fontSize: 11.5,
-              fontWeight: 600,
-              color: 'rgba(255,255,255,0.72)',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-              textShadow: '0 1px 6px rgba(0,0,0,0.3)',
-            }}
-          >
-            {displayName}
-            {hasHcp ? ` · WHS ${hcp?.toFixed(1)}` : ''}
-          </div>
-
-          {/* Progress bar */}
-          <div
-            style={{
-              marginTop: 14,
+              flex: 1,
               height: 5,
-              borderRadius: 3,
-              background: 'rgba(255,255,255,0.2)',
+              borderRadius: 999,
+              background: 'rgba(15,23,42,0.07)',
               overflow: 'hidden',
             }}
           >
@@ -316,37 +413,33 @@ export function RankIdentityCard({ userId }: Props) {
               style={{
                 width: `${barPct}%`,
                 height: '100%',
-                background: '#fff',
-                borderRadius: 3,
+                background: `linear-gradient(90deg, ${AMBER}, ${GOLD})`,
+                borderRadius: 999,
               }}
             />
           </div>
 
-          {/* Progress caption */}
           <div
             style={{
-              marginTop: 6,
               fontSize: 10.5,
-              fontWeight: 500,
-              color: 'rgba(255,255,255,0.5)',
-              lineHeight: 1.3,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
+              fontWeight: 700,
+              color: 'rgba(15,23,42,0.55)',
               whiteSpace: 'nowrap',
-              textShadow: '0 1px 4px rgba(0,0,0,0.3)',
+              flexShrink: 0,
             }}
           >
-            {isSignedInUnsynced ? (
-              'Sync your WHS handicap to start earning medals'
-            ) : showBootstrap ? (
-              'Play a verified round to start the climb'
-            ) : nextLevel ? (
+            {nextLevel ? (
               <>
-                <span style={{ color: '#fff', fontWeight: 700 }}>{medalsToNext}</span>
-                {' medals to '}{nextLevel.label}
+                <span
+                  style={{ color: AMBER, fontWeight: 800 }}
+                  className="tabular-nums"
+                >
+                  {medalsToNext}
+                </span>{' '}
+                to {nextLevel.label}
               </>
             ) : (
-              'Top of the ladder · Clubhouse Legend'
+              'Max level'
             )}
           </div>
         </div>
