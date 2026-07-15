@@ -237,7 +237,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
           overflowY: 'auto',
           WebkitOverflowScrolling: 'touch',
           background: SLATE_50,
-          padding: false ? '16px 0' : '12px 0',
+          padding: '12px 0',
         }}
       >
         {visibleRows.length === 0 ? (
@@ -261,12 +261,14 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
                 tier={tier}
                 index={i}
                 onTap={() => handleRowTap(row)}
+                mode={mode}
+                bestToPar={bestToPar}
               />
             ))}
           </div>
         )}
 
-        {!false && visible < displayRows.length && (
+        {visible < displayRows.length && (
           <div ref={sentinelRef} style={{ height: 40 }} />
         )}
         <div style={{ height: 24 }} />
