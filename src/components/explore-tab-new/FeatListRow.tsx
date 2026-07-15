@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { TierGem } from '@/components/shared/TierGem';
-import type { FeatRow, FeatTier } from './hooks/useRegionFeats';
+import { rowToPar, toParText, type FeatRow, type FeatTier, type RecordsMode } from './hooks/useRegionFeats';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const AMBER = '#F7931E';
