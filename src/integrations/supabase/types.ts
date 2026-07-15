@@ -19619,6 +19619,7 @@ export type Database = {
       refresh_college_season_stats_auto: { Args: never; Returns: undefined }
       refresh_college_weekly_movers: { Args: never; Returns: undefined }
       refresh_discover_feats: { Args: never; Returns: undefined }
+      refresh_eagle_leaders: { Args: never; Returns: undefined }
       refresh_expired_course_mood_blurbs: { Args: never; Returns: number }
       refresh_gam_league_standings: { Args: never; Returns: undefined }
       refresh_latest_records_cache: {
