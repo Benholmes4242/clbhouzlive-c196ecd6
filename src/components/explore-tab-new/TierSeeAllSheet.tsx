@@ -8,7 +8,6 @@ import {
   INK,
   INK_MUTE,
   SLATE_50,
-  SURFACE,
 } from '@/features/tourhub/_shared/tokens';
 import { REGION_TABS } from './AlmanacSections';
 import {
@@ -130,8 +129,8 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap }:
       variant="light"
       surfaceColor={SLATE_50}
       style={{
-        height: '90vh',
-        maxHeight: '90vh',
+        height: '75dvh',
+        maxHeight: '75dvh',
         display: 'flex',
         flexDirection: 'column',
         fontFamily: FONT,
@@ -155,9 +154,11 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap }:
               textTransform: 'uppercase',
               color: AMBER,
               marginBottom: 4,
+              fontVariantNumeric: 'tabular-nums',
             }}
           >
-            {TIER_SHORT[tier]}
+            {regionLabel(region)} {'\u00B7'} WHS
+            {'\u00B7'} {total} {total === 1 ? 'ENTRY' : 'ENTRIES'}
           </div>
           <div
             id="tier-see-all-title"
@@ -170,22 +171,6 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap }:
             }}
           >
             {TIER_TITLE[tier]}
-          </div>
-          <div
-            style={{
-              fontSize: 10.5,
-              fontWeight: 700,
-              color: INK_MUTE,
-              letterSpacing: '0.04em',
-              textTransform: 'uppercase',
-              marginTop: 3,
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            {regionLabel(region)} {'\u00B7'} WHS
-            {false
-              ? ` \u00B7 LEADERBOARDS`
-              : ` \u00B7 ${total} ${total === 1 ? 'ENTRY' : 'ENTRIES'}`}
           </div>
         </div>
 
@@ -232,7 +217,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap }:
           minHeight: 0,
           overflowY: 'auto',
           WebkitOverflowScrolling: 'touch',
-          background: SURFACE,
+          background: SLATE_50,
           padding: false ? '16px 0' : '12px 0',
         }}
       >
