@@ -5,7 +5,7 @@
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import type { TeeGroup } from '../data/useTeeTimesAll';
 import { TeeTimesFirstGroups } from './TeeTimesFirstGroups';
-import { FONT, INK, INK_MUTE, SLATE_50 } from '../../_shared/tokens';
+import { AMBER, FONT, INK, INK_MUTE, SLATE_50 } from '../../_shared/tokens';
 
 interface Props {
   open: boolean;
@@ -18,10 +18,10 @@ interface Props {
 
 export function AllTeeTimesSheet({ open, onClose, groups, tournamentName, round }: Props) {
   return (
-    <BottomSheet open={open} onClose={onClose} variant="light" surfaceColor={SLATE_50}>
-      <div style={{ background: SLATE_50, fontFamily: FONT, maxHeight: 'calc(90vh - 24px)', display: 'flex', flexDirection: 'column' }}>
+    <BottomSheet open={open} onClose={onClose} variant="light" surfaceColor={SLATE_50} style={{ height: '75dvh', maxHeight: '75dvh' }}>
+      <div style={{ background: SLATE_50, fontFamily: FONT, height: '75dvh', maxHeight: '75dvh', display: 'flex', flexDirection: 'column' }}>
         <div style={{ padding: '4px 16px 12px' }}>
-          <div style={{ fontSize: 9, fontWeight: 800, color: INK, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+          <div style={{ fontSize: 9, fontWeight: 800, color: AMBER, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
             All Tee Times
           </div>
           {tournamentName && (
