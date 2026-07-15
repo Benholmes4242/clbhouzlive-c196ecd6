@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { TierSeeAllSheet } from './TierSeeAllSheet';
 
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { useRegionFeats, type FeatRow, type RecordsMode } from './hooks/useRegionFeats';
+import { useRegionFeats, sortRecordsAllTime, rowToPar, toParText, type FeatRow, type RecordsMode } from './hooks/useRegionFeats';
 import { DiscoverSectionHeader } from './DiscoverSectionHeader';
 import { SPACE } from '@/lib/spacing';
 import { formatHcp } from '@/lib/formatHcp';
@@ -45,7 +45,7 @@ function initials(name: string): string {
   );
 }
 
-export function CrownCard({ row, opener }: { row: FeatRow; opener?: ScorecardOpener }) {
+export function CrownCard({ row, opener, mode = 'latest' }: { row: FeatRow; opener?: ScorecardOpener; mode?: RecordsMode }) {
   const navigate = useNavigate();
   const holder = formatHolderName(row.holder_name);
   const isStableford = row.category === 'best_stableford_all_time';
@@ -121,54 +121,75 @@ export function CrownCard({ row, opener }: { row: FeatRow; opener?: ScorecardOpe
         {row.course_name}
       </div>
 
-      <div
-        style={{
-          marginTop: 10,
-          display: 'flex',
-          alignItems: 'baseline',
-          justifyContent: 'space-between',
-          gap: 6,
-          minWidth: 0,
-        }}
-      >
-        <div
-          style={{
-            fontSize: 52,
-            fontWeight: 900,
-            color: '#fff',
-            letterSpacing: '-0.03em',
-            lineHeight: 1,
-            fontVariantNumeric: 'tabular-nums',
-          }}
-        >
-          {scoreValue}
-        </div>
-        {showDelta ? (
+      {mode === 'alltime' && showDelta ? (
+        <div style={{ marginTop: 10, display: 'flex', alignItems: 'baseline', gap: 9 }}>
           <div
             style={{
-              flex: delta === 0 ? 1 : 0,
-              display: 'flex',
-              justifyContent: delta === 0 ? 'center' : 'flex-end',
-              alignItems: 'baseline',
-              minWidth: 0,
+              fontSize: 48,
+              fontWeight: 900,
+              lineHeight: 1,
+              letterSpacing: '-0.03em',
+              fontVariantNumeric: 'tabular-nums',
+              color: delta < 0 ? '#FF4D57' : '#fff',
             }}
           >
-            <span
+            {toParText(delta)}
+          </div>
+          <div style={{ fontSize: 12, fontWeight: 800, color: 'rgba(255,255,255,0.55)', lineHeight: 1.25 }}>
+            {scoreValue} gross<br />
+            <span style={{ fontWeight: 600, color: 'rgba(255,255,255,0.35)' }}>par {row.course_par}</span>
+          </div>
+        </div>
+      ) : (
+        <div
+          style={{
+            marginTop: 10,
+            display: 'flex',
+            alignItems: 'baseline',
+            justifyContent: 'space-between',
+            gap: 6,
+            minWidth: 0,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 52,
+              fontWeight: 900,
+              color: '#fff',
+              letterSpacing: '-0.03em',
+              lineHeight: 1,
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            {scoreValue}
+          </div>
+          {showDelta ? (
+            <div
               style={{
-                fontSize: 13,
-                fontWeight: 800,
-                color: deltaColor,
-                lineHeight: 1,
-                letterSpacing: '-0.02em',
-                fontVariantNumeric: 'tabular-nums',
-                whiteSpace: 'nowrap',
+                flex: delta === 0 ? 1 : 0,
+                display: 'flex',
+                justifyContent: delta === 0 ? 'center' : 'flex-end',
+                alignItems: 'baseline',
+                minWidth: 0,
               }}
             >
-              {deltaText}
-            </span>
-          </div>
-        ) : null}
-      </div>
+              <span
+                style={{
+                  fontSize: 13,
+                  fontWeight: 800,
+                  color: deltaColor,
+                  lineHeight: 1,
+                  letterSpacing: '-0.02em',
+                  fontVariantNumeric: 'tabular-nums',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {deltaText}
+              </span>
+            </div>
+          ) : null}
+        </div>
+      )}
 
       {isStableford ? (
         <div
@@ -336,7 +357,10 @@ export function CourseCrownsRail({ region, opener }: Props) {
   const [mode, setMode] = useState<RecordsMode>('latest');
   const [sheetOpen, setSheetOpen] = useState(false);
   const { data } = useRegionFeats(region, 'records', mode);
-  const allRows = useMemo(() => data ?? [], [data]);
+  const allRows = useMemo(() => {
+    const raw = data ?? [];
+    return mode === 'alltime' ? sortRecordsAllTime(raw) : raw;
+  }, [data, mode]);
   const rows = useMemo(() => allRows.slice(0, 15), [allRows]);
 
   if (rows.length === 0) return null;
@@ -368,7 +392,7 @@ export function CourseCrownsRail({ region, opener }: Props) {
         style={{ padding: '0 16px', gap: 9 }}
       >
         {rows.map((row, i) => (
-          <CrownCard key={`${row.course_id ?? i}-${i}`} row={row} opener={opener} />
+          <CrownCard key={`${row.course_id ?? i}-${i}`} row={row} opener={opener} mode={mode} />
         ))}
       </div>
       <TierSeeAllSheet
@@ -378,6 +402,7 @@ export function CourseCrownsRail({ region, opener }: Props) {
         region={region}
         rows={allRows}
         onRowTap={handleRowTap}
+        initialMode={mode}
       />
     </section>
   );

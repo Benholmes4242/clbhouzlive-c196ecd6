@@ -12,6 +12,8 @@ import {
 import { REGION_TABS } from './AlmanacSections';
 import {
   useRegionFeats,
+  rowToPar,
+  sortRecordsAllTime,
   type FeatRow,
   type FeatTier,
   type RecordsMode,
@@ -47,6 +49,7 @@ interface Props {
   /** Fallback rows used while the sheet's own fetch is loading. */
   rows: FeatRow[];
   onRowTap?: (row: FeatRow) => void;
+  initialMode?: RecordsMode;
 }
 
 // Toggle exposed on tiers that have both RECENT and ALL TIME cache keys.
@@ -55,9 +58,9 @@ function tierHasToggle(tier: FeatTier): boolean {
   return tier !== 'eagles';
 }
 
-export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap }: Props) {
+export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, initialMode = 'latest' }: Props) {
   const [visible, setVisible] = useState(PAGE);
-  const [mode, setMode] = useState<RecordsMode>('latest');
+  const [mode, setMode] = useState<RecordsMode>(initialMode);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const scrollerRef = useRef<HTMLDivElement | null>(null);
 
@@ -71,18 +74,34 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap }:
   const { data: fetched } = useRegionFeats(region, fetchTier, fetchMode);
 
   const displayRows: FeatRow[] = useMemo(() => {
-    if (fetched && fetched.length > 0) return fetched;
-    // Fallback to the caller-provided rows only while the mode-fetch is empty
-    // (typical during the first paint of the recent tab).
-    if (mode === 'latest') return rows;
-    return [];
-  }, [fetched, mode, rows]);
+    const base =
+      fetched && fetched.length > 0
+        ? fetched
+        : mode === initialMode
+          ? rows
+          : [];
+    if (tier === 'records' && mode === 'alltime') {
+      return sortRecordsAllTime(base);
+    }
+    return base;
+  }, [fetched, mode, rows, initialMode, tier]);
+
+  const bestToPar: number | null = useMemo(() => {
+    if (tier !== 'records' || mode !== 'alltime') return null;
+    let best: number | null = null;
+    for (const r of displayRows) {
+      const d = rowToPar(r);
+      if (d == null) continue;
+      if (best == null || d < best) best = d;
+    }
+    return best;
+  }, [tier, mode, displayRows]);
 
   useEffect(() => {
     if (!open) return;
     setVisible(PAGE);
-    setMode('latest');
-  }, [open]);
+    setMode(initialMode);
+  }, [open, initialMode]);
 
   useEffect(() => {
     setVisible(PAGE);
@@ -90,7 +109,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap }:
   }, [mode]);
 
   useEffect(() => {
-    if (!open || false) return;
+    if (!open) return;
     const node = sentinelRef.current;
     if (!node) return;
     const io = new IntersectionObserver(
@@ -103,7 +122,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap }:
     );
     io.observe(node);
     return () => io.disconnect();
-  }, [open, displayRows.length, false]);
+  }, [open, displayRows.length]);
 
   // Own scorecard opener so ALL TIME rows (not present in the caller's list)
   // still open cleanly. Fall back to caller's onRowTap if provided.
@@ -119,7 +138,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap }:
   };
 
   const visibleRows = displayRows.slice(0, visible);
-  const total = false ? 0 : displayRows.length;
+  const total = displayRows.length;
 
   return (
     <BottomSheet
@@ -218,7 +237,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap }:
           overflowY: 'auto',
           WebkitOverflowScrolling: 'touch',
           background: SLATE_50,
-          padding: false ? '16px 0' : '12px 0',
+          padding: '12px 0',
         }}
       >
         {visibleRows.length === 0 ? (
@@ -242,12 +261,14 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap }:
                 tier={tier}
                 index={i}
                 onTap={() => handleRowTap(row)}
+                mode={mode}
+                bestToPar={bestToPar}
               />
             ))}
           </div>
         )}
 
-        {!false && visible < displayRows.length && (
+        {visible < displayRows.length && (
           <div ref={sentinelRef} style={{ height: 40 }} />
         )}
         <div style={{ height: 24 }} />
