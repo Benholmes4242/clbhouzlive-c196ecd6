@@ -8,6 +8,7 @@
 import { useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Pressable from '@/components/ui/Pressable';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { FormatBadge } from '@/features/watch-v2/components/FormatBadge';
 import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
 import { toFeedPosts } from '@/features/watch-v2/utils/toFeedPost';
@@ -191,43 +192,13 @@ export function ClipsInterruptShelf({ clips, shelfIndex }: Props) {
         fontFamily: FONT_FAMILY,
       }}
     >
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'baseline',
-          marginBottom: 12,
-          padding: '0 12px',
-        }}
-      >
-        <span
-          style={{
-            fontWeight: 700,
-            fontSize: 10.5,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-            color: '#c97a10',
-          }}
-        >
-          QUICK CLIPS
-        </span>
-        <button
-          type="button"
-          onClick={goToClips}
-          style={{
-            background: 'transparent',
-            border: 'none',
-            padding: 0,
-            fontWeight: 600,
-            fontSize: 12,
-            color: '#c97a10',
-            cursor: 'pointer',
-            fontFamily: FONT_FAMILY,
-          }}
-        >
-          See all {'\u203A'}
-        </button>
-      </div>
+      <SectionHeader
+        role="section"
+        kicker="Quick clips"
+        action={{ label: 'See all', onClick: goToClips }}
+        paddingX={12}
+        cutLine={false}
+      />
 
       <div
         ref={railRef}
@@ -275,7 +246,7 @@ export function ClipsInterruptShelf({ clips, shelfIndex }: Props) {
             fontFamily: FONT_FAMILY,
           }}
         >
-          <div style={{ fontWeight: 800, fontSize: 16, color: '#c97a10', lineHeight: 1 }}>
+          <div style={{ fontWeight: 800, fontSize: 16, color: '#94A3B8', lineHeight: 1 }}>
             {'\u203A'}
           </div>
           <div style={{ marginTop: 4, fontWeight: 600, fontSize: 11, color: '#64748B' }}>
