@@ -19,6 +19,7 @@ import {
   useRegionEagleLeaders,
   rowToPar,
   sortRecordsAllTime,
+  sortBirdieHauls,
   type FeatRow,
   type FeatTier,
   type LegendaryLeaderRow,
