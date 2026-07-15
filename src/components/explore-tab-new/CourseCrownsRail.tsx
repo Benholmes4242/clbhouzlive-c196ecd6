@@ -50,7 +50,6 @@ export function CrownCard({ row, opener, mode = 'latest' }: { row: FeatRow; open
   const isStableford = row.category === 'best_stableford_all_time';
   const scoreValue =
     row.value != null ? String(row.value) : row.feat_value ?? '--';
-  const hasHcp = row.holder_hcp != null;
   const club = (row.holder_club ?? '').trim();
   const avatarSrc = row.holder_avatar ?? null;
 
