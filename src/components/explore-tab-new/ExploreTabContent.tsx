@@ -320,3 +320,103 @@ function LegendaryModeToggle({
   );
 }
 
+const EAGLE_BAR_GRADIENT = `linear-gradient(90deg, ${SC_EAGLE}, ${SC_EAGLE_DARK})`;
+const EAGLES_RAIL_CAP = 12;
+
+function EaglesSection({
+  region,
+  regionUpper,
+  onRowTap,
+}: {
+  region: string | null;
+  regionUpper: string;
+  onRowTap?: (row: FeatRow) => void;
+}) {
+  const { data: featsData, isLoading } = useRegionFeats(region, 'eagles', 'latest');
+  const { data: leadersData } = useRegionEagleLeaders(region);
+  const rows = featsData ?? [];
+  const hasAny = rows.length > 0;
+  const [mode, setMode] = useState<RecordsMode>('latest');
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [sheetInitialMode, setSheetInitialMode] = useState<RecordsMode>('latest');
+
+  const leaderRows: CountLeaderRow[] = useMemo(
+    () =>
+      (leadersData ?? [])
+        .filter((r) => (r.eagles ?? 0) > 0)
+        .sort((a, b) => (b.eagles ?? 0) - (a.eagles ?? 0))
+        .map((r) => ({
+          user_id: r.user_id,
+          holder_name: r.holder_name,
+          holder_avatar: r.holder_avatar,
+          count: r.eagles ?? 0,
+        })),
+    [leadersData],
+  );
+
+  if (!isLoading && !hasAny) return null;
+  const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+  const displayRows = rows.slice(0, EAGLES_RAIL_CAP);
+  const hasOverflow = mode === 'latest' && rows.length > EAGLES_RAIL_CAP;
+
+  const openSheet = (initialMode: RecordsMode) => {
+    setSheetInitialMode(initialMode);
+    setSheetOpen(true);
+  };
+
+  return (
+    <section style={{ fontFamily: FONT, paddingTop: SPACE.sectionSection }}>
+      <AlmanacHead
+        title={`Eagles · ${regionUpper}`}
+        icon={TIER_ICON.eagles}
+        onSeeAll={hasOverflow ? () => openSheet('latest') : undefined}
+      />
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          padding: `0 ${SPACE.pagePadX}px 10px`,
+        }}
+      >
+        <LegendaryModeToggle mode={mode} setMode={setMode} />
+      </div>
+      {mode === 'latest' ? (
+        <div
+          className="flex gap-3 px-4 overflow-x-auto scrollbar-hide"
+          style={{ paddingBottom: SPACE.sectionSection }}
+        >
+          {displayRows.map((row, i) => (
+            <FeatCard
+              key={`${row.score_id ?? row.course_id ?? i}-${i}`}
+              row={row}
+              tier="eagles"
+              size="compact"
+              onTap={onRowTap ? () => onRowTap(row) : undefined}
+            />
+          ))}
+        </div>
+      ) : (
+        <div style={{ padding: `0 ${SPACE.pagePadX}px` }}>
+          <CountLeadersBoard
+            title="Most Eagles"
+            accent={SC_EAGLE}
+            barGradient={EAGLE_BAR_GRADIENT}
+            rows={leaderRows}
+            onViewAll={() => openSheet('alltime')}
+          />
+        </div>
+      )}
+      <TierSeeAllSheet
+        open={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        tier="eagles"
+        region={region}
+        rows={rows}
+        onRowTap={onRowTap}
+        initialMode={sheetInitialMode}
+      />
+    </section>
+  );
+}
+
+
