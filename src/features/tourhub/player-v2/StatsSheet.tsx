@@ -97,7 +97,7 @@ function SubSection({ label, rows }: { label: string; rows: Row[] }) {
           margin: '0 0 6px',
           fontSize: 8.5,
           fontWeight: 800,
-          color: INK_FAINT,
+          color: AMBER,
           letterSpacing: '0.14em',
           textTransform: 'uppercase',
         }}
