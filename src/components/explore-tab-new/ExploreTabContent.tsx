@@ -13,8 +13,11 @@ import {
 } from './AlmanacSections';
 import { LegendaryFeatHero } from './LegendaryFeatHero';
 import { LegendaryLeadersBoards } from './LegendaryLeadersBoards';
-import { useRegionFeats, type FeatRow, type RecordsMode } from './hooks/useRegionFeats';
+import { CountLeadersBoard, type CountLeaderRow } from './CountLeadersBoard';
+import { useRegionFeats, useRegionEagleLeaders, type FeatRow, type RecordsMode } from './hooks/useRegionFeats';
 import { TierSeeAllSheet } from './TierSeeAllSheet';
+import { SC_EAGLE, SC_EAGLE_DARK } from '@/features/courses/components/holes/_constants';
+
 import { scrollPageToTop } from '@/lib/getScrollParent';
 
 import { SeasonStrip } from './SeasonStrip';
