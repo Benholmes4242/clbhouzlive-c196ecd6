@@ -5,6 +5,13 @@
  */
 import React, { useEffect, useState } from 'react';
 import { Z } from '@/config/zIndex';
+import {
+  AMBER,
+  FONT,
+  HAIRLINE_INK_10,
+  INK,
+  INK_MUTE,
+} from '@/features/tourhub/_shared/tokens';
 import type { LucideIcon } from 'lucide-react';
 import {
   Compass,
@@ -40,11 +47,6 @@ const DESTINATIONS: { id: string; label: string; Icon: LucideIcon }[] = [
 ];
 
 
-const INK = '#0F172A';
-const MUTED = '#64748B';
-const DIVIDER = '#e4e8ec';
-const FAINT = '#94A3B8';
-const AMBER = '#F7931E';
 const DURATION = 280;
 
 function usePrefersReducedMotion() {
@@ -100,7 +102,7 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
         position: 'fixed',
         inset: 0,
         zIndex: Z.sideMenu,
-        fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
+        fontFamily: FONT,
       }}
     >
       {/* Backdrop */}
@@ -187,7 +189,7 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
         </nav>
 
         {/* Secondary group header */}
-        <div style={{ marginTop: 8, paddingTop: 12, borderTop: `1px solid ${DIVIDER}` }}>
+        <div style={{ marginTop: 8, paddingTop: 12, borderTop: `1px solid ${HAIRLINE_INK_10}` }}>
           <div style={{ marginTop: 12 }}>
             <GroupHeader>Account</GroupHeader>
           </div>
@@ -197,7 +199,7 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
         <div style={{ display: 'flex', flexDirection: 'column', padding: '0 24px 22px', gap: 4 }}>
           <SecondaryLink Icon={Settings} label="Settings" onClick={() => { onClose(); onSettings(); }} />
           <SecondaryLink Icon={User}     label="Profile"  onClick={() => { onClose(); onProfile(); }} />
-          <SecondaryLink Icon={LogOut}   label="Sign Out" onClick={() => { onClose(); onSignOut(); }} />
+          <SecondaryLink Icon={LogOut}   label="Sign out" onClick={() => { onClose(); onSignOut(); }} />
         </div>
       </aside>
     </div>
@@ -207,7 +209,7 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
 function GroupHeader({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ padding: '0 24px', marginBottom: 8 }}>
-      <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: FAINT, lineHeight: 1 }}>
+      <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: AMBER, lineHeight: 1 }}>
         {children}
       </div>
       <div style={{ width: 34, height: 3, borderRadius: 99, background: AMBER, marginTop: 9 }} />
@@ -238,12 +240,12 @@ function SecondaryLink({
         fontFamily: 'inherit',
         fontSize: 14,
         fontWeight: 600,
-        color: MUTED,
+        color: INK_MUTE,
         cursor: 'pointer',
         textAlign: 'left',
       }}
     >
-      <Icon size={18} color={MUTED} strokeWidth={2} />
+      <Icon size={18} color={INK_MUTE} strokeWidth={2} />
       {label}
     </button>
   );
