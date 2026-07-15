@@ -1,20 +1,16 @@
 import { useNavigate } from 'react-router-dom';
-import { useWatchHubCounts } from '../hooks/useWatchHubCounts';
-import { formatCount } from '../utils/formatCount';
 
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
 interface DoorProps {
   title: string;
-  count: number | null;
-  loading: boolean;
   suffix: string;
   onClick: () => void;
   tone: 'amber' | 'ink';
 }
 
-function Door({ title, count, loading, suffix, onClick, tone }: DoorProps) {
+function Door({ title, suffix, onClick, tone }: DoorProps) {
   const isAmber = tone === 'amber';
   const bg = isAmber
     ? 'linear-gradient(135deg,#F7931E,#e07d0a)'
@@ -25,9 +21,6 @@ function Door({ title, count, loading, suffix, onClick, tone }: DoorProps) {
   const circleBg = isAmber
     ? 'rgba(255,255,255,0.18)'
     : 'rgba(255,255,255,0.08)';
-  const skeletonBg = isAmber
-    ? 'rgba(0,0,0,0.12)'
-    : 'rgba(255,255,255,0.25)';
 
   return (
     <div
@@ -60,29 +53,17 @@ function Door({ title, count, loading, suffix, onClick, tone }: DoorProps) {
       <div style={{ fontWeight: 800, fontSize: 17, lineHeight: 1.1, letterSpacing: '-0.01em' }}>
         {title}
       </div>
-      {loading || count == null ? (
-        <div
-          style={{
-            marginTop: 6,
-            height: 8,
-            width: 56,
-            borderRadius: 4,
-            background: skeletonBg,
-          }}
-        />
-      ) : (
-        <div
-          style={{
-            fontWeight: 600,
-            fontSize: 11.5,
-            lineHeight: 1.2,
-            opacity: countOpacity,
-            marginTop: 2,
-          }}
-        >
-          {formatCount(count)} · {suffix}
-        </div>
-      )}
+      <div
+        style={{
+          fontWeight: 600,
+          fontSize: 11.5,
+          lineHeight: 1.2,
+          opacity: countOpacity,
+          marginTop: 2,
+        }}
+      >
+        {suffix}
+      </div>
       <div
         style={{
           position: 'absolute',
@@ -102,7 +83,6 @@ function Door({ title, count, loading, suffix, onClick, tone }: DoorProps) {
 
 export function DestinationDoors() {
   const navigate = useNavigate();
-  const { data, isLoading } = useWatchHubCounts();
 
   return (
     <div
@@ -116,16 +96,12 @@ export function DestinationDoors() {
       <Door
         title="Clips"
         tone="amber"
-        loading={isLoading}
-        count={data?.clip_count ?? null}
         suffix="under 90s"
         onClick={() => navigate('/watch/clips')}
       />
       <Door
         title="Videos"
         tone="ink"
-        loading={isLoading}
-        count={data?.video_count ?? null}
         suffix="full length"
         onClick={() => navigate('/watch/videos')}
       />
