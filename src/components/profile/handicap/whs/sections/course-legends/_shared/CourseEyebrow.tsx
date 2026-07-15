@@ -2,7 +2,7 @@ import React from 'react';
 import { buildEyebrow } from './eyebrowLabel';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
-const AMBER = '#F7931E';
+
 
 export const CourseEyebrow: React.FC<{
   type?: string | null;

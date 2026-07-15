@@ -89,7 +89,7 @@ const HolderCell: React.FC<HolderCellProps> = ({ short, holder, selfLabel }) => 
   const isSelf = !!holder?.is_self;
   const isEmpty = !holder;
 
-  const labelColor = isSelf ? '#F7931E' : 'var(--hcp-t-40)';
+  const labelColor = isSelf ? 'var(--hcp-amber)' : 'var(--hcp-t-40)';
   const valueColor = isSelf ? '#F7931E' : 'var(--hcp-t-100)';
 
   return (
