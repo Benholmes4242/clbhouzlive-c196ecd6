@@ -7,8 +7,10 @@
 //    are automatically stop-propagation wrapped so taps on the island do
 //    not close. Omit onTapClose for a destination screen with real actions.
 
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
+import { applyRouteChrome } from '@/lib/routeChrome';
 
 interface Props {
   /** Provide to make the overlay tap-anywhere-to-close. */
@@ -22,6 +24,21 @@ interface Props {
 
 export function ImmersiveSuccessShell({ onTapClose, showTapHint, padded = true, children }: Props) {
   const stop = (e: React.MouseEvent | React.TouchEvent) => e.stopPropagation();
+
+  // Full-bleed into the notch: transparent shield + white status-bar icons for
+  // the dark overlay. Mirrors FullscreenFeedOverlay. useLayoutEffect so the
+  // shield/statusbar mutations land before first paint. Restore re-resolves
+  // the underlying route chrome on close (force=true: we mutated behind the
+  // idempotency cache).
+  useLayoutEffect(() => {
+    const shield = document.getElementById('safe-area-shield');
+    if (shield) shield.style.backgroundColor = 'transparent';
+    try { setStatusBarStyleColor('light', '00000000'); } catch {}
+    return () => {
+      if (shield) shield.style.backgroundColor = 'transparent';
+      try { applyRouteChrome(window.location.pathname, true); } catch {}
+    };
+  }, []);
 
   const overlay = (
     <div
