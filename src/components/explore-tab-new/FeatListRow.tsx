@@ -206,9 +206,9 @@ export function FeatListRow({ row, tier, onTap, index = 0, medals, mode = 'lates
           <div
             style={{
               marginTop: 2,
-              fontSize: 11.5,
-              fontWeight: 700,
-              color: '#64748B',
+              fontSize: 10.5,
+              fontWeight: 600,
+              color: 'rgba(15,23,42,0.42)',
               lineHeight: 1.2,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -221,10 +221,13 @@ export function FeatListRow({ row, tier, onTap, index = 0, medals, mode = 'lates
             <div
               style={{
                 marginTop: 2,
-                fontSize: 11,
-                fontWeight: 700,
-                color: '#94A3B8',
+                fontSize: 10.5,
+                fontWeight: 600,
+                color: 'rgba(15,23,42,0.42)',
                 lineHeight: 1.2,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
               }}
             >
               {when}
