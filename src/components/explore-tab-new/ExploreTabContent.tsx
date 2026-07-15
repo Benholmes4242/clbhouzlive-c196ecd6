@@ -10,7 +10,10 @@ import {
   FeatTierRail,
   AlmanacHead,
   REGION_TABS,
+  TIER_ICON,
 } from './AlmanacSections';
+import { FeatCard } from './FeatCard';
+
 import { LegendaryFeatHero } from './LegendaryFeatHero';
 import { LegendaryLeadersBoards } from './LegendaryLeadersBoards';
 import { CountLeadersBoard, type CountLeaderRow } from './CountLeadersBoard';
