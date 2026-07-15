@@ -20,12 +20,12 @@ export default function MediaTray({ media, activeIndex, onSelect, onRemove, onRe
   const dragFrom = useRef<number | null>(null);
 
   const handleAdd = () => inputRef.current?.click();
-  const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
     if (media.length + files.length > MAX_MEDIA) {
       toast('Posts carry up to 10 photos or clips.');
     }
-    onAddFiles(files);
+    await onAddFiles(files);
     e.target.value = '';
   };
 
