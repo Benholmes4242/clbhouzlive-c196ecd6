@@ -6,14 +6,22 @@ import {
   useRegionLegendaryLeaders,
   type LegendaryLeaderRow,
 } from './hooks/useRegionFeats';
-import { SC_ACE, SC_ALBATROSS } from '@/features/courses/components/holes/_constants';
+import {
+  SC_ACE,
+  SC_ALBATROSS,
+  SC_ACE_DARK,
+  SC_ALBATROSS_DARK,
+  SC_FILL_GOLD,
+} from '@/features/courses/components/holes/_constants';
 
-const GOLD = '#FBBC2E';
 const INK = '#0F172A';
 const INK_MUTE = 'rgba(15,23,42,0.55)';
+const RANK_MUTE = 'rgba(15,23,42,0.35)';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
+const BAR_TRACK = 'rgba(15,23,42,0.07)';
 const CARD_BG = '#FFFFFF';
-const MAX_ROWS = 10;
+const HOUSE_AMBER = '#F7931E';
+const MAX_ROWS = 5;
 
 function formatHolderName(raw?: string | null): string {
   const s = (raw ?? '').trim();
@@ -41,9 +49,10 @@ interface BoardProps {
   accent: string;
   rows: LegendaryLeaderRow[];
   metric: 'aces' | 'albatrosses';
+  onViewAll?: (metric: 'aces' | 'albatrosses') => void;
 }
 
-function Board({ title, accent, rows, metric }: BoardProps) {
+function Board({ title, accent, rows, metric, onViewAll }: BoardProps) {
   const filtered = useMemo(
     () =>
       rows
@@ -52,6 +61,16 @@ function Board({ title, accent, rows, metric }: BoardProps) {
         .slice(0, MAX_ROWS),
     [rows, metric],
   );
+
+  const boardMax = filtered[0]?.[metric] ?? 1;
+  const barGradient =
+    metric === 'aces'
+      ? `linear-gradient(90deg, ${SC_ACE}, ${SC_FILL_GOLD})`
+      : `linear-gradient(90deg, ${SC_ALBATROSS}, ${SC_ALBATROSS_DARK})`;
+  // SC_ACE_DARK reserved for future dark-theme variant; keep import stable.
+  void SC_ACE_DARK;
+
+  const hasHolders = filtered.length > 0;
 
   return (
     <div
@@ -78,7 +97,7 @@ function Board({ title, accent, rows, metric }: BoardProps) {
       >
         {title}
       </div>
-      {filtered.length === 0 ? (
+      {!hasHolders ? (
         <div
           style={{
             padding: '28px 8px',
@@ -95,70 +114,149 @@ function Board({ title, accent, rows, metric }: BoardProps) {
           {filtered.map((r, i) => {
             const name = formatHolderName(r.holder_name);
             const rank = i + 1;
-            const rankColor = rank === 1 ? GOLD : INK;
+            const isTop = rank === 1;
             const count = r[metric] ?? 0;
+            const pct = Math.max(0.08, Math.min(1, count / (boardMax || 1)));
+
+            const rowInner = (
+              <>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 18,
+                      fontSize: 13,
+                      fontWeight: isTop ? 800 : 700,
+                      color: isTop ? accent : RANK_MUTE,
+                      fontVariantNumeric: 'tabular-nums',
+                      textAlign: 'right',
+                      letterSpacing: '-0.02em',
+                    }}
+                  >
+                    {rank}
+                  </div>
+                  <SquircleAvatar
+                    size={26}
+                    srcCandidates={r.holder_avatar ? [r.holder_avatar] : []}
+                    alt={name}
+                    fallback={initials(name)}
+                    userId={r.user_id}
+                    hairlineRing
+                    ringColor={isTop ? SC_FILL_GOLD : LIGHT_HAIRLINE}
+                  />
+                  <div
+                    style={{
+                      flex: 1,
+                      minWidth: 0,
+                      fontSize: 12.5,
+                      fontWeight: 700,
+                      color: INK,
+                      letterSpacing: '-0.005em',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {name}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 14,
+                      fontWeight: isTop ? 800 : 900,
+                      color: isTop ? accent : INK,
+                      fontVariantNumeric: 'tabular-nums',
+                      letterSpacing: '-0.01em',
+                    }}
+                  >
+                    {count}
+                  </div>
+                </div>
+                {/* Count bar */}
+                <div
+                  style={{
+                    marginTop: 6,
+                    marginLeft: 26,
+                    height: 3.5,
+                    borderRadius: 999,
+                    background: BAR_TRACK,
+                    overflow: 'hidden',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: `${pct * 100}%`,
+                      height: '100%',
+                      borderRadius: 999,
+                      background: barGradient,
+                      transition: 'width .35s cubic-bezier(.2,.8,.2,1)',
+                    }}
+                  />
+                </div>
+              </>
+            );
+
+            if (isTop) {
+              return (
+                <div
+                  key={`${r.user_id ?? name}-${i}`}
+                  style={{
+                    borderRadius: 12,
+                    padding: '9px 8px',
+                    border: '1px solid rgba(255,210,0,0.5)',
+                    background:
+                      'linear-gradient(120deg, rgba(255,210,0,0.12), rgba(255,210,0,0.02))',
+                    marginBottom: 2,
+                  }}
+                >
+                  {rowInner}
+                </div>
+              );
+            }
+
             return (
               <div
                 key={`${r.user_id ?? name}-${i}`}
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
                   padding: '8px 4px',
-                  borderTop: i === 0 ? 'none' : `0.5px solid ${HAIRLINE}`,
+                  borderTop: `0.5px solid ${HAIRLINE}`,
                 }}
               >
-                <div
-                  style={{
-                    width: 18,
-                    fontSize: 13,
-                    fontWeight: 700,
-                    color: rankColor,
-                    fontVariantNumeric: 'tabular-nums',
-                    textAlign: 'right',
-                    letterSpacing: '-0.02em',
-                  }}
-                >
-                  {rank}
-                </div>
-                <SquircleAvatar
-                  size={26}
-                  srcCandidates={r.holder_avatar ? [r.holder_avatar] : []}
-                  alt={name}
-                  fallback={initials(name)}
-                  userId={r.user_id}
-                  hairlineRing
-                  ringColor={LIGHT_HAIRLINE}
-                />
-                <div
-                  style={{
-                    flex: 1,
-                    minWidth: 0,
-                    fontSize: 12.5,
-                    fontWeight: 700,
-                    color: INK,
-                    letterSpacing: '-0.005em',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {name}
-                </div>
-                <div
-                  style={{
-                    fontSize: 14,
-                    fontWeight: 800,
-                    color: accent,
-                    fontVariantNumeric: 'tabular-nums',
-                    letterSpacing: '-0.01em',
-                  }}
-                >
-                  {count}
-                </div>
+                {rowInner}
               </div>
             );
           })}
+          {onViewAll && (
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                paddingTop: 6,
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => onViewAll(metric)}
+                style={{
+                  border: 'none',
+                  background: 'none',
+                  padding: '4px 6px',
+                  fontFamily: FONT,
+                  fontSize: 11,
+                  fontWeight: 800,
+                  color: HOUSE_AMBER,
+                  letterSpacing: '0.04em',
+                  cursor: 'pointer',
+                }}
+              >
+                View all {'\u203A'}
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -167,9 +265,10 @@ function Board({ title, accent, rows, metric }: BoardProps) {
 
 interface Props {
   region: string | null;
+  onViewAll?: (metric: 'aces' | 'albatrosses') => void;
 }
 
-export function LegendaryLeadersBoards({ region }: Props) {
+export function LegendaryLeadersBoards({ region, onViewAll }: Props) {
   const { data } = useRegionLegendaryLeaders(region);
   const rows = data ?? [];
 
@@ -184,7 +283,13 @@ export function LegendaryLeadersBoards({ region }: Props) {
     >
       {/* Wrap so each board is min ~280px; single-col below ~600px viewport. */}
       <div style={{ flex: '1 1 280px', minWidth: 0, display: 'flex' }}>
-        <Board title="Most Aces" accent={SC_ACE} rows={rows} metric="aces" />
+        <Board
+          title="Most Aces"
+          accent={SC_ACE}
+          rows={rows}
+          metric="aces"
+          onViewAll={onViewAll}
+        />
       </div>
       <div style={{ flex: '1 1 280px', minWidth: 0, display: 'flex' }}>
         <Board
@@ -192,6 +297,7 @@ export function LegendaryLeadersBoards({ region }: Props) {
           accent={SC_ALBATROSS}
           rows={rows}
           metric="albatrosses"
+          onViewAll={onViewAll}
         />
       </div>
     </div>

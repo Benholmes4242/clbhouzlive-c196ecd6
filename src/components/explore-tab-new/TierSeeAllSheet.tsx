@@ -55,6 +55,7 @@ interface Props {
   rows: FeatRow[];
   onRowTap?: (row: FeatRow) => void;
   initialMode?: RecordsMode;
+  initialMetric?: 'aces' | 'albatrosses';
 }
 
 // Toggle exposed on tiers that have both RECENT and ALL TIME cache keys.
@@ -63,10 +64,10 @@ function tierHasToggle(tier: FeatTier): boolean {
   return tier !== 'eagles';
 }
 
-export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, initialMode = 'latest' }: Props) {
+export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, initialMode = 'latest', initialMetric = 'aces' }: Props) {
   const [visible, setVisible] = useState(PAGE);
   const [mode, setMode] = useState<RecordsMode>(initialMode);
-  const [metric, setMetric] = useState<'aces' | 'albatrosses'>('aces');
+  const [metric, setMetric] = useState<'aces' | 'albatrosses'>(initialMetric);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const scrollerRef = useRef<HTMLDivElement | null>(null);
 
