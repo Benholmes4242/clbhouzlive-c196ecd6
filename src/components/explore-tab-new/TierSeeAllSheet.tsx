@@ -87,7 +87,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
   }, [fetched, mode, rows, initialMode, tier]);
 
   const bestToPar: number | null = useMemo(() => {
-    if (tier !== 'records' || mode !== 'alltime') return null;
+    if (tier !== 'records') return null;
     let best: number | null = null;
     for (const r of displayRows) {
       const d = rowToPar(r);
@@ -95,7 +95,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
       if (best == null || d < best) best = d;
     }
     return best;
-  }, [tier, mode, displayRows]);
+  }, [tier, displayRows]);
 
   useEffect(() => {
     if (!open) return;

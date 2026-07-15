@@ -121,7 +121,7 @@ export function CrownCard({ row, opener, mode = 'latest' }: { row: FeatRow; open
         {row.course_name}
       </div>
 
-      {mode === 'alltime' && showDelta ? (
+      {showDelta ? (
         <div style={{ marginTop: 10, display: 'flex', alignItems: 'baseline', gap: 9 }}>
           <div
             style={{
