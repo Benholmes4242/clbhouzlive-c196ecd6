@@ -107,13 +107,16 @@ function ToughCard({
       <div
         style={{
           position: 'relative',
-          marginTop: 2,
-          fontSize: 10,
+          marginTop: 4,
+          fontSize: 9.5,
+          fontWeight: 800,
+          letterSpacing: '0.1em',
+          textTransform: 'uppercase',
           color: '#94A3B8',
           lineHeight: 1.3,
         }}
       >
-        avg per round · {totalRounds} rounds
+        AVG PER ROUND {'\u00B7'} {totalRounds} ROUNDS
       </div>
     </button>
   );
