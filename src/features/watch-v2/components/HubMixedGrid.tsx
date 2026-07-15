@@ -5,6 +5,7 @@ import { toFeedPosts } from '../utils/toFeedPost';
 import { useWatchAutoplay } from '@/video/useWatchAutoplay';
 import { packColumns } from '@/components/feed-cards/packColumns';
 import { FeedCard } from '@/components/feed-cards/FeedCard';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
