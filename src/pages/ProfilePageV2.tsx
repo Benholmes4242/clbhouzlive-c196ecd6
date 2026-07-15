@@ -43,6 +43,7 @@ import { PrivateProfileGate } from '@/components/profile/PrivateProfileGate';
 import { CoverPhotoFallback } from '@/components/ui/CoverPhotoFallback';
 // FloatingPageHeader removed (H3) — chrome now driven by ChromeIsland registry.
 import { useSetChromeLeftOverride } from '@/features/chrome-v2/leftOverride';
+import { FilterChips } from '@/components/ui/FilterChips';
 
 
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
@@ -1253,49 +1254,22 @@ const ProfilePageV2Content: React.FC = () => {
 
         {/* Achievements Rail removed */}
 
-        {/* Segmented control tabs */}
-        <section 
+        {/* Canonical chip tabs */}
+        <section
           className="px-4 pt-1 pb-0"
-          style={{ 
+          style={{
             background: 'hsl(var(--background))',
             touchAction: 'auto',
             pointerEvents: 'auto',
           }}
         >
-          <div 
-            className="flex items-center justify-center gap-10 w-full"
-          >
-            {tabs.map((tab) => {
-              const isActive = activeSection === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => handleTabChange(tab.id)}
-                  className={cn(
-                    "relative text-sm transition-colors duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98] flex items-center justify-center",
-                    isActive ? "font-bold" : "font-semibold hover:text-foreground"
-                  )}
-                  style={{
-                    touchAction: 'auto',
-                    background: 'transparent',
-                    border: 'none',
-                    color: isActive ? '#0F172A' : '#94A3B8',
-                    letterSpacing: '-0.01em',
-                    padding: '8px 0',
-                  }}
-                >
-                  <span
-                    style={{
-                      display: 'inline-block',
-                      paddingBottom: 6,
-                      borderBottom: isActive ? '1.5px solid #0F172A' : '1.5px solid transparent',
-                    }}
-                  >
-                    {tab.label}
-                  </span>
-                </button>
-              );
-            })}
+          <div className="flex justify-center">
+            <FilterChips
+              options={tabs.map((t) => ({ id: t.id, label: t.label }))}
+              value={activeSection}
+              onChange={(id) => handleTabChange(id)}
+              ariaLabel="Profile sections"
+            />
           </div>
         </section>
 

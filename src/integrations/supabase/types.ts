@@ -20472,6 +20472,7 @@ export type Database = {
         }
         Returns: string
       }
+      sweep_orphaned_processing_posts: { Args: never; Returns: Json }
       sync_user_email: {
         Args: { current_email: string; user_id_param: string }
         Returns: undefined
