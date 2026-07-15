@@ -73,18 +73,34 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
   const { data: fetched } = useRegionFeats(region, fetchTier, fetchMode);
 
   const displayRows: FeatRow[] = useMemo(() => {
-    if (fetched && fetched.length > 0) return fetched;
-    // Fallback to the caller-provided rows only while the mode-fetch is empty
-    // (typical during the first paint of the recent tab).
-    if (mode === 'latest') return rows;
-    return [];
-  }, [fetched, mode, rows]);
+    const base =
+      fetched && fetched.length > 0
+        ? fetched
+        : mode === initialMode
+          ? rows
+          : [];
+    if (tier === 'records' && mode === 'alltime') {
+      return sortRecordsAllTime(base);
+    }
+    return base;
+  }, [fetched, mode, rows, initialMode, tier]);
+
+  const bestToPar: number | null = useMemo(() => {
+    if (tier !== 'records' || mode !== 'alltime') return null;
+    let best: number | null = null;
+    for (const r of displayRows) {
+      const d = rowToPar(r);
+      if (d == null) continue;
+      if (best == null || d < best) best = d;
+    }
+    return best;
+  }, [tier, mode, displayRows]);
 
   useEffect(() => {
     if (!open) return;
     setVisible(PAGE);
-    setMode('latest');
-  }, [open]);
+    setMode(initialMode);
+  }, [open, initialMode]);
 
   useEffect(() => {
     setVisible(PAGE);
@@ -92,7 +108,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
   }, [mode]);
 
   useEffect(() => {
-    if (!open || false) return;
+    if (!open) return;
     const node = sentinelRef.current;
     if (!node) return;
     const io = new IntersectionObserver(
@@ -105,7 +121,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
     );
     io.observe(node);
     return () => io.disconnect();
-  }, [open, displayRows.length, false]);
+  }, [open, displayRows.length]);
 
   // Own scorecard opener so ALL TIME rows (not present in the caller's list)
   // still open cleanly. Fall back to caller's onRowTap if provided.
@@ -121,7 +137,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
   };
 
   const visibleRows = displayRows.slice(0, visible);
-  const total = false ? 0 : displayRows.length;
+  const total = displayRows.length;
 
   return (
     <BottomSheet
