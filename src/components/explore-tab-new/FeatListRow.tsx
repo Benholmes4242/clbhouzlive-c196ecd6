@@ -48,14 +48,29 @@ interface Props {
   onTap?: () => void;
   index?: number;
   medals?: number | null;
+  mode?: RecordsMode;
+  bestToPar?: number | null;
 }
 
 // Birdie hauls leaderboard row - gaming-light Discover rebuild spec 3F.
-export function FeatListRow({ row, tier, onTap, index = 0, medals }: Props) {
+export function FeatListRow({ row, tier, onTap, index = 0, medals, mode = 'latest', bestToPar = null }: Props) {
   const holder = useMemo(() => formatHolderName(row.holder_name), [row.holder_name]);
   const when = relDate(row.play_date ?? row.attained_at ?? null);
   const rank = index + 1;
   const isTop = rank === 1;
+  const isRecordsAllTime = tier === 'records' && mode === 'alltime';
+  const isStableford = row.category === 'best_stableford_all_time';
+  const d = isRecordsAllTime ? rowToPar(row) : null;
+  const showToParPrimary = isRecordsAllTime && d != null && !isStableford;
+  const showBar = showToParPrimary;
+  const grossStr = row.value != null ? String(row.value) : (row.feat_value ?? '').match(/\d+/)?.[0] ?? '';
+
+  const WORST = 15;
+  const anchor = bestToPar ?? 0;
+  const span = WORST - anchor;
+  const barPct = showBar && d != null
+    ? Math.max(0.06, Math.min(1, (WORST - d) / (span || 1)))
+    : 0;
 
   // Value + label vary by tier.
   // - records: gross score / GROSS
