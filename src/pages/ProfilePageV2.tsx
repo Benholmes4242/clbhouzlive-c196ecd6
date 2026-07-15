@@ -43,6 +43,7 @@ import { PrivateProfileGate } from '@/components/profile/PrivateProfileGate';
 import { CoverPhotoFallback } from '@/components/ui/CoverPhotoFallback';
 // FloatingPageHeader removed (H3) — chrome now driven by ChromeIsland registry.
 import { useSetChromeLeftOverride } from '@/features/chrome-v2/leftOverride';
+import { FilterChips } from '@/components/ui/FilterChips';
 
 
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
