@@ -80,6 +80,8 @@ export function ThisWeek({ slug, collegeName }: Props) {
             size={30}
             srcCandidates={getPlayerHeadshotCandidates(row.fullName, row.tourCodes?.[0] ?? 'pga')}
             alt={row.fullName}
+            hairlineRing
+            ringColor="rgba(15,23,42,0.12)"
           />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div
