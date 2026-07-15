@@ -11,6 +11,7 @@ import {
 } from '@/features/tourhub/_shared/tokens';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { SC_ACE, SC_ALBATROSS, SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
+import { formatHcp } from '@/lib/formatHcp';
 import { REGION_TABS } from './AlmanacSections';
 import {
   useRegionFeats,
