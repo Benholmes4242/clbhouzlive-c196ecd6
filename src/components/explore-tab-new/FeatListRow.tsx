@@ -177,30 +177,61 @@ export function FeatListRow({ row, tier, onTap, index = 0, medals }: Props) {
           minWidth: 42,
         }}
       >
-        <div
-          style={{
-            fontSize: 15,
-            fontWeight: 900,
-            color: '#0F172A',
-            lineHeight: 1,
-            fontVariantNumeric: 'tabular-nums',
-          }}
-        >
-          {value}
-        </div>
-        <div
-          style={{
-            marginTop: 2,
-            fontSize: 8,
-            fontWeight: 800,
-            letterSpacing: '0.1em',
-            textTransform: 'uppercase',
-            color: '#94A3B8',
-            lineHeight: 1,
-          }}
-        >
-          {label}
-        </div>
+        {tier === 'eagles' || tier === 'legendary' ? (
+          <>
+            <div
+              style={{
+                fontSize: 8,
+                fontWeight: 800,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                color: '#94A3B8',
+                lineHeight: 1,
+              }}
+            >
+              {label}
+            </div>
+            <div
+              style={{
+                marginTop: 2,
+                fontSize: 15,
+                fontWeight: 900,
+                color: '#0F172A',
+                lineHeight: 1,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {value}
+            </div>
+          </>
+        ) : (
+          <>
+            <div
+              style={{
+                fontSize: 15,
+                fontWeight: 900,
+                color: '#0F172A',
+                lineHeight: 1,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {value}
+            </div>
+            <div
+              style={{
+                marginTop: 2,
+                fontSize: 8,
+                fontWeight: 800,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                color: '#94A3B8',
+                lineHeight: 1,
+              }}
+            >
+              {label}
+            </div>
+          </>
+        )}
       </div>
     </button>
   );
