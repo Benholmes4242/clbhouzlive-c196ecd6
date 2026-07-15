@@ -17,6 +17,7 @@ import { resolveRestingRect, getCurrentViewport, type RestingRect } from '@/lib/
 import { FS_TRANSITION_MODE } from '@/lib/media/transitionMode';
 import { TapForSoundPill } from '@/audio/MuteButton';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
+import { InlineSpinner } from '@/components/ui/InlineSpinner';
 
 
 import { usePostViewTracker } from '@/hooks/usePostViewTracker';
