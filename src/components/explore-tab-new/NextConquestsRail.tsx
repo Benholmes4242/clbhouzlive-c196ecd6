@@ -26,7 +26,7 @@ const CATEGORY_META: Record<string, { label: string; unit: string; unitSingular:
   most_rounds: { label: 'Most rounds', unit: 'rounds', unitSingular: 'round', style: 'back' },
 };
 
-const LOWER_IS_BETTER = new Set(['lowest_gross', 'best_score_diff']);
+
 
 function stripWindow(category: string): string {
   return category.replace(/_(90d|all_time)$/, '');
