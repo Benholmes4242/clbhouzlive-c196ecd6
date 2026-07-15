@@ -12,6 +12,7 @@ import {
   INK,
   INK_MUTE,
 } from '@/features/tourhub/_shared/tokens';
+import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import type { LucideIcon } from 'lucide-react';
 import {
   Compass,
