@@ -244,7 +244,6 @@ export function CollegeFranchise() {
           const name = displayName(s, media);
           const fname = fullName(s, media);
           const logo = getCollegeLogoUrl(fname);
-          const color = getCollegeColor(s.normalized_name);
           const cap = captainMap?.get(s.normalized_name);
           const capName = cap ? abbreviate(cap.fullName) : null;
           return (
@@ -271,10 +270,6 @@ export function CollegeFranchise() {
               <SchoolSquircle size={26} logo={logo} name={name} />
               <div style={{ minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
-                  <span
-                    aria-hidden
-                    style={{ width: 3, height: 3, borderRadius: '50%', background: color, flexShrink: 0 }}
-                  />
                   <span style={{ fontSize: 13, fontWeight: 700, color: V4.ink, letterSpacing: '-0.005em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {name}
                   </span>
