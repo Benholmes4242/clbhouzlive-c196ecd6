@@ -75,6 +75,8 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
   const reduced = usePrefersReducedMotion();
   const [mounted, setMounted] = useState(open);
   const [visible, setVisible] = useState(false);
+  const { data: liveTournaments, isFetched: liveFetched } = useLiveTournaments();
+  const showLive = liveFetched && (liveTournaments?.length ?? 0) > 0;
 
   // Mount on open; unmount after exit transition.
   useEffect(() => {
