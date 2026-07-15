@@ -57,9 +57,9 @@ function tierHasToggle(tier: FeatTier): boolean {
   return tier !== 'eagles';
 }
 
-export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap }: Props) {
+export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, initialMode = 'latest' }: Props) {
   const [visible, setVisible] = useState(PAGE);
-  const [mode, setMode] = useState<RecordsMode>('latest');
+  const [mode, setMode] = useState<RecordsMode>(initialMode);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const scrollerRef = useRef<HTMLDivElement | null>(null);
 
