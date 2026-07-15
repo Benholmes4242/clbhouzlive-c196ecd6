@@ -1,7 +1,7 @@
 import React from 'react';
 import { Flag } from 'lucide-react';
 import { EmptyStateTile } from '@/components/profile/handicap/gam/_shared/EmptyStateTile';
-import { AMBER, DEEP_AMBER, FONT, INK } from './_constants';
+import { AMBER, FONT, INK } from './_constants';
 import { HAIRLINE_INK_8, INK_TINT_06 } from '@/features/courses/_shared/tokens';
 
 const SLATE = 'var(--hcp-t-60, #64748b)';
@@ -15,7 +15,7 @@ export const HolesEmptyState: React.FC<{ courseName: string | null }> = ({ cours
       style={{
         fontSize: 10.5,
         fontWeight: 800,
-        color: DEEP_AMBER,
+        color: '#94A3B8',
         letterSpacing: '0.16em',
         textTransform: 'uppercase',
         marginBottom: 8,
