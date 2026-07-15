@@ -12,9 +12,9 @@ export const POST_LIMITS = {
   /** Maximum image file size in bytes (50MB) — generous for RAW/HEIC */
   MAX_IMAGE_SIZE_BYTES: 50 * 1024 * 1024,
   MAX_IMAGE_SIZE_DISPLAY: '50MB',
-  /** Maximum video duration in seconds (1 hour) */
-  MAX_VIDEO_DURATION_SECONDS: 3600,
-  MAX_VIDEO_DURATION_DISPLAY: '1 hour',
+  /** Maximum video duration in seconds (2 hours) */
+  MAX_VIDEO_DURATION_SECONDS: 7200,
+  MAX_VIDEO_DURATION_DISPLAY: '2 hours',
   /** Auto-save interval in milliseconds (30 seconds) */
   AUTO_SAVE_INTERVAL_MS: 30000,
   /** Maximum number of tags per post */
@@ -93,6 +93,14 @@ export function validateMediaFile(
       return { 
         valid: false, 
         error: `Video too long (${durationStr}). Maximum is ${POST_LIMITS.MAX_VIDEO_DURATION_DISPLAY}.` 
+      };
+    }
+    // Duration could not be probed -> do NOT let it silently bypass the
+    // cap and fail at Cloudflare. Reject with a clear message.
+    if (!videoDuration) {
+      return {
+        valid: false,
+        error: `Could not read this video's length. Please re-select or try a different file.`
       };
     }
   } else if (isImage) {
