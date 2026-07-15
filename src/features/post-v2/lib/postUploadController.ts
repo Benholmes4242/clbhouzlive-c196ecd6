@@ -254,8 +254,19 @@ async function runJob(job: InternalJob): Promise<void> {
   }
 
   if (!ctx.skipFinalize) {
-    const { error } = await supabase.rpc('finalize_post_v2', { p_post_id: ctx.postId });
+    const { data: fin, error } = await supabase.rpc('finalize_post_v2', { p_post_id: ctx.postId });
     if (error) throw error;
+
+    const finalized = (fin as any)?.finalized === true;
+
+    if (!finalized) {
+      const reason = (fin as any)?.reason
+        ?? ((fin as any)?.pending_media != null
+             ? `media still processing (${(fin as any).pending_media})`
+             : 'finalize refused');
+
+      throw new Error(`Post could not be published: ${reason}`);
+    }
   }
 
   uploadEventBus.emit('upload:complete', {
