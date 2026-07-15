@@ -320,7 +320,7 @@ function LegendaryModeToggle({
   );
 }
 
-const EAGLE_BAR_GRADIENT = `linear-gradient(90deg, ${SC_EAGLE}, ${SC_EAGLE_DARK})`;
+const EAGLE_BAR_GRADIENT = 'linear-gradient(90deg, #F7931E, #FBBC2E)';
 const EAGLES_RAIL_CAP = 12;
 
 function EaglesSection({
