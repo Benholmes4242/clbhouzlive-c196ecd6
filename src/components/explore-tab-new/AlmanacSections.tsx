@@ -1,4 +1,5 @@
 import { memo, useMemo, useState } from 'react';
+
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { FeatCard } from './FeatCard';
@@ -221,6 +222,18 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard', onRowTap
   const hasOverflow = rows.length > cap;
   const [sheetOpen, setSheetOpen] = useState(false);
 
+  // Birdie hauls list anchor: computed over the page's displayed rows,
+  // mirroring the sheet's birdieMaxCount logic.
+  const birdieMaxCount = useMemo(() => {
+    if (tier !== 'birdie_hauls') return null;
+    let max = 0;
+    for (const r of displayRows) {
+      const n = parseFloat(String(r.feat_value ?? r.value ?? '').replace(/[^\d.]/g, '')) || 0;
+      if (n > max) max = n;
+    }
+    return max > 0 ? max : null;
+  }, [tier, displayRows]);
+
   // Batch medal counts for the visible list-variant holders. Rails and
   // cards do not surface a gem slot yet -- keep the RPC scoped.
   const listHolderIds = useMemo(
@@ -284,6 +297,8 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard', onRowTap
               index={i}
               medals={row.user_id ? medalsMap?.get(row.user_id) ?? null : null}
               onTap={onRowTap ? () => onRowTap(row) : undefined}
+              mode={mode}
+              maxCount={birdieMaxCount}
             />
           ))}
         </div>
