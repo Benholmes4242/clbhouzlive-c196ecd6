@@ -49,7 +49,7 @@ export const WeeklyBanner: React.FC<Props> = ({ banner }) => {
               fontSize: 8.5,
               fontWeight: 800,
               letterSpacing: '0.12em',
-              color: '#F7931E',
+              color: 'var(--hcp-t-60)',
               textTransform: 'uppercase',
             }}
           >
