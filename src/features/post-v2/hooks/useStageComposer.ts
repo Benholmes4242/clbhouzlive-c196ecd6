@@ -6,6 +6,24 @@
 // usePostUploadOrchestrator for those).
 
 import { useCallback, useEffect, useState } from 'react';
+import { toast } from '@/lib/toast';
+import { POST_LIMITS, formatDuration } from '@/constants/postLimits';
+
+// Probe a video File's duration (seconds). Resolves 0 if unreadable.
+function probeVideoDuration(file: File): Promise<number> {
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(file);
+    const v = document.createElement('video');
+    v.preload = 'metadata';
+    const done = (d: number) => {
+      try { URL.revokeObjectURL(url); } catch { /* ignore */ }
+      resolve(d);
+    };
+    v.onloadedmetadata = () => done(Number.isFinite(v.duration) ? v.duration : 0);
+    v.onerror = () => done(0);
+    v.src = url;
+  });
+}
 
 export type FrameId = 'original' | '4:5' | '1:1' | '9:16';
 
