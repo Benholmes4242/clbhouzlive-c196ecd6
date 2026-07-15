@@ -434,8 +434,8 @@ function LegendaryLeaderRow({ row, index, metric, metricAccent, max, onTap }: Le
     metric === 'aces'
       ? `+${other} ${other === 1 ? 'albatross' : 'albatrosses'}`
       : `+${other} ${other === 1 ? 'ace' : 'aces'}`;
-  const hcp = (row as unknown as { holder_hcp?: number | null }).holder_hcp;
-  const club = (row as unknown as { holder_club?: string | null }).holder_club;
+  const hcp = row.holder_hcp;
+  const club = row.holder_club;
   const pct = Math.max(0.08, Math.min(1, count / (max || 1)));
 
   const barGradient =
