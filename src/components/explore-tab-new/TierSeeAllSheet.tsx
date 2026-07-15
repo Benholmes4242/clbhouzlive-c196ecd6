@@ -461,6 +461,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
                 onTap={() => handleRowTap(row)}
                 mode={mode}
                 bestToPar={bestToPar}
+                maxCount={birdieMaxCount}
               />
             ))}
           </div>
