@@ -46,14 +46,13 @@ function categoryLabel(category: string): string {
   return (CATEGORY_META[base]?.label ?? base.replace(/_/g, ' ')).toUpperCase();
 }
 
-function progressPct(category: string, userValue: number, leaderValue: number): number {
-  const base = stripWindow(category);
-  if (userValue <= 0 || leaderValue <= 0) return 6;
-  const raw = LOWER_IS_BETTER.has(base)
-    ? leaderValue / userValue
-    : userValue / leaderValue;
-  return Math.max(6, Math.min(96, Math.round(raw * 100)));
+function progressPct(_category: string, gap: number): number {
+  // Bar = closeness to taking the record, in units, category-agnostic.
+  // 1 unit away = 96, each further unit steps down 14, floor 20.
+  const n = Math.max(1, Math.round(gap));
+  return Math.max(20, 96 - (n - 1) * 14);
 }
+
 
 function ConquestCard({ row }: { row: TitleInReach }) {
   const navigate = useNavigate();
