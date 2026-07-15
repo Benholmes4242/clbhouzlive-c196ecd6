@@ -463,8 +463,8 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Legendary leaders row - all-time aces / albatrosses (leaders payload).
-// Distinct data shape from FeatRow so it lives here rather than in FeatListRow.
+// Generalized count-leader row - used for legendary (aces/albatrosses) and
+// eagles all-time views. Distinct data shape from FeatRow.
 // ─────────────────────────────────────────────────────────────────────────────
 
 const LEGEND_INK = '#0F172A';
@@ -492,42 +492,51 @@ function leaderInitials(name: string): string {
   );
 }
 
-interface LegendaryLeaderRowProps {
-  row: LegendaryLeaderRow;
+interface CountLeaderSheetRowProps {
   index: number;
-  metric: 'aces' | 'albatrosses';
-  metricAccent: string;
+  userId: string | null;
+  holderName: string | null;
+  holderAvatar: string | null;
+  holderHcp: number | null;
+  holderClub: string | null;
+  count: number;
   max: number;
+  accent: string;
+  barGradient: string;
+  countLabelSingular: string;
+  countLabelPlural: string;
+  /** Optional secondary line, e.g. cross-metric or club. */
+  subline: string | null;
   onTap?: () => void;
 }
 
-function LegendaryLeaderRow({ row, index, metric, metricAccent, max, onTap }: LegendaryLeaderRowProps) {
+function CountLeaderSheetRow({
+  index,
+  userId,
+  holderName,
+  holderAvatar,
+  holderHcp,
+  holderClub,
+  count,
+  max,
+  accent,
+  barGradient,
+  countLabelSingular,
+  countLabelPlural,
+  subline,
+  onTap,
+}: CountLeaderSheetRowProps) {
   const rank = index + 1;
   const isTop = rank === 1;
-  const name = formatLeaderName(row.holder_name);
-  const count = row[metric] ?? 0;
-  const other = metric === 'aces' ? (row.albatrosses ?? 0) : (row.aces ?? 0);
-  const otherLabel =
-    metric === 'aces'
-      ? `+${other} ${other === 1 ? 'albatross' : 'albatrosses'}`
-      : `+${other} ${other === 1 ? 'ace' : 'aces'}`;
-  const hcp = row.holder_hcp;
-  const club = row.holder_club;
+  const name = formatLeaderName(holderName);
   const pct = Math.max(0.08, Math.min(1, count / (max || 1)));
-
-  const barGradient =
-    metric === 'aces'
-      ? `linear-gradient(90deg, ${SC_ACE}, ${SC_FILL_GOLD})`
-      : `linear-gradient(90deg, ${SC_ALBATROSS}, #FFD84D)`;
-
-  const countLabel =
-    metric === 'aces'
-      ? count === 1
-        ? 'ACE'
-        : 'ACES'
-      : count === 1
-        ? 'ALBATROSS'
-        : 'ALBATROSSES';
+  const countLabel = count === 1 ? countLabelSingular : countLabelPlural;
+  const secondLine =
+    subline && holderClub
+      ? `${subline} \u00B7 ${holderClub}`
+      : subline
+        ? subline
+        : holderClub;
 
   return (
     <button
@@ -559,7 +568,7 @@ function LegendaryLeaderRow({ row, index, metric, metricAccent, max, onTap }: Le
             fontSize: 16,
             fontWeight: 800,
             fontVariantNumeric: 'tabular-nums',
-            color: isTop ? metricAccent : 'rgba(15,23,42,0.35)',
+            color: isTop ? accent : 'rgba(15,23,42,0.35)',
             lineHeight: 1,
             textAlign: 'center',
           }}
@@ -569,23 +578,16 @@ function LegendaryLeaderRow({ row, index, metric, metricAccent, max, onTap }: Le
         <div style={{ flexShrink: 0 }}>
           <SquircleAvatar
             size={40}
-            srcCandidates={row.holder_avatar ? [row.holder_avatar] : []}
+            srcCandidates={holderAvatar ? [holderAvatar] : []}
             alt={name}
             fallback={leaderInitials(name)}
-            userId={row.user_id ?? undefined}
+            userId={userId ?? undefined}
             hairlineRing
-            ringColor={isTop ? '#FBBC2E' : undefined}
+            ringColor={isTop ? SC_FILL_GOLD : undefined}
           />
         </div>
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'baseline',
-              gap: 6,
-              minWidth: 0,
-            }}
-          >
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, minWidth: 0 }}>
             <span
               style={{
                 fontSize: 14.5,
@@ -602,7 +604,7 @@ function LegendaryLeaderRow({ row, index, metric, metricAccent, max, onTap }: Le
             >
               {name}
             </span>
-            {hcp != null ? (
+            {holderHcp != null ? (
               <span
                 style={{
                   flexShrink: 0,
@@ -612,11 +614,11 @@ function LegendaryLeaderRow({ row, index, metric, metricAccent, max, onTap }: Le
                   fontVariantNumeric: 'tabular-nums',
                 }}
               >
-                {formatHcp(hcp)}
+                {formatHcp(holderHcp)}
               </span>
             ) : null}
           </div>
-          {(other > 0 || club) && (
+          {secondLine && (
             <div
               style={{
                 fontSize: 10.5,
@@ -628,11 +630,7 @@ function LegendaryLeaderRow({ row, index, metric, metricAccent, max, onTap }: Le
                 whiteSpace: 'nowrap',
               }}
             >
-              {other > 0 && club
-                ? `${otherLabel} \u00B7 ${club}`
-                : other > 0
-                  ? otherLabel
-                  : club}
+              {secondLine}
             </div>
           )}
         </div>
@@ -650,7 +648,7 @@ function LegendaryLeaderRow({ row, index, metric, metricAccent, max, onTap }: Le
             style={{
               fontSize: 24,
               fontWeight: 900,
-              color: isTop ? metricAccent : LEGEND_INK,
+              color: isTop ? accent : LEGEND_INK,
               lineHeight: 1,
               fontVariantNumeric: 'tabular-nums',
               letterSpacing: '-0.02em',
@@ -698,3 +696,4 @@ function LegendaryLeaderRow({ row, index, metric, metricAccent, max, onTap }: Le
 }
 
 export default TierSeeAllSheet;
+
