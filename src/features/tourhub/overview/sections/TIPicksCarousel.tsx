@@ -139,6 +139,11 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
   const [sheet, setSheet] = useState<SheetState>(null);
   const picks = data?.topContenders ?? [];
 
+  const leaderWinProb = useMemo(
+    () => Math.max(0, ...picks.map((p) => p.winProbability ?? 0)),
+    [picks]
+  );
+
   const playerIds = useMemo(() => picks.map((p) => p.playerId).filter(Boolean), [picks]);
   const needsLiveData = state === 'live' || state === 'completed';
   const { data: liveMap } = usePickLiveState(tournamentId, needsLiveData ? playerIds : [], {
