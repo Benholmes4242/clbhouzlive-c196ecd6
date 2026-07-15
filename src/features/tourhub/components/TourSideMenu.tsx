@@ -139,67 +139,96 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
           display: 'flex',
           flexDirection: 'column',
           willChange: 'transform',
+          overflow: 'hidden',
         }}
       >
-        {/* Primary group header */}
-        <div style={{ marginTop: 'max(20px, env(safe-area-inset-top, 0px))', paddingTop: 16 }}>
-          <GroupHeader>Tour</GroupHeader>
-        </div>
+        <img
+          src="/assets/logomark-orange.png"
+          alt=""
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            bottom: 'max(24px, env(safe-area-inset-bottom, 0px))',
+            right: -40,
+            width: 260,
+            height: 'auto',
+            opacity: 0.05,
+            pointerEvents: 'none',
+            zIndex: 0,
+            userSelect: 'none',
+          }}
+        />
 
-        {/* Nav list */}
-        <nav style={{ marginTop: 4, flex: 1, overflowY: 'auto' }}>
-          {DESTINATIONS.map(({ id, label, Icon }) => {
-            const isActive = id === activeTab;
-            return (
-              <button
-                key={id}
-                type="button"
-                onClick={() => {
-                  onSelectTab(id);
-                  onClose();
-                }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 14,
-                  width: 'calc(100% - 20px)',
-                  margin: '2px 10px',
-                  padding: '12px 14px',
-                  border: 'none',
-                  borderRadius: 14,
-                  background: isActive ? '#FFFFFF' : 'transparent',
-                  color: INK,
-                  fontFamily: 'inherit',
-                  fontSize: 16,
-                  fontWeight: isActive ? 800 : 600,
-                  letterSpacing: '-0.01em',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  boxShadow: isActive ? '0 1px 2px rgba(15,23,42,0.05)' : 'none',
-                  transition: 'background 150ms ease',
-                }}
-              >
-                <span style={{ width: 22, display: 'inline-flex', justifyContent: 'center' }}>
-                  <Icon size={20} color={INK} strokeWidth={isActive ? 2.4 : 2} />
-                </span>
-                {label}
-              </button>
-            );
-          })}
-        </nav>
-
-        {/* Secondary group header */}
-        <div style={{ marginTop: 8, paddingTop: 12, borderTop: `1px solid ${HAIRLINE_INK_10}` }}>
-          <div style={{ marginTop: 12 }}>
-            <GroupHeader>Account</GroupHeader>
+        <div
+          style={{
+            position: 'relative',
+            zIndex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            flex: 1,
+            minHeight: 0,
+          }}
+        >
+          {/* Primary group header */}
+          <div style={{ marginTop: 'max(20px, env(safe-area-inset-top, 0px))', paddingTop: 16 }}>
+            <GroupHeader>Tour</GroupHeader>
           </div>
-        </div>
 
-        {/* Secondary links */}
-        <div style={{ display: 'flex', flexDirection: 'column', padding: '0 24px 22px', gap: 4 }}>
-          <SecondaryLink Icon={Settings} label="Settings" onClick={() => { onClose(); onSettings(); }} />
-          <SecondaryLink Icon={User}     label="Profile"  onClick={() => { onClose(); onProfile(); }} />
-          <SecondaryLink Icon={LogOut}   label="Sign out" onClick={() => { onClose(); onSignOut(); }} />
+          {/* Nav list */}
+          <nav style={{ marginTop: 4, flex: 1, overflowY: 'auto' }}>
+            {DESTINATIONS.map(({ id, label, Icon }) => {
+              const isActive = id === activeTab;
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => {
+                    onSelectTab(id);
+                    onClose();
+                  }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 14,
+                    width: 'calc(100% - 20px)',
+                    margin: '2px 10px',
+                    padding: '12px 14px',
+                    border: 'none',
+                    borderRadius: 14,
+                    background: isActive ? '#FFFFFF' : 'transparent',
+                    color: INK,
+                    fontFamily: 'inherit',
+                    fontSize: 16,
+                    fontWeight: isActive ? 800 : 600,
+                    letterSpacing: '-0.01em',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    boxShadow: isActive ? '0 1px 2px rgba(15,23,42,0.05)' : 'none',
+                    transition: 'background 150ms ease',
+                  }}
+                >
+                  <span style={{ width: 22, display: 'inline-flex', justifyContent: 'center' }}>
+                    <Icon size={20} color={INK} strokeWidth={isActive ? 2.4 : 2} />
+                  </span>
+                  {label}
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* Secondary group header */}
+          <div style={{ marginTop: 8, paddingTop: 12, borderTop: `1px solid ${HAIRLINE_INK_10}` }}>
+            <div style={{ marginTop: 12 }}>
+              <GroupHeader>Account</GroupHeader>
+            </div>
+          </div>
+
+          {/* Secondary links */}
+          <div style={{ display: 'flex', flexDirection: 'column', padding: '0 24px 22px', gap: 4 }}>
+            <SecondaryLink Icon={Settings} label="Settings" onClick={() => { onClose(); onSettings(); }} />
+            <SecondaryLink Icon={User}     label="Profile"  onClick={() => { onClose(); onProfile(); }} />
+            <SecondaryLink Icon={LogOut}   label="Sign out" onClick={() => { onClose(); onSignOut(); }} />
+          </div>
         </div>
       </aside>
     </div>
@@ -212,7 +241,6 @@ function GroupHeader({ children }: { children: React.ReactNode }) {
       <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: AMBER, lineHeight: 1 }}>
         {children}
       </div>
-      <div style={{ width: 34, height: 3, borderRadius: 99, background: AMBER, marginTop: 9 }} />
     </div>
   );
 }
