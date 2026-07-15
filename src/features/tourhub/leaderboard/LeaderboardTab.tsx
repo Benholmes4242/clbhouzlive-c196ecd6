@@ -165,6 +165,7 @@ export function LeaderboardTab() {
   if (!selected) {
     return (
       <EditorialEmpty
+        tint="slate"
         eyebrow="Leaderboard"
         title="No live tournaments"
         body="When an event tees off, its live leaderboard will appear here."
@@ -437,6 +438,7 @@ export function LeaderboardTab() {
         <LeaderboardSkeleton />
       ) : filteredEntries.length === 0 ? (
         <EditorialEmpty
+          tint="slate"
           eyebrow="Leaderboard"
           title={searchQuery.trim() ? 'No players match' : 'Scoring not yet posted'}
           body={
