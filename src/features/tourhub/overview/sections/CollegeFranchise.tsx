@@ -244,7 +244,6 @@ export function CollegeFranchise() {
           const name = displayName(s, media);
           const fname = fullName(s, media);
           const logo = getCollegeLogoUrl(fname);
-          const color = getCollegeColor(s.normalized_name);
           const cap = captainMap?.get(s.normalized_name);
           const capName = cap ? abbreviate(cap.fullName) : null;
           return (
