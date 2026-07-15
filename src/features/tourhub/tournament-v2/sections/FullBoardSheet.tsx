@@ -13,7 +13,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { BoardTable, type BoardEntry, type CutState } from '../../leaderboard/BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
-import { FONT, INK, INK_MUTE, INK_FAINT, SLATE_50, HAIRLINE_INK_8 } from '../../_shared/tokens';
+import { FONT, INK, INK_MUTE, INK_FAINT, SLATE_50, HAIRLINE_INK_8, AMBER } from '../../_shared/tokens';
 
 interface Props {
   open: boolean;
@@ -64,16 +64,16 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
   };
 
   return (
-    <BottomSheet open={open} onClose={onClose} variant="light" surfaceColor={SLATE_50}>
+    <BottomSheet open={open} onClose={onClose} variant="light" surfaceColor={SLATE_50} style={{ height: '75dvh', maxHeight: '75dvh' }}>
       <div
         style={{
           background: SLATE_50, fontFamily: FONT,
-          maxHeight: 'calc(90vh - 24px)',
+          height: '75dvh', maxHeight: '75dvh',
           display: 'flex', flexDirection: 'column',
         }}
       >
         <div style={{ padding: '4px 16px 12px', borderBottom: `0.5px solid ${HAIRLINE_INK_8}` }}>
-          <div style={{ fontSize: 9, fontWeight: 800, color: INK, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+          <div style={{ fontSize: 9, fontWeight: 800, color: AMBER, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
             Full Board
           </div>
           {meta?.name && (
