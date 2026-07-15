@@ -35,6 +35,7 @@ import {
   FONT,
   HAIRLINE_INK_10,
   INK,
+  INK_FAINT,
   INK_MUTE,
   SLATE_50,
   STATUS_LIVE,
@@ -242,7 +243,7 @@ function ClassColumn({ headerCode, roster, liveMap, alignRight }: ClassColumnPro
           fontWeight: 800,
           letterSpacing: '0.16em',
           textTransform: 'uppercase',
-          color: AMBER,
+          color: INK_FAINT,
           textAlign: alignRight ? 'right' : 'left',
           marginBottom: 12,
         }}
