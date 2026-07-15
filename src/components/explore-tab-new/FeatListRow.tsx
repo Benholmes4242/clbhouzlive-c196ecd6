@@ -217,7 +217,7 @@ export function FeatListRow({ row, tier, onTap, index = 0, medals, mode = 'lates
           >
             {row.course_name}
           </div>
-          {when && !isRecordsRow ? (
+          {showDate ? (
             <div
               style={{
                 marginTop: 2,
