@@ -26,11 +26,21 @@ export function mapRowToFeedPost(row: FeedRpcRow): FeedPost {
   const streamId = row.stream_id || extractStreamId(row.media_url || '');
   const isReview = !!row.source_review_id;
   const isBusiness = row.post_actor_type === 'business';
+  const isVideo = row.media_type === 'video';
+  // A video is playable only once Cloudflare has finished encoding.
+  // duration_seconds is null until the cloudflare-stream-webhook stamps it,
+  // so it's the reliable readiness proxy. Handing the player a manifest
+  // before then triggers a 424 (not readyToStream) console-error storm.
+  const videoReady = isVideo && row.duration_seconds != null;
 
   const mediaItem: MediaItem = {
     id: row.media_id,
-    type: row.media_type === 'video' ? 'video' : 'image',
-    hlsUrl: streamId ? buildHlsUrl(streamId) : undefined,
+    type: isVideo ? 'video' : 'image',
+    // Only ready videos get a manifest URL. Not-ready videos fall through to
+    // the poster fallback in FeedSlide / consumers without a load attempt.
+    hlsUrl: isVideo
+      ? (videoReady && streamId ? buildHlsUrl(streamId) : undefined)
+      : (streamId ? buildHlsUrl(streamId) : undefined),
     // mp4Url intentionally undefined: /downloads/default.mp4 404s (Cloudflare MP4
     // downloads not enabled). HLS is the always-present primary path.
     mp4Url: undefined,
@@ -42,6 +52,7 @@ export function mapRowToFeedPost(row: FeedRpcRow): FeedPost {
     height: row.height || 1920,
     duration: row.duration_seconds ? Number(row.duration_seconds) : undefined,
     displayOrder: row.display_order || 0,
+    isProcessing: isVideo && !videoReady,
   };
 
   let review: ReviewData | null = null;

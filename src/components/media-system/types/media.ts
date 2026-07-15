@@ -15,6 +15,11 @@ export interface MediaItem {
   height: number;
   duration?: number;
   displayOrder?: number;
+  /** True for video items whose Cloudflare Stream encode has not completed
+   *  (duration_seconds still null). Consumers should render a poster/processing
+   *  state instead of attempting an HLS load — hlsUrl is intentionally
+   *  undefined while this is true. */
+  isProcessing?: boolean;
 }
 
 /** Feed tab modes */
