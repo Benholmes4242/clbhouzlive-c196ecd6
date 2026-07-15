@@ -58,10 +58,10 @@ export function FeatListRow({ row, tier, onTap, index = 0, medals, mode = 'lates
   const when = relDate(row.play_date ?? row.attained_at ?? null);
   const rank = index + 1;
   const isTop = rank === 1;
-  const isRecordsAllTime = tier === 'records' && mode === 'alltime';
+  const isRecordsRow = tier === 'records';
   const isStableford = row.category === 'best_stableford_all_time';
-  const d = isRecordsAllTime ? rowToPar(row) : null;
-  const showToParPrimary = isRecordsAllTime && d != null && !isStableford;
+  const d = isRecordsRow ? rowToPar(row) : null;
+  const showToParPrimary = isRecordsRow && d != null && !isStableford;
   const showBar = showToParPrimary;
   const grossStr = row.value != null ? String(row.value) : (row.feat_value ?? '').match(/\d+/)?.[0] ?? '';
 
@@ -168,7 +168,7 @@ export function FeatListRow({ row, tier, onTap, index = 0, medals, mode = 'lates
           >
             {row.course_name}
           </div>
-          {when && !isRecordsAllTime ? (
+          {when && !isRecordsRow ? (
             <div
               style={{
                 marginTop: 2,
