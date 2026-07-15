@@ -14,12 +14,12 @@ import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import CountryFlag from '@/components/ui/country-flag';
 import { resolvePlayerAvatarCandidates } from '../_shared/resolvePlayerAvatar';
 import {
-  AMBER,
   FONT,
   GOLD_DEEP,
   GOLD_BORDER,
   HAIRLINE_INK_10,
   INK,
+  INK_FAINT,
   INK_MUTE,
   SLATE_50,
 } from '../_shared/tokens';
@@ -86,7 +86,7 @@ export function FullListSheet({
               fontWeight: 800,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
-              color: AMBER,
+              color: INK_FAINT,
               marginBottom: 4,
               fontVariantNumeric: 'tabular-nums',
             }}
