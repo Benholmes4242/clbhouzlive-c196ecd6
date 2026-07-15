@@ -120,11 +120,13 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
       />
 
       <div className="relative flex-1 flex flex-col px-6 pt-safe overflow-y-auto">
+        <div className="flex-1" />
+
         {/* Brand block: logo + tagline */}
         <div
           className="flex flex-col justify-center items-center gap-3 auth-logo-animate"
           style={{
-            paddingTop: 'clamp(24px, 7vh, 56px)',
+            paddingTop: 0,
             paddingBottom: 0,
           }}
         >
