@@ -226,7 +226,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
 
 function InlineStateValue({ state, pick, live }: { state: EventState; pick: AITopContender; live: PickLiveState | undefined }) {
   if (state === 'upcoming') {
-    const pct = Math.round((pick.winProbability ?? 0) * 100);
+    const pct = Math.round(pick.winProbability ?? 0);
     return (
       <span style={{ fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.01em' }}>
         <span style={{ color: V4.ink }}>{pct}%</span>
@@ -240,7 +240,7 @@ function InlineStateValue({ state, pick, live }: { state: EventState; pick: AITo
   }
   if (state === 'live') {
     if (!live || live.position == null) {
-      const pct = Math.round((pick.winProbability ?? 0) * 100);
+      const pct = Math.round(pick.winProbability ?? 0);
       return (
         <span style={{ fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.01em' }}>
           <span style={{ color: V4.ink }}>{pct}%</span>
@@ -306,7 +306,7 @@ function CutTag({ label }: { label: string }) {
 function CaseHeaderMeta({ pick }: { pick: AITopContender }) {
   const parts: string[] = [];
   if (pick.courseFitScore != null) parts.push(`course fit ${Math.round(pick.courseFitScore)}`);
-  if (pick.winProbability != null) parts.push(`${Math.round(pick.winProbability * 100)}% win prob`);
+  if (pick.winProbability != null) parts.push(`${Math.round(pick.winProbability)}% win prob`);
   if (parts.length === 0) return null;
   return (
     <div style={{ fontSize: 11, fontWeight: 700, color: V4.inkMute, fontVariantNumeric: 'tabular-nums', letterSpacing: '0.02em' }}>
@@ -466,7 +466,7 @@ function AllPicksSheet({
 
 function SheetStateStrip({ state, pick, live }: { state: EventState; pick: AITopContender; live: PickLiveState | undefined }) {
   if (state === 'upcoming') {
-    const pct = Math.round((pick.winProbability ?? 0) * 100);
+    const pct = Math.round(pick.winProbability ?? 0);
     const fit = pick.courseFitScore != null ? `fit ${Math.round(pick.courseFitScore)}` : null;
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 11, fontWeight: 700, color: V4.inkMute, fontVariantNumeric: 'tabular-nums' }}>
@@ -479,7 +479,7 @@ function SheetStateStrip({ state, pick, live }: { state: EventState; pick: AITop
   if (state === 'live') {
     if (cut) return <CutTag label={cut} />;
     if (!live || live.position == null) {
-      const pct = Math.round((pick.winProbability ?? 0) * 100);
+      const pct = Math.round(pick.winProbability ?? 0);
       return <div style={{ fontSize: 11, fontWeight: 700, color: V4.inkMute, fontVariantNumeric: 'tabular-nums' }}>{pct}% win prob · not on board yet</div>;
     }
     const pos = formatPosition(live.position, live.positionTied);
