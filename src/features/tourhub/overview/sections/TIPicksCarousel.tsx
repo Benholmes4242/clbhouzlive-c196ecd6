@@ -54,6 +54,33 @@ function cutStatus(live: PickLiveState | undefined): string | null {
   return CUT_STATUSES.has(s) ? s : null;
 }
 
+// Confidence label from the ABSOLUTE win prob (kept honest, not relative).
+function confidenceLabel(winProb: number): { label: string; color: string } {
+  if (winProb >= 12) return { label: 'High', color: V4.amberDeep };
+  if (winProb >= 6) return { label: 'Solid', color: V4.amber };
+  return { label: 'Live', color: V4.inkMute };
+}
+
+// Confidence bar: fill is RELATIVE to the field leader so the top pick reads
+// full and others scale down. 8% floor guarantees a visible sliver. We never
+// render the raw percentage. `leader` is the max winProbability across the
+// current pick set (passed down from TIPicksCarousel).
+function ConfidenceBar({ value, leader, compact = false }: { value: number; leader: number; compact?: boolean }) {
+  const safeLeader = leader > 0 ? leader : 1;
+  const fillPct = Math.max(8, Math.min(100, Math.round((value / safeLeader) * 100)));
+  const { label, color } = confidenceLabel(value);
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
+      <div style={{ flex: 1, height: compact ? 5 : 6, borderRadius: 999, background: V4.hairline, overflow: 'hidden' }}>
+        <div style={{ width: `${fillPct}%`, height: '100%', borderRadius: 999, background: V4.amber }} />
+      </div>
+      <span style={{ fontSize: compact ? 10.5 : 11, fontWeight: 800, color, whiteSpace: 'nowrap', letterSpacing: '0.02em' }}>
+        {label}
+      </span>
+    </div>
+  );
+}
+
 function verdict(live: PickLiveState | undefined): { hit: boolean; label: string } {
   const cut = cutStatus(live);
   if (cut) return { hit: false, label: `MISS · ${cut}` };
@@ -111,6 +138,11 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
   const { data } = useAIPredictions(tournamentId ?? null);
   const [sheet, setSheet] = useState<SheetState>(null);
   const picks = data?.topContenders ?? [];
+
+  const leaderWinProb = useMemo(
+    () => Math.max(0, ...picks.map((p) => p.winProbability ?? 0)),
+    [picks]
+  );
 
   const playerIds = useMemo(() => picks.map((p) => p.playerId).filter(Boolean), [picks]);
   const needsLiveData = state === 'live' || state === 'completed';
@@ -176,7 +208,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                     {p.playerName}
                   </div>
                   <div style={{ marginTop: 2, fontSize: 11.5, fontWeight: 800, lineHeight: 1.2 }}>
-                    <InlineStateValue state={state} pick={p} live={liveMap?.[p.playerId]} />
+                    <InlineStateValue state={state} pick={p} live={liveMap?.[p.playerId]} leader={leaderWinProb} />
                   </div>
                 </div>
               </div>
@@ -204,6 +236,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
           state={state}
           tourCode={tourCode}
           liveMap={liveMap}
+          leader={leaderWinProb}
           onPick={(p) => setSheet({ kind: 'case', pick: p, from: 'index' })}
           onClose={() => setSheet(null)}
           onNavigatePlayer={goToPlayer}
@@ -216,6 +249,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
           state={state}
           live={liveMap?.[sheet.pick.playerId]}
           tourCode={tourCode}
+          leader={leaderWinProb}
           onClose={closeCase}
           onNavigatePlayer={goToPlayer}
         />
@@ -224,15 +258,9 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
   );
 }
 
-function InlineStateValue({ state, pick, live }: { state: EventState; pick: AITopContender; live: PickLiveState | undefined }) {
+function InlineStateValue({ state, pick, live, leader }: { state: EventState; pick: AITopContender; live: PickLiveState | undefined; leader: number }) {
   if (state === 'upcoming') {
-    const pct = Math.round(pick.winProbability ?? 0);
-    return (
-      <span style={{ fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.01em' }}>
-        <span style={{ color: V4.ink }}>{pct}%</span>
-        <span style={{ color: V4.inkFaint }}> win prob</span>
-      </span>
-    );
+    return <ConfidenceBar value={pick.winProbability ?? 0} leader={leader} compact />;
   }
   const cut = cutStatus(live);
   if (state === 'live' && cut) {
@@ -240,13 +268,7 @@ function InlineStateValue({ state, pick, live }: { state: EventState; pick: AITo
   }
   if (state === 'live') {
     if (!live || live.position == null) {
-      const pct = Math.round(pick.winProbability ?? 0);
-      return (
-        <span style={{ fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.01em' }}>
-          <span style={{ color: V4.ink }}>{pct}%</span>
-          <span style={{ color: V4.inkFaint }}> win prob</span>
-        </span>
-      );
+      return <ConfidenceBar value={pick.winProbability ?? 0} leader={leader} compact />;
     }
     const pos = formatPosition(live.position, live.positionTied);
     const todayText = live.today != null ? formatScore(live.today) : formatScore(live.score);
@@ -304,13 +326,10 @@ function CutTag({ label }: { label: string }) {
 }
 
 function CaseHeaderMeta({ pick }: { pick: AITopContender }) {
-  const parts: string[] = [];
-  if (pick.courseFitScore != null) parts.push(`course fit ${Math.round(pick.courseFitScore)}`);
-  if (pick.winProbability != null) parts.push(`${Math.round(pick.winProbability)}% win prob`);
-  if (parts.length === 0) return null;
+  if (pick.courseFitScore == null) return null;
   return (
     <div style={{ fontSize: 11, fontWeight: 700, color: V4.inkMute, fontVariantNumeric: 'tabular-nums', letterSpacing: '0.02em' }}>
-      {parts.join(' · ')}
+      {`course fit ${Math.round(pick.courseFitScore)}`}
     </div>
   );
 }
@@ -342,6 +361,7 @@ function CaseSheet({
   state,
   live,
   tourCode,
+  leader,
   onClose,
   onNavigatePlayer,
 }: {
@@ -349,6 +369,7 @@ function CaseSheet({
   state: EventState;
   live: PickLiveState | undefined;
   tourCode: string;
+  leader: number;
   onClose: () => void;
   onNavigatePlayer: (playerId: string) => void;
 }) {
@@ -372,7 +393,7 @@ function CaseSheet({
               {pick.playerName}
             </h2>
             <div style={{ marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <SheetStateStrip state={state} pick={pick} live={live} />
+              <SheetStateStrip state={state} pick={pick} live={live} leader={leader} />
               <CaseHeaderMeta pick={pick} />
             </div>
           </div>
@@ -404,6 +425,7 @@ function AllPicksSheet({
   state,
   tourCode,
   liveMap,
+  leader,
   onPick,
   onClose,
   onNavigatePlayer,
@@ -412,6 +434,7 @@ function AllPicksSheet({
   state: EventState;
   tourCode: string;
   liveMap: Record<string, PickLiveState> | undefined;
+  leader: number;
   onPick: (p: AITopContender) => void;
   onClose: () => void;
   onNavigatePlayer: (playerId: string) => void;
@@ -455,7 +478,7 @@ function AllPicksSheet({
               </div>
             </div>
             <div style={{ flexShrink: 0 }}>
-              <SheetStateStrip state={state} pick={p} live={liveMap?.[p.playerId]} />
+              <SheetStateStrip state={state} pick={p} live={liveMap?.[p.playerId]} leader={leader} />
             </div>
           </div>
         ))}
@@ -464,23 +487,15 @@ function AllPicksSheet({
   );
 }
 
-function SheetStateStrip({ state, pick, live }: { state: EventState; pick: AITopContender; live: PickLiveState | undefined }) {
+function SheetStateStrip({ state, pick, live, leader }: { state: EventState; pick: AITopContender; live: PickLiveState | undefined; leader: number }) {
   if (state === 'upcoming') {
-    const pct = Math.round(pick.winProbability ?? 0);
-    const fit = pick.courseFitScore != null ? `fit ${Math.round(pick.courseFitScore)}` : null;
-    return (
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 11, fontWeight: 700, color: V4.inkMute, fontVariantNumeric: 'tabular-nums' }}>
-        <span>{pct}% win prob</span>
-        {fit ? <span style={{ color: V4.inkFaint }}>· {fit}</span> : null}
-      </div>
-    );
+    return <ConfidenceBar value={pick.winProbability ?? 0} leader={leader} />;
   }
   const cut = cutStatus(live);
   if (state === 'live') {
     if (cut) return <CutTag label={cut} />;
     if (!live || live.position == null) {
-      const pct = Math.round(pick.winProbability ?? 0);
-      return <div style={{ fontSize: 11, fontWeight: 700, color: V4.inkMute, fontVariantNumeric: 'tabular-nums' }}>{pct}% win prob · not on board yet</div>;
+      return <ConfidenceBar value={pick.winProbability ?? 0} leader={leader} />;
     }
     const pos = formatPosition(live.position, live.positionTied);
     const todayText = live.today != null ? formatScore(live.today) : formatScore(live.score);
