@@ -222,7 +222,8 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
         <div className="px-4 pt-3">
           {rateNudge}
           <SectionHeader
-            role="prime"
+            role="section"
+            accent="#F7931E"
             kicker="TOP 100"
             title="The world's best"
             cutLine={false}
