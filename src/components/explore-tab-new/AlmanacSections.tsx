@@ -297,6 +297,8 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard', onRowTap
               index={i}
               medals={row.user_id ? medalsMap?.get(row.user_id) ?? null : null}
               onTap={onRowTap ? () => onRowTap(row) : undefined}
+              mode={mode}
+              maxCount={birdieMaxCount}
             />
           ))}
         </div>
