@@ -5,7 +5,7 @@ import { FeatCard } from './FeatCard';
 import { FeatListRow } from './FeatListRow';
 import { useRegionFeats, type FeatTier, type RecordsMode } from './hooks/useRegionFeats';
 import { useWallLevels } from '@/hooks/gam/useWallLevels';
-import { AMBER, INK, INK_TINT_06 } from '@/features/courses/_shared/tokens';
+import { INK, INK_TINT_06 } from '@/features/courses/_shared/tokens';
 import { TierSeeAllSheet } from './TierSeeAllSheet';
 import { FilterChips } from '@/components/ui/FilterChips';
 import { SPACE } from '@/lib/spacing';
@@ -90,7 +90,7 @@ export function AlmanacHead({
           fontWeight: 800,
           letterSpacing: '0.13em',
           textTransform: 'uppercase',
-          color: 'rgba(15,23,42,0.6)',
+          color: '#94A3B8',
         }}
       >
         {title}
@@ -106,7 +106,7 @@ export function AlmanacHead({
             fontSize: 11.5,
             fontWeight: 700,
             letterSpacing: '0.06em',
-            color: AMBER,
+            color: '#94A3B8',
             cursor: 'pointer',
           }}
         >
