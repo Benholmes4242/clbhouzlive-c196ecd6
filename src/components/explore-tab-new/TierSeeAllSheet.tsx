@@ -335,7 +335,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
         }}
       >
         {isLegendaryLeaders ? (
-          leaderRows.length === 0 ? (
+          legendaryLeaderRows.length === 0 ? (
             <div
               style={{
                 padding: '28px 16px',
@@ -349,14 +349,74 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
             </div>
           ) : (
             <div style={{ padding: '0 16px' }}>
-              {leaderRows.map((r, i) => (
-                <LegendaryLeaderRow
+              {legendaryLeaderRows.map((r, i) => {
+                const count = r[metric] ?? 0;
+                const other = metric === 'aces' ? (r.albatrosses ?? 0) : (r.aces ?? 0);
+                const otherLabel =
+                  other > 0
+                    ? metric === 'aces'
+                      ? `+${other} ${other === 1 ? 'albatross' : 'albatrosses'}`
+                      : `+${other} ${other === 1 ? 'ace' : 'aces'}`
+                    : null;
+                const barGradient =
+                  metric === 'aces'
+                    ? `linear-gradient(90deg, ${SC_ACE}, ${SC_FILL_GOLD})`
+                    : `linear-gradient(90deg, ${SC_ALBATROSS}, #FFD84D)`;
+                return (
+                  <CountLeaderSheetRow
+                    key={`${r.user_id ?? r.holder_name ?? i}-${i}`}
+                    index={i}
+                    userId={r.user_id}
+                    holderName={r.holder_name}
+                    holderAvatar={r.holder_avatar}
+                    holderHcp={r.holder_hcp ?? null}
+                    holderClub={r.holder_club ?? null}
+                    count={count}
+                    max={legendaryMax}
+                    accent={metricAccent}
+                    barGradient={barGradient}
+                    countLabelSingular={metric === 'aces' ? 'ACE' : 'ALBATROSS'}
+                    countLabelPlural={metric === 'aces' ? 'ACES' : 'ALBATROSSES'}
+                    subline={otherLabel}
+                    onTap={() => {
+                      if (r.user_id) opener.openProfile(r.user_id);
+                    }}
+                  />
+                );
+              })}
+            </div>
+          )
+        ) : isEagleLeaders ? (
+          eagleLeaderRows.length === 0 ? (
+            <div
+              style={{
+                padding: '28px 16px',
+                textAlign: 'center',
+                color: INK_MUTE,
+                fontSize: 12,
+                fontWeight: 600,
+              }}
+            >
+              No eagles yet.
+            </div>
+          ) : (
+            <div style={{ padding: '0 16px' }}>
+              {eagleLeaderRows.map((r, i) => (
+                <CountLeaderSheetRow
                   key={`${r.user_id ?? r.holder_name ?? i}-${i}`}
-                  row={r}
                   index={i}
-                  metric={metric}
-                  metricAccent={metricAccent}
-                  max={leaderMax}
+                  userId={r.user_id}
+                  holderName={r.holder_name}
+                  holderAvatar={r.holder_avatar}
+                  holderHcp={r.holder_hcp ?? null}
+                  holderClub={r.holder_club ?? null}
+                  count={r.eagles ?? 0}
+                  max={eagleMax}
+                  accent={SC_EAGLE}
+                  barGradient={eagleBarGradient}
+                  countLabelSingular="EAGLE"
+                  countLabelPlural="EAGLES"
+                  subline={null}
                   onTap={() => {
                     if (r.user_id) opener.openProfile(r.user_id);
                   }}
@@ -392,9 +452,10 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
           </div>
         )}
 
-        {!isLegendaryLeaders && visible < displayRows.length && (
+        {!isLeaderView && visible < displayRows.length && (
           <div ref={sentinelRef} style={{ height: 40 }} />
         )}
+
         <div style={{ height: 24 }} />
       </div>
     </BottomSheet>
