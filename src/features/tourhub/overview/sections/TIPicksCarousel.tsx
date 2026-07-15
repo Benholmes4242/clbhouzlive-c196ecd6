@@ -54,6 +54,33 @@ function cutStatus(live: PickLiveState | undefined): string | null {
   return CUT_STATUSES.has(s) ? s : null;
 }
 
+// Confidence label from the ABSOLUTE win prob (kept honest, not relative).
+function confidenceLabel(winProb: number): { label: string; color: string } {
+  if (winProb >= 12) return { label: 'High', color: V4.amberDeep };
+  if (winProb >= 6) return { label: 'Solid', color: V4.amber };
+  return { label: 'Live', color: V4.inkMute };
+}
+
+// Confidence bar: fill is RELATIVE to the field leader so the top pick reads
+// full and others scale down. 8% floor guarantees a visible sliver. We never
+// render the raw percentage. `leader` is the max winProbability across the
+// current pick set (passed down from TIPicksCarousel).
+function ConfidenceBar({ value, leader, compact = false }: { value: number; leader: number; compact?: boolean }) {
+  const safeLeader = leader > 0 ? leader : 1;
+  const fillPct = Math.max(8, Math.min(100, Math.round((value / safeLeader) * 100)));
+  const { label, color } = confidenceLabel(value);
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
+      <div style={{ flex: 1, height: compact ? 5 : 6, borderRadius: 999, background: V4.hairline, overflow: 'hidden' }}>
+        <div style={{ width: `${fillPct}%`, height: '100%', borderRadius: 999, background: V4.amber }} />
+      </div>
+      <span style={{ fontSize: compact ? 10.5 : 11, fontWeight: 800, color, whiteSpace: 'nowrap', letterSpacing: '0.02em' }}>
+        {label}
+      </span>
+    </div>
+  );
+}
+
 function verdict(live: PickLiveState | undefined): { hit: boolean; label: string } {
   const cut = cutStatus(live);
   if (cut) return { hit: false, label: `MISS · ${cut}` };
