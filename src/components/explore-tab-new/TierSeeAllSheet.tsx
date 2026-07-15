@@ -9,13 +9,17 @@ import {
   INK_MUTE,
   SLATE_50,
 } from '@/features/tourhub/_shared/tokens';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SC_ACE, SC_ALBATROSS, SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 import { REGION_TABS } from './AlmanacSections';
 import {
   useRegionFeats,
+  useRegionLegendaryLeaders,
   rowToPar,
   sortRecordsAllTime,
   type FeatRow,
   type FeatTier,
+  type LegendaryLeaderRow,
   type RecordsMode,
 } from './hooks/useRegionFeats';
 import { FeatListRow } from './FeatListRow';
