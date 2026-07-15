@@ -10,10 +10,10 @@ import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import CountryFlag from '@/components/ui/country-flag';
 import { resolvePlayerAvatarCandidates } from '../_shared/resolvePlayerAvatar';
 import {
-  AMBER,
   GOLD_DEEP,
   HAIRLINE_INK_10,
   INK,
+  INK_FAINT,
   INK_MUTE,
   SURFACE,
 } from '../_shared/tokens';
@@ -66,7 +66,7 @@ function StatBoardInner({ category, liveMap, onOpen }: StatBoardProps) {
             fontSize: 8.5,
             fontWeight: 800,
             letterSpacing: '0.12em',
-            color: AMBER,
+            color: INK_FAINT,
             textTransform: 'uppercase',
           }}
         >
