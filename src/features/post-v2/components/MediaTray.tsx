@@ -12,7 +12,7 @@ interface Props {
   onSelect: (i: number) => void;
   onRemove: (i: number) => void;
   onReorder: (from: number, to: number) => void;
-  onAddFiles: (files: File[]) => void;
+  onAddFiles: (files: File[]) => void | Promise<void>;
 }
 
 export default function MediaTray({ media, activeIndex, onSelect, onRemove, onReorder, onAddFiles }: Props) {
