@@ -209,63 +209,92 @@ export function StatsSheet({ open, onClose, playerStats, playerName }: StatsShee
     playerStats.strokes_gained !== null;
 
   return (
-    <BottomSheet open={open} onClose={onClose} ariaLabelledBy="stats-sheet-title">
+    <BottomSheet
+      open={open}
+      onClose={onClose}
+      ariaLabelledBy="stats-sheet-title"
+      style={{
+        height: '75dvh',
+        maxHeight: '75dvh',
+        display: 'flex',
+        flexDirection: 'column',
+        background: SLATE_50,
+      }}
+    >
       <div
         style={{
-          padding: '4px 16px 24px',
-          background: SURFACE,
-          maxHeight: 'calc(90vh - 20px)',
-          overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          flex: 1,
+          minHeight: 0,
+          background: SLATE_50,
         }}
       >
-        <h2
-          id="stats-sheet-title"
+        <div
           style={{
-            margin: '4px 0 2px',
-            fontSize: 20,
-            fontWeight: 800,
-            color: INK,
-            letterSpacing: '-0.01em',
+            flexShrink: 0,
+            padding: '4px 16px 8px',
           }}
         >
-          {playerName}
-        </h2>
-        <p
+          <p
+            style={{
+              margin: '4px 0 4px',
+              fontSize: 10,
+              fontWeight: 800,
+              color: AMBER,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+            }}
+          >
+            Season Statistics
+          </p>
+          <h2
+            id="stats-sheet-title"
+            style={{
+              margin: '0 0 2px',
+              fontSize: 20,
+              fontWeight: 800,
+              color: INK,
+              letterSpacing: '-0.01em',
+            }}
+          >
+            {playerName}
+          </h2>
+        </div>
+
+        <div
           style={{
-            margin: 0,
-            fontSize: 10,
-            fontWeight: 800,
-            color: INK_FAINT,
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
+            flex: 1,
+            minHeight: 0,
+            overflowY: 'auto',
+            WebkitOverflowScrolling: 'touch',
+            padding: '0 16px 24px',
           }}
         >
-          Season Statistics
-        </p>
+          <SubSection label="Overview" rows={overview} />
+          <SubSection label="Ball Striking" rows={ball} />
+          <SubSection label="Short Game" rows={shortGame} />
 
-        <SubSection label="Overview" rows={overview} />
-        <SubSection label="Ball Striking" rows={ball} />
-        <SubSection label="Short Game" rows={shortGame} />
-
-        {hasSG && (
-          <div style={{ marginTop: 24 }}>
-            <p
-              style={{
-                margin: '0 0 6px',
-                fontSize: 8.5,
-                fontWeight: 800,
-                color: INK_FAINT,
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-              }}
-            >
-              Strokes Gained
-            </p>
-            <SGBar label="SG: Total" value={playerStats.strokes_gained_total} />
-            <SGBar label="SG: Tee to Green" value={playerStats.strokes_gained_tee_green} />
-            <SGBar label="SG: Around Green" value={playerStats.strokes_gained} />
-          </div>
-        )}
+          {hasSG && (
+            <div style={{ marginTop: 24 }}>
+              <p
+                style={{
+                  margin: '0 0 6px',
+                  fontSize: 8.5,
+                  fontWeight: 800,
+                  color: AMBER,
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
+                }}
+              >
+                Strokes Gained
+              </p>
+              <SGBar label="SG: Total" value={playerStats.strokes_gained_total} />
+              <SGBar label="SG: Tee to Green" value={playerStats.strokes_gained_tee_green} />
+              <SGBar label="SG: Around Green" value={playerStats.strokes_gained} />
+            </div>
+          )}
+        </div>
       </div>
     </BottomSheet>
   );
