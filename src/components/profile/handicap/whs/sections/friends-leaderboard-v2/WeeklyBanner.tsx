@@ -20,7 +20,7 @@ export const WeeklyBanner: React.FC<Props> = ({ banner }) => {
         style={{
           background: 'var(--hcp-bg-1)',
           border: '1px solid var(--hcp-line)',
-          borderLeft: '3px solid #F7931E',
+          borderLeft: '3px solid var(--hcp-line)',
           borderRadius: 14,
           padding: '12px 14px',
           display: 'flex',
@@ -49,7 +49,7 @@ export const WeeklyBanner: React.FC<Props> = ({ banner }) => {
               fontSize: 8.5,
               fontWeight: 800,
               letterSpacing: '0.12em',
-              color: '#F7931E',
+              color: 'var(--hcp-t-60)',
               textTransform: 'uppercase',
             }}
           >
