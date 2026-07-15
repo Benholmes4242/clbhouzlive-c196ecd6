@@ -12,6 +12,7 @@ import {
 import { REGION_TABS } from './AlmanacSections';
 import {
   useRegionFeats,
+  rowToPar,
   type FeatRow,
   type FeatTier,
   type RecordsMode,
