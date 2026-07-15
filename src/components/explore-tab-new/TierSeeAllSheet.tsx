@@ -122,14 +122,14 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
     if (!open) return;
     setVisible(PAGE);
     setMode(initialMode);
-    setMetric('aces');
-  }, [open, initialMode]);
+    setMetric(initialMetric);
+  }, [open, initialMode, initialMetric]);
 
   useEffect(() => {
     setVisible(PAGE);
-    setMetric('aces');
+    if (mode === 'alltime') setMetric(initialMetric);
     if (scrollerRef.current) scrollerRef.current.scrollTop = 0;
-  }, [mode]);
+  }, [mode, initialMetric]);
 
   useEffect(() => {
     if (!open || isLegendaryLeaders) return;
