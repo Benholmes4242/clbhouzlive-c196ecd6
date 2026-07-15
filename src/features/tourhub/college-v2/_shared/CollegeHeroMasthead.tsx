@@ -126,32 +126,50 @@ export function CollegeHeroMasthead({
         {/* Crest 66 */}
         <div
           style={{
+            position: 'relative',
             width: 66,
             height: 66,
             flexShrink: 0,
-            borderRadius: '34%',
-            overflow: 'hidden',
-            background: 'rgba(255,255,255,0.06)',
-            border: isRankOne ? `1.5px solid ${GOLD}` : `0.5px solid ${WHITE_ALPHA_18}`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 8,
             boxShadow: isRankOne ? '0 4px 12px rgba(255,184,0,0.20)' : 'none',
           }}
           aria-hidden
         >
-          {logoUrl ? (
-            <img
-              src={logoUrl}
-              alt=""
-              style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-            />
-          ) : (
-            <span style={{ fontSize: 15, fontWeight: 900, color: GOLD, letterSpacing: '0.04em' }}>
-              {displayName.slice(0, 3).toUpperCase()}
-            </span>
-          )}
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              borderRadius: '34%',
+              overflow: 'hidden',
+              background: 'rgba(255,255,255,0.06)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 8,
+            }}
+          >
+            {logoUrl ? (
+              <img
+                src={logoUrl}
+                alt=""
+                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+              />
+            ) : (
+              <span style={{ fontSize: 15, fontWeight: 900, color: GOLD, letterSpacing: '0.04em' }}>
+                {displayName.slice(0, 3).toUpperCase()}
+              </span>
+            )}
+          </div>
+          {/* Traced canonical hairline (dark hero). Rank-1 keeps its gold status ring. */}
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              inset: 0,
+              borderRadius: '34%',
+              border: isRankOne ? `1.5px solid ${GOLD}` : '1px solid rgba(255,255,255,0.22)',
+              pointerEvents: 'none',
+            }}
+          />
         </div>
 
         {/* Name + meta */}
