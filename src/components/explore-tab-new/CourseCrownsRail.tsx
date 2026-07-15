@@ -357,7 +357,10 @@ export function CourseCrownsRail({ region, opener }: Props) {
   const [mode, setMode] = useState<RecordsMode>('latest');
   const [sheetOpen, setSheetOpen] = useState(false);
   const { data } = useRegionFeats(region, 'records', mode);
-  const allRows = useMemo(() => data ?? [], [data]);
+  const allRows = useMemo(() => {
+    const raw = data ?? [];
+    return mode === 'alltime' ? sortRecordsAllTime(raw) : raw;
+  }, [data, mode]);
   const rows = useMemo(() => allRows.slice(0, 15), [allRows]);
 
   if (rows.length === 0) return null;
