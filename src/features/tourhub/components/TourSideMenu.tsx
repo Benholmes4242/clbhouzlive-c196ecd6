@@ -241,7 +241,6 @@ function GroupHeader({ children }: { children: React.ReactNode }) {
       <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: AMBER, lineHeight: 1 }}>
         {children}
       </div>
-      <div style={{ width: 34, height: 3, borderRadius: 99, background: AMBER, marginTop: 9 }} />
     </div>
   );
 }
