@@ -57,74 +57,9 @@ export function formatDuration(seconds: number): string {
   return `${(seconds / 3600).toFixed(1)} hours`;
 }
 
-/**
- * Validate a file against post limits
- * @param file - The file to validate
- * @param videoDuration - Optional video duration in seconds (for video files)
- * @returns Object with valid boolean and optional error message
- */
-export function validateMediaFile(
-  file: File, 
-  videoDuration?: number
-): { valid: boolean; error?: string } {
-  const isVideo = file.type.startsWith('video/');
-  const isImage = file.type.startsWith('image/');
-  
-  // Check file type
-  if (isVideo) {
-    const allowedTypes: readonly string[] = ALLOWED_VIDEO_TYPES;
-    if (!allowedTypes.includes(file.type)) {
-      return { 
-        valid: false, 
-        error: `Unsupported video format. Use MP4, MOV, or WebM.` 
-      };
-    }
-    
-    if (file.size > POST_LIMITS.MAX_VIDEO_SIZE_BYTES) {
-      const sizeMB = formatBytes(file.size);
-      return { 
-        valid: false, 
-        error: `Video too large (${sizeMB}). Maximum is ${POST_LIMITS.MAX_VIDEO_SIZE_DISPLAY}.` 
-      };
-    }
-    
-    if (videoDuration && videoDuration > POST_LIMITS.MAX_VIDEO_DURATION_SECONDS) {
-      const durationStr = formatDuration(videoDuration);
-      return { 
-        valid: false, 
-        error: `Video too long (${durationStr}). Maximum is ${POST_LIMITS.MAX_VIDEO_DURATION_DISPLAY}.` 
-      };
-    }
-    // Duration could not be probed -> do NOT let it silently bypass the
-    // cap and fail at Cloudflare. Reject with a clear message.
-    if (!videoDuration) {
-      return {
-        valid: false,
-        error: `Could not read this video's length. Please re-select or try a different file.`
-      };
-    }
-  } else if (isImage) {
-    const allowedTypes: readonly string[] = ALLOWED_IMAGE_TYPES;
-    if (!allowedTypes.includes(file.type)) {
-      return { 
-        valid: false, 
-        error: `Unsupported image format. Use JPEG, PNG, WebP, HEIC, or GIF.` 
-      };
-    }
-    
-    if (file.size > POST_LIMITS.MAX_IMAGE_SIZE_BYTES) {
-      const sizeMB = formatBytes(file.size);
-      return { 
-        valid: false, 
-        error: `Image too large (${sizeMB}). Maximum is ${POST_LIMITS.MAX_IMAGE_SIZE_DISPLAY}.` 
-      };
-    }
-  } else {
-    return { 
-      valid: false, 
-      error: `Unsupported file type: ${file.type || 'unknown'}` 
-    };
-  }
-  
-  return { valid: true };
-}
+// NOTE: The previous `validateMediaFile` (singular) helper was removed — it
+// had zero call sites and gave a false sense of protection. The live
+// client-side guard for the post-v2 upload path lives in
+// `src/features/post-v2/hooks/useStageComposer.ts` (see `addFiles`). The
+// messaging path uses `validateMediaFiles` in `src/utils/media/pickMediaFiles.ts`.
+

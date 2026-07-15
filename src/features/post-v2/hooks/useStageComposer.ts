@@ -6,6 +6,24 @@
 // usePostUploadOrchestrator for those).
 
 import { useCallback, useEffect, useState } from 'react';
+import { toast } from '@/lib/toast';
+import { POST_LIMITS, formatDuration } from '@/constants/postLimits';
+
+// Probe a video File's duration (seconds). Resolves 0 if unreadable.
+function probeVideoDuration(file: File): Promise<number> {
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(file);
+    const v = document.createElement('video');
+    v.preload = 'metadata';
+    const done = (d: number) => {
+      try { URL.revokeObjectURL(url); } catch { /* ignore */ }
+      resolve(d);
+    };
+    v.onloadedmetadata = () => done(Number.isFinite(v.duration) ? v.duration : 0);
+    v.onerror = () => done(0);
+    v.src = url;
+  });
+}
 
 export type FrameId = 'original' | '4:5' | '1:1' | '9:16';
 
@@ -72,10 +90,26 @@ export function useStageComposer() {
   const markDirty = (patch: Partial<StageState>) =>
     setState(s => ({ ...s, ...patch, dirty: true }));
 
-  const addFiles = useCallback((files: File[]) => {
+  const addFiles = useCallback(async (files: File[]) => {
+    const kept: File[] = [];
+    for (const file of files) {
+      if (file.type.startsWith('video/')) {
+        const dur = await probeVideoDuration(file);
+        if (dur === 0) {
+          toast.error("Couldn't read that video's length. Try a different file.");
+          continue;
+        }
+        if (dur > POST_LIMITS.MAX_VIDEO_DURATION_SECONDS) {
+          toast.error(`Video too long (${formatDuration(dur)}). Maximum is ${POST_LIMITS.MAX_VIDEO_DURATION_DISPLAY}.`);
+          continue;
+        }
+      }
+      kept.push(file);
+    }
+    if (kept.length === 0) return;
     setState(s => {
       const remaining = MAX_MEDIA - s.media.length;
-      const accepted = files.slice(0, Math.max(0, remaining));
+      const accepted = kept.slice(0, Math.max(0, remaining));
       const newItems: StageMediaItem[] = accepted.map(file => {
         const isVideo = file.type.startsWith('video/');
         return {
