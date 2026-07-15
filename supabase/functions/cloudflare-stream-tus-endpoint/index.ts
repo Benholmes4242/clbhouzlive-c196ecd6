@@ -37,7 +37,7 @@ serve(async (req) => {
     }
 
     const body: TusEndpointRequest = await req.json();
-    const { fileName, fileSizeBytes, maxDurationSeconds = 3600, metadata = {} } = body;
+    const { fileName, fileSizeBytes, maxDurationSeconds = 7200, metadata = {} } = body;
 
     if (!fileName || !fileSizeBytes) {
       return new Response(JSON.stringify({ error: "Missing fileName or fileSizeBytes" }), {
