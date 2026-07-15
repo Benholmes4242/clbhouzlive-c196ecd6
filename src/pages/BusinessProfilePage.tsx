@@ -826,7 +826,7 @@ const BusinessProfilePage: React.FC = () => {
 
       {/* ───── Tabs ───── */}
       <section className="px-4 bg-background">
-        <div style={{ padding: '10px 0' }}>
+        <div className="flex justify-center" style={{ padding: '10px 0' }}>
           <FilterChips
             options={tabs.map((t) => ({ id: t.id, label: t.label }))}
             value={activeTab}
