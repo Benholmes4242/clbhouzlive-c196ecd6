@@ -6,8 +6,10 @@
  * the share icon and friends line.
  */
 
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
+import { applyRouteChrome } from '@/lib/routeChrome';
 import { Share2 } from 'lucide-react';
 import { renderBadgeIcon } from '../../badgeIcons';
 import { GAM } from '../../tokens';
