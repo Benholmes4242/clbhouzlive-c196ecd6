@@ -61,11 +61,7 @@ interface Props {
   initialMetric?: 'aces' | 'albatrosses';
 }
 
-// Toggle exposed on tiers that have both RECENT and ALL TIME cache keys.
-// Eagles are binary (no all-time ranking) - single-mode.
-function tierHasToggle(tier: FeatTier): boolean {
-  return tier !== 'eagles';
-}
+// All tiers are dual-mode (RECENT / ALL TIME) as of the eagles all-time upgrade.
 
 export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, initialMode = 'latest', initialMetric = 'aces' }: Props) {
   const [visible, setVisible] = useState(PAGE);
@@ -74,21 +70,23 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const scrollerRef = useRef<HTMLDivElement | null>(null);
 
-  const hasToggle = tierHasToggle(tier);
+  const hasToggle = true;
   const isEagles = tier === 'eagles';
   const isLegendaryLeaders = tier === 'legendary' && mode === 'alltime';
+  const isEagleLeaders = tier === 'eagles' && mode === 'alltime';
+  const isLeaderView = isLegendaryLeaders || isEagleLeaders;
 
-  // Fetch the mode-appropriate cache. Records / birdie_hauls / legendary use
-  // useRegionFeats with the mode; eagles is latest-only. For legendary ALL TIME
-  // we source the leaders payload instead, so keep the feats call pinned to
-  // 'latest' so RECENT round-trips stay warm and don't refetch.
+  // Fetch the mode-appropriate cache. Records / birdie_hauls use useRegionFeats
+  // with mode. Eagles and legendary keep their feats fetch pinned to 'latest'
+  // so RECENT stays warm; ALL TIME sources the dedicated leaders payload.
   const fetchTier: FeatTier = tier;
   const fetchMode: RecordsMode = isEagles || tier === 'legendary' ? 'latest' : mode;
   const { data: fetched } = useRegionFeats(region, fetchTier, fetchMode);
   const { data: leadersData } = useRegionLegendaryLeaders(region);
+  const { data: eagleLeadersData } = useRegionEagleLeaders(region);
 
   const displayRows: FeatRow[] = useMemo(() => {
-    if (isLegendaryLeaders) return [];
+    if (isLeaderView) return [];
     const base =
       fetched && fetched.length > 0
         ? fetched
@@ -99,16 +97,24 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
       return sortRecordsAllTime(base);
     }
     return base;
-  }, [fetched, mode, rows, initialMode, tier, isLegendaryLeaders]);
+  }, [fetched, mode, rows, initialMode, tier, isLeaderView]);
 
-  const leaderRows: LegendaryLeaderRow[] = useMemo(() => {
+  const legendaryLeaderRows: LegendaryLeaderRow[] = useMemo(() => {
     if (!isLegendaryLeaders) return [];
     return (leadersData ?? [])
       .filter((r) => (r[metric] ?? 0) > 0)
       .sort((a, b) => (b[metric] ?? 0) - (a[metric] ?? 0));
   }, [isLegendaryLeaders, leadersData, metric]);
 
-  const leaderMax = leaderRows[0]?.[metric] ?? 1;
+  const eagleLeaderRows: EagleLeaderRow[] = useMemo(() => {
+    if (!isEagleLeaders) return [];
+    return (eagleLeadersData ?? [])
+      .filter((r) => (r.eagles ?? 0) > 0)
+      .sort((a, b) => (b.eagles ?? 0) - (a.eagles ?? 0));
+  }, [isEagleLeaders, eagleLeadersData]);
+
+  const legendaryMax = legendaryLeaderRows[0]?.[metric] ?? 1;
+  const eagleMax = eagleLeaderRows[0]?.eagles ?? 1;
 
   const bestToPar: number | null = useMemo(() => {
     if (tier !== 'records') return null;
@@ -135,7 +141,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
   }, [mode, initialMetric]);
 
   useEffect(() => {
-    if (!open || isLegendaryLeaders) return;
+    if (!open || isLeaderView) return;
     const node = sentinelRef.current;
     if (!node) return;
     const io = new IntersectionObserver(
@@ -148,7 +154,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
     );
     io.observe(node);
     return () => io.disconnect();
-  }, [open, displayRows.length, isLegendaryLeaders]);
+  }, [open, displayRows.length, isLeaderView]);
 
   // Own scorecard opener so ALL TIME rows (not present in the caller's list)
   // still open cleanly. Fall back to caller's onRowTap if provided.
@@ -164,8 +170,14 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
   };
 
   const visibleRows = displayRows.slice(0, visible);
-  const total = isLegendaryLeaders ? leaderRows.length : displayRows.length;
+  const total = isLegendaryLeaders
+    ? legendaryLeaderRows.length
+    : isEagleLeaders
+      ? eagleLeaderRows.length
+      : displayRows.length;
   const metricAccent = metric === 'aces' ? SC_ACE : SC_ALBATROSS;
+  const eagleBarGradient = `linear-gradient(90deg, ${SC_EAGLE}, ${SC_EAGLE_DARK})`;
+
 
   return (
     <BottomSheet
