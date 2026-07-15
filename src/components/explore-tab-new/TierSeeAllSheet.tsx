@@ -48,6 +48,7 @@ interface Props {
   /** Fallback rows used while the sheet's own fetch is loading. */
   rows: FeatRow[];
   onRowTap?: (row: FeatRow) => void;
+  initialMode?: RecordsMode;
 }
 
 // Toggle exposed on tiers that have both RECENT and ALL TIME cache keys.
