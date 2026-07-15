@@ -5,10 +5,12 @@
  * every #1 record the user holds at that course.
  */
 
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Share2, Crown } from 'lucide-react';
 import { format } from 'date-fns';
+import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
+import { applyRouteChrome } from '@/lib/routeChrome';
 import { GAM } from '../../tokens';
 import type { TrophyItem } from '../_shared/normalizeTrophyItem';
 
@@ -40,6 +42,21 @@ function fmtDate(iso: string): string {
 }
 
 export const LegendImmersive: React.FC<Props> = ({ records, onClose, onShare }) => {
+  // Full-bleed into the notch: transparent shield + white status-bar icons for
+  // the dark overlay. Mirrors FullscreenFeedOverlay. useLayoutEffect so the
+  // shield/statusbar mutations land before first paint. Restore re-resolves
+  // the underlying route chrome on close (force=true: we mutated behind the
+  // idempotency cache).
+  useLayoutEffect(() => {
+    const shield = document.getElementById('safe-area-shield');
+    if (shield) shield.style.backgroundColor = 'transparent';
+    try { setStatusBarStyleColor('light', '00000000'); } catch {}
+    return () => {
+      if (shield) shield.style.backgroundColor = 'transparent';
+      try { applyRouteChrome(window.location.pathname, true); } catch {}
+    };
+  }, []);
+
   if (!records || records.length === 0) return null;
   const first = records[0];
   const courseName = first.courseName;

@@ -9,9 +9,11 @@
  * it).
  */
 
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Share2 } from 'lucide-react';
+import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
+import { applyRouteChrome } from '@/lib/routeChrome';
 import { renderBadgeIcon } from '../../badgeIcons';
 import { GAM } from '../../tokens';
 import { deriveDetailView } from '../_shared/deriveDetailView';
@@ -43,6 +45,21 @@ export const Top100Immersive: React.FC<Props> = ({
   onClose,
   onShare,
 }) => {
+  // Full-bleed into the notch: transparent shield + white status-bar icons for
+  // the dark overlay. Mirrors FullscreenFeedOverlay. useLayoutEffect so the
+  // shield/statusbar mutations land before first paint. Restore re-resolves
+  // the underlying route chrome on close (force=true: we mutated behind the
+  // idempotency cache).
+  useLayoutEffect(() => {
+    const shield = document.getElementById('safe-area-shield');
+    if (shield) shield.style.backgroundColor = 'transparent';
+    try { setStatusBarStyleColor('light', '00000000'); } catch {}
+    return () => {
+      if (shield) shield.style.backgroundColor = 'transparent';
+      try { applyRouteChrome(window.location.pathname, true); } catch {}
+    };
+  }, []);
+
   const view = deriveDetailView(item);
   if (view.kind !== 'achievement') return null;
   const { isTiered, materialColor, summaryLine, counterText, progressPct, nextThreshold: next, remaining, earnedDerived } = view;
