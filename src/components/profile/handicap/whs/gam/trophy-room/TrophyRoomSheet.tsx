@@ -142,7 +142,7 @@ const Eyebrow: React.FC<{ ownerFirstName?: string | null; isFriendView?: boolean
       fontWeight: 800,
       letterSpacing: '0.14em',
       textTransform: 'uppercase',
-      color: 'rgba(255,255,255,0.55)',
+      color: AMBER,
     }}
   >
     {isFriendView && ownerFirstName
