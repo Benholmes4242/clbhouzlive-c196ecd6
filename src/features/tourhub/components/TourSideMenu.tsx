@@ -179,7 +179,7 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
 
           {/* Nav list */}
           <nav style={{ marginTop: 4, flex: 1, overflowY: 'auto' }}>
-            {DESTINATIONS.map(({ id, label, Icon }) => {
+            {DESTINATIONS.filter(({ id }) => id !== 'live' || showLive).map(({ id, label, Icon }) => {
               const isActive = id === activeTab;
               return (
                 <button
