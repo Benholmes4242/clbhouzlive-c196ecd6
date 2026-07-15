@@ -49,27 +49,45 @@ function Column({
       {/* Crest */}
       <div
         style={{
+          position: 'relative',
           width: 54,
           height: 54,
-          borderRadius: '34%',
-          overflow: 'hidden',
-          background: 'rgba(255,255,255,0.06)',
-          border: isTop ? `1.5px solid ${GOLD}` : `0.5px solid ${WHITE_ALPHA_18}`,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: 6,
           boxShadow: isTop ? '0 3px 10px rgba(255,184,0,0.20)' : 'none',
         }}
         aria-hidden
       >
-        {standing?.logoUrl ? (
-          <img src={standing.logoUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-        ) : (
-          <span style={{ fontSize: 12, fontWeight: 900, color: isTop ? GOLD : '#FFF', letterSpacing: '0.04em' }}>
-            {(standing?.shortName ?? standing?.collegeName ?? '?').slice(0, 3).toUpperCase()}
-          </span>
-        )}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: '34%',
+            overflow: 'hidden',
+            background: 'rgba(255,255,255,0.06)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 6,
+          }}
+        >
+          {standing?.logoUrl ? (
+            <img src={standing.logoUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+          ) : (
+            <span style={{ fontSize: 12, fontWeight: 900, color: isTop ? GOLD : '#FFF', letterSpacing: '0.04em' }}>
+              {(standing?.shortName ?? standing?.collegeName ?? '?').slice(0, 3).toUpperCase()}
+            </span>
+          )}
+        </div>
+        {/* Traced canonical hairline (dark hero). Rank-1 keeps its gold status ring. */}
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: '34%',
+            border: isTop ? `1.5px solid ${GOLD}` : '1px solid rgba(255,255,255,0.22)',
+            pointerEvents: 'none',
+          }}
+        />
       </div>
 
       {/* Name */}
