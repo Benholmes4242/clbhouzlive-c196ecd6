@@ -213,21 +213,8 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard', onRowTap
   const [mode, setMode] = useState<RecordsMode>('latest');
   const { data, isLoading } = useRegionFeats(region, tier, mode);
   const rawRows = data ?? [];
-  const rows = variant === 'list'
-    ? (mode === 'alltime'
-        ? [...rawRows].sort((a, b) => {
-            const av = parseFloat(String(a.feat_value ?? a.value ?? '').replace(/[^\d.]/g, '')) || 0;
-            const bv = parseFloat(String(b.feat_value ?? b.value ?? '').replace(/[^\d.]/g, '')) || 0;
-            if (bv !== av) return bv - av;
-            const ad = a.play_date ?? a.attained_at ?? '';
-            const bd = b.play_date ?? b.attained_at ?? '';
-            return bd.localeCompare(ad);
-          })
-        : [...rawRows].sort((a, b) => {
-            const ad = a.play_date ?? a.attained_at ?? '';
-            const bd = b.play_date ?? b.attained_at ?? '';
-            return bd.localeCompare(ad);
-          }))
+  const rows = variant === 'list' && tier === 'birdie_hauls'
+    ? sortBirdieHauls(rawRows, mode)
     : rawRows;
   const cap = variant === 'list' ? LIST_CAP : RAIL_CAP;
   const displayRows = rows.slice(0, cap);
