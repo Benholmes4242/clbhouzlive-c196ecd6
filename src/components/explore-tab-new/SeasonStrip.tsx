@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { SPACE } from '@/lib/spacing';
-import { DEEP_AMBER, FONT } from './gamingLightTokens';
+import { AMBER, FONT } from './gamingLightTokens';
 import { quarterOf, daysLeft, seasonName } from '@/lib/gam/seasonClock';
 import { useViewerHemisphere } from '@/hooks/gam/useViewerHemisphere';
 
@@ -28,7 +28,7 @@ export function SeasonStrip() {
           fontWeight: 800,
           letterSpacing: '0.14em',
           textTransform: 'uppercase',
-          color: DEEP_AMBER,
+          color: AMBER,
         }}
       >
         {name} · Official WHS

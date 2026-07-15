@@ -1,5 +1,5 @@
 import { SPACE } from '@/lib/spacing';
-import { FONT, DEEP_AMBER } from './gamingLightTokens';
+import { FONT } from './gamingLightTokens';
 
 interface Props {
   eyebrow: string;
@@ -30,7 +30,7 @@ export function DiscoverSectionHeader({ eyebrow, title, linkLabel, onLinkClick }
             fontWeight: 800,
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
-            color: '#64748B',
+            color: '#94A3B8',
             lineHeight: 1,
           }}
         >
@@ -46,7 +46,7 @@ export function DiscoverSectionHeader({ eyebrow, title, linkLabel, onLinkClick }
               background: 'none',
               fontSize: 12,
               fontWeight: 800,
-              color: DEEP_AMBER,
+              color: '#94A3B8',
               cursor: 'pointer',
             }}
           >
