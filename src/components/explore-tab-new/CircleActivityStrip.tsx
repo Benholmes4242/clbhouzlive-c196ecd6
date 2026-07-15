@@ -90,7 +90,7 @@ export function CircleActivityStrip({ userId }: Props) {
 
   const rows = useMemo(() => data ?? [], [data]);
 
-  const Header = <AlmanacHead title="Your friends" />;
+  const Header = <AlmanacHead title="Friends Achievements" />;
 
   if (isLoading) {
     return (
