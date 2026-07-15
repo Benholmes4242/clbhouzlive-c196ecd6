@@ -95,6 +95,14 @@ export function validateMediaFile(
         error: `Video too long (${durationStr}). Maximum is ${POST_LIMITS.MAX_VIDEO_DURATION_DISPLAY}.` 
       };
     }
+    // Duration could not be probed -> do NOT let it silently bypass the
+    // cap and fail at Cloudflare. Reject with a clear message.
+    if (!videoDuration) {
+      return {
+        valid: false,
+        error: `Could not read this video's length. Please re-select or try a different file.`
+      };
+    }
   } else if (isImage) {
     const allowedTypes: readonly string[] = ALLOWED_IMAGE_TYPES;
     if (!allowedTypes.includes(file.type)) {
