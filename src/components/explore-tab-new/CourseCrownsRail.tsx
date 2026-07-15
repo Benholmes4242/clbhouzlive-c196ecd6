@@ -6,7 +6,6 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useRegionFeats, sortRecordsAllTime, rowToPar, toParText, type FeatRow, type RecordsMode } from './hooks/useRegionFeats';
 import { DiscoverSectionHeader } from './DiscoverSectionHeader';
 import { SPACE } from '@/lib/spacing';
-import { formatHcp } from '@/lib/formatHcp';
 import { FONT } from './gamingLightTokens';
 import type { ScorecardOpener } from './useScorecardOpener';
 
