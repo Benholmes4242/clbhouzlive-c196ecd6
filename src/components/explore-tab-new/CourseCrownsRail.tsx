@@ -267,20 +267,6 @@ export function CrownCard({ row, opener, mode = 'latest' }: { row: FeatRow; open
             >
               {holder}
             </span>
-            {hasHcp ? (
-              <span
-                style={{
-                  fontSize: 13.5,
-                  fontWeight: 800,
-                  color: GOLD,
-                  lineHeight: 1.2,
-                  flexShrink: 0,
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {formatHcp(row.holder_hcp)}
-              </span>
-            ) : null}
           </div>
           {club ? (
             <div
