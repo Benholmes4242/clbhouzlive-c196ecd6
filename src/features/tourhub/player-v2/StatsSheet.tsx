@@ -16,7 +16,7 @@ import {
   INK_FAINT,
   INK_MUTE,
   INK_TINT_07,
-  SURFACE,
+  SLATE_50,
 } from '../_shared/tokens';
 
 interface StatsSheetProps {
