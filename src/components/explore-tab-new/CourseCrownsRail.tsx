@@ -6,7 +6,6 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useRegionFeats, sortRecordsAllTime, rowToPar, toParText, type FeatRow, type RecordsMode } from './hooks/useRegionFeats';
 import { DiscoverSectionHeader } from './DiscoverSectionHeader';
 import { SPACE } from '@/lib/spacing';
-import { formatHcp } from '@/lib/formatHcp';
 import { FONT } from './gamingLightTokens';
 import type { ScorecardOpener } from './useScorecardOpener';
 
@@ -51,7 +50,6 @@ export function CrownCard({ row, opener, mode = 'latest' }: { row: FeatRow; open
   const isStableford = row.category === 'best_stableford_all_time';
   const scoreValue =
     row.value != null ? String(row.value) : row.feat_value ?? '--';
-  const hasHcp = row.holder_hcp != null;
   const club = (row.holder_club ?? '').trim();
   const avatarSrc = row.holder_avatar ?? null;
 
@@ -269,20 +267,6 @@ export function CrownCard({ row, opener, mode = 'latest' }: { row: FeatRow; open
             >
               {holder}
             </span>
-            {hasHcp ? (
-              <span
-                style={{
-                  fontSize: 13.5,
-                  fontWeight: 800,
-                  color: GOLD,
-                  lineHeight: 1.2,
-                  flexShrink: 0,
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {formatHcp(row.holder_hcp)}
-              </span>
-            ) : null}
           </div>
           {club ? (
             <div
