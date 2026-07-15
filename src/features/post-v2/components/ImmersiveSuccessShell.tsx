@@ -7,8 +7,10 @@
 //    are automatically stop-propagation wrapped so taps on the island do
 //    not close. Omit onTapClose for a destination screen with real actions.
 
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
+import { applyRouteChrome } from '@/lib/routeChrome';
 
 interface Props {
   /** Provide to make the overlay tap-anywhere-to-close. */
