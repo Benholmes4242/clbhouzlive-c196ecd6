@@ -22,7 +22,6 @@ import {
   INK,
   INK_MUTE,
   SLATE_50,
-  SURFACE,
 } from '@/features/tourhub/_shared/tokens';
 import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
 
@@ -90,8 +89,8 @@ export const FullCourseLeaderboardSheetDispatch: React.FC<Props> = ({
       variant="light"
       surfaceColor={SLATE_50}
       style={{
-        height: '90vh',
-        maxHeight: '90vh',
+        height: '75dvh',
+        maxHeight: '75dvh',
         display: 'flex',
         flexDirection: 'column',
         fontFamily: FONT,
@@ -109,9 +108,10 @@ export const FullCourseLeaderboardSheetDispatch: React.FC<Props> = ({
                 textTransform: 'uppercase',
                 color: AMBER,
                 marginBottom: 4,
+                fontVariantNumeric: 'tabular-nums',
               }}
             >
-              {category.short}
+              {courseName} {'\u00B7'} {windowLabel} {'\u00B7'} {total} {total === 1 ? 'ENTRY' : 'ENTRIES'}
             </div>
             <div
               id="course-legends-full-sheet-title"
@@ -125,19 +125,6 @@ export const FullCourseLeaderboardSheetDispatch: React.FC<Props> = ({
             >
               {category.label}
             </div>
-            <div
-              style={{
-                fontSize: 10.5,
-                fontWeight: 700,
-                color: INK_MUTE,
-                letterSpacing: '0.04em',
-                textTransform: 'uppercase',
-                marginTop: 3,
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {courseName} {'\u00B7'} {windowLabel} {'\u00B7'} {total} {total === 1 ? 'ENTRY' : 'ENTRIES'}
-            </div>
           </div>
         </div>
 
@@ -147,7 +134,7 @@ export const FullCourseLeaderboardSheetDispatch: React.FC<Props> = ({
             style={{
               marginTop: 12,
               padding: '12px 14px',
-              background: SURFACE,
+              background: SLATE_50,
               border: `1px solid ${GOLD_BORDER}`,
               borderRadius: 14,
               display: 'flex',
@@ -211,7 +198,7 @@ export const FullCourseLeaderboardSheetDispatch: React.FC<Props> = ({
       </div>
 
       {/* Ledger 2..N */}
-      <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', background: SURFACE }}>
+      <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', background: SLATE_50 }}>
         {rest.length === 0 ? (
           <div style={{ padding: '28px 16px', textAlign: 'center', color: INK_MUTE, fontSize: 12, fontWeight: 600 }}>
             The champion stands alone. Be the first to challenge.
