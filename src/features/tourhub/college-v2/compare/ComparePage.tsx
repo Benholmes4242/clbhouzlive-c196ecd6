@@ -285,6 +285,8 @@ function ClassColumn({ headerCode, roster, liveMap, alignRight }: ClassColumnPro
                   size={22}
                   srcCandidates={a.photoUrl ? [a.photoUrl] : []}
                   alt={a.fullName}
+                  hairlineRing
+                  ringColor="rgba(15,23,42,0.12)"
                 />
                 {isLive && (
                   <span
