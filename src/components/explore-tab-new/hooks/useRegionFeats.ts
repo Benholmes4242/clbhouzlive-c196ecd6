@@ -144,3 +144,36 @@ export function useRegionLegendaryLeaders(region: string | null) {
   });
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Eagle leaders (all-time eagle counts by holder)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface EagleLeaderRow {
+  user_id: string | null;
+  holder_name: string | null;
+  holder_avatar: string | null;
+  holder_hcp?: number | null;
+  holder_club?: string | null;
+  first_feat?: string | null;
+  eagles: number;
+}
+
+export function useRegionEagleLeaders(region: string | null) {
+  const cacheRegion = toCacheRegion(region);
+  const railKey = `eagle_leaders:${cacheRegion}`;
+  return useQuery<EagleLeaderRow[]>({
+    queryKey: ['discover-rail-cache', railKey],
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('discover_rail_cache')
+        .select('payload')
+        .eq('rail_key', railKey)
+        .maybeSingle();
+      if (error) throw error;
+      return (data?.payload ?? []) as unknown as EagleLeaderRow[];
+    },
+  });
+}
+
+
