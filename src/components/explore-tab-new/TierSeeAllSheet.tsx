@@ -131,6 +131,16 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
     return best;
   }, [tier, displayRows]);
 
+  const birdieMaxCount: number | null = useMemo(() => {
+    if (tier !== 'birdie_hauls') return null;
+    let max = 0;
+    for (const r of displayRows) {
+      const n = parseFloat(String(r.feat_value ?? r.value ?? '').replace(/[^\d.]/g, '')) || 0;
+      if (n > max) max = n;
+    }
+    return max > 0 ? max : null;
+  }, [tier, displayRows]);
+
   useEffect(() => {
     if (!open) return;
     setVisible(PAGE);
