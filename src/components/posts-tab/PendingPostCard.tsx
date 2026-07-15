@@ -8,6 +8,7 @@ import { toast } from '@/lib/toast';
 import { usePendingPostsStore, aggregatePendingProgress, type PendingPost } from '@/uploads/pendingPostsStore';
 import { uploadManager } from '@/uploads/UploadManager';
 import { retryJob, retryFailedItems, enqueuePostUpload, cancelJob } from '@/uploads/uploadPipeline';
+import { MentionText } from '@/components/mentions/MentionText';
 
 interface PendingPostCardProps {
   entry: PendingPost;
@@ -164,7 +165,9 @@ export const PendingPostCard: React.FC<PendingPostCardProps> = ({ entry, theme =
           </div>
 
           {entry.caption && (
-            <p
+            <MentionText
+              text={entry.caption}
+              as="p"
               style={{
                 margin: '6px 0 0',
                 fontSize: 14,
@@ -175,9 +178,7 @@ export const PendingPostCard: React.FC<PendingPostCardProps> = ({ entry, theme =
                 WebkitBoxOrient: 'vertical',
                 overflow: 'hidden',
               }}
-            >
-              {entry.caption}
-            </p>
+            />
           )}
 
           {/* Media preview thumb row */}
