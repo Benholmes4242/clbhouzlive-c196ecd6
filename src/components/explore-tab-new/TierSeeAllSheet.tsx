@@ -190,7 +190,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
       ? eagleLeaderRows.length
       : displayRows.length;
   const metricAccent = metric === 'aces' ? SC_ACE : SC_ALBATROSS;
-  const eagleBarGradient = `linear-gradient(90deg, ${SC_EAGLE}, ${SC_EAGLE_DARK})`;
+  const eagleBarGradient = 'linear-gradient(90deg, #F7931E, #FBBC2E)';
 
 
   return (
