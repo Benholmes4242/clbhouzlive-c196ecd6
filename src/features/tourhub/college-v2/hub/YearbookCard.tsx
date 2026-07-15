@@ -245,15 +245,17 @@ function YearbookCardInner({ standing, liveCount, onSelect, selected }: Props) {
                 key={a.id}
                 style={{
                   marginLeft: i === 0 ? 0 : -6,
+                  /* 1.5px surface wrapper = facepile-style solid separation (canon exception). */
                   border: `1.5px solid ${isTop ? '#FFF7E6' : SURFACE}`,
                   borderRadius: '34%',
-                  overflow: 'hidden',
                 }}
               >
                 <SquircleAvatar
                   size={20}
                   srcCandidates={a.photoUrl ? [a.photoUrl] : []}
                   alt={a.name}
+                  hairlineRing
+                  ringColor="rgba(15,23,42,0.12)"
                 />
               </div>
             ))}
