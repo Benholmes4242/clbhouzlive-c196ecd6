@@ -1,8 +1,8 @@
 /**
  * SectionEyebrow — TD1 section header: kicker + optional right action.
- * Dispatch grammar: 3px rule marker + 9px caps + right chevron affordance.
+ * Dispatch grammar: canonical slate eyebrow + right chevron affordance.
  */
-import { FONT, INK, INK_MUTE, INK_FAINT } from '../../_shared/tokens';
+import { FONT, INK_MUTE, INK_FAINT } from '../../_shared/tokens';
 
 interface Props {
   kicker: string;
@@ -18,11 +18,10 @@ export function SectionEyebrow({ kicker, actionLabel, onAction }: Props) {
         padding: '16px 16px 12px', fontFamily: FONT,
       }}
     >
-      <div style={{ width: 3, height: 12, background: INK, borderRadius: 1, flexShrink: 0 }} />
       <span
         style={{
-          fontSize: 9, fontWeight: 900, color: INK,
-          letterSpacing: '0.16em', textTransform: 'uppercase',
+          fontSize: 11, fontWeight: 800, color: INK_FAINT,
+          letterSpacing: '0.14em', textTransform: 'uppercase',
         }}
       >
         {kicker}
