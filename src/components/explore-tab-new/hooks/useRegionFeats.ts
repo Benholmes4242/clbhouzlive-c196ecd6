@@ -38,6 +38,47 @@ export function toCacheRegion(r: string | null): string {
 
 export type RecordsMode = 'latest' | 'alltime';
 
+export function rowToPar(row: FeatRow): number | null {
+  if (row.category === 'best_stableford_all_time') return null;
+  const n =
+    typeof row.value === 'number'
+      ? row.value
+      : typeof row.value === 'string' && row.value.trim() !== '' && !isNaN(Number(row.value))
+        ? Number(row.value)
+        : null;
+  if (n == null || row.course_par == null) return null;
+  return n - row.course_par;
+}
+
+export function toParText(d: number): string {
+  if (d === 0) return 'E';
+  return d < 0 ? String(d) : `+${d}`;
+}
+
+export function sortRecordsAllTime(rows: FeatRow[]): FeatRow[] {
+  const stroke: FeatRow[] = [];
+  const noPar: FeatRow[] = [];
+  const stableford: FeatRow[] = [];
+  for (const r of rows) {
+    if (r.category === 'best_stableford_all_time') stableford.push(r);
+    else if (rowToPar(r) == null) noPar.push(r);
+    else stroke.push(r);
+  }
+  stroke.sort((a, b) => {
+    const da = rowToPar(a)!;
+    const db = rowToPar(b)!;
+    if (da !== db) return da - db;
+    const ga = Number(a.value);
+    const gb = Number(b.value);
+    if (ga !== gb) return ga - gb;
+    const ta = a.attained_at ? Date.parse(a.attained_at) : Infinity;
+    const tb = b.attained_at ? Date.parse(b.attained_at) : Infinity;
+    return ta - tb;
+  });
+  noPar.sort((a, b) => Number(a.value) - Number(b.value));
+  return [...stroke, ...noPar, ...stableford];
+}
+
 export function useRegionFeats(
   region: string | null,
   tier: FeatTier,
