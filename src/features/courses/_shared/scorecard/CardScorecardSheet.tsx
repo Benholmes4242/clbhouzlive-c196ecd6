@@ -355,10 +355,10 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   const showFooter = !!onViewProfile || !!onViewCourse;
 
   return (
-    <BottomSheet open={open} onClose={onClose} variant="light" surfaceColor={CANVAS} style={{ background: CANVAS }}>
-      <div style={{ display: 'flex', flexDirection: 'column', fontFamily: GEIST, background: CANVAS, maxHeight: 'calc(90vh - 24px)', overflowY: 'auto' }}>
+    <BottomSheet open={open} onClose={onClose} variant="light" surfaceColor={CANVAS} style={{ background: CANVAS, height: '75dvh', maxHeight: '75dvh', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', fontFamily: GEIST, background: CANVAS, flex: 1, minHeight: 0 }}>
         {/* HEADER — course-first */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '10px 16px 12px', borderBottom: `1px solid ${HAIRLINE}` }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '10px 16px 12px', borderBottom: `1px solid ${HAIRLINE}`, flexShrink: 0 }}>
           <div style={{ minWidth: 0, flex: 1 }}>
             <div style={{ ...NUM, fontSize: 10.5, fontWeight: 800, color: EYEBROW, letterSpacing: '0.14em', textTransform: 'uppercase', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {eyebrowText}
@@ -404,113 +404,116 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
           </div>
         </div>
 
-        {/* ROUND SELECTOR */}
-        {rounds && rounds.available.length > 1 && (
-          <div style={{ display: 'flex', gap: 6, padding: '10px 16px 4px', overflowX: 'auto' }}>
-            {rounds.available.map((r) => {
-              const active = r === rounds.active;
-              return (
-                <button
-                  key={r}
-                  type="button"
-                  onClick={() => rounds.onSelect(r)}
-                  style={{
-                    padding: '6px 12px', borderRadius: 999,
-                    background: active ? INK : 'transparent',
-                    color: active ? '#FFFFFF' : SECONDARY,
-                    border: active ? `1px solid ${INK}` : `1px solid ${HAIRLINE}`,
-                    fontFamily: GEIST, fontSize: 11, fontWeight: 800,
-                    letterSpacing: '0.06em', cursor: 'pointer', whiteSpace: 'nowrap',
-                    WebkitTapHighlightColor: 'transparent',
-                  }}
-                  aria-pressed={active}
-                >
-                  R{r}
-                </button>
-              );
-            })}
-          </div>
-        )}
-
-        {loading ? (
-          <SkeletonMiddle nineHole={!!nineHole} />
-        ) : holes.length === 0 && emptyVariant === 'nohbh' ? (
-          <NohbhMiddle gross={emptyGross ?? null} toPar={emptyToPar ?? null} />
-        ) : holes.length === 0 ? (
-          <SyncingMiddle nineHole={!!nineHole} />
-        ) : (
-
-          <>
-            {showTrajectory && (
-              <div style={{ margin: 16, padding: '12px 12px 6px', background: '#FFFFFF', borderRadius: 14, border: `1px solid ${HAIRLINE}` }}>
-                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <span style={{ fontFamily: GEIST, fontSize: 10.5, fontWeight: 800, color: SECONDARY, letterSpacing: '0.1em' }}>
-                    TRAJECTORY
-                  </span>
-                  {totals.played && (
-                    <span style={{ ...NUM, fontSize: 11, fontWeight: 800, color: toParColor(totals.toPar) }}>
-                      {fmtRel(totals.toPar)}
-                    </span>
-                  )}
-                </div>
-                <TrajectoryLine holes={holes} />
-              </div>
-            )}
-
-            <div style={{ padding: '4px 16px 16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {nineHole ? (
-                <NineGrid holes={holes.filter((h) => h.holeNo <= 9)} label="HOLES 1-9" startAt={1} span={9} />
-              ) : (
-                <>
-                  <NineGrid holes={holes.filter((h) => h.holeNo <= 9)} label="OUT" startAt={1} span={9} />
-                  <NineGrid holes={holes.filter((h) => h.holeNo > 9)} label="IN" startAt={10} span={9} />
-                </>
-              )}
+        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
+          {/* ROUND SELECTOR */}
+          {rounds && rounds.available.length > 1 && (
+            <div style={{ display: 'flex', gap: 6, padding: '10px 16px 4px', overflowX: 'auto' }}>
+              {rounds.available.map((r) => {
+                const active = r === rounds.active;
+                return (
+                  <button
+                    key={r}
+                    type="button"
+                    onClick={() => rounds.onSelect(r)}
+                    style={{
+                      padding: '6px 12px', borderRadius: 999,
+                      background: active ? INK : 'transparent',
+                      color: active ? '#FFFFFF' : SECONDARY,
+                      border: active ? `1px solid ${INK}` : `1px solid ${HAIRLINE}`,
+                      fontFamily: GEIST, fontSize: 11, fontWeight: 800,
+                      letterSpacing: '0.06em', cursor: 'pointer', whiteSpace: 'nowrap',
+                      WebkitTapHighlightColor: 'transparent',
+                    }}
+                    aria-pressed={active}
+                  >
+                    R{r}
+                  </button>
+                );
+              })}
             </div>
-          </>
-        )}
+          )}
 
+          {loading ? (
+            <SkeletonMiddle nineHole={!!nineHole} />
+          ) : holes.length === 0 && emptyVariant === 'nohbh' ? (
+            <NohbhMiddle gross={emptyGross ?? null} toPar={emptyToPar ?? null} />
+          ) : holes.length === 0 ? (
+            <SyncingMiddle nineHole={!!nineHole} />
+          ) : (
 
-        {/* IDENTITY BLOCK */}
-        {showIdentity && (
-          <div style={{
-            margin: '12px 16px 0',
-            background: '#FFFFFF',
-            border: `1px solid ${HAIRLINE}`,
-            borderRadius: 14,
-            padding: '12px 16px',
-            display: 'flex', alignItems: 'center', gap: 11,
-          }}>
-            <SquircleAvatar
-              src={playerAvatarUrl ?? null}
-              alt={playerName}
-              userId={playerUserId ?? undefined}
-              size={44}
-              hairlineRing
-            />
-            <div style={{ minWidth: 0, flex: 1 }}>
-              <div style={{ fontSize: 15, fontWeight: 800, color: INK, letterSpacing: '-0.01em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {playerName}
-              </div>
-              {(playerHcp != null || showChip) && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 1 }}>
-                  {playerHcp != null && (
-                    <span style={{ ...NUM, fontSize: 12.5, fontWeight: 600, color: SECONDARY }}>
-                      HCP {playerHcp.toFixed(1)}
+            <>
+              {showTrajectory && (
+                <div style={{ margin: 16, padding: '12px 12px 6px', background: '#FFFFFF', borderRadius: 14, border: `1px solid ${HAIRLINE}` }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 4 }}>
+                    <span style={{ fontFamily: GEIST, fontSize: 10.5, fontWeight: 800, color: SECONDARY, letterSpacing: '0.1em' }}>
+                      TRAJECTORY
                     </span>
-                  )}
-                  {showChip && <HandicapChip delta={playerHcpDelta as number} />}
+                    {totals.played && (
+                      <span style={{ ...NUM, fontSize: 11, fontWeight: 800, color: toParColor(totals.toPar) }}>
+                        {fmtRel(totals.toPar)}
+                      </span>
+                    )}
+                  </div>
+                  <TrajectoryLine holes={holes} />
                 </div>
               )}
+
+              <div style={{ padding: '4px 16px 16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+                {nineHole ? (
+                  <NineGrid holes={holes.filter((h) => h.holeNo <= 9)} label="HOLES 1-9" startAt={1} span={9} />
+                ) : (
+                  <>
+                    <NineGrid holes={holes.filter((h) => h.holeNo <= 9)} label="OUT" startAt={1} span={9} />
+                    <NineGrid holes={holes.filter((h) => h.holeNo > 9)} label="IN" startAt={10} span={9} />
+                  </>
+                )}
+              </div>
+            </>
+          )}
+
+
+          {/* IDENTITY BLOCK */}
+          {showIdentity && (
+            <div style={{
+              margin: '12px 16px 0',
+              background: '#FFFFFF',
+              border: `1px solid ${HAIRLINE}`,
+              borderRadius: 14,
+              padding: '12px 16px',
+              display: 'flex', alignItems: 'center', gap: 11,
+            }}>
+              <SquircleAvatar
+                src={playerAvatarUrl ?? null}
+                alt={playerName}
+                userId={playerUserId ?? undefined}
+                size={44}
+                hairlineRing
+              />
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div style={{ fontSize: 15, fontWeight: 800, color: INK, letterSpacing: '-0.01em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {playerName}
+                </div>
+                {(playerHcp != null || showChip) && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 1 }}>
+                    {playerHcp != null && (
+                      <span style={{ ...NUM, fontSize: 12.5, fontWeight: 600, color: SECONDARY }}>
+                        HCP {playerHcp.toFixed(1)}
+                      </span>
+                    )}
+                    {showChip && <HandicapChip delta={playerHcpDelta as number} />}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* FOOTER — two buttons */}
         {showFooter && (
           <div style={{
             display: 'flex', gap: 8,
             padding: '12px 16px calc(env(safe-area-inset-bottom, 0px) + 16px)',
+            flexShrink: 0,
           }}>
             {onViewProfile && (
               <button
