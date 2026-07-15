@@ -125,14 +125,13 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
         {/* 8. Next Conquests -- self-hiding, owns its header */}
         <NextConquestsRail userId={userId} />
 
-        {/* 9. Eagles rail -- FeatTierRail returns null when empty */}
-        <FeatTierRail
+        {/* 9. Eagles section -- RECENT rail or ALL TIME Most Eagles board */}
+        <EaglesSection
           region={activeRegion}
-          tier="eagles"
-          title={`Eagles · ${regionUpper}`}
-          variant="compact"
+          regionUpper={regionUpper}
           onRowTap={handleFeatRowTap}
         />
+
 
         {/* 10. Toughest courses -- self-hiding, owns its header */}
         <ToughestCoursesRail />
