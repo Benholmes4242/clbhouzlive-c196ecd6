@@ -56,7 +56,7 @@ function progressPct(_category: string, gap: number): number {
 
 function ConquestCard({ row }: { row: TitleInReach }) {
   const navigate = useNavigate();
-  const pct = progressPct(row.category, row.user_value, row.leader_value);
+  const pct = progressPct(row.category, row.gap);
   const gap = gapCopy(row.category, row.gap);
   return (
     <button
