@@ -8,6 +8,7 @@ import { toast } from '@/lib/toast';
 import { usePendingPostsStore, aggregatePendingProgress, type PendingPost } from '@/uploads/pendingPostsStore';
 import { uploadManager } from '@/uploads/UploadManager';
 import { retryJob, retryFailedItems, enqueuePostUpload, cancelJob } from '@/uploads/uploadPipeline';
+import { MentionText } from '@/components/mentions/MentionText';
 
 interface PendingPostCardProps {
   entry: PendingPost;
