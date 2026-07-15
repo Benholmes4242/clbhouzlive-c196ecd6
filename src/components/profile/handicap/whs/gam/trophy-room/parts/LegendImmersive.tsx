@@ -42,6 +42,21 @@ function fmtDate(iso: string): string {
 }
 
 export const LegendImmersive: React.FC<Props> = ({ records, onClose, onShare }) => {
+  // Full-bleed into the notch: transparent shield + white status-bar icons for
+  // the dark overlay. Mirrors FullscreenFeedOverlay. useLayoutEffect so the
+  // shield/statusbar mutations land before first paint. Restore re-resolves
+  // the underlying route chrome on close (force=true: we mutated behind the
+  // idempotency cache).
+  useLayoutEffect(() => {
+    const shield = document.getElementById('safe-area-shield');
+    if (shield) shield.style.backgroundColor = 'transparent';
+    try { setStatusBarStyleColor('light', '00000000'); } catch {}
+    return () => {
+      if (shield) shield.style.backgroundColor = 'transparent';
+      try { applyRouteChrome(window.location.pathname, true); } catch {}
+    };
+  }, []);
+
   if (!records || records.length === 0) return null;
   const first = records[0];
   const courseName = first.courseName;
