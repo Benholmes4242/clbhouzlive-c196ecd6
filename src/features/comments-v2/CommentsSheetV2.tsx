@@ -208,8 +208,8 @@ function CommentsSheetV2Inner({
             style={{
               background: CANVAS,
               borderRadius: '20px 20px 0 0',
-              minHeight: 'min(52dvh, 380px)',
-              maxHeight: '85dvh',
+              height: '75dvh',
+              maxHeight: '75dvh',
               paddingBottom: kb > 0 ? kb : 0,
               transition: 'padding-bottom 120ms ease-out',
             }}
@@ -222,6 +222,18 @@ function CommentsSheetV2Inner({
             {/* Header */}
             <div className="flex items-start justify-between px-5 pb-3 shrink-0">
               <div>
+                <div
+                  style={{
+                    fontSize: '8.5px',
+                    fontWeight: 800,
+                    color: AMBER,
+                    letterSpacing: '0.14em',
+                    textTransform: 'uppercase',
+                    marginBottom: 4,
+                  }}
+                >
+                  COMMENTS
+                </div>
                 <div style={{ fontSize: 17, fontWeight: 800, color: INK, letterSpacing: '-0.01em' }}>
                   {totalCount} {totalCount === 1 ? 'comment' : 'comments'}
                 </div>
