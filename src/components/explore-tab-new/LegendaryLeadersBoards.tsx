@@ -184,12 +184,12 @@ export function LegendaryLeadersBoards({ region }: Props) {
     >
       {/* Wrap so each board is min ~280px; single-col below ~600px viewport. */}
       <div style={{ flex: '1 1 280px', minWidth: 0, display: 'flex' }}>
-        <Board title="Most Aces" accent={AMBER} rows={rows} metric="aces" />
+        <Board title="Most Aces" accent={SC_ACE} rows={rows} metric="aces" />
       </div>
       <div style={{ flex: '1 1 280px', minWidth: 0, display: 'flex' }}>
         <Board
           title="Most Albatrosses"
-          accent={PURPLE}
+          accent={SC_ALBATROSS}
           rows={rows}
           metric="albatrosses"
         />
