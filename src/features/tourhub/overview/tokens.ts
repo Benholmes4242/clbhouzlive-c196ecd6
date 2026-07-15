@@ -16,6 +16,7 @@ export const V4 = {
   inkSoft: '#3C4351',
   inkMute: '#5B6572',
   inkFaint: '#8A9099',
+  slate: '#94A3B8',
   hairline: 'rgba(15,23,42,0.10)',
 
   // Accents
