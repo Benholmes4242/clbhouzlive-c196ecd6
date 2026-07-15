@@ -144,16 +144,45 @@ export function FeatListRow({ row, tier, onTap, index = 0, medals, mode = 'lates
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <div
             style={{
-              fontSize: 13,
-              fontWeight: 700,
-              color: '#0F172A',
-              lineHeight: 1.2,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              minWidth: 0,
             }}
           >
-            {holder}
+            <div
+              style={{
+                fontSize: 13,
+                fontWeight: 700,
+                color: '#0F172A',
+                lineHeight: 1.2,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                minWidth: 0,
+                flex: '0 1 auto',
+              }}
+            >
+              {holder}
+            </div>
+            {tier === 'legendary' && (row.feat_type === 'ace' || row.feat_type === 'albatross') ? (
+              <span
+                style={{
+                  flexShrink: 0,
+                  fontSize: 8,
+                  fontWeight: 800,
+                  letterSpacing: '0.08em',
+                  padding: '3px 7px',
+                  borderRadius: 999,
+                  background: SC_FILL_GOLD,
+                  color: INK_TOKEN,
+                  lineHeight: 1,
+                  textTransform: 'uppercase',
+                }}
+              >
+                {row.feat_type === 'ace' ? 'ACE' : 'ALBATROSS'}
+              </span>
+            ) : null}
           </div>
           <div
             style={{
