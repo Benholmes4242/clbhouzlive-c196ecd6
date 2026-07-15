@@ -32,7 +32,7 @@ export const SC_BIRDIE    = '#D2222D';
 export const SC_PAR       = '#8A9099'; // unified on house even-gray
 export const SC_BOGEY     = '#1D5DBF';
 export const SC_DOUBLE    = '#0F2E63';
-export const SC_ACCENT    = '#C97A10'; // holes tab accent - house AA amber
+export const SC_ACCENT    = '#94A3B8'; // holes tab section eyebrow - slate (canonical rule)
 
 // Text tokens - dark surfaces.
 export const SC_ACE_DARK       = '#FFE066';
