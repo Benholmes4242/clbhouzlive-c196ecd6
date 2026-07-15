@@ -90,7 +90,7 @@ const HolderCell: React.FC<HolderCellProps> = ({ short, holder, selfLabel }) => 
   const isEmpty = !holder;
 
   const labelColor = isSelf ? 'var(--hcp-amber)' : 'var(--hcp-t-40)';
-  const valueColor = isSelf ? '#F7931E' : 'var(--hcp-t-100)';
+  const valueColor = isSelf ? 'var(--hcp-amber)' : 'var(--hcp-t-100)';
 
   return (
     <div
@@ -123,8 +123,8 @@ const HolderCell: React.FC<HolderCellProps> = ({ short, holder, selfLabel }) => 
             <Crown
               size={11}
               strokeWidth={2.6}
-              fill="#F7931E"
-              style={{ color: '#F7931E' }}
+              fill="var(--hcp-amber)"
+              style={{ color: 'var(--hcp-amber)' }}
             />
           )}
           {short}
