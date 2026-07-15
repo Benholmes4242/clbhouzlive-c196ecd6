@@ -10,21 +10,24 @@ import {
   SLATE_50,
 } from '@/features/tourhub/_shared/tokens';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { SC_ACE, SC_ALBATROSS, SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
+import { SC_ACE, SC_ALBATROSS, SC_EAGLE, SC_EAGLE_DARK, SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 import { formatHcp } from '@/lib/formatHcp';
 import { REGION_TABS } from './AlmanacSections';
 import {
   useRegionFeats,
   useRegionLegendaryLeaders,
+  useRegionEagleLeaders,
   rowToPar,
   sortRecordsAllTime,
   type FeatRow,
   type FeatTier,
   type LegendaryLeaderRow,
+  type EagleLeaderRow,
   type RecordsMode,
 } from './hooks/useRegionFeats';
 import { FeatListRow } from './FeatListRow';
 import { useScorecardOpener } from './useScorecardOpener';
+
 
 const PAGE = 20;
 
@@ -58,11 +61,7 @@ interface Props {
   initialMetric?: 'aces' | 'albatrosses';
 }
 
-// Toggle exposed on tiers that have both RECENT and ALL TIME cache keys.
-// Eagles are binary (no all-time ranking) - single-mode.
-function tierHasToggle(tier: FeatTier): boolean {
-  return tier !== 'eagles';
-}
+// All tiers are dual-mode (RECENT / ALL TIME) as of the eagles all-time upgrade.
 
 export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, initialMode = 'latest', initialMetric = 'aces' }: Props) {
   const [visible, setVisible] = useState(PAGE);
@@ -71,21 +70,23 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const scrollerRef = useRef<HTMLDivElement | null>(null);
 
-  const hasToggle = tierHasToggle(tier);
+  const hasToggle = true;
   const isEagles = tier === 'eagles';
   const isLegendaryLeaders = tier === 'legendary' && mode === 'alltime';
+  const isEagleLeaders = tier === 'eagles' && mode === 'alltime';
+  const isLeaderView = isLegendaryLeaders || isEagleLeaders;
 
-  // Fetch the mode-appropriate cache. Records / birdie_hauls / legendary use
-  // useRegionFeats with the mode; eagles is latest-only. For legendary ALL TIME
-  // we source the leaders payload instead, so keep the feats call pinned to
-  // 'latest' so RECENT round-trips stay warm and don't refetch.
+  // Fetch the mode-appropriate cache. Records / birdie_hauls use useRegionFeats
+  // with mode. Eagles and legendary keep their feats fetch pinned to 'latest'
+  // so RECENT stays warm; ALL TIME sources the dedicated leaders payload.
   const fetchTier: FeatTier = tier;
   const fetchMode: RecordsMode = isEagles || tier === 'legendary' ? 'latest' : mode;
   const { data: fetched } = useRegionFeats(region, fetchTier, fetchMode);
   const { data: leadersData } = useRegionLegendaryLeaders(region);
+  const { data: eagleLeadersData } = useRegionEagleLeaders(region);
 
   const displayRows: FeatRow[] = useMemo(() => {
-    if (isLegendaryLeaders) return [];
+    if (isLeaderView) return [];
     const base =
       fetched && fetched.length > 0
         ? fetched
@@ -96,16 +97,24 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
       return sortRecordsAllTime(base);
     }
     return base;
-  }, [fetched, mode, rows, initialMode, tier, isLegendaryLeaders]);
+  }, [fetched, mode, rows, initialMode, tier, isLeaderView]);
 
-  const leaderRows: LegendaryLeaderRow[] = useMemo(() => {
+  const legendaryLeaderRows: LegendaryLeaderRow[] = useMemo(() => {
     if (!isLegendaryLeaders) return [];
     return (leadersData ?? [])
       .filter((r) => (r[metric] ?? 0) > 0)
       .sort((a, b) => (b[metric] ?? 0) - (a[metric] ?? 0));
   }, [isLegendaryLeaders, leadersData, metric]);
 
-  const leaderMax = leaderRows[0]?.[metric] ?? 1;
+  const eagleLeaderRows: EagleLeaderRow[] = useMemo(() => {
+    if (!isEagleLeaders) return [];
+    return (eagleLeadersData ?? [])
+      .filter((r) => (r.eagles ?? 0) > 0)
+      .sort((a, b) => (b.eagles ?? 0) - (a.eagles ?? 0));
+  }, [isEagleLeaders, eagleLeadersData]);
+
+  const legendaryMax = legendaryLeaderRows[0]?.[metric] ?? 1;
+  const eagleMax = eagleLeaderRows[0]?.eagles ?? 1;
 
   const bestToPar: number | null = useMemo(() => {
     if (tier !== 'records') return null;
@@ -132,7 +141,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
   }, [mode, initialMetric]);
 
   useEffect(() => {
-    if (!open || isLegendaryLeaders) return;
+    if (!open || isLeaderView) return;
     const node = sentinelRef.current;
     if (!node) return;
     const io = new IntersectionObserver(
@@ -145,7 +154,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
     );
     io.observe(node);
     return () => io.disconnect();
-  }, [open, displayRows.length, isLegendaryLeaders]);
+  }, [open, displayRows.length, isLeaderView]);
 
   // Own scorecard opener so ALL TIME rows (not present in the caller's list)
   // still open cleanly. Fall back to caller's onRowTap if provided.
@@ -161,8 +170,14 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
   };
 
   const visibleRows = displayRows.slice(0, visible);
-  const total = isLegendaryLeaders ? leaderRows.length : displayRows.length;
+  const total = isLegendaryLeaders
+    ? legendaryLeaderRows.length
+    : isEagleLeaders
+      ? eagleLeaderRows.length
+      : displayRows.length;
   const metricAccent = metric === 'aces' ? SC_ACE : SC_ALBATROSS;
+  const eagleBarGradient = `linear-gradient(90deg, ${SC_EAGLE}, ${SC_EAGLE_DARK})`;
+
 
   return (
     <BottomSheet
@@ -320,7 +335,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
         }}
       >
         {isLegendaryLeaders ? (
-          leaderRows.length === 0 ? (
+          legendaryLeaderRows.length === 0 ? (
             <div
               style={{
                 padding: '28px 16px',
@@ -334,14 +349,74 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
             </div>
           ) : (
             <div style={{ padding: '0 16px' }}>
-              {leaderRows.map((r, i) => (
-                <LegendaryLeaderRow
+              {legendaryLeaderRows.map((r, i) => {
+                const count = r[metric] ?? 0;
+                const other = metric === 'aces' ? (r.albatrosses ?? 0) : (r.aces ?? 0);
+                const otherLabel =
+                  other > 0
+                    ? metric === 'aces'
+                      ? `+${other} ${other === 1 ? 'albatross' : 'albatrosses'}`
+                      : `+${other} ${other === 1 ? 'ace' : 'aces'}`
+                    : null;
+                const barGradient =
+                  metric === 'aces'
+                    ? `linear-gradient(90deg, ${SC_ACE}, ${SC_FILL_GOLD})`
+                    : `linear-gradient(90deg, ${SC_ALBATROSS}, #FFD84D)`;
+                return (
+                  <CountLeaderSheetRow
+                    key={`${r.user_id ?? r.holder_name ?? i}-${i}`}
+                    index={i}
+                    userId={r.user_id}
+                    holderName={r.holder_name}
+                    holderAvatar={r.holder_avatar}
+                    holderHcp={r.holder_hcp ?? null}
+                    holderClub={r.holder_club ?? null}
+                    count={count}
+                    max={legendaryMax}
+                    accent={metricAccent}
+                    barGradient={barGradient}
+                    countLabelSingular={metric === 'aces' ? 'ACE' : 'ALBATROSS'}
+                    countLabelPlural={metric === 'aces' ? 'ACES' : 'ALBATROSSES'}
+                    subline={otherLabel}
+                    onTap={() => {
+                      if (r.user_id) opener.openProfile(r.user_id);
+                    }}
+                  />
+                );
+              })}
+            </div>
+          )
+        ) : isEagleLeaders ? (
+          eagleLeaderRows.length === 0 ? (
+            <div
+              style={{
+                padding: '28px 16px',
+                textAlign: 'center',
+                color: INK_MUTE,
+                fontSize: 12,
+                fontWeight: 600,
+              }}
+            >
+              No eagles yet.
+            </div>
+          ) : (
+            <div style={{ padding: '0 16px' }}>
+              {eagleLeaderRows.map((r, i) => (
+                <CountLeaderSheetRow
                   key={`${r.user_id ?? r.holder_name ?? i}-${i}`}
-                  row={r}
                   index={i}
-                  metric={metric}
-                  metricAccent={metricAccent}
-                  max={leaderMax}
+                  userId={r.user_id}
+                  holderName={r.holder_name}
+                  holderAvatar={r.holder_avatar}
+                  holderHcp={r.holder_hcp ?? null}
+                  holderClub={r.holder_club ?? null}
+                  count={r.eagles ?? 0}
+                  max={eagleMax}
+                  accent={SC_EAGLE}
+                  barGradient={eagleBarGradient}
+                  countLabelSingular="EAGLE"
+                  countLabelPlural="EAGLES"
+                  subline={null}
                   onTap={() => {
                     if (r.user_id) opener.openProfile(r.user_id);
                   }}
@@ -377,9 +452,10 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
           </div>
         )}
 
-        {!isLegendaryLeaders && visible < displayRows.length && (
+        {!isLeaderView && visible < displayRows.length && (
           <div ref={sentinelRef} style={{ height: 40 }} />
         )}
+
         <div style={{ height: 24 }} />
       </div>
     </BottomSheet>
@@ -387,8 +463,8 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Legendary leaders row - all-time aces / albatrosses (leaders payload).
-// Distinct data shape from FeatRow so it lives here rather than in FeatListRow.
+// Generalized count-leader row - used for legendary (aces/albatrosses) and
+// eagles all-time views. Distinct data shape from FeatRow.
 // ─────────────────────────────────────────────────────────────────────────────
 
 const LEGEND_INK = '#0F172A';
@@ -416,42 +492,51 @@ function leaderInitials(name: string): string {
   );
 }
 
-interface LegendaryLeaderRowProps {
-  row: LegendaryLeaderRow;
+interface CountLeaderSheetRowProps {
   index: number;
-  metric: 'aces' | 'albatrosses';
-  metricAccent: string;
+  userId: string | null;
+  holderName: string | null;
+  holderAvatar: string | null;
+  holderHcp: number | null;
+  holderClub: string | null;
+  count: number;
   max: number;
+  accent: string;
+  barGradient: string;
+  countLabelSingular: string;
+  countLabelPlural: string;
+  /** Optional secondary line, e.g. cross-metric or club. */
+  subline: string | null;
   onTap?: () => void;
 }
 
-function LegendaryLeaderRow({ row, index, metric, metricAccent, max, onTap }: LegendaryLeaderRowProps) {
+function CountLeaderSheetRow({
+  index,
+  userId,
+  holderName,
+  holderAvatar,
+  holderHcp,
+  holderClub,
+  count,
+  max,
+  accent,
+  barGradient,
+  countLabelSingular,
+  countLabelPlural,
+  subline,
+  onTap,
+}: CountLeaderSheetRowProps) {
   const rank = index + 1;
   const isTop = rank === 1;
-  const name = formatLeaderName(row.holder_name);
-  const count = row[metric] ?? 0;
-  const other = metric === 'aces' ? (row.albatrosses ?? 0) : (row.aces ?? 0);
-  const otherLabel =
-    metric === 'aces'
-      ? `+${other} ${other === 1 ? 'albatross' : 'albatrosses'}`
-      : `+${other} ${other === 1 ? 'ace' : 'aces'}`;
-  const hcp = row.holder_hcp;
-  const club = row.holder_club;
+  const name = formatLeaderName(holderName);
   const pct = Math.max(0.08, Math.min(1, count / (max || 1)));
-
-  const barGradient =
-    metric === 'aces'
-      ? `linear-gradient(90deg, ${SC_ACE}, ${SC_FILL_GOLD})`
-      : `linear-gradient(90deg, ${SC_ALBATROSS}, #FFD84D)`;
-
-  const countLabel =
-    metric === 'aces'
-      ? count === 1
-        ? 'ACE'
-        : 'ACES'
-      : count === 1
-        ? 'ALBATROSS'
-        : 'ALBATROSSES';
+  const countLabel = count === 1 ? countLabelSingular : countLabelPlural;
+  const secondLine =
+    subline && holderClub
+      ? `${subline} \u00B7 ${holderClub}`
+      : subline
+        ? subline
+        : holderClub;
 
   return (
     <button
@@ -483,7 +568,7 @@ function LegendaryLeaderRow({ row, index, metric, metricAccent, max, onTap }: Le
             fontSize: 16,
             fontWeight: 800,
             fontVariantNumeric: 'tabular-nums',
-            color: isTop ? metricAccent : 'rgba(15,23,42,0.35)',
+            color: isTop ? accent : 'rgba(15,23,42,0.35)',
             lineHeight: 1,
             textAlign: 'center',
           }}
@@ -493,23 +578,16 @@ function LegendaryLeaderRow({ row, index, metric, metricAccent, max, onTap }: Le
         <div style={{ flexShrink: 0 }}>
           <SquircleAvatar
             size={40}
-            srcCandidates={row.holder_avatar ? [row.holder_avatar] : []}
+            srcCandidates={holderAvatar ? [holderAvatar] : []}
             alt={name}
             fallback={leaderInitials(name)}
-            userId={row.user_id ?? undefined}
+            userId={userId ?? undefined}
             hairlineRing
-            ringColor={isTop ? '#FBBC2E' : undefined}
+            ringColor={isTop ? SC_FILL_GOLD : undefined}
           />
         </div>
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'baseline',
-              gap: 6,
-              minWidth: 0,
-            }}
-          >
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, minWidth: 0 }}>
             <span
               style={{
                 fontSize: 14.5,
@@ -526,7 +604,7 @@ function LegendaryLeaderRow({ row, index, metric, metricAccent, max, onTap }: Le
             >
               {name}
             </span>
-            {hcp != null ? (
+            {holderHcp != null ? (
               <span
                 style={{
                   flexShrink: 0,
@@ -536,11 +614,11 @@ function LegendaryLeaderRow({ row, index, metric, metricAccent, max, onTap }: Le
                   fontVariantNumeric: 'tabular-nums',
                 }}
               >
-                {formatHcp(hcp)}
+                {formatHcp(holderHcp)}
               </span>
             ) : null}
           </div>
-          {(other > 0 || club) && (
+          {secondLine && (
             <div
               style={{
                 fontSize: 10.5,
@@ -552,11 +630,7 @@ function LegendaryLeaderRow({ row, index, metric, metricAccent, max, onTap }: Le
                 whiteSpace: 'nowrap',
               }}
             >
-              {other > 0 && club
-                ? `${otherLabel} \u00B7 ${club}`
-                : other > 0
-                  ? otherLabel
-                  : club}
+              {secondLine}
             </div>
           )}
         </div>
@@ -574,7 +648,7 @@ function LegendaryLeaderRow({ row, index, metric, metricAccent, max, onTap }: Le
             style={{
               fontSize: 24,
               fontWeight: 900,
-              color: isTop ? metricAccent : LEGEND_INK,
+              color: isTop ? accent : LEGEND_INK,
               lineHeight: 1,
               fontVariantNumeric: 'tabular-nums',
               letterSpacing: '-0.02em',
@@ -622,3 +696,4 @@ function LegendaryLeaderRow({ row, index, metric, metricAccent, max, onTap }: Le
 }
 
 export default TierSeeAllSheet;
+
