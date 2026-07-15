@@ -288,6 +288,7 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
               flatIndex={i}
               isAutoplayActive={activeIndices.has(i)}
               hideCourseAttribution
+              hideFormatBadge
             />
           ))}
         </div>
@@ -301,6 +302,7 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
               flatIndex={i}
               isAutoplayActive={activeIndices.has(i)}
               hideCourseAttribution
+              hideFormatBadge
             />
           ))}
         </div>
