@@ -195,9 +195,21 @@ function LegendarySection({
   const hasAny = rows.length > 0;
   const [sheetOpen, setSheetOpen] = useState(false);
   const [mode, setMode] = useState<RecordsMode>('latest');
+  const [sheetInitialMode, setSheetInitialMode] = useState<RecordsMode>('latest');
+  const [sheetInitialMetric, setSheetInitialMetric] = useState<'aces' | 'albatrosses'>('aces');
   if (!isLoading && !hasAny) return null;
   const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
   const hasOverflow = mode === 'latest' && rows.length > 12;
+  const openSheetLatest = () => {
+    setSheetInitialMode('latest');
+    setSheetInitialMetric('aces');
+    setSheetOpen(true);
+  };
+  const openSheetLeaders = (metric: 'aces' | 'albatrosses') => {
+    setSheetInitialMode('alltime');
+    setSheetInitialMetric(metric);
+    setSheetOpen(true);
+  };
   return (
     <section style={{ fontFamily: FONT, paddingTop: SPACE.sectionSection }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: `0 ${SPACE.pagePadX}px ${SPACE.sectionHeaderContent}px` }}>
@@ -217,7 +229,7 @@ function LegendarySection({
         {hasOverflow && (
           <button
             type="button"
-            onClick={() => setSheetOpen(true)}
+            onClick={openSheetLatest}
             style={{
               border: 'none',
               background: 'none',
@@ -244,7 +256,7 @@ function LegendarySection({
       {mode === 'latest' ? (
         <LegendaryFeatHero region={region} onRowTap={onRowTap} />
       ) : (
-        <LegendaryLeadersBoards region={region} />
+        <LegendaryLeadersBoards region={region} onViewAll={openSheetLeaders} />
       )}
       <TierSeeAllSheet
         open={sheetOpen}
@@ -253,6 +265,8 @@ function LegendarySection({
         region={region}
         rows={rows}
         onRowTap={onRowTap}
+        initialMode={sheetInitialMode}
+        initialMetric={sheetInitialMetric}
       />
     </section>
   );
