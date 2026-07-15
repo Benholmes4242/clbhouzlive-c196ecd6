@@ -6,10 +6,9 @@ import {
   useRegionLegendaryLeaders,
   type LegendaryLeaderRow,
 } from './hooks/useRegionFeats';
+import { SC_ACE, SC_ALBATROSS } from '@/features/courses/components/holes/_constants';
 
 const GOLD = '#FBBC2E';
-const AMBER = '#F59E0B';
-const PURPLE = '#8B5CF6';
 const INK = '#0F172A';
 const INK_MUTE = 'rgba(15,23,42,0.55)';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
