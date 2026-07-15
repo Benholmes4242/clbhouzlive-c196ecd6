@@ -5,10 +5,12 @@
  * every #1 record the user holds at that course.
  */
 
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Share2, Crown } from 'lucide-react';
 import { format } from 'date-fns';
+import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
+import { applyRouteChrome } from '@/lib/routeChrome';
 import { GAM } from '../../tokens';
 import type { TrophyItem } from '../_shared/normalizeTrophyItem';
 

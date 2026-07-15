@@ -9,9 +9,11 @@
  * it).
  */
 
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Share2 } from 'lucide-react';
+import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
+import { applyRouteChrome } from '@/lib/routeChrome';
 import { renderBadgeIcon } from '../../badgeIcons';
 import { GAM } from '../../tokens';
 import { deriveDetailView } from '../_shared/deriveDetailView';
