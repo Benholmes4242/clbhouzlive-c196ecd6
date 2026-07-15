@@ -392,7 +392,7 @@ export function CourseCrownsRail({ region, opener }: Props) {
         style={{ padding: '0 16px', gap: 9 }}
       >
         {rows.map((row, i) => (
-          <CrownCard key={`${row.course_id ?? i}-${i}`} row={row} opener={opener} />
+          <CrownCard key={`${row.course_id ?? i}-${i}`} row={row} opener={opener} mode={mode} />
         ))}
       </div>
       <TierSeeAllSheet
@@ -402,6 +402,7 @@ export function CourseCrownsRail({ region, opener }: Props) {
         region={region}
         rows={allRows}
         onRowTap={handleRowTap}
+        initialMode={mode}
       />
     </section>
   );
