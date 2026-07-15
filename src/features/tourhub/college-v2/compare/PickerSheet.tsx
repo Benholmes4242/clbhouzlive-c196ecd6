@@ -20,6 +20,7 @@ import {
   GOLD_DEEP,
   HAIRLINE_INK_10,
   INK,
+  INK_FAINT,
   INK_MUTE,
   SLATE_50,
   SURFACE,
@@ -91,7 +92,7 @@ export function PickerSheet({ open, onClose, target, standings, otherSlug }: Pro
             fontWeight: 800,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
-            color: AMBER,
+            color: INK_FAINT,
             marginBottom: 4,
           }}
         >

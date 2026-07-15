@@ -78,7 +78,7 @@ export function TheClass({ slug, collegeName }: Props) {
             fontWeight: 800,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
-            color: AMBER,
+            color: INK_FAINT,
           }}
         >
           The Class

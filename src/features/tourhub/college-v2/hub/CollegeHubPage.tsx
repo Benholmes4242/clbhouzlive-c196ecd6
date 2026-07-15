@@ -289,7 +289,7 @@ export function CollegeHubPage() {
                   fontWeight: 800,
                   letterSpacing: '0.12em',
                   textTransform: 'uppercase',
-                  color: AMBER,
+                  color: INK_FAINT,
                 }}
               >
                 {pickC1 ? 'Pick one more school' : 'Pick two schools to compare'}

@@ -55,7 +55,7 @@ export function ThisWeek({ slug, collegeName }: Props) {
             fontWeight: 800,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
-            color: AMBER,
+            color: INK_FAINT,
           }}
         >
           This Week
