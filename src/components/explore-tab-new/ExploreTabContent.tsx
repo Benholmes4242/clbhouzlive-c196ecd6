@@ -119,27 +119,20 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
         {/* 5. Empty-region editorial card (only when all four tiers are empty) */}
         <AlmanacEmptyCard region={activeRegion} />
 
-        {/* 6. Legendary hero (aces & albatrosses) */}
-        <LegendarySection region={activeRegion} onRowTap={handleFeatRowTap} />
-
-        {/* 7. Course Crowns -- self-hiding, owns its header */}
+        {/* 6. Course Crowns (course records) -- self-hiding, owns its header */}
         <CourseCrownsRail region={activeRegion} opener={opener} />
 
-        {/* 8. Next Conquests -- self-hiding, owns its header */}
-        <NextConquestsRail userId={userId} />
+        {/* 7. Legendary hero (aces & albatrosses) */}
+        <LegendarySection region={activeRegion} onRowTap={handleFeatRowTap} />
 
-        {/* 9. Eagles section -- RECENT rail or ALL TIME Most Eagles board */}
+        {/* 8. Eagles section -- RECENT rail or ALL TIME Most Eagles board */}
         <EaglesSection
           region={activeRegion}
           regionUpper={regionUpper}
           onRowTap={handleFeatRowTap}
         />
 
-
-        {/* 10. Toughest courses -- self-hiding, owns its header */}
-        <ToughestCoursesRail />
-
-        {/* 11. Birdie hauls -- FeatTierRail returns null when empty */}
+        {/* 9. Birdie hauls -- FeatTierRail returns null when empty */}
         <FeatTierRail
           region={activeRegion}
           tier="birdie_hauls"
@@ -148,8 +141,13 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
           onRowTap={handleFeatRowTap}
         />
 
+        {/* 10. Toughest courses -- self-hiding, owns its header */}
+        <ToughestCoursesRail />
 
-        {/* 11. Feed block */}
+        {/* 11. Next Conquests (records within reach) -- self-hiding, owns its header */}
+        <NextConquestsRail userId={userId} />
+
+        {/* 12. Feed block */}
         <div
           style={{
             marginTop: SPACE.sectionSection,
