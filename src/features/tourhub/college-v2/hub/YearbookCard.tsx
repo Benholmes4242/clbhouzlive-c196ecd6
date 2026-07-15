@@ -122,38 +122,51 @@ function YearbookCardInner({ standing, liveCount, onSelect, selected }: Props) {
 
         {/* Crest */}
         <div
-          style={{
-            width: 38,
-            height: 38,
-            flexShrink: 0,
-            borderRadius: '34%',
-            overflow: 'hidden',
-            background: isTop ? GOLD_TINT_10 : 'rgba(15,23,42,0.04)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            border: isTop ? `1px solid ${GOLD_BORDER}` : `0.5px solid ${HAIRLINE_INK_10}`,
-          }}
+          style={{ position: 'relative', width: 38, height: 38, flexShrink: 0 }}
           aria-hidden
         >
-          {standing.logoUrl ? (
-            <img
-              src={standing.logoUrl}
-              alt=""
-              style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-            />
-          ) : (
-            <span
-              style={{
-                fontSize: 11,
-                fontWeight: 800,
-                letterSpacing: '0.04em',
-                color: isTop ? GOLD_DEEP : INK,
-              }}
-            >
-              {(standing.shortName ?? standing.collegeName).slice(0, 3).toUpperCase()}
-            </span>
-          )}
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              borderRadius: '34%',
+              overflow: 'hidden',
+              background: isTop ? GOLD_TINT_10 : 'rgba(15,23,42,0.04)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            {standing.logoUrl ? (
+              <img
+                src={standing.logoUrl}
+                alt=""
+                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+              />
+            ) : (
+              <span
+                style={{
+                  fontSize: 11,
+                  fontWeight: 800,
+                  letterSpacing: '0.04em',
+                  color: isTop ? GOLD_DEEP : INK,
+                }}
+              >
+                {(standing.shortName ?? standing.collegeName).slice(0, 3).toUpperCase()}
+              </span>
+            )}
+          </div>
+          {/* Traced canonical hairline (light surface). Rank-1 keeps its gold status ring. */}
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              inset: 0,
+              borderRadius: '34%',
+              border: isTop ? `1px solid ${GOLD_BORDER}` : '1px solid rgba(15,23,42,0.12)',
+              pointerEvents: 'none',
+            }}
+          />
         </div>
 
         {/* Name + sub */}
