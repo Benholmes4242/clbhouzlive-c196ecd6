@@ -12,6 +12,7 @@ import {
   INK,
   INK_MUTE,
 } from '@/features/tourhub/_shared/tokens';
+import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import type { LucideIcon } from 'lucide-react';
 import {
   Compass,
@@ -74,6 +75,8 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
   const reduced = usePrefersReducedMotion();
   const [mounted, setMounted] = useState(open);
   const [visible, setVisible] = useState(false);
+  const { data: liveTournaments, isFetched: liveFetched } = useLiveTournaments();
+  const showLive = liveFetched && (liveTournaments?.length ?? 0) > 0;
 
   // Mount on open; unmount after exit transition.
   useEffect(() => {
@@ -176,7 +179,7 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
 
           {/* Nav list */}
           <nav style={{ marginTop: 4, flex: 1, overflowY: 'auto' }}>
-            {DESTINATIONS.map(({ id, label, Icon }) => {
+            {DESTINATIONS.filter(({ id }) => id !== 'live' || showLive).map(({ id, label, Icon }) => {
               const isActive = id === activeTab;
               return (
                 <button
