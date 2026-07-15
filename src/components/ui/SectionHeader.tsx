@@ -11,6 +11,7 @@ const AMBER = '#F7931E';
 const AMBER_AA = '#c97a10'; // AA-safe amber for caps eyebrows on white
 const INK = '#0F172A';
 const INK_MUTE = '#64748B';
+const SLATE = '#94A3B8';
 
 type Tier = 'editorial' | 'standard' | 'rail';
 type Role = 'prime' | 'section' | 'rail';
@@ -79,7 +80,7 @@ interface SectionHeaderProps {
 
 function ActionAffordance({
   action,
-  color = INK,
+  color = SLATE,
 }: {
   action: { label: string; onClick: () => void };
   color?: string;
