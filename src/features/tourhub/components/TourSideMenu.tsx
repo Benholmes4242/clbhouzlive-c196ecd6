@@ -5,6 +5,13 @@
  */
 import React, { useEffect, useState } from 'react';
 import { Z } from '@/config/zIndex';
+import {
+  AMBER,
+  FONT,
+  HAIRLINE_INK_10,
+  INK,
+  INK_MUTE,
+} from '@/features/tourhub/_shared/tokens';
 import type { LucideIcon } from 'lucide-react';
 import {
   Compass,
@@ -40,11 +47,6 @@ const DESTINATIONS: { id: string; label: string; Icon: LucideIcon }[] = [
 ];
 
 
-const INK = '#0F172A';
-const MUTED = '#64748B';
-const DIVIDER = '#e4e8ec';
-const FAINT = '#94A3B8';
-const AMBER = '#F7931E';
 const DURATION = 280;
 
 function usePrefersReducedMotion() {
