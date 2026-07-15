@@ -525,7 +525,7 @@ function LegendaryLeaderRow({ row, index, metric, metricAccent, max, onTap }: Le
             >
               {name}
             </span>
-            {typeof hcp === 'number' ? (
+            {hcp != null ? (
               <span
                 style={{
                   flexShrink: 0,
@@ -535,7 +535,7 @@ function LegendaryLeaderRow({ row, index, metric, metricAccent, max, onTap }: Le
                   fontVariantNumeric: 'tabular-nums',
                 }}
               >
-                {hcp > 0 ? `+${hcp}` : hcp}
+                {formatHcp(hcp)}
               </span>
             ) : null}
           </div>
