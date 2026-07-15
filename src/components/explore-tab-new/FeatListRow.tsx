@@ -73,7 +73,7 @@ export function FeatListRow({ row, tier, onTap, index = 0, medals }: Props) {
     }
     if (tier === 'eagles' || tier === 'legendary') {
       const v = digits(row.feat_value) || (row.value != null ? String(row.value) : '');
-      return { value: v || '—', label: 'HOLE' };
+      return { value: v || '—', label: 'Hole' };
     }
     // birdie_hauls
     const v = (row.feat_value ?? (row.value != null ? String(row.value) : '')).replace(/[^\d.]/g, '');
