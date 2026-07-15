@@ -34,6 +34,7 @@ import { useStartConversation } from '@/hooks/messaging/useStartConversation';
 
 import { Button } from '@/components/ui/button';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
+import { FilterChips } from '@/components/ui/FilterChips';
 
 import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
 import { ImageCropModal } from '@/components/business/ImageCropModal';
