@@ -65,19 +65,25 @@ function tierHasToggle(tier: FeatTier): boolean {
 export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, initialMode = 'latest' }: Props) {
   const [visible, setVisible] = useState(PAGE);
   const [mode, setMode] = useState<RecordsMode>(initialMode);
+  const [metric, setMetric] = useState<'aces' | 'albatrosses'>('aces');
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const scrollerRef = useRef<HTMLDivElement | null>(null);
 
   const hasToggle = tierHasToggle(tier);
   const isEagles = tier === 'eagles';
+  const isLegendaryLeaders = tier === 'legendary' && mode === 'alltime';
 
   // Fetch the mode-appropriate cache. Records / birdie_hauls / legendary use
-  // useRegionFeats with the mode; eagles is latest-only.
+  // useRegionFeats with the mode; eagles is latest-only. For legendary ALL TIME
+  // we source the leaders payload instead, so keep the feats call pinned to
+  // 'latest' so RECENT round-trips stay warm and don't refetch.
   const fetchTier: FeatTier = tier;
-  const fetchMode: RecordsMode = isEagles ? 'latest' : mode;
+  const fetchMode: RecordsMode = isEagles || tier === 'legendary' ? 'latest' : mode;
   const { data: fetched } = useRegionFeats(region, fetchTier, fetchMode);
+  const { data: leadersData } = useRegionLegendaryLeaders(region);
 
   const displayRows: FeatRow[] = useMemo(() => {
+    if (isLegendaryLeaders) return [];
     const base =
       fetched && fetched.length > 0
         ? fetched
@@ -88,7 +94,16 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
       return sortRecordsAllTime(base);
     }
     return base;
-  }, [fetched, mode, rows, initialMode, tier]);
+  }, [fetched, mode, rows, initialMode, tier, isLegendaryLeaders]);
+
+  const leaderRows: LegendaryLeaderRow[] = useMemo(() => {
+    if (!isLegendaryLeaders) return [];
+    return (leadersData ?? [])
+      .filter((r) => (r[metric] ?? 0) > 0)
+      .sort((a, b) => (b[metric] ?? 0) - (a[metric] ?? 0));
+  }, [isLegendaryLeaders, leadersData, metric]);
+
+  const leaderMax = leaderRows[0]?.[metric] ?? 1;
 
   const bestToPar: number | null = useMemo(() => {
     if (tier !== 'records') return null;
@@ -105,15 +120,17 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
     if (!open) return;
     setVisible(PAGE);
     setMode(initialMode);
+    setMetric('aces');
   }, [open, initialMode]);
 
   useEffect(() => {
     setVisible(PAGE);
+    setMetric('aces');
     if (scrollerRef.current) scrollerRef.current.scrollTop = 0;
   }, [mode]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || isLegendaryLeaders) return;
     const node = sentinelRef.current;
     if (!node) return;
     const io = new IntersectionObserver(
@@ -126,7 +143,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
     );
     io.observe(node);
     return () => io.disconnect();
-  }, [open, displayRows.length]);
+  }, [open, displayRows.length, isLegendaryLeaders]);
 
   // Own scorecard opener so ALL TIME rows (not present in the caller's list)
   // still open cleanly. Fall back to caller's onRowTap if provided.
@@ -142,7 +159,8 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
   };
 
   const visibleRows = displayRows.slice(0, visible);
-  const total = displayRows.length;
+  const total = isLegendaryLeaders ? leaderRows.length : displayRows.length;
+  const metricAccent = metric === 'aces' ? SC_ACE : SC_ALBATROSS;
 
   return (
     <BottomSheet
@@ -198,36 +216,91 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
         </div>
 
         {hasToggle && (
-          <div style={{ marginTop: 12, display: 'inline-flex', flexShrink: 0, gap: 6 }}>
-            {([
-              { v: 'latest', label: 'RECENT' },
-              { v: 'alltime', label: 'ALL TIME' },
-            ] as const).map((o) => {
-              const active = mode === o.v;
-              return (
-                <button
-                  key={o.v}
-                  type="button"
-                  onClick={() => setMode(o.v)}
-                  style={{
-                    padding: '4px 9px',
-                    borderRadius: 999,
-                    background: active ? '#15171F' : 'transparent',
-                    color: active ? '#FFFFFF' : 'rgba(15,23,42,0.65)',
-                    border: 'none',
-                    fontFamily: FONT,
-                    fontSize: 10,
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    letterSpacing: '0.02em',
-                    whiteSpace: 'nowrap',
-                    transition: 'all .15s',
-                  }}
-                >
-                  {o.label}
-                </button>
-              );
-            })}
+          <div
+            style={{
+              marginTop: 12,
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 8,
+            }}
+          >
+            <div style={{ display: 'inline-flex', flexShrink: 0, gap: 6 }}>
+              {([
+                { v: 'latest', label: 'RECENT' },
+                { v: 'alltime', label: 'ALL TIME' },
+              ] as const).map((o) => {
+                const active = mode === o.v;
+                return (
+                  <button
+                    key={o.v}
+                    type="button"
+                    onClick={() => setMode(o.v)}
+                    style={{
+                      padding: '4px 9px',
+                      borderRadius: 999,
+                      background: active ? '#15171F' : 'transparent',
+                      color: active ? '#FFFFFF' : 'rgba(15,23,42,0.65)',
+                      border: 'none',
+                      fontFamily: FONT,
+                      fontSize: 10,
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      letterSpacing: '0.02em',
+                      whiteSpace: 'nowrap',
+                      transition: 'all .15s',
+                    }}
+                  >
+                    {o.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {isLegendaryLeaders && (
+              <div
+                style={{
+                  display: 'inline-flex',
+                  flexShrink: 0,
+                  gap: 2,
+                  padding: 3,
+                  borderRadius: 999,
+                  background: 'rgba(15,23,42,0.06)',
+                }}
+              >
+                {([
+                  { v: 'aces', label: 'ACES', color: SC_ACE },
+                  { v: 'albatrosses', label: 'ALBATROSSES', color: SC_ALBATROSS },
+                ] as const).map((o) => {
+                  const active = metric === o.v;
+                  return (
+                    <button
+                      key={o.v}
+                      type="button"
+                      onClick={() => setMetric(o.v)}
+                      style={{
+                        padding: '4px 10px',
+                        borderRadius: 999,
+                        background: active ? '#FFFFFF' : 'transparent',
+                        color: active ? o.color : 'rgba(15,23,42,0.55)',
+                        border: 'none',
+                        fontFamily: FONT,
+                        fontSize: 9.5,
+                        fontWeight: 800,
+                        cursor: 'pointer',
+                        letterSpacing: '0.08em',
+                        whiteSpace: 'nowrap',
+                        boxShadow: active ? '0 1px 4px rgba(15,23,42,0.14)' : 'none',
+                        transition: 'all .15s',
+                      }}
+                    >
+                      {o.label}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -244,7 +317,37 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
           padding: '12px 0',
         }}
       >
-        {visibleRows.length === 0 ? (
+        {isLegendaryLeaders ? (
+          leaderRows.length === 0 ? (
+            <div
+              style={{
+                padding: '28px 16px',
+                textAlign: 'center',
+                color: INK_MUTE,
+                fontSize: 12,
+                fontWeight: 600,
+              }}
+            >
+              No {metric === 'aces' ? 'aces' : 'albatrosses'} yet.
+            </div>
+          ) : (
+            <div style={{ padding: '0 16px' }}>
+              {leaderRows.map((r, i) => (
+                <LegendaryLeaderRow
+                  key={`${r.user_id ?? r.holder_name ?? i}-${i}`}
+                  row={r}
+                  index={i}
+                  metric={metric}
+                  metricAccent={metricAccent}
+                  max={leaderMax}
+                  onTap={() => {
+                    if (r.user_id) opener.openProfile(r.user_id);
+                  }}
+                />
+              ))}
+            </div>
+          )
+        ) : visibleRows.length === 0 ? (
           <div
             style={{
               padding: '28px 16px',
@@ -272,12 +375,247 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
           </div>
         )}
 
-        {visible < displayRows.length && (
+        {!isLegendaryLeaders && visible < displayRows.length && (
           <div ref={sentinelRef} style={{ height: 40 }} />
         )}
         <div style={{ height: 24 }} />
       </div>
     </BottomSheet>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Legendary leaders row - all-time aces / albatrosses (leaders payload).
+// Distinct data shape from FeatRow so it lives here rather than in FeatListRow.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const LEGEND_INK = '#0F172A';
+const LEGEND_MUTE = 'rgba(15,23,42,0.42)';
+const LEGEND_HAIRLINE = 'rgba(15,23,42,0.07)';
+
+function formatLeaderName(raw?: string | null): string {
+  const s = (raw ?? '').trim();
+  if (!s) return 'A golfer';
+  if (s.includes(', ')) {
+    const [before, after] = s.split(', ').map((x) => x.trim());
+    if (before && after) return `${after} ${before}`;
+  }
+  return s;
+}
+
+function leaderInitials(name: string): string {
+  return (
+    (name || '?')
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((p) => p[0]?.toUpperCase() ?? '')
+      .join('') || '?'
+  );
+}
+
+interface LegendaryLeaderRowProps {
+  row: LegendaryLeaderRow;
+  index: number;
+  metric: 'aces' | 'albatrosses';
+  metricAccent: string;
+  max: number;
+  onTap?: () => void;
+}
+
+function LegendaryLeaderRow({ row, index, metric, metricAccent, max, onTap }: LegendaryLeaderRowProps) {
+  const rank = index + 1;
+  const isTop = rank === 1;
+  const name = formatLeaderName(row.holder_name);
+  const count = row[metric] ?? 0;
+  const other = metric === 'aces' ? (row.albatrosses ?? 0) : (row.aces ?? 0);
+  const otherLabel =
+    metric === 'aces'
+      ? `+${other} ${other === 1 ? 'albatross' : 'albatrosses'}`
+      : `+${other} ${other === 1 ? 'ace' : 'aces'}`;
+  const hcp = (row as unknown as { holder_hcp?: number | null }).holder_hcp;
+  const club = (row as unknown as { holder_club?: string | null }).holder_club;
+  const pct = Math.max(0.08, Math.min(1, count / (max || 1)));
+
+  const barGradient =
+    metric === 'aces'
+      ? `linear-gradient(90deg, ${SC_ACE}, ${SC_FILL_GOLD})`
+      : `linear-gradient(90deg, ${SC_ALBATROSS}, #FFD84D)`;
+
+  const countLabel =
+    metric === 'aces'
+      ? count === 1
+        ? 'ACE'
+        : 'ACES'
+      : count === 1
+        ? 'ALBATROSS'
+        : 'ALBATROSSES';
+
+  return (
+    <button
+      type="button"
+      onClick={onTap}
+      className="w-full text-left active:scale-[0.995] transition-transform"
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 9,
+        borderRadius: 16,
+        padding: '13px 15px',
+        marginBottom: 9,
+        background: isTop
+          ? 'linear-gradient(120deg, rgba(255,210,0,0.10), rgba(255,210,0,0.02))'
+          : '#FFFFFF',
+        border: isTop
+          ? `1px solid rgba(255,210,0,0.55)`
+          : `1px solid ${LEGEND_HAIRLINE}`,
+        cursor: onTap ? 'pointer' : 'default',
+        fontFamily: FONT,
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 11, minWidth: 0 }}>
+        <div
+          style={{
+            width: 20,
+            flexShrink: 0,
+            fontSize: 16,
+            fontWeight: 800,
+            fontVariantNumeric: 'tabular-nums',
+            color: isTop ? metricAccent : 'rgba(15,23,42,0.35)',
+            lineHeight: 1,
+            textAlign: 'center',
+          }}
+        >
+          {rank}
+        </div>
+        <div style={{ flexShrink: 0 }}>
+          <SquircleAvatar
+            size={40}
+            srcCandidates={row.holder_avatar ? [row.holder_avatar] : []}
+            alt={name}
+            fallback={leaderInitials(name)}
+            userId={row.user_id ?? undefined}
+            hairlineRing
+            ringColor={isTop ? '#FBBC2E' : undefined}
+          />
+        </div>
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'baseline',
+              gap: 6,
+              minWidth: 0,
+            }}
+          >
+            <span
+              style={{
+                fontSize: 14.5,
+                fontWeight: 800,
+                color: LEGEND_INK,
+                lineHeight: 1.15,
+                letterSpacing: '-0.01em',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                minWidth: 0,
+                flex: '0 1 auto',
+              }}
+            >
+              {name}
+            </span>
+            {typeof hcp === 'number' ? (
+              <span
+                style={{
+                  flexShrink: 0,
+                  fontSize: 13,
+                  fontWeight: 800,
+                  color: '#F7931E',
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {hcp > 0 ? `+${hcp}` : hcp}
+              </span>
+            ) : null}
+          </div>
+          {(other > 0 || club) && (
+            <div
+              style={{
+                fontSize: 10.5,
+                fontWeight: 600,
+                color: LEGEND_MUTE,
+                lineHeight: 1.2,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {other > 0 && club
+                ? `${otherLabel} \u00B7 ${club}`
+                : other > 0
+                  ? otherLabel
+                  : club}
+            </div>
+          )}
+        </div>
+        <div
+          style={{
+            flexShrink: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-end',
+            justifyContent: 'center',
+            minWidth: 42,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 24,
+              fontWeight: 900,
+              color: isTop ? metricAccent : LEGEND_INK,
+              lineHeight: 1,
+              fontVariantNumeric: 'tabular-nums',
+              letterSpacing: '-0.02em',
+            }}
+          >
+            {count}
+          </div>
+          <div
+            style={{
+              marginTop: 3,
+              fontSize: 8,
+              fontWeight: 800,
+              letterSpacing: '0.1em',
+              color: 'rgba(15,23,42,0.4)',
+              lineHeight: 1,
+            }}
+          >
+            {countLabel}
+          </div>
+        </div>
+      </div>
+      <div style={{ paddingLeft: 32, width: '100%' }}>
+        <div
+          style={{
+            width: '100%',
+            height: 4,
+            borderRadius: 999,
+            background: 'rgba(15,23,42,0.08)',
+            overflow: 'hidden',
+          }}
+        >
+          <div
+            style={{
+              width: `${pct * 100}%`,
+              height: '100%',
+              borderRadius: 999,
+              background: barGradient,
+              transition: 'width .35s cubic-bezier(.2,.8,.2,1)',
+            }}
+          />
+        </div>
+      </div>
+    </button>
   );
 }
 
