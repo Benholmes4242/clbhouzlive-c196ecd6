@@ -11,9 +11,11 @@ import CountryFlag from '@/components/ui/country-flag';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import { titleCaseCountry } from '../../utils/countryFlags';
-import { TOUR_LABEL } from '../../_shared/tourOrder';
+import { TOUR_LABEL, mapTourSlug } from '../../_shared/tourOrder';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
-import { CHARCOAL, WHITE_ALPHA_18, WHITE_ALPHA_55, WHITE_ALPHA_65 } from '../../_shared/tokens';
+import { WHITE_ALPHA_18, WHITE_ALPHA_55, WHITE_ALPHA_65 } from '../../_shared/tokens';
+import { heroTintGradient } from '../../_shared/heroGradient';
+import { TOUR_CONFIG } from '../../hooks/useOverviewData';
 
 interface HeroSectionProps {
 
@@ -40,10 +42,14 @@ export function HeroSection({ player, playerStats }: HeroSectionProps) {
     playerStats?.fedex_rank && playerStats.fedex_rank > 0 ? playerStats.fedex_rank : null;
   const isPga = player.tour_codes?.includes('pga') ?? false;
 
+  const tourId = mapTourSlug(player.tour_codes?.[0] ?? 'pga');
+  const tourColor = TOUR_CONFIG[tourId]?.color ?? null;
+  const heroBg = heroTintGradient(tourColor, 0.3);
+
   return (
     <div
       style={{
-        background: `linear-gradient(180deg, #262B33 0%, ${CHARCOAL} 100%)`,
+        background: heroBg,
         // Canonical hero height — matches course-detail / tournament hero.
         minHeight:
           'calc(clamp(380px, 44dvh, 460px) + env(safe-area-inset-top, 0px))',
