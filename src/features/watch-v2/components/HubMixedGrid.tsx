@@ -74,40 +74,13 @@ export function HubMixedGrid({ filter = 'all' }: { filter?: string } = {}) {
   return (
     <section style={{ fontFamily: FONT_FAMILY }}>
       <style>{spinKeyframes}</style>
-      <div style={{ padding: '0 16px 12px' }}>
-        <div
-          style={{
-            fontWeight: 700,
-            fontSize: 10.5,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-            color: '#c97a10',
-          }}
-        >
-          EVERYTHING
-        </div>
-        <div
-          style={{
-            fontWeight: 800,
-            fontSize: 17,
-            color: '#0F172A',
-            marginTop: 3,
-            letterSpacing: '-0.01em',
-          }}
-        >
-          Keep browsing
-        </div>
-        <div
-          style={{
-            fontWeight: 500,
-            fontSize: 12,
-            color: '#64748B',
-            marginTop: 3,
-          }}
-        >
-          Clips and videos, mixed
-        </div>
-      </div>
+      <SectionHeader
+        role="section"
+        kicker="EVERYTHING"
+        title="Keep browsing"
+        sub="Clips and videos, mixed"
+        paddingX={16}
+      />
 
       {isLoading ? (
         <div style={{ display: 'flex', gap: 4, padding: '0 4px' }}>

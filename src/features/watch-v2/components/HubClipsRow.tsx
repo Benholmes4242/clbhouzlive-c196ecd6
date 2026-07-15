@@ -186,55 +186,13 @@ export function HubClipsRow() {
 
   return (
     <section style={{ fontFamily: FONT_FAMILY }}>
-      <div
-        style={{
-          padding: '0 16px 12px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-end',
-        }}
-      >
-        <div>
-          <div
-            style={{
-              fontWeight: 700,
-              fontSize: 10.5,
-              letterSpacing: '0.16em',
-              textTransform: 'uppercase',
-              color: '#c97a10',
-            }}
-          >
-            UNDER 90 SECONDS
-          </div>
-          <div
-            style={{
-              fontWeight: 800,
-              fontSize: 17,
-              color: '#0F172A',
-              marginTop: 3,
-              letterSpacing: '-0.01em',
-            }}
-          >
-            Quick clips
-          </div>
-        </div>
-        <button
-          type="button"
-          onClick={() => navigate('/watch/clips')}
-          style={{
-            background: 'transparent',
-            border: 'none',
-            padding: 0,
-            fontWeight: 600,
-            fontSize: 12,
-            color: '#c97a10',
-            cursor: 'pointer',
-            fontFamily: FONT_FAMILY,
-          }}
-        >
-          See all {'\u203A'}
-        </button>
-      </div>
+      <SectionHeader
+        role="section"
+        kicker="UNDER 90 SECONDS"
+        title="Quick clips"
+        paddingX={16}
+        action={{ label: 'See all', onClick: () => navigate('/watch/clips') }}
+      />
 
       <div
         ref={railRef}
