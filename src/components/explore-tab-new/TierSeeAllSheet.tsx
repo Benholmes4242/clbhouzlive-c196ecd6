@@ -97,6 +97,9 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
     if (tier === 'records' && mode === 'alltime') {
       return sortRecordsAllTime(base);
     }
+    if (tier === 'birdie_hauls') {
+      return sortBirdieHauls(base, mode);
+    }
     return base;
   }, [fetched, mode, rows, initialMode, tier, isLeaderView]);
 
