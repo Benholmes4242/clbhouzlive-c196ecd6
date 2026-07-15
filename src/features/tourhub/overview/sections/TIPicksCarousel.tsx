@@ -334,7 +334,15 @@ function CaseHeaderMeta({ pick }: { pick: AITopContender }) {
   );
 }
 
-function SheetShell({ onClose, maxHeight = '80vh', children }: { onClose: () => void; maxHeight?: string; children: React.ReactNode }) {
+function SheetShell({
+  onClose,
+  header,
+  children,
+}: {
+  onClose: () => void;
+  header?: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 60 }}>
       <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.45)' }} />
@@ -344,13 +352,20 @@ function SheetShell({ onClose, maxHeight = '80vh', children }: { onClose: () => 
           left: 0, right: 0, bottom: 0,
           background: V4.bg,
           borderTopLeftRadius: 22, borderTopRightRadius: 22,
-          padding: '10px 20px 30px',
-          maxHeight,
-          overflowY: 'auto',
+          height: '75dvh',
+          maxHeight: '75dvh',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
         }}
       >
-        <div style={{ width: 36, height: 4, background: V4.hairline, borderRadius: 999, margin: '4px auto 14px' }} />
-        {children}
+        <div style={{ flexShrink: 0, padding: '10px 20px 0' }}>
+          <div style={{ width: 36, height: 4, background: V4.hairline, borderRadius: 999, margin: '4px auto 14px' }} />
+          {header}
+        </div>
+        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '0 20px 30px' }}>
+          {children}
+        </div>
       </div>
     </div>
   );
@@ -373,32 +388,34 @@ function CaseSheet({
   onClose: () => void;
   onNavigatePlayer: (playerId: string) => void;
 }) {
-  return (
-    <SheetShell onClose={onClose}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
-        <div
-          role="link"
-          onClick={() => onNavigatePlayer(pick.playerId)}
-          style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 0, cursor: 'pointer' }}
-        >
-          <PlayerAvatar playerId={pick.playerId} playerName={pick.playerName} tourCode={tourCode} photoUrl={pick.photoUrl} size="md" ringColor={LIGHT_HAIRLINE} />
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-              <span style={{ fontSize: 10.5, fontWeight: 800, color: V4.amber, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-                The case for
-              </span>
-              <span style={{ fontSize: 22, color: V4.inkFaint, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>#{pick.rank}</span>
-            </div>
-            <h2 style={{ fontSize: 22, fontWeight: 800, color: V4.ink, margin: '2px 0 0', letterSpacing: '-0.025em' }}>
-              {pick.playerName}
-            </h2>
-            <div style={{ marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <SheetStateStrip state={state} pick={pick} live={live} leader={leader} />
-              <CaseHeaderMeta pick={pick} />
-            </div>
+  const header = (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+      <div
+        role="link"
+        onClick={() => onNavigatePlayer(pick.playerId)}
+        style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 0, cursor: 'pointer' }}
+      >
+        <PlayerAvatar playerId={pick.playerId} playerName={pick.playerName} tourCode={tourCode} photoUrl={pick.photoUrl} size="md" ringColor={LIGHT_HAIRLINE} />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+            <span style={{ fontSize: 10.5, fontWeight: 800, color: V4.amber, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+              The case for
+            </span>
+            <span style={{ fontSize: 22, color: V4.inkFaint, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>#{pick.rank}</span>
+          </div>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: V4.ink, margin: '2px 0 0', letterSpacing: '-0.025em' }}>
+            {pick.playerName}
+          </h2>
+          <div style={{ marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <SheetStateStrip state={state} pick={pick} live={live} leader={leader} />
+            <CaseHeaderMeta pick={pick} />
           </div>
         </div>
       </div>
+    </div>
+  );
+  return (
+    <SheetShell onClose={onClose} header={header}>
       {pick.pulledQuote ? (
         <div style={{ fontSize: 14, color: V4.inkSoft, lineHeight: 1.5, marginBottom: 14 }}>{pick.pulledQuote}</div>
       ) : null}
@@ -439,15 +456,18 @@ function AllPicksSheet({
   onClose: () => void;
   onNavigatePlayer: (playerId: string) => void;
 }) {
-  return (
-    <SheetShell onClose={onClose} maxHeight="70vh">
-      <div style={{ marginBottom: 10 }}>
-        <div style={{ fontSize: 15.5, fontWeight: 800, color: V4.ink, letterSpacing: '-0.015em' }}>The board</div>
-        <div style={{ fontSize: 10.5, fontWeight: 700, color: V4.inkMute, letterSpacing: '0.04em', marginTop: 2 }}>
-          {picks.length} picks · tap for the case
-        </div>
+  const header = (
+    <div style={{ marginBottom: 12 }}>
+      <div style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: V4.amber, marginBottom: 4, fontVariantNumeric: 'tabular-nums' }}>
+        {picks.length} PICKS {'\u00B7'} TAP FOR THE CASE
       </div>
+      <div style={{ fontSize: 18, fontWeight: 800, color: V4.ink, letterSpacing: '-0.01em', lineHeight: 1.1 }}>The board</div>
+    </div>
+  );
+  return (
+    <SheetShell onClose={onClose} header={header}>
       <div>
+
         {picks.map((p, i) => (
           <div
             key={p.playerId}
