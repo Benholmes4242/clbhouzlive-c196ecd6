@@ -345,7 +345,7 @@ export function FeatListRow({ row, tier, onTap, index = 0, medals, mode = 'lates
                 width: `${barPct * 100}%`,
                 height: '100%',
                 borderRadius: 999,
-                background: 'linear-gradient(90deg, #F7931E, #FBBC2E)',
+                background: barGradient,
                 transition: 'width .35s cubic-bezier(.2,.8,.2,1)',
               }}
             />
