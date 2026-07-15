@@ -334,7 +334,15 @@ function CaseHeaderMeta({ pick }: { pick: AITopContender }) {
   );
 }
 
-function SheetShell({ onClose, maxHeight = '80vh', children }: { onClose: () => void; maxHeight?: string; children: React.ReactNode }) {
+function SheetShell({
+  onClose,
+  header,
+  children,
+}: {
+  onClose: () => void;
+  header?: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 60 }}>
       <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.45)' }} />
@@ -344,13 +352,20 @@ function SheetShell({ onClose, maxHeight = '80vh', children }: { onClose: () => 
           left: 0, right: 0, bottom: 0,
           background: V4.bg,
           borderTopLeftRadius: 22, borderTopRightRadius: 22,
-          padding: '10px 20px 30px',
-          maxHeight,
-          overflowY: 'auto',
+          height: '75dvh',
+          maxHeight: '75dvh',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
         }}
       >
-        <div style={{ width: 36, height: 4, background: V4.hairline, borderRadius: 999, margin: '4px auto 14px' }} />
-        {children}
+        <div style={{ flexShrink: 0, padding: '10px 20px 0' }}>
+          <div style={{ width: 36, height: 4, background: V4.hairline, borderRadius: 999, margin: '4px auto 14px' }} />
+          {header}
+        </div>
+        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '0 20px 30px' }}>
+          {children}
+        </div>
       </div>
     </div>
   );
