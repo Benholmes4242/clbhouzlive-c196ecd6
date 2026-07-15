@@ -57,7 +57,7 @@ const RateNudge: React.FC<Props> = ({ userId, onEmptyFallback }) => {
             Rate a course you've played
           </span>
         </div>
-        <ChevronRight size={14} color="#c97a10" strokeWidth={2.5} />
+        <ChevronRight size={14} color={AMBER} strokeWidth={2.5} />
       </button>
     );
   }
