@@ -311,6 +311,7 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard', onRowTap
         region={region}
         rows={rows}
         onRowTap={onRowTap}
+        initialMode={mode}
       />
 
     </section>
