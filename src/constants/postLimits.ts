@@ -12,9 +12,9 @@ export const POST_LIMITS = {
   /** Maximum image file size in bytes (50MB) — generous for RAW/HEIC */
   MAX_IMAGE_SIZE_BYTES: 50 * 1024 * 1024,
   MAX_IMAGE_SIZE_DISPLAY: '50MB',
-  /** Maximum video duration in seconds (1 hour) */
-  MAX_VIDEO_DURATION_SECONDS: 3600,
-  MAX_VIDEO_DURATION_DISPLAY: '1 hour',
+  /** Maximum video duration in seconds (2 hours) */
+  MAX_VIDEO_DURATION_SECONDS: 7200,
+  MAX_VIDEO_DURATION_DISPLAY: '2 hours',
   /** Auto-save interval in milliseconds (30 seconds) */
   AUTO_SAVE_INTERVAL_MS: 30000,
   /** Maximum number of tags per post */
