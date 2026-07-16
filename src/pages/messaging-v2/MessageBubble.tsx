@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import { Check, AlertCircle, Clock, Flag } from 'lucide-react';
 import { ReportSheet } from "@/components/moderation/ReportSheet";
@@ -65,6 +66,7 @@ export const MessageBubble: React.FC<Props> = ({
   showTicks,
   onRetry,
 }) => {
+  const { t } = useTranslation('messaging');
   const isDeleted = message.deleted_at != null;
   const isSending = message.status === 'sending';
   const isFailed = message.status === 'failed';
@@ -169,7 +171,7 @@ export const MessageBubble: React.FC<Props> = ({
               color: SUB,
             }}
           >
-            Message deleted
+            {t('bubble.deleted')}
           </span>
         ) : (
           <>
@@ -193,7 +195,7 @@ export const MessageBubble: React.FC<Props> = ({
                     lineHeight: 1.3,
                   }}
                 >
-                  {reply.sender_name ?? 'Unknown'}
+                  {reply.sender_name ?? t('bubble.unknownSender')}
                 </span>
                 <span
                   className="truncate"
@@ -205,7 +207,7 @@ export const MessageBubble: React.FC<Props> = ({
                   }}
                 >
                   {reply.deleted
-                    ? 'Message deleted'
+                    ? t('bubble.deleted')
                     : reply.body?.trim() || `[${reply.type}]`}
                 </span>
               </div>
@@ -274,7 +276,7 @@ export const MessageBubble: React.FC<Props> = ({
                       marginLeft: 6,
                     }}
                   >
-                    (edited)
+                    {t('bubble.edited')}
                   </span>
                 ) : null}
               </span>
@@ -339,10 +341,10 @@ export const MessageBubble: React.FC<Props> = ({
                 padding: 0,
                 cursor: 'pointer',
               }}
-              aria-label="Retry send"
+              aria-label={t('action.retrySend')}
             >
               <AlertCircle size={11} />
-              Failed — tap to retry
+              {t('bubble.failedTapRetry')}
             </button>
           ) : isSending ? (
             <Clock size={11} style={{ position: "relative",  color: HINT }} />

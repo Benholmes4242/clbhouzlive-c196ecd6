@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Play, Pause, AlertCircle } from 'lucide-react';
 import { useSignedUrl } from '@/hooks/messaging/useSignedUrl';
 import type { MessageAttachment } from '@/types/messaging';
@@ -18,6 +19,7 @@ function formatTime(sec: number): string {
 }
 
 export const VoiceNote: React.FC<Props> = ({ attachment, isOutgoing }) => {
+  const { t } = useTranslation('messaging');
   const hasLocal = !!attachment.localUrl;
   const { url: signedUrl, error } = useSignedUrl(
     hasLocal ? null : attachment.path,
@@ -85,7 +87,7 @@ export const VoiceNote: React.FC<Props> = ({ attachment, isOutgoing }) => {
         }}
       >
         <AlertCircle size={14} />
-        Voice unavailable
+        {t('error.voiceUnavailable')}
       </div>
     );
   }
@@ -103,7 +105,7 @@ export const VoiceNote: React.FC<Props> = ({ attachment, isOutgoing }) => {
       <button
         type="button"
         onClick={toggle}
-        aria-label={playing ? 'Pause' : 'Play'}
+        aria-label={playing ? t('action.pause') : t('action.play')}
         disabled={!src}
         style={{
           flexShrink: 0,

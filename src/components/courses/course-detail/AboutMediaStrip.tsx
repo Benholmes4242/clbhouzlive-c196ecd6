@@ -211,7 +211,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
               key={i}
               style={{
                 aspectRatio: '1',
-                borderRadius: 12,
+                borderRadius: 4,
                 background: 'rgba(15,23,42,0.04)',
                 border: '1.5px dashed rgba(15,23,42,0.10)',
                 display: 'flex',

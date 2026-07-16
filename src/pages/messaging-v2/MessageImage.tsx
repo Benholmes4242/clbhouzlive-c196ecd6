@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { useSignedUrl } from '@/hooks/messaging/useSignedUrl';
 import type { MessageAttachment } from '@/types/messaging';
@@ -15,6 +16,7 @@ const MAX_H = 280;
 const RADIUS = 14;
 
 export const MessageImage: React.FC<Props> = ({ attachment, onOpen }) => {
+  const { t } = useTranslation('messaging');
   const hasLocal = !!attachment.localUrl;
   const { url: signedUrl, loading, error } = useSignedUrl(
     hasLocal ? null : attachment.path,
@@ -62,7 +64,7 @@ export const MessageImage: React.FC<Props> = ({ attachment, onOpen }) => {
           }}
         >
           <AlertCircle size={14} />
-          Image unavailable
+          {t('error.imageUnavailable')}
         </div>
       ) : src ? (
         <img
@@ -116,7 +118,7 @@ export const MessageImage: React.FC<Props> = ({ attachment, onOpen }) => {
           }}
         >
           <AlertCircle size={14} />
-          Failed
+          {t('error.imageFailed')}
         </div>
       ) : null}
     </div>

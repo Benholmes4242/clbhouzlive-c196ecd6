@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/lib/toast';
@@ -56,6 +57,7 @@ const roleLabel = (r: MemberRole): string | null =>
   r === 'owner' ? 'Owner' : r === 'admin' ? 'Admin' : null;
 
 const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onClose }) => {
+  const { t } = useTranslation(['messaging', 'common']);
   const navigate = useNavigate();
   const qc = useQueryClient();
   const actor = useMessagingActor();
@@ -264,12 +266,12 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
 
   return (
     <BottomSheet open={open} onClose={onClose} zIndexBase={1500}>
-      <SheetHeader title="Details" onClose={onClose} />
+      <SheetHeader title={t('messaging:sheet.detailsTitle')} onClose={onClose} />
 
       <div style={{ background: CANVAS, paddingBottom: 32 }}>
         {isLoading || !detail ? (
           <div style={{ padding: 32, textAlign: 'center', color: SUB, fontSize: 14 }}>
-            Loading...
+            {t('common:state.loading')}
           </div>
         ) : (
           <>
@@ -326,7 +328,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                       fontWeight: 600,
                     }}
                   >
-                    Save
+                    {t('common:action.save')}
                   </button>
                 </div>
               ) : (
@@ -381,7 +383,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                     color: SUB,
                   }}
                 >
-                  Members
+                  {t('messaging:list.members')}
                 </div>
 
                 {isAdmin ? (
@@ -413,7 +415,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                     >
                       <Plus size={20} color={INK} />
                     </div>
-                    <span style={{ fontSize: 15, fontWeight: 500 }}>Add people</span>
+                    <span style={{ fontSize: 15, fontWeight: 500 }}>{t('messaging:action.addPeople')}</span>
                   </button>
                 ) : null}
 
@@ -526,7 +528,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                               disabled={busy}
                               style={menuItemStyle(DANGER)}
                             >
-                              Remove from group
+                              {t('messaging:action.removeFromGroup')}
                             </button>
                           ) : null}
                         </div>
@@ -690,6 +692,7 @@ const AddPeopleSheet: React.FC<AddPeopleSheetProps> = ({
   existingKeys,
   onConfirm,
 }) => {
+  const { t } = useTranslation(['messaging', 'common']);
   const [query, setQuery] = useState('');
   const debounced = useDebouncedValue(query, 250);
   const [selected, setSelected] = useState<Candidate[]>([]);
@@ -845,7 +848,7 @@ const AddPeopleSheet: React.FC<AddPeopleSheetProps> = ({
           ))}
           {query.trim().length > 0 && results.length === 0 ? (
             <div style={{ padding: 32, textAlign: 'center', color: SUB, fontSize: 13 }}>
-              No results
+              {t('common:state.noResults')}
             </div>
           ) : null}
         </div>
@@ -867,7 +870,7 @@ const AddPeopleSheet: React.FC<AddPeopleSheetProps> = ({
               opacity: selected.length === 0 ? 0.4 : 1,
             }}
           >
-            Add {selected.length > 0 ? `(${selected.length})` : ''}
+            {selected.length > 0 ? t('messaging:addSheet.addWithCount', { count: selected.length }) : t('messaging:addSheet.addZero')}
           </button>
         </div>
       </div>

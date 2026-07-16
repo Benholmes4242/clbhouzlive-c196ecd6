@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Flag, PencilLine, Sparkles, X } from 'lucide-react';
 import { useConversations } from '@/hooks/messaging/useConversations';
@@ -54,6 +55,7 @@ const Spinner: React.FC = () => (
 );
 
 const InboxV2Page: React.FC = () => {
+  const { t } = useTranslation(['messaging', 'common']);
   const navigate = useNavigate();
   const [composeOpen, setComposeOpen] = useState(false);
   const { conversations, isLoading, error, refetch, hasActor } = useConversations();
@@ -137,7 +139,7 @@ const InboxV2Page: React.FC = () => {
                   margin: 0,
                 }}
               >
-                Messages
+                {t('messaging:title.inbox')}
               </h1>
             </div>
             {composeButton}
@@ -170,7 +172,7 @@ const InboxV2Page: React.FC = () => {
             style={{ padding: '80px 24px', gap: 12 }}
           >
             <p style={{ color: INK, fontSize: 16, fontWeight: 500, margin: 0 }}>
-              Couldn't load messages
+              {t('messaging:error.couldntLoadInbox')}
             </p>
             <button
               type="button"
@@ -185,7 +187,7 @@ const InboxV2Page: React.FC = () => {
                 border: 'none',
               }}
             >
-              Try again
+              {t('common:action.tryAgain')}
             </button>
           </div>
         ) : conversations.length === 0 ? (
@@ -256,10 +258,10 @@ const InboxV2Page: React.FC = () => {
 
             <div className="flex flex-col items-center" style={{ gap: 8 }}>
               <p style={{ color: INK, fontSize: 21, fontWeight: 600, margin: 0, letterSpacing: '-0.01em' }}>
-                Start the conversation
+                {t('messaging:empty.inboxTitle')}
               </p>
               <p style={{ color: SUB, fontSize: 14, lineHeight: 1.5, maxWidth: 250, margin: 0 }}>
-                Message golfers, clubs, or businesses - it all lands here.
+                {t('messaging:empty.inboxBody')}
               </p>
             </div>
             <button
@@ -280,7 +282,7 @@ const InboxV2Page: React.FC = () => {
               }}
             >
               <PencilLine size={16} />
-              New message
+              {t('messaging:action.newMessage')}
             </button>
           </div>
 
@@ -315,15 +317,15 @@ const InboxV2Page: React.FC = () => {
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={{ margin: 0, fontSize: 13.5, fontWeight: 600, color: '#1F2428', lineHeight: 1.3 }}>
-                      Business messaging
+                      {t('messaging:banner.businessTitle')}
                     </p>
                     <p style={{ margin: '2px 0 0', fontSize: 12.5, color: '#6B7280', lineHeight: 1.45 }}>
-                      Message golfers directly.
+                      {t('messaging:banner.businessBody')}
                     </p>
                   </div>
                   <button
                     type="button"
-                    aria-label="Dismiss"
+                    aria-label={t('messaging:action.dismiss')}
                     onClick={() => {
                       if (actor) {
                         safeLocalStorage.set(

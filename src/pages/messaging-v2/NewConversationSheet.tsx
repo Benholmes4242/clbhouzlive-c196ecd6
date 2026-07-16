@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/lib/toast';
 import { X, Check, Sparkles } from 'lucide-react';
@@ -36,6 +37,7 @@ interface NewConversationSheetProps {
 }
 
 const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClose }) => {
+  const { t } = useTranslation('messaging');
   const navigate = useNavigate();
   const actor = useMessagingActor();
   const [query, setQuery] = useState('');
@@ -258,15 +260,15 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
         >
           {debounced.trim().length === 0 ? (
             <div style={{ padding: '32px 16px', color: SUB, fontSize: 14, textAlign: 'center' }}>
-              Search for someone to message.
+              {t('search.prompt')}
             </div>
           ) : isLoading ? (
             <div style={{ padding: '32px 16px', color: SUB, fontSize: 14, textAlign: 'center' }}>
-              Searching…
+              {t('search.searching')}
             </div>
           ) : candidates.length === 0 ? (
             <div style={{ padding: '32px 16px', color: SUB, fontSize: 14, textAlign: 'center' }}>
-              No results.
+              {t('search.noResults')}
             </div>
           ) : (
             candidates.map((c) => {
@@ -387,7 +389,7 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
                 opacity: selected.length !== 1 || busy ? 0.4 : 1,
               }}
             >
-              Message
+              {t('action.message')}
             </button>
           ) : (
             <button
@@ -405,7 +407,7 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
                 opacity: busy ? 0.4 : 1,
               }}
             >
-              Create group
+              {t('action.createGroup')}
             </button>
           )}
         </div>

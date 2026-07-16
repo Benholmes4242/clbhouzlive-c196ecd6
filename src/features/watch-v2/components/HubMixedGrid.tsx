@@ -19,7 +19,7 @@ function SkeletonTile({ aspect }: { aspect: string }) {
         style={{
           width: '100%',
           aspectRatio: aspect,
-          borderRadius: 12,
+          borderRadius: 4,
           background: 'rgba(0,0,0,0.06)',
         }}
       />
