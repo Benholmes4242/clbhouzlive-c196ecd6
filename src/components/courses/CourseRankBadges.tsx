@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { Earth } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
