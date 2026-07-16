@@ -347,7 +347,11 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
           return (
             <div>
               <GlassHeaderPlate visible={tabsStuck} />
-              <CoursesPageHero />
+              {activeTab === 'discover' ? (
+                <AmateurCircuitHero fallback={<CoursesPageHero />} />
+              ) : (
+                <CoursesPageHero />
+              )}
 
               <div ref={sentinelRef} style={{ height: 1 }} aria-hidden />
 
