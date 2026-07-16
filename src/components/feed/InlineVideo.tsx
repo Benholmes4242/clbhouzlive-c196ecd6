@@ -27,6 +27,7 @@ import { feedLaneRoles, type FeedRole } from '@/video/feedLaneRoles';
 import { originHostRegistry } from '@/video/originHostRegistry';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { MuteButton } from '@/audio/MuteButton';
+import { VideoProcessingCard } from './VideoProcessingCard';
 import {
   vperfMarkEarlyStarted,
   vperfCardFraction,
@@ -80,11 +81,13 @@ export const InlineVideo: React.FC<Props> = ({
   onFirstFrameReady,
 }) => {
 
-  const posterUrl =
-    (item as any).thumbnailUrl ||
-    (item as any).imageUrl ||
-    '';
-  const hlsUrl = (item as any).hlsUrl as string | undefined;
+  const isProcessing = (item as any).isProcessing === true;
+  const posterUrl = isProcessing
+    ? ''
+    : ((item as any).thumbnailUrl || (item as any).imageUrl || '');
+  const rawHlsUrl = (item as any).hlsUrl as string | undefined;
+  // While processing: no HLS load, no lane registration, no playback intent.
+  const hlsUrl = isProcessing ? undefined : rawHlsUrl;
   const firedRef = useRef(false);
   const posterElRef = useRef<HTMLImageElement | null>(null);
   // Mute state now owned by VideoEngine via 'session' audioPolicy — no local read.
@@ -126,16 +129,18 @@ export const InlineVideo: React.FC<Props> = ({
     const r = detectRoleForMatch();
     return r === 'next' || r === 'prev' ? r : null;
   };
-  const role: FeedRole | null = isActive
-    ? 'active'
-    : (earlyMotion
-        ? detectEarlyRole()
-        : (isNear ? detectRoleForMatch() : null));
+  const role: FeedRole | null = isProcessing
+    ? null
+    : (isActive
+        ? 'active'
+        : (earlyMotion
+            ? detectEarlyRole()
+            : (isNear ? detectRoleForMatch() : null)));
 
   const laneId = useLaneForRole(role);
   // Playback intent — separate from role/mount. Only active or early-motion
   // cards actually load + play; neighbour "bound" roles stay paused.
-  const playbackIntent = isActive || (earlyMotion && role !== null);
+  const playbackIntent = !isProcessing && (isActive || (earlyMotion && role !== null));
 
   // Start position: for the KEPT-BOUND promotion path (physical lane already
   // parented to this card and holding the true paused frame), skip the seed
@@ -320,7 +325,9 @@ export const InlineVideo: React.FC<Props> = ({
         }}
       />
 
-      {isActive && (
+      {isProcessing && <VideoProcessingCard />}
+
+      {isActive && !isProcessing && (
         <div style={{ position: 'absolute', right: 6, bottom: 6, zIndex: 30 }}>
           <MuteButton size="sm" />
         </div>

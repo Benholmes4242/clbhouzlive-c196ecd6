@@ -17,7 +17,7 @@ import { resolveRestingRect, getCurrentViewport, type RestingRect } from '@/lib/
 import { FS_TRANSITION_MODE } from '@/lib/media/transitionMode';
 import { TapForSoundPill } from '@/audio/MuteButton';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
-import { InlineSpinner } from '@/components/ui/InlineSpinner';
+import { VideoProcessingCard } from './VideoProcessingCard';
 
 
 import { usePostViewTracker } from '@/hooks/usePostViewTracker';
@@ -208,16 +208,7 @@ export const FeedSlide = memo(function FeedSlide({
               onLoad={() => onFirstFrameReady?.()}
             />
           )}
-          {(m as any).isProcessing && (
-            <div
-              className="absolute inset-0 flex flex-col items-center justify-center"
-              style={{ zIndex: 2, background: 'rgba(0,0,0,0.45)' }}
-            >
-              <InlineSpinner size="lg" className="mb-3" />
-              <span className="text-white text-sm font-semibold tracking-tight">Processing</span>
-              <span className="text-white/70 text-xs mt-1">This video will be ready shortly</span>
-            </div>
-          )}
+          {(m as any).isProcessing && <VideoProcessingCard overlay />}
         </div>
       );
     }
