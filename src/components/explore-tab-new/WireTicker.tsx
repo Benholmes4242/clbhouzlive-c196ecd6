@@ -112,10 +112,11 @@ export function WireTicker({ userId }: Props) {
         background: 'transparent',
         border: 'none',
         padding: 0,
+        paddingBlock: 12,
+        marginBlock: -12,
         cursor: 'pointer',
         fontFamily: FONT,
         flexShrink: 0,
-        minHeight: 40,
       }}
       >
         <span
@@ -126,10 +127,10 @@ export function WireTicker({ userId }: Props) {
             borderRadius: 4,
             background: '#FBBC2E',
             color: '#0F172A',
-            fontSize: 9,
+            fontSize: 10,
             fontWeight: 700,
             letterSpacing: '0.06em',
-            lineHeight: 1,
+            lineHeight: 1.3,
             flexShrink: 0,
           }}
         >
@@ -137,9 +138,9 @@ export function WireTicker({ userId }: Props) {
         </span>
         <span
           style={{
-            fontSize: 11.5,
+            fontSize: 13,
             fontWeight: 500,
-            color: 'rgba(255,255,255,0.7)',
+            color: 'rgba(255,255,255,0.72)',
             whiteSpace: 'nowrap',
             lineHeight: 1,
           }}
