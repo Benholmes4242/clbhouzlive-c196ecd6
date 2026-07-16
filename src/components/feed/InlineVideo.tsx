@@ -81,11 +81,13 @@ export const InlineVideo: React.FC<Props> = ({
   onFirstFrameReady,
 }) => {
 
-  const posterUrl =
-    (item as any).thumbnailUrl ||
-    (item as any).imageUrl ||
-    '';
-  const hlsUrl = (item as any).hlsUrl as string | undefined;
+  const isProcessing = (item as any).isProcessing === true;
+  const posterUrl = isProcessing
+    ? ''
+    : ((item as any).thumbnailUrl || (item as any).imageUrl || '');
+  const rawHlsUrl = (item as any).hlsUrl as string | undefined;
+  // While processing: no HLS load, no lane registration, no playback intent.
+  const hlsUrl = isProcessing ? undefined : rawHlsUrl;
   const firedRef = useRef(false);
   const posterElRef = useRef<HTMLImageElement | null>(null);
   // Mute state now owned by VideoEngine via 'session' audioPolicy — no local read.
