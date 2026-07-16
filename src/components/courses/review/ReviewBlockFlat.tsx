@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ThumbsUp, ThumbsDown, MoreHorizontal } from 'lucide-react';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { cn } from '@/lib/utils';
@@ -124,11 +125,11 @@ const ScoreRing: React.FC<{ score: number; size?: number }> = ({ score, size = 4
   );
 };
 
-const SUBSCORE_LABELS: { key: keyof Review; label: string }[] = [
-  { key: 'design_score', label: 'Design' },
-  { key: 'condition_score', label: 'Condition' },
-  { key: 'clubhouse_score', label: 'Clubhouse' },
-  { key: 'facilities_score', label: 'Facilities' },
+const SUBSCORE_LABELS: { key: keyof Review; labelKey: string }[] = [
+  { key: 'design_score', labelKey: 'review.subscore.design' },
+  { key: 'condition_score', labelKey: 'review.subscore.condition' },
+  { key: 'clubhouse_score', labelKey: 'review.subscore.clubhouse' },
+  { key: 'facilities_score', labelKey: 'review.subscore.facilities' },
 ];
 
 export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
