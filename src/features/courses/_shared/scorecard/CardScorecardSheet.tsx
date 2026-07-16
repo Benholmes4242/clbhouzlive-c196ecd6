@@ -537,7 +537,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 }}
               >
                 <User size={16} strokeWidth={2} />
-                View profile
+                {t('courses:scorecard.viewProfile')}
               </button>
             )}
             {onViewCourse && (
