@@ -19,6 +19,7 @@ import { Heart, MessageCircle, Send, MoreHorizontal, Plus, Check } from 'lucide-
 import { MuteButton } from '@/audio/MuteButton';
 import { Z } from '@/config/zIndex';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { formatCountKilo } from '@/i18n/format';
 
 // Shared lift + stroke for every floating glyph in the immersive feed chrome.
 const FLOAT_SHADOW = 'drop-shadow(0 1px 4px rgba(0,0,0,0.55))';
