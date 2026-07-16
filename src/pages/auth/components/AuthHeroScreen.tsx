@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 // Chrome owned solely by AppRoutes (/auth + /signup are darkChrome routes).
 import { Loader2, ArrowRight } from 'lucide-react';
 import { toast } from '@/lib/toast';
@@ -9,12 +10,6 @@ import { isMedianApp } from '@/utils/median/isMedianApp';
 
 // Toggle wordmark visibility
 const SHOW_WORDMARK = false;
-
-// Email validation schema
-const emailSchema = z
-  .string()
-  .trim()
-  .email({ message: 'Please enter a valid email address' });
 
 interface AuthHeroScreenProps {
   submitting: boolean;
