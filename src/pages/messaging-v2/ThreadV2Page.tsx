@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, MoreVertical, BadgeCheck, MessageCircle } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
