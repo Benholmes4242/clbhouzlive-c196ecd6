@@ -177,6 +177,17 @@ export default tseslint.config(
       "i18next/no-literal-string": ["error", i18nLiteralOptions],
       "no-restricted-syntax": ["error", literalAttrSyntax, ...toLocaleSyntax],
     },
+  },
+  // ─── Wave 3d.i — scope-dir ERROR flip for course-media-tab + _shared
+  {
+    files: [
+      "src/components/course-media-tab/**/*.{ts,tsx}",
+      "src/features/courses/_shared/**/*.{ts,tsx}",
+    ],
+    rules: {
+      "i18next/no-literal-string": ["error", i18nLiteralOptions],
+      "no-restricted-syntax": ["error", literalAttrSyntax, ...toLocaleSyntax],
+    },
   }
 );
 
