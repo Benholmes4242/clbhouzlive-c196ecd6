@@ -9,6 +9,7 @@ import { MapPin } from 'lucide-react';
 import { INK, GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants';
 
 import { SLATE_800, WHITE_ALPHA_55 } from '../../../_shared/tokens';
+import { formatNumber } from '@/i18n/format';
 
 export interface CourseStatsStripProps {
   par?: number | null;
