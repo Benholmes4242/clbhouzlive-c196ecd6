@@ -144,7 +144,7 @@ export function FeedCard({
           position: 'relative',
           width: '100%',
           aspectRatio: aspect,
-          borderRadius: 12,
+          borderRadius: 4,
           background: '#e5e9ef',
           overflow: 'hidden',
         }}

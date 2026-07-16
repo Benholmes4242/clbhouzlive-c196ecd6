@@ -87,7 +87,7 @@ function SkeletonTile() {
         style={{
           width: '100%',
           aspectRatio: '9 / 14',
-          borderRadius: 12,
+          borderRadius: 4,
           background: 'rgba(0,0,0,0.06)',
         }}
       />
@@ -236,7 +236,7 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
             style={{
               width: '100%',
               padding: '12px 0',
-              borderRadius: 12,
+              borderRadius: 4,
               background: 'transparent',
               color: INK,
               fontSize: 13,

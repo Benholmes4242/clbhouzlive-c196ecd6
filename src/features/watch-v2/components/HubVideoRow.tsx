@@ -88,7 +88,7 @@ function Card({
       <div
         style={{
           aspectRatio: '16 / 9',
-          borderRadius: 12,
+          borderRadius: 4,
           background: '#e5e9ef',
           position: 'relative',
           overflow: 'hidden',
@@ -208,7 +208,7 @@ function SkeletonCard() {
       <div
         style={{
           aspectRatio: '16 / 9',
-          borderRadius: 12,
+          borderRadius: 4,
           background: 'rgba(0,0,0,0.06)',
         }}
       />
@@ -279,7 +279,7 @@ export function HubVideoRow() {
                 width: 120,
                 flexShrink: 0,
                 aspectRatio: '16 / 11',
-                borderRadius: 12,
+                borderRadius: 4,
                 border: '1.5px dashed rgba(0,0,0,0.14)',
                 display: 'flex',
                 flexDirection: 'column',

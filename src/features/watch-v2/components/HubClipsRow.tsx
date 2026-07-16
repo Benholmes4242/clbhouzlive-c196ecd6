@@ -76,7 +76,7 @@ function Tile({
       <div
         style={{
           aspectRatio: '9 / 14',
-          borderRadius: 12,
+          borderRadius: 4,
           background: '#e5e9ef',
           position: 'relative',
           overflow: 'hidden',
@@ -161,7 +161,7 @@ function SkeletonTile() {
       <div
         style={{
           aspectRatio: '9 / 14',
-          borderRadius: 12,
+          borderRadius: 4,
           background: 'rgba(0,0,0,0.06)',
         }}
       />
@@ -232,7 +232,7 @@ export function HubClipsRow() {
                 width: 110,
                 flexShrink: 0,
                 aspectRatio: '9 / 14',
-                borderRadius: 12,
+                borderRadius: 4,
                 border: '1.5px dashed rgba(0,0,0,0.14)',
                 display: 'flex',
                 flexDirection: 'column',
