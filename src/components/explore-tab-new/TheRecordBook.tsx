@@ -448,18 +448,20 @@ function ConquestsStrip({ userId }: { userId: string | undefined }) {
       style={{
         marginTop: 14,
         paddingTop: 12,
+        marginLeft: 16,
+        marginRight: 16,
         borderTop: `1px solid ${CONQUEST_HAIRLINE}`,
       }}
     >
       <div
         style={{
-          fontSize: 9.5,
-          fontWeight: 800,
-          letterSpacing: '0.14em',
+          fontSize: 10.5,
+          fontWeight: 600,
+          letterSpacing: '0.06em',
           textTransform: 'uppercase',
-          color: PARCHMENT_GOLD,
+          color: MUTED,
           lineHeight: 1,
-          padding: '0 4px 10px',
+          padding: '0 0 10px',
         }}
       >
         Your next conquests
@@ -488,9 +490,9 @@ function ConquestChip({ row }: { row: TitleInReach }) {
       style={{
         flexShrink: 0,
         width: 172,
-        borderRadius: 12,
+        borderRadius: 10,
         background: CHIP_BG,
-        border: `1px solid ${CHIP_BORDER}`,
+        border: 'none',
         padding: '10px 11px',
         cursor: 'pointer',
         fontFamily: FONT,
@@ -499,37 +501,45 @@ function ConquestChip({ row }: { row: TitleInReach }) {
     >
       <div
         style={{
-          fontSize: 11.5,
-          fontWeight: 800,
-          color: INK,
-          lineHeight: 1.2,
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
+          display: 'flex',
+          alignItems: 'baseline',
+          gap: 6,
+          minWidth: 0,
         }}
       >
-        {row.course_name}
-      </div>
-      <div
-        style={{
-          marginTop: 3,
-          fontSize: 8.5,
-          fontWeight: 800,
-          letterSpacing: '0.1em',
-          color: AMBER,
-          textTransform: 'uppercase',
-          lineHeight: 1.2,
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        {categoryLabel(row.category)}
+        <div
+          style={{
+            flex: 1,
+            minWidth: 0,
+            fontSize: 12.5,
+            fontWeight: 600,
+            letterSpacing: '-0.01em',
+            color: INK,
+            lineHeight: 1.2,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {row.course_name}
+        </div>
+        <div
+          style={{
+            flexShrink: 0,
+            fontSize: 10,
+            fontWeight: 500,
+            color: 'rgba(15,23,42,0.45)',
+            lineHeight: 1.2,
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {categoryLabel(row.category)}
+        </div>
       </div>
       <div
         style={{
           marginTop: 8,
-          height: 4,
+          height: 3,
           borderRadius: 999,
           background: TRACK_BG,
           overflow: 'hidden',
@@ -539,7 +549,7 @@ function ConquestChip({ row }: { row: TitleInReach }) {
           style={{
             width: `${Math.max(8, pct)}%`,
             height: '100%',
-            background: `linear-gradient(90deg, ${AMBER}, ${GOLD})`,
+            background: AMBER,
             borderRadius: 999,
           }}
         />
@@ -547,20 +557,21 @@ function ConquestChip({ row }: { row: TitleInReach }) {
       <div
         style={{
           marginTop: 7,
-          fontSize: 10,
-          fontWeight: 600,
-          color: 'rgba(15,23,42,0.6)',
+          fontSize: 11,
+          fontWeight: 500,
+          color: 'rgba(15,23,42,0.55)',
           lineHeight: 1.25,
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
         }}
       >
-        <span style={{ color: PARCHMENT_GOLD, fontWeight: 800 }}>{gap}</span>
-        {' '}to take it ({row.leader_value})
+        <span style={{ color: INK, fontWeight: 700 }}>{gap}</span>
+        {' '}to take it · {row.leader_value}
       </div>
     </button>
   );
 }
+
 
 export default TheRecordBook;
