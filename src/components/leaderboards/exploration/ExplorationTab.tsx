@@ -67,10 +67,10 @@ function formatTierUnlockDate(iso: string): string {
   const monthsAgo = (now.getFullYear() - d.getFullYear()) * 12 + (now.getMonth() - d.getMonth());
 
   if (monthsAgo > 12) {
-    return d.toLocaleDateString('en-GB', { year: 'numeric' });
+    return formatYearNumeric(d);
   }
 
-  const month = d.toLocaleDateString('en-GB', { month: 'short' });
+  const month = formatMonthShort(d);
   const yy = d.getFullYear().toString().slice(2);
   return `${month} '${yy}`;
 }
