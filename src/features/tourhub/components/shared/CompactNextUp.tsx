@@ -49,7 +49,7 @@ export function CompactNextUp({
 
   const stats: { label: string; value: string }[] = [];
   if (par != null) stats.push({ label: 'PAR', value: String(par) });
-  if (yardage != null) stats.push({ label: 'YARDS', value: yardage.toLocaleString() });
+  if (yardage != null) stats.push({ label: 'YARDS', value: formatNumber(yardage) });
   if (purse != null && purse > 0) stats.push({ label: 'PURSE', value: formatPurse(purse) });
 
   const isToday = daysUntil === 0;
