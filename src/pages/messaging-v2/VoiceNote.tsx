@@ -19,6 +19,7 @@ function formatTime(sec: number): string {
 }
 
 export const VoiceNote: React.FC<Props> = ({ attachment, isOutgoing }) => {
+  const { t } = useTranslation('messaging');
   const hasLocal = !!attachment.localUrl;
   const { url: signedUrl, error } = useSignedUrl(
     hasLocal ? null : attachment.path,
