@@ -13,7 +13,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { uploadEventBus } from '@/uploads/uploadEventBus';
 import { compressImage, COMPRESSION_PRESETS } from '@/uploads/imageCompression';
-import { uploadVideoWithTus } from '@/uploads/tusVideoUpload';
+import { uploadVideoResilient } from '@/uploads/resilientVideoUpload';
 import { uploadToCloudflareR2 } from '@/utils/cloudflareUpload';
 import { bakeFrameCrop } from './bakeFrameCrop';
 import type { StageMediaItem } from '../hooks/useStageComposer';
@@ -162,7 +162,7 @@ async function runVideo(job: InternalJob, item: StageMediaItem, displayOrder: nu
   if (!item.file) throw new Error('Video item missing file');
   const videoFile: File = item.file;
   const streamId = await new Promise<string>((resolve, reject) => {
-    uploadVideoWithTus({
+    uploadVideoResilient({
       file: videoFile,
       onProgress: (bytesUploaded, bytesTotal) => {
         const pct = bytesTotal > 0 ? Math.round((bytesUploaded / bytesTotal) * 100) : 0;

@@ -11,7 +11,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
-import { uploadVideoWithTus } from '@/uploads/tusVideoUpload';
+import { uploadVideoResilient } from '@/uploads/resilientVideoUpload';
 import { REVIEW_V2_LIMITS } from '../tokens';
 import type { ExistingMedia, MediaItem } from '../types';
 
@@ -192,7 +192,7 @@ export function useReviewMediaPipeline({ userId, existingMedia }: UseReviewMedia
       try {
         if (item.type === 'video') {
           const streamId: string = await new Promise((resolve, reject) => {
-            uploadVideoWithTus({
+            uploadVideoResilient({
               file: item.file!,
               onProgress: (loaded, total) => {
                 updateItem(item.id, {

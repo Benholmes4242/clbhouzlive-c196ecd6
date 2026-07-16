@@ -19,7 +19,12 @@ export interface TusUploadOptions {
   onSuccess: (streamId: string) => void;
   onError: (error: Error) => void;
   metadata?: Record<string, string>;
+  /** Optional override for chunk size (bytes). Defaults to 50MB. */
+  chunkSize?: number;
+  /** Optional override for retryDelays (ms). Defaults to short exponential backoff. */
+  retryDelays?: number[];
 }
+
 
 export interface TusUploadResult {
   upload: tus.Upload;
@@ -32,7 +37,7 @@ export interface TusUploadResult {
  * Upload a video using TUS protocol for resumable uploads
  */
 export async function uploadVideoWithTus(options: TusUploadOptions): Promise<TusUploadResult> {
-  const { file, onProgress, onSuccess, onError, metadata = {} } = options;
+  const { file, onProgress, onSuccess, onError, metadata = {}, chunkSize, retryDelays } = options;
 
   // Step 1: Get TUS endpoint from Cloudflare via edge function
   const { data: tusEndpoint, error: endpointError } = await supabase.functions.invoke(
@@ -64,11 +69,12 @@ export async function uploadVideoWithTus(options: TusUploadOptions): Promise<Tus
   const upload = new tus.Upload(file, {
     endpoint: uploadUrl,
     
-    // Chunk size: 50MB (Cloudflare minimum is 5MB, max is 200MB)
-    chunkSize: 50 * 1024 * 1024,
+    // Chunk size: 50MB default (Cloudflare minimum is 5MB, max is 200MB). Overridable for large files.
+    chunkSize: chunkSize ?? 50 * 1024 * 1024,
     
-    // Retry configuration - exponential backoff
-    retryDelays: [0, 1000, 3000, 5000, 10000, 30000],
+    // Retry configuration - exponential backoff. Overridable for long-form uploads.
+    retryDelays: retryDelays ?? [0, 1000, 3000, 5000, 10000, 30000],
+
     
     // Store upload URL for resume capability
     storeFingerprintForResuming: true,
