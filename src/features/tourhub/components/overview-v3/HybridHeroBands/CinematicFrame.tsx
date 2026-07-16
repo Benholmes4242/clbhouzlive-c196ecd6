@@ -25,7 +25,7 @@ import {
   GOLD,
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
-import { AMBER_INK, GOLD_DEEP } from '../../../_shared/tokens';
+import { AMBER_INK, GOLD_DEEP, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 import { roundStarted } from '../../../_shared/roundState';
 import type { HeroState, TopTie, TickerRow } from '../HybridHero.utils';
 import { fmtScore, formatRank, buildLeaderboardSlots } from '../HybridHero.utils';
