@@ -40,7 +40,7 @@ const BG = '#F8FAFC';
 const SURFACE = '#FFFFFF';
 const HAIR = 'rgba(15,23,42,0.08)';
 const HAIR_STRONG = 'rgba(15,23,42,0.12)';
-const AMBER = '#F7931E';
+
 const AMBER_DEEP = '#C97A10';
 
 /* ── props ──────────────────────────────────────────────────────────── */
