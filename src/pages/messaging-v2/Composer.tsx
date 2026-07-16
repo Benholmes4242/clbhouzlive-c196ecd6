@@ -1,8 +1,10 @@
 import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Plus, ArrowUp } from 'lucide-react';
 import { useSendMessage } from '@/hooks/messaging/useSendMessage';
 import { useKeyboardHeight } from '@/hooks/messaging/useKeyboardHeight';
 import { pickMediaFiles, validateMediaFiles } from '@/utils/media/pickMediaFiles';
+
 
 const INK = '#1F2428';
 const SUB = '#8A9099';
@@ -31,6 +33,8 @@ export const Composer: React.FC<Props> = ({
   onHeightChange,
   onAfterSend,
 }) => {
+  const { t } = useTranslation('messaging');
+
   const { send, sendMedia } = useSendMessage(conversationId);
   const [picking, setPicking] = useState(false);
   const keyboardHeight = useKeyboardHeight();
@@ -136,7 +140,7 @@ export const Composer: React.FC<Props> = ({
         ref={textareaRef}
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder="Message"
+        placeholder={t('composer.placeholder')}
         rows={1}
         disabled={disabled}
         style={{

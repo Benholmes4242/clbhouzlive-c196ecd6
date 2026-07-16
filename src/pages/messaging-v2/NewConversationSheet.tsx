@@ -213,7 +213,7 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search people or businesses"
+            placeholder={t('search.people')}
             autoFocus
             style={{
               width: '100%',
@@ -235,7 +235,7 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Group name (optional)"
+              placeholder={t('group.namePlaceholder')}
               style={{
                 width: '100%',
                 padding: '12px 14px',

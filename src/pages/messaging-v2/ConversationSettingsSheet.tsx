@@ -786,7 +786,7 @@ const AddPeopleSheet: React.FC<AddPeopleSheetProps> = ({
             autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search people and businesses"
+            placeholder={t('search.peopleAnd')}
             style={{
               width: '100%',
               background: '#FFF',
