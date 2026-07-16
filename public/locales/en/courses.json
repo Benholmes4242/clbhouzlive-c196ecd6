@@ -39,10 +39,10 @@
     "overPar": "Over-par",
     "avgToPar": "AVG TO PAR",
     "playsTo": "PLAYS TO <1>{{playsTo}}</1>",
-    "rounds_one": "{{count}} round",
-    "rounds_other": "{{count}} rounds",
-    "players_one": "{{count}} player",
-    "players_other": "{{count}} players"
+    "rounds_one": "{{formattedCount}} round",
+    "rounds_other": "{{formattedCount}} rounds",
+    "players_one": "{{formattedCount}} player",
+    "players_other": "{{formattedCount}} players"
   },
   "scorecard": {
     "syncingTitle": "Scorecard on the way",
