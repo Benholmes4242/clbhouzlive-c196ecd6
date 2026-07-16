@@ -605,7 +605,7 @@ export function CinematicHeroFullBleed({
           style={{
             position: 'relative',
             zIndex: 2,
-            padding: '8px 18px 8px',
+            padding: '8px 48px 8px',
             borderTop: '0.5px solid rgba(255,255,255,0.10)',
             background:
               'linear-gradient(180deg, rgba(232,194,106,0.06) 0%, rgba(232,194,106,0) 100%)',
@@ -716,7 +716,7 @@ export function CinematicHeroFullBleed({
               display: 'flex',
               alignItems: 'center',
               gap: 10,
-              padding: '4px 18px',
+              padding: '4px 48px',
               borderTop: 'none',
             };
             if (row.kind === 'solo') {
@@ -852,7 +852,7 @@ export function CinematicHeroFullBleed({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 10,
-                padding: '0 18px 3px',
+                padding: '0 48px 3px',
               }}
             >
               <span style={{ width: RANK_W, flexShrink: 0 }} />
@@ -909,7 +909,7 @@ export function CinematicHeroFullBleed({
               display: 'flex',
               alignItems: 'center',
               gap: 10,
-              padding: isLive ? '3px 18px' : '8px 18px',
+              padding: isLive ? '3px 48px' : '8px 48px',
               borderTop: 'none',
             };
             if (row.kind === 'solo') {
@@ -1096,7 +1096,7 @@ export function CinematicHeroFullBleed({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 10,
-                padding: '8px 18px',
+                padding: '8px 48px',
               }}
             >
               <SquircleAvatar
@@ -1152,7 +1152,7 @@ export function CinematicHeroFullBleed({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 18,
-                padding: '8px 18px',
+                padding: '8px 48px',
               }}
             >
               {courseStats.par != null && (
