@@ -77,7 +77,7 @@ const InboxV2Page: React.FC = () => {
   const composeButton = (
     <button
       type="button"
-      aria-label="New message"
+      aria-label={t('a11y.newMessage')}
       onClick={() => setComposeOpen(true)}
       className="active:opacity-60 transition-opacity"
       style={{
@@ -117,7 +117,7 @@ const InboxV2Page: React.FC = () => {
               <button
                 type="button"
                 onClick={() => navigate(-1)}
-                aria-label="Back"
+                aria-label={t('a11y.back')}
                 className="active:opacity-60"
                 style={{
                   width: 32,
