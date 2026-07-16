@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { User, MapPin, RefreshCw, Table } from 'lucide-react';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -216,7 +217,9 @@ const SkeletonMiddle: React.FC<{ nineHole: boolean }> = ({ nineHole }) => (
   </div>
 );
 
-const SyncingMiddle: React.FC<{ nineHole: boolean }> = ({ nineHole }) => (
+const SyncingMiddle: React.FC<{ nineHole: boolean }> = ({ nineHole }) => {
+  const { t } = useTranslation(['courses']);
+  return (
   <div style={{ position: 'relative', padding: '4px 16px 24px' }}>
     <style>{KEYFRAMES}</style>
     <div style={{ opacity: 0.35, pointerEvents: 'none', display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -256,19 +259,23 @@ const SyncingMiddle: React.FC<{ nineHole: boolean }> = ({ nineHole }) => (
         </div>
       </div>
       <div style={{ fontFamily: GEIST, fontSize: 14.5, fontWeight: 800, color: INK }}>
-        Scorecard on the way
+        {t('courses:scorecard.syncingTitle')}
       </div>
       <div style={{
         fontFamily: GEIST, fontSize: 12.5, fontWeight: 500, color: SECONDARY,
         maxWidth: 240, lineHeight: 1.4,
       }}>
-        Hole-by-hole data is syncing from England Golf. It usually lands within a few hours.
+        {t('courses:scorecard.syncingBody')}
       </div>
     </div>
   </div>
-);
+  );
+};
 
-const NohbhMiddle: React.FC<{ gross: number | null; toPar: number | null }> = ({ gross, toPar }) => (
+
+const NohbhMiddle: React.FC<{ gross: number | null; toPar: number | null }> = ({ gross, toPar }) => {
+  const { t } = useTranslation(['courses']);
+  return (
   <div style={{
     padding: '20px 16px 24px',
     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, textAlign: 'center',
@@ -280,13 +287,13 @@ const NohbhMiddle: React.FC<{ gross: number | null; toPar: number | null }> = ({
       <Table size={24} strokeWidth={1.6} />
     </div>
     <div style={{ fontFamily: GEIST, fontSize: 14.5, fontWeight: 800, color: INK }}>
-      Gross score only
+      {t('courses:scorecard.grossOnlyTitle')}
     </div>
     <div style={{
       fontFamily: GEIST, fontSize: 12.5, fontWeight: 500, color: SECONDARY,
       maxWidth: 250, lineHeight: 1.4,
     }}>
-      This round was logged as a total, without hole-by-hole scores.
+      {t('courses:scorecard.grossOnlyBody')}
     </div>
     {gross != null && (
       <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
@@ -295,7 +302,7 @@ const NohbhMiddle: React.FC<{ gross: number | null; toPar: number | null }> = ({
           padding: '10px 18px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
         }}>
           <div style={{ ...NUM, fontSize: 9.5, fontWeight: 800, letterSpacing: '0.1em', color: MUTED }}>
-            GROSS
+            {t('courses:scorecard.gross')}
           </div>
           <div style={{ ...NUM, fontSize: 24, fontWeight: 200, color: INK, lineHeight: 1 }}>
             {gross}
@@ -306,7 +313,7 @@ const NohbhMiddle: React.FC<{ gross: number | null; toPar: number | null }> = ({
           padding: '10px 18px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
         }}>
           <div style={{ ...NUM, fontSize: 9.5, fontWeight: 800, letterSpacing: '0.1em', color: MUTED }}>
-            TO PAR
+            {t('courses:scorecard.toPar')}
           </div>
           <div style={{ ...NUM, fontSize: 24, fontWeight: 200, color: toPar == null ? INK : toParColor(toPar), lineHeight: 1 }}>
             {fmtRel(toPar)}
@@ -315,7 +322,8 @@ const NohbhMiddle: React.FC<{ gross: number | null; toPar: number | null }> = ({
       </div>
     )}
   </div>
-);
+  );
+};
 
 
 
@@ -327,6 +335,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   playerName, playerAvatarUrl, playerHcp, playerHcpDelta, playerUserId,
   onViewProfile, onViewCourse,
 }) => {
+  const { t } = useTranslation(['courses']);
   void emptyMessage;
 
   const totals = useMemo(() => {
@@ -528,7 +537,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 }}
               >
                 <User size={16} strokeWidth={2} />
-                View profile
+                {t('courses:scorecard.viewProfile')}
               </button>
             )}
             {onViewCourse && (
@@ -544,7 +553,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 }}
               >
                 <MapPin size={16} strokeWidth={2} />
-                View course
+                {t('courses:scorecard.viewCourse')}
               </button>
             )}
           </div>

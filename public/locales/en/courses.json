@@ -1,0 +1,57 @@
+{
+  "media": {
+    "signInTitle": "Sign in to view media",
+    "signInBody": "See photos and videos from golfers who've played here.",
+    "signInCta": "Sign in",
+    "errorTitle": "Couldn't load media",
+    "errorBody": "Please check your connection and try again.",
+    "emptyTitle": "No media yet",
+    "emptyBody": "Be the first to capture <1>{{courseName}}</1> — photos and videos from your round help fellow golfers discover it.",
+    "emptyCourseFallback": "this course",
+    "shareExperience": "Share your experience",
+    "uploadVideo": "Upload a video",
+    "filterAll": "All",
+    "filterPhotos": "Photos",
+    "filterVideos": "Videos",
+    "filterA11y": "Media filter",
+    "addMediaA11y": "Add media",
+    "guide": {
+      "kicker": "What to share",
+      "signatureHoles": "Signature holes",
+      "signatureHolesSub": "Show the world what makes this course special",
+      "shots": "Shots from your round",
+      "shotsSub": "Short clips of your best moments on the course",
+      "views": "Views & atmosphere",
+      "viewsSub": "Sunsets, landscapes, the feeling of being there",
+      "clubhouse": "Clubhouse & facilities",
+      "clubhouseSub": "Help others know what to expect before they visit"
+    }
+  },
+  "holes": {
+    "detailsA11y": "Hole {{holeNo}} details",
+    "parLabel": "Par {{par}}",
+    "yards": "{{yards}} yds",
+    "strokeIndex": "SI {{index}}",
+    "hardest": "HARDEST",
+    "easiest": "EASIEST",
+    "subPar": "Sub-par",
+    "par": "Par",
+    "overPar": "Over-par",
+    "avgToPar": "AVG TO PAR",
+    "playsTo": "PLAYS TO <1>{{playsTo}}</1>",
+    "rounds_one": "{{formattedCount}} round",
+    "rounds_other": "{{formattedCount}} rounds",
+    "players_one": "{{formattedCount}} player",
+    "players_other": "{{formattedCount}} players"
+  },
+  "scorecard": {
+    "syncingTitle": "Scorecard on the way",
+    "syncingBody": "Hole-by-hole data is syncing from England Golf. It usually lands within a few hours.",
+    "grossOnlyTitle": "Gross score only",
+    "grossOnlyBody": "This round was logged as a total, without hole-by-hole scores.",
+    "gross": "GROSS",
+    "toPar": "TO PAR",
+    "viewProfile": "View profile",
+    "viewCourse": "View course"
+  }
+}

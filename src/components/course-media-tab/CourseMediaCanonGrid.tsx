@@ -19,6 +19,7 @@
  */
 
 import { forwardRef, useCallback, useEffect, useMemo, useRef } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Loader2, AlertCircle, Camera, Film, Flag, Sunrise, Building2 } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
@@ -107,6 +108,7 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
   courseName,
   courseId,
 }, ref) => {
+  const { t } = useTranslation(['courses', 'common']);
   const navigate = useNavigate();
   const sentinelRef = useRef<HTMLDivElement>(null);
 
@@ -186,13 +188,13 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
         <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
           <AlertCircle className="w-6 h-6 text-muted-foreground/40" />
         </div>
-        <p className="text-base font-semibold text-foreground">Couldn't load media</p>
-        <p className="text-sm text-muted-foreground">Please check your connection and try again.</p>
+        <p className="text-base font-semibold text-foreground">{t('courses:media.errorTitle')}</p>
+        <p className="text-sm text-muted-foreground">{t('courses:media.errorBody')}</p>
         <button
           onClick={() => refetch()}
           className="px-5 py-2.5 rounded-full text-sm font-semibold bg-[#f59e0b] text-white hover:bg-[#e8920f] active:scale-[0.97] transition-all min-h-[44px]"
         >
-          Retry
+          {t('common:action.retry')}
         </button>
       </div>
     );
@@ -218,17 +220,21 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
             <Camera size={30} strokeWidth={1.8} color={AMBER} />
           </div>
           <div style={{ fontSize: 19, fontWeight: 900, color: INK, letterSpacing: '-0.03em', marginBottom: 6 }}>
-            No media yet
+            {t('courses:media.emptyTitle')}
           </div>
           <p style={{ fontSize: 13, color: INK_FAINT, lineHeight: 1.6, maxWidth: 270, margin: '0 auto 24px' }}>
-            Be the first to capture {courseName || 'this course'} — photos and videos from your round help fellow golfers discover it.
+            <Trans
+              i18nKey="courses:media.emptyBody"
+              values={{ courseName: courseName || t('courses:media.emptyCourseFallback') }}
+              components={[<span key="c" />]}
+            />
           </p>
           <PrimaryAmberCTA
             onClick={() => courseId && navigate(`/courses/${courseId}/rate`)}
             leadingIcon={<Camera size={15} strokeWidth={2} />}
             style={{ marginBottom: 12 }}
           >
-            Share your experience
+            {t('courses:media.shareExperience')}
           </PrimaryAmberCTA>
           <button
             type="button"
@@ -250,19 +256,19 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
             }}
           >
             <Film size={15} strokeWidth={2} />
-            Upload a video
+            {t('courses:media.uploadVideo')}
           </button>
         </div>
 
         <div style={{ height: '0.5px', background: HAIRLINE_INK_7, margin: '0 16px 16px' }} />
 
         <EmptyStateGuide
-          kicker="What to share"
+          kicker={t('courses:media.guide.kicker')}
           items={[
-            { icon: Flag, label: 'Signature holes', sub: 'Show the world what makes this course special' },
-            { icon: Film, label: 'Shots from your round', sub: 'Short clips of your best moments on the course' },
-            { icon: Sunrise, label: 'Views & atmosphere', sub: 'Sunsets, landscapes, the feeling of being there' },
-            { icon: Building2, label: 'Clubhouse & facilities', sub: 'Help others know what to expect before they visit' },
+            { icon: Flag, label: t('courses:media.guide.signatureHoles'), sub: t('courses:media.guide.signatureHolesSub') },
+            { icon: Film, label: t('courses:media.guide.shots'), sub: t('courses:media.guide.shotsSub') },
+            { icon: Sunrise, label: t('courses:media.guide.views'), sub: t('courses:media.guide.viewsSub') },
+            { icon: Building2, label: t('courses:media.guide.clubhouse'), sub: t('courses:media.guide.clubhouseSub') },
           ]}
         />
       </div>

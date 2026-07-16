@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import { ChevronDown } from 'lucide-react';
 import { INK, INK_MUTE } from '@/features/courses/_shared/tokens';
 import { TOPAR_OVER_LIGHT, TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
@@ -154,6 +155,7 @@ export const SharedHoleCard: React.FC<SharedHoleCardProps> = ({
   onToggle,
   tag = null,
 }) => {
+  const { t } = useTranslation(['courses']);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -168,9 +170,9 @@ export const SharedHoleCard: React.FC<SharedHoleCardProps> = ({
   const avgColor = avgColorFor(hole.avg_to_par);
   const tagInfo =
     tag === 'hardest'
-      ? { label: 'HARDEST', c: SC_DOUBLE }
+      ? { label: t('courses:holes.hardest'), c: SC_DOUBLE }
       : tag === 'easiest'
-      ? { label: 'EASIEST', c: SC_BIRDIE }
+      ? { label: t('courses:holes.easiest'), c: SC_BIRDIE }
       : null;
 
   const subPar =
@@ -183,7 +185,9 @@ export const SharedHoleCard: React.FC<SharedHoleCardProps> = ({
 
   const playsTo = (hole.par + hole.avg_to_par).toFixed(1);
 
-  const countText = `${formatNumber(hole.rounds)} ${countLabel}`;
+  const countText = countLabel === 'players'
+    ? t('courses:holes.players', { count: hole.rounds, formattedCount: formatNumber(hole.rounds) })
+    : t('courses:holes.rounds', { count: hole.rounds, formattedCount: formatNumber(hole.rounds) });
 
   return (
     <div
@@ -204,7 +208,7 @@ export const SharedHoleCard: React.FC<SharedHoleCardProps> = ({
         role="button"
         tabIndex={0}
         aria-expanded={expanded}
-        aria-label={`Hole ${hole.hole_no} details`}
+        aria-label={t('courses:holes.detailsA11y', { holeNo: hole.hole_no })}
         onClick={onToggle}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
@@ -246,7 +250,7 @@ export const SharedHoleCard: React.FC<SharedHoleCardProps> = ({
               letterSpacing: '0.005em',
             }}
           >
-            {`Par ${hole.par}`}
+            {t('courses:holes.parLabel', { par: hole.par })}
             {(hole.yards != null || hole.stroke_index != null) && (
               <span
                 style={{
@@ -258,9 +262,9 @@ export const SharedHoleCard: React.FC<SharedHoleCardProps> = ({
                   letterSpacing: '0.02em',
                 }}
               >
-                {hole.yards != null ? `${hole.yards} yds` : ''}
+                {hole.yards != null ? t('courses:holes.yards', { yards: hole.yards }) : ''}
                 {hole.yards != null && hole.stroke_index != null ? ` \u00B7 ` : ''}
-                {hole.stroke_index != null ? `SI ${hole.stroke_index}` : ''}
+                {hole.stroke_index != null ? t('courses:holes.strokeIndex', { index: hole.stroke_index }) : ''}
               </span>
             )}
           </div>
@@ -307,7 +311,7 @@ export const SharedHoleCard: React.FC<SharedHoleCardProps> = ({
               color: INK_MUTE,
             }}
           >
-            AVG TO PAR
+            {t('courses:holes.avgToPar')}
           </div>
         </div>
 
@@ -328,9 +332,10 @@ export const SharedHoleCard: React.FC<SharedHoleCardProps> = ({
       {expanded && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={{ display: 'flex', gap: 8 }}>
-            <Stat label="Sub-par" value={`${subPar.toFixed(1)}%`} color={SC_BIRDIE} />
-            <Stat label="Par" value={`${parPct.toFixed(1)}%`} color={SC_PAR} />
-            <Stat label="Over-par" value={`${overPar.toFixed(1)}%`} color={SC_DOUBLE} />
+            <Stat label={t('courses:holes.subPar')} value={`${subPar.toFixed(1)}%`} color={SC_BIRDIE} />
+            <Stat label={t('courses:holes.par')} value={`${parPct.toFixed(1)}%`} color={SC_PAR} />
+            <Stat label={t('courses:holes.overPar')} value={`${overPar.toFixed(1)}%`} color={SC_DOUBLE} />
+
           </div>
 
           <SharedHoleDistributionBar dist={hole.dist} mode="chart" mounted={mounted} />
@@ -377,17 +382,21 @@ export const SharedHoleCard: React.FC<SharedHoleCardProps> = ({
               {countText}
             </span>
             <span>
-              PLAYS TO{' '}
-              <span
-                style={{
-                  fontFamily: MONO,
-                  fontVariantNumeric: 'tabular-nums',
-                  color: INK,
-                  fontWeight: 800,
-                }}
-              >
-                {playsTo}
-              </span>
+              <Trans
+                i18nKey="courses:holes.playsTo"
+                values={{ playsTo }}
+                components={[
+                  <span
+                    key="v"
+                    style={{
+                      fontFamily: MONO,
+                      fontVariantNumeric: 'tabular-nums',
+                      color: INK,
+                      fontWeight: 800,
+                    }}
+                  />,
+                ]}
+              />
             </span>
           </div>
         </div>
