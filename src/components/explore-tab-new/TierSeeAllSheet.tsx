@@ -10,7 +10,7 @@ import {
   SLATE_50,
 } from '@/features/tourhub/_shared/tokens';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { SC_ACE, SC_ALBATROSS, SC_EAGLE, SC_EAGLE_DARK, SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
+import { SC_ACE, SC_ALBATROSS } from '@/features/courses/components/holes/_constants';
 import { formatHcp } from '@/lib/formatHcp';
 import { REGION_TABS } from './AlmanacSections';
 import {
@@ -189,8 +189,8 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
     : isEagleLeaders
       ? eagleLeaderRows.length
       : displayRows.length;
-  const metricAccent = metric === 'aces' ? SC_ACE : SC_ALBATROSS;
-  const eagleBarGradient = 'linear-gradient(90deg, #F7931E, #FBBC2E)';
+  
+
 
 
   return (
@@ -220,9 +220,9 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
         <div style={{ minWidth: 0 }}>
           <div
             style={{
-              fontSize: 8.5,
-              fontWeight: 800,
-              letterSpacing: '0.14em',
+              fontSize: 10.5,
+              fontWeight: 600,
+              letterSpacing: '0.06em',
               textTransform: 'uppercase',
               color: AMBER,
               marginBottom: 4,
@@ -235,10 +235,10 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
           <div
             id="tier-see-all-title"
             style={{
-              fontSize: 18,
-              fontWeight: 800,
+              fontSize: 20,
+              fontWeight: 700,
               color: INK,
-              letterSpacing: '-0.01em',
+              letterSpacing: '-0.02em',
               lineHeight: 1.1,
             }}
           >
@@ -275,8 +275,8 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
                       color: active ? '#FFFFFF' : 'rgba(15,23,42,0.65)',
                       border: 'none',
                       fontFamily: FONT,
-                      fontSize: 10,
-                      fontWeight: 700,
+                      fontSize: 10.5,
+                      fontWeight: 600,
                       cursor: 'pointer',
                       letterSpacing: '0.02em',
                       whiteSpace: 'nowrap',
@@ -318,7 +318,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
                         border: 'none',
                         fontFamily: FONT,
                         fontSize: 9.5,
-                        fontWeight: 800,
+                        fontWeight: 700,
                         cursor: 'pointer',
                         letterSpacing: '0.08em',
                         whiteSpace: 'nowrap',
@@ -372,10 +372,6 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
                       ? `+${other} ${other === 1 ? 'albatross' : 'albatrosses'}`
                       : `+${other} ${other === 1 ? 'ace' : 'aces'}`
                     : null;
-                const barGradient =
-                  metric === 'aces'
-                    ? `linear-gradient(90deg, ${SC_ACE}, ${SC_FILL_GOLD})`
-                    : `linear-gradient(90deg, ${SC_ALBATROSS}, #FFD84D)`;
                 return (
                   <CountLeaderSheetRow
                     key={`${r.user_id ?? r.holder_name ?? i}-${i}`}
@@ -387,8 +383,6 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
                     holderClub={r.holder_club ?? null}
                     count={count}
                     max={legendaryMax}
-                    accent={metricAccent}
-                    barGradient={barGradient}
                     countLabelSingular={metric === 'aces' ? 'ACE' : 'ALBATROSS'}
                     countLabelPlural={metric === 'aces' ? 'ACES' : 'ALBATROSSES'}
                     subline={otherLabel}
@@ -426,8 +420,6 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
                   holderClub={r.holder_club ?? null}
                   count={r.eagles ?? 0}
                   max={eagleMax}
-                  accent={SC_EAGLE}
-                  barGradient={eagleBarGradient}
                   countLabelSingular="EAGLE"
                   countLabelPlural="EAGLES"
                   subline={null}
@@ -483,8 +475,9 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
 // ─────────────────────────────────────────────────────────────────────────────
 
 const LEGEND_INK = '#0F172A';
-const LEGEND_MUTE = 'rgba(15,23,42,0.42)';
-const LEGEND_HAIRLINE = 'rgba(15,23,42,0.07)';
+const LEGEND_SUB = 'rgba(15,23,42,0.5)';
+const LEGEND_LABEL = 'rgba(15,23,42,0.4)';
+const LEGEND_RANK = 'rgba(15,23,42,0.35)';
 
 function formatLeaderName(raw?: string | null): string {
   const s = (raw ?? '').trim();
@@ -516,8 +509,6 @@ interface CountLeaderSheetRowProps {
   holderClub: string | null;
   count: number;
   max: number;
-  accent: string;
-  barGradient: string;
   countLabelSingular: string;
   countLabelPlural: string;
   /** Optional secondary line, e.g. cross-metric or club. */
@@ -534,8 +525,6 @@ function CountLeaderSheetRow({
   holderClub,
   count,
   max,
-  accent,
-  barGradient,
   countLabelSingular,
   countLabelPlural,
   subline,
@@ -561,16 +550,17 @@ function CountLeaderSheetRow({
       style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: 9,
-        borderRadius: 16,
-        padding: '13px 15px',
-        marginBottom: 9,
+        alignItems: 'stretch',
+        gap: 8,
+        borderRadius: 12,
+        padding: '10px 12px',
+        marginBottom: 6,
         background: isTop
-          ? 'linear-gradient(120deg, rgba(255,210,0,0.10), rgba(255,210,0,0.02))'
+          ? 'linear-gradient(100deg, #fff, #fff6e8)'
           : '#FFFFFF',
         border: isTop
-          ? `1px solid rgba(255,210,0,0.55)`
-          : `1px solid ${LEGEND_HAIRLINE}`,
+          ? '1px solid rgba(247,147,30,0.55)'
+          : '0.5px solid rgba(15,23,42,0.08)',
         cursor: onTap ? 'pointer' : 'default',
         fontFamily: FONT,
       }}
@@ -580,10 +570,10 @@ function CountLeaderSheetRow({
           style={{
             width: 20,
             flexShrink: 0,
-            fontSize: 16,
-            fontWeight: 800,
+            fontSize: 11,
+            fontWeight: 600,
             fontVariantNumeric: 'tabular-nums',
-            color: isTop ? accent : 'rgba(15,23,42,0.35)',
+            color: isTop ? AMBER : LEGEND_RANK,
             lineHeight: 1,
             textAlign: 'center',
           }}
@@ -592,23 +582,22 @@ function CountLeaderSheetRow({
         </div>
         <div style={{ flexShrink: 0 }}>
           <SquircleAvatar
-            size={40}
+            size={34}
             srcCandidates={holderAvatar ? [holderAvatar] : []}
             alt={name}
             fallback={leaderInitials(name)}
             userId={userId ?? undefined}
             hairlineRing
-            ringColor={isTop ? SC_FILL_GOLD : undefined}
           />
         </div>
-        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, minWidth: 0 }}>
             <span
               style={{
-                fontSize: 14.5,
-                fontWeight: 800,
+                fontSize: 13,
+                fontWeight: 600,
                 color: LEGEND_INK,
-                lineHeight: 1.15,
+                lineHeight: 1.2,
                 letterSpacing: '-0.01em',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -623,9 +612,9 @@ function CountLeaderSheetRow({
               <span
                 style={{
                   flexShrink: 0,
-                  fontSize: 13,
-                  fontWeight: 800,
-                  color: '#F7931E',
+                  fontSize: 11.5,
+                  fontWeight: 600,
+                  color: AMBER,
                   fontVariantNumeric: 'tabular-nums',
                 }}
               >
@@ -636,9 +625,10 @@ function CountLeaderSheetRow({
           {secondLine && (
             <div
               style={{
-                fontSize: 10.5,
-                fontWeight: 600,
-                color: LEGEND_MUTE,
+                marginTop: 2,
+                fontSize: 11,
+                fontWeight: 500,
+                color: LEGEND_SUB,
                 lineHeight: 1.2,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -661,35 +651,35 @@ function CountLeaderSheetRow({
         >
           <div
             style={{
-              fontSize: 24,
-              fontWeight: 900,
-              color: isTop ? accent : LEGEND_INK,
-              lineHeight: 1,
-              fontVariantNumeric: 'tabular-nums',
-              letterSpacing: '-0.02em',
-            }}
-          >
-            {count}
-          </div>
-          <div
-            style={{
-              marginTop: 3,
-              fontSize: 8,
-              fontWeight: 800,
-              letterSpacing: '0.1em',
-              color: 'rgba(15,23,42,0.4)',
+              fontSize: 9,
+              fontWeight: 600,
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+              color: LEGEND_LABEL,
               lineHeight: 1,
             }}
           >
             {countLabel}
           </div>
+          <div
+            style={{
+              marginTop: 3,
+              fontSize: 15,
+              fontWeight: 700,
+              color: isTop ? AMBER : LEGEND_INK,
+              lineHeight: 1,
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            {count}
+          </div>
         </div>
       </div>
-      <div style={{ paddingLeft: 32, width: '100%' }}>
+      <div style={{ paddingLeft: 35, width: '100%' }}>
         <div
           style={{
             width: '100%',
-            height: 4,
+            height: 3,
             borderRadius: 999,
             background: 'rgba(15,23,42,0.08)',
             overflow: 'hidden',
@@ -700,7 +690,7 @@ function CountLeaderSheetRow({
               width: `${pct * 100}%`,
               height: '100%',
               borderRadius: 999,
-              background: barGradient,
+              background: AMBER,
               transition: 'width .35s cubic-bezier(.2,.8,.2,1)',
             }}
           />

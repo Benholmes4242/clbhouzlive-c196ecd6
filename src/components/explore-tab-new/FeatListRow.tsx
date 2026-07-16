@@ -1,11 +1,14 @@
 import { useMemo } from 'react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { TierGem } from '@/components/shared/TierGem';
 import { rowToPar, toParText, type FeatRow, type FeatTier, type RecordsMode } from './hooks/useRegionFeats';
 import { SC_FILL_GOLD, INK as INK_TOKEN } from '@/features/courses/components/holes/_constants';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const AMBER = '#F7931E';
+const INK = '#0F172A';
+const INK_SUB = 'rgba(15,23,42,0.5)';
+const INK_LABEL = 'rgba(15,23,42,0.4)';
+const INK_RANK = 'rgba(15,23,42,0.35)';
 
 function formatHolderName(raw?: string | null): string {
   const s = (raw ?? '').trim();
@@ -54,8 +57,10 @@ interface Props {
   maxCount?: number | null;
 }
 
-// Birdie hauls leaderboard row - gaming-light Discover rebuild spec 3F.
-export function FeatListRow({ row, tier, onTap, index = 0, medals, mode = 'latest', bestToPar = null, maxCount = null }: Props) {
+// Canonical sheet/page leaderboard row. Refinement token spec applied:
+// rank 11/600, name 13/600, subline 11/500, value 15/700 (amber champion,
+// ink others), microlabel 9/600/0.06em, bar 3px solid amber (8% floor).
+export function FeatListRow({ row, tier, onTap, index = 0, mode = 'latest', bestToPar = null, maxCount = null }: Props) {
   const holder = useMemo(() => formatHolderName(row.holder_name), [row.holder_name]);
   const when = relDate(row.play_date ?? row.attained_at ?? null);
   const rank = index + 1;
@@ -71,7 +76,7 @@ export function FeatListRow({ row, tier, onTap, index = 0, medals, mode = 'lates
   const anchor = bestToPar ?? 0;
   const span = WORST - anchor;
   const recordsBarPct = showToParPrimary && d != null
-    ? Math.max(0.06, Math.min(1, (WORST - d) / (span || 1)))
+    ? Math.max(0.08, Math.min(1, (WORST - d) / (span || 1)))
     : 0;
 
   // Birdie hauls: count-proportional bar with 8% floor.
@@ -84,20 +89,12 @@ export function FeatListRow({ row, tier, onTap, index = 0, medals, mode = 'lates
 
   const showRecordsBar = showToParPrimary;
   const showBirdieBar = isBirdieHauls && maxCount != null && maxCount > 0;
-  // Bars mean magnitude, always. Eagles recent rows have no magnitude,
-  // so they never get a bar (page or sheet).
   const showBar = showRecordsBar || showBirdieBar;
   const barPct = showRecordsBar ? recordsBarPct : birdieBarPct;
-  const barGradient = 'linear-gradient(90deg, #F7931E, #FBBC2E)';
   void mode;
-  // Hide date line for records (existing) and birdie_hauls (new spec).
   const showDate = !!when && !isRecordsRow && !isBirdieHauls;
 
   // Value + label vary by tier.
-  // - records: gross score / GROSS
-  // - eagles: hole number (extracted from feat_value) / HOLE
-  // - legendary (aces + albatrosses): hole number / HOLE
-  // - birdie_hauls: birdie count / BIRDIES
   const { value, label } = useMemo(() => {
     const digits = (s: string | null | undefined): string => {
       const m = (s ?? '').match(/\d+/);
@@ -109,12 +106,14 @@ export function FeatListRow({ row, tier, onTap, index = 0, medals, mode = 'lates
     }
     if (tier === 'eagles' || tier === 'legendary') {
       const v = digits(row.feat_value) || (row.value != null ? String(row.value) : '');
-      return { value: v || '—', label: 'Hole' };
+      return { value: v || '—', label: 'HOLE' };
     }
     // birdie_hauls
     const v = (row.feat_value ?? (row.value != null ? String(row.value) : '')).replace(/[^\d.]/g, '');
     return { value: v || '—', label: 'BIRDIES' };
   }, [tier, row.feat_value, row.value]);
+
+  const valueColor = isTop ? AMBER : INK;
 
   return (
     <button
@@ -130,8 +129,8 @@ export function FeatListRow({ row, tier, onTap, index = 0, medals, mode = 'lates
         padding: '10px 12px',
         background: isTop ? 'linear-gradient(100deg, #fff, #fff6e8)' : '#fff',
         border: isTop
-          ? '1px solid rgba(247,147,30,0.3)'
-          : '1px solid rgba(15,23,42,0.07)',
+          ? '1px solid rgba(247,147,30,0.55)'
+          : '0.5px solid rgba(15,23,42,0.08)',
         marginBottom: 6,
         cursor: 'pointer',
         fontFamily: FONT,
@@ -140,13 +139,13 @@ export function FeatListRow({ row, tier, onTap, index = 0, medals, mode = 'lates
       <div style={{ display: 'flex', alignItems: 'center', gap: 11, minWidth: 0 }}>
         <div
           style={{
-            width: 24,
+            width: 20,
             textAlign: 'center',
             flexShrink: 0,
-            fontSize: 14,
-            fontWeight: 900,
+            fontSize: 11,
+            fontWeight: 600,
             fontVariantNumeric: 'tabular-nums',
-            color: isTop ? AMBER : '#94A3B8',
+            color: isTop ? AMBER : INK_RANK,
             lineHeight: 1,
           }}
         >
@@ -173,8 +172,9 @@ export function FeatListRow({ row, tier, onTap, index = 0, medals, mode = 'lates
             <div
               style={{
                 fontSize: 13,
-                fontWeight: 700,
-                color: '#0F172A',
+                fontWeight: 600,
+                color: INK,
+                letterSpacing: '-0.01em',
                 lineHeight: 1.2,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -189,9 +189,9 @@ export function FeatListRow({ row, tier, onTap, index = 0, medals, mode = 'lates
               <span
                 style={{
                   flexShrink: 0,
-                  fontSize: 8,
-                  fontWeight: 800,
-                  letterSpacing: '0.08em',
+                  fontSize: 9,
+                  fontWeight: 700,
+                  letterSpacing: '0.06em',
                   padding: '3px 7px',
                   borderRadius: 999,
                   background: SC_FILL_GOLD,
@@ -207,9 +207,9 @@ export function FeatListRow({ row, tier, onTap, index = 0, medals, mode = 'lates
           <div
             style={{
               marginTop: 2,
-              fontSize: 10.5,
-              fontWeight: 600,
-              color: 'rgba(15,23,42,0.42)',
+              fontSize: 11,
+              fontWeight: 500,
+              color: INK_SUB,
               lineHeight: 1.2,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -222,9 +222,9 @@ export function FeatListRow({ row, tier, onTap, index = 0, medals, mode = 'lates
             <div
               style={{
                 marginTop: 2,
-                fontSize: 10.5,
-                fontWeight: 600,
-                color: 'rgba(15,23,42,0.42)',
+                fontSize: 11,
+                fontWeight: 500,
+                color: INK_SUB,
                 lineHeight: 1.2,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -250,11 +250,11 @@ export function FeatListRow({ row, tier, onTap, index = 0, medals, mode = 'lates
             <>
               <div
                 style={{
-                  fontSize: 8,
-                  fontWeight: 800,
-                  letterSpacing: '0.1em',
+                  fontSize: 9,
+                  fontWeight: 600,
+                  letterSpacing: '0.06em',
                   textTransform: 'uppercase',
-                  color: '#94A3B8',
+                  color: INK_LABEL,
                   lineHeight: 1,
                 }}
               >
@@ -262,10 +262,10 @@ export function FeatListRow({ row, tier, onTap, index = 0, medals, mode = 'lates
               </div>
               <div
                 style={{
-                  marginTop: 2,
+                  marginTop: 3,
                   fontSize: 15,
-                  fontWeight: 900,
-                  color: '#0F172A',
+                  fontWeight: 700,
+                  color: valueColor,
                   lineHeight: 1,
                   fontVariantNumeric: 'tabular-nums',
                 }}
@@ -277,12 +277,12 @@ export function FeatListRow({ row, tier, onTap, index = 0, medals, mode = 'lates
             <>
               <div
                 style={{
-                  fontSize: 20,
-                  fontWeight: 900,
+                  fontSize: 15,
+                  fontWeight: 700,
                   lineHeight: 1,
-                  letterSpacing: '-0.02em',
+                  letterSpacing: '-0.01em',
                   fontVariantNumeric: 'tabular-nums',
-                  color: d! < 0 ? '#D2222D' : '#0F172A',
+                  color: valueColor,
                 }}
               >
                 {toParText(d!)}
@@ -290,11 +290,11 @@ export function FeatListRow({ row, tier, onTap, index = 0, medals, mode = 'lates
               <div
                 style={{
                   marginTop: 3,
-                  fontSize: 8,
-                  fontWeight: 800,
-                  letterSpacing: '0.09em',
+                  fontSize: 9,
+                  fontWeight: 600,
+                  letterSpacing: '0.06em',
                   textTransform: 'uppercase',
-                  color: '#94A3B8',
+                  color: INK_LABEL,
                   lineHeight: 1,
                   whiteSpace: 'nowrap',
                 }}
@@ -307,8 +307,8 @@ export function FeatListRow({ row, tier, onTap, index = 0, medals, mode = 'lates
               <div
                 style={{
                   fontSize: 15,
-                  fontWeight: 900,
-                  color: '#0F172A',
+                  fontWeight: 700,
+                  color: valueColor,
                   lineHeight: 1,
                   fontVariantNumeric: 'tabular-nums',
                 }}
@@ -317,12 +317,12 @@ export function FeatListRow({ row, tier, onTap, index = 0, medals, mode = 'lates
               </div>
               <div
                 style={{
-                  marginTop: 2,
-                  fontSize: 8,
-                  fontWeight: 800,
-                  letterSpacing: '0.1em',
+                  marginTop: 3,
+                  fontSize: 9,
+                  fontWeight: 600,
+                  letterSpacing: '0.06em',
                   textTransform: 'uppercase',
-                  color: '#94A3B8',
+                  color: INK_LABEL,
                   lineHeight: 1,
                 }}
               >
@@ -338,7 +338,7 @@ export function FeatListRow({ row, tier, onTap, index = 0, medals, mode = 'lates
           <div
             style={{
               width: '100%',
-              height: 4,
+              height: 3,
               borderRadius: 999,
               background: 'rgba(15,23,42,0.08)',
               overflow: 'hidden',
@@ -349,7 +349,7 @@ export function FeatListRow({ row, tier, onTap, index = 0, medals, mode = 'lates
                 width: `${barPct * 100}%`,
                 height: '100%',
                 borderRadius: 999,
-                background: barGradient,
+                background: AMBER,
                 transition: 'width .35s cubic-bezier(.2,.8,.2,1)',
               }}
             />
