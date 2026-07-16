@@ -145,7 +145,7 @@ export function LeadStory({ region, regionUpper, mode }: Props) {
               whiteSpace: 'nowrap',
             }}
           >
-            View all \u203A
+            View all ›
           </span>
         </div>
 
