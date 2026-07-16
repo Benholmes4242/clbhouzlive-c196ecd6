@@ -8,6 +8,8 @@ import { toast } from '@/lib/toast';
 import { fetchUserDrafts, deleteDraft } from '@/services/drafts/draftService';
 import type { DraftWithMedia } from '@/services/drafts/types';
 import WatchEmptyState from '@/components/watch/shared/WatchEmptyState';
+import { formatDateNumeric } from '@/i18n/format';
+
 
 const INK = '#1C1C1E';
 const INK_2 = '#0F172A';
@@ -40,7 +42,7 @@ function relativeTime(iso: string): string {
   if (h < 24) return `${h}h ago`;
   const d = Math.floor(h / 24);
   if (d < 7) return `${d}d ago`;
-  return new Date(iso).toLocaleDateString();
+  return formatDateNumeric(iso);
 }
 
 function sortByUpdated(list: DraftWithMedia[]): DraftWithMedia[] {

@@ -24,6 +24,8 @@ import {
 } from 'lucide-react';
 import { useScheduledPosts, type ScheduledPost } from '@/hooks/useScheduledPosts';
 import { ScheduleSheet } from './ScheduleSheet';
+import { formatScheduleDateTime } from '@/i18n/format';
+
 
 const INK = '#1C1C1E';
 const INK_2 = '#0F172A';
@@ -45,14 +47,9 @@ interface ScheduledPostsSheetProps {
 function formatLocal(iso: string): string {
   const d = new Date(iso);
   if (!Number.isFinite(d.getTime())) return '';
-  return d.toLocaleString(undefined, {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-  });
+  return formatScheduleDateTime(d);
 }
+
 
 export function ScheduledPostsSheet({ open, onClose }: ScheduledPostsSheetProps) {
   const {

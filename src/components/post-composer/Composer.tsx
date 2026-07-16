@@ -39,6 +39,8 @@ import { TaggedCoursesSheet } from './TaggedCoursesSheet';
 import { MediaStage } from './MediaStage';
 import { MediaEditor } from './MediaEditor';
 import { ScheduleSheet } from './ScheduleSheet';
+import { formatScheduleDateTime } from '@/i18n/format';
+
 import { bakeFrameCrop } from './bakeFrameCrop';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import {
@@ -902,13 +904,8 @@ export function Composer({
     // Scheduled posts get an immediate scheduling toast here; "live" toasts
     // are owned by UploadToastsBridge on upload:complete.
     if (scheduledAt) {
-      const when = scheduledAt.toLocaleString(undefined, {
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-      });
+      const when = formatScheduleDateTime(scheduledAt);
+
       toast.success(`Scheduled for ${when}`);
       queryClient.invalidateQueries({ queryKey: ['scheduled-posts'] });
       queryClient.invalidateQueries({ queryKey: ['scheduled-posts-count'] });
