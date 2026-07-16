@@ -12,7 +12,7 @@
  */
 
 import React from 'react';
-import { format } from 'date-fns';
+import { formatMonthDay, formatNumber } from '@/i18n/format';
 import { ChevronRight, Crown, Trophy } from 'lucide-react';
 import {
   CINEMATIC_FRAME_HEIGHT,
