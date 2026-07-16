@@ -407,7 +407,7 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
                 opacity: busy ? 0.4 : 1,
               }}
             >
-              Create group
+              {t('action.createGroup')}
             </button>
           )}
         </div>
