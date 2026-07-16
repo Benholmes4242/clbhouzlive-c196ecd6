@@ -155,9 +155,11 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
           }}
         >
           <SectionHead
-            overline={`The feed · ${regionUpper}`}
+            overline="The feed"
+            subline={regionUpper}
             title="On the course"
           />
+
           <ExploreGrid
             posts={posts}
             coursePosts={coursePosts}
