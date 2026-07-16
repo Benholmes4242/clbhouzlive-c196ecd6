@@ -65,9 +65,10 @@ export function LeadStory({ region, regionUpper, mode }: Props) {
   const grossText =
     numericValue != null ? String(numericValue) : record.feat_value ?? '';
 
-  const overline = mode === 'alltime'
-    ? `Deepest record · All time · ${regionUpper}`
-    : `Latest course record · ${regionUpper}`;
+  const overlineLabel = mode === 'alltime'
+    ? 'Deepest record · All time'
+    : 'Latest course record';
+  const regionLine = regionUpper;
 
   const bgImage = image
     ? `linear-gradient(180deg, rgba(15,23,42,0) 40%, rgba(15,23,42,0.72) 100%), url("${image}")`
@@ -123,17 +124,34 @@ export function LeadStory({ region, regionUpper, mode }: Props) {
             position: 'relative',
           }}
         >
-          <div
-            style={{
-              fontSize: 10.5,
-              fontWeight: 600,
-              letterSpacing: '0.06em',
-              textTransform: 'uppercase',
-              color: GOLD,
-              lineHeight: 1,
-            }}
-          >
-            {overline}
+          <div>
+            <div
+              style={{
+                fontSize: 10.5,
+                fontWeight: 600,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+                color: GOLD,
+                lineHeight: 1,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {overlineLabel}
+            </div>
+            <div
+              style={{
+                marginTop: 2,
+                fontSize: 9,
+                fontWeight: 600,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+                color: 'rgba(255,255,255,0.55)',
+                lineHeight: 1,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {regionLine}
+            </div>
           </div>
           <span
             style={{
