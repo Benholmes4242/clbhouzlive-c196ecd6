@@ -132,7 +132,7 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
   };
 
   const dateValue = rating.updated_at || rating.created_at;
-  const dateLabel = format(new Date(dateValue), 'MMM d, yyyy');
+  const dateLabel = formatMonthDayYearShort(new Date(dateValue));
 
   const categories = [
     { label: 'Design', score: rating.design_score },
