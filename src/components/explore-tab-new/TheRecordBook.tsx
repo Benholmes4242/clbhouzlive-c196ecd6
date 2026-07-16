@@ -21,20 +21,20 @@ const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const INK = '#0F172A';
 const PANEL_BG = 'linear-gradient(180deg, #FCF8F0 0%, #F7F1E4 100%)';
 const PANEL_BORDER = '0.5px solid rgba(158,115,0,0.18)';
-const PANEL_SHADOW = '0 2px 14px rgba(15,23,42,0.05)';
+const PANEL_SHADOW = '0 1px 3px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.05)';
 const GOLD = '#FBBC2E';
 const PARCHMENT_GOLD = '#B8860B';
 const AMBER = '#F7931E';
 const UNDER_PAR = '#D2222D';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
 const CONQUEST_HAIRLINE = 'rgba(15,23,42,0.1)';
-const MUTED = 'rgba(15,23,42,0.5)';
+const MUTED = 'rgba(15,23,42,0.45)';
 const FADED = 'rgba(15,23,42,0.35)';
-const GHOST = 'rgba(15,23,42,0.4)';
-const CHIP_BG = 'rgba(15,23,42,0.035)';
-const CHIP_BORDER = 'rgba(15,23,42,0.08)';
+const GHOST = 'rgba(15,23,42,0.45)';
+const CHIP_BG = 'rgba(15,23,42,0.04)';
 const TRACK_BG = 'rgba(15,23,42,0.08)';
 const AVATAR_RING_MUTED = 'rgba(15,23,42,0.2)';
+const CHEVRON_COLOR = 'rgba(15,23,42,0.3)';
 
 const REGION_HUMAN: Record<string, string> = {
   'uk-ireland': 'GB&I',
@@ -93,7 +93,7 @@ function gapCopy(category: string, gap: number): string {
 }
 function categoryLabel(category: string): string {
   const base = stripWindow(category);
-  return (CATEGORY_META[base]?.label ?? base.replace(/_/g, ' ')).toUpperCase();
+  return CATEGORY_META[base]?.label ?? base.replace(/_/g, ' ');
 }
 function progressPct(_category: string, gap: number): number {
   const n = Math.max(1, Math.round(gap));
@@ -135,8 +135,8 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
         style={{
           background: PANEL_BG,
           border: PANEL_BORDER,
-          borderRadius: 20,
-          padding: '16px 16px 14px',
+          borderRadius: 16,
+          padding: '16px 0 14px',
           fontFamily: FONT,
           color: INK,
           boxShadow: PANEL_SHADOW,
@@ -149,14 +149,15 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
             alignItems: 'baseline',
             justifyContent: 'space-between',
             gap: 12,
+            padding: '0 16px',
           }}
         >
           <div style={{ minWidth: 0, flex: 1 }}>
             <div
               style={{
-                fontSize: 10,
-                fontWeight: 800,
-                letterSpacing: '0.14em',
+                fontSize: 10.5,
+                fontWeight: 600,
+                letterSpacing: '0.06em',
                 textTransform: 'uppercase',
                 color: MUTED,
                 lineHeight: 1,
@@ -167,11 +168,11 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
             <div
               style={{
                 marginTop: 6,
-                fontSize: 19,
-                fontWeight: 800,
-                letterSpacing: '-0.01em',
+                fontSize: 17,
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
                 color: INK,
-                lineHeight: 1.1,
+                lineHeight: 1.15,
               }}
             >
               The record book
@@ -187,10 +188,9 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
               padding: 0,
               cursor: 'pointer',
               color: AMBER,
-              fontSize: 11.5,
-              fontWeight: 800,
+              fontSize: 12,
+              fontWeight: 600,
               fontFamily: FONT,
-              letterSpacing: '-0.005em',
               whiteSpace: 'nowrap',
             }}
           >
@@ -198,8 +198,30 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
           </button>
         </div>
 
+        {/* Column caption row */}
+        <div
+          style={{
+            marginTop: 12,
+            padding: '0 16px 0 64px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            fontSize: 9,
+            fontWeight: 600,
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+            color: 'rgba(15,23,42,0.35)',
+            lineHeight: 1,
+          }}
+        >
+          <div style={{ flex: 1, minWidth: 0 }}>Course</div>
+          <div style={{ width: 44, textAlign: 'right' }}>To par</div>
+          <div style={{ width: 34, textAlign: 'right' }}>Gross</div>
+          <div style={{ width: 12 }} aria-hidden />
+        </div>
+
         {/* Ledger */}
-        <div style={{ marginTop: 10 }}>
+        <div style={{ marginTop: 6 }}>
           {ledgerRows.map((row, i) => (
             <LedgerRow
               key={`${row.course_id ?? i}-${i}`}
