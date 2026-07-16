@@ -185,7 +185,9 @@ export const SharedHoleCard: React.FC<SharedHoleCardProps> = ({
 
   const playsTo = (hole.par + hole.avg_to_par).toFixed(1);
 
-  const countText = `${formatNumber(hole.rounds)} ${countLabel}`;
+  const countText = countLabel === 'players'
+    ? t('courses:holes.players', { count: hole.rounds, formattedCount: formatNumber(hole.rounds) })
+    : t('courses:holes.rounds', { count: hole.rounds, formattedCount: formatNumber(hole.rounds) });
 
   return (
     <div
