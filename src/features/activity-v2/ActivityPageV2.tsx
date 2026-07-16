@@ -241,7 +241,9 @@ export const ActivityPageV2: React.FC = () => {
           key={c.key}
           active={chip === c.key}
           label={c.label}
-          count={c.key === 'new' ? unreadCount : undefined}
+          // "New" chip count equals the highlighted rows on screen (same
+          // definition as bucketise -> !is_read) so the two never drift.
+          count={c.key === 'new' ? buckets.new.length : undefined}
           onClick={() => setChip(c.key)}
         />
       ))}

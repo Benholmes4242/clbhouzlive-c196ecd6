@@ -13,7 +13,8 @@
 
 import React from 'react';
 import { Sparkles, Mail, Bell } from 'lucide-react';
-import { useActorUnreadCounts } from '@/hooks/useActorUnreadCounts';
+import { useConversations } from '@/hooks/messaging/useConversations';
+import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 
 const INK = '#0F172A';
 const AMBER = '#F7931E';
@@ -83,12 +84,15 @@ function Tile({ label, icon, badge, onClick }: TileProps) {
 }
 
 export default function QuickActionsRow({ actorType, actorId, onNavigate }: Props) {
-  const { countFor } = useActorUnreadCounts();
-  const actorTotal = countFor(actorType, actorId);
-  // ActorCards displays actorTotal as a single per-card badge. The row's
-  // Messages and Alerts tiles reuse the SAME per-actor total so the two
-  // surfaces never disagree; we don't have a per-channel split available.
-  const badge = actorTotal;
+  // Messages: sum of per-conversation unread from the same RPC the inbox uses,
+  // so the badge cannot drift from what the Messages page renders.
+  const { conversations } = useConversations();
+  const messagesBadge = (conversations ?? []).reduce(
+    (sum, c) => sum + (c.unread_count ?? 0),
+    0,
+  );
+  // Alerts: notifications-only for the active actor (bell definition).
+  const { unreadCount: alertsBadge } = useUnreadNotifications();
 
   return (
     <div style={{ display: 'flex', gap: 8, padding: '12px 20px 0' }}>
@@ -100,13 +104,13 @@ export default function QuickActionsRow({ actorType, actorId, onNavigate }: Prop
       <Tile
         label="Messages"
         icon={<Mail size={17} color={INK} />}
-        badge={badge}
+        badge={messagesBadge}
         onClick={() => onNavigate('/messages')}
       />
       <Tile
         label="Alerts"
         icon={<Bell size={17} color={INK} />}
-        badge={badge}
+        badge={alertsBadge}
         onClick={() => onNavigate('/notificationmessages')}
       />
     </div>
