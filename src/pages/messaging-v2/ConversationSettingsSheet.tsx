@@ -266,12 +266,12 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
 
   return (
     <BottomSheet open={open} onClose={onClose} zIndexBase={1500}>
-      <SheetHeader title="Details" onClose={onClose} />
+      <SheetHeader title={t('messaging:sheet.detailsTitle')} onClose={onClose} />
 
       <div style={{ background: CANVAS, paddingBottom: 32 }}>
         {isLoading || !detail ? (
           <div style={{ padding: 32, textAlign: 'center', color: SUB, fontSize: 14 }}>
-            Loading...
+            {t('common:state.loading')}
           </div>
         ) : (
           <>
