@@ -313,15 +313,42 @@ function AmateurCircuitHeroInner({ fallback }: AmateurCircuitHeroProps) {
   const opener = useScorecardOpener();
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  // Latched once per mount as soon as stories arrive. Never re-rolled on
+  // re-renders (lens flips, scroll, parent updates) because the effect
+  // early-returns once the ref is set.
+  const initialIdxRef = useRef<number | null>(null);
 
   const stories = data ?? [];
   const count = stories.length;
 
-  // Preload slide 2's image once slide 1 exists
+  // Pick a random entry slide once per mount, jump to it instantly
+  // (no scroll animation), and sync the dot state. Runs BEFORE paint so
+  // the user lands on the chosen slide rather than watching it travel.
+  useLayoutEffect(() => {
+    if (initialIdxRef.current !== null || count === 0) return;
+    const idx = count === 1 ? 0 : Math.floor(Math.random() * count);
+    initialIdxRef.current = idx;
+    if (idx !== 0) {
+      const el = scrollerRef.current;
+      if (el) {
+        el.scrollTo({ left: idx * el.clientWidth, behavior: 'auto' });
+      }
+      setActiveIndex(idx);
+    }
+  }, [count]);
+
+  // Preload the immediate neighbours of the entry slide (clamped) so
+  // the very first swipe in either direction has a warm image.
   useEffect(() => {
-    if (count >= 2 && stories[1]?.image) {
-      const img = new Image();
-      img.src = stories[1].image;
+    const idx = initialIdxRef.current;
+    if (idx == null || count < 2) return;
+    for (const n of [idx - 1, idx + 1]) {
+      if (n < 0 || n >= count || n === idx) continue;
+      const src = stories[n]?.image;
+      if (src) {
+        const img = new Image();
+        img.src = src;
+      }
     }
   }, [count, stories]);
 
