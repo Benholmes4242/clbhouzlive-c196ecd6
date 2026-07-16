@@ -13,6 +13,7 @@
     "filterAll": "[~~Áļļ~~]",
     "filterPhotos": "[~~Ƥĥőţőš~~]",
     "filterVideos": "[~~Ṽíđéőš~~]",
+    "filterA11y": "[~~Ṁéđíá ƒíļţéř~~]",
     "addMediaA11y": "[~~Áđđ ɱéđíá~~]",
     "guide": {
       "kicker": "[~~Ŵĥáţ ţő šĥářé~~]",
@@ -38,10 +39,10 @@
     "overPar": "[~~Őṽéř-ƥář~~]",
     "avgToPar": "[~~ÁṼĜ ŢŐ ƤÁŘ~~]",
     "playsTo": "[~~ƤĻÁÝŠ ŢŐ <1>{{playsTo}}</1>~~]",
-    "rounds_one": "[~~{{count}} řőúñđ~~]",
-    "rounds_other": "[~~{{count}} řőúñđš~~]",
-    "players_one": "[~~{{count}} ƥļáýéř~~]",
-    "players_other": "[~~{{count}} ƥļáýéřš~~]"
+    "rounds_one": "[~~{{formattedCount}} řőúñđ~~]",
+    "rounds_other": "[~~{{formattedCount}} řőúñđš~~]",
+    "players_one": "[~~{{formattedCount}} ƥļáýéř~~]",
+    "players_other": "[~~{{formattedCount}} ƥļáýéřš~~]"
   },
   "scorecard": {
     "syncingTitle": "[~~Šĉőřéĉářđ őñ ţĥé ŵáý~~]",
