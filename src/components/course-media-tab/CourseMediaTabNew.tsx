@@ -51,9 +51,9 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
           <Camera className="w-7 h-7 text-muted-foreground/40" />
         </div>
         <div>
-          <p className="text-base font-semibold text-foreground">Sign in to view media</p>
+          <p className="text-base font-semibold text-foreground">{t('courses:media.signInTitle')}</p>
           <p className="text-sm text-muted-foreground">
-            See photos and videos from golfers who've played here.
+            {t('courses:media.signInBody')}
           </p>
         </div>
         <button
@@ -61,7 +61,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
           onClick={() => navigate('/auth')}
           className="h-11 px-6 rounded-xl bg-[#f59e0b] text-white text-sm font-semibold hover:bg-[#e8920f] active:scale-[0.97] transition-all"
         >
-          Sign in
+          {t('courses:media.signInCta')}
         </button>
       </div>
     );
