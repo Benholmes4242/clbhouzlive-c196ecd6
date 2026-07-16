@@ -20,7 +20,7 @@
  */
 import { useRef } from 'react';
 import { FormatBadge } from '@/features/watch-v2/components/FormatBadge';
-import { formatCount } from '@/features/watch-v2/utils/formatCount';
+import { formatCountShort as formatCount } from '@/i18n/format';
 import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
 import { stripMentionMarkup } from '@/lib/mentions/format';
 import Pressable from '@/components/ui/Pressable';
