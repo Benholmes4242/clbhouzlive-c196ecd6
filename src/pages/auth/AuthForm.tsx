@@ -393,7 +393,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
       <AuthBottomSheet
         isOpen={isSheetOpen}
         onClose={handleUseDifferentEmail}
-        title="Check your email"
+        title={t('otp.checkEmailTitle')}
         subtitle={undefined}
       >
         <OtpSheetContent
