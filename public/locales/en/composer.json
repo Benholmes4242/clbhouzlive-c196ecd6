@@ -1,0 +1,18 @@
+{
+  "schedule": {
+    "today": "Today",
+    "tomorrow": "Tomorrow"
+  },
+  "success": {
+    "posted": "Posted",
+    "postedBody": "It is live. Pull to refresh if you don't see it yet.",
+    "scheduled": "Scheduled",
+    "scheduledFor": "Scheduled for {{when}}",
+    "scheduledBody": "It is queued and will go out on time.",
+    "posting": "Posting...",
+    "uploadingBody": "Uploading - we'll take it from here. You can keep using the app.",
+    "uploadingScheduledBody": "Uploading - it'll go out {{when}}.",
+    "uploadFailed": "Upload failed",
+    "uploadFailedFallback": "Something went wrong - your post was not published."
+  }
+}
