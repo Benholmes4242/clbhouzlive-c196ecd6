@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '../_shared/resolvePlayerAvatar';
 import type { RankedRow } from './data/usePlayersRanking';
+import { formatNumberMaxFrac } from '@/i18n/format';
 import {
   GOLD,
   GOLD_BORDER,
