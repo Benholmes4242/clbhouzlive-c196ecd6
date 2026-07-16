@@ -9,6 +9,8 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { X, Calendar as CalendarIcon, Clock } from 'lucide-react';
+import { formatScheduleDateTime } from '@/i18n/format';
+
 
 const INK = '#1C1C1E';
 const INK_2 = '#0F172A';
@@ -41,14 +43,9 @@ function toLocalInputValue(d: Date): string {
 }
 
 function formatLocalReadable(d: Date): string {
-  return d.toLocaleString(undefined, {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-  });
+  return formatScheduleDateTime(d);
 }
+
 
 function tzLabel(): string {
   try {
