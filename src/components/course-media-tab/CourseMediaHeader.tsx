@@ -37,10 +37,10 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
   return (
     <div
       role="tablist"
-      aria-label="Media filter"
+      aria-label={t('courses:media.filterAll')}
       style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '16px 16px 12px' }}
     >
-      {FILTERS.map(({ key, label }) => {
+      {FILTER_KEYS.map(({ key, i18nKey }) => {
         const isActive = activeFilter === key;
         const count = countFor(key);
 
@@ -60,7 +60,7 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
               cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
             }}
           >
-            {label}
+            {t(i18nKey)}
             {hasMedia && (
               <span style={{
                 fontSize: 11, fontWeight: 800, fontVariantNumeric: 'tabular-nums',
@@ -76,7 +76,7 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
       {hasMedia && (
         <button
           onClick={() => navigate(`/courses/${courseId}/rate`)}
-          aria-label="Add media"
+          aria-label={t('courses:media.addMediaA11y')}
           style={{
             marginLeft: 'auto', width: 34, height: 34, borderRadius: 17,
             background: '#F7931E', color: '#FFFFFF', border: 'none',
