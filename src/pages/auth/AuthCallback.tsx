@@ -6,6 +6,7 @@ import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
 
 export default function AuthCallback() {
+  const { t } = useTranslation('auth');
   useHideBottomNav();
   useHideHeader();
 
