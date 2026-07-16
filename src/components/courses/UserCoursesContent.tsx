@@ -1,5 +1,6 @@
 
 import React, { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useUserCoursesData } from './user/useUserCoursesData';
 import { useTop100CoursesData } from '@/hooks/useTop100CoursesData';
 import { useMilestoneUnlockDates } from '@/hooks/useMilestoneUnlockDates';
