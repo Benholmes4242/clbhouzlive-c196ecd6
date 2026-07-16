@@ -41,6 +41,13 @@ export default function AppealsPage() {
     return () => window.removeEventListener('admin-v2:refetch', handler);
   }, [qc]);
 
+  const tabs = useMemo(() => [
+    { id: 'pending', label: 'Pending' },
+    { id: 'overturned', label: 'Overturned' },
+    { id: 'upheld', label: 'Upheld' },
+    { id: 'all', label: 'All' },
+  ], []);
+
   const setStatus = (id: string) => {
     const next = new URLSearchParams(params);
     next.set('status', id);
@@ -48,13 +55,6 @@ export default function AppealsPage() {
   };
 
   if (!caps.viewModeration) return <AdminAccessDenied />;
-
-  const tabs = useMemo(() => [
-    { id: 'pending', label: 'Pending' },
-    { id: 'overturned', label: 'Overturned' },
-    { id: 'upheld', label: 'Upheld' },
-    { id: 'all', label: 'All' },
-  ], []);
 
   const columns: DataListColumn<AppealRow>[] = [
     { key: 'appellant', header: 'Appellant', render: (r) => <AppellantCell row={r} /> },
