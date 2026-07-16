@@ -192,11 +192,13 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
 function LegendarySection({
   region,
   regionUpper,
+  mode,
   onRowTap,
   onLeaderTap,
 }: {
   region: string | null;
   regionUpper: string;
+  mode: RecordsMode;
   onRowTap: (row: FeatRow) => void;
   onLeaderTap: (uid: string) => void;
 }) {
@@ -213,9 +215,11 @@ function LegendarySection({
   return (
     <section style={{ marginTop: 32 }}>
       <SectionHead
-        overline={`Feats · ${regionUpper}`}
+        overline={mode === 'alltime' ? 'All-time feats' : 'Latest feats'}
+        subline={regionUpper}
         title="Moments of the game"
       />
+
       <AcesAlbatrossesPodium
         region={region}
         onViewAll={openSheet}
