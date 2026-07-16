@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useRegionFeats, sortRecordsAllTime, rowToPar, toParText, type FeatRow, type RecordsMode } from './hooks/useRegionFeats';
 import { TierSeeAllSheet } from './TierSeeAllSheet';
@@ -70,10 +70,20 @@ export function LeadStory({ region, regionUpper, mode }: Props) {
     : 'Latest course record';
   const regionLine = regionUpper;
 
-  const bgImage = image
-    ? `linear-gradient(180deg, rgba(15,23,42,0) 40%, rgba(15,23,42,0.72) 100%), url("${image}")`
-    : undefined;
-  const bgSolid = image ? undefined : 'linear-gradient(180deg, #3E5C3A, #23361F)';
+  // Crossfade image layers: mount incoming on top at opacity 0, fade to 1 on
+  // load, then unmount the outgoing. Prevents WKWebView white flash / relayout.
+  const [currentImage, setCurrentImage] = useState<string | null>(image);
+  const [previousImage, setPreviousImage] = useState<string | null>(null);
+  const [currentLoaded, setCurrentLoaded] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (image === currentImage) return;
+    setPreviousImage(currentImage);
+    setCurrentImage(image);
+    setCurrentLoaded(false);
+  }, [image, currentImage]);
+
+
 
   const handleRowTap = (row: FeatRow) => {
     if (row.score_id) opener.openByScore(row.score_id, null, row.user_id);
@@ -108,12 +118,70 @@ export function LeadStory({ region, regionUpper, mode }: Props) {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          background: bgImage ?? bgSolid,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
           boxShadow: '0 1px 3px rgba(15,23,42,0.06), 0 12px 32px rgba(15,23,42,0.14)',
         }}
       >
+        {/* Base gradient — always painted, prevents flash */}
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(180deg, #3E5C3A, #23361F)',
+          }}
+        />
+        {/* Image layers — crossfade on change */}
+        {previousImage ? (
+          <img
+            key={`prev-${previousImage}`}
+            src={previousImage}
+            alt=""
+            aria-hidden
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: 'center',
+              opacity: 1,
+            }}
+          />
+        ) : null}
+        {currentImage ? (
+          <img
+            key={`cur-${currentImage}`}
+            src={currentImage}
+            alt=""
+            aria-hidden
+            onLoad={() => {
+              setCurrentLoaded(true);
+              window.setTimeout(() => setPreviousImage(null), 260);
+            }}
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: 'center',
+              opacity: currentLoaded ? 1 : 0,
+              transition: 'opacity 250ms ease',
+            }}
+          />
+        ) : null}
+        {/* Dual scrim — above images, below content */}
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background:
+              'linear-gradient(180deg, rgba(15,23,42,0.55) 0%, rgba(15,23,42,0) 26%), linear-gradient(0deg, rgba(15,23,42,0.78) 0%, rgba(15,23,42,0) 45%)',
+            pointerEvents: 'none',
+          }}
+        />
+
         {/* Overline row */}
         <div
           style={{
@@ -124,6 +192,7 @@ export function LeadStory({ region, regionUpper, mode }: Props) {
             position: 'relative',
           }}
         >
+
           <div>
             <div
               style={{
