@@ -146,7 +146,7 @@ export default function AuthCallback() {
           alt="clbhouz"
           className="h-10 w-auto opacity-80"
         />
-        <div className="w-6 h-6 border-2 rounded-full animate-spin" style={{ borderColor: 'rgba(15,23,42,0.10)', borderTopColor: '#0F172A' }} aria-label="Loading" />
+        <div className="w-6 h-6 border-2 rounded-full animate-spin" style={{ borderColor: 'rgba(15,23,42,0.10)', borderTopColor: '#0F172A' }} aria-label={t('a11y.loading')} />
         <p className="text-sm" style={{ color: '#64748B' }} aria-live="polite">{message}</p>
       </div>
     </div>
