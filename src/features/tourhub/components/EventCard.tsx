@@ -39,7 +39,7 @@ export function EventCard({
   className,
 }: EventCardProps) {
   const displayTour = tourLabel || TOUR_LABELS[tour] || tour;
-  const dateRange = `${format(new Date(startDate), 'MMM d')} – ${format(new Date(endDate), 'd, yyyy')}`;
+  const dateRange = formatTournamentDateRange(startDate, endDate) ?? '';
   
   return (
     <Link
