@@ -49,7 +49,7 @@ export function CourseStatsStrip({
 }: CourseStatsStripProps) {
   const summaryParts: string[] = [];
   if (par) summaryParts.push(`Par ${par}`);
-  if (yardage) summaryParts.push(`${yardage.toLocaleString()} yds`);
+  if (yardage) summaryParts.push(`${formatNumber(yardage)} yds`);
   const summary = summaryParts.join(' · ') || 'Course preview';
 
   return (
