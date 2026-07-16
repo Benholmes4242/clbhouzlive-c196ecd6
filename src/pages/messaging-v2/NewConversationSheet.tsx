@@ -168,7 +168,7 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
 
   return (
     <BottomSheet open={open} onClose={handleClose} zIndexBase={1400}>
-      <SheetHeader title="New message" onClose={handleClose} />
+      <SheetHeader title={t('action.newMessage')} onClose={handleClose} />
 
       <div style={{ background: CANVAS, paddingBottom: 12 }}>
         {/* Selected chips */}

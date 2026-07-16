@@ -305,7 +305,7 @@ const ThreadV2Page: React.FC = () => {
       >
         <button
           type="button"
-          aria-label="Back"
+          aria-label={t('a11y.back')}
           onClick={() => {
             // Prefer real back so we don't push a duplicate /messages entry
             // and trap the user in an inbox ↔ thread loop.
@@ -355,7 +355,7 @@ const ThreadV2Page: React.FC = () => {
         </div>
         <button
           type="button"
-          aria-label="More"
+          aria-label={t('a11y.more')}
           className="active:opacity-60"
           onClick={() => setSettingsOpen(true)}
           style={{

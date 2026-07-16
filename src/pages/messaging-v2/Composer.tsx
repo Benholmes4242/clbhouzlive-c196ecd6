@@ -116,7 +116,7 @@ export const Composer: React.FC<Props> = ({
     >
       <button
         type="button"
-        aria-label="Attach image"
+        aria-label={t('a11y.attachImage')}
         onClick={handleAttach}
         disabled={disabled || picking}
         className="active:opacity-60"
@@ -162,7 +162,7 @@ export const Composer: React.FC<Props> = ({
 
       <button
         type="button"
-        aria-label="Send"
+        aria-label={t('a11y.send')}
         onClick={handleSend}
         disabled={!canSend}
         className={canSend ? 'active:opacity-80' : ''}

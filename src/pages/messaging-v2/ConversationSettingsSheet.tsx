@@ -350,7 +350,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                     <button
                       type="button"
                       onClick={() => setTitleEdit(detail.title ?? '')}
-                      aria-label="Edit title"
+                      aria-label={t('a11y.editTitle')}
                       style={{
                         background: 'transparent',
                         border: 'none',
@@ -483,7 +483,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                         <button
                           type="button"
                           onClick={() => setRowMenu(rowMenu === key ? null : key)}
-                          aria-label="Member actions"
+                          aria-label={t('a11y.memberActions')}
                           style={{
                             background: 'transparent',
                             border: 'none',
@@ -753,7 +753,7 @@ const AddPeopleSheet: React.FC<AddPeopleSheetProps> = ({
 
   return (
     <BottomSheet open={open} onClose={handleClose} zIndexBase={1600}>
-      <SheetHeader title="Add people" onClose={handleClose} />
+      <SheetHeader title={t('action.addPeople')} onClose={handleClose} />
       <div style={{ background: CANVAS, paddingBottom: 16 }}>
         {selected.length > 0 ? (
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', padding: '10px 16px 4px' }}>

@@ -142,7 +142,7 @@ export const MessageBubble: React.FC<Props> = ({
         <button
           type="button"
           onClick={() => setShowReport(true)}
-          aria-label="Report message"
+          aria-label={t('a11y.reportMessage')}
           style={{ position: "absolute", left: -28, top: "50%", transform: "translateY(-50%)", background: "transparent", border: "none", padding: 4, color: HINT, cursor: "pointer" }}
         >
           <Flag size={14} />
