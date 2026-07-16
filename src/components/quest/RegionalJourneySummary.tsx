@@ -1,15 +1,14 @@
 /**
- * RegionalJourneySummary - Apple-level polish for regional list progress
- * V3: Larger badge images, better typography, more padding
+ * RegionalJourneySummary - Regional list progress rail.
  */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronRight, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { QuestEmptyState } from './QuestEmptyState';
 
-// Import region badge images
 import gbiBadgeImage from '@/assets/badges/gbi-badge.png';
 import europeBadgeImage from '@/assets/badges/europe-badge.png';
 import usaBadgeImage from '@/assets/badges/usa-badge.png';
@@ -28,7 +27,6 @@ interface RegionalJourneySummaryProps {
   onRegionClick?: (region: RegionProgress) => void;
 }
 
-// Region badge images
 const REGION_BADGE_IMAGES: Record<string, string> = {
   'gb-i': gbiBadgeImage,
   'europe': europeBadgeImage,
@@ -36,7 +34,6 @@ const REGION_BADGE_IMAGES: Record<string, string> = {
   'global': globalBadgeImage,
 };
 
-// Region accent colors
 const REGION_COLORS: Record<string, string> = {
   'gb-i': '#334E3D',
   'europe': '#64748B',
@@ -48,6 +45,7 @@ const RegionRow: React.FC<{
   region: RegionProgress;
   onClick?: () => void;
 }> = ({ region, onClick }) => {
+  const { t } = useTranslation('achievements');
   const progressPercent = region.total > 0 ? (region.played / region.total) * 100 : 0;
   const isComplete = region.played >= region.total && region.total > 0;
   const badgeImage = REGION_BADGE_IMAGES[region.id];
@@ -59,7 +57,6 @@ const RegionRow: React.FC<{
       className="w-full text-left py-5 transition-all hover:bg-slate-50/50 group"
     >
       <div className="flex items-center gap-4">
-        {/* Region badge image */}
         <div className="relative flex-shrink-0">
           <img
             src={badgeImage}
@@ -70,15 +67,13 @@ const RegionRow: React.FC<{
             )}
           />
         </div>
-        
-        {/* Content */}
+
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-bold text-[#1e293b]">
               {region.name}
             </span>
             <div className="flex items-center gap-3">
-              {/* Status pill */}
               <span
                 className="text-xs font-medium px-2.5 py-1 rounded-full"
                 style={{
@@ -94,26 +89,28 @@ const RegionRow: React.FC<{
                     : '#94a3b8',
                 }}
               >
-                {isComplete ? '✓ Complete' : region.played > 0 ? 'In progress' : 'Not started'}
+                {isComplete
+                  ? t('quest.regional.statusComplete')
+                  : region.played > 0
+                  ? t('quest.regional.statusInProgress')
+                  : t('quest.regional.statusNotStarted')}
               </span>
-              
-              {/* Counter */}
+
               <span className="text-sm font-semibold text-[#64748b] tabular-nums min-w-[50px] text-right">
                 {region.played}/{region.total}
               </span>
-              
+
               <ChevronRight className="w-4 h-4 text-[#94a3b8] transition-transform group-hover:translate-x-0.5" />
             </div>
           </div>
 
-          {/* Progress bar */}
           <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
             <div
               className={cn(
                 "h-full rounded-full transition-all duration-500",
                 isComplete && "animate-quest-glow"
               )}
-              style={{ 
+              style={{
                 width: `${progressPercent}%`,
                 backgroundColor: accentColor,
                 opacity: region.played > 0 ? 1 : 0.3,
@@ -126,7 +123,6 @@ const RegionRow: React.FC<{
   );
 };
 
-// Map region IDs to their Top 100 page routes
 const REGION_ROUTES: Record<string, string> = {
   'gb-i': '/top100/gb-i',
   'europe': '/top100/europe',
@@ -137,6 +133,7 @@ const REGION_ROUTES: Record<string, string> = {
 export const RegionalJourneySummary: React.FC<RegionalJourneySummaryProps> = ({
   regions,
 }) => {
+  const { t } = useTranslation('achievements');
   const navigate = useNavigate();
 
   const handleRegionClick = (region: RegionProgress) => {
@@ -146,19 +143,18 @@ export const RegionalJourneySummary: React.FC<RegionalJourneySummaryProps> = ({
     }
   };
 
-  // Empty state
   if (!regions || regions.length === 0) {
     return (
       <section>
         <h2 className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500 mb-6">
-          Regional Progress
+          {t('quest.regional.sectionTitle')}
         </h2>
         <QuestEmptyState
           icon={<Globe className="w-8 h-8 text-[#64748b]" />}
-          title="Explore the World"
-          description="Track your progress across GB&I, Europe, USA and worldwide Top 100 lists"
+          title={t('quest.regional.emptyTitle')}
+          description={t('quest.regional.emptyDescription')}
           action={{
-            label: "View Top 100 Lists",
+            label: t('quest.regional.emptyCta'),
             onClick: () => navigate('/courses?tab=top100'),
           }}
         />
@@ -168,12 +164,10 @@ export const RegionalJourneySummary: React.FC<RegionalJourneySummaryProps> = ({
 
   return (
     <section>
-      {/* Section header */}
       <h2 className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500 mb-4">
-        Regional Progress
+        {t('quest.regional.sectionTitle')}
       </h2>
 
-      {/* Region rows with dividers */}
       <div className="bg-white rounded-2xl border border-slate-200/60 px-4">
         {regions.map((region, index) => (
           <React.Fragment key={region.id}>

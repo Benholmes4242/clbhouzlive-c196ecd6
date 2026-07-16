@@ -1,97 +1,108 @@
-## Goal
+# Wave 3c — Achievements + Quest extraction
 
-Harden the primitives that failed in the previous carousel warm attempt, ship them behind no behaviour change (no new neighbour warm), and prove `active.health` stays green under synthetic lane churn. Only after that evidence do we consider re-enabling the horizontal warm.
+## Scope receipts (BEFORE)
 
-## Scope (this PR only)
+Under the standard i18nLiteralOptions run against `src/components/achievements` and `src/components/quest`:
 
-1. Tighten `VideoEngine.preload()` with an **active-lane identity guard**.
-2. Normalize `InlineVideo.detectRoleForMatch()` so the two match-arms cannot both claim the same lane.
-3. Ship a dev-only **synthetic lane-churn harness** and a capture script.
-4. Update existing `CardFeed` cover warm callers to use the new guard (no new call sites added).
+- **94** `i18next/no-literal-string` warnings
+- **37** attribute-guard hits (`aria-label`/`title`/`placeholder`/`alt`/`label`)
+- Files with attr-guard hits: 16 (all 12 achievements/*, 6 quest/*)
 
-Explicitly **out of scope**: any `MediaCarousel` neighbour `preload()` write. `PrefetchController.request()` (HTTP cache only) stays as-is.
+Total extraction surface: **~131 literal sites** across **22 files** (~4,770 LOC).
 
-## Changes
+## Namespace + wiring
 
-### 1. `src/video/VideoEngine.ts` — `preload()` guard + discipline
+- New namespace: `achievements` at `public/locales/{en,de,es,ja,ko,en-XA}/achievements.json`
+- Register in `src/i18n/index.ts` `ns:` array
+- Common adoptions to prefer where texts match verbatim: `common:action.share`, `common:action.close`, `common:action.done`, `common:action.dismiss`, `common:state.loading`, `common:label.viewAll` (audit and adopt only on exact-string matches)
 
-New optional signature:
+## Key mint plan (~91 chrome strings)
 
-```text
-preload(laneId, {
-  hlsUrl, posterUrl, postId,
-  expectedActiveOwnerKey?: string,   // caller asserts this owns feed-active
-})
+Grouped under `achievements.*`:
+
+- `card.*` — AchievementCard chrome (progress bar labels, lock states)
+- `detail.*` — AchievementDetailModal (headers, tier ladder, unlock rules, share CTA)
+- `toast.*` — AchievementToast + LevelUpToast (unlock announcement, level-up copy, dismiss aria)
+- `levelUp.*` — LevelUpSheet + LevelUpGate (headline, subhead, tier reveal, continue CTA)
+- `elite.*` — EliteGameCard (mode headers, stat rows, empty states — the 1,513-line beast)
+- `nudge.*` — NudgeBanner (streak nudges, comeback prompts)
+- `season.*` — SeasonRecapModal (recap headline, stat labels, share)
+- `quest.hero.*` — TrophyRoomHero (progress, "to <club>", "Complete!", "Courses played")
+- `quest.ladder.*` — MilestoneLadder ("{{played}}/{{total}} played", "{{remaining}} away!")
+- `quest.leaderboard.*` — LeaderboardCard (headers, empty state, rank labels)
+- `quest.momentum.*` — MomentumCard (streak copy)
+- `quest.trophy.*` — TrophyCase (case chrome, filters)
+- `quest.recent.*` — RecentlyAddedSection (headers, empty state)
+- `quest.regional.*` — RegionalJourneySummary (region headers)
+- `quest.empty.*` — QuestEmptyState
+
+### Plurals to convert (ternary → `_one`/`_other`)
+
+Expected sites: `{{count}} days`, `{{count}} streak`, `{{count}} badges`, `{{count}} courses`, `{{count}} left`, `{{count}} played`. All will be split into `_one`/`_other` and switched via `t('key', { count })`.
+
+### `<Trans>` for mixed markup
+
+`{totalPlayed} of {nextThreshold} · <span>{nextClubName}</span>` (TrophyRoomHero:267) and similar composites will use `<Trans i18nKey=... components={{ bold: <span className=... /> }} values={...} />`.
+
+## Brand vocabulary — FLAG FOR BEN
+
+Per the brief, these are product-decision names. I will FLAG the full inventory and **leave them as literals with `// eslint-disable-next-line i18next/no-literal-string -- brand: awaiting rule`** until you rule translate-or-keep. The chrome around them still gets keyed.
+
+Preliminary flagged list (final list ships in R2):
+
+**Grand Slam tier ladder** (from MilestoneLadder + TrophyRoomHero + club naming):
+- Rookie, Contender, Regular, Veteran, Champion, Legend, Grand Slam (or the exact ladder in code — will confirm exact set in R2)
+
+**Elite Game tier/gem names** (from EliteGameCard):
+- Bronze, Silver, Gold, Platinum, Diamond gem/level names as they appear
+- Elite Game mode names (Solo, Head-to-Head, League, etc. as coded)
+
+**Achievement badge names** (from AchievementDetailModal + AchievementCard metadata):
+- Individual badge titles — these already come from data (DB rows), so may already be non-literal. Any hard-coded title constants get flagged.
+
+**Season recap headline names** (from SeasonRecapModal)
+
+R2 will paste the exact string inventory extracted from source, not this preliminary sketch.
+
+## Lint override (activation)
+
+Append to `eslint.config.js`:
+
+```js
+// ─── Wave 3c — scope-dir ERROR flip for achievements + quest ────────
+{
+  files: [
+    "src/components/achievements/**/*.{ts,tsx}",
+    "src/components/quest/**/*.{ts,tsx}",
+  ],
+  rules: {
+    "i18next/no-literal-string": ["error", i18nLiteralOptions],
+    "no-restricted-syntax": ["error", literalAttrSyntax, ...toLocaleSyntax],
+  },
+}
 ```
 
-Behaviour additions (all before delegating to `load()`):
+Flipped ONLY after both scopes are at genuine 0 (raw eslint receipts).
 
-- **OwnerKey discipline**: if `postId` is non-null and does not contain `:`, normalize to `${postId}:0` and emit `trace('preload.normalized', ...)`. Bare keys are accepted for backwards-compat but flagged.
-- **Active-lane identity guard**: resolve `activeLaneId = feedLaneRoles.laneForRole('active')`. Reject (return early, emit `trace('preload.rejected', { reason: 'would-evict-active' })`) if either:
-  - `laneId === activeLaneId` (writing directly onto the active role's physical lane), OR
-  - `expectedActiveOwnerKey` was provided AND the current `snapshot(activeLaneId).postId` (normalized) equals it AND the incoming `postId` (normalized) differs. This means: "protect the caller's known-active binding from accidental overwrite by a stale warm."
-- The guard is skipped when `expectedActiveOwnerKey` is omitted — existing single-media cover warm is unaffected unless it opts in.
+## Execution order
 
-Non-goals: no changes to `load()`'s own `alreadyLoaded` compare, no changes to `normalizeOwnerKey` semantics (bare↔`:0` only).
+1. Read all 22 files, inventory every literal (chrome + attr) + brand-name candidates
+2. Draft `en/achievements.json` (all keys + `_one`/`_other` plural forms)
+3. Fan out to `de/es/ja/ko/achievements.json` as en-clones (translation happens downstream); `en-XA/achievements.json` pseudo-padded per existing pattern
+4. Register namespace in `src/i18n/index.ts`
+5. Rewrite each source file: `useTranslation('achievements')`, replace literals with `t(...)`, use `<Trans>` for mixed markup, add `// eslint-disable-next-line ... -- brand: awaiting rule` on brand-vocabulary names
+6. Flip ERROR override in `eslint.config.js`
+7. Verify: `tsgo --noEmit` + raw `npx eslint <scope>` receipts + repo-wide count + parser round-trip
 
-### 2. `src/components/feed/InlineVideo.tsx` — `detectRoleForMatch()`
+## Report format (R1–R6)
 
-Drop the `s.postId === postId` arm. Replace with a single ownerKey-normalized compare so `abc` and `abc:0` collapse, but `abc:1` stays distinct:
+- **R1** `git rev-parse HEAD` + `tsgo --noEmit` output
+- **R2** Full key list + common.* adoptions + **THE FLAGGED NAME LIST** (verbatim strings, file:line for each)
+- **R3** Raw `eslint` receipts: one dirty-file BEFORE, both scope dirs AFTER (i18n + attr-guard) — actual tool output, not summaries
+- **R4** Repo-wide `i18next/no-literal-string` warning count vs prior baseline 2,854
+- **R5** en spot-check (Achievement toast, LevelUp sheet, TrophyRoomHero progress, MilestoneLadder pluralized rows) + en-XA visible pad flags
+- **R6** JSON parser round-trip clean for all 6 locales
 
-```text
-const norm = (k) => k == null ? null : (k.includes(':') ? k : `${k}:0`);
-const matches = (s) => norm(s.postId) === norm(resolvedOwnerKey);
-```
+## Confirm before I mint
 
-This closes the ambiguity where a slide-0 lookup could accidentally satisfy on a lane that a future carousel warm wrote for slide 1 (or vice versa).
-
-### 3. `src/components/feed/CardFeed.tsx` — opt into the guard
-
-At the two `warm('next', ...)` / `warm('prev', ...)` sites, pass `expectedActiveOwnerKey = "${posts[playingIdx].id}:0"`. Purely defensive — same behaviour as today unless something races.
-
-### 4. Dev-only synthetic lane-churn harness
-
-New file `src/video/devLaneChurn.ts`. Exposes `window.__lovable_laneChurn` in dev:
-
-```text
-window.__lovable_laneChurn.run({ cycles: 50, intervalMs: 20 })
-```
-
-For each cycle:
-- Snapshots current `feed-active` ownerKey.
-- Fires four synthetic `preload()` calls in the same tick against `feed-active`, `feed-next`, `feed-prev`, and a random one — each with a fake ownerKey `churn:${cycle}:${i}` and the real active key as `expectedActiveOwnerKey`.
-- After `intervalMs`, samples `active.health` (same shape the `[CAROUSEL2]` logger emits): resolves the active ownerKey via `findLaneForOwner`, records `{ laneId, firstFrame, playing, readyState }`.
-
-Pass criteria (harness prints PASS/FAIL summary):
-- Zero cycles where `findLaneForOwner(activeOwner)` returned `null` (binding lost).
-- Zero cycles where `firstFrame` regressed from `true` to `false`.
-- Reject count from `preload.rejected` trace equals expected (one per cycle minimum).
-
-Console output is a compact CSV block the user can paste into the capture.
-
-### 5. Trace additions
-
-`trace('preload.rejected', { laneId, reason, incomingOwnerKey, expectedActiveOwnerKey, currentActiveLanePostId })`
-`trace('preload.normalized', { laneId, from, to })`
-
-Both routed through the existing `trace()` sink — no new plumbing.
-
-## What this deliberately does NOT do
-
-- No `MediaCarousel.preload()` write for `abc:1`, `abc:2`, ...
-- No change to `feedLaneRoles.rotate()`.
-- No change to the `normalizeOwnerKey` rule (still bare↔`:0` only).
-- No fixes to horizontal-swipe latency yet.
-
-## Verification
-
-1. `npx tsgo --noEmit` — clean.
-2. Load feed, run `window.__lovable_laneChurn.run({ cycles: 100, intervalMs: 20 })` on an active video card. Expect the harness to print PASS with 0 binding losses and 0 firstFrame regressions, and a non-zero `preload.rejected` count.
-3. Vertical scroll for ~10 cards — existing `[CAROUSEL2] active.health` samples must still show `firstFrame: true, playing: true` at both `activate` and `+500ms`, matching today's baseline.
-
-If any of those fail, we abort before touching the horizontal path.
-
-## Follow-up (separate PR, only after evidence)
-
-- `MediaCarousel` neighbour warm using `preload(..., { expectedActiveOwnerKey })`.
-- `CardFeed` vertical prime using per-slide ownerKey from `carouselPositions`.
+The brand-vocabulary flagging is the only judgment call. My reading of the brief: **flag + literal-with-disable** for tier ladder / gem / mode names; extract everything else. Approve or amend and I'll execute end-to-end in one commit.

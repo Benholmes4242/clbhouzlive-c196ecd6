@@ -1,0 +1,153 @@
+{
+  "card": {
+    "unlockedAgo": "Unlocked {{time}}",
+    "label": "Achievement",
+    "xpBadge": "+{{points}} XP"
+  },
+  "toast": {
+    "unlockedOverline": "New achievement unlocked!",
+    "xpBadge": "+{{points}} XP"
+  },
+  "detail": {
+    "statusUnlocked": "Unlocked",
+    "statusLocked": "Locked",
+    "xp": "+{{xp}} XP",
+    "repeatable": "Repeatable",
+    "oneTime": "One-time",
+    "progress": "Progress: {{progress}}",
+    "earnedOn": "✅ Earned: {{date}}",
+    "howToUnlock": "How to unlock"
+  },
+  "levelUp": {
+    "youReached": "You reached",
+    "medals_one": "{{count}} medal",
+    "medals_other": "{{count}} medals",
+    "viewTrophyRoom": "View your Trophy Room",
+    "keepPlaying": "Keep playing"
+  },
+  "levelUpToast": {
+    "headline": "Level Up! 🎉",
+    "ringUnlocked": "{{level}} Ring Unlocked",
+    "totalXp": "Total XP: {{xp}}",
+    "viewJourney": "View Journey"
+  },
+  "nudge": {
+    "nextGlobal": "Next global milestone",
+    "nextRegional": "Next regional milestone",
+    "unlockRemaining_one": "Only {{count}} more Top 100 course to unlock this badge.",
+    "unlockRemaining_other": "Only {{count}} more Top 100 courses to unlock this badge.",
+    "seeNotPlayed": "See courses you haven't played",
+    "exploreTop100": "Explore Top 100 courses",
+    "closeToBadge": "You're close to your next badge",
+    "compactGlobal_one": "{{count}} more Top 100 course to reach the {{club}} Club ({{tier}}).",
+    "compactGlobal_other": "{{count}} more Top 100 courses to reach the {{club}} Club ({{tier}}).",
+    "compactRegional_one": "{{count}} more course on the {{region}} list to reach the {{club}} Club.",
+    "compactRegional_other": "{{count}} more courses on the {{region}} list to reach the {{club}} Club.",
+    "viewJourney": "View journey"
+  },
+  "season": {
+    "titleVo": "Season Complete",
+    "descriptionVo": "Your season recap for {{season}}",
+    "headline": "Season Complete!",
+    "ended": "{{season}} has ended",
+    "finalRank": "Final Rank",
+    "totalXp": "Total XP",
+    "xpValue": "{{xp}} XP",
+    "rewardTier": "Reward Tier",
+    "viewCabinet": "View Trophy Cabinet",
+    "continue": "Continue to New Season"
+  },
+  "quest": {
+    "hero": {
+      "grandSlamAchieved": "Grand Slam Achieved",
+      "tierAchieved": "{{tier}} Achieved",
+      "beginJourney": "Begin Your Journey",
+      "toGoParen_one": "({{count}} to go)",
+      "toGoParen_other": "({{count}} to go)",
+      "ofPlayed": "({{played}} of {{total}} played)",
+      "toShort": "to {{label}}",
+      "complete": "Complete!",
+      "toGo": "to go",
+      "toClub": "to {{club}}",
+      "coursesPlayed": "Courses played",
+      "progressLine": "<0>{{played}}</0> of <1>{{total}}</1> · <2>{{club}}</2>"
+    },
+    "ladder": {
+      "playCourses_one": "Play {{count}} course",
+      "playCourses_other": "Play {{count}} courses",
+      "ofPlayed": "{{played}} of {{total}} played",
+      "earned": "Earned",
+      "toGo": "{{count}} to go",
+      "showMore_one": "Show {{count}} more milestone",
+      "showMore_other": "Show {{count}} more milestones",
+      "regionalMastery": "Regional Mastery",
+      "conquerWithProgress": "Conquer the lists below to chase the Grand Slam · {{count}} of 4 lists in progress",
+      "conquerDefault": "Conquer regional Top 100 lists to chase the Grand Slam",
+      "complete": "Complete",
+      "emptyTitle": "Begin Your Journey",
+      "emptyDescription": "Log your first Top 100 course to start climbing the milestone ladder",
+      "emptyCta": "Explore Courses"
+    },
+    "regional": {
+      "sectionTitle": "Regional Progress",
+      "emptyTitle": "Explore the World",
+      "emptyDescription": "Track your progress across GB&I, Europe, USA and worldwide Top 100 lists",
+      "emptyCta": "View Top 100 Lists",
+      "statusComplete": "✓ Complete",
+      "statusInProgress": "In progress",
+      "statusNotStarted": "Not started"
+    },
+    "recent": {
+      "sectionTitle": "Recently Added"
+    },
+    "trophy": {
+      "overline": "Trophy Case",
+      "title": "Achievements",
+      "filterMilestones": "Milestones",
+      "filterRegions": "Regions",
+      "emptyTitle": "Start Your Collection",
+      "emptyDescription": "Play Top 100 courses to unlock achievement badges",
+      "emptyCta": "Explore Courses",
+      "earned": "Earned",
+      "awayCount": "{{count}} away!",
+      "playedFraction": "{{played}}/{{total}} played"
+    },
+    "leaderboard": {
+      "overline": "Leaderboard",
+      "title": "Friends Leaderboard",
+      "emptyTitle": "Add friends to see how you compare!",
+      "emptyDescription": "Connect with other golfers to track their Top 100 journey alongside yours",
+      "emptyCta": "Find Golfers",
+      "you": "(you)"
+    },
+    "momentum": {
+      "overline": "Momentum",
+      "title": "Your Momentum",
+      "lastLogged": "Last course logged",
+      "thisMonth": "This month",
+      "courses_one": "{{count}} course",
+      "courses_other": "{{count}} courses",
+      "delta": "{{sign}}{{count}} vs last",
+      "suggestedRegion": "Try a new region — you've barely played {{region}} yet.",
+      "keepBuilding": "Keep building your journey.",
+      "emptyPrompt": "Log your first Top 100 course to start momentum.",
+      "dateNever": "Never",
+      "dateToday": "Today",
+      "dateYesterday": "Yesterday",
+      "daysAgo_one": "{{count}} day ago",
+      "daysAgo_other": "{{count}} days ago",
+      "weeksAgo_one": "{{count}} week ago",
+      "weeksAgo_other": "{{count}} weeks ago"
+    }
+  },
+  "elite": {
+    "statusUnlocked": "Unlocked",
+    "statusInProgress": "In Progress",
+    "statusEarned": "Earned",
+    "toGo": "{{count}} to go",
+    "progressFraction": "{{current}} / {{target}}"
+  },
+  "a11y": {
+    "dismiss": "Dismiss"
+  }
+}

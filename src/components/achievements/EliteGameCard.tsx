@@ -19,7 +19,9 @@
  * - 400 Club: Radiant amber/gold
  */
 
+/* eslint-disable no-restricted-syntax -- brand: milestone/regional badge product names (alt="Rookie Club" etc) pending Ben's ruling */
 import React, { useMemo, memo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Check, Lock } from 'lucide-react';
 import { FaLandmarkDome, FaFlagUsa } from 'react-icons/fa6';
@@ -491,6 +493,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
   hideCheckmark = false,
   minimalBadgeOnly = false,
 }) => {
+  const { t } = useTranslation('achievements');
   // Determine variant from props (support legacy compact prop)
   const cardVariant: CardVariant = compact ? 'compact' : variant;
   const isCompact = cardVariant === 'compact';
@@ -893,13 +896,13 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         
         {/* Status */}
         {earned && !isGhost && (
-          <span className="text-[10px] text-green-600 font-medium z-10">Unlocked</span>
+          <span className="text-[10px] text-green-600 font-medium z-10">{t("elite.statusUnlocked")}</span>
         )}
         {isInProgress && (
-          <span className="text-[10px] font-medium text-[#F7931E] z-10">In Progress</span>
+          <span className="text-[10px] font-medium text-[#F7931E] z-10">{t("elite.statusInProgress")}</span>
         )}
         {!earned && !isGhost && !isInProgress && (
-          <span className="text-[10px] z-10" style={{ color: config.subtitleColor }}>{remaining} to go</span>
+          <span className="text-[10px] z-10" style={{ color: config.subtitleColor }}>{t("elite.toGo", { count: remaining })}</span>
         )}
       </motion.div>
     );
@@ -984,9 +987,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
                   transition={{ duration: 0.5, ease: 'easeOut' }}
                 />
               </div>
-              <span className="text-xs text-amber-600">
-                {currentProgress} / {target}
-              </span>
+              <span className="text-xs text-amber-600">{t('elite.progressFraction', { current: currentProgress, target })}</span>
             </div>
           )}
         </div>
@@ -994,19 +995,13 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         {/* Status badge */}
         <div className="flex-shrink-0 z-10">
           {earned && !isGhost && (
-            <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">
-              Earned
-            </span>
+            <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">{t('elite.statusEarned')}</span>
           )}
           {isInProgress && (
-            <span className="text-xs font-medium text-[#F7931E]">
-              {remaining} to go
-            </span>
+            <span className="text-xs font-medium text-[#F7931E]">{t('elite.toGo', { count: remaining })}</span>
           )}
           {!earned && !isGhost && !isInProgress && (
-            <span className="text-xs font-medium text-slate-500">
-              {remaining} to go
-            </span>
+            <span className="text-xs font-medium text-slate-500">{t('elite.toGo', { count: remaining })}</span>
           )}
         </div>
       </motion.div>
@@ -1093,9 +1088,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
                   transition={{ duration: 0.5, ease: 'easeOut' }}
                 />
               </div>
-              <span className="text-xs" style={{ color: earnedConfig.progressFill }}>
-                {currentProgress} / {target}
-              </span>
+              <span className="text-xs" style={{ color: earnedConfig.progressFill }}>{t('elite.progressFraction', { current: currentProgress, target })}</span>
             </div>
           )}
         </div>
@@ -1103,19 +1096,13 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         {/* Status badge */}
         <div className="flex-shrink-0 z-10">
           {earned && !isGhost && (
-            <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">
-              Earned
-            </span>
+            <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">{t('elite.statusEarned')}</span>
           )}
           {isInProgress && (
-            <span className="text-xs font-medium text-[#F7931E]">
-              {remaining} to go
-            </span>
+            <span className="text-xs font-medium text-[#F7931E]">{t('elite.toGo', { count: remaining })}</span>
           )}
           {!earned && !isGhost && !isInProgress && (
-            <span className="text-xs font-medium text-slate-500">
-              {remaining} to go
-            </span>
+            <span className="text-xs font-medium text-slate-500">{t('elite.toGo', { count: remaining })}</span>
           )}
         </div>
       </motion.div>
@@ -1202,9 +1189,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
                   transition={{ duration: 0.5, ease: 'easeOut' }}
                 />
               </div>
-              <span className="text-xs" style={{ color: earnedConfig.progressFill }}>
-                {currentProgress} / {target}
-              </span>
+              <span className="text-xs" style={{ color: earnedConfig.progressFill }}>{t('elite.progressFraction', { current: currentProgress, target })}</span>
             </div>
           )}
         </div>
@@ -1212,19 +1197,13 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         {/* Status badge */}
         <div className="flex-shrink-0 z-10">
           {earned && !isGhost && (
-            <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">
-              Earned
-            </span>
+            <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">{t('elite.statusEarned')}</span>
           )}
           {isInProgress && (
-            <span className="text-xs font-medium text-[#F7931E]">
-              {remaining} to go
-            </span>
+            <span className="text-xs font-medium text-[#F7931E]">{t('elite.toGo', { count: remaining })}</span>
           )}
           {!earned && !isGhost && !isInProgress && (
-            <span className="text-xs font-medium text-slate-500">
-              {remaining} to go
-            </span>
+            <span className="text-xs font-medium text-slate-500">{t('elite.toGo', { count: remaining })}</span>
           )}
         </div>
       </motion.div>
@@ -1311,9 +1290,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
                   transition={{ duration: 0.5, ease: 'easeOut' }}
                 />
               </div>
-              <span className="text-xs" style={{ color: earnedConfig.progressFill }}>
-                {currentProgress} / {target}
-              </span>
+              <span className="text-xs" style={{ color: earnedConfig.progressFill }}>{t('elite.progressFraction', { current: currentProgress, target })}</span>
             </div>
           )}
         </div>
@@ -1321,19 +1298,13 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         {/* Status badge */}
         <div className="flex-shrink-0 z-10">
           {earned && !isGhost && (
-            <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">
-              Earned
-            </span>
+            <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">{t('elite.statusEarned')}</span>
           )}
           {isInProgress && (
-            <span className="text-xs font-medium text-[#F7931E]">
-              {remaining} to go
-            </span>
+            <span className="text-xs font-medium text-[#F7931E]">{t('elite.toGo', { count: remaining })}</span>
           )}
           {!earned && !isGhost && !isInProgress && (
-            <span className="text-xs font-medium text-slate-500">
-              {remaining} to go
-            </span>
+            <span className="text-xs font-medium text-slate-500">{t('elite.toGo', { count: remaining })}</span>
           )}
         </div>
       </motion.div>
@@ -1479,9 +1450,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
                 transition={{ duration: 0.5, ease: 'easeOut' }}
               />
             </div>
-            <span className="text-xs" style={{ color: config.subtitleColor }}>
-              {currentProgress} / {target}
-            </span>
+            <span className="text-xs" style={{ color: config.subtitleColor }}>{t('elite.progressFraction', { current: currentProgress, target })}</span>
           </div>
         )}
       </div>
@@ -1489,19 +1458,13 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
       {/* Status badge */}
       <div className="flex-shrink-0 z-10">
         {earned && !isGhost && (
-          <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">
-            Earned
-          </span>
+          <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">{t('elite.statusEarned')}</span>
         )}
         {isInProgress && (
-          <span className="text-xs font-medium text-[#F7931E]">
-            {remaining} to go
-          </span>
+          <span className="text-xs font-medium text-[#F7931E]">{t('elite.toGo', { count: remaining })}</span>
         )}
         {!earned && !isGhost && !isInProgress && (
-          <span className="text-xs font-medium text-slate-500">
-            {remaining} to go
-          </span>
+          <span className="text-xs font-medium text-slate-500">{t('elite.toGo', { count: remaining })}</span>
         )}
       </div>
     </motion.div>

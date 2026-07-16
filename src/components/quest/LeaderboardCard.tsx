@@ -1,9 +1,9 @@
 /**
- * LeaderboardCard - Friends Leaderboard for Quest page
- * V4: Includes current user ("You") row with highlight
+ * LeaderboardCard - Friends Leaderboard for Quest page.
  */
 
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Trophy, Users, UserPlus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -19,12 +19,12 @@ interface LeaderboardCardProps {
 }
 
 export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalPlayed = 0 }) => {
+  const { t } = useTranslation('achievements');
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const { profile } = useProfileData();
   const { data: friends = [], isLoading, isError } = useFriendsLeaderboard(userId);
 
-  // Sort friends + current user by courses played and add ranks
   const rankedEntries = useMemo(() => {
     const entries = [
       ...friends.map(friend => ({
@@ -36,7 +36,6 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
       })),
     ];
 
-    // Insert current user with real profile data
     if (user?.id) {
       const p = profile as any;
       const realName = p?.display_name || p?.username || 'You';
@@ -54,16 +53,15 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
       .map((entry, index) => ({ ...entry, rank: index + 1 }));
   }, [friends, user?.id, totalPlayed, profile]);
 
-  // Loading state
   if (isLoading) {
     return (
       <section>
         <div className="mb-4">
           <div className="flex items-center gap-1.5 mb-1">
             <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Leaderboard</span>
+            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>{t('quest.leaderboard.overline')}</span>
           </div>
-          <h2 className="text-[17px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.01em' }}>Friends Leaderboard</h2>
+          <h2 className="text-[17px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.01em' }}>{t('quest.leaderboard.title')}</h2>
         </div>
         <div className="animate-pulse space-y-3">
           {[1, 2, 3].map(i => (
@@ -79,38 +77,36 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
     );
   }
 
-  // Error or no user
   if (isError || !userId) {
     return null;
   }
 
-  // Empty state (only current user, no friends)
   if (friends.length === 0) {
     return (
       <section>
         <div className="mb-4">
           <div className="flex items-center gap-1.5 mb-1">
             <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Leaderboard</span>
+            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>{t('quest.leaderboard.overline')}</span>
           </div>
-          <h2 className="text-[17px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.01em' }}>Friends Leaderboard</h2>
+          <h2 className="text-[17px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.01em' }}>{t('quest.leaderboard.title')}</h2>
         </div>
         <div className="text-center py-6">
           <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}>
             <UserPlus className="w-7 h-7 text-muted-foreground" />
           </div>
           <h3 className="text-base font-bold text-foreground mb-2">
-            Add friends to see how you compare!
+            {t('quest.leaderboard.emptyTitle')}
           </h3>
           <p className="text-sm text-muted-foreground mb-4 max-w-[280px] mx-auto">
-            Connect with other golfers to track their Top 100 journey alongside yours
+            {t('quest.leaderboard.emptyDescription')}
           </p>
           <button
             onClick={() => navigate('/watch')}
             className="inline-flex items-center gap-2 px-4 min-h-[44px] rounded-full text-sm font-semibold bg-[#334E3D] text-white hover:bg-[#2a4033] transition-colors active:scale-[0.98]"
           >
             <Users className="w-4 h-4" />
-            Find Golfers
+            {t('quest.leaderboard.emptyCta')}
           </button>
         </div>
       </section>
@@ -120,7 +116,6 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
   const top3 = rankedEntries.slice(0, 3);
   const remaining = rankedEntries.slice(3, 10);
 
-  // Medal styling for ranks 1-3 (rank number rendered inside the medal)
   const getMedalStyle = (rank: number): { background: string; color: string } | null => {
     switch (rank) {
       case 1:
@@ -139,17 +134,16 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
       <div className="mb-4">
         <div className="flex items-center gap-1.5 mb-1">
           <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-          <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Leaderboard</span>
+          <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>{t('quest.leaderboard.overline')}</span>
         </div>
-        <h2 className="text-[17px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.01em' }}>Friends Leaderboard</h2>
+        <h2 className="text-[17px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.01em' }}>{t('quest.leaderboard.title')}</h2>
       </div>
-      
+
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        {/* Top 3 list */}
         <div className="space-y-2">
           {top3.map((entry, index) => {
             const medal = getMedalStyle(entry.rank);
@@ -165,7 +159,6 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
               >
-                {/* Rank: medal for top 3, bare number for 4+ */}
                 {medal ? (
                   <div
                     className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
@@ -187,7 +180,6 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
                   </span>
                 )}
 
-                {/* Avatar */}
                 <SquircleAvatar
                   size={36}
                   src={entry.avatarUrl || undefined}
@@ -197,7 +189,6 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
                   ringColor={LIGHT_HAIRLINE}
                 />
 
-                {/* Name */}
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold truncate text-foreground"
                     style={entry.isCurrentUser ? { color: '#F7931E' } : undefined}
@@ -206,7 +197,7 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
                       <>
                         {entry.displayName}
                         {' '}
-                        <span className="font-normal text-muted-foreground">(you)</span>
+                        <span className="font-normal text-muted-foreground">{t('quest.leaderboard.you')}</span>
                       </>
                     ) : (
                       entry.displayName
@@ -214,7 +205,6 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
                   </p>
                 </div>
 
-                {/* Score */}
                 <div className="flex items-center gap-1.5 flex-shrink-0">
                   <Trophy className="w-4 h-4 text-[#C1A84C]" />
                   <span className="text-sm font-bold text-foreground">
@@ -226,7 +216,6 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
           })}
         </div>
 
-        {/* Remaining entries (4-10) - compact list */}
         {remaining.length > 0 && (
           <div className="pt-3 mt-3 space-y-1" style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
             {remaining.map((entry, index) => (
@@ -259,7 +248,7 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
                     <>
                       {entry.displayName}
                       {' '}
-                      <span className="font-normal text-muted-foreground">(you)</span>
+                      <span className="font-normal text-muted-foreground">{t('quest.leaderboard.you')}</span>
                     </>
                   ) : (
                     entry.displayName
