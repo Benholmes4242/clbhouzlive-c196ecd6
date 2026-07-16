@@ -431,14 +431,8 @@ function ResultRow({ course, index, onClick, isFocused, onMouseEnter, isAlreadyA
             })()}
             <span className="truncate">{course.sub_country || course.region}</span>
             {course.rating != null && (
-              <span>
-                {/* eslint-disable-next-line i18next/no-literal-string -- brand vocabulary, decorative typographic bullet */}
-                •{' '}
-                <span style={{ color: course.rating >= 9.0 ? '#d97706' : '#78716C', fontWeight: 600 }}>
-                  {course.rating.toFixed(1)}
-                </span>
-                <span style={{ color: '#AEAEB2', fontWeight: 400, fontSize: '11px', marginLeft: '2px' }}>{t('searchSheet.outOfTen')}</span>
-              </span>
+              /* eslint-disable-next-line i18next/no-literal-string -- brand vocabulary, decorative typographic bullet */
+              <span>• <span style={{ color: course.rating >= 9.0 ? '#d97706' : '#78716C', fontWeight: 600 }}>{course.rating.toFixed(1)}</span><span style={{ color: '#AEAEB2', fontWeight: 400, fontSize: '11px', marginLeft: '2px' }}>{t('searchSheet.outOfTen')}</span></span>
             )}
           </div>
         </div>
