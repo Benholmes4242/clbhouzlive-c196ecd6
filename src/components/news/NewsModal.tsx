@@ -4,6 +4,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { ExternalLink, X } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { formatNewsTimestampUS } from '@/i18n/format';
+
 
 interface NewsArticle {
   title: string;
@@ -26,15 +28,8 @@ const NewsModal = ({ article, isOpen, onClose }: NewsModalProps) => {
   const [isLoadingContent, setIsLoadingContent] = useState(false);
   const [contentError, setContentError] = useState<string | null>(null);
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
+  const formatDate = (dateString: string) => formatNewsTimestampUS(new Date(dateString));
+
 
   const getFallbackImage = () => {
     return 'https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=400&h=300&fit=crop&auto=format';

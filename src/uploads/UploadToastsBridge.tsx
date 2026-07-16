@@ -9,6 +9,8 @@ import { postKeys } from '@/queryKeys/posts';
 import { deleteDraft } from '@/services/drafts/draftService';
 import { uploadManager } from './UploadManager';
 import { triggerHaptic } from '@/lib/ui/haptics';
+import { formatWeekdayMonthDayShortUS, formatTimeHmUS } from '@/i18n/format';
+
 
 const TOAST_DURATION_ERROR_MS = 4000;
 
@@ -25,8 +27,9 @@ export function UploadToastsBridge() {
       if (evt.isScheduled) {
         toast.success('Post scheduled', {
           description: evt.scheduledAt
-            ? `Goes live ${new Date(evt.scheduledAt).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} at ${new Date(evt.scheduledAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`
+            ? `Goes live ${formatWeekdayMonthDayShortUS(new Date(evt.scheduledAt))} at ${formatTimeHmUS(new Date(evt.scheduledAt))}`
             : undefined,
+
           duration: 4000,
         });
       } else if (evt.uploadType === 'review') {

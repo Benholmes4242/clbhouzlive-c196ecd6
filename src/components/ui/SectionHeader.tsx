@@ -5,6 +5,8 @@
  */
 import { memo, type ReactNode } from 'react';
 import { ChevronRight, type LucideIcon } from 'lucide-react';
+import { formatNumber } from '@/i18n/format';
+
 
 const GEIST = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 const AMBER = '#F7931E';
@@ -255,7 +257,7 @@ function SectionHeaderInner(props: SectionHeaderProps) {
                   letterSpacing: 0,
                 }}
               >
-                {count.toLocaleString()}
+                {formatNumber(count)}
               </span>
             )}
           </div>

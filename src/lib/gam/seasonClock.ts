@@ -7,7 +7,10 @@
  * the catalogue and evaluator use one identifier space.
  */
 
+import { formatMonthShortGB, formatDayMonthShortGB } from '@/i18n/format';
+
 export type Hemisphere = 'N' | 'S';
+
 
 export interface Quarter {
   year: number;
@@ -91,16 +94,13 @@ export function seasonDateRange(year: number, quarter: number): string {
   const startMonth = (quarter - 1) * 3;
   const endMonth = startMonth + 2;
   const fmt = (m: number) =>
-    new Date(Date.UTC(year, m, 1)).toLocaleString('en-GB', { month: 'short', timeZone: 'UTC' });
+    formatMonthShortGB(new Date(Date.UTC(year, m, 1)));
   return `${fmt(startMonth)} - ${fmt(endMonth)} ${year}`;
 }
 
 /** "1 Oct" style. */
 export function shortStartDate(year: number, quarter: number): string {
   const startMonth = (quarter - 1) * 3;
-  return new Date(Date.UTC(year, startMonth, 1)).toLocaleString('en-GB', {
-    day: 'numeric',
-    month: 'short',
-    timeZone: 'UTC',
-  });
+  return formatDayMonthShortGB(new Date(Date.UTC(year, startMonth, 1)));
 }
+

@@ -3,7 +3,20 @@
  * with play_date == yesterday (in the user's local timezone).
  */
 import { useQuery } from '@tanstack/react-query';
-import { format, parseISO, subDays, isValid } from 'date-fns';
+import { parseISO, subDays, isValid } from 'date-fns';
+
+/**
+ * Local yyyy-MM-dd cache key formatter. Non-display: used only for query keys
+ * and the yesterday filter. Kept local (not in @/i18n/format) because it's
+ * a cache identifier, not a user-visible string.
+ */
+function toYmdKey(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
 import { fetchFriendsActivity } from '@/lib/whs/api';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 
@@ -63,7 +76,7 @@ export function toLocalDateKey(d: Date | string | null): string | null {
   if (!d) return null;
   if (d instanceof Date) {
     if (!isValid(d)) return null;
-    return format(d, 'yyyy-MM-dd');
+    return toYmdKey(d);
   }
   const dateOnlyMatch = /^\d{4}-\d{2}-\d{2}$/.test(d);
   let parsed: Date;
@@ -74,7 +87,7 @@ export function toLocalDateKey(d: Date | string | null): string | null {
     parsed = parseISO(d);
   }
   if (!isValid(parsed)) return null;
-  return format(parsed, 'yyyy-MM-dd');
+  return toYmdKey(parsed);
 }
 
 /**
@@ -84,7 +97,7 @@ export function toLocalDateKey(d: Date | string | null): string | null {
  * @internal — exported for testing.
  */
 export function getYesterdayKey(): string {
-  return format(subDays(new Date(), 1), 'yyyy-MM-dd');
+  return toYmdKey(subDays(new Date(), 1));
 }
 
 export function useFriendsYesterday(ownerUserId: string) {

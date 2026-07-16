@@ -7,6 +7,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
 import { toast } from '@/lib/toast';
+import { formatDayMonthShortGB } from '@/i18n/format';
+
 
 export interface QuestCourse {
   id: string;
@@ -136,7 +138,7 @@ export function useQuestCourses() {
             isPlayed,
             isRated,
             isWishlist: shortlistSet.has(m.course_id) && !isPlayed,
-            dateAdded: rawDate ? new Date(rawDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : undefined,
+            dateAdded: rawDate ? formatDayMonthShortGB(new Date(rawDate)) : undefined,
             rating: rating?.rating,
             imageUrl: (m.course as any)?.thumbnail_image || undefined,
             rawDate, // Keep raw ISO date for sorting

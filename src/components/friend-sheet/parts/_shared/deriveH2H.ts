@@ -1,4 +1,6 @@
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
+import { formatMonthDay2ShortGB } from '@/i18n/format';
+
 
 export type H2HState =
   | { kind: 'empty'; duelsCount: 0 }
@@ -82,11 +84,9 @@ function fmtRelative(iso: string): string {
   if (days < 1) return 'today';
   if (days < 30) return `${days}d ago`;
   if (days < 365) return `${Math.floor(days / 7)}w ago`;
-  return new Date(iso).toLocaleDateString('en-GB', {
-    month: 'short',
-    day: '2-digit',
-  });
+  return formatMonthDay2ShortGB(new Date(iso));
 }
+
 
 export function shortCourseName(name: string): string {
   return name

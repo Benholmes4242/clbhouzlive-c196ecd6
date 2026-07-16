@@ -2,6 +2,8 @@ import React from 'react';
 import { ChevronRight, Heart, MessageSquare } from 'lucide-react';
 import { Eyebrow } from './_shared/Eyebrow';
 import { BG_1, T100, T60, T40, LINE, FONT, TAB } from './_shared/tokens';
+import { formatMonthDay2ShortGB } from '@/i18n/format';
+
 
 interface Props {
   post: {
@@ -91,8 +93,6 @@ function fmtRelative(iso: string): string {
   if (days < 1) return 'today';
   if (days < 30) return `${days}d ago`;
   if (days < 365) return `${Math.floor(days / 7)}w ago`;
-  return new Date(iso).toLocaleDateString('en-GB', {
-    month: 'short',
-    day: '2-digit',
-  });
+  return formatMonthDay2ShortGB(new Date(iso));
 }
+

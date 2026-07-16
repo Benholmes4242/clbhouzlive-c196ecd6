@@ -5,6 +5,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { RankMilestone } from '@/components/leaderboard/v2/RankHistorySheet';
+import { formatMonthYearShort } from '@/i18n/format';
+
 
 // Type for milestone from database (using string enums since DB types may not be in sync)
 interface MilestoneRow {
@@ -76,7 +78,7 @@ function formatRelativeTime(dateStr: string): string {
     const months = Math.floor(diffDays / 30);
     return months === 1 ? '1 month ago' : `${months} months ago`;
   }
-  return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  return formatMonthYearShort(date);
 }
 
 // Format time range for display

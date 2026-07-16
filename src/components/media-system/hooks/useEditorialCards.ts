@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { formatMonthYearLong, formatMonthYearShortGB } from '@/i18n/format';
+
 import type {
   HistoryCardData,
   HistoryCardFeedPost,
@@ -337,7 +339,7 @@ export function useEditorialCards(userId: string | undefined): EditorialCards {
               .maybeSingle();
 
             const now = new Date();
-            const weekLabel = `W${String(getISOWeekNum(now)).padStart(2, '0')} · ${now.toLocaleString('default', { month: 'long', year: 'numeric' })}`;
+            const weekLabel = `W${String(getISOWeekNum(now)).padStart(2, '0')} · ${formatMonthYearLong(now)}`;
 
             const profile = (rating as any).user_profiles;
 
@@ -355,7 +357,7 @@ export function useEditorialCards(userId: string | undefined): EditorialCards {
               facilitiesScore: rating.facilities_score ?? null,
               helpfulCount: rating.helpful_count ?? 0,
               playedDate: rating.review_date
-                ? new Date(rating.review_date).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
+                ? formatMonthYearShortGB(new Date(rating.review_date))
                 : null,
               photoUrls: (media ?? []).map((m: any) => m.media_url).filter(Boolean),
               reviewer: {

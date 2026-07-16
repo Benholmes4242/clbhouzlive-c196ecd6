@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { INK, INK_MUTE } from '@/features/courses/_shared/tokens';
 import { TOPAR_OVER_LIGHT, TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
+import { formatNumber } from '@/i18n/format';
+
 import {
   FONT,
   MONO,
@@ -181,7 +183,7 @@ export const SharedHoleCard: React.FC<SharedHoleCardProps> = ({
 
   const playsTo = (hole.par + hole.avg_to_par).toFixed(1);
 
-  const countText = `${hole.rounds.toLocaleString()} ${countLabel}`;
+  const countText = `${formatNumber(hole.rounds)} ${countLabel}`;
 
   return (
     <div

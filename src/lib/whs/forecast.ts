@@ -1,5 +1,7 @@
 import type { WhsScore } from './types';
 import { projectNextRound } from './handicapMath';
+import { formatMonthLongGB } from '@/i18n/format';
+
 
 /**
  * Trend-projection helper for the Forecast card.
@@ -114,12 +116,13 @@ function ewma(values: number[], alpha: number): number {
 
 function formatWhenLabel(daysOut: number): string {
   const target = new Date(Date.now() + daysOut * 86_400_000);
-  const month = target.toLocaleString('en-GB', { month: 'long' });
+  const month = formatMonthLongGB(target);
   const day = target.getDate();
   if (day <= 10) return `early ${month}`;
   if (day <= 20) return `mid-${month}`;
   return `late ${month}`;
 }
+
 
 export function buildForecast(
   allScores: WhsScore[] | null | undefined,

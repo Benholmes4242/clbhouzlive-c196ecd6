@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { formatDayMonthYearShortGB } from '@/i18n/format';
 
 /**
  * Convert England Golf "Surname, Given" name format to display order
@@ -57,8 +57,9 @@ export function fmtRelative(
 export function fmtAbsoluteDate(iso: string | null | undefined): string {
   if (!iso) return '';
   try {
-    return format(new Date(iso), 'd LLL yyyy');
+    return formatDayMonthYearShortGB(new Date(iso));
   } catch {
     return iso;
   }
 }
+

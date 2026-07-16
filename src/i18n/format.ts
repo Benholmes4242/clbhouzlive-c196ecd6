@@ -460,6 +460,75 @@ export function formatWeekdayLongDayMonthLongGB(d: DateInput): string {
   }).format(toDate(d));
 }
 
+// ─── Wave 1 sub-batch 1f (final sweep) additions ─────────────────────────
+
+/** en-GB long month only — "July". Pinned en-GB for editorial forecast copy. */
+export function formatMonthLongGB(d: DateInput): string {
+  return new Intl.DateTimeFormat('en-GB', { month: 'long' }).format(toDate(d));
+}
+
+/** en-US "Thu, Jul 16" — short weekday + short month + day. Matches the
+ *  upload-scheduled toast pill (weekday:'short', month:'short', day:'numeric'). */
+export function formatWeekdayMonthDayShortUS(d: DateInput): string {
+  return new Intl.DateTimeFormat('en-US', {
+    weekday: 'short', month: 'short', day: 'numeric',
+  }).format(toDate(d));
+}
+
+/** en-US "3:45 PM" — hour + 2-digit minute, 12h clock. Matches
+ *  `toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })`. */
+export function formatTimeHmUS(d: DateInput): string {
+  return new Intl.DateTimeFormat('en-US', {
+    hour: 'numeric', minute: '2-digit',
+  }).format(toDate(d));
+}
+
+/** en-US "Jul 16, 2026, 03:45 PM" — full news timestamp. Matches
+ *  `toLocaleDateString('en-US', { year, month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' })`. */
+export function formatNewsTimestampUS(d: DateInput): string {
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric', month: 'short', day: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+  }).format(toDate(d));
+}
+
+/** "July 16, 2026 at 3:45 PM" — dateStyle:'long' + timeStyle:'short'.
+ *  Matches `toLocaleString(undefined, { dateStyle:'long', timeStyle:'short' })`. */
+export function formatDateLongTimeShort(d: DateInput): string {
+  return new Intl.DateTimeFormat(getActiveLocale(), {
+    dateStyle: 'long', timeStyle: 'short',
+  }).format(toDate(d));
+}
+
+/** Locale-driven long month + numeric year — "July 2026" for en. Matches
+ *  `toLocaleString('default', { month:'long', year:'numeric' })` (default →
+ *  active locale). */
+export function formatMonthYearLong(d: DateInput): string {
+  return new Intl.DateTimeFormat(getActiveLocale(), {
+    month: 'long', year: 'numeric',
+  }).format(toDate(d));
+}
+
+/**
+ * Long "X ago" with the date-fns "about"/"almost"/"over" en prefixes RETAINED.
+ * Thin wrapper around `formatDistanceToNow(d, { addSuffix: true })` so callers
+ * route through the i18n boundary. Non-en falls through to Intl long.
+ *
+ * QUIRK: date-fns emits "about 1 hour ago" / "almost 2 years ago" — those
+ * prefixes are en-only date-fns copy and move into i18n keys during Wave ≥ 2.
+ */
+export function formatDistanceToNowAgo(d: DateInput): string {
+  const date = toDate(d);
+  const locale = getActiveLocale();
+  if (locale === 'en') {
+    return formatDistanceToNow(date, { addSuffix: true });
+  }
+  return formatRelativeAgoLong(date.toISOString());
+}
+
+
+
+
 
 
 

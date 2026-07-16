@@ -1,5 +1,7 @@
 import type { FriendHybridSnapshot } from '@/lib/whs/hooks/useFriendHybridSnapshot';
 import type { FriendLeaderboardEntry, FriendRivalryHydrated } from '@/lib/whs/types';
+import { formatMonthDay2ShortGB } from '@/i18n/format';
+
 
 export type SheetState =
   | {
@@ -84,8 +86,6 @@ function fmtRelative(iso: string): string {
   if (days < 1) return 'today';
   if (days < 30) return `${days}d ago`;
   if (days < 365) return `${Math.floor(days / 7)}w ago`;
-  return new Date(iso).toLocaleDateString('en-GB', {
-    month: 'short',
-    day: '2-digit',
-  });
+  return formatMonthDay2ShortGB(new Date(iso));
 }
+

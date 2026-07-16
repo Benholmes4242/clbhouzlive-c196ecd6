@@ -3,7 +3,7 @@ import React from 'react';
 import { Drawer, DrawerContent, DrawerTitle, DrawerDescription } from '@/components/ui/drawer';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Clock, Trash2, Calendar, Play, Pencil } from 'lucide-react';
-import { format } from 'date-fns';
+import { formatMonthDayYearShort, formatTimeHm } from '@/i18n/format';
 import { useScheduledPosts, ScheduledPost } from '@/hooks/useScheduledPosts';
 
 interface ScheduledPostsListProps {
@@ -76,8 +76,9 @@ const ScheduledPostsList: React.FC<ScheduledPostsListProps> = ({
             ) : (
               scheduledPosts.map((post) => {
                 const scheduledDate = new Date(post.scheduledAt);
-                const formattedDate = format(scheduledDate, 'MMM d, yyyy');
-                const formattedTime = format(scheduledDate, 'h:mm a');
+                const formattedDate = formatMonthDayYearShort(scheduledDate);
+                const formattedTime = formatTimeHm(scheduledDate);
+
                 const thumbnail = getThumbnail(post);
 
                 return (
