@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Trophy, Share2 } from 'lucide-react';
+import { formatNumber } from '@/i18n/format';
 
 interface LevelUpToastProps {
   levelUpData: {
@@ -102,7 +103,7 @@ export const LevelUpToast: React.FC<LevelUpToastProps> = ({
                 {levelUpData.newLevel} Ring Unlocked
               </p>
               <p className="text-sm text-muted-foreground">
-                Total XP: {levelUpData.totalXP.toLocaleString()}
+                Total XP: {formatNumber(levelUpData.totalXP)}
               </p>
             </div>
 

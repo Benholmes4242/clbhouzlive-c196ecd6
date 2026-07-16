@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
-import { format } from 'date-fns';
+import { formatMonthYearLongGB } from '@/i18n/format';
 
 import { useAllScores, useHandicapTrend } from '@/lib/whs/hooks';
 import { computeRoundDeltas, type RoundWithDelta } from './computeRoundDeltas';
@@ -98,7 +98,7 @@ const fmtRelativeDate = (iso: string): string => {
 
 const fmtMonth = (iso: string): string => {
   try {
-    return format(new Date(iso), 'MMMM yyyy');
+    return formatMonthYearLongGB(iso);
   } catch {
     return iso;
   }

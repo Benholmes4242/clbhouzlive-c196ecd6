@@ -1,5 +1,5 @@
 import React from 'react';
-import { format } from 'date-fns';
+import { formatDayMonthLongYearGB } from '@/i18n/format';
 import { Flag, ChevronRight, X } from 'lucide-react';
 import {
   Sheet,
@@ -23,7 +23,7 @@ const formatDate = (iso: string | null): string => {
   if (!iso) return '';
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return '';
-  return format(d, 'd MMMM yyyy').toUpperCase();
+  return formatDayMonthLongYearGB(d).toUpperCase();
 };
 
 const splitRating = (rating: number) => {

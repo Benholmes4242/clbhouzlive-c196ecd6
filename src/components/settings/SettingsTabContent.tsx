@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { formatDistanceToNow } from 'date-fns';
+import { formatRelativeAgoLong } from '@/i18n/format';
 import {
   ChevronRight, Mail, Bell, Shield, UserX,
   HelpCircle, MessageSquare, FileText, Trash2, LogOut, Eye, BarChart2, Link2, Briefcase,
@@ -102,7 +102,7 @@ export function SettingsTabContent() {
 
   const whsSubtitle = whsConnection
     ? whsConnection.last_synced_at
-      ? `Connected \u00B7 synced ${formatDistanceToNow(new Date(whsConnection.last_synced_at), { addSuffix: true })}`
+      ? `Connected \u00B7 synced ${formatRelativeAgoLong(whsConnection.last_synced_at)}`
       : 'Connected'
     : 'Not connected';
 

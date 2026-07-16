@@ -3,6 +3,7 @@ import { useAllScores, useHandicapTrend } from '@/lib/whs/hooks';
 import { DarkSectionHeader } from './_shared/darkAtoms';
 import RoundDetailSheet from './round-detail/RoundDetailSheet';
 import { computeRoundDeltas }  from './trends/computeRoundDeltas';
+import { formatDayMonthShortGB } from '@/i18n/format';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
@@ -51,9 +52,8 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
   }, [scoresWithDelta]);
 
   const fmtDate = (s: string): string =>
-    new Date(s)
-      .toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
-      .toUpperCase();
+    formatDayMonthShortGB(s).toUpperCase();
+
 
   const mainCounter = useMemo<string | null>(() => {
     if (rounds14.length === 0) return null;

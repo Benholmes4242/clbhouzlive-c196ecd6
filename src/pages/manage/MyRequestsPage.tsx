@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { formatDistanceToNow } from 'date-fns';
+import { formatRelativeAgoLong } from '@/i18n/format';
 import { LifeBuoy, ChevronRight } from 'lucide-react';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { useMyRequestsList, type MyRequestStatus } from '@/hooks/useMyRequests';
@@ -26,7 +26,7 @@ function statusStyle(s: MyRequestStatus): { label: string; bg: string; fg: strin
 }
 
 function relTime(iso: string): string {
-  try { return formatDistanceToNow(new Date(iso), { addSuffix: true }); } catch { return ''; }
+  try { return formatRelativeAgoLong(iso); } catch { return ''; }
 }
 
 export default function MyRequestsPage() {

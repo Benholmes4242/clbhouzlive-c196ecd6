@@ -5,6 +5,7 @@ import { isReasonableGross, isReasonableDiff } from '@/lib/whs/handicapMath';
 import { DarkSectionHeader } from '../_shared/darkAtoms';
 import type { WhsScore } from '@/lib/whs/types';
 import { TrendingDown, Flag, Target, Award, CalendarDays, type LucideIcon } from 'lucide-react';
+import { formatDay2MonthYearShortGB, formatMonthYearLongGB } from '@/i18n/format';
 
 interface Props {
   connectionId: string;
@@ -40,7 +41,7 @@ function fmtCourseDate(s: WhsScore | null): string | null {
   const name = s.course?.name ?? null;
   const d = s.play_date ? new Date(s.play_date) : null;
   const dStr = d
-    ? d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+    ? formatDay2MonthYearShortGB(d)
     : null;
   return [name, dStr].filter(Boolean).join(' · ') || null;
 }
@@ -48,7 +49,7 @@ function fmtCourseDate(s: WhsScore | null): string | null {
 function monthLabel(yyyyMm: string): string {
   const [y, m] = yyyyMm.split('-').map((s) => parseInt(s, 10));
   const d = new Date(y, (m || 1) - 1, 1);
-  return d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+  return formatMonthYearLongGB(d);
 }
 
 export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, viewMode = 'owner', ownerFirstName = null }) => {

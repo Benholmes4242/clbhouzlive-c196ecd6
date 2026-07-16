@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { format } from 'date-fns';
+import { formatWeekdayLongDayMonthLongGB } from '@/i18n/format';
 import FlagSilhouetteOverlay from '@/components/whs/FlagSilhouetteOverlay';
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
@@ -33,7 +33,7 @@ export const CinemaCardMedia: React.FC<Props> = ({
 
   const dateLabel = (() => {
     try {
-      return format(new Date(playDate), 'EEEE, d MMMM');
+      return formatWeekdayLongDayMonthLongGB(playDate);
     } catch {
       return '';
     }

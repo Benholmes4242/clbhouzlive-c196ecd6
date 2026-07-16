@@ -333,6 +333,136 @@ export function formatYearNumeric(d: DateInput): string {
   }).format(toDate(d));
 }
 
+// Additional en-GB pinned display wrappers (Wave 1 sub-batch 1e).
+
+/** en-GB "05 Jul 2026" — day 2-digit, short month, numeric year. */
+export function formatDay2MonthYearShortGB(d: DateInput): string {
+  return new Intl.DateTimeFormat('en-GB', {
+    day: '2-digit', month: 'short', year: 'numeric',
+  }).format(toDate(d));
+}
+
+/** en-GB "Jul 05" — short month + 2-digit day. */
+export function formatMonthDay2ShortGB(d: DateInput): string {
+  return new Intl.DateTimeFormat('en-GB', {
+    month: 'short', day: '2-digit',
+  }).format(toDate(d));
+}
+
+/** en-GB "Jul 2026" — short month + numeric year. */
+export function formatMonthYearShortGB(d: DateInput): string {
+  return new Intl.DateTimeFormat('en-GB', {
+    month: 'short', year: 'numeric',
+  }).format(toDate(d));
+}
+
+/** en-GB "July 2026" — long month + numeric year. */
+export function formatMonthYearLongGB(d: DateInput): string {
+  return new Intl.DateTimeFormat('en-GB', {
+    month: 'long', year: 'numeric',
+  }).format(toDate(d));
+}
+
+/** en-GB "Jul" — short month only. */
+export function formatMonthShortGB(d: DateInput): string {
+  return new Intl.DateTimeFormat('en-GB', { month: 'short' }).format(toDate(d));
+}
+
+/** en-GB "Sat" — short weekday only. */
+export function formatWeekdayShortGB(d: DateInput): string {
+  return new Intl.DateTimeFormat('en-GB', { weekday: 'short' }).format(toDate(d));
+}
+
+/** en-GB "Sat 16 Jul" — short weekday + day + short month. */
+export function formatWeekdayDayMonthShortGB(d: DateInput): string {
+  return new Intl.DateTimeFormat('en-GB', {
+    weekday: 'short', day: 'numeric', month: 'short',
+  }).format(toDate(d));
+}
+
+/**
+ * en-GB "16 July 2026" — long month, numeric day + year.
+ * Replaces `toLocaleDateString(undefined, { day:'numeric', month:'long', year:'numeric' })`
+ * on English editorial pages (legal docs). Pinned en-GB for day-before-month.
+ */
+export function formatDayMonthLongYearGB(d: DateInput): string {
+  return new Intl.DateTimeFormat('en-GB', {
+    day: 'numeric', month: 'long', year: 'numeric',
+  }).format(toDate(d));
+}
+
+/**
+ * "now" / "{n}m" / "{n}h" / "{n}d" / "{n}w" / "{n}mo" / "{n}y" using
+ * Math.round bucket boundaries (NOT floor). Preserves the exact byte output
+ * of EchoHistoryPage's inline `relativeTime`, which rolls up on the nearest
+ * boundary rather than the floor.
+ *
+ * en output:
+ *   round(min) < 1     → "now"
+ *   round(min) < 60    → "{min}m"
+ *   round(hr)  < 24    → "{hr}h"
+ *   round(day) < 7     → "{day}d"
+ *   round(wk)  < 5     → "{wk}w"
+ *   round(mo)  < 12    → "{mo}mo"
+ *   else               → "{y}y"
+ */
+export function formatRelativeRounded(iso: string | null | undefined): string {
+  if (!iso) return '';
+  const then = new Date(iso).getTime();
+  if (Number.isNaN(then)) return '';
+  const diff = Date.now() - then;
+  const min = Math.round(diff / 60000);
+  const locale = getActiveLocale();
+  if (locale === 'en') {
+    if (min < 1) return 'now';
+    if (min < 60) return `${min}m`;
+    const hr = Math.round(min / 60);
+    if (hr < 24) return `${hr}h`;
+    const day = Math.round(hr / 24);
+    if (day < 7) return `${day}d`;
+    const wk = Math.round(day / 7);
+    if (wk < 5) return `${wk}w`;
+    const mo = Math.round(day / 30);
+    if (mo < 12) return `${mo}mo`;
+    return `${Math.round(day / 365)}y`;
+  }
+  return formatRelative(then);
+}
+
+/** "July 16, 2026" — long month, day, year (en-US ordering). Matches date-fns `MMMM d, yyyy`. */
+export function formatMonthLongDayYear(d: DateInput): string {
+  return new Intl.DateTimeFormat(getActiveLocale(), {
+    month: 'long', day: 'numeric', year: 'numeric',
+  }).format(toDate(d));
+}
+
+/** "Jul 16, 15:45" — short month + numeric day + 24h HH:MM.
+ *  Matches date-fns `MMM d, HH:mm` — comma from en-US locale ordering. */
+export function formatMonthDayHm24(d: DateInput): string {
+  const date = toDate(d);
+  const md = new Intl.DateTimeFormat(getActiveLocale(), { month: 'short', day: 'numeric' }).format(date);
+  const hm = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+  return `${md}, ${hm}`;
+}
+
+/** "16 July, 2026" — en-GB day + long month + comma + year. Matches date-fns `d MMMM, yyyy`. */
+export function formatDayMonthLongYearCommaGB(d: DateInput): string {
+  const date = toDate(d);
+  const dm = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long' }).format(date);
+  return `${dm}, ${date.getFullYear()}`;
+}
+
+/** "Saturday, 16 July" — en-GB long weekday + comma + day + long month.
+ *  Matches date-fns `EEEE, d MMMM`. */
+export function formatWeekdayLongDayMonthLongGB(d: DateInput): string {
+  return new Intl.DateTimeFormat('en-GB', {
+    weekday: 'long', day: 'numeric', month: 'long',
+  }).format(toDate(d));
+}
+
+
+
+
 
 
 

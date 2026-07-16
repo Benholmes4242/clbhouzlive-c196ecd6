@@ -1,7 +1,7 @@
 import React from 'react';
 import { Drawer as DrawerPrimitive } from 'vaul';
 import SheetHeader from '@/components/ui/SheetHeader';
-import { formatDistanceToNow } from 'date-fns';
+import { formatRelativeAgoLong } from '@/i18n/format';
 import { useSentInvites } from '@/lib/whs/hooks';
 import { firstName } from '@/lib/whs/utils/initials';
 import { shareInvite } from '@/lib/whs/share';
@@ -227,7 +227,7 @@ export const SentInvitesSheet: React.FC<Props> = ({ open, onClose }) => {
                         }}
                       >
                         {inv.invitee_home_club ?? '—'} ·{' '}
-                        {formatDistanceToNow(new Date(inv.sent_at), { addSuffix: true })}
+                        {formatRelativeAgoLong(inv.sent_at)}
                         {isPending && ' · Tap to share again'}
                       </p>
                     </div>

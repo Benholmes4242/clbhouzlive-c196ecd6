@@ -20,6 +20,7 @@ import { deriveDetailView } from '../_shared/deriveDetailView';
 import { GemLadder } from './GemLadder';
 import { Top100Body } from './Top100Body';
 import type { TrophyItem } from '../_shared/normalizeTrophyItem';
+import { formatNumber } from '@/i18n/format';
 
 interface Props {
   item: Extract<TrophyItem, { kind: 'achievement' }>;
@@ -262,7 +263,7 @@ export const Top100Immersive: React.FC<Props> = ({
                 }}
               >
                 <span style={{ color: materialColor, fontWeight: 700 }}>
-                  {remaining.toLocaleString()}
+                  {formatNumber(remaining)}
                 </span>{' '}
                 more until your next medal
               </div>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Flag, ArrowUpRight, ChevronDown } from 'lucide-react';
-import { format } from 'date-fns';
+import { formatDayMonthLongYearCommaGB } from '@/i18n/format';
 import { type RatedCourseData } from './my-ratings/myRatingsTiers';
 
 /**
@@ -37,7 +37,7 @@ const formatEditorialDate = (iso: string | null): string => {
   if (!iso) return '';
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return '';
-  return format(d, 'd MMMM, yyyy').toUpperCase();
+  return formatDayMonthLongYearCommaGB(d).toUpperCase();
 };
 
 const DossierCard: React.FC<DossierCardProps> = ({

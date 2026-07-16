@@ -6,6 +6,7 @@ import { ChevronLeft, MoreHorizontal, Pin, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useEchoChats, type EchoChatRow } from '@/features/echo-v2/hooks/useEchoChats';
 import { AnimatedEchoWave } from '@/features/echo-v2/components/AnimatedEchoWave';
+import { formatRelativeRounded } from '@/i18n/format';
 
 const CANVAS = '#F8FAFC';
 const INK = '#1F2428';
@@ -15,24 +16,9 @@ const AMBER = '#F7931E';
 const HAIRLINE = 'rgba(0,0,0,0.07)';
 const BOTTOM_NAV_CLEAR = 'calc(env(safe-area-inset-bottom, 0px) + 32px)';
 
-function relativeTime(iso: string | null): string {
-  if (!iso) return '';
-  const then = new Date(iso).getTime();
-  if (Number.isNaN(then)) return '';
-  const diff = Date.now() - then;
-  const min = Math.round(diff / 60000);
-  if (min < 1) return 'now';
-  if (min < 60) return `${min}m`;
-  const hr = Math.round(min / 60);
-  if (hr < 24) return `${hr}h`;
-  const day = Math.round(hr / 24);
-  if (day < 7) return `${day}d`;
-  const wk = Math.round(day / 7);
-  if (wk < 5) return `${wk}w`;
-  const mo = Math.round(day / 30);
-  if (mo < 12) return `${mo}mo`;
-  return `${Math.round(day / 365)}y`;
-}
+const relativeTime = formatRelativeRounded;
+
+
 
 type SheetMode = null | 'actions' | 'rename' | 'confirm-delete';
 

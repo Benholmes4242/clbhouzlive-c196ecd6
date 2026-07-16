@@ -3,6 +3,7 @@ import { useAllScores } from '@/lib/whs/hooks';
 import { useHandicapTrend } from '@/lib/whs/hooks';
 import { buildForecast, type Forecast, type CounterCell } from '@/lib/whs/forecast';
 import { DarkSectionHeader } from './_shared/darkAtoms';
+import { formatDayMonthYearShortGB } from '@/i18n/format';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
@@ -293,7 +294,7 @@ const formatPlayDate = (iso: string): string => {
   try {
     const d = new Date(iso);
     if (Number.isNaN(d.getTime())) return iso;
-    return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+    return formatDayMonthYearShortGB(d);
   } catch {
     return iso;
   }

@@ -12,6 +12,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAllScores } from '@/lib/whs/hooks';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { formatWeekdayDayMonthShortGB } from '@/i18n/format';
 import { useTodayWeather } from '@/lib/whs/useTodayWeather';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
@@ -29,9 +30,7 @@ function getTimeOfDay(now: Date = new Date()): 'Morning' | 'Afternoon' | 'Evenin
 }
 
 export function formatToday(): string {
-  return new Date()
-    .toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
-    .toUpperCase();
+  return formatWeekdayDayMonthShortGB(new Date()).toUpperCase();
 }
 
 function weatherGlyph(code: number | null | undefined): string {

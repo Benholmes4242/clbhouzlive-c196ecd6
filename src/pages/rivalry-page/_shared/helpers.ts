@@ -1,4 +1,9 @@
 import { firstName as canonicalFirstName } from '@/lib/whs/utils/initials';
+import {
+  formatDay2MonthYearShortGB,
+  formatMonthDay2ShortGB,
+  formatMonthYearShortGB,
+} from '@/i18n/format';
 
 export const firstName = (n: string | null | undefined): string => {
   const trimmed = (n ?? '').trim();
@@ -9,23 +14,19 @@ export const firstName = (n: string | null | undefined): string => {
 export function formatDate(iso: string): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;
-  return d.toLocaleDateString('en-GB', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
+  return formatDay2MonthYearShortGB(d);
 }
 
 export function formatDateShort(iso: string): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;
-  return d.toLocaleDateString('en-GB', { month: 'short', day: '2-digit' });
+  return formatMonthDay2ShortGB(d);
 }
 
 export function formatMonthYear(iso: string): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;
-  return d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+  return formatMonthYearShortGB(d);
 }
 
 export function shortCourseName(name: string): string {

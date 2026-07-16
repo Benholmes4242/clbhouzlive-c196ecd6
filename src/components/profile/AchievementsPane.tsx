@@ -10,6 +10,7 @@ import { OptimizedMedalIcon } from '@/components/ui/optimized-medal-icon';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { MILESTONE_TIER_META } from '@/config/achievements';
+import { formatNumber } from '@/i18n/format';
 // Using the user's original padlock image
 const padlockIcon = '/lovable-uploads/fa944ae3-272a-4bae-82bf-06e9bde7d784.png';
 
@@ -760,10 +761,10 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                     {/* Center content */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center px-12">
                       <div className="text-5xl font-bold text-foreground mb-3">
-                        {totalXP.toLocaleString()} XP
+                        {formatNumber(totalXP)} XP
                       </div>
                       <div className="text-base font-medium text-center leading-tight max-w-[200px] text-[#d97706]">
-                        {(nextTier.minXP - totalXP).toLocaleString()} XP remaining to unlock your {nextTier.name.split(' ')[0].toLowerCase()} ring
+                        {formatNumber(nextTier.minXP - totalXP)} XP remaining to unlock your {nextTier.name.split(' ')[0].toLowerCase()} ring
                       </div>
                     </div>
                   </div>
@@ -779,7 +780,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                     <p className="text-base text-foreground text-center">
                       {currentTier ? 
                         `Congratulations! You've earned the ${currentTier.name}!` :
-                        `Reach ${nextTier.minXP.toLocaleString()} XP to unlock your first ring`
+                        `Reach ${formatNumber(nextTier.minXP)} XP to unlock your first ring`
                       }
                     </p>
                   </div>
@@ -866,7 +867,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                     {/* Center content */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center px-2">
                       <div className="text-lg font-bold text-foreground mb-1">
-                        {totalXP.toLocaleString()}
+                        {formatNumber(totalXP)}
                       </div>
                       <div className="text-xs font-medium text-foreground">
                         XP
@@ -885,14 +886,14 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                     <p className="text-base text-foreground leading-tight">
                       {currentTier ? 
                         `You've earned the ${currentTier.name}!` :
-                        `${nextTier.minXP.toLocaleString()} XP to unlock your first ring`
+                        `${formatNumber(nextTier.minXP)} XP to unlock your first ring`
                       }
                     </p>
                   </div>
                   
                   {/* XP Progress Text */}
                   <div className="text-base text-[#d97706] leading-tight">
-                    {(nextTier.minXP - totalXP).toLocaleString()} XP to {nextTier.name.split(" ")[0].toLowerCase()} ring
+                    {formatNumber(nextTier.minXP - totalXP)} XP to {nextTier.name.split(" ")[0].toLowerCase()} ring
                   </div>
                   
                    {/* Monthly Gain */}
@@ -991,7 +992,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                           {tier.name}
                         </div>
                         <div className="text-base text-foreground">
-                          {tier.minXP.toLocaleString()} XP
+                          {formatNumber(tier.minXP)} XP
                         </div>
                       </div>
                     );
@@ -1073,7 +1074,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                           {tier.name}
                         </div>
                         <div className="text-xs text-foreground">
-                          {tier.minXP.toLocaleString()} XP
+                          {formatNumber(tier.minXP)} XP
                         </div>
                       </div>
                     );
@@ -1184,7 +1185,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                     <Trophy className={`absolute inset-0 m-auto text-muted-foreground ${isMobile ? 'w-3 h-3' : 'w-4 h-4'}`} />
                   </div>
                   <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium`}>
-                    {totalXP.toLocaleString()} XP | {progressPercentage.toFixed(0)}% to {nextTier.name}
+                    {formatNumber(totalXP)} XP | {progressPercentage.toFixed(0)}% to {nextTier.name}
                   </div>
                 </div>
                 <div className={`flex-1 mx-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden ${isMobile ? 'h-1.5' : 'h-2'}`}>
@@ -1199,7 +1200,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                 <div className="flex items-center gap-1">
                   {!isMobile && (
                     <div className="text-xs text-muted-foreground">
-                      Next: {nextTier.name} at {nextTier.minXP.toLocaleString()} XP
+                      Next: {nextTier.name} at {formatNumber(nextTier.minXP)} XP
                     </div>
                   )}
                   {!isMobile && (

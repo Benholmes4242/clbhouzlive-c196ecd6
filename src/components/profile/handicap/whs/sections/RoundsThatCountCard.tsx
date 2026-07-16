@@ -5,6 +5,7 @@ import { fmtDiff, fmtAxis } from '@/lib/whs/format';
 import { projectNextRound } from '@/lib/whs/handicapMath';
 import { DarkSectionHeader } from './_shared/darkAtoms';
 import RoundDetailSheet from './round-detail/RoundDetailSheet';
+import { formatDayMonthShortGB } from '@/i18n/format';
 
 interface Props {
   connectionId: string;
@@ -36,7 +37,7 @@ const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
 
 const fmtDate = (iso: string) => {
   try {
-    return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    return formatDayMonthShortGB(iso);
   } catch {
     return '';
   }

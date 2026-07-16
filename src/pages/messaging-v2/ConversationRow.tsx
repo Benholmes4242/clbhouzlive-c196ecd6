@@ -18,6 +18,7 @@ import { SheetHeader } from '@/components/ui/SheetHeader';
 import { useMessagingActor } from '@/hooks/messaging/useMessagingActor';
 import { supabase } from '@/integrations/supabase/client';
 import type { InboxConversation, InboxParticipant } from '@/types/messaging';
+import { formatWeekdayShort, formatMonthShort } from '@/i18n/format';
 
 const INK = '#1F2428';
 const SUB = '#8A9099';
@@ -85,10 +86,10 @@ function formatRelative(iso: string | null): string {
   if (isYest) return 'Yesterday';
   const withinWeek = now.getTime() - d.getTime() < 7 * 24 * 60 * 60 * 1000;
   if (withinWeek) {
-    return d.toLocaleDateString(undefined, { weekday: 'short' });
+    return formatWeekdayShort(d);
   }
   const day = String(d.getDate()).padStart(2, '0');
-  const month = d.toLocaleDateString(undefined, { month: 'short' });
+  const month = formatMonthShort(d);
   return `${day} ${month}`;
 }
 

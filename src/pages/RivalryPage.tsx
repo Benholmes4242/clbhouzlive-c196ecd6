@@ -32,6 +32,7 @@ import { RoundByRoundSection } from './rivalry-page/RoundByRoundSection';
 import { HeadToHeadSection } from './rivalry-page/HeadToHeadSection';
 import { computeInsights } from './rivalry-page/_shared/insights';
 import { firstName } from './rivalry-page/_shared/helpers';
+import { formatMonthYearShortGB } from '@/i18n/format';
 import {
   FONT,
   BG_0,
@@ -491,10 +492,7 @@ const PageEyebrow: React.FC<{
   rivalName: string;
 }> = ({ firstRoundDate, totalRounds, titleLeft, rivalName }) => {
   const since = firstRoundDate
-    ? new Date(firstRoundDate).toLocaleDateString('en-GB', {
-        month: 'short',
-        year: 'numeric',
-      }).toUpperCase()
+    ? formatMonthYearShortGB(firstRoundDate).toUpperCase()
     : null;
   return (
     <div style={{ padding: '0 16px', marginBottom: 12 }}>

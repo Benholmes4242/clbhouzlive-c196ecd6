@@ -3,7 +3,8 @@ import { ArrowLeft, CheckCircle2, Users, FileText, Settings, Clock } from 'lucid
 import { Button } from '@/components/ui/button';
 import { useBusinessActivityLog, getActivityDescription, BusinessActivityLogEntry } from '@/hooks/useBusinessActivityLog';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { format, isToday, isYesterday, startOfDay } from 'date-fns';
+import { isToday, isYesterday, startOfDay } from 'date-fns';
+import { formatMonthLongDayYear, formatTimeHm } from '@/i18n/format';
 
 const iconMap = {
   verification: CheckCircle2,
@@ -28,7 +29,7 @@ function formatDateHeader(dateStr: string) {
   const date = new Date(dateStr);
   if (isToday(date)) return 'Today';
   if (isYesterday(date)) return 'Yesterday';
-  return format(date, 'MMMM d, yyyy');
+  return formatMonthLongDayYear(date);
 }
 
 export default function BusinessActivityPage() {
@@ -86,7 +87,7 @@ export default function BusinessActivityPage() {
                           <p className="text-sm text-muted-foreground truncate">{description}</p>
                         </div>
                         <span className="text-xs text-muted-foreground shrink-0">
-                          {format(new Date(entry.created_at), 'h:mm a')}
+                          {formatTimeHm(entry.created_at)}
                         </span>
                       </div>
                     );

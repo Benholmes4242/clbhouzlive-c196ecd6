@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatDistanceToNow } from 'date-fns';
+import { formatRelativeAgoLong } from '@/i18n/format';
 
 interface AchievementCardProps {
   name: string;
@@ -56,7 +56,7 @@ export const AchievementCard: React.FC<AchievementCardProps> = ({
           </div>
           {unlockedAt && (
             <p className="text-meta text-muted-foreground mt-2">
-              Unlocked {formatDistanceToNow(new Date(unlockedAt), { addSuffix: true })}
+              Unlocked {formatRelativeAgoLong(unlockedAt)}
             </p>
           )}
         </div>

@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { ChevronLeft, Clock, XCircle, BadgeCheck, Mail, AlertCircle, ArrowRight, Check, FileCheck } from 'lucide-react';
-import { format } from 'date-fns';
+import { formatMonthDayYearShort } from '@/i18n/format';
 import { Button } from '@/components/ui/button';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { SectionHeader } from '@/components/ui/SectionHeader';
@@ -386,7 +386,7 @@ function PendingState({
         </p>
         {requestedAt && (
           <p className="text-xs text-muted-foreground/70 mt-3">
-            Submitted {format(new Date(requestedAt), 'MMM d, yyyy')}
+            Submitted {formatMonthDayYearShort(requestedAt)}
           </p>
         )}
       </div>
@@ -434,7 +434,7 @@ function VerifiedState({ reviewedAt, onViewProfile }: { reviewedAt: string | nul
       </p>
       {reviewedAt && (
         <p className="text-xs text-muted-foreground/70 mb-8">
-          Verified on {format(new Date(reviewedAt), 'MMM d, yyyy')}
+          Verified on {formatMonthDayYearShort(reviewedAt)}
         </p>
       )}
       <Button variant="secondary" onClick={onViewProfile} className="gap-2">View profile</Button>
@@ -470,7 +470,7 @@ function RejectedState({
 
       {reviewedAt && (
         <p className="text-xs text-muted-foreground/70 mb-8">
-          Reviewed on {format(new Date(reviewedAt), 'MMM d, yyyy')}
+          Reviewed on {formatMonthDayYearShort(reviewedAt)}
         </p>
       )}
 
@@ -516,7 +516,7 @@ function NeedsMoreInfoState({
 
       {reviewedAt && (
         <p className="text-xs text-muted-foreground/70 text-center">
-          Updated {format(new Date(reviewedAt), 'MMM d, yyyy')}
+          Updated {formatMonthDayYearShort(reviewedAt)}
         </p>
       )}
 

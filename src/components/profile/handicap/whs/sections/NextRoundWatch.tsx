@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { useAllScores } from '@/lib/whs/hooks';
 import { projectNextRound } from '@/lib/whs/handicapMath';
 import { DarkSectionHeader } from './_shared/darkAtoms';
+import { formatDayMonthShortGB } from '@/i18n/format';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
@@ -38,7 +39,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
     if (!o || typeof o.handicap_differential !== 'number') return null;
     return {
       diff: o.handicap_differential,
-      date: new Date(o.play_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
+      date: formatDayMonthShortGB(o.play_date),
     };
   }, [allScores]);
 

@@ -13,6 +13,7 @@ import { CardScorecardSheet } from '@/features/courses/_shared/scorecard/CardSco
 import { useRoundDetail, useWhsCourseId } from '@/lib/whs/hooks';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import type { WhsScoreHole } from '@/lib/whs/types';
+import { formatWeekdayShortGB, formatMonthShortGB } from '@/i18n/format';
 
 function strokesOf(h: WhsScoreHole): number | null {
   return h.adjusted_gross ?? h.actual_gross ?? null;
@@ -23,9 +24,9 @@ function fmtDateEyebrow(iso: string | null | undefined): string {
   const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
   const d = m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : new Date(iso);
   if (isNaN(d.getTime())) return '';
-  const dow = d.toLocaleDateString('en-GB', { weekday: 'short' }).toUpperCase();
+  const dow = formatWeekdayShortGB(d).toUpperCase();
   const day = d.getDate();
-  const mon = d.toLocaleDateString('en-GB', { month: 'short' }).toUpperCase();
+  const mon = formatMonthShortGB(d).toUpperCase();
   return `${dow}, ${day} ${mon}`;
 }
 

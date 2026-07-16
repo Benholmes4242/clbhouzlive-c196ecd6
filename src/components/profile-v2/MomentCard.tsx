@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Heart, MessageCircle, MapPin } from 'lucide-react';
 import { MomentPost } from './types';
-import { formatDistanceToNow } from 'date-fns';
+import { formatRelativeAgoLong } from '@/i18n/format';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 
 interface MomentCardProps {
@@ -23,7 +23,7 @@ export const MomentCard: React.FC<MomentCardProps> = ({
   const [isLoaded, setIsLoaded] = useState(false);
 
   const formattedDate = moment.date 
-    ? formatDistanceToNow(new Date(moment.date), { addSuffix: true })
+    ? formatRelativeAgoLong(moment.date)
     : '';
 
   return (

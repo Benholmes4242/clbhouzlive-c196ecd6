@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { useLegalDocument } from '@/hooks/useLegalDocuments';
 import LegalBodyRenderer from '@/components/legal/LegalBodyRenderer';
+import { formatDayMonthLongYearGB } from '@/i18n/format';
 
 const INK_55 = '#64748B';
 
@@ -11,7 +12,7 @@ function formatEffective(iso: string | null): string | null {
   try {
     const d = new Date(iso);
     if (isNaN(d.getTime())) return null;
-    return d.toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' });
+    return formatDayMonthLongYearGB(d);
   } catch { return null; }
 }
 
