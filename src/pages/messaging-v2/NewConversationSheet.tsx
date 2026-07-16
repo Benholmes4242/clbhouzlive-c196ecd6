@@ -389,7 +389,7 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
                 opacity: selected.length !== 1 || busy ? 0.4 : 1,
               }}
             >
-              Message
+              {t('action.message')}
             </button>
           ) : (
             <button
