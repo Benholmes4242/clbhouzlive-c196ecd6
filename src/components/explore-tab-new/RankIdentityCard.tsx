@@ -29,7 +29,10 @@ import { FONT } from './gamingLightTokens';
 
 interface Props {
   userId: string | undefined;
+  /** 'card' renders the full ledger card (default). 'strip' renders the slim single-row Almanac identity strip. */
+  variant?: 'card' | 'strip';
 }
+
 
 const INK = '#0F172A';
 const AMBER = '#F7931E';
