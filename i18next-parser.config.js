@@ -13,7 +13,7 @@ export default {
   namespaceSeparator: ':',
   sort: true,
   createOldCatalogs: false,
-  keepRemoved: false,
+  keepRemoved: true,
   useKeysAsDefaultValue: false,
   defaultValue: (locale, _ns, key) => (locale === 'en' ? key : ''),
   verbose: false,
