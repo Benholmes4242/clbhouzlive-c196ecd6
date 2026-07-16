@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -28,13 +29,13 @@ export const LevelUpToast: React.FC<LevelUpToastProps> = ({
   onDismiss,
   onShare,
 }) => {
+  const { t } = useTranslation('achievements');
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     if (levelUpData) {
       setIsVisible(true);
-      // Auto-dismiss after 8 seconds
       const timer = setTimeout(() => {
         setIsVisible(false);
         setTimeout(onDismiss, 300);
@@ -74,7 +75,6 @@ export const LevelUpToast: React.FC<LevelUpToastProps> = ({
           className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] w-[90%] max-w-md"
         >
           <div className="bg-card/95 backdrop-blur-xl border border-border/50 rounded-sq-md shadow-2xl p-6">
-            {/* Ring animation */}
             <div className="flex justify-center mb-4">
               <motion.div
                 initial={{ scale: 0 }}
@@ -96,18 +96,16 @@ export const LevelUpToast: React.FC<LevelUpToastProps> = ({
               </motion.div>
             </div>
 
-            {/* Content */}
             <div className="text-center space-y-2 mb-4">
-              <h3 className="text-2xl font-bold">Level Up! 🎉</h3>
+              <h3 className="text-2xl font-bold">{t('levelUpToast.headline')}</h3>
               <p className="text-lg font-semibold" style={{ color: levelColor }}>
-                {levelUpData.newLevel} Ring Unlocked
+                {t('levelUpToast.ringUnlocked', { level: levelUpData.newLevel })}
               </p>
               <p className="text-sm text-muted-foreground">
-                Total XP: {formatNumber(levelUpData.totalXP)}
+                {t('levelUpToast.totalXp', { xp: formatNumber(levelUpData.totalXP) })}
               </p>
             </div>
 
-            {/* Actions */}
             <div className="flex gap-2">
               <Button
                 variant="outline"
@@ -116,14 +114,14 @@ export const LevelUpToast: React.FC<LevelUpToastProps> = ({
                 className="flex-1"
               >
                 <Share2 className="w-4 h-4 mr-2" />
-                Share
+                {t('common:action.share', { defaultValue: 'Share' })}
               </Button>
               <Button
                 size="sm"
                 onClick={handleViewJourney}
                 className="flex-1"
               >
-                View Journey
+                {t('levelUpToast.viewJourney')}
               </Button>
             </div>
           </div>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -21,19 +22,17 @@ export const AchievementToast: React.FC<AchievementToastProps> = ({
   onDismiss,
   onShare,
 }) => {
+  const { t } = useTranslation('achievements');
   const [isVisible, setIsVisible] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (achievement) {
       setIsVisible(true);
-      
-      // Auto-dismiss after 6 seconds
       const timer = setTimeout(() => {
         setIsVisible(false);
-        setTimeout(onDismiss, 300); // Allow fade animation
+        setTimeout(onDismiss, 300);
       }, 6000);
-
       return () => clearTimeout(timer);
     }
   }, [achievement, onDismiss]);
@@ -68,15 +67,13 @@ export const AchievementToast: React.FC<AchievementToastProps> = ({
         `}
       >
         <div className="flex items-start gap-3">
-          {/* Emoji */}
           <div className="flex-shrink-0 text-3xl">
             {emoji}
           </div>
 
-          {/* Content */}
           <div className="flex-1 min-w-0">
             <p className="text-meta font-medium text-primary uppercase tracking-wide mb-1">
-              New achievement unlocked!
+              {t('toast.unlockedOverline')}
             </p>
             <h4 className="font-semibold text-foreground text-body-md mb-1">
               {achievement.name}
@@ -86,31 +83,28 @@ export const AchievementToast: React.FC<AchievementToastProps> = ({
             </p>
           </div>
 
-          {/* XP Badge */}
           {achievement.points > 0 && (
             <div className="flex-shrink-0 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-meta font-semibold">
-              +{achievement.points} XP
+              {t('toast.xpBadge', { points: achievement.points })}
             </div>
           )}
 
-          {/* Close button */}
           <button
             onClick={onDismiss}
             className="flex-shrink-0 text-muted-foreground hover:text-foreground transition-all duration-motion-fast ease-standard p-1"
-            aria-label="Dismiss"
+            aria-label={t('a11y.dismiss')}
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Action buttons */}
         <div className="flex items-center gap-2 mt-4">
           <Button
             onClick={handleShare}
             size="sm"
             className="flex-1 bg-primary hover:bg-primary/90"
           >
-            Share
+            {t('common:action.share', { defaultValue: 'Share' })}
           </Button>
           <Button
             onClick={handleViewAll}
@@ -118,7 +112,7 @@ export const AchievementToast: React.FC<AchievementToastProps> = ({
             variant="outline"
             className="flex-1"
           >
-            View all
+            {t('common:action.viewAll', { defaultValue: 'View all' })}
           </Button>
         </div>
       </div>

@@ -6,6 +6,7 @@
  */
 
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,10 +24,9 @@ interface Props {
 }
 
 export function LevelUpSheet({ eventId, label, medals, onClose }: Props) {
+  const { t } = useTranslation('achievements');
   const navigate = useNavigate();
 
-  // Mark seen_at on present (not on dismiss) so a hard-close during the
-  // celebration still counts and the sheet never re-shows for this event.
   useEffect(() => {
     (async () => {
       try {
@@ -79,7 +79,7 @@ export function LevelUpSheet({ eventId, label, medals, onClose }: Props) {
           marginBottom: 10,
         }}
       >
-        You reached
+        {t('levelUp.youReached')}
       </div>
       <div
         style={{
@@ -102,7 +102,7 @@ export function LevelUpSheet({ eventId, label, medals, onClose }: Props) {
           fontVariantNumeric: 'tabular-nums',
         }}
       >
-        {medals} {medals === 1 ? 'medal' : 'medals'}
+        {t('levelUp.medals', { count: medals })}
       </div>
 
       <button
@@ -121,7 +121,7 @@ export function LevelUpSheet({ eventId, label, medals, onClose }: Props) {
           cursor: 'pointer',
         }}
       >
-        View your Trophy Room
+        {t('levelUp.viewTrophyRoom')}
       </button>
       <button
         type="button"
@@ -136,7 +136,7 @@ export function LevelUpSheet({ eventId, label, medals, onClose }: Props) {
           cursor: 'pointer',
         }}
       >
-        Keep playing
+        {t('levelUp.keepPlaying')}
       </button>
     </div>,
     document.body,

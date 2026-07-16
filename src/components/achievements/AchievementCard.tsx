@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { formatRelativeAgoLong } from '@/i18n/format';
 
 interface AchievementCardProps {
@@ -24,6 +25,7 @@ export const AchievementCard: React.FC<AchievementCardProps> = ({
   unlockedAt,
   compact = false,
 }) => {
+  const { t } = useTranslation('achievements');
   const emoji = CATEGORY_EMOJIS[category] || '🏆';
 
   return (
@@ -50,19 +52,19 @@ export const AchievementCard: React.FC<AchievementCardProps> = ({
             </div>
             {points && points > 0 && (
               <div className="flex-shrink-0 px-2 py-1 rounded-full bg-primary/10 text-primary text-meta font-medium">
-                +{points} XP
+                {t('card.xpBadge', { points })}
               </div>
             )}
           </div>
           {unlockedAt && (
             <p className="text-meta text-muted-foreground mt-2">
-              Unlocked {formatRelativeAgoLong(unlockedAt)}
+              {t('card.unlockedAgo', { time: formatRelativeAgoLong(unlockedAt) })}
             </p>
           )}
         </div>
       </div>
       <div className="mt-2 px-2 py-1 rounded-md bg-muted inline-block">
-        <span className="text-meta font-medium text-secondary">Achievement</span>
+        <span className="text-meta font-medium text-secondary">{t('card.label')}</span>
       </div>
     </div>
   );

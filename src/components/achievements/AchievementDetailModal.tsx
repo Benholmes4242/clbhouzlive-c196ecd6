@@ -1,4 +1,7 @@
+/* eslint-disable no-restricted-syntax -- brand: badge product names (alt=) pending Ben's ruling */
+
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Lightbulb } from "lucide-react";
 
@@ -26,6 +29,7 @@ const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
   onClose,
   achievement
 }) => {
+  const { t } = useTranslation('achievements');
   if (!achievement) return null;
 
   // TODO: Extract to shared utility — duplicate of getAchievementIcon in AchievementsPane.tsx
@@ -84,11 +88,12 @@ const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
       default:
         return (
           <div className={`w-full h-full flex items-center justify-center rounded-lg ${
-            achievement.unlocked 
-              ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-white' 
+            achievement.unlocked
+              ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-white'
               : 'bg-gradient-to-br from-gray-300 to-gray-400 text-gray-600'
           }`}>
             <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
+              {/* eslint-disable-next-line i18next/no-literal-string -- glyph, not translatable copy */}
               <span className="text-2xl">🏆</span>
             </div>
           </div>
@@ -103,19 +108,15 @@ const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
         className="rounded-t-[20px] p-0 max-w-[560px] mx-auto"
         hideCloseButton
       >
-        {/* Drag handle */}
         <div className="flex justify-center pt-2.5 pb-1">
           <div className="w-9 h-1 rounded-full bg-muted-foreground/30" />
         </div>
 
-        {/* Title */}
         <h2 className="text-center text-lg font-semibold text-foreground px-4 pb-2">
           {achievement.name}
         </h2>
 
-        {/* Content */}
         <div className="px-4 pb-6 space-y-4" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)' }}>
-          {/* Badge centered */}
           <div className="flex justify-center">
             <div className={`w-20 h-20 overflow-hidden ${
               !achievement.unlocked ? 'grayscale opacity-60' : ''
@@ -123,65 +124,60 @@ const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
               {getAchievementBadge(achievement)}
             </div>
           </div>
-          
-          {/* Status centered */}
+
           <div className="text-center">
             <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-              achievement.unlocked 
-                ? 'bg-[#f59e0b]/12 text-[#d97706]' 
+              achievement.unlocked
+                ? 'bg-[#f59e0b]/12 text-[#d97706]'
                 : 'bg-muted text-muted-foreground'
             }`}>
-              {achievement.unlocked ? 'Unlocked' : 'Locked'}
+              {achievement.unlocked ? t('detail.statusUnlocked') : t('detail.statusLocked')}
             </span>
           </div>
 
-          {/* Description */}
           <div className="text-center">
             <p className="text-muted-foreground text-sm leading-relaxed">
               {achievement.description}
             </p>
           </div>
 
-          {/* XP and Type */}
           <div className="flex justify-center gap-6 text-sm">
             <div className="flex items-center gap-1">
+              {/* eslint-disable-next-line i18next/no-literal-string -- glyph, not translatable copy */}
               <span className="text-amber-500">✨</span>
-              <span className="font-medium text-[#d97706]">+{achievement.xp} XP</span>
+              <span className="font-medium text-[#d97706]">{t('detail.xp', { xp: achievement.xp })}</span>
             </div>
             <div className="flex items-center gap-1">
               <span>{achievement.isRepeatable ? '🔄' : '🏆'}</span>
               <span className="text-muted-foreground">
-                {achievement.isRepeatable ? 'Repeatable' : 'One-time'}
+                {achievement.isRepeatable ? t('detail.repeatable') : t('detail.oneTime')}
               </span>
             </div>
           </div>
 
-          {/* Progress */}
           {achievement.progress && (
             <div className="text-center">
               <p className="text-sm text-muted-foreground">
-                Progress: {achievement.progress}
+                {t('detail.progress', { progress: achievement.progress })}
               </p>
             </div>
           )}
 
-          {/* Date Earned */}
           {achievement.unlocked && achievement.dateEarned && (
             <div className="text-center">
               <p className="text-sm text-[#d97706] font-medium">
-                ✅ Earned: {achievement.dateEarned}
+                {t('detail.earnedOn', { date: achievement.dateEarned })}
               </p>
             </div>
           )}
 
-          {/* Unlock Hint */}
           {!achievement.unlocked && achievement.unlockHint && (
             <div className="bg-[#f59e0b]/8 border border-[#f59e0b]/25 rounded-lg p-3">
               <div className="flex items-start gap-2">
                 <Lightbulb className="h-4 w-4 text-[#d97706] flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm font-medium text-[#d97706] mb-1">
-                    How to unlock
+                    {t('detail.howToUnlock')}
                   </p>
                   <p className="text-sm text-[#d97706]/80">
                     {achievement.unlockHint}

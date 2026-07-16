@@ -1,9 +1,9 @@
 /**
- * RecentlyAddedSection - Shows recently played Top 100 courses
- * Light theme version
+ * RecentlyAddedSection - Shows recently played Top 100 courses.
  */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Trophy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -30,7 +30,7 @@ const RecentCourseRow: React.FC<{
   >
     <div
       className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-      style={{ 
+      style={{
         background: 'rgba(210, 180, 97, 0.12)',
         border: '1px solid rgba(210, 180, 97, 0.2)',
       }}
@@ -58,18 +58,17 @@ export const RecentlyAddedSection: React.FC<RecentlyAddedSectionProps> = ({
   hasGoldTrim = false,
   onCourseClick,
 }) => {
+  const { t } = useTranslation('achievements');
   const navigate = useNavigate();
 
   if (courses.length === 0) return null;
 
   return (
     <section>
-      {/* Section header */}
       <h2 className="text-sm font-semibold text-muted-foreground mb-4">
-        Recently Added
+        {t('quest.recent.sectionTitle')}
       </h2>
 
-      {/* Rows - py-3 each, border-b dividers, no divider after last */}
       <div>
         {courses.map((course, index) => (
           <div key={course.id}>

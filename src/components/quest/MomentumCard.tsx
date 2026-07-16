@@ -1,9 +1,9 @@
 /**
- * MomentumCard - Weekly momentum display
- * Shows last course logged date and courses logged this month
+ * MomentumCard - Weekly momentum display.
  */
 
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Calendar, TrendingUp, Flame } from 'lucide-react';
 import { formatDayMonthShortGB } from '@/i18n/format';
@@ -21,13 +21,13 @@ export const MomentumCard: React.FC<MomentumCardProps> = ({
   recentlyPlayed,
   suggestedRegion,
 }) => {
-  // Calculate last course date and this/last month counts
+  const { t } = useTranslation('achievements');
+
   const { lastCourseDate, thisMonthCount, lastMonthCount, hasActivity } = useMemo(() => {
     if (!recentlyPlayed || recentlyPlayed.length === 0) {
       return { lastCourseDate: null, thisMonthCount: 0, lastMonthCount: 0, hasActivity: false };
     }
 
-    // Parse dates - dateAdded is in format "DD MMM" like "15 Jan"
     const now = new Date();
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
@@ -35,47 +35,41 @@ export const MomentumCard: React.FC<MomentumCardProps> = ({
     const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
     const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
 
-    // Find the most recent date
     let latestDate: Date | null = null;
     let monthCount = 0;
     let prevMonthCount = 0;
 
     for (const course of recentlyPlayed) {
       if (!course.dateAdded) continue;
-      
-      // Parse "DD MMM" format
+
       const parts = course.dateAdded.split(' ');
       if (parts.length !== 2) continue;
-      
+
       const day = parseInt(parts[0], 10);
       const monthStr = parts[1];
-      
+
       const monthMap: Record<string, number> = {
         'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
         'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11,
       };
-      
+
       const month = monthMap[monthStr];
       if (month === undefined || isNaN(day)) continue;
-      
-      // Assume current year, but if month is in future, use last year
+
       let year = currentYear;
       if (month > currentMonth) {
         year = currentYear - 1;
       }
-      
+
       const courseDate = new Date(year, month, day);
-      
-      // Track latest
+
       if (!latestDate || courseDate > latestDate) {
         latestDate = courseDate;
       }
-      
-      // Count this month
+
       if (courseDate.getMonth() === currentMonth && courseDate.getFullYear() === currentYear) {
         monthCount++;
       }
-      // Count last month
       if (courseDate.getMonth() === lastMonth && courseDate.getFullYear() === lastMonthYear) {
         prevMonthCount++;
       }
@@ -89,34 +83,34 @@ export const MomentumCard: React.FC<MomentumCardProps> = ({
     };
   }, [recentlyPlayed]);
 
-  // Format the last course date
   const formatLastDate = (date: Date | null): string => {
-    if (!date) return 'Never';
-    
+    if (!date) return t('quest.momentum.dateNever');
+
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    
-    if (diffDays === 0) return 'Today';
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 7) return `${diffDays} days ago`;
-    if (diffDays < 30) return `${Math.floor(diffDays / 7)} week${Math.floor(diffDays / 7) > 1 ? 's' : ''} ago`;
-    
+
+    if (diffDays === 0) return t('quest.momentum.dateToday');
+    if (diffDays === 1) return t('quest.momentum.dateYesterday');
+    if (diffDays < 7) return t('quest.momentum.daysAgo', { count: diffDays });
+    if (diffDays < 30) return t('quest.momentum.weeksAgo', { count: Math.floor(diffDays / 7) });
+
     return formatDayMonthShortGB(date);
   };
 
+  const delta = thisMonthCount - lastMonthCount;
+  const deltaSign = delta > 0 ? '+' : '';
+
   return (
     <section>
-      {/* Section header */}
       <div className="mb-4">
         <div className="flex items-center gap-1.5 mb-1">
           <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-          <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Momentum</span>
+          <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>{t('quest.momentum.overline')}</span>
         </div>
-        <h2 className="text-[17px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.01em' }}>Your Momentum</h2>
+        <h2 className="text-[17px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.01em' }}>{t('quest.momentum.title')}</h2>
       </div>
-      
-      {/* Icon + stat rows */}
+
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -124,9 +118,8 @@ export const MomentumCard: React.FC<MomentumCardProps> = ({
       >
         {hasActivity ? (
           <div className="space-y-3">
-            {/* Last course logged */}
             <div className="flex items-center gap-3">
-              <div 
+              <div
                 className="w-9 h-9 rounded-xl flex items-center justify-center"
                 style={{
                   background: 'rgba(110, 146, 119, 0.1)',
@@ -137,7 +130,7 @@ export const MomentumCard: React.FC<MomentumCardProps> = ({
               </div>
               <div className="flex-1">
                 <p className="text-xs font-medium text-muted-foreground">
-                  Last course logged
+                  {t('quest.momentum.lastLogged')}
                 </p>
                 <p className="text-sm font-semibold text-foreground">
                   {formatLastDate(lastCourseDate)}
@@ -145,9 +138,8 @@ export const MomentumCard: React.FC<MomentumCardProps> = ({
               </div>
             </div>
 
-            {/* This month count + delta */}
             <div className="flex items-center gap-3">
-              <div 
+              <div
                 className="w-9 h-9 rounded-xl flex items-center justify-center"
                 style={{
                   background: 'rgba(210, 180, 97, 0.1)',
@@ -158,11 +150,11 @@ export const MomentumCard: React.FC<MomentumCardProps> = ({
               </div>
               <div className="flex-1">
                 <p className="text-xs font-medium text-muted-foreground">
-                  This month
+                  {t('quest.momentum.thisMonth')}
                 </p>
                 <div className="flex items-center gap-2 mt-0.5">
                   <p className="text-sm font-semibold text-foreground tabular-nums">
-                    {thisMonthCount} {thisMonthCount === 1 ? 'course' : 'courses'}
+                    {t('quest.momentum.courses', { count: thisMonthCount })}
                   </p>
                   {lastMonthCount > 0 && thisMonthCount !== lastMonthCount && (
                     <span
@@ -175,35 +167,33 @@ export const MomentumCard: React.FC<MomentumCardProps> = ({
                         color: thisMonthCount > lastMonthCount ? '#0F6E56' : '#64748B',
                       }}
                     >
-                      {thisMonthCount > lastMonthCount ? '+' : ''}
-                      {thisMonthCount - lastMonthCount} vs last
+                      {t('quest.momentum.delta', { sign: deltaSign, count: delta })}
                     </span>
                   )}
                 </div>
               </div>
             </div>
 
-            {/* Personalized nudge */}
             {suggestedRegion ? (
               <p className="text-xs mt-2 text-muted-foreground">
-                Try a new region — you've barely played {suggestedRegion} yet.
+                {t('quest.momentum.suggestedRegion', { region: suggestedRegion })}
               </p>
             ) : (
               <p className="text-xs mt-2 text-muted-foreground">
-                Keep building your journey.
+                {t('quest.momentum.keepBuilding')}
               </p>
             )}
           </div>
         ) : (
           <div className="flex items-center gap-3 py-2">
-            <div 
+            <div
                className="w-9 h-9 rounded-xl flex items-center justify-center"
                style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
             >
               <Flame className="w-4 h-4 text-muted-foreground" />
             </div>
             <p className="text-sm text-muted-foreground">
-              Log your first Top 100 course to start momentum.
+              {t('quest.momentum.emptyPrompt')}
             </p>
           </div>
         )}

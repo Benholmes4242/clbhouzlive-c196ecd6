@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Button } from '@/components/ui/button';
@@ -30,11 +31,11 @@ export const SeasonRecapModal: React.FC<SeasonRecapModalProps> = ({
   seasonId,
   userId,
 }) => {
+  const { t } = useTranslation('achievements');
   const navigate = useNavigate();
   const { width, height } = useWindowSize();
 
   useEffect(() => {
-    // Mark as seen when modal opens
     if (isOpen) {
       const markAsSeen = async () => {
         await supabase
@@ -57,11 +58,11 @@ export const SeasonRecapModal: React.FC<SeasonRecapModalProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <VisuallyHidden>
-          <DialogTitle>Season Complete</DialogTitle>
-          <DialogDescription>Your season recap for {seasonName}</DialogDescription>
+          <DialogTitle>{t('season.titleVo')}</DialogTitle>
+          <DialogDescription>{t('season.descriptionVo', { season: seasonName })}</DialogDescription>
         </VisuallyHidden>
         {isOpen && <Confetti width={width} height={height} recycle={false} numberOfPieces={200} />}
-        
+
         <div className="flex flex-col items-center text-center space-y-6 py-6">
           <div className="relative">
             <div className="absolute inset-0 animate-ping">
@@ -71,23 +72,23 @@ export const SeasonRecapModal: React.FC<SeasonRecapModalProps> = ({
           </div>
 
           <div className="space-y-2">
-            <h2 className="text-2xl font-bold">Season Complete!</h2>
+            <h2 className="text-2xl font-bold">{t('season.headline')}</h2>
             <p className="text-muted-foreground">
-              {seasonName} has ended
+              {t('season.ended', { season: seasonName })}
             </p>
           </div>
 
           <div className="w-full space-y-3 bg-muted/20 rounded-sq-sm p-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Final Rank</span>
+              <span className="text-sm text-muted-foreground">{t('season.finalRank')}</span>
               <span className="font-bold text-lg">#{finalRank}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Total XP</span>
-              <span className="font-bold text-lg">{formatNumber(finalXP)} XP</span>
+              <span className="text-sm text-muted-foreground">{t('season.totalXp')}</span>
+              <span className="font-bold text-lg">{t('season.xpValue', { xp: formatNumber(finalXP) })}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Reward Tier</span>
+              <span className="text-sm text-muted-foreground">{t('season.rewardTier')}</span>
               <span className="font-bold text-lg capitalize">{rewardTier}</span>
             </div>
           </div>
@@ -95,10 +96,10 @@ export const SeasonRecapModal: React.FC<SeasonRecapModalProps> = ({
           <div className="flex flex-col gap-2 w-full">
             <Button onClick={handleViewTrophies} className="w-full">
               <Trophy className="w-4 h-4 mr-2" />
-              View Trophy Cabinet
+              {t('season.viewCabinet')}
             </Button>
             <Button onClick={onClose} variant="outline" className="w-full">
-              Continue to New Season
+              {t('season.continue')}
             </Button>
           </div>
         </div>
