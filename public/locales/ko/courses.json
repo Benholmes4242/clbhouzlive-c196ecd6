@@ -84,7 +84,13 @@
     "countInRegion_other": "<1>{{formattedCount}}</1> courses in {{region}}",
     "results_one": "<1>{{formattedCount}}</1> result",
     "results_other": "<1>{{formattedCount}}</1> results",
-    "resetFilters": "Reset filters"
+    "resetFilters": "Reset filters",
+    "searchPlaceholder": "Search by name, county or area…",
+    "searchA11y": "Search golf courses",
+    "searching": "Searching",
+    "filtersA11y": "Course filters",
+    "selectRegionA11y": "Select region",
+    "allRegions": "All Regions"
   },
   "searchSheet": {
     "title": "Choose Golf Club",
@@ -94,14 +100,17 @@
     "trouble": "Trouble loading courses",
     "yourCourses": "Your courses",
     "outOfTen": "/ 10",
-    "added": "Added"
+    "added": "Added",
+    "retry": "Retry",
+    "ratingBullet": "• "
   },
   "rateSheet": {
     "subtitle": "Search any course you've played",
     "emptyLong": "Type a course name to get started",
     "searching": "Searching…",
     "noResults": "No courses found for \"{{query}}\"",
-    "rateAction": "Rate →"
+    "rateAction": "Rate →",
+    "searchPlaceholder": "Search courses…"
   },
   "tabs": {
     "explore": "Explore"
@@ -160,7 +169,8 @@
     "metaCourses_one": "<1>{{count}}</1> course · {{listLabel}}",
     "metaCourses_other": "<1>{{count}}</1> courses · {{listLabel}}",
     "clearSearch": "Clear search",
-    "resetFilters": "Reset filters"
+    "resetFilters": "Reset filters",
+    "sectionTitle": "The world's best"
   },
   "map": {
     "unavailableTitle": "Map Temporarily Unavailable",
@@ -168,7 +178,10 @@
     "loading": "Loading map...",
     "tapPrompt": "⛳ Tap a course to start your journey",
     "countOf": "{{rated}} of {{total}}",
-    "dotSeparator": "·"
+    "dotSeparator": "·",
+    "backA11y": "Go back",
+    "resetViewA11y": "Reset map view",
+    "filterStatusA11y": "Filter courses by status"
   },
   "userCourses": {
     "emptyRegion": "No courses found in the selected region.",
@@ -182,7 +195,16 @@
     "notFoundBody": "The user profile you're looking for doesn't exist or isn't public",
     "regionalSortView": "Sort & View",
     "regionalAddCourses": "Add Courses",
-    "showingRegion": "Showing {{region}} courses"
+    "showingRegion": "Showing {{region}} courses",
+    "regionalAddCoursesEmoji": "📍",
+    "emptyTop100OwnTitle": "No Top 100 courses rated yet",
+    "emptyTop100OtherTitle": "{{name}} hasn't rated any Top 100 courses yet",
+    "emptyTop100OwnBody": "Explore the world's greatest golf courses and rate them to track your journey",
+    "emptyTop100OtherBody": "Check back later to see their golf course journey",
+    "emptyRecentOwnTitle": "No recent activity",
+    "emptyRecentOtherTitle": "{{name}} has no recent activity",
+    "emptyRecentOwnBody": "Play some courses in the last 30 days and they'll appear here",
+    "emptyRecentOtherBody": "No courses played in the last 30 days"
   },
   "review": {
     "filter": {
@@ -225,7 +247,9 @@
     "write": {
       "title": "Played here?",
       "body": "Your rating helps golfers worldwide",
-      "rate": "Rate"
-    }
+      "rate": "Rate",
+      "emoji": "⭐"
+    },
+    "reportA11y": "Report review"
   }
 }

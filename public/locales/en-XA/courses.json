@@ -84,7 +84,13 @@
     "countInRegion_other": "[~~<1>{{formattedCount}}</1> courses in {{region}}~~]",
     "results_one": "[~~<1>{{formattedCount}}</1> result~~]",
     "results_other": "[~~<1>{{formattedCount}}</1> results~~]",
-    "resetFilters": "[~~Řéšéţ ƒíļţéřš~~]"
+    "resetFilters": "[~~Řéšéţ ƒíļţéřš~~]",
+    "searchPlaceholder": "[~~Šéářĉĥ ƀý ñáɱé, ĉőúñţý őř ářéá…~~]",
+    "searchA11y": "[~~Šéářĉĥ ĝőļƒ ĉőúřšéš~~]",
+    "searching": "[~~Šéářĉĥíñĝ~~]",
+    "filtersA11y": "[~~Ĉőúřšé ƒíļţéřš~~]",
+    "selectRegionA11y": "[~~Šéļéĉţ řéĝíőñ~~]",
+    "allRegions": "[~~Áļļ Řéĝíőñš~~]"
   },
   "searchSheet": {
     "title": "[~~Ĉĥőőšé Ĝőļƒ Ĉļúƀ~~]",
@@ -94,14 +100,17 @@
     "trouble": "[~~Ţřőúƀļé ļőáđíñĝ ĉőúřšéš~~]",
     "yourCourses": "[~~Ýőúř ĉőúřšéš~~]",
     "outOfTen": "[~~/ 10~~]",
-    "added": "[~~Áđđéđ~~]"
+    "added": "[~~Áđđéđ~~]",
+    "retry": "[~~Řéţřý~~]",
+    "ratingBullet": "[~~• ~~]"
   },
   "rateSheet": {
     "subtitle": "[~~Šéářĉĥ áñý ĉőúřšé ýőú'ṽé ƥļáýéđ~~]",
     "emptyLong": "[~~Ţýƥé á ĉőúřšé ñáɱé ţő ĝéţ šţářţéđ~~]",
     "searching": "[~~Šéářĉĥíñĝ…~~]",
     "noResults": "[~~Ñő ĉőúřšéš ƒőúñđ ƒőř \"{{query}}\"~~]",
-    "rateAction": "[~~Řáţé →~~]"
+    "rateAction": "[~~Řáţé →~~]",
+    "searchPlaceholder": "[~~Šéářĉĥ ĉőúřšéš…~~]"
   },
   "tabs": {
     "explore": "[~~Éẋƥļőřé~~]"
@@ -160,7 +169,8 @@
     "metaCourses_one": "[~~<1>{{count}}</1> course · {{listLabel}}~~]",
     "metaCourses_other": "[~~<1>{{count}}</1> courses · {{listLabel}}~~]",
     "clearSearch": "[~~Ĉļéář šéářĉĥ~~]",
-    "resetFilters": "[~~Řéšéţ ƒíļţéřš~~]"
+    "resetFilters": "[~~Řéšéţ ƒíļţéřš~~]",
+    "sectionTitle": "[~~Ţĥé ŵőřļđ'š ƀéšţ~~]"
   },
   "map": {
     "unavailableTitle": "[~~Ṁáƥ Ţéɱƥőřáříļý Úñáṽáíļáƀļé~~]",
@@ -168,7 +178,10 @@
     "loading": "[~~Ļőáđíñĝ ɱáƥ...~~]",
     "tapPrompt": "[~~⛳ Ţáƥ á ĉőúřšé ţő šţářţ ýőúř ĵőúřñéý~~]",
     "countOf": "[~~{{rated}} őƒ {{total}}~~]",
-    "dotSeparator": "[~~·~~]"
+    "dotSeparator": "[~~·~~]",
+    "backA11y": "[~~Ĝő ƀáĉǩ~~]",
+    "resetViewA11y": "[~~Řéšéţ ɱáƥ ṽíéŵ~~]",
+    "filterStatusA11y": "[~~Ƒíļţéř ĉőúřšéš ƀý šţáţúš~~]"
   },
   "userCourses": {
     "emptyRegion": "[~~Ñő ĉőúřšéš ƒőúñđ íñ ţĥé šéļéĉţéđ řéĝíőñ.~~]",
@@ -182,7 +195,16 @@
     "notFoundBody": "[~~Ţĥé úšéř ƥřőƒíļé ýőú'řé ļőőǩíñĝ ƒőř đőéšñ'ţ éẋíšţ őř íšñ'ţ ƥúƀļíĉ~~]",
     "regionalSortView": "[~~Šőřţ & Ṽíéŵ~~]",
     "regionalAddCourses": "[~~Áđđ Ĉőúřšéš~~]",
-    "showingRegion": "[~~Šĥőŵíñĝ {{region}} ĉőúřšéš~~]"
+    "showingRegion": "[~~Šĥőŵíñĝ {{region}} ĉőúřšéš~~]",
+    "regionalAddCoursesEmoji": "[~~📍~~]",
+    "emptyTop100OwnTitle": "[~~Ñő Ţőƥ 100 ĉőúřšéš řáţéđ ýéţ~~]",
+    "emptyTop100OtherTitle": "[~~{{name}} ĥášñ'ţ řáţéđ áñý Ţőƥ 100 ĉőúřšéš ýéţ~~]",
+    "emptyTop100OwnBody": "[~~Éẋƥļőřé ţĥé ŵőřļđ'š ĝřéáţéšţ ĝőļƒ ĉőúřšéš áñđ řáţé ţĥéɱ ţő ţřáĉǩ ýőúř ĵőúřñéý~~]",
+    "emptyTop100OtherBody": "[~~Ĉĥéĉǩ ƀáĉǩ ļáţéř ţő šéé ţĥéíř ĝőļƒ ĉőúřšé ĵőúřñéý~~]",
+    "emptyRecentOwnTitle": "[~~Ñő řéĉéñţ áĉţíṽíţý~~]",
+    "emptyRecentOtherTitle": "[~~{{name}} ĥáš ñő řéĉéñţ áĉţíṽíţý~~]",
+    "emptyRecentOwnBody": "[~~Ƥļáý šőɱé ĉőúřšéš íñ ţĥé ļášţ 30 đáýš áñđ ţĥéý'ļļ áƥƥéář ĥéřé~~]",
+    "emptyRecentOtherBody": "[~~Ñő ĉőúřšéš ƥļáýéđ íñ ţĥé ļášţ 30 đáýš~~]"
   },
   "review": {
     "filter": {
@@ -225,7 +247,9 @@
     "write": {
       "title": "[~~Ƥļáýéđ ĥéřé?~~]",
       "body": "[~~Ýőúř řáţíñĝ ĥéļƥš ĝőļƒéřš ŵőřļđŵíđé~~]",
-      "rate": "[~~Řáţé~~]"
-    }
+      "rate": "[~~Řáţé~~]",
+      "emoji": "[~~⭐~~]"
+    },
+    "reportA11y": "[~~Řéƥőřţ řéṽíéŵ~~]"
   }
 }
