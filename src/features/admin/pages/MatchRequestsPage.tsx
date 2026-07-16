@@ -89,14 +89,6 @@ export default function MatchRequestsPage() {
     return () => window.removeEventListener('admin-v2:refetch', handler);
   }, [qc]);
 
-  const setStatus = (id: string) => {
-    const next = new URLSearchParams(params);
-    next.set('status', id);
-    setParams(next, { replace: true });
-  };
-
-  if (!caps.viewUsers) return <AdminAccessDenied />;
-
   const tabs = useMemo(
     () => [
       { id: 'pending', label: 'Pending' },
@@ -105,6 +97,14 @@ export default function MatchRequestsPage() {
     ],
     [],
   );
+
+  const setStatus = (id: string) => {
+    const next = new URLSearchParams(params);
+    next.set('status', id);
+    setParams(next, { replace: true });
+  };
+
+  if (!caps.viewUsers) return <AdminAccessDenied />;
 
   const emptyCopy: Record<RequestStatus, string> = {
     pending: 'No pending match requests right now.',
