@@ -57,34 +57,39 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
   errorMessage,
   errorNonce,
 }) => {
+  const { t } = useTranslation(['auth', 'common']);
 
-  // Chrome (shield + native status bar) owned solely by AppRoutes.
-
+  const emailSchema = useMemo(
+    () =>
+      z
+        .string()
+        .trim()
+        .email({ message: t('auth:hero.invalidEmail') }),
+    [t],
+  );
 
   const [loginEmail, setLoginEmail] = useState('');
   const [emailError, setEmailError] = useState<string | null>(null);
   const [hasEditedSinceError, setHasEditedSinceError] = useState(false);
   const emailInputRef = useRef<HTMLInputElement>(null);
 
-  // Re-announce external errors whenever a new one arrives
   useEffect(() => {
     if (errorMessage) setHasEditedSinceError(false);
   }, [errorMessage, errorNonce]);
 
-  // Show session-expired toast on mount (preserved behaviour)
   useEffect(() => {
     const logoutReason = safeLocalStorage.get('logout_reason');
     if (logoutReason === 'session_expired') {
-      toast.info('For your security, please sign in again.', { duration: 5000 });
+      toast.info(t('auth:hero.sessionExpired'), { duration: 5000 });
       safeLocalStorage.remove('logout_reason');
     }
-  }, []);
+  }, [t]);
 
   const handleContinue = async () => {
     setEmailError(null);
     const result = emailSchema.safeParse(loginEmail);
     if (!result.success) {
-      setEmailError(result.error.errors[0]?.message || 'Invalid email');
+      setEmailError(result.error.errors[0]?.message || t('auth:hero.invalidEmailShort'));
       emailInputRef.current?.focus();
       return;
     }
