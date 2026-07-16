@@ -1,82 +1,17 @@
 {
   "action": {
-    "apply": "Apply",
-    "back": "Back",
-    "cancel": "Cancel",
-    "change": "Change",
-    "clear": "Clear",
     "close": "Close",
-    "confirm": "Confirm",
-    "continue": "Continue",
-    "copy": "Copy",
-    "create": "Create",
-    "delete": "Delete",
-    "dismiss": "Dismiss",
-    "done": "Done",
-    "edit": "Edit",
-    "follow": "Follow",
-    "manage": "Manage",
-    "next": "Next",
-    "ok": "OK",
-    "open": "Open",
-    "post": "Post",
-    "prev": "Prev",
-    "reload": "Reload",
-    "remove": "Remove",
-    "reset": "Reset",
-    "retry": "Retry",
-    "save": "Save",
-    "saveChanges": "Save changes",
-    "search": "Search",
-    "seeAll": "See all",
-    "select": "Select",
-    "send": "Send",
-    "share": "Share",
-    "submit": "Submit",
     "tapToRetry": "Tap to retry",
-    "tryAgain": "Try again",
-    "unfollow": "Unfollow",
-    "update": "Update",
-    "viewAll": "View all"
-  },
-  "state": {
-    "copied": "Copied",
-    "empty": "Nothing here yet",
-    "error": "Something went wrong",
-    "loading": "Loading...",
-    "loadingEllipsis": "Loading…",
-    "noResults": "No results",
-    "offline": "You're offline",
-    "posting": "Posting...",
-    "processing": "Processing",
-    "reloadPage": "Reload Page",
-    "saved": "Saved",
-    "saving": "Saving...",
-    "sending": "Sending...",
-    "somethingWentWrong": "Something went wrong",
-    "tryAgainLater": "Please try again later.",
-    "updated": "Updated",
-    "uploading": "Uploading..."
+    "tryAgain": "Try again"
   },
   "errors": {
-    "coursesLoadTitle": "Something went wrong",
     "coursesLoadBody": "We encountered an error loading the courses page. This might be a temporary issue.",
-    "sectionLoadFailed": "Couldn't load {{section}}.",
-    "genericBody": "We couldn't load this content. Please try again."
+    "coursesLoadTitle": "Something went wrong",
+    "genericBody": "We couldn't load this content. Please try again.",
+    "sectionLoadFailed": "Couldn't load {{section}}."
   },
-  "empty": {
-    "leaderboard": {
-      "title": "No Leaderboard Available",
-      "body": "Leaderboard data will appear once scoring begins."
-    },
-    "schedule": {
-      "title": "No Events Scheduled",
-      "body": "Tournament schedule will appear as events are announced."
-    },
-    "players": {
-      "title": "No Players Found",
-      "body": "Player data is being loaded."
-    }
-  },
-  "smoke": "ok"
+  "state": {
+    "reloadPage": "Reload Page",
+    "somethingWentWrong": "Something went wrong"
+  }
 }
