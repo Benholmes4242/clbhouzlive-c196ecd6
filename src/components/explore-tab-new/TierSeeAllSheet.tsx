@@ -189,7 +189,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
     : isEagleLeaders
       ? eagleLeaderRows.length
       : displayRows.length;
-  const metricAccent = metric === 'aces' ? SC_ACE : SC_ALBATROSS;
+  
 
 
 
