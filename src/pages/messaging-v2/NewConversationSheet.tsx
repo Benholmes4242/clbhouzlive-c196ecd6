@@ -260,15 +260,15 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
         >
           {debounced.trim().length === 0 ? (
             <div style={{ padding: '32px 16px', color: SUB, fontSize: 14, textAlign: 'center' }}>
-              Search for someone to message.
+              {t('search.prompt')}
             </div>
           ) : isLoading ? (
             <div style={{ padding: '32px 16px', color: SUB, fontSize: 14, textAlign: 'center' }}>
-              Searching…
+              {t('search.searching')}
             </div>
           ) : candidates.length === 0 ? (
             <div style={{ padding: '32px 16px', color: SUB, fontSize: 14, textAlign: 'center' }}>
-              No results.
+              {t('search.noResults')}
             </div>
           ) : (
             candidates.map((c) => {
