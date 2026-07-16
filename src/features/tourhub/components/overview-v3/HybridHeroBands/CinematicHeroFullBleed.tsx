@@ -27,12 +27,13 @@ import {
   type TopTie,
 } from '../HybridHero.utils';
 import { NUMERIC_STYLE, AMBER } from '../HybridHero.constants';
+import { TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 import type { DefendingChampData } from '../../../hooks/useTournamentDefendingChamp';
 
 // ---- tokens ---------------------------------------------------------------
 
-const LEADER_GREEN = '#5BD6A0';
-const LEADER_GREEN_RING = 'rgba(91,214,160,0.55)';
+const LEADER_RED = TOPAR_UNDER_DARK;              // '#FF6B5E'
+const LEADER_RED_RING = 'rgba(255,107,94,0.55)';
 const GOLD = '#E8C26A';
 const GOLD_TINT = 'rgba(232,194,106,0.16)';
 const GOLD_RING = 'rgba(232,194,106,0.65)';
