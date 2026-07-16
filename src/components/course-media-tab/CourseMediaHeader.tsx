@@ -37,7 +37,7 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
   return (
     <div
       role="tablist"
-      aria-label={t('courses:media.filterAll')}
+      aria-label={t('courses:media.filterA11y')}
       style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '16px 16px 12px' }}
     >
       {FILTER_KEYS.map(({ key, i18nKey }) => {
