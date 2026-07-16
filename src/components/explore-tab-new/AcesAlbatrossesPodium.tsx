@@ -97,7 +97,7 @@ export function AcesAlbatrossesPodium({
       {isAllTime ? (
         <>
           <LeaderPodiumCard
-            title="Most aces"
+            title="Aces"
             accent={SC_ACE}
             rows={aceLeaderRows}
             metric="aces"
@@ -105,7 +105,7 @@ export function AcesAlbatrossesPodium({
             onRowTap={onRowTap}
           />
           <LeaderPodiumCard
-            title="Most albatrosses"
+            title="Albatrosses"
             accent={SC_ALBATROSS}
             rows={albLeaderRows}
             metric="albatrosses"
@@ -116,14 +116,14 @@ export function AcesAlbatrossesPodium({
       ) : (
         <>
           <LatestPodiumCard
-            title="Latest aces"
+            title="Aces"
             accent={SC_ACE}
             rows={aceLatestRows}
             onViewAll={() => onViewAll('aces')}
             onRowTap={onLatestRowTap}
           />
           <LatestPodiumCard
-            title="Latest albatrosses"
+            title="Albatrosses"
             accent={SC_ALBATROSS}
             rows={albLatestRows}
             onViewAll={() => onViewAll('albatrosses')}
