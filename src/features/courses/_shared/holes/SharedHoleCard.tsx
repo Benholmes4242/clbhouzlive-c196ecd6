@@ -250,7 +250,7 @@ export const SharedHoleCard: React.FC<SharedHoleCardProps> = ({
               letterSpacing: '0.005em',
             }}
           >
-            {`Par ${hole.par}`}
+            {t('courses:holes.parLabel', { par: hole.par })}
             {(hole.yards != null || hole.stroke_index != null) && (
               <span
                 style={{
@@ -262,9 +262,9 @@ export const SharedHoleCard: React.FC<SharedHoleCardProps> = ({
                   letterSpacing: '0.02em',
                 }}
               >
-                {hole.yards != null ? `${hole.yards} yds` : ''}
+                {hole.yards != null ? t('courses:holes.yards', { yards: hole.yards }) : ''}
                 {hole.yards != null && hole.stroke_index != null ? ` \u00B7 ` : ''}
-                {hole.stroke_index != null ? `SI ${hole.stroke_index}` : ''}
+                {hole.stroke_index != null ? t('courses:holes.strokeIndex', { index: hole.stroke_index }) : ''}
               </span>
             )}
           </div>
