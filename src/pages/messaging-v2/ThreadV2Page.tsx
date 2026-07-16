@@ -171,6 +171,7 @@ const SkeletonBubble: React.FC<{ side: 'left' | 'right'; w: number }> = ({ side,
 );
 
 const ThreadV2Page: React.FC = () => {
+  const { t } = useTranslation(['messaging', 'common']);
   const { conversationId = '' } = useParams<{ conversationId: string }>();
   const navigate = useNavigate();
   const actor = useMessagingActor();
