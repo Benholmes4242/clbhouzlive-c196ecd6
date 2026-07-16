@@ -276,7 +276,7 @@ export const MessageBubble: React.FC<Props> = ({
                       marginLeft: 6,
                     }}
                   >
-                    (edited)
+                    {t('bubble.edited')}
                   </span>
                 ) : null}
               </span>
