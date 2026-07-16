@@ -43,7 +43,7 @@ export default tseslint.config(
           //   type/id/key/name/href/src → identifiers / URLs
           //   role/data-.*/testId/test-id/data-testid → a11y roles + test hooks
           "jsx-attributes": {
-            include: ["placeholder", "title", "aria-label", "label"],
+            include: ["placeholder", "title", "aria-label", "alt", "label"],
             exclude: [
               "className",
               "style",
