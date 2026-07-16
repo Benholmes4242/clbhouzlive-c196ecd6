@@ -1,11 +1,25 @@
 /**
- * OnTheCourse — live-only horizontal rail of featured groups.
- * Card min 218; header TEE {time} · THRU {n}; row = 24px squircle + name + score
- * (falls back to formatted total, CUT/WD as muted tag).
+ * OnTheCourse — live-only horizontal rail of featured groups with in-place
+ * expansion to the full field.
+ *
+ * Collapsed (default): featured cards from useFeaturedGroups (amber-ringed
+ * with a FEATURED chip) + a ghost "All groups" end-cap.
+ *
+ * Expanded (tap end-cap): fetches full round-1 tee times via useTeeTimesAll
+ * (lazy, enabled only after tap; cached by react-query). The rail continues
+ * with a FULL FIELD divider then every remaining group in chronological
+ * order, deduped against featured. TeeGroup has no live scores so score
+ * columns show an em-dash placeholder — no invented leaderboard join.
+ *
+ * Collapse via the "Back to featured" end tile OR the "Show featured only"
+ * pill under the rail. Expansion resets automatically when tournamentId
+ * changes (the hero swiped to a new tournament).
  */
 
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFeaturedGroups } from '../data/useFeaturedGroups';
+import { useTeeTimesAll, type TeeGroup } from '@/features/tourhub/tournament-v2/data/useTeeTimesAll';
 import { SectionShell } from './SectionShell';
 import { V4 } from '../tokens';
 import { getScoreColor } from '../../_shared/scoreColor';
@@ -39,6 +53,10 @@ interface GroupShape {
   players?: GroupPlayerShape[];
 }
 
+const AMBER = '#F7931E';
+const CARD_MIN_W = 218;
+const CARD_H_EST = 150;
+
 function parseGroups(raw: unknown): GroupShape[] {
   if (!raw) return [];
   if (Array.isArray(raw)) return raw as GroupShape[];
@@ -61,7 +79,6 @@ function parseRoundNumber(raw: unknown): number | null {
   return null;
 }
 
-
 function formatScore(v: number | string | null | undefined): string | null {
   if (v == null || v === '') return null;
   const n = typeof v === 'number' ? v : Number(v);
@@ -76,46 +93,137 @@ function scoreColor(s: string | null): string {
   return getScoreColor(n, 'light');
 }
 
-
 function groupThru(g: GroupShape): number | null {
   if (typeof g.thru === 'number') return g.thru;
   const first = g.players?.find((p) => typeof p.thru === 'number')?.thru;
   return typeof first === 'number' ? first : null;
 }
 
+function formatTeeTime(iso: string | undefined): string {
+  if (!iso) return '';
+  return new Date(iso).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toUpperCase();
+}
+
+/** Dedupe key: tee_time + sorted player names joined. */
+function featuredKey(g: GroupShape): string {
+  const names = (g.players ?? [])
+    .map((p) => (p.full_name || p.name || '').trim().toLowerCase())
+    .filter(Boolean)
+    .sort()
+    .join('|');
+  return `${g.tee_time ?? ''}|${names}`;
+}
+function teeKey(g: TeeGroup): string {
+  const names = g.players
+    .map((p) => p.name.trim().toLowerCase())
+    .filter(Boolean)
+    .sort()
+    .join('|');
+  return `${g.teeTime}|${names}`;
+}
+
 export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
   const navigate = useNavigate();
   const { data } = useFeaturedGroups(tournamentId, { live });
-  if (!live) return null;
+  const [expanded, setExpanded] = useState(false);
+  const railRef = useRef<HTMLDivElement | null>(null);
+
+  // Auto-collapse whenever the tournament changes (hero swiped away).
+  useEffect(() => {
+    setExpanded(false);
+  }, [tournamentId]);
+
+  const round = parseRoundNumber(data) ?? 1;
+
+  // Lazy full-field fetch — enabled only once expanded. React-query caches.
+  const teeTimesQuery = useTeeTimesAll(tournamentId, round, { enabled: expanded });
+  const teeGroups = teeTimesQuery.data ?? [];
+
   const groups = parseGroups(data);
+
+  const featuredKeys = useMemo(() => new Set(groups.map(featuredKey)), [groups]);
+  const dedupedTee = useMemo(
+    () => teeGroups.filter((g) => !featuredKeys.has(teeKey(g))),
+    [teeGroups, featuredKeys],
+  );
+
+  const collapseToFeatured = () => {
+    setExpanded(false);
+    railRef.current?.scrollTo({ left: 0, behavior: 'smooth' });
+  };
+
+  if (!live) return null;
   if (groups.length === 0) return null;
-  const round = parseRoundNumber(data);
+
+  const featuredCount = groups.length;
+  const totalKnown = expanded && teeTimesQuery.isSuccess ? teeGroups.length : null;
+  const moreCount = totalKnown != null ? Math.max(0, totalKnown - featuredCount) : null;
+
+  const rightMeta = totalKnown != null
+    ? `${totalKnown} groups${round != null ? ` · R${round}` : ''}`
+    : (round != null ? `R${round}` : undefined);
 
   return (
     <div style={{ marginTop: SPACE.sectionSection }}>
-      <SectionShell eyebrow="On the course" eyebrowColor={V4.amber} rightMeta={round != null ? `R${round}` : undefined}>
-        <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 16px 6px', scrollPaddingLeft: 16, scrollSnapType: 'x mandatory' }}>
+      <SectionShell eyebrow="On the course" eyebrowColor={V4.amber} rightMeta={rightMeta}>
+        <div
+          ref={railRef}
+          style={{
+            display: 'flex',
+            gap: 10,
+            overflowX: 'auto',
+            padding: '0 16px 6px',
+            scrollPaddingLeft: 16,
+            scrollSnapType: 'x proximity',
+          }}
+        >
           {groups.map((g, gi) => {
             const thru = groupThru(g);
-            const time = g.tee_time ? new Date(g.tee_time).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toUpperCase() : '';
+            const time = formatTeeTime(g.tee_time);
             return (
               <div
-                key={g.group_id ?? gi}
+                key={g.group_id ?? `f-${gi}`}
                 style={{
-                  minWidth: 218,
+                  minWidth: CARD_MIN_W,
                   flexShrink: 0,
                   scrollSnapAlign: 'start',
                   background: V4.surface,
-                  border: `0.5px solid ${V4.cardBorder}`,
+                  border: `1.5px solid ${AMBER}`,
                   boxShadow: V4.cardShadow,
                   borderRadius: 14,
                   padding: '12px 12px 10px',
+                  position: 'relative',
                 }}
               >
-                <div style={{ fontSize: 9.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>
-                  {time ? `TEE ${time}` : ''}
-                  {time && thru != null ? ' · ' : ''}
-                  {thru != null ? `THRU ${thru >= 18 ? 'F' : thru}` : ''}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 8,
+                    marginBottom: 8,
+                  }}
+                >
+                  <div style={{ fontSize: 9.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                    {time ? `TEE ${time}` : ''}
+                    {time && thru != null ? ' · ' : ''}
+                    {thru != null ? `THRU ${thru >= 18 ? 'F' : thru}` : ''}
+                  </div>
+                  <span
+                    style={{
+                      fontSize: 8,
+                      fontWeight: 900,
+                      letterSpacing: '0.12em',
+                      color: '#fff',
+                      background: AMBER,
+                      padding: '2px 5px',
+                      borderRadius: 5,
+                      textTransform: 'uppercase',
+                      lineHeight: 1,
+                    }}
+                  >
+                    ★ FEATURED
+                  </span>
                 </div>
                 {(g.players ?? []).slice(0, 3).map((p, pi) => {
                   const name = p.full_name || p.name || '';
@@ -164,7 +272,208 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
               </div>
             );
           })}
+
+          {!expanded && (
+            <button
+              type="button"
+              onClick={() => setExpanded(true)}
+              aria-label="Show all groups"
+              style={{
+                minWidth: 122,
+                flexShrink: 0,
+                scrollSnapAlign: 'start',
+                background: V4.surface,
+                border: `1px dashed #CBD5E1`,
+                borderRadius: 16,
+                padding: '14px 10px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 4,
+                cursor: 'pointer',
+              }}
+            >
+              <span style={{ fontSize: 22, fontWeight: 300, color: '#64748B', lineHeight: 1 }}>›</span>
+              <span style={{ fontSize: 11.5, fontWeight: 800, color: V4.ink }}>All groups</span>
+              <span style={{ fontSize: 10, fontWeight: 600, color: '#94A3B8' }}>
+                {moreCount != null ? `${moreCount} more` : 'full field'}
+              </span>
+            </button>
+          )}
+
+          {expanded && (
+            <>
+              {/* FULL FIELD divider */}
+              <div
+                aria-hidden
+                style={{
+                  minWidth: 34,
+                  flexShrink: 0,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 6,
+                  padding: '0 4px',
+                }}
+              >
+                <div style={{ flex: 1, width: 1, background: '#E2E8F0' }} />
+                <div
+                  style={{
+                    writingMode: 'vertical-rl',
+                    transform: 'rotate(180deg)',
+                    fontSize: 7.5,
+                    fontWeight: 800,
+                    color: '#94A3B8',
+                    letterSpacing: '0.2em',
+                    textTransform: 'uppercase',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  FULL FIELD
+                </div>
+                <div style={{ flex: 1, width: 1, background: '#E2E8F0' }} />
+              </div>
+
+              {teeTimesQuery.isLoading && (
+                <>
+                  {[0, 1, 2].map((i) => (
+                    <div
+                      key={`sk-${i}`}
+                      style={{
+                        minWidth: CARD_MIN_W,
+                        flexShrink: 0,
+                        scrollSnapAlign: 'start',
+                        background: V4.surface,
+                        border: `0.5px solid ${V4.cardBorder}`,
+                        borderRadius: 14,
+                        padding: 12,
+                        height: CARD_H_EST,
+                        opacity: 0.55,
+                      }}
+                    >
+                      <div style={{ width: 80, height: 10, background: '#E2E8F0', borderRadius: 4, marginBottom: 12 }} />
+                      {[0, 1, 2].map((r) => (
+                        <div key={r} style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '6px 0' }}>
+                          <div style={{ width: 26, height: 26, borderRadius: 8, background: '#E2E8F0' }} />
+                          <div style={{ flex: 1, height: 10, background: '#E2E8F0', borderRadius: 4 }} />
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </>
+              )}
+
+              {dedupedTee.map((g, gi) => {
+                const time = formatTeeTime(g.teeTime);
+                return (
+                  <div
+                    key={`t-${gi}-${g.teeTime}`}
+                    style={{
+                      minWidth: CARD_MIN_W,
+                      flexShrink: 0,
+                      scrollSnapAlign: 'start',
+                      background: V4.surface,
+                      border: `0.5px solid ${V4.cardBorder}`,
+                      boxShadow: V4.cardShadow,
+                      borderRadius: 14,
+                      padding: '12px 12px 10px',
+                      contentVisibility: 'auto',
+                      containIntrinsicSize: `${CARD_H_EST}px ${CARD_MIN_W}px`,
+                    } as React.CSSProperties}
+                  >
+                    <div style={{ fontSize: 9.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>
+                      {time ? `TEE ${time}` : ''}
+                      {g.startingHole ? ` · HOLE ${g.startingHole}` : ''}
+                    </div>
+                    {g.players.slice(0, 3).map((p, pi) => (
+                      <button
+                        key={pi}
+                        type="button"
+                        onClick={() => { if (p.id) navigate(`/tourhub/player/${p.id}`); }}
+                        disabled={!p.id}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 9,
+                          padding: '6px 0',
+                          minHeight: 40,
+                          width: '100%',
+                          background: 'transparent',
+                          border: 'none',
+                          borderTop: pi === 0 ? 'none' : `0.5px solid ${V4.hairline}`,
+                          textAlign: 'left',
+                          cursor: p.id ? 'pointer' : 'default',
+                        }}
+                      >
+                        <PlayerAvatar
+                          playerId={p.id ?? p.name}
+                          playerName={p.name}
+                          tourCode={tourCode}
+                          photoUrl={p.photoUrl ?? null}
+                          size="xs"
+                          ringColor={LIGHT_HAIRLINE}
+                        />
+                        <div style={{ flex: 1, minWidth: 0, fontSize: 12, fontWeight: 700, color: V4.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {p.name}
+                        </div>
+                        <span style={{ fontSize: 12.5, fontWeight: 800, color: V4.inkFaint, fontVariantNumeric: 'tabular-nums' }}>—</span>
+                      </button>
+                    ))}
+                  </div>
+                );
+              })}
+
+              {/* Back-to-featured end tile */}
+              <button
+                type="button"
+                onClick={collapseToFeatured}
+                aria-label="Back to featured"
+                style={{
+                  minWidth: 122,
+                  flexShrink: 0,
+                  scrollSnapAlign: 'start',
+                  background: V4.surface,
+                  border: `1px dashed #CBD5E1`,
+                  borderRadius: 16,
+                  padding: '14px 10px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 4,
+                  cursor: 'pointer',
+                }}
+              >
+                <span style={{ fontSize: 22, fontWeight: 300, color: '#64748B', lineHeight: 1 }}>‹</span>
+                <span style={{ fontSize: 11.5, fontWeight: 800, color: V4.ink }}>Back to</span>
+                <span style={{ fontSize: 11.5, fontWeight: 800, color: V4.ink }}>featured</span>
+              </button>
+            </>
+          )}
         </div>
+
+        {expanded && (
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 10 }}>
+            <button
+              type="button"
+              onClick={collapseToFeatured}
+              style={{
+                fontSize: 11.5,
+                fontWeight: 800,
+                color: '#64748B',
+                background: '#fff',
+                border: '1px solid #E2E8F0',
+                borderRadius: 999,
+                padding: '6px 14px',
+                cursor: 'pointer',
+              }}
+            >
+              Show featured only
+            </button>
+          </div>
+        )}
       </SectionShell>
     </div>
   );
