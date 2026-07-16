@@ -1159,7 +1159,7 @@ export function CinematicHeroFullBleed({
                 <CourseStat label="PAR" value={String(courseStats.par)} />
               )}
               {courseStats.yardage != null && (
-                <CourseStat label="YARDS" value={courseStats.yardage.toLocaleString()} />
+                <CourseStat label="YARDS" value={formatNumber(courseStats.yardage)} />
               )}
             </div>
           ) : null}
