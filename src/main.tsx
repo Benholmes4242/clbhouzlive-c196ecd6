@@ -31,6 +31,11 @@ import './styles/theme.css'
 import './styles/theme-tokens.css'
 import 'flag-icons/css/flag-icons.min.css'
 
+// i18n foundation (Wave 0) — must import before first React render so the
+// i18next instance + language detection are live from the initial paint.
+// No user-visible copy is keyed yet; this is machinery only.
+import './i18n'
+
 // ============================================================================
 // PRE-REACT IMMERSIVE FLAGS
 // Eliminates the white flash between native splash and Clubhouse skeleton on
