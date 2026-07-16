@@ -52,7 +52,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
   const major = meta.name ? isAnyMajor(meta.name) : false;
   const startDate = meta.start_date ? new Date(meta.start_date) : null;
   const daysUntil = startDate ? Math.max(0, differenceInCalendarDays(startDate, new Date())) : null;
-  const startsDay = startDate ? format(startDate, 'EEE MMM d').toUpperCase() : null;
+  const startsDay = startDate ? `${formatWeekdayShort(startDate)} ${formatMonthShort(startDate)} ${startDate.getDate()}`.toUpperCase() : null;
 
   const bg = imageUrl
     ? `linear-gradient(180deg, rgba(0,0,0,0.20) 0%, rgba(0,0,0,0.55) 55%, rgba(0,0,0,0.85) 100%), url("${imageUrl}") center/cover no-repeat`
