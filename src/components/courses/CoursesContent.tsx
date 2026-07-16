@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CoursesPageHero from './CoursesPageHero';
 import { AmateurCircuitHero } from '@/components/explore-tab-new/AmateurCircuitHero';
@@ -29,6 +30,7 @@ import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, HAIRLINE_INK_12, INK, INK_MUTE,
 
 /* ─── Rate a Course bottom sheet ─── */
 function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { t } = useTranslation('courses');
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
 
@@ -82,7 +84,7 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px 12px', borderBottom: `0.5px solid ${HAIRLINE_INK_7}` }}>
           <div>
             <SectionHeader tier="standard" kicker="Rate a Course" tone="amber" className="mb-0.5" />
-            <p style={{ fontSize: 12, color: INK_MUTE, margin: 0 }}>Search any course you've played</p>
+            <p style={{ fontSize: 12, color: INK_MUTE, margin: 0 }}>{t('rateSheet.subtitle')}</p>
           </div>
           <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: '50%', background: INK_TINT_05, border: `0.5px solid ${HAIRLINE_INK_10}`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <X size={16} style={{ color: INK_MUTE }} />
@@ -114,15 +116,15 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
           {query.trim().length < 2 ? (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '32px 16px', gap: 8, color: 'hsl(var(--muted-foreground))' }}>
               <Search size={28} style={{ opacity: 0.3 }} />
-              <p style={{ fontSize: 13, margin: 0 }}>Type a course name to get started</p>
+              <p style={{ fontSize: 13, margin: 0 }}>{t('rateSheet.emptyLong')}</p>
             </div>
           ) : isLoading ? (
             <div style={{ padding: '32px 16px', textAlign: 'center', color: 'hsl(var(--muted-foreground))' }}>
-              <p style={{ fontSize: 13, margin: 0 }}>Searching…</p>
+              <p style={{ fontSize: 13, margin: 0 }}>{t('rateSheet.searching')}</p>
             </div>
           ) : results.length === 0 ? (
             <div style={{ padding: '32px 16px', textAlign: 'center', color: 'hsl(var(--muted-foreground))' }}>
-              <p style={{ fontSize: 13, margin: 0 }}>No courses found for "{query}"</p>
+              <p style={{ fontSize: 13, margin: 0 }}>{t('rateSheet.noResults', { query })}</p>
             </div>
           ) : (
             results.map((course, i) => (
@@ -147,7 +149,7 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
                   </p>
                 </div>
                 <span style={{ fontSize: 12, fontWeight: 600, color: AMBER, flexShrink: 0 }}>
-                  Rate →
+                  {t('rateSheet.rateAction')}
                 </span>
               </button>
             ))
