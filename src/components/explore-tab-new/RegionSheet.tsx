@@ -33,10 +33,10 @@ export default function RegionSheet({
       <div style={{ padding: '8px 20px 12px' }}>
         <div
           style={{
-            fontSize: 8.5,
-            fontWeight: 900,
+            fontSize: 10.5,
+            fontWeight: 600,
             color: '#F7931E',
-            letterSpacing: '0.16em',
+            letterSpacing: '0.06em',
             textTransform: 'uppercase',
             marginBottom: 4,
           }}
@@ -47,9 +47,9 @@ export default function RegionSheet({
           id="explore-region-sheet-title"
           style={{
             fontSize: 20,
-            fontWeight: 900,
+            fontWeight: 700,
             color: '#0F172A',
-            letterSpacing: '-0.03em',
+            letterSpacing: '-0.02em',
           }}
         >
           Browse by region
