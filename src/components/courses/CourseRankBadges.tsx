@@ -310,7 +310,7 @@ const CourseRankBadges = ({
                   </div>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
-                  <p>Experience Points Earned</p>
+                  <p>{t('card.experiencePoints')}</p>
                 </TooltipContent>
              </Tooltip>
            )}
