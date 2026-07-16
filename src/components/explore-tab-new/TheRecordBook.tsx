@@ -19,8 +19,8 @@ import { relativeTime } from '@/utils/relativeTime';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const INK = '#0F172A';
-const PANEL_BG = 'linear-gradient(180deg, #FCF8F0 0%, #F7F1E4 100%)';
-const PANEL_BORDER = '0.5px solid rgba(158,115,0,0.18)';
+const PANEL_BG = 'linear-gradient(180deg, #FBFAF7 0%, #F5F3EC 100%)';
+const PANEL_BORDER = '0.5px solid rgba(158,115,0,0.14)';
 const PANEL_SHADOW = '0 1px 3px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.05)';
 const GOLD = '#FBBC2E';
 const PARCHMENT_GOLD = '#B8860B';
@@ -95,6 +95,21 @@ function categoryLabel(category: string): string {
   const base = stripWindow(category);
   return CATEGORY_META[base]?.label ?? base.replace(/_/g, ' ');
 }
+// Render the record's headline value with the right unit. Mirrors the old
+// caption unit derivation (CATEGORY_META), except Score (best_score_diff)
+// reads as a differential rather than strokes.
+function recordCopy(category: string, value: number): string {
+  const base = stripWindow(category);
+  if (base === 'best_score_diff') {
+    const n = Math.round(value * 10) / 10;
+    return `${n} differential`;
+  }
+  const meta = CATEGORY_META[base];
+  const n = Math.round(value);
+  if (!meta) return String(n);
+  const unit = n === 1 ? meta.unitSingular : meta.unit;
+  return `${n} ${unit}`;
+}
 function progressPct(_category: string, gap: number): number {
   const n = Math.max(1, Math.round(gap));
   return Math.max(20, 96 - (n - 1) * 14);
@@ -163,7 +178,7 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
                 lineHeight: 1,
               }}
             >
-              {`Course crowns · ${regionUpperFor(region)}`}
+              {`Course records · ${regionUpperFor(region)}`}
             </div>
             <div
               style={{
@@ -202,10 +217,12 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
         <div
           style={{
             marginTop: 12,
-            padding: '0 16px 0 64px',
+            // Caption starts at the course-name text edge:
+            //   pad 16 + rank 12 + gap 8 + avatar 24 + gap 8 = 68
+            padding: '0 16px 0 68px',
             display: 'flex',
             alignItems: 'center',
-            gap: 10,
+            gap: 8,
             fontSize: 9,
             fontWeight: 600,
             letterSpacing: '0.06em',
@@ -215,8 +232,8 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
           }}
         >
           <div style={{ flex: 1, minWidth: 0 }}>Course</div>
-          <div style={{ width: 44, textAlign: 'right' }}>To par</div>
-          <div style={{ width: 34, textAlign: 'right' }}>Gross</div>
+          <div style={{ width: 36, textAlign: 'right' }}>To par</div>
+          <div style={{ width: 26, textAlign: 'right' }}>Gross</div>
           <div style={{ width: 12 }} aria-hidden />
         </div>
 
@@ -286,7 +303,7 @@ function LedgerRow({
         position: 'relative',
         display: 'flex',
         alignItems: 'center',
-        gap: 10,
+        gap: 8,
         padding: '9px 16px',
         width: '100%',
         background: 'transparent',
@@ -301,7 +318,9 @@ function LedgerRow({
           aria-hidden
           style={{
             position: 'absolute',
-            left: 64,
+            // Separator starts at the course-name text edge:
+            //   pad 16 + rank 12 + gap 8 + avatar 24 + gap 8 = 68
+            left: 68,
             right: 16,
             top: 0,
             height: 0,
@@ -312,7 +331,7 @@ function LedgerRow({
       {/* Rank */}
       <div
         style={{
-          width: 16,
+          width: 12,
           flexShrink: 0,
           fontSize: 11,
           fontWeight: 600,
@@ -373,10 +392,10 @@ function LedgerRow({
       <div
         className="tabular-nums"
         style={{
-          width: 44,
+          width: 36,
           flexShrink: 0,
           textAlign: 'right',
-          fontSize: 15,
+          fontSize: 14,
           fontWeight: 700,
           color: toParColor,
           lineHeight: 1,
@@ -389,10 +408,10 @@ function LedgerRow({
       <div
         className="tabular-nums"
         style={{
-          width: 34,
+          width: 26,
           flexShrink: 0,
           textAlign: 'right',
-          fontSize: 12,
+          fontSize: 11,
           fontWeight: 500,
           color: GHOST,
           lineHeight: 1,
@@ -482,6 +501,8 @@ function ConquestChip({ row }: { row: TitleInReach }) {
   const navigate = useNavigate();
   const pct = progressPct(row.category, row.gap);
   const gap = gapCopy(row.category, row.gap);
+  const category = categoryLabel(row.category);
+  const record = recordCopy(row.category, row.leader_value);
   return (
     <button
       type="button"
@@ -489,7 +510,7 @@ function ConquestChip({ row }: { row: TitleInReach }) {
       className="text-left active:opacity-80 transition-opacity"
       style={{
         flexShrink: 0,
-        width: 172,
+        width: 196,
         borderRadius: 10,
         background: CHIP_BG,
         border: 'none',
@@ -499,43 +520,37 @@ function ConquestChip({ row }: { row: TitleInReach }) {
         color: INK,
       }}
     >
+      {/* Line 1: course name */}
       <div
         style={{
-          display: 'flex',
-          alignItems: 'baseline',
-          gap: 6,
-          minWidth: 0,
+          fontSize: 12.5,
+          fontWeight: 600,
+          letterSpacing: '-0.01em',
+          color: INK,
+          lineHeight: 1.2,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
         }}
       >
-        <div
-          style={{
-            flex: 1,
-            minWidth: 0,
-            fontSize: 12.5,
-            fontWeight: 600,
-            letterSpacing: '-0.01em',
-            color: INK,
-            lineHeight: 1.2,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {row.course_name}
-        </div>
-        <div
-          style={{
-            flexShrink: 0,
-            fontSize: 10,
-            fontWeight: 500,
-            color: 'rgba(15,23,42,0.45)',
-            lineHeight: 1.2,
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {categoryLabel(row.category)}
-        </div>
+        {row.course_name}
       </div>
+      {/* Line 2: {Category} · record {value-with-unit} */}
+      <div
+        style={{
+          marginTop: 3,
+          fontSize: 10.5,
+          fontWeight: 500,
+          color: 'rgba(15,23,42,0.5)',
+          lineHeight: 1.2,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {`${category} · record ${record}`}
+      </div>
+      {/* Bar */}
       <div
         style={{
           marginTop: 8,
@@ -554,6 +569,7 @@ function ConquestChip({ row }: { row: TitleInReach }) {
           }}
         />
       </div>
+      {/* Line 3: {gap} to take it */}
       <div
         style={{
           marginTop: 7,
@@ -567,7 +583,7 @@ function ConquestChip({ row }: { row: TitleInReach }) {
         }}
       >
         <span style={{ color: INK, fontWeight: 700 }}>{gap}</span>
-        {' '}to take it · {row.leader_value}
+        {' '}to take it
       </div>
     </button>
   );
