@@ -140,7 +140,7 @@ export const Composer: React.FC<Props> = ({
         ref={textareaRef}
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder="Message"
+        placeholder={t('composer.placeholder')}
         rows={1}
         disabled={disabled}
         style={{
