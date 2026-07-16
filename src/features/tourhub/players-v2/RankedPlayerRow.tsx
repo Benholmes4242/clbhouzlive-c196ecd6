@@ -42,8 +42,8 @@ export interface RankedPlayerRowProps {
 const LIVE_GREEN = '#10B981';
 
 function formatStat(n: number): string {
-  if (Math.abs(n) >= 1000) return n.toLocaleString(undefined, { maximumFractionDigits: 0 });
-  return n.toLocaleString(undefined, { maximumFractionDigits: 2 });
+  if (Math.abs(n) >= 1000) return formatNumberMaxFrac(n, 0);
+  return formatNumberMaxFrac(n, 2);
 }
 
 function RankedPlayerRowInner({
