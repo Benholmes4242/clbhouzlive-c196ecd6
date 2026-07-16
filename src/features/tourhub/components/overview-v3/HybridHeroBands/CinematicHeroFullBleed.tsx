@@ -78,7 +78,7 @@ function avatarFor(e: any, tourSlug?: string | null): string[] {
 
 function scoreColour(n: number | null | undefined): string {
   if (n == null || Number.isNaN(n)) return 'rgba(255,255,255,0.85)';
-  if (n < 0) return LEADER_GREEN;
+  if (n < 0) return LEADER_RED;
   if (n > 0) return 'rgba(255,255,255,0.55)';
   return 'rgba(255,255,255,0.85)';
 }
@@ -653,7 +653,7 @@ export function CinematicHeroFullBleed({
                   fontSize: 15,
                   fontWeight: 800,
                   letterSpacing: '-0.02em',
-                  color: LEADER_GREEN,
+                  color: LEADER_RED,
                 }}
               >
                 {champion.score}
@@ -930,7 +930,7 @@ export function CinematicHeroFullBleed({
                       width: RANK_W,
                       fontSize: 12,
                       fontWeight: 700,
-                      color: row.isLeader ? LEADER_GREEN : 'rgba(255,255,255,0.5)',
+                      color: row.isLeader ? LEADER_RED : 'rgba(255,255,255,0.5)',
                       textAlign: 'left',
                       flexShrink: 0,
                     }}
@@ -980,7 +980,7 @@ export function CinematicHeroFullBleed({
                       fontSize: 16,
                       fontWeight: 800,
                       letterSpacing: '-0.02em',
-                      color: row.isLeader ? LEADER_GREEN : scoreColour(row.entry?.score),
+                      color: row.isLeader ? LEADER_RED : scoreColour(row.entry?.score),
                     }}
                   >
                     {fmtScore(row.entry?.score)}
@@ -1017,7 +1017,7 @@ export function CinematicHeroFullBleed({
                     width: RANK_W,
                     fontSize: 12,
                     fontWeight: 700,
-                    color: row.isLeader ? (awaitingPlayoff ? GOLD : LEADER_GREEN) : 'rgba(255,255,255,0.5)',
+                    color: row.isLeader ? (awaitingPlayoff ? GOLD : LEADER_RED) : 'rgba(255,255,255,0.5)',
                     textAlign: 'left',
                     flexShrink: 0,
                   }}
@@ -1027,7 +1027,7 @@ export function CinematicHeroFullBleed({
                 <StackedAvatars
                   items={row.items}
                   count={row.count}
-                  ringColor={row.isLeader ? (awaitingPlayoff ? GOLD_RING : LEADER_GREEN_RING) : undefined}
+                  ringColor={row.isLeader ? (awaitingPlayoff ? GOLD_RING : LEADER_RED_RING) : undefined}
                 />
                 <span
                   style={{
@@ -1052,7 +1052,7 @@ export function CinematicHeroFullBleed({
                     fontSize: 16,
                     fontWeight: 800,
                     letterSpacing: '-0.02em',
-                    color: row.isLeader ? (awaitingPlayoff ? GOLD : LEADER_GREEN) : scoreColour(tieScoreNum),
+                    color: row.isLeader ? (awaitingPlayoff ? GOLD : LEADER_RED) : scoreColour(tieScoreNum),
                   }}
                 >
                   {typeof row.score === 'number' ? fmtScore(row.score) : row.score}
