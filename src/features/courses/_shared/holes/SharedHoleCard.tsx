@@ -155,6 +155,7 @@ export const SharedHoleCard: React.FC<SharedHoleCardProps> = ({
   onToggle,
   tag = null,
 }) => {
+  const { t } = useTranslation(['courses']);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -169,9 +170,9 @@ export const SharedHoleCard: React.FC<SharedHoleCardProps> = ({
   const avgColor = avgColorFor(hole.avg_to_par);
   const tagInfo =
     tag === 'hardest'
-      ? { label: 'HARDEST', c: SC_DOUBLE }
+      ? { label: t('courses:holes.hardest'), c: SC_DOUBLE }
       : tag === 'easiest'
-      ? { label: 'EASIEST', c: SC_BIRDIE }
+      ? { label: t('courses:holes.easiest'), c: SC_BIRDIE }
       : null;
 
   const subPar =
