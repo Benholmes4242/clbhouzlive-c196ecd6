@@ -513,7 +513,7 @@ const ThreadV2Page: React.FC = () => {
                 className="flex justify-center"
                 style={{ padding: '8px 0', color: HINT, fontSize: 12 }}
               >
-                Loading...
+                {t('common:state.loading')}
               </div>
             ) : null}
             {messages.map((m, i) => {
