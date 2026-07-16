@@ -149,6 +149,46 @@ export function formatMonthShort(d: DateInput): string {
   return new Intl.DateTimeFormat(getActiveLocale(), { month: 'short' }).format(toDate(d));
 }
 
+/**
+ * Composed weekday + short-month + day + 12h time — matches the composer's
+ * scheduled-post pill, toast, and ScheduleSheet readable line:
+ *   toLocaleString(undefined, { weekday:'short', month:'short', day:'numeric',
+ *                               hour:'numeric', minute:'2-digit' })
+ *
+ * en output (Intl 'en' resolves to en-US 12h clock): e.g. "Thu, Jul 16, 3:45 PM".
+ *
+ * QUIRKS REPLICATED (en):
+ *   - short weekday with trailing comma ("Thu, ")
+ *   - 12-hour clock with AM/PM
+ *   - two-digit minutes, one-or-two-digit hour
+ */
+export function formatScheduleDateTime(d: DateInput): string {
+  return new Intl.DateTimeFormat(getActiveLocale(), {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  }).format(toDate(d));
+}
+
+/**
+ * All-numeric short date — matches bare `toLocaleDateString()` fallback in
+ * the drafts sheet:  new Date(iso).toLocaleDateString()
+ *
+ * en output (Intl 'en' resolves to en-US): "7/16/2026" (M/D/YYYY, no padding).
+ */
+export function formatDateNumeric(d: DateInput): string {
+  return new Intl.DateTimeFormat(getActiveLocale(), {
+    month: 'numeric',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(toDate(d));
+}
+
+
+
+
 
 // ─── ordinals ─────────────────────────────────────────────────────────────
 
