@@ -9,7 +9,8 @@ import { selectFeaturedStreaks } from './selectFeaturedStreaks';
 import { milestoneFor } from './streakMilestones';
 import { openAllStreaks } from '../../whs/gam/events';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { relativeTime } from '@/lib/gam/visuals';
+import { formatRelativeAgo } from '@/i18n/format';
+const relativeTime = (iso: string | null) => formatRelativeAgo(iso, { yesterday: true });
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const AMBER = '#F7931E';

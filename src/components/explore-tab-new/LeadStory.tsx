@@ -5,7 +5,7 @@ import { TierSeeAllSheet } from './TierSeeAllSheet';
 import { useScorecardOpener } from './useScorecardOpener';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { SPACE } from '@/lib/spacing';
-import { relativeTime } from '@/utils/relativeTime';
+import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const GOLD = '#FBBC2E';

@@ -19,6 +19,7 @@ import { Heart, MessageCircle, Send, MoreHorizontal, Plus, Check } from 'lucide-
 import { MuteButton } from '@/audio/MuteButton';
 import { Z } from '@/config/zIndex';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { formatCountKilo } from '@/i18n/format';
 
 // Shared lift + stroke for every floating glyph in the immersive feed chrome.
 const FLOAT_SHADOW = 'drop-shadow(0 1px 4px rgba(0,0,0,0.55))';
@@ -61,10 +62,10 @@ interface FeedActionRailProps {
 
 const formatCount = (count: number | null | undefined): string | null => {
   if (count === null || count === undefined || count === 0) return null;
-  if (count >= 1_000_000) return `${(count / 1_000_000).toFixed(1)}M`;
-  if (count >= 1_000) return `${(count / 1_000).toFixed(1)}k`;
-  return count.toString();
+  return formatCountKilo(count);
 };
+
+
 
 interface ActionButtonProps {
   onClick: () => void;

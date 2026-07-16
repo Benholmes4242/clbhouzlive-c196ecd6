@@ -1,6 +1,7 @@
 import React from 'react';
 import { GAM } from '../../tokens';
-import { relativeTime } from '@/lib/gam/visuals';
+import { formatRelativeAgo } from '@/i18n/format';
+const relativeTime = (iso: string | null) => formatRelativeAgo(iso, { yesterday: true });
 import { useFriendsWhoEarnedBadge } from '@/hooks/gam/useFriendsWhoEarnedBadge';
 import { useFriendsWhoHeldLegend } from '@/hooks/gam/useFriendsWhoHeldLegend';
 import { MATERIAL_PALETTES } from '../_shared/rarityPalette';

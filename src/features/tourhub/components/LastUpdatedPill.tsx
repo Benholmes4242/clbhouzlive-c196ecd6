@@ -1,5 +1,5 @@
-import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { formatRelativeAgoLong } from '@/i18n/format';
 
 interface LastUpdatedPillProps {
   timestamp: string | null;
@@ -8,10 +8,12 @@ interface LastUpdatedPillProps {
 
 export function LastUpdatedPill({ timestamp, className }: LastUpdatedPillProps) {
   if (!timestamp) return null;
-  
-  const timeAgo = formatDistanceToNow(new Date(timestamp), { addSuffix: false });
-  const display = timeAgo === 'less than a minute' ? 'just now' : `${timeAgo} ago`;
-  
+
+  // formatRelativeAgoLong preserves the previous shape exactly:
+  //   "less than a minute" → "just now"
+  //   else                 → date-fns' "{distance} ago" (e.g. "about 1 hour ago")
+  const display = formatRelativeAgoLong(timestamp);
+
   return (
     <span className={cn(
       "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium backdrop-blur-[10px]",

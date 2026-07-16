@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import BottomSheet from './BottomSheet';
 import { Pencil, Trash2 } from 'lucide-react';
-import { relativeTime } from '@/utils/relativeTime';
+import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import type { DraftRow } from '../hooks/useDrafts';
 
 interface Props {

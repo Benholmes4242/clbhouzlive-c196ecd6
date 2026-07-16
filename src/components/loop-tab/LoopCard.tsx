@@ -29,6 +29,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useLikeMutation } from '@/components/media-system/hooks/useLikeMutation';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { MentionText } from '@/components/mentions/MentionText';
+import { formatCountUpperPadded as formatCompact } from '@/i18n/format';
 
 interface LoopCardProps {
   post: FeedPost;
@@ -46,11 +47,8 @@ interface LoopCardProps {
   showActivitySignals?: boolean;
 }
 
-function formatCompact(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
-  return String(n);
-}
+// formatCompact moved to @/i18n/format (Wave 1 drift-consolidation).
+
 
 function formatVideoDuration(totalSeconds: number): string {
   const s = Math.max(0, Math.floor(totalSeconds || 0));

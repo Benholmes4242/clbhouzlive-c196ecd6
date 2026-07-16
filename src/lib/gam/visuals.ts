@@ -144,24 +144,9 @@ export function rankEmoji(rank: number): string {
   return `${rank}`;
 }
 
-export function relativeTime(iso: string | null): string {
-  if (!iso) return '';
-  const now = Date.now();
-  const then = new Date(iso).getTime();
-  const diffMs = now - then;
-  const diffSec = Math.floor(diffMs / 1000);
-  if (diffSec < 60) return 'just now';
-  const diffMin = Math.floor(diffSec / 60);
-  if (diffMin < 60) return `${diffMin}m ago`;
-  const diffHr = Math.floor(diffMin / 60);
-  if (diffHr < 24) return `${diffHr}h ago`;
-  const diffDay = Math.floor(diffHr / 24);
-  if (diffDay === 1) return 'yesterday';
-  if (diffDay < 30) return `${diffDay}d ago`;
-  const diffMo = Math.floor(diffDay / 30);
-  if (diffMo < 12) return `${diffMo}mo ago`;
-  return `${Math.floor(diffMo / 12)}y ago`;
-}
+// relativeTime removed in Wave 1 — consumers now use
+// `formatRelativeAgo(iso, { yesterday: true })` from `@/i18n/format`.
+
 
 
 const MINUS = '\u2212'; // Unicode minus sign (not ASCII hyphen)

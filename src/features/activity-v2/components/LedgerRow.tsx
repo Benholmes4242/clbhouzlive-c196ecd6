@@ -7,7 +7,7 @@
 import React, { useRef } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { relativeTime } from '@/utils/relativeTime';
+import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import { useFollowState } from '@/hooks/useFollowState';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
