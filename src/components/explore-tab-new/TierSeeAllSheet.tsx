@@ -220,9 +220,9 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
         <div style={{ minWidth: 0 }}>
           <div
             style={{
-              fontSize: 8.5,
-              fontWeight: 800,
-              letterSpacing: '0.14em',
+              fontSize: 10.5,
+              fontWeight: 600,
+              letterSpacing: '0.06em',
               textTransform: 'uppercase',
               color: AMBER,
               marginBottom: 4,
@@ -235,10 +235,10 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
           <div
             id="tier-see-all-title"
             style={{
-              fontSize: 18,
-              fontWeight: 800,
+              fontSize: 20,
+              fontWeight: 700,
               color: INK,
-              letterSpacing: '-0.01em',
+              letterSpacing: '-0.02em',
               lineHeight: 1.1,
             }}
           >
