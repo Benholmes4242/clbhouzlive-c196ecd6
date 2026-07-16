@@ -210,20 +210,6 @@ export function LeadStory({ region, regionUpper, mode }: Props) {
             >
               {overlineLabel}
             </div>
-            <div
-              style={{
-                marginTop: 2,
-                fontSize: 9,
-                fontWeight: 600,
-                letterSpacing: '0.06em',
-                textTransform: 'uppercase',
-                color: 'rgba(255,255,255,0.55)',
-                lineHeight: 1,
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {regionLine}
-            </div>
           </div>
           <span
             style={{
