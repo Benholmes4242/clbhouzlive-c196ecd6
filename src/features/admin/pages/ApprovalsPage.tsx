@@ -53,6 +53,13 @@ export default function ApprovalsPage() {
     return () => window.removeEventListener('admin-v2:refetch', handler);
   }, [qc]);
 
+  const tabs = useMemo(() => [
+    { id: 'pending', label: 'Pending' },
+    { id: 'approved', label: 'Approved' },
+    { id: 'rejected', label: 'Rejected' },
+    { id: 'all', label: 'All' },
+  ], []);
+
   const setStatus = (id: string) => {
     const next = new URLSearchParams(params);
     next.set('status', id);
@@ -60,13 +67,6 @@ export default function ApprovalsPage() {
   };
 
   if (!caps.approveRequests) return <AdminAccessDenied />;
-
-  const tabs = useMemo(() => [
-    { id: 'pending', label: 'Pending' },
-    { id: 'approved', label: 'Approved' },
-    { id: 'rejected', label: 'Rejected' },
-    { id: 'all', label: 'All' },
-  ], []);
 
   const columns: DataListColumn<AdminRequestRow>[] = [
     { key: 'action', header: 'Action', render: (r) => (
