@@ -210,7 +210,7 @@ export function deriveHeroState(
     kind: 'upcoming',
     variant,
     countdown: start ? formatCountdown(start, now) : '',
-    meta: start ? format(start, 'MMM d').toUpperCase() : '',
+    meta: start ? formatMonthDay(start).toUpperCase() : '',
   };
 }
 
