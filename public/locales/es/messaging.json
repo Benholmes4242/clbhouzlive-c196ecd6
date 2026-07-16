@@ -46,12 +46,20 @@
   "search": {
     "noResults": "No results.",
     "prompt": "Search for someone to message.",
-    "searching": "Searching…"
+    "searching": "Searching…",
+    "people": "Search people or businesses",
+    "peopleAnd": "Search people and businesses"
   },
   "sheet": {
     "detailsTitle": "Details"
   },
   "title": {
     "inbox": "Messages"
+  },
+  "composer": {
+    "placeholder": "Message"
+  },
+  "group": {
+    "namePlaceholder": "Group name (optional)"
   }
 }
