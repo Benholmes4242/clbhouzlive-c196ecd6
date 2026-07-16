@@ -52,6 +52,7 @@ type Step = 'hero' | 'otp';
 const RESEND_COOLDOWN_SECONDS = 30;
 
 const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
+  const { t } = useTranslation('auth');
   const navigate = useNavigate();
 
   const [step, setStep] = useState<Step>('hero');
