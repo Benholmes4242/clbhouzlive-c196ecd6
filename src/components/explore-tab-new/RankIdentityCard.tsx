@@ -175,6 +175,204 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
     setTimeout(() => openGamAchievements(), 0);
   };
 
+  if (variant === 'strip') {
+    return (
+      <div style={{ padding: '12px 16px 0' }}>
+        <button
+          type="button"
+          onClick={onOpen}
+          className="w-full text-left active:scale-[0.995] transition-transform"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 14,
+            padding: '10px 14px',
+            borderRadius: 16,
+            background: '#FFFFFF',
+            border: `0.5px solid ${HAIRLINE}`,
+            boxShadow: '0 2px 10px rgba(15,23,42,0.05)',
+            color: INK,
+            cursor: 'pointer',
+            fontFamily: FONT,
+            width: '100%',
+          }}
+        >
+          {/* Left: medal count over MEDALS microlabel */}
+          <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 36 }}>
+            <div
+              className="tabular-nums"
+              style={{
+                fontSize: 26,
+                fontWeight: 900,
+                letterSpacing: '-0.02em',
+                color: INK,
+                lineHeight: 1,
+              }}
+            >
+              {medals}
+            </div>
+            <div
+              style={{
+                marginTop: 3,
+                fontSize: 8.5,
+                fontWeight: 800,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color: 'rgba(15,23,42,0.5)',
+              }}
+            >
+              Medals
+            </div>
+          </div>
+
+          {/* Vertical hairline divider */}
+          <div
+            aria-hidden
+            style={{
+              width: 1,
+              alignSelf: 'stretch',
+              background: HAIRLINE,
+              flexShrink: 0,
+            }}
+          />
+
+          {/* Right: two-line block */}
+          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {/* Line 1: name + hcp · #N worldwide */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'baseline',
+                gap: 8,
+                minWidth: 0,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 12.5,
+                  fontWeight: 800,
+                  color: INK,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  minWidth: 0,
+                  flex: 1,
+                }}
+              >
+                {displayName}
+                {hasHcp && (
+                  <>
+                    {' '}
+                    <span style={{ color: AMBER, fontWeight: 800 }}>
+                      {formatHcp(hcp)}
+                    </span>
+                  </>
+                )}
+              </div>
+              {globalRank != null && (
+                <div
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 800,
+                    letterSpacing: '0.08em',
+                    color: 'rgba(15,23,42,0.5)',
+                    textTransform: 'uppercase',
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0,
+                  }}
+                >
+                  · #{globalRank} Worldwide
+                </div>
+              )}
+            </div>
+
+            {/* Line 2: gem pill + progress bar + medalsToNext */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 5,
+                  flexShrink: 0,
+                  border: '0.5px solid rgba(15,23,42,0.12)',
+                  borderRadius: 999,
+                  padding: '3px 8px 3px 6px',
+                }}
+              >
+                <span
+                  style={{
+                    width: 7,
+                    height: 7,
+                    borderRadius: 999,
+                    background: tierHex,
+                    boxShadow: `0 0 5px ${tierHex}66`,
+                    flexShrink: 0,
+                  }}
+                />
+                <span
+                  style={{
+                    fontSize: 9.5,
+                    fontWeight: 800,
+                    color: INK,
+                    whiteSpace: 'nowrap',
+                    letterSpacing: '0.02em',
+                  }}
+                >
+                  {tierName} {currentLevel.level}
+                </span>
+              </div>
+
+              <div
+                style={{
+                  flex: 1,
+                  height: 4,
+                  borderRadius: 999,
+                  background: 'rgba(15,23,42,0.08)',
+                  overflow: 'hidden',
+                  minWidth: 24,
+                }}
+              >
+                <div
+                  style={{
+                    width: `${barPct}%`,
+                    height: '100%',
+                    background: `linear-gradient(90deg, ${AMBER}, ${GOLD})`,
+                    borderRadius: 999,
+                  }}
+                />
+              </div>
+
+              <div
+                style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  color: 'rgba(15,23,42,0.55)',
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
+                }}
+              >
+                {nextLevel ? (
+                  <>
+                    <span
+                      style={{ color: AMBER, fontWeight: 800 }}
+                      className="tabular-nums"
+                    >
+                      {medalsToNext}
+                    </span>{' '}
+                    to {nextLevel.label}
+                  </>
+                ) : (
+                  'Max level'
+                )}
+              </div>
+            </div>
+          </div>
+        </button>
+      </div>
+    );
+  }
+
+
   return (
     <div style={{ padding: '12px 16px 0' }}>
       <button
