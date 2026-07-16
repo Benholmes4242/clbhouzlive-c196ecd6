@@ -161,15 +161,18 @@ function PodiumCard({
           None yet
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
           {rows.map((r, i) => {
             const isTop = i === 0;
             const name = formatHolderName(r.holder_name);
             const count = r[metric] ?? 0;
-            const size = isTop ? 28 : 22;
-            const nameSize = isTop ? 13 : 12;
-            const countSize = isTop ? 17 : 13;
+            const size = isTop ? 32 : 26;
+            const nameSize = isTop ? 12.5 : 11.5;
+            const countSize = isTop ? 15 : 12.5;
             const countColor = isTop ? accent : INK;
+            const unitSingular = metric === 'aces' ? 'ACE' : 'ALBATROSS';
+            const unitPlural = metric === 'aces' ? 'ACES' : 'ALBATROSSES';
+            const unit = count === 1 ? unitSingular : unitPlural;
             const handleTap = () => {
               if (r.user_id && onRowTap) onRowTap(r.user_id);
             };
@@ -184,8 +187,17 @@ function PodiumCard({
                   alignItems: 'center',
                   gap: 9,
                   padding: 0,
-                  background: 'transparent',
+                  paddingTop: isTop ? 0 : 7,
+                  marginTop: isTop ? 0 : 8,
                   border: 'none',
+                  background: 'transparent',
+                  // Hairline inset past the avatar column (avatar 26 + gap 9 = 35px)
+                  backgroundImage: isTop
+                    ? 'none'
+                    : `linear-gradient(to right, transparent 35px, ${HAIRLINE} 35px)`,
+                  backgroundRepeat: 'no-repeat',
+                  backgroundSize: '100% 0.5px',
+                  backgroundPosition: '0 0',
                   cursor: r.user_id ? 'pointer' : 'default',
                   fontFamily: FONT,
                 }}
@@ -203,28 +215,56 @@ function PodiumCard({
                   style={{
                     flex: 1,
                     minWidth: 0,
-                    fontSize: nameSize,
-                    fontWeight: 600,
-                    color: INK,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    lineHeight: 1.2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
                   }}
                 >
-                  {name}
-                </div>
-                <div
-                  className="tabular-nums"
-                  style={{
-                    fontSize: countSize,
-                    fontWeight: 700,
-                    color: countColor,
-                    letterSpacing: '-0.01em',
-                    lineHeight: 1,
-                  }}
-                >
-                  {count}
+                  <div
+                    style={{
+                      fontSize: nameSize,
+                      fontWeight: 600,
+                      letterSpacing: isTop ? '-0.01em' : 0,
+                      color: INK,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {name}
+                  </div>
+                  <div
+                    style={{
+                      marginTop: 1,
+                      display: 'flex',
+                      alignItems: 'baseline',
+                      gap: 4,
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    <span
+                      className="tabular-nums"
+                      style={{
+                        fontSize: countSize,
+                        fontWeight: 700,
+                        color: countColor,
+                      }}
+                    >
+                      {count}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 8.5,
+                        fontWeight: 600,
+                        letterSpacing: '0.06em',
+                        textTransform: 'uppercase',
+                        color: 'rgba(15,23,42,0.4)',
+                      }}
+                    >
+                      {unit}
+                    </span>
+                  </div>
                 </div>
               </button>
             );
@@ -234,5 +274,6 @@ function PodiumCard({
     </div>
   );
 }
+
 
 export default AcesAlbatrossesPodium;
