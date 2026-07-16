@@ -42,6 +42,7 @@ import { createTapHandler } from './mediaTap';
 import { triggerHaptic } from '@/lib/ui/haptics';
 import type { ActiveActor } from '@/types/actor';
 import { MentionText } from '@/components/mentions/MentionText';
+import { formatCountKilo as formatCount, formatRelativeWithSeconds as timeAgo } from '@/i18n/format';
 
 
 // Full-bleed charcoal chrome — one charcoal (#15171F) across the app: tab
