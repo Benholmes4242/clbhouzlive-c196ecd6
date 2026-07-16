@@ -87,7 +87,7 @@ export const VoiceNote: React.FC<Props> = ({ attachment, isOutgoing }) => {
         }}
       >
         <AlertCircle size={14} />
-        Voice unavailable
+        {t('error.voiceUnavailable')}
       </div>
     );
   }
