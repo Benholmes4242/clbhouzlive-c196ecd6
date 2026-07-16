@@ -171,7 +171,7 @@ export const MessageBubble: React.FC<Props> = ({
               color: SUB,
             }}
           >
-            Message deleted
+            {t('bubble.deleted')}
           </span>
         ) : (
           <>
