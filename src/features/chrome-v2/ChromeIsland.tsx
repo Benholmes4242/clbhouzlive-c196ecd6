@@ -300,7 +300,8 @@ const AvatarCell: React.FC<{
   const activeUnread = activeActor
     ? countFor(activeActor.type as 'personal' | 'business', activeActor.id)
     : 0;
-  const badgeCount = activeUnread > 0 ? activeUnread : otherUnreadTotal;
+  const activeUnreadCount = activeUnread;
+  const showOtherDot = activeUnread === 0 && otherUnreadTotal > 0;
 
   if (isLoading || !activeActor) {
     return (
@@ -344,9 +345,9 @@ const AvatarCell: React.FC<{
           hairlineRing
         />
       </span>
-      {badgeCount > 0 && (
+      {activeUnreadCount > 0 ? (
         <span
-          aria-label={`${badgeCount} unread`}
+          aria-label={`${activeUnreadCount} unread`}
           style={{
             position: 'absolute',
             top: -3,
@@ -367,9 +368,24 @@ const AvatarCell: React.FC<{
             boxSizing: 'border-box',
           }}
         >
-          {badgeCount > 99 ? '99+' : badgeCount}
+          {activeUnreadCount > 99 ? '99+' : activeUnreadCount}
         </span>
-      )}
+      ) : showOtherDot ? (
+        <span
+          aria-label="Unread on another account"
+          style={{
+            position: 'absolute',
+            top: -1,
+            right: 0,
+            width: 8,
+            height: 8,
+            borderRadius: 999,
+            background: '#F7931E',
+            border: `1.5px solid ${canvasFor(tone)}`,
+            boxSizing: 'content-box',
+          }}
+        />
+      ) : null}
     </button>
   );
 };

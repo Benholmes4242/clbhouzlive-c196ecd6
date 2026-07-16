@@ -35,10 +35,11 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
       ? countFor(activeActor.type as 'personal' | 'business', activeActor.id)
       : 0;
 
-    // Single unified badge value: active actor's unread takes priority; if the
-    // active actor is clear, surface the other-accounts total instead (so the
-    // owner still sees a numbered top-right badge, never a bare top-left dot).
-    const badgeCount = activeUnread > 0 ? activeUnread : otherUnreadTotal;
+    // Split badge semantics: YOUR unread renders as a number; when only OTHER
+    // accounts have unread, render a bare dot (no number) so a foreign count
+    // is never mistaken for your own.
+    const activeUnreadCount = activeUnread;
+    const showOtherDot = activeUnread === 0 && otherUnreadTotal > 0;
 
 
     // Bare theme — no background, no chevron, white-ringed avatar with drop shadow
@@ -80,11 +81,11 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
 
           </span>
 
-          {badgeCount > 0 && (
+          {activeUnreadCount > 0 ? (
             <span
               className={cn(
                 "absolute -top-1 -right-1 flex items-center justify-center rounded-full bg-[#F7931E] font-bold",
-                badgeCount > 9
+                activeUnreadCount > 9
                   ? "h-[18px] min-w-[18px] px-[4px] text-[10px]"
                   : "h-[18px] w-[18px] text-[10px]"
               )}
@@ -95,11 +96,21 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
                 textAlign: 'center',
                 lineHeight: '18px',
               }}
-              aria-label={`${badgeCount} unread`}
+              aria-label={`${activeUnreadCount} unread`}
             >
-              {badgeCount > 99 ? '99+' : badgeCount}
+              {activeUnreadCount > 99 ? '99+' : activeUnreadCount}
             </span>
-          )}
+          ) : showOtherDot ? (
+            <span
+              aria-label="Unread on another account"
+              className="absolute -top-1 -right-1 rounded-full bg-[#F7931E]"
+              style={{
+                width: 8,
+                height: 8,
+                boxShadow: '0 0 0 0.5px rgba(255,255,255,0.95)',
+              }}
+            />
+          ) : null}
         </button>
       );
     }
@@ -197,25 +208,31 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
 
           </span>
           
-          {/* Single unified unread badge — top-right, numbered (matches profile sheet) */}
-          {badgeCount > 0 && (
+          {/* Your unread = number; other-account unread = bare dot */}
+          {activeUnreadCount > 0 ? (
             <span
               className={cn(
                 "absolute -top-1 -right-1 flex items-center justify-center rounded-full bg-[#F7931E] font-bold text-white",
-                badgeCount > 9
+                activeUnreadCount > 9
                   ? "h-[16px] min-w-[16px] px-[3px] text-[8px]"
                   : "h-[14px] w-[14px] text-[8px]"
               )}
               style={{
                 fontVariantNumeric: 'tabular-nums',
                 textAlign: 'center',
-                lineHeight: badgeCount > 9 ? '16px' : '14px',
+                lineHeight: activeUnreadCount > 9 ? '16px' : '14px',
               }}
-              aria-label={`${badgeCount} unread`}
+              aria-label={`${activeUnreadCount} unread`}
             >
-              {badgeCount > 99 ? '99+' : badgeCount}
+              {activeUnreadCount > 99 ? '99+' : activeUnreadCount}
             </span>
-          )}
+          ) : showOtherDot ? (
+            <span
+              aria-label="Unread on another account"
+              className="absolute -top-1 -right-1 rounded-full bg-[#F7931E]"
+              style={{ width: 8, height: 8 }}
+            />
+          ) : null}
         </div>
 
 
