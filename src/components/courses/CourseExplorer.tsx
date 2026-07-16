@@ -10,6 +10,7 @@ import { RequestCourseCTA } from './RequestCourseCTA';
 import { YourNetworkSection } from './network';
 import { UnseenReviewsBanner } from './network/UnseenReviewsBanner';
 import { Skeleton } from '@/components/ui/skeleton';
+import { formatNumber } from '@/i18n/format';
 import { useSearchParams } from 'react-router-dom';
 import {
   PRIMARY_REGIONS,
