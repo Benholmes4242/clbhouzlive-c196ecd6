@@ -139,7 +139,7 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
               <div className="flex items-center gap-1 mt-1.5">
                 <Calendar className="w-3 h-3 text-muted-foreground" />
                 <span className="text-[10px] text-muted-foreground">
-                  {format(new Date(course.context.lastPlayedAt), 'd MMM yyyy')}
+                  {formatDayMonthYearShortGB(course.context.lastPlayedAt)}
                 </span>
               </div>
             )}
