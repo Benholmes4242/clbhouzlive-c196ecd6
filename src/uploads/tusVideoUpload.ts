@@ -19,7 +19,12 @@ export interface TusUploadOptions {
   onSuccess: (streamId: string) => void;
   onError: (error: Error) => void;
   metadata?: Record<string, string>;
+  /** Optional override for chunk size (bytes). Defaults to 50MB. */
+  chunkSize?: number;
+  /** Optional override for retryDelays (ms). Defaults to short exponential backoff. */
+  retryDelays?: number[];
 }
+
 
 export interface TusUploadResult {
   upload: tus.Upload;
