@@ -182,19 +182,6 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
             </div>
             <div
               style={{
-                marginTop: 2,
-                fontSize: 9,
-                fontWeight: 600,
-                letterSpacing: '0.06em',
-                textTransform: 'uppercase',
-                color: 'rgba(15,23,42,0.4)',
-                lineHeight: 1,
-              }}
-            >
-              {regionUpperFor(region)}
-            </div>
-            <div
-              style={{
                 marginTop: 6,
                 fontSize: 17,
                 fontWeight: 700,
