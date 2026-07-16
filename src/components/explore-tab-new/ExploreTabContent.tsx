@@ -129,8 +129,10 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
         {/* 6. Empty-region editorial card (only when all four tiers are empty) */}
         <AlmanacEmptyCard region={activeRegion} />
 
-        {/* 7. Course Crowns (course records) -- self-hiding, owns its header */}
-        <CourseCrownsRail region={activeRegion} opener={opener} mode={scope} />
+        {/* 7. THE RECORD BOOK — dark panel: 5-row records ledger + personal conquests strip */}
+        <TheRecordBook region={activeRegion} opener={opener} mode={scope} userId={userId} />
+
+
 
 
         {/* 7. Legendary hero (aces & albatrosses) */}
