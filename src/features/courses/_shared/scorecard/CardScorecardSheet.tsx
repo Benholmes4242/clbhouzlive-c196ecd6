@@ -259,17 +259,19 @@ const SyncingMiddle: React.FC<{ nineHole: boolean }> = ({ nineHole }) => {
         </div>
       </div>
       <div style={{ fontFamily: GEIST, fontSize: 14.5, fontWeight: 800, color: INK }}>
-        Scorecard on the way
+        {t('courses:scorecard.syncingTitle')}
       </div>
       <div style={{
         fontFamily: GEIST, fontSize: 12.5, fontWeight: 500, color: SECONDARY,
         maxWidth: 240, lineHeight: 1.4,
       }}>
-        Hole-by-hole data is syncing from England Golf. It usually lands within a few hours.
+        {t('courses:scorecard.syncingBody')}
       </div>
     </div>
   </div>
-);
+  );
+};
+
 
 const NohbhMiddle: React.FC<{ gross: number | null; toPar: number | null }> = ({ gross, toPar }) => (
   <div style={{
