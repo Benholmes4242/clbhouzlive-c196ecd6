@@ -848,7 +848,7 @@ const AddPeopleSheet: React.FC<AddPeopleSheetProps> = ({
           ))}
           {query.trim().length > 0 && results.length === 0 ? (
             <div style={{ padding: 32, textAlign: 'center', color: SUB, fontSize: 13 }}>
-              No results
+              {t('common:state.noResults')}
             </div>
           ) : null}
         </div>
@@ -870,7 +870,7 @@ const AddPeopleSheet: React.FC<AddPeopleSheetProps> = ({
               opacity: selected.length === 0 ? 0.4 : 1,
             }}
           >
-            Add {selected.length > 0 ? `(${selected.length})` : ''}
+            {selected.length > 0 ? t('messaging:addSheet.addWithCount', { count: selected.length }) : t('messaging:addSheet.addZero')}
           </button>
         </div>
       </div>
