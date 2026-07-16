@@ -394,7 +394,7 @@ function LedgerRow({
         style={{
           width: 36,
           flexShrink: 0,
-          textAlign: 'right',
+          textAlign: 'center',
           fontSize: 14,
           fontWeight: 700,
           color: toParColor,
