@@ -89,7 +89,6 @@ export function FeatListRow({ row, tier, onTap, index = 0, medals, mode = 'lates
   const showBar = showRecordsBar || showBirdieBar;
   const barPct = showRecordsBar ? recordsBarPct : birdieBarPct;
   const barGradient = 'linear-gradient(90deg, #F7931E, #FBBC2E)';
-  void isEagles;
   void mode;
   // Hide date line for records (existing) and birdie_hauls (new spec).
   const showDate = !!when && !isRecordsRow && !isBirdieHauls;
