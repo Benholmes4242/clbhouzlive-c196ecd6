@@ -263,10 +263,7 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
                 {displayName}
                 {hasHcp && (
                   <>
-                    {' '}
-                    <span style={{ color: AMBER, fontWeight: 600 }}>
-                      {formatHcp(hcp)}
-                    </span>
+                    {' '}HCP {formatHcp(hcp)}
                   </>
                 )}
               </div>
