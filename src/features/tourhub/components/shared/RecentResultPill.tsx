@@ -1,4 +1,5 @@
 import { AMBER_TINT_12, SLATE_700 } from '../../_shared/tokens';
+import { formatOrdinal } from '@/i18n/format';
 /**
  * RecentResultPill — shows a player's most recent notable finish (last 4 weeks).
  *
