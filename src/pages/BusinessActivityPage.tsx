@@ -3,7 +3,8 @@ import { ArrowLeft, CheckCircle2, Users, FileText, Settings, Clock } from 'lucid
 import { Button } from '@/components/ui/button';
 import { useBusinessActivityLog, getActivityDescription, BusinessActivityLogEntry } from '@/hooks/useBusinessActivityLog';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { format, isToday, isYesterday, startOfDay } from 'date-fns';
+import { isToday, isYesterday, startOfDay } from 'date-fns';
+import { formatMonthLongDayYear, formatTimeHm } from '@/i18n/format';
 
 const iconMap = {
   verification: CheckCircle2,
