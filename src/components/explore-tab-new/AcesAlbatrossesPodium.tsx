@@ -119,7 +119,7 @@ export function AcesAlbatrossesPodium({
             title="Aces"
             accent={SC_ACE}
             rows={aceLatestRows}
-            onViewAll={() => onView the('aces')}
+            onViewAll={() => onViewAll('aces')}
             onRowTap={onLatestRowTap}
           />
           <LatestPodiumCard
