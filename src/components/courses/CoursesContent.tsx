@@ -99,7 +99,7 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
             autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search courses…"
+            placeholder={t('rateSheet.searchPlaceholder', { defaultValue: 'Search courses…' })}
             style={{
               width: '100%', padding: '9px 12px 9px 36px',
               borderRadius: 10, border: `1px solid ${HAIRLINE_INK_10}`,

@@ -622,7 +622,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
             position: 'fixed' as const,
           }}
-          aria-label="Go back"
+          aria-label={t('map.backA11y', { defaultValue: 'Go back' })}
         >
           {/* Progress ring — SVG circle, only renders when user has progress */}
           {progressPercent > 0 && (
@@ -664,7 +664,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             border: '1px solid rgba(255,255,255,0.18)',
             boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
           }}
-          aria-label="Reset map view"
+          aria-label={t('map.resetViewA11y', { defaultValue: 'Reset map view' })}
         >
           <RotateCcw className="h-4 w-4 text-white/85" aria-hidden="true" />
         </button>
@@ -807,7 +807,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             <div 
               className="flex items-center gap-1 p-1 rounded-xl bg-white/[0.08]"
               role="group"
-              aria-label="Filter courses by status"
+              aria-label={t('map.filterStatusA11y', { defaultValue: 'Filter courses by status' })}
             >
               {(['played', 'want_to_play', 'not_played'] as Exclude<StatusFilter, 'all'>[]).map((filter) => {
                 const isActive = statusFilter === filter;

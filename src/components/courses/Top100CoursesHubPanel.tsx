@@ -227,7 +227,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
             role="section"
             accent="#F7931E"
             kicker="TOP 100"
-            title="The world's best"
+            title={t('top100.sectionTitle', { defaultValue: "The world's best" })}
             cutLine={false}
           />
           {crossListProgress && (

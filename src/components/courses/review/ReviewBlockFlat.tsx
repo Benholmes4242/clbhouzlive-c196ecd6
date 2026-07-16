@@ -252,7 +252,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
-              aria-label="Report review"
+              aria-label={t('review.reportA11y', { defaultValue: 'Report review' })}
             >
               <MoreHorizontal size={18} />
             </button>
