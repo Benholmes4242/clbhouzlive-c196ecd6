@@ -1,7 +1,8 @@
 import React from 'react';
 import { Sparkles } from 'lucide-react';
 import { GAM } from '../../tokens';
-import { relativeTime } from '@/lib/gam/visuals';
+import { formatRelativeAgo } from '@/i18n/format';
+const relativeTime = (iso: string | null) => formatRelativeAgo(iso, { yesterday: true });
 import { TierRow } from './TierRow';
 import { FriendsBlock } from './FriendsBlock';
 import { GemLadder } from './GemLadder';

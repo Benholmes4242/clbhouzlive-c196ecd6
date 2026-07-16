@@ -1,7 +1,8 @@
 import React from 'react';
 import { Check } from 'lucide-react';
 import { GAM } from '../../tokens';
-import { relativeTime } from '@/lib/gam/visuals';
+import { formatRelativeAgo } from '@/i18n/format';
+const relativeTime = (iso: string | null) => formatRelativeAgo(iso, { yesterday: true });
 import { MATERIAL_PALETTES } from '../_shared/rarityPalette';
 import type { TrophyTier } from '../_shared/normalizeTrophyItem';
 

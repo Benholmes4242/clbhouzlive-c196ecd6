@@ -4,7 +4,8 @@ import { GamSheet } from '../_shared/GamSheet';
 import { Skeleton, RetryStub } from '../_shared/GamAtoms';
 import { useMyStreaks } from '@/hooks/gam/useMyStreaks';
 import type { StreakRow, StreakType } from '@/lib/gam/types';
-import { relativeTime } from '@/lib/gam/visuals';
+import { formatRelativeAgo } from '@/i18n/format';
+const relativeTime = (iso: string | null) => formatRelativeAgo(iso, { yesterday: true });
 import {
   STREAK_SHEET_CONFIG,
   STREAK_SHEET_ORDER,
