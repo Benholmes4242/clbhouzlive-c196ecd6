@@ -76,7 +76,7 @@ export function toLocalDateKey(d: Date | string | null): string | null {
   if (!d) return null;
   if (d instanceof Date) {
     if (!isValid(d)) return null;
-    return format(d, 'yyyy-MM-dd');
+    return toYmdKey(d);
   }
   const dateOnlyMatch = /^\d{4}-\d{2}-\d{2}$/.test(d);
   let parsed: Date;
@@ -87,7 +87,7 @@ export function toLocalDateKey(d: Date | string | null): string | null {
     parsed = parseISO(d);
   }
   if (!isValid(parsed)) return null;
-  return format(parsed, 'yyyy-MM-dd');
+  return toYmdKey(parsed);
 }
 
 /**
@@ -97,7 +97,7 @@ export function toLocalDateKey(d: Date | string | null): string | null {
  * @internal — exported for testing.
  */
 export function getYesterdayKey(): string {
-  return format(subDays(new Date(), 1), 'yyyy-MM-dd');
+  return toYmdKey(subDays(new Date(), 1));
 }
 
 export function useFriendsYesterday(ownerUserId: string) {
