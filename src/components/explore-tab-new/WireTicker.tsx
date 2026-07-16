@@ -153,8 +153,8 @@ export function WireTicker({ userId }: Props) {
 
   const content = reducedMotion ? (
     <div
-      className="flex overflow-x-auto scrollbar-hide"
-      style={{ gap: 20, padding: '0 14px' }}
+      className="flex items-center overflow-x-auto scrollbar-hide"
+      style={{ gap: 24, padding: '0 14px' }}
     >
       {items.map(renderItem)}
     </div>
