@@ -47,13 +47,9 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   // Track the currently-viewed tournament id so we can restore position
-  // across background data refreshes (idSignature changes but the user's
-  // tournament is still in the river). Updated only when activeIndex resolves.
+  // across background data refreshes. The restore effect runs FIRST (declared
+  // first) so it reads the pre-refresh id before the updater overwrites it.
   const prevIdRef = useRef<string | null>(null);
-  useEffect(() => {
-    const id = slides[activeIndex]?.tournament.id;
-    if (id) prevIdRef.current = id;
-  }, [activeIndex, slides]);
 
   useEffect(() => {
     if (count === 0) return;
@@ -62,6 +58,11 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
     setActiveIndex(nextIdx >= 0 ? nextIdx : 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idSignature]);
+
+  useEffect(() => {
+    const id = slides[activeIndex]?.tournament.id;
+    if (id) prevIdRef.current = id;
+  }, [activeIndex, slides]);
 
   // COMMAND jump: picker → hero. Find the tournament in the river; else the
   // first slide of the selected tour; else index 0.
