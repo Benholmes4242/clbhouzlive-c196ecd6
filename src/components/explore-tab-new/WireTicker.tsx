@@ -104,17 +104,18 @@ export function WireTicker({ userId }: Props) {
         key={`${r.score_id}-${i}`}
         type="button"
         onClick={() => openByScore(r.score_id, r.connection_id, r.friend_user_id)}
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 8,
-          background: 'transparent',
-          border: 'none',
-          padding: 0,
-          cursor: 'pointer',
-          fontFamily: FONT,
-          flexShrink: 0,
-        }}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 8,
+        background: 'transparent',
+        border: 'none',
+        padding: 0,
+        cursor: 'pointer',
+        fontFamily: FONT,
+        flexShrink: 0,
+        minHeight: 40,
+      }}
       >
         <span
           style={{
@@ -124,7 +125,7 @@ export function WireTicker({ userId }: Props) {
             borderRadius: 4,
             background: '#FBBC2E',
             color: '#0F172A',
-            fontSize: 8,
+            fontSize: 9,
             fontWeight: 800,
             letterSpacing: '0.08em',
             lineHeight: 1,
@@ -135,7 +136,7 @@ export function WireTicker({ userId }: Props) {
         </span>
         <span
           style={{
-            fontSize: 10.5,
+            fontSize: 11.5,
             fontWeight: 600,
             color: 'rgba(255,255,255,0.75)',
             whiteSpace: 'nowrap',
@@ -178,7 +179,7 @@ export function WireTicker({ userId }: Props) {
     <section
       style={{
         background: '#15171F',
-        padding: '8px 0',
+        padding: '12px 0',
         width: '100%',
         overflow: 'hidden',
       }}

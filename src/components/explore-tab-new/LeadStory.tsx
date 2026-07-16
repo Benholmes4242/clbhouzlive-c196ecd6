@@ -113,19 +113,40 @@ export function LeadStory({ region, regionUpper, mode }: Props) {
           boxShadow: '0 6px 22px rgba(15,23,42,0.16)',
         }}
       >
-        {/* Overline top-left */}
+        {/* Overline row */}
         <div
           style={{
-            fontSize: 10,
-            fontWeight: 800,
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
-            color: GOLD,
-            lineHeight: 1,
+            display: 'flex',
+            alignItems: 'baseline',
+            justifyContent: 'space-between',
+            gap: 12,
             position: 'relative',
           }}
         >
-          {overline}
+          <div
+            style={{
+              fontSize: 10,
+              fontWeight: 800,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              color: GOLD,
+              lineHeight: 1,
+            }}
+          >
+            {overline}
+          </div>
+          <span
+            style={{
+              fontSize: 10.5,
+              fontWeight: 800,
+              color: GOLD,
+              lineHeight: 1,
+              pointerEvents: 'none',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            View all ›
+          </span>
         </div>
 
         {/* Bottom row */}
