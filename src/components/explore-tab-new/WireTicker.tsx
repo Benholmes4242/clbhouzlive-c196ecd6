@@ -52,7 +52,8 @@ function ensureTickerStyles() {
 }
 .almanac-ticker-track {
   display: flex;
-  gap: 20px;
+  align-items: center;
+  gap: 24px;
   width: max-content;
   animation: almanac-ticker-scroll 28s linear infinite;
   will-change: transform;
@@ -111,10 +112,11 @@ export function WireTicker({ userId }: Props) {
         background: 'transparent',
         border: 'none',
         padding: 0,
+        paddingBlock: 12,
+        marginBlock: -12,
         cursor: 'pointer',
         fontFamily: FONT,
         flexShrink: 0,
-        minHeight: 40,
       }}
       >
         <span
@@ -125,10 +127,10 @@ export function WireTicker({ userId }: Props) {
             borderRadius: 4,
             background: '#FBBC2E',
             color: '#0F172A',
-            fontSize: 9,
+            fontSize: 10,
             fontWeight: 700,
             letterSpacing: '0.06em',
-            lineHeight: 1,
+            lineHeight: 1.3,
             flexShrink: 0,
           }}
         >
@@ -136,9 +138,9 @@ export function WireTicker({ userId }: Props) {
         </span>
         <span
           style={{
-            fontSize: 11.5,
+            fontSize: 13,
             fontWeight: 500,
-            color: 'rgba(255,255,255,0.7)',
+            color: 'rgba(255,255,255,0.72)',
             whiteSpace: 'nowrap',
             lineHeight: 1,
           }}
@@ -151,8 +153,8 @@ export function WireTicker({ userId }: Props) {
 
   const content = reducedMotion ? (
     <div
-      className="flex overflow-x-auto scrollbar-hide"
-      style={{ gap: 20, padding: '0 14px' }}
+      className="flex items-center overflow-x-auto scrollbar-hide"
+      style={{ gap: 24, padding: '0 14px' }}
     >
       {items.map(renderItem)}
     </div>
@@ -179,7 +181,9 @@ export function WireTicker({ userId }: Props) {
     <section
       style={{
         background: '#15171F',
-        padding: '12px 0',
+        height: 36,
+        display: 'flex',
+        alignItems: 'center',
         width: '100%',
         overflow: 'hidden',
       }}
