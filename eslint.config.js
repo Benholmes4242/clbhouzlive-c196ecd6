@@ -5,6 +5,58 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
 import i18next from "eslint-plugin-i18next";
 
+// Wave 3b.iii — single source of truth for the i18next/no-literal-string
+// options. The scope-dir ERROR overrides below MUST reuse this options
+// object; setting the rule to bare "error" would replace the whole rule
+// config and silently disable the widened jsx-attributes audit.
+const i18nLiteralOptions = {
+  mode: "jsx-text-only",
+  "should-validate-template": false,
+  "jsx-attributes": {
+    include: ["placeholder", "title", "aria-label", "alt", "label"],
+    exclude: [
+      "className",
+      "style",
+      "styleName",
+      "type",
+      "id",
+      "key",
+      "name",
+      "href",
+      "src",
+      "role",
+      "data-.*",
+      "testId",
+      "test-id",
+      "data-testid",
+    ],
+  },
+  callees: {
+    exclude: [
+      "i18n(ext)?",
+      "t",
+      "require",
+      "addEventListener",
+      "removeEventListener",
+      "postMessage",
+      "getElementById",
+      "dispatch",
+      "commit",
+      "includes",
+      "indexOf",
+      "endsWith",
+      "startsWith",
+      "console\\.(log|warn|error|info|debug)",
+      "track",
+      "logEvent",
+      "captureEvent",
+    ],
+  },
+  words: {
+    exclude: ["[0-9!-/:-@[-`{-~]+", "[A-Z_-]+"],
+  },
+};
+
 export default tseslint.config(
   { ignores: ["dist"] },
   {
@@ -26,68 +78,7 @@ export default tseslint.config(
         { allowConstantExport: true },
       ],
       "@typescript-eslint/no-unused-vars": "off",
-      // i18n WAVE 0: warn-only global ratchet. We flip warn → error path by
-      // path as each feature vertical is extracted. Ignored surfaces:
-      // className / style / testid props, imports, console.*, analytics
-      // event names, admin, perf harnesses, and tests.
-      "i18next/no-literal-string": [
-        "warn",
-        {
-          mode: "jsx-text-only",
-          "should-validate-template": false,
-          // Wave 3b.ii — widened jsx-attribute instrument. Previously the
-          // include list was [] which meant NO string props were audited
-          // (jsx-text-only mode). We now explicitly audit the user-visible
-          // string props. Excludes are pruned to technical props only:
-          //   className/style/styleName → visual, never user copy
-          //   type/id/key/name/href/src → identifiers / URLs
-          //   role/data-.*/testId/test-id/data-testid → a11y roles + test hooks
-          "jsx-attributes": {
-            include: ["placeholder", "title", "aria-label", "alt", "label"],
-            exclude: [
-              "className",
-              "style",
-              "styleName",
-              "type",
-              "id",
-              "key",
-              "name",
-              "href",
-              "src",
-              "role",
-              "data-.*",
-              "testId",
-              "test-id",
-              "data-testid",
-            ],
-          },
-
-          callees: {
-            exclude: [
-              "i18n(ext)?",
-              "t",
-              "require",
-              "addEventListener",
-              "removeEventListener",
-              "postMessage",
-              "getElementById",
-              "dispatch",
-              "commit",
-              "includes",
-              "indexOf",
-              "endsWith",
-              "startsWith",
-              "console\\.(log|warn|error|info|debug)",
-              "track",
-              "logEvent",
-              "captureEvent",
-            ],
-          },
-          words: {
-            exclude: ["[0-9!-/:-@[-`{-~]+", "[A-Z_-]+"],
-          },
-        },
-      ],
+      "i18next/no-literal-string": ["warn", i18nLiteralOptions],
     },
   },
   {
@@ -103,17 +94,8 @@ export default tseslint.config(
     },
   },
   // ─── Wave 1 (sub-batch 1f — FINAL RATCHET) ─────────────────────────
-  // Forbid direct display-formatting calls (toLocaleDateString /
-  // toLocaleTimeString / toLocaleString) and date-fns display imports
-  // (`format`, `formatDistanceToNow`) OUTSIDE src/i18n/. Route through
-  // src/i18n/format.ts wrappers so localisation, byte-parity, and
-  // quirk-replication live in one place.
-  //
-  // Severity map:
-  //   ERROR — everything under src/ except the ignored surfaces below.
-  //   OFF   — src/i18n/** (the wrapper implementation itself),
-  //           src/features/admin/**, src/perf/**, tests, mocks,
-  //           and the admin/debug/error pages (internal tooling).
+  // Forbid direct display-formatting calls and date-fns display imports
+  // outside src/i18n/.
   {
     files: ["src/**/*.{ts,tsx}"],
     ignores: [
@@ -159,20 +141,18 @@ export default tseslint.config(
     },
   },
   // ─── Wave 3a.ii — scope-dir ERROR flip for auth ────────────────────
-  // Auth surface is literal-clean; upgrade to ERROR so regressions block.
-  // Composer + post-v2 remain WARN pending mid-redesign settle.
+  // Reuses the widened options above; bare "error" would drop them.
   {
     files: ["src/pages/auth/**/*.{ts,tsx}"],
     rules: {
-      "i18next/no-literal-string": "error",
+      "i18next/no-literal-string": ["error", i18nLiteralOptions],
     },
   },
   // ─── Wave 3b — scope-dir ERROR flip for messaging ─────────────────
   {
     files: ["src/pages/messaging-v2/**/*.{ts,tsx}"],
     rules: {
-      "i18next/no-literal-string": "error",
+      "i18next/no-literal-string": ["error", i18nLiteralOptions],
     },
   }
 );
-
