@@ -47,11 +47,8 @@ interface LoopCardProps {
   showActivitySignals?: boolean;
 }
 
-function formatCompact(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
-  return String(n);
-}
+// formatCompact moved to @/i18n/format (Wave 1 drift-consolidation).
+
 
 function formatVideoDuration(totalSeconds: number): string {
   const s = Math.max(0, Math.floor(totalSeconds || 0));
