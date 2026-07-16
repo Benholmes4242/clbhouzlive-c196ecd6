@@ -29,6 +29,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useLikeMutation } from '@/components/media-system/hooks/useLikeMutation';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { MentionText } from '@/components/mentions/MentionText';
+import { formatCountUpperPadded as formatCompact } from '@/i18n/format';
 
 interface LoopCardProps {
   post: FeedPost;
