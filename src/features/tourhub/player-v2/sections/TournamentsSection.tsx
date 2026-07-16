@@ -11,7 +11,7 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { format } from 'date-fns';
+import { formatMonthShort } from '@/i18n/format';
 import type { PlayerTournamentResult } from '../../hooks/usePlayerResults';
 import { tournamentRoute } from '../../routes';
 import { isAnyMajor } from '../../utils/majorScope';
