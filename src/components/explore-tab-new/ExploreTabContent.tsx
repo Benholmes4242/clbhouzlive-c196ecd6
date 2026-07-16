@@ -49,6 +49,8 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
   const { user } = useSupabaseSession();
   const userId = user?.id;
   const gridRef = useRef<HTMLDivElement | null>(null);
+  // THE LENS — single page-level scope. Not persisted; defaults to 'latest' per visit.
+  const [scope, setScope] = useState<RecordsMode>('latest');
 
   const { region: activeRegion, setRegion } = useExploreRegion();
 
