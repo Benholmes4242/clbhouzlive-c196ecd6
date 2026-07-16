@@ -10,7 +10,6 @@ export default function AuthCallback() {
   useHideBottomNav();
   useHideHeader();
 
-  const { t } = useTranslation('auth');
   const navigate = useNavigate();
   const [message, setMessage] = useState(t('callback.signingIn'));
 
