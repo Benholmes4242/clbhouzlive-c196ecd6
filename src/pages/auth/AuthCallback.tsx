@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
@@ -8,8 +9,9 @@ export default function AuthCallback() {
   useHideBottomNav();
   useHideHeader();
 
+  const { t } = useTranslation('auth');
   const navigate = useNavigate();
-  const [message, setMessage] = useState('Signing you in…');
+  const [message, setMessage] = useState(t('callback.signingIn'));
 
   const isInMedianApp =
     typeof window !== 'undefined' && (
