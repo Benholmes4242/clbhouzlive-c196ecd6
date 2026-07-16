@@ -595,10 +595,10 @@ export function CinematicFrame({
   if (startD && endD) {
     const sameMonth = startD.getMonth() === endD.getMonth();
     dateRange = sameMonth
-      ? `${format(startD, 'MMM d')}–${format(endD, 'd')}`
-      : `${format(startD, 'MMM d')} – ${format(endD, 'MMM d')}`;
+      ? `${formatMonthDay(startD)}\u2013${endD.getDate()}`
+      : `${formatMonthDay(startD)} \u2013 ${formatMonthDay(endD)}`;
   } else if (endD) {
-    dateRange = format(endD, 'MMM d');
+    dateRange = formatMonthDay(endD);
   }
   const venueLine = [venueName, venueCity].filter(Boolean).join(', ');
 
