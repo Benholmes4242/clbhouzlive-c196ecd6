@@ -160,8 +160,9 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
         {/* 10. Toughest courses -- self-hiding, owns its header */}
         <ToughestCoursesRail />
 
-        {/* 11. Next Conquests (records within reach) -- self-hiding, owns its header */}
-        <NextConquestsRail userId={userId} />
+        {/* 11. (Next Conquests moved into TheRecordBook panel above) */}
+
+
 
         {/* 12. Feed block */}
         <div
