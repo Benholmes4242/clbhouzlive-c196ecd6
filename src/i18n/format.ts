@@ -171,3 +171,201 @@ export function formatOrdinal(n: number): string {
   // suffix maps in a later wave.
   return formatNumber(n);
 }
+
+// ─── additional relative-time variants (Wave 1 drift-consolidation) ──────
+//
+// The codebase grew half a dozen slightly-different local relative-time
+// formatters (feed cards, GAM trophy room, Echo history, drafts, activity
+// pills). Wave 1 pulls the DISPLAY shapes here so localisation can move
+// them later. Each variant preserves its call-site's exact en output.
+
+/**
+ * "X ago"-style relative time. Buckets and copy match the deleted
+ * `src/lib/gam/visuals.ts` helper (and, when `yesterday` is off, the
+ * `src/components/championship/FriendsActivityFeed.tsx` inline formatter).
+ *
+ * en output:
+ *   < 60s          → "just now"
+ *   < 60m          → "{m}m ago"
+ *   < 24h          → "{h}h ago"
+ *   1d & yesterday → "yesterday"      (opt-in via options.yesterday)
+ *   < 30d          → "{d}d ago"
+ *   < 12mo         → "{mo}mo ago"
+ *   else           → "{y}y ago"
+ */
+export function formatRelativeAgo(
+  d: DateInput | null | undefined,
+  options: { yesterday?: boolean } = {},
+): string {
+  if (d == null) return '';
+  const date = toDate(d);
+  if (Number.isNaN(date.getTime())) return '';
+  const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  const months = Math.floor(days / 30);
+  const years = Math.floor(months / 12);
+
+  const locale = getActiveLocale();
+  if (locale === 'en') {
+    if (seconds < 60) return 'just now';
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    if (options.yesterday && days === 1) return 'yesterday';
+    if (days < 30) return `${days}d ago`;
+    if (months < 12) return `${months}mo ago`;
+    return `${years}y ago`;
+  }
+
+  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto', style: 'short' });
+  if (seconds < 60) return rtf.format(-seconds, 'second');
+  if (minutes < 60) return rtf.format(-minutes, 'minute');
+  if (hours < 24) return rtf.format(-hours, 'hour');
+  if (days < 30) return rtf.format(-days, 'day');
+  if (months < 12) return rtf.format(-months, 'month');
+  return rtf.format(-years, 'year');
+}
+
+/**
+ * Feed-card compact relative time. Matches the local `timeAgo` in
+ * `feed/FeedCard.tsx`, `fullscreen-feed/ImmersiveFullscreenChrome.tsx`,
+ * and `posts-tab/LightFeedCard.tsx`.
+ *
+ * en output (all lowercase, no space):
+ *   < 60s  → "{s}s"           (min 1s — mirrors Math.max(1, …))
+ *   < 60m  → "{m}m"
+ *   < 24h  → "{h}h"
+ *   < 7d   → "{d}d"
+ *   < 5w   → "{w}w"            (feed cards cap weeks at 5, then months)
+ *   < 12mo → "{mo}mo"
+ *   else   → "{y}y"
+ */
+export function formatRelativeWithSeconds(iso: string | null | undefined): string {
+  if (!iso) return '';
+  const t = new Date(iso).getTime();
+  if (!isFinite(t)) return '';
+  const s = Math.max(1, Math.floor((Date.now() - t) / 1000));
+  const locale = getActiveLocale();
+  if (locale === 'en') {
+    if (s < 60) return `${s}s`;
+    const m = Math.floor(s / 60);
+    if (m < 60) return `${m}m`;
+    const h = Math.floor(m / 60);
+    if (h < 24) return `${h}h`;
+    const d = Math.floor(h / 24);
+    if (d < 7) return `${d}d`;
+    const w = Math.floor(d / 7);
+    if (w < 5) return `${w}w`;
+    const mo = Math.floor(d / 30);
+    if (mo < 12) return `${mo}mo`;
+    return `${Math.floor(d / 365)}y`;
+  }
+  return formatRelative(t);
+}
+
+/**
+ * Month-only compact relative time. Matches `src/utils/relativeTime.ts` —
+ * NEVER rolls over to years; anything ≥ 30 days is emitted in months.
+ *
+ * en output:
+ *   < 60s → "now"
+ *   < 60m → "{m}m"
+ *   < 24h → "{h}h"
+ *   < 7d  → "{d}d"
+ *   < 30d → "{w}w"
+ *   else  → "{mo}mo"              (no year rollover — quirk preserved)
+ */
+export function formatRelativeMonths(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return '';
+  const diffSec = Math.floor((Date.now() - date.getTime()) / 1000);
+  const locale = getActiveLocale();
+  if (locale === 'en') {
+    if (diffSec < 60) return 'now';
+    const diffMin = Math.floor(diffSec / 60);
+    if (diffMin < 60) return `${diffMin}m`;
+    const diffHour = Math.floor(diffMin / 60);
+    if (diffHour < 24) return `${diffHour}h`;
+    const diffDay = Math.floor(diffHour / 24);
+    if (diffDay < 7) return `${diffDay}d`;
+    if (diffDay < 30) return `${Math.floor(diffDay / 7)}w`;
+    return `${Math.floor(diffDay / 30)}mo`;
+  }
+  return formatRelative(date);
+}
+
+/**
+ * Long "X ago" — matches `date-fns`' `formatDistanceToNow(d, {addSuffix:true})`
+ * output in en (e.g. "5 minutes ago", "about 1 hour ago", "3 days ago"), with
+ * the LastUpdatedPill's "less than a minute" → "just now" normalisation.
+ *
+ * Kept on date-fns for en to preserve byte-identity (date-fns emits "about",
+ * Intl RelativeTimeFormat does not). Non-en falls through to Intl long.
+ *
+ * QUIRK: the "about" prefix is date-fns-specific en copy and moves into
+ * i18n keys during Wave ≥ 2.
+ */
+export function formatRelativeAgoLong(iso: string | null | undefined): string {
+  if (!iso) return '';
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return '';
+  const locale = getActiveLocale();
+  if (locale === 'en') {
+    const raw = formatDistanceToNow(date, { addSuffix: false });
+    if (raw === 'less than a minute') return 'just now';
+    return `${raw} ago`;
+  }
+  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto', style: 'long' });
+  const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  const months = Math.floor(days / 30);
+  const years = Math.floor(months / 12);
+  if (seconds < 60) return rtf.format(-seconds, 'second');
+  if (minutes < 60) return rtf.format(-minutes, 'minute');
+  if (hours < 24) return rtf.format(-hours, 'hour');
+  if (days < 30) return rtf.format(-days, 'day');
+  if (months < 12) return rtf.format(-months, 'month');
+  return rtf.format(-years, 'year');
+}
+
+// ─── additional compact-count variants ────────────────────────────────────
+
+/**
+ * Feed engagement counts. Matches the local `formatCount` in
+ * `feed/FeedCard`, `feed/FeedTopActionBar`, `feed/FeedActionRail`,
+ * `fullscreen-feed/ImmersiveFullscreenChrome`, `posts-tab/LightFeedCard`.
+ *
+ * en quirks (all preserved):
+ *   - uppercase `M`, lowercase `k` (mixed case — Intl uses matching case)
+ *   - always `.1` decimal for units (Intl trims `.0`)
+ *   - `n < 1000` renders as plain integer via `String(n)`
+ */
+export function formatCountKilo(n: number): string {
+  const locale = getActiveLocale();
+  if (locale === 'en') {
+    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+    if (n >= 1_000) return `${(n / 1_000).toFixed(1)}k`;
+    return String(n);
+  }
+  return formatCompact(n);
+}
+
+/**
+ * Uppercase, always-padded compact. Matches `LoopCard.formatCompact` and the
+ * old `posts-tab/utils.ts` shape: `1.2K` / `3.4M`, `.0` retained.
+ *
+ * QUIRK: `.0` retained for whole units (Intl trims by default).
+ */
+export function formatCountUpperPadded(n: number): string {
+  const locale = getActiveLocale();
+  if (locale === 'en') {
+    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+    if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+    return String(n);
+  }
+  return formatCompact(n);
+}
+
