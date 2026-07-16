@@ -12,14 +12,14 @@
  * copies of this logic.
  */
 
-import { format } from 'date-fns';
+
 import { paletteFor } from '../parts/DetailHero';
 import { materialNameForTier, type RarityPalette } from './rarityPalette';
 import { GAM } from '../../tokens';
 import type { LegendCategory } from '@/lib/gam/types';
 import type { TrophyItem } from './normalizeTrophyItem';
 import { statusForEarned, statusCopy, type BadgeStatus, type StatusCopy } from './statusBadges';
-import { formatNumber } from '@/i18n/format';
+import { formatNumber, formatMonthDayYearShort } from '@/i18n/format';
 
 export interface DetailViewAchievement {
   kind: 'achievement';
@@ -105,7 +105,7 @@ export function deriveDetailView(item: TrophyItem, currentIndex: number | null =
     const label = LEGEND_CATEGORY_LABEL[item.category] ?? item.name;
     let heldSince = '';
     try {
-      heldSince = format(new Date(item.attainedAt), 'MMM d, yyyy');
+      heldSince = formatMonthDayYearShort(item.attainedAt);
     } catch {
       heldSince = '';
     }
@@ -142,7 +142,7 @@ export function deriveDetailView(item: TrophyItem, currentIndex: number | null =
       return materialName ? `${base} · ${materialName}` : base;
     }
     if (item.earned && item.earnedAt) {
-      return `Earned ${format(new Date(item.earnedAt), 'MMM d, yyyy')}`;
+      return `Earned ${formatMonthDayYearShort(item.earnedAt)}`;
     }
     return null;
   })();
