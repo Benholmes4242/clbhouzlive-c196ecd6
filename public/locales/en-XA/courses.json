@@ -53,5 +53,179 @@
     "toPar": "[~~ŢŐ ƤÁŘ~~]",
     "viewProfile": "[~~Ṽíéŵ ƥřőƒíļé~~]",
     "viewCourse": "[~~Ṽíéŵ ĉőúřšé~~]"
+  },
+  "card": {
+    "friendsPlayed_one": "[~~Ƥļáýéđ ƀý {{count}} ƒříéñđ~~]",
+    "friendsPlayed_other": "[~~Ƥļáýéđ ƀý {{count}} ƒříéñđš~~]",
+    "yourRating": "[~~Ýőúř: {{rating}}~~]",
+    "avgRating": "[~~Áṽĝ: {{rating}}~~]",
+    "xpValue": "[~~{{xp}} ẊƤ~~]",
+    "rate": "[~~Řáţé~~]",
+    "played": "[~~Ƥļáýéđ~~]",
+    "logged": "[~~Ļőĝĝéđ: {{date}}~~]",
+    "friendsPlayedCount_one": "[~~{{count}} ƒříéñđ ƥļáýéđ~~]",
+    "friendsPlayedCount_other": "[~~{{count}} ƒříéñđš ƥļáýéđ~~]",
+    "noFriendsPlayed": "[~~Ñő ƒříéñđš ƥļáýéđ ýéţ~~]",
+    "aiQuoteLoading": "[~~Ĝéñéřáţíñĝ ʠúőţé...~~]",
+    "aiQuoteFallback": "[~~Á ĝőļƒ éẋƥéříéñĉé ļíǩé ñő őţĥéř~~]",
+    "experiencePoints": "[~~Éẋƥéříéñĉé Ƥőíñţš Éářñéđ~~]"
+  },
+  "explorer": {
+    "unableToLoadTitle": "[~~Úñáƀļé ţő ļőáđ ĉőúřšéš~~]",
+    "unableToLoadBody": "[~~Ŵé ĉőúļđñ'ţ ƒéţĉĥ ţĥé ĉőúřšéš. Ƥļéášé ĉĥéĉǩ ýőúř ĉőññéĉţíőñ áñđ ţřý áĝáíñ.~~]",
+    "loadMoreRetry": "[~~Ĉőúļđñ'ţ ļőáđ ɱőřé ĉőúřšéš · Ţáƥ ţő řéţřý~~]",
+    "allSubRegions": "[~~Áļļ šúƀ-řéĝíőñš~~]",
+    "chooseRegionFirst": "[~~Ĉĥőőšé á řéĝíőñ ƒířšţ~~]",
+    "subRegionA11y": "[~~Šéļéĉţ šúƀ-řéĝíőñ~~]",
+    "sortA11y": "[~~Šőřţ ĉőúřšéš~~]",
+    "countWorldwide_one": "[~~<1>{{formattedCount}}</1> course worldwide~~]",
+    "countWorldwide_other": "[~~<1>{{formattedCount}}</1> courses worldwide~~]",
+    "countInRegion_one": "[~~<1>{{formattedCount}}</1> course in {{region}}~~]",
+    "countInRegion_other": "[~~<1>{{formattedCount}}</1> courses in {{region}}~~]",
+    "results_one": "[~~<1>{{formattedCount}}</1> result~~]",
+    "results_other": "[~~<1>{{formattedCount}}</1> results~~]",
+    "resetFilters": "[~~Řéšéţ ƒíļţéřš~~]"
+  },
+  "searchSheet": {
+    "title": "[~~Ĉĥőőšé Ĝőļƒ Ĉļúƀ~~]",
+    "closeA11y": "[~~Ĉļőšé šéářĉĥ~~]",
+    "placeholder": "[~~Šéářĉĥ ƒőř á ĝőļƒ ĉőúřšé...~~]",
+    "clearSearchA11y": "[~~Ĉļéář šéářĉĥ~~]",
+    "trouble": "[~~Ţřőúƀļé ļőáđíñĝ ĉőúřšéš~~]",
+    "yourCourses": "[~~Ýőúř ĉőúřšéš~~]",
+    "outOfTen": "[~~/ 10~~]",
+    "added": "[~~Áđđéđ~~]"
+  },
+  "rateSheet": {
+    "subtitle": "[~~Šéářĉĥ áñý ĉőúřšé ýőú'ṽé ƥļáýéđ~~]",
+    "emptyLong": "[~~Ţýƥé á ĉőúřšé ñáɱé ţő ĝéţ šţářţéđ~~]",
+    "searching": "[~~Šéářĉĥíñĝ…~~]",
+    "noResults": "[~~Ñő ĉőúřšéš ƒőúñđ ƒőř \"{{query}}\"~~]",
+    "rateAction": "[~~Řáţé →~~]"
+  },
+  "tabs": {
+    "explore": "[~~Éẋƥļőřé~~]"
+  },
+  "hero": {
+    "viewCourse": "[~~Ṽíéŵ ĉőúřšé~~]"
+  },
+  "friends": {
+    "signInTitle": "[~~Šíĝñ íñ ţő šéé ƒříéñđš' ĉőúřšéš~~]",
+    "signInBody": "[~~Đíšĉőṽéř ŵĥéřé ýőúř ƒříéñđš ĥáṽé ƀééñ ƥļáýíñĝ áñđ ŵĥíĉĥ ĉőúřšéš ářé ţřéñđíñĝ íñ ýőúř ĉířĉļé.~~]",
+    "signIn": "[~~Šíĝñ íñ~~]"
+  },
+  "rateNudge": {
+    "emptyLabel": "[~~Řáţé á ĉőúřšé ýőú'ṽé ƥļáýéđ~~]",
+    "rateCta": "[~~Řáţé~~]"
+  },
+  "request": {
+    "hero": {
+      "headline": "[~~Ĉáñ'ţ ƒíñđ á ĉőúřšé?~~]",
+      "headlineWithQuery": "[~~Ĉáñ'ţ ƒíñđ \"{{query}}\"?~~]",
+      "body": "[~~Íƒ á ĉőúřšé íš ɱíššíñĝ, ţéļļ úš áñđ ŵé'ļļ áđđ íţ ţő ţĥé ɱáƥ.~~]",
+      "perkQuick": "[~~Ţáǩéš 20 šéĉőñđš – ĵúšţ ñáɱé áñđ ļőĉáţíőñ~~]",
+      "perkNotify": "[~~Ŵé'ļļ ñőţíƒý ýőú ţĥé ɱőɱéñţ íţ'š ļíṽé~~]",
+      "cta": "[~~Řéʠúéšţ ţĥíš ĉőúřšé~~]"
+    },
+    "buttonCta": "[~~Řéʠúéšţ á ĉőúřšé~~]",
+    "row": {
+      "title": "[~~Řéʠúéšţ á ĉőúřšé~~]",
+      "subtitle": "[~~Šţíļļ ñőţ ţĥé őñé? Ţáƥ ţő řéʠúéšţ íţ.~~]"
+    },
+    "sheet": {
+      "successTitle": "[~~Ţĥáñǩš — ŵé'ṽé ĝőţ íţ.~~]",
+      "successBody": "[~~Ŵé'ļļ éɱáíļ ýőú ŵĥéñ ţĥíš ĉőúřšé íš áđđéđ.~~]",
+      "done": "[~~Đőñé~~]",
+      "title": "[~~Řéʠúéšţ á ĉőúřšé~~]",
+      "subtitle": "[~~Ĉáñ'ţ ƒíñđ íţ? Ţéļļ úš ţĥé ñáɱé áñđ ļőĉáţíőñ áñđ ŵé'ļļ ĝéţ íţ áđđéđ.~~]",
+      "nameLabel": "[~~Ĉőúřšé ñáɱé~~]",
+      "locationLabel": "[~~Ļőĉáţíőñ~~]",
+      "locationPlaceholder": "[~~Ţőŵñ, řéĝíőñ, ĉőúñţřý~~]",
+      "noteLabel": "[~~Ñőţé~~]",
+      "optional": "[~~(őƥţíőñáļ)~~]",
+      "notePlaceholder": "[~~Áñýţĥíñĝ éļšé? Ñéŵ őƥéñíñĝ, áļţéřñáţíṽé ñáɱé…~~]",
+      "submit": "[~~Řéʠúéšţ ĉőúřšé~~]",
+      "sending": "[~~Šéñđíñĝ…~~]",
+      "error": "[~~Šőɱéţĥíñĝ ŵéñţ ŵřőñĝ. Ƥļéášé ţřý áĝáíñ.~~]"
+    }
+  },
+  "top100": {
+    "progress_one": "[~~Ýőú'ṽé řáţéđ <1>{{rated}} őƒ {{total}}</1> across {{count}} ļíšţ~~]",
+    "progress_other": "[~~Ýőú'ṽé řáţéđ <1>{{rated}} őƒ {{total}}</1> across {{count}} ļíšţš~~]",
+    "searchPlaceholder": "[~~Šéářĉĥ ţĥé {{listLabel}} Ţőƥ 100~~]",
+    "searchA11y": "[~~Šéářĉĥ ŵíţĥíñ Ţőƥ 100 ļíšţ~~]",
+    "listsA11y": "[~~Ţőƥ 100 ļíšţš~~]",
+    "metaResults_one": "[~~<1>{{count}}</1> result~~]",
+    "metaResults_other": "[~~<1>{{count}}</1> results~~]",
+    "metaCourses_one": "[~~<1>{{count}}</1> course · {{listLabel}}~~]",
+    "metaCourses_other": "[~~<1>{{count}}</1> courses · {{listLabel}}~~]",
+    "clearSearch": "[~~Ĉļéář šéářĉĥ~~]",
+    "resetFilters": "[~~Řéšéţ ƒíļţéřš~~]"
+  },
+  "map": {
+    "unavailableTitle": "[~~Ṁáƥ Ţéɱƥőřáříļý Úñáṽáíļáƀļé~~]",
+    "unavailableBody": "[~~Ţĥé íñţéřáĉţíṽé ɱáƥ ƒéáţúřé íš ĉúřřéñţļý úñáṽáíļáƀļé.~~]",
+    "loading": "[~~Ļőáđíñĝ ɱáƥ...~~]",
+    "tapPrompt": "[~~⛳ Ţáƥ á ĉőúřšé ţő šţářţ ýőúř ĵőúřñéý~~]",
+    "countOf": "[~~{{rated}} őƒ {{total}}~~]",
+    "dotSeparator": "[~~·~~]"
+  },
+  "userCourses": {
+    "emptyRegion": "[~~Ñő ĉőúřšéš ƒőúñđ íñ ţĥé šéļéĉţéđ řéĝíőñ.~~]",
+    "signInTitle": "[~~Úšéř'š Ĝőļƒ Ĉőúřšéš~~]",
+    "signInBody": "[~~Šíĝñ íñ ţő ṽíéŵ úšéř ƥřőƒíļéš áñđ ĉőúřšé ĉĥéĉǩļíšţš~~]",
+    "signInRequired": "[~~Šíĝñ íñ řéʠúířéđ~~]",
+    "signInRequiredBody": "[~~Ĉřéáţé áñ áĉĉőúñţ ţő ṽíéŵ úšéř ƥřőƒíļéš áñđ ĉőúřšé íñƒőřɱáţíőñ~~]",
+    "loading": "[~~Ļőáđíñĝ...~~]",
+    "loadingBody": "[~~Ļőáđíñĝ úšéř ƥřőƒíļé áñđ ĉőúřšé íñƒőřɱáţíőñ~~]",
+    "notFound": "[~~Úšéř Ñőţ Ƒőúñđ~~]",
+    "notFoundBody": "[~~Ţĥé úšéř ƥřőƒíļé ýőú'řé ļőőǩíñĝ ƒőř đőéšñ'ţ éẋíšţ őř íšñ'ţ ƥúƀļíĉ~~]",
+    "regionalSortView": "[~~Šőřţ & Ṽíéŵ~~]",
+    "regionalAddCourses": "[~~Áđđ Ĉőúřšéš~~]",
+    "showingRegion": "[~~Šĥőŵíñĝ {{region}} ĉőúřšéš~~]"
+  },
+  "review": {
+    "filter": {
+      "title": "[~~Ƒíļţéř ƀý řáţíñĝ~~]",
+      "button": "[~~Ƒíļţéř~~]",
+      "buttonLabel": "[~~Ƒíļţéř: {{label}}. Ţáƥ ţő ĉĥáñĝé.~~]",
+      "buttonLabelDefault": "[~~Ƒíļţéř řéṽíéŵš ƀý řáţíñĝ~~]",
+      "clear": "[~~Ĉļéář ƒíļţéř~~]",
+      "optionAll": "[~~Áļļ řáţíñĝš~~]",
+      "optionExceptional": "[~~Éẋĉéƥţíőñáļ~~]",
+      "optionExcellent": "[~~Éẋĉéļļéñţ~~]",
+      "optionGood": "[~~Ĝőőđ~~]",
+      "optionFair": "[~~Ƒáíř~~]",
+      "optionPoor": "[~~Ƥőőř~~]"
+    },
+    "subscore": {
+      "design": "[~~Đéšíĝñ~~]",
+      "condition": "[~~Ĉőñđíţíőñ~~]",
+      "clubhouse": "[~~Ĉļúƀĥőúšé~~]",
+      "facilities": "[~~Ƒáĉíļíţíéš~~]"
+    },
+    "helpful": "[~~Ĥéļƥƒúļ?~~]",
+    "response": {
+      "ownerBadge": "[~~- Őŵñéř řéšƥőñšé~~]",
+      "editA11y": "[~~Éđíţ řéšƥőñšé~~]",
+      "deleteA11y": "[~~Đéļéţé řéšƥőñšé~~]",
+      "edit": "[~~Éđíţ~~]",
+      "delete": "[~~Đéļéţé~~]",
+      "cancel": "[~~Ĉáñĉéļ~~]",
+      "deleteConfirm": "[~~Đéļéţé ţĥíš řéšƥőñšé? Ţĥíš ĉáññőţ ƀé úñđőñé.~~]",
+      "reply": "[~~Řéƥļý~~]",
+      "saving": "[~~Šáṽíñĝ...~~]",
+      "save": "[~~Šáṽé~~]",
+      "posting": "[~~Ƥőšţíñĝ...~~]",
+      "post": "[~~Ƥőšţ řéšƥőñšé~~]",
+      "replyPlaceholder": "[~~Řéšƥőñđ áš {{business}}...~~]",
+      "verifyLink": "[~~Ṽéříƒý {{business}}~~]",
+      "verifyPrompt": "[~~<1>Verify {{business}}</1> to respond to reviews.~~]"
+    },
+    "write": {
+      "title": "[~~Ƥļáýéđ ĥéřé?~~]",
+      "body": "[~~Ýőúř řáţíñĝ ĥéļƥš ĝőļƒéřš ŵőřļđŵíđé~~]",
+      "rate": "[~~Řáţé~~]"
+    }
   }
 }
