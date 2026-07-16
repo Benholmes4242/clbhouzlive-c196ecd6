@@ -3,7 +3,7 @@
  * Per §3 + §7 of HYBRID_HERO_IMPLEMENTATION_BRIEF.
  */
 
-import { format } from 'date-fns';
+import { formatMonthDay } from '@/i18n/format';
 import type { HeroTournament } from '../../hooks/useHeroCarouselData';
 import { getScoreColor } from '../../_shared/scoreColor';
 
