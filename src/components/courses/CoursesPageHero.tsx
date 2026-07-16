@@ -1,4 +1,5 @@
 import { memo, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExploreHero } from '@/components/explore-tab-new/hooks/useExploreHero';
@@ -24,6 +25,7 @@ const HERO_MIN_HEIGHT =
   'calc(clamp(380px, 44dvh, 460px) + env(safe-area-inset-top, 0px))';
 
 function CoursesPageHeroInner() {
+  const { t } = useTranslation('courses');
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const { mood } = useExploreMood();
@@ -165,7 +167,7 @@ function CoursesPageHeroInner() {
                   cursor: 'pointer',
                 }}
               >
-                View course
+                {t('hero.viewCourse')}
               </button>
             </div>
           </>
