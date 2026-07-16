@@ -365,7 +365,7 @@ function ReviewCard({
           }}
         >
           <div className="flex items-center justify-between mb-1">
-            <div className="text-[11.5px] font-bold uppercase tracking-[0.06em]" style={{ color: '#B4650C' }}>
+            <div className="text-[11.5px] font-bold uppercase tracking-[0.06em]" style={{ color: '#94A3B8' }}>
               Your reply
             </div>
             <div className="text-[11px]" style={{ color: INK_45 }}>
