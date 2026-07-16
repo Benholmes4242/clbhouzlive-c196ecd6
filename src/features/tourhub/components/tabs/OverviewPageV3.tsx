@@ -17,6 +17,7 @@ import { StatWatchSlot } from '../overview-v3/StatWatchSlot';
 
 import { OverviewHero } from '../overview-v3/OverviewHero';
 import { OnTheCourseSlot } from '../overview-v3/OnTheCourseSlot';
+import { useTourSelection } from '@/features/tourhub/context/TourSelectionContext';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { WifiOff } from 'lucide-react';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
@@ -25,6 +26,9 @@ import { SPACE } from '@/lib/spacing';
 
 export function OverviewPageV3() {
   const { isOnline } = useNetworkStatus();
+  // READ-ONLY: keyed here purely to drive the OTC + TI synchronized fade so
+  // the hero-lensed unit visibly changes together. Must not write back.
+  const { viewingTournamentId } = useTourSelection();
 
   return (
     <>
@@ -52,24 +56,33 @@ export function OverviewPageV3() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3 }}
       >
-        {/* Tour Hub hero — self-contained carousel (single-owner index, random
-            landing slide, all three states eligible). See OverviewHero.tsx. */}
+        {/* Tour Hub Hero River — self-contained carousel crossing all tours.
+            See OverviewHero.tsx. */}
         <OverviewHero />
 
-        {/* Live-only featured groups rail (renders null off-live). Locked
-            composition: hero -> ON THE COURSE -> TI. */}
-        <OnTheCourseSlot />
-
-
+        {/* Cohesion unit: OTC + TI sit in a tight 14px group directly under
+            the hero, keyed to viewingTournamentId so they crossfade together
+            in step with the hero. The larger sectionSection gap that follows
+            is what makes this unit read as one. */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={viewingTournamentId ?? 'none'}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingTop: 12 }}
+          >
+            <OnTheCourseSlot />
+            <TISlot />
+          </motion.div>
+        </AnimatePresence>
 
         <div
           id="content-below-hero"
           className="relative z-10"
         >
           <div className="bg-background" style={{ display: 'flex', flexDirection: 'column', gap: SPACE.sectionSection, paddingTop: SPACE.sectionSection, paddingBottom: 88 }}>
-            <LazySection minHeight={500}>
-              <TISlot />
-            </LazySection>
             <LazySection minHeight={400}>
               <ComingUpSlot />
             </LazySection>
