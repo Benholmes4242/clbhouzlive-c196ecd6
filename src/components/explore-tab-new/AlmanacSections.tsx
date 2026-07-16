@@ -376,7 +376,8 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard', onRowTap
   // silence unused
   void navigate;
 
-  const showModeToggle = tier === 'birdie_hauls';
+  // Local toggle only shown when uncontrolled (defensive fallback for other consumers).
+  const showModeToggle = !controlled && tier === 'birdie_hauls';
 
   return (
     <section style={{ fontFamily: FONT, paddingTop: SPACE.sectionSection }}>
@@ -389,6 +390,11 @@ function FeatTierRailInner({ region, tier, title, variant = 'standard', onRowTap
       {showModeToggle ? (
         <BirdieHaulsModeToggle mode={mode} setMode={setMode} />
       ) : null}
+
+
+
+
+
 
 
 
