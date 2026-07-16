@@ -293,6 +293,8 @@ export function CrownCard({ row, opener, mode = 'latest' }: { row: FeatRow; open
 interface Props {
   region: string | null;
   opener?: ScorecardOpener;
+  /** When provided, section follows page scope; no internal toggle rendered. */
+  mode?: RecordsMode;
 }
 
 function RecordsModeToggle({
