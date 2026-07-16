@@ -26,8 +26,7 @@ export const WriteReviewPrompt: React.FC<WriteReviewPromptProps> = ({
         className="w-11 h-11 rounded-[12px] flex items-center justify-center flex-shrink-0"
         style={{ background: 'linear-gradient(135deg, #F7931E, #FBBC2E)' }}
       >
-        {/* eslint-disable-next-line i18next/no-literal-string -- brand vocabulary, decorative emoji */}
-        <span style={{ fontSize: 20 }} aria-hidden="true">⭐</span>
+        <span style={{ fontSize: 20 }} aria-hidden="true">{t('review.write.emoji', { defaultValue: '⭐' })}</span>
       </div>
 
       {/* Copy */}
