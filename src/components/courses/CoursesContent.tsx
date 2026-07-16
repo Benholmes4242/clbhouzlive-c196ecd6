@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CoursesPageHero from './CoursesPageHero';
+import { AmateurCircuitHero } from '@/components/explore-tab-new/AmateurCircuitHero';
 import CourseExplorer from './CourseExplorer';
 import MyCourses from './MyCourses';
 import FriendsCoursesSignedOutEmpty from './FriendsCoursesSignedOutEmpty';
