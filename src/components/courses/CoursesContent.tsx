@@ -166,6 +166,7 @@ interface CoursesContentProps {
 }
 
 const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }) => {
+  const { t } = useTranslation('courses');
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const [rateSheetOpen, setRateSheetOpen] = useState(false);
@@ -306,7 +307,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
               value="explore"
               className="data-[state=active]:text-foreground"
             >
-              Explore
+              {t('tabs.explore')}
             </TabsTrigger>
             <TabsTrigger 
               value="my-courses"
