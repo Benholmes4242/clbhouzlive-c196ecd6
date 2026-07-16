@@ -332,9 +332,10 @@ export const SharedHoleCard: React.FC<SharedHoleCardProps> = ({
       {expanded && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={{ display: 'flex', gap: 8 }}>
-            <Stat label="Sub-par" value={`${subPar.toFixed(1)}%`} color={SC_BIRDIE} />
-            <Stat label="Par" value={`${parPct.toFixed(1)}%`} color={SC_PAR} />
-            <Stat label="Over-par" value={`${overPar.toFixed(1)}%`} color={SC_DOUBLE} />
+            <Stat label={t('courses:holes.subPar')} value={`${subPar.toFixed(1)}%`} color={SC_BIRDIE} />
+            <Stat label={t('courses:holes.par')} value={`${parPct.toFixed(1)}%`} color={SC_PAR} />
+            <Stat label={t('courses:holes.overPar')} value={`${overPar.toFixed(1)}%`} color={SC_DOUBLE} />
+
           </div>
 
           <SharedHoleDistributionBar dist={hole.dist} mode="chart" mounted={mounted} />
