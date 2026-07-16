@@ -189,17 +189,17 @@ function PodiumCard({
                   padding: 0,
                   paddingTop: isTop ? 0 : 7,
                   marginTop: isTop ? 0 : 8,
-                  borderTop: isTop ? 'none' : `0.5px solid ${HAIRLINE}`,
-                  borderLeft: 'none',
-                  borderRight: 'none',
-                  borderBottom: 'none',
+                  border: 'none',
                   background: 'transparent',
-                  cursor: r.user_id ? 'pointer' : 'default',
-                  fontFamily: FONT,
-                  // Inset the top hairline past the avatar column (avatar 26 + gap 9 = 35)
+                  // Hairline inset past the avatar column (avatar 26 + gap 9 = 35px)
                   backgroundImage: isTop
                     ? 'none'
-                    : undefined,
+                    : `linear-gradient(to right, transparent 35px, ${HAIRLINE} 35px)`,
+                  backgroundRepeat: 'no-repeat',
+                  backgroundSize: '100% 0.5px',
+                  backgroundPosition: '0 0',
+                  cursor: r.user_id ? 'pointer' : 'default',
+                  fontFamily: FONT,
                 }}
               >
                 <SquircleAvatar
