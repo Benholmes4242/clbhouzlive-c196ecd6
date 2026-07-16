@@ -28,7 +28,7 @@ import { LeaderboardBand } from './HybridHeroBands/LeaderboardBand';
 import { CinematicFrame } from './HybridHeroBands/CinematicFrame';
 import { CinematicHeroFullBleed } from './HybridHeroBands/CinematicHeroFullBleed';
 import { setHeroFullBleed } from '../../_shared/heroFullBleedSignal';
-import { format } from 'date-fns';
+import { formatMonthDay } from '@/i18n/format';
 import {
   deriveHeroState,
   detectTopTie,
