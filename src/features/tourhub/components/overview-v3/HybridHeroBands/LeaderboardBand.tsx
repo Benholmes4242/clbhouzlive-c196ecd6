@@ -18,6 +18,7 @@ import { INK, INK_15, AMBER } from '../HybridHero.constants';
 import { INK_ALPHA_45, FONT, GOLD, GOLD_DEEP } from '../../../_shared/tokens';
 import type { TeeTimeGroup } from '../../../hooks/useTournamentTeeTimes';
 import { resolvePlayerAvatarCandidates } from '../../../_shared/resolvePlayerAvatar';
+import { formatNumber } from '@/i18n/format';
 
 
 export interface LeaderboardBandProps {
