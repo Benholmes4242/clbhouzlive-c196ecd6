@@ -104,7 +104,7 @@ function toChip(item: TrophyItem): ChipData | null {
   };
 }
 
-export function RankIdentityCard({ userId }: Props) {
+export function RankIdentityCard({ userId, variant = 'card' }: Props) {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const effectiveUserId = userId ?? user?.id;
