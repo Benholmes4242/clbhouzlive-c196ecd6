@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { Pencil, Calendar, ArrowUp, ArrowDown, CheckCircle2 } from 'lucide-react';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { useNavigate } from 'react-router-dom';
-import { format } from 'date-fns';
+import { formatMonthDayYearShort } from '@/i18n/format';
 import { getScoreRingColors } from '@/hooks/useTierStyles';
 import { getRatingTier, rampForRating, ratingTextColor } from '@/lib/ratingTier';
 import { MentionText } from '@/components/mentions/MentionText';
@@ -132,7 +132,7 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
   };
 
   const dateValue = rating.updated_at || rating.created_at;
-  const dateLabel = format(new Date(dateValue), 'MMM d, yyyy');
+  const dateLabel = formatMonthDayYearShort(new Date(dateValue));
 
   const categories = [
     { label: 'Design', score: rating.design_score },

@@ -288,6 +288,52 @@ export function formatTournamentDateRange(
   return `${formatMonthDay(s)} \u2013 ${formatMonthDayYearShort(e)}`;
 }
 
+// ─── locale-pinned display wrappers ───────────────────────────────────────
+// A handful of editorial/table surfaces (season calendars, exploration tab,
+// unified course card "last played" chip) were hand-pinned to `en-GB` at the
+// call site to force day-before-month ordering. Wave 1 preserves that exact
+// byte output by pinning these wrappers to `en-GB` rather than routing
+// through getActiveLocale(). Non-en localisation is handled by copy overrides
+// in a later wave.
+
+/**
+ * en-GB short day + month — "16 Jul".
+ * Matches `toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })`.
+ * QUIRK: day-before-month ordering; pinned to en-GB.
+ */
+export function formatDayMonthShortGB(d: DateInput): string {
+  return new Intl.DateTimeFormat('en-GB', {
+    day: 'numeric',
+    month: 'short',
+  }).format(toDate(d));
+}
+
+/**
+ * en-GB day + short month + year — "16 Jul 2026".
+ * Matches BOTH `toLocaleDateString('en-GB', { day, month:'short', year })`
+ * AND date-fns `format(d, 'd MMM yyyy')` for en.
+ * QUIRK: day-before-month ordering; pinned to en-GB.
+ */
+export function formatDayMonthYearShortGB(d: DateInput): string {
+  return new Intl.DateTimeFormat('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  }).format(toDate(d));
+}
+
+/**
+ * 4-digit year — "2026". Matches `toLocaleDateString(*, { year: 'numeric' })`.
+ * Locale-neutral for latin-digit locales; kept in one place for future
+ * per-locale numeral overrides.
+ */
+export function formatYearNumeric(d: DateInput): string {
+  return new Intl.DateTimeFormat(getActiveLocale(), {
+    year: 'numeric',
+  }).format(toDate(d));
+}
+
+
 
 
 

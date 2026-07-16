@@ -4,7 +4,7 @@ import { Check, Calendar, Star } from 'lucide-react';
 import { CourseCardModel } from '@/types/courseCard';
 import { CourseCommunityRating } from './CourseCommunityRating';
 import { FlagChip } from './FlagChip';
-import { format } from 'date-fns';
+import { formatDayMonthYearShortGB } from '@/i18n/format';
 import { getOptimizedImageUrl, generateImageSrcSet } from '@/utils/enhancedImageOptimization';
 
 /**
@@ -139,7 +139,7 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
               <div className="flex items-center gap-1 mt-1.5">
                 <Calendar className="w-3 h-3 text-muted-foreground" />
                 <span className="text-[10px] text-muted-foreground">
-                  {format(new Date(course.context.lastPlayedAt), 'd MMM yyyy')}
+                  {formatDayMonthYearShortGB(course.context.lastPlayedAt)}
                 </span>
               </div>
             )}
@@ -316,7 +316,7 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
             {/* Logged date if present */}
             {loggedDate && (
               <div className="inline-block text-[9px] font-medium text-white/60 mt-0.5">
-                Logged: {format(new Date(loggedDate), 'd MMM yyyy')}
+                Logged: {formatDayMonthYearShortGB(loggedDate)}
               </div>
             )}
             {/* Friends context */}
