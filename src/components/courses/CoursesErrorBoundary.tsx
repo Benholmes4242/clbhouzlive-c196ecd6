@@ -1,9 +1,9 @@
 import React, { Component, ReactNode } from 'react';
 import { AlertTriangle } from 'lucide-react';
-import { withTranslation, WithTranslation } from 'react-i18next';
+import i18n from '@/i18n';
 import { Button } from '@/components/ui/button';
 
-interface Props extends WithTranslation {
+interface Props {
   children: ReactNode;
 }
 
@@ -57,12 +57,12 @@ class CoursesErrorBoundary extends Component<Props, State> {
           <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
             <AlertTriangle className="w-6 h-6 text-destructive" />
           </div>
-          <h2 className="text-lg font-semibold mb-2">Something went wrong</h2>
+          <h2 className="text-lg font-semibold mb-2">{i18n.t('common:errors.coursesLoadTitle')}</h2>
           <p className="text-sm text-muted-foreground mb-4 max-w-md">
-            We encountered an error loading the courses page. This might be a temporary issue.
+            {i18n.t('common:errors.coursesLoadBody')}
           </p>
           <Button onClick={this.handleReset} variant="outline">
-            Reload Page
+            {i18n.t('common:state.reloadPage')}
           </Button>
         </div>
       );
