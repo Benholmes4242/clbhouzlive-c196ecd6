@@ -774,7 +774,7 @@ export function CinematicFrame({
     const pills = [
       { label: 'PURSE', value: purse != null ? (formatPurse(purse) || '—') : '—' },
       { label: 'PAR', value: venuePar != null ? String(venuePar) : '—' },
-      { label: 'YDS', value: venueYardage != null ? venueYardage.toLocaleString() : '—' },
+      { label: 'YDS', value: venueYardage != null ? formatNumber(venueYardage) : '—' },
     ];
     return (
       <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', marginTop: 6 }}>
