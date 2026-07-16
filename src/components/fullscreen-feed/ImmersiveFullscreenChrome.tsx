@@ -40,6 +40,7 @@ import { Z } from '@/config/zIndex';
 import { formatRatingValue } from '@/utils/formatters';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { formatCountKilo, formatRelativeWithSeconds as timeAgo } from '@/i18n/format';
 
 const AMBER = '#F7931E';
 const CHEVRON_BG = 'rgba(0,0,0,0.32)';
@@ -49,29 +50,9 @@ const TEXT_SHADOW = '0 1px 3px rgba(0,0,0,0.55)';
 
 function formatCount(n: number | null | undefined): string | null {
   if (n === null || n === undefined || n === 0) return null;
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}k`;
-  return String(n);
+  return formatCountKilo(n);
 }
 
-function timeAgo(iso: string | null | undefined) {
-  if (!iso) return '';
-  const t = new Date(iso).getTime();
-  if (!isFinite(t)) return '';
-  const s = Math.max(1, Math.floor((Date.now() - t) / 1000));
-  if (s < 60) return `${s}s`;
-  const m = Math.floor(s / 60);
-  if (m < 60) return `${m}m`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h`;
-  const d = Math.floor(h / 24);
-  if (d < 7) return `${d}d`;
-  const w = Math.floor(d / 7);
-  if (w < 5) return `${w}w`;
-  const mo = Math.floor(d / 30);
-  if (mo < 12) return `${mo}mo`;
-  return `${Math.floor(d / 365)}y`;
-}
 
 interface Props {
   posts: FeedPost[];
