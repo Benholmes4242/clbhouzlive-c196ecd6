@@ -2,13 +2,13 @@ import { FONT } from './gamingLightTokens';
 
 // Canonical section header for the Discover Almanac page.
 // One implementation. Light + dark surfaces. Optional right-aligned meta.
-// Overline: 10px 800 letterSpacing 0.14em uppercase.
-// Title:    19px 800 letterSpacing -0.01em.
-// Meta:     "View all ›" 11.5px 800 amber, baseline-aligned with the title.
+// Overline: 10.5px 600 letterSpacing 0.06em uppercase.
+// Title:    17px 700 letterSpacing -0.02em.
+// Meta:     "View all ›" 12px 600 amber, baseline-aligned with the title.
 
 const AMBER = '#F7931E';
-const OVERLINE_LIGHT = 'rgba(15,23,42,0.5)';
-const OVERLINE_DARK = 'rgba(255,255,255,0.5)';
+const OVERLINE_LIGHT = 'rgba(15,23,42,0.45)';
+const OVERLINE_DARK = 'rgba(255,255,255,0.55)';
 const TITLE_LIGHT = '#0F172A';
 const TITLE_DARK = '#FFFFFF';
 
@@ -53,9 +53,9 @@ export function SectionHead({
         <div style={{ minWidth: 0, flex: 1 }}>
           <div
             style={{
-              fontSize: 10,
-              fontWeight: 800,
-              letterSpacing: '0.14em',
+              fontSize: 10.5,
+              fontWeight: 600,
+              letterSpacing: '0.06em',
               textTransform: 'uppercase',
               color: overlineColor,
               lineHeight: 1,
@@ -67,9 +67,9 @@ export function SectionHead({
             <div
               style={{
                 marginTop: 6,
-                fontSize: 19,
-                fontWeight: 800,
-                letterSpacing: '-0.01em',
+                fontSize: 17,
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
                 color: titleColor,
                 lineHeight: 1.15,
               }}
@@ -89,10 +89,9 @@ export function SectionHead({
               padding: 0,
               cursor: 'pointer',
               color: AMBER,
-              fontSize: 11.5,
-              fontWeight: 800,
+              fontSize: 12,
+              fontWeight: 600,
               fontFamily: FONT,
-              letterSpacing: '-0.005em',
               whiteSpace: 'nowrap',
             }}
           >

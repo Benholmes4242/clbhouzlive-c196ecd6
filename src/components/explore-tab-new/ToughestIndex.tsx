@@ -5,9 +5,10 @@ import { FONT } from './gamingLightTokens';
 
 const RED = '#D2222D';
 const INK = '#0F172A';
-const MUTE = '#94A3B8';
+const MUTE = 'rgba(15,23,42,0.45)';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
 const CARD_BG = '#FFFFFF';
+const CARD_SHADOW = '0 1px 3px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.05)';
 const MAX = 8;
 
 const numFmt = (n: number | null | undefined, digits = 1) =>
@@ -38,10 +39,10 @@ function ToughCard({
         flexShrink: 0,
         width: 148,
         minHeight: 130,
-        borderRadius: 14,
+        borderRadius: 12,
         background: CARD_BG,
         border: `0.5px solid ${HAIRLINE}`,
-        boxShadow: '0 2px 10px rgba(15,23,42,0.05)',
+        boxShadow: CARD_SHADOW,
         padding: '11px 12px 10px',
         cursor: 'pointer',
         fontFamily: FONT,
@@ -52,8 +53,8 @@ function ToughCard({
       <div
         style={{
           fontSize: 9,
-          fontWeight: 800,
-          letterSpacing: '0.1em',
+          fontWeight: 600,
+          letterSpacing: '0.06em',
           textTransform: 'uppercase',
           color: isTop ? RED : MUTE,
           lineHeight: 1,
@@ -65,9 +66,9 @@ function ToughCard({
         style={{
           marginTop: 6,
           fontSize: 12.5,
-          fontWeight: 800,
+          fontWeight: 600,
           color: INK,
-          letterSpacing: '-0.005em',
+          letterSpacing: '-0.01em',
           lineHeight: 1.2,
           minHeight: 30,
           display: '-webkit-box',
@@ -82,8 +83,8 @@ function ToughCard({
         className="tabular-nums"
         style={{
           marginTop: 'auto',
-          fontSize: 21,
-          fontWeight: 900,
+          fontSize: 20,
+          fontWeight: 700,
           color: RED,
           letterSpacing: '-0.02em',
           lineHeight: 1,
@@ -94,9 +95,9 @@ function ToughCard({
       <div
         style={{
           marginTop: 5,
-          fontSize: 8.5,
-          fontWeight: 800,
-          letterSpacing: '0.1em',
+          fontSize: 9,
+          fontWeight: 600,
+          letterSpacing: '0.06em',
           textTransform: 'uppercase',
           color: MUTE,
           lineHeight: 1.2,

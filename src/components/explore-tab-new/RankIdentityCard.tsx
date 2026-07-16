@@ -190,7 +190,7 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
             borderRadius: 16,
             background: '#FFFFFF',
             border: `0.5px solid ${HAIRLINE}`,
-            boxShadow: '0 2px 10px rgba(15,23,42,0.05)',
+            boxShadow: '0 1px 3px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.05)',
             color: INK,
             cursor: 'pointer',
             fontFamily: FONT,
@@ -203,7 +203,7 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
               className="tabular-nums"
               style={{
                 fontSize: 26,
-                fontWeight: 900,
+                fontWeight: 800,
                 letterSpacing: '-0.02em',
                 color: INK,
                 lineHeight: 1,
@@ -214,11 +214,11 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
             <div
               style={{
                 marginTop: 3,
-                fontSize: 8.5,
-                fontWeight: 800,
-                letterSpacing: '0.14em',
+                fontSize: 9,
+                fontWeight: 600,
+                letterSpacing: '0.06em',
                 textTransform: 'uppercase',
-                color: 'rgba(15,23,42,0.5)',
+                color: 'rgba(15,23,42,0.45)',
               }}
             >
               Medals
@@ -249,8 +249,9 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
             >
               <div
                 style={{
-                  fontSize: 12.5,
-                  fontWeight: 800,
+                  fontSize: 13,
+                  fontWeight: 600,
+                  letterSpacing: '-0.01em',
                   color: INK,
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
@@ -263,7 +264,7 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
                 {hasHcp && (
                   <>
                     {' '}
-                    <span style={{ color: AMBER, fontWeight: 800 }}>
+                    <span style={{ color: AMBER, fontWeight: 600 }}>
                       {formatHcp(hcp)}
                     </span>
                   </>
@@ -272,16 +273,14 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
               {globalRank != null && (
                 <div
                   style={{
-                    fontSize: 10,
-                    fontWeight: 800,
-                    letterSpacing: '0.08em',
-                    color: 'rgba(15,23,42,0.5)',
-                    textTransform: 'uppercase',
+                    fontSize: 11,
+                    fontWeight: 500,
+                    color: 'rgba(15,23,42,0.55)',
                     whiteSpace: 'nowrap',
                     flexShrink: 0,
                   }}
                 >
-                  · #{globalRank} Worldwide
+                  #{globalRank} worldwide
                 </div>
               )}
             </div>
@@ -311,11 +310,10 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
                 />
                 <span
                   style={{
-                    fontSize: 9.5,
-                    fontWeight: 800,
+                    fontSize: 10.5,
+                    fontWeight: 600,
                     color: INK,
                     whiteSpace: 'nowrap',
-                    letterSpacing: '0.02em',
                   }}
                 >
                   {tierName} {currentLevel.level}
@@ -325,7 +323,7 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
               <div
                 style={{
                   flex: 1,
-                  height: 4,
+                  height: 3,
                   borderRadius: 999,
                   background: 'rgba(15,23,42,0.08)',
                   overflow: 'hidden',
@@ -334,9 +332,9 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
               >
                 <div
                   style={{
-                    width: `${barPct}%`,
+                    width: `${Math.max(8, barPct)}%`,
                     height: '100%',
-                    background: `linear-gradient(90deg, ${AMBER}, ${GOLD})`,
+                    background: AMBER,
                     borderRadius: 999,
                   }}
                 />
@@ -344,8 +342,8 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
 
               <div
                 style={{
-                  fontSize: 10,
-                  fontWeight: 700,
+                  fontSize: 11,
+                  fontWeight: 500,
                   color: 'rgba(15,23,42,0.55)',
                   whiteSpace: 'nowrap',
                   flexShrink: 0,
@@ -354,7 +352,7 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
                 {nextLevel ? (
                   <>
                     <span
-                      style={{ color: AMBER, fontWeight: 800 }}
+                      style={{ color: INK, fontWeight: 700 }}
                       className="tabular-nums"
                     >
                       {medalsToNext}
@@ -371,6 +369,7 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
       </div>
     );
   }
+
 
 
   return (

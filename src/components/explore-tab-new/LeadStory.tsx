@@ -9,7 +9,7 @@ import { relativeTime } from '@/utils/relativeTime';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const GOLD = '#FBBC2E';
-const UNDER_PAR = '#FF4D57';
+const UNDER_PAR = '#D2222D';
 
 function formatHolderName(raw?: string | null): string {
   const s = (raw ?? '').trim();
@@ -97,7 +97,7 @@ export function LeadStory({ region, regionUpper, mode }: Props) {
           position: 'relative',
           width: '100%',
           minHeight: 210,
-          borderRadius: 20,
+          borderRadius: 16,
           overflow: 'hidden',
           border: 'none',
           padding: '16px 18px 16px',
@@ -110,7 +110,7 @@ export function LeadStory({ region, regionUpper, mode }: Props) {
           background: bgImage ?? bgSolid,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          boxShadow: '0 6px 22px rgba(15,23,42,0.16)',
+          boxShadow: '0 1px 3px rgba(15,23,42,0.06), 0 12px 32px rgba(15,23,42,0.14)',
         }}
       >
         {/* Overline row */}
@@ -125,9 +125,9 @@ export function LeadStory({ region, regionUpper, mode }: Props) {
         >
           <div
             style={{
-              fontSize: 10,
-              fontWeight: 800,
-              letterSpacing: '0.14em',
+              fontSize: 10.5,
+              fontWeight: 600,
+              letterSpacing: '0.06em',
               textTransform: 'uppercase',
               color: GOLD,
               lineHeight: 1,
@@ -137,8 +137,8 @@ export function LeadStory({ region, regionUpper, mode }: Props) {
           </div>
           <span
             style={{
-              fontSize: 10.5,
-              fontWeight: 800,
+              fontSize: 12,
+              fontWeight: 600,
               color: GOLD,
               lineHeight: 1,
               pointerEvents: 'none',
@@ -164,7 +164,7 @@ export function LeadStory({ region, regionUpper, mode }: Props) {
             <div
               style={{
                 fontSize: 27,
-                fontWeight: 900,
+                fontWeight: 800,
                 letterSpacing: '-0.02em',
                 color: '#FFFFFF',
                 lineHeight: 1.02,
@@ -197,7 +197,7 @@ export function LeadStory({ region, regionUpper, mode }: Props) {
               <span
                 style={{
                   fontSize: 12.5,
-                  fontWeight: 800,
+                  fontWeight: 600,
                   color: '#FFFFFF',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
@@ -211,7 +211,7 @@ export function LeadStory({ region, regionUpper, mode }: Props) {
                 <span
                   style={{
                     fontSize: 11,
-                    fontWeight: 600,
+                    fontWeight: 500,
                     color: 'rgba(255,255,255,0.55)',
                     whiteSpace: 'nowrap',
                     flexShrink: 0,
@@ -237,7 +237,7 @@ export function LeadStory({ region, regionUpper, mode }: Props) {
               className="tabular-nums"
               style={{
                 fontSize: 56,
-                fontWeight: 900,
+                fontWeight: 800,
                 letterSpacing: '-0.035em',
                 lineHeight: 0.9,
                 color: heroColor,
@@ -248,9 +248,9 @@ export function LeadStory({ region, regionUpper, mode }: Props) {
             <div
               style={{
                 marginTop: 4,
-                fontSize: 9.5,
-                fontWeight: 800,
-                letterSpacing: '0.12em',
+                fontSize: 9,
+                fontWeight: 600,
+                letterSpacing: '0.06em',
                 textTransform: 'uppercase',
                 color: 'rgba(255,255,255,0.65)',
                 whiteSpace: 'nowrap',

@@ -18,7 +18,7 @@ const INK_MUTE = 'rgba(15,23,42,0.45)';
 const RANK_MUTE = 'rgba(15,23,42,0.35)';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
 const BAR_TRACK = 'rgba(15,23,42,0.08)';
-const BAR_GRADIENT = `linear-gradient(90deg, ${AMBER}, #FBBC2E)`;
+const CHEVRON_COLOR = 'rgba(15,23,42,0.3)';
 const CARD_BG = '#FFFFFF';
 const ROWS = 5;
 
@@ -81,8 +81,8 @@ export function BirdieHaulsLedger({ region, regionUpper, mode, onRowTap }: Props
             background: CARD_BG,
             borderRadius: 16,
             border: `0.5px solid ${HAIRLINE}`,
-            boxShadow: '0 2px 10px rgba(15,23,42,0.05)',
-            padding: '10px 12px',
+            boxShadow: '0 1px 3px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.05)',
+            padding: '4px 0',
           }}
         >
           {display.map((row, i) => {
@@ -101,7 +101,7 @@ export function BirdieHaulsLedger({ region, regionUpper, mode, onRowTap }: Props
                   display: 'flex',
                   flexDirection: 'column',
                   gap: 6,
-                  padding: '9px 2px',
+                  padding: '9px 16px',
                   width: '100%',
                   background: 'transparent',
                   border: 'none',
@@ -115,7 +115,7 @@ export function BirdieHaulsLedger({ region, regionUpper, mode, onRowTap }: Props
                     style={{
                       width: 16,
                       fontSize: 11,
-                      fontWeight: 800,
+                      fontWeight: 600,
                       color: isFirst ? AMBER : RANK_MUTE,
                       fontVariantNumeric: 'tabular-nums',
                       textAlign: 'center',
@@ -135,8 +135,9 @@ export function BirdieHaulsLedger({ region, regionUpper, mode, onRowTap }: Props
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div
                       style={{
-                        fontSize: 12.5,
-                        fontWeight: 800,
+                        fontSize: 13,
+                        fontWeight: 600,
+                        letterSpacing: '-0.01em',
                         color: INK,
                         lineHeight: 1.2,
                         overflow: 'hidden',
@@ -149,8 +150,8 @@ export function BirdieHaulsLedger({ region, regionUpper, mode, onRowTap }: Props
                     <div
                       style={{
                         marginTop: 2,
-                        fontSize: 10.5,
-                        fontWeight: 600,
+                        fontSize: 11,
+                        fontWeight: 500,
                         color: INK_MUTE,
                         lineHeight: 1.2,
                         overflow: 'hidden',
@@ -175,10 +176,9 @@ export function BirdieHaulsLedger({ region, regionUpper, mode, onRowTap }: Props
                       className="tabular-nums"
                       style={{
                         fontSize: 15,
-                        fontWeight: 900,
+                        fontWeight: 700,
                         color: isFirst ? AMBER : INK,
                         lineHeight: 1,
-                        letterSpacing: '-0.01em',
                       }}
                     >
                       {count}
@@ -186,22 +186,23 @@ export function BirdieHaulsLedger({ region, regionUpper, mode, onRowTap }: Props
                     <div
                       style={{
                         marginTop: 3,
-                        fontSize: 8,
-                        fontWeight: 800,
-                        letterSpacing: '0.1em',
+                        fontSize: 9,
+                        fontWeight: 600,
+                        letterSpacing: '0.06em',
                         textTransform: 'uppercase',
-                        color: '#94A3B8',
+                        color: 'rgba(15,23,42,0.45)',
                         lineHeight: 1,
                       }}
                     >
                       BIRDIES
                     </div>
                   </div>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: CHEVRON_COLOR, lineHeight: 1 }}>›</span>
                 </div>
                 <div
                   style={{
-                    marginLeft: 26,
-                    height: 4,
+                    marginLeft: 34,
+                    height: 3,
                     borderRadius: 999,
                     background: BAR_TRACK,
                     overflow: 'hidden',
@@ -212,7 +213,7 @@ export function BirdieHaulsLedger({ region, regionUpper, mode, onRowTap }: Props
                       width: `${pct * 100}%`,
                       height: '100%',
                       borderRadius: 999,
-                      background: BAR_GRADIENT,
+                      background: AMBER,
                     }}
                   />
                 </div>

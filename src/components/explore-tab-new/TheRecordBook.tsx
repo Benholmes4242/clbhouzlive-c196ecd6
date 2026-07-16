@@ -21,20 +21,20 @@ const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const INK = '#0F172A';
 const PANEL_BG = 'linear-gradient(180deg, #FCF8F0 0%, #F7F1E4 100%)';
 const PANEL_BORDER = '0.5px solid rgba(158,115,0,0.18)';
-const PANEL_SHADOW = '0 2px 14px rgba(15,23,42,0.05)';
+const PANEL_SHADOW = '0 1px 3px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.05)';
 const GOLD = '#FBBC2E';
 const PARCHMENT_GOLD = '#B8860B';
 const AMBER = '#F7931E';
 const UNDER_PAR = '#D2222D';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
 const CONQUEST_HAIRLINE = 'rgba(15,23,42,0.1)';
-const MUTED = 'rgba(15,23,42,0.5)';
+const MUTED = 'rgba(15,23,42,0.45)';
 const FADED = 'rgba(15,23,42,0.35)';
-const GHOST = 'rgba(15,23,42,0.4)';
-const CHIP_BG = 'rgba(15,23,42,0.035)';
-const CHIP_BORDER = 'rgba(15,23,42,0.08)';
+const GHOST = 'rgba(15,23,42,0.45)';
+const CHIP_BG = 'rgba(15,23,42,0.04)';
 const TRACK_BG = 'rgba(15,23,42,0.08)';
 const AVATAR_RING_MUTED = 'rgba(15,23,42,0.2)';
+const CHEVRON_COLOR = 'rgba(15,23,42,0.3)';
 
 const REGION_HUMAN: Record<string, string> = {
   'uk-ireland': 'GB&I',
@@ -93,7 +93,7 @@ function gapCopy(category: string, gap: number): string {
 }
 function categoryLabel(category: string): string {
   const base = stripWindow(category);
-  return (CATEGORY_META[base]?.label ?? base.replace(/_/g, ' ')).toUpperCase();
+  return CATEGORY_META[base]?.label ?? base.replace(/_/g, ' ');
 }
 function progressPct(_category: string, gap: number): number {
   const n = Math.max(1, Math.round(gap));
@@ -135,8 +135,8 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
         style={{
           background: PANEL_BG,
           border: PANEL_BORDER,
-          borderRadius: 20,
-          padding: '16px 16px 14px',
+          borderRadius: 16,
+          padding: '16px 0 14px',
           fontFamily: FONT,
           color: INK,
           boxShadow: PANEL_SHADOW,
@@ -149,14 +149,15 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
             alignItems: 'baseline',
             justifyContent: 'space-between',
             gap: 12,
+            padding: '0 16px',
           }}
         >
           <div style={{ minWidth: 0, flex: 1 }}>
             <div
               style={{
-                fontSize: 10,
-                fontWeight: 800,
-                letterSpacing: '0.14em',
+                fontSize: 10.5,
+                fontWeight: 600,
+                letterSpacing: '0.06em',
                 textTransform: 'uppercase',
                 color: MUTED,
                 lineHeight: 1,
@@ -167,11 +168,11 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
             <div
               style={{
                 marginTop: 6,
-                fontSize: 19,
-                fontWeight: 800,
-                letterSpacing: '-0.01em',
+                fontSize: 17,
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
                 color: INK,
-                lineHeight: 1.1,
+                lineHeight: 1.15,
               }}
             >
               The record book
@@ -187,10 +188,9 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
               padding: 0,
               cursor: 'pointer',
               color: AMBER,
-              fontSize: 11.5,
-              fontWeight: 800,
+              fontSize: 12,
+              fontWeight: 600,
               fontFamily: FONT,
-              letterSpacing: '-0.005em',
               whiteSpace: 'nowrap',
             }}
           >
@@ -198,8 +198,30 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
           </button>
         </div>
 
+        {/* Column caption row */}
+        <div
+          style={{
+            marginTop: 12,
+            padding: '0 16px 0 64px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            fontSize: 9,
+            fontWeight: 600,
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+            color: 'rgba(15,23,42,0.35)',
+            lineHeight: 1,
+          }}
+        >
+          <div style={{ flex: 1, minWidth: 0 }}>Course</div>
+          <div style={{ width: 44, textAlign: 'right' }}>To par</div>
+          <div style={{ width: 34, textAlign: 'right' }}>Gross</div>
+          <div style={{ width: 12 }} aria-hidden />
+        </div>
+
         {/* Ledger */}
-        <div style={{ marginTop: 10 }}>
+        <div style={{ marginTop: 6 }}>
           {ledgerRows.map((row, i) => (
             <LedgerRow
               key={`${row.course_id ?? i}-${i}`}
@@ -261,26 +283,39 @@ function LedgerRow({
       onClick={onTap}
       className="text-left active:opacity-80 transition-opacity"
       style={{
+        position: 'relative',
         display: 'flex',
         alignItems: 'center',
         gap: 10,
-        padding: '9px 4px',
+        padding: '9px 16px',
         width: '100%',
         background: 'transparent',
         border: 'none',
-        borderTop: isFirst ? 'none' : `0.5px solid ${HAIRLINE}`,
         cursor: 'pointer',
         fontFamily: FONT,
         color: INK,
       }}
     >
+      {!isFirst ? (
+        <span
+          aria-hidden
+          style={{
+            position: 'absolute',
+            left: 64,
+            right: 16,
+            top: 0,
+            height: 0,
+            borderTop: `0.5px solid ${HAIRLINE}`,
+          }}
+        />
+      ) : null}
       {/* Rank */}
       <div
         style={{
           width: 16,
           flexShrink: 0,
           fontSize: 11,
-          fontWeight: 800,
+          fontWeight: 600,
           color: isFirst ? PARCHMENT_GOLD : FADED,
           fontVariantNumeric: 'tabular-nums',
           textAlign: 'center',
@@ -305,8 +340,9 @@ function LedgerRow({
       <div style={{ flex: 1, minWidth: 0 }}>
         <div
           style={{
-            fontSize: 12.5,
-            fontWeight: 800,
+            fontSize: 13,
+            fontWeight: 600,
+            letterSpacing: '-0.01em',
             color: INK,
             lineHeight: 1.2,
             overflow: 'hidden',
@@ -319,8 +355,8 @@ function LedgerRow({
         <div
           style={{
             marginTop: 2,
-            fontSize: 10,
-            fontWeight: 600,
+            fontSize: 11,
+            fontWeight: 500,
             color: MUTED,
             lineHeight: 1.2,
             overflow: 'hidden',
@@ -333,43 +369,40 @@ function LedgerRow({
         </div>
       </div>
 
-      {/* Right: to-par + gross */}
+      {/* To par column */}
       <div
+        className="tabular-nums"
         style={{
-          width: 62,
+          width: 44,
           flexShrink: 0,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-end',
+          textAlign: 'right',
+          fontSize: 15,
+          fontWeight: 700,
+          color: toParColor,
+          lineHeight: 1,
         }}
       >
-        <div
-          className="tabular-nums"
-          style={{
-            fontSize: 16,
-            fontWeight: 900,
-            letterSpacing: '-0.02em',
-            color: toParColor,
-            lineHeight: 1,
-          }}
-        >
-          {toParDisplay}
-        </div>
-        {grossText ? (
-          <div
-            className="tabular-nums"
-            style={{
-              marginTop: 3,
-              fontSize: 9.5,
-              fontWeight: 700,
-              color: GHOST,
-              lineHeight: 1,
-            }}
-          >
-            {grossText}
-          </div>
-        ) : null}
+        {toParDisplay}
       </div>
+
+      {/* Gross column */}
+      <div
+        className="tabular-nums"
+        style={{
+          width: 34,
+          flexShrink: 0,
+          textAlign: 'right',
+          fontSize: 12,
+          fontWeight: 500,
+          color: GHOST,
+          lineHeight: 1,
+        }}
+      >
+        {grossText || '—'}
+      </div>
+
+      {/* Chevron */}
+      <span style={{ width: 12, textAlign: 'right', fontSize: 12, fontWeight: 600, color: CHEVRON_COLOR, lineHeight: 1, flexShrink: 0 }}>›</span>
     </button>
   );
 }
@@ -415,18 +448,20 @@ function ConquestsStrip({ userId }: { userId: string | undefined }) {
       style={{
         marginTop: 14,
         paddingTop: 12,
+        marginLeft: 16,
+        marginRight: 16,
         borderTop: `1px solid ${CONQUEST_HAIRLINE}`,
       }}
     >
       <div
         style={{
-          fontSize: 9.5,
-          fontWeight: 800,
-          letterSpacing: '0.14em',
+          fontSize: 10.5,
+          fontWeight: 600,
+          letterSpacing: '0.06em',
           textTransform: 'uppercase',
-          color: PARCHMENT_GOLD,
+          color: MUTED,
           lineHeight: 1,
-          padding: '0 4px 10px',
+          padding: '0 0 10px',
         }}
       >
         Your next conquests
@@ -455,9 +490,9 @@ function ConquestChip({ row }: { row: TitleInReach }) {
       style={{
         flexShrink: 0,
         width: 172,
-        borderRadius: 12,
+        borderRadius: 10,
         background: CHIP_BG,
-        border: `1px solid ${CHIP_BORDER}`,
+        border: 'none',
         padding: '10px 11px',
         cursor: 'pointer',
         fontFamily: FONT,
@@ -466,37 +501,45 @@ function ConquestChip({ row }: { row: TitleInReach }) {
     >
       <div
         style={{
-          fontSize: 11.5,
-          fontWeight: 800,
-          color: INK,
-          lineHeight: 1.2,
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
+          display: 'flex',
+          alignItems: 'baseline',
+          gap: 6,
+          minWidth: 0,
         }}
       >
-        {row.course_name}
-      </div>
-      <div
-        style={{
-          marginTop: 3,
-          fontSize: 8.5,
-          fontWeight: 800,
-          letterSpacing: '0.1em',
-          color: AMBER,
-          textTransform: 'uppercase',
-          lineHeight: 1.2,
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        {categoryLabel(row.category)}
+        <div
+          style={{
+            flex: 1,
+            minWidth: 0,
+            fontSize: 12.5,
+            fontWeight: 600,
+            letterSpacing: '-0.01em',
+            color: INK,
+            lineHeight: 1.2,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {row.course_name}
+        </div>
+        <div
+          style={{
+            flexShrink: 0,
+            fontSize: 10,
+            fontWeight: 500,
+            color: 'rgba(15,23,42,0.45)',
+            lineHeight: 1.2,
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {categoryLabel(row.category)}
+        </div>
       </div>
       <div
         style={{
           marginTop: 8,
-          height: 4,
+          height: 3,
           borderRadius: 999,
           background: TRACK_BG,
           overflow: 'hidden',
@@ -506,7 +549,7 @@ function ConquestChip({ row }: { row: TitleInReach }) {
           style={{
             width: `${Math.max(8, pct)}%`,
             height: '100%',
-            background: `linear-gradient(90deg, ${AMBER}, ${GOLD})`,
+            background: AMBER,
             borderRadius: 999,
           }}
         />
@@ -514,20 +557,21 @@ function ConquestChip({ row }: { row: TitleInReach }) {
       <div
         style={{
           marginTop: 7,
-          fontSize: 10,
-          fontWeight: 600,
-          color: 'rgba(15,23,42,0.6)',
+          fontSize: 11,
+          fontWeight: 500,
+          color: 'rgba(15,23,42,0.55)',
           lineHeight: 1.25,
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
         }}
       >
-        <span style={{ color: PARCHMENT_GOLD, fontWeight: 800 }}>{gap}</span>
-        {' '}to take it ({row.leader_value})
+        <span style={{ color: INK, fontWeight: 700 }}>{gap}</span>
+        {' '}to take it · {row.leader_value}
       </div>
     </button>
   );
 }
+
 
 export default TheRecordBook;
