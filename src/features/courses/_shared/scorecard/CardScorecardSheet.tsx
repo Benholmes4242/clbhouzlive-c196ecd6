@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { User, MapPin, RefreshCw, Table } from 'lucide-react';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
