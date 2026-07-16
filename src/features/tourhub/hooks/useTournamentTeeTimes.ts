@@ -11,6 +11,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { formatTimeHm } from '@/i18n/format';
 
 export interface TeeTimeGroup {
   time: string;
@@ -48,7 +49,7 @@ export function useTournamentTeeTimes(tournamentId: string | null | undefined, e
         .map((row): TeeTimeGroup => {
           const dt = row.tee_time ? new Date(row.tee_time) : null;
           const time = dt
-            ? dt.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+            ? formatTimeHm(dt)
             : '—';
           const players = (row.players || [])
             .map((p: any) => {

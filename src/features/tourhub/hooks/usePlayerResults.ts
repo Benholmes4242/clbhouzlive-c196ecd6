@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { formatCurrencyUsd } from '@/i18n/format';
 
 export interface PlayerTournamentResult {
   id: string;
@@ -132,5 +133,5 @@ export function formatMoney(money: number | null): string {
   if (money >= 1_000_000) {
     return `$${(money / 1_000_000).toFixed(2)}M`;
   }
-  return `$${money.toLocaleString()}`;
+  return formatCurrencyUsd(money);
 }

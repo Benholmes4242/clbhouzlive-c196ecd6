@@ -3,6 +3,11 @@
  * Provides consistent fallback images for players and courses
  */
 
+import { formatCurrencyUsd, formatNumber } from '@/i18n/format';
+
+
+
+
 const COURSE_IMAGES = [
   '/placeholders/courses/course-aerial-1.jpg',
   '/placeholders/courses/course-aerial-2.jpg',
@@ -93,7 +98,7 @@ export const formatPurse = (purse: number | null | undefined): string => {
   if (purse >= 1000) {
     return `$${(purse / 1000).toFixed(0)}K`;
   }
-  return `$${purse.toLocaleString()}`;
+  return formatCurrencyUsd(purse);
 };
 
 /**
@@ -101,7 +106,7 @@ export const formatPurse = (purse: number | null | undefined): string => {
  */
 export const formatYardage = (yardage: number | null | undefined): string => {
   if (!yardage) return '--';
-  return `${yardage.toLocaleString()} yds`;
+  return `${formatNumber(yardage)} yds`;
 };
 
 /**

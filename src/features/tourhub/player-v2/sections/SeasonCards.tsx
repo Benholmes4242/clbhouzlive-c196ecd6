@@ -14,6 +14,7 @@ import { ChevronRight } from 'lucide-react';
 import type { PlayerTournamentResult } from '../../hooks/usePlayerResults';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
 import { StatsSheet } from '../StatsSheet';
+import { formatCurrencyUsd } from '@/i18n/format';
 import {
   HAIRLINE_INK_8,
   INK,
@@ -38,7 +39,7 @@ interface Card {
 function fmtCompactMoney(n: number): string {
   if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(2)}M`;
   if (n >= 1_000) return `$${(n / 1_000).toFixed(1)}K`;
-  return `$${n.toLocaleString()}`;
+  return formatCurrencyUsd(n);
 }
 
 function fromStats(s: TourPlayerStatistics): Card[] {

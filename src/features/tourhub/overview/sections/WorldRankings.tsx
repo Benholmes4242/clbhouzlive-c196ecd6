@@ -18,6 +18,7 @@ import type { TourId } from '../../hooks/useOverviewData';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { PlayerAvatar } from '../../components/PlayerAvatar';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
+import { formatNumber } from '@/i18n/format';
 
 const TOUR_TO_BOARD: Partial<Record<TourId, { board: RankingsBoard; label: string; tourCode: string }>> = {
   pga: { board: 'owgr', label: 'Official World Golf Ranking', tourCode: 'pga' },
@@ -94,7 +95,7 @@ export function WorldRankings({ tour }: { tour: TourId }) {
               </div>
               {r.points != null ? (
                 <div style={{ minWidth: 56, textAlign: 'right', fontSize: 12, fontWeight: 700, color: V4.inkFaint, fontVariantNumeric: 'tabular-nums' }}>
-                  {Math.round(r.points).toLocaleString()}
+                  {formatNumber(Math.round(r.points))}
                 </div>
               ) : (
                 <div style={{ minWidth: 56 }} />
@@ -155,7 +156,7 @@ function SpotlightRow({
       {row.points != null ? (
         <div style={{ textAlign: 'right', flexShrink: 0 }}>
           <div style={{ fontSize: 28, fontWeight: 200, color: V4.ink, lineHeight: 1, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em' }}>
-            {Math.round(row.points).toLocaleString()}
+            {formatNumber(Math.round(row.points))}
           </div>
           <div style={{ marginTop: 4, fontSize: 8.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.14em' }}>
             POINTS

@@ -29,6 +29,7 @@ import { TourHubShell } from '@/features/tourhub/components/TourHubShell';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { collegeProfileRoute, playerRoute } from '@/features/tourhub/routes';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
+import { formatNumber } from '@/i18n/format';
 import {
   AMBER,
   CHARCOAL,
@@ -50,7 +51,7 @@ import { TugStat } from './TugStat';
 import { PickerSheet } from './PickerSheet';
 
 const CLASS_CAP = 5;
-const fmtInt = (n: number) => n.toLocaleString();
+const fmtInt = (n: number) => formatNumber(n);
 
 export function ComparePage() {
   const [searchParams] = useSearchParams();

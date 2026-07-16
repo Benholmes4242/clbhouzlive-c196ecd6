@@ -17,6 +17,7 @@
  */
 
 import type { FranchiseCaptain } from '../hooks/useFranchiseCaptains';
+import { formatCurrencyUsd } from '@/i18n/format';
 
 const MARGIN_THRESHOLD = 0.20;
 
@@ -34,7 +35,7 @@ export function captainDominates(captain: FranchiseCaptain | undefined): boolean
 export function formatCaptainEarnings(n: number): string {
   if (Math.abs(n) >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
   if (Math.abs(n) >= 1_000) return `$${(n / 1_000).toFixed(0)}K`;
-  return `$${n.toLocaleString()}`;
+  return formatCurrencyUsd(n);
 }
 
 /** Last-name shortener for tight pill copy ("Scottie Scheffler" → "Scheffler"). */

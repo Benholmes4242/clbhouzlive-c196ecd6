@@ -26,6 +26,7 @@ import { getScoreColor } from '../../_shared/scoreColor';
 import { PlayerAvatar } from '../../components/PlayerAvatar';
 import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { SPACE } from '@/lib/spacing';
+import { formatTimeHm } from '@/i18n/format';
 
 interface Props {
   tournamentId: string | undefined;
@@ -100,7 +101,7 @@ function groupThru(g: GroupShape): number | null {
 
 function formatTeeTime(iso: string | undefined): string {
   if (!iso) return '';
-  return new Date(iso).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toUpperCase();
+  return formatTimeHm(new Date(iso)).toUpperCase();
 }
 
 /** Dedupe key: tee_time + sorted player names joined. */

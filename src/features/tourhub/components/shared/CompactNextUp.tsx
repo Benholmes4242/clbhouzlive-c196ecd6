@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { TourPill } from './TourPill';
 import { formatPurse } from './TourHeroHelpers';
 import { AMBER, AMBER_BORDER, INK } from '../../_shared/tokens';
+import { formatNumber } from '@/i18n/format';
 
 interface CompactNextUpProps {
   tournamentId: string;

@@ -11,6 +11,7 @@ import { PlayerAvatar } from '../../components/PlayerAvatar';
 import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { formatPurse } from '../../components/shared/TourHeroHelpers';
 import { isAnyMajor } from '../../utils/majorScope';
+import { formatNumber } from '@/i18n/format';
 import {
   FONT, GOLD, WHITE_ALPHA_10, WHITE_ALPHA_30, WHITE_ALPHA_65,
   STATUS_LIVE,
@@ -66,7 +67,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
   const venueLine = [
     meta.venue_name,
     meta.venue_par ? `Par ${meta.venue_par}` : null,
-    meta.venue_yardage ? `${meta.venue_yardage.toLocaleString()} yds` : null,
+    meta.venue_yardage ? `${formatNumber(meta.venue_yardage)} yds` : null,
   ].filter(Boolean).join(' · ');
 
   const statusChip = (() => {
