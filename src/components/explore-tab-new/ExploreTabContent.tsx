@@ -6,7 +6,7 @@ import { useExploreRegion } from './hooks/useExploreRegion';
 
 import { CircleActivityStrip } from './CircleActivityStrip';
 import {
-  AlmanacRegionTabs,
+  AlmanacLens,
   FeatTierRail,
   AlmanacHead,
   REGION_TABS,
@@ -49,6 +49,8 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
   const { user } = useSupabaseSession();
   const userId = user?.id;
   const gridRef = useRef<HTMLDivElement | null>(null);
+  // THE LENS — single page-level scope. Not persisted; defaults to 'latest' per visit.
+  const [scope, setScope] = useState<RecordsMode>('latest');
 
   const { region: activeRegion, setRegion } = useExploreRegion();
 
@@ -113,22 +115,28 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
       <div>
         {/* pre-chips spacer (chips must be a direct child of SCOPE 2 for sticky bounds) */}
         <div style={{ height: SPACE.sectionSection }} aria-hidden />
-        {/* 4. Region tabs (sticky within this scope) */}
-        <AlmanacRegionTabs region={activeRegion} onRegionChange={handleRegionChange} />
+        {/* 4. THE LENS — region + scope in one sticky bar */}
+        <AlmanacLens
+          region={activeRegion}
+          onRegionChange={handleRegionChange}
+          scope={scope}
+          onScopeChange={setScope}
+        />
 
         {/* 5. Empty-region editorial card (only when all four tiers are empty) */}
         <AlmanacEmptyCard region={activeRegion} />
 
         {/* 6. Course Crowns (course records) -- self-hiding, owns its header */}
-        <CourseCrownsRail region={activeRegion} opener={opener} />
+        <CourseCrownsRail region={activeRegion} opener={opener} mode={scope} />
 
         {/* 7. Legendary hero (aces & albatrosses) */}
-        <LegendarySection region={activeRegion} onRowTap={handleFeatRowTap} />
+        <LegendarySection region={activeRegion} mode={scope} onRowTap={handleFeatRowTap} />
 
         {/* 8. Eagles section -- RECENT rail or ALL TIME Most Eagles board */}
         <EaglesSection
           region={activeRegion}
           regionUpper={regionUpper}
+          mode={scope}
           onRowTap={handleFeatRowTap}
         />
 
@@ -138,8 +146,10 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
           tier="birdie_hauls"
           title={`Birdie hauls · ${regionUpper}`}
           variant="list"
+          mode={scope}
           onRowTap={handleFeatRowTap}
         />
+
 
         {/* 10. Toughest courses -- self-hiding, owns its header */}
         <ToughestCoursesRail />
@@ -188,16 +198,17 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
 
 function LegendarySection({
   region,
+  mode,
   onRowTap,
 }: {
   region: string | null;
+  mode: RecordsMode;
   onRowTap?: (row: FeatRow) => void;
 }) {
   const { data, isLoading } = useRegionFeats(region, 'legendary');
   const rows = data ?? [];
   const hasAny = rows.length > 0;
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [mode, setMode] = useState<RecordsMode>('latest');
   const [sheetInitialMode, setSheetInitialMode] = useState<RecordsMode>('latest');
   const [sheetInitialMetric, setSheetInitialMetric] = useState<'aces' | 'albatrosses'>('aces');
   if (!isLoading && !hasAny) return null;
@@ -247,15 +258,6 @@ function LegendarySection({
           </button>
         )}
       </div>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-          padding: `0 ${SPACE.pagePadX}px 10px`,
-        }}
-      >
-        <LegendaryModeToggle mode={mode} setMode={setMode} />
-      </div>
       {mode === 'latest' ? (
         <LegendaryFeatHero region={region} onRowTap={onRowTap} />
       ) : (
@@ -275,48 +277,7 @@ function LegendarySection({
   );
 }
 
-function LegendaryModeToggle({
-  mode,
-  setMode,
-}: {
-  mode: RecordsMode;
-  setMode: (m: RecordsMode) => void;
-}) {
-  const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
-  return (
-    <div style={{ display: 'inline-flex', flexShrink: 0, gap: 6 }}>
-      {([
-        { v: 'latest', label: 'RECENT' },
-        { v: 'alltime', label: 'ALL TIME' },
-      ] as const).map((o) => {
-        const active = mode === o.v;
-        return (
-          <button
-            key={o.v}
-            type="button"
-            onClick={() => setMode(o.v)}
-            style={{
-              padding: '4px 9px',
-              borderRadius: 999,
-              background: active ? '#15171F' : 'transparent',
-              color: active ? '#FFFFFF' : 'rgba(15,23,42,0.65)',
-              border: 'none',
-              fontFamily: FONT,
-              fontSize: 10,
-              fontWeight: 700,
-              cursor: 'pointer',
-              letterSpacing: '0.02em',
-              whiteSpace: 'nowrap',
-              transition: 'all .15s',
-            }}
-          >
-            {o.label}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
+
 
 const EAGLE_BAR_GRADIENT = 'linear-gradient(90deg, #F7931E, #FBBC2E)';
 const EAGLES_RAIL_CAP = 12;
@@ -324,17 +285,18 @@ const EAGLES_RAIL_CAP = 12;
 function EaglesSection({
   region,
   regionUpper,
+  mode,
   onRowTap,
 }: {
   region: string | null;
   regionUpper: string;
+  mode: RecordsMode;
   onRowTap?: (row: FeatRow) => void;
 }) {
   const { data: featsData, isLoading } = useRegionFeats(region, 'eagles', 'latest');
   const { data: leadersData } = useRegionEagleLeaders(region);
   const rows = featsData ?? [];
   const hasAny = rows.length > 0;
-  const [mode, setMode] = useState<RecordsMode>('latest');
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetInitialMode, setSheetInitialMode] = useState<RecordsMode>('latest');
 
@@ -369,15 +331,7 @@ function EaglesSection({
         icon={TIER_ICON.eagles}
         onSeeAll={hasOverflow ? () => openSheet('latest') : undefined}
       />
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-          padding: `0 ${SPACE.pagePadX}px 10px`,
-        }}
-      >
-        <LegendaryModeToggle mode={mode} setMode={setMode} />
-      </div>
+
       {mode === 'latest' ? (
         <div
           className="flex gap-3 px-4 overflow-x-auto scrollbar-hide"
