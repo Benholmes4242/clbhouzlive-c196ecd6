@@ -276,6 +276,8 @@ interface TierProps {
   title: string;
   variant?: 'standard' | 'compact' | 'list';
   onRowTap?: (row: import('./hooks/useRegionFeats').FeatRow) => void;
+  /** When provided, the section follows page scope and does not render its own toggle. */
+  mode?: RecordsMode;
 }
 
 
