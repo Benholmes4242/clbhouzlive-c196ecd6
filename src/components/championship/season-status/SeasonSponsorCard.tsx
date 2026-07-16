@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatOrdinal } from '@/i18n/format';
 
 interface SeasonSponsorCardProps {
   sponsorName: string;
