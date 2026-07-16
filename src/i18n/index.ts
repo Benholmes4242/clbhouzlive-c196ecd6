@@ -72,3 +72,17 @@ export function useLocale() {
 }
 
 export default i18n;
+
+// Dev-only pseudo-locale toggle. `en-XA` pads every key ~35% with brackets
+// and accents to expose text-expansion clipping. Because no copy is keyed
+// yet in Wave 0, only the smoke key visibly changes — the rest of the UI
+// stays byte-identical to `en`. Exposed as a window helper (behind the Vite
+// DEV gate) so QA can flip locales from the console without shipping a UI
+// affordance that would break the pixel-identical acceptance gate.
+if (import.meta.env.DEV && typeof window !== 'undefined') {
+  (window as unknown as { __clbhouzSetLocale?: (l: SupportedLocale) => Promise<void> })
+    .__clbhouzSetLocale = async (l: SupportedLocale) => {
+      try { window.localStorage.setItem(LOCALE_STORAGE_KEY, l); } catch { /* noop */ }
+      await i18n.changeLanguage(l);
+    };
+}
