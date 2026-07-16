@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { Z } from '@/config/zIndex';
 import { MuteButton } from '@/audio/MuteButton';
+import { formatCountKilo } from '@/i18n/format';
 
 interface FeedTopActionBarProps {
   onClose?: () => void;
