@@ -13,7 +13,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { uploadEventBus } from '@/uploads/uploadEventBus';
 import { compressImage, COMPRESSION_PRESETS } from '@/uploads/imageCompression';
-import { uploadVideoWithTus } from '@/uploads/tusVideoUpload';
+import { uploadVideoResilient } from '@/uploads/resilientVideoUpload';
 import { uploadToCloudflareR2 } from '@/utils/cloudflareUpload';
 import { bakeFrameCrop } from './bakeFrameCrop';
 import type { StageMediaItem } from '../hooks/useStageComposer';
