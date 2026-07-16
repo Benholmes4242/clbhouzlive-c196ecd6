@@ -79,7 +79,7 @@ export default function MatchRequestsPage() {
   const status = ((params.get('status') as RequestStatus) || 'pending') as RequestStatus;
 
   const qc = useQueryClient();
-  const { data = [], isLoading } = useQuery({
+  const { data = [], isLoading, isError, error, refetch, isFetching } = useQuery({
     queryKey: [...QUERY_KEY, status],
     queryFn: () => fetchMatchRequests(status),
   });
