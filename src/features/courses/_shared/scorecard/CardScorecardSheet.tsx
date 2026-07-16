@@ -335,6 +335,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   playerName, playerAvatarUrl, playerHcp, playerHcpDelta, playerUserId,
   onViewProfile, onViewCourse,
 }) => {
+  const { t } = useTranslation(['courses']);
   void emptyMessage;
 
   const totals = useMemo(() => {
