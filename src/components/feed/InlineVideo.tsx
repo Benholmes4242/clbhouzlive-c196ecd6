@@ -27,6 +27,7 @@ import { feedLaneRoles, type FeedRole } from '@/video/feedLaneRoles';
 import { originHostRegistry } from '@/video/originHostRegistry';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { MuteButton } from '@/audio/MuteButton';
+import { VideoProcessingCard } from './VideoProcessingCard';
 import {
   vperfMarkEarlyStarted,
   vperfCardFraction,
