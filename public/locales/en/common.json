@@ -39,6 +39,27 @@
     "update": "Update",
     "viewAll": "View all"
   },
+  "empty": {
+    "leaderboard": {
+      "body": "Leaderboard data will appear once scoring begins.",
+      "title": "No Leaderboard Available"
+    },
+    "players": {
+      "body": "Player data is being loaded.",
+      "title": "No Players Found"
+    },
+    "schedule": {
+      "body": "Tournament schedule will appear as events are announced.",
+      "title": "No Events Scheduled"
+    }
+  },
+  "errors": {
+    "coursesLoadBody": "We encountered an error loading the courses page. This might be a temporary issue.",
+    "coursesLoadTitle": "Something went wrong",
+    "genericBody": "We couldn't load this content. Please try again.",
+    "sectionLoadFailed": "Couldn't load {{section}}."
+  },
+  "smoke": "ok",
   "state": {
     "copied": "Copied",
     "empty": "Nothing here yet",
@@ -57,26 +78,5 @@
     "tryAgainLater": "Please try again later.",
     "updated": "Updated",
     "uploading": "Uploading..."
-  },
-  "errors": {
-    "coursesLoadTitle": "Something went wrong",
-    "coursesLoadBody": "We encountered an error loading the courses page. This might be a temporary issue.",
-    "sectionLoadFailed": "Couldn't load {{section}}.",
-    "genericBody": "We couldn't load this content. Please try again."
-  },
-  "empty": {
-    "leaderboard": {
-      "title": "No Leaderboard Available",
-      "body": "Leaderboard data will appear once scoring begins."
-    },
-    "schedule": {
-      "title": "No Events Scheduled",
-      "body": "Tournament schedule will appear as events are announced."
-    },
-    "players": {
-      "title": "No Players Found",
-      "body": "Player data is being loaded."
-    }
-  },
-  "smoke": "ok"
+  }
 }
