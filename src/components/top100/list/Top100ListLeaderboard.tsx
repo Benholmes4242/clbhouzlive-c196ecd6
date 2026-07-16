@@ -29,11 +29,7 @@ interface Top100ListLeaderboardProps {
 
 const PREVIEW_COUNT = 5;
 
-const ordinal = (n: number): string => {
-  const s = ['th', 'st', 'nd', 'rd'];
-  const v = n % 100;
-  return `${n}${s[(v - 20) % 10] || s[v] || s[0]}`;
-};
+const ordinal = (n: number): string => formatOrdinal(n);
 
 const firstName = (name: string): string => name.trim().split(/\s+/)[0] || name;
 
