@@ -21,6 +21,7 @@ const NAV: NavItem[] = [
   { to: '/admin-v2/moderation', label: 'Moderation', icon: ShieldAlert, moderatorAllowed: true },
   { to: '/admin-v2/approvals',  label: 'Approvals',  icon: ShieldCheck, requireFull: true },
   { to: '/admin-v2/match-requests', label: 'Match Requests', icon: Link2 },
+  { to: '/admin-v2/course-matching', label: 'Course Matching', icon: Link2 },
   { to: '/admin-v2/appeals',    label: 'Appeals',    icon: LifeBuoy, moderatorAllowed: true },
   { to: '/admin-v2/verifications', label: 'Verifications', icon: BadgeCheck },
   { to: '/admin-v2/users',      label: 'Users',      icon: Users },
