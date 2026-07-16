@@ -144,6 +144,7 @@ export default function AuthCallback() {
       >
         <img
           src="/images/clbhouz-logo.png"
+          // eslint-disable-next-line no-restricted-syntax -- brand wordmark, proper noun
           alt="clbhouz"
           className="h-10 w-auto opacity-80"
         />
