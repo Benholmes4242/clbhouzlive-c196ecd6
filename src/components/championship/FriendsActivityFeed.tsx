@@ -1,5 +1,6 @@
 import React from 'react';
 import { SquircleAvatar, LIGHT_HAIRLINE} from '@/components/ui/SquircleAvatar';
+import { formatRelativeAgo } from '@/i18n/format';
 
 interface Activity {
   id: string;
@@ -15,13 +16,12 @@ interface FriendsActivityFeedProps {
   maxItems?: number;
 }
 
-const timeAgo = (timestamp: string): string => {
-  const seconds = Math.floor((Date.now() - new Date(timestamp).getTime()) / 1000);
-  if (seconds < 60) return 'just now';
-  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-  return `${Math.floor(seconds / 86400)}d ago`;
-};
+// Local timeAgo removed in Wave 1 — output now routes through
+// `formatRelativeAgo` in `@/i18n/format` (byte-identical en: "just now"
+// / "{m}m ago" / "{h}h ago" / "{d}d ago" / … — the previous "yesterday"
+// bucket was never emitted here so it stays off).
+const timeAgo = (timestamp: string): string => formatRelativeAgo(timestamp);
+
 
 export const FriendsActivityFeed: React.FC<FriendsActivityFeedProps> = ({
   activities,
