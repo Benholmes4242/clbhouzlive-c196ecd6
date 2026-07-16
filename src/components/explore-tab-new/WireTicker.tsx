@@ -181,9 +181,12 @@ export function WireTicker({ userId }: Props) {
     <section
       style={{
         background: '#15171F',
-        padding: '12px 0',
+        height: 36,
+        display: 'flex',
+        alignItems: 'center',
         width: '100%',
-        overflow: 'hidden',
+        overflowX: 'hidden',
+        overflowY: 'visible',
       }}
       aria-label="Friends achievements ticker"
     >
