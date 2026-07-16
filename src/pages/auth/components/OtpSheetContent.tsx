@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface OtpSheetContentProps {
   email: string;
@@ -30,6 +31,7 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
   errorNonce = 0,
   onCodeEdit,
 }) => {
+  const { t } = useTranslation('auth');
   const [digits, setDigits] = useState<string[]>(() => Array(BOX_COUNT).fill(''));
   const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
   const hasAutoSubmittedRef = useRef(false);
