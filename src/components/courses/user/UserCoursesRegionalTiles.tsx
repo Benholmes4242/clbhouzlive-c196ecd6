@@ -225,11 +225,9 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
               onClick={onAddCoursesClick}
               className="flex items-center gap-2 text-base font-medium whitespace-nowrap px-6 py-2 transition-colors rounded-sq-xs bg-muted border border-border text-foreground hover:bg-muted/80"
             >
-              <div className="flex items-center gap-2">
-                {/* eslint-disable-next-line i18next/no-literal-string -- brand vocabulary, decorative emoji */}
-                📍 <Plus className="h-4 w-4" />
-                {t('userCourses.regionalAddCourses')}
-              </div>
+              {/* eslint-disable-next-line i18next/no-literal-string -- brand vocabulary, decorative emoji */}
+              <div className="flex items-center gap-2">📍 <Plus className="h-4 w-4" />{t('userCourses.regionalAddCourses')}</div>
+            </button>
             </button>
           )}
         </div>
