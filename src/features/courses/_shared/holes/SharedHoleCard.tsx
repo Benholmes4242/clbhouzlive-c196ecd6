@@ -208,7 +208,7 @@ export const SharedHoleCard: React.FC<SharedHoleCardProps> = ({
         role="button"
         tabIndex={0}
         aria-expanded={expanded}
-        aria-label={`Hole ${hole.hole_no} details`}
+        aria-label={t('courses:holes.detailsA11y', { holeNo: hole.hole_no })}
         onClick={onToggle}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
