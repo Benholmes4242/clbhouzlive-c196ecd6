@@ -1,5 +1,7 @@
 import type { FriendHybridSnapshot } from '@/lib/whs/hooks/useFriendHybridSnapshot';
 import type { FriendLeaderboardEntry, FriendRivalryHydrated } from '@/lib/whs/types';
+import { formatMonthDay2ShortGB } from '@/i18n/format';
+
 
 export type SheetState =
   | {

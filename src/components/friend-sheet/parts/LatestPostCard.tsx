@@ -2,6 +2,8 @@ import React from 'react';
 import { ChevronRight, Heart, MessageSquare } from 'lucide-react';
 import { Eyebrow } from './_shared/Eyebrow';
 import { BG_1, T100, T60, T40, LINE, FONT, TAB } from './_shared/tokens';
+import { formatMonthDay2ShortGB } from '@/i18n/format';
+
 
 interface Props {
   post: {

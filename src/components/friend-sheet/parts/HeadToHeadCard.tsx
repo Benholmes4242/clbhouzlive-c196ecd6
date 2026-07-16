@@ -1,6 +1,8 @@
 import React from 'react';
 import { Swords, Flame, Sparkles, MapPin, UserPlus } from 'lucide-react';
 import { Eyebrow } from './_shared/Eyebrow';
+import { formatMonthDay2ShortGB } from '@/i18n/format';
+
 import {
   BG_1,
   T100,

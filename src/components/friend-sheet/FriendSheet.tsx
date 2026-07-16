@@ -10,6 +10,8 @@ import React, { useMemo } from 'react';
 import { Drawer as DrawerPrimitive } from 'vaul';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/lib/toast';
+import { formatMonthDay2ShortGB } from '@/i18n/format';
+
 import {
   X,
   MessageCircle,

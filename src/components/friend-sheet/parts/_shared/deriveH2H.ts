@@ -1,4 +1,6 @@
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
+import { formatMonthDay2ShortGB } from '@/i18n/format';
+
 
 export type H2HState =
   | { kind: 'empty'; duelsCount: 0 }

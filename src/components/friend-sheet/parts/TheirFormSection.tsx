@@ -1,6 +1,8 @@
 import React from 'react';
 import { TrendingDown, TrendingUp, Award, Flame, MapPin } from 'lucide-react';
 import { Eyebrow } from './_shared/Eyebrow';
+import { formatMonthDay2ShortGB } from '@/i18n/format';
+
 import {
   T100,
   T60,
