@@ -172,7 +172,7 @@ const InboxV2Page: React.FC = () => {
             style={{ padding: '80px 24px', gap: 12 }}
           >
             <p style={{ color: INK, fontSize: 16, fontWeight: 500, margin: 0 }}>
-              Couldn't load messages
+              {t('messaging:error.couldntLoadInbox')}
             </p>
             <button
               type="button"
@@ -187,7 +187,7 @@ const InboxV2Page: React.FC = () => {
                 border: 'none',
               }}
             >
-              Try again
+              {t('common:action.tryAgain')}
             </button>
           </div>
         ) : conversations.length === 0 ? (
