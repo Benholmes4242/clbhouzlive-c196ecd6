@@ -125,7 +125,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
     avatarUrl: activePost.avatarUrl,
     handicapIndex: activePost.handicapIndex ?? null,
     homeClub: activePost.homeClub ?? null,
-    timeAgoLabel: activePost.createdAt ? formatTimeAgo(activePost.createdAt, 'short') : '',
+    timeAgoLabel: activePost.createdAt ? formatRelative(activePost.createdAt) : '',
   };
 
   const handleCourseTap = () => {
