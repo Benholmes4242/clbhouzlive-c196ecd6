@@ -32,6 +32,7 @@ const SECTION_TITLES: Record<string, string> = {
   moderation: 'Moderation',
   approvals:  'Approvals',
   'match-requests': 'Match Requests',
+  'course-matching': 'Course Matching',
   appeals:    'Appeals',
   users:      'Users',
   content:    'Content',
