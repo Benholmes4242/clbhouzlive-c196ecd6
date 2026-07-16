@@ -188,6 +188,18 @@ export default tseslint.config(
       "i18next/no-literal-string": ["error", i18nLiteralOptions],
       "no-restricted-syntax": ["error", literalAttrSyntax, ...toLocaleSyntax],
     },
+  },
+  // ─── Wave 3d.ii — scope-dir ERROR flip for courses top-level + review + user
+  {
+    files: [
+      "src/components/courses/*.{ts,tsx}",
+      "src/components/courses/review/**/*.{ts,tsx}",
+      "src/components/courses/user/**/*.{ts,tsx}",
+    ],
+    rules: {
+      "i18next/no-literal-string": ["error", i18nLiteralOptions],
+      "no-restricted-syntax": ["error", literalAttrSyntax, ...toLocaleSyntax],
+    },
   }
 );
 
