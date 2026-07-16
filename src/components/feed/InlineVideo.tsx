@@ -325,7 +325,9 @@ export const InlineVideo: React.FC<Props> = ({
         }}
       />
 
-      {isActive && (
+      {isProcessing && <VideoProcessingCard />}
+
+      {isActive && !isProcessing && (
         <div style={{ position: 'absolute', right: 6, bottom: 6, zIndex: 30 }}>
           <MuteButton size="sm" />
         </div>
