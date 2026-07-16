@@ -40,6 +40,7 @@ const CourseRankBadges = ({
   showXP = false,
   splitBadges = false
 }: CourseRankBadgesProps) => {
+  const { t } = useTranslation('courses');
   const [openTooltips, setOpenTooltips] = useState<Set<string>>(new Set());
   const isMobile = useIsMobile();
 
