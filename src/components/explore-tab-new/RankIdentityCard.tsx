@@ -238,11 +238,11 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
 
           {/* Right: two-line block */}
           <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {/* Line 1: name + hcp · #N worldwide */}
+            {/* Line 1: name · HCP value */}
             <div
               style={{
                 display: 'flex',
-                alignItems: 'baseline',
+                alignItems: 'center',
                 gap: 8,
                 minWidth: 0,
               }}
@@ -261,23 +261,37 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
                 }}
               >
                 {displayName}
-                {hasHcp && (
-                  <>
-                    {' '}HCP {formatHcp(hcp)}
-                  </>
-                )}
               </div>
-              {globalRank != null && (
+              {hasHcp && (
                 <div
                   style={{
-                    fontSize: 11,
-                    fontWeight: 500,
-                    color: 'rgba(15,23,42,0.55)',
-                    whiteSpace: 'nowrap',
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    gap: 4,
                     flexShrink: 0,
                   }}
                 >
-                  #{globalRank} worldwide
+                  <span
+                    style={{
+                      fontSize: 9,
+                      fontWeight: 600,
+                      letterSpacing: '0.06em',
+                      textTransform: 'uppercase',
+                      color: 'rgba(15,23,42,0.45)',
+                    }}
+                  >
+                    HCP
+                  </span>
+                  <span
+                    className="tabular-nums"
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 700,
+                      color: INK,
+                    }}
+                  >
+                    {formatHcp(hcp)}
+                  </span>
                 </div>
               )}
             </div>
