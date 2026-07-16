@@ -22,7 +22,8 @@
  */
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { format, differenceInCalendarDays } from 'date-fns';
+import { differenceInCalendarDays } from 'date-fns';
+import { formatWeekdayShort, formatTimeHm } from '@/i18n/format';
 import { TourHubShell } from '../components/TourHubShell';
 
 
