@@ -84,10 +84,12 @@ export function FeatListRow({ row, tier, onTap, index = 0, medals, mode = 'lates
 
   const showRecordsBar = showToParPrimary;
   const showBirdieBar = isBirdieHauls && maxCount != null && maxCount > 0;
-  const showEaglesLatestBar = tier === 'eagles' && mode === 'latest';
-  const showBar = showRecordsBar || showBirdieBar || showEaglesLatestBar;
-  const barPct = showEaglesLatestBar ? 1 : showRecordsBar ? recordsBarPct : birdieBarPct;
+  // Bars mean magnitude, always. Eagles recent rows have no magnitude,
+  // so they never get a bar (page or sheet).
+  const showBar = showRecordsBar || showBirdieBar;
+  const barPct = showRecordsBar ? recordsBarPct : birdieBarPct;
   const barGradient = 'linear-gradient(90deg, #F7931E, #FBBC2E)';
+  void mode;
   // Hide date line for records (existing) and birdie_hauls (new spec).
   const showDate = !!when && !isRecordsRow && !isBirdieHauls;
 

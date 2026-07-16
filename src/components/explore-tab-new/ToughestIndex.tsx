@@ -1,7 +1,14 @@
 import { useNavigate } from 'react-router-dom';
 import { useNotableDifficultCourses } from '@/hooks/gam/useNotableDifficultCourses';
-import { DiscoverSectionHeader } from './DiscoverSectionHeader';
+import { SectionHead } from './SectionHead';
 import { FONT } from './gamingLightTokens';
+
+const RED = '#D2222D';
+const INK = '#0F172A';
+const MUTE = '#94A3B8';
+const HAIRLINE = 'rgba(15,23,42,0.08)';
+const CARD_BG = '#FFFFFF';
+const MAX = 8;
 
 const numFmt = (n: number | null | undefined, digits = 1) =>
   n == null || Number.isNaN(Number(n)) ? '–' : Number(n).toFixed(digits);
@@ -20,23 +27,22 @@ function ToughCard({
   totalRounds: number;
 }) {
   const navigate = useNavigate();
-  const label = rank === 1 ? '#1 TOUGHEST' : `#${rank}`;
-  const watermarkSize = rank >= 10 ? 84 : 104;
+  const isTop = rank === 1;
+  const label = isTop ? '#1 TOUGHEST' : `#${rank}`;
   return (
     <button
       type="button"
       onClick={() => navigate(`/courses/${courseId}`, { state: { activeTab: 'holes' } })}
       className="text-left active:scale-[0.99] transition-transform"
       style={{
-        position: 'relative',
         flexShrink: 0,
-        width: 210,
-        height: 150,
-        borderRadius: 16,
-        background: '#fff',
-        border: '1px solid rgba(15,23,42,0.07)',
-        overflow: 'hidden',
-        padding: '13px 14px',
+        width: 148,
+        minHeight: 130,
+        borderRadius: 14,
+        background: CARD_BG,
+        border: `0.5px solid ${HAIRLINE}`,
+        boxShadow: '0 2px 10px rgba(15,23,42,0.05)',
+        padding: '11px 12px 10px',
         cursor: 'pointer',
         fontFamily: FONT,
         display: 'flex',
@@ -44,30 +50,12 @@ function ToughCard({
       }}
     >
       <div
-        aria-hidden
         style={{
-          position: 'absolute',
-          top: -18,
-          right: -6,
-          fontSize: watermarkSize,
-          fontWeight: 900,
-          color: 'rgba(220,38,38,0.07)',
-          letterSpacing: '-0.05em',
-          lineHeight: 1,
-          fontVariantNumeric: 'tabular-nums',
-          pointerEvents: 'none',
-        }}
-      >
-        {rank}
-      </div>
-      <div
-        style={{
-          position: 'relative',
-          fontSize: 9.5,
+          fontSize: 9,
           fontWeight: 800,
           letterSpacing: '0.1em',
           textTransform: 'uppercase',
-          color: '#94A3B8',
+          color: isTop ? RED : MUTE,
           lineHeight: 1,
         }}
       >
@@ -75,13 +63,13 @@ function ToughCard({
       </div>
       <div
         style={{
-          position: 'relative',
-          marginTop: 4,
-          fontSize: 13.5,
+          marginTop: 6,
+          fontSize: 12.5,
           fontWeight: 800,
-          color: '#0F172A',
-          letterSpacing: '-0.01em',
-          lineHeight: 1.25,
+          color: INK,
+          letterSpacing: '-0.005em',
+          lineHeight: 1.2,
+          minHeight: 30,
           display: '-webkit-box',
           WebkitLineClamp: 2,
           WebkitBoxOrient: 'vertical',
@@ -91,14 +79,13 @@ function ToughCard({
         {courseName}
       </div>
       <div
+        className="tabular-nums"
         style={{
-          position: 'relative',
           marginTop: 'auto',
-          fontSize: 24,
+          fontSize: 21,
           fontWeight: 900,
-          fontVariantNumeric: 'tabular-nums',
+          color: RED,
           letterSpacing: '-0.02em',
-          color: '#dc2626',
           lineHeight: 1,
         }}
       >
@@ -106,35 +93,31 @@ function ToughCard({
       </div>
       <div
         style={{
-          position: 'relative',
-          marginTop: 4,
-          fontSize: 9.5,
+          marginTop: 5,
+          fontSize: 8.5,
           fontWeight: 800,
           letterSpacing: '0.1em',
           textTransform: 'uppercase',
-          color: '#94A3B8',
-          lineHeight: 1.3,
+          color: MUTE,
+          lineHeight: 1.2,
         }}
       >
-        AVG PER ROUND {'\u00B7'} {totalRounds} ROUNDS
+        AVG · {totalRounds} ROUNDS
       </div>
     </button>
   );
 }
 
-export function ToughestCoursesRail() {
+export function ToughestIndex() {
   const { data } = useNotableDifficultCourses();
-  const rows = data ?? [];
+  const rows = (data ?? []).slice(0, MAX);
   if (rows.length === 0) return null;
   return (
-    <section style={{ marginTop: 4 }}>
-      <DiscoverSectionHeader
-        eyebrow="Toughest courses"
-        title="The sternest tests in golf"
-      />
+    <section style={{ marginTop: 32 }}>
+      <SectionHead overline="Course index" title="The sternest tests" />
       <div
         className="flex overflow-x-auto scrollbar-hide"
-        style={{ padding: '0 16px', gap: 9 }}
+        style={{ padding: '0 16px', gap: 10 }}
       >
         {rows.map((c, i) => (
           <ToughCard
@@ -151,5 +134,4 @@ export function ToughestCoursesRail() {
   );
 }
 
-export default ToughestCoursesRail;
-
+export default ToughestIndex;
