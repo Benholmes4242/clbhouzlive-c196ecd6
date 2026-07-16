@@ -1,6 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { TrendingUp, Target, Flame } from 'lucide-react';
+import { formatOrdinal } from '@/i18n/format';
 
 interface PerformanceStripProps {
   divisionName: string;
