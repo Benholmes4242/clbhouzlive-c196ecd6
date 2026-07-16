@@ -6,6 +6,7 @@ import { ChevronLeft, MoreHorizontal, Pin, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useEchoChats, type EchoChatRow } from '@/features/echo-v2/hooks/useEchoChats';
 import { AnimatedEchoWave } from '@/features/echo-v2/components/AnimatedEchoWave';
+import { formatRelativeRounded } from '@/i18n/format';
 
 const CANVAS = '#F8FAFC';
 const INK = '#1F2428';
