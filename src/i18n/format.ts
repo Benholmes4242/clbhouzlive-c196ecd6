@@ -429,6 +429,38 @@ export function formatRelativeRounded(iso: string | null | undefined): string {
   return formatRelative(then);
 }
 
+/** "July 16, 2026" — long month, day, year (en-US ordering). Matches date-fns `MMMM d, yyyy`. */
+export function formatMonthLongDayYear(d: DateInput): string {
+  return new Intl.DateTimeFormat(getActiveLocale(), {
+    month: 'long', day: 'numeric', year: 'numeric',
+  }).format(toDate(d));
+}
+
+/** "Jul 16, 15:45" — short month + numeric day + 24h HH:MM.
+ *  Matches date-fns `MMM d, HH:mm` — comma from en-US locale ordering. */
+export function formatMonthDayHm24(d: DateInput): string {
+  const date = toDate(d);
+  const md = new Intl.DateTimeFormat(getActiveLocale(), { month: 'short', day: 'numeric' }).format(date);
+  const hm = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+  return `${md}, ${hm}`;
+}
+
+/** "16 July, 2026" — en-GB day + long month + comma + year. Matches date-fns `d MMMM, yyyy`. */
+export function formatDayMonthLongYearCommaGB(d: DateInput): string {
+  const date = toDate(d);
+  const dm = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long' }).format(date);
+  return `${dm}, ${date.getFullYear()}`;
+}
+
+/** "Saturday, 16 July" — en-GB long weekday + comma + day + long month.
+ *  Matches date-fns `EEEE, d MMMM`. */
+export function formatWeekdayLongDayMonthLongGB(d: DateInput): string {
+  return new Intl.DateTimeFormat('en-GB', {
+    weekday: 'long', day: 'numeric', month: 'long',
+  }).format(toDate(d));
+}
+
+
 
 
 
