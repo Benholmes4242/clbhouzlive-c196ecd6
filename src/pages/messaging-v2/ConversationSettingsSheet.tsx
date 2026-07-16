@@ -692,6 +692,7 @@ const AddPeopleSheet: React.FC<AddPeopleSheetProps> = ({
   existingKeys,
   onConfirm,
 }) => {
+  const { t } = useTranslation(['messaging', 'common']);
   const [query, setQuery] = useState('');
   const debounced = useDebouncedValue(query, 250);
   const [selected, setSelected] = useState<Candidate[]>([]);
