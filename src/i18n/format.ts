@@ -100,6 +100,54 @@ export function formatCompact(n: number): string {
   }).format(n);
 }
 
+/**
+ * Compact form (lowercase-suffix flavour) — 1.2k / 3m — used by the watch/feed
+ * video engagement counters. English is produced by hand to preserve the exact
+ * legacy output (lowercase suffix, `.0` trimmed, and the `1m` rollover at the
+ * 999_950–999_999 boundary). Non-en falls back to Intl compact.
+ *
+ * QUIRKS REPLICATED (en):
+ *   - lowercase `k`/`m` (Intl uses uppercase)
+ *   - trailing `.0` trimmed for whole units (Intl trims by default)
+ *   - `1m` rollover for values that round to `1000.0k`
+ */
+export function formatCountShort(n: number): string {
+  const locale = getActiveLocale();
+  if (locale === 'en') {
+    if (n < 1000) return String(n);
+    const trim = (v: number, suffix: string) => {
+      const s = v.toFixed(1);
+      return (s.endsWith('.0') ? s.slice(0, -2) : s) + suffix;
+    };
+    if (n < 1_000_000) {
+      const v = n / 1000;
+      if (v.toFixed(1) === '1000.0') return '1m';
+      return trim(v, 'k');
+    }
+    return trim(n / 1_000_000, 'm');
+  }
+  return formatCompact(n);
+}
+
+// ─── weekday / month parts ────────────────────────────────────────────────
+
+/**
+ * Short weekday name — "Sun", "Mon", … (en byte-matches the legacy DAY_SHORT
+ * array used by scheduled-post pills).
+ */
+export function formatWeekdayShort(d: DateInput): string {
+  return new Intl.DateTimeFormat(getActiveLocale(), { weekday: 'short' }).format(toDate(d));
+}
+
+/**
+ * Short month name — "Jan", "Feb", …, "Sep" (Intl en gives "Sep", not "Sept",
+ * byte-matching the legacy MONTH_SHORT array).
+ */
+export function formatMonthShort(d: DateInput): string {
+  return new Intl.DateTimeFormat(getActiveLocale(), { month: 'short' }).format(toDate(d));
+}
+
+
 // ─── ordinals ─────────────────────────────────────────────────────────────
 
 const EN_ORDINAL_SUFFIX: Record<Intl.LDMLPluralRule, string> = {
