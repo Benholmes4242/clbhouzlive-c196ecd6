@@ -101,6 +101,7 @@ function farFutureIso(): string {
 }
 
 export const ConversationRow: React.FC<Props> = ({ conversation }) => {
+  const { t } = useTranslation('messaging');
   const navigate = useNavigate();
   const actor = useMessagingActor();
   const qc = useQueryClient();
