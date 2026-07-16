@@ -339,8 +339,10 @@ function RecordsModeToggle({
   );
 }
 
-export function CourseCrownsRail({ region, opener }: Props) {
-  const [mode, setMode] = useState<RecordsMode>('latest');
+export function CourseCrownsRail({ region, opener, mode: modeProp }: Props) {
+  const [localMode, setLocalMode] = useState<RecordsMode>('latest');
+  const mode = modeProp ?? localMode;
+  const controlled = modeProp !== undefined;
   const [sheetOpen, setSheetOpen] = useState(false);
   const { data } = useRegionFeats(region, 'records', mode);
   const allRows = useMemo(() => {
@@ -364,15 +366,17 @@ export function CourseCrownsRail({ region, opener }: Props) {
         linkLabel="View all"
         onLinkClick={() => setSheetOpen(true)}
       />
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-          padding: `0 ${SPACE.pagePadX}px 10px`,
-        }}
-      >
-        <RecordsModeToggle mode={mode} setMode={setMode} />
-      </div>
+      {!controlled && (
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            padding: `0 ${SPACE.pagePadX}px 10px`,
+          }}
+        >
+          <RecordsModeToggle mode={mode} setMode={setLocalMode} />
+        </div>
+      )}
       <div
         className="flex overflow-x-auto scrollbar-hide"
         style={{ padding: '0 16px', gap: 9 }}
