@@ -5,7 +5,7 @@ import { useExploreFeed } from './hooks/useExploreFeed';
 import { useExploreRegion } from './hooks/useExploreRegion';
 
 import { WireTicker } from './WireTicker';
-import { LeadStory } from './LeadStory';
+
 
 import { AlmanacLens, REGION_TABS } from './AlmanacSections';
 import {
@@ -111,7 +111,7 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
           onScopeChange={setScope}
         />
 
-        <LeadStory region={activeRegion} regionUpper={regionUpper} mode={scope} />
+
 
         <AlmanacEmptyCard region={activeRegion} />
 
