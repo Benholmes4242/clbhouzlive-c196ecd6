@@ -185,8 +185,7 @@ export function WireTicker({ userId }: Props) {
         display: 'flex',
         alignItems: 'center',
         width: '100%',
-        overflowX: 'hidden',
-        overflowY: 'visible',
+        overflow: 'hidden',
       }}
       aria-label="Friends achievements ticker"
     >
