@@ -159,6 +159,13 @@ export default tseslint.config(
     rules: {
       "i18next/no-literal-string": "error",
     },
+  },
+  // ─── Wave 3b — scope-dir ERROR flip for messaging ─────────────────
+  {
+    files: ["src/pages/messaging-v2/**/*.{ts,tsx}"],
+    rules: {
+      "i18next/no-literal-string": "error",
+    },
   }
 );
 
