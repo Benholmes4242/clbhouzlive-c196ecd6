@@ -382,17 +382,21 @@ export const SharedHoleCard: React.FC<SharedHoleCardProps> = ({
               {countText}
             </span>
             <span>
-              PLAYS TO{' '}
-              <span
-                style={{
-                  fontFamily: MONO,
-                  fontVariantNumeric: 'tabular-nums',
-                  color: INK,
-                  fontWeight: 800,
-                }}
-              >
-                {playsTo}
-              </span>
+              <Trans
+                i18nKey="courses:holes.playsTo"
+                values={{ playsTo }}
+                components={[
+                  <span
+                    key="v"
+                    style={{
+                      fontFamily: MONO,
+                      fontVariantNumeric: 'tabular-nums',
+                      color: INK,
+                      fontWeight: 800,
+                    }}
+                  />,
+                ]}
+              />
             </span>
           </div>
         </div>
