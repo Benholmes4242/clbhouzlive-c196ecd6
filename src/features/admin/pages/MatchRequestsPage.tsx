@@ -9,6 +9,7 @@ import SectionTabs from '../components/SectionTabs';
 import EmptyState from '../components/EmptyState';
 import StatusPill from '../components/StatusPill';
 import AdminAccessDenied from '../components/AdminAccessDenied';
+import AdminErrorState from '../components/AdminErrorState';
 import { usePanelRole } from '@/hooks/usePanelRole';
 import { panelCan } from '@/lib/panelCan';
 
