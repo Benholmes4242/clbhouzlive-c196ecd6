@@ -115,22 +115,28 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
       <div>
         {/* pre-chips spacer (chips must be a direct child of SCOPE 2 for sticky bounds) */}
         <div style={{ height: SPACE.sectionSection }} aria-hidden />
-        {/* 4. Region tabs (sticky within this scope) */}
-        <AlmanacRegionTabs region={activeRegion} onRegionChange={handleRegionChange} />
+        {/* 4. THE LENS — region + scope in one sticky bar */}
+        <AlmanacLens
+          region={activeRegion}
+          onRegionChange={handleRegionChange}
+          scope={scope}
+          onScopeChange={setScope}
+        />
 
         {/* 5. Empty-region editorial card (only when all four tiers are empty) */}
         <AlmanacEmptyCard region={activeRegion} />
 
         {/* 6. Course Crowns (course records) -- self-hiding, owns its header */}
-        <CourseCrownsRail region={activeRegion} opener={opener} />
+        <CourseCrownsRail region={activeRegion} opener={opener} mode={scope} />
 
         {/* 7. Legendary hero (aces & albatrosses) */}
-        <LegendarySection region={activeRegion} onRowTap={handleFeatRowTap} />
+        <LegendarySection region={activeRegion} mode={scope} onRowTap={handleFeatRowTap} />
 
         {/* 8. Eagles section -- RECENT rail or ALL TIME Most Eagles board */}
         <EaglesSection
           region={activeRegion}
           regionUpper={regionUpper}
+          mode={scope}
           onRowTap={handleFeatRowTap}
         />
 
@@ -140,8 +146,10 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
           tier="birdie_hauls"
           title={`Birdie hauls · ${regionUpper}`}
           variant="list"
+          mode={scope}
           onRowTap={handleFeatRowTap}
         />
+
 
         {/* 10. Toughest courses -- self-hiding, owns its header */}
         <ToughestCoursesRail />
