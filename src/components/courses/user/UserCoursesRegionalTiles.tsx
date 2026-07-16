@@ -238,7 +238,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
       {activeFilter && (
         <div className="flex items-center justify-center gap-2 text-sm text-foreground">
           <span>
-            {t('userCourses.showingRegion', { region: tiles.find(t => t.key === activeFilter)?.label.replace(' Played', '') ?? '' })}
+            {t('userCourses.showingRegion', { region: tiles.find(tl => tl.key === activeFilter)?.label.replace(' Played', '') ?? '' })}
           </span>
         </div>
       )}
