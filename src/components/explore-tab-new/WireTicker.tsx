@@ -126,8 +126,8 @@ export function WireTicker({ userId }: Props) {
             background: '#FBBC2E',
             color: '#0F172A',
             fontSize: 9,
-            fontWeight: 800,
-            letterSpacing: '0.08em',
+            fontWeight: 700,
+            letterSpacing: '0.06em',
             lineHeight: 1,
             flexShrink: 0,
           }}
@@ -137,8 +137,8 @@ export function WireTicker({ userId }: Props) {
         <span
           style={{
             fontSize: 11.5,
-            fontWeight: 600,
-            color: 'rgba(255,255,255,0.75)',
+            fontWeight: 500,
+            color: 'rgba(255,255,255,0.7)',
             whiteSpace: 'nowrap',
             lineHeight: 1,
           }}
