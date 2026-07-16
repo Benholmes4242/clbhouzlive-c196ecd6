@@ -158,9 +158,9 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
         >
           <SectionHead
             overline="The feed"
-            subline={regionUpper}
             title="On the course"
           />
+
 
           <ExploreGrid
             posts={posts}
@@ -215,10 +215,10 @@ function LegendarySection({
   return (
     <section style={{ marginTop: 32 }}>
       <SectionHead
-        overline={mode === 'alltime' ? 'All-time feats' : 'Latest feats'}
-        subline={regionUpper}
+        overline={mode === 'alltime' ? 'All-time honours' : 'Latest honours'}
         title="Moments of the game"
       />
+
 
       <AcesAlbatrossesPodium
         region={region}

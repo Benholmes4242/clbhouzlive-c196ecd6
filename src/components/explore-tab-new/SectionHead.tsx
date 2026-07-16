@@ -14,7 +14,6 @@ const TITLE_DARK = '#FFFFFF';
 
 interface Props {
   overline: string;
-  subline?: string;
   title?: string;
   meta?: string;
   onMeta?: () => void;
@@ -24,12 +23,8 @@ interface Props {
   paddingTop?: number;
 }
 
-const SUBLINE_LIGHT = 'rgba(15,23,42,0.4)';
-const SUBLINE_DARK = 'rgba(255,255,255,0.55)';
-
 export function SectionHead({
   overline,
-  subline,
   title,
   meta,
   onMeta,
@@ -39,7 +34,6 @@ export function SectionHead({
   paddingTop = 0,
 }: Props) {
   const overlineColor = surface === 'dark' ? OVERLINE_DARK : OVERLINE_LIGHT;
-  const sublineColor = surface === 'dark' ? SUBLINE_DARK : SUBLINE_LIGHT;
   const titleColor = surface === 'dark' ? TITLE_DARK : TITLE_LIGHT;
   return (
     <div
@@ -69,21 +63,6 @@ export function SectionHead({
           >
             {overline}
           </div>
-          {subline ? (
-            <div
-              style={{
-                marginTop: 2,
-                fontSize: 9,
-                fontWeight: 600,
-                letterSpacing: '0.06em',
-                textTransform: 'uppercase',
-                color: sublineColor,
-                lineHeight: 1,
-              }}
-            >
-              {subline}
-            </div>
-          ) : null}
           {title ? (
             <div
               style={{
