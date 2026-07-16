@@ -16,6 +16,7 @@ const MAX_H = 280;
 const RADIUS = 14;
 
 export const MessageImage: React.FC<Props> = ({ attachment, onOpen }) => {
+  const { t } = useTranslation('messaging');
   const hasLocal = !!attachment.localUrl;
   const { url: signedUrl, loading, error } = useSignedUrl(
     hasLocal ? null : attachment.path,
