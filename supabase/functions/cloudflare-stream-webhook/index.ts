@@ -160,7 +160,7 @@ Deno.serve(async (req) => {
     // Find post_media by stream_id or URL match
     const { data: mediaRows, error: findError } = await supabase
       .from('post_media')
-      .select('id, width, height, duration_seconds, aspect_ratio')
+      .select('id, post_id, width, height, duration_seconds, aspect_ratio')
       .or(`stream_id.eq.${uid},media_url.ilike.%${uid}%`)
       .eq('media_type', 'video');
 
@@ -177,6 +177,7 @@ Deno.serve(async (req) => {
     // Only update fields that are still null — don't overwrite client-side values
     const updateData: Record<string, unknown> = { stream_id: uid };
     const row = mediaRows[0];
+    const isFirstCompletion = !row.duration_seconds;
     if (!row.width && width) updateData.width = width;
     if (!row.height && height) updateData.height = height;
     if (!row.duration_seconds && durationSeconds) {
@@ -217,6 +218,68 @@ Deno.serve(async (req) => {
     console.log(
       `[stream-webhook] Updated ${ids.length} row(s) for uid: ${uid} status=${updateData.processing_status}`
     );
+
+    // Notify the post author on FIRST successful completion.
+    // Wrapped so a notification failure never fails the webhook — the metadata
+    // write above is the critical path. Cloudflare retries the same webhook on
+    // failure, so dedupe by (type='video_ready', entity_id=post_id).
+    if (
+      isFirstCompletion &&
+      updateData.processing_status === 'complete' &&
+      row.post_id
+    ) {
+      try {
+        const { data: post, error: postErr } = await supabase
+          .from('posts')
+          .select('user_id, status, actor_type, actor_id')
+          .eq('id', row.post_id)
+          .maybeSingle();
+
+        if (postErr) throw postErr;
+        if (!post) {
+          console.warn(
+            `[stream-webhook] Orphan media — no post row for post_id=${row.post_id}, skipping notify`
+          );
+        } else {
+          const { data: existing } = await supabase
+            .from('notifications')
+            .select('id')
+            .eq('type', 'video_ready')
+            .eq('entity_id', row.post_id)
+            .limit(1);
+
+          if (existing && existing.length > 0) {
+            console.log(
+              `[stream-webhook] video_ready already sent for post_id=${row.post_id}, skipping`
+            );
+          } else {
+            const { error: notifErr } = await supabase.from('notifications').insert({
+              user_id: post.user_id,
+              recipient_actor_id: post.user_id,
+              recipient_actor_type: 'personal',
+              actor_id: null,
+              type: 'video_ready',
+              title: 'Your video is ready',
+              message: 'Your video has finished processing and is now live.',
+              entity_type: 'post',
+              entity_id: row.post_id,
+              is_read: false,
+              is_deleted: false,
+              data: { post_id: row.post_id, stream_id: uid },
+            });
+            if (notifErr) throw notifErr;
+            console.log(
+              `[stream-webhook] Inserted video_ready notification for user=${post.user_id} post=${row.post_id}`
+            );
+          }
+        }
+      } catch (notifyError) {
+        console.error(
+          '[stream-webhook] Non-fatal: failed to send video_ready notification:',
+          notifyError
+        );
+      }
+    }
 
     return new Response(
       JSON.stringify({ received: true, updated: ids.length }),
