@@ -541,10 +541,10 @@ const CourseExplorer = () => {
               style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}` }}
               aria-label="Select sub-region"
             >
-              <SelectValue placeholder={selectedRegion === PRIMARY_REGIONS.ALL ? "Choose a region first" : "All sub-regions"} />
+              <SelectValue placeholder={selectedRegion === PRIMARY_REGIONS.ALL ? t('explorer.chooseRegionFirst') : t('explorer.allSubRegions')} />
             </SelectTrigger>
             <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg animate-in fade-in-0 zoom-in-95 duration-150">
-              <SelectItem value="all">All sub-regions</SelectItem>
+              <SelectItem value="all">{t('explorer.allSubRegions')}</SelectItem>
               {selectedRegion !== PRIMARY_REGIONS.ALL && SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>]?.map((s) => (
                 <SelectItem key={s} value={normalizeLabel(s)}>
                   {s}
@@ -564,11 +564,26 @@ const CourseExplorer = () => {
             fontWeight: 500,
           }}>
             {hasSearch ? (
-              <><strong style={{ color: '#0F172A', fontWeight: 700 }}>{formatNumber(totalCount)}</strong> {totalCount === 1 ? 'result' : 'results'}</>
+              <Trans
+                i18nKey={totalCount === 1 ? 'explorer.results_one' : 'explorer.results_other'}
+                ns="courses"
+                values={{ count: totalCount, formattedCount: formatNumber(totalCount) }}
+                components={{ 1: <strong style={{ color: '#0F172A', fontWeight: 700 }} /> }}
+              />
             ) : selectedRegion === PRIMARY_REGIONS.ALL ? (
-              <><strong style={{ color: '#0F172A', fontWeight: 700 }}>{formatNumber(totalCount)}</strong> courses worldwide</>
+              <Trans
+                i18nKey={totalCount === 1 ? 'explorer.countWorldwide_one' : 'explorer.countWorldwide_other'}
+                ns="courses"
+                values={{ count: totalCount, formattedCount: formatNumber(totalCount) }}
+                components={{ 1: <strong style={{ color: '#0F172A', fontWeight: 700 }} /> }}
+              />
             ) : (
-              <><strong style={{ color: '#0F172A', fontWeight: 700 }}>{formatNumber(totalCount)}</strong> courses in {getRegionLabel()}</>
+              <Trans
+                i18nKey={totalCount === 1 ? 'explorer.countInRegion_one' : 'explorer.countInRegion_other'}
+                ns="courses"
+                values={{ count: totalCount, formattedCount: formatNumber(totalCount), region: getRegionLabel() }}
+                components={{ 1: <strong style={{ color: '#0F172A', fontWeight: 700 }} /> }}
+              />
             )}
           </span>
           <AppSelect
@@ -598,7 +613,7 @@ const CourseExplorer = () => {
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium active:scale-[0.98] transition-transform"
               style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
             >
-              Reset filters
+              {t('explorer.resetFilters')}
             </button>
           )}
         </div>
