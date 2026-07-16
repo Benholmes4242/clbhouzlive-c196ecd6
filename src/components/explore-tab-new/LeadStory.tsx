@@ -48,10 +48,27 @@ export function LeadStory({ region, regionUpper, mode }: Props) {
     return mode === 'alltime' ? sortRecordsAllTime(raw) : raw;
   }, [data, mode]);
 
-  const record = rows[0];
+  // Derive record/image defensively before any hooks so the early return can
+  // live below a stable hook order. This prevents "Rendered more hooks than
+  // during the previous render" when records transition empty ↔ present.
+  const record = rows[0] ?? null;
+  const image = record ? (record.thumbnail_image ?? record.course_image ?? null) : null;
+
+  // Crossfade image layers: mount incoming on top at opacity 0, fade to 1 on
+  // load, then unmount the outgoing. Prevents WKWebView white flash / relayout.
+  const [currentImage, setCurrentImage] = useState<string | null>(image);
+  const [previousImage, setPreviousImage] = useState<string | null>(null);
+  const [currentLoaded, setCurrentLoaded] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (image === currentImage) return;
+    setPreviousImage(currentImage);
+    setCurrentImage(image);
+    setCurrentLoaded(false);
+  }, [image, currentImage]);
+
   if (!record) return null;
 
-  const image = record.thumbnail_image ?? record.course_image ?? null;
   const holder = formatHolderName(record.holder_name);
   const when = record.play_date ?? record.attained_at ?? null;
   const par = rowToPar(record);
@@ -69,21 +86,6 @@ export function LeadStory({ region, regionUpper, mode }: Props) {
     ? 'Deepest record · All time'
     : 'Latest course record';
   const regionLine = regionUpper;
-
-  // Crossfade image layers: mount incoming on top at opacity 0, fade to 1 on
-  // load, then unmount the outgoing. Prevents WKWebView white flash / relayout.
-  const [currentImage, setCurrentImage] = useState<string | null>(image);
-  const [previousImage, setPreviousImage] = useState<string | null>(null);
-  const [currentLoaded, setCurrentLoaded] = useState<boolean>(true);
-
-  useEffect(() => {
-    if (image === currentImage) return;
-    setPreviousImage(currentImage);
-    setCurrentImage(image);
-    setCurrentLoaded(false);
-  }, [image, currentImage]);
-
-
 
   const handleRowTap = (row: FeatRow) => {
     if (row.score_id) opener.openByScore(row.score_id, null, row.user_id);
