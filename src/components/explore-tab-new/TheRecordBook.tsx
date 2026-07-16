@@ -491,7 +491,7 @@ function ConquestChip({ row }: { row: TitleInReach }) {
           whiteSpace: 'nowrap',
         }}
       >
-        {categoryLabel:abel(row.category)}
+        {categoryLabel(row.category)}
       </div>
       <div
         style={{
