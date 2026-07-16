@@ -14,6 +14,7 @@ export const BIZ = {
   // Ink
   ink:         '#0F172A',
   inkMute:     '#64748B',
+  inkFaint:    '#94A3B8',   // canonical section-eyebrow slate
   // Brand
   amber:       '#F7931E',
   amberTint:   'rgba(247,147,30,0.10)',
