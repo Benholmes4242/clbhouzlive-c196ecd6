@@ -4,6 +4,7 @@
  */
 
 import { AlertCircle, WifiOff, RefreshCw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface SectionErrorStateProps {
   sectionName: string;
@@ -13,12 +14,13 @@ interface SectionErrorStateProps {
 
 export function SectionErrorState({ sectionName, onRetry, isOffline }: SectionErrorStateProps) {
   const Icon = isOffline ? WifiOff : AlertCircle;
+  const { t } = useTranslation('common');
 
   return (
     <div className="mx-4 rounded-2xl bg-card border border-border/50 p-6 text-center">
       <Icon className="w-5 h-5 mx-auto mb-2 text-muted-foreground/50" />
       <p className="text-sm text-muted-foreground">
-        Couldn't load {sectionName}.
+        {t('errors.sectionLoadFailed', { section: sectionName })}
       </p>
       {onRetry && (
         <button
@@ -27,7 +29,7 @@ export function SectionErrorState({ sectionName, onRetry, isOffline }: SectionEr
           aria-label={`Retry loading ${sectionName}`}
         >
           <RefreshCw className="w-3 h-3" />
-          Tap to retry
+          {t('action.tapToRetry')}
         </button>
       )}
     </div>

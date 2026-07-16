@@ -28,11 +28,11 @@ export function ErrorState({
       </div>
       
       <h3 className="text-body-lg font-semibold text-text-primary mb-2">
-        {title}
+        {resolvedTitle}
       </h3>
       
       <p className="text-body-sm text-text-secondary max-w-sm mx-auto mb-4">
-        {message}
+        {resolvedMessage}
       </p>
       
       {onRetry && (
@@ -41,7 +41,7 @@ export function ErrorState({
           className="inline-flex items-center gap-2 px-4 py-2 rounded-sq-sm bg-surface-alt border border-border-subtle text-text-primary text-body-sm font-medium hover:bg-surface-input-hover transition-colors"
         >
           <RefreshCw className="w-4 h-4" />
-          Try again
+          {t('action.tryAgain')}
         </button>
       )}
     </div>
