@@ -66,6 +66,7 @@ export const MessageBubble: React.FC<Props> = ({
   showTicks,
   onRetry,
 }) => {
+  const { t } = useTranslation('messaging');
   const isDeleted = message.deleted_at != null;
   const isSending = message.status === 'sending';
   const isFailed = message.status === 'failed';
