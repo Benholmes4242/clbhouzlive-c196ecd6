@@ -43,20 +43,23 @@ function groupReactions(rs: MessageReaction[]): { emoji: string; count: number }
 }
 
 /** Double-check (read ticks) rendered in monochrome grey. */
-const DoubleCheck: React.FC<{ color: string }> = ({ color }) => (
-  <span
-    style={{ position: "relative", 
-      display: 'inline-flex',
-      alignItems: 'center',
-      color,
-      lineHeight: 0,
-    }}
-    aria-label="Sent"
-  >
-    <Check size={12} strokeWidth={2.5} />
-    <Check size={12} strokeWidth={2.5} style={{ position: "relative",  marginLeft: -6 }} />
-  </span>
-);
+const DoubleCheck: React.FC<{ color: string }> = ({ color }) => {
+  const { t } = useTranslation('messaging');
+  return (
+    <span
+      style={{ position: "relative", 
+        display: 'inline-flex',
+        alignItems: 'center',
+        color,
+        lineHeight: 0,
+      }}
+      aria-label={t('a11y.sent')}
+    >
+      <Check size={12} strokeWidth={2.5} />
+      <Check size={12} strokeWidth={2.5} style={{ position: "relative",  marginLeft: -6 }} />
+    </span>
+  );
+};
 
 export const MessageBubble: React.FC<Props> = ({
   message,
@@ -139,7 +142,7 @@ export const MessageBubble: React.FC<Props> = ({
         <button
           type="button"
           onClick={() => setShowReport(true)}
-          aria-label="Report message"
+          aria-label={t('a11y.reportMessage')}
           style={{ position: "absolute", left: -28, top: "50%", transform: "translateY(-50%)", background: "transparent", border: "none", padding: 4, color: HINT, cursor: "pointer" }}
         >
           <Flag size={14} />

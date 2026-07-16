@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/lib/toast';
@@ -100,6 +101,7 @@ function farFutureIso(): string {
 }
 
 export const ConversationRow: React.FC<Props> = ({ conversation }) => {
+  const { t } = useTranslation('messaging');
   const navigate = useNavigate();
   const actor = useMessagingActor();
   const qc = useQueryClient();
@@ -312,7 +314,7 @@ export const ConversationRow: React.FC<Props> = ({ conversation }) => {
               setMenuOpen(true);
             }}
             onPointerDown={stop}
-            aria-label="Conversation actions"
+            aria-label={t('a11y.conversationActions')}
             style={{
               background: 'transparent',
               border: 'none',

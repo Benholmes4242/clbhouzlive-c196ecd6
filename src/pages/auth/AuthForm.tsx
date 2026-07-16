@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/lib/toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -51,6 +52,7 @@ type Step = 'hero' | 'otp';
 const RESEND_COOLDOWN_SECONDS = 30;
 
 const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
+  const { t } = useTranslation('auth');
   const navigate = useNavigate();
 
   const [step, setStep] = useState<Step>('hero');
@@ -391,7 +393,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
       <AuthBottomSheet
         isOpen={isSheetOpen}
         onClose={handleUseDifferentEmail}
-        title="Check your email"
+        title={t('otp.checkEmailTitle')}
         subtitle={undefined}
       >
         <OtpSheetContent

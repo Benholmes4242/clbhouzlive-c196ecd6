@@ -105,6 +105,7 @@ export default function AuthCallback() {
         <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24, textAlign: 'center', maxWidth: 380, width: '100%' }}>
           <img
             src="/images/clbhouz-logo.png"
+            // eslint-disable-next-line no-restricted-syntax -- brand wordmark, proper noun
             alt="clbhouz"
             className="h-16 w-auto opacity-90"
             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
@@ -143,10 +144,11 @@ export default function AuthCallback() {
       >
         <img
           src="/images/clbhouz-logo.png"
+          // eslint-disable-next-line no-restricted-syntax -- brand wordmark, proper noun
           alt="clbhouz"
           className="h-10 w-auto opacity-80"
         />
-        <div className="w-6 h-6 border-2 rounded-full animate-spin" style={{ borderColor: 'rgba(15,23,42,0.10)', borderTopColor: '#0F172A' }} aria-label="Loading" />
+        <div className="w-6 h-6 border-2 rounded-full animate-spin" style={{ borderColor: 'rgba(15,23,42,0.10)', borderTopColor: '#0F172A' }} aria-label={t('a11y.loading')} />
         <p className="text-sm" style={{ color: '#64748B' }} aria-live="polite">{message}</p>
       </div>
     </div>

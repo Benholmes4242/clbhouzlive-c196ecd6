@@ -40,19 +40,22 @@ const SkeletonRow: React.FC = () => (
   </div>
 );
 
-const Spinner: React.FC = () => (
-  <div
-    aria-label="Loading"
-    style={{
-      width: 22,
-      height: 22,
-      borderRadius: '50%',
-      border: '2px solid #E4E7EB',
-      borderTopColor: '#8A9099',
-      animation: 'msg-spin 0.8s linear infinite',
-    }}
-  />
-);
+const Spinner: React.FC = () => {
+  const { t } = useTranslation('messaging');
+  return (
+    <div
+      aria-label={t('a11y.loading')}
+      style={{
+        width: 22,
+        height: 22,
+        borderRadius: '50%',
+        border: '2px solid #E4E7EB',
+        borderTopColor: '#8A9099',
+        animation: 'msg-spin 0.8s linear infinite',
+      }}
+    />
+  );
+};
 
 const InboxV2Page: React.FC = () => {
   const { t } = useTranslation(['messaging', 'common']);
@@ -74,7 +77,7 @@ const InboxV2Page: React.FC = () => {
   const composeButton = (
     <button
       type="button"
-      aria-label="New message"
+      aria-label={t('a11y.newMessage')}
       onClick={() => setComposeOpen(true)}
       className="active:opacity-60 transition-opacity"
       style={{
@@ -114,7 +117,7 @@ const InboxV2Page: React.FC = () => {
               <button
                 type="button"
                 onClick={() => navigate(-1)}
-                aria-label="Back"
+                aria-label={t('a11y.back')}
                 className="active:opacity-60"
                 style={{
                   width: 32,
