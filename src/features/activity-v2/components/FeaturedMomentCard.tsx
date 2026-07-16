@@ -6,7 +6,7 @@ import type { ActivityFeedRowV2 } from '../hooks/useActivityFeedV2';
 const GEIST =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const AMBER = '#F7931E';
-const AMBER_DEEP = '#C97A10';
+
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 
 /**
