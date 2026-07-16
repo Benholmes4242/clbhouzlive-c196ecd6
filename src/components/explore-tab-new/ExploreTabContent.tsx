@@ -6,7 +6,7 @@ import { useExploreRegion } from './hooks/useExploreRegion';
 
 import { CircleActivityStrip } from './CircleActivityStrip';
 import {
-  AlmanacRegionTabs,
+  AlmanacLens,
   FeatTierRail,
   AlmanacHead,
   REGION_TABS,
