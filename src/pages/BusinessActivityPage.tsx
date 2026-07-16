@@ -29,7 +29,7 @@ function formatDateHeader(dateStr: string) {
   const date = new Date(dateStr);
   if (isToday(date)) return 'Today';
   if (isYesterday(date)) return 'Yesterday';
-  return format(date, 'MMMM d, yyyy');
+  return formatMonthLongDayYear(date);
 }
 
 export default function BusinessActivityPage() {
