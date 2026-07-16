@@ -195,7 +195,7 @@ export const MessageBubble: React.FC<Props> = ({
                     lineHeight: 1.3,
                   }}
                 >
-                  {reply.sender_name ?? 'Unknown'}
+                  {reply.sender_name ?? t('bubble.unknownSender')}
                 </span>
                 <span
                   className="truncate"
