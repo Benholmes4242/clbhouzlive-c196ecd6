@@ -207,7 +207,7 @@ export const MessageBubble: React.FC<Props> = ({
                   }}
                 >
                   {reply.deleted
-                    ? 'Message deleted'
+                    ? t('bubble.deleted')
                     : reply.body?.trim() || `[${reply.type}]`}
                 </span>
               </div>
