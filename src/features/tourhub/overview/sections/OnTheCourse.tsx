@@ -91,7 +91,7 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
   const round = parseRoundNumber(data);
 
   return (
-    <SectionShell eyebrow="On the course" eyebrowColor={V4.amber} rightMeta={round != null ? `R${round}` : undefined}>
+    <SectionShell eyebrow="On the course" eyebrowColor={V4.amber} rightMeta={round != null ? `R${round}` : undefined} style={{ marginTop: SPACE.sectionSection }}>
       <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 16px 6px', scrollPaddingLeft: 16, scrollSnapType: 'x mandatory' }}>
         {groups.map((g, gi) => {
           const thru = groupThru(g);
