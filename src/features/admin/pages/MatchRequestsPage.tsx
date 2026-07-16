@@ -9,6 +9,7 @@ import SectionTabs from '../components/SectionTabs';
 import EmptyState from '../components/EmptyState';
 import StatusPill from '../components/StatusPill';
 import AdminAccessDenied from '../components/AdminAccessDenied';
+import AdminErrorState from '../components/AdminErrorState';
 import { usePanelRole } from '@/hooks/usePanelRole';
 import { panelCan } from '@/lib/panelCan';
 
@@ -78,7 +79,7 @@ export default function MatchRequestsPage() {
   const status = ((params.get('status') as RequestStatus) || 'pending') as RequestStatus;
 
   const qc = useQueryClient();
-  const { data = [], isLoading } = useQuery({
+  const { data = [], isLoading, isError, error, refetch, isFetching } = useQuery({
     queryKey: [...QUERY_KEY, status],
     queryFn: () => fetchMatchRequests(status),
   });
@@ -118,6 +119,13 @@ export default function MatchRequestsPage() {
 
       {isLoading ? (
         <div style={{ color: t.inkMuted, fontSize: 13, padding: 24 }}>Loading requests...</div>
+      ) : isError ? (
+        <AdminErrorState
+          title="Couldn't load match requests"
+          message={(error as any)?.message ?? 'The request failed. Try again.'}
+          onRetry={() => refetch()}
+          retrying={isFetching}
+        />
       ) : data.length === 0 ? (
         <EmptyState icon={<Inbox size={28} />} title="No requests" subtitle={emptyCopy[status]} />
       ) : (

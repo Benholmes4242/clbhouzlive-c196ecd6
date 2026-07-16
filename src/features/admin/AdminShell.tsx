@@ -18,6 +18,7 @@ const SystemPage = lazy(() => import('./pages/SystemPage'));
 const ModerationPage = lazy(() => import('./pages/ModerationPage'));
 const ApprovalsPage = lazy(() => import('./pages/ApprovalsPage'));
 const MatchRequestsPage = lazy(() => import('./pages/MatchRequestsPage'));
+const CourseMatchingPage = lazy(() => import('./pages/CourseMatchingPage'));
 const AppealsPage = lazy(() => import('./pages/AppealsPage'));
 
 const SupportPage = lazy(() => import('./pages/SupportPage'));
@@ -31,6 +32,7 @@ const SECTION_TITLES: Record<string, string> = {
   moderation: 'Moderation',
   approvals:  'Approvals',
   'match-requests': 'Match Requests',
+  'course-matching': 'Course Matching',
   appeals:    'Appeals',
   users:      'Users',
   content:    'Content',
@@ -120,6 +122,7 @@ export default function AdminShell() {
                 <Route path="moderation/*" element={can.viewModeration ? <ModerationPage /> : <AdminAccessDenied />} />
                 <Route path="approvals/*"  element={can.approveRequests ? <ApprovalsPage /> : <AdminAccessDenied />} />
                 <Route path="match-requests/*" element={can.viewUsers ? <MatchRequestsPage /> : <AdminAccessDenied />} />
+                <Route path="course-matching/*" element={can.viewUsers ? <CourseMatchingPage /> : <AdminAccessDenied />} />
                 <Route path="appeals/*"    element={can.viewModeration ? <AppealsPage /> : <AdminAccessDenied />} />
                 <Route path="users/*"     element={can.viewUsers ? <UsersPage /> : <AdminAccessDenied />} />
                 <Route path="content/*"   element={<ContentPage />} />
