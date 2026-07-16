@@ -4,7 +4,7 @@ import { Check, Calendar, Star } from 'lucide-react';
 import { CourseCardModel } from '@/types/courseCard';
 import { CourseCommunityRating } from './CourseCommunityRating';
 import { FlagChip } from './FlagChip';
-import { format } from 'date-fns';
+import { formatDayMonthYearShortGB } from '@/i18n/format';
 import { getOptimizedImageUrl, generateImageSrcSet } from '@/utils/enhancedImageOptimization';
 
 /**
