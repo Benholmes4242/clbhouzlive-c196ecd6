@@ -122,6 +122,7 @@ export default function AdminShell() {
                 <Route path="moderation/*" element={can.viewModeration ? <ModerationPage /> : <AdminAccessDenied />} />
                 <Route path="approvals/*"  element={can.approveRequests ? <ApprovalsPage /> : <AdminAccessDenied />} />
                 <Route path="match-requests/*" element={can.viewUsers ? <MatchRequestsPage /> : <AdminAccessDenied />} />
+                <Route path="course-matching/*" element={can.viewUsers ? <CourseMatchingPage /> : <AdminAccessDenied />} />
                 <Route path="appeals/*"    element={can.viewModeration ? <AppealsPage /> : <AdminAccessDenied />} />
                 <Route path="users/*"     element={can.viewUsers ? <UsersPage /> : <AdminAccessDenied />} />
                 <Route path="content/*"   element={<ContentPage />} />
