@@ -69,11 +69,12 @@ export async function uploadVideoWithTus(options: TusUploadOptions): Promise<Tus
   const upload = new tus.Upload(file, {
     endpoint: uploadUrl,
     
-    // Chunk size: 50MB (Cloudflare minimum is 5MB, max is 200MB)
-    chunkSize: 50 * 1024 * 1024,
+    // Chunk size: 50MB default (Cloudflare minimum is 5MB, max is 200MB). Overridable for large files.
+    chunkSize: chunkSize ?? 50 * 1024 * 1024,
     
-    // Retry configuration - exponential backoff
-    retryDelays: [0, 1000, 3000, 5000, 10000, 30000],
+    // Retry configuration - exponential backoff. Overridable for long-form uploads.
+    retryDelays: retryDelays ?? [0, 1000, 3000, 5000, 10000, 30000],
+
     
     // Store upload URL for resume capability
     storeFingerprintForResuming: true,
