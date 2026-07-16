@@ -139,7 +139,7 @@ const InboxV2Page: React.FC = () => {
                   margin: 0,
                 }}
               >
-                Messages
+                {t('messaging:title.inbox')}
               </h1>
             </div>
             {composeButton}
