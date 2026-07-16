@@ -64,9 +64,9 @@ export const SeasonCalendarStrip: React.FC<SeasonCalendarStripProps> = ({
                     <p className="font-semibold">{season.name}</p>
                     <p className="text-xs italic text-muted-foreground">{season.tagline}</p>
                     <p className="text-xs">
-                      {new Date(season.startDate).toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })}
+                      {formatDayMonthShortGB(season.startDate)}
                       {' → '}
-                      {new Date(season.endDate).toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })}
+                      {formatDayMonthShortGB(season.endDate)}
                     </p>
                     {season.daysUntilStart && (
                       <p className="text-xs font-medium" style={{ color: season.color }}>
