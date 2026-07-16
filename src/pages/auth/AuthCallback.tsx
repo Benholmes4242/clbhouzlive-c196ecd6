@@ -31,7 +31,7 @@ export default function AuthCallback() {
         const { data: { session } } = await supabase.auth.getSession();
 
         if (!session) {
-          setMessage('Session not found. Redirecting…');
+          setMessage(t('callback.sessionNotFound'));
           setTimeout(() => navigate('/auth', { replace: true }), 1500);
           return;
         }
@@ -39,7 +39,7 @@ export default function AuthCallback() {
         // Password reset flow has been removed (passwordless OTP); fall through to
         // the normal onboarding-aware redirect below.
 
-        setMessage('Setting up your profile…');
+        setMessage(t('callback.settingUpProfile'));
 
         await new Promise(r => setTimeout(r, 700));
 
@@ -57,7 +57,7 @@ export default function AuthCallback() {
 
       } catch (err) {
         console.error('[AuthCallback]', err);
-        setMessage('Something went wrong. Redirecting…');
+        setMessage(t('callback.somethingWentWrong'));
         setTimeout(() => navigate('/auth', { replace: true }), 1500);
       }
     };
