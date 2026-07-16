@@ -217,10 +217,12 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
         <div
           style={{
             marginTop: 12,
-            padding: '0 16px 0 64px',
+            // Caption starts at the course-name text edge:
+            //   pad 16 + rank 12 + gap 8 + avatar 24 + gap 8 = 68
+            padding: '0 16px 0 68px',
             display: 'flex',
             alignItems: 'center',
-            gap: 10,
+            gap: 8,
             fontSize: 9,
             fontWeight: 600,
             letterSpacing: '0.06em',
@@ -230,8 +232,8 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
           }}
         >
           <div style={{ flex: 1, minWidth: 0 }}>Course</div>
-          <div style={{ width: 44, textAlign: 'right' }}>To par</div>
-          <div style={{ width: 34, textAlign: 'right' }}>Gross</div>
+          <div style={{ width: 36, textAlign: 'right' }}>To par</div>
+          <div style={{ width: 26, textAlign: 'right' }}>Gross</div>
           <div style={{ width: 12 }} aria-hidden />
         </div>
 
@@ -301,7 +303,7 @@ function LedgerRow({
         position: 'relative',
         display: 'flex',
         alignItems: 'center',
-        gap: 10,
+        gap: 8,
         padding: '9px 16px',
         width: '100%',
         background: 'transparent',
@@ -316,7 +318,9 @@ function LedgerRow({
           aria-hidden
           style={{
             position: 'absolute',
-            left: 64,
+            // Separator starts at the course-name text edge:
+            //   pad 16 + rank 12 + gap 8 + avatar 24 + gap 8 = 68
+            left: 68,
             right: 16,
             top: 0,
             height: 0,
@@ -327,7 +331,7 @@ function LedgerRow({
       {/* Rank */}
       <div
         style={{
-          width: 16,
+          width: 12,
           flexShrink: 0,
           fontSize: 11,
           fontWeight: 600,
@@ -388,10 +392,10 @@ function LedgerRow({
       <div
         className="tabular-nums"
         style={{
-          width: 44,
+          width: 36,
           flexShrink: 0,
           textAlign: 'right',
-          fontSize: 15,
+          fontSize: 14,
           fontWeight: 700,
           color: toParColor,
           lineHeight: 1,
@@ -404,10 +408,10 @@ function LedgerRow({
       <div
         className="tabular-nums"
         style={{
-          width: 34,
+          width: 26,
           flexShrink: 0,
           textAlign: 'right',
-          fontSize: 12,
+          fontSize: 11,
           fontWeight: 500,
           color: GHOST,
           lineHeight: 1,
