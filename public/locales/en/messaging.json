@@ -25,6 +25,8 @@
   },
   "addSheet": {
     "addWithCount": "Add ({{count}})",
+    "addWithCount_one": "addSheet.addWithCount",
+    "addWithCount_other": "addSheet.addWithCount",
     "addZero": "Add"
   },
   "banner": {
@@ -36,6 +38,9 @@
     "edited": "(edited)",
     "failedTapRetry": "Failed — tap to retry",
     "unknownSender": "Unknown"
+  },
+  "composer": {
+    "placeholder": "Message"
   },
   "empty": {
     "inboxBody": "Message golfers, clubs, or businesses - it all lands here.",
@@ -53,26 +58,23 @@
     "imageUnavailable": "Image unavailable",
     "voiceUnavailable": "Voice unavailable"
   },
+  "group": {
+    "namePlaceholder": "Group name (optional)"
+  },
   "list": {
     "members": "Members"
   },
   "search": {
     "noResults": "No results.",
-    "prompt": "Search for someone to message.",
-    "searching": "Searching…",
     "people": "Search people or businesses",
-    "peopleAnd": "Search people and businesses"
+    "peopleAnd": "Search people and businesses",
+    "prompt": "Search for someone to message.",
+    "searching": "Searching…"
   },
   "sheet": {
     "detailsTitle": "Details"
   },
   "title": {
     "inbox": "Messages"
-  },
-  "composer": {
-    "placeholder": "Message"
-  },
-  "group": {
-    "namePlaceholder": "Group name (optional)"
   }
 }
