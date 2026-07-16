@@ -19622,6 +19622,7 @@ export type Database = {
       refresh_eagle_leaders: { Args: never; Returns: undefined }
       refresh_expired_course_mood_blurbs: { Args: never; Returns: number }
       refresh_gam_league_standings: { Args: never; Returns: undefined }
+      refresh_hero_stories: { Args: never; Returns: undefined }
       refresh_latest_records_cache: {
         Args: { p_limit?: number }
         Returns: undefined

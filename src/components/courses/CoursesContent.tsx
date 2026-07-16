@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CoursesPageHero from './CoursesPageHero';
+import { AmateurCircuitHero } from '@/components/explore-tab-new/AmateurCircuitHero';
 import CourseExplorer from './CourseExplorer';
 import MyCourses from './MyCourses';
 import FriendsCoursesSignedOutEmpty from './FriendsCoursesSignedOutEmpty';
@@ -346,7 +347,11 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
           return (
             <div>
               <GlassHeaderPlate visible={tabsStuck} />
-              <CoursesPageHero />
+              {activeTab === 'discover' ? (
+                <AmateurCircuitHero fallback={<CoursesPageHero />} />
+              ) : (
+                <CoursesPageHero />
+              )}
 
               <div ref={sentinelRef} style={{ height: 1 }} aria-hidden />
 
