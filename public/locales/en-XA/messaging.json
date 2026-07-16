@@ -1,0 +1,78 @@
+{
+  "a11y": {
+    "attachImage": "[Attach image !!!]",
+    "back": "[Back !!!]",
+    "conversationActions": "[Conversation actions !!!]",
+    "editTitle": "[Edit title !!!]",
+    "loading": "[Loading !!!]",
+    "memberActions": "[Member actions !!!]",
+    "more": "[More !!!]",
+    "newMessage": "[New message !!!]",
+    "reportMessage": "[Report message !!!]",
+    "send": "[Send !!!]",
+    "sent": "[Sent !!!]"
+  },
+  "action": {
+    "addPeople": "[Add people !!!]",
+    "createGroup": "[Create group !!!]",
+    "dismiss": "[Dismiss !!!]",
+    "message": "[Message !!!]",
+    "newMessage": "[New message !!!]",
+    "pause": "[Pause !!!]",
+    "play": "[Play !!!]",
+    "removeFromGroup": "[Remove from group !!!]",
+    "retrySend": "[Retry send !!!]"
+  },
+  "addSheet": {
+    "addWithCount": "[Add ({{count}}) !!!]",
+    "addZero": "[Add !!!]"
+  },
+  "banner": {
+    "businessBody": "[Message golfers directly. !!!]",
+    "businessTitle": "[Business messaging !!!]"
+  },
+  "bubble": {
+    "deleted": "[Message deleted !!!]",
+    "edited": "[(edited) !!!]",
+    "failedTapRetry": "[Failed — tap to retry !!!]",
+    "unknownSender": "[Unknown !!!]"
+  },
+  "empty": {
+    "inboxBody": "[Message golfers, clubs, or businesses - it all lands here. !!!]",
+    "inboxTitle": "[Start the conversation !!!]",
+    "sayHello": "[Say hello !!!]",
+    "threadStart": "[This is the start of your conversation. !!!]",
+    "threadStartGroup": "[This is the start of {{name}}. !!!]",
+    "threadStartGroupGeneric": "[This is the start of this group. !!!]",
+    "threadStartWith": "[This is the start of your conversation with {{name}}. !!!]"
+  },
+  "error": {
+    "couldntLoadInbox": "[Couldn't load messages !!!]",
+    "couldntLoadThread": "[Couldn't load this conversation !!!]",
+    "imageFailed": "[Failed !!!]",
+    "imageUnavailable": "[Image unavailable !!!]",
+    "voiceUnavailable": "[Voice unavailable !!!]"
+  },
+  "list": {
+    "members": "[Members !!!]"
+  },
+  "search": {
+    "noResults": "[No results. !!!]",
+    "prompt": "[Search for someone to message. !!!]",
+    "searching": "[Searching… !!!]",
+    "people": "[Search people or businesses !!!]",
+    "peopleAnd": "[Search people and businesses !!!]"
+  },
+  "sheet": {
+    "detailsTitle": "[Details !!!]"
+  },
+  "title": {
+    "inbox": "[Messages !!!]"
+  },
+  "composer": {
+    "placeholder": "[Message !!!]"
+  },
+  "group": {
+    "namePlaceholder": "[Group name (optional) !!!]"
+  }
+}

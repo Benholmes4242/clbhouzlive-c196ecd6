@@ -61,5 +61,18 @@
   },
   "group": {
     "namePlaceholder": "Group name (optional)"
+  },
+  "a11y": {
+    "attachImage": "Attach image",
+    "back": "Back",
+    "conversationActions": "Conversation actions",
+    "editTitle": "Edit title",
+    "loading": "Loading",
+    "memberActions": "Member actions",
+    "more": "More",
+    "newMessage": "New message",
+    "reportMessage": "Report message",
+    "send": "Send",
+    "sent": "Sent"
   }
 }
