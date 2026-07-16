@@ -285,17 +285,18 @@ const EAGLES_RAIL_CAP = 12;
 function EaglesSection({
   region,
   regionUpper,
+  mode,
   onRowTap,
 }: {
   region: string | null;
   regionUpper: string;
+  mode: RecordsMode;
   onRowTap?: (row: FeatRow) => void;
 }) {
   const { data: featsData, isLoading } = useRegionFeats(region, 'eagles', 'latest');
   const { data: leadersData } = useRegionEagleLeaders(region);
   const rows = featsData ?? [];
   const hasAny = rows.length > 0;
-  const [mode, setMode] = useState<RecordsMode>('latest');
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetInitialMode, setSheetInitialMode] = useState<RecordsMode>('latest');
 
@@ -330,15 +331,7 @@ function EaglesSection({
         icon={TIER_ICON.eagles}
         onSeeAll={hasOverflow ? () => openSheet('latest') : undefined}
       />
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-          padding: `0 ${SPACE.pagePadX}px 10px`,
-        }}
-      >
-        <LegendaryModeToggle mode={mode} setMode={setMode} />
-      </div>
+
       {mode === 'latest' ? (
         <div
           className="flex gap-3 px-4 overflow-x-auto scrollbar-hide"
