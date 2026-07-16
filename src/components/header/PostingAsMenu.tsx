@@ -11,6 +11,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 import { useActorUnreadCounts } from '@/hooks/useActorUnreadCounts';
+import { useConversations } from '@/hooks/messaging/useConversations';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { cn } from '@/lib/utils';
 import { postingAsCopy } from '@/lib/postingAsCopy';
@@ -37,12 +38,14 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   const { data: userProfile, isLoading: isProfileLoading } = useUserProfile(user?.id);
   const { hasUnread, unreadCount: unreadNotificationCount } = useUnreadNotifications();
   const { countFor: actorUnreadFor } = useActorUnreadCounts();
+  const { conversations } = useConversations();
 
-
-  // Unread messages count derived from per-actor totals (notifications + DMs).
-  const unreadMessageCount = activeActor
-    ? actorUnreadFor(activeActor.type as 'personal' | 'business', activeActor.id)
-    : 0;
+  // Unread messages: sourced from the inbox itself (get_inbox) so the badge
+  // matches what the Messages page renders. Sum of per-conversation unread.
+  const unreadMessageCount = (conversations ?? []).reduce(
+    (sum, c) => sum + (c.unread_count ?? 0),
+    0,
+  );
   
   const [uploadCenterOpen, setUploadCenterOpen] = useState(false);
   const { hasPending, hasFailed } = useUploadJobs();
