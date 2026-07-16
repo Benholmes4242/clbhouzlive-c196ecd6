@@ -129,16 +129,18 @@ export const InlineVideo: React.FC<Props> = ({
     const r = detectRoleForMatch();
     return r === 'next' || r === 'prev' ? r : null;
   };
-  const role: FeedRole | null = isActive
-    ? 'active'
-    : (earlyMotion
-        ? detectEarlyRole()
-        : (isNear ? detectRoleForMatch() : null));
+  const role: FeedRole | null = isProcessing
+    ? null
+    : (isActive
+        ? 'active'
+        : (earlyMotion
+            ? detectEarlyRole()
+            : (isNear ? detectRoleForMatch() : null)));
 
   const laneId = useLaneForRole(role);
   // Playback intent — separate from role/mount. Only active or early-motion
   // cards actually load + play; neighbour "bound" roles stay paused.
-  const playbackIntent = isActive || (earlyMotion && role !== null);
+  const playbackIntent = !isProcessing && (isActive || (earlyMotion && role !== null));
 
   // Start position: for the KEPT-BOUND promotion path (physical lane already
   // parented to this card and holding the true paused frame), skip the seed
