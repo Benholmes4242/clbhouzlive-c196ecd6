@@ -44,10 +44,10 @@ interface FeedTopActionBarProps {
 
 const formatCount = (count: number | null | undefined): string | null => {
   if (count === null || count === undefined || count === 0) return null;
-  if (count >= 1_000_000) return `${(count / 1_000_000).toFixed(1)}M`;
-  if (count >= 1_000) return `${(count / 1_000).toFixed(1)}k`;
-  return count.toString();
+  return formatCountKilo(count);
 };
+
+
 
 // Bare icon buttons — no chip background, no blur, no border. Drop-shadow on
 // the icon itself provides legibility over bright media (Clubhouse-style).
