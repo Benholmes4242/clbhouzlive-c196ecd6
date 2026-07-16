@@ -64,7 +64,7 @@ export const MessageImage: React.FC<Props> = ({ attachment, onOpen }) => {
           }}
         >
           <AlertCircle size={14} />
-          Image unavailable
+          {t('error.imageUnavailable')}
         </div>
       ) : src ? (
         <img
