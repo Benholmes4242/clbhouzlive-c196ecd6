@@ -273,7 +273,9 @@ const SyncingMiddle: React.FC<{ nineHole: boolean }> = ({ nineHole }) => {
 };
 
 
-const NohbhMiddle: React.FC<{ gross: number | null; toPar: number | null }> = ({ gross, toPar }) => (
+const NohbhMiddle: React.FC<{ gross: number | null; toPar: number | null }> = ({ gross, toPar }) => {
+  const { t } = useTranslation(['courses']);
+  return (
   <div style={{
     padding: '20px 16px 24px',
     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, textAlign: 'center',
@@ -285,13 +287,13 @@ const NohbhMiddle: React.FC<{ gross: number | null; toPar: number | null }> = ({
       <Table size={24} strokeWidth={1.6} />
     </div>
     <div style={{ fontFamily: GEIST, fontSize: 14.5, fontWeight: 800, color: INK }}>
-      Gross score only
+      {t('courses:scorecard.grossOnlyTitle')}
     </div>
     <div style={{
       fontFamily: GEIST, fontSize: 12.5, fontWeight: 500, color: SECONDARY,
       maxWidth: 250, lineHeight: 1.4,
     }}>
-      This round was logged as a total, without hole-by-hole scores.
+      {t('courses:scorecard.grossOnlyBody')}
     </div>
     {gross != null && (
       <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
@@ -300,7 +302,7 @@ const NohbhMiddle: React.FC<{ gross: number | null; toPar: number | null }> = ({
           padding: '10px 18px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
         }}>
           <div style={{ ...NUM, fontSize: 9.5, fontWeight: 800, letterSpacing: '0.1em', color: MUTED }}>
-            GROSS
+            {t('courses:scorecard.gross')}
           </div>
           <div style={{ ...NUM, fontSize: 24, fontWeight: 200, color: INK, lineHeight: 1 }}>
             {gross}
@@ -311,7 +313,7 @@ const NohbhMiddle: React.FC<{ gross: number | null; toPar: number | null }> = ({
           padding: '10px 18px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
         }}>
           <div style={{ ...NUM, fontSize: 9.5, fontWeight: 800, letterSpacing: '0.1em', color: MUTED }}>
-            TO PAR
+            {t('courses:scorecard.toPar')}
           </div>
           <div style={{ ...NUM, fontSize: 24, fontWeight: 200, color: toPar == null ? INK : toParColor(toPar), lineHeight: 1 }}>
             {fmtRel(toPar)}
@@ -320,7 +322,8 @@ const NohbhMiddle: React.FC<{ gross: number | null; toPar: number | null }> = ({
       </div>
     )}
   </div>
-);
+  );
+};
 
 
 
