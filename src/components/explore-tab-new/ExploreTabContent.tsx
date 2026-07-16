@@ -27,8 +27,8 @@ import { scrollPageToTop } from '@/lib/getScrollParent';
 
 import { SeasonStrip } from './SeasonStrip';
 import { RankIdentityCard } from './RankIdentityCard';
-import { CourseCrownsRail } from './CourseCrownsRail';
-import { NextConquestsRail } from './NextConquestsRail';
+import { TheRecordBook } from './TheRecordBook';
+
 import { ToughestCoursesRail } from './ToughestCoursesRail';
 import { DiscoverSectionHeader } from './DiscoverSectionHeader';
 import { AlmanacEmptyCard } from './AlmanacEmptyCard';
