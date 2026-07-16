@@ -75,15 +75,16 @@ export function EaglesLedger({ region, regionUpper, mode, onRowTap, onLeaderTap 
   if (!isLoading && !hasData) return null;
 
   const leaderMax = leaders[0]?.eagles ?? 1;
-  const scopeLabel = mode === 'alltime' ? 'MOST' : 'LATEST';
+  const overlineLabel = mode === 'alltime' ? 'All-time eagles' : 'Latest eagles';
 
   return (
     <section style={{ marginTop: 32, fontFamily: FONT }}>
       <SectionHead
-        overline={`Eagles · ${scopeLabel} · ${regionUpper}`}
+        overline={overlineLabel}
         meta="View all"
         onMeta={() => setSheetOpen(true)}
       />
+
       <div style={{ padding: '0 16px' }}>
         <div
           style={{
