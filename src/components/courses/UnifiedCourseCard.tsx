@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Check, Calendar, Star } from 'lucide-react';
 import { CourseCardModel } from '@/types/courseCard';
