@@ -2,6 +2,8 @@ import React from 'react';
 import { ShieldCheck } from 'lucide-react';
 import { FONT, SC_ACCENT } from './_constants';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { formatNumber } from '@/i18n/format';
+
 
 interface Props {
   totalRounds: number;
@@ -33,8 +35,9 @@ export const HolesCredibilityHeader: React.FC<Props> = ({ totalRounds }) => {
         <ShieldCheck size={13} strokeWidth={2.2} />
         <span>
           <span style={{ fontWeight: 800 }}>
-            {totalRounds.toLocaleString()} round{totalRounds === 1 ? '' : 's'}
+            {formatNumber(totalRounds)} round{totalRounds === 1 ? '' : 's'}
           </span>
+
           {' \u00B7 Official WHS \u00B7 Gross scoring'}
         </span>
       </div>

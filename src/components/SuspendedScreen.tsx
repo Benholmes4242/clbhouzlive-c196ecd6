@@ -1,6 +1,8 @@
 import React from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { SuspensionDetails } from '@/hooks/useSuspensionStatus';
+import { formatDateLongTimeShort, formatDateNumeric } from '@/i18n/format';
+
 
 type Props = { suspension: SuspensionDetails };
 
@@ -9,12 +11,12 @@ const SUSPENSION_REF_FALLBACK = '1970-01-01T00:00:00.000Z';
 function formatUntil(iso: string | null): string {
   if (!iso) return '';
   try {
-    const d = new Date(iso);
-    return d.toLocaleString(undefined, { dateStyle: 'long', timeStyle: 'short' });
+    return formatDateLongTimeShort(new Date(iso));
   } catch {
     return iso;
   }
 }
+
 
 type AppealRow = {
   id: string;
@@ -327,7 +329,7 @@ function ExistingAppealCard({ row }: { row: AppealRow }) {
         </div>
       )}
       <div style={{ fontSize: 11, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-        Submitted {new Date(row.created_at).toLocaleDateString()}
+        Submitted {formatDateNumeric(new Date(row.created_at))}
       </div>
     </div>
   );

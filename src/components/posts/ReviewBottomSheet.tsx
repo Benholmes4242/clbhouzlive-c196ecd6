@@ -13,6 +13,8 @@
  */
 
 import React, { useCallback, useMemo } from 'react';
+import { formatMonthYearShort } from '@/i18n/format';
+
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -88,10 +90,9 @@ function formatMonthLabel(iso?: string | null): string {
   if (!iso) return '';
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return '';
-  return d
-    .toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
-    .toUpperCase();
+  return formatMonthYearShort(d).toUpperCase();
 }
+
 
 export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   isOpen,
