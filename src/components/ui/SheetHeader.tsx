@@ -1,5 +1,6 @@
 import React from 'react';
 import { X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const FONT_SERIF = '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
@@ -28,10 +29,12 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
   title,
   sub,
   onClose,
-  closeAriaLabel = 'Close',
+  closeAriaLabel,
   borderBottom = true,
   dark = false,
 }) => {
+  const { t } = useTranslation('common');
+  const resolvedCloseLabel = closeAriaLabel ?? t('action.close');
   // Literal dark handicap tokens — sheets portal outside `.hcp-dark`, so
   // `var(--hcp-*)` resolves to nothing. Values copied from handicap-dark.css.
   const titleColor = dark ? 'rgba(255,255,255,0.96)' : '#0F172A';
@@ -100,7 +103,7 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
       </div>
       <button
         onClick={onClose}
-        aria-label={closeAriaLabel}
+        aria-label={resolvedCloseLabel}
         style={{
           flexShrink: 0,
           width: 30,
