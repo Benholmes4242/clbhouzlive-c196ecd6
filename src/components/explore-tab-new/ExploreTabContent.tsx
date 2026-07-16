@@ -198,16 +198,17 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
 
 function LegendarySection({
   region,
+  mode,
   onRowTap,
 }: {
   region: string | null;
+  mode: RecordsMode;
   onRowTap?: (row: FeatRow) => void;
 }) {
   const { data, isLoading } = useRegionFeats(region, 'legendary');
   const rows = data ?? [];
   const hasAny = rows.length > 0;
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [mode, setMode] = useState<RecordsMode>('latest');
   const [sheetInitialMode, setSheetInitialMode] = useState<RecordsMode>('latest');
   const [sheetInitialMetric, setSheetInitialMetric] = useState<'aces' | 'albatrosses'>('aces');
   if (!isLoading && !hasAny) return null;
@@ -257,15 +258,6 @@ function LegendarySection({
           </button>
         )}
       </div>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-          padding: `0 ${SPACE.pagePadX}px 10px`,
-        }}
-      >
-        <LegendaryModeToggle mode={mode} setMode={setMode} />
-      </div>
       {mode === 'latest' ? (
         <LegendaryFeatHero region={region} onRowTap={onRowTap} />
       ) : (
@@ -285,48 +277,7 @@ function LegendarySection({
   );
 }
 
-function LegendaryModeToggle({
-  mode,
-  setMode,
-}: {
-  mode: RecordsMode;
-  setMode: (m: RecordsMode) => void;
-}) {
-  const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
-  return (
-    <div style={{ display: 'inline-flex', flexShrink: 0, gap: 6 }}>
-      {([
-        { v: 'latest', label: 'RECENT' },
-        { v: 'alltime', label: 'ALL TIME' },
-      ] as const).map((o) => {
-        const active = mode === o.v;
-        return (
-          <button
-            key={o.v}
-            type="button"
-            onClick={() => setMode(o.v)}
-            style={{
-              padding: '4px 9px',
-              borderRadius: 999,
-              background: active ? '#15171F' : 'transparent',
-              color: active ? '#FFFFFF' : 'rgba(15,23,42,0.65)',
-              border: 'none',
-              fontFamily: FONT,
-              fontSize: 10,
-              fontWeight: 700,
-              cursor: 'pointer',
-              letterSpacing: '0.02em',
-              whiteSpace: 'nowrap',
-              transition: 'all .15s',
-            }}
-          >
-            {o.label}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
+
 
 const EAGLE_BAR_GRADIENT = 'linear-gradient(90deg, #F7931E, #FBBC2E)';
 const EAGLES_RAIL_CAP = 12;
