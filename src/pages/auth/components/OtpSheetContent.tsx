@@ -160,7 +160,7 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
       {/* Sent-to */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         <p className="text-[13px]" style={{ color: 'rgba(255,255,255,0.60)', margin: 0 }}>
-          We sent a 6-digit code to
+          {t('otp.sentTo')}
         </p>
         <p className="text-[14px]" style={{ margin: 0, display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
           <span style={{ color: 'rgba(255,255,255,0.96)', fontWeight: 650 }}>{email}</span>
@@ -170,7 +170,7 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
             className="text-[13px]"
             style={{ color: '#F7931E', fontWeight: 600, background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
           >
-            Change
+            {t('otp.changeEmail')}
           </button>
         </p>
       </div>
