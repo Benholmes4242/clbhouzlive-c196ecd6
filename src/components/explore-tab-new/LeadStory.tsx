@@ -83,9 +83,9 @@ export function LeadStory({ region, regionUpper, mode }: Props) {
     numericValue != null ? String(numericValue) : record.feat_value ?? '';
 
   const overlineLabel = mode === 'alltime'
-    ? 'All-time course record'
+    ? 'Deepest record · All time'
     : 'Latest course record';
-  const regionLine = regionUpper;
+
 
 
   const handleRowTap = (row: FeatRow) => {
