@@ -395,7 +395,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
                   style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
                 >
                   <X className="h-3.5 w-3.5" />
-                  Clear search
+                  {t('top100.clearSearch')}
                 </button>
               ) : (
                 <button
@@ -403,7 +403,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
                   className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium active:scale-[0.97] transition-transform"
                   style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
                 >
-                  Reset filters
+                  {t('top100.resetFilters')}
                 </button>
               )}
             </div>
