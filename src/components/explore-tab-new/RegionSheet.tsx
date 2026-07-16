@@ -132,7 +132,7 @@ function SheetRow({
         <div
           style={{
             fontSize: 15,
-            fontWeight: isActive ? 800 : 600,
+            fontWeight: isActive ? 700 : 600,
             color: '#0F172A',
             letterSpacing: '-0.01em',
           }}
