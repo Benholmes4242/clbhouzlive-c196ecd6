@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useNavigate } from 'react-router-dom';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNowAgo } from '@/i18n/format';
 import { Heart, MessageCircle, Share2, MapPin, X } from 'lucide-react';
 import { getRatingTier, getRatingTierLabel } from '@/lib/ratingTier';
 
@@ -89,7 +89,7 @@ export const LoopCard = React.memo(function LoopCard({
   const thumbnailUrl = firstMedia?.thumbnailUrl || firstMedia?.imageUrl || '';
   const duration = firstMedia?.duration || 0;
   const hlsUrl = firstMedia?.hlsUrl;
-  const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
+  const timeAgo = formatDistanceToNowAgo(new Date(post.createdAt));
   const aspectClass = getMediaAspectClass(post);
   const tileRef = useRef<HTMLDivElement>(null);
 

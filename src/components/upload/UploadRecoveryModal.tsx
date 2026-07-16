@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { CloudUpload, Upload, Trash2, Clock, Image, Video, AlertCircle } from 'lucide-react';
 import { PersistedUploadJob } from '@/lib/uploadDatabase';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNowAgo } from '@/i18n/format';
 
 interface UploadRecoveryModalProps {
   open: boolean;
@@ -67,7 +67,7 @@ export function UploadRecoveryModal({
             const percentage = job.totalBytes > 0 
               ? Math.round((job.uploadedBytes / job.totalBytes) * 100)
               : 0;
-            const timeAgo = formatDistanceToNow(job.createdAt, { addSuffix: true });
+            const timeAgo = formatDistanceToNowAgo(job.createdAt);
 
             return (
               <div 
