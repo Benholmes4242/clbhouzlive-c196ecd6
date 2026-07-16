@@ -91,10 +91,10 @@ function UploadingState({ result, onDone }: Props) {
   const isScheduled = !!result.isScheduled;
 
   if (phase === 'complete') {
-    const label = isScheduled ? 'Scheduled' : 'Posted';
+    const label = isScheduled ? t('composer:success.scheduled') : t('composer:success.posted');
     const copy = isScheduled
-      ? "It is queued and will go out on time."
-      : "It is live. Pull to refresh if you don't see it yet.";
+      ? t('composer:success.scheduledBody')
+      : t('composer:success.postedBody');
     return (
       <ImmersiveSuccessShell onTapClose={onDone} showTapHint>
         <Column>
@@ -107,14 +107,14 @@ function UploadingState({ result, onDone }: Props) {
   }
 
   if (phase === 'failed') {
-    const copy = errorText || 'Something went wrong - your post was not published.';
+    const copy = errorText || t('composer:success.uploadFailedFallback');
     return (
       <ImmersiveSuccessShell onTapClose={onDone}>
         <Column>
           <GlyphTile accent={NEUTRAL} noGlow>
             <AlertTriangle size={40} color="rgba(255,255,255,0.85)" strokeWidth={2.25} />
           </GlyphTile>
-          <Label>Upload failed</Label>
+          <Label>{t('composer:success.uploadFailed')}</Label>
           <Copy>{copy}</Copy>
           <DonePill onClick={onDone} />
         </Column>
@@ -126,11 +126,11 @@ function UploadingState({ result, onDone }: Props) {
     <ImmersiveSuccessShell onTapClose={onDone}>
       <Column>
         <RingTile progress={progress} accent={AMBER} />
-        <Label>{isScheduled ? 'Scheduled' : 'Posting...'}</Label>
+        <Label>{isScheduled ? t('composer:success.scheduled') : t('composer:success.posting')}</Label>
         <Copy>
           {isScheduled && result.scheduledAt
-            ? `Uploading - it'll go out ${formatSchedule(new Date(result.scheduledAt))}.`
-            : "Uploading - we'll take it from here. You can keep using the app."}
+            ? t('composer:success.uploadingScheduledBody', { when: formatSchedule(new Date(result.scheduledAt)) })
+            : t('composer:success.uploadingBody')}
         </Copy>
         <DonePill onClick={onDone} />
       </Column>
@@ -170,6 +170,7 @@ function Copy({ children }: { children: React.ReactNode }) {
 }
 
 function DonePill({ onClick }: { onClick: () => void }) {
+  const { t } = useTranslation('common');
   return (
     <button
       type="button"
@@ -186,7 +187,7 @@ function DonePill({ onClick }: { onClick: () => void }) {
         cursor: 'pointer',
       }}
     >
-      Done
+      {t('action.done')}
     </button>
   );
 }
