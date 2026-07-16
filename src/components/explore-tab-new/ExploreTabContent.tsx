@@ -222,8 +222,10 @@ function LegendarySection({
 
       <AcesAlbatrossesPodium
         region={region}
+        mode={mode}
         onViewAll={openSheet}
         onRowTap={onLeaderTap}
+        onLatestRowTap={onRowTap}
       />
       <TierSeeAllSheet
         open={sheetOpen}
@@ -232,7 +234,7 @@ function LegendarySection({
         region={region}
         rows={rows}
         onRowTap={onRowTap}
-        initialMode="alltime"
+        initialMode={mode}
         initialMetric={sheetMetric}
       />
     </section>
