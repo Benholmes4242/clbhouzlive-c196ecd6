@@ -10,7 +10,10 @@ import i18next from "eslint-plugin-i18next";
 // object; setting the rule to bare "error" would replace the whole rule
 // config and silently disable the widened jsx-attributes audit.
 const i18nLiteralOptions = {
-  mode: "jsx-text-only",
+  // mode 'jsx-only' scans JSX text AND JSX attributes (filtered by the
+  // include/exclude lists below). The prior 'jsx-text-only' mode
+  // silently skipped every attribute regardless of jsx-attributes config.
+  mode: "jsx-only",
   "should-validate-template": false,
   "jsx-attributes": {
     include: ["placeholder", "title", "aria-label", "alt", "label"],
