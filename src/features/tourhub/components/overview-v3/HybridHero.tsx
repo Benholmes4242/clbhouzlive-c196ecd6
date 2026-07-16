@@ -310,9 +310,9 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
   // Compute hours-until-start for the cinematic upcoming countdown
   const datesStringForHero =
     startD && endD
-      ? `${format(startD, 'MMM d').toUpperCase()} – ${format(endD, 'd').toUpperCase()}`
+      ? `${formatMonthDay(startD).toUpperCase()} \u2013 ${endD.getDate()}`
       : endD
-        ? format(endD, 'MMM d').toUpperCase()
+        ? formatMonthDay(endD).toUpperCase()
         : null;
 
   if (useCinematicFrame && !(state.kind === 'results' && state.variant === 'cancelled')) {
