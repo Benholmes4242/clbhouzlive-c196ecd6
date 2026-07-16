@@ -1,8 +1,15 @@
 import { useMemo } from 'react';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { SC_ACE, SC_ALBATROSS, SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
-import { useRegionLegendaryLeaders, type LegendaryLeaderRow } from './hooks/useRegionFeats';
+import {
+  useRegionLegendaryLeaders,
+  useRegionFeats,
+  type LegendaryLeaderRow,
+  type FeatRow,
+  type RecordsMode,
+} from './hooks/useRegionFeats';
 import { FONT } from './gamingLightTokens';
+import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 
 const AMBER = '#F7931E';
 const INK = '#0F172A';
@@ -41,17 +48,42 @@ function toLeaders(rows: LegendaryLeaderRow[], metric: Metric): LegendaryLeaderR
     .slice(0, PODIUM_ROWS);
 }
 
-interface Props {
-  region: string | null;
-  onViewAll: (metric: Metric) => void;
-  onRowTap?: (userId: string) => void;
+function toLatest(rows: FeatRow[], metric: Metric): FeatRow[] {
+  const wanted = metric === 'aces' ? 'ace' : 'albatross';
+  const dateOf = (r: FeatRow) => r.play_date ?? r.attained_at ?? '';
+  return rows
+    .filter((r) => (r.feat_type ?? '').toLowerCase() === wanted)
+    .slice()
+    .sort((a, b) => dateOf(b).localeCompare(dateOf(a)))
+    .slice(0, PODIUM_ROWS);
 }
 
-export function AcesAlbatrossesPodium({ region, onViewAll, onRowTap }: Props) {
-  const { data } = useRegionLegendaryLeaders(region);
-  const rows = data ?? [];
-  const aceRows = useMemo(() => toLeaders(rows, 'aces'), [rows]);
-  const albRows = useMemo(() => toLeaders(rows, 'albatrosses'), [rows]);
+interface Props {
+  region: string | null;
+  mode: RecordsMode;
+  onViewAll: (metric: Metric) => void;
+  onRowTap?: (userId: string) => void;
+  onLatestRowTap?: (row: FeatRow) => void;
+}
+
+export function AcesAlbatrossesPodium({
+  region,
+  mode,
+  onViewAll,
+  onRowTap,
+  onLatestRowTap,
+}: Props) {
+  const { data: leaderData } = useRegionLegendaryLeaders(region);
+  const { data: latestData } = useRegionFeats(region, 'legendary', 'latest');
+  const leaders = leaderData ?? [];
+  const latest = latestData ?? [];
+
+  const aceLeaderRows = useMemo(() => toLeaders(leaders, 'aces'), [leaders]);
+  const albLeaderRows = useMemo(() => toLeaders(leaders, 'albatrosses'), [leaders]);
+  const aceLatestRows = useMemo(() => toLatest(latest, 'aces'), [latest]);
+  const albLatestRows = useMemo(() => toLatest(latest, 'albatrosses'), [latest]);
+
+  const isAllTime = mode === 'alltime';
 
   return (
     <div
@@ -62,40 +94,57 @@ export function AcesAlbatrossesPodium({ region, onViewAll, onRowTap }: Props) {
         fontFamily: FONT,
       }}
     >
-      <PodiumCard
-        title="Most aces"
-        accent={SC_ACE}
-        rows={aceRows}
-        metric="aces"
-        onViewAll={() => onViewAll('aces')}
-        onRowTap={onRowTap}
-      />
-      <PodiumCard
-        title="Most albatrosses"
-        accent={SC_ALBATROSS}
-        rows={albRows}
-        metric="albatrosses"
-        onViewAll={() => onViewAll('albatrosses')}
-        onRowTap={onRowTap}
-      />
+      {isAllTime ? (
+        <>
+          <LeaderPodiumCard
+            title="Most aces"
+            accent={SC_ACE}
+            rows={aceLeaderRows}
+            metric="aces"
+            onViewAll={() => onViewAll('aces')}
+            onRowTap={onRowTap}
+          />
+          <LeaderPodiumCard
+            title="Most albatrosses"
+            accent={SC_ALBATROSS}
+            rows={albLeaderRows}
+            metric="albatrosses"
+            onViewAll={() => onViewAll('albatrosses')}
+            onRowTap={onRowTap}
+          />
+        </>
+      ) : (
+        <>
+          <LatestPodiumCard
+            title="Latest aces"
+            accent={SC_ACE}
+            rows={aceLatestRows}
+            onViewAll={() => onViewAll('aces')}
+            onRowTap={onLatestRowTap}
+          />
+          <LatestPodiumCard
+            title="Latest albatrosses"
+            accent={SC_ALBATROSS}
+            rows={albLatestRows}
+            onViewAll={() => onViewAll('albatrosses')}
+            onRowTap={onLatestRowTap}
+          />
+        </>
+      )}
     </div>
   );
 }
 
-function PodiumCard({
+function CardShell({
   title,
   accent,
-  rows,
-  metric,
   onViewAll,
-  onRowTap,
+  children,
 }: {
   title: string;
   accent: string;
-  rows: LegendaryLeaderRow[];
-  metric: Metric;
   onViewAll: () => void;
-  onRowTap?: (userId: string) => void;
+  children: React.ReactNode;
 }) {
   return (
     <div
@@ -148,18 +197,46 @@ function PodiumCard({
           All ›
         </button>
       </div>
+      {children}
+    </div>
+  );
+}
+
+function EmptyBoard() {
+  return (
+    <div
+      style={{
+        padding: '22px 4px',
+        textAlign: 'center',
+        fontSize: 12,
+        fontWeight: 600,
+        color: INK_MUTE,
+      }}
+    >
+      None yet
+    </div>
+  );
+}
+
+function LeaderPodiumCard({
+  title,
+  accent,
+  rows,
+  metric,
+  onViewAll,
+  onRowTap,
+}: {
+  title: string;
+  accent: string;
+  rows: LegendaryLeaderRow[];
+  metric: Metric;
+  onViewAll: () => void;
+  onRowTap?: (userId: string) => void;
+}) {
+  return (
+    <CardShell title={title} accent={accent} onViewAll={onViewAll}>
       {rows.length === 0 ? (
-        <div
-          style={{
-            padding: '22px 4px',
-            textAlign: 'center',
-            fontSize: 12,
-            fontWeight: 600,
-            color: INK_MUTE,
-          }}
-        >
-          None yet
-        </div>
+        <EmptyBoard />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           {rows.map((r, i) => {
@@ -191,7 +268,6 @@ function PodiumCard({
                   marginTop: isTop ? 0 : 8,
                   border: 'none',
                   background: 'transparent',
-                  // Hairline inset past the avatar column (avatar 26 + gap 9 = 35px)
                   backgroundImage: isTop
                     ? 'none'
                     : `linear-gradient(to right, transparent 35px, ${HAIRLINE} 35px)`,
@@ -271,9 +347,116 @@ function PodiumCard({
           })}
         </div>
       )}
-    </div>
+    </CardShell>
   );
 }
 
+function LatestPodiumCard({
+  title,
+  accent,
+  rows,
+  onViewAll,
+  onRowTap,
+}: {
+  title: string;
+  accent: string;
+  rows: FeatRow[];
+  onViewAll: () => void;
+  onRowTap?: (row: FeatRow) => void;
+}) {
+  return (
+    <CardShell title={title} accent={accent} onViewAll={onViewAll}>
+      {rows.length === 0 ? (
+        <EmptyBoard />
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {rows.map((r, i) => {
+            const isFirst = i === 0;
+            const name = formatHolderName(r.holder_name);
+            const when = r.play_date ?? r.attained_at ?? null;
+            const canTap = !!(r.score_id || r.user_id);
+            const handleTap = () => {
+              if (canTap && onRowTap) onRowTap(r);
+            };
+            return (
+              <button
+                key={`${r.score_id ?? r.user_id ?? name}-${i}`}
+                type="button"
+                onClick={handleTap}
+                className="text-left active:opacity-80 transition-opacity"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 9,
+                  padding: 0,
+                  paddingTop: isFirst ? 0 : 7,
+                  marginTop: isFirst ? 0 : 8,
+                  border: 'none',
+                  background: 'transparent',
+                  backgroundImage: isFirst
+                    ? 'none'
+                    : `linear-gradient(to right, transparent 35px, ${HAIRLINE} 35px)`,
+                  backgroundRepeat: 'no-repeat',
+                  backgroundSize: '100% 0.5px',
+                  backgroundPosition: '0 0',
+                  cursor: canTap ? 'pointer' : 'default',
+                  fontFamily: FONT,
+                }}
+              >
+                <SquircleAvatar
+                  size={26}
+                  srcCandidates={r.holder_avatar ? [r.holder_avatar] : []}
+                  alt={name}
+                  fallback={initials(name)}
+                  userId={r.user_id}
+                  hairlineRing
+                  ringColor={LIGHT_HAIRLINE}
+                />
+                <div
+                  style={{
+                    flex: 1,
+                    minWidth: 0,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: 11.5,
+                      fontWeight: 600,
+                      color: INK,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {name}
+                  </div>
+                  <div
+                    style={{
+                      marginTop: 1,
+                      fontSize: 11,
+                      fontWeight: 500,
+                      color: 'rgba(15,23,42,0.45)',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {r.course_name}
+                    {when ? ` · ${relativeTime(when)}` : ''}
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </CardShell>
+  );
+}
 
 export default AcesAlbatrossesPodium;
