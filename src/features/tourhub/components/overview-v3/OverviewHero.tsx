@@ -1,29 +1,22 @@
 /**
- * OverviewHero — self-contained hero for the Tour Hub Overview tab.
- * All states (live / results / upcoming / cancelled) route through HybridHero,
- * which derives the visual state internally via deriveHeroState and renders
- * the unified CinematicFrame capsule. Filter mode: the tour picker locks the
- * carousel to a single tour's slides (never drifts across tours). Default
- * selection is 'pga' so the hero opens on PGA. Swipe + dots, tap-jump.
+ * OverviewHero — Hero River. The carousel crosses ALL tours in the
+ * editorial order returned by useHeroCarouselData (LIVE→majors→rest).
+ * Swipe / chevrons change the tournament AND the tour. The picker becomes a
+ * jump-to shortcut via selectionNonce. Display reporting is debounced 250ms
+ * so a rapid multi-slide swipe doesn't fan out pulse/OTC/TI fetches per
+ * intermediate slide.
  *
- * ALL hooks run unconditionally before any early return (React #310 safety).
+ * Strict one-way flows preserved: hero never reads viewing* back into its own
+ * index. All hooks run unconditionally before any early return (React #310).
  */
 
 import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useHeroCarouselData, type HeroSlide } from '../../hooks/useHeroCarouselData';
 import { HybridHero } from './HybridHero';
 import { useTourSelection } from '../../context/TourSelectionContext';
 import { INK_TINT_06 } from '../../_shared/tokens';
-
-function shuffle<T>(input: T[]): T[] {
-  const a = [...input];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
 
 const NOOP = () => {};
 
@@ -34,43 +27,52 @@ interface OverviewHeroProps {
 export function OverviewHero({ height = 528 }: OverviewHeroProps) {
   const { data: rawSlides = [], isLoading } = useHeroCarouselData();
 
-  const { selectedTourSlug, selectedTournamentId, selectionNonce, setViewingTourSlug, setViewingTournamentId } = useTourSelection();
+  const {
+    selectedTourSlug,
+    selectedTournamentId,
+    selectionNonce,
+    setViewingTourSlug,
+    setViewingTournamentId,
+  } = useTourSelection();
 
-  // Filter mode: carousel is scoped to the selected tour's slides only. If the
-  // picker has no selection yet (null), fall back to all raw slides so the
-  // hero has something to paint during the initial paint.
-  const filteredSlides = useMemo<HeroSlide[]>(() => {
-    if (!Array.isArray(rawSlides) || rawSlides.length === 0) return [];
-    if (!selectedTourSlug) return rawSlides;
-    return rawSlides.filter((s) => s.tournament.tourSlug === selectedTourSlug);
-  }, [rawSlides, selectedTourSlug]);
+  // Hero River: trust the hook's editorial order. No per-tour filter, no shuffle.
+  const slides = rawSlides;
+  const count = slides.length;
 
   const idSignature = useMemo(
-    () => filteredSlides.map((s) => s.tournament.id).join('|'),
-    [filteredSlides],
+    () => slides.map((s) => s.tournament.id).join('|'),
+    [slides],
   );
 
-  const slides = useMemo<HeroSlide[]>(() => {
-    if (filteredSlides.length === 0) return [];
-    return shuffle(filteredSlides);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  // Capture the currently-viewed tournament id BEFORE the slide set changes so
+  // we can restore position across background refreshes.
+  const prevIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    prevIdRef.current = slides[activeIndex]?.tournament.id ?? null;
+    // Intentionally not depending on activeIndex change alone — we just need
+    // the freshest value before an idSignature-triggered set change.
+  });
+
+  useEffect(() => {
+    if (count === 0) return;
+    const prevId = prevIdRef.current;
+    const nextIdx = prevId ? slides.findIndex((s) => s.tournament.id === prevId) : -1;
+    setActiveIndex(nextIdx >= 0 ? nextIdx : 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idSignature]);
 
-  const [activeIndex, setActiveIndex] = useState(0);
-  const count = slides.length;
-
-  // Reset to 0 whenever the filtered set changes (e.g. tour switch).
-  useEffect(() => {
-    setActiveIndex(0);
-  }, [idSignature]);
-
-  // Command jump: on every selectTour call (selectionNonce bump), jump to the
-  // exact tournament if provided, otherwise the first slide of the tour.
+  // COMMAND jump: picker → hero. Find the tournament in the river; else the
+  // first slide of the selected tour; else index 0.
   useEffect(() => {
     if (count === 0) return;
     let idx = -1;
     if (selectedTournamentId) {
       idx = slides.findIndex((s) => s.tournament.id === selectedTournamentId);
+    }
+    if (idx < 0 && selectedTourSlug) {
+      idx = slides.findIndex((s) => s.tournament.tourSlug === selectedTourSlug);
     }
     if (idx < 0) idx = 0;
     setActiveIndex(idx);
@@ -83,14 +85,24 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
   const activeSlide = count > 0 ? slides[Math.min(activeIndex, count - 1)] : undefined;
   const viewingSlug = activeSlide?.tournament.tourSlug;
   const viewingTid = activeSlide?.tournament.id ?? null;
-  useEffect(() => {
-    if (viewingSlug) setViewingTourSlug(viewingSlug);
-  }, [viewingSlug, setViewingTourSlug]);
-  useEffect(() => {
-    setViewingTournamentId(viewingTid);
-  }, [viewingTid, setViewingTournamentId]);
 
-  const goTo = useCallback((i: number) => setActiveIndex(i), []);
+  // DEBOUNCED display reporting (4G guard). One trailing-edge write 250ms after
+  // the last swipe/jump — rapid multi-slide sweeps no longer fire pulse/OTC/TI
+  // fetches per intermediate slide.
+  useEffect(() => {
+    const t = setTimeout(() => {
+      if (viewingSlug) setViewingTourSlug(viewingSlug);
+      setViewingTournamentId(viewingTid);
+    }, 250);
+    return () => clearTimeout(t);
+  }, [viewingSlug, viewingTid, setViewingTourSlug, setViewingTournamentId]);
+
+  const goPrev = useCallback(() => {
+    if (count > 1) setActiveIndex((p) => (p - 1 + count) % count);
+  }, [count]);
+  const goNext = useCallback(() => {
+    if (count > 1) setActiveIndex((p) => (p + 1) % count);
+  }, [count]);
 
   const onTouchStart = (e: React.TouchEvent) => {
     touchStartRef.current = e.touches[0].clientX;
@@ -108,16 +120,55 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
 
   if (isLoading || count === 0) {
     return (
-      <div style={{ height, borderRadius: 20, background: `linear-gradient(135deg, ${INK_TINT_06}, rgba(15,23,42,0.02))` }} aria-busy={isLoading} />
+      <div
+        style={{
+          height,
+          borderRadius: 20,
+          background: `linear-gradient(135deg, ${INK_TINT_06}, rgba(15,23,42,0.02))`,
+        }}
+        aria-busy={isLoading}
+      />
     );
   }
 
   const active = slides[Math.min(activeIndex, count - 1)];
+  const showChevrons = count > 1;
+  const showCounter = count > 8;
+
+  const chevronBase: React.CSSProperties = {
+    position: 'absolute',
+    top: '38%',
+    zIndex: 20,
+    width: 34,
+    height: 34,
+    borderRadius: 999,
+    background: 'rgba(255,255,255,0.16)',
+    backdropFilter: 'blur(4px)',
+    WebkitBackdropFilter: 'blur(4px)',
+    border: '0.5px solid rgba(255,255,255,0.22)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: '#fff',
+    cursor: 'pointer',
+    padding: 0,
+  };
 
   return (
-    <div style={{ position: 'relative', width: '100%' }} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
+    <div
+      style={{ position: 'relative', width: '100%' }}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+    >
       <AnimatePresence mode="wait">
-        <motion.div key={active.tournament.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>
+        <motion.div
+          key={active.tournament.id}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.25 }}
+        >
           <HybridHero
             slide={active}
             activeTournamentId={active.tournament.id}
@@ -125,6 +176,80 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
           />
         </motion.div>
       </AnimatePresence>
+
+      {showChevrons && (
+        <>
+          <button
+            type="button"
+            aria-label="Previous tournament"
+            onClick={goPrev}
+            style={{ ...chevronBase, left: 8 }}
+          >
+            <ChevronLeft size={20} strokeWidth={2.25} />
+          </button>
+          <button
+            type="button"
+            aria-label="Next tournament"
+            onClick={goNext}
+            style={{ ...chevronBase, right: 8 }}
+          >
+            <ChevronRight size={20} strokeWidth={2.25} />
+          </button>
+        </>
+      )}
+
+      {/* Dots / counter row */}
+      {count > 1 && (
+        <div
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            bottom: 10,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 6,
+            zIndex: 15,
+            pointerEvents: 'none',
+          }}
+        >
+          {showCounter ? (
+            <div
+              style={{
+                fontFamily: "'Geist', -apple-system, BlinkMacSystemFont, sans-serif",
+                fontSize: 10.5,
+                fontWeight: 800,
+                letterSpacing: '0.08em',
+                color: '#fff',
+                background: 'rgba(10,14,20,0.55)',
+                backdropFilter: 'blur(6px)',
+                WebkitBackdropFilter: 'blur(6px)',
+                padding: '4px 9px',
+                borderRadius: 999,
+                fontVariantNumeric: 'tabular-nums',
+                pointerEvents: 'auto',
+              }}
+            >
+              {activeIndex + 1} / {count}
+            </div>
+          ) : (
+            slides.map((_, i) => (
+              <span
+                key={i}
+                aria-hidden
+                style={{
+                  width: i === activeIndex ? 16 : 5,
+                  height: 5,
+                  borderRadius: 999,
+                  background: i === activeIndex ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.45)',
+                  transition: 'width 200ms ease, background 200ms ease',
+                }}
+              />
+            ))
+          )}
+        </div>
+      )}
     </div>
   );
 }
