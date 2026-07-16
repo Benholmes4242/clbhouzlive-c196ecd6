@@ -284,7 +284,7 @@ function UpcomingAct({
                 <>
                   <span style={{ color: INK_MUTE }}> · first tee </span>
                   <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
-                    {format(new Date(firstTee), 'EEE h:mm a')}
+                    {`${formatWeekdayShort(new Date(firstTee))} ${formatTimeHm(new Date(firstTee))}`}
                   </span>
                 </>
               )}
