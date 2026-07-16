@@ -94,5 +94,110 @@ export default tseslint.config(
     rules: {
       "i18next/no-literal-string": "off",
     },
+  },
+  // ─── Wave 1: format-drift lint guard ─────────────────────────────────
+  // Forbid direct display-formatting calls (toLocaleDateString /
+  // toLocaleTimeString / toLocaleString) and date-fns display imports
+  // (`format`, `formatDistanceToNow`) OUTSIDE src/i18n/. Route through
+  // src/i18n/format.ts wrappers so localisation, byte-parity, and
+  // quirk-replication live in one place. Severity split per Wave 1
+  // burn-down: ERROR on already-swept scope dirs, WARN elsewhere until
+  // sub-batch 1f completes.
+  {
+    // Warn everywhere first, then error-only override below picks up
+    // paths we've fully cleaned.
+    files: ["src/**/*.{ts,tsx}"],
+    ignores: [
+      "src/i18n/**",
+      "src/features/admin/**",
+      "src/perf/**",
+      "src/**/*.test.{ts,tsx}",
+      "src/test/**",
+      "src/mocks/**",
+    ],
+    rules: {
+      "no-restricted-syntax": [
+        "warn",
+        {
+          selector: "CallExpression[callee.property.name='toLocaleDateString']",
+          message: "Use a wrapper from src/i18n/format.ts (e.g. formatDayMonthYearShortGB) instead of Date.prototype.toLocaleDateString().",
+        },
+        {
+          selector: "CallExpression[callee.property.name='toLocaleTimeString']",
+          message: "Use a wrapper from src/i18n/format.ts (e.g. formatTimeHm) instead of Date.prototype.toLocaleTimeString().",
+        },
+        {
+          selector: "CallExpression[callee.property.name='toLocaleString']",
+          message: "Use formatNumber() or another wrapper from src/i18n/format.ts instead of toLocaleString().",
+        },
+      ],
+      "no-restricted-imports": [
+        "warn",
+        {
+          paths: [
+            {
+              name: "date-fns",
+              importNames: ["format", "formatDistanceToNow"],
+              message: "Import the equivalent wrapper from '@/i18n/format' instead of date-fns display helpers.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  // Error-level for paths already swept in Waves 1a–1e + tourhub.
+  {
+    files: [
+      "src/components/courses/**/*.{ts,tsx}",
+      "src/components/championship/**/*.{ts,tsx}",
+      "src/components/leaderboard/**/*.{ts,tsx}",
+      "src/components/leaderboards/**/*.{ts,tsx}",
+      "src/components/course-media-tab/**/*.{ts,tsx}",
+      "src/components/top100/**/*.{ts,tsx}",
+      "src/components/profile/**/*.{ts,tsx}",
+      "src/components/profile-v2/**/*.{ts,tsx}",
+      "src/components/settings/**/*.{ts,tsx}",
+      "src/components/achievements/**/*.{ts,tsx}",
+      "src/components/quest/**/*.{ts,tsx}",
+      "src/components/business/**/*.{ts,tsx}",
+      "src/components/explore-tab-new/**/*.{ts,tsx}",
+      "src/features/tourhub/**/*.{ts,tsx}",
+      "src/pages/**/*.{ts,tsx}",
+    ],
+    ignores: [
+      "src/pages/admin/**",
+      "src/pages/**/*Debug*.{ts,tsx}",
+      "src/pages/AdminSetupPage.tsx",
+      "src/pages/ErrorLogPage.tsx",
+    ],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "CallExpression[callee.property.name='toLocaleDateString']",
+          message: "Use a wrapper from src/i18n/format.ts (e.g. formatDayMonthYearShortGB) instead of Date.prototype.toLocaleDateString().",
+        },
+        {
+          selector: "CallExpression[callee.property.name='toLocaleTimeString']",
+          message: "Use a wrapper from src/i18n/format.ts (e.g. formatTimeHm) instead of Date.prototype.toLocaleTimeString().",
+        },
+        {
+          selector: "CallExpression[callee.property.name='toLocaleString']",
+          message: "Use formatNumber() or another wrapper from src/i18n/format.ts instead of toLocaleString().",
+        },
+      ],
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "date-fns",
+              importNames: ["format", "formatDistanceToNow"],
+              message: "Import the equivalent wrapper from '@/i18n/format' instead of date-fns display helpers.",
+            },
+          ],
+        },
+      ],
+    },
   }
 );
