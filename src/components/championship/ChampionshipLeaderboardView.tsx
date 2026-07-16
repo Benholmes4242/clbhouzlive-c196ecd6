@@ -27,6 +27,7 @@ import type { ChampionshipArenaMode, DivisionSlug } from '@/types/championship';
 import { abbreviateDivision } from '@/types/championship';
 import { supabase } from '@/integrations/supabase/client';
 import { getPageScrollTop, scrollPageTo } from '@/lib/getScrollParent';
+import { formatOrdinal } from '@/i18n/format';
 
 // ─── Persistence helpers ────────────────────────────────────────────
 const STORAGE_KEY_FILTERS = 'championship-leaderboard-filters';
