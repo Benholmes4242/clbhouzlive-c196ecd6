@@ -18,6 +18,7 @@ interface Props {
 }
 
 export default function BottomSheet({ open, title, onClose, children, fullHeight, fixedHeight, bottomOffset }: Props) {
+  const { t } = useTranslation('common');
   if (!open) return null;
   return (
     <div
@@ -57,7 +58,7 @@ export default function BottomSheet({ open, title, onClose, children, fullHeight
             <div style={{ fontSize: 17, fontWeight: 800, color: '#0F172A', letterSpacing: -0.2 }}>{title}</div>
             <button
               onClick={onClose}
-              aria-label="Close"
+              aria-label={t('action.close')}
               style={{ background: 'transparent', border: 0, color: '#1F2428', cursor: 'pointer', padding: 4 }}
             >
               <X size={20} />
