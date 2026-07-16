@@ -1,4 +1,4 @@
-import { memo, useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useHeroStories, type HeroStoryRow, type HeroStoryKind } from './hooks/useHeroStories';
 import { useScorecardOpener } from './useScorecardOpener';
