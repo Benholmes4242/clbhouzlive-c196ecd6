@@ -318,7 +318,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
                         border: 'none',
                         fontFamily: FONT,
                         fontSize: 9.5,
-                        fontWeight: 800,
+                        fontWeight: 700,
                         cursor: 'pointer',
                         letterSpacing: '0.08em',
                         whiteSpace: 'nowrap',
