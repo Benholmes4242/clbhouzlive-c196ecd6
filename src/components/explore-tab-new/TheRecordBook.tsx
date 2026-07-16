@@ -18,12 +18,23 @@ import { SPACE } from '@/lib/spacing';
 import { relativeTime } from '@/utils/relativeTime';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
-const PANEL_BG = '#15171F';
+const INK = '#0F172A';
+const PANEL_BG = 'linear-gradient(180deg, #FCF8F0 0%, #F7F1E4 100%)';
+const PANEL_BORDER = '0.5px solid rgba(158,115,0,0.18)';
+const PANEL_SHADOW = '0 2px 14px rgba(15,23,42,0.05)';
 const GOLD = '#FBBC2E';
+const PARCHMENT_GOLD = '#B8860B';
 const AMBER = '#F7931E';
-const UNDER_PAR = '#FF4D57';
-const HAIRLINE_DARK = 'rgba(255,255,255,0.07)';
-const CONQUEST_HAIRLINE = 'rgba(255,255,255,0.1)';
+const UNDER_PAR = '#D2222D';
+const HAIRLINE = 'rgba(15,23,42,0.08)';
+const CONQUEST_HAIRLINE = 'rgba(15,23,42,0.1)';
+const MUTED = 'rgba(15,23,42,0.5)';
+const FADED = 'rgba(15,23,42,0.35)';
+const GHOST = 'rgba(15,23,42,0.4)';
+const CHIP_BG = 'rgba(15,23,42,0.035)';
+const CHIP_BORDER = 'rgba(15,23,42,0.08)';
+const TRACK_BG = 'rgba(15,23,42,0.08)';
+const AVATAR_RING_MUTED = 'rgba(15,23,42,0.2)';
 
 const REGION_HUMAN: Record<string, string> = {
   'uk-ireland': 'GB&I',
@@ -123,11 +134,12 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
       <div
         style={{
           background: PANEL_BG,
+          border: PANEL_BORDER,
           borderRadius: 20,
           padding: '16px 16px 14px',
           fontFamily: FONT,
-          color: '#FFFFFF',
-          boxShadow: '0 6px 22px rgba(15,23,42,0.16)',
+          color: INK,
+          boxShadow: PANEL_SHADOW,
         }}
       >
         {/* Header */}
@@ -146,7 +158,7 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
                 fontWeight: 800,
                 letterSpacing: '0.14em',
                 textTransform: 'uppercase',
-                color: 'rgba(255,255,255,0.5)',
+                color: MUTED,
                 lineHeight: 1,
               }}
             >
@@ -158,7 +170,7 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
                 fontSize: 19,
                 fontWeight: 800,
                 letterSpacing: '-0.01em',
-                color: '#FFFFFF',
+                color: INK,
                 lineHeight: 1.1,
               }}
             >
@@ -240,7 +252,7 @@ function LedgerRow({
 
   const showToPar = par != null && !isStableford;
   const toParDisplay = showToPar ? toParText(par!) : '—';
-  const toParColor = showToPar && par! < 0 ? UNDER_PAR : '#FFFFFF';
+  const toParColor = showToPar && par! < 0 ? UNDER_PAR : INK;
   const isFirst = rank === 1;
 
   return (
@@ -256,10 +268,10 @@ function LedgerRow({
         width: '100%',
         background: 'transparent',
         border: 'none',
-        borderTop: isFirst ? 'none' : `0.5px solid ${HAIRLINE_DARK}`,
+        borderTop: isFirst ? 'none' : `0.5px solid ${HAIRLINE}`,
         cursor: 'pointer',
         fontFamily: FONT,
-        color: '#FFFFFF',
+        color: INK,
       }}
     >
       {/* Rank */}
@@ -269,7 +281,7 @@ function LedgerRow({
           flexShrink: 0,
           fontSize: 11,
           fontWeight: 800,
-          color: isFirst ? GOLD : 'rgba(255,255,255,0.35)',
+          color: isFirst ? PARCHMENT_GOLD : FADED,
           fontVariantNumeric: 'tabular-nums',
           textAlign: 'center',
         }}
@@ -285,7 +297,7 @@ function LedgerRow({
           alt={holder}
           fallback={initials(holder)}
           hairlineRing
-          ringColor={isFirst ? GOLD : 'rgba(255,255,255,0.2)'}
+          ringColor={isFirst ? GOLD : AVATAR_RING_MUTED}
         />
       </div>
 
@@ -295,7 +307,7 @@ function LedgerRow({
           style={{
             fontSize: 12.5,
             fontWeight: 800,
-            color: '#FFFFFF',
+            color: INK,
             lineHeight: 1.2,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -309,7 +321,7 @@ function LedgerRow({
             marginTop: 2,
             fontSize: 10,
             fontWeight: 600,
-            color: 'rgba(255,255,255,0.45)',
+            color: MUTED,
             lineHeight: 1.2,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -350,7 +362,7 @@ function LedgerRow({
               marginTop: 3,
               fontSize: 9.5,
               fontWeight: 700,
-              color: 'rgba(255,255,255,0.4)',
+              color: GHOST,
               lineHeight: 1,
             }}
           >
@@ -412,7 +424,7 @@ function ConquestsStrip({ userId }: { userId: string | undefined }) {
           fontWeight: 800,
           letterSpacing: '0.14em',
           textTransform: 'uppercase',
-          color: GOLD,
+          color: PARCHMENT_GOLD,
           lineHeight: 1,
           padding: '0 4px 10px',
         }}
@@ -444,19 +456,19 @@ function ConquestChip({ row }: { row: TitleInReach }) {
         flexShrink: 0,
         width: 172,
         borderRadius: 12,
-        background: 'rgba(255,255,255,0.05)',
-        border: '1px solid rgba(255,255,255,0.09)',
+        background: CHIP_BG,
+        border: `1px solid ${CHIP_BORDER}`,
         padding: '10px 11px',
         cursor: 'pointer',
         fontFamily: FONT,
-        color: '#FFFFFF',
+        color: INK,
       }}
     >
       <div
         style={{
           fontSize: 11.5,
           fontWeight: 800,
-          color: '#FFFFFF',
+          color: INK,
           lineHeight: 1.2,
           overflow: 'hidden',
           textOverflow: 'ellipsis',
@@ -486,7 +498,7 @@ function ConquestChip({ row }: { row: TitleInReach }) {
           marginTop: 8,
           height: 4,
           borderRadius: 999,
-          background: 'rgba(255,255,255,0.12)',
+          background: TRACK_BG,
           overflow: 'hidden',
         }}
       >
@@ -504,14 +516,14 @@ function ConquestChip({ row }: { row: TitleInReach }) {
           marginTop: 7,
           fontSize: 10,
           fontWeight: 600,
-          color: 'rgba(255,255,255,0.6)',
+          color: 'rgba(15,23,42,0.6)',
           lineHeight: 1.25,
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
         }}
       >
-        <span style={{ color: GOLD, fontWeight: 800 }}>{gap}</span>
+        <span style={{ color: PARCHMENT_GOLD, fontWeight: 800 }}>{gap}</span>
         {' '}to take it ({row.leader_value})
       </div>
     </button>
