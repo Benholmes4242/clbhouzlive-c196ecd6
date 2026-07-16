@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Users, Trophy, X } from 'lucide-react';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { formatOrdinal } from '@/i18n/format';
 
 interface FriendLeaderboardEntry {
   id: string;
