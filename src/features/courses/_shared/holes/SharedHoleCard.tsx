@@ -311,7 +311,7 @@ export const SharedHoleCard: React.FC<SharedHoleCardProps> = ({
               color: INK_MUTE,
             }}
           >
-            AVG TO PAR
+            {t('courses:holes.avgToPar')}
           </div>
         </div>
 
