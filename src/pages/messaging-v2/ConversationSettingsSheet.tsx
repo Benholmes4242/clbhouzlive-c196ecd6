@@ -57,6 +57,7 @@ const roleLabel = (r: MemberRole): string | null =>
   r === 'owner' ? 'Owner' : r === 'admin' ? 'Admin' : null;
 
 const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onClose }) => {
+  const { t } = useTranslation(['messaging', 'common']);
   const navigate = useNavigate();
   const qc = useQueryClient();
   const actor = useMessagingActor();
