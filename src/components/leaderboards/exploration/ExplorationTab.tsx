@@ -26,6 +26,7 @@ import { ClubSearchBar } from './ClubSearchBar';
 import { CountrySelector } from '../shared/CountrySelector';
 import { EditorialLedeSkeleton } from '../shared/EditorialLedeSkeleton';
 import type { LeaderboardScope, ExplorationLeaderboardEntry } from '@/types/leaderboards';
+import { formatMonthShort, formatYearNumeric } from '@/i18n/format';
 
 // ----------------------------------------------------------------------------
 // Constants
