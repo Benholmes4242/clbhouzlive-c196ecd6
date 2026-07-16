@@ -40,19 +40,22 @@ const SkeletonRow: React.FC = () => (
   </div>
 );
 
-const Spinner: React.FC = () => (
-  <div
-    aria-label="Loading"
-    style={{
-      width: 22,
-      height: 22,
-      borderRadius: '50%',
-      border: '2px solid #E4E7EB',
-      borderTopColor: '#8A9099',
-      animation: 'msg-spin 0.8s linear infinite',
-    }}
-  />
-);
+const Spinner: React.FC = () => {
+  const { t } = useTranslation('messaging');
+  return (
+    <div
+      aria-label={t('a11y.loading')}
+      style={{
+        width: 22,
+        height: 22,
+        borderRadius: '50%',
+        border: '2px solid #E4E7EB',
+        borderTopColor: '#8A9099',
+        animation: 'msg-spin 0.8s linear infinite',
+      }}
+    />
+  );
+};
 
 const InboxV2Page: React.FC = () => {
   const { t } = useTranslation(['messaging', 'common']);
