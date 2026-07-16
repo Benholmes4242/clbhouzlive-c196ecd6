@@ -328,7 +328,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                       fontWeight: 600,
                     }}
                   >
-                    Save
+                    {t('common:action.save')}
                   </button>
                 </div>
               ) : (
