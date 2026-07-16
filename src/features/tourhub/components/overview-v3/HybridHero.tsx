@@ -277,9 +277,9 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
   const endD = tournament.endDate ? new Date(tournament.endDate) : null;
   const datesString =
     startD && endD
-      ? `${format(startD, 'MMM d').toUpperCase()} – ${format(endD, 'd').toUpperCase()}`
+      ? `${formatMonthDay(startD).toUpperCase()} \u2013 ${endD.getDate()}`
       : endD
-        ? format(endD, 'MMM d').toUpperCase()
+        ? formatMonthDay(endD).toUpperCase()
         : null;
   const isPseudoMajor = tournament.tourSlug === 'major';
   const tourLabel = isPseudoMajor
