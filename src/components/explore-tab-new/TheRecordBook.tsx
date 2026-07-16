@@ -178,7 +178,20 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
                 lineHeight: 1,
               }}
             >
-              {`Course records · ${regionUpperFor(region)}`}
+              {mode === 'alltime' ? 'All-time course records' : 'Latest course records'}
+            </div>
+            <div
+              style={{
+                marginTop: 2,
+                fontSize: 9,
+                fontWeight: 600,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+                color: 'rgba(15,23,42,0.4)',
+                lineHeight: 1,
+              }}
+            >
+              {regionUpperFor(region)}
             </div>
             <div
               style={{
