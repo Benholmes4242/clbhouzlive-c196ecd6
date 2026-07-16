@@ -7,11 +7,11 @@
  * Live events with tee-time coverage gain a tappable row that opens
  * the full tee-times sheet (Brief F-TD-4).
  */
-import { format, isSameMonth } from 'date-fns';
 import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
 import { formatPurse } from '../../components/shared/TourHeroHelpers';
 import { SectionEyebrow } from './SectionEyebrow';
 import { FONT, INK, INK_MUTE, INK_FAINT, HAIRLINE_INK_8, SURFACE } from '../../_shared/tokens';
+import { formatNumber, formatTournamentDateRange } from '@/i18n/format';
 
 interface Props {
   meta: TournamentMeta;
@@ -21,13 +21,9 @@ interface Props {
 }
 
 function fmtRange(start: string | null, end: string | null): string | null {
-  if (!start) return null;
-  const s = new Date(start);
-  if (!end) return format(s, 'MMM d, yyyy');
-  const e = new Date(end);
-  if (isSameMonth(s, e)) return `${format(s, 'MMM d')} – ${format(e, 'd, yyyy')}`;
-  return `${format(s, 'MMM d')} – ${format(e, 'MMM d, yyyy')}`;
+  return formatTournamentDateRange(start, end);
 }
+
 
 export function EventInfoSection({ meta, broadcast, onTeeTimesTap, teeTimesRound }: Props) {
   const rows: Array<[string, string]> = [];
@@ -43,7 +39,7 @@ export function EventInfoSection({ meta, broadcast, onTeeTimesTap, teeTimesRound
 
   const py = [
     meta.venue_par != null ? `Par ${meta.venue_par}` : null,
-    meta.venue_yardage != null ? `${meta.venue_yardage.toLocaleString()} yds` : null,
+    meta.venue_yardage != null ? `${formatNumber(meta.venue_yardage)} yds` : null,
   ].filter(Boolean).join(' · ');
   if (py) rows.push(['Par / Yardage', py]);
 

@@ -8,6 +8,7 @@ import { ChevronRight } from 'lucide-react';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import CountryFlag from '@/components/ui/country-flag';
 import { resolvePlayerAvatarCandidates } from '../_shared/resolvePlayerAvatar';
+import { formatNumberMaxFrac } from '@/i18n/format';
 import {
   GOLD_DEEP,
   HAIRLINE_INK_10,
@@ -41,8 +42,8 @@ export interface RankedPlayerRowProps {
 const LIVE_GREEN = '#10B981';
 
 function formatStat(n: number): string {
-  if (Math.abs(n) >= 1000) return n.toLocaleString(undefined, { maximumFractionDigits: 0 });
-  return n.toLocaleString(undefined, { maximumFractionDigits: 2 });
+  if (Math.abs(n) >= 1000) return formatNumberMaxFrac(n, 0);
+  return formatNumberMaxFrac(n, 2);
 }
 
 function RankedPlayerRowInner({

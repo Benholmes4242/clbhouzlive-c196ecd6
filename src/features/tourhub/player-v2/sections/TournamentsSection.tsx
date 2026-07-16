@@ -11,7 +11,7 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { format } from 'date-fns';
+import { formatMonthShort } from '@/i18n/format';
 import type { PlayerTournamentResult } from '../../hooks/usePlayerResults';
 import { tournamentRoute } from '../../routes';
 import { isAnyMajor } from '../../utils/majorScope';
@@ -99,8 +99,8 @@ export function TournamentsSection({
           const isLive = liveTournamentId === r.tournament_id;
           const pos = fmtPosition(r);
           const dt = r.tournament_end_date ? new Date(r.tournament_end_date) : null;
-          const day = dt ? format(dt, 'd') : '';
-          const month = dt ? format(dt, 'MMM').toUpperCase() : '';
+          const day = dt ? String(dt.getDate()) : '';
+          const month = dt ? formatMonthShort(dt).toUpperCase() : '';
           const scoreStr = fmtScore(r.score);
           const scoreColor = isMissed
             ? INK_FAINT

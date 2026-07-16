@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '../_shared/resolvePlayerAvatar';
 import type { RankedRow } from './data/usePlayersRanking';
+import { formatNumberMaxFrac } from '@/i18n/format';
 import {
   GOLD,
   GOLD_BORDER,
@@ -26,8 +27,8 @@ interface Props {
 }
 
 function formatStat(n: number): string {
-  if (Math.abs(n) >= 1000) return n.toLocaleString(undefined, { maximumFractionDigits: 0 });
-  return n.toLocaleString(undefined, { maximumFractionDigits: 2 });
+  if (Math.abs(n) >= 1000) return formatNumberMaxFrac(n, 0);
+  return formatNumberMaxFrac(n, 2);
 }
 
 function PodiumCard({

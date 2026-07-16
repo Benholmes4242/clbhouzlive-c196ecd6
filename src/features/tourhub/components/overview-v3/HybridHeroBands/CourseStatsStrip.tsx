@@ -9,6 +9,7 @@ import { MapPin } from 'lucide-react';
 import { INK, GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants';
 
 import { SLATE_800, WHITE_ALPHA_55 } from '../../../_shared/tokens';
+import { formatNumber } from '@/i18n/format';
 
 export interface CourseStatsStripProps {
   par?: number | null;
@@ -48,7 +49,7 @@ export function CourseStatsStrip({
 }: CourseStatsStripProps) {
   const summaryParts: string[] = [];
   if (par) summaryParts.push(`Par ${par}`);
-  if (yardage) summaryParts.push(`${yardage.toLocaleString()} yds`);
+  if (yardage) summaryParts.push(`${formatNumber(yardage)} yds`);
   const summary = summaryParts.join(' · ') || 'Course preview';
 
   return (

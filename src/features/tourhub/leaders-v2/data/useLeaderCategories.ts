@@ -36,6 +36,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { TourId } from '../../hooks/useOverviewData';
+import { formatCurrencyUsd, formatNumber, formatNumberMaxFrac } from '@/i18n/format';
 
 export interface LeaderRow {
   playerId: string;
@@ -67,7 +68,7 @@ export interface LeaderCategoriesResult {
 function fmtMoneyCompact(v: number): string {
   if (v >= 1_000_000) return `$${(v / 1_000_000).toFixed(2)}M`;
   if (v >= 1_000) return `$${Math.round(v / 1000)}K`;
-  return `$${Math.round(v).toLocaleString()}`;
+  return formatCurrencyUsd(Math.round(v));
 }
 function fmtAvg(v: number): string {
   return v.toFixed(2);
@@ -76,7 +77,7 @@ function fmtAvg3(v: number): string {
   return v.toFixed(3);
 }
 function fmtInt(v: number): string {
-  return Math.round(v).toLocaleString();
+  return formatNumber(Math.round(v));
 }
 function fmtPct(v: number): string {
   return `${v.toFixed(1)}%`;
@@ -187,7 +188,7 @@ async function fetchWorldRankingCat(): Promise<LeaderCategoryDef | null> {
         photoUrl: p.photo_url ?? null,
         tourCode: p.tour_codes?.[0] ?? 'pga',
         value: pts,
-        valueFormatted: pts > 0 ? `${pts.toLocaleString(undefined, { maximumFractionDigits: 2 })}` : `#${i + 1}`,
+        valueFormatted: pts > 0 ? formatNumberMaxFrac(pts, 2) : `#${i + 1}`,
       };
     });
 
@@ -317,7 +318,7 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
         const base = resolve(r)!;
         base.rank = i + 1;
         base.value = Number(r.points);
-        base.valueFormatted = base.value.toLocaleString(undefined, { maximumFractionDigits: 2 });
+        base.valueFormatted = formatNumberMaxFrac(base.value, 2);
         return base;
       });
     if (pointsRows.length >= 3) {

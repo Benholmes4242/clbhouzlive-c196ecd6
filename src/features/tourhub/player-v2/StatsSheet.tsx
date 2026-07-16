@@ -8,6 +8,7 @@
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import type { TourPlayerStatistics } from '../hooks/useTourHubData';
+import { formatCurrencyUsd } from '@/i18n/format';
 import {
   AMBER,
   HAIRLINE_INK_8,
@@ -45,7 +46,7 @@ function fmtYards(v: number | null | undefined): string | null {
 function fmtMoney(v: number | null | undefined): string | null {
   if (v === null || v === undefined || v <= 0) return null;
   if (v >= 1_000_000) return `$${(v / 1_000_000).toFixed(2)}M`;
-  return `$${v.toLocaleString()}`;
+  return formatCurrencyUsd(v);
 }
 
 interface Row {

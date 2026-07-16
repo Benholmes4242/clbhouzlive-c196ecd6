@@ -2,7 +2,7 @@
  * TeeTimesFirstGroups — TD1 first N groups list for upcoming state.
  * Time 15/200 thin + names line beneath.
  */
-import { format } from 'date-fns';
+import { formatTimeHm } from '@/i18n/format';
 import type { TeeGroup } from '../data/useTeeTimesAll';
 import { FONT, INK, INK_MUTE, HAIRLINE_INK_8, SURFACE } from '../../_shared/tokens';
 
@@ -24,7 +24,7 @@ export function TeeTimesFirstGroups({ groups, limit = 5 }: Props) {
         >
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
             <span style={{ fontSize: 15, fontWeight: 200, color: INK, fontVariantNumeric: 'tabular-nums' }}>
-              {format(new Date(g.teeTime), 'h:mm a')}
+              {formatTimeHm(new Date(g.teeTime))}
             </span>
             <span style={{ fontSize: 9, fontWeight: 700, color: INK_MUTE, letterSpacing: '0.10em', textTransform: 'uppercase' }}>
               Tee {g.startingHole}

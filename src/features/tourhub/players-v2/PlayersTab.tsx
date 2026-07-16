@@ -37,6 +37,7 @@ import { usePlayersRanking, type RankedRow } from './data/usePlayersRanking';
 import { useLivePlayerIds } from './data/useLivePlayerIds';
 import { PodiumCards } from './PodiumCards';
 import { RankedPlayerRow } from './RankedPlayerRow';
+import { formatWeekdayLong } from '@/i18n/format';
 
 
 type SortKey = 'ranking' | 'live';
@@ -54,7 +55,7 @@ function formatDayShort(d: string | null | undefined): string | null {
   if (!d) return null;
   const dt = new Date(d);
   if (Number.isNaN(dt.getTime())) return null;
-  return dt.toLocaleDateString(undefined, { weekday: 'long' });
+  return formatWeekdayLong(dt);
 }
 
 export function PlayersTab() {

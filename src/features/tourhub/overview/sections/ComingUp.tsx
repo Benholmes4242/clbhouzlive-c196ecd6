@@ -11,6 +11,7 @@ import { V4, NUMERAL_THIN } from '../tokens';
 import { useComingUp, type ComingUpRow } from '../data/useComingUp';
 import type { TourId } from '../../hooks/useOverviewData';
 import { TOUR_LABEL } from '../../_shared/tourOrder';
+import { formatMonthShort } from '@/i18n/format';
 
 const PAGE_SIZE = 5;
 
@@ -72,7 +73,7 @@ export function ComingUp({ tour }: { tour: TourId | null }) {
                   const soon = r.days_away <= 7;
                   const d = new Date(r.start_date);
                   const day = d.getDate();
-                  const mon = d.toLocaleDateString(undefined, { month: 'short' }).toUpperCase();
+                  const mon = formatMonthShort(d).toUpperCase();
                   return (
                     <button
                       key={r.id}

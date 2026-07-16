@@ -186,6 +186,113 @@ export function formatDateNumeric(d: DateInput): string {
   }).format(toDate(d));
 }
 
+/**
+ * Hour + 2-digit minute time — 12h clock, e.g. "3:45 PM".
+ * Matches `toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })`.
+ * QUIRK: 12-hour clock with AM/PM in en; two-digit minutes; one-or-two-digit hour.
+ * Callers that need uppercase apply `.toUpperCase()` themselves (copy layer).
+ */
+export function formatTimeHm(d: DateInput): string {
+  return new Intl.DateTimeFormat(getActiveLocale(), {
+    hour: 'numeric',
+    minute: '2-digit',
+  }).format(toDate(d));
+}
+
+/**
+ * Long weekday name — "Sunday", "Monday", …
+ * Matches `toLocaleDateString(undefined, { weekday: 'long' })`.
+ */
+export function formatWeekdayLong(d: DateInput): string {
+  return new Intl.DateTimeFormat(getActiveLocale(), { weekday: 'long' }).format(toDate(d));
+}
+
+/**
+ * Month + year, short month — "Jul 2026".
+ * Matches `toLocaleDateString('en-US', { month: 'short', year: 'numeric' })`.
+ */
+export function formatMonthYearShort(d: DateInput): string {
+  return new Intl.DateTimeFormat(getActiveLocale(), {
+    month: 'short',
+    year: 'numeric',
+  }).format(toDate(d));
+}
+
+/**
+ * Short month + day + year — "Jul 16, 2026".
+ * Matches `toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' })`.
+ */
+export function formatMonthDayYearShort(d: DateInput): string {
+  return new Intl.DateTimeFormat(getActiveLocale(), {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  }).format(toDate(d));
+}
+
+/**
+ * US-dollar money in whole/decimal form — `$1,234`.
+ * Matches `$${n.toLocaleString()}` at money display sites (tour purses, prize
+ * money). Currency symbol is fixed English copy for this wave; extraction
+ * moves to i18n copy in Wave ≥ 2.
+ */
+export function formatCurrencyUsd(n: number): string {
+  return `$${formatNumber(n)}`;
+}
+
+/**
+ * Number with a MAX-fraction-digits cap — matches
+ * `n.toLocaleString(undefined, { maximumFractionDigits: max })`.
+ * En output byte-matches the legacy call; groups with commas.
+ */
+export function formatNumberMaxFrac(n: number, max: number): string {
+  return new Intl.NumberFormat(getActiveLocale(), { maximumFractionDigits: max }).format(n);
+}
+
+/**
+ * Short month + numeric day — "Jul 16".
+ * Matches date-fns `format(d, 'MMM d')` for en.
+ */
+export function formatMonthDay(d: DateInput): string {
+  return new Intl.DateTimeFormat(getActiveLocale(), {
+    month: 'short',
+    day: 'numeric',
+  }).format(toDate(d));
+}
+
+/**
+ * Tournament date-range formatter — matches the legacy date-fns composition
+ * used by EventInfoSection / LeaderboardTab:
+ *   only start                       → "MMM d, yyyy"           ("Jul 16, 2026")
+ *   same calendar month              → "MMM d – d, yyyy"       ("Jul 16 – 19, 2026")
+ *   different months (same year+)    → "MMM d – MMM d, yyyy"   ("Jun 30 – Jul 3, 2026")
+ *
+ * QUIRK: en dash (U+2013) separator; comma+year suffix; no year on the left
+ * side when months differ (matches legacy).
+ * QUIRK: month/day ordering is locale-driven via Intl; en output byte-matches
+ * the legacy date-fns emission.
+ */
+export function formatTournamentDateRange(
+  start: DateInput | null | undefined,
+  end: DateInput | null | undefined,
+): string | null {
+  if (start == null) return null;
+  const s = toDate(start);
+  if (end == null) return formatMonthDayYearShort(s);
+  const e = toDate(end);
+  const sameMonth = s.getFullYear() === e.getFullYear() && s.getMonth() === e.getMonth();
+  if (sameMonth) {
+    // "MMM d – d, yyyy"
+    return `${formatMonthDay(s)} \u2013 ${e.getDate()}, ${e.getFullYear()}`;
+  }
+  return `${formatMonthDay(s)} \u2013 ${formatMonthDayYearShort(e)}`;
+}
+
+
+
+
+
+
 
 
 

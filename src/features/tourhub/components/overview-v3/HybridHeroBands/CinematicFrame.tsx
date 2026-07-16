@@ -12,7 +12,7 @@
  */
 
 import React from 'react';
-import { format } from 'date-fns';
+import { formatMonthDay, formatNumber } from '@/i18n/format';
 import { ChevronRight, Crown, Trophy } from 'lucide-react';
 import {
   CINEMATIC_FRAME_HEIGHT,
@@ -595,10 +595,10 @@ export function CinematicFrame({
   if (startD && endD) {
     const sameMonth = startD.getMonth() === endD.getMonth();
     dateRange = sameMonth
-      ? `${format(startD, 'MMM d')}–${format(endD, 'd')}`
-      : `${format(startD, 'MMM d')} – ${format(endD, 'MMM d')}`;
+      ? `${formatMonthDay(startD)}\u2013${endD.getDate()}`
+      : `${formatMonthDay(startD)} \u2013 ${formatMonthDay(endD)}`;
   } else if (endD) {
-    dateRange = format(endD, 'MMM d');
+    dateRange = formatMonthDay(endD);
   }
   const venueLine = [venueName, venueCity].filter(Boolean).join(', ');
 
@@ -774,7 +774,7 @@ export function CinematicFrame({
     const pills = [
       { label: 'PURSE', value: purse != null ? (formatPurse(purse) || '—') : '—' },
       { label: 'PAR', value: venuePar != null ? String(venuePar) : '—' },
-      { label: 'YDS', value: venueYardage != null ? venueYardage.toLocaleString() : '—' },
+      { label: 'YDS', value: venueYardage != null ? formatNumber(venueYardage) : '—' },
     ];
     return (
       <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', marginTop: 6 }}>

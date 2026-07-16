@@ -22,7 +22,8 @@
  */
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { format, differenceInCalendarDays } from 'date-fns';
+import { differenceInCalendarDays } from 'date-fns';
+import { formatWeekdayShort, formatTimeHm } from '@/i18n/format';
 import { TourHubShell } from '../components/TourHubShell';
 
 
@@ -283,7 +284,7 @@ function UpcomingAct({
                 <>
                   <span style={{ color: INK_MUTE }}> · first tee </span>
                   <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
-                    {format(new Date(firstTee), 'EEE h:mm a')}
+                    {`${formatWeekdayShort(new Date(firstTee))} ${formatTimeHm(new Date(firstTee))}`}
                   </span>
                 </>
               )}

@@ -14,7 +14,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { format, isSameMonth } from 'date-fns';
+import { formatMonthDay, formatTournamentDateRange } from '@/i18n/format';
 import { Search, X } from 'lucide-react';
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import { useTourLeaderboard } from '../hooks/useTourHubData';
@@ -33,13 +33,9 @@ const SURFACE = '#F8FAFC';
 const STATUS_LIVE_GREEN = '#22C55E';
 
 function fmtDateRange(start: string | null, end: string | null): string | null {
-  if (!start) return null;
-  const s = new Date(start);
-  if (!end) return format(s, 'MMM d, yyyy');
-  const e = new Date(end);
-  if (isSameMonth(s, e)) return `${format(s, 'MMM d')} \u2013 ${format(e, 'd, yyyy')}`;
-  return `${format(s, 'MMM d')} \u2013 ${format(e, 'MMM d, yyyy')}`;
+  return formatTournamentDateRange(start, end);
 }
+
 
 function StatusChip({
   status,
@@ -96,7 +92,7 @@ function StatusChip({
       </span>
     );
   }
-  const startTxt = startDate ? format(new Date(startDate), 'MMM d').toUpperCase() : '';
+  const startTxt = startDate ? formatMonthDay(new Date(startDate)).toUpperCase() : '';
   return (
     <span
       style={{

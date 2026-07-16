@@ -28,7 +28,7 @@ import { LeaderboardBand } from './HybridHeroBands/LeaderboardBand';
 import { CinematicFrame } from './HybridHeroBands/CinematicFrame';
 import { CinematicHeroFullBleed } from './HybridHeroBands/CinematicHeroFullBleed';
 import { setHeroFullBleed } from '../../_shared/heroFullBleedSignal';
-import { format } from 'date-fns';
+import { formatMonthDay } from '@/i18n/format';
 import {
   deriveHeroState,
   detectTopTie,
@@ -277,9 +277,9 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
   const endD = tournament.endDate ? new Date(tournament.endDate) : null;
   const datesString =
     startD && endD
-      ? `${format(startD, 'MMM d').toUpperCase()} – ${format(endD, 'd').toUpperCase()}`
+      ? `${formatMonthDay(startD).toUpperCase()} \u2013 ${endD.getDate()}`
       : endD
-        ? format(endD, 'MMM d').toUpperCase()
+        ? formatMonthDay(endD).toUpperCase()
         : null;
   const isPseudoMajor = tournament.tourSlug === 'major';
   const tourLabel = isPseudoMajor
@@ -310,9 +310,9 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
   // Compute hours-until-start for the cinematic upcoming countdown
   const datesStringForHero =
     startD && endD
-      ? `${format(startD, 'MMM d').toUpperCase()} – ${format(endD, 'd').toUpperCase()}`
+      ? `${formatMonthDay(startD).toUpperCase()} \u2013 ${endD.getDate()}`
       : endD
-        ? format(endD, 'MMM d').toUpperCase()
+        ? formatMonthDay(endD).toUpperCase()
         : null;
 
   if (useCinematicFrame && !(state.kind === 'results' && state.variant === 'cancelled')) {

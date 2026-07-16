@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { TourPill } from './TourPill';
 import { formatPurse } from './TourHeroHelpers';
 import { AMBER, AMBER_BORDER, INK } from '../../_shared/tokens';
+import { formatNumber } from '@/i18n/format';
 
 interface CompactNextUpProps {
   tournamentId: string;
@@ -48,7 +49,7 @@ export function CompactNextUp({
 
   const stats: { label: string; value: string }[] = [];
   if (par != null) stats.push({ label: 'PAR', value: String(par) });
-  if (yardage != null) stats.push({ label: 'YARDS', value: yardage.toLocaleString() });
+  if (yardage != null) stats.push({ label: 'YARDS', value: formatNumber(yardage) });
   if (purse != null && purse > 0) stats.push({ label: 'PURSE', value: formatPurse(purse) });
 
   const isToday = daysUntil === 0;

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { format } from 'date-fns';
+import { formatTournamentDateRange } from '@/i18n/format';
 import { StatusChip } from './StatusChip';
 import { cn } from '@/lib/utils';
 import { ChevronRight } from 'lucide-react';
@@ -39,7 +39,7 @@ export function EventCard({
   className,
 }: EventCardProps) {
   const displayTour = tourLabel || TOUR_LABELS[tour] || tour;
-  const dateRange = `${format(new Date(startDate), 'MMM d')} – ${format(new Date(endDate), 'd, yyyy')}`;
+  const dateRange = formatTournamentDateRange(startDate, endDate) ?? '';
   
   return (
     <Link

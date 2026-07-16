@@ -1,4 +1,5 @@
 import { AMBER_TINT_12, SLATE_700 } from '../../_shared/tokens';
+import { formatOrdinal } from '@/i18n/format';
 /**
  * RecentResultPill — shows a player's most recent notable finish (last 4 weeks).
  *
@@ -23,10 +24,7 @@ interface RecentResultPillProps {
 }
 
 function ordinal(n: number): string {
-  if (n === 1) return '1st';
-  if (n === 2) return '2nd';
-  if (n === 3) return '3rd';
-  return `${n}th`;
+  return formatOrdinal(n);
 }
 
 export function RecentResultPill({ position, tied }: RecentResultPillProps) {

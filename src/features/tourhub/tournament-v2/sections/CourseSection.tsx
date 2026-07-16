@@ -18,6 +18,7 @@ import {
 } from '../../_shared/tokens';
 import { SharedHoleCard } from '@/features/courses/_shared/holes/SharedHoleCard';
 import type { SharedHole } from '@/features/courses/_shared/holes/types';
+import { formatNumber } from '@/i18n/format';
 
 interface Props { tournamentId: string }
 
@@ -164,7 +165,7 @@ function HolesSheet({
             <ShieldCheck size={13} strokeWidth={2.2} />
             <span>
               <span style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>
-                {totalPlayers.toLocaleString()} player{totalPlayers === 1 ? '' : 's'}
+                {formatNumber(totalPlayers)} player{totalPlayers === 1 ? '' : 's'}
               </span>
               {' \u00B7 field scoring'}
             </span>

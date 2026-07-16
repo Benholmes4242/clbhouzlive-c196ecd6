@@ -6,6 +6,7 @@
 import { Link } from 'react-router-dom';
 import type { TourPlayer } from '../../hooks/useTourHubData';
 import { INK, INK_FAINT, INK_TINT_06, INK_TINT_07, SURFACE } from '../../_shared/tokens';
+import { formatMonthDayYearShort } from '@/i18n/format';
 
 interface AboutSectionProps {
   player: TourPlayer;
@@ -35,11 +36,7 @@ export function AboutSection({ player }: AboutSectionProps) {
   if (player.birth_date) {
     fields.push({
       label: 'Born',
-      value: new Date(player.birth_date).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-      }),
+      value: formatMonthDayYearShort(new Date(player.birth_date)),
     });
   }
   const age = ageOf(player.birth_date);

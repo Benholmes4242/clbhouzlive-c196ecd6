@@ -3,7 +3,7 @@
  * Per §3 + §7 of HYBRID_HERO_IMPLEMENTATION_BRIEF.
  */
 
-import { format } from 'date-fns';
+import { formatMonthDay } from '@/i18n/format';
 import type { HeroTournament } from '../../hooks/useHeroCarouselData';
 import { getScoreColor } from '../../_shared/scoreColor';
 
@@ -194,8 +194,8 @@ export function deriveHeroState(
         variant: 'standard',
         finishDate: tournament.endDate || '',
         meta: start && end
-          ? `${format(start, 'MMM d').toUpperCase()} – ${format(end, 'MMM d').toUpperCase()}`
-          : end ? format(end, 'MMM d').toUpperCase() : '',
+          ? `${formatMonthDay(start).toUpperCase()} \u2013 ${formatMonthDay(end).toUpperCase()}`
+          : end ? formatMonthDay(end).toUpperCase() : '',
       };
     }
     // fall through to upcoming
@@ -210,7 +210,7 @@ export function deriveHeroState(
     kind: 'upcoming',
     variant,
     countdown: start ? formatCountdown(start, now) : '',
-    meta: start ? format(start, 'MMM d').toUpperCase() : '',
+    meta: start ? formatMonthDay(start).toUpperCase() : '',
   };
 }
 

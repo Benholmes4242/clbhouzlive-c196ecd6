@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useLeaderboardRealtime } from './useLeaderboardRealtime';
 import { usePlayerResults } from './usePlayerResults';
+import { formatMonthYearShort } from '@/i18n/format';
 
 export type PlayerState = 'live' | 'recent' | 'inform' | 'inactive';
 
@@ -201,10 +202,8 @@ export function usePlayerState(playerId: string | undefined): PlayerStateData {
 
   // ── 4. Inactive ────────────────────────────────────────────────────────
   const lastEventLabel = mostRecent
-    ? new Date(mostRecent.tournament_end_date).toLocaleDateString('en-US', {
-        month: 'short',
-        year: 'numeric',
-      })
+    ? formatMonthYearShort(new Date(mostRecent.tournament_end_date))
+
     : '—';
 
   return {

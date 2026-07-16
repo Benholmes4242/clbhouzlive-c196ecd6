@@ -29,6 +29,7 @@ import {
 import { NUMERIC_STYLE, AMBER } from '../HybridHero.constants';
 import { TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 import type { DefendingChampData } from '../../../hooks/useTournamentDefendingChamp';
+import { formatNumber } from '@/i18n/format';
 
 // ---- tokens ---------------------------------------------------------------
 
@@ -1158,7 +1159,7 @@ export function CinematicHeroFullBleed({
                 <CourseStat label="PAR" value={String(courseStats.par)} />
               )}
               {courseStats.yardage != null && (
-                <CourseStat label="YARDS" value={courseStats.yardage.toLocaleString()} />
+                <CourseStat label="YARDS" value={formatNumber(courseStats.yardage)} />
               )}
             </div>
           ) : null}

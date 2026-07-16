@@ -27,6 +27,7 @@ import type { ChampionshipArenaMode, DivisionSlug } from '@/types/championship';
 import { abbreviateDivision } from '@/types/championship';
 import { supabase } from '@/integrations/supabase/client';
 import { getPageScrollTop, scrollPageTo } from '@/lib/getScrollParent';
+import { formatOrdinal } from '@/i18n/format';
 
 // ─── Persistence helpers ────────────────────────────────────────────
 const STORAGE_KEY_FILTERS = 'championship-leaderboard-filters';
@@ -52,9 +53,7 @@ function readSavedFilters(): SavedFilters | null {
 
 // ─── Helpers ────────────────────────────────────────────────────────
 function ordinal(n: number): string {
-  const s = ['th', 'st', 'nd', 'rd'];
-  const v = n % 100;
-  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+  return formatOrdinal(n);
 }
 
 function formatDispatchTime(iso: string): string {
