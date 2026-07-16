@@ -92,78 +92,80 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
   const round = parseRoundNumber(data);
 
   return (
-    <SectionShell eyebrow="On the course" eyebrowColor={V4.amber} rightMeta={round != null ? `R${round}` : undefined} style={{ marginTop: SPACE.sectionSection }}>
-      <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 16px 6px', scrollPaddingLeft: 16, scrollSnapType: 'x mandatory' }}>
-        {groups.map((g, gi) => {
-          const thru = groupThru(g);
-          const time = g.tee_time ? new Date(g.tee_time).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toUpperCase() : '';
-          return (
-            <div
-              key={g.group_id ?? gi}
-              style={{
-                minWidth: 218,
-                flexShrink: 0,
-                scrollSnapAlign: 'start',
-                background: V4.surface,
-                border: `0.5px solid ${V4.cardBorder}`,
-                boxShadow: V4.cardShadow,
-                borderRadius: 14,
-                padding: '12px 12px 10px',
-              }}
-            >
-              <div style={{ fontSize: 9.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>
-                {time ? `TEE ${time}` : ''}
-                {time && thru != null ? ' · ' : ''}
-                {thru != null ? `THRU ${thru >= 18 ? 'F' : thru}` : ''}
+    <div style={{ marginTop: SPACE.sectionSection }}>
+      <SectionShell eyebrow="On the course" eyebrowColor={V4.amber} rightMeta={round != null ? `R${round}` : undefined}>
+        <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 16px 6px', scrollPaddingLeft: 16, scrollSnapType: 'x mandatory' }}>
+          {groups.map((g, gi) => {
+            const thru = groupThru(g);
+            const time = g.tee_time ? new Date(g.tee_time).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toUpperCase() : '';
+            return (
+              <div
+                key={g.group_id ?? gi}
+                style={{
+                  minWidth: 218,
+                  flexShrink: 0,
+                  scrollSnapAlign: 'start',
+                  background: V4.surface,
+                  border: `0.5px solid ${V4.cardBorder}`,
+                  boxShadow: V4.cardShadow,
+                  borderRadius: 14,
+                  padding: '12px 12px 10px',
+                }}
+              >
+                <div style={{ fontSize: 9.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>
+                  {time ? `TEE ${time}` : ''}
+                  {time && thru != null ? ' · ' : ''}
+                  {thru != null ? `THRU ${thru >= 18 ? 'F' : thru}` : ''}
+                </div>
+                {(g.players ?? []).slice(0, 3).map((p, pi) => {
+                  const name = p.full_name || p.name || '';
+                  const status = (p.status || '').toUpperCase();
+                  const isCut = status === 'CUT' || status === 'WD' || status === 'DQ';
+                  const display = formatScore(p.today) ?? formatScore(p.score) ?? '—';
+                  return (
+                    <button
+                      key={pi}
+                      type="button"
+                      onClick={() => { if (p.player_id) navigate(`/tourhub/player/${p.player_id}`); }}
+                      disabled={!p.player_id}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 9,
+                        padding: '6px 0',
+                        minHeight: 40,
+                        width: '100%',
+                        background: 'transparent',
+                        border: 'none',
+                        borderTop: pi === 0 ? 'none' : `0.5px solid ${V4.hairline}`,
+                        textAlign: 'left',
+                        cursor: p.player_id ? 'pointer' : 'default',
+                      }}
+                    >
+                      <PlayerAvatar
+                        playerId={name}
+                        playerName={name}
+                        tourCode={tourCode}
+                        photoUrl={p.photo_url ?? null}
+                        size="xs"
+                        ringColor={LIGHT_HAIRLINE}
+                      />
+                      <div style={{ flex: 1, minWidth: 0, fontSize: 12, fontWeight: 700, color: V4.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {name}
+                      </div>
+                      {isCut ? (
+                        <span style={{ fontSize: 9.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em' }}>{status}</span>
+                      ) : (
+                        <span style={{ fontSize: 12.5, fontWeight: 800, color: scoreColor(display), fontVariantNumeric: 'tabular-nums' }}>{display}</span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
-              {(g.players ?? []).slice(0, 3).map((p, pi) => {
-                const name = p.full_name || p.name || '';
-                const status = (p.status || '').toUpperCase();
-                const isCut = status === 'CUT' || status === 'WD' || status === 'DQ';
-                const display = formatScore(p.today) ?? formatScore(p.score) ?? '—';
-                return (
-                  <button
-                    key={pi}
-                    type="button"
-                    onClick={() => { if (p.player_id) navigate(`/tourhub/player/${p.player_id}`); }}
-                    disabled={!p.player_id}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 9,
-                      padding: '6px 0',
-                      minHeight: 40,
-                      width: '100%',
-                      background: 'transparent',
-                      border: 'none',
-                      borderTop: pi === 0 ? 'none' : `0.5px solid ${V4.hairline}`,
-                      textAlign: 'left',
-                      cursor: p.player_id ? 'pointer' : 'default',
-                    }}
-                  >
-                    <PlayerAvatar
-                      playerId={name}
-                      playerName={name}
-                      tourCode={tourCode}
-                      photoUrl={p.photo_url ?? null}
-                      size="xs"
-                      ringColor={LIGHT_HAIRLINE}
-                    />
-                    <div style={{ flex: 1, minWidth: 0, fontSize: 12, fontWeight: 700, color: V4.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {name}
-                    </div>
-                    {isCut ? (
-                      <span style={{ fontSize: 9.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em' }}>{status}</span>
-                    ) : (
-                      <span style={{ fontSize: 12.5, fontWeight: 800, color: scoreColor(display), fontVariantNumeric: 'tabular-nums' }}>{display}</span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          );
-        })}
-      </div>
-    </SectionShell>
+            );
+          })}
+        </div>
+      </SectionShell>
+    </div>
   );
 }
