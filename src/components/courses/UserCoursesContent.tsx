@@ -1,5 +1,6 @@
 
 import React, { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useUserCoursesData } from './user/useUserCoursesData';
 import { useTop100CoursesData } from '@/hooks/useTop100CoursesData';
 import { useMilestoneUnlockDates } from '@/hooks/useMilestoneUnlockDates';
@@ -99,6 +100,7 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
   isOwnProfile = false,
   displayName
 }) => {
+  const { t } = useTranslation('courses');
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<string>('rank-desc');
   const [carouselIndex, setCarouselIndex] = useState(0);
@@ -297,7 +299,7 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
       ) : activeFilter ? (
         <div className="text-center py-12">
           <p className="text-muted-foreground">
-            No courses found in the selected region.
+            {t('userCourses.emptyRegion')}
           </p>
         </div>
       ) : (

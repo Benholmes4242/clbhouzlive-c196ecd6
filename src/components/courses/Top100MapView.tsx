@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import '@/styles/hero-glass.css';
 import {
@@ -71,6 +73,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
   fullHeight = false,
   onClose,
 }) => {
+  const { t } = useTranslation('courses');
   const navigate = useNavigate();
   const { session } = useSupabaseSession();
   
@@ -563,9 +566,9 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
   if (!MAP_CONFIG.TOKEN) {
     return (
       <div className="rounded-sq-lg px-4 py-6 text-center text-sm" style={{ background: '#ffffff', border: '1px dashed rgba(15,23,42,0.15)', color: '#64748B' }}>
-        <p className="font-semibold">Map Temporarily Unavailable</p>
+        <p className="font-semibold">{t('map.unavailableTitle')}</p>
         <p className="mt-1 text-xs text-muted-foreground">
-          The interactive map feature is currently unavailable.
+          {t('map.unavailableBody')}
         </p>
       </div>
     );
@@ -598,7 +601,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center backdrop-blur-sm" style={{ background: 'rgba(26,32,64,0.80)' }}>
             <div className="flex flex-col items-center gap-3">
               <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white/60 animate-spin" />
-              <span className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>Loading map...</span>
+              <span className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>{t('map.loading')}</span>
             </div>
           </div>
         )}
@@ -619,7 +622,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
             position: 'fixed' as const,
           }}
-          aria-label="Go back"
+          aria-label={t('map.backA11y', { defaultValue: 'Go back' })}
         >
           {/* Progress ring — SVG circle, only renders when user has progress */}
           {progressPercent > 0 && (
@@ -661,7 +664,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             border: '1px solid rgba(255,255,255,0.18)',
             boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
           }}
-          aria-label="Reset map view"
+          aria-label={t('map.resetViewA11y', { defaultValue: 'Reset map view' })}
         >
           <RotateCcw className="h-4 w-4 text-white/85" aria-hidden="true" />
         </button>
@@ -677,7 +680,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           >
             <div className="glass-card pointer-events-auto px-4 py-3 rounded-xl text-center">
               <p className="text-sm font-medium text-white/90">
-                ⛳ Tap a course to start your journey
+                {t('map.tapPrompt')}
               </p>
             </div>
           </div>
@@ -784,9 +787,9 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             {/* Right side: count · percent */}
             <div className="flex items-center gap-1.5 text-xs font-medium">
               <span style={{ color: 'rgba(255,255,255,0.70)' }}>
-                {ratedCount} of {officialTotal}
+                {t('map.countOf', { rated: ratedCount, total: officialTotal })}
               </span>
-              <span style={{ color: 'rgba(255,255,255,0.30)' }}>·</span>
+              <span style={{ color: 'rgba(255,255,255,0.30)' }}>{t('map.dotSeparator')}</span>
               <span style={{ color: PLAYED_COLOR }}>{progressPercent}%</span>
             </div>
           </div>
@@ -804,7 +807,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             <div 
               className="flex items-center gap-1 p-1 rounded-xl bg-white/[0.08]"
               role="group"
-              aria-label="Filter courses by status"
+              aria-label={t('map.filterStatusA11y', { defaultValue: 'Filter courses by status' })}
             >
               {(['played', 'want_to_play', 'not_played'] as Exclude<StatusFilter, 'all'>[]).map((filter) => {
                 const isActive = statusFilter === filter;

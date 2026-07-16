@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { Earth } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
@@ -39,6 +40,7 @@ const CourseRankBadges = ({
   showXP = false,
   splitBadges = false
 }: CourseRankBadgesProps) => {
+  const { t } = useTranslation('courses');
   const [openTooltips, setOpenTooltips] = useState<Set<string>>(new Set());
   const isMobile = useIsMobile();
 
@@ -310,7 +312,7 @@ const CourseRankBadges = ({
                   </div>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
-                  <p>Experience Points Earned</p>
+                  <p>{t('card.experiencePoints')}</p>
                 </TooltipContent>
              </Tooltip>
            )}

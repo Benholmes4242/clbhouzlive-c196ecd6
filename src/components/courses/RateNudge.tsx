@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight, Star } from 'lucide-react';
 import { useRateNudgeCourse } from '@/hooks/useRateNudgeCourse';
@@ -11,6 +12,7 @@ interface Props {
 }
 
 const RateNudge: React.FC<Props> = ({ userId, onEmptyFallback }) => {
+  const { t } = useTranslation('courses');
   const navigate = useNavigate();
   const { course, loading } = useRateNudgeCourse(userId);
 
@@ -54,7 +56,7 @@ const RateNudge: React.FC<Props> = ({ userId, onEmptyFallback }) => {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <Star size={14} fill={AMBER} color={AMBER} strokeWidth={0} />
           <span style={{ fontSize: 13, fontWeight: 600, color: INK }}>
-            Rate a course you've played
+            {t('rateNudge.emptyLabel')}
           </span>
         </div>
         <ChevronRight size={14} color={AMBER} strokeWidth={2.5} />
@@ -165,7 +167,7 @@ const RateNudge: React.FC<Props> = ({ userId, onEmptyFallback }) => {
         }}
       >
         <Star size={12} fill="#fff" color="#fff" strokeWidth={0} />
-        Rate
+        {t('rateNudge.rateCta')}
       </div>
     </button>
   );

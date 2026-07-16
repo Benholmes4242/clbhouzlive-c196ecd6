@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Check, Loader2 } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,12 +14,13 @@ interface RequestCourseSheetProps {
 type Status = 'form' | 'submitting' | 'success';
 
 export function RequestCourseSheet({ open, onOpenChange, prefillName, zIndexBase = 10300 }: RequestCourseSheetProps) {
+  const { t } = useTranslation('courses');
   const [status, setStatus] = useState<Status>('form');
   const [name, setName] = useState('');
   const [location, setLocation] = useState('');
   const [note, setNote] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string>("We'll email you when this course is added.");
+  const [successMessage, setSuccessMessage] = useState<string>(t('request.sheet.successBody'));
 
   // Reset on open
   useEffect(() => {
@@ -28,9 +30,9 @@ export function RequestCourseSheet({ open, onOpenChange, prefillName, zIndexBase
       setLocation('');
       setNote('');
       setError(null);
-      setSuccessMessage("We'll email you when this course is added.");
+      setSuccessMessage(t('request.sheet.successBody'));
     }
-  }, [open, prefillName]);
+  }, [open, prefillName, t]);
 
   const canSubmit = name.trim().length > 0 && location.trim().length > 0 && status !== 'submitting';
 
@@ -53,10 +55,11 @@ export function RequestCourseSheet({ open, onOpenChange, prefillName, zIndexBase
         }
         setStatus('success');
       } else {
-        throw new Error(data?.message || 'Something went wrong. Please try again.');
+        throw new Error(data?.message || t('request.sheet.error'));
       }
-    } catch (e: any) {
-      setError(e?.message || 'Something went wrong. Please try again.');
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : undefined;
+      setError(msg || t('request.sheet.error'));
       setStatus('form');
     }
   };
@@ -79,7 +82,7 @@ export function RequestCourseSheet({ open, onOpenChange, prefillName, zIndexBase
               <Check size={28} color="#F7931E" strokeWidth={2.5} />
             </div>
             <h2 id="request-course-title" className="text-[18px] font-semibold text-slate-900 mb-1.5">
-              Thanks — we've got it.
+              {t('request.sheet.successTitle')}
             </h2>
             <p className="text-[14px] text-slate-500 mb-6 max-w-[280px]">{successMessage}</p>
             <button
@@ -88,24 +91,24 @@ export function RequestCourseSheet({ open, onOpenChange, prefillName, zIndexBase
               className="w-full h-11 rounded-[12px] text-[15px] font-semibold text-white"
               style={{ background: '#F7931E' }}
             >
-              Done
+              {t('request.sheet.done')}
             </button>
           </div>
         ) : (
           <>
             <div className="pt-1 pb-4">
               <h2 id="request-course-title" className="text-[18px] font-semibold text-slate-900">
-                Request a course
+                {t('request.sheet.title')}
               </h2>
               <p className="text-[13px] text-slate-500 mt-1 leading-snug">
-                Can't find it? Tell us the name and location and we'll get it added.
+                {t('request.sheet.subtitle')}
               </p>
             </div>
 
             <div className="space-y-3">
               <div>
                 <label className={labelCls} htmlFor="rc-name">
-                  Course name
+                  {t('request.sheet.nameLabel')}
                 </label>
                 <input
                   id="rc-name"
@@ -118,27 +121,28 @@ export function RequestCourseSheet({ open, onOpenChange, prefillName, zIndexBase
               </div>
               <div>
                 <label className={labelCls} htmlFor="rc-location">
-                  Location
+                  {t('request.sheet.locationLabel')}
                 </label>
                 <input
                   id="rc-location"
                   type="text"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
-                  placeholder="Town, region, country"
+                  placeholder={t('request.sheet.locationPlaceholder')}
                   className={inputCls}
                   autoComplete="off"
                 />
               </div>
               <div>
                 <label className={labelCls} htmlFor="rc-note">
-                  Note <span className="text-slate-400 font-normal">(optional)</span>
+                  {t('request.sheet.noteLabel')}{' '}
+                  <span className="text-slate-400 font-normal">{t('request.sheet.optional')}</span>
                 </label>
                 <textarea
                   id="rc-note"
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
-                  placeholder="Anything else? New opening, alternative name…"
+                  placeholder={t('request.sheet.notePlaceholder')}
                   rows={3}
                   className={`${inputCls} h-auto py-2.5 resize-none`}
                 />
@@ -155,10 +159,10 @@ export function RequestCourseSheet({ open, onOpenChange, prefillName, zIndexBase
               {status === 'submitting' ? (
                 <>
                   <Loader2 size={18} className="animate-spin" />
-                  Sending…
+                  {t('request.sheet.sending')}
                 </>
               ) : (
-                'Request course'
+                t('request.sheet.submit')
               )}
             </button>
             {error && (

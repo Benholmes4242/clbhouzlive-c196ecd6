@@ -13,6 +13,7 @@
     "filterAll": "All",
     "filterPhotos": "Photos",
     "filterVideos": "Videos",
+    "filterA11y": "Media filter",
     "addMediaA11y": "Add media",
     "guide": {
       "kicker": "What to share",
@@ -38,10 +39,10 @@
     "overPar": "Over-par",
     "avgToPar": "AVG TO PAR",
     "playsTo": "PLAYS TO <1>{{playsTo}}</1>",
-    "rounds_one": "{{count}} round",
-    "rounds_other": "{{count}} rounds",
-    "players_one": "{{count}} player",
-    "players_other": "{{count}} players"
+    "rounds_one": "{{formattedCount}} round",
+    "rounds_other": "{{formattedCount}} rounds",
+    "players_one": "{{formattedCount}} player",
+    "players_other": "{{formattedCount}} players"
   },
   "scorecard": {
     "syncingTitle": "Scorecard on the way",
@@ -52,5 +53,203 @@
     "toPar": "TO PAR",
     "viewProfile": "View profile",
     "viewCourse": "View course"
+  },
+  "card": {
+    "friendsPlayed_one": "Played by {{count}} friend",
+    "friendsPlayed_other": "Played by {{count}} friends",
+    "yourRating": "Your: {{rating}}",
+    "avgRating": "Avg: {{rating}}",
+    "xpValue": "{{xp}} XP",
+    "rate": "Rate",
+    "played": "Played",
+    "logged": "Logged: {{date}}",
+    "friendsPlayedCount_one": "{{count}} friend played",
+    "friendsPlayedCount_other": "{{count}} friends played",
+    "noFriendsPlayed": "No friends played yet",
+    "aiQuoteLoading": "Generating quote...",
+    "aiQuoteFallback": "A golf experience like no other",
+    "experiencePoints": "Experience Points Earned"
+  },
+  "explorer": {
+    "unableToLoadTitle": "Unable to load courses",
+    "unableToLoadBody": "We couldn't fetch the courses. Please check your connection and try again.",
+    "loadMoreRetry": "Couldn't load more courses · Tap to retry",
+    "allSubRegions": "All sub-regions",
+    "chooseRegionFirst": "Choose a region first",
+    "subRegionA11y": "Select sub-region",
+    "sortA11y": "Sort courses",
+    "countWorldwide_one": "<1>{{formattedCount}}</1> course worldwide",
+    "countWorldwide_other": "<1>{{formattedCount}}</1> courses worldwide",
+    "countInRegion_one": "<1>{{formattedCount}}</1> course in {{region}}",
+    "countInRegion_other": "<1>{{formattedCount}}</1> courses in {{region}}",
+    "results_one": "<1>{{formattedCount}}</1> result",
+    "results_other": "<1>{{formattedCount}}</1> results",
+    "resetFilters": "Reset filters",
+    "searchPlaceholder": "Search by name, county or area…",
+    "searchA11y": "Search golf courses",
+    "searching": "Searching",
+    "filtersA11y": "Course filters",
+    "selectRegionA11y": "Select region",
+    "allRegions": "All Regions"
+  },
+  "searchSheet": {
+    "title": "Choose Golf Club",
+    "closeA11y": "Close search",
+    "placeholder": "Search for a golf course...",
+    "clearSearchA11y": "Clear search",
+    "trouble": "Trouble loading courses",
+    "yourCourses": "Your courses",
+    "outOfTen": "/ 10",
+    "added": "Added",
+    "retry": "Retry",
+    "ratingBullet": "• "
+  },
+  "rateSheet": {
+    "subtitle": "Search any course you've played",
+    "emptyLong": "Type a course name to get started",
+    "searching": "Searching…",
+    "noResults": "No courses found for \"{{query}}\"",
+    "rateAction": "Rate →",
+    "searchPlaceholder": "Search courses…"
+  },
+  "tabs": {
+    "explore": "Explore"
+  },
+  "hero": {
+    "viewCourse": "View course"
+  },
+  "friends": {
+    "signInTitle": "Sign in to see friends' courses",
+    "signInBody": "Discover where your friends have been playing and which courses are trending in your circle.",
+    "signIn": "Sign in"
+  },
+  "rateNudge": {
+    "emptyLabel": "Rate a course you've played",
+    "rateCta": "Rate"
+  },
+  "request": {
+    "hero": {
+      "headline": "Can't find a course?",
+      "headlineWithQuery": "Can't find \"{{query}}\"?",
+      "body": "If a course is missing, tell us and we'll add it to the map.",
+      "perkQuick": "Takes 20 seconds – just name and location",
+      "perkNotify": "We'll notify you the moment it's live",
+      "cta": "Request this course"
+    },
+    "buttonCta": "Request a course",
+    "row": {
+      "title": "Request a course",
+      "subtitle": "Still not the one? Tap to request it."
+    },
+    "sheet": {
+      "successTitle": "Thanks — we've got it.",
+      "successBody": "We'll email you when this course is added.",
+      "done": "Done",
+      "title": "Request a course",
+      "subtitle": "Can't find it? Tell us the name and location and we'll get it added.",
+      "nameLabel": "Course name",
+      "locationLabel": "Location",
+      "locationPlaceholder": "Town, region, country",
+      "noteLabel": "Note",
+      "optional": "(optional)",
+      "notePlaceholder": "Anything else? New opening, alternative name…",
+      "submit": "Request course",
+      "sending": "Sending…",
+      "error": "Something went wrong. Please try again."
+    }
+  },
+  "top100": {
+    "progress_one": "You've rated <1>{{rated}} of {{total}}</1> across {{count}} list",
+    "progress_other": "You've rated <1>{{rated}} of {{total}}</1> across {{count}} lists",
+    "searchPlaceholder": "Search the {{listLabel}} Top 100",
+    "searchA11y": "Search within Top 100 list",
+    "listsA11y": "Top 100 lists",
+    "metaResults_one": "<1>{{count}}</1> result",
+    "metaResults_other": "<1>{{count}}</1> results",
+    "metaCourses_one": "<1>{{count}}</1> course · {{listLabel}}",
+    "metaCourses_other": "<1>{{count}}</1> courses · {{listLabel}}",
+    "clearSearch": "Clear search",
+    "resetFilters": "Reset filters",
+    "sectionTitle": "The world's best"
+  },
+  "map": {
+    "unavailableTitle": "Map Temporarily Unavailable",
+    "unavailableBody": "The interactive map feature is currently unavailable.",
+    "loading": "Loading map...",
+    "tapPrompt": "⛳ Tap a course to start your journey",
+    "countOf": "{{rated}} of {{total}}",
+    "dotSeparator": "·",
+    "backA11y": "Go back",
+    "resetViewA11y": "Reset map view",
+    "filterStatusA11y": "Filter courses by status"
+  },
+  "userCourses": {
+    "emptyRegion": "No courses found in the selected region.",
+    "signInTitle": "User's Golf Courses",
+    "signInBody": "Sign in to view user profiles and course checklists",
+    "signInRequired": "Sign in required",
+    "signInRequiredBody": "Create an account to view user profiles and course information",
+    "loading": "Loading...",
+    "loadingBody": "Loading user profile and course information",
+    "notFound": "User Not Found",
+    "notFoundBody": "The user profile you're looking for doesn't exist or isn't public",
+    "regionalSortView": "Sort & View",
+    "regionalAddCourses": "Add Courses",
+    "showingRegion": "Showing {{region}} courses",
+    "regionalAddCoursesEmoji": "📍",
+    "emptyTop100OwnTitle": "No Top 100 courses rated yet",
+    "emptyTop100OtherTitle": "{{name}} hasn't rated any Top 100 courses yet",
+    "emptyTop100OwnBody": "Explore the world's greatest golf courses and rate them to track your journey",
+    "emptyTop100OtherBody": "Check back later to see their golf course journey",
+    "emptyRecentOwnTitle": "No recent activity",
+    "emptyRecentOtherTitle": "{{name}} has no recent activity",
+    "emptyRecentOwnBody": "Play some courses in the last 30 days and they'll appear here",
+    "emptyRecentOtherBody": "No courses played in the last 30 days"
+  },
+  "review": {
+    "filter": {
+      "title": "Filter by rating",
+      "button": "Filter",
+      "buttonLabel": "Filter: {{label}}. Tap to change.",
+      "buttonLabelDefault": "Filter reviews by rating",
+      "clear": "Clear filter",
+      "optionAll": "All ratings",
+      "optionExceptional": "Exceptional",
+      "optionExcellent": "Excellent",
+      "optionGood": "Good",
+      "optionFair": "Fair",
+      "optionPoor": "Poor"
+    },
+    "subscore": {
+      "design": "Design",
+      "condition": "Condition",
+      "clubhouse": "Clubhouse",
+      "facilities": "Facilities"
+    },
+    "helpful": "Helpful?",
+    "response": {
+      "ownerBadge": "- Owner response",
+      "editA11y": "Edit response",
+      "deleteA11y": "Delete response",
+      "edit": "Edit",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "deleteConfirm": "Delete this response? This cannot be undone.",
+      "reply": "Reply",
+      "saving": "Saving...",
+      "save": "Save",
+      "posting": "Posting...",
+      "post": "Post response",
+      "replyPlaceholder": "Respond as {{business}}...",
+      "verifyLink": "Verify {{business}}",
+      "verifyPrompt": "<1>Verify {{business}}</1> to respond to reviews."
+    },
+    "write": {
+      "title": "Played here?",
+      "body": "Your rating helps golfers worldwide",
+      "rate": "Rate",
+      "emoji": "⭐"
+    },
+    "reportA11y": "Report review"
   }
 }

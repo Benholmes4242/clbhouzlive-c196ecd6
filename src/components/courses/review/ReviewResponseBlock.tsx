@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { Pencil, Trash2 } from 'lucide-react';
@@ -43,6 +44,7 @@ export const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
   courseId,
   viewerClaim,
 }) => {
+  const { t } = useTranslation('courses');
   const canManage =
     !!viewerClaim &&
     viewerClaim.businessId === response.business_id &&
@@ -68,7 +70,7 @@ export const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
   };
 
   const handleDelete = () => {
-    if (!window.confirm('Delete this response? This cannot be undone.')) return;
+    if (!window.confirm(t('review.response.deleteConfirm'))) return;
     deleteMutation.mutate({ responseId: response.id });
   };
 
@@ -98,7 +100,7 @@ export const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
             {response.business_name}
           </span>
           {response.business_is_verified && <VerifiedBadge size="sm" />}
-          <span className="text-xs text-muted-foreground">- Owner response</span>
+          <span className="text-xs text-muted-foreground">{t('review.response.ownerBadge')}</span>
         </div>
       </div>
 
@@ -118,18 +120,18 @@ export const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
                   type="button"
                   onClick={() => { setText(response.response_text); setIsEditing(true); }}
                   className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 active:opacity-70 px-1"
-                  aria-label="Edit response"
+                  aria-label={t('review.response.editA11y')}
                 >
-                  <Pencil className="w-3 h-3" /> Edit
+                  <Pencil className="w-3 h-3" /> {t('review.response.edit')}
                 </button>
                 <button
                   type="button"
                   onClick={handleDelete}
                   disabled={deleteMutation.isPending}
                   className="text-xs text-muted-foreground hover:text-destructive flex items-center gap-1 active:opacity-70 disabled:opacity-50 px-1"
-                  aria-label="Delete response"
+                  aria-label={t('review.response.deleteA11y')}
                 >
-                  <Trash2 className="w-3 h-3" /> Delete
+                  <Trash2 className="w-3 h-3" /> {t('review.response.delete')}
                 </button>
               </>
             )}
@@ -151,7 +153,7 @@ export const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
                 onClick={() => { setIsEditing(false); setText(response.response_text); }}
                 className="text-sm text-muted-foreground active:opacity-70 min-h-[40px] px-2"
               >
-                Cancel
+                {t('review.response.cancel')}
               </button>
               <button
                 type="button"
@@ -159,7 +161,7 @@ export const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
                 disabled={!text.trim() || updateMutation.isPending}
                 className="bg-[#f59e0b] text-white min-h-[40px] rounded-full px-4 text-sm font-medium active:scale-[0.97] transition-transform disabled:opacity-50"
               >
-                {updateMutation.isPending ? 'Saving...' : 'Save'}
+                {updateMutation.isPending ? t('review.response.saving') : t('review.response.save')}
               </button>
             </div>
           </div>
@@ -186,6 +188,7 @@ export const ReplyForm: React.FC<ReplyFormProps> = ({
   onSubmit,
   isSubmitting,
 }) => {
+  const { t } = useTranslation('courses');
   const [expanded, setExpanded] = useState(false);
   const [text, setText] = useState('');
 
@@ -197,7 +200,7 @@ export const ReplyForm: React.FC<ReplyFormProps> = ({
           onClick={() => setExpanded(true)}
           className="text-sm text-[#d97706] font-medium active:opacity-70 transition-opacity min-h-[44px] px-1"
         >
-          Reply
+          {t('review.response.reply')}
         </button>
       </div>
     );
@@ -216,7 +219,7 @@ export const ReplyForm: React.FC<ReplyFormProps> = ({
       <textarea
         value={text}
         onChange={(e) => setText(e.target.value.slice(0, 1000))}
-        placeholder={`Respond as ${businessClaim.businessName}...`}
+        placeholder={t('review.response.replyPlaceholder', { business: businessClaim.businessName })}
         className="w-full min-h-[80px] p-3 text-sm bg-card border border-border rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-border placeholder:text-muted-foreground"
         maxLength={1000}
       />
@@ -228,7 +231,7 @@ export const ReplyForm: React.FC<ReplyFormProps> = ({
             onClick={() => { setExpanded(false); setText(''); }}
             className="text-sm text-muted-foreground active:opacity-70 min-h-[40px] px-2"
           >
-            Cancel
+            {t('review.response.cancel')}
           </button>
           <button
             type="button"
@@ -236,7 +239,7 @@ export const ReplyForm: React.FC<ReplyFormProps> = ({
             disabled={!text.trim() || isSubmitting}
             className="bg-[#f59e0b] text-white min-h-[40px] rounded-full px-4 text-sm font-medium active:scale-[0.97] transition-transform disabled:opacity-50"
           >
-            {isSubmitting ? 'Posting...' : 'Post response'}
+            {isSubmitting ? t('review.response.posting') : t('review.response.post')}
           </button>
         </div>
       </div>
@@ -262,10 +265,14 @@ export const VerifyToRespondPrompt: React.FC<VerifyToRespondPromptProps> = ({
   return (
     <div className="ml-4 mt-2 pl-4 border-l-2 border-border">
       <p className="text-xs text-muted-foreground">
-        <Link to={href} className="font-medium text-[#d97706] active:opacity-70">
-          Verify {businessClaim.businessName}
-        </Link>{' '}
-        to respond to reviews.
+        <Trans
+          i18nKey="review.response.verifyPrompt"
+          ns="courses"
+          values={{ business: businessClaim.businessName }}
+          components={{
+            1: <Link to={href} className="font-medium text-[#d97706] active:opacity-70" />,
+          }}
+        />
       </p>
     </div>
   );

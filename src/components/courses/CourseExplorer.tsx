@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -215,41 +216,49 @@ const InlineLoadingSkeleton = () => (
   </div>
 );
 
-const ErrorState = ({ onRetry }: { onRetry: () => void }) => (
-  <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
-    <div className="w-12 h-12 mx-auto rounded-full bg-destructive/10 flex items-center justify-center">
-      <AlertCircle className="w-6 h-6 text-destructive" />
+const ErrorState = ({ onRetry }: { onRetry: () => void }) => {
+  const { t } = useTranslation('courses');
+  const { t: tc } = useTranslation('common');
+  return (
+    <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
+      <div className="w-12 h-12 mx-auto rounded-full bg-destructive/10 flex items-center justify-center">
+        <AlertCircle className="w-6 h-6 text-destructive" />
+      </div>
+      <h3 className="text-sm font-semibold">{t('explorer.unableToLoadTitle')}</h3>
+      <p className="text-sm text-muted-foreground max-w-xs">
+        {t('explorer.unableToLoadBody')}
+      </p>
+      <button
+        onClick={onRetry}
+        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium active:scale-[0.98] transition-transform"
+        style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
+      >
+        <ChevronDown className="h-4 w-4 rotate-180" />
+        {tc('action.retry')}
+      </button>
     </div>
-    <h3 className="text-sm font-semibold">Unable to load courses</h3>
-    <p className="text-sm text-muted-foreground max-w-xs">
-      We couldn't fetch the courses. Please check your connection and try again.
-    </p>
-    <button
-      onClick={onRetry}
-      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium active:scale-[0.98] transition-transform"
-      style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
-    >
-      <ChevronDown className="h-4 w-4 rotate-180" />
-      Retry
-    </button>
-  </div>
-);
+  );
+};
 
-const InlineRetryCard = ({ onRetry }: { onRetry: () => void }) => (
-  <div className="max-w-md mx-auto mt-4">
-    <button
-      onClick={onRetry}
-      className="w-full flex items-center justify-center gap-2 px-4 py-4 rounded-xl bg-card border border-border text-sm text-muted-foreground transition-colors active:scale-[0.98] active:opacity-70"
-    >
-      <RefreshCw className="w-3.5 h-3.5" />
-      Couldn't load more courses · Tap to retry
-    </button>
-  </div>
-);
+const InlineRetryCard = ({ onRetry }: { onRetry: () => void }) => {
+  const { t } = useTranslation('courses');
+  return (
+    <div className="max-w-md mx-auto mt-4">
+      <button
+        onClick={onRetry}
+        className="w-full flex items-center justify-center gap-2 px-4 py-4 rounded-xl bg-card border border-border text-sm text-muted-foreground transition-colors active:scale-[0.98] active:opacity-70"
+      >
+        <RefreshCw className="w-3.5 h-3.5" />
+        {t('explorer.loadMoreRetry')}
+      </button>
+    </div>
+  );
+};
 
 // ─── Main component ────────────────────────────────────────────────
 
 const CourseExplorer = () => {
+  const { t } = useTranslation('courses');
   const listTopRef = useRef<HTMLDivElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const [searchParams] = useSearchParams();
@@ -468,16 +477,16 @@ const CourseExplorer = () => {
       <div className="relative w-full">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4 z-10" aria-hidden="true" />
         <Input
-          placeholder="Search by name, county or area…"
+          placeholder={t('explorer.searchPlaceholder', { defaultValue: 'Search by name, county or area…' })}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="pl-10 pr-10 h-12 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F7931E]/30 transition-all duration-150 text-base placeholder:text-[15px]"
           style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}` }}
-          aria-label="Search golf courses"
+          aria-label={t('explorer.searchA11y', { defaultValue: 'Search golf courses' })}
           role="searchbox"
         />
         {isFetching && searchTerm && (
-          <div className="absolute right-10 top-1/2 -translate-y-1/2" aria-label="Searching">
+          <div className="absolute right-10 top-1/2 -translate-y-1/2" aria-label={t('explorer.searching', { defaultValue: 'Searching' })}>
             <div className="w-4 h-4 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin" />
           </div>
         )}
@@ -485,7 +494,7 @@ const CourseExplorer = () => {
           <button
             onClick={() => setSearchTerm('')}
             className="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 text-muted-foreground active:opacity-70 transition-opacity"
-            aria-label="Clear search"
+            aria-label={t('searchSheet.clearSearchA11y')}
           >
             <X className="h-4 w-4" />
           </button>
@@ -493,7 +502,7 @@ const CourseExplorer = () => {
       </div>
 
       {/* Region + sub-region filters */}
-      <div className="flex items-center gap-3" role="group" aria-label="Course filters" onClick={(e) => e.stopPropagation()} onTouchEnd={(e) => e.stopPropagation()}>
+      <div className="flex items-center gap-3" role="group" aria-label={t('explorer.filtersA11y', { defaultValue: 'Course filters' })} onClick={(e) => e.stopPropagation()} onTouchEnd={(e) => e.stopPropagation()}>
         {/* Primary region */}
         <div className="flex-1">
           <Select value={selectedRegion} onValueChange={(value) => {
@@ -503,11 +512,11 @@ const CourseExplorer = () => {
             <SelectTrigger 
               className="h-11 w-full rounded-2xl justify-between text-base focus:outline-none data-[state=open]:ring-0 transition-all duration-150"
               style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}` }}
-              aria-label="Select region"
+              aria-label={t('explorer.selectRegionA11y', { defaultValue: 'Select region' })}
             >
               <div className="flex items-center">
                 <MapPin className="mr-2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
-                <SelectValue placeholder="All Regions" />
+                <SelectValue placeholder={t('explorer.allRegions', { defaultValue: 'All Regions' })} />
               </div>
             </SelectTrigger>
             <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg animate-in fade-in-0 zoom-in-95 duration-150">
@@ -530,12 +539,12 @@ const CourseExplorer = () => {
             <SelectTrigger 
               className="h-11 w-full rounded-2xl justify-between text-base focus:outline-none data-[state=open]:ring-0 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
               style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}` }}
-              aria-label="Select sub-region"
+              aria-label={t('explorer.subRegionA11y')}
             >
-              <SelectValue placeholder={selectedRegion === PRIMARY_REGIONS.ALL ? "Choose a region first" : "All sub-regions"} />
+              <SelectValue placeholder={selectedRegion === PRIMARY_REGIONS.ALL ? t('explorer.chooseRegionFirst') : t('explorer.allSubRegions')} />
             </SelectTrigger>
             <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg animate-in fade-in-0 zoom-in-95 duration-150">
-              <SelectItem value="all">All sub-regions</SelectItem>
+              <SelectItem value="all">{t('explorer.allSubRegions')}</SelectItem>
               {selectedRegion !== PRIMARY_REGIONS.ALL && SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>]?.map((s) => (
                 <SelectItem key={s} value={normalizeLabel(s)}>
                   {s}
@@ -555,11 +564,26 @@ const CourseExplorer = () => {
             fontWeight: 500,
           }}>
             {hasSearch ? (
-              <><strong style={{ color: '#0F172A', fontWeight: 700 }}>{formatNumber(totalCount)}</strong> {totalCount === 1 ? 'result' : 'results'}</>
+              <Trans
+                i18nKey={totalCount === 1 ? 'explorer.results_one' : 'explorer.results_other'}
+                ns="courses"
+                values={{ count: totalCount, formattedCount: formatNumber(totalCount) }}
+                components={{ 1: <strong style={{ color: '#0F172A', fontWeight: 700 }} /> }}
+              />
             ) : selectedRegion === PRIMARY_REGIONS.ALL ? (
-              <><strong style={{ color: '#0F172A', fontWeight: 700 }}>{formatNumber(totalCount)}</strong> courses worldwide</>
+              <Trans
+                i18nKey={totalCount === 1 ? 'explorer.countWorldwide_one' : 'explorer.countWorldwide_other'}
+                ns="courses"
+                values={{ count: totalCount, formattedCount: formatNumber(totalCount) }}
+                components={{ 1: <strong style={{ color: '#0F172A', fontWeight: 700 }} /> }}
+              />
             ) : (
-              <><strong style={{ color: '#0F172A', fontWeight: 700 }}>{formatNumber(totalCount)}</strong> courses in {getRegionLabel()}</>
+              <Trans
+                i18nKey={totalCount === 1 ? 'explorer.countInRegion_one' : 'explorer.countInRegion_other'}
+                ns="courses"
+                values={{ count: totalCount, formattedCount: formatNumber(totalCount), region: getRegionLabel() }}
+                components={{ 1: <strong style={{ color: '#0F172A', fontWeight: 700 }} /> }}
+              />
             )}
           </span>
           <AppSelect
@@ -589,7 +613,7 @@ const CourseExplorer = () => {
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium active:scale-[0.98] transition-transform"
               style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
             >
-              Reset filters
+              {t('explorer.resetFilters')}
             </button>
           )}
         </div>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Check, Calendar, Star } from 'lucide-react';
 import { CourseCardModel } from '@/types/courseCard';
@@ -85,7 +86,9 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
   onClick,
   className = '',
 }) => {
+  const { t } = useTranslation('courses');
   const navigate = useNavigate();
+
 
   const handleClick = () => {
     if (onClick) {
@@ -275,12 +278,12 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
             }}
           >
             <Star size={10} fill="white" color="white" />
-            <span style={{ fontSize: 10, fontWeight: 700, color: 'white' }}>Rate</span>
+            <span style={{ fontSize: 10, fontWeight: 700, color: 'white' }}>{t('card.rate')}</span>
           </button>
         ) : showPlayedStatus && isPlayed ? (
           <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-0.5 rounded-sq-pill text-[9px] font-medium shadow-sm bg-emerald-500/90 text-white">
             <Check className="w-2.5 h-2.5" />
-            <span>Played</span>
+            <span>{t('card.played')}</span>
           </div>
         ) : null}
 
@@ -316,15 +319,15 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
             {/* Logged date if present */}
             {loggedDate && (
               <div className="inline-block text-[9px] font-medium text-white/60 mt-0.5">
-                Logged: {formatDayMonthYearShortGB(loggedDate)}
+                {t('card.logged', { date: formatDayMonthYearShortGB(loggedDate) })}
               </div>
             )}
             {/* Friends context */}
             {showFriendsContext && course.context?.friendsPlayedCount != null && (
               <p className="text-[10px] mt-0.5" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 {course.context.friendsPlayedCount > 0
-                  ? `${course.context.friendsPlayedCount} friend${course.context.friendsPlayedCount === 1 ? '' : 's'} played`
-                  : 'No friends played yet'}
+                  ? t('card.friendsPlayedCount', { count: course.context.friendsPlayedCount })
+                  : t('card.noFriendsPlayed')}
               </p>
             )}
           </div>

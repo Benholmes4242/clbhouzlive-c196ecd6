@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 import { useTop100ListSummaries } from '@/hooks/useTop100ListSummaries';
@@ -37,6 +38,7 @@ interface Top100CoursesHubPanelProps {
 }
 
 const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs, rateNudge }) => {
+  const { t } = useTranslation('courses');
   const { user } = useSupabaseSession();
   
   // State — initialised from sessionStorage when available
@@ -225,7 +227,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
             role="section"
             accent="#F7931E"
             kicker="TOP 100"
-            title="The world's best"
+            title={t('top100.sectionTitle', { defaultValue: "The world's best" })}
             cutLine={false}
           />
           {crossListProgress && (
@@ -239,18 +241,23 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
                 fontFamily: "'Geist', sans-serif",
               }}
             >
-              You've rated{' '}
-              <span
-                style={{
-                  color: AMBER,
-                  fontWeight: 700,
-                  fontVariantNumeric: 'tabular-nums',
-                  fontFeatureSettings: '"zero" 0',
+              <Trans
+                i18nKey={crossListProgress.listsStarted === 1 ? 'top100.progress_one' : 'top100.progress_other'}
+                ns="courses"
+                values={{
+                  rated: crossListProgress.totalRated,
+                  total: crossListProgress.totalInStartedLists,
+                  count: crossListProgress.listsStarted,
                 }}
-              >
-                {crossListProgress.totalRated} of {crossListProgress.totalInStartedLists}
-              </span>{' '}
-              across {crossListProgress.listsStarted} {crossListProgress.listsStarted === 1 ? 'list' : 'lists'}
+                components={{
+                  1: <span style={{
+                    color: AMBER,
+                    fontWeight: 700,
+                    fontVariantNumeric: 'tabular-nums',
+                    fontFeatureSettings: '"zero" 0',
+                  }} />,
+                }}
+              />
             </p>
           )}
         </div>
@@ -280,7 +287,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
               }))}
               value={selectedList}
               onChange={(id) => setSelectedList(id)}
-              ariaLabel="Top 100 lists"
+              ariaLabel={t('top100.listsA11y')}
             />
           </div>
         </div>
@@ -293,8 +300,8 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
               <Input
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder={`Search the ${activeListShortLabel} Top 100`}
-                aria-label="Search within Top 100 list"
+                placeholder={t('top100.searchPlaceholder', { listLabel: activeListShortLabel })}
+                aria-label={t('top100.searchA11y')}
                 className="pl-10 pr-10 h-12 rounded-2xl text-base focus-visible:ring-2 focus-visible:ring-[#F7931E]/30 focus-visible:outline-none"
                 style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}` }}
               />
@@ -303,7 +310,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
                   type="button"
                   onClick={() => setSearchTerm('')}
                   className="absolute right-2 top-1/2 -translate-y-1/2 p-2.5 text-muted-foreground active:scale-[0.9] active:opacity-70 transition-all"
-                  aria-label="Clear search"
+                  aria-label={t('top100.clearSearch')}
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -319,16 +326,26 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
                 fontWeight: 500,
               }}>
                 {searchTerm ? (
-                  <><strong style={{ color: INK, fontWeight: 700 }}>{allCourses.length}</strong> {allCourses.length === 1 ? 'result' : 'results'}</>
+                  <Trans
+                    i18nKey={allCourses.length === 1 ? 'top100.metaResults_one' : 'top100.metaResults_other'}
+                    ns="courses"
+                    values={{ count: allCourses.length }}
+                    components={{ 1: <strong style={{ color: INK, fontWeight: 700 }} /> }}
+                  />
                 ) : (
-                  <><strong style={{ color: INK, fontWeight: 700 }}>{totalCoursesInActiveList}</strong> courses · {activeListShortLabel}</>
+                  <Trans
+                    i18nKey={totalCoursesInActiveList === 1 ? 'top100.metaCourses_one' : 'top100.metaCourses_other'}
+                    ns="courses"
+                    values={{ count: totalCoursesInActiveList, listLabel: activeListShortLabel }}
+                    components={{ 1: <strong style={{ color: INK, fontWeight: 700 }} /> }}
+                  />
                 )}
               </span>
               <AppSelect
                 value={sortOption}
                 onChange={(v) => setSortOption(v as Top100SortOption)}
                 options={sortOptions}
-                ariaLabel="Sort courses"
+                ariaLabel={t('explorer.sortA11y')}
                 triggerClassName="h-8 text-[12px] px-3 active:scale-[0.98]"
               />
             </div>
@@ -378,7 +395,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
                   style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
                 >
                   <X className="h-3.5 w-3.5" />
-                  Clear search
+                  {t('top100.clearSearch')}
                 </button>
               ) : (
                 <button
@@ -386,7 +403,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
                   className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium active:scale-[0.97] transition-transform"
                   style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
                 >
-                  Reset filters
+                  {t('top100.resetFilters')}
                 </button>
               )}
             </div>

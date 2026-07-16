@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Plus, MapPin, MapPinPlus, Zap, Bell } from 'lucide-react';
 import { openRequestCourseSheet } from './requestCourseSheetStore';
 
@@ -31,6 +32,7 @@ export function RequestCourseCTA({
   className = '',
   onBeforeOpen,
 }: RequestCourseCTAProps) {
+  const { t } = useTranslation('courses');
   const handleOpen = () => {
     onBeforeOpen?.();
     // Defer a tick so any parent close animations can start cleanly first
@@ -39,7 +41,7 @@ export function RequestCourseCTA({
 
   if (variant === 'hero') {
     const q = (prefillName ?? '').trim();
-    const headline = q ? `Can't find "${truncate(q)}"?` : `Can't find a course?`;
+    const headline = q ? t('request.hero.headlineWithQuery', { query: truncate(q) }) : t('request.hero.headline');
     return (
       <div
         className={`mx-auto w-full overflow-hidden rounded-2xl border border-border/60 bg-white ${className}`}
@@ -86,7 +88,7 @@ export function RequestCourseCTA({
               marginTop: 6,
             }}
           >
-            If a course is missing, tell us and we'll add it to the map.
+            {t('request.hero.body')}
           </p>
         </div>
 
@@ -96,13 +98,13 @@ export function RequestCourseCTA({
             <div className="flex items-center gap-2.5">
               <Zap size={17} color={HERO_ACCENT} strokeWidth={2.25} />
               <span className="text-[13px] text-muted-foreground">
-                Takes 20 seconds – just name and location
+                {t('request.hero.perkQuick')}
               </span>
             </div>
             <div className="flex items-center gap-2.5">
               <Bell size={17} color={HERO_ACCENT} strokeWidth={2.25} />
               <span className="text-[13px] text-muted-foreground">
-                We'll notify you the moment it's live
+                {t('request.hero.perkNotify')}
               </span>
             </div>
           </div>
@@ -120,7 +122,7 @@ export function RequestCourseCTA({
             }}
           >
             <Plus size={18} color="#fff" strokeWidth={2.5} />
-            Request this course
+            {t('request.hero.cta')}
           </button>
         </div>
       </div>
@@ -135,7 +137,7 @@ export function RequestCourseCTA({
         className={`inline-flex items-center justify-center gap-2 h-11 px-4 rounded-[12px] border border-slate-200 bg-white text-[14px] font-semibold text-slate-900 active:bg-slate-50 ${className}`}
       >
         <Plus size={18} color={AMBER} strokeWidth={2.5} />
-        Request a course
+        {t('request.buttonCta')}
       </button>
     );
   }
@@ -155,10 +157,10 @@ export function RequestCourseCTA({
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-[14px] font-semibold truncate" style={{ color: INK }}>
-          Request a course
+          {t('request.row.title')}
         </p>
         <p className="text-[12px] truncate" style={{ color: INK_SOFT }}>
-          Still not the one? Tap to request it.
+          {t('request.row.subtitle')}
         </p>
       </div>
     </button>

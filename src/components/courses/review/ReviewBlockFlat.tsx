@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ThumbsUp, ThumbsDown, MoreHorizontal } from 'lucide-react';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { cn } from '@/lib/utils';
@@ -124,11 +125,11 @@ const ScoreRing: React.FC<{ score: number; size?: number }> = ({ score, size = 4
   );
 };
 
-const SUBSCORE_LABELS: { key: keyof Review; label: string }[] = [
-  { key: 'design_score', label: 'Design' },
-  { key: 'condition_score', label: 'Condition' },
-  { key: 'clubhouse_score', label: 'Clubhouse' },
-  { key: 'facilities_score', label: 'Facilities' },
+const SUBSCORE_LABELS: { key: keyof Review; labelKey: string }[] = [
+  { key: 'design_score', labelKey: 'review.subscore.design' },
+  { key: 'condition_score', labelKey: 'review.subscore.condition' },
+  { key: 'clubhouse_score', labelKey: 'review.subscore.clubhouse' },
+  { key: 'facilities_score', labelKey: 'review.subscore.facilities' },
 ];
 
 export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
@@ -142,13 +143,14 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
   onReportClick,
   disabled,
 }) => {
+  const { t } = useTranslation('courses');
   const { user, score, text, createdAt, isHelpful, isUnhelpful, helpfulCount, isMock, media } = review;
   const [showFull, setShowFull] = useState(false);
 
   const votingDisabled = disabled || isMock || false;
 
   const subscores = SUBSCORE_LABELS
-    .map((s) => ({ label: s.label, value: review[s.key] as number | null | undefined }))
+    .map((s) => ({ label: t(s.labelKey), value: review[s.key] as number | null | undefined }))
     .filter((s) => s.value !== null && s.value !== undefined);
 
   const strippedText = text ? stripMentionMarkup(text) : '';
@@ -250,7 +252,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
-              aria-label="Report review"
+              aria-label={t('review.reportA11y', { defaultValue: 'Report review' })}
             >
               <MoreHorizontal size={18} />
             </button>
@@ -331,7 +333,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
       {/* Helpful row — only for other reviews */}
       {!isMine && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
-          <span style={{ fontSize: 11, color: '#94A3B8', marginRight: 2 }}>Helpful?</span>
+          <span style={{ fontSize: 11, color: '#94A3B8', marginRight: 2 }}>{t('review.helpful')}</span>
           <button
             type="button"
             onClick={() => !votingDisabled && onToggleHelpful?.(review.id, isHelpful ? 'clear' : 'helpful')}

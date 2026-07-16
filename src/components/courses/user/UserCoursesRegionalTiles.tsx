@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { X, Earth, Trophy, TrendingUp, Clock, ChevronRight, Plus } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
@@ -39,6 +40,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
   isOwnProfile = false,
   onAddCoursesClick
 }) => {
+  const { t } = useTranslation('courses');
   const isMobile = useIsMobile();
   const [isSortViewModalOpen, setIsSortViewModalOpen] = useState(false);
 
@@ -212,7 +214,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
             className="flex items-center gap-2 text-base font-medium whitespace-nowrap px-6 py-2 transition-colors rounded-sq-xs bg-muted border border-border text-foreground hover:bg-muted/80"
           >
             <div className="flex items-center gap-2">
-              Sort & View
+              {t('userCourses.regionalSortView')}
               <ChevronRight className="ml-2 h-4 w-4" />
             </div>
           </button>
@@ -224,8 +226,9 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
               className="flex items-center gap-2 text-base font-medium whitespace-nowrap px-6 py-2 transition-colors rounded-sq-xs bg-muted border border-border text-foreground hover:bg-muted/80"
             >
               <div className="flex items-center gap-2">
-                📍 <Plus className="h-4 w-4" />
-                Add Courses
+                <span aria-hidden="true">{t('userCourses.regionalAddCoursesEmoji', { defaultValue: '📍' })}</span>
+                <Plus className="h-4 w-4" />
+                {t('userCourses.regionalAddCourses')}
               </div>
             </button>
           )}
@@ -236,7 +239,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
       {activeFilter && (
         <div className="flex items-center justify-center gap-2 text-sm text-foreground">
           <span>
-            Showing {tiles.find(t => t.key === activeFilter)?.label.replace(' Played', '')} courses
+            {t('userCourses.showingRegion', { region: tiles.find(tl => tl.key === activeFilter)?.label.replace(' Played', '') ?? '' })}
           </span>
         </div>
       )}

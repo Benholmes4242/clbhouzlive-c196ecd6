@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { RequestCourseCTA } from '@/components/courses/RequestCourseCTA';
 import { createPortal } from 'react-dom';
 import { X, MapPin, Search, Check } from 'lucide-react';
@@ -37,6 +38,7 @@ export function CourseSearchSheet({
   existingCourseIds = [],
   slotIndex
 }: CourseSearchSheetProps) {
+  const { t } = useTranslation('courses');
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<Course[]>([]);
   const [focusedIndex, setFocusedIndex] = useState(-1);
@@ -205,13 +207,13 @@ export function CourseSearchSheet({
             <div className="px-5 pb-4">
               <div className="flex items-center justify-between mb-4">
                 <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#1A1A1A' }}>
-                  Choose Golf Club
+                  {t('searchSheet.title')}
                 </h3>
                 <button
                   onClick={onClose}
                   className="w-11 h-11 rounded-full flex items-center justify-center transition-colors active:opacity-60"
                   style={{ backgroundColor: '#F5F5F7', color: '#7A7A7A' }}
-                  aria-label="Close search"
+                  aria-label={t('searchSheet.closeA11y')}
                 >
                   <X className="w-4.5 h-4.5" />
                 </button>
@@ -226,7 +228,7 @@ export function CourseSearchSheet({
                 <input
                   ref={inputRef}
                   type="text"
-                  placeholder="Search for a golf course..."
+                  placeholder={t('searchSheet.placeholder')}
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={handleKeyDown}
@@ -249,7 +251,7 @@ export function CourseSearchSheet({
                     onClick={() => setQuery('')}
                     className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full flex items-center justify-center transition-colors"
                     style={{ color: '#AEAEB2' }}
-                    aria-label="Clear search"
+                    aria-label={t('searchSheet.clearSearchA11y')}
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>
@@ -267,13 +269,13 @@ export function CourseSearchSheet({
                   <SkeletonList rows={6} />
                 ) : error ? (
                   <div className="p-8 text-center">
-                    <p className="text-sm mb-3" style={{ color: '#7A7A7A' }}>Trouble loading courses</p>
+                    <p className="text-sm mb-3" style={{ color: '#7A7A7A' }}>{t('searchSheet.trouble')}</p>
                     <button
                       onClick={() => window.location.reload()}
                       className="text-sm font-medium hover:underline"
                       style={{ color: '#f59e0b' }}
                     >
-                      Retry
+                      {t('searchSheet.retry', { defaultValue: 'Retry' })}
                     </button>
                   </div>
                 ) : items?.length ? (
@@ -284,7 +286,7 @@ export function CourseSearchSheet({
                         className="uppercase tracking-[1.5px] mb-2 mt-1 px-1"
                         style={{ fontSize: '11px', fontWeight: 600, color: '#AEAEB2' }}
                       >
-                        Your courses
+                        {t('searchSheet.yourCourses')}
                       </p>
                     )}
                     {items.map((course, index) => (
@@ -355,6 +357,7 @@ interface ResultRowProps {
 }
 
 function ResultRow({ course, index, onClick, isFocused, onMouseEnter, isAlreadyAdded, isSelecting, isLast, animate }: ResultRowProps) {
+  const { t } = useTranslation('courses');
   const [imgError, setImgError] = useState(false);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -429,11 +432,9 @@ function ResultRow({ course, index, onClick, isFocused, onMouseEnter, isAlreadyA
             <span className="truncate">{course.sub_country || course.region}</span>
             {course.rating != null && (
               <span>
-                •{' '}
-                <span style={{ color: course.rating >= 9.0 ? '#d97706' : '#78716C', fontWeight: 600 }}>
-                  {course.rating.toFixed(1)}
-                </span>
-                <span style={{ color: '#AEAEB2', fontWeight: 400, fontSize: '11px', marginLeft: '2px' }}>/ 10</span>
+                {t('searchSheet.ratingBullet', { defaultValue: '• ' })}
+                <span style={{ color: course.rating >= 9.0 ? '#d97706' : '#78716C', fontWeight: 600 }}>{course.rating.toFixed(1)}</span>
+                <span style={{ color: '#AEAEB2', fontWeight: 400, fontSize: '11px', marginLeft: '2px' }}>{t('searchSheet.outOfTen')}</span>
               </span>
             )}
           </div>
@@ -451,7 +452,7 @@ function ResultRow({ course, index, onClick, isFocused, onMouseEnter, isAlreadyA
             }}
           >
             <Check className="w-3 h-3" style={{ color: '#f59e0b' }} />
-            Added
+            {t('searchSheet.added')}
           </div>
         )}
       </div>

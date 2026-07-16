@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Filter, X, Check } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { Button } from '@/components/ui/button';
@@ -13,14 +14,14 @@ interface RatingFilterChipsProps {
   counts?: Partial<Record<ScoreTier | 'all', number>>;
 }
 
-// Tier-only labels (no numeric ranges)
-const FILTER_OPTIONS: { key: ScoreTier | 'all'; label: string }[] = [
-  { key: 'all', label: 'All ratings' },
-  { key: 'exceptional', label: 'Exceptional' },
-  { key: 'excellent', label: 'Excellent' },
-  { key: 'good', label: 'Good' },
-  { key: 'fair', label: 'Fair' },
-  { key: 'poor', label: 'Poor' },
+// Tier-only labels (no numeric ranges) — labels resolved via t() at render time
+const FILTER_OPTIONS: { key: ScoreTier | 'all'; labelKey: string }[] = [
+  { key: 'all', labelKey: 'review.filter.optionAll' },
+  { key: 'exceptional', labelKey: 'review.filter.optionExceptional' },
+  { key: 'excellent', labelKey: 'review.filter.optionExcellent' },
+  { key: 'good', labelKey: 'review.filter.optionGood' },
+  { key: 'fair', labelKey: 'review.filter.optionFair' },
+  { key: 'poor', labelKey: 'review.filter.optionPoor' },
 ];
 
 export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
@@ -28,12 +29,16 @@ export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
   onChange,
   counts = {},
 }) => {
+  const { t } = useTranslation('courses');
   const [open, setOpen] = useState(false);
 
   const activeLabel =
     value === null
       ? null
-      : FILTER_OPTIONS.find((o) => o.key === value)?.label ?? null;
+      : (() => {
+          const opt = FILTER_OPTIONS.find((o) => o.key === value);
+          return opt ? t(opt.labelKey) : null;
+        })();
 
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -52,15 +57,15 @@ export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
         variant="outline"
         size="sm"
         onClick={() => setOpen(true)}
-        aria-label={activeLabel ? `Filter: ${activeLabel}. Tap to change.` : 'Filter reviews by rating'}
+        aria-label={activeLabel ? t('review.filter.buttonLabel', { label: activeLabel }) : t('review.filter.buttonLabelDefault')}
         className="h-auto py-1 px-2 text-xs"
       >
         <Filter className="h-3 w-3 mr-1" />
-        {activeLabel || 'Filter'}
+        {activeLabel || t('review.filter.button')}
         {activeLabel ? (
           <span
             role="button"
-            aria-label="Clear filter"
+            aria-label={t('review.filter.clear')}
             onClick={handleClear}
             className="inline-flex items-center ml-1"
           >
@@ -85,11 +90,11 @@ export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
               margin: 0,
             }}
           >
-            Filter by rating
+            {t('review.filter.title')}
           </h2>
         </div>
 
-        <div role="radiogroup" aria-label="Filter reviews by rating" style={{ paddingBottom: 12 }}>
+        <div role="radiogroup" aria-label={t('review.filter.buttonLabelDefault')} style={{ paddingBottom: 12 }}>
           {FILTER_OPTIONS.map((option) => {
             const isActive =
               option.key === 'all' ? value === null : value === option.key;
@@ -116,7 +121,7 @@ export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
                   textAlign: 'left',
                 }}
               >
-                <span>{option.label}</span>
+                <span>{t(option.labelKey)}</span>
                 {isActive && (
                   <Check className="h-4 w-4" style={{ color: '#F7931E' }} />
                 )}
