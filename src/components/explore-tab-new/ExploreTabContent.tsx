@@ -7,21 +7,13 @@ import { useExploreRegion } from './hooks/useExploreRegion';
 import { WireTicker } from './WireTicker';
 import { LeadStory } from './LeadStory';
 
+import { AlmanacLens, REGION_TABS } from './AlmanacSections';
 import {
-  AlmanacLens,
-  FeatTierRail,
-  AlmanacHead,
-  REGION_TABS,
-  TIER_ICON,
-} from './AlmanacSections';
-import { FeatCard } from './FeatCard';
-
-import { LegendaryFeatHero } from './LegendaryFeatHero';
-import { LegendaryLeadersBoards } from './LegendaryLeadersBoards';
-import { CountLeadersBoard, type CountLeaderRow } from './CountLeadersBoard';
-import { useRegionFeats, useRegionEagleLeaders, type FeatRow, type RecordsMode } from './hooks/useRegionFeats';
+  useRegionFeats,
+  type FeatRow,
+  type RecordsMode,
+} from './hooks/useRegionFeats';
 import { TierSeeAllSheet } from './TierSeeAllSheet';
-import { SC_EAGLE, SC_EAGLE_DARK } from '@/features/courses/components/holes/_constants';
 
 import { scrollPageToTop } from '@/lib/getScrollParent';
 
@@ -29,8 +21,12 @@ import { SeasonStrip } from './SeasonStrip';
 import { RankIdentityCard } from './RankIdentityCard';
 import { TheRecordBook } from './TheRecordBook';
 
-import { ToughestCoursesRail } from './ToughestCoursesRail';
-import { DiscoverSectionHeader } from './DiscoverSectionHeader';
+import { AcesAlbatrossesPodium } from './AcesAlbatrossesPodium';
+import { EaglesLedger } from './EaglesLedger';
+import { BirdieHaulsLedger } from './BirdieHaulsLedger';
+import { ToughestIndex } from './ToughestIndex';
+import { SectionHead } from './SectionHead';
+
 import { AlmanacEmptyCard } from './AlmanacEmptyCard';
 
 import ExploreGrid from './ExploreGrid';
@@ -45,13 +41,10 @@ interface ExploreTabContentProps {
   shellTabs?: React.ReactNode;
 }
 
-
-
 export default function ExploreTabContent({ embedded: _embedded = false, shellTabs }: ExploreTabContentProps) {
   const { user } = useSupabaseSession();
   const userId = user?.id;
   const gridRef = useRef<HTMLDivElement | null>(null);
-  // THE LENS — single page-level scope. Not persisted; defaults to 'latest' per visit.
   const [scope, setScope] = useState<RecordsMode>('latest');
 
   const { region: activeRegion, setRegion } = useExploreRegion();
@@ -94,28 +87,23 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
     },
     [opener],
   );
+  const handleLeaderTap = useCallback(
+    (uid: string) => opener.openProfile(uid),
+    [opener],
+  );
 
   return (
     <div style={{ background: SLATE_50, minHeight: '100vh' }}>
-      {/* 1. WIRE TICKER — friends achievements as a one-line marquee at the very top */}
       <WireTicker userId={userId} />
 
-      {/* SCOPE 1 — ends where the almanac begins; shell tabs sticky here */}
       <div>
         {shellTabs}
-
-        {/* 2. Season strip */}
         <SeasonStrip />
-
-        {/* 3. Rank identity strip (slim single-row Almanac variant) */}
         <RankIdentityCard userId={userId} variant="strip" />
       </div>
 
-      {/* SCOPE 2 — spans the almanac + everything below; region chips sticky here */}
       <div>
-        {/* pre-chips spacer (chips must be a direct child of SCOPE 2 for sticky bounds) */}
         <div style={{ height: SPACE.sectionSection }} aria-hidden />
-        {/* 4. THE LENS — region + scope in one sticky bar */}
         <AlmanacLens
           region={activeRegion}
           onRegionChange={handleRegionChange}
@@ -123,48 +111,41 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
           onScopeChange={setScope}
         />
 
-        {/* 5. LEAD STORY — cinematic tile driven by the top record for scope/region */}
         <LeadStory region={activeRegion} regionUpper={regionUpper} mode={scope} />
 
-        {/* 6. Empty-region editorial card (only when all four tiers are empty) */}
         <AlmanacEmptyCard region={activeRegion} />
 
-        {/* 7. THE RECORD BOOK — dark panel: 5-row records ledger + personal conquests strip */}
         <TheRecordBook region={activeRegion} opener={opener} mode={scope} userId={userId} />
 
+        {/* Feats: header + aces/albatrosses podium pair */}
+        <LegendarySection
+          region={activeRegion}
+          regionUpper={regionUpper}
+          onRowTap={handleFeatRowTap}
+          onLeaderTap={handleLeaderTap}
+        />
 
+        {/* Eagles ledger card */}
+        <EaglesLedger
+          region={activeRegion}
+          regionUpper={regionUpper}
+          mode={scope}
+          onRowTap={handleFeatRowTap}
+          onLeaderTap={handleLeaderTap}
+        />
 
-
-        {/* 7. Legendary hero (aces & albatrosses) */}
-        <LegendarySection region={activeRegion} mode={scope} onRowTap={handleFeatRowTap} />
-
-        {/* 8. Eagles section -- RECENT rail or ALL TIME Most Eagles board */}
-        <EaglesSection
+        {/* Birdie hauls ledger card */}
+        <BirdieHaulsLedger
           region={activeRegion}
           regionUpper={regionUpper}
           mode={scope}
           onRowTap={handleFeatRowTap}
         />
 
-        {/* 9. Birdie hauls -- FeatTierRail returns null when empty */}
-        <FeatTierRail
-          region={activeRegion}
-          tier="birdie_hauls"
-          title={`Birdie hauls · ${regionUpper}`}
-          variant="list"
-          mode={scope}
-          onRowTap={handleFeatRowTap}
-        />
+        {/* Toughest courses index */}
+        <ToughestIndex />
 
-
-        {/* 10. Toughest courses -- self-hiding, owns its header */}
-        <ToughestCoursesRail />
-
-        {/* 11. (Next Conquests moved into TheRecordBook panel above) */}
-
-
-
-        {/* 12. Feed block */}
+        {/* Feed block */}
         <div
           style={{
             marginTop: SPACE.sectionSection,
@@ -173,7 +154,10 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
             paddingBottom: SPACE.pageBottom,
           }}
         >
-          <AlmanacHead icon="📍" title={`The feed · ${feedRegionLabel}`} />
+          <SectionHead
+            overline={`The feed · ${regionUpper}`}
+            title="On the course"
+          />
           <ExploreGrid
             posts={posts}
             coursePosts={coursePosts}
@@ -190,7 +174,6 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
         </div>
       </div>
 
-      {/* Single shared scorecard sheet for all feat/legendary/see-all rows */}
       <RoundDetailSheet
         open={!!opener.target}
         onClose={opener.close}
@@ -202,74 +185,38 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
   );
 }
 
-
 function LegendarySection({
   region,
-  mode,
+  regionUpper,
   onRowTap,
+  onLeaderTap,
 }: {
   region: string | null;
-  mode: RecordsMode;
-  onRowTap?: (row: FeatRow) => void;
+  regionUpper: string;
+  onRowTap: (row: FeatRow) => void;
+  onLeaderTap: (uid: string) => void;
 }) {
-  const { data, isLoading } = useRegionFeats(region, 'legendary');
+  const { data } = useRegionFeats(region, 'legendary');
   const rows = data ?? [];
-  const hasAny = rows.length > 0;
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [sheetInitialMode, setSheetInitialMode] = useState<RecordsMode>('latest');
-  const [sheetInitialMetric, setSheetInitialMetric] = useState<'aces' | 'albatrosses'>('aces');
-  if (!isLoading && !hasAny) return null;
-  const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
-  const hasOverflow = mode === 'latest' && rows.length > 12;
-  const openSheetLatest = () => {
-    setSheetInitialMode('latest');
-    setSheetInitialMetric('aces');
+  const [sheetMetric, setSheetMetric] = useState<'aces' | 'albatrosses'>('aces');
+
+  const openSheet = (metric: 'aces' | 'albatrosses') => {
+    setSheetMetric(metric);
     setSheetOpen(true);
   };
-  const openSheetLeaders = (metric: 'aces' | 'albatrosses') => {
-    setSheetInitialMode('alltime');
-    setSheetInitialMetric(metric);
-    setSheetOpen(true);
-  };
+
   return (
-    <section style={{ fontFamily: FONT, paddingTop: SPACE.sectionSection }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: `0 ${SPACE.pagePadX}px ${SPACE.sectionHeaderContent}px` }}>
-        <span aria-hidden style={{ fontSize: 13, lineHeight: 1 }}>⛳</span>
-        <span
-          style={{
-            fontSize: 11.5,
-            fontWeight: 800,
-            letterSpacing: '0.13em',
-            textTransform: 'uppercase',
-            color: '#8A6400',
-          }}
-        >
-          Aces &amp; Albatrosses
-        </span>
-        <span style={{ flex: 1 }} />
-        {hasOverflow && (
-          <button
-            type="button"
-            onClick={openSheetLatest}
-            style={{
-              border: 'none',
-              background: 'none',
-              fontSize: 11.5,
-              fontWeight: 700,
-              letterSpacing: '0.06em',
-              color: '#F7931E',
-              cursor: 'pointer',
-            }}
-          >
-            View all
-          </button>
-        )}
-      </div>
-      {mode === 'latest' ? (
-        <LegendaryFeatHero region={region} onRowTap={onRowTap} />
-      ) : (
-        <LegendaryLeadersBoards region={region} onViewAll={openSheetLeaders} />
-      )}
+    <section style={{ marginTop: 32 }}>
+      <SectionHead
+        overline={`Feats · ${regionUpper}`}
+        title="Moments of the game"
+      />
+      <AcesAlbatrossesPodium
+        region={region}
+        onViewAll={openSheet}
+        onRowTap={onLeaderTap}
+      />
       <TierSeeAllSheet
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
@@ -277,105 +224,9 @@ function LegendarySection({
         region={region}
         rows={rows}
         onRowTap={onRowTap}
-        initialMode={sheetInitialMode}
-        initialMetric={sheetInitialMetric}
+        initialMode="alltime"
+        initialMetric={sheetMetric}
       />
     </section>
   );
 }
-
-
-
-const EAGLE_BAR_GRADIENT = 'linear-gradient(90deg, #F7931E, #FBBC2E)';
-const EAGLES_RAIL_CAP = 12;
-
-function EaglesSection({
-  region,
-  regionUpper,
-  mode,
-  onRowTap,
-}: {
-  region: string | null;
-  regionUpper: string;
-  mode: RecordsMode;
-  onRowTap?: (row: FeatRow) => void;
-}) {
-  const { data: featsData, isLoading } = useRegionFeats(region, 'eagles', 'latest');
-  const { data: leadersData } = useRegionEagleLeaders(region);
-  const rows = featsData ?? [];
-  const hasAny = rows.length > 0;
-  const [sheetOpen, setSheetOpen] = useState(false);
-  const [sheetInitialMode, setSheetInitialMode] = useState<RecordsMode>('latest');
-
-  const leaderRows: CountLeaderRow[] = useMemo(
-    () =>
-      (leadersData ?? [])
-        .filter((r) => (r.eagles ?? 0) > 0)
-        .sort((a, b) => (b.eagles ?? 0) - (a.eagles ?? 0))
-        .map((r) => ({
-          user_id: r.user_id,
-          holder_name: r.holder_name,
-          holder_avatar: r.holder_avatar,
-          count: r.eagles ?? 0,
-        })),
-    [leadersData],
-  );
-
-  if (!isLoading && !hasAny) return null;
-  const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
-  const displayRows = rows.slice(0, EAGLES_RAIL_CAP);
-  const hasOverflow = mode === 'latest' && rows.length > EAGLES_RAIL_CAP;
-
-  const openSheet = (initialMode: RecordsMode) => {
-    setSheetInitialMode(initialMode);
-    setSheetOpen(true);
-  };
-
-  return (
-    <section style={{ fontFamily: FONT, paddingTop: SPACE.sectionSection }}>
-      <AlmanacHead
-        title={`Eagles · ${regionUpper}`}
-        icon={TIER_ICON.eagles}
-        onSeeAll={hasOverflow ? () => openSheet('latest') : undefined}
-      />
-
-      {mode === 'latest' ? (
-        <div
-          className="flex gap-3 px-4 overflow-x-auto scrollbar-hide"
-          style={{ paddingBottom: SPACE.sectionSection }}
-        >
-          {displayRows.map((row, i) => (
-            <FeatCard
-              key={`${row.score_id ?? row.course_id ?? i}-${i}`}
-              row={row}
-              tier="eagles"
-              size="compact"
-              onTap={onRowTap ? () => onRowTap(row) : undefined}
-            />
-          ))}
-        </div>
-      ) : (
-        <div style={{ padding: `0 ${SPACE.pagePadX}px` }}>
-          <CountLeadersBoard
-            title="Most Eagles"
-            accent={SC_EAGLE}
-            barGradient={EAGLE_BAR_GRADIENT}
-            rows={leaderRows}
-            onViewAll={() => openSheet('alltime')}
-          />
-        </div>
-      )}
-      <TierSeeAllSheet
-        open={sheetOpen}
-        onClose={() => setSheetOpen(false)}
-        tier="eagles"
-        region={region}
-        rows={rows}
-        onRowTap={onRowTap}
-        initialMode={sheetInitialMode}
-      />
-    </section>
-  );
-}
-
-
