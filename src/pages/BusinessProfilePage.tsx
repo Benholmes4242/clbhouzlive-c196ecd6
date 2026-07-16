@@ -795,7 +795,7 @@ const BusinessProfilePage: React.FC = () => {
           style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
         >
           <div className="flex-1 min-w-0">
-            <p className="text-[10.5px] font-bold tracking-[0.08em] uppercase" style={{ color: '#F7931E' }}>
+            <p className="text-[10.5px] font-bold tracking-[0.08em] uppercase" style={{ color: '#94A3B8' }}>
               Home course
             </p>
             <p className="mt-1 text-[15px] font-semibold text-foreground truncate">
