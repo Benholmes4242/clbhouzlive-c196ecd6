@@ -1,8 +1,9 @@
 import React, { Component, ReactNode } from 'react';
 import { AlertTriangle } from 'lucide-react';
+import { withTranslation, WithTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 
-interface Props {
+interface Props extends WithTranslation {
   children: ReactNode;
 }
 
