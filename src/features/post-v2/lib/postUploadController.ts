@@ -162,7 +162,7 @@ async function runVideo(job: InternalJob, item: StageMediaItem, displayOrder: nu
   if (!item.file) throw new Error('Video item missing file');
   const videoFile: File = item.file;
   const streamId = await new Promise<string>((resolve, reject) => {
-    uploadVideoWithTus({
+    uploadVideoResilient({
       file: videoFile,
       onProgress: (bytesUploaded, bytesTotal) => {
         const pct = bytesTotal > 0 ? Math.round((bytesUploaded / bytesTotal) * 100) : 0;
