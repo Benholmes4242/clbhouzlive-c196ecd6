@@ -5,7 +5,8 @@
  * pivot on `state`: live -> LEADER row, upcoming -> DAYS + Defending +
  * Purse, completed -> CHAMPION strip.
  */
-import { format, differenceInCalendarDays } from 'date-fns';
+import { differenceInCalendarDays } from 'date-fns';
+import { formatWeekdayShort, formatMonthShort } from '@/i18n/format';
 import { Trophy } from 'lucide-react';
 import { PlayerAvatar } from '../../components/PlayerAvatar';
 import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
