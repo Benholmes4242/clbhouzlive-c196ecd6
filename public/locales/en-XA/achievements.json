@@ -1,153 +1,153 @@
 {
   "card": {
-    "unlockedAgo": "[Unlocked {{time}} !!!]",
-    "label": "[Achievement !!!]",
-    "xpBadge": "[+{{points}} XP !!!]"
+    "unlockedAgo": "[~~Úñļőĉǩéđ {{time}}~~]",
+    "label": "[~~Áĉĥíéṽéɱéñţ~~]",
+    "xpBadge": "[~~+{{points}} ẊƤ~~]"
   },
   "toast": {
-    "unlockedOverline": "[New achievement unlocked! !!!]",
-    "xpBadge": "[+{{points}} XP !!!]"
+    "unlockedOverline": "[~~Ñéŵ áĉĥíéṽéɱéñţ úñļőĉǩéđ!~~]",
+    "xpBadge": "[~~+{{points}} ẊƤ~~]"
   },
   "detail": {
-    "statusUnlocked": "[Unlocked !!!]",
-    "statusLocked": "[Locked !!!]",
-    "xp": "[+{{xp}} XP !!!]",
-    "repeatable": "[Repeatable !!!]",
-    "oneTime": "[One-time !!!]",
-    "progress": "[Progress: {{progress}} !!!]",
-    "earnedOn": "[✅ Earned: {{date}} !!!]",
-    "howToUnlock": "[How to unlock !!!]"
+    "statusUnlocked": "[~~Úñļőĉǩéđ~~]",
+    "statusLocked": "[~~Ļőĉǩéđ~~]",
+    "xp": "[~~+{{xp}} ẊƤ~~]",
+    "repeatable": "[~~Řéƥéáţáƀļé~~]",
+    "oneTime": "[~~Őñé-ţíɱé~~]",
+    "progress": "[~~Ƥřőĝřéšš: {{progress}}~~]",
+    "earnedOn": "[~~✅ Éářñéđ: {{date}}~~]",
+    "howToUnlock": "[~~Ĥőŵ ţő úñļőĉǩ~~]"
   },
   "levelUp": {
-    "youReached": "[You reached !!!]",
-    "medals_one": "[{{count}} medal !!!]",
-    "medals_other": "[{{count}} medals !!!]",
-    "viewTrophyRoom": "[View your Trophy Room !!!]",
-    "keepPlaying": "[Keep playing !!!]"
+    "youReached": "[~~Ýőú řéáĉĥéđ~~]",
+    "medals_one": "[~~{{count}} ɱéđáļ~~]",
+    "medals_other": "[~~{{count}} ɱéđáļš~~]",
+    "viewTrophyRoom": "[~~Ṽíéŵ ýőúř Ţřőƥĥý Řőőɱ~~]",
+    "keepPlaying": "[~~Ǩééƥ ƥļáýíñĝ~~]"
   },
   "levelUpToast": {
-    "headline": "[Level Up! 🎉 !!!]",
-    "ringUnlocked": "[{{level}} Ring Unlocked !!!]",
-    "totalXp": "[Total XP: {{xp}} !!!]",
-    "viewJourney": "[View Journey !!!]"
+    "headline": "[~~Ļéṽéļ Úƥ! 🎉~~]",
+    "ringUnlocked": "[~~{{level}} Říñĝ Úñļőĉǩéđ~~]",
+    "totalXp": "[~~Ţőţáļ ẊƤ: {{xp}}~~]",
+    "viewJourney": "[~~Ṽíéŵ Ĵőúřñéý~~]"
   },
   "nudge": {
-    "nextGlobal": "[Next global milestone !!!]",
-    "nextRegional": "[Next regional milestone !!!]",
-    "unlockRemaining_one": "[Only {{count}} more Top 100 course to unlock this badge. !!!]",
-    "unlockRemaining_other": "[Only {{count}} more Top 100 courses to unlock this badge. !!!]",
-    "seeNotPlayed": "[See courses you haven't played !!!]",
-    "exploreTop100": "[Explore Top 100 courses !!!]",
-    "closeToBadge": "[You're close to your next badge !!!]",
-    "compactGlobal_one": "[{{count}} more Top 100 course to reach the {{club}} Club ({{tier}}). !!!]",
-    "compactGlobal_other": "[{{count}} more Top 100 courses to reach the {{club}} Club ({{tier}}). !!!]",
-    "compactRegional_one": "[{{count}} more course on the {{region}} list to reach the {{club}} Club. !!!]",
-    "compactRegional_other": "[{{count}} more courses on the {{region}} list to reach the {{club}} Club. !!!]",
-    "viewJourney": "[View journey !!!]"
+    "nextGlobal": "[~~Ñéẋţ ĝļőƀáļ ɱíļéšţőñé~~]",
+    "nextRegional": "[~~Ñéẋţ řéĝíőñáļ ɱíļéšţőñé~~]",
+    "unlockRemaining_one": "[~~Őñļý {{count}} ɱőřé Ţőƥ 100 ĉőúřšé ţő úñļőĉǩ ţĥíš ƀáđĝé.~~]",
+    "unlockRemaining_other": "[~~Őñļý {{count}} ɱőřé Ţőƥ 100 ĉőúřšéš ţő úñļőĉǩ ţĥíš ƀáđĝé.~~]",
+    "seeNotPlayed": "[~~Šéé ĉőúřšéš ýőú ĥáṽéñ'ţ ƥļáýéđ~~]",
+    "exploreTop100": "[~~Éẋƥļőřé Ţőƥ 100 ĉőúřšéš~~]",
+    "closeToBadge": "[~~Ýőú'řé ĉļőšé ţő ýőúř ñéẋţ ƀáđĝé~~]",
+    "compactGlobal_one": "[~~{{count}} ɱőřé Ţőƥ 100 ĉőúřšé ţő řéáĉĥ ţĥé {{club}} Ĉļúƀ ({{tier}}).~~]",
+    "compactGlobal_other": "[~~{{count}} ɱőřé Ţőƥ 100 ĉőúřšéš ţő řéáĉĥ ţĥé {{club}} Ĉļúƀ ({{tier}}).~~]",
+    "compactRegional_one": "[~~{{count}} ɱőřé ĉőúřšé őñ ţĥé {{region}} ļíšţ ţő řéáĉĥ ţĥé {{club}} Ĉļúƀ.~~]",
+    "compactRegional_other": "[~~{{count}} ɱőřé ĉőúřšéš őñ ţĥé {{region}} ļíšţ ţő řéáĉĥ ţĥé {{club}} Ĉļúƀ.~~]",
+    "viewJourney": "[~~Ṽíéŵ ĵőúřñéý~~]"
   },
   "season": {
-    "titleVo": "[Season Complete !!!]",
-    "descriptionVo": "[Your season recap for {{season}} !!!]",
-    "headline": "[Season Complete! !!!]",
-    "ended": "[{{season}} has ended !!!]",
-    "finalRank": "[Final Rank !!!]",
-    "totalXp": "[Total XP !!!]",
-    "xpValue": "[{{xp}} XP !!!]",
-    "rewardTier": "[Reward Tier !!!]",
-    "viewCabinet": "[View Trophy Cabinet !!!]",
-    "continue": "[Continue to New Season !!!]"
+    "titleVo": "[~~Šéášőñ Ĉőɱƥļéţé~~]",
+    "descriptionVo": "[~~Ýőúř šéášőñ řéĉáƥ ƒőř {{season}}~~]",
+    "headline": "[~~Šéášőñ Ĉőɱƥļéţé!~~]",
+    "ended": "[~~{{season}} ĥáš éñđéđ~~]",
+    "finalRank": "[~~Ƒíñáļ Řáñǩ~~]",
+    "totalXp": "[~~Ţőţáļ ẊƤ~~]",
+    "xpValue": "[~~{{xp}} ẊƤ~~]",
+    "rewardTier": "[~~Řéŵářđ Ţíéř~~]",
+    "viewCabinet": "[~~Ṽíéŵ Ţřőƥĥý Ĉáƀíñéţ~~]",
+    "continue": "[~~Ĉőñţíñúé ţő Ñéŵ Šéášőñ~~]"
   },
   "quest": {
     "hero": {
-      "grandSlamAchieved": "[Grand Slam Achieved !!!]",
-      "tierAchieved": "[{{tier}} Achieved !!!]",
-      "beginJourney": "[Begin Your Journey !!!]",
-      "toGoParen_one": "[({{count}} to go) !!!]",
-      "toGoParen_other": "[({{count}} to go) !!!]",
-      "ofPlayed": "[({{played}} of {{total}} played) !!!]",
-      "toShort": "[to {{label}} !!!]",
-      "complete": "[Complete! !!!]",
-      "toGo": "[to go !!!]",
-      "toClub": "[to {{club}} !!!]",
-      "coursesPlayed": "[Courses played !!!]",
-      "progressLine": "[<0>{{played}}</0> of <1>{{total}}</1> · <2>{{club}}</2> !!!]"
+      "grandSlamAchieved": "[~~Ĝřáñđ Šļáɱ Áĉĥíéṽéđ~~]",
+      "tierAchieved": "[~~{{tier}} Áĉĥíéṽéđ~~]",
+      "beginJourney": "[~~Ɓéĝíñ Ýőúř Ĵőúřñéý~~]",
+      "toGoParen_one": "[~~({{count}} ţő ĝő)~~]",
+      "toGoParen_other": "[~~({{count}} ţő ĝő)~~]",
+      "ofPlayed": "[~~({{played}} őƒ {{total}} ƥļáýéđ)~~]",
+      "toShort": "[~~ţő {{label}}~~]",
+      "complete": "[~~Ĉőɱƥļéţé!~~]",
+      "toGo": "[~~ţő ĝő~~]",
+      "toClub": "[~~ţő {{club}}~~]",
+      "coursesPlayed": "[~~Ĉőúřšéš ƥļáýéđ~~]",
+      "progressLine": "[~~<0>{{played}}</0> of <1>{{total}}</1> · <2>{{club}}</2>~~]"
     },
     "ladder": {
-      "playCourses_one": "[Play {{count}} course !!!]",
-      "playCourses_other": "[Play {{count}} courses !!!]",
-      "ofPlayed": "[{{played}} of {{total}} played !!!]",
-      "earned": "[Earned !!!]",
-      "toGo": "[{{count}} to go !!!]",
-      "showMore_one": "[Show {{count}} more milestone !!!]",
-      "showMore_other": "[Show {{count}} more milestones !!!]",
-      "regionalMastery": "[Regional Mastery !!!]",
-      "conquerWithProgress": "[Conquer the lists below to chase the Grand Slam · {{count}} of 4 lists in progress !!!]",
-      "conquerDefault": "[Conquer regional Top 100 lists to chase the Grand Slam !!!]",
-      "complete": "[Complete !!!]",
-      "emptyTitle": "[Begin Your Journey !!!]",
-      "emptyDescription": "[Log your first Top 100 course to start climbing the milestone ladder !!!]",
-      "emptyCta": "[Explore Courses !!!]"
+      "playCourses_one": "[~~Ƥļáý {{count}} ĉőúřšé~~]",
+      "playCourses_other": "[~~Ƥļáý {{count}} ĉőúřšéš~~]",
+      "ofPlayed": "[~~{{played}} őƒ {{total}} ƥļáýéđ~~]",
+      "earned": "[~~Éářñéđ~~]",
+      "toGo": "[~~{{count}} ţő ĝő~~]",
+      "showMore_one": "[~~Šĥőŵ {{count}} ɱőřé ɱíļéšţőñé~~]",
+      "showMore_other": "[~~Šĥőŵ {{count}} ɱőřé ɱíļéšţőñéš~~]",
+      "regionalMastery": "[~~Řéĝíőñáļ Ṁášţéřý~~]",
+      "conquerWithProgress": "[~~Ĉőñʠúéř ţĥé ļíšţš ƀéļőŵ ţő ĉĥášé ţĥé Ĝřáñđ Šļáɱ · {{count}} őƒ 4 ļíšţš íñ ƥřőĝřéšš~~]",
+      "conquerDefault": "[~~Ĉőñʠúéř řéĝíőñáļ Ţőƥ 100 ļíšţš ţő ĉĥášé ţĥé Ĝřáñđ Šļáɱ~~]",
+      "complete": "[~~Ĉőɱƥļéţé~~]",
+      "emptyTitle": "[~~Ɓéĝíñ Ýőúř Ĵőúřñéý~~]",
+      "emptyDescription": "[~~Ļőĝ ýőúř ƒířšţ Ţőƥ 100 ĉőúřšé ţő šţářţ ĉļíɱƀíñĝ ţĥé ɱíļéšţőñé ļáđđéř~~]",
+      "emptyCta": "[~~Éẋƥļőřé Ĉőúřšéš~~]"
     },
     "regional": {
-      "sectionTitle": "[Regional Progress !!!]",
-      "emptyTitle": "[Explore the World !!!]",
-      "emptyDescription": "[Track your progress across GB&I, Europe, USA and worldwide Top 100 lists !!!]",
-      "emptyCta": "[View Top 100 Lists !!!]",
-      "statusComplete": "[✓ Complete !!!]",
-      "statusInProgress": "[In progress !!!]",
-      "statusNotStarted": "[Not started !!!]"
+      "sectionTitle": "[~~Řéĝíőñáļ Ƥřőĝřéšš~~]",
+      "emptyTitle": "[~~Éẋƥļőřé ţĥé Ŵőřļđ~~]",
+      "emptyDescription": "[~~Ţřáĉǩ ýőúř ƥřőĝřéšš áĉřőšš ĜƁ&Í, Éúřőƥé, ÚŠÁ áñđ ŵőřļđŵíđé Ţőƥ 100 ļíšţš~~]",
+      "emptyCta": "[~~Ṽíéŵ Ţőƥ 100 Ļíšţš~~]",
+      "statusComplete": "[~~✓ Ĉőɱƥļéţé~~]",
+      "statusInProgress": "[~~Íñ ƥřőĝřéšš~~]",
+      "statusNotStarted": "[~~Ñőţ šţářţéđ~~]"
     },
     "recent": {
-      "sectionTitle": "[Recently Added !!!]"
+      "sectionTitle": "[~~Řéĉéñţļý Áđđéđ~~]"
     },
     "trophy": {
-      "overline": "[Trophy Case !!!]",
-      "title": "[Achievements !!!]",
-      "filterMilestones": "[Milestones !!!]",
-      "filterRegions": "[Regions !!!]",
-      "emptyTitle": "[Start Your Collection !!!]",
-      "emptyDescription": "[Play Top 100 courses to unlock achievement badges !!!]",
-      "emptyCta": "[Explore Courses !!!]",
-      "earned": "[Earned !!!]",
-      "awayCount": "[{{count}} away! !!!]",
-      "playedFraction": "[{{played}}/{{total}} played !!!]"
+      "overline": "[~~Ţřőƥĥý Ĉášé~~]",
+      "title": "[~~Áĉĥíéṽéɱéñţš~~]",
+      "filterMilestones": "[~~Ṁíļéšţőñéš~~]",
+      "filterRegions": "[~~Řéĝíőñš~~]",
+      "emptyTitle": "[~~Šţářţ Ýőúř Ĉőļļéĉţíőñ~~]",
+      "emptyDescription": "[~~Ƥļáý Ţőƥ 100 ĉőúřšéš ţő úñļőĉǩ áĉĥíéṽéɱéñţ ƀáđĝéš~~]",
+      "emptyCta": "[~~Éẋƥļőřé Ĉőúřšéš~~]",
+      "earned": "[~~Éářñéđ~~]",
+      "awayCount": "[~~{{count}} áŵáý!~~]",
+      "playedFraction": "[~~{{played}}/{{total}} ƥļáýéđ~~]"
     },
     "leaderboard": {
-      "overline": "[Leaderboard !!!]",
-      "title": "[Friends Leaderboard !!!]",
-      "emptyTitle": "[Add friends to see how you compare! !!!]",
-      "emptyDescription": "[Connect with other golfers to track their Top 100 journey alongside yours !!!]",
-      "emptyCta": "[Find Golfers !!!]",
-      "you": "[(you) !!!]"
+      "overline": "[~~Ļéáđéřƀőářđ~~]",
+      "title": "[~~Ƒříéñđš Ļéáđéřƀőářđ~~]",
+      "emptyTitle": "[~~Áđđ ƒříéñđš ţő šéé ĥőŵ ýőú ĉőɱƥářé!~~]",
+      "emptyDescription": "[~~Ĉőññéĉţ ŵíţĥ őţĥéř ĝőļƒéřš ţő ţřáĉǩ ţĥéíř Ţőƥ 100 ĵőúřñéý áļőñĝšíđé ýőúřš~~]",
+      "emptyCta": "[~~Ƒíñđ Ĝőļƒéřš~~]",
+      "you": "[~~(ýőú)~~]"
     },
     "momentum": {
-      "overline": "[Momentum !!!]",
-      "title": "[Your Momentum !!!]",
-      "lastLogged": "[Last course logged !!!]",
-      "thisMonth": "[This month !!!]",
-      "courses_one": "[{{count}} course !!!]",
-      "courses_other": "[{{count}} courses !!!]",
-      "delta": "[{{sign}}{{count}} vs last !!!]",
-      "suggestedRegion": "[Try a new region — you've barely played {{region}} yet. !!!]",
-      "keepBuilding": "[Keep building your journey. !!!]",
-      "emptyPrompt": "[Log your first Top 100 course to start momentum. !!!]",
-      "dateNever": "[Never !!!]",
-      "dateToday": "[Today !!!]",
-      "dateYesterday": "[Yesterday !!!]",
-      "daysAgo_one": "[{{count}} day ago !!!]",
-      "daysAgo_other": "[{{count}} days ago !!!]",
-      "weeksAgo_one": "[{{count}} week ago !!!]",
-      "weeksAgo_other": "[{{count}} weeks ago !!!]"
+      "overline": "[~~Ṁőɱéñţúɱ~~]",
+      "title": "[~~Ýőúř Ṁőɱéñţúɱ~~]",
+      "lastLogged": "[~~Ļášţ ĉőúřšé ļőĝĝéđ~~]",
+      "thisMonth": "[~~Ţĥíš ɱőñţĥ~~]",
+      "courses_one": "[~~{{count}} ĉőúřšé~~]",
+      "courses_other": "[~~{{count}} ĉőúřšéš~~]",
+      "delta": "[~~{{sign}}{{count}} ṽš ļášţ~~]",
+      "suggestedRegion": "[~~Ţřý á ñéŵ řéĝíőñ — ýőú'ṽé ƀářéļý ƥļáýéđ {{region}} ýéţ.~~]",
+      "keepBuilding": "[~~Ǩééƥ ƀúíļđíñĝ ýőúř ĵőúřñéý.~~]",
+      "emptyPrompt": "[~~Ļőĝ ýőúř ƒířšţ Ţőƥ 100 ĉőúřšé ţő šţářţ ɱőɱéñţúɱ.~~]",
+      "dateNever": "[~~Ñéṽéř~~]",
+      "dateToday": "[~~Ţőđáý~~]",
+      "dateYesterday": "[~~Ýéšţéřđáý~~]",
+      "daysAgo_one": "[~~{{count}} đáý áĝő~~]",
+      "daysAgo_other": "[~~{{count}} đáýš áĝő~~]",
+      "weeksAgo_one": "[~~{{count}} ŵééǩ áĝő~~]",
+      "weeksAgo_other": "[~~{{count}} ŵééǩš áĝő~~]"
     }
   },
   "elite": {
-    "statusUnlocked": "[Unlocked !!!]",
-    "statusInProgress": "[In Progress !!!]",
-    "statusEarned": "[Earned !!!]",
-    "toGo": "[{{count}} to go !!!]",
-    "progressFraction": "[{{current}} / {{target}} !!!]"
+    "statusUnlocked": "[~~Úñļőĉǩéđ~~]",
+    "statusInProgress": "[~~Íñ Ƥřőĝřéšš~~]",
+    "statusEarned": "[~~Éářñéđ~~]",
+    "toGo": "[~~{{count}} ţő ĝő~~]",
+    "progressFraction": "[~~{{current}} / {{target}}~~]"
   },
   "a11y": {
-    "dismiss": "[Dismiss !!!]"
+    "dismiss": "[~~Đíšɱíšš~~]"
   }
 }
