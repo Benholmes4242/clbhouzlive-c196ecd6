@@ -63,7 +63,7 @@ export function AcesAlbatrossesPodium({ region, onViewAll, onRowTap }: Props) {
       }}
     >
       <PodiumCard
-        title="Aces"
+        title="Most aces"
         accent={SC_ACE}
         rows={aceRows}
         metric="aces"
@@ -71,7 +71,7 @@ export function AcesAlbatrossesPodium({ region, onViewAll, onRowTap }: Props) {
         onRowTap={onRowTap}
       />
       <PodiumCard
-        title="Albatrosses"
+        title="Most albatrosses"
         accent={SC_ALBATROSS}
         rows={albRows}
         metric="albatrosses"
