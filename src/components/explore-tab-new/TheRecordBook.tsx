@@ -501,6 +501,8 @@ function ConquestChip({ row }: { row: TitleInReach }) {
   const navigate = useNavigate();
   const pct = progressPct(row.category, row.gap);
   const gap = gapCopy(row.category, row.gap);
+  const category = categoryLabel(row.category);
+  const record = recordCopy(row.category, row.leader_value);
   return (
     <button
       type="button"
@@ -508,7 +510,7 @@ function ConquestChip({ row }: { row: TitleInReach }) {
       className="text-left active:opacity-80 transition-opacity"
       style={{
         flexShrink: 0,
-        width: 172,
+        width: 196,
         borderRadius: 10,
         background: CHIP_BG,
         border: 'none',
@@ -518,43 +520,37 @@ function ConquestChip({ row }: { row: TitleInReach }) {
         color: INK,
       }}
     >
+      {/* Line 1: course name */}
       <div
         style={{
-          display: 'flex',
-          alignItems: 'baseline',
-          gap: 6,
-          minWidth: 0,
+          fontSize: 12.5,
+          fontWeight: 600,
+          letterSpacing: '-0.01em',
+          color: INK,
+          lineHeight: 1.2,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
         }}
       >
-        <div
-          style={{
-            flex: 1,
-            minWidth: 0,
-            fontSize: 12.5,
-            fontWeight: 600,
-            letterSpacing: '-0.01em',
-            color: INK,
-            lineHeight: 1.2,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {row.course_name}
-        </div>
-        <div
-          style={{
-            flexShrink: 0,
-            fontSize: 10,
-            fontWeight: 500,
-            color: 'rgba(15,23,42,0.45)',
-            lineHeight: 1.2,
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {categoryLabel(row.category)}
-        </div>
+        {row.course_name}
       </div>
+      {/* Line 2: {Category} · record {value-with-unit} */}
+      <div
+        style={{
+          marginTop: 3,
+          fontSize: 10.5,
+          fontWeight: 500,
+          color: 'rgba(15,23,42,0.5)',
+          lineHeight: 1.2,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {`${category} · record ${record}`}
+      </div>
+      {/* Bar */}
       <div
         style={{
           marginTop: 8,
@@ -573,6 +569,7 @@ function ConquestChip({ row }: { row: TitleInReach }) {
           }}
         />
       </div>
+      {/* Line 3: {gap} to take it */}
       <div
         style={{
           marginTop: 7,
@@ -586,7 +583,7 @@ function ConquestChip({ row }: { row: TitleInReach }) {
         }}
       >
         <span style={{ color: INK, fontWeight: 700 }}>{gap}</span>
-        {' '}to take it · {row.leader_value}
+        {' '}to take it
       </div>
     </button>
   );
