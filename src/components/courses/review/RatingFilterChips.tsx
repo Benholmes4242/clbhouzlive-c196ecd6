@@ -57,15 +57,15 @@ export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
         variant="outline"
         size="sm"
         onClick={() => setOpen(true)}
-        aria-label={activeLabel ? `Filter: ${activeLabel}. Tap to change.` : 'Filter reviews by rating'}
+        aria-label={activeLabel ? t('review.filter.buttonLabel', { label: activeLabel }) : t('review.filter.buttonLabelDefault')}
         className="h-auto py-1 px-2 text-xs"
       >
         <Filter className="h-3 w-3 mr-1" />
-        {activeLabel || 'Filter'}
+        {activeLabel || t('review.filter.button')}
         {activeLabel ? (
           <span
             role="button"
-            aria-label="Clear filter"
+            aria-label={t('review.filter.clear')}
             onClick={handleClear}
             className="inline-flex items-center ml-1"
           >
@@ -90,11 +90,11 @@ export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
               margin: 0,
             }}
           >
-            Filter by rating
+            {t('review.filter.title')}
           </h2>
         </div>
 
-        <div role="radiogroup" aria-label="Filter reviews by rating" style={{ paddingBottom: 12 }}>
+        <div role="radiogroup" aria-label={t('review.filter.buttonLabelDefault')} style={{ paddingBottom: 12 }}>
           {FILTER_OPTIONS.map((option) => {
             const isActive =
               option.key === 'all' ? value === null : value === option.key;
@@ -121,7 +121,7 @@ export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
                   textAlign: 'left',
                 }}
               >
-                <span>{option.label}</span>
+                <span>{t(option.labelKey)}</span>
                 {isActive && (
                   <Check className="h-4 w-4" style={{ color: '#F7931E' }} />
                 )}
