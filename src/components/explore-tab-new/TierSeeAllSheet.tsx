@@ -372,10 +372,6 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
                       ? `+${other} ${other === 1 ? 'albatross' : 'albatrosses'}`
                       : `+${other} ${other === 1 ? 'ace' : 'aces'}`
                     : null;
-                const barGradient =
-                  metric === 'aces'
-                    ? `linear-gradient(90deg, ${SC_ACE}, ${SC_FILL_GOLD})`
-                    : `linear-gradient(90deg, ${SC_ALBATROSS}, #FFD84D)`;
                 return (
                   <CountLeaderSheetRow
                     key={`${r.user_id ?? r.holder_name ?? i}-${i}`}
@@ -387,8 +383,6 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
                     holderClub={r.holder_club ?? null}
                     count={count}
                     max={legendaryMax}
-                    accent={metricAccent}
-                    barGradient={barGradient}
                     countLabelSingular={metric === 'aces' ? 'ACE' : 'ALBATROSS'}
                     countLabelPlural={metric === 'aces' ? 'ACES' : 'ALBATROSSES'}
                     subline={otherLabel}
