@@ -145,7 +145,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
             className="text-[30px] md:text-[36px] font-bold leading-[1.25] auth-tagline-animate"
             style={{ letterSpacing: '-0.02em', color: 'rgba(255,255,255,0.96)', textWrap: 'balance' as any, padding: '0 8px' }}
           >
-            the home of golf courses<span aria-hidden="true" style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', backgroundColor: '#F7931E', verticalAlign: 'baseline', marginLeft: 2 }} />
+            {t('auth:hero.tagline')}<span aria-hidden="true" style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', backgroundColor: '#F7931E', verticalAlign: 'baseline', marginLeft: 2 }} />
           </h1>
         </div>
 
@@ -167,7 +167,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                     type="button"
                     onClick={onAppleSignIn}
                     disabled={submitting}
-                    aria-label="Continue with Apple"
+                    aria-label={t('auth:hero.continueWithApple')}
                     className="w-full flex items-center justify-center gap-2 rounded-[16px] transition-opacity active:opacity-85 disabled:opacity-60"
                     style={{
                       minHeight: 52,
@@ -183,7 +183,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                     ) : (
                       <>
                         <AppleLogo size={17} color="#0B0D12" />
-                        <span>Continue with Apple</span>
+                        <span>{t('auth:hero.continueWithApple')}</span>
                       </>
                     )}
                   </button>
@@ -194,7 +194,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                     type="button"
                     onClick={onGoogleSignIn}
                     disabled={submitting}
-                    aria-label="Continue with Google"
+                    aria-label={t('auth:hero.continueWithGoogle')}
                     className="w-full flex items-center justify-center gap-2 rounded-[16px] transition-opacity active:opacity-85 disabled:opacity-60"
                     style={{
                       minHeight: 52,
@@ -210,7 +210,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                     ) : (
                       <>
                         <GoogleLogo size={18} />
-                        <span>Continue with Google</span>
+                        <span>{t('auth:hero.continueWithGoogle')}</span>
                       </>
                     )}
                   </button>
@@ -218,7 +218,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
 
                 <div className="flex items-center gap-3" aria-hidden="true">
                   <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.10)' }} />
-                  <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)' }}>or</span>
+                  <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)' }}>{t('auth:hero.or')}</span>
                   <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.10)' }} />
                 </div>
 
@@ -237,7 +237,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                 onKeyDown={handleEmailKeyDown}
                 onFocus={(e) => { e.currentTarget.style.borderColor = '#F7931E'; }}
                 onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.10)'; }}
-                placeholder="Email address"
+                placeholder={t('auth:hero.emailPlaceholder')}
                 disabled={submitting}
                 className="auth-email-input w-full h-[54px] px-5 rounded-[16px] font-medium text-[15px] text-left focus:outline-none transition-all disabled:opacity-50"
                 style={{
@@ -267,7 +267,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
             <button
               onClick={handleContinue}
               disabled={!canContinue}
-              aria-label="Continue"
+              aria-label={t('auth:hero.continue')}
               className="w-full h-[54px] flex items-center justify-center gap-2 rounded-[16px] font-bold text-[15px] transition-all duration-150 active:scale-[0.98]"
               style={{
                 background: canContinue ? '#F7931E' : 'rgba(255,255,255,0.06)',
@@ -281,7 +281,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                 <Loader2 size={18} className="animate-spin" />
               ) : (
                 <>
-                  Continue
+                  {t('auth:hero.continue')}
                   {trimmed && <ArrowRight size={17} aria-hidden="true" />}
                 </>
               )}
@@ -291,7 +291,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
               className="text-center"
               style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)' }}
             >
-              We'll email you a 6-digit code. No password needed.
+              {t('auth:hero.codeHint')}
             </p>
 
             <p
@@ -303,12 +303,14 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                 textAlign: 'center',
               }}
             >
-              By continuing, you agree to our{' '}
-              <Link to="/terms" style={{ color: '#F7931E', fontWeight: 600, textDecoration: 'none' }}>Terms of Service</Link>
-              {' '}and{' '}
-              <Link to="/privacy" style={{ color: '#F7931E', fontWeight: 600, textDecoration: 'none' }}>Privacy Policy</Link>
-              . clbhouz has zero tolerance for objectionable content and abusive
-              behavior. Reports are reviewed within 24 hours.
+              <Trans
+                i18nKey="auth:hero.termsBlock"
+                defaults="By continuing, you agree to our <terms>Terms of Service</terms> and <privacy>Privacy Policy</privacy>. clbhouz has zero tolerance for objectionable content and abusive behavior. Reports are reviewed within 24 hours."
+                components={{
+                  terms: <Link to="/terms" style={{ color: '#F7931E', fontWeight: 600, textDecoration: 'none' }} />,
+                  privacy: <Link to="/privacy" style={{ color: '#F7931E', fontWeight: 600, textDecoration: 'none' }} />,
+                }}
+              />
             </p>
           </div>
         </div>
