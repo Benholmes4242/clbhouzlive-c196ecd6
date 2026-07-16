@@ -150,6 +150,15 @@ export default tseslint.config(
         },
       ],
     },
+  },
+  // ─── Wave 3a.ii — scope-dir ERROR flip for auth ────────────────────
+  // Auth surface is literal-clean; upgrade to ERROR so regressions block.
+  // Composer + post-v2 remain WARN pending mid-redesign settle.
+  {
+    files: ["src/pages/auth/**/*.{ts,tsx}"],
+    rules: {
+      "i18next/no-literal-string": "error",
+    },
   }
 );
 

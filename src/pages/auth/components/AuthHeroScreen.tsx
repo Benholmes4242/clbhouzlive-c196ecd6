@@ -136,6 +136,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
             className="h-[72px] md:h-[80px] w-auto relative z-10"
           />
           {SHOW_WORDMARK && (
+            // eslint-disable-next-line i18next/no-literal-string -- brand wordmark, proper noun
             <span className="text-[24px] font-medium tracking-tight" style={{ color: 'rgba(255,255,255,0.96)' }}>clbhouz</span>
           )}
         </div>

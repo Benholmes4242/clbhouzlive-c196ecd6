@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
 
 export default function AuthCallback() {
+  const { t } = useTranslation('auth');
   useHideBottomNav();
   useHideHeader();
 
   const navigate = useNavigate();
-  const [message, setMessage] = useState('Signing you in…');
+  const [message, setMessage] = useState(t('callback.signingIn'));
 
   const isInMedianApp =
     typeof window !== 'undefined' && (
@@ -29,7 +31,7 @@ export default function AuthCallback() {
         const { data: { session } } = await supabase.auth.getSession();
 
         if (!session) {
-          setMessage('Session not found. Redirecting…');
+          setMessage(t('callback.sessionNotFound'));
           setTimeout(() => navigate('/auth', { replace: true }), 1500);
           return;
         }
@@ -37,7 +39,7 @@ export default function AuthCallback() {
         // Password reset flow has been removed (passwordless OTP); fall through to
         // the normal onboarding-aware redirect below.
 
-        setMessage('Setting up your profile…');
+        setMessage(t('callback.settingUpProfile'));
 
         await new Promise(r => setTimeout(r, 700));
 
@@ -55,7 +57,7 @@ export default function AuthCallback() {
 
       } catch (err) {
         console.error('[AuthCallback]', err);
-        setMessage('Something went wrong. Redirecting…');
+        setMessage(t('callback.somethingWentWrong'));
         setTimeout(() => navigate('/auth', { replace: true }), 1500);
       }
     };
@@ -108,17 +110,17 @@ export default function AuthCallback() {
             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
           />
           <h1 style={{ fontSize: 28, fontWeight: 700, color: '#0F172A', lineHeight: 1.2, letterSpacing: '-0.3px', margin: 0 }}>
-            Almost there
+            {t('callback.verifiedTitle')}
           </h1>
           <p style={{ fontSize: 15, fontWeight: 300, color: '#64748B', lineHeight: 1.6, maxWidth: 280, margin: 0 }}>
-            Your email has been verified. Please close your clbhouz app and reopen to sign in and start your journey.
+            {t('callback.verifiedBody')}
           </p>
           <p style={{ fontSize: 12, color: '#94A3B8', lineHeight: 1.5, maxWidth: 260, margin: 0 }}>
-            You can now close this page.
+            {t('callback.closePage')}
           </p>
         </div>
         <div style={{ position: 'fixed', bottom: 28, left: 0, right: 0, textAlign: 'center', fontSize: 11, color: '#94A3B8', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-          clbhouz · stay in play
+          {t('callback.brandTagline')}
         </div>
       </div>
     );
