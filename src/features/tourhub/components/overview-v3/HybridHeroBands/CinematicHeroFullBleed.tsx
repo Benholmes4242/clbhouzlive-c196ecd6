@@ -29,6 +29,7 @@ import {
 import { NUMERIC_STYLE, AMBER } from '../HybridHero.constants';
 import { TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 import type { DefendingChampData } from '../../../hooks/useTournamentDefendingChamp';
+import { formatNumber } from '@/i18n/format';
 
 // ---- tokens ---------------------------------------------------------------
 
