@@ -13,6 +13,7 @@ import { CardScorecardSheet } from '@/features/courses/_shared/scorecard/CardSco
 import { useRoundDetail, useWhsCourseId } from '@/lib/whs/hooks';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import type { WhsScoreHole } from '@/lib/whs/types';
+import { formatWeekdayShortGB, formatMonthShortGB } from '@/i18n/format';
 
 function strokesOf(h: WhsScoreHole): number | null {
   return h.adjusted_gross ?? h.actual_gross ?? null;
