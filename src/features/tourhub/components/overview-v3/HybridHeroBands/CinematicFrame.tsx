@@ -25,16 +25,16 @@ import {
   GOLD,
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
-import { AMBER_INK, GOLD_DEEP } from '../../../_shared/tokens';
+import { AMBER_INK, GOLD_DEEP, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 import { roundStarted } from '../../../_shared/roundState';
 import type { HeroState, TopTie, TickerRow } from '../HybridHero.utils';
 import { fmtScore, formatRank, buildLeaderboardSlots } from '../HybridHero.utils';
 import { formatPurse } from '../../shared/TourHeroHelpers';
 
 const TICKER_BAR_H = 34;
-const LEADER_GREEN = '#22C55E';
-const LEADER_GREEN_RING = 'rgba(34,197,94,0.55)';
-const LEADER_GREEN_WASH = 'linear-gradient(90deg, rgba(34,197,94,0.18) 0%, rgba(34,197,94,0.06) 100%)';
+const LEADER_RED = TOPAR_UNDER_DARK;              // '#FF6B5E'
+const LEADER_RED_RING = 'rgba(255,107,94,0.55)';
+const LEADER_RED_WASH = 'linear-gradient(90deg, rgba(255,107,94,0.18) 0%, rgba(255,107,94,0.06) 100%)';
 const CHAMPION_BAND_H = 62;
 const UPCOMING_BAND_H = 104;
 const LIVE_BOTTOM_H = CHAMPION_BAND_H + TICKER_BAR_H;
@@ -81,7 +81,7 @@ function nameCandidates(name: string | null | undefined, tourSlug?: string | nul
 
 function scoreColor(score: number | null | undefined): string {
   if (score == null || Number.isNaN(score)) return 'rgba(255,255,255,0.85)';
-  if (score < 0) return LEADER_GREEN;   // under par -> bright green
+  if (score < 0) return LEADER_RED;   // under par -> bright green
   if (score > 0) return 'rgba(255,255,255,0.55)'; // over par -> muted white
   return 'rgba(255,255,255,0.85)';   // even
 }
@@ -176,7 +176,7 @@ function SoloRowDark({
           width: 22,
           fontSize: 12,
           fontWeight: 700,
-          color: isLeader ? LEADER_GREEN : 'rgba(255,255,255,0.5)',
+          color: isLeader ? LEADER_RED : 'rgba(255,255,255,0.5)',
           textAlign: 'left',
           flexShrink: 0,
         }}
@@ -254,7 +254,7 @@ function TiedLeadersRowDark({
         style={{
           ...NUMERIC_STYLE,
           width: 22, fontSize: 12, fontWeight: 700,
-          color: LEADER_GREEN, textAlign: 'left', flexShrink: 0,
+          color: LEADER_RED, textAlign: 'left', flexShrink: 0,
         }}
       >
         T1
@@ -1225,7 +1225,7 @@ export function CinematicFrame({
                 display: 'flex', alignItems: 'center', gap: 10,
                 padding: '8px 16px',
                 borderTop: '0.5px solid rgba(255,255,255,0.08)',
-                background: row.isLeader ? LEADER_GREEN_WASH : 'transparent',
+                background: row.isLeader ? LEADER_RED_WASH : 'transparent',
               };
               if (row.kind === 'solo') {
                 const entry = row.entry;
@@ -1234,7 +1234,7 @@ export function CinematicFrame({
                 const thruDisplay = liveThru != null ? (liveThru === 18 ? 'F' : String(liveThru)) : entryThru(entry);
                 return (
                   <div key={`solo-${i}`} style={rowStyle}>
-                    <span style={{ ...NUMERIC_STYLE, width: RANK_W, fontSize: 12, fontWeight: 700, color: row.isLeader ? LEADER_GREEN : 'rgba(255,255,255,0.5)', textAlign: 'left', flexShrink: 0 }}>{row.rank}</span>
+                    <span style={{ ...NUMERIC_STYLE, width: RANK_W, fontSize: 12, fontWeight: 700, color: row.isLeader ? LEADER_RED : 'rgba(255,255,255,0.5)', textAlign: 'left', flexShrink: 0 }}>{row.rank}</span>
                     <SquircleAvatar
                       src={undefined}
                       srcCandidates={avatar(entry)}
@@ -1242,7 +1242,7 @@ export function CinematicFrame({
                       userId={entry?.player?.id ?? null}
                       size={26}
                       hairlineRing
-                      ringColor={row.isLeader ? LEADER_GREEN_RING : undefined}
+                      ringColor={row.isLeader ? LEADER_RED_RING : undefined}
                     />
                     <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: row.isLeader ? 700 : 600, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>
                     {anyToday && (
@@ -1265,7 +1265,7 @@ export function CinematicFrame({
                 : `${row.count} players`;
               return (
                 <div key={`tie-${i}`} style={rowStyle}>
-                  <span style={{ ...NUMERIC_STYLE, width: RANK_W, fontSize: 12, fontWeight: 700, color: row.isLeader ? LEADER_GREEN : 'rgba(255,255,255,0.5)', textAlign: 'left', flexShrink: 0 }}>{row.rank}</span>
+                  <span style={{ ...NUMERIC_STYLE, width: RANK_W, fontSize: 12, fontWeight: 700, color: row.isLeader ? LEADER_RED : 'rgba(255,255,255,0.5)', textAlign: 'left', flexShrink: 0 }}>{row.rank}</span>
                   <StackedAvatarsDark items={row.items} size={26} />
                   <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: row.isLeader ? 700 : 600, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</span>
                   {anyToday && <span style={{ width: COL_TODAY, flexShrink: 0 }} />}
