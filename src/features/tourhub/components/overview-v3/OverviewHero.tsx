@@ -46,14 +46,14 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
 
   const [activeIndex, setActiveIndex] = useState(0);
 
-  // Capture the currently-viewed tournament id BEFORE the slide set changes so
-  // we can restore position across background refreshes.
+  // Track the currently-viewed tournament id so we can restore position
+  // across background data refreshes (idSignature changes but the user's
+  // tournament is still in the river). Updated only when activeIndex resolves.
   const prevIdRef = useRef<string | null>(null);
   useEffect(() => {
-    prevIdRef.current = slides[activeIndex]?.tournament.id ?? null;
-    // Intentionally not depending on activeIndex change alone — we just need
-    // the freshest value before an idSignature-triggered set change.
-  });
+    const id = slides[activeIndex]?.tournament.id;
+    if (id) prevIdRef.current = id;
+  }, [activeIndex, slides]);
 
   useEffect(() => {
     if (count === 0) return;
