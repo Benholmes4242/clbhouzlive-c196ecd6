@@ -316,7 +316,7 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
             {/* Logged date if present */}
             {loggedDate && (
               <div className="inline-block text-[9px] font-medium text-white/60 mt-0.5">
-                Logged: {format(new Date(loggedDate), 'd MMM yyyy')}
+                Logged: {formatDayMonthYearShortGB(loggedDate)}
               </div>
             )}
             {/* Friends context */}
