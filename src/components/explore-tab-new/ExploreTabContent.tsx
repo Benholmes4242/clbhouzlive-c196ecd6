@@ -215,10 +215,10 @@ function LegendarySection({
   return (
     <section style={{ marginTop: 32 }}>
       <SectionHead
-        overline={mode === 'alltime' ? 'All-time feats' : 'Latest feats'}
-        subline={regionUpper}
+        overline={mode === 'alltime' ? 'All-time honours' : 'Latest honours'}
         title="Moments of the game"
       />
+
 
       <AcesAlbatrossesPodium
         region={region}
