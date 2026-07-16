@@ -136,21 +136,7 @@ export default tseslint.config(
       "src/pages/ErrorLogPage.tsx",
     ],
     rules: {
-      "no-restricted-syntax": [
-        "error",
-        {
-          selector: "CallExpression[callee.property.name='toLocaleDateString']",
-          message: "Use a wrapper from src/i18n/format.ts (e.g. formatDayMonthYearShortGB) instead of Date.prototype.toLocaleDateString().",
-        },
-        {
-          selector: "CallExpression[callee.property.name='toLocaleTimeString']",
-          message: "Use a wrapper from src/i18n/format.ts (e.g. formatTimeHm) instead of Date.prototype.toLocaleTimeString().",
-        },
-        {
-          selector: "CallExpression[callee.property.name='toLocaleString']",
-          message: "Use formatNumber() or another wrapper from src/i18n/format.ts instead of toLocaleString().",
-        },
-      ],
+      "no-restricted-syntax": ["error", ...toLocaleSyntax],
       "no-restricted-imports": [
         "error",
         {
