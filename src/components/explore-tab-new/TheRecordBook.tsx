@@ -286,11 +286,16 @@ function LedgerRow({
         display: 'flex',
         alignItems: 'center',
         gap: 10,
-        padding: '9px 4px',
+        padding: '9px 16px',
         width: '100%',
         background: 'transparent',
         border: 'none',
         borderTop: isFirst ? 'none' : `0.5px solid ${HAIRLINE}`,
+        marginLeft: isFirst ? 0 : 64,
+        marginRight: isFirst ? 0 : 16,
+        boxSizing: 'border-box',
+        // The inset separator is achieved by shrinking the row itself.
+        width: isFirst ? '100%' : 'calc(100% - 80px)',
         cursor: 'pointer',
         fontFamily: FONT,
         color: INK,
@@ -302,10 +307,11 @@ function LedgerRow({
           width: 16,
           flexShrink: 0,
           fontSize: 11,
-          fontWeight: 800,
+          fontWeight: 600,
           color: isFirst ? PARCHMENT_GOLD : FADED,
           fontVariantNumeric: 'tabular-nums',
           textAlign: 'center',
+          marginLeft: isFirst ? 0 : -64,
         }}
       >
         {rank}
@@ -327,8 +333,9 @@ function LedgerRow({
       <div style={{ flex: 1, minWidth: 0 }}>
         <div
           style={{
-            fontSize: 12.5,
-            fontWeight: 800,
+            fontSize: 13,
+            fontWeight: 600,
+            letterSpacing: '-0.01em',
             color: INK,
             lineHeight: 1.2,
             overflow: 'hidden',
@@ -341,8 +348,8 @@ function LedgerRow({
         <div
           style={{
             marginTop: 2,
-            fontSize: 10,
-            fontWeight: 600,
+            fontSize: 11,
+            fontWeight: 500,
             color: MUTED,
             lineHeight: 1.2,
             overflow: 'hidden',
@@ -355,43 +362,40 @@ function LedgerRow({
         </div>
       </div>
 
-      {/* Right: to-par + gross */}
+      {/* To par column */}
       <div
+        className="tabular-nums"
         style={{
-          width: 62,
+          width: 44,
           flexShrink: 0,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-end',
+          textAlign: 'right',
+          fontSize: 15,
+          fontWeight: 700,
+          color: toParColor,
+          lineHeight: 1,
         }}
       >
-        <div
-          className="tabular-nums"
-          style={{
-            fontSize: 16,
-            fontWeight: 900,
-            letterSpacing: '-0.02em',
-            color: toParColor,
-            lineHeight: 1,
-          }}
-        >
-          {toParDisplay}
-        </div>
-        {grossText ? (
-          <div
-            className="tabular-nums"
-            style={{
-              marginTop: 3,
-              fontSize: 9.5,
-              fontWeight: 700,
-              color: GHOST,
-              lineHeight: 1,
-            }}
-          >
-            {grossText}
-          </div>
-        ) : null}
+        {toParDisplay}
       </div>
+
+      {/* Gross column */}
+      <div
+        className="tabular-nums"
+        style={{
+          width: 34,
+          flexShrink: 0,
+          textAlign: 'right',
+          fontSize: 12,
+          fontWeight: 500,
+          color: GHOST,
+          lineHeight: 1,
+        }}
+      >
+        {grossText || '—'}
+      </div>
+
+      {/* Chevron */}
+      <span style={{ width: 12, textAlign: 'right', fontSize: 12, fontWeight: 600, color: CHEVRON_COLOR, lineHeight: 1, flexShrink: 0 }}>›</span>
     </button>
   );
 }
