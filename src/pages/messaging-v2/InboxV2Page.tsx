@@ -317,15 +317,15 @@ const InboxV2Page: React.FC = () => {
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={{ margin: 0, fontSize: 13.5, fontWeight: 600, color: '#1F2428', lineHeight: 1.3 }}>
-                      Business messaging
+                      {t('messaging:banner.businessTitle')}
                     </p>
                     <p style={{ margin: '2px 0 0', fontSize: 12.5, color: '#6B7280', lineHeight: 1.45 }}>
-                      Message golfers directly.
+                      {t('messaging:banner.businessBody')}
                     </p>
                   </div>
                   <button
                     type="button"
-                    aria-label="Dismiss"
+                    aria-label={t('messaging:action.dismiss')}
                     onClick={() => {
                       if (actor) {
                         safeLocalStorage.set(
