@@ -9,7 +9,7 @@ import {
 } from './hooks/useRegionFeats';
 import { TierSeeAllSheet } from './TierSeeAllSheet';
 import { SectionHead } from './SectionHead';
-import { relativeTime } from '@/utils/relativeTime';
+import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import { FONT } from './gamingLightTokens';
 
 const AMBER = '#F7931E';

@@ -12,7 +12,7 @@ import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { relativeTime } from '@/utils/relativeTime';
+import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import { toast } from '@/lib/toast';
 import {
   useBusinessReviews,

@@ -23,7 +23,7 @@ import { openGamAchievements } from '@/components/profile/handicap/whs/gam/event
 import { MATERIAL_HEX } from '@/components/profile/handicap/whs/gam/trophy-room/_shared/rarityPalette';
 import { renderBadgeIcon } from '@/components/profile/handicap/whs/gam/badgeIcons';
 import { formatHcp } from '@/lib/formatHcp';
-import { relativeTime } from '@/utils/relativeTime';
+import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 
 import { FONT } from './gamingLightTokens';
 
