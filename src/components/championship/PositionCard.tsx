@@ -1,6 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { Flame, TrendingUp, TrendingDown, Target } from 'lucide-react';
+import { formatOrdinal } from '@/i18n/format';
 
 interface PositionCardProps {
   rank: number;
