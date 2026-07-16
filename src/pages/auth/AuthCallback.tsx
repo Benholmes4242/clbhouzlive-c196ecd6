@@ -110,17 +110,17 @@ export default function AuthCallback() {
             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
           />
           <h1 style={{ fontSize: 28, fontWeight: 700, color: '#0F172A', lineHeight: 1.2, letterSpacing: '-0.3px', margin: 0 }}>
-            Almost there
+            {t('callback.verifiedTitle')}
           </h1>
           <p style={{ fontSize: 15, fontWeight: 300, color: '#64748B', lineHeight: 1.6, maxWidth: 280, margin: 0 }}>
-            Your email has been verified. Please close your clbhouz app and reopen to sign in and start your journey.
+            {t('callback.verifiedBody')}
           </p>
           <p style={{ fontSize: 12, color: '#94A3B8', lineHeight: 1.5, maxWidth: 260, margin: 0 }}>
-            You can now close this page.
+            {t('callback.closePage')}
           </p>
         </div>
         <div style={{ position: 'fixed', bottom: 28, left: 0, right: 0, textAlign: 'center', fontSize: 11, color: '#94A3B8', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-          clbhouz · stay in play
+          {t('callback.brandTagline')}
         </div>
       </div>
     );
