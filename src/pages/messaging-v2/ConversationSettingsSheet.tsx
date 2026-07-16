@@ -415,7 +415,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                     >
                       <Plus size={20} color={INK} />
                     </div>
-                    <span style={{ fontSize: 15, fontWeight: 500 }}>Add people</span>
+                    <span style={{ fontSize: 15, fontWeight: 500 }}>{t('messaging:action.addPeople')}</span>
                   </button>
                 ) : null}
 
