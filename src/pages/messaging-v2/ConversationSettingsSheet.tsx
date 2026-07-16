@@ -528,7 +528,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                               disabled={busy}
                               style={menuItemStyle(DANGER)}
                             >
-                              Remove from group
+                              {t('messaging:action.removeFromGroup')}
                             </button>
                           ) : null}
                         </div>
