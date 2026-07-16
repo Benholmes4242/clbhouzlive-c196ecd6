@@ -285,7 +285,7 @@ export default function SocialListPage({
                       background: 'transparent',
                       border: 'none',
                       padding: '10px 16px 4px',
-                      color: AMBER,
+                      color: '#94A3B8',
                       fontSize: 11.5,
                       fontWeight: 600,
                       fontFamily: FONT,
