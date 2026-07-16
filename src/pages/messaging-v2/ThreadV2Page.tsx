@@ -469,7 +469,7 @@ const ThreadV2Page: React.FC = () => {
                       letterSpacing: '-0.01em',
                     }}
                   >
-                    Say hello
+                    {t('messaging:empty.sayHello')}
                   </p>
                   <p
                     style={{
