@@ -188,13 +188,13 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
         <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
           <AlertCircle className="w-6 h-6 text-muted-foreground/40" />
         </div>
-        <p className="text-base font-semibold text-foreground">Couldn't load media</p>
-        <p className="text-sm text-muted-foreground">Please check your connection and try again.</p>
+        <p className="text-base font-semibold text-foreground">{t('courses:media.errorTitle')}</p>
+        <p className="text-sm text-muted-foreground">{t('courses:media.errorBody')}</p>
         <button
           onClick={() => refetch()}
           className="px-5 py-2.5 rounded-full text-sm font-semibold bg-[#f59e0b] text-white hover:bg-[#e8920f] active:scale-[0.97] transition-all min-h-[44px]"
         >
-          Retry
+          {t('common:action.retry')}
         </button>
       </div>
     );
