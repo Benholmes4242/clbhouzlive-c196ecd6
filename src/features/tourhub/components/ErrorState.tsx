@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils';
 import { AlertCircle, RefreshCw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ErrorStateProps {
   title?: string;
@@ -8,12 +9,15 @@ interface ErrorStateProps {
   className?: string;
 }
 
-export function ErrorState({ 
-  title = "Something went wrong",
-  message = "We couldn't load this content. Please try again.",
+export function ErrorState({
+  title,
+  message,
   onRetry,
-  className 
+  className
 }: ErrorStateProps) {
+  const { t } = useTranslation('common');
+  const resolvedTitle = title ?? t('state.somethingWentWrong');
+  const resolvedMessage = message ?? t('errors.genericBody');
   return (
     <div className={cn(
       "bg-surface-card border border-border-subtle rounded-sq-lg p-8 text-center",
