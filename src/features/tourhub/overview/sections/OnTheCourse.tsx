@@ -12,6 +12,7 @@ import { getScoreColor } from '../../_shared/scoreColor';
 
 import { PlayerAvatar } from '../../components/PlayerAvatar';
 import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SPACE } from '@/lib/spacing';
 
 interface Props {
   tournamentId: string | undefined;
