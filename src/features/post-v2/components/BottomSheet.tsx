@@ -2,6 +2,7 @@
 // Aligned to messaging-v2 sheet polish.
 
 import { X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Z } from '@/config/zIndex';
 
 interface Props {
