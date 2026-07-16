@@ -21,6 +21,7 @@ import { getFirstName } from '@/components/friend-sheet/parts/_shared/formatName
 import type { TrophyItem } from '../_shared/normalizeTrophyItem';
 import { seasonDisplayForBadgeId } from '@/lib/gam/seasonClock';
 import { useViewerHemisphere } from '@/hooks/gam/useViewerHemisphere';
+import { formatNumber } from '@/i18n/format';
 
 const EARNED_GOLD = '#F5C842';
 const IN_PROGRESS_BLUE = '#8CA3B8';
@@ -363,7 +364,7 @@ export const AchievementImmersive: React.FC<Props> = ({ item, viewerUserId, curr
                 ...GAM.TABULAR,
               }}
             >
-              <span style={{ color: materialColor, fontWeight: 700 }}>{remaining.toLocaleString()}</span>{' '}
+              <span style={{ color: materialColor, fontWeight: 700 }}>{formatNumber(remaining)}</span>{' '}
               more until your next medal
             </div>
           </div>

@@ -3,6 +3,7 @@ import { useLastRound } from '@/lib/whs/hooks';
 import RoundDetailSheet from './round-detail/RoundDetailSheet';
 import { CinemaCardSkeleton, LastRoundHeroCard } from './last-round-card';
 import { DarkSectionHeader } from './_shared/darkAtoms';
+import { formatWeekdayDayMonthShortGB } from '@/i18n/format';
 
 interface Props {
   connectionId: string;
@@ -69,9 +70,7 @@ export const LastRoundCard: React.FC<Props> = ({
   }
 
   const formattedDate = lastRound.play_date
-    ? new Date(lastRound.play_date)
-        .toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
-        .toUpperCase()
+    ? formatWeekdayDayMonthShortGB(lastRound.play_date).toUpperCase()
     : undefined;
 
   const timeAgo = lastRound.play_date ? timeAgoFrom(lastRound.play_date) : '';

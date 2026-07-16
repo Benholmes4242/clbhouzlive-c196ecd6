@@ -9,6 +9,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { formatRatingValue } from '@/utils/formatters';
+import { formatDateNumeric } from '@/i18n/format';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 const CourseReviewsPage: React.FC = () => {
@@ -246,7 +247,7 @@ const CourseReviewsPage: React.FC = () => {
                         <span className="text-xs font-medium">{name}</span>
                         {r.review_date && (
                           <span className="text-[11px] text-muted-foreground">
-                            {new Date(r.review_date).toLocaleDateString()}
+                            {formatDateNumeric(r.review_date)}
                           </span>
                         )}
                       </div>

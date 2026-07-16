@@ -19,6 +19,7 @@ import { GAM } from '../../tokens';
 import type { LegendCategory } from '@/lib/gam/types';
 import type { TrophyItem } from './normalizeTrophyItem';
 import { statusForEarned, statusCopy, type BadgeStatus, type StatusCopy } from './statusBadges';
+import { formatNumber } from '@/i18n/format';
 
 export interface DetailViewAchievement {
   kind: 'achievement';
@@ -146,10 +147,10 @@ export function deriveDetailView(item: TrophyItem, currentIndex: number | null =
     return null;
   })();
 
-  const counterText = isTiered ? currentValue.toLocaleString() : null;
+  const counterText = isTiered ? formatNumber(currentValue) : null;
   const progressLabel =
     isTiered && remaining != null && remaining > 0
-      ? `${remaining.toLocaleString()} more until your next medal`
+      ? `${formatNumber(remaining)} more until your next medal`
       : null;
 
   // Status decoration is gated on the milestone having been earned. A user

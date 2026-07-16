@@ -10,6 +10,7 @@ import React from 'react';
 import type { TrophyTier } from '../_shared/normalizeTrophyItem';
 import { MATERIAL_HEX } from '../_shared/rarityPalette';
 import { MATERIAL_LADDER } from '../_shared/levels';
+import { formatNumber } from '@/i18n/format';
 
 const OBSIDIAN_BODY = '#2A2F36';
 const OBSIDIAN_EDGE = '#D4A017';
@@ -54,7 +55,7 @@ export function GemLadder({ tiers }: { tiers: TrophyTier[] }) {
                 fontVariantNumeric: 'tabular-nums',
               }}
             >
-              {t.threshold.toLocaleString()}
+              {formatNumber(t.threshold)}
             </div>
           </div>
         );

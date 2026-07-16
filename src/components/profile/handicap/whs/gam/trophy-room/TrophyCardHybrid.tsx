@@ -13,6 +13,7 @@ import type { TrophyItem } from './_shared/normalizeTrophyItem';
 import { MATERIAL_HEX } from './_shared/rarityPalette';
 import { MATERIAL_LADDER, materialForTier } from './_shared/levels';
 import { renderBadgeIcon } from '../badgeIcons';
+import { formatNumber, formatMonthYearShortGB } from '@/i18n/format';
 // Legend cards are grouped by course in TrophyRoomSheet and render
 // LegendCard directly. TrophyCardHybrid only handles achievements.
 import { statusForEarned, statusCopy } from './_shared/statusBadges';
@@ -79,7 +80,7 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = 
   const nextMat = tiered && nextThreshold != null ? matName(MATERIAL_LADDER[Math.min(reached, MATERIAL_LADDER.length - 1)]) : null;
 
   const earnedDate = item.earnedAt
-    ? new Date(item.earnedAt).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
+    ? formatMonthYearShortGB(item.earnedAt)
     : null;
 
   const chipText = tiered
@@ -96,7 +97,7 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = 
 
   const baseSubline = tiered
     ? nextThreshold != null
-      ? `NEXT: ${nextThreshold.toLocaleString()} -> ${nextMat?.toUpperCase()}`
+      ? `NEXT: ${formatNumber(nextThreshold)} -> ${nextMat?.toUpperCase()}`
       : 'ALL TIERS EARNED'
     : earned
       ? item.description
@@ -270,7 +271,7 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = 
               lineHeight: 1,
             }}
           >
-            {(item.currentValue ?? 0).toLocaleString()}
+            {formatNumber(item.currentValue ?? 0)}
           </span>
         ) : earned ? (
           renderBadgeIcon(item.iconKey, 34, accent, 1.8)

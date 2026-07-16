@@ -21,6 +21,7 @@ import {
   type MyRatingsBucket,
   type RatedCourseData,
 } from './my-ratings/myRatingsTiers';
+import { formatNumber } from '@/i18n/format';
 
 interface AllCoursesListProps {
   userId: string;
@@ -499,14 +500,14 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
             )}
           </Button>
           <p className="text-[11px] text-muted-foreground">
-            Showing 1–{displayedCourses.length} of {totalFiltered.toLocaleString()} courses
+            Showing 1–{displayedCourses.length} of {formatNumber(totalFiltered)} courses
           </p>
         </div>
       )}
 
       {!hasMore && tieAnnotated.length > PAGE_SIZE && (
         <p className="text-center text-[11px] text-muted-foreground pt-4 pb-6">
-          {isOwnProfile ? "You\u2019ve reached the end" : "End of list"} • {totalFiltered.toLocaleString()} courses total
+          {isOwnProfile ? "You\u2019ve reached the end" : "End of list"} • {formatNumber(totalFiltered)} courses total
         </p>
       )}
 

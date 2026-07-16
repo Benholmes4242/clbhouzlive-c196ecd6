@@ -6,6 +6,7 @@
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, TrendingUp, Flame } from 'lucide-react';
+import { formatDayMonthShortGB } from '@/i18n/format';
 
 interface MomentumCardProps {
   recentlyPlayed: {
@@ -101,7 +102,7 @@ export const MomentumCard: React.FC<MomentumCardProps> = ({
     if (diffDays < 7) return `${diffDays} days ago`;
     if (diffDays < 30) return `${Math.floor(diffDays / 7)} week${Math.floor(diffDays / 7) > 1 ? 's' : ''} ago`;
     
-    return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    return formatDayMonthShortGB(date);
   };
 
   return (

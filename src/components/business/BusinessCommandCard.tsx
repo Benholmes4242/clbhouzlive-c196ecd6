@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { DeleteBusinessDialog } from './DeleteBusinessDialog';
 import { useBusinessStats7d } from '@/hooks/useBusinessStats7d';
+import { formatNumber } from '@/i18n/format';
 import { useBusinessFollowersCount } from '@/hooks/useBusinessFollow';
 import { useBusinessPendingRequestsCount } from '@/hooks/useBusinessPendingRequestsCount';
 import { useBusinessAccessRequestsRealtime } from '@/hooks/useBusinessAccessRequestsRealtime';
@@ -103,7 +104,7 @@ export function BusinessCommandCard({
   // Format stat display — "-" for zero/empty (never fabricate).
   const formatStat = (value: number | undefined) => {
     if (value === undefined || value === 0) return '-';
-    return value.toLocaleString();
+    return formatNumber(value);
   };
 
   const locationDisplay = getCityCountry({

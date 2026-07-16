@@ -1,10 +1,11 @@
 import React, { useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useProfileTouchDebug } from './ProfileTouchDebugProvider';
+import { formatTimeHm } from '@/i18n/format';
 
 function formatTime(ts: number) {
   try {
-    return new Date(ts).toLocaleTimeString();
+    return formatTimeHm(new Date(ts));
   } catch {
     return String(ts);
   }

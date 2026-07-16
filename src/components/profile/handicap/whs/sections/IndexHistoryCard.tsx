@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useHandicapHistory } from '@/lib/whs/hooks';
 import { DarkSectionHeader } from './_shared/darkAtoms';
+import { formatDayMonthShortGB } from '@/i18n/format';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const NUM: React.CSSProperties = { fontFamily: FONT, fontVariantNumeric: 'tabular-nums' };
@@ -29,7 +30,7 @@ const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
 
 const fmtDateShort = (iso: string) => {
   try {
-    return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }).toUpperCase();
+    return formatDayMonthShortGB(iso).toUpperCase();
   } catch {
     return '';
   }

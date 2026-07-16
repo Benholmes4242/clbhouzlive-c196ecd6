@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import Confetti from 'react-confetti';
 import { useWindowSize } from '@/hooks/useWindowSize';
 import { supabase } from '@/integrations/supabase/client';
+import { formatNumber } from '@/i18n/format';
 
 interface SeasonRecapModalProps {
   isOpen: boolean;
@@ -83,7 +84,7 @@ export const SeasonRecapModal: React.FC<SeasonRecapModalProps> = ({
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Total XP</span>
-              <span className="font-bold text-lg">{finalXP.toLocaleString()} XP</span>
+              <span className="font-bold text-lg">{formatNumber(finalXP)} XP</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Reward Tier</span>

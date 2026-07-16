@@ -6,6 +6,7 @@ import { ArrowLeft, Star, ThumbsUp } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AppSelect, AppSelectOption } from '@/components/ui/AppSelect';
 import { formatRatingValue } from '@/utils/formatters';
+import { formatDateNumeric } from '@/i18n/format';
 
 const SORT_OPTIONS: AppSelectOption<'recent' | 'highest' | 'lowest' | 'helpful'>[] = [
   { value: 'recent', label: 'Most recent' },
@@ -94,7 +95,7 @@ const UserReviewsPage: React.FC = () => {
             null;
           const rating = r.rating ?? 0;
           const dateLabel = r.review_date
-            ? new Date(r.review_date).toLocaleDateString()
+            ? formatDateNumeric(r.review_date)
             : '';
 
           return (

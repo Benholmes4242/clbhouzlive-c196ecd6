@@ -23,6 +23,7 @@ import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { BIZ } from '@/components/business/businessTokens';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { stripMentionMarkup } from '@/lib/mentions/format';
+import { formatNumber, formatDayMonthShortGB } from '@/i18n/format';
 
 type DateRange = '7d' | '30d' | '90d';
 
@@ -32,9 +33,9 @@ const RED = '#DC2626';
 const cardStyle: React.CSSProperties = { background: BIZ.card, border: `1px solid ${BIZ.hair}` };
 const numFeat: React.CSSProperties = { fontFeatureSettings: '"kern" 1, "liga" 1' };
 
-const formatNum = (n: number) => (n ?? 0).toLocaleString();
+const formatNum = (n: number) => formatNumber(n ?? 0);
 const formatDay = (iso: string) => {
-  try { return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }); }
+  try { return formatDayMonthShortGB(iso); }
   catch { return iso; }
 };
 

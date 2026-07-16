@@ -31,6 +31,7 @@ import { safeGoBack } from '@/utils/navigation';
 import SegmentedControl from '@/components/discover/SegmentedControl';
 import { RivalryCTA } from '@/components/profile/handicap/whs/sections/header/RivalryCTA';
 import { firstName } from '@/pages/rivalry-page/_shared/helpers';
+import { formatWeekdayDayMonthShortGB } from '@/i18n/format';
 
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { isHandicapSubtab, type HandicapSubtab } from '@/components/profile/handicap/whs/types';
@@ -190,9 +191,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
   const greeting = useMemo(() => getGreeting(), []);
 
   const subheadOwn = useMemo(() => {
-    const dateStr = new Date().toLocaleDateString('en-GB', {
-      weekday: 'short', day: 'numeric', month: 'short',
-    });
+    const dateStr = formatWeekdayDayMonthShortGB(new Date());
     return displayName
       ? `${greeting}, ${displayName} · ${dateStr}`
       : `${greeting} · ${dateStr}`;

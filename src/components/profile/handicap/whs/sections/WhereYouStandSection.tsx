@@ -7,6 +7,7 @@ import type {
   HandicapBucket,
 } from '@/lib/whs/types';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { formatNumber } from '@/i18n/format';
 
 const AMBER     = '#F7931E';
 const AMBER_14  = 'rgba(247,147,30,0.14)';
@@ -322,7 +323,7 @@ const AvailableCard: React.FC<{
             fontVariantNumeric: 'tabular-nums',
           }}
         >
-          {data.cohort_size.toLocaleString()}
+          {formatNumber(data.cohort_size)}
         </strong>{' '}
         active golfers on clbhouz this season.
       </p>
