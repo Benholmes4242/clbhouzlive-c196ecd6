@@ -66,15 +66,16 @@ export function BirdieHaulsLedger({ region, regionUpper, mode, onRowTap }: Props
 
   if (!isLoading && display.length === 0) return null;
 
-  const scopeLabel = mode === 'alltime' ? 'BEST EVER' : 'LATEST';
+  const overlineLabel = mode === 'alltime' ? 'All-time birdie hauls' : 'Latest birdie hauls';
 
   return (
     <section style={{ marginTop: 32, fontFamily: FONT }}>
       <SectionHead
-        overline={`Birdie hauls · ${scopeLabel} · ${regionUpper}`}
+        overline={overlineLabel}
         meta="View all"
         onMeta={() => setSheetOpen(true)}
       />
+
       <div style={{ padding: '0 16px' }}>
         <div
           style={{
