@@ -383,7 +383,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                     color: SUB,
                   }}
                 >
-                  Members
+                  {t('messaging:list.members')}
                 </div>
 
                 {isAdmin ? (
