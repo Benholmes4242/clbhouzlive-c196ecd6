@@ -37,7 +37,7 @@ export interface TusUploadResult {
  * Upload a video using TUS protocol for resumable uploads
  */
 export async function uploadVideoWithTus(options: TusUploadOptions): Promise<TusUploadResult> {
-  const { file, onProgress, onSuccess, onError, metadata = {} } = options;
+  const { file, onProgress, onSuccess, onError, metadata = {}, chunkSize, retryDelays } = options;
 
   // Step 1: Get TUS endpoint from Cloudflare via edge function
   const { data: tusEndpoint, error: endpointError } = await supabase.functions.invoke(
