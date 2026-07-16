@@ -140,12 +140,28 @@ export default tseslint.config(
       ],
     },
   },
+  // ─── Wave 3b.iii — user-visible attribute guard for gated scopes ──
+  // Diagnosis: eslint-plugin-i18next's `jsx-text-only` mode never
+  // scans JSX attributes, and `jsx-only` mode has no include-list —
+  // it fires on every prop (color/side/fill/reportType/etc), which is
+  // untenable. Substitute a targeted no-restricted-syntax selector
+  // that flags string-literal values on exactly the five user-visible
+  // attributes we care about. Empty strings and single-token upper-
+  // case identifiers are allowed via the value regex.
+  const literalAttrSyntax = {
+    selector:
+      "JSXAttribute[name.name=/^(aria-label|title|placeholder|alt|label)$/] > Literal[value=/[a-z]/]",
+    message:
+      "Localise user-visible props (aria-label/title/placeholder/alt/label) via t() — no bare string literals.",
+  };
+
+  return [
   // ─── Wave 3a.ii — scope-dir ERROR flip for auth ────────────────────
-  // Reuses the widened options above; bare "error" would drop them.
   {
     files: ["src/pages/auth/**/*.{ts,tsx}"],
     rules: {
       "i18next/no-literal-string": ["error", i18nLiteralOptions],
+      "no-restricted-syntax": ["error", literalAttrSyntax],
     },
   },
   // ─── Wave 3b — scope-dir ERROR flip for messaging ─────────────────
@@ -153,6 +169,11 @@ export default tseslint.config(
     files: ["src/pages/messaging-v2/**/*.{ts,tsx}"],
     rules: {
       "i18next/no-literal-string": ["error", i18nLiteralOptions],
+      "no-restricted-syntax": ["error", literalAttrSyntax],
+    },
+  }
+];
+})();
     },
   }
 );
