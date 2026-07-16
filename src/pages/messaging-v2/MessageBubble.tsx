@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import { Check, AlertCircle, Clock, Flag } from 'lucide-react';
 import { ReportSheet } from "@/components/moderation/ReportSheet";
