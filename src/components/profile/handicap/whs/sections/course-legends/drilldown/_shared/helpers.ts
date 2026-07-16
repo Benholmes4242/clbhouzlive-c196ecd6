@@ -1,4 +1,5 @@
 import type { LegendCategory } from '@/lib/gam/types';
+import { formatDay2MonthYearShortGB } from '@/i18n/format';
 
 export function formatHeldFor(days: number): string {
   if (days < 1) return 'Held today';
@@ -16,12 +17,9 @@ export function daysSince(iso: string | null): number {
 }
 
 export function formatAttainedAt(iso: string): string {
-  const d = new Date(iso);
-  return d.toLocaleDateString('en-GB', {
-    month: 'short',
-    day: '2-digit',
-    year: 'numeric',
-  });
+  // en-GB pins day-before-month regardless of option order — matches
+  // legacy `{ month:'short', day:'2-digit', year:'numeric' }` → "05 Jul 2026".
+  return formatDay2MonthYearShortGB(iso);
 }
 
 /** Rank tier colour — used for rank chips, champion card border, etc. */
