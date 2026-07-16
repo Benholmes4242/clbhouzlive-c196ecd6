@@ -1,5 +1,7 @@
 import type { WhsScore } from './types';
 import { projectNextRound } from './handicapMath';
+import { formatMonthLongGB } from '@/i18n/format';
+
 
 /**
  * Trend-projection helper for the Forecast card.

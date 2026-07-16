@@ -2,6 +2,8 @@
 import React from 'react';
 import { Card, CardContent, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { formatNewsTimestampUS } from '@/i18n/format';
+
 
 interface NewsArticle {
   title: string;
@@ -18,15 +20,8 @@ interface NewsCardProps {
 }
 
 const NewsCard = ({ article, onClick }: NewsCardProps) => {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
+  const formatDate = (dateString: string) => formatNewsTimestampUS(new Date(dateString));
+
 
   const getFallbackImage = () => {
     return 'https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=400&h=300&fit=crop&auto=format';
