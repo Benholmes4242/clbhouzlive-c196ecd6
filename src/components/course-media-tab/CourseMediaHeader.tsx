@@ -14,10 +14,10 @@ interface CourseMediaHeaderProps {
   courseId: string;
 }
 
-const FILTERS: { key: CourseMediaFilter; label: string }[] = [
-  { key: 'all', label: 'All' },
-  { key: 'photos', label: 'Photos' },
-  { key: 'videos', label: 'Videos' },
+const FILTER_KEYS: { key: CourseMediaFilter; i18nKey: string }[] = [
+  { key: 'all', i18nKey: 'courses:media.filterAll' },
+  { key: 'photos', i18nKey: 'courses:media.filterPhotos' },
+  { key: 'videos', i18nKey: 'courses:media.filterVideos' },
 ];
 
 export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
@@ -26,6 +26,7 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
   onFilterChange,
   courseId,
 }) => {
+  const { t } = useTranslation(['courses']);
   const navigate = useNavigate();
 
   const hasMedia = mediaCounts.total > 0;
