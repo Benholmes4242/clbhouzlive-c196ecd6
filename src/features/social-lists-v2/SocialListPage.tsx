@@ -40,7 +40,7 @@ const BG = '#F8FAFC';
 const SURFACE = '#FFFFFF';
 const HAIR = 'rgba(15,23,42,0.08)';
 const HAIR_STRONG = 'rgba(15,23,42,0.12)';
-const AMBER = '#F7931E';
+
 const AMBER_DEEP = '#C97A10';
 
 /* ── props ──────────────────────────────────────────────────────────── */
@@ -285,7 +285,7 @@ export default function SocialListPage({
                       background: 'transparent',
                       border: 'none',
                       padding: '10px 16px 4px',
-                      color: AMBER,
+                      color: '#94A3B8',
                       fontSize: 11.5,
                       fontWeight: 600,
                       fontFamily: FONT,

@@ -6,7 +6,7 @@ import type { ActivityFeedRowV2 } from '../hooks/useActivityFeedV2';
 const GEIST =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const AMBER = '#F7931E';
-const AMBER_DEEP = '#C97A10';
+
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 
 /**
@@ -76,7 +76,7 @@ export const FeaturedMomentCard: React.FC<Props> = ({ row }) => {
           fontWeight: 800,
           letterSpacing: '0.14em',
           textTransform: 'uppercase',
-          color: AMBER_DEEP,
+          color: '#94A3B8',
           marginBottom: 10,
         }}
       >
