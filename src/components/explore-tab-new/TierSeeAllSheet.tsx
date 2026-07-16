@@ -420,8 +420,6 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
                   holderClub={r.holder_club ?? null}
                   count={r.eagles ?? 0}
                   max={eagleMax}
-                  accent={SC_EAGLE}
-                  barGradient={eagleBarGradient}
                   countLabelSingular="EAGLE"
                   countLabelPlural="EAGLES"
                   subline={null}
