@@ -9,7 +9,9 @@
  * Golf lexicon (Birdie/Eagle/Par/Bogey…) is out of scope for i18n and
  * therefore never touches this module.
  */
+import { formatDistanceToNow } from 'date-fns';
 import { getActiveLocale } from './index';
+
 
 type DateInput = Date | string | number;
 
