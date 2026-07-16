@@ -232,7 +232,7 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
           }}
         >
           <div style={{ flex: 1, minWidth: 0 }}>Course</div>
-          <div style={{ width: 36, textAlign: 'right' }}>To par</div>
+          <div style={{ width: 36, textAlign: 'center' }}>To par</div>
           <div style={{ width: 26, textAlign: 'right' }}>Gross</div>
           <div style={{ width: 12 }} aria-hidden />
         </div>
