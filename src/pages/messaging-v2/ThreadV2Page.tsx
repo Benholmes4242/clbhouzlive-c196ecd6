@@ -396,7 +396,7 @@ const ThreadV2Page: React.FC = () => {
             style={{ padding: '80px 24px', gap: 12 }}
           >
             <p style={{ color: INK, fontSize: 16, fontWeight: 500, margin: 0 }}>
-              Couldn't load this conversation
+              {t('messaging:error.couldntLoadThread')}
             </p>
             <button
               type="button"
@@ -411,17 +411,20 @@ const ThreadV2Page: React.FC = () => {
                 border: 'none',
               }}
             >
-              Retry
+              {t('common:action.retry')}
             </button>
           </div>
         ) : messages.length === 0 ? (
           (() => {
             const isGroup = (detail?.type ?? conv?.type) === 'group';
+            const hasName = header.name && header.name !== 'Conversation' && header.name !== 'Unknown';
             const subtitle = isGroup
-              ? `This is the start of ${header.name && header.name !== 'Conversation' ? header.name : 'this group'}.`
-              : header.name && header.name !== 'Conversation' && header.name !== 'Unknown'
-                ? `This is the start of your conversation with ${header.name}.`
-                : 'This is the start of your conversation.';
+              ? hasName
+                ? t('messaging:empty.threadStartGroup', { name: header.name })
+                : t('messaging:empty.threadStartGroupGeneric')
+              : hasName
+                ? t('messaging:empty.threadStartWith', { name: header.name })
+                : t('messaging:empty.threadStart');
             return (
               <div
                 className="flex flex-col items-center justify-center text-center"
