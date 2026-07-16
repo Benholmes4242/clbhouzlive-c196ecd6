@@ -108,6 +108,7 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
   courseName,
   courseId,
 }, ref) => {
+  const { t } = useTranslation(['courses', 'common']);
   const navigate = useNavigate();
   const sentinelRef = useRef<HTMLDivElement>(null);
 
