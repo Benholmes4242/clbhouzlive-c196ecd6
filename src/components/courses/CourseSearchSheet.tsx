@@ -357,6 +357,7 @@ interface ResultRowProps {
 }
 
 function ResultRow({ course, index, onClick, isFocused, onMouseEnter, isAlreadyAdded, isSelecting, isLast, animate }: ResultRowProps) {
+  const { t } = useTranslation('courses');
   const [imgError, setImgError] = useState(false);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -435,7 +436,7 @@ function ResultRow({ course, index, onClick, isFocused, onMouseEnter, isAlreadyA
                 <span style={{ color: course.rating >= 9.0 ? '#d97706' : '#78716C', fontWeight: 600 }}>
                   {course.rating.toFixed(1)}
                 </span>
-                <span style={{ color: '#AEAEB2', fontWeight: 400, fontSize: '11px', marginLeft: '2px' }}>/ 10</span>
+                <span style={{ color: '#AEAEB2', fontWeight: 400, fontSize: '11px', marginLeft: '2px' }}>{t('searchSheet.outOfTen')}</span>
               </span>
             )}
           </div>
@@ -453,7 +454,7 @@ function ResultRow({ course, index, onClick, isFocused, onMouseEnter, isAlreadyA
             }}
           >
             <Check className="w-3 h-3" style={{ color: '#f59e0b' }} />
-            Added
+            {t('searchSheet.added')}
           </div>
         )}
       </div>
