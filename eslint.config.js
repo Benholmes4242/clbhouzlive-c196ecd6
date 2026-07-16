@@ -35,8 +35,15 @@ export default tseslint.config(
         {
           mode: "jsx-text-only",
           "should-validate-template": false,
+          // Wave 3b.ii — widened jsx-attribute instrument. Previously the
+          // include list was [] which meant NO string props were audited
+          // (jsx-text-only mode). We now explicitly audit the user-visible
+          // string props. Excludes are pruned to technical props only:
+          //   className/style/styleName → visual, never user copy
+          //   type/id/key/name/href/src → identifiers / URLs
+          //   role/data-.*/testId/test-id/data-testid → a11y roles + test hooks
           "jsx-attributes": {
-            include: [],
+            include: ["placeholder", "title", "aria-label", "label"],
             exclude: [
               "className",
               "style",
@@ -44,17 +51,17 @@ export default tseslint.config(
               "type",
               "id",
               "key",
+              "name",
               "href",
               "src",
-              "alt",
               "role",
               "data-.*",
-              "aria-.*",
               "testId",
               "test-id",
               "data-testid",
             ],
           },
+
           callees: {
             exclude: [
               "i18n(ext)?",
