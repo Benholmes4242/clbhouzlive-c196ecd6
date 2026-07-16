@@ -341,10 +341,10 @@ export const MessageBubble: React.FC<Props> = ({
                 padding: 0,
                 cursor: 'pointer',
               }}
-              aria-label="Retry send"
+              aria-label={t('action.retrySend')}
             >
               <AlertCircle size={11} />
-              Failed — tap to retry
+              {t('bubble.failedTapRetry')}
             </button>
           ) : isSending ? (
             <Clock size={11} style={{ position: "relative",  color: HINT }} />
