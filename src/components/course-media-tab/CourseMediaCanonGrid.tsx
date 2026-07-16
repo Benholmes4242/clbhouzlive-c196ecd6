@@ -19,6 +19,7 @@
  */
 
 import { forwardRef, useCallback, useEffect, useMemo, useRef } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Loader2, AlertCircle, Camera, Film, Flag, Sunrise, Building2 } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
