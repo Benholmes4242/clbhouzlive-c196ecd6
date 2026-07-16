@@ -52,7 +52,8 @@ function ensureTickerStyles() {
 }
 .almanac-ticker-track {
   display: flex;
-  gap: 20px;
+  align-items: center;
+  gap: 24px;
   width: max-content;
   animation: almanac-ticker-scroll 28s linear infinite;
   will-change: transform;
