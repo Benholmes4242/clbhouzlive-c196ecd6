@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Filter, X, Check } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { Button } from '@/components/ui/button';
@@ -13,14 +14,14 @@ interface RatingFilterChipsProps {
   counts?: Partial<Record<ScoreTier | 'all', number>>;
 }
 
-// Tier-only labels (no numeric ranges)
-const FILTER_OPTIONS: { key: ScoreTier | 'all'; label: string }[] = [
-  { key: 'all', label: 'All ratings' },
-  { key: 'exceptional', label: 'Exceptional' },
-  { key: 'excellent', label: 'Excellent' },
-  { key: 'good', label: 'Good' },
-  { key: 'fair', label: 'Fair' },
-  { key: 'poor', label: 'Poor' },
+// Tier-only labels (no numeric ranges) — labels resolved via t() at render time
+const FILTER_OPTIONS: { key: ScoreTier | 'all'; labelKey: string }[] = [
+  { key: 'all', labelKey: 'review.filter.optionAll' },
+  { key: 'exceptional', labelKey: 'review.filter.optionExceptional' },
+  { key: 'excellent', labelKey: 'review.filter.optionExcellent' },
+  { key: 'good', labelKey: 'review.filter.optionGood' },
+  { key: 'fair', labelKey: 'review.filter.optionFair' },
+  { key: 'poor', labelKey: 'review.filter.optionPoor' },
 ];
 
 export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
@@ -28,12 +29,16 @@ export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
   onChange,
   counts = {},
 }) => {
+  const { t } = useTranslation('courses');
   const [open, setOpen] = useState(false);
 
   const activeLabel =
     value === null
       ? null
-      : FILTER_OPTIONS.find((o) => o.key === value)?.label ?? null;
+      : (() => {
+          const opt = FILTER_OPTIONS.find((o) => o.key === value);
+          return opt ? t(opt.labelKey) : null;
+        })();
 
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation();
