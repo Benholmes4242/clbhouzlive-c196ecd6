@@ -553,7 +553,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 }}
               >
                 <MapPin size={16} strokeWidth={2} />
-                View course
+                {t('courses:scorecard.viewCourse')}
               </button>
             )}
           </div>
