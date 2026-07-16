@@ -4,7 +4,9 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExploreFeed } from './hooks/useExploreFeed';
 import { useExploreRegion } from './hooks/useExploreRegion';
 
-import { CircleActivityStrip } from './CircleActivityStrip';
+import { WireTicker } from './WireTicker';
+import { LeadStory } from './LeadStory';
+
 import {
   AlmanacLens,
   FeatTierRail,
@@ -95,20 +97,18 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
 
   return (
     <div style={{ background: SLATE_50, minHeight: '100vh' }}>
+      {/* 1. WIRE TICKER — friends achievements as a one-line marquee at the very top */}
+      <WireTicker userId={userId} />
+
       {/* SCOPE 1 — ends where the almanac begins; shell tabs sticky here */}
       <div>
         {shellTabs}
 
-        {/* 1. Season strip */}
+        {/* 2. Season strip */}
         <SeasonStrip />
 
-        {/* 2. Rank identity card (dark) */}
-        <RankIdentityCard userId={userId} />
-
-        {/* 3. Friends rail (region-independent) — rail owns its header */}
-        <div style={{ marginTop: SPACE.sectionSection }}>
-          <CircleActivityStrip userId={userId} />
-        </div>
+        {/* 3. Rank identity strip (slim single-row Almanac variant) */}
+        <RankIdentityCard userId={userId} variant="strip" />
       </div>
 
       {/* SCOPE 2 — spans the almanac + everything below; region chips sticky here */}
@@ -123,11 +123,15 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
           onScopeChange={setScope}
         />
 
-        {/* 5. Empty-region editorial card (only when all four tiers are empty) */}
+        {/* 5. LEAD STORY — cinematic tile driven by the top record for scope/region */}
+        <LeadStory region={activeRegion} regionUpper={regionUpper} mode={scope} />
+
+        {/* 6. Empty-region editorial card (only when all four tiers are empty) */}
         <AlmanacEmptyCard region={activeRegion} />
 
-        {/* 6. Course Crowns (course records) -- self-hiding, owns its header */}
+        {/* 7. Course Crowns (course records) -- self-hiding, owns its header */}
         <CourseCrownsRail region={activeRegion} opener={opener} mode={scope} />
+
 
         {/* 7. Legendary hero (aces & albatrosses) */}
         <LegendarySection region={activeRegion} mode={scope} onRowTap={handleFeatRowTap} />
