@@ -69,6 +69,21 @@ const literalAttrSyntax = {
     "Localise user-visible props (aria-label/title/placeholder/alt/label) via t() — no bare string literals.",
 };
 
+const toLocaleSyntax = [
+  {
+    selector: "CallExpression[callee.property.name='toLocaleDateString']",
+    message: "Use a wrapper from src/i18n/format.ts (e.g. formatDayMonthYearShortGB) instead of Date.prototype.toLocaleDateString().",
+  },
+  {
+    selector: "CallExpression[callee.property.name='toLocaleTimeString']",
+    message: "Use a wrapper from src/i18n/format.ts (e.g. formatTimeHm) instead of Date.prototype.toLocaleTimeString().",
+  },
+  {
+    selector: "CallExpression[callee.property.name='toLocaleString']",
+    message: "Use formatNumber() or another wrapper from src/i18n/format.ts instead of toLocaleString().",
+  },
+];
+
 export default tseslint.config(
   { ignores: ["dist"] },
   {
