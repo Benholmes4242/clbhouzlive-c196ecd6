@@ -4,7 +4,9 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExploreFeed } from './hooks/useExploreFeed';
 import { useExploreRegion } from './hooks/useExploreRegion';
 
-import { CircleActivityStrip } from './CircleActivityStrip';
+import { WireTicker } from './WireTicker';
+import { LeadStory } from './LeadStory';
+
 import {
   AlmanacLens,
   FeatTierRail,
