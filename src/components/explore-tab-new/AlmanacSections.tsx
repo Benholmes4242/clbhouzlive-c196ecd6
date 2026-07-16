@@ -331,9 +331,12 @@ function BirdieHaulsModeToggle({
   );
 }
 
-function FeatTierRailInner({ region, tier, title, variant = 'standard', onRowTap }: TierProps) {
+function FeatTierRailInner({ region, tier, title, variant = 'standard', onRowTap, mode: modeProp }: TierProps) {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<RecordsMode>('latest');
+  const [localMode, setLocalMode] = useState<RecordsMode>('latest');
+  const mode = modeProp ?? localMode;
+  const setMode = modeProp ? () => {} : setLocalMode;
+  const controlled = modeProp !== undefined;
   const { data, isLoading } = useRegionFeats(region, tier, mode);
   const rawRows = data ?? [];
   const rows = variant === 'list' && tier === 'birdie_hauls'
