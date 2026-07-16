@@ -314,7 +314,7 @@ export const ConversationRow: React.FC<Props> = ({ conversation }) => {
               setMenuOpen(true);
             }}
             onPointerDown={stop}
-            aria-label="Conversation actions"
+            aria-label={t('a11y.conversationActions')}
             style={{
               background: 'transparent',
               border: 'none',
