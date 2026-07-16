@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link2, Trash2, CheckCircle2, AlertTriangle } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { formatRelativeAgoLong } from '@/i18n/format';
 import { toast } from '@/lib/toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
@@ -135,8 +135,8 @@ const SyncedBody: React.FC<{
   const rows = [
     { label: 'Membership', value: connection.membership_number || '--' },
     { label: 'Passport ID', value: String(connection.passport_id ?? '--') },
-    { label: 'Connected', value: formatDistanceToNow(connectedAt, { addSuffix: true }) },
-    { label: 'Last sync', value: lastSyncedAt ? formatDistanceToNow(lastSyncedAt, { addSuffix: true }) : '--' },
+    { label: 'Connected', value: formatRelativeAgoLong(connectedAt.toISOString()) },
+    { label: 'Last sync', value: lastSyncedAt ? formatRelativeAgoLong(lastSyncedAt.toISOString()) : '--' },
   ];
 
   return (
@@ -205,7 +205,7 @@ const SyncedBody: React.FC<{
           >
             {isAuthFailed
               ? 'Sync issue, try disconnect and reconnect'
-              : `Synced ${lastSyncedAt ? formatDistanceToNow(lastSyncedAt, { addSuffix: true }) : 'recently'}`}
+              : `Synced ${lastSyncedAt ? formatRelativeAgoLong(lastSyncedAt.toISOString()) : 'recently'}`}
           </span>
         </div>
       </div>

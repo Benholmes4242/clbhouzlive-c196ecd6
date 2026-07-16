@@ -7,7 +7,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { Trophy } from './types';
 import { Trophy as TrophyIcon, Star, Target, Flag, Award, Medal, Crown, Zap, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { format } from 'date-fns';
+import { formatMonthLongDayYear } from '@/i18n/format';
 
 interface TrophyDetailSheetProps {
   trophy: Trophy | null;
@@ -114,7 +114,7 @@ export const TrophyDetailSheet: React.FC<TrophyDetailSheetProps> = ({
                 className="text-sm font-medium mt-1"
                 style={{ color: 'var(--dgp-text-primary)' }}
               >
-                {format(new Date(trophy.earnedDate), 'MMMM d, yyyy')}
+                {formatMonthLongDayYear(trophy.earnedDate)}
               </p>
             </div>
           )}

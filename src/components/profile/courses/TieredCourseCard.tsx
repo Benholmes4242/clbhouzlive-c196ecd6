@@ -5,7 +5,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, Trophy } from 'lucide-react';
 import { RatingPill } from '@/components/ui/RatingPill';
-import { format } from 'date-fns';
+import { formatDayMonthYearShortGB } from '@/i18n/format';
 import { motion } from 'framer-motion';
 
 export interface CourseCardData {
@@ -105,7 +105,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
               <div className="flex items-center gap-1 mt-1.5 whitespace-nowrap">
                 <Calendar className="w-3 h-3 text-muted-foreground" />
                 <span className="text-[10px] text-muted-foreground">
-                  {format(new Date(course.last_played_at), 'd MMM yyyy')}
+                  {formatDayMonthYearShortGB(course.last_played_at)}
                 </span>
               </div>
             )}
@@ -169,7 +169,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
               <div className="flex items-center gap-1 mt-1">
                 <Calendar className="w-2.5 h-2.5 text-muted-foreground" />
                 <span className="text-[9px] text-muted-foreground">
-                  {format(new Date(course.last_played_at), 'd MMM yyyy')}
+                  {formatDayMonthYearShortGB(course.last_played_at)}
                 </span>
               </div>
             )}
@@ -225,7 +225,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
             <div className="flex items-center gap-1 mt-1">
               <Calendar className="w-2.5 h-2.5 text-muted-foreground" />
               <span className="text-[9px] text-muted-foreground">
-                {format(new Date(course.last_played_at), 'd MMM yyyy')}
+                {formatDayMonthYearShortGB(course.last_played_at)}
               </span>
             </div>
           )}

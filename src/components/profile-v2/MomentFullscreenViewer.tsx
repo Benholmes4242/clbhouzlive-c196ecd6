@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { MomentPost } from './types';
 import { X, ChevronLeft, ChevronRight, Heart, MessageCircle, MapPin } from 'lucide-react';
-import { format } from 'date-fns';
+import { formatMonthDayYearShort } from '@/i18n/format';
 import { useSwipeable } from 'react-swipeable';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
@@ -180,7 +180,7 @@ export const MomentFullscreenViewer: React.FC<MomentFullscreenViewerProps> = ({
                 className="text-xs"
                 style={{ color: 'var(--dgp-text-muted)' }}
               >
-                {format(new Date(currentMoment.date), 'MMM d, yyyy')}
+                {formatMonthDayYearShort(currentMoment.date)}
               </span>
 
               <div className="flex items-center gap-4">

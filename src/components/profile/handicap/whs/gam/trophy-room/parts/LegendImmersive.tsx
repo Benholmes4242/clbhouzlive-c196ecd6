@@ -8,7 +8,7 @@
 import React, { useLayoutEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Share2, Crown } from 'lucide-react';
-import { format } from 'date-fns';
+import { formatMonthDayYearShort } from '@/i18n/format';
 import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
 import { applyRouteChrome } from '@/lib/routeChrome';
 import { GAM } from '../../tokens';
@@ -35,7 +35,7 @@ function hexToRgb(hex: string): string {
 
 function fmtDate(iso: string): string {
   try {
-    return format(new Date(iso), 'MMM d, yyyy');
+    return formatMonthDayYearShort(iso);
   } catch {
     return '';
   }

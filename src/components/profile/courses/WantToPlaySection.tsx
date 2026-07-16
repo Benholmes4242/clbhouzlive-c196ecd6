@@ -8,7 +8,7 @@ import { MapPin, Trophy, ListChecks, X } from 'lucide-react';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { cn } from '@/lib/utils';
 import { useUserWantToPlay, WantToPlayCourse } from '@/hooks/useUserWantToPlay';
-import { formatDistanceToNow } from 'date-fns';
+import { formatRelativeAgoLong } from '@/i18n/format';
 import { toast } from '@/lib/toast';
 
 interface WantToPlaySectionProps {
@@ -79,7 +79,7 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
       >
         {wantToPlay.map((course) => {
           const isTop100 = !!(course.global_rank || course.regional_rank || course.usa_rank);
-          const addedAgo = formatDistanceToNow(new Date(course.added_at), { addSuffix: true });
+          const addedAgo = formatRelativeAgoLong(course.added_at);
           const loc = course.sub_country || course.country;
           return (
             <article

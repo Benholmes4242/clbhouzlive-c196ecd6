@@ -5,7 +5,7 @@ import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/lib/toast';
-import { formatDistanceToNow } from 'date-fns';
+import { formatRelativeAgoLong } from '@/i18n/format';
 import { AppLog } from '@/lib/logger';
 import {
   AlertDialog,
@@ -241,7 +241,7 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
             {requests.map((request) => {
               const requesterName = request.requester.display_name || request.requester.username || 'A user';
               const roleLabel = getRoleLabel(request.requested_role);
-              const timeAgo = formatDistanceToNow(new Date(request.created_at), { addSuffix: false });
+              const timeAgo = formatRelativeAgoLong(request.created_at).replace(/ ago$/, '');
 
               return (
                 <div 

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { format } from 'date-fns';
+import { formatMonthDayHm24 } from '@/i18n/format';
 import { Send } from 'lucide-react';
 import { toast } from '@/lib/toast';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
@@ -141,7 +141,7 @@ export default function SupportThreadPage() {
                 >
                   {mine ? 'You' : 'Clbhouz Support'}
                   <span className="mx-1">.</span>
-                  {(() => { try { return format(new Date(m.created_at), 'MMM d, HH:mm'); } catch { return ''; } })()}
+                  {(() => { try { return formatMonthDayHm24(m.created_at); } catch { return ''; } })()}
                 </div>
                 <div
                   className="text-[14.5px] leading-relaxed whitespace-pre-wrap break-words"
