@@ -105,7 +105,7 @@ export const VoiceNote: React.FC<Props> = ({ attachment, isOutgoing }) => {
       <button
         type="button"
         onClick={toggle}
-        aria-label={playing ? 'Pause' : 'Play'}
+        aria-label={playing ? t('action.pause') : t('action.play')}
         disabled={!src}
         style={{
           flexShrink: 0,
