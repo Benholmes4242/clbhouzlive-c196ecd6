@@ -19,8 +19,8 @@ import { relativeTime } from '@/utils/relativeTime';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const INK = '#0F172A';
-const PANEL_BG = 'linear-gradient(180deg, #FCF8F0 0%, #F7F1E4 100%)';
-const PANEL_BORDER = '0.5px solid rgba(158,115,0,0.18)';
+const PANEL_BG = 'linear-gradient(180deg, #FBFAF7 0%, #F5F3EC 100%)';
+const PANEL_BORDER = '0.5px solid rgba(158,115,0,0.14)';
 const PANEL_SHADOW = '0 1px 3px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.05)';
 const GOLD = '#FBBC2E';
 const PARCHMENT_GOLD = '#B8860B';
@@ -95,6 +95,21 @@ function categoryLabel(category: string): string {
   const base = stripWindow(category);
   return CATEGORY_META[base]?.label ?? base.replace(/_/g, ' ');
 }
+// Render the record's headline value with the right unit. Mirrors the old
+// caption unit derivation (CATEGORY_META), except Score (best_score_diff)
+// reads as a differential rather than strokes.
+function recordCopy(category: string, value: number): string {
+  const base = stripWindow(category);
+  if (base === 'best_score_diff') {
+    const n = Math.round(value * 10) / 10;
+    return `${n} differential`;
+  }
+  const meta = CATEGORY_META[base];
+  const n = Math.round(value);
+  if (!meta) return String(n);
+  const unit = n === 1 ? meta.unitSingular : meta.unit;
+  return `${n} ${unit}`;
+}
 function progressPct(_category: string, gap: number): number {
   const n = Math.max(1, Math.round(gap));
   return Math.max(20, 96 - (n - 1) * 14);
@@ -163,7 +178,7 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
                 lineHeight: 1,
               }}
             >
-              {`Course crowns · ${regionUpperFor(region)}`}
+              {`Course records · ${regionUpperFor(region)}`}
             </div>
             <div
               style={{
