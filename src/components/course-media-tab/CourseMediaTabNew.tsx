@@ -15,6 +15,7 @@ interface CourseMediaTabNewProps {
 }
 
 const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseName }) => {
+  const { t } = useTranslation(['courses']);
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState<CourseMediaFilter>('all');
