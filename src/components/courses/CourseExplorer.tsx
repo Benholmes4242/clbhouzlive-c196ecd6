@@ -555,11 +555,11 @@ const CourseExplorer = () => {
             fontWeight: 500,
           }}>
             {hasSearch ? (
-              <><strong style={{ color: '#0F172A', fontWeight: 700 }}>{totalCount.toLocaleString()}</strong> {totalCount === 1 ? 'result' : 'results'}</>
+              <><strong style={{ color: '#0F172A', fontWeight: 700 }}>{formatNumber(totalCount)}</strong> {totalCount === 1 ? 'result' : 'results'}</>
             ) : selectedRegion === PRIMARY_REGIONS.ALL ? (
-              <><strong style={{ color: '#0F172A', fontWeight: 700 }}>{totalCount.toLocaleString()}</strong> courses worldwide</>
+              <><strong style={{ color: '#0F172A', fontWeight: 700 }}>{formatNumber(totalCount)}</strong> courses worldwide</>
             ) : (
-              <><strong style={{ color: '#0F172A', fontWeight: 700 }}>{totalCount.toLocaleString()}</strong> courses in {getRegionLabel()}</>
+              <><strong style={{ color: '#0F172A', fontWeight: 700 }}>{formatNumber(totalCount)}</strong> courses in {getRegionLabel()}</>
             )}
           </span>
           <AppSelect
