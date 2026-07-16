@@ -217,7 +217,9 @@ const SkeletonMiddle: React.FC<{ nineHole: boolean }> = ({ nineHole }) => (
   </div>
 );
 
-const SyncingMiddle: React.FC<{ nineHole: boolean }> = ({ nineHole }) => (
+const SyncingMiddle: React.FC<{ nineHole: boolean }> = ({ nineHole }) => {
+  const { t } = useTranslation(['courses']);
+  return (
   <div style={{ position: 'relative', padding: '4px 16px 24px' }}>
     <style>{KEYFRAMES}</style>
     <div style={{ opacity: 0.35, pointerEvents: 'none', display: 'flex', flexDirection: 'column', gap: 16 }}>
