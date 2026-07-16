@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { Pencil, Calendar, ArrowUp, ArrowDown, CheckCircle2 } from 'lucide-react';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { useNavigate } from 'react-router-dom';
-import { format } from 'date-fns';
+import { formatMonthDayYearShort } from '@/i18n/format';
 import { getScoreRingColors } from '@/hooks/useTierStyles';
 import { getRatingTier, rampForRating, ratingTextColor } from '@/lib/ratingTier';
 import { MentionText } from '@/components/mentions/MentionText';
