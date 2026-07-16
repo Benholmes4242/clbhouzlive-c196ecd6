@@ -7,6 +7,7 @@ import { fmtHcp } from '@/lib/whs/format';
 import RecentlyActiveItem from './RecentlyActiveItem';
 import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
 import { DarkSectionHeader } from '../_shared/darkAtoms';
+import { formatOrdinal } from '@/i18n/format';
 
 interface Props {
   userId: string;
