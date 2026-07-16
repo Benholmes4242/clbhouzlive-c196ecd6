@@ -32,9 +32,9 @@ import { fmtScore, formatRank, buildLeaderboardSlots } from '../HybridHero.utils
 import { formatPurse } from '../../shared/TourHeroHelpers';
 
 const TICKER_BAR_H = 34;
-const LEADER_GREEN = '#22C55E';
-const LEADER_GREEN_RING = 'rgba(34,197,94,0.55)';
-const LEADER_GREEN_WASH = 'linear-gradient(90deg, rgba(34,197,94,0.18) 0%, rgba(34,197,94,0.06) 100%)';
+const LEADER_RED = TOPAR_UNDER_DARK;              // '#FF6B5E'
+const LEADER_RED_RING = 'rgba(255,107,94,0.55)';
+const LEADER_RED_WASH = 'linear-gradient(90deg, rgba(255,107,94,0.18) 0%, rgba(255,107,94,0.06) 100%)';
 const CHAMPION_BAND_H = 62;
 const UPCOMING_BAND_H = 104;
 const LIVE_BOTTOM_H = CHAMPION_BAND_H + TICKER_BAR_H;
