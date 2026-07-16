@@ -93,8 +93,7 @@ const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
               : 'bg-gradient-to-br from-gray-300 to-gray-400 text-gray-600'
           }`}>
             <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
-              {/* eslint-disable-next-line i18next/no-literal-string -- glyph, not translatable copy */}
-              <span className="text-2xl">🏆</span>
+              <span className="text-2xl">{'🏆'}</span>
             </div>
           </div>
         );
@@ -143,8 +142,7 @@ const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
 
           <div className="flex justify-center gap-6 text-sm">
             <div className="flex items-center gap-1">
-              {/* eslint-disable-next-line i18next/no-literal-string -- glyph, not translatable copy */}
-              <span className="text-amber-500">✨</span>
+              <span className="text-amber-500">{'✨'}</span>
               <span className="font-medium text-[#d97706]">{t('detail.xp', { xp: achievement.xp })}</span>
             </div>
             <div className="flex items-center gap-1">
