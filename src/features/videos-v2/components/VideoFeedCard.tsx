@@ -8,7 +8,7 @@ import { useRef } from 'react';
 import Pressable from '@/components/ui/Pressable';
 import { FormatBadge } from '@/features/watch-v2/components/FormatBadge';
 import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
-import { formatCount } from '@/features/watch-v2/utils/formatCount';
+import { formatCountShort as formatCount } from '@/i18n/format';
 import { stripMentionMarkup } from '@/lib/mentions/format';
 import { useRailLane } from '@/video/useRailLane';
 import { usePreroutePrefetch } from '@/video/usePreroutePrefetch';
