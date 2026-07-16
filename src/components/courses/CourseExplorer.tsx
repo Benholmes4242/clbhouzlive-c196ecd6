@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -215,41 +216,49 @@ const InlineLoadingSkeleton = () => (
   </div>
 );
 
-const ErrorState = ({ onRetry }: { onRetry: () => void }) => (
-  <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
-    <div className="w-12 h-12 mx-auto rounded-full bg-destructive/10 flex items-center justify-center">
-      <AlertCircle className="w-6 h-6 text-destructive" />
+const ErrorState = ({ onRetry }: { onRetry: () => void }) => {
+  const { t } = useTranslation('courses');
+  const { t: tc } = useTranslation('common');
+  return (
+    <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
+      <div className="w-12 h-12 mx-auto rounded-full bg-destructive/10 flex items-center justify-center">
+        <AlertCircle className="w-6 h-6 text-destructive" />
+      </div>
+      <h3 className="text-sm font-semibold">{t('explorer.unableToLoadTitle')}</h3>
+      <p className="text-sm text-muted-foreground max-w-xs">
+        {t('explorer.unableToLoadBody')}
+      </p>
+      <button
+        onClick={onRetry}
+        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium active:scale-[0.98] transition-transform"
+        style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
+      >
+        <ChevronDown className="h-4 w-4 rotate-180" />
+        {tc('action.retry')}
+      </button>
     </div>
-    <h3 className="text-sm font-semibold">Unable to load courses</h3>
-    <p className="text-sm text-muted-foreground max-w-xs">
-      We couldn't fetch the courses. Please check your connection and try again.
-    </p>
-    <button
-      onClick={onRetry}
-      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium active:scale-[0.98] transition-transform"
-      style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
-    >
-      <ChevronDown className="h-4 w-4 rotate-180" />
-      Retry
-    </button>
-  </div>
-);
+  );
+};
 
-const InlineRetryCard = ({ onRetry }: { onRetry: () => void }) => (
-  <div className="max-w-md mx-auto mt-4">
-    <button
-      onClick={onRetry}
-      className="w-full flex items-center justify-center gap-2 px-4 py-4 rounded-xl bg-card border border-border text-sm text-muted-foreground transition-colors active:scale-[0.98] active:opacity-70"
-    >
-      <RefreshCw className="w-3.5 h-3.5" />
-      Couldn't load more courses · Tap to retry
-    </button>
-  </div>
-);
+const InlineRetryCard = ({ onRetry }: { onRetry: () => void }) => {
+  const { t } = useTranslation('courses');
+  return (
+    <div className="max-w-md mx-auto mt-4">
+      <button
+        onClick={onRetry}
+        className="w-full flex items-center justify-center gap-2 px-4 py-4 rounded-xl bg-card border border-border text-sm text-muted-foreground transition-colors active:scale-[0.98] active:opacity-70"
+      >
+        <RefreshCw className="w-3.5 h-3.5" />
+        {t('explorer.loadMoreRetry')}
+      </button>
+    </div>
+  );
+};
 
 // ─── Main component ────────────────────────────────────────────────
 
 const CourseExplorer = () => {
+  const { t } = useTranslation('courses');
   const listTopRef = useRef<HTMLDivElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const [searchParams] = useSearchParams();
