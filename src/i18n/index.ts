@@ -29,7 +29,7 @@ if (!i18n.isInitialized) {
       supportedLngs: SUPPORTED_LOCALES as unknown as string[],
       nonExplicitSupportedLngs: true,
       defaultNS: 'common',
-      ns: ['common'],
+      ns: ['common', 'auth', 'composer'],
       load: 'languageOnly',
       // React already escapes.
       interpolation: { escapeValue: false },

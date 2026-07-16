@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface OtpSheetContentProps {
   email: string;
@@ -30,6 +31,7 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
   errorNonce = 0,
   onCodeEdit,
 }) => {
+  const { t } = useTranslation('auth');
   const [digits, setDigits] = useState<string[]>(() => Array(BOX_COUNT).fill(''));
   const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
   const hasAutoSubmittedRef = useRef(false);
@@ -158,7 +160,7 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
       {/* Sent-to */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         <p className="text-[13px]" style={{ color: 'rgba(255,255,255,0.60)', margin: 0 }}>
-          We sent a 6-digit code to
+          {t('otp.sentTo')}
         </p>
         <p className="text-[14px]" style={{ margin: 0, display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
           <span style={{ color: 'rgba(255,255,255,0.96)', fontWeight: 650 }}>{email}</span>
@@ -168,7 +170,7 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
             className="text-[13px]"
             style={{ color: '#F7931E', fontWeight: 600, background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
           >
-            Change
+            {t('otp.changeEmail')}
           </button>
         </p>
       </div>
@@ -188,7 +190,7 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
             autoComplete={i === 0 ? 'one-time-code' : 'off'}
 
             disabled={submitting}
-            aria-label={`Digit ${i + 1}`}
+            aria-label={t('otp.digitLabel', { index: i + 1 })}
             className="text-center focus:outline-none transition-colors"
             style={{
               flex: '1 1 0',
@@ -230,7 +232,7 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
         type="button"
         onClick={handleManualSubmit}
         disabled={!canSubmit}
-        aria-label="Verify code"
+        aria-label={t('otp.verifyAria')}
         className="w-full h-[54px] flex items-center justify-center gap-2 rounded-[16px] font-bold text-[15px] transition-all duration-150 active:scale-[0.98]"
         style={{
           background: canSubmit ? '#F7931E' : 'rgba(255,255,255,0.06)',
@@ -240,7 +242,7 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
           cursor: canSubmit ? 'pointer' : 'not-allowed',
         }}
       >
-        {submitting ? <Loader2 size={18} className="animate-spin" /> : 'Verify'}
+        {submitting ? <Loader2 size={18} className="animate-spin" /> : t('otp.verify')}
       </button>
 
       {/* Resend */}
@@ -256,8 +258,8 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
           }}
         >
           {resendCooldown > 0
-            ? `Resend in ${resendCooldown}s · code valid for 1 hour`
-            : <>Didn't get it? <span style={{ color: '#F7931E', fontWeight: 600 }}>Resend code</span></>}
+            ? t('otp.resendCountdown', { seconds: resendCooldown })
+            : <>{t('otp.resendPromptPrefix')}<span style={{ color: '#F7931E', fontWeight: 600 }}>{t('otp.resendPromptCta')}</span></>}
         </button>
       </div>
     </div>

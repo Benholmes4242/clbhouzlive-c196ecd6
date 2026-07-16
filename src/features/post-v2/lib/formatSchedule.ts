@@ -1,10 +1,9 @@
 // Shared friendly formatter for scheduled post times.
 // "Today - 21:15" / "Tomorrow - 09:00" / "Fri 17 Jul - 18:30"
 //
-// Wave 1: weekday + month short-name arrays removed; those now route through
-// src/i18n/format.ts wrappers (formatWeekdayShort / formatMonthShort). "Today"
-// and "Tomorrow" literals stay hand-rolled until copy extraction (Wave ≥2).
+// Wave 3a: "Today"/"Tomorrow" now route through i18n via the `composer` ns.
 import { formatWeekdayShort, formatMonthShort } from '@/i18n/format';
+import i18n from '@/i18n';
 
 function sameDay(a: Date, b: Date) {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
@@ -12,9 +11,9 @@ function sameDay(a: Date, b: Date) {
 
 /** Day label only: "Today" | "Tomorrow" | "Fri 17 Jul". */
 export function formatScheduleDay(target: Date, now: Date = new Date()): string {
-  if (sameDay(target, now)) return 'Today';
+  if (sameDay(target, now)) return i18n.t('composer:schedule.today');
   const tmr = new Date(now); tmr.setDate(tmr.getDate() + 1);
-  if (sameDay(target, tmr)) return 'Tomorrow';
+  if (sameDay(target, tmr)) return i18n.t('composer:schedule.tomorrow');
   return `${formatWeekdayShort(target)} ${target.getDate()} ${formatMonthShort(target)}`;
 }
 

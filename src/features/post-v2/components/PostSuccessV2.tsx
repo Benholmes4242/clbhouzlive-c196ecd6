@@ -8,6 +8,7 @@
 
 import { useEffect, useState } from 'react';
 import { Check, Clock, AlertTriangle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import type { SubmitResult } from '../hooks/usePostSubmit';
 import { formatSchedule } from '../lib/formatSchedule';
 import { subscribeToJob, getJobSnapshot } from '../lib/postUploadController';
@@ -23,12 +24,16 @@ interface Props {
 }
 
 export default function PostSuccessV2({ result, onDone }: Props) {
+  const { t } = useTranslation(['composer', 'common']);
+
   if (result.kind === 'uploading') {
     return <UploadingState result={result} onDone={onDone} />;
   }
 
   if (result.kind === 'scheduled') {
-    const label = `Scheduled${result.scheduledAt ? ' for ' + formatSchedule(new Date(result.scheduledAt)) : ''}`;
+    const label = result.scheduledAt
+      ? t('composer:success.scheduledFor', { when: formatSchedule(new Date(result.scheduledAt)) })
+      : t('composer:success.scheduled');
     return (
       <ImmersiveSuccessShell onTapClose={onDone} showTapHint>
         <Column>
@@ -36,7 +41,7 @@ export default function PostSuccessV2({ result, onDone }: Props) {
             <Clock size={44} color={AMBER} strokeWidth={2.25} />
           </GlyphTile>
           <Label>{label}</Label>
-          <Copy>It is queued and will go out on time.</Copy>
+          <Copy>{t('composer:success.scheduledBody')}</Copy>
         </Column>
       </ImmersiveSuccessShell>
     );
@@ -49,8 +54,8 @@ export default function PostSuccessV2({ result, onDone }: Props) {
         <GlyphTile accent={GREEN}>
           <Check size={48} color={GREEN} strokeWidth={2.5} />
         </GlyphTile>
-        <Label>Posted</Label>
-        <Copy>It is live. Pull to refresh if you don't see it yet.</Copy>
+        <Label>{t('composer:success.posted')}</Label>
+        <Copy>{t('composer:success.postedBody')}</Copy>
       </Column>
     </ImmersiveSuccessShell>
   );
@@ -59,6 +64,7 @@ export default function PostSuccessV2({ result, onDone }: Props) {
 type Phase = 'running' | 'complete' | 'failed';
 
 function UploadingState({ result, onDone }: Props) {
+  const { t } = useTranslation(['composer', 'common']);
   if (result.kind !== 'uploading') return null;
   const jobId = result.jobId ?? null;
   const initial = jobId ? getJobSnapshot(jobId) : null;
@@ -85,10 +91,10 @@ function UploadingState({ result, onDone }: Props) {
   const isScheduled = !!result.isScheduled;
 
   if (phase === 'complete') {
-    const label = isScheduled ? 'Scheduled' : 'Posted';
+    const label = isScheduled ? t('composer:success.scheduled') : t('composer:success.posted');
     const copy = isScheduled
-      ? "It is queued and will go out on time."
-      : "It is live. Pull to refresh if you don't see it yet.";
+      ? t('composer:success.scheduledBody')
+      : t('composer:success.postedBody');
     return (
       <ImmersiveSuccessShell onTapClose={onDone} showTapHint>
         <Column>
@@ -101,14 +107,14 @@ function UploadingState({ result, onDone }: Props) {
   }
 
   if (phase === 'failed') {
-    const copy = errorText || 'Something went wrong - your post was not published.';
+    const copy = errorText || t('composer:success.uploadFailedFallback');
     return (
       <ImmersiveSuccessShell onTapClose={onDone}>
         <Column>
           <GlyphTile accent={NEUTRAL} noGlow>
             <AlertTriangle size={40} color="rgba(255,255,255,0.85)" strokeWidth={2.25} />
           </GlyphTile>
-          <Label>Upload failed</Label>
+          <Label>{t('composer:success.uploadFailed')}</Label>
           <Copy>{copy}</Copy>
           <DonePill onClick={onDone} />
         </Column>
@@ -120,11 +126,11 @@ function UploadingState({ result, onDone }: Props) {
     <ImmersiveSuccessShell onTapClose={onDone}>
       <Column>
         <RingTile progress={progress} accent={AMBER} />
-        <Label>{isScheduled ? 'Scheduled' : 'Posting...'}</Label>
+        <Label>{isScheduled ? t('composer:success.scheduled') : t('composer:success.posting')}</Label>
         <Copy>
           {isScheduled && result.scheduledAt
-            ? `Uploading - it'll go out ${formatSchedule(new Date(result.scheduledAt))}.`
-            : "Uploading - we'll take it from here. You can keep using the app."}
+            ? t('composer:success.uploadingScheduledBody', { when: formatSchedule(new Date(result.scheduledAt)) })
+            : t('composer:success.uploadingBody')}
         </Copy>
         <DonePill onClick={onDone} />
       </Column>
@@ -164,6 +170,7 @@ function Copy({ children }: { children: React.ReactNode }) {
 }
 
 function DonePill({ onClick }: { onClick: () => void }) {
+  const { t } = useTranslation('common');
   return (
     <button
       type="button"
@@ -180,7 +187,7 @@ function DonePill({ onClick }: { onClick: () => void }) {
         cursor: 'pointer',
       }}
     >
-      Done
+      {t('action.done')}
     </button>
   );
 }
