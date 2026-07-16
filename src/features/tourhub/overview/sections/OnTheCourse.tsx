@@ -11,9 +11,8 @@
  * order, deduped against featured. TeeGroup has no live scores so score
  * columns show an em-dash placeholder — no invented leaderboard join.
  *
- * Collapse via the "Back to featured" end tile OR the "Show featured only"
- * pill under the rail. Expansion resets automatically when tournamentId
- * changes (the hero swiped to a new tournament).
+ * Collapse via the "Back to featured" end tile. Expansion resets automatically
+ * when tournamentId changes (the hero swiped to a new tournament).
  */
 
 import { useEffect, useRef, useState, useMemo } from 'react';
@@ -170,6 +169,7 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
           ref={railRef}
           style={{
             display: 'flex',
+            alignItems: 'flex-start',
             gap: 10,
             overflowX: 'auto',
             padding: '0 16px 6px',
@@ -380,7 +380,7 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                       borderRadius: 14,
                       padding: '12px 12px 10px',
                       contentVisibility: 'auto',
-                      containIntrinsicSize: `${CARD_H_EST}px ${CARD_MIN_W}px`,
+                      containIntrinsicSize: `${CARD_MIN_W}px ${CARD_H_EST}px`,
                     } as React.CSSProperties}
                   >
                     <div style={{ fontSize: 9.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>
@@ -454,26 +454,6 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
           )}
         </div>
 
-        {expanded && (
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 10 }}>
-            <button
-              type="button"
-              onClick={collapseToFeatured}
-              style={{
-                fontSize: 11.5,
-                fontWeight: 800,
-                color: '#64748B',
-                background: '#fff',
-                border: '1px solid #E2E8F0',
-                borderRadius: 999,
-                padding: '6px 14px',
-                cursor: 'pointer',
-              }}
-            >
-              Show featured only
-            </button>
-          </div>
-        )}
       </SectionShell>
     </div>
   );
