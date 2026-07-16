@@ -126,7 +126,7 @@ const InsightCard = ({ title, kicker, action, children }: {
     <div className="flex items-start justify-between gap-3">
       <div>
         {kicker && (
-          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] mb-1" style={{ color: BIZ.amber }}>{kicker}</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] mb-1" style={{ color: BIZ.inkFaint }}>{kicker}</p>
         )}
         <h3 className="text-[0.95rem] font-semibold" style={{ color: BIZ.ink }}>{title}</h3>
       </div>
