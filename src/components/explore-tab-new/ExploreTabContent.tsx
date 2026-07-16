@@ -121,9 +121,11 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
         <LegendarySection
           region={activeRegion}
           regionUpper={regionUpper}
+          mode={scope}
           onRowTap={handleFeatRowTap}
           onLeaderTap={handleLeaderTap}
         />
+
 
         {/* Eagles ledger card */}
         <EaglesLedger
