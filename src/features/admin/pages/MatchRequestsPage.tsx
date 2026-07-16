@@ -119,6 +119,13 @@ export default function MatchRequestsPage() {
 
       {isLoading ? (
         <div style={{ color: t.inkMuted, fontSize: 13, padding: 24 }}>Loading requests...</div>
+      ) : isError ? (
+        <AdminErrorState
+          title="Couldn't load match requests"
+          message={(error as any)?.message ?? 'The request failed. Try again.'}
+          onRetry={() => refetch()}
+          retrying={isFetching}
+        />
       ) : data.length === 0 ? (
         <EmptyState icon={<Inbox size={28} />} title="No requests" subtitle={emptyCopy[status]} />
       ) : (
