@@ -37,6 +37,7 @@ interface NewConversationSheetProps {
 }
 
 const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClose }) => {
+  const { t } = useTranslation('messaging');
   const navigate = useNavigate();
   const actor = useMessagingActor();
   const [query, setQuery] = useState('');
