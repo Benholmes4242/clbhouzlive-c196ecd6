@@ -118,7 +118,7 @@ export const MessageImage: React.FC<Props> = ({ attachment, onOpen }) => {
           }}
         >
           <AlertCircle size={14} />
-          Failed
+          {t('error.imageFailed')}
         </div>
       ) : null}
     </div>
