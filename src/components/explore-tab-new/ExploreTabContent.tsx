@@ -27,8 +27,8 @@ import { scrollPageToTop } from '@/lib/getScrollParent';
 
 import { SeasonStrip } from './SeasonStrip';
 import { RankIdentityCard } from './RankIdentityCard';
-import { CourseCrownsRail } from './CourseCrownsRail';
-import { NextConquestsRail } from './NextConquestsRail';
+import { TheRecordBook } from './TheRecordBook';
+
 import { ToughestCoursesRail } from './ToughestCoursesRail';
 import { DiscoverSectionHeader } from './DiscoverSectionHeader';
 import { AlmanacEmptyCard } from './AlmanacEmptyCard';
@@ -129,8 +129,10 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
         {/* 6. Empty-region editorial card (only when all four tiers are empty) */}
         <AlmanacEmptyCard region={activeRegion} />
 
-        {/* 7. Course Crowns (course records) -- self-hiding, owns its header */}
-        <CourseCrownsRail region={activeRegion} opener={opener} mode={scope} />
+        {/* 7. THE RECORD BOOK — dark panel: 5-row records ledger + personal conquests strip */}
+        <TheRecordBook region={activeRegion} opener={opener} mode={scope} userId={userId} />
+
+
 
 
         {/* 7. Legendary hero (aces & albatrosses) */}
@@ -158,8 +160,9 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
         {/* 10. Toughest courses -- self-hiding, owns its header */}
         <ToughestCoursesRail />
 
-        {/* 11. Next Conquests (records within reach) -- self-hiding, owns its header */}
-        <NextConquestsRail userId={userId} />
+        {/* 11. (Next Conquests moved into TheRecordBook panel above) */}
+
+
 
         {/* 12. Feed block */}
         <div
