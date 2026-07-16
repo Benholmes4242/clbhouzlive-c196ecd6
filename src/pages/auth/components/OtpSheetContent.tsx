@@ -190,7 +190,7 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
             autoComplete={i === 0 ? 'one-time-code' : 'off'}
 
             disabled={submitting}
-            aria-label={`Digit ${i + 1}`}
+            aria-label={t('otp.digitLabel', { index: i + 1 })}
             className="text-center focus:outline-none transition-colors"
             style={{
               flex: '1 1 0',
@@ -232,7 +232,7 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
         type="button"
         onClick={handleManualSubmit}
         disabled={!canSubmit}
-        aria-label="Verify code"
+        aria-label={t('otp.verifyAria')}
         className="w-full h-[54px] flex items-center justify-center gap-2 rounded-[16px] font-bold text-[15px] transition-all duration-150 active:scale-[0.98]"
         style={{
           background: canSubmit ? '#F7931E' : 'rgba(255,255,255,0.06)',
@@ -242,7 +242,7 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
           cursor: canSubmit ? 'pointer' : 'not-allowed',
         }}
       >
-        {submitting ? <Loader2 size={18} className="animate-spin" /> : 'Verify'}
+        {submitting ? <Loader2 size={18} className="animate-spin" /> : t('otp.verify')}
       </button>
 
       {/* Resend */}
@@ -258,8 +258,8 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
           }}
         >
           {resendCooldown > 0
-            ? `Resend in ${resendCooldown}s · code valid for 1 hour`
-            : <>Didn't get it? <span style={{ color: '#F7931E', fontWeight: 600 }}>Resend code</span></>}
+            ? t('otp.resendCountdown', { seconds: resendCooldown })
+            : <>{t('otp.resendPromptPrefix')}<span style={{ color: '#F7931E', fontWeight: 600 }}>{t('otp.resendPromptCta')}</span></>}
         </button>
       </div>
     </div>
