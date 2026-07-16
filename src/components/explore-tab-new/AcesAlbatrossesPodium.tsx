@@ -9,6 +9,7 @@ const INK = '#0F172A';
 const INK_MUTE = 'rgba(15,23,42,0.55)';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
 const CARD_BG = '#FFFFFF';
+const CARD_SHADOW = '0 1px 3px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.05)';
 const PODIUM_ROWS = 3;
 
 function formatHolderName(raw?: string | null): string {
@@ -104,7 +105,7 @@ function PodiumCard({
         background: CARD_BG,
         borderRadius: 16,
         border: `0.5px solid ${HAIRLINE}`,
-        boxShadow: '0 2px 10px rgba(15,23,42,0.05)',
+        boxShadow: CARD_SHADOW,
         padding: '12px 12px 10px',
         fontFamily: FONT,
       }}
@@ -120,9 +121,9 @@ function PodiumCard({
       >
         <div
           style={{
-            fontSize: 10,
-            fontWeight: 800,
-            letterSpacing: '0.1em',
+            fontSize: 10.5,
+            fontWeight: 600,
+            letterSpacing: '0.06em',
             textTransform: 'uppercase',
             color: accent,
             lineHeight: 1,
@@ -139,8 +140,8 @@ function PodiumCard({
             padding: 0,
             cursor: 'pointer',
             color: AMBER,
-            fontSize: 10.5,
-            fontWeight: 800,
+            fontSize: 12,
+            fontWeight: 600,
             fontFamily: FONT,
           }}
         >
@@ -166,7 +167,7 @@ function PodiumCard({
             const name = formatHolderName(r.holder_name);
             const count = r[metric] ?? 0;
             const size = isTop ? 28 : 22;
-            const nameSize = isTop ? 12 : 11;
+            const nameSize = isTop ? 13 : 12;
             const countSize = isTop ? 17 : 13;
             const countColor = isTop ? accent : INK;
             const handleTap = () => {
@@ -203,7 +204,7 @@ function PodiumCard({
                     flex: 1,
                     minWidth: 0,
                     fontSize: nameSize,
-                    fontWeight: 800,
+                    fontWeight: 600,
                     color: INK,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
@@ -217,7 +218,7 @@ function PodiumCard({
                   className="tabular-nums"
                   style={{
                     fontSize: countSize,
-                    fontWeight: 900,
+                    fontWeight: 700,
                     color: countColor,
                     letterSpacing: '-0.01em',
                     lineHeight: 1,
