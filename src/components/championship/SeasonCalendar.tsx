@@ -8,24 +8,21 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { Skeleton } from '@/components/ui/skeleton';
+import { formatDayMonthShortGB, formatMonthShort } from '@/i18n/format';
 
 interface SeasonCardProps {
   season: Season;
 }
 
 const SeasonCard: React.FC<SeasonCardProps> = ({ season }) => {
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('en-GB', { 
-      day: 'numeric', 
-      month: 'short' 
-    });
-  };
+  const formatDate = (dateStr: string) => formatDayMonthShortGB(dateStr);
 
   const formatMonthRange = (start: string, end: string) => {
-    const startMonth = new Date(start).toLocaleDateString('en-GB', { month: 'short' });
-    const endMonth = new Date(end).toLocaleDateString('en-GB', { month: 'short' });
+    const startMonth = formatMonthShort(start);
+    const endMonth = formatMonthShort(end);
     return `${startMonth} - ${endMonth}`;
   };
+
 
   return (
     <Tooltip>
