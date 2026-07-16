@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface WriteReviewPromptProps {
   onRateClick: () => void;
@@ -11,6 +12,7 @@ interface WriteReviewPromptProps {
 export const WriteReviewPrompt: React.FC<WriteReviewPromptProps> = ({
   onRateClick,
 }) => {
+  const { t } = useTranslation('courses');
   return (
     <div
       className="flex items-center gap-3 p-4 rounded-2xl"
@@ -24,14 +26,14 @@ export const WriteReviewPrompt: React.FC<WriteReviewPromptProps> = ({
         className="w-11 h-11 rounded-[12px] flex items-center justify-center flex-shrink-0"
         style={{ background: 'linear-gradient(135deg, #F7931E, #FBBC2E)' }}
       >
-        <span style={{ fontSize: 20 }}>⭐</span>
+        <span style={{ fontSize: 20 }} aria-hidden="true">⭐</span>
       </div>
 
       {/* Copy */}
       <div className="flex-1 min-w-0">
-        <p className="text-[14px] font-bold text-foreground">Played here?</p>
+        <p className="text-[14px] font-bold text-foreground">{t('review.write.title')}</p>
         <p className="text-[13px] text-muted-foreground mt-0.5">
-          Your rating helps golfers worldwide
+          {t('review.write.body')}
         </p>
       </div>
 
@@ -45,8 +47,9 @@ export const WriteReviewPrompt: React.FC<WriteReviewPromptProps> = ({
           boxShadow: '0 4px 14px rgba(247,147,30,0.3)',
         }}
       >
-        Rate
+        {t('review.write.rate')}
       </button>
     </div>
   );
 };
+
