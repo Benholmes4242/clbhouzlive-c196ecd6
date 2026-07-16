@@ -8,6 +8,7 @@ import { ChevronRight } from 'lucide-react';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import CountryFlag from '@/components/ui/country-flag';
 import { resolvePlayerAvatarCandidates } from '../_shared/resolvePlayerAvatar';
+import { formatNumberMaxFrac } from '@/i18n/format';
 import {
   GOLD_DEEP,
   HAIRLINE_INK_10,
