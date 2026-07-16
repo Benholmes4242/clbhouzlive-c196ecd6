@@ -283,6 +283,7 @@ function LedgerRow({
       onClick={onTap}
       className="text-left active:opacity-80 transition-opacity"
       style={{
+        position: 'relative',
         display: 'flex',
         alignItems: 'center',
         gap: 10,
@@ -290,17 +291,24 @@ function LedgerRow({
         width: '100%',
         background: 'transparent',
         border: 'none',
-        borderTop: isFirst ? 'none' : `0.5px solid ${HAIRLINE}`,
-        marginLeft: isFirst ? 0 : 64,
-        marginRight: isFirst ? 0 : 16,
-        boxSizing: 'border-box',
-        // The inset separator is achieved by shrinking the row itself.
-        width: isFirst ? '100%' : 'calc(100% - 80px)',
         cursor: 'pointer',
         fontFamily: FONT,
         color: INK,
       }}
     >
+      {!isFirst ? (
+        <span
+          aria-hidden
+          style={{
+            position: 'absolute',
+            left: 64,
+            right: 16,
+            top: 0,
+            height: 0,
+            borderTop: `0.5px solid ${HAIRLINE}`,
+          }}
+        />
+      ) : null}
       {/* Rank */}
       <div
         style={{
@@ -311,7 +319,6 @@ function LedgerRow({
           color: isFirst ? PARCHMENT_GOLD : FADED,
           fontVariantNumeric: 'tabular-nums',
           textAlign: 'center',
-          marginLeft: isFirst ? 0 : -64,
         }}
       >
         {rank}
