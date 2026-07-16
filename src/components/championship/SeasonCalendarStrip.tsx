@@ -6,6 +6,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { formatDayMonthShortGB } from '@/i18n/format';
 
 interface Season {
   id: string;
