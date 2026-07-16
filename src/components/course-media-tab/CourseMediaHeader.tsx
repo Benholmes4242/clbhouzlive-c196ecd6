@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { MediaCounts } from './hooks/useCourseMedia';
