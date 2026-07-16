@@ -58,7 +58,7 @@ export function formatRelative(d: DateInput): string {
 
   const locale = getActiveLocale();
   if (locale === 'en') {
-    if (seconds < 60) return 'just now';
+    if (seconds < 60) return 'now';
     if (minutes < 60) return `${minutes}m`;
     if (hours < 24) return `${hours}h`;
     if (days < 7) return `${days}d`;
