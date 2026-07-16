@@ -156,7 +156,7 @@ export default tseslint.config(
     files: ["src/pages/auth/**/*.{ts,tsx}"],
     rules: {
       "i18next/no-literal-string": ["error", i18nLiteralOptions],
-      "no-restricted-syntax": ["error", literalAttrSyntax],
+      "no-restricted-syntax": ["error", literalAttrSyntax, ...toLocaleSyntax],
     },
   },
   // ─── Wave 3b — scope-dir ERROR flip for messaging ─────────────────
@@ -164,7 +164,7 @@ export default tseslint.config(
     files: ["src/pages/messaging-v2/**/*.{ts,tsx}"],
     rules: {
       "i18next/no-literal-string": ["error", i18nLiteralOptions],
-      "no-restricted-syntax": ["error", literalAttrSyntax],
+      "no-restricted-syntax": ["error", literalAttrSyntax, ...toLocaleSyntax],
     },
   }
 );
