@@ -87,7 +87,7 @@ export default function BusinessActivityPage() {
                           <p className="text-sm text-muted-foreground truncate">{description}</p>
                         </div>
                         <span className="text-xs text-muted-foreground shrink-0">
-                          {format(new Date(entry.created_at), 'h:mm a')}
+                          {formatTimeHm(entry.created_at)}
                         </span>
                       </div>
                     );
