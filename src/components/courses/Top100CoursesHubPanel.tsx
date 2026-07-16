@@ -38,6 +38,7 @@ interface Top100CoursesHubPanelProps {
 }
 
 const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs, rateNudge }) => {
+  const { t } = useTranslation('courses');
   const { user } = useSupabaseSession();
   
   // State — initialised from sessionStorage when available
@@ -240,18 +241,23 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
                 fontFamily: "'Geist', sans-serif",
               }}
             >
-              You've rated{' '}
-              <span
-                style={{
-                  color: AMBER,
-                  fontWeight: 700,
-                  fontVariantNumeric: 'tabular-nums',
-                  fontFeatureSettings: '"zero" 0',
+              <Trans
+                i18nKey={crossListProgress.listsStarted === 1 ? 'top100.progress_one' : 'top100.progress_other'}
+                ns="courses"
+                values={{
+                  rated: crossListProgress.totalRated,
+                  total: crossListProgress.totalInStartedLists,
+                  count: crossListProgress.listsStarted,
                 }}
-              >
-                {crossListProgress.totalRated} of {crossListProgress.totalInStartedLists}
-              </span>{' '}
-              across {crossListProgress.listsStarted} {crossListProgress.listsStarted === 1 ? 'list' : 'lists'}
+                components={{
+                  1: <span style={{
+                    color: AMBER,
+                    fontWeight: 700,
+                    fontVariantNumeric: 'tabular-nums',
+                    fontFeatureSettings: '"zero" 0',
+                  }} />,
+                }}
+              />
             </p>
           )}
         </div>
