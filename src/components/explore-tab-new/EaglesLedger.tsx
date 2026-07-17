@@ -18,9 +18,9 @@ const INK = '#0F172A';
 const INK_MUTE = 'rgba(15,23,42,0.45)';
 const RANK_MUTE = 'rgba(15,23,42,0.35)';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
+const BAND_BG = 'rgba(15,23,42,0.035)';
 const BAR_TRACK = 'rgba(15,23,42,0.08)';
 const CHEVRON_COLOR = 'rgba(15,23,42,0.3)';
-const CARD_BG = '#FFFFFF';
 const ROWS = 5;
 
 function formatHolderName(raw?: string | null): string {
