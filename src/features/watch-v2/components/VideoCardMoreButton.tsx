@@ -47,20 +47,32 @@ export function VideoCardMoreButton({ post }: { post: FeedPost }) {
         <MoreHorizontal size={18} strokeWidth={2} />
       </button>
       {moreOptionsOpen && (
-        <MoreOptionsDrawer
-          open={moreOptionsOpen}
-          onOpenChange={setMoreOptionsOpen}
-          post={post}
-          currentUserId={userId}
-          onReport={() => handleReport(post)}
-          onNotInterested={() => handleNotInterested(post)}
-          onCopyLink={() => {
-            navigator.clipboard.writeText(`${window.location.origin}/post/${post.id}`);
-            toast.success('Link copied');
-            setMoreOptionsOpen(false);
-          }}
-        />
+        <span
+          style={{ display: 'contents' }}
+          onPointerDown={(e) => e.stopPropagation()}
+          onPointerUp={(e) => e.stopPropagation()}
+          onPointerMove={(e) => e.stopPropagation()}
+          onPointerCancel={(e) => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
+          onTouchStart={(e) => e.stopPropagation()}
+          onTouchEnd={(e) => e.stopPropagation()}
+        >
+          <MoreOptionsDrawer
+            open={moreOptionsOpen}
+            onOpenChange={setMoreOptionsOpen}
+            post={post}
+            currentUserId={userId}
+            onReport={() => handleReport(post)}
+            onNotInterested={() => handleNotInterested(post)}
+            onCopyLink={() => {
+              navigator.clipboard.writeText(`${window.location.origin}/post/${post.id}`);
+              toast.success('Link copied');
+              setMoreOptionsOpen(false);
+            }}
+          />
+        </span>
       )}
+
     </>
   );
 }
