@@ -58,6 +58,7 @@ export function MiddleBand({
   par,
   championNarrative,
 }: MiddleBandProps) {
+  const { t } = useTranslation('tourhub');
 
   if (state.kind === 'live') {
     return <Ticker rows={top10 ?? []} />;
