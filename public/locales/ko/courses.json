@@ -289,6 +289,26 @@
       "profileLink": {
         "manages": "Manages this course",
         "visit": "Visit profile →"
+      },
+      "sheet": {
+        "title": "Claim {{clubName}}",
+        "signInBody": "Sign in to claim this course.",
+        "signIn": "Sign in",
+        "reviewBody": "Claim this course for your golf club profile. We will review it before it goes live.",
+        "claimAs": "Claim as {{name}}",
+        "claimAsFallback": "business",
+        "footnote": "Claiming covers all listings of this club on clbhouz.",
+        "setupInstead": "Set up a new golf club profile instead",
+        "linkedAlreadyManages": "{{name}} already manages another club and cannot claim a second course.",
+        "setupGolfClub": "Set up a Golf Club profile",
+        "setupGolfClubShort": "Set up Golf Club profile",
+        "stateCSingle": "Your golf club profile {{name}} already manages another club. A business can manage one club, so set up a separate Golf Club profile for {{clubName}}.",
+        "stateCMulti": "Your golf club profiles already manage other clubs. A business can manage one club, so set up a separate Golf Club profile for {{clubName}}.",
+        "needsGolfClub": "Claiming a course needs a Golf Club profile. Your {{category}} profile cannot manage a course. Set up a Golf Club profile to claim {{clubName}}.",
+        "categoryFallback": "business",
+        "stateDBody": "Set up a Golf Club profile to claim this course and manage its details, reviews, and updates.",
+        "submitted": "Claim submitted for review.",
+        "submitError": "Could not submit claim. Please try again."
       }
     },
     "exploreLinks": {
@@ -320,6 +340,45 @@
       "noChangesBody": "Make at least one change to submit.",
       "errorTitle": "Error",
       "errorBody": "Failed to submit suggestion. Please try again."
+    },
+    "mediaStrip": {
+      "helpDiscover": "Help fellow golfers discover this course — share your experience.",
+      "share": "Share your experience",
+      "seeAll": "See all"
+    },
+    "communityScore": {
+      "dashPlaceholder": "–",
+      "beFirst": "Be the first to rate this course",
+      "noOneRated": "No one's scored {{courseName}} yet. Give it a 0–10 and help fellow golfers discover it.",
+      "thisCourse": "this course",
+      "rateThis": "Rate this course",
+      "basedOn_one": "Based on 1 rating",
+      "basedOn_other": "Based on {{count}} ratings",
+      "onlyYouSuffix": " · Only you",
+      "categoryScores": "Category Scores",
+      "seeAllReviews": "See all reviews →"
+    },
+    "handicapCue": {
+      "bannerAction": "Connect →",
+      "cardCta": "Connect your handicap →",
+      "cardFootnote": "Works with WHS handicaps worldwide"
+    },
+    "about": {
+      "editRating": "Edit your rating",
+      "locationUnavailable": "Location data isn't available yet.",
+      "officialWebsite": "Official Course Website"
+    },
+    "locationPills": {
+      "separator": "›"
+    },
+    "top100Spotlight": {
+      "title": "Top 100 Spotlight",
+      "appearsIn_one": "Appears in 1 prestigious list",
+      "appearsIn_other": "Appears in {{count}} prestigious lists",
+      "tapToView": "Tap to view list",
+      "youvePlayed": "You've played {{played}}/{{total}}",
+      "journeyLabel": "Your Top 100 Journey",
+      "progressPlayed": "{{played}} of {{total}} played"
     }
   }
 }
