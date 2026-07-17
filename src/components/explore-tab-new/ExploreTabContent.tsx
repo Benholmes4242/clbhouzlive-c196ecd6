@@ -93,7 +93,7 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
 
   return (
     <div style={{ background: SLATE_50, minHeight: '100vh' }}>
-      <WireTicker userId={userId} />
+      <WireTicker />
 
       <div>
         {shellTabs}
