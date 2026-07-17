@@ -206,8 +206,7 @@ export default function ActorCards({
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    border: '2px solid #fff',
-                    boxSizing: 'content-box',
+                    boxShadow: '0 0 0 2px #FFFFFF',
                   }}
                 >
                   {unread > 99 ? '99+' : unread}

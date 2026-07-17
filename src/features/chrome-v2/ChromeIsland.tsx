@@ -359,8 +359,7 @@ const AvatarCell: React.FC<{
             lineHeight: '18px',
             textAlign: 'center',
             fontVariantNumeric: 'tabular-nums',
-            border: '2px solid #FFFFFF',
-            boxSizing: 'content-box',
+            boxShadow: '0 0 0 2px #FFFFFF',
           }}
         >
           {activeUnreadCount > 99 ? '99+' : activeUnreadCount}
@@ -376,8 +375,7 @@ const AvatarCell: React.FC<{
             height: 8,
             borderRadius: 999,
             background: '#F7931E',
-            border: '2px solid #FFFFFF',
-            boxSizing: 'content-box',
+            boxShadow: '0 0 0 2px #FFFFFF',
           }}
         />
       ) : null}
