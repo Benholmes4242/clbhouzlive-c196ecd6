@@ -323,18 +323,19 @@ export const ReplyForm: React.FC<ReplyFormProps> = ({
           </span>
         </div>
         {/* Line 2: Respond pill, indented to text's left edge (28 avatar + 10 gap) */}
-        <div style={{ marginTop: 7, paddingLeft: 38 }}>
+        <div style={{ marginTop: 3, paddingLeft: 38 }}>
           <span
             style={{
               display: 'inline-block',
-              background: '#F7931E',
-              color: '#ffffff',
               fontSize: 8.5,
               fontWeight: 700,
               letterSpacing: '0.07em',
               textTransform: 'uppercase',
-              padding: '3px 8px',
+              color: '#8A6400',
+              background: 'rgba(232,181,48,0.16)',
+              border: '1px solid rgba(232,181,48,0.35)',
               borderRadius: 999,
+              padding: '3px 8px',
               whiteSpace: 'nowrap',
             }}
           >
