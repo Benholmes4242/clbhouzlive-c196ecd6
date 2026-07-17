@@ -1,6 +1,6 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
-import { Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getTop100Club } from '@/lib/top100Club';
 import { getTop100RingBorderClass } from '@/lib/top100RingStyles';
@@ -10,6 +10,7 @@ interface CourseTop100SummaryProps {
 }
 
 export function CourseTop100Summary({ userId }: CourseTop100SummaryProps) {
+  const { t } = useTranslation('courses');
   const { data, isLoading } = useTop100ProgressForUser(userId);
 
   // TODO: if loading, show skeleton...
@@ -50,16 +51,17 @@ export function CourseTop100Summary({ userId }: CourseTop100SummaryProps) {
     bySlug('europe'),
   ].filter(Boolean);
 
+  const regionsText = t('courseDetail.top100Summary.regionsCount', { count: regions });
+
   return (
     <section className="px-4 pt-4 pb-5 bg-muted/30 text-center">
       {/* Header */}
       <div className="mb-3">
         <h2 className="text-lg font-semibold text-foreground mb-1">
-          Your Top 100 Progress
+          {t('courseDetail.top100Summary.heading')}
         </h2>
         <p className="text-base text-muted-foreground">
-          You've rated {totalRated} Top 100 course{totalRated === 1 ? '' : 's'} across{' '}
-          {regions} region{regions === 1 ? '' : 's'}.
+          {t('courseDetail.top100Summary.ratedCoursesLine', { count: totalRated, regionsText })}
         </p>
         
         {/* Club Ring & Milestone Chips */}
@@ -76,9 +78,7 @@ export function CourseTop100Summary({ userId }: CourseTop100SummaryProps) {
           
           {data.next_milestone && (
             <span className="inline-flex items-center gap-1 rounded-full bg-surface-alt px-3 py-1 text-sm text-muted-foreground">
-              Next milestone: {data.next_milestone.remaining} more{' '}
-              {data.next_milestone.remaining === 1 ? 'course' : 'courses'} to{' '}
-              {data.next_milestone.tierName}
+              {t('courseDetail.top100Summary.nextMilestone', { count: data.next_milestone.remaining, tierName: data.next_milestone.tierName })}
             </span>
           )}
         </div>
@@ -116,7 +116,7 @@ export function CourseTop100Summary({ userId }: CourseTop100SummaryProps) {
 
               {/* Completion % */}
               <div className="text-xs text-muted-foreground">
-                {percentage.toFixed(0)}% complete
+                {t('courseDetail.top100Summary.percentComplete', { pct: percentage.toFixed(0) })}
               </div>
             </div>
           );
