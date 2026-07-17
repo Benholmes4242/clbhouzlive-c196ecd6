@@ -307,7 +307,7 @@ const LivePill: React.FC = () => {
         borderRadius: 999,
         background: LIVE_INK,
         color: '#FFFFFF',
-        fontSize: 8.5,
+        fontSize: 9,
         fontWeight: 800,
         letterSpacing: '0.14em',
         lineHeight: 1,
