@@ -331,7 +331,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
                 background: '#0F172A',
                 cursor: 'pointer',
               }}
-              aria-label="Open Media tab"
+              aria-label={t('courseDetail.a11y.openMediaTab')}
             >
               {media.poster ? (
                 <img
