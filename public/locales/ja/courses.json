@@ -48,7 +48,7 @@
     "sortByDifficulty": "By difficulty",
     "errorLoading": "Couldn't load hole analysis.",
     "credibilityKicker": "OFFICIAL HOLE DATA",
-    "credibilitySuffix": " · Official WHS · Gross scoring",
+    "credibilitySuffix": " · Official WHS",
     "hardestTitle": "Hardest",
     "easiestTitle": "Easiest",
     "playsToInline": "Plays to {{playsTo}}",
