@@ -71,7 +71,6 @@ function inkFor(tone: ChromeTone): string {
   return tone === 'light' ? '#0F172A' : '#FFFFFF';
 }
 
-
 // ---------------------------------------------------------------------------
 // Left capsule
 // ---------------------------------------------------------------------------
@@ -191,7 +190,7 @@ const LeftCapsule: React.FC<{
 const HcpCell: React.FC<{ tone: ChromeTone }> = ({ tone }) => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
-  const { activeActor } = useActiveActor();
+  const { activeActor, isLoading } = useActiveActor();
   const isBusinessActor = activeActor?.type === 'business';
 
   const { data: connection, isLoading: whsLoading } = useWhsConnection(user?.id);
@@ -346,22 +345,22 @@ const AvatarCell: React.FC<{
           aria-label={`${activeUnreadCount} unread`}
           style={{
             position: 'absolute',
-            top: -3,
-            right: -2,
-            minWidth: 15,
-            height: 15,
-            padding: '0 4px',
+            top: -6,
+            right: -6,
+            minWidth: 18,
+            height: 18,
+            padding: '0 5px',
             borderRadius: 999,
             background: '#F7931E',
             color: '#FFFFFF',
             fontFamily: 'Geist, system-ui, sans-serif',
             fontWeight: 700,
-            fontSize: 9,
-            lineHeight: '15px',
+            fontSize: 10,
+            lineHeight: '18px',
             textAlign: 'center',
             fontVariantNumeric: 'tabular-nums',
-            border: `1.5px solid ${canvasFor(tone)}`,
-            boxSizing: 'border-box',
+            border: '2px solid #FFFFFF',
+            boxSizing: 'content-box',
           }}
         >
           {activeUnreadCount > 99 ? '99+' : activeUnreadCount}
@@ -371,13 +370,13 @@ const AvatarCell: React.FC<{
           aria-label="Unread on another account"
           style={{
             position: 'absolute',
-            top: -1,
-            right: 0,
+            top: -6,
+            right: -6,
             width: 8,
             height: 8,
             borderRadius: 999,
             background: '#F7931E',
-            border: `1.5px solid ${canvasFor(tone)}`,
+            border: '2px solid #FFFFFF',
             boxSizing: 'content-box',
           }}
         />
