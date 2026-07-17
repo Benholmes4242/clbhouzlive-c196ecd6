@@ -144,113 +144,108 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
   };
 
   return (
-    <section style={{ marginTop: SPACE.sectionSection, padding: `0 ${SPACE.pagePadX}px` }}>
+    <section
+      style={{
+        marginTop: SPACE.sectionSection,
+        fontFamily: FONT,
+        color: INK,
+      }}
+    >
+      {/* Header */}
       <div
         style={{
-          background: PANEL_BG,
-          border: PANEL_BORDER,
-          borderRadius: 16,
-          padding: '16px 0 14px',
-          fontFamily: FONT,
-          color: INK,
-          boxShadow: PANEL_SHADOW,
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'space-between',
+          gap: 12,
+          padding: `0 ${PAGE_PAD}px`,
         }}
       >
-        {/* Header */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'baseline',
-            justifyContent: 'space-between',
-            gap: 12,
-            padding: '0 16px',
-          }}
-        >
-          <div style={{ minWidth: 0, flex: 1 }}>
-            <div
-              style={{
-                fontSize: 10.5,
-                fontWeight: 600,
-                letterSpacing: '0.06em',
-                textTransform: 'uppercase',
-                color: MUTED,
-                lineHeight: 1,
-              }}
-            >
-              {mode === 'alltime' ? 'All-time course records' : 'Latest course records'}
-            </div>
-            <div
-              style={{
-                marginTop: 6,
-                fontSize: 17,
-                fontWeight: 700,
-                letterSpacing: '-0.02em',
-                color: INK,
-                lineHeight: 1.15,
-              }}
-            >
-              The record book
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={() => setSheetOpen(true)}
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <div
             style={{
-              flexShrink: 0,
-              background: 'none',
-              border: 'none',
-              padding: 0,
-              cursor: 'pointer',
-              color: AMBER,
-              fontSize: 12,
+              fontSize: 10.5,
               fontWeight: 600,
-              fontFamily: FONT,
-              whiteSpace: 'nowrap',
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+              color: MUTED,
+              lineHeight: 1,
             }}
           >
-            View all ›
-          </button>
+            {mode === 'alltime' ? 'All-time course records' : 'Latest course records'}
+          </div>
+          <div
+            style={{
+              marginTop: 6,
+              fontSize: 17,
+              fontWeight: 700,
+              letterSpacing: '-0.02em',
+              color: INK,
+              lineHeight: 1.15,
+            }}
+          >
+            The record book
+          </div>
         </div>
-
-        {/* Column caption row */}
-        <div
+        <button
+          type="button"
+          onClick={() => setSheetOpen(true)}
           style={{
-            marginTop: 12,
-            // Caption starts at the course-name text edge:
-            //   pad 16 + rank 12 + gap 8 + avatar 24 + gap 8 = 68
-            padding: '0 16px 0 68px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            fontSize: 9,
+            flexShrink: 0,
+            background: 'none',
+            border: 'none',
+            padding: 0,
+            cursor: 'pointer',
+            color: AMBER,
+            fontSize: 12,
             fontWeight: 600,
-            letterSpacing: '0.06em',
-            textTransform: 'uppercase',
-            color: 'rgba(15,23,42,0.35)',
-            lineHeight: 1,
+            fontFamily: FONT,
+            whiteSpace: 'nowrap',
           }}
         >
-          <div style={{ flex: 1, minWidth: 0 }}>Course</div>
-          <div style={{ width: 36, textAlign: 'center' }}>To par</div>
-          <div style={{ width: 26, textAlign: 'right' }}>Gross</div>
-          <div style={{ width: 12 }} aria-hidden />
-        </div>
-
-        {/* Ledger */}
-        <div style={{ marginTop: 6 }}>
-          {ledgerRows.map((row, i) => (
-            <LedgerRow
-              key={`${row.course_id ?? i}-${i}`}
-              row={row}
-              rank={i + 1}
-              onTap={() => handleRowTap(row)}
-            />
-          ))}
-        </div>
-
-        {/* Conquests sub-section (personal, does not follow Lens scope) */}
-        <ConquestsStrip userId={userId} />
+          View all ›
+        </button>
       </div>
+
+      {/* Column caption row — 14px side padding; course caption offset to line up
+          with the row's course text edge (rank 12 + gap 8 + avatar 24 + gap 8 = 52). */}
+      <div
+        style={{
+          marginTop: 12,
+          padding: `0 ${PAGE_PAD}px 0 ${PAGE_PAD + 52}px`,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          fontSize: 9,
+          fontWeight: 600,
+          letterSpacing: '0.06em',
+          textTransform: 'uppercase',
+          color: 'rgba(15,23,42,0.35)',
+          lineHeight: 1,
+        }}
+      >
+        <div style={{ flex: 1, minWidth: 0 }}>Course</div>
+        <div style={{ width: 40, textAlign: 'center' }}>To par</div>
+        <div style={{ width: 30, textAlign: 'right' }}>Gross</div>
+        <div style={{ width: 10 }} aria-hidden />
+      </div>
+
+      {/* Ledger — full-bleed banded table */}
+      <div style={{ marginTop: 8 }}>
+        {ledgerRows.map((row, i) => (
+          <LedgerRow
+            key={`${row.course_id ?? i}-${i}`}
+            row={row}
+            rank={i + 1}
+            banded={i === 1 || i === 3}
+            isLast={i === ledgerRows.length - 1}
+            onTap={() => handleRowTap(row)}
+          />
+        ))}
+      </div>
+
+      {/* Conquests sub-section (personal, does not follow Lens scope) */}
+      <ConquestsStrip userId={userId} />
 
       <TierSeeAllSheet
         open={sheetOpen}
@@ -264,6 +259,7 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
     </section>
   );
 }
+
 
 // ---- Ledger row -----------------------------------------------------------
 function LedgerRow({
