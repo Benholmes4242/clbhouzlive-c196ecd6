@@ -1124,7 +1124,7 @@ export function CinematicFrame({
                 <FieldStrengthRowDark data={fieldStrength} />
               ) : (
                 <div style={{ padding: '16px 16px', ...NUMERIC_STYLE, fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase' }}>
-                  Round 1 · Awaiting scores
+                  {t('overview.cinematic.roundAwaitingScores', { round: (state as any).round ?? 1 })}
                 </div>
               )}
               <div
