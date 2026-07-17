@@ -19,15 +19,12 @@ import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const INK = '#0F172A';
-const PANEL_BG = 'linear-gradient(180deg, #FBFAF7 0%, #F5F3EC 100%)';
-const PANEL_BORDER = '0.5px solid rgba(158,115,0,0.14)';
-const PANEL_SHADOW = '0 1px 3px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.05)';
 const GOLD = '#FBBC2E';
 const PARCHMENT_GOLD = '#B8860B';
 const AMBER = '#F7931E';
 const UNDER_PAR = '#D2222D';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
-const CONQUEST_HAIRLINE = 'rgba(15,23,42,0.1)';
+const BAND_BG = 'rgba(15,23,42,0.035)';
 const MUTED = 'rgba(15,23,42,0.45)';
 const FADED = 'rgba(15,23,42,0.35)';
 const GHOST = 'rgba(15,23,42,0.45)';
@@ -35,6 +32,8 @@ const CHIP_BG = 'rgba(15,23,42,0.04)';
 const TRACK_BG = 'rgba(15,23,42,0.08)';
 const AVATAR_RING_MUTED = 'rgba(15,23,42,0.2)';
 const CHEVRON_COLOR = 'rgba(15,23,42,0.3)';
+const PAGE_PAD = 14;
+
 
 const REGION_HUMAN: Record<string, string> = {
   'uk-ireland': 'GB&I',
