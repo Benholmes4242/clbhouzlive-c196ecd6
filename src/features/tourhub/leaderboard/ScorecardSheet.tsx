@@ -123,8 +123,8 @@ export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
     : t('tournament.scorecard.eyebrowFallback');
   // Status token ('CUT'/'WD'/'DQ'/'MDF'/'MC'/'DNS') is golf-universal data
   // vocabulary — never keyed, matches the lexicon rule for scoring tokens.
-  // eslint-disable-next-line i18next/no-literal-string
   const statusToken = (target.status || 'CUT').toUpperCase();
+
   const eyebrowText = demoted
     ? `${roundLabel} ${'\u00B7'} ${statusToken}`
     : roundLabel;
