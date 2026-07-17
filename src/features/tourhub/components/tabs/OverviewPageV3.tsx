@@ -6,6 +6,7 @@
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { ComingUpSlot } from '../overview-v3/ComingUpSlot';
 import { CollegeFranchise } from '../../overview/sections/CollegeFranchise';
 import { ConnectHandicapTile } from '../../overview/sections/ConnectHandicapTile';
@@ -24,11 +25,14 @@ import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { SPACE } from '@/lib/spacing';
 
 
+
 export function OverviewPageV3() {
+  const { t } = useTranslation('tourhub');
   const { isOnline } = useNetworkStatus();
   // READ-ONLY: keyed here purely to drive the OTC + TI synchronized fade so
   // the hero-lensed unit visibly changes together. Must not write back.
   const { viewingTournamentId } = useTourSelection();
+
 
   return (
     <>
@@ -43,8 +47,9 @@ export function OverviewPageV3() {
           >
             <WifiOff className="w-3.5 h-3.5 text-muted-foreground" />
             <span className="text-xs font-medium text-muted-foreground">
-              You're offline. Some data may be outdated.
+              {t('overview.page.offlineBanner')}
             </span>
+
           </motion.div>
         )}
       </AnimatePresence>

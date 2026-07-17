@@ -11,8 +11,10 @@
  */
 
 import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+
 import { useHeroCarouselData, type HeroSlide } from '../../hooks/useHeroCarouselData';
 import { HybridHero } from './HybridHero';
 import { useTourSelection } from '../../context/TourSelectionContext';
@@ -25,7 +27,9 @@ interface OverviewHeroProps {
 }
 
 export function OverviewHero({ height = 528 }: OverviewHeroProps) {
+  const { t } = useTranslation('tourhub');
   const { data: rawSlides = [], isLoading } = useHeroCarouselData();
+
 
   const {
     selectedTourSlug,
@@ -182,7 +186,7 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
         <>
           <button
             type="button"
-            aria-label="Previous tournament"
+            aria-label={t('overview.hero.prevAria')}
             onClick={goPrev}
             style={{ ...chevronBase, left: 8 }}
           >
@@ -190,12 +194,13 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
           </button>
           <button
             type="button"
-            aria-label="Next tournament"
+            aria-label={t('overview.hero.nextAria')}
             onClick={goNext}
             style={{ ...chevronBase, right: 8 }}
           >
             <ChevronRight size={20} strokeWidth={2.25} />
           </button>
+
         </>
       )}
 
@@ -232,7 +237,7 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
                 pointerEvents: 'auto',
               }}
             >
-              {activeIndex + 1} / {count}
+              {t('overview.hero.counter', { current: activeIndex + 1, total: count })}
             </div>
           ) : (
             slides.map((_, i) => (
