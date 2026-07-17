@@ -289,5 +289,94 @@
     "allTeeTimes": {
       "title": "All Tee Times"
     }
+  },
+  "leaders": {
+    "footer": "Season boards · live dot = on the course right now",
+    "fullList": "Full list",
+    "sheet": {
+      "eyebrow_one": "{{tourLabel}} · {{year}} · {{count}} PLAYER",
+      "eyebrow_other": "{{tourLabel}} · {{year}} · {{count}} PLAYERS",
+      "empty": "No players ranked in this category."
+    },
+    "tourChip": {
+      "pga": "PGA",
+      "lpga": "LPGA",
+      "euro": "DP WORLD",
+      "pgad": "KORN FERRY",
+      "champ": "CHAMPIONS",
+      "liv": "LIV"
+    },
+    "stat": {
+      "earnings": {
+        "label": "Season Earnings",
+        "short": "EARNINGS",
+        "unit": "USD"
+      },
+      "scoring_avg": {
+        "label": "Scoring Average",
+        "short": "SCORING",
+        "unit": "AVG"
+      },
+      "wins": {
+        "label": "Wins",
+        "short": "WINS",
+        "unit": "WINS"
+      },
+      "top_10": {
+        "label": "Top 10 Finishes",
+        "short": "TOP 10",
+        "unit": "TOP 10"
+      },
+      "drive_avg": {
+        "label": "Driving Distance",
+        "short": "DRIVING",
+        "unit": "YDS"
+      },
+      "drive_acc": {
+        "label": "Driving Accuracy",
+        "short": "ACCURACY",
+        "unit": "%"
+      },
+      "gir_pct": {
+        "label": "Greens in Regulation",
+        "short": "GIR",
+        "unit": "%"
+      },
+      "sand_saves_pct": {
+        "label": "Sand Saves",
+        "short": "SAND SAVES",
+        "unit": "%"
+      },
+      "putt_avg": {
+        "label": "Putting Average",
+        "short": "PUTTING",
+        "unit": "PUTTS"
+      },
+      "strokes_gained_tee_green": {
+        "label": "Strokes Gained T2G",
+        "short": "SG T2G",
+        "unit": "SG"
+      },
+      "strokes_gained_putting": {
+        "label": "Strokes Gained Putting",
+        "short": "SG PUTT",
+        "unit": "SG"
+      },
+      "world_rank": {
+        "label": "World Ranking",
+        "short": "WORLD",
+        "unit": "OWGR"
+      },
+      "points": {
+        "label": "Season Points",
+        "short": "POINTS",
+        "unit": "PTS"
+      }
+    },
+    "pointsBrand": {
+      "euro": "Race to Dubai",
+      "lpga": "CME Points",
+      "liv": "LIV Points"
+    }
   }
 }
