@@ -892,7 +892,7 @@ export function CinematicFrame({
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span aria-hidden style={{ width: 7, height: 7, borderRadius: '50%', background: AMBER, flexShrink: 0 }} />
-                <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', color: AMBER, textShadow: '0 1px 3px rgba(0,0,0,0.45)', textTransform: 'uppercase' }}>Upcoming</span>
+                <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', color: AMBER, textShadow: '0 1px 3px rgba(0,0,0,0.45)', textTransform: 'uppercase' }}>{t('status.upcoming')}</span>
               </div>
             )
           ) : roundLabel_ ? (
