@@ -5,6 +5,7 @@
  * of truth). No imports from src/components/watch/.
  */
 import { useRef } from 'react';
+import { Heart } from 'lucide-react';
 import Pressable from '@/components/ui/Pressable';
 import { FormatBadge } from '@/features/watch-v2/components/FormatBadge';
 import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
@@ -74,13 +75,6 @@ export function VideoFeedCard({ row, post, index, posts, isAutoplayActive }: Pro
   };
 
   const likeCount = typeof row.like_count === 'number' ? row.like_count : 0;
-  const metaParts: string[] = [];
-  if (row.creator_username) metaParts.push(`@${row.creator_username}`);
-  if (likeCount > 0) {
-    metaParts.push(`${formatCount(likeCount)} ${likeCount === 1 ? 'like' : 'likes'}`);
-  }
-  if (row.post_created_at) metaParts.push(relativeTime(row.post_created_at));
-  const metaLine = metaParts.join(' \u00B7 ');
 
   return (
     <Pressable
@@ -199,7 +193,7 @@ export function VideoFeedCard({ row, post, index, posts, isAutoplayActive }: Pro
           >
             {title}
           </div>
-          {metaLine ? (
+          {(row.creator_username || likeCount > 0 || row.post_created_at) ? (
             <div
               style={{
                 fontWeight: 500,
@@ -208,7 +202,24 @@ export function VideoFeedCard({ row, post, index, posts, isAutoplayActive }: Pro
                 marginTop: 3,
               }}
             >
-              {metaLine}
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, minWidth: 0 }}>
+                {row.creator_username && (
+                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
+                    @{row.creator_username}
+                  </span>
+                )}
+                {likeCount > 0 && (
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, flexShrink: 0 }}>
+                    <Heart style={{ width: 12, height: 12, color: '#F7931E', fill: '#F7931E' }} strokeWidth={1.8} />
+                    {formatCount(likeCount)}
+                  </span>
+                )}
+                {row.post_created_at && (
+                  <span style={{ flexShrink: 0 }}>
+                    {(row.creator_username || likeCount > 0) ? `\u00B7 ${relativeTime(row.post_created_at)}` : relativeTime(row.post_created_at)}
+                  </span>
+                )}
+              </span>
             </div>
           ) : null}
         </div>
