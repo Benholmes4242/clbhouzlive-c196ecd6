@@ -758,10 +758,10 @@ export function CinematicFrame({
         <DefendingChampionRowDark data={defendingChamp} avatarUrl={headshotCandidates} />
       );
 
-      upcomingFooter = 'View tournament';
+      upcomingFooter = t('overview.cinematic.viewTournament');
     } else if (fieldStrength && fieldStrength.totalPlayers > 0) {
       upcomingCapsule = <FieldStrengthRowDark data={fieldStrength} />;
-      upcomingFooter = 'View tournament';
+      upcomingFooter = t('overview.cinematic.viewTournament');
     }
     // else: no capsule — countdown chip carries the frame.
   }
