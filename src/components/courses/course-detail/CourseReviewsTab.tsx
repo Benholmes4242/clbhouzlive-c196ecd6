@@ -699,7 +699,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           />
           {(() => {
             const response = reviewResponses?.find(r => r.review_id === filteredMyReview.id);
-            if (response) return <div style={{ paddingBottom: 12 }}><ResponseDisplay response={response} courseId={courseId} viewerClaim={businessClaim} /></div>;
+            if (response) return <ResponseDisplay response={response} courseId={courseId} viewerClaim={businessClaim} />;
             return null;
           })()}
         </div>
