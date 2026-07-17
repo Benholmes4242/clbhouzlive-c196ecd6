@@ -94,7 +94,7 @@ export function CourseStatsStrip({
           }}
         >
           <MapPin size={10} color={GOLD} strokeWidth={2.5} />
-          COURSE
+          {t('overview.courseStats.eyebrow')}
         </div>
         <div
           style={{
