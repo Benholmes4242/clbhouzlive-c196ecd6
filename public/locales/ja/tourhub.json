@@ -490,7 +490,16 @@
       "teeChip": "Tee {{hole}}"
     },
     "allTeeTimes": {
-      "title": "All Tee Times"
+      "title": "All Tee Times",
+      "roundShort": "R{{round}}",
+      "roundScopeAria": "Round",
+      "roundEmpty": "Draw released after Round {{prev}}",
+      "noGroups": "No tee times available for this round."
+    },
+    "teeTimesBand": {
+      "title": "Tee times",
+      "subline": "Round {{round}} · {{count}} groups",
+      "notReleased": "Draw not yet released"
     }
   },
   "leaders": {
