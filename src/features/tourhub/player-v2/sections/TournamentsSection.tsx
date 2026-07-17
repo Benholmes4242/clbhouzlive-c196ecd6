@@ -212,7 +212,7 @@ export function TournamentsSection({
                         letterSpacing: '0.10em',
                       }}
                     >
-                      LIVE
+                      {t('player.tournaments.liveChip')}
                     </span>
                   )}
                 </div>
