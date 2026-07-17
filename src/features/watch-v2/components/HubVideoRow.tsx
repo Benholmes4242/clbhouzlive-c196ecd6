@@ -13,6 +13,7 @@ import { usePreroutePrefetch } from '@/video/usePreroutePrefetch';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { VideoCardMoreButton } from './VideoCardMoreButton';
 
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
@@ -137,7 +138,7 @@ function Card({
         ) : null}
       </div>
 
-      <div style={{ display: 'flex', gap: 9, marginTop: 8 }}>
+      <div style={{ display: 'flex', gap: 9, marginTop: 8, alignItems: 'flex-start' }}>
         {row.creator_avatar_url ? (
           <img
             src={row.creator_avatar_url}
@@ -197,6 +198,7 @@ function Card({
             </div>
           ) : null}
         </div>
+        <VideoCardMoreButton post={post} />
       </div>
     </Pressable>
   );
