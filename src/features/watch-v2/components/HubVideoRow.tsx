@@ -187,16 +187,30 @@ function Card({
           >
             {title}
           </div>
-          {row.creator_username ? (
+          {(row.creator_username || Number(row.like_count ?? 0) > 0) ? (
             <div
               style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
                 fontWeight: 500,
                 fontSize: 11.5,
                 color: '#64748B',
                 marginTop: 3,
+                minWidth: 0,
               }}
             >
-              @{row.creator_username}
+              {row.creator_username ? (
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
+                  @{row.creator_username}
+                </span>
+              ) : null}
+              {Number(row.like_count ?? 0) > 0 && (
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, flexShrink: 0 }}>
+                  <Heart style={{ width: 12, height: 12, color: '#F7931E', fill: '#F7931E' }} strokeWidth={1.8} />
+                  {formatCount(Number(row.like_count ?? 0))}
+                </span>
+              )}
             </div>
           ) : null}
         </div>
