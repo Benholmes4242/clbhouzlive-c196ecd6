@@ -371,6 +371,41 @@
         "label": "Season Points",
         "short": "POINTS",
         "unit": "PTS"
+      },
+      "events_played": {
+        "label": "Events Played",
+        "short": "EVENTS",
+        "unit": "EVENTS"
+      },
+      "top_25": {
+        "label": "Top 25 Finishes",
+        "short": "TOP 25",
+        "unit": "TOP 25"
+      },
+      "cuts_made": {
+        "label": "Cuts Made",
+        "short": "CUTS MADE",
+        "unit": "CUTS"
+      },
+      "birdies_per_round": {
+        "label": "Birdies Per Round",
+        "short": "BIRDIES / RD",
+        "unit": "AVG"
+      },
+      "scrambling": {
+        "label": "Scrambling",
+        "short": "SCRAMBLING",
+        "unit": "%"
+      },
+      "strokes_gained_total": {
+        "label": "Strokes Gained Total",
+        "short": "SG: TOTAL",
+        "unit": "SG"
+      },
+      "strokes_gained_around_green": {
+        "label": "Strokes Gained Around Green",
+        "short": "SG: AROUND",
+        "unit": "SG"
       }
     },
     "pointsBrand": {
@@ -386,7 +421,7 @@
       "closeAria": "Clear search"
     },
     "editorial": {
-      "leaderAt": "{{tournament}} \u2014 {{leader}} LEADS AT {{score}}",
+      "leaderAt": "{{tournament}} — {{leader}} LEADS AT {{score}}",
       "startsOn": "{{tournament}} STARTS {{day}}"
     },
     "field": {
@@ -402,12 +437,12 @@
       "top10s": "{{count}} TOP-10"
     },
     "footer": {
-      "synced": "Season ranking \u00B7 live dot = on the course right now",
-      "unsynced": "Ranked by world ranking \u2014 season statistics arrive with the sync"
+      "synced": "Season ranking · live dot = on the course right now",
+      "unsynced": "Ranked by world ranking — season statistics arrive with the sync"
     },
     "podium": {
       "rank": "No.{{rank}}",
-      "rankWithStat": "No.{{rank}} \u00B7 {{statLabel}}"
+      "rankWithStat": "No.{{rank}} · {{statLabel}}"
     },
     "statLabel": {
       "pga": "FEDEX PTS",
@@ -415,6 +450,78 @@
       "lpga": "CME PTS",
       "pgad": "POINTS",
       "liv": "LIV PTS"
+    }
+  },
+  "player": {
+    "error": {
+      "loadFailed": "Couldn't load player data",
+      "retry": "Retry"
+    },
+    "hero": {
+      "tourSuffix": "{{tour}} TOUR",
+      "fallback": "PLAYER",
+      "worldNo": "World No. {{rank}}",
+      "fedexNo": "FedEx No. {{rank}}"
+    },
+    "live": {
+      "badge": "LIVE",
+      "roundSuffix": " · R{{round}}",
+      "thru": "thru {{holes}}",
+      "finished": "F"
+    },
+    "form": {
+      "eyebrow": "Last 6 · Most Recent First",
+      "status": {
+        "mc": "MC",
+        "wd": "WD",
+        "dq": "DQ",
+        "noResult": "—"
+      }
+    },
+    "tournaments": {
+      "eyebrow": "Tournaments",
+      "winChip": "WIN",
+      "liveChip": "LIVE",
+      "expand": "Full season ›",
+      "status": {
+        "mc": "MC",
+        "wd": "WD",
+        "dq": "DQ",
+        "noResult": "—"
+      }
+    },
+    "season": {
+      "eyebrow": "This Season",
+      "allStats": "All stats",
+      "card": {
+        "top10s": "TOP 10s",
+        "wins": "WINS",
+        "scoring": "SCORING",
+        "earnings": "EARNINGS",
+        "events": "EVENTS",
+        "bestFinish": "BEST FINISH",
+        "madeCuts": "MADE CUTS"
+      }
+    },
+    "about": {
+      "eyebrow": "About",
+      "field": {
+        "born": "Born",
+        "age": "Age",
+        "turnedPro": "Turned Pro",
+        "height": "Height",
+        "college": "College",
+        "residence": "Residence"
+      }
+    },
+    "stats": {
+      "eyebrow": "Season Statistics",
+      "section": {
+        "overview": "Overview",
+        "ballStriking": "Ball Striking",
+        "shortGame": "Short Game",
+        "strokesGained": "Strokes Gained"
+      }
     }
   }
 }

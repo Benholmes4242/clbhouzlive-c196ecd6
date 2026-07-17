@@ -5,6 +5,8 @@
  * Section self-hides when < 2 rendered chips.
  */
 
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import type { PlayerTournamentResult } from '../../hooks/usePlayerResults';
 import { AMBER, GOLD, GOLD_DEEP, HAIRLINE_INK_8, INK, INK_FAINT, INK_TINT_07, SLATE_50, SURFACE } from '../../_shared/tokens';
 
@@ -12,12 +14,12 @@ interface FormSectionProps {
   results: PlayerTournamentResult[];
 }
 
-function chipLabel(r: PlayerTournamentResult): string {
+function chipLabel(r: PlayerTournamentResult, t: TFunction): string {
   const st = r.status?.toUpperCase();
-  if (st === 'CUT' || st === 'MC') return 'MC';
-  if (st === 'WD') return 'WD';
-  if (st === 'DQ') return 'DQ';
-  if (r.position === null) return '—';
+  if (st === 'CUT' || st === 'MC') return t('player.form.status.mc');
+  if (st === 'WD') return t('player.form.status.wd');
+  if (st === 'DQ') return t('player.form.status.dq');
+  if (r.position === null) return t('player.form.status.noResult');
   if (r.position === 1) return '1';
   return `${r.position_tied ? 'T' : ''}${r.position}`;
 }

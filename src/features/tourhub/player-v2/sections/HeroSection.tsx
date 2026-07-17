@@ -7,6 +7,8 @@
  * only what actually exists on the DB row (world_rank, fedex_rank).
  */
 
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import CountryFlag from '@/components/ui/country-flag';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
@@ -23,12 +25,15 @@ interface HeroSectionProps {
   playerStats: TourPlayerStatistics | null;
 }
 
-function tourLabel(codes: string[] | null): string {
+function tourLabel(codes: string[] | null, t: TFunction): string {
   const first = codes?.[0] as keyof typeof TOUR_LABEL | undefined;
-  return first ? `${TOUR_LABEL[first] ?? first.toUpperCase()} TOUR` : 'PLAYER';
+  return first
+    ? t('player.hero.tourSuffix', { tour: TOUR_LABEL[first] ?? first.toUpperCase() })
+    : t('player.hero.fallback');
 }
 
 export function HeroSection({ player, playerStats }: HeroSectionProps) {
+  const { t } = useTranslation('tourhub');
   const avatarCandidates = resolvePlayerAvatarCandidates({
     name: player.full_name,
     photoUrl: player.photo_url ?? null,
@@ -88,7 +93,7 @@ export function HeroSection({ player, playerStats }: HeroSectionProps) {
               flexWrap: 'wrap',
             }}
           >
-            <span>{tourLabel(player.tour_codes)}</span>
+            <span>{tourLabel(player.tour_codes, t)}</span>
             {country && (
               <>
                 <span aria-hidden style={{ opacity: 0.6 }}>·</span>
@@ -129,11 +134,11 @@ export function HeroSection({ player, playerStats }: HeroSectionProps) {
               fontVariantNumeric: 'tabular-nums',
             }}
             >
-              {worldRank && <span>World No. {worldRank}</span>}
+              {worldRank && <span>{t('player.hero.worldNo', { rank: worldRank })}</span>}
               {worldRank && isPga && fedexRank && (
                 <span aria-hidden style={{ opacity: 0.5 }}>·</span>
               )}
-              {isPga && fedexRank && <span>FedEx No. {fedexRank}</span>}
+              {isPga && fedexRank && <span>{t('player.hero.fedexNo', { rank: fedexRank })}</span>}
             </div>
           )}
         </div>
