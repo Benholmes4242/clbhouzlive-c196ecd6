@@ -125,14 +125,23 @@ export function PlayersTab() {
         : null;
       if (leaderRow && leader?.score != null) {
         const scoreStr = leader.score === 0 ? 'E' : leader.score > 0 ? `+${leader.score}` : `${leader.score}`;
-        return `${live.name.toUpperCase()} — ${leaderRow.name.toUpperCase()} LEADS AT ${scoreStr}`;
+        return t('players.editorial.leaderAt', {
+          tournament: live.name.toUpperCase(),
+          leader: leaderRow.name.toUpperCase(),
+          score: scoreStr,
+        });
       }
       return live.name.toUpperCase();
     }
     const soon = tours[0];
     const day = formatDayShort(soon.start_date);
-    return day ? `${soon.name.toUpperCase()} STARTS ${day.toUpperCase()}` : null;
-  }, [liveTournaments, activeTour, liveMap, ranking?.rows]);
+    return day
+      ? t('players.editorial.startsOn', {
+          tournament: soon.name.toUpperCase(),
+          day: day.toUpperCase(),
+        })
+      : null;
+  }, [liveTournaments, activeTour, liveMap, ranking?.rows, t]);
 
   // ── Rows: filter by search
   const filteredRows = useMemo<RankedRow[]>(() => {
