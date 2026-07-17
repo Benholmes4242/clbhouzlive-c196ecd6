@@ -297,8 +297,8 @@ export const ReplyForm: React.FC<ReplyFormProps> = ({
           cursor: 'pointer',
         }}
       >
-        {/* Line 1: club mark + placeholder */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', minWidth: 0 }}>
+        {/* Avatar + two-line stack (placeholder, then pill) — mirrors ResponseDisplay */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, width: '100%', minWidth: 0 }}>
           <SquircleAvatar
             size={28}
             src={businessClaim.businessLogoUrl ?? undefined}
@@ -307,40 +307,40 @@ export const ReplyForm: React.FC<ReplyFormProps> = ({
             hairlineRing
             ringColor={LIGHT_HAIRLINE}
           />
-          <span
-            style={{
-              flex: 1,
-              minWidth: 0,
-              fontSize: 12.5,
-              fontWeight: 500,
-              color: 'rgba(15,23,42,0.40)',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {`Respond publicly as ${shortName}\u2026`}
-          </span>
-        </div>
-        {/* Line 2: Respond pill, indented to text's left edge (28 avatar + 10 gap) */}
-        <div style={{ marginTop: 3, paddingLeft: 38 }}>
-          <span
-            style={{
-              display: 'inline-block',
-              fontSize: 8.5,
-              fontWeight: 700,
-              letterSpacing: '0.07em',
-              textTransform: 'uppercase',
-              color: '#8A6400',
-              background: 'rgba(232,181,48,0.16)',
-              border: '1px solid rgba(232,181,48,0.35)',
-              borderRadius: 999,
-              padding: '3px 8px',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            Respond
-          </span>
+          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+            <span
+              style={{
+                fontSize: 12.5,
+                fontWeight: 500,
+                color: 'rgba(15,23,42,0.40)',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                minWidth: 0,
+              }}
+            >
+              {`Respond publicly as ${shortName}\u2026`}
+            </span>
+            <span
+              style={{
+                marginTop: 3,
+                alignSelf: 'flex-start',
+                display: 'inline-block',
+                fontSize: 8.5,
+                fontWeight: 700,
+                letterSpacing: '0.07em',
+                textTransform: 'uppercase',
+                color: '#8A6400',
+                background: 'rgba(232,181,48,0.16)',
+                border: '1px solid rgba(232,181,48,0.35)',
+                borderRadius: 999,
+                padding: '3px 8px',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Respond
+            </span>
+          </div>
         </div>
       </div>
     );
