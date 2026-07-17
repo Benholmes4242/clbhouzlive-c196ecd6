@@ -464,21 +464,22 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           <div className="h-10 w-10 rounded-full bg-muted-foreground/10 flex items-center justify-center mb-3">
             <AlertCircle className="h-5 w-5 text-muted-foreground/40" />
           </div>
-          <p className="text-sm font-semibold text-foreground mb-1">Couldn't load reviews</p>
+          <p className="text-sm font-semibold text-foreground mb-1">{t('review.error.title')}</p>
           <p className="text-sm text-muted-foreground mb-4">
-            Something went wrong. Please try again.
+            {t('review.error.body')}
           </p>
           <button
             type="button"
             onClick={() => refetch()}
             className="rounded-full bg-[#f59e0b] text-white text-sm font-semibold px-5 py-2 active:scale-[0.98] transition-all min-h-[44px] hover:bg-[#e8920f]"
           >
-            Try Again
+            {t('review.error.retry')}
           </button>
         </div>
       </section>
     );
   }
+
 
   // Empty state
   if (!hasRatings) {
