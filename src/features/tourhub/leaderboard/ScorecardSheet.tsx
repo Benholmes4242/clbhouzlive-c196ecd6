@@ -8,6 +8,7 @@
  */
 
 import { useMemo, useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -71,6 +72,7 @@ function isDemotedStatus(s?: string | null): boolean {
 }
 
 export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
+  const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
   const { data: scRows = [] } = useScorecard(tournamentId, target?.playerId ?? null);
   const meta = useTournamentMeta(tournamentId);
