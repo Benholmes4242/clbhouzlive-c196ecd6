@@ -9,6 +9,8 @@
  * fall back to this when the event isn't present in the live tab.
  */
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { BoardTable, type BoardEntry, type CutState } from '../../leaderboard/BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
