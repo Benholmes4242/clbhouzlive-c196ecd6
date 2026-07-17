@@ -320,7 +320,7 @@ export const MapInsightChip: React.FC<MapInsightChipProps> = ({
           <button
             onClick={() => setIsDismissed(true)}
             className="flex-shrink-0 p-1 -mr-1 text-white/40 hover:text-white/80 transition-colors rounded-full hover:bg-white/10"
-            aria-label="Dismiss insight"
+            aria-label={t('map.dismissInsightA11y')}
           >
             <X className="h-3.5 w-3.5" />
           </button>
