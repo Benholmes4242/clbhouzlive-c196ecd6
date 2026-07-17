@@ -226,7 +226,19 @@ export default tseslint.config(
       "i18next/no-literal-string": ["error", i18nLiteralOptions],
       "no-restricted-syntax": ["error", literalAttrSyntax, ...toLocaleSyntax],
     },
+  },
+  // ─── Wave 3e.iii — tournament-v2 + leaderboard slices (Turn B.3 close) ─
+  {
+    files: [
+      "src/features/tourhub/tournament-v2/**/*.{ts,tsx}",
+      "src/features/tourhub/leaderboard/**/*.{ts,tsx}",
+    ],
+    rules: {
+      "i18next/no-literal-string": ["error", i18nLiteralOptions],
+      "no-restricted-syntax": ["error", literalAttrSyntax, ...toLocaleSyntax],
+    },
   }
+
 );
 
 
