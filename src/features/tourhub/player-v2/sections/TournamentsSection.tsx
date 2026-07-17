@@ -40,12 +40,12 @@ interface TournamentsSectionProps {
 
 const INITIAL_LIMIT = 8;
 
-function fmtPosition(r: PlayerTournamentResult): string {
+function fmtPosition(r: PlayerTournamentResult, t: TFunction): string {
   const st = r.status?.toUpperCase();
-  if (st === 'CUT' || st === 'MC') return 'MC';
-  if (st === 'WD') return 'WD';
-  if (st === 'DQ') return 'DQ';
-  if (r.position === null) return '—';
+  if (st === 'CUT' || st === 'MC') return t('player.tournaments.status.mc');
+  if (st === 'WD') return t('player.tournaments.status.wd');
+  if (st === 'DQ') return t('player.tournaments.status.dq');
+  if (r.position === null) return t('player.tournaments.status.noResult');
   if (r.position === 1) return '1';
   return `${r.position_tied ? 'T' : ''}${r.position}`;
 }
