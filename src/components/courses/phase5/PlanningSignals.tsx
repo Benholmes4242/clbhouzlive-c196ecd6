@@ -64,7 +64,7 @@ export const PlanningSignals: React.FC<PlanningSignalsProps> = ({
             "font-medium",
             isWantToPlay ? "text-amber-700" : "text-gray-700"
           )}>
-            Add to bucket list
+            {t('phase5.planning.addBucketList')}
           </span>
         </div>
         {isWantToPlay && (
