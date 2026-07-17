@@ -146,29 +146,27 @@ async function resolvePgaSeasonId(): Promise<string | null> {
   return null;
 }
 
-// PGA category definitions (accessor + sort + format + label)
+// PGA category definitions (accessor + sort + format). Labels are resolved via
+// LEADER_STAT_LABELS[key] at render — no display strings live here.
 interface PgaCatSpec {
   key: string;
-  label: string;
-  short: string;
-  unit: string;
   dir: 'asc' | 'desc';
   accessor: (s: any) => number | null;
   format: (v: number) => string;
 }
 
 const PGA_CATS: PgaCatSpec[] = [
-  { key: 'earnings',                 label: 'Season Earnings',       short: 'EARNINGS',      unit: 'USD',    dir: 'desc', accessor: (s) => s.earnings,                 format: fmtMoneyCompact },
-  { key: 'scoring_avg',              label: 'Scoring Average',       short: 'SCORING',       unit: 'AVG',    dir: 'asc',  accessor: (s) => s.scoring_average,          format: fmtAvg3 },
-  { key: 'wins',                     label: 'Wins',                  short: 'WINS',          unit: 'WINS',   dir: 'desc', accessor: (s) => s.wins,                     format: fmtInt },
-  { key: 'top_10',                   label: 'Top 10 Finishes',       short: 'TOP 10',        unit: 'TOP 10', dir: 'desc', accessor: (s) => s.top_10s,                  format: fmtInt },
-  { key: 'drive_avg',                label: 'Driving Distance',      short: 'DRIVING',       unit: 'YDS',    dir: 'desc', accessor: (s) => s.driving_distance,         format: fmtYds },
-  { key: 'drive_acc',                label: 'Driving Accuracy',      short: 'ACCURACY',      unit: '%',      dir: 'desc', accessor: (s) => s.driving_accuracy,         format: fmtPct },
-  { key: 'gir_pct',                  label: 'Greens in Regulation',  short: 'GIR',           unit: '%',      dir: 'desc', accessor: (s) => s.greens_in_reg,            format: fmtPct },
-  { key: 'sand_saves_pct',           label: 'Sand Saves',            short: 'SAND SAVES',    unit: '%',      dir: 'desc', accessor: (s) => s.sand_saves,               format: fmtPct },
-  { key: 'putt_avg',                 label: 'Putting Average',       short: 'PUTTING',       unit: 'PUTTS',  dir: 'asc',  accessor: (s) => s.putting_average,          format: fmtAvg3 },
-  { key: 'strokes_gained_tee_green', label: 'Strokes Gained T2G',    short: 'SG T2G',        unit: 'SG',     dir: 'desc', accessor: (s) => s.strokes_gained_tee_green, format: fmtSG },
-  { key: 'strokes_gained_putting',   label: 'Strokes Gained Putting',short: 'SG PUTT',       unit: 'SG',     dir: 'desc', accessor: (s) => s.strokes_gained_putting,   format: fmtSG },
+  { key: 'earnings',                 dir: 'desc', accessor: (s) => s.earnings,                 format: fmtMoneyCompact },
+  { key: 'scoring_avg',              dir: 'asc',  accessor: (s) => s.scoring_average,          format: fmtAvg3 },
+  { key: 'wins',                     dir: 'desc', accessor: (s) => s.wins,                     format: fmtInt },
+  { key: 'top_10',                   dir: 'desc', accessor: (s) => s.top_10s,                  format: fmtInt },
+  { key: 'drive_avg',                dir: 'desc', accessor: (s) => s.driving_distance,         format: fmtYds },
+  { key: 'drive_acc',                dir: 'desc', accessor: (s) => s.driving_accuracy,         format: fmtPct },
+  { key: 'gir_pct',                  dir: 'desc', accessor: (s) => s.greens_in_reg,            format: fmtPct },
+  { key: 'sand_saves_pct',           dir: 'desc', accessor: (s) => s.sand_saves,               format: fmtPct },
+  { key: 'putt_avg',                 dir: 'asc',  accessor: (s) => s.putting_average,          format: fmtAvg3 },
+  { key: 'strokes_gained_tee_green', dir: 'desc', accessor: (s) => s.strokes_gained_tee_green, format: fmtSG },
+  { key: 'strokes_gained_putting',   dir: 'desc', accessor: (s) => s.strokes_gained_putting,   format: fmtSG },
 ];
 
 type PlayerRec = {
