@@ -39,7 +39,7 @@ import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import { HeroSection } from './sections/HeroSection';
 import { SectionEyebrow } from './sections/SectionEyebrow';
 import { MiniBoard } from './sections/MiniBoard';
-import { FeaturedGroupsRail } from './sections/FeaturedGroupsRail';
+import { OnTheCourse } from '../_shared/OnTheCourse';
 import { TeeTimesFirstGroups } from './sections/TeeTimesFirstGroups';
 import { AllTeeTimesSheet } from './sections/AllTeeTimesSheet';
 import { CourseSection } from './sections/CourseSection';
