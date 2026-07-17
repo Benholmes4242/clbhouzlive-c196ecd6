@@ -443,7 +443,7 @@ function CaseSheet({
       {pick.concern ? (
         <div style={{ marginTop: 16, padding: 12, background: V4.amberSoft, borderRadius: 10, fontSize: 12, color: V4.ink }}>
           <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.14em', color: V4.amber, textTransform: 'uppercase', marginBottom: 4 }}>
-            Concern
+            {t('overview.tiPicks.case.concernLabel')}
           </div>
           {pick.concern}
         </div>
