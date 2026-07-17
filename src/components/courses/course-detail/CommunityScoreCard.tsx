@@ -147,14 +147,14 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         }}
       >
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 2, marginBottom: 14 }}>
-          <span style={{ fontSize: 52, fontWeight: 900, letterSpacing: '-0.04em', color: 'rgba(247,147,30,0.30)', lineHeight: 1 }}>–</span>
+          <span style={{ fontSize: 52, fontWeight: 900, letterSpacing: '-0.04em', color: 'rgba(247,147,30,0.30)', lineHeight: 1 }}>{t('courseDetail.communityScore.dashPlaceholder')}</span>
           <span style={{ fontSize: 18, fontWeight: 800, color: 'rgba(15,23,42,0.25)', letterSpacing: '-0.02em' }}>/10</span>
         </div>
         <div style={{ fontSize: 17, fontWeight: 800, color: INK, letterSpacing: '-0.02em', marginBottom: 5 }}>
-          Be the first to rate this course
+          {t('courseDetail.communityScore.beFirst')}
         </div>
         <p style={{ fontSize: 13, color: INK_MUTE, lineHeight: 1.5, maxWidth: 260, margin: '0 auto 18px' }}>
-          No one's scored {courseName || 'this course'} yet. Give it a 0–10 and help fellow golfers discover it.
+          {t('courseDetail.communityScore.noOneRated', { courseName: courseName || t('courseDetail.communityScore.thisCourse') })}
         </p>
         <button
           type="button"
@@ -172,7 +172,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
             boxShadow: '0 2px 8px rgba(247,147,30,0.28)',
           }}
         >
-          Rate this course
+          {t('courseDetail.communityScore.rateThis')}
         </button>
       </div>
     );
@@ -240,8 +240,8 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
               {tierLabel}
             </div>
             <div style={{ fontSize: 11.5, color: INK_FAINT, marginTop: 2 }}>
-              Based on {totalRatings} {totalRatings === 1 ? 'rating' : 'ratings'}
-              {onlyUserHasRated ? ' · Only you' : ''}
+              {t('courseDetail.communityScore.basedOn', { count: totalRatings })}
+              {onlyUserHasRated ? t('courseDetail.communityScore.onlyYouSuffix') : ''}
             </div>
           </div>
         </div>
@@ -331,7 +331,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
               marginBottom: 10,
             }}
           >
-            Category Scores
+            {t('courseDetail.communityScore.categoryScores')}
           </div>
           <div
             style={{
@@ -377,7 +377,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
             cursor: 'pointer',
           }}
         >
-          See all reviews →
+          {t('courseDetail.communityScore.seeAllReviews')}
         </button>
       )}
     </div>
