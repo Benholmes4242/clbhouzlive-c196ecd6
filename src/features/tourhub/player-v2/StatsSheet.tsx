@@ -6,9 +6,11 @@
  * omits entirely.
  */
 
+import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import type { TourPlayerStatistics } from '../hooks/useTourHubData';
 import { formatCurrencyUsd } from '@/i18n/format';
+import { LEADER_STAT_LABELS } from '../leaders-v2/data/useLeaderCategories';
 import {
   AMBER,
   HAIRLINE_INK_8,
