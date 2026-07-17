@@ -241,6 +241,16 @@ export default tseslint.config(
       "i18next/no-literal-string": ["error", i18nLiteralOptions],
       "no-restricted-syntax": ["error", literalAttrSyntax, ...toLocaleSyntax],
     },
+  },
+  // ─── Wave 3e.iv Turn C.1 — leaders-v2 slice ───────────────────────
+  {
+    files: [
+      "src/features/tourhub/leaders-v2/**/*.{ts,tsx}",
+    ],
+    rules: {
+      "i18next/no-literal-string": ["error", i18nLiteralOptions],
+      "no-restricted-syntax": ["error", literalAttrSyntax, ...toLocaleSyntax],
+    },
   }
 
 );
