@@ -207,7 +207,7 @@ export function TournamentPage() {
 
           {pulse.state === 'completed' && hasBoard && (
             <>
-              <SectionEyebrow kicker="Final Leaderboard" actionLabel="Full board" onAction={openFullBoard} />
+              <SectionEyebrow kicker={t('tournament.shell.leaderboard.finalEyebrow')} actionLabel={t('tournament.shell.leaderboard.fullBoardAction')} onAction={openFullBoard} />
               <MiniBoard tournamentId={tournamentId!} entries={leaderboardRows as any} />
             </>
           )}
