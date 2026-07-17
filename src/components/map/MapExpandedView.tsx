@@ -6,7 +6,6 @@ import { MapPin, X } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { createGlassyMarkerElement } from './MapMarker';
 import { MAP_CONFIG } from '@/config/maps';
-import { openExternalUrl } from '@/utils/median/openExternalUrl';
 import { openMapsUrl } from '@/utils/median/openMapsUrl';
 
 interface MapExpandedViewProps {
