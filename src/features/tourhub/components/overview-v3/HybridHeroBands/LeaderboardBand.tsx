@@ -438,7 +438,7 @@ export function LeaderboardBand({
         }}
         className="active:opacity-70 transition-opacity"
       >
-        {ctaLabel(state)}
+        {t(ctaLabelKey(state))}
         <ChevronRight size={12} strokeWidth={2.5} color={AMBER} />
       </button>
     </div>
