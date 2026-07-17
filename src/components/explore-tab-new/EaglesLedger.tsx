@@ -18,9 +18,9 @@ const INK = '#0F172A';
 const INK_MUTE = 'rgba(15,23,42,0.45)';
 const RANK_MUTE = 'rgba(15,23,42,0.35)';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
+const BAND_BG = 'rgba(15,23,42,0.035)';
 const BAR_TRACK = 'rgba(15,23,42,0.08)';
 const CHEVRON_COLOR = 'rgba(15,23,42,0.3)';
-const CARD_BG = '#FFFFFF';
 const ROWS = 5;
 
 function formatHolderName(raw?: string | null): string {
@@ -83,21 +83,17 @@ export function EaglesLedger({ region, regionUpper, mode, onRowTap, onLeaderTap 
         overline={overlineLabel}
         meta="View all"
         onMeta={() => setSheetOpen(true)}
+        paddingX={14}
       />
 
-      <div style={{ padding: '0 16px' }}>
-        <div
-          style={{
-            background: CARD_BG,
-            borderRadius: 16,
-            border: `0.5px solid ${HAIRLINE}`,
-            boxShadow: '0 1px 3px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.05)',
-            padding: '4px 0',
-          }}
-        >
+      <div>
+        <div>
+
           {mode === 'alltime'
             ? leaders.map((r, i) => {
                 const isFirst = i === 0;
+                const isLast = i === leaders.length - 1;
+                const banded = i === 1 || i === 3;
                 const name = formatHolderName(r.holder_name);
                 const count = r.eagles ?? 0;
                 const pct = Math.max(0.08, Math.min(1, count / (leaderMax || 1)));
@@ -115,12 +111,12 @@ export function EaglesLedger({ region, regionUpper, mode, onRowTap, onLeaderTap 
                       display: 'flex',
                       flexDirection: 'column',
                       gap: 6,
-                      padding: '9px 16px',
+                      padding: '10px 14px',
                       width: '100%',
-                      background: 'transparent',
+                      background: banded ? BAND_BG : 'transparent',
                       border: 'none',
-                      borderTop: isFirst ? 'none' : `0.5px solid ${HAIRLINE}`,
-                      marginLeft: 0,
+                      borderTop: `0.5px solid ${HAIRLINE}`,
+                      borderBottom: isLast ? `0.5px solid ${HAIRLINE}` : 'none',
                       cursor: r.user_id ? 'pointer' : 'default',
                       fontFamily: FONT,
                     }}
@@ -192,7 +188,7 @@ export function EaglesLedger({ region, regionUpper, mode, onRowTap, onLeaderTap 
                     <div
                       style={{
                         marginLeft: 34,
-                        marginRight: 16,
+                        marginRight: 14,
                         height: 3,
                         borderRadius: 999,
                         background: BAR_TRACK,
@@ -211,11 +207,12 @@ export function EaglesLedger({ region, regionUpper, mode, onRowTap, onLeaderTap 
                   </button>
                 );
               })
-            : feats.slice(0, ROWS).map((row, i) => {
+            : feats.slice(0, ROWS).map((row, i, arr) => {
                 const name = formatHolderName(row.holder_name);
                 const when = row.play_date ?? row.attained_at ?? null;
                 const hole = extractHoleNo(row);
-                const isFirst = i === 0;
+                const isLast = i === arr.length - 1;
+                const banded = i === 1 || i === 3;
                 return (
                   <button
                     key={`${row.score_id ?? row.course_id ?? i}-${i}`}
@@ -226,11 +223,12 @@ export function EaglesLedger({ region, regionUpper, mode, onRowTap, onLeaderTap 
                       display: 'flex',
                       alignItems: 'center',
                       gap: 10,
-                      padding: '10px 16px',
+                      padding: '10px 14px',
                       width: '100%',
-                      background: 'transparent',
+                      background: banded ? BAND_BG : 'transparent',
                       border: 'none',
-                      borderTop: isFirst ? 'none' : `0.5px solid ${HAIRLINE}`,
+                      borderTop: `0.5px solid ${HAIRLINE}`,
+                      borderBottom: isLast ? `0.5px solid ${HAIRLINE}` : 'none',
                       cursor: 'pointer',
                       fontFamily: FONT,
                     }}
