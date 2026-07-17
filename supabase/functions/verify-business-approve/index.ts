@@ -58,8 +58,10 @@ async function queueOwnerPush(
       data: payload.data,
     });
   }
+}
 
 serve(async (req) => {
+
   const corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
