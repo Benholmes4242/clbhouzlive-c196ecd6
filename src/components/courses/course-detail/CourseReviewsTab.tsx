@@ -713,7 +713,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
             onClick={handleRateClick}
             style={{ width: '100%', padding: '12px 0', borderRadius: 12, background: 'rgba(247,147,30,0.06)', border: '1.5px solid rgba(247,147,30,0.2)', fontSize: 13, fontWeight: 700, color: AMBER, cursor: 'pointer' }}
           >
-            ⭐ Write your review
+            {t('review.writePromptInline')}
           </button>
         </div>
       )}
