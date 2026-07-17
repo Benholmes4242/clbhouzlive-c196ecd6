@@ -8,6 +8,7 @@
 
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
