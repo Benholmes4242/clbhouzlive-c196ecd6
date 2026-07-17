@@ -406,10 +406,10 @@ export function LeaderboardBand({
           <div style={{ width: '0.5px', background: INK_15, alignSelf: 'stretch' }} />
           <div style={{ padding: '6px 20px', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.16em', color: INK_ALPHA_45, textTransform: 'uppercase' }}>
-              Field
+              {t('overview.leaderboardBand.fieldEyebrow')}
             </span>
             <span style={{ fontSize: 11, fontWeight: 700, color: INK, fontVariantNumeric: 'tabular-nums' }}>
-              {formatNumber(fieldSize ?? 0)}<span style={{ fontWeight: 600, color: INK_ALPHA_45 }}> players</span>
+              {formatNumber(fieldSize ?? 0)}<span style={{ fontWeight: 600, color: INK_ALPHA_45 }}>{t('overview.leaderboardBand.playersSuffix', { count: fieldSize ?? 0 })}</span>
             </span>
           </div>
         </div>
