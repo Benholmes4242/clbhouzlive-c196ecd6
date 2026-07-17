@@ -147,7 +147,7 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
               cursor: 'pointer',
             }}
           >
-            Rate
+            {t('phase5.statusToggle.rate')}
           </button>
         </div>
       )}
