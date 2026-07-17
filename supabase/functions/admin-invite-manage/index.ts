@@ -88,31 +88,118 @@ serve(async (req: Request) => {
 
     // Handle actions
     if (action === "create_invite") {
-      const { email, role, notes } = body;
-      if (!email || !role || !["limited", "full"].includes(role)) {
-        return new Response(JSON.stringify({ error: "email and role (limited/full) required" }), {
+      const { email, invited_user_id, role, notes } = body;
+      if (!role || !["limited", "full"].includes(role)) {
+        return new Response(JSON.stringify({ error: "role (limited/full) required" }), {
+          status: 400, headers: { ...headers, "Content-Type": "application/json" },
+        });
+      }
+      if (!email && !invited_user_id) {
+        return new Response(JSON.stringify({ error: "email or invited_user_id required" }), {
           status: 400, headers: { ...headers, "Content-Type": "application/json" },
         });
       }
 
+      // If invited_user_id is supplied, block if the target is already an admin
+      // or already has a pending invite.
+      if (invited_user_id) {
+        const { data: existing } = await svc
+          .from("admin_memberships")
+          .select("user_id")
+          .eq("user_id", invited_user_id)
+          .maybeSingle();
+        if (existing) {
+          return new Response(JSON.stringify({ error: "User is already an admin" }), {
+            status: 409, headers: { ...headers, "Content-Type": "application/json" },
+          });
+        }
+
+        const { data: pending } = await svc
+          .from("admin_invitations")
+          .select("id")
+          .eq("invited_user_id", invited_user_id)
+          .eq("status", "pending")
+          .maybeSingle();
+        if (pending) {
+          return new Response(JSON.stringify({ error: "User already has a pending invite" }), {
+            status: 409, headers: { ...headers, "Content-Type": "application/json" },
+          });
+        }
+      }
+
       const token = crypto.randomUUID().replace(/-/g, '');
       const { data, error } = await svc.from("admin_invitations").insert({
-        email,
+        email: email ?? null,
+        invited_user_id: invited_user_id ?? null,
         role,
         invited_by: actor.id,
+        status: "pending",
         token,
         notes,
+        expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
       }).select().single();
 
       if (error) throw error;
 
-      // TODO: Send email with invitation link
-      // const inviteUrl = `https://www.clbhouz.co.uk/admin/invite-accept?token=${token}`;
+      // Best-effort in-app notification for a user-targeted invite (mirrors the
+      // legacy send-admin-invite behavior). Failure does not fail the invite.
+      if (invited_user_id) {
+        const { data: inviterProfile } = await svc
+          .from("user_profiles")
+          .select("display_name, username, profile_photo_url")
+          .eq("id", actor.id)
+          .maybeSingle();
+        const inviterName =
+          inviterProfile?.display_name || inviterProfile?.username || "An admin";
+        const roleLabel = role === "full" ? "a Full Admin" : "a Limited Admin";
+
+        const { error: notifError } = await svc.from("notifications").insert({
+          user_id: invited_user_id,
+          recipient_actor_type: "personal",
+          recipient_actor_id: invited_user_id,
+          actor_id: actor.id,
+          type: "admin_invite",
+          title: "Admin Invitation",
+          message: `${inviterName} has invited you to join the Clbhouz admin team as ${roleLabel}.`,
+          entity_type: "admin_invitation",
+          entity_id: data.id,
+          data: {
+            invite_id: data.id,
+            role,
+            inviter_name: inviterName,
+            inviter_avatar_url: inviterProfile?.profile_photo_url ?? null,
+          },
+        });
+        if (notifError) {
+          console.error("[admin-invite-manage] Notification error:", notifError);
+        }
+      }
 
       return new Response(JSON.stringify({ ok: true, invitation: data }), {
         status: 200, headers: { ...headers, "Content-Type": "application/json" },
       });
     }
+
+    if (action === "resend_invite") {
+      const { id } = body;
+      if (!id) {
+        return new Response(JSON.stringify({ error: "id required" }), {
+          status: 400, headers: { ...headers, "Content-Type": "application/json" },
+        });
+      }
+      const newExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+      const { data, error } = await svc.from("admin_invitations")
+        .update({ expires_at: newExpiry, updated_at: new Date().toISOString() })
+        .eq("id", id)
+        .select()
+        .single();
+      if (error) throw error;
+      return new Response(JSON.stringify({ ok: true, invitation: data }), {
+        status: 200, headers: { ...headers, "Content-Type": "application/json" },
+      });
+    }
+
+
 
     if (action === "list_invites") {
       const limit = Math.min(Number(body?.limit) || 50, 200);
