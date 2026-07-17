@@ -1,0 +1,40 @@
+{
+  "status": {
+    "live": "[~~ĿÍṼÉ~~]",
+    "upcoming": "[~~ÚƤĈŐṀÍÑĜ~~]",
+    "final": "[~~ƑÍÑÁĿ~~]",
+    "results": "[~~ŘÉŠÚĿŢŠ~~]",
+    "noEvent": "[~~ÑŐ ÉṼÉÑŢ~~]"
+  },
+  "pill": {
+    "updated": "[~~Úƥđáţéđ {{time}}~~]",
+    "tourEyebrow": "[~~Ţőúř~~]",
+    "majorEyebrow": "[~~Ṁájőř~~]"
+  },
+  "picker": {
+    "eyebrow": "[~~ŠŴÍŢĈĤ ŢŐÚŘ~~]",
+    "title": "[~~Šéļéĉţ ţőúř~~]",
+    "noEventsThisWeek": "[~~Ñő éṽéñţš ţĥíš ŵééǩ~~]",
+    "openMenuAria": "[~~Őƥéñ ɱéñú~~]",
+    "switchTourAria": "[~~Šŵíţĉĥ ţőúř~~]",
+    "switchTourCurrentAria": "[~~Šŵíţĉĥ ţőúř \u2014 ĉúřřéñţ {{label}}~~]"
+  },
+  "nav": {
+    "group": {
+      "tour": "[~~Ţőúř~~]",
+      "account": "[~~Áĉĉőúñţ~~]"
+    },
+    "overview": "[~~Őṽéřṽíéŵ~~]",
+    "leaderboards": "[~~Ŀéáđéřƀőářđš~~]",
+    "schedule": "[~~Šĉĥéđúļé~~]",
+    "players": "[~~Ƥļáýéřš~~]",
+    "leaders": "[~~Ŀéáđéřš~~]",
+    "college": "[~~Ĉőļļéĝé~~]",
+    "settings": "[~~Šéţţíñĝš~~]",
+    "profile": "[~~Ƥřőƒíļé~~]",
+    "signOut": "[~~Šíĝñ őúţ~~]"
+  },
+  "section": {
+    "retryAria": "[~~Řéţřý ļőáđíñĝ {{section}}~~]"
+  }
+}
