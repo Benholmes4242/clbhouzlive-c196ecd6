@@ -210,6 +210,53 @@
       "roundEyebrow": "[~~ŘŐÚÑĐ {{round}}~~]",
       "eyebrowFallback": "[~~ŠĈŐŘÉĈÁŘĐ~~]",
       "courseFallback": "[~~Šĉőřéĉářđ~~]"
+    },
+    "shell": {
+      "board": {
+        "eyebrow": "[~~Ťĥé Ɓőářđ~~]",
+        "action": "[~~Fúļļ ļéáđéřƀőářđ~~]"
+      },
+      "leaderboard": {
+        "finalEyebrow": "[~~Fíñáļ Ļéáđéřƀőářđ~~]",
+        "fullBoardAction": "[~~Fúļļ ƀőářđ~~]"
+      },
+      "teeTimes": {
+        "eyebrow": "[~~Ťéé Ťíɱéš~~]",
+        "allAction": "[~~Áļļ ťíɱéš~~]"
+      },
+      "field": {
+        "eyebrow": "[~~Ťĥé Fíéļđ~~]",
+        "playersSuffix": "[~~ ρļáýéřš~~]",
+        "headlinedBySep": "[~~ · ĥéáđļíñéđ ƀý ~~]",
+        "firstTeeSep": "[~~ · ƒířšť ťéé ~~]",
+        "startsInSep": "[~~ · šťářťš íñ ~~]",
+        "daysSuffix_one": "[~~ đáý~~]",
+        "daysSuffix_other": "[~~ đáýš~~]",
+        "emptyFallback": "[~~Ťĥé ƒíéļđ áñđ ťéé ťíɱéš ẃíļļ áρρéář ĥéřé ĉļőšéř ťő ťĥé šťářť.~~]"
+      }
+    },
+    "hero": {
+      "chip": {
+        "majorStarts": "[~~ΜÁĴŐŘ · ŠŤÁŘŤŠ {{date}}~~]",
+        "starts": "[~~ŠŤÁŘŤŠ {{date}}~~]"
+      },
+      "leaderLabel": "[~~Ļéáđéř~~]",
+      "daysLabel": "[~~Đáýš~~]",
+      "defendingLabel": "[~~Đéƒéñđíñĝ~~]",
+      "purseLabel": "[~~Ρúřšé~~]",
+      "tbdPlayer": "[~~ŤƁĐ~~]",
+      "championFallback": "[~~Ĉĥáɱρíőñ~~]"
+    },
+    "story": {
+      "eyebrow": "[~~Ťĥé Šťőřý~~]",
+      "readMore": "[~~Řéáđ ɱőřé~~]"
+    },
+    "moments": {
+      "eyebrow": "[~~Μőɱéñťš~~]",
+      "emptyBody": "[~~Μőɱéñťš ƒřőɱ ťĥíš ťőúřñáɱéñť ẃíļļ áρρéář ĥéřé áš ɱéɱƀéřš šĥářé ťĥéɱ.~~]",
+      "shareCta": "[~~Šĥářé á ɱőɱéñť~~]",
+      "allAction": "[~~Áļļ ɱőɱéñťš~~]",
+      "sheetTitle": "[~~Áļļ Μőɱéñťš~~]"
     }
   }
 }
