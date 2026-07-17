@@ -502,11 +502,12 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           <EmptyStateGuide
             kicker="WHAT TO INCLUDE"
             items={[
-              { icon: Flag,      label: 'Course condition', sub: 'Greens, fairways, bunkers, rough' },
-              { icon: Map,       label: 'Layout & design',  sub: 'Challenge, variety, scenery, routing' },
-              { icon: Building2, label: 'Facilities',       sub: 'Clubhouse, practice areas, service' },
-              { icon: Tag,       label: 'Value',            sub: 'Was it worth the green fee?' },
+              { icon: Flag,      label: t('review.emptyGuide.condition.title'),  sub: t('review.emptyGuide.condition.sub') },
+              { icon: Map,       label: t('review.emptyGuide.layout.title'),     sub: t('review.emptyGuide.layout.sub') },
+              { icon: Building2, label: t('review.emptyGuide.facilities.title'), sub: t('review.emptyGuide.facilities.sub') },
+              { icon: Tag,       label: t('review.emptyGuide.value.title'),      sub: t('review.emptyGuide.value.sub') },
             ]}
+
           />
         </div>
         <ScrollToTopGlass />
