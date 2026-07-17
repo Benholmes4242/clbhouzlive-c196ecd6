@@ -62,47 +62,14 @@ export function CourseSection({ tournamentId }: Props) {
   const sorted = [...played].sort((a, b) => b.avg_to_par - a.avg_to_par);
   const hardest = sorted[0];
   const easiest = sorted[sorted.length - 1];
-
-  const Card = ({ label, h }: { label: string; h: TournamentHole }) => (
-    <div
-      style={{
-        flex: 1, background: SURFACE, borderRadius: 12,
-        border: `0.5px solid ${HAIRLINE_INK_8}`, padding: '12px 14px',
-        fontFamily: FONT,
-      }}
-    >
-      <div style={{ fontSize: 8.5, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-        {label}
-      </div>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 4 }}>
-        <span style={{ fontSize: 24, fontWeight: 200, color: INK, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
-          {h.hole_no}
-        </span>
-        {h.par != null && (
-          <span style={{ fontSize: 10, fontWeight: 700, color: INK_MUTE, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-            {t('board.meta.par', { par: h.par, ns: 'tourhub' })}
-
-          </span>
-        )}
-      </div>
-      <div style={{ marginTop: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <span style={{ fontSize: 9, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.10em', textTransform: 'uppercase' }}>
-          {t('tournament.course.avgVsPar', { ns: 'tourhub' })}
-        </span>
-        <span style={{ fontSize: 14, fontWeight: 800, color: avgColorFor(h.avg_to_par), fontVariantNumeric: 'tabular-nums' }}>
-          {fmtAvg(h.avg_to_par)}
-        </span>
-      </div>
-    </div>
-  );
+  const topMaxAbs = Math.max(0.01, Math.abs(hardest.avg_to_par), Math.abs(easiest.avg_to_par));
 
   return (
     <>
       <SectionEyebrow kicker={t('tournament.course.title', { ns: 'tourhub' })} actionLabel={t('tournament.course.allHolesAction', { ns: 'tourhub' })} onAction={() => setOpen(true)} />
       <div style={{ display: 'flex', gap: 12, padding: '0 16px 4px' }}>
-        <Card label={t('holes.hardestTitle', { ns: 'courses' })} h={hardest} />
-        <Card label={t('holes.easiestTitle', { ns: 'courses' })} h={easiest} />
-
+        <FeatureMini tone="hard" h={hardest} maxAbs={topMaxAbs} />
+        <FeatureMini tone="easy" h={easiest} maxAbs={topMaxAbs} />
       </div>
       <HolesSheet
         open={open}
