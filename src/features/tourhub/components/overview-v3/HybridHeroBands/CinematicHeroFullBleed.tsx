@@ -499,7 +499,7 @@ export function CinematicHeroFullBleed({
       </span>
       {!isLive && showMajorTag && (
         <span
-          aria-label="Major championship"
+          aria-label={t('overview.cinematic.majorAria')}
           style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -515,7 +515,7 @@ export function CinematicHeroFullBleed({
             lineHeight: 1,
           }}
         >
-          Major
+          {t('pill.majorEyebrow')}
         </span>
       )}
     </div>
