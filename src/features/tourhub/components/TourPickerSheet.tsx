@@ -147,7 +147,6 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
               <Trophy size={15} strokeWidth={2.4} color={GOLD_DEEP} aria-hidden />
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              {/* i18n deferred: 'The Majors' is a proper-noun tour-collection brand, same rule as PGA/LPGA. Wrapped in an expression container so the literal-string gate sees a string literal (not JSX text) and lets it through. */}
               <div
                 style={{
                   fontSize: 13,
@@ -156,7 +155,11 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
                   letterSpacing: '0.06em',
                   textTransform: 'uppercase',
                 }}
-              >{'The Majors'}</div>
+              >
+                {/* eslint-disable-next-line i18next/no-literal-string -- brand: tour-collection proper noun */}
+                The Majors
+              </div>
+
               <div
                 style={{
                   marginTop: 2,
