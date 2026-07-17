@@ -30,8 +30,9 @@ const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-internal-secret",
 };
+
 
 const PROBE_TIMEOUT_MS = 30_000;
 const PROBE_PROMPT = "Reply with exactly: OK";
