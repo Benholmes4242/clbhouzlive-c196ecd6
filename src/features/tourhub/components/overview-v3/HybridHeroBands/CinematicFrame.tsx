@@ -617,9 +617,9 @@ export function CinematicFrame({
   
   const roundLabel_ =
     state.kind === 'live'
-      ? 'LIVE'
+      ? t('status.live')
       : isResults
-        ? 'FINAL RESULT'
+        ? t('overview.cinematic.finalResult')
         : null;
 
   // ---- Capsule slot construction (mirrors LeaderboardBand live-state) ----
