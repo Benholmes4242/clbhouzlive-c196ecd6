@@ -43,6 +43,7 @@ const CHIP_LABEL_KEY: Record<TourId, string> = {
 
 export function LeadersTab() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { t } = useTranslation('tourhub');
 
   // Per-section tour lens (local state, NO All Tours, PGA default).
   // Champions is intentionally omitted here (insufficient stat coverage);
