@@ -293,11 +293,11 @@ export function StatsSheet({ open, onClose, playerStats, playerName }: StatsShee
                   textTransform: 'uppercase',
                 }}
               >
-                Strokes Gained
+                {t('player.stats.section.strokesGained')}
               </p>
-              <SGBar label="SG: Total" value={playerStats.strokes_gained_total} />
-              <SGBar label="SG: Tee to Green" value={playerStats.strokes_gained_tee_green} />
-              <SGBar label="SG: Around Green" value={playerStats.strokes_gained} />
+              <SGBar label={t(LEADER_STAT_LABELS.strokes_gained_total.shortKey)} value={playerStats.strokes_gained_total} />
+              <SGBar label={t(LEADER_STAT_LABELS.strokes_gained_tee_green.shortKey)} value={playerStats.strokes_gained_tee_green} />
+              <SGBar label={t(LEADER_STAT_LABELS.strokes_gained_around_green.shortKey)} value={playerStats.strokes_gained} />
             </div>
           )}
         </div>
