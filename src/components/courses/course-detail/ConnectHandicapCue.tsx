@@ -25,50 +25,18 @@ type CueVariant =
 
 const FONT = 'Geist, system-ui, sans-serif';
 
-const COPY: Record<
-  CueVariant,
-  { Icon: LucideIcon; benefit: (n: string) => string; sub: (n: string) => string }
-> = {
-  about: {
-    Icon: Users,
-    benefit: () => 'See how your handicap compares here',
-    sub: () => 'Friends, members and the world’s best at this course',
-  },
-  holes: {
-    Icon: LayoutGrid,
-    benefit: () => 'See your scoring on every hole',
-    sub: (n) => `Your average vs everyone who’s played ${n}, hole by hole.`,
-  },
-  champions: {
-    Icon: Trophy,
-    benefit: () => 'See where you rank at this course',
-    sub: (n) => `Connect your handicap and your rounds join the ${n} leaderboard.`,
-  },
-  progress: {
-    Icon: Sparkles,
-    benefit: () => 'Fill in your Top 100 automatically',
-    sub: () => 'Connect your handicap and every round you play counts itself — no manual logging.',
-  },
-  leaderboard: {
-    Icon: Trophy,
-    benefit: () => 'See where you rank worldwide',
-    sub: () => 'Connect your handicap to join the championship and climb the global rankings.',
-  },
-  discover: {
-    Icon: Map,
-    benefit: () => 'See which of these you’ve played',
-    sub: () => 'Connect your handicap to see how you scored at every course.',
-  },
-  'tour-venue': {
-    Icon: Trophy,
-    benefit: (n) => `See how you'd score at ${n}`,
-    sub: () => 'Connect your WHS handicap to compare your game to this week’s venue.',
-  },
-  'tour-holes': {
-    Icon: LayoutGrid,
-    benefit: () => 'See your scoring on these holes vs the field',
-    sub: () => 'Connect your WHS handicap to measure your game against the pros’, hole by hole.',
-  },
+// Variant catalogue. Copy is keyed and resolved via t() at the render site so
+// the strings live in JSON (see courses.json > courseDetail.handicapCue.variants).
+// {{name}} is always passed; unused interpolations are harmless.
+const COPY: Record<CueVariant, { Icon: LucideIcon; benefitKey: string; subKey: string }> = {
+  about:         { Icon: Users,      benefitKey: 'variants.about.benefit',       subKey: 'variants.about.sub' },
+  holes:         { Icon: LayoutGrid, benefitKey: 'variants.holes.benefit',       subKey: 'variants.holes.sub' },
+  champions:     { Icon: Trophy,     benefitKey: 'variants.champions.benefit',   subKey: 'variants.champions.sub' },
+  progress:      { Icon: Sparkles,   benefitKey: 'variants.progress.benefit',    subKey: 'variants.progress.sub' },
+  leaderboard:   { Icon: Trophy,     benefitKey: 'variants.leaderboard.benefit', subKey: 'variants.leaderboard.sub' },
+  discover:      { Icon: Map,        benefitKey: 'variants.discover.benefit',    subKey: 'variants.discover.sub' },
+  'tour-venue':  { Icon: Trophy,     benefitKey: 'variants.tour-venue.benefit',  subKey: 'variants.tour-venue.sub' },
+  'tour-holes':  { Icon: LayoutGrid, benefitKey: 'variants.tour-holes.benefit',  subKey: 'variants.tour-holes.sub' },
 };
 
 interface Props {
@@ -84,11 +52,14 @@ export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => 
 
   if (!user || isLoading || connection) return null;
 
-  const { Icon, benefit, sub } = COPY[variant];
+  const { Icon, benefitKey, subKey } = COPY[variant];
   const go = () => navigate('/handicap');
 
   const name = courseName ?? '';
+  const benefit = t(`courseDetail.handicapCue.${benefitKey}`, { name });
+  const sub = t(`courseDetail.handicapCue.${subKey}`, { name });
   const isBanner = variant === 'about' || variant === 'discover';
+
 
   // Banner: lighter inline locked-comparison row (about / discover)
   if (isBanner) {
@@ -127,10 +98,10 @@ export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => 
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: INK, letterSpacing: '-0.01em' }}>
-            {benefit(name)}
+            {benefit}
           </div>
           <div style={{ fontSize: 11.5, fontWeight: 500, color: INK_MUTE, marginTop: 2 }}>
-            {sub(name)}
+            {sub}
           </div>
         </div>
         <span
@@ -178,10 +149,10 @@ export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => 
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 14, fontWeight: 700, color: INK, letterSpacing: '-0.01em' }}>
-              {benefit(name)}
+              {benefit}
             </div>
             <div style={{ fontSize: 12.5, fontWeight: 500, color: INK_MUTE, marginTop: 3, lineHeight: 1.4 }}>
-              {sub(name)}
+              {sub}
             </div>
           </div>
         </div>

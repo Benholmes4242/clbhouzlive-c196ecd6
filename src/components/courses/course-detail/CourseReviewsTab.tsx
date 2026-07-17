@@ -228,7 +228,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   const handleToggleHelpful = (reviewId: string, action: 'helpful' | 'unhelpful' | 'clear') => {
     if (!user) {
-      toast('Sign in required', { description: 'Please sign in to vote on reviews' });
+      toast(t('review.toast.signInRequired'), { description: t('review.toast.voteBody') });
       navigate('/auth');
       return;
     }
@@ -237,12 +237,13 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   const handleRateClick = () => {
     if (!user) {
-      toast('Sign in required', { description: 'Please sign in to rate courses' });
+      toast(t('review.toast.signInRequired'), { description: t('review.toast.rateBody') });
       navigate('/auth');
       return;
     }
     navigate(`/courses/${courseId}/rate`);
   };
+
 
   const handleClearSearch = () => {
     setSearchQuery('');
@@ -463,21 +464,22 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           <div className="h-10 w-10 rounded-full bg-muted-foreground/10 flex items-center justify-center mb-3">
             <AlertCircle className="h-5 w-5 text-muted-foreground/40" />
           </div>
-          <p className="text-sm font-semibold text-foreground mb-1">Couldn't load reviews</p>
+          <p className="text-sm font-semibold text-foreground mb-1">{t('review.error.title')}</p>
           <p className="text-sm text-muted-foreground mb-4">
-            Something went wrong. Please try again.
+            {t('review.error.body')}
           </p>
           <button
             type="button"
             onClick={() => refetch()}
             className="rounded-full bg-[#f59e0b] text-white text-sm font-semibold px-5 py-2 active:scale-[0.98] transition-all min-h-[44px] hover:bg-[#e8920f]"
           >
-            Try Again
+            {t('review.error.retry')}
           </button>
         </div>
       </section>
     );
   }
+
 
   // Empty state
   if (!hasRatings) {
@@ -488,19 +490,19 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(247,147,30,0.07)', border: '1.5px solid rgba(247,147,30,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
             <MessageSquarePlus size={26} strokeWidth={2} color={AMBER} />
           </div>
-          <div style={{ fontSize: 19, fontWeight: 900, color: INK, letterSpacing: '-0.03em', marginBottom: 6 }}>No reviews yet</div>
+          <div style={{ fontSize: 19, fontWeight: 900, color: INK, letterSpacing: '-0.03em', marginBottom: 6 }}>{t('review.empty.title')}</div>
           <p style={{ fontSize: 13, color: INK_FAINT, lineHeight: 1.6, maxWidth: 260, margin: '0 auto 24px' }}>
-            Be the first to share your experience at {courseName}.
+            {t('review.empty.body', { courseName })}
           </p>
           <PrimaryAmberCTA onClick={handleRateClick}>
-            Write the first review
+            {t('review.empty.cta')}
           </PrimaryAmberCTA>
         </div>
         <div style={{ margin: '16px' }}><Divider /></div>
         {/* What to include guide */}
         <div style={{ padding: 0 }}>
           <EmptyStateGuide
-            kicker="WHAT TO INCLUDE"
+            kicker={t('review.empty.kicker')}
             items={[
               { icon: Flag,      label: t('review.emptyGuide.condition.title'),  sub: t('review.emptyGuide.condition.sub') },
               { icon: Map,       label: t('review.emptyGuide.layout.title'),     sub: t('review.emptyGuide.layout.sub') },
@@ -521,6 +523,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       </div>
     );
   }
+
 
   return (
     <PullToRefreshContainer onRefresh={handlePullToRefresh}>
@@ -561,8 +564,9 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                   {getScoreTier(communityScore).label}
                 </div>
                 <div style={{ fontSize: 11, color: INK_FAINT }}>
-                  {ratingCount} {ratingCount === 1 ? 'rating' : 'ratings'}
+                  {t('review.ratingCount', { count: ratingCount })}
                 </div>
+
               </div>
 
               {/* Tappable tier distribution */}
@@ -580,7 +584,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                       type="button"
                       onClick={() => setRatingFilter(selected ? null : key)}
                       aria-pressed={selected}
-                      aria-label={`Filter reviews: ${label} (${count})`}
+                      aria-label={t('review.filterA11y', { label, count })}
                       style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'none', border: 'none', padding: 0, cursor: 'pointer', width: '100%' }}
                     >
                       <span style={{ fontSize: 10.5, fontWeight: selected ? 800 : 600, color: selected ? INK : INK_MUTE, letterSpacing: '0.02em', textTransform: 'uppercase', width: 92, textAlign: 'left', flexShrink: 0 }}>
@@ -615,7 +619,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                 <Search className="h-4 w-4 text-muted-foreground" style={{ flexShrink: 0 }} />
                 <input
                   type="text"
-                  placeholder="Search reviews…"
+                  placeholder={t('review.search.placeholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   autoFocus
@@ -631,15 +635,16 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                   onClick={() => { handleClearSearch(); setSearchOpen(false); }}
                   style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: AMBER, padding: 0, flexShrink: 0 }}
                 >
-                  Cancel
+                  {t('review.search.cancel')}
                 </button>
+
               </div>
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <button
                   type="button"
                   onClick={() => setSearchOpen(true)}
-                  aria-label="Search reviews"
+                  aria-label={t('review.search.openA11y')}
                   style={{ width: 34, height: 34, borderRadius: 17, background: '#FFFFFF', border: `1px solid ${HAIRLINE_INK_10}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}
                 >
                   <Search className="h-4 w-4 text-muted-foreground" />
@@ -649,7 +654,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                   value={sortBy}
                   onChange={(v) => setSortBy(v as ReviewsSortBy)}
                   options={sortOptions.map((o) => ({ value: o.value as string, label: o.label }))}
-                  ariaLabel="Sort reviews"
+                  ariaLabel={t('review.sortA11y')}
                   icon={<ArrowUpDown className="h-3 w-3 mr-1" />}
                   triggerClassName="!h-[34px] !py-0 !px-3 !text-xs !font-semibold !rounded-full !bg-white !border !border-input !text-foreground hover:!bg-accent gap-0 [&>span]:text-foreground"
                 />
@@ -660,9 +665,10 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                     onClick={handleRateClick}
                     style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 6, height: 34, padding: '0 14px', borderRadius: 17, background: AMBER, color: '#FFFFFF', fontSize: 12, fontWeight: 800, border: 'none', cursor: 'pointer', flexShrink: 0 }}
                   >
-                    <Pencil className="w-3.5 h-3.5" /> Edit yours
+                    <Pencil className="w-3.5 h-3.5" /> {t('review.editYours')}
                   </button>
                 )}
+
               </div>
             )}
           </div>
@@ -707,7 +713,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
             onClick={handleRateClick}
             style={{ width: '100%', padding: '12px 0', borderRadius: 12, background: 'rgba(247,147,30,0.06)', border: '1.5px solid rgba(247,147,30,0.2)', fontSize: 13, fontWeight: 700, color: AMBER, cursor: 'pointer' }}
           >
-            ⭐ Write your review
+            {t('review.writePromptInline')}
           </button>
         </div>
       )}
@@ -758,13 +764,13 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       {/* No results */}
       {(searchQuery || ratingFilter) && filteredReviews.length === 0 && (
         <div style={{ textAlign: 'center', padding: '32px 16px' }}>
-          <p style={{ fontSize: 13, color: INK_FAINT, marginBottom: 10 }}>No reviews match your criteria.</p>
+          <p style={{ fontSize: 13, color: INK_FAINT, marginBottom: 10 }}>{t('review.noMatches.body')}</p>
           <button
             type="button"
             onClick={() => { setSearchQuery(''); setRatingFilter(null); }}
             style={{ fontSize: 12, fontWeight: 700, color: INK, background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
           >
-            Clear filters
+            {t('review.noMatches.clear')}
           </button>
         </div>
       )}
@@ -773,7 +779,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       {filteredReviews.length > 0 && !searchQuery && !ratingFilter && (
         <div style={{ padding: '20px 16px 0', textAlign: 'center' }}>
           <p style={{ fontSize: 12, color: INK_LIGHT, marginBottom: 8 }}>
-            You've seen all {filteredReviews.length} {filteredReviews.length === 1 ? 'review' : 'reviews'}.
+            {t('review.endMessage', { count: filteredReviews.length })}
           </p>
           {!myReview && (
             <button
@@ -781,11 +787,12 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
               onClick={handleRateClick}
               style={{ fontSize: 12, fontWeight: 700, color: INK_MUTE, background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
             >
-              Share your experience
+              {t('review.shareExperience')}
             </button>
           )}
         </div>
       )}
+
 
       <ScrollToTopGlass />
       <ReportSheet
