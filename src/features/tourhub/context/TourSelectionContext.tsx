@@ -152,6 +152,9 @@ export function useTourSelection(): TourSelectionValue {
       setViewingTourSlug: () => {},
       viewingTournamentId: null,
       setViewingTournamentId: () => {},
+      viewingIsLive: false,
+      setViewingIsLive: () => {},
+
     };
   }
   return ctx;
