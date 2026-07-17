@@ -30,6 +30,7 @@ export interface StatBoardProps {
 }
 
 function StatBoardInner({ category, liveMap, onOpen }: StatBoardProps) {
+  const { t } = useTranslation('tourhub');
   const top3 = category.rows.slice(0, 3);
   if (top3.length === 0) return null;
 
