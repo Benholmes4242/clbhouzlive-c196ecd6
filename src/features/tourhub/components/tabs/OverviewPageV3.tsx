@@ -47,8 +47,9 @@ export function OverviewPageV3() {
           >
             <WifiOff className="w-3.5 h-3.5 text-muted-foreground" />
             <span className="text-xs font-medium text-muted-foreground">
-              You're offline. Some data may be outdated.
+              {t('overview.page.offlineBanner')}
             </span>
+
           </motion.div>
         )}
       </AnimatePresence>
