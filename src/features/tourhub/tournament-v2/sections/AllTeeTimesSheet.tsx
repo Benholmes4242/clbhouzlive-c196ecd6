@@ -79,9 +79,9 @@ export function AllTeeTimesSheet({
             </div>
           )}
           <div style={{ marginTop: 10 }}>
-            <ScopeSegment<RoundKey>
+            <ScopeSegment
               value={round}
-              onChange={setRound}
+              onChange={(v) => setRound(v as RoundKey)}
               options={options}
               ariaLabel={t('tournament.allTeeTimes.roundScopeAria', { defaultValue: 'Round' })}
             />
