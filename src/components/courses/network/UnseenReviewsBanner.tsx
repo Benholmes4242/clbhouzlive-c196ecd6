@@ -55,16 +55,27 @@ export function UnseenReviewsBanner() {
       {/* Text */}
       <div className="flex-1 min-w-0">
         <p className="text-[11px] font-semibold text-muted-foreground leading-tight">
-          🔔 New review from your network
+          {t('network.unseenReviewsTitle')}
         </p>
         <p className="text-[13px] text-foreground leading-snug mt-0.5 truncate">
-          <span className="font-bold">{latest.reviewer_name}</span>
-          {' reviewed '}
-          <span className="font-semibold">{latest.course_name}</span>
-          {' · '}
-          <span style={{ color: AMBER, fontWeight: 700 }}>{Number(latest.rating).toFixed(1)}</span>
+          <Trans
+            i18nKey="network.unseenReviewsBody"
+            ns="courses"
+            values={{
+              name: latest.reviewer_name,
+              course: latest.course_name,
+              rating: Number(latest.rating).toFixed(1),
+            }}
+            components={{
+              name: <span className="font-bold" />,
+              course: <span className="font-semibold" />,
+              rating: <span style={{ color: AMBER, fontWeight: 700 }} />,
+            }}
+          />
           {extraCount > 0 && (
-            <span className="text-muted-foreground"> +{extraCount} more</span>
+            <span className="text-muted-foreground">
+              {t('network.unseenReviewsMore', { count: extraCount })}
+            </span>
           )}
         </p>
       </div>
@@ -74,7 +85,7 @@ export function UnseenReviewsBanner() {
         className="flex-shrink-0 text-[11px] font-bold"
         style={{ color: AMBER }}
       >
-        View →
+        {t('network.viewArrow')}
       </span>
 
       {/* Dismiss */}
