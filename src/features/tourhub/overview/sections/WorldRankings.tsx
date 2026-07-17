@@ -92,7 +92,7 @@ export function WorldRankings({ tour }: { tour: TourId }) {
                   size="sm"
                   ringColor={LIGHT_HAIRLINE}
                 />
-                <div style={{ flex: 1, minWidth: 0, fontSize: 13.5, fontWeight: 700, color: V4.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <div style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 600, color: V4.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {r.playerName}
                 </div>
               </div>
