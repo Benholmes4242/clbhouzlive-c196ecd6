@@ -457,14 +457,15 @@ const LeaderStrip: React.FC<{
       />
       <span
         style={{
-          fontSize: 10,
-          fontWeight: 700,
+          fontSize: 11.5,
+          fontWeight: 600,
           color: INK,
           letterSpacing: '-0.005em',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
           maxWidth: '50%',
+          lineHeight: 1.2,
         }}
       >
         {name}
@@ -472,10 +473,11 @@ const LeaderStrip: React.FC<{
       {totalText && (
         <span
           style={{
-            fontSize: 10,
+            fontSize: 11.5,
             fontWeight: 800,
             color: AMBER,
             fontVariantNumeric: 'tabular-nums',
+            lineHeight: 1.2,
           }}
         >
           {totalText}
@@ -483,9 +485,10 @@ const LeaderStrip: React.FC<{
       )}
       <span
         style={{
-          fontSize: 9.5,
+          fontSize: 11.5,
           fontWeight: 600,
           color: INK_MUTE,
+          lineHeight: 1.2,
         }}
       >
         {t('schedule.leader.suffix')}
