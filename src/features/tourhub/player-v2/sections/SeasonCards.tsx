@@ -11,6 +11,8 @@
 
 import { useState } from 'react';
 import { ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import type { PlayerTournamentResult } from '../../hooks/usePlayerResults';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
 import { StatsSheet } from '../StatsSheet';
