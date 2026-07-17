@@ -17,12 +17,14 @@
 //   - Telemetry to console: run start, per-course tier hits, run end counts.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
+import { requireInternalSecret } from "../_shared/internalAuth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type, x-internal-secret",
 };
+
 
 const LOCK_NAME = "gam-course-mapping-orchestrator";
 const BATCH_SIZE = 25;
@@ -44,6 +46,10 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
+
+  const gate = requireInternalSecret(req, corsHeaders);
+  if (gate) return gate;
+
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
