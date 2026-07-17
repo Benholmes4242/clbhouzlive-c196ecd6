@@ -186,9 +186,13 @@ export const MoreOptionsDrawer: React.FC<MoreOptionsDrawerProps> = ({
       {portalled}
 
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        {/* z override ensures the Block confirm presents above the fullscreen
-            viewer (FS_OVERLAY_Z = 200) just like the sheet itself. */}
-        <AlertDialogContent style={{ zIndex: MORE_SHEET_Z + 2 }}>
+        {/* z overrides ensure the Block confirm (Radix Overlay + Content)
+            present above the fullscreen viewer (FS_OVERLAY_Z = 200) and the
+            MoreOptions sheet itself (MORE_SHEET_Z = 230). */}
+        <AlertDialogContent
+          className="z-[233]"
+          overlayClassName="fixed inset-0 z-[232] bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
+        >
           <AlertDialogHeader>
             <AlertDialogTitle>Block {usernameLabel}?</AlertDialogTitle>
             <AlertDialogDescription>
