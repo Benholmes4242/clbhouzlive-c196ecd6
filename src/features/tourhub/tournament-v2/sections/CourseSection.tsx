@@ -173,10 +173,15 @@ function HolesSheet({
             <ShieldCheck size={13} strokeWidth={2.2} />
             <span>
               <span style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>
-                {formatNumber(totalPlayers)} player{totalPlayers === 1 ? '' : 's'}
+                {t('holes.players', {
+                  ns: 'courses',
+                  count: totalPlayers,
+                  formattedCount: formatNumber(totalPlayers),
+                })}
               </span>
-              {' \u00B7 field scoring'}
+              {t('tournament.course.fieldScoringSuffix', { ns: 'tourhub' })}
             </span>
+
           </div>
         </div>
 
