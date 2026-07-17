@@ -78,7 +78,8 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
       >
         <div style={{ padding: '4px 16px 12px', borderBottom: `0.5px solid ${HAIRLINE_INK_8}` }}>
           <div style={{ fontSize: 9, fontWeight: 800, color: AMBER, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-            Full Board
+            {t('tournament.fullBoard.title')}
+
           </div>
           {meta?.name && (
             <div style={{ fontSize: 15, fontWeight: 800, color: INK, marginTop: 4, letterSpacing: '-0.01em' }}>
