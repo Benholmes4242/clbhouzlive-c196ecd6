@@ -1135,10 +1135,10 @@ export function CinematicFrame({
                 }}
               >
                 <span style={{ ...NUMERIC_STYLE, fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>
-                  {fieldStrength?.totalPlayers != null ? `${fieldStrength.totalPlayers} in the field` : ''}
+                  {fieldStrength?.totalPlayers != null ? t('overview.cinematic.inTheField', { count: fieldStrength.totalPlayers }) : ''}
                 </span>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                  <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 800, letterSpacing: '0.06em', color: AMBER }}>TOURNAMENT</span>
+                  <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 800, letterSpacing: '0.06em', color: AMBER }}>{t('overview.cinematic.ctaTournament')}</span>
                   <ChevronRight size={13} strokeWidth={2.5} color={AMBER} style={{ flexShrink: 0 }} />
                 </span>
               </div>
