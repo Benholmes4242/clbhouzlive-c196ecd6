@@ -17,7 +17,7 @@
     "noEventsThisWeek": "[~~Ñő éṽéñţš ţĥíš ŵééǩ~~]",
     "openMenuAria": "[~~Őƥéñ ɱéñú~~]",
     "switchTourAria": "[~~Šŵíţĉĥ ţőúř~~]",
-    "switchTourCurrentAria": "[~~Šŵíţĉĥ ţőúř \u2014 ĉúřřéñţ {{label}}~~]"
+    "switchTourCurrentAria": "[~~Šŵíţĉĥ ţőúř — ĉúřřéñţ {{label}}~~]"
   },
   "nav": {
     "group": {
@@ -65,6 +65,58 @@
     },
     "champion": {
       "defendsSuffix": "[~~{{name}} đéƒéñđš~~]"
+    }
+  },
+  "overview": {
+    "connectHandicap": {
+      "title": "[~~Ĉőññéĉţ ýőúř ĥáñđíĉáƥ~~]",
+      "description": "[~~Šýñĉ ŴĤŠ áñđ šéé ŵĥéřé ýőú šţáñđ.~~]",
+      "cta": "[~~Ĉőññéĉţ~~]"
+    },
+    "cancelled": {
+      "eyebrow": "[~~Ñő Řéšúļţ~~]",
+      "reasonDefault": "[~~Ţĥíš éṽéñţ đíđ ñőţ ĉőṁƥļéţé éñőúĝĥ řőúñđš ƒőř áñ őƒƒíĉíáļ řéšúļţ.~~]"
+    },
+    "ticker": {
+      "top10Label": "[~~ŢŐƤ 10~~]"
+    },
+    "fieldStrength": {
+      "eyebrow": "[~~ƑÍÉĿĐ~~]",
+      "playersCount": "[~~{{count}} ƥļáýéřš~~]",
+      "topRankedLine": "[~~{{topRanked}} őƒ ŵőřļđ ţőƥ {{threshold}}~~]",
+      "inFieldLabel": "[~~ÍÑ ƑÍÉĿĐ~~]"
+    },
+    "champion": {
+      "scoreLabelToPar": "[~~ŢŐ ƤÁŘ~~]",
+      "eyebrow": "[~~ĈĤÁṀƤÍŐÑ~~]",
+      "eyebrowPlayoff": "[~~ĈĤÁṀƤÍŐÑ · ƤĿÁÝŐƑƑ~~]",
+      "resultPending": "[~~Řéšúļţ ƥéñđíñĝ~~]"
+    },
+    "cancelledStrip": {
+      "eyebrow": "[~~ĈÁÑĈÉĿĿÉĐ~~]"
+    },
+    "playoff": {
+      "eyebrow": "[~~ÁŴÁÍŢÍÑĜ ƤĿÁÝŐƑƑ~~]",
+      "tiedAtTop": "[~~{{count}} ţíéđ áţ ţĥé ţőƥ~~]"
+    },
+    "middleBand": {
+      "cancelledDefault": "[~~Ñő ƥļáý — ţőúřñáṁéñţ ĉáñĉéļļéđ.~~]"
+    },
+    "upcoming": {
+      "defendingEyebrow": "[~~ĐÉƑÉÑĐÍÑĜ~~]",
+      "previewTitle": "[~~Ţőúřñáṁéñţ Ƥřéṽíéŵ~~]",
+      "previewEyebrow": "[~~ƤŘÉṼÍÉŴ~~]"
+    },
+    "rankings": {
+      "sectionEyebrow": "[~~Ŵőřļđ řáñķíñĝš~~]",
+      "linkLabel": "[~~Ƒúļļ řáñķíñĝš~~]",
+      "worldNo1Label": "[~~Ŵőřļđ Ñő. 1~~]",
+      "pointsLabel": "[~~ƤŐÍÑŢŠ~~]",
+      "boards": {
+        "owgr": "[~~Őƒƒíĉíáļ Ŵőřļđ Ĝőļƒ Řáñķíñĝ~~]",
+        "r2d": "[~~Řáĉé ţő Đúɓáí~~]",
+        "rolex": "[~~Řőļéẋ Řáñķíñĝš~~]"
+      }
     }
   }
 }

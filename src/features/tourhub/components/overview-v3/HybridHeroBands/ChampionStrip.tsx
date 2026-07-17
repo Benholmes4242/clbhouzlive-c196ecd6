@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Trophy } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { INK, GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants';
@@ -45,14 +46,20 @@ export function ChampionStrip({
   name,
   country,
   score,
-  scoreLabel = 'TO PAR',
-  eyebrow = 'CHAMPION',
+  scoreLabel,
+  eyebrow,
   eyebrowIcon: EyebrowIcon = Trophy,
   avatarUrl,
   rounds,
   par,
   narrative,
 }: ChampionStripProps) {
+  const { t } = useTranslation('tourhub');
+  // Note: scoreLabel prop is retained on the interface but not rendered in this
+  // strip variant (kept for compatibility with MiddleBand callers). Only the
+  // eyebrow default is user-visible here.
+  void scoreLabel;
+  const resolvedEyebrow = eyebrow ?? t('overview.champion.eyebrow');
   const hasNarrative = !!(narrative && narrative.trim().length > 0);
 
   return (
@@ -96,7 +103,7 @@ export function ChampionStrip({
               }}
             >
               <EyebrowIcon size={10} color={GOLD} strokeWidth={2.5} />
-              {eyebrow}
+              {resolvedEyebrow}
             </span>
             {country && (
               <span
@@ -170,6 +177,7 @@ export function ChampionStrip({
 }
 
 export function CancelledStrip({ reason }: { reason: string }) {
+  const { t } = useTranslation('tourhub');
   return (
     <div
       style={{
@@ -197,7 +205,7 @@ export function CancelledStrip({ reason }: { reason: string }) {
             marginBottom: 2,
           }}
         >
-          CANCELLED
+          {t('overview.cancelledStrip.eyebrow')}
         </div>
         <div
           style={{
@@ -222,6 +230,7 @@ interface PlayoffStripProps {
 }
 
 export function PlayoffStrip({ count, score }: PlayoffStripProps) {
+  const { t } = useTranslation('tourhub');
   return (
     <div
       style={{
@@ -273,10 +282,10 @@ export function PlayoffStrip({ count, score }: PlayoffStripProps) {
           gap: 5,
         }}>
           <Trophy size={10} color={GOLD} strokeWidth={2.5} />
-          AWAITING PLAYOFF
+          {t('overview.playoff.eyebrow')}
         </div>
         <div style={{ fontSize: 17, fontWeight: 800, color: 'white', letterSpacing: '-0.01em' }}>
-          {count} tied at the top
+          {t('overview.playoff.tiedAtTop', { count })}
         </div>
       </div>
       <div style={{ textAlign: 'right' }}>
@@ -293,7 +302,7 @@ export function PlayoffStrip({ count, score }: PlayoffStripProps) {
           {score}
         </div>
         <div style={{ fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.50)', letterSpacing: '0.16em', marginTop: 2 }}>
-          TO PAR
+          {t('overview.champion.scoreLabelToPar')}
         </div>
       </div>
     </div>

@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import {
   NUMERIC_STYLE,
@@ -40,6 +41,7 @@ function TickerEntry({ row }: { row: TickerRow }) {
 }
 
 export function Ticker({ rows }: TickerProps) {
+  const { t } = useTranslation('tourhub');
   if (!rows || rows.length === 0) {
     return <div style={{ height: TICKER_HEIGHT, background: 'rgba(10,14,20,0.50)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }} aria-hidden="true" />;
   }
@@ -79,7 +81,7 @@ export function Ticker({ rows }: TickerProps) {
         }}
       >
         
-        TOP 10
+        {t('overview.ticker.top10Label')}
       </div>
       {/* Marquee track */}
       <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>

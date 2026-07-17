@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Users } from 'lucide-react';
 import { INK, GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants';
 
@@ -62,6 +63,7 @@ export function FieldStrengthStrip({
   topRankedThreshold = 15,
   headshots = [],
 }: FieldStrengthStripProps) {
+  const { t } = useTranslation('tourhub');
   return (
     <div
       style={{
@@ -102,7 +104,7 @@ export function FieldStrengthStrip({
           }}
         >
           <Users size={10} color={GOLD} strokeWidth={2.5} />
-          FIELD
+          {t('overview.fieldStrength.eyebrow')}
         </div>
         <div
           style={{
@@ -113,7 +115,7 @@ export function FieldStrengthStrip({
             lineHeight: 1.15,
           }}
         >
-          {totalPlayers} players
+          {t('overview.fieldStrength.playersCount', { count: totalPlayers })}
         </div>
         {topRanked != null && topRanked > 0 && (
           <div
@@ -124,7 +126,7 @@ export function FieldStrengthStrip({
               marginTop: 1,
             }}
           >
-            {topRanked} of world top {topRankedThreshold}
+            {t('overview.fieldStrength.topRankedLine', { topRanked, threshold: topRankedThreshold })}
           </div>
         )}
       </div>
@@ -150,7 +152,7 @@ export function FieldStrengthStrip({
             marginTop: 2,
           }}
         >
-          IN FIELD
+          {t('overview.fieldStrength.inFieldLabel')}
         </div>
       </div>
     </div>

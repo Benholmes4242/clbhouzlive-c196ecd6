@@ -11,6 +11,7 @@
  */
 
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { SectionShell } from './SectionShell';
 import { V4 } from '../tokens';
 import { useRankingsBoards, type RankingsBoard, type RankingsRow } from '../data/useRankingsBoards';
@@ -20,14 +21,16 @@ import { PlayerAvatar } from '../../components/PlayerAvatar';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { formatNumber } from '@/i18n/format';
 
-const TOUR_TO_BOARD: Partial<Record<TourId, { board: RankingsBoard; label: string; tourCode: string }>> = {
-  pga: { board: 'owgr', label: 'Official World Golf Ranking', tourCode: 'pga' },
-  euro: { board: 'r2d', label: 'Race to Dubai', tourCode: 'euro' },
-  lpga: { board: 'rolex', label: 'Rolex Rankings', tourCode: 'lpga' },
+// Board sub-label routed via i18n key (see overview.rankings.boards.*).
+const TOUR_TO_BOARD: Partial<Record<TourId, { board: RankingsBoard; labelKey: string; tourCode: string }>> = {
+  pga: { board: 'owgr', labelKey: 'overview.rankings.boards.owgr', tourCode: 'pga' },
+  euro: { board: 'r2d', labelKey: 'overview.rankings.boards.r2d', tourCode: 'euro' },
+  lpga: { board: 'rolex', labelKey: 'overview.rankings.boards.rolex', tourCode: 'lpga' },
 };
 
 export function WorldRankings({ tour }: { tour: TourId }) {
   const navigate = useNavigate();
+  const { t } = useTranslation('tourhub');
   const mapping = TOUR_TO_BOARD[tour];
   const { data } = useRankingsBoards(mapping?.board ?? 'owgr');
 
@@ -42,9 +45,9 @@ export function WorldRankings({ tour }: { tour: TourId }) {
   };
 
   return (
-    <SectionShell eyebrow="World rankings" linkLabel="Full rankings" onLinkClick={() => navigate('/tourhub?tab=leaderboards')}>
+    <SectionShell eyebrow={t('overview.rankings.sectionEyebrow')} linkLabel={t('overview.rankings.linkLabel')} onLinkClick={() => navigate('/tourhub?tab=leaderboards')}>
       <div style={{ padding: '0 16px 10px', fontSize: 11, fontWeight: 600, color: V4.inkMute }}>
-        {mapping.label}
+        {t(mapping.labelKey)}
       </div>
 
       {/* No.1 spotlight — cardless, scale does the work. */}
@@ -124,6 +127,7 @@ function SpotlightRow({
   tourCode: string;
   onNavigate: (playerId: string | null) => void;
 }) {
+  const { t } = useTranslation('tourhub');
   const tappable = !!row.playerId;
   const candidates = row.photoUrl
     ? [row.photoUrl, ...getPlayerHeadshotCandidates(row.playerName, tourCode)]
@@ -146,7 +150,7 @@ function SpotlightRow({
         />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 9.5, fontWeight: 800, color: V4.amberDeep, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-            World No. 1
+            {t('overview.rankings.worldNo1Label')}
           </div>
           <div style={{ marginTop: 2, fontSize: 16.5, fontWeight: 800, color: V4.ink, letterSpacing: '-0.015em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {row.playerName}
@@ -159,7 +163,7 @@ function SpotlightRow({
             {formatNumber(Math.round(row.points))}
           </div>
           <div style={{ marginTop: 4, fontSize: 8.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.14em' }}>
-            POINTS
+            {t('overview.rankings.pointsLabel')}
           </div>
         </div>
       ) : null}

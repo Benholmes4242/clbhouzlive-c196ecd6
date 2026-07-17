@@ -11,6 +11,7 @@
 import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { formatMonthShort } from '@/i18n/format';
 import { resolvePlayerAvatarCandidates } from '../_shared/resolvePlayerAvatar';
 import type { SeasonEvent } from './useSeasonTimeline';
 import { TOUR_LABEL } from '../_shared/tourOrder';
@@ -28,7 +29,6 @@ import {
   TOPAR_UNDER_LIGHT,
 } from '../_shared/tokens';
 
-const MONTHS_SHORT = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
 const VIOLET = '#7C3AED';
 const VIOLET_TINT = 'rgba(124,58,237,0.10)';
 const AMBER_WASH = 'rgba(247,147,30,0.05)';
@@ -37,8 +37,11 @@ function shortDay(iso: string): string {
   return String(parseInt(iso.slice(8, 10), 10));
 }
 function shortMonth(iso: string): string {
-  const idx = Math.max(0, Math.min(11, parseInt(iso.slice(5, 7), 10) - 1));
-  return MONTHS_SHORT[idx];
+  // Route through Wave-1 wrapper; upper-case at call site (matches player-v2,
+  // ComingUp). Legacy MONTHS_SHORT (JAN..DEC) was locale-dependent copy that
+  // ESLint's no-literal-string doesn't fire on (words excluded); byte-identical
+  // to Intl('en', {month:'short'}).toUpperCase() for all 12 months.
+  return formatMonthShort(new Date(iso)).toUpperCase();
 }
 
 export interface SeasonRowProps {

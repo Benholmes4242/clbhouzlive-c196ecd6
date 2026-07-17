@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { MapPin } from 'lucide-react';
 import type { HeroState, TickerRow, TopTie } from '../HybridHero.utils';
 import { Ticker } from './Ticker';
@@ -57,6 +58,7 @@ export function MiddleBand({
   par,
   championNarrative,
 }: MiddleBandProps) {
+  const { t } = useTranslation('tourhub');
 
   if (state.kind === 'live') {
     return <Ticker rows={top10 ?? []} />;
@@ -64,7 +66,7 @@ export function MiddleBand({
 
   if (state.kind === 'results') {
     if (state.variant === 'cancelled') {
-      return <CancelledStrip reason={cancelReason || 'No play — tournament cancelled.'} />;
+      return <CancelledStrip reason={cancelReason || t('overview.middleBand.cancelledDefault')} />;
     }
     if (state.variant === 'awaiting-playoff' && tiedLeaders) {
       return <PlayoffStrip count={tiedLeaders.count} score={tiedLeaders.score} />;
@@ -82,7 +84,7 @@ export function MiddleBand({
       );
     }
     if (champion) {
-      const eyebrow = state.variant === 'playoff' ? 'CHAMPION · PLAYOFF' : 'CHAMPION';
+      const eyebrow = state.variant === 'playoff' ? t('overview.champion.eyebrowPlayoff') : t('overview.champion.eyebrow');
       return (
         <ChampionStrip
           name={champion.name}
@@ -97,7 +99,7 @@ export function MiddleBand({
       );
     }
 
-    return <ChampionStrip name="Result pending" score="—" eyebrow="CHAMPION" />;
+    return <ChampionStrip name={t('overview.champion.resultPending')} score="—" eyebrow={t('overview.champion.eyebrow')} />;
   }
 
   // Upcoming — 4-level fallback chain (Polish Patch §4.5)
@@ -109,7 +111,7 @@ export function MiddleBand({
         country={defendingChamp.country}
         score={defendingChamp.score}
         scoreLabel={defendingChamp.year}
-        eyebrow="DEFENDING"
+        eyebrow={t('overview.upcoming.defendingEyebrow')}
       />
     );
   }
@@ -145,5 +147,5 @@ export function MiddleBand({
       />
     );
   }
-  return <ChampionStrip name="Tournament Preview" score="›" scoreLabel="" eyebrow="PREVIEW" eyebrowIcon={MapPin} />;
+  return <ChampionStrip name={t('overview.upcoming.previewTitle')} score="›" scoreLabel="" eyebrow={t('overview.upcoming.previewEyebrow')} eyebrowIcon={MapPin} />;
 }
