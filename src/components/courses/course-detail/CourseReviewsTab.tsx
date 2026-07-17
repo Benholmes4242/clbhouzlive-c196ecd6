@@ -619,7 +619,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                 <Search className="h-4 w-4 text-muted-foreground" style={{ flexShrink: 0 }} />
                 <input
                   type="text"
-                  placeholder="Search reviews…"
+                  placeholder={t('review.search.placeholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   autoFocus
@@ -635,8 +635,9 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                   onClick={() => { handleClearSearch(); setSearchOpen(false); }}
                   style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: AMBER, padding: 0, flexShrink: 0 }}
                 >
-                  Cancel
+                  {t('review.search.cancel')}
                 </button>
+
               </div>
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
