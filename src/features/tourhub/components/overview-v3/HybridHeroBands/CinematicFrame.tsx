@@ -269,7 +269,7 @@ function TiedLeadersRowDark({
           whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
         }}
       >
-        {count} tied for the lead
+        {t('overview.cinematic.tiedForLead', { count })}
       </span>
       <span
         style={{
