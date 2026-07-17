@@ -107,20 +107,6 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   const carouselSlide = carouselPositions.get(activeIndex) ?? 0;
   const mediaCount = activePost?.mediaItems?.length ?? 0;
 
-  const ownerMenu = useMemo(() => {
-    if (!activePost || !isOwnPost) return null;
-    return (
-      <PostOwnerMenu
-        postId={activePost.id}
-        isOwnPost
-        actorType={activePost.actorType === 'business' ? 'business' : 'personal'}
-        actorId={activePost.actorId}
-        sourceReviewId={activePost.review?.reviewId ?? null}
-        reviewCourseId={activePost.review?.courseId ?? null}
-        variant="overlay"
-      />
-    );
-  }, [isOwnPost, activePost]);
 
   if (!activePost) return null;
 
