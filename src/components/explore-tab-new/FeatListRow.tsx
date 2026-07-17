@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { rowToPar, toParText, type FeatRow, type FeatTier, type RecordsMode } from './hooks/useRegionFeats';
-import { SC_FILL_GOLD, INK as INK_TOKEN } from '@/features/courses/components/holes/_constants';
+import { INK as INK_TOKEN } from '@/features/courses/components/holes/_constants';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const AMBER = '#F7931E';
@@ -67,6 +67,7 @@ export function FeatListRow({ row, tier, onTap, index = 0, mode = 'latest', best
   const isTop = rank === 1;
   const isRecordsRow = tier === 'records';
   const isBirdieHauls = tier === 'birdie_hauls';
+  const isLegendary = tier === 'legendary';
   const isStableford = row.category === 'best_stableford_all_time';
   const d = isRecordsRow ? rowToPar(row) : null;
   const showToParPrimary = isRecordsRow && d != null && !isStableford;
@@ -123,6 +124,10 @@ export function FeatListRow({ row, tier, onTap, index = 0, mode = 'latest', best
     ? recordsValueColor
     : isTop ? AMBER : INK;
 
+  // Legendary tier (aces & albatrosses): champion adopts the exceptional gold
+  // treatment — champagne gradient + gold-edge border, shimmer rank/value.
+  const legendaryChampion = isLegendary && isTop;
+
   return (
     <button
       type="button"
@@ -135,10 +140,14 @@ export function FeatListRow({ row, tier, onTap, index = 0, mode = 'latest', best
         gap: 8,
         borderRadius: 12,
         padding: '10px 12px',
-        background: isTop ? 'linear-gradient(100deg, #fff, #fff6e8)' : '#fff',
-        border: isTop
-          ? '1px solid rgba(247,147,30,0.55)'
-          : '0.5px solid rgba(15,23,42,0.08)',
+        background: legendaryChampion
+          ? 'linear-gradient(100deg, #fff, #FFF6D8)'
+          : isTop ? 'linear-gradient(100deg, #fff, #fff6e8)' : '#fff',
+        border: legendaryChampion
+          ? '1px solid rgba(232,181,48,0.55)'
+          : isTop
+            ? '1px solid rgba(247,147,30,0.55)'
+            : '0.5px solid rgba(15,23,42,0.08)',
         marginBottom: 6,
         cursor: 'pointer',
         fontFamily: FONT,
@@ -146,6 +155,7 @@ export function FeatListRow({ row, tier, onTap, index = 0, mode = 'latest', best
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 11, minWidth: 0 }}>
         <div
+          className={legendaryChampion ? 'clbhouz-gold-shimmer-light' : undefined}
           style={{
             width: 20,
             textAlign: 'center',
@@ -153,8 +163,8 @@ export function FeatListRow({ row, tier, onTap, index = 0, mode = 'latest', best
             fontSize: 11,
             fontWeight: 600,
             fontVariantNumeric: 'tabular-nums',
-            color: isTop ? AMBER : INK_RANK,
             lineHeight: 1,
+            ...(legendaryChampion ? {} : { color: isTop ? AMBER : INK_RANK }),
           }}
         >
           {rank}
@@ -202,7 +212,7 @@ export function FeatListRow({ row, tier, onTap, index = 0, mode = 'latest', best
                   letterSpacing: '0.06em',
                   padding: '3px 7px',
                   borderRadius: 999,
-                  background: SC_FILL_GOLD,
+                  background: '#E8B530',
                   color: INK_TOKEN,
                   lineHeight: 1,
                   textTransform: 'uppercase',
@@ -269,13 +279,14 @@ export function FeatListRow({ row, tier, onTap, index = 0, mode = 'latest', best
                 {label}
               </div>
               <div
+                className={legendaryChampion ? 'clbhouz-gold-shimmer-light' : undefined}
                 style={{
                   marginTop: 3,
                   fontSize: 15,
                   fontWeight: 700,
-                  color: valueColor,
                   lineHeight: 1,
                   fontVariantNumeric: 'tabular-nums',
+                  ...(legendaryChampion ? {} : { color: valueColor }),
                 }}
               >
                 {value}
