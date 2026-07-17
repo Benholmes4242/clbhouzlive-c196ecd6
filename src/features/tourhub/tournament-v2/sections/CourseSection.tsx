@@ -152,7 +152,7 @@ function HolesSheet({
       <div style={{ background: SLATE_50, fontFamily: FONT, height: '75dvh', maxHeight: '75dvh', display: 'flex', flexDirection: 'column' }}>
         <div style={{ padding: '4px 16px 8px' }}>
           <div style={{ fontSize: 9, fontWeight: 800, color: AMBER, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-            All 18 Holes
+            {t('tournament.course.allHolesTitle', { ns: 'tourhub' })}
           </div>
           {/* Amber credibility pill */}
           <div
