@@ -19,15 +19,12 @@ import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const INK = '#0F172A';
-const PANEL_BG = 'linear-gradient(180deg, #FBFAF7 0%, #F5F3EC 100%)';
-const PANEL_BORDER = '0.5px solid rgba(158,115,0,0.14)';
-const PANEL_SHADOW = '0 1px 3px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.05)';
 const GOLD = '#FBBC2E';
 const PARCHMENT_GOLD = '#B8860B';
 const AMBER = '#F7931E';
 const UNDER_PAR = '#D2222D';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
-const CONQUEST_HAIRLINE = 'rgba(15,23,42,0.1)';
+const BAND_BG = 'rgba(15,23,42,0.035)';
 const MUTED = 'rgba(15,23,42,0.45)';
 const FADED = 'rgba(15,23,42,0.35)';
 const GHOST = 'rgba(15,23,42,0.45)';
@@ -35,6 +32,8 @@ const CHIP_BG = 'rgba(15,23,42,0.04)';
 const TRACK_BG = 'rgba(15,23,42,0.08)';
 const AVATAR_RING_MUTED = 'rgba(15,23,42,0.2)';
 const CHEVRON_COLOR = 'rgba(15,23,42,0.3)';
+const PAGE_PAD = 14;
+
 
 const REGION_HUMAN: Record<string, string> = {
   'uk-ireland': 'GB&I',
@@ -145,113 +144,108 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
   };
 
   return (
-    <section style={{ marginTop: SPACE.sectionSection, padding: `0 ${SPACE.pagePadX}px` }}>
+    <section
+      style={{
+        marginTop: SPACE.sectionSection,
+        fontFamily: FONT,
+        color: INK,
+      }}
+    >
+      {/* Header */}
       <div
         style={{
-          background: PANEL_BG,
-          border: PANEL_BORDER,
-          borderRadius: 16,
-          padding: '16px 0 14px',
-          fontFamily: FONT,
-          color: INK,
-          boxShadow: PANEL_SHADOW,
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'space-between',
+          gap: 12,
+          padding: `0 ${PAGE_PAD}px`,
         }}
       >
-        {/* Header */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'baseline',
-            justifyContent: 'space-between',
-            gap: 12,
-            padding: '0 16px',
-          }}
-        >
-          <div style={{ minWidth: 0, flex: 1 }}>
-            <div
-              style={{
-                fontSize: 10.5,
-                fontWeight: 600,
-                letterSpacing: '0.06em',
-                textTransform: 'uppercase',
-                color: MUTED,
-                lineHeight: 1,
-              }}
-            >
-              {mode === 'alltime' ? 'All-time course records' : 'Latest course records'}
-            </div>
-            <div
-              style={{
-                marginTop: 6,
-                fontSize: 17,
-                fontWeight: 700,
-                letterSpacing: '-0.02em',
-                color: INK,
-                lineHeight: 1.15,
-              }}
-            >
-              The record book
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={() => setSheetOpen(true)}
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <div
             style={{
-              flexShrink: 0,
-              background: 'none',
-              border: 'none',
-              padding: 0,
-              cursor: 'pointer',
-              color: AMBER,
-              fontSize: 12,
+              fontSize: 10.5,
               fontWeight: 600,
-              fontFamily: FONT,
-              whiteSpace: 'nowrap',
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+              color: MUTED,
+              lineHeight: 1,
             }}
           >
-            View all ›
-          </button>
+            {mode === 'alltime' ? 'All-time course records' : 'Latest course records'}
+          </div>
+          <div
+            style={{
+              marginTop: 6,
+              fontSize: 17,
+              fontWeight: 700,
+              letterSpacing: '-0.02em',
+              color: INK,
+              lineHeight: 1.15,
+            }}
+          >
+            The record book
+          </div>
         </div>
-
-        {/* Column caption row */}
-        <div
+        <button
+          type="button"
+          onClick={() => setSheetOpen(true)}
           style={{
-            marginTop: 12,
-            // Caption starts at the course-name text edge:
-            //   pad 16 + rank 12 + gap 8 + avatar 24 + gap 8 = 68
-            padding: '0 16px 0 68px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            fontSize: 9,
+            flexShrink: 0,
+            background: 'none',
+            border: 'none',
+            padding: 0,
+            cursor: 'pointer',
+            color: AMBER,
+            fontSize: 12,
             fontWeight: 600,
-            letterSpacing: '0.06em',
-            textTransform: 'uppercase',
-            color: 'rgba(15,23,42,0.35)',
-            lineHeight: 1,
+            fontFamily: FONT,
+            whiteSpace: 'nowrap',
           }}
         >
-          <div style={{ flex: 1, minWidth: 0 }}>Course</div>
-          <div style={{ width: 36, textAlign: 'center' }}>To par</div>
-          <div style={{ width: 26, textAlign: 'right' }}>Gross</div>
-          <div style={{ width: 12 }} aria-hidden />
-        </div>
-
-        {/* Ledger */}
-        <div style={{ marginTop: 6 }}>
-          {ledgerRows.map((row, i) => (
-            <LedgerRow
-              key={`${row.course_id ?? i}-${i}`}
-              row={row}
-              rank={i + 1}
-              onTap={() => handleRowTap(row)}
-            />
-          ))}
-        </div>
-
-        {/* Conquests sub-section (personal, does not follow Lens scope) */}
-        <ConquestsStrip userId={userId} />
+          View all ›
+        </button>
       </div>
+
+      {/* Column caption row — 14px side padding; course caption offset to line up
+          with the row's course text edge (rank 12 + gap 8 + avatar 24 + gap 8 = 52). */}
+      <div
+        style={{
+          marginTop: 12,
+          padding: `0 ${PAGE_PAD}px 0 ${PAGE_PAD + 52}px`,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          fontSize: 9,
+          fontWeight: 600,
+          letterSpacing: '0.06em',
+          textTransform: 'uppercase',
+          color: 'rgba(15,23,42,0.35)',
+          lineHeight: 1,
+        }}
+      >
+        <div style={{ flex: 1, minWidth: 0 }}>Course</div>
+        <div style={{ width: 40, textAlign: 'center' }}>To par</div>
+        <div style={{ width: 30, textAlign: 'right' }}>Gross</div>
+        <div style={{ width: 10 }} aria-hidden />
+      </div>
+
+      {/* Ledger — full-bleed banded table */}
+      <div style={{ marginTop: 8 }}>
+        {ledgerRows.map((row, i) => (
+          <LedgerRow
+            key={`${row.course_id ?? i}-${i}`}
+            row={row}
+            rank={i + 1}
+            banded={i === 1 || i === 3}
+            isLast={i === ledgerRows.length - 1}
+            onTap={() => handleRowTap(row)}
+          />
+        ))}
+      </div>
+
+      {/* Conquests sub-section (personal, does not follow Lens scope) */}
+      <ConquestsStrip userId={userId} />
 
       <TierSeeAllSheet
         open={sheetOpen}
@@ -266,14 +260,19 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
   );
 }
 
+
 // ---- Ledger row -----------------------------------------------------------
 function LedgerRow({
   row,
   rank,
+  banded,
+  isLast,
   onTap,
 }: {
   row: FeatRow;
   rank: number;
+  banded: boolean;
+  isLast: boolean;
   onTap: () => void;
 }) {
   const holder = formatHolderName(row.holder_name);
@@ -300,34 +299,20 @@ function LedgerRow({
       onClick={onTap}
       className="text-left active:opacity-80 transition-opacity"
       style={{
-        position: 'relative',
         display: 'flex',
         alignItems: 'center',
         gap: 8,
-        padding: '9px 16px',
+        padding: `10px ${PAGE_PAD}px`,
         width: '100%',
-        background: 'transparent',
+        background: banded ? BAND_BG : 'transparent',
         border: 'none',
+        borderTop: `0.5px solid ${HAIRLINE}`,
+        borderBottom: isLast ? `0.5px solid ${HAIRLINE}` : 'none',
         cursor: 'pointer',
         fontFamily: FONT,
         color: INK,
       }}
     >
-      {!isFirst ? (
-        <span
-          aria-hidden
-          style={{
-            position: 'absolute',
-            // Separator starts at the course-name text edge:
-            //   pad 16 + rank 12 + gap 8 + avatar 24 + gap 8 = 68
-            left: 68,
-            right: 16,
-            top: 0,
-            height: 0,
-            borderTop: `0.5px solid ${HAIRLINE}`,
-          }}
-        />
-      ) : null}
       {/* Rank */}
       <div
         style={{
@@ -342,6 +327,8 @@ function LedgerRow({
       >
         {rank}
       </div>
+
+
 
       {/* Avatar */}
       <div style={{ flexShrink: 0 }}>
@@ -466,10 +453,8 @@ function ConquestsStrip({ userId }: { userId: string | undefined }) {
     <div
       style={{
         marginTop: 14,
-        paddingTop: 12,
-        marginLeft: 16,
-        marginRight: 16,
-        borderTop: `1px solid ${CONQUEST_HAIRLINE}`,
+        paddingLeft: PAGE_PAD,
+        paddingRight: PAGE_PAD,
       }}
     >
       <div
@@ -487,7 +472,12 @@ function ConquestsStrip({ userId }: { userId: string | undefined }) {
       </div>
       <div
         className="flex overflow-x-auto scrollbar-hide"
-        style={{ gap: 8, margin: '0 -16px', padding: '0 16px' }}
+        style={{
+          gap: 8,
+          margin: `0 -${PAGE_PAD}px`,
+          paddingLeft: PAGE_PAD,
+          paddingRight: PAGE_PAD,
+        }}
       >
         {picks.map((row) => (
           <ConquestChip key={`${row.course_id}-${row.category}`} row={row} />
@@ -496,6 +486,7 @@ function ConquestsStrip({ userId }: { userId: string | undefined }) {
     </div>
   );
 }
+
 
 function ConquestChip({ row }: { row: TitleInReach }) {
   const navigate = useNavigate();
