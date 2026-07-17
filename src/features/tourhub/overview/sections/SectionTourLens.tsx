@@ -13,9 +13,12 @@ interface SectionTourLensProps {
    * Defaults to true — existing callers are unchanged.
    */
   showAllTours?: boolean;
+  /** Tour ids to omit from the pill row (page-specific exclusions). */
+  excludeTours?: TourId[];
 }
 
 const TOUR_ORDER: TourId[] = ['pga', 'lpga', 'euro', 'liv', 'champ', 'pgad'];
+
 
 type LensId = '__all__' | TourId;
 
