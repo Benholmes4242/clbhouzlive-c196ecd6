@@ -109,11 +109,12 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
           <span
             style={{
               marginTop: 4,
-              fontSize: 7.5,
+              fontSize: 9,
               fontWeight: 800,
               letterSpacing: '0.14em',
               color: INK_MUTE,
               textTransform: 'uppercase',
+              lineHeight: 1,
             }}
           >
             {shortMonth(event.startDate)}
