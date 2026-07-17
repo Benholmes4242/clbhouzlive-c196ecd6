@@ -38,7 +38,9 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
     applyLandingSelection,
     setViewingTourSlug,
     setViewingTournamentId,
+    setViewingIsLive,
   } = useTourSelection();
+
 
   // Hero River: trust the hook's editorial order. No per-tour filter, no shuffle.
   const slides = rawSlides;
