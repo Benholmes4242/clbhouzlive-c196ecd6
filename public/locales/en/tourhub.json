@@ -378,5 +378,43 @@
       "lpga": "CME Points",
       "liv": "LIV Points"
     }
+  },
+  "players": {
+    "search": {
+      "placeholder": "Search players",
+      "openAria": "Search players",
+      "closeAria": "Clear search"
+    },
+    "editorial": {
+      "leaderAt": "{{tournament}} \u2014 {{leader}} LEADS AT {{score}}",
+      "startsOn": "{{tournament}} STARTS {{day}}"
+    },
+    "field": {
+      "eyebrow": "THE FIELD"
+    },
+    "sort": {
+      "ranking": "Ranking",
+      "playingNow": "Playing now"
+    },
+    "sub": {
+      "wins_one": "{{count}} WIN",
+      "wins_other": "{{count}} WINS",
+      "top10s": "{{count}} TOP-10"
+    },
+    "footer": {
+      "synced": "Season ranking \u00B7 live dot = on the course right now",
+      "unsynced": "Ranked by world ranking \u2014 season statistics arrive with the sync"
+    },
+    "podium": {
+      "rank": "No.{{rank}}",
+      "rankWithStat": "No.{{rank}} \u00B7 {{statLabel}}"
+    },
+    "statLabel": {
+      "pga": "FEDEX PTS",
+      "euro": "RTD PTS",
+      "lpga": "CME PTS",
+      "pgad": "POINTS",
+      "liv": "LIV PTS"
+    }
   }
 }
