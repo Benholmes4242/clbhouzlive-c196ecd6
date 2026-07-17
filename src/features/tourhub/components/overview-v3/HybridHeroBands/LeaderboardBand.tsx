@@ -113,6 +113,7 @@ export function LeaderboardBand({
   fieldSize,
   onCtaTap,
 }: LeaderboardBandProps) {
+  const { t } = useTranslation('tourhub');
   const showFooterStrip =
     state.kind === 'live' && (!!defendingChampion || (fieldSize ?? 0) > 0);
   const entryAvatars = (entry: any) => entryAvatarCandidates(entry, tourSlug);
