@@ -242,7 +242,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
                 ringColor={LIGHT_HAIRLINE}
               />
               <div style={{ flex: 1, minWidth: 0, fontSize: 13.5, fontWeight: 800, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {champion.player?.full_name ?? 'Champion'}
+                {champion.player?.full_name ?? t('tournament.hero.championFallback')}
               </div>
               <div style={{ fontSize: 13.5, fontWeight: 800, color: '#FCD34D', fontVariantNumeric: 'tabular-nums' }}>
                 {fmtScoreSigned(champion.score)}
