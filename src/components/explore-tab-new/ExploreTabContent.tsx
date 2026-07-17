@@ -97,7 +97,6 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
 
       <div>
         {shellTabs}
-        <SeasonStrip />
         <RankIdentityCard userId={userId} variant="strip" />
       </div>
 
