@@ -99,7 +99,9 @@ export function MiddleBand({
       );
     }
 
-    return <ChampionStrip name="Result pending" score="—" eyebrow="CHAMPION" />;
+    {/* Score glyph '—' (em-dash) is a typographic affordance, not translatable copy. */}
+    {/* eslint-disable-next-line i18next/no-literal-string */}
+    return <ChampionStrip name={t('overview.champion.resultPending')} score="—" eyebrow={t('overview.champion.eyebrow')} />;
   }
 
   // Upcoming — 4-level fallback chain (Polish Patch §4.5)
