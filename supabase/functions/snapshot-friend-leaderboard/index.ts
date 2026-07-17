@@ -12,6 +12,8 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsHeaders } from '../_shared/cors.ts';
+import { requireInternalSecret } from '../_shared/internalAuth.ts';
+
 
 const RETENTION_DAYS = 90;
 const STALE_THRESHOLD_DAYS = 90; // mirrors buildLeaderboardCohorts.ts
