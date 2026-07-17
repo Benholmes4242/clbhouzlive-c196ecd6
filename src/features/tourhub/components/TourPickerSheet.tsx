@@ -78,6 +78,7 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
   const { data: heroSlides } = useHeroCarouselData();
   const activeMajor = useActiveMensMajor();
   const { selectedTourSlug, selectTour, viewingTourSlug, viewingTournamentId } = useTourSelection();
+  const { t } = useTranslation('tourhub');
 
   const activeTourSlug = viewingTourSlug ?? selectedTourSlug ?? 'pga';
   const isMajorActive = activeTourSlug === 'major';
@@ -100,10 +101,11 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
       ariaLabelledBy="tour-switcher-sheet-title"
     >
       <SheetHeader
-        eyebrow="SWITCH TOUR"
-        title={<span id="tour-switcher-sheet-title">Select tour</span>}
+        eyebrow={t('picker.eyebrow')}
+        title={<span id="tour-switcher-sheet-title">{t('picker.title')}</span>}
         onClose={onClose}
       />
+
 
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         {activeMajor && (
