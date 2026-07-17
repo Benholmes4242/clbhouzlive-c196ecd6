@@ -39,7 +39,7 @@ function SkeletonCard() {
       <div
         style={{
           aspectRatio: '16 / 9',
-          borderRadius: 12,
+          borderRadius: 4,
           background: 'rgba(0,0,0,0.06)',
         }}
       />

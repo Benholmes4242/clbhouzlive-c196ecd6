@@ -75,7 +75,7 @@ function ClipTile({
   };
 
   return (
-    <div style={{ width: 104, flexShrink: 0, fontFamily: FONT_FAMILY }}>
+    <div style={{ width: 143, flexShrink: 0, fontFamily: FONT_FAMILY }}>
       <Pressable
         ref={rootRef}
         as="div"
@@ -88,9 +88,9 @@ function ClipTile({
         data-post-id={post.id}
         style={{
           position: 'relative',
-          width: 104,
+          width: 143,
           aspectRatio: '9 / 14',
-          borderRadius: 11,
+          borderRadius: 4,
           overflow: 'hidden',
           background: '#e5e9ef',
           cursor: 'pointer',
@@ -233,9 +233,9 @@ export function ClipsInterruptShelf({ clips, shelfIndex }: Props) {
             }
           }}
           style={{
-            width: 104,
+            width: 143,
             aspectRatio: '9 / 14',
-            borderRadius: 11,
+            borderRadius: 4,
             border: '1.5px dashed rgba(0,0,0,0.14)',
             display: 'flex',
             flexDirection: 'column',
