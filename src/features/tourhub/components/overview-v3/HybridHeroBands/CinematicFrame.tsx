@@ -243,6 +243,7 @@ function TiedLeadersRowDark({
   isLast: boolean;
   isResults?: boolean;
 }) {
+  const { t } = useTranslation('tourhub');
   return (
     <div
       style={{
@@ -258,6 +259,7 @@ function TiedLeadersRowDark({
           color: LEADER_RED, textAlign: 'left', flexShrink: 0,
         }}
       >
+        {/* eslint-disable-next-line i18next/no-literal-string -- rank code, not translated */}
         T1
       </span>
       <StackedAvatarsDark urls={avatars} items={items} size={26} />
