@@ -2,6 +2,7 @@
  * TeeTimesFirstGroups — TD1 first N groups list for upcoming state.
  * Time 15/200 thin + names line beneath.
  */
+import { useTranslation } from 'react-i18next';
 import { formatTimeHm } from '@/i18n/format';
 import type { TeeGroup } from '../data/useTeeTimesAll';
 import { FONT, INK, INK_MUTE, HAIRLINE_INK_8, SURFACE } from '../../_shared/tokens';
@@ -9,6 +10,7 @@ import { FONT, INK, INK_MUTE, HAIRLINE_INK_8, SURFACE } from '../../_shared/toke
 interface Props { groups: TeeGroup[]; limit?: number }
 
 export function TeeTimesFirstGroups({ groups, limit = 5 }: Props) {
+  const { t } = useTranslation('tourhub');
   const rows = groups.slice(0, limit);
   if (rows.length === 0) return null;
   return (
@@ -27,7 +29,7 @@ export function TeeTimesFirstGroups({ groups, limit = 5 }: Props) {
               {formatTimeHm(new Date(g.teeTime))}
             </span>
             <span style={{ fontSize: 9, fontWeight: 700, color: INK_MUTE, letterSpacing: '0.10em', textTransform: 'uppercase' }}>
-              Tee {g.startingHole}
+              {t('tournament.teeTimes.teeChip', { hole: g.startingHole })}
             </span>
           </div>
           <div style={{ fontSize: 12, fontWeight: 600, color: INK_MUTE, marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -38,3 +40,4 @@ export function TeeTimesFirstGroups({ groups, limit = 5 }: Props) {
     </div>
   );
 }
+
