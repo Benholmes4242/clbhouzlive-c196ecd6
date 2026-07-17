@@ -31,7 +31,6 @@ const TOUR_TO_BOARD: Partial<Record<TourId, { board: RankingsBoard; labelKey: st
 export function WorldRankings({ tour }: { tour: TourId }) {
   const navigate = useNavigate();
   const { t } = useTranslation('tourhub');
-  const navigate = useNavigate();
   const mapping = TOUR_TO_BOARD[tour];
   const { data } = useRankingsBoards(mapping?.board ?? 'owgr');
 
@@ -46,9 +45,9 @@ export function WorldRankings({ tour }: { tour: TourId }) {
   };
 
   return (
-    <SectionShell eyebrow="World rankings" linkLabel="Full rankings" onLinkClick={() => navigate('/tourhub?tab=leaderboards')}>
+    <SectionShell eyebrow={t('overview.rankings.sectionEyebrow')} linkLabel={t('overview.rankings.linkLabel')} onLinkClick={() => navigate('/tourhub?tab=leaderboards')}>
       <div style={{ padding: '0 16px 10px', fontSize: 11, fontWeight: 600, color: V4.inkMute }}>
-        {mapping.label}
+        {t(mapping.labelKey)}
       </div>
 
       {/* No.1 spotlight — cardless, scale does the work. */}
