@@ -200,12 +200,15 @@ serve(async (req: Request) => {
     return new Response(null, { status: 204, headers: corsHeaders });
   }
 
-  // Auth: service-role OR admin JWT.
-  const authHeader = req.headers.get("Authorization") ?? "";
-  const bearer = authHeader.replace(/^Bearer\s+/i, "");
-  const isServiceRole = bearer === SUPABASE_SERVICE_ROLE_KEY;
+  // Auth: internal-secret (cron) OR admin JWT (admin dashboard).
+  // Historic service-role bearer path removed — cron now uses x-internal-secret.
+  const expectedInternal = Deno.env.get("INTERNAL_FN_SECRET");
+  const providedInternal = req.headers.get("x-internal-secret");
+  const isInternalCall = !!expectedInternal && providedInternal === expectedInternal;
 
-  if (!isServiceRole) {
+  if (!isInternalCall) {
+    const authHeader = req.headers.get("Authorization") ?? "";
+    const bearer = authHeader.replace(/^Bearer\s+/i, "");
     if (!bearer) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -232,6 +235,7 @@ serve(async (req: Request) => {
       });
     }
   }
+
 
   // Probe all engines in parallel — none may throw out of here.
   const [claude, openai, gemini, perplexity] = await Promise.all([
