@@ -10,6 +10,7 @@
  */
 import React from 'react';
 import { ChevronDown, Menu } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const INK = '#0F172A';
 const DIVIDER = 'rgba(15,23,42,0.14)';
