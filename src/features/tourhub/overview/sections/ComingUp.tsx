@@ -83,7 +83,7 @@ export function ComingUp({ tour }: { tour: TourId | null }) {
                         alignItems: 'center',
                         gap: 14,
                         width: '100%',
-                        padding: '14px 14px',
+                        padding: '11px 14px',
                         textAlign: 'left',
                         background: 'transparent',
                         border: 'none',
