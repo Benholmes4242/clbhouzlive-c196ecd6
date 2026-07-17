@@ -7,11 +7,13 @@
  * Live events with tee-time coverage gain a tappable row that opens
  * the full tee-times sheet (Brief F-TD-4).
  */
+import { useTranslation } from 'react-i18next';
 import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
 import { formatPurse } from '../../_shared/formatPurse';
 import { SectionEyebrow } from './SectionEyebrow';
 import { FONT, INK, INK_MUTE, INK_FAINT, HAIRLINE_INK_8, SURFACE } from '../../_shared/tokens';
 import { formatNumber, formatTournamentDateRange } from '@/i18n/format';
+
 
 interface Props {
   meta: TournamentMeta;
