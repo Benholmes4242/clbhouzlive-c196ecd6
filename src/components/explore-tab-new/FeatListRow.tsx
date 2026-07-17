@@ -212,7 +212,7 @@ export function FeatListRow({ row, tier, onTap, index = 0, mode = 'latest', best
                   letterSpacing: '0.06em',
                   padding: '3px 7px',
                   borderRadius: 999,
-                  background: SC_FILL_GOLD,
+                  background: '#E8B530',
                   color: INK_TOKEN,
                   lineHeight: 1,
                   textTransform: 'uppercase',
