@@ -50,8 +50,10 @@ function thruLabel(row: Row): string {
 }
 
 export function MiniBoard({ tournamentId, entries, limit = 5 }: Props) {
+  const { t } = useTranslation('tourhub');
   const [target, setTarget] = useState<ScorecardSheetTarget | null>(null);
   const rows = entries.slice(0, limit);
+
 
   return (
     <>
