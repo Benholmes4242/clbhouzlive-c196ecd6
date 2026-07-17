@@ -6,6 +6,7 @@
 
 import React, { useState } from 'react';
 import { ArrowLeftRight, Trophy } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useActiveMensMajor } from '../hooks/useActiveMensMajor';
 import { useTourSelection } from '../context/TourSelectionContext';
 import { TourPickerSheet, useTourPillLabel } from './TourPickerSheet';
@@ -27,6 +28,7 @@ export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
   variant = 'default',
 }) => {
   const [open, setOpen] = useState(false);
+  const { t } = useTranslation('tourhub');
   const { selectedTourSlug, viewingTourSlug } = useTourSelection();
   const activeTourSlug = viewingTourSlug ?? selectedTourSlug ?? 'pga';
   const isMajorActive = activeTourSlug === 'major';
@@ -34,13 +36,15 @@ export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
   // Reference activeMajor to preserve prior side-effect fetch surface
   useActiveMensMajor();
 
+
+
   return (
     <>
       {variant === 'glass' ? (
         <button
           type="button"
           onClick={() => setOpen(true)}
-          aria-label="Switch tour"
+          aria-label={t('picker.switchTourAria')}
           aria-haspopup="dialog"
           aria-expanded={open}
           className="active:scale-[0.96]"
@@ -80,7 +84,7 @@ export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
         <button
           type="button"
           onClick={() => setOpen(true)}
-          aria-label="Switch tour"
+          aria-label={t('picker.switchTourAria')}
           aria-haspopup="dialog"
           aria-expanded={open}
           style={{
@@ -108,7 +112,7 @@ export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
               lineHeight: 1,
             }}
           >
-            {isMajorActive ? 'Major' : 'Tour'}
+            {isMajorActive ? t('pill.majorEyebrow') : t('pill.tourEyebrow')}
           </span>
           <span
             style={{

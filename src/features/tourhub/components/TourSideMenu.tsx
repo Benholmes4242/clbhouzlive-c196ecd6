@@ -4,6 +4,7 @@
  * Does NOT depend on any shared drawer/sheet component.
  */
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Z } from '@/config/zIndex';
 import {
   AMBER,
@@ -38,13 +39,16 @@ export interface TourSideMenuProps {
   onSignOut: () => void;
 }
 
-const DESTINATIONS: { id: string; label: string; Icon: LucideIcon }[] = [
-  { id: 'overview',     label: 'Overview',     Icon: Compass },
-  { id: 'live',         label: 'Leaderboards', Icon: Trophy },
-  { id: 'schedule',     label: 'Schedule',     Icon: CalendarDays },
-  { id: 'players',      label: 'Players',      Icon: Users },
-  { id: 'leaderboards', label: 'Leaders',      Icon: BarChart3 },
-  { id: 'college',      label: 'College',      Icon: GraduationCap },
+// Constants table pattern: destination id is the compare key; labelKey resolves
+// to `tourhub.nav.<key>` at render. IDs remain untranslatable to keep
+// activeTab/onSelectTab comparisons enum-safe.
+const DESTINATIONS: { id: string; labelKey: string; Icon: LucideIcon }[] = [
+  { id: 'overview',     labelKey: 'nav.overview',     Icon: Compass },
+  { id: 'live',         labelKey: 'nav.leaderboards', Icon: Trophy },
+  { id: 'schedule',     labelKey: 'nav.schedule',     Icon: CalendarDays },
+  { id: 'players',      labelKey: 'nav.players',      Icon: Users },
+  { id: 'leaderboards', labelKey: 'nav.leaders',      Icon: BarChart3 },
+  { id: 'college',      labelKey: 'nav.college',      Icon: GraduationCap },
 ];
 
 
@@ -72,6 +76,7 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
   onProfile,
   onSignOut,
 }) => {
+  const { t } = useTranslation('tourhub');
   const reduced = usePrefersReducedMotion();
   const [mounted, setMounted] = useState(open);
   const [visible, setVisible] = useState(false);
@@ -174,12 +179,12 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
         >
           {/* Primary group header */}
           <div style={{ marginTop: 'max(20px, env(safe-area-inset-top, 0px))', paddingTop: 16 }}>
-            <GroupHeader>Tour</GroupHeader>
+            <GroupHeader>{t('nav.group.tour')}</GroupHeader>
           </div>
 
           {/* Nav list */}
           <nav style={{ marginTop: 4, flex: 1, overflowY: 'auto' }}>
-            {DESTINATIONS.filter(({ id }) => id !== 'live' || showLive).map(({ id, label, Icon }) => {
+            {DESTINATIONS.filter(({ id }) => id !== 'live' || showLive).map(({ id, labelKey, Icon }) => {
               const isActive = id === activeTab;
               return (
                 <button
@@ -213,7 +218,7 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
                   <span style={{ width: 22, display: 'inline-flex', justifyContent: 'center' }}>
                     <Icon size={20} color={INK} strokeWidth={isActive ? 2.4 : 2} />
                   </span>
-                  {label}
+                  {t(labelKey)}
                 </button>
               );
             })}
@@ -222,15 +227,15 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
           {/* Secondary group header */}
           <div style={{ marginTop: 8, paddingTop: 12, borderTop: `1px solid ${HAIRLINE_INK_10}` }}>
             <div style={{ marginTop: 12 }}>
-              <GroupHeader>Account</GroupHeader>
+              <GroupHeader>{t('nav.group.account')}</GroupHeader>
             </div>
           </div>
 
           {/* Secondary links */}
           <div style={{ display: 'flex', flexDirection: 'column', padding: '0 24px 22px', gap: 4 }}>
-            <SecondaryLink Icon={Settings} label="Settings" onClick={() => { onClose(); onSettings(); }} />
-            <SecondaryLink Icon={User}     label="Profile"  onClick={() => { onClose(); onProfile(); }} />
-            <SecondaryLink Icon={LogOut}   label="Sign out" onClick={() => { onClose(); onSignOut(); }} />
+            <SecondaryLink Icon={Settings} label={t('nav.settings')} onClick={() => { onClose(); onSettings(); }} />
+            <SecondaryLink Icon={User}     label={t('nav.profile')}  onClick={() => { onClose(); onProfile(); }} />
+            <SecondaryLink Icon={LogOut}   label={t('nav.signOut')}  onClick={() => { onClose(); onSignOut(); }} />
           </div>
         </div>
       </aside>

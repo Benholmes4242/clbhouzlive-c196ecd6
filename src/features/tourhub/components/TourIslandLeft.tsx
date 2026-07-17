@@ -10,6 +10,7 @@
  */
 import React from 'react';
 import { ChevronDown, Menu } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const INK = '#0F172A';
 const DIVIDER = 'rgba(15,23,42,0.14)';
@@ -29,6 +30,7 @@ export const TourIslandLeft: React.FC<TourIslandLeftProps> = ({
   onPickerTap,
   showPicker = true,
 }) => {
+  const { t } = useTranslation('tourhub');
   return (
     <div
       style={{
@@ -40,7 +42,7 @@ export const TourIslandLeft: React.FC<TourIslandLeftProps> = ({
     >
       <button
         type="button"
-        aria-label="Open menu"
+        aria-label={t('picker.openMenuAria')}
         onClick={onMenuTap}
         style={{
           background: 'none',
@@ -70,7 +72,7 @@ export const TourIslandLeft: React.FC<TourIslandLeftProps> = ({
 
           <button
             type="button"
-            aria-label={`Switch tour — current ${label}`}
+            aria-label={t('picker.switchTourCurrentAria', { label })}
             aria-haspopup="dialog"
             onClick={onPickerTap}
             style={{

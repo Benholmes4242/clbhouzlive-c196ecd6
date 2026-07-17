@@ -1,0 +1,40 @@
+{
+  "status": {
+    "live": "EN VIVO",
+    "upcoming": "PRÓXIMO",
+    "final": "FINAL",
+    "results": "RESULTADOS",
+    "noEvent": "SIN TORNEO"
+  },
+  "pill": {
+    "updated": "Actualizado {{time}}",
+    "tourEyebrow": "Tour",
+    "majorEyebrow": "Major"
+  },
+  "picker": {
+    "eyebrow": "CAMBIAR TOUR",
+    "title": "Elegir tour",
+    "noEventsThisWeek": "Sin torneos esta semana",
+    "openMenuAria": "Abrir menú",
+    "switchTourAria": "Cambiar tour",
+    "switchTourCurrentAria": "Cambiar tour \u2014 actual {{label}}"
+  },
+  "nav": {
+    "group": {
+      "tour": "Tour",
+      "account": "Cuenta"
+    },
+    "overview": "Resumen",
+    "leaderboards": "Leaderboards",
+    "schedule": "Calendario",
+    "players": "Jugadores",
+    "leaders": "Líderes",
+    "college": "Universidad",
+    "settings": "Ajustes",
+    "profile": "Perfil",
+    "signOut": "Cerrar sesión"
+  },
+  "section": {
+    "retryAria": "Volver a cargar {{section}}"
+  }
+}

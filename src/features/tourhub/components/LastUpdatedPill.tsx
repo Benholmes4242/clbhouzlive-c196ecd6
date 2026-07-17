@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 import { formatRelativeAgoLong } from '@/i18n/format';
 
 interface LastUpdatedPillProps {
@@ -7,6 +8,7 @@ interface LastUpdatedPillProps {
 }
 
 export function LastUpdatedPill({ timestamp, className }: LastUpdatedPillProps) {
+  const { t } = useTranslation('tourhub');
   if (!timestamp) return null;
 
   // formatRelativeAgoLong preserves the previous shape exactly:
@@ -21,7 +23,7 @@ export function LastUpdatedPill({ timestamp, className }: LastUpdatedPillProps) 
       className
     )}>
       <span className="w-1.5 h-1.5 rounded-full bg-white/50" />
-      Updated {display}
+      {t('pill.updated', { time: display })}
     </span>
   );
 }

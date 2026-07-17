@@ -1,0 +1,40 @@
+{
+  "status": {
+    "live": "LIVE",
+    "upcoming": "UPCOMING",
+    "final": "FINAL",
+    "results": "RESULTS",
+    "noEvent": "NO EVENT"
+  },
+  "pill": {
+    "updated": "Updated {{time}}",
+    "tourEyebrow": "Tour",
+    "majorEyebrow": "Major"
+  },
+  "picker": {
+    "eyebrow": "SWITCH TOUR",
+    "title": "Select tour",
+    "noEventsThisWeek": "No events this week",
+    "openMenuAria": "Open menu",
+    "switchTourAria": "Switch tour",
+    "switchTourCurrentAria": "Switch tour \u2014 current {{label}}"
+  },
+  "nav": {
+    "group": {
+      "tour": "Tour",
+      "account": "Account"
+    },
+    "overview": "Overview",
+    "leaderboards": "Leaderboards",
+    "schedule": "Schedule",
+    "players": "Players",
+    "leaders": "Leaders",
+    "college": "College",
+    "settings": "Settings",
+    "profile": "Profile",
+    "signOut": "Sign out"
+  },
+  "section": {
+    "retryAria": "Retry loading {{section}}"
+  }
+}

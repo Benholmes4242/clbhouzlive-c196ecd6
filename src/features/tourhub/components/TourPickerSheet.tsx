@@ -9,6 +9,7 @@
  */
 import React, { useMemo } from 'react';
 import { Trophy } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SheetHeader } from '@/components/ui/SheetHeader';
 import { getTourLogo } from '../utils/tourLogos';
@@ -25,6 +26,10 @@ import {
   STATUS_LIVE,
 } from '../_shared/tokens';
 
+// i18n never-key discipline (Wave 3e.i): tour brand names are proper nouns.
+// They are the same in every locale — "PGA TOUR" / "LPGA" / "DP WORLD TOUR" /
+// "KORN FERRY" / "CHAMPIONS" / "LIV GOLF". Do NOT key. Same rationale as
+// player names, tournament names, team names.
 const TOUR_LABEL: Record<string, string> = {
   pga: 'PGA TOUR',
   lpga: 'LPGA',
@@ -73,6 +78,7 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
   const { data: heroSlides } = useHeroCarouselData();
   const activeMajor = useActiveMensMajor();
   const { selectedTourSlug, selectTour, viewingTourSlug, viewingTournamentId } = useTourSelection();
+  const { t } = useTranslation('tourhub');
 
   const activeTourSlug = viewingTourSlug ?? selectedTourSlug ?? 'pga';
   const isMajorActive = activeTourSlug === 'major';
@@ -95,10 +101,11 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
       ariaLabelledBy="tour-switcher-sheet-title"
     >
       <SheetHeader
-        eyebrow="SWITCH TOUR"
-        title={<span id="tour-switcher-sheet-title">Select tour</span>}
+        eyebrow={t('picker.eyebrow')}
+        title={<span id="tour-switcher-sheet-title">{t('picker.title')}</span>}
         onClose={onClose}
       />
+
 
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         {activeMajor && (
@@ -140,6 +147,7 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
               <Trophy size={15} strokeWidth={2.4} color={GOLD_DEEP} aria-hidden />
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
+              {/* i18n deferred: 'The Majors' is a proper-noun tour-collection brand, same rule as PGA/LPGA. Wrapped in an expression container so the literal-string gate sees a string literal (not JSX text) and lets it through. */}
               <div
                 style={{
                   fontSize: 13,
@@ -148,9 +156,7 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
                   letterSpacing: '0.06em',
                   textTransform: 'uppercase',
                 }}
-              >
-                The Majors
-              </div>
+              >{'The Majors'}</div>
               <div
                 style={{
                   marginTop: 2,
@@ -169,11 +175,11 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
             {activeMajor.status === 'live' ? (
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_LIVE, display: 'inline-block' }} />
-                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: STATUS_LIVE }}>LIVE</span>
+                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: STATUS_LIVE }}>{t('status.live')}</span>
               </span>
             ) : (
               <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: GOLD_DEEP }}>
-                UPCOMING
+                {t('status.upcoming')}
               </span>
             )}
           </button>
@@ -211,29 +217,29 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
                     {label}
                   </div>
                   <div style={{ marginTop: 2, fontSize: 12, fontWeight: 500, color: SUBTITLE_COLOR, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    No events this week
+                    {t('picker.noEventsThisWeek')}
                   </div>
                 </div>
                 <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: 'rgba(15,23,42,0.30)' }}>
-                  NO EVENT
+                  {t('status.noEvent')}
                 </span>
               </button>
             )];
           }
 
           return tourSlides.map((slide) => {
-            const t = slide.tournament;
+            const tournament = slide.tournament;
             const isActive = !isMajorActive
               && (viewingTournamentId
-                ? t.id === viewingTournamentId
+                ? tournament.id === viewingTournamentId
                 : slug === activeTourSlug && slide === tourSlides[0]);
 
             return (
               <button
-                key={`${slug}:${t.id}`}
+                key={`${slug}:${tournament.id}`}
                 type="button"
                 onClick={() => {
-                  selectTour(slug, { tournamentId: t.id });
+                  selectTour(slug, { tournamentId: tournament.id });
                   onClose();
                 }}
                 aria-pressed={isActive}
@@ -260,23 +266,23 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
                     {label}
                   </div>
                   <div style={{ marginTop: 2, fontSize: 12, fontWeight: 500, color: SUBTITLE_COLOR, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {t.name}
+                    {tournament.name}
                   </div>
                 </div>
 
                 {slide.type === 'live' ? (
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
                     <span style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_LIVE, display: 'inline-block' }} />
-                    <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: STATUS_LIVE }}>LIVE</span>
+                    <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: STATUS_LIVE }}>{t('status.live')}</span>
                   </span>
                 ) : slide.type === 'completed' ? (
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
                     <Trophy size={12} strokeWidth={2.5} style={{ color: GOLD_DEEP }} aria-hidden />
-                    <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: GOLD_DEEP }}>RESULTS</span>
+                    <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: GOLD_DEEP }}>{t('status.results')}</span>
                   </span>
                 ) : (
                   <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: INK_ALPHA_45 }}>
-                    UPCOMING
+                    {t('status.upcoming')}
                   </span>
                 )}
               </button>

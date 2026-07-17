@@ -1,0 +1,40 @@
+{
+  "status": {
+    "live": "라이브",
+    "upcoming": "예정",
+    "final": "종료",
+    "results": "결과",
+    "noEvent": "대회 없음"
+  },
+  "pill": {
+    "updated": "업데이트 {{time}}",
+    "tourEyebrow": "투어",
+    "majorEyebrow": "메이저"
+  },
+  "picker": {
+    "eyebrow": "투어 전환",
+    "title": "투어 선택",
+    "noEventsThisWeek": "이번 주 대회 없음",
+    "openMenuAria": "메뉴 열기",
+    "switchTourAria": "투어 전환",
+    "switchTourCurrentAria": "투어 전환 \u2014 현재 {{label}}"
+  },
+  "nav": {
+    "group": {
+      "tour": "투어",
+      "account": "계정"
+    },
+    "overview": "개요",
+    "leaderboards": "리더보드",
+    "schedule": "일정",
+    "players": "선수",
+    "leaders": "리더",
+    "college": "대학",
+    "settings": "설정",
+    "profile": "프로필",
+    "signOut": "로그아웃"
+  },
+  "section": {
+    "retryAria": "{{section}} 다시 불러오기"
+  }
+}
