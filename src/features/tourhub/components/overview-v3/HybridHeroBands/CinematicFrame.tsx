@@ -339,7 +339,7 @@ function TiedChasersRowDark({
           whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
         }}
       >
-        {count} players
+        {t('overview.cinematic.playersTiedCount', { count })}
       </span>
       <span
         style={{
