@@ -83,7 +83,7 @@ export function ComingUp({ tour }: { tour: TourId | null }) {
                         alignItems: 'center',
                         gap: 14,
                         width: '100%',
-                        padding: '14px 14px',
+                        padding: '11px 14px',
                         textAlign: 'left',
                         background: 'transparent',
                         border: 'none',
@@ -101,10 +101,11 @@ export function ComingUp({ tour }: { tour: TourId | null }) {
                           {r.isMajor ? <Chip label="Major" fg={V4.goldDeep} gradient={`linear-gradient(90deg, ${V4.goldSoftA}, ${V4.goldSoftB})`} /> : null}
                           {r.isPlayoff ? <Chip label="Playoffs" fg={V4.violet} gradient={V4.violetSoft} /> : null}
                         </div>
-                        <div style={{ fontSize: 14, fontWeight: 800, color: V4.ink, letterSpacing: '-0.015em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {r.name}
-                        </div>
-                        <div style={{ marginTop: 2, fontSize: 11.5, color: V4.inkMute }}>
+                       <div style={{ fontSize: 13, fontWeight: 600, color: V4.ink, letterSpacing: '-0.005em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                         {r.name}
+                       </div>
+                       <div style={{ marginTop: 2, fontSize: 11, fontWeight: 500, color: V4.inkMute }}>
+
                           {r.venue ?? '—'}
                           {r.defending_champion ? <span style={{ color: V4.inkFaint }}> · {r.defending_champion} defends</span> : null}
                         </div>

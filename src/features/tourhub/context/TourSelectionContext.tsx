@@ -57,7 +57,11 @@ interface TourSelectionValue {
   setViewingTourSlug: (slug: string) => void;
   viewingTournamentId: string | null;
   setViewingTournamentId: (id: string | null) => void;
+  /** Whether the hero's currently-viewed slide is a LIVE tournament. Display-only. */
+  viewingIsLive: boolean;
+  setViewingIsLive: (isLive: boolean) => void;
 }
+
 
 const TourSelectionContext = createContext<TourSelectionValue | null>(null);
 
@@ -70,6 +74,8 @@ export function TourSelectionProvider({ children }: { children: ReactNode }) {
   const [selectionNonce, setSelectionNonce] = useState(0);
   const [viewingTourSlug, setViewingTourSlugState] = useState<string | null>(null);
   const [viewingTournamentId, setViewingTournamentIdState] = useState<string | null>(null);
+  const [viewingIsLive, setViewingIsLiveState] = useState<boolean>(false);
+
 
   // Guards for the land-time override — runs at most once per session, and
   // never after the user has manually switched tours.
@@ -106,6 +112,11 @@ export function TourSelectionProvider({ children }: { children: ReactNode }) {
     setViewingTournamentIdState((prev) => (prev === id ? prev : id));
   }, []);
 
+  const setViewingIsLive = useCallback((isLive: boolean) => {
+    setViewingIsLiveState((prev) => (prev === isLive ? prev : isLive));
+  }, []);
+
+
   return (
     <TourSelectionContext.Provider
       value={{
@@ -118,7 +129,10 @@ export function TourSelectionProvider({ children }: { children: ReactNode }) {
         setViewingTourSlug,
         viewingTournamentId,
         setViewingTournamentId,
+        viewingIsLive,
+        setViewingIsLive,
       }}
+
     >
       {children}
     </TourSelectionContext.Provider>
@@ -138,6 +152,9 @@ export function useTourSelection(): TourSelectionValue {
       setViewingTourSlug: () => {},
       viewingTournamentId: null,
       setViewingTournamentId: () => {},
+      viewingIsLive: false,
+      setViewingIsLive: () => {},
+
     };
   }
   return ctx;

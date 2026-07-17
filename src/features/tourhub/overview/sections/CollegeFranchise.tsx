@@ -256,7 +256,7 @@ export function CollegeFranchise() {
                 gridTemplateColumns: '28px 26px 1fr auto',
                 alignItems: 'center',
                 gap: 12,
-                padding: '7px 12px',
+                padding: '11px 12px',
                 background: 'transparent',
                 border: 'none',
                 borderBottom: i < top5.length - 1 ? `0.5px solid ${V4.hairline}` : 'none',
@@ -270,13 +270,14 @@ export function CollegeFranchise() {
               <SchoolSquircle size={26} logo={logo} name={name} />
               <div style={{ minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: V4.ink, letterSpacing: '-0.005em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: V4.ink, letterSpacing: '-0.005em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {name}
                   </span>
                 </div>
-                <div style={{ fontSize: 9.5, fontWeight: 600, color: V4.inkFaint, marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <div style={{ fontSize: 11, fontWeight: 500, color: V4.inkFaint, marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {s.player_count} on tour{capName ? ` · ${capName} captains` : ''}
                 </div>
+
               </div>
               <span style={{ fontSize: 12, fontWeight: 700, color: V4.ink, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.01em' }}>
                 {formatCurrency(s.earnings_total)}

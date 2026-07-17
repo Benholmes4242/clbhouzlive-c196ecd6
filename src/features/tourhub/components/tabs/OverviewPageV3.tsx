@@ -31,7 +31,7 @@ export function OverviewPageV3() {
   const { isOnline } = useNetworkStatus();
   // READ-ONLY: keyed here purely to drive the OTC + TI synchronized fade so
   // the hero-lensed unit visibly changes together. Must not write back.
-  const { viewingTournamentId } = useTourSelection();
+  const { viewingTournamentId, viewingIsLive } = useTourSelection();
 
 
   return (
@@ -76,7 +76,7 @@ export function OverviewPageV3() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingTop: 12 }}
+            style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingTop: viewingIsLive ? 2 : 12 }}
           >
             <OnTheCourseSlot />
             <TISlot />

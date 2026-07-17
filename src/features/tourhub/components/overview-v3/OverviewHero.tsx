@@ -38,7 +38,9 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
     applyLandingSelection,
     setViewingTourSlug,
     setViewingTournamentId,
+    setViewingIsLive,
   } = useTourSelection();
+
 
   // Hero River: trust the hook's editorial order. No per-tour filter, no shuffle.
   const slides = rawSlides;
@@ -111,6 +113,7 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
   const activeSlide = count > 0 ? slides[Math.min(activeIndex, count - 1)] : undefined;
   const viewingSlug = activeSlide?.tournament.tourSlug;
   const viewingTid = activeSlide?.tournament.id ?? null;
+  const viewingLive = activeSlide?.type === 'live';
 
   // DEBOUNCED display reporting (4G guard). One trailing-edge write 250ms after
   // the last swipe/jump — rapid multi-slide sweeps no longer fire pulse/OTC/TI
@@ -119,9 +122,11 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
     const t = setTimeout(() => {
       if (viewingSlug) setViewingTourSlug(viewingSlug);
       setViewingTournamentId(viewingTid);
+      setViewingIsLive(viewingLive);
     }, 250);
     return () => clearTimeout(t);
-  }, [viewingSlug, viewingTid, setViewingTourSlug, setViewingTournamentId]);
+  }, [viewingSlug, viewingTid, viewingLive, setViewingTourSlug, setViewingTournamentId, setViewingIsLive]);
+
 
   const goPrev = useCallback(() => {
     if (count > 1) setActiveIndex((p) => (p - 1 + count) % count);
