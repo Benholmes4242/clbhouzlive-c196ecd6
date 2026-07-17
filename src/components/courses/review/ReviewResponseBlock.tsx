@@ -88,8 +88,8 @@ export const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
         padding: '12px 13px',
       }}
     >
-      {/* Header row */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+      {/* Header row: avatar + two-line stack (name/verified, then chip) */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, minWidth: 0 }}>
         {response.business_logo_url ? (
           <SquircleAvatar
             src={response.business_logo_url}
@@ -107,47 +107,44 @@ export const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
             ringColor={LIGHT_HAIRLINE}
           />
         )}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            flex: 1,
-            minWidth: 0,
-          }}
-        >
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+            <span
+              style={{
+                fontSize: 12.5,
+                fontWeight: 700,
+                color: INK,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                minWidth: 0,
+              }}
+            >
+              {response.business_name}
+            </span>
+            {response.business_is_verified && <VerifiedBadge size="sm" />}
+          </div>
           <span
             style={{
-              fontSize: 12.5,
+              marginTop: 3,
+              alignSelf: 'flex-start',
+              fontSize: 8.5,
               fontWeight: 700,
-              color: INK,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
+              letterSpacing: '0.07em',
+              color: '#8A6400',
+              background: 'rgba(232,181,48,0.16)',
+              border: '1px solid rgba(232,181,48,0.35)',
+              borderRadius: 999,
+              padding: '3px 8px',
               whiteSpace: 'nowrap',
-              minWidth: 0,
+              textTransform: 'uppercase',
             }}
           >
-            {response.business_name}
+            OWNER RESPONSE
           </span>
-          {response.business_is_verified && <VerifiedBadge size="sm" />}
         </div>
-        <span
-          style={{
-            flexShrink: 0,
-            fontSize: 8.5,
-            fontWeight: 700,
-            letterSpacing: '0.07em',
-            color: '#8A6400',
-            background: 'rgba(232,181,48,0.16)',
-            border: '1px solid rgba(232,181,48,0.35)',
-            borderRadius: 999,
-            padding: '3px 8px',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          OWNER RESPONSE
-        </span>
       </div>
+
 
       {!isEditing ? (
         <>
@@ -289,9 +286,9 @@ export const ReplyForm: React.FC<ReplyFormProps> = ({
         style={{
           marginTop: 12,
           display: 'flex',
-          alignItems: 'center',
-          gap: 10,
+          flexDirection: 'column',
           width: '100%',
+          minHeight: 44,
           background: '#ffffff',
           border: '0.5px solid rgba(15,23,42,0.08)',
           borderRadius: 14,
@@ -300,45 +297,54 @@ export const ReplyForm: React.FC<ReplyFormProps> = ({
           cursor: 'pointer',
         }}
       >
-        <SquircleAvatar
-          size={28}
-          src={businessClaim.businessLogoUrl ?? undefined}
-          alt={shortName}
-          fallback={shortName.slice(0, 2).toUpperCase()}
-          hairlineRing
-          ringColor={LIGHT_HAIRLINE}
-          
-        />
-        <span
-          style={{
-            flex: 1,
-            minWidth: 0,
-            fontSize: 12.5,
-            fontWeight: 500,
-            color: 'rgba(15,23,42,0.40)',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {`Respond publicly as ${shortName}\u2026`}
-        </span>
-        <span
-          style={{
-            flexShrink: 0,
-            background: '#F7931E',
-            color: '#ffffff',
-            fontSize: 12,
-            fontWeight: 700,
-            padding: '7px 14px',
-            borderRadius: 999,
-          }}
-        >
-          Respond
-        </span>
+        {/* Line 1: club mark + placeholder */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', minWidth: 0 }}>
+          <SquircleAvatar
+            size={28}
+            src={businessClaim.businessLogoUrl ?? undefined}
+            alt={shortName}
+            fallback={shortName.slice(0, 2).toUpperCase()}
+            hairlineRing
+            ringColor={LIGHT_HAIRLINE}
+          />
+          <span
+            style={{
+              flex: 1,
+              minWidth: 0,
+              fontSize: 12.5,
+              fontWeight: 500,
+              color: 'rgba(15,23,42,0.40)',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {`Respond publicly as ${shortName}\u2026`}
+          </span>
+        </div>
+        {/* Line 2: Respond pill, indented to text's left edge (28 avatar + 10 gap) */}
+        <div style={{ marginTop: 7, paddingLeft: 38 }}>
+          <span
+            style={{
+              display: 'inline-block',
+              background: '#F7931E',
+              color: '#ffffff',
+              fontSize: 8.5,
+              fontWeight: 700,
+              letterSpacing: '0.07em',
+              textTransform: 'uppercase',
+              padding: '3px 8px',
+              borderRadius: 999,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Respond
+          </span>
+        </div>
       </div>
     );
   }
+
 
   const handleSubmit = () => {
     const trimmed = text.trim();
