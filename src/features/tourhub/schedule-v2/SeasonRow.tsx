@@ -349,11 +349,12 @@ const UpcomingRail: React.FC<{ daysAway: number; highlight: boolean }> = ({
       <span
         style={{
           marginTop: 3,
-          fontSize: 7,
+          fontSize: 9,
           fontWeight: 800,
           letterSpacing: '0.14em',
           color: INK_FAINT,
           textTransform: 'uppercase',
+          lineHeight: 1,
         }}
       >
         {t('schedule.rail.daysUnit', { count: daysAway })}
