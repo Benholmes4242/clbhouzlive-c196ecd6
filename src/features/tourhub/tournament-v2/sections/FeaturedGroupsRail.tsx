@@ -56,7 +56,7 @@ export function FeaturedGroupsRail({ tournamentId, live, tourCode }: Props) {
 
   return (
     <>
-      <SectionEyebrow kicker="On the Course" />
+      <SectionEyebrow kicker={t('tournament.featuredGroups.eyebrow')} />
       <div
         style={{
           display: 'flex', gap: 12, overflowX: 'auto',
