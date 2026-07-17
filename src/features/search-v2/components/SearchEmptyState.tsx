@@ -20,6 +20,7 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { useFollowState } from '@/hooks/useFollowState';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { isAnyMajor } from '@/features/tourhub/utils/majorScope';
+import CountryFlag from '@/components/ui/country-flag';
 import { CourseRow } from './CourseRow';
 import {
   useSearchEmptyStateV2,
@@ -244,13 +245,13 @@ function PlayerCard({
       >
         {player.abbr_name || player.full_name}
       </p>
-      {player.country && (
-        <p
-          className="truncate w-full text-center"
-          style={{ marginTop: 2, fontSize: 10.5, color: '#64748B' }}
-        >
-          {player.country}
-        </p>
+      {(player.country_code || player.country) && (
+        <div className="flex justify-center w-full" style={{ marginTop: 4 }}>
+          <CountryFlag
+            country={player.country_code || player.country}
+            size="sm"
+          />
+        </div>
       )}
     </button>
   );
