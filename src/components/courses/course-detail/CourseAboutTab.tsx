@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { useCourseClaim, useCourseClaimStatus } from '@/hooks/useCourseClaim';
 import { supabase } from '@/integrations/supabase/client';
@@ -73,9 +74,11 @@ const Divider = () => (
 );
 
 const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
+  const { t } = useTranslation('courses');
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [showWebsiteSheet, setShowWebsiteSheet] = useState(false);
   const { user } = useSupabaseSession();
+  
   
   const navigate = useNavigate();
   const { data: courseClaim } = useCourseClaim(course.id);
@@ -160,7 +163,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
               }}
             >
               <Pencil className="h-3 w-3" />
-              Edit your rating
+              {t('courseDetail.about.editRating')}
             </button>
           </div>
         )}
@@ -265,7 +268,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             />
           )}
           {!coords && !coordsLoading && (
-            <p style={{ fontSize: 13, color: INK_FAINT }}>Location data isn't available yet.</p>
+            <p style={{ fontSize: 13, color: INK_FAINT }}>{t('courseDetail.about.locationUnavailable')}</p>
           )}
         </div>
       </section>
@@ -308,7 +311,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px 0', borderRadius: 14, background: 'rgba(247,147,30,0.06)', border: '1.5px solid rgba(247,147,30,0.2)', fontSize: 13, fontWeight: 700, color: AMBER, cursor: 'pointer' }}
           >
             <ExternalLink className="h-4 w-4" />
-            Official Course Website
+            {t('courseDetail.about.officialWebsite')}
           </button>
         </div>
       )}
