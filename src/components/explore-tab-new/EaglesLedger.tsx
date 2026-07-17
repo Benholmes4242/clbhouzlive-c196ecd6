@@ -207,11 +207,12 @@ export function EaglesLedger({ region, regionUpper, mode, onRowTap, onLeaderTap 
                   </button>
                 );
               })
-            : feats.slice(0, ROWS).map((row, i) => {
+            : feats.slice(0, ROWS).map((row, i, arr) => {
                 const name = formatHolderName(row.holder_name);
                 const when = row.play_date ?? row.attained_at ?? null;
                 const hole = extractHoleNo(row);
-                const isFirst = i === 0;
+                const isLast = i === arr.length - 1;
+                const banded = i === 1 || i === 3;
                 return (
                   <button
                     key={`${row.score_id ?? row.course_id ?? i}-${i}`}
@@ -222,11 +223,12 @@ export function EaglesLedger({ region, regionUpper, mode, onRowTap, onLeaderTap 
                       display: 'flex',
                       alignItems: 'center',
                       gap: 10,
-                      padding: '10px 16px',
+                      padding: '10px 14px',
                       width: '100%',
-                      background: 'transparent',
+                      background: banded ? BAND_BG : 'transparent',
                       border: 'none',
-                      borderTop: isFirst ? 'none' : `0.5px solid ${HAIRLINE}`,
+                      borderTop: `0.5px solid ${HAIRLINE}`,
+                      borderBottom: isLast ? `0.5px solid ${HAIRLINE}` : 'none',
                       cursor: 'pointer',
                       fontFamily: FONT,
                     }}
