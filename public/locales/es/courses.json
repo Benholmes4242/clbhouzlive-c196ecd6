@@ -250,6 +250,29 @@
       "rate": "Rate",
       "emoji": "⭐"
     },
-    "reportA11y": "Report review"
+    "reportA11y": "Report review",
+    "sort": {
+      "recent": "Most recent",
+      "highest": "Highest rated",
+      "helpful": "Most helpful"
+    },
+    "emptyGuide": {
+      "condition": {
+        "title": "Course condition",
+        "sub": "Greens, fairways, bunkers, rough"
+      },
+      "layout": {
+        "title": "Layout & design",
+        "sub": "Challenge, variety, scenery, routing"
+      },
+      "facilities": {
+        "title": "Facilities",
+        "sub": "Clubhouse, practice areas, service"
+      },
+      "value": {
+        "title": "Value",
+        "sub": "Was it worth the green fee?"
+      }
+    }
   }
 }

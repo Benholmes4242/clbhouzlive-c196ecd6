@@ -2,7 +2,9 @@
  * PersonalReviewCard - User's own review display, flat white card
  */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pencil, Calendar, ArrowUp, ArrowDown, CheckCircle2 } from 'lucide-react';
+
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { useNavigate } from 'react-router-dom';
 import { formatMonthDayYearShort } from '@/i18n/format';
@@ -126,6 +128,7 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
   communityAverage,
 }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation('courses');
 
   const handleEditClick = () => {
     navigate(`/courses/${courseId}/rate`);
@@ -135,15 +138,18 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
   const dateLabel = formatMonthDayYearShort(new Date(dateValue));
 
   const categories = [
-    { label: 'Design', score: rating.design_score },
-    { label: 'Condition', score: rating.condition_score },
-    { label: 'Clubhouse', score: rating.clubhouse_score },
-    { label: 'Facilities', score: rating.facilities_score },
-  ].filter((c): c is { label: string; score: number } => c.score !== null);
+    { key: 'design', labelKey: 'review.subscore.design', score: rating.design_score },
+    { key: 'condition', labelKey: 'review.subscore.condition', score: rating.condition_score },
+    { key: 'clubhouse', labelKey: 'review.subscore.clubhouse', score: rating.clubhouse_score },
+    { key: 'facilities', labelKey: 'review.subscore.facilities', score: rating.facilities_score },
+  ].filter(
+    (c): c is { key: string; labelKey: string; score: number } => c.score !== null,
+  );
 
   const highlightCategories = categories
     .filter(c => c.score >= 9.0)
-    .map(c => c.label);
+    .map(c => ({ key: c.key, labelKey: c.labelKey }));
+
 
   return (
     <div
@@ -221,9 +227,10 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
               const catRamp = rampForRating(cat.score);
               const catExceptional = getRatingTier(cat.score) === 'EXCEPTIONAL';
               return (
-                <div key={cat.label}>
+                <div key={cat.key}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 4 }}>
-                    <span style={{ color: '#94A3B8' }}>{cat.label}</span>
+                    <span style={{ color: '#94A3B8' }}>{t(cat.labelKey)}</span>
+
                     <span style={{ fontWeight: 700, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
                       {cat.score.toFixed(1)}
                     </span>
@@ -251,9 +258,9 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
       {/* Highlight pills */}
       {highlightCategories.length > 0 && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: rating.review ? 14 : 0 }}>
-          {highlightCategories.map(label => (
+          {highlightCategories.map(cat => (
             <span
-              key={label}
+              key={cat.key}
               style={{
                 fontSize: 10,
                 fontWeight: 700,
@@ -266,9 +273,10 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
                 letterSpacing: '0.04em',
               }}
             >
-              {label}
+              {t(cat.labelKey)}
             </span>
           ))}
+
         </div>
       )}
 

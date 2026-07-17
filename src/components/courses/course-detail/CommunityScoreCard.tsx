@@ -1,4 +1,6 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
+
 import { CourseRatingAggregate } from '@/hooks/useCourseRatingAggregates';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { RatingTierDistributionData } from '@/components/courses/review/RatingTierDistribution';
@@ -39,13 +41,14 @@ interface CommunityScoreCardProps {
 
 const formatScore = (score: number) => score.toFixed(1);
 
-const TIERS: { key: keyof RatingTierDistributionData; label: string }[] = [
-  { key: 'exceptional', label: 'Exceptional' },
-  { key: 'excellent', label: 'Excellent' },
-  { key: 'good', label: 'Good' },
-  { key: 'fair', label: 'Fair' },
-  { key: 'poor', label: 'Poor' },
+const TIERS: { key: keyof RatingTierDistributionData; labelKey: string }[] = [
+  { key: 'exceptional', labelKey: 'review.filter.optionExceptional' },
+  { key: 'excellent', labelKey: 'review.filter.optionExcellent' },
+  { key: 'good', labelKey: 'review.filter.optionGood' },
+  { key: 'fair', labelKey: 'review.filter.optionFair' },
+  { key: 'poor', labelKey: 'review.filter.optionPoor' },
 ];
+
 
 const ScoreRing: React.FC<{ score: number; size?: number }> = ({ score, size = 50 }) => {
   const { from, to } = getScoreRingColors(score);
@@ -124,9 +127,11 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
   onRateClick,
   onSeeAllReviews,
 }) => {
+  const { t } = useTranslation('courses');
   const totalRatings = ratingAggregates?.review_count || 0;
   const communityAverage = ratingAggregates?.avg_overall_score || 0;
   const tierLabel = getRatingTier(communityAverage);
+
 
   // Empty state — invitation card with 0–10 numeric language
   if (totalRatings === 0) {
@@ -177,11 +182,12 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
 
 
   const categories = [
-    { id: 'design', label: 'Design', score: ratingAggregates?.avg_design_score },
-    { id: 'condition', label: 'Condition', score: ratingAggregates?.avg_condition_score },
-    { id: 'clubhouse', label: 'Clubhouse', score: ratingAggregates?.avg_clubhouse_score },
-    { id: 'facilities', label: 'Facilities', score: ratingAggregates?.avg_facilities_score },
+    { id: 'design', labelKey: 'review.subscore.design', score: ratingAggregates?.avg_design_score },
+    { id: 'condition', labelKey: 'review.subscore.condition', score: ratingAggregates?.avg_condition_score },
+    { id: 'clubhouse', labelKey: 'review.subscore.clubhouse', score: ratingAggregates?.avg_clubhouse_score },
+    { id: 'facilities', labelKey: 'review.subscore.facilities', score: ratingAggregates?.avg_facilities_score },
   ].filter((cat) => cat.score !== null && cat.score !== undefined);
+
 
   // Distribution counts (fallback to zeros)
   const distCounts: Record<string, number> = {
@@ -245,7 +251,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
 
       {/* Distribution bars — taller, gradient, zero tiers de-emphasised */}
       <div style={{ marginBottom: 14 }}>
-        {TIERS.map(({ key, label }) => {
+        {TIERS.map(({ key, labelKey }) => {
           const count = distCounts[key] || 0;
           const pct = (count / maxCount) * 100;
           const has = count > 0;
@@ -261,8 +267,9 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
                   flexShrink: 0,
                 }}
               >
-                {label}
+                {t(labelKey)}
               </span>
+
               <div
                 style={{
                   flex: 1,
@@ -346,7 +353,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
                     marginTop: 6,
                   }}
                 >
-                  {cat.label}
+                  {t(cat.labelKey)}
                 </div>
               </div>
             ))}
