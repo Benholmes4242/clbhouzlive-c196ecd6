@@ -369,7 +369,7 @@ export function PlayersTab() {
                   lineHeight: 1,
                 }}
               >
-                {k === 'ranking' ? 'Ranking' : 'Playing now'}
+                {k === 'ranking' ? t('players.sort.ranking') : t('players.sort.playingNow')}
               </button>
             );
           })}
