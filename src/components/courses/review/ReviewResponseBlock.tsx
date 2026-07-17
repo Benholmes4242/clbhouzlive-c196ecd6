@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
-import { Pencil, Trash2 } from 'lucide-react';
+
 import { Link } from 'react-router-dom';
 import type { ReviewResponse } from '@/hooks/useReviewResponses';
 import {
