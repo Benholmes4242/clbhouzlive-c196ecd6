@@ -48,17 +48,20 @@ async function sendPush(
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
-  // Shared-secret gate — cron/trigger callers set x-push-secret; direct
-  // unauthorised callers get 401. When the secret is not configured this is
-  // a no-op (dev environments still work).
+  // Shared-secret gate — FAIL CLOSED. If PUSH_QUEUE_SECRET is not configured,
+  // refuse to run rather than accepting anonymous callers.
   const expectedSecret = Deno.env.get('PUSH_QUEUE_SECRET');
-  if (expectedSecret) {
-    const provided = req.headers.get('x-push-secret');
-    if (provided !== expectedSecret) {
-      return new Response(JSON.stringify({ success: false, error: 'Unauthorized' }), {
-        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
+  if (!expectedSecret) {
+    return new Response(
+      JSON.stringify({ success: false, error: 'Server misconfigured: push queue secret unset' }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+    );
+  }
+  const provided = req.headers.get('x-push-secret');
+  if (provided !== expectedSecret) {
+    return new Response(JSON.stringify({ success: false, error: 'Unauthorized' }), {
+      status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
   try {

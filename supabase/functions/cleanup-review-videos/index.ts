@@ -19,11 +19,18 @@ serve(async (req) => {
   }
 
   try {
-    // Fix #4: Verify cleanup secret header
+    // Verify cleanup secret header — FAIL CLOSED. If CLEANUP_SECRET env is
+    // unset, refuse to run rather than accept anonymous callers.
     const cleanupSecret = Deno.env.get("CLEANUP_SECRET");
+    if (!cleanupSecret) {
+      console.error("❌ CLEANUP_SECRET env not configured");
+      return new Response(
+        JSON.stringify({ error: "Server misconfigured: cleanup secret unset" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
     const providedSecret = req.headers.get("x-cleanup-secret");
-    
-    if (cleanupSecret && providedSecret !== cleanupSecret) {
+    if (providedSecret !== cleanupSecret) {
       console.log("❌ Invalid or missing cleanup secret");
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
