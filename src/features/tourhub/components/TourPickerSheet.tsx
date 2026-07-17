@@ -176,11 +176,11 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
             {activeMajor.status === 'live' ? (
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_LIVE, display: 'inline-block' }} />
-                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: STATUS_LIVE }}>LIVE</span>
+                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: STATUS_LIVE }}>{t('status.live')}</span>
               </span>
             ) : (
               <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: GOLD_DEEP }}>
-                UPCOMING
+                {t('status.upcoming')}
               </span>
             )}
           </button>
