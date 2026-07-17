@@ -4,7 +4,7 @@
  * this section is per-tournament, not per-tour.
  */
 import { useTourSelection } from '@/features/tourhub/context/TourSelectionContext';
-import { OnTheCourse } from '@/features/tourhub/overview/sections/OnTheCourse';
+import { OnTheCourse } from '@/features/tourhub/_shared/OnTheCourse';
 import { useTournamentPulse } from './useTournamentPulse';
 import type { TourId } from '@/features/tourhub/hooks/useOverviewData';
 

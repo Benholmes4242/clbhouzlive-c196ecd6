@@ -39,7 +39,7 @@ import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import { HeroSection } from './sections/HeroSection';
 import { SectionEyebrow } from './sections/SectionEyebrow';
 import { MiniBoard } from './sections/MiniBoard';
-import { FeaturedGroupsRail } from './sections/FeaturedGroupsRail';
+import { OnTheCourse } from '../_shared/OnTheCourse';
 import { TeeTimesFirstGroups } from './sections/TeeTimesFirstGroups';
 import { AllTeeTimesSheet } from './sections/AllTeeTimesSheet';
 import { CourseSection } from './sections/CourseSection';
@@ -190,9 +190,9 @@ export function TournamentPage() {
                   <MiniBoard tournamentId={tournamentId!} entries={leaderboardRows as any} />
                 </>
               )}
-              {/* Rail owns its 'On the Course' eyebrow — self-hides when
-                  featured groups are absent (Brief F-TD-3 §1). */}
-              <FeaturedGroupsRail tournamentId={tournamentId!} live tourCode={tourCode} />
+              {/* Shared OnTheCourse — featured groups + FULL FIELD expander,
+                  live-score-joined. Self-hides when no featured groups. */}
+              <OnTheCourse tournamentId={tournamentId!} live tourCode={tourCode} />
             </>
           )}
 

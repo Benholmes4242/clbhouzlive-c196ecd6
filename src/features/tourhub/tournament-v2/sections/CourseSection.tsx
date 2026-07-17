@@ -15,7 +15,7 @@ import {
   type TournamentHole,
 } from '../data/useTournamentHoleAnalysis';
 import {
-  FONT, INK, INK_MUTE, INK_FAINT, SURFACE, HAIRLINE_INK_8, SLATE_50, AMBER,
+  FONT, INK, INK_MUTE, INK_FAINT, SLATE_50, AMBER,
   TOPAR_UNDER_LIGHT, TOPAR_OVER_LIGHT,
 } from '../../_shared/tokens';
 import { SharedHoleCard } from '@/features/courses/_shared/holes/SharedHoleCard';
@@ -38,16 +38,6 @@ function toShared(h: TournamentHole): SharedHole {
 }
 
 const AVG_EPSILON = 0.05;
-function avgColorFor(avg: number): string {
-  if (avg > AVG_EPSILON) return TOPAR_OVER_LIGHT;
-  if (avg < -AVG_EPSILON) return TOPAR_UNDER_LIGHT;
-  return INK_MUTE;
-}
-function fmtAvg(v: number): string {
-  if (Math.abs(v) < 0.005) return `\u00B10.00`;
-  if (v > 0) return `+${v.toFixed(2)}`;
-  return `\u2212${Math.abs(v).toFixed(2)}`;
-}
 
 export function CourseSection({ tournamentId }: Props) {
   const { t } = useTranslation(['tourhub', 'courses']);
@@ -62,47 +52,14 @@ export function CourseSection({ tournamentId }: Props) {
   const sorted = [...played].sort((a, b) => b.avg_to_par - a.avg_to_par);
   const hardest = sorted[0];
   const easiest = sorted[sorted.length - 1];
-
-  const Card = ({ label, h }: { label: string; h: TournamentHole }) => (
-    <div
-      style={{
-        flex: 1, background: SURFACE, borderRadius: 12,
-        border: `0.5px solid ${HAIRLINE_INK_8}`, padding: '12px 14px',
-        fontFamily: FONT,
-      }}
-    >
-      <div style={{ fontSize: 8.5, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-        {label}
-      </div>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 4 }}>
-        <span style={{ fontSize: 24, fontWeight: 200, color: INK, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
-          {h.hole_no}
-        </span>
-        {h.par != null && (
-          <span style={{ fontSize: 10, fontWeight: 700, color: INK_MUTE, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-            {t('board.meta.par', { par: h.par, ns: 'tourhub' })}
-
-          </span>
-        )}
-      </div>
-      <div style={{ marginTop: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <span style={{ fontSize: 9, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.10em', textTransform: 'uppercase' }}>
-          {t('tournament.course.avgVsPar', { ns: 'tourhub' })}
-        </span>
-        <span style={{ fontSize: 14, fontWeight: 800, color: avgColorFor(h.avg_to_par), fontVariantNumeric: 'tabular-nums' }}>
-          {fmtAvg(h.avg_to_par)}
-        </span>
-      </div>
-    </div>
-  );
+  const topMaxAbs = Math.max(0.01, Math.abs(hardest.avg_to_par), Math.abs(easiest.avg_to_par));
 
   return (
     <>
       <SectionEyebrow kicker={t('tournament.course.title', { ns: 'tourhub' })} actionLabel={t('tournament.course.allHolesAction', { ns: 'tourhub' })} onAction={() => setOpen(true)} />
       <div style={{ display: 'flex', gap: 12, padding: '0 16px 4px' }}>
-        <Card label={t('holes.hardestTitle', { ns: 'courses' })} h={hardest} />
-        <Card label={t('holes.easiestTitle', { ns: 'courses' })} h={easiest} />
-
+        <FeatureMini tone="hard" h={hardest} maxAbs={topMaxAbs} />
+        <FeatureMini tone="easy" h={easiest} maxAbs={topMaxAbs} />
       </div>
       <HolesSheet
         open={open}
