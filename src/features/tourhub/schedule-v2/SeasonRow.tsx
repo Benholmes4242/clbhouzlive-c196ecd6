@@ -109,11 +109,12 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
           <span
             style={{
               marginTop: 4,
-              fontSize: 7.5,
+              fontSize: 9,
               fontWeight: 800,
               letterSpacing: '0.14em',
               color: INK_MUTE,
               textTransform: 'uppercase',
+              lineHeight: 1,
             }}
           >
             {shortMonth(event.startDate)}
@@ -126,7 +127,7 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
             {event.tourSlug && (
               <span
                 style={{
-                  fontSize: 8.5,
+                  fontSize: 9,
                   fontWeight: 800,
                   letterSpacing: '0.16em',
                   color: INK_MUTE,
@@ -160,7 +161,7 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
           {(event.venueName || event.venueCity) && (
             <div
               style={{
-                fontSize: 9.5,
+                fontSize: 11,
                 fontWeight: 500,
                 color: INK_MUTE,
                 letterSpacing: '0.01em',
@@ -255,7 +256,7 @@ const MajorChip: React.FC = () => {
   return (
     <span
       style={{
-        fontSize: 8.5,
+        fontSize: 9,
         fontWeight: 800,
         letterSpacing: '0.16em',
         color: GOLD_DEEP,
@@ -277,7 +278,7 @@ const PlayoffChip: React.FC = () => {
   return (
     <span
       style={{
-        fontSize: 8.5,
+        fontSize: 9,
         fontWeight: 800,
         letterSpacing: '0.16em',
         color: VIOLET,
@@ -306,7 +307,7 @@ const LivePill: React.FC = () => {
         borderRadius: 999,
         background: LIVE_INK,
         color: '#FFFFFF',
-        fontSize: 8.5,
+        fontSize: 9,
         fontWeight: 800,
         letterSpacing: '0.14em',
         lineHeight: 1,
@@ -348,11 +349,12 @@ const UpcomingRail: React.FC<{ daysAway: number; highlight: boolean }> = ({
       <span
         style={{
           marginTop: 3,
-          fontSize: 7,
+          fontSize: 9,
           fontWeight: 800,
           letterSpacing: '0.14em',
           color: INK_FAINT,
           textTransform: 'uppercase',
+          lineHeight: 1,
         }}
       >
         {t('schedule.rail.daysUnit', { count: daysAway })}
@@ -387,14 +389,15 @@ const ChampionStrip: React.FC<{
       />
       <span
         style={{
-          fontSize: 10,
-          fontWeight: 700,
+          fontSize: 11.5,
+          fontWeight: 600,
           color: INK,
           letterSpacing: '-0.005em',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
           maxWidth: '48%',
+          lineHeight: 1.2,
         }}
       >
         {name}
@@ -402,10 +405,11 @@ const ChampionStrip: React.FC<{
       {scoreText && (
         <span
           style={{
-            fontSize: 10,
+            fontSize: 11.5,
             fontWeight: 800,
             color: TOPAR_UNDER_LIGHT,
             fontVariantNumeric: 'tabular-nums',
+            lineHeight: 1.2,
           }}
         >
           {scoreText}
@@ -414,11 +418,12 @@ const ChampionStrip: React.FC<{
       <span
         style={{
           marginLeft: 'auto',
-          fontSize: 7.5,
+          fontSize: 9,
           fontWeight: 800,
           letterSpacing: '0.14em',
           color: GOLD_DEEP,
           textTransform: 'uppercase',
+          lineHeight: 1,
         }}
       >
         {t('schedule.badge.champion')}
@@ -452,14 +457,15 @@ const LeaderStrip: React.FC<{
       />
       <span
         style={{
-          fontSize: 10,
-          fontWeight: 700,
+          fontSize: 11.5,
+          fontWeight: 600,
           color: INK,
           letterSpacing: '-0.005em',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
           maxWidth: '50%',
+          lineHeight: 1.2,
         }}
       >
         {name}
@@ -467,10 +473,11 @@ const LeaderStrip: React.FC<{
       {totalText && (
         <span
           style={{
-            fontSize: 10,
+            fontSize: 11.5,
             fontWeight: 800,
             color: AMBER,
             fontVariantNumeric: 'tabular-nums',
+            lineHeight: 1.2,
           }}
         >
           {totalText}
@@ -478,9 +485,10 @@ const LeaderStrip: React.FC<{
       )}
       <span
         style={{
-          fontSize: 9.5,
+          fontSize: 11.5,
           fontWeight: 600,
           color: INK_MUTE,
+          lineHeight: 1.2,
         }}
       >
         {t('schedule.leader.suffix')}
