@@ -104,7 +104,7 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
         <div style={{ background: SLATE_50, fontFamily: FONT, maxHeight: 'calc(90vh - 24px)', display: 'flex', flexDirection: 'column' }}>
           <div style={{ padding: '4px 16px 12px' }}>
             <div style={{ fontSize: 9, fontWeight: 800, color: INK, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-              All Moments
+              {t('tournament.moments.sheetTitle')}
             </div>
           </div>
           <div style={{ overflowY: 'auto', flex: 1, minHeight: 0, background: SURFACE, borderTop: `1px solid ${HAIRLINE_INK_8}`, borderBottom: `1px solid ${HAIRLINE_INK_8}` }}>
