@@ -100,8 +100,9 @@ export function CourseSection({ tournamentId }: Props) {
     <>
       <SectionEyebrow kicker={t('tournament.course.title', { ns: 'tourhub' })} actionLabel={t('tournament.course.allHolesAction', { ns: 'tourhub' })} onAction={() => setOpen(true)} />
       <div style={{ display: 'flex', gap: 12, padding: '0 16px 4px' }}>
-        <Card label="Hardest" h={hardest} />
-        <Card label="Easiest" h={easiest} />
+        <Card label={t('holes.hardestTitle', { ns: 'courses' })} h={hardest} />
+        <Card label={t('holes.easiestTitle', { ns: 'courses' })} h={easiest} />
+
       </div>
       <HolesSheet
         open={open}
