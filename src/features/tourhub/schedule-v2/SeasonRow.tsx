@@ -127,7 +127,7 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
             {event.tourSlug && (
               <span
                 style={{
-                  fontSize: 8.5,
+                  fontSize: 9,
                   fontWeight: 800,
                   letterSpacing: '0.16em',
                   color: INK_MUTE,
