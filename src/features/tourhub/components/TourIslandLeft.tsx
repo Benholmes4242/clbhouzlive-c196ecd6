@@ -42,7 +42,7 @@ export const TourIslandLeft: React.FC<TourIslandLeftProps> = ({
     >
       <button
         type="button"
-        aria-label="Open menu"
+        aria-label={t('picker.openMenuAria')}
         onClick={onMenuTap}
         style={{
           background: 'none',
