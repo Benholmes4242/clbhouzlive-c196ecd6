@@ -80,7 +80,8 @@ export function CourseSection({ tournamentId }: Props) {
         </span>
         {h.par != null && (
           <span style={{ fontSize: 10, fontWeight: 700, color: INK_MUTE, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-            Par {h.par}
+            {t('board.meta.par', { par: h.par, ns: 'tourhub' })}
+
           </span>
         )}
       </div>
