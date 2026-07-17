@@ -403,7 +403,7 @@ function ChampionRowDark({
             textTransform: 'uppercase',
           }}
         >
-          Champion
+          {t('overview.cinematic.championLabel')}
         </span>
         <span
           style={{
