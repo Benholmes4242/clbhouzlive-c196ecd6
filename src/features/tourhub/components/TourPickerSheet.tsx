@@ -229,18 +229,18 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
           }
 
           return tourSlides.map((slide) => {
-            const t = slide.tournament;
+            const tournament = slide.tournament;
             const isActive = !isMajorActive
               && (viewingTournamentId
-                ? t.id === viewingTournamentId
+                ? tournament.id === viewingTournamentId
                 : slug === activeTourSlug && slide === tourSlides[0]);
 
             return (
               <button
-                key={`${slug}:${t.id}`}
+                key={`${slug}:${tournament.id}`}
                 type="button"
                 onClick={() => {
-                  selectTour(slug, { tournamentId: t.id });
+                  selectTour(slug, { tournamentId: tournament.id });
                   onClose();
                 }}
                 aria-pressed={isActive}
@@ -267,23 +267,23 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
                     {label}
                   </div>
                   <div style={{ marginTop: 2, fontSize: 12, fontWeight: 500, color: SUBTITLE_COLOR, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {t.name}
+                    {tournament.name}
                   </div>
                 </div>
 
                 {slide.type === 'live' ? (
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
                     <span style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_LIVE, display: 'inline-block' }} />
-                    <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: STATUS_LIVE }}>LIVE</span>
+                    <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: STATUS_LIVE }}>{t('status.live')}</span>
                   </span>
                 ) : slide.type === 'completed' ? (
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
                     <Trophy size={12} strokeWidth={2.5} style={{ color: GOLD_DEEP }} aria-hidden />
-                    <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: GOLD_DEEP }}>RESULTS</span>
+                    <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: GOLD_DEEP }}>{t('status.results')}</span>
                   </span>
                 ) : (
                   <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: INK_ALPHA_45 }}>
-                    UPCOMING
+                    {t('status.upcoming')}
                   </span>
                 )}
               </button>
