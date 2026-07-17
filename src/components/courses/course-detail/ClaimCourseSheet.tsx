@@ -122,16 +122,16 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
         const msg =
           (data && data.error) ||
           error?.message ||
-          'Could not submit claim. Please try again.';
+          t('courseDetail.claim.sheet.submitError');
         setErrorMessage(String(msg));
         setSubmitting(false);
         return;
       }
-      toast.success('Claim submitted for review.');
+      toast.success(t('courseDetail.claim.sheet.submitted'));
       onClose();
     } catch (err) {
       AppLog.error('[ClaimCourseSheet]', 'submit failed', err);
-      setErrorMessage('Could not submit claim. Please try again.');
+      setErrorMessage(t('courseDetail.claim.sheet.submitError'));
       setSubmitting(false);
     }
   };
@@ -154,7 +154,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
         <BadgeCheck size={20} color={AMBER} strokeWidth={2.2} />
       </div>
       <h2 style={{ fontSize: 20, fontWeight: 800, color: INK, letterSpacing: '-0.02em' }}>
-        Claim {clubName}
+        {t('courseDetail.claim.sheet.title', { clubName })}
       </h2>
     </div>
   );
@@ -164,10 +164,10 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
       return (
         <>
           <p style={{ fontSize: 14, color: INK_FAINT, lineHeight: 1.5, marginBottom: 16 }}>
-            Sign in to claim this course.
+            {t('courseDetail.claim.sheet.signInBody')}
           </p>
           <PrimaryButton onClick={() => { onClose(); navigate('/auth'); }}>
-            Sign in
+            {t('courseDetail.claim.sheet.signIn')}
           </PrimaryButton>
         </>
       );
@@ -188,7 +188,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
       return (
         <>
           <p style={{ fontSize: 14, color: INK_FAINT, lineHeight: 1.5, marginBottom: 12 }}>
-            Claim this course for your golf club profile. We will review it before it goes live.
+            {t('courseDetail.claim.sheet.reviewBody')}
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 12 }}>
@@ -270,11 +270,11 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
             disabled={!selectedId}
             loading={submitting}
           >
-            Claim as {claimable.find((m) => m.business.id === selectedId)?.business.name ?? 'business'}
+            {t('courseDetail.claim.sheet.claimAs', { name: claimable.find((m) => m.business.id === selectedId)?.business.name ?? t('courseDetail.claim.sheet.claimAsFallback') })}
           </PrimaryButton>
 
           <p style={{ fontSize: 11, color: INK_FAINT, marginTop: 10, textAlign: 'center' }}>
-            Claiming covers all listings of this club on clbhouz.
+            {t('courseDetail.claim.sheet.footnote')}
           </p>
 
           <button
@@ -283,7 +283,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
             className="w-full mt-3 text-[13px] font-semibold"
             style={{ color: AMBER, padding: '8px 0' }}
           >
-            Set up a new golf club profile instead
+            {t('courseDetail.claim.sheet.setupInstead')}
           </button>
 
           {linkedGolf.length > 0 && (
@@ -293,7 +293,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
                   key={m.business.id}
                   style={{ fontSize: 12, color: INK_FAINT, lineHeight: 1.5, marginBottom: 4 }}
                 >
-                  {m.business.name} already manages another club and cannot claim a second course.
+                  {t('courseDetail.claim.sheet.linkedAlreadyManages', { name: m.business.name })}
                 </p>
               ))}
             </div>
