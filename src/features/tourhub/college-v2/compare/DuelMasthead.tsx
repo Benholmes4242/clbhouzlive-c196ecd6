@@ -1,12 +1,18 @@
 /**
  * DuelMasthead — charcoal head for the compare page.
  *
- * HEAD TO HEAD eyebrow (amber, centered) · two symmetric columns:
- * crest 54 (gold treatment when franchise rank 1), school 13/800 white,
- * "No.{rank} · {n} live" sub (green when live > 0), "Change" ghost button
- * that opens the PickerSheet for that side.
+ * Convergence with the College profile hero (CollegeHeroMasthead):
+ *   - Same vertical rhythm: min-height clamp(280px, 34dvh, 360px) + sat,
+ *     paddingTop 62 + sat, paddingBottom 24. Renders full-bleed.
+ *   - Crests are UNBOXED — no rings, no tile fill, drawn directly on the
+ *     hero at 104px (largest that keeps proportional parity with the
+ *     detail page's 128 while still fitting the two-up layout + centre
+ *     rule at 375pt).
+ *   - Rank-1 school gets the amber drop-shadow glow from the detail page;
+ *     the other gets a neutral soft shadow for separation.
+ *   - School names scale up to 20/800, "No.{n} · {n} live" lockup to 12s.
  *
- * ~215px tall + safe-area padding at the top.
+ * HEAD TO HEAD overline stays. CHANGE buttons unchanged (small ghost).
  */
 
 import { memo } from 'react';
@@ -16,7 +22,6 @@ import {
   CHARCOAL,
   FONT,
   GOLD,
-  GOLD_DEEP,
   STATUS_LIVE,
   WHITE_ALPHA_18,
   WHITE_ALPHA_55,
@@ -32,6 +37,8 @@ interface Props {
   onChangeRight: () => void;
 }
 
+const CREST_SIZE = 104;
+
 function Column({
   standing,
   live,
@@ -42,61 +49,69 @@ function Column({
   onChange: () => void;
 }) {
   const isTop = standing?.rank === 1;
-  const name = standing?.shortName || standing?.collegeName || '—';
+  const name = standing?.shortName || standing?.collegeName || 'Pick a school';
 
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, minWidth: 0 }}>
-      {/* Crest */}
+    <div
+      style={{
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 10,
+        minWidth: 0,
+      }}
+    >
+      {/* Crest — unboxed. */}
       <div
         style={{
-          position: 'relative',
-          width: 54,
-          height: 54,
-          boxShadow: isTop ? '0 3px 10px rgba(255,184,0,0.20)' : 'none',
+          width: CREST_SIZE,
+          height: CREST_SIZE,
+          flexShrink: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
         aria-hidden
       >
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            borderRadius: '34%',
-            overflow: 'hidden',
-            background: 'rgba(255,255,255,0.06)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 6,
-          }}
-        >
-          {standing?.logoUrl ? (
-            <img src={standing.logoUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-          ) : (
-            <span style={{ fontSize: 12, fontWeight: 900, color: isTop ? GOLD : '#FFF', letterSpacing: '0.04em' }}>
-              {(standing?.shortName ?? standing?.collegeName ?? '?').slice(0, 3).toUpperCase()}
-            </span>
-          )}
-        </div>
-        {/* Traced canonical hairline (dark hero). Rank-1 keeps its gold status ring. */}
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            inset: 0,
-            borderRadius: '34%',
-            border: isTop ? `1.5px solid ${GOLD}` : '1px solid rgba(255,255,255,0.22)',
-            pointerEvents: 'none',
-          }}
-        />
+        {standing?.logoUrl ? (
+          <img
+            src={standing.logoUrl}
+            alt=""
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',
+              filter: isTop
+                ? 'drop-shadow(0 6px 24px rgba(255,184,0,0.35))'
+                : 'drop-shadow(0 4px 16px rgba(0,0,0,0.35))',
+            }}
+          />
+        ) : (
+          <span
+            style={{
+              fontSize: 24,
+              fontWeight: 900,
+              color: isTop ? GOLD : '#FFFFFF',
+              letterSpacing: '0.04em',
+              filter: isTop
+                ? 'drop-shadow(0 6px 24px rgba(255,184,0,0.35))'
+                : 'drop-shadow(0 4px 16px rgba(0,0,0,0.35))',
+            }}
+          >
+            {(standing?.shortName ?? standing?.collegeName ?? '?').slice(0, 3).toUpperCase()}
+          </span>
+        )}
       </div>
 
       {/* Name */}
       <div
         style={{
-          fontSize: 13,
+          fontSize: 20,
           fontWeight: 800,
           color: '#FFFFFF',
-          letterSpacing: '-0.01em',
+          letterSpacing: '-0.02em',
+          lineHeight: 1.1,
           textAlign: 'center',
           maxWidth: '100%',
           overflow: 'hidden',
@@ -110,7 +125,7 @@ function Column({
       {/* Sub */}
       <div
         style={{
-          fontSize: 10.5,
+          fontSize: 12,
           fontWeight: 700,
           color: live > 0 ? STATUS_LIVE : WHITE_ALPHA_65,
           letterSpacing: '0.02em',
@@ -118,7 +133,7 @@ function Column({
           textAlign: 'center',
         }}
       >
-        {standing?.rank ? `No.${standing.rank}` : '—'}
+        {standing?.rank ? `No.${standing.rank}` : 'Unranked'}
         {live > 0 && (
           <>
             <span style={{ color: WHITE_ALPHA_55, margin: '0 5px' }}>{'\u00B7'}</span>
@@ -158,11 +173,16 @@ function DuelMastheadInner({ left, right, liveLeft, liveRight, onChangeLeft, onC
     <div
       style={{
         background: `linear-gradient(180deg, #262B33 0%, ${CHARCOAL} 100%)`,
-        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 58px)',
+        minHeight:
+          'calc(clamp(280px, 34dvh, 360px) + env(safe-area-inset-top, 0px))',
+        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 62px)',
         paddingLeft: 12,
         paddingRight: 12,
-        paddingBottom: 16,
+        paddingBottom: 24,
         fontFamily: FONT,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
       }}
     >
       <div
@@ -173,7 +193,7 @@ function DuelMastheadInner({ left, right, liveLeft, liveRight, onChangeLeft, onC
           textTransform: 'uppercase',
           color: AMBER,
           textAlign: 'center',
-          marginBottom: 12,
+          marginBottom: 16,
         }}
       >
         Head to Head
@@ -193,8 +213,6 @@ function DuelMastheadInner({ left, right, liveLeft, liveRight, onChangeLeft, onC
         />
         <Column standing={right} live={liveRight} onChange={onChangeRight} />
       </div>
-      {/* Suppress unused-var noise for GOLD_DEEP (reserved for future rank-1 accents). */}
-      <span style={{ display: 'none' }} data-g={GOLD_DEEP} />
     </div>
   );
 }

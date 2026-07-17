@@ -31,7 +31,6 @@ import { collegeProfileRoute, playerRoute } from '@/features/tourhub/routes';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { formatNumber } from '@/i18n/format';
 import {
-  AMBER,
   CHARCOAL,
   FONT,
   HAIRLINE_INK_10,
@@ -45,13 +44,19 @@ import {
 import { useFranchiseStandings } from '@/features/tourhub/college-v2/hub/data/useFranchiseStandings';
 import { useLiveAlumni } from '@/features/tourhub/college-v2/hub/data/useLiveAlumni';
 import { useCollegeRoster } from '@/features/tourhub/college-v2/profile/data/useCollegeRoster';
-import { useLivePlayerIds } from '@/features/tourhub/players-v2/data/useLivePlayerIds';
+import { useThisWeekAlumni, type WeekAlumnusRow } from '@/features/tourhub/college-v2/profile/data/useThisWeekAlumni';
+import { useLivePlayerIds, type LivePlayerMap } from '@/features/tourhub/players-v2/data/useLivePlayerIds';
 import { DuelMasthead } from './DuelMasthead';
 import { TugStat } from './TugStat';
 import { PickerSheet } from './PickerSheet';
+import { useCollegeAggregateStats } from './data/useCollegeAggregateStats';
 
 const CLASS_CAP = 5;
+const OFF_INK = 'rgba(15,23,42,0.38)';
 const fmtInt = (n: number) => formatNumber(n);
+const fmtScoringAvg = (n: number) => (n > 0 ? n.toFixed(2) : '0.00');
+const fmtDrive = (n: number) => (n > 0 ? `${n.toFixed(1)} yds` : '0.0 yds');
+const fmtSg = (n: number) => (n === 0 ? '0.00' : (n > 0 ? `+${n.toFixed(2)}` : n.toFixed(2)));
 
 export function ComparePage() {
   const [searchParams] = useSearchParams();
@@ -69,6 +74,21 @@ export function ComparePage() {
   const { data: leftRoster = [] } = useCollegeRoster(c1 || undefined);
   const { data: rightRoster = [] } = useCollegeRoster(c2 || undefined);
   const { data: liveMap = {} } = useLivePlayerIds();
+  const { data: leftWeek = [] } = useThisWeekAlumni(c1 || undefined);
+  const { data: rightWeek = [] } = useThisWeekAlumni(c2 || undefined);
+  const { data: leftAgg } = useCollegeAggregateStats(c1 || undefined);
+  const { data: rightAgg } = useCollegeAggregateStats(c2 || undefined);
+
+  const leftWeekByPlayer = useMemo(() => {
+    const m = new Map<string, WeekAlumnusRow>();
+    for (const r of leftWeek) if (!m.has(r.playerId)) m.set(r.playerId, r);
+    return m;
+  }, [leftWeek]);
+  const rightWeekByPlayer = useMemo(() => {
+    const m = new Map<string, WeekAlumnusRow>();
+    for (const r of rightWeek) if (!m.has(r.playerId)) m.set(r.playerId, r);
+    return m;
+  }, [rightWeek]);
 
   const [pickerTarget, setPickerTarget] = useState<'c1' | 'c2' | null>(null);
 
@@ -174,6 +194,40 @@ export function ComparePage() {
                 rightValue={right?.top10Total ?? 0}
                 format={fmtInt}
               />
+              {(leftAgg?.scoringAvg || rightAgg?.scoringAvg) && (
+                <>
+                  <div style={{ height: 0.5, background: HAIRLINE_INK_10, margin: '0 16px' }} />
+                  <TugStat
+                    label="Scoring Avg"
+                    leftValue={leftAgg?.scoringAvg?.value ?? 0}
+                    rightValue={rightAgg?.scoringAvg?.value ?? 0}
+                    format={fmtScoringAvg}
+                    lowerWins
+                  />
+                </>
+              )}
+              {(leftAgg?.drivingDistance || rightAgg?.drivingDistance) && (
+                <>
+                  <div style={{ height: 0.5, background: HAIRLINE_INK_10, margin: '0 16px' }} />
+                  <TugStat
+                    label="Driving Distance"
+                    leftValue={leftAgg?.drivingDistance?.value ?? 0}
+                    rightValue={rightAgg?.drivingDistance?.value ?? 0}
+                    format={fmtDrive}
+                  />
+                </>
+              )}
+              {(leftAgg?.sgTotal || rightAgg?.sgTotal) && (
+                <>
+                  <div style={{ height: 0.5, background: HAIRLINE_INK_10, margin: '0 16px' }} />
+                  <TugStat
+                    label="SG: Total"
+                    leftValue={leftAgg?.sgTotal?.value ?? 0}
+                    rightValue={rightAgg?.sgTotal?.value ?? 0}
+                    format={fmtSg}
+                  />
+                </>
+              )}
             </>
           )}
         </section>
@@ -192,12 +246,14 @@ export function ComparePage() {
               headerCode={leftCode}
               roster={leftClass}
               liveMap={liveMap}
+              weekByPlayer={leftWeekByPlayer}
               alignRight={false}
             />
             <ClassColumn
               headerCode={rightCode}
               roster={rightClass}
               liveMap={liveMap}
+              weekByPlayer={rightWeekByPlayer}
               alignRight
             />
           </div>
@@ -226,11 +282,18 @@ interface ClassColumnProps {
     firstName: string;
     lastName: string;
   }>;
-  liveMap: Record<string, unknown>;
+  liveMap: LivePlayerMap;
+  weekByPlayer: Map<string, WeekAlumnusRow>;
   alignRight: boolean;
 }
 
-function ClassColumn({ headerCode, roster, liveMap, alignRight }: ClassColumnProps) {
+function formatWeekSubline(week: WeekAlumnusRow): string {
+  const pos =
+    week.position != null ? `${week.positionTied ? 'T' : ''}${week.position}` : null;
+  return pos ? `${pos} \u00B7 ${week.tournamentName}` : week.tournamentName;
+}
+
+function ClassColumn({ headerCode, roster, liveMap, weekByPlayer, alignRight }: ClassColumnProps) {
   return (
     <div
       style={{
@@ -261,12 +324,33 @@ function ClassColumn({ headerCode, roster, liveMap, alignRight }: ClassColumnPro
             paddingTop: 4,
           }}
         >
-          —
+          No alumni on file
         </div>
       ) : (
         roster.map((a) => {
-          const isLive = Boolean(liveMap[a.id]);
+          const live = liveMap[a.id] ?? null;
+          const week = weekByPlayer.get(a.id) ?? null;
           const nav = playerRoute(a.id, { kind: 'college', collegeName: headerCode });
+
+          let subline: string;
+          let sublineColor: string;
+          if (live) {
+            const posLabel =
+              live.position != null
+                ? `${live.positionTied ? 'T' : ''}${live.position}`
+                : '';
+            subline = posLabel
+              ? `${posLabel} \u00B7 ${live.tournamentName}`
+              : live.tournamentName;
+            sublineColor = STATUS_LIVE;
+          } else if (week) {
+            subline = formatWeekSubline(week);
+            sublineColor = INK_MUTE;
+          } else {
+            subline = 'Off this week';
+            sublineColor = OFF_INK;
+          }
+
           return (
             <Link
               key={a.id}
@@ -284,13 +368,13 @@ function ClassColumn({ headerCode, roster, liveMap, alignRight }: ClassColumnPro
             >
               <div style={{ position: 'relative', flexShrink: 0 }}>
                 <SquircleAvatar
-                  size={22}
+                  size={26}
                   srcCandidates={a.photoUrl ? [a.photoUrl] : []}
                   alt={a.fullName}
                   hairlineRing
                   ringColor="rgba(15,23,42,0.12)"
                 />
-                {isLive && (
+                {live && (
                   <span
                     aria-hidden
                     style={{
@@ -306,20 +390,37 @@ function ClassColumn({ headerCode, roster, liveMap, alignRight }: ClassColumnPro
                   />
                 )}
               </div>
-              <div
-                style={{
-                  flex: 1,
-                  minWidth: 0,
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: INK,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  textAlign: alignRight ? 'right' : 'left',
-                }}
-              >
-                {a.fullName}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: 11.5,
+                    fontWeight: 700,
+                    color: INK,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    textAlign: alignRight ? 'right' : 'left',
+                    letterSpacing: '-0.005em',
+                  }}
+                >
+                  {a.fullName}
+                </div>
+                <div
+                  style={{
+                    marginTop: 1,
+                    fontSize: 10,
+                    fontWeight: live ? 700 : 500,
+                    color: sublineColor,
+                    letterSpacing: '0.02em',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    textAlign: alignRight ? 'right' : 'left',
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
+                  {subline}
+                </div>
               </div>
             </Link>
           );
