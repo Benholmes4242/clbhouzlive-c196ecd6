@@ -453,10 +453,8 @@ function ConquestsStrip({ userId }: { userId: string | undefined }) {
     <div
       style={{
         marginTop: 14,
-        paddingTop: 12,
-        marginLeft: 16,
-        marginRight: 16,
-        borderTop: `1px solid ${CONQUEST_HAIRLINE}`,
+        paddingLeft: PAGE_PAD,
+        paddingRight: PAGE_PAD,
       }}
     >
       <div
@@ -474,7 +472,12 @@ function ConquestsStrip({ userId }: { userId: string | undefined }) {
       </div>
       <div
         className="flex overflow-x-auto scrollbar-hide"
-        style={{ gap: 8, margin: '0 -16px', padding: '0 16px' }}
+        style={{
+          gap: 8,
+          margin: `0 -${PAGE_PAD}px`,
+          paddingLeft: PAGE_PAD,
+          paddingRight: PAGE_PAD,
+        }}
       >
         {picks.map((row) => (
           <ConquestChip key={`${row.course_id}-${row.category}`} row={row} />
@@ -483,6 +486,7 @@ function ConquestsStrip({ userId }: { userId: string | undefined }) {
     </div>
   );
 }
+
 
 function ConquestChip({ row }: { row: TitleInReach }) {
   const navigate = useNavigate();
