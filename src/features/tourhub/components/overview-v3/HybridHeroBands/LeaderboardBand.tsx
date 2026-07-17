@@ -67,15 +67,6 @@ export interface LeaderboardBandProps {
 }
 
 
-function ctaLabel(state: HeroState): string {
-  if (state.kind === 'live') return 'OPEN LIVE LEADERBOARD';
-  if (state.kind === 'results') {
-    if (state.variant === 'cancelled') return 'VIEW TOUR SCHEDULE';
-    if (state.variant === 'awaiting-playoff') return 'VIEW LIVE PLAYOFF';
-    return 'VIEW FULL RESULTS';
-  }
-  return state.variant === 'imminent' ? 'VIEW ALL TEE TIMES' : 'VIEW TOURNAMENT';
-}
 
 
 
