@@ -88,8 +88,8 @@ export const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
         padding: '12px 13px',
       }}
     >
-      {/* Header row */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+      {/* Header row: avatar + two-line stack (name/verified, then chip) */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, minWidth: 0 }}>
         {response.business_logo_url ? (
           <SquircleAvatar
             src={response.business_logo_url}
@@ -107,47 +107,44 @@ export const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
             ringColor={LIGHT_HAIRLINE}
           />
         )}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            flex: 1,
-            minWidth: 0,
-          }}
-        >
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+            <span
+              style={{
+                fontSize: 12.5,
+                fontWeight: 700,
+                color: INK,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                minWidth: 0,
+              }}
+            >
+              {response.business_name}
+            </span>
+            {response.business_is_verified && <VerifiedBadge size="sm" />}
+          </div>
           <span
             style={{
-              fontSize: 12.5,
+              marginTop: 3,
+              alignSelf: 'flex-start',
+              fontSize: 8.5,
               fontWeight: 700,
-              color: INK,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
+              letterSpacing: '0.07em',
+              color: '#8A6400',
+              background: 'rgba(232,181,48,0.16)',
+              border: '1px solid rgba(232,181,48,0.35)',
+              borderRadius: 999,
+              padding: '3px 8px',
               whiteSpace: 'nowrap',
-              minWidth: 0,
+              textTransform: 'uppercase',
             }}
           >
-            {response.business_name}
+            OWNER RESPONSE
           </span>
-          {response.business_is_verified && <VerifiedBadge size="sm" />}
         </div>
-        <span
-          style={{
-            flexShrink: 0,
-            fontSize: 8.5,
-            fontWeight: 700,
-            letterSpacing: '0.07em',
-            color: '#8A6400',
-            background: 'rgba(232,181,48,0.16)',
-            border: '1px solid rgba(232,181,48,0.35)',
-            borderRadius: 999,
-            padding: '3px 8px',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          OWNER RESPONSE
-        </span>
       </div>
+
 
       {!isEditing ? (
         <>
