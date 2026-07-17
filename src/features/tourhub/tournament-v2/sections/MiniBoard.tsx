@@ -4,6 +4,8 @@
  * Row tap opens ScorecardSheet.
  */
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import { countryFlag, countryFallback } from '../../leaderboard/countryFlag';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import {
