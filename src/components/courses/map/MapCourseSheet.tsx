@@ -343,7 +343,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
                     onClick={() => navigate(`/courses/${course.id}/rate`)}
                   >
                     <Check className="h-4 w-4" />
-                    Mark Played
+                    {t('map.markPlayed')}
                   </button>
                   
                   <button
