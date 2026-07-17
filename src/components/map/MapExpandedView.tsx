@@ -197,7 +197,7 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
           {isIOS && (
             <button
               type="button"
-              onClick={() => openExternalUrl(appleMapsUrl)}
+              onClick={() => openMapsUrl(appleMapsUrl)}
               className="pointer-events-auto flex-1"
               style={{
                 height: 50, borderRadius: 999, border: 'none', cursor: 'pointer',
