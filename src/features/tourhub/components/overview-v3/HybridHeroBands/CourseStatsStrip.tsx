@@ -122,7 +122,9 @@ export function CourseStatsStrip({
               textOverflow: 'ellipsis',
             }}
           >
-            Record: {courseRecord}{courseRecordHolder ? ` · ${courseRecordHolder}` : ''}
+            {courseRecordHolder
+              ? t('overview.courseStats.recordLabelWithHolder', { value: courseRecord, holder: courseRecordHolder })
+              : t('overview.courseStats.recordLabel', { value: courseRecord })}
           </div>
         )}
       </div>
