@@ -13,7 +13,6 @@ import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { useActorUnreadCounts } from '@/hooks/useActorUnreadCounts';
 
 const AMBER = '#F7931E';
-const AMBER_DEEP = '#c97a10';
 const INK = '#0F172A';
 const MUTED = '#94A3B8';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
@@ -68,7 +67,7 @@ export default function ActorCards({
           fontSize: 10,
           letterSpacing: '0.16em',
           textTransform: 'uppercase',
-          color: AMBER_DEEP,
+          color: AMBER,
           padding: '0 20px 8px',
         }}
       >
@@ -79,7 +78,8 @@ export default function ActorCards({
           display: 'flex',
           gap: 10,
           overflowX: 'auto',
-          padding: '0 20px 2px',
+          padding: '12px 20px 2px',
+          marginTop: -12,
           scrollbarWidth: 'none',
         }}
         className="ps2-no-scrollbar"
@@ -188,25 +188,13 @@ export default function ActorCards({
                   {sub}
                 </div>
               </div>
-              {active && (
-                <div
-                  style={{
-                    fontWeight: 800,
-                    fontSize: 14,
-                    color: AMBER,
-                    flexShrink: 0,
-                  }}
-                >
-                  {'\u2713'}
-                </div>
-              )}
               {unread > 0 && (
                 <div
                   aria-label={`${unread} unread`}
                   style={{
                     position: 'absolute',
-                    top: 8,
-                    right: 8,
+                    top: -8,
+                    right: -8,
                     minWidth: 17,
                     height: 17,
                     padding: '0 5px',
@@ -218,6 +206,8 @@ export default function ActorCards({
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    border: '2px solid #fff',
+                    boxSizing: 'content-box',
                   }}
                 >
                   {unread > 99 ? '99+' : unread}
@@ -245,7 +235,7 @@ export default function ActorCards({
               padding: '13px 8px',
             }}
           >
-            <div style={{ fontWeight: 800, fontSize: 16, color: AMBER_DEEP, lineHeight: 1 }}>
+            <div style={{ fontWeight: 800, fontSize: 16, color: AMBER, lineHeight: 1 }}>
               +
             </div>
             <div style={{ fontWeight: 600, fontSize: 10, color: MUTED, marginTop: 4 }}>
