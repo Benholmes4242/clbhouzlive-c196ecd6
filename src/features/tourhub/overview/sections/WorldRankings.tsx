@@ -30,6 +30,8 @@ const TOUR_TO_BOARD: Partial<Record<TourId, { board: RankingsBoard; labelKey: st
 
 export function WorldRankings({ tour }: { tour: TourId }) {
   const navigate = useNavigate();
+  const { t } = useTranslation('tourhub');
+  const navigate = useNavigate();
   const mapping = TOUR_TO_BOARD[tour];
   const { data } = useRankingsBoards(mapping?.board ?? 'owgr');
 
