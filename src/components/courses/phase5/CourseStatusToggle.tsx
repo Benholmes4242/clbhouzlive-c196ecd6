@@ -32,9 +32,9 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
   if (!user) {
     return (
       <div className={cn("space-y-3", className)}>
-        <p className="text-sm text-muted-foreground">Sign in to track this course</p>
+        <p className="text-sm text-muted-foreground">{t('phase5.statusToggle.signInPrompt')}</p>
         <Button variant="outline" size="sm" onClick={() => navigate('/auth')} className="w-full">
-          Sign in
+          {t('phase5.statusToggle.signIn')}
         </Button>
       </div>
     );
