@@ -193,7 +193,7 @@ export function TournamentsSection({
                         letterSpacing: '0.10em',
                       }}
                     >
-                      WIN
+                      {t('player.tournaments.winChip')}
                     </span>
                   )}
                   {isLive && (
