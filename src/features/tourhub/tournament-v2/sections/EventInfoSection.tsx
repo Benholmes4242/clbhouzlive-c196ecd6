@@ -57,7 +57,7 @@ export function EventInfoSection({ meta, broadcast, onTeeTimesTap, teeTimesRound
 
   return (
     <section style={{ fontFamily: FONT }}>
-      <SectionEyebrow kicker="Event Info" />
+      <SectionEyebrow kicker={t('tournament.eventInfo.eyebrow')} />
       <div style={{ background: SURFACE }}>
         {rows.map(([label, value], i) => (
           <div
