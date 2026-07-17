@@ -30,6 +30,7 @@ export const TourIslandLeft: React.FC<TourIslandLeftProps> = ({
   onPickerTap,
   showPicker = true,
 }) => {
+  const { t } = useTranslation('tourhub');
   return (
     <div
       style={{
