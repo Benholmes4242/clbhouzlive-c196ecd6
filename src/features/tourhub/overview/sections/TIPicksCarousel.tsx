@@ -268,6 +268,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
 }
 
 function InlineStateValue({ state, pick, live, leader }: { state: EventState; pick: AITopContender; live: PickLiveState | undefined; leader: number }) {
+  const { t } = useTranslation('tourhub');
   if (state === 'upcoming') {
     return <ConfidenceBar value={pick.winProbability ?? 0} leader={leader} compact />;
   }
@@ -291,8 +292,11 @@ function InlineStateValue({ state, pick, live, leader }: { state: EventState; pi
     );
   }
   // completed
-  const v = verdict(live);
+  const v = verdict(t, live);
   const isWon = !cut && live?.position === 1;
+  const chipLabel = v.hit
+    ? (isWon ? t('overview.tiPicks.chip.won') : t('overview.tiPicks.chip.hit'))
+    : (cut ? t('overview.tiPicks.chip.missCut', { cut }) : t('overview.tiPicks.chip.miss'));
   return (
     <span
       style={{
@@ -308,7 +312,7 @@ function InlineStateValue({ state, pick, live, leader }: { state: EventState; pi
         textTransform: 'uppercase',
       }}
     >
-      {v.hit ? (isWon ? 'Won' : 'Hit') : cut ? `Miss · ${cut}` : 'Miss'}
+      {chipLabel}
     </span>
   );
 }
