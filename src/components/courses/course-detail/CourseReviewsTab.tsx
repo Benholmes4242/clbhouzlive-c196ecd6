@@ -764,13 +764,13 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       {/* No results */}
       {(searchQuery || ratingFilter) && filteredReviews.length === 0 && (
         <div style={{ textAlign: 'center', padding: '32px 16px' }}>
-          <p style={{ fontSize: 13, color: INK_FAINT, marginBottom: 10 }}>No reviews match your criteria.</p>
+          <p style={{ fontSize: 13, color: INK_FAINT, marginBottom: 10 }}>{t('review.noMatches.body')}</p>
           <button
             type="button"
             onClick={() => { setSearchQuery(''); setRatingFilter(null); }}
             style={{ fontSize: 12, fontWeight: 700, color: INK, background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
           >
-            Clear filters
+            {t('review.noMatches.clear')}
           </button>
         </div>
       )}
@@ -779,7 +779,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       {filteredReviews.length > 0 && !searchQuery && !ratingFilter && (
         <div style={{ padding: '20px 16px 0', textAlign: 'center' }}>
           <p style={{ fontSize: 12, color: INK_LIGHT, marginBottom: 8 }}>
-            You've seen all {filteredReviews.length} {filteredReviews.length === 1 ? 'review' : 'reviews'}.
+            {t('review.endMessage', { count: filteredReviews.length })}
           </p>
           {!myReview && (
             <button
@@ -787,11 +787,12 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
               onClick={handleRateClick}
               style={{ fontSize: 12, fontWeight: 700, color: INK_MUTE, background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
             >
-              Share your experience
+              {t('review.shareExperience')}
             </button>
           )}
         </div>
       )}
+
 
       <ScrollToTopGlass />
       <ReportSheet
