@@ -467,7 +467,7 @@ function DefendingChampionRowDark({
             textTransform: 'uppercase',
           }}
         >
-          Defending Champion
+          {t('overview.cinematic.defendingChampionLabel')}
         </span>
         <span
           style={{
