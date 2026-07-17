@@ -243,7 +243,7 @@ export function FullListSheet({
                         lineHeight: 1,
                       }}
                     >
-                      {category.short}
+                      {t(category.shortKey)}
                     </div>
                   </div>
                 </button>
