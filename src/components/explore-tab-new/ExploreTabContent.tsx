@@ -17,7 +17,6 @@ import { TierSeeAllSheet } from './TierSeeAllSheet';
 
 import { scrollPageToTop } from '@/lib/getScrollParent';
 
-import { SeasonStrip } from './SeasonStrip';
 import { RankIdentityCard } from './RankIdentityCard';
 import { TheRecordBook } from './TheRecordBook';
 
@@ -98,7 +97,6 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
 
       <div>
         {shellTabs}
-        <SeasonStrip />
         <RankIdentityCard userId={userId} variant="strip" />
       </div>
 
