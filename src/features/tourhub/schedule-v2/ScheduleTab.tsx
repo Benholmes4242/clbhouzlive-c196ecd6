@@ -11,10 +11,12 @@
  * Not registered yet — TS2 cutover.
  */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertCircle } from 'lucide-react';
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { SectionTourLens } from '../overview/sections/SectionTourLens';
 import { TOUR_CONFIG, type TourId } from '../hooks/useOverviewData';
 
