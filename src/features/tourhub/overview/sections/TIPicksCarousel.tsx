@@ -229,10 +229,10 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
 
             <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
               <span style={{ fontSize: 10, fontWeight: 800, color: V4.amber, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                The case ›
+                {t('overview.tiPicks.card.theCase')}
               </span>
               <span style={{ fontSize: 9, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                Pick {p.rank}
+                {t('overview.tiPicks.card.pickLabel', { rank: p.rank })}
               </span>
             </div>
           </button>
