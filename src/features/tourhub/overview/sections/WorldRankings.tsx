@@ -127,6 +127,7 @@ function SpotlightRow({
   tourCode: string;
   onNavigate: (playerId: string | null) => void;
 }) {
+  const { t } = useTranslation('tourhub');
   const tappable = !!row.playerId;
   const candidates = row.photoUrl
     ? [row.photoUrl, ...getPlayerHeadshotCandidates(row.playerName, tourCode)]
