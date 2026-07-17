@@ -22,6 +22,7 @@ interface Props {
 }
 
 export function MomentsSection({ tournamentId, tourCode }: Props) {
+  const { t } = useTranslation('tourhub');
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const { data: moments, isLoading } = useEventMoments(tournamentId);
