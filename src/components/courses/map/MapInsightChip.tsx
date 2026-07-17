@@ -296,7 +296,7 @@ export const MapInsightChip: React.FC<MapInsightChipProps> = ({
         className="inline-flex"
       >
         <div className="glass-card flex items-center gap-1.5 px-2.5 py-1.5 rounded-full">
-          <span className="text-[11px] text-white/90 leading-tight">Map unavailable — your journey progress is still safe.</span>
+          <span className="text-[11px] text-white/90 leading-tight">{t('map.unavailableSafe')}</span>
         </div>
       </motion.div>
     );
