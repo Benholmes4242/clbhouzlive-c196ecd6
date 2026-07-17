@@ -80,7 +80,7 @@ function AlmanacLensInner({ region, onRegionChange, scope, onScopeChange }: Lens
           );
         })}
       </div>
-      <ScopeSegment<RecordsMode>
+      <ScopeSegment
         value={scope}
         onChange={onScopeChange}
         ariaLabel="Scope"

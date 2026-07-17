@@ -126,7 +126,7 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
           accent={SC_ACCENT}
           className="!mb-0"
         />
-        <ScopeSegment<'hole' | 'difficulty'>
+        <ScopeSegment
           value={sort}
           onChange={setSort}
           ariaLabel={t('courses:holes.sortAriaLabel', 'Sort holes')}

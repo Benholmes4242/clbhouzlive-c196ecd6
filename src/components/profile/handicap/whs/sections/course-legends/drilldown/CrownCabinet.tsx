@@ -136,7 +136,7 @@ export const CrownCabinet: React.FC<CrownCabinetProps> = ({
         })}
       </div>
       <div style={{ marginTop: 12, display: 'flex', justifyContent: 'flex-start' }}>
-        <ScopeSegment<LegendWindow>
+        <ScopeSegment
           value={window}
           onChange={onWindowChange}
           ariaLabel="Time window"
