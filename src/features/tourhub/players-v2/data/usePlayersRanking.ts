@@ -189,7 +189,7 @@ export function usePlayersRanking(tour: TourId) {
             tournamentsPlayed: r.tournaments_played ?? null,
           };
         });
-        return { synced: true, statLabel: STAT_LABEL[tour], rows };
+        return { synced: true, statLabel: statLabelFor(tour), rows };
       }
 
       // champ (degrade) — world-ranking order from sr_world_rankings.
