@@ -348,11 +348,15 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
         return base;
       });
     if (pointsRows.length >= 3) {
-      const label = tour === 'euro' ? 'Race to Dubai'
-        : tour === 'lpga' ? 'CME Points'
-        : tour === 'liv' ? 'LIV Points'
-        : 'Season Points';
-      categories.push({ key: 'points', label, short: 'POINTS', unit: 'PTS', rows: pointsRows });
+      const pointsBase = LEADER_STAT_LABELS.points;
+      const brandLabelKey = POINTS_LABEL_KEY_BY_TOUR[tour];
+      categories.push({
+        key: 'points',
+        labelKey: brandLabelKey ?? pointsBase.labelKey,
+        shortKey: pointsBase.shortKey,
+        unitKey: pointsBase.unitKey,
+        rows: pointsRows,
+      });
     }
 
     // Wins
@@ -368,7 +372,7 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
         return base;
       });
     if (winsRows.length >= 3) {
-      categories.push({ key: 'wins', label: 'Wins', short: 'WINS', unit: 'WINS', rows: winsRows });
+      categories.push({ key: 'wins', ...LEADER_STAT_LABELS.wins, rows: winsRows });
     }
   }
 
