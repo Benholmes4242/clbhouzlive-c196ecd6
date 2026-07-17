@@ -124,6 +124,7 @@ function teeKey(g: TeeGroup): string {
 }
 
 export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
+  const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
   const { data } = useFeaturedGroups(tournamentId, { live });
   const [expanded, setExpanded] = useState(false);
