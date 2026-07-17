@@ -307,7 +307,7 @@ export const ReplyForm: React.FC<ReplyFormProps> = ({
           fallback={shortName.slice(0, 2).toUpperCase()}
           hairlineRing
           ringColor={LIGHT_HAIRLINE}
-          radiusRatio={9 / 28}
+          radius={9}
         />
         <span
           style={{
