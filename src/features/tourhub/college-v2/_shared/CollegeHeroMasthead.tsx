@@ -124,54 +124,49 @@ export function CollegeHeroMasthead({
         textAlign: 'center',
       }}
     >
-      {/* Crest 92 — stacked above name */}
+      {/* Crest 128 — unboxed, floats on the hero. Rank-1 gets an amber glow;
+          others a neutral soft drop shadow for separation from busy gradients. */}
       <div
         style={{
           position: 'relative',
-          width: 92,
-          height: 92,
+          width: 128,
+          height: 128,
           flexShrink: 0,
           marginBottom: 14,
-          boxShadow: isRankOne ? '0 4px 12px rgba(255,184,0,0.20)' : 'none',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
         aria-hidden
       >
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            borderRadius: '34%',
-            overflow: 'hidden',
-            background: 'rgba(255,255,255,0.06)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 10,
-          }}
-        >
-          {logoUrl ? (
-            <img
-              src={logoUrl}
-              alt=""
-              style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-            />
-          ) : (
-            <span style={{ fontSize: 20, fontWeight: 900, color: GOLD, letterSpacing: '0.04em' }}>
-              {displayName.slice(0, 3).toUpperCase()}
-            </span>
-          )}
-        </div>
-        {/* Traced canonical hairline (dark hero). Rank-1 keeps its gold status ring. */}
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            inset: 0,
-            borderRadius: '34%',
-            border: isRankOne ? `1.5px solid ${GOLD}` : '1px solid rgba(255,255,255,0.22)',
-            pointerEvents: 'none',
-          }}
-        />
+        {logoUrl ? (
+          <img
+            src={logoUrl}
+            alt=""
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',
+              filter: isRankOne
+                ? 'drop-shadow(0 6px 24px rgba(255,184,0,0.35))'
+                : 'drop-shadow(0 4px 16px rgba(0,0,0,0.35))',
+            }}
+          />
+        ) : (
+          <span
+            style={{
+              fontSize: 28,
+              fontWeight: 900,
+              color: GOLD,
+              letterSpacing: '0.04em',
+              filter: isRankOne
+                ? 'drop-shadow(0 6px 24px rgba(255,184,0,0.35))'
+                : 'drop-shadow(0 4px 16px rgba(0,0,0,0.35))',
+            }}
+          >
+            {displayName.slice(0, 3).toUpperCase()}
+          </span>
+        )}
       </div>
 
       {/* Name + meta (centred) */}
