@@ -225,7 +225,7 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                       lineHeight: 1,
                     }}
                   >
-                    ★ FEATURED
+                    ★ {t('overview.onTheCourse.featuredChip')}
                   </span>
                 </div>
                 {(g.players ?? []).slice(0, 3).map((p, pi) => {
