@@ -78,6 +78,7 @@ function ctaLabel(state: HeroState): string {
 }
 
 
+
 function entryName(entry: any): string {
   const p = entry?.player;
   return p?.full_name || `${p?.first_name ?? ''} ${p?.last_name ?? ''}`.trim() || '—';
