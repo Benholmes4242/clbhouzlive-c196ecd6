@@ -122,8 +122,8 @@ export function CollegeHubPage() {
 
   return (
     <TourHubShell showBack={false} immersiveStatusBar>
-      {/* Always-on glass plate (island 70px). */}
-      <GlassHeaderPlate />
+      {/* Hero bleeds into the notch — no GlassHeaderPlate veil (matches profile page). */}
+
       <div
         className="pb-22"
         style={{
