@@ -249,7 +249,7 @@ export function LeaderboardTab() {
   };
 
   return (
-    <div style={{ background: SURFACE, minHeight: '60vh', fontFamily: F }}>
+    <div style={{ background: SURFACE, minHeight: '60vh', fontFamily: F, paddingTop: 'calc(var(--sat, 0px) + 69px)' }}>
       {/* MASTHEAD */}
       <div style={{ padding: '16px 16px 12px', background: SURFACE }}>
         <div
