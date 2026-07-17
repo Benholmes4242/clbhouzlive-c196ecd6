@@ -61,6 +61,7 @@ export function TournamentsSection({
   playerName,
   liveTournamentId,
 }: TournamentsSectionProps) {
+  const { t } = useTranslation('tourhub');
   const [expanded, setExpanded] = useState(false);
   if (results.length === 0) return null;
 
