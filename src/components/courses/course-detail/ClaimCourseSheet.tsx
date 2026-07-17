@@ -307,15 +307,15 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
       const first = linkedGolf[0].business;
       const bodyCopy =
         linkedGolf.length === 1
-          ? `Your golf club profile ${first.name} already manages another club. A business can manage one club, so set up a separate Golf Club profile for ${clubName}.`
-          : `Your golf club profiles already manage other clubs. A business can manage one club, so set up a separate Golf Club profile for ${clubName}.`;
+          ? t('courseDetail.claim.sheet.stateCSingle', { name: first.name, clubName })
+          : t('courseDetail.claim.sheet.stateCMulti', { clubName });
       return (
         <>
           <p style={{ fontSize: 14, color: INK_FAINT, lineHeight: 1.5, marginBottom: 16 }}>
             {bodyCopy}
           </p>
           <PrimaryButton onClick={goToCreate}>
-            Set up a Golf Club profile
+            {t('courseDetail.claim.sheet.setupGolfClub')}
             <ArrowRight size={16} />
           </PrimaryButton>
         </>
@@ -325,14 +325,14 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
     // State C: businesses exist but none are Golf Club
     if (hasAnyBusiness && !hasGolfBusiness) {
       const first = (memberships ?? [])[0]?.business;
-      const cat = first?.category || 'business';
+      const cat = first?.category || t('courseDetail.claim.sheet.categoryFallback');
       return (
         <>
           <p style={{ fontSize: 14, color: INK_FAINT, lineHeight: 1.5, marginBottom: 16 }}>
-            Claiming a course needs a Golf Club profile. Your {cat} profile cannot manage a course. Set up a Golf Club profile to claim {clubName}.
+            {t('courseDetail.claim.sheet.needsGolfClub', { category: cat, clubName })}
           </p>
           <PrimaryButton onClick={goToCreate}>
-            Set up a Golf Club profile
+            {t('courseDetail.claim.sheet.setupGolfClub')}
             <ArrowRight size={16} />
           </PrimaryButton>
         </>
@@ -343,15 +343,16 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
     return (
       <>
         <p style={{ fontSize: 14, color: INK_FAINT, lineHeight: 1.5, marginBottom: 16 }}>
-          Set up a Golf Club profile to claim this course and manage its details, reviews, and updates.
+          {t('courseDetail.claim.sheet.stateDBody')}
         </p>
         <PrimaryButton onClick={goToCreate}>
-          Set up Golf Club profile
+          {t('courseDetail.claim.sheet.setupGolfClubShort')}
           <ArrowRight size={16} />
         </PrimaryButton>
       </>
     );
   };
+
 
   return (
     <BottomSheet open={open} onClose={onClose} variant="light">
