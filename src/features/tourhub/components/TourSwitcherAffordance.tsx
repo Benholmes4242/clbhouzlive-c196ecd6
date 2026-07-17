@@ -28,12 +28,15 @@ export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
   variant = 'default',
 }) => {
   const [open, setOpen] = useState(false);
+  const { t } = useTranslation('tourhub');
   const { selectedTourSlug, viewingTourSlug } = useTourSelection();
   const activeTourSlug = viewingTourSlug ?? selectedTourSlug ?? 'pga';
   const isMajorActive = activeTourSlug === 'major';
   const pillLabel = useTourPillLabel();
   // Reference activeMajor to preserve prior side-effect fetch surface
   useActiveMensMajor();
+
+
 
   return (
     <>
