@@ -441,9 +441,7 @@ export function PlayersTab() {
           textAlign: 'center',
         }}
       >
-        {synced
-          ? 'Season ranking \u00B7 live dot = on the course right now'
-          : 'Ranked by world ranking \u2014 season statistics arrive with the sync'}
+        {synced ? t('players.footer.synced') : t('players.footer.unsynced')}
       </div>
     </div>
   );
