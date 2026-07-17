@@ -343,7 +343,7 @@ export function PlayersTab() {
             textTransform: 'uppercase',
           }}
         >
-          THE FIELD
+          {t('players.field.eyebrow')}
         </span>
         <div style={{ display: 'flex', gap: 4 }}>
           {sortOptions.map((k) => {
