@@ -32,8 +32,10 @@ const Header: React.FC<{ photoCount: number; videoCount: number; onSeeAll?: () =
 );
 
 const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick }) => {
+  const { t } = useTranslation('courses');
   const isMobile = useIsMobile();
   const navigate = useNavigate();
+
 
   const maxItems = isMobile ? 3 : 9;
   const fetchLimit = isMobile ? 10 : 20;
@@ -240,7 +242,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
         </div>
 
         <p style={{ fontSize: 12, color: '#94A3B8', margin: '0 16px 12px', lineHeight: 1.5, textAlign: 'center' as const }}>
-          Help fellow golfers discover this course — share your experience.
+          {t('courseDetail.mediaStrip.helpDiscover')}
         </p>
 
         <div style={{ padding: '0 16px' }}>
@@ -265,7 +267,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
             }}
           >
             <Camera size={16} strokeWidth={2} />
-            Share your experience
+            {t('courseDetail.mediaStrip.share')}
           </button>
         </div>
       </div>
@@ -373,7 +375,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
                 >
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
                     <span style={{ color: '#fff', fontSize: 19, fontWeight: 800 }}>+{overflowCount}</span>
-                    <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 10, fontWeight: 600 }}>See all</span>
+                    <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 10, fontWeight: 600 }}>{t('courseDetail.mediaStrip.seeAll')}</span>
                   </div>
                 </div>
               )}
