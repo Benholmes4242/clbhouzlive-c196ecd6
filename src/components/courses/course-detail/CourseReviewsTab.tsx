@@ -728,7 +728,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           const showVerifyPrompt = isClaimAdmin && !businessClaim?.isVerified && !response;
           return (
             <div key={review.id} style={{ borderBottom: `0.5px solid ${INK_TINT_06}` }}>
-              <div style={{ padding: '2px 16px 0' }}>
+              <div style={{ padding: '2px 16px 16px' }}>
                 <ReviewBlockFlat
                 onReportClick={() => setReportingReview(review)}
                   review={transformReview(review, isDeepLinked)}
