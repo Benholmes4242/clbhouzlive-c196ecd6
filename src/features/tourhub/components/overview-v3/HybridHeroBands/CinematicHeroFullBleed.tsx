@@ -837,7 +837,7 @@ export function CinematicHeroFullBleed({
         <button
           type="button"
           onClick={onCtaTap}
-          aria-label="Open tournament"
+          aria-label={t('overview.cinematic.openTournamentAria')}
           style={{
             position: 'relative',
             zIndex: 2,
