@@ -28,28 +28,32 @@ function fmtRange(start: string | null, end: string | null): string | null {
 
 
 export function EventInfoSection({ meta, broadcast, onTeeTimesTap, teeTimesRound }: Props) {
+  const { t } = useTranslation('tourhub');
   const rows: Array<[string, string]> = [];
 
   const dates = fmtRange(meta.start_date, meta.end_date);
-  if (dates) rows.push(['Dates', dates]);
+  if (dates) rows.push([t('tournament.eventInfo.dates'), dates]);
 
   const venue = [
     meta.venue_name,
     [meta.venue_city, meta.venue_country].filter(Boolean).join(', ') || null,
   ].filter(Boolean).join(' · ');
-  if (venue) rows.push(['Venue', venue]);
+  if (venue) rows.push([t('tournament.eventInfo.venue'), venue]);
 
   const py = [
-    meta.venue_par != null ? `Par ${meta.venue_par}` : null,
-    meta.venue_yardage != null ? `${formatNumber(meta.venue_yardage)} yds` : null,
+    meta.venue_par != null ? t('board.meta.par', { par: meta.venue_par }) : null,
+    meta.venue_yardage != null
+      ? t('tournament.eventInfo.yardageShort', { yardage: formatNumber(meta.venue_yardage) })
+      : null,
   ].filter(Boolean).join(' · ');
-  if (py) rows.push(['Par / Yardage', py]);
+  if (py) rows.push([t('tournament.eventInfo.parYardageLabel'), py]);
 
-  if (meta.purse != null) rows.push(['Purse', formatPurse(meta.purse)]);
-  if (meta.defending_champion) rows.push(['Defending', meta.defending_champion]);
-  if (broadcast) rows.push(['TV', broadcast]);
+  if (meta.purse != null) rows.push([t('tournament.hero.purseLabel'), formatPurse(meta.purse)]);
+  if (meta.defending_champion) rows.push([t('tournament.hero.defendingLabel'), meta.defending_champion]);
+  if (broadcast) rows.push([t('tournament.eventInfo.tv'), broadcast]);
 
   const showTeeTimes = !!onTeeTimesTap && teeTimesRound != null;
+
 
   return (
     <section style={{ fontFamily: FONT }}>
