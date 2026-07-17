@@ -72,7 +72,7 @@ export const TourIslandLeft: React.FC<TourIslandLeftProps> = ({
 
           <button
             type="button"
-            aria-label={`Switch tour — current ${label}`}
+            aria-label={t('picker.switchTourCurrentAria', { label })}
             aria-haspopup="dialog"
             onClick={onPickerTap}
             style={{
