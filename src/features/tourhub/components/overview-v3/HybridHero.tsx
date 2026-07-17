@@ -82,6 +82,7 @@ export interface HybridHeroProps {
 
 export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHeroProps) {
   const { tournament } = slide;
+  const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
 
   // 1-minute clock tick (suspended for live state — Sportradar polling drives those transitions)
