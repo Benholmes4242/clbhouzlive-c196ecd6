@@ -316,6 +316,7 @@ function DuelSide({
   onClick: () => void;
   onCaptainClick?: () => void;
 }) {
+  const { t } = useTranslation('tourhub');
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
       <button
