@@ -175,7 +175,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
                 ringColor={LIGHT_HAIRLINE}
               />
               <div style={{ flex: 1, minWidth: 0, fontSize: 13.5, fontWeight: 800, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {leader.player?.full_name ?? 'TBD'}
+                {leader.player?.full_name ?? t('tournament.hero.tbdPlayer')}
               </div>
               <div style={{ fontSize: 24, fontWeight: 200, color: (leader.score ?? 0) < 0 ? getScoreColor(leader.score ?? 0, 'dark') : '#fff', fontVariantNumeric: 'tabular-nums' }}>
                 {fmtScoreSigned(leader.score)}
