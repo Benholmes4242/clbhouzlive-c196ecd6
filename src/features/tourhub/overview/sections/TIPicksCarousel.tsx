@@ -402,6 +402,7 @@ function CaseSheet({
   onClose: () => void;
   onNavigatePlayer: (playerId: string) => void;
 }) {
+  const { t } = useTranslation('tourhub');
   const header = (
     <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
       <div
@@ -413,7 +414,7 @@ function CaseSheet({
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
             <span style={{ fontSize: 10.5, fontWeight: 800, color: V4.amber, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-              The case for
+              {t('overview.tiPicks.case.eyebrow')}
             </span>
             <span style={{ fontSize: 22, color: V4.inkFaint, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>#{pick.rank}</span>
           </div>
