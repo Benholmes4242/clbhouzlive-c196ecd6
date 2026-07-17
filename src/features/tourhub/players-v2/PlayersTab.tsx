@@ -68,8 +68,11 @@ export function PlayersTab() {
   // ?tour= is honored once on mount for deep-link parity.
   const inboundTour = searchParams.get('tour');
   const initialTour: TourId =
-    inboundTour && inboundTour in TOUR_CONFIG ? (inboundTour as TourId) : 'pga';
+    inboundTour && inboundTour in TOUR_CONFIG && inboundTour !== 'champ'
+      ? (inboundTour as TourId)
+      : 'pga';
   const [activeTour, setActiveTour] = useState<TourId>(initialTour);
+
 
 
   // ── Sort (honor inbound ?sort=)
