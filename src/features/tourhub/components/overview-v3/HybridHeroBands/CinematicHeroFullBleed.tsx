@@ -1179,6 +1179,7 @@ export function CinematicHeroFullBleed({
 // ---- shared footer --------------------------------------------------------
 
 function Footer({ leftText, isLive, noBorder }: { leftText: string; isLive: boolean; noBorder?: boolean }) {
+  const { t } = useTranslation('tourhub');
   return (
     <div
       style={{
@@ -1210,7 +1211,7 @@ function Footer({ leftText, isLive, noBorder }: { leftText: string; isLive: bool
             color: AMBER,
           }}
         >
-          TOURNAMENT
+          {t('overview.cinematic.ctaTournament')}
         </span>
         <ChevronRight size={13} strokeWidth={2.5} color={AMBER} style={{ flexShrink: 0 }} />
       </span>
