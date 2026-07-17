@@ -371,7 +371,7 @@ function DuelSide({
             {captain.name}
           </span>
           <span style={{ fontSize: 7.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em', whiteSpace: 'nowrap' }}>
-            · CAPTAIN
+            {t('overview.collegeFranchise.captainSuffix')}
           </span>
         </button>
       ) : (
