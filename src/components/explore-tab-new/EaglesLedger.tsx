@@ -83,18 +83,12 @@ export function EaglesLedger({ region, regionUpper, mode, onRowTap, onLeaderTap 
         overline={overlineLabel}
         meta="View all"
         onMeta={() => setSheetOpen(true)}
+        paddingX={14}
       />
 
-      <div style={{ padding: '0 16px' }}>
-        <div
-          style={{
-            background: CARD_BG,
-            borderRadius: 16,
-            border: `0.5px solid ${HAIRLINE}`,
-            boxShadow: '0 1px 3px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.05)',
-            padding: '4px 0',
-          }}
-        >
+      <div>
+        <div>
+
           {mode === 'alltime'
             ? leaders.map((r, i) => {
                 const isFirst = i === 0;
