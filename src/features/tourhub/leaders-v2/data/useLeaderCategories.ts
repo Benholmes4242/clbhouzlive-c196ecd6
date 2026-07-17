@@ -274,9 +274,7 @@ async function fetchPgaCategories(): Promise<LeaderCategoriesResult> {
       if (top.length < 3) return null;
       return {
         key: cat.key,
-        label: cat.label,
-        short: cat.short,
-        unit: cat.unit,
+        ...LEADER_STAT_LABELS[cat.key],
         rows: top,
       } as LeaderCategoryDef;
     })
