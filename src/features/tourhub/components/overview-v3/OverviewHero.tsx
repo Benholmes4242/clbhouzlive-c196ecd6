@@ -13,7 +13,7 @@
 import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+
 
 import { useHeroCarouselData, type HeroSlide } from '../../hooks/useHeroCarouselData';
 import { HybridHero } from './HybridHero';
@@ -163,27 +163,14 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
   }
 
   const active = slides[Math.min(activeIndex, count - 1)];
-  const showChevrons = count > 1;
   const showCounter = count > 8;
 
-  const chevronBase: React.CSSProperties = {
-    position: 'absolute',
-    top: '38%',
-    zIndex: 20,
-    width: 34,
-    height: 34,
-    borderRadius: 999,
-    background: 'rgba(255,255,255,0.16)',
-    backdropFilter: 'blur(4px)',
-    WebkitBackdropFilter: 'blur(4px)',
-    border: '0.5px solid rgba(255,255,255,0.22)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: '#fff',
-    cursor: 'pointer',
-    padding: 0,
-  };
+  // Chevron UI removed per micro-brief; swipe is the sole gesture and dots
+  // remain the affordance that more slides exist. goPrev/goNext are retained
+  // for keyboard/a11y and COMMAND-jump paths.
+  void goPrev;
+  void goNext;
+
 
   return (
     <div
@@ -208,27 +195,7 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
         </motion.div>
       </AnimatePresence>
 
-      {showChevrons && (
-        <>
-          <button
-            type="button"
-            aria-label={t('overview.hero.prevAria')}
-            onClick={goPrev}
-            style={{ ...chevronBase, left: 8 }}
-          >
-            <ChevronLeft size={20} strokeWidth={2.25} />
-          </button>
-          <button
-            type="button"
-            aria-label={t('overview.hero.nextAria')}
-            onClick={goNext}
-            style={{ ...chevronBase, right: 8 }}
-          >
-            <ChevronRight size={20} strokeWidth={2.25} />
-          </button>
 
-        </>
-      )}
 
       {/* Dots / counter row */}
       {count > 1 && (

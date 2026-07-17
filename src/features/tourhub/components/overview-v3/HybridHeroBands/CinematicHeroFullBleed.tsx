@@ -237,7 +237,7 @@ function CountdownPills({ hoursUntilStart }: { hoursUntilStart: number }) {
           <span
             style={{
               ...NUMERIC_STYLE,
-              fontSize: 22,
+              fontSize: 24,
               fontWeight: 800,
               letterSpacing: '-0.02em',
               color: 'white',
@@ -323,7 +323,7 @@ export function CinematicHeroFullBleed({
 
   // ----- Background composition (shared across all states) -----
   const gradientScrim =
-    'linear-gradient(180deg, rgba(15,23,42,0.12) 0%, rgba(15,23,42,0) 26%, rgba(15,23,42,0.5) 54%, rgba(13,30,22,0.97) 100%)';
+    'linear-gradient(180deg, rgba(15,23,42,0.10) 0%, rgba(15,23,42,0) 30%, rgba(15,23,42,0.32) 58%, rgba(13,30,22,0.82) 100%)';
   const background = venueImageUrl
     ? `${gradientScrim}, url(${venueImageUrl}) ${IMAGE_FOCAL} / cover no-repeat`
     : FALLBACK_GRADIENT;
@@ -569,13 +569,13 @@ export function CinematicHeroFullBleed({
           style={{
             margin: 0,
             fontFamily: "'Geist', -apple-system, BlinkMacSystemFont, sans-serif",
-            fontSize: 'clamp(20px, 6.6vw, 26px)',
+            fontSize: 'clamp(22px, 7.2vw, 28px)',
             fontWeight: 800,
             lineHeight: 0.98,
             letterSpacing: '-0.01em',
             color: 'white',
             textTransform: 'uppercase',
-            textShadow: '0 2px 14px rgba(0,0,0,0.45)',
+            textShadow: '0 2px 16px rgba(0,0,0,0.55)',
             textWrap: 'balance' as any,
           }}
         >
@@ -610,7 +610,7 @@ export function CinematicHeroFullBleed({
           style={{
             position: 'relative',
             zIndex: 2,
-            padding: '8px 48px 8px',
+            padding: '8px 18px 8px',
             borderTop: '0.5px solid rgba(255,255,255,0.10)',
             background:
               'linear-gradient(180deg, rgba(232,194,106,0.06) 0%, rgba(232,194,106,0) 100%)',
@@ -721,7 +721,7 @@ export function CinematicHeroFullBleed({
               display: 'flex',
               alignItems: 'center',
               gap: 10,
-              padding: '4px 48px',
+              padding: '4px 18px',
               borderTop: 'none',
             };
             if (row.kind === 'solo') {
@@ -766,7 +766,7 @@ export function CinematicHeroFullBleed({
                       ...NUMERIC_STYLE,
                       width: COL_TOTAL,
                       textAlign: 'center',
-                      fontSize: 16,
+                      fontSize: 17,
                       fontWeight: 800,
                       letterSpacing: '-0.02em',
                       color: scoreColour(row.entry?.score),
@@ -814,7 +814,7 @@ export function CinematicHeroFullBleed({
                     ...NUMERIC_STYLE,
                     width: COL_TOTAL,
                     textAlign: 'center',
-                    fontSize: 16,
+                    fontSize: 17,
                     fontWeight: 800,
                     letterSpacing: '-0.02em',
                     color: scoreColour(tieScoreNum),
@@ -857,7 +857,7 @@ export function CinematicHeroFullBleed({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 10,
-                padding: '0 48px 3px',
+                padding: '0 18px 3px',
               }}
             >
               <span style={{ width: RANK_W, flexShrink: 0 }} />
@@ -914,7 +914,7 @@ export function CinematicHeroFullBleed({
               display: 'flex',
               alignItems: 'center',
               gap: 10,
-              padding: isLive ? '3px 48px' : '8px 48px',
+              padding: isLive ? '3px 18px' : '8px 18px',
               borderTop: 'none',
             };
             if (row.kind === 'solo') {
@@ -983,7 +983,7 @@ export function CinematicHeroFullBleed({
                       ...NUMERIC_STYLE,
                       width: COL_TOTAL,
                       textAlign: 'center',
-                      fontSize: 16,
+                      fontSize: 17,
                       fontWeight: 800,
                       letterSpacing: '-0.02em',
                       color: row.isLeader ? LEADER_RED : scoreColour(row.entry?.score),
@@ -1055,7 +1055,7 @@ export function CinematicHeroFullBleed({
                     ...NUMERIC_STYLE,
                     width: COL_TOTAL,
                     textAlign: 'center',
-                    fontSize: 16,
+                    fontSize: 17,
                     fontWeight: 800,
                     letterSpacing: '-0.02em',
                     color: row.isLeader ? (awaitingPlayoff ? GOLD : LEADER_RED) : scoreColour(tieScoreNum),
@@ -1101,7 +1101,7 @@ export function CinematicHeroFullBleed({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 10,
-                padding: '8px 48px',
+                padding: '8px 18px',
               }}
             >
               <SquircleAvatar
@@ -1157,7 +1157,7 @@ export function CinematicHeroFullBleed({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 18,
-                padding: '8px 48px',
+                padding: '8px 18px',
               }}
             >
               {courseStats.par != null && (
