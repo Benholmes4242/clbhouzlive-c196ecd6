@@ -164,10 +164,10 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 14 }}>
         <div>
-          <h3 style={{ fontSize: 14, fontWeight: 800, color: '#0F172A', margin: 0 }}>Your Rating</h3>
+          <h3 style={{ fontSize: 14, fontWeight: 800, color: '#0F172A', margin: 0 }}>{t('phase5.personalReview.title')}</h3>
           <p style={{ fontSize: 11, color: '#94A3B8', margin: '3px 0 0', display: 'flex', alignItems: 'center', gap: 4 }}>
             <Calendar style={{ width: 12, height: 12 }} />
-            Played on {dateLabel}
+            {t('phase5.personalReview.playedOn', { date: dateLabel })}
           </p>
           {communityAverage != null && communityAverage > 0 && (() => {
             const diff = Number((rating.rating - communityAverage).toFixed(1));
@@ -180,20 +180,20 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
             if (absDiff < 0.2) {
               return (
                 <span style={{ ...pill, background: 'rgba(15,23,42,0.05)', color: '#64748B' }}>
-                  <CheckCircle2 style={{ width: 12, height: 12 }} /> Matches community consensus
+                  <CheckCircle2 style={{ width: 12, height: 12 }} /> {t('phase5.personalReview.matchesConsensus')}
                 </span>
               );
             }
             if (diff > 0) {
               return (
                 <span style={{ ...pill, background: 'rgba(22,163,74,0.08)', color: '#16A34A' }}>
-                  <ArrowUp style={{ width: 12, height: 12 }} /> {absDiff.toFixed(1)} above community avg
+                  <ArrowUp style={{ width: 12, height: 12 }} /> {t('phase5.personalReview.aboveAvg', { diff: absDiff.toFixed(1) })}
                 </span>
               );
             }
             return (
               <span style={{ ...pill, background: 'rgba(239,68,68,0.08)', color: '#EF4444' }}>
-                <ArrowDown style={{ width: 12, height: 12 }} /> {absDiff.toFixed(1)} below community avg
+                <ArrowDown style={{ width: 12, height: 12 }} /> {t('phase5.personalReview.belowAvg', { diff: absDiff.toFixed(1) })}
               </span>
             );
           })()}
@@ -214,7 +214,7 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
           }}
         >
           <Pencil style={{ width: 12, height: 12 }} />
-          Edit
+          {t('common:action.edit')}
         </button>
       </div>
 
