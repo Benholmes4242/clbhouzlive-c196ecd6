@@ -389,14 +389,15 @@ const ChampionStrip: React.FC<{
       />
       <span
         style={{
-          fontSize: 10,
-          fontWeight: 700,
+          fontSize: 11.5,
+          fontWeight: 600,
           color: INK,
           letterSpacing: '-0.005em',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
           maxWidth: '48%',
+          lineHeight: 1.2,
         }}
       >
         {name}
@@ -404,10 +405,11 @@ const ChampionStrip: React.FC<{
       {scoreText && (
         <span
           style={{
-            fontSize: 10,
+            fontSize: 11.5,
             fontWeight: 800,
             color: TOPAR_UNDER_LIGHT,
             fontVariantNumeric: 'tabular-nums',
+            lineHeight: 1.2,
           }}
         >
           {scoreText}
@@ -416,11 +418,12 @@ const ChampionStrip: React.FC<{
       <span
         style={{
           marginLeft: 'auto',
-          fontSize: 7.5,
+          fontSize: 9,
           fontWeight: 800,
           letterSpacing: '0.14em',
           color: GOLD_DEEP,
           textTransform: 'uppercase',
+          lineHeight: 1,
         }}
       >
         {t('schedule.badge.champion')}
