@@ -186,17 +186,47 @@ export const MoreOptionsDrawer: React.FC<MoreOptionsDrawerProps> = ({
                   <span style={rowLabelStyle}>Report this post</span>
                 </button>
               )}
-              <button onClick={onNotInterested} style={rowStyle}>
-                <EyeOff className="w-5 h-5" style={{ color: 'rgba(15,23,42,0.35)' }} />
-                <span style={rowLabelStyle}>Not interested</span>
-              </button>
+              {!isOwnPost && (
+                <button onClick={onNotInterested} style={rowStyle}>
+                  <EyeOff className="w-5 h-5" style={{ color: 'rgba(15,23,42,0.35)' }} />
+                  <span style={rowLabelStyle}>Not interested</span>
+                </button>
+              )}
               <button
                 onClick={onCopyLink}
-                style={{ ...rowStyle, borderBottom: canBlock ? rowStyle.borderBottom : 'none' }}
+                style={{
+                  ...rowStyle,
+                  borderBottom: (canBlock || canOwnerEdit) ? rowStyle.borderBottom : 'none',
+                }}
               >
                 <LinkIcon className="w-5 h-5" style={{ color: 'rgba(15,23,42,0.35)' }} />
                 <span style={rowLabelStyle}>Copy link</span>
               </button>
+              {canOwnerEdit && isReviewDerived && (
+                <button
+                  onClick={handleManageReview}
+                  disabled={!reviewCourseId}
+                  style={{ ...rowStyle, borderBottom: 'none', opacity: reviewCourseId ? 1 : 0.5 }}
+                >
+                  <ExternalLink className="w-5 h-5" style={{ color: 'rgba(15,23,42,0.35)' }} />
+                  <span style={rowLabelStyle}>Manage review</span>
+                </button>
+              )}
+              {canOwnerEdit && !isReviewDerived && (
+                <>
+                  <button onClick={handleEdit} style={rowStyle}>
+                    <Pencil className="w-5 h-5" style={{ color: 'rgba(15,23,42,0.35)' }} />
+                    <span style={rowLabelStyle}>Edit post</span>
+                  </button>
+                  <button
+                    onClick={() => setConfirmDeleteOpen(true)}
+                    style={{ ...rowStyle, borderBottom: 'none' }}
+                  >
+                    <Trash2 className="w-5 h-5" style={{ color: '#DC2626' }} />
+                    <span style={{ ...rowLabelStyle, color: '#DC2626' }}>Delete post</span>
+                  </button>
+                </>
+              )}
               {canBlock && (
                 <button
                   onClick={() => setConfirmOpen(true)}
