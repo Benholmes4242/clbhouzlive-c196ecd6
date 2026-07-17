@@ -25,6 +25,7 @@ function chipLabel(r: PlayerTournamentResult, t: TFunction): string {
 }
 
 export function FormSection({ results }: FormSectionProps) {
+  const { t } = useTranslation('tourhub');
   const last6 = results.slice(0, 6);
   if (last6.length < 2) return null;
 
@@ -46,7 +47,7 @@ export function FormSection({ results }: FormSectionProps) {
           textTransform: 'uppercase',
         }}
       >
-        Last 6 · Most Recent First
+        {t('player.form.eyebrow')}
       </p>
       <div
         style={{
@@ -59,9 +60,10 @@ export function FormSection({ results }: FormSectionProps) {
         }}
       >
         {last6.map((r) => {
-          const label = chipLabel(r);
-          const isWin = r.position === 1 && r.status?.toUpperCase() !== 'WD';
-          const isMissed = ['MC', 'WD', 'DQ'].includes(label);
+          const label = chipLabel(r, t);
+          const st = r.status?.toUpperCase();
+          const isWin = r.position === 1 && st !== 'WD';
+          const isMissed = st === 'MC' || st === 'CUT' || st === 'WD' || st === 'DQ';
           return (
             <div
               key={r.id}
