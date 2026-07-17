@@ -339,10 +339,11 @@ function CutTag({ label }: { label: string }) {
 }
 
 function CaseHeaderMeta({ pick }: { pick: AITopContender }) {
+  const { t } = useTranslation('tourhub');
   if (pick.courseFitScore == null) return null;
   return (
     <div style={{ fontSize: 11, fontWeight: 700, color: V4.inkMute, fontVariantNumeric: 'tabular-nums', letterSpacing: '0.02em' }}>
-      {`course fit ${Math.round(pick.courseFitScore)}`}
+      {t('overview.tiPicks.case.courseFit', { score: Math.round(pick.courseFitScore) })}
     </div>
   );
 }
