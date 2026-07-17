@@ -1,8 +1,10 @@
 import { useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Heart } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useHubLongFormVideos } from '../hooks/useHubLongFormVideos';
 import { formatDuration } from '../utils/formatDuration';
+import { formatCountShort as formatCount } from '@/i18n/format';
 import { FormatBadge } from './FormatBadge';
 import { stripMentionMarkup } from '@/lib/mentions/format';
 import { toFeedPosts } from '../utils/toFeedPost';
