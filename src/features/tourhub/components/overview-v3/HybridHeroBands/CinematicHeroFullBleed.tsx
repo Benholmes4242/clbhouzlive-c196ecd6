@@ -636,7 +636,7 @@ export function CinematicHeroFullBleed({
                 textTransform: 'uppercase',
               }}
             >
-              ★ Champion
+              {t('overview.cinematic.championEyebrow')}
             </span>
             <span
               style={{
