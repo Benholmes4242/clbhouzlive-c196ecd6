@@ -107,7 +107,7 @@ export function LeadersTab() {
     [categories, openKey],
   );
 
-  const tourLabel = CHIP_LABEL[activeTour];
+  const tourLabel = t(CHIP_LABEL_KEY[activeTour]);
 
   return (
     <div
