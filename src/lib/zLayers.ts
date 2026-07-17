@@ -15,4 +15,5 @@
 
 export const FS_OVERLAY_Z     = 200;   // FullscreenFeedOverlay root
 export const COMMENTS_SHEET_Z = 210;   // CommentsSheetV2 scrim (panel = +1)
+export const MORE_SHEET_Z     = 230;   // MoreOptions sheet scrim (panel = +1)
 export const REVIEW_SHEET_Z   = 240;   // ReviewBottomSheet scrim (panel = +1)

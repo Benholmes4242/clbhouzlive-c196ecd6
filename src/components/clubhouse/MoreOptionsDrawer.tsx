@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Flag, EyeOff, Link as LinkIcon, Ban } from 'lucide-react';
-import { toast } from '@/lib/toast';
-import { Drawer, DrawerContent } from '@/components/ui/drawer';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,13 +13,19 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useBlockActions } from '@/hooks/useBlockActions';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
+import { MORE_SHEET_Z } from '@/lib/zLayers';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 /**
- * Shared non-owner "more options" drawer used by:
+ * Shared non-owner "more options" sheet used by:
  *  - Clubhouse.tsx (in-feed activePost)
  *  - PostsTabContent.tsx (profile posts tab)
  *  - FullscreenFeedOverlay.tsx (immersive viewer)
+ *
+ * Presentation shell mirrors CommentsSheetV2 exactly: framer-motion scrim +
+ * panel portalled to document.body, inline zIndex from zLayers so it stacks
+ * ABOVE FullscreenFeedOverlay (MORE_SHEET_Z > FS_OVERLAY_Z).
  *
  * Editorial / system cards (postType === 'course_of_week_card' and other
  * non-UGC card types) hide Report + Block since they don't map to a real
@@ -70,6 +76,13 @@ export const MoreOptionsDrawer: React.FC<MoreOptionsDrawerProps> = ({
 
   const usernameLabel = post?.username ? `@${post.username}` : (post?.displayName ?? 'this user');
 
+  // Body scroll lock while open — mirrors CommentsSheetV2.
+  useEffect(() => {
+    if (!open) return;
+    lockBodyScroll();
+    return () => unlockBodyScroll();
+  }, [open]);
+
   const handleBlockConfirm = async () => {
     if (!authorId) return;
     const ok = await blockUser(authorId);
@@ -80,53 +93,106 @@ export const MoreOptionsDrawer: React.FC<MoreOptionsDrawerProps> = ({
     }
   };
 
+  const sheet = (
+    <AnimatePresence>
+      {open && (
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => onOpenChange(false)}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: MORE_SHEET_Z,
+              background: 'rgba(0,0,0,0.40)',
+            }}
+          />
+          <motion.div
+            role="dialog"
+            aria-modal="true"
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+            drag="y"
+            dragConstraints={{ top: 0 }}
+            dragElastic={{ top: 0, bottom: 0.3 }}
+            onDragEnd={(_, info) => {
+              if (info.velocity.y > 300 || info.offset.y > 120) onOpenChange(false);
+            }}
+            style={{
+              position: 'fixed',
+              insetInline: 0,
+              bottom: 0,
+              zIndex: MORE_SHEET_Z + 1,
+              width: '100%',
+              background: '#F8FAFC',
+              borderRadius: '20px 20px 0 0',
+              display: 'flex',
+              flexDirection: 'column',
+              paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+            }}
+          >
+            {/* Grabber */}
+            <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8, paddingBottom: 4 }}>
+              <div style={{ width: 36, height: 4, borderRadius: 999, background: 'rgba(0,0,0,0.14)' }} />
+            </div>
+
+            <div style={{ padding: '4px 0 0' }}>
+              {canReport && (
+                <button onClick={onReport} style={rowStyle}>
+                  <Flag className="w-5 h-5" style={{ color: 'rgba(15,23,42,0.35)' }} />
+                  <span style={rowLabelStyle}>Report this post</span>
+                </button>
+              )}
+              <button onClick={onNotInterested} style={rowStyle}>
+                <EyeOff className="w-5 h-5" style={{ color: 'rgba(15,23,42,0.35)' }} />
+                <span style={rowLabelStyle}>Not interested</span>
+              </button>
+              <button
+                onClick={onCopyLink}
+                style={{ ...rowStyle, borderBottom: canBlock ? rowStyle.borderBottom : 'none' }}
+              >
+                <LinkIcon className="w-5 h-5" style={{ color: 'rgba(15,23,42,0.35)' }} />
+                <span style={rowLabelStyle}>Copy link</span>
+              </button>
+              {canBlock && (
+                <button
+                  onClick={() => setConfirmOpen(true)}
+                  disabled={loading}
+                  style={{ ...rowStyle, borderBottom: 'none', opacity: loading ? 0.6 : 1 }}
+                >
+                  <Ban className="w-5 h-5" style={{ color: '#DC2626' }} />
+                  <span style={{ ...rowLabelStyle, color: '#DC2626' }}>
+                    Block {usernameLabel}
+                  </span>
+                </button>
+              )}
+            </div>
+            <div style={{ minHeight: 16 }} />
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+
+  const portalled = typeof window !== 'undefined' ? createPortal(sheet, document.body) : null;
+
   return (
     <>
-      <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent
-          className="rounded-t-[20px]"
-          style={{ background: '#F8FAFC', border: 'none' }}
-        >
-          <div style={{ padding: '4px 0 0' }}>
-            {canReport && (
-              <button
-                onClick={onReport}
-                style={rowStyle}
-              >
-                <Flag className="w-5 h-5" style={{ color: 'rgba(15,23,42,0.35)' }} />
-                <span style={rowLabelStyle}>Report this post</span>
-              </button>
-            )}
-            <button onClick={onNotInterested} style={rowStyle}>
-              <EyeOff className="w-5 h-5" style={{ color: 'rgba(15,23,42,0.35)' }} />
-              <span style={rowLabelStyle}>Not interested</span>
-            </button>
-            <button
-              onClick={onCopyLink}
-              style={{ ...rowStyle, borderBottom: canBlock ? rowStyle.borderBottom : 'none' }}
-            >
-              <LinkIcon className="w-5 h-5" style={{ color: 'rgba(15,23,42,0.35)' }} />
-              <span style={rowLabelStyle}>Copy link</span>
-            </button>
-            {canBlock && (
-              <button
-                onClick={() => setConfirmOpen(true)}
-                disabled={loading}
-                style={{ ...rowStyle, borderBottom: 'none', opacity: loading ? 0.6 : 1 }}
-              >
-                <Ban className="w-5 h-5" style={{ color: '#DC2626' }} />
-                <span style={{ ...rowLabelStyle, color: '#DC2626' }}>
-                  Block {usernameLabel}
-                </span>
-              </button>
-            )}
-          </div>
-          <div className="h-[env(safe-area-inset-bottom,0px)]" style={{ minHeight: 16 }} />
-        </DrawerContent>
-      </Drawer>
+      {portalled}
 
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <AlertDialogContent>
+        {/* z overrides ensure the Block confirm (Radix Overlay + Content)
+            present above the fullscreen viewer (FS_OVERLAY_Z = 200) and the
+            MoreOptions sheet itself (MORE_SHEET_Z = 230). */}
+        <AlertDialogContent
+          className="z-[233]"
+          overlayClassName="fixed inset-0 z-[232] bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
+        >
           <AlertDialogHeader>
             <AlertDialogTitle>Block {usernameLabel}?</AlertDialogTitle>
             <AlertDialogDescription>
