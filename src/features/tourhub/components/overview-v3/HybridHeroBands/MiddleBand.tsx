@@ -147,7 +147,5 @@ export function MiddleBand({
       />
     );
   }
-  {/* Score glyph '›' (rsaquo) is a typographic affordance, not translatable copy. */}
-  {/* eslint-disable-next-line i18next/no-literal-string */}
   return <ChampionStrip name={t('overview.upcoming.previewTitle')} score="›" scoreLabel="" eyebrow={t('overview.upcoming.previewEyebrow')} eyebrowIcon={MapPin} />;
 }
