@@ -4,6 +4,7 @@
  */
 
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import type { TourPlayer } from '../../hooks/useTourHubData';
 import { INK, INK_FAINT, INK_TINT_06, INK_TINT_07, SURFACE } from '../../_shared/tokens';
 import { formatMonthDayYearShort } from '@/i18n/format';
