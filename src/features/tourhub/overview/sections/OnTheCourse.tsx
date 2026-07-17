@@ -144,6 +144,24 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
   const teeTimesQuery = useTeeTimesAll(tournamentId, round, { enabled: expanded });
   const teeGroups = teeTimesQuery.data ?? [];
 
+  // Reuse the hero's leaderboard query (react-query dedupes by key). Only
+  // consumed by the expanded full-field rail — no extra network fires.
+  const leaderboardQuery = useTourLeaderboard(tournamentId ?? '');
+  const leaderboardByPlayerId = useMemo(() => {
+    const m = new Map<string, { today: number | null; score: number | null; status: string | null; thru: number | null }>();
+    for (const row of (leaderboardQuery.data ?? []) as any[]) {
+      const pid = row?.player_id as string | null | undefined;
+      if (!pid) continue;
+      m.set(pid, {
+        today: row?.today ?? null,
+        score: row?.score ?? null,
+        status: (row?.status ?? null) as string | null,
+        thru: row?.thru ?? null,
+      });
+    }
+    return m;
+  }, [leaderboardQuery.data]);
+
   const groups = parseGroups(data);
 
   const featuredKeys = useMemo(() => new Set(groups.map(featuredKey)), [groups]);
