@@ -486,7 +486,7 @@ function DefendingChampionRowDark({
             color: 'rgba(255,255,255,0.5)',
           }}
         >
-          Won {data.year} · {data.score}
+          {t('overview.cinematic.wonYearScore', { year: data.year, score: data.score })}
         </span>
       </div>
       <Trophy size={16} color={GOLD} strokeWidth={1.8} style={{ flexShrink: 0, opacity: 0.8 }} />
