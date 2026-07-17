@@ -16,10 +16,10 @@ import { formatRatingValue } from '@/utils/formatters';
 
 export const REVIEW_GHOST_COLOR: Record<RatingTier, string> = {
   EXCEPTIONAL: 'rgba(255,194,61,0.16)',
-  EXCELLENT:   'rgba(247,147,30,0.14)',
-  GOOD:        'rgba(247,147,30,0.12)',
-  FAIR:        'rgba(154,74,14,0.14)',
-  POOR:        'rgba(154,74,14,0.12)',
+  EXCELLENT:   'rgba(247,147,30,0.17)',
+  GOOD:        'rgba(247,147,30,0.15)',
+  FAIR:        'rgba(201,118,43,0.20)',
+  POOR:        'rgba(201,118,43,0.16)',
 };
 
 export const REVIEW_LABEL_COLOR: Record<RatingTier, string> = {
