@@ -277,6 +277,17 @@
       "allHolesTitle": "All 18 Holes",
       "avgVsPar": "Avg vs par",
       "fieldScoringSuffix": " · field scoring"
+    },
+    "featuredGroups": {
+      "eyebrow": "On the Course",
+      "holeLabel": "HOLE {{hole}}",
+      "onCourse": "ON COURSE"
+    },
+    "teeTimes": {
+      "teeChip": "Tee {{hole}}"
+    },
+    "allTeeTimes": {
+      "title": "All Tee Times"
     }
   }
 }

@@ -4,6 +4,8 @@
  * Self-hides on empty (parent decides via presence of children).
  */
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+
 import { useFeaturedGroups } from '../../overview/data/useFeaturedGroups';
 import { PlayerAvatar } from '../../components/PlayerAvatar';
 import { SectionEyebrow } from './SectionEyebrow';
@@ -43,7 +45,9 @@ function scoreColor(s: string | null): string {
 
 export function FeaturedGroupsRail({ tournamentId, live, tourCode }: Props) {
   const navigate = useNavigate();
+  const { t } = useTranslation('tourhub');
   const { data } = useFeaturedGroups(tournamentId, { live });
+
   const groups = parseGroups(data);
   // Self-hide when there are no featured groups. Eyebrow lives INSIDE
   // the rail so a live event without groups shows no floating chrome
@@ -52,7 +56,7 @@ export function FeaturedGroupsRail({ tournamentId, live, tourCode }: Props) {
 
   return (
     <>
-      <SectionEyebrow kicker="On the Course" />
+      <SectionEyebrow kicker={t('tournament.featuredGroups.eyebrow')} />
       <div
         style={{
           display: 'flex', gap: 12, overflowX: 'auto',
@@ -77,7 +81,7 @@ export function FeaturedGroupsRail({ tournamentId, live, tourCode }: Props) {
                 letterSpacing: '0.10em', textTransform: 'uppercase', marginBottom: 8,
               }}
             >
-              {thru != null ? `HOLE ${thru >= 18 ? 'F' : thru}` : 'ON COURSE'}
+              {thru != null ? t('tournament.featuredGroups.holeLabel', { hole: thru >= 18 ? 'F' : thru }) : t('tournament.featuredGroups.onCourse')}
             </div>
             {(g.players ?? []).slice(0, 3).map((p: any, pi: number) => {
               const name = p.full_name || p.name || '';

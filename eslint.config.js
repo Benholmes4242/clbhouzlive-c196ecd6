@@ -50,8 +50,12 @@ const i18nLiteralOptions = {
     ],
   },
   words: {
-    exclude: ["[0-9!-/:-@[-`{-~]+", "[A-Z_-]+"],
+    // Extra exclude: U+2039/U+203A single angle quotation marks used as
+    // decorative chevrons in row/action affordances (see EventInfoSection,
+    // SectionEyebrow, StorySection). Non-linguistic typographic glyphs.
+    exclude: ["[0-9!-/:-@[-`{-~]+", "[A-Z_-]+", "[\\u2039\\u203A]+"],
   },
+
 };
 
 // Wave 3b.iii — user-visible attribute guard for gated scopes.
@@ -226,7 +230,19 @@ export default tseslint.config(
       "i18next/no-literal-string": ["error", i18nLiteralOptions],
       "no-restricted-syntax": ["error", literalAttrSyntax, ...toLocaleSyntax],
     },
+  },
+  // ─── Wave 3e.iii — tournament-v2 + leaderboard slices (Turn B.3 close) ─
+  {
+    files: [
+      "src/features/tourhub/tournament-v2/**/*.{ts,tsx}",
+      "src/features/tourhub/leaderboard/**/*.{ts,tsx}",
+    ],
+    rules: {
+      "i18next/no-literal-string": ["error", i18nLiteralOptions],
+      "no-restricted-syntax": ["error", literalAttrSyntax, ...toLocaleSyntax],
+    },
   }
+
 );
 
 
