@@ -216,7 +216,7 @@ export function PlayersTab() {
           {!searchExpanded ? (
             <button
               type="button"
-              aria-label="Search players"
+              aria-label={t('players.search.openAria')}
               onClick={() => setSearchExpanded(true)}
               style={{
                 width: 28,
