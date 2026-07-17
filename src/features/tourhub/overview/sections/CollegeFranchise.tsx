@@ -151,28 +151,31 @@ export function CollegeFranchise() {
   const chaserColor = getCollegeColor(chaser.normalized_name);
 
   // Headline chain: DB > data-driven > generic fallback
-  const headline = (() => {
-    if (editorial.data?.headline) {
-      const line2 = (editorial.data as any).headlineTwo ?? null;
-      return { line1: editorial.data.headline as string, line2 };
-    }
-    if (!isClosingRace) return { line1: `${leaderShort} runs away with it.`, line2: null as string | null };
-    return { line1: `${leaderShort} leads. ${chaserShort} is closing.`, line2: null as string | null };
-  })();
+  const editorialLine1 = editorial.data?.headline as string | undefined;
+  const editorialLine2 = editorialLine1 ? ((editorial.data as any).headlineTwo ?? null) : null;
+  const useEditorial = Boolean(editorialLine1);
 
   const goCollege = (norm: string) => navigate(`/tourhub/college-golf/${norm}`);
 
   return (
     <SectionShell
-      eyebrow="COLLEGE FRANCHISE"
-      linkLabel="All franchises"
+      eyebrow={t('overview.collegeFranchise.eyebrow')}
+      linkLabel={t('overview.collegeFranchise.linkLabel')}
       onLinkClick={() => navigate('/tourhub?tab=college')}
     >
       {/* Editorial headline */}
       <div style={{ padding: '0 16px', marginBottom: 16 }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: V4.ink, letterSpacing: '-0.005em', lineHeight: 1.35 }}>
-          {headline.line1}
-          {headline.line2 ? <> <span style={{ color: V4.inkMute }}>{headline.line2}</span></> : null}
+          {useEditorial ? (
+            <>
+              {editorialLine1}
+              {editorialLine2 ? <> <span style={{ color: V4.inkMute }}>{editorialLine2}</span></> : null}
+            </>
+          ) : !isClosingRace ? (
+            <Trans t={t} i18nKey="overview.collegeFranchise.headlineRunaway" values={{ leader: leaderShort }} components={[<span key="a" />]} />
+          ) : (
+            <Trans t={t} i18nKey="overview.collegeFranchise.headlineClosing" values={{ leader: leaderShort, chaser: chaserShort }} components={[<span key="a" />]} />
+          )}
         </div>
       </div>
 
