@@ -4,6 +4,7 @@
  * Shows only when course is NOT played
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Compass, Bookmark } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCoursePersonalStatus } from '@/hooks/useCoursePersonalStatus';
