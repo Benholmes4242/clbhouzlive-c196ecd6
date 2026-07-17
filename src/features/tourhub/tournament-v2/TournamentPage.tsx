@@ -58,6 +58,7 @@ import {
 } from '../_shared/tokens';
 
 export function TournamentPage() {
+  const { t } = useTranslation('tourhub');
   const { tournamentId } = useParams<{ tournamentId: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
