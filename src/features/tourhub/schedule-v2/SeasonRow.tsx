@@ -161,7 +161,7 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
           {(event.venueName || event.venueCity) && (
             <div
               style={{
-                fontSize: 9.5,
+                fontSize: 11,
                 fontWeight: 500,
                 color: INK_MUTE,
                 letterSpacing: '0.01em',
