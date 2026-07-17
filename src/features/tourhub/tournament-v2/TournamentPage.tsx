@@ -186,7 +186,7 @@ export function TournamentPage() {
             <>
               {hasBoard && (
                 <>
-                  <SectionEyebrow kicker="The Board" actionLabel="Full leaderboard" onAction={openFullBoard} />
+                  <SectionEyebrow kicker={t('tournament.shell.board.eyebrow')} actionLabel={t('tournament.shell.board.action')} onAction={openFullBoard} />
                   <MiniBoard tournamentId={tournamentId!} entries={leaderboardRows as any} />
                 </>
               )}
