@@ -76,7 +76,7 @@ export const PlanningSignals: React.FC<PlanningSignalsProps> = ({
 
       {/* Subtle helper text */}
       <p className="text-xs text-gray-500 mt-3 text-center">
-        Only you can see your bucket list.
+        {t('phase5.planning.privateNote')}
       </p>
     </div>
   );
