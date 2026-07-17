@@ -277,9 +277,9 @@ export function StatsSheet({ open, onClose, playerStats, playerName }: StatsShee
             padding: '0 16px 24px',
           }}
         >
-          <SubSection label="Overview" rows={overview} />
-          <SubSection label="Ball Striking" rows={ball} />
-          <SubSection label="Short Game" rows={shortGame} />
+          <SubSection label={t('player.stats.section.overview')} rows={overview} />
+          <SubSection label={t('player.stats.section.ballStriking')} rows={ball} />
+          <SubSection label={t('player.stats.section.shortGame')} rows={shortGame} />
 
           {hasSG && (
             <div style={{ marginTop: 24 }}>
