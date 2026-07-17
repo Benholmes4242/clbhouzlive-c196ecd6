@@ -100,7 +100,7 @@ export const CourseDetailShellTabs: React.FC<CourseDetailShellTabsProps> = ({
               }}
             >
               <span style={{ position: 'relative', display: 'inline-block' }}>
-                {tab.label}
+                {t(tab.labelKey)}
                 {isActive ? (
                   <span
                     aria-hidden
