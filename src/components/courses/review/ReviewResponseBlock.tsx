@@ -74,71 +74,152 @@ export const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
     deleteMutation.mutate({ responseId: response.id });
   };
 
+  const INK = '#0F172A';
+  const INK_75 = 'rgba(15,23,42,0.75)';
+  const INK_40 = 'rgba(15,23,42,0.40)';
+  const HAIRLINE = 'rgba(15,23,42,0.07)';
+
   return (
-    <div className="ml-4 mt-3 pl-4 border-l-2 border-amber-300">
-      <div className="flex items-center gap-2 mb-1.5">
+    <div
+      style={{
+        marginTop: 12,
+        background: 'rgba(15,23,42,0.035)',
+        borderRadius: 14,
+        padding: '12px 13px',
+      }}
+    >
+      {/* Header row */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
         {response.business_logo_url ? (
           <SquircleAvatar
             src={response.business_logo_url}
             alt={response.business_name}
-            size={28}
+            size={26}
             fallback={response.business_name.slice(0, 2).toUpperCase()}
             hairlineRing
             ringColor={LIGHT_HAIRLINE}
           />
         ) : (
           <SquircleAvatar
-            size={28}
+            size={26}
             fallback={response.business_name.slice(0, 2).toUpperCase()}
             hairlineRing
             ringColor={LIGHT_HAIRLINE}
           />
         )}
-
-        <div className="flex items-center gap-1.5 flex-wrap min-w-0">
-          <span className="text-sm font-semibold text-foreground truncate">
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            flex: 1,
+            minWidth: 0,
+          }}
+        >
+          <span
+            style={{
+              fontSize: 12.5,
+              fontWeight: 700,
+              color: INK,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              minWidth: 0,
+            }}
+          >
             {response.business_name}
           </span>
           {response.business_is_verified && <VerifiedBadge size="sm" />}
-          <span className="text-xs text-muted-foreground">{t('review.response.ownerBadge')}</span>
         </div>
+        <span
+          style={{
+            flexShrink: 0,
+            fontSize: 8.5,
+            fontWeight: 700,
+            letterSpacing: '0.07em',
+            color: '#8A6400',
+            background: 'rgba(232,181,48,0.16)',
+            border: '1px solid rgba(232,181,48,0.35)',
+            borderRadius: 999,
+            padding: '3px 8px',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          OWNER RESPONSE
+        </span>
       </div>
 
       {!isEditing ? (
         <>
-          <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+          <p
+            style={{
+              margin: 0,
+              marginTop: 9,
+              fontSize: 12.5,
+              fontWeight: 400,
+              color: INK_75,
+              lineHeight: 1.55,
+              whiteSpace: 'pre-wrap',
+            }}
+          >
             {response.response_text}
           </p>
-          <div className="flex items-center gap-2 mt-1 flex-wrap">
-            <p className="text-xs text-muted-foreground">
+          <div
+            style={{
+              marginTop: 10,
+              paddingTop: 9,
+              borderTop: `1px solid ${HAIRLINE}`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <span style={{ fontSize: 11, fontWeight: 500, color: INK_40 }}>
               {formatRelativeDate(response.created_at)}
               {response.edited_at ? ' (edited)' : ''}
-            </p>
+            </span>
             {canManage && (
-              <>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                 <button
                   type="button"
                   onClick={() => { setText(response.response_text); setIsEditing(true); }}
-                  className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 active:opacity-70 px-1"
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    padding: 0,
+                    cursor: 'pointer',
+                    fontSize: 11.5,
+                    fontWeight: 600,
+                    color: INK,
+                  }}
                   aria-label={t('review.response.editA11y')}
                 >
-                  <Pencil className="w-3 h-3" /> {t('review.response.edit')}
+                  {t('review.response.edit')}
                 </button>
                 <button
                   type="button"
                   onClick={handleDelete}
                   disabled={deleteMutation.isPending}
-                  className="text-xs text-muted-foreground hover:text-destructive flex items-center gap-1 active:opacity-70 disabled:opacity-50 px-1"
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    padding: 0,
+                    cursor: 'pointer',
+                    fontSize: 11.5,
+                    fontWeight: 600,
+                    color: 'rgba(210,34,45,0.85)',
+                    opacity: deleteMutation.isPending ? 0.5 : 1,
+                  }}
                   aria-label={t('review.response.deleteA11y')}
                 >
-                  <Trash2 className="w-3 h-3" /> {t('review.response.delete')}
+                  {t('review.response.delete')}
                 </button>
-              </>
+              </div>
             )}
           </div>
         </>
       ) : (
-        <div>
+        <div style={{ marginTop: 9 }}>
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value.slice(0, 1000))}
