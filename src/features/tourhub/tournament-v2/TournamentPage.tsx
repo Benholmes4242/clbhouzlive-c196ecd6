@@ -190,9 +190,9 @@ export function TournamentPage() {
                   <MiniBoard tournamentId={tournamentId!} entries={leaderboardRows as any} />
                 </>
               )}
-              {/* Rail owns its 'On the Course' eyebrow — self-hides when
-                  featured groups are absent (Brief F-TD-3 §1). */}
-              <FeaturedGroupsRail tournamentId={tournamentId!} live tourCode={tourCode} />
+              {/* Shared OnTheCourse — featured groups + FULL FIELD expander,
+                  live-score-joined. Self-hides when no featured groups. */}
+              <OnTheCourse tournamentId={tournamentId!} live tourCode={tourCode} />
             </>
           )}
 
