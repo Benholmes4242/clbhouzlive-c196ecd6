@@ -16419,10 +16419,6 @@ export type Database = {
         }
         Returns: Json
       }
-      create_vault_secret: {
-        Args: { p_name: string; p_secret: string }
-        Returns: string
-      }
       current_auth_uid: { Args: never; Returns: string }
       decline_golfer_verification_invite: {
         Args: { p_note?: string; p_request_id: string }
@@ -20619,10 +20615,6 @@ export type Database = {
         Args: { p_ordered_course_ids: string[]; p_user_id: string }
         Returns: undefined
       }
-      update_vault_secret: {
-        Args: { p_id: string; p_secret: string }
-        Returns: undefined
-      }
       updategeometrysrid: {
         Args: {
           catalogn_name: string
@@ -20650,6 +20642,7 @@ export type Database = {
             }
             Returns: string
           }
+      upsert_internal_fn_secret: { Args: { p_secret: string }; Returns: string }
       upsert_whs_course_alias: {
         Args: {
           p_course_id: string
