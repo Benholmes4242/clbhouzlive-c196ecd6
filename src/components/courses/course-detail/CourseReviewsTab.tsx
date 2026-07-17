@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 // groupMultiMedia intentionally not imported: posts are constructed one-per-review already grouped.
@@ -64,13 +66,14 @@ const Divider = () => (
   <div style={{ height: '0.5px', background: HAIRLINE_INK_7 }} />
 );
 
-const TIER_ROWS: { key: ScoreTier; label: string }[] = [
-  { key: 'exceptional', label: 'Exceptional' },
-  { key: 'excellent',  label: 'Excellent' },
-  { key: 'good',       label: 'Good' },
-  { key: 'fair',       label: 'Fair' },
-  { key: 'poor',       label: 'Poor' },
+const TIER_ROWS: { key: ScoreTier; labelKey: string }[] = [
+  { key: 'exceptional', labelKey: 'review.filter.optionExceptional' },
+  { key: 'excellent',  labelKey: 'review.filter.optionExcellent' },
+  { key: 'good',       labelKey: 'review.filter.optionGood' },
+  { key: 'fair',       labelKey: 'review.filter.optionFair' },
+  { key: 'poor',       labelKey: 'review.filter.optionPoor' },
 ];
+
 
 // Representative score per tier — drives distribution bar fill via rampForRating.
 const TIER_REP_SCORE: Record<ScoreTier, number> = {
@@ -87,7 +90,9 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   courseName,
   highlightReviewId: externalHighlightReviewId,
 }) => {
+  const { t } = useTranslation('courses');
   const { user } = useSupabaseSession();
+
   const navigate = useNavigate();
   const location = useLocation();
   const [, setSearchParams] = useSearchParams();
@@ -113,11 +118,12 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const [highlightedReviewId, setHighlightedReviewId] = useState<string | null>(externalHighlightReviewId || null);
 
 
-  const sortOptions: SegmentedTabOption[] = [
-    { value: 'recent', label: 'Most recent' },
-    { value: 'highest', label: 'Highest rated' },
-    { value: 'helpful', label: 'Most helpful' },
+  const sortOptions: (SegmentedTabOption & { labelKey: string })[] = [
+    { value: 'recent',  labelKey: 'review.sort.recent',  label: t('review.sort.recent') },
+    { value: 'highest', labelKey: 'review.sort.highest', label: t('review.sort.highest') },
+    { value: 'helpful', labelKey: 'review.sort.helpful', label: t('review.sort.helpful') },
   ];
+
 
   const { data: ratingAggregates } = useCourseRatingAggregates(courseId);
 
@@ -560,12 +566,13 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
               {/* Tappable tier distribution */}
               <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {TIER_ROWS.map(({ key, label }) => {
+                {TIER_ROWS.map(({ key, labelKey }) => {
                   const count = reviewCountsByTier[key] ?? 0;
                   const selected = ratingFilter === key;
                   const pct = Math.round((count / maxTierCount) * 100);
                   const ramp = rampForRating(TIER_REP_SCORE[key]);
                   const isExceptionalRow = key === 'exceptional' && count > 0;
+                  const label = t(labelKey);
                   return (
                     <button
                       key={key}
@@ -577,6 +584,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                     >
                       <span style={{ fontSize: 10.5, fontWeight: selected ? 800 : 600, color: selected ? INK : INK_MUTE, letterSpacing: '0.02em', textTransform: 'uppercase', width: 92, textAlign: 'left', flexShrink: 0 }}>
                         {label}
+
                       </span>
                       <span style={{ flex: 1, minWidth: 0, height: 6, borderRadius: 999, background: INK_TINT_06, overflow: 'hidden', boxShadow: selected ? `0 0 0 1.5px ${AMBER}` : 'none', transition: 'box-shadow 160ms ease' }}>
                         <span

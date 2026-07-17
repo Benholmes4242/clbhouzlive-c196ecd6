@@ -250,6 +250,11 @@
       "rate": "Rate",
       "emoji": "⭐"
     },
-    "reportA11y": "Report review"
+    "reportA11y": "Report review",
+    "sort": {
+      "recent": "Most recent",
+      "highest": "Highest rated",
+      "helpful": "Most helpful"
+    }
   }
 }

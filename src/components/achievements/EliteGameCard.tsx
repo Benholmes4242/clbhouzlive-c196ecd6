@@ -19,7 +19,7 @@
  * - 400 Club: Radiant amber/gold
  */
 
-/* eslint-disable no-restricted-syntax -- brand: milestone/regional badge product names (alt="Rookie Club" etc) pending Ben's ruling */
+/* eslint-disable no-restricted-syntax -- brand: milestone/regional badge product names (alt="Rookie Club" etc) are proper nouns and stay English by product ruling */
 import React, { useMemo, memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';

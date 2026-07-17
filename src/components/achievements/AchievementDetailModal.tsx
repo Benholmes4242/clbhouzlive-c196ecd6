@@ -1,4 +1,4 @@
-/* eslint-disable no-restricted-syntax -- brand: badge product names (alt=) pending Ben's ruling */
+/* eslint-disable no-restricted-syntax -- brand: badge product names (alt=) are proper nouns and stay English by product ruling */
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
