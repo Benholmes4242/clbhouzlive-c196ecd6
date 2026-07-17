@@ -1,8 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { MapPin, Trophy } from 'lucide-react';
 import { HAIRLINE_INK_7, INK } from '@/features/courses/_shared/tokens';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+
 import {
   dbValueToRegionKey,
   normalizeLabel,
@@ -38,6 +40,7 @@ const SHORT_LIST_LABELS: Record<string, string> = {
 };
 
 const CourseExploreLinks: React.FC<CourseExploreLinksProps> = ({ course }) => {
+  const { t } = useTranslation('courses');
   const navigate = useNavigate();
 
   const primaryRegionKey: PrimaryRegionKey =
@@ -64,7 +67,7 @@ const CourseExploreLinks: React.FC<CourseExploreLinksProps> = ({ course }) => {
 
   return (
     <div>
-      <SectionHeader role="section" kicker="KEEP EXPLORING" paddingX={16} />
+      <SectionHeader role="section" kicker={t('courseDetail.exploreLinks.kicker')} paddingX={16} />
       <div style={{ display: 'flex', gap: 12, padding: '9px 16px 0' }}>
         {subCountryLabel && (
           <button
@@ -98,7 +101,7 @@ const CourseExploreLinks: React.FC<CourseExploreLinksProps> = ({ course }) => {
                 {subCountryLabel}
               </div>
               <div style={{ fontSize: 11, fontWeight: 500, color: 'rgba(15,23,42,0.55)', marginTop: 2 }}>
-                More courses nearby
+                {t('courseDetail.exploreLinks.nearby')}
               </div>
             </div>
           </button>
@@ -131,10 +134,10 @@ const CourseExploreLinks: React.FC<CourseExploreLinksProps> = ({ course }) => {
           </div>
           <div>
             <div style={{ fontSize: 13, fontWeight: 700, color: INK, lineHeight: 1.25 }}>
-              {shortListLabel} Top 100
+              {t('courseDetail.exploreLinks.top100Suffix', { region: shortListLabel })}
             </div>
             <div style={{ fontSize: 11, fontWeight: 500, color: 'rgba(15,23,42,0.55)', marginTop: 2 }}>
-              Explore the full list
+              {t('courseDetail.exploreLinks.exploreList')}
             </div>
           </div>
         </button>
