@@ -1069,7 +1069,7 @@ export function CinematicHeroFullBleed({
           })}
 
           <Footer
-            leftText={`${fieldSize} in the field`}
+            leftText={t('overview.cinematic.inTheField', { count: fieldSize })}
             isLive
             noBorder
           />
