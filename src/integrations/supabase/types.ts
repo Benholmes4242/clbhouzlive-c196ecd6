@@ -19175,6 +19175,22 @@ export type Database = {
           width: number
         }[]
       }
+      get_wire_activity: {
+        Args: never
+        Returns: {
+          connection_id: string
+          course_image: string
+          course_name: string
+          feat_tone: string
+          feat_type: string
+          feat_value: string
+          friend_avatar: string
+          friend_name: string
+          friend_user_id: string
+          play_date: string
+          score_id: string
+        }[]
+      }
       gettransactionid: { Args: never; Returns: unknown }
       global_search_v2: {
         Args: {

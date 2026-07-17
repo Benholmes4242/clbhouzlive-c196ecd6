@@ -216,6 +216,16 @@ export default tseslint.config(
       "i18next/no-literal-string": ["error", i18nLiteralOptions],
       "no-restricted-syntax": ["error", literalAttrSyntax, ...toLocaleSyntax],
     },
+  },
+  // ─── Wave 3e.ii — schedule-v2 slice (Turn 1) ─────────────────────────
+  {
+    files: [
+      "src/features/tourhub/schedule-v2/**/*.{ts,tsx}",
+    ],
+    rules: {
+      "i18next/no-literal-string": ["error", i18nLiteralOptions],
+      "no-restricted-syntax": ["error", literalAttrSyntax, ...toLocaleSyntax],
+    },
   }
 );
 

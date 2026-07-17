@@ -11,6 +11,7 @@
  * Not registered yet — TS2 cutover.
  */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertCircle } from 'lucide-react';
@@ -36,6 +37,7 @@ import {
 
 
 export function ScheduleTab() {
+  const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
   const anchorRef = useRef<HTMLDivElement | null>(null);
   const chipsRef = useRef<HTMLDivElement | null>(null);
@@ -185,10 +187,10 @@ export function ScheduleTab() {
       <div className="flex flex-col items-center justify-center gap-4 py-24 px-6 text-center">
         <AlertCircle className="w-10 h-10 text-muted-foreground/50" />
         <h3 className="text-lg font-semibold text-foreground">
-          Couldn't load the schedule
+          {t('schedule.error.title')}
         </h3>
         <p className="text-sm text-muted-foreground max-w-[280px]">
-          Something went wrong. Please try again.
+          {t('schedule.error.body')}
         </p>
       </div>
     );
@@ -248,7 +250,7 @@ export function ScheduleTab() {
               textTransform: 'uppercase',
             }}
           >
-            THE SEASON
+            {t('schedule.eyebrow.season')}
           </span>
           <span
             style={{
@@ -282,8 +284,10 @@ export function ScheduleTab() {
                 fontVariantNumeric: 'tabular-nums',
               }}
             >
-              EVENT {timeline.currentEventNumber ?? '—'} OF{' '}
-              {timeline.totalEvents}
+              {t('schedule.progress.eventOf', {
+                current: timeline.currentEventNumber ?? '—',
+                total: timeline.totalEvents,
+              })}
             </span>
           </div>
           <div
@@ -393,7 +397,7 @@ export function ScheduleTab() {
               display: 'inline-block',
             }}
           />
-          This week
+          {t('schedule.floating.thisWeek')}
         </button>
       )}
 
