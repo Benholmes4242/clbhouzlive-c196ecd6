@@ -181,7 +181,11 @@
     "dotSeparator": "[~~·~~]",
     "backA11y": "[~~Ĝő ƀáĉǩ~~]",
     "resetViewA11y": "[~~Řéšéţ ɱáƥ ṽíéŵ~~]",
-    "filterStatusA11y": "[~~Ƒíļţéř ĉőúřšéš ƀý šţáţúš~~]"
+    "filterStatusA11y": "[~~Ƒíļţéř ĉőúřšéš ƀý šţáţúš~~]",
+    "yourRating": "⟦Ýóúr rátíñg: {{rating}}·••⟧",
+    "viewCourse": "⟦Víéw çóúršé·••⟧",
+    "markPlayed": "⟦Márk Pláýéd·••⟧",
+    "unavailableSafe": "⟦Máp úñáváíláblé — ýóúr jóúrñéý prógréšš íš štíll šáfé.·••⟧"
   },
   "userCourses": {
     "emptyRegion": "[~~Ñő ĉőúřšéš ƒőúñđ íñ ţĥé šéļéĉţéđ řéĝíőñ.~~]",
@@ -447,6 +451,51 @@
       "youvePlayed": "[~~Ýőú'ṽé ƥļáýéđ {{played}}/{{total}}~~]",
       "journeyLabel": "[~~Ýőúř Ţőƥ 100 Ĵőúřñéý~~]",
       "progressPlayed": "[~~{{played}} őƒ {{total}} ƥļáýéđ~~]"
+    }
+  },
+  "network": {
+    "emojiFlag": "⟦⛳·••⟧",
+    "viewCourseA11y": "⟦Víéw {{name}}·••⟧",
+    "badge": {
+      "playedByFriends_one": "⟦Pláýéd bý {{count}} fríéñd·••⟧",
+      "playedByFriends_other": "⟦Pláýéd bý {{count}} fríéñdš·••⟧",
+      "newForNetwork": "⟦Ñéw fór ýóúr ñétwórk·••⟧",
+      "topRated": "⟦Tóp rátéd·••⟧",
+      "trending": "⟦Tréñdíñg·••⟧"
+    },
+    "unseenReviewsTitle": "⟦🔔 Ñéw révíéw fróm ýóúr ñétwórk·••⟧",
+    "unseenReviewsBody": "⟦<name>{{name}}</name> révíéwéd <course>{{course}}</course> · <rating>{{rating}}</rating>·••⟧",
+    "unseenReviewsMore_one": "⟦ +{{count}} móré·••⟧",
+    "unseenReviewsMore_other": "⟦ +{{count}} móré·••⟧",
+    "viewArrow": "⟦Víéw →·••⟧"
+  },
+  "phase5": {
+    "statusToggle": {
+      "signInPrompt": "⟦Šígñ íñ tó tráçk thíš çóúršé·••⟧",
+      "signIn": "⟦Šígñ íñ·••⟧",
+      "playedTitle": "⟦Ýóú'vé pláýéd héré·••⟧",
+      "playedSub": "⟦Táp tó víéw ór édít ýóúr révíéw·••⟧",
+      "playedBadge": "⟦Pláýéd·••⟧",
+      "notPlayedTitle": "⟦Pláýéd héré?·••⟧",
+      "notPlayedSub": "⟦Ýóúr rátíñg hélpš gólférš wórldwídé·••⟧",
+      "rate": "⟦Ráté·••⟧",
+      "onBucketList": "⟦Óñ ýóúr búçkét líšt·••⟧",
+      "addBucketList": "⟦Ádd tó búçkét líšt·••⟧",
+      "removedFromBucket": "⟦Rémóvéd fróm búçkét líšt·••⟧",
+      "addedToBucket": "⟦Áddéd tó búçkét líšt·••⟧",
+      "mapHint": "⟦Évérý çóúršé ýóú márk béçóméš párt óf ýóúr jóúrñéý — víéw thém áñýtímé óñ ýóúr <mapLink>máp</mapLink>.·••⟧"
+    },
+    "personalReview": {
+      "title": "⟦Ýóúr Rátíñg·••⟧",
+      "playedOn": "⟦Pláýéd óñ {{date}}·••⟧",
+      "matchesConsensus": "⟦Mátçhéš çómmúñítý çóñšéñšúš·••⟧",
+      "aboveAvg": "⟦{{diff}} ábóvé çómmúñítý ávg·••⟧",
+      "belowAvg": "⟦{{diff}} bélów çómmúñítý ávg·••⟧"
+    },
+    "planning": {
+      "title": "⟦Pláññíñg·••⟧",
+      "addBucketList": "⟦Ádd tó búçkét líšt·••⟧",
+      "privateNote": "⟦Óñlý ýóú çáñ šéé ýóúr búçkét líšt.·••⟧"
     }
   }
 }
