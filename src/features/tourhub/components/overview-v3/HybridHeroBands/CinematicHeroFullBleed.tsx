@@ -1010,10 +1010,10 @@ export function CinematicHeroFullBleed({
             }
             // tie row — stacked avatars
             const label = awaitingPlayoff && row.isLeader
-              ? `${row.count} in playoff`
+              ? t('overview.cinematic.inPlayoffCount', { count: row.count })
               : row.isLeader
-                ? `${row.count} tied for the lead`
-                : `${row.count} players`;
+                ? t('overview.cinematic.tiedForLead', { count: row.count })
+                : t('overview.cinematic.playersTiedCount', { count: row.count });
             const tieScoreNum = scoreStringToNumber(row.score);
             return (
               <div key={`tie-${i}`} style={rowStyle}>
