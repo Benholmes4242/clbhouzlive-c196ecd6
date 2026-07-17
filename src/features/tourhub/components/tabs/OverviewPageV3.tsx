@@ -6,6 +6,7 @@
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { ComingUpSlot } from '../overview-v3/ComingUpSlot';
 import { CollegeFranchise } from '../../overview/sections/CollegeFranchise';
 import { ConnectHandicapTile } from '../../overview/sections/ConnectHandicapTile';
@@ -22,6 +23,7 @@ import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { WifiOff } from 'lucide-react';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { SPACE } from '@/lib/spacing';
+
 
 
 export function OverviewPageV3() {
