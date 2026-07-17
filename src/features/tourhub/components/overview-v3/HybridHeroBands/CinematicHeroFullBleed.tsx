@@ -309,6 +309,7 @@ export function CinematicHeroFullBleed({
   isPseudoMajor,
   showMajorTag,
 }: CinematicHeroFullBleedProps) {
+  const { t } = useTranslation('tourhub');
   const isLive = state.kind === 'live';
   const isResults = state.kind === 'results';
   const isUpcoming = state.kind === 'upcoming';
@@ -331,20 +332,22 @@ export function CinematicHeroFullBleed({
   let eyebrowGold = false;
   let eyebrowText = '';
   // Pseudo-major slides never render a tour name (e.g. "DP WORLD TOUR").
-  const tourSuffix = tourLabel && !isPseudoMajor ? ` · ${tourLabel.toUpperCase()}` : '';
+  const tourSuffix = tourLabel && !isPseudoMajor
+    ? t('overview.cinematic.eyebrowSuffix', { tour: tourLabel.toUpperCase() })
+    : '';
   if (isLive) {
     // Live state: tour name only, no "LIVE", round label, or major tag.
     eyebrowText = tourLabel ? tourLabel.toUpperCase() : '';
   } else if (awaitingPlayoff) {
-    eyebrowText = `PLAYOFF${tourSuffix}`;
+    eyebrowText = `${t('overview.cinematic.eyebrowPlayoff')}${tourSuffix}`;
     eyebrowGold = true;
   } else if (isResults) {
-    eyebrowText = `🏆 FINAL${tourSuffix}`;
+    eyebrowText = `${t('overview.cinematic.eyebrowFinal')}${tourSuffix}`;
     eyebrowGold = true;
   } else if (isUpcoming) {
     eyebrowText = isPseudoMajor
-      ? `UPCOMING · MAJOR CHAMPIONSHIP`
-      : `UPCOMING${tourSuffix}`;
+      ? t('overview.cinematic.eyebrowUpcomingMajor')
+      : `${t('overview.cinematic.eyebrowUpcoming')}${tourSuffix}`;
     if (isPseudoMajor) eyebrowGold = true;
   }
 
