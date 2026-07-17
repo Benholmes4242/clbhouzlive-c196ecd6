@@ -25,6 +25,7 @@
  */
 
 import { useMemo } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useCollegeSeasonStats, type CollegeSeasonStats } from '../../hooks/useCollegeStats';
 import { useCollegeMediaMap, type CollegeMedia } from '../../hooks/useCollegeMedia';
