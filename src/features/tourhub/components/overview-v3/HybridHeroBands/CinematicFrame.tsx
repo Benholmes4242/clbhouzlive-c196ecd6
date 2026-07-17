@@ -775,14 +775,16 @@ export function CinematicFrame({
   const hasCapsule = isUpcoming ? upcomingCapsule !== null : true;
   const capsuleFooter = isUpcoming
     ? upcomingFooter
-    : `Full leaderboard${fieldSize > 0 ? ` · ${fieldSize} players` : ''}`;
+    : fieldSize > 0
+      ? t('overview.cinematic.fullLeaderboardWithField', { count: fieldSize })
+      : t('overview.cinematic.fullLeaderboard');
 
   // ---- GlassPills (floating over photo, under venue) ------------------------
   const GlassPills = () => {
     const pills = [
-      { label: 'PURSE', value: purse != null ? (formatPurse(purse) || '—') : '—' },
-      { label: 'PAR', value: venuePar != null ? String(venuePar) : '—' },
-      { label: 'YDS', value: venueYardage != null ? formatNumber(venueYardage) : '—' },
+      { label: t('overview.cinematic.colPurse'), value: purse != null ? (formatPurse(purse) || '—') : '—' },
+      { label: t('overview.courseStats.parLabel'), value: venuePar != null ? String(venuePar) : '—' },
+      { label: t('overview.cinematic.colYards'), value: venueYardage != null ? formatNumber(venueYardage) : '—' },
     ];
     return (
       <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', marginTop: 6 }}>
