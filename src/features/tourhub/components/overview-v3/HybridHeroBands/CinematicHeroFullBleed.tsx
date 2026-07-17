@@ -826,7 +826,7 @@ export function CinematicHeroFullBleed({
             );
           })}
           <Footer
-            leftText="Final results"
+            leftText={t('overview.cinematic.finalResults')}
             isLive={false}
           />
         </button>
