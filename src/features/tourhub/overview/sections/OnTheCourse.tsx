@@ -8,8 +8,10 @@
  * Expanded (tap end-cap): fetches full round-1 tee times via useTeeTimesAll
  * (lazy, enabled only after tap; cached by react-query). The rail continues
  * with a FULL FIELD divider then every remaining group in chronological
- * order, deduped against featured. TeeGroup has no live scores so score
- * columns show an em-dash placeholder — no invented leaderboard join.
+ * order, deduped against featured. Full-field score columns are joined on
+ * sr_players.id to the tournament leaderboard (useTourLeaderboard, shared
+ * via react-query with the hero — no extra network); missing = em-dash
+ * (WDs, pre-tee players with no card yet, or leaderboard fetch failure).
  *
  * Collapse via the "Back to featured" end tile. Expansion resets automatically
  * when tournamentId changes (the hero swiped to a new tournament).
@@ -20,6 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useFeaturedGroups } from '../data/useFeaturedGroups';
 import { useTeeTimesAll, type TeeGroup } from '@/features/tourhub/tournament-v2/data/useTeeTimesAll';
+import { useTourLeaderboard } from '../../hooks/useTourHubData';
 import { SectionShell } from './SectionShell';
 import { V4 } from '../tokens';
 import { getScoreColor } from '../../_shared/scoreColor';
@@ -140,6 +143,24 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
   // Lazy full-field fetch — enabled only once expanded. React-query caches.
   const teeTimesQuery = useTeeTimesAll(tournamentId, round, { enabled: expanded });
   const teeGroups = teeTimesQuery.data ?? [];
+
+  // Reuse the hero's leaderboard query (react-query dedupes by key). Only
+  // consumed by the expanded full-field rail — no extra network fires.
+  const leaderboardQuery = useTourLeaderboard(tournamentId ?? '');
+  const leaderboardByPlayerId = useMemo(() => {
+    const m = new Map<string, { today: number | null; score: number | null; status: string | null; thru: number | null }>();
+    for (const row of (leaderboardQuery.data ?? []) as any[]) {
+      const pid = row?.player_id as string | null | undefined;
+      if (!pid) continue;
+      m.set(pid, {
+        today: row?.today ?? null,
+        score: row?.score ?? null,
+        status: (row?.status ?? null) as string | null,
+        thru: row?.thru ?? null,
+      });
+    }
+    return m;
+  }, [leaderboardQuery.data]);
 
   const groups = parseGroups(data);
 
@@ -390,40 +411,50 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                       {time ? t('overview.onTheCourse.teeTimeLabel', { time }) : ''}
                       {g.startingHole ? t('overview.onTheCourse.holeLabelSep', { hole: g.startingHole }) : ''}
                     </div>
-                    {g.players.slice(0, 3).map((p, pi) => (
-                      <button
-                        key={pi}
-                        type="button"
-                        onClick={() => { if (p.id) navigate(`/tourhub/player/${p.id}`); }}
-                        disabled={!p.id}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 9,
-                          padding: '6px 0',
-                          minHeight: 40,
-                          width: '100%',
-                          background: 'transparent',
-                          border: 'none',
-                          borderTop: pi === 0 ? 'none' : `0.5px solid ${V4.hairline}`,
-                          textAlign: 'left',
-                          cursor: p.id ? 'pointer' : 'default',
-                        }}
-                      >
-                        <PlayerAvatar
-                          playerId={p.id ?? p.name}
-                          playerName={p.name}
-                          tourCode={tourCode}
-                          photoUrl={p.photoUrl ?? null}
-                          size="xs"
-                          ringColor={LIGHT_HAIRLINE}
-                        />
-                        <div style={{ flex: 1, minWidth: 0, fontSize: 12, fontWeight: 700, color: V4.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {p.name}
-                        </div>
-                        <span style={{ fontSize: 12.5, fontWeight: 800, color: V4.inkFaint, fontVariantNumeric: 'tabular-nums' }}>—</span>
-                      </button>
-                    ))}
+                    {g.players.slice(0, 3).map((p, pi) => {
+                      const lb = p.id ? leaderboardByPlayerId.get(p.id) : undefined;
+                      const status = (lb?.status || '').toUpperCase();
+                      const isCut = status === 'CUT' || status === 'WD' || status === 'DQ';
+                      const display = formatScore(lb?.today) ?? formatScore(lb?.score) ?? '—';
+                      return (
+                        <button
+                          key={pi}
+                          type="button"
+                          onClick={() => { if (p.id) navigate(`/tourhub/player/${p.id}`); }}
+                          disabled={!p.id}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 9,
+                            padding: '6px 0',
+                            minHeight: 40,
+                            width: '100%',
+                            background: 'transparent',
+                            border: 'none',
+                            borderTop: pi === 0 ? 'none' : `0.5px solid ${V4.hairline}`,
+                            textAlign: 'left',
+                            cursor: p.id ? 'pointer' : 'default',
+                          }}
+                        >
+                          <PlayerAvatar
+                            playerId={p.id ?? p.name}
+                            playerName={p.name}
+                            tourCode={tourCode}
+                            photoUrl={p.photoUrl ?? null}
+                            size="xs"
+                            ringColor={LIGHT_HAIRLINE}
+                          />
+                          <div style={{ flex: 1, minWidth: 0, fontSize: 12, fontWeight: 700, color: V4.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {p.name}
+                          </div>
+                          {isCut ? (
+                            <span style={{ fontSize: 9.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em' }}>{status}</span>
+                          ) : (
+                            <span style={{ fontSize: 12.5, fontWeight: 800, color: display === '—' ? V4.inkFaint : scoreColor(display), fontVariantNumeric: 'tabular-nums' }}>{display}</span>
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
                 );
               })}
