@@ -179,210 +179,210 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
   };
 
   if (variant === 'strip') {
+    const hemi = useViewerHemisphere();
+    const now = new Date();
+    const { quarter } = quarterOf(now);
+    const seasonLabel = seasonName(quarter, hemi);
+    const daysRemaining = daysLeft(now);
+    const initials = (displayName || 'G')
+      .split(/\s+/)
+      .map((s) => s[0])
+      .filter(Boolean)
+      .slice(0, 2)
+      .join('')
+      .toUpperCase();
+
     return (
-      <div style={{ padding: '12px 16px 0' }}>
-        <button
-          type="button"
-          onClick={onOpen}
-          className="w-full text-left active:scale-[0.995] transition-transform"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 14,
-            padding: '10px 14px',
-            borderRadius: 16,
-            background: '#FFFFFF',
-            border: `0.5px solid ${HAIRLINE}`,
-            boxShadow: '0 1px 3px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.05)',
-            color: INK,
-            cursor: 'pointer',
-            fontFamily: FONT,
-            width: '100%',
-          }}
-        >
-          {/* Left: medal count over MEDALS microlabel */}
-          <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 36 }}>
-            <div
+      <button
+        type="button"
+        onClick={onOpen}
+        className="w-full text-left active:opacity-90 transition-opacity"
+        style={{
+          display: 'block',
+          width: '100%',
+          padding: '9px 14px',
+          borderTop: `0.5px solid ${HAIRLINE}`,
+          borderBottom: `0.5px solid ${HAIRLINE}`,
+          background: 'transparent',
+          color: INK,
+          cursor: 'pointer',
+          fontFamily: FONT,
+        }}
+      >
+        {/* Line 1 */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 9, minWidth: 0 }}>
+          <div style={{ flexShrink: 0 }}>
+            <SquircleAvatar
+              size={26}
+              src={profile?.avatar_url ?? null}
+              alt={displayName}
+              fallback={initials}
+              hairlineRing
+            />
+          </div>
+
+          {/* Medals value + label */}
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, flexShrink: 0 }}>
+            <span
               className="tabular-nums"
-              style={{
-                fontSize: 26,
-                fontWeight: 800,
-                letterSpacing: '-0.02em',
-                color: INK,
-                lineHeight: 1,
-              }}
+              style={{ fontSize: 12.5, fontWeight: 700, color: INK, lineHeight: 1 }}
             >
               {medals}
-            </div>
-            <div
+            </span>
+            <span
               style={{
-                marginTop: 3,
-                fontSize: 9,
+                fontSize: 8.5,
                 fontWeight: 600,
                 letterSpacing: '0.06em',
                 textTransform: 'uppercase',
-                color: 'rgba(15,23,42,0.45)',
+                color: 'rgba(15,23,42,0.40)',
               }}
             >
               Medals
-            </div>
+            </span>
           </div>
 
-          {/* Vertical hairline divider */}
-          <div
-            aria-hidden
-            style={{
-              width: 1,
-              alignSelf: 'stretch',
-              background: HAIRLINE,
-              flexShrink: 0,
-            }}
-          />
-
-          {/* Right: two-line block */}
-          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {/* Line 1: name · HCP value */}
-            <div
+          {/* Tier dot + label */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0 }}>
+            <span
+              aria-hidden
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                minWidth: 0,
+                width: 6,
+                height: 6,
+                borderRadius: 999,
+                background: tierHex,
+                flexShrink: 0,
+              }}
+            />
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 600,
+                color: INK,
+                whiteSpace: 'nowrap',
               }}
             >
-              <div
-                style={{
-                  fontSize: 13,
-                  fontWeight: 600,
-                  letterSpacing: '-0.01em',
-                  color: INK,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  minWidth: 0,
-                  flex: 1,
-                }}
-              >
-                {displayName}
-              </div>
-              {hasHcp && (
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'baseline',
-                    gap: 4,
-                    flexShrink: 0,
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: 9,
-                      fontWeight: 600,
-                      letterSpacing: '0.06em',
-                      textTransform: 'uppercase',
-                      color: 'rgba(15,23,42,0.45)',
-                    }}
-                  >
-                    HCP
-                  </span>
-                  <span
-                    className="tabular-nums"
-                    style={{
-                      fontSize: 13,
-                      fontWeight: 700,
-                      color: INK,
-                    }}
-                  >
-                    {formatHcp(hcp)}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* Line 2: gem pill + progress bar + medalsToNext */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-              <div
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 5,
-                  flexShrink: 0,
-                  border: '0.5px solid rgba(15,23,42,0.12)',
-                  borderRadius: 999,
-                  padding: '3px 8px 3px 6px',
-                }}
-              >
-                <span
-                  style={{
-                    width: 7,
-                    height: 7,
-                    borderRadius: 999,
-                    background: tierHex,
-                    boxShadow: `0 0 5px ${tierHex}66`,
-                    flexShrink: 0,
-                  }}
-                />
-                <span
-                  style={{
-                    fontSize: 10.5,
-                    fontWeight: 600,
-                    color: INK,
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {tierName} {currentLevel.level}
-                </span>
-              </div>
-
-              <div
-                style={{
-                  flex: 1,
-                  height: 3,
-                  borderRadius: 999,
-                  background: 'rgba(15,23,42,0.08)',
-                  overflow: 'hidden',
-                  minWidth: 24,
-                }}
-              >
-                <div
-                  style={{
-                    width: `${Math.max(8, barPct)}%`,
-                    height: '100%',
-                    background: AMBER,
-                    borderRadius: 999,
-                  }}
-                />
-              </div>
-
-              <div
-                style={{
-                  fontSize: 11,
-                  fontWeight: 500,
-                  color: 'rgba(15,23,42,0.55)',
-                  whiteSpace: 'nowrap',
-                  flexShrink: 0,
-                }}
-              >
-                {nextLevel ? (
-                  <>
-                    <span
-                      style={{ color: INK, fontWeight: 700 }}
-                      className="tabular-nums"
-                    >
-                      {medalsToNext}
-                    </span>{' '}
-                    to {nextLevel.label}
-                  </>
-                ) : (
-                  'Max level'
-                )}
-              </div>
-            </div>
+              {tierName} {currentLevel.level}
+            </span>
           </div>
-        </button>
-      </div>
+
+          {/* Progress bar */}
+          <div
+            style={{
+              flex: 1,
+              height: 3,
+              borderRadius: 999,
+              background: 'rgba(15,23,42,0.08)',
+              overflow: 'hidden',
+              minWidth: 16,
+            }}
+          >
+            <div
+              style={{
+                width: `${Math.max(8, barPct)}%`,
+                height: '100%',
+                background: AMBER,
+                borderRadius: 999,
+              }}
+            />
+          </div>
+
+          {/* To-next */}
+          <div
+            style={{
+              fontSize: 10.5,
+              fontWeight: 500,
+              color: 'rgba(15,23,42,0.55)',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              flexShrink: 0,
+              minWidth: 0,
+              maxWidth: '38%',
+            }}
+          >
+            {nextLevel ? (
+              <>
+                <span
+                  className="tabular-nums"
+                  style={{ color: INK, fontWeight: 700 }}
+                >
+                  {medalsToNext}
+                </span>{' '}
+                to {nextLevel.label}
+              </>
+            ) : (
+              'Max level'
+            )}
+          </div>
+
+          {/* HCP pinned right */}
+          {hasHcp && (
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, flexShrink: 0 }}>
+              <span
+                style={{
+                  fontSize: 8.5,
+                  fontWeight: 600,
+                  letterSpacing: '0.06em',
+                  textTransform: 'uppercase',
+                  color: 'rgba(15,23,42,0.40)',
+                }}
+              >
+                HCP
+              </span>
+              <span
+                className="tabular-nums"
+                style={{ fontSize: 12, fontWeight: 700, color: INK }}
+              >
+                {formatHcp(hcp)}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Line 2 */}
+        <div
+          style={{
+            marginTop: 6,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 8,
+          }}
+        >
+          <span
+            style={{
+              fontSize: 9.5,
+              fontWeight: 600,
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+              color: AMBER,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              minWidth: 0,
+            }}
+          >
+            {seasonLabel} Season · Official WHS
+          </span>
+          <span
+            style={{
+              fontSize: 9.5,
+              fontWeight: 600,
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+              color: 'rgba(15,23,42,0.45)',
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
+            }}
+          >
+            {daysRemaining} Days Left
+          </span>
+        </div>
+      </button>
     );
   }
+
 
 
 
