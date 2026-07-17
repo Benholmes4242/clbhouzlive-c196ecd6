@@ -73,10 +73,8 @@ export function useInvites() {
 
   const create = useMutation({
     mutationFn: async ({ invitedUserId, role }: { invitedUserId: string; role: string }) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-      const { data, error } = await supabase.functions.invoke('send-admin-invite', {
-        body: { invitedUserId, invitedByUserId: user.id, role },
+      const { data, error } = await supabase.functions.invoke('admin-invite-manage', {
+        body: { action: 'create_invite', invited_user_id: invitedUserId, role },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
@@ -88,29 +86,28 @@ export function useInvites() {
 
   const cancel = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('admin_invitations')
-        .update({ status: 'cancelled', updated_at: new Date().toISOString() })
-        .eq('id', id);
+      const { data, error } = await supabase.functions.invoke('admin-invite-manage', {
+        body: { action: 'revoke_invite', id },
+      });
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
     },
     onSuccess: () => { toast.success('Invite cancelled'); invalidate(); },
-    onError: () => toast.error('Failed to cancel invite'),
+    onError: (e: Error) => toast.error(e.message || 'Failed to cancel invite'),
   });
 
   const resend = useMutation({
     mutationFn: async (id: string) => {
-      const exp = new Date();
-      exp.setDate(exp.getDate() + 7);
-      const { error } = await supabase
-        .from('admin_invitations')
-        .update({ expires_at: exp.toISOString(), updated_at: new Date().toISOString() })
-        .eq('id', id);
+      const { data, error } = await supabase.functions.invoke('admin-invite-manage', {
+        body: { action: 'resend_invite', id },
+      });
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
     },
     onSuccess: () => { toast.success('Invite extended +7 days'); invalidate(); },
-    onError: () => toast.error('Failed to resend invite'),
+    onError: (e: Error) => toast.error(e.message || 'Failed to resend invite'),
   });
+
 
   const revokeBulk = useMutation({
     mutationFn: (ids: string[]) => revokeBulkInvites(ids),
