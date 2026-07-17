@@ -266,7 +266,7 @@ export function PlayersTab() {
               />
               <button
                 type="button"
-                aria-label="Clear search"
+                aria-label={t('players.search.closeAria')}
                 onClick={() => {
                   setSearch('');
                   setSearchExpanded(false);
