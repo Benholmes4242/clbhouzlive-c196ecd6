@@ -2,6 +2,7 @@
  * CourseMoments - User's own media/content at this course
  */
 import React, { useMemo, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Play } from 'lucide-react';
 import { useUserCourseMoments } from '@/hooks/useUserCourseMoments';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -20,6 +21,7 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
   courseId,
   courseName,
 }) => {
+  const { t } = useTranslation('courses');
   const { data: moments, isLoading } = useUserCourseMoments(courseId);
   const { user } = useSupabaseSession();
   const { profile } = useProfileData();
@@ -122,7 +124,7 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
               <>
                 <img
                   src={moment.posterUrl || moment.mediaUrl}
-                  alt="Video moment"
+                  alt={t('phase5.videoMomentAlt')}
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   loading="lazy"
                 />
@@ -139,7 +141,7 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
             ) : (
               <img
                 src={moment.mediaUrl}
-                alt="Course moment"
+                alt={t('phase5.courseMomentAlt')}
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 loading="lazy"
               />

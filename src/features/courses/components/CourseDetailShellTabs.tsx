@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { INK, INK_MUTE } from '@/features/courses/_shared/tokens';
 
 
@@ -6,15 +7,15 @@ type CourseDetailTab = 'about' | 'reviews' | 'media' | 'holes' | 'legends';
 
 interface TabDef {
   id: CourseDetailTab;
-  label: string;
+  labelKey: string;
 }
 
 const TABS: TabDef[] = [
-  { id: 'about', label: 'About' },
-  { id: 'reviews', label: 'Reviews' },
-  { id: 'media', label: 'Media' },
-  { id: 'holes', label: 'Holes' },
-  { id: 'legends', label: 'Champions' },
+  { id: 'about',   labelKey: 'courseDetail.tabs.about' },
+  { id: 'reviews', labelKey: 'courseDetail.tabs.reviews' },
+  { id: 'media',   labelKey: 'courseDetail.tabs.media' },
+  { id: 'holes',   labelKey: 'courseDetail.tabs.holes' },
+  { id: 'legends', labelKey: 'courseDetail.tabs.legends' },
 ];
 
 interface CourseDetailShellTabsProps {
@@ -33,6 +34,7 @@ export const CourseDetailShellTabs: React.FC<CourseDetailShellTabsProps> = ({
   activeTab,
   onTabChange,
 }) => {
+  const { t } = useTranslation('courses');
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const [overflowing, setOverflowing] = useState(false);
 
@@ -53,7 +55,7 @@ export const CourseDetailShellTabs: React.FC<CourseDetailShellTabsProps> = ({
         ref={scrollerRef}
         data-course-detail-tabs
         role="tablist"
-        aria-label="Course Detail Sections"
+        aria-label={t('courseDetail.a11y.sections')}
         style={{
           display: 'flex',
           justifyContent: overflowing ? 'flex-start' : 'space-evenly',
@@ -98,7 +100,7 @@ export const CourseDetailShellTabs: React.FC<CourseDetailShellTabsProps> = ({
               }}
             >
               <span style={{ position: 'relative', display: 'inline-block' }}>
-                {tab.label}
+                {t(tab.labelKey)}
                 {isActive ? (
                   <span
                     aria-hidden

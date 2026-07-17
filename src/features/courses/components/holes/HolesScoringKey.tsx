@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   FONT,
   INK,
@@ -14,16 +15,17 @@ import {
 // Gold disc = ace / albatross / eagle. Red disc = birdie. Small gray dot = par.
 // Blue square = bogey. Navy square = double-plus.
 type KeyShape = 'circle' | 'square' | 'dot';
-interface KeyItem { label: string; color: string; shape: KeyShape; ink?: string; }
+type KeyId = 'ace' | 'albatross' | 'eagle' | 'birdie' | 'par' | 'bogey' | 'doublePlus';
+interface KeyItem { id: KeyId; labelKey: string; color: string; shape: KeyShape; ink?: string; }
 
 const KEY: KeyItem[] = [
-  { label: 'Ace',       color: SC_FILL_GOLD,   shape: 'circle', ink: INK },
-  { label: 'Albatross', color: SC_FILL_GOLD,   shape: 'circle', ink: INK },
-  { label: 'Eagle',     color: SC_FILL_GOLD,   shape: 'circle', ink: INK },
-  { label: 'Birdie',    color: SC_FILL_BIRDIE, shape: 'circle' },
-  { label: 'Par',       color: SC_PAR,         shape: 'dot' },
-  { label: 'Bogey',     color: SC_FILL_BOGEY,  shape: 'square' },
-  { label: 'Dbl+',      color: SC_FILL_DOUBLE, shape: 'square' },
+  { id: 'ace',        labelKey: 'courses:holes.scoringKey.ace',        color: SC_FILL_GOLD,   shape: 'circle', ink: INK },
+  { id: 'albatross',  labelKey: 'courses:holes.scoringKey.albatross',  color: SC_FILL_GOLD,   shape: 'circle', ink: INK },
+  { id: 'eagle',      labelKey: 'courses:holes.scoringKey.eagle',      color: SC_FILL_GOLD,   shape: 'circle', ink: INK },
+  { id: 'birdie',     labelKey: 'courses:holes.scoringKey.birdie',     color: SC_FILL_BIRDIE, shape: 'circle' },
+  { id: 'par',        labelKey: 'courses:holes.par',                   color: SC_PAR,         shape: 'dot' },
+  { id: 'bogey',      labelKey: 'courses:holes.scoringKey.bogey',      color: SC_FILL_BOGEY,  shape: 'square' },
+  { id: 'doublePlus', labelKey: 'courses:holes.scoringKey.doublePlus', color: SC_FILL_DOUBLE, shape: 'square' },
 ];
 
 const Swatch: React.FC<{ item: KeyItem }> = ({ item }) => {
@@ -59,42 +61,46 @@ const Swatch: React.FC<{ item: KeyItem }> = ({ item }) => {
   );
 };
 
-export const HolesScoringKey: React.FC = () => (
-  <div
-    style={{
-      padding: '22px 18px 28px',
-      borderTop: '1px solid rgba(15,23,42,0.06)',
-      fontFamily: FONT,
-    }}
-  >
+export const HolesScoringKey: React.FC = () => {
+  const { t } = useTranslation(['courses']);
+  return (
     <div
       style={{
-        fontSize: 10,
-        fontWeight: 800,
-        letterSpacing: '0.16em',
-        textTransform: 'uppercase',
-        color: SC_ACCENT,
-        marginBottom: 12,
+        padding: '22px 18px 28px',
+        borderTop: '1px solid rgba(15,23,42,0.06)',
+        fontFamily: FONT,
       }}
     >
-      Scoring key
+      <div
+        style={{
+          fontSize: 10,
+          fontWeight: 800,
+          letterSpacing: '0.16em',
+          textTransform: 'uppercase',
+          color: SC_ACCENT,
+          marginBottom: 12,
+        }}
+      >
+        {t('courses:holes.scoringKey.title')}
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 16,
+          rowGap: 10,
+        }}
+      >
+        {KEY.map((it) => (
+          <div key={it.id} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+            <Swatch item={it} />
+            <span style={{ fontSize: 12, fontWeight: 600, color: INK }}>{t(it.labelKey)}</span>
+          </div>
+        ))}
+      </div>
     </div>
-    <div
-      style={{
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: 16,
-        rowGap: 10,
-      }}
-    >
-      {KEY.map((it) => (
-        <div key={it.label} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-          <Swatch item={it} />
-          <span style={{ fontSize: 12, fontWeight: 600, color: INK }}>{it.label}</span>
-        </div>
-      ))}
-    </div>
-  </div>
-);
+  );
+};
 
 export default HolesScoringKey;
+

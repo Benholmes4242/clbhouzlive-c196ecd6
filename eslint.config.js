@@ -178,23 +178,24 @@ export default tseslint.config(
       "no-restricted-syntax": ["error", literalAttrSyntax, ...toLocaleSyntax],
     },
   },
-  // ─── Wave 3d.i — scope-dir ERROR flip for course-media-tab + _shared
+  // ─── Wave 3d — courses vertical parent gate ─────────────────────────
+  // Consolidates the per-subdir ERROR blocks from 3d.i / 3d.ii / 3d.iii
+  // slices 1-5 into two parent gates. New subdirs under either parent
+  // are born gated. course-media-tab keeps its own block (separate
+  // top-level path).
   {
     files: [
       "src/components/course-media-tab/**/*.{ts,tsx}",
-      "src/features/courses/_shared/**/*.{ts,tsx}",
     ],
     rules: {
       "i18next/no-literal-string": ["error", i18nLiteralOptions],
       "no-restricted-syntax": ["error", literalAttrSyntax, ...toLocaleSyntax],
     },
   },
-  // ─── Wave 3d.ii — scope-dir ERROR flip for courses top-level + review + user
   {
     files: [
-      "src/components/courses/*.{ts,tsx}",
-      "src/components/courses/review/**/*.{ts,tsx}",
-      "src/components/courses/user/**/*.{ts,tsx}",
+      "src/components/courses/**/*.{ts,tsx}",
+      "src/features/courses/**/*.{ts,tsx}",
     ],
     rules: {
       "i18next/no-literal-string": ["error", i18nLiteralOptions],

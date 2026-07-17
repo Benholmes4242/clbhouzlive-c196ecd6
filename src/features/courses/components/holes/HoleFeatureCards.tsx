@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import { TOPAR_OVER_LIGHT, TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
 import { FONT, INK, MONO, SC_BIRDIE, SC_DOUBLE } from './_constants';
@@ -73,6 +74,7 @@ const Card: React.FC<{
   hole: CourseHole;
   maxAbs: number;
 }> = ({ tone, label, hole, maxAbs }) => {
+  const { t } = useTranslation(['courses']);
   const tint = tone === 'hard' ? 'rgba(29,93,191,0.05)' : 'rgba(210,34,45,0.05)';
   const border = tone === 'hard' ? 'rgba(29,93,191,0.18)' : 'rgba(210,34,45,0.18)';
   const eyebrow = tone === 'hard' ? SC_DOUBLE : SC_BIRDIE;
@@ -125,7 +127,7 @@ const Card: React.FC<{
             fontVariantNumeric: 'tabular-nums',
           }}
         >
-          Plays to {playsTo}
+          {t('courses:holes.playsToInline', { playsTo })}
         </div>
       </div>
       <div
@@ -140,8 +142,9 @@ const Card: React.FC<{
           fontVariantNumeric: 'tabular-nums',
         }}
       >
-        Par {hole.par}
-        {hole.stroke_index != null ? ` \u00B7 SI ${hole.stroke_index}` : ''}
+        {hole.stroke_index != null
+          ? t('courses:holes.parAndSi', { par: hole.par, si: hole.stroke_index })
+          : t('courses:holes.parLabel', { par: hole.par })}
       </div>
       <MiniDifficultyBar avg={hole.avg_to_par} maxAbs={maxAbs} />
     </div>
@@ -149,6 +152,7 @@ const Card: React.FC<{
 };
 
 export const HoleFeatureCards: React.FC<Props> = ({ hardest, easiest }) => {
+  const { t } = useTranslation(['courses']);
   const maxAbs = Math.max(
     0.01,
     Math.abs(hardest.avg_to_par),
@@ -162,8 +166,8 @@ export const HoleFeatureCards: React.FC<Props> = ({ hardest, easiest }) => {
         gap: 12,
       }}
     >
-      <Card tone="hard" label="Hardest" hole={hardest} maxAbs={maxAbs} />
-      <Card tone="easy" label="Easiest" hole={easiest} maxAbs={maxAbs} />
+      <Card tone="hard" label={t('courses:holes.hardestTitle')} hole={hardest} maxAbs={maxAbs} />
+      <Card tone="easy" label={t('courses:holes.easiestTitle')} hole={easiest} maxAbs={maxAbs} />
     </div>
   );
 };

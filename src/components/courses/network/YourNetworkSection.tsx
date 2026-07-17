@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNetworkActivity } from '@/hooks/useNetworkActivity';
@@ -20,6 +21,7 @@ interface YourNetworkSectionProps {
  * Renders nothing when the user has no friends or no network-played highlights.
  */
 export const YourNetworkSection: React.FC<YourNetworkSectionProps> = ({ className }) => {
+  const { t } = useTranslation('courses');
   const { user } = useSupabaseSession();
   const { data, isLoading } = useNetworkActivity(user?.id);
 
@@ -36,8 +38,8 @@ export const YourNetworkSection: React.FC<YourNetworkSectionProps> = ({ classNam
     >
       <SectionHeader
         role="section"
-        kicker="YOUR CIRCLE"
-        title="Courses played by friends"
+        kicker={t('network.circleKicker')}
+        title={t('network.friendsPlayedTitle')}
         paddingX={16}
         className="mb-2"
         cutLine={false}
