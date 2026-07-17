@@ -387,8 +387,8 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                     } as React.CSSProperties}
                   >
                     <div style={{ fontSize: 9.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>
-                      {time ? `TEE ${time}` : ''}
-                      {g.startingHole ? ` · HOLE ${g.startingHole}` : ''}
+                      {time ? t('overview.onTheCourse.teeTimeLabel', { time }) : ''}
+                      {g.startingHole ? t('overview.onTheCourse.holeLabelSep', { hole: g.startingHole }) : ''}
                     </div>
                     {g.players.slice(0, 3).map((p, pi) => (
                       <button
