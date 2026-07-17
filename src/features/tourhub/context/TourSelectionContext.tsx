@@ -112,6 +112,11 @@ export function TourSelectionProvider({ children }: { children: ReactNode }) {
     setViewingTournamentIdState((prev) => (prev === id ? prev : id));
   }, []);
 
+  const setViewingIsLive = useCallback((isLive: boolean) => {
+    setViewingIsLiveState((prev) => (prev === isLive ? prev : isLive));
+  }, []);
+
+
   return (
     <TourSelectionContext.Provider
       value={{
