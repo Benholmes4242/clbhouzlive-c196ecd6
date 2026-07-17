@@ -108,8 +108,6 @@ verify_jwt = false
 [functions.backfill-video-metadata]
 verify_jwt = false
 
-[functions.auth-email-exists]
-verify_jwt = false
 
 [functions.sportradar-sync]
 verify_jwt = false
@@ -147,8 +145,6 @@ verify_jwt = false
 [functions.tournament-live-sync]
 verify_jwt = false
 
-[functions.sync-golf-headshots]
-verify_jwt = false
 
 [functions.image-proxy]
 verify_jwt = false
