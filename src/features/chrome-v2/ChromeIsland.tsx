@@ -190,7 +190,7 @@ const LeftCapsule: React.FC<{
 const HcpCell: React.FC<{ tone: ChromeTone }> = ({ tone }) => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
-  const { activeActor, isLoading } = useActiveActor();
+  const { activeActor } = useActiveActor();
   const isBusinessActor = activeActor?.type === 'business';
 
   const { data: connection, isLoading: whsLoading } = useWhsConnection(user?.id);
