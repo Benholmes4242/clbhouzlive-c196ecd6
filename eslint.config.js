@@ -242,11 +242,12 @@ export default tseslint.config(
       "no-restricted-syntax": ["error", literalAttrSyntax, ...toLocaleSyntax],
     },
   },
-  // ─── Wave 3e.iv Turn C.1 — leaders-v2 slice; Turn C.2 — players-v2 slice ─
+  // ─── Wave 3e.iv — leaders-v2 (C.1) · players-v2 (C.2) · player-v2 (C.3) ─
   {
     files: [
       "src/features/tourhub/leaders-v2/**/*.{ts,tsx}",
       "src/features/tourhub/players-v2/**/*.{ts,tsx}",
+      "src/features/tourhub/player-v2/**/*.{ts,tsx}",
     ],
     rules: {
       "i18next/no-literal-string": ["error", i18nLiteralOptions],
