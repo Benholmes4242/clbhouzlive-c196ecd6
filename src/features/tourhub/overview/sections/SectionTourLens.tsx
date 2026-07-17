@@ -1,4 +1,5 @@
 import { memo, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useEdgeFades } from '@/components/watch/shared/useEdgeFades';
 import { FilterChips } from '@/components/ui/FilterChips';
 import { TOUR_CONFIG, type TourId } from '../../hooks/useOverviewData';
