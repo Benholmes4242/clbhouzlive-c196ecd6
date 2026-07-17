@@ -138,7 +138,7 @@ export function SeasonCards({ playerStats, results, player }: SeasonCardsProps) 
             }}
             className="active:opacity-60 transition-opacity"
           >
-            All stats
+            {t('player.season.allStats')}
             <ChevronRight size={14} strokeWidth={2.4} />
           </button>
         )}
