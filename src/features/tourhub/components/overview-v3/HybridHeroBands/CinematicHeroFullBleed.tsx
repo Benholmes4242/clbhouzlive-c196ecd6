@@ -678,7 +678,7 @@ export function CinematicHeroFullBleed({
                     textTransform: 'uppercase',
                   }}
                 >
-                  Won in playoff
+                  {t('overview.cinematic.wonInPlayoff')}
                 </span>
               ) : margin != null && margin > 0 ? (
                 <span
@@ -689,7 +689,7 @@ export function CinematicHeroFullBleed({
                     letterSpacing: '0.02em',
                   }}
                 >
-                  Won by {margin}
+                  {t('overview.cinematic.wonByMargin', { margin })}
                 </span>
               ) : null}
             </div>
