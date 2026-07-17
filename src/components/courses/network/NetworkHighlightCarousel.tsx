@@ -74,7 +74,7 @@ export const NetworkHighlightCarousel: React.FC<NetworkHighlightCarouselProps> =
                 height: '160px',
                 scrollSnapAlign: 'start',
               }}
-              aria-label={`View ${highlight.course_name}`}
+              aria-label={t('network.viewCourseA11y', { name: highlight.course_name })}
             >
               {/* Full-bleed course image */}
               {highlight.image_url ? (
@@ -86,7 +86,7 @@ export const NetworkHighlightCarousel: React.FC<NetworkHighlightCarouselProps> =
                 />
               ) : (
                 <div className="w-full h-full bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center">
-                  <span className="text-4xl">⛳</span>
+                  <span className="text-4xl">{t('network.emojiFlag')}</span>
                 </div>
               )}
 
