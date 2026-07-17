@@ -100,6 +100,7 @@ function SchoolSquircle({ size, logo, name }: { size: number; logo: string | nul
 }
 
 export function CollegeFranchise() {
+  const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
   const { data: collegeStats } = useCollegeSeasonStats();
   const { data: mediaMap } = useCollegeMediaMap();
