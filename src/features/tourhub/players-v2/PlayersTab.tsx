@@ -60,6 +60,7 @@ function formatDayShort(d: string | null | undefined): string | null {
 }
 
 export function PlayersTab() {
+  const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
