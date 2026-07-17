@@ -27,7 +27,9 @@ interface OverviewHeroProps {
 }
 
 export function OverviewHero({ height = 528 }: OverviewHeroProps) {
+  const { t } = useTranslation('tourhub');
   const { data: rawSlides = [], isLoading } = useHeroCarouselData();
+
 
   const {
     selectedTourSlug,
