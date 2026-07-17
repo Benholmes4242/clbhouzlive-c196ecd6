@@ -199,7 +199,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
                   <div style={{ width: 1, background: WHITE_ALPHA_10 }} />
                   <div style={{ flex: 1.4, minWidth: 0 }}>
                     <div style={{ fontSize: 8.5, fontWeight: 800, color: WHITE_ALPHA_65, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-                      Defending
+                      {t('tournament.hero.defendingLabel')}
                     </div>
                     <div style={{ fontSize: 12.5, fontWeight: 700, color: '#fff', marginTop: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {meta.defending_champion}
