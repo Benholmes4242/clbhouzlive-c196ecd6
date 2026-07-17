@@ -211,7 +211,7 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
           )}
           <button
             type="button"
-            onClick={() => openExternalUrl(googleMapsUrl)}
+            onClick={() => openMapsUrl(googleMapsUrl)}
             className="pointer-events-auto flex-1"
             style={{
               height: 50, borderRadius: 999, cursor: 'pointer',
