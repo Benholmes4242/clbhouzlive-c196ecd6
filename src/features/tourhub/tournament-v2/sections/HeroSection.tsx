@@ -164,7 +164,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
           {state === 'live' && leader && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <div style={{ fontSize: 8.5, fontWeight: 800, color: WHITE_ALPHA_65, letterSpacing: '0.14em', textTransform: 'uppercase', width: 54, flexShrink: 0 }}>
-                Leader
+                {t('tournament.hero.leaderLabel')}
               </div>
               <PlayerAvatar
                 playerId={leader.player?.id ?? ''}
