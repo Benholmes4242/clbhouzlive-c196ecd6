@@ -217,10 +217,11 @@ function HolesSheet({
 }
 
 const FeatureMini: React.FC<{ tone: 'hard' | 'easy'; h: TournamentHole; maxAbs: number }> = ({ tone, h, maxAbs }) => {
+  const { t } = useTranslation(['tourhub', 'courses']);
   const tint = tone === 'hard' ? 'rgba(29,93,191,0.05)' : 'rgba(210,34,45,0.05)';
   const border = tone === 'hard' ? 'rgba(29,93,191,0.18)' : 'rgba(210,34,45,0.18)';
   const eyebrow = tone === 'hard' ? TOPAR_OVER_LIGHT : TOPAR_UNDER_LIGHT;
-  const label = tone === 'hard' ? 'HARDEST' : 'EASIEST';
+  const label = tone === 'hard' ? t('holes.hardest', { ns: 'courses' }) : t('holes.easiest', { ns: 'courses' });
   const playsTo = (h.par + h.avg_to_par).toFixed(1);
   const magnitude = Math.min(1, Math.abs(h.avg_to_par) / Math.max(0.01, maxAbs)) * 50;
   const isOver = h.avg_to_par > AVG_EPSILON;
@@ -247,12 +248,13 @@ const FeatureMini: React.FC<{ tone: 'hard' | 'easy'; h: TournamentHole; maxAbs: 
           {h.hole_no}
         </div>
         <div style={{ fontSize: 11.5, fontWeight: 600, color: INK_MUTE, fontVariantNumeric: 'tabular-nums' }}>
-          Plays to {playsTo}
+          {t('holes.playsToInline', { ns: 'courses', playsTo })}
         </div>
       </div>
       <div style={{ fontSize: 10, fontWeight: 700, color: INK_MUTE, letterSpacing: '0.04em', textTransform: 'uppercase', marginTop: -2, fontVariantNumeric: 'tabular-nums' }}>
-        Par {h.par}
+        {t('board.meta.par', { ns: 'tourhub', par: h.par })}
       </div>
+
       <div
         aria-hidden
         style={{ position: 'relative', width: '100%', height: 4, background: 'rgba(15,23,42,0.06)', borderRadius: 4, overflow: 'hidden' }}
