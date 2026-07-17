@@ -121,7 +121,7 @@ export function CollegeHubPage() {
       : `Colleges ranked by their alumni on tour.`;
 
   return (
-    <TourHubShell showBack={false}>
+    <TourHubShell showBack={false} immersiveStatusBar>
       {/* Always-on glass plate (island 70px). */}
       <GlassHeaderPlate />
       <div
