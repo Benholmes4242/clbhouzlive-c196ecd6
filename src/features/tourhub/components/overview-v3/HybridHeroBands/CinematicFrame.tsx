@@ -29,7 +29,7 @@ import { AMBER_INK, GOLD_DEEP, TOPAR_UNDER_DARK } from '../../../_shared/tokens'
 import { roundStarted } from '../../../_shared/roundState';
 import type { HeroState, TopTie, TickerRow } from '../HybridHero.utils';
 import { fmtScore, formatRank, buildLeaderboardSlots } from '../HybridHero.utils';
-import { formatPurse } from '../../shared/TourHeroHelpers';
+import { formatPurse } from '../../../_shared/formatPurse';
 
 const TICKER_BAR_H = 34;
 const LEADER_RED = TOPAR_UNDER_DARK;              // '#FF6B5E'
