@@ -57,7 +57,11 @@ interface TourSelectionValue {
   setViewingTourSlug: (slug: string) => void;
   viewingTournamentId: string | null;
   setViewingTournamentId: (id: string | null) => void;
+  /** Whether the hero's currently-viewed slide is a LIVE tournament. Display-only. */
+  viewingIsLive: boolean;
+  setViewingIsLive: (isLive: boolean) => void;
 }
+
 
 const TourSelectionContext = createContext<TourSelectionValue | null>(null);
 
