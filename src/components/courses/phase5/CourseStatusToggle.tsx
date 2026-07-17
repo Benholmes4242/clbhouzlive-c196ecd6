@@ -194,10 +194,13 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
       {/* Footnote — only when nothing marked yet */}
       {hasNoSelection && (
         <p style={{ fontSize: 11, color: '#94A3B8', lineHeight: 1.5, margin: '4px 0 0' }}>
-          Every course you mark becomes part of your journey — view them anytime on your{' '}
-          <Link to="/map" style={{ color: '#64748B', textDecoration: 'underline', textUnderlineOffset: 2 }}>
-            map
-          </Link>.
+          <Trans
+            i18nKey="phase5.statusToggle.mapHint"
+            ns="courses"
+            components={{
+              mapLink: <Link to="/map" style={{ color: '#64748B', textDecoration: 'underline', textUnderlineOffset: 2 }} />,
+            }}
+          />
         </p>
       )}
     </div>
