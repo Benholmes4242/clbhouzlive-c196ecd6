@@ -152,8 +152,43 @@ export function ScheduleTab() {
     if (!anchorId) return;
     const el = document.getElementById(`sv2-row-${anchorId}`);
     if (!el) return;
-    scrollElementIntoView(el, { offset: computeOffset(), behavior: 'smooth' });
+    scrollElementIntoView(el, { offset: computeOffset(), behavior: 'auto' });
   }, [anchorId]);
+
+  // ── "Far from today" detector — anchor >1.5 viewports off-screen (either dir)
+  useEffect(() => {
+    if (!anchorId) {
+      setAnchorFar(false);
+      return;
+    }
+    const el = document.getElementById(`sv2-row-${anchorId}`);
+    if (!el) {
+      setAnchorFar(false);
+      return;
+    }
+    const scroller = getScrollAncestor(el);
+    const target: HTMLElement | Window = scroller ?? window;
+    let ticking = false;
+    const compute = () => {
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight || 1;
+      // Distance from viewport center; > 1.5 viewports = far.
+      const center = rect.top + rect.height / 2;
+      const dist = Math.abs(center - vh / 2);
+      setAnchorFar(dist > vh * 1.5);
+    };
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        compute();
+        ticking = false;
+      });
+    };
+    compute();
+    target.addEventListener('scroll', onScroll, { passive: true } as AddEventListenerOptions);
+    return () => target.removeEventListener('scroll', onScroll as EventListener);
+  }, [anchorId, timeline?.totalEvents]);
 
 
   // ── Row navigation ─────────────────────────────────────────────────────
