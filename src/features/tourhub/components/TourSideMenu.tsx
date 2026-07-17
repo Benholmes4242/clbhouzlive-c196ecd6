@@ -76,6 +76,7 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
   onProfile,
   onSignOut,
 }) => {
+  const { t } = useTranslation('tourhub');
   const reduced = usePrefersReducedMotion();
   const [mounted, setMounted] = useState(open);
   const [visible, setVisible] = useState(false);
