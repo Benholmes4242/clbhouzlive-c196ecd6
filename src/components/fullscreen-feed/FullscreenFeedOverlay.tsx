@@ -828,7 +828,14 @@ export function FullscreenFeedOverlay() {
                     onLike={handleLike}
                     onComment={safeOpenComments}
                     onShare={handleShare}
-                    onMore={() => setMoreOptionsOpen(true)}
+                    onMore={() => {
+                      setMoreOptionsOpen(true);
+                      setTimeout(() => {
+                        const node = document.querySelector('[data-vaul-drawer], [vaul-drawer]');
+                        toast(`3dot: open set; drawer node ${node ? 'IN DOM' : 'MISSING'}`);
+                      }, 350);
+                    }}
+
                     getLikeState={getActiveLikeState}
                     getCommentCount={getCommentCount}
                     getFollowState={getFollowState}

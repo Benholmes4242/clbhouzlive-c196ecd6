@@ -25,6 +25,8 @@ export function VideoCardMoreButton({ post }: { post: FeedPost }) {
       <button
         type="button"
         aria-label="More options"
+        data-stop-press
+
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
