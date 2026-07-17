@@ -366,6 +366,7 @@ function ChampionRowDark({
   avatarUrl: string | string[] | null;
   isLast: boolean;
 }) {
+  const { t } = useTranslation('tourhub');
   const name = entryName(entry);
   const score = entry?.score;
   return (
