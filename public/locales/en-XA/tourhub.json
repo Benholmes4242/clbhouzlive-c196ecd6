@@ -615,6 +615,30 @@
       "euro": "[~~Řáĉé ţő Đúƀáí~~]",
       "lpga": "[~~ĈṀÉ Ƥőíñţš~~]",
       "liv": "[~~ĻÍṼ Ƥőíñţš~~]"
+    },
+    "almanac": {
+      "world": {
+        "overline": "⟦⟦ÓFFÍCÍÁL WÓRLD RÁNKÍNG⟧⟧",
+        "title": "⟦⟦Thé wórld órdér⟧⟧",
+        "no1": "⟦⟦WÓRLD NÓ. 1⟧⟧"
+      },
+      "pointsMarquee": {
+        "title": "⟦⟦Thé séásón léádérs⟧⟧"
+      },
+      "marquee": {
+        "no1": "⟦⟦TÓÚR LÉÁDÉR⟧⟧"
+      },
+      "money": {
+        "title": "⟦⟦Thé mónéy líst⟧⟧"
+      },
+      "scoring": {
+        "title": "⟦⟦Thé púrést róúnds⟧⟧",
+        "leader": "⟦⟦LÉÁDS THÉ TÓÚR⟧⟧",
+        "behind": "⟦⟦+⟧{{delta}}⟦ béhínd⟧⟧"
+      },
+      "winners": {
+        "title": "⟦⟦Thé wínnérs' círclé⟧⟧"
+      }
     }
   },
   "players": {

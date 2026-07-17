@@ -615,6 +615,30 @@
       "euro": "Race to Dubai",
       "lpga": "CME Points",
       "liv": "LIV Points"
+    },
+    "almanac": {
+      "world": {
+        "overline": "OFFICIAL WORLD RANKING",
+        "title": "The world order",
+        "no1": "WORLD NO. 1"
+      },
+      "pointsMarquee": {
+        "title": "The season leaders"
+      },
+      "marquee": {
+        "no1": "TOUR LEADER"
+      },
+      "money": {
+        "title": "The money list"
+      },
+      "scoring": {
+        "title": "The purest rounds",
+        "leader": "LEADS THE TOUR",
+        "behind": "+{{delta}} behind"
+      },
+      "winners": {
+        "title": "The winners' circle"
+      }
     }
   },
   "players": {
