@@ -26,7 +26,14 @@ import {
 } from '../_shared/tokens';
 
 import { useLeaderCategories } from './data/useLeaderCategories';
-import { StatBoard } from './StatBoard';
+import {
+  WorldBoard,
+  MoneyBoard,
+  ScoringBoard,
+  WinnersCircle,
+  ANATOMY_BY_KEY,
+  type Anatomy,
+} from './boards/AlmanacBoards';
 import { FullListSheet } from './FullListSheet';
 
 // Compact tour-eyebrow chip labels resolved via i18n. Keys are the stable
