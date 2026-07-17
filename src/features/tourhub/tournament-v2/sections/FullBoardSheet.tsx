@@ -87,7 +87,8 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
             </div>
           )}
           <div style={{ fontSize: 11, fontWeight: 600, color: INK_MUTE, marginTop: 2 }}>
-            {entries.length} players
+            {t('overview.fieldStrength.playersCount', { count: entries.length })}
+
           </div>
         </div>
 
