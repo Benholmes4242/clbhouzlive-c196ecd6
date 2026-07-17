@@ -170,5 +170,46 @@
         "body": "Scoring will populate as players post numbers."
       }
     }
+  },
+  "board": {
+    "columns": {
+      "pos": "POS",
+      "player": "PLAYER",
+      "tot": "TOT",
+      "thru": "THRU",
+      "today": "TODAY"
+    },
+    "status": {
+      "inProgress": "R{{round}} · IN PROGRESS",
+      "final": "FINAL",
+      "startsOn": "STARTS {{date}}",
+      "upcoming": "UPCOMING"
+    },
+    "search": {
+      "placeholder": "Search players",
+      "openAria": "Search players",
+      "closeAria": "Close search"
+    },
+    "meta": {
+      "par": "Par {{par}}",
+      "yardage": "{{yardage}} yards"
+    },
+    "unknownPlayer": "Unknown",
+    "footnote": "F Finished",
+    "cut": {
+      "projected": "Projected cut",
+      "actual": "The following players failed to make the cut"
+    },
+    "movement": {
+      "up": "Up {{count}}",
+      "down": "Down {{count}}"
+    }
+  },
+  "tournament": {
+    "scorecard": {
+      "roundEyebrow": "ROUND {{round}}",
+      "eyebrowFallback": "SCORECARD",
+      "courseFallback": "Scorecard"
+    }
   }
 }
