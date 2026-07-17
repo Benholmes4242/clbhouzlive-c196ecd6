@@ -177,7 +177,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
   const orderedPicks = orderPicksByBoard(picks, state, liveMap);
 
   return (
-    <SectionShell eyebrow="Tournament intelligence" linkLabel="All picks" onLinkClick={() => setSheet({ kind: 'index' })}>
+    <SectionShell eyebrow={t('overview.tiPicks.eyebrow')} linkLabel={t('overview.tiPicks.linkLabel')} onLinkClick={() => setSheet({ kind: 'index' })}>
       <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 16px 10px', scrollPaddingLeft: 16, scrollSnapType: 'x mandatory' }}>
         {orderedPicks.slice(0, 8).map((p) => (
           <button
