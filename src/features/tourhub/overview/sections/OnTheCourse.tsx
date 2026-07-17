@@ -162,12 +162,12 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
   const moreCount = totalKnown != null ? Math.max(0, totalKnown - featuredCount) : null;
 
   const rightMeta = totalKnown != null
-    ? `${totalKnown} groups${round != null ? ` · R${round}` : ''}`
-    : (round != null ? `R${round}` : undefined);
+    ? t('overview.onTheCourse.rightMetaWithRound', { count: totalKnown, round })
+    : (round != null ? t('overview.onTheCourse.roundShort', { round }) : undefined);
 
   return (
     <div style={{ marginTop: SPACE.sectionSection }}>
-      <SectionShell eyebrow="On the course" eyebrowColor={V4.amber} rightMeta={rightMeta}>
+      <SectionShell eyebrow={t('overview.onTheCourse.eyebrow')} eyebrowColor={V4.amber} rightMeta={rightMeta}>
         <div
           ref={railRef}
           style={{
