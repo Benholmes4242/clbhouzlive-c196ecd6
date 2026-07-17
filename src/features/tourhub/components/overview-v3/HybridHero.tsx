@@ -229,7 +229,7 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
         photoUrl: m.player.photo_url ?? null,
       }));
     return {
-      teamName: team.abbr_name || team.display_name || 'Team',
+      teamName: team.abbr_name || team.display_name || t('overview.hybridHero.teamFallback'),
       members,
       score: fmtScore(top.score),
     };
