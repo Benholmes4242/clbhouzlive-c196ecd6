@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
@@ -76,6 +77,7 @@ interface Props {
 }
 
 export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => {
+  const { t } = useTranslation('courses');
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const { data: connection, isLoading } = useWhsConnection(user?.id);
@@ -141,7 +143,7 @@ export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => 
             flexShrink: 0,
           }}
         >
-          Connect →
+          {t('courseDetail.handicapCue.bannerAction')}
         </span>
       </button>
     );
@@ -201,7 +203,7 @@ export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => 
             fontFamily: FONT,
           }}
         >
-          Connect your handicap →
+          {t('courseDetail.handicapCue.cardCta')}
         </button>
         <div
           style={{
@@ -214,7 +216,7 @@ export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => 
             textAlign: 'center',
           }}
         >
-          Works with WHS handicaps worldwide
+          {t('courseDetail.handicapCue.cardFootnote')}
         </div>
       </div>
     </div>
