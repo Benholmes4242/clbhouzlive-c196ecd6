@@ -9,21 +9,17 @@ import { Search, Award, X } from 'lucide-react';
 
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
-import { cn } from '@/lib/utils';
 import VirtualizedCourseList from './VirtualizedCourseList';
-import { AppSelect, type AppSelectOption } from '@/components/ui/AppSelect';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { FilterChips } from '@/components/ui/FilterChips';
-import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, INK, INK_FAINT, INK_MUTE, SLATE_600, SURFACE } from '@/features/courses/_shared/tokens';
+import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, INK, INK_MUTE, SLATE_600, SURFACE } from '@/features/courses/_shared/tokens';
 import { getPageScrollTop, scrollPageTo } from '@/lib/getScrollParent';
-
-type Top100SortOption = 'official' | 'user_rating';
 
 /** Known Top 100 list slugs for validation. */
 const KNOWN_LIST_SLUGS = ['global', 'gb-i', 'usa', 'europe'];
 
 /** Read saved Top 100 filters from sessionStorage (parsed once, shared by initialisers). */
-function readSavedFilters(): { list?: string; sort?: string; searchTerm?: string } | null {
+function readSavedFilters(): { list?: string; searchTerm?: string } | null {
   try {
     const raw = sessionStorage.getItem('top100-last-filters');
     return raw ? JSON.parse(raw) : null;
@@ -40,7 +36,7 @@ interface Top100CoursesHubPanelProps {
 const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs, rateNudge }) => {
   const { t } = useTranslation('courses');
   const { user } = useSupabaseSession();
-  
+
   // State — initialised from sessionStorage when available
   const [selectedList, setSelectedList] = useState(() => {
     const saved = readSavedFilters();
@@ -52,17 +48,9 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
     return saved?.searchTerm || '';
   });
   const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
-  const [sortOption, setSortOption] = useState<Top100SortOption>(() => {
-    const saved = readSavedFilters();
-    const val = saved?.sort;
-    return val === 'user_rating' ? 'user_rating' : 'official';
-  });
 
   // Scroll restoration ref
   const hasRestoredScroll = useRef(false);
-
-
-
 
   // Fetch data
   const { data: listSummaries = [] } = useTop100ListSummaries(user?.id);
@@ -93,14 +81,13 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
     try {
       sessionStorage.setItem('top100-last-filters', JSON.stringify({
         list: selectedList,
-        sort: sortOption,
         searchTerm,
       }));
     } catch { /* ignore */ }
-  }, [selectedList, sortOption, searchTerm]);
+  }, [selectedList, searchTerm]);
 
   // Fetch courses
-  const { 
+  const {
     data: coursesData,
     isLoading,
   } = useGolfCoursesInfinite({
@@ -108,7 +95,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
     listSlug: selectedList,
   });
 
-  // Flatten and sort courses (and attach displayRank reflecting list position)
+  // Flatten and sort courses (official ranking only) — attach displayRank reflecting list position
   const allCourses: (SearchedCourseWithRating & { displayRank?: number })[] = React.useMemo(() => {
     const courses = coursesData?.pages.flat() ?? [];
 
@@ -130,17 +117,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
       return memberships[0]?.rank ?? 999;
     };
 
-    if (sortOption === 'user_rating') {
-      const sorted = [...courses].sort((a, b) => {
-        const ratingA = a.average_rating ?? -1;
-        const ratingB = b.average_rating ?? -1;
-        if (ratingB !== ratingA) return ratingB - ratingA;
-        return (a.name ?? '').localeCompare(b.name ?? '');
-      });
-      return sorted.map((c, idx) => ({ ...c, displayRank: idx + 1 }));
-    }
-
-    // 'official' sort — pre-extract rank keys so the comparator is O(1)
+    // Official ranking — pre-extract rank keys so the comparator is O(1)
     const withRankKey = courses.map((c) => ({
       course: c,
       rankKey: getRankForSelectedList(c),
@@ -149,7 +126,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
     withRankKey.sort((a, b) => a.rankKey - b.rankKey);
 
     return withRankKey.map((x, idx) => ({ ...x.course, displayRank: idx + 1 }));
-  }, [coursesData, sortOption, selectedList]);
+  }, [coursesData, selectedList]);
 
   // Scroll restoration on mount (after courses load)
   useEffect(() => {
@@ -195,15 +172,9 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
         { value: 'europe', label: 'Europe Top 100' },
       ];
 
-  const sortOptions: AppSelectOption<Top100SortOption>[] = [
-    { value: 'official', label: 'Official ranking' },
-    { value: 'user_rating', label: 'Community rating' },
-  ];
-
   const handleResetFilters = () => {
     setSelectedList('global');
     setSearchTerm('');
-    setSortOption('official');
   };
 
   // Active list short label (used for placeholder + meta row)
@@ -230,6 +201,21 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
             title={t('top100.sectionTitle', { defaultValue: "The world's best" })}
             cutLine={false}
           />
+          {/* Provenance subhead — masthead-line mock */}
+          <p
+            style={{
+              fontSize: 11.5,
+              fontWeight: 500,
+              color: 'rgba(15,23,42,0.55)',
+              lineHeight: 1.45,
+              marginTop: 6,
+              marginBottom: 12,
+              fontFamily: "'Geist', sans-serif",
+              letterSpacing: '-0.005em',
+            }}
+          >
+            {t('top100.provenance', { defaultValue: "As ranked by golf's leading publications." })}
+          </p>
           {crossListProgress && (
             <p
               style={{
@@ -341,13 +327,6 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
                   />
                 )}
               </span>
-              <AppSelect
-                value={sortOption}
-                onChange={(v) => setSortOption(v as Top100SortOption)}
-                options={sortOptions}
-                ariaLabel={t('explorer.sortA11y')}
-                triggerClassName="h-8 text-[12px] px-3 active:scale-[0.98]"
-              />
             </div>
           )}
 
