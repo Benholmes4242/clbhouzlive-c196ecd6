@@ -17,7 +17,7 @@
     "noEventsThisWeek": "이번 주 대회 없음",
     "openMenuAria": "메뉴 열기",
     "switchTourAria": "투어 전환",
-    "switchTourCurrentAria": "투어 전환 \u2014 현재 {{label}}"
+    "switchTourCurrentAria": "투어 전환 — 현재 {{label}}"
   },
   "nav": {
     "group": {
@@ -36,5 +36,120 @@
   },
   "section": {
     "retryAria": "{{section}} 다시 불러오기"
+  },
+  "schedule": {
+    "eyebrow": {
+      "season": "THE SEASON"
+    },
+    "progress": {
+      "eventOf": "EVENT {{current}} OF {{total}}"
+    },
+    "error": {
+      "title": "Couldn't load the schedule",
+      "body": "Something went wrong. Please try again."
+    },
+    "floating": {
+      "thisWeek": "This week"
+    },
+    "badge": {
+      "major": "MAJOR",
+      "playoffs": "PLAYOFFS",
+      "champion": "CHAMPION"
+    },
+    "rail": {
+      "daysUnit_one": "DAY",
+      "daysUnit_other": "DAYS"
+    },
+    "leader": {
+      "suffix": "leads"
+    },
+    "champion": {
+      "defendsSuffix": "{{name}} defends"
+    }
+  },
+  "overview": {
+    "connectHandicap": {
+      "title": "Connect your handicap",
+      "description": "Sync WHS and see where you stand.",
+      "cta": "Connect"
+    },
+    "cancelled": {
+      "eyebrow": "No Result",
+      "reasonDefault": "This event did not complete enough rounds for an official result."
+    },
+    "ticker": {
+      "top10Label": "TOP 10"
+    },
+    "fieldStrength": {
+      "eyebrow": "FIELD",
+      "playersCount": "{{count}} players",
+      "topRankedLine": "{{topRanked}} of world top {{threshold}}",
+      "inFieldLabel": "IN FIELD"
+    },
+    "champion": {
+      "scoreLabelToPar": "TO PAR",
+      "eyebrow": "CHAMPION",
+      "eyebrowPlayoff": "CHAMPION · PLAYOFF",
+      "resultPending": "Result pending"
+    },
+    "cancelledStrip": {
+      "eyebrow": "CANCELLED"
+    },
+    "playoff": {
+      "eyebrow": "AWAITING PLAYOFF",
+      "tiedAtTop": "{{count}} tied at the top"
+    },
+    "middleBand": {
+      "cancelledDefault": "No play — tournament cancelled."
+    },
+    "upcoming": {
+      "defendingEyebrow": "DEFENDING",
+      "previewTitle": "Tournament Preview",
+      "previewEyebrow": "PREVIEW"
+    },
+    "rankings": {
+      "sectionEyebrow": "World rankings",
+      "linkLabel": "Full rankings",
+      "worldNo1Label": "World No. 1",
+      "pointsLabel": "POINTS",
+      "boards": {
+        "owgr": "Official World Golf Ranking",
+        "r2d": "Race to Dubai",
+        "rolex": "Rolex Rankings"
+      }
+    },
+    "teamWinnerStrip": {
+      "eyebrow": "TEAM WINNER",
+      "labelVsPar": "VS PAR",
+      "labelStrokes": "STROKES"
+    },
+    "leaderRow": {
+      "tiedAtRank_one": "{{count}} tied at {{rank}}",
+      "tiedAtRank_other": "{{count}} tied at {{rank}}",
+      "tiedAtRankAria_one": "{{count}} player tied at {{rank}} with score {{score}}, average trajectory",
+      "tiedAtRankAria_other": "{{count}} players tied at {{rank}} with score {{score}}, average trajectory",
+      "tiedAtTop_one": "{{count}} tied at the top",
+      "tiedAtTop_other": "{{count}} tied at the top",
+      "tiedAtTopAria_one": "{{count}} player tied at the top with score {{score}}",
+      "tiedAtTopAria_other": "{{count}} players tied at the top with score {{score}}",
+      "playoffMarker": "* PLAYOFF",
+      "championIconLabel": "Champion"
+    },
+    "photoBand": {
+      "wonBy": "Won by {{winnerName}}"
+    },
+    "trajectorySparkline": {
+      "ariaLabel": "Trajectory: rounds {{rounds}}",
+      "ariaLabelRoundOf": "Trajectory: rounds {{rounds}} (round {{current}} of {{total}})"
+    },
+    "statWatch": {
+      "eyebrow": "Stat watch",
+      "allStatsLink": "All stats",
+      "seasonLeaders": "Season leaders · {{tourLabel}}"
+    },
+    "sectionTourLens": {
+      "allTours": "All Tours",
+      "filterAriaLabel": "Filter section by tour"
+    }
   }
 }

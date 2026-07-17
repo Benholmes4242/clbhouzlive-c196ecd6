@@ -1,4 +1,5 @@
 import { memo, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useEdgeFades } from '@/components/watch/shared/useEdgeFades';
 import { FilterChips } from '@/components/ui/FilterChips';
 import { TOUR_CONFIG, type TourId } from '../../hooks/useOverviewData';
@@ -27,21 +28,25 @@ type LensId = '__all__' | TourId;
  * overflows. Uses the canonical FilterChips pill language.
  */
 function SectionTourLensInner({ value, onChange, showAllTours = true }: SectionTourLensProps) {
+  const { t } = useTranslation('tourhub');
   const wrapperRef = useRef<HTMLDivElement>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
   useEdgeFades(scrollerRef, wrapperRef);
 
+  const filterAriaLabel = t('overview.sectionTourLens.filterAriaLabel');
+
   const options = useMemo(() => {
     const list: { id: LensId; label: string }[] = [];
     if (showAllTours) {
-      list.push({ id: '__all__', label: 'All Tours' });
+      list.push({ id: '__all__', label: t('overview.sectionTourLens.allTours') });
     }
     TOUR_ORDER.forEach((id) => {
       const config = TOUR_CONFIG[id];
+      // NEVER-KEY: config.name is a tour display name (proper noun).
       list.push({ id, label: config.name });
     });
     return list;
-  }, [showAllTours]);
+  }, [showAllTours, t]);
 
   return (
     <div
@@ -51,7 +56,7 @@ function SectionTourLensInner({ value, onChange, showAllTours = true }: SectionT
       <div
         ref={scrollerRef}
         role="tablist"
-        aria-label="Filter section by tour"
+        aria-label={filterAriaLabel}
         className="overflow-x-auto scrollbar-hide"
         style={{ padding: '8.5px 16px' }}
       >
@@ -59,7 +64,7 @@ function SectionTourLensInner({ value, onChange, showAllTours = true }: SectionT
           options={options}
           value={value ?? '__all__'}
           onChange={(id) => onChange(id === '__all__' ? null : (id as TourId))}
-          ariaLabel="Filter section by tour"
+          ariaLabel={filterAriaLabel}
           className="!overflow-visible !p-0"
         />
       </div>

@@ -117,6 +117,39 @@
         "r2d": "[~~Řáĉé ţő Đúɓáí~~]",
         "rolex": "[~~Řőļéẋ Řáñķíñĝš~~]"
       }
+    },
+    "teamWinnerStrip": {
+      "eyebrow": "[~~ŢÉÁṀ ŴÍÑÑÉŘ~~]",
+      "labelVsPar": "[~~ṼŠ ƤÁŘ~~]",
+      "labelStrokes": "[~~ŠŢŘŐKÉŠ~~]"
+    },
+    "leaderRow": {
+      "tiedAtRank_one": "[~~{{count}} ţíéđ áţ {{rank}}~~]",
+      "tiedAtRank_other": "[~~{{count}} ţíéđ áţ {{rank}}~~]",
+      "tiedAtRankAria_one": "[~~{{count}} ƥļáýéř ţíéđ áţ {{rank}} ŵíţĥ šĉőřé {{score}}, áṽéřáĝé ţřájéĉţőřý~~]",
+      "tiedAtRankAria_other": "[~~{{count}} ƥļáýéřš ţíéđ áţ {{rank}} ŵíţĥ šĉőřé {{score}}, áṽéřáĝé ţřájéĉţőřý~~]",
+      "tiedAtTop_one": "[~~{{count}} ţíéđ áţ ţĥé ţőƥ~~]",
+      "tiedAtTop_other": "[~~{{count}} ţíéđ áţ ţĥé ţőƥ~~]",
+      "tiedAtTopAria_one": "[~~{{count}} ƥļáýéř ţíéđ áţ ţĥé ţőƥ ŵíţĥ šĉőřé {{score}}~~]",
+      "tiedAtTopAria_other": "[~~{{count}} ƥļáýéřš ţíéđ áţ ţĥé ţőƥ ŵíţĥ šĉőřé {{score}}~~]",
+      "playoffMarker": "[~~* ƤĿÁÝŐƑƑ~~]",
+      "championIconLabel": "[~~Ĉĥáṁƥíőñ~~]"
+    },
+    "photoBand": {
+      "wonBy": "[~~Ŵőñ bý {{winnerName}}~~]"
+    },
+    "trajectorySparkline": {
+      "ariaLabel": "[~~Ţřájéĉţőřý: řőúñđš {{rounds}}~~]",
+      "ariaLabelRoundOf": "[~~Ţřájéĉţőřý: řőúñđš {{rounds}} (řőúñđ {{current}} őƒ {{total}})~~]"
+    },
+    "statWatch": {
+      "eyebrow": "[~~Šţáţ ŵáţĉĥ~~]",
+      "allStatsLink": "[~~Áļļ šţáţš~~]",
+      "seasonLeaders": "[~~Šéášőñ ļéáđéřš · {{tourLabel}}~~]"
+    },
+    "sectionTourLens": {
+      "allTours": "[~~Áļļ Ţőúřš~~]",
+      "filterAriaLabel": "[~~Ƒíļţéř šéĉţíőñ bý ţőúř~~]"
     }
   }
 }

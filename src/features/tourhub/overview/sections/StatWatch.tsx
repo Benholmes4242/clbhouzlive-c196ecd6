@@ -4,6 +4,7 @@
  */
 
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { SectionShell } from './SectionShell';
 import { V4 } from '../tokens';
 import { useStatWatch, type StatCategory } from '../data/useStatWatch';
@@ -14,18 +15,20 @@ import type { TourId } from '../../hooks/useOverviewData';
 
 export function StatWatch({ tour }: { tour: TourId }) {
   const navigate = useNavigate();
+  const { t } = useTranslation('tourhub');
   const { data } = useStatWatch(tour);
   const categories = data?.categories ?? [];
   if (categories.length === 0) return null;
 
   return (
     <SectionShell
-      eyebrow="Stat watch"
-      linkLabel="All stats"
+      eyebrow={t('overview.statWatch.eyebrow')}
+      linkLabel={t('overview.statWatch.allStatsLink')}
       onLinkClick={() => navigate('/tourhub?tab=leaderboards')}
     >
       <div style={{ padding: '0 16px 6px', fontSize: 11, fontWeight: 600, color: V4.inkMute }}>
-        Season leaders · {TOUR_LABEL[tour] ?? tour.toUpperCase()}
+        {/* NEVER-KEY interpolation: TOUR_LABEL/tour is a data token (proper noun). */}
+        {t('overview.statWatch.seasonLeaders', { tourLabel: TOUR_LABEL[tour] ?? tour.toUpperCase() })}
       </div>
       <div
         style={{

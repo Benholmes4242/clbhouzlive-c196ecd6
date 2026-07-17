@@ -117,6 +117,39 @@
         "r2d": "Race to Dubai",
         "rolex": "Rolex Rankings"
       }
+    },
+    "teamWinnerStrip": {
+      "eyebrow": "TEAM WINNER",
+      "labelVsPar": "VS PAR",
+      "labelStrokes": "STROKES"
+    },
+    "leaderRow": {
+      "tiedAtRank_one": "{{count}} tied at {{rank}}",
+      "tiedAtRank_other": "{{count}} tied at {{rank}}",
+      "tiedAtRankAria_one": "{{count}} player tied at {{rank}} with score {{score}}, average trajectory",
+      "tiedAtRankAria_other": "{{count}} players tied at {{rank}} with score {{score}}, average trajectory",
+      "tiedAtTop_one": "{{count}} tied at the top",
+      "tiedAtTop_other": "{{count}} tied at the top",
+      "tiedAtTopAria_one": "{{count}} player tied at the top with score {{score}}",
+      "tiedAtTopAria_other": "{{count}} players tied at the top with score {{score}}",
+      "playoffMarker": "* PLAYOFF",
+      "championIconLabel": "Champion"
+    },
+    "photoBand": {
+      "wonBy": "Won by {{winnerName}}"
+    },
+    "trajectorySparkline": {
+      "ariaLabel": "Trajectory: rounds {{rounds}}",
+      "ariaLabelRoundOf": "Trajectory: rounds {{rounds}} (round {{current}} of {{total}})"
+    },
+    "statWatch": {
+      "eyebrow": "Stat watch",
+      "allStatsLink": "All stats",
+      "seasonLeaders": "Season leaders · {{tourLabel}}"
+    },
+    "sectionTourLens": {
+      "allTours": "All Tours",
+      "filterAriaLabel": "Filter section by tour"
     }
   }
 }

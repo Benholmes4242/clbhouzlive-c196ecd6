@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
@@ -211,6 +212,7 @@ export function TiedChasersRow({
   isResults = false,
   onTap,
 }: TiedChasersRowProps) {
+  const { t } = useTranslation('tourhub');
   const avgRounds = averageRounds(players);
   const hideThru = isResults;
   return (
@@ -227,7 +229,7 @@ export function TiedChasersRow({
         borderBottom: 'none',
         cursor: onTap ? 'pointer' : 'default',
       }}
-      aria-label={`${count} players tied at ${rank} with score ${score}, average trajectory`}
+      aria-label={t('overview.leaderRow.tiedAtRankAria', { count, rank, score })}
     >
       <span style={{ ...NUMERIC_STYLE, fontSize: 13, fontWeight: 700, color: INK_45 }}>
         {rank}
@@ -235,7 +237,7 @@ export function TiedChasersRow({
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
         <StackedAvatars players={players} size={22} variant="chaser" />
         <span style={{ fontSize: 14, fontWeight: 700, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>
-          {count} tied at {rank}
+          {t('overview.leaderRow.tiedAtRank', { count, rank })}
           <ChevronRight size={11} strokeWidth={2.5} color={INK_45} style={{ marginLeft: 4, flexShrink: 0 }} />
         </span>
       </div>
@@ -279,6 +281,7 @@ interface TiedLeadersRowProps {
 }
 
 export function TiedLeadersRow({ count, score, players, isLast = false }: TiedLeadersRowProps) {
+  const { t } = useTranslation('tourhub');
   const stack: StackedAvatarPlayer[] = players && players.length > 0
     ? players
     : Array.from({ length: count }, () => ({}));
@@ -293,7 +296,7 @@ export function TiedLeadersRow({ count, score, players, isLast = false }: TiedLe
         background: LEADER_GOLD_TINT_7,
         borderBottom: 'none',
       }}
-      aria-label={`${count} players tied at the top with score ${score}`}
+      aria-label={t('overview.leaderRow.tiedAtTopAria', { count, score })}
     >
       <span
         style={{
@@ -304,6 +307,8 @@ export function TiedLeadersRow({ count, score, players, isLast = false }: TiedLe
           letterSpacing: '-0.02em',
         }}
       >
+        {/* NEVER-KEY: score/rank token */}
+        {/* eslint-disable-next-line i18next/no-literal-string */}
         T1
       </span>
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}>
@@ -319,7 +324,7 @@ export function TiedLeadersRow({ count, score, players, isLast = false }: TiedLe
             textOverflow: 'ellipsis',
           }}
         >
-          {count} tied at the top
+          {t('overview.leaderRow.tiedAtTop', { count })}
         </div>
       </div>
       <span
@@ -355,6 +360,8 @@ export function ChampionRow({
   avatarUrl,
   isLast,
 }: ChampionRowProps) {
+  const { t } = useTranslation('tourhub');
+  const championLabel = t('overview.leaderRow.championIconLabel');
   return (
     <div
       style={{
@@ -368,8 +375,8 @@ export function ChampionRow({
       }}
     >
       <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-label="Champion">
-          <title>Champion</title>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-label={championLabel}>
+          <title>{championLabel}</title>
           <path
             d="M7 4h10v3a5 5 0 0 1-10 0V4z M5 5H3a2 2 0 0 0 2 2V5z M19 5h2a2 2 0 0 1-2 2V5z M9 13h6l-1 4h-4z M8 19h8v2H8z"
             fill={GOLD_DARK}
@@ -407,7 +414,7 @@ export function ChampionRow({
                   marginLeft: 8,
                 }}
               >
-                * PLAYOFF
+                {t('overview.leaderRow.playoffMarker')}
               </span>
             )}
           </span>
@@ -434,6 +441,8 @@ export function ChampionRow({
           textAlign: 'right',
         }}
       >
+        {/* NEVER-KEY: thru/score token */}
+        {/* eslint-disable-next-line i18next/no-literal-string */}
         F
       </span>
     </div>

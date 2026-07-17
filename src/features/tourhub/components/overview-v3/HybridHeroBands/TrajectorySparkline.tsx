@@ -8,6 +8,7 @@
  */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { classifyTrajectory } from '../HybridHero.utils';
 import { TREND_UP, TREND_DOWN } from '../../../_shared/tokens';
 
@@ -43,6 +44,7 @@ export function TrajectorySparkline({
   totalRounds,
   ariaHidden = false,
 }: TrajectorySparklineProps) {
+  const { t } = useTranslation('tourhub');
   if (rounds.length < 2 || !par || par <= 0) return null;
 
   const { width, height, stroke, dotR } = SIZING[variant];
@@ -68,9 +70,15 @@ export function TrajectorySparkline({
   const lastX = (rounds.length - 1) * stepX;
   const lastY = yFor(points[points.length - 1]);
 
-  const ariaLabel = `Trajectory: rounds ${rounds.join(', ')}${
-    totalRounds && rounds.length < totalRounds ? ` (round ${rounds.length} of ${totalRounds})` : ''
-  }`;
+  // NEVER-KEY tokens: rounds values / totalRounds are score data; only the surrounding prose is translated.
+  const roundsStr = rounds.join(', ');
+  const ariaLabel = totalRounds && rounds.length < totalRounds
+    ? t('overview.trajectorySparkline.ariaLabelRoundOf', {
+        rounds: roundsStr,
+        current: rounds.length,
+        total: totalRounds,
+      })
+    : t('overview.trajectorySparkline.ariaLabel', { rounds: roundsStr });
 
   return (
     <svg

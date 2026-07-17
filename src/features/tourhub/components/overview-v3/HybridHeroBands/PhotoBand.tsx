@@ -5,6 +5,8 @@
  */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
+
 
 import {
   PHOTO_BAND_HEIGHT,
@@ -31,8 +33,14 @@ interface PhotoBandProps {
   datesString?: string | null;
 }
 
-function ledeLine(state: HeroState, winnerName?: string | null): string | null {
-  if (state.kind === 'results' && winnerName) return `Won by ${winnerName}`;
+function ledeLine(
+  state: HeroState,
+  winnerName: string | null | undefined,
+  t: (key: string, opts?: Record<string, unknown>) => string,
+): string | null {
+  if (state.kind === 'results' && winnerName) {
+    return t('overview.photoBand.wonBy', { winnerName });
+  }
   if (state.kind === 'live') {
     return roundLabel(state.round, state.totalRounds);
   }
@@ -41,6 +49,7 @@ function ledeLine(state: HeroState, winnerName?: string | null): string | null {
 }
 
 function splitTitle(title: string): { main: string; sub: string } {
+  // NEVER-KEY: tournament title tokens are data-derived and must match source data in English.
   const m = title.match(/^(.+?(?:CUP|OPEN|CHAMPIONSHIP|INVITATIONAL|CLASSIC))\s+(.+)$/i);
   if (m) return { main: m[1], sub: m[2] };
   return { main: title, sub: '' };
@@ -58,10 +67,12 @@ export function PhotoBand({
   isSignature,
   datesString,
 }: PhotoBandProps) {
+  const { t } = useTranslation('tourhub');
   const useDusk =
     state.kind === 'results' && (state.variant === 'declared' || state.variant === 'cancelled');
-  const lede = ledeLine(state, winnerName);
+  const lede = ledeLine(state, winnerName, t);
   const titleSplit = splitTitle(title);
+
 
   return (
     <div

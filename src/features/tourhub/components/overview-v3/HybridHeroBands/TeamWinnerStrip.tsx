@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Trophy } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { INK, GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants';
@@ -88,21 +89,25 @@ export function TeamWinnerStrip({
   members,
   score,
   scoreLabel,
-  eyebrow = 'TEAM WINNER',
+  eyebrow,
   eyebrowIcon: EyebrowIcon = Trophy,
   teamColor,
   teamCrestUrl,
 }: TeamWinnerStripProps) {
+  const { t } = useTranslation('tourhub');
+  const eyebrowText = eyebrow ?? t('overview.teamWinnerStrip.eyebrow');
   const membersDisplay = members
     .slice(0, 4)
     .map(m => surnameOnly(m.fullName))
     .filter(Boolean)
     .join(' · ');
 
-  // Auto-derive label: vs-par formatting → "VS PAR", else strokes total
+  // Auto-derive label: vs-par formatting → labelVsPar, else strokes total
   const derivedLabel =
     scoreLabel ??
-    (score.startsWith('\u2212') || score.startsWith('+') || score === 'E' ? 'VS PAR' : 'STROKES');
+    (score.startsWith('\u2212') || score.startsWith('+') || score === 'E'
+      ? t('overview.teamWinnerStrip.labelVsPar')
+      : t('overview.teamWinnerStrip.labelStrokes'));
 
   return (
     <div
@@ -132,7 +137,7 @@ export function TeamWinnerStrip({
       <div style={{ flex: 1, minWidth: 0, position: 'relative' }}>
         <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.18em', color: GOLD, marginBottom: 2, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
           <EyebrowIcon size={10} color={GOLD} strokeWidth={2.5} />
-          {eyebrow}
+          {eyebrowText}
         </div>
         <div
           style={{
