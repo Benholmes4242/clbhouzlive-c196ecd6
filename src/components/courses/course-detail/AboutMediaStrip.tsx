@@ -1,4 +1,5 @@
 import React, { useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Camera, Play, Plus } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
