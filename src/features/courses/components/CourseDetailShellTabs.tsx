@@ -55,7 +55,7 @@ export const CourseDetailShellTabs: React.FC<CourseDetailShellTabsProps> = ({
         ref={scrollerRef}
         data-course-detail-tabs
         role="tablist"
-        aria-label="Course Detail Sections"
+        aria-label={t('courseDetail.a11y.sections')}
         style={{
           display: 'flex',
           justifyContent: overflowing ? 'flex-start' : 'space-evenly',
