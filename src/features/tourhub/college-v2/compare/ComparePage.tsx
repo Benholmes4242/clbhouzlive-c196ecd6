@@ -194,6 +194,40 @@ export function ComparePage() {
                 rightValue={right?.top10Total ?? 0}
                 format={fmtInt}
               />
+              {(leftAgg?.scoringAvg || rightAgg?.scoringAvg) && (
+                <>
+                  <div style={{ height: 0.5, background: HAIRLINE_INK_10, margin: '0 16px' }} />
+                  <TugStat
+                    label="Scoring Avg"
+                    leftValue={leftAgg?.scoringAvg?.value ?? 0}
+                    rightValue={rightAgg?.scoringAvg?.value ?? 0}
+                    format={fmtScoringAvg}
+                    lowerWins
+                  />
+                </>
+              )}
+              {(leftAgg?.drivingDistance || rightAgg?.drivingDistance) && (
+                <>
+                  <div style={{ height: 0.5, background: HAIRLINE_INK_10, margin: '0 16px' }} />
+                  <TugStat
+                    label="Driving Distance"
+                    leftValue={leftAgg?.drivingDistance?.value ?? 0}
+                    rightValue={rightAgg?.drivingDistance?.value ?? 0}
+                    format={fmtDrive}
+                  />
+                </>
+              )}
+              {(leftAgg?.sgTotal || rightAgg?.sgTotal) && (
+                <>
+                  <div style={{ height: 0.5, background: HAIRLINE_INK_10, margin: '0 16px' }} />
+                  <TugStat
+                    label="SG: Total"
+                    leftValue={leftAgg?.sgTotal?.value ?? 0}
+                    rightValue={rightAgg?.sgTotal?.value ?? 0}
+                    format={fmtSg}
+                  />
+                </>
+              )}
             </>
           )}
         </section>
@@ -212,12 +246,14 @@ export function ComparePage() {
               headerCode={leftCode}
               roster={leftClass}
               liveMap={liveMap}
+              weekByPlayer={leftWeekByPlayer}
               alignRight={false}
             />
             <ClassColumn
               headerCode={rightCode}
               roster={rightClass}
               liveMap={liveMap}
+              weekByPlayer={rightWeekByPlayer}
               alignRight
             />
           </div>
