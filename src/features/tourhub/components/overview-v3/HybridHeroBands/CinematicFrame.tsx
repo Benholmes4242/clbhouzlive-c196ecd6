@@ -497,6 +497,7 @@ function DefendingChampionRowDark({
 // ---- upcoming: field-strength fallback row -------------------------------
 
 function FieldStrengthRowDark({ data }: { data: FieldStrength }) {
+  const { t } = useTranslation('tourhub');
   return (
     <div
       style={{
