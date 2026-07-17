@@ -280,7 +280,9 @@ export function CollegeFranchise() {
                   </span>
                 </div>
                 <div style={{ fontSize: 11, fontWeight: 500, color: V4.inkFaint, marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {s.player_count} on tour{capName ? ` · ${capName} captains` : ''}
+                  {capName
+                    ? t('overview.collegeFranchise.rowMetaWithCaptain', { count: s.player_count, captain: capName })
+                    : t('overview.collegeFranchise.rowMeta', { count: s.player_count })}
                 </div>
 
               </div>
