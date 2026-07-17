@@ -5,6 +5,8 @@
  */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
+
 
 import {
   PHOTO_BAND_HEIGHT,
