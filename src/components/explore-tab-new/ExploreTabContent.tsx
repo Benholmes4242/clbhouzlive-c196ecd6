@@ -17,7 +17,6 @@ import { TierSeeAllSheet } from './TierSeeAllSheet';
 
 import { scrollPageToTop } from '@/lib/getScrollParent';
 
-import { SeasonStrip } from './SeasonStrip';
 import { RankIdentityCard } from './RankIdentityCard';
 import { TheRecordBook } from './TheRecordBook';
 
