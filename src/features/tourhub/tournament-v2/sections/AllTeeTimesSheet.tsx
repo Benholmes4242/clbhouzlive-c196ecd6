@@ -79,7 +79,7 @@ export function AllTeeTimesSheet({
             </div>
           )}
           <div style={{ marginTop: 10 }}>
-            <ScopeSegment<RoundKey>
+            <ScopeSegment
               value={round}
               onChange={setRound}
               options={options}
