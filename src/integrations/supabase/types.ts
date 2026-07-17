@@ -20642,7 +20642,6 @@ export type Database = {
             }
             Returns: string
           }
-      upsert_internal_fn_secret: { Args: { p_secret: string }; Returns: string }
       upsert_whs_course_alias: {
         Args: {
           p_course_id: string
