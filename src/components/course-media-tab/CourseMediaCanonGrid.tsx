@@ -285,32 +285,44 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
     <div ref={setGridRef} style={{ fontFamily: FONT_FAMILY, padding: '12px 0 0' }}>
       <div style={{ display: 'flex', gap: 4, padding: '0 4px' }}>
         <div style={{ flex: 1 }}>
-          {packed.left.map(({ item, flatIndex: i }) => (
-            <FeedCard
-              key={item.post_id}
-              row={item}
-              feedPost={posts[i]}
-              posts={posts}
-              flatIndex={i}
-              isAutoplayActive={activeIndices.has(i)}
-              hideCourseAttribution
-              hideFormatBadge
-            />
-          ))}
+          {packed.left.map(({ item, flatIndex: i }) => {
+            // KEY MUST BE PER-TILE, NOT PER-POST. Course media is one row per
+            // media item, so a single post can contribute multiple tiles that
+            // all share post_id. Keying by post_id causes React to reconcile
+            // sibling tiles by position under a duplicate key — swapping a
+            // video's poster/duration onto an image tile after a filter change
+            // ("photo tile with a 0:10 badge" symptom).
+            const tileKey = posts[i]?.mediaItems[0]?.id ?? `${item.post_id}-${i}`;
+            return (
+              <FeedCard
+                key={tileKey}
+                row={item}
+                feedPost={posts[i]}
+                posts={posts}
+                flatIndex={i}
+                isAutoplayActive={activeIndices.has(i)}
+                hideCourseAttribution
+                hideFormatBadge
+              />
+            );
+          })}
         </div>
         <div style={{ flex: 1 }}>
-          {packed.right.map(({ item, flatIndex: i }) => (
-            <FeedCard
-              key={item.post_id}
-              row={item}
-              feedPost={posts[i]}
-              posts={posts}
-              flatIndex={i}
-              isAutoplayActive={activeIndices.has(i)}
-              hideCourseAttribution
-              hideFormatBadge
-            />
-          ))}
+          {packed.right.map(({ item, flatIndex: i }) => {
+            const tileKey = posts[i]?.mediaItems[0]?.id ?? `${item.post_id}-${i}`;
+            return (
+              <FeedCard
+                key={tileKey}
+                row={item}
+                feedPost={posts[i]}
+                posts={posts}
+                flatIndex={i}
+                isAutoplayActive={activeIndices.has(i)}
+                hideCourseAttribution
+                hideFormatBadge
+              />
+            );
+          })}
         </div>
       </div>
 
