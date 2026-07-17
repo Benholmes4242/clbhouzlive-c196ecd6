@@ -5,7 +5,9 @@
  * Section self-hides when the RPC reports unavailable coverage.
  */
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ShieldCheck } from 'lucide-react';
+
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SectionEyebrow } from './SectionEyebrow';
 import {
