@@ -490,19 +490,19 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(247,147,30,0.07)', border: '1.5px solid rgba(247,147,30,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
             <MessageSquarePlus size={26} strokeWidth={2} color={AMBER} />
           </div>
-          <div style={{ fontSize: 19, fontWeight: 900, color: INK, letterSpacing: '-0.03em', marginBottom: 6 }}>No reviews yet</div>
+          <div style={{ fontSize: 19, fontWeight: 900, color: INK, letterSpacing: '-0.03em', marginBottom: 6 }}>{t('review.empty.title')}</div>
           <p style={{ fontSize: 13, color: INK_FAINT, lineHeight: 1.6, maxWidth: 260, margin: '0 auto 24px' }}>
-            Be the first to share your experience at {courseName}.
+            {t('review.empty.body', { courseName })}
           </p>
           <PrimaryAmberCTA onClick={handleRateClick}>
-            Write the first review
+            {t('review.empty.cta')}
           </PrimaryAmberCTA>
         </div>
         <div style={{ margin: '16px' }}><Divider /></div>
         {/* What to include guide */}
         <div style={{ padding: 0 }}>
           <EmptyStateGuide
-            kicker="WHAT TO INCLUDE"
+            kicker={t('review.empty.kicker')}
             items={[
               { icon: Flag,      label: t('review.emptyGuide.condition.title'),  sub: t('review.emptyGuide.condition.sub') },
               { icon: Map,       label: t('review.emptyGuide.layout.title'),     sub: t('review.emptyGuide.layout.sub') },
@@ -523,6 +523,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       </div>
     );
   }
+
 
   return (
     <PullToRefreshContainer onRefresh={handlePullToRefresh}>
