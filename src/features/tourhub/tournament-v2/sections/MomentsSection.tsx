@@ -74,7 +74,7 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
               }}
               className="active:opacity-80 transition-opacity"
             >
-              Share a moment
+              {t('tournament.moments.shareCta')}
             </button>
           </div>
         </div>
