@@ -188,7 +188,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
             <div style={{ display: 'flex', alignItems: 'stretch', gap: 12 }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 8.5, fontWeight: 800, color: WHITE_ALPHA_65, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-                  Days
+                  {t('tournament.hero.daysLabel')}
                 </div>
                 <div style={{ fontSize: 26, fontWeight: 200, color: major ? GOLD : '#fff', fontVariantNumeric: 'tabular-nums', lineHeight: 1.05 }}>
                   {daysUntil != null ? daysUntil : '—'}
