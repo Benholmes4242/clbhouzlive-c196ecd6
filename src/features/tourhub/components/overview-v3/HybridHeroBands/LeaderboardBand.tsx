@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronRight, Crown } from 'lucide-react';
 import type { HeroState, TopTie } from '../HybridHero.utils';
 import { fmtScore, formatRank, buildLeaderboardSlots, extractRounds } from '../HybridHero.utils';
@@ -19,6 +20,28 @@ import { INK_ALPHA_45, FONT, GOLD, GOLD_DEEP } from '../../../_shared/tokens';
 import type { TeeTimeGroup } from '../../../hooks/useTournamentTeeTimes';
 import { resolvePlayerAvatarCandidates } from '../../../_shared/resolvePlayerAvatar';
 import { formatNumber } from '@/i18n/format';
+
+// CTA label lookup table — copy-table bucket per Wave 3e HOT-SET brief.
+const CTA_LABEL_KEYS: { key: string; labelKey: string }[] = [
+  { key: 'live', labelKey: 'overview.leaderboardBand.ctaLive' },
+  { key: 'results.cancelled', labelKey: 'overview.leaderboardBand.ctaCancelled' },
+  { key: 'results.awaiting-playoff', labelKey: 'overview.leaderboardBand.ctaAwaitingPlayoff' },
+  { key: 'results', labelKey: 'overview.leaderboardBand.ctaResults' },
+  { key: 'upcoming.imminent', labelKey: 'overview.leaderboardBand.ctaImminent' },
+  { key: 'upcoming', labelKey: 'overview.leaderboardBand.ctaUpcoming' },
+];
+
+function ctaLabelKey(state: HeroState): string {
+  if (state.kind === 'live') return 'overview.leaderboardBand.ctaLive';
+  if (state.kind === 'results') {
+    if (state.variant === 'cancelled') return 'overview.leaderboardBand.ctaCancelled';
+    if (state.variant === 'awaiting-playoff') return 'overview.leaderboardBand.ctaAwaitingPlayoff';
+    return 'overview.leaderboardBand.ctaResults';
+  }
+  return state.variant === 'imminent'
+    ? 'overview.leaderboardBand.ctaImminent'
+    : 'overview.leaderboardBand.ctaUpcoming';
+}
 
 
 export interface LeaderboardBandProps {
