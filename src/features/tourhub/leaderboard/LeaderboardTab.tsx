@@ -13,6 +13,7 @@
 
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { formatMonthDay, formatTournamentDateRange } from '@/i18n/format';
 import { Search, X } from 'lucide-react';
@@ -113,6 +114,7 @@ function StatusChip({
 }
 
 export function LeaderboardTab() {
+  const { t } = useTranslation('tourhub');
   const [searchParams, setSearchParams] = useSearchParams();
   const eventParam = searchParams.get('event');
 
@@ -162,9 +164,9 @@ export function LeaderboardTab() {
     return (
       <EditorialEmpty
         tint="slate"
-        eyebrow="Leaderboard"
-        title="No live tournaments"
-        body="When an event tees off, its live leaderboard will appear here."
+        eyebrow={t('empty.leaderboard.noLive.eyebrow')}
+        title={t('empty.leaderboard.noLive.title')}
+        body={t('empty.leaderboard.noLive.body')}
       />
     );
   }
@@ -435,14 +437,15 @@ export function LeaderboardTab() {
       ) : filteredEntries.length === 0 ? (
         <EditorialEmpty
           tint="slate"
-          eyebrow="Leaderboard"
-          title={searchQuery.trim() ? 'No players match' : 'Scoring not yet posted'}
+          eyebrow={t('empty.leaderboard.noPlayersMatch.eyebrow')}
+          title={searchQuery.trim() ? t('empty.leaderboard.noPlayersMatch.title') : t('empty.leaderboard.notPosted.title')}
           body={
             searchQuery.trim()
-              ? 'Try a different name.'
-              : 'Scoring will populate as players post numbers.'
+              ? t('empty.leaderboard.noPlayersMatch.body')
+              : t('empty.leaderboard.notPosted.body')
           }
         />
+
       ) : (
         <BoardTable
           entries={filteredEntries}

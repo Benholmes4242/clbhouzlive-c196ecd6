@@ -151,5 +151,24 @@
       "allTours": "All Tours",
       "filterAriaLabel": "Filter section by tour"
     }
+  },
+  "empty": {
+    "leaderboard": {
+      "noLive": {
+        "eyebrow": "Leaderboard",
+        "title": "No live tournaments",
+        "body": "When an event tees off, its live leaderboard will appear here."
+      },
+      "noPlayersMatch": {
+        "eyebrow": "Leaderboard",
+        "title": "No players match",
+        "body": "Try a different name."
+      },
+      "notPosted": {
+        "eyebrow": "Leaderboard",
+        "title": "Scoring not yet posted",
+        "body": "Scoring will populate as players post numbers."
+      }
+    }
   }
 }
