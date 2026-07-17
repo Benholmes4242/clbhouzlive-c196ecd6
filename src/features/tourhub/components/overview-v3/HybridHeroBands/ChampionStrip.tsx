@@ -282,10 +282,10 @@ export function PlayoffStrip({ count, score }: PlayoffStripProps) {
           gap: 5,
         }}>
           <Trophy size={10} color={GOLD} strokeWidth={2.5} />
-          AWAITING PLAYOFF
+          {t('overview.playoff.eyebrow')}
         </div>
         <div style={{ fontSize: 17, fontWeight: 800, color: 'white', letterSpacing: '-0.01em' }}>
-          {count} tied at the top
+          {t('overview.playoff.tiedAtTop', { count })}
         </div>
       </div>
       <div style={{ textAlign: 'right' }}>
