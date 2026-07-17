@@ -1,11 +1,11 @@
 import { useMemo, useRef, useState, useEffect } from 'react';
-import { useCircleActivity, type CircleActivityRow, type CircleFeatType } from './hooks/useCircleActivity';
+import { useWireActivity, type WireActivityRow, type WireFeatType } from './hooks/useWireActivity';
 import { useScorecardOpener } from './useScorecardOpener';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
-const CHIP_LABEL: Record<CircleFeatType, string> = {
+const CHIP_LABEL: Record<WireFeatType, string> = {
   ace: 'ACE',
   albatross: 'ALBATROSS',
   eagle: 'EAGLE',
@@ -26,7 +26,7 @@ function formatFriendName(raw: string): string {
   return s;
 }
 
-function achievementPhrase(row: CircleActivityRow): string {
+function achievementPhrase(row: WireActivityRow): string {
   const t = row.feat_type;
   if (t === 'ace') return 'made an ace';
   if (t === 'albatross') return 'made an albatross';
@@ -45,6 +45,8 @@ function ensureTickerStyles() {
   if (document.getElementById(TICKER_STYLE_ID)) return;
   const style = document.createElement('style');
   style.id = TICKER_STYLE_ID;
+  // Keyframes only — per-instance duration comes from an inline style var so
+  // the loop cadence can scale with item count without CSS rebuilds.
   style.textContent = `
 @keyframes almanac-ticker-scroll {
   from { transform: translateX(0); }
@@ -55,7 +57,10 @@ function ensureTickerStyles() {
   align-items: center;
   gap: 24px;
   width: max-content;
-  animation: almanac-ticker-scroll 28s linear infinite;
+  animation-name: almanac-ticker-scroll;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-duration: var(--almanac-ticker-duration, 28s);
   will-change: transform;
 }
 .almanac-ticker-track[data-paused="true"] { animation-play-state: paused; }
@@ -66,12 +71,8 @@ function ensureTickerStyles() {
   document.head.appendChild(style);
 }
 
-interface Props {
-  userId?: string;
-}
-
-export function WireTicker({ userId }: Props) {
-  const { data } = useCircleActivity(userId);
+export function WireTicker() {
+  const { data } = useWireActivity();
   const { target, openByScore, close } = useScorecardOpener();
   const [paused, setPaused] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -86,15 +87,21 @@ export function WireTicker({ userId }: Props) {
     return () => mq.removeEventListener?.('change', handler);
   }, []);
 
-  const items = useMemo(() => (data ?? []).slice(0, 8), [data]);
+  const items = useMemo(() => (data ?? []).slice(0, 20), [data]);
   // Duplicate the sequence once so translateX(-50%) yields a seamless join.
   const loopItems = useMemo(() => [...items, ...items], [items]);
+  // Scale duration with content so 20 items scroll at the same per-item speed
+  // as 6 rather than whipping past. Floor keeps very short sets readable.
+  const durationSec = useMemo(
+    () => Math.max(24, items.length * 3.5),
+    [items.length],
+  );
 
   const trackRef = useRef<HTMLDivElement | null>(null);
 
   if (items.length === 0) return null;
 
-  const renderItem = (r: CircleActivityRow, i: number) => {
+  const renderItem = (r: WireActivityRow, i: number) => {
     const friend = formatFriendName(r.friend_name);
     const chipLabel = CHIP_LABEL[r.feat_type] ?? 'HIGHLIGHT';
     const detail = (r.feat_value ?? '').trim();
@@ -164,6 +171,7 @@ export function WireTicker({ userId }: Props) {
         ref={trackRef}
         className="almanac-ticker-track"
         data-paused={paused || undefined}
+        style={{ ['--almanac-ticker-duration' as string]: `${durationSec}s` }}
         onPointerDown={() => setPaused(true)}
         onPointerUp={() => setPaused(false)}
         onPointerLeave={() => setPaused(false)}
@@ -187,7 +195,7 @@ export function WireTicker({ userId }: Props) {
         width: '100%',
         overflow: 'hidden',
       }}
-      aria-label="Friends achievements ticker"
+      aria-label="Live achievements wire"
     >
       {content}
       <RoundDetailSheet
