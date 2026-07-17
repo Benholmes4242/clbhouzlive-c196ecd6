@@ -564,8 +564,9 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                   {getScoreTier(communityScore).label}
                 </div>
                 <div style={{ fontSize: 11, color: INK_FAINT }}>
-                  {ratingCount} {ratingCount === 1 ? 'rating' : 'ratings'}
+                  {t('review.ratingCount', { count: ratingCount })}
                 </div>
+
               </div>
 
               {/* Tappable tier distribution */}
