@@ -204,7 +204,15 @@
       "backLine1": "[~~Ɓáĉǩ ţő~~]",
       "backLine2": "[~~ƒéáţúřéđ~~]",
       "showAllAria": "[~~Šĥőŵ áļļ ĝřőúƥš~~]",
-      "backAria": "[~~Ɓáĉǩ ţő ƒéáţúřéđ~~]"
+      "backAria": "[~~Ɓáĉǩ ţő ƒéáţúřéđ~~]",
+      "rightMetaWithRound": "[~~{{count}} gróúpš · R{{round}}~~]",
+      "roundShort": "[~~R{{round}}~~]",
+      "featuredChip": "[~~FÉÁTÚRÉD~~]",
+      "teeTimeLabel": "[~~TÉÉ {{time}}~~]",
+      "holeLabelSep": "[~~ · HÓLÉ {{hole}}~~]",
+      "backToFeaturedAria": "[~~Báçk tó féátúréd~~]",
+      "backToLine1": "[~~Báçk tó~~]",
+      "backToLine2": "[~~féátúréd~~]"
     },
     "tiPicks": {
       "eyebrow": "[~~Ţőúřñáɱéñţ íñţéļļíĝéñĉé~~]",

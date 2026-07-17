@@ -204,7 +204,15 @@
       "backLine1": "Back to",
       "backLine2": "featured",
       "showAllAria": "Show all groups",
-      "backAria": "Back to featured"
+      "backAria": "Back to featured",
+      "rightMetaWithRound": "{{count}} groups · R{{round}}",
+      "roundShort": "R{{round}}",
+      "featuredChip": "FEATURED",
+      "teeTimeLabel": "TEE {{time}}",
+      "holeLabelSep": " · HOLE {{hole}}",
+      "backToFeaturedAria": "Back to featured",
+      "backToLine1": "Back to",
+      "backToLine2": "featured"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
