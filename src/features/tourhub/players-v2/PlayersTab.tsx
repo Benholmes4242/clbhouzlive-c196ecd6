@@ -68,8 +68,11 @@ export function PlayersTab() {
   // ?tour= is honored once on mount for deep-link parity.
   const inboundTour = searchParams.get('tour');
   const initialTour: TourId =
-    inboundTour && inboundTour in TOUR_CONFIG ? (inboundTour as TourId) : 'pga';
+    inboundTour && inboundTour in TOUR_CONFIG && inboundTour !== 'champ'
+      ? (inboundTour as TourId)
+      : 'pga';
   const [activeTour, setActiveTour] = useState<TourId>(initialTour);
+
 
 
   // ── Sort (honor inbound ?sort=)
@@ -203,36 +206,57 @@ export function PlayersTab() {
         paddingTop: 'calc(var(--sat, 0px) + 69px)',
       }}
     >
-      {/* HEADER — search icon only */}
-      <div style={{ padding: '16px 16px 12px' }}>
+      {/* Tour lens + search — single sticky row. Pills scroll under a pinned
+          search button; expanding search hides the pills and fills the row. */}
+      <div
+        style={{
+          position: 'sticky',
+          top: 'var(--sat, 0px)',
+          zIndex: 10,
+          background: 'rgba(248,250,252,0.72)',
+          backdropFilter: 'blur(14px)',
+          WebkitBackdropFilter: 'blur(14px)',
+          borderBottom: '1px solid rgba(0,0,0,0.07)',
+        }}
+      >
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'flex-end',
             gap: 8,
+            paddingRight: 16,
           }}
         >
           {!searchExpanded ? (
-            <button
-              type="button"
-              aria-label={t('players.search.openAria')}
-              onClick={() => setSearchExpanded(true)}
-              style={{
-                width: 28,
-                height: 28,
-                borderRadius: 14,
-                background: '#FFFFFF',
-                border: `0.5px solid ${HAIRLINE_INK_10}`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                flexShrink: 0,
-              }}
-            >
-              <Search size={14} color={INK} />
-            </button>
+            <>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <SectionTourLens
+                  value={activeTour}
+                  onChange={(t) => t && setActiveTour(t)}
+                  showAllTours={false}
+                  excludeTours={['champ']}
+                />
+              </div>
+              <button
+                type="button"
+                aria-label={t('players.search.openAria')}
+                onClick={() => setSearchExpanded(true)}
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 18,
+                  background: '#FFFFFF',
+                  border: `0.5px solid ${HAIRLINE_INK_10}`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                }}
+              >
+                <Search size={14} color={INK} />
+              </button>
+            </>
           ) : (
             <div
               style={{
@@ -242,9 +266,10 @@ export function PlayersTab() {
                 gap: 6,
                 background: '#FFFFFF',
                 border: `0.5px solid ${HAIRLINE_INK_10}`,
-                borderRadius: 14,
-                padding: '4px 10px',
+                borderRadius: 18,
+                padding: '6px 12px',
                 minWidth: 0,
+                margin: '8.5px 0 8.5px 16px',
               }}
             >
               <Search size={13} color={INK_MUTE} />
@@ -286,25 +311,7 @@ export function PlayersTab() {
         </div>
       </div>
 
-      {/* Tour lens — sticky glass wrapper; chips from SectionTourLens
-          (no All Tours; PGA default). */}
-      <div
-        style={{
-          position: 'sticky',
-          top: 'var(--sat, 0px)',
-          zIndex: 10,
-          background: 'rgba(248,250,252,0.72)',
-          backdropFilter: 'blur(14px)',
-          WebkitBackdropFilter: 'blur(14px)',
-          borderBottom: '1px solid rgba(0,0,0,0.07)',
-        }}
-      >
-        <SectionTourLens
-          value={activeTour}
-          onChange={(t) => t && setActiveTour(t)}
-          showAllTours={false}
-        />
-      </div>
+
 
 
       <div style={{ padding: '12px 16px 0' }}>

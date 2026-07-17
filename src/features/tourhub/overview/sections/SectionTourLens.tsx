@@ -13,9 +13,12 @@ interface SectionTourLensProps {
    * Defaults to true — existing callers are unchanged.
    */
   showAllTours?: boolean;
+  /** Tour ids to omit from the pill row (page-specific exclusions). */
+  excludeTours?: TourId[];
 }
 
 const TOUR_ORDER: TourId[] = ['pga', 'lpga', 'euro', 'liv', 'champ', 'pgad'];
+
 
 type LensId = '__all__' | TourId;
 
@@ -27,7 +30,7 @@ type LensId = '__all__' | TourId;
  * state, no auto-scroll. Right-edge fade appears only when the row
  * overflows. Uses the canonical FilterChips pill language.
  */
-function SectionTourLensInner({ value, onChange, showAllTours = true }: SectionTourLensProps) {
+function SectionTourLensInner({ value, onChange, showAllTours = true, excludeTours }: SectionTourLensProps) {
   const { t } = useTranslation('tourhub');
   const wrapperRef = useRef<HTMLDivElement>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
@@ -40,13 +43,16 @@ function SectionTourLensInner({ value, onChange, showAllTours = true }: SectionT
     if (showAllTours) {
       list.push({ id: '__all__', label: t('overview.sectionTourLens.allTours') });
     }
+    const excluded = new Set(excludeTours ?? []);
     TOUR_ORDER.forEach((id) => {
+      if (excluded.has(id)) return;
       const config = TOUR_CONFIG[id];
       // NEVER-KEY: config.name is a tour display name (proper noun).
       list.push({ id, label: config.name });
     });
     return list;
-  }, [showAllTours, t]);
+  }, [showAllTours, excludeTours, t]);
+
 
   return (
     <div
