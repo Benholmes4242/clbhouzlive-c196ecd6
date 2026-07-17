@@ -85,8 +85,8 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
   return (
     <>
       <SectionEyebrow
-        kicker="Moments"
-        actionLabel={list.length > 4 ? 'All moments' : undefined}
+        kicker={t('tournament.moments.eyebrow')}
+        actionLabel={list.length > 4 ? t('tournament.moments.allAction') : undefined}
         onAction={list.length > 4 ? () => setOpen(true) : undefined}
       />
       <div
