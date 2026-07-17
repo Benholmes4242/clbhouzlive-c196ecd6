@@ -114,7 +114,7 @@ export function EventInfoSection({ meta, broadcast, onTeeTimesTap, teeTimesRound
                 letterSpacing: '0.14em', textTransform: 'uppercase',
               }}
             >
-              Tee times
+              {t('tournament.eventInfo.teeTimes')}
             </div>
             <div
               style={{
