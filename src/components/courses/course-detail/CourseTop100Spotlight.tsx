@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTop100CourseInsights } from '@/hooks/useTop100CourseInsights';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -14,6 +15,7 @@ export const CourseTop100Spotlight: React.FC<CourseTop100SpotlightProps> = ({
   courseId,
   courseName,
 }) => {
+  const { t } = useTranslation('courses');
   const { data, isLoading } = useTop100CourseInsights(courseId);
   const { user } = useSupabaseSession();
   const { data: top100Progress } = useTop100ProgressForUser(user?.id);
@@ -117,9 +119,9 @@ export const CourseTop100Spotlight: React.FC<CourseTop100SpotlightProps> = ({
           <Trophy style={{ width: 18, height: 18, color: '#fff' }} />
         </div>
         <div>
-          <h3 style={{ fontSize: 14, fontWeight: 800, color: '#fff', margin: 0 }}>Top 100 Spotlight</h3>
+          <h3 style={{ fontSize: 14, fontWeight: 800, color: '#fff', margin: 0 }}>{t('courseDetail.top100Spotlight.title')}</h3>
           <p style={{ fontSize: 11, color: '#94A3B8', margin: '2px 0 0' }}>
-            Appears in {listCount} prestigious {listCount === 1 ? 'list' : 'lists'}
+            {t('courseDetail.top100Spotlight.appearsIn', { count: listCount })}
           </p>
         </div>
       </div>
@@ -155,7 +157,7 @@ export const CourseTop100Spotlight: React.FC<CourseTop100SpotlightProps> = ({
               if (!progress) {
                 return (
                   <div style={{ display: 'inline-flex', alignItems: 'center', marginTop: 8, fontSize: 9.5, fontWeight: 700, color: '#94A3B8', background: 'rgba(255,255,255,0.06)', borderRadius: 999, padding: '3px 8px' }}>
-                    Tap to view list
+                    {t('courseDetail.top100Spotlight.tapToView')}
                   </div>
                 );
               }
@@ -169,7 +171,7 @@ export const CourseTop100Spotlight: React.FC<CourseTop100SpotlightProps> = ({
                   background: playedThis ? 'rgba(247,147,30,0.14)' : 'rgba(255,255,255,0.06)',
                 }}>
                   {playedThis && <Check size={9} strokeWidth={3} />}
-                  You've played {progress.played}/{progress.total}
+                  {t('courseDetail.top100Spotlight.youvePlayed', { played: progress.played, total: progress.total })}
                 </div>
               );
             })()}
@@ -182,10 +184,10 @@ export const CourseTop100Spotlight: React.FC<CourseTop100SpotlightProps> = ({
         <div style={{ marginTop: 14, paddingTop: 12, borderTop: '0.5px solid rgba(247,147,30,0.18)', position: 'relative' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
             <span style={{ fontSize: 10, color: '#94A3B8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-              Your Top 100 Journey
+              {t('courseDetail.top100Spotlight.journeyLabel')}
             </span>
             <span style={{ fontSize: 11, color: '#F7931E', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
-              {bestProgress.played} of {bestProgress.total} played
+              {t('courseDetail.top100Spotlight.progressPlayed', { played: bestProgress.played, total: bestProgress.total })}
             </span>
           </div>
           <div style={{ height: 4, borderRadius: 999, overflow: 'hidden', background: 'rgba(247,147,30,0.12)' }}>
