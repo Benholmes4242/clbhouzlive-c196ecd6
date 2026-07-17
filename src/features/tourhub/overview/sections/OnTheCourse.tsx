@@ -432,7 +432,7 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
               <button
                 type="button"
                 onClick={collapseToFeatured}
-                aria-label="Back to featured"
+                aria-label={t('overview.onTheCourse.backToFeaturedAria')}
                 style={{
                   minWidth: 122,
                   flexShrink: 0,
@@ -450,8 +450,8 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                 }}
               >
                 <span style={{ fontSize: 22, fontWeight: 300, color: '#64748B', lineHeight: 1 }}>‹</span>
-                <span style={{ fontSize: 11.5, fontWeight: 800, color: V4.ink }}>Back to</span>
-                <span style={{ fontSize: 11.5, fontWeight: 800, color: V4.ink }}>featured</span>
+                <span style={{ fontSize: 11.5, fontWeight: 800, color: V4.ink }}>{t('overview.onTheCourse.backToLine1')}</span>
+                <span style={{ fontSize: 11.5, fontWeight: 800, color: V4.ink }}>{t('overview.onTheCourse.backToLine2')}</span>
               </button>
             </>
           )}
