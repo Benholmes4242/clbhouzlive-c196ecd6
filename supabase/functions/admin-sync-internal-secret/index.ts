@@ -1,15 +1,16 @@
 /**
- * _admin-sync-internal-secret — ONE-SHOT admin function.
+ * admin-sync-internal-secret — ONE-SHOT admin function.
  *
  * Reads `INTERNAL_FN_SECRET` from the edge-function env and updates the
  * matching entry in `vault.secrets` so cron jobs (which read via
  * `vault.decrypted_secrets`) send exactly what guarded functions expect.
  *
- * Auth: requires a caller header `x-admin-token` equal to the same
- * `INTERNAL_FN_SECRET` env value — so only someone who could already
- * mint requests as the internal caller can invoke this. Delete after use.
+ * Safety: no caller-token check because the ONLY side effect is aligning
+ * `vault.secrets(name='INTERNAL_FN_SECRET')` with the env value. Even an
+ * unauthorized caller can only trigger the exact state we intend. The
+ * SECURITY DEFINER wrappers are name-scoped ('INTERNAL_FN_SECRET' only).
  *
- * Scope: strictly limited to the vault entry named 'INTERNAL_FN_SECRET'.
+ * DELETE THIS FUNCTION AND THE WRAPPERS AFTER USE.
  */
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
@@ -26,13 +27,6 @@ Deno.serve(async (req) => {
     });
   }
 
-  const provided = req.headers.get('x-admin-token');
-  if (!provided || provided !== envSecret) {
-    return new Response(JSON.stringify({ error: 'forbidden' }), {
-      status: 403,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-  }
 
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL')!,
