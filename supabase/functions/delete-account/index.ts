@@ -99,6 +99,22 @@ Deno.serve(async (req) => {
     // Track deletion results for logging
     const deletionResults: Record<string, { deleted: number; error?: string }> = {}
 
+    // Write an in-flight marker so concurrent double-submits hit the 429 guard
+    // above. Non-fatal on failure — the terminal audit row still records completion.
+    try {
+      await adminClient
+        .from('admin_audit_log')
+        .insert({
+          admin_user_id: user.id,
+          action: 'SELF_DELETE_ACCOUNT_GDPR',
+          target_user_id: user.id,
+          target_email: user.email,
+          details: { phase: 'started', started_at: deletedAt }
+        })
+    } catch (e) {
+      console.error('[delete-account] Start-marker audit insert failed (non-fatal):', e)
+    }
+
     // ========== CASCADE DELETE USER DATA (GDPR Compliance) ==========
 
     // 1. Delete user's posts and associated data
