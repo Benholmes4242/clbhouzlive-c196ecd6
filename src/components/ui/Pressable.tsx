@@ -281,9 +281,16 @@ const Pressable = forwardRef<HTMLElement, PressableProps>(function Pressable(
 
   const handlePointerUp = useCallback(
     (e: React.PointerEvent<HTMLElement>) => {
+      const targetEl = e.target as HTMLElement | null;
+      if (targetEl?.closest('[data-stop-press]')) {
+        releasePressed();
+        clearPrerouteTimers();
+        return;
+      }
       const s = stateRef.current;
       if (!s.active) return;
       if (e.pointerId !== s.pointerId) return;
+
       const wasAborted = s.aborted;
       const dx = Math.abs(e.clientX - s.startX);
       const dy = Math.abs(e.clientY - s.startY);
