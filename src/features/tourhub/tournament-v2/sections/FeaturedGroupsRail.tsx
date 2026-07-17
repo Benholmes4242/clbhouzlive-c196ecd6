@@ -45,7 +45,9 @@ function scoreColor(s: string | null): string {
 
 export function FeaturedGroupsRail({ tournamentId, live, tourCode }: Props) {
   const navigate = useNavigate();
+  const { t } = useTranslation('tourhub');
   const { data } = useFeaturedGroups(tournamentId, { live });
+
   const groups = parseGroups(data);
   // Self-hide when there are no featured groups. Eyebrow lives INSIDE
   // the rail so a live event without groups shows no floating chrome
