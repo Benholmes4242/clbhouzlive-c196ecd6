@@ -46,6 +46,51 @@ Deno.serve(async (req) => {
     // Create admin client with service role for deletion operations
     const adminClient = createClient(supabaseUrl, supabaseServiceKey)
 
+    // ========== DOUBLE-SUBMIT GUARD ==========
+    // GDPR deletion is a once-ever action. A second call within a short window
+    // is a double-submit or retry storm, not a legitimate request.
+    // 1) If the profile is already soft-deleted, return idempotent success.
+    try {
+      const { data: existingProfile } = await adminClient
+        .from('user_profiles')
+        .select('deleted_at')
+        .eq('id', user.id)
+        .maybeSingle()
+
+      if (existingProfile?.deleted_at) {
+        console.log(`[delete-account] Idempotent: user ${user.id} already deleted at ${existingProfile.deleted_at}`)
+        return new Response(
+          JSON.stringify({ success: true, message: 'Account already deleted', idempotent: true }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+    } catch (e) {
+      console.error('[delete-account] Idempotency check failed (non-fatal, proceeding):', e)
+    }
+
+    // 2) If another delete for this user is already in-flight (audit row within
+    //    the last 2 minutes), reject as a double-submit.
+    try {
+      const twoMinutesAgo = new Date(Date.now() - 120_000).toISOString()
+      const { count: recentDeletes } = await adminClient
+        .from('admin_audit_log')
+        .select('id', { count: 'exact', head: true })
+        .eq('action', 'SELF_DELETE_ACCOUNT_GDPR')
+        .eq('target_user_id', user.id)
+        .gte('created_at', twoMinutesAgo)
+
+      if ((recentDeletes ?? 0) >= 1) {
+        console.warn(`[delete-account] Double-submit blocked for user ${user.id} (recent audit rows: ${recentDeletes})`)
+        return new Response(
+          JSON.stringify({ error: 'Account deletion already in progress. Please wait a moment before retrying.' }),
+          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+    } catch (e) {
+      console.error('[delete-account] Rate-limit check failed (non-fatal, proceeding):', e)
+    }
+
+
     // Generate anonymized values
     const anonymizedUsername = `deleted_${user.id.slice(0, 8)}_${Date.now()}`
     const anonymizedDisplayName = 'Deleted User'
