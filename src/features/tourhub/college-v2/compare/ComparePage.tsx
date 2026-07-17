@@ -282,11 +282,18 @@ interface ClassColumnProps {
     firstName: string;
     lastName: string;
   }>;
-  liveMap: Record<string, unknown>;
+  liveMap: LivePlayerMap;
+  weekByPlayer: Map<string, WeekAlumnusRow>;
   alignRight: boolean;
 }
 
-function ClassColumn({ headerCode, roster, liveMap, alignRight }: ClassColumnProps) {
+function formatWeekSubline(week: WeekAlumnusRow): string {
+  const pos =
+    week.position != null ? `${week.positionTied ? 'T' : ''}${week.position}` : null;
+  return pos ? `${pos} \u00B7 ${week.tournamentName}` : week.tournamentName;
+}
+
+function ClassColumn({ headerCode, roster, liveMap, weekByPlayer, alignRight }: ClassColumnProps) {
   return (
     <div
       style={{
@@ -317,12 +324,33 @@ function ClassColumn({ headerCode, roster, liveMap, alignRight }: ClassColumnPro
             paddingTop: 4,
           }}
         >
-          —
+          No alumni on file
         </div>
       ) : (
         roster.map((a) => {
-          const isLive = Boolean(liveMap[a.id]);
+          const live = liveMap[a.id] ?? null;
+          const week = weekByPlayer.get(a.id) ?? null;
           const nav = playerRoute(a.id, { kind: 'college', collegeName: headerCode });
+
+          let subline: string;
+          let sublineColor: string;
+          if (live) {
+            const posLabel =
+              live.position != null
+                ? `${live.positionTied ? 'T' : ''}${live.position}`
+                : '';
+            subline = posLabel
+              ? `${posLabel} \u00B7 ${live.tournamentName}`
+              : live.tournamentName;
+            sublineColor = STATUS_LIVE;
+          } else if (week) {
+            subline = formatWeekSubline(week);
+            sublineColor = INK_MUTE;
+          } else {
+            subline = 'Off this week';
+            sublineColor = OFF_INK;
+          }
+
           return (
             <Link
               key={a.id}
@@ -340,13 +368,13 @@ function ClassColumn({ headerCode, roster, liveMap, alignRight }: ClassColumnPro
             >
               <div style={{ position: 'relative', flexShrink: 0 }}>
                 <SquircleAvatar
-                  size={22}
+                  size={26}
                   srcCandidates={a.photoUrl ? [a.photoUrl] : []}
                   alt={a.fullName}
                   hairlineRing
                   ringColor="rgba(15,23,42,0.12)"
                 />
-                {isLive && (
+                {live && (
                   <span
                     aria-hidden
                     style={{
@@ -362,20 +390,37 @@ function ClassColumn({ headerCode, roster, liveMap, alignRight }: ClassColumnPro
                   />
                 )}
               </div>
-              <div
-                style={{
-                  flex: 1,
-                  minWidth: 0,
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: INK,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  textAlign: alignRight ? 'right' : 'left',
-                }}
-              >
-                {a.fullName}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: 11.5,
+                    fontWeight: 700,
+                    color: INK,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    textAlign: alignRight ? 'right' : 'left',
+                    letterSpacing: '-0.005em',
+                  }}
+                >
+                  {a.fullName}
+                </div>
+                <div
+                  style={{
+                    marginTop: 1,
+                    fontSize: 10,
+                    fontWeight: live ? 700 : 500,
+                    color: sublineColor,
+                    letterSpacing: '0.02em',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    textAlign: alignRight ? 'right' : 'left',
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
+                  {subline}
+                </div>
               </div>
             </Link>
           );
