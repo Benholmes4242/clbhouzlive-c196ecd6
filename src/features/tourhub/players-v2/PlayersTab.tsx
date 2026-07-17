@@ -400,8 +400,8 @@ export function PlayersTab() {
               subLive = true;
             } else if (synced && (r.wins || r.top10s)) {
               const parts: string[] = [];
-              if (r.wins) parts.push(`${r.wins} WIN${r.wins === 1 ? '' : 'S'}`);
-              if (r.top10s) parts.push(`${r.top10s} TOP-10`);
+              if (r.wins) parts.push(t('players.sub.wins', { count: r.wins }));
+              if (r.top10s) parts.push(t('players.sub.top10s', { count: r.top10s }));
               sub = parts.join(' \u00B7 ');
             }
             const goldRank = synced && r.rank === 1 && !podiumRows.length;
