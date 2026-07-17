@@ -21,6 +21,7 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
   courseId,
   courseName,
 }) => {
+  const { t } = useTranslation('courses');
   const { data: moments, isLoading } = useUserCourseMoments(courseId);
   const { user } = useSupabaseSession();
   const { profile } = useProfileData();
