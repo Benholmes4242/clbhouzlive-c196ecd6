@@ -411,40 +411,50 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                       {time ? t('overview.onTheCourse.teeTimeLabel', { time }) : ''}
                       {g.startingHole ? t('overview.onTheCourse.holeLabelSep', { hole: g.startingHole }) : ''}
                     </div>
-                    {g.players.slice(0, 3).map((p, pi) => (
-                      <button
-                        key={pi}
-                        type="button"
-                        onClick={() => { if (p.id) navigate(`/tourhub/player/${p.id}`); }}
-                        disabled={!p.id}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 9,
-                          padding: '6px 0',
-                          minHeight: 40,
-                          width: '100%',
-                          background: 'transparent',
-                          border: 'none',
-                          borderTop: pi === 0 ? 'none' : `0.5px solid ${V4.hairline}`,
-                          textAlign: 'left',
-                          cursor: p.id ? 'pointer' : 'default',
-                        }}
-                      >
-                        <PlayerAvatar
-                          playerId={p.id ?? p.name}
-                          playerName={p.name}
-                          tourCode={tourCode}
-                          photoUrl={p.photoUrl ?? null}
-                          size="xs"
-                          ringColor={LIGHT_HAIRLINE}
-                        />
-                        <div style={{ flex: 1, minWidth: 0, fontSize: 12, fontWeight: 700, color: V4.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {p.name}
-                        </div>
-                        <span style={{ fontSize: 12.5, fontWeight: 800, color: V4.inkFaint, fontVariantNumeric: 'tabular-nums' }}>—</span>
-                      </button>
-                    ))}
+                    {g.players.slice(0, 3).map((p, pi) => {
+                      const lb = p.id ? leaderboardByPlayerId.get(p.id) : undefined;
+                      const status = (lb?.status || '').toUpperCase();
+                      const isCut = status === 'CUT' || status === 'WD' || status === 'DQ';
+                      const display = formatScore(lb?.today) ?? formatScore(lb?.score) ?? '—';
+                      return (
+                        <button
+                          key={pi}
+                          type="button"
+                          onClick={() => { if (p.id) navigate(`/tourhub/player/${p.id}`); }}
+                          disabled={!p.id}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 9,
+                            padding: '6px 0',
+                            minHeight: 40,
+                            width: '100%',
+                            background: 'transparent',
+                            border: 'none',
+                            borderTop: pi === 0 ? 'none' : `0.5px solid ${V4.hairline}`,
+                            textAlign: 'left',
+                            cursor: p.id ? 'pointer' : 'default',
+                          }}
+                        >
+                          <PlayerAvatar
+                            playerId={p.id ?? p.name}
+                            playerName={p.name}
+                            tourCode={tourCode}
+                            photoUrl={p.photoUrl ?? null}
+                            size="xs"
+                            ringColor={LIGHT_HAIRLINE}
+                          />
+                          <div style={{ flex: 1, minWidth: 0, fontSize: 12, fontWeight: 700, color: V4.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {p.name}
+                          </div>
+                          {isCut ? (
+                            <span style={{ fontSize: 9.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em' }}>{status}</span>
+                          ) : (
+                            <span style={{ fontSize: 12.5, fontWeight: 800, color: display === '—' ? V4.inkFaint : scoreColor(display), fontVariantNumeric: 'tabular-nums' }}>{display}</span>
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
                 );
               })}
