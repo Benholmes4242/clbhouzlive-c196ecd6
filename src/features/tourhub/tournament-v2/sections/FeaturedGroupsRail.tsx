@@ -4,6 +4,8 @@
  * Self-hides on empty (parent decides via presence of children).
  */
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+
 import { useFeaturedGroups } from '../../overview/data/useFeaturedGroups';
 import { PlayerAvatar } from '../../components/PlayerAvatar';
 import { SectionEyebrow } from './SectionEyebrow';
