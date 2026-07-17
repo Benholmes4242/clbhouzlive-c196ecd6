@@ -93,7 +93,7 @@ export function FullListSheet({
               fontVariantNumeric: 'tabular-nums',
             }}
           >
-            {tourLabel} {'\u00B7'} {year} {'\u00B7'} {total} {total === 1 ? 'PLAYER' : 'PLAYERS'}
+            {t('leaders.sheet.eyebrow', { tourLabel, year, count: total })}
           </div>
           <div
             id="tour-leaders-full-sheet-title"
@@ -105,7 +105,7 @@ export function FullListSheet({
               lineHeight: 1.1,
             }}
           >
-            {category.label}
+            {t(category.labelKey)}
           </div>
         </div>
       </div>
