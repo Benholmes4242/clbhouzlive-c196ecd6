@@ -95,7 +95,11 @@ function PodiumCard({
             marginBottom: 4,
           }}
         >
-          {center ? `No.1${statLabel ? ' \u00B7 ' + statLabel : ''}` : `No.${row.rank}`}
+          {center
+            ? statLabel
+              ? t('players.podium.rankWithStat', { rank: 1, statLabel })
+              : t('players.podium.rank', { rank: 1 })
+            : t('players.podium.rank', { rank: row.rank })}
         </div>
         <div
           style={{
