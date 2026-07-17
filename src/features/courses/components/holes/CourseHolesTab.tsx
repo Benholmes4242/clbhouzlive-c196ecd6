@@ -128,7 +128,7 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
         />
         <ScopeSegment
           value={sort}
-          onChange={setSort}
+          onChange={(next) => setSort(next as 'hole' | 'difficulty')}
           ariaLabel={t('courses:holes.sortAriaLabel', 'Sort holes')}
           options={[
             { value: 'hole', label: t('courses:holes.sortByHole') },

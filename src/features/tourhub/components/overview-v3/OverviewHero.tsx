@@ -35,6 +35,7 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
     selectedTourSlug,
     selectedTournamentId,
     selectionNonce,
+    applyLandingSelection,
     setViewingTourSlug,
     setViewingTournamentId,
   } = useTourSelection();
@@ -47,6 +48,20 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
     () => slides.map((s) => s.tournament.id).join('|'),
     [slides],
   );
+
+  // Land-time live-first: as soon as slides resolve, tell the context which
+  // tours are live so it can override the stored/default tour once. The
+  // context guards against re-runs after user interaction.
+  const liveTourSignature = useMemo(() => {
+    const set = new Set<string>();
+    for (const s of slides) if (s.type === 'live') set.add(s.tournament.tourSlug);
+    return Array.from(set).sort().join('|');
+  }, [slides]);
+  useEffect(() => {
+    if (count === 0) return;
+    applyLandingSelection(liveTourSignature ? liveTourSignature.split('|') : []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [count, liveTourSignature]);
 
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -69,7 +84,8 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
   }, [activeIndex, slides]);
 
   // COMMAND jump: picker → hero. Find the tournament in the river; else the
-  // first slide of the selected tour; else index 0.
+  // first LIVE slide of the selected tour; else the first slide of that tour;
+  // else index 0.
   useEffect(() => {
     if (count === 0) return;
     let idx = -1;
@@ -77,7 +93,12 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
       idx = slides.findIndex((s) => s.tournament.id === selectedTournamentId);
     }
     if (idx < 0 && selectedTourSlug) {
-      idx = slides.findIndex((s) => s.tournament.tourSlug === selectedTourSlug);
+      idx = slides.findIndex(
+        (s) => s.tournament.tourSlug === selectedTourSlug && s.type === 'live',
+      );
+      if (idx < 0) {
+        idx = slides.findIndex((s) => s.tournament.tourSlug === selectedTourSlug);
+      }
     }
     if (idx < 0) idx = 0;
     setActiveIndex(idx);

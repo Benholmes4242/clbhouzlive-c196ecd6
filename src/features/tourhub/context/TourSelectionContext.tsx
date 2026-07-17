@@ -1,8 +1,7 @@
 /**
  * TourSelectionContext — channels between the (scoped) tour picker and the hero.
  *
- * Restored in Phase 5C after Phase 5A removed the command surface. Scope is
- * now local: only the OverviewHero (+ downstream OnTheCourseSlot / TISlot)
+ * Scope is local: only the OverviewHero (+ downstream OnTheCourseSlot / TISlot)
  * read from these fields. Every other section moved to its own local lens
  * in Phase 3-4.
  *
@@ -14,13 +13,30 @@
  *
  *  2. DISPLAY (hero -> picker + OTC/TI):  setViewingTourSlug /
  *     setViewingTournamentId report whichever tour + tournament the hero is
- *     currently showing. The picker reads viewingTourSlug for its LABEL and
- *     viewingTournamentId for its active-row highlight; OTC + TI read
- *     viewingTournamentId so they stay locked to the hero. The hero must
- *     NEVER read these back into its own index — display-only, dead end.
+ *     currently showing. Display-only; the hero must never read these back.
+ *
+ * LAND-TIME LIVE-FIRST OVERRIDE:
+ *  The initial tour comes from localStorage (default 'pga'). After live
+ *  carousel data resolves, the hero calls applyLandingSelection(liveSlugs)
+ *  once. If the stored tour has no live tournament but another tour does,
+ *  we switch to the highest-priority live tour — WITHOUT overwriting
+ *  storage. Manual selectTour calls set userInteracted=true and skip any
+ *  further landing overrides for the rest of the session.
  */
 
-import React, { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useRef,
+  type ReactNode,
+} from 'react';
+import {
+  readStoredTour,
+  writeStoredTour,
+  resolveLandingTour,
+} from '@/features/tourhub/hooks/useTourSelection';
 
 interface SelectTourOptions {
   tournamentId?: string;
@@ -31,6 +47,12 @@ interface TourSelectionValue {
   selectedTournamentId: string | null;
   selectionNonce: number;
   selectTour: (slug: string, opts?: SelectTourOptions) => void;
+  /**
+   * Land-time only: once live tour slugs are known, evaluate whether to
+   * override the stored/default tour with the highest-priority live tour.
+   * No-op after the first call OR after any manual selectTour.
+   */
+  applyLandingSelection: (liveSlugs: readonly string[]) => void;
   viewingTourSlug: string | null;
   setViewingTourSlug: (slug: string) => void;
   viewingTournamentId: string | null;
@@ -40,19 +62,41 @@ interface TourSelectionValue {
 const TourSelectionContext = createContext<TourSelectionValue | null>(null);
 
 export function TourSelectionProvider({ children }: { children: ReactNode }) {
-  // No "All Tours" state in the restored picker: a tour is always selected.
-  // Default to PGA so the hero opens on PGA on first mount.
-  const [selectedTourSlug, setSelectedTourSlug] = useState<string | null>('pga');
+  // Initial tour comes from localStorage — falls back to PGA.
+  const [selectedTourSlug, setSelectedTourSlug] = useState<string | null>(
+    () => readStoredTour() ?? 'pga',
+  );
   const [selectedTournamentId, setSelectedTournamentId] = useState<string | null>(null);
   const [selectionNonce, setSelectionNonce] = useState(0);
   const [viewingTourSlug, setViewingTourSlugState] = useState<string | null>(null);
   const [viewingTournamentId, setViewingTournamentIdState] = useState<string | null>(null);
 
+  // Guards for the land-time override — runs at most once per session, and
+  // never after the user has manually switched tours.
+  const userInteractedRef = useRef(false);
+  const landingAppliedRef = useRef(false);
+
   const selectTour = useCallback((slug: string, opts?: SelectTourOptions) => {
+    userInteractedRef.current = true;
+    landingAppliedRef.current = true;
+    writeStoredTour(slug);
     setSelectedTourSlug(slug);
     setSelectedTournamentId(opts?.tournamentId ?? null);
     setSelectionNonce((n) => n + 1);
   }, []);
+
+  const applyLandingSelection = useCallback((liveSlugs: readonly string[]) => {
+    if (landingAppliedRef.current || userInteractedRef.current) return;
+    landingAppliedRef.current = true;
+    const stored = readStoredTour() ?? selectedTourSlug ?? 'pga';
+    const next = resolveLandingTour(stored, liveSlugs);
+    if (!next || next === selectedTourSlug) return;
+    // Do NOT persist — storage still reflects the user's preference. Bump the
+    // nonce so the hero jumps to a slide on the new tour.
+    setSelectedTourSlug(next);
+    setSelectedTournamentId(null);
+    setSelectionNonce((n) => n + 1);
+  }, [selectedTourSlug]);
 
   const setViewingTourSlug = useCallback((slug: string) => {
     setViewingTourSlugState((prev) => (prev === slug ? prev : slug));
@@ -69,6 +113,7 @@ export function TourSelectionProvider({ children }: { children: ReactNode }) {
         selectedTournamentId,
         selectionNonce,
         selectTour,
+        applyLandingSelection,
         viewingTourSlug,
         setViewingTourSlug,
         viewingTournamentId,
@@ -88,6 +133,7 @@ export function useTourSelection(): TourSelectionValue {
       selectedTournamentId: null,
       selectionNonce: 0,
       selectTour: () => {},
+      applyLandingSelection: () => {},
       viewingTourSlug: null,
       setViewingTourSlug: () => {},
       viewingTournamentId: null,
