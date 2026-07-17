@@ -212,7 +212,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
                   <div style={{ width: 1, background: WHITE_ALPHA_10 }} />
                   <div style={{ flexShrink: 0, textAlign: 'right' }}>
                     <div style={{ fontSize: 8.5, fontWeight: 800, color: WHITE_ALPHA_65, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-                      Purse
+                      {t('tournament.hero.purseLabel')}
                     </div>
                     <div style={{ fontSize: 15, fontWeight: 800, color: '#fff', marginTop: 3, fontVariantNumeric: 'tabular-nums' }}>
                       {formatPurse(meta.purse)}
