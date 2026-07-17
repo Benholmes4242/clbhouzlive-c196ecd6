@@ -3,34 +3,32 @@
  *
  * Per-tour category reality (fields ARE real; nothing is faked):
  *
- *   pga (sr_player_statistics):
- *     earnings              (desc)  MONEY
- *     scoring_average       (asc)   AVG
- *     wins                  (desc)  WINS
- *     top_10s               (desc)  TOP 10
- *     driving_distance      (desc)  YDS
- *     driving_accuracy      (desc)  %
- *     greens_in_reg         (desc)  %
- *     scrambling            (desc)  %
- *     putting_average       (asc)   PUTTS
- *     sand_saves            (desc)  %
- *     strokes_gained_total  (desc)  SG
- *     strokes_gained_tee_green (desc) SG T2G
+ *   pga (sr_player_statistics) — 11 categories:
+ *     earnings                  (desc)  USD
+ *     scoring_average           (asc)   AVG
+ *     wins                      (desc)  WINS
+ *     top_10s                   (desc)  TOP 10
+ *     driving_distance          (desc)  YDS
+ *     driving_accuracy          (desc)  %
+ *     greens_in_reg             (desc)  %
+ *     sand_saves                (desc)  %
+ *     putting_average           (asc)   PUTTS
+ *     strokes_gained_tee_green  (desc)  SG
+ *     strokes_gained_putting    (desc)  SG
  *
  *   euro / lpga / pgad / liv (tour_season_rankings):
- *     points  (desc)  PTS
- *     wins    (desc)  WINS  (only when wins column has any nonzero)
+ *     points  (desc)  PTS  (per-tour brand label: Race to Dubai / CME Points / LIV Points / Season Points)
+ *     wins    (desc)  WINS (only when wins column has any nonzero)
  *
- *   all tours (sr_world_rankings):
+ *   all tours (sr_world_rankings) — PGA-only per editorial policy:
  *     world_rank (asc rank -> desc points, latest ranking_date)  OWGR PTS
- *
- * Dropped from constants.ts (no real DB field): events_played + cuts_made
- * ARE real, so kept in PGA; nothing else in constants.ts maps to nothing.
- * (constants.ts had ~14 categories; here we cover the 12 that carry a
- * meaningful editorial ranking on PGA today.)
  *
  * ONE fetch per data source per tour — categories share the pool. The
  * FullListSheet reads the same top-50 slice; the board slices to 3.
+ *
+ * i18n — LEADER_STAT_LABELS is the canonical registry of category KEY ->
+ * { labelKey, shortKey, unitKey } consumed by StatBoard, FullListSheet, and
+ * (Wave 3e.iv Turn C.3) player-v2/StatsSheet. One source of truth per stat.
  */
 
 import { useQuery } from '@tanstack/react-query';
@@ -50,11 +48,44 @@ export interface LeaderRow {
   valueFormatted: string;
 }
 
+// Canonical category-label registry. Keys are the stable category identifiers
+// (never displayed, never compared against translated labels). Values point at
+// the i18n keys under tourhub#leaders.stat.<key>.{label,short,unit}. Shared
+// between leaders-v2 (StatBoard/FullListSheet) and player-v2 (StatsSheet, C.3).
+export interface LeaderStatLabelSet {
+  labelKey: string;
+  shortKey: string;
+  unitKey: string;
+}
+export const LEADER_STAT_LABELS: Record<string, LeaderStatLabelSet> = {
+  earnings:                 { labelKey: 'leaders.stat.earnings.label',                 shortKey: 'leaders.stat.earnings.short',                 unitKey: 'leaders.stat.earnings.unit' },
+  scoring_avg:              { labelKey: 'leaders.stat.scoring_avg.label',              shortKey: 'leaders.stat.scoring_avg.short',              unitKey: 'leaders.stat.scoring_avg.unit' },
+  wins:                     { labelKey: 'leaders.stat.wins.label',                     shortKey: 'leaders.stat.wins.short',                     unitKey: 'leaders.stat.wins.unit' },
+  top_10:                   { labelKey: 'leaders.stat.top_10.label',                   shortKey: 'leaders.stat.top_10.short',                   unitKey: 'leaders.stat.top_10.unit' },
+  drive_avg:                { labelKey: 'leaders.stat.drive_avg.label',                shortKey: 'leaders.stat.drive_avg.short',                unitKey: 'leaders.stat.drive_avg.unit' },
+  drive_acc:                { labelKey: 'leaders.stat.drive_acc.label',                shortKey: 'leaders.stat.drive_acc.short',                unitKey: 'leaders.stat.drive_acc.unit' },
+  gir_pct:                  { labelKey: 'leaders.stat.gir_pct.label',                  shortKey: 'leaders.stat.gir_pct.short',                  unitKey: 'leaders.stat.gir_pct.unit' },
+  sand_saves_pct:           { labelKey: 'leaders.stat.sand_saves_pct.label',           shortKey: 'leaders.stat.sand_saves_pct.short',           unitKey: 'leaders.stat.sand_saves_pct.unit' },
+  putt_avg:                 { labelKey: 'leaders.stat.putt_avg.label',                 shortKey: 'leaders.stat.putt_avg.short',                 unitKey: 'leaders.stat.putt_avg.unit' },
+  strokes_gained_tee_green: { labelKey: 'leaders.stat.strokes_gained_tee_green.label', shortKey: 'leaders.stat.strokes_gained_tee_green.short', unitKey: 'leaders.stat.strokes_gained_tee_green.unit' },
+  strokes_gained_putting:   { labelKey: 'leaders.stat.strokes_gained_putting.label',   shortKey: 'leaders.stat.strokes_gained_putting.short',   unitKey: 'leaders.stat.strokes_gained_putting.unit' },
+  world_rank:               { labelKey: 'leaders.stat.world_rank.label',               shortKey: 'leaders.stat.world_rank.short',               unitKey: 'leaders.stat.world_rank.unit' },
+  points:                   { labelKey: 'leaders.stat.points.label',                   shortKey: 'leaders.stat.points.short',                   unitKey: 'leaders.stat.points.unit' },
+};
+
+// Per-tour override for the points category display label (brand names).
+// shortKey/unitKey stay on the generic points entry above.
+const POINTS_LABEL_KEY_BY_TOUR: Partial<Record<TourId, string>> = {
+  euro: 'leaders.pointsBrand.euro',
+  lpga: 'leaders.pointsBrand.lpga',
+  liv:  'leaders.pointsBrand.liv',
+};
+
 export interface LeaderCategoryDef {
   key: string;
-  label: string;         // full ("Season Earnings")
-  short: string;         // eyebrow ("EARNINGS")
-  unit: string;          // right-column subtitle in the sheet header
+  labelKey: string;      // t() -> full title ("Season Earnings")
+  shortKey: string;      // t() -> eyebrow ("EARNINGS")
+  unitKey: string;       // t() -> right-column subtitle in the sheet header
   rows: LeaderRow[];     // top 50
 }
 
@@ -63,6 +94,7 @@ export interface LeaderCategoriesResult {
   categories: LeaderCategoryDef[];
   year: number;
 }
+
 
 // ── formatting helpers ────────────────────────────────────────────────
 function fmtMoneyCompact(v: number): string {
@@ -114,29 +146,27 @@ async function resolvePgaSeasonId(): Promise<string | null> {
   return null;
 }
 
-// PGA category definitions (accessor + sort + format + label)
+// PGA category definitions (accessor + sort + format). Labels are resolved via
+// LEADER_STAT_LABELS[key] at render — no display strings live here.
 interface PgaCatSpec {
   key: string;
-  label: string;
-  short: string;
-  unit: string;
   dir: 'asc' | 'desc';
   accessor: (s: any) => number | null;
   format: (v: number) => string;
 }
 
 const PGA_CATS: PgaCatSpec[] = [
-  { key: 'earnings',                 label: 'Season Earnings',       short: 'EARNINGS',      unit: 'USD',    dir: 'desc', accessor: (s) => s.earnings,                 format: fmtMoneyCompact },
-  { key: 'scoring_avg',              label: 'Scoring Average',       short: 'SCORING',       unit: 'AVG',    dir: 'asc',  accessor: (s) => s.scoring_average,          format: fmtAvg3 },
-  { key: 'wins',                     label: 'Wins',                  short: 'WINS',          unit: 'WINS',   dir: 'desc', accessor: (s) => s.wins,                     format: fmtInt },
-  { key: 'top_10',                   label: 'Top 10 Finishes',       short: 'TOP 10',        unit: 'TOP 10', dir: 'desc', accessor: (s) => s.top_10s,                  format: fmtInt },
-  { key: 'drive_avg',                label: 'Driving Distance',      short: 'DRIVING',       unit: 'YDS',    dir: 'desc', accessor: (s) => s.driving_distance,         format: fmtYds },
-  { key: 'drive_acc',                label: 'Driving Accuracy',      short: 'ACCURACY',      unit: '%',      dir: 'desc', accessor: (s) => s.driving_accuracy,         format: fmtPct },
-  { key: 'gir_pct',                  label: 'Greens in Regulation',  short: 'GIR',           unit: '%',      dir: 'desc', accessor: (s) => s.greens_in_reg,            format: fmtPct },
-  { key: 'sand_saves_pct',           label: 'Sand Saves',            short: 'SAND SAVES',    unit: '%',      dir: 'desc', accessor: (s) => s.sand_saves,               format: fmtPct },
-  { key: 'putt_avg',                 label: 'Putting Average',       short: 'PUTTING',       unit: 'PUTTS',  dir: 'asc',  accessor: (s) => s.putting_average,          format: fmtAvg3 },
-  { key: 'strokes_gained_tee_green', label: 'Strokes Gained T2G',    short: 'SG T2G',        unit: 'SG',     dir: 'desc', accessor: (s) => s.strokes_gained_tee_green, format: fmtSG },
-  { key: 'strokes_gained_putting',   label: 'Strokes Gained Putting',short: 'SG PUTT',       unit: 'SG',     dir: 'desc', accessor: (s) => s.strokes_gained_putting,   format: fmtSG },
+  { key: 'earnings',                 dir: 'desc', accessor: (s) => s.earnings,                 format: fmtMoneyCompact },
+  { key: 'scoring_avg',              dir: 'asc',  accessor: (s) => s.scoring_average,          format: fmtAvg3 },
+  { key: 'wins',                     dir: 'desc', accessor: (s) => s.wins,                     format: fmtInt },
+  { key: 'top_10',                   dir: 'desc', accessor: (s) => s.top_10s,                  format: fmtInt },
+  { key: 'drive_avg',                dir: 'desc', accessor: (s) => s.driving_distance,         format: fmtYds },
+  { key: 'drive_acc',                dir: 'desc', accessor: (s) => s.driving_accuracy,         format: fmtPct },
+  { key: 'gir_pct',                  dir: 'desc', accessor: (s) => s.greens_in_reg,            format: fmtPct },
+  { key: 'sand_saves_pct',           dir: 'desc', accessor: (s) => s.sand_saves,               format: fmtPct },
+  { key: 'putt_avg',                 dir: 'asc',  accessor: (s) => s.putting_average,          format: fmtAvg3 },
+  { key: 'strokes_gained_tee_green', dir: 'desc', accessor: (s) => s.strokes_gained_tee_green, format: fmtSG },
+  { key: 'strokes_gained_putting',   dir: 'desc', accessor: (s) => s.strokes_gained_putting,   format: fmtSG },
 ];
 
 type PlayerRec = {
@@ -194,9 +224,7 @@ async function fetchWorldRankingCat(): Promise<LeaderCategoryDef | null> {
 
   return {
     key: 'world_rank',
-    label: 'World Ranking',
-    short: 'WORLD',
-    unit: 'OWGR',
+    ...LEADER_STAT_LABELS.world_rank,
     rows,
   };
 }
@@ -246,9 +274,7 @@ async function fetchPgaCategories(): Promise<LeaderCategoriesResult> {
       if (top.length < 3) return null;
       return {
         key: cat.key,
-        label: cat.label,
-        short: cat.short,
-        unit: cat.unit,
+        ...LEADER_STAT_LABELS[cat.key],
         rows: top,
       } as LeaderCategoryDef;
     })
@@ -322,11 +348,15 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
         return base;
       });
     if (pointsRows.length >= 3) {
-      const label = tour === 'euro' ? 'Race to Dubai'
-        : tour === 'lpga' ? 'CME Points'
-        : tour === 'liv' ? 'LIV Points'
-        : 'Season Points';
-      categories.push({ key: 'points', label, short: 'POINTS', unit: 'PTS', rows: pointsRows });
+      const pointsBase = LEADER_STAT_LABELS.points;
+      const brandLabelKey = POINTS_LABEL_KEY_BY_TOUR[tour];
+      categories.push({
+        key: 'points',
+        labelKey: brandLabelKey ?? pointsBase.labelKey,
+        shortKey: pointsBase.shortKey,
+        unitKey: pointsBase.unitKey,
+        rows: pointsRows,
+      });
     }
 
     // Wins
@@ -342,7 +372,7 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
         return base;
       });
     if (winsRows.length >= 3) {
-      categories.push({ key: 'wins', label: 'Wins', short: 'WINS', unit: 'WINS', rows: winsRows });
+      categories.push({ key: 'wins', ...LEADER_STAT_LABELS.wins, rows: winsRows });
     }
   }
 

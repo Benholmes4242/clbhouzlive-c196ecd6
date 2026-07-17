@@ -4,6 +4,7 @@
  */
 
 import { memo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
 
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
@@ -29,6 +30,7 @@ export interface StatBoardProps {
 }
 
 function StatBoardInner({ category, liveMap, onOpen }: StatBoardProps) {
+  const { t } = useTranslation('tourhub');
   const top3 = category.rows.slice(0, 3);
   if (top3.length === 0) return null;
 
@@ -70,7 +72,7 @@ function StatBoardInner({ category, liveMap, onOpen }: StatBoardProps) {
             textTransform: 'uppercase',
           }}
         >
-          {category.short}
+          {t(category.shortKey)}
         </span>
         <span
           style={{
@@ -83,7 +85,7 @@ function StatBoardInner({ category, liveMap, onOpen }: StatBoardProps) {
             gap: 2,
           }}
         >
-          Full list <ChevronRight size={11} color={INK_MUTE} />
+          {t('leaders.fullList')} <ChevronRight size={11} color={INK_MUTE} />
         </span>
       </button>
 

@@ -8,6 +8,7 @@
 
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
@@ -47,6 +48,7 @@ export function FullListSheet({
   year,
 }: FullListSheetProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation('tourhub');
 
   const handleRowTap = useCallback(
     (playerId: string) => {
@@ -91,7 +93,7 @@ export function FullListSheet({
               fontVariantNumeric: 'tabular-nums',
             }}
           >
-            {tourLabel} {'\u00B7'} {year} {'\u00B7'} {total} {total === 1 ? 'PLAYER' : 'PLAYERS'}
+            {t('leaders.sheet.eyebrow', { tourLabel, year, count: total })}
           </div>
           <div
             id="tour-leaders-full-sheet-title"
@@ -103,7 +105,7 @@ export function FullListSheet({
               lineHeight: 1.1,
             }}
           >
-            {category.label}
+            {t(category.labelKey)}
           </div>
         </div>
       </div>
@@ -121,7 +123,7 @@ export function FullListSheet({
       >
         {rows.length === 0 ? (
           <div style={{ padding: '28px 16px', textAlign: 'center', color: INK_MUTE, fontSize: 12, fontWeight: 600 }}>
-            No players ranked in this category.
+            {t('leaders.sheet.empty')}
           </div>
         ) : (
           <div style={{ padding: '0 16px' }}>
@@ -241,7 +243,7 @@ export function FullListSheet({
                         lineHeight: 1,
                       }}
                     >
-                      {category.short}
+                      {t(category.shortKey)}
                     </div>
                   </div>
                 </button>

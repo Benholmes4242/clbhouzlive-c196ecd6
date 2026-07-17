@@ -11,6 +11,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import { Skeleton } from '@/components/ui/skeleton';
 import { TourHubEmptyState } from '../components/TourHubEmptyState';
@@ -19,10 +20,7 @@ import { TOUR_CONFIG, type TourId } from '../hooks/useOverviewData';
 
 import { useLivePlayerIds } from '../players-v2/data/useLivePlayerIds';
 import {
-  AMBER,
   FONT,
-  HAIRLINE_INK_10,
-  INK,
   INK_MUTE,
   SLATE_50,
 } from '../_shared/tokens';
@@ -31,18 +29,21 @@ import { useLeaderCategories } from './data/useLeaderCategories';
 import { StatBoard } from './StatBoard';
 import { FullListSheet } from './FullListSheet';
 
-const CHIP_LABEL: Record<TourId, string> = {
-  pga: 'PGA',
-  lpga: 'LPGA',
-  euro: 'DP WORLD',
-  pgad: 'KORN FERRY',
-  champ: 'CHAMPIONS',
-  liv: 'LIV',
+// Compact tour-eyebrow chip labels resolved via i18n. Keys are the stable
+// TourId enum; the values live under leaders.tourChip.<tour>.
+const CHIP_LABEL_KEY: Record<TourId, string> = {
+  pga:   'leaders.tourChip.pga',
+  lpga:  'leaders.tourChip.lpga',
+  euro:  'leaders.tourChip.euro',
+  pgad:  'leaders.tourChip.pgad',
+  champ: 'leaders.tourChip.champ',
+  liv:   'leaders.tourChip.liv',
 };
 
 
 export function LeadersTab() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { t } = useTranslation('tourhub');
 
   // Per-section tour lens (local state, NO All Tours, PGA default).
   // Champions is intentionally omitted here (insufficient stat coverage);
@@ -106,7 +107,7 @@ export function LeadersTab() {
     [categories, openKey],
   );
 
-  const tourLabel = CHIP_LABEL[activeTour];
+  const tourLabel = t(CHIP_LABEL_KEY[activeTour]);
 
   return (
     <div
@@ -178,7 +179,7 @@ export function LeadersTab() {
               textAlign: 'center',
             }}
           >
-            Season boards {'\u00B7'} live dot = on the course right now
+            {t('leaders.footer')}
           </div>
         </div>
       )}
