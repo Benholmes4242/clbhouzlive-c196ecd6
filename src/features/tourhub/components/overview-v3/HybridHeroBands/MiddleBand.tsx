@@ -113,7 +113,7 @@ export function MiddleBand({
         country={defendingChamp.country}
         score={defendingChamp.score}
         scoreLabel={defendingChamp.year}
-        eyebrow="DEFENDING"
+        eyebrow={t('overview.upcoming.defendingEyebrow')}
       />
     );
   }
