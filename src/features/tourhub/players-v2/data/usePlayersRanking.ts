@@ -132,7 +132,7 @@ export function usePlayersRanking(tour: TourId) {
           };
         });
         rows = [...rows].sort((a, b) => a.rank - b.rank);
-        return { synced: true, statLabel: STAT_LABEL.pga, rows };
+        return { synced: true, statLabel: statLabelFor('pga'), rows };
       }
 
       if (tour === 'euro' || tour === 'lpga' || tour === 'pgad' || tour === 'liv') {
