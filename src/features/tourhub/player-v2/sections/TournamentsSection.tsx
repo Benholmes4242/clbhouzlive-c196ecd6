@@ -86,7 +86,7 @@ export function TournamentsSection({
           textTransform: 'uppercase',
         }}
       >
-        Tournaments
+        {t('player.tournaments.eyebrow')}
       </p>
 
       <div>
