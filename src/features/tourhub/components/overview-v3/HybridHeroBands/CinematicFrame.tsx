@@ -1011,7 +1011,7 @@ export function CinematicFrame({
                   />
                 </span>
                 <div style={{ ...NUMERIC_STYLE, fontSize: 10, fontWeight: 800, letterSpacing: '0.22em', color: GOLD, textTransform: 'uppercase' }}>
-                  Champion
+                  {t('overview.cinematic.championLabel')}
                 </div>
                 <div
                   style={{
