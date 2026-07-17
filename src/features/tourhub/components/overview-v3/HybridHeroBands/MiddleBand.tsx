@@ -99,8 +99,6 @@ export function MiddleBand({
       );
     }
 
-    {/* Score glyph '—' (em-dash) is a typographic affordance, not translatable copy. */}
-    {/* eslint-disable-next-line i18next/no-literal-string */}
     return <ChampionStrip name={t('overview.champion.resultPending')} score="—" eyebrow={t('overview.champion.eyebrow')} />;
   }
 
