@@ -95,6 +95,10 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const gate = requireInternalSecret(req, corsHeaders);
+  if (gate) return gate;
+
+
   const t0 = Date.now();
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL') ?? '',
