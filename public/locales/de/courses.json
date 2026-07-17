@@ -274,5 +274,52 @@
         "sub": "Was it worth the green fee?"
       }
     }
+  },
+  "courseDetail": {
+    "claim": {
+      "cta": {
+        "title": "Own or manage this course?",
+        "body": "Claim it to respond to reviews and update info",
+        "action": "Claim"
+      },
+      "underReview": {
+        "title": "Claim under review",
+        "body": "A business has requested to manage this course. Verification is in progress."
+      },
+      "profileLink": {
+        "manages": "Manages this course",
+        "visit": "Visit profile →"
+      }
+    },
+    "exploreLinks": {
+      "kicker": "KEEP EXPLORING",
+      "nearby": "More courses nearby",
+      "top100Suffix": "{{region}} Top 100",
+      "exploreList": "Explore the full list"
+    },
+    "top100Summary": {
+      "heading": "Your Top 100 Progress",
+      "ratedCoursesLine_one": "You've rated 1 Top 100 course across {{regionsText}}.",
+      "ratedCoursesLine_other": "You've rated {{count}} Top 100 courses across {{regionsText}}.",
+      "regionsCount_one": "1 region",
+      "regionsCount_other": "{{count}} regions",
+      "nextMilestone_one": "Next milestone: 1 more course to {{tierName}}",
+      "nextMilestone_other": "Next milestone: {{count}} more courses to {{tierName}}",
+      "percentComplete": "{{pct}}% complete"
+    },
+    "suggestEdit": {
+      "title": "Suggest an edit",
+      "descriptionLabel": "Description",
+      "websiteLabel": "Website",
+      "cancel": "Cancel",
+      "submit": "Submit suggestion for review",
+      "submitting": "Submitting…",
+      "successTitle": "Suggestion submitted",
+      "successBody": "Your suggestion has been submitted. We'll review it shortly.",
+      "noChangesTitle": "No changes",
+      "noChangesBody": "Make at least one change to submit.",
+      "errorTitle": "Error",
+      "errorBody": "Failed to submit suggestion. Please try again."
+    }
   }
 }

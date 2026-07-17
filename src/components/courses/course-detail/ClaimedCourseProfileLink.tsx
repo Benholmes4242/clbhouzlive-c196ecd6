@@ -1,14 +1,17 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { AMBER, INK, INK_FAINT } from '@/features/courses/_shared/tokens';
 import type { ClaimingBusiness } from '@/hooks/useCourseClaim';
+
 
 interface Props {
   business: ClaimingBusiness;
 }
 
 const ClaimedCourseProfileLink: React.FC<Props> = ({ business }) => {
+  const { t } = useTranslation('courses');
   const navigate = useNavigate();
   const target = `/business/${business.slug ?? business.id}`;
 
@@ -56,7 +59,7 @@ const ClaimedCourseProfileLink: React.FC<Props> = ({ business }) => {
           {business.is_verified && <VerifiedBadge size="sm" />}
         </div>
         <div style={{ fontSize: 11, color: INK_FAINT, marginTop: 2 }}>
-          Manages this course
+          {t('courseDetail.claim.profileLink.manages')}
         </div>
       </div>
       <button
@@ -77,7 +80,7 @@ const ClaimedCourseProfileLink: React.FC<Props> = ({ business }) => {
           flexShrink: 0,
         }}
       >
-        Visit profile →
+        {t('courseDetail.claim.profileLink.visit')}
       </button>
     </div>
   );

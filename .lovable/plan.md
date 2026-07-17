@@ -1,108 +1,91 @@
-# Wave 3c — Achievements + Quest extraction
+# Wave 3d.iii — final courses sub-wave
 
-## Scope receipts (BEFORE)
+## Scope receipt (measured, not assumed)
 
-Under the standard i18nLiteralOptions run against `src/components/achievements` and `src/components/quest`:
+Ran the WARN-as-ERROR probe over the five sub-wave paths. Baseline:
 
-- **94** `i18next/no-literal-string` warnings
-- **37** attribute-guard hits (`aria-label`/`title`/`placeholder`/`alt`/`label`)
-- Files with attr-guard hits: 16 (all 12 achievements/*, 6 quest/*)
+- **152 violations across 26 files** in `course-detail/` + `network/` + `map/` + `phase5/` + `features/courses/components/`.
+- Distribution (files with hits):
+  - `course-detail/` — 14 files (Claim*, CommunityScoreCard, ConnectHandicapCue, CourseAboutTab, CourseExploreLinks, CourseLocationPills, CourseReviewsTab, CourseTop100*, SuggestEditModal, AboutMediaStrip)
+  - `map/` — MapCourseSheet, MapInsightChip
+  - `network/` — NetworkHighlightCarousel, UnseenReviewsBanner
+  - `phase5/` — CourseStatusToggle, PersonalReviewCard, PlanningSignals
+  - `features/courses/components/holes/` — CourseHolesTab, HoleFeatureCards, HolesCredibilityHeader, HolesEmptyState, HolesScoringKey
 
-Total extraction surface: **~131 literal sites** across **22 files** (~4,770 LOC).
+All of it is user-visible copy: JSX text, `aria-label`, `title`, `placeholder`, `alt`, and prop-passed `label`s. No literals sit in constants that legitimately stay in English (brand vocabulary lives in `achievements/` and stayed there in the previous ruling).
 
-## Namespace + wiring
+## How to execute
 
-- New namespace: `achievements` at `public/locales/{en,de,es,ja,ko,en-XA}/achievements.json`
-- Register in `src/i18n/index.ts` `ns:` array
-- Common adoptions to prefer where texts match verbatim: `common:action.share`, `common:action.close`, `common:action.done`, `common:action.dismiss`, `common:state.loading`, `common:label.viewAll` (audit and adopt only on exact-string matches)
+Because a single 26-file drop-and-pray is a bad shape (merge conflicts, review load, and the risk of a partial extraction leaving the gate un-flippable), I'll run this as **three tight sub-batches inside 3d.iii**, one per turn, each landing green before the next starts:
 
-## Key mint plan (~91 chrome strings)
+**3d.iii.a — course-detail/ (14 files, ~110 violations)**
+- The bulk of the wave. Every file gets `useTranslation('courses')` if missing, JSX text and user-visible attrs routed through `t(...)`, with keys namespaced under:
+  - `courseDetail.claim.*` (CTA, sheet states, under-review, claimed profile link)
+  - `courseDetail.about.*` (media strip, description toggle, location empty, website button)
+  - `courseDetail.locationPills.*`
+  - `courseDetail.exploreLinks.*`
+  - `courseDetail.top100.*` (spotlight, summary)
+  - `courseDetail.suggestEdit.*`
+  - Plus the "Category Scores" / "Based on N ratings" strings on `CommunityScoreCard` and the empty-state / "Be the first" copy.
+- Interpolation for `{{clubName}}`, `{{count}}` (pluralised where the source already branches on `n === 1`), `{{cat}}` category label in State C of the claim sheet.
 
-Grouped under `achievements.*`:
+**3d.iii.b — map/ + network/ + phase5/ (7 files, ~28 violations)**
+- `map.*`, `network.*`, `phase5.*` sub-namespaces; the `ConnectHandicapCue` COPY table's inline sentences move into keyed variants (`courseDetail.handicapCue.<variant>.benefit|sub`).
 
-- `card.*` — AchievementCard chrome (progress bar labels, lock states)
-- `detail.*` — AchievementDetailModal (headers, tier ladder, unlock rules, share CTA)
-- `toast.*` — AchievementToast + LevelUpToast (unlock announcement, level-up copy, dismiss aria)
-- `levelUp.*` — LevelUpSheet + LevelUpGate (headline, subhead, tier reveal, continue CTA)
-- `elite.*` — EliteGameCard (mode headers, stat rows, empty states — the 1,513-line beast)
-- `nudge.*` — NudgeBanner (streak nudges, comeback prompts)
-- `season.*` — SeasonRecapModal (recap headline, stat labels, share)
-- `quest.hero.*` — TrophyRoomHero (progress, "to <club>", "Complete!", "Courses played")
-- `quest.ladder.*` — MilestoneLadder ("{{played}}/{{total}} played", "{{remaining}} away!")
-- `quest.leaderboard.*` — LeaderboardCard (headers, empty state, rank labels)
-- `quest.momentum.*` — MomentumCard (streak copy)
-- `quest.trophy.*` — TrophyCase (case chrome, filters)
-- `quest.recent.*` — RecentlyAddedSection (headers, empty state)
-- `quest.regional.*` — RegionalJourneySummary (region headers)
-- `quest.empty.*` — QuestEmptyState
+**3d.iii.c — features/courses/components/holes/ (5 files, ~14 violations)**
+- Extends the existing `holes.*` namespace already in `courses.json`.
+- No new locale namespaces — just additional keys.
 
-### Plurals to convert (ternary → `_one`/`_other`)
+## Locale coverage
 
-Expected sites: `{{count}} days`, `{{count}} streak`, `{{count}} badges`, `{{count}} courses`, `{{count}} left`, `{{count}} played`. All will be split into `_one`/`_other` and switched via `t('key', { count })`.
+Every new key lands in all six locales in the same turn it's introduced:
+- `en`, `de`, `es`, `ja`, `ko`, `en-XA`.
+- `en-XA` gets pseudo-localised strings (`[!!ëẍáṁṗłë!!]` style) matching the existing convention in the file.
+- Non-English locales get English fallback text with a `// TODO: translate` sibling only if the existing file uses that convention; a quick scan says the file just carries English strings today, so I'll mirror that pattern rather than invent one.
 
-### `<Trans>` for mixed markup
+## ESLint config — parent-dir gate consolidation
 
-`{totalPlayed} of {nextThreshold} · <span>{nextClubName}</span>` (TrophyRoomHero:267) and similar composites will use `<Trans i18nKey=... components={{ bold: <span className=... /> }} values={...} />`.
-
-## Brand vocabulary — FLAG FOR BEN
-
-Per the brief, these are product-decision names. I will FLAG the full inventory and **leave them as literals with `// eslint-disable-next-line i18next/no-literal-string -- brand: awaiting rule`** until you rule translate-or-keep. The chrome around them still gets keyed.
-
-Preliminary flagged list (final list ships in R2):
-
-**Grand Slam tier ladder** (from MilestoneLadder + TrophyRoomHero + club naming):
-- Rookie, Contender, Regular, Veteran, Champion, Legend, Grand Slam (or the exact ladder in code — will confirm exact set in R2)
-
-**Elite Game tier/gem names** (from EliteGameCard):
-- Bronze, Silver, Gold, Platinum, Diamond gem/level names as they appear
-- Elite Game mode names (Solo, Head-to-Head, League, etc. as coded)
-
-**Achievement badge names** (from AchievementDetailModal + AchievementCard metadata):
-- Individual badge titles — these already come from data (DB rows), so may already be non-literal. Any hard-coded title constants get flagged.
-
-**Season recap headline names** (from SeasonRecapModal)
-
-R2 will paste the exact string inventory extracted from source, not this preliminary sketch.
-
-## Lint override (activation)
-
-Append to `eslint.config.js`:
+Only after all three sub-batches show 0 with the ERROR rule locally. The three sub-wave ERROR blocks (3d.i, 3d.ii, 3d.iii) collapse into a single block:
 
 ```js
-// ─── Wave 3c — scope-dir ERROR flip for achievements + quest ────────
+// ─── Wave 3d — scope-dir ERROR flip for courses vertical ──────────
 {
   files: [
-    "src/components/achievements/**/*.{ts,tsx}",
-    "src/components/quest/**/*.{ts,tsx}",
+    "src/components/courses/**/*.{ts,tsx}",
+    "src/components/course-media-tab/**/*.{ts,tsx}",
+    "src/features/courses/**/*.{ts,tsx}",
   ],
   rules: {
     "i18next/no-literal-string": ["error", i18nLiteralOptions],
     "no-restricted-syntax": ["error", literalAttrSyntax, ...toLocaleSyntax],
   },
-}
+},
 ```
 
-Flipped ONLY after both scopes are at genuine 0 (raw eslint receipts).
+The three narrower blocks (`courses/*.{ts,tsx}`, `courses/review/**`, `courses/user/**`, `course-media-tab/**`, `_shared/**`) are removed as they're now covered by the two `**` globs. This closes the gap so any new file under `src/components/courses/**` or `src/features/courses/**` is gated on creation.
 
-## Execution order
+## Carry-over items
 
-1. Read all 22 files, inventory every literal (chrome + attr) + brand-name candidates
-2. Draft `en/achievements.json` (all keys + `_one`/`_other` plural forms)
-3. Fan out to `de/es/ja/ko/achievements.json` as en-clones (translation happens downstream); `en-XA/achievements.json` pseudo-padded per existing pattern
-4. Register namespace in `src/i18n/index.ts`
-5. Rewrite each source file: `useTranslation('achievements')`, replace literals with `t(...)`, use `<Trans>` for mixed markup, add `// eslint-disable-next-line ... -- brand: awaiting rule` on brand-vocabulary names
-6. Flip ERROR override in `eslint.config.js`
-7. Verify: `tsgo --noEmit` + raw `npx eslint <scope>` receipts + repo-wide count + parser round-trip
+Both already landed in the previous turn per the summary:
+- `PersonalReviewCard` / `CommunityScoreCard` / `CourseReviewsTab` — `{ key, labelKey }` conversion is done; I verified `t(labelKey)` sites in the files I just read.
+- Achievements "pending-Ben" markers — flipped to "by product ruling".
 
-## Report format (R1–R6)
+No re-work needed on these; the receipts below will confirm on grep.
 
-- **R1** `git rev-parse HEAD` + `tsgo --noEmit` output
-- **R2** Full key list + common.* adoptions + **THE FLAGGED NAME LIST** (verbatim strings, file:line for each)
-- **R3** Raw `eslint` receipts: one dirty-file BEFORE, both scope dirs AFTER (i18n + attr-guard) — actual tool output, not summaries
-- **R4** Repo-wide `i18next/no-literal-string` warning count vs prior baseline 2,854
-- **R5** en spot-check (Achievement toast, LevelUp sheet, TrophyRoomHero progress, MilestoneLadder pluralized rows) + en-XA visible pad flags
-- **R6** JSON parser round-trip clean for all 6 locales
+## Receipts each sub-batch will paste back
 
-## Confirm before I mint
+1. `npx eslint --rule '{"i18next/no-literal-string":["error",...]}' <sub-batch paths>` → **0 errors**.
+2. Full-scope re-probe after the last sub-batch: same command over all five paths → **0 errors**.
+3. `grep -rn '\bpending Ben\b' src/components/achievements/` → 0 hits.
+4. `git diff --stat` per sub-batch.
+5. `npx tsc --noEmit` clean; `vite build` succeeds.
 
-The brand-vocabulary flagging is the only judgment call. My reading of the brief: **flag + literal-with-disable** for tier ladder / gem / mode names; extract everything else. Approve or amend and I'll execute end-to-end in one commit.
+## Non-goals for this wave
+
+- No visual changes; extraction is text-in-place with `t(...)` swaps.
+- No refactor of the ConnectHandicapCue variant table's structure — the COPY object stays, its string returns move to `t(...)`.
+- No touching files outside the five listed directories.
+
+---
+
+**Ready to fire 3d.iii.a on your go.** Landing all three sub-batches plus the gate consolidation in one turn is technically possible but would ship ~40 file edits and ~150 locale-key additions without an intermediate green light — I'd rather you see 3d.iii.a's receipts first and greenlight .b and .c.

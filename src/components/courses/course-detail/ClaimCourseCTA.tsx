@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BadgeCheck } from 'lucide-react';
 import { AMBER, INK, INK_FAINT } from '@/features/courses/_shared/tokens';
 import ClaimCourseSheet from './ClaimCourseSheet';
@@ -10,6 +11,7 @@ interface ClaimCourseCTAProps {
 }
 
 const ClaimCourseCTA: React.FC<ClaimCourseCTAProps> = ({ clubId, clubName, sourceCourseId }) => {
+  const { t } = useTranslation('courses');
   const [open, setOpen] = useState(false);
 
   return (
@@ -42,10 +44,10 @@ const ClaimCourseCTA: React.FC<ClaimCourseCTAProps> = ({ clubId, clubName, sourc
           </div>
           <div style={{ minWidth: 0, flex: 1 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: INK }}>
-              Own or manage this course?
+              {t('courseDetail.claim.cta.title')}
             </div>
             <div style={{ fontSize: 11, color: INK_FAINT, marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              Claim it to respond to reviews and update info
+              {t('courseDetail.claim.cta.body')}
             </div>
           </div>
           <button
@@ -58,7 +60,7 @@ const ClaimCourseCTA: React.FC<ClaimCourseCTAProps> = ({ clubId, clubName, sourc
               fontSize: 12, fontWeight: 700, cursor: 'pointer',
             }}
           >
-            Claim
+            {t('courseDetail.claim.cta.action')}
           </button>
         </div>
       </div>
@@ -75,4 +77,3 @@ const ClaimCourseCTA: React.FC<ClaimCourseCTAProps> = ({ clubId, clubName, sourc
 };
 
 export default ClaimCourseCTA;
-
