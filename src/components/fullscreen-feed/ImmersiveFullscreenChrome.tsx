@@ -94,6 +94,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   golfCourse,
   readOnly = false,
   onBeforeNavigate,
+  feedEnded = false,
 }: Props) {
   const navigate = useNavigate();
   const carouselPositions = useClubhouseStore((s) => s.carouselPositions);
