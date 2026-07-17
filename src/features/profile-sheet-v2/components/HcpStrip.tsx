@@ -14,7 +14,7 @@
 import React, { useMemo } from 'react';
 import { useWhsConnection, useHandicapTrend, useHandicapHistory, useAllScores } from '@/lib/whs/hooks';
 
-const AMBER_DEEP = '#c97a10';
+const AMBER = '#F7931E';
 const INK = '#0F172A';
 const MUTED = '#94A3B8';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
@@ -73,7 +73,7 @@ export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
         fontSize: 10,
         letterSpacing: '0.14em',
         textTransform: 'uppercase',
-        color: AMBER_DEEP,
+        color: AMBER,
       }}
     >
       HCP
