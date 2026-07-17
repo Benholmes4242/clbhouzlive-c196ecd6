@@ -11,7 +11,7 @@
 // get_friend_leaderboard and the snapshot table PK disallows nulls).
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { corsHeaders } from '../_shared/cors.ts';
+import { corsFor } from '../_shared/cors.ts';
 import { requireInternalSecret } from '../_shared/internalAuth.ts';
 
 
@@ -91,6 +91,7 @@ function computeRanksForCircle(
 }
 
 Deno.serve(async (req) => {
+  const corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }

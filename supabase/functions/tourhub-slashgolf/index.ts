@@ -2,13 +2,9 @@
 // Fetches comprehensive golf data from Slash Golf API (via RapidAPI)
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 
+import { corsFor } from '../_shared/cors.ts';
 const RAPIDAPI_HOST = "golf-leaderboard-data.p.rapidapi.com";
 const RAPIDAPI_KEY = Deno.env.get("RAPIDAPI_GOLF_KEY") || "";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
 
 function jsonResponse(body: unknown, status = 200, cacheSeconds = 60) {
   return new Response(JSON.stringify(body), {
@@ -59,6 +55,7 @@ async function fetchFromSlashGolf(endpoint: string, params: Record<string, strin
 }
 
 serve(async (req) => {
+  const corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }

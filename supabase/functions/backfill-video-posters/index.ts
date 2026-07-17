@@ -17,13 +17,7 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers':
-    'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-};
-
+import { corsFor } from '../_shared/cors.ts';
 const BATCH_SIZE = 100;
 const SAMPLE_SIZE = 50; // size of preview returned in dry-run mode
 
@@ -44,6 +38,7 @@ function rewritePosterUrl(currentUrl: string, durationSeconds: number): string |
 }
 
 Deno.serve(async (req) => {
+  const corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }

@@ -11,6 +11,7 @@
 import { serve } from "https://deno.land/std@0.220.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import {
+import { corsFor } from '../_shared/cors.ts';
   ANTHROPIC_MODEL_SYNTH,
   OPENAI_MODEL_SYNTH,
   GEMINI_MODEL,
@@ -27,12 +28,6 @@ const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY") ?? "";
 const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY") ?? "";
 
 const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-internal-secret",
-};
-
 
 const PROBE_TIMEOUT_MS = 30_000;
 const PROBE_PROMPT = "Reply with exactly: OK";
@@ -197,6 +192,7 @@ async function probePerplexity(): Promise<ProbeResult> {
 // ─── Handler ────────────────────────────────────────────────────────────
 
 serve(async (req: Request) => {
+  const corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: corsHeaders });
   }

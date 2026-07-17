@@ -1,10 +1,6 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
-
+import { corsFor } from '../_shared/cors.ts';
 // Determine location precision from Mapbox place_type
 function getPrecision(placeTypes: string[]): string {
   if (placeTypes.includes('address')) return 'address'
@@ -17,6 +13,7 @@ function getPrecision(placeTypes: string[]): string {
 }
 
 serve(async (req) => {
+  const corsHeaders = corsFor(req.headers.get('Origin'));
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })

@@ -1,3 +1,4 @@
+import { corsFor } from '../_shared/cors.ts';
 /**
  * Generate AI-powered tournament predictions using Consensus Engine V2
  * 
@@ -20,11 +21,6 @@ import { calculateVenueHistoryScores, formatVenueHistoryForPrompt } from './venu
 import { runConsensus } from './consensusEngine.ts';
 import type { PlayerStats as EnrichedPlayerStats } from './detailedStats.ts';
 import type { CourseDNAProfile } from './courseFitCalculator.ts';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
-};
 
 // =============================================
 // TYPES
@@ -69,6 +65,7 @@ interface PlayerStats {
 // =============================================
 
 serve(async (req) => {
+  const corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }

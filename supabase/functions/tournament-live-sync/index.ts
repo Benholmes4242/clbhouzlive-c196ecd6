@@ -1,3 +1,4 @@
+import { corsFor } from '../_shared/cors.ts';
 /**
  * tournament-live-sync — Sync ALL in-hours live tournaments per invocation
  *
@@ -13,11 +14,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { isWithinPlayingHoursForTimezone, isTournamentDay } from '../_shared/countryTimezoneMap.ts'
 import { getActiveRound } from '../_shared/roundState.ts'
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
 
 const getAccessLevel = () => Deno.env.get('SPORTRADAR_ACCESS_LEVEL') || 'production';
 const getTourBaseUrl = (tour: string = 'pga') =>
@@ -56,6 +52,7 @@ interface TournamentSyncResult {
 }
 
 Deno.serve(async (req) => {
+  const corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }

@@ -1,12 +1,7 @@
 import { serve } from "https://deno.land/std@0.220.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
-  'Access-Control-Allow-Methods': 'POST, DELETE, OPTIONS',
-};
-
+import { corsFor } from '../_shared/cors.ts';
 // Tour code → R2 folder name mapping (matches playerHeadshot.ts)
 const TOUR_FOLDER: Record<string, string> = {
   pga: 'PGA Tour',
@@ -78,6 +73,7 @@ async function signRequest(
 }
 
 serve(async (req) => {
+  const corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }

@@ -1,10 +1,11 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { corsHeaders } from '../_shared/cors.ts'
+import { corsFor } from '../_shared/cors.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { normalizeError } from '../_shared/normalize-error.ts';
 import { generateStreamHlsUrl } from '../_shared/cloudflare-config.ts';
 
 serve(async (req) => {
+  const corsHeaders = corsFor(req.headers.get('Origin'));
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })

@@ -1,11 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.0";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
-
+import { corsFor } from '../_shared/cors.ts';
 const APP_URL = Deno.env.get("APP_URL") || "https://www.clbhouz.co.uk";
 
 interface Payload {
@@ -13,6 +9,7 @@ interface Payload {
 }
 
 serve(async (req) => {
+  const corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {

@@ -8,6 +8,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.76.1';
 
 Deno.serve(async (req: Request) => {
   const corsHeaders = corsFor(req.headers.get('Origin'));
+  const corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }

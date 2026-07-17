@@ -1,17 +1,11 @@
 import { serve } from "https://deno.land/std@0.220.0/http/server.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, range',
-  'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
-  'Access-Control-Expose-Headers': 'content-type, content-length, accept-ranges, content-range',
-  'Access-Control-Max-Age': '86400',
-};
-
+import { corsFor } from '../_shared/cors.ts';
 // R2 public bucket for audio tracks
 const R2_PUBLIC_BASE = 'https://pub-9f6095ba86ef4833a86c1e06bec47b40.r2.dev';
 
 serve(async (req) => {
+  const corsHeaders = corsFor(req.headers.get('Origin'));
   const url = new URL(req.url);
   
   // Handle CORS preflight

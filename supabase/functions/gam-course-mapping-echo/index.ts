@@ -7,12 +7,7 @@
 // result to whs_to_golf_course_map.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-internal-secret",
-};
-
+import { corsFor } from '../_shared/cors.ts';
 const GBI = "Britain & Ireland";
 
 type Decision = "MATCH" | "NO_MATCH" | "CREATE_NEW";
@@ -37,6 +32,7 @@ interface Candidate {
 }
 
 Deno.serve(async (req) => {
+  const corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }

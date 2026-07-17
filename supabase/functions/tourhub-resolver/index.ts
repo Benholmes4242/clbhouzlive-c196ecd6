@@ -3,12 +3,7 @@
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
-};
-
+import { corsFor } from '../_shared/cors.ts';
 function json(data: unknown, status = 200, cacheSeconds = 60) {
   return new Response(JSON.stringify(data), {
     status,
@@ -132,6 +127,7 @@ function normalizeLeaders(leaders: unknown[]): NormalizedLeader[] {
 }
 
 serve(async (req) => {
+  const corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }

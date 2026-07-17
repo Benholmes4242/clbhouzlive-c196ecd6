@@ -1,15 +1,10 @@
+import { corsFor } from '../_shared/cors.ts';
 /**
  * scrape-tour-rankings — Scrapes DP World Tour Race to Dubai rankings
  * and upserts into tour_season_rankings table.
  */
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
 
 const RANKINGS_URLS: Record<
   string,
@@ -22,6 +17,7 @@ const RANKINGS_URLS: Record<
 };
 
 Deno.serve(async (req) => {
+  const corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
