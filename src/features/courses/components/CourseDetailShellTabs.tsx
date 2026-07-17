@@ -34,6 +34,7 @@ export const CourseDetailShellTabs: React.FC<CourseDetailShellTabsProps> = ({
   activeTab,
   onTabChange,
 }) => {
+  const { t } = useTranslation('courses');
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const [overflowing, setOverflowing] = useState(false);
 
