@@ -201,6 +201,22 @@ export default tseslint.config(
       "i18next/no-literal-string": ["error", i18nLiteralOptions],
       "no-restricted-syntax": ["error", literalAttrSyntax, ...toLocaleSyntax],
     },
+  },
+  // ─── Wave 3e.i — tourhub slice: _shared/* + top-level components/*.tsx ─
+  // Parent gate for src/features/tourhub/** lands with 3e.v close-out.
+  // Slice-scoped block keeps subdirs (overview-v3/, premium/, shared/,
+  // tabs/, tournament-v2/, leaderboard/, player-v2/, players-v2/,
+  // leaders-v2/, college-v2/) at WARN until their slice ships.
+  {
+    files: [
+      "src/features/tourhub/_shared/**/*.{ts,tsx}",
+      "src/features/tourhub/components/*.tsx",
+    ],
+    rules: {
+      "i18next/no-literal-string": ["error", i18nLiteralOptions],
+      "no-restricted-syntax": ["error", literalAttrSyntax, ...toLocaleSyntax],
+    },
   }
 );
+
 
