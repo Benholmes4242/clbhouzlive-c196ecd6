@@ -53,13 +53,16 @@ export function ScopeSegment<T extends string>({
     >
       {options.map((o) => {
         const active = value === o.value;
+        const disabled = !!o.disabled;
         return (
           <button
             key={o.value}
             type="button"
             role="tab"
             aria-selected={active}
-            onClick={() => onChange(o.value)}
+            aria-disabled={disabled}
+            disabled={disabled}
+            onClick={() => { if (!disabled) onChange(o.value); }}
             style={{
               padding: '5px 11px',
               borderRadius: 999,
@@ -70,7 +73,8 @@ export function ScopeSegment<T extends string>({
               fontSize: 10.5,
               fontWeight: 600,
               whiteSpace: 'nowrap',
-              cursor: 'pointer',
+              cursor: disabled ? 'not-allowed' : 'pointer',
+              opacity: disabled ? 0.35 : 1,
               transition: 'all .15s',
             }}
           >
