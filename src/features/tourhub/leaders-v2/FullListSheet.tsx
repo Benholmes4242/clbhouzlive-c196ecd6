@@ -123,7 +123,7 @@ export function FullListSheet({
       >
         {rows.length === 0 ? (
           <div style={{ padding: '28px 16px', textAlign: 'center', color: INK_MUTE, fontSize: 12, fontWeight: 600 }}>
-            No players ranked in this category.
+            {t('leaders.sheet.empty')}
           </div>
         ) : (
           <div style={{ padding: '0 16px' }}>
