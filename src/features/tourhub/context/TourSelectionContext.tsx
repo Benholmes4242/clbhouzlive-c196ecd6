@@ -129,7 +129,10 @@ export function TourSelectionProvider({ children }: { children: ReactNode }) {
         setViewingTourSlug,
         viewingTournamentId,
         setViewingTournamentId,
+        viewingIsLive,
+        setViewingIsLive,
       }}
+
     >
       {children}
     </TourSelectionContext.Provider>
