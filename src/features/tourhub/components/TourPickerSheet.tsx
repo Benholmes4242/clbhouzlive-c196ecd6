@@ -218,11 +218,11 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
                     {label}
                   </div>
                   <div style={{ marginTop: 2, fontSize: 12, fontWeight: 500, color: SUBTITLE_COLOR, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    No events this week
+                    {t('picker.noEventsThisWeek')}
                   </div>
                 </div>
                 <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: 'rgba(15,23,42,0.30)' }}>
-                  NO EVENT
+                  {t('status.noEvent')}
                 </span>
               </button>
             )];
