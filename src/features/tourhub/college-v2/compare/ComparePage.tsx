@@ -31,7 +31,6 @@ import { collegeProfileRoute, playerRoute } from '@/features/tourhub/routes';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { formatNumber } from '@/i18n/format';
 import {
-  AMBER,
   CHARCOAL,
   FONT,
   HAIRLINE_INK_10,
@@ -45,13 +44,19 @@ import {
 import { useFranchiseStandings } from '@/features/tourhub/college-v2/hub/data/useFranchiseStandings';
 import { useLiveAlumni } from '@/features/tourhub/college-v2/hub/data/useLiveAlumni';
 import { useCollegeRoster } from '@/features/tourhub/college-v2/profile/data/useCollegeRoster';
-import { useLivePlayerIds } from '@/features/tourhub/players-v2/data/useLivePlayerIds';
+import { useThisWeekAlumni, type WeekAlumnusRow } from '@/features/tourhub/college-v2/profile/data/useThisWeekAlumni';
+import { useLivePlayerIds, type LivePlayerMap } from '@/features/tourhub/players-v2/data/useLivePlayerIds';
 import { DuelMasthead } from './DuelMasthead';
 import { TugStat } from './TugStat';
 import { PickerSheet } from './PickerSheet';
+import { useCollegeAggregateStats } from './data/useCollegeAggregateStats';
 
 const CLASS_CAP = 5;
+const OFF_INK = 'rgba(15,23,42,0.38)';
 const fmtInt = (n: number) => formatNumber(n);
+const fmtScoringAvg = (n: number) => (n > 0 ? n.toFixed(2) : '0.00');
+const fmtDrive = (n: number) => (n > 0 ? `${n.toFixed(1)} yds` : '0.0 yds');
+const fmtSg = (n: number) => (n === 0 ? '0.00' : (n > 0 ? `+${n.toFixed(2)}` : n.toFixed(2)));
 
 export function ComparePage() {
   const [searchParams] = useSearchParams();
