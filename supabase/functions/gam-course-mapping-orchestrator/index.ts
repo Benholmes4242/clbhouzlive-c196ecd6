@@ -17,12 +17,14 @@
 //   - Telemetry to console: run start, per-course tier hits, run end counts.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
+import { requireInternalSecret } from "../_shared/internalAuth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type, x-internal-secret",
 };
+
 
 const LOCK_NAME = "gam-course-mapping-orchestrator";
 const BATCH_SIZE = 25;
