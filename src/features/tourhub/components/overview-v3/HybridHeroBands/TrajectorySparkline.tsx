@@ -8,6 +8,7 @@
  */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { classifyTrajectory } from '../HybridHero.utils';
 import { TREND_UP, TREND_DOWN } from '../../../_shared/tokens';
 
