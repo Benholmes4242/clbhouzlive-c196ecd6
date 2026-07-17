@@ -179,12 +179,12 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
         >
           {/* Primary group header */}
           <div style={{ marginTop: 'max(20px, env(safe-area-inset-top, 0px))', paddingTop: 16 }}>
-            <GroupHeader>Tour</GroupHeader>
+            <GroupHeader>{t('nav.group.tour')}</GroupHeader>
           </div>
 
           {/* Nav list */}
           <nav style={{ marginTop: 4, flex: 1, overflowY: 'auto' }}>
-            {DESTINATIONS.filter(({ id }) => id !== 'live' || showLive).map(({ id, label, Icon }) => {
+            {DESTINATIONS.filter(({ id }) => id !== 'live' || showLive).map(({ id, labelKey, Icon }) => {
               const isActive = id === activeTab;
               return (
                 <button
@@ -218,7 +218,7 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
                   <span style={{ width: 22, display: 'inline-flex', justifyContent: 'center' }}>
                     <Icon size={20} color={INK} strokeWidth={isActive ? 2.4 : 2} />
                   </span>
-                  {label}
+                  {t(labelKey)}
                 </button>
               );
             })}
@@ -227,15 +227,15 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
           {/* Secondary group header */}
           <div style={{ marginTop: 8, paddingTop: 12, borderTop: `1px solid ${HAIRLINE_INK_10}` }}>
             <div style={{ marginTop: 12 }}>
-              <GroupHeader>Account</GroupHeader>
+              <GroupHeader>{t('nav.group.account')}</GroupHeader>
             </div>
           </div>
 
           {/* Secondary links */}
           <div style={{ display: 'flex', flexDirection: 'column', padding: '0 24px 22px', gap: 4 }}>
-            <SecondaryLink Icon={Settings} label="Settings" onClick={() => { onClose(); onSettings(); }} />
-            <SecondaryLink Icon={User}     label="Profile"  onClick={() => { onClose(); onProfile(); }} />
-            <SecondaryLink Icon={LogOut}   label="Sign out" onClick={() => { onClose(); onSignOut(); }} />
+            <SecondaryLink Icon={Settings} label={t('nav.settings')} onClick={() => { onClose(); onSettings(); }} />
+            <SecondaryLink Icon={User}     label={t('nav.profile')}  onClick={() => { onClose(); onProfile(); }} />
+            <SecondaryLink Icon={LogOut}   label={t('nav.signOut')}  onClick={() => { onClose(); onSignOut(); }} />
           </div>
         </div>
       </aside>
