@@ -83,7 +83,7 @@ function Card({
       onPrerouteCancel={onPrerouteCancel}
       data-watch-tile-index={index}
       data-post-id={post.id}
-      style={{ width: 288, flexShrink: 0, cursor: 'pointer', fontFamily: FONT_FAMILY }}
+      style={{ width: 374, flexShrink: 0, cursor: 'pointer', fontFamily: FONT_FAMILY }}
     >
       <div
         style={{
@@ -204,7 +204,7 @@ function Card({
 
 function SkeletonCard() {
   return (
-    <div style={{ width: 288, flexShrink: 0 }}>
+    <div style={{ width: 374, flexShrink: 0 }}>
       <div
         style={{
           aspectRatio: '16 / 9',

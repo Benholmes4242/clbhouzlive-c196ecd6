@@ -71,7 +71,7 @@ function Tile({
       onPrerouteCancel={onPrerouteCancel}
       data-watch-tile-index={index}
       data-post-id={post.id}
-      style={{ width: 110, flexShrink: 0, cursor: 'pointer', fontFamily: FONT_FAMILY }}
+      style={{ width: 143, flexShrink: 0, cursor: 'pointer', fontFamily: FONT_FAMILY }}
     >
       <div
         style={{
@@ -157,7 +157,7 @@ function Tile({
 
 function SkeletonTile() {
   return (
-    <div style={{ width: 110, flexShrink: 0 }}>
+    <div style={{ width: 143, flexShrink: 0 }}>
       <div
         style={{
           aspectRatio: '9 / 14',
@@ -229,7 +229,7 @@ export function HubClipsRow() {
               tabIndex={0}
               onClick={() => navigate('/watch/clips')}
               style={{
-                width: 110,
+                width: 143,
                 flexShrink: 0,
                 aspectRatio: '9 / 14',
                 borderRadius: 4,
