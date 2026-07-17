@@ -31,7 +31,9 @@ function isDemoted(s?: string | null): boolean {
 }
 
 export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: Props) {
+  const { t } = useTranslation('tourhub');
   const [target, setTarget] = useState<ScorecardSheetTarget | null>(null);
+
 
   const cutState: CutState = useMemo(() => {
     const status = (meta?.status ?? '').toLowerCase();
