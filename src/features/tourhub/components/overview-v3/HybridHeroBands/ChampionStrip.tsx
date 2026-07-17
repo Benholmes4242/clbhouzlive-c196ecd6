@@ -302,7 +302,7 @@ export function PlayoffStrip({ count, score }: PlayoffStripProps) {
           {score}
         </div>
         <div style={{ fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.50)', letterSpacing: '0.16em', marginTop: 2 }}>
-          TO PAR
+          {t('overview.champion.scoreLabelToPar')}
         </div>
       </div>
     </div>
