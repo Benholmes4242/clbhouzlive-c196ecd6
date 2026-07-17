@@ -44,7 +44,7 @@ export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
         <button
           type="button"
           onClick={() => setOpen(true)}
-          aria-label="Switch tour"
+          aria-label={t('picker.switchTourAria')}
           aria-haspopup="dialog"
           aria-expanded={open}
           className="active:scale-[0.96]"
@@ -84,7 +84,7 @@ export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
         <button
           type="button"
           onClick={() => setOpen(true)}
-          aria-label="Switch tour"
+          aria-label={t('picker.switchTourAria')}
           aria-haspopup="dialog"
           aria-expanded={open}
           style={{
@@ -112,7 +112,7 @@ export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
               lineHeight: 1,
             }}
           >
-            {isMajorActive ? 'Major' : 'Tour'}
+            {isMajorActive ? t('pill.majorEyebrow') : t('pill.tourEyebrow')}
           </span>
           <span
             style={{
