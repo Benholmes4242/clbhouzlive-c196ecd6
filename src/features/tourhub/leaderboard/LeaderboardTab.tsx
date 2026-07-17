@@ -47,6 +47,7 @@ function StatusChip({
   currentRound: number | null | undefined;
   startDate: string | null | undefined;
 }) {
+  const { t } = useTranslation('tourhub');
   const s = (status || '').toLowerCase();
   if (s === 'inprogress') {
     return (
@@ -70,7 +71,7 @@ function StatusChip({
           aria-hidden
           style={{ width: 5, height: 5, borderRadius: '50%', background: '#fff' }}
         />
-        {`R${currentRound ?? 1} \u00B7 IN PROGRESS`}
+        {t('board.status.inProgress', { round: currentRound ?? 1 })}
       </span>
     );
   }
@@ -89,7 +90,7 @@ function StatusChip({
           borderRadius: 4,
         }}
       >
-        FINAL
+        {t('board.status.final')}
       </span>
     );
   }
@@ -108,10 +109,11 @@ function StatusChip({
         borderRadius: 4,
       }}
     >
-      {startTxt ? `STARTS ${startTxt}` : 'UPCOMING'}
+      {startTxt ? t('board.status.startsOn', { date: startTxt }) : t('board.status.upcoming')}
     </span>
   );
 }
+
 
 export function LeaderboardTab() {
   const { t } = useTranslation('tourhub');
