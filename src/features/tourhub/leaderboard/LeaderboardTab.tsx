@@ -284,7 +284,7 @@ export function LeaderboardTab() {
                 ref={searchInputRef}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search players"
+                placeholder={t('board.search.placeholder')}
                 style={{
                   flex: 1,
                   border: 'none',
@@ -302,7 +302,7 @@ export function LeaderboardTab() {
                   setSearchQuery('');
                   setSearchOpen(false);
                 }}
-                aria-label="Close search"
+                aria-label={t('board.search.closeAria')}
                 style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex' }}
               >
                 <X size={13} color={MUTED} />
@@ -312,7 +312,7 @@ export function LeaderboardTab() {
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
-              aria-label="Search players"
+              aria-label={t('board.search.openAria')}
               style={{
                 background: 'none',
                 border: 'none',
