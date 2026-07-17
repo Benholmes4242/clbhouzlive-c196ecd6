@@ -33,51 +33,19 @@ Deno.serve(async (req) => {
     Deno.env.get('SUPABASE_SERVICE_ROLE') ?? Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
   );
 
-  // Upsert the vault entry. Use vault.update_secret when the entry exists;
-  // vault.create_secret otherwise. Both are strictly scoped to the name.
-  const { data: existing, error: readErr } = await supabase
-    .schema('vault' as unknown as 'public')
-    .from('secrets' as unknown as never)
-    .select('id, name')
-    .eq('name', 'INTERNAL_FN_SECRET')
-    .maybeSingle();
-
-  if (readErr) {
-    return new Response(JSON.stringify({ error: 'vault read failed', detail: readErr.message }), {
+  const { data, error } = await supabase.rpc('upsert_internal_fn_secret', {
+    p_secret: envSecret,
+  });
+  if (error) {
+    return new Response(JSON.stringify({ error: 'vault upsert failed', detail: error.message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
 
-  let action: 'updated' | 'created';
-  if (existing) {
-    const { error } = await supabase.rpc('update_vault_secret', {
-      p_id: (existing as { id: string }).id,
-      p_secret: envSecret,
-    });
-    if (error) {
-      return new Response(JSON.stringify({ error: 'vault update failed', detail: error.message }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-    action = 'updated';
-  } else {
-    const { error } = await supabase.rpc('create_vault_secret', {
-      p_secret: envSecret,
-      p_name: 'INTERNAL_FN_SECRET',
-    });
-    if (error) {
-      return new Response(JSON.stringify({ error: 'vault create failed', detail: error.message }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-    action = 'created';
-  }
-
-  return new Response(JSON.stringify({ ok: true, action, name: 'INTERNAL_FN_SECRET' }), {
+  return new Response(JSON.stringify({ ok: true, action: data, name: 'INTERNAL_FN_SECRET' }), {
     status: 200,
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   });
 });
+
