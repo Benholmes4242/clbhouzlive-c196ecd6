@@ -19,12 +19,13 @@ interface Props {
 }
 
 export function AllTeeTimesSheet({ open, onClose, groups, tournamentName, round }: Props) {
+  const { t } = useTranslation('tourhub');
   return (
     <BottomSheet open={open} onClose={onClose} variant="light" surfaceColor={SLATE_50} style={{ height: '75dvh', maxHeight: '75dvh' }}>
       <div style={{ background: SLATE_50, fontFamily: FONT, height: '75dvh', maxHeight: '75dvh', display: 'flex', flexDirection: 'column' }}>
         <div style={{ padding: '4px 16px 12px' }}>
           <div style={{ fontSize: 9, fontWeight: 800, color: AMBER, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-            All Tee Times
+            {t('tournament.allTeeTimes.title')}
           </div>
           {tournamentName && (
             <div style={{ fontSize: 15, fontWeight: 800, color: INK, marginTop: 4, letterSpacing: '-0.01em' }}>
@@ -33,10 +34,11 @@ export function AllTeeTimesSheet({ open, onClose, groups, tournamentName, round 
           )}
           {round != null && (
             <div style={{ fontSize: 11, fontWeight: 600, color: INK_MUTE, marginTop: 2 }}>
-              Round {round}
+              {t('tournament.eventInfo.round', { round })}
             </div>
           )}
         </div>
+
         <div style={{ overflowY: 'auto', flex: 1, minHeight: 0 }}>
           <TeeTimesFirstGroups groups={groups} limit={9999} />
         </div>
