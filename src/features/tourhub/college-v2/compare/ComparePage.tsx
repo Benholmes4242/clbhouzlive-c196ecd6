@@ -74,6 +74,21 @@ export function ComparePage() {
   const { data: leftRoster = [] } = useCollegeRoster(c1 || undefined);
   const { data: rightRoster = [] } = useCollegeRoster(c2 || undefined);
   const { data: liveMap = {} } = useLivePlayerIds();
+  const { data: leftWeek = [] } = useThisWeekAlumni(c1 || undefined);
+  const { data: rightWeek = [] } = useThisWeekAlumni(c2 || undefined);
+  const { data: leftAgg } = useCollegeAggregateStats(c1 || undefined);
+  const { data: rightAgg } = useCollegeAggregateStats(c2 || undefined);
+
+  const leftWeekByPlayer = useMemo(() => {
+    const m = new Map<string, WeekAlumnusRow>();
+    for (const r of leftWeek) if (!m.has(r.playerId)) m.set(r.playerId, r);
+    return m;
+  }, [leftWeek]);
+  const rightWeekByPlayer = useMemo(() => {
+    const m = new Map<string, WeekAlumnusRow>();
+    for (const r of rightWeek) if (!m.has(r.playerId)) m.set(r.playerId, r);
+    return m;
+  }, [rightWeek]);
 
   const [pickerTarget, setPickerTarget] = useState<'c1' | 'c2' | null>(null);
 
