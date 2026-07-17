@@ -12,6 +12,7 @@
  */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { formatMonthDay, formatNumber } from '@/i18n/format';
 import { ChevronRight, Crown, Trophy } from 'lucide-react';
 import {
