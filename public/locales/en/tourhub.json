@@ -158,9 +158,93 @@
       "prevAria": "Previous tournament",
       "nextAria": "Next tournament",
       "counter": "{{current}} / {{total}}"
+    },
+    "leaderboardBand": {
+      "ctaLive": "OPEN LIVE LEADERBOARD",
+      "ctaCancelled": "VIEW TOUR SCHEDULE",
+      "ctaAwaitingPlayoff": "VIEW LIVE PLAYOFF",
+      "ctaResults": "VIEW FULL RESULTS",
+      "ctaImminent": "VIEW ALL TEE TIMES",
+      "ctaUpcoming": "VIEW TOURNAMENT",
+      "inauguralPlaceholder": "INAUGURAL EVENT · NO PRIOR RESULTS",
+      "previewUnavailable": "Tournament preview not available.",
+      "fieldEyebrow": "Field",
+      "playersSuffix_one": " player",
+      "playersSuffix_other": " players"
+    },
+    "courseStats": {
+      "eyebrow": "COURSE",
+      "parLabel": "PAR",
+      "recordLabel": "Record: {{value}}",
+      "recordLabelWithHolder": "Record: {{value}} · {{holder}}",
+      "fallbackSummary": "Course preview"
+    },
+    "comingUp": {
+      "eyebrow": "What's coming up",
+      "linkLabel": "Full schedule",
+      "chipPlayoffs": "Playoffs",
+      "daysLabel": "DAYS",
+      "venueDefendsSep": " · {{name}} defends"
+    },
+    "onTheCourse": {
+      "eyebrow": "On the course",
+      "rightMeta_one": "{{count}} group",
+      "rightMeta_other": "{{count}} groups",
+      "rightMetaWithRound_one": "{{count}} group · R{{round}}",
+      "rightMetaWithRound_other": "{{count}} groups · R{{round}}",
+      "roundOnly": "R{{round}}",
+      "teeLabel": "TEE {{time}}",
+      "thruLabel": "THRU {{value}}",
+      "holeLabel": "HOLE {{hole}}",
+      "featuredBadge": "★ FEATURED",
+      "allGroups": "All groups",
+      "fullField": "full field",
+      "moreCount": "{{count}} more",
+      "fullFieldDivider": "FULL FIELD",
+      "backLine1": "Back to",
+      "backLine2": "featured",
+      "showAllAria": "Show all groups",
+      "backAria": "Back to featured"
+    },
+    "tiPicks": {
+      "eyebrow": "Tournament intelligence",
+      "linkLabel": "All picks",
+      "confidenceHigh": "High",
+      "confidenceSolid": "Solid",
+      "confidenceLive": "Live",
+      "theCase": "The case ›",
+      "pickLabel": "Pick {{rank}}",
+      "won": "Won",
+      "hit": "Hit",
+      "miss": "Miss",
+      "missWithCut": "Miss · {{cut}}",
+      "wonBadge": "WON · {{score}}",
+      "hitBadge": "HIT · {{pos}} · {{score}}",
+      "missBadge": "MISS · {{pos}} · {{score}}",
+      "missShort": "MISS",
+      "missWithCutBadge": "MISS · {{cut}}",
+      "thruLabel": "thru {{value}}",
+      "caseFor": "The case for",
+      "boardTitle": "The board",
+      "boardMeta_one": "{{count}} PICK · TAP FOR THE CASE",
+      "boardMeta_other": "{{count}} PICKS · TAP FOR THE CASE",
+      "courseFit": "course fit {{score}}",
+      "concernLabel": "Concern",
+      "finalLine": "{{pos}} · {{score}}"
+    },
+    "collegeFranchise": {
+      "eyebrow": "COLLEGE FRANCHISE",
+      "linkLabel": "All franchises",
+      "vs": "VS",
+      "tugLabel": "SEASON ALUMNI EARNINGS",
+      "captainLabel": "· CAPTAIN",
+      "onTour_one": "{{count}} on tour",
+      "onTour_other": "{{count}} on tour",
+      "onTourCaptainSuffix": " · {{name}} captains",
+      "headlineFallbackWide": "{{leader}} runs away with it.",
+      "headlineFallbackClose": "{{leader}} leads. {{chaser}} is closing."
     }
   },
-
   "empty": {
     "leaderboard": {
       "noLive": {

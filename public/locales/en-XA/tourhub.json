@@ -1,15 +1,15 @@
 {
   "status": {
-    "live": "[~~ĿÍṼÉ~~]",
+    "live": "[~~ĻÍṼÉ~~]",
     "upcoming": "[~~ÚƤĈŐṀÍÑĜ~~]",
-    "final": "[~~ƑÍÑÁĿ~~]",
-    "results": "[~~ŘÉŠÚĿŢŠ~~]",
+    "final": "[~~ƑÍÑÁĻ~~]",
+    "results": "[~~ŘÉŠÚĻŢŠ~~]",
     "noEvent": "[~~ÑŐ ÉṼÉÑŢ~~]"
   },
   "pill": {
     "updated": "[~~Úƥđáţéđ {{time}}~~]",
     "tourEyebrow": "[~~Ţőúř~~]",
-    "majorEyebrow": "[~~Ṁájőř~~]"
+    "majorEyebrow": "[~~Ṁáĵőř~~]"
   },
   "picker": {
     "eyebrow": "[~~ŠŴÍŢĈĤ ŢŐÚŘ~~]",
@@ -25,10 +25,10 @@
       "account": "[~~Áĉĉőúñţ~~]"
     },
     "overview": "[~~Őṽéřṽíéŵ~~]",
-    "leaderboards": "[~~Ŀéáđéřƀőářđš~~]",
+    "leaderboards": "[~~Ļéáđéřƀőářđš~~]",
     "schedule": "[~~Šĉĥéđúļé~~]",
     "players": "[~~Ƥļáýéřš~~]",
-    "leaders": "[~~Ŀéáđéřš~~]",
+    "leaders": "[~~Ļéáđéřš~~]",
     "college": "[~~Ĉőļļéĝé~~]",
     "settings": "[~~Šéţţíñĝš~~]",
     "profile": "[~~Ƥřőƒíļé~~]",
@@ -52,8 +52,8 @@
       "thisWeek": "[~~Ţĥíš ŵééǩ~~]"
     },
     "badge": {
-      "major": "[~~ṀÁJŐŘ~~]",
-      "playoffs": "[~~ƤĿÁÝŐƑƑŠ~~]",
+      "major": "[~~ṀÁĴŐŘ~~]",
+      "playoffs": "[~~ƤĻÁÝŐƑƑŠ~~]",
       "champion": "[~~ĈĤÁṀƤÍŐÑ~~]"
     },
     "rail": {
@@ -75,72 +75,72 @@
     },
     "cancelled": {
       "eyebrow": "[~~Ñő Řéšúļţ~~]",
-      "reasonDefault": "[~~Ţĥíš éṽéñţ đíđ ñőţ ĉőṁƥļéţé éñőúĝĥ řőúñđš ƒőř áñ őƒƒíĉíáļ řéšúļţ.~~]"
+      "reasonDefault": "[~~Ţĥíš éṽéñţ đíđ ñőţ ĉőɱƥļéţé éñőúĝĥ řőúñđš ƒőř áñ őƒƒíĉíáļ řéšúļţ.~~]"
     },
     "ticker": {
       "top10Label": "[~~ŢŐƤ 10~~]"
     },
     "fieldStrength": {
-      "eyebrow": "[~~ƑÍÉĿĐ~~]",
+      "eyebrow": "[~~ƑÍÉĻĐ~~]",
       "playersCount": "[~~{{count}} ƥļáýéřš~~]",
       "topRankedLine": "[~~{{topRanked}} őƒ ŵőřļđ ţőƥ {{threshold}}~~]",
-      "inFieldLabel": "[~~ÍÑ ƑÍÉĿĐ~~]"
+      "inFieldLabel": "[~~ÍÑ ƑÍÉĻĐ~~]"
     },
     "champion": {
       "scoreLabelToPar": "[~~ŢŐ ƤÁŘ~~]",
       "eyebrow": "[~~ĈĤÁṀƤÍŐÑ~~]",
-      "eyebrowPlayoff": "[~~ĈĤÁṀƤÍŐÑ · ƤĿÁÝŐƑƑ~~]",
+      "eyebrowPlayoff": "[~~ĈĤÁṀƤÍŐÑ · ƤĻÁÝŐƑƑ~~]",
       "resultPending": "[~~Řéšúļţ ƥéñđíñĝ~~]"
     },
     "cancelledStrip": {
-      "eyebrow": "[~~ĈÁÑĈÉĿĿÉĐ~~]"
+      "eyebrow": "[~~ĈÁÑĈÉĻĻÉĐ~~]"
     },
     "playoff": {
-      "eyebrow": "[~~ÁŴÁÍŢÍÑĜ ƤĿÁÝŐƑƑ~~]",
+      "eyebrow": "[~~ÁŴÁÍŢÍÑĜ ƤĻÁÝŐƑƑ~~]",
       "tiedAtTop": "[~~{{count}} ţíéđ áţ ţĥé ţőƥ~~]"
     },
     "middleBand": {
-      "cancelledDefault": "[~~Ñő ƥļáý — ţőúřñáṁéñţ ĉáñĉéļļéđ.~~]"
+      "cancelledDefault": "[~~Ñő ƥļáý — ţőúřñáɱéñţ ĉáñĉéļļéđ.~~]"
     },
     "upcoming": {
       "defendingEyebrow": "[~~ĐÉƑÉÑĐÍÑĜ~~]",
-      "previewTitle": "[~~Ţőúřñáṁéñţ Ƥřéṽíéŵ~~]",
+      "previewTitle": "[~~Ţőúřñáɱéñţ Ƥřéṽíéŵ~~]",
       "previewEyebrow": "[~~ƤŘÉṼÍÉŴ~~]"
     },
     "rankings": {
-      "sectionEyebrow": "[~~Ŵőřļđ řáñķíñĝš~~]",
-      "linkLabel": "[~~Ƒúļļ řáñķíñĝš~~]",
+      "sectionEyebrow": "[~~Ŵőřļđ řáñǩíñĝš~~]",
+      "linkLabel": "[~~Ƒúļļ řáñǩíñĝš~~]",
       "worldNo1Label": "[~~Ŵőřļđ Ñő. 1~~]",
       "pointsLabel": "[~~ƤŐÍÑŢŠ~~]",
       "boards": {
-        "owgr": "[~~Őƒƒíĉíáļ Ŵőřļđ Ĝőļƒ Řáñķíñĝ~~]",
-        "r2d": "[~~Řáĉé ţő Đúɓáí~~]",
-        "rolex": "[~~Řőļéẋ Řáñķíñĝš~~]"
+        "owgr": "[~~Őƒƒíĉíáļ Ŵőřļđ Ĝőļƒ Řáñǩíñĝ~~]",
+        "r2d": "[~~Řáĉé ţő Đúƀáí~~]",
+        "rolex": "[~~Řőļéẋ Řáñǩíñĝš~~]"
       }
     },
     "teamWinnerStrip": {
       "eyebrow": "[~~ŢÉÁṀ ŴÍÑÑÉŘ~~]",
       "labelVsPar": "[~~ṼŠ ƤÁŘ~~]",
-      "labelStrokes": "[~~ŠŢŘŐKÉŠ~~]"
+      "labelStrokes": "[~~ŠŢŘŐǨÉŠ~~]"
     },
     "leaderRow": {
       "tiedAtRank_one": "[~~{{count}} ţíéđ áţ {{rank}}~~]",
       "tiedAtRank_other": "[~~{{count}} ţíéđ áţ {{rank}}~~]",
-      "tiedAtRankAria_one": "[~~{{count}} ƥļáýéř ţíéđ áţ {{rank}} ŵíţĥ šĉőřé {{score}}, áṽéřáĝé ţřájéĉţőřý~~]",
-      "tiedAtRankAria_other": "[~~{{count}} ƥļáýéřš ţíéđ áţ {{rank}} ŵíţĥ šĉőřé {{score}}, áṽéřáĝé ţřájéĉţőřý~~]",
+      "tiedAtRankAria_one": "[~~{{count}} ƥļáýéř ţíéđ áţ {{rank}} ŵíţĥ šĉőřé {{score}}, áṽéřáĝé ţřáĵéĉţőřý~~]",
+      "tiedAtRankAria_other": "[~~{{count}} ƥļáýéřš ţíéđ áţ {{rank}} ŵíţĥ šĉőřé {{score}}, áṽéřáĝé ţřáĵéĉţőřý~~]",
       "tiedAtTop_one": "[~~{{count}} ţíéđ áţ ţĥé ţőƥ~~]",
       "tiedAtTop_other": "[~~{{count}} ţíéđ áţ ţĥé ţőƥ~~]",
       "tiedAtTopAria_one": "[~~{{count}} ƥļáýéř ţíéđ áţ ţĥé ţőƥ ŵíţĥ šĉőřé {{score}}~~]",
       "tiedAtTopAria_other": "[~~{{count}} ƥļáýéřš ţíéđ áţ ţĥé ţőƥ ŵíţĥ šĉőřé {{score}}~~]",
-      "playoffMarker": "[~~* ƤĿÁÝŐƑƑ~~]",
-      "championIconLabel": "[~~Ĉĥáṁƥíőñ~~]"
+      "playoffMarker": "[~~* ƤĻÁÝŐƑƑ~~]",
+      "championIconLabel": "[~~Ĉĥáɱƥíőñ~~]"
     },
     "photoBand": {
-      "wonBy": "[~~Ŵőñ bý {{winnerName}}~~]"
+      "wonBy": "[~~Ŵőñ ƀý {{winnerName}}~~]"
     },
     "trajectorySparkline": {
-      "ariaLabel": "[~~Ţřájéĉţőřý: řőúñđš {{rounds}}~~]",
-      "ariaLabelRoundOf": "[~~Ţřájéĉţőřý: řőúñđš {{rounds}} (řőúñđ {{current}} őƒ {{total}})~~]"
+      "ariaLabel": "[~~Ţřáĵéĉţőřý: řőúñđš {{rounds}}~~]",
+      "ariaLabelRoundOf": "[~~Ţřáĵéĉţőřý: řőúñđš {{rounds}} (řőúñđ {{current}} őƒ {{total}})~~]"
     },
     "statWatch": {
       "eyebrow": "[~~Šţáţ ŵáţĉĥ~~]",
@@ -149,18 +149,102 @@
     },
     "sectionTourLens": {
       "allTours": "[~~Áļļ Ţőúřš~~]",
-      "filterAriaLabel": "[~~Ƒíļţéř šéĉţíőñ bý ţőúř~~]"
+      "filterAriaLabel": "[~~Ƒíļţéř šéĉţíőñ ƀý ţőúř~~]"
     },
     "page": {
-      "offlineBanner": "[~~Ýőú'řé őƒƒļíñé. Šőṁé đáţá ṁáý ƀé őúţđáţéđ.~~]"
+      "offlineBanner": "[~~Ýőú'řé őƒƒļíñé. Šőɱé đáţá ɱáý ƀé őúţđáţéđ.~~]"
     },
     "hero": {
-      "prevAria": "[~~Ƥřéṽíőúš ţőúřñáṁéñţ~~]",
-      "nextAria": "[~~Ñéẋţ ţőúřñáṁéñţ~~]",
-      "counter": "{{current}} / {{total}}"
+      "prevAria": "[~~Ƥřéṽíőúš ţőúřñáɱéñţ~~]",
+      "nextAria": "[~~Ñéẋţ ţőúřñáɱéñţ~~]",
+      "counter": "[~~{{current}} / {{total}}~~]"
+    },
+    "leaderboardBand": {
+      "ctaLive": "[~~ŐƤÉÑ ĻÍṼÉ ĻÉÁĐÉŘƁŐÁŘĐ~~]",
+      "ctaCancelled": "[~~ṼÍÉŴ ŢŐÚŘ ŠĈĤÉĐÚĻÉ~~]",
+      "ctaAwaitingPlayoff": "[~~ṼÍÉŴ ĻÍṼÉ ƤĻÁÝŐƑƑ~~]",
+      "ctaResults": "[~~ṼÍÉŴ ƑÚĻĻ ŘÉŠÚĻŢŠ~~]",
+      "ctaImminent": "[~~ṼÍÉŴ ÁĻĻ ŢÉÉ ŢÍṀÉŠ~~]",
+      "ctaUpcoming": "[~~ṼÍÉŴ ŢŐÚŘÑÁṀÉÑŢ~~]",
+      "inauguralPlaceholder": "[~~ÍÑÁÚĜÚŘÁĻ ÉṼÉÑŢ · ÑŐ ƤŘÍŐŘ ŘÉŠÚĻŢŠ~~]",
+      "previewUnavailable": "[~~Ţőúřñáɱéñţ ƥřéṽíéŵ ñőţ áṽáíļáƀļé.~~]",
+      "fieldEyebrow": "[~~Ƒíéļđ~~]",
+      "playersSuffix_one": "[~~ ƥļáýéř~~]",
+      "playersSuffix_other": "[~~ ƥļáýéřš~~]"
+    },
+    "courseStats": {
+      "eyebrow": "[~~ĈŐÚŘŠÉ~~]",
+      "parLabel": "[~~ƤÁŘ~~]",
+      "recordLabel": "[~~Řéĉőřđ: {{value}}~~]",
+      "recordLabelWithHolder": "[~~Řéĉőřđ: {{value}} · {{holder}}~~]",
+      "fallbackSummary": "[~~Ĉőúřšé ƥřéṽíéŵ~~]"
+    },
+    "comingUp": {
+      "eyebrow": "[~~Ŵĥáţ'š ĉőɱíñĝ úƥ~~]",
+      "linkLabel": "[~~Ƒúļļ šĉĥéđúļé~~]",
+      "chipPlayoffs": "[~~Ƥļáýőƒƒš~~]",
+      "daysLabel": "[~~ĐÁÝŠ~~]",
+      "venueDefendsSep": "[~~ · {{name}} đéƒéñđš~~]"
+    },
+    "onTheCourse": {
+      "eyebrow": "[~~Őñ ţĥé ĉőúřšé~~]",
+      "rightMeta_one": "[~~{{count}} ĝřőúƥ~~]",
+      "rightMeta_other": "[~~{{count}} ĝřőúƥš~~]",
+      "rightMetaWithRound_one": "[~~{{count}} ĝřőúƥ · Ř{{round}}~~]",
+      "rightMetaWithRound_other": "[~~{{count}} ĝřőúƥš · Ř{{round}}~~]",
+      "roundOnly": "[~~Ř{{round}}~~]",
+      "teeLabel": "[~~ŢÉÉ {{time}}~~]",
+      "thruLabel": "[~~ŢĤŘÚ {{value}}~~]",
+      "holeLabel": "[~~ĤŐĻÉ {{hole}}~~]",
+      "featuredBadge": "[~~★ ƑÉÁŢÚŘÉĐ~~]",
+      "allGroups": "[~~Áļļ ĝřőúƥš~~]",
+      "fullField": "[~~ƒúļļ ƒíéļđ~~]",
+      "moreCount": "[~~{{count}} ɱőřé~~]",
+      "fullFieldDivider": "[~~ƑÚĻĻ ƑÍÉĻĐ~~]",
+      "backLine1": "[~~Ɓáĉǩ ţő~~]",
+      "backLine2": "[~~ƒéáţúřéđ~~]",
+      "showAllAria": "[~~Šĥőŵ áļļ ĝřőúƥš~~]",
+      "backAria": "[~~Ɓáĉǩ ţő ƒéáţúřéđ~~]"
+    },
+    "tiPicks": {
+      "eyebrow": "[~~Ţőúřñáɱéñţ íñţéļļíĝéñĉé~~]",
+      "linkLabel": "[~~Áļļ ƥíĉǩš~~]",
+      "confidenceHigh": "[~~Ĥíĝĥ~~]",
+      "confidenceSolid": "[~~Šőļíđ~~]",
+      "confidenceLive": "[~~Ļíṽé~~]",
+      "theCase": "[~~Ţĥé ĉášé ›~~]",
+      "pickLabel": "[~~Ƥíĉǩ {{rank}}~~]",
+      "won": "[~~Ŵőñ~~]",
+      "hit": "[~~Ĥíţ~~]",
+      "miss": "[~~Ṁíšš~~]",
+      "missWithCut": "[~~Ṁíšš · {{cut}}~~]",
+      "wonBadge": "[~~ŴŐÑ · {{score}}~~]",
+      "hitBadge": "[~~ĤÍŢ · {{pos}} · {{score}}~~]",
+      "missBadge": "[~~ṀÍŠŠ · {{pos}} · {{score}}~~]",
+      "missShort": "[~~ṀÍŠŠ~~]",
+      "missWithCutBadge": "[~~ṀÍŠŠ · {{cut}}~~]",
+      "thruLabel": "[~~ţĥřú {{value}}~~]",
+      "caseFor": "[~~Ţĥé ĉášé ƒőř~~]",
+      "boardTitle": "[~~Ţĥé ƀőářđ~~]",
+      "boardMeta_one": "[~~{{count}} ƤÍĈǨ · ŢÁƤ ƑŐŘ ŢĤÉ ĈÁŠÉ~~]",
+      "boardMeta_other": "[~~{{count}} ƤÍĈǨŠ · ŢÁƤ ƑŐŘ ŢĤÉ ĈÁŠÉ~~]",
+      "courseFit": "[~~ĉőúřšé ƒíţ {{score}}~~]",
+      "concernLabel": "[~~Ĉőñĉéřñ~~]",
+      "finalLine": "[~~{{pos}} · {{score}}~~]"
+    },
+    "collegeFranchise": {
+      "eyebrow": "[~~ĈŐĻĻÉĜÉ ƑŘÁÑĈĤÍŠÉ~~]",
+      "linkLabel": "[~~Áļļ ƒřáñĉĥíšéš~~]",
+      "vs": "[~~ṼŠ~~]",
+      "tugLabel": "[~~ŠÉÁŠŐÑ ÁĻÚṀÑÍ ÉÁŘÑÍÑĜŠ~~]",
+      "captainLabel": "[~~· ĈÁƤŢÁÍÑ~~]",
+      "onTour_one": "[~~{{count}} őñ ţőúř~~]",
+      "onTour_other": "[~~{{count}} őñ ţőúř~~]",
+      "onTourCaptainSuffix": "[~~ · {{name}} ĉáƥţáíñš~~]",
+      "headlineFallbackWide": "[~~{{leader}} řúñš áŵáý ŵíţĥ íţ.~~]",
+      "headlineFallbackClose": "[~~{{leader}} ļéáđš. {{chaser}} íš ĉļőšíñĝ.~~]"
     }
   },
-
   "empty": {
     "leaderboard": {
       "noLive": {
@@ -222,50 +306,50 @@
     },
     "shell": {
       "board": {
-        "eyebrow": "[~~Ťĥé Ɓőářđ~~]",
-        "action": "[~~Fúļļ ļéáđéřƀőářđ~~]"
+        "eyebrow": "[~~Ţĥé Ɓőářđ~~]",
+        "action": "[~~Ƒúļļ ļéáđéřƀőářđ~~]"
       },
       "leaderboard": {
-        "finalEyebrow": "[~~Fíñáļ Ļéáđéřƀőářđ~~]",
-        "fullBoardAction": "[~~Fúļļ ƀőářđ~~]"
+        "finalEyebrow": "[~~Ƒíñáļ Ļéáđéřƀőářđ~~]",
+        "fullBoardAction": "[~~Ƒúļļ ƀőářđ~~]"
       },
       "teeTimes": {
-        "eyebrow": "[~~Ťéé Ťíɱéš~~]",
-        "allAction": "[~~Áļļ ťíɱéš~~]"
+        "eyebrow": "[~~Ţéé Ţíɱéš~~]",
+        "allAction": "[~~Áļļ ţíɱéš~~]"
       },
       "field": {
-        "eyebrow": "[~~Ťĥé Fíéļđ~~]",
-        "playersSuffix": "[~~ ρļáýéřš~~]",
+        "eyebrow": "[~~Ţĥé Ƒíéļđ~~]",
+        "playersSuffix": "[~~ ƥļáýéřš~~]",
         "headlinedBySep": "[~~ · ĥéáđļíñéđ ƀý ~~]",
-        "firstTeeSep": "[~~ · ƒířšť ťéé ~~]",
-        "startsInSep": "[~~ · šťářťš íñ ~~]",
+        "firstTeeSep": "[~~ · ƒířšţ ţéé ~~]",
+        "startsInSep": "[~~ · šţářţš íñ ~~]",
         "daysSuffix_one": "[~~ đáý~~]",
         "daysSuffix_other": "[~~ đáýš~~]",
-        "emptyFallback": "[~~Ťĥé ƒíéļđ áñđ ťéé ťíɱéš ẃíļļ áρρéář ĥéřé ĉļőšéř ťő ťĥé šťářť.~~]"
+        "emptyFallback": "[~~Ţĥé ƒíéļđ áñđ ţéé ţíɱéš ŵíļļ áƥƥéář ĥéřé ĉļőšéř ţő ţĥé šţářţ.~~]"
       }
     },
     "hero": {
       "chip": {
-        "majorStarts": "[~~ΜÁĴŐŘ · ŠŤÁŘŤŠ {{date}}~~]",
-        "starts": "[~~ŠŤÁŘŤŠ {{date}}~~]"
+        "majorStarts": "[~~ṀÁĴŐŘ · ŠŢÁŘŢŠ {{date}}~~]",
+        "starts": "[~~ŠŢÁŘŢŠ {{date}}~~]"
       },
       "leaderLabel": "[~~Ļéáđéř~~]",
       "daysLabel": "[~~Đáýš~~]",
       "defendingLabel": "[~~Đéƒéñđíñĝ~~]",
-      "purseLabel": "[~~Ρúřšé~~]",
-      "tbdPlayer": "[~~ŤƁĐ~~]",
-      "championFallback": "[~~Ĉĥáɱρíőñ~~]"
+      "purseLabel": "[~~Ƥúřšé~~]",
+      "tbdPlayer": "[~~ŢƁĐ~~]",
+      "championFallback": "[~~Ĉĥáɱƥíőñ~~]"
     },
     "story": {
-      "eyebrow": "[~~Ťĥé Šťőřý~~]",
+      "eyebrow": "[~~Ţĥé Šţőřý~~]",
       "readMore": "[~~Řéáđ ɱőřé~~]"
     },
     "moments": {
-      "eyebrow": "[~~Μőɱéñťš~~]",
-      "emptyBody": "[~~Μőɱéñťš ƒřőɱ ťĥíš ťőúřñáɱéñť ẃíļļ áρρéář ĥéřé áš ɱéɱƀéřš šĥářé ťĥéɱ.~~]",
-      "shareCta": "[~~Šĥářé á ɱőɱéñť~~]",
-      "allAction": "[~~Áļļ ɱőɱéñťš~~]",
-      "sheetTitle": "[~~Áļļ Μőɱéñťš~~]"
+      "eyebrow": "[~~Ṁőɱéñţš~~]",
+      "emptyBody": "[~~Ṁőɱéñţš ƒřőɱ ţĥíš ţőúřñáɱéñţ ŵíļļ áƥƥéář ĥéřé áš ɱéɱƀéřš šĥářé ţĥéɱ.~~]",
+      "shareCta": "[~~Šĥářé á ɱőɱéñţ~~]",
+      "allAction": "[~~Áļļ ɱőɱéñţš~~]",
+      "sheetTitle": "[~~Áļļ Ṁőɱéñţš~~]"
     },
     "fullBoard": {
       "title": "[~~Ƒúļļ Ɓőářđ~~]"
@@ -300,31 +384,31 @@
     }
   },
   "leaders": {
-    "footer": "[~~Šéášöñ ḇöáŕđš · ĺíṽé đöţ = öñ ţĥé ćöúŕšé ŕíġĥţ ñöŵ~~]",
-    "fullList": "[~~Ƒúĺĺ ĺíšţ~~]",
+    "footer": "[~~Šéášőñ ƀőářđš · ļíṽé đőţ = őñ ţĥé ĉőúřšé říĝĥţ ñőŵ~~]",
+    "fullList": "[~~Ƒúļļ ļíšţ~~]",
     "sheet": {
-      "eyebrow_one": "[~~{{tourLabel}} · {{year}} · {{count}} ŘĻÁÝÉŔ~~]",
-      "eyebrow_other": "[~~{{tourLabel}} · {{year}} · {{count}} ŘĻÁÝÉŔŠ~~]",
-      "empty": "[~~Ñö řĺáýéŕš ŕáñĸéđ íñ ţĥíš ćáţéġöŕý.~~]"
+      "eyebrow_one": "[~~{{tourLabel}} · {{year}} · {{count}} ƤĻÁÝÉŘ~~]",
+      "eyebrow_other": "[~~{{tourLabel}} · {{year}} · {{count}} ƤĻÁÝÉŘŠ~~]",
+      "empty": "[~~Ñő ƥļáýéřš řáñǩéđ íñ ţĥíš ĉáţéĝőřý.~~]"
     },
     "tourChip": {
-      "pga": "[~~ŘĠÁ~~]",
-      "lpga": "[~~ĻŘĠÁ~~]",
-      "euro": "[~~ĐŘ ŴÖŔĻĐ~~]",
-      "pgad": "[~~ĶÖŔÑ ƑÉŔŔÝ~~]",
-      "champ": "[~~ĈĤÁṀŘÍÖÑŠ~~]",
+      "pga": "[~~ƤĜÁ~~]",
+      "lpga": "[~~ĻƤĜÁ~~]",
+      "euro": "[~~ĐƤ ŴŐŘĻĐ~~]",
+      "pgad": "[~~ǨŐŘÑ ƑÉŘŘÝ~~]",
+      "champ": "[~~ĈĤÁṀƤÍŐÑŠ~~]",
       "liv": "[~~ĻÍṼ~~]"
     },
     "stat": {
       "earnings": {
-        "label": "[~~Šéášöñ Éáŕñíñġš~~]",
-        "short": "[~~ÉÁŔÑÍÑĠŠ~~]",
+        "label": "[~~Šéášőñ Éářñíñĝš~~]",
+        "short": "[~~ÉÁŘÑÍÑĜŠ~~]",
         "unit": "[~~ÚŠĐ~~]"
       },
       "scoring_avg": {
-        "label": "[~~Šćöŕíñġ Áṽéŕáġé~~]",
-        "short": "[~~ŠĈÖŔÍÑĠ~~]",
-        "unit": "[~~ÁṼĠ~~]"
+        "label": "[~~Šĉőříñĝ Áṽéřáĝé~~]",
+        "short": "[~~ŠĈŐŘÍÑĜ~~]",
+        "unit": "[~~ÁṼĜ~~]"
       },
       "wins": {
         "label": "[~~Ŵíñš~~]",
@@ -332,23 +416,23 @@
         "unit": "[~~ŴÍÑŠ~~]"
       },
       "top_10": {
-        "label": "[~~Ţöř 10 Ƒíñíšĥéš~~]",
-        "short": "[~~ŢÖŘ 10~~]",
-        "unit": "[~~ŢÖŘ 10~~]"
+        "label": "[~~Ţőƥ 10 Ƒíñíšĥéš~~]",
+        "short": "[~~ŢŐƤ 10~~]",
+        "unit": "[~~ŢŐƤ 10~~]"
       },
       "drive_avg": {
-        "label": "[~~Đŕíṽíñġ Đíšţáñćé~~]",
-        "short": "[~~ĐŔÍṼÍÑĠ~~]",
+        "label": "[~~Đříṽíñĝ Đíšţáñĉé~~]",
+        "short": "[~~ĐŘÍṼÍÑĜ~~]",
         "unit": "[~~ÝĐŠ~~]"
       },
       "drive_acc": {
-        "label": "[~~Đŕíṽíñġ Áććúŕáćý~~]",
-        "short": "[~~ÁĈĈÚŔÁĈÝ~~]",
+        "label": "[~~Đříṽíñĝ Áĉĉúřáĉý~~]",
+        "short": "[~~ÁĈĈÚŘÁĈÝ~~]",
         "unit": "[~~%~~]"
       },
       "gir_pct": {
-        "label": "[~~Ġŕééñš íñ Ŕéġúĺáţíöñ~~]",
-        "short": "[~~ĠÍŔ~~]",
+        "label": "[~~Ĝřééñš íñ Řéĝúļáţíőñ~~]",
+        "short": "[~~ĜÍŘ~~]",
         "unit": "[~~%~~]"
       },
       "sand_saves_pct": {
@@ -357,88 +441,88 @@
         "unit": "[~~%~~]"
       },
       "putt_avg": {
-        "label": "[~~Řúţţíñġ Áṽéŕáġé~~]",
-        "short": "[~~ŘÚŢŢÍÑĠ~~]",
-        "unit": "[~~ŘÚŢŢŠ~~]"
+        "label": "[~~Ƥúţţíñĝ Áṽéřáĝé~~]",
+        "short": "[~~ƤÚŢŢÍÑĜ~~]",
+        "unit": "[~~ƤÚŢŢŠ~~]"
       },
       "strokes_gained_tee_green": {
-        "label": "[~~Šţŕöĸéš Ġáíñéđ Ţ2Ġ~~]",
-        "short": "[~~ŠĠ Ţ2Ġ~~]",
-        "unit": "[~~ŠĠ~~]"
+        "label": "[~~Šţřőǩéš Ĝáíñéđ Ţ2Ĝ~~]",
+        "short": "[~~ŠĜ Ţ2Ĝ~~]",
+        "unit": "[~~ŠĜ~~]"
       },
       "strokes_gained_putting": {
-        "label": "[~~Šţŕöĸéš Ġáíñéđ Řúţţíñġ~~]",
-        "short": "[~~ŠĠ ŘÚŢŢ~~]",
-        "unit": "[~~ŠĠ~~]"
+        "label": "[~~Šţřőǩéš Ĝáíñéđ Ƥúţţíñĝ~~]",
+        "short": "[~~ŠĜ ƤÚŢŢ~~]",
+        "unit": "[~~ŠĜ~~]"
       },
       "world_rank": {
-        "label": "[~~Ŵöŕĺđ Ŕáñĸíñġ~~]",
-        "short": "[~~ŴÖŔĻĐ~~]",
-        "unit": "[~~ÖŴĠŔ~~]"
+        "label": "[~~Ŵőřļđ Řáñǩíñĝ~~]",
+        "short": "[~~ŴŐŘĻĐ~~]",
+        "unit": "[~~ŐŴĜŘ~~]"
       },
       "points": {
-        "label": "[~~Šéášöñ Řöíñţš~~]",
-        "short": "[~~ŘÖÍÑŢŠ~~]",
-        "unit": "[~~ŘŢŠ~~]"
+        "label": "[~~Šéášőñ Ƥőíñţš~~]",
+        "short": "[~~ƤŐÍÑŢŠ~~]",
+        "unit": "[~~ƤŢŠ~~]"
       },
       "events_played": {
-        "label": "[~~Éṽéñţš Ƥľáýéđ~~]",
+        "label": "[~~Éṽéñţš Ƥļáýéđ~~]",
         "short": "[~~ÉṼÉÑŢŠ~~]",
         "unit": "[~~ÉṼÉÑŢŠ~~]"
       },
       "top_25": {
-        "label": "[~~Ţóƥ 25 Ƒíñíšĥéš~~]",
-        "short": "[~~ŢÓƤ 25~~]",
-        "unit": "[~~ŢÓƤ 25~~]"
+        "label": "[~~Ţőƥ 25 Ƒíñíšĥéš~~]",
+        "short": "[~~ŢŐƤ 25~~]",
+        "unit": "[~~ŢŐƤ 25~~]"
       },
       "cuts_made": {
-        "label": "[~~Čúţš Ṃáđé~~]",
-        "short": "[~~ČÚŢŠ ṂÁĐÉ~~]",
-        "unit": "[~~ČÚŢŠ~~]"
+        "label": "[~~Ĉúţš Ṁáđé~~]",
+        "short": "[~~ĈÚŢŠ ṀÁĐÉ~~]",
+        "unit": "[~~ĈÚŢŠ~~]"
       },
       "birdies_per_round": {
-        "label": "[~~Ɓířđíéš Ƥéř Řóúñđ~~]",
+        "label": "[~~Ɓířđíéš Ƥéř Řőúñđ~~]",
         "short": "[~~ƁÍŘĐÍÉŠ / ŘĐ~~]",
-        "unit": "[~~ÁṼĞ~~]"
+        "unit": "[~~ÁṼĜ~~]"
       },
       "scrambling": {
-        "label": "[~~Ščřáṃƀľíñğ~~]",
-        "short": "[~~ŠČŘÁṂƁĹÍÑĞ~~]",
+        "label": "[~~Šĉřáɱƀļíñĝ~~]",
+        "short": "[~~ŠĈŘÁṀƁĻÍÑĜ~~]",
         "unit": "[~~%~~]"
       },
       "strokes_gained_total": {
-        "label": "[~~Šţřóķéš Ğáíñéđ Ţóţáľ~~]",
-        "short": "[~~ŠĞ: ŢÓŢÁĹ~~]",
-        "unit": "[~~ŠĞ~~]"
+        "label": "[~~Šţřőǩéš Ĝáíñéđ Ţőţáļ~~]",
+        "short": "[~~ŠĜ: ŢŐŢÁĻ~~]",
+        "unit": "[~~ŠĜ~~]"
       },
       "strokes_gained_around_green": {
-        "label": "[~~Šţřóķéš Ğáíñéđ Ářóúñđ Ğřééñ~~]",
-        "short": "[~~ŠĞ: ÁŘÓÚÑĐ~~]",
-        "unit": "[~~ŠĞ~~]"
+        "label": "[~~Šţřőǩéš Ĝáíñéđ Ářőúñđ Ĝřééñ~~]",
+        "short": "[~~ŠĜ: ÁŘŐÚÑĐ~~]",
+        "unit": "[~~ŠĜ~~]"
       }
     },
     "pointsBrand": {
-      "euro": "[~~Ŕáćé ţö Đúḇáí~~]",
-      "lpga": "[~~ĈṀÉ Řöíñţš~~]",
-      "liv": "[~~ĻÍṼ Řöíñţš~~]"
+      "euro": "[~~Řáĉé ţő Đúƀáí~~]",
+      "lpga": "[~~ĈṀÉ Ƥőíñţš~~]",
+      "liv": "[~~ĻÍṼ Ƥőíñţš~~]"
     }
   },
   "players": {
     "search": {
-      "placeholder": "[~~Šéářĉĥ ƥĺáýéřš~~]",
-      "openAria": "[~~Šéářĉĥ ƥĺáýéřš~~]",
-      "closeAria": "[~~Ĉĺéář šéářĉĥ~~]"
+      "placeholder": "[~~Šéářĉĥ ƥļáýéřš~~]",
+      "openAria": "[~~Šéářĉĥ ƥļáýéřš~~]",
+      "closeAria": "[~~Ĉļéář šéářĉĥ~~]"
     },
     "editorial": {
-      "leaderAt": "[~~{{tournament}} — {{leader}} ĹÉÁĐŠ ÁŢ {{score}}~~]",
+      "leaderAt": "[~~{{tournament}} — {{leader}} ĻÉÁĐŠ ÁŢ {{score}}~~]",
       "startsOn": "[~~{{tournament}} ŠŢÁŘŢŠ {{day}}~~]"
     },
     "field": {
-      "eyebrow": "[~~ŢĤÉ ƑÍÉĹĐ~~]"
+      "eyebrow": "[~~ŢĤÉ ƑÍÉĻĐ~~]"
     },
     "sort": {
-      "ranking": "[~~Řáñķíñĝ~~]",
-      "playingNow": "[~~Ƥĺáýíñĝ ñőŵ~~]"
+      "ranking": "[~~Řáñǩíñĝ~~]",
+      "playingNow": "[~~Ƥļáýíñĝ ñőŵ~~]"
     },
     "sub": {
       "wins_one": "[~~{{count}} ŴÍÑ~~]",
@@ -446,90 +530,90 @@
       "top10s": "[~~{{count}} ŢŐƤ-10~~]"
     },
     "footer": {
-      "synced": "[~~Šéášőñ řáñķíñĝ · ĺíṽé đőţ = őñ ţĥé ĉőúřšé říĝĥţ ñőŵ~~]",
-      "unsynced": "[~~Řáñķéđ ƀý ŵőřĺđ řáñķíñĝ — šéášőñ šţáţíšţíĉš ářříṽé ŵíţĥ ţĥé šýñĉ~~]"
+      "synced": "[~~Šéášőñ řáñǩíñĝ · ļíṽé đőţ = őñ ţĥé ĉőúřšé říĝĥţ ñőŵ~~]",
+      "unsynced": "[~~Řáñǩéđ ƀý ŵőřļđ řáñǩíñĝ — šéášőñ šţáţíšţíĉš ářříṽé ŵíţĥ ţĥé šýñĉ~~]"
     },
     "podium": {
       "rank": "[~~Ñő.{{rank}}~~]",
       "rankWithStat": "[~~Ñő.{{rank}} · {{statLabel}}~~]"
     },
     "statLabel": {
-      "pga": "[~~ƑÉĐÉX ƤŢŠ~~]",
+      "pga": "[~~ƑÉĐÉẊ ƤŢŠ~~]",
       "euro": "[~~ŘŢĐ ƤŢŠ~~]",
       "lpga": "[~~ĈṀÉ ƤŢŠ~~]",
       "pgad": "[~~ƤŐÍÑŢŠ~~]",
-      "liv": "[~~ĹÍṼ ƤŢŠ~~]"
+      "liv": "[~~ĻÍṼ ƤŢŠ~~]"
     }
   },
   "player": {
     "error": {
-      "loadFailed": "[~~Čóúľđñ'ţ ľóáđ ƥľáýéř đáţá~~]",
+      "loadFailed": "[~~Ĉőúļđñ'ţ ļőáđ ƥļáýéř đáţá~~]",
       "retry": "[~~Řéţřý~~]"
     },
     "hero": {
-      "tourSuffix": "[~~{{tour}} ŢÓÚŘ~~]",
-      "fallback": "[~~ƤĹÁÝÉŘ~~]",
-      "worldNo": "[~~Ŵóřľđ Ñó. {{rank}}~~]",
-      "fedexNo": "[~~ƑéđÉẋ Ñó. {{rank}}~~]"
+      "tourSuffix": "[~~{{tour}} ŢŐÚŘ~~]",
+      "fallback": "[~~ƤĻÁÝÉŘ~~]",
+      "worldNo": "[~~Ŵőřļđ Ñő. {{rank}}~~]",
+      "fedexNo": "[~~ƑéđÉẋ Ñő. {{rank}}~~]"
     },
     "live": {
-      "badge": "[~~ĹÍṼÉ~~]",
+      "badge": "[~~ĻÍṼÉ~~]",
       "roundSuffix": "[~~ · Ř{{round}}~~]",
       "thru": "[~~ţĥřú {{holes}}~~]",
       "finished": "[~~Ƒ~~]"
     },
     "form": {
-      "eyebrow": "[~~Ĺášţ 6 · Ṃóšţ Řéčéñţ Ƒířšţ~~]",
+      "eyebrow": "[~~Ļášţ 6 · Ṁőšţ Řéĉéñţ Ƒířšţ~~]",
       "status": {
-        "mc": "[~~ṂČ~~]",
+        "mc": "[~~ṀĈ~~]",
         "wd": "[~~ŴĐ~~]",
         "dq": "[~~ĐǪ~~]",
         "noResult": "[~~—~~]"
       }
     },
     "tournaments": {
-      "eyebrow": "[~~Ţóúřñáṃéñţš~~]",
+      "eyebrow": "[~~Ţőúřñáɱéñţš~~]",
       "winChip": "[~~ŴÍÑ~~]",
-      "liveChip": "[~~ĹÍṼÉ~~]",
-      "expand": "[~~Ƒúľľ šéášóñ ›~~]",
+      "liveChip": "[~~ĻÍṼÉ~~]",
+      "expand": "[~~Ƒúļļ šéášőñ ›~~]",
       "status": {
-        "mc": "[~~ṂČ~~]",
+        "mc": "[~~ṀĈ~~]",
         "wd": "[~~ŴĐ~~]",
         "dq": "[~~ĐǪ~~]",
         "noResult": "[~~—~~]"
       }
     },
     "season": {
-      "eyebrow": "[~~Ţĥíš Šéášóñ~~]",
-      "allStats": "[~~Áľľ šţáţš~~]",
+      "eyebrow": "[~~Ţĥíš Šéášőñ~~]",
+      "allStats": "[~~Áļļ šţáţš~~]",
       "card": {
-        "top10s": "[~~ŢÓƤ 10š~~]",
+        "top10s": "[~~ŢŐƤ 10š~~]",
         "wins": "[~~ŴÍÑŠ~~]",
-        "scoring": "[~~ŠČÓŘÍÑĞ~~]",
-        "earnings": "[~~ÉÁŘÑÍÑĞŠ~~]",
+        "scoring": "[~~ŠĈŐŘÍÑĜ~~]",
+        "earnings": "[~~ÉÁŘÑÍÑĜŠ~~]",
         "events": "[~~ÉṼÉÑŢŠ~~]",
         "bestFinish": "[~~ƁÉŠŢ ƑÍÑÍŠĤ~~]",
-        "madeCuts": "[~~ṂÁĐÉ ČÚŢŠ~~]"
+        "madeCuts": "[~~ṀÁĐÉ ĈÚŢŠ~~]"
       }
     },
     "about": {
-      "eyebrow": "[~~Áƀóúţ~~]",
+      "eyebrow": "[~~Áƀőúţ~~]",
       "field": {
-        "born": "[~~Ɓóřñ~~]",
-        "age": "[~~Áğé~~]",
-        "turnedPro": "[~~Ţúřñéđ Ƥřó~~]",
-        "height": "[~~Ĥéíğĥţ~~]",
-        "college": "[~~Čóľľéğé~~]",
-        "residence": "[~~Řéšíđéñčé~~]"
+        "born": "[~~Ɓőřñ~~]",
+        "age": "[~~Áĝé~~]",
+        "turnedPro": "[~~Ţúřñéđ Ƥřő~~]",
+        "height": "[~~Ĥéíĝĥţ~~]",
+        "college": "[~~Ĉőļļéĝé~~]",
+        "residence": "[~~Řéšíđéñĉé~~]"
       }
     },
     "stats": {
-      "eyebrow": "[~~Šéášóñ Šţáţíšţíčš~~]",
+      "eyebrow": "[~~Šéášőñ Šţáţíšţíĉš~~]",
       "section": {
-        "overview": "[~~Óṽéřṽíéŵ~~]",
-        "ballStriking": "[~~Ɓáľľ Šţříķíñğ~~]",
-        "shortGame": "[~~Šĥóřţ Ğáṃé~~]",
-        "strokesGained": "[~~Šţřóķéš Ğáíñéđ~~]"
+        "overview": "[~~Őṽéřṽíéŵ~~]",
+        "ballStriking": "[~~Ɓáļļ Šţříǩíñĝ~~]",
+        "shortGame": "[~~Šĥőřţ Ĝáɱé~~]",
+        "strokesGained": "[~~Šţřőǩéš Ĝáíñéđ~~]"
       }
     }
   }
