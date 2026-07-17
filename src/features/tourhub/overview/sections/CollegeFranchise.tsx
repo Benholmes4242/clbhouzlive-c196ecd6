@@ -199,7 +199,7 @@ export function CollegeFranchise() {
           onClick={() => goCollege(leader.normalized_name)}
           onCaptainClick={leaderCap ? () => navigate(`/tourhub/player/${leaderCap.playerId}`) : undefined}
         />
-        <div style={{ fontSize: 10, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.16em' }}>VS</div>
+        <div style={{ fontSize: 10, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.16em' }}>{t('overview.collegeFranchise.vs')}</div>
         <DuelSide
           name={chaserShort}
           logo={chaserLogo}
