@@ -256,7 +256,7 @@ const MajorChip: React.FC = () => {
   return (
     <span
       style={{
-        fontSize: 8.5,
+        fontSize: 9,
         fontWeight: 800,
         letterSpacing: '0.16em',
         color: GOLD_DEEP,
