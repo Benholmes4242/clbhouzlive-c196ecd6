@@ -150,8 +150,17 @@
     "sectionTourLens": {
       "allTours": "[~~Áļļ Ţőúřš~~]",
       "filterAriaLabel": "[~~Ƒíļţéř šéĉţíőñ bý ţőúř~~]"
+    },
+    "page": {
+      "offlineBanner": "[~~Ýőú'řé őƒƒļíñé. Šőṁé đáţá ṁáý ƀé őúţđáţéđ.~~]"
+    },
+    "hero": {
+      "prevAria": "[~~Ƥřéṽíőúš ţőúřñáṁéñţ~~]",
+      "nextAria": "[~~Ñéẋţ ţőúřñáṁéñţ~~]",
+      "counter": "{{current}} / {{total}}"
     }
   },
+
   "empty": {
     "leaderboard": {
       "noLive": {
