@@ -237,7 +237,7 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
                 pointerEvents: 'auto',
               }}
             >
-              {activeIndex + 1} / {count}
+              {t('overview.hero.counter', { current: activeIndex + 1, total: count })}
             </div>
           ) : (
             slides.map((_, i) => (
