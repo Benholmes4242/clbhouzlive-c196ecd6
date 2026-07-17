@@ -313,7 +313,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
                 >
                   <Star className="h-3.5 w-3.5 fill-current" style={{ color: '#F7931E' }} />
                   <span className="text-xs font-semibold" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-                    Your rating: {course.user_rating.toFixed(1)}
+                    {t('map.yourRating', { rating: course.user_rating.toFixed(1) })}
                   </span>
                 </div>
               )}
