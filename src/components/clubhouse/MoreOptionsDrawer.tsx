@@ -69,14 +69,23 @@ export const MoreOptionsDrawer: React.FC<MoreOptionsDrawerProps> = ({
   onCopyLink,
   onAfterBlock,
 }) => {
+  const navigate = useNavigate();
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const { blockUser, loading } = useBlockActions({ currentUserId: currentUserId ?? '' });
+  const openPostStudioForEdit = usePostStudioStore((s) => s.openPostStudioForEdit);
+  const { deletePost } = usePostDeletion();
 
   const authorId = post?.userId ?? null;
   const isEditorial = post ? EDITORIAL_POST_TYPES.has(post.postType ?? '') : false;
   const isOwnPost = !!(currentUserId && authorId && authorId === currentUserId);
   const canBlock = !!currentUserId && !!authorId && !isOwnPost && !isEditorial;
   const canReport = !!currentUserId && !!post && !isOwnPost && !isEditorial;
+  const sourceReviewId = post?.review?.reviewId ?? null;
+  const reviewCourseId = post?.review?.courseId ?? null;
+  const isReviewDerived = !!sourceReviewId;
+  const canOwnerEdit = isOwnPost && !isEditorial && !!post;
 
   const usernameLabel = post?.username ? `@${post.username}` : (post?.displayName ?? 'this user');
 
@@ -94,6 +103,31 @@ export const MoreOptionsDrawer: React.FC<MoreOptionsDrawerProps> = ({
     if (ok) {
       onOpenChange(false);
       onAfterBlock?.();
+    }
+  };
+
+  const handleEdit = () => {
+    if (!post) return;
+    onOpenChange(false);
+    openPostStudioForEdit({ postId: post.id });
+  };
+
+  const handleManageReview = () => {
+    if (!reviewCourseId) return;
+    onOpenChange(false);
+    navigate(`/courses/${reviewCourseId}/rate`);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!post || isDeleting) return;
+    setIsDeleting(true);
+    try {
+      const actorType = post.actorType === 'business' ? 'business' : 'personal';
+      await deletePost(post.id, actorType, post.actorId);
+    } finally {
+      setIsDeleting(false);
+      setConfirmDeleteOpen(false);
+      onOpenChange(false);
     }
   };
 
