@@ -26,6 +26,10 @@ import {
   STATUS_LIVE,
 } from '../_shared/tokens';
 
+// i18n never-key discipline (Wave 3e.i): tour brand names are proper nouns.
+// They are the same in every locale — "PGA TOUR" / "LPGA" / "DP WORLD TOUR" /
+// "KORN FERRY" / "CHAMPIONS" / "LIV GOLF". Do NOT key. Same rationale as
+// player names, tournament names, team names.
 const TOUR_LABEL: Record<string, string> = {
   pga: 'PGA TOUR',
   lpga: 'LPGA',
