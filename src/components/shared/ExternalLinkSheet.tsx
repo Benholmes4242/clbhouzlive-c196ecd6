@@ -1,12 +1,7 @@
 import React, { useState } from 'react';
-import {
-  Sheet,
-  SheetContent,
-} from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
-import { Globe, Copy, ExternalLink, Check } from 'lucide-react';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { Globe, Check } from 'lucide-react';
 import { toast } from '@/lib/toast';
-import { motion } from 'framer-motion';
 import { openExternalUrl } from '@/utils/median/openExternalUrl';
 
 interface ExternalLinkSheetProps {
@@ -16,29 +11,35 @@ interface ExternalLinkSheetProps {
   title?: string;
 }
 
+const DEFAULT_TITLE = 'Official Website';
+
+const extractDomain = (url: string): string => {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return url.replace(/^https?:\/\//, '').replace(/^www\./, '');
+  }
+};
+
 export const ExternalLinkSheet: React.FC<ExternalLinkSheetProps> = ({
   isOpen,
   onClose,
   url,
-  title = 'Official Website',
+  title = DEFAULT_TITLE,
 }) => {
   const [copied, setCopied] = useState(false);
 
-  // Format URL for display (remove protocol, truncate if needed)
-  const displayUrl = url
-    .replace(/^https?:\/\//, '')
-    .replace(/^www\./, '')
-    .slice(0, 40) + (url.length > 50 ? '...' : '');
+  const domain = extractDomain(url);
+  const hasCustomTitle = title && title !== DEFAULT_TITLE;
+  const contextLine = hasCustomTitle ? `${title} · official website` : title;
 
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
       toast.success('Copied to clipboard');
-      
-      // Reset copied state after 2 seconds
       setTimeout(() => setCopied(false), 2000);
-    } catch (error) {
+    } catch {
       toast.error('Failed to copy link');
     }
   };
@@ -50,75 +51,130 @@ export const ExternalLinkSheet: React.FC<ExternalLinkSheetProps> = ({
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <SheetContent 
-        side="bottom" 
+      <SheetContent
+        side="bottom"
         className="rounded-t-3xl bg-background border-t border-border px-0 pb-8"
       >
-        {/* Grabber Handle - At very top */}
+        {/* Grabber Handle */}
         <div className="flex justify-center pt-2 pb-4">
           <div className="w-9 h-1 bg-muted-foreground/30 rounded-full" />
         </div>
 
-        <div className="px-6 space-y-5">
-          {/* Header with Icon and URL */}
-          <div className="flex items-start gap-3">
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.1 }}
-              className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center flex-shrink-0"
+        <div className="px-6">
+          {/* Overline */}
+          <div
+            className="text-center uppercase"
+            style={{
+              fontSize: '10.5px',
+              fontWeight: 600,
+              letterSpacing: '0.06em',
+              color: 'rgba(15,23,42,0.45)',
+            }}
+          >
+            LEAVING CLBHOUZ
+          </div>
+
+          {/* Plaque */}
+          <div
+            className="flex flex-col items-center text-center"
+            style={{
+              marginTop: 12,
+              background: '#ffffff',
+              border: '0.5px solid rgba(15,23,42,0.08)',
+              borderRadius: 16,
+              boxShadow: '0 1px 3px rgba(15,23,42,0.04)',
+              padding: '18px 16px',
+            }}
+          >
+            {/* Globe squircle */}
+            <div
+              className="flex items-center justify-center"
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 12,
+                background: 'rgba(247,147,30,0.1)',
+                border: '1px solid rgba(247,147,30,0.25)',
+              }}
             >
-              <Globe className="w-6 h-6 text-muted-foreground" />
-            </motion.div>
-            
-            <div className="flex-1 min-w-0 pt-0.5">
-              <h3 className="text-base font-semibold text-foreground leading-tight">
-                {title}
-              </h3>
-              <p className="text-xs text-muted-foreground truncate mt-0.5">
-                {displayUrl}
-              </p>
+              <Globe style={{ width: 22, height: 22, color: '#F7931E' }} />
+            </div>
+
+            {/* Domain */}
+            <div
+              className="w-full truncate"
+              style={{
+                marginTop: 10,
+                fontSize: 16,
+                fontWeight: 700,
+                letterSpacing: '-0.01em',
+                color: '#0F172A',
+              }}
+              title={domain}
+            >
+              {domain}
+            </div>
+
+            {/* Context line */}
+            <div
+              className="w-full truncate"
+              style={{
+                marginTop: 3,
+                fontSize: 11.5,
+                fontWeight: 500,
+                color: 'rgba(15,23,42,0.45)',
+              }}
+            >
+              {contextLine}
+            </div>
+
+            {/* Split actions */}
+            <div className="w-full flex" style={{ gap: 9, marginTop: 14 }}>
+              <button
+                type="button"
+                onClick={handleCopyLink}
+                style={{
+                  flex: 1,
+                  background: '#ffffff',
+                  border: '0.5px solid rgba(15,23,42,0.08)',
+                  color: copied ? '#16a34a' : '#0F172A',
+                  fontSize: 13.5,
+                  fontWeight: 700,
+                  borderRadius: 14,
+                  padding: '13px 0',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 6,
+                }}
+              >
+                {copied ? (
+                  <>
+                    <Check style={{ width: 14, height: 14 }} />
+                    Copied
+                  </>
+                ) : (
+                  'Copy link'
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={handleOpenWebsite}
+                style={{
+                  flex: 2,
+                  background: '#F7931E',
+                  border: 'none',
+                  color: '#ffffff',
+                  fontSize: 13.5,
+                  fontWeight: 700,
+                  borderRadius: 14,
+                  padding: '13px 0',
+                }}
+              >
+                Visit website
+              </button>
             </div>
           </div>
-
-          {/* Info Message - Plain text, centered */}
-          <p className="text-sm text-muted-foreground leading-relaxed text-center">
-            You're about to leave clbhouz and visit an external website.
-          </p>
-
-          {/* Action Buttons - Stacked layout */}
-          <div className="space-y-3 pt-1">
-            <Button
-              onClick={handleOpenWebsite}
-              className="w-full h-12 rounded-xl font-medium"
-            >
-              Open Website
-              <ExternalLink className="w-4 h-4 ml-2" />
-            </Button>
-            
-            <Button
-              variant="ghost"
-              onClick={handleCopyLink}
-              className="w-full h-12 text-muted-foreground hover:text-foreground"
-            >
-              {copied ? (
-                <>
-                  <Check className="w-4 h-4 mr-2 text-green-500" />
-                  Copied!
-                </>
-              ) : (
-                <>
-                  <Copy className="w-4 h-4 mr-2" />
-                  Copy Link
-                </>
-              )}
-            </Button>
-          </div>
-
-          {/* Safety Note */}
-          <p className="text-xs text-center text-muted-foreground/70 pt-1">
-            External sites not controlled by clbhouz
-          </p>
         </div>
       </SheetContent>
     </Sheet>
