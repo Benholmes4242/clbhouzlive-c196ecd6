@@ -22,6 +22,7 @@ export const PlanningSignals: React.FC<PlanningSignalsProps> = ({
   className,
 }) => {
   const { user } = useSupabaseSession();
+  const { t } = useTranslation('courses');
   const { status, setWantToPlay, isUpdating } = useCoursePersonalStatus(courseId);
 
   if (!user) return null;
