@@ -1,0 +1,40 @@
+{
+  "status": {
+    "live": "ライブ",
+    "upcoming": "まもなく",
+    "final": "終了",
+    "results": "結果",
+    "noEvent": "大会なし"
+  },
+  "pill": {
+    "updated": "更新 {{time}}",
+    "tourEyebrow": "ツアー",
+    "majorEyebrow": "メジャー"
+  },
+  "picker": {
+    "eyebrow": "ツアー切替",
+    "title": "ツアーを選択",
+    "noEventsThisWeek": "今週の大会はありません",
+    "openMenuAria": "メニューを開く",
+    "switchTourAria": "ツアーを切り替え",
+    "switchTourCurrentAria": "ツアーを切り替え \u2014 現在 {{label}}"
+  },
+  "nav": {
+    "group": {
+      "tour": "ツアー",
+      "account": "アカウント"
+    },
+    "overview": "概要",
+    "leaderboards": "リーダーボード",
+    "schedule": "スケジュール",
+    "players": "選手",
+    "leaders": "リーダー",
+    "college": "カレッジ",
+    "settings": "設定",
+    "profile": "プロフィール",
+    "signOut": "サインアウト"
+  },
+  "section": {
+    "retryAria": "{{section}} を再読み込み"
+  }
+}
