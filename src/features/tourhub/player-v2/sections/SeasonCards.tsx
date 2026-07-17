@@ -117,7 +117,7 @@ export function SeasonCards({ playerStats, results, player }: SeasonCardsProps) 
             textTransform: 'uppercase',
           }}
         >
-          This Season
+          {t('player.season.eyebrow')}
         </p>
         {hasStats && (
           <button
