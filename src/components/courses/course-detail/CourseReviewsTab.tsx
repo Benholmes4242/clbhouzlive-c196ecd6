@@ -228,7 +228,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   const handleToggleHelpful = (reviewId: string, action: 'helpful' | 'unhelpful' | 'clear') => {
     if (!user) {
-      toast('Sign in required', { description: 'Please sign in to vote on reviews' });
+      toast(t('review.toast.signInRequired'), { description: t('review.toast.voteBody') });
       navigate('/auth');
       return;
     }
@@ -237,12 +237,13 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   const handleRateClick = () => {
     if (!user) {
-      toast('Sign in required', { description: 'Please sign in to rate courses' });
+      toast(t('review.toast.signInRequired'), { description: t('review.toast.rateBody') });
       navigate('/auth');
       return;
     }
     navigate(`/courses/${courseId}/rate`);
   };
+
 
   const handleClearSearch = () => {
     setSearchQuery('');
