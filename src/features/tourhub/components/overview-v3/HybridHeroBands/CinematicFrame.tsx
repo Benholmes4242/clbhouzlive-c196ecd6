@@ -1326,7 +1326,7 @@ export function CinematicFrame({
           }}
         >
           <span style={{ ...NUMERIC_STYLE, fontSize: 12, fontWeight: 800, letterSpacing: '0.06em', color: GOLD }}>
-            FINAL LEADERBOARD · {safe.length}
+            {t('overview.cinematic.finalLeaderboardCount', { count: safe.length })}
           </span>
           <ChevronRight size={14} strokeWidth={2.5} color={GOLD} style={{ flexShrink: 0 }} />
         </button>
