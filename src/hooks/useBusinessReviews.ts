@@ -189,10 +189,9 @@ export function useDeleteReviewReply(businessId: string | undefined) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ responseId }: { responseId: string }) => {
-      const { error } = await supabase
-        .from('review_responses')
-        .update({ is_deleted: true })
-        .eq('id', responseId);
+      const { error } = await supabase.rpc('soft_delete_review_response', {
+        p_response_id: responseId,
+      });
       if (error) throw error;
     },
     onSuccess: () => {
