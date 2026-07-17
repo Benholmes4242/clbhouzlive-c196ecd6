@@ -224,9 +224,7 @@ async function fetchWorldRankingCat(): Promise<LeaderCategoryDef | null> {
 
   return {
     key: 'world_rank',
-    label: 'World Ranking',
-    short: 'WORLD',
-    unit: 'OWGR',
+    ...LEADER_STAT_LABELS.world_rank,
     rows,
   };
 }
