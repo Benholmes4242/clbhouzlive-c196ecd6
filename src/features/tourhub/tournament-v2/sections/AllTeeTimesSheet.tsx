@@ -2,7 +2,9 @@
  * AllTeeTimesSheet — full-height sheet listing every group in round-1
  * order. Reuses TeeTimesFirstGroups grammar with no limit.
  */
+import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+
 import type { TeeGroup } from '../data/useTeeTimesAll';
 import { TeeTimesFirstGroups } from './TeeTimesFirstGroups';
 import { AMBER, FONT, INK, INK_MUTE, SLATE_50 } from '../../_shared/tokens';
