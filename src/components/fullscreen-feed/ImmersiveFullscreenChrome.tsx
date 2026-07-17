@@ -111,8 +111,6 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   const mediaCount = activePost?.mediaItems?.length ?? 0;
 
 
-  if (!activePost && !feedEnded) return null;
-
   if (feedEnded) {
     return (
       <div className="fixed inset-0" style={{ zIndex: 30, pointerEvents: 'none' }} data-immersive-chrome>
@@ -145,10 +143,12 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
     );
   }
 
+  if (!activePost) return null;
+
   const isEditorialCard =
-    activePost!.postType === 'tournament_result' ||
-    activePost!.postType === 'pga_card' ||
-    activePost!.postType === 'course_of_week_card';
+    activePost.postType === 'tournament_result' ||
+    activePost.postType === 'pga_card' ||
+    activePost.postType === 'course_of_week_card';
   if (isEditorialCard || isTournamentCardActive) return null;
 
   const likeState = getLikeState(activePost);
