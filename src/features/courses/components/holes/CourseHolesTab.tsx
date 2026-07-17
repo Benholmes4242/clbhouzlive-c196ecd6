@@ -11,6 +11,8 @@ import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHa
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { SharedHoleCard } from '@/features/courses/_shared/holes/SharedHoleCard';
 import type { SharedHole } from '@/features/courses/_shared/holes/types';
+import { ScopeSegment } from '@/components/shared/ScopeSegment';
+
 
 interface Props {
   courseId: string | undefined;
@@ -124,50 +126,16 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
           accent={SC_ACCENT}
           className="!mb-0"
         />
-        <div
-          role="tablist"
-          aria-label={t('courses:holes.sortAriaLabel', 'Sort holes')}
-          style={{
-            flexShrink: 0,
-            display: 'inline-flex',
-            gap: 2,
-            padding: 2,
-            background: '#FFFFFF',
-            border: '1px solid rgba(15,23,42,0.08)',
-            borderRadius: 999,
-          }}
-        >
-          {([
-            ['hole', t('courses:holes.sortByHole')],
-            ['difficulty', t('courses:holes.sortByDifficulty')],
-          ] as const).map(([k, l]) => {
-            const active = sort === k;
-            return (
-              <button
-                key={k}
-                type="button"
-                role="tab"
-                aria-selected={active}
-                onClick={() => setSort(k)}
-                style={{
-                  padding: '5px 11px',
-                  borderRadius: 999,
-                  background: active ? '#15171F' : 'transparent',
-                  color: active ? '#FFFFFF' : 'rgba(15,23,42,0.55)',
-                  border: 'none',
-                  fontFamily: FONT,
-                  fontSize: 10.5,
-                  fontWeight: 600,
-                  whiteSpace: 'nowrap',
-                  cursor: 'pointer',
-                  transition: 'all .15s',
-                }}
-              >
-                {l}
-              </button>
-            );
-          })}
-        </div>
+        <ScopeSegment<'hole' | 'difficulty'>
+          value={sort}
+          onChange={setSort}
+          ariaLabel={t('courses:holes.sortAriaLabel', 'Sort holes')}
+          options={[
+            { value: 'hole', label: t('courses:holes.sortByHole') },
+            { value: 'difficulty', label: t('courses:holes.sortByDifficulty') },
+          ]}
+        />
+
 
       </div>
       {sorted.map((h) => (
