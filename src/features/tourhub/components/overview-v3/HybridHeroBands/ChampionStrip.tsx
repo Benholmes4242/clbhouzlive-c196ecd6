@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Trophy } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { INK, GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants';
@@ -45,14 +46,20 @@ export function ChampionStrip({
   name,
   country,
   score,
-  scoreLabel = 'TO PAR',
-  eyebrow = 'CHAMPION',
+  scoreLabel,
+  eyebrow,
   eyebrowIcon: EyebrowIcon = Trophy,
   avatarUrl,
   rounds,
   par,
   narrative,
 }: ChampionStripProps) {
+  const { t } = useTranslation('tourhub');
+  // Note: scoreLabel prop is retained on the interface but not rendered in this
+  // strip variant (kept for compatibility with MiddleBand callers). Only the
+  // eyebrow default is user-visible here.
+  void scoreLabel;
+  const resolvedEyebrow = eyebrow ?? t('overview.champion.eyebrow');
   const hasNarrative = !!(narrative && narrative.trim().length > 0);
 
   return (
@@ -96,7 +103,7 @@ export function ChampionStrip({
               }}
             >
               <EyebrowIcon size={10} color={GOLD} strokeWidth={2.5} />
-              {eyebrow}
+              {resolvedEyebrow}
             </span>
             {country && (
               <span
@@ -170,6 +177,7 @@ export function ChampionStrip({
 }
 
 export function CancelledStrip({ reason }: { reason: string }) {
+  const { t } = useTranslation('tourhub');
   return (
     <div
       style={{

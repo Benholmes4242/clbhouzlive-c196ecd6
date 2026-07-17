@@ -18,6 +18,7 @@
  */
 
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
 
@@ -30,6 +31,7 @@ const FONT = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
 export function ConnectHandicapTile() {
   const navigate = useNavigate();
+  const { t } = useTranslation('tourhub');
   const { user, loading: authLoading } = useSupabaseSession();
   const { data: connection, isLoading: whsLoading, isFetched: whsFetched } =
     useWhsConnection(user?.id);
@@ -64,7 +66,7 @@ export function ConnectHandicapTile() {
               lineHeight: 1.2,
             }}
           >
-            Connect your handicap
+            {t('overview.connectHandicap.title')}
           </div>
           <div
             style={{
@@ -75,7 +77,7 @@ export function ConnectHandicapTile() {
               lineHeight: 1.3,
             }}
           >
-            Sync WHS and see where you stand.
+            {t('overview.connectHandicap.description')}
           </div>
         </div>
         <button
@@ -95,7 +97,7 @@ export function ConnectHandicapTile() {
             letterSpacing: '-0.005em',
           }}
         >
-          Connect
+          {t('overview.connectHandicap.cta')}
         </button>
       </div>
     </div>

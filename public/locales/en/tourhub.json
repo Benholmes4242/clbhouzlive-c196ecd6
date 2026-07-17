@@ -17,7 +17,7 @@
     "noEventsThisWeek": "No events this week",
     "openMenuAria": "Open menu",
     "switchTourAria": "Switch tour",
-    "switchTourCurrentAria": "Switch tour \u2014 current {{label}}"
+    "switchTourCurrentAria": "Switch tour — current {{label}}"
   },
   "nav": {
     "group": {
@@ -65,6 +65,58 @@
     },
     "champion": {
       "defendsSuffix": "{{name}} defends"
+    }
+  },
+  "overview": {
+    "connectHandicap": {
+      "title": "Connect your handicap",
+      "description": "Sync WHS and see where you stand.",
+      "cta": "Connect"
+    },
+    "cancelled": {
+      "eyebrow": "No Result",
+      "reasonDefault": "This event did not complete enough rounds for an official result."
+    },
+    "ticker": {
+      "top10Label": "TOP 10"
+    },
+    "fieldStrength": {
+      "eyebrow": "FIELD",
+      "playersCount": "{{count}} players",
+      "topRankedLine": "{{topRanked}} of world top {{threshold}}",
+      "inFieldLabel": "IN FIELD"
+    },
+    "champion": {
+      "scoreLabelToPar": "TO PAR",
+      "eyebrow": "CHAMPION",
+      "eyebrowPlayoff": "CHAMPION · PLAYOFF",
+      "resultPending": "Result pending"
+    },
+    "cancelledStrip": {
+      "eyebrow": "CANCELLED"
+    },
+    "playoff": {
+      "eyebrow": "AWAITING PLAYOFF",
+      "tiedAtTop": "{{count}} tied at the top"
+    },
+    "middleBand": {
+      "cancelledDefault": "No play — tournament cancelled."
+    },
+    "upcoming": {
+      "defendingEyebrow": "DEFENDING",
+      "previewTitle": "Tournament Preview",
+      "previewEyebrow": "PREVIEW"
+    },
+    "rankings": {
+      "sectionEyebrow": "World rankings",
+      "linkLabel": "Full rankings",
+      "worldNo1Label": "World No. 1",
+      "pointsLabel": "POINTS",
+      "boards": {
+        "owgr": "Official World Golf Ranking",
+        "r2d": "Race to Dubai",
+        "rolex": "Rolex Rankings"
+      }
     }
   }
 }

@@ -4,9 +4,11 @@
  */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { INK_15, INK_60, SLATE_500 } from '../HybridHero.constants';
 
 export function CancelledPanel({ reason }: { reason?: string }) {
+  const { t } = useTranslation('tourhub');
   return (
     <div
       style={{
@@ -26,10 +28,10 @@ export function CancelledPanel({ reason }: { reason?: string }) {
           marginBottom: 6,
         }}
       >
-        No Result
+        {t('overview.cancelled.eyebrow')}
       </div>
       <div style={{ fontSize: 14, fontWeight: 600, color: INK_60, lineHeight: 1.4 }}>
-        {reason || 'This event did not complete enough rounds for an official result.'}
+        {reason || t('overview.cancelled.reasonDefault')}
       </div>
     </div>
   );
