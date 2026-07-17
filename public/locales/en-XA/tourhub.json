@@ -277,16 +277,21 @@
       "thruSep": "[~~ · {{value}}~~]"
     },
     "collegeFranchise": {
-      "eyebrow": "[~~ĈŐĻĻÉĜÉ ƑŘÁÑĈĤÍŠÉ~~]",
-      "linkLabel": "[~~Áļļ ƒřáñĉĥíšéš~~]",
-      "vs": "[~~ṼŠ~~]",
-      "tugLabel": "[~~ŠÉÁŠŐÑ ÁĻÚṀÑÍ ÉÁŘÑÍÑĜŠ~~]",
+      "eyebrow": "[~~ÇÓLLÉGÉ FRÁÑÇHÍŠÉ~~]",
+      "linkLabel": "[~~Áll fráñçhíšéš~~]",
+      "vs": "[~~VŠ~~]",
+      "tugLabel": "[~~ŠÉÁŠÓÑ ÁLÚMÑÍ ÉÁRÑÍÑGŠ~~]",
       "captainLabel": "[~~· ĈÁƤŢÁÍÑ~~]",
       "onTour_one": "[~~{{count}} őñ ţőúř~~]",
       "onTour_other": "[~~{{count}} őñ ţőúř~~]",
       "onTourCaptainSuffix": "[~~ · {{name}} ĉáƥţáíñš~~]",
       "headlineFallbackWide": "[~~{{leader}} řúñš áŵáý ŵíţĥ íţ.~~]",
-      "headlineFallbackClose": "[~~{{leader}} ļéáđš. {{chaser}} íš ĉļőšíñĝ.~~]"
+      "headlineFallbackClose": "[~~{{leader}} ļéáđš. {{chaser}} íš ĉļőšíñĝ.~~]",
+      "captainSuffix": "[~~· ÇÁPTÁÍÑ~~]",
+      "headlineRunaway": "[~~<0>{{leader}} rúñš áwáy wíth ít.</0>~~]",
+      "headlineClosing": "[~~<0>{{leader}} léádš. {{chaser}} íš çlóšíñg.</0>~~]",
+      "rowMetaWithCaptain": "[~~{{count}} óñ tóúr · {{captain}} çáptáíñš~~]",
+      "rowMeta": "[~~{{count}} óñ tóúr~~]"
     }
   },
   "empty": {

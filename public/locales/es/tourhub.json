@@ -286,7 +286,12 @@
       "onTour_other": "{{count}} on tour",
       "onTourCaptainSuffix": " · {{name}} captains",
       "headlineFallbackWide": "{{leader}} runs away with it.",
-      "headlineFallbackClose": "{{leader}} leads. {{chaser}} is closing."
+      "headlineFallbackClose": "{{leader}} leads. {{chaser}} is closing.",
+      "captainSuffix": "· CAPTAIN",
+      "headlineRunaway": "<0>{{leader}} runs away with it.</0>",
+      "headlineClosing": "<0>{{leader}} leads. {{chaser}} is closing.</0>",
+      "rowMetaWithCaptain": "{{count}} on tour · {{captain}} captains",
+      "rowMeta": "{{count}} on tour"
     }
   },
   "empty": {
