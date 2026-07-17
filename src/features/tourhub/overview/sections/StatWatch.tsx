@@ -4,6 +4,7 @@
  */
 
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { SectionShell } from './SectionShell';
 import { V4 } from '../tokens';
 import { useStatWatch, type StatCategory } from '../data/useStatWatch';
