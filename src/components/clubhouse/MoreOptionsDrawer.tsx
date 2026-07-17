@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Flag, EyeOff, Link as LinkIcon, Ban } from 'lucide-react';
+import { Flag, EyeOff, Link as LinkIcon, Ban, Pencil, Trash2, ExternalLink } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,7 +13,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
 import { useBlockActions } from '@/hooks/useBlockActions';
+import { usePostStudioStore } from '@/stores/usePostStudioStore';
+import { usePostDeletion } from '@/hooks/usePostDeletion';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { MORE_SHEET_Z } from '@/lib/zLayers';
 import type { FeedPost } from '@/components/media-system/types/media';
