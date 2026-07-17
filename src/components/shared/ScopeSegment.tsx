@@ -17,6 +17,7 @@ const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 export interface ScopeSegmentOption<T extends string> {
   value: T;
   label: string;
+  disabled?: boolean;
 }
 
 interface Props<T extends string> {
