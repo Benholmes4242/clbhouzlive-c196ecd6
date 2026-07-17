@@ -131,7 +131,9 @@ function HolesSheet({
   easiest: TournamentHole;
   totalPlayers: number;
 }) {
+  const { t } = useTranslation(['tourhub', 'courses']);
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
+
   const toggle = (n: number) =>
     setExpanded((prev) => {
       const next = new Set(prev);
