@@ -64,6 +64,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
   scope,
 }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation('courses');
   const queryClient = useQueryClient();
   const { user } = useSupabaseSession();
   const [imageLoaded, setImageLoaded] = useState(false);
