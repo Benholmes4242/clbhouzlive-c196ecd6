@@ -59,18 +59,22 @@ function Tile({ label, icon, badge, onClick }: TileProps) {
       <span style={{ fontWeight: 600, fontSize: 11.5, color: INK }}>{label}</span>
       {badge != null && badge > 0 && (
         <span
+          aria-label={`${badge} unread`}
           style={{
             position: 'absolute',
-            top: 6,
-            right: 6,
-            minWidth: 17,
-            height: 17,
+            top: -8,
+            right: -8,
+            minWidth: 18,
+            height: 18,
             padding: '0 5px',
             borderRadius: 999,
             background: AMBER,
             color: '#fff',
             fontWeight: 700,
             fontSize: 10,
+            fontVariantNumeric: 'tabular-nums',
+            border: '2px solid #fff',
+            boxSizing: 'content-box',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',

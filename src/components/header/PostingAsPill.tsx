@@ -84,14 +84,14 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
           {activeUnreadCount > 0 ? (
             <span
               className={cn(
-                "absolute -top-1 -right-1 flex items-center justify-center rounded-full bg-[#F7931E] font-bold",
+                "absolute -top-1.5 -right-1.5 flex items-center justify-center rounded-full bg-[#F7931E] font-bold",
                 activeUnreadCount > 9
                   ? "h-[18px] min-w-[18px] px-[4px] text-[10px]"
                   : "h-[18px] w-[18px] text-[10px]"
               )}
               style={{
                 color: 'rgba(255,255,255,0.95)',
-                boxShadow: '0 0 0 0.5px rgba(255,255,255,0.95)',
+                boxShadow: '0 0 0 2px #FFFFFF',
                 fontVariantNumeric: 'tabular-nums',
                 textAlign: 'center',
                 lineHeight: '18px',
@@ -103,11 +103,11 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
           ) : showOtherDot ? (
             <span
               aria-label="Unread on another account"
-              className="absolute -top-1 -right-1 rounded-full bg-[#F7931E]"
+              className="absolute -top-1.5 -right-1.5 rounded-full bg-[#F7931E]"
               style={{
                 width: 8,
                 height: 8,
-                boxShadow: '0 0 0 0.5px rgba(255,255,255,0.95)',
+                boxShadow: '0 0 0 2px #FFFFFF',
               }}
             />
           ) : null}
@@ -212,15 +212,16 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
           {activeUnreadCount > 0 ? (
             <span
               className={cn(
-                "absolute -top-1 -right-1 flex items-center justify-center rounded-full bg-[#F7931E] font-bold text-white",
+                "absolute -top-1.5 -right-1.5 flex items-center justify-center rounded-full bg-[#F7931E] font-bold text-white",
                 activeUnreadCount > 9
-                  ? "h-[16px] min-w-[16px] px-[3px] text-[8px]"
-                  : "h-[14px] w-[14px] text-[8px]"
+                  ? "h-[18px] min-w-[18px] px-[4px] text-[10px]"
+                  : "h-[18px] w-[18px] text-[10px]"
               )}
               style={{
+                boxShadow: '0 0 0 2px #FFFFFF',
                 fontVariantNumeric: 'tabular-nums',
                 textAlign: 'center',
-                lineHeight: activeUnreadCount > 9 ? '16px' : '14px',
+                lineHeight: '18px',
               }}
               aria-label={`${activeUnreadCount} unread`}
             >
@@ -229,8 +230,12 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
           ) : showOtherDot ? (
             <span
               aria-label="Unread on another account"
-              className="absolute -top-1 -right-1 rounded-full bg-[#F7931E]"
-              style={{ width: 8, height: 8 }}
+              className="absolute -top-1.5 -right-1.5 rounded-full bg-[#F7931E]"
+              style={{
+                width: 8,
+                height: 8,
+                boxShadow: '0 0 0 2px #FFFFFF',
+              }}
             />
           ) : null}
         </div>
