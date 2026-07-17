@@ -163,7 +163,7 @@ function SpotlightRow({
             {formatNumber(Math.round(row.points))}
           </div>
           <div style={{ marginTop: 4, fontSize: 8.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.14em' }}>
-            POINTS
+            {t('overview.rankings.pointsLabel')}
           </div>
         </div>
       ) : null}
