@@ -124,7 +124,7 @@ export function EventInfoSection({ meta, broadcast, onTeeTimesTap, teeTimesRound
                 fontVariantNumeric: 'tabular-nums',
               }}
             >
-              Round {teeTimesRound} <span style={{ color: INK }}>›</span>
+              {t('tournament.eventInfo.round', { round: teeTimesRound })} <span style={{ color: INK }}>›</span>
             </div>
           </button>
         )}
