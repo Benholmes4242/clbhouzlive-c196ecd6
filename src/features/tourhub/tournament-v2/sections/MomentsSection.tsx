@@ -31,7 +31,7 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
   if (isLoading) {
     return (
       <>
-        <SectionEyebrow kicker="Moments" />
+        <SectionEyebrow kicker={t('tournament.moments.eyebrow')} />
         <div style={{ padding: '0 16px 8px', display: 'flex', gap: 12, fontFamily: FONT }}>
           {[0, 1, 2].map((i) => (
             <div key={i} style={{
