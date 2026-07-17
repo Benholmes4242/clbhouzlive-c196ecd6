@@ -87,7 +87,7 @@ export function CourseSection({ tournamentId }: Props) {
       </div>
       <div style={{ marginTop: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
         <span style={{ fontSize: 9, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.10em', textTransform: 'uppercase' }}>
-          Avg vs par
+          {t('tournament.course.avgVsPar', { ns: 'tourhub' })}
         </span>
         <span style={{ fontSize: 14, fontWeight: 800, color: avgColorFor(h.avg_to_par), fontVariantNumeric: 'tabular-nums' }}>
           {fmtAvg(h.avg_to_par)}
