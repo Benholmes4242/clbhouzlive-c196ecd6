@@ -274,15 +274,68 @@ export const ReplyForm: React.FC<ReplyFormProps> = ({
   const [text, setText] = useState('');
 
   if (!expanded) {
+    const shortName = businessClaim.businessName;
     return (
-      <div className="ml-4 mt-2">
-        <button
-          type="button"
-          onClick={() => setExpanded(true)}
-          className="text-sm text-[#d97706] font-medium active:opacity-70 transition-opacity min-h-[44px] px-1"
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={() => setExpanded(true)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setExpanded(true);
+          }
+        }}
+        style={{
+          marginTop: 12,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
+          width: '100%',
+          background: '#ffffff',
+          border: '0.5px solid rgba(15,23,42,0.08)',
+          borderRadius: 14,
+          padding: '9px 10px',
+          boxShadow: '0 1px 3px rgba(15,23,42,0.03)',
+          cursor: 'pointer',
+        }}
+      >
+        <SquircleAvatar
+          size={28}
+          src={businessClaim.businessLogoUrl ?? undefined}
+          alt={shortName}
+          fallback={shortName.slice(0, 2).toUpperCase()}
+          hairlineRing
+          ringColor={LIGHT_HAIRLINE}
+          radiusRatio={9 / 28}
+        />
+        <span
+          style={{
+            flex: 1,
+            minWidth: 0,
+            fontSize: 12.5,
+            fontWeight: 500,
+            color: 'rgba(15,23,42,0.40)',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
         >
-          {t('review.response.reply')}
-        </button>
+          {`Respond publicly as ${shortName}\u2026`}
+        </span>
+        <span
+          style={{
+            flexShrink: 0,
+            background: '#F7931E',
+            color: '#ffffff',
+            fontSize: 12,
+            fontWeight: 700,
+            padding: '7px 14px',
+            borderRadius: 999,
+          }}
+        >
+          Respond
+        </span>
       </div>
     );
   }
