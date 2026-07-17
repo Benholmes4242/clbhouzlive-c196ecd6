@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { MapPin } from 'lucide-react';
 import type { HeroState, TickerRow, TopTie } from '../HybridHero.utils';
 import { Ticker } from './Ticker';
