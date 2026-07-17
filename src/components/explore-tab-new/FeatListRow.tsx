@@ -279,13 +279,14 @@ export function FeatListRow({ row, tier, onTap, index = 0, mode = 'latest', best
                 {label}
               </div>
               <div
+                className={legendaryChampion ? 'clbhouz-gold-shimmer-light' : undefined}
                 style={{
                   marginTop: 3,
                   fontSize: 15,
                   fontWeight: 700,
-                  color: valueColor,
                   lineHeight: 1,
                   fontVariantNumeric: 'tabular-nums',
+                  ...(legendaryChampion ? {} : { color: valueColor }),
                 }}
               >
                 {value}
