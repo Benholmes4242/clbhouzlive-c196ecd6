@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
@@ -211,6 +212,7 @@ export function TiedChasersRow({
   isResults = false,
   onTap,
 }: TiedChasersRowProps) {
+  const { t } = useTranslation('tourhub');
   const avgRounds = averageRounds(players);
   const hideThru = isResults;
   return (
@@ -227,7 +229,7 @@ export function TiedChasersRow({
         borderBottom: 'none',
         cursor: onTap ? 'pointer' : 'default',
       }}
-      aria-label={`${count} players tied at ${rank} with score ${score}, average trajectory`}
+      aria-label={t('overview.leaderRow.tiedAtRankAria', { count, rank, score })}
     >
       <span style={{ ...NUMERIC_STYLE, fontSize: 13, fontWeight: 700, color: INK_45 }}>
         {rank}
@@ -235,7 +237,7 @@ export function TiedChasersRow({
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
         <StackedAvatars players={players} size={22} variant="chaser" />
         <span style={{ fontSize: 14, fontWeight: 700, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>
-          {count} tied at {rank}
+          {t('overview.leaderRow.tiedAtRank', { count, rank })}
           <ChevronRight size={11} strokeWidth={2.5} color={INK_45} style={{ marginLeft: 4, flexShrink: 0 }} />
         </span>
       </div>
@@ -279,6 +281,7 @@ interface TiedLeadersRowProps {
 }
 
 export function TiedLeadersRow({ count, score, players, isLast = false }: TiedLeadersRowProps) {
+  const { t } = useTranslation('tourhub');
   const stack: StackedAvatarPlayer[] = players && players.length > 0
     ? players
     : Array.from({ length: count }, () => ({}));
@@ -293,7 +296,7 @@ export function TiedLeadersRow({ count, score, players, isLast = false }: TiedLe
         background: LEADER_GOLD_TINT_7,
         borderBottom: 'none',
       }}
-      aria-label={`${count} players tied at the top with score ${score}`}
+      aria-label={t('overview.leaderRow.tiedAtTopAria', { count, score })}
     >
       <span
         style={{
@@ -304,6 +307,8 @@ export function TiedLeadersRow({ count, score, players, isLast = false }: TiedLe
           letterSpacing: '-0.02em',
         }}
       >
+        {/* NEVER-KEY: score/rank token */}
+        {/* eslint-disable-next-line i18next/no-literal-string */}
         T1
       </span>
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}>
@@ -319,7 +324,7 @@ export function TiedLeadersRow({ count, score, players, isLast = false }: TiedLe
             textOverflow: 'ellipsis',
           }}
         >
-          {count} tied at the top
+          {t('overview.leaderRow.tiedAtTop', { count })}
         </div>
       </div>
       <span
