@@ -21,6 +21,7 @@
  * component behind the same params.
  */
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { differenceInCalendarDays } from 'date-fns';
 import { formatWeekdayShort, formatTimeHm } from '@/i18n/format';
