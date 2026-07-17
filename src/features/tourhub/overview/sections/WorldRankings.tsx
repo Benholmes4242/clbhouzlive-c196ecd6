@@ -21,10 +21,11 @@ import { PlayerAvatar } from '../../components/PlayerAvatar';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { formatNumber } from '@/i18n/format';
 
-const TOUR_TO_BOARD: Partial<Record<TourId, { board: RankingsBoard; label: string; tourCode: string }>> = {
-  pga: { board: 'owgr', label: 'Official World Golf Ranking', tourCode: 'pga' },
-  euro: { board: 'r2d', label: 'Race to Dubai', tourCode: 'euro' },
-  lpga: { board: 'rolex', label: 'Rolex Rankings', tourCode: 'lpga' },
+// Board sub-label routed via i18n key (see overview.rankings.boards.*).
+const TOUR_TO_BOARD: Partial<Record<TourId, { board: RankingsBoard; labelKey: string; tourCode: string }>> = {
+  pga: { board: 'owgr', labelKey: 'overview.rankings.boards.owgr', tourCode: 'pga' },
+  euro: { board: 'r2d', labelKey: 'overview.rankings.boards.r2d', tourCode: 'euro' },
+  lpga: { board: 'rolex', labelKey: 'overview.rankings.boards.rolex', tourCode: 'lpga' },
 };
 
 export function WorldRankings({ tour }: { tour: TourId }) {
