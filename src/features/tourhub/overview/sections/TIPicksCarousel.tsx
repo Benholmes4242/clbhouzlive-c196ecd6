@@ -524,6 +524,7 @@ function AllPicksSheet({
 }
 
 function SheetStateStrip({ state, pick, live, leader }: { state: EventState; pick: AITopContender; live: PickLiveState | undefined; leader: number }) {
+  const { t } = useTranslation('tourhub');
   if (state === 'upcoming') {
     return <ConfidenceBar value={pick.winProbability ?? 0} leader={leader} />;
   }
@@ -536,22 +537,25 @@ function SheetStateStrip({ state, pick, live, leader }: { state: EventState; pic
     const pos = formatPosition(live.position, live.positionTied);
     const todayText = live.today != null ? formatScore(live.today) : formatScore(live.score);
     const todayCol = scoreColor(live.today ?? live.score);
-    const thruText = formatThru(live.thru);
+    const thruText = formatThru(t, live.thru);
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, fontWeight: 700 }}>
         <span style={{ color: V4.inkFaint, fontWeight: 700, fontVariantNumeric: 'tabular-nums', fontSize: 14 }}>{pos}</span>
         <span style={{ color: todayCol, fontVariantNumeric: 'tabular-nums' }}>{todayText}</span>
-        {thruText ? <span style={{ color: V4.inkFaint, fontVariantNumeric: 'tabular-nums' }}>· {thruText}</span> : null}
+        {thruText ? <span style={{ color: V4.inkFaint, fontVariantNumeric: 'tabular-nums' }}>{t('overview.tiPicks.thruSep', { value: thruText })}</span> : null}
       </div>
     );
   }
-  const v = verdict(live);
+  const v = verdict(t, live);
   const isWon = !cut && live?.position === 1;
   const finalLine = cut
     ? null
     : live && live.position != null
-      ? `${formatPosition(live.position, live.positionTied)} · ${formatScore(live.score)}`
+      ? t('overview.tiPicks.finalLine', { pos: formatPosition(live.position, live.positionTied), score: formatScore(live.score) })
       : '—';
+  const chipLabel = v.hit
+    ? (isWon ? t('overview.tiPicks.chip.won') : t('overview.tiPicks.chip.hit'))
+    : (cut ? t('overview.tiPicks.chip.missCut', { cut }) : t('overview.tiPicks.chip.miss'));
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
       <span
@@ -566,7 +570,7 @@ function SheetStateStrip({ state, pick, live, leader }: { state: EventState; pic
           textTransform: 'uppercase',
         }}
       >
-        {v.hit ? (isWon ? 'Won' : 'Hit') : cut ? `Miss · ${cut}` : 'Miss'}
+        {chipLabel}
       </span>
       {finalLine ? (
         <span style={{ fontSize: 11.5, fontWeight: 700, color: V4.inkMute, fontVariantNumeric: 'tabular-nums' }}>{finalLine}</span>
