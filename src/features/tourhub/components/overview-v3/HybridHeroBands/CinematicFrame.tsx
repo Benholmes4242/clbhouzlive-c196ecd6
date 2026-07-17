@@ -1071,7 +1071,9 @@ export function CinematicFrame({
               })()}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ ...NUMERIC_STYLE, fontSize: 8.5, fontWeight: 800, letterSpacing: '0.16em', color: GOLD, textTransform: 'uppercase' }}>
-                  {defendingChamp.year ? `${defendingChamp.year} Defending Champion` : 'Defending Champion'}
+                  {defendingChamp.year
+                    ? t('overview.cinematic.defendingChampionYearLabel', { year: defendingChamp.year })
+                    : t('overview.cinematic.defendingChampionLabel')}
                 </div>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 1, minWidth: 0 }}>
                   <span style={{ fontSize: 17, fontWeight: 800, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{defendingChamp.name}</span>
