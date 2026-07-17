@@ -2,13 +2,9 @@
 // Fetches golf data from Live Golf API (livegolfapi.com)
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 
+import { corsFor } from '../_shared/cors.ts';
 const LIVEGOLF_BASE_URL = "https://use.livegolfapi.com/v1";
 const API_KEY = Deno.env.get("GOLF_API_KEY") || "";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
 
 function jsonResponse(body: unknown, status = 200, cacheSeconds = 60) {
   return new Response(JSON.stringify(body), {
@@ -67,6 +63,7 @@ async function fetchFromLiveGolf(
 }
 
 serve(async (req) => {
+  const corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }

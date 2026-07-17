@@ -2,12 +2,9 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { normalizeError } from '../_shared/normalize-error.ts';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
-
+import { corsFor } from '../_shared/cors.ts';
 serve(async (req) => {
+  const corsHeaders = corsFor(req.headers.get('Origin'));
   console.log('Update mobile crop function called');
   
   // Handle CORS preflight requests

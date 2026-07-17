@@ -1,12 +1,8 @@
 // supabase/functions/tourhub-scoreboard/index.ts
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 
+import { corsFor } from '../_shared/cors.ts';
 const ALLOWED_TOURS = new Set(["pga", "lpga", "eur", "champions-tour"]);
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
 
 function jsonResponse(body: unknown, status = 200, cacheSeconds = 60) {
   return new Response(JSON.stringify(body), {
@@ -37,6 +33,7 @@ function first<T>(arr: T[] | undefined | null): T | null {
 }
 
 serve(async (req) => {
+  const corsHeaders = corsFor(req.headers.get('Origin'));
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });

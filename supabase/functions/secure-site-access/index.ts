@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { cors } from "../_shared/cors.ts";
+import { corsFor } from "../_shared/cors.ts";
 import { signGateToken } from "../_shared/tokens.ts";
 
 const BACKOFF_STEPS = [1, 2, 4, 8, 16]; // seconds
@@ -62,7 +62,7 @@ async function verifyPBKDF2(scheme: string, rawCode: string) {
 
 const handler = async (req: Request): Promise<Response> => {
   const rid = crypto.randomUUID();
-  const corsHeaders = cors(req.headers.get('Origin'));
+  const corsHeaders = corsFor(req.headers.get('Origin'));
   
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: corsHeaders });

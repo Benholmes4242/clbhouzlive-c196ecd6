@@ -7,7 +7,7 @@
 
 import { serve } from "https://deno.land/std@0.220.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.76.1";
-import { corsHeaders } from "../_shared/cors.ts";
+import { corsFor } from '../_shared/cors.ts';
 import { normalizeError } from "../_shared/normalize-error.ts";
 
 interface MediaItem {
@@ -22,6 +22,7 @@ interface CleanupRequest {
 }
 
 serve(async (req) => {
+  const corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === "OPTIONS") {
     return new Response("ok", { status: 200, headers: corsHeaders });
   }

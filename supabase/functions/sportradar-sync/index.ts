@@ -2,11 +2,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { resolveTimezone } from '../_shared/countryTimezoneMap.ts'
 import { roundStarted } from '../_shared/roundState.ts'
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
-
+import { corsFor } from '../_shared/cors.ts';
 // URL Builders - Match Sportradar docs exactly
 // Uses SPORTRADAR_ACCESS_LEVEL env var (trial or production) instead of hardcoding
 const getAccessLevel = () => Deno.env.get('SPORTRADAR_ACCESS_LEVEL') || 'production';
@@ -77,6 +73,7 @@ function getTourSlugForTeeTimes(tourName: string): string | null {
 }
 
 Deno.serve(async (req) => {
+  const corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }

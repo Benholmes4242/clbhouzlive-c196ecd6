@@ -84,17 +84,11 @@ export function corsFor(
 // ---- Back-compat aliases -------------------------------------------------
 
 /**
- * Legacy wildcard header set. Kept so the 19 functions that already
- * import `corsHeaders` continue to work unchanged. Behavior is
- * strictly permissive (same as before this sweep) with a widened
- * Allow-Headers superset. Prefer `corsFor(origin)` in new code.
+ * Alias for corsFor — kept for pre-existing `cors` importers. The
+ * wildcard `corsHeaders` module-level export was removed during the
+ * CORS standardization sweep; call `corsFor(req.headers.get('Origin'))`
+ * inside every request handler instead so the response is scoped to
+ * the caller's origin.
  */
-export const corsHeaders: Record<string, string> = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": DEFAULT_METHODS,
-  "Access-Control-Allow-Headers": ALLOW_HEADERS,
-  "Access-Control-Max-Age": "86400",
-};
-
-/** Alias for corsFor - kept for pre-existing `cors` importers. */
 export const cors = corsFor;
+

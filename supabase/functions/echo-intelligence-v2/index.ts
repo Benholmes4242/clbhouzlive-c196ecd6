@@ -16,6 +16,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { crypto } from "https://deno.land/std@0.220.0/crypto/mod.ts";
 import { decideRoute } from "./router.ts";
 
+import { corsFor } from '../_shared/cors.ts';
 // ─── Secrets (reuse v1 env names) ────────────────────────────────────────
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY")!;
 const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY")!;
@@ -52,10 +53,6 @@ const CACHE_TTL_DUAL_MS   = 7 * 24 * 60 * 60 * 1000;
 const CACHE_TTL_FULL_MS   = 6 * 60 * 60 * 1000;
 
 // ─── CORS ────────────────────────────────────────────────────────────────
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
 const sseHeaders = {
   ...corsHeaders,
   "Content-Type": "text/event-stream",
@@ -734,6 +731,7 @@ function makeSseWriter(controller: ReadableStreamDefaultController<Uint8Array>):
 
 // ─── Main handler ────────────────────────────────────────────────────────
 serve(async (req: Request) => {
+  const corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }

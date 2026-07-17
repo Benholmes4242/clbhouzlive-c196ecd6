@@ -1,6 +1,6 @@
 // supabase/functions/cloudflare-stream-upload/index.ts
 import { serve } from "https://deno.land/std@0.220.0/http/server.ts";
-import { corsHeaders } from "../_shared/cors.ts";
+import { corsFor } from '../_shared/cors.ts';
 import { normalizeError } from "../_shared/normalize-error.ts";
 
 type DirectUploadRequest = {
@@ -9,6 +9,7 @@ type DirectUploadRequest = {
 };
 
 serve(async (req) => {
+  const corsHeaders = corsFor(req.headers.get('Origin'));
   // CORS preflight
   if (req.method === "OPTIONS") {
     return new Response("ok", { status: 200, headers: corsHeaders });

@@ -1,10 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
-
+import { corsFor } from '../_shared/cors.ts';
 /**
  * Verify the Cloudflare Stream webhook signature.
  * Spec: https://developers.cloudflare.com/stream/manage-video-library/using-webhooks/
@@ -83,6 +79,7 @@ function timingSafeEqual(a: string, b: string): boolean {
 }
 
 Deno.serve(async (req) => {
+  const corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }

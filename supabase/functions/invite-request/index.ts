@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { cors } from "../_shared/cors.ts";
+import { corsFor } from "../_shared/cors.ts";
 
 async function hashIP(ip: string): Promise<string> {
   const data = new TextEncoder().encode(ip);
@@ -27,7 +27,7 @@ async function verifyTurnstile(token: string, secret: string, ip?: string): Prom
 
 const handler = async (req: Request): Promise<Response> => {
   const rid = crypto.randomUUID();
-  const corsHeaders = cors(req.headers.get('Origin'));
+  const corsHeaders = corsFor(req.headers.get('Origin'));
   
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: corsHeaders });

@@ -19,13 +19,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import { requireInternalSecret } from "../_shared/internalAuth.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-internal-secret",
-};
-
-
+import { corsFor } from '../_shared/cors.ts';
 const LOCK_NAME = "gam-course-mapping-orchestrator";
 const BATCH_SIZE = 25;
 const TIER_1_3_METHODS = new Set([
@@ -43,6 +37,7 @@ type TierResult = {
 };
 
 Deno.serve(async (req) => {
+  const corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }

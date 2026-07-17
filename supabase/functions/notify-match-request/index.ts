@@ -1,10 +1,6 @@
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
-
+import { corsFor } from '../_shared/cors.ts';
 function escapeHtml(s: string): string {
   return s
     .replace(/&/g, "&amp;")
@@ -23,6 +19,7 @@ interface Payload {
 }
 
 serve(async (req) => {
+  const corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {

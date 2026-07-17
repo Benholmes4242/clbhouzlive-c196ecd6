@@ -1,8 +1,7 @@
 // One-time backfill: fetch leaderboards for all closed 2025 tournaments
 // that currently have zero rows in sr_leaderboards. Idempotent.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { corsHeaders } from '../_shared/cors.ts';
-
+import { corsFor } from '../_shared/cors.ts';
 const TOUR_SLUG_MAP: Record<string, string> = {
   pga: 'pga',
   euro: 'euro',
@@ -25,6 +24,7 @@ function mapTourSlug(tourName: string): string | null {
 }
 
 Deno.serve(async (req) => {
+  const corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   try {

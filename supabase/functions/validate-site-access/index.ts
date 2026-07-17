@@ -1,11 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+import { corsFor } from "../_shared/cors.ts";
 
 interface AccessValidationRequest {
   accessCode: string;
@@ -13,9 +8,11 @@ interface AccessValidationRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
+  const corsHeaders = corsFor(req.headers.get("Origin"));
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+
 
   try {
     const { accessCode, domain }: AccessValidationRequest = await req.json();

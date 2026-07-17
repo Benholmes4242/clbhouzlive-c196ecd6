@@ -1,8 +1,4 @@
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
-
+import { corsFor } from '../_shared/cors.ts';
 type MapType = 'roadmap' | 'satellite' | 'hybrid' | 'terrain';
 
 interface MapUrlRequest {
@@ -14,6 +10,7 @@ interface MapUrlRequest {
 }
 
 Deno.serve(async (req) => {
+  const corsHeaders = corsFor(req.headers.get('Origin'));
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
