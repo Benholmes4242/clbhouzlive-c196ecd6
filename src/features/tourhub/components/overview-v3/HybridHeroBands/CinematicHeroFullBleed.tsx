@@ -903,7 +903,7 @@ export function CinematicHeroFullBleed({
                     color: 'rgba(255,255,255,0.45)',
                   }}
                 >
-                  THRU
+                  {t('overview.cinematic.colThru')}
                 </span>
               )}
             </div>
