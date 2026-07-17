@@ -115,14 +115,15 @@ function StatCard({
           key={c.playerId}
           role="link"
           onClick={() => onNavigate(c.playerId)}
-          style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 0', cursor: 'pointer' }}
+          style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 0', cursor: 'pointer' }}
         >
-          <span style={{ width: 14, fontSize: 10.5, fontWeight: 700, color: V4.inkFaint, fontVariantNumeric: 'tabular-nums' }}>
+          <span style={{ width: 14, fontSize: 11, fontWeight: 500, color: V4.inkFaint, fontVariantNumeric: 'tabular-nums' }}>
             {i + 2}
           </span>
-          <span style={{ flex: 1, minWidth: 0, fontSize: 11.5, fontWeight: 700, color: V4.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <span style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 600, color: V4.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {c.playerName}
           </span>
+
           <span style={{ fontSize: 11, fontWeight: 700, color: V4.inkMute, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.01em' }}>
             {category.format(c.value)}
           </span>
