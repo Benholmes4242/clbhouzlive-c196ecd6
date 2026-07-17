@@ -273,6 +273,40 @@
         "title": "Value",
         "sub": "Was it worth the green fee?"
       }
+    },
+    "ratingCount_one": "{{count}} rating",
+    "ratingCount_other": "{{count}} ratings",
+    "error": {
+      "title": "Couldn't load reviews",
+      "body": "Something went wrong. Please try again.",
+      "retry": "Try Again"
+    },
+    "empty": {
+      "title": "No reviews yet",
+      "body": "Be the first to share your experience at {{courseName}}.",
+      "cta": "Write the first review",
+      "kicker": "WHAT TO INCLUDE"
+    },
+    "search": {
+      "placeholder": "Search reviews…",
+      "openA11y": "Search reviews",
+      "cancel": "Cancel"
+    },
+    "sortA11y": "Sort reviews",
+    "filterA11y": "Filter reviews: {{label}} ({{count}})",
+    "editYours": "Edit yours",
+    "writePromptInline": "⭐ Write your review",
+    "noMatches": {
+      "body": "No reviews match your criteria.",
+      "clear": "Clear filters"
+    },
+    "endMessage_one": "You've seen all {{count}} review.",
+    "endMessage_other": "You've seen all {{count}} reviews.",
+    "shareExperience": "Share your experience",
+    "toast": {
+      "signInRequired": "Sign in required",
+      "voteBody": "Please sign in to vote on reviews",
+      "rateBody": "Please sign in to rate courses"
     }
   },
   "courseDetail": {
@@ -361,7 +395,41 @@
     "handicapCue": {
       "bannerAction": "Connect →",
       "cardCta": "Connect your handicap →",
-      "cardFootnote": "Works with WHS handicaps worldwide"
+      "cardFootnote": "Works with WHS handicaps worldwide",
+      "variants": {
+        "about": {
+          "benefit": "See how your handicap compares here",
+          "sub": "Friends, members and the world’s best at this course"
+        },
+        "holes": {
+          "benefit": "See your scoring on every hole",
+          "sub": "Your average vs everyone who’s played {{name}}, hole by hole."
+        },
+        "champions": {
+          "benefit": "See where you rank at this course",
+          "sub": "Connect your handicap and your rounds join the {{name}} leaderboard."
+        },
+        "progress": {
+          "benefit": "Fill in your Top 100 automatically",
+          "sub": "Connect your handicap and every round you play counts itself — no manual logging."
+        },
+        "leaderboard": {
+          "benefit": "See where you rank worldwide",
+          "sub": "Connect your handicap to join the championship and climb the global rankings."
+        },
+        "discover": {
+          "benefit": "See which of these you’ve played",
+          "sub": "Connect your handicap to see how you scored at every course."
+        },
+        "tour-venue": {
+          "benefit": "See how you'd score at {{name}}",
+          "sub": "Connect your WHS handicap to compare your game to this week’s venue."
+        },
+        "tour-holes": {
+          "benefit": "See your scoring on these holes vs the field",
+          "sub": "Connect your WHS handicap to measure your game against the pros’, hole by hole."
+        }
+      }
     },
     "about": {
       "editRating": "Edit your rating",
