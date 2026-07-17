@@ -45,9 +45,9 @@ function scoreColor(v: number | null | undefined): string {
   return getScoreColor(v, 'light');
 }
 
-function formatThru(thru: number | null | undefined): string {
+function formatThru(t: TFunction, thru: number | null | undefined): string {
   if (thru == null || !Number.isFinite(thru)) return '';
-  return thru >= 18 ? 'F' : `thru ${thru}`;
+  return thru >= 18 ? t('overview.tiPicks.thru.finished') : t('overview.tiPicks.thru.thruN', { n: thru });
 }
 
 const CUT_STATUSES = new Set(['CUT', 'WD', 'DQ']);
@@ -57,10 +57,10 @@ function cutStatus(live: PickLiveState | undefined): string | null {
 }
 
 // Confidence label from the ABSOLUTE win prob (kept honest, not relative).
-function confidenceLabel(winProb: number): { label: string; color: string } {
-  if (winProb >= 12) return { label: 'High', color: V4.amberDeep };
-  if (winProb >= 6) return { label: 'Solid', color: V4.amber };
-  return { label: 'Live', color: V4.inkMute };
+function confidenceLabel(t: TFunction, winProb: number): { label: string; color: string } {
+  if (winProb >= 12) return { label: t('overview.tiPicks.confidence.high'), color: V4.amberDeep };
+  if (winProb >= 6) return { label: t('overview.tiPicks.confidence.solid'), color: V4.amber };
+  return { label: t('overview.tiPicks.confidence.live'), color: V4.inkMute };
 }
 
 // Confidence bar: fill is RELATIVE to the field leader so the top pick reads
@@ -68,9 +68,10 @@ function confidenceLabel(winProb: number): { label: string; color: string } {
 // render the raw percentage. `leader` is the max winProbability across the
 // current pick set (passed down from TIPicksCarousel).
 function ConfidenceBar({ value, leader, compact = false }: { value: number; leader: number; compact?: boolean }) {
+  const { t } = useTranslation('tourhub');
   const safeLeader = leader > 0 ? leader : 1;
   const fillPct = Math.max(8, Math.min(100, Math.round((value / safeLeader) * 100)));
-  const { label, color } = confidenceLabel(value);
+  const { label, color } = confidenceLabel(t, value);
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
       <div style={{ flex: 1, height: compact ? 5 : 6, borderRadius: 999, background: V4.hairline, overflow: 'hidden' }}>
@@ -83,17 +84,22 @@ function ConfidenceBar({ value, leader, compact = false }: { value: number; lead
   );
 }
 
-function verdict(live: PickLiveState | undefined): { hit: boolean; label: string } {
+function verdict(t: TFunction, live: PickLiveState | undefined): { hit: boolean; label: string } {
   const cut = cutStatus(live);
-  if (cut) return { hit: false, label: `MISS · ${cut}` };
+  if (cut) return { hit: false, label: t('overview.tiPicks.verdict.missCut', { cut }) };
   if (!live || live.position == null) {
-    return { hit: false, label: 'MISS' };
+    return { hit: false, label: t('overview.tiPicks.verdict.missOnly') };
   }
   const posText = formatPosition(live.position, live.positionTied);
   const scoreText = formatScore(live.score);
-  if (live.position === 1) return { hit: true, label: `WON · ${scoreText}` };
+  if (live.position === 1) return { hit: true, label: t('overview.tiPicks.verdict.won', { score: scoreText }) };
   const hit = live.position <= 10;
-  return { hit, label: `${hit ? 'HIT' : 'MISS'} · ${posText} · ${scoreText}` };
+  return {
+    hit,
+    label: hit
+      ? t('overview.tiPicks.verdict.hit', { pos: posText, score: scoreText })
+      : t('overview.tiPicks.verdict.miss', { pos: posText, score: scoreText }),
+  };
 }
 
 /**
