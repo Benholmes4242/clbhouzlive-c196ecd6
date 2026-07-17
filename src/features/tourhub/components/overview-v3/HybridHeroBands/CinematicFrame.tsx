@@ -312,6 +312,7 @@ function TiedChasersRowDark({
   onTap?: () => void;
   isResults?: boolean;
 }) {
+  const { t } = useTranslation('tourhub');
   return (
     <div
       onClick={onTap}
