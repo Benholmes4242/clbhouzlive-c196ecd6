@@ -226,13 +226,18 @@ export function LeaderboardTab() {
     meta?.start_date ?? selected.start_date,
     meta?.end_date ?? selected.end_date,
   );
-  const metaBits = [par != null ? `Par ${par}` : null, yardage != null ? `${yardage} yards` : null, dates]
+  const metaBits = [
+    par != null ? t('board.meta.par', { par }) : null,
+    yardage != null ? t('board.meta.yardage', { yardage }) : null,
+    dates,
+  ]
     .filter(Boolean)
     .join(' \u00B7 ');
 
   // Footnote: our thru column stores 0-18 integers only; no back-nine marker
   // is encoded. Render only the 'F Finished' clause.
-  const footnote = 'F Finished';
+  const footnote = t('board.footnote');
+
 
   const showTabs = liveTournaments.length > 1;
 
