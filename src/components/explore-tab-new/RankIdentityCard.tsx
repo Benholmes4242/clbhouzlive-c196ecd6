@@ -214,7 +214,7 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
           <div style={{ flexShrink: 0 }}>
             <SquircleAvatar
               size={26}
-              src={profile?.avatar_url ?? null}
+              src={profile?.profile_photo_url ?? null}
               alt={displayName}
               fallback={initials}
               hairlineRing
