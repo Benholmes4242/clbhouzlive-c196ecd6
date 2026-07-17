@@ -590,6 +590,7 @@ export function CinematicFrame({
   winningShare = null,
   onCtaTap,
 }: CinematicFrameProps) {
+  const { t } = useTranslation('tourhub');
   const useDusk =
     state.kind === 'results' &&
     (state as any).variant !== 'standard' &&
