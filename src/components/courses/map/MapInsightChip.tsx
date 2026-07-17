@@ -48,6 +48,7 @@ export const MapInsightChip: React.FC<MapInsightChipProps> = ({
   friendsCount = 0,
   isMapError = false,
 }) => {
+  const { t } = useTranslation('courses');
   const [isDismissed, setIsDismissed] = useState(false);
   const [currentInsightIndex, setCurrentInsightIndex] = useState(0);
   const idleTimerRef = useRef<number | null>(null);
