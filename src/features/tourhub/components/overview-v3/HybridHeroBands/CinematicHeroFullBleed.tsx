@@ -889,7 +889,7 @@ export function CinematicHeroFullBleed({
                   color: 'rgba(255,255,255,0.45)',
                 }}
               >
-                TOT
+                {t('overview.cinematic.colTotalShort')}
               </span>
               {isLive && (
                 <span
