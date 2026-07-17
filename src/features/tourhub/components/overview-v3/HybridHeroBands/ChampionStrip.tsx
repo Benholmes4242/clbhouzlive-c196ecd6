@@ -230,6 +230,7 @@ interface PlayoffStripProps {
 }
 
 export function PlayoffStrip({ count, score }: PlayoffStripProps) {
+  const { t } = useTranslation('tourhub');
   return (
     <div
       style={{
