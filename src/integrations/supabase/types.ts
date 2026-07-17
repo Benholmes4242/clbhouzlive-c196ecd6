@@ -16508,7 +16508,6 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: undefined
       }
-      execute_sql: { Args: { params?: Json; query: string }; Returns: Json }
       expire_pings: { Args: never; Returns: undefined }
       explore_courses_by_rating: {
         Args: {
