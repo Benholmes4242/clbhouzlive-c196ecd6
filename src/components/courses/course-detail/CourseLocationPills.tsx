@@ -75,7 +75,7 @@ const CourseLocationPills: React.FC<CourseLocationPillsProps> = ({ course }) => 
 
       {subCountryLabel && (
         <>
-          <span style={sepStyle}>›</span>
+          <span style={sepStyle} aria-hidden>{t('courseDetail.locationPills.separator')}</span>
           <button
             type="button"
             onClick={() => {
@@ -95,7 +95,7 @@ const CourseLocationPills: React.FC<CourseLocationPillsProps> = ({ course }) => 
 
       {localAreaLabel && (
         <>
-          <span style={sepStyle}>›</span>
+          <span style={sepStyle} aria-hidden>{t('courseDetail.locationPills.separator')}</span>
           <button
             type="button"
             onClick={() => {
