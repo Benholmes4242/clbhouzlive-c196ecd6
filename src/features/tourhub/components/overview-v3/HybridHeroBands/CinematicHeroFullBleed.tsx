@@ -875,7 +875,7 @@ export function CinematicHeroFullBleed({
                     color: 'rgba(255,255,255,0.45)',
                   }}
                 >
-                  TODAY
+                  {t('overview.cinematic.colToday')}
                 </span>
               )}
               <span
