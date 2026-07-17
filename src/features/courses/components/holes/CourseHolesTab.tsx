@@ -124,7 +124,19 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
           accent={SC_ACCENT}
           className="!mb-0"
         />
-        <div style={{ display: 'inline-flex', flexShrink: 0, gap: 6 }}>
+        <div
+          role="tablist"
+          aria-label={t('courses:holes.sortAriaLabel', 'Sort holes')}
+          style={{
+            flexShrink: 0,
+            display: 'inline-flex',
+            gap: 2,
+            padding: 2,
+            background: '#FFFFFF',
+            border: '1px solid rgba(15,23,42,0.08)',
+            borderRadius: 999,
+          }}
+        >
           {([
             ['hole', t('courses:holes.sortByHole')],
             ['difficulty', t('courses:holes.sortByDifficulty')],
@@ -134,19 +146,20 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
               <button
                 key={k}
                 type="button"
+                role="tab"
+                aria-selected={active}
                 onClick={() => setSort(k)}
                 style={{
-                  padding: '6px 13px',
+                  padding: '5px 11px',
                   borderRadius: 999,
                   background: active ? '#15171F' : 'transparent',
-                  color: active ? '#FFFFFF' : 'rgba(15,23,42,0.65)',
+                  color: active ? '#FFFFFF' : 'rgba(15,23,42,0.55)',
                   border: 'none',
                   fontFamily: FONT,
-                  fontSize: 11.5,
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  letterSpacing: '0.01em',
+                  fontSize: 10.5,
+                  fontWeight: 600,
                   whiteSpace: 'nowrap',
+                  cursor: 'pointer',
                   transition: 'all .15s',
                 }}
               >
@@ -155,6 +168,7 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
             );
           })}
         </div>
+
       </div>
       {sorted.map((h) => (
         <SharedHoleCard
