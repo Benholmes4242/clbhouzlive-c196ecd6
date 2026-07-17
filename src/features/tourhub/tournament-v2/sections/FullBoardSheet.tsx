@@ -102,11 +102,12 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
             background: SLATE_50, borderBottom: `0.5px solid ${HAIRLINE_INK_8}`,
           }}
         >
-          <div style={{ width: 52, flexShrink: 0 }}>POS</div>
-          <div style={{ flex: 1, minWidth: 0, paddingLeft: 8 }}>PLAYER</div>
-          <div style={{ width: 44, textAlign: 'center', flexShrink: 0 }}>TOT</div>
-          <div style={{ width: 44, textAlign: 'center', flexShrink: 0 }}>THRU</div>
-          <div style={{ width: 44, textAlign: 'center', flexShrink: 0 }}>TODAY</div>
+          <div style={{ width: 52, flexShrink: 0 }}>{t('board.columns.pos')}</div>
+          <div style={{ flex: 1, minWidth: 0, paddingLeft: 8 }}>{t('board.columns.player')}</div>
+          <div style={{ width: 44, textAlign: 'center', flexShrink: 0 }}>{t('board.columns.tot')}</div>
+          <div style={{ width: 44, textAlign: 'center', flexShrink: 0 }}>{t('board.columns.thru')}</div>
+          <div style={{ width: 44, textAlign: 'center', flexShrink: 0 }}>{t('board.columns.today')}</div>
+
         </div>
 
         <div style={{ overflowY: 'auto', flex: 1, minHeight: 0 }}>
