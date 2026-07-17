@@ -11,13 +11,15 @@ import {
 import { FONT } from './gamingLightTokens';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 
-const AMBER = '#F7931E';
 const INK = '#0F172A';
 const INK_MUTE = 'rgba(15,23,42,0.55)';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
-const CARD_BG = '#FFFFFF';
-const CARD_SHADOW = '0 1px 3px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.05)';
-const PODIUM_ROWS = 3;
+const BAND_BG = 'rgba(15,23,42,0.035)';
+const PAGE_PAD = 14;
+
+const MAX_ROWS = 3;
+const MIN_ROWS = 2;
+const CELL_MIN_H = 52;
 
 function formatHolderName(raw?: string | null): string {
   const s = (raw ?? '').trim();
@@ -45,7 +47,7 @@ function toLeaders(rows: LegendaryLeaderRow[], metric: Metric): LegendaryLeaderR
   return rows
     .filter((r) => (r[metric] ?? 0) > 0)
     .sort((a, b) => (b[metric] ?? 0) - (a[metric] ?? 0))
-    .slice(0, PODIUM_ROWS);
+    .slice(0, MAX_ROWS);
 }
 
 function toLatest(rows: FeatRow[], metric: Metric): FeatRow[] {
@@ -55,13 +57,12 @@ function toLatest(rows: FeatRow[], metric: Metric): FeatRow[] {
     .filter((r) => (r.feat_type ?? '').toLowerCase() === wanted)
     .slice()
     .sort((a, b) => dateOf(b).localeCompare(dateOf(a)))
-    .slice(0, PODIUM_ROWS);
+    .slice(0, MAX_ROWS);
 }
 
 interface Props {
   region: string | null;
   mode: RecordsMode;
-  onViewAll: (metric: Metric) => void;
   onRowTap?: (userId: string) => void;
   onLatestRowTap?: (row: FeatRow) => void;
 }
@@ -69,7 +70,6 @@ interface Props {
 export function AcesAlbatrossesPodium({
   region,
   mode,
-  onViewAll,
   onRowTap,
   onLatestRowTap,
 }: Props) {
@@ -78,385 +78,352 @@ export function AcesAlbatrossesPodium({
   const leaders = leaderData ?? [];
   const latest = latestData ?? [];
 
-  const aceLeaderRows = useMemo(() => toLeaders(leaders, 'aces'), [leaders]);
-  const albLeaderRows = useMemo(() => toLeaders(leaders, 'albatrosses'), [leaders]);
-  const aceLatestRows = useMemo(() => toLatest(latest, 'aces'), [latest]);
-  const albLatestRows = useMemo(() => toLatest(latest, 'albatrosses'), [latest]);
-
   const isAllTime = mode === 'alltime';
 
-  return (
-    <div
-      style={{
-        display: 'flex',
-        gap: 10,
-        padding: '0 16px',
-        fontFamily: FONT,
-      }}
-    >
-      {isAllTime ? (
-        <>
-          <LeaderPodiumCard
-            title="Aces"
-            accent={SC_ACE}
-            rows={aceLeaderRows}
-            metric="aces"
-            onViewAll={() => onViewAll('aces')}
-            onRowTap={onRowTap}
-          />
-          <LeaderPodiumCard
-            title="Albatrosses"
-            accent={SC_ALBATROSS}
-            rows={albLeaderRows}
-            metric="albatrosses"
-            onViewAll={() => onViewAll('albatrosses')}
-            onRowTap={onRowTap}
-          />
-        </>
-      ) : (
-        <>
-          <LatestPodiumCard
-            title="Aces"
-            accent={SC_ACE}
-            rows={aceLatestRows}
-            onViewAll={() => onViewAll('aces')}
-            onRowTap={onLatestRowTap}
-          />
-          <LatestPodiumCard
-            title="Albatrosses"
-            accent={SC_ALBATROSS}
-            rows={albLatestRows}
-            onViewAll={() => onViewAll('albatrosses')}
-            onRowTap={onLatestRowTap}
-          />
-        </>
-      )}
-    </div>
+  const aceRows = useMemo(
+    () => (isAllTime ? toLeaders(leaders, 'aces') : toLatest(latest, 'aces')),
+    [isAllTime, leaders, latest],
   );
-}
+  const albRows = useMemo(
+    () => (isAllTime ? toLeaders(leaders, 'albatrosses') : toLatest(latest, 'albatrosses')),
+    [isAllTime, leaders, latest],
+  );
 
-function CardShell({
-  title,
-  accent,
-  onViewAll,
-  children,
-}: {
-  title: string;
-  accent: string;
-  onViewAll: () => void;
-  children: React.ReactNode;
-}) {
+  const bothEmpty = aceRows.length === 0 && albRows.length === 0;
+
+  if (bothEmpty) {
+    return (
+      <div
+        style={{
+          padding: `18px ${PAGE_PAD}px 0`,
+          fontFamily: FONT,
+          fontSize: 12,
+          fontWeight: 500,
+          color: INK_MUTE,
+        }}
+      >
+        None yet.
+      </div>
+    );
+  }
+
+  const bandCount = Math.min(
+    MAX_ROWS,
+    Math.max(MIN_ROWS, Math.max(aceRows.length, albRows.length)),
+  );
+
   return (
-    <div
-      style={{
-        flex: 1,
-        minWidth: 0,
-        background: CARD_BG,
-        borderRadius: 16,
-        border: `0.5px solid ${HAIRLINE}`,
-        boxShadow: CARD_SHADOW,
-        padding: '12px 12px 10px',
-        fontFamily: FONT,
-      }}
-    >
+    <div style={{ fontFamily: FONT, color: INK }}>
+      {/* Column captions — centered over the two 50% columns */}
       <div
         style={{
           display: 'flex',
-          alignItems: 'baseline',
-          justifyContent: 'space-between',
-          gap: 8,
-          padding: '0 2px 10px',
+          alignItems: 'center',
+          marginTop: 10,
+          paddingBottom: 8,
         }}
       >
         <div
           style={{
+            flex: 1,
+            minWidth: 0,
+            textAlign: 'center',
             fontSize: 10.5,
             fontWeight: 600,
             letterSpacing: '0.06em',
             textTransform: 'uppercase',
-            color: accent,
+            color: SC_ACE,
             lineHeight: 1,
           }}
         >
-          {title}
+          Aces
         </div>
-        <button
-          type="button"
-          onClick={onViewAll}
+        <div
           style={{
-            background: 'none',
-            border: 'none',
-            padding: 0,
-            cursor: 'pointer',
-            color: AMBER,
-            fontSize: 12,
+            flex: 1,
+            minWidth: 0,
+            textAlign: 'center',
+            fontSize: 10.5,
             fontWeight: 600,
-            fontFamily: FONT,
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+            color: SC_ALBATROSS,
+            lineHeight: 1,
           }}
         >
-          All ›
-        </button>
+          Albatrosses
+        </div>
       </div>
-      {children}
+
+      {/* Table zone — full-bleed rules + stripes */}
+      <div style={{ borderTop: `0.5px solid ${HAIRLINE}` }}>
+        {Array.from({ length: bandCount }).map((_, i) => {
+          const banded = i % 2 === 1; // bands 2 and 4
+          const aceRow = aceRows[i];
+          const albRow = albRows[i];
+          return (
+            <div
+              key={i}
+              style={{
+                display: 'flex',
+                alignItems: 'stretch',
+                background: banded ? BAND_BG : 'transparent',
+                borderBottom: `0.5px solid ${HAIRLINE}`,
+                minHeight: CELL_MIN_H,
+              }}
+            >
+              <ColumnCell
+                mode={isAllTime ? 'alltime' : 'latest'}
+                index={i}
+                accent={SC_ACE}
+                metric="aces"
+                leader={isAllTime ? (aceRow as LegendaryLeaderRow | undefined) : undefined}
+                feat={isAllTime ? undefined : (aceRow as FeatRow | undefined)}
+                columnEmpty={aceRows.length === 0}
+                onLeaderTap={onRowTap}
+                onFeatTap={onLatestRowTap}
+              />
+              <ColumnCell
+                mode={isAllTime ? 'alltime' : 'latest'}
+                index={i}
+                accent={SC_ALBATROSS}
+                metric="albatrosses"
+                leader={isAllTime ? (albRow as LegendaryLeaderRow | undefined) : undefined}
+                feat={isAllTime ? undefined : (albRow as FeatRow | undefined)}
+                columnEmpty={albRows.length === 0}
+                onLeaderTap={onRowTap}
+                onFeatTap={onLatestRowTap}
+              />
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
 
-function EmptyBoard() {
-  return (
-    <div
-      style={{
-        padding: '22px 4px',
-        textAlign: 'center',
-        fontSize: 12,
-        fontWeight: 600,
-        color: INK_MUTE,
-      }}
-    >
-      None yet
-    </div>
-  );
-}
-
-function LeaderPodiumCard({
-  title,
+function ColumnCell({
+  mode,
+  index,
   accent,
-  rows,
   metric,
-  onViewAll,
-  onRowTap,
+  leader,
+  feat,
+  columnEmpty,
+  onLeaderTap,
+  onFeatTap,
 }: {
-  title: string;
+  mode: 'alltime' | 'latest';
+  index: number;
   accent: string;
-  rows: LegendaryLeaderRow[];
   metric: Metric;
-  onViewAll: () => void;
-  onRowTap?: (userId: string) => void;
+  leader?: LegendaryLeaderRow;
+  feat?: FeatRow;
+  columnEmpty: boolean;
+  onLeaderTap?: (userId: string) => void;
+  onFeatTap?: (row: FeatRow) => void;
 }) {
-  return (
-    <CardShell title={title} accent={accent} onViewAll={onViewAll}>
-      {rows.length === 0 ? (
-        <EmptyBoard />
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          {rows.map((r, i) => {
-            const isTop = i === 0;
-            const name = formatHolderName(r.holder_name);
-            const count = r[metric] ?? 0;
-            const size = isTop ? 32 : 26;
-            const nameSize = isTop ? 12.5 : 11.5;
-            const countSize = isTop ? 15 : 12.5;
-            const countColor = isTop ? accent : INK;
-            const unitSingular = metric === 'aces' ? 'ACE' : 'ALBATROSS';
-            const unitPlural = metric === 'aces' ? 'ACES' : 'ALBATROSSES';
-            const unit = count === 1 ? unitSingular : unitPlural;
-            const handleTap = () => {
-              if (r.user_id && onRowTap) onRowTap(r.user_id);
-            };
-            return (
-              <button
-                key={`${r.user_id ?? name}-${i}`}
-                type="button"
-                onClick={handleTap}
-                className="text-left active:opacity-80 transition-opacity"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 9,
-                  padding: 0,
-                  paddingTop: isTop ? 0 : 7,
-                  marginTop: isTop ? 0 : 8,
-                  border: 'none',
-                  background: 'transparent',
-                  backgroundImage: isTop
-                    ? 'none'
-                    : `linear-gradient(to right, transparent 35px, ${HAIRLINE} 35px)`,
-                  backgroundRepeat: 'no-repeat',
-                  backgroundSize: '100% 0.5px',
-                  backgroundPosition: '0 0',
-                  cursor: r.user_id ? 'pointer' : 'default',
-                  fontFamily: FONT,
-                }}
-              >
-                <SquircleAvatar
-                  size={size}
-                  srcCandidates={r.holder_avatar ? [r.holder_avatar] : []}
-                  alt={name}
-                  fallback={initials(name)}
-                  userId={r.user_id}
-                  hairlineRing
-                  ringColor={isTop ? SC_FILL_GOLD : LIGHT_HAIRLINE}
-                />
-                <div
-                  style={{
-                    flex: 1,
-                    minWidth: 0,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: nameSize,
-                      fontWeight: 600,
-                      letterSpacing: isTop ? '-0.01em' : 0,
-                      color: INK,
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                      lineHeight: 1.2,
-                    }}
-                  >
-                    {name}
-                  </div>
-                  <div
-                    style={{
-                      marginTop: 1,
-                      display: 'flex',
-                      alignItems: 'baseline',
-                      gap: 4,
-                      lineHeight: 1.2,
-                    }}
-                  >
-                    <span
-                      className="tabular-nums"
-                      style={{
-                        fontSize: countSize,
-                        fontWeight: 700,
-                        color: countColor,
-                      }}
-                    >
-                      {count}
-                    </span>
-                    <span
-                      style={{
-                        fontSize: 8.5,
-                        fontWeight: 600,
-                        letterSpacing: '0.06em',
-                        textTransform: 'uppercase',
-                        color: 'rgba(15,23,42,0.4)',
-                      }}
-                    >
-                      {unit}
-                    </span>
-                  </div>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      )}
-    </CardShell>
-  );
-}
+  // "None yet." only on the first row of a fully-empty column
+  if (columnEmpty) {
+    return (
+      <div
+        style={{
+          flex: 1,
+          minWidth: 0,
+          padding: '9px 14px',
+          display: 'flex',
+          alignItems: 'center',
+          fontSize: 11,
+          fontWeight: 500,
+          color: INK_MUTE,
+        }}
+      >
+        {index === 0 ? 'None yet.' : ''}
+      </div>
+    );
+  }
 
-function LatestPodiumCard({
-  title,
-  accent,
-  rows,
-  onViewAll,
-  onRowTap,
-}: {
-  title: string;
-  accent: string;
-  rows: FeatRow[];
-  onViewAll: () => void;
-  onRowTap?: (row: FeatRow) => void;
-}) {
-  return (
-    <CardShell title={title} accent={accent} onViewAll={onViewAll}>
-      {rows.length === 0 ? (
-        <EmptyBoard />
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          {rows.map((r, i) => {
-            const isFirst = i === 0;
-            const name = formatHolderName(r.holder_name);
-            const when = r.play_date ?? r.attained_at ?? null;
-            const canTap = !!(r.score_id || r.user_id);
-            const handleTap = () => {
-              if (canTap && onRowTap) onRowTap(r);
-            };
-            return (
-              <button
-                key={`${r.score_id ?? r.user_id ?? name}-${i}`}
-                type="button"
-                onClick={handleTap}
-                className="text-left active:opacity-80 transition-opacity"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 9,
-                  padding: 0,
-                  paddingTop: isFirst ? 0 : 7,
-                  marginTop: isFirst ? 0 : 8,
-                  border: 'none',
-                  background: 'transparent',
-                  backgroundImage: isFirst
-                    ? 'none'
-                    : `linear-gradient(to right, transparent 35px, ${HAIRLINE} 35px)`,
-                  backgroundRepeat: 'no-repeat',
-                  backgroundSize: '100% 0.5px',
-                  backgroundPosition: '0 0',
-                  cursor: canTap ? 'pointer' : 'default',
-                  fontFamily: FONT,
-                }}
-              >
-                <SquircleAvatar
-                  size={26}
-                  srcCandidates={r.holder_avatar ? [r.holder_avatar] : []}
-                  alt={name}
-                  fallback={initials(name)}
-                  userId={r.user_id}
-                  hairlineRing
-                  ringColor={LIGHT_HAIRLINE}
-                />
-                <div
-                  style={{
-                    flex: 1,
-                    minWidth: 0,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: 11.5,
-                      fontWeight: 600,
-                      color: INK,
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                      lineHeight: 1.2,
-                    }}
-                  >
-                    {name}
-                  </div>
-                  <div
-                    style={{
-                      marginTop: 1,
-                      fontSize: 11,
-                      fontWeight: 500,
-                      color: 'rgba(15,23,42,0.45)',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                      lineHeight: 1.2,
-                    }}
-                  >
-                    {r.course_name}
-                    {when ? ` · ${relativeTime(when)}` : ''}
-                  </div>
-                </div>
-              </button>
-            );
-          })}
+  // Populated in some rows but not this one -> striped empty cell
+  if (mode === 'alltime' ? !leader : !feat) {
+    return <div style={{ flex: 1, minWidth: 0, padding: '9px 14px' }} aria-hidden />;
+  }
+
+  if (mode === 'alltime' && leader) {
+    const isTop = index === 0;
+    const name = formatHolderName(leader.holder_name);
+    const count = leader[metric] ?? 0;
+    const avatarSize = isTop ? 24 : 20;
+    const countColor = isTop ? accent : INK;
+    const unitSingular = metric === 'aces' ? 'ACE' : 'ALBATROSS';
+    const unitPlural = metric === 'aces' ? 'ACES' : 'ALBATROSSES';
+    const unit = count === 1 ? unitSingular : unitPlural;
+    const canTap = !!leader.user_id;
+    const handleTap = () => {
+      if (canTap && onLeaderTap) onLeaderTap(leader.user_id!);
+    };
+    return (
+      <button
+        type="button"
+        onClick={handleTap}
+        className="text-left active:opacity-80 transition-opacity"
+        style={{
+          flex: 1,
+          minWidth: 0,
+          padding: '9px 14px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          gap: 3,
+          background: 'transparent',
+          border: 'none',
+          cursor: canTap ? 'pointer' : 'default',
+          fontFamily: FONT,
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+          <SquircleAvatar
+            size={avatarSize}
+            srcCandidates={leader.holder_avatar ? [leader.holder_avatar] : []}
+            alt={name}
+            fallback={initials(name)}
+            userId={leader.user_id}
+            hairlineRing
+            ringColor={isTop ? SC_FILL_GOLD : LIGHT_HAIRLINE}
+          />
+          <div
+            style={{
+              flex: 1,
+              minWidth: 0,
+              fontSize: 11.5,
+              fontWeight: 600,
+              letterSpacing: '-0.01em',
+              color: INK,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              lineHeight: 1.2,
+            }}
+          >
+            {name}
+          </div>
         </div>
-      )}
-    </CardShell>
-  );
+        <div
+          style={{
+            paddingLeft: 27,
+            display: 'flex',
+            alignItems: 'baseline',
+            gap: 4,
+            lineHeight: 1.2,
+          }}
+        >
+          <span
+            className="tabular-nums"
+            style={{ fontSize: 13, fontWeight: 700, color: countColor }}
+          >
+            {count}
+          </span>
+          <span
+            style={{
+              fontSize: 8.5,
+              fontWeight: 600,
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+              color: 'rgba(15,23,42,0.4)',
+            }}
+          >
+            {unit}
+          </span>
+        </div>
+      </button>
+    );
+  }
+
+  // Latest cell
+  if (feat) {
+    const name = formatHolderName(feat.holder_name);
+    const when = feat.play_date ?? feat.attained_at ?? null;
+    const canTap = !!(feat.score_id || feat.user_id);
+    const handleTap = () => {
+      if (canTap && onFeatTap) onFeatTap(feat);
+    };
+    return (
+      <button
+        type="button"
+        onClick={handleTap}
+        className="text-left active:opacity-80 transition-opacity"
+        style={{
+          flex: 1,
+          minWidth: 0,
+          padding: '9px 14px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          gap: 3,
+          background: 'transparent',
+          border: 'none',
+          cursor: canTap ? 'pointer' : 'default',
+          fontFamily: FONT,
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+          <SquircleAvatar
+            size={20}
+            srcCandidates={feat.holder_avatar ? [feat.holder_avatar] : []}
+            alt={name}
+            fallback={initials(name)}
+            userId={feat.user_id}
+            hairlineRing
+            ringColor={LIGHT_HAIRLINE}
+          />
+          <div
+            style={{
+              flex: 1,
+              minWidth: 0,
+              fontSize: 11.5,
+              fontWeight: 600,
+              letterSpacing: '-0.01em',
+              color: INK,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              lineHeight: 1.2,
+            }}
+          >
+            {name}
+          </div>
+          {when ? (
+            <div
+              style={{
+                flexShrink: 0,
+                fontSize: 10,
+                fontWeight: 500,
+                color: 'rgba(15,23,42,0.4)',
+                lineHeight: 1.2,
+              }}
+            >
+              {relativeTime(when)}
+            </div>
+          ) : null}
+        </div>
+        <div
+          style={{
+            paddingLeft: 27,
+            fontSize: 10.5,
+            fontWeight: 500,
+            color: 'rgba(15,23,42,0.5)',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            lineHeight: 1.2,
+          }}
+        >
+          {feat.course_name ?? ''}
+        </div>
+      </button>
+    );
+  }
+
+  return <div style={{ flex: 1, minWidth: 0 }} aria-hidden />;
 }
 
 export default AcesAlbatrossesPodium;
