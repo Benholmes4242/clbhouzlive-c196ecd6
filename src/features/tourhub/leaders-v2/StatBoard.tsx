@@ -72,7 +72,7 @@ function StatBoardInner({ category, liveMap, onOpen }: StatBoardProps) {
             textTransform: 'uppercase',
           }}
         >
-          {category.short}
+          {t(category.shortKey)}
         </span>
         <span
           style={{
@@ -85,7 +85,7 @@ function StatBoardInner({ category, liveMap, onOpen }: StatBoardProps) {
             gap: 2,
           }}
         >
-          Full list <ChevronRight size={11} color={INK_MUTE} />
+          {t('leaders.fullList')} <ChevronRight size={11} color={INK_MUTE} />
         </span>
       </button>
 
