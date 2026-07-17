@@ -243,9 +243,10 @@ export function TournamentPage() {
       <AllTeeTimesSheet
         open={teeTimesOpen}
         onClose={() => setTeeTimesOpen(false)}
-        groups={teeGroups}
+        tournamentId={tournamentId!}
         tournamentName={meta.name}
-        round={currentRound}
+        defaultRound={currentRound}
+        maxAvailableRound={pulse.state === 'upcoming' ? 1 : (meta?.current_round ?? currentRound)}
       />
       <FullBoardSheet
         open={fullBoardOpen}
