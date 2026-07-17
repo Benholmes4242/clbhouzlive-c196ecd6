@@ -439,6 +439,43 @@ export function ScheduleTab() {
         </button>
       )}
 
+      {/* Back-to-top FAB (canonical grey chevron, portaled) */}
+      <ScrollToTopGlass />
+
+      {/* TODAY pill — adjacent to FAB, appears when today is >1.5vh off-screen */}
+      {anchorId && anchorFar && createPortal(
+        <button
+          type="button"
+          onClick={scrollToAnchor}
+          aria-label={t('schedule.floating.today')}
+          style={{
+            position: 'fixed',
+            bottom: 'calc(6rem + 2px)',
+            right: 'calc(1rem + 48px)',
+            zIndex: 39,
+            display: 'inline-flex',
+            alignItems: 'center',
+            height: 28,
+            padding: '0 12px',
+            borderRadius: 999,
+            background: '#FFFFFF',
+            color: AMBER,
+            border: `1px solid ${HAIRLINE_INK_10}`,
+            fontFamily: FONT,
+            fontSize: 11,
+            fontWeight: 800,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.10)',
+            cursor: 'pointer',
+            WebkitTapHighlightColor: 'transparent',
+          }}
+        >
+          {t('schedule.floating.today')}
+        </button>,
+        document.body,
+      )}
+
       {/* Silence unused imports */}
       <span aria-hidden style={{ display: 'none', color: INK_FAINT }} />
     </div>
