@@ -150,8 +150,17 @@
     "sectionTourLens": {
       "allTours": "All Tours",
       "filterAriaLabel": "Filter section by tour"
+    },
+    "page": {
+      "offlineBanner": "オフラインです。データが最新でない可能性があります。"
+    },
+    "hero": {
+      "prevAria": "前のトーナメント",
+      "nextAria": "次のトーナメント",
+      "counter": "{{current}} / {{total}}"
     }
   },
+
   "empty": {
     "leaderboard": {
       "noLive": {
