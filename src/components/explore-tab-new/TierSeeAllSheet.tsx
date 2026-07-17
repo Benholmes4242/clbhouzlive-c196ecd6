@@ -392,6 +392,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
                     countLabelSingular={metric === 'aces' ? 'ACE' : 'ALBATROSS'}
                     countLabelPlural={metric === 'aces' ? 'ACES' : 'ALBATROSSES'}
                     subline={otherLabel}
+                    variant="gold"
                     onTap={() => {
                       if (r.user_id) opener.openProfile(r.user_id);
                     }}
