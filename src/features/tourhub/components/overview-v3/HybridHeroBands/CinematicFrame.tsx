@@ -1195,7 +1195,7 @@ export function CinematicFrame({
           <button
             type="button"
             onClick={onCtaTap}
-            aria-label="Open full leaderboard"
+            aria-label={t('overview.cinematic.openFullLeaderboardAria')}
             style={{
               position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 4,
               border: 'none', padding: 0, margin: 0, cursor: 'pointer',
