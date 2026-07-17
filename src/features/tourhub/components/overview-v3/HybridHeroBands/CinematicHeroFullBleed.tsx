@@ -778,7 +778,7 @@ export function CinematicHeroFullBleed({
               );
             }
             const tieScoreNum = scoreStringToNumber(row.score);
-            const label = `${row.count} players`;
+            const label = t('overview.cinematic.playersTiedCount', { count: row.count });
             return (
               <div key={`ru-tie-${i}`} style={rowStyle}>
                 <span
