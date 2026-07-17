@@ -39,7 +39,7 @@ export const PlanningSignals: React.FC<PlanningSignalsProps> = ({
         <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
           <Compass className="h-4 w-4 text-amber-600" />
         </div>
-        <h4 className="font-semibold text-foreground">Planning</h4>
+        <h4 className="font-semibold text-foreground">{t('phase5.planning.title')}</h4>
       </div>
 
       {/* Action button - Want to Play */}
