@@ -46,7 +46,7 @@ export function VideoFeedCard({ row, post, index, posts, isAutoplayActive }: Pro
       .toUpperCase() || '?';
 
   const hlsUrl = post.mediaItems[0]?.hlsUrl ?? null;
-  const isVideo = !!hlsUrl;
+  const isVideo = post.mediaItems[0]?.type === 'video';
   const ownerKey = isVideo ? `${post.id}:0` : null;
   const posterUrl = row.poster_url ?? post.mediaItems[0]?.thumbnailUrl ?? null;
 

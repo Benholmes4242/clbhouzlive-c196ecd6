@@ -43,7 +43,7 @@ function ClipTile({
   const rootRef = useRef<HTMLElement>(null);
 
   const hlsUrl = post.mediaItems[0]?.hlsUrl ?? null;
-  const isVideo = !!hlsUrl;
+  const isVideo = post.mediaItems[0]?.type === 'video';
   const ownerKey = isVideo ? `${post.id}:0` : null;
   const posterUrl = row.poster_url ?? post.mediaItems[0]?.thumbnailUrl ?? null;
 

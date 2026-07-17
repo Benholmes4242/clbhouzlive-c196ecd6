@@ -1,4 +1,4 @@
-import { useInfiniteQuery, useQuery, keepPreviousData } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useActiveActor } from '@/context/ActiveActorContext';
@@ -83,7 +83,11 @@ export function useCourseMedia({ userId, courseId, filter }: UseCourseMediaParam
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     initialPageParam: undefined as string | undefined,
     enabled: !!userId && !!courseId,
-    placeholderData: keepPreviousData,
+    // No placeholderData: on filter switch we want the skeleton, not the
+    // previous filter's tiles. keepPreviousData across filter keys means
+    // Photos briefly renders the last All/Videos page — the exact "video
+    // tile under Photos" symptom. Pagination within a filter is already
+    // handled by the infinite query's page list.
     staleTime: 2 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });
