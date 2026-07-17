@@ -48,6 +48,7 @@ export function FullListSheet({
   year,
 }: FullListSheetProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation('tourhub');
 
   const handleRowTap = useCallback(
     (playerId: string) => {
