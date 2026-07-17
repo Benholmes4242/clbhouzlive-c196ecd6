@@ -113,7 +113,15 @@ export function FeatListRow({ row, tier, onTap, index = 0, mode = 'latest', best
     return { value: v || '—', label: 'BIRDIES' };
   }, [tier, row.feat_value, row.value]);
 
-  const valueColor = isTop ? AMBER : INK;
+  // Records tier: to-par value follows score semantics at every rank and both
+  // scopes (under par -> red, even/over -> ink), overriding champion amber.
+  // Amber-as-champion still applies to eagles/birdie-haul counts (no score
+  // semantics). See RATING_RAMPS canon: red = under-par data, amber = champion
+  // chrome + interactivity.
+  const recordsValueColor = showToParPrimary && d != null && d < 0 ? '#D2222D' : INK;
+  const valueColor = isRecordsRow
+    ? recordsValueColor
+    : isTop ? AMBER : INK;
 
   return (
     <button
