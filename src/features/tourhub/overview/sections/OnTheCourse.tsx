@@ -8,8 +8,10 @@
  * Expanded (tap end-cap): fetches full round-1 tee times via useTeeTimesAll
  * (lazy, enabled only after tap; cached by react-query). The rail continues
  * with a FULL FIELD divider then every remaining group in chronological
- * order, deduped against featured. TeeGroup has no live scores so score
- * columns show an em-dash placeholder — no invented leaderboard join.
+ * order, deduped against featured. Full-field score columns are joined on
+ * sr_players.id to the tournament leaderboard (useTourLeaderboard, shared
+ * via react-query with the hero — no extra network); missing = em-dash
+ * (WDs, pre-tee players with no card yet, or leaderboard fetch failure).
  *
  * Collapse via the "Back to featured" end tile. Expansion resets automatically
  * when tournamentId changes (the hero swiped to a new tournament).
@@ -20,6 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useFeaturedGroups } from '../data/useFeaturedGroups';
 import { useTeeTimesAll, type TeeGroup } from '@/features/tourhub/tournament-v2/data/useTeeTimesAll';
+import { useTourLeaderboard } from '../../hooks/useTourHubData';
 import { SectionShell } from './SectionShell';
 import { V4 } from '../tokens';
 import { getScoreColor } from '../../_shared/scoreColor';
