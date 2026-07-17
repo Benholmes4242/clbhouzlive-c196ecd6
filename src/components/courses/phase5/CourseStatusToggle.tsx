@@ -105,7 +105,7 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
             background: 'rgba(247,147,30,0.12)', color: '#F7931E',
             fontSize: 12.5, fontWeight: 700,
           }}>
-            <Check size={15} strokeWidth={2.5} /> Played
+            <Check size={15} strokeWidth={2.5} /> {t('phase5.statusToggle.playedBadge')}
           </span>
         </button>
       ) : (
