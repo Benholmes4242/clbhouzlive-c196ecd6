@@ -15,7 +15,7 @@ import {
   type TournamentHole,
 } from '../data/useTournamentHoleAnalysis';
 import {
-  FONT, INK, INK_MUTE, INK_FAINT, SURFACE, HAIRLINE_INK_8, SLATE_50, AMBER,
+  FONT, INK, INK_MUTE, INK_FAINT, SLATE_50, AMBER,
   TOPAR_UNDER_LIGHT, TOPAR_OVER_LIGHT,
 } from '../../_shared/tokens';
 import { SharedHoleCard } from '@/features/courses/_shared/holes/SharedHoleCard';
@@ -38,16 +38,6 @@ function toShared(h: TournamentHole): SharedHole {
 }
 
 const AVG_EPSILON = 0.05;
-function avgColorFor(avg: number): string {
-  if (avg > AVG_EPSILON) return TOPAR_OVER_LIGHT;
-  if (avg < -AVG_EPSILON) return TOPAR_UNDER_LIGHT;
-  return INK_MUTE;
-}
-function fmtAvg(v: number): string {
-  if (Math.abs(v) < 0.005) return `\u00B10.00`;
-  if (v > 0) return `+${v.toFixed(2)}`;
-  return `\u2212${Math.abs(v).toFixed(2)}`;
-}
 
 export function CourseSection({ tournamentId }: Props) {
   const { t } = useTranslation(['tourhub', 'courses']);
