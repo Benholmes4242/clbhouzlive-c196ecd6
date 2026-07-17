@@ -268,7 +268,8 @@
       "tv": "TV",
       "teeTimes": "Tee times",
       "round": "Round {{round}}",
-      "yardageShort": "{{yardage}} yds"
+      "yardageShort": "{{yardage}} yds",
+      "eyebrow": "Event Info"
     },
     "course": {
       "title": "The Course",
