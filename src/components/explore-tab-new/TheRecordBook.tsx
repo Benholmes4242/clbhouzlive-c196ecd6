@@ -19,8 +19,6 @@ import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const INK = '#0F172A';
-const GOLD = '#FBBC2E';
-const PARCHMENT_GOLD = '#B8860B';
 const AMBER = '#F7931E';
 const UNDER_PAR = '#D2222D';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
