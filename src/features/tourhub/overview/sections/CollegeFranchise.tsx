@@ -256,7 +256,7 @@ export function CollegeFranchise() {
                 gridTemplateColumns: '28px 26px 1fr auto',
                 alignItems: 'center',
                 gap: 12,
-                padding: '7px 12px',
+                padding: '11px 12px',
                 background: 'transparent',
                 border: 'none',
                 borderBottom: i < top5.length - 1 ? `0.5px solid ${V4.hairline}` : 'none',
