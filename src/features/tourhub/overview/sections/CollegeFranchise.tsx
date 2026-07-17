@@ -231,7 +231,7 @@ export function CollegeFranchise() {
             {formatCurrency(leader.earnings_total)}
           </span>
           <span style={{ fontSize: 9, fontWeight: 700, color: V4.inkFaint, letterSpacing: '0.14em', textAlign: 'center' }}>
-            SEASON ALUMNI EARNINGS
+            {t('overview.collegeFranchise.tugLabel')}
           </span>
           <span style={{ fontSize: 11.5, fontWeight: 800, color: chaserColor, fontVariantNumeric: 'tabular-nums', textAlign: 'right' }}>
             {formatCurrency(chaser.earnings_total)}
