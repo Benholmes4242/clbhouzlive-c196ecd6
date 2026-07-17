@@ -238,7 +238,43 @@
       "boardMeta_other": "{{count}} PICKS · TAP FOR THE CASE",
       "courseFit": "course fit {{score}}",
       "concernLabel": "Concern",
-      "finalLine": "{{pos}} · {{score}}"
+      "finalLine": "{{pos}} · {{score}}",
+      "confidence": {
+        "high": "High",
+        "solid": "Solid",
+        "live": "Live"
+      },
+      "verdict": {
+        "won": "WON · {{score}}",
+        "hit": "HIT · {{pos}} · {{score}}",
+        "miss": "MISS · {{pos}} · {{score}}",
+        "missOnly": "MISS",
+        "missCut": "MISS · {{cut}}"
+      },
+      "chip": {
+        "won": "Won",
+        "hit": "Hit",
+        "miss": "Miss",
+        "missCut": "Miss · {{cut}}"
+      },
+      "card": {
+        "theCase": "The case ›",
+        "pickLabel": "Pick {{rank}}"
+      },
+      "case": {
+        "eyebrow": "The case for",
+        "concernLabel": "Concern",
+        "courseFit": "course fit {{score}}"
+      },
+      "sheet": {
+        "picksHeader": "{{count}} PICKS · TAP FOR THE CASE",
+        "title": "The board"
+      },
+      "thru": {
+        "finished": "F",
+        "thruN": "thru {{n}}"
+      },
+      "thruSep": " · {{value}}"
     },
     "collegeFranchise": {
       "eyebrow": "COLLEGE FRANCHISE",

@@ -215,8 +215,8 @@
       "backToLine2": "[~~féátúréd~~]"
     },
     "tiPicks": {
-      "eyebrow": "[~~Ţőúřñáɱéñţ íñţéļļíĝéñĉé~~]",
-      "linkLabel": "[~~Áļļ ƥíĉǩš~~]",
+      "eyebrow": "[~~Tóúrñáméñt íñtéllígéñçé~~]",
+      "linkLabel": "[~~Áll píçkš~~]",
       "confidenceHigh": "[~~Ĥíĝĥ~~]",
       "confidenceSolid": "[~~Šőļíđ~~]",
       "confidenceLive": "[~~Ļíṽé~~]",
@@ -238,7 +238,43 @@
       "boardMeta_other": "[~~{{count}} ƤÍĈǨŠ · ŢÁƤ ƑŐŘ ŢĤÉ ĈÁŠÉ~~]",
       "courseFit": "[~~ĉőúřšé ƒíţ {{score}}~~]",
       "concernLabel": "[~~Ĉőñĉéřñ~~]",
-      "finalLine": "[~~{{pos}} · {{score}}~~]"
+      "finalLine": "[~~{{pos}} · {{score}}~~]",
+      "confidence": {
+        "high": "[~~Hígh~~]",
+        "solid": "[~~Šólíd~~]",
+        "live": "[~~Lívé~~]"
+      },
+      "verdict": {
+        "won": "[~~WÓÑ · {{score}}~~]",
+        "hit": "[~~HÍT · {{pos}} · {{score}}~~]",
+        "miss": "[~~MÍŠŠ · {{pos}} · {{score}}~~]",
+        "missOnly": "[~~MÍŠŠ~~]",
+        "missCut": "[~~MÍŠŠ · {{cut}}~~]"
+      },
+      "chip": {
+        "won": "[~~Wóñ~~]",
+        "hit": "[~~Hít~~]",
+        "miss": "[~~Míšš~~]",
+        "missCut": "[~~Míšš · {{cut}}~~]"
+      },
+      "card": {
+        "theCase": "[~~Thé çášé ›~~]",
+        "pickLabel": "[~~Píçk {{rank}}~~]"
+      },
+      "case": {
+        "eyebrow": "[~~Thé çášé fór~~]",
+        "concernLabel": "[~~Çóñçérñ~~]",
+        "courseFit": "[~~çóúršé fít {{score}}~~]"
+      },
+      "sheet": {
+        "picksHeader": "[~~{{count}} PÍÇKŠ · TÁP FÓR THÉ ÇÁŠÉ~~]",
+        "title": "[~~Thé bóárd~~]"
+      },
+      "thru": {
+        "finished": "[~~F~~]",
+        "thruN": "[~~thrú {{n}}~~]"
+      },
+      "thruSep": "[~~ · {{value}}~~]"
     },
     "collegeFranchise": {
       "eyebrow": "[~~ĈŐĻĻÉĜÉ ƑŘÁÑĈĤÍŠÉ~~]",
