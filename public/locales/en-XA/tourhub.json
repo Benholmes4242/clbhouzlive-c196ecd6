@@ -277,6 +277,17 @@
       "allHolesTitle": "[~~Áļļ 18 Ĥőļéš~~]",
       "avgVsPar": "[~~Áṽĝ ṽš ƥář~~]",
       "fieldScoringSuffix": "[~~ · ƒíéļđ šĉőříñĝ~~]"
+    },
+    "featuredGroups": {
+      "eyebrow": "[~~Őñ ţĥé Ĉőúřšé~~]",
+      "holeLabel": "[~~ĤŐĻÉ {{hole}}~~]",
+      "onCourse": "[~~ŐÑ ĈŐÚŘŠÉ~~]"
+    },
+    "teeTimes": {
+      "teeChip": "[~~Ţéé {{hole}}~~]"
+    },
+    "allTeeTimes": {
+      "title": "[~~Áļļ Ţéé Ţíɱéš~~]"
     }
   }
 }
