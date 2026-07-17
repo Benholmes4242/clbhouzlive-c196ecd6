@@ -217,14 +217,18 @@ export function TournamentPage() {
         {/* THE STORY — completed events only, self-hides w/o text */}
         {pulse.state === 'completed' && <StorySection story={story?.story ?? null} />}
 
-        {/* EVENT INFO — always-on. Live events with tee-time coverage get a
-            tappable row that opens the full tee-times sheet (Brief F-TD-4). */}
-        <EventInfoSection
-          meta={meta}
-          broadcast={story?.broadcast ?? null}
-          onTeeTimesTap={pulse.state === 'live' && teeGroups.length > 0 ? () => setTeeTimesOpen(true) : null}
-          teeTimesRound={pulse.state === 'live' && teeGroups.length > 0 ? currentRound : null}
-        />
+        {/* TEE TIMES BAND — promoted entry point to the round-by-round
+            sheet. Renders for live + upcoming states only. */}
+        {(pulse.state === 'live' || pulse.state === 'upcoming') && (
+          <TeeTimesBand
+            round={currentRound}
+            groupCount={teeGroups.length}
+            onTap={() => setTeeTimesOpen(true)}
+          />
+        )}
+
+        {/* EVENT INFO — always-on. */}
+        <EventInfoSection meta={meta} broadcast={story?.broadcast ?? null} />
 
 
         {/* THE COURSE */}
