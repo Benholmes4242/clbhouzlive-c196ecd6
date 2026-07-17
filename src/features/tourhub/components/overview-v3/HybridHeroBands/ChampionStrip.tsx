@@ -205,7 +205,7 @@ export function CancelledStrip({ reason }: { reason: string }) {
             marginBottom: 2,
           }}
         >
-          CANCELLED
+          {t('overview.cancelledStrip.eyebrow')}
         </div>
         <div
           style={{
