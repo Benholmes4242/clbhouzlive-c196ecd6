@@ -257,6 +257,25 @@
       "shareCta": "[~~Šĥářé á ɱőɱéñť~~]",
       "allAction": "[~~Áļļ ɱőɱéñťš~~]",
       "sheetTitle": "[~~Áļļ Μőɱéñťš~~]"
+    },
+    "fullBoard": {
+      "title": "[~~Ƒúļļ Ɓőářđ~~]"
+    },
+    "eventInfo": {
+      "dates": "[~~Đáţéš~~]",
+      "venue": "[~~Ṽéñúé~~]",
+      "parYardageLabel": "[~~Ƥář / Ýářđáĝé~~]",
+      "tv": "[~~ŢṼ~~]",
+      "teeTimes": "[~~Ţéé ţíɱéš~~]",
+      "round": "[~~Řőúñđ {{round}}~~]",
+      "yardageShort": "[~~{{yardage}} ýđš~~]"
+    },
+    "course": {
+      "title": "[~~Ţĥé Ĉőúřšé~~]",
+      "allHolesAction": "[~~Áļļ 18 ĥőļéš~~]",
+      "allHolesTitle": "[~~Áļļ 18 Ĥőļéš~~]",
+      "avgVsPar": "[~~Áṽĝ ṽš ƥář~~]",
+      "fieldScoringSuffix": "[~~ · ƒíéļđ šĉőříñĝ~~]"
     }
   }
 }
