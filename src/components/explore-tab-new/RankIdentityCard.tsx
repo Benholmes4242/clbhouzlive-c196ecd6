@@ -24,6 +24,9 @@ import { MATERIAL_HEX } from '@/components/profile/handicap/whs/gam/trophy-room/
 import { renderBadgeIcon } from '@/components/profile/handicap/whs/gam/badgeIcons';
 import { formatHcp } from '@/lib/formatHcp';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { quarterOf, daysLeft, seasonName } from '@/lib/gam/seasonClock';
+import { useViewerHemisphere } from '@/hooks/gam/useViewerHemisphere';
 
 import { FONT } from './gamingLightTokens';
 
