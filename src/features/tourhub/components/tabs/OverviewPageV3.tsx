@@ -31,7 +31,7 @@ export function OverviewPageV3() {
   const { isOnline } = useNetworkStatus();
   // READ-ONLY: keyed here purely to drive the OTC + TI synchronized fade so
   // the hero-lensed unit visibly changes together. Must not write back.
-  const { viewingTournamentId } = useTourSelection();
+  const { viewingTournamentId, viewingIsLive } = useTourSelection();
 
 
   return (
