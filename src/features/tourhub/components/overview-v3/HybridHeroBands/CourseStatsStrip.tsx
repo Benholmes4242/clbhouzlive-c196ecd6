@@ -48,10 +48,11 @@ export function CourseStatsStrip({
   courseRecord,
   courseRecordHolder,
 }: CourseStatsStripProps) {
+  const { t } = useTranslation('tourhub');
   const summaryParts: string[] = [];
-  if (par) summaryParts.push(`Par ${par}`);
-  if (yardage) summaryParts.push(`${formatNumber(yardage)} yds`);
-  const summary = summaryParts.join(' · ') || 'Course preview';
+  if (par) summaryParts.push(t('board.meta.par', { par }));
+  if (yardage) summaryParts.push(t('tournament.eventInfo.yardageShort', { yardage: formatNumber(yardage) }));
+  const summary = summaryParts.join(' · ') || t('overview.courseStats.fallbackSummary');
 
   return (
     <div
