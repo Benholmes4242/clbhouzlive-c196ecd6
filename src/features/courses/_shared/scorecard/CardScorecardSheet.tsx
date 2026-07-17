@@ -17,7 +17,7 @@ const MUTED = '#94A3B8';
 const GHOST = '#CBD5E1';
 const HAIRLINE = 'rgba(0,0,0,0.08)';
 const CELL_BORDER = '#E2E8F0';
-const EYEBROW = '#c97a10';
+const EYEBROW = '#F7931E';
 const EVEN_GRAY = '#8A9099';
 
 const NUM: React.CSSProperties = {
