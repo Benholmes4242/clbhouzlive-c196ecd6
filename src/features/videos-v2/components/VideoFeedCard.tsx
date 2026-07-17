@@ -98,7 +98,7 @@ export function VideoFeedCard({ row, post, index, posts, isAutoplayActive }: Pro
       <div
         style={{
           aspectRatio: '16 / 9',
-          borderRadius: 12,
+          borderRadius: 4,
           background: '#e5e9ef',
           position: 'relative',
           overflow: 'hidden',
