@@ -19862,6 +19862,10 @@ export type Database = {
         Args: { _business_id: string }
         Returns: undefined
       }
+      soft_delete_review_response: {
+        Args: { p_response_id: string }
+        Returns: undefined
+      }
       st_3dclosestpoint: {
         Args: { geom1: unknown; geom2: unknown }
         Returns: unknown
