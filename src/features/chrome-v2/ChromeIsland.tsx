@@ -71,10 +71,6 @@ function inkFor(tone: ChromeTone): string {
   return tone === 'light' ? '#0F172A' : '#FFFFFF';
 }
 
-// Canvas bg used for the avatar unread-badge ring — matches page tone.
-function canvasFor(tone: ChromeTone): string {
-  return tone === 'light' ? '#F8FAFC' : '#0A0E14';
-}
 
 // ---------------------------------------------------------------------------
 // Left capsule
