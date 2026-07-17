@@ -270,7 +270,7 @@ export function TournamentsSection({
           }}
           className="active:opacity-60 transition-opacity"
         >
-          Full season ›
+          {t('player.tournaments.expand')}
         </button>
       )}
     </section>
