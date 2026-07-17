@@ -17,7 +17,7 @@
  * NO fade-on-idle. NO carousel dots at top. NO score eyebrow. Course chip in
  * the top-right is the ONLY score surface.
  */
-import React, { memo, useCallback, useMemo } from 'react';
+import React, { memo, useCallback } from 'react';
 import {
   ChevronLeft,
   Heart,
