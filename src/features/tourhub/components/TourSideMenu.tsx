@@ -39,13 +39,16 @@ export interface TourSideMenuProps {
   onSignOut: () => void;
 }
 
-const DESTINATIONS: { id: string; label: string; Icon: LucideIcon }[] = [
-  { id: 'overview',     label: 'Overview',     Icon: Compass },
-  { id: 'live',         label: 'Leaderboards', Icon: Trophy },
-  { id: 'schedule',     label: 'Schedule',     Icon: CalendarDays },
-  { id: 'players',      label: 'Players',      Icon: Users },
-  { id: 'leaderboards', label: 'Leaders',      Icon: BarChart3 },
-  { id: 'college',      label: 'College',      Icon: GraduationCap },
+// Constants table pattern: destination id is the compare key; labelKey resolves
+// to `tourhub.nav.<key>` at render. IDs remain untranslatable to keep
+// activeTab/onSelectTab comparisons enum-safe.
+const DESTINATIONS: { id: string; labelKey: string; Icon: LucideIcon }[] = [
+  { id: 'overview',     labelKey: 'nav.overview',     Icon: Compass },
+  { id: 'live',         labelKey: 'nav.leaderboards', Icon: Trophy },
+  { id: 'schedule',     labelKey: 'nav.schedule',     Icon: CalendarDays },
+  { id: 'players',      labelKey: 'nav.players',      Icon: Users },
+  { id: 'leaderboards', labelKey: 'nav.leaders',      Icon: BarChart3 },
+  { id: 'college',      labelKey: 'nav.college',      Icon: GraduationCap },
 ];
 
 
