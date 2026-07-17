@@ -210,6 +210,53 @@
       "roundEyebrow": "ROUND {{round}}",
       "eyebrowFallback": "SCORECARD",
       "courseFallback": "Scorecard"
+    },
+    "shell": {
+      "board": {
+        "eyebrow": "The Board",
+        "action": "Full leaderboard"
+      },
+      "leaderboard": {
+        "finalEyebrow": "Final Leaderboard",
+        "fullBoardAction": "Full board"
+      },
+      "teeTimes": {
+        "eyebrow": "Tee Times",
+        "allAction": "All times"
+      },
+      "field": {
+        "eyebrow": "The Field",
+        "playersSuffix": " players",
+        "headlinedBySep": " · headlined by ",
+        "firstTeeSep": " · first tee ",
+        "startsInSep": " · starts in ",
+        "daysSuffix_one": " day",
+        "daysSuffix_other": " days",
+        "emptyFallback": "The field and tee times will appear here closer to the start."
+      }
+    },
+    "hero": {
+      "chip": {
+        "majorStarts": "MAJOR · STARTS {{date}}",
+        "starts": "STARTS {{date}}"
+      },
+      "leaderLabel": "Leader",
+      "daysLabel": "Days",
+      "defendingLabel": "Defending",
+      "purseLabel": "Purse",
+      "tbdPlayer": "TBD",
+      "championFallback": "Champion"
+    },
+    "story": {
+      "eyebrow": "The Story",
+      "readMore": "Read more"
+    },
+    "moments": {
+      "eyebrow": "Moments",
+      "emptyBody": "Moments from this tournament will appear here as members share them.",
+      "shareCta": "Share a moment",
+      "allAction": "All moments",
+      "sheetTitle": "All Moments"
     }
   }
 }

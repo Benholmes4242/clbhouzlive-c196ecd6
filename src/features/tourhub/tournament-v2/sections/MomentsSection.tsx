@@ -5,6 +5,7 @@
  * Self-hides on empty.
  */
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SectionEyebrow } from './SectionEyebrow';
@@ -21,6 +22,7 @@ interface Props {
 }
 
 export function MomentsSection({ tournamentId, tourCode }: Props) {
+  const { t } = useTranslation('tourhub');
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const { data: moments, isLoading } = useEventMoments(tournamentId);
@@ -29,7 +31,7 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
   if (isLoading) {
     return (
       <>
-        <SectionEyebrow kicker="Moments" />
+        <SectionEyebrow kicker={t('tournament.moments.eyebrow')} />
         <div style={{ padding: '0 16px 8px', display: 'flex', gap: 12, fontFamily: FONT }}>
           {[0, 1, 2].map((i) => (
             <div key={i} style={{
@@ -48,7 +50,7 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
   if (list.length === 0) {
     return (
       <>
-        <SectionEyebrow kicker="Moments" />
+        <SectionEyebrow kicker={t('tournament.moments.eyebrow')} />
         <div style={{ padding: '0 16px 8px', fontFamily: FONT }}>
           <div style={{
             background: SURFACE, border: `0.5px solid ${HAIRLINE_INK_8}`,
@@ -59,7 +61,7 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
             <div style={{
               fontSize: 12.5, fontWeight: 600, color: INK_MUTE, lineHeight: 1.45,
             }}>
-              Moments from this tournament will appear here as members share them.
+              {t('tournament.moments.emptyBody')}
             </div>
             <button
               type="button"
@@ -72,7 +74,7 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
               }}
               className="active:opacity-80 transition-opacity"
             >
-              Share a moment
+              {t('tournament.moments.shareCta')}
             </button>
           </div>
         </div>
@@ -83,8 +85,8 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
   return (
     <>
       <SectionEyebrow
-        kicker="Moments"
-        actionLabel={list.length > 4 ? 'All moments' : undefined}
+        kicker={t('tournament.moments.eyebrow')}
+        actionLabel={list.length > 4 ? t('tournament.moments.allAction') : undefined}
         onAction={list.length > 4 ? () => setOpen(true) : undefined}
       />
       <div
@@ -102,7 +104,7 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
         <div style={{ background: SLATE_50, fontFamily: FONT, maxHeight: 'calc(90vh - 24px)', display: 'flex', flexDirection: 'column' }}>
           <div style={{ padding: '4px 16px 12px' }}>
             <div style={{ fontSize: 9, fontWeight: 800, color: INK, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-              All Moments
+              {t('tournament.moments.sheetTitle')}
             </div>
           </div>
           <div style={{ overflowY: 'auto', flex: 1, minHeight: 0, background: SURFACE, borderTop: `1px solid ${HAIRLINE_INK_8}`, borderBottom: `1px solid ${HAIRLINE_INK_8}` }}>

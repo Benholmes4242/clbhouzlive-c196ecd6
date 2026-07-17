@@ -21,6 +21,7 @@
  * component behind the same params.
  */
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { differenceInCalendarDays } from 'date-fns';
 import { formatWeekdayShort, formatTimeHm } from '@/i18n/format';
@@ -57,6 +58,7 @@ import {
 } from '../_shared/tokens';
 
 export function TournamentPage() {
+  const { t } = useTranslation('tourhub');
   const { tournamentId } = useParams<{ tournamentId: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -184,7 +186,7 @@ export function TournamentPage() {
             <>
               {hasBoard && (
                 <>
-                  <SectionEyebrow kicker="The Board" actionLabel="Full leaderboard" onAction={openFullBoard} />
+                  <SectionEyebrow kicker={t('tournament.shell.board.eyebrow')} actionLabel={t('tournament.shell.board.action')} onAction={openFullBoard} />
                   <MiniBoard tournamentId={tournamentId!} entries={leaderboardRows as any} />
                 </>
               )}
@@ -205,7 +207,7 @@ export function TournamentPage() {
 
           {pulse.state === 'completed' && hasBoard && (
             <>
-              <SectionEyebrow kicker="Final Leaderboard" actionLabel="Full board" onAction={openFullBoard} />
+              <SectionEyebrow kicker={t('tournament.shell.leaderboard.finalEyebrow')} actionLabel={t('tournament.shell.leaderboard.fullBoardAction')} onAction={openFullBoard} />
               <MiniBoard tournamentId={tournamentId!} entries={leaderboardRows as any} />
             </>
           )}
@@ -259,22 +261,26 @@ function UpcomingAct({
   teeGroups: import('./data/useTeeTimesAll').TeeGroup[];
   onOpenAllTimes: () => void;
 }) {
+  const { t } = useTranslation('tourhub');
   const hasField = field && field.fieldCount > 0;
   const hasTimes = teeGroups.length > 0;
   const firstTee = field?.firstTeeTime ?? teeGroups[0]?.teeTime ?? null;
+  const daysToStart = meta.start_date
+    ? Math.max(0, differenceInCalendarDays(new Date(meta.start_date), new Date()))
+    : 0;
 
   return (
     <>
       {hasField && (
         <>
-          <SectionEyebrow kicker="The Field" />
+          <SectionEyebrow kicker={t('tournament.shell.field.eyebrow')} />
           <div style={{ padding: '0 16px 8px' }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: INK, lineHeight: 1.55 }}>
               <span style={{ fontWeight: 800 }}>{field!.fieldCount}</span>
-              <span style={{ color: INK_MUTE }}> players</span>
+              <span style={{ color: INK_MUTE }}>{t('tournament.shell.field.playersSuffix')}</span>
               {field!.topPlayers.length > 0 && (
                 <>
-                  <span style={{ color: INK_MUTE }}> · headlined by </span>
+                  <span style={{ color: INK_MUTE }}>{t('tournament.shell.field.headlinedBySep')}</span>
                   <span style={{ fontWeight: 700 }}>
                     {field!.topPlayers.map((p) => p.name).join(', ')}
                   </span>
@@ -282,7 +288,7 @@ function UpcomingAct({
               )}
               {firstTee && (
                 <>
-                  <span style={{ color: INK_MUTE }}> · first tee </span>
+                  <span style={{ color: INK_MUTE }}>{t('tournament.shell.field.firstTeeSep')}</span>
                   <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
                     {`${formatWeekdayShort(new Date(firstTee))} ${formatTimeHm(new Date(firstTee))}`}
                   </span>
@@ -290,9 +296,9 @@ function UpcomingAct({
               )}
               {!firstTee && meta.start_date && (
                 <>
-                  <span style={{ color: INK_MUTE }}> · starts in </span>
+                  <span style={{ color: INK_MUTE }}>{t('tournament.shell.field.startsInSep')}</span>
                   <span style={{ fontWeight: 700 }}>
-                    {Math.max(0, differenceInCalendarDays(new Date(meta.start_date), new Date()))} days
+                    {daysToStart}{t('tournament.shell.field.daysSuffix', { count: daysToStart })}
                   </span>
                 </>
               )}
@@ -303,7 +309,7 @@ function UpcomingAct({
 
       {hasTimes && (
         <>
-          <SectionEyebrow kicker="Tee Times" actionLabel="All times" onAction={onOpenAllTimes} />
+          <SectionEyebrow kicker={t('tournament.shell.teeTimes.eyebrow')} actionLabel={t('tournament.shell.teeTimes.allAction')} onAction={onOpenAllTimes} />
           <TeeTimesFirstGroups groups={teeGroups} limit={5} />
         </>
       )}
@@ -314,7 +320,7 @@ function UpcomingAct({
       {!hasField && !hasTimes && (
         <div style={{ padding: '8px 16px 4px' }}>
           <div style={{ fontSize: 12.5, fontWeight: 600, color: INK_MUTE, lineHeight: 1.5 }}>
-            The field and tee times will appear here closer to the start.
+            {t('tournament.shell.field.emptyFallback')}
           </div>
         </div>
       )}

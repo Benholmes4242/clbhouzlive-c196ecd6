@@ -6,6 +6,7 @@
  * Purse, completed -> CHAMPION strip.
  */
 import { differenceInCalendarDays } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 import { formatWeekdayShort, formatMonthShort } from '@/i18n/format';
 import { Trophy } from 'lucide-react';
 import { PlayerAvatar } from '../../components/PlayerAvatar';
@@ -49,6 +50,7 @@ function fmtScoreSigned(n: number | null | undefined): string {
 }
 
 export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Props) {
+  const { t } = useTranslation('tourhub');
   const major = meta.name ? isAnyMajor(meta.name) : false;
   const startDate = meta.start_date ? new Date(meta.start_date) : null;
   const daysUntil = startDate ? Math.max(0, differenceInCalendarDays(startDate, new Date())) : null;
@@ -67,23 +69,28 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
 
   const venueLine = [
     meta.venue_name,
-    meta.venue_par ? `Par ${meta.venue_par}` : null,
+    // Reuses tourhub.board.meta.par so byte identity matches Turn A.
+    meta.venue_par ? t('board.meta.par', { par: meta.venue_par }) : null,
     meta.venue_yardage ? `${formatNumber(meta.venue_yardage)} yds` : null,
   ].filter(Boolean).join(' · ');
 
   const statusChip = (() => {
     if (state === 'live') {
       const round = meta.current_round ?? 1;
+      // Composed from tourhub.status.live ("LIVE") + " · R{round}" so
+      // the LIVE token itself reuses Turn A's key without a new mint.
       return {
-        label: `LIVE · R${round}`,
+        label: `${t('status.live')} · R${round}`,
         bg: 'rgba(16,185,129,0.20)', border: 'rgba(16,185,129,0.50)', color: '#6EE7B7',
       };
     }
     if (state === 'completed') {
-      return { label: 'FINAL', bg: WHITE_ALPHA_10, border: WHITE_ALPHA_30, color: '#fff' };
+      return { label: t('status.final'), bg: WHITE_ALPHA_10, border: WHITE_ALPHA_30, color: '#fff' };
     }
     if (startsDay) {
-      const label = major ? `MAJOR · STARTS ${startsDay}` : `STARTS ${startsDay}`;
+      const label = major
+        ? t('tournament.hero.chip.majorStarts', { date: startsDay })
+        : t('tournament.hero.chip.starts', { date: startsDay });
       return {
         label,
         bg: major ? 'rgba(255,184,0,0.16)' : WHITE_ALPHA_10,
@@ -157,7 +164,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
           {state === 'live' && leader && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <div style={{ fontSize: 8.5, fontWeight: 800, color: WHITE_ALPHA_65, letterSpacing: '0.14em', textTransform: 'uppercase', width: 54, flexShrink: 0 }}>
-                Leader
+                {t('tournament.hero.leaderLabel')}
               </div>
               <PlayerAvatar
                 playerId={leader.player?.id ?? ''}
@@ -168,7 +175,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
                 ringColor={LIGHT_HAIRLINE}
               />
               <div style={{ flex: 1, minWidth: 0, fontSize: 13.5, fontWeight: 800, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {leader.player?.full_name ?? 'TBD'}
+                {leader.player?.full_name ?? t('tournament.hero.tbdPlayer')}
               </div>
               <div style={{ fontSize: 24, fontWeight: 200, color: (leader.score ?? 0) < 0 ? getScoreColor(leader.score ?? 0, 'dark') : '#fff', fontVariantNumeric: 'tabular-nums' }}>
                 {fmtScoreSigned(leader.score)}
@@ -181,7 +188,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
             <div style={{ display: 'flex', alignItems: 'stretch', gap: 12 }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 8.5, fontWeight: 800, color: WHITE_ALPHA_65, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-                  Days
+                  {t('tournament.hero.daysLabel')}
                 </div>
                 <div style={{ fontSize: 26, fontWeight: 200, color: major ? GOLD : '#fff', fontVariantNumeric: 'tabular-nums', lineHeight: 1.05 }}>
                   {daysUntil != null ? daysUntil : '—'}
@@ -192,7 +199,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
                   <div style={{ width: 1, background: WHITE_ALPHA_10 }} />
                   <div style={{ flex: 1.4, minWidth: 0 }}>
                     <div style={{ fontSize: 8.5, fontWeight: 800, color: WHITE_ALPHA_65, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-                      Defending
+                      {t('tournament.hero.defendingLabel')}
                     </div>
                     <div style={{ fontSize: 12.5, fontWeight: 700, color: '#fff', marginTop: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {meta.defending_champion}
@@ -205,7 +212,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
                   <div style={{ width: 1, background: WHITE_ALPHA_10 }} />
                   <div style={{ flexShrink: 0, textAlign: 'right' }}>
                     <div style={{ fontSize: 8.5, fontWeight: 800, color: WHITE_ALPHA_65, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-                      Purse
+                      {t('tournament.hero.purseLabel')}
                     </div>
                     <div style={{ fontSize: 15, fontWeight: 800, color: '#fff', marginTop: 3, fontVariantNumeric: 'tabular-nums' }}>
                       {formatPurse(meta.purse)}
@@ -235,7 +242,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
                 ringColor={LIGHT_HAIRLINE}
               />
               <div style={{ flex: 1, minWidth: 0, fontSize: 13.5, fontWeight: 800, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {champion.player?.full_name ?? 'Champion'}
+                {champion.player?.full_name ?? t('tournament.hero.championFallback')}
               </div>
               <div style={{ fontSize: 13.5, fontWeight: 800, color: '#FCD34D', fontVariantNumeric: 'tabular-nums' }}>
                 {fmtScoreSigned(champion.score)}
