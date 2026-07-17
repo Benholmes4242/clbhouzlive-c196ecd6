@@ -437,6 +437,7 @@ function DefendingChampionRowDark({
   data: DefendingChampData;
   avatarUrl: string | string[] | null;
 }) {
+  const { t } = useTranslation('tourhub');
   return (
     <div
       style={{
