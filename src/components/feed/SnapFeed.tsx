@@ -14,6 +14,7 @@ import { trace } from '@/perf/trace';
 import { VideoEngine } from '@/video/VideoEngine';
 import { isPerfEnabled } from '@/perf/navTiming';
 import { useInviteSheet } from '@/hooks/useInviteSheet';
+import clbhouzLogo from '@/assets/clbhouz-logo.png';
 
 // Normalized owner-key compare — bare "X" ≡ "X:0", ":1"/":2" distinct.
 // Never use strict === here; strict compare caused false-null mismatch
@@ -747,85 +748,88 @@ export function SnapFeed({
       {!hasNextPage && posts.length > 0 && (
         <div
           data-index={posts.length}
-          className="w-full flex-shrink-0 flex flex-col items-center justify-center bg-background"
+          data-feed-ended
+          className="w-full flex-shrink-0 flex flex-col items-center justify-center"
           style={{
             height: '100dvh',
             scrollSnapAlign: 'start',
             scrollSnapStop: 'always',
-            padding: '0 24px',
+            padding: '0 44px',
+            background: '#000',
           }}
         >
           <div
             style={{
               width: '100%',
-              maxWidth: 340,
-              background: '#FFFFFF',
-              borderRadius: 16,
-              padding: '24px 20px',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: 12,
-              boxShadow: '0 10px 30px rgba(15,23,42,0.10)',
+              textAlign: 'center',
+              fontFamily: 'Geist, system-ui, sans-serif',
             }}
           >
+            <img
+              src={clbhouzLogo}
+              alt="clbhouz"
+              style={{ height: 46, width: 'auto', objectFit: 'contain' }}
+            />
             <div
               style={{
-                width: 44,
-                height: 44,
-                borderRadius: 15,
-                background: '#FFF7EC',
-                border: '0.5px solid #F7931E',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-              aria-hidden
-            >
-              <span style={{ fontSize: 22 }}>⛳</span>
-            </div>
-            <div
-              style={{
-                fontSize: 13,
-                fontWeight: 500,
-                color: '#0F172A',
-                textAlign: 'center',
+                marginTop: 16,
+                fontSize: 20,
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+                color: '#fff',
+                lineHeight: 1.2,
               }}
             >
               You're all caught up
             </div>
             <div
               style={{
-                fontSize: 11,
-                color: '#64748B',
-                textAlign: 'center',
-                lineHeight: 1.45,
+                marginTop: 6,
+                maxWidth: 260,
+                fontSize: 12.5,
+                fontWeight: 500,
+                color: 'rgba(255,255,255,0.5)',
+                lineHeight: 1.55,
               }}
             >
-              Your feed gets louder with more of your group on here.
+              New posts from your group will land here first.
             </div>
             <button
               type="button"
               onClick={() => openInviteSheet('feed_end')}
               style={{
-                marginTop: 4,
-                padding: '9px 18px',
+                marginTop: 20,
+                padding: '11px 24px',
                 borderRadius: 999,
-                background: '#F7931E',
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.18)',
+                backdropFilter: 'blur(6px)',
+                WebkitBackdropFilter: 'blur(6px)',
                 color: '#fff',
-                border: 'none',
-                fontSize: 12.5,
+                fontSize: 13,
                 fontWeight: 700,
                 cursor: 'pointer',
-                boxShadow: '0 4px 14px rgba(247,147,30,0.28)',
+                fontFamily: 'inherit',
               }}
             >
               Invite friends
             </button>
             <button
+              type="button"
               onClick={() => containerRef.current?.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="mt-1 text-xs font-semibold text-muted-foreground active:scale-[0.97] transition-all"
-              style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
+              style={{
+                marginTop: 12,
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: 12.5,
+                fontWeight: 600,
+                color: 'rgba(255,255,255,0.5)',
+                fontFamily: 'inherit',
+              }}
             >
               Back to top
             </button>

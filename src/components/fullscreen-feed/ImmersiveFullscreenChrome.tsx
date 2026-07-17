@@ -72,6 +72,8 @@ interface Props {
   golfCourse?: { id?: string | null; name?: string | null; courseCountry?: string | null } | null;
   readOnly?: boolean;
   onBeforeNavigate?: () => void;
+  /** When true, only the back chevron renders — the user is on the end-of-feed plate. */
+  feedEnded?: boolean;
 }
 
 export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome({
@@ -92,6 +94,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   golfCourse,
   readOnly = false,
   onBeforeNavigate,
+  feedEnded = false,
 }: Props) {
   const navigate = useNavigate();
   const carouselPositions = useClubhouseStore((s) => s.carouselPositions);
@@ -107,6 +110,38 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   const carouselSlide = carouselPositions.get(activeIndex) ?? 0;
   const mediaCount = activePost?.mediaItems?.length ?? 0;
 
+
+  if (feedEnded) {
+    return (
+      <div className="fixed inset-0" style={{ zIndex: 30, pointerEvents: 'none' }} data-immersive-chrome>
+        <div
+          style={{
+            position: 'fixed',
+            top: 0, left: 0, right: 0,
+            zIndex: Z.echo + 2,
+            pointerEvents: 'none',
+            paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 48px) + 8px)',
+            paddingLeft: 'max(14px, env(safe-area-inset-left, 0px))',
+            display: 'flex', alignItems: 'flex-start',
+          }}
+        >
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); onClose(); }}
+            aria-label="Back"
+            style={{
+              width: 44, height: 44, borderRadius: '50%', background: CHEVRON_BG,
+              border: 'none', display: 'inline-flex', alignItems: 'center',
+              justifyContent: 'center', color: '#fff', cursor: 'pointer',
+              pointerEvents: 'auto', padding: 0, flexShrink: 0,
+            }}
+          >
+            <ChevronLeft size={26} stroke="#fff" strokeWidth={2.5} style={{ display: 'block', marginLeft: -2 }} />
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (!activePost) return null;
 
