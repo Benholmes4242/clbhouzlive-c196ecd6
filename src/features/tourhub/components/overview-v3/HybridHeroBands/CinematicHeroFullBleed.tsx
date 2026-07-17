@@ -1161,10 +1161,10 @@ export function CinematicHeroFullBleed({
               }}
             >
               {courseStats.par != null && (
-                <CourseStat label="PAR" value={String(courseStats.par)} />
+                <CourseStat label={t('overview.courseStats.parLabel')} value={String(courseStats.par)} />
               )}
               {courseStats.yardage != null && (
-                <CourseStat label="YARDS" value={formatNumber(courseStats.yardage)} />
+                <CourseStat label={t('overview.cinematic.colYardsFull')} value={formatNumber(courseStats.yardage)} />
               )}
             </div>
           ) : null}
