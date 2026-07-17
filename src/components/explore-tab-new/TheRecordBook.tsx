@@ -265,10 +265,14 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
 function LedgerRow({
   row,
   rank,
+  banded,
+  isLast,
   onTap,
 }: {
   row: FeatRow;
   rank: number;
+  banded: boolean;
+  isLast: boolean;
   onTap: () => void;
 }) {
   const holder = formatHolderName(row.holder_name);
@@ -295,34 +299,20 @@ function LedgerRow({
       onClick={onTap}
       className="text-left active:opacity-80 transition-opacity"
       style={{
-        position: 'relative',
         display: 'flex',
         alignItems: 'center',
         gap: 8,
-        padding: '9px 16px',
+        padding: `10px ${PAGE_PAD}px`,
         width: '100%',
-        background: 'transparent',
+        background: banded ? BAND_BG : 'transparent',
         border: 'none',
+        borderTop: `0.5px solid ${HAIRLINE}`,
+        borderBottom: isLast ? `0.5px solid ${HAIRLINE}` : 'none',
         cursor: 'pointer',
         fontFamily: FONT,
         color: INK,
       }}
     >
-      {!isFirst ? (
-        <span
-          aria-hidden
-          style={{
-            position: 'absolute',
-            // Separator starts at the course-name text edge:
-            //   pad 16 + rank 12 + gap 8 + avatar 24 + gap 8 = 68
-            left: 68,
-            right: 16,
-            top: 0,
-            height: 0,
-            borderTop: `0.5px solid ${HAIRLINE}`,
-          }}
-        />
-      ) : null}
       {/* Rank */}
       <div
         style={{
@@ -337,6 +327,8 @@ function LedgerRow({
       >
         {rank}
       </div>
+
+
 
       {/* Avatar */}
       <div style={{ flexShrink: 0 }}>
