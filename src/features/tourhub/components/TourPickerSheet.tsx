@@ -156,6 +156,8 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
                   textTransform: 'uppercase',
                 }}
               >
+                {/* i18n deferred: proper noun (tour-collection brand name), same rule as PGA/LPGA. */}
+                {/* eslint-disable-next-line i18next/no-literal-string */}
                 The Majors
               </div>
               <div
