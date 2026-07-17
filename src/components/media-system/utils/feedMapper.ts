@@ -2,6 +2,12 @@ import { CLOUDFLARE_STREAM_SUBDOMAIN } from '@/config/streamConstants';
 import type { FeedPost, FeedRpcRow, MediaItem, ReviewData, CreatorRelation, FeedPostTag } from '../types/media';
 import { isPortraitAdmissible } from './mediaOrientation';
 
+// Matches ANY 32-hex substring in a URL. Cloudflare Stream UIDs are
+// 32-hex, but so are plenty of storage object IDs / UUIDs-without-dashes
+// on image URLs. NEVER consult this for image rows — see the type-gated
+// branch in mapRowToFeedPost below. Consulting it for images will assign
+// a bogus HLS manifest to a photo and downstream consumers (FeedCard etc.)
+// may treat manifest presence as a video signal.
 const UID_RE = /([0-9a-f]{32})/i;
 
 function buildHlsUrl(streamId: string): string {
@@ -38,9 +44,8 @@ export function mapRowToFeedPost(row: FeedRpcRow): FeedPost {
     type: isVideo ? 'video' : 'image',
     // Only ready videos get a manifest URL. Not-ready videos fall through to
     // the poster fallback in FeedSlide / consumers without a load attempt.
-    hlsUrl: isVideo
-      ? (videoReady && streamId ? buildHlsUrl(streamId) : undefined)
-      : (streamId ? buildHlsUrl(streamId) : undefined),
+    // IMAGE ROWS NEVER GET AN hlsUrl — see UID_RE comment above.
+    hlsUrl: isVideo && videoReady && streamId ? buildHlsUrl(streamId) : undefined,
     // mp4Url intentionally undefined: /downloads/default.mp4 404s (Cloudflare MP4
     // downloads not enabled). HLS is the always-present primary path.
     mp4Url: undefined,

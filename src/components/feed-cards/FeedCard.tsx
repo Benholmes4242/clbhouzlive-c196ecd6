@@ -91,8 +91,11 @@ export function FeedCard({
   const duration = formatDuration(row.duration_seconds);
 
 
+  // Type is truth; hlsUrl is a capability. A video with no manifest still
+  // renders as a video tile (poster path); an image must never be treated
+  // as a video just because a URL contained a 32-hex substring.
   const hlsUrl = feedPost.mediaItems[0]?.hlsUrl ?? null;
-  const isVideo = !!hlsUrl;
+  const isVideo = feedPost.mediaItems[0]?.type === 'video';
   const ownerKey = isVideo ? `${feedPost.id}:0` : null;
   const posterUrl = row.poster_url ?? feedPost.mediaItems[0]?.thumbnailUrl ?? null;
 
