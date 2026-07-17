@@ -4,6 +4,7 @@
  * Shows only when course is NOT played
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Compass, Bookmark } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCoursePersonalStatus } from '@/hooks/useCoursePersonalStatus';
@@ -21,6 +22,7 @@ export const PlanningSignals: React.FC<PlanningSignalsProps> = ({
   className,
 }) => {
   const { user } = useSupabaseSession();
+  const { t } = useTranslation('courses');
   const { status, setWantToPlay, isUpdating } = useCoursePersonalStatus(courseId);
 
   if (!user) return null;
@@ -37,7 +39,7 @@ export const PlanningSignals: React.FC<PlanningSignalsProps> = ({
         <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
           <Compass className="h-4 w-4 text-amber-600" />
         </div>
-        <h4 className="font-semibold text-foreground">Planning</h4>
+        <h4 className="font-semibold text-foreground">{t('phase5.planning.title')}</h4>
       </div>
 
       {/* Action button - Want to Play */}
@@ -62,7 +64,7 @@ export const PlanningSignals: React.FC<PlanningSignalsProps> = ({
             "font-medium",
             isWantToPlay ? "text-amber-700" : "text-gray-700"
           )}>
-            Add to bucket list
+            {t('phase5.planning.addBucketList')}
           </span>
         </div>
         {isWantToPlay && (
@@ -74,7 +76,7 @@ export const PlanningSignals: React.FC<PlanningSignalsProps> = ({
 
       {/* Subtle helper text */}
       <p className="text-xs text-gray-500 mt-3 text-center">
-        Only you can see your bucket list.
+        {t('phase5.planning.privateNote')}
       </p>
     </div>
   );

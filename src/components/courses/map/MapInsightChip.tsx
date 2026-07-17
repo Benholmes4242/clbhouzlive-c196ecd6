@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import '@/styles/hero-glass.css';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Sparkles } from 'lucide-react';
@@ -47,6 +48,7 @@ export const MapInsightChip: React.FC<MapInsightChipProps> = ({
   friendsCount = 0,
   isMapError = false,
 }) => {
+  const { t } = useTranslation('courses');
   const [isDismissed, setIsDismissed] = useState(false);
   const [currentInsightIndex, setCurrentInsightIndex] = useState(0);
   const idleTimerRef = useRef<number | null>(null);
@@ -294,7 +296,7 @@ export const MapInsightChip: React.FC<MapInsightChipProps> = ({
         className="inline-flex"
       >
         <div className="glass-card flex items-center gap-1.5 px-2.5 py-1.5 rounded-full">
-          <span className="text-[11px] text-white/90 leading-tight">Map unavailable — your journey progress is still safe.</span>
+          <span className="text-[11px] text-white/90 leading-tight">{t('map.unavailableSafe')}</span>
         </div>
       </motion.div>
     );

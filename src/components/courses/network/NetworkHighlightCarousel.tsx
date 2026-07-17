@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import type { NetworkCourseHighlight } from '@/hooks/useNetworkActivity';
 
@@ -23,6 +24,7 @@ export const NetworkHighlightCarousel: React.FC<NetworkHighlightCarouselProps> =
   className,
 }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation('courses');
 
   if (highlights.length === 0) return null;
 
@@ -33,13 +35,13 @@ export const NetworkHighlightCarousel: React.FC<NetworkHighlightCarouselProps> =
   const getBadgeLabel = (highlight: NetworkCourseHighlight): string | null => {
     switch (highlight.badge_type) {
       case 'played_by_friends':
-        return `Played by ${highlight.friends_played_count} friends`;
+        return t('network.badge.playedByFriends', { count: highlight.friends_played_count });
       case 'new_for_network':
-        return 'New for your network';
+        return t('network.badge.newForNetwork');
       case 'top_rated':
-        return 'Top rated';
+        return t('network.badge.topRated');
       case 'trending':
-        return 'Trending';
+        return t('network.badge.trending');
       default:
         return null;
     }
@@ -72,7 +74,7 @@ export const NetworkHighlightCarousel: React.FC<NetworkHighlightCarouselProps> =
                 height: '160px',
                 scrollSnapAlign: 'start',
               }}
-              aria-label={`View ${highlight.course_name}`}
+              aria-label={t('network.viewCourseA11y', { name: highlight.course_name })}
             >
               {/* Full-bleed course image */}
               {highlight.image_url ? (
@@ -84,7 +86,7 @@ export const NetworkHighlightCarousel: React.FC<NetworkHighlightCarouselProps> =
                 />
               ) : (
                 <div className="w-full h-full bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center">
-                  <span className="text-4xl">⛳</span>
+                  <span className="text-4xl">{t('network.emojiFlag')}</span>
                 </div>
               )}
 

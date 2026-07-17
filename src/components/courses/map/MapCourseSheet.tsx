@@ -3,6 +3,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import '@/styles/hero-glass.css';
 import { useNavigate } from 'react-router-dom';
 import { Globe, Star, Bookmark, Flag, Check, Loader2 } from 'lucide-react';
@@ -63,6 +64,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
   scope,
 }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation('courses');
   const queryClient = useQueryClient();
   const { user } = useSupabaseSession();
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -311,7 +313,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
                 >
                   <Star className="h-3.5 w-3.5 fill-current" style={{ color: '#F7931E' }} />
                   <span className="text-xs font-semibold" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-                    Your rating: {course.user_rating.toFixed(1)}
+                    {t('map.yourRating', { rating: course.user_rating.toFixed(1) })}
                   </span>
                 </div>
               )}
@@ -326,7 +328,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
                 }}
                 onClick={() => navigate(`/courses/${course.id}`)}
               >
-                View course
+                {t('map.viewCourse')}
               </button>
               
               {!course.user_has_rated && user && (
@@ -341,7 +343,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
                     onClick={() => navigate(`/courses/${course.id}/rate`)}
                   >
                     <Check className="h-4 w-4" />
-                    Mark Played
+                    {t('map.markPlayed')}
                   </button>
                   
                   <button

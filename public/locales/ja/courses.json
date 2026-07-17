@@ -181,7 +181,11 @@
     "dotSeparator": "·",
     "backA11y": "Go back",
     "resetViewA11y": "Reset map view",
-    "filterStatusA11y": "Filter courses by status"
+    "filterStatusA11y": "Filter courses by status",
+    "yourRating": "Your rating: {{rating}}",
+    "viewCourse": "View course",
+    "markPlayed": "Mark Played",
+    "unavailableSafe": "Map unavailable — your journey progress is still safe."
   },
   "userCourses": {
     "emptyRegion": "No courses found in the selected region.",
@@ -447,6 +451,51 @@
       "youvePlayed": "You've played {{played}}/{{total}}",
       "journeyLabel": "Your Top 100 Journey",
       "progressPlayed": "{{played}} of {{total}} played"
+    }
+  },
+  "network": {
+    "emojiFlag": "⛳",
+    "viewCourseA11y": "View {{name}}",
+    "badge": {
+      "playedByFriends_one": "Played by {{count}} friend",
+      "playedByFriends_other": "Played by {{count}} friends",
+      "newForNetwork": "New for your network",
+      "topRated": "Top rated",
+      "trending": "Trending"
+    },
+    "unseenReviewsTitle": "🔔 New review from your network",
+    "unseenReviewsBody": "<name>{{name}}</name> reviewed <course>{{course}}</course> · <rating>{{rating}}</rating>",
+    "unseenReviewsMore_one": " +{{count}} more",
+    "unseenReviewsMore_other": " +{{count}} more",
+    "viewArrow": "View →"
+  },
+  "phase5": {
+    "statusToggle": {
+      "signInPrompt": "Sign in to track this course",
+      "signIn": "Sign in",
+      "playedTitle": "You've played here",
+      "playedSub": "Tap to view or edit your review",
+      "playedBadge": "Played",
+      "notPlayedTitle": "Played here?",
+      "notPlayedSub": "Your rating helps golfers worldwide",
+      "rate": "Rate",
+      "onBucketList": "On your bucket list",
+      "addBucketList": "Add to bucket list",
+      "removedFromBucket": "Removed from bucket list",
+      "addedToBucket": "Added to bucket list",
+      "mapHint": "Every course you mark becomes part of your journey — view them anytime on your <mapLink>map</mapLink>."
+    },
+    "personalReview": {
+      "title": "Your Rating",
+      "playedOn": "Played on {{date}}",
+      "matchesConsensus": "Matches community consensus",
+      "aboveAvg": "{{diff}} above community avg",
+      "belowAvg": "{{diff}} below community avg"
+    },
+    "planning": {
+      "title": "Planning",
+      "addBucketList": "Add to bucket list",
+      "privateNote": "Only you can see your bucket list."
     }
   }
 }
