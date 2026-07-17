@@ -50,8 +50,12 @@ const i18nLiteralOptions = {
     ],
   },
   words: {
-    exclude: ["[0-9!-/:-@[-`{-~]+", "[A-Z_-]+"],
+    // Extra exclude: U+2039/U+203A single angle quotation marks used as
+    // decorative chevrons in row/action affordances (see EventInfoSection,
+    // SectionEyebrow, StorySection). Non-linguistic typographic glyphs.
+    exclude: ["[0-9!-/:-@[-`{-~]+", "[A-Z_-]+", "[\\u2039\\u203A]+"],
   },
+
 };
 
 // Wave 3b.iii — user-visible attribute guard for gated scopes.
