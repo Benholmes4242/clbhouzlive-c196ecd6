@@ -886,7 +886,7 @@ export function CinematicFrame({
                 border: '0.5px solid rgba(255,255,255,0.18)',
                 borderRadius: 999, padding: '5px 11px', alignSelf: 'flex-start',
               }}>
-                <span style={{ ...NUMERIC_STYLE, fontSize: 8.5, fontWeight: 800, letterSpacing: '0.16em', color: '#fff', textTransform: 'uppercase' }}>TEES OFF IN</span>
+                <span style={{ ...NUMERIC_STYLE, fontSize: 8.5, fontWeight: 800, letterSpacing: '0.16em', color: '#fff', textTransform: 'uppercase' }}>{t('overview.cinematic.teesOffIn')}</span>
                 <span style={{ ...NUMERIC_STYLE, fontSize: 12, fontWeight: 900, color: '#fff', letterSpacing: '-0.01em' }}>{countdownText}</span>
               </div>
             ) : (
