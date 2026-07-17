@@ -6,6 +6,7 @@
  * Purse, completed -> CHAMPION strip.
  */
 import { differenceInCalendarDays } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 import { formatWeekdayShort, formatMonthShort } from '@/i18n/format';
 import { Trophy } from 'lucide-react';
 import { PlayerAvatar } from '../../components/PlayerAvatar';
