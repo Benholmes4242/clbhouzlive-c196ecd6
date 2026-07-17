@@ -45,6 +45,7 @@ function PodiumCard({
   onClick: () => void;
   statLabel: string | null;
 }) {
+  const { t } = useTranslation('tourhub');
   const candidates = resolvePlayerAvatarCandidates({
     name: row.name,
     photoUrl: row.photoUrl,
