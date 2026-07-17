@@ -3,6 +3,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import '@/styles/hero-glass.css';
 import { useNavigate } from 'react-router-dom';
 import { Globe, Star, Bookmark, Flag, Check, Loader2 } from 'lucide-react';
