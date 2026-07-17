@@ -334,7 +334,7 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  FULL FIELD
+                  {t('overview.onTheCourse.fullFieldDivider')}
                 </div>
                 <div style={{ flex: 1, width: 1, background: '#E2E8F0' }} />
               </div>
