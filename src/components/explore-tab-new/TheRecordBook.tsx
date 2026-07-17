@@ -19,8 +19,6 @@ import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const INK = '#0F172A';
-const GOLD = '#FBBC2E';
-const PARCHMENT_GOLD = '#B8860B';
 const AMBER = '#F7931E';
 const UNDER_PAR = '#D2222D';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
@@ -291,7 +289,6 @@ function LedgerRow({
   const showToPar = par != null && !isStableford;
   const toParDisplay = showToPar ? toParText(par!) : '—';
   const toParColor = showToPar && par! < 0 ? UNDER_PAR : INK;
-  const isFirst = rank === 1;
 
   return (
     <button
@@ -320,7 +317,7 @@ function LedgerRow({
           flexShrink: 0,
           fontSize: 11,
           fontWeight: 600,
-          color: isFirst ? PARCHMENT_GOLD : FADED,
+          color: FADED,
           fontVariantNumeric: 'tabular-nums',
           textAlign: 'center',
         }}
@@ -338,7 +335,7 @@ function LedgerRow({
           alt={holder}
           fallback={initials(holder)}
           hairlineRing
-          ringColor={isFirst ? GOLD : AVATAR_RING_MUTED}
+          ringColor={AVATAR_RING_MUTED}
         />
       </div>
 
