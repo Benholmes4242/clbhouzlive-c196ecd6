@@ -124,6 +124,10 @@ export function FeatListRow({ row, tier, onTap, index = 0, mode = 'latest', best
     ? recordsValueColor
     : isTop ? AMBER : INK;
 
+  // Legendary tier (aces & albatrosses): champion adopts the exceptional gold
+  // treatment — champagne gradient + gold-edge border, shimmer rank/value.
+  const legendaryChampion = isLegendary && isTop;
+
   return (
     <button
       type="button"
@@ -136,10 +140,14 @@ export function FeatListRow({ row, tier, onTap, index = 0, mode = 'latest', best
         gap: 8,
         borderRadius: 12,
         padding: '10px 12px',
-        background: isTop ? 'linear-gradient(100deg, #fff, #fff6e8)' : '#fff',
-        border: isTop
-          ? '1px solid rgba(247,147,30,0.55)'
-          : '0.5px solid rgba(15,23,42,0.08)',
+        background: legendaryChampion
+          ? 'linear-gradient(100deg, #fff, #FFF6D8)'
+          : isTop ? 'linear-gradient(100deg, #fff, #fff6e8)' : '#fff',
+        border: legendaryChampion
+          ? '1px solid rgba(232,181,48,0.55)'
+          : isTop
+            ? '1px solid rgba(247,147,30,0.55)'
+            : '0.5px solid rgba(15,23,42,0.08)',
         marginBottom: 6,
         cursor: 'pointer',
         fontFamily: FONT,
