@@ -175,36 +175,39 @@ function SGBar({ label, value }: { label: string; value: number | null | undefin
 }
 
 export function StatsSheet({ open, onClose, playerStats, playerName }: StatsSheetProps) {
+  const { t } = useTranslation('tourhub');
+  const label = (key: keyof typeof LEADER_STAT_LABELS) => t(LEADER_STAT_LABELS[key].shortKey);
+
   // OVERVIEW
   const overview: Row[] = [];
-  const push = (label: string, v: string | null) => {
-    if (v !== null) overview.push({ label, value: v });
+  const push = (l: string, v: string | null) => {
+    if (v !== null) overview.push({ label: l, value: v });
   };
-  push('Events Played', fmtInt(playerStats.events_played));
-  push('Wins', fmtInt(playerStats.wins));
-  push('Top 10s', fmtInt(playerStats.top_10s));
-  push('Top 25s', fmtInt(playerStats.top_25s));
-  push('Cuts Made', fmtInt(playerStats.cuts_made));
-  push('Earnings', fmtMoney(playerStats.earnings));
-  push('Scoring Avg', fmtDecimal(playerStats.scoring_average, 2));
-  push('Birdies / Rd', fmtDecimal(playerStats.birdies_per_round, 2));
+  push(label('events_played'), fmtInt(playerStats.events_played));
+  push(label('wins'), fmtInt(playerStats.wins));
+  push(label('top_10'), fmtInt(playerStats.top_10s));
+  push(label('top_25'), fmtInt(playerStats.top_25s));
+  push(label('cuts_made'), fmtInt(playerStats.cuts_made));
+  push(label('earnings'), fmtMoney(playerStats.earnings));
+  push(label('scoring_avg'), fmtDecimal(playerStats.scoring_average, 2));
+  push(label('birdies_per_round'), fmtDecimal(playerStats.birdies_per_round, 2));
 
   // BALL STRIKING
   const ball: Row[] = [];
-  const pushBall = (label: string, v: string | null) => {
-    if (v !== null) ball.push({ label, value: v });
+  const pushBall = (l: string, v: string | null) => {
+    if (v !== null) ball.push({ label: l, value: v });
   };
-  pushBall('Driving Dist', fmtYards(playerStats.driving_distance));
-  pushBall('Driving Acc', fmtPct(playerStats.driving_accuracy));
-  pushBall('GIR', fmtPct(playerStats.greens_in_reg));
+  pushBall(label('drive_avg'), fmtYards(playerStats.driving_distance));
+  pushBall(label('drive_acc'), fmtPct(playerStats.driving_accuracy));
+  pushBall(label('gir_pct'), fmtPct(playerStats.greens_in_reg));
 
   // SHORT GAME
   const shortGame: Row[] = [];
-  const pushShort = (label: string, v: string | null) => {
-    if (v !== null) shortGame.push({ label, value: v });
+  const pushShort = (l: string, v: string | null) => {
+    if (v !== null) shortGame.push({ label: l, value: v });
   };
-  pushShort('Scrambling', fmtPct(playerStats.scrambling));
-  pushShort('Putting Avg', fmtDecimal(playerStats.putting_average, 3));
+  pushShort(label('scrambling'), fmtPct(playerStats.scrambling));
+  pushShort(label('putt_avg'), fmtDecimal(playerStats.putting_average, 3));
 
   const hasSG =
     playerStats.strokes_gained_total !== null ||
