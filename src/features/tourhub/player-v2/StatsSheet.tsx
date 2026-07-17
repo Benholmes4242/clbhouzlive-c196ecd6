@@ -252,7 +252,7 @@ export function StatsSheet({ open, onClose, playerStats, playerName }: StatsShee
               textTransform: 'uppercase',
             }}
           >
-            Season Statistics
+            {t('player.stats.eyebrow')}
           </p>
           <h2
             id="stats-sheet-title"
