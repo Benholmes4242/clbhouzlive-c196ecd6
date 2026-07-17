@@ -81,7 +81,7 @@ export function FeaturedGroupsRail({ tournamentId, live, tourCode }: Props) {
                 letterSpacing: '0.10em', textTransform: 'uppercase', marginBottom: 8,
               }}
             >
-              {thru != null ? `HOLE ${thru >= 18 ? 'F' : thru}` : 'ON COURSE'}
+              {thru != null ? t('tournament.featuredGroups.holeLabel', { hole: thru >= 18 ? 'F' : thru }) : t('tournament.featuredGroups.onCourse')}
             </div>
             {(g.players ?? []).slice(0, 3).map((p: any, pi: number) => {
               const name = p.full_name || p.name || '';
