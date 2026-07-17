@@ -328,7 +328,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
                 }}
                 onClick={() => navigate(`/courses/${course.id}`)}
               >
-                View course
+                {t('map.viewCourse')}
               </button>
               
               {!course.user_has_rated && user && (
