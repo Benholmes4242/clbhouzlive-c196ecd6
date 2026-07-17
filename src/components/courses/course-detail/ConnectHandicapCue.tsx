@@ -98,10 +98,10 @@ export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => 
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: INK, letterSpacing: '-0.01em' }}>
-            {benefit(name)}
+            {benefit}
           </div>
           <div style={{ fontSize: 11.5, fontWeight: 500, color: INK_MUTE, marginTop: 2 }}>
-            {sub(name)}
+            {sub}
           </div>
         </div>
         <span
@@ -149,10 +149,10 @@ export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => 
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 14, fontWeight: 700, color: INK, letterSpacing: '-0.01em' }}>
-              {benefit(name)}
+              {benefit}
             </div>
             <div style={{ fontSize: 12.5, fontWeight: 500, color: INK_MUTE, marginTop: 3, lineHeight: 1.4 }}>
-              {sub(name)}
+              {sub}
             </div>
           </div>
         </div>
