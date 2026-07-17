@@ -280,7 +280,7 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
             <button
               type="button"
               onClick={() => setExpanded(true)}
-              aria-label="Show all groups"
+              aria-label={t('overview.onTheCourse.showAllAria')}
               style={{
                 minWidth: 122,
                 flexShrink: 0,
@@ -298,9 +298,9 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
               }}
             >
               <span style={{ fontSize: 22, fontWeight: 300, color: '#64748B', lineHeight: 1 }}>›</span>
-              <span style={{ fontSize: 11.5, fontWeight: 800, color: V4.ink }}>All groups</span>
+              <span style={{ fontSize: 11.5, fontWeight: 800, color: V4.ink }}>{t('overview.onTheCourse.allGroups')}</span>
               <span style={{ fontSize: 10, fontWeight: 600, color: '#94A3B8' }}>
-                {moreCount != null ? `${moreCount} more` : 'full field'}
+                {moreCount != null ? t('overview.onTheCourse.moreCount', { count: moreCount }) : t('overview.onTheCourse.fullField')}
               </span>
             </button>
           )}
