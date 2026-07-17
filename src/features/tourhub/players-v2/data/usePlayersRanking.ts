@@ -15,6 +15,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import type { TourId } from '../../hooks/useOverviewData';
 
@@ -40,13 +41,14 @@ export interface RankingResult {
   rows: RankedRow[];
 }
 
-const STAT_LABEL: Record<TourId, string> = {
-  pga: 'FEDEX PTS',
-  euro: 'RTD PTS',
-  lpga: 'CME PTS',
-  pgad: 'POINTS',
-  liv: 'LIV PTS',
-  champ: '',
+/** Maps tour → i18n key under `players.statLabel.*`. `champ` has no stat label. */
+const STAT_LABEL_KEY: Record<TourId, string | null> = {
+  pga: 'players.statLabel.pga',
+  euro: 'players.statLabel.euro',
+  lpga: 'players.statLabel.lpga',
+  pgad: 'players.statLabel.pgad',
+  liv: 'players.statLabel.liv',
+  champ: null,
 };
 
 const DB_TOUR_NAME: Record<TourId, string[]> = {
