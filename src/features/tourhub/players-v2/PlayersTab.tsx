@@ -252,7 +252,7 @@ export function PlayersTab() {
                 ref={searchInputRef}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search players"
+                placeholder={t('players.search.placeholder')}
                 style={{
                   flex: 1,
                   border: 'none',
