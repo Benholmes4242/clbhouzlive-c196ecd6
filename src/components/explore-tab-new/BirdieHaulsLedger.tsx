@@ -74,20 +74,15 @@ export function BirdieHaulsLedger({ region, regionUpper, mode, onRowTap }: Props
         overline={overlineLabel}
         meta="View all"
         onMeta={() => setSheetOpen(true)}
+        paddingX={14}
       />
 
-      <div style={{ padding: '0 16px' }}>
-        <div
-          style={{
-            background: CARD_BG,
-            borderRadius: 16,
-            border: `0.5px solid ${HAIRLINE}`,
-            boxShadow: '0 1px 3px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.05)',
-            padding: '4px 0',
-          }}
-        >
+      <div>
+        <div>
           {display.map((row, i) => {
             const isFirst = i === 0;
+            const isLast = i === display.length - 1;
+            const banded = i === 1 || i === 3;
             const name = formatHolderName(row.holder_name);
             const count = birdieCount(row);
             const pct = Math.max(0.08, Math.min(1, count / maxCount));
@@ -102,11 +97,12 @@ export function BirdieHaulsLedger({ region, regionUpper, mode, onRowTap }: Props
                   display: 'flex',
                   flexDirection: 'column',
                   gap: 6,
-                  padding: '9px 16px',
+                  padding: '10px 14px',
                   width: '100%',
-                  background: 'transparent',
+                  background: banded ? BAND_BG : 'transparent',
                   border: 'none',
-                  borderTop: isFirst ? 'none' : `0.5px solid ${HAIRLINE}`,
+                  borderTop: `0.5px solid ${HAIRLINE}`,
+                  borderBottom: isLast ? `0.5px solid ${HAIRLINE}` : 'none',
                   cursor: 'pointer',
                   fontFamily: FONT,
                 }}
