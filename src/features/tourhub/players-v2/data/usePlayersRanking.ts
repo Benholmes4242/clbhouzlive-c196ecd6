@@ -87,8 +87,13 @@ async function resolvePgaSeasonId(): Promise<string | null> {
 }
 
 export function usePlayersRanking(tour: TourId) {
+  const { t, i18n } = useTranslation('tourhub');
+  const statLabelFor = (id: TourId): string | null => {
+    const key = STAT_LABEL_KEY[id];
+    return key ? t(key) : null;
+  };
   return useQuery<RankingResult>({
-    queryKey: ['players-v2', 'ranking', tour, currentSeasonYear()],
+    queryKey: ['players-v2', 'ranking', tour, currentSeasonYear(), i18n.language],
     staleTime: 5 * 60_000,
     gcTime: 30 * 60_000,
     queryFn: async () => {
