@@ -345,21 +345,21 @@ const AvatarCell: React.FC<{
           aria-label={`${activeUnreadCount} unread`}
           style={{
             position: 'absolute',
-            top: -6,
-            right: -6,
-            minWidth: 18,
-            height: 18,
-            padding: '0 5px',
+            top: -4,
+            right: -4,
+            minWidth: 15,
+            height: 15,
+            padding: '0 4px',
             borderRadius: 999,
             background: '#F7931E',
             color: '#FFFFFF',
             fontFamily: 'Geist, system-ui, sans-serif',
             fontWeight: 700,
-            fontSize: 10,
-            lineHeight: '18px',
+            fontSize: 9.5,
+            lineHeight: '15px',
             textAlign: 'center',
             fontVariantNumeric: 'tabular-nums',
-            border: '2px solid #FFFFFF',
+            border: '1.5px solid #FFFFFF',
             boxSizing: 'content-box',
           }}
         >
@@ -370,13 +370,13 @@ const AvatarCell: React.FC<{
           aria-label="Unread on another account"
           style={{
             position: 'absolute',
-            top: -6,
-            right: -6,
-            width: 8,
-            height: 8,
+            top: -3,
+            right: -3,
+            width: 7,
+            height: 7,
             borderRadius: 999,
             background: '#F7931E',
-            border: '2px solid #FFFFFF',
+            border: '1.5px solid #FFFFFF',
             boxSizing: 'content-box',
           }}
         />
