@@ -682,7 +682,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
       {/* Your review — pinned first */}
       {filteredMyReview && (
-        <div style={{ padding: '8px 16px 0', borderBottom: `0.5px solid ${INK_TINT_06}` }}>
+        <div style={{ padding: '8px 16px 16px', borderBottom: `0.5px solid ${INK_TINT_06}` }}>
           <ReviewBlockFlat
             onReportClick={() => setReportingReview(filteredMyReview)}
             review={transformReview(filteredMyReview, isJustSubmittedOrUpdated)}
@@ -699,7 +699,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           />
           {(() => {
             const response = reviewResponses?.find(r => r.review_id === filteredMyReview.id);
-            if (response) return <div style={{ paddingBottom: 12 }}><ResponseDisplay response={response} courseId={courseId} viewerClaim={businessClaim} /></div>;
+            if (response) return <ResponseDisplay response={response} courseId={courseId} viewerClaim={businessClaim} />;
             return null;
           })()}
         </div>
@@ -728,7 +728,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           const showVerifyPrompt = isClaimAdmin && !businessClaim?.isVerified && !response;
           return (
             <div key={review.id} style={{ borderBottom: `0.5px solid ${INK_TINT_06}` }}>
-              <div style={{ padding: '2px 16px 0' }}>
+              <div style={{ padding: '2px 16px 16px' }}>
                 <ReviewBlockFlat
                 onReportClick={() => setReportingReview(review)}
                   review={transformReview(review, isDeepLinked)}
