@@ -147,6 +147,7 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
               <Trophy size={15} strokeWidth={2.4} color={GOLD_DEEP} aria-hidden />
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
+              {/* i18n deferred: proper noun (tour-collection brand, same rule as PGA/LPGA). */}
               <div
                 style={{
                   fontSize: 13,
@@ -155,11 +156,8 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
                   letterSpacing: '0.06em',
                   textTransform: 'uppercase',
                 }}
-              >
-                {/* i18n deferred: proper noun (tour-collection brand name), same rule as PGA/LPGA. */}
-                {/* eslint-disable-next-line i18next/no-literal-string */}
-                The Majors
-              </div>
+                // eslint-disable-next-line i18next/no-literal-string -- proper noun defer, see comment above
+              >{'The Majors'}</div>
               <div
                 style={{
                   marginTop: 2,
