@@ -11,6 +11,7 @@
  */
 
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { SectionShell } from './SectionShell';
 import { V4 } from '../tokens';
 import { useRankingsBoards, type RankingsBoard, type RankingsRow } from '../data/useRankingsBoards';
