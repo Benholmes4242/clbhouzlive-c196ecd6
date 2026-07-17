@@ -1,6 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { HAIRLINE_INK_8, INK_LIGHT, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
+
 import {
   PRIMARY_REGION_LABELS,
   dbValueToRegionKey,
@@ -41,6 +43,7 @@ const sepStyle: React.CSSProperties = {
 };
 
 const CourseLocationPills: React.FC<CourseLocationPillsProps> = ({ course }) => {
+  const { t } = useTranslation('courses');
   const navigate = useNavigate();
 
   const primaryRegionKey: PrimaryRegionKey =
