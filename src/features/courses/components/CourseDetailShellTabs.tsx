@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { INK, INK_MUTE } from '@/features/courses/_shared/tokens';
 
 
@@ -6,15 +7,15 @@ type CourseDetailTab = 'about' | 'reviews' | 'media' | 'holes' | 'legends';
 
 interface TabDef {
   id: CourseDetailTab;
-  label: string;
+  labelKey: string;
 }
 
 const TABS: TabDef[] = [
-  { id: 'about', label: 'About' },
-  { id: 'reviews', label: 'Reviews' },
-  { id: 'media', label: 'Media' },
-  { id: 'holes', label: 'Holes' },
-  { id: 'legends', label: 'Champions' },
+  { id: 'about',   labelKey: 'courseDetail.tabs.about' },
+  { id: 'reviews', labelKey: 'courseDetail.tabs.reviews' },
+  { id: 'media',   labelKey: 'courseDetail.tabs.media' },
+  { id: 'holes',   labelKey: 'courseDetail.tabs.holes' },
+  { id: 'legends', labelKey: 'courseDetail.tabs.legends' },
 ];
 
 interface CourseDetailShellTabsProps {
