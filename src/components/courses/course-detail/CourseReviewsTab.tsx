@@ -644,7 +644,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                 <button
                   type="button"
                   onClick={() => setSearchOpen(true)}
-                  aria-label="Search reviews"
+                  aria-label={t('review.search.openA11y')}
                   style={{ width: 34, height: 34, borderRadius: 17, background: '#FFFFFF', border: `1px solid ${HAIRLINE_INK_10}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}
                 >
                   <Search className="h-4 w-4 text-muted-foreground" />
@@ -654,7 +654,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                   value={sortBy}
                   onChange={(v) => setSortBy(v as ReviewsSortBy)}
                   options={sortOptions.map((o) => ({ value: o.value as string, label: o.label }))}
-                  ariaLabel="Sort reviews"
+                  ariaLabel={t('review.sortA11y')}
                   icon={<ArrowUpDown className="h-3 w-3 mr-1" />}
                   triggerClassName="!h-[34px] !py-0 !px-3 !text-xs !font-semibold !rounded-full !bg-white !border !border-input !text-foreground hover:!bg-accent gap-0 [&>span]:text-foreground"
                 />
@@ -665,9 +665,10 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                     onClick={handleRateClick}
                     style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 6, height: 34, padding: '0 14px', borderRadius: 17, background: AMBER, color: '#FFFFFF', fontSize: 12, fontWeight: 800, border: 'none', cursor: 'pointer', flexShrink: 0 }}
                   >
-                    <Pencil className="w-3.5 h-3.5" /> Edit yours
+                    <Pencil className="w-3.5 h-3.5" /> {t('review.editYours')}
                   </button>
                 )}
+
               </div>
             )}
           </div>
