@@ -1043,13 +1043,13 @@ export function CinematicFrame({
             ? fieldStrength.totalPlayers
             : null;
           const viewTournamentLabel = fieldCount
-            ? `View tournament · ${fieldCount} in the field`
-            : 'View tournament';
+            ? t('overview.cinematic.viewTournamentWithField', { count: fieldCount })
+            : t('overview.cinematic.viewTournament');
           return (
           <button
             type="button"
             onClick={onCtaTap}
-            aria-label="View tournament"
+            aria-label={t('overview.cinematic.viewTournamentAria')}
             style={{
               position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 4,
               border: 'none', padding: 0, margin: 0, cursor: 'pointer',
