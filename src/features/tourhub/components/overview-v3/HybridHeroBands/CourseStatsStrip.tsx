@@ -151,7 +151,7 @@ export function CourseStatsStrip({
               marginTop: 2,
             }}
           >
-            PAR
+            {t('overview.courseStats.parLabel')}
           </div>
         </div>
       )}
