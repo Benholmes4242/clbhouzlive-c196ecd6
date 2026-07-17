@@ -72,6 +72,8 @@ interface Props {
   golfCourse?: { id?: string | null; name?: string | null; courseCountry?: string | null } | null;
   readOnly?: boolean;
   onBeforeNavigate?: () => void;
+  /** When true, only the back chevron renders — the user is on the end-of-feed plate. */
+  feedEnded?: boolean;
 }
 
 export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome({
