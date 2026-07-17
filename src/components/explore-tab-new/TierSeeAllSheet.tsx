@@ -301,8 +301,8 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
                 }}
               >
                 {([
-                  { v: 'aces', label: 'ACES', color: SC_ACE },
-                  { v: 'albatrosses', label: 'ALBATROSSES', color: SC_ALBATROSS },
+                  { v: 'aces', label: 'ACES' },
+                  { v: 'albatrosses', label: 'ALBATROSSES' },
                 ] as const).map((o) => {
                   const active = metric === o.v;
                   return (
@@ -314,19 +314,25 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
                         padding: '4px 10px',
                         borderRadius: 999,
                         background: active ? '#FFFFFF' : 'transparent',
-                        color: active ? o.color : 'rgba(15,23,42,0.55)',
                         border: 'none',
-                        fontFamily: FONT,
-                        fontSize: 9.5,
-                        fontWeight: 700,
                         cursor: 'pointer',
-                        letterSpacing: '0.08em',
-                        whiteSpace: 'nowrap',
                         boxShadow: active ? '0 1px 4px rgba(15,23,42,0.14)' : 'none',
                         transition: 'all .15s',
+                        fontFamily: FONT,
                       }}
                     >
-                      {o.label}
+                      <span
+                        className={active ? 'clbhouz-gold-shimmer-light' : undefined}
+                        style={{
+                          fontSize: 9.5,
+                          fontWeight: 700,
+                          letterSpacing: '0.08em',
+                          whiteSpace: 'nowrap',
+                          ...(active ? {} : { color: 'rgba(15,23,42,0.55)' }),
+                        }}
+                      >
+                        {o.label}
+                      </span>
                     </button>
                   );
                 })}
