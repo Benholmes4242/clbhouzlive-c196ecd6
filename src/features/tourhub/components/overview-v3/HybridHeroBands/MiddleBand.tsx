@@ -66,7 +66,7 @@ export function MiddleBand({
 
   if (state.kind === 'results') {
     if (state.variant === 'cancelled') {
-      return <CancelledStrip reason={cancelReason || 'No play — tournament cancelled.'} />;
+      return <CancelledStrip reason={cancelReason || t('overview.middleBand.cancelledDefault')} />;
     }
     if (state.variant === 'awaiting-playoff' && tiedLeaders) {
       return <PlayoffStrip count={tiedLeaders.count} score={tiedLeaders.score} />;
