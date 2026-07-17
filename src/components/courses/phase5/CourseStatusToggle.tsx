@@ -93,10 +93,10 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 15, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.01em' }}>
-              You've played here
+              {t('phase5.statusToggle.playedTitle')}
             </div>
             <div style={{ fontSize: 12.5, color: '#64748B', marginTop: 2 }}>
-              Tap to view or edit your review
+              {t('phase5.statusToggle.playedSub')}
             </div>
           </div>
           <span style={{
