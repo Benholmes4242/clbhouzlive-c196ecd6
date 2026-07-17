@@ -74,6 +74,8 @@ export function TourSelectionProvider({ children }: { children: ReactNode }) {
   const [selectionNonce, setSelectionNonce] = useState(0);
   const [viewingTourSlug, setViewingTourSlugState] = useState<string | null>(null);
   const [viewingTournamentId, setViewingTournamentIdState] = useState<string | null>(null);
+  const [viewingIsLive, setViewingIsLiveState] = useState<boolean>(false);
+
 
   // Guards for the land-time override — runs at most once per session, and
   // never after the user has manually switched tours.
