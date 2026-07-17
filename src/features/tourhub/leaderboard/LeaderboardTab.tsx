@@ -431,11 +431,11 @@ export function LeaderboardTab() {
           textTransform: 'uppercase',
         }}
       >
-        <div style={{ width: 52, flexShrink: 0 }}>POS</div>
-        <div style={{ flex: 1, minWidth: 0 }}>PLAYER</div>
-        <div style={{ width: 44, flexShrink: 0, textAlign: 'center' }}>TOT</div>
-        <div style={{ width: 44, flexShrink: 0, textAlign: 'center' }}>THRU</div>
-        <div style={{ width: 44, flexShrink: 0, textAlign: 'center' }}>TODAY</div>
+        <div style={{ width: 52, flexShrink: 0, whiteSpace: 'nowrap' }}>{t('board.columns.pos')}</div>
+        <div style={{ flex: 1, minWidth: 0, whiteSpace: 'nowrap' }}>{t('board.columns.player')}</div>
+        <div style={{ width: 44, flexShrink: 0, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('board.columns.tot')}</div>
+        <div style={{ width: 44, flexShrink: 0, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('board.columns.thru')}</div>
+        <div style={{ width: 44, flexShrink: 0, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('board.columns.today')}</div>
       </div>
 
       {/* BOARD */}
@@ -462,7 +462,7 @@ export function LeaderboardTab() {
             if (!row.player?.id) return;
             setSheetTarget({
               playerId: row.player.id,
-              playerName: row.player.full_name || 'Unknown',
+              playerName: row.player.full_name || t('board.unknownPlayer'),
               countryCode: row.player.country_code ?? row.player.country ?? null,
               position: row.position,
               positionTied: row.position_tied ?? false,
