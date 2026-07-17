@@ -19,6 +19,7 @@
  *   - `isAutoplayActive` — activeIndices.has(flatIndex).
  */
 import { useRef } from 'react';
+import { Heart } from 'lucide-react';
 import { FormatBadge } from '@/features/watch-v2/components/FormatBadge';
 import { formatCountShort as formatCount } from '@/i18n/format';
 import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
@@ -218,12 +219,40 @@ export function FeedCard({
           fontSize: 11,
           color: '#64748B',
           marginTop: 2,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+          minWidth: 0,
         }}
       >
-        {row.creator_username ? `@${row.creator_username}` : ''}
-        {row.like_count > 0
-          ? ` \u00B7 ${formatCount(row.like_count)} ${row.like_count === 1 ? 'like' : 'likes'}`
-          : ''}
+        {row.creator_username ? (
+          <span
+            style={{
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              minWidth: 0,
+            }}
+          >
+            @{row.creator_username}
+          </span>
+        ) : null}
+        {row.like_count > 0 && (
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 3,
+              flexShrink: 0,
+            }}
+          >
+            <Heart
+              style={{ width: 12, height: 12, color: '#F7931E', fill: '#F7931E' }}
+              strokeWidth={1.8}
+            />
+            {formatCount(row.like_count)}
+          </span>
+        )}
       </div>
     </Pressable>
   );
