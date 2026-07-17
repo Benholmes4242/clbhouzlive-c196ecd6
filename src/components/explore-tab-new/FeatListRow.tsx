@@ -67,6 +67,7 @@ export function FeatListRow({ row, tier, onTap, index = 0, mode = 'latest', best
   const isTop = rank === 1;
   const isRecordsRow = tier === 'records';
   const isBirdieHauls = tier === 'birdie_hauls';
+  const isLegendary = tier === 'legendary';
   const isStableford = row.category === 'best_stableford_all_time';
   const d = isRecordsRow ? rowToPar(row) : null;
   const showToParPrimary = isRecordsRow && d != null && !isStableford;
