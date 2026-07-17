@@ -179,7 +179,7 @@ export function LeadersTab() {
               textAlign: 'center',
             }}
           >
-            Season boards {'\u00B7'} live dot = on the course right now
+            {t('leaders.footer')}
           </div>
         </div>
       )}
