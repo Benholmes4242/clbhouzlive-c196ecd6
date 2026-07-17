@@ -15,8 +15,26 @@ import { isMedianApp, isMedianBridgeReady, getMedianPlatform } from './isMedianA
 export function openExternalUrl(rawUrl: string): void {
   if (!rawUrl) return;
 
-  // Normalise: ensure protocol so we never feed a bare host to a browser.
-  const url = /^https?:\/\//i.test(rawUrl) ? rawUrl : `https://${rawUrl}`;
+  // Contract-violation guard: if the input carries a non-http(s) scheme
+  // (e.g. maps://, tel:, mailto:, whatsapp://, itms-apps://), do NOT
+  // prefix https:// — that silently mangles the URL. Warn loudly, pass
+  // the URL through to a best-effort window.open, and return. Bare hosts
+  // (no scheme at all) still get the https prefix, preserving today's
+  // behaviour for the legitimate https-only callers.
+  const hasScheme = /^[a-z][a-z0-9+.-]*:/i.test(rawUrl);
+  const isHttp = /^https?:\/\//i.test(rawUrl);
+  if (hasScheme && !isHttp) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      '[openExternalUrl] Non-http(s) scheme passed to https-only helper; ' +
+        'route custom schemes through their own path instead. url=',
+      rawUrl,
+    );
+    try { window.open(rawUrl, '_blank', 'noopener,noreferrer'); } catch (_) { /* no-op */ }
+    return;
+  }
+
+  const url = isHttp ? rawUrl : `https://${rawUrl}`;
 
   // Web / preview: plain new-tab open is correct and not a trap.
   if (!isMedianApp()) {
