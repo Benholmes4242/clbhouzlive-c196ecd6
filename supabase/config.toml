@@ -184,8 +184,6 @@ verify_jwt = false
 verify_jwt = false
 
 
-[functions.backfill-scorecards]
-verify_jwt = false
 
 [functions.select-review-of-week]
 verify_jwt = false
@@ -227,8 +225,6 @@ verify_jwt = true
 [functions.send-course-claim-result-email]
 verify_jwt = false
 
-[functions.backfill-2025-leaderboards]
-verify_jwt = false
 
 [functions.send-business-invite]
 verify_jwt = true
