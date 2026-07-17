@@ -1,0 +1,40 @@
+{
+  "status": {
+    "live": "LIVE",
+    "upcoming": "DEMNÄCHST",
+    "final": "BEENDET",
+    "results": "ERGEBNISSE",
+    "noEvent": "KEIN TURNIER"
+  },
+  "pill": {
+    "updated": "Aktualisiert {{time}}",
+    "tourEyebrow": "Tour",
+    "majorEyebrow": "Major"
+  },
+  "picker": {
+    "eyebrow": "TOUR WECHSELN",
+    "title": "Tour auswählen",
+    "noEventsThisWeek": "Diese Woche keine Turniere",
+    "openMenuAria": "Menü öffnen",
+    "switchTourAria": "Tour wechseln",
+    "switchTourCurrentAria": "Tour wechseln \u2014 aktuell {{label}}"
+  },
+  "nav": {
+    "group": {
+      "tour": "Tour",
+      "account": "Konto"
+    },
+    "overview": "Übersicht",
+    "leaderboards": "Leaderboards",
+    "schedule": "Spielplan",
+    "players": "Spieler",
+    "leaders": "Statistiken",
+    "college": "College",
+    "settings": "Einstellungen",
+    "profile": "Profil",
+    "signOut": "Abmelden"
+  },
+  "section": {
+    "retryAria": "{{section}} erneut laden"
+  }
+}
