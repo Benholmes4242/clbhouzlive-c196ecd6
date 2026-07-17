@@ -92,12 +92,13 @@ function StatCard({
           ringColor={LIGHT_HAIRLINE}
         />
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 13, fontWeight: 800, color: V4.ink, letterSpacing: '-0.01em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: V4.ink, letterSpacing: '-0.005em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {leader.playerName}
           </div>
-          <div style={{ fontSize: 10, fontWeight: 600, color: V4.inkFaint, letterSpacing: '0.02em', marginTop: 1 }}>
+          <div style={{ fontSize: 11, fontWeight: 500, color: V4.inkFaint, letterSpacing: '0.02em', marginTop: 1 }}>
             {category.unit}
           </div>
+
         </div>
         <div style={{ fontSize: 21, fontWeight: 200, color: V4.ink, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em', lineHeight: 1, flexShrink: 0 }}>
           {category.format(leader.value)}
