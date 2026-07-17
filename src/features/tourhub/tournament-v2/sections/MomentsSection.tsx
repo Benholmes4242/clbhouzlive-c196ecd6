@@ -61,7 +61,7 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
             <div style={{
               fontSize: 12.5, fontWeight: 600, color: INK_MUTE, lineHeight: 1.45,
             }}>
-              Moments from this tournament will appear here as members share them.
+              {t('tournament.moments.emptyBody')}
             </div>
             <button
               type="button"
