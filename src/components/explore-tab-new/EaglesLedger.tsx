@@ -188,7 +188,7 @@ export function EaglesLedger({ region, regionUpper, mode, onRowTap, onLeaderTap 
                     <div
                       style={{
                         marginLeft: 34,
-                        marginRight: 16,
+                        marginRight: 14,
                         height: 3,
                         borderRadius: 999,
                         background: BAR_TRACK,
