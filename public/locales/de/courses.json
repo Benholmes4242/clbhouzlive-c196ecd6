@@ -42,7 +42,32 @@
     "rounds_one": "{{formattedCount}} round",
     "rounds_other": "{{formattedCount}} rounds",
     "players_one": "{{formattedCount}} player",
-    "players_other": "{{formattedCount}} players"
+    "players_other": "{{formattedCount}} players",
+    "allHolesKicker": "ALL HOLES",
+    "sortByHole": "By hole",
+    "sortByDifficulty": "By difficulty",
+    "errorLoading": "Couldn't load hole analysis.",
+    "credibilityKicker": "OFFICIAL HOLE DATA",
+    "credibilitySuffix": " · Official WHS · Gross scoring",
+    "hardestTitle": "Hardest",
+    "easiestTitle": "Easiest",
+    "playsToInline": "Plays to {{playsTo}}",
+    "parAndSi": "Par {{par}} · SI {{si}}",
+    "empty": {
+      "eyebrow": "Official hole data",
+      "title": "Hole insights are coming",
+      "body": "When global golfers holding official WHS handicaps log rounds with hole scores at <1>{{courseName}}</1>, we'll break down every hole — average score, hardest and easiest, and the full birdie-to-double spread.",
+      "thisCourse": "this course"
+    },
+    "scoringKey": {
+      "title": "Scoring key",
+      "ace": "Ace",
+      "albatross": "Albatross",
+      "eagle": "Eagle",
+      "birdie": "Birdie",
+      "bogey": "Bogey",
+      "doublePlus": "Dbl+"
+    }
   },
   "scorecard": {
     "syncingTitle": "Scorecard on the way",

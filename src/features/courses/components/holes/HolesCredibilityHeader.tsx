@@ -1,8 +1,10 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ShieldCheck } from 'lucide-react';
 import { FONT, SC_ACCENT } from './_constants';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { formatNumber } from '@/i18n/format';
+
 
 
 interface Props {
@@ -10,11 +12,12 @@ interface Props {
 }
 
 export const HolesCredibilityHeader: React.FC<Props> = ({ totalRounds }) => {
+  const { t } = useTranslation(['courses']);
   return (
     <div style={{ padding: '16px 16px', fontFamily: FONT }}>
       <SectionHeader
         role="section"
-        kicker="OFFICIAL HOLE DATA"
+        kicker={t('courses:holes.credibilityKicker')}
         accent={SC_ACCENT}
       />
       <div
@@ -35,10 +38,9 @@ export const HolesCredibilityHeader: React.FC<Props> = ({ totalRounds }) => {
         <ShieldCheck size={13} strokeWidth={2.2} />
         <span>
           <span style={{ fontWeight: 800 }}>
-            {formatNumber(totalRounds)} round{totalRounds === 1 ? '' : 's'}
+            {t('courses:holes.rounds', { count: totalRounds, formattedCount: formatNumber(totalRounds) })}
           </span>
-
-          {' \u00B7 Official WHS \u00B7 Gross scoring'}
+          {t('courses:holes.credibilitySuffix')}
         </span>
       </div>
     </div>

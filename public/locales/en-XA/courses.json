@@ -42,7 +42,32 @@
     "rounds_one": "[~~{{formattedCount}} řőúñđ~~]",
     "rounds_other": "[~~{{formattedCount}} řőúñđš~~]",
     "players_one": "[~~{{formattedCount}} ƥļáýéř~~]",
-    "players_other": "[~~{{formattedCount}} ƥļáýéřš~~]"
+    "players_other": "[~~{{formattedCount}} ƥļáýéřš~~]",
+    "allHolesKicker": "[~~ÁĻĻ ĤŐĻÉŠ~~]",
+    "sortByHole": "[~~Ɓý ĥőļé~~]",
+    "sortByDifficulty": "[~~Ɓý đíƒƒíĉúļţý~~]",
+    "errorLoading": "[~~Ĉőúļđñ'ţ ļőáđ ĥőļé áñáļýšíš.~~]",
+    "credibilityKicker": "[~~ŐƑƑÍĈÍÁĻ ĤŐĻÉ ĐÁŢÁ~~]",
+    "credibilitySuffix": "[~~ · Őƒƒíĉíáļ ŴĤŠ · Ĝřőšš šĉőříñĝ~~]",
+    "hardestTitle": "[~~Ĥářđéšţ~~]",
+    "easiestTitle": "[~~Éášíéšţ~~]",
+    "playsToInline": "[~~Ƥļáýš ţő {{playsTo}}~~]",
+    "parAndSi": "[~~Ƥář {{par}} · ŠÍ {{si}}~~]",
+    "empty": {
+      "eyebrow": "[~~Őƒƒíĉíáļ ĥőļé đáţá~~]",
+      "title": "[~~Ĥőļé íñšíĝĥţš ářé ĉőɱíñĝ~~]",
+      "body": "[~~Ŵĥéñ ĝļőƀáļ ĝőļƒéřš ĥőļđíñĝ őƒƒíĉíáļ ŴĤŠ ĥáñđíĉáƥš ļőĝ řőúñđš ŵíţĥ ĥőļé šĉőřéš áţ <1>{{courseName}}</1>, we'll break down every hole — average score, hardest and easiest, and the full birdie-to-double spread.~~]",
+      "thisCourse": "[~~ţĥíš ĉőúřšé~~]"
+    },
+    "scoringKey": {
+      "title": "[~~Šĉőříñĝ ǩéý~~]",
+      "ace": "[~~Áĉé~~]",
+      "albatross": "[~~Áļƀáţřőšš~~]",
+      "eagle": "[~~Éáĝļé~~]",
+      "birdie": "[~~Ɓířđíé~~]",
+      "bogey": "[~~Ɓőĝéý~~]",
+      "doublePlus": "[~~Đƀļ+~~]"
+    }
   },
   "scorecard": {
     "syncingTitle": "[~~Šĉőřéĉářđ őñ ţĥé ŵáý~~]",
@@ -182,10 +207,10 @@
     "backA11y": "[~~Ĝő ƀáĉǩ~~]",
     "resetViewA11y": "[~~Řéšéţ ɱáƥ ṽíéŵ~~]",
     "filterStatusA11y": "[~~Ƒíļţéř ĉőúřšéš ƀý šţáţúš~~]",
-    "yourRating": "⟦Ýóúr rátíñg: {{rating}}·••⟧",
-    "viewCourse": "⟦Víéw çóúršé·••⟧",
-    "markPlayed": "⟦Márk Pláýéd·••⟧",
-    "unavailableSafe": "⟦Máp úñáváíláblé — ýóúr jóúrñéý prógréšš íš štíll šáfé.·••⟧"
+    "yourRating": "[~~Ýőúř řáţíñĝ: {{rating}}~~]",
+    "viewCourse": "[~~Ṽíéŵ ĉőúřšé~~]",
+    "markPlayed": "[~~Ṁářǩ Ƥļáýéđ~~]",
+    "unavailableSafe": "[~~Ṁáƥ úñáṽáíļáƀļé — ýőúř ĵőúřñéý ƥřőĝřéšš íš šţíļļ šáƒé.~~]"
   },
   "userCourses": {
     "emptyRegion": "[~~Ñő ĉőúřšéš ƒőúñđ íñ ţĥé šéļéĉţéđ řéĝíőñ.~~]",
@@ -257,16 +282,16 @@
     "reportA11y": "[~~Řéƥőřţ řéṽíéŵ~~]",
     "sort": {
       "recent": "[~~Ṁőšţ řéĉéñţ~~]",
-      "highest": "[~~Ĥíĝĥéšţ řáţéð~~]",
+      "highest": "[~~Ĥíĝĥéšţ řáţéđ~~]",
       "helpful": "[~~Ṁőšţ ĥéļƥƒúļ~~]"
     },
     "emptyGuide": {
       "condition": {
-        "title": "[~~Ĉőúřšé ĉőñðíţíőñ~~]",
-        "sub": "[~~Ġřééñš, ƒáířŵáýš, ƀúñķéřš, řőúĝĥ~~]"
+        "title": "[~~Ĉőúřšé ĉőñđíţíőñ~~]",
+        "sub": "[~~Ĝřééñš, ƒáířŵáýš, ƀúñǩéřš, řőúĝĥ~~]"
       },
       "layout": {
-        "title": "[~~Ļáýőúţ & ðéšíĝñ~~]",
+        "title": "[~~Ļáýőúţ & đéšíĝñ~~]",
         "sub": "[~~Ĉĥáļļéñĝé, ṽáříéţý, šĉéñéřý, řőúţíñĝ~~]"
       },
       "facilities": {
@@ -287,7 +312,7 @@
     },
     "empty": {
       "title": "[~~Ñő řéṽíéŵš ýéţ~~]",
-      "body": "[~~Ɓé ţĥé ƒířšţ ţő šĥářé ýőúř éxƥéříéñĉé áţ {{courseName}}.~~]",
+      "body": "[~~Ɓé ţĥé ƒířšţ ţő šĥářé ýőúř éẋƥéříéñĉé áţ {{courseName}}.~~]",
       "cta": "[~~Ŵříţé ţĥé ƒířšţ řéṽíéŵ~~]",
       "kicker": "[~~ŴĤÁŢ ŢŐ ÍÑĈĻÚĐÉ~~]"
     },
@@ -306,9 +331,9 @@
     },
     "endMessage_one": "[~~Ýőú'ṽé šééñ áļļ {{count}} řéṽíéŵ.~~]",
     "endMessage_other": "[~~Ýőú'ṽé šééñ áļļ {{count}} řéṽíéŵš.~~]",
-    "shareExperience": "[~~Šĥářé ýőúř éxƥéříéñĉé~~]",
+    "shareExperience": "[~~Šĥářé ýőúř éẋƥéříéñĉé~~]",
     "toast": {
-      "signInRequired": "[~~Šíĝñ íñ řéqúířéđ~~]",
+      "signInRequired": "[~~Šíĝñ íñ řéʠúířéđ~~]",
       "voteBody": "[~~Ƥļéášé šíĝñ íñ ţő ṽőţé őñ řéṽíéŵš~~]",
       "rateBody": "[~~Ƥļéášé šíĝñ íñ ţő řáţé ĉőúřšéš~~]"
     }
@@ -322,7 +347,7 @@
       },
       "underReview": {
         "title": "[~~Ĉļáíɱ úñđéř řéṽíéŵ~~]",
-        "body": "[~~Á ƀúšíñéšš ĥáš řéqúéšţéđ ţő ɱáñáĝé ţĥíš ĉőúřšé. Ṽéříƒíĉáţíőñ íš íñ ƥřőĝřéšš.~~]"
+        "body": "[~~Á ƀúšíñéšš ĥáš řéʠúéšţéđ ţő ɱáñáĝé ţĥíš ĉőúřšé. Ṽéříƒíĉáţíőñ íš íñ ƥřőĝřéšš.~~]"
       },
       "profileLink": {
         "manages": "[~~Ṁáñáĝéš ţĥíš ĉőúřšé~~]",
@@ -335,7 +360,7 @@
         "reviewBody": "[~~Ĉļáíɱ ţĥíš ĉőúřšé ƒőř ýőúř ĝőļƒ ĉļúƀ ƥřőƒíļé. Ŵé ŵíļļ řéṽíéŵ íţ ƀéƒőřé íţ ĝőéš ļíṽé.~~]",
         "claimAs": "[~~Ĉļáíɱ áš {{name}}~~]",
         "claimAsFallback": "[~~ƀúšíñéšš~~]",
-        "footnote": "[~~Ĉļáíɱíñĝ ĉőṽéřš áļļ ļíšţíñĝš őƒ ţĥíš ĉļúƀ őñ ĉļƀĥőúẑ.~~]",
+        "footnote": "[~~Ĉļáíɱíñĝ ĉőṽéřš áļļ ļíšţíñĝš őƒ ţĥíš ĉļúƀ őñ ĉļƀĥőúž.~~]",
         "setupInstead": "[~~Šéţ úƥ á ñéŵ ĝőļƒ ĉļúƀ ƥřőƒíļé íñšţéáđ~~]",
         "linkedAlreadyManages": "[~~{{name}} áļřéáđý ɱáñáĝéš áñőţĥéř ĉļúƀ áñđ ĉáññőţ ĉļáíɱ á šéĉőñđ ĉőúřšé.~~]",
         "setupGolfClub": "[~~Šéţ úƥ á Ĝőļƒ Ĉļúƀ ƥřőƒíļé~~]",
@@ -454,48 +479,48 @@
     }
   },
   "network": {
-    "emojiFlag": "⟦⛳·••⟧",
-    "viewCourseA11y": "⟦Víéw {{name}}·••⟧",
+    "emojiFlag": "[~~⛳~~]",
+    "viewCourseA11y": "[~~Ṽíéŵ {{name}}~~]",
     "badge": {
-      "playedByFriends_one": "⟦Pláýéd bý {{count}} fríéñd·••⟧",
-      "playedByFriends_other": "⟦Pláýéd bý {{count}} fríéñdš·••⟧",
-      "newForNetwork": "⟦Ñéw fór ýóúr ñétwórk·••⟧",
-      "topRated": "⟦Tóp rátéd·••⟧",
-      "trending": "⟦Tréñdíñg·••⟧"
+      "playedByFriends_one": "[~~Ƥļáýéđ ƀý {{count}} ƒříéñđ~~]",
+      "playedByFriends_other": "[~~Ƥļáýéđ ƀý {{count}} ƒříéñđš~~]",
+      "newForNetwork": "[~~Ñéŵ ƒőř ýőúř ñéţŵőřǩ~~]",
+      "topRated": "[~~Ţőƥ řáţéđ~~]",
+      "trending": "[~~Ţřéñđíñĝ~~]"
     },
-    "unseenReviewsTitle": "⟦🔔 Ñéw révíéw fróm ýóúr ñétwórk·••⟧",
-    "unseenReviewsBody": "⟦<name>{{name}}</name> révíéwéd <course>{{course}}</course> · <rating>{{rating}}</rating>·••⟧",
-    "unseenReviewsMore_one": "⟦ +{{count}} móré·••⟧",
-    "unseenReviewsMore_other": "⟦ +{{count}} móré·••⟧",
-    "viewArrow": "⟦Víéw →·••⟧"
+    "unseenReviewsTitle": "[~~🔔 Ñéŵ řéṽíéŵ ƒřőɱ ýőúř ñéţŵőřǩ~~]",
+    "unseenReviewsBody": "[~~<name>{{name}}</name> řéṽíéŵéđ <course>{{course}}</course> · <rating>{{rating}}</rating>~~]",
+    "unseenReviewsMore_one": "[~~ +{{count}} ɱőřé~~]",
+    "unseenReviewsMore_other": "[~~ +{{count}} ɱőřé~~]",
+    "viewArrow": "[~~Ṽíéŵ →~~]"
   },
   "phase5": {
     "statusToggle": {
-      "signInPrompt": "⟦Šígñ íñ tó tráçk thíš çóúršé·••⟧",
-      "signIn": "⟦Šígñ íñ·••⟧",
-      "playedTitle": "⟦Ýóú'vé pláýéd héré·••⟧",
-      "playedSub": "⟦Táp tó víéw ór édít ýóúr révíéw·••⟧",
-      "playedBadge": "⟦Pláýéd·••⟧",
-      "notPlayedTitle": "⟦Pláýéd héré?·••⟧",
-      "notPlayedSub": "⟦Ýóúr rátíñg hélpš gólférš wórldwídé·••⟧",
-      "rate": "⟦Ráté·••⟧",
-      "onBucketList": "⟦Óñ ýóúr búçkét líšt·••⟧",
-      "addBucketList": "⟦Ádd tó búçkét líšt·••⟧",
-      "removedFromBucket": "⟦Rémóvéd fróm búçkét líšt·••⟧",
-      "addedToBucket": "⟦Áddéd tó búçkét líšt·••⟧",
-      "mapHint": "⟦Évérý çóúršé ýóú márk béçóméš párt óf ýóúr jóúrñéý — víéw thém áñýtímé óñ ýóúr <mapLink>máp</mapLink>.·••⟧"
+      "signInPrompt": "[~~Šíĝñ íñ ţő ţřáĉǩ ţĥíš ĉőúřšé~~]",
+      "signIn": "[~~Šíĝñ íñ~~]",
+      "playedTitle": "[~~Ýőú'ṽé ƥļáýéđ ĥéřé~~]",
+      "playedSub": "[~~Ţáƥ ţő ṽíéŵ őř éđíţ ýőúř řéṽíéŵ~~]",
+      "playedBadge": "[~~Ƥļáýéđ~~]",
+      "notPlayedTitle": "[~~Ƥļáýéđ ĥéřé?~~]",
+      "notPlayedSub": "[~~Ýőúř řáţíñĝ ĥéļƥš ĝőļƒéřš ŵőřļđŵíđé~~]",
+      "rate": "[~~Řáţé~~]",
+      "onBucketList": "[~~Őñ ýőúř ƀúĉǩéţ ļíšţ~~]",
+      "addBucketList": "[~~Áđđ ţő ƀúĉǩéţ ļíšţ~~]",
+      "removedFromBucket": "[~~Řéɱőṽéđ ƒřőɱ ƀúĉǩéţ ļíšţ~~]",
+      "addedToBucket": "[~~Áđđéđ ţő ƀúĉǩéţ ļíšţ~~]",
+      "mapHint": "[~~Éṽéřý ĉőúřšé ýőú ɱářǩ ƀéĉőɱéš ƥářţ őƒ ýőúř ĵőúřñéý — ṽíéŵ ţĥéɱ áñýţíɱé őñ ýőúř <mapLink>ɱáƥ</mapLink>.~~]"
     },
     "personalReview": {
-      "title": "⟦Ýóúr Rátíñg·••⟧",
-      "playedOn": "⟦Pláýéd óñ {{date}}·••⟧",
-      "matchesConsensus": "⟦Mátçhéš çómmúñítý çóñšéñšúš·••⟧",
-      "aboveAvg": "⟦{{diff}} ábóvé çómmúñítý ávg·••⟧",
-      "belowAvg": "⟦{{diff}} bélów çómmúñítý ávg·••⟧"
+      "title": "[~~Ýőúř Řáţíñĝ~~]",
+      "playedOn": "[~~Ƥļáýéđ őñ {{date}}~~]",
+      "matchesConsensus": "[~~Ṁáţĉĥéš ĉőɱɱúñíţý ĉőñšéñšúš~~]",
+      "aboveAvg": "[~~{{diff}} áƀőṽé ĉőɱɱúñíţý áṽĝ~~]",
+      "belowAvg": "[~~{{diff}} ƀéļőŵ ĉőɱɱúñíţý áṽĝ~~]"
     },
     "planning": {
-      "title": "⟦Pláññíñg·••⟧",
-      "addBucketList": "⟦Ádd tó búçkét líšt·••⟧",
-      "privateNote": "⟦Óñlý ýóú çáñ šéé ýóúr búçkét líšt.·••⟧"
+      "title": "[~~Ƥļáññíñĝ~~]",
+      "addBucketList": "[~~Áđđ ţő ƀúĉǩéţ ļíšţ~~]",
+      "privateNote": "[~~Őñļý ýőú ĉáñ šéé ýőúř ƀúĉǩéţ ļíšţ.~~]"
     }
   }
 }

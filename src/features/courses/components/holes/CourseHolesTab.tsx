@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCourseHoleAnalysis, type CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import { useCourseMeta } from '@/hooks/gam/useCourseMeta';
 import { HolesCredibilityHeader } from './HolesCredibilityHeader';
@@ -29,6 +30,7 @@ function toShared(h: CourseHole): SharedHole {
 }
 
 export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
+  const { t } = useTranslation(['courses']);
   const { data, isLoading, isError } = useCourseHoleAnalysis(courseId);
   const { data: meta } = useCourseMeta(courseId);
   const [sort, setSort] = useState<'hole' | 'difficulty'>('hole');
@@ -86,7 +88,7 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
     return (
       <div style={{ padding: '40px 16px', textAlign: 'center', fontFamily: FONT }}>
         <div style={{ fontSize: 14, fontWeight: 600, color: INK_MUTE }}>
-          Couldn't load hole analysis.
+          {t('courses:holes.errorLoading')}
         </div>
       </div>
     );
@@ -118,12 +120,15 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
       >
         <SectionHeader
           role="section"
-          kicker="ALL HOLES"
+          kicker={t('courses:holes.allHolesKicker')}
           accent={SC_ACCENT}
           className="!mb-0"
         />
         <div style={{ display: 'inline-flex', flexShrink: 0, gap: 6 }}>
-          {([['hole', 'By hole'], ['difficulty', 'By difficulty']] as const).map(([k, l]) => {
+          {([
+            ['hole', t('courses:holes.sortByHole')],
+            ['difficulty', t('courses:holes.sortByDifficulty')],
+          ] as const).map(([k, l]) => {
             const active = sort === k;
             return (
               <button
