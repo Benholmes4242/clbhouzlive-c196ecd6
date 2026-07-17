@@ -26,6 +26,7 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
 }) => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
+  const { t } = useTranslation('courses');
   const { status, isLoading, setWantToPlay, isUpdating } = useCoursePersonalStatus(courseId);
 
   if (!user) {
