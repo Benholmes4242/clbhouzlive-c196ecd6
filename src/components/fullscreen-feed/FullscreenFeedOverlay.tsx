@@ -841,6 +841,7 @@ export function FullscreenFeedOverlay() {
                     golfCourse={golfCourse}
                     readOnly={readOnly}
                     onBeforeNavigate={handleClose}
+                    feedEnded={!hasNextPage && activeIndex >= posts.length}
                   />
 
                   <FullscreenScrubber
