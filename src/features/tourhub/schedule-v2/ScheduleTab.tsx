@@ -44,6 +44,7 @@ export function ScheduleTab() {
   const anchorRef = useRef<HTMLDivElement | null>(null);
   const chipsRef = useRef<HTMLDivElement | null>(null);
   const [anchorVisible, setAnchorVisible] = useState(true);
+  const [anchorFar, setAnchorFar] = useState(false);
 
   // Publish real chips-row outer height so month headers can stack flush.
   useEffect(() => {
