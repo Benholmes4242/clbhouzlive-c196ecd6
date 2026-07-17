@@ -6,9 +6,11 @@
  * omits entirely.
  */
 
+import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import type { TourPlayerStatistics } from '../hooks/useTourHubData';
 import { formatCurrencyUsd } from '@/i18n/format';
+import { LEADER_STAT_LABELS } from '../leaders-v2/data/useLeaderCategories';
 import {
   AMBER,
   HAIRLINE_INK_8,
@@ -173,36 +175,39 @@ function SGBar({ label, value }: { label: string; value: number | null | undefin
 }
 
 export function StatsSheet({ open, onClose, playerStats, playerName }: StatsSheetProps) {
+  const { t } = useTranslation('tourhub');
+  const label = (key: keyof typeof LEADER_STAT_LABELS) => t(LEADER_STAT_LABELS[key].shortKey);
+
   // OVERVIEW
   const overview: Row[] = [];
-  const push = (label: string, v: string | null) => {
-    if (v !== null) overview.push({ label, value: v });
+  const push = (l: string, v: string | null) => {
+    if (v !== null) overview.push({ label: l, value: v });
   };
-  push('Events Played', fmtInt(playerStats.events_played));
-  push('Wins', fmtInt(playerStats.wins));
-  push('Top 10s', fmtInt(playerStats.top_10s));
-  push('Top 25s', fmtInt(playerStats.top_25s));
-  push('Cuts Made', fmtInt(playerStats.cuts_made));
-  push('Earnings', fmtMoney(playerStats.earnings));
-  push('Scoring Avg', fmtDecimal(playerStats.scoring_average, 2));
-  push('Birdies / Rd', fmtDecimal(playerStats.birdies_per_round, 2));
+  push(label('events_played'), fmtInt(playerStats.events_played));
+  push(label('wins'), fmtInt(playerStats.wins));
+  push(label('top_10'), fmtInt(playerStats.top_10s));
+  push(label('top_25'), fmtInt(playerStats.top_25s));
+  push(label('cuts_made'), fmtInt(playerStats.cuts_made));
+  push(label('earnings'), fmtMoney(playerStats.earnings));
+  push(label('scoring_avg'), fmtDecimal(playerStats.scoring_average, 2));
+  push(label('birdies_per_round'), fmtDecimal(playerStats.birdies_per_round, 2));
 
   // BALL STRIKING
   const ball: Row[] = [];
-  const pushBall = (label: string, v: string | null) => {
-    if (v !== null) ball.push({ label, value: v });
+  const pushBall = (l: string, v: string | null) => {
+    if (v !== null) ball.push({ label: l, value: v });
   };
-  pushBall('Driving Dist', fmtYards(playerStats.driving_distance));
-  pushBall('Driving Acc', fmtPct(playerStats.driving_accuracy));
-  pushBall('GIR', fmtPct(playerStats.greens_in_reg));
+  pushBall(label('drive_avg'), fmtYards(playerStats.driving_distance));
+  pushBall(label('drive_acc'), fmtPct(playerStats.driving_accuracy));
+  pushBall(label('gir_pct'), fmtPct(playerStats.greens_in_reg));
 
   // SHORT GAME
   const shortGame: Row[] = [];
-  const pushShort = (label: string, v: string | null) => {
-    if (v !== null) shortGame.push({ label, value: v });
+  const pushShort = (l: string, v: string | null) => {
+    if (v !== null) shortGame.push({ label: l, value: v });
   };
-  pushShort('Scrambling', fmtPct(playerStats.scrambling));
-  pushShort('Putting Avg', fmtDecimal(playerStats.putting_average, 3));
+  pushShort(label('scrambling'), fmtPct(playerStats.scrambling));
+  pushShort(label('putt_avg'), fmtDecimal(playerStats.putting_average, 3));
 
   const hasSG =
     playerStats.strokes_gained_total !== null ||
@@ -247,7 +252,7 @@ export function StatsSheet({ open, onClose, playerStats, playerName }: StatsShee
               textTransform: 'uppercase',
             }}
           >
-            Season Statistics
+            {t('player.stats.eyebrow')}
           </p>
           <h2
             id="stats-sheet-title"
@@ -272,9 +277,9 @@ export function StatsSheet({ open, onClose, playerStats, playerName }: StatsShee
             padding: '0 16px 24px',
           }}
         >
-          <SubSection label="Overview" rows={overview} />
-          <SubSection label="Ball Striking" rows={ball} />
-          <SubSection label="Short Game" rows={shortGame} />
+          <SubSection label={t('player.stats.section.overview')} rows={overview} />
+          <SubSection label={t('player.stats.section.ballStriking')} rows={ball} />
+          <SubSection label={t('player.stats.section.shortGame')} rows={shortGame} />
 
           {hasSG && (
             <div style={{ marginTop: 24 }}>
@@ -288,11 +293,11 @@ export function StatsSheet({ open, onClose, playerStats, playerName }: StatsShee
                   textTransform: 'uppercase',
                 }}
               >
-                Strokes Gained
+                {t('player.stats.section.strokesGained')}
               </p>
-              <SGBar label="SG: Total" value={playerStats.strokes_gained_total} />
-              <SGBar label="SG: Tee to Green" value={playerStats.strokes_gained_tee_green} />
-              <SGBar label="SG: Around Green" value={playerStats.strokes_gained} />
+              <SGBar label={t(LEADER_STAT_LABELS.strokes_gained_total.shortKey)} value={playerStats.strokes_gained_total} />
+              <SGBar label={t(LEADER_STAT_LABELS.strokes_gained_tee_green.shortKey)} value={playerStats.strokes_gained_tee_green} />
+              <SGBar label={t(LEADER_STAT_LABELS.strokes_gained_around_green.shortKey)} value={playerStats.strokes_gained} />
             </div>
           )}
         </div>

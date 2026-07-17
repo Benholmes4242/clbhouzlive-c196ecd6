@@ -9,6 +9,7 @@
  */
 
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AlertCircle } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import { TourHubShell } from '../components/TourHubShell';
@@ -26,6 +27,7 @@ import { SLATE_50 } from '../_shared/tokens';
 import { scrollPageToTop } from '@/lib/getScrollParent';
 
 export function PlayerPage() {
+  const { t } = useTranslation('tourhub');
   const { playerId } = useParams<{ playerId: string }>();
 
   const { data: player, isLoading: playerLoading, refetch } = useTourPlayer(playerId || '');
@@ -59,12 +61,12 @@ export function PlayerPage() {
         >
           <div className="text-center py-20 flex flex-col items-center gap-3">
             <AlertCircle className="w-10 h-10 text-muted-foreground" />
-            <p className="text-muted-foreground text-lg font-medium">Couldn't load player data</p>
+            <p className="text-muted-foreground text-lg font-medium">{t('player.error.loadFailed')}</p>
             <button
               onClick={() => refetch()}
               className="mt-2 px-5 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium active:opacity-70 transition-opacity"
             >
-              Retry
+              {t('player.error.retry')}
             </button>
           </div>
         </div>

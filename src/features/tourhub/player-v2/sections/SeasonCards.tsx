@@ -11,6 +11,8 @@
 
 import { useState } from 'react';
 import { ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import type { PlayerTournamentResult } from '../../hooks/usePlayerResults';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
 import { StatsSheet } from '../StatsSheet';
@@ -42,22 +44,22 @@ function fmtCompactMoney(n: number): string {
   return formatCurrencyUsd(n);
 }
 
-function fromStats(s: TourPlayerStatistics): Card[] {
+function fromStats(s: TourPlayerStatistics, t: TFunction): Card[] {
   const cards: Card[] = [];
   if (typeof s.top_10s === 'number' && s.top_10s >= 0)
-    cards.push({ key: 'top10', label: 'TOP 10s', value: String(s.top_10s) });
+    cards.push({ key: 'top10', label: t('player.season.card.top10s'), value: String(s.top_10s) });
   if (typeof s.wins === 'number' && s.wins >= 0)
-    cards.push({ key: 'wins', label: 'WINS', value: String(s.wins) });
+    cards.push({ key: 'wins', label: t('player.season.card.wins'), value: String(s.wins) });
   if (typeof s.scoring_average === 'number' && s.scoring_average > 0)
-    cards.push({ key: 'scoring', label: 'SCORING', value: s.scoring_average.toFixed(1) });
+    cards.push({ key: 'scoring', label: t('player.season.card.scoring'), value: s.scoring_average.toFixed(1) });
   if (typeof s.earnings === 'number' && s.earnings > 0)
-    cards.push({ key: 'earnings', label: 'EARNINGS', value: fmtCompactMoney(s.earnings) });
+    cards.push({ key: 'earnings', label: t('player.season.card.earnings'), value: fmtCompactMoney(s.earnings) });
   return cards;
 }
 
-function fromResults(r: PlayerTournamentResult[]): Card[] {
+function fromResults(r: PlayerTournamentResult[], t: TFunction): Card[] {
   const cards: Card[] = [];
-  if (r.length > 0) cards.push({ key: 'events', label: 'EVENTS', value: String(r.length) });
+  if (r.length > 0) cards.push({ key: 'events', label: t('player.season.card.events'), value: String(r.length) });
 
   const finishes = r
     .filter((x) => {
@@ -68,22 +70,23 @@ function fromResults(r: PlayerTournamentResult[]): Card[] {
     .sort((a, b) => a - b);
   if (finishes.length > 0) {
     const best = finishes[0];
-    cards.push({ key: 'best', label: 'BEST FINISH', value: best === 1 ? '1' : `T${best}` });
+    cards.push({ key: 'best', label: t('player.season.card.bestFinish'), value: best === 1 ? '1' : `T${best}` });
   }
 
   const madeCuts = r.filter((x) => {
     const st = x.status?.toUpperCase();
     return st !== 'CUT' && st !== 'MC' && st !== 'WD' && st !== 'DQ' && x.position !== null;
   }).length;
-  if (madeCuts > 0) cards.push({ key: 'cuts', label: 'MADE CUTS', value: String(madeCuts) });
+  if (madeCuts > 0) cards.push({ key: 'cuts', label: t('player.season.card.madeCuts'), value: String(madeCuts) });
 
   return cards;
 }
 
 export function SeasonCards({ playerStats, results, player }: SeasonCardsProps) {
+  const { t } = useTranslation('tourhub');
   const [sheetOpen, setSheetOpen] = useState(false);
   const hasStats = !!playerStats;
-  const cards = hasStats ? fromStats(playerStats!) : fromResults(results);
+  const cards = hasStats ? fromStats(playerStats!, t) : fromResults(results, t);
 
   if (cards.length === 0) return null;
 
@@ -114,7 +117,7 @@ export function SeasonCards({ playerStats, results, player }: SeasonCardsProps) 
             textTransform: 'uppercase',
           }}
         >
-          This Season
+          {t('player.season.eyebrow')}
         </p>
         {hasStats && (
           <button
@@ -135,7 +138,7 @@ export function SeasonCards({ playerStats, results, player }: SeasonCardsProps) 
             }}
             className="active:opacity-60 transition-opacity"
           >
-            All stats
+            {t('player.season.allStats')}
             <ChevronRight size={14} strokeWidth={2.4} />
           </button>
         )}

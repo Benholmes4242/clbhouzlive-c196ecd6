@@ -52,8 +52,9 @@ const i18nLiteralOptions = {
   words: {
     // Extra exclude: U+2039/U+203A single angle quotation marks used as
     // decorative chevrons in row/action affordances (see EventInfoSection,
-    // SectionEyebrow, StorySection). Non-linguistic typographic glyphs.
-    exclude: ["[0-9!-/:-@[-`{-~]+", "[A-Z_-]+", "[\\u2039\\u203A]+"],
+    // SectionEyebrow, StorySection). U+00B7 middot used as a decorative
+    // aria-hidden separator (HeroSection meta rows). Non-linguistic glyphs.
+    exclude: ["[0-9!-/:-@[-`{-~]+", "[A-Z_-]+", "[\\u2039\\u203A]+", "[\\u00B7]+"],
   },
 
 };
@@ -242,11 +243,12 @@ export default tseslint.config(
       "no-restricted-syntax": ["error", literalAttrSyntax, ...toLocaleSyntax],
     },
   },
-  // ─── Wave 3e.iv Turn C.1 — leaders-v2 slice; Turn C.2 — players-v2 slice ─
+  // ─── Wave 3e.iv — leaders-v2 (C.1) · players-v2 (C.2) · player-v2 (C.3) ─
   {
     files: [
       "src/features/tourhub/leaders-v2/**/*.{ts,tsx}",
       "src/features/tourhub/players-v2/**/*.{ts,tsx}",
+      "src/features/tourhub/player-v2/**/*.{ts,tsx}",
     ],
     rules: {
       "i18next/no-literal-string": ["error", i18nLiteralOptions],

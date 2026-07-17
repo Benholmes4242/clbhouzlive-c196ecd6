@@ -4,6 +4,7 @@
  */
 
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import type { TourPlayer } from '../../hooks/useTourHubData';
 import { INK, INK_FAINT, INK_TINT_06, INK_TINT_07, SURFACE } from '../../_shared/tokens';
 import { formatMonthDayYearShort } from '@/i18n/format';
@@ -31,22 +32,23 @@ interface Field {
 }
 
 export function AboutSection({ player }: AboutSectionProps) {
+  const { t } = useTranslation('tourhub');
   const fields: Field[] = [];
 
   if (player.birth_date) {
     fields.push({
-      label: 'Born',
+      label: t('player.about.field.born'),
       value: formatMonthDayYearShort(new Date(player.birth_date)),
     });
   }
   const age = ageOf(player.birth_date);
-  if (age !== null) fields.push({ label: 'Age', value: String(age) });
-  if (player.turned_pro) fields.push({ label: 'Turned Pro', value: String(player.turned_pro) });
+  if (age !== null) fields.push({ label: t('player.about.field.age'), value: String(age) });
+  if (player.turned_pro) fields.push({ label: t('player.about.field.turnedPro'), value: String(player.turned_pro) });
   const height = fmtHeight(player.height);
-  if (height) fields.push({ label: 'Height', value: height });
+  if (height) fields.push({ label: t('player.about.field.height'), value: height });
   if (player.college) {
     fields.push({
-      label: 'College',
+      label: t('player.about.field.college'),
       value: player.college_normalized ? (
         <Link
           to={`/tourhub/college-golf/${player.college_normalized}`}
@@ -60,7 +62,7 @@ export function AboutSection({ player }: AboutSectionProps) {
       ),
     });
   }
-  if (player.residence) fields.push({ label: 'Residence', value: player.residence });
+  if (player.residence) fields.push({ label: t('player.about.field.residence'), value: player.residence });
 
   if (fields.length < 2) return null;
 
@@ -82,7 +84,7 @@ export function AboutSection({ player }: AboutSectionProps) {
           textTransform: 'uppercase',
         }}
       >
-        About
+        {t('player.about.eyebrow')}
       </p>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
         {fields.map((f) => (

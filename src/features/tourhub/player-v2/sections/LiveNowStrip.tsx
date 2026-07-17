@@ -7,6 +7,7 @@
 
 import { ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import type { PlayerLiveData } from '../../hooks/usePlayerState';
 import { tournamentRoute } from '../../routes';
 import { CHARCOAL, LIVE_DOT, TOPAR_UNDER_DARK, WHITE_ALPHA_55 } from '../../_shared/tokens';
@@ -23,6 +24,7 @@ function posLabel(pos: number | null, tied: boolean | null): string | null {
 }
 
 export function LiveNowStrip({ liveData, playerName }: LiveNowStripProps) {
+  const { t } = useTranslation('tourhub');
   const target = tournamentRoute(liveData.tournamentId, {
     kind: 'player',
     playerName,
@@ -32,8 +34,8 @@ export function LiveNowStrip({ liveData, playerName }: LiveNowStripProps) {
     liveData.thru === null
       ? null
       : liveData.thru >= 18
-      ? 'F'
-      : `thru ${liveData.thru}`;
+      ? t('player.live.finished')
+      : t('player.live.thru', { holes: liveData.thru });
 
   const subParts = [pos, thruLabel].filter(Boolean).join(' · ');
   const scoreDisplay =
@@ -93,7 +95,7 @@ export function LiveNowStrip({ liveData, playerName }: LiveNowStripProps) {
               letterSpacing: '0.14em',
             }}
           >
-            LIVE
+            {t('player.live.badge')}
           </span>
         </div>
 
@@ -113,8 +115,7 @@ export function LiveNowStrip({ liveData, playerName }: LiveNowStripProps) {
             {liveData.tournamentName}
             {liveData.currentRound && (
               <span style={{ color: WHITE_ALPHA_55, fontWeight: 700 }}>
-                {' · R'}
-                {liveData.currentRound}
+                {t('player.live.roundSuffix', { round: liveData.currentRound })}
               </span>
             )}
           </div>

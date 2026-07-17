@@ -11,6 +11,8 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { formatMonthShort } from '@/i18n/format';
 import type { PlayerTournamentResult } from '../../hooks/usePlayerResults';
 import { tournamentRoute } from '../../routes';
@@ -38,12 +40,12 @@ interface TournamentsSectionProps {
 
 const INITIAL_LIMIT = 8;
 
-function fmtPosition(r: PlayerTournamentResult): string {
+function fmtPosition(r: PlayerTournamentResult, t: TFunction): string {
   const st = r.status?.toUpperCase();
-  if (st === 'CUT' || st === 'MC') return 'MC';
-  if (st === 'WD') return 'WD';
-  if (st === 'DQ') return 'DQ';
-  if (r.position === null) return '—';
+  if (st === 'CUT' || st === 'MC') return t('player.tournaments.status.mc');
+  if (st === 'WD') return t('player.tournaments.status.wd');
+  if (st === 'DQ') return t('player.tournaments.status.dq');
+  if (r.position === null) return t('player.tournaments.status.noResult');
   if (r.position === 1) return '1';
   return `${r.position_tied ? 'T' : ''}${r.position}`;
 }
@@ -59,6 +61,7 @@ export function TournamentsSection({
   playerName,
   liveTournamentId,
 }: TournamentsSectionProps) {
+  const { t } = useTranslation('tourhub');
   const [expanded, setExpanded] = useState(false);
   if (results.length === 0) return null;
 
@@ -83,7 +86,7 @@ export function TournamentsSection({
           textTransform: 'uppercase',
         }}
       >
-        Tournaments
+        {t('player.tournaments.eyebrow')}
       </p>
 
       <div>
@@ -97,7 +100,7 @@ export function TournamentsSection({
           const isWin = r.position === 1 && !isMissed;
           const isMajor = r.tournament_name ? isAnyMajor(r.tournament_name) : false;
           const isLive = liveTournamentId === r.tournament_id;
-          const pos = fmtPosition(r);
+          const pos = fmtPosition(r, t);
           const dt = r.tournament_end_date ? new Date(r.tournament_end_date) : null;
           const day = dt ? String(dt.getDate()) : '';
           const month = dt ? formatMonthShort(dt).toUpperCase() : '';
@@ -190,7 +193,7 @@ export function TournamentsSection({
                         letterSpacing: '0.10em',
                       }}
                     >
-                      WIN
+                      {t('player.tournaments.winChip')}
                     </span>
                   )}
                   {isLive && (
@@ -209,7 +212,7 @@ export function TournamentsSection({
                         letterSpacing: '0.10em',
                       }}
                     >
-                      LIVE
+                      {t('player.tournaments.liveChip')}
                     </span>
                   )}
                 </div>
@@ -267,7 +270,7 @@ export function TournamentsSection({
           }}
           className="active:opacity-60 transition-opacity"
         >
-          Full season ›
+          {t('player.tournaments.expand')}
         </button>
       )}
     </section>

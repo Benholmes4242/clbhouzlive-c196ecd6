@@ -5,6 +5,8 @@
  * Section self-hides when < 2 rendered chips.
  */
 
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import type { PlayerTournamentResult } from '../../hooks/usePlayerResults';
 import { AMBER, GOLD, GOLD_DEEP, HAIRLINE_INK_8, INK, INK_FAINT, INK_TINT_07, SLATE_50, SURFACE } from '../../_shared/tokens';
 
@@ -12,17 +14,18 @@ interface FormSectionProps {
   results: PlayerTournamentResult[];
 }
 
-function chipLabel(r: PlayerTournamentResult): string {
+function chipLabel(r: PlayerTournamentResult, t: TFunction): string {
   const st = r.status?.toUpperCase();
-  if (st === 'CUT' || st === 'MC') return 'MC';
-  if (st === 'WD') return 'WD';
-  if (st === 'DQ') return 'DQ';
-  if (r.position === null) return '—';
+  if (st === 'CUT' || st === 'MC') return t('player.form.status.mc');
+  if (st === 'WD') return t('player.form.status.wd');
+  if (st === 'DQ') return t('player.form.status.dq');
+  if (r.position === null) return t('player.form.status.noResult');
   if (r.position === 1) return '1';
   return `${r.position_tied ? 'T' : ''}${r.position}`;
 }
 
 export function FormSection({ results }: FormSectionProps) {
+  const { t } = useTranslation('tourhub');
   const last6 = results.slice(0, 6);
   if (last6.length < 2) return null;
 
@@ -44,7 +47,7 @@ export function FormSection({ results }: FormSectionProps) {
           textTransform: 'uppercase',
         }}
       >
-        Last 6 · Most Recent First
+        {t('player.form.eyebrow')}
       </p>
       <div
         style={{
@@ -57,9 +60,10 @@ export function FormSection({ results }: FormSectionProps) {
         }}
       >
         {last6.map((r) => {
-          const label = chipLabel(r);
-          const isWin = r.position === 1 && r.status?.toUpperCase() !== 'WD';
-          const isMissed = ['MC', 'WD', 'DQ'].includes(label);
+          const label = chipLabel(r, t);
+          const st = r.status?.toUpperCase();
+          const isWin = r.position === 1 && st !== 'WD';
+          const isMissed = st === 'MC' || st === 'CUT' || st === 'WD' || st === 'DQ';
           return (
             <div
               key={r.id}
