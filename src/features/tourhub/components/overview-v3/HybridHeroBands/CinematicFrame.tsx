@@ -519,7 +519,7 @@ function FieldStrengthRowDark({ data }: { data: FieldStrength }) {
             textTransform: 'uppercase',
           }}
         >
-          Field Strength
+          {t('overview.cinematic.fieldStrengthEyebrow')}
         </span>
         <span
           style={{
@@ -527,8 +527,8 @@ function FieldStrengthRowDark({ data }: { data: FieldStrength }) {
             whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
           }}
         >
-          {data.totalPlayers} players
-          {data.topRanked != null ? ` · #${data.topRanked} world` : ''}
+          {t('overview.cinematic.fieldPreviewPlayers', { count: data.totalPlayers })}
+          {data.topRanked != null ? t('overview.cinematic.topRankedWorld', { rank: data.topRanked }) : ''}
         </span>
       </div>
     </div>
