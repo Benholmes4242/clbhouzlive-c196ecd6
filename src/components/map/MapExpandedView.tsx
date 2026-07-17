@@ -6,7 +6,7 @@ import { MapPin, X } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { createGlassyMarkerElement } from './MapMarker';
 import { MAP_CONFIG } from '@/config/maps';
-import { openExternalUrl } from '@/utils/median/openExternalUrl';
+import { openMapsUrl } from '@/utils/median/openMapsUrl';
 
 interface MapExpandedViewProps {
   open: boolean;
@@ -46,9 +46,12 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
     trackMouse: false,
   });
 
-  // Deep link URLs
-  const appleMapsUrl = `maps://maps.apple.com/?q=${encodeURIComponent(name)}&ll=${lat},${lng}&z=13`;
+  // Deep link URLs — both are https universal links so the OS can route to
+  // the native Apple Maps / Google Maps app on device (via openMapsUrl's
+  // direct-navigation path) and fall back to the web mapping UI on desktop.
+  const appleMapsUrl = `https://maps.apple.com/?q=${encodeURIComponent(name)}&ll=${lat},${lng}`;
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+
 
   useEffect(() => {
     mountedRef.current = true;
@@ -193,7 +196,7 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
           {isIOS && (
             <button
               type="button"
-              onClick={() => openExternalUrl(appleMapsUrl)}
+              onClick={() => openMapsUrl(appleMapsUrl)}
               className="pointer-events-auto flex-1"
               style={{
                 height: 50, borderRadius: 999, border: 'none', cursor: 'pointer',
@@ -207,7 +210,7 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
           )}
           <button
             type="button"
-            onClick={() => openExternalUrl(googleMapsUrl)}
+            onClick={() => openMapsUrl(googleMapsUrl)}
             className="pointer-events-auto flex-1"
             style={{
               height: 50, borderRadius: 999, cursor: 'pointer',
