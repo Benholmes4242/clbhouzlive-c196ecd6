@@ -9,6 +9,7 @@
  * reserved for majors only.
  */
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '../_shared/resolvePlayerAvatar';
 import type { SeasonEvent } from './useSeasonTimeline';
@@ -51,6 +52,7 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
   anchorRef,
   onSelect,
 }) => {
+  const { t } = useTranslation('tourhub');
   const isLive = event.state === 'live';
   const isDone = event.state === 'completed';
 
@@ -169,7 +171,14 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
               {event.state === 'upcoming' &&
                 event.isMajor &&
                 event.defendingChampion?.name && (
-                  <> · {event.defendingChampion.name} defends</>
+                  <>
+                    {' · '}
+                    <Trans
+                      i18nKey="schedule.champion.defendsSuffix"
+                      ns="tourhub"
+                      values={{ name: event.defendingChampion.name }}
+                    />
+                  </>
                 )}
             </div>
           )}
@@ -211,19 +220,7 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
           }}
         >
           {isLive && <LivePill />}
-          {isDone && (
-            <span
-              style={{
-                fontSize: 15,
-                color: INK_FAINT,
-                fontWeight: 300,
-                lineHeight: 1,
-              }}
-              aria-hidden
-            >
-              ›
-            </span>
-          )}
+          {isDone && <Chevron />}
           {event.state === 'upcoming' && event.daysAway !== null && (
             <UpcomingRail
               daysAway={event.daysAway}
@@ -238,224 +235,255 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
 
 // ─── Sub-components ───────────────────────────────────────────────────────
 
-const MajorChip: React.FC = () => (
+/* eslint-disable i18next/no-literal-string -- typography glyph: chevron affordance, aria-hidden */
+const Chevron: React.FC = () => (
   <span
-    style={{
-      fontSize: 8.5,
-      fontWeight: 800,
-      letterSpacing: '0.16em',
-      color: GOLD_DEEP,
-      padding: '2px 6px',
-      borderRadius: 4,
-      background: 'linear-gradient(135deg, rgba(255,184,0,0.18), rgba(255,184,0,0.06))',
-      textTransform: 'uppercase',
-      lineHeight: 1,
-      whiteSpace: 'nowrap',
-    }}
+    style={{ fontSize: 15, color: INK_FAINT, fontWeight: 300, lineHeight: 1 }}
+    aria-hidden
   >
-    MAJOR
+    ›
   </span>
 );
+/* eslint-enable i18next/no-literal-string */
 
-const PlayoffChip: React.FC = () => (
-  <span
-    style={{
-      fontSize: 8.5,
-      fontWeight: 800,
-      letterSpacing: '0.16em',
-      color: VIOLET,
-      padding: '2px 6px',
-      borderRadius: 4,
-      background: VIOLET_TINT,
-      textTransform: 'uppercase',
-      lineHeight: 1,
-      whiteSpace: 'nowrap',
-    }}
-  >
-    PLAYOFFS
-  </span>
-);
 
-const LivePill: React.FC = () => (
-  <span
-    style={{
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: 5,
-      padding: '3px 7px 3px 6px',
-      borderRadius: 999,
-      background: LIVE_INK,
-      color: '#FFFFFF',
-      fontSize: 8.5,
-      fontWeight: 800,
-      letterSpacing: '0.14em',
-      lineHeight: 1,
-    }}
-  >
+const MajorChip: React.FC = () => {
+  const { t } = useTranslation('tourhub');
+  return (
     <span
       style={{
-        width: 5,
-        height: 5,
-        borderRadius: '50%',
-        background: '#FFFFFF',
-        display: 'inline-block',
+        fontSize: 8.5,
+        fontWeight: 800,
+        letterSpacing: '0.16em',
+        color: GOLD_DEEP,
+        padding: '2px 6px',
+        borderRadius: 4,
+        background: 'linear-gradient(135deg, rgba(255,184,0,0.18), rgba(255,184,0,0.06))',
+        textTransform: 'uppercase',
+        lineHeight: 1,
+        whiteSpace: 'nowrap',
       }}
-    />
-    LIVE
-  </span>
-);
+    >
+      {t('schedule.badge.major')}
+    </span>
+  );
+};
+
+const PlayoffChip: React.FC = () => {
+  const { t } = useTranslation('tourhub');
+  return (
+    <span
+      style={{
+        fontSize: 8.5,
+        fontWeight: 800,
+        letterSpacing: '0.16em',
+        color: VIOLET,
+        padding: '2px 6px',
+        borderRadius: 4,
+        background: VIOLET_TINT,
+        textTransform: 'uppercase',
+        lineHeight: 1,
+        whiteSpace: 'nowrap',
+      }}
+    >
+      {t('schedule.badge.playoffs')}
+    </span>
+  );
+};
+
+const LivePill: React.FC = () => {
+  const { t } = useTranslation('tourhub');
+  return (
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 5,
+        padding: '3px 7px 3px 6px',
+        borderRadius: 999,
+        background: LIVE_INK,
+        color: '#FFFFFF',
+        fontSize: 8.5,
+        fontWeight: 800,
+        letterSpacing: '0.14em',
+        lineHeight: 1,
+      }}
+    >
+      <span
+        style={{
+          width: 5,
+          height: 5,
+          borderRadius: '50%',
+          background: '#FFFFFF',
+          display: 'inline-block',
+        }}
+      />
+      {t('status.live')}
+    </span>
+  );
+};
 
 const UpcomingRail: React.FC<{ daysAway: number; highlight: boolean }> = ({
   daysAway,
   highlight,
-}) => (
-  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-    <span
-      style={{
-        fontSize: 16,
-        fontWeight: 200,
-        color: highlight ? GOLD : INK_MUTE,
-        fontVariantNumeric: 'tabular-nums',
-        lineHeight: 1,
-        letterSpacing: '-0.02em',
-      }}
-    >
-      {daysAway}
-    </span>
-    <span
-      style={{
-        marginTop: 3,
-        fontSize: 7,
-        fontWeight: 800,
-        letterSpacing: '0.14em',
-        color: INK_FAINT,
-        textTransform: 'uppercase',
-      }}
-    >
-      DAYS
-    </span>
-  </div>
-);
+}) => {
+  const { t } = useTranslation('tourhub');
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+      <span
+        style={{
+          fontSize: 16,
+          fontWeight: 200,
+          color: highlight ? GOLD : INK_MUTE,
+          fontVariantNumeric: 'tabular-nums',
+          lineHeight: 1,
+          letterSpacing: '-0.02em',
+        }}
+      >
+        {daysAway}
+      </span>
+      <span
+        style={{
+          marginTop: 3,
+          fontSize: 7,
+          fontWeight: 800,
+          letterSpacing: '0.14em',
+          color: INK_FAINT,
+          textTransform: 'uppercase',
+        }}
+      >
+        {t('schedule.rail.daysUnit', { count: daysAway })}
+      </span>
+    </div>
+  );
+};
+
 
 const ChampionStrip: React.FC<{
   name: string;
   scoreText: string;
   photoCandidates: string[];
-}> = ({ name, scoreText, photoCandidates }) => (
-  <div
-    style={{
-      marginTop: 2,
-      display: 'flex',
-      alignItems: 'center',
-      gap: 6,
-      minWidth: 0,
-    }}
-  >
-    <SquircleAvatar
-      size={20}
-      srcCandidates={photoCandidates}
-      alt={name}
-      hairlineRing
-      ringColor={LIGHT_HAIRLINE}
-    />
-    <span
+}> = ({ name, scoreText, photoCandidates }) => {
+  const { t } = useTranslation('tourhub');
+  return (
+    <div
       style={{
-        fontSize: 10,
-        fontWeight: 700,
-        color: INK,
-        letterSpacing: '-0.005em',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-        maxWidth: '48%',
+        marginTop: 2,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 6,
+        minWidth: 0,
       }}
     >
-      {name}
-    </span>
-    {scoreText && (
+      <SquircleAvatar
+        size={20}
+        srcCandidates={photoCandidates}
+        alt={name}
+        hairlineRing
+        ringColor={LIGHT_HAIRLINE}
+      />
       <span
         style={{
           fontSize: 10,
-          fontWeight: 800,
-          color: TOPAR_UNDER_LIGHT,
-          fontVariantNumeric: 'tabular-nums',
+          fontWeight: 700,
+          color: INK,
+          letterSpacing: '-0.005em',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+          maxWidth: '48%',
         }}
       >
-        {scoreText}
+        {name}
       </span>
-    )}
-    <span
-      style={{
-        marginLeft: 'auto',
-        fontSize: 7.5,
-        fontWeight: 800,
-        letterSpacing: '0.14em',
-        color: GOLD_DEEP,
-        textTransform: 'uppercase',
-      }}
-    >
-      CHAMPION
-    </span>
-  </div>
-);
+      {scoreText && (
+        <span
+          style={{
+            fontSize: 10,
+            fontWeight: 800,
+            color: TOPAR_UNDER_LIGHT,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {scoreText}
+        </span>
+      )}
+      <span
+        style={{
+          marginLeft: 'auto',
+          fontSize: 7.5,
+          fontWeight: 800,
+          letterSpacing: '0.14em',
+          color: GOLD_DEEP,
+          textTransform: 'uppercase',
+        }}
+      >
+        {t('schedule.badge.champion')}
+      </span>
+    </div>
+  );
+};
 
 const LeaderStrip: React.FC<{
   name: string;
   totalText: string;
   photoCandidates: string[];
-}> = ({ name, totalText, photoCandidates }) => (
-  <div
-    style={{
-      marginTop: 2,
-      display: 'flex',
-      alignItems: 'center',
-      gap: 6,
-      minWidth: 0,
-    }}
-  >
-    <SquircleAvatar
-      size={20}
-      srcCandidates={photoCandidates}
-      alt={name}
-      hairlineRing
-      ringColor={LIGHT_HAIRLINE}
-    />
-    <span
+}> = ({ name, totalText, photoCandidates }) => {
+  const { t } = useTranslation('tourhub');
+  return (
+    <div
       style={{
-        fontSize: 10,
-        fontWeight: 700,
-        color: INK,
-        letterSpacing: '-0.005em',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-        maxWidth: '50%',
+        marginTop: 2,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 6,
+        minWidth: 0,
       }}
     >
-      {name}
-    </span>
-    {totalText && (
+      <SquircleAvatar
+        size={20}
+        srcCandidates={photoCandidates}
+        alt={name}
+        hairlineRing
+        ringColor={LIGHT_HAIRLINE}
+      />
       <span
         style={{
           fontSize: 10,
-          fontWeight: 800,
-          color: AMBER,
-          fontVariantNumeric: 'tabular-nums',
+          fontWeight: 700,
+          color: INK,
+          letterSpacing: '-0.005em',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+          maxWidth: '50%',
         }}
       >
-        {totalText}
+        {name}
       </span>
-    )}
-    <span
-      style={{
-        fontSize: 9.5,
-        fontWeight: 600,
-        color: INK_MUTE,
-      }}
-    >
-      leads
-    </span>
-  </div>
-);
+      {totalText && (
+        <span
+          style={{
+            fontSize: 10,
+            fontWeight: 800,
+            color: AMBER,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {totalText}
+        </span>
+      )}
+      <span
+        style={{
+          fontSize: 9.5,
+          fontWeight: 600,
+          color: INK_MUTE,
+        }}
+      >
+        {t('schedule.leader.suffix')}
+      </span>
+    </div>
+  );
+};
 
 export default SeasonRow;

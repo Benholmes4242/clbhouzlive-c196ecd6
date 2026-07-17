@@ -36,5 +36,35 @@
   },
   "section": {
     "retryAria": "[~~Řéţřý ļőáđíñĝ {{section}}~~]"
+  },
+  "schedule": {
+    "eyebrow": {
+      "season": "[~~ŢĤÉ ŠÉÁŠŐÑ~~]"
+    },
+    "progress": {
+      "eventOf": "[~~ÉṼÉÑŢ {{current}} ŐƑ {{total}}~~]"
+    },
+    "error": {
+      "title": "[~~Ĉőúļđñ'ţ ļőáđ ţĥé šĉĥéđúļé~~]",
+      "body": "[~~Šőɱéţĥíñĝ ŵéñţ ŵřőñĝ. Ƥļéášé ţřý áĝáíñ.~~]"
+    },
+    "floating": {
+      "thisWeek": "[~~Ţĥíš ŵééǩ~~]"
+    },
+    "badge": {
+      "major": "[~~ṀÁJŐŘ~~]",
+      "playoffs": "[~~ƤĿÁÝŐƑƑŠ~~]",
+      "champion": "[~~ĈĤÁṀƤÍŐÑ~~]"
+    },
+    "rail": {
+      "daysUnit_one": "[~~ĐÁÝ~~]",
+      "daysUnit_other": "[~~ĐÁÝŠ~~]"
+    },
+    "leader": {
+      "suffix": "[~~ļéáđš~~]"
+    },
+    "champion": {
+      "defendsSuffix": "[~~{{name}} đéƒéñđš~~]"
+    }
   }
 }

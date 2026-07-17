@@ -21,7 +21,7 @@ const { spawnSync } = require('child_process');
 
 const res = spawnSync(
   'npx',
-  ['--no-install', 'eslint', 'src', '--format', 'json', '--ext', '.ts,.tsx,.js,.jsx'],
+  ['--no-install', 'eslint', 'src', '--format', 'json'],
   { encoding: 'utf8', maxBuffer: 256 * 1024 * 1024 }
 );
 
