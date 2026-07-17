@@ -285,7 +285,7 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
         : null;
   const isPseudoMajor = tournament.tourSlug === 'major';
   const tourLabel = isPseudoMajor
-    ? 'MAJOR CHAMPIONSHIP'
+    ? t('overview.hybridHero.majorChampionship')
     : tournament.tourName || tournament.tourSlug?.toUpperCase() || null;
   // Same-tour majors (Evian on LPGA, Senior PGA on CHAMP, etc.) get a small
   // gold "MAJOR" tag next to the eyebrow — no relocation, cosmetic only.
