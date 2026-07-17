@@ -521,6 +521,13 @@ interface CountLeaderSheetRowProps {
   /** Optional secondary line, e.g. cross-metric or club. */
   subline: string | null;
   onTap?: () => void;
+  /**
+   * 'amber' (default) = eagles all-time champion chrome.
+   * 'gold' = legendary (aces & albatrosses) — champion adopts the exceptional
+   * review gold system (shimmer rank/value, gold-edge border, champagne
+   * gradient, shimmering bar); HCP suppressed sheet-wide.
+   */
+  variant?: 'amber' | 'gold';
 }
 
 function CountLeaderSheetRow({
@@ -536,9 +543,12 @@ function CountLeaderSheetRow({
   countLabelPlural,
   subline,
   onTap,
+  variant = 'amber',
 }: CountLeaderSheetRowProps) {
   const rank = index + 1;
   const isTop = rank === 1;
+  const isGold = variant === 'gold';
+  const goldChampion = isGold && isTop;
   const name = formatLeaderName(holderName);
   const pct = Math.max(0.08, Math.min(1, count / (max || 1)));
   const countLabel = count === 1 ? countLabelSingular : countLabelPlural;
@@ -562,27 +572,32 @@ function CountLeaderSheetRow({
         borderRadius: 12,
         padding: '10px 12px',
         marginBottom: 6,
-        background: isTop
-          ? 'linear-gradient(100deg, #fff, #fff6e8)'
-          : '#FFFFFF',
-        border: isTop
-          ? '1px solid rgba(247,147,30,0.55)'
-          : '0.5px solid rgba(15,23,42,0.08)',
+        background: goldChampion
+          ? 'linear-gradient(100deg, #fff, #FFF6D8)'
+          : isTop
+            ? 'linear-gradient(100deg, #fff, #fff6e8)'
+            : '#FFFFFF',
+        border: goldChampion
+          ? '1px solid rgba(232,181,48,0.55)'
+          : isTop
+            ? '1px solid rgba(247,147,30,0.55)'
+            : '0.5px solid rgba(15,23,42,0.08)',
         cursor: onTap ? 'pointer' : 'default',
         fontFamily: FONT,
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 11, minWidth: 0 }}>
         <div
+          className={goldChampion ? 'clbhouz-gold-shimmer-light' : undefined}
           style={{
             width: 20,
             flexShrink: 0,
             fontSize: 11,
             fontWeight: 600,
             fontVariantNumeric: 'tabular-nums',
-            color: isTop ? AMBER : LEGEND_RANK,
             lineHeight: 1,
             textAlign: 'center',
+            ...(goldChampion ? {} : { color: isTop ? AMBER : LEGEND_RANK }),
           }}
         >
           {rank}
@@ -615,7 +630,7 @@ function CountLeaderSheetRow({
             >
               {name}
             </span>
-            {holderHcp != null ? (
+            {!isGold && holderHcp != null ? (
               <span
                 style={{
                   flexShrink: 0,
@@ -669,13 +684,14 @@ function CountLeaderSheetRow({
             {countLabel}
           </div>
           <div
+            className={goldChampion ? 'clbhouz-gold-shimmer-light' : undefined}
             style={{
               marginTop: 3,
               fontSize: 15,
               fontWeight: 700,
-              color: isTop ? AMBER : LEGEND_INK,
               lineHeight: 1,
               fontVariantNumeric: 'tabular-nums',
+              ...(goldChampion ? {} : { color: isTop ? AMBER : LEGEND_INK }),
             }}
           >
             {count}
@@ -693,12 +709,13 @@ function CountLeaderSheetRow({
           }}
         >
           <div
+            className={isGold ? 'clbhouz-gold-shimmer-bar' : undefined}
             style={{
               width: `${pct * 100}%`,
               height: '100%',
               borderRadius: 999,
-              background: AMBER,
               transition: 'width .35s cubic-bezier(.2,.8,.2,1)',
+              ...(isGold ? {} : { background: AMBER }),
             }}
           />
         </div>
