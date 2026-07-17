@@ -136,7 +136,7 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="bottom"
-        className="h-[92vh] p-0 !rounded-t-2xl overflow-hidden immersive-map-sheet expanded-map-glass-controls"
+        className="h-[75dvh] p-0 !rounded-t-2xl overflow-hidden immersive-map-sheet expanded-map-glass-controls"
         hideCloseButton
       >
         {/* Map IS the sheet */}
