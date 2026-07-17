@@ -210,7 +210,8 @@
     "yourRating": "[~~Ýőúř řáţíñĝ: {{rating}}~~]",
     "viewCourse": "[~~Ṽíéŵ ĉőúřšé~~]",
     "markPlayed": "[~~Ṁářǩ Ƥļáýéđ~~]",
-    "unavailableSafe": "[~~Ṁáƥ úñáṽáíļáƀļé — ýőúř ĵőúřñéý ƥřőĝřéšš íš šţíļļ šáƒé.~~]"
+    "unavailableSafe": "[~~Ṁáƥ úñáṽáíļáƀļé — ýőúř ĵőúřñéý ƥřőĝřéšš íš šţíļļ šáƒé.~~]",
+    "dismissInsightA11y": "[~~Đíšɱíšš íñšíĝĥţ~~]"
   },
   "userCourses": {
     "emptyRegion": "[~~Ñő ĉőúřšéš ƒőúñđ íñ ţĥé šéļéĉţéđ řéĝíőñ.~~]",
@@ -476,6 +477,10 @@
       "youvePlayed": "[~~Ýőú'ṽé ƥļáýéđ {{played}}/{{total}}~~]",
       "journeyLabel": "[~~Ýőúř Ţőƥ 100 Ĵőúřñéý~~]",
       "progressPlayed": "[~~{{played}} őƒ {{total}} ƥļáýéđ~~]"
+    },
+    "a11y": {
+      "openMediaTab": "[~~Őƥéñ Ṁéđíá ţáƀ~~]",
+      "sections": "[~~Ĉőúřšé Đéţáíļ Šéĉţíőñš~~]"
     }
   },
   "network": {
@@ -492,7 +497,9 @@
     "unseenReviewsBody": "[~~<name>{{name}}</name> řéṽíéŵéđ <course>{{course}}</course> · <rating>{{rating}}</rating>~~]",
     "unseenReviewsMore_one": "[~~ +{{count}} ɱőřé~~]",
     "unseenReviewsMore_other": "[~~ +{{count}} ɱőřé~~]",
-    "viewArrow": "[~~Ṽíéŵ →~~]"
+    "viewArrow": "[~~Ṽíéŵ →~~]",
+    "circleKicker": "[~~ÝŐÚŘ ĈÍŘĈĻÉ~~]",
+    "friendsPlayedTitle": "[~~Ĉőúřšéš ƥļáýéđ ƀý ƒříéñđš~~]"
   },
   "phase5": {
     "statusToggle": {
@@ -521,6 +528,8 @@
       "title": "[~~Ƥļáññíñĝ~~]",
       "addBucketList": "[~~Áđđ ţő ƀúĉǩéţ ļíšţ~~]",
       "privateNote": "[~~Őñļý ýőú ĉáñ šéé ýőúř ƀúĉǩéţ ļíšţ.~~]"
-    }
+    },
+    "videoMomentAlt": "[~~Ṽíđéő ɱőɱéñţ~~]",
+    "courseMomentAlt": "[~~Ĉőúřšé ɱőɱéñţ~~]"
   }
 }

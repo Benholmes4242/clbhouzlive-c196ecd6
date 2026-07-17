@@ -210,7 +210,8 @@
     "yourRating": "Your rating: {{rating}}",
     "viewCourse": "View course",
     "markPlayed": "Mark Played",
-    "unavailableSafe": "Map unavailable — your journey progress is still safe."
+    "unavailableSafe": "Map unavailable — your journey progress is still safe.",
+    "dismissInsightA11y": "Dismiss insight"
   },
   "userCourses": {
     "emptyRegion": "No courses found in the selected region.",
@@ -476,6 +477,10 @@
       "youvePlayed": "You've played {{played}}/{{total}}",
       "journeyLabel": "Your Top 100 Journey",
       "progressPlayed": "{{played}} of {{total}} played"
+    },
+    "a11y": {
+      "openMediaTab": "Open Media tab",
+      "sections": "Course Detail Sections"
     }
   },
   "network": {
@@ -492,7 +497,9 @@
     "unseenReviewsBody": "<name>{{name}}</name> reviewed <course>{{course}}</course> · <rating>{{rating}}</rating>",
     "unseenReviewsMore_one": " +{{count}} more",
     "unseenReviewsMore_other": " +{{count}} more",
-    "viewArrow": "View →"
+    "viewArrow": "View →",
+    "circleKicker": "YOUR CIRCLE",
+    "friendsPlayedTitle": "Courses played by friends"
   },
   "phase5": {
     "statusToggle": {
@@ -521,6 +528,8 @@
       "title": "Planning",
       "addBucketList": "Add to bucket list",
       "privateNote": "Only you can see your bucket list."
-    }
+    },
+    "videoMomentAlt": "Video moment",
+    "courseMomentAlt": "Course moment"
   }
 }
