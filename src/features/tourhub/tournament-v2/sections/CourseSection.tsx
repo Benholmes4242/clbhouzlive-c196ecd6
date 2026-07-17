@@ -50,8 +50,10 @@ function fmtAvg(v: number): string {
 }
 
 export function CourseSection({ tournamentId }: Props) {
+  const { t } = useTranslation(['tourhub', 'courses']);
   const { data } = useTournamentHoleAnalysis(tournamentId);
   const [open, setOpen] = useState(false);
+
 
   const holes = data?.holes ?? [];
   const played = holes.filter((h) => Number.isFinite(h.avg_to_par));
