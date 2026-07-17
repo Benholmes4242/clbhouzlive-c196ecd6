@@ -11,8 +11,10 @@
  */
 
 import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+
 import { useHeroCarouselData, type HeroSlide } from '../../hooks/useHeroCarouselData';
 import { HybridHero } from './HybridHero';
 import { useTourSelection } from '../../context/TourSelectionContext';
