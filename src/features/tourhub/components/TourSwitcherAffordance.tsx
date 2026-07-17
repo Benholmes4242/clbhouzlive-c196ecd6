@@ -6,6 +6,7 @@
 
 import React, { useState } from 'react';
 import { ArrowLeftRight, Trophy } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useActiveMensMajor } from '../hooks/useActiveMensMajor';
 import { useTourSelection } from '../context/TourSelectionContext';
 import { TourPickerSheet, useTourPillLabel } from './TourPickerSheet';
