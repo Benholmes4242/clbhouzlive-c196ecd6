@@ -353,8 +353,8 @@ export function LeaderboardBand({
       );
     } else {
       const placeholderText = firstYearEvent
-        ? 'INAUGURAL EVENT · NO PRIOR RESULTS'
-        : 'Tournament preview not available.';
+        ? t('overview.leaderboardBand.inauguralPlaceholder')
+        : t('overview.leaderboardBand.previewUnavailable');
       body = (
         <div
           style={{
