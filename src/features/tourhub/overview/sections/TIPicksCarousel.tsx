@@ -471,12 +471,13 @@ function AllPicksSheet({
   onClose: () => void;
   onNavigatePlayer: (playerId: string) => void;
 }) {
+  const { t } = useTranslation('tourhub');
   const header = (
     <div style={{ marginBottom: 12 }}>
       <div style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: V4.amber, marginBottom: 4, fontVariantNumeric: 'tabular-nums' }}>
-        {picks.length} PICKS {'\u00B7'} TAP FOR THE CASE
+        {t('overview.tiPicks.sheet.picksHeader', { count: picks.length })}
       </div>
-      <div style={{ fontSize: 18, fontWeight: 800, color: V4.ink, letterSpacing: '-0.01em', lineHeight: 1.1 }}>The board</div>
+      <div style={{ fontSize: 18, fontWeight: 800, color: V4.ink, letterSpacing: '-0.01em', lineHeight: 1.1 }}>{t('overview.tiPicks.sheet.title')}</div>
     </div>
   );
   return (
