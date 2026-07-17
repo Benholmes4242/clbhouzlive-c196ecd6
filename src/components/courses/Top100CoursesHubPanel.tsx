@@ -208,14 +208,16 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
               fontWeight: 500,
               color: 'rgba(15,23,42,0.55)',
               lineHeight: 1.45,
+              maxWidth: 330,
               marginTop: 6,
               marginBottom: 12,
               fontFamily: "'Geist', sans-serif",
               letterSpacing: '-0.005em',
             }}
           >
-            {t('top100.provenance', { defaultValue: "As ranked by golf's leading publications." })}
+            {t('top100.provenance', { defaultValue: "The top 100 courses in the world and in every region, as ranked by golf's leading publications." })}
           </p>
+
           {crossListProgress && (
             <p
               style={{
