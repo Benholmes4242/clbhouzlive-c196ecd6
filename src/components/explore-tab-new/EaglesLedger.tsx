@@ -92,6 +92,9 @@ export function EaglesLedger({ region, regionUpper, mode, onRowTap, onLeaderTap 
           {mode === 'alltime'
             ? leaders.map((r, i) => {
                 const isFirst = i === 0;
+                const isLast = i === leaders.length - 1;
+                const banded = i === 1 || i === 3;
+                const isFirst = i === 0;
                 const name = formatHolderName(r.holder_name);
                 const count = r.eagles ?? 0;
                 const pct = Math.max(0.08, Math.min(1, count / (leaderMax || 1)));
