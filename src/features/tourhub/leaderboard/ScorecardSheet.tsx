@@ -8,6 +8,7 @@
  */
 
 import { useMemo, useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -71,6 +72,7 @@ function isDemotedStatus(s?: string | null): boolean {
 }
 
 export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
+  const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
   const { data: scRows = [] } = useScorecard(tournamentId, target?.playerId ?? null);
   const meta = useTournamentMeta(tournamentId);
@@ -116,15 +118,21 @@ export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
   }
 
   const demoted = isDemotedStatus(target.status);
-  const roundLabel = selectedRound != null ? `ROUND ${selectedRound}` : 'SCORECARD';
+  const roundLabel = selectedRound != null
+    ? t('tournament.scorecard.roundEyebrow', { round: selectedRound })
+    : t('tournament.scorecard.eyebrowFallback');
+  // Status token ('CUT'/'WD'/'DQ'/'MDF'/'MC'/'DNS') is golf-universal data
+  // vocabulary — never keyed, matches the lexicon rule for scoring tokens.
+  // eslint-disable-next-line i18next/no-literal-string
+  const statusToken = (target.status || 'CUT').toUpperCase();
   const eyebrowText = demoted
-    ? `${roundLabel} ${'\u00B7'} ${(target.status || 'CUT').toUpperCase()}`
+    ? `${roundLabel} ${'\u00B7'} ${statusToken}`
     : roundLabel;
 
   const courseName =
     meta.data?.venue_course_name
     ?? meta.data?.venue_name
-    ?? (meta.data?.name?.trim() || 'Scorecard');
+    ?? (meta.data?.name?.trim() || t('tournament.scorecard.courseFallback'));
   const courseLocation =
     [meta.data?.venue_city, meta.data?.venue_country].filter(Boolean).join(', ') || null;
   const coursePar = meta.data?.venue_par ?? null;

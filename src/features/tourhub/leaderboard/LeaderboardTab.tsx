@@ -47,6 +47,7 @@ function StatusChip({
   currentRound: number | null | undefined;
   startDate: string | null | undefined;
 }) {
+  const { t } = useTranslation('tourhub');
   const s = (status || '').toLowerCase();
   if (s === 'inprogress') {
     return (
@@ -70,7 +71,7 @@ function StatusChip({
           aria-hidden
           style={{ width: 5, height: 5, borderRadius: '50%', background: '#fff' }}
         />
-        {`R${currentRound ?? 1} \u00B7 IN PROGRESS`}
+        {t('board.status.inProgress', { round: currentRound ?? 1 })}
       </span>
     );
   }
@@ -89,7 +90,7 @@ function StatusChip({
           borderRadius: 4,
         }}
       >
-        FINAL
+        {t('board.status.final')}
       </span>
     );
   }
@@ -108,10 +109,11 @@ function StatusChip({
         borderRadius: 4,
       }}
     >
-      {startTxt ? `STARTS ${startTxt}` : 'UPCOMING'}
+      {startTxt ? t('board.status.startsOn', { date: startTxt }) : t('board.status.upcoming')}
     </span>
   );
 }
+
 
 export function LeaderboardTab() {
   const { t } = useTranslation('tourhub');
@@ -224,13 +226,18 @@ export function LeaderboardTab() {
     meta?.start_date ?? selected.start_date,
     meta?.end_date ?? selected.end_date,
   );
-  const metaBits = [par != null ? `Par ${par}` : null, yardage != null ? `${yardage} yards` : null, dates]
+  const metaBits = [
+    par != null ? t('board.meta.par', { par }) : null,
+    yardage != null ? t('board.meta.yardage', { yardage }) : null,
+    dates,
+  ]
     .filter(Boolean)
     .join(' \u00B7 ');
 
   // Footnote: our thru column stores 0-18 integers only; no back-nine marker
   // is encoded. Render only the 'F Finished' clause.
-  const footnote = 'F Finished';
+  const footnote = t('board.footnote');
+
 
   const showTabs = liveTournaments.length > 1;
 
@@ -277,7 +284,7 @@ export function LeaderboardTab() {
                 ref={searchInputRef}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search players"
+                placeholder={t('board.search.placeholder')}
                 style={{
                   flex: 1,
                   border: 'none',
@@ -295,7 +302,7 @@ export function LeaderboardTab() {
                   setSearchQuery('');
                   setSearchOpen(false);
                 }}
-                aria-label="Close search"
+                aria-label={t('board.search.closeAria')}
                 style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex' }}
               >
                 <X size={13} color={MUTED} />
@@ -305,7 +312,7 @@ export function LeaderboardTab() {
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
-              aria-label="Search players"
+              aria-label={t('board.search.openAria')}
               style={{
                 background: 'none',
                 border: 'none',
@@ -424,11 +431,11 @@ export function LeaderboardTab() {
           textTransform: 'uppercase',
         }}
       >
-        <div style={{ width: 52, flexShrink: 0 }}>POS</div>
-        <div style={{ flex: 1, minWidth: 0 }}>PLAYER</div>
-        <div style={{ width: 44, flexShrink: 0, textAlign: 'center' }}>TOT</div>
-        <div style={{ width: 44, flexShrink: 0, textAlign: 'center' }}>THRU</div>
-        <div style={{ width: 44, flexShrink: 0, textAlign: 'center' }}>TODAY</div>
+        <div style={{ width: 52, flexShrink: 0, whiteSpace: 'nowrap' }}>{t('board.columns.pos')}</div>
+        <div style={{ flex: 1, minWidth: 0, whiteSpace: 'nowrap' }}>{t('board.columns.player')}</div>
+        <div style={{ width: 44, flexShrink: 0, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('board.columns.tot')}</div>
+        <div style={{ width: 44, flexShrink: 0, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('board.columns.thru')}</div>
+        <div style={{ width: 44, flexShrink: 0, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('board.columns.today')}</div>
       </div>
 
       {/* BOARD */}
@@ -455,7 +462,7 @@ export function LeaderboardTab() {
             if (!row.player?.id) return;
             setSheetTarget({
               playerId: row.player.id,
-              playerName: row.player.full_name || 'Unknown',
+              playerName: row.player.full_name || t('board.unknownPlayer'),
               countryCode: row.player.country_code ?? row.player.country ?? null,
               position: row.position,
               positionTied: row.position_tied ?? false,

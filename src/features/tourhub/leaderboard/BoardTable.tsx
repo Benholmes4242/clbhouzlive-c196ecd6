@@ -22,6 +22,7 @@
  */
 
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { movementFromRounds } from './movementFromRounds';
 import { countryFlag, countryFallback } from './countryFlag';
@@ -137,6 +138,7 @@ function statusWord(s?: string | null): string {
 }
 
 export function BoardTable({ entries, cutState, currentRound, onRowClick }: Props) {
+  const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
 
   // Computed round-start deltas (empty in R1 / when unavailable).
@@ -177,7 +179,7 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
   const renderCutSentence = () => {
     if (cutState.kind === 'none') return null;
     const isProjected = cutState.kind === 'projected';
-    const label = isProjected ? 'Projected cut' : 'The following players failed to make the cut';
+    const label = isProjected ? t('board.cut.projected') : t('board.cut.actual');
     const cl = cutState.cutline;
     const numTxt =
       cl == null ? '' : cl === 0 ? 'E' : cl > 0 ? `+${cl}` : String(cl);
@@ -287,7 +289,7 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
             const n = Math.abs(d);
             return (
               <span
-                aria-label={climbed ? `Up ${n}` : `Down ${n}`}
+                aria-label={climbed ? t('board.movement.up', { count: n }) : t('board.movement.down', { count: n })}
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -330,7 +332,7 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
                 whiteSpace: 'nowrap',
               }}
             >
-              {e.player?.full_name || 'Unknown'}
+              {e.player?.full_name || t('board.unknownPlayer')}
             </span>
             {cc && (() => {
               const flag = countryFlag(cc);
