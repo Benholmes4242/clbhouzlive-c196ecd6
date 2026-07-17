@@ -1,6 +1,8 @@
 import { memo } from 'react';
 import { FONT } from './gamingLightTokens';
 import type { RecordsMode } from './hooks/useRegionFeats';
+import { ScopeSegment } from '@/components/shared/ScopeSegment';
+
 
 export const REGION_TABS: Array<{ slug: string | null; label: string }> = [
   { slug: null, label: 'Worldwide' },
@@ -78,52 +80,18 @@ function AlmanacLensInner({ region, onRegionChange, scope, onScopeChange }: Lens
           );
         })}
       </div>
-      <div
-        role="tablist"
-        aria-label="Scope"
-        style={{
-          flexShrink: 0,
-          display: 'inline-flex',
-          gap: 2,
-          padding: 2,
-          background: '#FFFFFF',
-          border: '1px solid rgba(15,23,42,0.08)',
-          borderRadius: 999,
-        }}
-      >
-        {([
-          { v: 'latest', label: 'Recent' },
-          { v: 'alltime', label: 'All time' },
-        ] as const).map((o) => {
-          const active = scope === o.v;
-          return (
-            <button
-              key={o.v}
-              type="button"
-              role="tab"
-              aria-selected={active}
-              onClick={() => onScopeChange(o.v)}
-              style={{
-                padding: '5px 11px',
-                borderRadius: 999,
-                background: active ? '#15171F' : 'transparent',
-                color: active ? '#FFFFFF' : 'rgba(15,23,42,0.55)',
-                border: 'none',
-                fontFamily: FONT,
-                fontSize: 10.5,
-                fontWeight: 600,
-                whiteSpace: 'nowrap',
-                cursor: 'pointer',
-                transition: 'all .15s',
-              }}
-            >
-              {o.label}
-            </button>
-          );
-        })}
-      </div>
+      <ScopeSegment<RecordsMode>
+        value={scope}
+        onChange={onScopeChange}
+        ariaLabel="Scope"
+        options={[
+          { value: 'latest', label: 'Recent' },
+          { value: 'alltime', label: 'All time' },
+        ]}
+      />
     </section>
   );
 }
+
 
 export const AlmanacLens = memo(AlmanacLensInner);

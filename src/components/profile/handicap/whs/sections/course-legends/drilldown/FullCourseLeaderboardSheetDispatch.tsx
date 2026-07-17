@@ -1,14 +1,17 @@
 /**
- * FullCourseLeaderboardSheetDispatch — Course Details "Champions > Full List"
- * sheet. Visually 1:1 with the Tour Hub Leaders FullListSheet: light SLATE_50
- * surface, amber eyebrow, ink title, dark sub-line, gold No.1 masthead, and a
- * simple ranked ledger for ranks 2..N.
+ * FullCourseLeaderboardSheetDispatch — Course Details "Champions" sheet.
  *
- * Signature-compatible with the legacy FullCourseLeaderboardSheet so the
- * drilldown just swaps components based on theme.
+ * Discover-language re-skin (see TierSeeAllSheet):
+ *   grabber → amber eyebrow (COURSE · CATEGORY · N ENTRIES) → 22/700 title
+ *   → white cards with hairline borders, champion tint on rank-1,
+ *     self-row tint, power bar per row (direction-aware).
+ *
+ * Behaviour parity with the dark FullCourseLeaderboardSheet:
+ *   pinned champion, defending "YOUR CROWN" pill, self-row jump pill.
  */
 
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { ChevronUp, ChevronDown } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -58,6 +61,33 @@ interface Props {
   theme?: 'light' | 'dark';
 }
 
+const SELF_TINT = 'rgba(247,147,30,0.06)';
+const SELF_BORDER = 'rgba(247,147,30,0.28)';
+const BAR_TRACK = 'rgba(15,23,42,0.08)';
+
+/** Lower-value-wins categories. */
+function isLowerBetter(cat: LegendCategory): boolean {
+  return cat.startsWith('lowest_gross_') || cat.startsWith('best_score_diff_');
+}
+
+function computeBarPct(
+  cat: LegendCategory,
+  rowValue: number,
+  championValue: number,
+): number {
+  if (!Number.isFinite(rowValue) || !Number.isFinite(championValue) || championValue === 0) {
+    return 0.08;
+  }
+  if (isLowerBetter(cat)) {
+    // Champion has the smallest value; higher values fill less.
+    // Handle negatives (score_diff) by using absolute distance from 0.
+    const c = Math.abs(championValue);
+    const r = Math.abs(rowValue) || c;
+    return Math.max(0.08, Math.min(1, c / r));
+  }
+  return Math.max(0.08, Math.min(1, rowValue / championValue));
+}
+
 export const FullCourseLeaderboardSheetDispatch: React.FC<Props> = ({
   open,
   onClose,
@@ -65,7 +95,6 @@ export const FullCourseLeaderboardSheetDispatch: React.FC<Props> = ({
   groupedRows,
   visibleCategories,
   initialCategory,
-  window: legendWindow,
 }) => {
   const category = useMemo(
     () => visibleCategories.find((c) => c.key === initialCategory) ?? null,
@@ -75,9 +104,176 @@ export const FullCourseLeaderboardSheetDispatch: React.FC<Props> = ({
   const rows = entry?.rows ?? [];
   const total = entry?.total ?? rows.length;
 
-  const windowLabel = legendWindow === '90d' ? '90 DAYS' : 'ALL TIME';
+  const champion = rows[0] ?? null;
+  const restRows = rows.slice(1);
+  const championValue = champion?.value ?? 0;
+  const selfIsChampion = !!champion?.isSelf;
+
+  // Self-row visibility tracking for the jump pill.
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const selfRowRef = useRef<HTMLDivElement | null>(null);
+  const [selfOffscreen, setSelfOffscreen] = useState<null | 'above' | 'below'>(null);
+  const selfRow = rows.find((r) => r.isSelf) ?? null;
+
+  useEffect(() => {
+    if (!open || !selfRow || selfIsChampion) {
+      setSelfOffscreen(null);
+      return;
+    }
+    const root = scrollRef.current;
+    const target = selfRowRef.current;
+    if (!root || !target) return;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          setSelfOffscreen(null);
+        } else {
+          const rootRect = root.getBoundingClientRect();
+          const tRect = target.getBoundingClientRect();
+          setSelfOffscreen(tRect.top < rootRect.top ? 'above' : 'below');
+        }
+      },
+      { root, threshold: 0.5 },
+    );
+    io.observe(target);
+    return () => io.disconnect();
+  }, [open, selfRow, selfIsChampion, initialCategory]);
+
+  const scrollToSelf = () => {
+    selfRowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
 
   if (!category) return null;
+
+  const renderRow = (r: SectionRow, opts: { isChampion: boolean }) => {
+    const { isChampion } = opts;
+    const barPct = isChampion ? 1 : computeBarPct(initialCategory, r.value, championValue);
+    const rowBg = isChampion
+      ? 'linear-gradient(100deg, #fff, #fff6e8)'
+      : r.isSelf
+      ? SELF_TINT
+      : '#fff';
+    const border = isChampion
+      ? `1px solid ${GOLD_BORDER}`
+      : r.isSelf
+      ? `1px solid ${SELF_BORDER}`
+      : '1px solid rgba(15,23,42,0.07)';
+    const rankColor = isChampion ? GOLD_DEEP : '#94A3B8';
+    const valueColor = isChampion ? GOLD_DEEP : INK;
+
+    return (
+      <div
+        key={`${r.rank}-${r.attained_at}-${r.name}`}
+        ref={r.isSelf && !isChampion ? selfRowRef : undefined}
+        style={{
+          borderRadius: 12,
+          padding: '10px 12px',
+          background: rowBg,
+          border,
+          marginBottom: 8,
+          fontFamily: FONT,
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
+          <div
+            style={{
+              width: 24,
+              textAlign: 'center',
+              flexShrink: 0,
+              fontSize: 14,
+              fontWeight: 900,
+              fontVariantNumeric: 'tabular-nums',
+              color: rankColor,
+              lineHeight: 1,
+            }}
+          >
+            {r.rank}
+          </div>
+          <div style={{ flexShrink: 0 }}>
+            <SquircleAvatar
+              size={34}
+              srcCandidates={r.photoUrl ? [r.photoUrl] : []}
+              alt={r.name}
+              hairlineRing
+              ringColor={isChampion ? GOLD_DEEP : LIGHT_HAIRLINE}
+            />
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div
+              style={{
+                fontSize: 13,
+                fontWeight: 700,
+                color: INK,
+                lineHeight: 1.2,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {r.isSelf ? 'You' : r.name}
+            </div>
+          </div>
+          <div
+            style={{
+              flexShrink: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-end',
+              justifyContent: 'center',
+              minWidth: 42,
+            }}
+          >
+            <div
+              style={{
+                fontSize: 15,
+                fontWeight: 900,
+                color: valueColor,
+                lineHeight: 1,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {r.valueDisplay}
+            </div>
+            <div
+              style={{
+                marginTop: 2,
+                fontSize: 8,
+                fontWeight: 800,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                color: '#94A3B8',
+                lineHeight: 1,
+              }}
+            >
+              {category.short}
+            </div>
+          </div>
+        </div>
+        {/* Power bar — indexed to champion. */}
+        <div
+          aria-hidden
+          style={{
+            marginTop: 8,
+            marginLeft: 35, // 24 rank + 11 gap
+            height: 3,
+            borderRadius: 999,
+            background: BAR_TRACK,
+            overflow: 'hidden',
+          }}
+        >
+          <div
+            style={{
+              width: `${Math.round(barPct * 100)}%`,
+              height: '100%',
+              background: AMBER,
+              borderRadius: 999,
+              transition: 'width .2s ease',
+            }}
+          />
+        </div>
+      </div>
+    );
+  };
 
   return (
     <BottomSheet
@@ -100,22 +296,25 @@ export const FullCourseLeaderboardSheetDispatch: React.FC<Props> = ({
         <div style={{ minWidth: 0 }}>
           <div
             style={{
-              fontSize: 8.5,
-              fontWeight: 800,
-              letterSpacing: '0.14em',
+              fontSize: 10.5,
+              fontWeight: 600,
+              letterSpacing: '0.06em',
               textTransform: 'uppercase',
               color: AMBER,
-              marginBottom: 4,
+              marginBottom: 6,
               fontVariantNumeric: 'tabular-nums',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
             }}
           >
-            {courseName} {'\u00B7'} {windowLabel} {'\u00B7'} {total} {total === 1 ? 'ENTRY' : 'ENTRIES'}
+            {courseName} {'\u00B7'} {category.short} {'\u00B7'} {total} {total === 1 ? 'ENTRY' : 'ENTRIES'}
           </div>
           <div
             id="course-legends-full-sheet-title"
             style={{
-              fontSize: 18,
-              fontWeight: 800,
+              fontSize: 22,
+              fontWeight: 700,
               color: INK,
               letterSpacing: '-0.01em',
               lineHeight: 1.1,
@@ -123,11 +322,33 @@ export const FullCourseLeaderboardSheetDispatch: React.FC<Props> = ({
           >
             {category.label}
           </div>
+          {selfIsChampion && (
+            <div
+              style={{
+                marginTop: 8,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '3px 8px',
+                borderRadius: 999,
+                background: 'rgba(247,147,30,0.12)',
+                border: `1px solid ${GOLD_BORDER}`,
+                color: GOLD_DEEP,
+                fontSize: 10,
+                fontWeight: 800,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+              }}
+            >
+              Your crown
+            </div>
+          )}
         </div>
       </div>
 
       {/* Body */}
       <div
+        ref={scrollRef}
         style={{
           flex: 1,
           minHeight: 0,
@@ -135,6 +356,7 @@ export const FullCourseLeaderboardSheetDispatch: React.FC<Props> = ({
           WebkitOverflowScrolling: 'touch',
           background: SLATE_50,
           padding: '12px 0',
+          position: 'relative',
         }}
       >
         {rows.length === 0 ? (
@@ -143,105 +365,48 @@ export const FullCourseLeaderboardSheetDispatch: React.FC<Props> = ({
           </div>
         ) : (
           <div style={{ padding: '0 16px' }}>
-            {rows.map((r, i) => {
-              const isTop = r.rank === 1;
-              return (
-                <div
-                  key={`${r.rank}-${r.attained_at}-${i}`}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 11,
-                    borderRadius: 12,
-                    padding: '10px 12px',
-                    background: isTop ? 'linear-gradient(100deg, #fff, #fff6e8)' : '#fff',
-                    border: isTop
-                      ? `1px solid ${GOLD_BORDER}`
-                      : '1px solid rgba(15,23,42,0.07)',
-                    marginBottom: 6,
-                    fontFamily: FONT,
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 24,
-                      textAlign: 'center',
-                      flexShrink: 0,
-                      fontSize: 14,
-                      fontWeight: 900,
-                      fontVariantNumeric: 'tabular-nums',
-                      color: isTop ? GOLD_DEEP : '#94A3B8',
-                      lineHeight: 1,
-                    }}
-                  >
-                    {r.rank}
-                  </div>
-                  <div style={{ flexShrink: 0 }}>
-                    <SquircleAvatar
-                      size={34}
-                      srcCandidates={r.photoUrl ? [r.photoUrl] : []}
-                      alt={r.name}
-                      hairlineRing
-                      ringColor={isTop ? GOLD_DEEP : LIGHT_HAIRLINE}
-                    />
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                    <div
-                      style={{
-                        fontSize: 13,
-                        fontWeight: 700,
-                        color: INK,
-                        lineHeight: 1.2,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {r.isSelf ? 'You' : r.name}
-                    </div>
-                  </div>
-                  <div
-                    style={{
-                      flexShrink: 0,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'flex-end',
-                      justifyContent: 'center',
-                      minWidth: 42,
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: 15,
-                        fontWeight: 900,
-                        color: INK,
-                        lineHeight: 1,
-                        fontVariantNumeric: 'tabular-nums',
-                      }}
-                    >
-                      {r.valueDisplay}
-                    </div>
-                    <div
-                      style={{
-                        marginTop: 2,
-                        fontSize: 8,
-                        fontWeight: 800,
-                        letterSpacing: '0.1em',
-                        textTransform: 'uppercase',
-                        color: '#94A3B8',
-                        lineHeight: 1,
-                      }}
-                    >
-                      {category.short}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+            {champion && renderRow(champion, { isChampion: true })}
+            {restRows.map((r) => renderRow(r, { isChampion: false }))}
           </div>
         )}
         <div style={{ height: 24 }} />
       </div>
+
+      {/* Self-row jump pill */}
+      {selfOffscreen && selfRow && (
+        <button
+          type="button"
+          onClick={scrollToSelf}
+          style={{
+            position: 'absolute',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            bottom: 20,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '8px 14px',
+            borderRadius: 999,
+            background: INK,
+            color: '#fff',
+            border: 'none',
+            fontFamily: FONT,
+            fontSize: 11,
+            fontWeight: 700,
+            letterSpacing: '0.04em',
+            boxShadow: '0 6px 20px rgba(15,23,42,0.28)',
+            cursor: 'pointer',
+            zIndex: 2,
+          }}
+        >
+          {selfOffscreen === 'above' ? (
+            <ChevronUp size={14} strokeWidth={2.5} />
+          ) : (
+            <ChevronDown size={14} strokeWidth={2.5} />
+          )}
+          Jump to you {'\u00B7'} #{selfRow.rank}
+        </button>
+      )}
     </BottomSheet>
   );
 };
