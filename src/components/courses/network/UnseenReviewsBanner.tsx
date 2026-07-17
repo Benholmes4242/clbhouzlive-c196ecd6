@@ -9,6 +9,7 @@ const AMBER = '#F7931E';
 
 export function UnseenReviewsBanner() {
   const navigate = useNavigate();
+  const { t } = useTranslation('courses');
   const { hasUnseen, unseenReviews, unseenCount, markCoursesAsSeen } = useUnseenFriendReviews();
   const [dismissed, setDismissed] = useState(false);
 
