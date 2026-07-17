@@ -5,7 +5,7 @@
 // "Round started" = at least one hole played by this competitor.
 // Used by CinematicFrame.liveRoundFor and FullLeaderboard.getLiveRoundData
 // so the hero and the leaderboard agree on when to show TODAY data.
-export function roundStarted(r: any): boolean {
+export function roundStarted(r: { thru?: number | null; strokes?: number | null } | null | undefined): boolean {
   if (!r) return false;
   const thru = r.thru ?? 0;
   const strokes = r.strokes ?? 0;
