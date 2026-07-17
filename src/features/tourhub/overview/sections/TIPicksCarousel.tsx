@@ -142,6 +142,7 @@ type SheetState =
   | { kind: 'case'; pick: AITopContender; from: 'index' | 'card' };
 
 export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props) {
+  const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
   const { data } = useAIPredictions(tournamentId ?? null);
   const [sheet, setSheet] = useState<SheetState>(null);
