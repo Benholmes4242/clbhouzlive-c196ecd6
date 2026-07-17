@@ -25,6 +25,7 @@
  */
 
 import { useMemo } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useCollegeSeasonStats, type CollegeSeasonStats } from '../../hooks/useCollegeStats';
 import { useCollegeMediaMap, type CollegeMedia } from '../../hooks/useCollegeMedia';
@@ -99,6 +100,7 @@ function SchoolSquircle({ size, logo, name }: { size: number; logo: string | nul
 }
 
 export function CollegeFranchise() {
+  const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
   const { data: collegeStats } = useCollegeSeasonStats();
   const { data: mediaMap } = useCollegeMediaMap();
@@ -149,28 +151,31 @@ export function CollegeFranchise() {
   const chaserColor = getCollegeColor(chaser.normalized_name);
 
   // Headline chain: DB > data-driven > generic fallback
-  const headline = (() => {
-    if (editorial.data?.headline) {
-      const line2 = (editorial.data as any).headlineTwo ?? null;
-      return { line1: editorial.data.headline as string, line2 };
-    }
-    if (!isClosingRace) return { line1: `${leaderShort} runs away with it.`, line2: null as string | null };
-    return { line1: `${leaderShort} leads. ${chaserShort} is closing.`, line2: null as string | null };
-  })();
+  const editorialLine1 = editorial.data?.headline as string | undefined;
+  const editorialLine2 = editorialLine1 ? ((editorial.data as any).headlineTwo ?? null) : null;
+  const useEditorial = Boolean(editorialLine1);
 
   const goCollege = (norm: string) => navigate(`/tourhub/college-golf/${norm}`);
 
   return (
     <SectionShell
-      eyebrow="COLLEGE FRANCHISE"
-      linkLabel="All franchises"
+      eyebrow={t('overview.collegeFranchise.eyebrow')}
+      linkLabel={t('overview.collegeFranchise.linkLabel')}
       onLinkClick={() => navigate('/tourhub?tab=college')}
     >
       {/* Editorial headline */}
       <div style={{ padding: '0 16px', marginBottom: 16 }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: V4.ink, letterSpacing: '-0.005em', lineHeight: 1.35 }}>
-          {headline.line1}
-          {headline.line2 ? <> <span style={{ color: V4.inkMute }}>{headline.line2}</span></> : null}
+          {useEditorial ? (
+            <>
+              {editorialLine1}
+              {editorialLine2 ? <> <span style={{ color: V4.inkMute }}>{editorialLine2}</span></> : null}
+            </>
+          ) : !isClosingRace ? (
+            <Trans t={t} i18nKey="overview.collegeFranchise.headlineRunaway" values={{ leader: leaderShort }} components={[<span key="a" />]} />
+          ) : (
+            <Trans t={t} i18nKey="overview.collegeFranchise.headlineClosing" values={{ leader: leaderShort, chaser: chaserShort }} components={[<span key="a" />]} />
+          )}
         </div>
       </div>
 
@@ -194,7 +199,7 @@ export function CollegeFranchise() {
           onClick={() => goCollege(leader.normalized_name)}
           onCaptainClick={leaderCap ? () => navigate(`/tourhub/player/${leaderCap.playerId}`) : undefined}
         />
-        <div style={{ fontSize: 10, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.16em' }}>VS</div>
+        <div style={{ fontSize: 10, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.16em' }}>{t('overview.collegeFranchise.vs')}</div>
         <DuelSide
           name={chaserShort}
           logo={chaserLogo}
@@ -226,7 +231,7 @@ export function CollegeFranchise() {
             {formatCurrency(leader.earnings_total)}
           </span>
           <span style={{ fontSize: 9, fontWeight: 700, color: V4.inkFaint, letterSpacing: '0.14em', textAlign: 'center' }}>
-            SEASON ALUMNI EARNINGS
+            {t('overview.collegeFranchise.tugLabel')}
           </span>
           <span style={{ fontSize: 11.5, fontWeight: 800, color: chaserColor, fontVariantNumeric: 'tabular-nums', textAlign: 'right' }}>
             {formatCurrency(chaser.earnings_total)}
@@ -275,7 +280,9 @@ export function CollegeFranchise() {
                   </span>
                 </div>
                 <div style={{ fontSize: 11, fontWeight: 500, color: V4.inkFaint, marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {s.player_count} on tour{capName ? ` · ${capName} captains` : ''}
+                  {capName
+                    ? t('overview.collegeFranchise.rowMetaWithCaptain', { count: s.player_count, captain: capName })
+                    : t('overview.collegeFranchise.rowMeta', { count: s.player_count })}
                 </div>
 
               </div>
@@ -309,6 +316,7 @@ function DuelSide({
   onClick: () => void;
   onCaptainClick?: () => void;
 }) {
+  const { t } = useTranslation('tourhub');
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
       <button
@@ -363,7 +371,7 @@ function DuelSide({
             {captain.name}
           </span>
           <span style={{ fontSize: 7.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em', whiteSpace: 'nowrap' }}>
-            · CAPTAIN
+            {t('overview.collegeFranchise.captainSuffix')}
           </span>
         </button>
       ) : (

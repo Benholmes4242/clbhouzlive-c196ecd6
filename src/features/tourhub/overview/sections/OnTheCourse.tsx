@@ -16,6 +16,7 @@
  */
 
 import { useEffect, useRef, useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useFeaturedGroups } from '../data/useFeaturedGroups';
 import { useTeeTimesAll, type TeeGroup } from '@/features/tourhub/tournament-v2/data/useTeeTimesAll';
@@ -123,6 +124,7 @@ function teeKey(g: TeeGroup): string {
 }
 
 export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
+  const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
   const { data } = useFeaturedGroups(tournamentId, { live });
   const [expanded, setExpanded] = useState(false);
@@ -160,12 +162,12 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
   const moreCount = totalKnown != null ? Math.max(0, totalKnown - featuredCount) : null;
 
   const rightMeta = totalKnown != null
-    ? `${totalKnown} groups${round != null ? ` · R${round}` : ''}`
-    : (round != null ? `R${round}` : undefined);
+    ? t('overview.onTheCourse.rightMetaWithRound', { count: totalKnown, round })
+    : (round != null ? t('overview.onTheCourse.roundShort', { round }) : undefined);
 
   return (
     <div style={{ marginTop: SPACE.sectionSection }}>
-      <SectionShell eyebrow="On the course" eyebrowColor={V4.amber} rightMeta={rightMeta}>
+      <SectionShell eyebrow={t('overview.onTheCourse.eyebrow')} eyebrowColor={V4.amber} rightMeta={rightMeta}>
         <div
           ref={railRef}
           style={{
@@ -223,7 +225,7 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                       lineHeight: 1,
                     }}
                   >
-                    ★ FEATURED
+                    ★ {t('overview.onTheCourse.featuredChip')}
                   </span>
                 </div>
                 {(g.players ?? []).slice(0, 3).map((p, pi) => {
@@ -278,7 +280,7 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
             <button
               type="button"
               onClick={() => setExpanded(true)}
-              aria-label="Show all groups"
+              aria-label={t('overview.onTheCourse.showAllAria')}
               style={{
                 minWidth: 122,
                 flexShrink: 0,
@@ -296,9 +298,9 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
               }}
             >
               <span style={{ fontSize: 22, fontWeight: 300, color: '#64748B', lineHeight: 1 }}>›</span>
-              <span style={{ fontSize: 11.5, fontWeight: 800, color: V4.ink }}>All groups</span>
+              <span style={{ fontSize: 11.5, fontWeight: 800, color: V4.ink }}>{t('overview.onTheCourse.allGroups')}</span>
               <span style={{ fontSize: 10, fontWeight: 600, color: '#94A3B8' }}>
-                {moreCount != null ? `${moreCount} more` : 'full field'}
+                {moreCount != null ? t('overview.onTheCourse.moreCount', { count: moreCount }) : t('overview.onTheCourse.fullField')}
               </span>
             </button>
           )}
@@ -332,7 +334,7 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  FULL FIELD
+                  {t('overview.onTheCourse.fullFieldDivider')}
                 </div>
                 <div style={{ flex: 1, width: 1, background: '#E2E8F0' }} />
               </div>
@@ -385,8 +387,8 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                     } as React.CSSProperties}
                   >
                     <div style={{ fontSize: 9.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>
-                      {time ? `TEE ${time}` : ''}
-                      {g.startingHole ? ` · HOLE ${g.startingHole}` : ''}
+                      {time ? t('overview.onTheCourse.teeTimeLabel', { time }) : ''}
+                      {g.startingHole ? t('overview.onTheCourse.holeLabelSep', { hole: g.startingHole }) : ''}
                     </div>
                     {g.players.slice(0, 3).map((p, pi) => (
                       <button
@@ -430,7 +432,7 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
               <button
                 type="button"
                 onClick={collapseToFeatured}
-                aria-label="Back to featured"
+                aria-label={t('overview.onTheCourse.backToFeaturedAria')}
                 style={{
                   minWidth: 122,
                   flexShrink: 0,
@@ -448,8 +450,8 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                 }}
               >
                 <span style={{ fontSize: 22, fontWeight: 300, color: '#64748B', lineHeight: 1 }}>‹</span>
-                <span style={{ fontSize: 11.5, fontWeight: 800, color: V4.ink }}>Back to</span>
-                <span style={{ fontSize: 11.5, fontWeight: 800, color: V4.ink }}>featured</span>
+                <span style={{ fontSize: 11.5, fontWeight: 800, color: V4.ink }}>{t('overview.onTheCourse.backToLine1')}</span>
+                <span style={{ fontSize: 11.5, fontWeight: 800, color: V4.ink }}>{t('overview.onTheCourse.backToLine2')}</span>
               </button>
             </>
           )}

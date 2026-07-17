@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { MapPin } from 'lucide-react';
 import { INK, GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants';
 
@@ -47,10 +48,11 @@ export function CourseStatsStrip({
   courseRecord,
   courseRecordHolder,
 }: CourseStatsStripProps) {
+  const { t } = useTranslation('tourhub');
   const summaryParts: string[] = [];
-  if (par) summaryParts.push(`Par ${par}`);
-  if (yardage) summaryParts.push(`${formatNumber(yardage)} yds`);
-  const summary = summaryParts.join(' · ') || 'Course preview';
+  if (par) summaryParts.push(t('board.meta.par', { par }));
+  if (yardage) summaryParts.push(t('tournament.eventInfo.yardageShort', { yardage: formatNumber(yardage) }));
+  const summary = summaryParts.join(' · ') || t('overview.courseStats.fallbackSummary');
 
   return (
     <div
@@ -92,7 +94,7 @@ export function CourseStatsStrip({
           }}
         >
           <MapPin size={10} color={GOLD} strokeWidth={2.5} />
-          COURSE
+          {t('overview.courseStats.eyebrow')}
         </div>
         <div
           style={{
@@ -120,7 +122,9 @@ export function CourseStatsStrip({
               textOverflow: 'ellipsis',
             }}
           >
-            Record: {courseRecord}{courseRecordHolder ? ` · ${courseRecordHolder}` : ''}
+            {courseRecordHolder
+              ? t('overview.courseStats.recordLabelWithHolder', { value: courseRecord, holder: courseRecordHolder })
+              : t('overview.courseStats.recordLabel', { value: courseRecord })}
           </div>
         )}
       </div>
@@ -147,7 +151,7 @@ export function CourseStatsStrip({
               marginTop: 2,
             }}
           >
-            PAR
+            {t('overview.courseStats.parLabel')}
           </div>
         </div>
       )}

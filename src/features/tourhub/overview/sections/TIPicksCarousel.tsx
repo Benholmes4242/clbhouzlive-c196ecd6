@@ -4,6 +4,8 @@
  */
 
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { useNavigate } from 'react-router-dom';
 import { useAIPredictions } from '../../hooks/useAIPredictions';
 import { SectionShell } from './SectionShell';
@@ -43,9 +45,9 @@ function scoreColor(v: number | null | undefined): string {
   return getScoreColor(v, 'light');
 }
 
-function formatThru(thru: number | null | undefined): string {
+function formatThru(t: TFunction, thru: number | null | undefined): string {
   if (thru == null || !Number.isFinite(thru)) return '';
-  return thru >= 18 ? 'F' : `thru ${thru}`;
+  return thru >= 18 ? t('overview.tiPicks.thru.finished') : t('overview.tiPicks.thru.thruN', { n: thru });
 }
 
 const CUT_STATUSES = new Set(['CUT', 'WD', 'DQ']);
@@ -55,10 +57,10 @@ function cutStatus(live: PickLiveState | undefined): string | null {
 }
 
 // Confidence label from the ABSOLUTE win prob (kept honest, not relative).
-function confidenceLabel(winProb: number): { label: string; color: string } {
-  if (winProb >= 12) return { label: 'High', color: V4.amberDeep };
-  if (winProb >= 6) return { label: 'Solid', color: V4.amber };
-  return { label: 'Live', color: V4.inkMute };
+function confidenceLabel(t: TFunction, winProb: number): { label: string; color: string } {
+  if (winProb >= 12) return { label: t('overview.tiPicks.confidence.high'), color: V4.amberDeep };
+  if (winProb >= 6) return { label: t('overview.tiPicks.confidence.solid'), color: V4.amber };
+  return { label: t('overview.tiPicks.confidence.live'), color: V4.inkMute };
 }
 
 // Confidence bar: fill is RELATIVE to the field leader so the top pick reads
@@ -66,9 +68,10 @@ function confidenceLabel(winProb: number): { label: string; color: string } {
 // render the raw percentage. `leader` is the max winProbability across the
 // current pick set (passed down from TIPicksCarousel).
 function ConfidenceBar({ value, leader, compact = false }: { value: number; leader: number; compact?: boolean }) {
+  const { t } = useTranslation('tourhub');
   const safeLeader = leader > 0 ? leader : 1;
   const fillPct = Math.max(8, Math.min(100, Math.round((value / safeLeader) * 100)));
-  const { label, color } = confidenceLabel(value);
+  const { label, color } = confidenceLabel(t, value);
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
       <div style={{ flex: 1, height: compact ? 5 : 6, borderRadius: 999, background: V4.hairline, overflow: 'hidden' }}>
@@ -81,17 +84,22 @@ function ConfidenceBar({ value, leader, compact = false }: { value: number; lead
   );
 }
 
-function verdict(live: PickLiveState | undefined): { hit: boolean; label: string } {
+function verdict(t: TFunction, live: PickLiveState | undefined): { hit: boolean; label: string } {
   const cut = cutStatus(live);
-  if (cut) return { hit: false, label: `MISS · ${cut}` };
+  if (cut) return { hit: false, label: t('overview.tiPicks.verdict.missCut', { cut }) };
   if (!live || live.position == null) {
-    return { hit: false, label: 'MISS' };
+    return { hit: false, label: t('overview.tiPicks.verdict.missOnly') };
   }
   const posText = formatPosition(live.position, live.positionTied);
   const scoreText = formatScore(live.score);
-  if (live.position === 1) return { hit: true, label: `WON · ${scoreText}` };
+  if (live.position === 1) return { hit: true, label: t('overview.tiPicks.verdict.won', { score: scoreText }) };
   const hit = live.position <= 10;
-  return { hit, label: `${hit ? 'HIT' : 'MISS'} · ${posText} · ${scoreText}` };
+  return {
+    hit,
+    label: hit
+      ? t('overview.tiPicks.verdict.hit', { pos: posText, score: scoreText })
+      : t('overview.tiPicks.verdict.miss', { pos: posText, score: scoreText }),
+  };
 }
 
 /**
@@ -134,6 +142,7 @@ type SheetState =
   | { kind: 'case'; pick: AITopContender; from: 'index' | 'card' };
 
 export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props) {
+  const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
   const { data } = useAIPredictions(tournamentId ?? null);
   const [sheet, setSheet] = useState<SheetState>(null);
@@ -168,7 +177,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
   const orderedPicks = orderPicksByBoard(picks, state, liveMap);
 
   return (
-    <SectionShell eyebrow="Tournament intelligence" linkLabel="All picks" onLinkClick={() => setSheet({ kind: 'index' })}>
+    <SectionShell eyebrow={t('overview.tiPicks.eyebrow')} linkLabel={t('overview.tiPicks.linkLabel')} onLinkClick={() => setSheet({ kind: 'index' })}>
       <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 16px 10px', scrollPaddingLeft: 16, scrollSnapType: 'x mandatory' }}>
         {orderedPicks.slice(0, 8).map((p) => (
           <button
@@ -220,10 +229,10 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
 
             <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
               <span style={{ fontSize: 10, fontWeight: 800, color: V4.amber, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                The case ›
+                {t('overview.tiPicks.card.theCase')}
               </span>
               <span style={{ fontSize: 9, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                Pick {p.rank}
+                {t('overview.tiPicks.card.pickLabel', { rank: p.rank })}
               </span>
             </div>
           </button>
@@ -259,6 +268,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
 }
 
 function InlineStateValue({ state, pick, live, leader }: { state: EventState; pick: AITopContender; live: PickLiveState | undefined; leader: number }) {
+  const { t } = useTranslation('tourhub');
   if (state === 'upcoming') {
     return <ConfidenceBar value={pick.winProbability ?? 0} leader={leader} compact />;
   }
@@ -282,8 +292,11 @@ function InlineStateValue({ state, pick, live, leader }: { state: EventState; pi
     );
   }
   // completed
-  const v = verdict(live);
+  const v = verdict(t, live);
   const isWon = !cut && live?.position === 1;
+  const chipLabel = v.hit
+    ? (isWon ? t('overview.tiPicks.chip.won') : t('overview.tiPicks.chip.hit'))
+    : (cut ? t('overview.tiPicks.chip.missCut', { cut }) : t('overview.tiPicks.chip.miss'));
   return (
     <span
       style={{
@@ -299,7 +312,7 @@ function InlineStateValue({ state, pick, live, leader }: { state: EventState; pi
         textTransform: 'uppercase',
       }}
     >
-      {v.hit ? (isWon ? 'Won' : 'Hit') : cut ? `Miss · ${cut}` : 'Miss'}
+      {chipLabel}
     </span>
   );
 }
@@ -326,10 +339,11 @@ function CutTag({ label }: { label: string }) {
 }
 
 function CaseHeaderMeta({ pick }: { pick: AITopContender }) {
+  const { t } = useTranslation('tourhub');
   if (pick.courseFitScore == null) return null;
   return (
     <div style={{ fontSize: 11, fontWeight: 700, color: V4.inkMute, fontVariantNumeric: 'tabular-nums', letterSpacing: '0.02em' }}>
-      {`course fit ${Math.round(pick.courseFitScore)}`}
+      {t('overview.tiPicks.case.courseFit', { score: Math.round(pick.courseFitScore) })}
     </div>
   );
 }
@@ -388,6 +402,7 @@ function CaseSheet({
   onClose: () => void;
   onNavigatePlayer: (playerId: string) => void;
 }) {
+  const { t } = useTranslation('tourhub');
   const header = (
     <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
       <div
@@ -399,7 +414,7 @@ function CaseSheet({
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
             <span style={{ fontSize: 10.5, fontWeight: 800, color: V4.amber, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-              The case for
+              {t('overview.tiPicks.case.eyebrow')}
             </span>
             <span style={{ fontSize: 22, color: V4.inkFaint, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>#{pick.rank}</span>
           </div>
@@ -428,7 +443,7 @@ function CaseSheet({
       {pick.concern ? (
         <div style={{ marginTop: 16, padding: 12, background: V4.amberSoft, borderRadius: 10, fontSize: 12, color: V4.ink }}>
           <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.14em', color: V4.amber, textTransform: 'uppercase', marginBottom: 4 }}>
-            Concern
+            {t('overview.tiPicks.case.concernLabel')}
           </div>
           {pick.concern}
         </div>
@@ -456,12 +471,13 @@ function AllPicksSheet({
   onClose: () => void;
   onNavigatePlayer: (playerId: string) => void;
 }) {
+  const { t } = useTranslation('tourhub');
   const header = (
     <div style={{ marginBottom: 12 }}>
       <div style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: V4.amber, marginBottom: 4, fontVariantNumeric: 'tabular-nums' }}>
-        {picks.length} PICKS {'\u00B7'} TAP FOR THE CASE
+        {t('overview.tiPicks.sheet.picksHeader', { count: picks.length })}
       </div>
-      <div style={{ fontSize: 18, fontWeight: 800, color: V4.ink, letterSpacing: '-0.01em', lineHeight: 1.1 }}>The board</div>
+      <div style={{ fontSize: 18, fontWeight: 800, color: V4.ink, letterSpacing: '-0.01em', lineHeight: 1.1 }}>{t('overview.tiPicks.sheet.title')}</div>
     </div>
   );
   return (
@@ -508,6 +524,7 @@ function AllPicksSheet({
 }
 
 function SheetStateStrip({ state, pick, live, leader }: { state: EventState; pick: AITopContender; live: PickLiveState | undefined; leader: number }) {
+  const { t } = useTranslation('tourhub');
   if (state === 'upcoming') {
     return <ConfidenceBar value={pick.winProbability ?? 0} leader={leader} />;
   }
@@ -520,22 +537,25 @@ function SheetStateStrip({ state, pick, live, leader }: { state: EventState; pic
     const pos = formatPosition(live.position, live.positionTied);
     const todayText = live.today != null ? formatScore(live.today) : formatScore(live.score);
     const todayCol = scoreColor(live.today ?? live.score);
-    const thruText = formatThru(live.thru);
+    const thruText = formatThru(t, live.thru);
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, fontWeight: 700 }}>
         <span style={{ color: V4.inkFaint, fontWeight: 700, fontVariantNumeric: 'tabular-nums', fontSize: 14 }}>{pos}</span>
         <span style={{ color: todayCol, fontVariantNumeric: 'tabular-nums' }}>{todayText}</span>
-        {thruText ? <span style={{ color: V4.inkFaint, fontVariantNumeric: 'tabular-nums' }}>· {thruText}</span> : null}
+        {thruText ? <span style={{ color: V4.inkFaint, fontVariantNumeric: 'tabular-nums' }}>{t('overview.tiPicks.thruSep', { value: thruText })}</span> : null}
       </div>
     );
   }
-  const v = verdict(live);
+  const v = verdict(t, live);
   const isWon = !cut && live?.position === 1;
   const finalLine = cut
     ? null
     : live && live.position != null
-      ? `${formatPosition(live.position, live.positionTied)} · ${formatScore(live.score)}`
+      ? t('overview.tiPicks.finalLine', { pos: formatPosition(live.position, live.positionTied), score: formatScore(live.score) })
       : '—';
+  const chipLabel = v.hit
+    ? (isWon ? t('overview.tiPicks.chip.won') : t('overview.tiPicks.chip.hit'))
+    : (cut ? t('overview.tiPicks.chip.missCut', { cut }) : t('overview.tiPicks.chip.miss'));
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
       <span
@@ -550,7 +570,7 @@ function SheetStateStrip({ state, pick, live, leader }: { state: EventState; pic
           textTransform: 'uppercase',
         }}
       >
-        {v.hit ? (isWon ? 'Won' : 'Hit') : cut ? `Miss · ${cut}` : 'Miss'}
+        {chipLabel}
       </span>
       {finalLine ? (
         <span style={{ fontSize: 11.5, fontWeight: 700, color: V4.inkMute, fontVariantNumeric: 'tabular-nums' }}>{finalLine}</span>
