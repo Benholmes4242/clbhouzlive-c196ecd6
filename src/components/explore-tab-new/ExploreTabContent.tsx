@@ -217,13 +217,15 @@ function LegendarySection({
       <SectionHead
         overline={mode === 'alltime' ? 'All-time honours' : 'Latest honours'}
         title="Moments of the game"
+        meta="View all"
+        onMeta={() => openSheet('aces')}
+        paddingX={14}
       />
 
 
       <AcesAlbatrossesPodium
         region={region}
         mode={mode}
-        onViewAll={openSheet}
         onRowTap={onLeaderTap}
         onLatestRowTap={onRowTap}
       />
