@@ -4,7 +4,7 @@ export * from './StatusChip';
 export * from './LastUpdatedPill';
 export * from './EventCard';
 
-export * from './PremiumEmptyState';
+
 export * from './ErrorState';
 export * from './skeletons';
 export * from './CollegeLogo';

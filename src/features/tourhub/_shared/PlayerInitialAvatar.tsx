@@ -12,7 +12,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { INK_TINT_06 } from '../../_shared/tokens';
+import { INK_TINT_06 } from './tokens';
 import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
 
 export interface PlayerInitialAvatarProps {

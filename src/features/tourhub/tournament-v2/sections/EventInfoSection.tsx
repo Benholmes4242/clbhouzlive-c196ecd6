@@ -8,7 +8,7 @@
  * the full tee-times sheet (Brief F-TD-4).
  */
 import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
-import { formatPurse } from '../../components/shared/TourHeroHelpers';
+import { formatPurse } from '../../_shared/formatPurse';
 import { SectionEyebrow } from './SectionEyebrow';
 import { FONT, INK, INK_MUTE, INK_FAINT, HAIRLINE_INK_8, SURFACE } from '../../_shared/tokens';
 import { formatNumber, formatTournamentDateRange } from '@/i18n/format';

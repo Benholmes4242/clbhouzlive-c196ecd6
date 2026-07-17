@@ -13,7 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { Check, Zap } from 'lucide-react';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
-import { PlayerInitialAvatar } from '@/features/tourhub/components/shared/PlayerInitialAvatar';
+import { PlayerInitialAvatar } from '@/features/tourhub/_shared/PlayerInitialAvatar';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';

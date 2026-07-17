@@ -10,7 +10,7 @@ import { formatWeekdayShort, formatMonthShort } from '@/i18n/format';
 import { Trophy } from 'lucide-react';
 import { PlayerAvatar } from '../../components/PlayerAvatar';
 import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
-import { formatPurse } from '../../components/shared/TourHeroHelpers';
+import { formatPurse } from '../../_shared/formatPurse';
 import { isAnyMajor } from '../../utils/majorScope';
 import { formatNumber } from '@/i18n/format';
 import {
