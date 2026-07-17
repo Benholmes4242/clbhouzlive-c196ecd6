@@ -124,7 +124,7 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
               <>
                 <img
                   src={moment.posterUrl || moment.mediaUrl}
-                  alt="Video moment"
+                  alt={t('phase5.videoMomentAlt')}
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   loading="lazy"
                 />
