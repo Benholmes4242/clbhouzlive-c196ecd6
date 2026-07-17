@@ -1273,8 +1273,8 @@ export function CinematicFrame({
               }
               // tie row — shared TOTAL only; spacers for TODAY/THRU
               const label = row.isLeader
-                ? `${row.count} tied for the lead`
-                : `${row.count} players`;
+                ? t('overview.cinematic.tiedForLead', { count: row.count })
+                : t('overview.cinematic.playersTiedCount', { count: row.count });
               return (
                 <div key={`tie-${i}`} style={rowStyle}>
                   <span style={{ ...NUMERIC_STYLE, width: RANK_W, fontSize: 12, fontWeight: 700, color: row.isLeader ? LEADER_RED : 'rgba(255,255,255,0.5)', textAlign: 'left', flexShrink: 0 }}>{row.rank}</span>
