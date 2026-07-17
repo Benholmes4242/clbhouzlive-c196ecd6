@@ -100,7 +100,7 @@ export function TournamentsSection({
           const isWin = r.position === 1 && !isMissed;
           const isMajor = r.tournament_name ? isAnyMajor(r.tournament_name) : false;
           const isLive = liveTournamentId === r.tournament_id;
-          const pos = fmtPosition(r);
+          const pos = fmtPosition(r, t);
           const dt = r.tournament_end_date ? new Date(r.tournament_end_date) : null;
           const day = dt ? String(dt.getDate()) : '';
           const month = dt ? formatMonthShort(dt).toUpperCase() : '';
