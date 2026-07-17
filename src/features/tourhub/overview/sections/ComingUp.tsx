@@ -17,6 +17,7 @@ import { formatMonthShort } from '@/i18n/format';
 const PAGE_SIZE = 5;
 
 export function ComingUp({ tour }: { tour: TourId | null }) {
+  const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
   const { data } = useComingUp(tour, 15);
   const rows = data ?? [];
