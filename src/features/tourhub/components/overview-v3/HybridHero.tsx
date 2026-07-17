@@ -7,6 +7,7 @@
  */
 
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import '@/styles/hybrid-hero.css';
 
@@ -81,6 +82,7 @@ export interface HybridHeroProps {
 
 export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHeroProps) {
   const { tournament } = slide;
+  const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
 
   // 1-minute clock tick (suspended for live state — Sportradar polling drives those transitions)
@@ -227,7 +229,7 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
         photoUrl: m.player.photo_url ?? null,
       }));
     return {
-      teamName: team.abbr_name || team.display_name || 'Team',
+      teamName: team.abbr_name || team.display_name || t('overview.hybridHero.teamFallback'),
       members,
       score: fmtScore(top.score),
     };
@@ -283,7 +285,7 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
         : null;
   const isPseudoMajor = tournament.tourSlug === 'major';
   const tourLabel = isPseudoMajor
-    ? 'MAJOR CHAMPIONSHIP'
+    ? t('overview.hybridHero.majorChampionship')
     : tournament.tourName || tournament.tourSlug?.toUpperCase() || null;
   // Same-tour majors (Evian on LPGA, Senior PGA on CHAMP, etc.) get a small
   // gold "MAJOR" tag next to the eyebrow — no relocation, cosmetic only.

@@ -16,6 +16,7 @@
  */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '../../../_shared/resolvePlayerAvatar';
@@ -179,6 +180,7 @@ export interface ChampionData {
 // ---- Countdown (upcoming) -------------------------------------------------
 
 function CountdownPills({ hoursUntilStart }: { hoursUntilStart: number }) {
+  const { t } = useTranslation('tourhub');
   if (!Number.isFinite(hoursUntilStart) || hoursUntilStart <= 0) return null;
 
   const totalMin = Math.max(0, Math.floor(hoursUntilStart * 60));
@@ -194,7 +196,7 @@ function CountdownPills({ hoursUntilStart }: { hoursUntilStart: number }) {
           ...NUMERIC_STYLE,
         }}
       >
-        Teeing off soon
+        {t('overview.cinematic.teeingOffSoon')}
       </span>
     );
   }
@@ -205,14 +207,14 @@ function CountdownPills({ hoursUntilStart }: { hoursUntilStart: number }) {
 
   const pills: { value: number; label: string }[] = [];
   if (hoursUntilStart >= 24) {
-    pills.push({ value: d, label: 'DAYS' });
-    pills.push({ value: h, label: 'HRS' });
-    pills.push({ value: m, label: 'MIN' });
+    pills.push({ value: d, label: t('overview.comingUp.daysLabel') });
+    pills.push({ value: h, label: t('overview.cinematic.countdownHoursLabel') });
+    pills.push({ value: m, label: t('overview.cinematic.countdownMinutesLabel') });
   } else if (hoursUntilStart >= 1) {
-    pills.push({ value: h, label: 'HRS' });
-    pills.push({ value: m, label: 'MIN' });
+    pills.push({ value: h, label: t('overview.cinematic.countdownHoursLabel') });
+    pills.push({ value: m, label: t('overview.cinematic.countdownMinutesLabel') });
   } else {
-    pills.push({ value: m, label: 'MIN' });
+    pills.push({ value: m, label: t('overview.cinematic.countdownMinutesLabel') });
   }
 
   return (
@@ -307,6 +309,7 @@ export function CinematicHeroFullBleed({
   isPseudoMajor,
   showMajorTag,
 }: CinematicHeroFullBleedProps) {
+  const { t } = useTranslation('tourhub');
   const isLive = state.kind === 'live';
   const isResults = state.kind === 'results';
   const isUpcoming = state.kind === 'upcoming';
@@ -329,20 +332,22 @@ export function CinematicHeroFullBleed({
   let eyebrowGold = false;
   let eyebrowText = '';
   // Pseudo-major slides never render a tour name (e.g. "DP WORLD TOUR").
-  const tourSuffix = tourLabel && !isPseudoMajor ? ` · ${tourLabel.toUpperCase()}` : '';
+  const tourSuffix = tourLabel && !isPseudoMajor
+    ? t('overview.cinematic.eyebrowSuffix', { tour: tourLabel.toUpperCase() })
+    : '';
   if (isLive) {
     // Live state: tour name only, no "LIVE", round label, or major tag.
     eyebrowText = tourLabel ? tourLabel.toUpperCase() : '';
   } else if (awaitingPlayoff) {
-    eyebrowText = `PLAYOFF${tourSuffix}`;
+    eyebrowText = `${t('overview.cinematic.eyebrowPlayoff')}${tourSuffix}`;
     eyebrowGold = true;
   } else if (isResults) {
-    eyebrowText = `🏆 FINAL${tourSuffix}`;
+    eyebrowText = `${t('overview.cinematic.eyebrowFinal')}${tourSuffix}`;
     eyebrowGold = true;
   } else if (isUpcoming) {
     eyebrowText = isPseudoMajor
-      ? `UPCOMING · MAJOR CHAMPIONSHIP`
-      : `UPCOMING${tourSuffix}`;
+      ? t('overview.cinematic.eyebrowUpcomingMajor')
+      : `${t('overview.cinematic.eyebrowUpcoming')}${tourSuffix}`;
     if (isPseudoMajor) eyebrowGold = true;
   }
 
@@ -494,7 +499,7 @@ export function CinematicHeroFullBleed({
       </span>
       {!isLive && showMajorTag && (
         <span
-          aria-label="Major championship"
+          aria-label={t('overview.cinematic.majorAria')}
           style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -510,7 +515,7 @@ export function CinematicHeroFullBleed({
             lineHeight: 1,
           }}
         >
-          Major
+          {t('pill.majorEyebrow')}
         </span>
       )}
     </div>
@@ -631,7 +636,7 @@ export function CinematicHeroFullBleed({
                 textTransform: 'uppercase',
               }}
             >
-              ★ Champion
+              {t('overview.cinematic.championEyebrow')}
             </span>
             <span
               style={{
@@ -673,7 +678,7 @@ export function CinematicHeroFullBleed({
                     textTransform: 'uppercase',
                   }}
                 >
-                  Won in playoff
+                  {t('overview.cinematic.wonInPlayoff')}
                 </span>
               ) : margin != null && margin > 0 ? (
                 <span
@@ -684,7 +689,7 @@ export function CinematicHeroFullBleed({
                     letterSpacing: '0.02em',
                   }}
                 >
-                  Won by {margin}
+                  {t('overview.cinematic.wonByMargin', { margin })}
                 </span>
               ) : null}
             </div>
@@ -697,7 +702,7 @@ export function CinematicHeroFullBleed({
         <button
           type="button"
           onClick={onCtaTap}
-          aria-label="Final tournament"
+          aria-label={t('overview.cinematic.finalTournamentAria')}
           style={{
             position: 'relative',
             zIndex: 2,
@@ -773,7 +778,7 @@ export function CinematicHeroFullBleed({
               );
             }
             const tieScoreNum = scoreStringToNumber(row.score);
-            const label = `${row.count} players`;
+            const label = t('overview.cinematic.playersTiedCount', { count: row.count });
             return (
               <div key={`ru-tie-${i}`} style={rowStyle}>
                 <span
@@ -821,7 +826,7 @@ export function CinematicHeroFullBleed({
             );
           })}
           <Footer
-            leftText="Final results"
+            leftText={t('overview.cinematic.finalResults')}
             isLive={false}
           />
         </button>
@@ -832,7 +837,7 @@ export function CinematicHeroFullBleed({
         <button
           type="button"
           onClick={onCtaTap}
-          aria-label="Open tournament"
+          aria-label={t('overview.cinematic.openTournamentAria')}
           style={{
             position: 'relative',
             zIndex: 2,
@@ -870,7 +875,7 @@ export function CinematicHeroFullBleed({
                     color: 'rgba(255,255,255,0.45)',
                   }}
                 >
-                  TODAY
+                  {t('overview.cinematic.colToday')}
                 </span>
               )}
               <span
@@ -884,7 +889,7 @@ export function CinematicHeroFullBleed({
                   color: 'rgba(255,255,255,0.45)',
                 }}
               >
-                TOT
+                {t('overview.cinematic.colTotalShort')}
               </span>
               {isLive && (
                 <span
@@ -898,7 +903,7 @@ export function CinematicHeroFullBleed({
                     color: 'rgba(255,255,255,0.45)',
                   }}
                 >
-                  THRU
+                  {t('overview.cinematic.colThru')}
                 </span>
               )}
             </div>
@@ -1005,10 +1010,10 @@ export function CinematicHeroFullBleed({
             }
             // tie row — stacked avatars
             const label = awaitingPlayoff && row.isLeader
-              ? `${row.count} in playoff`
+              ? t('overview.cinematic.inPlayoffCount', { count: row.count })
               : row.isLeader
-                ? `${row.count} tied for the lead`
-                : `${row.count} players`;
+                ? t('overview.cinematic.tiedForLead', { count: row.count })
+                : t('overview.cinematic.playersTiedCount', { count: row.count });
             const tieScoreNum = scoreStringToNumber(row.score);
             return (
               <div key={`tie-${i}`} style={rowStyle}>
@@ -1064,7 +1069,7 @@ export function CinematicHeroFullBleed({
           })}
 
           <Footer
-            leftText={`${fieldSize} in the field`}
+            leftText={t('overview.cinematic.inTheField', { count: fieldSize })}
             isLive
             noBorder
           />
@@ -1076,7 +1081,7 @@ export function CinematicHeroFullBleed({
         <button
           type="button"
           onClick={onCtaTap}
-          aria-label="Open tournament"
+          aria-label={t('overview.cinematic.openTournamentAria')}
           style={{
             position: 'relative',
             zIndex: 2,
@@ -1116,7 +1121,7 @@ export function CinematicHeroFullBleed({
                     textTransform: 'uppercase',
                   }}
                 >
-                  ★ Defending champion
+                  {t('overview.cinematic.defendingChampionEyebrow')}
                 </span>
                 <span
                   style={{
@@ -1156,10 +1161,10 @@ export function CinematicHeroFullBleed({
               }}
             >
               {courseStats.par != null && (
-                <CourseStat label="PAR" value={String(courseStats.par)} />
+                <CourseStat label={t('overview.courseStats.parLabel')} value={String(courseStats.par)} />
               )}
               {courseStats.yardage != null && (
-                <CourseStat label="YARDS" value={formatNumber(courseStats.yardage)} />
+                <CourseStat label={t('overview.cinematic.colYardsFull')} value={formatNumber(courseStats.yardage)} />
               )}
             </div>
           ) : null}
@@ -1174,6 +1179,7 @@ export function CinematicHeroFullBleed({
 // ---- shared footer --------------------------------------------------------
 
 function Footer({ leftText, isLive, noBorder }: { leftText: string; isLive: boolean; noBorder?: boolean }) {
+  const { t } = useTranslation('tourhub');
   return (
     <div
       style={{
@@ -1205,7 +1211,7 @@ function Footer({ leftText, isLive, noBorder }: { leftText: string; isLive: bool
             color: AMBER,
           }}
         >
-          TOURNAMENT
+          {t('overview.cinematic.ctaTournament')}
         </span>
         <ChevronRight size={13} strokeWidth={2.5} color={AMBER} style={{ flexShrink: 0 }} />
       </span>

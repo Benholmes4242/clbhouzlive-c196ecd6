@@ -12,6 +12,7 @@
  */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { formatMonthDay, formatNumber } from '@/i18n/format';
 import { ChevronRight, Crown, Trophy } from 'lucide-react';
 import {
@@ -242,6 +243,7 @@ function TiedLeadersRowDark({
   isLast: boolean;
   isResults?: boolean;
 }) {
+  const { t } = useTranslation('tourhub');
   return (
     <div
       style={{
@@ -257,6 +259,7 @@ function TiedLeadersRowDark({
           color: LEADER_RED, textAlign: 'left', flexShrink: 0,
         }}
       >
+        {/* eslint-disable-next-line i18next/no-literal-string -- rank code, not translated */}
         T1
       </span>
       <StackedAvatarsDark urls={avatars} items={items} size={26} />
@@ -266,7 +269,7 @@ function TiedLeadersRowDark({
           whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
         }}
       >
-        {count} tied for the lead
+        {t('overview.cinematic.tiedForLead', { count })}
       </span>
       <span
         style={{
@@ -309,6 +312,7 @@ function TiedChasersRowDark({
   onTap?: () => void;
   isResults?: boolean;
 }) {
+  const { t } = useTranslation('tourhub');
   return (
     <div
       onClick={onTap}
@@ -335,7 +339,7 @@ function TiedChasersRowDark({
           whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
         }}
       >
-        {count} players
+        {t('overview.cinematic.playersTiedCount', { count })}
       </span>
       <span
         style={{
@@ -362,6 +366,7 @@ function ChampionRowDark({
   avatarUrl: string | string[] | null;
   isLast: boolean;
 }) {
+  const { t } = useTranslation('tourhub');
   const name = entryName(entry);
   const score = entry?.score;
   return (
@@ -398,7 +403,7 @@ function ChampionRowDark({
             textTransform: 'uppercase',
           }}
         >
-          Champion
+          {t('overview.cinematic.championLabel')}
         </span>
         <span
           style={{
@@ -432,6 +437,7 @@ function DefendingChampionRowDark({
   data: DefendingChampData;
   avatarUrl: string | string[] | null;
 }) {
+  const { t } = useTranslation('tourhub');
   return (
     <div
       style={{
@@ -461,7 +467,7 @@ function DefendingChampionRowDark({
             textTransform: 'uppercase',
           }}
         >
-          Defending Champion
+          {t('overview.cinematic.defendingChampionLabel')}
         </span>
         <span
           style={{
@@ -480,7 +486,7 @@ function DefendingChampionRowDark({
             color: 'rgba(255,255,255,0.5)',
           }}
         >
-          Won {data.year} · {data.score}
+          {t('overview.cinematic.wonYearScore', { year: data.year, score: data.score })}
         </span>
       </div>
       <Trophy size={16} color={GOLD} strokeWidth={1.8} style={{ flexShrink: 0, opacity: 0.8 }} />
@@ -491,6 +497,7 @@ function DefendingChampionRowDark({
 // ---- upcoming: field-strength fallback row -------------------------------
 
 function FieldStrengthRowDark({ data }: { data: FieldStrength }) {
+  const { t } = useTranslation('tourhub');
   return (
     <div
       style={{
@@ -512,7 +519,7 @@ function FieldStrengthRowDark({ data }: { data: FieldStrength }) {
             textTransform: 'uppercase',
           }}
         >
-          Field Strength
+          {t('overview.cinematic.fieldStrengthEyebrow')}
         </span>
         <span
           style={{
@@ -520,8 +527,8 @@ function FieldStrengthRowDark({ data }: { data: FieldStrength }) {
             whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
           }}
         >
-          {data.totalPlayers} players
-          {data.topRanked != null ? ` · #${data.topRanked} world` : ''}
+          {t('overview.cinematic.fieldPreviewPlayers', { count: data.totalPlayers })}
+          {data.topRanked != null ? t('overview.cinematic.topRankedWorld', { rank: data.topRanked }) : ''}
         </span>
       </div>
     </div>
@@ -583,6 +590,7 @@ export function CinematicFrame({
   winningShare = null,
   onCtaTap,
 }: CinematicFrameProps) {
+  const { t } = useTranslation('tourhub');
   const useDusk =
     state.kind === 'results' &&
     (state as any).variant !== 'standard' &&
@@ -609,9 +617,9 @@ export function CinematicFrame({
   
   const roundLabel_ =
     state.kind === 'live'
-      ? 'LIVE'
+      ? t('status.live')
       : isResults
-        ? 'FINAL RESULT'
+        ? t('overview.cinematic.finalResult')
         : null;
 
   // ---- Capsule slot construction (mirrors LeaderboardBand live-state) ----
@@ -750,10 +758,10 @@ export function CinematicFrame({
         <DefendingChampionRowDark data={defendingChamp} avatarUrl={headshotCandidates} />
       );
 
-      upcomingFooter = 'View tournament';
+      upcomingFooter = t('overview.cinematic.viewTournament');
     } else if (fieldStrength && fieldStrength.totalPlayers > 0) {
       upcomingCapsule = <FieldStrengthRowDark data={fieldStrength} />;
-      upcomingFooter = 'View tournament';
+      upcomingFooter = t('overview.cinematic.viewTournament');
     }
     // else: no capsule — countdown chip carries the frame.
   }
@@ -767,14 +775,16 @@ export function CinematicFrame({
   const hasCapsule = isUpcoming ? upcomingCapsule !== null : true;
   const capsuleFooter = isUpcoming
     ? upcomingFooter
-    : `Full leaderboard${fieldSize > 0 ? ` · ${fieldSize} players` : ''}`;
+    : fieldSize > 0
+      ? t('overview.cinematic.fullLeaderboardWithField', { count: fieldSize })
+      : t('overview.cinematic.fullLeaderboard');
 
   // ---- GlassPills (floating over photo, under venue) ------------------------
   const GlassPills = () => {
     const pills = [
-      { label: 'PURSE', value: purse != null ? (formatPurse(purse) || '—') : '—' },
-      { label: 'PAR', value: venuePar != null ? String(venuePar) : '—' },
-      { label: 'YDS', value: venueYardage != null ? formatNumber(venueYardage) : '—' },
+      { label: t('overview.cinematic.colPurse'), value: purse != null ? (formatPurse(purse) || '—') : '—' },
+      { label: t('overview.courseStats.parLabel'), value: venuePar != null ? String(venuePar) : '—' },
+      { label: t('overview.cinematic.colYards'), value: venueYardage != null ? formatNumber(venueYardage) : '—' },
     ];
     return (
       <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', marginTop: 6 }}>
@@ -876,13 +886,13 @@ export function CinematicFrame({
                 border: '0.5px solid rgba(255,255,255,0.18)',
                 borderRadius: 999, padding: '5px 11px', alignSelf: 'flex-start',
               }}>
-                <span style={{ ...NUMERIC_STYLE, fontSize: 8.5, fontWeight: 800, letterSpacing: '0.16em', color: '#fff', textTransform: 'uppercase' }}>TEES OFF IN</span>
+                <span style={{ ...NUMERIC_STYLE, fontSize: 8.5, fontWeight: 800, letterSpacing: '0.16em', color: '#fff', textTransform: 'uppercase' }}>{t('overview.cinematic.teesOffIn')}</span>
                 <span style={{ ...NUMERIC_STYLE, fontSize: 12, fontWeight: 900, color: '#fff', letterSpacing: '-0.01em' }}>{countdownText}</span>
               </div>
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span aria-hidden style={{ width: 7, height: 7, borderRadius: '50%', background: AMBER, flexShrink: 0 }} />
-                <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', color: AMBER, textShadow: '0 1px 3px rgba(0,0,0,0.45)', textTransform: 'uppercase' }}>Upcoming</span>
+                <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', color: AMBER, textShadow: '0 1px 3px rgba(0,0,0,0.45)', textTransform: 'uppercase' }}>{t('status.upcoming')}</span>
               </div>
             )
           ) : roundLabel_ ? (
@@ -1001,7 +1011,7 @@ export function CinematicFrame({
                   />
                 </span>
                 <div style={{ ...NUMERIC_STYLE, fontSize: 10, fontWeight: 800, letterSpacing: '0.22em', color: GOLD, textTransform: 'uppercase' }}>
-                  Champion
+                  {t('overview.cinematic.championLabel')}
                 </div>
                 <div
                   style={{
@@ -1033,13 +1043,13 @@ export function CinematicFrame({
             ? fieldStrength.totalPlayers
             : null;
           const viewTournamentLabel = fieldCount
-            ? `View tournament · ${fieldCount} in the field`
-            : 'View tournament';
+            ? t('overview.cinematic.viewTournamentWithField', { count: fieldCount })
+            : t('overview.cinematic.viewTournament');
           return (
           <button
             type="button"
             onClick={onCtaTap}
-            aria-label="View tournament"
+            aria-label={t('overview.cinematic.viewTournamentAria')}
             style={{
               position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 4,
               border: 'none', padding: 0, margin: 0, cursor: 'pointer',
@@ -1061,7 +1071,9 @@ export function CinematicFrame({
               })()}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ ...NUMERIC_STYLE, fontSize: 8.5, fontWeight: 800, letterSpacing: '0.16em', color: GOLD, textTransform: 'uppercase' }}>
-                  {defendingChamp.year ? `${defendingChamp.year} Defending Champion` : 'Defending Champion'}
+                  {defendingChamp.year
+                    ? t('overview.cinematic.defendingChampionYearLabel', { year: defendingChamp.year })
+                    : t('overview.cinematic.defendingChampionLabel')}
                 </div>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 1, minWidth: 0 }}>
                   <span style={{ fontSize: 17, fontWeight: 800, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{defendingChamp.name}</span>
@@ -1097,7 +1109,7 @@ export function CinematicFrame({
             <button
               type="button"
               onClick={onCtaTap}
-              aria-label="Open leaderboard"
+              aria-label={t('overview.cinematic.openLeaderboardAria')}
               style={{
                 position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 4,
                 border: 'none', padding: 0, margin: 0, cursor: 'pointer',
@@ -1112,7 +1124,7 @@ export function CinematicFrame({
                 <FieldStrengthRowDark data={fieldStrength} />
               ) : (
                 <div style={{ padding: '16px 16px', ...NUMERIC_STYLE, fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase' }}>
-                  Round 1 · Awaiting scores
+                  {t('overview.cinematic.roundAwaitingScores', { round: (state as any).round ?? 1 })}
                 </div>
               )}
               <div
@@ -1123,10 +1135,10 @@ export function CinematicFrame({
                 }}
               >
                 <span style={{ ...NUMERIC_STYLE, fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>
-                  {fieldStrength?.totalPlayers != null ? `${fieldStrength.totalPlayers} in the field` : ''}
+                  {fieldStrength?.totalPlayers != null ? t('overview.cinematic.inTheField', { count: fieldStrength.totalPlayers }) : ''}
                 </span>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                  <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 800, letterSpacing: '0.06em', color: AMBER }}>TOURNAMENT</span>
+                  <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 800, letterSpacing: '0.06em', color: AMBER }}>{t('overview.cinematic.ctaTournament')}</span>
                   <ChevronRight size={13} strokeWidth={2.5} color={AMBER} style={{ flexShrink: 0 }} />
                 </span>
               </div>
@@ -1183,7 +1195,7 @@ export function CinematicFrame({
           <button
             type="button"
             onClick={onCtaTap}
-            aria-label="Open full leaderboard"
+            aria-label={t('overview.cinematic.openFullLeaderboardAria')}
             style={{
               position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 4,
               border: 'none', padding: 0, margin: 0, cursor: 'pointer',
@@ -1214,9 +1226,9 @@ export function CinematicFrame({
               <span style={{ width: RANK_W, flexShrink: 0 }} />
               <span style={{ width: 26, flexShrink: 0 }} />
               <span style={{ flex: 1 }} />
-              {anyToday && <span style={{ ...NUMERIC_STYLE, width: COL_TODAY, textAlign: 'center', fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)' }}>TODAY</span>}
-              <span style={{ ...NUMERIC_STYLE, width: COL_TOTAL, textAlign: 'center', fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)' }}>TOTAL</span>
-              <span style={{ ...NUMERIC_STYLE, width: COL_THRU, textAlign: 'center', fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)' }}>THRU</span>
+              {anyToday && <span style={{ ...NUMERIC_STYLE, width: COL_TODAY, textAlign: 'center', fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)' }}>{t('overview.cinematic.colToday')}</span>}
+              <span style={{ ...NUMERIC_STYLE, width: COL_TOTAL, textAlign: 'center', fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)' }}>{t('overview.cinematic.colTotal')}</span>
+              <span style={{ ...NUMERIC_STYLE, width: COL_THRU, textAlign: 'center', fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)' }}>{t('overview.cinematic.colThru')}</span>
             </div>
 
             {/* Score rows */}
@@ -1261,8 +1273,8 @@ export function CinematicFrame({
               }
               // tie row — shared TOTAL only; spacers for TODAY/THRU
               const label = row.isLeader
-                ? `${row.count} tied for the lead`
-                : `${row.count} players`;
+                ? t('overview.cinematic.tiedForLead', { count: row.count })
+                : t('overview.cinematic.playersTiedCount', { count: row.count });
               return (
                 <div key={`tie-${i}`} style={rowStyle}>
                   <span style={{ ...NUMERIC_STYLE, width: RANK_W, fontSize: 12, fontWeight: 700, color: row.isLeader ? LEADER_RED : 'rgba(255,255,255,0.5)', textAlign: 'left', flexShrink: 0 }}>{row.rank}</span>
@@ -1286,10 +1298,10 @@ export function CinematicFrame({
               }}
             >
               <span style={{ ...NUMERIC_STYLE, fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>
-                {fieldSize} in the field
+                {t('overview.cinematic.inTheField', { count: fieldSize })}
               </span>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 800, letterSpacing: '0.06em', color: AMBER }}>TOURNAMENT</span>
+                <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 800, letterSpacing: '0.06em', color: AMBER }}>{t('overview.cinematic.ctaTournament')}</span>
                 <ChevronRight size={13} strokeWidth={2.5} color={AMBER} style={{ flexShrink: 0 }} />
               </span>
             </div>
@@ -1302,7 +1314,7 @@ export function CinematicFrame({
         <button
           type="button"
           onClick={onCtaTap}
-          aria-label="Final leaderboard"
+          aria-label={t('overview.cinematic.finalLeaderboardAria')}
           style={{
             position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 4,
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
@@ -1314,7 +1326,7 @@ export function CinematicFrame({
           }}
         >
           <span style={{ ...NUMERIC_STYLE, fontSize: 12, fontWeight: 800, letterSpacing: '0.06em', color: GOLD }}>
-            FINAL LEADERBOARD · {safe.length}
+            {t('overview.cinematic.finalLeaderboardCount', { count: safe.length })}
           </span>
           <ChevronRight size={14} strokeWidth={2.5} color={GOLD} style={{ flexShrink: 0 }} />
         </button>
