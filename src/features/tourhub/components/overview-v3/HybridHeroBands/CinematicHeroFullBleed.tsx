@@ -180,6 +180,7 @@ export interface ChampionData {
 // ---- Countdown (upcoming) -------------------------------------------------
 
 function CountdownPills({ hoursUntilStart }: { hoursUntilStart: number }) {
+  const { t } = useTranslation('tourhub');
   if (!Number.isFinite(hoursUntilStart) || hoursUntilStart <= 0) return null;
 
   const totalMin = Math.max(0, Math.floor(hoursUntilStart * 60));
@@ -195,7 +196,7 @@ function CountdownPills({ hoursUntilStart }: { hoursUntilStart: number }) {
           ...NUMERIC_STYLE,
         }}
       >
-        Teeing off soon
+        {t('overview.cinematic.teeingOffSoon')}
       </span>
     );
   }
@@ -206,14 +207,14 @@ function CountdownPills({ hoursUntilStart }: { hoursUntilStart: number }) {
 
   const pills: { value: number; label: string }[] = [];
   if (hoursUntilStart >= 24) {
-    pills.push({ value: d, label: 'DAYS' });
-    pills.push({ value: h, label: 'HRS' });
-    pills.push({ value: m, label: 'MIN' });
+    pills.push({ value: d, label: t('overview.comingUp.daysLabel') });
+    pills.push({ value: h, label: t('overview.cinematic.countdownHoursLabel') });
+    pills.push({ value: m, label: t('overview.cinematic.countdownMinutesLabel') });
   } else if (hoursUntilStart >= 1) {
-    pills.push({ value: h, label: 'HRS' });
-    pills.push({ value: m, label: 'MIN' });
+    pills.push({ value: h, label: t('overview.cinematic.countdownHoursLabel') });
+    pills.push({ value: m, label: t('overview.cinematic.countdownMinutesLabel') });
   } else {
-    pills.push({ value: m, label: 'MIN' });
+    pills.push({ value: m, label: t('overview.cinematic.countdownMinutesLabel') });
   }
 
   return (
