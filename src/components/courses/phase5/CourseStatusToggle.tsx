@@ -171,7 +171,7 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
               color={isWantToPlay ? '#F7931E' : '#64748B'}
               fill={isWantToPlay ? '#F7931E' : 'none'}
             />
-            {isWantToPlay ? 'On your bucket list' : 'Add to bucket list'}
+            {isWantToPlay ? t('phase5.statusToggle.onBucketList') : t('phase5.statusToggle.addBucketList')}
           </span>
           {isUpdating ? (
             <Loader2 className="h-4 w-4 animate-spin" style={{ color: '#94A3B8' }} />
