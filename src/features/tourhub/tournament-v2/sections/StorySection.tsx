@@ -5,6 +5,7 @@
  * and an in-place "Read more" toggle. Self-hides when no story text.
  */
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { SectionEyebrow } from './SectionEyebrow';
 import { FONT, INK, INK_MUTE, SURFACE, HAIRLINE_INK_8 } from '../../_shared/tokens';
 
@@ -13,12 +14,13 @@ interface Props {
 }
 
 export function StorySection({ story }: Props) {
+  const { t } = useTranslation('tourhub');
   const [expanded, setExpanded] = useState(false);
   if (!story) return null;
 
   return (
     <section style={{ fontFamily: FONT }}>
-      <SectionEyebrow kicker="The Story" />
+      <SectionEyebrow kicker={t('tournament.story.eyebrow')} />
       <div
         style={{
           background: SURFACE,
@@ -49,7 +51,7 @@ export function StorySection({ story }: Props) {
               letterSpacing: '0.10em', textTransform: 'uppercase', cursor: 'pointer',
             }}
           >
-            Read more ›
+            {t('tournament.story.readMore')} ›
           </button>
         )}
       </div>
