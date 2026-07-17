@@ -17,7 +17,7 @@
  * NO fade-on-idle. NO carousel dots at top. NO score eyebrow. Course chip in
  * the top-right is the ONLY score surface.
  */
-import React, { memo, useCallback, useMemo } from 'react';
+import React, { memo, useCallback } from 'react';
 import {
   ChevronLeft,
   Heart,
@@ -33,7 +33,7 @@ import { useSessionAudio } from '@/audio/sessionAudioStore';
 import { triggerHaptic } from '@/lib/ui/haptics';
 import { CarouselDots } from '@/components/media/CarouselDots';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
+
 import { FeedFollowPill } from '@/components/feed/FeedFollowPill';
 import MapPinIcon from '@/components/icons/MapPinIcon';
 import { Z } from '@/config/zIndex';
@@ -107,20 +107,6 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   const carouselSlide = carouselPositions.get(activeIndex) ?? 0;
   const mediaCount = activePost?.mediaItems?.length ?? 0;
 
-  const ownerMenu = useMemo(() => {
-    if (!activePost || !isOwnPost) return null;
-    return (
-      <PostOwnerMenu
-        postId={activePost.id}
-        isOwnPost
-        actorType={activePost.actorType === 'business' ? 'business' : 'personal'}
-        actorId={activePost.actorId}
-        sourceReviewId={activePost.review?.reviewId ?? null}
-        reviewCourseId={activePost.review?.courseId ?? null}
-        variant="overlay"
-      />
-    );
-  }, [isOwnPost, activePost]);
 
   if (!activePost) return null;
 
@@ -456,13 +442,9 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             <Send size={32} stroke="#fff" strokeWidth={2} />
           </RailButton>
 
-          {ownerMenu ? (
-            <div style={{ filter: ICON_SHADOW, pointerEvents: 'auto' }}>{ownerMenu}</div>
-          ) : (
-            <RailButton onClick={onMore} ariaLabel="More options">
-              <MoreHorizontal size={28} stroke="#fff" strokeWidth={2} />
-            </RailButton>
-          )}
+          <RailButton onClick={onMore} ariaLabel="More options">
+            <MoreHorizontal size={28} stroke="#fff" strokeWidth={2} />
+          </RailButton>
         </div>
       )}
 

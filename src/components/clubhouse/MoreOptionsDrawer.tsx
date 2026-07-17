@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Flag, EyeOff, Link as LinkIcon, Ban } from 'lucide-react';
+import { Flag, EyeOff, Link as LinkIcon, Ban, Pencil, Trash2, ExternalLink } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,7 +13,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
 import { useBlockActions } from '@/hooks/useBlockActions';
+import { usePostStudioStore } from '@/stores/usePostStudioStore';
+import { usePostDeletion } from '@/hooks/usePostDeletion';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { MORE_SHEET_Z } from '@/lib/zLayers';
 import type { FeedPost } from '@/components/media-system/types/media';
@@ -65,14 +69,23 @@ export const MoreOptionsDrawer: React.FC<MoreOptionsDrawerProps> = ({
   onCopyLink,
   onAfterBlock,
 }) => {
+  const navigate = useNavigate();
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const { blockUser, loading } = useBlockActions({ currentUserId: currentUserId ?? '' });
+  const openPostStudioForEdit = usePostStudioStore((s) => s.openPostStudioForEdit);
+  const { deletePost } = usePostDeletion();
 
   const authorId = post?.userId ?? null;
   const isEditorial = post ? EDITORIAL_POST_TYPES.has(post.postType ?? '') : false;
   const isOwnPost = !!(currentUserId && authorId && authorId === currentUserId);
   const canBlock = !!currentUserId && !!authorId && !isOwnPost && !isEditorial;
   const canReport = !!currentUserId && !!post && !isOwnPost && !isEditorial;
+  const sourceReviewId = post?.review?.reviewId ?? null;
+  const reviewCourseId = post?.review?.courseId ?? null;
+  const isReviewDerived = !!sourceReviewId;
+  const canOwnerEdit = isOwnPost && !isEditorial && !!post;
 
   const usernameLabel = post?.username ? `@${post.username}` : (post?.displayName ?? 'this user');
 
@@ -90,6 +103,31 @@ export const MoreOptionsDrawer: React.FC<MoreOptionsDrawerProps> = ({
     if (ok) {
       onOpenChange(false);
       onAfterBlock?.();
+    }
+  };
+
+  const handleEdit = () => {
+    if (!post) return;
+    onOpenChange(false);
+    openPostStudioForEdit({ postId: post.id });
+  };
+
+  const handleManageReview = () => {
+    if (!reviewCourseId) return;
+    onOpenChange(false);
+    navigate(`/courses/${reviewCourseId}/rate`);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!post || isDeleting) return;
+    setIsDeleting(true);
+    try {
+      const actorType = post.actorType === 'business' ? 'business' : 'personal';
+      await deletePost(post.id, actorType, post.actorId);
+    } finally {
+      setIsDeleting(false);
+      setConfirmDeleteOpen(false);
+      onOpenChange(false);
     }
   };
 
@@ -148,17 +186,47 @@ export const MoreOptionsDrawer: React.FC<MoreOptionsDrawerProps> = ({
                   <span style={rowLabelStyle}>Report this post</span>
                 </button>
               )}
-              <button onClick={onNotInterested} style={rowStyle}>
-                <EyeOff className="w-5 h-5" style={{ color: 'rgba(15,23,42,0.35)' }} />
-                <span style={rowLabelStyle}>Not interested</span>
-              </button>
+              {!isOwnPost && (
+                <button onClick={onNotInterested} style={rowStyle}>
+                  <EyeOff className="w-5 h-5" style={{ color: 'rgba(15,23,42,0.35)' }} />
+                  <span style={rowLabelStyle}>Not interested</span>
+                </button>
+              )}
               <button
                 onClick={onCopyLink}
-                style={{ ...rowStyle, borderBottom: canBlock ? rowStyle.borderBottom : 'none' }}
+                style={{
+                  ...rowStyle,
+                  borderBottom: (canBlock || canOwnerEdit) ? rowStyle.borderBottom : 'none',
+                }}
               >
                 <LinkIcon className="w-5 h-5" style={{ color: 'rgba(15,23,42,0.35)' }} />
                 <span style={rowLabelStyle}>Copy link</span>
               </button>
+              {canOwnerEdit && isReviewDerived && (
+                <button
+                  onClick={handleManageReview}
+                  disabled={!reviewCourseId}
+                  style={{ ...rowStyle, borderBottom: 'none', opacity: reviewCourseId ? 1 : 0.5 }}
+                >
+                  <ExternalLink className="w-5 h-5" style={{ color: 'rgba(15,23,42,0.35)' }} />
+                  <span style={rowLabelStyle}>Manage review</span>
+                </button>
+              )}
+              {canOwnerEdit && !isReviewDerived && (
+                <>
+                  <button onClick={handleEdit} style={rowStyle}>
+                    <Pencil className="w-5 h-5" style={{ color: 'rgba(15,23,42,0.35)' }} />
+                    <span style={rowLabelStyle}>Edit post</span>
+                  </button>
+                  <button
+                    onClick={() => setConfirmDeleteOpen(true)}
+                    style={{ ...rowStyle, borderBottom: 'none' }}
+                  >
+                    <Trash2 className="w-5 h-5" style={{ color: '#DC2626' }} />
+                    <span style={{ ...rowLabelStyle, color: '#DC2626' }}>Delete post</span>
+                  </button>
+                </>
+              )}
               {canBlock && (
                 <button
                   onClick={() => setConfirmOpen(true)}
@@ -210,6 +278,30 @@ export const MoreOptionsDrawer: React.FC<MoreOptionsDrawerProps> = ({
             >
               {loading ? 'Blocking…' : 'Block'}
             </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={confirmDeleteOpen} onOpenChange={setConfirmDeleteOpen}>
+        <AlertDialogContent
+          className="z-[233]"
+          overlayClassName="fixed inset-0 z-[232] bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
+        >
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Post?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. Your post and all its media will be permanently deleted.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <Button
+              variant="destructive"
+              onClick={handleConfirmDelete}
+              disabled={isDeleting}
+            >
+              {isDeleting ? 'Deleting…' : 'Delete'}
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
