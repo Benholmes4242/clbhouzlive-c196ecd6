@@ -54,10 +54,10 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
     if (status.status === 'played') return;
     if (status.status === 'want_to_play') {
       await setWantToPlay(false);
-      toast("Removed from bucket list", { duration: 2000 });
+      toast(t('phase5.statusToggle.removedFromBucket'), { duration: 2000 });
     } else {
       await setWantToPlay(true);
-      toast("Added to bucket list", { duration: 2000 });
+      toast(t('phase5.statusToggle.addedToBucket'), { duration: 2000 });
     }
   };
 
