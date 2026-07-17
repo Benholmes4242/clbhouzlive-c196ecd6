@@ -5,7 +5,9 @@
  * Section self-hides when the RPC reports unavailable coverage.
  */
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ShieldCheck } from 'lucide-react';
+
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SectionEyebrow } from './SectionEyebrow';
 import {
@@ -48,8 +50,10 @@ function fmtAvg(v: number): string {
 }
 
 export function CourseSection({ tournamentId }: Props) {
+  const { t } = useTranslation(['tourhub', 'courses']);
   const { data } = useTournamentHoleAnalysis(tournamentId);
   const [open, setOpen] = useState(false);
+
 
   const holes = data?.holes ?? [];
   const played = holes.filter((h) => Number.isFinite(h.avg_to_par));
@@ -76,13 +80,14 @@ export function CourseSection({ tournamentId }: Props) {
         </span>
         {h.par != null && (
           <span style={{ fontSize: 10, fontWeight: 700, color: INK_MUTE, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-            Par {h.par}
+            {t('board.meta.par', { par: h.par, ns: 'tourhub' })}
+
           </span>
         )}
       </div>
       <div style={{ marginTop: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
         <span style={{ fontSize: 9, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.10em', textTransform: 'uppercase' }}>
-          Avg vs par
+          {t('tournament.course.avgVsPar', { ns: 'tourhub' })}
         </span>
         <span style={{ fontSize: 14, fontWeight: 800, color: avgColorFor(h.avg_to_par), fontVariantNumeric: 'tabular-nums' }}>
           {fmtAvg(h.avg_to_par)}
@@ -93,10 +98,11 @@ export function CourseSection({ tournamentId }: Props) {
 
   return (
     <>
-      <SectionEyebrow kicker="The Course" actionLabel="All 18 holes" onAction={() => setOpen(true)} />
+      <SectionEyebrow kicker={t('tournament.course.title', { ns: 'tourhub' })} actionLabel={t('tournament.course.allHolesAction', { ns: 'tourhub' })} onAction={() => setOpen(true)} />
       <div style={{ display: 'flex', gap: 12, padding: '0 16px 4px' }}>
-        <Card label="Hardest" h={hardest} />
-        <Card label="Easiest" h={easiest} />
+        <Card label={t('holes.hardestTitle', { ns: 'courses' })} h={hardest} />
+        <Card label={t('holes.easiestTitle', { ns: 'courses' })} h={easiest} />
+
       </div>
       <HolesSheet
         open={open}
@@ -125,7 +131,9 @@ function HolesSheet({
   easiest: TournamentHole;
   totalPlayers: number;
 }) {
+  const { t } = useTranslation(['tourhub', 'courses']);
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
+
   const toggle = (n: number) =>
     setExpanded((prev) => {
       const next = new Set(prev);
@@ -144,7 +152,7 @@ function HolesSheet({
       <div style={{ background: SLATE_50, fontFamily: FONT, height: '75dvh', maxHeight: '75dvh', display: 'flex', flexDirection: 'column' }}>
         <div style={{ padding: '4px 16px 8px' }}>
           <div style={{ fontSize: 9, fontWeight: 800, color: AMBER, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-            All 18 Holes
+            {t('tournament.course.allHolesTitle', { ns: 'tourhub' })}
           </div>
           {/* Amber credibility pill */}
           <div
@@ -165,10 +173,15 @@ function HolesSheet({
             <ShieldCheck size={13} strokeWidth={2.2} />
             <span>
               <span style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>
-                {formatNumber(totalPlayers)} player{totalPlayers === 1 ? '' : 's'}
+                {t('holes.players', {
+                  ns: 'courses',
+                  count: totalPlayers,
+                  formattedCount: formatNumber(totalPlayers),
+                })}
               </span>
-              {' \u00B7 field scoring'}
+              {t('tournament.course.fieldScoringSuffix', { ns: 'tourhub' })}
             </span>
+
           </div>
         </div>
 
@@ -204,10 +217,11 @@ function HolesSheet({
 }
 
 const FeatureMini: React.FC<{ tone: 'hard' | 'easy'; h: TournamentHole; maxAbs: number }> = ({ tone, h, maxAbs }) => {
+  const { t } = useTranslation(['tourhub', 'courses']);
   const tint = tone === 'hard' ? 'rgba(29,93,191,0.05)' : 'rgba(210,34,45,0.05)';
   const border = tone === 'hard' ? 'rgba(29,93,191,0.18)' : 'rgba(210,34,45,0.18)';
   const eyebrow = tone === 'hard' ? TOPAR_OVER_LIGHT : TOPAR_UNDER_LIGHT;
-  const label = tone === 'hard' ? 'HARDEST' : 'EASIEST';
+  const label = tone === 'hard' ? t('holes.hardest', { ns: 'courses' }) : t('holes.easiest', { ns: 'courses' });
   const playsTo = (h.par + h.avg_to_par).toFixed(1);
   const magnitude = Math.min(1, Math.abs(h.avg_to_par) / Math.max(0.01, maxAbs)) * 50;
   const isOver = h.avg_to_par > AVG_EPSILON;
@@ -234,12 +248,13 @@ const FeatureMini: React.FC<{ tone: 'hard' | 'easy'; h: TournamentHole; maxAbs: 
           {h.hole_no}
         </div>
         <div style={{ fontSize: 11.5, fontWeight: 600, color: INK_MUTE, fontVariantNumeric: 'tabular-nums' }}>
-          Plays to {playsTo}
+          {t('holes.playsToInline', { ns: 'courses', playsTo })}
         </div>
       </div>
       <div style={{ fontSize: 10, fontWeight: 700, color: INK_MUTE, letterSpacing: '0.04em', textTransform: 'uppercase', marginTop: -2, fontVariantNumeric: 'tabular-nums' }}>
-        Par {h.par}
+        {t('board.meta.par', { ns: 'tourhub', par: h.par })}
       </div>
+
       <div
         aria-hidden
         style={{ position: 'relative', width: '100%', height: 4, background: 'rgba(15,23,42,0.06)', borderRadius: 4, overflow: 'hidden' }}

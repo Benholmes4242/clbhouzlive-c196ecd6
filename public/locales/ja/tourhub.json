@@ -257,6 +257,26 @@
       "shareCta": "Share a moment",
       "allAction": "All moments",
       "sheetTitle": "All Moments"
+    },
+    "fullBoard": {
+      "title": "Full Board"
+    },
+    "eventInfo": {
+      "dates": "Dates",
+      "venue": "Venue",
+      "parYardageLabel": "Par / Yardage",
+      "tv": "TV",
+      "teeTimes": "Tee times",
+      "round": "Round {{round}}",
+      "yardageShort": "{{yardage}} yds",
+      "eyebrow": "Event Info"
+    },
+    "course": {
+      "title": "The Course",
+      "allHolesAction": "All 18 holes",
+      "allHolesTitle": "All 18 Holes",
+      "avgVsPar": "Avg vs par",
+      "fieldScoringSuffix": " · field scoring"
     }
   }
 }

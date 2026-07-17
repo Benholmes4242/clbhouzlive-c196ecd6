@@ -7,11 +7,13 @@
  * Live events with tee-time coverage gain a tappable row that opens
  * the full tee-times sheet (Brief F-TD-4).
  */
+import { useTranslation } from 'react-i18next';
 import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
 import { formatPurse } from '../../_shared/formatPurse';
 import { SectionEyebrow } from './SectionEyebrow';
 import { FONT, INK, INK_MUTE, INK_FAINT, HAIRLINE_INK_8, SURFACE } from '../../_shared/tokens';
 import { formatNumber, formatTournamentDateRange } from '@/i18n/format';
+
 
 interface Props {
   meta: TournamentMeta;
@@ -26,32 +28,36 @@ function fmtRange(start: string | null, end: string | null): string | null {
 
 
 export function EventInfoSection({ meta, broadcast, onTeeTimesTap, teeTimesRound }: Props) {
+  const { t } = useTranslation('tourhub');
   const rows: Array<[string, string]> = [];
 
   const dates = fmtRange(meta.start_date, meta.end_date);
-  if (dates) rows.push(['Dates', dates]);
+  if (dates) rows.push([t('tournament.eventInfo.dates'), dates]);
 
   const venue = [
     meta.venue_name,
     [meta.venue_city, meta.venue_country].filter(Boolean).join(', ') || null,
   ].filter(Boolean).join(' · ');
-  if (venue) rows.push(['Venue', venue]);
+  if (venue) rows.push([t('tournament.eventInfo.venue'), venue]);
 
   const py = [
-    meta.venue_par != null ? `Par ${meta.venue_par}` : null,
-    meta.venue_yardage != null ? `${formatNumber(meta.venue_yardage)} yds` : null,
+    meta.venue_par != null ? t('board.meta.par', { par: meta.venue_par }) : null,
+    meta.venue_yardage != null
+      ? t('tournament.eventInfo.yardageShort', { yardage: formatNumber(meta.venue_yardage) })
+      : null,
   ].filter(Boolean).join(' · ');
-  if (py) rows.push(['Par / Yardage', py]);
+  if (py) rows.push([t('tournament.eventInfo.parYardageLabel'), py]);
 
-  if (meta.purse != null) rows.push(['Purse', formatPurse(meta.purse)]);
-  if (meta.defending_champion) rows.push(['Defending', meta.defending_champion]);
-  if (broadcast) rows.push(['TV', broadcast]);
+  if (meta.purse != null) rows.push([t('tournament.hero.purseLabel'), formatPurse(meta.purse)]);
+  if (meta.defending_champion) rows.push([t('tournament.hero.defendingLabel'), meta.defending_champion]);
+  if (broadcast) rows.push([t('tournament.eventInfo.tv'), broadcast]);
 
   const showTeeTimes = !!onTeeTimesTap && teeTimesRound != null;
 
+
   return (
     <section style={{ fontFamily: FONT }}>
-      <SectionEyebrow kicker="Event Info" />
+      <SectionEyebrow kicker={t('tournament.eventInfo.eyebrow')} />
       <div style={{ background: SURFACE }}>
         {rows.map(([label, value], i) => (
           <div
@@ -108,7 +114,7 @@ export function EventInfoSection({ meta, broadcast, onTeeTimesTap, teeTimesRound
                 letterSpacing: '0.14em', textTransform: 'uppercase',
               }}
             >
-              Tee times
+              {t('tournament.eventInfo.teeTimes')}
             </div>
             <div
               style={{
@@ -118,7 +124,7 @@ export function EventInfoSection({ meta, broadcast, onTeeTimesTap, teeTimesRound
                 fontVariantNumeric: 'tabular-nums',
               }}
             >
-              Round {teeTimesRound} <span style={{ color: INK }}>›</span>
+              {t('tournament.eventInfo.round', { round: teeTimesRound })} <span style={{ color: INK }}>›</span>
             </div>
           </button>
         )}

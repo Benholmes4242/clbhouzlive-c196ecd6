@@ -71,7 +71,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
     meta.venue_name,
     // Reuses tourhub.board.meta.par so byte identity matches Turn A.
     meta.venue_par ? t('board.meta.par', { par: meta.venue_par }) : null,
-    meta.venue_yardage ? `${formatNumber(meta.venue_yardage)} yds` : null,
+    meta.venue_yardage ? t('tournament.eventInfo.yardageShort', { yardage: formatNumber(meta.venue_yardage) }) : null,
   ].filter(Boolean).join(' · ');
 
   const statusChip = (() => {

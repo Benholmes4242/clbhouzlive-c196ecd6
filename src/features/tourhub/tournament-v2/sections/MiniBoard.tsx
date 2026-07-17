@@ -4,6 +4,8 @@
  * Row tap opens ScorecardSheet.
  */
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import { countryFlag, countryFallback } from '../../leaderboard/countryFlag';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import {
@@ -48,8 +50,10 @@ function thruLabel(row: Row): string {
 }
 
 export function MiniBoard({ tournamentId, entries, limit = 5 }: Props) {
+  const { t } = useTranslation('tourhub');
   const [target, setTarget] = useState<ScorecardSheetTarget | null>(null);
   const rows = entries.slice(0, limit);
+
 
   return (
     <>
@@ -63,11 +67,12 @@ export function MiniBoard({ tournamentId, entries, limit = 5 }: Props) {
             color: INK_FAINT, textTransform: 'uppercase',
           }}
         >
-          <div style={{ width: 34, flexShrink: 0 }}>POS</div>
-          <div style={{ flex: 1, minWidth: 0 }}>PLAYER</div>
-          <div style={{ width: 40, textAlign: 'right', flexShrink: 0 }}>THRU</div>
-          <div style={{ width: 46, textAlign: 'right', flexShrink: 0 }}>TODAY</div>
-          <div style={{ width: 46, textAlign: 'right', flexShrink: 0 }}>TOT</div>
+          <div style={{ width: 34, flexShrink: 0 }}>{t('board.columns.pos')}</div>
+          <div style={{ flex: 1, minWidth: 0 }}>{t('board.columns.player')}</div>
+          <div style={{ width: 40, textAlign: 'right', flexShrink: 0 }}>{t('board.columns.thru')}</div>
+          <div style={{ width: 46, textAlign: 'right', flexShrink: 0 }}>{t('board.columns.today')}</div>
+          <div style={{ width: 46, textAlign: 'right', flexShrink: 0 }}>{t('board.columns.tot')}</div>
+
         </div>
         {rows.map((r) => {
           const posText = r.status === 'MC' || r.status === 'CUT' ? 'MC'

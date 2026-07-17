@@ -9,6 +9,8 @@
  * fall back to this when the event isn't present in the live tab.
  */
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { BoardTable, type BoardEntry, type CutState } from '../../leaderboard/BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
@@ -29,7 +31,9 @@ function isDemoted(s?: string | null): boolean {
 }
 
 export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: Props) {
+  const { t } = useTranslation('tourhub');
   const [target, setTarget] = useState<ScorecardSheetTarget | null>(null);
+
 
   const cutState: CutState = useMemo(() => {
     const status = (meta?.status ?? '').toLowerCase();
@@ -74,7 +78,8 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
       >
         <div style={{ padding: '4px 16px 12px', borderBottom: `0.5px solid ${HAIRLINE_INK_8}` }}>
           <div style={{ fontSize: 9, fontWeight: 800, color: AMBER, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-            Full Board
+            {t('tournament.fullBoard.title')}
+
           </div>
           {meta?.name && (
             <div style={{ fontSize: 15, fontWeight: 800, color: INK, marginTop: 4, letterSpacing: '-0.01em' }}>
@@ -82,7 +87,8 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
             </div>
           )}
           <div style={{ fontSize: 11, fontWeight: 600, color: INK_MUTE, marginTop: 2 }}>
-            {entries.length} players
+            {t('overview.fieldStrength.playersCount', { count: entries.length })}
+
           </div>
         </div>
 
@@ -96,11 +102,12 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
             background: SLATE_50, borderBottom: `0.5px solid ${HAIRLINE_INK_8}`,
           }}
         >
-          <div style={{ width: 52, flexShrink: 0 }}>POS</div>
-          <div style={{ flex: 1, minWidth: 0, paddingLeft: 8 }}>PLAYER</div>
-          <div style={{ width: 44, textAlign: 'center', flexShrink: 0 }}>TOT</div>
-          <div style={{ width: 44, textAlign: 'center', flexShrink: 0 }}>THRU</div>
-          <div style={{ width: 44, textAlign: 'center', flexShrink: 0 }}>TODAY</div>
+          <div style={{ width: 52, flexShrink: 0 }}>{t('board.columns.pos')}</div>
+          <div style={{ flex: 1, minWidth: 0, paddingLeft: 8 }}>{t('board.columns.player')}</div>
+          <div style={{ width: 44, textAlign: 'center', flexShrink: 0 }}>{t('board.columns.tot')}</div>
+          <div style={{ width: 44, textAlign: 'center', flexShrink: 0 }}>{t('board.columns.thru')}</div>
+          <div style={{ width: 44, textAlign: 'center', flexShrink: 0 }}>{t('board.columns.today')}</div>
+
         </div>
 
         <div style={{ overflowY: 'auto', flex: 1, minHeight: 0 }}>
