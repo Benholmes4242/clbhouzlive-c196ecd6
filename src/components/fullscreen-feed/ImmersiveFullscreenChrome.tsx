@@ -456,13 +456,9 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             <Send size={32} stroke="#fff" strokeWidth={2} />
           </RailButton>
 
-          {ownerMenu ? (
-            <div style={{ filter: ICON_SHADOW, pointerEvents: 'auto' }}>{ownerMenu}</div>
-          ) : (
-            <RailButton onClick={onMore} ariaLabel="More options">
-              <MoreHorizontal size={28} stroke="#fff" strokeWidth={2} />
-            </RailButton>
-          )}
+          <RailButton onClick={onMore} ariaLabel="More options">
+            <MoreHorizontal size={28} stroke="#fff" strokeWidth={2} />
+          </RailButton>
         </div>
       )}
 
