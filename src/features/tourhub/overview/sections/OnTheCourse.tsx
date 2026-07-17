@@ -16,6 +16,7 @@
  */
 
 import { useEffect, useRef, useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useFeaturedGroups } from '../data/useFeaturedGroups';
 import { useTeeTimesAll, type TeeGroup } from '@/features/tourhub/tournament-v2/data/useTeeTimesAll';
