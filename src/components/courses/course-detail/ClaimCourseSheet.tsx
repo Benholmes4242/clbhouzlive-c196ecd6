@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Loader2, Check, BadgeCheck, ArrowRight } from 'lucide-react';
 import { toast } from '@/lib/toast';
@@ -57,6 +58,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
   clubName,
   sourceCourseId,
 }) => {
+  const { t } = useTranslation('courses');
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const { data: memberships, isLoading } = useMyBusinesses(user?.id);
