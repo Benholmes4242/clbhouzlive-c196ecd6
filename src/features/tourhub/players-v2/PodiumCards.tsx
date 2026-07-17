@@ -5,6 +5,7 @@
  */
 
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '../_shared/resolvePlayerAvatar';
 import type { RankedRow } from './data/usePlayersRanking';
@@ -44,6 +45,7 @@ function PodiumCard({
   onClick: () => void;
   statLabel: string | null;
 }) {
+  const { t } = useTranslation('tourhub');
   const candidates = resolvePlayerAvatarCandidates({
     name: row.name,
     photoUrl: row.photoUrl,
@@ -93,7 +95,11 @@ function PodiumCard({
             marginBottom: 4,
           }}
         >
-          {center ? `No.1${statLabel ? ' \u00B7 ' + statLabel : ''}` : `No.${row.rank}`}
+          {center
+            ? statLabel
+              ? t('players.podium.rankWithStat', { rank: 1, statLabel })
+              : t('players.podium.rank', { rank: 1 })
+            : t('players.podium.rank', { rank: row.rank })}
         </div>
         <div
           style={{

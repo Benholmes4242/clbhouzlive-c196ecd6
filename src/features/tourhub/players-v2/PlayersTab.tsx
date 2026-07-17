@@ -15,6 +15,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Search, X } from 'lucide-react';
 
 import { Skeleton } from '@/components/ui/skeleton';
@@ -59,6 +60,7 @@ function formatDayShort(d: string | null | undefined): string | null {
 }
 
 export function PlayersTab() {
+  const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -123,14 +125,23 @@ export function PlayersTab() {
         : null;
       if (leaderRow && leader?.score != null) {
         const scoreStr = leader.score === 0 ? 'E' : leader.score > 0 ? `+${leader.score}` : `${leader.score}`;
-        return `${live.name.toUpperCase()} — ${leaderRow.name.toUpperCase()} LEADS AT ${scoreStr}`;
+        return t('players.editorial.leaderAt', {
+          tournament: live.name.toUpperCase(),
+          leader: leaderRow.name.toUpperCase(),
+          score: scoreStr,
+        });
       }
       return live.name.toUpperCase();
     }
     const soon = tours[0];
     const day = formatDayShort(soon.start_date);
-    return day ? `${soon.name.toUpperCase()} STARTS ${day.toUpperCase()}` : null;
-  }, [liveTournaments, activeTour, liveMap, ranking?.rows]);
+    return day
+      ? t('players.editorial.startsOn', {
+          tournament: soon.name.toUpperCase(),
+          day: day.toUpperCase(),
+        })
+      : null;
+  }, [liveTournaments, activeTour, liveMap, ranking?.rows, t]);
 
   // ── Rows: filter by search
   const filteredRows = useMemo<RankedRow[]>(() => {
@@ -205,7 +216,7 @@ export function PlayersTab() {
           {!searchExpanded ? (
             <button
               type="button"
-              aria-label="Search players"
+              aria-label={t('players.search.openAria')}
               onClick={() => setSearchExpanded(true)}
               style={{
                 width: 28,
@@ -241,7 +252,7 @@ export function PlayersTab() {
                 ref={searchInputRef}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search players"
+                placeholder={t('players.search.placeholder')}
                 style={{
                   flex: 1,
                   border: 'none',
@@ -255,7 +266,7 @@ export function PlayersTab() {
               />
               <button
                 type="button"
-                aria-label="Clear search"
+                aria-label={t('players.search.closeAria')}
                 onClick={() => {
                   setSearch('');
                   setSearchExpanded(false);
@@ -332,7 +343,7 @@ export function PlayersTab() {
             textTransform: 'uppercase',
           }}
         >
-          THE FIELD
+          {t('players.field.eyebrow')}
         </span>
         <div style={{ display: 'flex', gap: 4 }}>
           {sortOptions.map((k) => {
@@ -358,7 +369,7 @@ export function PlayersTab() {
                   lineHeight: 1,
                 }}
               >
-                {k === 'ranking' ? 'Ranking' : 'Playing now'}
+                {k === 'ranking' ? t('players.sort.ranking') : t('players.sort.playingNow')}
               </button>
             );
           })}
@@ -389,8 +400,8 @@ export function PlayersTab() {
               subLive = true;
             } else if (synced && (r.wins || r.top10s)) {
               const parts: string[] = [];
-              if (r.wins) parts.push(`${r.wins} WIN${r.wins === 1 ? '' : 'S'}`);
-              if (r.top10s) parts.push(`${r.top10s} TOP-10`);
+              if (r.wins) parts.push(t('players.sub.wins', { count: r.wins }));
+              if (r.top10s) parts.push(t('players.sub.top10s', { count: r.top10s }));
               sub = parts.join(' \u00B7 ');
             }
             const goldRank = synced && r.rank === 1 && !podiumRows.length;
@@ -430,9 +441,7 @@ export function PlayersTab() {
           textAlign: 'center',
         }}
       >
-        {synced
-          ? 'Season ranking \u00B7 live dot = on the course right now'
-          : 'Ranked by world ranking \u2014 season statistics arrive with the sync'}
+        {synced ? t('players.footer.synced') : t('players.footer.unsynced')}
       </div>
     </div>
   );

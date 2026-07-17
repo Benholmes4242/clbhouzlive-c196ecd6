@@ -15,6 +15,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import type { TourId } from '../../hooks/useOverviewData';
 
@@ -40,13 +41,14 @@ export interface RankingResult {
   rows: RankedRow[];
 }
 
-const STAT_LABEL: Record<TourId, string> = {
-  pga: 'FEDEX PTS',
-  euro: 'RTD PTS',
-  lpga: 'CME PTS',
-  pgad: 'POINTS',
-  liv: 'LIV PTS',
-  champ: '',
+/** Maps tour → i18n key under `players.statLabel.*`. `champ` has no stat label. */
+const STAT_LABEL_KEY: Record<TourId, string | null> = {
+  pga: 'players.statLabel.pga',
+  euro: 'players.statLabel.euro',
+  lpga: 'players.statLabel.lpga',
+  pgad: 'players.statLabel.pgad',
+  liv: 'players.statLabel.liv',
+  champ: null,
 };
 
 const DB_TOUR_NAME: Record<TourId, string[]> = {
@@ -85,8 +87,13 @@ async function resolvePgaSeasonId(): Promise<string | null> {
 }
 
 export function usePlayersRanking(tour: TourId) {
+  const { t, i18n } = useTranslation('tourhub');
+  const statLabelFor = (id: TourId): string | null => {
+    const key = STAT_LABEL_KEY[id];
+    return key ? t(key) : null;
+  };
   return useQuery<RankingResult>({
-    queryKey: ['players-v2', 'ranking', tour, currentSeasonYear()],
+    queryKey: ['players-v2', 'ranking', tour, currentSeasonYear(), i18n.language],
     staleTime: 5 * 60_000,
     gcTime: 30 * 60_000,
     queryFn: async () => {
@@ -125,7 +132,7 @@ export function usePlayersRanking(tour: TourId) {
           };
         });
         rows = [...rows].sort((a, b) => a.rank - b.rank);
-        return { synced: true, statLabel: STAT_LABEL.pga, rows };
+        return { synced: true, statLabel: statLabelFor('pga'), rows };
       }
 
       if (tour === 'euro' || tour === 'lpga' || tour === 'pgad' || tour === 'liv') {
@@ -182,7 +189,7 @@ export function usePlayersRanking(tour: TourId) {
             tournamentsPlayed: r.tournaments_played ?? null,
           };
         });
-        return { synced: true, statLabel: STAT_LABEL[tour], rows };
+        return { synced: true, statLabel: statLabelFor(tour), rows };
       }
 
       // champ (degrade) — world-ranking order from sr_world_rankings.
