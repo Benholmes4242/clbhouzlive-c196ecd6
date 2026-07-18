@@ -31,7 +31,7 @@ interface GolfClubViewProps {
 const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false, onClose }) => {
   const { user } = useSupabaseSession();
   const location = useLocation();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const queryClient = useQueryClient();
   
   const tabFromState = (location.state as any)?.activeTab;
