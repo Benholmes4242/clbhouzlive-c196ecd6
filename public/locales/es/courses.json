@@ -199,22 +199,6 @@
     "resetFilters": "Reset filters",
     "sectionTitle": "The world's best"
   },
-  "map": {
-    "unavailableTitle": "Map Temporarily Unavailable",
-    "unavailableBody": "The interactive map feature is currently unavailable.",
-    "loading": "Loading map...",
-    "tapPrompt": "⛳ Tap a course to start your journey",
-    "countOf": "{{rated}} of {{total}}",
-    "dotSeparator": "·",
-    "backA11y": "Go back",
-    "resetViewA11y": "Reset map view",
-    "filterStatusA11y": "Filter courses by status",
-    "yourRating": "Your rating: {{rating}}",
-    "viewCourse": "View course",
-    "markPlayed": "Mark Played",
-    "unavailableSafe": "Map unavailable — your journey progress is still safe.",
-    "dismissInsightA11y": "Dismiss insight"
-  },
   "userCourses": {
     "emptyRegion": "No courses found in the selected region.",
     "signInTitle": "User's Golf Courses",
@@ -523,8 +507,7 @@
       "onBucketList": "On your bucket list",
       "addBucketList": "Add to bucket list",
       "removedFromBucket": "Removed from bucket list",
-      "addedToBucket": "Added to bucket list",
-      "mapHint": "Every course you mark becomes part of your journey — view them anytime on your <mapLink>map</mapLink>."
+      "addedToBucket": "Added to bucket list"
     },
     "personalReview": {
       "title": "Your Rating",
