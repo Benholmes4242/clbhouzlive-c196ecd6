@@ -8,6 +8,7 @@ import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
 import { TrajectoryLine } from './TrajectoryLine';
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import { TREND_UP, TREND_DOWN } from '@/features/tourhub/_shared/tokens';
+import { formatHcp } from '@/lib/formatHcp';
 
 const GEIST = "'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
 const CANVAS = '#F8FAFC';
@@ -54,7 +55,7 @@ export interface CardScorecardSheetProps {
   heroMuted?: boolean;
   emptyMessage?: string;
   loading?: boolean;
-  emptyVariant?: 'syncing' | 'nohbh';
+  emptyVariant?: 'syncing' | 'nohbh' | 'unavailable';
   emptyGross?: number | null;
   emptyToPar?: number | null;
 
@@ -220,7 +221,7 @@ const SkeletonMiddle: React.FC<{ nineHole: boolean }> = ({ nineHole }) => (
 const SyncingMiddle: React.FC<{ nineHole: boolean }> = ({ nineHole }) => {
   const { t } = useTranslation(['courses']);
   return (
-  <div style={{ position: 'relative', padding: '4px 16px 24px' }}>
+  <div style={{ position: 'relative', padding: '4px 16px 24px', minHeight: 210 }}>
     <style>{KEYFRAMES}</style>
     <div style={{ opacity: 0.35, pointerEvents: 'none', display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ display: 'flex', gap: 3 }}>
@@ -269,6 +270,33 @@ const SyncingMiddle: React.FC<{ nineHole: boolean }> = ({ nineHole }) => {
       </div>
     </div>
   </div>
+  );
+};
+
+const UnavailableMiddle: React.FC = () => {
+  const { t } = useTranslation(['courses']);
+  return (
+    <div style={{
+      padding: '20px 16px 24px', minHeight: 210,
+      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+      gap: 12, textAlign: 'center',
+    }}>
+      <div style={{
+        width: 54, height: 54, borderRadius: 14, background: SKEL_BG,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', color: SECONDARY,
+      }}>
+        <Table size={24} strokeWidth={1.6} />
+      </div>
+      <div style={{ fontFamily: GEIST, fontSize: 14.5, fontWeight: 800, color: INK }}>
+        {t('courses:scorecard.unavailableTitle')}
+      </div>
+      <div style={{
+        fontFamily: GEIST, fontSize: 12.5, fontWeight: 500, color: SECONDARY,
+        maxWidth: 250, lineHeight: 1.4,
+      }}>
+        {t('courses:scorecard.unavailableBody')}
+      </div>
+    </div>
   );
 };
 
@@ -444,6 +472,8 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
 
           {loading ? (
             <SkeletonMiddle nineHole={!!nineHole} />
+          ) : holes.length === 0 && emptyVariant === 'unavailable' ? (
+            <UnavailableMiddle />
           ) : holes.length === 0 && emptyVariant === 'nohbh' ? (
             <NohbhMiddle gross={emptyGross ?? null} toPar={emptyToPar ?? null} />
           ) : holes.length === 0 ? (
@@ -506,7 +536,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 1 }}>
                     {playerHcp != null && (
                       <span style={{ ...NUM, fontSize: 12.5, fontWeight: 600, color: SECONDARY }}>
-                        HCP {playerHcp.toFixed(1)}
+                        HCP {formatHcp(playerHcp)}
                       </span>
                     )}
                     {showChip && <HandicapChip delta={playerHcpDelta as number} />}
