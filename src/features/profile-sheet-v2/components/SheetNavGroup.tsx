@@ -77,7 +77,7 @@ export default function SheetNavGroup({ currentActor, isAdmin, onNavigate }: Pro
         onClick={() => onNavigate('/businesses/manage')}
       />
       <Row
-        label="Settings"
+        label="Settings and Manage Profile"
         onClick={() => onNavigate('/edit-profile?tab=settings')}
         isLast={!isAdmin}
       />
