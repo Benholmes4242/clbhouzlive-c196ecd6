@@ -678,7 +678,7 @@ const BusinessProfilePage: React.FC = () => {
                   <button
                     className="h-11 px-4 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]"
                     style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
-                    onClick={() => navigate(`/business/${business.id}/manage`)}
+                    onClick={() => navigate('/businesses/manage')}
                   >
                     Manage
                   </button>
