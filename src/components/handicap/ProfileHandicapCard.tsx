@@ -235,97 +235,20 @@ const ProfileHandicapCard: React.FC<Props> = ({
           </div>
         </div>
 
-        {/* Trophies info strip */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-            margin: '14px -16px -14px',
-            padding: '12px 16px',
-            borderTop: '1px solid var(--hcp-line)',
-            background: 'var(--hcp-amber-tint, rgba(247,147,30,0.10))',
-          }}
-        >
-            <div
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: 10,
-                background: '#fff',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-                boxShadow: '0 1px 2px rgba(15,23,42,0.06)',
-              }}
-            >
-              <Trophy
-                size={18}
-                color={trophyCount > 0 ? '#c97a10' : 'var(--hcp-t-60)'}
-                strokeWidth={2.2}
-              />
-            </div>
-            {trophyCount > 0 ? (
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div
-                  style={{
-                    fontSize: 13.5,
-                    color: 'var(--hcp-t-100)',
-                    lineHeight: 1.35,
-                  }}
-                >
-                  <span style={{ fontWeight: 800, color: '#c97a10' }}>
-                    {trophyCount}
-                  </span>
-                  <span style={{ fontWeight: 700 }}>
-                    {' '}
-                    {trophyCount === 1 ? 'trophy' : 'trophies'} in{' '}
-                    {isOwnProfile ? 'your' : `${resolvedName}'s`} case
-                  </span>
-                </div>
-                <div
-                  style={{
-                    fontSize: 11.5,
-                    color: 'var(--hcp-t-60)',
-                    marginTop: 1,
-                  }}
-                >
-                  Tap anywhere to see{' '}
-                  {isOwnProfile ? 'your' : 'their'} full record
-                </div>
-              </div>
-            ) : (
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div
-                  style={{
-                    fontSize: 13.5,
-                    color: 'var(--hcp-t-100)',
-                    lineHeight: 1.35,
-                    fontWeight: 700,
-                  }}
-                >
-                  {isOwnProfile
-                    ? 'Start your trophy hunt'
-                    : `${resolvedName} is on the trophy hunt`}
-                </div>
-                <div
-                  style={{
-                    fontSize: 11.5,
-                    color: 'var(--hcp-t-60)',
-                    marginTop: 1,
-                  }}
-                >
-                  {isOwnProfile
-                    ? 'Play rounds and post reviews to earn your first'
-                    : 'No trophies earned yet'}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+      </div>
+
+      {/* Trophies entry row (light variant of handicap page shelf preview) */}
+      <div style={{ marginTop: 10 }}>
+        <TrophyRoomEntryRow
+          userId={userId}
+          viewMode={isOwnProfile ? 'owner' : 'friend'}
+          ownerFirstName={resolvedName}
+          variant="light"
+        />
+      </div>
     </div>
   );
 };
+
 
 export default ProfileHandicapCard;
