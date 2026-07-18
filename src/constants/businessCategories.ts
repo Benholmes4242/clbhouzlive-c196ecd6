@@ -5,6 +5,9 @@ import {
   Briefcase, 
   Building2,
   Sparkles,
+  Bed,
+  UtensilsCrossed,
+  Beer,
   LucideIcon
 } from 'lucide-react';
 
@@ -37,6 +40,9 @@ export const BUSINESS_CATEGORIES_WITH_ICONS: BusinessCategoryOption[] = [
   { value: 'Retailer / Pro Shop', label: 'Retailer / Pro Shop', icon: ShoppingBag },
   { value: 'Club Fitter', label: 'Club Fitter', icon: Briefcase },
   { value: 'Resort', label: 'Resort', icon: Building2 },
+  { value: 'Hotel / Accommodation', label: 'Hotel / Accommodation', icon: Bed, subtitle: 'Hotels, B&Bs, and stays near the course' },
+  { value: 'Restaurant / Cafe', label: 'Restaurant / Cafe', icon: UtensilsCrossed },
+  { value: 'Bar / Pub', label: 'Bar / Pub', icon: Beer },
   { value: 'Brand / Manufacturer', label: 'Brand / Manufacturer', icon: Briefcase },
   { value: 'Other', label: 'Other', icon: Building2 },
 ];
