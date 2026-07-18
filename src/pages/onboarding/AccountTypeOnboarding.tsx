@@ -424,7 +424,6 @@ const AccountTypeOnboarding: React.FC = () => {
 
           <WhsConnectScreen
             onConnected={() => handleFinalSubmit()}
-            onSkip={() => handleFinalSubmit()}
           />
         </main>
       </PageRoot>
