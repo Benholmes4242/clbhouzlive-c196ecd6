@@ -27,7 +27,7 @@ const HIDDEN_ROUTES = [
   '/auth',
   '/admin-setup',
   '/onboarding',
-  '/map',
+  
   '/notificationmessages',
   '/followers',
   '/following',
