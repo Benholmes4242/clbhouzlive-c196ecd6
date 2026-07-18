@@ -143,6 +143,8 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
         window.clearTimeout(initTimeoutRef.current);
         initTimeoutRef.current = null;
       }
+      secondaryMarkersRef.current.forEach((m) => m.remove());
+      secondaryMarkersRef.current = [];
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
