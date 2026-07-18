@@ -82,7 +82,7 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
         </div>
 
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px 12px', borderBottom: `0.5px solid ${HAIRLINE_INK_7}` }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px 12px' }}>
           <div>
             <SectionHeader tier="standard" kicker="Rate a Course" tone="amber" className="mb-0.5" />
             <p style={{ fontSize: 12, color: INK_MUTE, margin: 0 }}>{t('rateSheet.subtitle')}</p>
