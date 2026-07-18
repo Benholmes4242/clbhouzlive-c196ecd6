@@ -5,7 +5,6 @@ import { CheckCircle2, XCircle, Loader2, Building2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
-import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { useAcceptInvite, BUSINESS_ROLE_LABELS, BusinessRole } from '@/hooks/useBusinessTeam';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
@@ -28,7 +27,6 @@ export default function BusinessInviteAcceptPage() {
   const token = params.get('token');
 
   useHideBottomNav();
-  useHideHeader();
 
   const acceptInvite = useAcceptInvite();
 

@@ -7,7 +7,6 @@ import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
-import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import {
   useCreateInvite, useCreateInviteByUser,
   AssignableBusinessRole, BUSINESS_ROLE_LABELS,
@@ -40,7 +39,6 @@ export default function BusinessInvitePage() {
   const navigate = useNavigate();
 
   useHideBottomNav();
-  useHideHeader();
 
   const createEmailInvite = useCreateInvite(businessId || '');
   const createUserInvite = useCreateInviteByUser(businessId || '');

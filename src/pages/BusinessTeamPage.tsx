@@ -22,7 +22,6 @@ import {
 } from '@/hooks/useBusinessTeam';
 import { AccessRequestsSection } from '@/components/business/AccessRequestsSection';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
-import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 const INK = '#0F172A';
@@ -64,7 +63,6 @@ export default function BusinessTeamPage() {
   const navigate = useNavigate();
 
   useHideBottomNav();
-  useHideHeader();
 
   const { data: membership } = useBusinessMembership(businessId);
   const { data: business } = useBusinessProfile(businessId);

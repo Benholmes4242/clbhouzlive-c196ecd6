@@ -11,7 +11,6 @@ import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
-import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import {
   useBusinessVerificationRealtime,
   useVerificationNotificationsRealtime,
@@ -29,7 +28,6 @@ export default function BusinessVerificationPage() {
   const { user } = useSupabaseSession();
 
   useHideBottomNav();
-  useHideHeader();
   useBusinessVerificationRealtime(id);
   useVerificationNotificationsRealtime(user?.id);
 

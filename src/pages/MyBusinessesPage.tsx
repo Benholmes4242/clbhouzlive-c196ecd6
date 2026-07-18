@@ -8,7 +8,6 @@ import { BusinessEmptyState } from '@/components/business/BusinessEmptyState';
 
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
-import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { BIZ } from '@/components/business/businessTokens';
 
@@ -61,7 +60,6 @@ const MyBusinessesPage = () => {
   const { activeActor } = useActiveActor();
 
   useHideBottomNav();
-  useHideHeader();
 
   // Sort businesses — active first, then alphabetical.
   const sortedBusinesses = useMemo(() => {

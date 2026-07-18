@@ -10,7 +10,6 @@ import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
-import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import { toast } from '@/lib/toast';
@@ -414,7 +413,6 @@ function ReviewCard({
 export default function BusinessReviewsPage() {
   const { id: businessId } = useParams<{ id: string }>();
   useHideBottomNav();
-  useHideHeader();
 
   const { session } = useSupabaseSession();
   const currentUserId = session?.user?.id;

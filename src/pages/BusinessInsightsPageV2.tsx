@@ -19,7 +19,6 @@ import { trackBusinessProfileVisit } from '@/lib/businessAnalyticsTracking';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { AppLog } from '@/lib/logger';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
-import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { BIZ } from '@/components/business/businessTokens';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { stripMentionMarkup } from '@/lib/mentions/format';
@@ -316,7 +315,6 @@ const BusinessInsightsPageV2 = () => {
   const { user } = useSupabaseSession();
 
   useHideBottomNav();
-  useHideHeader();
   const { data: business, isLoading: businessLoading } = useBusinessProfile(id);
   const { data: membership, isLoading: membershipLoading, isFetched: membershipFetched } = useBusinessMembership(id);
   const { data: insights, isLoading: insightsLoading } = useBusinessInsights(business?.id, dateRange);
