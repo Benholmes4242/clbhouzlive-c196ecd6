@@ -103,7 +103,6 @@ const ProfileHandicapCard: React.FC<Props> = ({
   const { data: trend, isLoading: trendLoading } = useHandicapTrend(connection?.id);
   const { data: history90 } = useHandicapHistory(connection?.id, 90);
   const trend12 = useHandicapTrend12mo(connection?.id);
-  const { data: achievements } = useUserAchievements(userId);
 
   const handicap = trend?.current ?? null;
 
@@ -114,7 +113,6 @@ const ProfileHandicapCard: React.FC<Props> = ({
     );
   }, [history90]);
 
-  const trophyCount = (achievements ?? []).filter((b: any) => b.is_earned).length;
 
   if (connLoading || trendLoading) return null;
   if (!connection) return null;
