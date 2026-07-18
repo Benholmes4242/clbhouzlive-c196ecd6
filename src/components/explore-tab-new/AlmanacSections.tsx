@@ -34,7 +34,6 @@ function AlmanacLensInner({ region, onRegionChange, scope, onScopeChange }: Lens
         WebkitBackdropFilter: 'blur(10px)',
         borderBottom: '1px solid rgba(15,23,42,0.06)',
         padding: '10px 14px',
-        marginTop: -1,
         display: 'flex',
         alignItems: 'center',
         gap: 10,
