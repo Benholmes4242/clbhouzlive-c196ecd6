@@ -53,6 +53,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
 
   const profileQuery = useUserProfile(profileUserId ?? undefined);
   const profile = profileQuery.data;
+  const { data: whsConn } = useWhsConnection(profileUserId ?? undefined);
 
   const courseIdQuery = useWhsCourseId(
     userData?.course?.name ?? null,
