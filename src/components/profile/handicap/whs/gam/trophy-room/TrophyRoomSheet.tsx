@@ -321,8 +321,12 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
   // Owner's current WHS handicap index -- drives the LOSABLE STATUS overlay
   // for single_figures / scratch. Friend-view uses the owner's index (userId),
   // not the viewer's, so friend cards reflect the owner's live status.
-  const { data: ownerProfile } = useUserProfile(open ? userId : undefined);
-  const currentIndex: number | null = ownerProfile?.eg_handicap_index ?? null;
+  const { data: ownerConnection } = useWhsConnection(open ? userId : undefined);
+  const currentIndex: number | null = resolveDisplayHandicap({
+    egHandicapIndex: (ownerProfile as any)?.eg_handicap_index ?? null,
+    manualHandicapIndex: (ownerProfile as any)?.manual_handicap_index ?? null,
+    hasWhsConnection: !!ownerConnection,
+  }).value;
 
   const achievementItems = useMemo(() => badges.map(normalizeBadge), [badges]);
   const legendItems = useMemo(() => legends.map(normalizeLegend), [legends]);
