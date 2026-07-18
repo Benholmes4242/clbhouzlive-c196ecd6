@@ -154,12 +154,17 @@ function OpeningHoursSection({
 }
 
 /* ── Socials ── */
-const SOCIAL_CONFIG: { key: keyof NonNullable<BusinessProfile['social_links']>; Icon: React.ElementType; label: string }[] = [
-  { key: 'instagram', Icon: Instagram, label: 'Instagram' },
-  { key: 'twitter',   Icon: Twitter,   label: 'X / Twitter' },
-  { key: 'facebook',  Icon: Facebook,  label: 'Facebook' },
-  { key: 'tiktok',    Icon: Music2,    label: 'TikTok' },
-  { key: 'youtube',   Icon: Youtube,   label: 'YouTube' },
+const SOCIAL_CONFIG: {
+  key: keyof NonNullable<BusinessProfile['social_links']>;
+  Icon: React.ElementType;
+  label: string;
+  buildUrl: (value: string) => string;
+}[] = [
+  { key: 'instagram', Icon: SiInstagram, label: 'Instagram', buildUrl: (h) => `https://instagram.com/${h.replace(/^@/, '')}` },
+  { key: 'twitter',   Icon: SiX,         label: 'X',         buildUrl: (h) => `https://x.com/${h.replace(/^@/, '')}` },
+  { key: 'facebook',  Icon: SiFacebook,  label: 'Facebook',  buildUrl: ensureProtocol },
+  { key: 'tiktok',    Icon: SiTiktok,    label: 'TikTok',    buildUrl: (h) => `https://tiktok.com/@${h.replace(/^@/, '')}` },
+  { key: 'youtube',   Icon: SiYoutube,   label: 'YouTube',   buildUrl: ensureProtocol },
 ];
 
 function ensureProtocol(url: string): string {
