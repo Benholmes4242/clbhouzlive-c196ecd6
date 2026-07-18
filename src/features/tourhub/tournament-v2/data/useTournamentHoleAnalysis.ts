@@ -1,9 +1,13 @@
 /**
  * useTournamentHoleAnalysis — RPC-backed hole analysis for the tournament
- * "All 18 Holes" sheet. Delegates to get_tournament_hole_analysis(uuid);
+ * "All 18 Holes" sheet. Delegates to get_tournament_hole_analysis(uuid, int);
  * shape mirrors get_course_hole_analysis so SharedHoleCard can consume it
  * source-agnostically. Note: `rounds` here means distinct PLAYERS on the
  * hole (the surface labels it accordingly via countLabel="players").
+ *
+ * `p_round` defaults to NULL (all rounds combined). Server now also returns
+ * `rounds_present: number[]` so the client can render an R1–R4 chip row
+ * enabled only for rounds with data.
  */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -33,20 +37,25 @@ export interface TournamentHoleAnalysis {
   available: boolean;
   total_players: number;
   holes: TournamentHole[];
+  rounds_present: number[];
 }
 
-export function useTournamentHoleAnalysis(tournamentId: string | null | undefined) {
+export function useTournamentHoleAnalysis(
+  tournamentId: string | null | undefined,
+  round: number | null = null,
+) {
   return useQuery<TournamentHoleAnalysis>({
-    queryKey: ['tournament-v2', 'hole-analysis', tournamentId],
+    queryKey: ['tournament-v2', 'hole-analysis', tournamentId, round],
     enabled: !!tournamentId,
     staleTime: 60_000,
     queryFn: async () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error } = await (supabase.rpc as any)('get_tournament_hole_analysis', {
         p_tournament_id: tournamentId,
+        p_round: round,
       });
       if (error) throw error;
-      return (data ?? { available: false, total_players: 0, holes: [] }) as TournamentHoleAnalysis;
+      return (data ?? { available: false, total_players: 0, holes: [], rounds_present: [] }) as TournamentHoleAnalysis;
     },
   });
 }

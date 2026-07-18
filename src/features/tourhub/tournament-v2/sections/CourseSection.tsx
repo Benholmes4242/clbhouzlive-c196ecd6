@@ -4,7 +4,7 @@
  * an "All 18 holes >" sheet that uses SharedHoleCard with countLabel="players".
  * Section self-hides when the RPC reports unavailable coverage.
  */
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ShieldCheck } from 'lucide-react';
 
@@ -21,8 +21,11 @@ import {
 import { SharedHoleCard } from '@/features/courses/_shared/holes/SharedHoleCard';
 import type { SharedHole } from '@/features/courses/_shared/holes/types';
 import { formatNumber } from '@/i18n/format';
+import { ScopeSegment, type ScopeSegmentOption } from '@/components/shared/ScopeSegment';
 
 interface Props { tournamentId: string }
+
+type RoundKey = 'all' | '1' | '2' | '3' | '4';
 
 function toShared(h: TournamentHole): SharedHole {
   return {
@@ -41,9 +44,9 @@ const AVG_EPSILON = 0.05;
 
 export function CourseSection({ tournamentId }: Props) {
   const { t } = useTranslation(['tourhub', 'courses']);
-  const { data } = useTournamentHoleAnalysis(tournamentId);
+  // Mini cards always represent the full tournament (all rounds combined).
+  const { data } = useTournamentHoleAnalysis(tournamentId, null);
   const [open, setOpen] = useState(false);
-
 
   const holes = data?.holes ?? [];
   const played = holes.filter((h) => Number.isFinite(h.avg_to_par));
@@ -64,10 +67,8 @@ export function CourseSection({ tournamentId }: Props) {
       <HolesSheet
         open={open}
         onClose={() => setOpen(false)}
-        holes={holes}
-        hardest={hardest}
-        easiest={easiest}
-        totalPlayers={data.total_players}
+        tournamentId={tournamentId}
+        roundsPresent={data.rounds_present ?? []}
       />
     </>
   );
@@ -76,20 +77,37 @@ export function CourseSection({ tournamentId }: Props) {
 function HolesSheet({
   open,
   onClose,
-  holes,
-  hardest,
-  easiest,
-  totalPlayers,
+  tournamentId,
+  roundsPresent,
 }: {
   open: boolean;
   onClose: () => void;
-  holes: TournamentHole[];
-  hardest: TournamentHole;
-  easiest: TournamentHole;
-  totalPlayers: number;
+  tournamentId: string;
+  roundsPresent: number[];
 }) {
   const { t } = useTranslation(['tourhub', 'courses']);
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
+
+  // Default: highest round present (fallback: all rounds).
+  const highest = roundsPresent.length ? Math.max(...roundsPresent) : null;
+  const initial: RoundKey = highest ? (String(highest) as RoundKey) : 'all';
+  const [round, setRound] = useState<RoundKey>(initial);
+
+  // Re-seed selection each time the sheet opens so it lands on the latest round.
+  useEffect(() => {
+    if (open) setRound(initial);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, highest]);
+
+  const roundParam = round === 'all' ? null : Number(round);
+  const { data, isLoading } = useTournamentHoleAnalysis(tournamentId, roundParam);
+  const holes = data?.holes ?? [];
+  const totalPlayers = data?.total_players ?? 0;
+
+  const played = holes.filter((h) => Number.isFinite(h.avg_to_par));
+  const sorted = [...played].sort((a, b) => b.avg_to_par - a.avg_to_par);
+  const hardest = sorted[0];
+  const easiest = sorted[sorted.length - 1];
 
   const toggle = (n: number) =>
     setExpanded((prev) => {
@@ -103,6 +121,18 @@ function HolesSheet({
     () => Math.max(0.01, ...holes.map((h) => Math.abs(h.avg_to_par))),
     [holes],
   );
+
+  const roundOptions: ReadonlyArray<ScopeSegmentOption<RoundKey>> = useMemo(() => {
+    const present = new Set(roundsPresent);
+    return [
+      { value: 'all' as RoundKey, label: t('tournament.course.roundAll', { ns: 'tourhub', defaultValue: 'All' }) },
+      ...(['1', '2', '3', '4'] as RoundKey[]).map((r) => ({
+        value: r,
+        label: t('tournament.allTeeTimes.roundShort', { ns: 'tourhub', round: r, defaultValue: `R${r}` }),
+        disabled: !present.has(Number(r)),
+      })),
+    ];
+  }, [t, roundsPresent]);
 
   return (
     <BottomSheet open={open} onClose={onClose} variant="light" surfaceColor={SLATE_50} style={{ height: '75dvh', maxHeight: '75dvh' }}>
@@ -140,38 +170,55 @@ function HolesSheet({
             </span>
 
           </div>
+          <div style={{ marginTop: 10 }}>
+            <ScopeSegment
+              value={round}
+              onChange={(v) => setRound(v as RoundKey)}
+              options={roundOptions}
+              ariaLabel={t('tournament.allTeeTimes.roundScopeAria', { ns: 'tourhub', defaultValue: 'Round' })}
+            />
+          </div>
         </div>
 
         <div style={{ overflowY: 'auto', flex: 1, minHeight: 0, paddingBottom: 16 }}>
-          {/* HARDEST / EASIEST feature cards */}
-          {hardest.hole_no !== easiest.hole_no && (
-            <div style={{ padding: '4px 16px 4px', display: 'flex', gap: 12 }}>
-              <FeatureMini tone="hard" h={hardest} maxAbs={maxAbs} />
-              <FeatureMini tone="easy" h={easiest} maxAbs={maxAbs} />
+          {isLoading || !hardest || !easiest ? (
+            <div style={{ padding: '24px 16px', fontSize: 12.5, fontWeight: 600, color: INK_FAINT }}>
+              {t('tournament.course.roundEmpty', { ns: 'tourhub', defaultValue: 'No scoring data for this round yet.' })}
             </div>
+          ) : (
+            <>
+              {/* HARDEST / EASIEST feature cards */}
+              {hardest.hole_no !== easiest.hole_no && (
+                <div style={{ padding: '4px 16px 4px', display: 'flex', gap: 12 }}>
+                  <FeatureMini tone="hard" h={hardest} maxAbs={maxAbs} />
+                  <FeatureMini tone="easy" h={easiest} maxAbs={maxAbs} />
+                </div>
+              )}
+              {holes.map((h) => (
+                <SharedHoleCard
+                  key={h.hole_no}
+                  hole={toShared(h)}
+                  maxAbs={maxAbs}
+                  countLabel="players"
+                  expanded={expanded.has(h.hole_no)}
+                  onToggle={() => toggle(h.hole_no)}
+                  tag={
+                    h.hole_no === hardest.hole_no
+                      ? 'hardest'
+                      : h.hole_no === easiest.hole_no
+                      ? 'easiest'
+                      : null
+                  }
+                />
+              ))}
+            </>
           )}
-          {holes.map((h) => (
-            <SharedHoleCard
-              key={h.hole_no}
-              hole={toShared(h)}
-              maxAbs={maxAbs}
-              countLabel="players"
-              expanded={expanded.has(h.hole_no)}
-              onToggle={() => toggle(h.hole_no)}
-              tag={
-                h.hole_no === hardest.hole_no
-                  ? 'hardest'
-                  : h.hole_no === easiest.hole_no
-                  ? 'easiest'
-                  : null
-              }
-            />
-          ))}
         </div>
       </div>
     </BottomSheet>
   );
 }
+
 
 const FeatureMini: React.FC<{ tone: 'hard' | 'easy'; h: TournamentHole; maxAbs: number }> = ({ tone, h, maxAbs }) => {
   const { t } = useTranslation(['tourhub', 'courses']);
