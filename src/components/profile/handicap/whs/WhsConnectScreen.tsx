@@ -145,7 +145,6 @@ export const WhsConnectScreen: React.FC<Props> = ({ onConnected, onSkip, onDecli
         error={error}
         submitting={false}
         onChangeCountry={handleChangeCountry}
-        onSkip={onSkip}
       />
       <CountryPickerSheet
         open={pickerOpen}

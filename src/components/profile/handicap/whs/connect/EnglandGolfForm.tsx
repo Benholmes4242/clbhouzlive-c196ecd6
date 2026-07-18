@@ -56,7 +56,6 @@ export const EnglandGolfForm: React.FC<Props> = ({
   error,
   submitting,
   onChangeCountry,
-  onSkip,
 }) => {
   const [membershipNumber, setMembershipNumber] = useState('');
   const [password, setPassword] = useState('');
