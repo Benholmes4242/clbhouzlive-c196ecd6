@@ -427,9 +427,41 @@ const FullscreenVideoSlot: React.FC<{
   // clone's expand target (both consume resolveRestingRect). Prevents the
   // clone-retire → settled-paint size delta that produced the visible
   // "media resize after first paint" flash.
-  const settledRect = React.useMemo(() => {
-    return resolveRestingRect(mediaW, mediaH, getCurrentViewport(), 'video');
-  }, [mediaW, mediaH]);
+  //
+  // iOS/WKWebView cold-open sliver fix: at the render tick, visualViewport
+  // height may still be settling (dynamic toolbars, boot). A one-shot
+  // useMemo baked a stale rect that never re-measured, leaving a top-pinned
+  // sliver over white. Mirror BorrowedFullscreenSlot (~L905): compute the
+  // rect from a layout effect on mount, then re-resolve on visualViewport
+  // resize + orientationchange while the slide is active.
+  const [settledRect, setSettledRect] = React.useState<RestingRect>(() =>
+    resolveRestingRect(mediaW, mediaH, getCurrentViewport(), 'video'),
+  );
+  React.useLayoutEffect(() => {
+    if (isBorrowSlide) return;
+    const measure = () => {
+      const next = resolveRestingRect(mediaW, mediaH, getCurrentViewport(), 'video');
+      setSettledRect((prev) =>
+        prev.top === next.top && prev.left === next.left
+          && prev.width === next.width && prev.height === next.height
+          && prev.fit === next.fit
+          ? prev
+          : next,
+      );
+    };
+    // Initial measure on mount — captures the post-layout viewport, not the
+    // pre-layout one that useMemo saw.
+    measure();
+    if (!isActive) return;
+    const vv = typeof window !== 'undefined' ? window.visualViewport : null;
+    vv?.addEventListener('resize', measure);
+    window.addEventListener('orientationchange', measure);
+    return () => {
+      vv?.removeEventListener('resize', measure);
+      window.removeEventListener('orientationchange', measure);
+    };
+  }, [mediaW, mediaH, isBorrowSlide, isActive]);
+
 
   React.useEffect(() => {
     if (isBorrowSlide) return;
