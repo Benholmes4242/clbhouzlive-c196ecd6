@@ -82,6 +82,29 @@ export function SettingsTabContent() {
   const [signOutOpen, setSignOutOpen] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
 
+  const queryClient = useQueryClient();
+  const hideHandicapChip = !!(profile as any)?.hide_handicap_chip;
+  const [chipUpdating, setChipUpdating] = useState(false);
+  const handleToggleHandicapChip = async (nextChecked: boolean) => {
+    if (!user?.id || chipUpdating) return;
+    const nextHidden = !nextChecked; // toggle shows chip when ON
+    setChipUpdating(true);
+    try {
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({ hide_handicap_chip: nextHidden })
+        .eq('id', user.id);
+      if (error) throw error;
+      queryClient.invalidateQueries({ queryKey: ['user-profile', user.id] });
+      queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
+    } catch (e) {
+      console.error('[settings] hide_handicap_chip update failed', e);
+      toast.error('Could not update. Please try again.');
+    } finally {
+      setChipUpdating(false);
+    }
+  };
+
   const handleConfirmSignOut = async () => {
     if (signingOut) return;
     setSigningOut(true);
