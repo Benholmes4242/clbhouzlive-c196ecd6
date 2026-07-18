@@ -73,6 +73,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [showBreakdownsPicker, setShowBreakdownsPicker] = useState(false);
   const [showReviewPicker, setShowReviewPicker] = useState(false);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   const { courses: playedUnrated, count: reviewCount } = usePlayedUnratedCourses(userId);
 
