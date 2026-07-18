@@ -18685,7 +18685,7 @@ export type Database = {
         Returns: Json
       }
       get_tournament_hole_analysis: {
-        Args: { p_tournament_id: string }
+        Args: { p_round?: number; p_tournament_id: string }
         Returns: Json
       }
       get_trending_courses: {
