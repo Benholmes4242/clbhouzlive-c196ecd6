@@ -93,7 +93,7 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
         </div>
 
         {/* Search input */}
-        <div style={{ padding: '0 16px 12px', position: 'relative' }}>
+        <div style={{ padding: '2px 16px 12px', position: 'relative' }}>
           <Search size={15} style={{ position: 'absolute', left: 28, top: 11, color: 'hsl(var(--muted-foreground))' }} />
           <input
             type="text"
