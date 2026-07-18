@@ -15,7 +15,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { ChevronRight, Search, Send, Check } from 'lucide-react';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useSuggestedCreators, type SuggestedCreator } from '@/components/watch/hooks/useSuggestedCreators';
 import { useSocialCounts } from '@/hooks/useSocialCounts';
 import { useSocialListV2 } from '@/features/social-lists-v2/hooks/useSocialListV2';
