@@ -156,11 +156,6 @@ export function HandicapChip({ light = false, pill = false }: { light?: boolean;
     </button>
   );
 
-  // Disconnected — no WHS connection.
-  if (!connection) {
-    return disconnectedPill;
-  }
-
   const resolved = resolveDisplayHandicap({
     egHandicapIndex: (profile as any)?.eg_handicap_index,
     manualHandicapIndex: (profile as any)?.manual_handicap_index,
@@ -168,7 +163,7 @@ export function HandicapChip({ light = false, pill = false }: { light?: boolean;
   });
   const indexValue = resolved.value;
   if (indexValue === null) {
-    // No handicap of any kind — fall back to Connect WHS.
+    // No handicap of any kind — show Connect WHS.
     return disconnectedPill;
   }
 
@@ -179,6 +174,28 @@ export function HandicapChip({ light = false, pill = false }: { light?: boolean;
   const ArrowIcon = direction === 'improving' ? TrendingDown : TrendingUp;
 
   const formattedIndex = Number(indexValue).toFixed(1);
+
+  // Manual source: render non-interactive (no navigation, no trend).
+  if (isManual) {
+    return (
+      <div
+        aria-label={`Your handicap ${formattedIndex}`}
+        style={{ ...baseStyle, gap: 0, cursor: 'default' }}
+      >
+        <span
+          style={{
+            fontSize: pill ? 14 : 12,
+            fontWeight: 700,
+            color: INK,
+            fontVariantNumeric: 'tabular-nums',
+            letterSpacing: '-0.01em',
+          }}
+        >
+          {formattedIndex}
+        </span>
+      </div>
+    );
+  }
 
   return (
     <button
