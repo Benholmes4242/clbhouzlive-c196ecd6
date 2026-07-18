@@ -220,7 +220,7 @@ export default function ManageProfile() {
         >
           <div
             className="flex items-center justify-between px-4 pb-3"
-            style={{ paddingTop: 'max(var(--safe-top, env(safe-area-inset-top, 0px)), 8px)', minHeight: 56 }}
+            style={{ paddingTop: 8, minHeight: 56 }}
           >
             <div className="flex items-center gap-3 flex-1 min-w-0">
               {!isNewUser.current && (
