@@ -17,7 +17,6 @@ interface Props {
   error: string | null;
   submitting: boolean;
   onChangeCountry: () => void;
-  onSkip?: () => void;
 }
 
 const cardBase: React.CSSProperties = {
