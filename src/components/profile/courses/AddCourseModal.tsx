@@ -42,7 +42,6 @@ const INK = '#0F172A';
 const INK_SOFT = '#475569';
 const INK_SUBTLE = '#94A3B8';
 const AMBER = '#F7931E';
-const AMBER_DEEP = '#c97a10';
 const AMBER_WASH = 'rgba(247,147,30,0.08)';
 const AMBER_BORDER = 'rgba(247,147,30,0.30)';
 const BORDER = 'rgba(15,23,42,0.07)';
