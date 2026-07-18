@@ -254,29 +254,6 @@ export const EnglandGolfForm: React.FC<Props> = ({
           Connect official WHS handicap
           {isValid && !submitting && <ArrowRight size={18} strokeWidth={2.4} />}
         </button>
-
-        {onSkip && (
-          <div style={{ textAlign: 'center', fontSize: 13, color: INK_45, paddingTop: 4 }}>
-            Not a member?{' '}
-            <button
-              type="button"
-              onClick={onSkip}
-              style={{
-                color: INK,
-                fontWeight: 600,
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                textDecoration: 'underline',
-                textDecorationColor: 'rgba(15,23,42,0.30)',
-                textUnderlineOffset: 3,
-                fontFamily: FONT,
-              }}
-            >
-              Skip for now
-            </button>
-          </div>
-        )}
       </form>
     </div>
   );
