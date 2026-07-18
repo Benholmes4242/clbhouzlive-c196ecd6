@@ -242,7 +242,7 @@ export const FriendsEmptyState: React.FC<FriendsEmptyStateProps> = ({ userId, on
               <div key="self" style={{ width: 52 }}>
                 <SquircleAvatar
                   size={52}
-                  src={profile?.avatar_url ?? null}
+                  src={profile?.profile_photo_url ?? null}
                   alt={profile?.display_name ?? 'You'}
                   fallback={userInitials}
                   hairlineRing
