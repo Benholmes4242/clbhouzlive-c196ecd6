@@ -48,7 +48,6 @@ import { FilterChips } from '@/components/ui/FilterChips';
 
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
 import { useWallLevels } from '@/hooks/gam/useWallLevels';
-import { TierGem } from '@/components/shared/TierGem';
 import {
   DropdownMenu,
   DropdownMenuContent,
