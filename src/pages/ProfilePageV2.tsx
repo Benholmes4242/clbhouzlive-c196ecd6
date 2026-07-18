@@ -585,7 +585,7 @@ const ProfilePageV2Content: React.FC = () => {
           <AchievementsPane 
             userId={profile?.id}
             userDisplayName={profile?.display_name || 'User'}
-            userHandicap={profile?.eg_handicap_index}
+            userHandicap={resolvedHcp.value}
             userProfilePhotoUrl={profile?.profile_photo_url}
             isCurrentUser={isSelf}
           />
