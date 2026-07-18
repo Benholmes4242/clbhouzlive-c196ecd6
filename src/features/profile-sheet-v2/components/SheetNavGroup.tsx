@@ -23,6 +23,7 @@ interface Props {
   currentActor: { id: string; type: 'personal' | 'business' };
   isAdmin: boolean;
   onNavigate: (route: string) => void;
+  onInviteFriends?: () => void;
 }
 
 interface RowProps {
