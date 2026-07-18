@@ -174,9 +174,7 @@ const ProfilePageV2Content: React.FC = () => {
   const { data: postsCount = 0, isLoading: postsCountLoading } = usePersonalPostsCount(profileUserId);
   const { data: reviewsCount = 0, isLoading: reviewsCountLoading } = usePersonalReviewsCount(profileUserId);
   const { data: achievements } = useProfileAchievements(profileUserId);
-  const { data: profileMedalsMap } = useWallLevels(profileUserId ? [profileUserId] : []);
-  const profileMedals = profileUserId ? profileMedalsMap?.get(profileUserId) ?? null : null;
-  
+
   // Two-flag model:
   //   isOwnAccount = the auth user owns this profile (drives personal-identity UI:
   //                  handicap, Top Ten curation, settings, avatar uploader, bio prompt).
