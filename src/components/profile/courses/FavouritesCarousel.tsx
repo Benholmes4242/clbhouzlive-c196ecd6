@@ -157,11 +157,11 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
             </div>
           </div>
         </div>
-        <div className="flex gap-4 overflow-hidden px-4">
+        <div className="flex gap-3 overflow-hidden px-1">
           {[1, 2].map((i) => (
              <div 
               key={i} 
-              className="flex-shrink-0 w-[210px] h-[269px] bg-muted rounded-[24px] animate-pulse" 
+              className="flex-shrink-0 w-[210px] h-[269px] bg-muted rounded-[4px] animate-pulse" 
             />
           ))}
         </div>
