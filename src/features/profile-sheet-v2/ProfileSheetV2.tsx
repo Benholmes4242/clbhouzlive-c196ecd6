@@ -96,6 +96,11 @@ export default function ProfileSheetV2({
   isLoading,
 }: ProfileSheetV2Props) {
   const sheetY = useMotionValue(0);
+  const { openInviteSheet } = useInviteSheet();
+  const handleInviteFriends = () => {
+    onClose();
+    setTimeout(() => openInviteSheet('profile_sheet'), 250);
+  };
   const panelRef = useRef<HTMLDivElement | null>(null);
   const openTweenRef = useRef<ReturnType<typeof animate> | null>(null);
   const ovlId = useRef<number>(-1);
