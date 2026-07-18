@@ -184,8 +184,19 @@ function ensureProtocol(url: string): string {
 
 /* ── Main ── */
 export function BusinessProfileInfo({ business, userId }: BusinessProfileInfoProps) {
+  const navigate = useNavigate();
   const amenities = Array.isArray(business.amenities) ? business.amenities.filter(Boolean) : [];
   const hasAmenities = amenities.length > 0;
+
+  // Reverse link: hospitality businesses near a course get a "Near {course}" row.
+  const isHospitality = !!business.category && HOSPITALITY_CATEGORIES.has(business.category);
+  const hasCoords =
+    business.lat != null && business.lng != null &&
+    Number.isFinite(business.lat) && Number.isFinite(business.lng);
+  const { data: nearestCourse } = useNearestCourse(
+    isHospitality && hasCoords ? business.lat : null,
+    isHospitality && hasCoords ? business.lng : null,
+  );
 
   const contactHandlers = {
     website: () => {
