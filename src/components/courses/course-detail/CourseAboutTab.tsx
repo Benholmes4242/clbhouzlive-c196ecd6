@@ -287,6 +287,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
               name={course.name}
               locationText={formatCourseLocation(course)}
               colorful
+              nearby={nearbyPins}
             />
           )}
           {!coords && !coordsLoading && (
