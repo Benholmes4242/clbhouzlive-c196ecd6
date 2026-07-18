@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useCallback } from 'react';
+import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUserCourseActivity } from '@/hooks/useUserCourseActivity';
 import { useQuery } from '@tanstack/react-query';
