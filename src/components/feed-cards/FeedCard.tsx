@@ -52,6 +52,7 @@ export function FeedCard({
   posts,
   flatIndex,
   isAutoplayActive,
+  openedFrom,
   hideCourseAttribution = false,
   hideFormatBadge = false,
 }: {
@@ -60,6 +61,15 @@ export function FeedCard({
   posts: FeedPost[];
   flatIndex: number;
   isAutoplayActive: boolean;
+  /**
+   * Surface tag passed straight into openWithOrigin({ openedFrom }). MUST
+   * match the tag that this surface's grid checks via
+   * useIsViewerOwnedBy(...) — otherwise the surface's appendPosts /
+   * setPaginationState effects never fire and the fullscreen viewer opens
+   * against an empty / wrong post array (blank white or partial media).
+   * Known tags: 'watch' | 'clips' | 'course-media' | 'explore' | 'clubhouse'.
+   */
+  openedFrom: string;
   /**
    * When true, the course-name element does not render — the title falls
    * through to caption or the format-based fallback (Clip / Video). The
@@ -75,6 +85,7 @@ export function FeedCard({
    */
   hideFormatBadge?: boolean;
 }) {
+
   const rootRef = useRef<HTMLElement>(null);
   const isClip = row.derived_format === 'clip';
   const w = Number(row?.width) || 0;
