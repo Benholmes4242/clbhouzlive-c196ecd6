@@ -9,7 +9,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from '@/lib/toast';
 import { supabase } from '@/integrations/supabase/client';
 import { SeasonRecapModal } from '@/components/achievements/SeasonRecapModal';
-import { ProfileCompleteNudge } from '@/components/clubhouse/ProfileCompleteNudge';
+
 import { useSeasonRecap } from '@/hooks/useSeasonRecap';
 
 import { Compass, Users } from 'lucide-react';
@@ -513,8 +513,6 @@ const ClubhouseContent = () => {
         </div>
        )}
 
-      {/* Profile completeness nudge — new users only, first 7 days, hidden on editorial cards */}
-      {!isTournamentCardActive && <ProfileCompleteNudge />}
 
       {/* Rehydration skeleton */}
       <ClubhouseSkeletonShimmer isVisible={showRehydrationSkeleton} isStatic={false} variant={posts[0]?.isReview ? 'review' : 'regular'} isVideo={posts[0]?.mediaItems?.[0]?.type === 'video'} surface="card" />
