@@ -92,7 +92,7 @@ export default function SheetNavGroup({ currentActor, isAdmin, onNavigate }: Pro
                 fontWeight: 700,
                 fontSize: 9,
                 letterSpacing: '0.1em',
-                color: AMBER_DEEP,
+                color: AMBER,
               }}
             >
               ADMIN
