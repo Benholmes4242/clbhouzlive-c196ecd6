@@ -12704,10 +12704,6 @@ export type Database = {
           eg_handicap_index: number | null
           eg_recent_rounds: Json | null
           eg_visible: boolean | null
-          email_change_cooldown_until: string | null
-          email_change_count: number | null
-          email_change_requested_at: string | null
-          email_change_token: string | null
           email_confirmed: boolean
           featured_post_id: string | null
           first_name: string | null
@@ -12758,7 +12754,6 @@ export type Database = {
           mobile_crop_y: number | null
           notification_preferences: Json | null
           peer_comparison_visible: boolean
-          pending_email: string | null
           phone: string | null
           pinned_achievement_ids: string[] | null
           pinned_post_ids: string[] | null
@@ -12832,10 +12827,6 @@ export type Database = {
           eg_handicap_index?: number | null
           eg_recent_rounds?: Json | null
           eg_visible?: boolean | null
-          email_change_cooldown_until?: string | null
-          email_change_count?: number | null
-          email_change_requested_at?: string | null
-          email_change_token?: string | null
           email_confirmed?: boolean
           featured_post_id?: string | null
           first_name?: string | null
@@ -12886,7 +12877,6 @@ export type Database = {
           mobile_crop_y?: number | null
           notification_preferences?: Json | null
           peer_comparison_visible?: boolean
-          pending_email?: string | null
           phone?: string | null
           pinned_achievement_ids?: string[] | null
           pinned_post_ids?: string[] | null
@@ -12960,10 +12950,6 @@ export type Database = {
           eg_handicap_index?: number | null
           eg_recent_rounds?: Json | null
           eg_visible?: boolean | null
-          email_change_cooldown_until?: string | null
-          email_change_count?: number | null
-          email_change_requested_at?: string | null
-          email_change_token?: string | null
           email_confirmed?: boolean
           featured_post_id?: string | null
           first_name?: string | null
@@ -13014,7 +13000,6 @@ export type Database = {
           mobile_crop_y?: number | null
           notification_preferences?: Json | null
           peer_comparison_visible?: boolean
-          pending_email?: string | null
           phone?: string | null
           pinned_achievement_ids?: string[] | null
           pinned_post_ids?: string[] | null
@@ -16302,7 +16287,6 @@ export type Database = {
         Args: { _scope?: string; _target: string; _viewer: string }
         Returns: boolean
       }
-      can_change_email: { Args: { user_id_param: string }; Returns: boolean }
       can_manage_business: { Args: { _business_id: string }; Returns: boolean }
       can_moderate: { Args: never; Returns: boolean }
       can_view_followers_post: {
