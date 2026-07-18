@@ -67,6 +67,19 @@ export const WhsConnectScreen: React.FC<Props> = ({ onConnected, onSkip, onDecli
         setError(ERROR_MESSAGES[code] ?? data.message ?? ERROR_MESSAGES.internal_error);
         return;
       }
+      // Auto-restore: connected users have earned the live index chip.
+      if (user?.id) {
+        try {
+          await supabase
+            .from('user_profiles')
+            .update({ hide_handicap_chip: false })
+            .eq('id', user.id);
+          queryClient.invalidateQueries({ queryKey: ['user-profile', user.id] });
+          queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
+        } catch (e) {
+          console.warn('[WhsConnectScreen] failed to clear hide_handicap_chip:', e);
+        }
+      }
       setSuccessData(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
