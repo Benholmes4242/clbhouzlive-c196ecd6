@@ -257,6 +257,17 @@ export function SettingsTabContent() {
           />
         </SettingsSection>
 
+        {/* Friends */}
+        <SettingsSection title="Friends">
+          <SettingsChevronRow
+            icon={<UserPlus size={18} />}
+            title="Invite friends"
+            subtitle="Share your link \u2014 golf's better with your circle"
+            iconTheme="account"
+            onClick={() => openInviteSheet('settings')}
+          />
+        </SettingsSection>
+
         {/* Support & Legal */}
         <SettingsSection title="Support & Legal">
           <SettingsChevronRow
