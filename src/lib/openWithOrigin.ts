@@ -391,11 +391,26 @@ export function openWithOrigin({
             postIdIntoStore: postId,
             hlsUrl,
           });
+        } else {
+          // Cold gate skipped because no manifest is available for the tapped
+          // media (image row, still-processing video, or missing streamId).
+          // Previously silent — surfaced here so device traces can classify
+          // the "blank fullscreen" sub-case without ambiguity.
+          trace('cold.skip', {
+            openId,
+            postId,
+            surface: openedFrom,
+            reason: 'no-hlsUrl',
+            mediaIndex: mediaIndex ?? 0,
+            hasItems: !!items?.length,
+            itemType: (item as { type?: string } | undefined)?.type ?? null,
+          });
         }
       } catch {
         /* trace-only */
       }
     }
+
   }
 
   // Two-way resume: prefer the tile's live rail-lane playhead (Watch tap),
