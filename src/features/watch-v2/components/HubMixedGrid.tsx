@@ -125,6 +125,7 @@ export function HubMixedGrid({ filter = 'all' }: { filter?: string } = {}) {
                 posts={feedPosts}
                 flatIndex={i}
                 isAutoplayActive={activeIndices.has(i)}
+                openedFrom="watch"
                 hideFormatBadge
               />
             ))}
@@ -138,9 +139,11 @@ export function HubMixedGrid({ filter = 'all' }: { filter?: string } = {}) {
                 posts={feedPosts}
                 flatIndex={i}
                 isAutoplayActive={activeIndices.has(i)}
+                openedFrom="watch"
                 hideFormatBadge
               />
             ))}
+
           </div>
         </div>
       )}
