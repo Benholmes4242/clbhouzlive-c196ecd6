@@ -78,7 +78,7 @@ const PERSIST_PREFIXES = [
   'tour',
   'handicap',
   'profile-sheet-stats',
-  'profile-clubs',
+  
 ];
 
 const _skippedKeysLogged = new Set<string>();

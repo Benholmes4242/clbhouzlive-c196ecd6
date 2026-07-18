@@ -96,10 +96,12 @@ export function useProfileSave(userId: string) {
         updatePayload.username_is_custom = true;
       }
 
-      const { error: profileError } = await supabase
+      const { data: updated, error: profileError } = await supabase
         .from('user_profiles')
         .update(updatePayload as any)
-        .eq('id', userId);
+        .eq('id', userId)
+        .select('id')
+        .single();
 
       if (profileError) {
         const msg = (profileError.message || '').toLowerCase();
@@ -112,15 +114,22 @@ export function useProfileSave(userId: string) {
         }
         throw profileError;
       }
+      if (!updated) {
+        throw new Error('Profile update did not match any row');
+      }
 
 
       // 4. Sync home clubs (primary + additional) to user_home_clubs.
       //    Replace-all strategy: delete existing rows, then insert the new set.
       //    user_home_clubs.club_id is UUID referencing golf_clubs.
-      await supabase
+      const { error: clubsDelErr } = await supabase
         .from('user_home_clubs')
         .delete()
         .eq('user_profile_id', userId);
+      if (clubsDelErr) {
+        toast.error('Clubs could not be saved: ' + (clubsDelErr.message || 'delete failed'));
+        return false;
+      }
 
       // user_home_clubs holds ADDITIONAL clubs only. The primary club's source
       // of truth is user_profiles.primary_club_id (written above); never mirror
@@ -132,7 +141,7 @@ export function useProfileSave(userId: string) {
         }
       }
       if (clubRows.length > 0) {
-        // Dedupe defensively — unique index is (user_profile_id, club_id).
+        // Dedupe defensively - unique index is (user_profile_id, club_id).
         const seen = new Set<string>();
         const unique = clubRows.filter(r => {
           const k = `${r.user_profile_id}:${r.club_id}`;
@@ -141,18 +150,24 @@ export function useProfileSave(userId: string) {
           return true;
         });
         const { error: clubsErr } = await supabase.from('user_home_clubs').insert(unique);
-        if (clubsErr) console.warn('[useProfileSave] insert user_home_clubs failed', clubsErr);
+        if (clubsErr) {
+          toast.error('Clubs could not be saved: ' + (clubsErr.message || 'insert failed'));
+          return false;
+        }
       }
 
 
-      // 6. Invalidate all relevant query keys — await to prevent stale data
+      // 6. Invalidate all relevant query keys - await to prevent stale data.
+      //    refetchType: 'all' forces inactive caches (e.g. profile-clubs on a
+      //    non-mounted profile page) to refetch, not just be marked stale.
       await Promise.all(
         INVALIDATE_KEYS.map(key =>
-          queryClient.invalidateQueries({ queryKey: [key] })
+          queryClient.invalidateQueries({ queryKey: [key], refetchType: 'all' })
         )
       );
       // FIX I5: Invalidate onboarding cache so AuthWrapper doesn't re-route
       queryClient.invalidateQueries({ queryKey: ['onboarding-status', userId] });
+
 
       return true;
     } catch (err: any) {

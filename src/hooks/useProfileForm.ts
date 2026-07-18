@@ -84,10 +84,9 @@ export function useProfileForm(profile: any, loading?: boolean) {
               name: r.golf_clubs.name as string,
               clubId: r.club_id as string,
             }));
-          if (clubs.length > 0) {
-            setForm(prev => ({ ...prev, additionalClubs: clubs }));
-            setInitialData(prev => ({ ...prev, additionalClubs: clubs }));
-          }
+          setForm(prev => ({ ...prev, additionalClubs: clubs }));
+          setInitialData(prev => ({ ...prev, additionalClubs: clubs }));
+
         } catch (err) {
           console.warn('[useProfileForm] hydrate additional clubs failed', err);
         }
