@@ -12,6 +12,8 @@ import { useNavigate } from 'react-router-dom';
 import { CardScorecardSheet } from '@/features/courses/_shared/scorecard/CardScorecardSheet';
 import { useRoundDetail, useWhsCourseId } from '@/lib/whs/hooks';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useWhsConnection } from '@/lib/whs/hooks';
+import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import type { WhsScoreHole } from '@/lib/whs/types';
 import { formatWeekdayShortGB, formatMonthShortGB } from '@/i18n/format';
 
