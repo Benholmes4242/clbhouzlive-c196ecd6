@@ -5,7 +5,7 @@
  *   improving    — index number + green TrendingDown (90D delta ≤ -0.3)
  *   drifting     — index number + crimson TrendingUp  (90D delta ≥ +0.3)
  *   steady       — index number alone (|delta| < 0.3 or insufficient history)
- *   disconnected — amber "Connect HCP" label
+ *   disconnected — amber "Connect WHS" label
  *
  * Logged-out users render nothing. While the WHS connection resolves we
  * render a fixed-width skeleton pill to prevent layout shift.
@@ -150,7 +150,7 @@ export function HandicapChip({ light = false, pill = false }: { light?: boolean;
           letterSpacing: '0.02em',
         }}
       >
-        Connect HCP
+        Connect WHS
       </span>
     </button>
   );
@@ -162,7 +162,7 @@ export function HandicapChip({ light = false, pill = false }: { light?: boolean;
 
   const indexValue = trendData?.current ?? null;
   if (indexValue === null) {
-    // Connection exists but no current index — fall back to Connect HCP.
+    // Connection exists but no current index — fall back to Connect WHS.
     return disconnectedPill;
   }
 
