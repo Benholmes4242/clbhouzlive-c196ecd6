@@ -224,7 +224,7 @@ const HcpCell: React.FC<{ tone: ChromeTone }> = ({ tone }) => {
     return (
       <button
         type="button"
-        onClick={() => navigate('/handicap')}
+        onClick={() => navigate('/manage/handicap')}
         aria-label="Connect handicap"
         style={{
           background: 'none',
