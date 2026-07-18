@@ -13,6 +13,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePrivacySettings } from '@/hooks/usePrivacySettings';
 import { useDeleteAccount } from '@/hooks/useDeleteAccount';
 import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from '@/lib/toast';
 import {
   SettingsSection,
   SettingsChevronRow,
