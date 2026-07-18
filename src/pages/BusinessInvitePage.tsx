@@ -102,7 +102,7 @@ export default function BusinessInvitePage() {
   const pending = createEmailInvite.isPending || createUserInvite.isPending;
 
   return (
-    <ManagePageShell title="Invite to team">
+    <ManagePageShell title="Invite to team" offsetForChrome>
       <main className="px-4 pt-4 pb-22 max-w-lg mx-auto">
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
           <p className="text-[13px] leading-relaxed mb-5" style={{ color: INK_45 }}>
