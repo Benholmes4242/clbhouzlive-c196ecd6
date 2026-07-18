@@ -1,14 +1,14 @@
 /**
  * ProfileSheetV2 · SheetNavGroup
  *
- * Grouped card with View profile / Manage businesses / Settings, plus
+ * Grouped card with View profile / Manage businesses / Settings and Manage Profile, plus
  * an admin-only Command Center row. Route strings verbatim from
  * src/components/profile/ProfileHubSheet.tsx (via its opener
  * PostingAsMenu.handleAccountHubNavigate):
- *   View profile      -> `/profile/${currentActor.id}`
- *   Manage businesses -> '/businesses/manage'
- *   Settings          -> '/edit-profile?tab=settings'
- *   Command Center    -> '/admin/command-center'
+ *   View profile             -> `/profile/${currentActor.id}`
+ *   Manage businesses        -> '/businesses/manage'
+ *   Settings and Manage Profile -> '/edit-profile?tab=settings'
+ *   Command Center           -> '/admin/command-center'
  */
 
 import React from 'react';
@@ -77,7 +77,7 @@ export default function SheetNavGroup({ currentActor, isAdmin, onNavigate }: Pro
         onClick={() => onNavigate('/businesses/manage')}
       />
       <Row
-        label="Settings"
+        label="Settings and Manage Profile"
         onClick={() => onNavigate('/edit-profile?tab=settings')}
         isLast={!isAdmin}
       />
