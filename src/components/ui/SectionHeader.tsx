@@ -29,7 +29,7 @@ const TIER_TO_ROLE: Record<Tier, Role> = {
 
 const EYEBROW_TONE: Record<EyebrowTone, string> = {
   slate: '#64748B',
-  amber: '#c97a10',
+  amber: AMBER,
   danger: '#DC2626',
 };
 
