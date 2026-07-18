@@ -108,7 +108,7 @@ export function AcesAlbatrossesPodium({
 
   const bandCount = Math.min(
     MAX_ROWS,
-    Math.max(MIN_ROWS, Math.max(aceRows.length, albRows.length)),
+    Math.max(1, Math.max(aceRows.length, albRows.length)),
   );
 
   return (
