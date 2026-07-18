@@ -489,29 +489,12 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
 
       {/* Load More */}
       {hasMore && (
-        <div className="flex flex-col items-center gap-2 pt-4 px-4 pb-6">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={loadMore}
-            disabled={isLoadingMore}
-            className="w-full max-w-xs gap-1.5 transition-all duration-150 hover:shadow-sm active:scale-[0.98]"
-          >
-            {isLoadingMore ? (
-              <>
-                <div className="w-4 h-4 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin" />
-                Loading next courses…
-              </>
-            ) : (
-              <>
-                <ChevronDown className="h-4 w-4" />
-                Next {remainingCount} courses
-              </>
-            )}
-          </Button>
-          <p className="text-[11px] text-muted-foreground">
-            Showing 1–{displayedCourses.length} of {formatNumber(totalFiltered)} courses
-          </p>
+        <div
+          ref={sentinelRef}
+          style={{ padding: '16px 0', display: 'flex', justifyContent: 'center' }}
+          aria-hidden="true"
+        >
+          <div className="text-xs font-semibold text-muted-foreground">Loading more...</div>
         </div>
       )}
 
