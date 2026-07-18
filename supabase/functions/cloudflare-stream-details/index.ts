@@ -2,8 +2,6 @@ import { serve } from "https://deno.land/std@0.220.0/http/server.ts"
 import { corsFor } from '../_shared/cors.ts';
 serve(async (req) => {
   const corsHeaders = corsFor(req.headers.get('Origin'));
-  const origin = req.headers.get('origin');
-  const corsHeaders = cors(origin);
 
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
