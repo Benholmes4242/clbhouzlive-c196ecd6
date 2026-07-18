@@ -9,6 +9,7 @@ import AboutMediaStrip from './AboutMediaStrip';
 import NearbySection from './NearbySection';
 import { useCourseCoordinates } from '@/hooks/useCourseCoordinates';
 import { LocationMapCard } from '@/components/map';
+import { useNearbyBusinesses } from '@/hooks/useNearbyBusinesses';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { useCourseRatingDistribution } from '@/hooks/useCourseRatingDistribution';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
