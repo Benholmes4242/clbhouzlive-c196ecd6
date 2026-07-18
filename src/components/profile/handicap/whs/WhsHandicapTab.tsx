@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWhsConnection } from '@/lib/whs/hooks';
+import { useDeclineHandicapChip } from '@/lib/whs/useDeclineHandicapChip';
 import WhsConnectScreen from './WhsConnectScreen';
 import HandicapDashboard from './HandicapDashboard';
 
