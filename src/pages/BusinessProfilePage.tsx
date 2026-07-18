@@ -470,10 +470,16 @@ const BusinessProfilePage: React.FC = () => {
                 <img src={business.logo_url} alt={business.name} className="w-full h-full object-cover" />
               ) : (
                 <div
-                  className="w-full h-full flex items-center justify-center text-3xl font-bold text-muted-foreground"
-                  style={{ background: 'rgba(15,23,42,0.06)' }}
+                  className="w-full h-full flex items-center justify-center text-white"
+                  style={{
+                    background: getAvatarFallbackColor(avatarFallbackKey),
+                    fontSize: '48px',
+                    fontWeight: 600,
+                    letterSpacing: '0.01em',
+                    lineHeight: 1,
+                  }}
                 >
-                  {initials}
+                  {avatarInitials}
                 </div>
               )}
             </div>
