@@ -186,12 +186,7 @@ export const ConversationRow: React.FC<Props> = ({ conversation }) => {
         p_as_actor_id: actor.actorId,
       });
       if (error) {
-        const msg = (error.message || '').toLowerCase();
-        if (msg.includes('owner') || msg.includes('transfer')) {
-          toast.error('Make someone else an admin or owner first');
-        } else {
-          toast.error(isGroup ? 'Could not leave group' : 'Could not delete conversation');
-        }
+        toast.error(isGroup ? 'Could not leave group' : 'Could not delete conversation');
         return;
       }
       invalidateInbox();
