@@ -157,11 +157,11 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
             </div>
           </div>
         </div>
-        <div className="flex gap-4 overflow-hidden px-4">
+        <div className="flex gap-3 overflow-hidden px-1">
           {[1, 2].map((i) => (
              <div 
               key={i} 
-              className="flex-shrink-0 w-[210px] h-[269px] bg-muted rounded-[24px] animate-pulse" 
+              className="flex-shrink-0 w-[210px] h-[269px] bg-muted rounded-[4px] animate-pulse" 
             />
           ))}
         </div>
@@ -245,7 +245,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
       {/* Carousel */}
       <div 
         ref={scrollContainerRef}
-        className="flex gap-5 overflow-x-auto snap-x snap-mandatory scrollbar-hide px-4 pb-2"
+        className="flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide px-1 pb-2"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {topTen.map((course) => {
@@ -280,7 +280,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
               <div 
                 key={`empty-${index}`}
                 onClick={onManage}
-                className="relative w-[210px] h-[269px] rounded-[24px] flex-shrink-0 snap-center flex items-center justify-center cursor-pointer transition-transform duration-200 hover:scale-[0.99] active:scale-[0.97] border-2 border-dashed"
+                className="relative w-[210px] h-[269px] rounded-[4px] flex-shrink-0 snap-center flex items-center justify-center cursor-pointer transition-transform duration-200 hover:scale-[0.99] active:scale-[0.97] border-2 border-dashed"
                 style={{ background: 'rgba(15,23,42,0.04)', borderColor: 'rgba(15,23,42,0.12)' }}
               >
                 <div className="text-center p-6">
