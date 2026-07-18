@@ -1,12 +1,22 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
-  Phone, Mail, Globe, MapPin, Clock, Check, ArrowUpRight,
+  Phone, Mail, Globe, MapPin, Clock, Check, ArrowUpRight, Flag,
 } from 'lucide-react';
 import { SiInstagram, SiX, SiFacebook, SiTiktok, SiYoutube } from 'react-icons/si';
 import { BusinessProfile } from '@/hooks/useBusinessProfile';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { openExternalUrl } from '@/utils/median/openExternalUrl';
 import { trackBusinessAction } from '@/lib/businessAnalyticsTracking';
+import { useNearestCourse } from '@/hooks/useNearestCourse';
+import { formatDistanceKm } from '@/utils/formatDistance';
+
+const HOSPITALITY_CATEGORIES = new Set<string>([
+  'Hotel / Accommodation',
+  'Restaurant / Cafe',
+  'Bar / Pub',
+  'Resort',
+]);
 
 interface BusinessProfileInfoProps {
   business: BusinessProfile;
