@@ -293,19 +293,21 @@ export function BusinessProfileInfo({ business, userId }: BusinessProfileInfoPro
         <section className="px-4 py-4">
           <SectionKicker>Follow us</SectionKicker>
           <div className="flex items-center gap-2 flex-wrap">
-            {socials.map(({ key, Icon, label }) => (
-              <a
-                key={key}
-                href={ensureProtocol(socialLinks[key] as string)}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={label}
-                className="h-10 w-10 inline-flex items-center justify-center rounded-full active:scale-[0.97] transition-transform"
-                style={{ background: '#ffffff', border: `1px solid ${HAIR}` }}
-              >
-                <Icon className="w-4 h-4" style={{ color: INK }} />
-              </a>
-            ))}
+            {socials.map(({ key, Icon, label, buildUrl }) => {
+              const url = buildUrl(socialLinks[key]!.trim());
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => openExternalUrl(url)}
+                  aria-label={label}
+                  className="h-10 w-10 inline-flex items-center justify-center rounded-full active:scale-[0.97] transition-transform"
+                  style={{ background: '#ffffff', border: `1px solid ${HAIR}`, color: INK }}
+                >
+                  <Icon className="w-4 h-4" />
+                </button>
+              );
+            })}
           </div>
         </section>
       )}
