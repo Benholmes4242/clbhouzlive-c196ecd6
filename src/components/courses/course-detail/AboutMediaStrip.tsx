@@ -338,10 +338,10 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
                   src={media.poster}
                   alt=""
                   loading="lazy"
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
                 />
               ) : (
-                <div style={{ width: '100%', height: '100%', background: 'rgba(15,23,42,0.08)' }} />
+                <div style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.08)' }} />
               )}
 
               {media.media_type === 'video' && !showOverflow && (
