@@ -13,6 +13,7 @@ import { WhsConnectScreen } from '@/components/profile/handicap/whs/WhsConnectSc
 import { bodyNameForProvider } from '@/lib/whs/whsCountries';
 import DisconnectConfirmSheet from '@/components/settings/sheets/DisconnectConfirmSheet';
 import DeleteAllDataConfirmSheet from '@/components/settings/sheets/DeleteAllDataConfirmSheet';
+import { useDeclineHandicapChip } from '@/lib/whs/useDeclineHandicapChip';
 
 const INK = '#0F172A';
 const INK_45 = '#64748B';
