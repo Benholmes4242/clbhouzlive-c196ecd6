@@ -95,6 +95,9 @@ const FACILITIES_BY_CATEGORY: Record<string, string[]> = {
     'On-site accommodation', 'Multiple courses', 'Driving range', 'Pro shop',
     'Restaurant', 'Spa', 'Buggy hire', 'Lessons',
   ],
+  'Hotel / Accommodation': ['Parking', 'Restaurant', 'Bar', 'Spa', 'Gym', 'Golf packages', 'Club storage', 'EV charging'],
+  'Restaurant / Cafe': ['Parking', 'Outdoor seating', 'Takeaway', 'Reservations', 'Vegetarian options', 'Family friendly'],
+  'Bar / Pub': ['Parking', 'Outdoor seating', 'Live sport on TV', 'Food served', 'Dog friendly', 'Beer garden'],
 };
 
 export function getFacilitiesForCategory(category: string): string[] {
