@@ -174,7 +174,10 @@ function DonePill({ onClick }: { onClick: () => void }) {
   return (
     <button
       type="button"
-      onClick={onClick}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
       style={{
         marginTop: 8,
         background: 'rgba(255,255,255,0.08)',
