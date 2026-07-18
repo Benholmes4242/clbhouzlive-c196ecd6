@@ -20,6 +20,7 @@ import HcpStrip from './components/HcpStrip';
 import QuickActionsRow from './components/QuickActionsRow';
 import SheetNavGroup from './components/SheetNavGroup';
 import SignOutRow from './components/SignOutRow';
+import { useInviteSheet } from '@/hooks/useInviteSheet';
 
 interface Profile {
   id: string;
@@ -95,6 +96,11 @@ export default function ProfileSheetV2({
   isLoading,
 }: ProfileSheetV2Props) {
   const sheetY = useMotionValue(0);
+  const { openInviteSheet } = useInviteSheet();
+  const handleInviteFriends = () => {
+    onClose();
+    setTimeout(() => openInviteSheet('profile_sheet'), 250);
+  };
   const panelRef = useRef<HTMLDivElement | null>(null);
   const openTweenRef = useRef<ReturnType<typeof animate> | null>(null);
   const ovlId = useRef<number>(-1);
@@ -267,6 +273,7 @@ export default function ProfileSheetV2({
                 currentActor={{ id: currentActor.id, type: currentActor.type }}
                 isAdmin={isAdmin}
                 onNavigate={onNavigate}
+                onInviteFriends={handleInviteFriends}
               />
               <SignOutRow onNavigate={onNavigate} />
             </div>

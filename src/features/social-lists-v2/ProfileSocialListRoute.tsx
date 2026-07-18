@@ -10,6 +10,7 @@
 import { useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useUserByUsername } from '@/hooks/useUserByUsername';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import SocialListPage from './SocialListPage';
 
@@ -24,6 +25,8 @@ export default function ProfileSocialListRoute({ direction }: Props) {
   const initialTab: 'followers' | 'following' =
     searchTab === 'followers' || searchTab === 'following' ? searchTab : direction;
   const { data: profile, isLoading } = useUserByUsername(username);
+  const { user: viewer } = useSupabaseSession();
+  const isOwnProfile = !!viewer?.id && !!profile?.id && viewer.id === profile.id;
 
   useEffect(() => {
     if (profile?.id) {
@@ -58,6 +61,7 @@ export default function ProfileSocialListRoute({ direction }: Props) {
       profileUsername={profile.username}
       profileDisplayName={profile.display_name}
       initialTab={initialTab}
+      showInviteCard={isOwnProfile}
     />
   );
 }

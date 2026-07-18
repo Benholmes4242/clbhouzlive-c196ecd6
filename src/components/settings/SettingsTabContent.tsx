@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { formatRelativeAgoLong } from '@/i18n/format';
 import {
   ChevronRight, Mail, Bell, Shield, UserX,
-  HelpCircle, MessageSquare, FileText, Trash2, LogOut, Eye, BarChart2, Link2, Briefcase,
+  HelpCircle, MessageSquare, FileText, Trash2, LogOut, Eye, BarChart2, Link2, Briefcase, UserPlus,
 } from 'lucide-react';
+import { useInviteSheet } from '@/hooks/useInviteSheet';
 import { useHasBusinesses } from '@/hooks/useMyBusinesses';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { formatHcp } from '@/lib/formatHcp';
@@ -58,6 +59,7 @@ export function SettingsTabContent() {
   const { user, loading: sessionLoading } = useSupabaseSession();
   const { profile, loading } = useProfileData();
   const { hasBusinesses, count } = useHasBusinesses(user?.id);
+  const { openInviteSheet } = useInviteSheet();
 
   useEffect(() => {
     if (user?.id && user?.email) {
@@ -253,6 +255,17 @@ export function SettingsTabContent() {
             subtitle={whsSubtitle}
             iconTheme="account"
             onClick={() => navigate('/manage/handicap')}
+          />
+        </SettingsSection>
+
+        {/* Friends */}
+        <SettingsSection title="Friends">
+          <SettingsChevronRow
+            icon={<UserPlus size={18} />}
+            title="Invite friends"
+            subtitle={"Share your link \u2014 golf's better with your circle"}
+            iconTheme="account"
+            onClick={() => openInviteSheet('settings')}
           />
         </SettingsSection>
 

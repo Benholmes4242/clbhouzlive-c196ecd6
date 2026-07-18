@@ -23,6 +23,7 @@ interface Props {
   currentActor: { id: string; type: 'personal' | 'business' };
   isAdmin: boolean;
   onNavigate: (route: string) => void;
+  onInviteFriends?: () => void;
 }
 
 interface RowProps {
@@ -57,7 +58,7 @@ function Row({ label, onClick, trailing, isLast }: RowProps) {
   );
 }
 
-export default function SheetNavGroup({ currentActor, isAdmin, onNavigate }: Props) {
+export default function SheetNavGroup({ currentActor, isAdmin, onNavigate, onInviteFriends }: Props) {
   return (
     <div
       style={{
@@ -72,6 +73,25 @@ export default function SheetNavGroup({ currentActor, isAdmin, onNavigate }: Pro
         label="View profile"
         onClick={() => onNavigate(`/profile/${currentActor.id}`)}
       />
+      {currentActor.type === 'personal' && onInviteFriends && (
+        <Row
+          label="Invite friends"
+          onClick={onInviteFriends}
+          trailing={
+            <span
+              style={{
+                fontWeight: 500,
+                fontSize: 10.5,
+                color: AMBER,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+              }}
+            >
+              {'Share \u203A'}
+            </span>
+          }
+        />
+      )}
       <Row
         label="Manage businesses"
         onClick={() => onNavigate('/businesses/manage')}
