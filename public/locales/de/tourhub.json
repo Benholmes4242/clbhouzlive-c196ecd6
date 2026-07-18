@@ -647,6 +647,19 @@
       },
       "winners": {
         "title": "The winners' circle"
+      },
+      "titles": {
+        "earnings": "Die Geldrangliste",
+        "drive_avg": "Driving-Distanz",
+        "drive_acc": "Fairway-Quote",
+        "gir_pct": "Gruens in Regulation",
+        "sand_saves_pct": "Sand Saves",
+        "strokes_gained_tee_green": "Strokes Gained Tee bis Gruen",
+        "strokes_gained_putting": "Strokes Gained Putting",
+        "scoring_avg": "Score-Durchschnitt",
+        "putt_avg": "Putt-Durchschnitt",
+        "wins": "Meiste Siege",
+        "top_10": "Meiste Top-10"
       }
     }
   },

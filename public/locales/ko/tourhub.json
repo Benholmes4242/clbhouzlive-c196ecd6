@@ -647,6 +647,19 @@
       },
       "winners": {
         "title": "The winners' circle"
+      },
+      "titles": {
+        "earnings": "상금 순위",
+        "drive_avg": "평균 드라이브 거리",
+        "drive_acc": "페어웨이 안착률",
+        "gir_pct": "그린 적중률",
+        "sand_saves_pct": "샌드 세이브",
+        "strokes_gained_tee_green": "스트로크 게인드 티투그린",
+        "strokes_gained_putting": "스트로크 게인드 퍼팅",
+        "scoring_avg": "평균 타수",
+        "putt_avg": "평균 퍼팅",
+        "wins": "최다 우승",
+        "top_10": "최다 톱10"
       }
     }
   },

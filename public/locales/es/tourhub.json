@@ -647,6 +647,19 @@
       },
       "winners": {
         "title": "The winners' circle"
+      },
+      "titles": {
+        "earnings": "La lista de ganancias",
+        "drive_avg": "Distancia de drive",
+        "drive_acc": "Precision de drive",
+        "gir_pct": "Greens en regulacion",
+        "sand_saves_pct": "Salvadas de bunker",
+        "strokes_gained_tee_green": "Golpes ganados tee a green",
+        "strokes_gained_putting": "Golpes ganados con el putt",
+        "scoring_avg": "Promedio de score",
+        "putt_avg": "Promedio de putts",
+        "wins": "Mas victorias",
+        "top_10": "Mas top 10"
       }
     }
   },
