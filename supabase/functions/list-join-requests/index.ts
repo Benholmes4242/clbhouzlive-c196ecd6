@@ -66,7 +66,10 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Fetch pending requests with requester details
+    // Fetch pending requests with requester details.
+    // Also join the active (non-deleted) whs_connections row so we can
+    // resolve the display handicap server-side and never ship a stale
+    // eg_handicap_index after a WHS disconnect.
     const { data: requests, error: requestsError } = await supabase
       .from('game_join_requests')
       .select(`
@@ -80,7 +83,9 @@ Deno.serve(async (req) => {
           username,
           profile_photo_url,
           home_club,
-          eg_handicap_index
+          eg_handicap_index,
+          manual_handicap_index,
+          whs_connections!left(id, deleted_at)
         )
       `)
       .eq('game_id', game_id)
@@ -96,18 +101,26 @@ Deno.serve(async (req) => {
     }
 
     // Transform the data to match expected format
-    const transformedRequests = (requests || []).map((req: any) => ({
-      id: req.id,
-      game_id: req.game_id,
-      created_at: req.created_at,
-      requester: {
-        user_id: req.requester?.id,
-        display_name: req.requester?.display_name,
-        profile_photo_url: req.requester?.profile_photo_url,
-        home_club: req.requester?.home_club,
-        eg_handicap_index: req.requester?.eg_handicap_index,
-      },
-    }));
+    const transformedRequests = (requests || []).map((r: any) => {
+      const reqUser = r.requester;
+      const conns: Array<{ id: string; deleted_at: string | null }> = reqUser?.whs_connections ?? [];
+      const hasActiveWhs = conns.some((c) => c && c.deleted_at == null);
+      const resolvedHcp = hasActiveWhs
+        ? (reqUser?.eg_handicap_index ?? null)
+        : (reqUser?.manual_handicap_index ?? null);
+      return {
+        id: r.id,
+        game_id: r.game_id,
+        created_at: r.created_at,
+        requester: {
+          user_id: reqUser?.id,
+          display_name: reqUser?.display_name,
+          profile_photo_url: reqUser?.profile_photo_url,
+          home_club: reqUser?.home_club,
+          eg_handicap_index: resolvedHcp,
+        },
+      };
+    });
 
     console.log(`[list-join-requests] Found ${transformedRequests.length} pending requests`);
 
