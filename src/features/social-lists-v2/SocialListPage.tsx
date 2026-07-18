@@ -262,6 +262,63 @@ export default function SocialListPage({
         </div>
       </div>
 
+      {showInviteCard && isOwnProfile && (
+        <div style={{ padding: '0 16px 12px' }}>
+          <button
+            type="button"
+            onClick={() => openInviteSheet('social_list')}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              background: SURFACE,
+              border: `1px solid ${HAIR}`,
+              borderRadius: 12,
+              padding: '12px 14px',
+              cursor: 'pointer',
+              textAlign: 'left',
+              fontFamily: FONT,
+            }}
+          >
+            <div
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 10,
+                background: 'rgba(247,147,30,0.10)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
+              <UserPlus size={16} color={BRAND_AMBER} strokeWidth={2.2} />
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 13, fontWeight: 500, color: INK }}>
+                Invite friends to Clbhouz
+              </div>
+              <div style={{ fontSize: 11.5, fontWeight: 500, color: INK_MUTE, marginTop: 2 }}>
+                Bring your regular fourball along
+              </div>
+            </div>
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 500,
+                color: BRAND_AMBER,
+                textTransform: 'uppercase',
+                letterSpacing: '0.04em',
+                flexShrink: 0,
+              }}
+            >
+              INVITE \u2192
+            </span>
+          </button>
+        </div>
+      )}
+
       {/* Sections */}
       <div style={{ paddingBottom: 24 }}>
         {list.isLoading ? (
