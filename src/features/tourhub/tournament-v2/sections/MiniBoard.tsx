@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { countryFlag, countryFallback } from '../../leaderboard/countryFlag';
+import { todayFromEntry } from '../../leaderboard/BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import {
   FONT, INK, INK_MUTE, INK_FAINT, HAIRLINE_INK_8, SURFACE,
@@ -21,6 +22,10 @@ interface Row {
   today?: number | null;
   thru?: number | null;
   status?: string | null;
+  round_1?: number | null;
+  round_2?: number | null;
+  round_3?: number | null;
+  round_4?: number | null;
   player?: { id?: string; full_name?: string; country?: string | null; country_code?: string | null } | null;
 }
 
