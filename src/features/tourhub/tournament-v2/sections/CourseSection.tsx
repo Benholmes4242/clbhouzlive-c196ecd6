@@ -4,7 +4,7 @@
  * an "All 18 holes >" sheet that uses SharedHoleCard with countLabel="players".
  * Section self-hides when the RPC reports unavailable coverage.
  */
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ShieldCheck } from 'lucide-react';
 
@@ -21,8 +21,11 @@ import {
 import { SharedHoleCard } from '@/features/courses/_shared/holes/SharedHoleCard';
 import type { SharedHole } from '@/features/courses/_shared/holes/types';
 import { formatNumber } from '@/i18n/format';
+import { ScopeSegment, type ScopeSegmentOption } from '@/components/shared/ScopeSegment';
 
 interface Props { tournamentId: string }
+
+type RoundKey = 'all' | '1' | '2' | '3' | '4';
 
 function toShared(h: TournamentHole): SharedHole {
   return {
@@ -41,9 +44,9 @@ const AVG_EPSILON = 0.05;
 
 export function CourseSection({ tournamentId }: Props) {
   const { t } = useTranslation(['tourhub', 'courses']);
-  const { data } = useTournamentHoleAnalysis(tournamentId);
+  // Mini cards always represent the full tournament (all rounds combined).
+  const { data } = useTournamentHoleAnalysis(tournamentId, null);
   const [open, setOpen] = useState(false);
-
 
   const holes = data?.holes ?? [];
   const played = holes.filter((h) => Number.isFinite(h.avg_to_par));
@@ -64,10 +67,8 @@ export function CourseSection({ tournamentId }: Props) {
       <HolesSheet
         open={open}
         onClose={() => setOpen(false)}
-        holes={holes}
-        hardest={hardest}
-        easiest={easiest}
-        totalPlayers={data.total_players}
+        tournamentId={tournamentId}
+        roundsPresent={data.rounds_present ?? []}
       />
     </>
   );
