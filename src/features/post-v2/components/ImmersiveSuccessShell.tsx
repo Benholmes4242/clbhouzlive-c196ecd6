@@ -59,8 +59,6 @@ export function ImmersiveSuccessShell({ onTapClose, showTapHint, padded = true, 
       }}
     >
       <div
-        onClick={onTapClose ? stop : undefined}
-        onTouchStart={onTapClose ? stop : undefined}
         style={{
           flex: 1,
           display: 'flex',
