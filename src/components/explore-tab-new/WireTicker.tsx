@@ -93,7 +93,7 @@ export function WireTicker() {
   // Scale duration with content so 20 items scroll at the same per-item speed
   // as 6 rather than whipping past. Floor keeps very short sets readable.
   const durationSec = useMemo(
-    () => Math.max(24, items.length * 3.5),
+    () => Math.max(40, items.length * 5.5),
     [items.length],
   );
 
