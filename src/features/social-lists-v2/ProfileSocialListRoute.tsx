@@ -10,6 +10,7 @@
 import { useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useUserByUsername } from '@/hooks/useUserByUsername';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import SocialListPage from './SocialListPage';
 
