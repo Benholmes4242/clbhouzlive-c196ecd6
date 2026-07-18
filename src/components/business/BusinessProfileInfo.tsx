@@ -303,6 +303,19 @@ export function BusinessProfileInfo({ business, userId }: BusinessProfileInfoPro
                   Get directions
                   <ArrowUpRight className="h-3.5 w-3.5 opacity-70" style={{ color: INK_45 }} />
                 </button>
+                {isHospitality && hasCoords && nearestCourse && (
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/courses/${nearestCourse.id}`)}
+                    className="mt-1 min-h-[44px] flex items-center gap-2 active:scale-[0.97] transition-transform"
+                  >
+                    <Flag className="h-3.5 w-3.5 shrink-0" style={{ color: INK_45 }} strokeWidth={2} />
+                    <span className="text-[13px]" style={{ color: INK }}>
+                      <span className="font-semibold">Near {nearestCourse.name}</span>
+                      <span style={{ color: INK_45 }}> · {formatDistanceKm(nearestCourse.distance_km)}</span>
+                    </span>
+                  </button>
+                )}
               </div>
             </div>
           </section>
