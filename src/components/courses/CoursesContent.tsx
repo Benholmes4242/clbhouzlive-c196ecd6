@@ -53,7 +53,7 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
 
   if (!open) return null;
 
-  return (
+  return createPortal(
     <>
       {/* Backdrop */}
       <div
@@ -157,7 +157,8 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
           )}
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 }
 
