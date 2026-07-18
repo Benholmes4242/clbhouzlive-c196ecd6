@@ -57,7 +57,7 @@ interface AdminOperationRequest {
 const ALLOWED_NONFULL_DURATIONS = new Set<number>([1, 7, 30]);
 
 serve(async (req) => {
-  const corsHeaders = corsFor(req.headers.get('Origin'));
+  
   const headers = corsHeaders(req.headers.get('Origin'));
 
   if (req.method === 'OPTIONS') {
