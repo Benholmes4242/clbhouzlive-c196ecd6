@@ -129,7 +129,7 @@ export default function ContactPage() {
         >
           <p className="text-[13.5px] leading-relaxed" style={{ color: INK_55 }}>
             Tell us what's going on and we'll get back to you. Include as much detail as
-            possible so we can help fast.
+            possible so we can help fast. We aim to respond to all requests within 24 hours.
           </p>
         </div>
 
