@@ -860,7 +860,7 @@ const BusinessProfilePage: React.FC = () => {
         imageUrl={business.logo_url || ''}
         altText={`${business.name} logo`}
         shape="squircle"
-        fallbackInitial={initials}
+        fallbackInitial={avatarInitials}
       />
 
       {/* Report sheet (real submission via submit_report RPC) */}
