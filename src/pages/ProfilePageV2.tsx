@@ -37,6 +37,7 @@ import { useHideHeader } from '@/hooks/useHeaderVisibility';
 
 import { safeGoBack } from '@/utils/navigation';
 import { uploadToR2Only } from '@/utils/r2OnlyUpload';
+import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
 import { FavouritesCarousel } from '@/components/profile/courses/FavouritesCarousel';
 import { AddCourseModal } from '@/components/profile/courses/AddCourseModal';
 import { PrivateProfileGate } from '@/components/profile/PrivateProfileGate';
@@ -558,6 +559,8 @@ const ProfilePageV2Content: React.FC = () => {
   if (!user) return null;
 
   const displayName = profile?.display_name || 'Golfer';
+  const avatarInitials = getInitialsFromName(displayName) || '?';
+  const avatarFallbackKey = profile?.id || displayName || 'user';
   const username = profile?.username || 'user';
   const heroUrl = profile?.header_photo_url || profile?.profile_photo_url || '';
   const websites = profile?.websites || [];
@@ -678,8 +681,17 @@ const ProfilePageV2Content: React.FC = () => {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full bg-muted flex items-center justify-center text-3xl font-bold text-muted-foreground">
-                  {displayName.charAt(0)}
+                <div
+                  className="w-full h-full flex items-center justify-center text-white"
+                  style={{
+                    background: getAvatarFallbackColor(avatarFallbackKey),
+                    fontSize: '48px',
+                    fontWeight: 600,
+                    letterSpacing: '0.01em',
+                    lineHeight: 1,
+                  }}
+                >
+                  {avatarInitials}
                 </div>
               )}
             </div>
@@ -1350,7 +1362,7 @@ const ProfilePageV2Content: React.FC = () => {
         imageUrl={profile?.profile_photo_url || ''}
         altText={`${displayName}'s profile photo`}
         shape="squircle"
-        fallbackInitial={displayName?.charAt(0)}
+        fallbackInitial={avatarInitials}
       />
 
       {/* Block confirmation dialog */}

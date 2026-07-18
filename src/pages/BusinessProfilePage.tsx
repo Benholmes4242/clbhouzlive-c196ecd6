@@ -61,6 +61,7 @@ import { useBusinessReviewStats } from '@/hooks/useBusinessReviewStats';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { openExternalUrl } from '@/utils/median/openExternalUrl';
+import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
 
 
 type BusinessTab = 'posts' | 'about' | 'team';
@@ -326,8 +327,8 @@ const BusinessProfilePage: React.FC = () => {
 
   const heroUrl = business.cover_image_url || '';
   const bioText = business.description || '';
-  const initials = business.name
-    ?.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase() || 'B';
+  const avatarInitials = getInitialsFromName(business.name) || 'B';
+  const avatarFallbackKey = business.id || business.name || 'business';
 
   const subtitleText = buildCategoryLocation(
     business.category, business.country, business.region, business.city
@@ -469,10 +470,16 @@ const BusinessProfilePage: React.FC = () => {
                 <img src={business.logo_url} alt={business.name} className="w-full h-full object-cover" />
               ) : (
                 <div
-                  className="w-full h-full flex items-center justify-center text-3xl font-bold text-muted-foreground"
-                  style={{ background: 'rgba(15,23,42,0.06)' }}
+                  className="w-full h-full flex items-center justify-center text-white"
+                  style={{
+                    background: getAvatarFallbackColor(avatarFallbackKey),
+                    fontSize: '48px',
+                    fontWeight: 600,
+                    letterSpacing: '0.01em',
+                    lineHeight: 1,
+                  }}
                 >
-                  {initials}
+                  {avatarInitials}
                 </div>
               )}
             </div>
@@ -853,7 +860,7 @@ const BusinessProfilePage: React.FC = () => {
         imageUrl={business.logo_url || ''}
         altText={`${business.name} logo`}
         shape="squircle"
-        fallbackInitial={initials}
+        fallbackInitial={avatarInitials}
       />
 
       {/* Report sheet (real submission via submit_report RPC) */}
