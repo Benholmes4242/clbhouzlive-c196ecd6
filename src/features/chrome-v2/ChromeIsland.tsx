@@ -193,7 +193,7 @@ const HcpCell: React.FC<{ tone: ChromeTone }> = ({ tone }) => {
   const { user } = useSupabaseSession();
   const { activeActor } = useActiveActor();
   const isBusinessActor = activeActor?.type === 'business';
-  const { profile } = useUserProfile(user?.id);
+  const { data: profile } = useUserProfile(user?.id);
 
   const { data: connection, isLoading: whsLoading } = useWhsConnection(user?.id);
   const { data: trendData } = useHandicapTrend(connection?.id);
