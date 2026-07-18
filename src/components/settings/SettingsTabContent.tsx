@@ -8,6 +8,7 @@ import {
 import { useHasBusinesses } from '@/hooks/useMyBusinesses';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { formatHcp } from '@/lib/formatHcp';
+import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePrivacySettings } from '@/hooks/usePrivacySettings';
