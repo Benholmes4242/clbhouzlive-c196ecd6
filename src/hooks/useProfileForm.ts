@@ -66,6 +66,32 @@ export function useProfileForm(profile: any, loading?: boolean) {
       const data = makeInitial(profile);
       setForm(data);
       setInitialData(data);
+
+      // Hydrate additional clubs from user_home_clubs (the source of truth for
+      // multi-club memberships). Primary club is filtered out — it's tracked
+      // separately via primaryClubId / homeClubName.
+      (async () => {
+        try {
+          const { data: rows } = await supabase
+            .from('user_home_clubs')
+            .select('club_id, golf_clubs:club_id(id, name)')
+            .eq('user_profile_id', profile.id);
+          const primaryId = profile.primary_club_id ?? null;
+          const clubs: ClubEntry[] = (rows ?? [])
+            .filter((r: any) => r.club_id && r.club_id !== primaryId && r.golf_clubs?.name)
+            .map((r: any) => ({
+              id: nanoid(),
+              name: r.golf_clubs.name as string,
+              clubId: r.club_id as string,
+            }));
+          if (clubs.length > 0) {
+            setForm(prev => ({ ...prev, additionalClubs: clubs }));
+            setInitialData(prev => ({ ...prev, additionalClubs: clubs }));
+          }
+        } catch (err) {
+          console.warn('[useProfileForm] hydrate additional clubs failed', err);
+        }
+      })();
     }
   }, [loading, profile]);
 
