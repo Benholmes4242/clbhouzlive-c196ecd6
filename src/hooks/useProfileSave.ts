@@ -122,10 +122,10 @@ export function useProfileSave(userId: string) {
         .delete()
         .eq('user_profile_id', userId);
 
+      // user_home_clubs holds ADDITIONAL clubs only. The primary club's source
+      // of truth is user_profiles.primary_club_id (written above); never mirror
+      // it as a user_home_clubs row.
       const clubRows: Array<{ user_profile_id: string; club_id: string }> = [];
-      if (form.primaryClubId) {
-        clubRows.push({ user_profile_id: userId, club_id: form.primaryClubId });
-      }
       for (const c of form.additionalClubs) {
         if (c.clubId && c.clubId !== form.primaryClubId) {
           clubRows.push({ user_profile_id: userId, club_id: c.clubId });
