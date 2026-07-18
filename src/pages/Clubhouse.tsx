@@ -44,7 +44,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 
 // ── Clubhouse UI overlays ──
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
-import { SuggestedCreatorsShelf } from '@/components/shared/SuggestedCreatorsShelf';
+import { FriendsEmptyState } from '@/components/clubhouse/FriendsEmptyState';
 
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { useReviewerStats } from '@/hooks/useReviewerStats';
