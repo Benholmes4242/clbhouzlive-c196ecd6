@@ -21,7 +21,7 @@ export default function BusinessSocialListRoute({ direction }: Props) {
 
   if (isLoading) {
     return (
-      <div style={{ minHeight: '100dvh', background: '#F8FAFC', padding: '80px 16px', color: '#64748B', fontSize: 13 }}>
+      <div style={{ minHeight: '100dvh', background: '#F8FAFC', padding: 'calc(var(--chrome-total-h, 0px) + 24px) 16px 80px', color: '#64748B', fontSize: 13 }}>
         Loading…
       </div>
     );
@@ -29,7 +29,7 @@ export default function BusinessSocialListRoute({ direction }: Props) {
 
   if (!business) {
     return (
-      <div style={{ minHeight: '100dvh', background: '#F8FAFC', padding: '80px 16px', color: '#64748B', fontSize: 13 }}>
+      <div style={{ minHeight: '100dvh', background: '#F8FAFC', padding: 'calc(var(--chrome-total-h, 0px) + 24px) 16px 80px', color: '#64748B', fontSize: 13 }}>
         Business not found.
       </div>
     );
