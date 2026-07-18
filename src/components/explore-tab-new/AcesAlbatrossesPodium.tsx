@@ -293,45 +293,52 @@ function ColumnCell({
             style={{
               flex: 1,
               minWidth: 0,
-              fontSize: 11.5,
-              fontWeight: 600,
-              letterSpacing: '-0.01em',
-              color: INK,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-              lineHeight: 1.2,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 2,
             }}
           >
-            {name}
+            <div
+              style={{
+                fontSize: 11.5,
+                fontWeight: 600,
+                letterSpacing: '-0.01em',
+                color: INK,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                lineHeight: 1.2,
+              }}
+            >
+              {name}
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'baseline',
+                gap: 4,
+                lineHeight: 1.2,
+              }}
+            >
+              <span
+                className="tabular-nums"
+                style={{ fontSize: 13, fontWeight: 700, color: countColor }}
+              >
+                {count}
+              </span>
+              <span
+                style={{
+                  fontSize: 8.5,
+                  fontWeight: 600,
+                  letterSpacing: '0.06em',
+                  textTransform: 'uppercase',
+                  color: 'rgba(15,23,42,0.4)',
+                }}
+              >
+                {unit}
+              </span>
+            </div>
           </div>
-        </div>
-        <div
-          style={{
-            paddingLeft: 27,
-            display: 'flex',
-            alignItems: 'baseline',
-            gap: 4,
-            lineHeight: 1.2,
-          }}
-        >
-          <span
-            className="tabular-nums"
-            style={{ fontSize: 13, fontWeight: 700, color: countColor }}
-          >
-            {count}
-          </span>
-          <span
-            style={{
-              fontSize: 8.5,
-              fontWeight: 600,
-              letterSpacing: '0.06em',
-              textTransform: 'uppercase',
-              color: 'rgba(15,23,42,0.4)',
-            }}
-          >
-            {unit}
-          </span>
         </div>
       </button>
     );
