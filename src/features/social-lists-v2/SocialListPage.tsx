@@ -41,7 +41,7 @@ const SURFACE = '#FFFFFF';
 const HAIR = 'rgba(15,23,42,0.08)';
 const HAIR_STRONG = 'rgba(15,23,42,0.12)';
 
-const AMBER_DEEP = '#C97A10';
+const BRAND_AMBER = '#F7931E';
 
 /* ── props ──────────────────────────────────────────────────────────── */
 interface Props {
