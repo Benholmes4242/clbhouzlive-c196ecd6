@@ -27,6 +27,7 @@ const SkeletonView = () => (
 export const WhsHandicapTab: React.FC<Props> = ({ userId, ownerFirstName = null }) => {
   const navigate = useNavigate();
   const { data: connection, isLoading, refetch } = useWhsConnection(userId);
+  const declineHandicapChip = useDeclineHandicapChip();
 
   if (isLoading) return <SkeletonView />;
 
@@ -47,6 +48,7 @@ export const WhsHandicapTab: React.FC<Props> = ({ userId, ownerFirstName = null 
           }
         }}
         onSkip={() => navigate(-1)}
+        onDecline={declineHandicapChip}
       />
     );
   }
