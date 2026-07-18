@@ -194,6 +194,15 @@ export function SettingsTabContent() {
             disabled={privacy.isUpdatingPrivacy}
             onCheckedChange={privacy.togglePublic}
           />
+          <SettingsToggleRow
+            icon={<Eye size={18} />}
+            title="Handicap button"
+            subtitle="Show the Connect HCP button in your header"
+            iconTheme="privacy"
+            checked={!hideHandicapChip}
+            disabled={chipUpdating}
+            onCheckedChange={handleToggleHandicapChip}
+          />
           <SettingsLevelRow
             icon={<Shield size={18} />}
             title="Who can see your handicap"
