@@ -19345,6 +19345,14 @@ export type Database = {
         }
         Returns: undefined
       }
+      msg_delete_group: {
+        Args: {
+          p_as_actor_id: string
+          p_as_actor_type: string
+          p_conversation_id: string
+        }
+        Returns: undefined
+      }
       msg_dm_key: {
         Args: { a_id: string; a_type: string; b_id: string; b_type: string }
         Returns: string
