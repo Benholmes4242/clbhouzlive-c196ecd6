@@ -305,7 +305,7 @@ export function useEditorialCards(userId: string | undefined): EditorialCards {
             .select(`
               id, rating, review, design_score, condition_score, clubhouse_score, facilities_score,
               helpful_count, review_date, user_id, course_id,
-              user_profiles!inner(id, display_name, username, profile_photo_url, eg_handicap_index, is_verified_golfer)
+              user_profiles!inner(id, display_name, username, profile_photo_url, eg_handicap_index, manual_handicap_index, is_verified_golfer)
             `)
             .eq('is_review_of_week', true)
             .maybeSingle();
