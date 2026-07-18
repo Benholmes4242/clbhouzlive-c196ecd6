@@ -16,24 +16,14 @@ export const ScrollRestoration = () => {
 
   // Save current scroll position before leaving
   useEffect(() => {
-    const isCourseDetail = /^\/courses\/[^/]+$/.test(location.pathname);
-    
     return () => {
-      if (!isCourseDetail) {
-        const currentPath = location.pathname + location.search;
-        scrollPositions.set(currentPath, getPageScrollTop());
-      }
+      const currentPath = location.pathname + location.search;
+      scrollPositions.set(currentPath, getPageScrollTop());
     };
   }, [location]);
 
   // Restore or reset scroll based on navigation type
   useEffect(() => {
-    const isCourseDetail = /^\/courses\/[^/]+$/.test(location.pathname);
-    if (isCourseDetail) {
-      prevPathnameRef.current = location.pathname;
-      return;
-    }
-
     const currentPath = location.pathname + location.search;
     const pathnameChanged = prevPathnameRef.current !== location.pathname;
     prevPathnameRef.current = location.pathname;
@@ -61,6 +51,7 @@ export const ScrollRestoration = () => {
       scrollPageToTop('instant');
     }
   }, [location, navigationType]);
+
 
   return null;
 };
