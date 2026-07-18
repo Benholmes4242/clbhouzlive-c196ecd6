@@ -412,6 +412,15 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
     return () => window.removeEventListener('clbhouz:open-search', openHandler);
   }, []);
 
+  // A1: never let the profile sheet (or search overlay) survive a route change.
+  // Any tap that navigates from inside the sheet must close it here even if the
+  // caller forgets to invoke onClose before navigate().
+  useEffect(() => {
+    setMenuOpen(false);
+    setSearchOpen(false);
+  }, [location.pathname]);
+
+
   const suppressed = hidden || runtimeSuppressed || spec.chrome === 'none';
   // bleed island routes let the page own top padding — publish 0 so content
   // flows under the island rather than being pushed down another 64px.
