@@ -162,7 +162,7 @@ export function TournamentPage() {
     if (pulse.state === 'live') {
       const inLiveList = liveList.some((t: any) => t?.id === tournamentId);
       if (inLiveList) {
-        navigate(`/tourhub?tab=live&event=${tournamentId}`);
+        navigate(`/tourhub?tab=live&event=${tournamentId}`, { state: { from: 'tournament' } });
         return;
       }
     }
