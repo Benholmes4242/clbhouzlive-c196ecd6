@@ -41,7 +41,7 @@ const LONGFORM_THRESHOLD = 180;
 const FILTER_OPTIONS: { value: PostsFilter; label: string }[] = [
   { value: 'all', label: 'All Posts' },
   { value: 'videos', label: 'Videos' },
-  { value: 'shorts', label: 'Shorts' },
+  { value: 'shorts', label: 'Clips' },
   { value: 'images', label: 'Images' },
   { value: 'reviews', label: 'Reviews' },
 ];

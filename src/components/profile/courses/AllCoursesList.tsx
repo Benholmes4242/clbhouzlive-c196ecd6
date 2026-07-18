@@ -315,14 +315,9 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
     );
   }
 
-  const ownerSubtitle = isOwnProfile ? 'Your full course history' : `${firstName || "Their"}\u2019s full course history`;
-
   return (
-    <div ref={sectionRef} className="py-4">
-      {/* Section header — amber eyebrow with icon (matches Courses Discover) */}
-      <div className="px-2.5">
-        <SectionHeader role="section" kicker="COURSE HISTORY" sub={ownerSubtitle} />
-      </div>
+    <div ref={sectionRef} className="pt-1 pb-4">
+
 
 
       {/* Filter bar */}
