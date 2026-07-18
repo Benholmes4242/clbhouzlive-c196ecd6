@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { GoldRingAvatar } from '@/components/shared/GoldRingAvatar';
 import { SC_ACE, SC_ALBATROSS, SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 import {
   useRegionLegendaryLeaders,
