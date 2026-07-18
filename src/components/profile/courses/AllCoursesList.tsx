@@ -7,8 +7,8 @@ import { TieredCourseCard, CourseCardData } from './TieredCourseCard';
 import { StickyFilterBar, CoursePrimaryTab, CourseSortOption } from './StickyFilterBar';
 import { type QuickRegion } from '@/components/leaderboard/courses/CourseRegionPills';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ClipboardList, History } from 'lucide-react';
-import { SectionHeader } from '@/components/ui/SectionHeader';
+import { ChevronDown, ClipboardList } from 'lucide-react';
+
 import { compareOwnRatings } from '@/lib/sortCoursesByRating';
 import DossierCard from './DossierCard';
 import BreakdownsPrompt from './BreakdownsPrompt';
