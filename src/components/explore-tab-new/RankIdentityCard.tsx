@@ -202,7 +202,6 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
           width: '100%',
           padding: '9px 14px',
           borderTop: `0.5px solid ${HAIRLINE}`,
-          borderBottom: `0.5px solid ${HAIRLINE}`,
           background: 'transparent',
           color: INK,
           cursor: 'pointer',
