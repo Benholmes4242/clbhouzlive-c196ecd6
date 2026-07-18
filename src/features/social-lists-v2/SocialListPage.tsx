@@ -15,7 +15,8 @@
 
 import { useMemo, useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search } from 'lucide-react';
+import { Search, UserPlus } from 'lucide-react';
+import { useInviteSheet } from '@/hooks/useInviteSheet';
 import { toast } from '@/lib/toast';
 
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
