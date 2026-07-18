@@ -95,7 +95,11 @@ const EchoV2Page: React.FC = () => {
           onBack={() => {
             if (inChat) {
               const from = (location.state as { from?: string } | null)?.from;
-              navigate(from === 'history' ? '/echo/history' : '/echo');
+              if (from === 'history' && location.key !== 'default') {
+                navigate(-1);
+              } else {
+                navigate('/echo', { replace: true });
+              }
               return;
             }
             // Welcome back: exit Echo to previous history entry or home.
