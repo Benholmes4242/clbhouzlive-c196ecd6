@@ -363,7 +363,7 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
               minWidth: 0,
             }}
           >
-            {seasonLabel} Season · Official WHS
+            {seasonLabel} · Official WHS
           </span>
           <span
             style={{
