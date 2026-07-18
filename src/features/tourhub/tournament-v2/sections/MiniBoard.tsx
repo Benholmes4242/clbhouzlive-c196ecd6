@@ -86,6 +86,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5 }: Props) {
             : `${r.position_tied ? 'T' : ''}${r.position}`;
           const cc = r.player?.country_code ?? r.player?.country ?? null;
           const flag = cc ? countryFlag(cc) : null;
+          const today = todayFromEntry(r as any);
           return (
             <button
               key={r.id}
@@ -97,7 +98,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5 }: Props) {
                 position: r.position ?? null,
                 positionTied: r.position_tied ?? null,
                 total: r.score ?? null,
-                today: r.today ?? null,
+                today,
                 thru: r.thru ?? null,
                 status: r.status ?? null,
               })}
@@ -127,8 +128,8 @@ export function MiniBoard({ tournamentId, entries, limit = 5 }: Props) {
               <div style={{ width: 40, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 600, color: INK_MUTE, fontVariantNumeric: 'tabular-nums' }}>
                 {thruLabel(r)}
               </div>
-              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 800, color: color(r.today), fontVariantNumeric: 'tabular-nums' }}>
-                {fmt(r.today)}
+              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 800, color: color(today), fontVariantNumeric: 'tabular-nums' }}>
+                {fmt(today)}
               </div>
               <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 13, fontWeight: 800, color: color(r.score), fontVariantNumeric: 'tabular-nums' }}>
                 {fmt(r.score)}
