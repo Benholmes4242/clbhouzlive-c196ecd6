@@ -195,7 +195,11 @@ export function LocationContactSection({
             <p className="text-[14px] font-semibold text-foreground">Contact Details</p>
             <div className="space-y-1.5">
               <label className={LABEL_CLASS}>Phone</label>
-              <PhoneInputWithDialCode value={phone} onChange={setPhone} />
+              <PhoneInputWithDialCode
+                value={phone}
+                onChange={setPhone}
+                defaultCountryIso={getCountryCode(countrySelection)}
+              />
             </div>
             <div style={{ height: '0.5px', background: BIZ.hair, margin: '12px 0' }} />
             <div className="space-y-1.5">
