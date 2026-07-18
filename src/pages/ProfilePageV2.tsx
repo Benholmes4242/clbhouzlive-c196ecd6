@@ -681,8 +681,17 @@ const ProfilePageV2Content: React.FC = () => {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full bg-muted flex items-center justify-center text-3xl font-bold text-muted-foreground">
-                  {displayName.charAt(0)}
+                <div
+                  className="w-full h-full flex items-center justify-center text-white"
+                  style={{
+                    background: getAvatarFallbackColor(avatarFallbackKey),
+                    fontSize: '48px',
+                    fontWeight: 600,
+                    letterSpacing: '0.01em',
+                    lineHeight: 1,
+                  }}
+                >
+                  {avatarInitials}
                 </div>
               )}
             </div>
