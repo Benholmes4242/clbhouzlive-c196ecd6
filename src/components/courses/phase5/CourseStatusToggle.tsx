@@ -63,7 +63,7 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
 
   const isPlayed = status.status === 'played';
   const isWantToPlay = status.status === 'want_to_play';
-  const hasNoSelection = status.status === 'none';
+  
 
   return (
     <div className={cn('space-y-3', className)}>
