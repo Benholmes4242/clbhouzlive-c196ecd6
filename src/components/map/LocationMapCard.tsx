@@ -24,6 +24,7 @@ export const LocationMapCard: React.FC<LocationMapCardProps> = ({
   locationText,
   showOwnerPrompt = false,
   colorful = false,
+  nearby,
 }) => {
   const [expanded, setExpanded] = useState(false);
 
