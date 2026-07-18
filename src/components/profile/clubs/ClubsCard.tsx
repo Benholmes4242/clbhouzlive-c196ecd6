@@ -107,8 +107,7 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
       {homeClub && (
         <div className="flex flex-col items-start gap-1">
           <span
-            className="px-2 py-0.5 text-xs font-semibold rounded-full text-[#F7931E]"
-            style={{ background: 'rgba(247,147,30,0.08)', border: '1px solid rgba(247,147,30,0.30)' }}
+            className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#F7931E]"
           >
             Home club
           </span>
