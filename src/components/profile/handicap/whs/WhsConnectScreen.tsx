@@ -112,7 +112,7 @@ export const WhsConnectScreen: React.FC<Props> = ({ onConnected, onSkip, onDecli
   if (!country) {
     return (
       <>
-        <EmptyStateScreen onPickCountry={() => setPickerOpen(true)} />
+        <EmptyStateScreen onPickCountry={() => setPickerOpen(true)} onDecline={onDecline} />
         <CountryPickerSheet
           open={pickerOpen}
           onClose={() => setPickerOpen(false)}
