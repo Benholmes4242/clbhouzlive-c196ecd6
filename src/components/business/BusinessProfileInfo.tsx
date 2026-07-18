@@ -1,8 +1,8 @@
 import React from 'react';
 import {
   Phone, Mail, Globe, MapPin, Clock, Check, ArrowUpRight,
-  Instagram, Facebook, Youtube, Linkedin, Twitter, Music2,
 } from 'lucide-react';
+import { SiInstagram, SiX, SiFacebook, SiTiktok, SiYoutube } from 'react-icons/si';
 import { BusinessProfile } from '@/hooks/useBusinessProfile';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { openExternalUrl } from '@/utils/median/openExternalUrl';
