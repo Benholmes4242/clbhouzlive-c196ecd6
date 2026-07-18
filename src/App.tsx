@@ -237,7 +237,7 @@ const PostV2Page = lazy(() => import("./features/post-v2/PostV2Page"));
 const UserCoursesPage = lazy(() => import("./pages/UserCoursesPage"));
 
 const JourneyListPage = lazy(() => import("./pages/JourneyListPage"));
-const MapPage = lazy(() => import("./pages/MapPage"));
+
 const News = lazy(() => import("./pages/News"));
 
 
