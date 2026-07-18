@@ -120,3 +120,34 @@ export function useMyRequestReply() {
     ]);
   };
 }
+
+export function useHideMyRequest() {
+  const qc = useQueryClient();
+  const { user } = useSupabaseSession();
+  const uid = user?.id ?? null;
+  return useMutation({
+    mutationFn: async (ticketId: string) => {
+      const sb: any = supabase;
+      const { error } = await sb
+        .from('support_tickets')
+        .update({ user_hidden_at: new Date().toISOString() })
+        .eq('id', ticketId);
+      if (error) throw error;
+    },
+    onMutate: async (ticketId: string) => {
+      const key = [...MY_REQUESTS_KEY, uid];
+      await qc.cancelQueries({ queryKey: key });
+      const prev = qc.getQueryData<MyRequestTicket[]>(key);
+      if (prev) {
+        qc.setQueryData<MyRequestTicket[]>(key, prev.filter((t) => t.id !== ticketId));
+      }
+      return { prev, key };
+    },
+    onError: (_err, _id, ctx) => {
+      if (ctx?.prev && ctx?.key) qc.setQueryData(ctx.key, ctx.prev);
+    },
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: [...MY_REQUESTS_KEY, uid] });
+    },
+  });
+}
