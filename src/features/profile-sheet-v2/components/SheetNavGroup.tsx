@@ -15,7 +15,7 @@ import React from 'react';
 
 const INK = '#0F172A';
 const MUTED = '#94A3B8';
-const AMBER_DEEP = '#c97a10';
+const AMBER = '#F7931E';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
 const CHEVRON = '\u203A';
 
