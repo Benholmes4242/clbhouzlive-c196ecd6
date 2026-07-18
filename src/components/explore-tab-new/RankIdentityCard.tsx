@@ -28,6 +28,7 @@ import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { quarterOf, daysLeft, seasonName } from '@/lib/gam/seasonClock';
 import { useViewerHemisphere } from '@/hooks/gam/useViewerHemisphere';
+import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 
 import { FONT } from './gamingLightTokens';
 
