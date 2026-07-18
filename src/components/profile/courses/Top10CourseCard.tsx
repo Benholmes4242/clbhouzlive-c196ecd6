@@ -7,7 +7,7 @@
  * - Frosted glass rating chip (bottom)
  * - Frosted glass reaction strip overlay
  * - 280x360px taller aspect ratio
- * - 24px rounded corners
+ * - 4px rounded corners (matches watch video tiles)
  * - Layered shadow with press state
  */
 import React, { useState } from 'react';
@@ -84,7 +84,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
         whileTap={{ scale: 0.98 }}
         transition={{ duration: 0.2 }}
         className={cn(
-          "relative w-[210px] h-[269px] rounded-[24px] overflow-hidden flex-shrink-0 cursor-pointer",
+          "relative w-[210px] h-[269px] rounded-[4px] overflow-hidden flex-shrink-0 cursor-pointer",
           className
         )}
         style={{
@@ -176,7 +176,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
 
         {/* Reaction strip — overlaid at bottom of card image */}
         <div
-          className="absolute bottom-0 left-0 right-0 flex h-[47px] glass-dark !rounded-none !rounded-b-[24px] !border-t-[1px] !border-t-white/[0.06] !border-b-0 !border-x-0"
+          className="absolute bottom-0 left-0 right-0 flex h-[47px] glass-dark !rounded-none !rounded-b-[4px] !border-t-[1px] !border-t-white/[0.06] !border-b-0 !border-x-0"
         >
           {(Object.entries(REACTION_CONFIG) as [ReactionType, typeof REACTION_CONFIG[ReactionType]][]).map(([type, config], idx) => {
             const count = counts[type] ?? 0;
