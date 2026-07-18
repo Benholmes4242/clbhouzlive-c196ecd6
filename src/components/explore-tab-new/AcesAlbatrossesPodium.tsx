@@ -280,14 +280,12 @@ function ColumnCell({
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-          <SquircleAvatar
+          <GoldRingAvatar
             size={avatarSize}
             srcCandidates={leader.holder_avatar ? [leader.holder_avatar] : []}
             alt={name}
             fallback={initials(name)}
             userId={leader.user_id}
-            hairlineRing
-            ringColor={isTop ? SC_FILL_GOLD : LIGHT_HAIRLINE}
           />
           <div
             style={{
