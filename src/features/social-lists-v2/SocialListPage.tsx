@@ -313,7 +313,7 @@ export default function SocialListPage({
                 flexShrink: 0,
               }}
             >
-              INVITE \u2192
+              {'INVITE \u2192'}
             </span>
           </button>
         </div>
