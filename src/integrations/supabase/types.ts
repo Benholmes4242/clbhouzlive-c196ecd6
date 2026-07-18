@@ -17852,6 +17852,27 @@ export type Database = {
           suspended_until: string
         }[]
       }
+      get_nearby_businesses: {
+        Args: {
+          p_categories?: string[]
+          p_lat: number
+          p_limit?: number
+          p_lng: number
+          p_radius_km?: number
+        }
+        Returns: {
+          category: string
+          cover_image_url: string
+          distance_km: number
+          id: string
+          is_verified: boolean
+          lat: number
+          lng: number
+          logo_url: string
+          name: string
+          slug: string
+        }[]
+      }
       get_nearby_courses: {
         Args: {
           p_limit?: number
