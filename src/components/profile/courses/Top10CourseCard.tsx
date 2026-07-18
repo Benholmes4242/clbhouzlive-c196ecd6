@@ -7,7 +7,7 @@
  * - Frosted glass rating chip (bottom)
  * - Frosted glass reaction strip overlay
  * - 280x360px taller aspect ratio
- * - 24px rounded corners
+ * - 4px rounded corners (matches watch video tiles)
  * - Layered shadow with press state
  */
 import React, { useState } from 'react';
