@@ -89,6 +89,10 @@ export function HandicapChip({ light = false, pill = false }: { light?: boolean;
 
   if (!user) return null;
 
+  // User-controlled visibility — Settings toggle is the single source of truth.
+  // Hides the chip in every state (disconnected, skeleton, connected).
+  if (profile?.hide_handicap_chip) return null;
+
   // Skeleton — reserves space to prevent layout shift on initial load.
   if (whsLoading) {
     return (
