@@ -171,7 +171,6 @@ export default function ExploreGrid({
               posts={coursePosts}
               flatIndex={i}
               isAutoplayActive={activeIndices.has(i)}
-              openedFrom="explore"
               hideFormatBadge
             />
           ))}
@@ -185,11 +184,9 @@ export default function ExploreGrid({
               posts={coursePosts}
               flatIndex={i}
               isAutoplayActive={activeIndices.has(i)}
-              openedFrom="explore"
               hideFormatBadge
             />
           ))}
-
         </div>
       </div>
 
