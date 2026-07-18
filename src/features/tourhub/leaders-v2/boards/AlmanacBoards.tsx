@@ -352,7 +352,7 @@ function MoneyBoardInner({ category, liveMap, onOpen }: BoardBaseProps) {
     <section style={{ fontFamily: FONT }}>
       <SectionHead
         overline={t(category.shortKey)}
-        title={t('leaders.almanac.money.title')}
+        title={t(`leaders.almanac.titles.${category.key}`, { defaultValue: t(category.labelKey) })}
         onOpen={onOpen}
       />
       {top.map((r, i) => {
