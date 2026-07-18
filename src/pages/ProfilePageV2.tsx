@@ -37,6 +37,7 @@ import { useHideHeader } from '@/hooks/useHeaderVisibility';
 
 import { safeGoBack } from '@/utils/navigation';
 import { uploadToR2Only } from '@/utils/r2OnlyUpload';
+import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
 import { FavouritesCarousel } from '@/components/profile/courses/FavouritesCarousel';
 import { AddCourseModal } from '@/components/profile/courses/AddCourseModal';
 import { PrivateProfileGate } from '@/components/profile/PrivateProfileGate';
