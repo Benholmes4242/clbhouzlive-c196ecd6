@@ -1,8 +1,8 @@
 import React from 'react';
 import {
   Phone, Mail, Globe, MapPin, Clock, Check, ArrowUpRight,
-  Instagram, Facebook, Youtube, Linkedin, Twitter, Music2,
 } from 'lucide-react';
+import { SiInstagram, SiX, SiFacebook, SiTiktok, SiYoutube } from 'react-icons/si';
 import { BusinessProfile } from '@/hooks/useBusinessProfile';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { openExternalUrl } from '@/utils/median/openExternalUrl';
@@ -154,12 +154,17 @@ function OpeningHoursSection({
 }
 
 /* ── Socials ── */
-const SOCIAL_CONFIG: { key: keyof NonNullable<BusinessProfile['social_links']>; Icon: React.ElementType; label: string }[] = [
-  { key: 'instagram', Icon: Instagram, label: 'Instagram' },
-  { key: 'twitter',   Icon: Twitter,   label: 'X / Twitter' },
-  { key: 'facebook',  Icon: Facebook,  label: 'Facebook' },
-  { key: 'tiktok',    Icon: Music2,    label: 'TikTok' },
-  { key: 'youtube',   Icon: Youtube,   label: 'YouTube' },
+const SOCIAL_CONFIG: {
+  key: keyof NonNullable<BusinessProfile['social_links']>;
+  Icon: React.ElementType;
+  label: string;
+  buildUrl: (value: string) => string;
+}[] = [
+  { key: 'instagram', Icon: SiInstagram, label: 'Instagram', buildUrl: (h) => `https://instagram.com/${h.replace(/^@/, '')}` },
+  { key: 'twitter',   Icon: SiX,         label: 'X',         buildUrl: (h) => `https://x.com/${h.replace(/^@/, '')}` },
+  { key: 'facebook',  Icon: SiFacebook,  label: 'Facebook',  buildUrl: ensureProtocol },
+  { key: 'tiktok',    Icon: SiTiktok,    label: 'TikTok',    buildUrl: (h) => `https://tiktok.com/@${h.replace(/^@/, '')}` },
+  { key: 'youtube',   Icon: SiYoutube,   label: 'YouTube',   buildUrl: ensureProtocol },
 ];
 
 function ensureProtocol(url: string): string {
@@ -288,19 +293,21 @@ export function BusinessProfileInfo({ business, userId }: BusinessProfileInfoPro
         <section className="px-4 py-4">
           <SectionKicker>Follow us</SectionKicker>
           <div className="flex items-center gap-2 flex-wrap">
-            {socials.map(({ key, Icon, label }) => (
-              <a
-                key={key}
-                href={ensureProtocol(socialLinks[key] as string)}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={label}
-                className="h-10 w-10 inline-flex items-center justify-center rounded-full active:scale-[0.97] transition-transform"
-                style={{ background: '#ffffff', border: `1px solid ${HAIR}` }}
-              >
-                <Icon className="w-4 h-4" style={{ color: INK }} />
-              </a>
-            ))}
+            {socials.map(({ key, Icon, label, buildUrl }) => {
+              const url = buildUrl(socialLinks[key]!.trim());
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => openExternalUrl(url)}
+                  aria-label={label}
+                  className="h-10 w-10 inline-flex items-center justify-center rounded-full active:scale-[0.97] transition-transform"
+                  style={{ background: '#ffffff', border: `1px solid ${HAIR}`, color: INK }}
+                >
+                  <Icon className="w-4 h-4" />
+                </button>
+              );
+            })}
           </div>
         </section>
       )}
