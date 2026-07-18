@@ -61,6 +61,7 @@ export default function ProfileSocialListRoute({ direction }: Props) {
       profileUsername={profile.username}
       profileDisplayName={profile.display_name}
       initialTab={initialTab}
+      showInviteCard={isOwnProfile}
     />
   );
 }
