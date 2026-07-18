@@ -404,6 +404,14 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
   const [menuOpen, setMenuOpen] = useState(false);
   const avatarRef = useRef<HTMLButtonElement>(null);
 
+  // Cross-surface trigger: allow non-chrome components (e.g. FriendsEmptyState)
+  // to open the search overlay via a window event, without lifting state.
+  useEffect(() => {
+    const openHandler = () => setSearchOpen(true);
+    window.addEventListener('clbhouz:open-search', openHandler);
+    return () => window.removeEventListener('clbhouz:open-search', openHandler);
+  }, []);
+
   const suppressed = hidden || runtimeSuppressed || spec.chrome === 'none';
   // bleed island routes let the page own top padding — publish 0 so content
   // flows under the island rather than being pushed down another 64px.
