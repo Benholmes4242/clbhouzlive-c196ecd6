@@ -233,10 +233,10 @@ const ProfileHandicapCard: React.FC<Props> = ({
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <TrendRow label="90 Days" delta={delta90} caption="over 90 days" />
+            <TrendRow label="90 Days" delta={isManual ? null : delta90} caption="over 90 days" />
             <TrendRow
               label="12 Months"
-              delta={trend12.delta}
+              delta={isManual ? null : trend12.delta}
               caption="over 12 months"
               borderTop
             />
