@@ -9,7 +9,9 @@ import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import { supabase } from '@/integrations/supabase/client';
+
 import {
   useActivityFeedV2,
   type ActivityFilterV2,
@@ -155,7 +157,13 @@ export const ActivityPageV2: React.FC = () => {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { user } = useSupabaseSession();
+  const { activeActor } = useActiveActor();
   const { unreadCount } = useUnreadNotifications();
+
+  const recipientActorType: 'personal' | 'business' =
+    activeActor?.type === 'business' ? 'business' : 'personal';
+  const recipientActorId = activeActor?.id ?? user?.id ?? '';
+
 
   const [chip, setChip] = useState<ChipKey>('all');
   const filter = chipToFilter(chip);
