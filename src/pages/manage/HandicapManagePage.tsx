@@ -104,6 +104,7 @@ export default function HandicapManagePage() {
               navigate('/handicap', { replace: true });
             }}
             onSkip={() => { /* stay on page */ }}
+            onDecline={declineHandicapChip}
           />
         )}
       </div>
