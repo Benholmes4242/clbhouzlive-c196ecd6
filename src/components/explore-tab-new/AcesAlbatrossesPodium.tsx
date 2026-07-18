@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { GoldRingAvatar } from '@/components/shared/GoldRingAvatar';
-import { SC_ACE, SC_ALBATROSS, SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
+import { SC_ACE, SC_ALBATROSS } from '@/features/courses/components/holes/_constants';
 import {
   useRegionLegendaryLeaders,
   useRegionFeats,
