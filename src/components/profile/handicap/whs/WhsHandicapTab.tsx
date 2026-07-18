@@ -1,7 +1,8 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { useDeclineHandicapChip } from '@/lib/whs/useDeclineHandicapChip';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import WhsConnectScreen from './WhsConnectScreen';
 import HandicapDashboard from './HandicapDashboard';
 
@@ -26,12 +27,21 @@ const SkeletonView = () => (
 
 export const WhsHandicapTab: React.FC<Props> = ({ userId, ownerFirstName = null }) => {
   const navigate = useNavigate();
+  const { user: sessionUser } = useSupabaseSession();
   const { data: connection, isLoading, refetch } = useWhsConnection(userId);
   const declineHandicapChip = useDeclineHandicapChip();
 
   if (isLoading) return <SkeletonView />;
 
   if (!connection) {
+    // Own profile and no connection: the full-page connect form lives in
+    // Manage -> Handicap (/manage/handicap). Redirect there instead of
+    // rendering it inside the dark-chrome /handicap route.
+    if (userId === sessionUser?.id) {
+      return <Navigate to="/manage/handicap" replace />;
+    }
+
+    // Friend view without a connection: keep existing behavior unchanged.
     return (
       <WhsConnectScreen
         onConnected={async () => {
