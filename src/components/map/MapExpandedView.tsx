@@ -1,12 +1,23 @@
 import React, { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { useNavigate } from 'react-router-dom';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { MapPin, X } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { createGlassyMarkerElement } from './MapMarker';
 import { MAP_CONFIG } from '@/config/maps';
 import { openMapsUrl } from '@/utils/median/openMapsUrl';
+import { getActorRouteByType } from '@/types/actor';
+
+export interface MapExpandedViewNearbyPin {
+  id: string;
+  name: string;
+  slug: string | null;
+  lat: number;
+  lng: number;
+  category: string;
+}
 
 interface MapExpandedViewProps {
   open: boolean;
@@ -16,6 +27,7 @@ interface MapExpandedViewProps {
   name: string;
   locationText?: string;
   colorful?: boolean;
+  nearby?: MapExpandedViewNearbyPin[];
 }
 
 /**
