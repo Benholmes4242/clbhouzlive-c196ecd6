@@ -29,7 +29,7 @@ const TIER_TO_ROLE: Record<Tier, Role> = {
 
 const EYEBROW_TONE: Record<EyebrowTone, string> = {
   slate: '#64748B',
-  amber: '#c97a10',
+  amber: AMBER,
   danger: '#DC2626',
 };
 
@@ -53,7 +53,7 @@ interface SectionHeaderProps {
   action?: { label: string; onClick: () => void };
   /** Non-interactive right-aligned caps text (e.g. "FRI 19 JUN", "SCORE DIFF VS HCP"). */
   meta?: ReactNode;
-  /** Tier-2 eyebrow colour. 'slate' default (#64748B) | 'amber' (#c97a10) | 'danger' (#DC2626). */
+  /** Tier-2 eyebrow colour. 'slate' default (#64748B) | 'amber' (#F7931E) | 'danger' (#DC2626). */
   tone?: EyebrowTone;
   /** Optional inline count rendered after the eyebrow (slate-400, tabular). */
   count?: number;
