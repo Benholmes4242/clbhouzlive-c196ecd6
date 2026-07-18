@@ -42,6 +42,7 @@ export function useMyRequestsList() {
         .from('support_tickets')
         .select('id, user_id, category, subject, status, last_sender, last_message_at, created_at')
         .eq('user_id', uid)
+        .is('user_hidden_at', null)
         .order('last_message_at', { ascending: false })
         .limit(200);
       if (error) throw error;
