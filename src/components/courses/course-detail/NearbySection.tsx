@@ -98,7 +98,7 @@ const NearbySection: React.FC<NearbySectionProps> = ({ lat, lng }) => {
                   textOverflow: 'ellipsis',
                 }}
               >
-                {biz.category} · {formatDistance(biz.distance_km)}
+                {biz.category} · {formatDistanceKm(biz.distance_km)}
               </div>
             </button>
           );
