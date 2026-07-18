@@ -181,6 +181,9 @@ export const ActivityPageV2: React.FC = () => {
   const buckets = useMemo(() => bucketise(allRows), [allRows]);
 
   // Optimistic single-row mark-read ----
+  // NOTE: only touch the local 'activity-v2' cache so the visible dot state
+  // remains through the visit; badges are refreshed via invalidation which
+  // re-runs the pure is_read=false count.
   const markRead = async (notifId: string) => {
     qc.setQueriesData({ queryKey: ['activity-v2'] }, (old: any) => {
       if (!old?.pages) return old;
@@ -191,11 +194,9 @@ export const ActivityPageV2: React.FC = () => {
         ),
       };
     });
-    qc.setQueryData(['activity-unread-count'], (n: any) =>
-      typeof n === 'number' && n > 0 ? n - 1 : n,
-    );
     await supabase.from('notifications').update({ is_read: true }).eq('id', notifId);
     qc.invalidateQueries({ queryKey: ['activity-unread-count'] });
+    qc.invalidateQueries({ queryKey: ['actor-unread-counts'] });
   };
 
   const openSheet = (row: ActivityFeedRowV2) => {
@@ -203,15 +204,46 @@ export const ActivityPageV2: React.FC = () => {
     setSheetOpen(true);
   };
 
-  // -- Mark-all-read (legacy write path) ------------------------------
-  const handleMarkAllRead = async () => {
-    if (!user?.id) return;
+  // -- Auto-read on visit (Fix A) -------------------------------------
+  // Marks the ACTIVE ACTOR's notifications read once per mount, scoped
+  // exactly like the feed/badges. Does NOT invalidate the feed cache so
+  // the "New" section stays highlighted for the whole visit; on the next
+  // visit rows render read. friend_request excluded (own lifecycle).
+  const didAutoRead = useRef(false);
+  useEffect(() => {
+    if (didAutoRead.current || !recipientActorId || !user?.id) return;
+    didAutoRead.current = true;
     const now = new Date().toISOString();
-    qc.setQueryData(['activity-unread-count'], 0);
+    (async () => {
+      await supabase
+        .from('notifications')
+        .update({ is_read: true })
+        .eq('recipient_actor_type', recipientActorType)
+        .eq('recipient_actor_id', recipientActorId)
+        .eq('is_read', false)
+        .neq('type', 'friend_request')
+        .lte('created_at', now);
+      await supabase
+        .from('user_profiles')
+        .update({ last_notifications_seen_at: now })
+        .eq('id', user.id);
+      qc.invalidateQueries({ queryKey: ['activity-unread-count'] });
+      qc.invalidateQueries({ queryKey: ['actor-unread-counts'] });
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [recipientActorType, recipientActorId, user?.id]);
+
+  // -- Mark-all-read (actor-scoped) -----------------------------------
+  const handleMarkAllRead = async () => {
+    if (!user?.id || !recipientActorId) return;
+    const now = new Date().toISOString();
     await supabase
       .from('notifications')
       .update({ is_read: true })
-      .eq('user_id', user.id)
+      .eq('recipient_actor_type', recipientActorType)
+      .eq('recipient_actor_id', recipientActorId)
+      .eq('is_read', false)
+      .neq('type', 'friend_request')
       .lte('created_at', now);
     await supabase
       .from('user_profiles')
@@ -220,8 +252,11 @@ export const ActivityPageV2: React.FC = () => {
     qc.invalidateQueries({ queryKey: ['activity-v2'] });
     qc.invalidateQueries({ queryKey: ['activity-feed'] });
     qc.invalidateQueries({ queryKey: ['activity-unread-count'] });
+    qc.invalidateQueries({ queryKey: ['actor-unread-counts'] });
     toast.success('All caught up');
   };
+
+
 
   // -- Infinite sentinel ----------------------------------------------
   const sentinelRef = useRef<HTMLDivElement | null>(null);
