@@ -59,6 +59,7 @@ export function SettingsTabContent() {
   const { user, loading: sessionLoading } = useSupabaseSession();
   const { profile, loading } = useProfileData();
   const { hasBusinesses, count } = useHasBusinesses(user?.id);
+  const { openInviteSheet } = useInviteSheet();
 
   useEffect(() => {
     if (user?.id && user?.email) {
