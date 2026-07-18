@@ -152,6 +152,61 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
     };
   }, [open, lat, lng]);
 
+  // Secondary hospitality pins — mount after map is ready and re-sync on change.
+  useEffect(() => {
+    if (!open) return;
+    const pins = nearby ?? [];
+    let cancelled = false;
+
+    const applyPins = () => {
+      const map = mapRef.current;
+      if (!map || cancelled) return;
+      secondaryMarkersRef.current.forEach((m) => m.remove());
+      secondaryMarkersRef.current = [];
+      pins.forEach((pin) => {
+        if (!Number.isFinite(pin.lat) || !Number.isFinite(pin.lng)) return;
+        const el = document.createElement('button');
+        el.type = 'button';
+        el.setAttribute('aria-label', pin.name);
+        el.title = pin.name;
+        el.style.cssText =
+          'width:12px;height:12px;padding:0;border-radius:9999px;background:#0F172A;' +
+          'border:2px solid #FFFFFF;box-shadow:0 1px 3px rgba(15,23,42,0.35);' +
+          'cursor:pointer;display:block;';
+        el.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          const route = getActorRouteByType('business', pin.id, pin.slug);
+          onOpenChange(false);
+          navigate(route);
+        });
+        const marker = new mapboxgl.Marker({ element: el, anchor: 'center' })
+          .setLngLat([pin.lng, pin.lat])
+          .addTo(map);
+        secondaryMarkersRef.current.push(marker);
+      });
+    };
+
+    // If the map isn't up yet (init is timeout-gated), poll briefly.
+    if (mapRef.current) {
+      applyPins();
+    } else {
+      const iv = window.setInterval(() => {
+        if (mapRef.current) {
+          window.clearInterval(iv);
+          applyPins();
+        }
+      }, 100);
+      return () => {
+        cancelled = true;
+        window.clearInterval(iv);
+      };
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [open, nearby, navigate, onOpenChange]);
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
