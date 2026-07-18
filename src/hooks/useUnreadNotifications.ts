@@ -26,19 +26,21 @@ export function useUnreadNotifications() {
     queryFn: async () => {
       if (!user?.id || !recipientActorId) return 0;
 
-      const { count, error: cErr } = await supabase
-        .from('notifications')
-        .select('id', { count: 'exact', head: true })
-        .eq('recipient_actor_type', recipientActorType)
-        .eq('recipient_actor_id', recipientActorId)
-        .eq('is_deleted', false)
-        .eq('is_read', false)
-        .neq('type', 'friend_request')
-        .not('type', 'in', '("message","message_received","dm")');
-
-      if (cErr) throw cErr;
-      return count ?? 0;
+      // Uses the RPC so the count applies the SAME predicate set as
+      // get_activity_feed (muted_types/muted_user_ids, entity liveness),
+      // preventing badge > visible-row-count drift.
+      const { data, error: rpcErr } = await (supabase as any).rpc(
+        'get_unread_notification_count',
+        {
+          p_user_id: user.id,
+          p_actor_type: recipientActorType,
+          p_actor_id: recipientActorId,
+        },
+      );
+      if (rpcErr) throw rpcErr;
+      return typeof data === 'number' ? data : 0;
     },
+
     enabled: !!user?.id && !!recipientActorId,
     refetchInterval: 30000,
     staleTime: 10000,

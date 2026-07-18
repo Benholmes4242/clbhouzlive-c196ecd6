@@ -31,23 +31,24 @@ export function useActorUnreadCounts() {
     queryFn: async (): Promise<Record<string, number>> => {
       if (!user?.id || availableActors.length === 0) return {};
 
-      // 1) Per-actor NOTIFICATION unread (excludes message + friend_request).
-      //    Aligned with useUnreadNotifications so the header bell and the
-      //    POSTING AS avatar always agree for the same actor.
+      // 1) Per-actor NOTIFICATION unread via RPC — applies the SAME
+      //    predicate set as get_activity_feed (muted_types/muted_user_ids,
+      //    entity liveness, friend_request excluded, message-types excluded)
+      //    so badges cannot exceed visible ledger rows for the same actor.
       const notifResults = await Promise.all(
         availableActors.map(async (actor) => {
-          const { count } = await supabase
-            .from('notifications')
-            .select('id', { count: 'exact', head: true })
-            .eq('recipient_actor_type', actor.type)
-            .eq('recipient_actor_id', actor.id)
-            .eq('is_deleted', false)
-            .eq('is_read', false)
-            .neq('type', 'friend_request')
-            .not('type', 'in', '("message","message_received","dm")');
-          return { key: `${actor.type}:${actor.id}`, count: count ?? 0 };
+          const { data } = await (supabase as any).rpc(
+            'get_unread_notification_count',
+            {
+              p_user_id: user.id,
+              p_actor_type: actor.type,
+              p_actor_id: actor.id,
+            },
+          );
+          return { key: `${actor.type}:${actor.id}`, count: typeof data === 'number' ? data : 0 };
         }),
       );
+
 
       const totals = notifResults.reduce<Record<string, number>>((acc, r) => {
         acc[r.key] = r.count;
