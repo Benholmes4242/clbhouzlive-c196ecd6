@@ -4,16 +4,12 @@ import { useNearbyBusinesses } from '@/hooks/useNearbyBusinesses';
 import { getActorRouteByType } from '@/types/actor';
 import { getBusinessCategoryIcon } from '@/constants/businessCategories';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { formatDistanceKm } from '@/utils/formatDistance';
 
 interface NearbySectionProps {
   lat?: number | null;
   lng?: number | null;
 }
-
-const formatDistance = (km: number) => {
-  if (km < 1) return `${Math.round(km * 1000)} m`;
-  return `${km.toFixed(1)} km`;
-};
 
 const NearbySection: React.FC<NearbySectionProps> = ({ lat, lng }) => {
   const navigate = useNavigate();
