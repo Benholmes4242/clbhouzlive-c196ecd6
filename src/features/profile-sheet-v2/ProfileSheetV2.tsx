@@ -273,6 +273,7 @@ export default function ProfileSheetV2({
                 currentActor={{ id: currentActor.id, type: currentActor.type }}
                 isAdmin={isAdmin}
                 onNavigate={onNavigate}
+                onInviteFriends={handleInviteFriends}
               />
               <SignOutRow onNavigate={onNavigate} />
             </div>
