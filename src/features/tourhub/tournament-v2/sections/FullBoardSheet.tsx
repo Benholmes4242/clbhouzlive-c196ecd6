@@ -12,7 +12,7 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { BoardTable, type BoardEntry, type CutState } from '../../leaderboard/BoardTable';
+import { BoardTable, todayFromEntry, type BoardEntry, type CutState } from '../../leaderboard/BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
 import { FONT, INK, INK_MUTE, INK_FAINT, SLATE_50, HAIRLINE_INK_8, AMBER } from '../../_shared/tokens';
@@ -61,7 +61,7 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
       position: e.position ?? null,
       positionTied: e.position_tied ?? null,
       total: e.score ?? null,
-      today: e.today ?? null,
+      today: todayFromEntry(e),
       thru: e.thru ?? null,
       status: e.status ?? null,
     });
