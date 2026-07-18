@@ -345,6 +345,8 @@ const CommentDeepLinkPage = lazy(() => import("./features/comments-v2/CommentDee
 
 // Import season wrap modal
 import { SeasonWrapModal } from '@/components/season/SeasonWrapModal';
+import { InAppNotificationsMount } from '@/components/notifications/InAppNotificationsMount';
+
 
 
 // Creator routes removed - now handled via Business Creator profiles or Personal Creator Mode
@@ -908,8 +910,10 @@ const AppInner: React.FC = () => {
                                       <ErrorBoundary>
                                         <MountSignal />
                                         <AuthWrapper>
+                                          <InAppNotificationsMount />
 
                                           <FriendSheetProvider>
+
                                             <InviteSheetProvider>
                                             <SeasonWrapModal />
                                             <AchievementToastWrapper />
