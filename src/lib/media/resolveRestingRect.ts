@@ -151,12 +151,21 @@ export function readSafeAreaInsets(): Insets {
   return _insetsCache;
 }
 
-/** Convenience: build a Viewport for the current window. */
+/** Convenience: build a Viewport for the current window.
+ *
+ * iOS/WKWebView: window.innerHeight is the layout viewport, which can lag
+ * the visible viewport during boot, dynamic-toolbar transitions, and
+ * status-bar changes — producing a stale height at the render tick that
+ * manifested as the fullscreen "top-pinned sliver". Prefer visualViewport
+ * dimensions when available; fall back to innerWidth/innerHeight otherwise.
+ */
 export function getCurrentViewport(): Viewport {
   const insets = readSafeAreaInsets();
+  const hasWin = typeof window !== 'undefined';
+  const vv = hasWin ? window.visualViewport : null;
   return {
-    w: typeof window !== 'undefined' ? window.innerWidth : 0,
-    h: typeof window !== 'undefined' ? window.innerHeight : 0,
+    w: hasWin ? (vv?.width ?? window.innerWidth) : 0,
+    h: hasWin ? (vv?.height ?? window.innerHeight) : 0,
     ...insets,
   };
 }
