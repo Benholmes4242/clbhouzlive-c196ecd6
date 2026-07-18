@@ -15,7 +15,13 @@ export interface UserProfile {
   // home_club_id?: string | null;
   primary_club_id?: string | null; // Links to golf_clubs.id - canonical club identity
   eg_handicap_index: number | null;
+  manual_handicap_index?: number | null;
   show_handicap?: boolean;
+  // Social handles (personal profiles)
+  instagram_handle?: string | null;
+  twitter_handle?: string | null;
+  tiktok_handle?: string | null;
+  youtube_handle?: string | null;
   bio?: string | null;
   website?: string | null;
   user_type?: string | null;
