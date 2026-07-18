@@ -61,6 +61,7 @@ import { useBusinessReviewStats } from '@/hooks/useBusinessReviewStats';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { openExternalUrl } from '@/utils/median/openExternalUrl';
+import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
 
 
 type BusinessTab = 'posts' | 'about' | 'team';
