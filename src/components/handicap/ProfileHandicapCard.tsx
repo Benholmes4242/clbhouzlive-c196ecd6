@@ -105,8 +105,15 @@ const ProfileHandicapCard: React.FC<Props> = ({
   const { data: trend, isLoading: trendLoading } = useHandicapTrend(connection?.id);
   const { data: history90 } = useHandicapHistory(connection?.id, 90);
   const trend12 = useHandicapTrend12mo(connection?.id);
+  const { data: profileRow } = useUserProfile(userId);
 
-  const handicap = trend?.current ?? null;
+  const resolved = resolveDisplayHandicap({
+    egHandicapIndex: trend?.current ?? (profileRow as any)?.eg_handicap_index ?? null,
+    manualHandicapIndex: (profileRow as any)?.manual_handicap_index ?? null,
+    hasWhsConnection: !!connection,
+  });
+  const handicap = resolved.value;
+  const isManual = resolved.source === 'manual';
 
   const delta90 = useMemo<number | null>(() => {
     if (!history90 || history90.length < 2) return null;
@@ -117,7 +124,6 @@ const ProfileHandicapCard: React.FC<Props> = ({
 
 
   if (connLoading || trendLoading) return null;
-  if (!connection) return null;
   if (handicap == null) return null;
 
   const resolvedName = (displayName ?? '').trim().split(/\s+/)[0] || 'this golfer';
