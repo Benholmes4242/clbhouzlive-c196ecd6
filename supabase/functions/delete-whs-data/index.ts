@@ -84,6 +84,18 @@ Deno.serve(async (req) => {
     }
   }
 
+  // Clear the stale WHS-owned index on the profile so display resolvers
+  // fall back to manual_handicap_index (or 'none').
+  try {
+    await admin
+      .from("user_profiles")
+      .update({ eg_handicap_index: null })
+      .eq("id", user.id);
+  } catch (err) {
+    console.error("[delete-whs-data] clear eg_handicap_index failed (non-fatal):", err);
+  }
+
+
   return new Response(JSON.stringify({
     ok: true,
     message: "All England Golf data deleted",
