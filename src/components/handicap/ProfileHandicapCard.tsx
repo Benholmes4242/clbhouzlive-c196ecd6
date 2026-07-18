@@ -2,11 +2,16 @@
  * ProfileHandicapCard: light-mode handicap summary card for the profile page.
  *
  * Index block mirrors HeroHandicapCardDark (handicap page) re-themed light.
- * Whole card taps through:
- *   own profile  -> /handicap
- *   friend       -> /handicap/:userId   (fires friend_handicap_page_viewed)
  *
- * Renders null when the user has no WHS connection or no current handicap.
+ * WHS-synced users see the full interactive card (index + trends + trophies),
+ * which taps through to /handicap (or /handicap/:userId for friends).
+ *
+ * Manual-handicap users see a simple, non-interactive variant: eyebrow +
+ * current index only. They have no WHS round data, so trends and trophies
+ * are intentionally omitted.
+ *
+ * Renders null when the user has no WHS connection and no manual handicap,
+ * or when no current handicap can be resolved.
  */
 
 import React, { useMemo } from 'react';
@@ -94,6 +99,12 @@ function TrendRow({ label, delta, caption, borderTop }: TrendRowProps) {
   );
 }
 
+function formatHandicap(handicap: number | null): string {
+  if (handicap == null) return 'N/A';
+  if (handicap < 0) return `+${Math.abs(handicap).toFixed(1)}`;
+  return handicap.toFixed(1);
+}
+
 const ProfileHandicapCard: React.FC<Props> = ({
   userId,
   viewerUserId,
@@ -122,8 +133,10 @@ const ProfileHandicapCard: React.FC<Props> = ({
     );
   }, [history90]);
 
-
-  if (connLoading || trendLoading) return null;
+  // Manual users have no connection/trend data; don't let WHS loading gates
+  // suppress their simple card. WHS users still wait for both.
+  if (connLoading) return null;
+  if (!isManual && trendLoading) return null;
   if (handicap == null) return null;
 
   const resolvedName = (displayName ?? '').trim().split(/\s+/)[0] || 'this golfer';
@@ -148,6 +161,81 @@ const ProfileHandicapCard: React.FC<Props> = ({
     }
   };
 
+  const eyebrow = (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+        marginBottom: 12,
+      }}
+    >
+      <span
+        style={{
+          fontSize: 10,
+          fontWeight: 800,
+          letterSpacing: '0.22em',
+          color: 'var(--hcp-t-60)',
+        }}
+      >
+        HANDICAP INDEX
+      </span>
+    </div>
+  );
+
+  const currentIndexLabel = (
+    <div
+      style={{
+        fontSize: 9,
+        fontWeight: 700,
+        letterSpacing: '0.12em',
+        textTransform: 'uppercase',
+        color: 'var(--hcp-t-40)',
+        marginBottom: 8,
+      }}
+    >
+      Current Index
+    </div>
+  );
+
+  const currentIndexValue = (
+    <div
+      style={{
+        fontSize: 56,
+        fontWeight: 200,
+        color: 'var(--hcp-t-100)',
+        lineHeight: 0.9,
+        letterSpacing: '-0.03em',
+        fontVariantNumeric: 'tabular-nums',
+      }}
+    >
+      {formatHandicap(handicap)}
+    </div>
+  );
+
+  // Simple, non-interactive variant for manual-handicap users.
+  if (isManual) {
+    return (
+      <div className="hcp-light" style={{ padding: '8px 16px 16px' }}>
+        <div
+          style={{
+            background: 'var(--hcp-bg-1)',
+            border: '1px solid var(--hcp-line)',
+            borderRadius: 18,
+            overflow: 'hidden',
+            padding: '16px 16px 14px',
+            fontFamily: FONT,
+          }}
+        >
+          {eyebrow}
+          {currentIndexLabel}
+          {currentIndexValue}
+        </div>
+      </div>
+    );
+  }
+
+  // Full interactive variant for WHS-synced users.
   return (
     <div className="hcp-light" style={{ padding: '8px 16px 16px' }}>
       <div
@@ -170,26 +258,7 @@ const ProfileHandicapCard: React.FC<Props> = ({
           cursor: 'pointer',
         }}
       >
-        {/* Eyebrow */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            marginBottom: 12,
-          }}
-        >
-          <span
-            style={{
-              fontSize: 10,
-              fontWeight: 800,
-              letterSpacing: '0.22em',
-              color: 'var(--hcp-t-60)',
-            }}
-          >
-            HANDICAP INDEX
-          </span>
-        </div>
+        {eyebrow}
 
         {/* Index grid: CURRENT INDEX | 90d / 12mo */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
@@ -202,47 +271,20 @@ const ProfileHandicapCard: React.FC<Props> = ({
               justifyContent: 'center',
             }}
           >
-            <div
-              style={{
-                fontSize: 9,
-                fontWeight: 700,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                color: 'var(--hcp-t-40)',
-                marginBottom: 8,
-              }}
-            >
-              Current Index
-            </div>
-            <div
-              style={{
-                fontSize: 56,
-                fontWeight: 200,
-                color: 'var(--hcp-t-100)',
-                lineHeight: 0.9,
-                letterSpacing: '-0.03em',
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {handicap != null
-                ? handicap < 0
-                  ? `+${Math.abs(handicap).toFixed(1)}`
-                  : handicap.toFixed(1)
-                : 'N/A'}
-            </div>
+            {currentIndexLabel}
+            {currentIndexValue}
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <TrendRow label="90 Days" delta={isManual ? null : delta90} caption="over 90 days" />
+            <TrendRow label="90 Days" delta={delta90} caption="over 90 days" />
             <TrendRow
               label="12 Months"
-              delta={isManual ? null : trend12.delta}
+              delta={trend12.delta}
               caption="over 12 months"
               borderTop
             />
           </div>
         </div>
-
       </div>
 
       {/* Trophies entry row (light variant of handicap page shelf preview) */}
