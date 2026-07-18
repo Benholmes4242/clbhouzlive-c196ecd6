@@ -122,8 +122,9 @@ export function useInAppNotifications() {
     const invalidateUnread = () => {
       queryClient.invalidateQueries({ queryKey: ['actor-unread-counts'], exact: false });
       queryClient.invalidateQueries({ queryKey: ['activity-unread-count'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['activity-feed'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['activity-v2'], exact: false });
     };
+
 
     const channel = supabase
       .channel(`inapp_notifications_${user.id}`)

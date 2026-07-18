@@ -119,7 +119,7 @@ const BUCKET_LABELS: Record<'new' | 'today' | 'yesterday' | 'thisWeek' | 'earlie
   earlier: 'Earlier',
 };
 
-function bucketise(rows: ActivityFeedRowV2[]) {
+function bucketise(rows: ActivityFeedRowV2[], visitUnreadIds: Set<string>) {
   const now = new Date();
   const todayStart = startOfDay(now);
   const yesterdayStart = subDays(todayStart, 1);
@@ -133,7 +133,9 @@ function bucketise(rows: ActivityFeedRowV2[]) {
 
   const seen = new Set<string>();
   for (const r of rows) {
-    if (!r.is_read) {
+    // visit-snapshot: rows unread at page-open (or arriving unread mid-visit)
+    // stay in "New" even if a realtime-triggered refetch returns them read.
+    if (!r.is_read || visitUnreadIds.has(r.notif_id)) {
       newBucket.push(r);
       seen.add(r.notif_id);
     }
@@ -149,6 +151,7 @@ function bucketise(rows: ActivityFeedRowV2[]) {
 
   return { new: newBucket, today, yesterday, thisWeek, earlier };
 }
+
 
 export const ActivityPageV2: React.FC = () => {
   useHideBottomNav();
@@ -177,8 +180,23 @@ export const ActivityPageV2: React.FC = () => {
     () => (feed.data?.pages ?? []).flat(),
     [feed.data],
   );
+
+  // Visit snapshot: capture notif_ids that were unread at any point during
+  // this visit. Keeps them presented as "New" even after auto-read + a
+  // realtime-triggered mid-visit refetch returns them with is_read=true.
+  const visitUnreadIds = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    for (const r of allRows) {
+      if (!r.is_read) visitUnreadIds.current.add(r.notif_id);
+    }
+  }, [allRows]);
+
   const featured = useMemo(() => pickFeaturedRow(firstPage), [firstPage]);
-  const buckets = useMemo(() => bucketise(allRows), [allRows]);
+  const buckets = useMemo(
+    () => bucketise(allRows, visitUnreadIds.current),
+    [allRows],
+  );
+
 
   // Optimistic single-row mark-read ----
   // NOTE: only touch the local 'activity-v2' cache so the visible dot state
