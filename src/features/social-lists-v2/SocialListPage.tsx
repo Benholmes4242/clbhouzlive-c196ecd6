@@ -41,7 +41,7 @@ const SURFACE = '#FFFFFF';
 const HAIR = 'rgba(15,23,42,0.08)';
 const HAIR_STRONG = 'rgba(15,23,42,0.12)';
 
-const AMBER_DEEP = '#C97A10';
+const BRAND_AMBER = '#F7931E';
 
 /* ── props ──────────────────────────────────────────────────────────── */
 interface Props {
@@ -263,7 +263,7 @@ export default function SocialListPage({
         ) : (
           <>
             {showPending && pending.length > 0 && (
-              <Section eyebrow={`PENDING · ${pending.length}`} eyebrowColor={AMBER_DEEP}>
+              <Section eyebrow={`PENDING · ${pending.length}`} eyebrowColor={BRAND_AMBER}>
                 {pending.map((r) => (
                   <PendingRow key={rowKey(r)} row={r} viewerUserId={viewer?.id} />
                 ))}
