@@ -27,11 +27,14 @@ const ERROR_MESSAGES: Record<string, string> = {
 interface Props {
   onConnected: () => void | Promise<void>;
   onSkip?: () => void;
+  onDecline?: () => void;
 }
 
-export const WhsConnectScreen: React.FC<Props> = ({ onConnected, onSkip }) => {
+export const WhsConnectScreen: React.FC<Props> = ({ onConnected, onSkip, onDecline }) => {
   const { country, setCountryId } = useSelectedCountry();
   const location = useLocation();
+  const { user } = useSupabaseSession();
+  const queryClient = useQueryClient();
   const [pickerOpen, setPickerOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
