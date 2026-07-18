@@ -94,7 +94,11 @@ export const RoundDetailSheet: React.FC<Props> = ({
   const displayName = profile?.display_name ?? profile?.username ?? '';
   const playerHcp = profile?.show_handicap === false
     ? null
-    : profile?.eg_handicap_index ?? null;
+    : resolveDisplayHandicap({
+        egHandicapIndex: (profile as any)?.eg_handicap_index ?? null,
+        manualHandicapIndex: (profile as any)?.manual_handicap_index ?? null,
+        hasWhsConnection: !!whsConn,
+      }).value;
 
   const onViewProfile = profileUserId
     ? () => { onClose(); navigate(`/handicap/${profileUserId}`); }
