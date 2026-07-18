@@ -68,6 +68,7 @@ export function useProfileSave(userId: string) {
         manual_handicap_index: parseHcpFormString(form.handicapIndex),
         home_club_visibility: form.homeClubVisibility,
         additional_clubs_visibility: form.additionalClubsVisibility,
+        show_additional_home_clubs: form.additionalClubsVisibility !== 'private',
         websites: form.websites.map(w => w.url).filter(Boolean),
         instagram_handle: form.instagramHandle.replace('@', '').trim(),
         twitter_handle: form.twitterHandle.replace('@', '').trim(),
