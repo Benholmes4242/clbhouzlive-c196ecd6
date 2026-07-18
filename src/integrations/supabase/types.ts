@@ -10702,6 +10702,7 @@ export type Database = {
           last_sender: string
           status: string
           subject: string
+          user_hidden_at: string | null
           user_id: string
         }
         Insert: {
@@ -10712,6 +10713,7 @@ export type Database = {
           last_sender?: string
           status?: string
           subject: string
+          user_hidden_at?: string | null
           user_id: string
         }
         Update: {
@@ -10722,6 +10724,7 @@ export type Database = {
           last_sender?: string
           status?: string
           subject?: string
+          user_hidden_at?: string | null
           user_id?: string
         }
         Relationships: []
