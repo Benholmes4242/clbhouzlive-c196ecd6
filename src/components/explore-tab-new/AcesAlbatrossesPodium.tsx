@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
-import { SC_ACE, SC_ALBATROSS, SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
+import { GoldRingAvatar } from '@/components/shared/GoldRingAvatar';
+import { SC_ACE, SC_ALBATROSS } from '@/features/courses/components/holes/_constants';
 import {
   useRegionLegendaryLeaders,
   useRegionFeats,
@@ -280,14 +280,12 @@ function ColumnCell({
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-          <SquircleAvatar
+          <GoldRingAvatar
             size={avatarSize}
             srcCandidates={leader.holder_avatar ? [leader.holder_avatar] : []}
             alt={name}
             fallback={initials(name)}
             userId={leader.user_id}
-            hairlineRing
-            ringColor={isTop ? SC_FILL_GOLD : LIGHT_HAIRLINE}
           />
           <div
             style={{
@@ -372,14 +370,12 @@ function ColumnCell({
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-          <SquircleAvatar
+          <GoldRingAvatar
             size={20}
             srcCandidates={feat.holder_avatar ? [feat.holder_avatar] : []}
             alt={name}
             fallback={initials(name)}
             userId={feat.user_id}
-            hairlineRing
-            ringColor={LIGHT_HAIRLINE}
           />
           <div
             style={{
