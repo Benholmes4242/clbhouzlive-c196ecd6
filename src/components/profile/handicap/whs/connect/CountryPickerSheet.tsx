@@ -33,7 +33,9 @@ export const CountryPickerSheet: React.FC<Props> = ({ open, onClose, onSelect })
       : WHS_COUNTRIES;
     return {
       supported: filtered.filter((c) => c.supported),
-      comingSoon: filtered.filter((c) => !c.supported),
+      comingSoon: filtered
+        .filter((c) => !c.supported)
+        .sort((a, b) => Number(!!b.comingSoon) - Number(!!a.comingSoon)),
     };
   }, [query]);
 
@@ -257,9 +259,10 @@ export const CountryPickerSheet: React.FC<Props> = ({ open, onClose, onSelect })
                         background: SOON_BG,
                         padding: '4px 8px',
                         borderRadius: 6,
+                        whiteSpace: 'nowrap',
                       }}
                     >
-                      SOON
+                      {c.comingSoon ? 'COMING SOON' : 'SOON'}
                     </span>
                   </button>
                 ))}

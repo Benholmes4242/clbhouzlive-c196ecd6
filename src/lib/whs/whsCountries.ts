@@ -11,6 +11,8 @@ export interface WhsCountry {
   bodyShort?: string;
   /** True when the user can actually log in via this body today. */
   supported: boolean;
+  /** Partnership agreed - pinned to the top of the unsupported list with a COMING SOON badge. */
+  comingSoon?: boolean;
 }
 
 export const WHS_COUNTRIES: WhsCountry[] = [
@@ -24,7 +26,7 @@ export const WHS_COUNTRIES: WhsCountry[] = [
   },
   { id: 'au',     name: 'Australia',     iso: 'AU', body: 'Golf Australia',                       supported: false },
   { id: 'ca',     name: 'Canada',        iso: 'CA', body: 'Golf Canada',                          supported: false },
-  { id: 'fr',     name: 'France',        iso: 'FR', body: 'Fédération Française de Golf',         supported: false },
+  { id: 'fr',     name: 'France',        iso: 'FR', body: 'Fédération Française de Golf',         supported: false, comingSoon: true },
   { id: 'de',     name: 'Germany',       iso: 'DE', body: 'Deutscher Golf Verband',               supported: false },
   { id: 'ie',     name: 'Ireland',       iso: 'IE', body: 'Golf Ireland',                         supported: false },
   { id: 'it',     name: 'Italy',         iso: 'IT', body: 'Federazione Italiana Golf',            supported: false },
@@ -36,7 +38,7 @@ export const WHS_COUNTRIES: WhsCountry[] = [
   { id: 'es',     name: 'Spain',         iso: 'ES', body: 'Federación Española de Golf',          supported: false },
   { id: 'se',     name: 'Sweden',        iso: 'SE', body: 'Svenska Golfförbundet',                supported: false },
   { id: 'ch',     name: 'Switzerland',   iso: 'CH', body: 'Swiss Golf',                           supported: false },
-  { id: 'us',     name: 'United States', iso: 'US', body: 'USGA / GHIN',                          supported: false },
+  { id: 'us',     name: 'United States', iso: 'US', body: 'USGA / GHIN',                          supported: false, comingSoon: true },
   { id: 'gb-wls', name: 'Wales',         iso: 'GB-WLS', body: 'Wales Golf',                       supported: false },
 ];
 
