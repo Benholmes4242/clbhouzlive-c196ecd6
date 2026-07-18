@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useCallback } from 'react';
+import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUserCourseActivity } from '@/hooks/useUserCourseActivity';
 import { useQuery } from '@tanstack/react-query';
@@ -6,8 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { TieredCourseCard, CourseCardData } from './TieredCourseCard';
 import { StickyFilterBar, CoursePrimaryTab, CourseSortOption } from './StickyFilterBar';
 import { type QuickRegion } from '@/components/leaderboard/courses/CourseRegionPills';
-import { Button } from '@/components/ui/button';
-import { ChevronDown, ClipboardList } from 'lucide-react';
+import { ClipboardList } from 'lucide-react';
 
 import { compareOwnRatings } from '@/lib/sortCoursesByRating';
 import DossierCard from './DossierCard';
@@ -74,6 +73,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [showBreakdownsPicker, setShowBreakdownsPicker] = useState(false);
   const [showReviewPicker, setShowReviewPicker] = useState(false);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   const { courses: playedUnrated, count: reviewCount } = usePlayedUnratedCourses(userId);
 
@@ -276,7 +276,6 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
 
   const displayedCourses = tieAnnotated.slice(0, displayCount);
   const hasMore = displayCount < tieAnnotated.length;
-  const remainingCount = Math.min(PAGE_SIZE, tieAnnotated.length - displayCount);
   const totalFiltered = tieAnnotated.length;
 
   const loadMore = useCallback(() => {
@@ -287,6 +286,21 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
       setIsLoadingMore(false);
     }, 300);
   }, [hasMore, isLoadingMore, tieAnnotated.length]);
+
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el || !hasMore) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) loadMore();
+        }
+      },
+      { rootMargin: '400px' },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [hasMore, loadMore]);
 
   const firstName = displayName?.split(' ')[0];
 
@@ -474,29 +488,12 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
 
       {/* Load More */}
       {hasMore && (
-        <div className="flex flex-col items-center gap-2 pt-4 px-4 pb-6">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={loadMore}
-            disabled={isLoadingMore}
-            className="w-full max-w-xs gap-1.5 transition-all duration-150 hover:shadow-sm active:scale-[0.98]"
-          >
-            {isLoadingMore ? (
-              <>
-                <div className="w-4 h-4 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin" />
-                Loading next courses…
-              </>
-            ) : (
-              <>
-                <ChevronDown className="h-4 w-4" />
-                Next {remainingCount} courses
-              </>
-            )}
-          </Button>
-          <p className="text-[11px] text-muted-foreground">
-            Showing 1–{displayedCourses.length} of {formatNumber(totalFiltered)} courses
-          </p>
+        <div
+          ref={sentinelRef}
+          style={{ padding: '16px 0', display: 'flex', justifyContent: 'center' }}
+          aria-hidden="true"
+        >
+          <div className="text-xs font-semibold text-muted-foreground">Loading more...</div>
         </div>
       )}
 
