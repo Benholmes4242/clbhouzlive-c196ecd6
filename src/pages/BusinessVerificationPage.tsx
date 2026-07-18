@@ -73,7 +73,8 @@ export default function BusinessVerificationPage() {
 
   return (
     <ManagePageShell title="Verification" offsetForChrome>
-      <main className="px-4 py-6 max-w-lg mx-auto pb-22">
+      <main className="px-4 py-6 max-w-lg mx-auto" style={{ paddingBottom: 140 }}>
+
         {isLoading ? (
           <div className="space-y-3">
             <div className="h-24 animate-pulse rounded-xl" style={{ background: 'rgba(15,23,42,0.08)' }} />
