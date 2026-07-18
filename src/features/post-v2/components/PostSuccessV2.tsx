@@ -26,6 +26,16 @@ interface Props {
 export default function PostSuccessV2({ result, onDone }: Props) {
   const { t } = useTranslation(['composer', 'common']);
 
+  // Auto-dismiss the terminal (non-uploading) variants so edit-save success
+  // closes itself if the user does not tap. Mirrors UploadingState's 1200ms
+  // auto-dismiss. Tap remains the immediate path.
+  const isTerminal = result.kind === 'scheduled' || result.kind === 'published';
+  useEffect(() => {
+    if (!isTerminal) return;
+    const id = window.setTimeout(() => onDone(), 1200);
+    return () => window.clearTimeout(id);
+  }, [isTerminal, onDone]);
+
   if (result.kind === 'uploading') {
     return <UploadingState result={result} onDone={onDone} />;
   }
@@ -174,7 +184,10 @@ function DonePill({ onClick }: { onClick: () => void }) {
   return (
     <button
       type="button"
-      onClick={onClick}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
       style={{
         marginTop: 8,
         background: 'rgba(255,255,255,0.08)',

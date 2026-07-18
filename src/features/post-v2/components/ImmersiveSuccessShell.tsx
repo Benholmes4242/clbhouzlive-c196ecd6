@@ -23,7 +23,6 @@ interface Props {
 }
 
 export function ImmersiveSuccessShell({ onTapClose, showTapHint, padded = true, children }: Props) {
-  const stop = (e: React.MouseEvent | React.TouchEvent) => e.stopPropagation();
 
   // Full-bleed into the notch: transparent shield + white status-bar icons for
   // the dark overlay. Mirrors FullscreenFeedOverlay. useLayoutEffect so the
@@ -60,8 +59,6 @@ export function ImmersiveSuccessShell({ onTapClose, showTapHint, padded = true, 
       }}
     >
       <div
-        onClick={onTapClose ? stop : undefined}
-        onTouchStart={onTapClose ? stop : undefined}
         style={{
           flex: 1,
           display: 'flex',
