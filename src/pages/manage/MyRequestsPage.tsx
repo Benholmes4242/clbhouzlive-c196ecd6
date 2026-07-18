@@ -34,7 +34,31 @@ function relTime(iso: string): string {
 export default function MyRequestsPage() {
   const navigate = useNavigate();
   const { data, isLoading } = useMyRequestsList();
+  const hide = useHideMyRequest();
   const tickets = data ?? [];
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+  const confirmTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => () => {
+    if (confirmTimer.current) clearTimeout(confirmTimer.current);
+  }, []);
+
+  const handleRemoveClick = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (confirmId !== id) {
+      setConfirmId(id);
+      if (confirmTimer.current) clearTimeout(confirmTimer.current);
+      confirmTimer.current = setTimeout(() => setConfirmId((cur) => (cur === id ? null : cur)), 3000);
+      return;
+    }
+    if (confirmTimer.current) clearTimeout(confirmTimer.current);
+    setConfirmId(null);
+    hide.mutate(id, {
+      onSuccess: () => toast.success('Request removed'),
+      onError: () => toast.error("Couldn't remove. Try again."),
+    });
+  };
 
   return (
     <ManagePageShell title="My requests">
