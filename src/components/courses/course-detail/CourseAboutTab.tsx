@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { ExternalLink, Pencil, BookOpen, BarChart3, MapPin, Quote } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import AboutMediaStrip from './AboutMediaStrip';
+import NearbySection from './NearbySection';
 import { useCourseCoordinates } from '@/hooks/useCourseCoordinates';
 import { LocationMapCard } from '@/components/map';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
