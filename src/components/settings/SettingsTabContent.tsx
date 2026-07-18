@@ -122,8 +122,13 @@ export function SettingsTabContent() {
   if (sessionLoading || loading || !profile) return <SettingsSkeleton />;
 
   const p = profile as any;
-  const handicapSuffix = p?.eg_handicap_index != null
-    ? ` \u00B7 ${formatHcp(p.eg_handicap_index)} hcp`
+  const resolvedHcp = resolveDisplayHandicap({
+    egHandicapIndex: p?.eg_handicap_index ?? null,
+    manualHandicapIndex: p?.manual_handicap_index ?? null,
+    hasWhsConnection: !!whsConnection,
+  });
+  const handicapSuffix = resolvedHcp.value != null
+    ? ` \u00B7 ${formatHcp(resolvedHcp.value)} hcp`
     : '';
 
   const whsSubtitle = whsConnection
