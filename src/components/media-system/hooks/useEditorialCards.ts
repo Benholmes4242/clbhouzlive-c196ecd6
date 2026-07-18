@@ -365,7 +365,7 @@ export function useEditorialCards(userId: string | undefined): EditorialCards {
                 displayName: profile?.display_name ?? 'Golfer',
                 username: profile?.username ?? null,
                 avatarUrl: profile?.profile_photo_url ?? null,
-                handicap: profile?.eg_handicap_index ?? null,
+                handicap: profile?.eg_handicap_index ?? profile?.manual_handicap_index ?? null,
                 reviewCount: reviewCount ?? 0,
                 isVerified: profile?.is_verified_golfer ?? false,
               },
