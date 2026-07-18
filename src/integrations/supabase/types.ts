@@ -12719,6 +12719,7 @@ export type Database = {
           has_seen_creator_welcome: boolean | null
           has_seen_watch_longpress_tip: boolean
           header_photo_url: string | null
+          hide_handicap_chip: boolean
           home_club: string | null
           home_club_business_id: string | null
           home_club_id: string | null
@@ -12842,6 +12843,7 @@ export type Database = {
           has_seen_creator_welcome?: boolean | null
           has_seen_watch_longpress_tip?: boolean
           header_photo_url?: string | null
+          hide_handicap_chip?: boolean
           home_club?: string | null
           home_club_business_id?: string | null
           home_club_id?: string | null
@@ -12965,6 +12967,7 @@ export type Database = {
           has_seen_creator_welcome?: boolean | null
           has_seen_watch_longpress_tip?: boolean
           header_photo_url?: string | null
+          hide_handicap_chip?: boolean
           home_club?: string | null
           home_club_business_id?: string | null
           home_club_id?: string | null

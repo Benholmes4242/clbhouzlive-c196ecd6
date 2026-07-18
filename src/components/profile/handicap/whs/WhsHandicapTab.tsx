@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWhsConnection } from '@/lib/whs/hooks';
+import { useDeclineHandicapChip } from '@/lib/whs/useDeclineHandicapChip';
 import WhsConnectScreen from './WhsConnectScreen';
 import HandicapDashboard from './HandicapDashboard';
 
@@ -26,6 +27,7 @@ const SkeletonView = () => (
 export const WhsHandicapTab: React.FC<Props> = ({ userId, ownerFirstName = null }) => {
   const navigate = useNavigate();
   const { data: connection, isLoading, refetch } = useWhsConnection(userId);
+  const declineHandicapChip = useDeclineHandicapChip();
 
   if (isLoading) return <SkeletonView />;
 
@@ -46,6 +48,7 @@ export const WhsHandicapTab: React.FC<Props> = ({ userId, ownerFirstName = null 
           }
         }}
         onSkip={() => navigate(-1)}
+        onDecline={declineHandicapChip}
       />
     );
   }

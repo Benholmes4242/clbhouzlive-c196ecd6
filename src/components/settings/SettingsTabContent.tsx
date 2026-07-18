@@ -13,6 +13,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePrivacySettings } from '@/hooks/usePrivacySettings';
 import { useDeleteAccount } from '@/hooks/useDeleteAccount';
 import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from '@/lib/toast';
 import {
   SettingsSection,
   SettingsChevronRow,
@@ -79,6 +81,29 @@ export function SettingsTabContent() {
   const { logout } = useLogout();
   const [signOutOpen, setSignOutOpen] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
+
+  const queryClient = useQueryClient();
+  const hideHandicapChip = !!(profile as any)?.hide_handicap_chip;
+  const [chipUpdating, setChipUpdating] = useState(false);
+  const handleToggleHandicapChip = async (nextChecked: boolean) => {
+    if (!user?.id || chipUpdating) return;
+    const nextHidden = !nextChecked; // toggle shows chip when ON
+    setChipUpdating(true);
+    try {
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({ hide_handicap_chip: nextHidden })
+        .eq('id', user.id);
+      if (error) throw error;
+      queryClient.invalidateQueries({ queryKey: ['user-profile', user.id] });
+      queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
+    } catch (e) {
+      console.error('[settings] hide_handicap_chip update failed', e);
+      toast.error('Could not update. Please try again.');
+    } finally {
+      setChipUpdating(false);
+    }
+  };
 
   const handleConfirmSignOut = async () => {
     if (signingOut) return;
@@ -168,6 +193,15 @@ export function SettingsTabContent() {
             checked={privacy.isPublic}
             disabled={privacy.isUpdatingPrivacy}
             onCheckedChange={privacy.togglePublic}
+          />
+          <SettingsToggleRow
+            icon={<Eye size={18} />}
+            title="Handicap button"
+            subtitle="Show the Connect HCP button in your header"
+            iconTheme="privacy"
+            checked={!hideHandicapChip}
+            disabled={chipUpdating}
+            onCheckedChange={handleToggleHandicapChip}
           />
           <SettingsLevelRow
             icon={<Shield size={18} />}

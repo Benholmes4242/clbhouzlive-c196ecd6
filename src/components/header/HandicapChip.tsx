@@ -15,6 +15,7 @@ import { TrendingDown, TrendingUp } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection, useHandicapTrend } from '@/lib/whs/hooks';
 import { useHandicapTrend90d, type HandicapTrend90dDirection } from '@/hooks/useHandicapTrend90d';
+import { useUserProfile } from '@/hooks/useUserProfile';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 const WHITE = '#FFFFFF';
@@ -69,6 +70,7 @@ export function HandicapChip({ light = false, pill = false }: { light?: boolean;
   const { data: connection, isLoading: whsLoading } = useWhsConnection(user?.id);
   const { data: trendData } = useHandicapTrend(connection?.id);
   const trend = useHandicapTrend90d(connection?.id);
+  const { data: profile } = useUserProfile(user?.id);
 
   // Theme-aware tokens
   const INK = light ? DARK_INK : WHITE;
@@ -86,6 +88,10 @@ export function HandicapChip({ light = false, pill = false }: { light?: boolean;
     : { ...BASE_STYLE, border: `1px solid ${HAIRLINE}`, filter: shadow };
 
   if (!user) return null;
+
+  // User-controlled visibility — Settings toggle is the single source of truth.
+  // Hides the chip in every state (disconnected, skeleton, connected).
+  if (profile?.hide_handicap_chip) return null;
 
   // Skeleton — reserves space to prevent layout shift on initial load.
   if (whsLoading) {

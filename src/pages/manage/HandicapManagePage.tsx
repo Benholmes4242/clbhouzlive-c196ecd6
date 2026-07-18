@@ -13,6 +13,7 @@ import { WhsConnectScreen } from '@/components/profile/handicap/whs/WhsConnectSc
 import { bodyNameForProvider } from '@/lib/whs/whsCountries';
 import DisconnectConfirmSheet from '@/components/settings/sheets/DisconnectConfirmSheet';
 import DeleteAllDataConfirmSheet from '@/components/settings/sheets/DeleteAllDataConfirmSheet';
+import { useDeclineHandicapChip } from '@/lib/whs/useDeclineHandicapChip';
 
 const INK = '#0F172A';
 const INK_45 = '#64748B';
@@ -33,6 +34,7 @@ export default function HandicapManagePage() {
   const [confirmDisconnect, setConfirmDisconnect] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [isWorking, setIsWorking] = useState(false);
+  const declineHandicapChip = useDeclineHandicapChip();
 
   const invalidateAll = (conn?: WhsConnection | null) => {
     const c = conn ?? connection;
@@ -102,6 +104,7 @@ export default function HandicapManagePage() {
               navigate('/handicap', { replace: true });
             }}
             onSkip={() => { /* stay on page */ }}
+            onDecline={declineHandicapChip}
           />
         )}
       </div>

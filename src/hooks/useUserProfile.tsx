@@ -57,6 +57,8 @@ export interface UserProfile {
   websites?: string[] | null;
   // Notification tracking
   last_notifications_seen_at?: string | null;
+  // Header chip visibility
+  hide_handicap_chip?: boolean | null;
 }
 
 /**

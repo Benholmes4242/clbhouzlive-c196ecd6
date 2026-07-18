@@ -4,6 +4,9 @@ import { callConnectWhs } from '@/lib/whs/api';
 import type { ConnectWhsSuccess } from '@/lib/whs/types';
 import { useSelectedCountry } from '@/lib/whs/useSelectedCountry';
 import type { WhsCountry } from '@/lib/whs/whsCountries';
+import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import EmptyStateScreen from './connect/EmptyStateScreen';
 import CountryPickerSheet from './connect/CountryPickerSheet';
 import EnglandGolfForm from './connect/EnglandGolfForm';
@@ -24,11 +27,14 @@ const ERROR_MESSAGES: Record<string, string> = {
 interface Props {
   onConnected: () => void | Promise<void>;
   onSkip?: () => void;
+  onDecline?: () => void;
 }
 
-export const WhsConnectScreen: React.FC<Props> = ({ onConnected, onSkip }) => {
+export const WhsConnectScreen: React.FC<Props> = ({ onConnected, onSkip, onDecline }) => {
   const { country, setCountryId } = useSelectedCountry();
   const location = useLocation();
+  const { user } = useSupabaseSession();
+  const queryClient = useQueryClient();
   const [pickerOpen, setPickerOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -60,6 +66,19 @@ export const WhsConnectScreen: React.FC<Props> = ({ onConnected, onSkip }) => {
         const code = data.error_code ?? 'internal_error';
         setError(ERROR_MESSAGES[code] ?? data.message ?? ERROR_MESSAGES.internal_error);
         return;
+      }
+      // Auto-restore: connected users have earned the live index chip.
+      if (user?.id) {
+        try {
+          await supabase
+            .from('user_profiles')
+            .update({ hide_handicap_chip: false })
+            .eq('id', user.id);
+          queryClient.invalidateQueries({ queryKey: ['user-profile', user.id] });
+          queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
+        } catch (e) {
+          console.warn('[WhsConnectScreen] failed to clear hide_handicap_chip:', e);
+        }
       }
       setSuccessData(data);
     } catch (err) {
@@ -93,7 +112,7 @@ export const WhsConnectScreen: React.FC<Props> = ({ onConnected, onSkip }) => {
   if (!country) {
     return (
       <>
-        <EmptyStateScreen onPickCountry={() => setPickerOpen(true)} />
+        <EmptyStateScreen onPickCountry={() => setPickerOpen(true)} onDecline={onDecline} />
         <CountryPickerSheet
           open={pickerOpen}
           onClose={() => setPickerOpen(false)}

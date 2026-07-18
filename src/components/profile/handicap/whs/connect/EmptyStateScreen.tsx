@@ -12,9 +12,10 @@ const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 interface Props {
   onPickCountry: () => void;
+  onDecline?: () => void;
 }
 
-export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry }) => {
+export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline }) => {
   return (
     <div
       style={{
@@ -129,6 +130,54 @@ export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry }) => {
         </div>
         <ChevronRight size={20} color={INK_30} strokeWidth={2} />
       </button>
+
+      {onDecline && (
+        <div
+          style={{
+            width: '100%',
+            marginTop: 16,
+            paddingTop: 14,
+            borderTop: '1px solid rgba(15,23,42,0.06)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            textAlign: 'center',
+          }}
+        >
+          <button
+            type="button"
+            onClick={onDecline}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              padding: 0,
+              minHeight: 44,
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontFamily: FONT,
+              fontSize: 13.5,
+              fontWeight: 600,
+              color: '#475569',
+              cursor: 'pointer',
+            }}
+          >
+            I don't track a handicap
+          </button>
+          <div
+            style={{
+              fontFamily: FONT,
+              fontSize: 11.5,
+              color: '#94A3B8',
+              lineHeight: 1.45,
+              maxWidth: 260,
+              marginTop: 2,
+            }}
+          >
+            Hides the Connect HCP button from your header. Turn it back on anytime in Settings.
+          </div>
+        </div>
+      )}
     </div>
   );
 };
