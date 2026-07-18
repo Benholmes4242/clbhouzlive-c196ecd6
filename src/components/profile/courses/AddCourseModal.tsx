@@ -42,7 +42,6 @@ const INK = '#0F172A';
 const INK_SOFT = '#475569';
 const INK_SUBTLE = '#94A3B8';
 const AMBER = '#F7931E';
-const AMBER_DEEP = '#c97a10';
 const AMBER_WASH = 'rgba(247,147,30,0.08)';
 const AMBER_BORDER = 'rgba(247,147,30,0.30)';
 const BORDER = 'rgba(15,23,42,0.07)';
@@ -151,7 +150,7 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
         <div style={{
           fontSize: 16,
           fontWeight: 900,
-          color: isPodium ? AMBER_DEEP : INK_SUBTLE,
+          color: isPodium ? AMBER : INK_SUBTLE,
           letterSpacing: '-0.03em',
           fontVariantNumeric: 'tabular-nums',
           lineHeight: 1.3,
@@ -409,7 +408,7 @@ const CourseRow: React.FC<CourseRowProps> = ({
         border: `1px solid ${isAtLimit ? BORDER : isSecondary ? BORDER : AMBER_BORDER}`,
         borderRadius: 10,
         cursor: isAtLimit ? 'not-allowed' : 'pointer',
-        color: isAtLimit ? INK_SUBTLE : isSecondary ? INK_SOFT : AMBER_DEEP,
+        color: isAtLimit ? INK_SUBTLE : isSecondary ? INK_SOFT : AMBER,
         padding: 0,
         flexShrink: 0,
       }}
@@ -621,7 +620,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
             fontWeight: 600,
             color: INK_SUBTLE,
           }}>
-            <span style={{ color: AMBER_DEEP, fontWeight: 700 }}>10 / 10 list complete</span>
+            <span style={{ color: AMBER, fontWeight: 700 }}>10 / 10 list complete</span>
             <span style={{ color: '#CBD5E1' }}>·</span>
             <span>Remove one to add another</span>
           </div>
@@ -835,7 +834,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                           background: '#FFFFFF',
                           border: `1px solid ${AMBER_BORDER}`,
                           borderRadius: 10,
-                          color: AMBER_DEEP,
+                          color: AMBER,
                           fontSize: 13,
                           fontWeight: 700,
                           cursor: 'pointer',
@@ -857,7 +856,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                           borderRadius: 10,
                           border: `1px solid ${AMBER_BORDER}`,
                           background: '#FFFFFF',
-                          color: AMBER_DEEP,
+                          color: AMBER,
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
