@@ -770,11 +770,6 @@ const ProfilePageV2Content: React.FC = () => {
           <h1 className="text-[28px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.03em' }}>
             {displayName}
           </h1>
-          {profileMedals != null && profileMedals > 0 ? (
-            <span style={{ display: 'inline-flex', alignItems: 'center', marginLeft: 6 }}>
-              <TierGem medals={profileMedals} size="md" />
-            </span>
-          ) : null}
         </div>
       </div>
 
