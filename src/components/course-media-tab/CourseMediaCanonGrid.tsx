@@ -33,7 +33,6 @@ import { EmptyStateGuide } from '@/components/ui/EmptyStateGuide';
 import {
   AMBER,
   HAIRLINE_INK_7,
-  HAIRLINE_INK_10,
   INK,
   INK_FAINT,
 } from '@/features/courses/_shared/tokens';
