@@ -90,6 +90,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
   const [addOpen, setAddOpen] = useState(false);
   const [rowMenu, setRowMenu] = useState<string | null>(null);
   const [confirmLeave, setConfirmLeave] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [busy, setBusy] = useState(false);
 
   const invalidateAll = useCallback(() => {
