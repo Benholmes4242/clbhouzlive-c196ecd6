@@ -647,6 +647,19 @@
       },
       "winners": {
         "title": "The winners' circle"
+      },
+      "titles": {
+        "earnings": "The money list",
+        "drive_avg": "Driving distance",
+        "drive_acc": "Driving accuracy",
+        "gir_pct": "Greens in regulation",
+        "sand_saves_pct": "Sand saves",
+        "strokes_gained_tee_green": "Strokes gained tee to green",
+        "strokes_gained_putting": "Strokes gained putting",
+        "scoring_avg": "Scoring average",
+        "putt_avg": "Putting average",
+        "wins": "Most wins",
+        "top_10": "Most top tens"
       }
     }
   },

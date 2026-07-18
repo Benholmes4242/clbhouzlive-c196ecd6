@@ -647,6 +647,19 @@
       },
       "winners": {
         "title": "The winners' circle"
+      },
+      "titles": {
+        "earnings": "賞金ランキング",
+        "drive_avg": "ドライビングディスタンス",
+        "drive_acc": "フェアウェイキープ率",
+        "gir_pct": "パーオン率",
+        "sand_saves_pct": "サンドセーブ率",
+        "strokes_gained_tee_green": "ストロークスゲインド ティーtoグリーン",
+        "strokes_gained_putting": "ストロークスゲインド パッティング",
+        "scoring_avg": "平均ストローク",
+        "putt_avg": "平均パット数",
+        "wins": "最多優勝",
+        "top_10": "最多トップ10"
       }
     }
   },
