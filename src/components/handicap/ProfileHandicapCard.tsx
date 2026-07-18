@@ -17,6 +17,8 @@ import {
   useHandicapHistory,
 } from '@/lib/whs/hooks';
 import { useHandicapTrend12mo } from '@/hooks/useHandicapTrend12mo';
+import { useUserProfile } from '@/hooks/useUserProfile';
+import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import TrophyRoomEntryRow from '@/components/profile/handicap/whs/sections/TrophyRoomEntryRow';
 
 import { analyticsEvents } from '@/utils/analyticsEvents';
