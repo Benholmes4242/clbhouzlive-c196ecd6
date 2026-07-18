@@ -1,8 +1,10 @@
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { formatRelativeAgoLong } from '@/i18n/format';
-import { LifeBuoy, ChevronRight } from 'lucide-react';
+import { LifeBuoy, ChevronRight, Trash2 } from 'lucide-react';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
-import { useMyRequestsList, type MyRequestStatus } from '@/hooks/useMyRequests';
+import { useMyRequestsList, useHideMyRequest, type MyRequestStatus } from '@/hooks/useMyRequests';
 
 const INK = '#0F172A';
 const INK_55 = '#64748B';
