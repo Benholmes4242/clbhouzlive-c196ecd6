@@ -68,7 +68,6 @@ import {
 } from '@/components/business/editor/editorTypes';
 
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
-import { useHideHeader } from '@/hooks/useHeaderVisibility';
 
 import type { Database } from '@/integrations/supabase/types';
 
@@ -90,7 +89,6 @@ export default function BusinessProfileEditor() {
   const { user, loading: authLoading } = useSupabaseSession();
 
   useHideBottomNav();
-  useHideHeader();
 
   /* ── edit-mode data load ────────────────────────────── */
   const { data: business, isLoading: businessLoading, error: businessError } =
@@ -710,7 +708,7 @@ export default function BusinessProfileEditor() {
       <ManagePageShell
         title={mode === 'create' ? 'Create a business' : 'Edit business'}
         onBack={handleClose}
-        offsetForChrome
+       
       >
         <div className="flex-1 overflow-y-auto" style={{ background: BIZ.pageBg }}>
 

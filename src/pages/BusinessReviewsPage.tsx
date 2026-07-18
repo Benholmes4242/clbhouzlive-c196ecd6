@@ -10,7 +10,6 @@ import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
-import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import { toast } from '@/lib/toast';
@@ -414,7 +413,6 @@ function ReviewCard({
 export default function BusinessReviewsPage() {
   const { id: businessId } = useParams<{ id: string }>();
   useHideBottomNav();
-  useHideHeader();
 
   const { session } = useSupabaseSession();
   const currentUserId = session?.user?.id;
@@ -444,7 +442,7 @@ export default function BusinessReviewsPage() {
   // Brands / coaches / retailers without a claimed club have no course_ratings to show.
   if (!profileLoading && businessProfile && !businessProfile.club_id) {
     return (
-      <ManagePageShell title="Reviews" offsetForChrome>
+      <ManagePageShell title="Reviews">
         <main className="px-4 pt-16 pb-22 max-w-lg mx-auto text-center">
           <div
             className="mx-auto mb-4 flex items-center justify-center"
@@ -466,7 +464,7 @@ export default function BusinessReviewsPage() {
   const showEmpty = !isLoading && (summary?.count ?? 0) === 0;
 
   return (
-    <ManagePageShell title="Reviews" offsetForChrome>
+    <ManagePageShell title="Reviews">
       <main className="px-4 pt-4 pb-22 max-w-lg mx-auto">
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
           {/* SUMMARY */}

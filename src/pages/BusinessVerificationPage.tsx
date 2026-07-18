@@ -11,7 +11,6 @@ import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
-import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import {
   useBusinessVerificationRealtime,
   useVerificationNotificationsRealtime,
@@ -29,7 +28,6 @@ export default function BusinessVerificationPage() {
   const { user } = useSupabaseSession();
 
   useHideBottomNav();
-  useHideHeader();
   useBusinessVerificationRealtime(id);
   useVerificationNotificationsRealtime(user?.id);
 
@@ -72,7 +70,7 @@ export default function BusinessVerificationPage() {
     state === 'pending' && !!request?.requires_domain_check && !request?.domain_confirmed;
 
   return (
-    <ManagePageShell title="Verification" offsetForChrome>
+    <ManagePageShell title="Verification">
       <main className="px-4 py-6 max-w-lg mx-auto" style={{ paddingBottom: 140 }}>
 
         {isLoading ? (

@@ -135,7 +135,7 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   { match: { prefix: '/privacy' },                spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { prefix: '/terms' },                  spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { prefix: '/businesses/manage' },      spec: { chrome: 'none', tone: 'light', bleed: false } },
-  { match: { prefix: '/business/create' },        spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/businesses/manage' }, tone: 'light', bleed: false, note: 'business create wizard' } },
+  { match: { prefix: '/business/create' },        spec: { chrome: 'none', tone: 'light', bleed: false, note: 'business create wizard - shell owns chrome' } },
   { match: { prefix: '/business/invite/accept' }, spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { prefix: '/i/' },                     spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { prefix: '/rate-course-v2/' },        spec: { chrome: 'none', tone: 'light', bleed: false } },
@@ -166,7 +166,7 @@ export const CHROME_REGISTRY: ChromeRule[] = [
       test: (p) =>
         /^\/business\/[^/]+\/(verification|edit|insights|team|activity|reviews)(\/.*)?$/.test(p),
     },
-    spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/businesses/manage' }, tone: 'light', bleed: false, note: 'managed business subpages' },
+    spec: { chrome: 'none', tone: 'light', bleed: false, note: 'managed business subpages - shell owns chrome' },
   },
 
 

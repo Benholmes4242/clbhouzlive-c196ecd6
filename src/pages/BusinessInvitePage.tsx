@@ -7,7 +7,6 @@ import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
-import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import {
   useCreateInvite, useCreateInviteByUser,
   AssignableBusinessRole, BUSINESS_ROLE_LABELS,
@@ -40,7 +39,6 @@ export default function BusinessInvitePage() {
   const navigate = useNavigate();
 
   useHideBottomNav();
-  useHideHeader();
 
   const createEmailInvite = useCreateInvite(businessId || '');
   const createUserInvite = useCreateInviteByUser(businessId || '');
@@ -102,7 +100,7 @@ export default function BusinessInvitePage() {
   const pending = createEmailInvite.isPending || createUserInvite.isPending;
 
   return (
-    <ManagePageShell title="Invite to team" offsetForChrome>
+    <ManagePageShell title="Invite to team">
       <main className="px-4 pt-4 pb-22 max-w-lg mx-auto">
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
           <p className="text-[13px] leading-relaxed mb-5" style={{ color: INK_45 }}>

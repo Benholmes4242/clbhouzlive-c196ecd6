@@ -22,7 +22,6 @@ import {
 } from '@/hooks/useBusinessTeam';
 import { AccessRequestsSection } from '@/components/business/AccessRequestsSection';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
-import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 const INK = '#0F172A';
@@ -64,7 +63,6 @@ export default function BusinessTeamPage() {
   const navigate = useNavigate();
 
   useHideBottomNav();
-  useHideHeader();
 
   const { data: membership } = useBusinessMembership(businessId);
   const { data: business } = useBusinessProfile(businessId);
@@ -179,7 +177,7 @@ export default function BusinessTeamPage() {
   };
 
   return (
-    <ManagePageShell title="Manage team" offsetForChrome>
+    <ManagePageShell title="Manage team">
       <main className="px-4 pt-4 pb-22 max-w-lg mx-auto">
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
           <p className="text-[13px] leading-relaxed mb-4" style={{ color: INK_45 }}>
