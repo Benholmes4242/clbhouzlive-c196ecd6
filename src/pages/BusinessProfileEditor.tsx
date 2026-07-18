@@ -710,7 +710,7 @@ export default function BusinessProfileEditor() {
       <ManagePageShell
         title={mode === 'create' ? 'Create a business' : 'Edit business'}
         onBack={handleClose}
-        offsetForChrome
+       
       >
         <div className="flex-1 overflow-y-auto" style={{ background: BIZ.pageBg }}>
 

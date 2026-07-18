@@ -72,7 +72,7 @@ export default function BusinessVerificationPage() {
     state === 'pending' && !!request?.requires_domain_check && !request?.domain_confirmed;
 
   return (
-    <ManagePageShell title="Verification" offsetForChrome>
+    <ManagePageShell title="Verification">
       <main className="px-4 py-6 max-w-lg mx-auto" style={{ paddingBottom: 140 }}>
 
         {isLoading ? (
