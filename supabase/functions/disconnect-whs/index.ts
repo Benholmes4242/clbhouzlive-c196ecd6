@@ -83,6 +83,18 @@ Deno.serve(async (req) => {
     }
   }
 
+  // Clear the stale WHS-owned index so display resolvers fall back to the
+  // user's manual handicap (if any) and never show a phantom WHS number.
+  try {
+    await admin
+      .from("user_profiles")
+      .update({ eg_handicap_index: null })
+      .eq("id", user.id);
+  } catch (err) {
+    console.error("[disconnect-whs] clear eg_handicap_index failed (non-fatal):", err);
+  }
+
+
   return new Response(JSON.stringify({
     ok: true,
     message: "Disconnected — your historical data is kept. Reconnect any time to resume syncing.",
