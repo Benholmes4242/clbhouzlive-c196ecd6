@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CoursesPageHero from './CoursesPageHero';
@@ -52,7 +53,7 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
 
   if (!open) return null;
 
-  return (
+  return createPortal(
     <>
       {/* Backdrop */}
       <div
@@ -81,7 +82,7 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
         </div>
 
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px 12px', borderBottom: `0.5px solid ${HAIRLINE_INK_7}` }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px 12px' }}>
           <div>
             <SectionHeader tier="standard" kicker="Rate a Course" tone="amber" className="mb-0.5" />
             <p style={{ fontSize: 12, color: INK_MUTE, margin: 0 }}>{t('rateSheet.subtitle')}</p>
@@ -92,7 +93,7 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
         </div>
 
         {/* Search input */}
-        <div style={{ padding: '0 16px 12px', position: 'relative' }}>
+        <div style={{ padding: '2px 16px 12px', position: 'relative' }}>
           <Search size={15} style={{ position: 'absolute', left: 28, top: 11, color: 'hsl(var(--muted-foreground))' }} />
           <input
             type="text"
@@ -156,7 +157,8 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
           )}
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 }
 
