@@ -263,7 +263,7 @@ export function SettingsTabContent() {
           <SettingsChevronRow
             icon={<UserPlus size={18} />}
             title="Invite friends"
-            subtitle="Share your link \u2014 golf's better with your circle"
+            subtitle={"Share your link \u2014 golf's better with your circle"}
             iconTheme="account"
             onClick={() => openInviteSheet('settings')}
           />
