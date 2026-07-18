@@ -52,13 +52,8 @@ const CACHE_TTL_SINGLE_MS = 7 * 24 * 60 * 60 * 1000;
 const CACHE_TTL_DUAL_MS   = 7 * 24 * 60 * 60 * 1000;
 const CACHE_TTL_FULL_MS   = 6 * 60 * 60 * 1000;
 
-// ─── CORS ────────────────────────────────────────────────────────────────
-const sseHeaders = {
-  ...corsHeaders,
-  "Content-Type": "text/event-stream",
-  "Cache-Control": "no-cache",
-  "Connection": "keep-alive",
-};
+
+
 
 // ─── Utility ─────────────────────────────────────────────────────────────
 async function withTimeout<T>(p: Promise<T>, ms = 20000): Promise<T> {
