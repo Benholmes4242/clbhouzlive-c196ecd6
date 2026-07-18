@@ -145,7 +145,7 @@ export default function SocialListPage({
         minHeight: '100dvh',
         background: BG,
         fontFamily: FONT,
-        paddingTop: 'var(--header-h, 0px)',
+        paddingTop: 'calc(var(--chrome-total-h, 0px) + 8px)',
         paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 96px)',
       }}
     >
