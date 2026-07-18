@@ -23,7 +23,7 @@ import { ChampionsUnclaimedCard } from './drilldown/ChampionsUnclaimedCard';
 import { FullCourseLeaderboardSheet } from './drilldown/FullCourseLeaderboardSheet';
 import { FullCourseLeaderboardSheetDispatch } from './drilldown/FullCourseLeaderboardSheetDispatch';
 import { WindowToggle } from './CourseLegendsSection';
-import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHandicapCue';
+
 import { ChampionsCourseSearch } from './drilldown/ChampionsCourseSearch';
 import { ChampionsInfoCarousel } from './drilldown/ChampionsInfoCarousel';
 import { formatGapFromChampion } from './drilldown/_shared/helpers';
