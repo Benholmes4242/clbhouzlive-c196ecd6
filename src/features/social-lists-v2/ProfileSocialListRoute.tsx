@@ -25,6 +25,8 @@ export default function ProfileSocialListRoute({ direction }: Props) {
   const initialTab: 'followers' | 'following' =
     searchTab === 'followers' || searchTab === 'following' ? searchTab : direction;
   const { data: profile, isLoading } = useUserByUsername(username);
+  const { user: viewer } = useSupabaseSession();
+  const isOwnProfile = !!viewer?.id && !!profile?.id && viewer.id === profile.id;
 
   useEffect(() => {
     if (profile?.id) {
