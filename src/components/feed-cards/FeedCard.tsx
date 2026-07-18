@@ -126,7 +126,7 @@ export function FeedCard({
 
   const handlePress = () => {
     openWithOrigin({
-      openedFrom: 'watch',
+      openedFrom,
       posts,
       index: flatIndex,
       originEl: rootRef.current as HTMLElement | null,
@@ -134,6 +134,7 @@ export function FeedCard({
       railOwnerKey: ownerKey,
     });
   };
+
 
   return (
     <Pressable
