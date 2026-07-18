@@ -171,6 +171,8 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
     ? Math.max(0, nextLevel.medalsRequired - medals)
     : 0;
 
+  if (profile?.hide_handicap_chip) return null;
+
   const onOpen = () => {
     if (isSignedInUnsynced) {
       navigate('/handicap');
