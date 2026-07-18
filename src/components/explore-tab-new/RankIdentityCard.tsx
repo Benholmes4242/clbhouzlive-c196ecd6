@@ -121,6 +121,7 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
     maxRank: 1,
   });
   const { data: globalRank } = useGlobalMedalRank(effectiveUserId);
+  const hemi = useViewerHemisphere();
 
   const items = useMemo(() => {
     const a = badges.map(normalizeBadge);
