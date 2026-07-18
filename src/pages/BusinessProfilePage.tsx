@@ -327,8 +327,8 @@ const BusinessProfilePage: React.FC = () => {
 
   const heroUrl = business.cover_image_url || '';
   const bioText = business.description || '';
-  const initials = business.name
-    ?.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase() || 'B';
+  const avatarInitials = getInitialsFromName(business.name) || 'B';
+  const avatarFallbackKey = business.id || business.name || 'business';
 
   const subtitleText = buildCategoryLocation(
     business.category, business.country, business.region, business.city
