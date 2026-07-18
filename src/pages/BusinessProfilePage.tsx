@@ -625,7 +625,7 @@ const BusinessProfilePage: React.FC = () => {
               const q = business.location
                 ? encodeURIComponent(business.location)
                 : `${business.lat},${business.lng}`;
-              openExternalUrl(`https://www.google.com/maps/search/?api=1&query=${q}`);
+              openExternalUrl(`https://www.google.com/maps/search/?api=1&query=${q}`, 'external');
             },
           },
           email: {
