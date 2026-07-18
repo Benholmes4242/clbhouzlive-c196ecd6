@@ -559,6 +559,8 @@ const ProfilePageV2Content: React.FC = () => {
   if (!user) return null;
 
   const displayName = profile?.display_name || 'Golfer';
+  const avatarInitials = getInitialsFromName(displayName) || '?';
+  const avatarFallbackKey = profile?.id || displayName || 'user';
   const username = profile?.username || 'user';
   const heroUrl = profile?.header_photo_url || profile?.profile_photo_url || '';
   const websites = profile?.websites || [];
