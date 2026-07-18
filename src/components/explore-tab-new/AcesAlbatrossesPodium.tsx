@@ -18,7 +18,6 @@ const BAND_BG = 'rgba(15,23,42,0.035)';
 const PAGE_PAD = 14;
 
 const MAX_ROWS = 5;
-const MIN_ROWS = 2;
 const CELL_MIN_H = 52;
 
 function formatHolderName(raw?: string | null): string {
