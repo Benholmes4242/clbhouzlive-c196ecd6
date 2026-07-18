@@ -250,10 +250,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
     if (!actor) return;
     try {
       setBusy(true);
-      const { error } = await (supabase.rpc as unknown as (
-        fn: string,
-        args: Record<string, unknown>,
-      ) => Promise<{ error: { message: string } | null }>)('msg_delete_group', {
+      const { error } = await supabase.rpc('msg_delete_group', {
         p_conversation_id: conversationId,
         p_as_actor_type: actor.actorType,
         p_as_actor_id: actor.actorId,
