@@ -231,32 +231,9 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
           <PrimaryAmberCTA
             onClick={() => courseId && navigate(`/courses/${courseId}/rate`)}
             leadingIcon={<Camera size={15} strokeWidth={2} />}
-            style={{ marginBottom: 12 }}
           >
             {t('courses:media.shareExperience')}
           </PrimaryAmberCTA>
-          <button
-            type="button"
-            onClick={() => navigate('/share')}
-            style={{
-              width: '100%',
-              padding: '12px 0',
-              borderRadius: 4,
-              background: 'transparent',
-              color: INK,
-              fontSize: 13,
-              fontWeight: 700,
-              border: `1.5px solid ${HAIRLINE_INK_10}`,
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 8,
-            }}
-          >
-            <Film size={15} strokeWidth={2} />
-            {t('courses:media.uploadVideo')}
-          </button>
         </div>
 
         <div style={{ height: '0.5px', background: HAIRLINE_INK_7, margin: '0 16px 16px' }} />
