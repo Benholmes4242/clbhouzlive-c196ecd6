@@ -589,20 +589,38 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                 disabled={busy}
               />
               {isGroup ? (
-                <ActionRow
-                  icon={<LogOut size={20} color={DANGER} />}
-                  label={confirmLeave ? 'Tap again to confirm' : 'Leave group'}
-                  onClick={() => {
-                    if (!confirmLeave) {
-                      setConfirmLeave(true);
-                      setTimeout(() => setConfirmLeave(false), 3000);
-                      return;
-                    }
-                    void handleLeave();
-                  }}
-                  disabled={busy}
-                  danger
-                />
+                <>
+                  <ActionRow
+                    icon={<LogOut size={20} color={DANGER} />}
+                    label={confirmLeave ? 'Tap again to confirm' : 'Leave group'}
+                    onClick={() => {
+                      if (!confirmLeave) {
+                        setConfirmLeave(true);
+                        setTimeout(() => setConfirmLeave(false), 3000);
+                        return;
+                      }
+                      void handleLeave();
+                    }}
+                    disabled={busy}
+                    danger
+                  />
+                  {isAdmin ? (
+                    <ActionRow
+                      icon={<Trash2 size={20} color={DANGER} />}
+                      label={confirmDelete ? 'Tap again to confirm' : 'Delete group'}
+                      onClick={() => {
+                        if (!confirmDelete) {
+                          setConfirmDelete(true);
+                          setTimeout(() => setConfirmDelete(false), 3000);
+                          return;
+                        }
+                        void handleDeleteGroup();
+                      }}
+                      disabled={busy}
+                      danger
+                    />
+                  ) : null}
+                </>
               ) : (
                 <ActionRow
                   icon={<Trash2 size={20} color={DANGER} />}
