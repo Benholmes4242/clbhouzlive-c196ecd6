@@ -20,6 +20,7 @@ import HcpStrip from './components/HcpStrip';
 import QuickActionsRow from './components/QuickActionsRow';
 import SheetNavGroup from './components/SheetNavGroup';
 import SignOutRow from './components/SignOutRow';
+import { useInviteSheet } from '@/hooks/useInviteSheet';
 
 interface Profile {
   id: string;
