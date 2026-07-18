@@ -17,8 +17,6 @@ interface Props {
   onBack?: () => void;
   /** Renders inside the sticky header, below the title row. */
   belowTitle?: React.ReactNode;
-  /** When true, offset the header for chrome-v2 islands (managed business subpages). */
-  offsetForChrome?: boolean;
 }
 
 /**
@@ -32,7 +30,7 @@ interface Props {
  * on top of that. Do NOT snapshot safe-area here — it would double the
  * inset and open a visible gap under the notch on device.
  */
-export function ManagePageShell({ title, children, right, onBack, belowTitle, offsetForChrome = false }: Props) {
+export function ManagePageShell({ title, children, right, onBack, belowTitle }: Props) {
   const navigate = useNavigate();
   const handleBack = () => (onBack ? onBack() : navigate(-1));
 
@@ -48,7 +46,7 @@ export function ManagePageShell({ title, children, right, onBack, belowTitle, of
         >
           <div
             className="flex items-center justify-between px-4"
-            style={{ paddingTop: offsetForChrome ? 'calc(var(--chrome-total-h, 0px) + 8px)' : 8, paddingBottom: belowTitle ? 8 : 12, minHeight: 56 }}
+            style={{ paddingTop: 8, paddingBottom: belowTitle ? 8 : 12, minHeight: 56 }}
           >
             <div className="flex items-center gap-3 flex-1 min-w-0">
               <button
