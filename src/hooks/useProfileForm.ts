@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { ProfileFormData, ClubEntry } from '@/components/profile/profile-wizard/types';
 import { nanoid } from 'nanoid';
 import { formHcpFromDb } from '@/lib/formatHcp';
+import { supabase } from '@/integrations/supabase/client';
 
 function makeInitial(profile: any): ProfileFormData {
   const social = profile?.social_links ?? {};
