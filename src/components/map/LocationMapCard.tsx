@@ -125,6 +125,7 @@ export const LocationMapCard: React.FC<LocationMapCardProps> = ({
         name={name}
         locationText={locationText}
         colorful={colorful}
+        nearby={nearby}
       />
     </>
   );
