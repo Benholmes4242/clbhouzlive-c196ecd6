@@ -2,12 +2,12 @@
  * CourseStatusToggle - Equal-width pill buttons for course status
  */
 import React from 'react';
-import { useTranslation, Trans } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { Loader2, Star, Check, Bookmark } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useCoursePersonalStatus } from '@/hooks/useCoursePersonalStatus';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from '@/lib/toast';
 
@@ -63,7 +63,7 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
 
   const isPlayed = status.status === 'played';
   const isWantToPlay = status.status === 'want_to_play';
-  const hasNoSelection = status.status === 'none';
+  
 
   return (
     <div className={cn('space-y-3', className)}>
@@ -191,18 +191,6 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
         </button>
       )}
 
-      {/* Footnote — only when nothing marked yet */}
-      {hasNoSelection && (
-        <p style={{ fontSize: 11, color: '#94A3B8', lineHeight: 1.5, margin: '4px 0 0' }}>
-          <Trans
-            i18nKey="phase5.statusToggle.mapHint"
-            ns="courses"
-            components={{
-              mapLink: <Link to="/map" style={{ color: '#64748B', textDecoration: 'underline', textUnderlineOffset: 2 }} />,
-            }}
-          />
-        </p>
-      )}
     </div>
   );
 };

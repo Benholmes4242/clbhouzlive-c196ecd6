@@ -237,7 +237,7 @@ const PostV2Page = lazy(() => import("./features/post-v2/PostV2Page"));
 const UserCoursesPage = lazy(() => import("./pages/UserCoursesPage"));
 
 const JourneyListPage = lazy(() => import("./pages/JourneyListPage"));
-const MapPage = lazy(() => import("./pages/MapPage"));
+
 const News = lazy(() => import("./pages/News"));
 
 
@@ -486,7 +486,7 @@ function AppRoutes() {
         <Route path="/user/:username/courses" element={<Suspense fallback={<CoursesListSkeleton />}><UserCoursesPage /></Suspense>} />
         
         <Route path="/journey" element={<Suspense fallback={<CoursesListSkeleton />}><JourneyListPage /></Suspense>} />
-        <Route path="/map" element={<Suspense fallback={<GenericPageSkeleton />}><MapPage /></Suspense>} />
+        
         <Route path="/friends-activity" element={<Navigate to="/courses" replace />} />
         <Route path="/news" element={<Suspense fallback={<GenericPageSkeleton />}><News /></Suspense>} />
         
