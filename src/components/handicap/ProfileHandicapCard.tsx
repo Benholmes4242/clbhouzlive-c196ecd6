@@ -11,14 +11,13 @@
 
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trophy } from 'lucide-react';
 import {
   useWhsConnection,
   useHandicapTrend,
   useHandicapHistory,
 } from '@/lib/whs/hooks';
 import { useHandicapTrend12mo } from '@/hooks/useHandicapTrend12mo';
-import { useUserAchievements } from '@/hooks/gam/useUserAchievements';
+import TrophyRoomEntryRow from '@/components/profile/handicap/whs/sections/TrophyRoomEntryRow';
 
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
