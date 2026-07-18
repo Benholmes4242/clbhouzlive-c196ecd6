@@ -76,8 +76,7 @@ export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => 
           padding: '12px 14px',
           background: SURFACE,
           border: `1px solid ${HAIRLINE_INK_8}`,
-          borderLeft: `3px solid ${AMBER}`,
-          borderRadius: 10,
+          borderRadius: 12,
           cursor: 'pointer',
           textAlign: 'left',
           fontFamily: FONT,
@@ -87,7 +86,7 @@ export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => 
           style={{
             width: 32,
             height: 32,
-            borderRadius: 8,
+            borderRadius: 10,
             background: 'rgba(247,147,30,0.10)',
             display: 'grid',
             placeItems: 'center',
@@ -119,6 +118,7 @@ export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => 
       </button>
     );
   }
+
 
   // Holes + Champions: amber card
   return (
