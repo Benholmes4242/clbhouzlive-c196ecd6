@@ -263,7 +263,7 @@ export default function SocialListPage({
         ) : (
           <>
             {showPending && pending.length > 0 && (
-              <Section eyebrow={`PENDING · ${pending.length}`} eyebrowColor={AMBER_DEEP}>
+              <Section eyebrow={`PENDING · ${pending.length}`} eyebrowColor={BRAND_AMBER}>
                 {pending.map((r) => (
                   <PendingRow key={rowKey(r)} row={r} viewerUserId={viewer?.id} />
                 ))}
