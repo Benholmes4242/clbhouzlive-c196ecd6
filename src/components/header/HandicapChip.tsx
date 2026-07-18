@@ -161,14 +161,20 @@ export function HandicapChip({ light = false, pill = false }: { light?: boolean;
     return disconnectedPill;
   }
 
-  const indexValue = trendData?.current ?? null;
+  const resolved = resolveDisplayHandicap({
+    egHandicapIndex: (profile as any)?.eg_handicap_index,
+    manualHandicapIndex: (profile as any)?.manual_handicap_index,
+    hasWhsConnection: !!connection,
+  });
+  const indexValue = resolved.value;
   if (indexValue === null) {
-    // Connection exists but no current index — fall back to Connect WHS.
+    // No handicap of any kind — fall back to Connect WHS.
     return disconnectedPill;
   }
 
+  const isManual = resolved.source === 'manual';
   const { direction } = trend;
-  const showArrow = direction === 'improving' || direction === 'drifting';
+  const showArrow = !isManual && (direction === 'improving' || direction === 'drifting');
   const arrowColor = direction === 'improving' ? SEASON_GREEN : CRIMSON;
   const ArrowIcon = direction === 'improving' ? TrendingDown : TrendingUp;
 
