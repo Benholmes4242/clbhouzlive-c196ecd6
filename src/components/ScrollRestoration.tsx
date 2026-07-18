@@ -3,7 +3,7 @@
  * Restores scroll position when returning to a list/feed
  */
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useLocation, useNavigationType } from 'react-router-dom';
 import { getPageScrollTop, getPrimaryScrollElement, scrollPageTo, scrollPageToTop } from '@/lib/getScrollParent';
 
@@ -12,6 +12,7 @@ export const scrollPositions = new Map<string, number>();
 export const ScrollRestoration = () => {
   const location = useLocation();
   const navigationType = useNavigationType();
+  const prevPathnameRef = useRef<string | null>(null);
 
   // Save current scroll position before leaving
   useEffect(() => {
@@ -28,9 +29,14 @@ export const ScrollRestoration = () => {
   // Restore or reset scroll based on navigation type
   useEffect(() => {
     const isCourseDetail = /^\/courses\/[^/]+$/.test(location.pathname);
-    if (isCourseDetail) return;
+    if (isCourseDetail) {
+      prevPathnameRef.current = location.pathname;
+      return;
+    }
 
     const currentPath = location.pathname + location.search;
+    const pathnameChanged = prevPathnameRef.current !== location.pathname;
+    prevPathnameRef.current = location.pathname;
 
     if (navigationType === 'POP') {
       // Back/forward — restore saved position
@@ -48,8 +54,9 @@ export const ScrollRestoration = () => {
         }, 100);
         return () => clearTimeout(timeoutId);
       }
-    } else {
-      // PUSH or REPLACE — clear stale position and scroll to top
+    } else if (pathnameChanged) {
+      // PUSH or REPLACE with a new pathname — clear stale position and scroll to top.
+      // Same-pathname query-only updates (e.g. tab switches) preserve scroll.
       scrollPositions.delete(currentPath);
       scrollPageToTop('instant');
     }

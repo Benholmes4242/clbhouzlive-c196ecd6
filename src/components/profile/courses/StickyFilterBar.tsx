@@ -51,7 +51,7 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
 
   return (
     <div className="space-y-3">
-      {/* Primary tab row — dark INK underline (matches course detail media tabs) */}
+      {/* Primary tab row — canonical charcoal chips */}
       <div
         role="tablist"
         aria-label="Course list filter"
@@ -68,46 +68,44 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
             <button
               key={key}
               role="tab"
+              aria-pressed={isActive}
               aria-selected={isActive}
               onClick={() => onTabChange(key)}
               style={{
-                flex: '0 0 auto',
-                height: 44,
-                padding: '0 8px',
-                borderRadius: 0,
-                border: 'none',
-                background: 'transparent',
-                color: isActive ? '#0F172A' : '#94A3B8',
-                fontFamily: 'inherit',
-                fontSize: 14,
-                fontWeight: isActive ? 700 : 600,
-                letterSpacing: '-0.005em',
-                whiteSpace: 'nowrap',
+                flexShrink: 0,
                 cursor: 'pointer',
+                fontWeight: 600,
+                fontSize: 12.5,
+                padding: '7px 14px',
+                borderRadius: 999,
+                background: isActive ? '#15171F' : '#fff',
+                color: isActive ? '#fff' : '#0F172A',
+                border: isActive ? 'none' : '1px solid rgba(0,0,0,0.07)',
+                fontFamily: 'inherit',
+                whiteSpace: 'nowrap',
                 display: 'inline-flex',
                 alignItems: 'center',
-                position: 'relative',
-                transition: 'color 0.15s',
+                gap: 6,
               }}
             >
-              <span
-                style={{
-                  display: 'inline-block',
-                  paddingBottom: 4,
-                  borderBottom: isActive ? '1.5px solid #0F172A' : '1.5px solid transparent',
-                }}
-              >
-                {label}
-                {count > 0 && (
-                  <span style={{ marginLeft: 6, fontSize: 12, fontWeight: 600, color: '#94A3B8' }}>
-                    {count}
-                  </span>
-                )}
-              </span>
+              {label}
+              {count > 0 && (
+                <span
+                  style={{
+                    fontSize: 11.5,
+                    fontWeight: 600,
+                    color: isActive ? 'rgba(255,255,255,0.65)' : '#94A3B8',
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
+                  {count}
+                </span>
+              )}
             </button>
           );
         })}
       </div>
+
 
       {/* Controls: region pills + sort on a single row */}
       <div className="flex items-center gap-3 pt-2">

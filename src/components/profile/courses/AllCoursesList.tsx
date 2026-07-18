@@ -7,8 +7,8 @@ import { TieredCourseCard, CourseCardData } from './TieredCourseCard';
 import { StickyFilterBar, CoursePrimaryTab, CourseSortOption } from './StickyFilterBar';
 import { type QuickRegion } from '@/components/leaderboard/courses/CourseRegionPills';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ClipboardList, History } from 'lucide-react';
-import { SectionHeader } from '@/components/ui/SectionHeader';
+import { ChevronDown, ClipboardList } from 'lucide-react';
+
 import { compareOwnRatings } from '@/lib/sortCoursesByRating';
 import DossierCard from './DossierCard';
 import BreakdownsPrompt from './BreakdownsPrompt';
@@ -315,14 +315,9 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
     );
   }
 
-  const ownerSubtitle = isOwnProfile ? 'Your full course history' : `${firstName || "Their"}\u2019s full course history`;
-
   return (
-    <div ref={sectionRef} className="py-4">
-      {/* Section header — amber eyebrow with icon (matches Courses Discover) */}
-      <div className="px-2.5">
-        <SectionHeader role="section" kicker="COURSE HISTORY" sub={ownerSubtitle} />
-      </div>
+    <div ref={sectionRef} className="pt-1 pb-4">
+
 
 
       {/* Filter bar */}
