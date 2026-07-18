@@ -15,6 +15,7 @@ interface Props {
   onChange: (value: PhoneValue | null) => void;
   className?: string;
   disabled?: boolean;
+  defaultCountryIso?: string | null;
 }
 
 const sanitizePhoneNumber = (v: string) => v.replace(/[^\d\s\-]/g, '');
@@ -25,6 +26,7 @@ export const PhoneInputWithDialCode: React.FC<Props> = ({
   onChange,
   className,
   disabled = false,
+  defaultCountryIso,
 }) => {
   const dialCode = value?.dialCode || '';
   const localNumber = value?.localNumber || '';
@@ -65,6 +67,15 @@ export const PhoneInputWithDialCode: React.FC<Props> = ({
     if (open && searchRef.current) searchRef.current.focus();
   }, [open]);
 
+  useEffect(() => {
+    if (!defaultCountryIso) return;
+    if (dialCode) return;
+    if (localNumber) return;
+    const found = COUNTRIES.find(c => c.code === defaultCountryIso);
+    if (!found) return;
+    onChange({ dialCode: found.dialCode, localNumber: '', fullNumber: '' });
+  }, [defaultCountryIso]);
+
   const setDial = (newDialCode: string) => {
     const stripped = stripToDigits(localNumber);
     onChange({
@@ -88,7 +99,7 @@ export const PhoneInputWithDialCode: React.FC<Props> = ({
 
   return (
     <div className={cn('flex gap-2', className)}>
-      <div ref={wrapRef} className="relative">
+      <div ref={wrapRef} className="relative shrink-0">
         <button
           type="button"
           disabled={disabled}
@@ -111,7 +122,7 @@ export const PhoneInputWithDialCode: React.FC<Props> = ({
             />
           )}
           <span
-            className="text-[13px] tabular-nums"
+            className="text-[13px] tabular-nums whitespace-nowrap"
             style={{ color: dialCode ? '#0F172A' : '#94A3B8' }}
           >
             {dialCode || '+--'}
@@ -174,7 +185,7 @@ export const PhoneInputWithDialCode: React.FC<Props> = ({
         onChange={setLocal}
         placeholder="Phone number"
         disabled={disabled}
-        className="flex-1 h-11 rounded-[10px] px-3.5 text-[15px] focus:outline-none focus:ring-2 focus:ring-[rgba(15,23,42,0.20)]"
+        className="flex-1 min-w-0 h-11 rounded-[10px] px-3.5 text-[15px] focus:outline-none focus:ring-2 focus:ring-[rgba(15,23,42,0.20)]"
         style={{
           background: '#F8FAFC',
           border: '1px solid rgba(15,23,42,0.08)',
