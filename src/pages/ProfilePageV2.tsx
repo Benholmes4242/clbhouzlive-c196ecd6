@@ -44,6 +44,10 @@ import { CoverPhotoFallback } from '@/components/ui/CoverPhotoFallback';
 // FloatingPageHeader removed (H3) — chrome now driven by ChromeIsland registry.
 import { useSetChromeLeftOverride } from '@/features/chrome-v2/leftOverride';
 import { FilterChips } from '@/components/ui/FilterChips';
+import { useWhsConnection } from '@/lib/whs/hooks';
+import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
+import { openExternalUrl } from '@/utils/median/openExternalUrl';
+import { Instagram, Twitter, Youtube, Globe } from 'lucide-react';
 
 
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
