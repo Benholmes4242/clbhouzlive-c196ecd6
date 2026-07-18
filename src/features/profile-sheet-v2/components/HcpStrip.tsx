@@ -3,7 +3,7 @@
  *
  * Slim tappable handicap strip. Two states:
  *   - Connected: HCP eyebrow + index + trend arrow + rounds-90d + chevron
- *   - Disconnected: HCP eyebrow + "Connect England Golf" + chevron
+ *   - Disconnected: HCP eyebrow + "Connect official WHS handicap" + chevron
  * Hidden for business actors. Both states tap to /handicap.
  *
  * rounds-90d is computed locally by scanning useAllScores by play_date,
@@ -90,7 +90,7 @@ export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
       <div onClick={() => onNavigate('/handicap')} role="button" tabIndex={0} style={stripBase}>
         {eyebrow}
         <span style={{ fontWeight: 600, fontSize: 13, color: INK }}>
-          Connect England Golf
+          Connect official WHS handicap
         </span>
         {chevron}
       </div>
