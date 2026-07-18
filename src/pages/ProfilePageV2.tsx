@@ -744,7 +744,7 @@ const ProfilePageV2Content: React.FC = () => {
       {/* HCP pill — lifted OUT of hero wrapper to escape its z-index:1 stacking context.
           Rendered as a PageRoot-level sibling at z-30 so it sits above the Identity Stack
           (z-10) which would otherwise absorb taps in the overlap band. Same top math. */}
-      {profile?.eg_handicap_index != null && (
+      {resolvedHcp.value != null && (
         <div className="absolute right-5 z-30 flex items-center gap-2 pointer-events-auto" style={{ top: 'calc(35dvh + 12px)' }}>
           <button
             type="button"
