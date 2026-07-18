@@ -765,7 +765,7 @@ const ProfilePageV2Content: React.FC = () => {
               cursor: 'pointer',
             }}
           >
-            <span>HCP {formatHandicap(profile.eg_handicap_index)}</span>
+            <span>HCP {formatHandicap(resolvedHcp.value)}</span>
             <ChevronRight size={14} strokeWidth={2.4} style={{ color: '#64748B' }} />
           </button>
         </div>
