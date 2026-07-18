@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
@@ -42,6 +42,7 @@ export function useMyRequestsList() {
         .from('support_tickets')
         .select('id, user_id, category, subject, status, last_sender, last_message_at, created_at')
         .eq('user_id', uid)
+        .is('user_hidden_at', null)
         .order('last_message_at', { ascending: false })
         .limit(200);
       if (error) throw error;
@@ -118,4 +119,35 @@ export function useMyRequestReply() {
       qc.invalidateQueries({ queryKey: [...MY_REQUESTS_KEY, uid] }),
     ]);
   };
+}
+
+export function useHideMyRequest() {
+  const qc = useQueryClient();
+  const { user } = useSupabaseSession();
+  const uid = user?.id ?? null;
+  return useMutation({
+    mutationFn: async (ticketId: string) => {
+      const sb: any = supabase;
+      const { error } = await sb
+        .from('support_tickets')
+        .update({ user_hidden_at: new Date().toISOString() })
+        .eq('id', ticketId);
+      if (error) throw error;
+    },
+    onMutate: async (ticketId: string) => {
+      const key = [...MY_REQUESTS_KEY, uid];
+      await qc.cancelQueries({ queryKey: key });
+      const prev = qc.getQueryData<MyRequestTicket[]>(key);
+      if (prev) {
+        qc.setQueryData<MyRequestTicket[]>(key, prev.filter((t) => t.id !== ticketId));
+      }
+      return { prev, key };
+    },
+    onError: (_err, _id, ctx) => {
+      if (ctx?.prev && ctx?.key) qc.setQueryData(ctx.key, ctx.prev);
+    },
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: [...MY_REQUESTS_KEY, uid] });
+    },
+  });
 }

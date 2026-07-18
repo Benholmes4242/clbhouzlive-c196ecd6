@@ -1,8 +1,10 @@
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { formatRelativeAgoLong } from '@/i18n/format';
-import { LifeBuoy, ChevronRight } from 'lucide-react';
+import { LifeBuoy, ChevronRight, Trash2 } from 'lucide-react';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
-import { useMyRequestsList, type MyRequestStatus } from '@/hooks/useMyRequests';
+import { useMyRequestsList, useHideMyRequest, type MyRequestStatus } from '@/hooks/useMyRequests';
 
 const INK = '#0F172A';
 const INK_55 = '#64748B';
@@ -32,7 +34,31 @@ function relTime(iso: string): string {
 export default function MyRequestsPage() {
   const navigate = useNavigate();
   const { data, isLoading } = useMyRequestsList();
+  const hide = useHideMyRequest();
   const tickets = data ?? [];
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+  const confirmTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => () => {
+    if (confirmTimer.current) clearTimeout(confirmTimer.current);
+  }, []);
+
+  const handleRemoveClick = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (confirmId !== id) {
+      setConfirmId(id);
+      if (confirmTimer.current) clearTimeout(confirmTimer.current);
+      confirmTimer.current = setTimeout(() => setConfirmId((cur) => (cur === id ? null : cur)), 3000);
+      return;
+    }
+    if (confirmTimer.current) clearTimeout(confirmTimer.current);
+    setConfirmId(null);
+    hide.mutate(id, {
+      onSuccess: () => toast.success('Request removed'),
+      onError: () => toast.error("Couldn't remove. Try again."),
+    });
+  };
 
   return (
     <ManagePageShell title="My requests">
@@ -75,12 +101,20 @@ export default function MyRequestsPage() {
               const status = statusStyle(t.status);
               const cat = CATEGORY_LABELS[t.category] ?? t.category;
               const unread = t.last_sender === 'admin';
+              const confirming = confirmId === t.id;
               return (
-                <button
+                <div
                   key={t.id}
-                  type="button"
+                  role="button"
+                  tabIndex={0}
                   onClick={() => navigate(`/support/thread/${t.id}`)}
-                  className="w-full text-left flex items-start gap-3 px-4 py-3"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      navigate(`/support/thread/${t.id}`);
+                    }
+                  }}
+                  className="w-full text-left flex items-start gap-3 px-4 py-3 cursor-pointer"
                   style={{ borderTop: i === 0 ? 'none' : `0.5px solid ${HAIR}` }}
                 >
                   <div className="mt-1.5 shrink-0" style={{ width: 8, height: 8 }}>
@@ -126,8 +160,22 @@ export default function MyRequestsPage() {
                       Updated {relTime(t.last_message_at)}
                     </div>
                   </div>
-                  <ChevronRight size={16} className="shrink-0 mt-3" style={{ color: INK_55 }} />
-                </button>
+                  <div className="flex items-center gap-1 shrink-0 mt-1.5">
+                    <button
+                      type="button"
+                      onClick={(e) => handleRemoveClick(e, t.id)}
+                      aria-label={confirming ? 'Confirm remove request' : 'Remove request'}
+                      className="min-h-[32px] px-2 rounded-md text-[11px] font-semibold inline-flex items-center gap-1"
+                      style={{
+                        color: confirming ? '#B45309' : INK_55,
+                        background: confirming ? 'rgba(245,158,11,0.12)' : 'transparent',
+                      }}
+                    >
+                      {confirming ? 'Remove?' : <Trash2 size={16} />}
+                    </button>
+                    <ChevronRight size={16} style={{ color: INK_55 }} />
+                  </div>
+                </div>
               );
             })}
           </div>
