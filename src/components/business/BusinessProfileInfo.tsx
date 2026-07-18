@@ -1,12 +1,22 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
-  Phone, Mail, Globe, MapPin, Clock, Check, ArrowUpRight,
+  Phone, Mail, Globe, MapPin, Clock, Check, ArrowUpRight, Flag,
 } from 'lucide-react';
 import { SiInstagram, SiX, SiFacebook, SiTiktok, SiYoutube } from 'react-icons/si';
 import { BusinessProfile } from '@/hooks/useBusinessProfile';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { openExternalUrl } from '@/utils/median/openExternalUrl';
 import { trackBusinessAction } from '@/lib/businessAnalyticsTracking';
+import { useNearestCourse } from '@/hooks/useNearestCourse';
+import { formatDistanceKm } from '@/utils/formatDistance';
+
+const HOSPITALITY_CATEGORIES = new Set<string>([
+  'Hotel / Accommodation',
+  'Restaurant / Cafe',
+  'Bar / Pub',
+  'Resort',
+]);
 
 interface BusinessProfileInfoProps {
   business: BusinessProfile;
@@ -174,8 +184,19 @@ function ensureProtocol(url: string): string {
 
 /* ── Main ── */
 export function BusinessProfileInfo({ business, userId }: BusinessProfileInfoProps) {
+  const navigate = useNavigate();
   const amenities = Array.isArray(business.amenities) ? business.amenities.filter(Boolean) : [];
   const hasAmenities = amenities.length > 0;
+
+  // Reverse link: hospitality businesses near a course get a "Near {course}" row.
+  const isHospitality = !!business.category && HOSPITALITY_CATEGORIES.has(business.category);
+  const hasCoords =
+    business.lat != null && business.lng != null &&
+    Number.isFinite(business.lat) && Number.isFinite(business.lng);
+  const { data: nearestCourse } = useNearestCourse(
+    isHospitality && hasCoords ? business.lat : null,
+    isHospitality && hasCoords ? business.lng : null,
+  );
 
   const contactHandlers = {
     website: () => {
@@ -282,6 +303,19 @@ export function BusinessProfileInfo({ business, userId }: BusinessProfileInfoPro
                   Get directions
                   <ArrowUpRight className="h-3.5 w-3.5 opacity-70" style={{ color: INK_45 }} />
                 </button>
+                {isHospitality && hasCoords && nearestCourse && (
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/courses/${nearestCourse.id}`)}
+                    className="mt-1 min-h-[44px] flex items-center gap-2 active:scale-[0.97] transition-transform"
+                  >
+                    <Flag className="h-3.5 w-3.5 shrink-0" style={{ color: INK_45 }} strokeWidth={2} />
+                    <span className="text-[13px]" style={{ color: INK }}>
+                      <span className="font-semibold">Near {nearestCourse.name}</span>
+                      <span style={{ color: INK_45 }}> · {formatDistanceKm(nearestCourse.distance_km)}</span>
+                    </span>
+                  </button>
+                )}
               </div>
             </div>
           </section>

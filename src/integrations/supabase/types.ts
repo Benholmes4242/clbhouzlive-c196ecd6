@@ -17892,6 +17892,14 @@ export type Database = {
           thumbnail_image: string
         }[]
       }
+      get_nearest_golf_club: {
+        Args: { p_lat: number; p_lng: number; p_max_km?: number }
+        Returns: {
+          distance_km: number
+          id: string
+          name: string
+        }[]
+      }
       get_notable_difficult_courses: {
         Args: { p_limit?: number; p_min_rounds?: number }
         Returns: {

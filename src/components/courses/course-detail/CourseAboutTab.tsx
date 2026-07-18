@@ -9,6 +9,7 @@ import AboutMediaStrip from './AboutMediaStrip';
 import NearbySection from './NearbySection';
 import { useCourseCoordinates } from '@/hooks/useCourseCoordinates';
 import { LocationMapCard } from '@/components/map';
+import { useNearbyBusinesses } from '@/hooks/useNearbyBusinesses';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { useCourseRatingDistribution } from '@/hooks/useCourseRatingDistribution';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -95,6 +96,26 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
     subCountry: course.sub_country,
     region: course.region,
   });
+
+  // Shared cached query — NearbySection uses the same params, so no extra fetch.
+  const nearbyLat = coords?.lat ?? course.latitude;
+  const nearbyLng = coords?.lng ?? course.longitude;
+  const { data: nearbyBusinesses } = useNearbyBusinesses(nearbyLat, nearbyLng);
+  const nearbyPins = React.useMemo(
+    () =>
+      (nearbyBusinesses ?? [])
+        .filter((b) => Number.isFinite(b.lat) && Number.isFinite(b.lng))
+        .map((b) => ({
+          id: b.id,
+          name: b.name,
+          slug: b.slug,
+          lat: b.lat,
+          lng: b.lng,
+          category: b.category,
+        })),
+    [nearbyBusinesses],
+  );
+
 
   const { data: ratingAggregates } = useCourseRatingAggregates(course.id);
   const { data: distribution } = useCourseRatingDistribution(course.id);
@@ -266,6 +287,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
               name={course.name}
               locationText={formatCourseLocation(course)}
               colorful
+              nearby={nearbyPins}
             />
           )}
           {!coords && !coordsLoading && (

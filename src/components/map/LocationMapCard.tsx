@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { MapPin, Navigation } from 'lucide-react';
 import { MapPreview } from './MapPreview';
-import { MapExpandedView } from './MapExpandedView';
+import { MapExpandedView, type MapExpandedViewNearbyPin } from './MapExpandedView';
 
 interface LocationMapCardProps {
   lat: number | null | undefined;
@@ -10,6 +10,7 @@ interface LocationMapCardProps {
   locationText: string;
   showOwnerPrompt?: boolean;
   colorful?: boolean;
+  nearby?: MapExpandedViewNearbyPin[];
 }
 
 /**
@@ -23,6 +24,7 @@ export const LocationMapCard: React.FC<LocationMapCardProps> = ({
   locationText,
   showOwnerPrompt = false,
   colorful = false,
+  nearby,
 }) => {
   const [expanded, setExpanded] = useState(false);
 
@@ -123,6 +125,7 @@ export const LocationMapCard: React.FC<LocationMapCardProps> = ({
         name={name}
         locationText={locationText}
         colorful={colorful}
+        nearby={nearby}
       />
     </>
   );
