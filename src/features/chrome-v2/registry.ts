@@ -164,9 +164,9 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   {
     match: {
       test: (p) =>
-        /^\/business\/[^/]+\/(verification|edit|insights|team|activity)(\/.*)?$/.test(p),
+        /^\/business\/[^/]+\/(verification|edit|insights|team|activity|reviews)(\/.*)?$/.test(p),
     },
-    spec: { chrome: 'none', tone: 'light', bleed: false },
+    spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/businesses/manage' }, tone: 'light', bleed: false, note: 'managed business subpages' },
   },
 
 
