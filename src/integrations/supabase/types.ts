@@ -20685,6 +20685,14 @@ export type Database = {
         Args: { _host_id: string; _viewer_id: string }
         Returns: boolean
       }
+      whs_connection_publicly_visible: {
+        Args: { p_connection_id: string }
+        Returns: boolean
+      }
+      whs_score_publicly_visible: {
+        Args: { p_score_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       admin_role: "none" | "moderator" | "limited" | "full"
