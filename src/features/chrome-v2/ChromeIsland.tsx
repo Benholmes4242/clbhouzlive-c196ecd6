@@ -36,6 +36,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useActorUnreadCounts } from '@/hooks/useActorUnreadCounts';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useUserProfile } from '@/hooks/useUserProfile';
 import { useWhsConnection, useHandicapTrend } from '@/lib/whs/hooks';
 import { useHandicapTrend90d } from '@/hooks/useHandicapTrend90d';
 import { safeGoBack } from '@/utils/navigation';
@@ -192,6 +193,7 @@ const HcpCell: React.FC<{ tone: ChromeTone }> = ({ tone }) => {
   const { user } = useSupabaseSession();
   const { activeActor } = useActiveActor();
   const isBusinessActor = activeActor?.type === 'business';
+  const { profile } = useUserProfile(user?.id);
 
   const { data: connection, isLoading: whsLoading } = useWhsConnection(user?.id);
   const { data: trendData } = useHandicapTrend(connection?.id);
@@ -199,6 +201,7 @@ const HcpCell: React.FC<{ tone: ChromeTone }> = ({ tone }) => {
 
   if (!user) return null;
   if (isBusinessActor) return null;
+  if (profile?.hide_handicap_chip) return null;
 
   if (whsLoading) {
     return (
