@@ -47,7 +47,7 @@ import { FilterChips } from '@/components/ui/FilterChips';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import { openExternalUrl } from '@/utils/median/openExternalUrl';
-import { Instagram, Twitter, Youtube, Globe } from 'lucide-react';
+import { SiInstagram, SiX, SiTiktok, SiYoutube } from 'react-icons/si';
 
 
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
@@ -1215,19 +1215,19 @@ const ProfilePageV2Content: React.FC = () => {
           const links: Array<{ key: string; url: string; icon: React.ReactNode; label: string }> = [];
           if (p.instagram_handle) {
             const h = String(p.instagram_handle).replace(/^@/, '').trim();
-            if (h) links.push({ key: 'ig', url: `https://instagram.com/${h}`, icon: <Instagram className="w-4 h-4" />, label: `Instagram @${h}` });
+            if (h) links.push({ key: 'ig', url: `https://instagram.com/${h}`, icon: <SiInstagram className="w-4 h-4" />, label: `Instagram @${h}` });
           }
           if (p.twitter_handle) {
             const h = String(p.twitter_handle).replace(/^@/, '').trim();
-            if (h) links.push({ key: 'x', url: `https://x.com/${h}`, icon: <Twitter className="w-4 h-4" />, label: `X @${h}` });
+            if (h) links.push({ key: 'x', url: `https://x.com/${h}`, icon: <SiX className="w-4 h-4" />, label: `X @${h}` });
           }
           if (p.tiktok_handle) {
             const h = String(p.tiktok_handle).replace(/^@/, '').trim();
-            if (h) links.push({ key: 'tt', url: `https://tiktok.com/@${h}`, icon: <Globe className="w-4 h-4" />, label: `TikTok @${h}` });
+            if (h) links.push({ key: 'tt', url: `https://tiktok.com/@${h}`, icon: <SiTiktok className="w-4 h-4" />, label: `TikTok @${h}` });
           }
           if (p.youtube_handle) {
             const h = String(p.youtube_handle).replace(/^@/, '').trim();
-            if (h) links.push({ key: 'yt', url: `https://youtube.com/@${h}`, icon: <Youtube className="w-4 h-4" />, label: `YouTube @${h}` });
+            if (h) links.push({ key: 'yt', url: `https://youtube.com/@${h}`, icon: <SiYoutube className="w-4 h-4" />, label: `YouTube @${h}` });
           }
           if (links.length === 0) return null;
           return (
