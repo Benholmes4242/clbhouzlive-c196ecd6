@@ -103,7 +103,6 @@ export default function HandicapManagePage() {
               invalidateAll();
               navigate('/handicap', { replace: true });
             }}
-            onSkip={() => { /* stay on page */ }}
             onDecline={declineHandicapChip}
           />
         )}

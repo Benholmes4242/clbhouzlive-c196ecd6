@@ -57,7 +57,6 @@ export const WhsHandicapTab: React.FC<Props> = ({ userId, ownerFirstName = null 
             res = await refetch();
           }
         }}
-        onSkip={() => navigate(-1)}
         onDecline={declineHandicapChip}
       />
     );
