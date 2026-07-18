@@ -7,6 +7,8 @@ import { gamAchievementsBus } from '../events';
 import { useUserAchievements } from '@/hooks/gam/useUserAchievements';
 import { useUserTopLegends } from '@/hooks/gam/useUserTopLegends';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useWhsConnection } from '@/lib/whs/hooks';
+import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import { TrophyCardHybrid } from './TrophyCardHybrid';
 import { renderBadgeIcon } from '../badgeIcons';
 import { TrophyDetailSheet } from './TrophyDetailSheet';
@@ -320,7 +322,12 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
   // for single_figures / scratch. Friend-view uses the owner's index (userId),
   // not the viewer's, so friend cards reflect the owner's live status.
   const { data: ownerProfile } = useUserProfile(open ? userId : undefined);
-  const currentIndex: number | null = ownerProfile?.eg_handicap_index ?? null;
+  const { data: ownerConnection } = useWhsConnection(open ? userId : undefined);
+  const currentIndex: number | null = resolveDisplayHandicap({
+    egHandicapIndex: (ownerProfile as any)?.eg_handicap_index ?? null,
+    manualHandicapIndex: (ownerProfile as any)?.manual_handicap_index ?? null,
+    hasWhsConnection: !!ownerConnection,
+  }).value;
 
   const achievementItems = useMemo(() => badges.map(normalizeBadge), [badges]);
   const legendItems = useMemo(() => legends.map(normalizeLegend), [legends]);

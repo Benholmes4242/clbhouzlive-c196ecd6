@@ -28,6 +28,7 @@ import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { quarterOf, daysLeft, seasonName } from '@/lib/gam/seasonClock';
 import { useViewerHemisphere } from '@/hooks/gam/useViewerHemisphere';
+import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 
 import { FONT } from './gamingLightTokens';
 
@@ -159,8 +160,13 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
 
   const displayName =
     profile?.display_name ?? profile?.username ?? 'Golfer';
-  const hcp = profile?.eg_handicap_index ?? null;
-  const hasHcp = !!connection && hcp != null;
+  const resolvedHcp = resolveDisplayHandicap({
+    egHandicapIndex: (profile as any)?.eg_handicap_index ?? null,
+    manualHandicapIndex: (profile as any)?.manual_handicap_index ?? null,
+    hasWhsConnection: !!connection,
+  });
+  const hcp = resolvedHcp.value;
+  const hasHcp = hcp != null;
 
   const material = currentLevel.material;
   const tierHex = MATERIAL_HEX[material] ?? '#12B784';

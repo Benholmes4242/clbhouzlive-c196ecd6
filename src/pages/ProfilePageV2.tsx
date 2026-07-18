@@ -44,6 +44,10 @@ import { CoverPhotoFallback } from '@/components/ui/CoverPhotoFallback';
 // FloatingPageHeader removed (H3) — chrome now driven by ChromeIsland registry.
 import { useSetChromeLeftOverride } from '@/features/chrome-v2/leftOverride';
 import { FilterChips } from '@/components/ui/FilterChips';
+import { useWhsConnection } from '@/lib/whs/hooks';
+import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
+import { openExternalUrl } from '@/utils/median/openExternalUrl';
+import { Instagram, Twitter, Youtube, Globe } from 'lucide-react';
 
 
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
@@ -456,6 +460,13 @@ const ProfilePageV2Content: React.FC = () => {
     }
   };
 
+  const { data: viewedWhsConnection } = useWhsConnection(profileUserId ?? undefined);
+  const resolvedHcp = resolveDisplayHandicap({
+    egHandicapIndex: (profile as any)?.eg_handicap_index ?? null,
+    manualHandicapIndex: (profile as any)?.manual_handicap_index ?? null,
+    hasWhsConnection: !!viewedWhsConnection,
+  });
+
   const formatHandicap = (hcp: number | null | undefined): string => {
     if (hcp == null) return '–';
     return hcp.toFixed(1);
@@ -574,7 +585,7 @@ const ProfilePageV2Content: React.FC = () => {
           <AchievementsPane 
             userId={profile?.id}
             userDisplayName={profile?.display_name || 'User'}
-            userHandicap={profile?.eg_handicap_index}
+            userHandicap={resolvedHcp.value}
             userProfilePhotoUrl={profile?.profile_photo_url}
             isCurrentUser={isSelf}
           />
@@ -733,7 +744,7 @@ const ProfilePageV2Content: React.FC = () => {
       {/* HCP pill — lifted OUT of hero wrapper to escape its z-index:1 stacking context.
           Rendered as a PageRoot-level sibling at z-30 so it sits above the Identity Stack
           (z-10) which would otherwise absorb taps in the overlap band. Same top math. */}
-      {profile?.eg_handicap_index != null && (
+      {resolvedHcp.value != null && (
         <div className="absolute right-5 z-30 flex items-center gap-2 pointer-events-auto" style={{ top: 'calc(35dvh + 12px)' }}>
           <button
             type="button"
@@ -754,7 +765,7 @@ const ProfilePageV2Content: React.FC = () => {
               cursor: 'pointer',
             }}
           >
-            <span>HCP {formatHandicap(profile.eg_handicap_index)}</span>
+            <span>HCP {formatHandicap(resolvedHcp.value)}</span>
             <ChevronRight size={14} strokeWidth={2.4} style={{ color: '#64748B' }} />
           </button>
         </div>
@@ -1197,6 +1208,48 @@ const ProfilePageV2Content: React.FC = () => {
             </div>
           </section>
         ) : null}
+
+        {/* Social handles row */}
+        {(() => {
+          const p: any = profile ?? {};
+          const links: Array<{ key: string; url: string; icon: React.ReactNode; label: string }> = [];
+          if (p.instagram_handle) {
+            const h = String(p.instagram_handle).replace(/^@/, '').trim();
+            if (h) links.push({ key: 'ig', url: `https://instagram.com/${h}`, icon: <Instagram className="w-4 h-4" />, label: `Instagram @${h}` });
+          }
+          if (p.twitter_handle) {
+            const h = String(p.twitter_handle).replace(/^@/, '').trim();
+            if (h) links.push({ key: 'x', url: `https://x.com/${h}`, icon: <Twitter className="w-4 h-4" />, label: `X @${h}` });
+          }
+          if (p.tiktok_handle) {
+            const h = String(p.tiktok_handle).replace(/^@/, '').trim();
+            if (h) links.push({ key: 'tt', url: `https://tiktok.com/@${h}`, icon: <Globe className="w-4 h-4" />, label: `TikTok @${h}` });
+          }
+          if (p.youtube_handle) {
+            const h = String(p.youtube_handle).replace(/^@/, '').trim();
+            if (h) links.push({ key: 'yt', url: `https://youtube.com/@${h}`, icon: <Youtube className="w-4 h-4" />, label: `YouTube @${h}` });
+          }
+          if (links.length === 0) return null;
+          return (
+            <section className="px-4 mb-4">
+              <div className="flex flex-wrap gap-2">
+                {links.map((l) => (
+                  <button
+                    key={l.key}
+                    type="button"
+                    aria-label={l.label}
+                    onClick={(e) => { e.preventDefault(); openExternalUrl(l.url); }}
+                    className="inline-flex items-center justify-center rounded-full min-h-[44px] min-w-[44px] text-[#64748B] hover:text-foreground transition-colors active:scale-[0.96]"
+                    style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
+                  >
+                    {l.icon}
+                  </button>
+                ))}
+              </div>
+            </section>
+          );
+        })()}
+
 
         {/* Handicap summary card — shown on personal profiles (own + friends) */}
         {isPersonal && profile?.id && user?.id && (

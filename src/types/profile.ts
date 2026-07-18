@@ -32,13 +32,20 @@ export interface UserProfileData {
   username: string | null;
   home_club?: string | null;
   eg_handicap_index?: number | null;
+  manual_handicap_index?: number | null;
   profile_photo_url?: string | null;
   header_photo_url?: string | null;
   bio?: string | null;
   location?: string | null;
   is_public?: boolean | null;
-  
-  
+
+  // Social handles (personal profiles)
+  instagram_handle?: string | null;
+  twitter_handle?: string | null;
+  tiktok_handle?: string | null;
+  youtube_handle?: string | null;
+  websites?: string[] | null;
+
   // Business-only fields
   business_name?: string | null;
   business_category?: BusinessCategory | null;

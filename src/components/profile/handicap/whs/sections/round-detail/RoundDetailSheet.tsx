@@ -12,6 +12,8 @@ import { useNavigate } from 'react-router-dom';
 import { CardScorecardSheet } from '@/features/courses/_shared/scorecard/CardScorecardSheet';
 import { useRoundDetail, useWhsCourseId } from '@/lib/whs/hooks';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useWhsConnection } from '@/lib/whs/hooks';
+import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import type { WhsScoreHole } from '@/lib/whs/types';
 import { formatWeekdayShortGB, formatMonthShortGB } from '@/i18n/format';
 
@@ -51,6 +53,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
 
   const profileQuery = useUserProfile(profileUserId ?? undefined);
   const profile = profileQuery.data;
+  const { data: whsConn } = useWhsConnection(profileUserId ?? undefined);
 
   const courseIdQuery = useWhsCourseId(
     userData?.course?.name ?? null,
@@ -91,7 +94,11 @@ export const RoundDetailSheet: React.FC<Props> = ({
   const displayName = profile?.display_name ?? profile?.username ?? '';
   const playerHcp = profile?.show_handicap === false
     ? null
-    : profile?.eg_handicap_index ?? null;
+    : resolveDisplayHandicap({
+        egHandicapIndex: (profile as any)?.eg_handicap_index ?? null,
+        manualHandicapIndex: (profile as any)?.manual_handicap_index ?? null,
+        hasWhsConnection: !!whsConn,
+      }).value;
 
   const onViewProfile = profileUserId
     ? () => { onClose(); navigate(`/handicap/${profileUserId}`); }

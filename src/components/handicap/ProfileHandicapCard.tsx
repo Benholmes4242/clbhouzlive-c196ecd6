@@ -17,6 +17,8 @@ import {
   useHandicapHistory,
 } from '@/lib/whs/hooks';
 import { useHandicapTrend12mo } from '@/hooks/useHandicapTrend12mo';
+import { useUserProfile } from '@/hooks/useUserProfile';
+import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import TrophyRoomEntryRow from '@/components/profile/handicap/whs/sections/TrophyRoomEntryRow';
 
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -103,8 +105,15 @@ const ProfileHandicapCard: React.FC<Props> = ({
   const { data: trend, isLoading: trendLoading } = useHandicapTrend(connection?.id);
   const { data: history90 } = useHandicapHistory(connection?.id, 90);
   const trend12 = useHandicapTrend12mo(connection?.id);
+  const { data: profileRow } = useUserProfile(userId);
 
-  const handicap = trend?.current ?? null;
+  const resolved = resolveDisplayHandicap({
+    egHandicapIndex: trend?.current ?? (profileRow as any)?.eg_handicap_index ?? null,
+    manualHandicapIndex: (profileRow as any)?.manual_handicap_index ?? null,
+    hasWhsConnection: !!connection,
+  });
+  const handicap = resolved.value;
+  const isManual = resolved.source === 'manual';
 
   const delta90 = useMemo<number | null>(() => {
     if (!history90 || history90.length < 2) return null;
@@ -115,7 +124,6 @@ const ProfileHandicapCard: React.FC<Props> = ({
 
 
   if (connLoading || trendLoading) return null;
-  if (!connection) return null;
   if (handicap == null) return null;
 
   const resolvedName = (displayName ?? '').trim().split(/\s+/)[0] || 'this golfer';
@@ -225,10 +233,10 @@ const ProfileHandicapCard: React.FC<Props> = ({
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <TrendRow label="90 Days" delta={delta90} caption="over 90 days" />
+            <TrendRow label="90 Days" delta={isManual ? null : delta90} caption="over 90 days" />
             <TrendRow
               label="12 Months"
-              delta={trend12.delta}
+              delta={isManual ? null : trend12.delta}
               caption="over 12 months"
               borderTop
             />

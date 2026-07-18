@@ -68,6 +68,7 @@ export function useProfileSave(userId: string) {
         manual_handicap_index: parseHcpFormString(form.handicapIndex),
         home_club_visibility: form.homeClubVisibility,
         additional_clubs_visibility: form.additionalClubsVisibility,
+        show_additional_home_clubs: form.additionalClubsVisibility !== 'private',
         websites: form.websites.map(w => w.url).filter(Boolean),
         instagram_handle: form.instagramHandle.replace('@', '').trim(),
         twitter_handle: form.twitterHandle.replace('@', '').trim(),
@@ -113,19 +114,34 @@ export function useProfileSave(userId: string) {
       }
 
 
-      // 4. Sync home club to user_home_clubs
+      // 4. Sync home clubs (primary + additional) to user_home_clubs.
+      //    Replace-all strategy: delete existing rows, then insert the new set.
+      //    user_home_clubs.club_id is UUID referencing golf_clubs.
+      await supabase
+        .from('user_home_clubs')
+        .delete()
+        .eq('user_profile_id', userId);
+
+      const clubRows: Array<{ user_profile_id: string; club_id: string }> = [];
       if (form.primaryClubId) {
-        await supabase
-          .from('user_home_clubs')
-          .upsert(
-            { user_profile_id: userId, club_id: form.primaryClubId },
-            { onConflict: 'user_profile_id' }
-          );
-      } else {
-        await supabase
-          .from('user_home_clubs')
-          .delete()
-          .eq('user_profile_id', userId);
+        clubRows.push({ user_profile_id: userId, club_id: form.primaryClubId });
+      }
+      for (const c of form.additionalClubs) {
+        if (c.clubId && c.clubId !== form.primaryClubId) {
+          clubRows.push({ user_profile_id: userId, club_id: c.clubId });
+        }
+      }
+      if (clubRows.length > 0) {
+        // Dedupe defensively — unique index is (user_profile_id, club_id).
+        const seen = new Set<string>();
+        const unique = clubRows.filter(r => {
+          const k = `${r.user_profile_id}:${r.club_id}`;
+          if (seen.has(k)) return false;
+          seen.add(k);
+          return true;
+        });
+        const { error: clubsErr } = await supabase.from('user_home_clubs').insert(unique);
+        if (clubsErr) console.warn('[useProfileSave] insert user_home_clubs failed', clubsErr);
       }
 
 

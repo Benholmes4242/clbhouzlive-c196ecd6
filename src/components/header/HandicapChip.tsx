@@ -16,6 +16,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection, useHandicapTrend } from '@/lib/whs/hooks';
 import { useHandicapTrend90d, type HandicapTrend90dDirection } from '@/hooks/useHandicapTrend90d';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 const WHITE = '#FFFFFF';
@@ -68,7 +69,7 @@ export function HandicapChip({ light = false, pill = false }: { light?: boolean;
   const location = useLocation();
 
   const { data: connection, isLoading: whsLoading } = useWhsConnection(user?.id);
-  const { data: trendData } = useHandicapTrend(connection?.id);
+  useHandicapTrend(connection?.id); // keep query warm for trend hooks below
   const trend = useHandicapTrend90d(connection?.id);
   const { data: profile } = useUserProfile(user?.id);
 
@@ -155,23 +156,46 @@ export function HandicapChip({ light = false, pill = false }: { light?: boolean;
     </button>
   );
 
-  // Disconnected — no WHS connection.
-  if (!connection) {
-    return disconnectedPill;
-  }
-
-  const indexValue = trendData?.current ?? null;
+  const resolved = resolveDisplayHandicap({
+    egHandicapIndex: (profile as any)?.eg_handicap_index,
+    manualHandicapIndex: (profile as any)?.manual_handicap_index,
+    hasWhsConnection: !!connection,
+  });
+  const indexValue = resolved.value;
   if (indexValue === null) {
-    // Connection exists but no current index — fall back to Connect WHS.
+    // No handicap of any kind — show Connect WHS.
     return disconnectedPill;
   }
 
+  const isManual = resolved.source === 'manual';
   const { direction } = trend;
-  const showArrow = direction === 'improving' || direction === 'drifting';
+  const showArrow = !isManual && (direction === 'improving' || direction === 'drifting');
   const arrowColor = direction === 'improving' ? SEASON_GREEN : CRIMSON;
   const ArrowIcon = direction === 'improving' ? TrendingDown : TrendingUp;
 
   const formattedIndex = Number(indexValue).toFixed(1);
+
+  // Manual source: render non-interactive (no navigation, no trend).
+  if (isManual) {
+    return (
+      <div
+        aria-label={`Your handicap ${formattedIndex}`}
+        style={{ ...baseStyle, gap: 0, cursor: 'default' }}
+      >
+        <span
+          style={{
+            fontSize: pill ? 14 : 12,
+            fontWeight: 700,
+            color: INK,
+            fontVariantNumeric: 'tabular-nums',
+            letterSpacing: '-0.01em',
+          }}
+        >
+          {formattedIndex}
+        </span>
+      </div>
+    );
+  }
 
   return (
     <button
