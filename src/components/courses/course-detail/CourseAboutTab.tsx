@@ -97,6 +97,26 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
     region: course.region,
   });
 
+  // Shared cached query — NearbySection uses the same params, so no extra fetch.
+  const nearbyLat = coords?.lat ?? course.latitude;
+  const nearbyLng = coords?.lng ?? course.longitude;
+  const { data: nearbyBusinesses } = useNearbyBusinesses(nearbyLat, nearbyLng);
+  const nearbyPins = React.useMemo(
+    () =>
+      (nearbyBusinesses ?? [])
+        .filter((b) => Number.isFinite(b.lat) && Number.isFinite(b.lng))
+        .map((b) => ({
+          id: b.id,
+          name: b.name,
+          slug: b.slug,
+          lat: b.lat,
+          lng: b.lng,
+          category: b.category,
+        })),
+    [nearbyBusinesses],
+  );
+
+
   const { data: ratingAggregates } = useCourseRatingAggregates(course.id);
   const { data: distribution } = useCourseRatingDistribution(course.id);
   const { data: userRating } = useUserCourseRating(course.id, user?.id);
