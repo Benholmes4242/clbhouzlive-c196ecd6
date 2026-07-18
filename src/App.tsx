@@ -486,7 +486,7 @@ function AppRoutes() {
         <Route path="/user/:username/courses" element={<Suspense fallback={<CoursesListSkeleton />}><UserCoursesPage /></Suspense>} />
         
         <Route path="/journey" element={<Suspense fallback={<CoursesListSkeleton />}><JourneyListPage /></Suspense>} />
-        <Route path="/map" element={<Suspense fallback={<GenericPageSkeleton />}><MapPage /></Suspense>} />
+        
         <Route path="/friends-activity" element={<Navigate to="/courses" replace />} />
         <Route path="/news" element={<Suspense fallback={<GenericPageSkeleton />}><News /></Suspense>} />
         
