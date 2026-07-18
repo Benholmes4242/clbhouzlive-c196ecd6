@@ -2,7 +2,8 @@
  * TrophyRoomEntryRow -- "shelf preview" entry to the trophy room.
  * Shows the 3 most recently earned trophies as rarity-coloured
  * medallions. Renders a ghost shelf when the case is empty.
- * Used for both owner and friend view of /handicap/[:userId].
+ * Used for both owner and friend view of /handicap/[:userId] (dark)
+ * and the profile page's ProfileHandicapCard (light).
  */
 import React from 'react';
 import { Trophy, ChevronRight } from 'lucide-react';
@@ -12,10 +13,13 @@ import type { BadgeRarity } from '@/lib/gam/types';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
+type Variant = 'dark' | 'light';
+
 interface Props {
   userId: string;
   viewMode?: 'owner' | 'friend';
   ownerFirstName?: string | null;
+  variant?: Variant;
 }
 
 const MED_W = 32;
@@ -59,7 +63,43 @@ const CHIP_TINTS: Record<BadgeRarity, { top: string; bottom: string; border: str
   },
 };
 
-const chipBaseStyle = (z: number, first: boolean): React.CSSProperties => ({
+/** Light-variant chip tints -- same rarity hues, softer alphas that read
+ *  cleanly on the white profile card surface. Icon uses the rarity color
+ *  itself for punch, borders sit around 35-40% alpha. */
+const CHIP_TINTS_LIGHT: Record<BadgeRarity, { top: string; bottom: string; border: string; glyph: string }> = {
+  common: {
+    top: 'rgba(148,163,184,0.14)',
+    bottom: 'rgba(148,163,184,0.06)',
+    border: 'rgba(148,163,184,0.40)',
+    glyph: '#94A3B8',
+  },
+  uncommon: {
+    top: 'rgba(59,130,246,0.12)',
+    bottom: 'rgba(59,130,246,0.05)',
+    border: 'rgba(59,130,246,0.38)',
+    glyph: '#3B82F6',
+  },
+  rare: {
+    top: 'rgba(247,147,30,0.12)',
+    bottom: 'rgba(247,147,30,0.05)',
+    border: 'rgba(247,147,30,0.40)',
+    glyph: '#F7931E',
+  },
+  epic: {
+    top: 'rgba(168,85,247,0.12)',
+    bottom: 'rgba(168,85,247,0.05)',
+    border: 'rgba(168,85,247,0.38)',
+    glyph: '#A855F7',
+  },
+  legendary: {
+    top: 'rgba(251,188,46,0.14)',
+    bottom: 'rgba(251,188,46,0.06)',
+    border: 'rgba(251,188,46,0.40)',
+    glyph: '#D89A16',
+  },
+};
+
+const chipBaseStyle = (z: number, first: boolean, ringColor: string): React.CSSProperties => ({
   width: MED_W,
   height: MED_H,
   borderRadius: MED_RADIUS,
@@ -71,20 +111,23 @@ const chipBaseStyle = (z: number, first: boolean): React.CSSProperties => ({
   justifyContent: 'center',
   boxSizing: 'border-box',
   // 2px bg-coloured ring creates clean separation between overlapping chips (box-shadow is radius-safe)
-  boxShadow: '0 0 0 2px var(--hcp-bg-1)',
+  boxShadow: `0 0 0 2px ${ringColor}`,
 });
 
-const Medallion: React.FC<{ rarity: BadgeRarity; z: number; first: boolean }> = ({
-  rarity,
-  z,
-  first,
-}) => {
-  const t = CHIP_TINTS[rarity] ?? CHIP_TINTS.common;
+const Medallion: React.FC<{
+  rarity: BadgeRarity;
+  z: number;
+  first: boolean;
+  variant: Variant;
+}> = ({ rarity, z, first, variant }) => {
+  const tints = variant === 'light' ? CHIP_TINTS_LIGHT : CHIP_TINTS;
+  const t = tints[rarity] ?? tints.common;
+  const surface = variant === 'light' ? '#FFFFFF' : 'var(--hcp-bg-1)';
   return (
     <div
       style={{
-        ...chipBaseStyle(z, first),
-        background: `linear-gradient(160deg, ${t.top} 0%, ${t.bottom} 100%), var(--hcp-bg-1)`,
+        ...chipBaseStyle(z, first, surface),
+        background: `linear-gradient(160deg, ${t.top} 0%, ${t.bottom} 100%), ${surface}`,
         border: `1px solid ${t.border}`,
       }}
     >
@@ -93,42 +136,25 @@ const Medallion: React.FC<{ rarity: BadgeRarity; z: number; first: boolean }> = 
   );
 };
 
-const GhostMedallion: React.FC<{ z: number; first: boolean }> = ({ z, first }) => (
-  <div
-    style={{
-      ...chipBaseStyle(z, first),
-      background: 'transparent',
-      border: '1.5px dashed var(--hcp-line)',
-    }}
-  >
-    <Trophy size={13} strokeWidth={1.8} color="var(--hcp-t-40, #94A3B8)" />
-  </div>
-);
-
-const rowStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: 12,
-  width: '100%',
-  textAlign: 'left',
-  padding: '12px 16px',
-  borderRadius: 16,
-  background: 'var(--hcp-bg-1)',
-  border: '1px solid var(--hcp-line)',
-};
-
-const titleStyle: React.CSSProperties = {
-  fontSize: 15,
-  fontWeight: 800,
-  color: 'var(--hcp-t-100)',
-  letterSpacing: '-0.01em',
-  lineHeight: 1.2,
-};
-
-const subStyle: React.CSSProperties = {
-  fontSize: 12,
-  color: 'var(--hcp-t-60)',
-  marginTop: 3,
+const GhostMedallion: React.FC<{ z: number; first: boolean; variant: Variant }> = ({
+  z,
+  first,
+  variant,
+}) => {
+  const surface = variant === 'light' ? '#FFFFFF' : 'var(--hcp-bg-1)';
+  const line = variant === 'light' ? 'rgba(15,23,42,0.18)' : 'var(--hcp-line)';
+  const glyph = variant === 'light' ? '#94A3B8' : 'var(--hcp-t-40, #94A3B8)';
+  return (
+    <div
+      style={{
+        ...chipBaseStyle(z, first, surface),
+        background: 'transparent',
+        border: `1.5px dashed ${line}`,
+      }}
+    >
+      <Trophy size={13} strokeWidth={1.8} color={glyph} />
+    </div>
+  );
 };
 
 const shelfStyle: React.CSSProperties = {
@@ -144,6 +170,7 @@ const TrophyRoomEntryRow: React.FC<Props> = ({
   userId,
   viewMode = 'owner',
   ownerFirstName = null,
+  variant = 'dark',
 }) => {
   const { data: achievements } = useUserAchievements(userId);
 
@@ -172,23 +199,72 @@ const TrophyRoomEntryRow: React.FC<Props> = ({
   // Wait for data before rendering anything (avoids empty-state flash)
   if (!achievements) return null;
 
+  const isLight = variant === 'light';
   const isFriend = viewMode === 'friend';
   const name = ownerFirstName ?? 'them';
   const poss = ownerFirstName ? `${ownerFirstName}'s` : 'their';
+
+  const rowStyle: React.CSSProperties = isLight
+    ? {
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+        width: '100%',
+        textAlign: 'left',
+        padding: '12px 14px',
+        borderRadius: 14,
+        background: '#FFFFFF',
+        border: '0.5px solid rgba(15,23,42,0.10)',
+      }
+    : {
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+        width: '100%',
+        textAlign: 'left',
+        padding: '12px 16px',
+        borderRadius: 16,
+        background: 'var(--hcp-bg-1)',
+        border: '1px solid var(--hcp-line)',
+      };
+
+  const titleStyle: React.CSSProperties = isLight
+    ? {
+        fontSize: 14,
+        fontWeight: 800,
+        color: '#0F172A',
+        letterSpacing: '-0.01em',
+        lineHeight: 1.2,
+      }
+    : {
+        fontSize: 15,
+        fontWeight: 800,
+        color: 'var(--hcp-t-100)',
+        letterSpacing: '-0.01em',
+        lineHeight: 1.2,
+      };
+
+  const subStyle: React.CSSProperties = isLight
+    ? { fontSize: 12, color: '#64748B', marginTop: 3 }
+    : { fontSize: 12, color: 'var(--hcp-t-60)', marginTop: 3 };
+
+  const outerWrapStyle: React.CSSProperties = isLight
+    ? { fontFamily: FONT }
+    : { padding: '0 16px 4px', fontFamily: FONT };
 
   // ---- EMPTY STATE: ghost shelf ----
   if (lifetimeCount === 0) {
     const ghostShelf = (
       <div style={shelfStyle}>
-        <GhostMedallion z={3} first={true} />
-        <GhostMedallion z={2} first={false} />
-        <GhostMedallion z={1} first={false} />
+        <GhostMedallion z={3} first={true} variant={variant} />
+        <GhostMedallion z={2} first={false} variant={variant} />
+        <GhostMedallion z={1} first={false} variant={variant} />
       </div>
     );
 
     if (isFriend) {
       return (
-        <div style={{ padding: '0 16px 4px', fontFamily: FONT }}>
+        <div style={outerWrapStyle}>
           <div style={rowStyle}>
             {ghostShelf}
             <div style={{ flex: 1, minWidth: 0 }}>
@@ -205,7 +281,7 @@ const TrophyRoomEntryRow: React.FC<Props> = ({
     }
 
     return (
-      <div style={{ padding: '0 16px 4px', fontFamily: FONT }}>
+      <div style={outerWrapStyle}>
         <button
           type="button"
           onClick={() => openGamAchievements()}
@@ -245,7 +321,7 @@ const TrophyRoomEntryRow: React.FC<Props> = ({
       : 'See them all';
 
   return (
-    <div style={{ padding: '0 16px 4px', fontFamily: FONT }}>
+    <div style={outerWrapStyle}>
       <button
         type="button"
         onClick={() => openGamAchievements()}
@@ -263,6 +339,7 @@ const TrophyRoomEntryRow: React.FC<Props> = ({
               rarity={r}
               z={recentRarities.length - i}
               first={i === 0}
+              variant={variant}
             />
           ))}
         </div>
