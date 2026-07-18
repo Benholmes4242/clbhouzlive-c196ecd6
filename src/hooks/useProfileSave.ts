@@ -7,7 +7,7 @@ import { uploadToR2Only } from '@/utils/r2OnlyUpload';
 import { parseHcpFormString } from '@/lib/formatHcp';
 
 const INVALIDATE_KEYS = [
-  'profile', 'user-profile', 'home-clubs-map',
+  'profile', 'profile-clubs', 'user-profile', 'home-clubs-map',
   'user-home-clubs', 'golfers-filtered', 'search-golfers',
 ];
 
