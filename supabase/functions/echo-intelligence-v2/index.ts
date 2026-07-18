@@ -997,5 +997,5 @@ serve(async (req: Request) => {
     },
   });
 
-  return new Response(stream, { headers: sseHeaders });
+  return new Response(stream, { headers: { ...corsHeaders, "Content-Type": "text/event-stream", "Cache-Control": "no-cache", "Connection": "keep-alive" } });
 });
