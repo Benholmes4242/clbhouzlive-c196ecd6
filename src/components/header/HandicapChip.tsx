@@ -16,6 +16,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection, useHandicapTrend } from '@/lib/whs/hooks';
 import { useHandicapTrend90d, type HandicapTrend90dDirection } from '@/hooks/useHandicapTrend90d';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 const WHITE = '#FFFFFF';
