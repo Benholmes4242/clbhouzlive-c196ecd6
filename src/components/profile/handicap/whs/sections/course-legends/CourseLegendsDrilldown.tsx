@@ -23,7 +23,7 @@ import { ChampionsUnclaimedCard } from './drilldown/ChampionsUnclaimedCard';
 import { FullCourseLeaderboardSheet } from './drilldown/FullCourseLeaderboardSheet';
 import { FullCourseLeaderboardSheetDispatch } from './drilldown/FullCourseLeaderboardSheetDispatch';
 import { WindowToggle } from './CourseLegendsSection';
-import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHandicapCue';
+
 import { ChampionsCourseSearch } from './drilldown/ChampionsCourseSearch';
 import { ChampionsInfoCarousel } from './drilldown/ChampionsInfoCarousel';
 import { formatGapFromChampion } from './drilldown/_shared/helpers';
@@ -305,7 +305,6 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
           a small connect-WHS cue beneath for non-synced users. */}
       <ChampionsCourseSearch currentCourseId={ctx.courseId} />
 
-      <ConnectHandicapCue variant="champions" courseName={ctx.courseName} />
 
       {autoSwitchedToAllTime && window === 'all_time' && (
         <div style={{ padding: '0 16px 12px' }}>

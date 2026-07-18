@@ -31,7 +31,7 @@ interface GolfClubViewProps {
 const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false, onClose }) => {
   const { user } = useSupabaseSession();
   const location = useLocation();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const queryClient = useQueryClient();
   
   const tabFromState = (location.state as any)?.activeTab;
@@ -84,14 +84,21 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   const handleTabChange = useCallback((newTab: string) => {
     setActiveTab(newTab);
     setVisitedTabs(prev => new Set(prev).add(newTab));
-    
+
+    if (!isInModal) {
+      const next = new URLSearchParams(searchParams);
+      if (newTab === 'about') next.delete('tab'); else next.set('tab', newTab);
+      setSearchParams(next, { replace: true });
+    }
+
     if (user?.id && courseId) {
-      queryClient.invalidateQueries({ 
+      queryClient.invalidateQueries({
         queryKey: ['user-course-rating', courseId, user.id],
         refetchType: 'active'
       });
     }
-  }, [user?.id, courseId, queryClient]);
+  }, [user?.id, courseId, queryClient, isInModal, searchParams, setSearchParams]);
+
 
   if ((courseLoading || !course) && ratingStatsLoading) {
     return <CourseDetailSkeleton />;

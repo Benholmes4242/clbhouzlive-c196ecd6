@@ -76,8 +76,7 @@ export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => 
           padding: '12px 14px',
           background: SURFACE,
           border: `1px solid ${HAIRLINE_INK_8}`,
-          borderLeft: `3px solid ${AMBER}`,
-          borderRadius: 10,
+          borderRadius: 12,
           cursor: 'pointer',
           textAlign: 'left',
           fontFamily: FONT,
@@ -87,7 +86,7 @@ export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => 
           style={{
             width: 32,
             height: 32,
-            borderRadius: 8,
+            borderRadius: 10,
             background: 'rgba(247,147,30,0.10)',
             display: 'grid',
             placeItems: 'center',
@@ -120,6 +119,7 @@ export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => 
     );
   }
 
+
   // Holes + Champions: amber card
   return (
     <div style={{ padding: '12px 16px 4px' }}>
@@ -127,9 +127,8 @@ export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => 
         style={{
           background: SURFACE,
           border: `1px solid ${HAIRLINE_INK_8}`,
-          borderLeft: `3px solid ${AMBER}`,
-          borderRadius: 12,
-          padding: '14px 14px 12px',
+          borderRadius: 14,
+          padding: 16,
           fontFamily: FONT,
         }}
       >
@@ -138,7 +137,7 @@ export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => 
             style={{
               width: 36,
               height: 36,
-              borderRadius: 9,
+              borderRadius: 12,
               background: 'rgba(247,147,30,0.10)',
               display: 'grid',
               placeItems: 'center',
@@ -160,13 +159,13 @@ export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => 
           type="button"
           onClick={go}
           style={{
-            marginTop: 12,
+            marginTop: 14,
             width: '100%',
-            padding: '10px 14px',
+            padding: '11px 14px',
             background: AMBER,
             color: SURFACE,
             border: 'none',
-            borderRadius: 8,
+            borderRadius: 12,
             fontSize: 12.5,
             fontWeight: 800,
             letterSpacing: '0.02em',
@@ -178,11 +177,11 @@ export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => 
         </button>
         <div
           style={{
-            marginTop: 8,
+            marginTop: 9,
             fontSize: 10.5,
             fontWeight: 600,
             color: INK_FAINT,
-            letterSpacing: '0.04em',
+            letterSpacing: '0.05em',
             textTransform: 'uppercase',
             textAlign: 'center',
           }}
@@ -193,5 +192,6 @@ export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => 
     </div>
   );
 };
+
 
 export default ConnectHandicapCue;

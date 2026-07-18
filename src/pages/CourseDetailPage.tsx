@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useNavigationType } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import GolfClubView from '@/components/golf-club/GolfClubView';
 import { FadeInContent } from '@/components/ui/FadeInContent';
@@ -13,13 +13,14 @@ const CourseDetailPage = () => {
   const params = useParams();
   const courseId = params?.courseId;
   const navigate = useNavigate();
+  const navigationType = useNavigationType();
 
   usePreventOverscroll();
 
   useEffect(() => {
     const sp = new URLSearchParams(window.location.search);
     const hasDeepLink = sp.has('review') || sp.has('reviewId') || sp.has('tab');
-    if (!hasDeepLink) {
+    if (navigationType !== 'POP' && !hasDeepLink) {
       scrollPageToTop('auto');
     }
 
@@ -29,7 +30,8 @@ const CourseDetailPage = () => {
         course_id: courseId,
       });
     }
-  }, [courseId]);
+  }, [courseId, navigationType]);
+
 
   if (!courseId) {
     return (
