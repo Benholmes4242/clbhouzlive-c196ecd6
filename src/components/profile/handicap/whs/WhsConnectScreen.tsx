@@ -26,11 +26,10 @@ const ERROR_MESSAGES: Record<string, string> = {
 
 interface Props {
   onConnected: () => void | Promise<void>;
-  onSkip?: () => void;
   onDecline?: () => void;
 }
 
-export const WhsConnectScreen: React.FC<Props> = ({ onConnected, onSkip, onDecline }) => {
+export const WhsConnectScreen: React.FC<Props> = ({ onConnected, onDecline }) => {
   const { country, setCountryId } = useSelectedCountry();
   const location = useLocation();
   const { user } = useSupabaseSession();
