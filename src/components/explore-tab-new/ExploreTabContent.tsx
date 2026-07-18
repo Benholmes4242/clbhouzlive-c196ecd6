@@ -101,7 +101,7 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
       </div>
 
       <div>
-        <div style={{ height: SPACE.sectionSection }} aria-hidden />
+        <div style={{ height: 8 }} aria-hidden />
         <AlmanacLens
           region={activeRegion}
           onRegionChange={handleRegionChange}
