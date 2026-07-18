@@ -101,12 +101,20 @@ export default function MyRequestsPage() {
               const status = statusStyle(t.status);
               const cat = CATEGORY_LABELS[t.category] ?? t.category;
               const unread = t.last_sender === 'admin';
+              const confirming = confirmId === t.id;
               return (
-                <button
+                <div
                   key={t.id}
-                  type="button"
+                  role="button"
+                  tabIndex={0}
                   onClick={() => navigate(`/support/thread/${t.id}`)}
-                  className="w-full text-left flex items-start gap-3 px-4 py-3"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      navigate(`/support/thread/${t.id}`);
+                    }
+                  }}
+                  className="w-full text-left flex items-start gap-3 px-4 py-3 cursor-pointer"
                   style={{ borderTop: i === 0 ? 'none' : `0.5px solid ${HAIR}` }}
                 >
                   <div className="mt-1.5 shrink-0" style={{ width: 8, height: 8 }}>
@@ -152,8 +160,22 @@ export default function MyRequestsPage() {
                       Updated {relTime(t.last_message_at)}
                     </div>
                   </div>
-                  <ChevronRight size={16} className="shrink-0 mt-3" style={{ color: INK_55 }} />
-                </button>
+                  <div className="flex items-center gap-1 shrink-0 mt-1.5">
+                    <button
+                      type="button"
+                      onClick={(e) => handleRemoveClick(e, t.id)}
+                      aria-label={confirming ? 'Confirm remove request' : 'Remove request'}
+                      className="min-h-[32px] px-2 rounded-md text-[11px] font-semibold inline-flex items-center gap-1"
+                      style={{
+                        color: confirming ? '#B45309' : INK_55,
+                        background: confirming ? 'rgba(245,158,11,0.12)' : 'transparent',
+                      }}
+                    >
+                      {confirming ? 'Remove?' : <Trash2 size={16} />}
+                    </button>
+                    <ChevronRight size={16} style={{ color: INK_55 }} />
+                  </div>
+                </div>
               );
             })}
           </div>
