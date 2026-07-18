@@ -53,6 +53,9 @@ interface Props {
   profileDisplayName: string | null;
   /** Which list to open on mount. */
   initialTab?: 'followers' | 'following';
+  /** Show the "Invite friends" card above the list. Only true on own
+   *  personal-profile route; business route leaves it false. */
+  showInviteCard?: boolean;
 }
 
 export default function SocialListPage({
@@ -61,8 +64,10 @@ export default function SocialListPage({
   profileUsername,
   profileDisplayName,
   initialTab = 'followers',
+  showInviteCard = false,
 }: Props) {
   const { user: viewer } = useSupabaseSession();
+  const { openInviteSheet } = useInviteSheet();
   const isOwnProfile =
     profileActorType === 'personal' && !!viewer?.id && viewer.id === profileActorId;
 
