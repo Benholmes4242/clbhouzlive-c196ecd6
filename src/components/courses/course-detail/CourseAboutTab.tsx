@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { ExternalLink, Pencil, BookOpen, BarChart3, MapPin, Quote } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import AboutMediaStrip from './AboutMediaStrip';
+import NearbySection from './NearbySection';
 import { useCourseCoordinates } from '@/hooks/useCourseCoordinates';
 import { LocationMapCard } from '@/components/map';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
@@ -274,6 +275,10 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       </section>
 
       <div style={{ margin: '16px 0' }}><Divider /></div>
+
+      {/* 8b. Nearby hospitality */}
+      <NearbySection lat={coords?.lat ?? course.latitude} lng={coords?.lng ?? course.longitude} />
+
 
       {/* 9. Claim Course — tri-state: unclaimed / pending / claimed */}
       {course.club_id && claimStatus && (
