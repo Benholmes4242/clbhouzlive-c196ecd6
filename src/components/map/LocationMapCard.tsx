@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { MapPin, Navigation } from 'lucide-react';
 import { MapPreview } from './MapPreview';
-import { MapExpandedView } from './MapExpandedView';
+import { MapExpandedView, type MapExpandedViewNearbyPin } from './MapExpandedView';
 
 interface LocationMapCardProps {
   lat: number | null | undefined;
@@ -10,6 +10,7 @@ interface LocationMapCardProps {
   locationText: string;
   showOwnerPrompt?: boolean;
   colorful?: boolean;
+  nearby?: MapExpandedViewNearbyPin[];
 }
 
 /**
