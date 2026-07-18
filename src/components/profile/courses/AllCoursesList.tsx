@@ -276,7 +276,6 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
 
   const displayedCourses = tieAnnotated.slice(0, displayCount);
   const hasMore = displayCount < tieAnnotated.length;
-  const remainingCount = Math.min(PAGE_SIZE, tieAnnotated.length - displayCount);
   const totalFiltered = tieAnnotated.length;
 
   const loadMore = useCallback(() => {
