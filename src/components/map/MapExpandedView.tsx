@@ -42,9 +42,12 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
   name,
   locationText,
   colorful = false,
+  nearby,
 }) => {
+  const navigate = useNavigate();
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
+  const secondaryMarkersRef = useRef<mapboxgl.Marker[]>([]);
   const initTimeoutRef = useRef<number | null>(null);
   const mountedRef = useRef(true);
 
