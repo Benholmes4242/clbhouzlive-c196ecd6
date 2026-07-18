@@ -18706,6 +18706,10 @@ export type Database = {
         }
         Returns: Json
       }
+      get_unread_notification_count: {
+        Args: { p_actor_id?: string; p_actor_type?: string; p_user_id: string }
+        Returns: number
+      }
       get_user_achievements_for_viewer: {
         Args: { p_user_id: string }
         Returns: {
