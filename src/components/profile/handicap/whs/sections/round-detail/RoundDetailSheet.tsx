@@ -81,8 +81,12 @@ export const RoundDetailSheet: React.FC<Props> = ({
     ? (userData.adjusted_gross ?? userData.actual_gross ?? null)
     : null;
   const toParVal = (grossVal != null && totalPar > 0) ? grossVal - totalPar : null;
-  const emptyVariant: 'syncing' | 'nohbh' =
-    userData?.hole_by_hole_fetched ? 'nohbh' : 'syncing';
+  const emptyVariant: 'syncing' | 'nohbh' | 'unavailable' =
+    !isRoundLoading && userData == null
+      ? 'unavailable'
+      : userData?.hole_by_hole_fetched
+        ? 'nohbh'
+        : 'syncing';
 
   const eyebrowText = fmtDateEyebrow(userData?.play_date);
   const courseName = userData?.course?.name ?? '';
