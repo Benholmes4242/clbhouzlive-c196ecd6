@@ -277,9 +277,11 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
                 posts={posts}
                 flatIndex={i}
                 isAutoplayActive={activeIndices.has(i)}
+                openedFrom="course-media"
                 hideCourseAttribution
                 hideFormatBadge
               />
+
             );
           })}
         </div>
