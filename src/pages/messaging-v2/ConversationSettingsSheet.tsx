@@ -90,6 +90,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
   const [addOpen, setAddOpen] = useState(false);
   const [rowMenu, setRowMenu] = useState<string | null>(null);
   const [confirmLeave, setConfirmLeave] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [busy, setBusy] = useState(false);
 
   const invalidateAll = useCallback(() => {
@@ -231,12 +232,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
         p_as_actor_id: actor.actorId,
       });
       if (error) {
-        const msg = (error.message || '').toLowerCase();
-        if (msg.includes('owner') || msg.includes('transfer')) {
-          toast.error('Make someone else an admin or owner first');
-        } else {
-          toast.error('Could not leave group');
-        }
+        toast.error('Could not leave group');
         return;
       }
       qc.invalidateQueries({ queryKey: ['messaging', 'inbox'] });
@@ -245,6 +241,33 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
     } catch (e) {
       console.error(e);
       toast.error('Could not leave group');
+    } finally {
+      setBusy(false);
+    }
+  }, [actor, conversationId, qc, navigate, onClose]);
+
+  const handleDeleteGroup = useCallback(async () => {
+    if (!actor) return;
+    try {
+      setBusy(true);
+      const { error } = await (supabase.rpc as unknown as (
+        fn: string,
+        args: Record<string, unknown>,
+      ) => Promise<{ error: { message: string } | null }>)('msg_delete_group', {
+        p_conversation_id: conversationId,
+        p_as_actor_type: actor.actorType,
+        p_as_actor_id: actor.actorId,
+      });
+      if (error) {
+        toast.error('Could not delete group');
+        return;
+      }
+      qc.invalidateQueries({ queryKey: ['messaging', 'inbox'] });
+      onClose();
+      navigate('/messages');
+    } catch (e) {
+      console.error(e);
+      toast.error('Could not delete group');
     } finally {
       setBusy(false);
     }
@@ -566,20 +589,38 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                 disabled={busy}
               />
               {isGroup ? (
-                <ActionRow
-                  icon={<LogOut size={20} color={DANGER} />}
-                  label={confirmLeave ? 'Tap again to confirm' : 'Leave group'}
-                  onClick={() => {
-                    if (!confirmLeave) {
-                      setConfirmLeave(true);
-                      setTimeout(() => setConfirmLeave(false), 3000);
-                      return;
-                    }
-                    void handleLeave();
-                  }}
-                  disabled={busy}
-                  danger
-                />
+                <>
+                  <ActionRow
+                    icon={<LogOut size={20} color={DANGER} />}
+                    label={confirmLeave ? 'Tap again to confirm' : 'Leave group'}
+                    onClick={() => {
+                      if (!confirmLeave) {
+                        setConfirmLeave(true);
+                        setTimeout(() => setConfirmLeave(false), 3000);
+                        return;
+                      }
+                      void handleLeave();
+                    }}
+                    disabled={busy}
+                    danger
+                  />
+                  {isAdmin ? (
+                    <ActionRow
+                      icon={<Trash2 size={20} color={DANGER} />}
+                      label={confirmDelete ? 'Tap again to confirm' : 'Delete group'}
+                      onClick={() => {
+                        if (!confirmDelete) {
+                          setConfirmDelete(true);
+                          setTimeout(() => setConfirmDelete(false), 3000);
+                          return;
+                        }
+                        void handleDeleteGroup();
+                      }}
+                      disabled={busy}
+                      danger
+                    />
+                  ) : null}
+                </>
               ) : (
                 <ActionRow
                   icon={<Trash2 size={20} color={DANGER} />}
