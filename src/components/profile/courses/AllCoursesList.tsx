@@ -288,6 +288,21 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
     }, 300);
   }, [hasMore, isLoadingMore, tieAnnotated.length]);
 
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el || !hasMore) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) loadMore();
+        }
+      },
+      { rootMargin: '400px' },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [hasMore, loadMore]);
+
   const firstName = displayName?.split(' ')[0];
 
   const getEmptyMessage = () => {
