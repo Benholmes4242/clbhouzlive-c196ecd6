@@ -1362,7 +1362,7 @@ const ProfilePageV2Content: React.FC = () => {
         imageUrl={profile?.profile_photo_url || ''}
         altText={`${displayName}'s profile photo`}
         shape="squircle"
-        fallbackInitial={displayName?.charAt(0)}
+        fallbackInitial={avatarInitials}
       />
 
       {/* Block confirmation dialog */}
