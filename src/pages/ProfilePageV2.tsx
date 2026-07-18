@@ -47,7 +47,6 @@ import { FilterChips } from '@/components/ui/FilterChips';
 
 
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
-import { useWallLevels } from '@/hooks/gam/useWallLevels';
 import {
   DropdownMenu,
   DropdownMenuContent,
