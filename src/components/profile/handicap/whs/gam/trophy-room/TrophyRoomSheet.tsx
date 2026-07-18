@@ -7,6 +7,8 @@ import { gamAchievementsBus } from '../events';
 import { useUserAchievements } from '@/hooks/gam/useUserAchievements';
 import { useUserTopLegends } from '@/hooks/gam/useUserTopLegends';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useWhsConnection } from '@/lib/whs/hooks';
+import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import { TrophyCardHybrid } from './TrophyCardHybrid';
 import { renderBadgeIcon } from '../badgeIcons';
 import { TrophyDetailSheet } from './TrophyDetailSheet';
