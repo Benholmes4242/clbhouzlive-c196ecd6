@@ -125,7 +125,7 @@ export function AllTeeTimesSheet({
               </div>
             </div>
           ) : (
-            <TeeTimesFirstGroups groups={groups} limit={9999} />
+            <TeeTimesFirstGroups groups={groups} limit={9999} surface="transparent" />
           )}
         </div>
       </div>

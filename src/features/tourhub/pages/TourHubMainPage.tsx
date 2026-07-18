@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import { TourHubShell } from '../components/TourHubShell';
 import type { TourHubTab } from '../components/types';
@@ -36,6 +36,8 @@ function TourHubChromeBridge({
   onSettings,
   onProfile,
   onSignOut,
+  backMode,
+  onBack,
 }: {
   activeTab: TourHubTab;
   onSelectTab: (tabId: string) => void;
@@ -43,6 +45,8 @@ function TourHubChromeBridge({
   onSettings: () => void;
   onProfile: () => void;
   onSignOut: () => void;
+  backMode: boolean;
+  onBack: () => void;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -58,6 +62,8 @@ function TourHubChromeBridge({
     () => (
       <TourIslandLeft
         label={label}
+        mode={backMode ? 'back' : 'menu'}
+        onBackTap={onBack}
         onMenuTap={() => setMenuOpen(true)}
         onPickerTap={() => {
           // Picker is scoped to the overview tab only.
@@ -66,7 +72,7 @@ function TourHubChromeBridge({
         showPicker={isOverview}
       />
     ),
-    [label, isOverview],
+    [label, isOverview, backMode, onBack],
   );
   useSetChromeLeftSlot(slot);
 
@@ -95,6 +101,9 @@ function TourHubChromeBridge({
 export function TourHubMainPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const backMode =
+    (location.state as any)?.from === 'tournament' && location.key !== 'default';
   const tabParam = searchParams.get('tab') as TourHubTab | null;
   const [activeTab, setActiveTab] = useState<TourHubTab>(tabParam || 'overview');
   const [searchOpen, setSearchOpen] = useState(false);
@@ -188,6 +197,8 @@ export function TourHubMainPage() {
           onSettings={() => navigate('/edit-profile?tab=settings')}
           onProfile={() => navigate('/profile')}
           onSignOut={() => { void logout(); }}
+          backMode={backMode}
+          onBack={() => navigate(-1)}
         />
         {/* Glass plate: mounted for every non-overview tab. Overview keeps
             its own cinematic hero overlay chrome. Height 70 matches tour

@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { countryFlag, countryFallback } from '../../leaderboard/countryFlag';
+import { todayFromEntry } from '../../leaderboard/BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import {
   FONT, INK, INK_MUTE, INK_FAINT, HAIRLINE_INK_8, SURFACE,
@@ -21,6 +22,10 @@ interface Row {
   today?: number | null;
   thru?: number | null;
   status?: string | null;
+  round_1?: number | null;
+  round_2?: number | null;
+  round_3?: number | null;
+  round_4?: number | null;
   player?: { id?: string; full_name?: string; country?: string | null; country_code?: string | null } | null;
 }
 
@@ -81,6 +86,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5 }: Props) {
             : `${r.position_tied ? 'T' : ''}${r.position}`;
           const cc = r.player?.country_code ?? r.player?.country ?? null;
           const flag = cc ? countryFlag(cc) : null;
+          const today = todayFromEntry(r as any);
           return (
             <button
               key={r.id}
@@ -92,7 +98,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5 }: Props) {
                 position: r.position ?? null,
                 positionTied: r.position_tied ?? null,
                 total: r.score ?? null,
-                today: r.today ?? null,
+                today,
                 thru: r.thru ?? null,
                 status: r.status ?? null,
               })}
@@ -122,8 +128,8 @@ export function MiniBoard({ tournamentId, entries, limit = 5 }: Props) {
               <div style={{ width: 40, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 600, color: INK_MUTE, fontVariantNumeric: 'tabular-nums' }}>
                 {thruLabel(r)}
               </div>
-              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 800, color: color(r.today), fontVariantNumeric: 'tabular-nums' }}>
-                {fmt(r.today)}
+              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 800, color: color(today), fontVariantNumeric: 'tabular-nums' }}>
+                {fmt(today)}
               </div>
               <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 13, fontWeight: 800, color: color(r.score), fontVariantNumeric: 'tabular-nums' }}>
                 {fmt(r.score)}

@@ -9,7 +9,7 @@
  * ChromeIsland's LeftCapsule; this component only owns the row content.
  */
 import React from 'react';
-import { ChevronDown, Menu } from 'lucide-react';
+import { ChevronDown, ChevronLeft, Menu } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const INK = '#0F172A';
@@ -22,6 +22,9 @@ export interface TourIslandLeftProps {
   onPickerTap: () => void;
   /** When false, the tour label/picker trigger is hidden; only the menu remains. */
   showPicker?: boolean;
+  /** When 'back', render a back chevron in place of the burger. */
+  mode?: 'menu' | 'back';
+  onBackTap?: () => void;
 }
 
 export const TourIslandLeft: React.FC<TourIslandLeftProps> = ({
@@ -29,6 +32,8 @@ export const TourIslandLeft: React.FC<TourIslandLeftProps> = ({
   onMenuTap,
   onPickerTap,
   showPicker = true,
+  mode = 'menu',
+  onBackTap,
 }) => {
   const { t } = useTranslation('tourhub');
   return (
@@ -42,8 +47,8 @@ export const TourIslandLeft: React.FC<TourIslandLeftProps> = ({
     >
       <button
         type="button"
-        aria-label={t('picker.openMenuAria')}
-        onClick={onMenuTap}
+        aria-label={mode === 'back' ? t('picker.backAria', { defaultValue: 'Back' }) : t('picker.openMenuAria')}
+        onClick={mode === 'back' ? onBackTap : onMenuTap}
         style={{
           background: 'none',
           border: 'none',
@@ -55,7 +60,9 @@ export const TourIslandLeft: React.FC<TourIslandLeftProps> = ({
         }}
         className="active:scale-[0.94]"
       >
-        <Menu size={15} color={INK} strokeWidth={2.2} />
+        {mode === 'back'
+          ? <ChevronLeft size={17} color={INK} strokeWidth={2.2} />
+          : <Menu size={15} color={INK} strokeWidth={2.2} />}
       </button>
 
       {showPicker && (

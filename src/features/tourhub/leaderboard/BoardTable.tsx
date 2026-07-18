@@ -95,7 +95,7 @@ function fmtThru(thru: number | null | undefined): string {
   return String(thru);
 }
 
-function todayFromEntry(e: BoardEntry): number | null {
+export function todayFromEntry(e: BoardEntry): number | null {
   if (e.today != null) return e.today;
   const roundNum = [e.round_1, e.round_2, e.round_3, e.round_4].filter(
     (r) => r != null,
