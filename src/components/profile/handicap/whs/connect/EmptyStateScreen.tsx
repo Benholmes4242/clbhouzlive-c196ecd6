@@ -12,9 +12,10 @@ const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 interface Props {
   onPickCountry: () => void;
+  onDecline?: () => void;
 }
 
-export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry }) => {
+export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline }) => {
   return (
     <div
       style={{
