@@ -45,32 +45,50 @@ const sanitiseErrorForAnalytics = (message?: string): string => {
 };
 
 type Step = 'hero' | 'otp';
+type SubmittingMethod = 'email' | 'apple' | 'google' | null;
 
 const RESEND_COOLDOWN_SECONDS = 30;
 
-const AuthForm: React.FC = () => {
+interface AuthFormProps {
+  onWillNavigate?: () => void;
+}
+
+const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
   const { t } = useTranslation('auth');
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   const [step, setStep] = useState<Step>('hero');
   const [email, setEmailState] = useState('');
-  const [submitting, setSubmitting] = useState(false);
+  const [submittingMethod, setSubmittingMethod] = useState<SubmittingMethod>(null);
+  const submitting = submittingMethod !== null; // convenience for guards
   const [otpError, setOtpError] = useState<string | null>(null);
   const [otpErrorNonce, setOtpErrorNonce] = useState(0);
   const [otpInfo, setOtpInfo] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
 
   const sendStartRef = useRef<number>(0);
+  const oauthPendingRef = useRef(false);
 
   // Safety net: if the app returns to foreground while we are stuck in
   // a submitting state started by a native OAuth sheet that never fired
-  // its callback, clear the spinner so the user can retry.
+  // its callback, clear the spinner so the user can retry. Guard against
+  // the native OAuth race: some providers fire `visible` BEFORE the
+  // Median callback runs signInWithIdToken - clearing immediately would
+  // re-enable buttons mid-exchange. Hold 10s for OAuth flows.
   useEffect(() => {
     const onVis = () => {
-      if (document.visibilityState === 'visible') {
-        setSubmitting(false);
+      if (document.visibilityState !== 'visible') return;
+      if (!oauthPendingRef.current) {
+        setSubmittingMethod(null);
+        return;
       }
+      window.setTimeout(() => {
+        if (oauthPendingRef.current) {
+          oauthPendingRef.current = false;
+          setSubmittingMethod(null);
+        }
+      }, 10000);
     };
     document.addEventListener('visibilitychange', onVis);
     return () => document.removeEventListener('visibilitychange', onVis);
@@ -88,7 +106,7 @@ const AuthForm: React.FC = () => {
   const sendCode = async (rawEmail: string): Promise<boolean> => {
     if (submitting) return false;
     const normalised = rawEmail.trim().toLowerCase();
-    setSubmitting(true);
+    setSubmittingMethod('email');
     setOtpError(null);
     trackAuthMethodSelected('email');
     sendStartRef.current = Date.now();
@@ -111,21 +129,21 @@ const AuthForm: React.FC = () => {
         );
         setOtpError(msg);
         setOtpErrorNonce((n) => n + 1);
-        setSubmitting(false);
+        setSubmittingMethod(null);
         return false;
       }
 
       trackAuthInitiated('email', Date.now() - sendStartRef.current);
       setEmailState(normalised);
       setResendCooldown(RESEND_COOLDOWN_SECONDS);
-      setSubmitting(false);
+      setSubmittingMethod(null);
       return true;
     } catch (err) {
       const e = err as Error;
       trackAuthException('email', e.message);
       setOtpError('Something went wrong. Please try again.');
       setOtpErrorNonce((n) => n + 1);
-      setSubmitting(false);
+      setSubmittingMethod(null);
       return false;
     }
   };
@@ -150,7 +168,7 @@ const AuthForm: React.FC = () => {
   };
 
   const handleVerify = async (token: string) => {
-    setSubmitting(true);
+    setSubmittingMethod('email');
     setOtpError(null);
     const start = Date.now();
 
@@ -177,12 +195,13 @@ const AuthForm: React.FC = () => {
         );
         setOtpError(friendly);
         setOtpErrorNonce((n) => n + 1);
-        setSubmitting(false);
+        setSubmittingMethod(null);
         return;
       }
 
       if (data?.session?.user) {
         trackLoginSuccess('email', Date.now() - start);
+        onWillNavigate?.();
         const dest = await resolvePostAuthRoute(
           data.session.user.id,
           searchParams.get('redirect'),
@@ -192,24 +211,25 @@ const AuthForm: React.FC = () => {
       } else {
         setOtpError('Could not start session. Please try again.');
         setOtpErrorNonce((n) => n + 1);
-        setSubmitting(false);
+        setSubmittingMethod(null);
       }
     } catch (err) {
       const e = err as Error;
       trackAuthException('email', e.message);
       setOtpError('Something went wrong. Please try again.');
       setOtpErrorNonce((n) => n + 1);
-      setSubmitting(false);
+      setSubmittingMethod(null);
     }
   };
 
   // ---- Native Apple Sign-In (Median bridge) -------------------------------
   const handleAppleCallback = useCallback(
     async (response: MedianAppleResponse) => {
+      oauthPendingRef.current = false;
       try {
         const idToken = (response as MedianAppleSuccess)?.idToken;
         if (!idToken) {
-          setSubmitting(false);
+          setSubmittingMethod(null);
           const msg = String((response as MedianAppleError)?.error ?? '');
           const cancelled = /cancel|1001/i.test(msg);
           if (!cancelled && msg) {
@@ -247,7 +267,7 @@ const AuthForm: React.FC = () => {
           console.error('[apple-auth] supabase rejection:', (error as { status?: number }).status, error.message);
           trackAuthFailed('apple', sanitiseErrorForAnalytics(error.message));
           toast.error('Could not complete Apple Sign-In. Please try again or use email.');
-          setSubmitting(false);
+          setSubmittingMethod(null);
           return;
         }
 
@@ -269,6 +289,7 @@ const AuthForm: React.FC = () => {
 
         if (data?.session?.user) {
           trackLoginSuccess('apple');
+          onWillNavigate?.();
           const dest = await resolvePostAuthRoute(
             data.session.user.id,
             searchParams.get('redirect'),
@@ -277,10 +298,10 @@ const AuthForm: React.FC = () => {
           navigate(dest, { replace: true });
         }
       } finally {
-        setSubmitting(false);
+        setSubmittingMethod(null);
       }
     },
-    [navigate, searchParams],
+    [navigate, searchParams, onWillNavigate],
   );
 
   const handleAppleSignIn = useCallback(() => {
@@ -290,7 +311,8 @@ const AuthForm: React.FC = () => {
       toast.error('Apple Sign-In needs the latest app version.');
       return;
     }
-    setSubmitting(true);
+    setSubmittingMethod('apple');
+    oauthPendingRef.current = true;
     median.socialLogin.apple.login({
       callback: handleAppleCallback,
       scope: 'full_name, email',
@@ -300,11 +322,12 @@ const AuthForm: React.FC = () => {
   // ---- Native Google Sign-In (Median bridge) ------------------------------
   const handleGoogleCallback = useCallback(
     async (response: unknown) => {
+      oauthPendingRef.current = false;
       try {
         const r = (response ?? {}) as { idToken?: string; error?: string };
         const idToken = r.idToken;
         if (!idToken) {
-          setSubmitting(false);
+          setSubmittingMethod(null);
           const msg = String(r.error ?? '');
           const cancelled = /cancel|canceled|cancelled|12501/i.test(msg);
           if (!cancelled && msg) {
@@ -348,7 +371,7 @@ const AuthForm: React.FC = () => {
           }
           trackAuthFailed('google', sanitiseErrorForAnalytics(error.message));
           toast.error('Could not complete Google Sign-In. Please try again or use email.');
-          setSubmitting(false);
+          setSubmittingMethod(null);
           return;
         }
 
@@ -368,6 +391,7 @@ const AuthForm: React.FC = () => {
 
         if (data?.session?.user) {
           trackLoginSuccess('google');
+          onWillNavigate?.();
           const dest = await resolvePostAuthRoute(
             data.session.user.id,
             searchParams.get('redirect'),
@@ -376,10 +400,10 @@ const AuthForm: React.FC = () => {
           navigate(dest, { replace: true });
         }
       } finally {
-        setSubmitting(false);
+        setSubmittingMethod(null);
       }
     },
-    [navigate, searchParams],
+    [navigate, searchParams, onWillNavigate],
   );
 
   const handleGoogleSignIn = useCallback(() => {
@@ -389,7 +413,8 @@ const AuthForm: React.FC = () => {
       toast.error('Google Sign-In needs the latest app version.');
       return;
     }
-    setSubmitting(true);
+    setSubmittingMethod('google');
+    oauthPendingRef.current = true;
     median.socialLogin.google.login({ callback: handleGoogleCallback });
   }, [handleGoogleCallback]);
 
@@ -404,10 +429,12 @@ const AuthForm: React.FC = () => {
         style={isSheetOpen ? { pointerEvents: 'none' as const } : undefined}
       >
         <AuthHeroScreen
-          submitting={submitting && step === 'hero'}
+          submittingMethod={step === 'hero' ? submittingMethod : null}
           onSubmitEmail={handleSubmitEmail}
           onAppleSignIn={handleAppleSignIn}
           onGoogleSignIn={handleGoogleSignIn}
+          errorMessage={step === 'hero' ? otpError : null}
+          errorNonce={otpErrorNonce}
         />
 
       </div>
@@ -420,7 +447,7 @@ const AuthForm: React.FC = () => {
       >
         <OtpSheetContent
           email={email}
-          submitting={submitting && step === 'otp'}
+          submitting={submittingMethod === 'email' && step === 'otp'}
           errorMessage={otpError}
           infoMessage={otpInfo}
           errorNonce={otpErrorNonce}

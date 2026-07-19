@@ -12,7 +12,7 @@ import { isMedianApp } from '@/utils/median/isMedianApp';
 const SHOW_WORDMARK = false;
 
 interface AuthHeroScreenProps {
-  submitting: boolean;
+  submittingMethod: 'email' | 'apple' | 'google' | null;
   onSubmitEmail: (email: string) => Promise<void> | void;
   onAppleSignIn?: () => void;
   onGoogleSignIn?: () => void;
@@ -50,13 +50,17 @@ const GoogleLogo: React.FC<{ size?: number }> = ({ size = 18 }) => (
 
 
 const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
-  submitting,
+  submittingMethod,
   onSubmitEmail,
   onAppleSignIn,
   onGoogleSignIn,
   errorMessage,
   errorNonce,
 }) => {
+  const submitting = submittingMethod !== null;
+  const emailSubmitting = submittingMethod === 'email';
+  const appleSubmitting = submittingMethod === 'apple';
+  const googleSubmitting = submittingMethod === 'google';
   const { t } = useTranslation(['auth', 'common']);
 
   const emailSchema = useMemo(
