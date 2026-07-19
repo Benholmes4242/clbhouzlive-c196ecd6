@@ -45,8 +45,9 @@ export default function CourseTagSheet({
 }: Props) {
   const [q, setQ] = useState('');
   const [rows, setRows] = useState<Row[]>([]);
+  const [searching, setSearching] = useState(false);
   const [draft, setDraft] = useState<StageCourse[]>(selected);
-  const { rows: popular } = usePopularCourses(open, {
+  const { rows: popular, loaded: popularLoaded } = usePopularCourses(open, {
     excludeReviewedForUserId,
   });
   const [reviewedIds, setReviewedIds] = useState<Set<string>>(new Set());
