@@ -21,6 +21,7 @@ export function SubmitBar({
   disabledLabel = 'Continue with your verdict',
 }: Props) {
   const enabled = canSubmit && !submitting;
+  const activeLook = enabled || submitting;
   return (
     <div
       style={{
@@ -39,13 +40,13 @@ export function SubmitBar({
           padding: '16px',
           borderRadius: 14,
           border: 'none',
-          background: enabled ? RV2.amber : 'rgba(15,23,42,0.10)',
-          color: enabled ? '#FFFFFF' : RV2.secondary,
+          background: activeLook ? RV2.amber : 'rgba(15,23,42,0.10)',
+          color: activeLook ? '#FFFFFF' : RV2.secondary,
           fontSize: 14.5,
           fontWeight: 700,
           letterSpacing: '-0.005em',
           cursor: enabled ? 'pointer' : 'not-allowed',
-          boxShadow: enabled ? '0 6px 16px rgba(247,147,30,0.28)' : 'none',
+          boxShadow: activeLook ? '0 6px 16px rgba(247,147,30,0.28)' : 'none',
           transition: 'background 160ms, color 160ms',
         }}
       >

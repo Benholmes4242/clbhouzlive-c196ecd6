@@ -32,6 +32,7 @@ import { SubmitBar } from './components/SubmitBar';
 import { SuccessScreenV2 } from './components/SuccessScreenV2';
 import { RemoveReviewSheetV2 } from './components/RemoveReviewSheetV2';
 import type { ExistingMedia, ExistingReview, ReviewV2Course } from './types';
+import { RateCoursePageSkeleton } from '@/components/skeletons/RateCoursePageSkeleton';
 
 
 
@@ -122,24 +123,68 @@ function InnerComposer() {
     !sessionLoading &&
     (!userId
       ? true // signed-out: nothing to prefill
-      : !existingQ.isLoading && (!existingQ.data || !existingMediaQ.isLoading));
+      : !profileQ.isLoading && !existingQ.isLoading && (!existingQ.data || !existingMediaQ.isLoading));
 
-  if (!ready) {
+  if (courseQ.isError) {
     return (
       <div
         style={{
           minHeight: '100vh',
           background: RV2.canvas,
           display: 'flex',
+          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          color: RV2.muted,
-          fontSize: 13,
+          padding: '0 24px',
+          textAlign: 'center',
         }}
       >
-        Loading course...
+        <div style={{ fontSize: 17, fontWeight: 700, color: RV2.ink, marginBottom: 6 }}>
+          Couldn&apos;t load this course
+        </div>
+        <div style={{ fontSize: 13, color: RV2.secondary, marginBottom: 20, maxWidth: 280 }}>
+          Check your connection and try again.
+        </div>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            style={{
+              background: '#FFFFFF',
+              border: `1px solid ${RV2.hairlineStrong}`,
+              borderRadius: 999,
+              padding: '10px 18px',
+              fontSize: 14,
+              fontWeight: 600,
+              color: RV2.ink,
+              cursor: 'pointer',
+            }}
+          >
+            Go back
+          </button>
+          <button
+            type="button"
+            onClick={() => courseQ.refetch()}
+            style={{
+              background: RV2.dark,
+              color: '#F5F6F7',
+              border: 0,
+              borderRadius: 999,
+              padding: '10px 18px',
+              fontSize: 14,
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            Retry
+          </button>
+        </div>
       </div>
     );
+  }
+
+  if (!ready) {
+    return <RateCoursePageSkeleton />;
   }
 
   return (
