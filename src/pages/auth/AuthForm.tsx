@@ -431,21 +431,6 @@ const AuthForm: React.FC = () => {
           onCodeEdit={() => setOtpInfo(null)}
         />
       </AuthBottomSheet>
-
-      {step === 'hero' && authNotice && (
-        <div className="fixed bottom-24 left-4 right-4 z-50">
-          <div
-            className="p-4 rounded-2xl text-center text-[14px]"
-            style={{
-              backgroundColor: '#1B1E27',
-              color: 'rgba(255,255,255,0.96)',
-              border: '1px solid rgba(255,255,255,0.10)',
-            }}
-          >
-            {authNotice.message}
-          </div>
-        </div>
-      )}
     </>
   );
 };
