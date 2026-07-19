@@ -10,7 +10,8 @@ import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { TierGem } from '@/components/shared/TierGem';
+import { TierGlyph, TIER_COLOR_DARK } from '@/components/shared/TierGlyph';
+import { levelForMedals } from '@/components/profile/handicap/whs/gam/trophy-room/_shared/levels';
 import { openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
 
 const FONT = "'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif";
