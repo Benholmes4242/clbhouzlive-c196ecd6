@@ -142,7 +142,11 @@ function CommentsSheetV2Inner({
 
   const onMore = useCallback((c: CommentV2) => setActionTarget(c), []);
   const onCopy = useCallback((c: CommentV2) => {
-    if (c.content) navigator.clipboard.writeText(c.content).then(() => toast.success('Copied'));
+    if (c.content) {
+      navigator.clipboard.writeText(c.content)
+        .then(() => toast.success('Copied'))
+        .catch(() => toast.error('Could not copy'));
+    }
   }, []);
   const beginEdit = useCallback((c: CommentV2) => {
     setEditing(c); setEditText(c.content ?? '');
@@ -153,8 +157,8 @@ function CommentsSheetV2Inner({
       await editComment.mutateAsync({ id: editing.id, content: editText });
       toast.success('Comment updated');
       setEditing(null); setEditText('');
-    } catch (e: any) {
-      toast.error(e?.message ?? 'Failed to update');
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Failed to update');
     }
   }, [editing, editText, editComment]);
   const beginDelete = useCallback((c: CommentV2) => {
@@ -164,10 +168,10 @@ function CommentsSheetV2Inner({
   const confirmDelete = useCallback(async () => {
     if (!deleteTarget) return;
     try {
-      await deleteComment.mutateAsync(deleteTarget.id);
+      await deleteComment.mutateAsync({ id: deleteTarget.id, replyCount: deleteTarget.reply_count });
       toast.success('Comment deleted');
-    } catch (e: any) {
-      toast.error(e?.message ?? 'Failed to delete');
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Failed to delete');
     }
     setDeleteTarget(null);
   }, [deleteTarget, deleteComment]);
