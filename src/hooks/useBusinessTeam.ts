@@ -18,6 +18,7 @@ export interface BusinessMember {
   role: BusinessRole;
   created_at: string;
   is_public: boolean | null;
+  job_title: string | null;
   user_profile?: {
     id: string;
     display_name: string | null;
