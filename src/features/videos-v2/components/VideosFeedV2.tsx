@@ -157,7 +157,7 @@ export function VideosFeedV2({ sort, category }: Props) {
         </div>
       )}
 
-      {(isLoading || authLoading) && rows.length === 0) ? (
+      {(isLoading || authLoading) && rows.length === 0 ? (
         <div style={{ padding: '12px 4px 0' }}>
           <SkeletonCard />
           <SkeletonCard />

@@ -227,7 +227,7 @@ export function HubClipsRow() {
         }}
         className="hide-scrollbar"
       >
-        {(isLoading || authLoading) && rows.length === 0) ? (
+        {(isLoading || authLoading) && rows.length === 0 ? (
           <>
             <SkeletonTile />
             <SkeletonTile />

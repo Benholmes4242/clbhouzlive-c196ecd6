@@ -302,7 +302,7 @@ export function HubVideoRow() {
         }}
         className="hide-scrollbar"
       >
-        {(isLoading || authLoading) && rows.length === 0) ? (
+        {(isLoading || authLoading) && rows.length === 0 ? (
           <>
             <SkeletonCard />
             <SkeletonCard />
