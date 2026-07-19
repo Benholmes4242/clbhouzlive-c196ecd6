@@ -16,6 +16,7 @@ import { compressImage, COMPRESSION_PRESETS } from '@/uploads/imageCompression';
 import { uploadVideoResilient } from '@/uploads/resilientVideoUpload';
 import { uploadToCloudflareR2 } from '@/utils/cloudflareUpload';
 import { bakeFrameCrop } from './bakeFrameCrop';
+import { CLOUDFLARE_STREAM_SUBDOMAIN } from '@/config/streamConstants';
 import type { StageMediaItem } from '../hooks/useStageComposer';
 
 export interface UploadJobContext {
