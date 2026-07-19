@@ -9,6 +9,7 @@ import {
   SLATE_50,
 } from '@/features/tourhub/_shared/tokens';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { ScopeSegment } from '@/components/shared/ScopeSegment';
 
 import { formatHcp } from '@/lib/formatHcp';
 import { REGION_TABS } from './AlmanacSections';
@@ -255,37 +256,15 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
               gap: 8,
             }}
           >
-            <div style={{ display: 'inline-flex', flexShrink: 0, gap: 6 }}>
-              {([
-                { v: 'latest', label: 'RECENT' },
-                { v: 'alltime', label: 'ALL TIME' },
-              ] as const).map((o) => {
-                const active = mode === o.v;
-                return (
-                  <button
-                    key={o.v}
-                    type="button"
-                    onClick={() => setMode(o.v)}
-                    style={{
-                      padding: '4px 9px',
-                      borderRadius: 999,
-                      background: active ? '#15171F' : 'transparent',
-                      color: active ? '#FFFFFF' : 'rgba(15,23,42,0.65)',
-                      border: 'none',
-                      fontFamily: FONT,
-                      fontSize: 10.5,
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      letterSpacing: '0.02em',
-                      whiteSpace: 'nowrap',
-                      transition: 'all .15s',
-                    }}
-                  >
-                    {o.label}
-                  </button>
-                );
-              })}
-            </div>
+            <ScopeSegment
+              value={mode}
+              onChange={(v) => setMode(v)}
+              ariaLabel="Scope"
+              options={[
+                { value: 'latest', label: 'Recent' },
+                { value: 'alltime', label: 'All time' },
+              ]}
+            />
 
             {isLegendaryLeaders && (
               <div
