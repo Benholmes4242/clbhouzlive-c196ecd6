@@ -85,6 +85,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { migrateChatHistory } from '@/utils/chatHistoryMigration';
 import { NavTimingProvider } from '@/perf/NavTimingProvider';
 import { AdminGatedPerfPill, AdminGatedBootTimelinePill, AdminGatedPerfHud, AdminGatedLogHud } from '@/perf/AdminGatedPills';
+import { AudioDebugHud } from '@/perf/AudioDebugHud';
 
 
 
@@ -888,6 +889,7 @@ const AppInner: React.FC = () => {
         <AdminGatedLogHud />
         <AdminGatedPerfPill />
         <AdminGatedBootTimelinePill />
+        <AudioDebugHud />
         
         
         

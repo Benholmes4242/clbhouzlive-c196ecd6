@@ -13,6 +13,7 @@
 import React from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
+import * as audioDbg from '@/perf/audioDebug';
 
 type Size = 'sm' | 'md';
 
@@ -41,6 +42,11 @@ export const MuteButton: React.FC<MuteButtonProps> = ({
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (audioDbg.audioDebugEnabled()) {
+      audioDbg.logAudio('viewer.mute.tap', {
+        controlled, before: { sessionMuted, isMuted },
+      });
+    }
     if (controlled) {
       onToggle?.();
     } else {

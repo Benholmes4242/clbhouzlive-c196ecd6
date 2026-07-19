@@ -5,6 +5,9 @@ import { applyEngagementDelta } from '@/lib/applyEngagementDelta';
 import type { LaneId } from '@/video/lanePolicy';
 import { vperfStart, vperfMark, vperfArmLane, vperfNextId } from '@/perf/vperf';
 import { trace, traceLookup } from '@/perf/trace';
+import * as audioDbg from '@/perf/audioDebug';
+import { useSessionAudio, getLastUnmuteGestureTs } from '@/audio/sessionAudioStore';
+import { VideoEngine } from '@/video/VideoEngine';
 
 
 
@@ -228,6 +231,56 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       startPosition: options?.startPosition ?? 0,
       openedFrom: options?.openedFrom ?? null,
     });
+    // ── AudioDebug: tap → open cycle instrumentation (flag-gated, zero-cost off)
+    if (audioDbg.audioDebugEnabled()) {
+      try {
+        const ownerKey = options?.borrow?.ownerKey
+          ?? (slidePostId ? `${slidePostId}:${options?.mediaIndex ?? 0}` : null);
+        const openId = audioDbg.beginOpen(slidePostId ?? undefined);
+        const s = useSessionAudio.getState();
+        const lastTs = getLastUnmuteGestureTs();
+        audioDbg.logAudio('tap', {
+          slidePostId, ownerKey, openId,
+          openedFrom: options?.openedFrom ?? null,
+        });
+        audioDbg.logAudio('session.state', {
+          isMuted: s.isMuted,
+          lastUnmuteGestureTs: lastTs,
+          msSinceGesture: lastTs > 0 ? Date.now() - lastTs : null,
+        });
+        if (options?.borrow) {
+          const laneId = options.borrow.laneId;
+          const el = (VideoEngine as unknown as { _debugGetElement?: (id: string) => HTMLMediaElement | null })._debugGetElement?.(laneId) ?? null;
+          const snap = VideoEngine.snapshot(laneId as LaneId);
+          audioDbg.logAudio('tile.state', {
+            laneId, ownerKey: options.borrow.ownerKey,
+            muted: el?.muted ?? null, volume: el?.volume ?? null,
+            paused: el?.paused ?? null,
+            currentTime: +(el?.currentTime ?? snap.currentTime).toFixed(3),
+            state: snap.state,
+          });
+          audioDbg.setSummary({ tilePos: +(el?.currentTime ?? snap.currentTime).toFixed(2) });
+        } else if (ownerKey) {
+          const lastPos = VideoEngine.getLastPos(ownerKey);
+          audioDbg.logAudio('tile.state', { laneId: null, ownerKey, lastPos: +lastPos.toFixed(3) });
+          audioDbg.setSummary({ tilePos: +lastPos.toFixed(2) });
+        }
+        audioDbg.logAudio('open.decision', {
+          mode: options?.borrow ? 'borrow' : 'cold',
+          laneId: options?.borrow?.laneId ?? 'fullscreen',
+          startPosition: +Number(options?.startPosition ?? 0).toFixed(3),
+          lastPos: ownerKey ? +VideoEngine.getLastPos(ownerKey).toFixed(3) : null,
+        });
+        audioDbg.setSummary({
+          mode: options?.borrow ? 'borrow' : 'cold',
+          laneId: options?.borrow?.laneId ?? 'fullscreen',
+          sessionMuted: s.isMuted,
+          msSinceGesture: lastTs > 0 ? Date.now() - lastTs : null,
+          continuityOk: null,
+          fsPos: null,
+        });
+      } catch {}
+    }
     set({
       isOpen: true,
       posts,
@@ -266,6 +319,35 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       laneId: borrow ? borrow.laneId : 'fullscreen',
     });
     vperfMark(closeSpanId, 'closeIntent');
+    // ── AudioDebug: close.state + tile.resume snapshot @500ms (flag-gated)
+    if (audioDbg.audioDebugEnabled()) {
+      try {
+        const laneId = borrow ? borrow.laneId : 'fullscreen';
+        const el = (VideoEngine as unknown as { _debugGetElement?: (id: string) => HTMLMediaElement | null })._debugGetElement?.(laneId) ?? null;
+        const sess = useSessionAudio.getState();
+        audioDbg.logAudio('close.state', {
+          laneId, mode: borrow ? 'borrow-return' : 'no-borrow',
+          sessionMuted: sess.isMuted,
+          elMuted: el?.muted ?? null, elVolume: el?.volume ?? null,
+          elPaused: el?.paused ?? null,
+          elCurrentTime: el ? +el.currentTime.toFixed(3) : null,
+        });
+        const resumeKey = borrow?.ownerKey ?? null;
+        setTimeout(() => {
+          try {
+            const el2 = (VideoEngine as unknown as { _debugGetElement?: (id: string) => HTMLMediaElement | null })._debugGetElement?.(laneId) ?? null;
+            audioDbg.logAudio('tile.resume', {
+              laneId, ownerKey: resumeKey,
+              muted: el2?.muted ?? null, volume: el2?.volume ?? null,
+              paused: el2?.paused ?? null,
+              currentTime: el2 ? +el2.currentTime.toFixed(3) : null,
+              lastPos: resumeKey ? +VideoEngine.getLastPos(resumeKey).toFixed(3) : null,
+            });
+          } catch {}
+          audioDbg.endOpen();
+        }, 500);
+      } catch {}
+    }
     if (borrow) {
       // handback = returnBorrow tail done (approximated on next frame); tileLive
       // = lane playing on tile (armed on the borrowed lane's next 'playing').

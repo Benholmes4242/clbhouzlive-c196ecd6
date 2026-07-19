@@ -1112,6 +1112,14 @@ class VideoEngineImpl {
     };
   }
 
+  /** Debug-only: return the underlying media element for a lane. Used by
+   * AudioDebugHud (FLAGS.audioDebug) to attach volumechange/play/pause
+   * listeners without pushing engine-side changes into every consumer. */
+  _debugGetElement(laneId: LaneId): HTMLMediaElement | null {
+    try { return this.getLane(laneId).el; } catch { return null; }
+  }
+
+
   /**
    * Live-read directly from the underlying element (no cached state). Used by
    * openWithOrigin at bind time to re-validate a borrow candidate immediately
