@@ -22,7 +22,6 @@ const MOOD_LABELS: Record<ClipsV2Mood, string> = {
   lightning: 'Lightning',
   friends: 'Friends',
   your_courses: 'Your courses',
-  trending: 'Trending',
 };
 
 function parseMood(raw: string | null): ClipsV2Mood {
