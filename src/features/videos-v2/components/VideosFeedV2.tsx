@@ -96,6 +96,8 @@ export function VideosFeedV2({ sort, category }: Props) {
   const {
     data,
     isLoading,
+    isError,
+    refetch,
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
