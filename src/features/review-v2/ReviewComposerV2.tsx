@@ -189,7 +189,40 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
 
   const [success, setSuccess] = useState<{ ratingId: string; shareToFeed: boolean } | null>(null);
   const [removeOpen, setRemoveOpen] = useState(false);
+  const [exitGuardOpen, setExitGuardOpen] = useState(false);
   const [dictationFlashKey, setDictationFlashKey] = useState(0);
+
+  const isDirty = useMemo(() => {
+    if (isEditMode) {
+      return (
+        composer.state.overall !== (existing?.rating ?? null) ||
+        composer.state.reviewText !== (existing?.review ?? '') ||
+        composer.state.shareToFeed !== (existing?.share_to_feed !== false) ||
+        composer.state.scores.design !== (existing?.design_score ?? null) ||
+        composer.state.scores.condition !== (existing?.condition_score ?? null) ||
+        composer.state.scores.clubhouse !== (existing?.clubhouse_score ?? null) ||
+        composer.state.scores.facilities !== (existing?.facilities_score ?? null) ||
+        media.hasNewMedia()
+      );
+    }
+    return (
+      composer.state.overall != null ||
+      composer.state.reviewText.trim().length > 0 ||
+      composer.state.scores.design != null ||
+      composer.state.scores.condition != null ||
+      composer.state.scores.clubhouse != null ||
+      composer.state.scores.facilities != null ||
+      media.hasNewMedia()
+    );
+  }, [isEditMode, existing, composer.state, media]);
+
+  const handleBack = useCallback(() => {
+    if (isDirty && !success) {
+      setExitGuardOpen(true);
+      return;
+    }
+    onExit();
+  }, [isDirty, success, onExit]);
 
   const handleSubmit = useCallback(async () => {
     try {
@@ -200,8 +233,8 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
       // Fire uploads AFTER the RPC (media picked before submit is held locally).
       media.flushToReview(ratingId).catch(() => { /* per-item errors surfaced in tray */ });
       setSuccess({ ratingId, shareToFeed });
-    } catch {
-      // hook exposed error state already
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Couldn't save your review");
     }
   }, [submit, media, composer.state, course.id]);
 
@@ -219,8 +252,8 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
       }
       setRemoveOpen(false);
       onExit();
-    } catch {
-      // error surfaced via hook
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Couldn't remove your review");
     }
   }, [existing, submit, existingMedia, onExit]);
 
