@@ -13,7 +13,18 @@ function read(): RecentItem[] {
     if (!Array.isArray(arr)) return [];
     return arr.slice(0, MAX);
   } catch {
+    /* storage unavailable - recents disabled */
     return [];
+  }
+}
+
+function write(items: RecentItem[]) {
+  try {
+    localStorage.setItem(KEY, JSON.stringify(items.slice(0, MAX)));
+  } catch {
+    /* storage unavailable - recents disabled */
+  }
+}
   }
 }
 
