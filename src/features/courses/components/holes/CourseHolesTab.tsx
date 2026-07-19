@@ -150,7 +150,7 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
           key={h.hole_no}
           hole={toShared(h)}
           maxAbs={maxAbs}
-          countLabel={t('courses:holes.roundsLabel', 'rounds') as 'rounds' | 'players'}
+          countLabel="rounds"
           expanded={expanded.has(h.hole_no)}
           onToggle={() => toggle(h.hole_no)}
           tag={
