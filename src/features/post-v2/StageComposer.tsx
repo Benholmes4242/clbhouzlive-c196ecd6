@@ -38,7 +38,7 @@ import ActorSheet from './components/ActorSheet';
 import ScheduleSheetV2 from './components/ScheduleSheetV2';
 import DraftsSheetV2 from './components/DraftsSheetV2';
 import ScheduledPostsSheetV2 from './components/ScheduledPostsSheetV2';
-import MediaTrimSheet from './components/MediaTrimSheet';
+
 import CoverFrameSheet from './components/CoverFrameSheet';
 import AdjustSheet from './components/AdjustSheet';
 import PostSuccessV2 from './components/PostSuccessV2';
