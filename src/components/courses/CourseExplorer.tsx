@@ -74,6 +74,24 @@ function applySortToQuery<Q extends OrderableQuery<Q>>(query: Q, sortOption: Sor
 }
 
 
+/**
+ * Row shape produced by explore_courses_by_rating and the fallback PostgREST
+ * select — only the fields the UI + card mapper touch. Kept structural so
+ * both call sites converge on one type.
+ */
+type ExploreCourseRow = {
+  id: string;
+  name: string;
+  country?: string | null;
+  sub_country?: string | null;
+  thumbnail_image?: string | null;
+  global_rank?: number | null;
+  regional_rank?: number | null;
+  usa_rank?: number | null;
+  average_rating?: number | null;
+  course_rating_aggregates?: Array<{ avg_overall_score: number | null }> | null;
+};
+
 interface FetchCoursePageParams {
   selectedRegion: PrimaryRegionKey;
   selectedSubregion: string;
