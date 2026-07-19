@@ -46,6 +46,7 @@ export default function ActorCards({
   onNavigate,
 }: Props) {
   const { countFor } = useActorUnreadCounts();
+  const [switchingId, setSwitchingId] = React.useState<string | null>(null);
   const hasBusiness = profiles.some(p => p.type === 'business');
   // Active actor first; preserve original order for the rest (stable sort).
   const orderedProfiles = React.useMemo(() => {
