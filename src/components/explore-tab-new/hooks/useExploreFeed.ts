@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { mapRowToFeedPost, groupMultiMedia } from '@/components/media-system/utils/feedMapper';
 import type { FeedPost, FeedRpcRow } from '@/components/media-system/types/media';
+import type { RpcClient } from '@/features/watch-v2/hooks/useHubMixedGrid';
 
 const PAGE_SIZE = 30;
 
