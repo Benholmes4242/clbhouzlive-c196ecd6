@@ -177,7 +177,7 @@ function CommentsSheetV2Inner({
   }, [deleteTarget, deleteComment]);
 
   const onSubmit = useCallback(async (input: {
-    content?: string; mediaUrl?: string; mediaType?: string; actor: { type: 'personal' | 'business'; id: string };
+    content?: string; mediaUrl?: string; mediaType?: string; actor: ActiveActor;
   }) => {
     try {
       await addComment.mutateAsync({
@@ -189,8 +189,8 @@ function CommentsSheetV2Inner({
         actorId: input.actor.id,
       });
       setReplyingTo(null);
-    } catch (e: any) {
-      toast.error(e?.message ?? 'Failed to post comment');
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Failed to post comment');
     }
   }, [addComment, replyingTo]);
 
