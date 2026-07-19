@@ -213,6 +213,7 @@ export const Fsv2VideoSlot: React.FC<Props> = ({
 
     return () => {
       cancelled = true;
+      clearTimeout(stallProbe);
       el.removeEventListener('loadeddata', onFrame);
       el.removeEventListener('playing', onFrame);
       detachInstr();
