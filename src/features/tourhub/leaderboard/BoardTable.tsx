@@ -50,6 +50,7 @@ export interface BoardEntry {
   score: number | null;
   thru: number | null;
   today?: number | null;
+  today_round?: number | null;
   status?: string | null;
   round_1?: number | null;
   round_2?: number | null;
