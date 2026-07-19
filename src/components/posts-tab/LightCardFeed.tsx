@@ -344,7 +344,18 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
           surface: 'posts-tab',
         });
       }
-      if (origin?.el) {
+      if (FLAGS.fsv2) {
+        openFsv2({
+          openedFrom: 'posts-tab',
+          posts,
+          startIndex: idx,
+          mediaId: mediaId ?? null,
+          mediaIndex,
+          hasNextPage: hasNextPage ?? false,
+          fetchNextPage: hasNextPage ? fetchNextPage : undefined,
+          isFetchingNextPage: isFetchingNextPage ?? false,
+        });
+      } else if (origin?.el) {
         openWithOrigin({
           openedFrom: 'posts-tab',
           posts,
