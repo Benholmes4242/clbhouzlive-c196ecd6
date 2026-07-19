@@ -55,17 +55,20 @@ interface CourseMediaCanonGridProps {
 
 // Same FeedPost → FeedCardRow projection ExploreGrid uses (Brief U3R).
 function toFeedCardRow(post: FeedPost): FeedCardRow {
-  const media = post.mediaItems[0];
-  const explicit = (media as any)?.format as ('clip' | 'video' | undefined);
+  const media = post.mediaItems[0] as (typeof post.mediaItems[0] & {
+    format?: 'clip' | 'video';
+    width?: number | null;
+    height?: number | null;
+  }) | undefined;
+  const explicit = media?.format;
   const duration = media?.duration ?? null;
   const derived: 'clip' | 'video' =
     explicit ??
     (media?.type === 'video'
       ? (duration != null && duration <= 90 ? 'clip' : 'video')
       : 'clip');
-  const mAny = media as any;
-  const width = Number(mAny?.width) || null;
-  const height = Number(mAny?.height) || null;
+  const width = Number(media?.width) || null;
+  const height = Number(media?.height) || null;
   return {
     post_id: post.id,
     post_content: post.caption ?? null,
