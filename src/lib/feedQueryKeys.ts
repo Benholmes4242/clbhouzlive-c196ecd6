@@ -94,10 +94,11 @@ export const PROFILE_QUERY_KEYS: readonly (readonly unknown[])[] = [
   ['userPosts'],
   ['user-posts-preview'],
 
-  // Business surfaces
-  ['business-posts-infinite'],
-  ['business-tagged-posts'],
-  ['business-tagged-posts-infinite'],
+  // Business surfaces — real hook `useBusinessPosts` uses
+  // `postKeys.actorPosts('business', id)` → prefix `['actor-posts']`,
+  // already covered above. Legacy `business-posts-infinite` /
+  // `business-tagged-posts(-infinite)` names had no live callsites
+  // and have been removed to keep the registry accurate.
 
   // Course-scoped feeds
   ['course-media-feed'],
