@@ -25,7 +25,9 @@ export function applyEngagementDelta<T extends Record<string, any>>(
   delta: EngagementDelta,
 ): T {
   if (!post) return post;
-  if (postId !== null && post.id !== postId) return post;
+  // Some feed rows (Watch-v2 / Videos-v2 / Clips-v2 RPC rows) carry the
+  // post identifier as `post_id` instead of `id`. Accept either.
+  if (postId !== null && post.id !== postId && post.post_id !== postId) return post;
 
   const patched: any = { ...post };
 

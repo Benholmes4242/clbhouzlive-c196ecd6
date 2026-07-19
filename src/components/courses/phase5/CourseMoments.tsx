@@ -49,6 +49,14 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
         height: 0,
       }],
       createdAt: m.createdAt,
+      // ⚠️ HARDCODED 0/false engagement fields.
+      // SAFE ONLY because CourseMoments opens the fullscreen viewer with
+      // readOnly:true — likes/comments UI is suppressed and no mutation
+      // paths can fire against these stub values. If this surface is ever
+      // switched to an interactive viewer, wire real engagement (fetch
+      // like_count / comment_count / is_liked_by_me for the moment's
+      // underlying post) BEFORE flipping readOnly off, or every viewed
+      // moment will appear zeroed and any like will patch a stale delta.
       likeCount: 0,
       commentCount: 0,
       shareCount: 0,

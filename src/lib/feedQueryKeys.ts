@@ -62,6 +62,15 @@ export const FEED_QUERY_KEYS: readonly (readonly unknown[])[] = [
   ['long-form-videos'],
   ['related-long-form-videos'],
 
+  // Watch-v2 / Videos-v2 / Clips-v2 (rows carry `post_id`, not `id`;
+  // applyEngagementDelta id-check also matches `post_id`).
+  ['videos-v2-feed'],
+  ['videos-v2-interrupt-clips'],
+  ['hub-mixed-grid'],
+  ['hub-quick-clips'],
+  ['hub-long-form-videos'],
+  ['clips-v2-wall'],
+
   // Tournament live (Clubhouse + Watch surfaces)
   ['live-tournament-counts'],
   ['live-tournament-post-ids'],
@@ -85,10 +94,11 @@ export const PROFILE_QUERY_KEYS: readonly (readonly unknown[])[] = [
   ['userPosts'],
   ['user-posts-preview'],
 
-  // Business surfaces
-  ['business-posts-infinite'],
-  ['business-tagged-posts'],
-  ['business-tagged-posts-infinite'],
+  // Business surfaces — real hook `useBusinessPosts` uses
+  // `postKeys.actorPosts('business', id)` → prefix `['actor-posts']`,
+  // already covered above. Legacy `business-posts-infinite` /
+  // `business-tagged-posts(-infinite)` names had no live callsites
+  // and have been removed to keep the registry accurate.
 
   // Course-scoped feeds
   ['course-media-feed'],
