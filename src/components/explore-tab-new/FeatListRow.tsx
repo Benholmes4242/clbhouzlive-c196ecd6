@@ -62,7 +62,7 @@ interface Props {
 // Canonical sheet/page leaderboard row. Refinement token spec applied:
 // rank 11/600, name 13/600, subline 11/500, value 15/700 (amber champion,
 // ink others), microlabel 9/600/0.06em, bar 3px solid amber (8% floor).
-export function FeatListRow({ row, tier, onTap, index = 0, mode = 'latest', bestToPar = null, maxCount = null }: Props) {
+export function FeatListRow({ row, tier, onTap, index = 0, mode = 'latest', bestToPar = null, maxCount = null, crownLeader = false }: Props) {
   const holder = useMemo(() => formatHolderName(row.holder_name), [row.holder_name]);
   const when = relDate(row.play_date ?? row.attained_at ?? null);
   const rank = index + 1;
