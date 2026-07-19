@@ -143,17 +143,25 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
     let cancelled = false;
     supabase
       .from('post_drafts')
-      .select('id, actor_type, actor_id, content, course_id, course_name, course_country')
+      .select('id, actor_type, actor_id, content, course_id, course_name, course_country, course_data')
       .eq('id', draftId)
       .eq('user_id', profile.id)
       .maybeSingle()
       .then(({ data }) => {
         if (cancelled || !data) return;
+        // Multi-course drafts stash the full ordered list in course_data.courses.
+        const cd = (data.course_data as { courses?: Array<{ id: string; name: string; country: string | null }> } | null) ?? null;
+        const savedCourses = cd?.courses ?? [];
+        const primary = data.course_id && data.course_name
+          ? { id: data.course_id as string, name: data.course_name as string, country: (data.course_country as string) ?? null }
+          : null;
+        const courses = savedCourses.length > 0
+          ? savedCourses
+          : (primary ? [primary] : []);
         restoreDraft({
           caption: (data.content as string) ?? '',
-          course: data.course_id && data.course_name
-            ? { id: data.course_id as string, name: data.course_name as string, country: (data.course_country as string) ?? null }
-            : null,
+          courses,
+          course: courses[0] ?? null,
         });
       });
     return () => { cancelled = true; };
