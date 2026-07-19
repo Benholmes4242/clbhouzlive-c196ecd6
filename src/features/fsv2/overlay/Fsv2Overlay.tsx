@@ -195,6 +195,7 @@ export const Fsv2Overlay: React.FC = () => {
       }}
     >
       <Fsv2VerticalSnapPager
+        key={openId || 'idle'}
         posts={posts}
         activeIndex={activeIndex}
         openId={openId}
