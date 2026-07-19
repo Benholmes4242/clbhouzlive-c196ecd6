@@ -532,6 +532,104 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
         onCancel={() => setRemoveOpen(false)}
         onConfirm={handleRemove}
       />
+
+      <DiscardReviewSheet
+        open={exitGuardOpen}
+        onKeep={() => setExitGuardOpen(false)}
+        onDiscard={() => {
+          setExitGuardOpen(false);
+          onExit();
+        }}
+      />
+    </div>
+  );
+}
+
+function DiscardReviewSheet({
+  open,
+  onKeep,
+  onDiscard,
+}: {
+  open: boolean;
+  onKeep: () => void;
+  onDiscard: () => void;
+}) {
+  if (!open) return null;
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 10000,
+        background: 'rgba(15,23,42,0.4)',
+        display: 'flex',
+        alignItems: 'flex-end',
+        justifyContent: 'center',
+      }}
+      onClick={onKeep}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          width: '100%',
+          maxWidth: 480,
+          background: '#FFFFFF',
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
+          padding: '16px 16px calc(env(safe-area-inset-bottom, 0px) + 16px)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 12,
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <div style={{ width: 36, height: 4, borderRadius: 999, background: 'rgba(15,23,42,0.16)' }} />
+        </div>
+        <div style={{ padding: '4px 4px 0' }}>
+          <div style={{ fontSize: 15, fontWeight: 700, color: RV2.ink }}>Discard this review?</div>
+          <div style={{ fontSize: 12.5, color: RV2.secondary, marginTop: 4 }}>
+            Your scores and words won't be saved.
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button
+            type="button"
+            onClick={onKeep}
+            style={{
+              flex: 1,
+              padding: 12,
+              borderRadius: 12,
+              background: '#FFFFFF',
+              border: `1px solid ${RV2.hairline}`,
+              fontSize: 14,
+              fontWeight: 600,
+              color: RV2.ink,
+              cursor: 'pointer',
+            }}
+          >
+            Keep writing
+          </button>
+          <button
+            type="button"
+            onClick={onDiscard}
+            style={{
+              flex: 1,
+              padding: 12,
+              borderRadius: 12,
+              background: '#EF4444',
+              border: 'none',
+              fontSize: 14,
+              fontWeight: 700,
+              color: '#FFFFFF',
+              cursor: 'pointer',
+            }}
+          >
+            Discard
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
