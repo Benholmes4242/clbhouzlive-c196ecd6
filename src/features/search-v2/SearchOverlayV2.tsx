@@ -121,7 +121,7 @@ export function SearchOverlayV2({
   }, [isOpen]);
 
 
-  const { data, isLoading, error, debouncedQuery } = useGlobalSearchV2({
+  const { data, isLoading, error, debouncedQuery, refetch } = useGlobalSearchV2({
     query: inputValue,
     scope,
     enabled: isOpen,
