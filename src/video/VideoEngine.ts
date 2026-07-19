@@ -304,6 +304,16 @@ class VideoEngineImpl {
         elPausedAfter: lane.el.paused,
         msSinceOpen: msSinceOpen(),
       });
+      // handback.position — element's playback position at the moment the
+      // borrow flag is cleared. Compared later against resume.position to
+      // quantify any jump-back.
+      if (audioDebugEnabled()) {
+        logAudio('handback.position', {
+          laneId,
+          elCurrentTime: +lane.el.currentTime.toFixed(3),
+          elPaused: lane.el.paused,
+        });
+      }
     }
     // AUDIO FIX v6: borrowed elements keep playing through the borrow (the
     // pause.borrowed swallow keeps them alive), so the feed's resume path
