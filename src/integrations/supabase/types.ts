@@ -8400,6 +8400,7 @@ export type Database = {
           id: string
           is_high_priority: boolean
           reason: string
+          reported_comment_id: string | null
           reported_conversation_id: string | null
           reported_message_id: string | null
           reported_review_id: string | null
@@ -8416,6 +8417,7 @@ export type Database = {
           id?: string
           is_high_priority?: boolean
           reason: string
+          reported_comment_id?: string | null
           reported_conversation_id?: string | null
           reported_message_id?: string | null
           reported_review_id?: string | null
@@ -8432,6 +8434,7 @@ export type Database = {
           id?: string
           is_high_priority?: boolean
           reason?: string
+          reported_comment_id?: string | null
           reported_conversation_id?: string | null
           reported_message_id?: string | null
           reported_review_id?: string | null
