@@ -318,17 +318,17 @@ const AuthForm: React.FC = () => {
         trackAuthInitiated('google');
 
         // Decode claims once for diagnostics + names.
-        let claims: any = null;
+        let claims: GoogleClaims | null = null;
         try {
           claims = JSON.parse(
             atob(idToken.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')),
           );
           console.log('[google-auth] token claims:', {
-            aud: claims.aud,
-            iss: claims.iss,
-            email: claims.email,
-            email_verified: claims.email_verified,
-            has_nonce: 'nonce' in claims,
+            aud: claims?.aud,
+            iss: claims?.iss,
+            email: claims?.email,
+            email_verified: claims?.email_verified,
+            has_nonce: !!claims && 'nonce' in claims,
           });
         } catch {
           /* non-fatal */
@@ -340,7 +340,7 @@ const AuthForm: React.FC = () => {
         });
 
         if (error) {
-          console.error('[google-auth] supabase rejection:', (error as any).status, error.message);
+          console.error('[google-auth] supabase rejection:', (error as { status?: number }).status, error.message);
           if (/nonce/i.test(error.message || '')) {
             console.error(
               '[google-auth] NONCE MISMATCH - enable Skip nonce checks in the Supabase Google provider settings',
