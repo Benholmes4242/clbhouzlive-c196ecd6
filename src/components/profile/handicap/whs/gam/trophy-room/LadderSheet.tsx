@@ -8,13 +8,12 @@
 
 import React, { useEffect, useMemo, useRef } from 'react';
 import { GamSheet } from '../../../gam/_shared/GamSheet';
-import { GemVisual } from '@/components/shared/TierGem';
+import { TierGlyph } from '@/components/shared/TierGlyph';
 import {
   WALL_LEVELS,
   levelForMedals,
-  type WallMaterial,
+  type WallLevel,
 } from './_shared/levels';
-import { MATERIAL_HEX } from './_shared/rarityPalette';
 import type { TrophyItem } from './_shared/normalizeTrophyItem';
 import {
   quarterOf,
@@ -33,12 +32,17 @@ const AMBER = '#F7931E';
 const AMBER_BAR_A = '#E8800C';
 const AMBER_BAR_B = '#FFCB45';
 const GOLD = '#F5C842';
-const OBSIDIAN_EDGE = '#D4A017';
 const FONT = "'Geist', -apple-system, sans-serif";
 
-function matColor(m: WallMaterial): string {
-  if (m === 'obsidian') return OBSIDIAN_EDGE;
-  return (MATERIAL_HEX as Record<string, string>)[m] ?? '#C97B4A';
+const CURRENT = '#34D399';
+const ACHIEVED = 'rgba(241,245,249,0.88)';
+const LOCKED_INK = 'rgba(241,245,249,0.28)';
+
+function levelColor(lvl: WallLevel, state: 'current' | 'achieved' | 'locked'): string {
+  if (lvl.key === 'the_goat' && state !== 'locked') return AMBER;
+  if (state === 'current') return CURRENT;
+  if (state === 'achieved') return ACHIEVED;
+  return LOCKED_INK;
 }
 
 interface Props {
