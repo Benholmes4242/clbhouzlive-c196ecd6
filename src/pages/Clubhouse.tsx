@@ -208,12 +208,31 @@ const ClubhouseContent = () => {
   usePageReady(skeletonMode === 'hidden');
 
 
-  // Effect 2: Once feed is ready, gate on tournament card state
+  // Apple 2.1 safety net: never let the skeleton be the terminal state.
+  // If the feed has not produced posts within 12s, stop blocking on
+  // skeletons so the empty/error surface can render and the reviewer
+  // (or any user behind a VPN / restrictive webview) sees a usable screen.
+  const [skeletonTimedOut, setSkeletonTimedOut] = useState(false);
   useEffect(() => {
-    if (!skeletonVisible) {
+    if (!isLoading && posts.length > 0) {
+      setSkeletonTimedOut(false);
+      return;
+    }
+    const id = window.setTimeout(() => {
+      setSkeletonTimedOut(true);
+    }, 12000);
+    return () => window.clearTimeout(id);
+  }, [isLoading, posts.length, activeTab, user, authLoading]);
+
+  // Effect 2: Once feed is ready, gate on tournament card state.
+  // Also restore nav on terminal empty/error states and skeleton timeout so
+  // the user is never trapped when the feed produces zero posts.
+  const isTerminalEmpty = !isLoading && posts.length === 0;
+  useEffect(() => {
+    if (!skeletonVisible || isTerminalEmpty || skeletonTimedOut) {
       setBottomNavVisible(!isTournamentCardActive);
     }
-  }, [skeletonVisible, isTournamentCardActive, setBottomNavVisible]);
+  }, [skeletonVisible, isTerminalEmpty, skeletonTimedOut, isTournamentCardActive, setBottomNavVisible]);
 
   // ── Lifecycle ──
   useClubhouseLifecycle();
