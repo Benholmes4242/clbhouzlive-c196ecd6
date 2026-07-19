@@ -89,7 +89,18 @@ export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
   // Disconnected state
   if (!connection) {
     return (
-      <div onClick={() => onNavigate('/handicap')} role="button" tabIndex={0} style={stripBase}>
+      <div
+        onClick={() => onNavigate('/handicap')}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onNavigate('/handicap');
+          }
+        }}
+        role="button"
+        tabIndex={0}
+        style={stripBase}
+      >
         {eyebrow}
         <span style={{ fontWeight: 600, fontSize: 13, color: INK }}>
           Connect official WHS handicap
