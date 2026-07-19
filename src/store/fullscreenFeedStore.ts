@@ -321,7 +321,25 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       laneId: borrow ? borrow.laneId : 'fullscreen',
     });
     vperfMark(closeSpanId, 'closeIntent');
-    // ── AudioDebug: close.state + tile.resume snapshot @500ms (flag-gated)
+    // [VPERF] fs.close.motion — mirror of fs.open.motion for the return
+    // animation. Live-resolves the origin tile rect each frame via
+    // originHostRegistry so a mid-flight tile shift shows up as a delta
+    // between wrapper.rect and tileLive.rect at that frame.
+    try {
+      const ownerKey = borrow?.ownerKey ?? null;
+      vperfCloseMotionTrace(closeSpanId, {
+        originResolver: ownerKey
+          ? () => {
+              const host = originHostRegistry.get(ownerKey);
+              if (!host) return null;
+              const r = host.getBoundingClientRect();
+              return { top: r.top, left: r.left, width: r.width, height: r.height };
+            }
+          : null,
+      });
+      vperfCloseMotionMark('closeRequested', { hadBorrow: !!borrow, ownerKey });
+    } catch {}
+    // ── AudioDebug: close.state + close.position + tile.resume @500ms (flag-gated)
     if (audioDbg.audioDebugEnabled()) {
       try {
         const laneId = borrow ? borrow.laneId : 'fullscreen';
