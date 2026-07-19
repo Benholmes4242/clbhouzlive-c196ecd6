@@ -244,13 +244,13 @@ export function VideosFeedV2({ sort, category }: Props) {
             if (!shouldInsertShelf) return card;
             const shelfIndex = (i - 5) / 12;
             return (
-              <span key={r.post_id}>
+              <Fragment key={`${r.post_id}-with-shelf`}>
                 {card}
                 <ClipsInterruptShelf
                   clips={interruptClips}
                   shelfIndex={shelfIndex}
                 />
-              </span>
+              </Fragment>
             );
           })}
 
