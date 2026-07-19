@@ -490,6 +490,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
           const savedCourses = cd?.courses ?? [];
           const courses = savedCourses.length > 0 ? savedCourses : (primary ? [primary] : []);
           restoreDraft({ caption: d.content ?? '', course: courses[0] ?? null, courses });
+          setRestoredDraftId(d.id);
         }}
         onDelete={drafts.remove}
       />
