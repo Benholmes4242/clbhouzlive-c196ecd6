@@ -18,6 +18,7 @@ import { attach, withBandwidthHint, type Fsv2Source } from '../player/fsv2Player
 import { takePreWarmed, dropPreWarmed } from '../player/audioContract';
 import { traceReveal, hudEvent } from '../perf/trace';
 import { registerVideoEl } from '../debug/hudBus';
+import { getPendingRestoreCount } from '@/lib/fsv2Bridge';
 import { WATCHDOG_MS, armWatchdog } from './Watchdogs';
 import { Fsv2TapForSoundPill } from './TapForSoundPill';
 
