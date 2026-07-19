@@ -426,7 +426,7 @@ class VideoEngineImpl {
     lane.mountedHost = hostEl;
     // AUDIO POLICY: apply on mount so a lane's element muted state reflects
     // its policy the moment it's parented into a surface host.
-    this.applyAudioPolicy(lane);
+    this.applyAudioPolicy(lane, 'mount');
     // If play-intent is set (from a pre-mount play() or a still-loading source),
     // kick it off now — wantPlay persists through source changes.
     if (lane.wantPlay && lane.el.paused) {
