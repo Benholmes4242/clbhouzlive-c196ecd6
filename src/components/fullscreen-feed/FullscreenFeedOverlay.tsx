@@ -211,6 +211,7 @@ export function FullscreenFeedOverlay() {
           const snap = VideoEngine.snapshot('fullscreen');
           const el = document.querySelector('video[data-lane-id="fullscreen"]') as HTMLVideoElement | null;
           const boundElId = (el?.dataset as any)?.vid ?? null;
+          const vpSnap = readRawViewportSnapshot();
           trace('fsLane.at.open', {
             openId: currentOpenId,
             boundElId,
@@ -220,6 +221,7 @@ export function FullscreenFeedOverlay() {
             hasOrigin: s.origin != null,
             hasBorrow: s.borrow != null,
             borrowPostId: s.borrow?.postId ?? null,
+            ...vpSnap,
           });
         } catch {}
       }
