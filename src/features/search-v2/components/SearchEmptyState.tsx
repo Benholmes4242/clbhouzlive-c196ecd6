@@ -305,22 +305,15 @@ function SuggestionRow({
     e.stopPropagation();
     if (!user?.id || !viewerActorId) return;
     if (toggle.isPending) return;
-    toggle.mutate(
-      {
-        targetActorType: 'personal',
-        targetActorId: suggestion.id,
-        targetUserId: suggestion.id,
-        viewerActorType,
-        viewerActorId,
-        viewerUserId: user.id,
-        isFollowing: following,
-      },
-      {
-        onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: ['search-empty-state-v2'] });
-        },
-      },
-    );
+    toggle.mutate({
+      targetActorType: 'personal',
+      targetActorId: suggestion.id,
+      targetUserId: suggestion.id,
+      viewerActorType,
+      viewerActorId,
+      viewerUserId: user.id,
+      isFollowing: following,
+    });
   };
 
   return (
