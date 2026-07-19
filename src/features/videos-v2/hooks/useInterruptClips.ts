@@ -28,7 +28,7 @@ export function useInterruptClips(userId: string | undefined) {
     enabled: !!userId,
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
-      const { data, error } = await (supabase.rpc as any)('get_watch_shorts', {
+      const { data, error } = await (supabase as unknown as RpcClient).rpc('get_watch_shorts', {
         p_user_id: userId,
         p_mode: 'trending',
         p_page_size: 9,
