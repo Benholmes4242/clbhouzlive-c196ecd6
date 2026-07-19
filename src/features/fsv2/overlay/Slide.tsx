@@ -116,7 +116,7 @@ export const Fsv2Slide: React.FC<Props> = ({
     const m = items[0];
     if (!m) return <div style={{ position: 'absolute', inset: 0, background: FSV2.BACKDROP }} />;
     return (
-      <div style={{ position: 'absolute', inset: 0, background: FSV2.BACKDROP }}>
+      <div ref={scrollerRef} style={{ position: 'absolute', inset: 0, background: FSV2.BACKDROP }}>
         {renderItem(m, 0, active)}
       </div>
     );
