@@ -219,7 +219,7 @@ export const LoopCard = React.memo(function LoopCard({
             ariaLabel={`Media from post by ${post.displayName}`}
             onSlideClick={() => {
               if (allPosts && cardIndex != null) {
-                useFullscreenFeedStore.getState().open(allPosts, cardIndex);
+                if (FLAGS.fsv2) { openFsv2({ posts: allPosts, startIndex: cardIndex, openedFrom: 'loop' }); } else { useFullscreenFeedStore.getState().open(allPosts, cardIndex, { openedFrom: 'loop' }); }
               }
             }}
             bottomLeftOverlay={
@@ -266,7 +266,7 @@ export const LoopCard = React.memo(function LoopCard({
             className={`relative w-full ${aspectClass} bg-muted block`}
             onClick={() => {
               if (allPosts && cardIndex != null) {
-                useFullscreenFeedStore.getState().open(allPosts, cardIndex);
+                if (FLAGS.fsv2) { openFsv2({ posts: allPosts, startIndex: cardIndex, openedFrom: 'loop' }); } else { useFullscreenFeedStore.getState().open(allPosts, cardIndex, { openedFrom: 'loop' }); }
               }
             }}
           >
@@ -421,7 +421,7 @@ export const LoopCard = React.memo(function LoopCard({
               type="button"
               onClick={() => {
                 if (allPosts && cardIndex != null) {
-                  useFullscreenFeedStore.getState().open(allPosts, cardIndex);
+                  if (FLAGS.fsv2) { openFsv2({ posts: allPosts, startIndex: cardIndex, openedFrom: 'loop' }); } else { useFullscreenFeedStore.getState().open(allPosts, cardIndex, { openedFrom: 'loop' }); }
                 }
               }}
               className="mt-1.5 text-[14px] font-semibold text-foreground"
