@@ -238,7 +238,7 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
     const totColor = demotedRow ? SECONDARY : houseColor(e.score);
     const totalDisplay = fmtScore(e.score);
     const thruDisplay = fmtThru(e.thru);
-    const todayVal = todayFromEntry(e);
+    const todayVal = todayFromEntry(e, currentRound);
     const todayDisplay = fmtScore(todayVal);
     const todayColor = demotedRow ? SECONDARY : houseColor(todayVal);
     const rounds = roundsLine(e);
