@@ -43,6 +43,55 @@ import { coldOpenAttach, coldOpenFirstFrame } from '@/perf/coldOpen';
 import { trace, traceLookup, elIdOf, traceGenElId } from '@/perf/trace';
 import { feedLaneRoles } from './feedLaneRoles';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
+import { audioDebugEnabled, logAudio, msSinceOpen } from '@/perf/audioDebug';
+
+/**
+ * Wrap `muted` on an <video> instance so every write is logged. The
+ * accessor delegates to the prototype descriptor, so behaviour is
+ * byte-identical when audioDebug is off (this helper isn't called then).
+ *
+ * Stack: top 3-4 meaningful frames of new Error().stack, trimmed to
+ * "fn @ file:line". Catches ALL writers — engine policy, tile effects,
+ * borrow machinery, external code — since it hooks the setter itself.
+ */
+function installMutedSetterProbe(el: HTMLVideoElement, laneId: LaneId): void {
+  try {
+    const proto = Object.getPrototypeOf(el) as HTMLMediaElement;
+    // HTMLMediaElement.prototype has the real descriptor.
+    let desc: PropertyDescriptor | undefined;
+    let cursor: any = proto;
+    while (cursor && !desc) {
+      desc = Object.getOwnPropertyDescriptor(cursor, 'muted');
+      if (!desc) cursor = Object.getPrototypeOf(cursor);
+    }
+    if (!desc || !desc.get || !desc.set) return;
+    const nativeGet = desc.get.bind(el);
+    const nativeSet = desc.set.bind(el);
+    Object.defineProperty(el, 'muted', {
+      configurable: true,
+      enumerable: true,
+      get() { return nativeGet(); },
+      set(value: boolean) {
+        try {
+          const raw = new Error().stack || '';
+          const frames = raw.split('\n').map(s => s.trim()).filter(Boolean)
+            // Drop "Error" header and this probe's own frame.
+            .filter(l => !/^Error/i.test(l) && !/installMutedSetterProbe|Object\.set /.test(l))
+            .slice(0, 4)
+            .map(l => l.replace(/^at\s+/, ''));
+          logAudio('muted.set', {
+            laneId,
+            value: !!value,
+            msSinceOpen: msSinceOpen(),
+            stack: frames,
+          });
+        } catch {}
+        nativeSet(value);
+      },
+    });
+  } catch {}
+}
+
 
 export type LaneAudioPolicy = 'session' | 'always-muted' | 'local';
 
