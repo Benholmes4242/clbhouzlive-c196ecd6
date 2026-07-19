@@ -692,9 +692,20 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   const components = useMemo(
     () => ({
       Header: () => <div style={{ height: 0, paddingTop: topPadding }} />,
-      Footer: () => <div style={{ height: bottomPadding }} />,
+      Footer: () => (
+        <>
+          {isFetchingNextPage && (
+            <div style={{ padding: '8px 0 12px' }}>
+              <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9', overflow: 'hidden' }}>
+                <CardSkeleton isStatic={false} variant="regular" mediaRatio="16/9" />
+              </div>
+            </div>
+          )}
+          <div style={{ height: bottomPadding }} />
+        </>
+      ),
     }),
-    [topPadding, bottomPadding],
+    [topPadding, bottomPadding, isFetchingNextPage],
   );
 
 
