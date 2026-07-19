@@ -53,9 +53,9 @@ export function usePostSubmit() {
   const submit = useCallback(async (input: SubmitInput): Promise<SubmitResult> => {
     setSubmitting(true);
     setError(null);
+    const jobId = crypto.randomUUID();
+    const hasMedia = input.media.length > 0;
     try {
-      const jobId = crypto.randomUUID();
-      const hasMedia = input.media.length > 0;
       const userId = profile?.id;
       if (!userId) throw new Error('Not signed in');
 
