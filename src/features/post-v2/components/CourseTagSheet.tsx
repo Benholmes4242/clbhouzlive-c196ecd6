@@ -318,6 +318,9 @@ function CourseRowSkeleton() {
       </div>
     </div>
   );
+}
+
+
 
 function CourseRow({
   row,
