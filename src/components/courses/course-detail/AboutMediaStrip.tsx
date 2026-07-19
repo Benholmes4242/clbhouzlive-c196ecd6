@@ -6,6 +6,8 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useClubMedia } from '@/hooks/useClubMedia';
 import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { openWithOrigin } from '@/lib/openWithOrigin';
+import { openFsv2 } from '@/features/fsv2';
+import { FLAGS } from '@/config/flags';
 // groupMultiMedia intentionally not imported: posts are built one-per-parent-id already grouped.
 import type { FeedPost, MediaItem } from '@/components/media-system/types/media';
 import { AMBER } from '@/features/courses/_shared/tokens';
