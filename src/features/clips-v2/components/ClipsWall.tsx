@@ -45,7 +45,7 @@ function SkeletonTile() {
 }
 
 export function ClipsWall({ mood }: { mood: ClipsV2Mood }) {
-  const { user } = useSupabaseSession();
+  const { user, loading: authLoading } = useSupabaseSession();
   const userId = user?.id;
   const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, isLoading, isError, refetch } =
     useClipsWallFeed({ userId, mood });
@@ -97,7 +97,7 @@ export function ClipsWall({ mood }: { mood: ClipsV2Mood }) {
     return () => observer.disconnect();
   }, [fetchNextPage, hasNextPage, isFetching]);
 
-  if (isLoading) {
+  if (isLoading || (authLoading && rows.length === 0)) {
     return (
       <div style={{ padding: '12px 4px 0', fontFamily: FONT_FAMILY }}>
         <div style={{ display: 'flex', gap: 4 }}>

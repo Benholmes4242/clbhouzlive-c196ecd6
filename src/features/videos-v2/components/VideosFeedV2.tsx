@@ -77,7 +77,7 @@ function SkeletonCard() {
 }
 
 export function VideosFeedV2({ sort, category }: Props) {
-  const { user } = useSupabaseSession();
+  const { user, loading: authLoading } = useSupabaseSession();
   const userId = user?.id;
 
   const {
@@ -142,7 +142,7 @@ export function VideosFeedV2({ sort, category }: Props) {
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   // Empty state.
-  const isEmpty = !isLoading && rows.length === 0 && visiblePending.length === 0;
+  const isEmpty = !isLoading && !authLoading && rows.length === 0 && visiblePending.length === 0;
   const nonDefault = sort !== 'latest' || category != null;
 
   return (
@@ -157,7 +157,7 @@ export function VideosFeedV2({ sort, category }: Props) {
         </div>
       )}
 
-      {isLoading && rows.length === 0 ? (
+      {(isLoading || authLoading) && rows.length === 0) ? (
         <div style={{ padding: '12px 4px 0' }}>
           <SkeletonCard />
           <SkeletonCard />
