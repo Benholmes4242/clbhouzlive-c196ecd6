@@ -9,17 +9,35 @@ import { useClipsWallFeed, type ClipsV2Mood, type ClipsWallRow } from '../hooks/
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
-const spinKeyframes = `@keyframes clips-v2-spin { to { transform: rotate(360deg); } }`;
-
 function SkeletonTile() {
   return (
     <div style={{ marginBottom: 12 }}>
       <div
+        className="clb-shimmer-light"
         style={{
           width: '100%',
           aspectRatio: '9 / 14',
-          borderRadius: 12,
+          borderRadius: 4,
           background: 'rgba(0,0,0,0.06)',
+        }}
+      />
+      <div
+        className="clb-shimmer-light"
+        style={{
+          height: 12.5,
+          borderRadius: 4,
+          background: 'rgba(0,0,0,0.06)',
+          marginTop: 6,
+        }}
+      />
+      <div
+        className="clb-shimmer-light"
+        style={{
+          height: 11,
+          width: '55%',
+          borderRadius: 4,
+          background: 'rgba(0,0,0,0.06)',
+          marginTop: 2,
         }}
       />
     </div>
