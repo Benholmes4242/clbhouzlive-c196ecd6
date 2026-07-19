@@ -30,9 +30,9 @@ export function useCommentsRealtimeV2(
           filter: `target_id=eq.${targetId}`,
         },
         (payload) => {
-          const row = (payload.new ?? {}) as any;
+          const row = (payload.new ?? {}) as { target_type?: string };
           if (row.target_type !== targetType) return;
-          qc.invalidateQueries({ queryKey: ['comments-v2', targetType, targetId] as any });
+          qc.invalidateQueries({ queryKey: ['comments-v2', targetType, targetId] });
         }
       )
       .on(
@@ -44,7 +44,7 @@ export function useCommentsRealtimeV2(
           filter: `target_id=eq.${targetId}`,
         },
         () => {
-          qc.invalidateQueries({ queryKey: ['comments-v2', targetType, targetId] as any });
+          qc.invalidateQueries({ queryKey: ['comments-v2', targetType, targetId] });
         }
       )
       .subscribe();
