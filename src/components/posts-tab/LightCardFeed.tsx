@@ -17,7 +17,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Virtuoso } from 'react-virtuoso';
 import type { FeedPost } from '@/components/media-system/types/media';
 import type { ActiveActor } from '@/types/actor';
-import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+
 import { openFsv2 } from '@/features/fsv2';
 import { isPerfEnabled } from '@/perf/navTiming';
 import { useClubhouseStore } from '@/store/clubhouseStore';
@@ -44,11 +44,10 @@ const LightItemGate: React.FC<{
   earlyIdx: number;
   children: (v: { isActive: boolean; mountVideo: boolean; earlyMotion: boolean }) => React.ReactNode;
 }> = ({ post, index, playingIdx, activeIdx, earlyIdx, children }) => {
-  const fsOpen = useFullscreenFeedStore((s) => s.isOpen);
-  const borrowedOwnerKey = useFullscreenFeedStore((s) => s.borrow?.ownerKey ?? null);
-  const isBorrowedCard =
-    fsOpen && !!borrowedOwnerKey &&
-    (borrowedOwnerKey === post.id || borrowedOwnerKey.startsWith(`${post.id}:`));
+  // V1 fullscreen borrow/isOpen gates removed — fsv2 owns fullscreen and
+  // does not require inline-feed video suppression.
+  const fsOpen = false;
+  const isBorrowedCard = false;
   const isActive = !fsOpen && index === playingIdx;
   const isNear =
     isBorrowedCard || (!fsOpen && Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS);
@@ -284,10 +283,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   useEffect(() => {
     if (earlyIdx === playingIdx && earlyIdx !== -1) setEarlyIdx(-1);
   }, [earlyIdx, playingIdx]);
-  const fsIsOpen = useFullscreenFeedStore((s) => s.isOpen);
-  useEffect(() => {
-    if (fsIsOpen && earlyIdx !== -1) setEarlyIdx(-1);
-  }, [fsIsOpen, earlyIdx]);
+  // V1 fullscreen isOpen gate removed.
 
   // Activation scorecard — one feed.activate emit per promotion.
   const activateT0Ref = useRef<number>(0);
