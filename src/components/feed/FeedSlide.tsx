@@ -1067,40 +1067,42 @@ const BorrowedFullscreenSlot: React.FC<{
       console.info('[BORROW]', 'mount', { laneId: borrow.laneId, ownerKey: borrow.ownerKey, postId: borrow.postId });
     }
 
-    // ── AudioDebug: borrow.audio at bind + 100ms after (detect mutations)
-    if (audioDbg.audioDebugEnabled()) {
-      try {
-        const bEl = (VideoEngine as unknown as { _debugGetElement?: (id: string) => HTMLMediaElement | null })._debugGetElement?.(borrow.laneId) ?? null;
-        // ── AUDIO PUSHDOWN (borrow): reuse engine's session-policy apply
-        // right after adoption so the borrowed lane element inherits current
-        // useSessionAudio state. No-op when session is muted.
-        const sessionMuted = useSessionAudio.getState().isMuted;
-        const elMutedBefore = bEl?.muted ?? null;
-        try { VideoEngine.applyLaneAudioPolicy(borrow.laneId); } catch {}
-        const bElAfter = (VideoEngine as unknown as { _debugGetElement?: (id: string) => HTMLMediaElement | null })._debugGetElement?.(borrow.laneId) ?? null;
-        audioDbg.logAudio('audio.pushdown', {
-          site: 'borrow', laneId: borrow.laneId, sessionMuted,
-          elMutedBefore, elMutedAfter: bElAfter?.muted ?? null,
-        });
-        audioDbg.logAudio('borrow.audio', {
-          phase: 'bind', laneId: borrow.laneId, ownerKey: borrow.ownerKey,
-          muted: bElAfter?.muted ?? null, volume: bElAfter?.volume ?? null,
-          paused: bElAfter?.paused ?? null,
-          currentTime: bElAfter ? +bElAfter.currentTime.toFixed(3) : null,
-        });
-        setTimeout(() => {
-          try {
-            const bEl2 = (VideoEngine as unknown as { _debugGetElement?: (id: string) => HTMLMediaElement | null })._debugGetElement?.(borrow.laneId) ?? null;
-            audioDbg.logAudio('borrow.audio', {
-              phase: 'post100', laneId: borrow.laneId,
-              muted: bEl2?.muted ?? null, volume: bEl2?.volume ?? null,
-              paused: bEl2?.paused ?? null,
-              currentTime: bEl2 ? +bEl2.currentTime.toFixed(3) : null,
-            });
-            audioDbg.setSummary({ fsPos: bEl2 ? +bEl2.currentTime.toFixed(2) : null });
-          } catch {}
-        }, 100);
-      } catch {}
+    // ── AUDIO PUSHDOWN (borrow): reuse engine's session-policy apply right
+    // after adoption so the borrowed lane element inherits current
+    // useSessionAudio state at open time. No-op when session is muted
+    // (elements default muted). Always runs — HUD logging is conditional.
+    {
+      const bElPre = (VideoEngine as unknown as { _debugGetElement?: (id: string) => HTMLMediaElement | null })._debugGetElement?.(borrow.laneId) ?? null;
+      const sessionMuted = useSessionAudio.getState().isMuted;
+      const elMutedBefore = bElPre?.muted ?? null;
+      try { VideoEngine.applyLaneAudioPolicy(borrow.laneId); } catch {}
+      if (audioDbg.audioDebugEnabled()) {
+        try {
+          const bElAfter = (VideoEngine as unknown as { _debugGetElement?: (id: string) => HTMLMediaElement | null })._debugGetElement?.(borrow.laneId) ?? null;
+          audioDbg.logAudio('audio.pushdown', {
+            site: 'borrow', laneId: borrow.laneId, sessionMuted,
+            elMutedBefore, elMutedAfter: bElAfter?.muted ?? null,
+          });
+          audioDbg.logAudio('borrow.audio', {
+            phase: 'bind', laneId: borrow.laneId, ownerKey: borrow.ownerKey,
+            muted: bElAfter?.muted ?? null, volume: bElAfter?.volume ?? null,
+            paused: bElAfter?.paused ?? null,
+            currentTime: bElAfter ? +bElAfter.currentTime.toFixed(3) : null,
+          });
+          setTimeout(() => {
+            try {
+              const bEl2 = (VideoEngine as unknown as { _debugGetElement?: (id: string) => HTMLMediaElement | null })._debugGetElement?.(borrow.laneId) ?? null;
+              audioDbg.logAudio('borrow.audio', {
+                phase: 'post100', laneId: borrow.laneId,
+                muted: bEl2?.muted ?? null, volume: bEl2?.volume ?? null,
+                paused: bEl2?.paused ?? null,
+                currentTime: bEl2 ? +bEl2.currentTime.toFixed(3) : null,
+              });
+              audioDbg.setSummary({ fsPos: bEl2 ? +bEl2.currentTime.toFixed(2) : null });
+            } catch {}
+          }, 100);
+        } catch {}
+      }
     }
 
 
