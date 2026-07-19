@@ -76,6 +76,7 @@ import { resolveRestingRect, getCurrentViewport, readRawViewportSnapshot } from 
 import { FS_TRANSITION_MODE, FS_CUT_FADE_MS } from '@/lib/media/transitionMode';
 import { FS_OVERLAY_Z } from '@/lib/zLayers';
 import { trace as perfTrace } from '@/perf/trace';
+import { vperfCloseMotionMark } from '@/perf/vperf';
 
 
 
