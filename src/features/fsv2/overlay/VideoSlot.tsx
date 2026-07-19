@@ -118,6 +118,8 @@ export const Fsv2VideoSlot: React.FC<Props> = ({
       elRef.current = el;
       detachRef.current = preWarmed.detach;
       if (preWarmed.needsTapForSound) setNeedsTapForSound(true);
+      const detachInstr = instrumentElement(openId, el, 'prewarmed');
+      registerVideoEl(openId, el);
 
       const onFrame = () => reveal('first-frame');
       el.addEventListener('loadeddata', onFrame);
@@ -128,6 +130,8 @@ export const Fsv2VideoSlot: React.FC<Props> = ({
       return () => {
         el.removeEventListener('loadeddata', onFrame);
         el.removeEventListener('playing', onFrame);
+        detachInstr();
+        registerVideoEl(openId, null);
         detachRef.current?.();
         detachRef.current = null;
         elRef.current = null;
