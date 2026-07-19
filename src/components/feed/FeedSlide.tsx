@@ -12,6 +12,7 @@ import { originHostRegistry } from '@/video/originHostRegistry';
 import { isPerfEnabled } from '@/perf/navTiming';
 import { vperfStart, vperfArmLane, vperfNextId, vperfMotionMark } from '@/perf/vperf';
 import { trace, traceLookup } from '@/perf/trace';
+import * as audioDbg from '@/perf/audioDebug';
 import { PrefetchController } from '@/video/PrefetchController';
 import { resolveRestingRect, getCurrentViewport, type RestingRect } from '@/lib/media/resolveRestingRect';
 import { FS_TRANSITION_MODE } from '@/lib/media/transitionMode';
@@ -616,6 +617,45 @@ const FullscreenVideoSlot: React.FC<{
       laneSnapCt,
     });
   }, [isActive, isBorrowSlide, resumeKey, startPosition]);
+
+  // ── AudioDebug: cold.audio at the (non-borrow) fullscreen slot bind.
+  const audioDbgColdRef = React.useRef(false);
+  React.useEffect(() => {
+    if (isBorrowSlide) { audioDbgColdRef.current = false; return; }
+    if (!isActive) { audioDbgColdRef.current = false; return; }
+    if (audioDbgColdRef.current) return;
+    if (!audioDbg.audioDebugEnabled()) return;
+    audioDbgColdRef.current = true;
+    try {
+      const el = (VideoEngine as unknown as { _debugGetElement?: (id: string) => HTMLMediaElement | null })._debugGetElement?.('fullscreen') ?? null;
+      audioDbg.logAudio('cold.audio', {
+        laneId: 'fullscreen', ownerKey: resumeKey,
+        srcSet: !!el?.currentSrc,
+        muted: el?.muted ?? null, volume: el?.volume ?? null,
+        paused: el?.paused ?? null,
+        currentTime: el ? +el.currentTime.toFixed(3) : null,
+        startPosition: +Number(startPosition).toFixed(3),
+      });
+      audioDbg.setSummary({
+        fsPos: el ? +el.currentTime.toFixed(2) : null,
+      });
+      // Snapshot play() promise outcome on the next tick — the engine kicked
+      // off play() before our effect ran; observe via the resulting el.paused
+      // state after a short delay. NotAllowedError surfaces as still-paused.
+      setTimeout(() => {
+        try {
+          const el2 = (VideoEngine as unknown as { _debugGetElement?: (id: string) => HTMLMediaElement | null })._debugGetElement?.('fullscreen') ?? null;
+          audioDbg.logAudio('cold.audio.postPlay', {
+            laneId: 'fullscreen',
+            muted: el2?.muted ?? null,
+            paused: el2?.paused ?? null,
+            currentTime: el2 ? +el2.currentTime.toFixed(3) : null,
+          });
+        } catch {}
+      }, 120);
+    } catch {}
+  }, [isActive, isBorrowSlide, resumeKey, startPosition]);
+
 
   // [TRACE] slot.render — once per active mount of this slot for correlation.
   const didTraceRenderRef = React.useRef(false);
