@@ -58,7 +58,14 @@ export interface StageState {
   media: StageMediaItem[];
   activeIndex: number;
   caption: string;
-  course: StageCourse | null;
+  /**
+   * Ordered list of tagged courses. The FIRST entry remains the primary
+   * course written to posts.course_id exactly as today; all entries
+   * (including the first) are also written to posts.tagged_course_ids
+   * in selection order. Consumers that need a single course should read
+   * `courses[0] ?? null`.
+   */
+  courses: StageCourse[];
   scheduledAt: Date | null;
   dirty: boolean;
 }
@@ -67,7 +74,7 @@ const emptyState: StageState = {
   media: [],
   activeIndex: 0,
   caption: '',
-  course: null,
+  courses: [],
   scheduledAt: null,
   dirty: false,
 };
