@@ -438,6 +438,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
                 mode={mode}
                 bestToPar={bestToPar}
                 maxCount={birdieMaxCount}
+                crownLeader={mode === 'alltime'}
               />
             ))}
           </div>
