@@ -288,3 +288,24 @@ export function useSetMemberVisibility(businessId: string) {
     },
   });
 }
+
+export function useSetMemberJobTitle(businessId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ memberUserId, jobTitle }: { memberUserId: string; jobTitle: string }) => {
+      const { error } = await (supabase.rpc as any)('set_member_job_title', {
+        _business_id: businessId,
+        _member_user_id: memberUserId,
+        _job_title: jobTitle,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['business-team', businessId] });
+    },
+    onError: (error: Error) => {
+      toast.error('Failed to update job title', { description: error.message });
+    },
+  });
+}
