@@ -211,6 +211,14 @@ class VideoEngineImpl {
    */
   private borrowedLanes = new Set<LaneId>();
   /**
+   * Close-transition fix: lanes that were just handed back from a fullscreen
+   * borrow. The next load() call on the same lane must NOT re-seek from
+   * lastPos — the element's currentTime is authoritative (carried through
+   * handback). Consumed (deleted) on that next load(); cleared defensively
+   * on unmountLane.
+   */
+  private sameElementReturn = new Set<LaneId>();
+  /**
    * Stage-7 Audio v3: per-borrow volumechange guard detachers. While a lane
    * is borrowed by the fullscreen viewer, an element-level `volumechange`
    * listener defends the session audio policy — any external writer that
