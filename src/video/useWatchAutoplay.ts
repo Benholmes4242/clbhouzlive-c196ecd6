@@ -31,7 +31,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { useWatchRevealed } from './WatchRevealContext';
-import { useFsv2Store } from '@/features/fsv2/store/fsv2Store';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { PrefetchController } from './PrefetchController';
 import type { FeedPost } from '@/components/media-system/types/media';
 
@@ -144,7 +144,7 @@ export function useWatchAutoplay(
   // Stage-7 PR-1: suspend activation while the fullscreen viewer is open so
   // rail tiles scrolling under the overlay cannot acquire lanes and evict a
   // pinned borrow (or otherwise churn the pool).
-  const fsOpen = useFsv2Store((s) => s.isOpen);
+  const fsOpen = useFullscreenFeedStore((s) => s.isOpen);
   const eligible = enabled && revealed && !reducedMotion && docVisible && !fsOpen;
 
   const ratiosRef = useRef<Map<number, number>>(new Map());

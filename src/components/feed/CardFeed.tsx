@@ -22,7 +22,7 @@ import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useLayo
 import { Virtuoso, type VirtuosoHandle, type StateSnapshot } from 'react-virtuoso';
 import type { FeedPost } from '@/components/media-system/types/media';
 import type { ActiveActor } from '@/types/actor';
-
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { openFsv2 } from '@/features/fsv2';
 import { isPerfEnabled } from '@/perf/navTiming';
 import { useClubhouseStore } from '@/store/clubhouseStore';
@@ -63,10 +63,11 @@ const FeedItemGate: React.FC<{
   earlyIdx: number;
   children: (v: { isActive: boolean; mountVideo: boolean; earlyMotion: boolean }) => React.ReactNode;
 }> = ({ post, index, playingIdx, activeIdx, earlyIdx, children }) => {
-  // V1 fullscreen borrow/isOpen gates removed — fsv2 owns fullscreen and
-  // does not require inline-feed video suppression.
-  const fsOpen = false;
-  const isBorrowedCard = false;
+  const fsOpen = useFullscreenFeedStore((s) => s.isOpen);
+  const borrowedOwnerKey = useFullscreenFeedStore((s) => s.borrow?.ownerKey ?? null);
+  const isBorrowedCard =
+    fsOpen && !!borrowedOwnerKey &&
+    (borrowedOwnerKey === post.id || borrowedOwnerKey.startsWith(`${post.id}:`));
   const isActive = !fsOpen && index === playingIdx;
   const isNear =
     isBorrowedCard || (!fsOpen && Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS);
@@ -474,8 +475,14 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
     if (earlyIdx === playingIdx && earlyIdx !== -1) setEarlyIdx(-1);
   }, [earlyIdx, playingIdx]);
 
-  // V1 fullscreen fsIsOpen gate removed — fsv2 owns fullscreen and pauses
-  // inline playback via its own bridge.
+  // Fullscreen open — clear earlyIdx so the InlineVideo cleanup runs
+  // (pause + unmount feed-next) instead of leaving a stale early lane behind
+  // the borrowed feed-active. pauseAll from viewer-open pauses playback
+  // regardless; this clears the DOM residue.
+  const fsIsOpen = useFullscreenFeedStore((s) => s.isOpen);
+  useEffect(() => {
+    if (fsIsOpen && earlyIdx !== -1) setEarlyIdx(-1);
+  }, [fsIsOpen, earlyIdx]);
 
   // ── Activation scorecard ────────────────────────────────────────────
   // Emit one feed.activate line per promotion so early-motion telemetry
@@ -516,7 +523,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   const carouselPositionsByTab = useClubhouseStore((s) => s.carouselPositionsByTab);
   const globalCarouselPositions = useClubhouseStore((s) => s.carouselPositions);
   const carouselPositions = tab ? (carouselPositionsByTab[tab] ?? globalCarouselPositions) : globalCarouselPositions;
-  // V1 openFullscreen removed — fsv2's openFsv2 is called directly.
+  const openFullscreen = useFullscreenFeedStore((s) => s.open);
   // NOTE: fsOpen / borrow.ownerKey are intentionally NOT read at this level.
   // They are consumed inside `FeedItemGate` so viewer-open doesn't change
   // `itemContent` identity (which would remount the borrowed card).
@@ -564,7 +571,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
         mediaIndex,
       });
     },
-    [posts, setActiveIndex, setCarouselPosition, tab, playingIdx],
+    [posts, setActiveIndex, setCarouselPosition, openFullscreen, tab, playingIdx],
   );
 
   // Stable per-post carousel-change callback so FeedCard memo holds.

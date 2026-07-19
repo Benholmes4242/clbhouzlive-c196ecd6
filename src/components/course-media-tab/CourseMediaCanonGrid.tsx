@@ -26,7 +26,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { groupMultiMedia } from '@/components/media-system/utils/feedMapper';
 import { FeedCard, type FeedCardRow } from '@/components/feed-cards/FeedCard';
 import { packColumns } from '@/components/feed-cards/packColumns';
-
+import { useFullscreenFeedStore, useIsViewerOwnedBy } from '@/store/fullscreenFeedStore';
 import { useWatchAutoplay } from '@/video/useWatchAutoplay';
 import { PrimaryAmberCTA } from '@/components/ui/PrimaryAmberCTA';
 import { EmptyStateGuide } from '@/components/ui/EmptyStateGuide';
@@ -139,8 +139,28 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  // V1 fullscreen pagination-mirror + append effects removed (fsv2 owns
-  // pagination via openFsv2 args passed at tap time).
+  // Mirror pagination + append grouped posts into the fullscreen store when
+  // this surface owns it (preserves infinite scroll inside the viewer).
+  const isViewerOwnedHere = useIsViewerOwnedBy('course-media');
+  const setPaginationState = useFullscreenFeedStore((s) => s.setPaginationState);
+
+  useEffect(() => {
+    if (!isViewerOwnedHere) return;
+    setPaginationState({
+      hasNextPage: hasNextPage ?? false,
+      isFetchingNextPage: isFetchingNextPage ?? false,
+    });
+  }, [isViewerOwnedHere, hasNextPage, isFetchingNextPage, setPaginationState]);
+
+  const groupedForViewer = useMemo(
+    () => postsForFullscreen ?? groupMultiMedia(posts),
+    [postsForFullscreen, posts],
+  );
+
+  useEffect(() => {
+    if (!isViewerOwnedHere) return;
+    useFullscreenFeedStore.getState().appendPosts(groupedForViewer);
+  }, [isViewerOwnedHere, groupedForViewer]);
 
   const cardRows = useMemo(() => posts.map(toFeedCardRow), [posts]);
 
