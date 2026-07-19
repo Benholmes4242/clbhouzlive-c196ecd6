@@ -26,7 +26,7 @@ import { MentionText } from '@/components/mentions/MentionText';
 import { REVIEW_SHEET_Z } from '@/lib/zLayers';
 import { ReviewGhostNumeral, ReviewVerdictLabel } from '@/components/shared/ReviewGhostScore';
 import { getPublicProfilePath } from '@/lib/profileRoutes';
-import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+
 
 const AMBER = '#F7931E';
 const FONT_GEIST =
@@ -119,14 +119,9 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   // Scope drag to header only so the middle scrolls without dismissing.
   const dragControls = useDragControls();
 
-  // Also dismiss the fullscreen viewer (if this sheet was opened from it)
-  // so the destination route is actually visible.
-  const closeFullscreen = useCallback(() => {
-    try {
-      const fs = useFullscreenFeedStore.getState();
-      if (fs.isOpen) fs.close();
-    } catch {}
-  }, []);
+  // V1 fullscreen dismiss removed — fsv2 owns fullscreen and handles its
+  // own close on navigation.
+  const closeFullscreen = useCallback(() => {}, []);
 
   const handleGoToProfile = useCallback(() => {
     if (!user.id) return;

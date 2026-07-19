@@ -1,7 +1,7 @@
 import { useRef, useEffect, useCallback, useMemo, type RefObject } from 'react';
 // App-wide scroll container (#root, not window) — used by all infinite lists
 const SCROLL_ROOT = typeof document !== 'undefined' ? document.getElementById('root') : null;
-import { useFullscreenFeedStore, useIsViewerOwnedBy } from '@/store/fullscreenFeedStore';
+
 import { useInView } from 'react-intersection-observer';
 import { useWatchAutoplay } from '@/video/useWatchAutoplay';
 import { Loader2 } from 'lucide-react';
@@ -100,16 +100,7 @@ export default function ExploreGrid({
     if (!isFetchingNextPage) fetchGuard.current = false;
   }, [isFetchingNextPage]);
 
-  // Sync new posts into fullscreen overlay — only when THIS surface owns it.
-  const isViewerOwnedHere = useIsViewerOwnedBy('explore');
-  const appendPosts = useFullscreenFeedStore((s) => s.appendPosts);
-
-  useEffect(() => {
-    if (!isViewerOwnedHere) return;
-    if (coursePosts.length > 0) {
-      appendPosts(coursePosts);
-    }
-  }, [coursePosts.length, isViewerOwnedHere, appendPosts, coursePosts]);
+  // V1 fullscreen append-effect removed (fsv2 owns pagination via openFsv2 args).
 
   const { activeIndices, railRef: autoplayRef } = useWatchAutoplay({
     railId: 'explore-grid',
