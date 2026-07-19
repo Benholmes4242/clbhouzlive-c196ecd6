@@ -224,7 +224,7 @@ const AuthForm: React.FC = () => {
 
         // Diagnostic: decode claims locally (never log the raw token).
         try {
-          const claims = JSON.parse(
+          const claims: AppleClaims = JSON.parse(
             atob(idToken.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')),
           );
           console.log('[apple-auth] token claims:', {
@@ -244,7 +244,7 @@ const AuthForm: React.FC = () => {
         });
 
         if (error) {
-          console.error('[apple-auth] supabase rejection:', (error as any).status, error.message);
+          console.error('[apple-auth] supabase rejection:', (error as { status?: number }).status, error.message);
           trackAuthFailed('apple', sanitiseErrorForAnalytics(error.message));
           toast.error('Could not complete Apple Sign-In. Please try again or use email.');
           setSubmitting(false);
