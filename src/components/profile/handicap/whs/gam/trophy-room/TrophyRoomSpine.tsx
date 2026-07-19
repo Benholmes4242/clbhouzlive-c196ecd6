@@ -8,50 +8,18 @@
 
 import React, { useState } from 'react';
 import type { TrophyItem } from './_shared/normalizeTrophyItem';
-import { MATERIAL_HEX } from './_shared/rarityPalette';
 import {
-  MATERIAL_LADDER,
+  WALL_LEVELS,
   medalsOwned,
   levelForMedals,
   nextLevelForMedals,
   levelProgress,
   levelDisplay,
-  type WallMaterial,
 } from './_shared/levels';
-import { TierGem } from '@/components/shared/TierGem';
+import { TierGlyph, TIER_COLOR_DARK } from '@/components/shared/TierGlyph';
 import { LadderSheet } from './LadderSheet';
 
 const FONT = "'Geist', -apple-system, sans-serif";
-const OBSIDIAN_BODY = '#2A2F36';
-const OBSIDIAN_EDGE = '#D4A017';
-
-function gemColor(m: WallMaterial): string {
-  if (m === 'obsidian') return OBSIDIAN_BODY;
-  return (MATERIAL_HEX as Record<string, string>)[m] ?? '#C97B4A';
-}
-
-function Gem({ material, dim, size = 15 }: { material: WallMaterial; dim: boolean; size?: number }) {
-  const c = gemColor(material);
-  const isObsidian = material === 'obsidian';
-  return (
-    <div
-      style={{
-        width: size,
-        height: size * 1.15,
-        flexShrink: 0,
-        background: dim
-          ? 'rgba(255,255,255,0.07)'
-          : `linear-gradient(135deg, ${c}, ${c}55 55%, ${c}CC)`,
-        clipPath: 'polygon(50% 0, 100% 28%, 100% 72%, 50% 100%, 0 72%, 0 28%)',
-        boxShadow: dim
-          ? 'none'
-          : isObsidian
-            ? `0 0 10px ${OBSIDIAN_EDGE}66, inset 0 0 0 1px ${OBSIDIAN_EDGE}55`
-            : `0 0 10px ${c}55`,
-      }}
-    />
-  );
-}
 
 const STREAK_DEFS: Array<{ badgeId: string; label: string; unit?: string; color: string }> = [
   { badgeId: 'round_streak_tier', label: 'Round streak', unit: 'wks', color: '#C084FC' },
@@ -73,7 +41,10 @@ export function TrophyRoomSpine({ items, userId }: Props) {
   const level = levelForMedals(owned);
   const next = nextLevelForMedals(owned);
   const progress = levelProgress(owned);
-  const currentMatIdx = level ? MATERIAL_LADDER.indexOf(level.material) : -1;
+  const currentIdx = level ? level.level - 1 : -1;
+
+  const isGoat = level?.level === 10;
+  const activeAccent = isGoat ? TIER_COLOR_DARK.goat : TIER_COLOR_DARK.current;
 
   const streaks = STREAK_DEFS.map((def) => {
     const item = achievements.find((a) => a.badgeId === def.badgeId);
@@ -105,16 +76,11 @@ export function TrophyRoomSpine({ items, userId }: Props) {
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 17, fontWeight: 800, color: '#FFFFFF' }}>
-            {level ? <TierGem medals={owned} size="md" /> : null}
+            {level ? <TierGlyph tierKey={level.key} color={activeAccent} size={22} /> : null}
             {level ? (
               <span>
                 Level {level.level} &middot;{' '}
-                <span
-                  style={{
-                    color:
-                      level.material === 'obsidian' ? OBSIDIAN_EDGE : gemColor(level.material),
-                  }}
-                >
+                <span style={{ color: activeAccent }}>
                   {levelDisplay(level, owned)}
                 </span>
               </span>
@@ -132,10 +98,20 @@ export function TrophyRoomSpine({ items, userId }: Props) {
             {owned} {owned === 1 ? 'medal' : 'medals'}
           </span>
         </div>
-        <div style={{ display: 'flex', gap: 6, margin: '12px 0 10px' }}>
-          {MATERIAL_LADDER.map((m, i) => (
-            <Gem key={m} material={m} dim={i > currentMatIdx} />
-          ))}
+        <div style={{ display: 'flex', gap: 6, margin: '12px 0 10px', justifyContent: 'space-between' }}>
+          {WALL_LEVELS.map((lvl, i) => {
+            const achieved = i <= currentIdx;
+            const isCurrent = i === currentIdx;
+            const isSummit = lvl.key === 'the_goat';
+            const color = isCurrent
+              ? activeAccent
+              : achieved
+                ? isSummit
+                  ? TIER_COLOR_DARK.goat
+                  : TIER_COLOR_DARK.achieved
+                : TIER_COLOR_DARK.locked;
+            return <TierGlyph key={lvl.key} tierKey={lvl.key} color={color} size={17} />;
+          })}
         </div>
         <div
           style={{
@@ -149,11 +125,7 @@ export function TrophyRoomSpine({ items, userId }: Props) {
             style={{
               width: `${Math.round(progress * 100)}%`,
               height: '100%',
-              background: level
-                ? level.material === 'obsidian'
-                  ? OBSIDIAN_EDGE
-                  : gemColor(level.material)
-                : 'rgba(255,255,255,0.3)',
+              background: level ? activeAccent : 'rgba(255,255,255,0.3)',
             }}
           />
         </div>

@@ -8,13 +8,12 @@
 
 import React, { useEffect, useMemo, useRef } from 'react';
 import { GamSheet } from '../../../gam/_shared/GamSheet';
-import { GemVisual } from '@/components/shared/TierGem';
+import { TierGlyph, TIER_COLOR_DARK } from '@/components/shared/TierGlyph';
 import {
   WALL_LEVELS,
   levelForMedals,
-  type WallMaterial,
+  type WallLevel,
 } from './_shared/levels';
-import { MATERIAL_HEX } from './_shared/rarityPalette';
 import type { TrophyItem } from './_shared/normalizeTrophyItem';
 import {
   quarterOf,
@@ -33,12 +32,14 @@ const AMBER = '#F7931E';
 const AMBER_BAR_A = '#E8800C';
 const AMBER_BAR_B = '#FFCB45';
 const GOLD = '#F5C842';
-const OBSIDIAN_EDGE = '#D4A017';
 const FONT = "'Geist', -apple-system, sans-serif";
 
-function matColor(m: WallMaterial): string {
-  if (m === 'obsidian') return OBSIDIAN_EDGE;
-  return (MATERIAL_HEX as Record<string, string>)[m] ?? '#C97B4A';
+/** Row tint for a level state on the dark ladder surface. */
+function rowTint(lvl: WallLevel, isCurrent: boolean, earned: boolean): string {
+  if (lvl.key === 'the_goat' && earned) return TIER_COLOR_DARK.goat;
+  if (isCurrent) return TIER_COLOR_DARK.current;
+  if (earned) return TIER_COLOR_DARK.achieved;
+  return TIER_COLOR_DARK.locked;
 }
 
 interface Props {
@@ -202,7 +203,7 @@ export const LadderSheet: React.FC<Props> = ({ open, onClose, owned, items, user
             const earned = owned >= lvl.medalsRequired;
             const isCurrent = level?.level === lvl.level;
             const isFuture = !earned && !isCurrent;
-            const mc = matColor(lvl.material);
+            const mc = rowTint(lvl, isCurrent, earned);
             const isLegend = lvl.level === 10;
             return (
               <div
@@ -214,16 +215,16 @@ export const LadderSheet: React.FC<Props> = ({ open, onClose, owned, items, user
                   padding: '9px 11px',
                   borderRadius: 12,
                   marginBottom: 4,
-                  opacity: isFuture ? 0.45 : 1,
+                  opacity: isFuture ? 0.55 : 1,
                   background: isCurrent ? 'rgba(255,255,255,0.06)' : 'transparent',
                   border: isCurrent ? `1px solid ${mc}59` : '1px solid transparent',
                 }}
               >
-                <GemVisual material={lvl.material} size={26} />
+                <TierGlyph tierKey={lvl.key} color={mc} size={26} />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ fontSize: 13, fontWeight: 800, color: '#FFFFFF' }}>
-                      {isLegend ? 'Clubhouse Legend' : lvl.label}
+                      {lvl.label}
                     </span>
                     {isCurrent && (
                       <span
