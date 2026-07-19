@@ -391,10 +391,10 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({ course, courseM
 );
 
 interface StandaloneCourseDetailProps {
-  course: any;
-  courseMeta: any;
-  activeTab: string;
-  handleTabChange: (tab: string) => void;
+  course: CourseDetailRow;
+  courseMeta: CourseMetaShape | null | undefined;
+  activeTab: CourseTabId;
+  handleTabChange: (tab: CourseTabId) => void;
   cinematicHero: React.ReactNode;
   tabContent: React.ReactNode;
 }
