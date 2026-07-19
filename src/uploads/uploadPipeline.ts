@@ -598,6 +598,9 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
             : 1;
           const posterTime = mediaItem?.posterTimestamp ?? computedDefaultPosterTime;
           posterUrl = generateStreamThumbnailUrl(streamId, { width: 1280, height: 720, time: posterTime });
+          if (typeof mediaItem?.posterTimestamp === 'number' && mediaItem.posterTimestamp > 0) {
+            posterUrl = `https://${CLOUDFLARE_STREAM_SUBDOMAIN}/${streamId}/thumbnails/thumbnail.jpg?time=${mediaItem.posterTimestamp}s&height=1080`;
+          }
           
           // Track for potential cleanup
           if (streamId) {
