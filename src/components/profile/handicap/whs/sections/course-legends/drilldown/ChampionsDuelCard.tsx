@@ -45,7 +45,11 @@ interface ChampionsDuelCardProps {
   } | null;
   /** Backdrop theme for the embedded rows/avatars. Default 'dark'. */
   theme?: 'light' | 'dark';
+  /** When true, section sits on a soft alternating band (matches the
+   *  course-records ledger on the discover page). No card chrome either way. */
+  banded?: boolean;
 }
+
 
 const INK = 'var(--hcp-t-100)';
 const INK_55 = 'var(--hcp-t-60)';
@@ -180,9 +184,11 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
   onFullLeaderboardTap,
   proBenchmark,
   theme = 'dark',
+  banded = false,
 }) => {
   const isLight = theme === 'light';
   const avatarRing = isLight ? 'rgba(15,23,42,0.12)' : 'rgba(255,255,255,0.22)';
+
   // Track mini-avatars: preserve current dark rendering (slate 10%) so the
   // handicap compete drilldown stays pixel-for-pixel. Light theme uses the
   // canonical ink-12% traced hairline.
@@ -240,18 +246,20 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
   // Inline ranks 2–5
   const inlineRows = rows.filter((r) => r.rank >= 2 && r.rank <= 5);
 
+  // Section band tone — mirrors The Record Book's alternating ledger on
+  // the discover page (light BAND_BG on light theme, faint white on dark).
+  const bandBg = isLight ? 'rgba(15,23,42,0.035)' : 'rgba(255,255,255,0.025)';
+  const hairline = isLight ? 'rgba(15,23,42,0.08)' : 'rgba(255,255,255,0.06)';
+
   return (
     <div
       data-category-section
       style={{
-        background: 'var(--hcp-bg-1)',
-        border: '0.5px solid var(--hcp-line)',
-        borderTop: defending ? `2px solid ${GOLD}` : '0.5px solid var(--hcp-line)',
-        borderRadius: 16,
+        background: banded ? bandBg : 'transparent',
+        borderTop: defending ? `2px solid ${GOLD}` : `0.5px solid ${hairline}`,
         padding: '12px 16px',
-        margin: '0 16px 12px',
-        boxShadow: '0 1px 3px rgba(15,23,42,0.04)',
       }}
+
     >
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, marginBottom: 6 }}>

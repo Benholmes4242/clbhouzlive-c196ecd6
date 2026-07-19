@@ -361,9 +361,10 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
 
 
 
-          <div>
-          {visibleCategories.map((cat) => {
+          <div style={{ borderBottom: theme === 'light' ? '0.5px solid rgba(15,23,42,0.08)' : '0.5px solid rgba(255,255,255,0.06)' }}>
+          {visibleCategories.map((cat, i) => {
             const entry = groupedWithTotals.get(cat);
+            const banded = i % 2 === 1;
             if (!entry || entry.rows.length === 0) {
               return (
                 <div key={cat} data-category={cat}>
@@ -371,6 +372,8 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
                     category={cat}
                     categoryLabel={legendCategoryLabel[cat]}
                     categoryIcon={legendCategoryIcon[cat]}
+                    banded={banded}
+                    theme={theme}
                   />
                 </div>
               );
@@ -405,11 +408,13 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
                       : null
                   }
                   theme={theme}
+                  banded={banded}
                 />
               </div>
             );
           })}
           </div>
+
         </>
       )}
 
