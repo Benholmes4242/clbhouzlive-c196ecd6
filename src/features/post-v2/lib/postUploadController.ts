@@ -15,6 +15,7 @@ import { uploadEventBus } from '@/uploads/uploadEventBus';
 import { compressImage, COMPRESSION_PRESETS } from '@/uploads/imageCompression';
 import { uploadVideoResilient } from '@/uploads/resilientVideoUpload';
 import { uploadToCloudflareR2 } from '@/utils/cloudflareUpload';
+import { CLOUDFLARE_STREAM_SUBDOMAIN } from '@/config/streamConstants';
 import { bakeFrameCrop } from './bakeFrameCrop';
 import type { StageMediaItem } from '../hooks/useStageComposer';
 
@@ -183,13 +184,19 @@ async function runVideo(job: InternalJob, item: StageMediaItem, displayOrder: nu
     }).catch(reject);
   });
 
+  const posterTimestamp = typeof item.posterTimestamp === 'number' ? item.posterTimestamp : null;
+  const posterUrl = posterTimestamp && posterTimestamp > 0
+    ? `https://${CLOUDFLARE_STREAM_SUBDOMAIN}/${streamId}/thumbnails/thumbnail.jpg?time=${posterTimestamp}s&height=1080`
+    : null;
+
   await insertMediaRow(ctx.postId, displayOrder, {
     media_type: 'video',
     media_url: `stream:${streamId}`,
     stream_id: streamId,
     trim_start: item.trimStart ?? null,
     trim_end: item.trimEnd ?? null,
-    poster_timestamp: item.posterTimestamp ?? null,
+    poster_timestamp: posterTimestamp,
+    ...(posterUrl ? { poster_url: posterUrl } : {}),
     studio_edits: { frame: item.frame, crop: item.crop ?? null },
   });
 

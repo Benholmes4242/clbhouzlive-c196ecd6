@@ -250,10 +250,7 @@ export default function MediaStageV2({ item, index, total, onOpenAdjust, onOpenT
           <button onClick={onOpenAdjust} style={chipStyle}>Adjust</button>
         )}
         {item.type === 'video' && (
-          <>
-            <button onClick={onOpenTrim} style={chipStyle}>Trim</button>
-            <button onClick={onOpenCover} style={chipStyle}>Cover</button>
-          </>
+          <button onClick={onOpenCover} style={chipStyle}>Cover</button>
         )}
       </div>
     </div>
