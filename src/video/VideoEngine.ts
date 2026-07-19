@@ -176,8 +176,12 @@ function createLaneElement(laneId: LaneId): HTMLVideoElement {
   // [TRACE] element identity — every lane <video> carries a stable short id
   // so trace lines across layers can prove they hold the SAME element.
   (el.dataset as any).vid = traceGenElId();
+  // Muted-setter probe (audioDebug only). Installed BEFORE any write so the
+  // initial mute below is captured too. No-op when the flag is off.
+  if (audioDebugEnabled()) installMutedSetterProbe(el, laneId);
   el.playsInline = true;
   el.muted = true;
+
   el.loop = true; // Stage-1 polish: loop by default on both feed + fullscreen lanes.
   el.preload = 'metadata';
   el.setAttribute('webkit-playsinline', 'true');
