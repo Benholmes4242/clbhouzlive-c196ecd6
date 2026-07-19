@@ -516,7 +516,16 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
       {/* Close guard */}
       <BottomSheet open={sheet === 'close-guard'} onClose={() => setSheet(null)} title="Unsaved changes">
         <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <button onClick={saveAsDraft} style={{ background: '#15171F', color: '#F5F6F7', border: 0, borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Save draft</button>
+          {!isEditMode && (
+            <>
+              {state.media.length > 0 && (
+                <div style={{ fontSize: 12.5, color: '#5A6270', lineHeight: 1.45 }}>
+                  Drafts save your caption and course tags. Photos and videos aren't kept yet - you'll need to re-add them.
+                </div>
+              )}
+              <button onClick={saveAsDraft} style={{ background: '#15171F', color: '#F5F6F7', border: 0, borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Save draft</button>
+            </>
+          )}
           <button onClick={() => { setSheet(null); reset(); onClose(); }} style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer', color: '#B00020' }}>Discard</button>
         </div>
       </BottomSheet>
