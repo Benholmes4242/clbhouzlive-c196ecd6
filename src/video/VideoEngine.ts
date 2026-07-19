@@ -323,6 +323,19 @@ class VideoEngineImpl {
     this.applyAudioPolicy(lane);
   }
 
+  /**
+   * Public re-apply of a lane's declared audio policy. Same code path the
+   * session-toggle uses; call this at bind sites (fullscreen borrow / cold)
+   * to push current useSessionAudio state onto the freshly-parented element.
+   * No-op for 'always-muted' / 'local' semantics is preserved inside
+   * applyAudioPolicy. Safe when the lane doesn't exist (silent return).
+   */
+  applyLaneAudioPolicy(laneId: LaneId): void {
+    const lane = this.lanes.get(laneId);
+    if (!lane) return;
+    this.applyAudioPolicy(lane);
+  }
+
   private applyAudioPolicy(lane: Lane): void {
     if (lane.audioPolicy === 'always-muted') {
       if (!lane.el.muted) { lane.el.muted = true; this.emit(lane); }
