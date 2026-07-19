@@ -1,43 +1,49 @@
 /**
- * GoldRingAvatar — SquircleAvatar wrapped in the canonical animated gold
- * gradient ring used for EXCEPTIONAL (>=9.0) review surfaces. Same visual
- * language as `clbhouz-gold-shimmer-bar` (see index.css).
+ * GoldRingAvatar — SquircleAvatar wrapped in a soft animated gold radiant
+ * glow. Uses the canonical 1px hairline ring in exceptional gold for Aces &
+ * Albatrosses moments and legendary "See all" sheets.
  *
- * Used by Moments of the Game (Aces & Albatrosses podium + Latest honours)
- * and the legendary "See all" TierSeeAllSheet.
+ * The old padding-based outer shimmer ring has been removed so the avatar
+ * carries a single canonical ring (not a double/triple border).
  */
 import React from 'react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { GOLD } from '@/components/explore-tab-new/gamingLightTokens';
 
 type SquircleAvatarProps = React.ComponentProps<typeof SquircleAvatar>;
 
-interface GoldRingAvatarProps extends Omit<SquircleAvatarProps, 'hairlineRing' | 'ringColor'> {
-  /** Ring thickness in px. Defaults to 1.5 (matches hairline ring visual weight). */
-  ringWidth?: number;
-}
+interface GoldRingAvatarProps extends Omit<SquircleAvatarProps, 'hairlineRing' | 'ringColor'> {}
 
 export const GoldRingAvatar: React.FC<GoldRingAvatarProps> = ({
   size = 24,
-  ringWidth = 1.5,
   ...rest
 }) => {
   const numericSize = typeof size === 'number' ? size : 24;
-  const outer = numericSize + ringWidth * 2;
   return (
     <div
-      className="clbhouz-gold-shimmer-bar"
+      className="relative inline-flex items-center justify-center flex-shrink-0"
       style={{
-        width: outer,
-        height: outer,
-        padding: ringWidth,
-        borderRadius: '34%',
-        flexShrink: 0,
-        display: 'inline-block',
-        lineHeight: 0,
+        width: numericSize,
+        height: numericSize,
       }}
       aria-hidden={false}
     >
-      <SquircleAvatar size={numericSize} {...rest} />
+      {/* Soft animated gold radiant glow behind the avatar */}
+      <div
+        className="clbhouz-gold-shimmer-bar absolute pointer-events-none"
+        style={{
+          inset: -2,
+          borderRadius: '34%',
+          filter: 'blur(2px)',
+          opacity: 0.55,
+        }}
+      />
+      <SquircleAvatar
+        size={numericSize}
+        hairlineRing
+        ringColor={GOLD}
+        {...rest}
+      />
     </div>
   );
 };
