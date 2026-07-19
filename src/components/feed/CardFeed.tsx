@@ -88,6 +88,7 @@ export interface CardFeedProps {
   getCommentCount: (post: FeedPost) => number;
   onNearEnd?: () => void;
   hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
   topPadding?: number | string;
   bottomPadding?: number;
   onFollow?: (post: FeedPost) => void;
