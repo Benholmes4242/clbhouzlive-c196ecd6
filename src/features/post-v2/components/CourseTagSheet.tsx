@@ -45,8 +45,9 @@ export default function CourseTagSheet({
 }: Props) {
   const [q, setQ] = useState('');
   const [rows, setRows] = useState<Row[]>([]);
+  const [searching, setSearching] = useState(false);
   const [draft, setDraft] = useState<StageCourse[]>(selected);
-  const { rows: popular } = usePopularCourses(open, {
+  const { rows: popular, loaded: popularLoaded } = usePopularCourses(open, {
     excludeReviewedForUserId,
   });
   const [reviewedIds, setReviewedIds] = useState<Set<string>>(new Set());
@@ -79,16 +80,20 @@ export default function CourseTagSheet({
 
   useEffect(() => {
     if (!open) return;
+    let cancelled = false;
     const t = setTimeout(async () => {
-      if (q.trim().length === 0) { setRows([]); return; }
+      if (q.trim().length === 0) { setRows([]); setSearching(false); return; }
+      setSearching(true);
       const { data } = await supabase
         .from('golf_courses')
         .select('id, name, country, sub_country')
         .ilike('name', `%${q.trim()}%`)
         .limit(20);
+      if (cancelled) return;
       setRows((data ?? []) as Row[]);
+      setSearching(false);
     }, 180);
-    return () => clearTimeout(t);
+    return () => { cancelled = true; clearTimeout(t); };
   }, [q, open]);
 
   const showPopular = q.trim().length === 0;
@@ -192,7 +197,13 @@ export default function CourseTagSheet({
                   ))}
                 </>
               )}
-              {popular.length > 0 ? (
+              {!popularLoaded ? (
+                <>
+                  <CourseRowSkeleton />
+                  <CourseRowSkeleton />
+                  <CourseRowSkeleton />
+                </>
+              ) : popular.length > 0 ? (
                 <>
                   <SectionLabel>POPULAR ON CLBHOUZ</SectionLabel>
                   {popularPinned.rest.map(r => (
@@ -224,15 +235,27 @@ export default function CourseTagSheet({
                   <SectionLabel>RESULTS</SectionLabel>
                 </>
               )}
-              {searchPinned.rest.map(r => (
-                <CourseRow
-                  key={r.id}
-                  row={r}
-                  reviewed={reviewedIds.has(r.id)}
-                  selected={selectedIds.has(r.id)}
-                  onToggle={toggle}
-                />
-              ))}
+              {searching && searchPinned.rest.length === 0 ? (
+                <>
+                  <CourseRowSkeleton />
+                  <CourseRowSkeleton />
+                  <CourseRowSkeleton />
+                </>
+              ) : searchPinned.rest.length === 0 && searchPinned.pinned.length === 0 ? (
+                <div style={{ padding: '32px 16px', fontSize: 13, color: '#94A3B8', textAlign: 'center' }}>
+                  No courses found for "{q.trim()}"
+                </div>
+              ) : (
+                searchPinned.rest.map(r => (
+                  <CourseRow
+                    key={r.id}
+                    row={r}
+                    reviewed={reviewedIds.has(r.id)}
+                    selected={selectedIds.has(r.id)}
+                    onToggle={toggle}
+                  />
+                ))
+              )}
             </>
           )}
         </div>
@@ -284,6 +307,20 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
+
+function CourseRowSkeleton() {
+  return (
+    <div style={{ padding: '12px 16px', borderTop: '1px solid rgba(15,23,42,0.06)', display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div className="clb-shimmer-light" style={{ width: 34, height: 34, borderRadius: 12, background: 'rgba(0,0,0,0.06)', flex: 'none' }} />
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div className="clb-shimmer-light" style={{ height: 12, width: '55%', borderRadius: 6, background: 'rgba(0,0,0,0.06)' }} />
+        <div className="clb-shimmer-light" style={{ height: 10, width: '30%', borderRadius: 6, background: 'rgba(0,0,0,0.06)' }} />
+      </div>
+    </div>
+  );
+}
+
+
 
 function CourseRow({
   row,

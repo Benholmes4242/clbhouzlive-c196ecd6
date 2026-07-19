@@ -13,8 +13,8 @@ interface Props {
   onClose: () => void;
   value: Date | null;
   onChange: (d: Date | null) => void;
-  onOpenScheduled: () => void;
-  scheduledCount: number;
+  onOpenScheduled?: () => void;
+  scheduledCount?: number;
 }
 
 const DAY_LABELS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
@@ -176,12 +176,14 @@ export default function ScheduleSheetV2({ open, onClose, value, onChange, onOpen
         </div>
       </div>
 
-      <button
-        onClick={onOpenScheduled}
-        style={{ display: 'block', width: '100%', border: 0, borderTop: '1px solid rgba(15,23,42,0.07)', background: 'transparent', padding: '12px 16px', textAlign: 'left', fontSize: 13, color: '#0F172A', cursor: 'pointer' }}
-      >
-        View scheduled - <span style={{ fontWeight: 700 }}>{scheduledCount}</span>
-      </button>
+      {onOpenScheduled && (
+        <button
+          onClick={onOpenScheduled}
+          style={{ display: 'block', width: '100%', border: 0, borderTop: '1px solid rgba(15,23,42,0.07)', background: 'transparent', padding: '12px 16px', textAlign: 'left', fontSize: 13, color: '#0F172A', cursor: 'pointer' }}
+        >
+          View scheduled - <span style={{ fontWeight: 700 }}>{scheduledCount ?? 0}</span>
+        </button>
+      )}
     </BottomSheet>
   );
 }

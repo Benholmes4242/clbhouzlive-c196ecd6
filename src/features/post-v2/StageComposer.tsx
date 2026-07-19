@@ -13,7 +13,7 @@
 // drafts -> useDrafts, uploads -> postUploadController (module-level, survives unmount).
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { X } from 'lucide-react';
+import { X, Loader2 } from 'lucide-react';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { toast } from '@/lib/toast';
@@ -168,11 +168,12 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
     return () => { cancelled = true; };
   }, [draftId, isEditMode, profile?.id, restoreDraft]);
 
-  const [sheet, setSheet] = useState<null | 'course' | 'actor' | 'schedule' | 'drafts' | 'scheduled' | 'trim' | 'cover' | 'adjust' | 'close-guard'>(null);
+  const [sheet, setSheet] = useState<null | 'course' | 'actor' | 'schedule' | 'drafts' | 'scheduled' | 'cover' | 'adjust' | 'close-guard'>(null);
   const [success, setSuccess] = useState<SubmitResult | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [scheduledCount, setScheduledCount] = useState<number>(0);
   const [restoredDraftId, setRestoredDraftId] = useState<string | null>(null);
+  const [savingDraft, setSavingDraft] = useState(false);
 
   const active = state.media[state.activeIndex] ?? null;
 
@@ -192,7 +193,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
     fontSize: 14,
     fontWeight: 600,
     cursor: canSubmit ? 'pointer' : 'not-allowed',
-    opacity: canSubmit ? 1 : 0.4,
+    opacity: (canSubmit || submitting || saving) ? 1 : 0.4,
   };
 
   const authorName = useMemo(() => activeActor?.name ?? profile?.display_name ?? 'You', [activeActor, profile]);
@@ -340,23 +341,29 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
   };
 
   const saveAsDraft = async () => {
+    if (savingDraft) return;
     if (!activeActor) return;
-    await drafts.save({
-      actorType: activeActor.type,
-      actorId: activeActor.id,
-      content: state.caption || null,
-      courseId: state.course?.id ?? null,
-      courseName: state.course?.name ?? null,
-      courseCountry: state.course?.country ?? null,
-      courses: state.courses,
-    });
-    if (restoredDraftId) {
-      await drafts.remove(restoredDraftId);
-      setRestoredDraftId(null);
+    setSavingDraft(true);
+    try {
+      await drafts.save({
+        actorType: activeActor.type,
+        actorId: activeActor.id,
+        content: state.caption || null,
+        courseId: state.course?.id ?? null,
+        courseName: state.course?.name ?? null,
+        courseCountry: state.course?.country ?? null,
+        courses: state.courses,
+      });
+      if (restoredDraftId) {
+        await drafts.remove(restoredDraftId);
+        setRestoredDraftId(null);
+      }
+      setSheet(null);
+      reset();
+      onClose();
+    } finally {
+      setSavingDraft(false);
     }
-    setSheet(null);
-    reset();
-    onClose();
   };
 
   // No hooks below this point - early returns above.
@@ -386,6 +393,48 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
     if (files.length) addFiles(files);
     e.target.value = '';
   };
+
+  // Edit-mode load hold: never show the empty create composer while the
+  // post is being fetched for editing.
+  if (isEditMode && !hydrated && (editable.isLoading || (editable.data && editable.data.canManage))) {
+    return (
+      <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: '#F8FAFC', display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 12000 }}>
+        {/* Header mirror: close X + "Edit post" title */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', paddingTop: 'max(env(safe-area-inset-top), 12px)', background: '#F8FAFC', borderBottom: '1px solid rgba(0,0,0,0.07)', flex: 'none' }}>
+          <button onClick={onClose} aria-label="Close" style={{ background: 'transparent', border: 0, color: '#1F2428', cursor: 'pointer', padding: 8 }}>
+            <X size={22} />
+          </button>
+          <div style={{ fontSize: 14, fontWeight: 600, color: '#1F2428' }}>Edit post</div>
+          <div style={{ flex: 1 }} />
+        </div>
+        {/* Stage block */}
+        <div style={{ flex: '1 1 0', minHeight: 0, padding: 12 }}>
+          <div className="clb-shimmer-light" style={{ width: '100%', height: '100%', borderRadius: 16, background: 'rgba(0,0,0,0.06)' }} />
+        </div>
+        {/* Tray thumbs + caption bars */}
+        <div style={{ flex: 'none', padding: '8px 12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <div className="clb-shimmer-light" style={{ width: 64, height: 64, borderRadius: 12, background: 'rgba(0,0,0,0.06)' }} />
+            <div className="clb-shimmer-light" style={{ width: 64, height: 64, borderRadius: 12, background: 'rgba(0,0,0,0.06)' }} />
+            <div className="clb-shimmer-light" style={{ width: 64, height: 64, borderRadius: 12, background: 'rgba(0,0,0,0.06)' }} />
+          </div>
+          <div className="clb-shimmer-light" style={{ height: 14, width: '80%', borderRadius: 6, background: 'rgba(0,0,0,0.06)' }} />
+          <div className="clb-shimmer-light" style={{ height: 14, width: '55%', borderRadius: 6, background: 'rgba(0,0,0,0.06)' }} />
+        </div>
+      </div>
+    );
+  }
+
+  // Edit target failed to load or does not exist.
+  if (isEditMode && !editable.isLoading && !editable.data) {
+    return (
+      <div style={{ position: 'fixed', inset: 0, background: '#F8FAFC', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 12000, padding: 24, gap: 12 }}>
+        <div style={{ fontSize: 16, fontWeight: 600, color: '#1F2428' }}>Couldn't load this post</div>
+        <div style={{ fontSize: 13, color: '#5A6270', textAlign: 'center' }}>It may have been deleted, or your connection dropped.</div>
+        <button onClick={onClose} style={{ background: '#15171F', color: '#F5F6F7', border: 0, borderRadius: 999, padding: '10px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Close</button>
+      </div>
+    );
+  }
 
   // Ownership guard: if edit target isn't manageable, close out.
   if (isEditMode && editable.data && !editable.data.canManage) {
@@ -417,7 +466,11 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
           </button>
         )}
         <div style={{ flex: 1 }} />
-        <button onClick={onPrimary} disabled={!canSubmit} style={primaryStyle}>{primaryLabel}</button>
+        <button onClick={onPrimary} disabled={!canSubmit} style={primaryStyle}>
+          {(submitting || saving)
+            ? <Loader2 size={16} className="animate-spin" style={{ display: 'block' }} />
+            : primaryLabel}
+        </button>
       </div>
 
       <input ref={stageAddInputRef} type="file" accept="image/*,video/*" multiple hidden onChange={handleStageAddFiles} />
@@ -523,7 +576,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
                   Drafts save your caption and course tags. Photos and videos aren't kept yet - you'll need to re-add them.
                 </div>
               )}
-              <button onClick={saveAsDraft} style={{ background: '#15171F', color: '#F5F6F7', border: 0, borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Save draft</button>
+              <button onClick={saveAsDraft} disabled={savingDraft} style={{ background: '#15171F', color: '#F5F6F7', border: 0, borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 600, cursor: savingDraft ? 'not-allowed' : 'pointer', opacity: savingDraft ? 0.7 : 1 }}>{savingDraft ? 'Saving' : 'Save draft'}</button>
             </>
           )}
           <button onClick={() => { setSheet(null); reset(); onClose(); }} style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer', color: '#B00020' }}>Discard</button>
