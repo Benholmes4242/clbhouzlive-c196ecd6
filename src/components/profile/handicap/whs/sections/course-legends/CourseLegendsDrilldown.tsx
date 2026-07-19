@@ -1,5 +1,6 @@
 import { GAM } from '../../gam/tokens';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { lookupCourseMetaV2 } from '@/lib/whs/courseNameMatcher';
 import { useCourseLegends } from '@/hooks/gam/useCourseLegends';
 import { useCourseMeta } from '@/hooks/gam/useCourseMeta';
