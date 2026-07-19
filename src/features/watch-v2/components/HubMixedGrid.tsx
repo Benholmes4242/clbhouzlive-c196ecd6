@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, type ReactNode } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useHubMixedGrid, type MixedGridRow } from '../hooks/useHubMixedGrid';
 import { toFeedPosts } from '../utils/toFeedPost';
@@ -27,7 +27,13 @@ function SkeletonTile({ aspect }: { aspect: string }) {
   );
 }
 
-export function HubMixedGrid({ filter = 'all' }: { filter?: string } = {}) {
+export function HubMixedGrid({
+  filter = 'all',
+  children,
+}: {
+  filter?: string;
+  children?: ReactNode;
+} = {}) {
   const { user } = useSupabaseSession();
   const {
     data,
@@ -81,6 +87,10 @@ export function HubMixedGrid({ filter = 'all' }: { filter?: string } = {}) {
         sub="Clips and videos, mixed"
         paddingX={16}
       />
+
+      {children}
+
+      <div style={{ height: 16 }} />
 
       {isLoading ? (
         <div style={{ display: 'flex', gap: 4, padding: '0 4px' }}>
