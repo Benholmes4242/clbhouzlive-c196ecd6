@@ -37,6 +37,7 @@ function SkeletonCard() {
   return (
     <div style={{ marginBottom: 16 }}>
       <div
+        className="clb-shimmer-light"
         style={{
           aspectRatio: '16 / 9',
           borderRadius: 4,
@@ -45,6 +46,7 @@ function SkeletonCard() {
       />
       <div style={{ display: 'flex', gap: 9, marginTop: 8 }}>
         <div
+          className="clb-shimmer-light"
           style={{
             width: 30,
             height: 30,
@@ -54,8 +56,12 @@ function SkeletonCard() {
           }}
         />
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ height: 12, borderRadius: 4, background: 'rgba(0,0,0,0.06)' }} />
           <div
+            className="clb-shimmer-light"
+            style={{ height: 12, borderRadius: 4, background: 'rgba(0,0,0,0.06)' }}
+          />
+          <div
+            className="clb-shimmer-light"
             style={{
               marginTop: 6,
               height: 10,
@@ -67,25 +73,6 @@ function SkeletonCard() {
         </div>
       </div>
     </div>
-  );
-}
-
-function Spinner() {
-  return (
-    <>
-      <style>{`@keyframes videosV2Spin{to{transform:rotate(360deg)}}`}</style>
-      <div
-        aria-label="Loading"
-        style={{
-          width: 26,
-          height: 26,
-          borderRadius: '50%',
-          border: '3px solid rgba(0,0,0,0.08)',
-          borderTopColor: '#F7931E',
-          animation: 'videosV2Spin 0.9s linear infinite',
-        }}
-      />
-    </>
   );
 }
 
