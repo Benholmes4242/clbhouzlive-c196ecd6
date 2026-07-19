@@ -85,9 +85,21 @@ const Auth: React.FC<AuthProps> = () => {
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, [navigate, searchParams]);
 
+  if (user) {
+    // Redirect effect above is resolving the destination; hold a quiet dark
+    // frame instead of flashing the sign-in hero (also covers the frame
+    // between a successful verify and route change).
+    return (
+      <div
+        aria-hidden
+        style={{ position: 'fixed', inset: 0, background: '#15171F', zIndex: 50 }}
+      />
+    );
+  }
+
   return (
     <div className="w-full md:max-w-[440px] md:mx-auto">
-      <AuthForm />
+      <AuthForm onWillNavigate={() => { hasNavigated.current = true; }} />
     </div>
   );
 };
