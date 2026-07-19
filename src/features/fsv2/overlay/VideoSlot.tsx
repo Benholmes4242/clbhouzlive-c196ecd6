@@ -174,7 +174,27 @@ export const Fsv2VideoSlot: React.FC<Props> = ({
     el.addEventListener('loadeddata', onFrame);
     el.addEventListener('playing', onFrame);
 
-    hudEvent(openId, 'src.set', { hlsUrl: !!source.hlsUrl, mp4Url: !!source.mp4Url });
+    const restoresPendingAtSrcSet = getPendingRestoreCount();
+    hudEvent(openId, 'src.set', { hlsUrl: !!source.hlsUrl, mp4Url: !!source.mp4Url, restoresPendingAtSrcSet });
+    const stallProbe = setTimeout(() => {
+      if (cancelled) return;
+      if (el.readyState < 2) {
+        const ranges: Array<[number, number]> = [];
+        try {
+          for (let i = 0; i < el.buffered.length; i++) {
+            ranges.push([+el.buffered.start(i).toFixed(2), +el.buffered.end(i).toFixed(2)]);
+          }
+        } catch { /* ignore */ }
+        const payload = {
+          networkState: el.networkState,
+          readyState: el.readyState,
+          bufferedRanges: ranges,
+          restoresPendingAtSrcSet,
+        };
+        trace('fsv2.pipeline.stalled', payload);
+        hudEvent(openId, 'pipeline.stalled', payload);
+      }
+    }, 1500);
     attach(el, source, { muted: isMuted, startPosition }).then((handle) => {
       if (cancelled) { handle.detach(); return; }
       detachRef.current = handle.detach;
