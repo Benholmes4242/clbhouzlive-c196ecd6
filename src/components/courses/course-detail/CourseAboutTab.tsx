@@ -88,7 +88,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
   const { coords, loading: coordsLoading } = useCourseCoordinates({
     courseId: course.id,
-    clubId: (course as any).club_id ?? null,
+    clubId: course.club_id ?? null,
     latitude: course.latitude,
     longitude: course.longitude,
     name: course.name,
