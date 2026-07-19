@@ -353,6 +353,23 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
                 </div>
               ))}
             </div>
+          ) : isError ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center gap-4 animate-fade-in">
+              <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto">
+                <Award className="w-5 h-5 text-muted-foreground" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-sm font-semibold text-foreground">Couldn't load this list</h3>
+                <p className="text-sm text-muted-foreground max-w-xs">Check your connection and try again.</p>
+              </div>
+              <button
+                onClick={() => refetch()}
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium active:scale-[0.97] transition-transform"
+                style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
+              >
+                Retry
+              </button>
+            </div>
           ) : allCourses.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center gap-4 animate-fade-in">
               <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto">
