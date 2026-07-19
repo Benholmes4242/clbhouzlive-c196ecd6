@@ -957,6 +957,20 @@ export function CinematicHeroFullBleed({
                   >
                     {entryName(row.entry)}
                   </span>
+                  {isLive && (
+                    <span
+                      style={{
+                        ...NUMERIC_STYLE,
+                        width: COL_THRU,
+                        textAlign: 'center',
+                        fontSize: 11,
+                        fontWeight: 600,
+                        color: 'rgba(255,255,255,0.45)',
+                      }}
+                    >
+                      {thruDisplay}
+                    </span>
+                  )}
                   {anyToday && (
                     <span
                       style={{
@@ -984,20 +998,6 @@ export function CinematicHeroFullBleed({
                   >
                     {fmtScore(row.entry?.score)}
                   </span>
-                  {isLive && (
-                    <span
-                      style={{
-                        ...NUMERIC_STYLE,
-                        width: COL_THRU,
-                        textAlign: 'center',
-                        fontSize: 11,
-                        fontWeight: 600,
-                        color: 'rgba(255,255,255,0.45)',
-                      }}
-                    >
-                      {thruDisplay}
-                    </span>
-                  )}
                 </div>
               );
             }
