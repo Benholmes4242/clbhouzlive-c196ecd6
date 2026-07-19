@@ -51,7 +51,7 @@ export function useCourseMedia({ userId, courseId, filter }: UseCourseMediaParam
 
       if (cursor) params.p_cursor = cursor;
 
-      const { data, error } = await supabase.rpc('get_course_media', params as any);
+      const { data, error } = await (supabase as unknown as RpcClient).rpc('get_course_media', params);
 
       if (error) throw error;
 
