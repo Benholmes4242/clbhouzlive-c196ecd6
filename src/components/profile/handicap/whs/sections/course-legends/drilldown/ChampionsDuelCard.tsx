@@ -246,18 +246,20 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
   // Inline ranks 2–5
   const inlineRows = rows.filter((r) => r.rank >= 2 && r.rank <= 5);
 
+  // Section band tone — mirrors The Record Book's alternating ledger on
+  // the discover page (light BAND_BG on light theme, faint white on dark).
+  const bandBg = isLight ? 'rgba(15,23,42,0.035)' : 'rgba(255,255,255,0.025)';
+  const hairline = isLight ? 'rgba(15,23,42,0.08)' : 'rgba(255,255,255,0.06)';
+
   return (
     <div
       data-category-section
       style={{
-        background: 'var(--hcp-bg-1)',
-        border: '0.5px solid var(--hcp-line)',
-        borderTop: defending ? `2px solid ${GOLD}` : '0.5px solid var(--hcp-line)',
-        borderRadius: 16,
+        background: banded ? bandBg : 'transparent',
+        borderTop: defending ? `2px solid ${GOLD}` : `0.5px solid ${hairline}`,
         padding: '12px 16px',
-        margin: '0 16px 12px',
-        boxShadow: '0 1px 3px rgba(15,23,42,0.04)',
       }}
+
     >
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, marginBottom: 6 }}>
