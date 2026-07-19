@@ -110,8 +110,6 @@ const ClubhouseContent = () => {
   
   // ── Store wiring ──
   const activeIndex = useClubhouseStore(s => s.activeIndex);
-  const carouselPositions = useClubhouseStore(s => s.carouselPositions);
-  const currentMediaIndex = carouselPositions.get(activeIndex) ?? 0;
   const isTournamentCardActive = useClubhouseStore(s => s.isTournamentCardActive);
   const setStoreActiveTab = useClubhouseStore(s => s.setActiveTab);
 
