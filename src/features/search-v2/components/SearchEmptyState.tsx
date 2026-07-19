@@ -91,43 +91,50 @@ export function SearchEmptyState({ onSelect }: Props) {
       )}
 
       {/* ============ PEOPLE TO FOLLOW ============ */}
-      <SectionEyebrow label="People to follow" />
-      {isLoading && people.length === 0 ? (
-        <PeopleSkeleton />
-      ) : (
-        <div>
-          {people.map((s) => (
-            <SuggestionRow
-              key={s.id}
-              suggestion={s}
-              onSelect={() => {
-                if (!s.username) return;
-                onSelect();
-                navigate(`/profile/${s.username}`);
-              }}
-            />
-          ))}
-        </div>
+      {(isLoading || people.length > 0) && (
+        <>
+          <SectionEyebrow label="People to follow" />
+          {isLoading && people.length === 0 ? (
+            <PeopleSkeleton />
+          ) : (
+            <div>
+              {people.map((s) => (
+                <SuggestionRow
+                  key={s.id}
+                  suggestion={s}
+                  onSelect={() => {
+                    onSelect();
+                    navigate(`/profile/${s.username ?? s.id}`);
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </>
       )}
 
       {/* ============ POPULAR ON CLBHOUZ ============ */}
-      <SectionEyebrow label="Popular on clbhouz" />
-      {isLoading && courses.length === 0 ? (
-        <CoursesSkeleton />
-      ) : (
-        <div>
-          {courses.map((c) => (
-            <CourseRow
-              key={c.id}
-              course={c}
-              query=""
-              onSelect={() => {
-                onSelect();
-                navCourse(navigate, c);
-              }}
-            />
-          ))}
-        </div>
+      {(isLoading || courses.length > 0) && (
+        <>
+          <SectionEyebrow label="Popular on clbhouz" />
+          {isLoading && courses.length === 0 ? (
+            <CoursesSkeleton />
+          ) : (
+            <div>
+              {courses.map((c) => (
+                <CourseRow
+                  key={c.id}
+                  course={c}
+                  query=""
+                  onSelect={() => {
+                    onSelect();
+                    navCourse(navigate, c);
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </>
       )}
     </div>
   );
