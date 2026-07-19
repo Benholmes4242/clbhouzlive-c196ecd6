@@ -280,10 +280,10 @@ export function useReviewMediaPipeline({ userId, existingMedia }: UseReviewMedia
           uploadedUrl: data.publicUrl,
           dbRowId: row?.id ?? null,
         });
-      } catch (e: any) {
+      } catch (e) {
         updateItem(item.id, {
           status: 'failed',
-          error: e?.message || 'Upload failed',
+          error: e instanceof Error ? e.message : 'Upload failed',
         });
       }
     },
