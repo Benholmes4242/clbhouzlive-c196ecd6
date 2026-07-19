@@ -63,6 +63,19 @@ const AuthForm: React.FC = () => {
 
   const sendStartRef = useRef<number>(0);
 
+  // Safety net: if the app returns to foreground while we are stuck in
+  // a submitting state started by a native OAuth sheet that never fired
+  // its callback, clear the spinner so the user can retry.
+  useEffect(() => {
+    const onVis = () => {
+      if (document.visibilityState === 'visible') {
+        setSubmitting(false);
+      }
+    };
+    document.addEventListener('visibilitychange', onVis);
+    return () => document.removeEventListener('visibilitychange', onVis);
+  }, []);
+
   // Resend cooldown ticker
   useEffect(() => {
     if (resendCooldown <= 0) return;
