@@ -184,9 +184,11 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
   onFullLeaderboardTap,
   proBenchmark,
   theme = 'dark',
+  banded = false,
 }) => {
   const isLight = theme === 'light';
   const avatarRing = isLight ? 'rgba(15,23,42,0.12)' : 'rgba(255,255,255,0.22)';
+
   // Track mini-avatars: preserve current dark rendering (slate 10%) so the
   // handicap compete drilldown stays pixel-for-pixel. Light theme uses the
   // canonical ink-12% traced hairline.
