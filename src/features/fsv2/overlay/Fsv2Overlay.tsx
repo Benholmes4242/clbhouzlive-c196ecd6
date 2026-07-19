@@ -81,6 +81,17 @@ export const Fsv2Overlay: React.FC = () => {
     }
   }, [isOpen, mounted]);
 
+  // Snap-to-visible when a NEW open lands while the overlay is still
+  // mounted from a previous open (rapid close→open). Without this the
+  // outer div stays mid-fade for ~2 RAFs and the light body underneath
+  // shows through as a white flash — or, if state stalls, a fully white
+  // viewer. Keyed by openId so every fresh open forces opacity: 1 now.
+  useEffect(() => {
+    if (!isOpen) return;
+    setVisible(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openId]);
+
   // Body-scroll lock + chrome/status-bar orchestration
   const shieldPrevRef = useRef<string>('transparent');
   useEffect(() => {
@@ -184,6 +195,7 @@ export const Fsv2Overlay: React.FC = () => {
       }}
     >
       <Fsv2VerticalSnapPager
+        key={openId || 'idle'}
         posts={posts}
         activeIndex={activeIndex}
         openId={openId}
