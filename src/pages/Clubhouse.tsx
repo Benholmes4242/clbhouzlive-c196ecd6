@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { useQueryClient, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ClubhouseIslandTabs } from '@/components/clubhouse/ClubhouseIslandTabs';
 import { useSetChromeLeftSlot, useSetChromeSuppressed } from '@/features/chrome-v2/leftOverride';
@@ -7,12 +7,10 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { useHeaderVariant } from '@/hooks/useHeaderVisibility';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from '@/lib/toast';
-import { supabase } from '@/integrations/supabase/client';
 import { SeasonRecapModal } from '@/components/achievements/SeasonRecapModal';
 
 import { useSeasonRecap } from '@/hooks/useSeasonRecap';
 
-import { Compass, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 // Chrome owned solely by AppRoutes; no local status-bar imports.
 
