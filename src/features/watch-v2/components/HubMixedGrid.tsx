@@ -10,17 +10,35 @@ import { SectionHeader } from '@/components/ui/SectionHeader';
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
-const spinKeyframes = `@keyframes hub-mixed-spin { to { transform: rotate(360deg); } }`;
-
 function SkeletonTile({ aspect }: { aspect: string }) {
   return (
     <div style={{ marginBottom: 12 }}>
       <div
+        className="clb-shimmer-light"
         style={{
           width: '100%',
           aspectRatio: aspect,
           borderRadius: 4,
           background: 'rgba(0,0,0,0.06)',
+        }}
+      />
+      <div
+        className="clb-shimmer-light"
+        style={{
+          height: 12.5,
+          borderRadius: 4,
+          background: 'rgba(0,0,0,0.06)',
+          marginTop: 6,
+        }}
+      />
+      <div
+        className="clb-shimmer-light"
+        style={{
+          height: 11,
+          width: '55%',
+          borderRadius: 4,
+          background: 'rgba(0,0,0,0.06)',
+          marginTop: 2,
         }}
       />
     </div>
