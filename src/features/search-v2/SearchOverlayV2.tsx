@@ -615,7 +615,7 @@ function CommitResults({
           }}
           aria-hidden="true"
         >
-          ⌕
+          <Search size={15} strokeWidth={2.5} />
         </div>
         <div className="flex-1 min-w-0">
           <div className="text-[14px] font-extrabold truncate" style={{ color: '#0F172A' }}>
