@@ -437,6 +437,7 @@ export function useCommentsV2({
   return {
     threads,
     totalCount,
+    totalCountLoading,
     isLoading,
     fetchNextPage,
     hasNextPage: !!hasNextPage,
