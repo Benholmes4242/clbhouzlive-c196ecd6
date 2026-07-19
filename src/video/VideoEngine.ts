@@ -209,6 +209,16 @@ class VideoEngineImpl {
    * must be preserved.
    */
   private borrowedLanes = new Set<LaneId>();
+  /**
+   * Stage-7 Audio v3: per-borrow volumechange guard detachers. While a lane
+   * is borrowed by the fullscreen viewer, an element-level `volumechange`
+   * listener defends the session audio policy — any external writer that
+   * mutes the element out from under us (e.g. a tile-side effect firing on
+   * deactivate) is corrected on the next microtask and traced to the HUD.
+   * Cleared on clearBorrowed BEFORE the rail's own policy is restored so
+   * handback muting does not falsely trip the guard.
+   */
+  private borrowGuardDetach = new Map<LaneId, () => void>();
 
   /**
    * Autoplay-blocked signal — fires when a 'session' lane's unmuted play()
