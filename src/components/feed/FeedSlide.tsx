@@ -1240,7 +1240,7 @@ const BorrowedFullscreenSlot: React.FC<{
         e.propertyName !== 'height'
       ) return;
       closeFiredRef.current = true;
-      try { vperfMotionMark('shrinkEnd'); } catch {}
+      try { vperfMotionMark('shrinkEnd'); vperfCloseMotionMark('returnAnimEnd'); } catch {}
       signalCloseAnimDone();
       return;
     }
