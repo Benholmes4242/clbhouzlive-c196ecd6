@@ -126,7 +126,7 @@ export function useReviewMediaPipeline({ userId, existingMedia }: UseReviewMedia
             };
             setItems((prev) => [...prev, item]);
             currentCount++;
-          } catch (e) {
+          } catch {
             setPickerError('Could not read video.');
           }
         } else {
