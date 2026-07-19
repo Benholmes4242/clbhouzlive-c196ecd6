@@ -222,7 +222,8 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
     try {
       const patch: Record<string, unknown> = {
         content: state.caption?.length ? state.caption : null,
-        course_id: state.course?.id ?? null,
+        course_id: primaryCourse?.id ?? null,
+        tagged_course_ids: state.courses.map((c) => c.id),
       };
       // Only touch scheduled_at when the post is still scheduled.
       if (editStatus?.status === 'scheduled') {
@@ -234,10 +235,10 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
       // Sync the single-course junction row to the primary course (best-effort;
       // full multi-course junction editing stays with useUpdatePost).
       await supabase.from('post_courses').delete().eq('post_id', editPostId);
-      if (state.course?.id) {
+      if (primaryCourse?.id) {
         await supabase.from('post_courses').insert({
           post_id: editPostId,
-          course_id: state.course.id,
+          course_id: primaryCourse.id,
           display_order: 0,
         } as never);
       }
