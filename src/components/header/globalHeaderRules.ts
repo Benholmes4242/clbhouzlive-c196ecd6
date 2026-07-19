@@ -13,7 +13,6 @@ export const IMMERSIVE_ROUTE_PREFIXES = [
   '/tourhub',         // All Tour Hub pages
   '/tour',            // Tour alias
   '/top100/',         // Region Top 100 pages
-  '/business/',       // Business profile pages (immersive hero)
   '/discover/explore/region/', // Region pages
 ] as const;
 
@@ -36,10 +35,25 @@ export function isLightImmersiveRoute(pathname: string): boolean {
   return (LIGHT_IMMERSIVE_EXACT_ROUTES as readonly string[]).includes(pathname);
 }
 
+/**
+ * Business PROFILE only is immersive (hero bleed). All other /business/*
+ * routes (create wizard, managed subpages, invite pages, follower lists)
+ * are standard shell pages whose headers must sit below the notch.
+ *
+ * Segment logic mirrors the chrome-v2 registry profile rule so the two
+ * systems can never disagree: `/business/:idOrSlug` is exactly 3 segments
+ * after stripping a trailing slash.
+ */
+function isBusinessProfilePath(pathname: string): boolean {
+  if (!pathname.startsWith('/business/')) return false;
+  return pathname.replace(/\/$/, '').split('/').length === 3;
+}
+
 export function isImmersiveRoute(pathname: string): boolean {
   // The review composer is a plain light page, not a hero page — it must
   // never mount immersive (the post-mount flip caused device paint bugs).
   if (/^\/courses\/[^/]+\/rate\/?$/.test(pathname)) return false;
+  if (isBusinessProfilePath(pathname)) return true;
   const exactMatch = (IMMERSIVE_EXACT_ROUTES as readonly string[]).some(
     (r) => pathname === r
   );
