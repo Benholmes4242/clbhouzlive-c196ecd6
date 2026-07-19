@@ -84,14 +84,12 @@ export const useFsv2Store = create<Fsv2State>((set, get) => ({
   open: (opts: Fsv2OpenOptions) => {
     if (!opts.openedFrom) {
       if (import.meta.env.DEV) {
-        // eslint-disable-next-line no-console
         console.warn('[fsv2] open() refused: openedFrom is required.');
       }
       return;
     }
     if (!opts.posts || opts.posts.length === 0) {
       if (import.meta.env.DEV) {
-        // eslint-disable-next-line no-console
         console.warn('[fsv2] open() refused: empty posts array.');
       }
       return;

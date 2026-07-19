@@ -26,7 +26,6 @@ export type { Fsv2OpenOptions } from './types';
 export function openFsv2(opts: Fsv2OpenOptions): void {
   if (!opts?.openedFrom) {
     if (import.meta.env.DEV) {
-      // eslint-disable-next-line no-console
       console.warn('[fsv2] openFsv2() refused: openedFrom is required.');
     }
     return;

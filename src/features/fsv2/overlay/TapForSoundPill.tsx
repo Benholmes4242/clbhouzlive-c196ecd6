@@ -53,7 +53,7 @@ export const Fsv2TapForSoundPill: React.FC<Props> = ({ onClick, style }) => {
           lineHeight: 1,
         }}
       >
-        Tap for sound
+        {'Tap for sound'}
       </span>
     </button>
   );
