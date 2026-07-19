@@ -11,6 +11,7 @@ import type { FeedPost, MediaItem } from '@/components/media-system/types/media'
 import { FSV2 } from '../tokens';
 import { useFsv2Store } from '../store/fsv2Store';
 import { traceSlide } from '../perf/trace';
+import { registerSlideEl } from '../debug/hudBus';
 import { Fsv2ImageSlot } from './ImageSlot';
 import { Fsv2VideoSlot } from './VideoSlot';
 
