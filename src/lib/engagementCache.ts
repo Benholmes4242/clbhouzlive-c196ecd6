@@ -16,6 +16,12 @@
  * NOTE: Editorial cards (`editorial_card_likes` table, `usePostLikes(...,
  * 'editorial')`) are intentionally NOT covered — they live in a separate
  * data path with separate hooks. Do not merge them in here.
+ *
+ * TODO(post-launch): `isLikedByMe` in shared caches reflects the
+ * last-fetching actor's like state. When a user acts as multiple actors
+ * (personal + business) the cached flag can misrepresent the current
+ * actor's state. Redesign to actor-partitioned engagement is deferred
+ * post-launch; `useClubhouseLikes` mitigates locally for now.
  */
 
 import type { QueryClient } from '@tanstack/react-query';
