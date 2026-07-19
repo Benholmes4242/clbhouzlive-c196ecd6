@@ -566,12 +566,11 @@ export function FullscreenFeedOverlay() {
       // NOTE: no engine-wide pauseAll here — the overlay must never pause a
       // borrowed lane on its own open. Owner-guard + null-caller rules keep
       // playback correct for both borrow and non-borrow entries.
-      lockBodyScroll();
+      const unlockViewportScroll = lockFullscreenViewportScroll();
 
-      // Same-frame restore: lockBodyScroll fixes the body which can clamp the
-      // #root scroller to 0. Reassign immediately so the pre-lock scroll
-      // position is what frame 0 composites — no visible jump behind the
-      // translucent overlay.
+      // With the html+body overflow lock (no position:fixed) the #root scroller
+      // is not clamped, but keep the same-frame restore as a defensive no-op in
+      // case any ancestor still shifts it before frame 0.
       if (rootEl && rootEl.scrollTop !== savedScrollTop) {
         rootEl.scrollTop = savedScrollTop;
       }
