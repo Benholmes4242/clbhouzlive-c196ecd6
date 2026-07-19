@@ -52,10 +52,7 @@ export function useCourseMedia({ userId, courseId, filter }: UseCourseMediaParam
 
       const { data, error } = await supabase.rpc('get_course_media', params as any);
 
-      if (error) {
-        console.error('[CourseMedia] RPC error:', error);
-        return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
-      }
+      if (error) throw error;
 
       if (!data || data.length === 0) {
         return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
