@@ -252,23 +252,21 @@ const ClubhouseContent = () => {
   }, [activeTab, posts.length]);
   
   // ── Active post derivation ──
-  const { activePost, golfCourse, activeReview, isActiveReview, isActiveVideo } = useActivePostDerived(posts, activeIndex);
-  
+  const { activePost } = useActivePostDerived(posts, activeIndex);
+
   // ── Optimistic like state ──
-  const { handleLike, getActiveLikeState, resetLikes } = useClubhouseLikes({ userId: user?.id, activeActor });
-  const activeLikeState = getActiveLikeState(activePost);
+  const { handleLike, getActiveLikeState } = useClubhouseLikes({ userId: user?.id, activeActor });
 
   // Editorial like-count query removed in C4 — CommentsSheetV2 owns its own
   // counts and the editorial mount no longer needs likesCount plumbing.
 
 
-  
+
   // ── Optimistic follow state ──
-  const { followOverrides, handleFollow, handleFollowChange, getFollowState, resetFollows } = useClubhouseFollows({ userId: user?.id });
-  const isActivePostFollowed = getFollowState(activePost);
-  
+  const { handleFollow, getFollowState, resetFollows } = useClubhouseFollows({ userId: user?.id });
+
   // ── Comments state ──
-  const { commentsOpen, overlayVisible, openComments, closeComments, getCommentCount, resetComments } = useClubhouseComments(activeActor);
+  const { commentsOpen, openComments, closeComments, getCommentCount, resetComments } = useClubhouseComments(activeActor);
 
   // Conditionally mount CommentsSheet so its hooks/subtrees don't exist while closed.
   // Keep it mounted through the exit animation (~500ms spring) so close still animates.
