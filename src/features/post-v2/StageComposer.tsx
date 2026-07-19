@@ -438,7 +438,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
         />
         <CaptionField value={state.caption} onChange={setCaption} currentUserId={profile?.id ?? null} />
         <DetailRows
-          course={state.course}
+          courses={state.courses}
           onOpenCourse={() => setSheet('course')}
           actor={activeActor}
           onOpenActor={() => setSheet('actor')}
@@ -450,7 +450,13 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
       </div>
 
       {/* Sheets */}
-      <CourseTagSheet open={sheet === 'course'} onClose={() => setSheet(null)} onSelect={setCourse} current={state.course} userId={profile?.id ?? null} />
+      <CourseTagSheet
+        open={sheet === 'course'}
+        onClose={() => setSheet(null)}
+        onSubmit={(cs) => setCourses(cs)}
+        selected={state.courses}
+        userId={profile?.id ?? null}
+      />
       <ActorSheet open={sheet === 'actor'} onClose={() => setSheet(null)} onSelect={(a) => setActiveActor(a)} selectedId={activeActor?.id ?? null} />
       <ScheduleSheetV2
         open={sheet === 'schedule'}
@@ -464,10 +470,18 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
         open={sheet === 'drafts'}
         onClose={() => setSheet(null)}
         drafts={drafts.drafts}
-        onRestore={(d) => restoreDraft({
-          caption: d.content ?? '',
-          course: d.course_id && d.course_name ? { id: d.course_id, name: d.course_name, country: d.course_country ?? null } : null,
-        })}
+        onRestore={(d) => {
+          const stored = (d.course_data as { courses?: StageCourse[] } | null)?.courses;
+          const draftCourses: StageCourse[] = Array.isArray(stored) && stored.length > 0
+            ? stored
+            : (d.course_id && d.course_name
+                ? [{ id: d.course_id, name: d.course_name, country: d.course_country ?? null }]
+                : []);
+          restoreDraft({
+            caption: d.content ?? '',
+            courses: draftCourses,
+          });
+        }}
         onDelete={drafts.remove}
       />
       <ScheduledPostsSheetV2
