@@ -467,17 +467,10 @@ export function LeaderboardTab() {
               position: row.position,
               positionTied: row.position_tied ?? false,
               total: row.score,
-              today:
-                row.today != null
-                  ? row.today
-                  : (() => {
-                      const rs = [row.round_1, row.round_2, row.round_3, row.round_4].filter(
-                        (r) => r != null,
-                      );
-                      return rs.length ? (rs[rs.length - 1] as number) : null;
-                    })(),
+              today: todayFromEntry(row, currentRound),
               thru: row.thru,
               status: row.status ?? null,
+              playerPhotoUrl: (row.player as any)?.photo_url ?? null,
             });
           }}
         />
