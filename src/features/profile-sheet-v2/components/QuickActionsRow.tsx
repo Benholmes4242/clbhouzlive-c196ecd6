@@ -1,10 +1,11 @@
 /**
  * ProfileSheetV2 · QuickActionsRow
  *
- * Three tiles: Echo / Messages / Alerts. Badges (Messages, Alerts) come
- * from the CURRENT actor's per-actor counts via useActorUnreadCounts —
- * same source ActorCards reads, so numbers agree.
- *
+ * Three tiles: Echo / Messages / Alerts.
+ * Badges: Messages sums per-conversation unread from useConversations (the
+ * same RPC the inbox renders); Alerts reads useUnreadNotifications. These
+ * are intentionally the same sources as the destination pages so tile
+ * badges cannot drift from what those pages show.
  * Route strings copied verbatim from src/components/profile/ProfileHubSheet.tsx:
  *   Echo     -> '/echo'
  *   Messages -> '/messages'

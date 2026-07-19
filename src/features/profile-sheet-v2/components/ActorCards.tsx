@@ -2,7 +2,7 @@
  * ProfileSheetV2 · ActorCards
  *
  * Horizontal rail of "posting as" actor cards. Active card gets an amber
- * ring + trailing check; inactive cards tap to switch. Per-actor unread
+ * ring; inactive cards tap to switch. Per-actor unread
  * badges (notifications + DMs) via useActorUnreadCounts. A trailing
  * dashed "+ Business" door is rendered ONLY when the user has no
  * business actors yet.
@@ -46,6 +46,7 @@ export default function ActorCards({
   onNavigate,
 }: Props) {
   const { countFor } = useActorUnreadCounts();
+  const [switchingId, setSwitchingId] = React.useState<string | null>(null);
   const hasBusiness = profiles.some(p => p.type === 'business');
   // Active actor first; preserve original order for the rest (stable sort).
   const orderedProfiles = React.useMemo(() => {
@@ -65,7 +66,7 @@ export default function ActorCards({
         style={{
           fontWeight: 700,
           fontSize: 10,
-          letterSpacing: '0.16em',
+          letterSpacing: '0.14em',
           textTransform: 'uppercase',
           color: AMBER,
           padding: '0 20px 8px',
@@ -96,10 +97,22 @@ export default function ActorCards({
                 .filter(Boolean).join(` ${DOT} `);
           const initial = (p.name?.[0] || '?').toUpperCase();
 
+          const handleCardTap = () => {
+            if (active || switchingId) return;
+            setSwitchingId(p.id);
+            Promise.resolve(onSwitchProfile(p.id)).finally(() => setSwitchingId(null));
+          };
+
           return (
             <div
               key={`${p.type}-${p.id}`}
-              onClick={() => { if (!active) void onSwitchProfile(p.id); }}
+              onClick={handleCardTap}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleCardTap();
+                }
+              }}
               role="button"
               tabIndex={0}
               style={{
@@ -117,6 +130,8 @@ export default function ActorCards({
                 border: active
                   ? `2px solid ${AMBER}`
                   : `1px solid ${HAIRLINE}`,
+                opacity: switchingId === p.id ? 0.55 : 1,
+                transition: 'opacity 120ms ease',
               }}
             >
               <div style={{ position: 'relative', flexShrink: 0 }}>
@@ -220,6 +235,12 @@ export default function ActorCards({
         {!hasBusiness && (
           <div
             onClick={() => onNavigate('/businesses/manage')}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onNavigate('/businesses/manage');
+              }
+            }}
             role="button"
             tabIndex={0}
             style={{

@@ -30,9 +30,9 @@ interface Props {
 }
 
 export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
-  if (actorType === 'business') return null;
+  const isBusiness = actorType === 'business';
 
-  const { data: connection } = useWhsConnection(actorId);
+  const { data: connection } = useWhsConnection(isBusiness ? undefined : actorId);
   const { data: trend } = useHandicapTrend(connection?.id);
   const { data: history90 } = useHandicapHistory(connection?.id, 90);
   const { data: scores } = useAllScores(connection?.id);
@@ -52,6 +52,8 @@ export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
       (s: any) => s.play_date && new Date(s.play_date).getTime() >= cutoff,
     ).length;
   }, [scores]);
+
+  if (isBusiness) return null;
 
   const stripBase: React.CSSProperties = {
     margin: '12px 20px 0',
@@ -87,7 +89,18 @@ export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
   // Disconnected state
   if (!connection) {
     return (
-      <div onClick={() => onNavigate('/handicap')} role="button" tabIndex={0} style={stripBase}>
+      <div
+        onClick={() => onNavigate('/handicap')}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onNavigate('/handicap');
+          }
+        }}
+        role="button"
+        tabIndex={0}
+        style={stripBase}
+      >
         {eyebrow}
         <span style={{ fontWeight: 600, fontSize: 13, color: INK }}>
           Connect official WHS handicap
@@ -122,7 +135,18 @@ export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
     : '\u2014';
 
   return (
-    <div onClick={() => onNavigate('/handicap')} role="button" tabIndex={0} style={stripBase}>
+    <div
+      onClick={() => onNavigate('/handicap')}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onNavigate('/handicap');
+        }
+      }}
+      role="button"
+      tabIndex={0}
+      style={stripBase}
+    >
       {eyebrow}
       <span
         style={{
