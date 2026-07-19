@@ -182,10 +182,8 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
         id: `rating-${course.course_id}`
       }));
 
-      console.log('Rated courses:', courses.map(c => ({ 
-        name: c.golf_courses?.name, 
-        rating: c.rating 
-      })));
+
+
       
       return getSortedUserCourses(courses, 'rank-desc');
     },
