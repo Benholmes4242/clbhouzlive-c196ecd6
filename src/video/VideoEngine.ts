@@ -44,6 +44,7 @@ import { trace, traceLookup, elIdOf, traceGenElId } from '@/perf/trace';
 import { feedLaneRoles } from './feedLaneRoles';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
 import { audioDebugEnabled, logAudio, msSinceOpen } from '@/perf/audioDebug';
+import { getLastCloseSnapshot } from '@/perf/positionContinuity';
 
 /**
  * Wrap `muted` on an <video> instance so every write is logged. The
