@@ -548,7 +548,7 @@ function CountLeaderSheetRow({
         gap: 8,
         padding: '10px 16px',
         background: index % 2 === 0 ? 'rgba(15,23,42,0.035)' : 'transparent',
-        borderTop: '0.5px solid rgba(15,23,42,0.08)',
+        borderTop: index === 0 ? 'none' : '0.5px solid rgba(15,23,42,0.08)',
         cursor: onTap ? 'pointer' : 'default',
         fontFamily: FONT,
       }}
