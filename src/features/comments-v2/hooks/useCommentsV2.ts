@@ -283,7 +283,7 @@ export function useCommentsV2({
   });
 
   const invalidate = useCallback(() => {
-    qc.invalidateQueries({ queryKey: keyRoot as any });
+    qc.invalidateQueries({ queryKey: keyRoot as unknown as readonly unknown[] });
   }, [qc, targetType, targetId, targetSecondaryId]);
 
   // ── Mutations (RPC only) ──
