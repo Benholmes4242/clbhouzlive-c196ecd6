@@ -13,8 +13,8 @@ interface Props {
   onClose: () => void;
   value: Date | null;
   onChange: (d: Date | null) => void;
-  onOpenScheduled: () => void;
-  scheduledCount: number;
+  onOpenScheduled?: () => void;
+  scheduledCount?: number;
 }
 
 const DAY_LABELS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
