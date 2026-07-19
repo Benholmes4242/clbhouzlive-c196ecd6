@@ -318,14 +318,14 @@ function LedgerRow({
         style={{
           width: 12,
           flexShrink: 0,
-          fontSize: 11,
+          fontSize: crown ? 13 : 11,
           fontWeight: 600,
           color: FADED,
-          fontVariantNumeric: 'tabular-nums',
+          ...(crown ? {} : { fontVariantNumeric: 'tabular-nums' as const }),
           textAlign: 'center',
         }}
       >
-        {rank}
+        {crown ? '\u{1F3C6}' : rank}
       </div>
 
 
