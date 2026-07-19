@@ -133,6 +133,7 @@ export default function VideosPageV2() {
           </button>
         </div>
 
+        {/* Sticky control block. Glass treatment matches Clips + Watch. */}
         <div
           style={{
             position: 'sticky',
