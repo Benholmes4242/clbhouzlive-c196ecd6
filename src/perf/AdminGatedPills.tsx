@@ -41,3 +41,15 @@ export function AdminGatedLogHud() {
   return <LogHud />;
 }
 
+export function AdminGatedFsv2DebugPill() {
+  const { role, loading } = usePanelRole();
+  const [visible] = useAdminPillVisibility();
+  if (loading || role !== 'full' || !visible) return null;
+  return (
+    <>
+      <Fsv2DebugToggle />
+      <Fsv2DebugHUD />
+    </>
+  );
+}
+
