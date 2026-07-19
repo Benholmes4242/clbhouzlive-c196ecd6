@@ -565,30 +565,13 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
           });
         }).catch(() => {});
       }
-      if (FLAGS.fsv2) {
-        openFsv2({
-          openedFrom: 'clubhouse',
-          posts,
-          startIndex: idx,
-          mediaId: mediaId ?? null,
-          mediaIndex,
-        });
-        return;
-      }
-      if (origin?.el) {
-        openWithOrigin({
-          openedFrom: 'clubhouse',
-          posts,
-          index: idx,
-          originEl: origin.el,
-          posterUrl: origin.posterUrl ?? null,
-          mediaId: mediaId ?? null,
-          mediaIndex,
-          railOwnerKey: ownerKey ?? null,
-        });
-      } else {
-        openFullscreen(posts, idx, { mediaId: mediaId ?? null, openedFrom: 'clubhouse' });
-      }
+      openFsv2({
+        openedFrom: 'clubhouse',
+        posts,
+        startIndex: idx,
+        mediaId: mediaId ?? null,
+        mediaIndex,
+      });
     },
     [posts, setActiveIndex, setCarouselPosition, openFullscreen, tab, playingIdx],
   );

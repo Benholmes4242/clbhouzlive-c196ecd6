@@ -229,11 +229,7 @@ const PostDeepLinkPage: React.FC = () => {
       },
     };
 
-    if (FLAGS.fsv2) {
-      openFsv2({ posts: [feedPost], startIndex: 0, ...openOpts });
-    } else {
-      useFullscreenFeedStore.getState().open([feedPost], 0, openOpts);
-    }
+    openFsv2({ posts: [feedPost], startIndex: 0, ...openOpts });
 
   }, [authLoading, user, isLoading, feedPost, navigate, navState, searchParams]);
 

@@ -66,18 +66,7 @@ function ClipTile({
   const label = row.review_course_name || row.course_name || 'Clip';
 
   const handlePress = () => {
-    if (FLAGS.fsv2) {
-      openFsv2({ openedFrom: 'watch', posts, startIndex: index });
-      return;
-    }
-    openWithOrigin({
-      openedFrom: 'watch',
-      posts,
-      index,
-      originEl: rootRef.current as HTMLElement | null,
-      posterUrl,
-      railOwnerKey: ownerKey,
-    });
+    openFsv2({ openedFrom: 'watch', posts, startIndex: index });
   };
 
   return (

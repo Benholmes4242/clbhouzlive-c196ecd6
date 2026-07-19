@@ -127,21 +127,10 @@ export function FeedCard({
   });
 
   const handlePress = () => {
-    if (FLAGS.fsv2) {
-      openFsv2({
-        openedFrom,
-        posts,
-        startIndex: flatIndex,
-      });
-      return;
-    }
-    openWithOrigin({
+    openFsv2({
       openedFrom,
       posts,
-      index: flatIndex,
-      originEl: rootRef.current as HTMLElement | null,
-      posterUrl,
-      railOwnerKey: ownerKey,
+      startIndex: flatIndex,
     });
   };
 

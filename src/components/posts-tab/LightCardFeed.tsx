@@ -346,43 +346,16 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
           surface: 'posts-tab',
         });
       }
-      if (FLAGS.fsv2) {
-        openFsv2({
-          openedFrom: 'posts-tab',
-          posts,
-          startIndex: idx,
-          mediaId: mediaId ?? null,
-          mediaIndex,
-          hasNextPage: hasNextPage ?? false,
-          fetchNextPage: hasNextPage ? fetchNextPage : undefined,
-          isFetchingNextPage: isFetchingNextPage ?? false,
-        });
-      } else if (origin?.el) {
-        openWithOrigin({
-          openedFrom: 'posts-tab',
-          posts,
-          index: idx,
-          originEl: origin.el,
-          posterUrl: origin.posterUrl ?? null,
-          mediaId: mediaId ?? null,
-          mediaIndex,
-          railOwnerKey: ownerKey ?? null,
-          options: {
-            hasNextPage: hasNextPage ?? false,
-            fetchNextPage: hasNextPage ? fetchNextPage : undefined,
-            isFetchingNextPage: isFetchingNextPage ?? false,
-          },
-        });
-      } else {
-        openFullscreen(posts, idx, {
-          mediaId: mediaId ?? null,
-          openedFrom: 'posts-tab',
-          hasNextPage: hasNextPage ?? false,
-          fetchNextPage: hasNextPage ? fetchNextPage : undefined,
-          isFetchingNextPage: isFetchingNextPage ?? false,
-        });
-
-      }
+      openFsv2({
+        openedFrom: 'posts-tab',
+        posts,
+        startIndex: idx,
+        mediaId: mediaId ?? null,
+        mediaIndex,
+        hasNextPage: hasNextPage ?? false,
+        fetchNextPage: hasNextPage ? fetchNextPage : undefined,
+        isFetchingNextPage: isFetchingNextPage ?? false,
+      });
     },
     [posts, setActiveIndex, setCarouselPosition, openFullscreen, hasNextPage, fetchNextPage, isFetchingNextPage, playingIdx],
   );

@@ -52,7 +52,7 @@ import { PendingPostsController } from '@/uploads/PendingPostsController';
 import UploadProgressBanner from '@/components/uploads/UploadProgressBanner';
 import GlobalBottomNavigation from '@/components/GlobalBottomNavigation';
 import { GlobalPostComposer } from '@/components/post-composer/GlobalPostComposer';
-import { FullscreenFeedOverlay } from '@/components/fullscreen-feed/FullscreenFeedOverlay';
+
 import { ReviewBottomSheetPortal } from '@/components/posts/ReviewBottomSheetPortal';
 import { RequestCourseSheetHost } from '@/components/courses/RequestCourseSheetHost';
 
@@ -934,9 +934,8 @@ const AppInner: React.FC = () => {
                                             <Suspense fallback={null}>
                                               <MiniPlayer />
                                             </Suspense>
-                                            {/* Fullscreen Feed Overlay - portal-based, renders above everything */}
-                                            <FullscreenFeedOverlay />
-                                            {FLAGS.fsv2 ? <Fsv2Overlay /> : null}
+                                            {/* Fullscreen Viewer V2 - single overlay portal */}
+                                            <Fsv2Overlay />
                                             
                                             {/* Unified ReviewBottomSheet portal — single mount, store-driven */}
                                             <ReviewBottomSheetPortal />

@@ -52,18 +52,7 @@ function Tile({
   });
 
   const handlePress = () => {
-    if (FLAGS.fsv2) {
-      openFsv2({ openedFrom: 'watch', posts, startIndex: index });
-      return;
-    }
-    openWithOrigin({
-      openedFrom: 'watch',
-      posts,
-      index,
-      originEl: rootRef.current as HTMLElement | null,
-      posterUrl,
-      railOwnerKey: ownerKey,
-    });
+    openFsv2({ openedFrom: 'watch', posts, startIndex: index });
   };
 
   return (
