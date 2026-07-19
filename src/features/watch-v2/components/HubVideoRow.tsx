@@ -67,6 +67,10 @@ function Card({
   });
 
   const handlePress = () => {
+    if (FLAGS.fsv2) {
+      openFsv2({ openedFrom: 'watch', posts, startIndex: index });
+      return;
+    }
     openWithOrigin({
       openedFrom: 'watch',
       posts,
