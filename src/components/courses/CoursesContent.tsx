@@ -28,6 +28,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, HAIRLINE_INK_12, INK, INK_MUTE, INK_TINT_05, SLATE_50, SURFACE } from '@/features/courses/_shared/tokens';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 
 /* ─── Rate a Course bottom sheet ─── */
 function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -35,21 +36,28 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
 
-  const { data: results = [], isLoading } = useQuery({
+  const { data: results = [], isLoading, isError } = useQuery({
     queryKey: ['rate-course-search', query],
     queryFn: async () => {
       if (query.trim().length < 2) return [];
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('golf_courses')
         .select('id, name, country, sub_country, global_rank')
         .ilike('name', `%${query.trim()}%`)
         .order('global_rank', { ascending: true, nullsFirst: false })
         .limit(12);
+      if (error) throw error;
       return data ?? [];
     },
     enabled: query.trim().length >= 2,
     staleTime: 30_000,
   });
+
+  useEffect(() => {
+    if (!open) return;
+    lockBodyScroll();
+    return () => unlockBodyScroll();
+  }, [open]);
 
   if (!open) return null;
 
@@ -122,6 +130,10 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
           ) : isLoading ? (
             <div style={{ padding: '32px 16px', textAlign: 'center', color: 'hsl(var(--muted-foreground))' }}>
               <p style={{ fontSize: 13, margin: 0 }}>{t('rateSheet.searching')}</p>
+            </div>
+          ) : isError ? (
+            <div style={{ padding: '32px 16px', textAlign: 'center', color: 'hsl(var(--muted-foreground))' }}>
+              <p style={{ fontSize: 13, margin: 0 }}>{t('rateSheet.searchError', { defaultValue: "Search isn't working right now — try again in a moment." })}</p>
             </div>
           ) : results.length === 0 ? (
             <div style={{ padding: '32px 16px', textAlign: 'center', color: 'hsl(var(--muted-foreground))' }}>
@@ -196,8 +208,11 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
   
   // Default to 'discover' for the main courses page
   const [activeTab, setActiveTab] = useState(() => {
-    if (username) return 'my-courses'; // Keep for user profile pages
     const tabParam = new URLSearchParams(window.location.search).get('tab');
+    if (username) {
+      // User-profile variant only defines 'explore' and 'my-courses'.
+      return tabParam === 'explore' ? 'explore' : 'my-courses';
+    }
     if (tabParam && ['explore', 'top100', 'discover'].includes(tabParam)) {
       return tabParam;
     }
@@ -212,10 +227,13 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
   useEffect(() => {
     const tabParam = searchParams.get('tab');
 
+    if (username) {
+      // User-profile variant only defines 'explore' and 'my-courses'.
+      setActiveTab(tabParam === 'explore' ? 'explore' : 'my-courses');
+      return;
+    }
     if (tabParam && (tabParam === 'explore' || tabParam === 'top100' || tabParam === 'discover')) {
       setActiveTab(tabParam);
-    } else if (username) {
-      setActiveTab('my-courses');
     } else {
       setActiveTab('discover');
     }

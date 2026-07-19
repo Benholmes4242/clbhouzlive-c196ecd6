@@ -12,7 +12,7 @@ export interface ExploreHeroRow {
   review_count: number | null;
   global_rank: number | null;
   why_ai: string | null;
-  context_stats: Record<string, any> | null;
+  context_stats: Record<string, unknown> | null;
   filter_tier: string | null;
   list_rank: number | null;
   list_label: string | null;
@@ -29,7 +29,7 @@ export function useExploreHero(userId: string | undefined, mood: ExploreMoodId) 
       const { data, error } = await supabase.rpc('get_explore_hero', {
         p_user_id: userId!,
         p_mood: mood,
-      } as any);
+      } as { p_user_id: string; p_mood: ExploreMoodId });
       if (error) {
         console.error('[useExploreHero] RPC error:', error);
         if (import.meta.env.DEV) throw error;

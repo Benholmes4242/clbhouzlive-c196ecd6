@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { mapRowToFeedPost, groupMultiMedia } from '@/components/media-system/utils/feedMapper';
 import type { FeedPost, FeedRpcRow } from '@/components/media-system/types/media';
+import type { RpcClient } from '@/features/watch-v2/hooks/useHubMixedGrid';
 
 const PAGE_SIZE = 30;
 
@@ -31,7 +32,7 @@ export function useExploreFeed({ userId, region, searchQuery, enabled: externalE
 
       const cursor = typeof pageParam === 'string' ? pageParam : undefined;
 
-      const params: Record<string, any> = {
+      const params: Record<string, unknown> = {
         p_user_id: userId,
         p_viewer_actor_type: activeActor?.type ?? 'personal',
         p_viewer_actor_id: activeActor?.id ?? userId,
@@ -43,18 +44,16 @@ export function useExploreFeed({ userId, region, searchQuery, enabled: externalE
       if (cursor) params.p_cursor = cursor;
       if (searchQuery) params.p_search_query = searchQuery;
 
-      const { data, error } = await supabase.rpc('get_explore_feed', params as any);
+      const rpc = (supabase as unknown as RpcClient).rpc;
+      const { data, error } = await rpc('get_explore_feed', params);
 
-      if (error) {
-        console.error('[ExploreFeed] RPC error:', error);
+      if (error) throw error;
+
+      const rows = (data ?? []) as unknown as FeedRpcRow[];
+      if (rows.length === 0) {
         return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
       }
 
-      if (!data || data.length === 0) {
-        return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
-      }
-
-      const rows = data as unknown as FeedRpcRow[];
       const posts = groupMultiMedia(rows.map(mapRowToFeedPost));
 
       for (const post of posts) {

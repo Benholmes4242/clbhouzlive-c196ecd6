@@ -62,7 +62,7 @@ function ExploreDestinationsInner({ activeRegion, onRegionSelect }: ExploreDesti
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, transparent 55%, rgba(0,0,0,0.5) 100%)' }} />
           <span style={{ position: 'absolute', bottom: 12, left: 14, fontSize: 14, fontWeight: 800, color: '#fff', letterSpacing: '-0.01em' }}>Worldwide</span>
         </button>
-        {regions.map((r: any) => {
+        {regions.map((r: { slug?: string | null; id?: string | null; region_slug?: string | null; title?: string | null; name?: string | null; label?: string | null; image_url?: string | null; hero_image_url?: string | null; cover_image?: string | null }) => {
           const slug = r.slug ?? r.id ?? r.region_slug;
           const title = r.title ?? r.name ?? r.label ?? 'Region';
           const image = r.image_url ?? r.hero_image_url ?? r.cover_image ?? null;

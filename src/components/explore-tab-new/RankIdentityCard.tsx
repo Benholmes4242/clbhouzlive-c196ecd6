@@ -160,9 +160,10 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
 
   const displayName =
     profile?.display_name ?? profile?.username ?? 'Golfer';
+  const profileWithHcp = profile as (typeof profile & { eg_handicap_index?: number | null; manual_handicap_index?: number | null }) | null | undefined;
   const resolvedHcp = resolveDisplayHandicap({
-    egHandicapIndex: (profile as any)?.eg_handicap_index ?? null,
-    manualHandicapIndex: (profile as any)?.manual_handicap_index ?? null,
+    egHandicapIndex: profileWithHcp?.eg_handicap_index ?? null,
+    manualHandicapIndex: profileWithHcp?.manual_handicap_index ?? null,
     hasWhsConnection: !!connection,
   });
   const hcp = resolvedHcp.value;
