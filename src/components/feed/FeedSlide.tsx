@@ -221,37 +221,16 @@ export const FeedSlide = memo(function FeedSlide({
       // expand target by construction — no post-paint resize.
       // Feed: legacy heuristic preserved verbatim (out of scope for this fix).
       if (isFullscreen) {
-        const fsRect = resolveRestingRect(m.width ?? 0, m.height ?? 0, getCurrentViewport(), 'image');
         return (
-          <div className="absolute inset-0 overflow-hidden">
-            <div aria-hidden="true" className="absolute inset-0" style={{
-              backgroundImage: `url(${imgSrc})`, backgroundSize: 'cover', backgroundPosition: 'center',
-              filter: 'blur(40px) brightness(0.5) saturate(1.2)', transform: 'scale(1.2)',
-            }} />
-            {/* Dim the surround: near-black wash, IG-style. Media itself sits
-                above at zIndex 1 and is NOT dimmed. */}
-            <div aria-hidden="true" className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.55)' }} />
-            <div
-              ref={zoomRef}
-              style={{
-                ...zoomStyle,
-                position: 'absolute',
-                top: fsRect.top, left: fsRect.left,
-                width: fsRect.width, height: fsRect.height,
-                zIndex: 1,
-              }}
-            >
-              <img
-                ref={imgRef}
-                src={imgSrc}
-                alt=""
-                className="w-full h-full"
-                style={{ objectFit: fsRect.fit }}
-                loading="eager"
-                draggable={false}
-              />
-            </div>
-          </div>
+          <FullscreenImageSlot
+            imgSrc={imgSrc}
+            mediaW={m.width ?? 0}
+            mediaH={m.height ?? 0}
+            isActive={isActive}
+            zoomRef={zoomRef}
+            imgRef={imgRef}
+            zoomStyle={zoomStyle}
+          />
         );
       }
       const aspect = (m.height ?? 1) > 0 && (m.width ?? 0) > 0
