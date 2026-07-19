@@ -462,7 +462,7 @@ class VideoEngineImpl {
     this.applyAudioPolicy(lane);
   }
 
-  private applyAudioPolicy(lane: Lane): void {
+  private applyAudioPolicy(lane: Lane, trigger: 'mount' | 'activation' | 'policy-change' | 'external-bind' | 'guard-reassert' | 'unknown' = 'unknown'): void {
     // Borrow override: while the fullscreen viewer owns this lane's element,
     // the effective policy is 'session' regardless of the lane's declared
     // policy (rails ship as 'always-muted'/'local' but must sing in the
@@ -478,6 +478,7 @@ class VideoEngineImpl {
     }
     logAudio('policy.resolve', {
       laneId: lane.id,
+      trigger,
       declaredPolicy: lane.audioPolicy,
       borrowed,
       effectivePolicy,
