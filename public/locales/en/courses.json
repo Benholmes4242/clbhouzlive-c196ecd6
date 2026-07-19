@@ -365,6 +365,13 @@
         "submitError": "Could not submit claim. Please try again."
       }
     },
+    "nearby": {
+      "kicker": "NEARBY",
+      "title": "Food & stays nearby"
+    },
+    "legends": {
+      "errorLoading": "Couldn't load Course Legends"
+    },
     "exploreLinks": {
       "kicker": "KEEP EXPLORING",
       "nearby": "More courses nearby",
