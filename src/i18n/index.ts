@@ -14,6 +14,7 @@ import { initReactI18next, useTranslation } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import HttpBackend from 'i18next-http-backend';
 import { useCallback } from 'react';
+import authEn from '../../public/locales/en/auth.json';
 
 export const LOCALE_STORAGE_KEY = 'clbhouz.locale';
 export const SUPPORTED_LOCALES = ['en', 'ja', 'ko', 'es', 'de', 'en-XA'] as const;
@@ -28,6 +29,10 @@ if (!i18n.isInitialized) {
       fallbackLng: 'en',
       supportedLngs: SUPPORTED_LOCALES as unknown as string[],
       nonExplicitSupportedLngs: true,
+      partialBundledLanguages: true,
+      resources: {
+        en: { auth: authEn as Record<string, unknown> },
+      },
       defaultNS: 'common',
       ns: ['common', 'auth', 'composer', 'messaging', 'achievements', 'courses', 'tourhub'],
       load: 'languageOnly',

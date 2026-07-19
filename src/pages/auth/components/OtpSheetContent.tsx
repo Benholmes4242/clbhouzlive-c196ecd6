@@ -148,6 +148,7 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
 
   const code = digits.join('');
   const canSubmit = code.length === BOX_COUNT && !submitting;
+  const verifyActiveLook = canSubmit || submitting;
 
   const handleManualSubmit = () => {
     if (!canSubmit) return;
@@ -234,10 +235,10 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
         aria-label={t('otp.verifyAria')}
         className="w-full h-[54px] flex items-center justify-center gap-2 rounded-[16px] font-bold text-[15px] transition-all duration-150 active:scale-[0.98]"
         style={{
-          background: canSubmit ? '#F7931E' : 'rgba(255,255,255,0.06)',
-          boxShadow: canSubmit ? '0 6px 20px rgba(247,147,30,0.30)' : 'none',
-          color: canSubmit ? '#FFFFFF' : 'rgba(255,255,255,0.38)',
-          border: canSubmit ? 'none' : '1px solid rgba(255,255,255,0.10)',
+          background: verifyActiveLook ? '#F7931E' : 'rgba(255,255,255,0.06)',
+          boxShadow: verifyActiveLook ? '0 6px 20px rgba(247,147,30,0.30)' : 'none',
+          color: verifyActiveLook ? '#FFFFFF' : 'rgba(255,255,255,0.38)',
+          border: verifyActiveLook ? 'none' : '1px solid rgba(255,255,255,0.10)',
           cursor: canSubmit ? 'pointer' : 'not-allowed',
         }}
       >

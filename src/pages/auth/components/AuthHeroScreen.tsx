@@ -12,7 +12,7 @@ import { isMedianApp } from '@/utils/median/isMedianApp';
 const SHOW_WORDMARK = false;
 
 interface AuthHeroScreenProps {
-  submitting: boolean;
+  submittingMethod: 'email' | 'apple' | 'google' | null;
   onSubmitEmail: (email: string) => Promise<void> | void;
   onAppleSignIn?: () => void;
   onGoogleSignIn?: () => void;
@@ -50,13 +50,17 @@ const GoogleLogo: React.FC<{ size?: number }> = ({ size = 18 }) => (
 
 
 const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
-  submitting,
+  submittingMethod,
   onSubmitEmail,
   onAppleSignIn,
   onGoogleSignIn,
   errorMessage,
   errorNonce,
 }) => {
+  const submitting = submittingMethod !== null;
+  const emailSubmitting = submittingMethod === 'email';
+  const appleSubmitting = submittingMethod === 'apple';
+  const googleSubmitting = submittingMethod === 'google';
   const { t } = useTranslation(['auth', 'common']);
 
   const emailSchema = useMemo(
@@ -105,6 +109,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
 
   const trimmed = loginEmail.trim();
   const canContinue = trimmed.length > 0 && !submitting;
+  const continueActiveLook = canContinue || emailSubmitting;
   const inMedian = useMemo(() => isMedianApp(), []);
   const showApple = inMedian && !!onAppleSignIn;
   const showGoogle = inMedian && !!onGoogleSignIn;
@@ -180,7 +185,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                       fontWeight: 600,
                     }}
                   >
-                    {submitting ? (
+                    {appleSubmitting ? (
                       <Loader2 size={18} className="animate-spin" style={{ color: '#0B0D12' }} />
                     ) : (
                       <>
@@ -207,7 +212,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                       fontWeight: 600,
                     }}
                   >
-                    {submitting ? (
+                    {googleSubmitting ? (
                       <Loader2 size={18} className="animate-spin" style={{ color: '#1F1F1F' }} />
                     ) : (
                       <>
@@ -272,14 +277,14 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
               aria-label={t('auth:hero.continue')}
               className="w-full h-[54px] flex items-center justify-center gap-2 rounded-[16px] font-bold text-[15px] transition-all duration-150 active:scale-[0.98]"
               style={{
-                background: canContinue ? '#F7931E' : 'rgba(255,255,255,0.06)',
-                color: canContinue ? '#FFFFFF' : 'rgba(255,255,255,0.38)',
-                border: canContinue ? 'none' : '1px solid rgba(255,255,255,0.10)',
-                boxShadow: canContinue ? '0 6px 20px rgba(247,147,30,0.30)' : 'none',
+                background: continueActiveLook ? '#F7931E' : 'rgba(255,255,255,0.06)',
+                color: continueActiveLook ? '#FFFFFF' : 'rgba(255,255,255,0.38)',
+                border: continueActiveLook ? 'none' : '1px solid rgba(255,255,255,0.10)',
+                boxShadow: continueActiveLook ? '0 6px 20px rgba(247,147,30,0.30)' : 'none',
                 cursor: !canContinue ? 'not-allowed' : 'pointer',
               }}
             >
-              {submitting ? (
+              {emailSubmitting ? (
                 <Loader2 size={18} className="animate-spin" />
               ) : (
                 <>
