@@ -2,7 +2,7 @@
  * ProfileSheetV2 · ActorCards
  *
  * Horizontal rail of "posting as" actor cards. Active card gets an amber
- * ring + trailing check; inactive cards tap to switch. Per-actor unread
+ * ring; inactive cards tap to switch. Per-actor unread
  * badges (notifications + DMs) via useActorUnreadCounts. A trailing
  * dashed "+ Business" door is rendered ONLY when the user has no
  * business actors yet.
