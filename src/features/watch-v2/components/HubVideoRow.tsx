@@ -240,7 +240,7 @@ export function HubVideoRow() {
   const { user } = useSupabaseSession();
   const { data, isLoading } = useHubLongFormVideos(user?.id);
 
-  const rows = (data ?? []) as any[];
+  const rows = (data ?? []) as HubRpcRow[];
   const feedPosts = useMemo(() => toFeedPosts(rows), [rows]);
   const { activeIndices, railRef } = useWatchAutoplay({
     railId: 'hub-video-row',
