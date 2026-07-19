@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
+import type { Top100ListProgress } from '@/hooks/useTop100ProgressForUser';
 import { cn } from '@/lib/utils';
 import { getTop100Club } from '@/lib/top100Club';
 import { getTop100RingBorderClass } from '@/lib/top100RingStyles';
