@@ -176,6 +176,32 @@ export function VideosFeedV2({ sort, category }: Props) {
           <SkeletonCard />
           <SkeletonCard />
         </div>
+      ) : isError ? (
+        <div style={{ padding: '40px 16px', textAlign: 'center' }}>
+          <div style={{ fontWeight: 700, fontSize: 14, color: '#0F172A' }}>
+            Couldn't load videos
+          </div>
+          <div style={{ marginTop: 6, fontWeight: 500, fontSize: 12, color: '#64748B' }}>
+            Check your connection and try again.
+          </div>
+          <button
+            type="button"
+            onClick={() => refetch()}
+            style={{
+              marginTop: 12,
+              padding: '8px 18px',
+              borderRadius: 999,
+              border: 'none',
+              background: '#0F172A',
+              color: '#fff',
+              fontWeight: 700,
+              fontSize: 12.5,
+              cursor: 'pointer',
+            }}
+          >
+            Retry
+          </button>
+        </div>
       ) : isEmpty ? (
         <div style={{ padding: '40px 16px', textAlign: 'center' }}>
           <div style={{ fontWeight: 700, fontSize: 14, color: '#0F172A' }}>
