@@ -131,7 +131,7 @@ export function FeatListRow({ row, tier, onTap, index = 0, mode = 'latest', best
   // Flat, alternating-band row (mirrors the on-page Record Book / Champions).
   // No card container: band background with a uniform 0.5px hairline separator.
   const bandBg = index % 2 === 0 ? 'rgba(15,23,42,0.035)' : 'transparent';
-  const topRule = `0.5px solid rgba(15,23,42,0.08)`;
+  const topRule = index === 0 ? 'none' : `0.5px solid rgba(15,23,42,0.08)`;
 
   return (
     <button

@@ -149,7 +149,7 @@ export const FullCourseLeaderboardSheetDispatch: React.FC<Props> = ({
     const barPct = isChampion ? 1 : computeBarPct(initialCategory, r.value, championValue);
     const bandBg = index % 2 === 0 ? 'rgba(15,23,42,0.035)' : 'transparent';
     const rowBg = r.isSelf ? SELF_TINT : bandBg;
-    const topRule = `0.5px solid rgba(15,23,42,0.08)`;
+    const topRule = index === 0 ? 'none' : `0.5px solid rgba(15,23,42,0.08)`;
     const rankColor = isChampion ? GOLD_DEEP : '#94A3B8';
     const valueColor = isChampion ? GOLD_DEEP : INK;
 
