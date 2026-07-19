@@ -198,7 +198,8 @@ export function FullscreenFeedOverlay() {
   // prior open (hypothesis #3). origin.lost: log the first non-null→null
   // transition of store.origin during the open — the origin-race check.
   useEffect(() => {
-    const { trace } = require('@/perf/trace') as typeof import('@/perf/trace');
+    const trace = perfTrace;
+
     let currentOpenId: string | null = null;
     let lastIsOpen = false;
     let lastOrigin: unknown = null;
