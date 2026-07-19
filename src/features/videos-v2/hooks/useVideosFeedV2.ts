@@ -1,5 +1,5 @@
 /**
- * useVideosFeedV2 — infinite feed for the /videos-v2-test surface.
+ * useVideosFeedV2 — infinite feed for the /watch/videos surface.
  *
  * RPC: get_long_form_videos. Pagination is SEEN-IDS ONLY, matching
  * useHubMixedGrid's contract exactly. This keeps ordering correct for
@@ -7,6 +7,7 @@
  */
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { type RpcClient } from '@/features/watch-v2/hooks/useHubMixedGrid';
 import type { VideosSortId } from '../types';
 import type { VideosV2CategoryId } from '../categories';
 
@@ -39,7 +40,7 @@ export function useVideosFeedV2(params: {
     initialPageParam: [] as string[],
     queryFn: async ({ pageParam }) => {
       const seenIds = (pageParam as string[]) ?? [];
-      const { data, error } = await (supabase.rpc as any)('get_long_form_videos', {
+      const { data, error } = await (supabase as unknown as RpcClient).rpc('get_long_form_videos', {
         p_user_id: userId,
         p_mode: sort,
         p_category: category,
@@ -47,10 +48,7 @@ export function useVideosFeedV2(params: {
         p_cursor: null,
         p_seen_post_ids: seenIds,
       });
-      if (error) {
-        if (import.meta.env.DEV) console.error('[useVideosFeedV2]', error);
-        return [] as VideosFeedV2Row[];
-      }
+      if (error) throw error;
       return (data ?? []) as VideosFeedV2Row[];
     },
     getNextPageParam: (lastPage, allPages) => {

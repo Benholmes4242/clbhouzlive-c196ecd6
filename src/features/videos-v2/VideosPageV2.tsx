@@ -91,7 +91,7 @@ export default function VideosPageV2() {
           fontFamily: FONT_FAMILY,
         }}
       >
-        {/* Sticky control block. Glass treatment matches Clips + Watch. */}
+        {/* Sort tabs + search — scrolls away; only the category chips below are sticky. */}
         <div
           style={{
             display: 'flex',
@@ -133,6 +133,7 @@ export default function VideosPageV2() {
           </button>
         </div>
 
+        {/* Sticky control block. Glass treatment matches Clips + Watch. */}
         <div
           style={{
             position: 'sticky',

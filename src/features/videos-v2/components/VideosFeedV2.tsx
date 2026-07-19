@@ -1,5 +1,5 @@
 /**
- * VideosFeedV2 — infinite feed body for /videos-v2-test.
+ * VideosFeedV2 — infinite feed body for /watch/videos.
  *
  * Pending uploads integration replicates VideosFullFeed's semantics:
  *   - usePendingPostsForActor keyed to the active actor (business or
@@ -10,7 +10,7 @@
  *     surface elsewhere).
  * Reference (READ, do not import): src/components/watch/videos/VideosFullFeed.tsx.
  */
-import { useEffect, useMemo, useRef } from 'react';
+import { Fragment, useEffect, useMemo, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
@@ -96,6 +96,8 @@ export function VideosFeedV2({ sort, category }: Props) {
   const {
     data,
     isLoading,
+    isError,
+    refetch,
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
@@ -174,6 +176,32 @@ export function VideosFeedV2({ sort, category }: Props) {
           <SkeletonCard />
           <SkeletonCard />
         </div>
+      ) : isError ? (
+        <div style={{ padding: '40px 16px', textAlign: 'center' }}>
+          <div style={{ fontWeight: 700, fontSize: 14, color: '#0F172A' }}>
+            Couldn't load videos
+          </div>
+          <div style={{ marginTop: 6, fontWeight: 500, fontSize: 12, color: '#64748B' }}>
+            Check your connection and try again.
+          </div>
+          <button
+            type="button"
+            onClick={() => refetch()}
+            style={{
+              marginTop: 12,
+              padding: '8px 18px',
+              borderRadius: 999,
+              border: 'none',
+              background: '#0F172A',
+              color: '#fff',
+              fontWeight: 700,
+              fontSize: 12.5,
+              cursor: 'pointer',
+            }}
+          >
+            Retry
+          </button>
+        </div>
       ) : isEmpty ? (
         <div style={{ padding: '40px 16px', textAlign: 'center' }}>
           <div style={{ fontWeight: 700, fontSize: 14, color: '#0F172A' }}>
@@ -216,13 +244,13 @@ export function VideosFeedV2({ sort, category }: Props) {
             if (!shouldInsertShelf) return card;
             const shelfIndex = (i - 5) / 12;
             return (
-              <span key={r.post_id}>
+              <Fragment key={`${r.post_id}-with-shelf`}>
                 {card}
                 <ClipsInterruptShelf
                   clips={interruptClips}
                   shelfIndex={shelfIndex}
                 />
-              </span>
+              </Fragment>
             );
           })}
 

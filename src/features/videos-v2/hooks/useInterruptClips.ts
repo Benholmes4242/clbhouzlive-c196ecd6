@@ -1,11 +1,12 @@
 /**
  * useInterruptClips — single shared trending-clips pool for every clips
- * interrupt shelf on /videos-v2-test. Not infinite; one page of 9.
+ * interrupt shelf on /watch/videos. Not infinite; one page of 9.
  * All shelves on the page slice this pool by shelfIndex so we make ONE
  * network call regardless of how many shelves are interleaved.
  */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { type RpcClient } from '@/features/watch-v2/hooks/useHubMixedGrid';
 
 export interface InterruptClipRow {
   post_id: string;
@@ -27,7 +28,7 @@ export function useInterruptClips(userId: string | undefined) {
     enabled: !!userId,
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
-      const { data, error } = await (supabase.rpc as any)('get_watch_shorts', {
+      const { data, error } = await (supabase as unknown as RpcClient).rpc('get_watch_shorts', {
         p_user_id: userId,
         p_mode: 'trending',
         p_page_size: 9,

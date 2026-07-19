@@ -158,15 +158,13 @@ function ClipTile({
 export function ClipsInterruptShelf({ clips, shelfIndex }: Props) {
   const navigate = useNavigate();
 
-  // Slice the shared 9-clip pool by shelfIndex, wrapping with modulo.
+  // Slice the shared 9-clip pool by shelfIndex. Once the pool is exhausted,
+  // later shelves render nothing (the null-guard below hides the section).
   const shelfClips = useMemo<InterruptClipRow[]>(() => {
     if (!clips || clips.length === 0) return [];
-    const start = ((shelfIndex * 3) % clips.length + clips.length) % clips.length;
-    const out: InterruptClipRow[] = [];
-    for (let i = 0; i < 3 && i < clips.length; i++) {
-      out.push(clips[(start + i) % clips.length]);
-    }
-    return out;
+    const start = shelfIndex * 3;
+    if (start >= clips.length) return []; // pool exhausted — shelf hides
+    return clips.slice(start, start + 3);
   }, [clips, shelfIndex]);
 
   const shelfFeedPosts = useMemo(() => toFeedPosts(shelfClips), [shelfClips]);
