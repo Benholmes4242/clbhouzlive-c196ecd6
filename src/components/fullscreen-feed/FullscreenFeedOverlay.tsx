@@ -603,7 +603,7 @@ export function FullscreenFeedOverlay() {
         // firstFrame before the next cold open can synchronously snapshot it.
         try { VideoEngine.unmountLane('fullscreen'); } catch {}
 
-        unlockBodyScroll();
+        unlockViewportScroll();
         document.body.classList.remove('route-fullscreen-overlay');
         // Restore shield to transparent (NOT #F8FAFC) so the dark feed background
         // shows through — matches the prior CourseMediaViewer behaviour and
