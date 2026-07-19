@@ -158,6 +158,10 @@ export function usePostSubmit() {
         isScheduled: !!input.scheduledAt,
       };
     } catch (e) {
+      // Roll back the optimistic pending card - the post was never born.
+      if (hasMedia) {
+        try { usePendingPostsStore.getState().removeJob(jobId); } catch { /* store rollback best-effort */ }
+      }
       const msg = e instanceof Error ? e.message : 'Submit failed';
       setError(msg);
       throw e;
