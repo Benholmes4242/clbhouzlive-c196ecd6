@@ -88,6 +88,10 @@ export function HubMixedGrid({
         paddingX={16}
       />
 
+      {children}
+
+      <div style={{ height: 16 }} />
+
       {isLoading ? (
         <div style={{ display: 'flex', gap: 4, padding: '0 4px' }}>
           <div style={{ flex: 1 }}>
