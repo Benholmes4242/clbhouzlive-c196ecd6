@@ -421,7 +421,6 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
           index={state.activeIndex}
           total={state.media.length}
           onOpenAdjust={() => setSheet('adjust')}
-          onOpenTrim={() => setSheet('trim')}
           onOpenCover={() => setSheet('cover')}
           onRequestAdd={handleStageAdd}
         />
