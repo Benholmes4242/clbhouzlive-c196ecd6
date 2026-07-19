@@ -11,6 +11,11 @@ export const FLAGS = {
   
   // Debug flags
   CLUBHOUSE_DEBUG: false, // Enable comprehensive clubhouse/video debug panel and logging
+
+  // Fullscreen Viewer V2 (fsv2) — clean-room rebuild, Phase 1 dev flag.
+  // When true, taps from Clubhouse cards and HubMixedGrid open the V2 viewer.
+  // All other surfaces stay on V1 until Phase 3.
+  fsv2: false,
 } as const;
 
 export type FeatureFlags = typeof FLAGS;
