@@ -87,7 +87,7 @@ function Card({
       onPrerouteCancel={onPrerouteCancel}
       data-watch-tile-index={index}
       data-post-id={post.id}
-      style={{ width: 374, flexShrink: 0, cursor: 'pointer', fontFamily: FONT_FAMILY }}
+      style={{ width: 'min(374px, calc(100vw - 32px))', flexShrink: 0, cursor: 'pointer', fontFamily: FONT_FAMILY }}
     >
       <div
         style={{
