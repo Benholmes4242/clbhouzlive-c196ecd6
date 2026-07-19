@@ -6,7 +6,9 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/lib/toast';
 import BottomSheet from './BottomSheet';
+import ScheduleSheetV2 from './ScheduleSheetV2';
 import { CalendarClock, Trash2 } from 'lucide-react';
 import { formatSchedule } from '../lib/formatSchedule';
 
@@ -26,9 +28,14 @@ interface Props {
 
 export default function ScheduledPostsSheetV2({ open, onClose, userId, onCountChange }: Props) {
   const [rows, setRows] = useState<Row[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [reschedTarget, setReschedTarget] = useState<Row | null>(null);
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [confirmCancelId, setConfirmCancelId] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     if (!userId) { setRows([]); return; }
+    setLoading(true);
     const { data } = await supabase
       .from('posts')
       .select('id, content, scheduled_at, actor_type')
@@ -39,50 +46,118 @@ export default function ScheduledPostsSheetV2({ open, onClose, userId, onCountCh
     const list = (data ?? []) as Row[];
     setRows(list);
     onCountChange?.(list.length);
+    setLoading(false);
   }, [userId, onCountChange]);
 
   useEffect(() => { if (open) void refresh(); }, [open, refresh]);
 
-  const reschedule = async (id: string) => {
-    const next = prompt('New send time (YYYY-MM-DD HH:mm, local):');
-    if (!next) return;
-    const dt = new Date(next);
-    if (Number.isNaN(dt.getTime()) || dt.getTime() < Date.now()) { alert('Future time only.'); return; }
-    await supabase.from('posts').update({ scheduled_at: dt.toISOString() }).eq('id', id);
-    await refresh();
+  const performReschedule = async (id: string, dt: Date | null) => {
+    if (!dt) { setReschedTarget(null); return; }
+    setBusyId(id);
+    try {
+      const { error } = await supabase.from('posts').update({ scheduled_at: dt.toISOString() }).eq('id', id);
+      if (error) throw error;
+      setReschedTarget(null);
+      await refresh();
+    } catch {
+      toast.error("Couldn't reschedule. Please try again.");
+    } finally {
+      setBusyId(null);
+    }
   };
 
-  const cancel = async (id: string) => {
-    if (!confirm('Cancel this scheduled post?')) return;
-    await supabase.from('posts').delete().eq('id', id);
-    await refresh();
+  const performCancel = async (id: string) => {
+    setBusyId(id);
+    try {
+      const { error } = await supabase.from('posts').delete().eq('id', id);
+      if (error) throw error;
+      setConfirmCancelId(null);
+      await refresh();
+    } catch {
+      toast.error("Couldn't cancel. Please try again.");
+    } finally {
+      setBusyId(null);
+    }
   };
 
   return (
-    <BottomSheet open={open} title="Scheduled posts" onClose={onClose} fullHeight>
-      {rows.length === 0 && (
-        <div style={{ padding: '32px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-          <div style={{ width: 56, height: 56, borderRadius: 18, background: '#0F172A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <CalendarClock size={22} color="#F8FAFC" />
+    <>
+      <BottomSheet open={open} title="Scheduled posts" onClose={onClose} fullHeight>
+        {loading && rows.length === 0 && (
+          <>
+            {[0, 1, 2].map((i) => (
+              <div key={`sk-${i}`} style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '12px 16px', borderTop: '1px solid rgba(0,0,0,0.07)' }}>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <div className="clb-shimmer-light" style={{ height: 14, width: '70%', borderRadius: 6, background: 'rgba(0,0,0,0.06)' }} />
+                  <div className="clb-shimmer-light" style={{ height: 11, width: '40%', borderRadius: 6, background: 'rgba(0,0,0,0.06)' }} />
+                </div>
+                <div className="clb-shimmer-light" style={{ height: 22, width: 92, borderRadius: 999, background: 'rgba(0,0,0,0.06)' }} />
+              </div>
+            ))}
+          </>
+        )}
+        {!loading && rows.length === 0 && (
+          <div style={{ padding: '32px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+            <div style={{ width: 56, height: 56, borderRadius: 18, background: '#0F172A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <CalendarClock size={22} color="#F8FAFC" />
+            </div>
+            <div style={{ fontSize: 16, fontWeight: 700, color: '#0F172A' }}>Nothing scheduled yet</div>
+            <div style={{ fontSize: 13, color: '#94A3B8', textAlign: 'center', maxWidth: 280, lineHeight: 1.45 }}>
+              Line up a post for the perfect tee time - we'll publish it on the dot.
+            </div>
           </div>
-          <div style={{ fontSize: 16, fontWeight: 700, color: '#0F172A' }}>Nothing scheduled yet</div>
-          <div style={{ fontSize: 13, color: '#94A3B8', textAlign: 'center', maxWidth: 280, lineHeight: 1.45 }}>
-            Line up a post for the perfect tee time - we'll publish it on the dot.
+        )}
+        {rows.map(r => (
+          <div key={r.id} style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '12px 16px', borderTop: '1px solid rgba(0,0,0,0.07)' }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 14, color: '#1F2428', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{(r.content || '(no caption)').slice(0, 60)}</div>
+              <div style={{ fontSize: 12, color: '#8A9099', marginTop: 2 }}>{r.scheduled_at ? formatSchedule(new Date(r.scheduled_at)) : '-'}</div>
+            </div>
+            {confirmCancelId === r.id ? (
+              <>
+                <span style={{ fontSize: 12, color: '#B00020', fontWeight: 600 }}>Cancel this post?</span>
+                <button
+                  onClick={() => void performCancel(r.id)}
+                  disabled={busyId === r.id}
+                  style={{ background: '#B00020', color: '#fff', border: 0, borderRadius: 999, padding: '4px 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
+                >
+                  {busyId === r.id ? 'Cancelling' : 'Yes'}
+                </button>
+                <button
+                  onClick={() => setConfirmCancelId(null)}
+                  style={{ background: 'transparent', border: '1px solid rgba(0,0,0,0.12)', color: '#1F2428', borderRadius: 999, padding: '4px 12px', fontSize: 12, cursor: 'pointer' }}
+                >
+                  No
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => setReschedTarget(r)}
+                  disabled={busyId === r.id}
+                  style={{ background: 'transparent', border: '1px solid rgba(0,0,0,0.12)', color: '#1F2428', borderRadius: 999, padding: '4px 10px', fontSize: 12, cursor: 'pointer' }}
+                >
+                  Reschedule
+                </button>
+                <button
+                  onClick={() => setConfirmCancelId(r.id)}
+                  aria-label="Cancel"
+                  style={{ background: 'transparent', border: 0, color: '#8A9099', cursor: 'pointer', padding: 8 }}
+                >
+                  <Trash2 size={16} />
+                </button>
+              </>
+            )}
           </div>
-        </div>
-      )}
-      {rows.map(r => (
-        <div key={r.id} style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '12px 16px', borderTop: '1px solid rgba(0,0,0,0.07)' }}>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 14, color: '#1F2428', fontWeight: 500 }}>{(r.content || '(no caption)').slice(0, 60)}</div>
-            <div style={{ fontSize: 12, color: '#8A9099', marginTop: 2 }}>{r.scheduled_at ? formatSchedule(new Date(r.scheduled_at)) : '-'}</div>
-          </div>
-          <button onClick={() => reschedule(r.id)} style={{ background: 'transparent', border: '1px solid rgba(0,0,0,0.12)', color: '#1F2428', borderRadius: 999, padding: '4px 10px', fontSize: 12, cursor: 'pointer' }}>Reschedule</button>
-          <button onClick={() => cancel(r.id)} aria-label="Cancel" style={{ background: 'transparent', border: 0, color: '#8A9099', cursor: 'pointer', padding: 8 }}>
-            <Trash2 size={16} />
-          </button>
-        </div>
-      ))}
-    </BottomSheet>
+        ))}
+      </BottomSheet>
+
+      <ScheduleSheetV2
+        open={!!reschedTarget}
+        onClose={() => setReschedTarget(null)}
+        value={reschedTarget?.scheduled_at ? new Date(reschedTarget.scheduled_at) : null}
+        onChange={(d) => { if (reschedTarget) void performReschedule(reschedTarget.id, d); }}
+      />
+    </>
   );
 }
