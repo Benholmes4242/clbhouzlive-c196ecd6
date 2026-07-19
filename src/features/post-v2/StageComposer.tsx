@@ -143,17 +143,21 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
     let cancelled = false;
     supabase
       .from('post_drafts')
-      .select('id, actor_type, actor_id, content, course_id, course_name, course_country')
+      .select('id, actor_type, actor_id, content, course_id, course_name, course_country, course_data')
       .eq('id', draftId)
       .eq('user_id', profile.id)
       .maybeSingle()
       .then(({ data }) => {
         if (cancelled || !data) return;
+        const stored = (data.course_data as { courses?: StageCourse[] } | null)?.courses;
+        const draftCourses: StageCourse[] = Array.isArray(stored) && stored.length > 0
+          ? stored
+          : (data.course_id && data.course_name
+              ? [{ id: data.course_id as string, name: data.course_name as string, country: (data.course_country as string) ?? null }]
+              : []);
         restoreDraft({
           caption: (data.content as string) ?? '',
-          course: data.course_id && data.course_name
-            ? { id: data.course_id as string, name: data.course_name as string, country: (data.course_country as string) ?? null }
-            : null,
+          courses: draftCourses,
         });
       });
     return () => { cancelled = true; };
