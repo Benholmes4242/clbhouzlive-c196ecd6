@@ -29,20 +29,35 @@ import { getPageScrollTop, getPrimaryScrollElement, scrollPageTo } from '@/lib/g
 
 type SortOption = 'official_rating' | 'community_rating' | 'recently_added' | 'name_asc' | 'name_desc';
 
-/** Apply the current sort option to a Supabase query builder. */
+/**
+ * Minimal chainable shape of the Supabase query builder — enough to type
+ * the sort helper without leaking `any` and without depending on
+ * PostgrestFilterBuilder's exhaustive generics.
+ */
+type OrderableQuery<Q> = {
+  order: (
+    column: string,
+    options?: { ascending?: boolean; nullsFirst?: boolean },
+  ) => Q;
+};
+
 /**
  * Apply the current sort option to a Supabase query builder.
  *
- * NOTE: For 'community_rating', PostgREST referencedTable ordering on views
- * is silently ignored. We fall back to a default server-side order here and
- * apply the real community-rating sort **client-side** after fetching
- * (see `applyCommunitySort` below).
+ * 'community_rating' never reaches this builder — fetchCoursePage routes it
+ * to the explore_courses_by_rating RPC (server-side sort).
  */
-function applySortToQuery(query: any, sortOption: SortOption) {
+function applySortToQuery<Q extends OrderableQuery<Q>>(query: Q, sortOption: SortOption): Q {
   switch (sortOption) {
     case 'community_rating':
-      // Server can't sort by view column — use name as stable fallback.
-      // Real sort happens client-side in applyCommunitySort().
+      // Unreachable — fetchCoursePage branches to explore_courses_by_rating
+      // before calling this helper. Case label retained for exhaustiveness;
+      // fall through to default so the query still gets a stable order if
+      // an unexpected call ever lands here.
+      // fallthrough
+    case 'official_rating':
+    default:
+      query = query.order('global_rank', { ascending: true, nullsFirst: false });
       query = query.order('name', { ascending: true });
       break;
     case 'recently_added':
@@ -54,31 +69,10 @@ function applySortToQuery(query: any, sortOption: SortOption) {
     case 'name_desc':
       query = query.order('name', { ascending: false });
       break;
-    case 'official_rating':
-    default:
-      query = query.order('global_rank', { ascending: true, nullsFirst: false });
-      query = query.order('name', { ascending: true });
-      break;
   }
   return query;
 }
 
-/**
- * Client-side community rating sort.
- * Applied after fetch because PostgREST can't order by view columns.
- *
- * LIMITATION: With infinite scroll, this only sorts within currently loaded
- * pages — not globally across all courses. Acceptable trade-off vs. creating
- * a DB function.
- */
-function applyCommunitySort<T extends { average_rating?: number | null; name?: string }>(courses: T[]): T[] {
-  return [...courses].sort((a, b) => {
-    const rA = a.average_rating ?? -1;
-    const rB = b.average_rating ?? -1;
-    if (rB !== rA) return rB - rA;
-    return (a.name ?? '').localeCompare(b.name ?? '');
-  });
-}
 
 interface FetchCoursePageParams {
   selectedRegion: PrimaryRegionKey;
