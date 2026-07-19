@@ -304,6 +304,33 @@ class VideoEngineImpl {
         msSinceOpen: msSinceOpen(),
       });
     }
+    // AUDIO FIX v6: borrowed elements keep playing through the borrow (the
+    // pause.borrowed swallow keeps them alive), so the feed's resume path
+    // never calls play() on them and the 'activation' policy hook inside
+    // play() never fires. Explicitly kick the post-close ACTIVE lane so it
+    // adopts session audio. Deferred one rAF (with microtask fallback) so
+    // the feed's role rotation has settled and laneForRole('active')
+    // reflects the promoted lane, not the returned one.
+    const kick = () => {
+      let activeLaneId: LaneId | null = null;
+      try { activeLaneId = feedLaneRoles.laneForRole('active'); } catch {}
+      const sessionMuted = useSessionAudio.getState().isMuted;
+      logAudio('resume.policyKick', {
+        returnedLaneId: laneId,
+        activeLaneId,
+        sessionMuted,
+        msSinceOpen: msSinceOpen(),
+      });
+      if (!activeLaneId) return;
+      const activeLane = this.lanes.get(activeLaneId);
+      if (!activeLane) return;
+      this.applyAudioPolicy(activeLane, 'activation');
+    };
+    if (typeof requestAnimationFrame === 'function') {
+      requestAnimationFrame(kick);
+    } else {
+      queueMicrotask(kick);
+    }
   }
 
   /** Public read: is this lane currently borrowed by the fullscreen viewer?
