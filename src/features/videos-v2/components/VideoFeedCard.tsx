@@ -1,5 +1,5 @@
 /**
- * VideoFeedCard — full-width video card for /videos-v2-test.
+ * VideoFeedCard — full-width video card for /watch/videos.
  * Autoplay + fullscreen handoff replicates the W6 rail-lane pattern
  * (see src/features/watch-v2/components/HubVideoRow.tsx as the source
  * of truth). No imports from src/components/watch/.

@@ -1,6 +1,6 @@
 /**
  * ClipsInterruptShelf — full-bleed tinted band that periodically
- * interrupts the /videos-v2-test video feed with 3 trending clips.
+ * interrupts the /watch/videos video feed with 3 trending clips.
  * A signposted doorway into /watch/clips, not mixed content: each shelf
  * runs its OWN autoplay rail and its OWN posts array so it can never
  * pollute the surrounding video-feed autoplay indexing.
