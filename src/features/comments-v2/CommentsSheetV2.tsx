@@ -317,8 +317,8 @@ function CommentsSheetV2Inner({
               try {
                 await hideComment.mutateAsync(actionTarget.id);
                 toast.success('Comment hidden');
-              } catch (e: any) {
-                toast.error(e?.message ?? 'Failed to hide');
+              } catch (e) {
+                toast.error(e instanceof Error ? e.message : 'Failed to hide');
               }
             }}
           />
@@ -330,9 +330,15 @@ function CommentsSheetV2Inner({
             onSubmit={async (reason, details) => {
               if (!reportTarget) return;
               try {
-                await reportComment.mutateAsync({ id: reportTarget.id, reason, details });
-              } catch (e: any) {
-                toast.error(e?.message ?? 'Failed to submit report');
+                await reportComment.mutateAsync({
+                  id: reportTarget.id,
+                  targetUserId: reportTarget.user_id,
+                  reason,
+                  details,
+                });
+              } catch (e) {
+                toast.error(e instanceof Error ? e.message : 'Failed to submit report');
+                throw e;
               }
             }}
           />
