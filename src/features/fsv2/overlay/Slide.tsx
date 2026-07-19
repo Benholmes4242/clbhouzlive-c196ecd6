@@ -95,8 +95,8 @@ export const Fsv2Slide: React.FC<Props> = ({
       );
     }
     const imageUrl =
-      (m as unknown as { url?: string }).url
-      ?? (m as unknown as { imageUrl?: string }).imageUrl
+      (m as unknown as { imageUrl?: string }).imageUrl
+      ?? (m as unknown as { url?: string }).url
       ?? '';
     return (
       <Fsv2ImageSlot
