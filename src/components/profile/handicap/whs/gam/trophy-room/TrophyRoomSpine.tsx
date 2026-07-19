@@ -103,19 +103,6 @@ export function TrophyRoomSpine({ items, userId }: Props) {
         onPointerUp={(e) => { (e.currentTarget as HTMLElement).style.transform = ''; }}
         onPointerLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = ''; }}
       >
-        <span
-          aria-hidden
-          style={{
-            position: 'absolute',
-            top: 12,
-            right: 14,
-            fontSize: 15,
-            color: 'rgba(255,255,255,0.4)',
-            lineHeight: 1,
-          }}
-        >
-          ›
-        </span>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 17, fontWeight: 800, color: '#FFFFFF' }}>
             {level ? <TierGem medals={owned} size="md" /> : null}
@@ -170,10 +157,31 @@ export function TrophyRoomSpine({ items, userId }: Props) {
             }}
           />
         </div>
-        <div style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.5)', marginTop: 8 }}>
-          {next
-            ? `${next.medalsRequired - owned} ${next.medalsRequired - owned === 1 ? 'medal' : 'medals'} to Level ${next.level} · ${next.label}`
-            : 'Every level earned. The wall is yours.'}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: 8,
+            marginTop: 8,
+          }}
+        >
+          <span style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.5)' }}>
+            {next
+              ? `${next.medalsRequired - owned} ${next.medalsRequired - owned === 1 ? 'medal' : 'medals'} to Level ${next.level} · ${next.label}`
+              : 'Every level earned. The wall is yours.'}
+          </span>
+          <span
+            aria-hidden
+            style={{
+              fontSize: 15,
+              color: 'rgba(255,255,255,0.4)',
+              lineHeight: 1,
+              flexShrink: 0,
+            }}
+          >
+            ›
+          </span>
         </div>
       </button>
 
