@@ -119,12 +119,14 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
       trimEnd: null,
       posterTimestamp: null,
     }));
-    const firstCourse = data.courses[0] ?? null;
+    const hydratedCourses: StageCourse[] = (data.courses ?? []).map((c) => ({
+      id: c.courseId,
+      name: c.courseName,
+      country: c.country,
+    }));
     hydrate({
       caption: data.caption,
-      course: firstCourse
-        ? { id: firstCourse.courseId, name: firstCourse.courseName, country: firstCourse.country }
-        : null,
+      courses: hydratedCourses,
       scheduledAt: editStatus?.status === 'scheduled' && editStatus.scheduledAt
         ? new Date(editStatus.scheduledAt)
         : null,
