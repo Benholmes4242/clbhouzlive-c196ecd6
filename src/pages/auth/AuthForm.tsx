@@ -51,6 +51,7 @@ const RESEND_COOLDOWN_SECONDS = 30;
 const AuthForm: React.FC = () => {
   const { t } = useTranslation('auth');
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [step, setStep] = useState<Step>('hero');
   const [email, setEmailState] = useState('');
