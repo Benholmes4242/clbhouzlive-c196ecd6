@@ -175,11 +175,24 @@ export function useStageComposer() {
   }, []);
 
   const setCaption = useCallback((v: string) => markDirty({ caption: v }), []);
-  const setCourse = useCallback((c: StageCourse | null) => markDirty({ course: c }), []);
+  const setCourse = useCallback((c: StageCourse | null) => {
+    // Single-course setter: replaces the whole list with [c] (or clears).
+    const courses = c ? [c] : [];
+    markDirty({ courses, course: courses[0] ?? null });
+  }, []);
+  const setCourses = useCallback((cs: StageCourse[]) => {
+    markDirty({ courses: cs, course: cs[0] ?? null });
+  }, []);
   const setScheduledAt = useCallback((d: Date | null) => markDirty({ scheduledAt: d }), []);
 
   const restoreDraft = useCallback((patch: Partial<StageState>) => {
-    setState(s => ({ ...s, ...patch, dirty: false }));
+    setState(s => {
+      const next = { ...s, ...patch, dirty: false };
+      // Keep derived alias in sync if only one side was patched.
+      if (patch.courses && !patch.course) next.course = patch.courses[0] ?? null;
+      else if (patch.course && !patch.courses) next.courses = patch.course ? [patch.course] : [];
+      return next;
+    });
   }, []);
 
   /**
@@ -187,7 +200,12 @@ export function useStageComposer() {
    * flipping `dirty`. Called once on mount when editPostId is set.
    */
   const hydrate = useCallback((patch: Partial<StageState>) => {
-    setState(s => ({ ...s, ...patch, dirty: false }));
+    setState(s => {
+      const next = { ...s, ...patch, dirty: false };
+      if (patch.courses && !patch.course) next.course = patch.courses[0] ?? null;
+      else if (patch.course && !patch.courses) next.courses = patch.course ? [patch.course] : [];
+      return next;
+    });
   }, []);
 
   const reset = useCallback(() => setState(emptyState), []);
