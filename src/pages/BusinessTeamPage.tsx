@@ -120,6 +120,28 @@ export default function BusinessTeamPage() {
           {profile?.username && (
             <p className="text-[12px] truncate" style={{ color: INK_45 }}>@{profile.username}</p>
           )}
+          {(() => {
+            const canEditTitle = canManage || isSelf;
+            const title = m.job_title?.trim() || '';
+            const label = title || 'Add job title';
+            const color = title ? INK : INK_45;
+            const weight = title ? 600 : 500;
+            if (canEditTitle) {
+              return (
+                <button
+                  type="button"
+                  onClick={() => setTitleSheet({ open: true, member: m })}
+                  className="mt-0.5 block text-left active:opacity-70"
+                  style={{ fontSize: 12.5, color, fontWeight: weight, background: 'transparent', border: 0, padding: 0 }}
+                >
+                  {label}
+                </button>
+              );
+            }
+            return title ? (
+              <p className="mt-0.5 truncate" style={{ fontSize: 12.5, color: INK, fontWeight: 600 }}>{title}</p>
+            ) : null;
+          })()}
           {canToggleVisibility && (
             <button
               type="button"
