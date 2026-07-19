@@ -49,11 +49,11 @@ export function useExploreFeed({ userId, region, searchQuery, enabled: externalE
 
       if (error) throw error;
 
-      if (!data || data.length === 0) {
+      const rows = (data ?? []) as unknown as FeedRpcRow[];
+      if (rows.length === 0) {
         return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
       }
 
-      const rows = data as unknown as FeedRpcRow[];
       const posts = groupMultiMedia(rows.map(mapRowToFeedPost));
 
       for (const post of posts) {
