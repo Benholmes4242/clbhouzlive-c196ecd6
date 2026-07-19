@@ -267,12 +267,14 @@ function LedgerRow({
   banded,
   isLast,
   onTap,
+  crown = false,
 }: {
   row: FeatRow;
   rank: number;
   banded: boolean;
   isLast: boolean;
   onTap: () => void;
+  crown?: boolean;
 }) {
   const holder = formatHolderName(row.holder_name);
   const par = rowToPar(row);
