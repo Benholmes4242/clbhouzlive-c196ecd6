@@ -440,8 +440,8 @@ const StandaloneCourseDetail: React.FC<StandaloneCourseDetailProps> = ({
         }}
       >
         <CourseDetailShellTabs
-          activeTab={activeTab as any}
-          onTabChange={handleTabChange as any}
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
         />
       </div>
       {tabContent}
