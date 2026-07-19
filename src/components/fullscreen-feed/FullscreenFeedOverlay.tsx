@@ -45,6 +45,8 @@ import { useSetChromeSuppressed } from '@/features/chrome-v2/leftOverride';
 import { resolveRestingRect, getCurrentViewport } from '@/lib/media/resolveRestingRect';
 import { FS_TRANSITION_MODE, FS_CUT_FADE_MS } from '@/lib/media/transitionMode';
 import { FS_OVERLAY_Z } from '@/lib/zLayers';
+import { trace as perfTrace } from '@/perf/trace';
+
 
 
 const fsTimeStart = (_label: string) => {};
@@ -189,10 +191,60 @@ export function FullscreenFeedOverlay() {
     return unsub;
   }, []);
 
+  // ── [TRACE] fsLane.at.open + origin.lost ──────────────────────────────
+  // fsLane.at.open: on every false→true transition of isOpen, snapshot the
+  // 'fullscreen' lane's currently-bound element + snapshot postId. Lets us
+  // tell whether v4 is a fresh fall-through mount or stale residue from a
+  // prior open (hypothesis #3). origin.lost: log the first non-null→null
+  // transition of store.origin during the open — the origin-race check.
+  useEffect(() => {
+    const trace = perfTrace;
+
+    let currentOpenId: string | null = null;
+    let lastIsOpen = false;
+    let lastOrigin: unknown = null;
+    const unsub = useFullscreenFeedStore.subscribe((s) => {
+      // fsLane.at.open on false→true
+      if (s.isOpen && !lastIsOpen) {
+        currentOpenId = `fs_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+        try {
+          const snap = VideoEngine.snapshot('fullscreen');
+          const el = document.querySelector('video[data-lane-id="fullscreen"]') as HTMLVideoElement | null;
+          const boundElId = (el?.dataset as any)?.vid ?? null;
+          trace('fsLane.at.open', {
+            openId: currentOpenId,
+            boundElId,
+            snapshotPostId: snap.postId,
+            snapshotFirstFrame: snap.firstFrame,
+            hlsUrl: !!(el?.src || (el as any)?.currentSrc),
+            hasOrigin: s.origin != null,
+            hasBorrow: s.borrow != null,
+            borrowPostId: s.borrow?.postId ?? null,
+          });
+        } catch {}
+      }
+      if (!s.isOpen && lastIsOpen) currentOpenId = null;
+      // origin.lost while open
+      if (s.isOpen && lastOrigin != null && s.origin == null) {
+        try {
+          trace('origin.lost', {
+            openId: currentOpenId,
+            atMs: Date.now(),
+            reason: 'store.origin transitioned non-null → null while isOpen',
+          });
+        } catch {}
+      }
+      lastIsOpen = s.isOpen;
+      lastOrigin = s.origin;
+    });
+    return unsub;
+  }, []);
+
   // Snapshot borrow so the isOpen-cleanup path can run the return even after
   // close() has cleared the store's borrow field synchronously.
   const borrowRef = useRef<BorrowDescriptor | null>(null);
   useEffect(() => { borrowRef.current = borrow; }, [borrow]);
+
 
   // ── Swipe-away demotion (A1c: borrow is a one-shot property of the tap) ──
   // When the user swipes vertically off the opening slide, unmount the
