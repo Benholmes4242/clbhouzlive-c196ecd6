@@ -11,8 +11,17 @@ async function sendPush(
   data: Record<string, unknown>,
   appId: string,
   apiKey: string,
-  idempotencyKey: string
+  idempotencyKey: string,
+  badgeCount: number | null
 ): Promise<{ success: boolean; error?: string }> {
+  // iOS badge: always SetTo (never Increase) so it mirrors the app's
+  // Alerts unread count. If we couldn't compute the count, omit the
+  // number but still send SetTo to avoid runaway lifetime increments.
+  const badgeFields: Record<string, unknown> = { ios_badgeType: 'SetTo' };
+  if (typeof badgeCount === 'number' && badgeCount >= 0) {
+    badgeFields.ios_badgeCount = badgeCount;
+  }
+
   const response = await fetch('https://onesignal.com/api/v1/notifications', {
     method: 'POST',
     headers: {
@@ -27,8 +36,7 @@ async function sendPush(
       contents: { en: body || '' },
       data: data || {},
       external_id: idempotencyKey,
-      ios_badgeType: 'Increase',
-      ios_badgeCount: 1,
+      ...badgeFields,
       priority: 10,
       ttl: 86400,
     }),
@@ -40,6 +48,7 @@ async function sendPush(
   }
   return { success: false, error: result.errors?.join(', ') || 'OneSignal error' };
 }
+
 
 serve(async (req) => {
   const corsHeaders = corsFor(req.headers.get('Origin'));
@@ -110,12 +119,29 @@ serve(async (req) => {
     let successCount = 0;
     let errorCount = 0;
 
+    // Compute per-recipient unread count ONCE per batch. Matches the
+    // predicate set of useUnreadNotifications (muted types, entity
+    // liveness), so the iOS badge equals the in-app Alerts number.
+    const unreadByUser = new Map<string, number | null>();
+    for (const uid of userIds as string[]) {
+      try {
+        const { data: cnt, error: cntErr } = await supabase.rpc(
+          'get_unread_notification_count',
+          { p_user_id: uid, p_actor_type: 'personal', p_actor_id: uid },
+        );
+        unreadByUser.set(uid, cntErr ? null : (typeof cnt === 'number' ? cnt : null));
+      } catch {
+        unreadByUser.set(uid, null);
+      }
+    }
+
     // Fan-out is done at enqueue time. Each queue row targets a single
     // (user_id, device_id); we apply that user's muted_types filter then send.
     // OneSignal's `external_id` body field is the idempotency key — reusing
     // the queue row UUID guarantees at-most-once even on retry.
     for (const item of queue) {
       try {
+
         const data = (item.data ?? {}) as Record<string, any>;
         const notifType = (data.type as string | undefined) ?? null;
         const muted = mutedByUser.get(item.user_id) ?? [];
@@ -150,6 +176,10 @@ serve(async (req) => {
         const targetUrl = route.startsWith('http') ? route : `${APP_ORIGIN}${route}`;
         const outgoingData = { ...data, route, targetUrl };
 
+        const badgeCount = unreadByUser.has(item.user_id)
+          ? unreadByUser.get(item.user_id) ?? null
+          : null;
+
         const result = await sendPush(
           externalId,
           item.title,
@@ -157,8 +187,10 @@ serve(async (req) => {
           outgoingData,
           ONESIGNAL_APP_ID,
           ONESIGNAL_API_KEY,
-          item.id
+          item.id,
+          badgeCount
         );
+
 
 
         if (result.success) {
