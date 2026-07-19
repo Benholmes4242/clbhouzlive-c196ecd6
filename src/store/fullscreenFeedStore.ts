@@ -232,65 +232,55 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       openedFrom: options?.openedFrom ?? null,
     });
     // ── AudioDebug: tap → open cycle instrumentation (flag-gated, zero-cost off)
-    try {
-      // Dynamic import so the debug module is only pulled when we touch it.
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const dbg = require('@/perf/audioDebug') as typeof import('@/perf/audioDebug');
-      if (dbg.audioDebugEnabled()) {
+    if (audioDbg.audioDebugEnabled()) {
+      try {
         const ownerKey = options?.borrow?.ownerKey
           ?? (slidePostId ? `${slidePostId}:${options?.mediaIndex ?? 0}` : null);
-        const openId = dbg.beginOpen(slidePostId ?? undefined);
-        const sess = require('@/audio/sessionAudioStore') as typeof import('@/audio/sessionAudioStore');
-        const s = sess.useSessionAudio.getState();
-        const lastTs = sess.getLastUnmuteGestureTs();
-        dbg.logAudio('tap', {
+        const openId = audioDbg.beginOpen(slidePostId ?? undefined);
+        const s = useSessionAudio.getState();
+        const lastTs = getLastUnmuteGestureTs();
+        audioDbg.logAudio('tap', {
           slidePostId, ownerKey, openId,
           openedFrom: options?.openedFrom ?? null,
         });
-        dbg.logAudio('session.state', {
+        audioDbg.logAudio('session.state', {
           isMuted: s.isMuted,
           lastUnmuteGestureTs: lastTs,
           msSinceGesture: lastTs > 0 ? Date.now() - lastTs : null,
         });
-        // Tile.state + open.decision — read borrow lane snapshot if borrowing.
-        try {
-          const eng = require('@/video/VideoEngine') as typeof import('@/video/VideoEngine');
-          if (options?.borrow) {
-            const laneId = options.borrow.laneId;
-            const el = (eng.VideoEngine as unknown as { _debugGetElement?: (id: string) => HTMLMediaElement | null })._debugGetElement?.(laneId) ?? null;
-            const snap = eng.VideoEngine.snapshot(laneId as any);
-            dbg.logAudio('tile.state', {
-              laneId, ownerKey: options.borrow.ownerKey,
-              muted: el?.muted ?? null, volume: el?.volume ?? null,
-              paused: el?.paused ?? null,
-              currentTime: +(el?.currentTime ?? snap.currentTime).toFixed(3),
-              state: snap.state,
-            });
-            dbg.setSummary({
-              tilePos: +(el?.currentTime ?? snap.currentTime).toFixed(2),
-            });
-          } else if (ownerKey) {
-            const lastPos = eng.VideoEngine.getLastPos(ownerKey);
-            dbg.logAudio('tile.state', { laneId: null, ownerKey, lastPos: +lastPos.toFixed(3) });
-            dbg.setSummary({ tilePos: +lastPos.toFixed(2) });
-          }
-          dbg.logAudio('open.decision', {
-            mode: options?.borrow ? 'borrow' : 'cold',
-            laneId: options?.borrow?.laneId ?? 'fullscreen',
-            startPosition: +Number(options?.startPosition ?? 0).toFixed(3),
-            lastPos: ownerKey ? +eng.VideoEngine.getLastPos(ownerKey).toFixed(3) : null,
+        if (options?.borrow) {
+          const laneId = options.borrow.laneId;
+          const el = (VideoEngine as unknown as { _debugGetElement?: (id: string) => HTMLMediaElement | null })._debugGetElement?.(laneId) ?? null;
+          const snap = VideoEngine.snapshot(laneId as LaneId);
+          audioDbg.logAudio('tile.state', {
+            laneId, ownerKey: options.borrow.ownerKey,
+            muted: el?.muted ?? null, volume: el?.volume ?? null,
+            paused: el?.paused ?? null,
+            currentTime: +(el?.currentTime ?? snap.currentTime).toFixed(3),
+            state: snap.state,
           });
-          dbg.setSummary({
-            mode: options?.borrow ? 'borrow' : 'cold',
-            laneId: options?.borrow?.laneId ?? 'fullscreen',
-            sessionMuted: s.isMuted,
-            msSinceGesture: lastTs > 0 ? Date.now() - lastTs : null,
-            continuityOk: null,
-            fsPos: null,
-          });
-        } catch {}
-      }
-    } catch {}
+          audioDbg.setSummary({ tilePos: +(el?.currentTime ?? snap.currentTime).toFixed(2) });
+        } else if (ownerKey) {
+          const lastPos = VideoEngine.getLastPos(ownerKey);
+          audioDbg.logAudio('tile.state', { laneId: null, ownerKey, lastPos: +lastPos.toFixed(3) });
+          audioDbg.setSummary({ tilePos: +lastPos.toFixed(2) });
+        }
+        audioDbg.logAudio('open.decision', {
+          mode: options?.borrow ? 'borrow' : 'cold',
+          laneId: options?.borrow?.laneId ?? 'fullscreen',
+          startPosition: +Number(options?.startPosition ?? 0).toFixed(3),
+          lastPos: ownerKey ? +VideoEngine.getLastPos(ownerKey).toFixed(3) : null,
+        });
+        audioDbg.setSummary({
+          mode: options?.borrow ? 'borrow' : 'cold',
+          laneId: options?.borrow?.laneId ?? 'fullscreen',
+          sessionMuted: s.isMuted,
+          msSinceGesture: lastTs > 0 ? Date.now() - lastTs : null,
+          continuityOk: null,
+          fsPos: null,
+        });
+      } catch {}
+    }
     set({
       isOpen: true,
       posts,
