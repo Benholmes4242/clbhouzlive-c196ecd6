@@ -293,7 +293,7 @@ const ClubhouseContent = () => {
     onTabSwitch: () => {
       resetFollows();
       resetComments();
-      if (!(activeFeed as any).hasEverLoaded) {
+      if (!(activeFeed as { hasEverLoaded?: boolean }).hasEverLoaded) {
         resetSkeleton();
       }
     },
