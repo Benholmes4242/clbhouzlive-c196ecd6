@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useNearbyBusinesses } from '@/hooks/useNearbyBusinesses';
 import { getActorRouteByType } from '@/types/actor';
