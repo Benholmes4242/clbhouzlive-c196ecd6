@@ -14,12 +14,23 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
 
 import { FSV2 } from '../tokens';
-import { attach, type Fsv2Source } from '../player/fsv2Player';
+import { attach, withBandwidthHint, type Fsv2Source } from '../player/fsv2Player';
 import { takePreWarmed, dropPreWarmed } from '../player/audioContract';
 import { traceReveal, hudEvent } from '../perf/trace';
 import { registerVideoEl } from '../debug/hudBus';
 import { WATCHDOG_MS, armWatchdog } from './Watchdogs';
 import { Fsv2TapForSoundPill } from './TapForSoundPill';
+
+const TRACK_WATCHDOG_MS = 1200;
+const TRACK_RECOVERY_LIMIT = 1;
+
+function totalVideoFrames(el: HTMLVideoElement): number {
+  try {
+    const q = (el as HTMLVideoElement & { getVideoPlaybackQuality?: () => { totalVideoFrames: number } })
+      .getVideoPlaybackQuality?.();
+    return q?.totalVideoFrames ?? 0;
+  } catch { return 0; }
+}
 
 function instrumentElement(openId: string, el: HTMLVideoElement, tag: string) {
   hudEvent(openId, `el.adopt.${tag}`, {
