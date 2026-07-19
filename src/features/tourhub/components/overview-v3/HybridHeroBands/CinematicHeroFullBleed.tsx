@@ -24,6 +24,7 @@ import {
   fmtScore,
   formatRank,
   buildLeaderboardSlots,
+  entryToday,
   type HeroState,
   type TopTie,
 } from '../HybridHero.utils';
