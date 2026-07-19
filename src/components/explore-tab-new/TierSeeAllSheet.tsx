@@ -570,19 +570,11 @@ function CountLeaderSheetRow({
         flexDirection: 'column',
         alignItems: 'stretch',
         gap: 8,
-        borderRadius: 12,
-        padding: '10px 12px',
-        marginBottom: 6,
-        background: goldChampion
-          ? 'linear-gradient(100deg, #fff, #FFF6D8)'
-          : isTop
-            ? 'linear-gradient(100deg, #fff, #fff6e8)'
-            : '#FFFFFF',
-        border: goldChampion
-          ? '1px solid rgba(232,181,48,0.55)'
-          : isTop
-            ? '1px solid rgba(247,147,30,0.55)'
-            : '0.5px solid rgba(15,23,42,0.08)',
+        padding: '10px 16px',
+        background: index % 2 === 0 ? 'rgba(15,23,42,0.035)' : 'transparent',
+        borderTop: isTop
+          ? `2px solid ${goldChampion ? '#E8B530' : AMBER}`
+          : '0.5px solid rgba(15,23,42,0.08)',
         cursor: onTap ? 'pointer' : 'default',
         fontFamily: FONT,
       }}
