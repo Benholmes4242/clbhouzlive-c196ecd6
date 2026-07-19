@@ -16,9 +16,42 @@ import { useSessionAudio } from '@/audio/sessionAudioStore';
 import { FSV2 } from '../tokens';
 import { attach, type Fsv2Source } from '../player/fsv2Player';
 import { takePreWarmed, dropPreWarmed } from '../player/audioContract';
-import { traceReveal } from '../perf/trace';
+import { traceReveal, hudEvent } from '../perf/trace';
+import { registerVideoEl } from '../debug/hudBus';
 import { WATCHDOG_MS, armWatchdog } from './Watchdogs';
 import { Fsv2TapForSoundPill } from './TapForSoundPill';
+
+function instrumentElement(openId: string, el: HTMLVideoElement, tag: string) {
+  hudEvent(openId, `el.adopt.${tag}`, {
+    parent: el.parentElement?.tagName,
+    hasSrc: !!el.src,
+    muted: el.muted,
+    readyState: el.readyState,
+  });
+  const evs = ['loadstart', 'loadedmetadata', 'canplay', 'playing', 'pause', 'stalled', 'waiting', 'error', 'ended', 'emptied'];
+  const handlers: Array<[string, EventListener]> = [];
+  let tuCount = 0;
+  for (const name of evs) {
+    const h: EventListener = () => {
+      const p: Record<string, unknown> = {};
+      if (name === 'loadedmetadata') { p.vw = el.videoWidth; p.vh = el.videoHeight; }
+      if (name === 'error') { p.code = el.error?.code; p.msg = el.error?.message; }
+      if (name === 'canplay' || name === 'playing') p.rs = el.readyState;
+      hudEvent(openId, `el.${name}`, p);
+    };
+    el.addEventListener(name, h);
+    handlers.push([name, h]);
+  }
+  const tuH: EventListener = () => {
+    if (tuCount < 3) {
+      hudEvent(openId, 'el.timeupdate', { t: +el.currentTime.toFixed(3), n: tuCount });
+      tuCount++;
+    }
+  };
+  el.addEventListener('timeupdate', tuH);
+  handlers.push(['timeupdate', tuH]);
+  return () => { for (const [n, h] of handlers) el.removeEventListener(n, h); };
+}
 
 interface Props {
   source: Fsv2Source;
@@ -85,6 +118,8 @@ export const Fsv2VideoSlot: React.FC<Props> = ({
       elRef.current = el;
       detachRef.current = preWarmed.detach;
       if (preWarmed.needsTapForSound) setNeedsTapForSound(true);
+      const detachInstr = instrumentElement(openId, el, 'prewarmed');
+      registerVideoEl(openId, el);
 
       const onFrame = () => reveal('first-frame');
       el.addEventListener('loadeddata', onFrame);
@@ -95,6 +130,8 @@ export const Fsv2VideoSlot: React.FC<Props> = ({
       return () => {
         el.removeEventListener('loadeddata', onFrame);
         el.removeEventListener('playing', onFrame);
+        detachInstr();
+        registerVideoEl(openId, null);
         detachRef.current?.();
         detachRef.current = null;
         elRef.current = null;
@@ -118,11 +155,14 @@ export const Fsv2VideoSlot: React.FC<Props> = ({
     el.style.transition = `opacity ${FSV2.VIDEO_CROSSFADE_MS}ms ease`;
     host.appendChild(el);
     elRef.current = el;
+    const detachInstr = instrumentElement(openId, el, 'fresh');
+    registerVideoEl(openId, el);
 
     const onFrame = () => reveal('first-frame');
     el.addEventListener('loadeddata', onFrame);
     el.addEventListener('playing', onFrame);
 
+    hudEvent(openId, 'src.set', { hlsUrl: !!source.hlsUrl, mp4Url: !!source.mp4Url });
     attach(el, source, { muted: isMuted, startPosition }).then((handle) => {
       if (cancelled) { handle.detach(); return; }
       detachRef.current = handle.detach;
@@ -142,6 +182,8 @@ export const Fsv2VideoSlot: React.FC<Props> = ({
       cancelled = true;
       el.removeEventListener('loadeddata', onFrame);
       el.removeEventListener('playing', onFrame);
+      detachInstr();
+      registerVideoEl(openId, null);
       detachRef.current?.();
       detachRef.current = null;
       elRef.current = null;

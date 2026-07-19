@@ -11,6 +11,7 @@ import type { FeedPost, MediaItem } from '@/components/media-system/types/media'
 import { FSV2 } from '../tokens';
 import { useFsv2Store } from '../store/fsv2Store';
 import { traceSlide } from '../perf/trace';
+import { registerSlideEl } from '../debug/hudBus';
 import { Fsv2ImageSlot } from './ImageSlot';
 import { Fsv2VideoSlot } from './VideoSlot';
 
@@ -71,6 +72,7 @@ export const Fsv2Slide: React.FC<Props> = ({
   useEffect(() => {
     if (!active) return;
     traceSlide(openId, { postId: post.id, mediaCount: items.length });
+    registerSlideEl(openId, scrollerRef.current);
   }, [active, openId, post.id, items.length]);
 
   const renderItem = (m: MediaItem, idx: number, isActive: boolean) => {
@@ -114,7 +116,7 @@ export const Fsv2Slide: React.FC<Props> = ({
     const m = items[0];
     if (!m) return <div style={{ position: 'absolute', inset: 0, background: FSV2.BACKDROP }} />;
     return (
-      <div style={{ position: 'absolute', inset: 0, background: FSV2.BACKDROP }}>
+      <div ref={scrollerRef} style={{ position: 'absolute', inset: 0, background: FSV2.BACKDROP }}>
         {renderItem(m, 0, active)}
       </div>
     );

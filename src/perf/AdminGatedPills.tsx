@@ -9,6 +9,8 @@ import { PerfToggleButton } from '@/perf/PerfToggleButton';
 import { BootTimelineToggleButton } from '@/perf/BootTimelineToggleButton';
 import { PerfHud } from '@/perf/PerfHud';
 import { LogHud } from '@/perf/LogHud';
+import { Fsv2DebugToggle } from '@/features/fsv2/debug/Fsv2DebugToggle';
+import { Fsv2DebugHUD } from '@/features/fsv2/debug/Fsv2DebugHUD';
 
 
 export function AdminGatedPerfPill() {
@@ -37,5 +39,17 @@ export function AdminGatedLogHud() {
   const [visible] = useAdminPillVisibility();
   if (loading || role !== 'full' || !visible) return null;
   return <LogHud />;
+}
+
+export function AdminGatedFsv2DebugPill() {
+  const { role, loading } = usePanelRole();
+  const [visible] = useAdminPillVisibility();
+  if (loading || role !== 'full' || !visible) return null;
+  return (
+    <>
+      <Fsv2DebugToggle />
+      <Fsv2DebugHUD />
+    </>
+  );
 }
 

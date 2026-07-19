@@ -30,6 +30,8 @@ import { FSV2 } from '../tokens';
 import { useFsv2Store } from '../store/fsv2Store';
 import { startFsv2EngagementBridge } from '../store/engagementBridge';
 import { startOpenSpan, endOpen, startCloseSpan, endCloseSpan } from '../perf/spans';
+import { hudEvent } from '../perf/trace';
+import { registerOverlayEl } from '../debug/hudBus';
 import { useFsv2Viewport } from '../player/viewport';
 import { WATCHDOG_MS, useWatchdog } from './Watchdogs';
 import { Fsv2Chrome } from './Chrome';
@@ -172,11 +174,21 @@ export const Fsv2Overlay: React.FC = () => {
 
   const activePost = posts[activeIndex];
   const mediaCount = activePost?.mediaItems?.length ?? 0;
+  const rootRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    hudEvent(openId, 'overlay.mount', { activeIndex, mediaCount });
+    registerOverlayEl(openId, rootRef.current);
+    return () => { hudEvent(openId, 'overlay.unmount'); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, openId]);
 
   if (!mounted) return null;
 
   return (
     <div
+      ref={rootRef}
       role="dialog"
       aria-modal="true"
       style={{
