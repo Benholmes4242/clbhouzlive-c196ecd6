@@ -376,21 +376,6 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
           )}
         </div>
 
-        {/* TOT */}
-        <div
-          style={{
-            width: NUM_W,
-            flexShrink: 0,
-            textAlign: 'center',
-            fontSize: 13.5,
-            fontWeight: 800,
-            color: totColor,
-            fontVariantNumeric: 'tabular-nums',
-          }}
-        >
-          {totalDisplay}
-        </div>
-
         {/* THRU */}
         <div
           style={{
@@ -418,6 +403,21 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
           }}
         >
           {demotedRow ? '-' : todayDisplay}
+        </div>
+
+        {/* TOT */}
+        <div
+          style={{
+            width: NUM_W,
+            flexShrink: 0,
+            textAlign: 'center',
+            fontSize: 13.5,
+            fontWeight: 800,
+            color: totColor,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {totalDisplay}
         </div>
       </div>
     );
