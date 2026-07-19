@@ -268,7 +268,7 @@ export function SearchOverlayV2({
                 </p>
                 <button
                   type="button"
-                  onClick={() => setInputValue((v) => v + ' ')}
+                  onClick={() => refetch()}
                   className="mt-3 text-[13px] font-bold"
                   style={{ color: '#0F172A' }}
                 >
