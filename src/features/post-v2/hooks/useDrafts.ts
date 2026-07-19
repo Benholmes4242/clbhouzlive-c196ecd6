@@ -45,7 +45,7 @@ export function useDrafts(userId: string | null | undefined) {
     courseName?: string | null;
     courseCountry?: string | null;
     /** Full ordered multi-course tag list; persisted via course_data.courses. */
-    courses?: Array<{ id: string; name: string; country: string | null }>;
+    courses?: Array<{ id: string; name: string; country?: string | null }>;
   }) => {
     if (!userId) return;
     await supabase.from('post_drafts').insert({
