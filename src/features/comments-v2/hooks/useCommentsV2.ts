@@ -49,8 +49,16 @@ export interface UseCommentsV2Args {
   enabled?: boolean;
 }
 
+type RawCommentRow = {
+  id: string; user_id: string; content: string | null;
+  media_type: string | null; media_url: string | null;
+  parent_id: string | null; created_at: string;
+  is_edited: boolean | null; actor_type: string | null;
+  actor_id: string | null; target_secondary_id?: string | null;
+};
+
 interface Page {
-  parents: any[];
+  parents: RawCommentRow[];
   nextCursor: string | null;
 }
 
