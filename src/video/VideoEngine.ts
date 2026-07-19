@@ -286,10 +286,15 @@ class VideoEngineImpl {
     this.borrowedLanes.delete(laneId);
     DBG('clearBorrowed', { laneId });
     logAudio('borrow.cleared', { laneId, msSinceOpen: msSinceOpen() });
-    // Handback: restore the lane's declared audio policy on the element
-    // BEFORE the inline tile resumes, so rails never blast audio after close.
-    const lane = this.lanes.get(laneId);
-    if (lane) this.applyAudioPolicy(lane);
+    // Handback = session semantics: the resuming inline tile follows the
+    // current session mute state, not the lane's declared policy. This keeps
+    // audio continuous when the user was hearing sound before the tap, and
+    // silent when the session is muted. The declared policy re-asserts
+    // naturally at the next mount / policy application. Routing through
+    // setMuted preserves the ONE_UNMUTED_LANE invariant.
+    if (this.lanes.get(laneId)) {
+      this.setMuted(laneId, useSessionAudio.getState().isMuted);
+    }
   }
 
   /** Public read: is this lane currently borrowed by the fullscreen viewer?
