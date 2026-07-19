@@ -29,7 +29,7 @@ export function useDrafts(userId: string | null | undefined) {
     setLoading(true);
     const { data, error } = await supabase
       .from('post_drafts')
-      .select('id, actor_type, actor_id, content, course_id, course_name, course_country, updated_at')
+      .select('id, actor_type, actor_id, content, course_id, course_name, course_country, course_data, updated_at')
       .eq('user_id', userId)
       .order('updated_at', { ascending: false })
       .limit(20);
