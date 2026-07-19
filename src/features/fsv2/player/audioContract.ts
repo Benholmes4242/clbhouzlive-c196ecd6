@@ -33,6 +33,41 @@ interface PreWarmed {
 
 const preWarmed = new Map<string, PreWarmed>();
 
+const PARK_ATTR = 'data-fsv2-prewarm';
+
+/**
+ * Style an element as a full-viewport, in-DOM, invisible parked video.
+ * Full layout size is REQUIRED at src-set time so iOS native HLS picks a
+ * real video rendition rather than the audio-only Cloudflare variant.
+ */
+export function parkVideoElement(el: HTMLVideoElement): void {
+  el.style.position = 'fixed';
+  el.style.top = '0';
+  el.style.left = '0';
+  el.style.width = '100vw';
+  el.style.height = '100dvh';
+  el.style.opacity = '0';
+  el.style.pointerEvents = 'none';
+  el.style.zIndex = '-1';
+  el.style.background = 'transparent';
+  el.style.transition = '';
+  el.setAttribute(PARK_ATTR, 'parked');
+  if (typeof document !== 'undefined' && el.parentElement !== document.body) {
+    try { document.body.appendChild(el); } catch { /* ignore */ }
+  }
+}
+
+/** Remove any stale parked video elements from prior opens. */
+function purgeStaleParked(): void {
+  if (typeof document === 'undefined') return;
+  const nodes = document.querySelectorAll<HTMLVideoElement>(`video[${PARK_ATTR}]`);
+  nodes.forEach((n) => {
+    try { n.pause(); } catch { /* ignore */ }
+    try { n.removeAttribute('src'); n.load(); } catch { /* ignore */ }
+    try { n.remove(); } catch { /* ignore */ }
+  });
+}
+
 /**
  * Create a <video> element synchronously inside a tap handler, attach
  * the source, and issue the first play(). Returns the element so the
@@ -49,19 +84,16 @@ export function preWarmVideoForGesture(
   if (!source.hlsUrl && !source.mp4Url) return;
   if (preWarmed.has(openId)) return;
 
+  purgeStaleParked();
+
   const isMuted = useSessionAudio.getState().isMuted;
 
   const el = document.createElement('video');
-  el.setAttribute('data-fsv2-prewarm', openId);
-  el.style.position = 'fixed';
-  el.style.width = '1px';
-  el.style.height = '1px';
-  el.style.opacity = '0';
-  el.style.pointerEvents = 'none';
-  el.style.top = '0';
-  el.style.left = '0';
-  el.style.zIndex = '-1';
-  document.body.appendChild(el);
+  el.setAttribute(PARK_ATTR, openId);
+  // Park sized BEFORE src is set inside attach() — full viewport layout so
+  // Cloudflare/iOS pick a real video rendition, not audio-only.
+  parkVideoElement(el);
+  el.setAttribute(PARK_ATTR, openId);
 
   const record: PreWarmed = {
     openId,

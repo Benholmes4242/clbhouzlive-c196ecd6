@@ -33,6 +33,18 @@ function canPlayNativeHls(el: HTMLVideoElement): boolean {
 }
 
 /**
+ * Force Cloudflare Stream's initial rendition selection to a real video
+ * track rather than the audio-only variant iOS picks when the element is
+ * parked/detached at src-set time. See:
+ * https://developers.cloudflare.com/stream/viewing-videos/using-own-player/
+ */
+export function withBandwidthHint(hlsUrl: string, mbps = 2.5): string {
+  if (!hlsUrl) return hlsUrl;
+  if (/[?&]clientBandwidthHint=/.test(hlsUrl)) return hlsUrl;
+  return `${hlsUrl}${hlsUrl.includes('?') ? '&' : '?'}clientBandwidthHint=${mbps}`;
+}
+
+/**
  * Attach a source to an existing <video> element. Returns a `detach`
  * function that clears listeners and the hls.js instance if any.
  *
@@ -67,9 +79,10 @@ export async function attach(
 
   const hasHls = !!source.hlsUrl;
   const hasMp4 = !!source.mp4Url;
+  const hintedHls = hasHls ? withBandwidthHint(source.hlsUrl!) : '';
 
   if (hasHls && canPlayNativeHls(el)) {
-    el.src = source.hlsUrl!;
+    el.src = hintedHls;
     el.load();
   } else if (hasHls) {
     try {
@@ -77,7 +90,7 @@ export async function attach(
       const HlsCtor = (mod.default || (mod as unknown as { Hls: typeof Hls }).Hls) as typeof Hls;
       if (HlsCtor.isSupported()) {
         hls = new HlsCtor({ enableWorker: true });
-        hls.loadSource(source.hlsUrl!);
+        hls.loadSource(hintedHls);
         hls.attachMedia(el);
       } else if (hasMp4) {
         el.src = source.mp4Url!;

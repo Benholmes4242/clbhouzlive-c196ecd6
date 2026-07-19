@@ -14,12 +14,23 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
 
 import { FSV2 } from '../tokens';
-import { attach, type Fsv2Source } from '../player/fsv2Player';
+import { attach, withBandwidthHint, type Fsv2Source } from '../player/fsv2Player';
 import { takePreWarmed, dropPreWarmed } from '../player/audioContract';
 import { traceReveal, hudEvent } from '../perf/trace';
 import { registerVideoEl } from '../debug/hudBus';
 import { WATCHDOG_MS, armWatchdog } from './Watchdogs';
 import { Fsv2TapForSoundPill } from './TapForSoundPill';
+
+const TRACK_WATCHDOG_MS = 1200;
+const TRACK_RECOVERY_LIMIT = 1;
+
+function totalVideoFrames(el: HTMLVideoElement): number {
+  try {
+    const q = (el as HTMLVideoElement & { getVideoPlaybackQuality?: () => { totalVideoFrames: number } })
+      .getVideoPlaybackQuality?.();
+    return q?.totalVideoFrames ?? 0;
+  } catch { return 0; }
+}
 
 function instrumentElement(openId: string, el: HTMLVideoElement, tag: string) {
   hudEvent(openId, `el.adopt.${tag}`, {
@@ -236,6 +247,47 @@ export const Fsv2VideoSlot: React.FC<Props> = ({
       () => reveal('forced'),
     );
     return cancel;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active, openId]);
+
+  // Video-track watchdog — iOS may lock onto Cloudflare's audio-only
+  // variant if the src was set while the element was parked/detached.
+  // Force one recovery cycle if playback has advanced no frames after
+  // TRACK_WATCHDOG_MS of active playback.
+  useEffect(() => {
+    if (!active) return;
+    let recoveries = 0;
+    let cancelled = false;
+    const t = setTimeout(async () => {
+      if (cancelled) return;
+      const el = elRef.current;
+      if (!el || el.paused) return;
+      if (totalVideoFrames(el) > 0) return;
+      if (recoveries >= TRACK_RECOVERY_LIMIT) {
+        hudEvent(openId, 'videoTrack.recovery.exhausted', { recoveries });
+        return;
+      }
+      recoveries++;
+      const at = el.currentTime;
+      const wasMuted = el.muted;
+      const hinted = source.hlsUrl ? withBandwidthHint(source.hlsUrl) : source.mp4Url ?? '';
+      try {
+        try { detachRef.current?.(); } catch { /* ignore */ }
+        detachRef.current = null;
+        el.removeAttribute('src');
+        el.load();
+        const handle = await attach(el, { hlsUrl: source.hlsUrl, mp4Url: source.mp4Url }, {
+          muted: wasMuted,
+          startPosition: at,
+        });
+        if (cancelled) { handle.detach(); return; }
+        detachRef.current = handle.detach;
+        try { el.currentTime = at; } catch { /* ignore */ }
+        try { await el.play(); } catch { /* ignore */ }
+        hudEvent(openId, 'videoTrack.recovered', { atMs: Math.round(at * 1000), hinted: !!hinted });
+      } catch { /* swallow */ }
+    }, TRACK_WATCHDOG_MS);
+    return () => { cancelled = true; clearTimeout(t); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active, openId]);
 
