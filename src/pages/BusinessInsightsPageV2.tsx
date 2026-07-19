@@ -13,6 +13,7 @@ import { useBusinessMembership } from '@/hooks/useBusinessMembership';
 import { useBusinessReviewStats } from '@/hooks/useBusinessReviewStats';
 import { useBusinessInsights, deltaPct } from '@/hooks/useBusinessInsights';
 import { PageRoot } from '@/components/layout/PageRoot';
+import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { trackBusinessProfileVisit } from '@/lib/businessAnalyticsTracking';
@@ -344,70 +345,63 @@ const BusinessInsightsPageV2 = () => {
 
   if (isLoading || !membershipFetched) {
     return (
-      <PageRoot className="min-h-screen bg-background">
+      <ManagePageShell title="Insights">
         <div className="space-y-4 px-4 pt-4">
           <Skeleton className="h-32 rounded-2xl" />
           <Skeleton className="h-24 rounded-2xl" />
           <Skeleton className="h-24 rounded-2xl" />
         </div>
-      </PageRoot>
+      </ManagePageShell>
     );
   }
 
   if (!business) {
     return (
-      <PageRoot className="min-h-screen bg-background">
+      <ManagePageShell title="Insights">
         <div className="max-w-xl mx-auto mt-10 text-center px-4">
           <p style={{ color: BIZ.inkMute }}>Business not found</p>
           <Button onClick={() => navigate('/')} className="mt-4 text-white border-0" style={{ background: BIZ.amber }}>Go home</Button>
         </div>
-      </PageRoot>
+      </ManagePageShell>
     );
   }
 
   if (!membership?.canViewInsights) {
     return (
-      <PageRoot className="min-h-screen bg-background">
+      <ManagePageShell title="Insights">
         <div className="space-y-4 px-4 pt-4">
           <div className="h-32 animate-pulse rounded-2xl" style={{ background: BIZ.fillStrong }} />
           <div className="h-24 animate-pulse rounded-2xl" style={{ background: BIZ.fillStrong }} />
         </div>
-      </PageRoot>
+      </ManagePageShell>
     );
   }
 
   const rangeLabels: Record<DateRange, string> = { '7d': '7 days', '30d': '30 days', '90d': '90 days' };
   const h = insights.headline;
 
-  return (
-    <PageRoot className="min-h-screen pb-20" style={{ background: BIZ.pageBg }}>
-      <div className="px-4 pt-3 pb-3" style={{ paddingTop: 'calc(var(--chrome-total-h, 0px) + 12px)' }}>
-        <SectionHeader tier="standard" kicker="INSIGHTS" tone="amber" />
-        <h1 className="text-[18px] leading-tight mt-0.5" style={{ color: BIZ.ink, fontWeight: 700, letterSpacing: '-0.01em' }}>
-          Insights
-        </h1>
+  const rangePicker = (
+    <div className="flex justify-center pb-3">
+      <div className="inline-flex rounded-full p-1" style={{ border: `1px solid ${BIZ.hair}`, background: BIZ.fill }}>
+        {(['7d', '30d', '90d'] as DateRange[]).map(range => {
+          const active = dateRange === range;
+          return (
+            <button
+              key={range}
+              onClick={() => setDateRange(range)}
+              className={cn('px-3 md:px-4 py-1.5 text-[0.8rem] rounded-full transition-colors', active ? 'font-medium' : '')}
+              style={active ? { background: BIZ.amber, color: '#ffffff' } : { color: BIZ.inkMute }}
+            >
+              {rangeLabels[range]}
+            </button>
+          );
+        })}
       </div>
+    </div>
+  );
 
-      <div className="sticky z-10 backdrop-blur-xl"
-        style={{ top: 'var(--chrome-total-h, 0px)', background: 'rgba(248,250,252,0.97)', borderBottom: `0.5px solid ${BIZ.hair}` }}>
-        <div className="flex justify-center pb-3">
-          <div className="inline-flex rounded-full p-1" style={{ border: `1px solid ${BIZ.hair}`, background: BIZ.fill }}>
-            {(['7d', '30d', '90d'] as DateRange[]).map(range => {
-              const active = dateRange === range;
-              return (
-                <button
-                  key={range}
-                  onClick={() => setDateRange(range)}
-                  className={cn('px-3 md:px-4 py-1.5 text-[0.8rem] rounded-full transition-colors', active ? 'font-medium' : '')}
-                  style={active ? { background: BIZ.amber, color: '#ffffff' } : { color: BIZ.inkMute }}
-                >
-                  {rangeLabels[range]}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
+  return (
+    <ManagePageShell title="Insights" belowTitle={rangePicker}>
 
       <div className="max-w-[1024px] mx-auto px-4 md:px-6 py-6 space-y-5 md:space-y-6">
         {/* ── OVERVIEW ── */}
@@ -519,7 +513,7 @@ const BusinessInsightsPageV2 = () => {
         {/* ── REPUTATION (course-linked only) ── */}
         {business.club_id && <ReviewsSection businessId={business.id} navigate={navigate} />}
       </div>
-    </PageRoot>
+    </ManagePageShell>
   );
 };
 

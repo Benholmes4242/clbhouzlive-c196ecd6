@@ -496,28 +496,37 @@ export default function VerificationFlowSheet({
         className="p-0 gap-0 max-w-[440px] w-full h-[100dvh] sm:h-[92vh] sm:max-h-[820px] sm:rounded-2xl flex flex-col overflow-hidden border-0"
         style={{ background: BIZ.pageBg }}
       >
-        {/* Header */}
+        {/* Header — matches ManagePageShell (Manage Business Profiles) */}
         <header
-          className="sticky top-0 z-10 backdrop-blur-xl shrink-0"
-          style={{ background: 'rgba(248,250,252,0.97)', borderBottom: `0.5px solid ${BIZ.hair}` }}
+          className="sticky top-0 z-10 shrink-0"
+          style={{
+            background: BIZ.pageBg,
+            borderBottom: '1px solid rgba(15,23,42,0.08)',
+            paddingTop: 'max(env(safe-area-inset-top, 0px), 8px)',
+          }}
         >
-          <div className="flex items-center px-4 h-14">
+          <div
+            className="flex items-center gap-3 px-4"
+            style={{ paddingBottom: 12, minHeight: 56 }}
+          >
             <button
               onClick={() => onOpenChange(false)}
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center -ml-2 text-foreground active:scale-[0.97] transition-transform"
-              aria-label="Close"
+              style={{
+                width: 32, height: 32, borderRadius: '50%',
+                background: '#fff', border: '1px solid rgba(15,23,42,0.10)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                flexShrink: 0, cursor: 'pointer',
+              }}
+              aria-label={showDomainMode ? 'Back' : 'Close'}
             >
-              {showDomainMode ? <ChevronLeft className="w-5 h-5" /> : <X className="w-5 h-5" />}
+              <ChevronLeft size={18} strokeWidth={2.5} style={{ color: '#0F172A' }} />
             </button>
-            <div className="flex-1 text-center">
-              <h2
-                className="text-[16px] text-foreground"
-                style={{ fontWeight: 900, letterSpacing: '-0.01em' }}
-              >
-                {showDomainMode ? 'Verify domain' : 'Get verified'}
-              </h2>
-            </div>
-            <div className="w-11" />
+            <h2
+              className="text-[18px] leading-none"
+              style={{ color: '#0F172A', fontWeight: 600, letterSpacing: '-0.01em', margin: 0 }}
+            >
+              {showDomainMode ? 'Verify domain' : 'Submit for review'}
+            </h2>
           </div>
         </header>
 
