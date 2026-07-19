@@ -265,7 +265,7 @@ class VideoEngineImpl {
             expected: sessionMuted,
             msSinceOpen: msSinceOpen(),
           });
-          this.applyAudioPolicy(lane);
+          this.applyAudioPolicy(lane, 'guard-reassert');
         }
       };
       el.addEventListener('volumechange', onVC);
