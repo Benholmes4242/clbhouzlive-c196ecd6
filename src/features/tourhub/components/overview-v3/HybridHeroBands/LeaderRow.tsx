@@ -19,6 +19,7 @@ import {
 import { getScoreColor } from '../../../_shared/scoreColor';
 import { AMBER_TINT_04, LEADER_GOLD_TINT_10, LEADER_GOLD_TINT_7 } from '../../../_shared/tokens';
 import { TrajectorySparkline } from './TrajectorySparkline';
+import { todayFromEntry } from '../HybridHero.utils';
 
 function liveScoreColour(s: string): string {
   if (s.startsWith('\u2212') || s.startsWith('-')) return getScoreColor(-1, 'dark', 'standard');
