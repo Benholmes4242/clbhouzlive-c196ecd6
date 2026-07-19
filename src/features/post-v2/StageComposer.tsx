@@ -57,7 +57,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
   const { profile } = useProfileData();
   const { activeActor, setActiveActor } = useActiveActor();
   const composer = useStageComposer();
-  const { state, addFiles, removeAt, reorder, setActiveIndex, updateActive, setCaption, setCourse, setScheduledAt, restoreDraft, hydrate, reset } = composer;
+  const { state, addFiles, removeAt, reorder, setActiveIndex, updateActive, setCaption, setCourse, setCourses, setScheduledAt, restoreDraft, hydrate, reset } = composer;
   const { submit, submitting } = usePostSubmit();
   const drafts = useDrafts(profile?.id);
   const queryClient = useQueryClient();
@@ -118,12 +118,15 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
       trimEnd: null,
       posterTimestamp: null,
     }));
-    const firstCourse = data.courses[0] ?? null;
+    const allCourses = (data.courses ?? []).map((c) => ({
+      id: c.courseId,
+      name: c.courseName,
+      country: c.country,
+    }));
     hydrate({
       caption: data.caption,
-      course: firstCourse
-        ? { id: firstCourse.courseId, name: firstCourse.courseName, country: firstCourse.country }
-        : null,
+      courses: allCourses,
+      course: allCourses[0] ?? null,
       scheduledAt: editStatus?.status === 'scheduled' && editStatus.scheduledAt
         ? new Date(editStatus.scheduledAt)
         : null,
@@ -140,17 +143,25 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
     let cancelled = false;
     supabase
       .from('post_drafts')
-      .select('id, actor_type, actor_id, content, course_id, course_name, course_country')
+      .select('id, actor_type, actor_id, content, course_id, course_name, course_country, course_data')
       .eq('id', draftId)
       .eq('user_id', profile.id)
       .maybeSingle()
       .then(({ data }) => {
         if (cancelled || !data) return;
+        // Multi-course drafts stash the full ordered list in course_data.courses.
+        const cd = (data.course_data as { courses?: Array<{ id: string; name: string; country: string | null }> } | null) ?? null;
+        const savedCourses = cd?.courses ?? [];
+        const primary = data.course_id && data.course_name
+          ? { id: data.course_id as string, name: data.course_name as string, country: (data.course_country as string) ?? null }
+          : null;
+        const courses = savedCourses.length > 0
+          ? savedCourses
+          : (primary ? [primary] : []);
         restoreDraft({
           caption: (data.content as string) ?? '',
-          course: data.course_id && data.course_name
-            ? { id: data.course_id as string, name: data.course_name as string, country: (data.course_country as string) ?? null }
-            : null,
+          courses,
+          course: courses[0] ?? null,
         });
       });
     return () => { cancelled = true; };
@@ -193,6 +204,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
         caption: state.caption,
         media: state.media,
         course: state.course,
+        courses: state.courses,
         scheduledAt: state.scheduledAt,
         actorType: activeActor.type,
         actorId: activeActor.id,
@@ -215,6 +227,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
       const patch: Record<string, unknown> = {
         content: state.caption?.length ? state.caption : null,
         course_id: state.course?.id ?? null,
+        tagged_course_ids: state.courses.map((c) => c.id),
       };
       // Only touch scheduled_at when the post is still scheduled.
       if (editStatus?.status === 'scheduled') {
@@ -331,6 +344,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
       courseId: state.course?.id ?? null,
       courseName: state.course?.name ?? null,
       courseCountry: state.course?.country ?? null,
+      courses: state.courses,
     });
     setSheet(null);
     reset();
@@ -429,6 +443,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
         <CaptionField value={state.caption} onChange={setCaption} currentUserId={profile?.id ?? null} />
         <DetailRows
           course={state.course}
+          courses={state.courses}
           onOpenCourse={() => setSheet('course')}
           actor={activeActor}
           onOpenActor={() => setSheet('actor')}
@@ -440,7 +455,13 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
       </div>
 
       {/* Sheets */}
-      <CourseTagSheet open={sheet === 'course'} onClose={() => setSheet(null)} onSelect={setCourse} current={state.course} userId={profile?.id ?? null} />
+      <CourseTagSheet
+        open={sheet === 'course'}
+        onClose={() => setSheet(null)}
+        onDone={setCourses}
+        selected={state.courses}
+        userId={profile?.id ?? null}
+      />
       <ActorSheet open={sheet === 'actor'} onClose={() => setSheet(null)} onSelect={(a) => setActiveActor(a)} selectedId={activeActor?.id ?? null} />
       <ScheduleSheetV2
         open={sheet === 'schedule'}
@@ -454,10 +475,15 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
         open={sheet === 'drafts'}
         onClose={() => setSheet(null)}
         drafts={drafts.drafts}
-        onRestore={(d) => restoreDraft({
-          caption: d.content ?? '',
-          course: d.course_id && d.course_name ? { id: d.course_id, name: d.course_name, country: d.course_country ?? null } : null,
-        })}
+        onRestore={(d) => {
+          const primary = d.course_id && d.course_name
+            ? { id: d.course_id, name: d.course_name, country: d.course_country ?? null }
+            : null;
+          const cd = (d as unknown as { course_data?: { courses?: Array<{ id: string; name: string; country: string | null }> } }).course_data ?? null;
+          const savedCourses = cd?.courses ?? [];
+          const courses = savedCourses.length > 0 ? savedCourses : (primary ? [primary] : []);
+          restoreDraft({ caption: d.content ?? '', course: courses[0] ?? null, courses });
+        }}
         onDelete={drafts.remove}
       />
       <ScheduledPostsSheetV2

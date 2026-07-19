@@ -18,7 +18,10 @@ import type { StageMediaItem, StageCourse } from './useStageComposer';
 export interface SubmitInput {
   caption: string;
   media: StageMediaItem[];
+  /** Primary course - written to posts.course_id exactly as today. */
   course: StageCourse | null;
+  /** Full ordered tag list - written to posts.tagged_course_ids. */
+  courses?: StageCourse[];
   scheduledAt: Date | null;
   actorType: 'personal' | 'business';
   actorId: string;
@@ -105,6 +108,19 @@ export function usePostSubmit() {
       const bornObj = (born ?? {}) as { post_id?: string; status?: string; scheduled_at?: string };
       const postId = bornObj.post_id;
       if (!postId) throw new Error('create_post_v2 returned no post_id');
+
+      // Multi-course tag: write the full ordered list to posts.tagged_course_ids.
+      // The primary tag (course_id) is already set by create_post_v2 above.
+      const taggedIds = (input.courses && input.courses.length > 0)
+        ? input.courses.map((c) => c.id)
+        : (input.course ? [input.course.id] : []);
+      if (taggedIds.length > 0) {
+        const { error: tagErr } = await supabase
+          .from('posts')
+          .update({ tagged_course_ids: taggedIds } as never)
+          .eq('id', postId);
+        if (tagErr) console.warn('[post-v2] tagged_course_ids write failed:', tagErr);
+      }
 
       // Text-only or scheduled-text: single-shot. finalize is implicit on the server.
       if (!hasMedia) {

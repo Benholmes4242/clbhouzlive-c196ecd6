@@ -7,6 +7,8 @@ import { formatSchedule } from '../lib/formatSchedule';
 
 interface Props {
   course: StageCourse | null;
+  /** Full ordered tag list; when length > 1 the row shows "Name +N-1". */
+  courses?: StageCourse[];
   onOpenCourse: () => void;
   actor: ActiveActor | null;
   onOpenActor: () => void;
@@ -17,10 +19,16 @@ interface Props {
   showSchedule?: boolean;
 }
 
-export default function DetailRows({ course, onOpenCourse, actor, onOpenActor, scheduledAt, onOpenSchedule, actorLocked, showSchedule = true }: Props) {
+export default function DetailRows({ course, courses, onOpenCourse, actor, onOpenActor, scheduledAt, onOpenSchedule, actorLocked, showSchedule = true }: Props) {
+  const list = courses ?? (course ? [course] : []);
+  const courseLabel = list.length === 0
+    ? null
+    : list.length === 1
+      ? list[0].name
+      : `${list[0].name} +${list.length - 1}`;
   return (
     <div style={{ background: '#F8FAFC' }}>
-      <Row icon={<MapPin size={16} color="#F7931E" />} label="Tag a course" value={course?.name ?? null} onClick={onOpenCourse} />
+      <Row icon={<MapPin size={16} color="#F7931E" />} label="Tag a course" value={courseLabel} onClick={onOpenCourse} />
       <Row icon={<User2 size={16} color="#F7931E" />} label="Posting as" value={actor?.name ?? null} onClick={onOpenActor} disabled={actorLocked} />
       {showSchedule && (
         <Row icon={<Clock size={16} color="#F7931E" />} label="Schedule for later" value={scheduledAt ? formatSchedule(scheduledAt) : null} onClick={onOpenSchedule} />
