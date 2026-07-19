@@ -19885,6 +19885,14 @@ export type Database = {
         }
         Returns: undefined
       }
+      set_member_public_visibility: {
+        Args: {
+          _business_id: string
+          _is_public: boolean
+          _member_user_id: string
+        }
+        Returns: undefined
+      }
       set_typing_indicator: {
         Args: { p_conversation_id: string }
         Returns: undefined

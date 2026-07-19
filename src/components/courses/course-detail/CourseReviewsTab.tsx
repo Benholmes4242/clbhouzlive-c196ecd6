@@ -297,6 +297,14 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       caption: review.review || '',
       mediaItems,
       createdAt: review.review_date || new Date().toISOString(),
+      // ⚠️ HARDCODED 0/false engagement fields.
+      // SAFE ONLY because CourseReviewsTab opens the fullscreen viewer with
+      // readOnly:true — likes/comments UI is suppressed and no mutation
+      // paths can fire against these stub values. If this surface is ever
+      // switched to an interactive viewer, wire real engagement (fetch
+      // like_count / comment_count / is_liked_by_me for the review's
+      // underlying post) BEFORE flipping readOnly off, or every viewed
+      // review will appear zeroed and any like will patch a stale delta.
       likeCount: 0,
       commentCount: 0,
       shareCount: 0,
