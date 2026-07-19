@@ -377,16 +377,6 @@ export default function BusinessTeamPage() {
         confirmText="Remove"
         confirmVariant="destructive"
       />
-
-      {titleSheet.member && businessId && (
-        <JobTitleSheet
-          open={titleSheet.open}
-          onClose={() => setTitleSheet({ open: false, member: null })}
-          businessId={businessId}
-          memberUserId={titleSheet.member.user_profile_id}
-          currentTitle={titleSheet.member.job_title ?? null}
-        />
-      )}
     </ManagePageShell>
   );
 }
