@@ -96,8 +96,20 @@ function fmtThru(thru: number | null | undefined): string {
   return String(thru);
 }
 
-export function todayFromEntry(e: BoardEntry): number | null {
-  if (e.today != null) return e.today;
+export function todayFromEntry(
+  e: BoardEntry,
+  currentRound?: number | null,
+): number | null {
+  if (e.today != null) {
+    if (
+      e.today_round == null ||
+      currentRound == null ||
+      e.today_round === currentRound
+    ) {
+      return e.today;
+    }
+    return null;
+  }
   const roundNum = [e.round_1, e.round_2, e.round_3, e.round_4].filter(
     (r) => r != null,
   ).length;
