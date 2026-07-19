@@ -403,6 +403,7 @@ interface ChampionRowProps {
   name: string;
   country?: string | null;
   score: string;
+  today?: number | null;
   playoffWin?: boolean;
   avatarUrl?: string | null;
   isLast?: boolean;
@@ -412,17 +413,20 @@ export function ChampionRow({
   name,
   country,
   score,
+  today,
   playoffWin,
   avatarUrl,
   isLast,
 }: ChampionRowProps) {
   const { t } = useTranslation('tourhub');
   const championLabel = t('overview.leaderRow.championIconLabel');
+  const todayDisplay = today != null ? (today === 0 ? 'E' : today > 0 ? `+${today}` : String(today)) : '—';
+  const todayColor = today != null ? liveScoreColour(todayDisplay) : INK_45;
   return (
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: '32px 1fr auto 42px',
+        gridTemplateColumns: '32px 1fr 42px 42px auto',
         gap: 12,
         padding: '14px 20px',
         alignItems: 'center',
@@ -480,17 +484,6 @@ export function ChampionRow({
       <span
         style={{
           ...NUMERIC_STYLE,
-          fontSize: 22,
-          fontWeight: 700,
-          color: GOLD_DARK,
-          letterSpacing: '-0.02em',
-        }}
-      >
-        {score}
-      </span>
-      <span
-        style={{
-          ...NUMERIC_STYLE,
           fontSize: 11,
           fontWeight: 700,
           color: INK_45,
@@ -500,6 +493,29 @@ export function ChampionRow({
         {/* NEVER-KEY: thru/score token */}
         {/* eslint-disable-next-line i18next/no-literal-string */}
         F
+      </span>
+      <span
+        style={{
+          ...NUMERIC_STYLE,
+          fontSize: 13,
+          fontWeight: 700,
+          color: todayColor,
+          textAlign: 'right',
+        }}
+      >
+        {todayDisplay}
+      </span>
+      <span
+        style={{
+          ...NUMERIC_STYLE,
+          fontSize: 22,
+          fontWeight: 700,
+          color: GOLD_DARK,
+          letterSpacing: '-0.02em',
+          textAlign: 'right',
+        }}
+      >
+        {score}
       </span>
     </div>
   );
