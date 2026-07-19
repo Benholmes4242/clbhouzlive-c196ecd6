@@ -298,7 +298,7 @@ function CommentsSheetV2Inner({
             <CommentComposer
               replyingTo={replyingTo}
               onClearReply={() => setReplyingTo(null)}
-              onSubmit={onSubmit as any}
+              onSubmit={onSubmit}
               isSubmitting={addComment.isPending}
             />
           </motion.div>
