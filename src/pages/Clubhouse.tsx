@@ -299,14 +299,8 @@ const ClubhouseContent = () => {
     },
   });
   
-  // ── Carousel media index ──
-  const activeMediaCount = activePost?.mediaItems?.length ?? 0;
-  
-  // ── Navigation to profile ──
-  const handleViewProfile = useCallback(() => {
-    if (!activePost) return;
-    navigate(getActorRouteByType(activePost.actorType, activePost.actorId));
-  }, [activePost, navigate]);
+
+
 
   // Season Recap Modal
   const { data: seasonRecap } = useSeasonRecap(user?.id);
