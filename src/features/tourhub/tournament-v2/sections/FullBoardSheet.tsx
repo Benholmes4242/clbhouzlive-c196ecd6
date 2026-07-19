@@ -110,7 +110,7 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
 
         </div>
 
-        <div style={{ overflowY: 'auto', flex: 1, minHeight: 0 }}>
+        <div style={{ overflowY: 'auto', flex: 1, minHeight: 0, paddingBottom: 'calc(24px + env(safe-area-inset-bottom, 0px))' }}>
           <BoardTable
             entries={entries}
             cutState={cutState}

@@ -180,7 +180,7 @@ function HolesSheet({
           </div>
         </div>
 
-        <div style={{ overflowY: 'auto', flex: 1, minHeight: 0, paddingBottom: 16 }}>
+        <div style={{ overflowY: 'auto', flex: 1, minHeight: 0, paddingBottom: 'calc(24px + env(safe-area-inset-bottom, 0px))' }}>
           {isLoading || !hardest || !easiest ? (
             <div style={{ padding: '24px 16px', fontSize: 12.5, fontWeight: 600, color: INK_FAINT }}>
               {t('tournament.course.roundEmpty', { ns: 'tourhub', defaultValue: 'No scoring data for this round yet.' })}
