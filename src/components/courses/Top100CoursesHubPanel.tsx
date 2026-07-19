@@ -310,7 +310,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
           </div>
 
           {/* Meta row */}
-          {!isLoading && allCourses.length > 0 && (
+          {!isLoading && !isError && allCourses.length > 0 && (
             <div className="flex items-center justify-between gap-3">
               <span style={{
                 fontSize: 13, color: INK_MUTE, flex: 1, lineHeight: 1.35,
