@@ -23,7 +23,9 @@ import { Virtuoso, type VirtuosoHandle, type StateSnapshot } from 'react-virtuos
 import type { FeedPost } from '@/components/media-system/types/media';
 import type { ActiveActor } from '@/types/actor';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { openWithOrigin } from '@/lib/openWithOrigin';
 import { openFsv2 } from '@/features/fsv2';
+import { FLAGS } from '@/config/flags';
 import { isPerfEnabled } from '@/perf/navTiming';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { registerNavScroller } from '@/hooks/useScrollDirection';
@@ -563,13 +565,30 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
           });
         }).catch(() => {});
       }
-      openFsv2({
-        openedFrom: 'clubhouse',
-        posts,
-        startIndex: idx,
-        mediaId: mediaId ?? null,
-        mediaIndex,
-      });
+      if (FLAGS.fsv2) {
+        openFsv2({
+          openedFrom: 'clubhouse',
+          posts,
+          startIndex: idx,
+          mediaId: mediaId ?? null,
+          mediaIndex,
+        });
+        return;
+      }
+      if (origin?.el) {
+        openWithOrigin({
+          openedFrom: 'clubhouse',
+          posts,
+          index: idx,
+          originEl: origin.el,
+          posterUrl: origin.posterUrl ?? null,
+          mediaId: mediaId ?? null,
+          mediaIndex,
+          railOwnerKey: ownerKey ?? null,
+        });
+      } else {
+        openFullscreen(posts, idx, { mediaId: mediaId ?? null, openedFrom: 'clubhouse' });
+      }
     },
     [posts, setActiveIndex, setCarouselPosition, openFullscreen, tab, playingIdx],
   );

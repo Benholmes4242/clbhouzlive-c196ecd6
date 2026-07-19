@@ -9,10 +9,14 @@
  * default) and applies the current route's chrome (v1 defect 14).
  */
 
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import { useSetChromeSuppressed } from '@/features/chrome-v2/leftOverride';
+import {
+  lockBodyScroll,
+  unlockBodyScroll,
+} from '@/lib/bodyScrollLock';
 import {
   setStatusBarStyleColor,
   resetShieldToTransparent,
@@ -49,38 +53,6 @@ function getSafeAreaBottom(): number {
   const n = parseFloat(v);
   if (Number.isFinite(n) && n > 0) return n;
   return 16;
-}
-
-function lockFsv2ViewportScroll(): () => void {
-  if (typeof document === 'undefined') return () => {};
-  const { body, documentElement: html } = document;
-  const prev = {
-    bodyOverflow: body.style.overflow,
-    bodyOverscrollBehavior: body.style.overscrollBehavior,
-    bodyTouchAction: body.style.touchAction,
-    htmlOverflow: html.style.overflow,
-    htmlOverscrollBehavior: html.style.overscrollBehavior,
-    htmlTouchAction: html.style.touchAction,
-  };
-
-  // Do NOT use the shared bodyScrollLock here. It freezes body at
-  // top:-scrollY; on iOS/WKWebView that can offset fixed descendants, so
-  // opening after page scroll leaves only a top strip of the fullscreen media.
-  body.style.overflow = 'hidden';
-  body.style.overscrollBehavior = 'none';
-  body.style.touchAction = 'none';
-  html.style.overflow = 'hidden';
-  html.style.overscrollBehavior = 'none';
-  html.style.touchAction = 'none';
-
-  return () => {
-    body.style.overflow = prev.bodyOverflow;
-    body.style.overscrollBehavior = prev.bodyOverscrollBehavior;
-    body.style.touchAction = prev.bodyTouchAction;
-    html.style.overflow = prev.htmlOverflow;
-    html.style.overscrollBehavior = prev.htmlOverscrollBehavior;
-    html.style.touchAction = prev.htmlTouchAction;
-  };
 }
 
 export const Fsv2Overlay: React.FC = () => {
@@ -122,11 +94,11 @@ export const Fsv2Overlay: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [openId]);
 
-  // Viewport scroll lock + chrome/status-bar orchestration
+  // Body-scroll lock + chrome/status-bar orchestration
   const shieldPrevRef = useRef<string>('transparent');
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!isOpen) return;
-    const unlockViewportScroll = lockFsv2ViewportScroll();
+    lockBodyScroll();
     document.body.classList.add('route-fullscreen-overlay');
     shieldPrevRef.current = currentShieldColor;
     ensureStatusBarOverlayBooted();
@@ -135,7 +107,7 @@ export const Fsv2Overlay: React.FC = () => {
 
     const startPath = location.pathname;
     return () => {
-      unlockViewportScroll();
+      unlockBodyScroll();
       document.body.classList.remove('route-fullscreen-overlay');
       resetShieldToTransparent();
       try { applyRouteChrome(startPath, true); } catch { /* ignore */ }
@@ -222,8 +194,8 @@ export const Fsv2Overlay: React.FC = () => {
       style={{
         position: 'fixed',
         inset: 0,
-        width: '100vw',
-        height: '100dvh',
+        width: vp.width,
+        height: vp.height,
         background: FSV2.BACKDROP,
         zIndex: 2147483000,
         opacity: visible ? 1 : 0,

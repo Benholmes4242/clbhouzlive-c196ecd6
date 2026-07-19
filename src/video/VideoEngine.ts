@@ -1198,41 +1198,7 @@ class VideoEngineImpl {
     return false;
   }
 
-  /**
-   * Overlay bridge — decoder starvation escape hatch.
-   *
-   * When fsv2 opens, iOS/WKWebView's decoder pool is saturated by the
-   * feed/rail lanes still holding sources. Every lane pauses, detaches its
-   * source (via the standard `release()` path — hls stopLoad+detach+rebind,
-   * or removeAttribute+load for native HLS), and is marked idle. The next
-   * activation flow re-acquires normally.
-   *
-   * Returns the number of lanes whose source was actually detached.
-   */
-  releaseAllForOverlay(): number {
-    let detached = 0;
-    this.lanes.forEach((lane) => {
-      const hadSrc = !!lane.hlsUrl || !!lane.el.getAttribute('src') || (lane.hls != null);
-      try { lane.el.pause(); } catch { /* noop */ }
-      try {
-        this.release(lane.id);
-        if (hadSrc) detached += 1;
-      } catch { /* noop */ }
-    });
-    return detached;
-  }
-
-  /**
-   * Overlay bridge — post-close nudge. Feed activation naturally re-acquires
-   * the current lane, so this is intentionally a no-op today. Kept as an
-   * explicit hook so we can wire a re-arm later without churning callers.
-   */
-  restoreAfterOverlay(): void {
-    /* no-op: feed activation flow re-acquires on close */
-  }
-
 }
-
 
 export const VideoEngine = new VideoEngineImpl();
 export type { LaneId } from './lanePolicy';

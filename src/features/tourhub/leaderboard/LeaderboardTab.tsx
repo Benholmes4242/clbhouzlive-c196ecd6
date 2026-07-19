@@ -433,9 +433,9 @@ export function LeaderboardTab() {
       >
         <div style={{ width: 52, flexShrink: 0, whiteSpace: 'nowrap' }}>{t('board.columns.pos')}</div>
         <div style={{ flex: 1, minWidth: 0, whiteSpace: 'nowrap' }}>{t('board.columns.player')}</div>
+        <div style={{ width: 44, flexShrink: 0, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('board.columns.tot')}</div>
         <div style={{ width: 44, flexShrink: 0, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('board.columns.thru')}</div>
         <div style={{ width: 44, flexShrink: 0, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('board.columns.today')}</div>
-        <div style={{ width: 44, flexShrink: 0, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('board.columns.tot')}</div>
       </div>
 
       {/* BOARD */}

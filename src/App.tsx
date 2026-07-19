@@ -52,7 +52,7 @@ import { PendingPostsController } from '@/uploads/PendingPostsController';
 import UploadProgressBanner from '@/components/uploads/UploadProgressBanner';
 import GlobalBottomNavigation from '@/components/GlobalBottomNavigation';
 import { GlobalPostComposer } from '@/components/post-composer/GlobalPostComposer';
-
+import { FullscreenFeedOverlay } from '@/components/fullscreen-feed/FullscreenFeedOverlay';
 import { ReviewBottomSheetPortal } from '@/components/posts/ReviewBottomSheetPortal';
 import { RequestCourseSheetHost } from '@/components/courses/RequestCourseSheetHost';
 
@@ -64,8 +64,6 @@ import { useUploadGuard } from '@/hooks/useUploadGuard';
 import { FLAGS } from '@/config/flags';
 import { FEATURE_FLAGS } from '@/config/featureFlags';
 import { Fsv2Overlay } from '@/features/fsv2';
-import '@/lib/fsv2Bridge';
-
 
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
 import { CoursesListSkeleton } from '@/components/skeletons/CoursesListSkeleton';
@@ -934,8 +932,9 @@ const AppInner: React.FC = () => {
                                             <Suspense fallback={null}>
                                               <MiniPlayer />
                                             </Suspense>
-                                            {/* Fullscreen Viewer V2 - single overlay portal */}
-                                            <Fsv2Overlay />
+                                            {/* Fullscreen Feed Overlay - portal-based, renders above everything */}
+                                            <FullscreenFeedOverlay />
+                                            {FLAGS.fsv2 ? <Fsv2Overlay /> : null}
                                             
                                             {/* Unified ReviewBottomSheet portal — single mount, store-driven */}
                                             <ReviewBottomSheetPortal />

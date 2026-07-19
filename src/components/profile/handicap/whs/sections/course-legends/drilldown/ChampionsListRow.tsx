@@ -1,6 +1,6 @@
 import { GAM } from '../../../gam/tokens';
 import React from 'react';
-
+import { Crown } from 'lucide-react';
 import { MovementCell } from './_shared/MovementCell';
 
 /**
@@ -155,15 +155,8 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
       }}
     >
       {rank === 1 ? (
-        <div
-          aria-label="Champion"
-          style={{
-            fontSize: 13,
-            lineHeight: 1,
-            textAlign: 'right',
-          }}
-        >
-          {'\u{1F3C6}'}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', lineHeight: 0 }} aria-label="Champion">
+          <Crown size={15} strokeWidth={2.5} fill={GAM.GOLD} style={{ color: GAM.DEEP_AMBER, flexShrink: 0 }} />
         </div>
       ) : (
         <div

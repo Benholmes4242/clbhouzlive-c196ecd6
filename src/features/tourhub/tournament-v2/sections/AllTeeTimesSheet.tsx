@@ -88,7 +88,7 @@ export function AllTeeTimesSheet({
           </div>
         </div>
 
-        <div style={{ overflowY: 'auto', flex: 1, minHeight: 0, paddingBottom: 'calc(24px + env(safe-area-inset-bottom, 0px))' }}>
+        <div style={{ overflowY: 'auto', flex: 1, minHeight: 0 }}>
           {!isDrawn ? (
             <div style={{ padding: '24px 16px' }}>
               <div style={{ fontSize: 12.5, fontWeight: 600, color: INK_MUTE, lineHeight: 1.5 }}>

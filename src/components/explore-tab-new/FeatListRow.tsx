@@ -55,14 +55,12 @@ interface Props {
   mode?: RecordsMode;
   bestToPar?: number | null;
   maxCount?: number | null;
-  /** When true, rank 1 renders the trophy emoji in place of the numeral "1". */
-  crownLeader?: boolean;
 }
 
 // Canonical sheet/page leaderboard row. Refinement token spec applied:
 // rank 11/600, name 13/600, subline 11/500, value 15/700 (amber champion,
 // ink others), microlabel 9/600/0.06em, bar 3px solid amber (8% floor).
-export function FeatListRow({ row, tier, onTap, index = 0, mode = 'latest', bestToPar = null, maxCount = null, crownLeader = false }: Props) {
+export function FeatListRow({ row, tier, onTap, index = 0, mode = 'latest', bestToPar = null, maxCount = null }: Props) {
   const holder = useMemo(() => formatHolderName(row.holder_name), [row.holder_name]);
   const when = relDate(row.play_date ?? row.attained_at ?? null);
   const rank = index + 1;
@@ -154,19 +152,19 @@ export function FeatListRow({ row, tier, onTap, index = 0, mode = 'latest', best
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 11, minWidth: 0 }}>
         <div
-          className={legendaryChampion && !(crownLeader && isTop) ? 'clbhouz-gold-shimmer-light' : undefined}
+          className={legendaryChampion ? 'clbhouz-gold-shimmer-light' : undefined}
           style={{
             width: 20,
             textAlign: 'center',
             flexShrink: 0,
-            fontSize: crownLeader && isTop ? 13 : 11,
+            fontSize: 11,
             fontWeight: 600,
-            ...(crownLeader && isTop ? {} : { fontVariantNumeric: 'tabular-nums' as const }),
+            fontVariantNumeric: 'tabular-nums',
             lineHeight: 1,
-            ...(legendaryChampion && !(crownLeader && isTop) ? {} : { color: isTop ? AMBER : INK_RANK }),
+            ...(legendaryChampion ? {} : { color: isTop ? AMBER : INK_RANK }),
           }}
         >
-          {crownLeader && isTop ? '\u{1F3C6}' : rank}
+          {rank}
         </div>
         <div style={{ flexShrink: 0 }}>
           <SquircleAvatar

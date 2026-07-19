@@ -208,7 +208,6 @@ function summarize(sample: HudEntry | null): string {
       chain?: Array<{ op: string; disp: string; vis: string }>;
     };
     hit?: { tag?: string; isVideo?: boolean };
-    mediaCensus?: { videoEls?: number; withSrcCount?: number };
   };
   const v = s.video;
   if (!v) return 'no video registered';
@@ -218,10 +217,6 @@ function summarize(sample: HudEntry | null): string {
     || chain.find((c) => c.disp === 'none' || c.vis === 'hidden');
   const hitTag = s.hit?.tag ?? '?';
   const hitVideo = s.hit?.isVideo ? '✓VIDEO' : `⚠ ${hitTag}`;
-  const census = s.mediaCensus;
-  const censusStr = census
-    ? `CENSUS ${census.withSrcCount}/${census.videoEls}`
-    : '';
   return [
     `CONN ${v.connected ? '✓' : '✗'}`,
     `RECT ${v.rect?.w}×${v.rect?.h}`,
@@ -231,11 +226,9 @@ function summarize(sample: HudEntry | null): string {
     `Δframes ${v.frameDelta ?? '?'}`,
     `IO ${v.ioRatio}`,
     `HIT ${hitVideo}`,
-    censusStr,
     `OPCHAIN ${opChain}`,
     badAncestor ? `⚠ ANCESTOR op=${badAncestor.op} disp=${badAncestor.disp} vis=${badAncestor.vis}` : '',
   ].filter(Boolean).join('  ');
 }
-
 
 export default Fsv2DebugHUD;

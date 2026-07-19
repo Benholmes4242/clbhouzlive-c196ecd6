@@ -7,7 +7,9 @@ import { Play } from 'lucide-react';
 import { useUserCourseMoments } from '@/hooks/useUserCourseMoments';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileData } from '@/hooks/useProfileData';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { openFsv2 } from '@/features/fsv2';
+import { FLAGS } from '@/config/flags';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import type { FeedPost } from '@/components/media-system/types/media';
 
@@ -63,12 +65,19 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
 
   const handleMomentTap = useCallback((index: number) => {
     if (fullscreenPosts.length === 0) return;
-    openFsv2({
-      posts: fullscreenPosts,
-      startIndex: index,
-      openedFrom: 'course-moments',
-      readOnly: true,
-    });
+    if (FLAGS.fsv2) {
+      openFsv2({
+        posts: fullscreenPosts,
+        startIndex: index,
+        openedFrom: 'course-moments',
+        readOnly: true,
+      });
+    } else {
+      useFullscreenFeedStore.getState().open(fullscreenPosts, index, {
+        readOnly: true,
+        openedFrom: 'course-moments',
+      });
+    }
   }, [fullscreenPosts]);
 
   if (isLoading) {
