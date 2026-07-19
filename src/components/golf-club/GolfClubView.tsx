@@ -317,9 +317,22 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   />;
 };
 
+interface CourseOverlayShape {
+  name: string;
+  country?: string | null;
+  global_rank?: number | null;
+  regional_rank?: number | null;
+  usa_rank?: number | null;
+  [key: string]: unknown;
+}
+interface CourseMetaShape {
+  course_cr?: number | null;
+  course_slope?: number | null;
+  [key: string]: unknown;
+}
 interface CourseTitleOverlayProps {
-  course: any;
-  courseMeta: any;
+  course: CourseOverlayShape;
+  courseMeta: CourseMetaShape | null | undefined;
 }
 
 const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({ course, courseMeta }) => (
