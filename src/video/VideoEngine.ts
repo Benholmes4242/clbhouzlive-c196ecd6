@@ -702,7 +702,11 @@ class VideoEngineImpl {
       const target = startPosition > 0 ? startPosition : 0;
       const now = lane.el.currentTime || 0;
       const needsResumeSeek = target > 0 && Math.abs(now - target) > 0.35;
-      if (needsResumeSeek) {
+      const sameReturn = this.sameElementReturn.delete(laneId);
+      if (sameReturn) {
+        DBG(laneId, 'skip resume seek: same-element borrow return', { now, target });
+      }
+      if (needsResumeSeek && !sameReturn) {
         // Same source, different desired playhead. A warm skip must still seek
         // before surfaces reveal this lane; otherwise React sees the stale
         // firstFrame=true snapshot for one paint and users get a frame-0/old-
