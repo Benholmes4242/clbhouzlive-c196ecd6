@@ -32,10 +32,10 @@ export function ImmersiveSuccessShell({ onTapClose, showTapHint, padded = true, 
   useLayoutEffect(() => {
     const shield = document.getElementById('safe-area-shield');
     if (shield) shield.style.backgroundColor = 'transparent';
-    try { setStatusBarStyleColor('light', '00000000'); } catch {}
+    try { setStatusBarStyleColor('light', '00000000'); } catch { /* status bar best-effort */ }
     return () => {
       if (shield) shield.style.backgroundColor = 'transparent';
-      try { applyRouteChrome(window.location.pathname, true); } catch {}
+      try { applyRouteChrome(window.location.pathname, true); } catch { /* chrome re-resolve best-effort */ }
     };
   }, []);
 
