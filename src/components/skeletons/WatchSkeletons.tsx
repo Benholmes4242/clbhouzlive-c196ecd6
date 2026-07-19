@@ -26,8 +26,8 @@ export function WatchHubSkeleton() {
     >
       {/* Destination doors row */}
       <div style={{ display: 'flex', gap: 10, padding: '0 4px 16px' }}>
-        <Block style={{ flex: 1, height: 96, borderRadius: 14 }} />
-        <Block style={{ flex: 1, height: 96, borderRadius: 14 }} />
+        <Block style={{ flex: 1, height: 60, borderRadius: 14 }} />
+        <Block style={{ flex: 1, height: 60, borderRadius: 14 }} />
       </div>
 
       {/* Long form rail */}
