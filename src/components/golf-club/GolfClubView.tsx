@@ -300,7 +300,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
           className="sticky bg-background"
           style={{ top: 0, zIndex: 20, paddingTop: 'env(safe-area-inset-top, 0px)' }}
         >
-          <CourseTabs activeTab={activeTab as any} onChange={handleTabChange as any} />
+          <CourseTabs activeTab={activeTab} onChange={handleTabChange} />
         </div>
         {tabContent}
       </div>
