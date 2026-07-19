@@ -518,7 +518,9 @@ const ClubhouseContent = () => {
         <>
           {(() => {
             const isEditorial = activePost.postType === 'course_of_week_card';
-            const editorialId = isEditorial ? (activePost as any).cardData?.cardId : null;
+            const editorialId = isEditorial
+              ? (activePost as { cardData?: { cardId?: string } }).cardData?.cardId ?? null
+              : null;
             return (
               <CommentsSheetV2
                 isOpen={commentsOpen}
