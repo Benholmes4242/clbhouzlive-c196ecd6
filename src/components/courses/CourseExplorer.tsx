@@ -129,7 +129,7 @@ async function fetchCoursePage({ selectedRegion, selectedSubregion, debouncedSea
       throw error;
     }
 
-    const courses = (data || []) as any[];
+    const courses = (data || []) as ExploreCourseRow[];
 
     // For first page we need a count – do a lightweight count query
     let totalCount: number | null = null;
