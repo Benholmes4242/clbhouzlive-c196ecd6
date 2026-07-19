@@ -286,15 +286,16 @@ class VideoEngineImpl {
     this.borrowedLanes.delete(laneId);
     DBG('clearBorrowed', { laneId });
     logAudio('borrow.cleared', { laneId, msSinceOpen: msSinceOpen() });
-    // Handback = session semantics: the resuming inline tile follows the
-    // current session mute state, not the lane's declared policy. This keeps
-    // audio continuous when the user was hearing sound before the tap, and
-    // silent when the session is muted. The declared policy re-asserts
-    // naturally at the next mount / policy application. Routing through
-    // setMuted preserves the ONE_UNMUTED_LANE invariant.
+    // Handback returns the lane muted and audio-neutral. The returned lane
+    // is about to be rotated/idled by the feed's post-close activation flow;
+    // a muted return can never steal the ONE_UNMUTED_LANE slot from whichever
+    // lane the feed actually promotes. The feed's activation path
+    // (play() → applyAudioPolicy trigger='activation') then applies session
+    // policy to whichever lane actually speaks, unmuting the true speaker
+    // via the same invariant-respecting setMuted route.
     const lane = this.lanes.get(laneId);
     if (lane) {
-      this.setMuted(laneId, useSessionAudio.getState().isMuted);
+      this.setMuted(laneId, true);
       logAudio('handback.done', {
         laneId,
         elMutedAfter: lane.el.muted,
