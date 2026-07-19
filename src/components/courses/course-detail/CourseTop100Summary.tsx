@@ -87,7 +87,7 @@ export function CourseTop100Summary({ userId }: CourseTop100SummaryProps) {
 
       {/* Mini progress cards for each list */}
       <div className="grid grid-cols-2 gap-3">
-        {listsToShow.map((list: any) => {
+        {listsToShow.map((list: Top100ListProgress) => {
           const percentage = list.total > 0 ? (list.played / list.total) * 100 : 0;
 
           return (
