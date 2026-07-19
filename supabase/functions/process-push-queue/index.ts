@@ -11,8 +11,17 @@ async function sendPush(
   data: Record<string, unknown>,
   appId: string,
   apiKey: string,
-  idempotencyKey: string
+  idempotencyKey: string,
+  badgeCount: number | null
 ): Promise<{ success: boolean; error?: string }> {
+  // iOS badge: always SetTo (never Increase) so it mirrors the app's
+  // Alerts unread count. If we couldn't compute the count, omit the
+  // number but still send SetTo to avoid runaway lifetime increments.
+  const badgeFields: Record<string, unknown> = { ios_badgeType: 'SetTo' };
+  if (typeof badgeCount === 'number' && badgeCount >= 0) {
+    badgeFields.ios_badgeCount = badgeCount;
+  }
+
   const response = await fetch('https://onesignal.com/api/v1/notifications', {
     method: 'POST',
     headers: {
@@ -27,8 +36,7 @@ async function sendPush(
       contents: { en: body || '' },
       data: data || {},
       external_id: idempotencyKey,
-      ios_badgeType: 'Increase',
-      ios_badgeCount: 1,
+      ...badgeFields,
       priority: 10,
       ttl: 86400,
     }),
@@ -40,6 +48,7 @@ async function sendPush(
   }
   return { success: false, error: result.errors?.join(', ') || 'OneSignal error' };
 }
+
 
 serve(async (req) => {
   const corsHeaders = corsFor(req.headers.get('Origin'));
