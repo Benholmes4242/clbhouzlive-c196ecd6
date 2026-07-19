@@ -176,6 +176,10 @@ serve(async (req) => {
         const targetUrl = route.startsWith('http') ? route : `${APP_ORIGIN}${route}`;
         const outgoingData = { ...data, route, targetUrl };
 
+        const badgeCount = unreadByUser.has(item.user_id)
+          ? unreadByUser.get(item.user_id) ?? null
+          : null;
+
         const result = await sendPush(
           externalId,
           item.title,
@@ -183,8 +187,10 @@ serve(async (req) => {
           outgoingData,
           ONESIGNAL_APP_ID,
           ONESIGNAL_API_KEY,
-          item.id
+          item.id,
+          badgeCount
         );
+
 
 
         if (result.success) {
