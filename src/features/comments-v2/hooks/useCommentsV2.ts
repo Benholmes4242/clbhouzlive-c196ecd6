@@ -309,7 +309,7 @@ export function useCommentsV2({
         p_actor_id: input.actorId ?? actorId,
       });
       if (error) throw error;
-      return data as any;
+      return data as unknown;
     },
     onSuccess: () => {
       // Server trigger `comments_v2_count_inc` bumps posts.comment_count
