@@ -293,6 +293,9 @@ class VideoEngineImpl {
       this.borrowGuardDetach.delete(laneId);
     }
     this.borrowedLanes.delete(laneId);
+    // Same-element return: the next load() on this lane must not seek from
+    // stale lastPos. The element's currentTime is the authority.
+    this.sameElementReturn.add(laneId);
     DBG('clearBorrowed', { laneId });
     logAudio('borrow.cleared', { laneId, msSinceOpen: msSinceOpen() });
     // Handback returns the lane muted and audio-neutral. The returned lane
