@@ -524,70 +524,72 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
         </div>
       )}
 
-      {/* Line */}
+      {/* Caption row (merged with former 30D/SCORE header) */}
       <div
         style={{
+          display: 'grid',
+          gridTemplateColumns: CHAMPS_GRID_COMPACT,
+          gap: CHAMPS_GRID_GAP_COMPACT,
+          alignItems: 'end',
           marginTop: showTrack ? 8 : 12,
-          fontSize: 11,
-          fontWeight: 600,
-          color: defending ? DEEP_AMBER : INK_55,
+          marginLeft: -16,
+          marginRight: -16,
+          padding: `0 ${CHAMPS_ROW_PADDING_X}px`,
         }}
       >
-        {line}
+        <span
+          style={{
+            gridColumn: '1 / 4',
+            fontSize: 11,
+            fontWeight: 600,
+            color: defending ? DEEP_AMBER : INK_55,
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
+          {line}
+        </span>
+        {!standsAlone && inlineRows.length > 0 && (
+          <>
+            <span
+              style={{
+                textAlign: 'center',
+                fontSize: 9,
+                fontWeight: 800,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                color: INK_55,
+              }}
+            >
+              30D
+            </span>
+            <span
+              style={{
+                textAlign: 'center',
+                fontSize: 9,
+                fontWeight: 800,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                color: INK_55,
+              }}
+            >
+              SCORE
+            </span>
+          </>
+        )}
       </div>
 
       {/* Inline top 5 */}
       <div
         style={{
-          marginTop: 12,
-          paddingTop: 4,
-          borderTop: '0.5px solid var(--hcp-line)',
+          marginTop: 6,
           marginLeft: -16,
           marginRight: -16,
         }}
       >
         {standsAlone ? null : (
           <>
-            {/* Column header — matches the compact list row grid so 30D and
-                SCORE sit exactly above their columns in both themes. */}
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: CHAMPS_GRID_COMPACT,
-                gap: CHAMPS_GRID_GAP_COMPACT,
-                alignItems: 'center',
-                padding: `6px ${CHAMPS_ROW_PADDING_X}px 4px`,
-                borderBottom: '0.5px solid var(--hcp-line)',
-              }}
-            >
-              <span />
-              <span />
-              <span />
-              <span
-                style={{
-                  textAlign: 'center',
-                  fontSize: 9,
-                  fontWeight: 800,
-                  letterSpacing: '0.12em',
-                  textTransform: 'uppercase',
-                  color: INK_55,
-                }}
-              >
-                30D
-              </span>
-              <span
-                style={{
-                  textAlign: 'center',
-                  fontSize: 9,
-                  fontWeight: 800,
-                  letterSpacing: '0.12em',
-                  textTransform: 'uppercase',
-                  color: INK_55,
-                }}
-              >
-                SCORE
-              </span>
-            </div>
             {inlineRows.map((row, i) => (
               <ChampionsListRow
                 key={`${row.rank}-${i}`}
