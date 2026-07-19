@@ -11,7 +11,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { toast } from '@/lib/toast';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
-import { useCourseReviews, type ReviewsSortBy, type CourseReview, type ReviewMediaItem } from '@/hooks/useCourseReviews';
+import { useCourseReviews, type ReviewsSortBy, type ReviewsRatingFilter, type CourseReview, type ReviewMediaItem } from '@/hooks/useCourseReviews';
 import { useReviewResponses, useSubmitReviewResponse } from '@/hooks/useReviewResponses';
 import { useBusinessClaimForCourse } from '@/hooks/useBusinessClaimForCourse';
 import { ReviewBlockFlat } from '../review/ReviewBlockFlat';
