@@ -56,6 +56,7 @@ export interface ScorecardSheetTarget {
   today: number | null;
   thru: number | null;
   status?: string | null;
+  playerPhotoUrl?: string | null;
 }
 
 interface Props {
@@ -154,7 +155,7 @@ export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
         onSelect: setSelectedRound,
       } : undefined}
       playerName={target.playerName}
-      playerAvatarUrl={null}
+      playerAvatarUrl={target.playerPhotoUrl ?? null}
       playerHcp={null}
       playerHcpDelta={null}
       playerUserId={target.playerId}

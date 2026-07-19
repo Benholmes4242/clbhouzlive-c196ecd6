@@ -50,6 +50,7 @@ export interface BoardEntry {
   score: number | null;
   thru: number | null;
   today?: number | null;
+  today_round?: number | null;
   status?: string | null;
   round_1?: number | null;
   round_2?: number | null;
@@ -95,8 +96,20 @@ function fmtThru(thru: number | null | undefined): string {
   return String(thru);
 }
 
-export function todayFromEntry(e: BoardEntry): number | null {
-  if (e.today != null) return e.today;
+export function todayFromEntry(
+  e: BoardEntry,
+  currentRound?: number | null,
+): number | null {
+  if (e.today != null) {
+    if (
+      e.today_round == null ||
+      currentRound == null ||
+      e.today_round === currentRound
+    ) {
+      return e.today;
+    }
+    return null;
+  }
   const roundNum = [e.round_1, e.round_2, e.round_3, e.round_4].filter(
     (r) => r != null,
   ).length;
@@ -225,7 +238,7 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
     const totColor = demotedRow ? SECONDARY : houseColor(e.score);
     const totalDisplay = fmtScore(e.score);
     const thruDisplay = fmtThru(e.thru);
-    const todayVal = todayFromEntry(e);
+    const todayVal = todayFromEntry(e, currentRound);
     const todayDisplay = fmtScore(todayVal);
     const todayColor = demotedRow ? SECONDARY : houseColor(todayVal);
     const rounds = roundsLine(e);
