@@ -337,9 +337,10 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
       actorType: activeActor.type,
       actorId: activeActor.id,
       content: state.caption || null,
-      courseId: state.course?.id ?? null,
-      courseName: state.course?.name ?? null,
-      courseCountry: state.course?.country ?? null,
+      courseId: primaryCourse?.id ?? null,
+      courseName: primaryCourse?.name ?? null,
+      courseCountry: primaryCourse?.country ?? null,
+      courses: state.courses,
     });
     setSheet(null);
     reset();
