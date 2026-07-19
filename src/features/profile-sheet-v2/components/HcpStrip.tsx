@@ -164,17 +164,24 @@ export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
       style={stripBase}
     >
       {eyebrow}
-      <span
-        style={{
-          fontWeight: 800,
-          fontSize: 22,
-          color: INK,
-          letterSpacing: '-0.02em',
-          fontVariantNumeric: 'tabular-nums',
-        }}
-      >
-        {indexText}
-      </span>
+      {trendLoading ? (
+        <div
+          className="clb-shimmer-light rounded-sm"
+          style={{ width: 52, height: 22, background: 'rgba(15,23,42,0.06)' }}
+        />
+      ) : (
+        <span
+          style={{
+            fontWeight: 800,
+            fontSize: 22,
+            color: INK,
+            letterSpacing: '-0.02em',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {indexText}
+        </span>
+      )}
       {trendNode}
       {rounds90d != null && (
         <span style={{ fontWeight: 500, fontSize: 11, color: MUTED }}>
