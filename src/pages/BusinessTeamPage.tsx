@@ -79,6 +79,9 @@ export default function BusinessTeamPage() {
   const [removeConfirm, setRemoveConfirm] = useState<{ open: boolean; member: BusinessMember | null }>({
     open: false, member: null,
   });
+  const [titleSheet, setTitleSheet] = useState<{ open: boolean; member: BusinessMember | null }>({
+    open: false, member: null,
+  });
 
   const canManage = !!membership?.canManage;
   const pendingInvites = (invites || []).filter((i) => i.status === 'pending');
