@@ -7,8 +7,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight, Crown } from 'lucide-react';
 import type { HeroState, TopTie } from '../HybridHero.utils';
-import { fmtScore, formatRank, buildLeaderboardSlots, extractRounds } from '../HybridHero.utils';
-import { SoloLeaderRow, TiedLeadersRow, ChampionRow, TiedChasersRow } from './LeaderRow';
+import { fmtScore, formatRank, buildLeaderboardSlots, extractRounds, todayFromEntry } from '../HybridHero.utils';
+import { SoloLeaderRow, TiedLeadersRow, TiedChasersRow } from './LeaderRow';
 import { ChaserRow } from './ChaserRow';
 import { LastYearRow } from './LastYearRow';
 import { TeeTimeRow } from './TeeTimeRow';
@@ -134,7 +134,7 @@ export function LeaderboardBand({
         .map(e => ({ avatarCandidates: entryAvatars(e), playerId: entryPlayerId(e), name: entryName(e) }));
       body = (
         <>
-          <TiedLeadersRow count={tiedLeaders.count} score={tiedLeaders.score} players={tiedPlayers} />
+          <TiedLeadersRow count={tiedLeaders.count} score={tiedLeaders.score} today={todayFromEntry(leaderboard[0])} players={tiedPlayers} />
           {chasers.map((e, i) => (
             <ChaserRow
               key={i}
@@ -143,6 +143,7 @@ export function LeaderboardBand({
               country={entryCountry(e)}
               score={fmtScore(e.score)}
               thru={entryThru(e)}
+              today={todayFromEntry(e)}
               avatarCandidates={entryAvatars(e)}
               playerId={entryPlayerId(e)}
               isLast={i === chasers.length - 1}
@@ -163,6 +164,7 @@ export function LeaderboardBand({
               country={entryCountry(leader)}
               score={fmtScore(leader.score)}
               thru={entryThru(leader)}
+              today={todayFromEntry(leader)}
               avatarCandidates={entryAvatars(leader)}
               playerId={entryPlayerId(leader)}
             />
@@ -177,6 +179,7 @@ export function LeaderboardBand({
                   count={slot.count}
                   score={fmtScore(slot.score)}
                   thru="—"
+                  today={todayFromEntry(slot.members[0])}
                   players={slot.members.map((m: any) => ({ avatarCandidates: entryAvatars(m), playerId: entryPlayerId(m), name: entryName(m) }))}
                   isLast={isLast}
                   onTap={onCtaTap}
@@ -191,6 +194,7 @@ export function LeaderboardBand({
                 country={entryCountry(slot.entry)}
                 score={fmtScore(slot.entry.score)}
                 thru={entryThru(slot.entry)}
+                today={todayFromEntry(slot.entry)}
                 avatarCandidates={entryAvatars(slot.entry)}
                 playerId={entryPlayerId(slot.entry)}
                 isLast={isLast}
@@ -278,6 +282,7 @@ export function LeaderboardBand({
                   count={slot.count}
                   score={fmtScore(slot.score)}
                   thru="F"
+                  today={todayFromEntry(slot.members[0])}
                   players={slot.members.map((m: any) => ({
                     avatarCandidates: entryAvatars(m),
                     playerId: entryPlayerId(m),
@@ -300,6 +305,7 @@ export function LeaderboardBand({
                 country={entryCountry(slot.entry)}
                 score={fmtScore(slot.entry.score)}
                 thru="F"
+                today={todayFromEntry(slot.entry)}
                 avatarCandidates={entryAvatars(slot.entry)}
                 playerId={entryPlayerId(slot.entry)}
                 rounds={extractRounds(slot.entry)}

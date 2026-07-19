@@ -27,6 +27,7 @@ interface ChaserRowProps {
   country?: string | null;
   score: string;
   thru: string;
+  today?: number | null;
   /** Ordered multi-folder candidate URLs (resolvePlayerAvatarCandidates output). */
   avatarCandidates?: (string | null | undefined)[];
   /** Stable id used to derive the deterministic initials colour. */
@@ -44,6 +45,7 @@ export function ChaserRow({
   country,
   score,
   thru,
+  today,
   avatarCandidates,
   playerId,
   isResults = false,
@@ -52,11 +54,13 @@ export function ChaserRow({
   par,
 }: ChaserRowProps) {
   const hideThru = isResults;
+  const todayDisplay = today != null ? (today === 0 ? 'E' : today > 0 ? `+${today}` : String(today)) : '—';
+  const todayColor = today != null ? liveScoreColour(todayDisplay) : INK_45;
   return (
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: hideThru ? '32px 1fr 36px auto' : '32px 1fr 36px auto 42px',
+        gridTemplateColumns: hideThru ? '32px 1fr 36px auto' : '32px 1fr 36px 42px 42px auto',
         gap: 12,
         height: 40,
         padding: '8px 20px',
@@ -105,19 +109,6 @@ export function ChaserRow({
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
         <TrajectorySparkline rounds={rounds ?? []} par={par ?? 0} variant="solo" totalRounds={4} />
       </div>
-      <span
-        style={{
-          ...NUMERIC_STYLE,
-          fontSize: 16,
-          fontWeight: 700,
-          color: isResults ? INK : liveScoreColour(score),
-          letterSpacing: '-0.01em',
-          fontFeatureSettings: '"tnum" 1, "kern" 1',
-          textAlign: 'right',
-        }}
-      >
-        {score}
-      </span>
       {!hideThru && (
         <span
           style={{
@@ -131,6 +122,32 @@ export function ChaserRow({
           {thru}
         </span>
       )}
+      {!hideThru && (
+        <span
+          style={{
+            ...NUMERIC_STYLE,
+            fontSize: 13,
+            fontWeight: 700,
+            color: todayColor,
+            textAlign: 'right',
+          }}
+        >
+          {todayDisplay}
+        </span>
+      )}
+      <span
+        style={{
+          ...NUMERIC_STYLE,
+          fontSize: 16,
+          fontWeight: 700,
+          color: isResults ? INK : liveScoreColour(score),
+          letterSpacing: '-0.01em',
+          fontFeatureSettings: '"tnum" 1, "kern" 1',
+          textAlign: 'right',
+        }}
+      >
+        {score}
+      </span>
     </div>
   );
 }

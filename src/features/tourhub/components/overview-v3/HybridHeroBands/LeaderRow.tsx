@@ -19,6 +19,7 @@ import {
 import { getScoreColor } from '../../../_shared/scoreColor';
 import { AMBER_TINT_04, LEADER_GOLD_TINT_10, LEADER_GOLD_TINT_7 } from '../../../_shared/tokens';
 import { TrajectorySparkline } from './TrajectorySparkline';
+import { todayFromEntry } from '../HybridHero.utils';
 
 function liveScoreColour(s: string): string {
   if (s.startsWith('\u2212') || s.startsWith('-')) return getScoreColor(-1, 'dark', 'standard');
@@ -32,6 +33,7 @@ interface SoloLeaderRowProps {
   country?: string | null;
   score: string;
   thru: string;
+  today?: number | null;
   /** Ordered multi-folder candidate URLs (resolvePlayerAvatarCandidates output). */
   avatarCandidates?: (string | null | undefined)[];
   /** Stable id used to derive the deterministic initials colour. */
@@ -46,17 +48,20 @@ export function SoloLeaderRow({
   country,
   score,
   thru,
+  today,
   avatarCandidates,
   playerId,
   isResults = false,
   isLast = false,
 }: SoloLeaderRowProps) {
   const hideThru = isResults;
+  const todayDisplay = today != null ? (today === 0 ? 'E' : today > 0 ? `+${today}` : String(today)) : '—';
+  const todayColor = today != null ? liveScoreColour(todayDisplay) : INK_45;
   return (
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: hideThru ? '32px 1fr auto' : '32px 1fr auto 42px',
+        gridTemplateColumns: hideThru ? '32px 1fr auto' : '32px 1fr 42px 42px auto',
         gap: 12,
         padding: '14px 20px',
         alignItems: 'center',
@@ -100,18 +105,6 @@ export function SoloLeaderRow({
           {country && <CountryFlag country={country} size="sm" />}
         </div>
       </div>
-      <span
-        style={{
-          ...NUMERIC_STYLE,
-          fontSize: 22,
-          fontWeight: 700,
-          color: isResults ? GOLD_DARK : liveScoreColour(score),
-          letterSpacing: '-0.02em',
-          fontFeatureSettings: '"tnum" 1, "kern" 1',
-        }}
-      >
-        {score}
-      </span>
       {!hideThru && (
         <span
           style={{
@@ -125,6 +118,32 @@ export function SoloLeaderRow({
           {thru}
         </span>
       )}
+      {!hideThru && (
+        <span
+          style={{
+            ...NUMERIC_STYLE,
+            fontSize: 13,
+            fontWeight: 700,
+            color: todayColor,
+            textAlign: 'right',
+          }}
+        >
+          {todayDisplay}
+        </span>
+      )}
+      <span
+        style={{
+          ...NUMERIC_STYLE,
+          fontSize: 22,
+          fontWeight: 700,
+          color: isResults ? GOLD_DARK : liveScoreColour(score),
+          letterSpacing: '-0.02em',
+          fontFeatureSettings: '"tnum" 1, "kern" 1',
+          textAlign: 'right',
+        }}
+      >
+        {score}
+      </span>
     </div>
   );
 }
@@ -180,6 +199,7 @@ interface TiedChasersRowProps {
   count: number;
   score: string;
   thru: string;
+  today?: number | null;
   players: StackedAvatarPlayer[];
   par?: number;
   isLast?: boolean;
@@ -206,6 +226,7 @@ export function TiedChasersRow({
   count,
   score,
   thru,
+  today,
   players,
   par,
   isLast = false,
@@ -215,12 +236,14 @@ export function TiedChasersRow({
   const { t } = useTranslation('tourhub');
   const avgRounds = averageRounds(players);
   const hideThru = isResults;
+  const todayDisplay = today != null ? (today === 0 ? 'E' : today > 0 ? `+${today}` : String(today)) : '—';
+  const todayColor = today != null ? liveScoreColour(todayDisplay) : INK_45;
   return (
     <div
       onClick={onTap}
       style={{
         display: 'grid',
-        gridTemplateColumns: hideThru ? '32px 1fr 36px auto' : '32px 1fr 36px auto 42px',
+        gridTemplateColumns: hideThru ? '32px 1fr 36px auto' : '32px 1fr 36px 42px 42px auto',
         gap: 12,
         padding: '8px 20px',
         height: 40,
@@ -250,6 +273,16 @@ export function TiedChasersRow({
           ariaHidden
         />
       </div>
+      {!hideThru && (
+        <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 700, color: INK_45, textAlign: 'right' }}>
+          {thru}
+        </span>
+      )}
+      {!hideThru && (
+        <span style={{ ...NUMERIC_STYLE, fontSize: 13, fontWeight: 700, color: todayColor, textAlign: 'right' }}>
+          {todayDisplay}
+        </span>
+      )}
       <span
         style={{
           ...NUMERIC_STYLE,
@@ -262,11 +295,6 @@ export function TiedChasersRow({
       >
         {score}
       </span>
-      {!hideThru && (
-        <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 700, color: INK_45, textAlign: 'right' }}>
-          {thru}
-        </span>
-      )}
     </div>
   );
 }
@@ -276,20 +304,23 @@ export function TiedChasersRow({
 interface TiedLeadersRowProps {
   count: number;
   score: string;
+  today?: number | null;
   players?: StackedAvatarPlayer[];
   isLast?: boolean;
 }
 
-export function TiedLeadersRow({ count, score, players, isLast = false }: TiedLeadersRowProps) {
+export function TiedLeadersRow({ count, score, today, players, isLast = false }: TiedLeadersRowProps) {
   const { t } = useTranslation('tourhub');
   const stack: StackedAvatarPlayer[] = players && players.length > 0
     ? players
     : Array.from({ length: count }, () => ({}));
+  const todayDisplay = today != null ? (today === 0 ? 'E' : today > 0 ? `+${today}` : String(today)) : '—';
+  const todayColor = today != null ? liveScoreColour(todayDisplay) : INK_45;
   return (
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: '32px 1fr auto',
+        gridTemplateColumns: '32px 1fr 42px 42px auto',
         gap: 12,
         padding: '14px 20px',
         alignItems: 'center',
@@ -330,10 +361,35 @@ export function TiedLeadersRow({ count, score, players, isLast = false }: TiedLe
       <span
         style={{
           ...NUMERIC_STYLE,
+          fontSize: 11,
+          fontWeight: 700,
+          color: INK_45,
+          textAlign: 'right',
+        }}
+      >
+        {/* NEVER-KEY: thru/score token */}
+        {/* eslint-disable-next-line i18next/no-literal-string */}
+        —
+      </span>
+      <span
+        style={{
+          ...NUMERIC_STYLE,
+          fontSize: 13,
+          fontWeight: 700,
+          color: todayColor,
+          textAlign: 'right',
+        }}
+      >
+        {todayDisplay}
+      </span>
+      <span
+        style={{
+          ...NUMERIC_STYLE,
           fontSize: 22,
           fontWeight: 700,
           color: liveScoreColour(score),
           letterSpacing: '-0.02em',
+          textAlign: 'right',
         }}
       >
         {score}
@@ -347,6 +403,7 @@ interface ChampionRowProps {
   name: string;
   country?: string | null;
   score: string;
+  today?: number | null;
   playoffWin?: boolean;
   avatarUrl?: string | null;
   isLast?: boolean;
@@ -356,17 +413,20 @@ export function ChampionRow({
   name,
   country,
   score,
+  today,
   playoffWin,
   avatarUrl,
   isLast,
 }: ChampionRowProps) {
   const { t } = useTranslation('tourhub');
   const championLabel = t('overview.leaderRow.championIconLabel');
+  const todayDisplay = today != null ? (today === 0 ? 'E' : today > 0 ? `+${today}` : String(today)) : '—';
+  const todayColor = today != null ? liveScoreColour(todayDisplay) : INK_45;
   return (
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: '32px 1fr auto 42px',
+        gridTemplateColumns: '32px 1fr 42px 42px auto',
         gap: 12,
         padding: '14px 20px',
         alignItems: 'center',
@@ -424,17 +484,6 @@ export function ChampionRow({
       <span
         style={{
           ...NUMERIC_STYLE,
-          fontSize: 22,
-          fontWeight: 700,
-          color: GOLD_DARK,
-          letterSpacing: '-0.02em',
-        }}
-      >
-        {score}
-      </span>
-      <span
-        style={{
-          ...NUMERIC_STYLE,
           fontSize: 11,
           fontWeight: 700,
           color: INK_45,
@@ -444,6 +493,29 @@ export function ChampionRow({
         {/* NEVER-KEY: thru/score token */}
         {/* eslint-disable-next-line i18next/no-literal-string */}
         F
+      </span>
+      <span
+        style={{
+          ...NUMERIC_STYLE,
+          fontSize: 13,
+          fontWeight: 700,
+          color: todayColor,
+          textAlign: 'right',
+        }}
+      >
+        {todayDisplay}
+      </span>
+      <span
+        style={{
+          ...NUMERIC_STYLE,
+          fontSize: 22,
+          fontWeight: 700,
+          color: GOLD_DARK,
+          letterSpacing: '-0.02em',
+          textAlign: 'right',
+        }}
+      >
+        {score}
       </span>
     </div>
   );

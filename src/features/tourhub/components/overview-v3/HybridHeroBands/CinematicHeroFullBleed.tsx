@@ -24,6 +24,7 @@ import {
   fmtScore,
   formatRank,
   buildLeaderboardSlots,
+  entryToday,
   type HeroState,
   type TopTie,
 } from '../HybridHero.utils';
@@ -60,14 +61,6 @@ function entryThru(e: any): string {
   if (e?.thru === 18 || e?.thru === 'F') return 'F';
   if (e?.thru == null) return '—';
   return String(e.thru);
-}
-
-function entryToday(e: any, round: number | undefined): number | null {
-  const rounds = e?.raw_data?.rounds;
-  if (!Array.isArray(rounds) || !round || rounds.length < round) return null;
-  const r = rounds[round - 1];
-  if (!r || r.score == null) return null;
-  return r.score ?? null;
 }
 
 function avatarFor(e: any, tourSlug?: string | null): string[] {
@@ -863,6 +856,21 @@ export function CinematicHeroFullBleed({
               <span style={{ width: RANK_W, flexShrink: 0 }} />
               <span style={{ width: 26, flexShrink: 0 }} />
               <span style={{ flex: 1 }} />
+              {isLive && (
+                <span
+                  style={{
+                    ...NUMERIC_STYLE,
+                    width: COL_THRU,
+                    textAlign: 'center',
+                    fontSize: 8,
+                    fontWeight: 800,
+                    letterSpacing: '0.12em',
+                    color: 'rgba(255,255,255,0.45)',
+                  }}
+                >
+                  {t('overview.cinematic.colThru')}
+                </span>
+              )}
               {anyToday && (
                 <span
                   style={{
@@ -891,21 +899,6 @@ export function CinematicHeroFullBleed({
               >
                 {t('overview.cinematic.colTotalShort')}
               </span>
-              {isLive && (
-                <span
-                  style={{
-                    ...NUMERIC_STYLE,
-                    width: COL_THRU,
-                    textAlign: 'center',
-                    fontSize: 8,
-                    fontWeight: 800,
-                    letterSpacing: '0.12em',
-                    color: 'rgba(255,255,255,0.45)',
-                  }}
-                >
-                  {t('overview.cinematic.colThru')}
-                </span>
-              )}
             </div>
           )}
 
@@ -964,6 +957,20 @@ export function CinematicHeroFullBleed({
                   >
                     {entryName(row.entry)}
                   </span>
+                  {isLive && (
+                    <span
+                      style={{
+                        ...NUMERIC_STYLE,
+                        width: COL_THRU,
+                        textAlign: 'center',
+                        fontSize: 11,
+                        fontWeight: 600,
+                        color: 'rgba(255,255,255,0.45)',
+                      }}
+                    >
+                      {thruDisplay}
+                    </span>
+                  )}
                   {anyToday && (
                     <span
                       style={{
@@ -991,20 +998,6 @@ export function CinematicHeroFullBleed({
                   >
                     {fmtScore(row.entry?.score)}
                   </span>
-                  {isLive && (
-                    <span
-                      style={{
-                        ...NUMERIC_STYLE,
-                        width: COL_THRU,
-                        textAlign: 'center',
-                        fontSize: 11,
-                        fontWeight: 600,
-                        color: 'rgba(255,255,255,0.45)',
-                      }}
-                    >
-                      {thruDisplay}
-                    </span>
-                  )}
                 </div>
               );
             }
@@ -1049,6 +1042,7 @@ export function CinematicHeroFullBleed({
                 >
                   {label}
                 </span>
+                {isLive && <span style={{ width: COL_THRU, flexShrink: 0 }} />}
                 {anyToday && <span style={{ width: COL_TODAY, flexShrink: 0 }} />}
                 <span
                   style={{
@@ -1063,7 +1057,6 @@ export function CinematicHeroFullBleed({
                 >
                   {typeof row.score === 'number' ? fmtScore(row.score) : row.score}
                 </span>
-                {isLive && <span style={{ width: COL_THRU, flexShrink: 0 }} />}
               </div>
             );
           })}
