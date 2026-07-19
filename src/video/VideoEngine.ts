@@ -636,6 +636,8 @@ class VideoEngineImpl {
       DBG(laneId, 'unmounted');
     }
     lane.mountedHost = null;
+    // The lane detached — any pending same-element-return hint is stale.
+    this.sameElementReturn.delete(laneId);
     lane.wantPlay = false;
     if (laneId === 'fullscreen') {
       this.resetFirstFrameForLane(lane, 'unmount');
