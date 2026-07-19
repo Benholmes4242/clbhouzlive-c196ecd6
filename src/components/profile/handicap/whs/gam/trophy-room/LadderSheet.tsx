@@ -206,8 +206,13 @@ export const LadderSheet: React.FC<Props> = ({ open, onClose, owned, items, user
             const earned = owned >= lvl.medalsRequired;
             const isCurrent = level?.level === lvl.level;
             const isFuture = !earned && !isCurrent;
-            const mc = matColor(lvl.material);
-            const isLegend = lvl.level === 10;
+            const state: 'current' | 'achieved' | 'locked' = isCurrent
+              ? 'current'
+              : earned
+                ? 'achieved'
+                : 'locked';
+            const mc = levelColor(lvl, state);
+            const isSummit = lvl.level === 10;
             return (
               <div
                 key={lvl.level}
@@ -218,16 +223,16 @@ export const LadderSheet: React.FC<Props> = ({ open, onClose, owned, items, user
                   padding: '9px 11px',
                   borderRadius: 12,
                   marginBottom: 4,
-                  opacity: isFuture ? 0.45 : 1,
+                  opacity: isFuture ? 0.55 : 1,
                   background: isCurrent ? 'rgba(255,255,255,0.06)' : 'transparent',
                   border: isCurrent ? `1px solid ${mc}59` : '1px solid transparent',
                 }}
               >
-                <GemVisual material={lvl.material} size={26} />
+                <TierGlyph tierKey={lvl.key} color={mc} size={24} />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ fontSize: 13, fontWeight: 800, color: '#FFFFFF' }}>
-                      {isLegend ? 'Clubhouse Legend' : lvl.label}
+                      {lvl.label}
                     </span>
                     {isCurrent && (
                       <span
@@ -246,7 +251,7 @@ export const LadderSheet: React.FC<Props> = ({ open, onClose, owned, items, user
                       </span>
                     )}
                   </div>
-                  {isLegend && (
+                  {isSummit && (
                     <div style={{ fontSize: 9.5, color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>
                       the summit &mdash; counts every medal beyond
                     </div>
