@@ -65,14 +65,18 @@ export function useReviewSubmit() {
 
 
       // RPC returns Json — accept { rating_id } or { id } or a bare uuid.
-      const anyData = data as any;
-      const ratingId: string | undefined =
-        anyData?.rating_id ?? anyData?.id ?? (typeof anyData === 'string' ? anyData : undefined);
+      const anyData = data as { rating_id?: string; id?: string } | string | null;
+      let ratingId: string | undefined;
+      if (typeof anyData === 'string') {
+        ratingId = anyData;
+      } else if (anyData && typeof anyData === 'object') {
+        ratingId = anyData.rating_id ?? anyData.id;
+      }
       if (!ratingId) throw new Error('Submit succeeded but no rating id returned');
 
       return { ratingId, shareToFeed: state.shareToFeed };
-    } catch (e: any) {
-      setError(e?.message || 'Submit failed');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Submit failed');
       throw e;
     } finally {
       setSubmitting(false);
@@ -87,8 +91,8 @@ export function useReviewSubmit() {
         p_rating_id: ratingId,
       });
       if (error) throw error;
-    } catch (e: any) {
-      setError(e?.message || 'Delete failed');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Delete failed');
       throw e;
     } finally {
       setSubmitting(false);
