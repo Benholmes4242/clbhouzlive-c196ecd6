@@ -128,6 +128,15 @@ export function FeatListRow({ row, tier, onTap, index = 0, mode = 'latest', best
   // treatment — champagne gradient + gold-edge border, shimmer rank/value.
   const legendaryChampion = isLegendary && isTop;
 
+  // Flat, alternating-band row (mirrors the on-page Record Book / Champions).
+  // No card container: band background, 0.5px hairline separator, and a
+  // 2px gold top-rule for the champion (rank 1) — the sheet's flat analogue
+  // of the defending-champion accent used on the champions page.
+  const bandBg = index % 2 === 0 ? 'rgba(15,23,42,0.035)' : 'transparent';
+  const topRule = isTop
+    ? `2px solid ${legendaryChampion ? '#E8B530' : AMBER}`
+    : `0.5px solid rgba(15,23,42,0.08)`;
+
   return (
     <button
       type="button"
@@ -138,17 +147,9 @@ export function FeatListRow({ row, tier, onTap, index = 0, mode = 'latest', best
         flexDirection: 'column',
         alignItems: 'stretch',
         gap: 8,
-        borderRadius: 12,
-        padding: '10px 12px',
-        background: legendaryChampion
-          ? 'linear-gradient(100deg, #fff, #FFF6D8)'
-          : isTop ? 'linear-gradient(100deg, #fff, #fff6e8)' : '#fff',
-        border: legendaryChampion
-          ? '1px solid rgba(232,181,48,0.55)'
-          : isTop
-            ? '1px solid rgba(247,147,30,0.55)'
-            : '0.5px solid rgba(15,23,42,0.08)',
-        marginBottom: 6,
+        padding: '10px 16px',
+        background: bandBg,
+        borderTop: topRule,
         cursor: 'pointer',
         fontFamily: FONT,
       }}
