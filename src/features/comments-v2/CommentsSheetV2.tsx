@@ -59,7 +59,7 @@ function CommentsSheetV2Inner({
   const kb = useKeyboardHeight();
 
   const {
-    threads, totalCount, isLoading,
+    threads, totalCount, totalCountLoading, isLoading,
     fetchNextPage, hasNextPage, isFetchingNextPage,
     addComment, editComment, deleteComment, toggleLike, hideComment, reportComment,
   } = useCommentsV2({ targetType, targetId, targetSecondaryId, enabled: isOpen });
