@@ -459,7 +459,7 @@ class VideoEngineImpl {
   applyLaneAudioPolicy(laneId: LaneId): void {
     const lane = this.lanes.get(laneId);
     if (!lane) return;
-    this.applyAudioPolicy(lane);
+    this.applyAudioPolicy(lane, 'external-bind');
   }
 
   private applyAudioPolicy(lane: Lane, trigger: 'mount' | 'activation' | 'policy-change' | 'external-bind' | 'guard-reassert' | 'unknown' = 'unknown'): void {
