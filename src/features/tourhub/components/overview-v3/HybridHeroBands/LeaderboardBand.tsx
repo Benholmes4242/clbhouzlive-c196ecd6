@@ -7,7 +7,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight, Crown } from 'lucide-react';
 import type { HeroState, TopTie } from '../HybridHero.utils';
-import { fmtScore, formatRank, buildLeaderboardSlots, extractRounds, todayFromEntry, entryToday } from '../HybridHero.utils';
+import { fmtScore, formatRank, buildLeaderboardSlots, extractRounds, todayFromEntry } from '../HybridHero.utils';
 import { SoloLeaderRow, TiedLeadersRow, ChampionRow, TiedChasersRow } from './LeaderRow';
 import { ChaserRow } from './ChaserRow';
 import { LastYearRow } from './LastYearRow';
