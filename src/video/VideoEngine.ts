@@ -336,6 +336,37 @@ class VideoEngineImpl {
       const activeLane = this.lanes.get(activeLaneId);
       if (!activeLane) return;
       this.applyAudioPolicy(activeLane, 'activation');
+      // resume.position — active lane's playback position after the
+      // activation policy kick. Delta = resume - fsClose isolates the
+      // "jump-back" (positive delta = rewound; ~0 = continuous).
+      if (audioDebugEnabled()) {
+        const snap = getLastCloseSnapshot();
+        const nowT = +activeLane.el.currentTime.toFixed(3);
+        logAudio('resume.position', {
+          laneId: activeLaneId,
+          elCurrentTime: nowT,
+          fsCloseCurrentTime: snap?.fsCurrentTime ?? null,
+          delta: snap && snap.fsCurrentTime != null ? +(nowT - snap.fsCurrentTime).toFixed(3) : null,
+          when: 'activation',
+        });
+        // Second beat @ +500ms — quantifies drift after any late seeks/loads.
+        const t500 = setTimeout(() => {
+          try {
+            const lane500 = this.lanes.get(activeLaneId!);
+            if (!lane500) return;
+            const now500 = +lane500.el.currentTime.toFixed(3);
+            logAudio('resume.position', {
+              laneId: activeLaneId,
+              elCurrentTime: now500,
+              fsCloseCurrentTime: snap?.fsCurrentTime ?? null,
+              delta: snap && snap.fsCurrentTime != null ? +(now500 - snap.fsCurrentTime).toFixed(3) : null,
+              when: 'activation+500ms',
+            });
+          } catch {}
+        }, 500);
+        // Best-effort cleanup handle (no-op consumer).
+        void t500;
+      }
     };
     if (typeof requestAnimationFrame === 'function') {
       requestAnimationFrame(kick);
