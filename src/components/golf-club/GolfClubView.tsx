@@ -34,7 +34,7 @@ const asTabId = (v: unknown): CourseTabId => (VALID_TABS.includes(v as CourseTab
 interface CourseDetailRow {
   id: string;
   name: string;
-  country?: string | null;
+  country: string;
   region?: string | null;
   sub_country?: string | null;
   course_type?: string | null;
