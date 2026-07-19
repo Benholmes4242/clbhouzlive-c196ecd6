@@ -304,20 +304,23 @@ export function TiedChasersRow({
 interface TiedLeadersRowProps {
   count: number;
   score: string;
+  today?: number | null;
   players?: StackedAvatarPlayer[];
   isLast?: boolean;
 }
 
-export function TiedLeadersRow({ count, score, players, isLast = false }: TiedLeadersRowProps) {
+export function TiedLeadersRow({ count, score, today, players, isLast = false }: TiedLeadersRowProps) {
   const { t } = useTranslation('tourhub');
   const stack: StackedAvatarPlayer[] = players && players.length > 0
     ? players
     : Array.from({ length: count }, () => ({}));
+  const todayDisplay = today != null ? (today === 0 ? 'E' : today > 0 ? `+${today}` : String(today)) : '—';
+  const todayColor = today != null ? liveScoreColour(todayDisplay) : INK_45;
   return (
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: '32px 1fr auto',
+        gridTemplateColumns: '32px 1fr 42px 42px auto',
         gap: 12,
         padding: '14px 20px',
         alignItems: 'center',
@@ -358,10 +361,35 @@ export function TiedLeadersRow({ count, score, players, isLast = false }: TiedLe
       <span
         style={{
           ...NUMERIC_STYLE,
+          fontSize: 11,
+          fontWeight: 700,
+          color: INK_45,
+          textAlign: 'right',
+        }}
+      >
+        {/* NEVER-KEY: thru/score token */}
+        {/* eslint-disable-next-line i18next/no-literal-string */}
+        —
+      </span>
+      <span
+        style={{
+          ...NUMERIC_STYLE,
+          fontSize: 13,
+          fontWeight: 700,
+          color: todayColor,
+          textAlign: 'right',
+        }}
+      >
+        {todayDisplay}
+      </span>
+      <span
+        style={{
+          ...NUMERIC_STYLE,
           fontSize: 22,
           fontWeight: 700,
           color: liveScoreColour(score),
           letterSpacing: '-0.02em',
+          textAlign: 'right',
         }}
       >
         {score}
