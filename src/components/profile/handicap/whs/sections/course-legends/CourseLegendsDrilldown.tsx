@@ -115,6 +115,7 @@ interface Props {
 }
 
 export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader = false, theme = 'dark' }) => {
+  const { t } = useTranslation('courses');
   const ctx = selection;
 
 
