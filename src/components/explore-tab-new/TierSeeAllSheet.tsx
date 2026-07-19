@@ -369,7 +369,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
               No {metric === 'aces' ? 'aces' : 'albatrosses'} yet.
             </div>
           ) : (
-            <div style={{ padding: '0 16px' }}>
+            <div>
               {legendaryLeaderRows.map((r, i) => {
                 const count = r[metric] ?? 0;
                 const other = metric === 'aces' ? (r.albatrosses ?? 0) : (r.aces ?? 0);
@@ -416,7 +416,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
               No eagles yet.
             </div>
           ) : (
-            <div style={{ padding: '0 16px' }}>
+            <div>
               {eagleLeaderRows.map((r, i) => (
                 <CountLeaderSheetRow
                   key={`${r.user_id ?? r.holder_name ?? i}-${i}`}
@@ -451,7 +451,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
             None yet.
           </div>
         ) : (
-          <div style={{ padding: '0 16px' }}>
+          <div>
             {visibleRows.map((row, i) => (
               <FeatListRow
                 key={`${row.score_id ?? row.course_id ?? i}-${i}`}
