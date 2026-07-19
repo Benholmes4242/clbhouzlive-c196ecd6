@@ -15,6 +15,7 @@ import { toast } from '@/lib/toast';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { useKeyboardHeight } from '@/hooks/messaging/useKeyboardHeight';
+import type { ActiveActor } from '@/types/actor';
 
 import { useCommentsV2, type TargetType, type CommentV2 } from './hooks/useCommentsV2';
 import { useCommentsRealtimeV2 } from './hooks/useCommentsRealtimeV2';
