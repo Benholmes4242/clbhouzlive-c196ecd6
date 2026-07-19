@@ -12,12 +12,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 import { useSessionAudio } from '@/audio/sessionAudioStore';
+import { trace } from '@/perf/trace';
 
 import { FSV2 } from '../tokens';
 import { attach, withBandwidthHint, type Fsv2Source } from '../player/fsv2Player';
 import { takePreWarmed, dropPreWarmed } from '../player/audioContract';
 import { traceReveal, hudEvent } from '../perf/trace';
 import { registerVideoEl } from '../debug/hudBus';
+import { getPendingRestoreCount } from '@/lib/fsv2Bridge';
 import { WATCHDOG_MS, armWatchdog } from './Watchdogs';
 import { Fsv2TapForSoundPill } from './TapForSoundPill';
 
@@ -173,7 +175,27 @@ export const Fsv2VideoSlot: React.FC<Props> = ({
     el.addEventListener('loadeddata', onFrame);
     el.addEventListener('playing', onFrame);
 
-    hudEvent(openId, 'src.set', { hlsUrl: !!source.hlsUrl, mp4Url: !!source.mp4Url });
+    const restoresPendingAtSrcSet = getPendingRestoreCount();
+    hudEvent(openId, 'src.set', { hlsUrl: !!source.hlsUrl, mp4Url: !!source.mp4Url, restoresPendingAtSrcSet });
+    const stallProbe = setTimeout(() => {
+      if (cancelled) return;
+      if (el.readyState < 2) {
+        const ranges: Array<[number, number]> = [];
+        try {
+          for (let i = 0; i < el.buffered.length; i++) {
+            ranges.push([+el.buffered.start(i).toFixed(2), +el.buffered.end(i).toFixed(2)]);
+          }
+        } catch { /* ignore */ }
+        const payload = {
+          networkState: el.networkState,
+          readyState: el.readyState,
+          bufferedRanges: ranges,
+          restoresPendingAtSrcSet,
+        };
+        trace('fsv2.pipeline.stalled', payload);
+        hudEvent(openId, 'pipeline.stalled', payload);
+      }
+    }, 1500);
     attach(el, source, { muted: isMuted, startPosition }).then((handle) => {
       if (cancelled) { handle.detach(); return; }
       detachRef.current = handle.detach;
@@ -191,6 +213,7 @@ export const Fsv2VideoSlot: React.FC<Props> = ({
 
     return () => {
       cancelled = true;
+      clearTimeout(stallProbe);
       el.removeEventListener('loadeddata', onFrame);
       el.removeEventListener('playing', onFrame);
       detachInstr();
