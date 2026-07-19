@@ -227,6 +227,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
       const patch: Record<string, unknown> = {
         content: state.caption?.length ? state.caption : null,
         course_id: state.course?.id ?? null,
+        tagged_course_ids: state.courses.map((c) => c.id),
       };
       // Only touch scheduled_at when the post is still scheduled.
       if (editStatus?.status === 'scheduled') {
