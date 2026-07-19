@@ -188,7 +188,12 @@ class VideoEngineImpl {
   clearBorrowed(laneId: LaneId): void {
     this.borrowedLanes.delete(laneId);
     DBG('clearBorrowed', { laneId });
+    // Handback: restore the lane's declared audio policy on the element
+    // BEFORE the inline tile resumes, so rails never blast audio after close.
+    const lane = this.lanes.get(laneId);
+    if (lane) this.applyAudioPolicy(lane);
   }
+
 
   boot(laneIds: LaneId[] = DEFAULT_LANE_IDS): void {
     if (this.booted) return;
