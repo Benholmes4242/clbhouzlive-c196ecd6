@@ -10,7 +10,7 @@ import CourseAboutTab from '@/components/courses/course-detail/CourseAboutTab';
 import CourseReviewsTab from '@/components/courses/course-detail/CourseReviewsTab';
 import CourseMediaTabNew from '@/components/course-media-tab/CourseMediaTabNew';
 import CourseRankBadges from '@/components/courses/CourseRankBadges';
-import { CourseTabs } from '@/components/courses/course-detail/CourseTabs';
+import { CourseTabs, type CourseTabId } from '@/components/courses/course-detail/CourseTabs';
 import CourseDetailShellTabs from '@/features/courses/components/CourseDetailShellTabs';
 // FloatingPageHeader removed (H3) — chrome now driven by ChromeIsland registry.
 import { safeGoBack } from '@/utils/navigation';
@@ -28,33 +28,54 @@ interface GolfClubViewProps {
   onClose?: () => void;
 }
 
+const VALID_TABS: readonly CourseTabId[] = ['about', 'reviews', 'media', 'holes', 'legends'] as const;
+const asTabId = (v: unknown): CourseTabId => (VALID_TABS.includes(v as CourseTabId) ? (v as CourseTabId) : 'about');
+
+interface CourseDetailRow {
+  id: string;
+  name: string;
+  country: string;
+  region?: string | null;
+  sub_country?: string | null;
+  course_type?: string | null;
+  club_id?: string | null;
+  thumbnail_image?: string | null;
+  global_rank?: number | null;
+  regional_rank?: number | null;
+  usa_rank?: number | null;
+  [key: string]: unknown;
+}
+
 const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false, onClose }) => {
   const { user } = useSupabaseSession();
   const location = useLocation();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const queryClient = useQueryClient();
-  
-  const tabFromState = (location.state as any)?.activeTab;
+
+  const routerState = (location.state ?? null) as { activeTab?: string } | null;
+  const tabFromState = routerState?.activeTab;
   const tabFromQuery = searchParams.get('tab');
-  const initialTab = tabFromState || tabFromQuery || 'about';
-  const [activeTab, setActiveTab] = useState(initialTab);
-  
+  const initialTab: CourseTabId = asTabId(tabFromState ?? tabFromQuery ?? 'about');
+  const [activeTab, setActiveTab] = useState<CourseTabId>(initialTab);
+
   const highlightReviewId = searchParams.get('review');
-  
-  const [visitedTabs, setVisitedTabs] = useState<Set<string>>(new Set([initialTab]));
+
+  const [visitedTabs, setVisitedTabs] = useState<Set<CourseTabId>>(new Set([initialTab]));
 
   // Sync activeTab when URL/state changes (handles deep links when already mounted on this course)
   useEffect(() => {
-    const next = (location.state as any)?.activeTab || searchParams.get('tab') || 'about';
+    const nextState = (location.state ?? null) as { activeTab?: string } | null;
+    const next = asTabId(nextState?.activeTab ?? searchParams.get('tab') ?? 'about');
     setActiveTab(next);
     setVisitedTabs(prev => (prev.has(next) ? prev : new Set(prev).add(next)));
   }, [searchParams, location.state]);
 
-  const { data: course, isLoading: courseLoading } = useQuery({
+  const { data: course, isLoading: courseLoading, isError: courseError, refetch: refetchCourse } = useQuery({
     queryKey: ['course-detail', courseId],
     queryFn: async () => {
       if (!courseId) return null;
-      
+
       const { data, error } = await supabase
         .from('golf_courses')
         .select(`
@@ -71,7 +92,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         .single();
 
       if (error) throw error;
-      return data;
+      return data as CourseDetailRow;
     },
     enabled: !!courseId,
     staleTime: 5 * 60 * 1000,
@@ -80,8 +101,9 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
 
   const { isLoading: ratingStatsLoading } = useCourseRatingAggregates(courseId);
   const { data: courseMeta } = useCourseMeta(courseId);
+  void ratingStatsLoading;
 
-  const handleTabChange = useCallback((newTab: string) => {
+  const handleTabChange = useCallback((newTab: CourseTabId) => {
     setActiveTab(newTab);
     setVisitedTabs(prev => new Set(prev).add(newTab));
 
@@ -100,13 +122,35 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   }, [user?.id, courseId, queryClient, isInModal, searchParams, setSearchParams]);
 
 
-  if ((courseLoading || !course) && ratingStatsLoading) {
+  if (courseError) {
+    return (
+      <div className="min-h-screen w-full bg-background flex flex-col items-center justify-center gap-4 px-6 text-center">
+        <h2 style={{ fontSize: 17, fontWeight: 700, color: '#0F172A', margin: 0 }}>Couldn't load this course</h2>
+        <p style={{ fontSize: 13.5, color: '#64748B', margin: 0, maxWidth: 280 }}>
+          It may have been removed, or your connection dropped.
+        </p>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button
+            onClick={() => refetchCourse()}
+            style={{ background: '#0F172A', color: '#fff', border: 0, borderRadius: 999, padding: '10px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
+          >
+            Retry
+          </button>
+          <button
+            onClick={() => (isInModal && onClose ? onClose() : safeGoBack(navigate, '/courses'))}
+            style={{ background: '#fff', color: '#0F172A', border: '1px solid rgba(15,23,42,0.12)', borderRadius: 999, padding: '10px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
+          >
+            Back
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (courseLoading || !course) {
     return <CourseDetailSkeleton />;
   }
 
-  if (!course) {
-    return <CourseDetailSkeleton />;
-  }
 
   // Modal-mode hero (legacy boxed image, 306px).
   const modalHeroBlock = (
@@ -233,9 +277,9 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
                 selection={{
                   courseId: course.id,
                   courseName: course.name,
-                  courseRegion: (course as any).region ?? null,
-                  courseCountry: (course as any).country ?? null,
-                  courseType: (course as any).course_type ?? null,
+                  courseRegion: course.region ?? null,
+                  courseCountry: course.country ?? null,
+                  courseType: course.course_type ?? null,
                 }}
                 hideHeader
                 theme="light"
@@ -256,7 +300,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
           className="sticky bg-background"
           style={{ top: 0, zIndex: 20, paddingTop: 'env(safe-area-inset-top, 0px)' }}
         >
-          <CourseTabs activeTab={activeTab as any} onChange={handleTabChange as any} />
+          <CourseTabs activeTab={activeTab} onChange={handleTabChange} />
         </div>
         {tabContent}
       </div>
@@ -273,9 +317,21 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   />;
 };
 
+interface CourseOverlayShape {
+  name: string;
+  country?: string | null;
+  global_rank?: number | null;
+  regional_rank?: number | null;
+  usa_rank?: number | null;
+  [key: string]: unknown;
+}
+interface CourseMetaShape {
+  course_cr?: number | null;
+  course_slope?: number | null;
+}
 interface CourseTitleOverlayProps {
-  course: any;
-  courseMeta: any;
+  course: CourseOverlayShape;
+  courseMeta: CourseMetaShape | null | undefined;
 }
 
 const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({ course, courseMeta }) => (
@@ -335,10 +391,10 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({ course, courseM
 );
 
 interface StandaloneCourseDetailProps {
-  course: any;
-  courseMeta: any;
-  activeTab: string;
-  handleTabChange: (tab: string) => void;
+  course: CourseDetailRow;
+  courseMeta: CourseMetaShape | null | undefined;
+  activeTab: CourseTabId;
+  handleTabChange: (tab: CourseTabId) => void;
   cinematicHero: React.ReactNode;
   tabContent: React.ReactNode;
 }
@@ -384,8 +440,8 @@ const StandaloneCourseDetail: React.FC<StandaloneCourseDetailProps> = ({
         }}
       >
         <CourseDetailShellTabs
-          activeTab={activeTab as any}
-          onTabChange={handleTabChange as any}
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
         />
       </div>
       {tabContent}

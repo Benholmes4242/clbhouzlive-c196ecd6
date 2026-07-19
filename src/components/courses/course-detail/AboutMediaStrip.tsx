@@ -40,7 +40,26 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
   const maxItems = isMobile ? 3 : 9;
   const fetchLimit = isMobile ? 10 : 20;
 
-  const { data: rawMedia, isLoading: loading } = useClubMedia(clubId, fetchLimit);
+  const { data: rawMediaRaw, isLoading: loading } = useClubMedia(clubId, fetchLimit);
+
+  interface ClubMediaItem {
+    id: string;
+    sourceId?: string;
+    type: 'image' | 'video';
+    url?: string;
+    thumbnailUrl?: string;
+    width?: number;
+    height?: number;
+    duration?: number;
+    createdAt?: string;
+    author?: {
+      id?: string;
+      username?: string;
+      displayName?: string;
+      avatarUrl?: string;
+    };
+  }
+  const rawMedia = rawMediaRaw as ClubMediaItem[] | undefined;
 
   // (Removed dependency on the legacy explore adapter; tiles derive
   //  directly from `rawMedia` below.)
@@ -58,8 +77,8 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
     const visible = rawMedia.slice(0, maxItems);
     // Preserve display order via first-seen parent id.
     const parentOrder: string[] = [];
-    const byParent = new Map<string, any[]>();
-    for (const item of rawMedia as any[]) {
+    const byParent = new Map<string, ClubMediaItem[]>();
+    for (const item of rawMedia) {
       const parentId = item.sourceId || item.id;
       if (!byParent.has(parentId)) {
         parentOrder.push(parentId);
@@ -71,7 +90,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
     // and order them by the first visible tile of each parent.
     const visibleParentIds: string[] = [];
     const seen = new Set<string>();
-    for (const item of visible as any[]) {
+    for (const item of visible) {
       const parentId = item.sourceId || item.id;
       if (!seen.has(parentId)) {
         seen.add(parentId);
@@ -81,7 +100,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
     const posts: FeedPost[] = visibleParentIds.map((parentId) => {
       const group = byParent.get(parentId) ?? [];
       const first = group[0];
-      const mediaItems: MediaItem[] = group.map((item: any) => {
+      const mediaItems: MediaItem[] = group.map((item) => {
         const isVideo = item.type === 'video';
         return {
           id: item.id,
@@ -127,7 +146,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
     });
     // Map each visible tile (by index) to its parent id, so click handlers
     // can resolve the post index quickly.
-    const tileParentIds = (visible as any[]).map((item) => item.sourceId || item.id);
+    const tileParentIds = visible.map((item) => item.sourceId || item.id);
     return { feedPosts: posts, tileParentIds };
   }, [rawMedia, maxItems]);
 
@@ -143,9 +162,9 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
 
   const streamThumb = (uid: string) => generateStreamThumbnailUrl(uid);
 
-  const mediaTiles = (rawMedia ?? []).slice(0, maxItems).map((raw: any) => {
+  const mediaTiles = (rawMedia ?? []).slice(0, maxItems).map((raw) => {
     const isVideo = raw.type === 'video';
-    const url = raw.url as string | undefined;
+    const url = raw.url;
     if (isVideo) {
       const uid = url ? extractStreamUidFromHls(url) : null;
       const thumb = raw.thumbnailUrl || (uid ? streamThumb(uid) : undefined);
@@ -165,8 +184,8 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
 
   const { photoCount, videoCount, totalCount } = useMemo(() => {
     if (loading || !rawMedia) return { photoCount: 0, videoCount: 0, totalCount: 0 };
-    const photos = rawMedia.filter((m: any) => m.type === 'image').length;
-    const videos = rawMedia.filter((m: any) => m.type === 'video').length;
+    const photos = rawMedia.filter((m) => m.type === 'image').length;
+    const videos = rawMedia.filter((m) => m.type === 'video').length;
     const total = rawMedia.length;
     return { photoCount: photos, videoCount: videos, totalCount: total };
   }, [loading, rawMedia]);

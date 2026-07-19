@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
+import type { Top100ListProgress } from '@/hooks/useTop100ProgressForUser';
 import { cn } from '@/lib/utils';
 import { getTop100Club } from '@/lib/top100Club';
 import { getTop100RingBorderClass } from '@/lib/top100RingStyles';
@@ -49,7 +50,7 @@ export function CourseTop100Summary({ userId }: CourseTop100SummaryProps) {
     bySlug('gb-i'),
     bySlug('usa'),
     bySlug('europe'),
-  ].filter(Boolean);
+  ].filter((l): l is Top100ListProgress => Boolean(l));
 
   const regionsText = t('courseDetail.top100Summary.regionsCount', { count: regions });
 
@@ -86,7 +87,7 @@ export function CourseTop100Summary({ userId }: CourseTop100SummaryProps) {
 
       {/* Mini progress cards for each list */}
       <div className="grid grid-cols-2 gap-3">
-        {listsToShow.map((list: any) => {
+        {listsToShow.map((list: Top100ListProgress) => {
           const percentage = list.total > 0 ? (list.played / list.total) * 100 : 0;
 
           return (
