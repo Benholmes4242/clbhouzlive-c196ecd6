@@ -1,36 +1,22 @@
-import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
+import React, { useEffect, useRef, useLayoutEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import AuthForm from "./auth/AuthForm";
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
-
-
+import { resolvePostAuthRoute } from '@/lib/auth/postAuthRoute';
 
 interface AuthProps {
   defaultSignUp?: boolean;
 }
 
-type AuthNotice = {
-  type: 'success' | 'error';
-  message: string;
-} | null;
-
-const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
-  const [isSignUp, setIsSignUp] = useState(defaultSignUp);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [resendMsg, setResendMsg] = useState<string | null>(null);
-  const [authNotice, setAuthNotice] = useState<AuthNotice>(null);
+const Auth: React.FC<AuthProps> = () => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const lastResendEmail = useRef("");
   const hasNavigated = useRef(false);
-  
+
   useHideBottomNav();
   useHideHeader();
 
@@ -39,38 +25,14 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
     return () => { document.body.classList.remove('route-auth'); };
   }, []);
 
-  async function checkProfileAndOnboarding(userId: string): Promise<{
-    hasProfile: boolean;
-    hasCompletedOnboarding: boolean;
-  }> {
-    const { data } = await supabase
-      .from('user_profiles')
-      .select('id, has_completed_onboarding')
-      .eq('id', userId)
-      .maybeSingle();
-    
-    return {
-      hasProfile: !!data,
-      hasCompletedOnboarding: data?.has_completed_onboarding ?? false,
-    };
-  }
-
   // Redirect if user is already authenticated
   useEffect(() => {
     if (user && !hasNavigated.current) {
       hasNavigated.current = true;
-      const redirectUser = async () => {
-        const { hasProfile, hasCompletedOnboarding } = await checkProfileAndOnboarding(user.id);
-        const redirectPath = searchParams.get('redirect');
-        
-        if (!hasProfile || !hasCompletedOnboarding) {
-          navigate("/edit-profile?onboarding=1", { replace: true });
-        } else {
-          navigate(redirectPath || "/", { replace: true });
-        }
-      };
-      
-      redirectUser();
+      (async () => {
+        const dest = await resolvePostAuthRoute(user.id, searchParams.get('redirect'));
+        navigate(dest, { replace: true });
+      })();
     }
   }, [user, navigate, searchParams]);
 
@@ -80,18 +42,14 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
     const handleVisibilityChange = async () => {
       if (document.visibilityState !== 'visible') return;
 
-      // Always clear stuck spinner immediately
-      setSubmitting(false);
-
       if (hasNavigated.current) return;
 
       // 1. Direct session check (works if Supabase resolved via URL hash)
       const { data: { session: existingSession } } = await supabase.auth.getSession();
       if (existingSession?.user) {
         hasNavigated.current = true;
-        const { hasProfile, hasCompletedOnboarding } = await checkProfileAndOnboarding(existingSession.user.id);
-        const redirectPath = searchParams.get('redirect');
-        navigate(!hasProfile || !hasCompletedOnboarding ? '/edit-profile?onboarding=1' : (redirectPath || '/'), { replace: true });
+        const dest = await resolvePostAuthRoute(existingSession.user.id, searchParams.get('redirect'));
+        navigate(dest, { replace: true });
         return;
       }
 
@@ -118,41 +76,19 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
         if (error || !session?.user) return;
 
         hasNavigated.current = true;
-        const { hasProfile, hasCompletedOnboarding } = await checkProfileAndOnboarding(session.user.id);
-        const redirectPath = searchParams.get('redirect');
-        navigate(!hasProfile || !hasCompletedOnboarding ? '/edit-profile?onboarding=1' : (redirectPath || '/'), { replace: true });
-      } catch {}
+        const dest = await resolvePostAuthRoute(session.user.id, searchParams.get('redirect'));
+        navigate(dest, { replace: true });
+      } catch { /* handshake token invalid - ignore */ }
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, [navigate, searchParams]);
 
-  const clearAuthMessages = () => {
-    setErrorMsg(null);
-    setResendMsg(null);
-    setAuthNotice(null);
-  };
-
   return (
     <div className="w-full md:max-w-[440px] md:mx-auto">
-      <AuthForm
-        isSignUp={isSignUp}
-        setIsSignUp={setIsSignUp}
-        setErrorMsg={setErrorMsg}
-        setSubmitting={setSubmitting}
-        setResendMsg={setResendMsg}
-        lastResendEmail={lastResendEmail}
-        setEmail={setEmail}
-        setPassword={setPassword}
-        email={email}
-        password={password}
-        submitting={submitting}
-        authNotice={authNotice}
-        setAuthNotice={setAuthNotice}
-      />
+      <AuthForm />
     </div>
-
   );
 };
 export default Auth;

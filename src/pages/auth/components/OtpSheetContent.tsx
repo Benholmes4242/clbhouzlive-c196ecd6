@@ -186,7 +186,6 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
             onKeyDown={(e) => handleKeyDown(i, e)}
             onPaste={(e) => handlePaste(i, e)}
             inputMode="numeric"
-            // eslint-disable-next-line jsx-a11y/no-autofocus
             autoComplete={i === 0 ? 'one-time-code' : 'off'}
 
             disabled={submitting}

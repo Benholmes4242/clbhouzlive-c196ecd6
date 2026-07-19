@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from '@/lib/toast';
 import { supabase } from '@/integrations/supabase/client';
+import { resolvePostAuthRoute } from '@/lib/auth/postAuthRoute';
 import {
   trackAuthMethodSelected,
   trackAuthInitiated,
@@ -15,27 +16,23 @@ import AuthHeroScreen from './components/AuthHeroScreen';
 import AuthBottomSheet from './components/AuthBottomSheet';
 import OtpSheetContent from './components/OtpSheetContent';
 
-type AuthNotice = {
-  type: 'success' | 'error';
-  message: string;
-} | null;
-
-interface AuthFormProps {
-  // Kept for back-compat with the existing Auth.tsx wrapper. Most are unused.
-  isSignUp?: boolean;
-  setIsSignUp?: (b: boolean) => void;
-  setErrorMsg?: (msg: string | null) => void;
-  setSubmitting?: (b: boolean) => void;
-  setResendMsg?: (msg: string | null) => void;
-  lastResendEmail?: React.MutableRefObject<string>;
-  setEmail?: (email: string) => void;
-  setPassword?: (password: string) => void;
+type AppleClaims = {
+  aud?: string;
+  iss?: string;
   email?: string;
-  password?: string;
-  submitting?: boolean;
-  authNotice?: AuthNotice;
-  setAuthNotice?: (notice: AuthNotice) => void;
-}
+  email_verified?: boolean;
+  nonce?: string;
+};
+
+type GoogleClaims = {
+  aud?: string;
+  iss?: string;
+  email?: string;
+  email_verified?: boolean;
+  given_name?: string;
+  family_name?: string;
+  nonce?: string;
+};
 
 const sanitiseErrorForAnalytics = (message?: string): string => {
   if (!message) return 'auth_error';
@@ -51,9 +48,10 @@ type Step = 'hero' | 'otp';
 
 const RESEND_COOLDOWN_SECONDS = 30;
 
-const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
+const AuthForm: React.FC = () => {
   const { t } = useTranslation('auth');
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [step, setStep] = useState<Step>('hero');
   const [email, setEmailState] = useState('');
@@ -64,6 +62,19 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
   const [resendCooldown, setResendCooldown] = useState(0);
 
   const sendStartRef = useRef<number>(0);
+
+  // Safety net: if the app returns to foreground while we are stuck in
+  // a submitting state started by a native OAuth sheet that never fired
+  // its callback, clear the spinner so the user can retry.
+  useEffect(() => {
+    const onVis = () => {
+      if (document.visibilityState === 'visible') {
+        setSubmitting(false);
+      }
+    };
+    document.addEventListener('visibilitychange', onVis);
+    return () => document.removeEventListener('visibilitychange', onVis);
+  }, []);
 
   // Resend cooldown ticker
   useEffect(() => {
@@ -134,6 +145,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
   const handleUseDifferentEmail = () => {
     setStep('hero');
     setOtpError(null);
+    setOtpInfo(null);
     setResendCooldown(0);
   };
 
@@ -171,10 +183,12 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
 
       if (data?.session?.user) {
         trackLoginSuccess('email', Date.now() - start);
-        // Session is set synchronously on the client here; navigate immediately.
-        // Close the OTP sheet before nav so it does not freeze mid-transition.
+        const dest = await resolvePostAuthRoute(
+          data.session.user.id,
+          searchParams.get('redirect'),
+        );
         setStep('hero');
-        navigate('/', { replace: true });
+        navigate(dest, { replace: true });
       } else {
         setOtpError('Could not start session. Please try again.');
         setOtpErrorNonce((n) => n + 1);
@@ -210,7 +224,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
 
         // Diagnostic: decode claims locally (never log the raw token).
         try {
-          const claims = JSON.parse(
+          const claims: AppleClaims = JSON.parse(
             atob(idToken.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')),
           );
           console.log('[apple-auth] token claims:', {
@@ -230,7 +244,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
         });
 
         if (error) {
-          console.error('[apple-auth] supabase rejection:', (error as any).status, error.message);
+          console.error('[apple-auth] supabase rejection:', (error as { status?: number }).status, error.message);
           trackAuthFailed('apple', sanitiseErrorForAnalytics(error.message));
           toast.error('Could not complete Apple Sign-In. Please try again or use email.');
           setSubmitting(false);
@@ -255,14 +269,18 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
 
         if (data?.session?.user) {
           trackLoginSuccess('apple');
+          const dest = await resolvePostAuthRoute(
+            data.session.user.id,
+            searchParams.get('redirect'),
+          );
           setStep('hero');
-          navigate('/', { replace: true });
+          navigate(dest, { replace: true });
         }
       } finally {
         setSubmitting(false);
       }
     },
-    [],
+    [navigate, searchParams],
   );
 
   const handleAppleSignIn = useCallback(() => {
@@ -300,17 +318,17 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
         trackAuthInitiated('google');
 
         // Decode claims once for diagnostics + names.
-        let claims: any = null;
+        let claims: GoogleClaims | null = null;
         try {
           claims = JSON.parse(
             atob(idToken.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')),
           );
           console.log('[google-auth] token claims:', {
-            aud: claims.aud,
-            iss: claims.iss,
-            email: claims.email,
-            email_verified: claims.email_verified,
-            has_nonce: 'nonce' in claims,
+            aud: claims?.aud,
+            iss: claims?.iss,
+            email: claims?.email,
+            email_verified: claims?.email_verified,
+            has_nonce: !!claims && 'nonce' in claims,
           });
         } catch {
           /* non-fatal */
@@ -322,7 +340,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
         });
 
         if (error) {
-          console.error('[google-auth] supabase rejection:', (error as any).status, error.message);
+          console.error('[google-auth] supabase rejection:', (error as { status?: number }).status, error.message);
           if (/nonce/i.test(error.message || '')) {
             console.error(
               '[google-auth] NONCE MISMATCH - enable Skip nonce checks in the Supabase Google provider settings',
@@ -350,14 +368,18 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
 
         if (data?.session?.user) {
           trackLoginSuccess('google');
+          const dest = await resolvePostAuthRoute(
+            data.session.user.id,
+            searchParams.get('redirect'),
+          );
           setStep('hero');
-          navigate('/', { replace: true });
+          navigate(dest, { replace: true });
         }
       } finally {
         setSubmitting(false);
       }
     },
-    [],
+    [navigate, searchParams],
   );
 
   const handleGoogleSignIn = useCallback(() => {
@@ -409,21 +431,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
           onCodeEdit={() => setOtpInfo(null)}
         />
       </AuthBottomSheet>
-
-      {step === 'hero' && authNotice && (
-        <div className="fixed bottom-24 left-4 right-4 z-50">
-          <div
-            className="p-4 rounded-2xl text-center text-[14px]"
-            style={{
-              backgroundColor: '#1B1E27',
-              color: 'rgba(255,255,255,0.96)',
-              border: '1px solid rgba(255,255,255,0.10)',
-            }}
-          >
-            {authNotice.message}
-          </div>
-        </div>
-      )}
     </>
   );
 };
