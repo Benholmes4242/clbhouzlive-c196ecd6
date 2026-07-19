@@ -174,6 +174,15 @@ export const Fsv2Overlay: React.FC = () => {
 
   const activePost = posts[activeIndex];
   const mediaCount = activePost?.mediaItems?.length ?? 0;
+  const rootRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    hudEvent(openId, 'overlay.mount', { activeIndex, mediaCount });
+    registerOverlayEl(openId, rootRef.current);
+    return () => { hudEvent(openId, 'overlay.unmount'); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, openId]);
 
   if (!mounted) return null;
 
