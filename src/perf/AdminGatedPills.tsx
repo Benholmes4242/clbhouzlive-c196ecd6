@@ -9,6 +9,8 @@ import { PerfToggleButton } from '@/perf/PerfToggleButton';
 import { BootTimelineToggleButton } from '@/perf/BootTimelineToggleButton';
 import { PerfHud } from '@/perf/PerfHud';
 import { LogHud } from '@/perf/LogHud';
+import { Fsv2DebugToggle } from '@/features/fsv2/debug/Fsv2DebugToggle';
+import { Fsv2DebugHUD } from '@/features/fsv2/debug/Fsv2DebugHUD';
 
 
 export function AdminGatedPerfPill() {
