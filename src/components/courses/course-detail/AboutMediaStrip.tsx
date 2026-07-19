@@ -107,6 +107,14 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
         caption: '',
         mediaItems,
         createdAt: first?.createdAt || new Date().toISOString(),
+        // ⚠️ HARDCODED 0/false engagement fields.
+        // SAFE ONLY because AboutMediaStrip opens the fullscreen viewer with
+        // readOnly:true — likes/comments UI is suppressed and no mutation
+        // paths can fire against these stub values. If this surface is ever
+        // switched to an interactive viewer, wire real engagement (fetch
+        // like_count / comment_count / is_liked_by_me for each parent post)
+        // BEFORE flipping readOnly off, or every viewed item will appear
+        // zeroed and any like will patch a stale delta.
         likeCount: 0,
         commentCount: 0,
         shareCount: 0,
