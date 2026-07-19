@@ -1,6 +1,8 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
+type RpcClient = { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }> };
+
 export interface MixedGridRow {
   post_id: string;
   post_content: string | null;
