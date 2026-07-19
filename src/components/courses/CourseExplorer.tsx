@@ -189,7 +189,7 @@ async function fetchCoursePage({ selectedRegion, selectedSubregion, debouncedSea
     throw error;
   }
 
-  const courses = (data || []).map((course: any) => ({
+  const courses = ((data || []) as ExploreCourseRow[]).map((course) => ({
     ...course,
     average_rating: course.course_rating_aggregates?.[0]?.avg_overall_score ?? null,
   }));
