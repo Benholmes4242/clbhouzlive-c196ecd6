@@ -5,7 +5,6 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Loader2, MapPin } from 'lucide-react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { openFsv2 } from '@/features/fsv2';
-import { FLAGS } from '@/config/flags';
 import { recordPostViewOnce } from '@/hooks/usePostViewTracker';
 import { mapActivityPostToFeedPost } from '@/lib/activityPostMapper';
 import type { ActivityPost } from '@/components/profile/types/ActivityTypes';
@@ -229,11 +228,7 @@ const PostDeepLinkPage: React.FC = () => {
       },
     };
 
-    if (FLAGS.fsv2) {
-      openFsv2({ posts: [feedPost], startIndex: 0, ...openOpts });
-    } else {
-      useFullscreenFeedStore.getState().open([feedPost], 0, openOpts);
-    }
+    openFsv2({ posts: [feedPost], startIndex: 0, ...openOpts });
 
   }, [authLoading, user, isLoading, feedPost, navigate, navState, searchParams]);
 

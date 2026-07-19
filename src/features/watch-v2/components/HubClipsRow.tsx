@@ -7,9 +7,7 @@ import Pressable from '@/components/ui/Pressable';
 import { useWatchAutoplay } from '@/video/useWatchAutoplay';
 import { useRailLane } from '@/video/useRailLane';
 import { usePreroutePrefetch } from '@/video/usePreroutePrefetch';
-import { openWithOrigin } from '@/lib/openWithOrigin';
 import { openFsv2 } from '@/features/fsv2';
-import { FLAGS } from '@/config/flags';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useNavigate } from 'react-router-dom';
 import { SectionHeader } from '@/components/ui/SectionHeader';
@@ -52,18 +50,7 @@ function Tile({
   });
 
   const handlePress = () => {
-    if (FLAGS.fsv2) {
-      openFsv2({ openedFrom: 'watch', posts, startIndex: index });
-      return;
-    }
-    openWithOrigin({
-      openedFrom: 'watch',
-      posts,
-      index,
-      originEl: rootRef.current as HTMLElement | null,
-      posterUrl,
-      railOwnerKey: ownerKey,
-    });
+    openFsv2({ openedFrom: 'watch', posts, startIndex: index });
   };
 
   return (

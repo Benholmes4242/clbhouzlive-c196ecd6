@@ -12,11 +12,6 @@ export const FLAGS = {
   // Debug flags
   CLUBHOUSE_DEBUG: false, // Enable comprehensive clubhouse/video debug panel and logging
 
-  // Fullscreen Viewer V2 (fsv2) — clean-room rebuild.
-  // Default ON: every fullscreen open routes through openFsv2.
-  // Flip to false to instantly restore the V1 overlay everywhere
-  // (V1 code is retained as the kill-switch through Phase 3).
-  fsv2: true,
 } as const;
 
 export type FeatureFlags = typeof FLAGS;

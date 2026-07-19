@@ -18,9 +18,7 @@ import { Virtuoso } from 'react-virtuoso';
 import type { FeedPost } from '@/components/media-system/types/media';
 import type { ActiveActor } from '@/types/actor';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
-import { openWithOrigin } from '@/lib/openWithOrigin';
 import { openFsv2 } from '@/features/fsv2';
-import { FLAGS } from '@/config/flags';
 import { isPerfEnabled } from '@/perf/navTiming';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { getPrimaryScrollElement } from '@/lib/getScrollParent';
@@ -346,43 +344,16 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
           surface: 'posts-tab',
         });
       }
-      if (FLAGS.fsv2) {
-        openFsv2({
-          openedFrom: 'posts-tab',
-          posts,
-          startIndex: idx,
-          mediaId: mediaId ?? null,
-          mediaIndex,
-          hasNextPage: hasNextPage ?? false,
-          fetchNextPage: hasNextPage ? fetchNextPage : undefined,
-          isFetchingNextPage: isFetchingNextPage ?? false,
-        });
-      } else if (origin?.el) {
-        openWithOrigin({
-          openedFrom: 'posts-tab',
-          posts,
-          index: idx,
-          originEl: origin.el,
-          posterUrl: origin.posterUrl ?? null,
-          mediaId: mediaId ?? null,
-          mediaIndex,
-          railOwnerKey: ownerKey ?? null,
-          options: {
-            hasNextPage: hasNextPage ?? false,
-            fetchNextPage: hasNextPage ? fetchNextPage : undefined,
-            isFetchingNextPage: isFetchingNextPage ?? false,
-          },
-        });
-      } else {
-        openFullscreen(posts, idx, {
-          mediaId: mediaId ?? null,
-          openedFrom: 'posts-tab',
-          hasNextPage: hasNextPage ?? false,
-          fetchNextPage: hasNextPage ? fetchNextPage : undefined,
-          isFetchingNextPage: isFetchingNextPage ?? false,
-        });
-
-      }
+      openFsv2({
+        openedFrom: 'posts-tab',
+        posts,
+        startIndex: idx,
+        mediaId: mediaId ?? null,
+        mediaIndex,
+        hasNextPage: hasNextPage ?? false,
+        fetchNextPage: hasNextPage ? fetchNextPage : undefined,
+        isFetchingNextPage: isFetchingNextPage ?? false,
+      });
     },
     [posts, setActiveIndex, setCarouselPosition, openFullscreen, hasNextPage, fetchNextPage, isFetchingNextPage, playingIdx],
   );
