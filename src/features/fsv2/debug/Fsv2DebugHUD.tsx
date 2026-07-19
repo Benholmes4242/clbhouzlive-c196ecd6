@@ -202,6 +202,7 @@ function summarize(sample: HudEntry | null): string {
       readyState?: number;
       videoW?: number;
       videoH?: number;
+      frames?: number;
       frameDelta?: number;
       ioRatio?: number;
       chain?: Array<{ op: string; disp: string; vis: string }>;
@@ -221,6 +222,7 @@ function summarize(sample: HudEntry | null): string {
     `RECT ${v.rect?.w}×${v.rect?.h}`,
     `INTRINSIC ${v.videoW}×${v.videoH}`,
     `RS ${v.readyState}`,
+    `FRAMES ${v.frames ?? '?'}`,
     `Δframes ${v.frameDelta ?? '?'}`,
     `IO ${v.ioRatio}`,
     `HIT ${hitVideo}`,
