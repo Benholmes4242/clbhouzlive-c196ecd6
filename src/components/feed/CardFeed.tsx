@@ -34,6 +34,7 @@ import { vperfFeedActivateStart, vperfFeedActivateEnd, vperfConsumeEarlyStarted 
 import { isPerfEnabled as _isPerfEnabledForRotate } from '@/perf/navTiming';
 
 import { FeedCard } from './FeedCard';
+import { CardSkeleton } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
 import { safeInitialState } from './feedSnapshot';
 
 const CANVAS = '#15171F';
