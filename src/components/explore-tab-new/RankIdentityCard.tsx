@@ -325,17 +325,13 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
                 </span>
               </div>
 
-              {/* Tier dot + label */}
+              {/* Tier glyph + label */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0 }}>
-                <span
-                  aria-hidden
-                  style={{
-                    width: 6,
-                    height: 6,
-                    borderRadius: 999,
-                    background: tierHex,
-                    flexShrink: 0,
-                  }}
+                <TierGlyph
+                  tierKey={currentLevel.key}
+                  color={tierHex}
+                  size={14}
+                  strokeWidth={1.6}
                 />
                 <span
                   style={{
@@ -345,7 +341,7 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  {tierName} {currentLevel.level}
+                  {tierName}
                 </span>
               </div>
 
