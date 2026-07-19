@@ -170,14 +170,14 @@ export const FullCourseLeaderboardSheetDispatch: React.FC<Props> = ({
               width: 24,
               textAlign: 'center',
               flexShrink: 0,
-              fontSize: 14,
+              fontSize: r.rank === 1 ? 13 : 14,
               fontWeight: 900,
-              fontVariantNumeric: 'tabular-nums',
+              ...(r.rank === 1 ? {} : { fontVariantNumeric: 'tabular-nums' as const }),
               color: rankColor,
               lineHeight: 1,
             }}
           >
-            {r.rank}
+            {r.rank === 1 ? '\u{1F3C6}' : r.rank}
           </div>
           <div style={{ flexShrink: 0 }}>
             <SquircleAvatar
