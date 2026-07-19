@@ -134,7 +134,7 @@ export function LeaderboardBand({
         .map(e => ({ avatarCandidates: entryAvatars(e), playerId: entryPlayerId(e), name: entryName(e) }));
       body = (
         <>
-          <TiedLeadersRow count={tiedLeaders.count} score={tiedLeaders.score} players={tiedPlayers} />
+          <TiedLeadersRow count={tiedLeaders.count} score={tiedLeaders.score} today={todayFromEntry(leaderboard[0])} players={tiedPlayers} />
           {chasers.map((e, i) => (
             <ChaserRow
               key={i}
@@ -143,6 +143,7 @@ export function LeaderboardBand({
               country={entryCountry(e)}
               score={fmtScore(e.score)}
               thru={entryThru(e)}
+              today={todayFromEntry(e)}
               avatarCandidates={entryAvatars(e)}
               playerId={entryPlayerId(e)}
               isLast={i === chasers.length - 1}
