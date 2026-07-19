@@ -34,6 +34,7 @@ import { vperfFeedActivateStart, vperfFeedActivateEnd, vperfConsumeEarlyStarted 
 import { isPerfEnabled as _isPerfEnabledForRotate } from '@/perf/navTiming';
 
 import { FeedCard } from './FeedCard';
+import { CardSkeleton } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
 import { safeInitialState } from './feedSnapshot';
 
 const CANVAS = '#15171F';
@@ -87,6 +88,7 @@ export interface CardFeedProps {
   getCommentCount: (post: FeedPost) => number;
   onNearEnd?: () => void;
   hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
   topPadding?: number | string;
   bottomPadding?: number;
   onFollow?: (post: FeedPost) => void;
@@ -125,6 +127,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   hasNextPage,
   topPadding = 96,
   bottomPadding = 96,
+  isFetchingNextPage = false,
   onFollow,
   currentUserId,
   onRefresh,
@@ -689,9 +692,20 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   const components = useMemo(
     () => ({
       Header: () => <div style={{ height: 0, paddingTop: topPadding }} />,
-      Footer: () => <div style={{ height: bottomPadding }} />,
+      Footer: () => (
+        <>
+          {isFetchingNextPage && (
+            <div style={{ padding: '8px 0 12px' }}>
+              <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9', overflow: 'hidden' }}>
+                <CardSkeleton isStatic={false} variant="regular" mediaRatio="16/9" />
+              </div>
+            </div>
+          )}
+          <div style={{ height: bottomPadding }} />
+        </>
+      ),
     }),
-    [topPadding, bottomPadding],
+    [topPadding, bottomPadding, isFetchingNextPage],
   );
 
 

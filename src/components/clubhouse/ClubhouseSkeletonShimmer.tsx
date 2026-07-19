@@ -247,7 +247,7 @@ const CARD_BG = '#1B1E27';
 const HAIRLINE = 'rgba(255,255,255,0.08)';
 const CANVAS = '#15171F';
 
-const CardSkeleton: React.FC<{
+export const CardSkeleton: React.FC<{
   isStatic?: boolean;
   variant?: 'regular' | 'review';
   mediaRatio?: string;
@@ -308,35 +308,58 @@ const CardFeedSkeleton: React.FC<{
   isStatic?: boolean;
   variant?: 'regular' | 'review';
 }> = ({ isStatic = false, variant = 'regular' }) => {
-  const topPad = 'calc(env(safe-area-inset-top, 0px) + 59px)';
+  const topPad = 'calc(env(safe-area-inset-top, 0px) + 70px)';
   return (
     <>
-      {/* Header strip skeleton — matches ClubhouseTopBar (top: sat, height 44) */}
+      {/* Chrome island skeleton — mirrors ChromeIsland: two dark glass capsules
+          at sat+10, inset 12px, 44h, radius 999. Keep the SkeletonBlock contents
+          inside so labels/icons shimmer while the capsule frames read as chrome. */}
       <div
         style={{
           position: 'fixed',
-          top: 'env(safe-area-inset-top, 0px)',
-          left: 0,
-          right: 0,
+          top: 'calc(env(safe-area-inset-top, 0px) + 10px)',
+          left: 12,
+          right: 12,
           height: 44,
           zIndex: 40,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '0 16px',
-          background: CANVAS,
+          pointerEvents: 'none',
         }}
       >
-        {/* left: tab labels */}
-        <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
-          <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 78, height: 16 }} />
-          <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 52, height: 16 }} />
+        {/* LEFT capsule: island tabs */}
+        <div
+          style={{
+            height: 44,
+            borderRadius: 999,
+            background: 'rgba(20,22,28,0.72)',
+            border: '1px solid rgba(255,255,255,0.12)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 14,
+            padding: '0 16px',
+          }}
+        >
+          <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 78, height: 14 }} />
+          <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 52, height: 14 }} />
         </div>
-        {/* right: search + pill + avatar */}
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+        {/* RIGHT capsule: search + pill + avatar */}
+        <div
+          style={{
+            height: 44,
+            borderRadius: 999,
+            background: 'rgba(20,22,28,0.72)',
+            border: '1px solid rgba(255,255,255,0.12)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            padding: '0 10px',
+          }}
+        >
           <SkeletonBlock isStatic={isStatic} className="rounded-full" style={{ width: 22, height: 22 }} />
-          <SkeletonBlock isStatic={isStatic} className="rounded-full" style={{ width: 52, height: 26 }} />
-          <SkeletonBlock isStatic={isStatic} style={{ width: 34, height: 34, borderRadius: '34%' }} />
+          <SkeletonBlock isStatic={isStatic} className="rounded-full" style={{ width: 52, height: 24 }} />
+          <SkeletonBlock isStatic={isStatic} style={{ width: 30, height: 30, borderRadius: '34%' }} />
         </div>
       </div>
 

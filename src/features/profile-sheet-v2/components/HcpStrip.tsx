@@ -32,8 +32,8 @@ interface Props {
 export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
   const isBusiness = actorType === 'business';
 
-  const { data: connection } = useWhsConnection(isBusiness ? undefined : actorId);
-  const { data: trend } = useHandicapTrend(connection?.id);
+  const { data: connection, isLoading: connectionLoading } = useWhsConnection(isBusiness ? undefined : actorId);
+  const { data: trend, isLoading: trendLoading } = useHandicapTrend(connection?.id);
   const { data: history90 } = useHandicapHistory(connection?.id, 90);
   const { data: scores } = useAllScores(connection?.id);
 
@@ -85,6 +85,22 @@ export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
   const chevron = (
     <span style={{ color: MUTED, fontSize: 15, marginLeft: 'auto' }}>{CHEVRON}</span>
   );
+
+  // Loading state: shimmer strip in the exact stripBase geometry so there is
+  // zero layout shift when the real state lands. Never show the connect CTA
+  // or an index until the connection query has resolved.
+  if (connectionLoading) {
+    return (
+      <div style={stripBase} aria-hidden>
+        {eyebrow}
+        <div
+          className="clb-shimmer-light rounded-sm"
+          style={{ width: 60, height: 22, background: 'rgba(15,23,42,0.06)' }}
+        />
+        {chevron}
+      </div>
+    );
+  }
 
   // Disconnected state
   if (!connection) {
@@ -148,17 +164,24 @@ export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
       style={stripBase}
     >
       {eyebrow}
-      <span
-        style={{
-          fontWeight: 800,
-          fontSize: 22,
-          color: INK,
-          letterSpacing: '-0.02em',
-          fontVariantNumeric: 'tabular-nums',
-        }}
-      >
-        {indexText}
-      </span>
+      {trendLoading ? (
+        <div
+          className="clb-shimmer-light rounded-sm"
+          style={{ width: 52, height: 22, background: 'rgba(15,23,42,0.06)' }}
+        />
+      ) : (
+        <span
+          style={{
+            fontWeight: 800,
+            fontSize: 22,
+            color: INK,
+            letterSpacing: '-0.02em',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {indexText}
+        </span>
+      )}
       {trendNode}
       {rounds90d != null && (
         <span style={{ fontWeight: 500, fontSize: 11, color: MUTED }}>

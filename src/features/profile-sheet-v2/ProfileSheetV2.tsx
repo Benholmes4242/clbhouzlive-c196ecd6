@@ -56,6 +56,7 @@ const SKELETON_TILE = 'rgba(0,0,0,0.06)';
 function SheetSkeleton() {
   const block = (h: number, style: React.CSSProperties = {}) => (
     <div
+      className="clb-shimmer-light"
       style={{
         height: h,
         background: SKELETON_TILE,

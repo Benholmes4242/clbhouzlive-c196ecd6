@@ -59,7 +59,7 @@ function CommentsSheetV2Inner({
   const kb = useKeyboardHeight();
 
   const {
-    threads, totalCount, isLoading,
+    threads, totalCount, totalCountLoading, isLoading,
     fetchNextPage, hasNextPage, isFetchingNextPage,
     addComment, editComment, deleteComment, toggleLike, hideComment, reportComment,
   } = useCommentsV2({ targetType, targetId, targetSecondaryId, enabled: isOpen });
@@ -239,9 +239,16 @@ function CommentsSheetV2Inner({
                 >
                   COMMENTS
                 </div>
-                <div style={{ fontSize: 17, fontWeight: 800, color: INK, letterSpacing: '-0.01em' }}>
-                  {totalCount} {totalCount === 1 ? 'comment' : 'comments'}
-                </div>
+                {totalCountLoading ? (
+                  <div
+                    className="clb-shimmer-light rounded-sm"
+                    style={{ width: 96, height: 21, background: 'rgba(15,23,42,0.06)' }}
+                  />
+                ) : (
+                  <div style={{ fontSize: 17, fontWeight: 800, color: INK, letterSpacing: '-0.01em', lineHeight: '21px' }}>
+                    {totalCount} {totalCount === 1 ? 'comment' : 'comments'}
+                  </div>
+                )}
               </div>
               <button
                 type="button"

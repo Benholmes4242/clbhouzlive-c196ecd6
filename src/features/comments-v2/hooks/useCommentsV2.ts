@@ -256,7 +256,7 @@ export function useCommentsV2({
   }, [parents, replies, hiddenIds, blockedIds, shape]);
 
   // Header total (top-level count for the current target).
-  const { data: totalCount = 0 } = useQuery({
+  const { data: totalCount = 0, isLoading: totalCountLoading } = useQuery({
     queryKey: [...keyRoot, 'count'],
     enabled: enabled && !!targetId,
     staleTime: 30_000,
@@ -437,6 +437,7 @@ export function useCommentsV2({
   return {
     threads,
     totalCount,
+    totalCountLoading,
     isLoading,
     fetchNextPage,
     hasNextPage: !!hasNextPage,
