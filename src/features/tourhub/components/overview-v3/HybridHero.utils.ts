@@ -274,6 +274,34 @@ export function buildLeaderboardSlots(chasers: any[], maxSlots = 4): ChaserSlot[
   return slots;
 }
 
+// ---------- Today / thru helpers --------------------------------------------
+
+/**
+ * Current-round score for a live leaderboard entry.
+ * Reads from the Sportradar `raw_data.rounds` array when round is known.
+ */
+export function entryToday(entry: any, round: number | undefined): number | null {
+  const rounds = entry?.raw_data?.rounds;
+  if (!Array.isArray(rounds) || !round || rounds.length < round) return null;
+  const r = rounds[round - 1];
+  if (!r || r.score == null) return null;
+  return r.score ?? null;
+}
+
+/**
+ * Best-effort "today" score for any leaderboard entry.
+ * Uses the explicit `today` field, then falls back to the latest completed round.
+ * Matches the BoardTable `todayFromEntry` semantics so the hero and the
+ * full leaderboard read the same number.
+ */
+export function todayFromEntry(entry: any): number | null {
+  if (entry?.today != null) return entry.today;
+  const rs = [entry?.round_1, entry?.round_2, entry?.round_3, entry?.round_4];
+  const completed = rs.filter((r) => r != null);
+  if (completed.length === 0) return null;
+  return completed[completed.length - 1] ?? null;
+}
+
 // ---------- Trajectory sparkline helpers (Pass 3) --------------------------
 
 /**
