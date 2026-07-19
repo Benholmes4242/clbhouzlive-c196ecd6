@@ -282,6 +282,7 @@ export function LeaderboardBand({
                   count={slot.count}
                   score={fmtScore(slot.score)}
                   thru="F"
+                  today={todayFromEntry(slot.members[0])}
                   players={slot.members.map((m: any) => ({
                     avatarCandidates: entryAvatars(m),
                     playerId: entryPlayerId(m),
@@ -304,6 +305,7 @@ export function LeaderboardBand({
                 country={entryCountry(slot.entry)}
                 score={fmtScore(slot.entry.score)}
                 thru="F"
+                today={todayFromEntry(slot.entry)}
                 avatarCandidates={entryAvatars(slot.entry)}
                 playerId={entryPlayerId(slot.entry)}
                 rounds={extractRounds(slot.entry)}
