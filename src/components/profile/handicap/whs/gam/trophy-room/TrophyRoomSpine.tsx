@@ -8,50 +8,18 @@
 
 import React, { useState } from 'react';
 import type { TrophyItem } from './_shared/normalizeTrophyItem';
-import { MATERIAL_HEX } from './_shared/rarityPalette';
 import {
-  MATERIAL_LADDER,
+  WALL_LEVELS,
   medalsOwned,
   levelForMedals,
   nextLevelForMedals,
   levelProgress,
   levelDisplay,
-  type WallMaterial,
 } from './_shared/levels';
-import { TierGem } from '@/components/shared/TierGem';
+import { TierGlyph, TIER_COLOR_DARK } from '@/components/shared/TierGlyph';
 import { LadderSheet } from './LadderSheet';
 
 const FONT = "'Geist', -apple-system, sans-serif";
-const OBSIDIAN_BODY = '#2A2F36';
-const OBSIDIAN_EDGE = '#D4A017';
-
-function gemColor(m: WallMaterial): string {
-  if (m === 'obsidian') return OBSIDIAN_BODY;
-  return (MATERIAL_HEX as Record<string, string>)[m] ?? '#C97B4A';
-}
-
-function Gem({ material, dim, size = 15 }: { material: WallMaterial; dim: boolean; size?: number }) {
-  const c = gemColor(material);
-  const isObsidian = material === 'obsidian';
-  return (
-    <div
-      style={{
-        width: size,
-        height: size * 1.15,
-        flexShrink: 0,
-        background: dim
-          ? 'rgba(255,255,255,0.07)'
-          : `linear-gradient(135deg, ${c}, ${c}55 55%, ${c}CC)`,
-        clipPath: 'polygon(50% 0, 100% 28%, 100% 72%, 50% 100%, 0 72%, 0 28%)',
-        boxShadow: dim
-          ? 'none'
-          : isObsidian
-            ? `0 0 10px ${OBSIDIAN_EDGE}66, inset 0 0 0 1px ${OBSIDIAN_EDGE}55`
-            : `0 0 10px ${c}55`,
-      }}
-    />
-  );
-}
 
 const STREAK_DEFS: Array<{ badgeId: string; label: string; unit?: string; color: string }> = [
   { badgeId: 'round_streak_tier', label: 'Round streak', unit: 'wks', color: '#C084FC' },
@@ -73,7 +41,10 @@ export function TrophyRoomSpine({ items, userId }: Props) {
   const level = levelForMedals(owned);
   const next = nextLevelForMedals(owned);
   const progress = levelProgress(owned);
-  const currentMatIdx = level ? MATERIAL_LADDER.indexOf(level.material) : -1;
+  const currentIdx = level ? level.level - 1 : -1;
+
+  const isGoat = level?.level === 10;
+  const activeAccent = isGoat ? TIER_COLOR_DARK.goat : TIER_COLOR_DARK.current;
 
   const streaks = STREAK_DEFS.map((def) => {
     const item = achievements.find((a) => a.badgeId === def.badgeId);
