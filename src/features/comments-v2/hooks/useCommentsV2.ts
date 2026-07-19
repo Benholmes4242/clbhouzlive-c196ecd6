@@ -300,7 +300,15 @@ export function useCommentsV2({
       if (error) throw error;
       return data as any;
     },
-    onSuccess: invalidate,
+    onSuccess: () => {
+      // Server trigger `comments_v2_count_inc` bumps posts.comment_count
+      // for EVERY insert — top-level AND replies. Mirror that here so
+      // every feed surface reflects the new count without a refetch.
+      if (targetType === 'post') {
+        patchEngagement(qc, targetId, { commentCountDelta: +1 });
+      }
+      invalidate();
+    },
   });
 
   const editComment = useMutation({
@@ -318,7 +326,14 @@ export function useCommentsV2({
       if (error) throw error;
       return data as any;
     },
-    onSuccess: invalidate,
+    onSuccess: () => {
+      // Server trigger `comments_v2_count_dec` decrements posts.comment_count
+      // for both top-level and reply deletions. Mirror symmetrically.
+      if (targetType === 'post') {
+        patchEngagement(qc, targetId, { commentCountDelta: -1 });
+      }
+      invalidate();
+    },
   });
 
   const toggleLike = useMutation({
