@@ -489,12 +489,6 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
         userId={profile?.id}
         onCountChange={setScheduledCount}
       />
-      <MediaTrimSheet
-        open={sheet === 'trim'}
-        onClose={() => setSheet(null)}
-        item={active}
-        onApply={(s, e) => updateActive({ trimStart: s, trimEnd: e })}
-      />
       <CoverFrameSheet
         open={sheet === 'cover'}
         onClose={() => setSheet(null)}
