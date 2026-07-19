@@ -1,5 +1,5 @@
 /**
- * Trophy Room level system -- the medal wall.
+ * Trophy Room level system -- the Career Ladder.
  *
  * Every tier of every badge is one MEDAL. The wall level is a pure
  * function of medals owned. The ladder is capped at what a lifelong
@@ -7,48 +7,43 @@
  * medals): deep albatross / hole-in-one tiers are bonus-beyond-max,
  * never a wall requirement.
  *
- * Materials ride the existing Forge ladder:
- * bronze -> silver -> emerald -> diamond -> obsidian.
+ * The ladder is named for a golfer's own career arc, not for
+ * material: New Recruit -> Rising Star -> Season Regular ->
+ * Team Captain -> National Squad -> Amateur Champion ->
+ * Tour Rookie -> Contender -> Hall of Famer -> The GOAT.
  */
 
 import type { TrophyItem } from './normalizeTrophyItem';
-
-export const MATERIAL_LADDER = [
-  'bronze',
-  'silver',
-  'emerald',
-  'diamond',
-  'obsidian',
-] as const;
-
-export type WallMaterial = (typeof MATERIAL_LADDER)[number];
+import { TIER_KEYS, type TierKey } from '@/components/shared/TierGlyph';
 
 export interface WallLevel {
   level: number;
   medalsRequired: number;
-  material: WallMaterial;
-  sub: 'I' | 'II';
+  key: TierKey;
   label: string;
 }
 
 export const WALL_LEVELS: readonly WallLevel[] = [
-  { level: 1, medalsRequired: 1, material: 'bronze', sub: 'I', label: 'Bronze I' },
-  { level: 2, medalsRequired: 4, material: 'bronze', sub: 'II', label: 'Bronze II' },
-  { level: 3, medalsRequired: 8, material: 'silver', sub: 'I', label: 'Silver I' },
-  { level: 4, medalsRequired: 13, material: 'silver', sub: 'II', label: 'Silver II' },
-  { level: 5, medalsRequired: 19, material: 'emerald', sub: 'I', label: 'Emerald I' },
-  { level: 6, medalsRequired: 26, material: 'emerald', sub: 'II', label: 'Emerald II' },
-  { level: 7, medalsRequired: 33, material: 'diamond', sub: 'I', label: 'Diamond I' },
-  { level: 8, medalsRequired: 40, material: 'diamond', sub: 'II', label: 'Diamond II' },
-  { level: 9, medalsRequired: 47, material: 'obsidian', sub: 'I', label: 'Obsidian I' },
-  { level: 10, medalsRequired: 55, material: 'obsidian', sub: 'II', label: 'Clubhouse Legend' },
+  { level: 1, medalsRequired: 1, key: 'new_recruit', label: 'New Recruit' },
+  { level: 2, medalsRequired: 4, key: 'rising_star', label: 'Rising Star' },
+  { level: 3, medalsRequired: 8, key: 'season_regular', label: 'Season Regular' },
+  { level: 4, medalsRequired: 13, key: 'team_captain', label: 'Team Captain' },
+  { level: 5, medalsRequired: 19, key: 'national_squad', label: 'National Squad' },
+  { level: 6, medalsRequired: 26, key: 'amateur_champion', label: 'Amateur Champion' },
+  { level: 7, medalsRequired: 33, key: 'tour_rookie', label: 'Tour Rookie' },
+  { level: 8, medalsRequired: 40, key: 'contender', label: 'Contender' },
+  { level: 9, medalsRequired: 47, key: 'hall_of_famer', label: 'Hall of Famer' },
+  { level: 10, medalsRequired: 55, key: 'the_goat', label: 'The GOAT' },
 ] as const;
+
+// Sanity: keep the ladder aligned with the glyph registry.
+void TIER_KEYS;
 
 /**
  * Display string for a wall level. At the summit (level 10) we append the
  * live medal count so the ladder gains infinite headroom past 55 medals:
- *   'Clubhouse Legend · 61 medals'
- * Below the summit we render the label verbatim (e.g. 'Diamond I').
+ *   'The GOAT · 61 medals'
+ * Below the summit we render the label verbatim (e.g. 'Team Captain').
  * Null level (zero medals) falls back to the first rung's label.
  */
 export function levelDisplay(level: WallLevel | null, medals: number): string {
@@ -85,7 +80,7 @@ export function levelForMedals(count: number): WallLevel | null {
   return current;
 }
 
-/** Next wall level, or null at Clubhouse Legend. */
+/** Next wall level, or null at The GOAT. */
 export function nextLevelForMedals(count: number): WallLevel | null {
   return WALL_LEVELS.find((lvl) => lvl.medalsRequired > count) ?? null;
 }
@@ -99,10 +94,4 @@ export function levelProgress(count: number): number {
   const span = next.medalsRequired - floor;
   if (span <= 0) return 1;
   return Math.max(0, Math.min(1, (count - floor) / span));
-}
-
-/** Material for a badge's current earned tier count (1-based). */
-export function materialForTier(tiersEarned: number): WallMaterial {
-  if (tiersEarned <= 0) return 'bronze';
-  return MATERIAL_LADDER[Math.min(tiersEarned - 1, MATERIAL_LADDER.length - 1)];
 }

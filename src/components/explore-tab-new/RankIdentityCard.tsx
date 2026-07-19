@@ -21,7 +21,7 @@ import {
   WALL_LEVELS,
 } from '@/components/profile/handicap/whs/gam/trophy-room/_shared/levels';
 import { openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
-import { MATERIAL_HEX } from '@/components/profile/handicap/whs/gam/trophy-room/_shared/rarityPalette';
+import { TierGlyph } from '@/components/shared/TierGlyph';
 import { renderBadgeIcon } from '@/components/profile/handicap/whs/gam/badgeIcons';
 import { formatHcp } from '@/lib/formatHcp';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
@@ -168,10 +168,9 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
   const hcp = resolvedHcp.value;
   const hasHcp = hcp != null;
 
-  const material = currentLevel.material;
-  const tierHex = MATERIAL_HEX[material] ?? '#12B784';
+  const tierHex = currentLevel.key === 'the_goat' ? '#F7931E' : '#34D399';
 
-  const tierName = currentLevel.label.replace(/\s+(I|II)$/, '');
+  const tierName = currentLevel.label;
 
   const medalsToNext = nextLevel
     ? Math.max(0, nextLevel.medalsRequired - medals)
@@ -326,17 +325,13 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
                 </span>
               </div>
 
-              {/* Tier dot + label */}
+              {/* Tier glyph + label */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0 }}>
-                <span
-                  aria-hidden
-                  style={{
-                    width: 6,
-                    height: 6,
-                    borderRadius: 999,
-                    background: tierHex,
-                    flexShrink: 0,
-                  }}
+                <TierGlyph
+                  tierKey={currentLevel.key}
+                  color={tierHex}
+                  size={14}
+                  strokeWidth={1.6}
                 />
                 <span
                   style={{
@@ -346,7 +341,7 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  {tierName} {currentLevel.level}
+                  {tierName}
                 </span>
               </div>
 
@@ -639,15 +634,11 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
               padding: '4px 10px 4px 7px',
             }}
           >
-            <span
-              style={{
-                width: 8,
-                height: 8,
-                borderRadius: 999,
-                background: tierHex,
-                boxShadow: `0 0 6px ${tierHex}66`,
-                flexShrink: 0,
-              }}
+            <TierGlyph
+              tierKey={currentLevel.key}
+              color={tierHex}
+              size={16}
+              strokeWidth={1.7}
             />
             <span
               style={{
@@ -657,7 +648,7 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
                 whiteSpace: 'nowrap',
               }}
             >
-              {tierName} {currentLevel.level}
+              {tierName}
             </span>
           </div>
 
