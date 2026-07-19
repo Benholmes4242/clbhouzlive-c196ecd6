@@ -12,6 +12,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 import { useSessionAudio } from '@/audio/sessionAudioStore';
+import { trace } from '@/perf/trace';
 
 import { FSV2 } from '../tokens';
 import { attach, withBandwidthHint, type Fsv2Source } from '../player/fsv2Player';
