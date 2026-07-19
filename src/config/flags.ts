@@ -11,6 +11,7 @@ export const FLAGS = {
   
   // Debug flags
   CLUBHOUSE_DEBUG: false, // Enable comprehensive clubhouse/video debug panel and logging
+  audioDebug: false, // V1 Audio + Continuity HUD. Zero-cost when off; instrumentation gates on this flag.
 } as const;
 
 export type FeatureFlags = typeof FLAGS;
