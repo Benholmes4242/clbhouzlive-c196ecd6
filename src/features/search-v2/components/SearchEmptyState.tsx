@@ -284,7 +284,6 @@ function SuggestionRow({
   const viewerActorType: 'personal' | 'business' =
     activeActor?.type ?? 'personal';
   const viewerActorId = activeActor?.id ?? user?.id;
-  const queryClient = useQueryClient();
   const toggle = useToggleFollow();
   const { isFollowing: cached } = useFollowState({
     targetActorType: 'personal',
