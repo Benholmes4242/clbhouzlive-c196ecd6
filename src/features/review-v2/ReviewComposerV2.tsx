@@ -13,6 +13,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, Trash2 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/lib/toast';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { MentionsComposerInput } from '@/components/mentions/MentionsComposerInput';
 import AccessControl from '@/components/AccessControl';
@@ -112,7 +113,7 @@ function InnerComposer() {
         .select('id, display_name, username, profile_photo_url')
         .eq('id', userId!)
         .maybeSingle();
-      return data;
+      return (data as { display_name?: string | null; username?: string | null; profile_photo_url?: string | null } | null) ?? null;
     },
   });
 
@@ -150,13 +151,14 @@ function InnerComposer() {
       existingMedia={existingMediaQ.data ?? []}
       author={{
         displayName:
-          (profileQ.data as any)?.display_name ||
-          (profileQ.data as any)?.username ||
+          profileQ.data?.display_name ||
+          profileQ.data?.username ||
           'You',
-        avatarUrl: (profileQ.data as any)?.profile_photo_url ?? null,
+        avatarUrl: profileQ.data?.profile_photo_url ?? null,
       }}
       onExit={() => {
-        if (window.history.state && (window.history.state as any).idx > 0) {
+        const hs = window.history.state as { idx?: number } | null;
+        if (hs && typeof hs.idx === 'number' && hs.idx > 0) {
           navigate(-1);
         } else if (courseId) {
           navigate(`/courses/${courseId}`, { replace: true });
@@ -187,7 +189,40 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
 
   const [success, setSuccess] = useState<{ ratingId: string; shareToFeed: boolean } | null>(null);
   const [removeOpen, setRemoveOpen] = useState(false);
+  const [exitGuardOpen, setExitGuardOpen] = useState(false);
   const [dictationFlashKey, setDictationFlashKey] = useState(0);
+
+  const isDirty = useMemo(() => {
+    if (isEditMode) {
+      return (
+        composer.state.overall !== (existing?.rating ?? null) ||
+        composer.state.reviewText !== (existing?.review ?? '') ||
+        composer.state.shareToFeed !== (existing?.share_to_feed !== false) ||
+        composer.state.scores.design !== (existing?.design_score ?? null) ||
+        composer.state.scores.condition !== (existing?.condition_score ?? null) ||
+        composer.state.scores.clubhouse !== (existing?.clubhouse_score ?? null) ||
+        composer.state.scores.facilities !== (existing?.facilities_score ?? null) ||
+        media.hasNewMedia()
+      );
+    }
+    return (
+      composer.state.overall != null ||
+      composer.state.reviewText.trim().length > 0 ||
+      composer.state.scores.design != null ||
+      composer.state.scores.condition != null ||
+      composer.state.scores.clubhouse != null ||
+      composer.state.scores.facilities != null ||
+      media.hasNewMedia()
+    );
+  }, [isEditMode, existing, composer.state, media]);
+
+  const handleBack = useCallback(() => {
+    if (isDirty && !success) {
+      setExitGuardOpen(true);
+      return;
+    }
+    onExit();
+  }, [isDirty, success, onExit]);
 
   const handleSubmit = useCallback(async () => {
     try {
@@ -198,8 +233,8 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
       // Fire uploads AFTER the RPC (media picked before submit is held locally).
       media.flushToReview(ratingId).catch(() => { /* per-item errors surfaced in tray */ });
       setSuccess({ ratingId, shareToFeed });
-    } catch {
-      // hook exposed error state already
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Couldn't save your review");
     }
   }, [submit, media, composer.state, course.id]);
 
@@ -217,8 +252,8 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
       }
       setRemoveOpen(false);
       onExit();
-    } catch {
-      // error surfaced via hook
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Couldn't remove your review");
     }
   }, [existing, submit, existingMedia, onExit]);
 
@@ -296,7 +331,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
         >
           <button
             type="button"
-            onClick={onExit}
+            onClick={handleBack}
             aria-label="Back"
             style={{
               width: 36,
@@ -497,6 +532,104 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
         onCancel={() => setRemoveOpen(false)}
         onConfirm={handleRemove}
       />
+
+      <DiscardReviewSheet
+        open={exitGuardOpen}
+        onKeep={() => setExitGuardOpen(false)}
+        onDiscard={() => {
+          setExitGuardOpen(false);
+          onExit();
+        }}
+      />
+    </div>
+  );
+}
+
+function DiscardReviewSheet({
+  open,
+  onKeep,
+  onDiscard,
+}: {
+  open: boolean;
+  onKeep: () => void;
+  onDiscard: () => void;
+}) {
+  if (!open) return null;
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 10000,
+        background: 'rgba(15,23,42,0.4)',
+        display: 'flex',
+        alignItems: 'flex-end',
+        justifyContent: 'center',
+      }}
+      onClick={onKeep}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          width: '100%',
+          maxWidth: 480,
+          background: '#FFFFFF',
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
+          padding: '16px 16px calc(env(safe-area-inset-bottom, 0px) + 16px)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 12,
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <div style={{ width: 36, height: 4, borderRadius: 999, background: 'rgba(15,23,42,0.16)' }} />
+        </div>
+        <div style={{ padding: '4px 4px 0' }}>
+          <div style={{ fontSize: 15, fontWeight: 700, color: RV2.ink }}>Discard this review?</div>
+          <div style={{ fontSize: 12.5, color: RV2.secondary, marginTop: 4 }}>
+            Your scores and words won't be saved.
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button
+            type="button"
+            onClick={onKeep}
+            style={{
+              flex: 1,
+              padding: 12,
+              borderRadius: 12,
+              background: '#FFFFFF',
+              border: `1px solid ${RV2.hairline}`,
+              fontSize: 14,
+              fontWeight: 600,
+              color: RV2.ink,
+              cursor: 'pointer',
+            }}
+          >
+            Keep writing
+          </button>
+          <button
+            type="button"
+            onClick={onDiscard}
+            style={{
+              flex: 1,
+              padding: 12,
+              borderRadius: 12,
+              background: '#EF4444',
+              border: 'none',
+              fontSize: 14,
+              fontWeight: 700,
+              color: '#FFFFFF',
+              cursor: 'pointer',
+            }}
+          >
+            Discard
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

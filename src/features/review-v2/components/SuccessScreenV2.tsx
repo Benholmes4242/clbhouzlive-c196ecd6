@@ -46,6 +46,9 @@ export function SuccessScreenV2({
     ? "Live on the course page and in your friends' feeds."
     : 'Live on the course page.';
 
+  const uploading = media.filter((m) => m.status === 'pending' || m.status === 'uploading').length;
+  const failed = media.filter((m) => m.status === 'failed').length;
+
   return (
     <ImmersiveSuccessShell padded={false}>
       {/* Top-right Share affordance (glass) */}
@@ -144,6 +147,30 @@ export function SuccessScreenV2({
 
         {/* Actions */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%', marginTop: 6 }}>
+          {uploading > 0 && (
+            <div
+              style={{
+                fontSize: 12,
+                color: 'rgba(255,255,255,0.62)',
+                textAlign: 'center',
+                padding: '0 4px 2px',
+              }}
+            >
+              Uploading your {uploading === 1 ? 'photo' : 'media'} — keep the app open
+            </div>
+          )}
+          {uploading === 0 && failed > 0 && (
+            <div
+              style={{
+                fontSize: 12,
+                color: '#F87171',
+                textAlign: 'center',
+                padding: '0 4px 2px',
+              }}
+            >
+              {failed} {failed === 1 ? 'item' : 'items'} didn't upload
+            </div>
+          )}
           <button
             type="button"
             onClick={onViewReview}

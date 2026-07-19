@@ -126,7 +126,7 @@ export function useReviewMediaPipeline({ userId, existingMedia }: UseReviewMedia
             };
             setItems((prev) => [...prev, item]);
             currentCount++;
-          } catch (e) {
+          } catch {
             setPickerError('Could not read video.');
           }
         } else {
@@ -220,7 +220,7 @@ export function useReviewMediaPipeline({ userId, existingMedia }: UseReviewMedia
               status: 'attached',
               owner_user_id: userId,
               duration_seconds: item.durationSeconds ?? null,
-            } as any)
+            })
             .select('id')
             .single();
 
@@ -268,7 +268,7 @@ export function useReviewMediaPipeline({ userId, existingMedia }: UseReviewMedia
             status: 'attached',
             owner_user_id: userId,
             ...dims,
-          } as any)
+          })
           .select('id')
           .single();
 
@@ -280,10 +280,10 @@ export function useReviewMediaPipeline({ userId, existingMedia }: UseReviewMedia
           uploadedUrl: data.publicUrl,
           dbRowId: row?.id ?? null,
         });
-      } catch (e: any) {
+      } catch (e) {
         updateItem(item.id, {
           status: 'failed',
-          error: e?.message || 'Upload failed',
+          error: e instanceof Error ? e.message : 'Upload failed',
         });
       }
     },
