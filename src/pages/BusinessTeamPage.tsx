@@ -72,13 +72,11 @@ export default function BusinessTeamPage() {
   const updateRole = useUpdateMemberRole(businessId || '');
   const revokeInvite = useRevokeInvite(businessId || '');
   const setVisibility = useSetMemberVisibility(businessId || '');
+  const setJobTitle = useSetMemberJobTitle(businessId || '');
   const { user } = useSupabaseSession();
   const currentUserId = user?.id;
 
   const [removeConfirm, setRemoveConfirm] = useState<{ open: boolean; member: BusinessMember | null }>({
-    open: false, member: null,
-  });
-  const [titleSheet, setTitleSheet] = useState<{ open: boolean; member: BusinessMember | null }>({
     open: false, member: null,
   });
 
