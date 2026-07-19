@@ -194,8 +194,8 @@ export const Fsv2Overlay: React.FC = () => {
       style={{
         position: 'fixed',
         inset: 0,
-        width: vp.width,
-        height: vp.height,
+        width: '100vw',
+        height: '100dvh',
         background: FSV2.BACKDROP,
         zIndex: 2147483000,
         opacity: visible ? 1 : 0,
