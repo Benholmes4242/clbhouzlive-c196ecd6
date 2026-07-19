@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from '@/lib/toast';
 import { supabase } from '@/integrations/supabase/client';
+import { resolvePostAuthRoute } from '@/lib/auth/postAuthRoute';
 import {
   trackAuthMethodSelected,
   trackAuthInitiated,
@@ -15,27 +16,23 @@ import AuthHeroScreen from './components/AuthHeroScreen';
 import AuthBottomSheet from './components/AuthBottomSheet';
 import OtpSheetContent from './components/OtpSheetContent';
 
-type AuthNotice = {
-  type: 'success' | 'error';
-  message: string;
-} | null;
-
-interface AuthFormProps {
-  // Kept for back-compat with the existing Auth.tsx wrapper. Most are unused.
-  isSignUp?: boolean;
-  setIsSignUp?: (b: boolean) => void;
-  setErrorMsg?: (msg: string | null) => void;
-  setSubmitting?: (b: boolean) => void;
-  setResendMsg?: (msg: string | null) => void;
-  lastResendEmail?: React.MutableRefObject<string>;
-  setEmail?: (email: string) => void;
-  setPassword?: (password: string) => void;
+type AppleClaims = {
+  aud?: string;
+  iss?: string;
   email?: string;
-  password?: string;
-  submitting?: boolean;
-  authNotice?: AuthNotice;
-  setAuthNotice?: (notice: AuthNotice) => void;
-}
+  email_verified?: boolean;
+  nonce?: string;
+};
+
+type GoogleClaims = {
+  aud?: string;
+  iss?: string;
+  email?: string;
+  email_verified?: boolean;
+  given_name?: string;
+  family_name?: string;
+  nonce?: string;
+};
 
 const sanitiseErrorForAnalytics = (message?: string): string => {
   if (!message) return 'auth_error';
@@ -51,7 +48,7 @@ type Step = 'hero' | 'otp';
 
 const RESEND_COOLDOWN_SECONDS = 30;
 
-const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
+const AuthForm: React.FC = () => {
   const { t } = useTranslation('auth');
   const navigate = useNavigate();
 
