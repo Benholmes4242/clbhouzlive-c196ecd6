@@ -155,7 +155,7 @@ export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
         onSelect: setSelectedRound,
       } : undefined}
       playerName={target.playerName}
-      playerAvatarUrl={null}
+      playerAvatarUrl={target.playerPhotoUrl ?? null}
       playerHcp={null}
       playerHcpDelta={null}
       playerUserId={target.playerId}
