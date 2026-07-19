@@ -59,6 +59,7 @@ export function useBusinessTeam(businessId?: string) {
           role,
           created_at,
           is_public,
+          job_title,
           user_profile:user_profiles!business_members_user_profile_id_fkey (
             id,
             display_name,
