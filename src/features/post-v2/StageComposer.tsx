@@ -171,6 +171,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
   const [success, setSuccess] = useState<SubmitResult | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [scheduledCount, setScheduledCount] = useState<number>(0);
+  const [restoredDraftId, setRestoredDraftId] = useState<string | null>(null);
 
   const active = state.media[state.activeIndex] ?? null;
 
