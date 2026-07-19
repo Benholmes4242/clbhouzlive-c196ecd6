@@ -21,7 +21,7 @@ import {
   WALL_LEVELS,
 } from '@/components/profile/handicap/whs/gam/trophy-room/_shared/levels';
 import { openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
-import { MATERIAL_HEX } from '@/components/profile/handicap/whs/gam/trophy-room/_shared/rarityPalette';
+
 import { renderBadgeIcon } from '@/components/profile/handicap/whs/gam/badgeIcons';
 import { formatHcp } from '@/lib/formatHcp';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
