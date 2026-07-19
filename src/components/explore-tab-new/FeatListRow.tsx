@@ -154,19 +154,19 @@ export function FeatListRow({ row, tier, onTap, index = 0, mode = 'latest', best
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 11, minWidth: 0 }}>
         <div
-          className={legendaryChampion ? 'clbhouz-gold-shimmer-light' : undefined}
+          className={legendaryChampion && !(crownLeader && isTop) ? 'clbhouz-gold-shimmer-light' : undefined}
           style={{
             width: 20,
             textAlign: 'center',
             flexShrink: 0,
-            fontSize: 11,
+            fontSize: crownLeader && isTop ? 13 : 11,
             fontWeight: 600,
-            fontVariantNumeric: 'tabular-nums',
+            ...(crownLeader && isTop ? {} : { fontVariantNumeric: 'tabular-nums' as const }),
             lineHeight: 1,
-            ...(legendaryChampion ? {} : { color: isTop ? AMBER : INK_RANK }),
+            ...(legendaryChampion && !(crownLeader && isTop) ? {} : { color: isTop ? AMBER : INK_RANK }),
           }}
         >
-          {rank}
+          {crownLeader && isTop ? '\u{1F3C6}' : rank}
         </div>
         <div style={{ flexShrink: 0 }}>
           <SquircleAvatar
