@@ -219,6 +219,7 @@ export function useStageComposer() {
     updateActive,
     setCaption,
     setCourse,
+    setCourses,
     setScheduledAt,
     restoreDraft,
     hydrate,
