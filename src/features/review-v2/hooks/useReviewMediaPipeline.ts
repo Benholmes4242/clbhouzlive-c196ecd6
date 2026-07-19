@@ -220,7 +220,7 @@ export function useReviewMediaPipeline({ userId, existingMedia }: UseReviewMedia
               status: 'attached',
               owner_user_id: userId,
               duration_seconds: item.durationSeconds ?? null,
-            } as any)
+            })
             .select('id')
             .single();
 
