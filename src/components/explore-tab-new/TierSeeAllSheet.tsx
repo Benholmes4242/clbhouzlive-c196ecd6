@@ -9,7 +9,6 @@ import {
   SLATE_50,
 } from '@/features/tourhub/_shared/tokens';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { GoldRingAvatar } from '@/components/shared/GoldRingAvatar';
 
 import { formatHcp } from '@/lib/formatHcp';
 import { REGION_TABS } from './AlmanacSections';
@@ -592,24 +591,14 @@ function CountLeaderSheetRow({
           {rank}
         </div>
         <div style={{ flexShrink: 0 }}>
-          {isGold ? (
-            <GoldRingAvatar
-              size={34}
-              srcCandidates={holderAvatar ? [holderAvatar] : []}
-              alt={name}
-              fallback={leaderInitials(name)}
-              userId={userId ?? undefined}
-            />
-          ) : (
-            <SquircleAvatar
-              size={34}
-              srcCandidates={holderAvatar ? [holderAvatar] : []}
-              alt={name}
-              fallback={leaderInitials(name)}
-              userId={userId ?? undefined}
-              hairlineRing
-            />
-          )}
+          <SquircleAvatar
+            size={34}
+            srcCandidates={holderAvatar ? [holderAvatar] : []}
+            alt={name}
+            fallback={leaderInitials(name)}
+            userId={userId ?? undefined}
+            hairlineRing
+          />
         </div>
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, minWidth: 0 }}>
