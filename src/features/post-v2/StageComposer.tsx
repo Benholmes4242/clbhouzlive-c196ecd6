@@ -199,7 +199,8 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
       const res = await submit({
         caption: state.caption,
         media: state.media,
-        course: state.course,
+        course: primaryCourse,
+        taggedCourseIds: state.courses.map((c) => c.id),
         scheduledAt: state.scheduledAt,
         actorType: activeActor.type,
         actorId: activeActor.id,
