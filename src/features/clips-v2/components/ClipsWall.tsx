@@ -163,7 +163,6 @@ export function ClipsWall({ mood }: { mood: ClipsV2Mood }) {
 
   return (
     <div style={{ padding: '12px 0 0', fontFamily: FONT_FAMILY }}>
-      <style>{spinKeyframes}</style>
       <div ref={railRef} style={{ display: 'flex', gap: 4, padding: '0 4px' }}>
         <div style={{ flex: 1 }}>
           {packed.left.map(({ item, flatIndex: i }) => (
@@ -199,17 +198,13 @@ export function ClipsWall({ mood }: { mood: ClipsV2Mood }) {
       <div ref={sentinelRef} style={{ height: 1 }} />
 
       {isFetchingNextPage ? (
-        <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0' }}>
-          <div
-            style={{
-              width: 26,
-              height: 26,
-              borderRadius: 999,
-              border: '3px solid rgba(0,0,0,0.08)',
-              borderTopColor: '#F7931E',
-              animation: 'clips-v2-spin 0.9s linear infinite',
-            }}
-          />
+        <div style={{ display: 'flex', gap: 4, padding: '16px 4px 0' }}>
+          <div style={{ flex: 1 }}>
+            <SkeletonTile />
+          </div>
+          <div style={{ flex: 1 }}>
+            <SkeletonTile />
+          </div>
         </div>
       ) : null}
     </div>
