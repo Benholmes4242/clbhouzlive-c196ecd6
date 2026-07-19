@@ -33,6 +33,7 @@ interface SoloLeaderRowProps {
   country?: string | null;
   score: string;
   thru: string;
+  today?: number | null;
   /** Ordered multi-folder candidate URLs (resolvePlayerAvatarCandidates output). */
   avatarCandidates?: (string | null | undefined)[];
   /** Stable id used to derive the deterministic initials colour. */
@@ -47,17 +48,20 @@ export function SoloLeaderRow({
   country,
   score,
   thru,
+  today,
   avatarCandidates,
   playerId,
   isResults = false,
   isLast = false,
 }: SoloLeaderRowProps) {
   const hideThru = isResults;
+  const todayDisplay = today != null ? (today === 0 ? 'E' : today > 0 ? `+${today}` : String(today)) : '—';
+  const todayColor = today != null ? liveScoreColour(todayDisplay) : INK_45;
   return (
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: hideThru ? '32px 1fr auto' : '32px 1fr auto 42px',
+        gridTemplateColumns: hideThru ? '32px 1fr auto' : '32px 1fr 42px 42px auto',
         gap: 12,
         padding: '14px 20px',
         alignItems: 'center',
@@ -101,18 +105,6 @@ export function SoloLeaderRow({
           {country && <CountryFlag country={country} size="sm" />}
         </div>
       </div>
-      <span
-        style={{
-          ...NUMERIC_STYLE,
-          fontSize: 22,
-          fontWeight: 700,
-          color: isResults ? GOLD_DARK : liveScoreColour(score),
-          letterSpacing: '-0.02em',
-          fontFeatureSettings: '"tnum" 1, "kern" 1',
-        }}
-      >
-        {score}
-      </span>
       {!hideThru && (
         <span
           style={{
@@ -126,6 +118,32 @@ export function SoloLeaderRow({
           {thru}
         </span>
       )}
+      {!hideThru && (
+        <span
+          style={{
+            ...NUMERIC_STYLE,
+            fontSize: 13,
+            fontWeight: 700,
+            color: todayColor,
+            textAlign: 'right',
+          }}
+        >
+          {todayDisplay}
+        </span>
+      )}
+      <span
+        style={{
+          ...NUMERIC_STYLE,
+          fontSize: 22,
+          fontWeight: 700,
+          color: isResults ? GOLD_DARK : liveScoreColour(score),
+          letterSpacing: '-0.02em',
+          fontFeatureSettings: '"tnum" 1, "kern" 1',
+          textAlign: 'right',
+        }}
+      >
+        {score}
+      </span>
     </div>
   );
 }
