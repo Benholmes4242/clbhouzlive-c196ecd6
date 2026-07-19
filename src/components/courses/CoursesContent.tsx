@@ -196,8 +196,11 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
   
   // Default to 'discover' for the main courses page
   const [activeTab, setActiveTab] = useState(() => {
-    if (username) return 'my-courses'; // Keep for user profile pages
     const tabParam = new URLSearchParams(window.location.search).get('tab');
+    if (username) {
+      // User-profile variant only defines 'explore' and 'my-courses'.
+      return tabParam === 'explore' ? 'explore' : 'my-courses';
+    }
     if (tabParam && ['explore', 'top100', 'discover'].includes(tabParam)) {
       return tabParam;
     }
@@ -212,10 +215,13 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
   useEffect(() => {
     const tabParam = searchParams.get('tab');
 
+    if (username) {
+      // User-profile variant only defines 'explore' and 'my-courses'.
+      setActiveTab(tabParam === 'explore' ? 'explore' : 'my-courses');
+      return;
+    }
     if (tabParam && (tabParam === 'explore' || tabParam === 'top100' || tabParam === 'discover')) {
       setActiveTab(tabParam);
-    } else if (username) {
-      setActiveTab('my-courses');
     } else {
       setActiveTab('discover');
     }
