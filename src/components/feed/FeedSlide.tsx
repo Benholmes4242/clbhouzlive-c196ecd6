@@ -1055,6 +1055,32 @@ const BorrowedFullscreenSlot: React.FC<{
       console.info('[BORROW]', 'mount', { laneId: borrow.laneId, ownerKey: borrow.ownerKey, postId: borrow.postId });
     }
 
+    // ── AudioDebug: borrow.audio at bind + 100ms after (detect mutations)
+    if (audioDbg.audioDebugEnabled()) {
+      try {
+        const bEl = (VideoEngine as unknown as { _debugGetElement?: (id: string) => HTMLMediaElement | null })._debugGetElement?.(borrow.laneId) ?? null;
+        audioDbg.logAudio('borrow.audio', {
+          phase: 'bind', laneId: borrow.laneId, ownerKey: borrow.ownerKey,
+          muted: bEl?.muted ?? null, volume: bEl?.volume ?? null,
+          paused: bEl?.paused ?? null,
+          currentTime: bEl ? +bEl.currentTime.toFixed(3) : null,
+        });
+        setTimeout(() => {
+          try {
+            const bEl2 = (VideoEngine as unknown as { _debugGetElement?: (id: string) => HTMLMediaElement | null })._debugGetElement?.(borrow.laneId) ?? null;
+            audioDbg.logAudio('borrow.audio', {
+              phase: 'post100', laneId: borrow.laneId,
+              muted: bEl2?.muted ?? null, volume: bEl2?.volume ?? null,
+              paused: bEl2?.paused ?? null,
+              currentTime: bEl2 ? +bEl2.currentTime.toFixed(3) : null,
+            });
+            audioDbg.setSummary({ fsPos: bEl2 ? +bEl2.currentTime.toFixed(2) : null });
+          } catch {}
+        }, 100);
+      } catch {}
+    }
+
+
     // Aspect-aware expand target — grow INTO the media's resting rect so
     // there is no post-expand shrink.
     //
