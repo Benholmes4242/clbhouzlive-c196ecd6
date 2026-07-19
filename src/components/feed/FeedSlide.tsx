@@ -1071,11 +1071,22 @@ const BorrowedFullscreenSlot: React.FC<{
     if (audioDbg.audioDebugEnabled()) {
       try {
         const bEl = (VideoEngine as unknown as { _debugGetElement?: (id: string) => HTMLMediaElement | null })._debugGetElement?.(borrow.laneId) ?? null;
+        // ── AUDIO PUSHDOWN (borrow): reuse engine's session-policy apply
+        // right after adoption so the borrowed lane element inherits current
+        // useSessionAudio state. No-op when session is muted.
+        const sessionMuted = useSessionAudio.getState().isMuted;
+        const elMutedBefore = bEl?.muted ?? null;
+        try { VideoEngine.applyLaneAudioPolicy(borrow.laneId); } catch {}
+        const bElAfter = (VideoEngine as unknown as { _debugGetElement?: (id: string) => HTMLMediaElement | null })._debugGetElement?.(borrow.laneId) ?? null;
+        audioDbg.logAudio('audio.pushdown', {
+          site: 'borrow', laneId: borrow.laneId, sessionMuted,
+          elMutedBefore, elMutedAfter: bElAfter?.muted ?? null,
+        });
         audioDbg.logAudio('borrow.audio', {
           phase: 'bind', laneId: borrow.laneId, ownerKey: borrow.ownerKey,
-          muted: bEl?.muted ?? null, volume: bEl?.volume ?? null,
-          paused: bEl?.paused ?? null,
-          currentTime: bEl ? +bEl.currentTime.toFixed(3) : null,
+          muted: bElAfter?.muted ?? null, volume: bElAfter?.volume ?? null,
+          paused: bElAfter?.paused ?? null,
+          currentTime: bElAfter ? +bElAfter.currentTime.toFixed(3) : null,
         });
         setTimeout(() => {
           try {
