@@ -603,9 +603,12 @@ export function FullscreenFeedOverlay() {
         // Close/route teardown must park the fullscreen singleton and clear
         // firstFrame before the next cold open can synchronously snapshot it.
         try { VideoEngine.unmountLane('fullscreen'); } catch {}
+        try { vperfCloseMotionMark('laneRemounted', { lane: 'fullscreen', op: 'unmount' }); } catch {}
 
         unlockViewportScroll();
+        try { vperfCloseMotionMark('scrollUnlocked'); } catch {}
         document.body.classList.remove('route-fullscreen-overlay');
+        try { vperfCloseMotionMark('bodyClassRemoved'); vperfCloseMotionMark('chromeUnsuppressed'); } catch {}
         // Restore shield to transparent (NOT #F8FAFC) so the dark feed background
         // shows through — matches the prior CourseMediaViewer behaviour and
         // App.tsx's dark route baseline. #F8FAFC was a light slate that flashed
