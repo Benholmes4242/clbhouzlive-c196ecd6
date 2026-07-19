@@ -223,7 +223,7 @@ function Card({
 
 function SkeletonCard() {
   return (
-    <div style={{ width: 374, flexShrink: 0 }}>
+    <div style={{ width: 'min(374px, calc(100vw - 32px))', flexShrink: 0 }}>
       <div
         style={{
           aspectRatio: '16 / 9',
