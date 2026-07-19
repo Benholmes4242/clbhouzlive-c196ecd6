@@ -4,15 +4,27 @@ import { formatRatingValue } from '@/utils/formatters';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate } from 'react-router-dom';
 
+// Structural row shapes — only the fields the sorter touches.
+type UserCourseInner = {
+  name?: string;
+  regional_rank?: number | null;
+  global_rank?: number | null;
+};
+
+type UserCourseRow = {
+  golf_courses?: UserCourseInner | null;
+  rating?: number | null;
+};
+
 // Helper function to get the best ranking for sorting
-const getCourseRanking = (course: any) => {
-  if (course.regional_rank) return course.regional_rank;
-  if (course.global_rank) return course.global_rank;
+const getCourseRanking = (course: UserCourseInner | null | undefined) => {
+  if (course?.regional_rank) return course.regional_rank;
+  if (course?.global_rank) return course.global_rank;
   return 9999;
 };
 
 // Custom sorting function for user courses - prioritize user ratings first
-const getSortedUserCourses = (userCourses: any[]) => {
+const getSortedUserCourses = <T extends UserCourseRow>(userCourses: T[]): T[] => {
   console.log('Sorting user courses:', userCourses.map(c => ({ 
     name: c.golf_courses?.name, 
     rating: c.rating 
