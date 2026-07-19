@@ -4,6 +4,8 @@
 //
 // Edit mode + draft deep-link are threaded through to StageComposer. The
 // legacy initialMedia hand-off is no longer used by any live opener.
+//
+// This file and types.ts are the only survivors of the retired post-composer module; the rest was deleted 2026-07-19.
 
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';

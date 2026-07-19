@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 /**
  * Mirrors the visualViewport keyboard math used by
- * src/components/post-composer/Composer.tsx so the messaging composer
+ * the retired composer (removed) so the messaging composer
  * behaves identically when the on-screen keyboard opens.
  */
 export function useKeyboardHeight(): number {

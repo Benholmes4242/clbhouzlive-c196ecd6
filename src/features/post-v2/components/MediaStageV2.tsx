@@ -164,7 +164,7 @@ export default function MediaStageV2({ item, index, total, onOpenAdjust, onOpenT
               willChange: 'transform',
               transform: `rotate(${f.r}deg)`,
             };
-            (style as any)['--r'] = `${f.r}deg`;
+            (style as React.CSSProperties & Record<string, string>)['--r'] = `${f.r}deg`;
             if (!reduced) {
               style.animation = `pv2-floaty 3.2s ${f.delay}s ease-in-out infinite`;
             }

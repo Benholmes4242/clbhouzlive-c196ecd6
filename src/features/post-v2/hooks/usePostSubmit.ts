@@ -53,9 +53,9 @@ export function usePostSubmit() {
   const submit = useCallback(async (input: SubmitInput): Promise<SubmitResult> => {
     setSubmitting(true);
     setError(null);
+    const jobId = crypto.randomUUID();
+    const hasMedia = input.media.length > 0;
     try {
-      const jobId = crypto.randomUUID();
-      const hasMedia = input.media.length > 0;
       const userId = profile?.id;
       if (!userId) throw new Error('Not signed in');
 
@@ -95,6 +95,8 @@ export function usePostSubmit() {
       }
 
       // Birth the post via RPC (SECURITY INVOKER; RLS enforces actor rights).
+      // Visibility selector was deliberately removed in the v2 composer -
+      // all posts are public ('anyone'). Owner decision 2026-07-19.
       const { data: born, error: bornErr } = await supabase.rpc('create_post_v2', {
         p_actor_id: input.actorId,
         p_actor_type: input.actorType,
@@ -156,6 +158,10 @@ export function usePostSubmit() {
         isScheduled: !!input.scheduledAt,
       };
     } catch (e) {
+      // Roll back the optimistic pending card - the post was never born.
+      if (hasMedia) {
+        try { usePendingPostsStore.getState().removeJob(jobId); } catch { /* store rollback best-effort */ }
+      }
       const msg = e instanceof Error ? e.message : 'Submit failed';
       setError(msg);
       throw e;

@@ -95,9 +95,9 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
   // On unmount, re-resolve chrome for the route underneath (Clubhouse dark,
   // Watch light, profile immersive, etc.) because overlay close is not a route change.
   useEffect(() => {
-    try { setStatusBarStyleColor('dark', 'FFF8FAFC'); } catch {}
+    try { setStatusBarStyleColor('dark', 'FFF8FAFC'); } catch { /* status bar best-effort */ }
     return () => {
-      try { applyRouteChrome(window.location.pathname, true); } catch {}
+      try { applyRouteChrome(window.location.pathname, true); } catch { /* chrome re-resolve best-effort */ }
     };
   }, []);
 
@@ -163,6 +163,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
           courses,
           course: courses[0] ?? null,
         });
+        if (!cancelled) setRestoredDraftId(data.id as string);
       });
     return () => { cancelled = true; };
   }, [draftId, isEditMode, profile?.id, restoreDraft]);
@@ -171,6 +172,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
   const [success, setSuccess] = useState<SubmitResult | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [scheduledCount, setScheduledCount] = useState<number>(0);
+  const [restoredDraftId, setRestoredDraftId] = useState<string | null>(null);
 
   const active = state.media[state.activeIndex] ?? null;
 
@@ -238,13 +240,15 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
 
       // Sync the single-course junction row to the primary course (best-effort;
       // full multi-course junction editing stays with useUpdatePost).
-      await supabase.from('post_courses').delete().eq('post_id', editPostId);
+      const { error: pcDelErr } = await supabase.from('post_courses').delete().eq('post_id', editPostId);
+      if (pcDelErr) throw pcDelErr;
       if (state.course?.id) {
-        await supabase.from('post_courses').insert({
+        const { error: pcInsErr } = await supabase.from('post_courses').insert({
           post_id: editPostId,
           course_id: state.course.id,
           display_order: 0,
         } as never);
+        if (pcInsErr) throw pcInsErr;
       }
 
       // Removed media rows: snapshot for cleanup, then delete.
@@ -253,7 +257,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
           .from('post_media')
           .select('id, media_url, media_type, stream_id')
           .in('id', removedExistingIds);
-        const snapshot = (rows ?? []).map((r: any) => ({
+        const snapshot = ((rows ?? []) as Array<{ id: string; media_url: string; media_type: string; stream_id: string | null }>).map((r) => ({
           id: r.id,
           media_url: r.media_url,
           media_type: (r.media_type === 'video' ? 'video' : 'image') as 'image' | 'video',
@@ -328,7 +332,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
   }, [state.media, removeAt]);
 
   const handleClose = () => {
-    if (state.dirty && !isEditMode) {
+    if (state.dirty) {
       setSheet('close-guard');
       return;
     }
@@ -346,6 +350,10 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
       courseCountry: state.course?.country ?? null,
       courses: state.courses,
     });
+    if (restoredDraftId) {
+      await drafts.remove(restoredDraftId);
+      setRestoredDraftId(null);
+    }
     setSheet(null);
     reset();
     onClose();
@@ -482,6 +490,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
           const savedCourses = cd?.courses ?? [];
           const courses = savedCourses.length > 0 ? savedCourses : (primary ? [primary] : []);
           restoreDraft({ caption: d.content ?? '', course: courses[0] ?? null, courses });
+          setRestoredDraftId(d.id);
         }}
         onDelete={drafts.remove}
       />
@@ -507,7 +516,16 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
       {/* Close guard */}
       <BottomSheet open={sheet === 'close-guard'} onClose={() => setSheet(null)} title="Unsaved changes">
         <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <button onClick={saveAsDraft} style={{ background: '#15171F', color: '#F5F6F7', border: 0, borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Save draft</button>
+          {!isEditMode && (
+            <>
+              {state.media.length > 0 && (
+                <div style={{ fontSize: 12.5, color: '#5A6270', lineHeight: 1.45 }}>
+                  Drafts save your caption and course tags. Photos and videos aren't kept yet - you'll need to re-add them.
+                </div>
+              )}
+              <button onClick={saveAsDraft} style={{ background: '#15171F', color: '#F5F6F7', border: 0, borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Save draft</button>
+            </>
+          )}
           <button onClick={() => { setSheet(null); reset(); onClose(); }} style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer', color: '#B00020' }}>Discard</button>
         </div>
       </BottomSheet>
