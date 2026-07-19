@@ -1,6 +1,6 @@
 import { GAM } from '../../../gam/tokens';
 import React from 'react';
-import { Crown } from 'lucide-react';
+
 import { MovementCell } from './_shared/MovementCell';
 
 /**
