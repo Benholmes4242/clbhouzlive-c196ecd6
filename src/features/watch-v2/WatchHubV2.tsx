@@ -28,16 +28,16 @@ export default function WatchHubV2({ embedded = false }: { embedded?: boolean })
             10px top padding to sit under the fixed chrome. */}
         <DestinationDoors />
 
-        <div style={{ height: 24 }} />
-        <HubChipBar active={filter} onChange={setFilter} />
-
         <div style={{ paddingTop: 24 }}>
           <HubVideoRow />
         </div>
         <div style={{ paddingTop: 24 }}>
           <HubClipsRow />
         </div>
-        <div style={{ paddingTop: 24 }}>
+
+        <HubChipBar active={filter} onChange={setFilter} />
+
+        <div style={{ paddingTop: 16 }}>
           <HubMixedGrid filter={filter} />
         </div>
       </main>
