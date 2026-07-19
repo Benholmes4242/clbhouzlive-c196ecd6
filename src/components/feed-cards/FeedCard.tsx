@@ -28,6 +28,8 @@ import Pressable from '@/components/ui/Pressable';
 import { useRailLane } from '@/video/useRailLane';
 import { usePreroutePrefetch } from '@/video/usePreroutePrefetch';
 import { openWithOrigin } from '@/lib/openWithOrigin';
+import { openFsv2 } from '@/features/fsv2';
+import { FLAGS } from '@/config/flags';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 const FONT_FAMILY =
@@ -125,6 +127,14 @@ export function FeedCard({
   });
 
   const handlePress = () => {
+    if (FLAGS.fsv2) {
+      openFsv2({
+        openedFrom,
+        posts,
+        startIndex: flatIndex,
+      });
+      return;
+    }
     openWithOrigin({
       openedFrom,
       posts,
