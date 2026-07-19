@@ -18,6 +18,7 @@ export interface BusinessMember {
   role: BusinessRole;
   created_at: string;
   is_public: boolean | null;
+  job_title: string | null;
   user_profile?: {
     id: string;
     display_name: string | null;
@@ -58,6 +59,7 @@ export function useBusinessTeam(businessId?: string) {
           role,
           created_at,
           is_public,
+          job_title,
           user_profile:user_profiles!business_members_user_profile_id_fkey (
             id,
             display_name,
@@ -283,6 +285,27 @@ export function useSetMemberVisibility(businessId: string) {
     },
     onError: (error: Error) => {
       toast.error('Failed to update visibility', { description: error.message });
+    },
+  });
+}
+
+export function useSetMemberJobTitle(businessId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ memberUserId, jobTitle }: { memberUserId: string; jobTitle: string }) => {
+      const { error } = await (supabase.rpc as any)('set_member_job_title', {
+        _business_id: businessId,
+        _member_user_id: memberUserId,
+        _job_title: jobTitle,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['business-team', businessId] });
+    },
+    onError: (error: Error) => {
+      toast.error('Failed to update job title', { description: error.message });
     },
   });
 }

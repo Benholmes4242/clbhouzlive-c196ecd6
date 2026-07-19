@@ -65,7 +65,7 @@ export const BusinessTeamTab: React.FC<BusinessTeamTabProps> = ({ businessId }) 
             />
             <div className="min-w-0 flex-1">
               <p className="text-[15px] font-semibold text-foreground truncate">{name}</p>
-              <p className="text-xs text-muted-foreground">{FRIENDLY_ROLE[m.role]}</p>
+              <p className="text-xs text-muted-foreground">{m.job_title || FRIENDLY_ROLE[m.role]}</p>
             </div>
           </button>
         );
