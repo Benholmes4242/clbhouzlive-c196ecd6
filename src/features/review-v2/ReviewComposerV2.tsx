@@ -151,13 +151,14 @@ function InnerComposer() {
       existingMedia={existingMediaQ.data ?? []}
       author={{
         displayName:
-          (profileQ.data as any)?.display_name ||
-          (profileQ.data as any)?.username ||
+          profileQ.data?.display_name ||
+          profileQ.data?.username ||
           'You',
-        avatarUrl: (profileQ.data as any)?.profile_photo_url ?? null,
+        avatarUrl: profileQ.data?.profile_photo_url ?? null,
       }}
       onExit={() => {
-        if (window.history.state && (window.history.state as any).idx > 0) {
+        const hs = window.history.state as { idx?: number } | null;
+        if (hs && typeof hs.idx === 'number' && hs.idx > 0) {
           navigate(-1);
         } else if (courseId) {
           navigate(`/courses/${courseId}`, { replace: true });
