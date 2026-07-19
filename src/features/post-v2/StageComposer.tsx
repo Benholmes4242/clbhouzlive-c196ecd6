@@ -576,7 +576,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
                   Drafts save your caption and course tags. Photos and videos aren't kept yet - you'll need to re-add them.
                 </div>
               )}
-              <button onClick={saveAsDraft} style={{ background: '#15171F', color: '#F5F6F7', border: 0, borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Save draft</button>
+              <button onClick={saveAsDraft} disabled={savingDraft} style={{ background: '#15171F', color: '#F5F6F7', border: 0, borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 600, cursor: savingDraft ? 'not-allowed' : 'pointer', opacity: savingDraft ? 0.7 : 1 }}>{savingDraft ? 'Saving' : 'Save draft'}</button>
             </>
           )}
           <button onClick={() => { setSheet(null); reset(); onClose(); }} style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer', color: '#B00020' }}>Discard</button>
