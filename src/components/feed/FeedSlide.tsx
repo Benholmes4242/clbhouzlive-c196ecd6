@@ -350,6 +350,10 @@ export default FeedSlide;
 const PostViewSentinel: React.FC<{ postId: string }> = ({ postId }) => {
   const attach = usePostViewTracker(postId, true);
   return <div ref={attach} className="absolute inset-0 pointer-events-none" aria-hidden="true" />;
+};
+
+
+
 
 
 /**
