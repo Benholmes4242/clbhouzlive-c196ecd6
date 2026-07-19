@@ -758,9 +758,19 @@ async function syncLeaderboard(supabase: any, apiKey: string, tour: string, year
 
       // 4. Upsert leaderboard row keyed by team_id (player_id MUST be null — XOR check)
       const rounds = mergeLiveRound(entry);
-      const latestRound = rounds.length > 0 ? rounds[rounds.length - 1] : null;
-      const derivedThru = latestRound?.thru ?? entry.thru ?? null;
-      // today is read client-side from raw_data.rounds (see CinematicFrame liveRoundFor).
+      const activeRoundIndex = (() => {
+        for (let i = rounds.length - 1; i >= 0; i--) {
+          const r: any = rounds[i];
+          if ((r?.thru ?? 0) > 0 && (r?.strokes ?? 0) > 0) return i;
+        }
+        return -1;
+      })();
+      const activeRound: any = activeRoundIndex >= 0 ? rounds[activeRoundIndex] : null;
+      const derivedThru = activeRound?.thru ?? entry.thru ?? null;
+      const derivedToday = activeRound?.score ?? null;
+      const derivedTodayRound = activeRoundIndex >= 0 ? activeRoundIndex + 1 : null;
+      // today/today_round are now authoritative in this column; raw_data.rounds
+      // is still written and CinematicFrame's client-side derivation remains as a fallback.
       const derivedStatus = entry.status || (entry.position != null ? 'active' : null);
 
       const { error } = await supabase.from('sr_leaderboards').upsert({
@@ -780,7 +790,8 @@ async function syncLeaderboard(supabase: any, apiKey: string, tour: string, year
         points: entry.points,
         status: derivedStatus,
         starting_score: entry.starting_score,
-        today: null,
+        today: derivedToday,
+        today_round: derivedTodayRound,
         wins: entry.wins,
         losses: entry.losses,
         raw_data: { ...entry, rounds },
