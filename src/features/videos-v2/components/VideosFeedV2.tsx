@@ -1,5 +1,5 @@
 /**
- * VideosFeedV2 — infinite feed body for /videos-v2-test.
+ * VideosFeedV2 — infinite feed body for /watch/videos.
  *
  * Pending uploads integration replicates VideosFullFeed's semantics:
  *   - usePendingPostsForActor keyed to the active actor (business or
@@ -10,7 +10,7 @@
  *     surface elsewhere).
  * Reference (READ, do not import): src/components/watch/videos/VideosFullFeed.tsx.
  */
-import { useEffect, useMemo, useRef } from 'react';
+import { Fragment, useEffect, useMemo, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
