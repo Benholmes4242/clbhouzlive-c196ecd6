@@ -6,7 +6,7 @@ import type { ActiveActor } from '@/types/actor';
 import { formatSchedule } from '../lib/formatSchedule';
 
 interface Props {
-  courses: StageCourse[];
+  course: StageCourse | null;
   onOpenCourse: () => void;
   actor: ActiveActor | null;
   onOpenActor: () => void;
@@ -17,15 +17,10 @@ interface Props {
   showSchedule?: boolean;
 }
 
-export default function DetailRows({ courses, onOpenCourse, actor, onOpenActor, scheduledAt, onOpenSchedule, actorLocked, showSchedule = true }: Props) {
-  const courseValue = courses.length === 0
-    ? null
-    : courses.length === 1
-      ? courses[0].name
-      : `${courses[0].name} +${courses.length - 1}`;
+export default function DetailRows({ course, onOpenCourse, actor, onOpenActor, scheduledAt, onOpenSchedule, actorLocked, showSchedule = true }: Props) {
   return (
     <div style={{ background: '#F8FAFC' }}>
-      <Row icon={<MapPin size={16} color="#F7931E" />} label="Tag a course" value={courseValue} onClick={onOpenCourse} />
+      <Row icon={<MapPin size={16} color="#F7931E" />} label="Tag a course" value={course?.name ?? null} onClick={onOpenCourse} />
       <Row icon={<User2 size={16} color="#F7931E" />} label="Posting as" value={actor?.name ?? null} onClick={onOpenActor} disabled={actorLocked} />
       {showSchedule && (
         <Row icon={<Clock size={16} color="#F7931E" />} label="Schedule for later" value={scheduledAt ? formatSchedule(scheduledAt) : null} onClick={onOpenSchedule} />

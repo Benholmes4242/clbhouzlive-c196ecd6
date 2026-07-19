@@ -22,7 +22,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
 import { applyRouteChrome } from '@/lib/routeChrome';
 
-import { useStageComposer, type StageMediaItem, type StageCourse } from './hooks/useStageComposer';
+import { useStageComposer, type StageMediaItem } from './hooks/useStageComposer';
 import { usePostSubmit, type SubmitResult } from './hooks/usePostSubmit';
 import { useDrafts } from './hooks/useDrafts';
 import { useEditablePost } from '@/hooks/useEditablePost';
@@ -38,7 +38,7 @@ import ActorSheet from './components/ActorSheet';
 import ScheduleSheetV2 from './components/ScheduleSheetV2';
 import DraftsSheetV2 from './components/DraftsSheetV2';
 import ScheduledPostsSheetV2 from './components/ScheduledPostsSheetV2';
-
+import MediaTrimSheet from './components/MediaTrimSheet';
 import CoverFrameSheet from './components/CoverFrameSheet';
 import AdjustSheet from './components/AdjustSheet';
 import PostSuccessV2 from './components/PostSuccessV2';
@@ -57,8 +57,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
   const { profile } = useProfileData();
   const { activeActor, setActiveActor } = useActiveActor();
   const composer = useStageComposer();
-  const { state, addFiles, removeAt, reorder, setActiveIndex, updateActive, setCaption, setCourses, setScheduledAt, restoreDraft, hydrate, reset } = composer;
-  const primaryCourse = state.courses[0] ?? null;
+  const { state, addFiles, removeAt, reorder, setActiveIndex, updateActive, setCaption, setCourse, setScheduledAt, restoreDraft, hydrate, reset } = composer;
   const { submit, submitting } = usePostSubmit();
   const drafts = useDrafts(profile?.id);
   const queryClient = useQueryClient();
@@ -119,14 +118,12 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
       trimEnd: null,
       posterTimestamp: null,
     }));
-    const hydratedCourses: StageCourse[] = (data.courses ?? []).map((c) => ({
-      id: c.courseId,
-      name: c.courseName,
-      country: c.country,
-    }));
+    const firstCourse = data.courses[0] ?? null;
     hydrate({
       caption: data.caption,
-      courses: hydratedCourses,
+      course: firstCourse
+        ? { id: firstCourse.courseId, name: firstCourse.courseName, country: firstCourse.country }
+        : null,
       scheduledAt: editStatus?.status === 'scheduled' && editStatus.scheduledAt
         ? new Date(editStatus.scheduledAt)
         : null,
@@ -143,27 +140,23 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
     let cancelled = false;
     supabase
       .from('post_drafts')
-      .select('id, actor_type, actor_id, content, course_id, course_name, course_country, course_data')
+      .select('id, actor_type, actor_id, content, course_id, course_name, course_country')
       .eq('id', draftId)
       .eq('user_id', profile.id)
       .maybeSingle()
       .then(({ data }) => {
         if (cancelled || !data) return;
-        const stored = (data.course_data as { courses?: StageCourse[] } | null)?.courses;
-        const draftCourses: StageCourse[] = Array.isArray(stored) && stored.length > 0
-          ? stored
-          : (data.course_id && data.course_name
-              ? [{ id: data.course_id as string, name: data.course_name as string, country: (data.course_country as string) ?? null }]
-              : []);
         restoreDraft({
           caption: (data.content as string) ?? '',
-          courses: draftCourses,
+          course: data.course_id && data.course_name
+            ? { id: data.course_id as string, name: data.course_name as string, country: (data.course_country as string) ?? null }
+            : null,
         });
       });
     return () => { cancelled = true; };
   }, [draftId, isEditMode, profile?.id, restoreDraft]);
 
-  const [sheet, setSheet] = useState<null | 'course' | 'actor' | 'schedule' | 'drafts' | 'scheduled' | 'cover' | 'adjust' | 'close-guard'>(null);
+  const [sheet, setSheet] = useState<null | 'course' | 'actor' | 'schedule' | 'drafts' | 'scheduled' | 'trim' | 'cover' | 'adjust' | 'close-guard'>(null);
   const [success, setSuccess] = useState<SubmitResult | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [scheduledCount, setScheduledCount] = useState<number>(0);
@@ -199,8 +192,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
       const res = await submit({
         caption: state.caption,
         media: state.media,
-        course: primaryCourse,
-        taggedCourseIds: state.courses.map((c) => c.id),
+        course: state.course,
         scheduledAt: state.scheduledAt,
         actorType: activeActor.type,
         actorId: activeActor.id,
@@ -222,8 +214,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
     try {
       const patch: Record<string, unknown> = {
         content: state.caption?.length ? state.caption : null,
-        course_id: primaryCourse?.id ?? null,
-        tagged_course_ids: state.courses.map((c) => c.id),
+        course_id: state.course?.id ?? null,
       };
       // Only touch scheduled_at when the post is still scheduled.
       if (editStatus?.status === 'scheduled') {
@@ -235,10 +226,10 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
       // Sync the single-course junction row to the primary course (best-effort;
       // full multi-course junction editing stays with useUpdatePost).
       await supabase.from('post_courses').delete().eq('post_id', editPostId);
-      if (primaryCourse?.id) {
+      if (state.course?.id) {
         await supabase.from('post_courses').insert({
           post_id: editPostId,
-          course_id: primaryCourse.id,
+          course_id: state.course.id,
           display_order: 0,
         } as never);
       }
@@ -337,10 +328,9 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
       actorType: activeActor.type,
       actorId: activeActor.id,
       content: state.caption || null,
-      courseId: primaryCourse?.id ?? null,
-      courseName: primaryCourse?.name ?? null,
-      courseCountry: primaryCourse?.country ?? null,
-      courses: state.courses,
+      courseId: state.course?.id ?? null,
+      courseName: state.course?.name ?? null,
+      courseCountry: state.course?.country ?? null,
     });
     setSheet(null);
     reset();
@@ -417,6 +407,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
           index={state.activeIndex}
           total={state.media.length}
           onOpenAdjust={() => setSheet('adjust')}
+          onOpenTrim={() => setSheet('trim')}
           onOpenCover={() => setSheet('cover')}
           onRequestAdd={handleStageAdd}
         />
@@ -437,7 +428,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
         />
         <CaptionField value={state.caption} onChange={setCaption} currentUserId={profile?.id ?? null} />
         <DetailRows
-          courses={state.courses}
+          course={state.course}
           onOpenCourse={() => setSheet('course')}
           actor={activeActor}
           onOpenActor={() => setSheet('actor')}
@@ -449,13 +440,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
       </div>
 
       {/* Sheets */}
-      <CourseTagSheet
-        open={sheet === 'course'}
-        onClose={() => setSheet(null)}
-        onSubmit={(cs) => setCourses(cs)}
-        selected={state.courses}
-        userId={profile?.id ?? null}
-      />
+      <CourseTagSheet open={sheet === 'course'} onClose={() => setSheet(null)} onSelect={setCourse} current={state.course} userId={profile?.id ?? null} />
       <ActorSheet open={sheet === 'actor'} onClose={() => setSheet(null)} onSelect={(a) => setActiveActor(a)} selectedId={activeActor?.id ?? null} />
       <ScheduleSheetV2
         open={sheet === 'schedule'}
@@ -469,18 +454,10 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
         open={sheet === 'drafts'}
         onClose={() => setSheet(null)}
         drafts={drafts.drafts}
-        onRestore={(d) => {
-          const stored = (d.course_data as { courses?: StageCourse[] } | null)?.courses;
-          const draftCourses: StageCourse[] = Array.isArray(stored) && stored.length > 0
-            ? stored
-            : (d.course_id && d.course_name
-                ? [{ id: d.course_id, name: d.course_name, country: d.course_country ?? null }]
-                : []);
-          restoreDraft({
-            caption: d.content ?? '',
-            courses: draftCourses,
-          });
-        }}
+        onRestore={(d) => restoreDraft({
+          caption: d.content ?? '',
+          course: d.course_id && d.course_name ? { id: d.course_id, name: d.course_name, country: d.course_country ?? null } : null,
+        })}
         onDelete={drafts.remove}
       />
       <ScheduledPostsSheetV2
@@ -488,6 +465,12 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
         onClose={() => setSheet(null)}
         userId={profile?.id}
         onCountChange={setScheduledCount}
+      />
+      <MediaTrimSheet
+        open={sheet === 'trim'}
+        onClose={() => setSheet(null)}
+        item={active}
+        onApply={(s, e) => updateActive({ trimStart: s, trimEnd: e })}
       />
       <CoverFrameSheet
         open={sheet === 'cover'}

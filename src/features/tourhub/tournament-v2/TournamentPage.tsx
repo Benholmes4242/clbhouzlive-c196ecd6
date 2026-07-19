@@ -42,7 +42,7 @@ import { MiniBoard } from './sections/MiniBoard';
 import { OnTheCourse } from '../_shared/OnTheCourse';
 import { TeeTimesFirstGroups } from './sections/TeeTimesFirstGroups';
 import { AllTeeTimesSheet } from './sections/AllTeeTimesSheet';
-import { TeeTimesRail } from './sections/TeeTimesRail';
+import { TeeTimesBand } from './sections/TeeTimesBand';
 import { CourseSection } from './sections/CourseSection';
 import { MomentsSection } from './sections/MomentsSection';
 import { EventInfoSection } from './sections/EventInfoSection';
@@ -220,11 +220,10 @@ export function TournamentPage() {
         {/* TEE TIMES BAND — promoted entry point to the round-by-round
             sheet. Renders for live + upcoming states only. */}
         {(pulse.state === 'live' || pulse.state === 'upcoming') && (
-          <TeeTimesRail
-            groups={teeGroups}
+          <TeeTimesBand
             round={currentRound}
-            onOpenAll={() => setTeeTimesOpen(true)}
-            tourCode={tourCode}
+            groupCount={teeGroups.length}
+            onTap={() => setTeeTimesOpen(true)}
           />
         )}
 

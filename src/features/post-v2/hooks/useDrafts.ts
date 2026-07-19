@@ -3,14 +3,9 @@
 // IMPORTANT: never writes audio_mode or studio_music - the audio system is CUT.
 // We use the content / course_* / actor_* columns only. Media is not persisted
 // in drafts for P2 (attaching restored files needs P3 work).
-//
-// Multi-course tagging: primary course is written to course_id/course_name
-// exactly as today. The full ordered list is persisted to course_data.courses
-// (Json) so restore rehydrates all tagged courses.
 
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import type { StageCourse } from './useStageComposer';
 
 export interface DraftRow {
   id: string;
@@ -20,7 +15,6 @@ export interface DraftRow {
   course_id: string | null;
   course_name: string | null;
   course_country: string | null;
-  course_data: { courses?: StageCourse[] } | null;
   updated_at: string;
 }
 
@@ -33,7 +27,7 @@ export function useDrafts(userId: string | null | undefined) {
     setLoading(true);
     const { data, error } = await supabase
       .from('post_drafts')
-      .select('id, actor_type, actor_id, content, course_id, course_name, course_country, course_data, updated_at')
+      .select('id, actor_type, actor_id, content, course_id, course_name, course_country, updated_at')
       .eq('user_id', userId)
       .order('updated_at', { ascending: false })
       .limit(20);
@@ -50,7 +44,6 @@ export function useDrafts(userId: string | null | undefined) {
     courseId?: string | null;
     courseName?: string | null;
     courseCountry?: string | null;
-    courses?: StageCourse[];
   }) => {
     if (!userId) return;
     await supabase.from('post_drafts').insert({
@@ -61,7 +54,6 @@ export function useDrafts(userId: string | null | undefined) {
       course_id: patch.courseId ?? null,
       course_name: patch.courseName ?? null,
       course_country: patch.courseCountry ?? null,
-      course_data: patch.courses && patch.courses.length > 0 ? { courses: patch.courses } : null,
     } as never);
     await refresh();
   }, [userId, refresh]);

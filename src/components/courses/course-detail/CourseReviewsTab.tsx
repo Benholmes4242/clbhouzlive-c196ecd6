@@ -3,8 +3,6 @@ import { useTranslation } from 'react-i18next';
 
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { openWithOrigin } from '@/lib/openWithOrigin';
-import { openFsv2 } from '@/features/fsv2';
-import { FLAGS } from '@/config/flags';
 // groupMultiMedia intentionally not imported: posts are constructed one-per-review already grouped.
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -342,26 +340,15 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     const posterUrl = parent?.mediaItems?.find((m) => m.id === mediaId)?.thumbnailUrl
       || parent?.mediaItems?.[0]?.thumbnailUrl
       || null;
-    if (FLAGS.fsv2) {
-      openFsv2({
-        openedFrom: 'course-reviews',
-        posts,
-        startIndex: parentIndex,
-        mediaId,
-        readOnly: true,
-        hasNextPage: false,
-      });
-    } else {
-      openWithOrigin({
-        posts,
-        index: parentIndex,
-        originEl,
-        posterUrl,
-        mediaId,
-        openedFrom: 'course-reviews',
-        options: { readOnly: true, hasNextPage: false },
-      });
-    }
+    openWithOrigin({
+      posts,
+      index: parentIndex,
+      originEl,
+      posterUrl,
+      mediaId,
+      openedFrom: 'course-reviews',
+      options: { readOnly: true, hasNextPage: false },
+    });
   }, [filteredMyReview, otherReviews, buildReviewFeedPost]);
 
   // Per-tier review counts for the filter sheet (computed client-side from fetched reviews)

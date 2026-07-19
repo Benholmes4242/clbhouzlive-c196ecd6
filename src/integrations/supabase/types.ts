@@ -7686,7 +7686,6 @@ export type Database = {
           source_review_id: string | null
           status: string
           studio_music: Json | null
-          tagged_course_ids: string[]
           updated_at: string
           user_id: string
           visibility: Database["public"]["Enums"]["post_visibility"]
@@ -7721,7 +7720,6 @@ export type Database = {
           source_review_id?: string | null
           status?: string
           studio_music?: Json | null
-          tagged_course_ids?: string[]
           updated_at?: string
           user_id: string
           visibility?: Database["public"]["Enums"]["post_visibility"]
@@ -7756,7 +7754,6 @@ export type Database = {
           source_review_id?: string | null
           status?: string
           studio_music?: Json | null
-          tagged_course_ids?: string[]
           updated_at?: string
           user_id?: string
           visibility?: Database["public"]["Enums"]["post_visibility"]

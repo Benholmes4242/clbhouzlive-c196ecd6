@@ -1,14 +1,9 @@
-// CourseTagSheet - multi-select search + "popular on clbhouz" empty state.
+// CourseTagSheet - search + "popular on clbhouz" empty state.
 // Header styled as an eyebrow (icon + uppercase label) to match the
 // shared @mention sheet chrome.
-//
-// Multi-select semantics: tapping a course toggles it (amber check on selected
-// rows). Selected courses pin to the top so the ordering the user sees matches
-// the order that will be persisted. Done button commits the ordered array
-// (empty = clear tag). Search behaviour unchanged.
 
-import { useEffect, useMemo, useState } from 'react';
-import { Check, MapPin, Search, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { MapPin, Search, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import BottomSheet from './BottomSheet';
 import type { StageCourse } from '../hooks/useStageComposer';
@@ -19,10 +14,8 @@ import useKeyboardHeight from '@/hooks/messaging/useKeyboardHeight';
 interface Props {
   open: boolean;
   onClose: () => void;
-  /** Commit the ordered selection. Empty array clears the tag. */
-  onSubmit: (courses: StageCourse[]) => void;
-  /** Currently selected courses (ordered). */
-  selected: StageCourse[];
+  onSelect: (c: StageCourse | null) => void;
+  current: StageCourse | null;
   userId?: string | null;
   title?: string;
   /**
@@ -41,8 +34,8 @@ interface Row extends StageCourse {
 export default function CourseTagSheet({
   open,
   onClose,
-  onSubmit,
-  selected,
+  onSelect,
+  current,
   userId,
   title = 'Tag a course',
   excludeReviewedForUserId = null,
@@ -54,13 +47,6 @@ export default function CourseTagSheet({
   });
   const [reviewedIds, setReviewedIds] = useState<Set<string>>(new Set());
   const keyboardHeight = useKeyboardHeight();
-
-  // Local ordered selection - seeded from `selected` each time the sheet opens.
-  const [picked, setPicked] = useState<StageCourse[]>(selected);
-  useEffect(() => {
-    if (open) setPicked(selected);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
 
   // Pull the user's reviewed course ids so search results can be badged.
   useEffect(() => {
@@ -96,25 +82,6 @@ export default function CourseTagSheet({
   }, [q, open]);
 
   const showPopular = q.trim().length === 0;
-  const pickedIds = useMemo(() => new Set(picked.map((c) => c.id)), [picked]);
-
-  const toggle = (c: StageCourse) => {
-    setPicked((prev) => prev.some((p) => p.id === c.id)
-      ? prev.filter((p) => p.id !== c.id)
-      : [...prev, c]);
-  };
-
-  const commit = () => {
-    onSubmit(picked);
-    onClose();
-  };
-
-  // Compose the visible list: selected courses pinned to the top, then
-  // popular/search rows with the already-picked ones filtered out.
-  const suggestions: Row[] = showPopular
-    ? popular.map(r => ({ id: r.id, name: r.name, country: r.country, sub_country: r.sub_country }))
-    : rows;
-  const restRows = suggestions.filter((r) => !pickedIds.has(r.id));
 
   return (
     <BottomSheet open={open} onClose={onClose} bottomOffset={keyboardHeight} fixedHeight="60dvh">
@@ -170,35 +137,24 @@ export default function CourseTagSheet({
 
         {/* Scrolling list region — the only part that grows */}
         <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}>
-          {picked.length > 0 && (
-            <>
-              <div style={{ padding: '10px 16px 6px', fontSize: 10, fontWeight: 800, letterSpacing: 1, color: '#94A3B8' }}>
-                SELECTED
-              </div>
-              {picked.map((c) => (
-                <CourseRow
-                  key={c.id}
-                  row={{ id: c.id, name: c.name, country: c.country ?? null }}
-                  selected
-                  onToggle={toggle}
-                />
-              ))}
-            </>
+          {current && (
+            <button onClick={() => { onSelect(null); onClose(); }} style={rowBtn}>
+              <div style={{ color: '#8A9099', fontSize: 13 }}>Remove current tag ({current.name})</div>
+            </button>
           )}
 
           {showPopular ? (
             <>
-              {restRows.length > 0 ? (
+              {popular.length > 0 ? (
                 <>
                   <div style={{ padding: '10px 16px 6px', fontSize: 10, fontWeight: 800, letterSpacing: 1, color: '#94A3B8' }}>
                     POPULAR ON CLBHOUZ
                   </div>
-                  {restRows.map(r => (
+                  {popular.map(r => (
                     <CourseRow
                       key={r.id}
-                      row={r}
-                      selected={false}
-                      onToggle={toggle}
+                      row={{ id: r.id, name: r.name, country: r.country, sub_country: r.sub_country }}
+                      onSelect={(c) => { onSelect(c); onClose(); }}
                     />
                   ))}
                   <div style={{ padding: '16px', fontSize: 12, color: '#94A3B8' }}>
@@ -212,80 +168,38 @@ export default function CourseTagSheet({
               )}
             </>
           ) : (
-            restRows.map(r => (
+            rows.map(r => (
               <CourseRow
                 key={r.id}
                 row={r}
-                selected={false}
                 reviewed={reviewedIds.has(r.id)}
-                onToggle={toggle}
+                onSelect={(c) => { onSelect(c); onClose(); }}
               />
             ))
           )}
         </div>
 
-        {/* Done bar — clears tag at zero selections (matches today's untag path). */}
+        {/* Thin footer band — latches onto the top of the keyboard so list
+            content scrolls under it rather than under the keyboard itself.
+            Mirrors the shared @mention sheet chrome. */}
         <div
           style={{
             flexShrink: 0,
-            padding: '10px 16px calc(10px + env(safe-area-inset-bottom))',
+            height: 6,
             borderTop: '1px solid rgba(15,23,42,0.08)',
             background: '#FFFFFF',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 12,
           }}
-        >
-          <div style={{ fontSize: 12, color: '#5A6270' }}>
-            {picked.length === 0
-              ? 'No courses tagged'
-              : picked.length === 1
-                ? '1 course selected'
-                : `${picked.length} courses selected`}
-          </div>
-          <button
-            onClick={commit}
-            style={{
-              background: '#F7931E',
-              color: '#15171F',
-              border: 0,
-              borderRadius: 999,
-              padding: '8px 18px',
-              fontSize: 14,
-              fontWeight: 700,
-              cursor: 'pointer',
-            }}
-          >
-            Done
-          </button>
-        </div>
+        />
       </div>
     </BottomSheet>
   );
 }
 
 
-function CourseRow({
-  row,
-  selected,
-  onToggle,
-  reviewed = false,
-}: {
-  row: Row;
-  selected: boolean;
-  onToggle: (c: StageCourse) => void;
-  reviewed?: boolean;
-}) {
+function CourseRow({ row, onSelect, reviewed = false }: { row: Row; onSelect: (c: StageCourse) => void; reviewed?: boolean }) {
   const locality = row.isHomeClub ? 'Your home club' : (row.sub_country || row.country || null);
   return (
-    <button
-      onClick={() => onToggle({ id: row.id, name: row.name, country: row.country ?? null })}
-      style={{
-        ...rowBtn,
-        background: selected ? 'rgba(247,147,30,0.06)' : 'transparent',
-      }}
-    >
+    <button onClick={() => onSelect({ id: row.id, name: row.name, country: row.country ?? null })} style={rowBtn}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <div style={{ width: 34, height: 34, borderRadius: 12, background: '#F1F5F9', border: '1px solid rgba(15,23,42,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <MapPin size={16} color="#F7931E" />
@@ -294,7 +208,7 @@ function CourseRow({
           <div style={{ fontSize: 14, color: '#0F172A', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.name}</div>
           {locality && <div style={{ fontSize: 12, color: row.isHomeClub ? '#F7931E' : '#94A3B8', fontWeight: row.isHomeClub ? 700 : 400 }}>{locality}</div>}
         </div>
-        {reviewed && !selected && (
+        {reviewed && (
           <div
             style={{
               flex: 'none',
@@ -310,22 +224,6 @@ function CourseRow({
             REVIEWED
           </div>
         )}
-        <div
-          aria-hidden
-          style={{
-            flex: 'none',
-            width: 22,
-            height: 22,
-            borderRadius: 999,
-            border: selected ? '0' : '1.5px solid rgba(15,23,42,0.18)',
-            background: selected ? '#F7931E' : 'transparent',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          {selected && <Check size={14} color="#15171F" strokeWidth={3} />}
-        </div>
       </div>
     </button>
   );

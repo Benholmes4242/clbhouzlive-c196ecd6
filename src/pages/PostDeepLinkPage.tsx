@@ -4,8 +4,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Loader2, MapPin } from 'lucide-react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
-import { openFsv2 } from '@/features/fsv2';
-import { FLAGS } from '@/config/flags';
 import { recordPostViewOnce } from '@/hooks/usePostViewTracker';
 import { mapActivityPostToFeedPost } from '@/lib/activityPostMapper';
 import type { ActivityPost } from '@/components/profile/types/ActivityTypes';
@@ -215,7 +213,7 @@ const PostDeepLinkPage: React.FC = () => {
 
     const shouldOpenComments = navState?.openComments === true || searchParams.get('openComments') === '1';
 
-    const openOpts = {
+    useFullscreenFeedStore.getState().open([feedPost], 0, {
       openCommentsInitially: shouldOpenComments,
       initialCommentId: navState?.initialCommentId ?? null,
       openedFrom: 'post-deep-link',
@@ -227,13 +225,7 @@ const PostDeepLinkPage: React.FC = () => {
           navigate('/', { replace: true });
         }
       },
-    };
-
-    if (FLAGS.fsv2) {
-      openFsv2({ posts: [feedPost], startIndex: 0, ...openOpts });
-    } else {
-      useFullscreenFeedStore.getState().open([feedPost], 0, openOpts);
-    }
+    });
 
   }, [authLoading, user, isLoading, feedPost, navigate, navState, searchParams]);
 

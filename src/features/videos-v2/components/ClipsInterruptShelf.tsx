@@ -16,8 +16,6 @@ import { useWatchAutoplay } from '@/video/useWatchAutoplay';
 import { useRailLane } from '@/video/useRailLane';
 import { usePreroutePrefetch } from '@/video/usePreroutePrefetch';
 import { openWithOrigin } from '@/lib/openWithOrigin';
-import { openFsv2 } from '@/features/fsv2';
-import { FLAGS } from '@/config/flags';
 import type { FeedPost } from '@/components/media-system/types/media';
 import type { InterruptClipRow } from '../hooks/useInterruptClips';
 
@@ -66,10 +64,6 @@ function ClipTile({
   const label = row.review_course_name || row.course_name || 'Clip';
 
   const handlePress = () => {
-    if (FLAGS.fsv2) {
-      openFsv2({ openedFrom: 'watch', posts, startIndex: index });
-      return;
-    }
     openWithOrigin({
       openedFrom: 'watch',
       posts,

@@ -63,7 +63,6 @@ import { InviteSheetProvider } from '@/components/invite/InviteSheetProvider';
 import { useUploadGuard } from '@/hooks/useUploadGuard';
 import { FLAGS } from '@/config/flags';
 import { FEATURE_FLAGS } from '@/config/featureFlags';
-import { Fsv2Overlay } from '@/features/fsv2';
 
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
 import { CoursesListSkeleton } from '@/components/skeletons/CoursesListSkeleton';
@@ -85,7 +84,7 @@ import { ReviewIslandLoader } from '@/ReviewIslandLoader';
 import { supabase } from '@/integrations/supabase/client';
 import { migrateChatHistory } from '@/utils/chatHistoryMigration';
 import { NavTimingProvider } from '@/perf/NavTimingProvider';
-import { AdminGatedPerfPill, AdminGatedBootTimelinePill, AdminGatedPerfHud, AdminGatedLogHud, AdminGatedFsv2DebugPill } from '@/perf/AdminGatedPills';
+import { AdminGatedPerfPill, AdminGatedBootTimelinePill, AdminGatedPerfHud, AdminGatedLogHud } from '@/perf/AdminGatedPills';
 
 
 
@@ -889,7 +888,6 @@ const AppInner: React.FC = () => {
         <AdminGatedLogHud />
         <AdminGatedPerfPill />
         <AdminGatedBootTimelinePill />
-        <AdminGatedFsv2DebugPill />
         
         
         
@@ -934,7 +932,6 @@ const AppInner: React.FC = () => {
                                             </Suspense>
                                             {/* Fullscreen Feed Overlay - portal-based, renders above everything */}
                                             <FullscreenFeedOverlay />
-                                            {FLAGS.fsv2 ? <Fsv2Overlay /> : null}
                                             
                                             {/* Unified ReviewBottomSheet portal — single mount, store-driven */}
                                             <ReviewBottomSheetPortal />

@@ -1,7 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
-import { openFsv2 } from '@/features/fsv2';
-import { FLAGS } from '@/config/flags';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNowAgo } from '@/i18n/format';
 import { Heart, MessageCircle, Share2, MapPin, X } from 'lucide-react';
@@ -219,7 +217,7 @@ export const LoopCard = React.memo(function LoopCard({
             ariaLabel={`Media from post by ${post.displayName}`}
             onSlideClick={() => {
               if (allPosts && cardIndex != null) {
-                if (FLAGS.fsv2) { openFsv2({ posts: allPosts, startIndex: cardIndex, openedFrom: 'loop' }); } else { useFullscreenFeedStore.getState().open(allPosts, cardIndex, { openedFrom: 'loop' }); }
+                useFullscreenFeedStore.getState().open(allPosts, cardIndex);
               }
             }}
             bottomLeftOverlay={
@@ -266,7 +264,7 @@ export const LoopCard = React.memo(function LoopCard({
             className={`relative w-full ${aspectClass} bg-muted block`}
             onClick={() => {
               if (allPosts && cardIndex != null) {
-                if (FLAGS.fsv2) { openFsv2({ posts: allPosts, startIndex: cardIndex, openedFrom: 'loop' }); } else { useFullscreenFeedStore.getState().open(allPosts, cardIndex, { openedFrom: 'loop' }); }
+                useFullscreenFeedStore.getState().open(allPosts, cardIndex);
               }
             }}
           >
@@ -421,7 +419,7 @@ export const LoopCard = React.memo(function LoopCard({
               type="button"
               onClick={() => {
                 if (allPosts && cardIndex != null) {
-                  if (FLAGS.fsv2) { openFsv2({ posts: allPosts, startIndex: cardIndex, openedFrom: 'loop' }); } else { useFullscreenFeedStore.getState().open(allPosts, cardIndex, { openedFrom: 'loop' }); }
+                  useFullscreenFeedStore.getState().open(allPosts, cardIndex);
                 }
               }}
               className="mt-1.5 text-[14px] font-semibold text-foreground"

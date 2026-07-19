@@ -8,12 +8,13 @@
 
 import React, { useEffect, useMemo, useRef } from 'react';
 import { GamSheet } from '../../../gam/_shared/GamSheet';
-import { TierGlyph } from '@/components/shared/TierGlyph';
+import { GemVisual } from '@/components/shared/TierGem';
 import {
   WALL_LEVELS,
   levelForMedals,
-  type WallLevel,
+  type WallMaterial,
 } from './_shared/levels';
+import { MATERIAL_HEX } from './_shared/rarityPalette';
 import type { TrophyItem } from './_shared/normalizeTrophyItem';
 import {
   quarterOf,
@@ -32,17 +33,12 @@ const AMBER = '#F7931E';
 const AMBER_BAR_A = '#E8800C';
 const AMBER_BAR_B = '#FFCB45';
 const GOLD = '#F5C842';
+const OBSIDIAN_EDGE = '#D4A017';
 const FONT = "'Geist', -apple-system, sans-serif";
 
-const CURRENT = '#34D399';
-const ACHIEVED = 'rgba(241,245,249,0.88)';
-const LOCKED_INK = 'rgba(241,245,249,0.28)';
-
-function levelColor(lvl: WallLevel, state: 'current' | 'achieved' | 'locked'): string {
-  if (lvl.key === 'the_goat' && state !== 'locked') return AMBER;
-  if (state === 'current') return CURRENT;
-  if (state === 'achieved') return ACHIEVED;
-  return LOCKED_INK;
+function matColor(m: WallMaterial): string {
+  if (m === 'obsidian') return OBSIDIAN_EDGE;
+  return (MATERIAL_HEX as Record<string, string>)[m] ?? '#C97B4A';
 }
 
 interface Props {
@@ -206,13 +202,8 @@ export const LadderSheet: React.FC<Props> = ({ open, onClose, owned, items, user
             const earned = owned >= lvl.medalsRequired;
             const isCurrent = level?.level === lvl.level;
             const isFuture = !earned && !isCurrent;
-            const state: 'current' | 'achieved' | 'locked' = isCurrent
-              ? 'current'
-              : earned
-                ? 'achieved'
-                : 'locked';
-            const mc = levelColor(lvl, state);
-            const isSummit = lvl.level === 10;
+            const mc = matColor(lvl.material);
+            const isLegend = lvl.level === 10;
             return (
               <div
                 key={lvl.level}
@@ -223,16 +214,16 @@ export const LadderSheet: React.FC<Props> = ({ open, onClose, owned, items, user
                   padding: '9px 11px',
                   borderRadius: 12,
                   marginBottom: 4,
-                  opacity: isFuture ? 0.55 : 1,
+                  opacity: isFuture ? 0.45 : 1,
                   background: isCurrent ? 'rgba(255,255,255,0.06)' : 'transparent',
                   border: isCurrent ? `1px solid ${mc}59` : '1px solid transparent',
                 }}
               >
-                <TierGlyph tierKey={lvl.key} color={mc} size={24} />
+                <GemVisual material={lvl.material} size={26} />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ fontSize: 13, fontWeight: 800, color: '#FFFFFF' }}>
-                      {lvl.label}
+                      {isLegend ? 'Clubhouse Legend' : lvl.label}
                     </span>
                     {isCurrent && (
                       <span
@@ -251,7 +242,7 @@ export const LadderSheet: React.FC<Props> = ({ open, onClose, owned, items, user
                       </span>
                     )}
                   </div>
-                  {isSummit && (
+                  {isLegend && (
                     <div style={{ fontSize: 9.5, color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>
                       the summit &mdash; counts every medal beyond
                     </div>

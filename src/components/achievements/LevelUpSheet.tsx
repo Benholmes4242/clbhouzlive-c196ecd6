@@ -10,8 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { TierGlyph } from '@/components/shared/TierGlyph';
-import { levelForMedals } from '@/components/profile/handicap/whs/gam/trophy-room/_shared/levels';
+import { TierGem } from '@/components/shared/TierGem';
 import { openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
 
 const FONT = "'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif";
@@ -68,11 +67,7 @@ export function LevelUpSheet({ eventId, label, medals, onClose }: Props) {
       }}
     >
       <div style={{ marginBottom: 24 }}>
-        {(() => {
-          const lvl = levelForMedals(medals);
-          const c = lvl?.key === 'the_goat' ? '#F7931E' : '#34D399';
-          return lvl ? <TierGlyph tierKey={lvl.key} color={c} size={72} strokeWidth={1.4} /> : null;
-        })()}
+        <TierGem medals={medals} size="xl" />
       </div>
       <div
         style={{

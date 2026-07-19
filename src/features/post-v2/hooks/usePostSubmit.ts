@@ -18,13 +18,7 @@ import type { StageMediaItem, StageCourse } from './useStageComposer';
 export interface SubmitInput {
   caption: string;
   media: StageMediaItem[];
-  /** Primary tagged course. Written to posts.course_id exactly as today. */
   course: StageCourse | null;
-  /**
-   * Ordered list of ALL tagged course ids (including the primary one at index 0).
-   * Written to posts.tagged_course_ids. Empty array when no course is tagged.
-   */
-  taggedCourseIds: string[];
   scheduledAt: Date | null;
   actorType: 'personal' | 'business';
   actorId: string;

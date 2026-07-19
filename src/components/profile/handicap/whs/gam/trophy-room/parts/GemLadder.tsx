@@ -9,10 +9,7 @@
 import React from 'react';
 import type { TrophyTier } from '../_shared/normalizeTrophyItem';
 import { MATERIAL_HEX } from '../_shared/rarityPalette';
-
-// Per-badge tier materials. Distinct from the wall Career Ladder.
-const BADGE_TIER_MATERIALS = ['bronze', 'silver', 'emerald', 'diamond', 'obsidian'] as const;
-const MATERIAL_LADDER = BADGE_TIER_MATERIALS;
+import { MATERIAL_LADDER } from '../_shared/levels';
 import { formatNumber } from '@/i18n/format';
 
 const OBSIDIAN_BODY = '#2A2F36';

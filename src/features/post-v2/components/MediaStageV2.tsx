@@ -204,15 +204,18 @@ export default function MediaStageV2({ item, index, total, onOpenAdjust, onOpenT
   }
 
   const ratio = FRAME_RATIO[item.frame];
+  const boxStyle: React.CSSProperties = ratio
+    ? { aspectRatio: `${ratio}`, width: '100%', maxHeight: '100%' }
+    : { width: '100%', height: '100%' };
   return (
-    <div ref={stageRef} style={{ flex: 1, background: '#15171F', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-      <FrameBox stageRef={stageRef} ratio={ratio}>
+    <div style={{ flex: 1, background: '#15171F', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', transition: 'all 250ms cubic-bezier(.2,.8,.2,1)' }}>
+      <div style={boxStyle}>
         {item.type === 'video' ? (
           <video src={item.previewUrl} playsInline muted loop autoPlay style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         ) : (
           <CroppedImage item={item} />
         )}
-      </FrameBox>
+      </div>
       {total > 1 && (
         <div style={{ position: 'absolute', top: 12, left: 12, background: 'rgba(0,0,0,0.55)', color: '#F5F6F7', fontSize: 12, padding: '4px 8px', borderRadius: 999 }}>
           {index + 1} / {total}
@@ -223,48 +226,14 @@ export default function MediaStageV2({ item, index, total, onOpenAdjust, onOpenT
           <button onClick={onOpenAdjust} style={chipStyle}>Adjust</button>
         )}
         {item.type === 'video' && (
-          <button onClick={onOpenCover} style={chipStyle}>Cover</button>
+          <>
+            <button onClick={onOpenTrim} style={chipStyle}>Trim</button>
+            <button onClick={onOpenCover} style={chipStyle}>Cover</button>
+          </>
         )}
       </div>
     </div>
   );
-}
-
-// Measures the stage in px and applies an explicit width/height so the frame
-// pill's ratio is honored deterministically. Without this, CSS aspect-ratio
-// with width:100% + maxHeight:100% silently clamps height and discards ratio.
-function FrameBox({
-  stageRef,
-  ratio,
-  children,
-}: {
-  stageRef: React.RefObject<HTMLDivElement>;
-  ratio: number | null;
-  children: React.ReactNode;
-}) {
-  const [size, setSize] = useState<{ w: number; h: number }>({ w: 0, h: 0 });
-  useEffect(() => {
-    const el = stageRef.current;
-    if (!el) return;
-    const measure = () => {
-      const rect = el.getBoundingClientRect();
-      setSize({ w: rect.width, h: rect.height });
-    };
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [stageRef]);
-
-  const style: React.CSSProperties =
-    ratio && size.w > 0 && size.h > 0
-      ? (() => {
-          const boxW = Math.min(size.w, size.h * ratio);
-          const boxH = boxW / ratio;
-          return { width: boxW, height: boxH, transition: 'width 250ms cubic-bezier(.2,.8,.2,1), height 250ms cubic-bezier(.2,.8,.2,1)', overflow: 'hidden' };
-        })()
-      : { width: '100%', height: '100%', transition: 'width 250ms cubic-bezier(.2,.8,.2,1), height 250ms cubic-bezier(.2,.8,.2,1)' };
-  return <div style={style}>{children}</div>;
 }
 
 const chipStyle: React.CSSProperties = {

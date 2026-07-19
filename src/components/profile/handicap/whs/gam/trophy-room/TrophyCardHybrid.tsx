@@ -11,16 +11,7 @@
 import React from 'react';
 import type { TrophyItem } from './_shared/normalizeTrophyItem';
 import { MATERIAL_HEX } from './_shared/rarityPalette';
-
-// Per-badge tier materials for tiered achievements (bronze->silver->
-// emerald->diamond->obsidian). Distinct from the wall Career Ladder;
-// scoped locally so this file owns its material vocabulary.
-const BADGE_TIER_MATERIALS = ['bronze', 'silver', 'emerald', 'diamond', 'obsidian'] as const;
-type BadgeTierMaterial = (typeof BADGE_TIER_MATERIALS)[number];
-function materialForTier(tiersEarned: number): BadgeTierMaterial {
-  if (tiersEarned <= 0) return 'bronze';
-  return BADGE_TIER_MATERIALS[Math.min(tiersEarned - 1, BADGE_TIER_MATERIALS.length - 1)];
-}
+import { MATERIAL_LADDER, materialForTier } from './_shared/levels';
 import { renderBadgeIcon } from '../badgeIcons';
 import { formatNumber, formatMonthYearShortGB } from '@/i18n/format';
 // Legend cards are grouped by course in TrophyRoomSheet and render
@@ -86,7 +77,7 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = 
   
 
   const nextThreshold = tiered ? item.nextThreshold : null;
-  const nextMat = tiered && nextThreshold != null ? matName(BADGE_TIER_MATERIALS[Math.min(reached, BADGE_TIER_MATERIALS.length - 1)]) : null;
+  const nextMat = tiered && nextThreshold != null ? matName(MATERIAL_LADDER[Math.min(reached, MATERIAL_LADDER.length - 1)]) : null;
 
   const earnedDate = item.earnedAt
     ? formatMonthYearShortGB(item.earnedAt)
