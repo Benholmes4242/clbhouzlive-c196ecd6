@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { GoldRingAvatar } from '@/components/shared/GoldRingAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { SC_ACE, SC_ALBATROSS } from '@/features/courses/components/holes/_constants';
 import {
   useRegionLegendaryLeaders,
