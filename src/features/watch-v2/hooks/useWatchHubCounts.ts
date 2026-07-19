@@ -19,7 +19,7 @@ export function useWatchHubCounts() {
         }
         return { clip_count: 0, video_count: 0 };
       }
-      const row = Array.isArray(data) ? data[0] : null;
+      const row = Array.isArray(data) ? (data[0] as Partial<WatchHubCounts> | undefined) : null;
       return {
         clip_count: row?.clip_count ?? 0,
         video_count: row?.video_count ?? 0,
