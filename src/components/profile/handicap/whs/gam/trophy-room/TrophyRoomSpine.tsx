@@ -76,16 +76,11 @@ export function TrophyRoomSpine({ items, userId }: Props) {
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 17, fontWeight: 800, color: '#FFFFFF' }}>
-            {level ? <TierGem medals={owned} size="md" /> : null}
+            {level ? <TierGlyph tierKey={level.key} color={activeAccent} size={22} /> : null}
             {level ? (
               <span>
                 Level {level.level} &middot;{' '}
-                <span
-                  style={{
-                    color:
-                      level.material === 'obsidian' ? OBSIDIAN_EDGE : gemColor(level.material),
-                  }}
-                >
+                <span style={{ color: activeAccent }}>
                   {levelDisplay(level, owned)}
                 </span>
               </span>
@@ -103,10 +98,20 @@ export function TrophyRoomSpine({ items, userId }: Props) {
             {owned} {owned === 1 ? 'medal' : 'medals'}
           </span>
         </div>
-        <div style={{ display: 'flex', gap: 6, margin: '12px 0 10px' }}>
-          {MATERIAL_LADDER.map((m, i) => (
-            <Gem key={m} material={m} dim={i > currentMatIdx} />
-          ))}
+        <div style={{ display: 'flex', gap: 6, margin: '12px 0 10px', justifyContent: 'space-between' }}>
+          {WALL_LEVELS.map((lvl, i) => {
+            const achieved = i <= currentIdx;
+            const isCurrent = i === currentIdx;
+            const isSummit = lvl.key === 'the_goat';
+            const color = isCurrent
+              ? activeAccent
+              : achieved
+                ? isSummit
+                  ? TIER_COLOR_DARK.goat
+                  : TIER_COLOR_DARK.achieved
+                : TIER_COLOR_DARK.locked;
+            return <TierGlyph key={lvl.key} tierKey={lvl.key} color={color} size={17} />;
+          })}
         </div>
         <div
           style={{
@@ -120,11 +125,7 @@ export function TrophyRoomSpine({ items, userId }: Props) {
             style={{
               width: `${Math.round(progress * 100)}%`,
               height: '100%',
-              background: level
-                ? level.material === 'obsidian'
-                  ? OBSIDIAN_EDGE
-                  : gemColor(level.material)
-                : 'rgba(255,255,255,0.3)',
+              background: level ? activeAccent : 'rgba(255,255,255,0.3)',
             }}
           />
         </div>
