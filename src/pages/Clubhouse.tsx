@@ -480,6 +480,7 @@ const ClubhouseContent = () => {
               topPadding={'calc(env(safe-area-inset-top, 0px) + 70px)'}
               onNearEnd={handleNearEnd}
               hasNextPage={hasNextPage}
+              isFetchingNextPage={activeFeed.isFetchingNextPage ?? false}
               onLike={(post) => handleLike(post)}
               onComment={(post) => openComments(post)}
               onShare={(post) => handleShare(post)}
