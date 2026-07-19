@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Crown, Shield, Edit3, BarChart3, MoreHorizontal, Trash2,
-  Eye, EyeOff, Mail, AtSign, UserPlus, Plus,
+  Eye, EyeOff, Mail, AtSign, UserPlus, Plus, Briefcase, Pencil,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Skeleton } from '@/components/ui/skeleton';
