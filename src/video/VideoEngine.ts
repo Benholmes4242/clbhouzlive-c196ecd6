@@ -188,7 +188,12 @@ class VideoEngineImpl {
   clearBorrowed(laneId: LaneId): void {
     this.borrowedLanes.delete(laneId);
     DBG('clearBorrowed', { laneId });
+    // Handback: restore the lane's declared audio policy on the element
+    // BEFORE the inline tile resumes, so rails never blast audio after close.
+    const lane = this.lanes.get(laneId);
+    if (lane) this.applyAudioPolicy(lane);
   }
+
 
   boot(laneIds: LaneId[] = DEFAULT_LANE_IDS): void {
     if (this.booted) return;
@@ -337,11 +342,18 @@ class VideoEngineImpl {
   }
 
   private applyAudioPolicy(lane: Lane): void {
-    if (lane.audioPolicy === 'always-muted') {
+    // Borrow override: while the fullscreen viewer owns this lane's element,
+    // the effective policy is 'session' regardless of the lane's declared
+    // policy (rails ship as 'always-muted'/'local' but must sing in the
+    // viewer). Handback re-runs this after clearBorrowed to restore.
+    const effectivePolicy: LaneAudioPolicy = this.borrowedLanes.has(lane.id)
+      ? 'session'
+      : lane.audioPolicy;
+    if (effectivePolicy === 'always-muted') {
       if (!lane.el.muted) { lane.el.muted = true; this.emit(lane); }
       return;
     }
-    if (lane.audioPolicy === 'session') {
+    if (effectivePolicy === 'session') {
       const desired = useSessionAudio.getState().isMuted;
       if (lane.el.muted !== desired) {
         // Respect ONE_UNMUTED_LANE on unmute.
@@ -351,6 +363,7 @@ class VideoEngineImpl {
     }
     // 'local' → leave alone.
   }
+
 
   /** Return the lane's element to the hidden host (does not release source). */
   unmountLane(laneId: LaneId): void {
