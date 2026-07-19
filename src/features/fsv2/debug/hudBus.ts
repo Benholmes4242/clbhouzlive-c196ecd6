@@ -246,8 +246,24 @@ function sample() {
     }
   } catch { /* ignore */ }
 
+  // Media census — count of <video> elements in the document that currently
+  // hold an active source (either an `src` attribute or a MediaSource-backed
+  // srcObject). Target at fullscreen open: <= 2.
+  try {
+    const vids = document.getElementsByTagName('video');
+    let withSrc = 0;
+    for (let i = 0; i < vids.length; i++) {
+      const el = vids[i] as HTMLVideoElement;
+      const hasAttrSrc = !!el.getAttribute('src');
+      const hasObjSrc = !!el.srcObject;
+      if (hasAttrSrc || hasObjSrc) withSrc += 1;
+    }
+    payload.mediaCensus = { videoEls: vids.length, withSrcCount: withSrc };
+  } catch { /* ignore */ }
+
   pushEvent('sample', payload);
 }
+
 
 function startSampler() {
   if (sampleTimer || !enabled) return;
