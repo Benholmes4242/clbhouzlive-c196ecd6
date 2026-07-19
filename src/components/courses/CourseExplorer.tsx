@@ -278,7 +278,12 @@ const CourseExplorer = () => {
   // URL params take priority, then sessionStorage, then defaults
   const [selectedRegion, setSelectedRegion] = useState<PrimaryRegionKey>(() => {
     const urlRegion = searchParams.get('region');
-    if (urlRegion) return urlRegion as PrimaryRegionKey;
+    // Only trust the param when it is one of OUR keys — the Discover tab
+    // shares this URL and writes its own region slugs (uk-ireland,
+    // continental-europe, rest-of-world, usa) here.
+    if (urlRegion && (Object.values(PRIMARY_REGIONS) as string[]).includes(urlRegion)) {
+      return urlRegion as PrimaryRegionKey;
+    }
     const saved = sessionStorage.getItem('explore-last-filters');
     if (saved) {
       try {
@@ -290,7 +295,13 @@ const CourseExplorer = () => {
   });
 
   const [selectedSubregion, setSelectedSubregion] = useState(() => {
-    const urlSub = searchParams.get('sub');
+    // Gate the ?sub= read on the same validity check as ?region= above.
+    // A Discover URL never carries ?sub=, so if the region param isn't one
+    // of our keys we drop any accompanying sub too.
+    const urlRegion = searchParams.get('region');
+    const urlRegionValid =
+      !!urlRegion && (Object.values(PRIMARY_REGIONS) as string[]).includes(urlRegion);
+    const urlSub = urlRegionValid ? searchParams.get('sub') : null;
     if (urlSub) return urlSub;
     const saved = sessionStorage.getItem('explore-last-filters');
     if (saved) {
