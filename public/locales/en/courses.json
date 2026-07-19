@@ -322,7 +322,11 @@
     "toast": {
       "signInRequired": "Sign in required",
       "voteBody": "Please sign in to vote on reviews",
-      "rateBody": "Please sign in to rate courses"
+      "rateBody": "Please sign in to rate courses",
+      "voteFailed": "Couldn't save your vote"
+    },
+    "error": {
+      "retry": "Try again"
     }
   },
   "courseDetail": {
