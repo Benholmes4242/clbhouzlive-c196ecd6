@@ -42,7 +42,7 @@ import { MiniBoard } from './sections/MiniBoard';
 import { OnTheCourse } from '../_shared/OnTheCourse';
 import { TeeTimesFirstGroups } from './sections/TeeTimesFirstGroups';
 import { AllTeeTimesSheet } from './sections/AllTeeTimesSheet';
-import { TeeTimesBand } from './sections/TeeTimesBand';
+import { TeeTimesRail } from './sections/TeeTimesRail';
 import { CourseSection } from './sections/CourseSection';
 import { MomentsSection } from './sections/MomentsSection';
 import { EventInfoSection } from './sections/EventInfoSection';
