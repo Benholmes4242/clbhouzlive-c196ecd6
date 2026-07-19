@@ -64,6 +64,8 @@ import { useUploadGuard } from '@/hooks/useUploadGuard';
 import { FLAGS } from '@/config/flags';
 import { FEATURE_FLAGS } from '@/config/featureFlags';
 import { Fsv2Overlay } from '@/features/fsv2';
+import '@/lib/fsv2Bridge';
+
 
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
 import { CoursesListSkeleton } from '@/components/skeletons/CoursesListSkeleton';
