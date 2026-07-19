@@ -9525,6 +9525,7 @@ export type Database = {
           thru: number | null
           thru_updated_at: string | null
           today: number | null
+          today_round: number | null
           tournament_id: string | null
           updated_at: string | null
           wins: number | null
@@ -9551,6 +9552,7 @@ export type Database = {
           thru?: number | null
           thru_updated_at?: string | null
           today?: number | null
+          today_round?: number | null
           tournament_id?: string | null
           updated_at?: string | null
           wins?: number | null
@@ -9577,6 +9579,7 @@ export type Database = {
           thru?: number | null
           thru_updated_at?: string | null
           today?: number | null
+          today_round?: number | null
           tournament_id?: string | null
           updated_at?: string | null
           wins?: number | null
