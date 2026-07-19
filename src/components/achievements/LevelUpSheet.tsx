@@ -68,7 +68,11 @@ export function LevelUpSheet({ eventId, label, medals, onClose }: Props) {
       }}
     >
       <div style={{ marginBottom: 24 }}>
-        <TierGem medals={medals} size="xl" />
+        {(() => {
+          const lvl = levelForMedals(medals);
+          const c = lvl?.key === 'the_goat' ? '#F7931E' : '#34D399';
+          return lvl ? <TierGlyph tierKey={lvl.key} color={c} size={72} strokeWidth={1.4} /> : null;
+        })()}
       </div>
       <div
         style={{
