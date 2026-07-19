@@ -19,7 +19,7 @@ import { PostsFeedSkeleton } from './PostsFeedSkeleton';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { LightCardFeed } from './LightCardFeed';
 import { useClubhouseStore } from '@/store/clubhouseStore';
-import { useFullscreenFeedStore, useIsViewerOwnedBy } from '@/store/fullscreenFeedStore';
+
 
 import { useClubhouseLikes } from '@/components/clubhouse/hooks/useClubhouseLikes';
 import { useClubhouseFollows } from '@/components/clubhouse/hooks/useClubhouseFollows';
@@ -185,24 +185,8 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
     if (hasNextPage && !isFetchingNextPage) fetchNextPage();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  // Mirror pagination state into the fullscreen store while the viewer is
-  // open, so swipes past the initially-loaded set can trigger more loads.
-  const isViewerOwnedHere = useIsViewerOwnedBy('posts-tab');
-  const setPaginationState = useFullscreenFeedStore(s => s.setPaginationState);
-  useEffect(() => {
-    if (!isViewerOwnedHere) return;
-    setPaginationState({
-      hasNextPage: hasNextPage ?? false,
-      isFetchingNextPage: isFetchingNextPage ?? false,
-    });
-  }, [isViewerOwnedHere, hasNextPage, isFetchingNextPage, setPaginationState]);
-
-  // Append newly-loaded posts (already grouped at the hook) into the open
-  // viewer as growth occurs. Store dedupes by post id.
-  useEffect(() => {
-    if (!isViewerOwnedHere) return;
-    useFullscreenFeedStore.getState().appendPosts(filteredPosts);
-  }, [isViewerOwnedHere, filteredPosts]);
+  // V1 fullscreen pagination-mirror + append effects removed (fsv2 owns
+  // pagination via openFsv2 args passed at tap time).
 
 
 

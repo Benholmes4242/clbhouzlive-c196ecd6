@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+
 import { openFsv2 } from '@/features/fsv2';
 // groupMultiMedia intentionally not imported: posts are constructed one-per-review already grouped.
 
