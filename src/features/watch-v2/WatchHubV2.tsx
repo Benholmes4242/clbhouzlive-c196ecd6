@@ -35,12 +35,10 @@ export default function WatchHubV2({ embedded = false }: { embedded?: boolean })
           <HubClipsRow />
         </div>
 
-        <div style={{ height: 16 }} />
-
-        <HubChipBar active={filter} onChange={setFilter} />
-
         <div style={{ paddingTop: 16 }}>
-          <HubMixedGrid filter={filter} />
+          <HubMixedGrid filter={filter}>
+            <HubChipBar active={filter} onChange={setFilter} />
+          </HubMixedGrid>
         </div>
       </main>
     </>
