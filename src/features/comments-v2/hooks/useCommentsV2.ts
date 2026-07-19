@@ -87,7 +87,7 @@ export function useCommentsV2({
         .from('hidden_comments')
         .select('comment_id')
         .eq('user_id', user!.id);
-      return new Set<string>((data ?? []).map((r: any) => r.comment_id));
+      return new Set<string>((data ?? []).map((r: { comment_id: string }) => r.comment_id));
     },
   });
 
