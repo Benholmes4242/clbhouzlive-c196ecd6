@@ -36,21 +36,28 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
 
-  const { data: results = [], isLoading } = useQuery({
+  const { data: results = [], isLoading, isError } = useQuery({
     queryKey: ['rate-course-search', query],
     queryFn: async () => {
       if (query.trim().length < 2) return [];
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('golf_courses')
         .select('id, name, country, sub_country, global_rank')
         .ilike('name', `%${query.trim()}%`)
         .order('global_rank', { ascending: true, nullsFirst: false })
         .limit(12);
+      if (error) throw error;
       return data ?? [];
     },
     enabled: query.trim().length >= 2,
     staleTime: 30_000,
   });
+
+  useEffect(() => {
+    if (!open) return;
+    lockBodyScroll();
+    return () => unlockBodyScroll();
+  }, [open]);
 
   if (!open) return null;
 
