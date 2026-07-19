@@ -1,5 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { openFsv2 } from '@/features/fsv2';
+import { FLAGS } from '@/config/flags';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNowAgo } from '@/i18n/format';
 import { Heart, MessageCircle, Share2, MapPin, X } from 'lucide-react';
