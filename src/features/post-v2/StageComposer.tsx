@@ -163,6 +163,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
           courses,
           course: courses[0] ?? null,
         });
+        if (!cancelled) setRestoredDraftId(data.id as string);
       });
     return () => { cancelled = true; };
   }, [draftId, isEditMode, profile?.id, restoreDraft]);
