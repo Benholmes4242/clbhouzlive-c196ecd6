@@ -70,6 +70,19 @@ export default function MediaStageV2({ item, index, total, onOpenAdjust, onOpenT
   );
   const stageRef = useRef<HTMLDivElement>(null);
   const containerSize = useContainerSize(stageRef);
+  const [stageSize, setStageSize] = useState<{ w: number; h: number }>({ w: 0, h: 0 });
+  useEffect(() => {
+    const el = stageRef.current;
+    if (!el) return;
+    const measure = () => {
+      const r = el.getBoundingClientRect();
+      setStageSize({ w: r.width, h: r.height });
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [item?.id]);
   const k = containerSize / BASE;
   const frameRefs = useRef<Array<HTMLDivElement | null>>([]);
   useEffect(() => {
