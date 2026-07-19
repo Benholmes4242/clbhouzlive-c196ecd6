@@ -56,10 +56,11 @@ export default function CreateSheetV2({ open, onClose, returnPath }: Props) {
         open={courseOpen}
         title="Choose a course"
         onClose={() => { setCourseOpen(false); onClose(); }}
-        current={null}
+        selected={[]}
         userId={profile?.id ?? null}
         excludeReviewedForUserId={profile?.id ?? null}
-        onSelect={(c) => {
+        onSubmit={(cs) => {
+          const c = cs[0];
           if (!c) return;
           setCourseOpen(false);
           onClose();

@@ -58,7 +58,14 @@ export interface StageState {
   media: StageMediaItem[];
   activeIndex: number;
   caption: string;
-  course: StageCourse | null;
+  /**
+   * Ordered list of tagged courses. The FIRST entry remains the primary
+   * course written to posts.course_id exactly as today; all entries
+   * (including the first) are also written to posts.tagged_course_ids
+   * in selection order. Consumers that need a single course should read
+   * `courses[0] ?? null`.
+   */
+  courses: StageCourse[];
   scheduledAt: Date | null;
   dirty: boolean;
 }
@@ -67,7 +74,7 @@ const emptyState: StageState = {
   media: [],
   activeIndex: 0,
   caption: '',
-  course: null,
+  courses: [],
   scheduledAt: null,
   dirty: false,
 };
@@ -167,7 +174,9 @@ export function useStageComposer() {
   }, []);
 
   const setCaption = useCallback((v: string) => markDirty({ caption: v }), []);
-  const setCourse = useCallback((c: StageCourse | null) => markDirty({ course: c }), []);
+  const setCourses = useCallback((cs: StageCourse[]) => markDirty({ courses: cs }), []);
+  /** Back-compat single-course setter — writes as a 1-element (or empty) array. */
+  const setCourse = useCallback((c: StageCourse | null) => markDirty({ courses: c ? [c] : [] }), []);
   const setScheduledAt = useCallback((d: Date | null) => markDirty({ scheduledAt: d }), []);
 
   const restoreDraft = useCallback((patch: Partial<StageState>) => {
@@ -193,6 +202,7 @@ export function useStageComposer() {
     updateActive,
     setCaption,
     setCourse,
+    setCourses,
     setScheduledAt,
     restoreDraft,
     hydrate,
