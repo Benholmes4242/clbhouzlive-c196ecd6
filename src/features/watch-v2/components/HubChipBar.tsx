@@ -21,6 +21,7 @@ export function HubChipBar({ active, onChange }: Props) {
     <div
       style={{
         position: 'sticky',
+        marginTop: 24,
         top: 'var(--sat, 0px)',
         zIndex: 10,
         background: 'rgba(248,250,252,0.72)',
