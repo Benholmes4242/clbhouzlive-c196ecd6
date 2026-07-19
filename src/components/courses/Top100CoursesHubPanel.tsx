@@ -114,7 +114,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
     const getRankForSelectedList = (course: SearchedCourseWithRating): number => {
       const memberships = course.list_memberships ?? [];
       if (matcher) {
-        const m = memberships.find((x: any) => x.list_slug.includes(matcher));
+        const m = memberships.find((x: CourseListMembership) => x.list_slug.includes(matcher));
         return m?.rank ?? 999;
       }
       return memberships[0]?.rank ?? 999;
