@@ -269,14 +269,20 @@ export function LivePreviewCard({
             style={{
               display: 'flex',
               flexDirection: 'column',
-              gap: 6,
               minHeight: REVIEW_BODY_MIN_HEIGHT,
               justifyContent: 'center',
             }}
           >
-            <Ghost width="100%" height={16} pal={pal} />
-            <Ghost width="88%" height={16} pal={pal} />
-            <Ghost width="62%" height={16} pal={pal} />
+            <div
+              style={{
+                fontSize: REVIEW_FONT_SIZE,
+                lineHeight: REVIEW_LINE_HEIGHT,
+                color: pal.mute,
+                fontStyle: 'italic',
+              }}
+            >
+              Your review will appear here as you type...
+            </div>
           </div>
         )}
       </div>
