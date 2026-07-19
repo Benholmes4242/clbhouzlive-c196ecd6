@@ -197,7 +197,13 @@ export default function CourseTagSheet({
                   ))}
                 </>
               )}
-              {popular.length > 0 ? (
+              {!popularLoaded ? (
+                <>
+                  <CourseRowSkeleton />
+                  <CourseRowSkeleton />
+                  <CourseRowSkeleton />
+                </>
+              ) : popular.length > 0 ? (
                 <>
                   <SectionLabel>POPULAR ON CLBHOUZ</SectionLabel>
                   {popularPinned.rest.map(r => (
@@ -229,15 +235,27 @@ export default function CourseTagSheet({
                   <SectionLabel>RESULTS</SectionLabel>
                 </>
               )}
-              {searchPinned.rest.map(r => (
-                <CourseRow
-                  key={r.id}
-                  row={r}
-                  reviewed={reviewedIds.has(r.id)}
-                  selected={selectedIds.has(r.id)}
-                  onToggle={toggle}
-                />
-              ))}
+              {searching && searchPinned.rest.length === 0 ? (
+                <>
+                  <CourseRowSkeleton />
+                  <CourseRowSkeleton />
+                  <CourseRowSkeleton />
+                </>
+              ) : searchPinned.rest.length === 0 && searchPinned.pinned.length === 0 ? (
+                <div style={{ padding: '32px 16px', fontSize: 13, color: '#94A3B8', textAlign: 'center' }}>
+                  No courses found for "{q.trim()}"
+                </div>
+              ) : (
+                searchPinned.rest.map(r => (
+                  <CourseRow
+                    key={r.id}
+                    row={r}
+                    reviewed={reviewedIds.has(r.id)}
+                    selected={selectedIds.has(r.id)}
+                    onToggle={toggle}
+                  />
+                ))
+              )}
             </>
           )}
         </div>
