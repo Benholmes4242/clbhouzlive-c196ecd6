@@ -265,7 +265,7 @@ class VideoEngineImpl {
             expected: sessionMuted,
             msSinceOpen: msSinceOpen(),
           });
-          this.applyAudioPolicy(lane);
+          this.applyAudioPolicy(lane, 'guard-reassert');
         }
       };
       el.addEventListener('volumechange', onVC);
@@ -292,8 +292,16 @@ class VideoEngineImpl {
     // silent when the session is muted. The declared policy re-asserts
     // naturally at the next mount / policy application. Routing through
     // setMuted preserves the ONE_UNMUTED_LANE invariant.
-    if (this.lanes.get(laneId)) {
+    const lane = this.lanes.get(laneId);
+    if (lane) {
       this.setMuted(laneId, useSessionAudio.getState().isMuted);
+      logAudio('handback.done', {
+        laneId,
+        elMutedAfter: lane.el.muted,
+        elVolumeAfter: lane.el.volume,
+        elPausedAfter: lane.el.paused,
+        msSinceOpen: msSinceOpen(),
+      });
     }
   }
 
@@ -418,7 +426,7 @@ class VideoEngineImpl {
     lane.mountedHost = hostEl;
     // AUDIO POLICY: apply on mount so a lane's element muted state reflects
     // its policy the moment it's parented into a surface host.
-    this.applyAudioPolicy(lane);
+    this.applyAudioPolicy(lane, 'mount');
     // If play-intent is set (from a pre-mount play() or a still-loading source),
     // kick it off now — wantPlay persists through source changes.
     if (lane.wantPlay && lane.el.paused) {
@@ -438,7 +446,7 @@ class VideoEngineImpl {
     const lane = this.getLane(laneId);
     if (lane.audioPolicy === policy) return;
     lane.audioPolicy = policy;
-    this.applyAudioPolicy(lane);
+    this.applyAudioPolicy(lane, 'policy-change');
   }
 
   /**
@@ -451,10 +459,10 @@ class VideoEngineImpl {
   applyLaneAudioPolicy(laneId: LaneId): void {
     const lane = this.lanes.get(laneId);
     if (!lane) return;
-    this.applyAudioPolicy(lane);
+    this.applyAudioPolicy(lane, 'external-bind');
   }
 
-  private applyAudioPolicy(lane: Lane): void {
+  private applyAudioPolicy(lane: Lane, trigger: 'mount' | 'activation' | 'policy-change' | 'external-bind' | 'guard-reassert' | 'unknown' = 'unknown'): void {
     // Borrow override: while the fullscreen viewer owns this lane's element,
     // the effective policy is 'session' regardless of the lane's declared
     // policy (rails ship as 'always-muted'/'local' but must sing in the
@@ -470,6 +478,7 @@ class VideoEngineImpl {
     }
     logAudio('policy.resolve', {
       laneId: lane.id,
+      trigger,
       declaredPolicy: lane.audioPolicy,
       borrowed,
       effectivePolicy,
@@ -1049,7 +1058,13 @@ class VideoEngineImpl {
     lane.wantPlay = true;
     // AUDIO POLICY: on activation, re-consult session store so an earlier
     // unmute carries to the NEXT video (inheritance on activation).
-    this.applyAudioPolicy(lane);
+    this.applyAudioPolicy(lane, 'activation');
+    logAudio('resume.activate', {
+      laneId,
+      callerPostId: caller ?? null,
+      borrowed: this.borrowedLanes.has(laneId),
+      msSinceOpen: msSinceOpen(),
+    });
     if (!lane.mountedHost) {
       DBG(laneId, 'play() queued — no mounted host');
       return Promise.resolve();

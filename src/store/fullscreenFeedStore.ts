@@ -345,7 +345,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
             });
           } catch {}
           audioDbg.endOpen();
-        }, 500);
+        }, 2000);
       } catch {}
     }
     if (borrow) {
