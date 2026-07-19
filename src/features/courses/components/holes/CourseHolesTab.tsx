@@ -33,7 +33,7 @@ function toShared(h: CourseHole): SharedHole {
 
 export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
   const { t } = useTranslation(['courses']);
-  const { data, isLoading, isError } = useCourseHoleAnalysis(courseId);
+  const { data, isLoading, isError, refetch } = useCourseHoleAnalysis(courseId);
   const { data: meta } = useCourseMeta(courseId);
   const [sort, setSort] = useState<'hole' | 'difficulty'>('hole');
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
