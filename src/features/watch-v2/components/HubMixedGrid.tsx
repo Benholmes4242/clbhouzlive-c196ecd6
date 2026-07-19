@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, type ReactNode } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useHubMixedGrid, type MixedGridRow } from '../hooks/useHubMixedGrid';
 import { toFeedPosts } from '../utils/toFeedPost';
