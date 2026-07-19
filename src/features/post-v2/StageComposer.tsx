@@ -394,6 +394,48 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
     e.target.value = '';
   };
 
+  // Edit-mode load hold: never show the empty create composer while the
+  // post is being fetched for editing.
+  if (isEditMode && !hydrated && (editable.isLoading || (editable.data && editable.data.canManage))) {
+    return (
+      <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: '#F8FAFC', display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 12000 }}>
+        {/* Header mirror: close X + "Edit post" title */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', paddingTop: 'max(env(safe-area-inset-top), 12px)', background: '#F8FAFC', borderBottom: '1px solid rgba(0,0,0,0.07)', flex: 'none' }}>
+          <button onClick={onClose} aria-label="Close" style={{ background: 'transparent', border: 0, color: '#1F2428', cursor: 'pointer', padding: 8 }}>
+            <X size={22} />
+          </button>
+          <div style={{ fontSize: 14, fontWeight: 600, color: '#1F2428' }}>Edit post</div>
+          <div style={{ flex: 1 }} />
+        </div>
+        {/* Stage block */}
+        <div style={{ flex: '1 1 0', minHeight: 0, padding: 12 }}>
+          <div className="clb-shimmer-light" style={{ width: '100%', height: '100%', borderRadius: 16, background: 'rgba(0,0,0,0.06)' }} />
+        </div>
+        {/* Tray thumbs + caption bars */}
+        <div style={{ flex: 'none', padding: '8px 12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <div className="clb-shimmer-light" style={{ width: 64, height: 64, borderRadius: 12, background: 'rgba(0,0,0,0.06)' }} />
+            <div className="clb-shimmer-light" style={{ width: 64, height: 64, borderRadius: 12, background: 'rgba(0,0,0,0.06)' }} />
+            <div className="clb-shimmer-light" style={{ width: 64, height: 64, borderRadius: 12, background: 'rgba(0,0,0,0.06)' }} />
+          </div>
+          <div className="clb-shimmer-light" style={{ height: 14, width: '80%', borderRadius: 6, background: 'rgba(0,0,0,0.06)' }} />
+          <div className="clb-shimmer-light" style={{ height: 14, width: '55%', borderRadius: 6, background: 'rgba(0,0,0,0.06)' }} />
+        </div>
+      </div>
+    );
+  }
+
+  // Edit target failed to load or does not exist.
+  if (isEditMode && !editable.isLoading && !editable.data) {
+    return (
+      <div style={{ position: 'fixed', inset: 0, background: '#F8FAFC', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 12000, padding: 24, gap: 12 }}>
+        <div style={{ fontSize: 16, fontWeight: 600, color: '#1F2428' }}>Couldn't load this post</div>
+        <div style={{ fontSize: 13, color: '#5A6270', textAlign: 'center' }}>It may have been deleted, or your connection dropped.</div>
+        <button onClick={onClose} style={{ background: '#15171F', color: '#F5F6F7', border: 0, borderRadius: 999, padding: '10px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Close</button>
+      </div>
+    );
+  }
+
   // Ownership guard: if edit target isn't manageable, close out.
   if (isEditMode && editable.data && !editable.data.canManage) {
     return (
