@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useDebounce } from '@/hooks/useDebounce';
 import type {
@@ -30,15 +30,16 @@ const EMPTY: SearchBuckets = {
   posts: [],
 };
 
-function normalize(raw: any): SearchBuckets {
+function normalize(raw: unknown): SearchBuckets {
   if (!raw || typeof raw !== 'object') return EMPTY;
+  const r = raw as Record<string, unknown>;
   return {
-    people: Array.isArray(raw.people) ? raw.people : [],
-    courses: Array.isArray(raw.courses) ? raw.courses : [],
-    players: Array.isArray(raw.players) ? raw.players : [],
-    clubs: Array.isArray(raw.clubs) ? raw.clubs : [],
-    videos: Array.isArray(raw.videos) ? raw.videos : [],
-    posts: Array.isArray(raw.posts) ? raw.posts : [],
+    people: Array.isArray(r.people) ? (r.people as PersonHit[]) : [],
+    courses: Array.isArray(r.courses) ? (r.courses as CourseHit[]) : [],
+    players: Array.isArray(r.players) ? (r.players as PlayerHit[]) : [],
+    clubs: Array.isArray(r.clubs) ? (r.clubs as ClubHit[]) : [],
+    videos: Array.isArray(r.videos) ? (r.videos as VideoHit[]) : [],
+    posts: Array.isArray(r.posts) ? (r.posts as PostHit[]) : [],
   };
 }
 
@@ -63,7 +64,10 @@ export function useGlobalSearchV2(opts: {
   const [data, setData] = useState<SearchBuckets>(EMPTY);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const [retryNonce, setRetryNonce] = useState(0);
   const seq = useRef(0);
+
+  const refetch = useCallback(() => setRetryNonce((n) => n + 1), []);
 
   useEffect(() => {
     const q = debounced.trim();
@@ -93,7 +97,7 @@ export function useGlobalSearchV2(opts: {
         }
         setIsLoading(false);
       });
-  }, [debounced, scope, enabled, limit, offset]);
+  }, [debounced, scope, enabled, limit, offset, retryNonce]);
 
-  return { data, isLoading, error, debouncedQuery: debounced };
+  return { data, isLoading, error, debouncedQuery: debounced, refetch };
 }
