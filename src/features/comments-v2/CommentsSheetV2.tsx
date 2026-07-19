@@ -229,7 +229,7 @@ function CommentsSheetV2Inner({
               <div>
                 <div
                   style={{
-                    fontSize: '8.5px',
+                    fontSize: 10,
                     fontWeight: 800,
                     color: AMBER,
                     letterSpacing: '0.14em',
