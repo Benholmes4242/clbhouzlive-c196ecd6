@@ -76,6 +76,7 @@ import { resolveRestingRect, getCurrentViewport, readRawViewportSnapshot } from 
 import { FS_TRANSITION_MODE, FS_CUT_FADE_MS } from '@/lib/media/transitionMode';
 import { FS_OVERLAY_Z } from '@/lib/zLayers';
 import { trace as perfTrace } from '@/perf/trace';
+import { vperfCloseMotionMark } from '@/perf/vperf';
 
 
 
@@ -134,6 +135,7 @@ function returnBorrow(borrow: BorrowDescriptor, reason: 'close' | 'route' | 'dem
   if (reason !== 'demote' && originHost && !viewportChanged) {
     try {
       VideoEngine.mountLane(borrow.laneId, originHost);
+      try { vperfCloseMotionMark('laneRemounted', { lane: borrow.laneId, op: 'mount-origin' }); } catch {}
       // Live-tile return.
       //  - Rail: DO NOT execute the deferred release — the tile will re-acquire
       //    this exact lane (coalesced) as soon as the autoplay gate lifts, and
@@ -602,9 +604,12 @@ export function FullscreenFeedOverlay() {
         // Close/route teardown must park the fullscreen singleton and clear
         // firstFrame before the next cold open can synchronously snapshot it.
         try { VideoEngine.unmountLane('fullscreen'); } catch {}
+        try { vperfCloseMotionMark('laneRemounted', { lane: 'fullscreen', op: 'unmount' }); } catch {}
 
         unlockViewportScroll();
+        try { vperfCloseMotionMark('scrollUnlocked'); } catch {}
         document.body.classList.remove('route-fullscreen-overlay');
+        try { vperfCloseMotionMark('bodyClassRemoved'); vperfCloseMotionMark('chromeUnsuppressed'); } catch {}
         // Restore shield to transparent (NOT #F8FAFC) so the dark feed background
         // shows through — matches the prior CourseMediaViewer behaviour and
         // App.tsx's dark route baseline. #F8FAFC was a light slate that flashed

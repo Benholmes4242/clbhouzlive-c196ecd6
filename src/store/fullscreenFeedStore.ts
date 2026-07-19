@@ -3,11 +3,13 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { engagementBus } from '@/lib/engagementBus';
 import { applyEngagementDelta } from '@/lib/applyEngagementDelta';
 import type { LaneId } from '@/video/lanePolicy';
-import { vperfStart, vperfMark, vperfArmLane, vperfNextId } from '@/perf/vperf';
+import { vperfStart, vperfMark, vperfArmLane, vperfNextId, vperfCloseMotionTrace, vperfCloseMotionMark } from '@/perf/vperf';
 import { trace, traceLookup } from '@/perf/trace';
 import * as audioDbg from '@/perf/audioDebug';
 import { useSessionAudio, getLastUnmuteGestureTs } from '@/audio/sessionAudioStore';
 import { VideoEngine } from '@/video/VideoEngine';
+import { originHostRegistry } from '@/video/originHostRegistry';
+import { setLastCloseSnapshot } from '@/perf/positionContinuity';
 
 
 
@@ -319,7 +321,25 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       laneId: borrow ? borrow.laneId : 'fullscreen',
     });
     vperfMark(closeSpanId, 'closeIntent');
-    // ── AudioDebug: close.state + tile.resume snapshot @500ms (flag-gated)
+    // [VPERF] fs.close.motion — mirror of fs.open.motion for the return
+    // animation. Live-resolves the origin tile rect each frame via
+    // originHostRegistry so a mid-flight tile shift shows up as a delta
+    // between wrapper.rect and tileLive.rect at that frame.
+    try {
+      const ownerKey = borrow?.ownerKey ?? null;
+      vperfCloseMotionTrace(closeSpanId, {
+        originResolver: ownerKey
+          ? () => {
+              const host = originHostRegistry.get(ownerKey);
+              if (!host) return null;
+              const r = host.getBoundingClientRect();
+              return { top: r.top, left: r.left, width: r.width, height: r.height };
+            }
+          : null,
+      });
+      vperfCloseMotionMark('closeRequested', { hadBorrow: !!borrow, ownerKey });
+    } catch {}
+    // ── AudioDebug: close.state + close.position + tile.resume @500ms (flag-gated)
     if (audioDbg.audioDebugEnabled()) {
       try {
         const laneId = borrow ? borrow.laneId : 'fullscreen';
@@ -331,6 +351,20 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
           elMuted: el?.muted ?? null, elVolume: el?.volume ?? null,
           elPaused: el?.paused ?? null,
           elCurrentTime: el ? +el.currentTime.toFixed(3) : null,
+        });
+        // close.position — dedicated beat isolating fs playback position at
+        // close intent; the resume beat later diffs against this.
+        audioDbg.logAudio('close.position', {
+          laneId,
+          fsCurrentTime: el ? +el.currentTime.toFixed(3) : null,
+          fsPaused: el?.paused ?? null,
+        });
+        setLastCloseSnapshot({
+          laneId,
+          ownerKey: borrow?.ownerKey ?? null,
+          fsCurrentTime: el ? +el.currentTime.toFixed(3) : null,
+          fsPaused: el?.paused ?? null,
+          closeTs: performance.now(),
         });
         const resumeKey = borrow?.ownerKey ?? null;
         setTimeout(() => {

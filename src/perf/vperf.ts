@@ -658,6 +658,141 @@ export function vperfMotionEnd(spanId: string): void {
   rec.cleanup();
 }
 
+// ------------------------ Close-motion trace (fs.close symmetry) ------------------------
+//
+// Mirror of fs.open.motion, tuned for the RETURN animation. Per-frame samples
+// the FLIP wrapper's rect versus a live re-measured origin-tile rect (the
+// crucial pair: if the tile moves mid-flight, the diff appears as a frame
+// where targetTile* shifts and by how much). Also captures scrollY, whether
+// the fullscreen body class is still present, whether the body scroll lock is
+// still engaged, and the underlay opacity. Event marks are recorded via
+// vperfCloseMotionMark: closeRequested / chromeUnsuppressed / bodyClassRemoved
+// / scrollUnlocked / returnAnimStart / returnAnimEnd / laneRemounted.
+// Emits ONE compact 'fs.close.motion' summary line at end. Strict no-op when
+// DBG is off. Independent from vperfMotionTrace (open) — they may overlap in
+// theory but the FLIP wrapper is only mounted once at a time.
+
+interface CloseMotionRec {
+  spanId: string;
+  t0: number;
+  originResolver: (() => { top: number; left: number; width: number; height: number } | null) | null;
+  frames: number[][]; // see CLOSE_FRAME_SHAPE
+  events: Array<{ t: number; kind: string; data?: Record<string, unknown> }>;
+  phaseMarks: Record<string, number>;
+  rafId: number;
+  timerId: ReturnType<typeof setTimeout>;
+  cleanup: () => void;
+  ended: boolean;
+}
+// Frame tuple:
+//  0 t
+//  1..4 wrapper x,y,w,h
+//  5..8 tileLive x,y,w,h   (0,0,0,0 when resolver returns null)
+//  9 underlayOpacity (0..1, 2dp)
+// 10 scrollY
+// 11 chromeSuppressed (1|0) — body has route-fullscreen-overlay class
+// 12 bodyClassPresent (1|0) — same as chromeSuppressed today; kept as separate
+//                             slot for future divergence
+// 13 lockState (1|0) — bodyScrollLock still engaged
+const CLOSE_FRAME_SHAPE =
+  't,wx,wy,ww,wh,tx,ty,tw,th,uOpacity,scrollY,chromeSuppressed,bodyClassPresent,lockState';
+
+const activeCloseMotion = new Map<string, CloseMotionRec>();
+let activeCloseMotionSpanId: string | null = null;
+
+function chromeSuppressedNow(): number {
+  if (typeof document === 'undefined') return 0;
+  return document.body.classList.contains('route-fullscreen-overlay') ? 1 : 0;
+}
+
+export function vperfCloseMotionTrace(
+  spanId: string,
+  opts: {
+    originResolver?: (() => { top: number; left: number; width: number; height: number } | null) | null;
+    windowMs?: number;
+  } = {},
+): void {
+  if (!on()) return;
+  if (typeof window === 'undefined') return;
+  const prior = activeCloseMotion.get(spanId);
+  if (prior) { try { prior.cleanup(); } catch {} }
+
+  const windowMs = opts.windowMs ?? 700;
+  const t0 = performance.now();
+  const rec: CloseMotionRec = {
+    spanId,
+    t0,
+    originResolver: opts.originResolver ?? null,
+    frames: [],
+    events: [],
+    phaseMarks: {},
+    rafId: 0,
+    timerId: 0 as unknown as ReturnType<typeof setTimeout>,
+    cleanup: () => {},
+    ended: false,
+  };
+
+  const sample = () => {
+    if (rec.ended) return;
+    const t = rr(performance.now() - t0);
+    const wrapper = document.querySelector('[data-vperf="flip-wrapper"]');
+    const underlay = document.querySelector('[data-vperf="flip-underlay"]') as HTMLElement | null;
+    const [wx, wy, ww, wh] = readRect(wrapper);
+    let tx = 0, ty = 0, tw = 0, th = 0;
+    if (rec.originResolver) {
+      try {
+        const r = rec.originResolver();
+        if (r) { tx = rr(r.left); ty = rr(r.top); tw = rr(r.width); th = rr(r.height); }
+      } catch {}
+    }
+    const uOpacity = underlay ? r2(parseFloat(underlay.style.opacity || '0') || 0) : 0;
+    const scrollY = rr(window.scrollY || 0);
+    const cs = chromeSuppressedNow();
+    rec.frames.push([t, wx, wy, ww, wh, tx, ty, tw, th, uOpacity, scrollY, cs, cs, isBodyLocked()]);
+    rec.rafId = requestAnimationFrame(sample);
+  };
+  rec.rafId = requestAnimationFrame(sample);
+
+  rec.cleanup = () => {
+    if (rec.ended) return;
+    rec.ended = true;
+    try { cancelAnimationFrame(rec.rafId); } catch {}
+    try { clearTimeout(rec.timerId); } catch {}
+    activeCloseMotion.delete(spanId);
+    if (activeCloseMotionSpanId === spanId) activeCloseMotionSpanId = null;
+    emit('fs.close.motion', {
+      spanId,
+      shape: CLOSE_FRAME_SHAPE,
+      phaseMarks: rec.phaseMarks,
+      frames: rec.frames,
+      events: rec.events,
+    });
+  };
+  rec.timerId = setTimeout(() => rec.cleanup(), windowMs);
+  activeCloseMotion.set(spanId, rec);
+  activeCloseMotionSpanId = spanId;
+}
+
+/** Mark a phase on the currently-armed close-motion trace. Also pushes an
+ *  event with the same name so the ordering question (does chrome reflow
+ *  land mid-animation?) is answered by timestamps, not theory. */
+export function vperfCloseMotionMark(phase: string, data?: Record<string, unknown>): void {
+  if (!on()) return;
+  const spanId = activeCloseMotionSpanId;
+  if (!spanId) return;
+  const rec = activeCloseMotion.get(spanId);
+  if (!rec) return;
+  const t = rr(performance.now() - rec.t0);
+  rec.phaseMarks[phase] = t;
+  rec.events.push({ t, kind: phase, data });
+}
+
+export function vperfCloseMotionEnd(spanId: string): void {
+  const rec = activeCloseMotion.get(spanId);
+  if (!rec) return;
+  rec.cleanup();
+}
+
 // ------------------------ Convenience helpers ------------------------
 
 let __seq = 0;

@@ -10,7 +10,7 @@ import { VideoEngine } from '@/video/VideoEngine';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { originHostRegistry } from '@/video/originHostRegistry';
 import { isPerfEnabled } from '@/perf/navTiming';
-import { vperfStart, vperfArmLane, vperfNextId, vperfMotionMark } from '@/perf/vperf';
+import { vperfStart, vperfArmLane, vperfNextId, vperfMotionMark, vperfCloseMotionMark } from '@/perf/vperf';
 import { trace, traceLookup } from '@/perf/trace';
 import * as audioDbg from '@/perf/audioDebug';
 import { PrefetchController } from '@/video/PrefetchController';
@@ -1222,7 +1222,7 @@ const BorrowedFullscreenSlot: React.FC<{
     // Commit the collapse on the next frame so the browser has a real
     // "from" style (the current resting rect) to interpolate from.
     requestAnimationFrame(() => {
-      try { vperfMotionMark('shrinkStart'); } catch {}
+      try { vperfMotionMark('shrinkStart'); vperfCloseMotionMark('returnAnimStart'); } catch {}
       setClosing(true);
     });
   }, [closeAnim, closing, originRect, borrow.laneId, borrow.ownerKey]);
@@ -1240,7 +1240,7 @@ const BorrowedFullscreenSlot: React.FC<{
         e.propertyName !== 'height'
       ) return;
       closeFiredRef.current = true;
-      try { vperfMotionMark('shrinkEnd'); } catch {}
+      try { vperfMotionMark('shrinkEnd'); vperfCloseMotionMark('returnAnimEnd'); } catch {}
       signalCloseAnimDone();
       return;
     }

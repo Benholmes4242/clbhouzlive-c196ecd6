@@ -44,6 +44,7 @@ import { trace, traceLookup, elIdOf, traceGenElId } from '@/perf/trace';
 import { feedLaneRoles } from './feedLaneRoles';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
 import { audioDebugEnabled, logAudio, msSinceOpen } from '@/perf/audioDebug';
+import { getLastCloseSnapshot } from '@/perf/positionContinuity';
 
 /**
  * Wrap `muted` on an <video> instance so every write is logged. The
@@ -303,6 +304,16 @@ class VideoEngineImpl {
         elPausedAfter: lane.el.paused,
         msSinceOpen: msSinceOpen(),
       });
+      // handback.position — element's playback position at the moment the
+      // borrow flag is cleared. Compared later against resume.position to
+      // quantify any jump-back.
+      if (audioDebugEnabled()) {
+        logAudio('handback.position', {
+          laneId,
+          elCurrentTime: +lane.el.currentTime.toFixed(3),
+          elPaused: lane.el.paused,
+        });
+      }
     }
     // AUDIO FIX v6: borrowed elements keep playing through the borrow (the
     // pause.borrowed swallow keeps them alive), so the feed's resume path
@@ -325,6 +336,37 @@ class VideoEngineImpl {
       const activeLane = this.lanes.get(activeLaneId);
       if (!activeLane) return;
       this.applyAudioPolicy(activeLane, 'activation');
+      // resume.position — active lane's playback position after the
+      // activation policy kick. Delta = resume - fsClose isolates the
+      // "jump-back" (positive delta = rewound; ~0 = continuous).
+      if (audioDebugEnabled()) {
+        const snap = getLastCloseSnapshot();
+        const nowT = +activeLane.el.currentTime.toFixed(3);
+        logAudio('resume.position', {
+          laneId: activeLaneId,
+          elCurrentTime: nowT,
+          fsCloseCurrentTime: snap?.fsCurrentTime ?? null,
+          delta: snap && snap.fsCurrentTime != null ? +(nowT - snap.fsCurrentTime).toFixed(3) : null,
+          when: 'activation',
+        });
+        // Second beat @ +500ms — quantifies drift after any late seeks/loads.
+        const t500 = setTimeout(() => {
+          try {
+            const lane500 = this.lanes.get(activeLaneId!);
+            if (!lane500) return;
+            const now500 = +lane500.el.currentTime.toFixed(3);
+            logAudio('resume.position', {
+              laneId: activeLaneId,
+              elCurrentTime: now500,
+              fsCloseCurrentTime: snap?.fsCurrentTime ?? null,
+              delta: snap && snap.fsCurrentTime != null ? +(now500 - snap.fsCurrentTime).toFixed(3) : null,
+              when: 'activation+500ms',
+            });
+          } catch {}
+        }, 500);
+        // Best-effort cleanup handle (no-op consumer).
+        void t500;
+      }
     };
     if (typeof requestAnimationFrame === 'function') {
       requestAnimationFrame(kick);
