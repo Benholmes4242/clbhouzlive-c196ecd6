@@ -145,19 +145,14 @@ export const FullCourseLeaderboardSheetDispatch: React.FC<Props> = ({
 
   if (!category) return null;
 
-  const renderRow = (r: SectionRow, opts: { isChampion: boolean }) => {
-    const { isChampion } = opts;
+  const renderRow = (r: SectionRow, opts: { isChampion: boolean; index: number }) => {
+    const { isChampion, index } = opts;
     const barPct = isChampion ? 1 : computeBarPct(initialCategory, r.value, championValue);
-    const rowBg = isChampion
-      ? 'linear-gradient(100deg, #fff, #fff6e8)'
-      : r.isSelf
-      ? SELF_TINT
-      : '#fff';
-    const border = isChampion
-      ? `1px solid ${GOLD_BORDER}`
-      : r.isSelf
-      ? `1px solid ${SELF_BORDER}`
-      : '1px solid rgba(15,23,42,0.07)';
+    const bandBg = index % 2 === 0 ? 'rgba(15,23,42,0.035)' : 'transparent';
+    const rowBg = r.isSelf ? SELF_TINT : bandBg;
+    const topRule = isChampion
+      ? `2px solid ${GOLD_DEEP}`
+      : `0.5px solid rgba(15,23,42,0.08)`;
     const rankColor = isChampion ? GOLD_DEEP : '#94A3B8';
     const valueColor = isChampion ? GOLD_DEEP : INK;
 
@@ -166,11 +161,9 @@ export const FullCourseLeaderboardSheetDispatch: React.FC<Props> = ({
         key={`${r.rank}-${r.attained_at}-${r.name}`}
         ref={r.isSelf && !isChampion ? selfRowRef : undefined}
         style={{
-          borderRadius: 12,
-          padding: '10px 12px',
+          padding: '10px 16px',
           background: rowBg,
-          border,
-          marginBottom: 8,
+          borderTop: topRule,
           fontFamily: FONT,
         }}
       >
