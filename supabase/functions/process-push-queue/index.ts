@@ -135,7 +135,13 @@ serve(async (req) => {
       }
     }
 
+    // Fan-out is done at enqueue time. Each queue row targets a single
+    // (user_id, device_id); we apply that user's muted_types filter then send.
+    // OneSignal's `external_id` body field is the idempotency key — reusing
+    // the queue row UUID guarantees at-most-once even on retry.
+    for (const item of queue) {
       try {
+
         const data = (item.data ?? {}) as Record<string, any>;
         const notifType = (data.type as string | undefined) ?? null;
         const muted = mutedByUser.get(item.user_id) ?? [];
