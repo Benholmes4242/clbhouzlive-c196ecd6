@@ -107,7 +107,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [ratingFilter, setRatingFilter] = useState<RatingFilterValue>(null);
   
-  const hookRatingFilter = ratingFilter === 'exceptional' ? '10-9'
+  const hookRatingFilter: ReviewsRatingFilter =
+    ratingFilter === 'exceptional' ? '10-9'
     : ratingFilter === 'excellent' ? '8.9-7.5'
     : ratingFilter === 'good' ? '7.4-5'
     : 'all';
