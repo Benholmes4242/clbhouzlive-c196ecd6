@@ -280,12 +280,13 @@ function ColumnCell({
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-          <GoldRingAvatar
+          <SquircleAvatar
             size={avatarSize}
             srcCandidates={leader.holder_avatar ? [leader.holder_avatar] : []}
             alt={name}
             fallback={initials(name)}
             userId={leader.user_id}
+            hairlineRing
           />
           <div
             style={{
@@ -370,12 +371,13 @@ function ColumnCell({
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-          <GoldRingAvatar
+          <SquircleAvatar
             size={20}
             srcCandidates={feat.holder_avatar ? [feat.holder_avatar] : []}
             alt={name}
             fallback={initials(name)}
             userId={feat.user_id}
+            hairlineRing
           />
           <div
             style={{
