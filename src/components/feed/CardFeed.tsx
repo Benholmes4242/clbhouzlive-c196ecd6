@@ -127,6 +127,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   hasNextPage,
   topPadding = 96,
   bottomPadding = 96,
+  isFetchingNextPage = false,
   onFollow,
   currentUserId,
   onRefresh,
