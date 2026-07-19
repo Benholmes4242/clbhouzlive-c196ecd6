@@ -220,10 +220,11 @@ export function TournamentPage() {
         {/* TEE TIMES BAND — promoted entry point to the round-by-round
             sheet. Renders for live + upcoming states only. */}
         {(pulse.state === 'live' || pulse.state === 'upcoming') && (
-          <TeeTimesBand
+          <TeeTimesRail
+            groups={teeGroups}
             round={currentRound}
-            groupCount={teeGroups.length}
-            onTap={() => setTeeTimesOpen(true)}
+            onOpenAll={() => setTeeTimesOpen(true)}
+            tourCode={tourCode}
           />
         )}
 
