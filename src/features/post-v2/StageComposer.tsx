@@ -22,7 +22,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
 import { applyRouteChrome } from '@/lib/routeChrome';
 
-import { useStageComposer, type StageMediaItem } from './hooks/useStageComposer';
+import { useStageComposer, type StageMediaItem, type StageCourse } from './hooks/useStageComposer';
 import { usePostSubmit, type SubmitResult } from './hooks/usePostSubmit';
 import { useDrafts } from './hooks/useDrafts';
 import { useEditablePost } from '@/hooks/useEditablePost';
