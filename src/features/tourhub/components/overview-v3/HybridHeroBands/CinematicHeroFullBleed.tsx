@@ -63,14 +63,6 @@ function entryThru(e: any): string {
   return String(e.thru);
 }
 
-function entryToday(e: any, round: number | undefined): number | null {
-  const rounds = e?.raw_data?.rounds;
-  if (!Array.isArray(rounds) || !round || rounds.length < round) return null;
-  const r = rounds[round - 1];
-  if (!r || r.score == null) return null;
-  return r.score ?? null;
-}
-
 function avatarFor(e: any, tourSlug?: string | null): string[] {
   return resolvePlayerAvatarCandidates({
     name: entryName(e),
