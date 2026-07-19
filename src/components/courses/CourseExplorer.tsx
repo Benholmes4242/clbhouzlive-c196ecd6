@@ -82,9 +82,9 @@ function applySortToQuery<Q extends OrderableQuery<Q>>(query: Q, sortOption: Sor
 type ExploreCourseRow = {
   id: string;
   name: string;
-  country?: string | null;
-  sub_country?: string | null;
-  thumbnail_image?: string | null;
+  country: string;
+  sub_country?: string;
+  thumbnail_image?: string;
   global_rank?: number | null;
   regional_rank?: number | null;
   usa_rank?: number | null;
