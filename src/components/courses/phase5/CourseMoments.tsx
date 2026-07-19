@@ -64,8 +64,19 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
   }, [moments, user?.id, courseName, courseId, profile]);
 
   const handleMomentTap = useCallback((index: number) => {
-    if (fullscreenPosts.length > 0) {
-      useFullscreenFeedStore.getState().open(fullscreenPosts, index, { readOnly: true });
+    if (fullscreenPosts.length === 0) return;
+    if (FLAGS.fsv2) {
+      openFsv2({
+        posts: fullscreenPosts,
+        startIndex: index,
+        openedFrom: 'course-moments',
+        readOnly: true,
+      });
+    } else {
+      useFullscreenFeedStore.getState().open(fullscreenPosts, index, {
+        readOnly: true,
+        openedFrom: 'course-moments',
+      });
     }
   }, [fullscreenPosts]);
 
