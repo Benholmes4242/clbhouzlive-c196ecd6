@@ -53,6 +53,8 @@ export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
     ).length;
   }, [scores]);
 
+  if (isBusiness) return null;
+
   const stripBase: React.CSSProperties = {
     margin: '12px 20px 0',
     padding: '11px 15px',
