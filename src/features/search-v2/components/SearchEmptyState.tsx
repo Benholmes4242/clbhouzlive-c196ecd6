@@ -10,7 +10,6 @@
  * cached for the session.
  */
 import { useNavigate } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
 import { Check, Zap } from 'lucide-react';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { PlayerInitialAvatar } from '@/features/tourhub/_shared/PlayerInitialAvatar';
