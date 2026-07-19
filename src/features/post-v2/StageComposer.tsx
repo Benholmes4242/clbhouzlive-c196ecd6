@@ -57,7 +57,8 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
   const { profile } = useProfileData();
   const { activeActor, setActiveActor } = useActiveActor();
   const composer = useStageComposer();
-  const { state, addFiles, removeAt, reorder, setActiveIndex, updateActive, setCaption, setCourse, setScheduledAt, restoreDraft, hydrate, reset } = composer;
+  const { state, addFiles, removeAt, reorder, setActiveIndex, updateActive, setCaption, setCourses, setScheduledAt, restoreDraft, hydrate, reset } = composer;
+  const primaryCourse = state.courses[0] ?? null;
   const { submit, submitting } = usePostSubmit();
   const drafts = useDrafts(profile?.id);
   const queryClient = useQueryClient();
