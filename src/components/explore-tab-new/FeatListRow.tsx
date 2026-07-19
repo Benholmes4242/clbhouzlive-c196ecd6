@@ -55,6 +55,8 @@ interface Props {
   mode?: RecordsMode;
   bestToPar?: number | null;
   maxCount?: number | null;
+  /** When true, rank 1 renders the trophy emoji in place of the numeral "1". */
+  crownLeader?: boolean;
 }
 
 // Canonical sheet/page leaderboard row. Refinement token spec applied:
