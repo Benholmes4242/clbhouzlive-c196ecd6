@@ -174,7 +174,9 @@ export function useStageComposer() {
   }, []);
 
   const setCaption = useCallback((v: string) => markDirty({ caption: v }), []);
-  const setCourse = useCallback((c: StageCourse | null) => markDirty({ course: c }), []);
+  const setCourses = useCallback((cs: StageCourse[]) => markDirty({ courses: cs }), []);
+  /** Back-compat single-course setter — writes as a 1-element (or empty) array. */
+  const setCourse = useCallback((c: StageCourse | null) => markDirty({ courses: c ? [c] : [] }), []);
   const setScheduledAt = useCallback((d: Date | null) => markDirty({ scheduledAt: d }), []);
 
   const restoreDraft = useCallback((patch: Partial<StageState>) => {
