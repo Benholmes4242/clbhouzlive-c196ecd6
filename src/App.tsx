@@ -889,6 +889,7 @@ const AppInner: React.FC = () => {
         <AdminGatedLogHud />
         <AdminGatedPerfPill />
         <AdminGatedBootTimelinePill />
+        <AdminGatedFsv2DebugPill />
         
         
         
