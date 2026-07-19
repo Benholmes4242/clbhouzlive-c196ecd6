@@ -81,6 +81,7 @@ export function BirdieHaulsLedger({ region, regionUpper, mode, onRowTap }: Props
         <div>
           {display.map((row, i) => {
             const isFirst = i === 0;
+            const crown = isFirst && mode === 'alltime';
             const isLast = i === display.length - 1;
             const banded = i === 1 || i === 3;
             const name = formatHolderName(row.holder_name);
@@ -111,14 +112,14 @@ export function BirdieHaulsLedger({ region, regionUpper, mode, onRowTap }: Props
                   <div
                     style={{
                       width: 16,
-                      fontSize: 11,
+                      fontSize: crown ? 13 : 11,
                       fontWeight: 600,
                       color: isFirst ? AMBER : RANK_MUTE,
-                      fontVariantNumeric: 'tabular-nums',
+                      ...(crown ? {} : { fontVariantNumeric: 'tabular-nums' as const }),
                       textAlign: 'center',
                     }}
                   >
-                    {i + 1}
+                    {crown ? '\u{1F3C6}' : i + 1}
                   </div>
                   <SquircleAvatar
                     size={24}

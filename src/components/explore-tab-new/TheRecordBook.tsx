@@ -238,6 +238,7 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
             banded={i === 1 || i === 3}
             isLast={i === ledgerRows.length - 1}
             onTap={() => handleRowTap(row)}
+            crown={i === 0 && mode === 'alltime'}
           />
         ))}
       </div>
@@ -266,12 +267,14 @@ function LedgerRow({
   banded,
   isLast,
   onTap,
+  crown = false,
 }: {
   row: FeatRow;
   rank: number;
   banded: boolean;
   isLast: boolean;
   onTap: () => void;
+  crown?: boolean;
 }) {
   const holder = formatHolderName(row.holder_name);
   const par = rowToPar(row);
@@ -315,14 +318,14 @@ function LedgerRow({
         style={{
           width: 12,
           flexShrink: 0,
-          fontSize: 11,
+          fontSize: crown ? 13 : 11,
           fontWeight: 600,
           color: FADED,
-          fontVariantNumeric: 'tabular-nums',
+          ...(crown ? {} : { fontVariantNumeric: 'tabular-nums' as const }),
           textAlign: 'center',
         }}
       >
-        {rank}
+        {crown ? '\u{1F3C6}' : rank}
       </div>
 
 

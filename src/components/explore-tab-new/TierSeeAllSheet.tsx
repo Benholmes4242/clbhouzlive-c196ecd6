@@ -438,6 +438,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
                 mode={mode}
                 bestToPar={bestToPar}
                 maxCount={birdieMaxCount}
+                crownLeader={mode === 'alltime'}
               />
             ))}
           </div>
@@ -555,19 +556,19 @@ function CountLeaderSheetRow({
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 11, minWidth: 0 }}>
         <div
-          className={goldChampion ? 'clbhouz-gold-shimmer-light' : undefined}
+          className={goldChampion && !isTop ? 'clbhouz-gold-shimmer-light' : undefined}
           style={{
             width: 20,
             flexShrink: 0,
-            fontSize: 11,
+            fontSize: isTop ? 13 : 11,
             fontWeight: 600,
-            fontVariantNumeric: 'tabular-nums',
+            ...(isTop ? {} : { fontVariantNumeric: 'tabular-nums' as const }),
             lineHeight: 1,
             textAlign: 'center',
-            ...(goldChampion ? {} : { color: isTop ? AMBER : LEGEND_RANK }),
+            ...(goldChampion && !isTop ? {} : { color: isTop ? AMBER : LEGEND_RANK }),
           }}
         >
-          {rank}
+          {isTop ? '\u{1F3C6}' : rank}
         </div>
         <div style={{ flexShrink: 0 }}>
           <SquircleAvatar
