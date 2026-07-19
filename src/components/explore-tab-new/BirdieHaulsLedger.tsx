@@ -81,6 +81,7 @@ export function BirdieHaulsLedger({ region, regionUpper, mode, onRowTap }: Props
         <div>
           {display.map((row, i) => {
             const isFirst = i === 0;
+            const crown = isFirst && mode === 'alltime';
             const isLast = i === display.length - 1;
             const banded = i === 1 || i === 3;
             const name = formatHolderName(row.holder_name);
