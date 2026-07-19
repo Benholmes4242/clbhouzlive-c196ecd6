@@ -15,6 +15,7 @@ import { toast } from '@/lib/toast';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { useKeyboardHeight } from '@/hooks/messaging/useKeyboardHeight';
+import type { ActiveActor } from '@/types/actor';
 
 import { useCommentsV2, type TargetType, type CommentV2 } from './hooks/useCommentsV2';
 import { useCommentsRealtimeV2 } from './hooks/useCommentsRealtimeV2';
@@ -142,7 +143,11 @@ function CommentsSheetV2Inner({
 
   const onMore = useCallback((c: CommentV2) => setActionTarget(c), []);
   const onCopy = useCallback((c: CommentV2) => {
-    if (c.content) navigator.clipboard.writeText(c.content).then(() => toast.success('Copied'));
+    if (c.content) {
+      navigator.clipboard.writeText(c.content)
+        .then(() => toast.success('Copied'))
+        .catch(() => toast.error('Could not copy'));
+    }
   }, []);
   const beginEdit = useCallback((c: CommentV2) => {
     setEditing(c); setEditText(c.content ?? '');
@@ -153,8 +158,8 @@ function CommentsSheetV2Inner({
       await editComment.mutateAsync({ id: editing.id, content: editText });
       toast.success('Comment updated');
       setEditing(null); setEditText('');
-    } catch (e: any) {
-      toast.error(e?.message ?? 'Failed to update');
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Failed to update');
     }
   }, [editing, editText, editComment]);
   const beginDelete = useCallback((c: CommentV2) => {
@@ -164,16 +169,16 @@ function CommentsSheetV2Inner({
   const confirmDelete = useCallback(async () => {
     if (!deleteTarget) return;
     try {
-      await deleteComment.mutateAsync(deleteTarget.id);
+      await deleteComment.mutateAsync({ id: deleteTarget.id, replyCount: deleteTarget.reply_count });
       toast.success('Comment deleted');
-    } catch (e: any) {
-      toast.error(e?.message ?? 'Failed to delete');
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Failed to delete');
     }
     setDeleteTarget(null);
   }, [deleteTarget, deleteComment]);
 
   const onSubmit = useCallback(async (input: {
-    content?: string; mediaUrl?: string; mediaType?: string; actor: { type: 'personal' | 'business'; id: string };
+    content?: string; mediaUrl?: string; mediaType?: string; actor: ActiveActor;
   }) => {
     try {
       await addComment.mutateAsync({
@@ -185,8 +190,8 @@ function CommentsSheetV2Inner({
         actorId: input.actor.id,
       });
       setReplyingTo(null);
-    } catch (e: any) {
-      toast.error(e?.message ?? 'Failed to post comment');
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Failed to post comment');
     }
   }, [addComment, replyingTo]);
 
@@ -224,7 +229,7 @@ function CommentsSheetV2Inner({
               <div>
                 <div
                   style={{
-                    fontSize: '8.5px',
+                    fontSize: 10,
                     fontWeight: 800,
                     color: AMBER,
                     letterSpacing: '0.14em',
@@ -293,7 +298,7 @@ function CommentsSheetV2Inner({
             <CommentComposer
               replyingTo={replyingTo}
               onClearReply={() => setReplyingTo(null)}
-              onSubmit={onSubmit as any}
+              onSubmit={onSubmit}
               isSubmitting={addComment.isPending}
             />
           </motion.div>
@@ -312,8 +317,8 @@ function CommentsSheetV2Inner({
               try {
                 await hideComment.mutateAsync(actionTarget.id);
                 toast.success('Comment hidden');
-              } catch (e: any) {
-                toast.error(e?.message ?? 'Failed to hide');
+              } catch (e) {
+                toast.error(e instanceof Error ? e.message : 'Failed to hide');
               }
             }}
           />
@@ -325,9 +330,15 @@ function CommentsSheetV2Inner({
             onSubmit={async (reason, details) => {
               if (!reportTarget) return;
               try {
-                await reportComment.mutateAsync({ id: reportTarget.id, reason, details });
-              } catch (e: any) {
-                toast.error(e?.message ?? 'Failed to submit report');
+                await reportComment.mutateAsync({
+                  id: reportTarget.id,
+                  targetUserId: reportTarget.user_id,
+                  reason,
+                  details,
+                });
+              } catch (e) {
+                toast.error(e instanceof Error ? e.message : 'Failed to submit report');
+                throw e;
               }
             }}
           />

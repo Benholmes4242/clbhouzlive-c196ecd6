@@ -49,8 +49,16 @@ export interface UseCommentsV2Args {
   enabled?: boolean;
 }
 
+type RawCommentRow = {
+  id: string; user_id: string; content: string | null;
+  media_type: string | null; media_url: string | null;
+  parent_id: string | null; created_at: string;
+  is_edited: boolean | null; actor_type: string | null;
+  actor_id: string | null; target_secondary_id?: string | null;
+};
+
 interface Page {
-  parents: any[];
+  parents: RawCommentRow[];
   nextCursor: string | null;
 }
 
@@ -79,7 +87,7 @@ export function useCommentsV2({
         .from('hidden_comments')
         .select('comment_id')
         .eq('user_id', user!.id);
-      return new Set<string>((data ?? []).map((r: any) => r.comment_id));
+      return new Set<string>((data ?? []).map((r: { comment_id: string }) => r.comment_id));
     },
   });
 
@@ -151,37 +159,40 @@ export function useCommentsV2({
           .map(r => r.actor_id).filter(Boolean)
       ));
 
+      type ProfileRow = { id: string; display_name: string | null; username: string | null; profile_photo_url: string | null };
+      type BusinessRow = { id: string; name: string | null; slug: string | null; logo_url: string | null; is_verified: boolean | null };
+      type LikeRow = { comment_id: string };
       const [profilesRes, businessRes, likeCountsRes, myLikesRes] = await Promise.all([
         personalIds.length
           ? supabase.from('user_profiles').select('id, display_name, username, profile_photo_url').in('id', personalIds)
-          : Promise.resolve({ data: [] as any[] }),
+          : Promise.resolve({ data: [] as ProfileRow[] }),
         businessIds.length
           ? supabase.from('business_accounts').select('id, name, slug, logo_url, is_verified').in('id', businessIds)
-          : Promise.resolve({ data: [] as any[] }),
+          : Promise.resolve({ data: [] as BusinessRow[] }),
         supabase.from('comment_likes_v2').select('comment_id').in('comment_id', rowIds),
         actorId
           ? supabase.from('comment_likes_v2').select('comment_id').in('comment_id', rowIds).eq('user_id', user?.id ?? '')
-          : Promise.resolve({ data: [] as any[] }),
+          : Promise.resolve({ data: [] as LikeRow[] }),
       ]);
 
-      const profileMap = new Map((profilesRes.data ?? []).map((p: any) => [p.id, p]));
-      const businessMap = new Map((businessRes.data ?? []).map((b: any) => [b.id, b]));
+      const profileMap = new Map((profilesRes.data ?? []).map((p) => [(p as ProfileRow).id, p as ProfileRow]));
+      const businessMap = new Map((businessRes.data ?? []).map((b) => [(b as BusinessRow).id, b as BusinessRow]));
       const likeCounts = new Map<string, number>();
-      (likeCountsRes.data ?? []).forEach((l: any) =>
-        likeCounts.set(l.comment_id, (likeCounts.get(l.comment_id) ?? 0) + 1)
+      (likeCountsRes.data ?? []).forEach((l) =>
+        likeCounts.set((l as LikeRow).comment_id, (likeCounts.get((l as LikeRow).comment_id) ?? 0) + 1)
       );
-      const myLikes = new Set((myLikesRes.data ?? []).map((l: any) => l.comment_id));
+      const myLikes = new Set((myLikesRes.data ?? []).map((l) => (l as LikeRow).comment_id));
 
       return { profileMap, businessMap, likeCounts, myLikes };
     },
   });
 
-  const shape = useCallback((row: any): CommentV2 => {
+  const shape = useCallback((row: RawCommentRow): CommentV2 => {
     const at = (row.actor_type ?? 'personal') as 'personal' | 'business';
     const aId = row.actor_id ?? row.user_id;
     let info: CommentActorInfo;
     if (at === 'business') {
-      const b: any = enrichment?.businessMap.get(aId);
+      const b = enrichment?.businessMap.get(aId);
       info = {
         actor_type: 'business',
         actor_id: aId,
@@ -191,7 +202,7 @@ export function useCommentsV2({
         verified: !!b?.is_verified,
       };
     } else {
-      const p: any = enrichment?.profileMap.get(aId);
+      const p = enrichment?.profileMap.get(aId);
       info = {
         actor_type: 'personal',
         actor_id: aId,
@@ -223,11 +234,12 @@ export function useCommentsV2({
 
   const threads = useMemo<CommentV2[]>(() => {
     if (!parents.length) return [];
-    const isBlocked = (r: any) => blockedIds.has(r.user_id) || (r.actor_type !== 'business' && r.actor_id && blockedIds.has(r.actor_id));
-    const byParent = new Map<string, any[]>();
-    for (const r of replies) {
+    const isBlocked = (r: RawCommentRow) => blockedIds.has(r.user_id) || (r.actor_type !== 'business' && !!r.actor_id && blockedIds.has(r.actor_id));
+    const byParent = new Map<string, RawCommentRow[]>();
+    for (const r of replies as RawCommentRow[]) {
       if (hiddenIds.has(r.id)) continue;
       if (isBlocked(r)) continue;
+      if (!r.parent_id) continue;
       const list = byParent.get(r.parent_id) ?? [];
       list.push(r);
       byParent.set(r.parent_id, list);
@@ -256,9 +268,8 @@ export function useCommentsV2({
           .select('comment_count')
           .eq('id', targetId)
           .maybeSingle();
-        if (data && typeof (data as any).comment_count === 'number') {
-          return (data as any).comment_count as number;
-        }
+        const cc = (data as { comment_count?: number } | null)?.comment_count;
+        if (typeof cc === 'number') return cc;
       }
       let cq = supabase
         .from('comments_v2')
@@ -272,7 +283,7 @@ export function useCommentsV2({
   });
 
   const invalidate = useCallback(() => {
-    qc.invalidateQueries({ queryKey: keyRoot as any });
+    qc.invalidateQueries({ queryKey: keyRoot as unknown as readonly unknown[] });
   }, [qc, targetType, targetId, targetSecondaryId]);
 
   // ── Mutations (RPC only) ──
@@ -298,7 +309,7 @@ export function useCommentsV2({
         p_actor_id: input.actorId ?? actorId,
       });
       if (error) throw error;
-      return data as any;
+      return data as unknown;
     },
     onSuccess: () => {
       // Server trigger `comments_v2_count_inc` bumps posts.comment_count
@@ -315,22 +326,22 @@ export function useCommentsV2({
     mutationFn: async ({ id, content }: { id: string; content: string }) => {
       const { data, error } = await supabase.rpc('edit_comment_v2', { p_id: id, p_content: content });
       if (error) throw error;
-      return data as any;
+      return data as unknown;
     },
     onSuccess: invalidate,
   });
 
   const deleteComment = useMutation({
-    mutationFn: async (id: string) => {
+    mutationFn: async ({ id }: { id: string; replyCount: number }) => {
       const { data, error } = await supabase.rpc('delete_comment_v2', { p_id: id });
       if (error) throw error;
-      return data as any;
+      return data;
     },
-    onSuccess: () => {
+    onSuccess: (_data, vars) => {
       // Server trigger `comments_v2_count_dec` decrements posts.comment_count
-      // for both top-level and reply deletions. Mirror symmetrically.
+      // for both top-level and cascaded reply deletions. Mirror symmetrically.
       if (targetType === 'post') {
-        patchEngagement(qc, targetId, { commentCountDelta: -1 });
+        patchEngagement(qc, targetId, { commentCountDelta: -(1 + (vars.replyCount ?? 0)) });
       }
       invalidate();
     },
@@ -340,12 +351,13 @@ export function useCommentsV2({
     mutationFn: async (id: string) => {
       const { data, error } = await supabase.rpc('toggle_comment_like_v2', { p_comment_id: id });
       if (error) throw error;
-      return data as { liked: boolean; count: number } | any;
+      return data as { liked: boolean; count: number } | null;
     },
     onMutate: async (id: string) => {
-      await qc.cancelQueries({ queryKey: keyRoot as any });
+      await qc.cancelQueries({ queryKey: keyRoot as unknown as readonly unknown[] });
       // Optimistic like toggle for the row cache — we mutate enrichment directly.
-      qc.setQueryData([...keyRoot, 'enrichment', rowIds, actorType, actorId], (old: any) => {
+      type EnrichmentCache = { myLikes: Set<string>; likeCounts: Map<string, number> } & Record<string, unknown>;
+      qc.setQueryData([...keyRoot, 'enrichment', rowIds, actorType, actorId], (old: EnrichmentCache | undefined) => {
         if (!old) return old;
         const myLikes = new Set<string>(old.myLikes);
         const likeCounts = new Map<string, number>(old.likeCounts);
@@ -363,9 +375,10 @@ export function useCommentsV2({
     onSuccess: (res, id) => {
       // Reconcile from RPC return { liked, count }.
       if (!res || typeof res !== 'object') return;
-      const liked = !!(res as any).liked;
-      const count = Number((res as any).count ?? 0);
-      qc.setQueryData([...keyRoot, 'enrichment', rowIds, actorType, actorId], (old: any) => {
+      const liked = !!res.liked;
+      const count = Number(res.count ?? 0);
+      type EnrichmentCache = { myLikes: Set<string>; likeCounts: Map<string, number> } & Record<string, unknown>;
+      qc.setQueryData([...keyRoot, 'enrichment', rowIds, actorType, actorId], (old: EnrichmentCache | undefined) => {
         if (!old) return old;
         const myLikes = new Set<string>(old.myLikes);
         const likeCounts = new Map<string, number>(old.likeCounts);
@@ -395,7 +408,7 @@ export function useCommentsV2({
   });
 
   const reportComment = useMutation({
-    mutationFn: async ({ id, reason, details }: { id: string; reason: string; details?: string }) => {
+    mutationFn: async ({ id, targetUserId, reason, details }: { id: string; targetUserId: string; reason: string; details?: string }) => {
       if (!user?.id) throw new Error('Not signed in');
       // Dual write: hidden_comments captures the reason (also filters it out for
       // this user), and reports feeds the moderation queue.
@@ -405,13 +418,15 @@ export function useCommentsV2({
         }),
         supabase.from('reports').insert({
           reporter_id: user.id,
+          reported_comment_id: id,
+          reported_user_id: targetUserId,
           reason,
           details: details ?? null,
           status: 'pending',
         }),
       ]);
       if (hideErr) throw hideErr;
-      if (repErr) console.warn('[comments-v2] report insert failed:', repErr);
+      if (repErr) throw repErr;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['comments-v2-hidden', user?.id] });
