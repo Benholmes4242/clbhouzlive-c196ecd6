@@ -66,7 +66,7 @@ export default function ActorCards({
         style={{
           fontWeight: 700,
           fontSize: 10,
-          letterSpacing: '0.16em',
+          letterSpacing: '0.14em',
           textTransform: 'uppercase',
           color: AMBER,
           padding: '0 20px 8px',
