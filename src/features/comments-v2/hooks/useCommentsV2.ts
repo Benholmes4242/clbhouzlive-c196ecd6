@@ -159,37 +159,40 @@ export function useCommentsV2({
           .map(r => r.actor_id).filter(Boolean)
       ));
 
+      type ProfileRow = { id: string; display_name: string | null; username: string | null; profile_photo_url: string | null };
+      type BusinessRow = { id: string; name: string | null; slug: string | null; logo_url: string | null; is_verified: boolean | null };
+      type LikeRow = { comment_id: string };
       const [profilesRes, businessRes, likeCountsRes, myLikesRes] = await Promise.all([
         personalIds.length
           ? supabase.from('user_profiles').select('id, display_name, username, profile_photo_url').in('id', personalIds)
-          : Promise.resolve({ data: [] as any[] }),
+          : Promise.resolve({ data: [] as ProfileRow[] }),
         businessIds.length
           ? supabase.from('business_accounts').select('id, name, slug, logo_url, is_verified').in('id', businessIds)
-          : Promise.resolve({ data: [] as any[] }),
+          : Promise.resolve({ data: [] as BusinessRow[] }),
         supabase.from('comment_likes_v2').select('comment_id').in('comment_id', rowIds),
         actorId
           ? supabase.from('comment_likes_v2').select('comment_id').in('comment_id', rowIds).eq('user_id', user?.id ?? '')
-          : Promise.resolve({ data: [] as any[] }),
+          : Promise.resolve({ data: [] as LikeRow[] }),
       ]);
 
-      const profileMap = new Map((profilesRes.data ?? []).map((p: any) => [p.id, p]));
-      const businessMap = new Map((businessRes.data ?? []).map((b: any) => [b.id, b]));
+      const profileMap = new Map((profilesRes.data ?? []).map((p) => [(p as ProfileRow).id, p as ProfileRow]));
+      const businessMap = new Map((businessRes.data ?? []).map((b) => [(b as BusinessRow).id, b as BusinessRow]));
       const likeCounts = new Map<string, number>();
-      (likeCountsRes.data ?? []).forEach((l: any) =>
-        likeCounts.set(l.comment_id, (likeCounts.get(l.comment_id) ?? 0) + 1)
+      (likeCountsRes.data ?? []).forEach((l) =>
+        likeCounts.set((l as LikeRow).comment_id, (likeCounts.get((l as LikeRow).comment_id) ?? 0) + 1)
       );
-      const myLikes = new Set((myLikesRes.data ?? []).map((l: any) => l.comment_id));
+      const myLikes = new Set((myLikesRes.data ?? []).map((l) => (l as LikeRow).comment_id));
 
       return { profileMap, businessMap, likeCounts, myLikes };
     },
   });
 
-  const shape = useCallback((row: any): CommentV2 => {
+  const shape = useCallback((row: RawCommentRow): CommentV2 => {
     const at = (row.actor_type ?? 'personal') as 'personal' | 'business';
     const aId = row.actor_id ?? row.user_id;
     let info: CommentActorInfo;
     if (at === 'business') {
-      const b: any = enrichment?.businessMap.get(aId);
+      const b = enrichment?.businessMap.get(aId);
       info = {
         actor_type: 'business',
         actor_id: aId,
