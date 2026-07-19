@@ -29,20 +29,35 @@ import { getPageScrollTop, getPrimaryScrollElement, scrollPageTo } from '@/lib/g
 
 type SortOption = 'official_rating' | 'community_rating' | 'recently_added' | 'name_asc' | 'name_desc';
 
-/** Apply the current sort option to a Supabase query builder. */
+/**
+ * Minimal chainable shape of the Supabase query builder — enough to type
+ * the sort helper without leaking `any` and without depending on
+ * PostgrestFilterBuilder's exhaustive generics.
+ */
+type OrderableQuery<Q> = {
+  order: (
+    column: string,
+    options?: { ascending?: boolean; nullsFirst?: boolean },
+  ) => Q;
+};
+
 /**
  * Apply the current sort option to a Supabase query builder.
  *
- * NOTE: For 'community_rating', PostgREST referencedTable ordering on views
- * is silently ignored. We fall back to a default server-side order here and
- * apply the real community-rating sort **client-side** after fetching
- * (see `applyCommunitySort` below).
+ * 'community_rating' never reaches this builder — fetchCoursePage routes it
+ * to the explore_courses_by_rating RPC (server-side sort).
  */
-function applySortToQuery(query: any, sortOption: SortOption) {
+function applySortToQuery<Q extends OrderableQuery<Q>>(query: Q, sortOption: SortOption): Q {
   switch (sortOption) {
     case 'community_rating':
-      // Server can't sort by view column — use name as stable fallback.
-      // Real sort happens client-side in applyCommunitySort().
+      // Unreachable — fetchCoursePage branches to explore_courses_by_rating
+      // before calling this helper. Case label retained for exhaustiveness;
+      // fall through to default so the query still gets a stable order if
+      // an unexpected call ever lands here.
+      // fallthrough
+    case 'official_rating':
+    default:
+      query = query.order('global_rank', { ascending: true, nullsFirst: false });
       query = query.order('name', { ascending: true });
       break;
     case 'recently_added':
@@ -54,31 +69,28 @@ function applySortToQuery(query: any, sortOption: SortOption) {
     case 'name_desc':
       query = query.order('name', { ascending: false });
       break;
-    case 'official_rating':
-    default:
-      query = query.order('global_rank', { ascending: true, nullsFirst: false });
-      query = query.order('name', { ascending: true });
-      break;
   }
   return query;
 }
 
+
 /**
- * Client-side community rating sort.
- * Applied after fetch because PostgREST can't order by view columns.
- *
- * LIMITATION: With infinite scroll, this only sorts within currently loaded
- * pages — not globally across all courses. Acceptable trade-off vs. creating
- * a DB function.
+ * Row shape produced by explore_courses_by_rating and the fallback PostgREST
+ * select — only the fields the UI + card mapper touch. Kept structural so
+ * both call sites converge on one type.
  */
-function applyCommunitySort<T extends { average_rating?: number | null; name?: string }>(courses: T[]): T[] {
-  return [...courses].sort((a, b) => {
-    const rA = a.average_rating ?? -1;
-    const rB = b.average_rating ?? -1;
-    if (rB !== rA) return rB - rA;
-    return (a.name ?? '').localeCompare(b.name ?? '');
-  });
-}
+type ExploreCourseRow = {
+  id: string;
+  name: string;
+  country: string;
+  sub_country?: string;
+  thumbnail_image?: string;
+  global_rank?: number | null;
+  regional_rank?: number | null;
+  usa_rank?: number | null;
+  average_rating?: number | null;
+  course_rating_aggregates?: Array<{ avg_overall_score: number | null }> | null;
+};
 
 interface FetchCoursePageParams {
   selectedRegion: PrimaryRegionKey;
@@ -117,7 +129,7 @@ async function fetchCoursePage({ selectedRegion, selectedSubregion, debouncedSea
       throw error;
     }
 
-    const courses = (data || []) as any[];
+    const courses = (data || []) as ExploreCourseRow[];
 
     // For first page we need a count – do a lightweight count query
     let totalCount: number | null = null;
@@ -177,7 +189,7 @@ async function fetchCoursePage({ selectedRegion, selectedSubregion, debouncedSea
     throw error;
   }
 
-  const courses = (data || []).map((course: any) => ({
+  const courses = ((data || []) as ExploreCourseRow[]).map((course) => ({
     ...course,
     average_rating: course.course_rating_aggregates?.[0]?.avg_overall_score ?? null,
   }));
@@ -266,7 +278,12 @@ const CourseExplorer = () => {
   // URL params take priority, then sessionStorage, then defaults
   const [selectedRegion, setSelectedRegion] = useState<PrimaryRegionKey>(() => {
     const urlRegion = searchParams.get('region');
-    if (urlRegion) return urlRegion as PrimaryRegionKey;
+    // Only trust the param when it is one of OUR keys — the Discover tab
+    // shares this URL and writes its own region slugs (uk-ireland,
+    // continental-europe, rest-of-world, usa) here.
+    if (urlRegion && (Object.values(PRIMARY_REGIONS) as string[]).includes(urlRegion)) {
+      return urlRegion as PrimaryRegionKey;
+    }
     const saved = sessionStorage.getItem('explore-last-filters');
     if (saved) {
       try {
@@ -278,7 +295,13 @@ const CourseExplorer = () => {
   });
 
   const [selectedSubregion, setSelectedSubregion] = useState(() => {
-    const urlSub = searchParams.get('sub');
+    // Gate the ?sub= read on the same validity check as ?region= above.
+    // A Discover URL never carries ?sub=, so if the region param isn't one
+    // of our keys we drop any accompanying sub too.
+    const urlRegion = searchParams.get('region');
+    const urlRegionValid =
+      !!urlRegion && (Object.values(PRIMARY_REGIONS) as string[]).includes(urlRegion);
+    const urlSub = urlRegionValid ? searchParams.get('sub') : null;
     if (urlSub) return urlSub;
     const saved = sessionStorage.getItem('explore-last-filters');
     if (saved) {
