@@ -120,23 +120,23 @@ export default function BusinessTeamPage() {
           {(() => {
             const canEditTitle = canManage || isSelf;
             const title = m.job_title?.trim() || '';
-            const label = title || 'Add job title';
-            const color = title ? INK : INK_45;
-            const weight = title ? 600 : 500;
             if (canEditTitle) {
               return (
-                <button
-                  type="button"
-                  onClick={() => setTitleSheet({ open: true, member: m })}
-                  className="mt-0.5 block text-left active:opacity-70"
-                  style={{ fontSize: 12.5, color, fontWeight: weight, background: 'transparent', border: 0, padding: 0 }}
-                >
-                  {label}
-                </button>
+                <div className="mt-1.5">
+                  <JobTitleField
+                    initialTitle={title}
+                    onSave={async (next) => {
+                      await setJobTitle.mutateAsync({
+                        memberUserId: m.user_profile_id,
+                        jobTitle: next,
+                      });
+                    }}
+                  />
+                </div>
               );
             }
             return title ? (
-              <p className="mt-0.5 truncate" style={{ fontSize: 12.5, color: INK, fontWeight: 600 }}>{title}</p>
+              <p className="mt-0.5 truncate" style={{ fontSize: 13.5, color: INK, fontWeight: 600 }}>{title}</p>
             ) : null;
           })()}
           {canToggleVisibility && (
