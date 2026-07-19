@@ -351,12 +351,13 @@ export function useCommentsV2({
     mutationFn: async (id: string) => {
       const { data, error } = await supabase.rpc('toggle_comment_like_v2', { p_comment_id: id });
       if (error) throw error;
-      return data as { liked: boolean; count: number } | any;
+      return data as { liked: boolean; count: number } | null;
     },
     onMutate: async (id: string) => {
-      await qc.cancelQueries({ queryKey: keyRoot as any });
+      await qc.cancelQueries({ queryKey: keyRoot as unknown as readonly unknown[] });
       // Optimistic like toggle for the row cache — we mutate enrichment directly.
-      qc.setQueryData([...keyRoot, 'enrichment', rowIds, actorType, actorId], (old: any) => {
+      type EnrichmentCache = { myLikes: Set<string>; likeCounts: Map<string, number> } & Record<string, unknown>;
+      qc.setQueryData([...keyRoot, 'enrichment', rowIds, actorType, actorId], (old: EnrichmentCache | undefined) => {
         if (!old) return old;
         const myLikes = new Set<string>(old.myLikes);
         const likeCounts = new Map<string, number>(old.likeCounts);
@@ -374,9 +375,10 @@ export function useCommentsV2({
     onSuccess: (res, id) => {
       // Reconcile from RPC return { liked, count }.
       if (!res || typeof res !== 'object') return;
-      const liked = !!(res as any).liked;
-      const count = Number((res as any).count ?? 0);
-      qc.setQueryData([...keyRoot, 'enrichment', rowIds, actorType, actorId], (old: any) => {
+      const liked = !!res.liked;
+      const count = Number(res.count ?? 0);
+      type EnrichmentCache = { myLikes: Set<string>; likeCounts: Map<string, number> } & Record<string, unknown>;
+      qc.setQueryData([...keyRoot, 'enrichment', rowIds, actorType, actorId], (old: EnrichmentCache | undefined) => {
         if (!old) return old;
         const myLikes = new Set<string>(old.myLikes);
         const likeCounts = new Map<string, number>(old.likeCounts);
