@@ -367,21 +367,6 @@ const ClubhouseContent = () => {
   const showRehydrationSkeleton = isRehydrating && (isLoading || posts.length > 0);
 
 
-  // Apple 2.1 safety net: never let the skeleton be the terminal state.
-  // If the feed has not produced posts within 12s, stop blocking on
-  // skeletons so the empty/error surface can render and the reviewer
-  // (or any user behind a VPN / restrictive webview) sees a usable screen.
-  const [skeletonTimedOut, setSkeletonTimedOut] = useState(false);
-  useEffect(() => {
-    if (!isLoading && posts.length > 0) {
-      setSkeletonTimedOut(false);
-      return;
-    }
-    const id = window.setTimeout(() => {
-      setSkeletonTimedOut(true);
-    }, 12000);
-    return () => window.clearTimeout(id);
-  }, [isLoading, posts.length, activeTab, user, authLoading]);
 
 
   // Guard: wait for auth to resolve before evaluating feed state — but
