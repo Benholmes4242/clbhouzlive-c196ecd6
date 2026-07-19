@@ -1222,7 +1222,7 @@ const BorrowedFullscreenSlot: React.FC<{
     // Commit the collapse on the next frame so the browser has a real
     // "from" style (the current resting rect) to interpolate from.
     requestAnimationFrame(() => {
-      try { vperfMotionMark('shrinkStart'); } catch {}
+      try { vperfMotionMark('shrinkStart'); vperfCloseMotionMark('returnAnimStart'); } catch {}
       setClosing(true);
     });
   }, [closeAnim, closing, originRect, borrow.laneId, borrow.ownerKey]);
