@@ -294,6 +294,12 @@ export function HubVideoRow() {
               role="button"
               tabIndex={0}
               onClick={() => navigate('/watch/videos')}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  navigate('/watch/videos');
+                }
+              }}
               style={{
                 width: 120,
                 flexShrink: 0,
