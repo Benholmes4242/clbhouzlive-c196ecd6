@@ -27,7 +27,13 @@ function SkeletonTile({ aspect }: { aspect: string }) {
   );
 }
 
-export function HubMixedGrid({ filter = 'all' }: { filter?: string } = {}) {
+export function HubMixedGrid({
+  filter = 'all',
+  children,
+}: {
+  filter?: string;
+  children?: ReactNode;
+} = {}) {
   const { user } = useSupabaseSession();
   const {
     data,
