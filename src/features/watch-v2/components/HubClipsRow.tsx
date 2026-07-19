@@ -229,6 +229,12 @@ export function HubClipsRow() {
               role="button"
               tabIndex={0}
               onClick={() => navigate('/watch/clips')}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  navigate('/watch/clips');
+                }
+              }}
               style={{
                 width: 143,
                 flexShrink: 0,
