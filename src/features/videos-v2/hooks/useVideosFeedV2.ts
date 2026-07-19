@@ -1,5 +1,5 @@
 /**
- * useVideosFeedV2 — infinite feed for the /videos-v2-test surface.
+ * useVideosFeedV2 — infinite feed for the /watch/videos surface.
  *
  * RPC: get_long_form_videos. Pagination is SEEN-IDS ONLY, matching
  * useHubMixedGrid's contract exactly. This keeps ordering correct for
@@ -7,6 +7,7 @@
  */
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { type RpcClient } from '@/features/watch-v2/hooks/useHubMixedGrid';
 import type { VideosSortId } from '../types';
 import type { VideosV2CategoryId } from '../categories';
 
