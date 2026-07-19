@@ -359,15 +359,15 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
                 <Award className="w-5 h-5 text-muted-foreground" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-sm font-semibold text-foreground">Couldn't load this list</h3>
-                <p className="text-sm text-muted-foreground max-w-xs">Check your connection and try again.</p>
+                <h3 className="text-sm font-semibold text-foreground">{t('top100.errorTitle', { defaultValue: "Couldn't load this list" })}</h3>
+                <p className="text-sm text-muted-foreground max-w-xs">{t('top100.errorBody', { defaultValue: 'Check your connection and try again.' })}</p>
               </div>
               <button
                 onClick={() => refetch()}
                 className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium active:scale-[0.97] transition-transform"
                 style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
               >
-                Retry
+                {t('top100.retry', { defaultValue: 'Retry' })}
               </button>
             </div>
           ) : allCourses.length === 0 ? (
