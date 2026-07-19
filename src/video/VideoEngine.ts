@@ -402,23 +402,38 @@ class VideoEngineImpl {
     // the effective policy is 'session' regardless of the lane's declared
     // policy (rails ship as 'always-muted'/'local' but must sing in the
     // viewer). Handback re-runs this after clearBorrowed to restore.
-    const effectivePolicy: LaneAudioPolicy = this.borrowedLanes.has(lane.id)
-      ? 'session'
-      : lane.audioPolicy;
+    const borrowed = this.borrowedLanes.has(lane.id);
+    const effectivePolicy: LaneAudioPolicy = borrowed ? 'session' : lane.audioPolicy;
+    const sessionMuted = useSessionAudio.getState().isMuted;
+    let action: 'noop' | 'mute' | 'setMuted' = 'noop';
+    if (effectivePolicy === 'always-muted') {
+      if (!lane.el.muted) { action = 'mute'; }
+    } else if (effectivePolicy === 'session') {
+      if (lane.el.muted !== sessionMuted) { action = 'setMuted'; }
+    }
+    logAudio('policy.resolve', {
+      laneId: lane.id,
+      declaredPolicy: lane.audioPolicy,
+      borrowed,
+      effectivePolicy,
+      sessionMuted,
+      elMuted: lane.el.muted,
+      action,
+    });
     if (effectivePolicy === 'always-muted') {
       if (!lane.el.muted) { lane.el.muted = true; this.emit(lane); }
       return;
     }
     if (effectivePolicy === 'session') {
-      const desired = useSessionAudio.getState().isMuted;
-      if (lane.el.muted !== desired) {
+      if (lane.el.muted !== sessionMuted) {
         // Respect ONE_UNMUTED_LANE on unmute.
-        this.setMuted(lane.id, desired);
+        this.setMuted(lane.id, sessionMuted);
       }
       return;
     }
     // 'local' → leave alone.
   }
+
 
 
   /** Return the lane's element to the hidden host (does not release source). */
