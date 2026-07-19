@@ -4,7 +4,6 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import {
   AMBER,
   FONT,
-  HAIRLINE_INK_10,
   INK,
   INK_MUTE,
   SLATE_50,
@@ -214,7 +213,6 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
       <div
         style={{
           padding: '10px 16px 12px',
-          borderBottom: `0.5px solid ${HAIRLINE_INK_10}`,
           background: SLATE_50,
         }}
       >
@@ -572,9 +570,7 @@ function CountLeaderSheetRow({
         gap: 8,
         padding: '10px 16px',
         background: index % 2 === 0 ? 'rgba(15,23,42,0.035)' : 'transparent',
-        borderTop: isTop
-          ? `2px solid ${goldChampion ? '#E8B530' : AMBER}`
-          : '0.5px solid rgba(15,23,42,0.08)',
+        borderTop: '0.5px solid rgba(15,23,42,0.08)',
         cursor: onTap ? 'pointer' : 'default',
         fontFamily: FONT,
       }}

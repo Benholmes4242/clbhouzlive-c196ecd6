@@ -129,13 +129,9 @@ export function FeatListRow({ row, tier, onTap, index = 0, mode = 'latest', best
   const legendaryChampion = isLegendary && isTop;
 
   // Flat, alternating-band row (mirrors the on-page Record Book / Champions).
-  // No card container: band background, 0.5px hairline separator, and a
-  // 2px gold top-rule for the champion (rank 1) — the sheet's flat analogue
-  // of the defending-champion accent used on the champions page.
+  // No card container: band background with a uniform 0.5px hairline separator.
   const bandBg = index % 2 === 0 ? 'rgba(15,23,42,0.035)' : 'transparent';
-  const topRule = isTop
-    ? `2px solid ${legendaryChampion ? '#E8B530' : AMBER}`
-    : `0.5px solid rgba(15,23,42,0.08)`;
+  const topRule = `0.5px solid rgba(15,23,42,0.08)`;
 
   return (
     <button

@@ -21,7 +21,6 @@ import {
   FONT,
   GOLD_DEEP,
   GOLD_BORDER,
-  HAIRLINE_INK_10,
   INK,
   INK_MUTE,
   SLATE_50,
@@ -150,9 +149,7 @@ export const FullCourseLeaderboardSheetDispatch: React.FC<Props> = ({
     const barPct = isChampion ? 1 : computeBarPct(initialCategory, r.value, championValue);
     const bandBg = index % 2 === 0 ? 'rgba(15,23,42,0.035)' : 'transparent';
     const rowBg = r.isSelf ? SELF_TINT : bandBg;
-    const topRule = isChampion
-      ? `2px solid ${GOLD_DEEP}`
-      : `0.5px solid rgba(15,23,42,0.08)`;
+    const topRule = `0.5px solid rgba(15,23,42,0.08)`;
     const rankColor = isChampion ? GOLD_DEEP : '#94A3B8';
     const valueColor = isChampion ? GOLD_DEEP : INK;
 
@@ -285,7 +282,7 @@ export const FullCourseLeaderboardSheetDispatch: React.FC<Props> = ({
       }}
     >
       {/* Header */}
-      <div style={{ padding: '10px 16px 12px', borderBottom: `0.5px solid ${HAIRLINE_INK_10}`, background: SLATE_50 }}>
+      <div style={{ padding: '10px 16px 12px', background: SLATE_50 }}>
         <div style={{ minWidth: 0 }}>
           <div
             style={{
