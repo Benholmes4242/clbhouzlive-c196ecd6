@@ -72,6 +72,7 @@ export const Fsv2Slide: React.FC<Props> = ({
   useEffect(() => {
     if (!active) return;
     traceSlide(openId, { postId: post.id, mediaCount: items.length });
+    registerSlideEl(openId, scrollerRef.current);
   }, [active, openId, post.id, items.length]);
 
   const renderItem = (m: MediaItem, idx: number, isActive: boolean) => {
