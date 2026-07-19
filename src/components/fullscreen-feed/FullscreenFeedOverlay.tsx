@@ -135,6 +135,7 @@ function returnBorrow(borrow: BorrowDescriptor, reason: 'close' | 'route' | 'dem
   if (reason !== 'demote' && originHost && !viewportChanged) {
     try {
       VideoEngine.mountLane(borrow.laneId, originHost);
+      try { vperfCloseMotionMark('laneRemounted', { lane: borrow.laneId, op: 'mount-origin' }); } catch {}
       // Live-tile return.
       //  - Rail: DO NOT execute the deferred release — the tile will re-acquire
       //    this exact lane (coalesced) as soon as the autoplay gate lifts, and
