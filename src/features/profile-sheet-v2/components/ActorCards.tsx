@@ -97,10 +97,22 @@ export default function ActorCards({
                 .filter(Boolean).join(` ${DOT} `);
           const initial = (p.name?.[0] || '?').toUpperCase();
 
+          const handleCardTap = () => {
+            if (active || switchingId) return;
+            setSwitchingId(p.id);
+            Promise.resolve(onSwitchProfile(p.id)).finally(() => setSwitchingId(null));
+          };
+
           return (
             <div
               key={`${p.type}-${p.id}`}
-              onClick={() => { if (!active) void onSwitchProfile(p.id); }}
+              onClick={handleCardTap}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleCardTap();
+                }
+              }}
               role="button"
               tabIndex={0}
               style={{
@@ -118,6 +130,8 @@ export default function ActorCards({
                 border: active
                   ? `2px solid ${AMBER}`
                   : `1px solid ${HAIRLINE}`,
+                opacity: switchingId === p.id ? 0.55 : 1,
+                transition: 'opacity 120ms ease',
               }}
             >
               <div style={{ position: 'relative', flexShrink: 0 }}>
