@@ -46,6 +46,9 @@ export function SuccessScreenV2({
     ? "Live on the course page and in your friends' feeds."
     : 'Live on the course page.';
 
+  const uploading = media.filter((m) => m.status === 'pending' || m.status === 'uploading').length;
+  const failed = media.filter((m) => m.status === 'failed').length;
+
   return (
     <ImmersiveSuccessShell padded={false}>
       {/* Top-right Share affordance (glass) */}
