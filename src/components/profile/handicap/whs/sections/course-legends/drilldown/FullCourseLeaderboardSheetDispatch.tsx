@@ -357,9 +357,9 @@ export const FullCourseLeaderboardSheetDispatch: React.FC<Props> = ({
             None yet.
           </div>
         ) : (
-          <div style={{ padding: '0 16px' }}>
-            {champion && renderRow(champion, { isChampion: true })}
-            {restRows.map((r) => renderRow(r, { isChampion: false }))}
+          <div>
+            {champion && renderRow(champion, { isChampion: true, index: 0 })}
+            {restRows.map((r, i) => renderRow(r, { isChampion: false, index: i + 1 }))}
           </div>
         )}
         <div style={{ height: 24 }} />
