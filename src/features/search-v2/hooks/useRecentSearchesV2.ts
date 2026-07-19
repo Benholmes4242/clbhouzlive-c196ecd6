@@ -25,14 +25,6 @@ function write(items: RecentItem[]) {
     /* storage unavailable - recents disabled */
   }
 }
-  }
-}
-
-function write(items: RecentItem[]) {
-  try {
-    localStorage.setItem(KEY, JSON.stringify(items.slice(0, MAX)));
-  } catch {}
-}
 
 export function useRecentSearchesV2() {
   const [items, setItems] = useState<RecentItem[]>(() => read());
