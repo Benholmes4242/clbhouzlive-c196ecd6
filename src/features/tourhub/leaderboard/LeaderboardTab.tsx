@@ -20,7 +20,7 @@ import { Search, X } from 'lucide-react';
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import { useTourLeaderboard } from '../hooks/useTourHubData';
 import { useTournamentMeta } from './useTournamentMeta';
-import { BoardTable, type BoardEntry, type CutState } from './BoardTable';
+import { BoardTable, todayFromEntry, type BoardEntry, type CutState } from './BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from './ScorecardSheet';
 import { EditorialEmpty } from '../components/EditorialEmpty';
 import { tourPriorityIndex } from '../_shared/tourOrder';
