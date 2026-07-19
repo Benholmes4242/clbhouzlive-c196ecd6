@@ -28,7 +28,7 @@ function Card({
   posts,
   isAutoplayActive,
 }: {
-  row: any;
+  row: HubRpcRow;
   post: FeedPost;
   index: number;
   posts: FeedPost[];
