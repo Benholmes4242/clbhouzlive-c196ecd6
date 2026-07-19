@@ -269,14 +269,18 @@ const AuthForm: React.FC = () => {
 
         if (data?.session?.user) {
           trackLoginSuccess('apple');
+          const dest = await resolvePostAuthRoute(
+            data.session.user.id,
+            searchParams.get('redirect'),
+          );
           setStep('hero');
-          navigate('/', { replace: true });
+          navigate(dest, { replace: true });
         }
       } finally {
         setSubmitting(false);
       }
     },
-    [],
+    [navigate, searchParams],
   );
 
   const handleAppleSignIn = useCallback(() => {
