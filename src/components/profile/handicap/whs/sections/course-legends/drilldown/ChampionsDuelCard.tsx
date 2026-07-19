@@ -45,7 +45,11 @@ interface ChampionsDuelCardProps {
   } | null;
   /** Backdrop theme for the embedded rows/avatars. Default 'dark'. */
   theme?: 'light' | 'dark';
+  /** When true, section sits on a soft alternating band (matches the
+   *  course-records ledger on the discover page). No card chrome either way. */
+  banded?: boolean;
 }
+
 
 const INK = 'var(--hcp-t-100)';
 const INK_55 = 'var(--hcp-t-60)';
