@@ -218,11 +218,8 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
     // Then apply sorting
     const sortedCourses = getSortedUserCourses(coursesToFilter, sortBy);
     
-    console.log('Final filtered and sorted courses:', sortedCourses.map(c => ({ 
-      name: c.golf_courses?.name, 
-      rating: c.rating,
-      sortBy 
-    })));
+
+
     
     return sortedCourses;
   }, [allPlayedCourses, activeFilter, sortBy]);
