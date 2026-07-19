@@ -628,16 +628,28 @@ const FullscreenVideoSlot: React.FC<{
     audioDbgColdRef.current = true;
     try {
       const el = (VideoEngine as unknown as { _debugGetElement?: (id: string) => HTMLMediaElement | null })._debugGetElement?.('fullscreen') ?? null;
+      // ── AUDIO PUSHDOWN (cold): reuse the engine's session-policy apply so
+      // the freshly-bound fullscreen lane inherits current useSessionAudio
+      // state at open time. No-op when session is muted (elements default
+      // to muted); never unmutes against session intent.
+      const sessionMuted = useSessionAudio.getState().isMuted;
+      const elMutedBefore = el?.muted ?? null;
+      try { VideoEngine.applyLaneAudioPolicy('fullscreen'); } catch {}
+      const elAfter = (VideoEngine as unknown as { _debugGetElement?: (id: string) => HTMLMediaElement | null })._debugGetElement?.('fullscreen') ?? null;
+      audioDbg.logAudio('audio.pushdown', {
+        site: 'cold', laneId: 'fullscreen', sessionMuted,
+        elMutedBefore, elMutedAfter: elAfter?.muted ?? null,
+      });
       audioDbg.logAudio('cold.audio', {
         laneId: 'fullscreen', ownerKey: resumeKey,
         srcSet: !!el?.currentSrc,
-        muted: el?.muted ?? null, volume: el?.volume ?? null,
-        paused: el?.paused ?? null,
-        currentTime: el ? +el.currentTime.toFixed(3) : null,
+        muted: elAfter?.muted ?? null, volume: elAfter?.volume ?? null,
+        paused: elAfter?.paused ?? null,
+        currentTime: elAfter ? +elAfter.currentTime.toFixed(3) : null,
         startPosition: +Number(startPosition).toFixed(3),
       });
       audioDbg.setSummary({
-        fsPos: el ? +el.currentTime.toFixed(2) : null,
+        fsPos: elAfter ? +elAfter.currentTime.toFixed(2) : null,
       });
       // Snapshot play() promise outcome on the next tick — the engine kicked
       // off play() before our effect ran; observe via the resulting el.paused
