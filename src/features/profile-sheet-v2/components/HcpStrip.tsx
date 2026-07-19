@@ -30,9 +30,9 @@ interface Props {
 }
 
 export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
-  if (actorType === 'business') return null;
+  const isBusiness = actorType === 'business';
 
-  const { data: connection } = useWhsConnection(actorId);
+  const { data: connection } = useWhsConnection(isBusiness ? undefined : actorId);
   const { data: trend } = useHandicapTrend(connection?.id);
   const { data: history90 } = useHandicapHistory(connection?.id, 90);
   const { data: scores } = useAllScores(connection?.id);
