@@ -225,6 +225,11 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       queryClient.invalidateQueries({ queryKey: ['course-reviews-full', courseId] });
       queryClient.invalidateQueries({ queryKey: ['review-votes', user?.id] });
     },
+    onError: (e) => {
+      toast(t('review.toast.voteFailed', { defaultValue: "Couldn't save your vote" }), {
+        description: e instanceof Error ? e.message : undefined,
+      });
+    },
   });
 
   const handleToggleHelpful = (reviewId: string, action: 'helpful' | 'unhelpful' | 'clear') => {
