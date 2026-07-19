@@ -42,6 +42,8 @@ export function HubMixedGrid({
     isFetching,
     isFetchingNextPage,
     isLoading,
+    isError,
+    refetch,
   } = useHubMixedGrid(user?.id, filter);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -102,6 +104,32 @@ export function HubMixedGrid({
             <SkeletonTile aspect="16 / 9" />
             <SkeletonTile aspect="9 / 14" />
           </div>
+        </div>
+      ) : isError ? (
+        <div style={{ padding: '40px 16px', textAlign: 'center', fontFamily: FONT_FAMILY }}>
+          <div style={{ fontWeight: 700, fontSize: 14, color: '#0F172A' }}>
+            Couldn't load clips
+          </div>
+          <div style={{ fontWeight: 500, fontSize: 12, color: '#64748B', marginTop: 4 }}>
+            Check your connection and try again.
+          </div>
+          <button
+            type="button"
+            onClick={() => refetch()}
+            style={{
+              marginTop: 12,
+              padding: '8px 18px',
+              borderRadius: 999,
+              border: 'none',
+              background: '#0F172A',
+              color: '#fff',
+              fontWeight: 700,
+              fontSize: 12.5,
+              cursor: 'pointer',
+            }}
+          >
+            Retry
+          </button>
         </div>
       ) : rows.length === 0 ? (
         <div

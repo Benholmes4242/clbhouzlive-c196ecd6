@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { toFeedPosts } from '@/features/watch-v2/utils/toFeedPost';
+import { toFeedPosts, type HubRpcRow } from '@/features/watch-v2/utils/toFeedPost';
 import { useWatchAutoplay } from '@/video/useWatchAutoplay';
 import { FeedCard, type FeedCardRow } from '@/components/feed-cards/FeedCard';
 import { packColumns } from '@/components/feed-cards/packColumns';
@@ -29,14 +29,14 @@ function SkeletonTile() {
 export function ClipsWall({ mood }: { mood: ClipsV2Mood }) {
   const { user } = useSupabaseSession();
   const userId = user?.id;
-  const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, isLoading } =
+  const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, isLoading, isError, refetch } =
     useClipsWallFeed({ userId, mood });
 
   const rows: ClipsWallRow[] = useMemo(
     () => (data?.pages ?? []).flat() as ClipsWallRow[],
     [data],
   );
-  const feedPosts = useMemo(() => toFeedPosts(rows as any[]), [rows]);
+  const feedPosts = useMemo(() => toFeedPosts(rows as unknown as HubRpcRow[]), [rows]);
   const { activeIndices, railRef } = useWatchAutoplay({
     railId: 'clips-v2-wall',
     posts: feedPosts,
@@ -54,7 +54,7 @@ export function ClipsWall({ mood }: { mood: ClipsV2Mood }) {
         poster_url: r.poster_url ?? null,
         duration_seconds: r.duration_seconds ?? null,
         creator_username: r.creator_username ?? null,
-        like_count: Number((r as any).like_count ?? 0),
+        like_count: Number(r.like_count ?? 0),
         course_name: r.course_name ?? null,
         width: r.width ?? null,
         height: r.height ?? null,
@@ -93,6 +93,36 @@ export function ClipsWall({ mood }: { mood: ClipsV2Mood }) {
             <SkeletonTile />
           </div>
         </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div style={{ padding: '40px 16px', textAlign: 'center', fontFamily: FONT_FAMILY }}>
+        <div style={{ fontWeight: 700, fontSize: 14, color: '#0F172A' }}>
+          Couldn't load clips
+        </div>
+        <div style={{ fontWeight: 500, fontSize: 12, color: '#64748B', marginTop: 4 }}>
+          Check your connection and try again.
+        </div>
+        <button
+          type="button"
+          onClick={() => refetch()}
+          style={{
+            marginTop: 12,
+            padding: '8px 18px',
+            borderRadius: 999,
+            border: 'none',
+            background: '#0F172A',
+            color: '#fff',
+            fontWeight: 700,
+            fontSize: 12.5,
+            cursor: 'pointer',
+          }}
+        >
+          Retry
+        </button>
       </div>
     );
   }

@@ -1,7 +1,7 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
-type RpcClient = { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }> };
+export type RpcClient = { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }> };
 
 export interface MixedGridRow {
   post_id: string;
@@ -33,10 +33,7 @@ export function useHubMixedGrid(userId: string | undefined, filter: string = 'al
         p_cursor: null,
         p_seen_ids: seenIds,
       });
-      if (error) {
-        if (import.meta.env.DEV) console.error(error);
-        return [] as MixedGridRow[];
-      }
+      if (error) throw error;
       return (data ?? []) as MixedGridRow[];
     },
     getNextPageParam: (lastPage, allPages) => {

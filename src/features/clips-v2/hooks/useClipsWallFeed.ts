@@ -1,5 +1,5 @@
 /**
- * useClipsWallFeed — infinite Wall v3 feed for /clips-v2-test.
+ * useClipsWallFeed — infinite Wall v3 feed for /watch/clips.
  *
  * RPC: get_watch_shorts. Seen-ids-only pagination, matching the
  * useHubMixedGrid contract exactly. Server-side mood mapping — see
@@ -7,13 +7,16 @@
  */
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import type { RpcClient } from '@/features/watch-v2/hooks/useHubMixedGrid';
 
+// 'trending' removed for launch: it duplicated for_you (same RPC
+// params). Reinstate when get_watch_shorts gains a distinct
+// personalised for_you mode.
 export const CLIPS_V2_MOODS = [
   'for_you',
   'lightning',
   'friends',
   'your_courses',
-  'trending',
 ] as const;
 export type ClipsV2Mood = (typeof CLIPS_V2_MOODS)[number];
 
@@ -43,7 +46,6 @@ function moodParams(mood: ClipsV2Mood): Record<string, unknown> {
     case 'your_courses':
       return { p_mode: 'latest', p_filter: 'played_courses' };
     case 'for_you':
-    case 'trending':
     default:
       return { p_mode: 'trending' };
   }
@@ -61,17 +63,14 @@ export function useClipsWallFeed(params: {
     initialPageParam: [] as string[],
     queryFn: async ({ pageParam }) => {
       const seenIds = (pageParam as string[]) ?? [];
-      const { data, error } = await (supabase.rpc as any)('get_watch_shorts', {
+      const { data, error } = await (supabase as unknown as RpcClient).rpc('get_watch_shorts', {
         p_user_id: userId,
         p_page_size: PAGE_SIZE,
         p_cursor: null,
         p_seen_ids: seenIds,
         ...moodParams(mood),
       });
-      if (error) {
-        if (import.meta.env.DEV) console.error('[useClipsWallFeed]', error);
-        return [] as ClipsWallRow[];
-      }
+      if (error) throw error;
       return (data ?? []) as ClipsWallRow[];
     },
     getNextPageParam: (lastPage, allPages) => {
