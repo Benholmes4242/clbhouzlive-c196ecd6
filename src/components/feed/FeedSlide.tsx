@@ -701,6 +701,32 @@ const FullscreenVideoSlot: React.FC<{
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActive, isBorrowSlide, resumeKey]);
 
+  // [TRACE] slide.branch — every render tick during an open. Dedup on the
+  // serialized signal so we get transitions (e.g. borrow-slot → video-slot)
+  // without spamming steady state. Instrumentation only, no behaviour change.
+  const tickRef = React.useRef(0);
+  const lastBranchRef = React.useRef<string>('');
+  tickRef.current += 1;
+  const branchTaken: 'borrow-slot' | 'video-slot' =
+    (isBorrowSlide && borrow && origin) ? 'borrow-slot' : 'video-slot';
+  const branchKey = `${branchTaken}|iB=${isBorrowSlide}|bPid=${borrow?.postId ?? 'null'}|oA=${origin != null}|pid=${postId}`;
+  if (isActive && (branchKey !== lastBranchRef.current)) {
+    lastBranchRef.current = branchKey;
+    try {
+      const openT = traceLookup({ ownerKey: resumeKey, postId });
+      trace('slide.branch', {
+        openId: openT?.openId,
+        tick: tickRef.current,
+        isBorrowSlide,
+        borrowPostId: borrow?.postId ?? null,
+        postId,
+        originAlive: origin != null,
+        allowBorrow,
+        branchTaken,
+      });
+    } catch {}
+  }
+
   // Borrow branch: re-parent the live rail-pool <video> into a wrapper here
   // and run the two-phase cover→contain FLIP.
   if (isBorrowSlide && borrow && origin) {
@@ -713,6 +739,7 @@ const FullscreenVideoSlot: React.FC<{
       />
     );
   }
+
 
   const mediaFrameStyle: React.CSSProperties = {
     position: 'absolute',
