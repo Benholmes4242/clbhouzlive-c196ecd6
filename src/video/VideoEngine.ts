@@ -446,7 +446,7 @@ class VideoEngineImpl {
     const lane = this.getLane(laneId);
     if (lane.audioPolicy === policy) return;
     lane.audioPolicy = policy;
-    this.applyAudioPolicy(lane);
+    this.applyAudioPolicy(lane, 'policy-change');
   }
 
   /**
