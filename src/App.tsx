@@ -72,6 +72,7 @@ import { DiscoverSkeleton } from '@/components/skeletons/DiscoverSkeleton';
 
 
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
+import { WatchHubSkeleton, WatchClipsSkeleton, WatchVideosSkeleton } from '@/components/skeletons/WatchSkeletons';
 import { AchievementsSkeleton } from '@/components/skeletons/AchievementsSkeleton';
 import { ActivityPageSkeleton } from '@/components/skeletons/ActivityPageSkeleton';
 import { HubSkeleton } from '@/components/skeletons/HubSkeleton';
