@@ -168,10 +168,9 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
   const hcp = resolvedHcp.value;
   const hasHcp = hcp != null;
 
-  const material = currentLevel.material;
-  const tierHex = MATERIAL_HEX[material] ?? '#12B784';
+  const tierHex = currentLevel.key === 'the_goat' ? '#F7931E' : '#34D399';
 
-  const tierName = currentLevel.label.replace(/\s+(I|II)$/, '');
+  const tierName = currentLevel.label;
 
   const medalsToNext = nextLevel
     ? Math.max(0, nextLevel.medalsRequired - medals)
