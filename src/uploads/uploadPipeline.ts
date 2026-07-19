@@ -17,6 +17,7 @@ import { pollStreamMetadata, updatePostMediaMetadata } from '@/utils/pollStreamM
 import { queueImageProcessing } from '@/services/imageProcessing';
 import { toast } from '@/lib/toast';
 import { generateStreamThumbnailUrl, generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { CLOUDFLARE_STREAM_SUBDOMAIN } from '@/config/streamConstants';
 import type { UploadJobInput } from './types';
 import { POST_LIMITS } from '@/constants/postLimits';
 
