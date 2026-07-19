@@ -311,15 +311,26 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
                   const posterUrl = parent?.mediaItems?.find((m) => m.id === mediaId)?.thumbnailUrl
                     || parent?.mediaItems?.[0]?.thumbnailUrl
                     || null;
-                  openWithOrigin({
-                    posts: feedPosts,
-                    index: parentIndex,
-                    originEl: btnRef.current,
-                    posterUrl,
-                    mediaId,
-                    openedFrom: 'about-strip',
-                    options: { readOnly: true, hasNextPage: false },
-                  });
+                  if (FLAGS.fsv2) {
+                    openFsv2({
+                      posts: feedPosts,
+                      startIndex: parentIndex,
+                      mediaId,
+                      openedFrom: 'about-strip',
+                      readOnly: true,
+                      hasNextPage: false,
+                    });
+                  } else {
+                    openWithOrigin({
+                      posts: feedPosts,
+                      index: parentIndex,
+                      originEl: btnRef.current,
+                      posterUrl,
+                      mediaId,
+                      openedFrom: 'about-strip',
+                      options: { readOnly: true, hasNextPage: false },
+                    });
+                  }
                 }
               }}
               style={{
