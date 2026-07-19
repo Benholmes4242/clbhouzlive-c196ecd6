@@ -352,6 +352,20 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
           elPaused: el?.paused ?? null,
           elCurrentTime: el ? +el.currentTime.toFixed(3) : null,
         });
+        // close.position — dedicated beat isolating fs playback position at
+        // close intent; the resume beat later diffs against this.
+        audioDbg.logAudio('close.position', {
+          laneId,
+          fsCurrentTime: el ? +el.currentTime.toFixed(3) : null,
+          fsPaused: el?.paused ?? null,
+        });
+        setLastCloseSnapshot({
+          laneId,
+          ownerKey: borrow?.ownerKey ?? null,
+          fsCurrentTime: el ? +el.currentTime.toFixed(3) : null,
+          fsPaused: el?.paused ?? null,
+          closeTs: performance.now(),
+        });
         const resumeKey = borrow?.ownerKey ?? null;
         setTimeout(() => {
           try {
