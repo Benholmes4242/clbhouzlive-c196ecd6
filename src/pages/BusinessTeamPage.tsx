@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Crown, Shield, Edit3, BarChart3, MoreHorizontal, Trash2,
-  Eye, EyeOff, Mail, AtSign, UserPlus, Plus,
+  Eye, EyeOff, Mail, AtSign, UserPlus, Plus, Briefcase, Pencil,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -17,11 +17,10 @@ import { useBusinessMembership } from '@/hooks/useBusinessMembership';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import {
   useBusinessTeam, useBusinessInvites, useRemoveMember, useUpdateMemberRole,
-  useRevokeInvite, useSetMemberVisibility,
+  useRevokeInvite, useSetMemberVisibility, useSetMemberJobTitle,
   BUSINESS_ROLE_LABELS, BusinessMember, BusinessRole, AssignableBusinessRole,
 } from '@/hooks/useBusinessTeam';
 import { AccessRequestsSection } from '@/components/business/AccessRequestsSection';
-import JobTitleSheet from '@/components/business/JobTitleSheet';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
@@ -59,6 +58,126 @@ function RoleChip({ role }: { role: BusinessRole }) {
   );
 }
 
+const JOB_TITLE_MAX = 40;
+
+function JobTitleField({
+  initialTitle,
+  onSave,
+}: {
+  initialTitle: string;
+  onSave: (next: string) => Promise<void>;
+}) {
+  const [savedTitle, setSavedTitle] = useState(initialTitle);
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(initialTitle);
+  const [saving, setSaving] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setSavedTitle(initialTitle);
+    if (!editing) setValue(initialTitle);
+  }, [initialTitle]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (editing) {
+      inputRef.current?.focus();
+    }
+  }, [editing]);
+
+  const beginEdit = () => {
+    setValue(savedTitle);
+    setEditing(true);
+  };
+
+  const commit = async () => {
+    const next = value.trim().slice(0, JOB_TITLE_MAX);
+    setEditing(false);
+    if (next === savedTitle) {
+      setValue(savedTitle);
+      return;
+    }
+    const prev = savedTitle;
+    setSavedTitle(next);
+    setSaving(true);
+    try {
+      await onSave(next);
+    } catch {
+      setSavedTitle(prev);
+      setValue(prev);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleFocus = () => {
+    setTimeout(() => {
+      wrapRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }, 250);
+  };
+
+  if (!editing && savedTitle) {
+    return (
+      <button
+        type="button"
+        onClick={beginEdit}
+        className="inline-flex items-center gap-1.5 text-left active:opacity-70"
+        style={{ minHeight: 44, background: 'transparent', border: 0, padding: 0 }}
+        aria-label="Edit job title"
+      >
+        <span style={{ fontSize: 13.5, fontWeight: 600, color: INK }}>{savedTitle}</span>
+        <Pencil size={14} color={INK_45} strokeWidth={2.25} />
+      </button>
+    );
+  }
+
+  const borderColor = editing ? AMBER : 'rgba(15,23,42,0.10)';
+  const borderWidth = editing ? 1.5 : 1;
+  const iconColor = editing ? AMBER : '#94A3B8';
+
+  return (
+    <div
+      ref={wrapRef}
+      onClick={() => !editing && setEditing(true)}
+      className="flex items-center gap-2"
+      style={{
+        background: '#F8FAFC',
+        border: `${borderWidth}px solid ${borderColor}`,
+        borderRadius: 10,
+        padding: '9px 11px',
+      }}
+    >
+      <Briefcase size={15} color={iconColor} strokeWidth={2.25} style={{ flexShrink: 0 }} />
+      <input
+        ref={inputRef}
+        type="text"
+        value={value}
+        maxLength={JOB_TITLE_MAX}
+        placeholder="Add a job title"
+        onChange={(e) => setValue(e.target.value)}
+        onFocus={handleFocus}
+        onBlur={() => { if (editing) void commit(); }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') { e.preventDefault(); (e.target as HTMLInputElement).blur(); }
+          if (e.key === 'Escape') { setValue(savedTitle); setEditing(false); }
+        }}
+        disabled={saving && !editing}
+        className="flex-1 min-w-0 bg-transparent outline-none"
+        style={{
+          fontSize: 13.5,
+          color: value ? INK : '#94A3B8',
+          fontWeight: value ? 600 : 400,
+        }}
+      />
+      {editing && (
+        <span className="tabular-nums" style={{ fontSize: 11, color: '#94A3B8', flexShrink: 0 }}>
+          {value.length}/{JOB_TITLE_MAX}
+        </span>
+      )}
+    </div>
+  );
+}
+
 export default function BusinessTeamPage() {
   const { businessId } = useParams<{ businessId: string }>();
   const navigate = useNavigate();
@@ -73,13 +192,11 @@ export default function BusinessTeamPage() {
   const updateRole = useUpdateMemberRole(businessId || '');
   const revokeInvite = useRevokeInvite(businessId || '');
   const setVisibility = useSetMemberVisibility(businessId || '');
+  const setJobTitle = useSetMemberJobTitle(businessId || '');
   const { user } = useSupabaseSession();
   const currentUserId = user?.id;
 
   const [removeConfirm, setRemoveConfirm] = useState<{ open: boolean; member: BusinessMember | null }>({
-    open: false, member: null,
-  });
-  const [titleSheet, setTitleSheet] = useState<{ open: boolean; member: BusinessMember | null }>({
     open: false, member: null,
   });
 
@@ -123,23 +240,23 @@ export default function BusinessTeamPage() {
           {(() => {
             const canEditTitle = canManage || isSelf;
             const title = m.job_title?.trim() || '';
-            const label = title || 'Add job title';
-            const color = title ? INK : INK_45;
-            const weight = title ? 600 : 500;
             if (canEditTitle) {
               return (
-                <button
-                  type="button"
-                  onClick={() => setTitleSheet({ open: true, member: m })}
-                  className="mt-0.5 block text-left active:opacity-70"
-                  style={{ fontSize: 12.5, color, fontWeight: weight, background: 'transparent', border: 0, padding: 0 }}
-                >
-                  {label}
-                </button>
+                <div className="mt-1.5">
+                  <JobTitleField
+                    initialTitle={title}
+                    onSave={async (next) => {
+                      await setJobTitle.mutateAsync({
+                        memberUserId: m.user_profile_id,
+                        jobTitle: next,
+                      });
+                    }}
+                  />
+                </div>
               );
             }
             return title ? (
-              <p className="mt-0.5 truncate" style={{ fontSize: 12.5, color: INK, fontWeight: 600 }}>{title}</p>
+              <p className="mt-0.5 truncate" style={{ fontSize: 13.5, color: INK, fontWeight: 600 }}>{title}</p>
             ) : null;
           })()}
           {canToggleVisibility && (
@@ -380,16 +497,6 @@ export default function BusinessTeamPage() {
         confirmText="Remove"
         confirmVariant="destructive"
       />
-
-      {titleSheet.member && businessId && (
-        <JobTitleSheet
-          open={titleSheet.open}
-          onClose={() => setTitleSheet({ open: false, member: null })}
-          businessId={businessId}
-          memberUserId={titleSheet.member.user_profile_id}
-          currentTitle={titleSheet.member.job_title ?? null}
-        />
-      )}
     </ManagePageShell>
   );
 }
