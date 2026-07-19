@@ -247,9 +247,42 @@ class VideoEngineImpl {
     this.borrowedLanes.add(laneId);
     DBG('markBorrowed', { laneId });
     logAudio('borrow.marked', { laneId, msSinceOpen: msSinceOpen() });
+    // Attach volumechange guard: while borrowed, the effective policy is
+    // 'session', so any external write that contradicts the session store
+    // must be corrected. Self-triggered volumechanges are naturally
+    // terminating — the reassert writes the expected value, the resulting
+    // volumechange matches sessionMuted, and the branch no-ops.
+    const lane = this.lanes.get(laneId);
+    if (lane) {
+      const el = lane.el;
+      const onVC = () => {
+        if (!this.borrowedLanes.has(laneId)) return;
+        const sessionMuted = useSessionAudio.getState().isMuted;
+        if (el.muted !== sessionMuted) {
+          logAudio('audio.guard.reassert', {
+            laneId,
+            externalValue: el.muted,
+            expected: sessionMuted,
+            msSinceOpen: msSinceOpen(),
+          });
+          this.applyAudioPolicy(lane);
+        }
+      };
+      el.addEventListener('volumechange', onVC);
+      this.borrowGuardDetach.set(laneId, () => {
+        try { el.removeEventListener('volumechange', onVC); } catch {}
+      });
+    }
   }
 
   clearBorrowed(laneId: LaneId): void {
+    // Detach the borrow guard FIRST so the handback's applyAudioPolicy
+    // (which re-mutes rails) does not fire the reassert branch.
+    const detach = this.borrowGuardDetach.get(laneId);
+    if (detach) {
+      detach();
+      this.borrowGuardDetach.delete(laneId);
+    }
     this.borrowedLanes.delete(laneId);
     DBG('clearBorrowed', { laneId });
     logAudio('borrow.cleared', { laneId, msSinceOpen: msSinceOpen() });
@@ -257,6 +290,15 @@ class VideoEngineImpl {
     // BEFORE the inline tile resumes, so rails never blast audio after close.
     const lane = this.lanes.get(laneId);
     if (lane) this.applyAudioPolicy(lane);
+  }
+
+  /** Public read: is this lane currently borrowed by the fullscreen viewer?
+   *  Tile-side hooks (useRailLane belt-and-braces mute, etc.) consult this
+   *  before writing to `el.muted` so they never fight the viewer's session
+   *  policy. Handback restores the declared policy — no tile-side rewrite
+   *  needed. */
+  isBorrowed(laneId: LaneId): boolean {
+    return this.borrowedLanes.has(laneId);
   }
 
 
