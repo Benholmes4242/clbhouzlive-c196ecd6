@@ -8,13 +8,12 @@
 
 import React, { useEffect, useMemo, useRef } from 'react';
 import { GamSheet } from '../../../gam/_shared/GamSheet';
-import { GemVisual } from '@/components/shared/TierGem';
+import { TierGlyph, TIER_COLOR_DARK } from '@/components/shared/TierGlyph';
 import {
   WALL_LEVELS,
   levelForMedals,
-  type WallMaterial,
+  type WallLevel,
 } from './_shared/levels';
-import { MATERIAL_HEX } from './_shared/rarityPalette';
 import type { TrophyItem } from './_shared/normalizeTrophyItem';
 import {
   quarterOf,
@@ -33,12 +32,14 @@ const AMBER = '#F7931E';
 const AMBER_BAR_A = '#E8800C';
 const AMBER_BAR_B = '#FFCB45';
 const GOLD = '#F5C842';
-const OBSIDIAN_EDGE = '#D4A017';
 const FONT = "'Geist', -apple-system, sans-serif";
 
-function matColor(m: WallMaterial): string {
-  if (m === 'obsidian') return OBSIDIAN_EDGE;
-  return (MATERIAL_HEX as Record<string, string>)[m] ?? '#C97B4A';
+/** Row tint for a level state on the dark ladder surface. */
+function rowTint(lvl: WallLevel, isCurrent: boolean, earned: boolean): string {
+  if (lvl.key === 'the_goat' && earned) return TIER_COLOR_DARK.goat;
+  if (isCurrent) return TIER_COLOR_DARK.current;
+  if (earned) return TIER_COLOR_DARK.achieved;
+  return TIER_COLOR_DARK.locked;
 }
 
 interface Props {
