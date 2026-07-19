@@ -13,6 +13,7 @@ import { useBusinessMembership } from '@/hooks/useBusinessMembership';
 import { useBusinessReviewStats } from '@/hooks/useBusinessReviewStats';
 import { useBusinessInsights, deltaPct } from '@/hooks/useBusinessInsights';
 import { PageRoot } from '@/components/layout/PageRoot';
+import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { trackBusinessProfileVisit } from '@/lib/businessAnalyticsTracking';
