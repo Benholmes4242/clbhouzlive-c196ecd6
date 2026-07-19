@@ -331,7 +331,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
         >
           <button
             type="button"
-            onClick={onExit}
+            onClick={handleBack}
             aria-label="Back"
             style={{
               width: 36,
