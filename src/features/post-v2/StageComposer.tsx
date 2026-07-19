@@ -442,6 +442,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
         <CaptionField value={state.caption} onChange={setCaption} currentUserId={profile?.id ?? null} />
         <DetailRows
           course={state.course}
+          courses={state.courses}
           onOpenCourse={() => setSheet('course')}
           actor={activeActor}
           onOpenActor={() => setSheet('actor')}
@@ -453,7 +454,13 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
       </div>
 
       {/* Sheets */}
-      <CourseTagSheet open={sheet === 'course'} onClose={() => setSheet(null)} onSelect={setCourse} current={state.course} userId={profile?.id ?? null} />
+      <CourseTagSheet
+        open={sheet === 'course'}
+        onClose={() => setSheet(null)}
+        onDone={setCourses}
+        selected={state.courses}
+        userId={profile?.id ?? null}
+      />
       <ActorSheet open={sheet === 'actor'} onClose={() => setSheet(null)} onSelect={(a) => setActiveActor(a)} selectedId={activeActor?.id ?? null} />
       <ScheduleSheetV2
         open={sheet === 'schedule'}
