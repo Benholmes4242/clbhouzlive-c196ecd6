@@ -8,6 +8,8 @@ import { useUserCourseMoments } from '@/hooks/useUserCourseMoments';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { openFsv2 } from '@/features/fsv2';
+import { FLAGS } from '@/config/flags';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import type { FeedPost } from '@/components/media-system/types/media';
 
