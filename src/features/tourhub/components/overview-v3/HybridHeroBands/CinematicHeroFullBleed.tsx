@@ -1042,6 +1042,7 @@ export function CinematicHeroFullBleed({
                 >
                   {label}
                 </span>
+                {isLive && <span style={{ width: COL_THRU, flexShrink: 0 }} />}
                 {anyToday && <span style={{ width: COL_TODAY, flexShrink: 0 }} />}
                 <span
                   style={{
@@ -1056,7 +1057,6 @@ export function CinematicHeroFullBleed({
                 >
                   {typeof row.score === 'number' ? fmtScore(row.score) : row.score}
                 </span>
-                {isLive && <span style={{ width: COL_THRU, flexShrink: 0 }} />}
               </div>
             );
           })}
