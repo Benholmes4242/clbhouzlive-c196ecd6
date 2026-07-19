@@ -63,12 +63,14 @@ import { useClubhouseShare } from '@/components/clubhouse/hooks/useClubhouseShar
 import { useClubhouseFeedNav } from '@/components/clubhouse/hooks/useClubhouseFeedNav';
 
 import { MoreOptionsDrawer } from '@/components/clubhouse/MoreOptionsDrawer';
+import { ClubhouseEmptyState } from '@/components/clubhouse/ClubhouseEmptyState';
 
 
 
 const ClubhouseContent = () => {
   const { isRehydrating } = useRehydrationSafe();
-  const queryClient = useQueryClient();
+
+
 
   // Note: do NOT invalidate the suggested feed on every mount — it caused a
   // cold refetch + full video/HLS teardown each time the user returned to
