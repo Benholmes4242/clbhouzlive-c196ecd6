@@ -28,18 +28,14 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
     // Per-actor unread (badge hybrid): show a small dot on the pill when ANY
     // non-active actor has unread activity — tells the owner "another profile
     // has activity".
-    const { otherUnreadTotal, countFor } = useActorUnreadCounts();
+    const { countFor } = useActorUnreadCounts();
 
     // Combined unread count for the active actor (notifications + DMs).
     const activeUnread = activeActor
       ? countFor(activeActor.type as 'personal' | 'business', activeActor.id)
       : 0;
 
-    // Split badge semantics: YOUR unread renders as a number; when only OTHER
-    // accounts have unread, render a bare dot (no number) so a foreign count
-    // is never mistaken for your own.
     const activeUnreadCount = activeUnread;
-    const showOtherDot = activeUnread === 0 && otherUnreadTotal > 0;
 
 
     // Bare theme — no background, no chevron, white-ringed avatar with drop shadow
@@ -100,16 +96,6 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
             >
               {activeUnreadCount > 99 ? '99+' : activeUnreadCount}
             </span>
-          ) : showOtherDot ? (
-            <span
-              aria-label="Unread on another account"
-              className="absolute -top-1.5 -right-1.5 rounded-full bg-[#F7931E]"
-              style={{
-                width: 8,
-                height: 8,
-                boxShadow: '0 0 0 2px #FFFFFF',
-              }}
-            />
           ) : null}
         </button>
       );
@@ -227,16 +213,6 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
             >
               {activeUnreadCount > 99 ? '99+' : activeUnreadCount}
             </span>
-          ) : showOtherDot ? (
-            <span
-              aria-label="Unread on another account"
-              className="absolute -top-1.5 -right-1.5 rounded-full bg-[#F7931E]"
-              style={{
-                width: 8,
-                height: 8,
-                boxShadow: '0 0 0 2px #FFFFFF',
-              }}
-            />
           ) : null}
         </div>
 

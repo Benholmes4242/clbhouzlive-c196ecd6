@@ -293,13 +293,12 @@ const AvatarCell: React.FC<{
   triggerRef: React.RefObject<HTMLButtonElement>;
 }> = ({ tone, onOpen, triggerRef }) => {
   const { activeActor, isLoading } = useActiveActor();
-  const { otherUnreadTotal, countFor } = useActorUnreadCounts();
+  const { countFor } = useActorUnreadCounts();
 
   const activeUnread = activeActor
     ? countFor(activeActor.type as 'personal' | 'business', activeActor.id)
     : 0;
   const activeUnreadCount = activeUnread;
-  const showOtherDot = activeUnread === 0 && otherUnreadTotal > 0;
 
   if (isLoading || !activeActor) {
     return (
@@ -368,21 +367,6 @@ const AvatarCell: React.FC<{
         >
           {activeUnreadCount > 99 ? '99+' : activeUnreadCount}
         </span>
-      ) : showOtherDot ? (
-        <span
-          aria-label="Unread on another account"
-          style={{
-            position: 'absolute',
-            top: -2,
-            right: -2,
-            width: 6,
-            height: 6,
-            borderRadius: 999,
-            background: '#F7931E',
-            border: '1px solid #FFFFFF',
-            boxSizing: 'content-box',
-          }}
-        />
       ) : null}
     </button>
   );
