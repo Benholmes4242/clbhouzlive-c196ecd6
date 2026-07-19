@@ -11,7 +11,7 @@
 import React from 'react';
 import type { TrophyItem } from './_shared/normalizeTrophyItem';
 import { MATERIAL_HEX } from './_shared/rarityPalette';
-import { MATERIAL_LADDER, materialForTier } from './_shared/levels';
+import { MATERIAL_LADDER, materialForTier } from './_shared/materials';
 import { renderBadgeIcon } from '../badgeIcons';
 import { formatNumber, formatMonthYearShortGB } from '@/i18n/format';
 // Legend cards are grouped by course in TrophyRoomSheet and render
