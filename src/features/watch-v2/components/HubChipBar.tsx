@@ -27,7 +27,6 @@ export function HubChipBar({ active, onChange }: Props) {
         backdropFilter: 'blur(14px)',
         WebkitBackdropFilter: 'blur(14px)',
         padding: '8px 0 10px',
-        borderBottom: '1px solid rgba(0,0,0,0.07)',
         fontFamily: FONT_FAMILY,
       }}
     >
