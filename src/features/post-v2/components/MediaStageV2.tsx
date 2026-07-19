@@ -204,12 +204,23 @@ export default function MediaStageV2({ item, index, total, onOpenAdjust, onOpenT
   }
 
   const ratio = FRAME_RATIO[item.frame];
+  // Measured px box: for aspected frames compute boxW/boxH so the frame is
+  // fully visible in the stage (the CSS aspectRatio + %-only sizing dropped
+  // the ratio whenever height was the binding dimension - making pills look
+  // dead even though the ratio IS baked into the posted file).
   const boxStyle: React.CSSProperties = ratio
-    ? { aspectRatio: `${ratio}`, width: '100%', maxHeight: '100%' }
+    ? (() => {
+        const stageW = stageSize.w || 0;
+        const stageH = stageSize.h || 0;
+        if (stageW === 0 || stageH === 0) return { width: 0, height: 0 };
+        const boxW = Math.min(stageW, stageH * ratio);
+        const boxH = boxW / ratio;
+        return { width: boxW, height: boxH };
+      })()
     : { width: '100%', height: '100%' };
   return (
-    <div style={{ flex: 1, background: '#15171F', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', transition: 'all 250ms cubic-bezier(.2,.8,.2,1)' }}>
-      <div style={boxStyle}>
+    <div ref={stageRef} style={{ flex: 1, background: '#15171F', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+      <div style={{ ...boxStyle, transition: 'width 250ms cubic-bezier(.2,.8,.2,1), height 250ms cubic-bezier(.2,.8,.2,1)' }}>
         {item.type === 'video' ? (
           <video src={item.previewUrl} playsInline muted loop autoPlay style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         ) : (
