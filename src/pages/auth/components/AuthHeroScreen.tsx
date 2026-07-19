@@ -109,6 +109,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
 
   const trimmed = loginEmail.trim();
   const canContinue = trimmed.length > 0 && !submitting;
+  const continueActiveLook = canContinue || emailSubmitting;
   const inMedian = useMemo(() => isMedianApp(), []);
   const showApple = inMedian && !!onAppleSignIn;
   const showGoogle = inMedian && !!onGoogleSignIn;
