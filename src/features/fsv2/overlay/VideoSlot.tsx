@@ -155,11 +155,14 @@ export const Fsv2VideoSlot: React.FC<Props> = ({
     el.style.transition = `opacity ${FSV2.VIDEO_CROSSFADE_MS}ms ease`;
     host.appendChild(el);
     elRef.current = el;
+    const detachInstr = instrumentElement(openId, el, 'fresh');
+    registerVideoEl(openId, el);
 
     const onFrame = () => reveal('first-frame');
     el.addEventListener('loadeddata', onFrame);
     el.addEventListener('playing', onFrame);
 
+    hudEvent(openId, 'src.set', { hlsUrl: !!source.hlsUrl, mp4Url: !!source.mp4Url });
     attach(el, source, { muted: isMuted, startPosition }).then((handle) => {
       if (cancelled) { handle.detach(); return; }
       detachRef.current = handle.detach;
@@ -179,6 +182,8 @@ export const Fsv2VideoSlot: React.FC<Props> = ({
       cancelled = true;
       el.removeEventListener('loadeddata', onFrame);
       el.removeEventListener('playing', onFrame);
+      detachInstr();
+      registerVideoEl(openId, null);
       detachRef.current?.();
       detachRef.current = null;
       elRef.current = null;
