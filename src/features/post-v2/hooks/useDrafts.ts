@@ -15,6 +15,8 @@ export interface DraftRow {
   course_id: string | null;
   course_name: string | null;
   course_country: string | null;
+  /** Multi-course tag list stashed via course_data.courses. */
+  course_data: { courses?: Array<{ id: string; name: string; country: string | null }> } | null;
   updated_at: string;
 }
 
