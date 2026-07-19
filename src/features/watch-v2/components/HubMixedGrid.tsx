@@ -57,7 +57,7 @@ export function HubMixedGrid({ filter = 'all' }: { filter?: string } = {}) {
   }, [fetchNextPage, hasNextPage, isFetching]);
 
   const rows: MixedGridRow[] = (data?.pages ?? []).flat() as MixedGridRow[];
-  const feedPosts = useMemo(() => toFeedPosts(rows as any[]), [rows]);
+  const feedPosts = useMemo(() => toFeedPosts(rows as unknown as Parameters<typeof toFeedPosts>[0]), [rows]);
   const { activeIndices, railRef } = useWatchAutoplay({
     railId: 'hub-mixed-grid',
     posts: feedPosts,
