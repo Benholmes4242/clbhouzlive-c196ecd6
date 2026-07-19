@@ -27,73 +27,82 @@ interface UserCoursesContentProps {
   displayName?: string;
 }
 
+// Structural row shapes — only the fields the sorter and card renderers read.
+type UserCourseInner = {
+  name?: string;
+  regional_rank?: number | null;
+  global_rank?: number | null;
+};
+
+type UserCourseRow = {
+  id?: string;
+  golf_courses?: UserCourseInner | null;
+  rating?: number | null;
+  played_date?: string | null;
+  created_at?: string | null;
+};
+
 // Helper function to get the best ranking for sorting
-const getCourseRanking = (course: any) => {
-  if (course.regional_rank) return course.regional_rank;
-  if (course.global_rank) return course.global_rank;
+const getCourseRanking = (course: UserCourseInner | null | undefined) => {
+  if (course?.regional_rank) return course.regional_rank;
+  if (course?.global_rank) return course.global_rank;
   return 9999;
 };
 
 // Custom sorting function for user courses with different sort options
-const getSortedUserCourses = (userCourses: any[], sortBy: string) => {
-  console.log('Sorting user courses in UserCoursesContent:', userCourses.map(c => ({ 
-    name: c.golf_courses?.name, 
-    rating: c.rating 
-  })));
-  
-  const sortedCourses = userCourses.sort((a, b) => {
+const getSortedUserCourses = <T extends UserCourseRow>(userCourses: T[], sortBy: string): T[] => {
+  const sortedCourses = [...userCourses].sort((a, b) => {
     switch (sortBy) {
       case 'rank-desc':
-      case 'rating-high-low':
+      case 'rating-high-low': {
         // Sort by rating descending (10, 9, 8, ...)
         const aRating = a.rating;
         const bRating = b.rating;
-        
+
         if (aRating !== null && aRating !== undefined && bRating !== null && bRating !== undefined) {
           return bRating - aRating;
         }
         if (aRating !== null && aRating !== undefined) return -1;
         if (bRating !== null && bRating !== undefined) return 1;
-        
+
         // If neither has a rating, sort by official ranking
         const aRank = getCourseRanking(a.golf_courses);
         const bRank = getCourseRanking(b.golf_courses);
         return aRank - bRank;
-        
+      }
+
       case 'rank-asc':
-      case 'rating-low-high':
+      case 'rating-low-high': {
         // Sort by rating ascending (0.5, 1, 2, ...)
         const aRatingLow = a.rating;
         const bRatingLow = b.rating;
-        
+
         if (aRatingLow !== null && aRatingLow !== undefined && bRatingLow !== null && bRatingLow !== undefined) {
           return aRatingLow - bRatingLow;
         }
         if (aRatingLow !== null && aRatingLow !== undefined) return -1;
         if (bRatingLow !== null && bRatingLow !== undefined) return 1;
-        
+
         // If neither has a rating, sort by official ranking
         const aRankLow = getCourseRanking(a.golf_courses);
         const bRankLow = getCourseRanking(b.golf_courses);
         return aRankLow - bRankLow;
-        
+      }
+
       case 'recent':
       case 'recently-played':
-      default:
+      default: {
         // Sort by most recent date (played_date or created_at for ratings)
         const aDate = new Date(a.played_date || a.created_at || 0);
         const bDate = new Date(b.played_date || b.created_at || 0);
         return bDate.getTime() - aDate.getTime();
+      }
     }
   });
-  
-  console.log('Final sorted order in UserCoursesContent:', sortedCourses.map(c => ({ 
-    name: c.golf_courses?.name, 
-    rating: c.rating 
-  })));
-  
+
   return sortedCourses;
 };
+
 
 const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ 
   username,
