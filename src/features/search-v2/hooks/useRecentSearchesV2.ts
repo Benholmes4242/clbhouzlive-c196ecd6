@@ -13,6 +13,7 @@ function read(): RecentItem[] {
     if (!Array.isArray(arr)) return [];
     return arr.slice(0, MAX);
   } catch {
+    /* storage unavailable - recents disabled */
     return [];
   }
 }
@@ -20,7 +21,9 @@ function read(): RecentItem[] {
 function write(items: RecentItem[]) {
   try {
     localStorage.setItem(KEY, JSON.stringify(items.slice(0, MAX)));
-  } catch {}
+  } catch {
+    /* storage unavailable - recents disabled */
+  }
 }
 
 export function useRecentSearchesV2() {

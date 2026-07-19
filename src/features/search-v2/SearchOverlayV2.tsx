@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { Search } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -120,7 +121,7 @@ export function SearchOverlayV2({
   }, [isOpen]);
 
 
-  const { data, isLoading, error, debouncedQuery } = useGlobalSearchV2({
+  const { data, isLoading, error, debouncedQuery, refetch } = useGlobalSearchV2({
     query: inputValue,
     scope,
     enabled: isOpen,
@@ -158,10 +159,10 @@ export function SearchOverlayV2({
   const hasInput = inputValue.trim().length >= 1;
   const showChips = mode === 'default' && hasInput;
 
-  // Reset scope to 'all' whenever the query clears back to empty.
+  // Reset scope to the mode's initial scope whenever the query clears.
   useEffect(() => {
-    if (!hasInput && scope !== 'all') setScope('all');
-  }, [hasInput, scope]);
+    if (!hasInput && scope !== initialScope) setScope(initialScope);
+  }, [hasInput, scope, initialScope]);
   const isCommit = mode === 'commit';
 
   const totalHits =
@@ -267,7 +268,7 @@ export function SearchOverlayV2({
                 </p>
                 <button
                   type="button"
-                  onClick={() => setInputValue((v) => v + ' ')}
+                  onClick={() => refetch()}
                   className="mt-3 text-[13px] font-bold"
                   style={{ color: '#0F172A' }}
                 >
@@ -614,7 +615,7 @@ function CommitResults({
           }}
           aria-hidden="true"
         >
-          ⌕
+          <Search size={15} strokeWidth={2.5} />
         </div>
         <div className="flex-1 min-w-0">
           <div className="text-[14px] font-extrabold truncate" style={{ color: '#0F172A' }}>

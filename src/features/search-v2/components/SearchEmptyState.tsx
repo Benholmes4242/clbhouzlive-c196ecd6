@@ -10,7 +10,6 @@
  * cached for the session.
  */
 import { useNavigate } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
 import { Check, Zap } from 'lucide-react';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { PlayerInitialAvatar } from '@/features/tourhub/_shared/PlayerInitialAvatar';
@@ -92,43 +91,50 @@ export function SearchEmptyState({ onSelect }: Props) {
       )}
 
       {/* ============ PEOPLE TO FOLLOW ============ */}
-      <SectionEyebrow label="People to follow" />
-      {isLoading && people.length === 0 ? (
-        <PeopleSkeleton />
-      ) : (
-        <div>
-          {people.map((s) => (
-            <SuggestionRow
-              key={s.id}
-              suggestion={s}
-              onSelect={() => {
-                if (!s.username) return;
-                onSelect();
-                navigate(`/profile/${s.username}`);
-              }}
-            />
-          ))}
-        </div>
+      {(isLoading || people.length > 0) && (
+        <>
+          <SectionEyebrow label="People to follow" />
+          {isLoading && people.length === 0 ? (
+            <PeopleSkeleton />
+          ) : (
+            <div>
+              {people.map((s) => (
+                <SuggestionRow
+                  key={s.id}
+                  suggestion={s}
+                  onSelect={() => {
+                    onSelect();
+                    navigate(`/profile/${s.username ?? s.id}`);
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </>
       )}
 
       {/* ============ POPULAR ON CLBHOUZ ============ */}
-      <SectionEyebrow label="Popular on clbhouz" />
-      {isLoading && courses.length === 0 ? (
-        <CoursesSkeleton />
-      ) : (
-        <div>
-          {courses.map((c) => (
-            <CourseRow
-              key={c.id}
-              course={c}
-              query=""
-              onSelect={() => {
-                onSelect();
-                navCourse(navigate, c);
-              }}
-            />
-          ))}
-        </div>
+      {(isLoading || courses.length > 0) && (
+        <>
+          <SectionEyebrow label="Popular on clbhouz" />
+          {isLoading && courses.length === 0 ? (
+            <CoursesSkeleton />
+          ) : (
+            <div>
+              {courses.map((c) => (
+                <CourseRow
+                  key={c.id}
+                  course={c}
+                  query=""
+                  onSelect={() => {
+                    onSelect();
+                    navCourse(navigate, c);
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </>
       )}
     </div>
   );
@@ -278,7 +284,6 @@ function SuggestionRow({
   const viewerActorType: 'personal' | 'business' =
     activeActor?.type ?? 'personal';
   const viewerActorId = activeActor?.id ?? user?.id;
-  const queryClient = useQueryClient();
   const toggle = useToggleFollow();
   const { isFollowing: cached } = useFollowState({
     targetActorType: 'personal',
@@ -300,22 +305,15 @@ function SuggestionRow({
     e.stopPropagation();
     if (!user?.id || !viewerActorId) return;
     if (toggle.isPending) return;
-    toggle.mutate(
-      {
-        targetActorType: 'personal',
-        targetActorId: suggestion.id,
-        targetUserId: suggestion.id,
-        viewerActorType,
-        viewerActorId,
-        viewerUserId: user.id,
-        isFollowing: following,
-      },
-      {
-        onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: ['search-empty-state-v2'] });
-        },
-      },
-    );
+    toggle.mutate({
+      targetActorType: 'personal',
+      targetActorId: suggestion.id,
+      targetUserId: suggestion.id,
+      viewerActorType,
+      viewerActorId,
+      viewerUserId: user.id,
+      isFollowing: following,
+    });
   };
 
   return (
