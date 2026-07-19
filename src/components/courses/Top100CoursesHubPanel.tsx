@@ -4,6 +4,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 import { useTop100ListSummaries } from '@/hooks/useTop100ListSummaries';
 import { useGolfCoursesInfinite, type SearchedCourseWithRating } from '@/hooks/useGolfCoursesInfinite';
+import type { CourseListMembership } from '@/hooks/useGolfCoursesSearch';
 import { useTop100Lists } from '@/hooks/useTop100Lists';
 import { Search, Award, X } from 'lucide-react';
 
@@ -90,6 +91,8 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
   const {
     data: coursesData,
     isLoading,
+    isError,
+    refetch,
   } = useGolfCoursesInfinite({
     searchQuery: debouncedSearch,
     listSlug: selectedList,
@@ -111,7 +114,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
     const getRankForSelectedList = (course: SearchedCourseWithRating): number => {
       const memberships = course.list_memberships ?? [];
       if (matcher) {
-        const m = memberships.find((x: any) => x.list_slug.includes(matcher));
+        const m = memberships.find((x: CourseListMembership) => x.list_slug.includes(matcher));
         return m?.rank ?? 999;
       }
       return memberships[0]?.rank ?? 999;
@@ -307,7 +310,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
           </div>
 
           {/* Meta row */}
-          {!isLoading && allCourses.length > 0 && (
+          {!isLoading && !isError && allCourses.length > 0 && (
             <div className="flex items-center justify-between gap-3">
               <span style={{
                 fontSize: 13, color: INK_MUTE, flex: 1, lineHeight: 1.35,
@@ -349,6 +352,23 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
                   </div>
                 </div>
               ))}
+            </div>
+          ) : isError ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center gap-4 animate-fade-in">
+              <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto">
+                <Award className="w-5 h-5 text-muted-foreground" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-sm font-semibold text-foreground">{t('top100.errorTitle', { defaultValue: "Couldn't load this list" })}</h3>
+                <p className="text-sm text-muted-foreground max-w-xs">{t('top100.errorBody', { defaultValue: 'Check your connection and try again.' })}</p>
+              </div>
+              <button
+                onClick={() => refetch()}
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium active:scale-[0.97] transition-transform"
+                style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
+              >
+                {t('top100.retry', { defaultValue: 'Retry' })}
+              </button>
             </div>
           ) : allCourses.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center gap-4 animate-fade-in">

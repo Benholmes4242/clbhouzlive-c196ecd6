@@ -41,8 +41,8 @@ export function useGolfCoursesInfinite(filters: Omit<CourseSearchFilters, 'limit
         .in('course_id', courseIds);
       
       // 3. Create a map for quick lookup
-      const ratingsMap = new Map<string, number>(
-        (ratingsData || []).map((r: any) => [r.course_id, r.avg_overall_score])
+      const ratingsMap = new Map<string, number | null>(
+        (ratingsData || []).map((r: { course_id: string; avg_overall_score: number | null }) => [r.course_id, r.avg_overall_score])
       );
       
       // 4. Merge ratings into courses
