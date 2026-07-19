@@ -14,6 +14,8 @@ import { stripMentionMarkup } from '@/lib/mentions/format';
 import { useRailLane } from '@/video/useRailLane';
 import { usePreroutePrefetch } from '@/video/usePreroutePrefetch';
 import { openWithOrigin } from '@/lib/openWithOrigin';
+import { openFsv2 } from '@/features/fsv2';
+import { FLAGS } from '@/config/flags';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import type { FeedPost } from '@/components/media-system/types/media';
 import type { VideosFeedV2Row } from '../hooks/useVideosFeedV2';
