@@ -113,7 +113,7 @@ function InnerComposer() {
         .select('id, display_name, username, profile_photo_url')
         .eq('id', userId!)
         .maybeSingle();
-      return data;
+      return (data as { display_name?: string | null; username?: string | null; profile_photo_url?: string | null } | null) ?? null;
     },
   });
 
