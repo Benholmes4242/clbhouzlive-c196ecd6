@@ -117,6 +117,39 @@ export const FeedSlide = memo(function FeedSlide({
   // ── Content routing ──
   // Phase 3: PGA / Course-of-Week editorial card branches were removed; those
   // cards now render as standalone Home modules (HomePGAModule, HomeCourseOfWeekModule).
+
+  // [TRACE] slide.branch — at the TOP of the FeedSlide render, once per
+  // branch transition per active slide. Fires for ALL branches (borrow-slot,
+  // video-slot, image, pager, text). Instrumentation only.
+  const slideBranchLastRef = React.useRef<string>('');
+  const computeBranch = (): 'pager' | 'borrow-slot' | 'video-slot' | 'image' | 'text' => {
+    if (isFullscreen && isActive && media && media.length > 1) return 'pager';
+    const m = media?.[openIdx] ?? media?.[0];
+    if (m?.type === 'video') {
+      const mHlsUrl = (m as any).hlsUrl || null;
+      if (isFullscreen && mHlsUrl && isActive) return 'video-slot';
+      return 'video-slot';
+    }
+    if (m?.type === 'image') return 'image';
+    return 'text';
+  };
+  if (isActive) {
+    const branchTaken = computeBranch();
+    const key = `${branchTaken}|pid=${post.id}|fs=${isFullscreen}|idx=${openIdx}`;
+    if (key !== slideBranchLastRef.current) {
+      slideBranchLastRef.current = key;
+      try {
+        trace('slide.branch', {
+          postId: post.id,
+          isFullscreen,
+          openIdx,
+          mediaLen: media?.length ?? 0,
+          branchTaken,
+        });
+      } catch {}
+    }
+  }
+
   const renderContent = () => {
 
     // Multi-media carousel — feed surface (non-fullscreen). Fullscreen
