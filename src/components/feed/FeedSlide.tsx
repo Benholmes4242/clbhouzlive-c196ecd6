@@ -10,7 +10,7 @@ import { VideoEngine } from '@/video/VideoEngine';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { originHostRegistry } from '@/video/originHostRegistry';
 import { isPerfEnabled } from '@/perf/navTiming';
-import { vperfStart, vperfArmLane, vperfNextId, vperfMotionMark } from '@/perf/vperf';
+import { vperfStart, vperfArmLane, vperfNextId, vperfMotionMark, vperfCloseMotionMark } from '@/perf/vperf';
 import { trace, traceLookup } from '@/perf/trace';
 import * as audioDbg from '@/perf/audioDebug';
 import { PrefetchController } from '@/video/PrefetchController';
