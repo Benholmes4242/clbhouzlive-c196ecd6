@@ -240,13 +240,15 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
 
       // Sync the single-course junction row to the primary course (best-effort;
       // full multi-course junction editing stays with useUpdatePost).
-      await supabase.from('post_courses').delete().eq('post_id', editPostId);
+      const { error: pcDelErr } = await supabase.from('post_courses').delete().eq('post_id', editPostId);
+      if (pcDelErr) throw pcDelErr;
       if (state.course?.id) {
-        await supabase.from('post_courses').insert({
+        const { error: pcInsErr } = await supabase.from('post_courses').insert({
           post_id: editPostId,
           course_id: state.course.id,
           display_order: 0,
         } as never);
+        if (pcInsErr) throw pcInsErr;
       }
 
       // Removed media rows: snapshot for cleanup, then delete.
@@ -255,7 +257,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
           .from('post_media')
           .select('id, media_url, media_type, stream_id')
           .in('id', removedExistingIds);
-        const snapshot = (rows ?? []).map((r: any) => ({
+        const snapshot = ((rows ?? []) as Array<{ id: string; media_url: string; media_type: string; stream_id: string | null }>).map((r) => ({
           id: r.id,
           media_url: r.media_url,
           media_type: (r.media_type === 'video' ? 'video' : 'image') as 'image' | 'video',
