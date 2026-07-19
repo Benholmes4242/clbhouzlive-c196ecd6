@@ -475,10 +475,15 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
         open={sheet === 'drafts'}
         onClose={() => setSheet(null)}
         drafts={drafts.drafts}
-        onRestore={(d) => restoreDraft({
-          caption: d.content ?? '',
-          course: d.course_id && d.course_name ? { id: d.course_id, name: d.course_name, country: d.course_country ?? null } : null,
-        })}
+        onRestore={(d) => {
+          const primary = d.course_id && d.course_name
+            ? { id: d.course_id, name: d.course_name, country: d.course_country ?? null }
+            : null;
+          const cd = (d as unknown as { course_data?: { courses?: Array<{ id: string; name: string; country: string | null }> } }).course_data ?? null;
+          const savedCourses = cd?.courses ?? [];
+          const courses = savedCourses.length > 0 ? savedCourses : (primary ? [primary] : []);
+          restoreDraft({ caption: d.content ?? '', course: courses[0] ?? null, courses });
+        }}
         onDelete={drafts.remove}
       />
       <ScheduledPostsSheetV2
