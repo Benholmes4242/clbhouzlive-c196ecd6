@@ -215,7 +215,7 @@ const PostDeepLinkPage: React.FC = () => {
 
     const shouldOpenComments = navState?.openComments === true || searchParams.get('openComments') === '1';
 
-    useFullscreenFeedStore.getState().open([feedPost], 0, {
+    const openOpts = {
       openCommentsInitially: shouldOpenComments,
       initialCommentId: navState?.initialCommentId ?? null,
       openedFrom: 'post-deep-link',
@@ -227,7 +227,13 @@ const PostDeepLinkPage: React.FC = () => {
           navigate('/', { replace: true });
         }
       },
-    });
+    };
+
+    if (FLAGS.fsv2) {
+      openFsv2({ posts: [feedPost], startIndex: 0, ...openOpts });
+    } else {
+      useFullscreenFeedStore.getState().open([feedPost], 0, openOpts);
+    }
 
   }, [authLoading, user, isLoading, feedPost, navigate, navState, searchParams]);
 
