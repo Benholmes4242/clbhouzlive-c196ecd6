@@ -91,6 +91,8 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
   const {
     data: coursesData,
     isLoading,
+    isError,
+    refetch,
   } = useGolfCoursesInfinite({
     searchQuery: debouncedSearch,
     listSlug: selectedList,
