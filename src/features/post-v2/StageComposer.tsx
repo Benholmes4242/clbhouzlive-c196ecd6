@@ -344,6 +344,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
       courseId: state.course?.id ?? null,
       courseName: state.course?.name ?? null,
       courseCountry: state.course?.country ?? null,
+      courses: state.courses,
     });
     setSheet(null);
     reset();
