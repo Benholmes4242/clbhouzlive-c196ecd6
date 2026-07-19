@@ -163,9 +163,29 @@ export function getCurrentViewport(): Viewport {
   const insets = readSafeAreaInsets();
   const hasWin = typeof window !== 'undefined';
   const vv = hasWin ? window.visualViewport : null;
+  // Median/WKWebView can report a degenerate visualViewport (height ~0) at
+  // overlay-mount tick during body-scroll-lock. Prefer vv only when sane —
+  // otherwise fall back to innerWidth/innerHeight so one-shot consumers
+  // (image rects, overlay geometry) never size to nothing.
+  const vvSane = !!vv && vv.width >= 100 && vv.height >= 100;
   return {
-    w: hasWin ? (vv?.width ?? window.innerWidth) : 0,
-    h: hasWin ? (vv?.height ?? window.innerHeight) : 0,
+    w: hasWin ? (vvSane ? vv!.width : window.innerWidth) : 0,
+    h: hasWin ? (vvSane ? vv!.height : window.innerHeight) : 0,
     ...insets,
+  };
+}
+
+/** Raw pre-clamp viewport readings for diagnostics. Instrumentation only. */
+export function readRawViewportSnapshot() {
+  const hasWin = typeof window !== 'undefined';
+  const vv = hasWin ? window.visualViewport : null;
+  const clamped = getCurrentViewport();
+  return {
+    vpW: clamped.w,
+    vpH: clamped.h,
+    innerW: hasWin ? window.innerWidth : 0,
+    innerH: hasWin ? window.innerHeight : 0,
+    vvW: vv?.width ?? null,
+    vvH: vv?.height ?? null,
   };
 }

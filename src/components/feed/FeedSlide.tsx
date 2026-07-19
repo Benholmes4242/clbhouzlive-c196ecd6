@@ -117,6 +117,39 @@ export const FeedSlide = memo(function FeedSlide({
   // ── Content routing ──
   // Phase 3: PGA / Course-of-Week editorial card branches were removed; those
   // cards now render as standalone Home modules (HomePGAModule, HomeCourseOfWeekModule).
+
+  // [TRACE] slide.branch — at the TOP of the FeedSlide render, once per
+  // branch transition per active slide. Fires for ALL branches (borrow-slot,
+  // video-slot, image, pager, text). Instrumentation only.
+  const slideBranchLastRef = React.useRef<string>('');
+  const computeBranch = (): 'pager' | 'borrow-slot' | 'video-slot' | 'image' | 'text' => {
+    if (isFullscreen && isActive && media && media.length > 1) return 'pager';
+    const m = media?.[openIdx] ?? media?.[0];
+    if (m?.type === 'video') {
+      const mHlsUrl = (m as any).hlsUrl || null;
+      if (isFullscreen && mHlsUrl && isActive) return 'video-slot';
+      return 'video-slot';
+    }
+    if (m?.type === 'image') return 'image';
+    return 'text';
+  };
+  if (isActive) {
+    const branchTaken = computeBranch();
+    const key = `${branchTaken}|pid=${post.id}|fs=${isFullscreen}|idx=${openIdx}`;
+    if (key !== slideBranchLastRef.current) {
+      slideBranchLastRef.current = key;
+      try {
+        trace('slide.branch', {
+          postId: post.id,
+          isFullscreen,
+          openIdx,
+          mediaLen: media?.length ?? 0,
+          branchTaken,
+        });
+      } catch {}
+    }
+  }
+
   const renderContent = () => {
 
     // Multi-media carousel — feed surface (non-fullscreen). Fullscreen
@@ -221,37 +254,16 @@ export const FeedSlide = memo(function FeedSlide({
       // expand target by construction — no post-paint resize.
       // Feed: legacy heuristic preserved verbatim (out of scope for this fix).
       if (isFullscreen) {
-        const fsRect = resolveRestingRect(m.width ?? 0, m.height ?? 0, getCurrentViewport(), 'image');
         return (
-          <div className="absolute inset-0 overflow-hidden">
-            <div aria-hidden="true" className="absolute inset-0" style={{
-              backgroundImage: `url(${imgSrc})`, backgroundSize: 'cover', backgroundPosition: 'center',
-              filter: 'blur(40px) brightness(0.5) saturate(1.2)', transform: 'scale(1.2)',
-            }} />
-            {/* Dim the surround: near-black wash, IG-style. Media itself sits
-                above at zIndex 1 and is NOT dimmed. */}
-            <div aria-hidden="true" className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.55)' }} />
-            <div
-              ref={zoomRef}
-              style={{
-                ...zoomStyle,
-                position: 'absolute',
-                top: fsRect.top, left: fsRect.left,
-                width: fsRect.width, height: fsRect.height,
-                zIndex: 1,
-              }}
-            >
-              <img
-                ref={imgRef}
-                src={imgSrc}
-                alt=""
-                className="w-full h-full"
-                style={{ objectFit: fsRect.fit }}
-                loading="eager"
-                draggable={false}
-              />
-            </div>
-          </div>
+          <FullscreenImageSlot
+            imgSrc={imgSrc}
+            mediaW={m.width ?? 0}
+            mediaH={m.height ?? 0}
+            isActive={isActive}
+            zoomRef={zoomRef}
+            imgRef={imgRef}
+            zoomStyle={zoomStyle}
+          />
         );
       }
       const aspect = (m.height ?? 1) > 0 && (m.width ?? 0) > 0
@@ -338,6 +350,85 @@ export default FeedSlide;
 const PostViewSentinel: React.FC<{ postId: string }> = ({ postId }) => {
   const attach = usePostViewTracker(postId, true);
   return <div ref={attach} className="absolute inset-0 pointer-events-none" aria-hidden="true" />;
+};
+
+
+
+
+
+/**
+ * FullscreenImageSlot — image counterpart to the video settledRect pattern.
+ * Computes the resting rect from a layout effect on mount, then re-resolves
+ * on visualViewport resize + orientationchange while the slide is active.
+ *
+ * Necessary because getCurrentViewport() prefers visualViewport, and in
+ * Median/WKWebView vv can read degenerate at overlay-mount tick (during body
+ * scroll-lock), which — combined with a one-shot render-tick read — baked a
+ * zero-sized rect that never re-measured: image slides rendered white.
+ */
+const FullscreenImageSlot: React.FC<{
+  imgSrc: string;
+  mediaW: number;
+  mediaH: number;
+  isActive: boolean;
+  zoomRef: React.Ref<HTMLDivElement>;
+  imgRef: React.Ref<HTMLImageElement>;
+  zoomStyle: React.CSSProperties;
+}> = ({ imgSrc, mediaW, mediaH, isActive, zoomRef, imgRef, zoomStyle }) => {
+  const [fsRect, setFsRect] = React.useState<RestingRect>(() =>
+    resolveRestingRect(mediaW, mediaH, getCurrentViewport(), 'image'),
+  );
+  React.useLayoutEffect(() => {
+    const measure = () => {
+      const next = resolveRestingRect(mediaW, mediaH, getCurrentViewport(), 'image');
+      setFsRect((prev) =>
+        prev.top === next.top && prev.left === next.left
+          && prev.width === next.width && prev.height === next.height
+          && prev.fit === next.fit
+          ? prev
+          : next,
+      );
+    };
+    measure();
+    if (!isActive) return;
+    const vv = typeof window !== 'undefined' ? window.visualViewport : null;
+    vv?.addEventListener('resize', measure);
+    window.addEventListener('orientationchange', measure);
+    return () => {
+      vv?.removeEventListener('resize', measure);
+      window.removeEventListener('orientationchange', measure);
+    };
+  }, [mediaW, mediaH, isActive]);
+
+  return (
+    <div className="absolute inset-0 overflow-hidden">
+      <div aria-hidden="true" className="absolute inset-0" style={{
+        backgroundImage: `url(${imgSrc})`, backgroundSize: 'cover', backgroundPosition: 'center',
+        filter: 'blur(40px) brightness(0.5) saturate(1.2)', transform: 'scale(1.2)',
+      }} />
+      <div aria-hidden="true" className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.55)' }} />
+      <div
+        ref={zoomRef}
+        style={{
+          ...zoomStyle,
+          position: 'absolute',
+          top: fsRect.top, left: fsRect.left,
+          width: fsRect.width, height: fsRect.height,
+          zIndex: 1,
+        }}
+      >
+        <img
+          ref={imgRef}
+          src={imgSrc}
+          alt=""
+          className="w-full h-full"
+          style={{ objectFit: fsRect.fit }}
+          loading="eager"
+          draggable={false}
+        />
+      </div>
+    </div>
+  );
 };
 
 

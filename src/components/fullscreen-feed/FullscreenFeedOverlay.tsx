@@ -42,7 +42,7 @@ import type { BorrowDescriptor } from '@/store/fullscreenFeedStore';
 import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
 import { applyRouteChrome } from '@/lib/routeChrome';
 import { useSetChromeSuppressed } from '@/features/chrome-v2/leftOverride';
-import { resolveRestingRect, getCurrentViewport } from '@/lib/media/resolveRestingRect';
+import { resolveRestingRect, getCurrentViewport, readRawViewportSnapshot } from '@/lib/media/resolveRestingRect';
 import { FS_TRANSITION_MODE, FS_CUT_FADE_MS } from '@/lib/media/transitionMode';
 import { FS_OVERLAY_Z } from '@/lib/zLayers';
 import { trace as perfTrace } from '@/perf/trace';
@@ -211,6 +211,7 @@ export function FullscreenFeedOverlay() {
           const snap = VideoEngine.snapshot('fullscreen');
           const el = document.querySelector('video[data-lane-id="fullscreen"]') as HTMLVideoElement | null;
           const boundElId = (el?.dataset as any)?.vid ?? null;
+          const vpSnap = readRawViewportSnapshot();
           trace('fsLane.at.open', {
             openId: currentOpenId,
             boundElId,
@@ -220,6 +221,7 @@ export function FullscreenFeedOverlay() {
             hasOrigin: s.origin != null,
             hasBorrow: s.borrow != null,
             borrowPostId: s.borrow?.postId ?? null,
+            ...vpSnap,
           });
         } catch {}
       }
