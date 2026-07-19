@@ -183,10 +183,12 @@ const AuthForm: React.FC = () => {
 
       if (data?.session?.user) {
         trackLoginSuccess('email', Date.now() - start);
-        // Session is set synchronously on the client here; navigate immediately.
-        // Close the OTP sheet before nav so it does not freeze mid-transition.
+        const dest = await resolvePostAuthRoute(
+          data.session.user.id,
+          searchParams.get('redirect'),
+        );
         setStep('hero');
-        navigate('/', { replace: true });
+        navigate(dest, { replace: true });
       } else {
         setOtpError('Could not start session. Please try again.');
         setOtpErrorNonce((n) => n + 1);
