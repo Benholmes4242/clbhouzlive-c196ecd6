@@ -9,7 +9,37 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { SnapFeed } from '@/components/feed/SnapFeed';
 import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
 
-import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
+// NOTE: intentionally NOT using the shared bodyScrollLock. It freezes body at
+// position:fixed; top:-scrollY. On iOS/WKWebView that offsets fixed descendants,
+// so opening after page scroll leaves only a top strip of the fullscreen media
+// visible. We instead toggle overflow/overscroll/touchAction on <html>+<body>
+// which prevents page scroll without disturbing the fixed overlay's viewport.
+function lockFullscreenViewportScroll(): () => void {
+  if (typeof document === 'undefined') return () => {};
+  const { body, documentElement: html } = document;
+  const prev = {
+    bodyOverflow: body.style.overflow,
+    bodyOverscrollBehavior: body.style.overscrollBehavior,
+    bodyTouchAction: body.style.touchAction,
+    htmlOverflow: html.style.overflow,
+    htmlOverscrollBehavior: html.style.overscrollBehavior,
+    htmlTouchAction: html.style.touchAction,
+  };
+  body.style.overflow = 'hidden';
+  body.style.overscrollBehavior = 'none';
+  body.style.touchAction = 'none';
+  html.style.overflow = 'hidden';
+  html.style.overscrollBehavior = 'none';
+  html.style.touchAction = 'none';
+  return () => {
+    body.style.overflow = prev.bodyOverflow;
+    body.style.overscrollBehavior = prev.bodyOverscrollBehavior;
+    body.style.touchAction = prev.bodyTouchAction;
+    html.style.overflow = prev.htmlOverflow;
+    html.style.overscrollBehavior = prev.htmlOverscrollBehavior;
+    html.style.touchAction = prev.htmlTouchAction;
+  };
+}
 
 
 import { ImmersiveFullscreenChrome } from '@/components/fullscreen-feed/ImmersiveFullscreenChrome';
