@@ -67,9 +67,10 @@ export async function attach(
 
   const hasHls = !!source.hlsUrl;
   const hasMp4 = !!source.mp4Url;
+  const hintedHls = hasHls ? withBandwidthHint(source.hlsUrl!) : '';
 
   if (hasHls && canPlayNativeHls(el)) {
-    el.src = source.hlsUrl!;
+    el.src = hintedHls;
     el.load();
   } else if (hasHls) {
     try {
@@ -77,7 +78,7 @@ export async function attach(
       const HlsCtor = (mod.default || (mod as unknown as { Hls: typeof Hls }).Hls) as typeof Hls;
       if (HlsCtor.isSupported()) {
         hls = new HlsCtor({ enableWorker: true });
-        hls.loadSource(source.hlsUrl!);
+        hls.loadSource(hintedHls);
         hls.attachMedia(el);
       } else if (hasMp4) {
         el.src = source.mp4Url!;
