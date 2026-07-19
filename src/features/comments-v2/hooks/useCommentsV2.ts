@@ -326,7 +326,7 @@ export function useCommentsV2({
     mutationFn: async ({ id, content }: { id: string; content: string }) => {
       const { data, error } = await supabase.rpc('edit_comment_v2', { p_id: id, p_content: content });
       if (error) throw error;
-      return data as any;
+      return data as unknown;
     },
     onSuccess: invalidate,
   });
