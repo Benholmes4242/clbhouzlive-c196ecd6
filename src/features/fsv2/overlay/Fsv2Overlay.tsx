@@ -30,6 +30,8 @@ import { FSV2 } from '../tokens';
 import { useFsv2Store } from '../store/fsv2Store';
 import { startFsv2EngagementBridge } from '../store/engagementBridge';
 import { startOpenSpan, endOpen, startCloseSpan, endCloseSpan } from '../perf/spans';
+import { hudEvent } from '../perf/trace';
+import { registerOverlayEl } from '../debug/hudBus';
 import { useFsv2Viewport } from '../player/viewport';
 import { WATCHDOG_MS, useWatchdog } from './Watchdogs';
 import { Fsv2Chrome } from './Chrome';
