@@ -99,7 +99,6 @@ export function HubMixedGrid({
 
   return (
     <section style={{ fontFamily: FONT_FAMILY }}>
-      <style>{spinKeyframes}</style>
       <SectionHeader
         role="section"
         kicker="EVERYTHING"
