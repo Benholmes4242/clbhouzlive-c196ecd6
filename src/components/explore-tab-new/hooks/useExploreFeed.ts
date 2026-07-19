@@ -31,7 +31,7 @@ export function useExploreFeed({ userId, region, searchQuery, enabled: externalE
 
       const cursor = typeof pageParam === 'string' ? pageParam : undefined;
 
-      const params: Record<string, any> = {
+      const params: Record<string, unknown> = {
         p_user_id: userId,
         p_viewer_actor_type: activeActor?.type ?? 'personal',
         p_viewer_actor_id: activeActor?.id ?? userId,
@@ -43,12 +43,10 @@ export function useExploreFeed({ userId, region, searchQuery, enabled: externalE
       if (cursor) params.p_cursor = cursor;
       if (searchQuery) params.p_search_query = searchQuery;
 
-      const { data, error } = await supabase.rpc('get_explore_feed', params as any);
+      const rpc = (supabase as unknown as RpcClient).rpc;
+      const { data, error } = await rpc('get_explore_feed', params);
 
-      if (error) {
-        console.error('[ExploreFeed] RPC error:', error);
-        return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
-      }
+      if (error) throw error;
 
       if (!data || data.length === 0) {
         return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
