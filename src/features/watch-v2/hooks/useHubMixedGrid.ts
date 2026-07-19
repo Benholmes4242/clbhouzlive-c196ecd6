@@ -26,7 +26,7 @@ export function useHubMixedGrid(userId: string | undefined, filter: string = 'al
     initialPageParam: [] as string[],
     queryFn: async ({ pageParam }) => {
       const seenIds = (pageParam as string[]) ?? [];
-      const { data, error } = await (supabase.rpc as any)('get_watch_mixed_grid', {
+      const { data, error } = await (supabase as unknown as RpcClient).rpc('get_watch_mixed_grid', {
         p_user_id: userId,
         p_filter: filter,
         p_page_size: PAGE_SIZE,
