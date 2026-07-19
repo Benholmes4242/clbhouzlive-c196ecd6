@@ -243,11 +243,7 @@ export function VideosFeedV2({ sort, category }: Props) {
 
           <div ref={sentinelRef} style={{ height: 1 }} />
 
-          {isFetchingNextPage && (
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0' }}>
-              <Spinner />
-            </div>
-          )}
+          {isFetchingNextPage && <SkeletonCard />}
         </div>
       )}
     </div>
