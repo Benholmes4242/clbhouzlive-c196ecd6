@@ -9,7 +9,37 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { SnapFeed } from '@/components/feed/SnapFeed';
 import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
 
-import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
+// NOTE: intentionally NOT using the shared bodyScrollLock. It freezes body at
+// position:fixed; top:-scrollY. On iOS/WKWebView that offsets fixed descendants,
+// so opening after page scroll leaves only a top strip of the fullscreen media
+// visible. We instead toggle overflow/overscroll/touchAction on <html>+<body>
+// which prevents page scroll without disturbing the fixed overlay's viewport.
+function lockFullscreenViewportScroll(): () => void {
+  if (typeof document === 'undefined') return () => {};
+  const { body, documentElement: html } = document;
+  const prev = {
+    bodyOverflow: body.style.overflow,
+    bodyOverscrollBehavior: body.style.overscrollBehavior,
+    bodyTouchAction: body.style.touchAction,
+    htmlOverflow: html.style.overflow,
+    htmlOverscrollBehavior: html.style.overscrollBehavior,
+    htmlTouchAction: html.style.touchAction,
+  };
+  body.style.overflow = 'hidden';
+  body.style.overscrollBehavior = 'none';
+  body.style.touchAction = 'none';
+  html.style.overflow = 'hidden';
+  html.style.overscrollBehavior = 'none';
+  html.style.touchAction = 'none';
+  return () => {
+    body.style.overflow = prev.bodyOverflow;
+    body.style.overscrollBehavior = prev.bodyOverscrollBehavior;
+    body.style.touchAction = prev.bodyTouchAction;
+    html.style.overflow = prev.htmlOverflow;
+    html.style.overscrollBehavior = prev.htmlOverscrollBehavior;
+    html.style.touchAction = prev.htmlTouchAction;
+  };
+}
 
 
 import { ImmersiveFullscreenChrome } from '@/components/fullscreen-feed/ImmersiveFullscreenChrome';
@@ -536,12 +566,11 @@ export function FullscreenFeedOverlay() {
       // NOTE: no engine-wide pauseAll here — the overlay must never pause a
       // borrowed lane on its own open. Owner-guard + null-caller rules keep
       // playback correct for both borrow and non-borrow entries.
-      lockBodyScroll();
+      const unlockViewportScroll = lockFullscreenViewportScroll();
 
-      // Same-frame restore: lockBodyScroll fixes the body which can clamp the
-      // #root scroller to 0. Reassign immediately so the pre-lock scroll
-      // position is what frame 0 composites — no visible jump behind the
-      // translucent overlay.
+      // With the html+body overflow lock (no position:fixed) the #root scroller
+      // is not clamped, but keep the same-frame restore as a defensive no-op in
+      // case any ancestor still shifts it before frame 0.
       if (rootEl && rootEl.scrollTop !== savedScrollTop) {
         rootEl.scrollTop = savedScrollTop;
       }
@@ -574,7 +603,7 @@ export function FullscreenFeedOverlay() {
         // firstFrame before the next cold open can synchronously snapshot it.
         try { VideoEngine.unmountLane('fullscreen'); } catch {}
 
-        unlockBodyScroll();
+        unlockViewportScroll();
         document.body.classList.remove('route-fullscreen-overlay');
         // Restore shield to transparent (NOT #F8FAFC) so the dark feed background
         // shows through — matches the prior CourseMediaViewer behaviour and
