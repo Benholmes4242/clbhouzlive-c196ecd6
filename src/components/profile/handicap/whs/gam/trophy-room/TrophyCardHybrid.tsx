@@ -86,7 +86,7 @@ export const TrophyCardHybrid: React.FC<Props> = ({ item, onTap, currentIndex = 
   
 
   const nextThreshold = tiered ? item.nextThreshold : null;
-  const nextMat = tiered && nextThreshold != null ? matName(MATERIAL_LADDER[Math.min(reached, MATERIAL_LADDER.length - 1)]) : null;
+  const nextMat = tiered && nextThreshold != null ? matName(BADGE_TIER_MATERIALS[Math.min(reached, BADGE_TIER_MATERIALS.length - 1)]) : null;
 
   const earnedDate = item.earnedAt
     ? formatMonthYearShortGB(item.earnedAt)
