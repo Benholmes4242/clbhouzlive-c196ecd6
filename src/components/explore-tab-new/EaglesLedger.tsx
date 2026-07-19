@@ -125,14 +125,14 @@ export function EaglesLedger({ region, regionUpper, mode, onRowTap, onLeaderTap 
                       <div
                         style={{
                           width: 16,
-                          fontSize: 11,
+                          fontSize: isFirst ? 13 : 11,
                           fontWeight: 600,
                           color: isFirst ? SC_EAGLE : RANK_MUTE,
-                          fontVariantNumeric: 'tabular-nums',
+                          ...(isFirst ? {} : { fontVariantNumeric: 'tabular-nums' as const }),
                           textAlign: 'center',
                         }}
                       >
-                        {i + 1}
+                        {isFirst ? '\u{1F3C6}' : i + 1}
                       </div>
                       <SquircleAvatar
                         size={24}
