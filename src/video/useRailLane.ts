@@ -117,6 +117,20 @@ export function useRailLane(opts: UseRailLaneOptions): UseRailLaneResult {
     });
     vperfMark(autoSpanId, 'laneAcquire');
 
+    const willBeltMute = !VideoEngine.isBorrowed(laneId);
+    import('@/perf/audioDebug').then((m) => {
+      m.logAudio('resume.effectRun', {
+        laneId,
+        ownerKey: opts.ownerKey ?? null,
+        isBorrowed: VideoEngine.isBorrowed(laneId),
+        willBeltMute,
+      });
+      m.logAudio('resume.hostRemount', {
+        laneId,
+        ownerKey: opts.ownerKey ?? null,
+      });
+    }).catch(() => {});
+
     VideoEngine.mountLane(laneId, host);
     // Declare rails as always-muted; engine enforces. Belt-and-braces setMuted
     // remains for immediate effect on first paint — BUT skip when the lane
@@ -125,7 +139,7 @@ export function useRailLane(opts: UseRailLaneOptions): UseRailLaneResult {
     // override); a tile-side re-mute here would fight the viewer's audio.
     // Handback's clearBorrowed → applyAudioPolicy restores rail muting.
     VideoEngine.setAudioPolicy(laneId, 'always-muted');
-    if (!VideoEngine.isBorrowed(laneId)) {
+    if (willBeltMute) {
       VideoEngine.setMuted(laneId, true);
     }
     // Resume at the engine's lastPos for this post — kept fresh by every lane
