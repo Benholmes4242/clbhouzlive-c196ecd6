@@ -466,7 +466,11 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
           </button>
         )}
         <div style={{ flex: 1 }} />
-        <button onClick={onPrimary} disabled={!canSubmit} style={primaryStyle}>{primaryLabel}</button>
+        <button onClick={onPrimary} disabled={!canSubmit} style={primaryStyle}>
+          {(submitting || saving)
+            ? <Loader2 size={16} className="animate-spin" style={{ display: 'block' }} />
+            : primaryLabel}
+        </button>
       </div>
 
       <input ref={stageAddInputRef} type="file" accept="image/*,video/*" multiple hidden onChange={handleStageAddFiles} />
