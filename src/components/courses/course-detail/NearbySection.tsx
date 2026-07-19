@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useNearbyBusinesses } from '@/hooks/useNearbyBusinesses';
 import { getActorRouteByType } from '@/types/actor';
@@ -12,6 +13,7 @@ interface NearbySectionProps {
 }
 
 const NearbySection: React.FC<NearbySectionProps> = ({ lat, lng }) => {
+  const { t } = useTranslation('courses');
   const navigate = useNavigate();
   const { data } = useNearbyBusinesses(lat, lng);
 
@@ -20,7 +22,12 @@ const NearbySection: React.FC<NearbySectionProps> = ({ lat, lng }) => {
 
   return (
     <section>
-      <SectionHeader role="section" kicker="NEARBY" title="Food & stays nearby" paddingX={16} />
+      <SectionHeader
+        role="section"
+        kicker={t('courseDetail.nearby.kicker')}
+        title={t('courseDetail.nearby.title')}
+        paddingX={16}
+      />
       <div
         style={{
           display: 'flex',

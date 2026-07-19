@@ -46,6 +46,9 @@
     "allHolesKicker": "ALL HOLES",
     "sortByHole": "By hole",
     "sortByDifficulty": "By difficulty",
+    "sortAriaLabel": "Sort holes",
+    "roundsLabel": "rounds",
+    "retry": "Try again",
     "errorLoading": "Couldn't load hole analysis.",
     "credibilityKicker": "OFFICIAL HOLE DATA",
     "credibilitySuffix": " · Official WHS",
@@ -322,7 +325,8 @@
     "toast": {
       "signInRequired": "Sign in required",
       "voteBody": "Please sign in to vote on reviews",
-      "rateBody": "Please sign in to rate courses"
+      "rateBody": "Please sign in to rate courses",
+      "voteFailed": "Couldn't save your vote"
     }
   },
   "courseDetail": {
@@ -360,6 +364,13 @@
         "submitted": "Claim submitted for review.",
         "submitError": "Could not submit claim. Please try again."
       }
+    },
+    "nearby": {
+      "kicker": "NEARBY",
+      "title": "Food & stays nearby"
+    },
+    "legends": {
+      "errorLoading": "Couldn't load Course Legends"
     },
     "exploreLinks": {
       "kicker": "KEEP EXPLORING",

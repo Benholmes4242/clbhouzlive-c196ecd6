@@ -33,7 +33,7 @@ function toShared(h: CourseHole): SharedHole {
 
 export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
   const { t } = useTranslation(['courses']);
-  const { data, isLoading, isError } = useCourseHoleAnalysis(courseId);
+  const { data, isLoading, isError, refetch } = useCourseHoleAnalysis(courseId);
   const { data: meta } = useCourseMeta(courseId);
   const [sort, setSort] = useState<'hole' | 'difficulty'>('hole');
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
@@ -89,9 +89,16 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
   if (isError) {
     return (
       <div style={{ padding: '40px 16px', textAlign: 'center', fontFamily: FONT }}>
-        <div style={{ fontSize: 14, fontWeight: 600, color: INK_MUTE }}>
+        <div style={{ fontSize: 14, fontWeight: 600, color: INK_MUTE, marginBottom: 16 }}>
           {t('courses:holes.errorLoading')}
         </div>
+        <button
+          type="button"
+          onClick={() => refetch()}
+          className="rounded-full bg-[#f59e0b] text-white text-sm font-semibold px-5 py-2 active:scale-[0.98] transition-all min-h-[44px] hover:bg-[#e8920f]"
+        >
+          {t('courses:holes.retry')}
+        </button>
       </div>
     );
   }
@@ -143,7 +150,7 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
           key={h.hole_no}
           hole={toShared(h)}
           maxAbs={maxAbs}
-          countLabel="rounds"
+          countLabel={t('courses:holes.roundsLabel', 'rounds') as 'rounds' | 'players'}
           expanded={expanded.has(h.hole_no)}
           onToggle={() => toggle(h.hole_no)}
           tag={

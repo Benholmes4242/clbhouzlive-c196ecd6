@@ -1,5 +1,6 @@
 import { GAM } from '../../gam/tokens';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { lookupCourseMetaV2 } from '@/lib/whs/courseNameMatcher';
 import { useCourseLegends } from '@/hooks/gam/useCourseLegends';
 import { useCourseMeta } from '@/hooks/gam/useCourseMeta';
@@ -114,6 +115,7 @@ interface Props {
 }
 
 export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader = false, theme = 'dark' }) => {
+  const { t } = useTranslation('courses');
   const ctx = selection;
 
 
@@ -324,7 +326,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
 
       {isError && (
         <div style={{ padding: '16px' }}>
-          <RetryStub message="Couldn't load Course Legends" onRetry={() => refetch()} />
+          <RetryStub message={t('courseDetail.legends.errorLoading')} onRetry={() => refetch()} />
         </div>
       )}
 

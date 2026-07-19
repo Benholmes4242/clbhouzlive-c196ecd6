@@ -11,7 +11,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { toast } from '@/lib/toast';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
-import { useCourseReviews, type ReviewsSortBy, type CourseReview, type ReviewMediaItem } from '@/hooks/useCourseReviews';
+import { useCourseReviews, type ReviewsSortBy, type ReviewsRatingFilter, type CourseReview, type ReviewMediaItem } from '@/hooks/useCourseReviews';
 import { useReviewResponses, useSubmitReviewResponse } from '@/hooks/useReviewResponses';
 import { useBusinessClaimForCourse } from '@/hooks/useBusinessClaimForCourse';
 import { ReviewBlockFlat } from '../review/ReviewBlockFlat';
@@ -107,7 +107,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [ratingFilter, setRatingFilter] = useState<RatingFilterValue>(null);
   
-  const hookRatingFilter = ratingFilter === 'exceptional' ? '10-9'
+  const hookRatingFilter: ReviewsRatingFilter =
+    ratingFilter === 'exceptional' ? '10-9'
     : ratingFilter === 'excellent' ? '8.9-7.5'
     : ratingFilter === 'good' ? '7.4-5'
     : 'all';
@@ -174,7 +175,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const { data: reviewsData, isLoading, isError, refetch } = useCourseReviews(
     courseId,
     sortBy,
-    hookRatingFilter as any,
+    hookRatingFilter,
     { 
       searchQuery: searchQuery.trim() || undefined,
       showMock: SHOW_MOCK_REVIEWS,
@@ -223,6 +224,11 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['course-reviews-full', courseId] });
       queryClient.invalidateQueries({ queryKey: ['review-votes', user?.id] });
+    },
+    onError: (e) => {
+      toast(t('review.toast.voteFailed', { defaultValue: "Couldn't save your vote" }), {
+        description: e instanceof Error ? e.message : undefined,
+      });
     },
   });
 

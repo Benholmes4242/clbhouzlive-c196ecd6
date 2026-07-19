@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { mapRowToFeedPost, groupMultiMedia } from '@/components/media-system/utils/feedMapper';
 import type { FeedPost, FeedRpcRow } from '@/components/media-system/types/media';
+import type { RpcClient } from '@/features/watch-v2/hooks/useHubMixedGrid';
 
 export type CourseMediaFilter = 'all' | 'photos' | 'videos';
 
@@ -50,18 +51,15 @@ export function useCourseMedia({ userId, courseId, filter }: UseCourseMediaParam
 
       if (cursor) params.p_cursor = cursor;
 
-      const { data, error } = await supabase.rpc('get_course_media', params as any);
+      const { data, error } = await (supabase as unknown as RpcClient).rpc('get_course_media', params);
 
-      if (error) {
-        console.error('[CourseMedia] RPC error:', error);
+      if (error) throw error;
+
+      const rows = (data ?? []) as FeedRpcRow[];
+      if (rows.length === 0) {
         return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
       }
 
-      if (!data || data.length === 0) {
-        return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
-      }
-
-      const rows = data as unknown as FeedRpcRow[];
       // Each row = one media item = one tile. Do NOT group by post.
       const posts = rows.map(mapRowToFeedPost);
 
