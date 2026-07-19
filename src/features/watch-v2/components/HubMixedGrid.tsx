@@ -52,7 +52,7 @@ export function HubMixedGrid({
   filter?: string;
   children?: ReactNode;
 } = {}) {
-  const { user } = useSupabaseSession();
+  const { user, loading: authLoading } = useSupabaseSession();
   const {
     data,
     fetchNextPage,
@@ -111,7 +111,7 @@ export function HubMixedGrid({
 
       <div style={{ height: 16 }} />
 
-      {isLoading ? (
+      {isLoading || (authLoading && rows.length === 0) ? (
         <div style={{ display: 'flex', gap: 4, padding: '0 4px' }}>
           <div style={{ flex: 1 }}>
             <SkeletonTile aspect="9 / 14" />

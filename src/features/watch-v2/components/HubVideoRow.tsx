@@ -266,7 +266,7 @@ function SkeletonCard() {
 
 export function HubVideoRow() {
   const navigate = useNavigate();
-  const { user } = useSupabaseSession();
+  const { user, loading: authLoading } = useSupabaseSession();
   const { data, isLoading } = useHubLongFormVideos(user?.id);
 
   const rows = (data ?? []) as HubRpcRow[];
@@ -277,7 +277,7 @@ export function HubVideoRow() {
     maxActive: 1,
   });
 
-  if (!isLoading && rows.length === 0) return null;
+  if (!isLoading && !authLoading && rows.length === 0) return null;
 
   return (
     <section style={{ fontFamily: FONT_FAMILY }}>
@@ -302,7 +302,7 @@ export function HubVideoRow() {
         }}
         className="hide-scrollbar"
       >
-        {isLoading && rows.length === 0 ? (
+        {(isLoading || authLoading) && rows.length === 0 ? (
           <>
             <SkeletonCard />
             <SkeletonCard />
