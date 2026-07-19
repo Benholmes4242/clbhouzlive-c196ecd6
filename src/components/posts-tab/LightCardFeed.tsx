@@ -308,8 +308,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   const setActiveIndex = useClubhouseStore((s) => s.setActiveIndex);
   const setCarouselPosition = useClubhouseStore((s) => s.setCarouselPosition);
   const carouselPositions = useClubhouseStore((s) => s.carouselPositions);
-  const openFullscreen = useFullscreenFeedStore((s) => s.open);
-  // fsOpen / borrow.ownerKey consumed inside `LightItemGate` — see CardFeed.
+  // V1 openFullscreen removed — fsv2's openFsv2 is called directly below.
 
   useEffect(() => {
     setActiveIndex(activeIdx);
@@ -351,7 +350,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
         isFetchingNextPage: isFetchingNextPage ?? false,
       });
     },
-    [posts, setActiveIndex, setCarouselPosition, openFullscreen, hasNextPage, fetchNextPage, isFetchingNextPage, playingIdx],
+    [posts, setActiveIndex, setCarouselPosition, hasNextPage, fetchNextPage, isFetchingNextPage, playingIdx],
   );
 
   const carouselChangeCacheRef = useRef(new Map<string, (post: FeedPost, slide: number) => void>());
