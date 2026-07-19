@@ -1126,15 +1126,24 @@ class VideoEngineImpl {
 
   setMuted(laneId: LaneId, muted: boolean): void {
     const lane = this.getLane(laneId);
+    const enforcedOn: LaneId[] = [];
+    logAudio('setMuted.enter', { laneId, desired: muted, msSinceOpen: msSinceOpen() });
     if (!muted && ONE_UNMUTED_LANE) {
       // Enforce: mute every other lane first.
       this.lanes.forEach((other) => {
-        if (other.id !== laneId) other.el.muted = true;
+        if (other.id !== laneId) {
+          if (!other.el.muted) enforcedOn.push(other.id);
+          other.el.muted = true;
+        }
       });
     }
     lane.el.muted = muted;
     this.emit(lane);
+    logAudio('setMuted.exit', {
+      laneId, desired: muted, oneUnmutedEnforcedOn: enforcedOn,
+    });
   }
+
 
   /** Set object-fit on the lane's <video> element. */
   setObjectFit(laneId: LaneId, fit: 'cover' | 'contain'): void {
