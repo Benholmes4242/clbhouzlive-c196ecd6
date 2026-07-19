@@ -856,6 +856,21 @@ export function CinematicHeroFullBleed({
               <span style={{ width: RANK_W, flexShrink: 0 }} />
               <span style={{ width: 26, flexShrink: 0 }} />
               <span style={{ flex: 1 }} />
+              {isLive && (
+                <span
+                  style={{
+                    ...NUMERIC_STYLE,
+                    width: COL_THRU,
+                    textAlign: 'center',
+                    fontSize: 8,
+                    fontWeight: 800,
+                    letterSpacing: '0.12em',
+                    color: 'rgba(255,255,255,0.45)',
+                  }}
+                >
+                  {t('overview.cinematic.colThru')}
+                </span>
+              )}
               {anyToday && (
                 <span
                   style={{
@@ -884,21 +899,6 @@ export function CinematicHeroFullBleed({
               >
                 {t('overview.cinematic.colTotalShort')}
               </span>
-              {isLive && (
-                <span
-                  style={{
-                    ...NUMERIC_STYLE,
-                    width: COL_THRU,
-                    textAlign: 'center',
-                    fontSize: 8,
-                    fontWeight: 800,
-                    letterSpacing: '0.12em',
-                    color: 'rgba(255,255,255,0.45)',
-                  }}
-                >
-                  {t('overview.cinematic.colThru')}
-                </span>
-              )}
             </div>
           )}
 
