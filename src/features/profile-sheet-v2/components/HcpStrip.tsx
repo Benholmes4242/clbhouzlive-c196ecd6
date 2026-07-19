@@ -135,7 +135,18 @@ export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
     : '\u2014';
 
   return (
-    <div onClick={() => onNavigate('/handicap')} role="button" tabIndex={0} style={stripBase}>
+    <div
+      onClick={() => onNavigate('/handicap')}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onNavigate('/handicap');
+        }
+      }}
+      role="button"
+      tabIndex={0}
+      style={stripBase}
+    >
       {eyebrow}
       <span
         style={{
