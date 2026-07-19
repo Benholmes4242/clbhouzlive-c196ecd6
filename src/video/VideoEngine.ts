@@ -211,6 +211,14 @@ class VideoEngineImpl {
    */
   private borrowedLanes = new Set<LaneId>();
   /**
+   * Close-transition fix: lanes that were just handed back from a fullscreen
+   * borrow. The next load() call on the same lane must NOT re-seek from
+   * lastPos — the element's currentTime is authoritative (carried through
+   * handback). Consumed (deleted) on that next load(); cleared defensively
+   * on unmountLane.
+   */
+  private sameElementReturn = new Set<LaneId>();
+  /**
    * Stage-7 Audio v3: per-borrow volumechange guard detachers. While a lane
    * is borrowed by the fullscreen viewer, an element-level `volumechange`
    * listener defends the session audio policy — any external writer that
@@ -285,6 +293,9 @@ class VideoEngineImpl {
       this.borrowGuardDetach.delete(laneId);
     }
     this.borrowedLanes.delete(laneId);
+    // Same-element return: the next load() on this lane must not seek from
+    // stale lastPos. The element's currentTime is the authority.
+    this.sameElementReturn.add(laneId);
     DBG('clearBorrowed', { laneId });
     logAudio('borrow.cleared', { laneId, msSinceOpen: msSinceOpen() });
     // Handback returns the lane muted and audio-neutral. The returned lane
@@ -625,6 +636,8 @@ class VideoEngineImpl {
       DBG(laneId, 'unmounted');
     }
     lane.mountedHost = null;
+    // The lane detached — any pending same-element-return hint is stale.
+    this.sameElementReturn.delete(laneId);
     lane.wantPlay = false;
     if (laneId === 'fullscreen') {
       this.resetFirstFrameForLane(lane, 'unmount');
@@ -691,7 +704,11 @@ class VideoEngineImpl {
       const target = startPosition > 0 ? startPosition : 0;
       const now = lane.el.currentTime || 0;
       const needsResumeSeek = target > 0 && Math.abs(now - target) > 0.35;
-      if (needsResumeSeek) {
+      const sameReturn = this.sameElementReturn.delete(laneId);
+      if (sameReturn) {
+        DBG(laneId, 'skip resume seek: same-element borrow return', { now, target });
+      }
+      if (needsResumeSeek && !sameReturn) {
         // Same source, different desired playhead. A warm skip must still seek
         // before surfaces reveal this lane; otherwise React sees the stale
         // firstFrame=true snapshot for one paint and users get a frame-0/old-

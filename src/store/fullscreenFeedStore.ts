@@ -310,6 +310,14 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
   close: () => {
     const cb = get().onCloseCallback;
     const borrow = get().borrow;
+    // Close-transition fix: freeze lastPos to the element's true fs playback
+    // position BEFORE any handback / lane teardown runs. Cold resumes elsewhere
+    // (fresh rail acquires, feed re-enters) then see the fresh value; and for
+    // same-element borrow returns the target/now delta collapses so no seek
+    // fires even if the sameElementReturn hint is bypassed.
+    try {
+      VideoEngine.captureLastPos(borrow ? borrow.laneId : 'fullscreen');
+    } catch {}
     // [VPERF] S2 fs.close — from close intent to tileLive.
     // borrow  → tile element re-mounted + playing on its rail lane
     // no-borrow → overlay unmounted (approximated as fullscreen lane 'paused')

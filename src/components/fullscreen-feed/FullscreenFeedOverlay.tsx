@@ -608,23 +608,32 @@ export function FullscreenFeedOverlay() {
 
         unlockViewportScroll();
         try { vperfCloseMotionMark('scrollUnlocked'); } catch {}
-        document.body.classList.remove('route-fullscreen-overlay');
-        try { vperfCloseMotionMark('bodyClassRemoved'); vperfCloseMotionMark('chromeUnsuppressed'); } catch {}
-        // Restore shield to transparent (NOT #F8FAFC) so the dark feed background
-        // shows through — matches the prior CourseMediaViewer behaviour and
-        // App.tsx's dark route baseline. #F8FAFC was a light slate that flashed
-        // over the dark feed on return.
-        if (shield) shield.style.backgroundColor = 'transparent';
-        document.documentElement.style.backgroundColor = '';
-        document.body.style.backgroundColor = '';
 
-        // Overlay open/close is not a route change, so AppRoutes' chrome effect
-        // never re-fires. Re-resolve chrome for whatever route we're returning
-        // to (Clubhouse -> dark notch/white icons, Watch -> light notch/dark
-        // icons). force=true because the overlay mutated chrome behind the
-        // idempotency cache's back.
-        try { applyRouteChrome(window.location.pathname, true); } catch {}
-
+        // Close-transition fix: hold chrome / body-class / overlay-color
+        // restores until after the landing (returnAnimEnd already gated us
+        // here; add a ~50ms fallback beat so the tile settles into its
+        // resting rect before the OS chrome re-appears and any layout math
+        // shifts). Scroll-unlock is intentionally NOT deferred — capture
+        // showed the shifting rect correlates with chrome/body-class flips,
+        // not the overflow unlock.
+        const restoreChromeAfterLanding = () => {
+          document.body.classList.remove('route-fullscreen-overlay');
+          try { vperfCloseMotionMark('bodyClassRemoved'); vperfCloseMotionMark('chromeUnsuppressed'); } catch {}
+          // Restore shield to transparent (NOT #F8FAFC) so the dark feed background
+          // shows through — matches the prior CourseMediaViewer behaviour and
+          // App.tsx's dark route baseline. #F8FAFC was a light slate that flashed
+          // over the dark feed on return.
+          if (shield) shield.style.backgroundColor = 'transparent';
+          document.documentElement.style.backgroundColor = '';
+          document.body.style.backgroundColor = '';
+          // Overlay open/close is not a route change, so AppRoutes' chrome effect
+          // never re-fires. Re-resolve chrome for whatever route we're returning
+          // to (Clubhouse -> dark notch/white icons, Watch -> light notch/dark
+          // icons). force=true because the overlay mutated chrome behind the
+          // idempotency cache's back.
+          try { applyRouteChrome(window.location.pathname, true); } catch {}
+        };
+        window.setTimeout(restoreChromeAfterLanding, 50);
 
         // Restore #root scroll position on the next frame so the feed's scroll
         // height is settled after the overlay unmounts.
