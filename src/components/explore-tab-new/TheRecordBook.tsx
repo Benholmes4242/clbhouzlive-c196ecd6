@@ -238,6 +238,7 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
             banded={i === 1 || i === 3}
             isLast={i === ledgerRows.length - 1}
             onTap={() => handleRowTap(row)}
+            crown={i === 0 && mode === 'alltime'}
           />
         ))}
       </div>
