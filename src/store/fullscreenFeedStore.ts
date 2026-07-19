@@ -319,6 +319,35 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       laneId: borrow ? borrow.laneId : 'fullscreen',
     });
     vperfMark(closeSpanId, 'closeIntent');
+    // ── AudioDebug: close.state + tile.resume snapshot @500ms (flag-gated)
+    if (audioDbg.audioDebugEnabled()) {
+      try {
+        const laneId = borrow ? borrow.laneId : 'fullscreen';
+        const el = (VideoEngine as unknown as { _debugGetElement?: (id: string) => HTMLMediaElement | null })._debugGetElement?.(laneId) ?? null;
+        const sess = useSessionAudio.getState();
+        audioDbg.logAudio('close.state', {
+          laneId, mode: borrow ? 'borrow-return' : 'no-borrow',
+          sessionMuted: sess.isMuted,
+          elMuted: el?.muted ?? null, elVolume: el?.volume ?? null,
+          elPaused: el?.paused ?? null,
+          elCurrentTime: el ? +el.currentTime.toFixed(3) : null,
+        });
+        const resumeKey = borrow?.ownerKey ?? null;
+        setTimeout(() => {
+          try {
+            const el2 = (VideoEngine as unknown as { _debugGetElement?: (id: string) => HTMLMediaElement | null })._debugGetElement?.(laneId) ?? null;
+            audioDbg.logAudio('tile.resume', {
+              laneId, ownerKey: resumeKey,
+              muted: el2?.muted ?? null, volume: el2?.volume ?? null,
+              paused: el2?.paused ?? null,
+              currentTime: el2 ? +el2.currentTime.toFixed(3) : null,
+              lastPos: resumeKey ? +VideoEngine.getLastPos(resumeKey).toFixed(3) : null,
+            });
+          } catch {}
+          audioDbg.endOpen();
+        }, 500);
+      } catch {}
+    }
     if (borrow) {
       // handback = returnBorrow tail done (approximated on next frame); tileLive
       // = lane playing on tile (armed on the borrowed lane's next 'playing').
