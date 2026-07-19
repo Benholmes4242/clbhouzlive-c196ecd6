@@ -206,23 +206,13 @@ export function HubMixedGrid({
       <div ref={sentinelRef} style={{ height: 1 }} />
 
       {isFetchingNextPage ? (
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            padding: '16px 0',
-          }}
-        >
-          <div
-            style={{
-              width: 26,
-              height: 26,
-              borderRadius: 999,
-              border: '3px solid rgba(0,0,0,0.08)',
-              borderTopColor: '#F7931E',
-              animation: 'hub-mixed-spin 0.9s linear infinite',
-            }}
-          />
+        <div style={{ display: 'flex', gap: 4, padding: '16px 4px 0' }}>
+          <div style={{ flex: 1 }}>
+            <SkeletonTile aspect="9 / 14" />
+          </div>
+          <div style={{ flex: 1 }}>
+            <SkeletonTile aspect="16 / 9" />
+          </div>
         </div>
       ) : null}
     </section>
