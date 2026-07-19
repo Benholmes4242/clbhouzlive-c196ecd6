@@ -308,6 +308,17 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
+function CourseRowSkeleton() {
+  return (
+    <div style={{ padding: '12px 16px', borderTop: '1px solid rgba(15,23,42,0.06)', display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div className="clb-shimmer-light" style={{ width: 34, height: 34, borderRadius: 12, background: 'rgba(0,0,0,0.06)', flex: 'none' }} />
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div className="clb-shimmer-light" style={{ height: 12, width: '55%', borderRadius: 6, background: 'rgba(0,0,0,0.06)' }} />
+        <div className="clb-shimmer-light" style={{ height: 10, width: '30%', borderRadius: 6, background: 'rgba(0,0,0,0.06)' }} />
+      </div>
+    </div>
+  );
+
 function CourseRow({
   row,
   onToggle,
