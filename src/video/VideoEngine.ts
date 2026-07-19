@@ -292,8 +292,16 @@ class VideoEngineImpl {
     // silent when the session is muted. The declared policy re-asserts
     // naturally at the next mount / policy application. Routing through
     // setMuted preserves the ONE_UNMUTED_LANE invariant.
-    if (this.lanes.get(laneId)) {
+    const lane = this.lanes.get(laneId);
+    if (lane) {
       this.setMuted(laneId, useSessionAudio.getState().isMuted);
+      logAudio('handback.done', {
+        laneId,
+        elMutedAfter: lane.el.muted,
+        elVolumeAfter: lane.el.volume,
+        elPausedAfter: lane.el.paused,
+        msSinceOpen: msSinceOpen(),
+      });
     }
   }
 
