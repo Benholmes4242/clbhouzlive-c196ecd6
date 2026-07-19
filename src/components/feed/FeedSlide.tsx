@@ -618,23 +618,25 @@ const FullscreenVideoSlot: React.FC<{
     });
   }, [isActive, isBorrowSlide, resumeKey, startPosition]);
 
-  // ── AudioDebug: cold.audio at the (non-borrow) fullscreen slot bind.
+  // ── AUDIO PUSHDOWN (cold) + AudioDebug cold.audio at slot bind.
+  // Runs the pushdown unconditionally; HUD events are only logged when
+  // audioDebug is on.
   const audioDbgColdRef = React.useRef(false);
   React.useEffect(() => {
     if (isBorrowSlide) { audioDbgColdRef.current = false; return; }
     if (!isActive) { audioDbgColdRef.current = false; return; }
     if (audioDbgColdRef.current) return;
-    if (!audioDbg.audioDebugEnabled()) return;
     audioDbgColdRef.current = true;
     try {
-      const el = (VideoEngine as unknown as { _debugGetElement?: (id: string) => HTMLMediaElement | null })._debugGetElement?.('fullscreen') ?? null;
-      // ── AUDIO PUSHDOWN (cold): reuse the engine's session-policy apply so
-      // the freshly-bound fullscreen lane inherits current useSessionAudio
-      // state at open time. No-op when session is muted (elements default
-      // to muted); never unmutes against session intent.
+      const elPre = (VideoEngine as unknown as { _debugGetElement?: (id: string) => HTMLMediaElement | null })._debugGetElement?.('fullscreen') ?? null;
+      // Reuse the engine's session-policy apply so the freshly-bound
+      // fullscreen lane inherits current useSessionAudio state at open time.
+      // No-op when session is muted (elements default muted); never unmutes
+      // against session intent.
       const sessionMuted = useSessionAudio.getState().isMuted;
-      const elMutedBefore = el?.muted ?? null;
+      const elMutedBefore = elPre?.muted ?? null;
       try { VideoEngine.applyLaneAudioPolicy('fullscreen'); } catch {}
+      if (!audioDbg.audioDebugEnabled()) return;
       const elAfter = (VideoEngine as unknown as { _debugGetElement?: (id: string) => HTMLMediaElement | null })._debugGetElement?.('fullscreen') ?? null;
       audioDbg.logAudio('audio.pushdown', {
         site: 'cold', laneId: 'fullscreen', sessionMuted,
@@ -642,7 +644,7 @@ const FullscreenVideoSlot: React.FC<{
       });
       audioDbg.logAudio('cold.audio', {
         laneId: 'fullscreen', ownerKey: resumeKey,
-        srcSet: !!el?.currentSrc,
+        srcSet: !!elAfter?.currentSrc,
         muted: elAfter?.muted ?? null, volume: elAfter?.volume ?? null,
         paused: elAfter?.paused ?? null,
         currentTime: elAfter ? +elAfter.currentTime.toFixed(3) : null,
@@ -651,9 +653,7 @@ const FullscreenVideoSlot: React.FC<{
       audioDbg.setSummary({
         fsPos: elAfter ? +elAfter.currentTime.toFixed(2) : null,
       });
-      // Snapshot play() promise outcome on the next tick — the engine kicked
-      // off play() before our effect ran; observe via the resulting el.paused
-      // state after a short delay. NotAllowedError surfaces as still-paused.
+      // Snapshot play() promise outcome on the next tick.
       setTimeout(() => {
         try {
           const el2 = (VideoEngine as unknown as { _debugGetElement?: (id: string) => HTMLMediaElement | null })._debugGetElement?.('fullscreen') ?? null;
