@@ -277,9 +277,9 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
                 selection={{
                   courseId: course.id,
                   courseName: course.name,
-                  courseRegion: (course as any).region ?? null,
-                  courseCountry: (course as any).country ?? null,
-                  courseType: (course as any).course_type ?? null,
+                  courseRegion: course.region ?? null,
+                  courseCountry: course.country ?? null,
+                  courseType: course.course_type ?? null,
                 }}
                 hideHeader
                 theme="light"
