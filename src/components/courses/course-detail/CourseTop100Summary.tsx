@@ -50,7 +50,7 @@ export function CourseTop100Summary({ userId }: CourseTop100SummaryProps) {
     bySlug('gb-i'),
     bySlug('usa'),
     bySlug('europe'),
-  ].filter(Boolean);
+  ].filter((l): l is Top100ListProgress => Boolean(l));
 
   const regionsText = t('courseDetail.top100Summary.regionsCount', { count: regions });
 
