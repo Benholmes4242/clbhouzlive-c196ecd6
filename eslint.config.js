@@ -254,6 +254,42 @@ export default tseslint.config(
       "i18next/no-literal-string": ["error", i18nLiteralOptions],
       "no-restricted-syntax": ["error", literalAttrSyntax, ...toLocaleSyntax],
     },
+  },
+  // ─── fsv2 clean-room fence ─────────────────────────────────────────
+  // Isolate the V2 fullscreen viewer from V1 internals and any shared
+  // media/borrow lifecycle. Permitted app-service imports (supabase
+  // client, session audio, chrome/status-bar helpers, media-system
+  // types, bodyScrollLock, engagementBus, perf helpers, design tokens)
+  // are allowed by omission.
+  {
+    files: ["src/features/fsv2/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: [
+                "@/video/*",
+                "src/video/*",
+                "@/components/fullscreen-feed/*",
+                "src/components/fullscreen-feed/*",
+                "@/components/feed/FeedSlide*",
+                "src/components/feed/FeedSlide*",
+                "@/lib/openWithOrigin*",
+                "src/lib/openWithOrigin*",
+                "@/components/feed/SnapFeed*",
+                "src/components/feed/SnapFeed*",
+                "@/store/fullscreenFeedStore*",
+                "src/store/fullscreenFeedStore*",
+              ],
+              message:
+                "fsv2 is a clean-room rebuild. Do not import from V1 fullscreen/video internals. See BRIEF: Fullscreen Viewer V2 Phase 1.",
+            },
+          ],
+        },
+      ],
+    },
   }
 
 );

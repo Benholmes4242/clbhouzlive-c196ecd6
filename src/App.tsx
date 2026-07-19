@@ -63,6 +63,7 @@ import { InviteSheetProvider } from '@/components/invite/InviteSheetProvider';
 import { useUploadGuard } from '@/hooks/useUploadGuard';
 import { FLAGS } from '@/config/flags';
 import { FEATURE_FLAGS } from '@/config/featureFlags';
+import { Fsv2Overlay } from '@/features/fsv2';
 
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
 import { CoursesListSkeleton } from '@/components/skeletons/CoursesListSkeleton';
@@ -932,6 +933,7 @@ const AppInner: React.FC = () => {
                                             </Suspense>
                                             {/* Fullscreen Feed Overlay - portal-based, renders above everything */}
                                             <FullscreenFeedOverlay />
+                                            {FLAGS.fsv2 ? <Fsv2Overlay /> : null}
                                             
                                             {/* Unified ReviewBottomSheet portal — single mount, store-driven */}
                                             <ReviewBottomSheetPortal />
