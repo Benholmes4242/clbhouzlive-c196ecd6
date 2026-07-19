@@ -539,8 +539,10 @@ const ClubhouseContent = () => {
             onReport={() => handleReport(activePost)}
             onNotInterested={() => handleNotInterested(activePost)}
             onCopyLink={() => {
-              navigator.clipboard.writeText(`${window.location.origin}/post/${activePost.id}`);
-              toast.success('Link copied');
+              navigator.clipboard
+                .writeText(`${window.location.origin}/post/${activePost.id}`)
+                .then(() => toast.success('Link copied'))
+                .catch(() => toast.error('Could not copy link'));
               setMoreOptionsOpen(false);
             }}
           />
