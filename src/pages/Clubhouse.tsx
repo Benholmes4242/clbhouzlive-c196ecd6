@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { useQueryClient, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ClubhouseIslandTabs } from '@/components/clubhouse/ClubhouseIslandTabs';
 import { useSetChromeLeftSlot, useSetChromeSuppressed } from '@/features/chrome-v2/leftOverride';
@@ -7,12 +7,10 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { useHeaderVariant } from '@/hooks/useHeaderVisibility';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from '@/lib/toast';
-import { supabase } from '@/integrations/supabase/client';
 import { SeasonRecapModal } from '@/components/achievements/SeasonRecapModal';
 
 import { useSeasonRecap } from '@/hooks/useSeasonRecap';
 
-import { Compass, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 // Chrome owned solely by AppRoutes; no local status-bar imports.
 
@@ -32,8 +30,7 @@ import { FeedErrorBoundary } from '@/components/feed/FeedErrorBoundary';
 import { safeInitialState } from '@/components/feed/feedSnapshot';
 import type { StateSnapshot } from 'react-virtuoso';
 
-import { FullscreenCarouselOverlay } from '@/components/media/FullscreenCarouselOverlay';
-import { CarouselDots } from '@/components/media/CarouselDots';
+// FullscreenCarouselOverlay is referenced by legacy consumers (see comment below).
 import { useClubhouseStore } from '@/store/clubhouseStore';
 
 // ── Data hooks ──
@@ -44,7 +41,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 
 // ── Clubhouse UI overlays ──
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
-import { FriendsEmptyState } from '@/components/clubhouse/FriendsEmptyState';
+
 
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { useReviewerStats } from '@/hooks/useReviewerStats';
@@ -66,12 +63,14 @@ import { useClubhouseShare } from '@/components/clubhouse/hooks/useClubhouseShar
 import { useClubhouseFeedNav } from '@/components/clubhouse/hooks/useClubhouseFeedNav';
 
 import { MoreOptionsDrawer } from '@/components/clubhouse/MoreOptionsDrawer';
+import { ClubhouseEmptyState } from '@/components/clubhouse/ClubhouseEmptyState';
 
 
 
 const ClubhouseContent = () => {
   const { isRehydrating } = useRehydrationSafe();
-  const queryClient = useQueryClient();
+
+
 
   // Note: do NOT invalidate the suggested feed on every mount — it caused a
   // cold refetch + full video/HLS teardown each time the user returned to
@@ -111,8 +110,6 @@ const ClubhouseContent = () => {
   
   // ── Store wiring ──
   const activeIndex = useClubhouseStore(s => s.activeIndex);
-  const carouselPositions = useClubhouseStore(s => s.carouselPositions);
-  const currentMediaIndex = carouselPositions.get(activeIndex) ?? 0;
   const isTournamentCardActive = useClubhouseStore(s => s.isTournamentCardActive);
   const setStoreActiveTab = useClubhouseStore(s => s.setActiveTab);
 
@@ -211,12 +208,31 @@ const ClubhouseContent = () => {
   usePageReady(skeletonMode === 'hidden');
 
 
-  // Effect 2: Once feed is ready, gate on tournament card state
+  // Apple 2.1 safety net: never let the skeleton be the terminal state.
+  // If the feed has not produced posts within 12s, stop blocking on
+  // skeletons so the empty/error surface can render and the reviewer
+  // (or any user behind a VPN / restrictive webview) sees a usable screen.
+  const [skeletonTimedOut, setSkeletonTimedOut] = useState(false);
   useEffect(() => {
-    if (!skeletonVisible) {
+    if (!isLoading && posts.length > 0) {
+      setSkeletonTimedOut(false);
+      return;
+    }
+    const id = window.setTimeout(() => {
+      setSkeletonTimedOut(true);
+    }, 12000);
+    return () => window.clearTimeout(id);
+  }, [isLoading, posts.length, activeTab, user, authLoading]);
+
+  // Effect 2: Once feed is ready, gate on tournament card state.
+  // Also restore nav on terminal empty/error states and skeleton timeout so
+  // the user is never trapped when the feed produces zero posts.
+  const isTerminalEmpty = !isLoading && posts.length === 0;
+  useEffect(() => {
+    if (!skeletonVisible || isTerminalEmpty || skeletonTimedOut) {
       setBottomNavVisible(!isTournamentCardActive);
     }
-  }, [skeletonVisible, isTournamentCardActive, setBottomNavVisible]);
+  }, [skeletonVisible, isTerminalEmpty, skeletonTimedOut, isTournamentCardActive, setBottomNavVisible]);
 
   // ── Lifecycle ──
   useClubhouseLifecycle();
@@ -236,23 +252,21 @@ const ClubhouseContent = () => {
   }, [activeTab, posts.length]);
   
   // ── Active post derivation ──
-  const { activePost, golfCourse, activeReview, isActiveReview, isActiveVideo } = useActivePostDerived(posts, activeIndex);
-  
+  const { activePost } = useActivePostDerived(posts, activeIndex);
+
   // ── Optimistic like state ──
-  const { handleLike, getActiveLikeState, resetLikes } = useClubhouseLikes({ userId: user?.id, activeActor });
-  const activeLikeState = getActiveLikeState(activePost);
+  const { handleLike, getActiveLikeState } = useClubhouseLikes({ userId: user?.id, activeActor });
 
   // Editorial like-count query removed in C4 — CommentsSheetV2 owns its own
   // counts and the editorial mount no longer needs likesCount plumbing.
 
 
-  
+
   // ── Optimistic follow state ──
-  const { followOverrides, handleFollow, handleFollowChange, getFollowState, resetFollows } = useClubhouseFollows({ userId: user?.id });
-  const isActivePostFollowed = getFollowState(activePost);
-  
+  const { handleFollow, getFollowState, resetFollows } = useClubhouseFollows({ userId: user?.id });
+
   // ── Comments state ──
-  const { commentsOpen, overlayVisible, openComments, closeComments, getCommentCount, resetComments } = useClubhouseComments(activeActor);
+  const { commentsOpen, openComments, closeComments, getCommentCount, resetComments } = useClubhouseComments(activeActor);
 
   // Conditionally mount CommentsSheet so its hooks/subtrees don't exist while closed.
   // Keep it mounted through the exit animation (~500ms spring) so close still animates.
@@ -279,20 +293,14 @@ const ClubhouseContent = () => {
     onTabSwitch: () => {
       resetFollows();
       resetComments();
-      if (!(activeFeed as any).hasEverLoaded) {
+      if (!(activeFeed as { hasEverLoaded?: boolean }).hasEverLoaded) {
         resetSkeleton();
       }
     },
   });
   
-  // ── Carousel media index ──
-  const activeMediaCount = activePost?.mediaItems?.length ?? 0;
-  
-  // ── Navigation to profile ──
-  const handleViewProfile = useCallback(() => {
-    if (!activePost) return;
-    navigate(getActorRouteByType(activePost.actorType, activePost.actorId));
-  }, [activePost, navigate]);
+
+
 
   // Season Recap Modal
   const { data: seasonRecap } = useSeasonRecap(user?.id);
@@ -351,21 +359,6 @@ const ClubhouseContent = () => {
   const showRehydrationSkeleton = isRehydrating && (isLoading || posts.length > 0);
 
 
-  // Apple 2.1 safety net: never let the skeleton be the terminal state.
-  // If the feed has not produced posts within 12s, stop blocking on
-  // skeletons so the empty/error surface can render and the reviewer
-  // (or any user behind a VPN / restrictive webview) sees a usable screen.
-  const [skeletonTimedOut, setSkeletonTimedOut] = useState(false);
-  useEffect(() => {
-    if (!isLoading && posts.length > 0) {
-      setSkeletonTimedOut(false);
-      return;
-    }
-    const id = window.setTimeout(() => {
-      setSkeletonTimedOut(true);
-    }, 12000);
-    return () => window.clearTimeout(id);
-  }, [isLoading, posts.length, activeTab, user, authLoading]);
 
 
   // Guard: wait for auth to resolve before evaluating feed state — but
@@ -386,76 +379,16 @@ const ClubhouseContent = () => {
   // This fixes the Apple 2.1 cold-load symptom where skeletons never
   // resolved because hasPosts (posts.length > 0) was never true.
   if (!isLoading && posts.length === 0) {
-    return activeTab === 'friends' ? (
-      !user ? (
-        <div
-          className="flex flex-col items-center justify-center min-h-screen px-8 text-center"
-          style={{ background: '#15171F', paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)' }}
-        >
-          <div className="w-14 h-14 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(255,255,255,0.06)' }}>
-            <Users className="w-7 h-7" style={{ color: 'rgba(255,255,255,0.5)' }} />
-          </div>
-          <p className="text-[17px] font-semibold mb-1" style={{ color: '#FFFFFF' }}>Sign in to see your friends</p>
-          <p className="text-[13px] leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.7)' }}>
-            Create an account or sign in to start following golfers.
-          </p>
-          <button
-            onClick={() => navigate('/auth')}
-            style={{ background: '#F7931E', color: '#0F172A', fontWeight: 600, fontSize: 15, padding: '12px 24px', borderRadius: 12, border: 'none' }}
-          >
-            Sign in
-          </button>
-        </div>
-      ) : activeFeed.isError ? (
-        <div
-          className="flex flex-col items-center justify-center min-h-screen px-8 text-center"
-          style={{ background: '#15171F', paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)' }}
-        >
-          <div className="w-14 h-14 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(255,255,255,0.06)' }}>
-            <Users className="w-7 h-7" style={{ color: 'rgba(255,255,255,0.5)' }} />
-          </div>
-          <p className="text-[17px] font-semibold mb-1" style={{ color: '#FFFFFF' }}>Couldn’t load your feed</p>
-          <p className="text-[13px] leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.7)' }}>Tap retry to try again.</p>
-          <button
-            onClick={() => activeFeed.refetch?.()}
-            style={{ background: '#0F172A', color: '#FFFFFF', fontWeight: 600, fontSize: 15, padding: '12px 24px', borderRadius: 12, border: 'none' }}
-          >
-            Retry
-          </button>
-        </div>
-      ) : (
-        <FriendsEmptyState userId={user.id} onSeeYourFeed={() => activeFeed.refetch?.()} />
-      )
-    ) : (
-      <div
-        className="flex flex-col items-center justify-center min-h-screen px-8 text-center"
-        style={{ background: '#15171F', paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)' }}
-      >
-        <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(255,255,255,0.06)' }}>
-          <Compass className="w-8 h-8" style={{ color: 'rgba(255,255,255,0.5)' }} />
-        </div>
-        <p className="text-lg font-semibold mb-1" style={{ color: '#FFFFFF' }}>
-          {!user ? 'Sign in to see your feed' : (activeFeed.isError ? 'Couldn’t load your feed' : 'No posts to show')}
-        </p>
-        <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,0.7)' }}>
-          {!user ? 'Create an account or sign in to get started.' : (activeFeed.isError ? 'Tap retry to try again.' : 'Check back soon for new content')}
-        </p>
-        {!user ? (
-          <button
-            onClick={() => navigate('/auth')}
-            style={{ background: '#F7931E', color: '#0F172A', fontWeight: 600, fontSize: 15, padding: '12px 24px', borderRadius: 12, border: 'none' }}
-          >
-            Sign in
-          </button>
-        ) : (
-          <button
-            onClick={() => activeFeed.refetch?.()}
-            style={{ background: '#0F172A', color: '#FFFFFF', fontWeight: 600, fontSize: 15, padding: '12px 24px', borderRadius: 12, border: 'none' }}
-          >
-            Retry
-          </button>
-        )}
-      </div>
+    return (
+      <ClubhouseEmptyState
+        activeTab={activeTab}
+        user={user}
+        isError={activeFeed.isError}
+        onSignIn={() => navigate('/auth')}
+        onRetry={() => activeFeed.refetch?.()}
+        userId={user?.id}
+        onSeeYourFeed={() => activeFeed.refetch?.()}
+      />
     );
   }
 
@@ -517,78 +450,16 @@ const ClubhouseContent = () => {
       <ClubhouseSkeletonShimmer isVisible={showRehydrationSkeleton} isStatic={false} variant={posts[0]?.isReview ? 'review' : 'regular'} isVideo={posts[0]?.mediaItems?.[0]?.type === 'video'} surface="card" />
 
       {/* ═══ MAIN FEED AREA ═══ */}
-      {((!isLoading && posts.length === 0) || (skeletonTimedOut && posts.length === 0)) ? (
-        activeTab === 'friends' ? (
-          !user ? (
-            <div
-              className="flex flex-col items-center justify-center min-h-screen px-8 text-center"
-              style={{ background: '#15171F', paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)' }}
-            >
-              <div className="w-14 h-14 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(255,255,255,0.06)' }}>
-                <Users className="w-7 h-7" style={{ color: 'rgba(255,255,255,0.5)' }} />
-              </div>
-              <p className="text-[17px] font-semibold mb-1" style={{ color: '#FFFFFF' }}>Sign in to see your friends</p>
-              <p className="text-[13px] leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.7)' }}>
-                Create an account or sign in to start following golfers.
-              </p>
-              <button
-                onClick={() => navigate('/auth')}
-                style={{ background: '#F7931E', color: '#0F172A', fontWeight: 600, fontSize: 15, padding: '12px 24px', borderRadius: 12, border: 'none' }}
-              >
-                Sign in
-              </button>
-            </div>
-          ) : activeFeed.isError ? (
-            <div
-              className="flex flex-col items-center justify-center min-h-screen px-8 text-center"
-              style={{ background: '#15171F', paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)' }}
-            >
-              <div className="w-14 h-14 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(255,255,255,0.06)' }}>
-                <Users className="w-7 h-7" style={{ color: 'rgba(255,255,255,0.5)' }} />
-              </div>
-              <p className="text-[17px] font-semibold mb-1" style={{ color: '#FFFFFF' }}>Couldn’t load your feed</p>
-              <p className="text-[13px] leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.7)' }}>Tap retry to try again.</p>
-              <button
-                onClick={() => activeFeed.refetch?.()}
-                style={{ background: '#0F172A', color: '#FFFFFF', fontWeight: 600, fontSize: 15, padding: '12px 24px', borderRadius: 12, border: 'none' }}
-              >
-                Retry
-              </button>
-            </div>
-          ) : (
-            <FriendsEmptyState userId={user.id} onSeeYourFeed={() => activeFeed.refetch?.()} />
-          )
-        ) : (
-          <div
-            className="flex flex-col items-center justify-center min-h-screen px-8 text-center"
-            style={{ background: '#15171F', paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)' }}
-          >
-            <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(255,255,255,0.06)' }}>
-              <Compass className="w-8 h-8" style={{ color: 'rgba(255,255,255,0.5)' }} />
-            </div>
-            <p className="text-lg font-semibold mb-1" style={{ color: '#FFFFFF' }}>
-              {!user ? 'Sign in to see your feed' : (activeFeed.isError ? 'Couldn’t load your feed' : 'No posts to show')}
-            </p>
-            <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,0.7)' }}>
-              {!user ? 'Create an account or sign in to get started.' : (activeFeed.isError ? 'Tap retry to try again.' : 'Check back soon for new content')}
-            </p>
-            {!user ? (
-              <button
-                onClick={() => navigate('/auth')}
-                style={{ background: '#F7931E', color: '#0F172A', fontWeight: 600, fontSize: 15, padding: '12px 24px', borderRadius: 12, border: 'none' }}
-              >
-                Sign in
-              </button>
-            ) : (
-              <button
-                onClick={() => activeFeed.refetch?.()}
-                style={{ background: '#0F172A', color: '#FFFFFF', fontWeight: 600, fontSize: 15, padding: '12px 24px', borderRadius: 12, border: 'none' }}
-              >
-                Retry
-              </button>
-            )}
-          </div>
-        )
+      {(skeletonTimedOut && posts.length === 0) ? (
+        <ClubhouseEmptyState
+          activeTab={activeTab}
+          user={user}
+          isError={activeFeed.isError}
+          onSignIn={() => navigate('/auth')}
+          onRetry={() => activeFeed.refetch?.()}
+          userId={user?.id}
+          onSeeYourFeed={() => activeFeed.refetch?.()}
+        />
       ) : posts.length > 0 ? (
         <>
           <FeedErrorBoundary
@@ -647,7 +518,9 @@ const ClubhouseContent = () => {
         <>
           {(() => {
             const isEditorial = activePost.postType === 'course_of_week_card';
-            const editorialId = isEditorial ? (activePost as any).cardData?.cardId : null;
+            const editorialId = isEditorial
+              ? (activePost as { cardData?: { cardId?: string } }).cardData?.cardId ?? null
+              : null;
             return (
               <CommentsSheetV2
                 isOpen={commentsOpen}
@@ -666,8 +539,10 @@ const ClubhouseContent = () => {
             onReport={() => handleReport(activePost)}
             onNotInterested={() => handleNotInterested(activePost)}
             onCopyLink={() => {
-              navigator.clipboard.writeText(`${window.location.origin}/post/${activePost.id}`);
-              toast.success('Link copied');
+              navigator.clipboard
+                .writeText(`${window.location.origin}/post/${activePost.id}`)
+                .then(() => toast.success('Link copied'))
+                .catch(() => toast.error('Could not copy link'));
               setMoreOptionsOpen(false);
             }}
           />
