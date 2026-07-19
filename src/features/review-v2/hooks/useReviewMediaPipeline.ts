@@ -268,7 +268,7 @@ export function useReviewMediaPipeline({ userId, existingMedia }: UseReviewMedia
             status: 'attached',
             owner_user_id: userId,
             ...dims,
-          } as any)
+          })
           .select('id')
           .single();
 
