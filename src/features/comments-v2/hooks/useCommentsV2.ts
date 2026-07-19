@@ -268,9 +268,8 @@ export function useCommentsV2({
           .select('comment_count')
           .eq('id', targetId)
           .maybeSingle();
-        if (data && typeof (data as any).comment_count === 'number') {
-          return (data as any).comment_count as number;
-        }
+        const cc = (data as { comment_count?: number } | null)?.comment_count;
+        if (typeof cc === 'number') return cc;
       }
       let cq = supabase
         .from('comments_v2')
