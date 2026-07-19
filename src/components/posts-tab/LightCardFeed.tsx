@@ -18,7 +18,6 @@ import { Virtuoso } from 'react-virtuoso';
 import type { FeedPost } from '@/components/media-system/types/media';
 import type { ActiveActor } from '@/types/actor';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
-import { openWithOrigin } from '@/lib/openWithOrigin';
 import { openFsv2 } from '@/features/fsv2';
 import { FLAGS } from '@/config/flags';
 import { isPerfEnabled } from '@/perf/navTiming';
