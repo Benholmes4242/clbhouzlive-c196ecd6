@@ -145,6 +145,7 @@ const AuthForm: React.FC = () => {
   const handleUseDifferentEmail = () => {
     setStep('hero');
     setOtpError(null);
+    setOtpInfo(null);
     setResendCooldown(0);
   };
 
