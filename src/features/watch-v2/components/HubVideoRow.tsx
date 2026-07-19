@@ -16,6 +16,7 @@ import { openWithOrigin } from '@/lib/openWithOrigin';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { VideoCardMoreButton } from './VideoCardMoreButton';
+import type { HubRpcRow } from '../utils/toFeedPost';
 
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
@@ -27,7 +28,7 @@ function Card({
   posts,
   isAutoplayActive,
 }: {
-  row: any;
+  row: HubRpcRow;
   post: FeedPost;
   index: number;
   posts: FeedPost[];
@@ -86,7 +87,7 @@ function Card({
       onPrerouteCancel={onPrerouteCancel}
       data-watch-tile-index={index}
       data-post-id={post.id}
-      style={{ width: 374, flexShrink: 0, cursor: 'pointer', fontFamily: FONT_FAMILY }}
+      style={{ width: 'min(374px, calc(100vw - 32px))', flexShrink: 0, cursor: 'pointer', fontFamily: FONT_FAMILY }}
     >
       <div
         style={{
@@ -222,7 +223,7 @@ function Card({
 
 function SkeletonCard() {
   return (
-    <div style={{ width: 374, flexShrink: 0 }}>
+    <div style={{ width: 'min(374px, calc(100vw - 32px))', flexShrink: 0 }}>
       <div
         style={{
           aspectRatio: '16 / 9',
@@ -239,7 +240,7 @@ export function HubVideoRow() {
   const { user } = useSupabaseSession();
   const { data, isLoading } = useHubLongFormVideos(user?.id);
 
-  const rows = (data ?? []) as any[];
+  const rows = (data ?? []) as HubRpcRow[];
   const feedPosts = useMemo(() => toFeedPosts(rows), [rows]);
   const { activeIndices, railRef } = useWatchAutoplay({
     railId: 'hub-video-row',
@@ -293,6 +294,12 @@ export function HubVideoRow() {
               role="button"
               tabIndex={0}
               onClick={() => navigate('/watch/videos')}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  navigate('/watch/videos');
+                }
+              }}
               style={{
                 width: 120,
                 flexShrink: 0,

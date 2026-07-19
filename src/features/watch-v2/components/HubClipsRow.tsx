@@ -11,6 +11,7 @@ import { openWithOrigin } from '@/lib/openWithOrigin';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useNavigate } from 'react-router-dom';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import type { HubRpcRow } from '../utils/toFeedPost';
 
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
@@ -22,7 +23,7 @@ function Tile({
   posts,
   isAutoplayActive,
 }: {
-  row: any;
+  row: HubRpcRow;
   post: FeedPost;
   index: number;
   posts: FeedPost[];
@@ -174,7 +175,7 @@ export function HubClipsRow() {
   const { user } = useSupabaseSession();
   const { data, isLoading } = useHubQuickClips(user?.id);
 
-  const rows = (data ?? []) as any[];
+  const rows = (data ?? []) as HubRpcRow[];
   const feedPosts = useMemo(() => toFeedPosts(rows), [rows]);
   const { activeIndices, railRef } = useWatchAutoplay({
     railId: 'hub-clips-row',
@@ -228,6 +229,12 @@ export function HubClipsRow() {
               role="button"
               tabIndex={0}
               onClick={() => navigate('/watch/clips')}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  navigate('/watch/clips');
+                }
+              }}
               style={{
                 width: 143,
                 flexShrink: 0,
