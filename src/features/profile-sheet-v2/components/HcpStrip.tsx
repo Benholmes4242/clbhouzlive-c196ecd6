@@ -86,6 +86,22 @@ export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
     <span style={{ color: MUTED, fontSize: 15, marginLeft: 'auto' }}>{CHEVRON}</span>
   );
 
+  // Loading state: shimmer strip in the exact stripBase geometry so there is
+  // zero layout shift when the real state lands. Never show the connect CTA
+  // or an index until the connection query has resolved.
+  if (connectionLoading) {
+    return (
+      <div style={stripBase} aria-hidden>
+        {eyebrow}
+        <div
+          className="clb-shimmer-light rounded-sm"
+          style={{ width: 60, height: 22, background: 'rgba(15,23,42,0.06)' }}
+        />
+        {chevron}
+      </div>
+    );
+  }
+
   // Disconnected state
   if (!connection) {
     return (
