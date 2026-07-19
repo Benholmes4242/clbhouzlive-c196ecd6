@@ -202,7 +202,7 @@ export function useCommentsV2({
         verified: !!b?.is_verified,
       };
     } else {
-      const p: any = enrichment?.profileMap.get(aId);
+      const p = enrichment?.profileMap.get(aId);
       info = {
         actor_type: 'personal',
         actor_id: aId,
