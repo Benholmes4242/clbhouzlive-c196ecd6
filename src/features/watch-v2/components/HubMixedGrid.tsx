@@ -42,6 +42,8 @@ export function HubMixedGrid({
     isFetching,
     isFetchingNextPage,
     isLoading,
+    isError,
+    refetch,
   } = useHubMixedGrid(user?.id, filter);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
