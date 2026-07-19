@@ -32,6 +32,7 @@ import { SubmitBar } from './components/SubmitBar';
 import { SuccessScreenV2 } from './components/SuccessScreenV2';
 import { RemoveReviewSheetV2 } from './components/RemoveReviewSheetV2';
 import type { ExistingMedia, ExistingReview, ReviewV2Course } from './types';
+import { RateCoursePageSkeleton } from '@/components/skeletons/RateCoursePageSkeleton';
 
 
 
