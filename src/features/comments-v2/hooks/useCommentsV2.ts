@@ -234,11 +234,12 @@ export function useCommentsV2({
 
   const threads = useMemo<CommentV2[]>(() => {
     if (!parents.length) return [];
-    const isBlocked = (r: any) => blockedIds.has(r.user_id) || (r.actor_type !== 'business' && r.actor_id && blockedIds.has(r.actor_id));
-    const byParent = new Map<string, any[]>();
-    for (const r of replies) {
+    const isBlocked = (r: RawCommentRow) => blockedIds.has(r.user_id) || (r.actor_type !== 'business' && !!r.actor_id && blockedIds.has(r.actor_id));
+    const byParent = new Map<string, RawCommentRow[]>();
+    for (const r of replies as RawCommentRow[]) {
       if (hiddenIds.has(r.id)) continue;
       if (isBlocked(r)) continue;
+      if (!r.parent_id) continue;
       const list = byParent.get(r.parent_id) ?? [];
       list.push(r);
       byParent.set(r.parent_id, list);
