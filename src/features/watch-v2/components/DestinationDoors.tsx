@@ -25,6 +25,12 @@ function Door({ title, suffix, onClick, tone }: DoorProps) {
   return (
     <div
       onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick();
+        }
+      }}
       role="button"
       tabIndex={0}
       style={{
