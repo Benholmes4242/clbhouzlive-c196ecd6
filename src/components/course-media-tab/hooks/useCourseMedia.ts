@@ -55,11 +55,11 @@ export function useCourseMedia({ userId, courseId, filter }: UseCourseMediaParam
 
       if (error) throw error;
 
-      if (!data || data.length === 0) {
+      const rows = (data ?? []) as FeedRpcRow[];
+      if (rows.length === 0) {
         return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
       }
 
-      const rows = data as unknown as FeedRpcRow[];
       // Each row = one media item = one tile. Do NOT group by post.
       const posts = rows.map(mapRowToFeedPost);
 
