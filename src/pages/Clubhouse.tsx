@@ -30,8 +30,7 @@ import { FeedErrorBoundary } from '@/components/feed/FeedErrorBoundary';
 import { safeInitialState } from '@/components/feed/feedSnapshot';
 import type { StateSnapshot } from 'react-virtuoso';
 
-import { FullscreenCarouselOverlay } from '@/components/media/FullscreenCarouselOverlay';
-import { CarouselDots } from '@/components/media/CarouselDots';
+// FullscreenCarouselOverlay is referenced by legacy consumers (see comment below).
 import { useClubhouseStore } from '@/store/clubhouseStore';
 
 // ── Data hooks ──
