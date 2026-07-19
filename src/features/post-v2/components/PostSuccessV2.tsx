@@ -75,8 +75,8 @@ type Phase = 'running' | 'complete' | 'failed';
 
 function UploadingState({ result, onDone }: Props) {
   const { t } = useTranslation(['composer', 'common']);
-  if (result.kind !== 'uploading') return null;
-  const jobId = result.jobId ?? null;
+  const isUploadingKind = result.kind === 'uploading';
+  const jobId = isUploadingKind ? (result.jobId ?? null) : null;
   const initial = jobId ? getJobSnapshot(jobId) : null;
   const [progress, setProgress] = useState<number>(initial?.overallProgress ?? 0);
   const [phase, setPhase] = useState<Phase>((initial?.phase as Phase) ?? 'running');
@@ -93,10 +93,13 @@ function UploadingState({ result, onDone }: Props) {
 
   // Auto-dismiss shortly after completion so the user does not need to tap.
   useEffect(() => {
+    if (!isUploadingKind) return;
     if (phase !== 'complete') return;
     const t = window.setTimeout(() => onDone(), 1200);
     return () => window.clearTimeout(t);
-  }, [phase, onDone]);
+  }, [isUploadingKind, phase, onDone]);
+
+  if (!isUploadingKind) return null;
 
   const isScheduled = !!result.isScheduled;
 
