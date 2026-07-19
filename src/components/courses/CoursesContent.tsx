@@ -131,6 +131,10 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
             <div style={{ padding: '32px 16px', textAlign: 'center', color: 'hsl(var(--muted-foreground))' }}>
               <p style={{ fontSize: 13, margin: 0 }}>{t('rateSheet.searching')}</p>
             </div>
+          ) : isError ? (
+            <div style={{ padding: '32px 16px', textAlign: 'center', color: 'hsl(var(--muted-foreground))' }}>
+              <p style={{ fontSize: 13, margin: 0 }}>Search isn't working right now — try again in a moment.</p>
+            </div>
           ) : results.length === 0 ? (
             <div style={{ padding: '32px 16px', textAlign: 'center', color: 'hsl(var(--muted-foreground))' }}>
               <p style={{ fontSize: 13, margin: 0 }}>{t('rateSheet.noResults', { query })}</p>
