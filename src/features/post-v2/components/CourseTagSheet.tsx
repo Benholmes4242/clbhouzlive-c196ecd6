@@ -80,16 +80,20 @@ export default function CourseTagSheet({
 
   useEffect(() => {
     if (!open) return;
+    let cancelled = false;
     const t = setTimeout(async () => {
-      if (q.trim().length === 0) { setRows([]); return; }
+      if (q.trim().length === 0) { setRows([]); setSearching(false); return; }
+      setSearching(true);
       const { data } = await supabase
         .from('golf_courses')
         .select('id, name, country, sub_country')
         .ilike('name', `%${q.trim()}%`)
         .limit(20);
+      if (cancelled) return;
       setRows((data ?? []) as Row[]);
+      setSearching(false);
     }, 180);
-    return () => clearTimeout(t);
+    return () => { cancelled = true; clearTimeout(t); };
   }, [q, open]);
 
   const showPopular = q.trim().length === 0;
