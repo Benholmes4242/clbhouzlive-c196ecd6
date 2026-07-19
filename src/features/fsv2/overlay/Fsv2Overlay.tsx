@@ -188,6 +188,7 @@ export const Fsv2Overlay: React.FC = () => {
 
   return (
     <div
+      ref={rootRef}
       role="dialog"
       aria-modal="true"
       style={{
