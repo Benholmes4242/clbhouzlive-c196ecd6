@@ -21,6 +21,7 @@ import {
   BUSINESS_ROLE_LABELS, BusinessMember, BusinessRole, AssignableBusinessRole,
 } from '@/hooks/useBusinessTeam';
 import { AccessRequestsSection } from '@/components/business/AccessRequestsSection';
+import JobTitleSheet from '@/components/business/JobTitleSheet';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
