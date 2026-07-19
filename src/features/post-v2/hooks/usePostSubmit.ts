@@ -95,6 +95,8 @@ export function usePostSubmit() {
       }
 
       // Birth the post via RPC (SECURITY INVOKER; RLS enforces actor rights).
+      // Visibility selector was deliberately removed in the v2 composer -
+      // all posts are public ('anyone'). Owner decision 2026-07-19.
       const { data: born, error: bornErr } = await supabase.rpc('create_post_v2', {
         p_actor_id: input.actorId,
         p_actor_type: input.actorType,
