@@ -3,11 +3,13 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { engagementBus } from '@/lib/engagementBus';
 import { applyEngagementDelta } from '@/lib/applyEngagementDelta';
 import type { LaneId } from '@/video/lanePolicy';
-import { vperfStart, vperfMark, vperfArmLane, vperfNextId } from '@/perf/vperf';
+import { vperfStart, vperfMark, vperfArmLane, vperfNextId, vperfCloseMotionTrace, vperfCloseMotionMark } from '@/perf/vperf';
 import { trace, traceLookup } from '@/perf/trace';
 import * as audioDbg from '@/perf/audioDebug';
 import { useSessionAudio, getLastUnmuteGestureTs } from '@/audio/sessionAudioStore';
 import { VideoEngine } from '@/video/VideoEngine';
+import { originHostRegistry } from '@/video/originHostRegistry';
+import { setLastCloseSnapshot } from '@/perf/positionContinuity';
 
 
 
