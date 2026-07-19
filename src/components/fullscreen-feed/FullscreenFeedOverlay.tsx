@@ -42,7 +42,7 @@ import type { BorrowDescriptor } from '@/store/fullscreenFeedStore';
 import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
 import { applyRouteChrome } from '@/lib/routeChrome';
 import { useSetChromeSuppressed } from '@/features/chrome-v2/leftOverride';
-import { resolveRestingRect, getCurrentViewport } from '@/lib/media/resolveRestingRect';
+import { resolveRestingRect, getCurrentViewport, readRawViewportSnapshot } from '@/lib/media/resolveRestingRect';
 import { FS_TRANSITION_MODE, FS_CUT_FADE_MS } from '@/lib/media/transitionMode';
 import { FS_OVERLAY_Z } from '@/lib/zLayers';
 import { trace as perfTrace } from '@/perf/trace';
