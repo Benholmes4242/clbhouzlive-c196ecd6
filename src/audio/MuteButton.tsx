@@ -41,6 +41,16 @@ export const MuteButton: React.FC<MuteButtonProps> = ({
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    // AudioDebug tap (flag-gated, no-op when off)
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const dbg = require('@/perf/audioDebug') as typeof import('@/perf/audioDebug');
+      if (dbg.audioDebugEnabled()) {
+        dbg.logAudio('viewer.mute.tap', {
+          controlled, before: { sessionMuted, isMuted },
+        });
+      }
+    } catch {}
     if (controlled) {
       onToggle?.();
     } else {
