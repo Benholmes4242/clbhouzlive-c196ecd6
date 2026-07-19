@@ -175,7 +175,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const { data: reviewsData, isLoading, isError, refetch } = useCourseReviews(
     courseId,
     sortBy,
-    hookRatingFilter as any,
+    hookRatingFilter,
     { 
       searchQuery: searchQuery.trim() || undefined,
       showMock: SHOW_MOCK_REVIEWS,
