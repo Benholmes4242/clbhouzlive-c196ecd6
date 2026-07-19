@@ -332,16 +332,16 @@ export function useCommentsV2({
   });
 
   const deleteComment = useMutation({
-    mutationFn: async (id: string) => {
+    mutationFn: async ({ id }: { id: string; replyCount: number }) => {
       const { data, error } = await supabase.rpc('delete_comment_v2', { p_id: id });
       if (error) throw error;
-      return data as any;
+      return data;
     },
-    onSuccess: () => {
+    onSuccess: (_data, vars) => {
       // Server trigger `comments_v2_count_dec` decrements posts.comment_count
-      // for both top-level and reply deletions. Mirror symmetrically.
+      // for both top-level and cascaded reply deletions. Mirror symmetrically.
       if (targetType === 'post') {
-        patchEngagement(qc, targetId, { commentCountDelta: -1 });
+        patchEngagement(qc, targetId, { commentCountDelta: -(1 + (vars.replyCount ?? 0)) });
       }
       invalidate();
     },
