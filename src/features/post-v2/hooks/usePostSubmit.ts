@@ -18,7 +18,10 @@ import type { StageMediaItem, StageCourse } from './useStageComposer';
 export interface SubmitInput {
   caption: string;
   media: StageMediaItem[];
+  /** Primary course - written to posts.course_id exactly as today. */
   course: StageCourse | null;
+  /** Full ordered tag list - written to posts.tagged_course_ids. */
+  courses?: StageCourse[];
   scheduledAt: Date | null;
   actorType: 'personal' | 'business';
   actorId: string;
