@@ -247,7 +247,7 @@ const CARD_BG = '#1B1E27';
 const HAIRLINE = 'rgba(255,255,255,0.08)';
 const CANVAS = '#15171F';
 
-const CardSkeleton: React.FC<{
+export const CardSkeleton: React.FC<{
   isStatic?: boolean;
   variant?: 'regular' | 'review';
   mediaRatio?: string;
