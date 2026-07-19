@@ -199,6 +199,7 @@ interface TiedChasersRowProps {
   count: number;
   score: string;
   thru: string;
+  today?: number | null;
   players: StackedAvatarPlayer[];
   par?: number;
   isLast?: boolean;
@@ -225,6 +226,7 @@ export function TiedChasersRow({
   count,
   score,
   thru,
+  today,
   players,
   par,
   isLast = false,
@@ -234,12 +236,14 @@ export function TiedChasersRow({
   const { t } = useTranslation('tourhub');
   const avgRounds = averageRounds(players);
   const hideThru = isResults;
+  const todayDisplay = today != null ? (today === 0 ? 'E' : today > 0 ? `+${today}` : String(today)) : '—';
+  const todayColor = today != null ? liveScoreColour(todayDisplay) : INK_45;
   return (
     <div
       onClick={onTap}
       style={{
         display: 'grid',
-        gridTemplateColumns: hideThru ? '32px 1fr 36px auto' : '32px 1fr 36px auto 42px',
+        gridTemplateColumns: hideThru ? '32px 1fr 36px auto' : '32px 1fr 36px 42px 42px auto',
         gap: 12,
         padding: '8px 20px',
         height: 40,
@@ -269,6 +273,16 @@ export function TiedChasersRow({
           ariaHidden
         />
       </div>
+      {!hideThru && (
+        <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 700, color: INK_45, textAlign: 'right' }}>
+          {thru}
+        </span>
+      )}
+      {!hideThru && (
+        <span style={{ ...NUMERIC_STYLE, fontSize: 13, fontWeight: 700, color: todayColor, textAlign: 'right' }}>
+          {todayDisplay}
+        </span>
+      )}
       <span
         style={{
           ...NUMERIC_STYLE,
@@ -281,11 +295,6 @@ export function TiedChasersRow({
       >
         {score}
       </span>
-      {!hideThru && (
-        <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 700, color: INK_45, textAlign: 'right' }}>
-          {thru}
-        </span>
-      )}
     </div>
   );
 }
