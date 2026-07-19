@@ -119,11 +119,22 @@ serve(async (req) => {
     let successCount = 0;
     let errorCount = 0;
 
-    // Fan-out is done at enqueue time. Each queue row targets a single
-    // (user_id, device_id); we apply that user's muted_types filter then send.
-    // OneSignal's `external_id` body field is the idempotency key — reusing
-    // the queue row UUID guarantees at-most-once even on retry.
-    for (const item of queue) {
+    // Compute per-recipient unread count ONCE per batch. Matches the
+    // predicate set of useUnreadNotifications (muted types, entity
+    // liveness), so the iOS badge equals the in-app Alerts number.
+    const unreadByUser = new Map<string, number | null>();
+    for (const uid of userIds as string[]) {
+      try {
+        const { data: cnt, error: cntErr } = await supabase.rpc(
+          'get_unread_notification_count',
+          { p_user_id: uid, p_actor_type: 'personal', p_actor_id: uid },
+        );
+        unreadByUser.set(uid, cntErr ? null : (typeof cnt === 'number' ? cnt : null));
+      } catch {
+        unreadByUser.set(uid, null);
+      }
+    }
+
       try {
         const data = (item.data ?? {}) as Record<string, any>;
         const notifType = (data.type as string | undefined) ?? null;
