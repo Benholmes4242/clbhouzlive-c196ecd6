@@ -160,10 +160,30 @@ function SkeletonTile() {
   return (
     <div style={{ width: 143, flexShrink: 0 }}>
       <div
+        className="clb-shimmer-light"
         style={{
           aspectRatio: '9 / 14',
           borderRadius: 4,
           background: 'rgba(0,0,0,0.06)',
+        }}
+      />
+      <div
+        className="clb-shimmer-light"
+        style={{
+          height: 11.5,
+          borderRadius: 4,
+          background: 'rgba(0,0,0,0.06)',
+          marginTop: 6,
+        }}
+      />
+      <div
+        className="clb-shimmer-light"
+        style={{
+          height: 10.5,
+          width: '60%',
+          borderRadius: 4,
+          background: 'rgba(0,0,0,0.06)',
+          marginTop: 1,
         }}
       />
     </div>

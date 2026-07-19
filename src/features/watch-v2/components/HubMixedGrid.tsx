@@ -10,17 +10,35 @@ import { SectionHeader } from '@/components/ui/SectionHeader';
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
-const spinKeyframes = `@keyframes hub-mixed-spin { to { transform: rotate(360deg); } }`;
-
 function SkeletonTile({ aspect }: { aspect: string }) {
   return (
     <div style={{ marginBottom: 12 }}>
       <div
+        className="clb-shimmer-light"
         style={{
           width: '100%',
           aspectRatio: aspect,
           borderRadius: 4,
           background: 'rgba(0,0,0,0.06)',
+        }}
+      />
+      <div
+        className="clb-shimmer-light"
+        style={{
+          height: 12.5,
+          borderRadius: 4,
+          background: 'rgba(0,0,0,0.06)',
+          marginTop: 6,
+        }}
+      />
+      <div
+        className="clb-shimmer-light"
+        style={{
+          height: 11,
+          width: '55%',
+          borderRadius: 4,
+          background: 'rgba(0,0,0,0.06)',
+          marginTop: 2,
         }}
       />
     </div>
@@ -81,7 +99,6 @@ export function HubMixedGrid({
 
   return (
     <section style={{ fontFamily: FONT_FAMILY }}>
-      <style>{spinKeyframes}</style>
       <SectionHeader
         role="section"
         kicker="EVERYTHING"
@@ -189,23 +206,13 @@ export function HubMixedGrid({
       <div ref={sentinelRef} style={{ height: 1 }} />
 
       {isFetchingNextPage ? (
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            padding: '16px 0',
-          }}
-        >
-          <div
-            style={{
-              width: 26,
-              height: 26,
-              borderRadius: 999,
-              border: '3px solid rgba(0,0,0,0.08)',
-              borderTopColor: '#F7931E',
-              animation: 'hub-mixed-spin 0.9s linear infinite',
-            }}
-          />
+        <div style={{ display: 'flex', gap: 4, padding: '16px 4px 0' }}>
+          <div style={{ flex: 1 }}>
+            <SkeletonTile aspect="9 / 14" />
+          </div>
+          <div style={{ flex: 1 }}>
+            <SkeletonTile aspect="16 / 9" />
+          </div>
         </div>
       ) : null}
     </section>
