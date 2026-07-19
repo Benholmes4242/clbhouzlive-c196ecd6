@@ -12,7 +12,7 @@ export function useWatchHubCounts() {
     staleTime: 15 * 60 * 1000,
     gcTime: 24 * 60 * 60 * 1000,
     queryFn: async () => {
-      const { data, error } = await (supabase as any).rpc('get_watch_hub_counts');
+      const { data, error } = await (supabase as unknown as { rpc: (fn: string) => Promise<{ data: unknown; error: unknown }> }).rpc('get_watch_hub_counts');
       if (error) {
         if (import.meta.env.DEV) {
           console.error('[useWatchHubCounts]', error);
