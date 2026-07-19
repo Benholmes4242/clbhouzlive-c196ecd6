@@ -164,6 +164,7 @@ export function LeaderboardBand({
               country={entryCountry(leader)}
               score={fmtScore(leader.score)}
               thru={entryThru(leader)}
+              today={todayFromEntry(leader)}
               avatarCandidates={entryAvatars(leader)}
               playerId={entryPlayerId(leader)}
             />
@@ -178,6 +179,7 @@ export function LeaderboardBand({
                   count={slot.count}
                   score={fmtScore(slot.score)}
                   thru="—"
+                  today={todayFromEntry(slot.members[0])}
                   players={slot.members.map((m: any) => ({ avatarCandidates: entryAvatars(m), playerId: entryPlayerId(m), name: entryName(m) }))}
                   isLast={isLast}
                   onTap={onCtaTap}
@@ -192,6 +194,7 @@ export function LeaderboardBand({
                 country={entryCountry(slot.entry)}
                 score={fmtScore(slot.entry.score)}
                 thru={entryThru(slot.entry)}
+                today={todayFromEntry(slot.entry)}
                 avatarCandidates={entryAvatars(slot.entry)}
                 playerId={entryPlayerId(slot.entry)}
                 isLast={isLast}
