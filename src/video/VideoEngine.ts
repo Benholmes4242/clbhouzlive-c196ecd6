@@ -43,6 +43,55 @@ import { coldOpenAttach, coldOpenFirstFrame } from '@/perf/coldOpen';
 import { trace, traceLookup, elIdOf, traceGenElId } from '@/perf/trace';
 import { feedLaneRoles } from './feedLaneRoles';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
+import { audioDebugEnabled, logAudio, msSinceOpen } from '@/perf/audioDebug';
+
+/**
+ * Wrap `muted` on an <video> instance so every write is logged. The
+ * accessor delegates to the prototype descriptor, so behaviour is
+ * byte-identical when audioDebug is off (this helper isn't called then).
+ *
+ * Stack: top 3-4 meaningful frames of new Error().stack, trimmed to
+ * "fn @ file:line". Catches ALL writers — engine policy, tile effects,
+ * borrow machinery, external code — since it hooks the setter itself.
+ */
+function installMutedSetterProbe(el: HTMLVideoElement, laneId: LaneId): void {
+  try {
+    const proto = Object.getPrototypeOf(el) as HTMLMediaElement;
+    // HTMLMediaElement.prototype has the real descriptor.
+    let desc: PropertyDescriptor | undefined;
+    let cursor: any = proto;
+    while (cursor && !desc) {
+      desc = Object.getOwnPropertyDescriptor(cursor, 'muted');
+      if (!desc) cursor = Object.getPrototypeOf(cursor);
+    }
+    if (!desc || !desc.get || !desc.set) return;
+    const nativeGet = desc.get.bind(el);
+    const nativeSet = desc.set.bind(el);
+    Object.defineProperty(el, 'muted', {
+      configurable: true,
+      enumerable: true,
+      get() { return nativeGet(); },
+      set(value: boolean) {
+        try {
+          const raw = new Error().stack || '';
+          const frames = raw.split('\n').map(s => s.trim()).filter(Boolean)
+            // Drop "Error" header and this probe's own frame.
+            .filter(l => !/^Error/i.test(l) && !/installMutedSetterProbe|Object\.set /.test(l))
+            .slice(0, 4)
+            .map(l => l.replace(/^at\s+/, ''));
+          logAudio('muted.set', {
+            laneId,
+            value: !!value,
+            msSinceOpen: msSinceOpen(),
+            stack: frames,
+          });
+        } catch {}
+        nativeSet(value);
+      },
+    });
+  } catch {}
+}
+
 
 export type LaneAudioPolicy = 'session' | 'always-muted' | 'local';
 
@@ -127,8 +176,12 @@ function createLaneElement(laneId: LaneId): HTMLVideoElement {
   // [TRACE] element identity — every lane <video> carries a stable short id
   // so trace lines across layers can prove they hold the SAME element.
   (el.dataset as any).vid = traceGenElId();
+  // Muted-setter probe (audioDebug only). Installed BEFORE any write so the
+  // initial mute below is captured too. No-op when the flag is off.
+  if (audioDebugEnabled()) installMutedSetterProbe(el, laneId);
   el.playsInline = true;
   el.muted = true;
+
   el.loop = true; // Stage-1 polish: loop by default on both feed + fullscreen lanes.
   el.preload = 'metadata';
   el.setAttribute('webkit-playsinline', 'true');
@@ -183,16 +236,19 @@ class VideoEngineImpl {
   markBorrowed(laneId: LaneId): void {
     this.borrowedLanes.add(laneId);
     DBG('markBorrowed', { laneId });
+    logAudio('borrow.marked', { laneId, msSinceOpen: msSinceOpen() });
   }
 
   clearBorrowed(laneId: LaneId): void {
     this.borrowedLanes.delete(laneId);
     DBG('clearBorrowed', { laneId });
+    logAudio('borrow.cleared', { laneId, msSinceOpen: msSinceOpen() });
     // Handback: restore the lane's declared audio policy on the element
     // BEFORE the inline tile resumes, so rails never blast audio after close.
     const lane = this.lanes.get(laneId);
     if (lane) this.applyAudioPolicy(lane);
   }
+
 
 
   boot(laneIds: LaneId[] = DEFAULT_LANE_IDS): void {
@@ -346,23 +402,38 @@ class VideoEngineImpl {
     // the effective policy is 'session' regardless of the lane's declared
     // policy (rails ship as 'always-muted'/'local' but must sing in the
     // viewer). Handback re-runs this after clearBorrowed to restore.
-    const effectivePolicy: LaneAudioPolicy = this.borrowedLanes.has(lane.id)
-      ? 'session'
-      : lane.audioPolicy;
+    const borrowed = this.borrowedLanes.has(lane.id);
+    const effectivePolicy: LaneAudioPolicy = borrowed ? 'session' : lane.audioPolicy;
+    const sessionMuted = useSessionAudio.getState().isMuted;
+    let action: 'noop' | 'mute' | 'setMuted' = 'noop';
+    if (effectivePolicy === 'always-muted') {
+      if (!lane.el.muted) { action = 'mute'; }
+    } else if (effectivePolicy === 'session') {
+      if (lane.el.muted !== sessionMuted) { action = 'setMuted'; }
+    }
+    logAudio('policy.resolve', {
+      laneId: lane.id,
+      declaredPolicy: lane.audioPolicy,
+      borrowed,
+      effectivePolicy,
+      sessionMuted,
+      elMuted: lane.el.muted,
+      action,
+    });
     if (effectivePolicy === 'always-muted') {
       if (!lane.el.muted) { lane.el.muted = true; this.emit(lane); }
       return;
     }
     if (effectivePolicy === 'session') {
-      const desired = useSessionAudio.getState().isMuted;
-      if (lane.el.muted !== desired) {
+      if (lane.el.muted !== sessionMuted) {
         // Respect ONE_UNMUTED_LANE on unmute.
-        this.setMuted(lane.id, desired);
+        this.setMuted(lane.id, sessionMuted);
       }
       return;
     }
     // 'local' → leave alone.
   }
+
 
 
   /** Return the lane's element to the hidden host (does not release source). */
@@ -1055,15 +1126,24 @@ class VideoEngineImpl {
 
   setMuted(laneId: LaneId, muted: boolean): void {
     const lane = this.getLane(laneId);
+    const enforcedOn: LaneId[] = [];
+    logAudio('setMuted.enter', { laneId, desired: muted, msSinceOpen: msSinceOpen() });
     if (!muted && ONE_UNMUTED_LANE) {
       // Enforce: mute every other lane first.
       this.lanes.forEach((other) => {
-        if (other.id !== laneId) other.el.muted = true;
+        if (other.id !== laneId) {
+          if (!other.el.muted) enforcedOn.push(other.id);
+          other.el.muted = true;
+        }
       });
     }
     lane.el.muted = muted;
     this.emit(lane);
+    logAudio('setMuted.exit', {
+      laneId, desired: muted, oneUnmutedEnforcedOn: enforcedOn,
+    });
   }
+
 
   /** Set object-fit on the lane's <video> element. */
   setObjectFit(laneId: LaneId, fit: 'cover' | 'contain'): void {
