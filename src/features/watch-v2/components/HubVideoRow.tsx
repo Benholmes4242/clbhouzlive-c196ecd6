@@ -225,12 +225,41 @@ function SkeletonCard() {
   return (
     <div style={{ width: 'min(374px, calc(100vw - 32px))', flexShrink: 0 }}>
       <div
+        className="clb-shimmer-light"
         style={{
           aspectRatio: '16 / 9',
           borderRadius: 4,
           background: 'rgba(0,0,0,0.06)',
         }}
       />
+      <div style={{ display: 'flex', gap: 9, marginTop: 8, alignItems: 'flex-start' }}>
+        <div
+          className="clb-shimmer-light"
+          style={{
+            width: 30,
+            height: 30,
+            borderRadius: '34%',
+            background: 'rgba(0,0,0,0.06)',
+            flexShrink: 0,
+          }}
+        />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div
+            className="clb-shimmer-light"
+            style={{ height: 13.5, borderRadius: 4, background: 'rgba(0,0,0,0.06)' }}
+          />
+          <div
+            className="clb-shimmer-light"
+            style={{
+              marginTop: 6,
+              height: 11.5,
+              width: '55%',
+              borderRadius: 4,
+              background: 'rgba(0,0,0,0.06)',
+            }}
+          />
+        </div>
+      </div>
     </div>
   );
 }
