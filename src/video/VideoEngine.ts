@@ -1058,7 +1058,13 @@ class VideoEngineImpl {
     lane.wantPlay = true;
     // AUDIO POLICY: on activation, re-consult session store so an earlier
     // unmute carries to the NEXT video (inheritance on activation).
-    this.applyAudioPolicy(lane);
+    this.applyAudioPolicy(lane, 'activation');
+    logAudio('resume.activate', {
+      laneId,
+      callerPostId: caller ?? null,
+      borrowed: this.borrowedLanes.has(laneId),
+      msSinceOpen: msSinceOpen(),
+    });
     if (!lane.mountedHost) {
       DBG(laneId, 'play() queued — no mounted host');
       return Promise.resolve();
