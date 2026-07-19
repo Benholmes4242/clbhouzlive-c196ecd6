@@ -56,6 +56,7 @@ export interface ScorecardSheetTarget {
   today: number | null;
   thru: number | null;
   status?: string | null;
+  playerPhotoUrl?: string | null;
 }
 
 interface Props {
