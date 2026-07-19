@@ -12,7 +12,7 @@ export interface ExploreHeroRow {
   review_count: number | null;
   global_rank: number | null;
   why_ai: string | null;
-  context_stats: Record<string, any> | null;
+  context_stats: Record<string, unknown> | null;
   filter_tier: string | null;
   list_rank: number | null;
   list_label: string | null;
