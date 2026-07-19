@@ -28,7 +28,6 @@ import Pressable from '@/components/ui/Pressable';
 import { useRailLane } from '@/video/useRailLane';
 import { usePreroutePrefetch } from '@/video/usePreroutePrefetch';
 import { openFsv2 } from '@/features/fsv2';
-import { FLAGS } from '@/config/flags';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 const FONT_FAMILY =

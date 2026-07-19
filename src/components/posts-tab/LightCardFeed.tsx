@@ -19,7 +19,6 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import type { ActiveActor } from '@/types/actor';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { openFsv2 } from '@/features/fsv2';
-import { FLAGS } from '@/config/flags';
 import { isPerfEnabled } from '@/perf/navTiming';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { getPrimaryScrollElement } from '@/lib/getScrollParent';

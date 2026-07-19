@@ -8,7 +8,6 @@ import { useWatchAutoplay } from '@/video/useWatchAutoplay';
 import { useRailLane } from '@/video/useRailLane';
 import { usePreroutePrefetch } from '@/video/usePreroutePrefetch';
 import { openFsv2 } from '@/features/fsv2';
-import { FLAGS } from '@/config/flags';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useNavigate } from 'react-router-dom';
 import { SectionHeader } from '@/components/ui/SectionHeader';
