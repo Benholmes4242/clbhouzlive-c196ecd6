@@ -9,7 +9,6 @@ import {
   SLATE_50,
 } from '@/features/tourhub/_shared/tokens';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { GoldRingAvatar } from '@/components/shared/GoldRingAvatar';
 
 import { formatHcp } from '@/lib/formatHcp';
 import { REGION_TABS } from './AlmanacSections';
