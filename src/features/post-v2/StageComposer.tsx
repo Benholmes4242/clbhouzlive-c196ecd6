@@ -193,7 +193,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
     fontSize: 14,
     fontWeight: 600,
     cursor: canSubmit ? 'pointer' : 'not-allowed',
-    opacity: canSubmit ? 1 : 0.4,
+    opacity: (canSubmit || submitting || saving) ? 1 : 0.4,
   };
 
   const authorName = useMemo(() => activeActor?.name ?? profile?.display_name ?? 'You', [activeActor, profile]);
