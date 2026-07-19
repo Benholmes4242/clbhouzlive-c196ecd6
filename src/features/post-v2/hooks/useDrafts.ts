@@ -44,6 +44,8 @@ export function useDrafts(userId: string | null | undefined) {
     courseId?: string | null;
     courseName?: string | null;
     courseCountry?: string | null;
+    /** Full ordered multi-course tag list; persisted via course_data.courses. */
+    courses?: Array<{ id: string; name: string; country: string | null }>;
   }) => {
     if (!userId) return;
     await supabase.from('post_drafts').insert({
@@ -54,6 +56,9 @@ export function useDrafts(userId: string | null | undefined) {
       course_id: patch.courseId ?? null,
       course_name: patch.courseName ?? null,
       course_country: patch.courseCountry ?? null,
+      course_data: patch.courses && patch.courses.length > 0
+        ? ({ courses: patch.courses } as unknown as never)
+        : null,
     } as never);
     await refresh();
   }, [userId, refresh]);
