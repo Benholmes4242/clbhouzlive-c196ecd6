@@ -204,6 +204,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
         caption: state.caption,
         media: state.media,
         course: state.course,
+        courses: state.courses,
         scheduledAt: state.scheduledAt,
         actorType: activeActor.type,
         actorId: activeActor.id,
