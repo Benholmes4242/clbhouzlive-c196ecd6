@@ -16,6 +16,7 @@ import { openWithOrigin } from '@/lib/openWithOrigin';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { VideoCardMoreButton } from './VideoCardMoreButton';
+import type { HubRpcRow } from '../utils/toFeedPost';
 
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
