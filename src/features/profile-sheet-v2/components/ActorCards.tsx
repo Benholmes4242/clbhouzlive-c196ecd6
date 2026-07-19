@@ -235,6 +235,12 @@ export default function ActorCards({
         {!hasBusiness && (
           <div
             onClick={() => onNavigate('/businesses/manage')}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onNavigate('/businesses/manage');
+              }
+            }}
             role="button"
             tabIndex={0}
             style={{
