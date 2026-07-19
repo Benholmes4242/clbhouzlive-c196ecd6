@@ -168,11 +168,12 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
     return () => { cancelled = true; };
   }, [draftId, isEditMode, profile?.id, restoreDraft]);
 
-  const [sheet, setSheet] = useState<null | 'course' | 'actor' | 'schedule' | 'drafts' | 'scheduled' | 'trim' | 'cover' | 'adjust' | 'close-guard'>(null);
+  const [sheet, setSheet] = useState<null | 'course' | 'actor' | 'schedule' | 'drafts' | 'scheduled' | 'cover' | 'adjust' | 'close-guard'>(null);
   const [success, setSuccess] = useState<SubmitResult | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [scheduledCount, setScheduledCount] = useState<number>(0);
   const [restoredDraftId, setRestoredDraftId] = useState<string | null>(null);
+  const [savingDraft, setSavingDraft] = useState(false);
 
   const active = state.media[state.activeIndex] ?? null;
 
