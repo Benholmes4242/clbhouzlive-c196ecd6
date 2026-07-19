@@ -1,7 +1,7 @@
 /**
  * BoardTable — Tour Book leaderboard rows.
  *
- * Columns: POS(32) + MOVE(20) = 52 left | PLAYER(flex) | TOT(44) | THRU(44) | TODAY(44)
+ * Columns: POS(32) + MOVE(20) = 52 left | PLAYER(flex) | THRU(44) | TODAY(44) | TOT(44)
  * Header rendered by parent (LeaderboardTab) with a single 52px POS
  * label; the delta lives inside that footprint so the outer layout
  * is unchanged.
@@ -376,21 +376,6 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
           )}
         </div>
 
-        {/* TOT */}
-        <div
-          style={{
-            width: NUM_W,
-            flexShrink: 0,
-            textAlign: 'center',
-            fontSize: 13.5,
-            fontWeight: 800,
-            color: totColor,
-            fontVariantNumeric: 'tabular-nums',
-          }}
-        >
-          {totalDisplay}
-        </div>
-
         {/* THRU */}
         <div
           style={{
@@ -418,6 +403,21 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
           }}
         >
           {demotedRow ? '-' : todayDisplay}
+        </div>
+
+        {/* TOT */}
+        <div
+          style={{
+            width: NUM_W,
+            flexShrink: 0,
+            textAlign: 'center',
+            fontSize: 13.5,
+            fontWeight: 800,
+            color: totColor,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {totalDisplay}
         </div>
       </div>
     );
