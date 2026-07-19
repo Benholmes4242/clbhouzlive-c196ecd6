@@ -29,7 +29,7 @@ export function useExploreHero(userId: string | undefined, mood: ExploreMoodId) 
       const { data, error } = await supabase.rpc('get_explore_hero', {
         p_user_id: userId!,
         p_mood: mood,
-      } as any);
+      } as { p_user_id: string; p_mood: ExploreMoodId });
       if (error) {
         console.error('[useExploreHero] RPC error:', error);
         if (import.meta.env.DEV) throw error;
