@@ -328,7 +328,6 @@ interface CourseOverlayShape {
 interface CourseMetaShape {
   course_cr?: number | null;
   course_slope?: number | null;
-  [key: string]: unknown;
 }
 interface CourseTitleOverlayProps {
   course: CourseOverlayShape;
