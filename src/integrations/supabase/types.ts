@@ -1276,6 +1276,7 @@ export type Database = {
           created_at: string | null
           id: string
           is_public: boolean
+          job_title: string | null
           role: string
           user_profile_id: string
         }
@@ -1284,6 +1285,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           is_public?: boolean
+          job_title?: string | null
           role: string
           user_profile_id: string
         }
@@ -1292,6 +1294,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           is_public?: boolean
+          job_title?: string | null
           role?: string
           user_profile_id?: string
         }
@@ -19882,6 +19885,14 @@ export type Database = {
           p_additional_business_ids?: string[]
           p_clear_pending?: boolean
           p_primary_business_id: string
+        }
+        Returns: undefined
+      }
+      set_member_job_title: {
+        Args: {
+          _business_id: string
+          _job_title: string
+          _member_user_id: string
         }
         Returns: undefined
       }
