@@ -175,7 +175,7 @@ export function HubClipsRow() {
   const { user } = useSupabaseSession();
   const { data, isLoading } = useHubQuickClips(user?.id);
 
-  const rows = (data ?? []) as any[];
+  const rows = (data ?? []) as HubRpcRow[];
   const feedPosts = useMemo(() => toFeedPosts(rows), [rows]);
   const { activeIndices, railRef } = useWatchAutoplay({
     railId: 'hub-clips-row',
