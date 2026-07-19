@@ -341,23 +341,29 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
   };
 
   const saveAsDraft = async () => {
+    if (savingDraft) return;
     if (!activeActor) return;
-    await drafts.save({
-      actorType: activeActor.type,
-      actorId: activeActor.id,
-      content: state.caption || null,
-      courseId: state.course?.id ?? null,
-      courseName: state.course?.name ?? null,
-      courseCountry: state.course?.country ?? null,
-      courses: state.courses,
-    });
-    if (restoredDraftId) {
-      await drafts.remove(restoredDraftId);
-      setRestoredDraftId(null);
+    setSavingDraft(true);
+    try {
+      await drafts.save({
+        actorType: activeActor.type,
+        actorId: activeActor.id,
+        content: state.caption || null,
+        courseId: state.course?.id ?? null,
+        courseName: state.course?.name ?? null,
+        courseCountry: state.course?.country ?? null,
+        courses: state.courses,
+      });
+      if (restoredDraftId) {
+        await drafts.remove(restoredDraftId);
+        setRestoredDraftId(null);
+      }
+      setSheet(null);
+      reset();
+      onClose();
+    } finally {
+      setSavingDraft(false);
     }
-    setSheet(null);
-    reset();
-    onClose();
   };
 
   // No hooks below this point - early returns above.
