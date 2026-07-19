@@ -14,6 +14,7 @@ import {
 } from '../HybridHero.constants';
 import { getScoreColor } from '../../../_shared/scoreColor';
 import { TrajectorySparkline } from './TrajectorySparkline';
+import { todayFromEntry } from '../HybridHero.utils';
 
 function liveScoreColour(s: string): string {
   if (s.startsWith('\u2212') || s.startsWith('-')) return getScoreColor(-1, 'dark', 'standard');
