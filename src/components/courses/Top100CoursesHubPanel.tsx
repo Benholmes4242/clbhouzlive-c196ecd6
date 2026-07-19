@@ -4,6 +4,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 import { useTop100ListSummaries } from '@/hooks/useTop100ListSummaries';
 import { useGolfCoursesInfinite, type SearchedCourseWithRating } from '@/hooks/useGolfCoursesInfinite';
+import type { CourseListMembership } from '@/hooks/useGolfCoursesSearch';
 import { useTop100Lists } from '@/hooks/useTop100Lists';
 import { Search, Award, X } from 'lucide-react';
 
