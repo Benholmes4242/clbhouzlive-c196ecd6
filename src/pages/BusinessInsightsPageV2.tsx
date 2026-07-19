@@ -513,7 +513,7 @@ const BusinessInsightsPageV2 = () => {
         {/* ── REPUTATION (course-linked only) ── */}
         {business.club_id && <ReviewsSection businessId={business.id} navigate={navigate} />}
       </div>
-    </PageRoot>
+    </ManagePageShell>
   );
 };
 
