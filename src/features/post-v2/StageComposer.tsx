@@ -332,7 +332,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
   }, [state.media, removeAt]);
 
   const handleClose = () => {
-    if (state.dirty && !isEditMode) {
+    if (state.dirty) {
       setSheet('close-guard');
       return;
     }
@@ -350,6 +350,10 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
       courseCountry: state.course?.country ?? null,
       courses: state.courses,
     });
+    if (restoredDraftId) {
+      await drafts.remove(restoredDraftId);
+      setRestoredDraftId(null);
+    }
     setSheet(null);
     reset();
     onClose();
