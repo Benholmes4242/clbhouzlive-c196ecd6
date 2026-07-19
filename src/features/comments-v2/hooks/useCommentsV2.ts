@@ -408,7 +408,7 @@ export function useCommentsV2({
   });
 
   const reportComment = useMutation({
-    mutationFn: async ({ id, reason, details }: { id: string; reason: string; details?: string }) => {
+    mutationFn: async ({ id, targetUserId, reason, details }: { id: string; targetUserId: string; reason: string; details?: string }) => {
       if (!user?.id) throw new Error('Not signed in');
       // Dual write: hidden_comments captures the reason (also filters it out for
       // this user), and reports feeds the moderation queue.
@@ -418,13 +418,15 @@ export function useCommentsV2({
         }),
         supabase.from('reports').insert({
           reporter_id: user.id,
+          reported_comment_id: id,
+          reported_user_id: targetUserId,
           reason,
           details: details ?? null,
           status: 'pending',
         }),
       ]);
       if (hideErr) throw hideErr;
-      if (repErr) console.warn('[comments-v2] report insert failed:', repErr);
+      if (repErr) throw repErr;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['comments-v2-hidden', user?.id] });
