@@ -258,7 +258,7 @@ export function BusinessProfileInfo({ business, userId }: BusinessProfileInfoPro
         <>
           <section className="px-4 py-4">
             <SectionKicker>Contact</SectionKicker>
-            <div className="flex flex-col [&>*+*]:border-t" style={{ ['--tw-border-opacity' as any]: 1 }}>
+            <div className="flex flex-col [&>*+*]:border-t" style={{ '--tw-border-opacity': 1 } as React.CSSProperties}>
               {business.website && (
                 <ContactRow
                   icon={Globe}
