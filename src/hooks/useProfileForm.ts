@@ -61,10 +61,10 @@ function makeInitial(profile: RawProfile | null | undefined): ProfileFormData {
     headerPhotoBlob: null,
     homeClubName: profile?.home_club ?? '',
     primaryClubId: profile?.primary_club_id ?? null,
-    additionalClubs: (profile?.additional_clubs ?? []).map((c: any) => ({
+    additionalClubs: (profile?.additional_clubs ?? []).map((c) => ({
       id: nanoid(),
       name: c.name,
-      clubId: c.club_id,
+      clubId: c.club_id ?? undefined,
     })),
     // MANUAL handicap entry (maps to user_profiles.manual_handicap_index, NOT
     // the WHS-synced eg_handicap_index). WHS always wins for display when a
