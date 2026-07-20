@@ -115,9 +115,9 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
     // #4 Best vs handicap
     let bestVsHcp: Tile = empty('Best vs HCP');
     if (currentHandicap != null && grossList.length) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const scored = grossList.map((s) => {
-        const par = (s.course as any)?.course_par ?? 72;
+        const course = s.course as { course_par?: number | null } | null | undefined;
+        const par = course?.course_par ?? 72;
         const overPar = (s.adjusted_gross as number) - par;
         const vsHcp = overPar - currentHandicap;
         return { s, vsHcp };
