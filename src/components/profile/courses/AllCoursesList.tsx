@@ -242,7 +242,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
     }
 
     // Step 3: Sort
-    const buildOwnRow = (c: any) => ({
+    const buildOwnRow = (c: CourseCardData & { review_date?: string | null }) => ({
       course_id: c.id,
       course_name: c.name,
       rating: c.rating_value,
