@@ -85,7 +85,7 @@ export default function MyRequestsPage() {
         )}
 
 
-        {!isLoading && tickets.length === 0 && (
+        {!isLoading && !isError && tickets.length === 0 && (
           <div
             className="rounded-2xl p-6 text-center"
             style={{ background: '#fff', border: `1px solid ${CARD_BORDER}` }}
