@@ -461,7 +461,7 @@ export default function BusinessReviewsPage() {
     );
   }
 
-  const showEmpty = !isLoading && (summary?.count ?? 0) === 0;
+  const showEmpty = !isLoading && !isError && (summary?.count ?? 0) === 0;
 
   return (
     <ManagePageShell title="Reviews">
