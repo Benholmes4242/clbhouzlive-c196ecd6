@@ -369,7 +369,40 @@ export default function SocialListPage({
               </Section>
             )}
 
-            {filtered.length === 0 && !list.isFetching && (
+            {list.isError && (
+              <div
+                style={{
+                  padding: '48px 24px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 12,
+                  color: INK_MUTE,
+                  fontSize: 13,
+                }}
+              >
+                Couldn't load this list.
+                <button
+                  type="button"
+                  onClick={() => list.refetch()}
+                  style={{
+                    background: INK,
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 999,
+                    padding: '8px 16px',
+                    fontSize: 13,
+                    fontWeight: 700,
+                    fontFamily: FONT,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Retry
+                </button>
+              </div>
+            )}
+
+            {filtered.length === 0 && !list.isFetching && !list.isError && (
               <div
                 style={{
                   padding: '48px 24px',
