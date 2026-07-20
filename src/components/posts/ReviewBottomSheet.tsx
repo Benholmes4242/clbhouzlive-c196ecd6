@@ -184,14 +184,14 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   const monthLabel = formatMonthLabel(reviewDate ?? null);
 
   const breakdownEntries = useMemo(() => {
-    if (!breakdown) return [];
+    if (!effectiveBreakdown) return [];
     return BREAKDOWN_KEYS.flatMap((k) => {
-      const v = breakdown[k];
+      const v = effectiveBreakdown[k];
       return v == null || Number.isNaN(v)
         ? []
         : [{ key: k, label: BREAKDOWN_LABELS[k], value: v }];
     });
-  }, [breakdown]);
+  }, [effectiveBreakdown]);
 
   const relMonths = relativeMonths(reviewDate ?? effectiveStats?.memberSince ?? null);
   const handicapSeg =
@@ -203,9 +203,9 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   const metaSeg = [relMonths, handicapSeg].filter(Boolean).join(' · ');
 
   const paragraphs = useMemo(() => {
-    if (!reviewText) return [];
-    return reviewText.split(/\n\n+/).map((p) => p.trim()).filter(Boolean);
-  }, [reviewText]);
+    if (!effectiveReviewText) return [];
+    return effectiveReviewText.split(/\n\n+/).map((p) => p.trim()).filter(Boolean);
+  }, [effectiveReviewText]);
 
   const content = (
     <AnimatePresence>
