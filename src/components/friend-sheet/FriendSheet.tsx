@@ -123,7 +123,7 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
       toast.error("Can't invite this player yet");
       return;
     }
-    const res = await callCreateInvite(passportId, 'friend_sheet');
+    const res = await callCreateInvite(passportId, 'copy_link');
     if (!res.ok || !res.share_url || !res.share_message) {
       toast.error(res.message ?? "Couldn't create invite");
       return;

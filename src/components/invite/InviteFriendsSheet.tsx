@@ -270,10 +270,14 @@ function EGFriendRow({
     : null;
 
   const onInvite = useCallback(async () => {
-    if (busy || friend.friend_passport_id == null) return;
+    if (friend.friend_passport_id == null) {
+      toast.error('Cannot invite this friend (missing ID)');
+      return;
+    }
+    if (busy) return;
     setBusy(true);
     try {
-      const res = await callCreateInvite(friend.friend_passport_id, 'invite_sheet');
+      const res = await callCreateInvite(friend.friend_passport_id, 'copy_link');
       if (!res.ok || !res.share_url) {
         toast.error(res.message ?? "Couldn't create invite");
         return;
