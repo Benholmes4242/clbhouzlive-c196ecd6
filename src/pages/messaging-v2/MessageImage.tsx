@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { useSignedUrl } from '@/hooks/messaging/useSignedUrl';
+import { Skeleton } from '@/components/ui/skeleton';
 import type { MessageAttachment } from '@/types/messaging';
 
 interface Props {
@@ -81,10 +82,7 @@ export const MessageImage: React.FC<Props> = ({ attachment, onOpen }) => {
           }}
         />
       ) : loading ? (
-        <div
-          className="animate-pulse"
-          style={{ width: '100%', height: '100%', background: '#EDEFF2' }}
-        />
+        <Skeleton className="rounded-none" style={{ width: '100%', height: '100%' }} />
       ) : null}
 
       {uploading ? (

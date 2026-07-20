@@ -12,6 +12,7 @@ import { useKeyboardHeight } from '@/hooks/messaging/useKeyboardHeight';
 import { MessageBubble } from './MessageBubble';
 import { Composer } from './Composer';
 import { ConversationSettingsSheet } from './ConversationSettingsSheet';
+import { Skeleton } from '@/components/ui/skeleton';
 import type {
   ConversationDetail,
   ConversationMember,
@@ -159,11 +160,10 @@ const SkeletonBubble: React.FC<{ side: 'left' | 'right'; w: number }> = ({ side,
     className="w-full flex"
     style={{ justifyContent: side === 'right' ? 'flex-end' : 'flex-start', marginTop: 10 }}
   >
-    <div
+    <Skeleton
       style={{
         width: `${w}%`,
         height: 34,
-        background: side === 'right' ? '#DDE1E6' : '#EDEFF2',
         borderRadius: 18,
       }}
     />
@@ -188,6 +188,7 @@ const ThreadV2Page: React.FC = () => {
     isLoading,
     isFetchingOlder,
     error,
+    refetch,
   } = useThread(conversationId || null);
   const { retry } = useSendMessage(conversationId);
   const keyboardHeight = useKeyboardHeight();
@@ -400,7 +401,7 @@ const ThreadV2Page: React.FC = () => {
             </p>
             <button
               type="button"
-              onClick={() => window.location.reload()}
+              onClick={() => refetch()}
               className="rounded-full"
               style={{
                 background: AMBER,
