@@ -135,12 +135,28 @@ const MyBusinessesPage = () => {
                 activeBusinessId={
                   activeActor?.type === 'business' ? activeActor?.id ?? null : null
                 }
+                onRequestDelete={handleRequestDelete}
               />
 
               <AddBusinessCard onClick={handleCreateBusiness} />
             </>
           )}
         </div>
+      )}
+
+      {/* Hoisted confirm-delete dialog — lives outside the accordion so the
+          mutation's cache invalidation can evict the target card without
+          racing Radix's DismissableLayer cleanup. */}
+      {pendingDelete && user?.id && (
+        <DeleteBusinessDialog
+          open={!!pendingDelete}
+          onOpenChange={(open) => {
+            if (!open) setPendingDelete(null);
+          }}
+          businessId={pendingDelete.id}
+          businessName={pendingDelete.name}
+          userId={user.id}
+        />
       )}
     </ManagePageShell>
   );
