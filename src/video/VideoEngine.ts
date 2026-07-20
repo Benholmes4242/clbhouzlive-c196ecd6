@@ -43,8 +43,17 @@ import { coldOpenAttach, coldOpenFirstFrame } from '@/perf/coldOpen';
 import { trace, traceLookup, elIdOf, traceGenElId } from '@/perf/trace';
 import { feedLaneRoles } from './feedLaneRoles';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
-import { audioDebugEnabled, logAudio, msSinceOpen } from '@/perf/audioDebug';
+import { audioDebugEnabled, logAudio, msSinceOpen, getEntries } from '@/perf/audioDebug';
 import { getLastCloseSnapshot } from '@/perf/positionContinuity';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+
+/**
+ * v9 reconciler — module-level record of the last writer to each lane's
+ * `muted` property. Populated by installMutedSetterProbe (audioDebug flag).
+ * Consumed by reconcileAudio on drift-reason reconciles for forensics.
+ */
+type MutedWriterRecord = { value: boolean; stack: string[]; ts: number };
+const lastMutedWriter = new Map<LaneId, MutedWriterRecord>();
 
 /**
  * Wrap `muted` on an <video> instance so every write is logged. The
