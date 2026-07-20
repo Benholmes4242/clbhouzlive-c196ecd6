@@ -64,7 +64,7 @@ export function LeadersTab() {
   const [activeTour, setActiveTour] = useState<TourId>(initialTour);
 
 
-  const { data: result, isLoading } = useLeaderCategories(activeTour);
+  const { data: result, isLoading, isError, refetch } = useLeaderCategories(activeTour);
   const { data: liveMap } = useLivePlayerIds();
 
   const categories = result?.categories ?? [];
