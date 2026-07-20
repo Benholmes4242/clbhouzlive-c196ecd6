@@ -154,6 +154,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
       )}
 
       {/* ===== MERGED LEADERBOARD CARD ===== */}
+      {!isError && (
       <div
         style={{
           margin: '0 16px',
