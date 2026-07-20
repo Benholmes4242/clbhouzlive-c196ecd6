@@ -114,7 +114,7 @@ export function HeroWireTicker({ rows }: HeroWireTickerProps) {
     </span>
   ));
 
-  const label = t('overview.ticker.top10Label', 'TOP 10');
+  const label = t('overview.ticker.top10Label');
   const leftAccessory = (
     <div
       style={{
