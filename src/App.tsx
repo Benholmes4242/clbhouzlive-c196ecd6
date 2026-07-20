@@ -271,6 +271,7 @@ const AchievementsHubPage = lazy(() => import("./pages/AchievementsHubPage"));
 const AchievementsPage = lazy(() => import("./pages/AchievementsPage"));
 const AdminSetupPage = lazy(() => import("./pages/AdminSetupPage"));
 const AdminShell = lazy(() => import('./features/admin/AdminShell'));
+const __TestMatchRequest = lazy(() => import('./pages/__TestMatchRequest'));
 
 
 
