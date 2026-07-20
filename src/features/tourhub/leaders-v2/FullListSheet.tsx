@@ -235,7 +235,7 @@ export function FullListSheet({
                     <div
                       style={{
                         marginTop: 2,
-                        fontSize: 8,
+                        fontSize: 10,
                         fontWeight: 800,
                         letterSpacing: '0.1em',
                         textTransform: 'uppercase',
