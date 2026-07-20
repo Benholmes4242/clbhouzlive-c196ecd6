@@ -127,7 +127,7 @@ function SGBar({ label, value }: { label: string; value: number | null | undefin
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
         <span
           style={{
-            fontSize: 8,
+            fontSize: 10,
             fontWeight: 800,
             color: INK_MUTE,
             letterSpacing: '0.16em',
