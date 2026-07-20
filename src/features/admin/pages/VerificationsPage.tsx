@@ -1,12 +1,11 @@
 import React, { useEffect } from 'react';
 import { useVerifications } from '../hooks/useVerifications';
-import { VerificationsTab } from './UsersPage';
+import { VerificationsTab } from '../components/VerificationsReview';
 
 /**
  * Top-level admin section for verification review (business, course claims,
- * golfer invites). Promoted out of the Users page so it has parity with
- * Support / Approvals / Appeals. Uses the existing VerificationsTab UI and
- * useVerifications queue - no behaviour change, just its own route/nav entry.
+ * golfer invites). Uses the shared VerificationsReview component so InboxPage
+ * and this page render identical UI without depending on UsersPage.
  */
 export default function VerificationsPage() {
   const verifs = useVerifications();
