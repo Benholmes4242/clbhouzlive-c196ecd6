@@ -31,20 +31,26 @@ export function useInboxOpsStats(doneItems: InboxItem[]) {
         const row = it.payload as ModerationQueueRow;
         const start = row.created_at ? new Date(row.created_at).getTime() : null;
         const end = row.reviewed_at ? new Date(row.reviewed_at).getTime() : null;
-        if (end != null && end >= sinceWeek) resolvedThisWeek += 1;
-        if (start != null && end != null && end >= start) durationsMs.push(end - start);
+        if (end != null && end >= sinceWeek) {
+          resolvedThisWeek += 1;
+          if (start != null && end >= start) durationsMs.push(end - start);
+        }
       } else if (it.type === 'appeal') {
         const row = it.payload as AppealRow;
         const start = row.created_at ? new Date(row.created_at).getTime() : null;
         const end = row.reviewed_at ? new Date(row.reviewed_at).getTime() : null;
-        if (end != null && end >= sinceWeek) resolvedThisWeek += 1;
-        if (start != null && end != null && end >= start) durationsMs.push(end - start);
+        if (end != null && end >= sinceWeek) {
+          resolvedThisWeek += 1;
+          if (start != null && end >= start) durationsMs.push(end - start);
+        }
       } else if (it.type === 'verification') {
         const row = it.payload as VerificationRow;
         const start = row.createdAt ? new Date(row.createdAt).getTime() : null;
         const end = row.reviewedAt ? new Date(row.reviewedAt).getTime() : null;
-        if (end != null && end >= sinceWeek) resolvedThisWeek += 1;
-        if (start != null && end != null && end >= start) durationsMs.push(end - start);
+        if (end != null && end >= sinceWeek) {
+          resolvedThisWeek += 1;
+          if (start != null && end >= start) durationsMs.push(end - start);
+        }
       }
       // Other types (support/match/courseRequest/approval): no authoritative
       // resolved timestamp on the payload - excluded per no-fabrication rule.
