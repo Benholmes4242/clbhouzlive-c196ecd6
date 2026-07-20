@@ -131,7 +131,11 @@ export function SettingsTabContent() {
   const handleConfirmSignOut = async () => {
     if (signingOut) return;
     setSigningOut(true);
-    try { (window as any).median?.onesignal?.logout?.(); } catch {}
+    try {
+      (window as WindowWithMedian).median?.onesignal?.logout?.();
+    } catch (e) {
+      void e;
+    }
     try {
       await logout();
     } catch {
