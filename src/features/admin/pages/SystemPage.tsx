@@ -126,7 +126,7 @@ function Card({
 
 // ─── Tab 1: Audit Log ─────────────────────────────────────────────────────────
 
-function AuditLogTab() {
+export function AuditLogTab() {
   const [page, setPage] = useState(0);
   const [actionFilter, setActionFilter] = useState<string | null>(null);
   const { data, isLoading } = useAudit({ page, action: actionFilter });
