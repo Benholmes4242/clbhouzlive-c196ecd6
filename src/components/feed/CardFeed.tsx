@@ -512,6 +512,33 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
     return () => cancelAnimationFrame(raf);
   }, [playingIdx, posts]);
 
+  // v11 audio-focus — inline Clubhouse feed registration. Mirrors SnapFeed's
+  // wiring so the reconciler can resolve a speaker when the user unmutes.
+  // Without this, `audioFocus.laneId` stays null in the engine, reconcile
+  // resolves to `whyNone: 'no-audio-focus'`, and every lane is force-muted
+  // even though the active card is playing. Re-asserts on fullscreen close
+  // and on active-card change; clears on unmount.
+  useEffect(() => {
+    if (fsIsOpen) return; // overlay branch owns the speaker while open
+    const post = posts[playingIdx];
+    if (!post) return;
+    const hasVideo = (post as any)?.mediaItems?.some?.((m: any) => m?.type === 'video');
+    try {
+      if (hasVideo) {
+        const activeLane = feedLaneRoles.laneForRole('active');
+        VideoEngine.setAudioFocus(activeLane, 'feed');
+      } else {
+        VideoEngine.setAudioFocus(null, 'feed');
+      }
+    } catch { /* engine may not be booted yet — safe to ignore */ }
+  }, [fsIsOpen, playingIdx, posts]);
+
+  useEffect(() => {
+    return () => {
+      try { VideoEngine.setAudioFocus(null, 'feed'); } catch { /* noop */ }
+    };
+  }, []);
+
 
   // Virtuoso's rangeChanged kept as a no-op; center-proximity owns activeIdx.
   const handleRangeChanged = useCallback(
