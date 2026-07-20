@@ -29,6 +29,7 @@ import {
   toneColor, type ChipState,
 } from '../lib/healthChips';
 import { useErrorCount24h } from '../hooks/useStability';
+import { stripMentionMarkup } from '@/lib/mentions/format';
 
 const num = (n: number) => n.toLocaleString();
 function relTime(iso: string): string {
