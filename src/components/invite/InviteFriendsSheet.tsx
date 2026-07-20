@@ -6,6 +6,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection, useFriendLeaderboard, useSentInvites, whsKeys } from '@/lib/whs/hooks';
+import type { FriendLeaderboardEntry, WhsInviteStatus } from '@/lib/whs/types';
 import { callCreateInvite } from '@/lib/whs/api';
 import { shareInvite, firstName } from '@/lib/whs/share';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
