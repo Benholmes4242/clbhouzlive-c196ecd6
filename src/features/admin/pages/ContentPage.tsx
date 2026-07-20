@@ -313,6 +313,37 @@ function PagerBtn({ children, ...rest }: React.ButtonHTMLAttributes<HTMLButtonEl
   );
 }
 
+/* ───────── Draft-restored notice bar ───────── */
+
+function DraftRestoredBar({ visible, onDiscard }: { visible: boolean; onDiscard: () => void }) {
+  if (!visible) return null;
+  return (
+    <div
+      role="status"
+      style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        gap: 8, padding: '8px 12px', minHeight: 40,
+        borderRadius: t.radius.md, border: `1px solid ${t.line}`,
+        background: t.brandSoft, color: t.brandText,
+        fontSize: 12, fontWeight: 600,
+      }}
+    >
+      <span>Draft restored</span>
+      <button
+        type="button"
+        onClick={onDiscard}
+        style={{
+          background: 'transparent', border: 'none',
+          color: t.brandText, fontSize: 12, fontWeight: 700,
+          cursor: 'pointer', padding: '4px 8px',
+        }}
+      >Discard</button>
+    </div>
+  );
+}
+
+
+
 function CourseCard({ course, onOpen }: { course: AdminCourseRow; onOpen: () => void }) {
   const top100 = isTop100(course);
   const rank = firstRank(course);
