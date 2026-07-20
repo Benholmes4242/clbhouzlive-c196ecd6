@@ -1100,9 +1100,9 @@ class VideoEngineImpl {
 
     // Persistent intent: set now, honored on mount + on canplay after (re)load.
     lane.wantPlay = true;
-    // AUDIO POLICY: on activation, re-consult session store so an earlier
-    // unmute carries to the NEXT video (inheritance on activation).
-    this.applyAudioPolicy(lane, 'activation', { claimsAudio: opts.claimsAudio === true });
+    // v9: NO activation-time audio claim here. The role-change subscription
+    // (feedLaneRoles → reconcileAudio) is the single writer that promotes
+    // the newly-active lane's audio. play() is now audio-neutral.
     logAudio('resume.activate', {
       laneId,
       callerPostId: caller ?? null,
