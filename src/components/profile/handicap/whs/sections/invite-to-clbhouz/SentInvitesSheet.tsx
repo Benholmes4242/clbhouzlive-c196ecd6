@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Drawer as DrawerPrimitive } from 'vaul';
 import SheetHeader from '@/components/ui/SheetHeader';
 import { formatRelativeAgoLong } from '@/i18n/format';
@@ -6,6 +6,7 @@ import { useSentInvites } from '@/lib/whs/hooks';
 import { firstName } from '@/lib/whs/utils/initials';
 import { shareInvite } from '@/lib/whs/share';
 import type { WhsInviteStatus } from '@/lib/whs/types';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 
 interface Props {
   open: boolean;
