@@ -132,7 +132,13 @@ function useFriendViewRivalry(
       const raw = (rpcRows as unknown[] | null)?.[0] as FriendRivalryHydrated | undefined;
       if (!raw) return null;
       const ids = [friendId!, rivalId!];
-      const { data: profiles } = await supabase
+      const { data: profiles } = await (supabase as unknown as {
+        from: (table: string) => {
+          select: (cols: string) => {
+            in: (col: string, values: string[]) => Promise<{ data: unknown; error: unknown }>;
+          };
+        };
+      })
         .from('user_profiles')
         .select('user_id, full_name, profile_photo_url')
         .in('user_id', ids);
