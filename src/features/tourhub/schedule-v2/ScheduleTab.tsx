@@ -208,52 +208,7 @@ export function ScheduleTab() {
     return Math.max(0, Math.min(1, n / timeline.totalEvents));
   }, [timeline]);
 
-  // ── Loading / error / empty ────────────────────────────────────────────
-  if (isLoading) {
-    return (
-      <div style={{ background: SLATE_50, minHeight: '60vh', padding: 16 }}>
-        <Skeleton className="w-full mb-3" style={{ height: 44 }} />
-        <Skeleton className="w-full mb-3" style={{ height: 32 }} />
-        {Array.from({ length: 6 }).map((_, i) => (
-          <Skeleton key={i} className="w-full mb-2" style={{ height: 68, borderRadius: 8 }} />
-        ))}
-      </div>
-    );
-  }
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center gap-4 py-24 px-6 text-center">
-        <AlertCircle className="w-10 h-10 text-muted-foreground/50" />
-        <h3 className="text-lg font-semibold text-foreground">
-          {t('schedule.error.title')}
-        </h3>
-        <p className="text-sm text-muted-foreground max-w-[280px]">
-          {t('schedule.error.body')}
-        </p>
-        <button
-          type="button"
-          onClick={() => refetch()}
-          style={{
-            marginTop: 4,
-            background: '#0F172A',
-            color: '#fff',
-            border: 'none',
-            borderRadius: 999,
-            padding: '10px 20px',
-            fontFamily: FONT,
-            fontSize: 13.5,
-            fontWeight: 700,
-            cursor: 'pointer',
-          }}
-        >
-          {t('schedule.error.retry', { defaultValue: 'Retry' })}
-        </button>
-      </div>
-    );
-  }
-  if (!timeline || timeline.totalEvents === 0) {
-    return <TourHubEmptyState variant="schedule" />;
-  }
+  const hasTimeline = !!timeline && timeline.totalEvents > 0;
 
   return (
     <div
@@ -320,98 +275,146 @@ export function ScheduleTab() {
           </span>
         </div>
 
-        {/* Progress strip */}
-        <div>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'baseline',
-              justifyContent: 'space-between',
-              marginBottom: 6,
-            }}
-          >
-            <span
-              style={{
-                fontSize: 8.5,
-                fontWeight: 800,
-                letterSpacing: '0.14em',
-                color: INK,
-                textTransform: 'uppercase',
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {t('schedule.progress.eventOf', {
-                current: timeline.currentEventNumber ?? '—',
-                total: timeline.totalEvents,
-              })}
-            </span>
+        {/* Progress strip — shimmers while loading, hidden on error/empty. */}
+        {isLoading ? (
+          <div>
+            <Skeleton className="h-3 w-32 rounded mb-2" />
+            <Skeleton className="h-1.5 w-full rounded-full" />
           </div>
-          <div
-            style={{
-              height: 3,
-              background: HAIRLINE_INK_10,
-              borderRadius: 2,
-              overflow: 'hidden',
-            }}
-          >
+        ) : hasTimeline ? (
+          <div>
             <div
               style={{
-                width: `${Math.round(progressPct * 100)}%`,
-                height: '100%',
-                background: AMBER,
-                transition: 'width 240ms ease',
+                display: 'flex',
+                alignItems: 'baseline',
+                justifyContent: 'space-between',
+                marginBottom: 6,
               }}
-            />
+            >
+              <span
+                style={{
+                  fontSize: 8.5,
+                  fontWeight: 800,
+                  letterSpacing: '0.14em',
+                  color: INK,
+                  textTransform: 'uppercase',
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {t('schedule.progress.eventOf', {
+                  current: timeline!.currentEventNumber ?? '—',
+                  total: timeline!.totalEvents,
+                })}
+              </span>
+            </div>
+            <div
+              style={{
+                height: 3,
+                background: HAIRLINE_INK_10,
+                borderRadius: 2,
+                overflow: 'hidden',
+              }}
+            >
+              <div
+                style={{
+                  width: `${Math.round(progressPct * 100)}%`,
+                  height: '100%',
+                  background: AMBER,
+                  transition: 'width 240ms ease',
+                }}
+              />
+            </div>
           </div>
-        </div>
+        ) : null}
       </div>
 
-      {/* TIMELINE — page owns the scroll (no inner scroller). */}
+      {/* BODY — page owns the scroll (no inner scroller). */}
       <div style={{ position: 'relative' }}>
-        {timeline.months.map((group) => (
-          <section key={group.key}>
-            <div
+        {isLoading ? (
+          <div style={{ padding: '0 16px' }}>
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} className="w-full mb-2" style={{ height: 68, borderRadius: 8 }} />
+            ))}
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center gap-4 py-24 px-6 text-center">
+            <AlertCircle className="w-10 h-10 text-muted-foreground/50" />
+            <h3 className="text-lg font-semibold text-foreground">
+              {t('schedule.error.title')}
+            </h3>
+            <p className="text-sm text-muted-foreground max-w-[280px]">
+              {t('schedule.error.body')}
+            </p>
+            <button
+              type="button"
+              onClick={() => refetch()}
               style={{
-                position: 'sticky',
-                // Stack flush below sticky chip row (measured); -1px overlap.
-                top: 'calc(var(--sat, 0px) + var(--tour-chips-h, 47px) - 1px)',
-                zIndex: 2,
-                background: 'rgba(248,250,252,0.72)',
-                backdropFilter: 'blur(14px)',
-                WebkitBackdropFilter: 'blur(14px)',
-                padding: '12px 16px 6px',
-                fontSize: 10.5,
-                fontWeight: 800,
-                letterSpacing: '0.14em',
-                color: INK_MUTE,
-                textTransform: 'uppercase',
-                borderBottom: `0.5px solid ${HAIRLINE_INK_10}`,
+                marginTop: 4,
+                background: '#0F172A',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 999,
+                padding: '10px 20px',
+                fontFamily: FONT,
+                fontSize: 13.5,
+                fontWeight: 700,
+                cursor: 'pointer',
               }}
             >
+              {t('schedule.error.retry', { defaultValue: 'Retry' })}
+            </button>
+          </div>
+        ) : !hasTimeline ? (
+          <TourHubEmptyState variant="schedule" />
+        ) : (
+          <>
+            {timeline!.months.map((group) => (
+              <section key={group.key}>
+                <div
+                  style={{
+                    position: 'sticky',
+                    // Stack flush below sticky chip row (measured); -1px overlap.
+                    top: 'calc(var(--sat, 0px) + var(--tour-chips-h, 47px) - 1px)',
+                    zIndex: 2,
+                    background: 'rgba(248,250,252,0.72)',
+                    backdropFilter: 'blur(14px)',
+                    WebkitBackdropFilter: 'blur(14px)',
+                    padding: '12px 16px 6px',
+                    fontSize: 10.5,
+                    fontWeight: 800,
+                    letterSpacing: '0.14em',
+                    color: INK_MUTE,
+                    textTransform: 'uppercase',
+                    borderBottom: `0.5px solid ${HAIRLINE_INK_10}`,
+                  }}
+                >
 
-              {group.label}
-            </div>
-            <div>
-              {group.events.map((evt) => {
-                const isAnchor = evt.id === timeline.anchorEventId;
-                return (
-                  <div
-                    key={evt.id}
-                    id={`sv2-row-${evt.id}`}
-                  >
-                    <SeasonRow
-                      event={evt}
-                      anchorRef={isAnchor ? anchorRef : undefined}
-                      onSelect={onSelectEvent}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-        ))}
-        <div style={{ paddingBottom: 88 }} />
+                  {group.label}
+                </div>
+                <div>
+                  {group.events.map((evt) => {
+                    const isAnchor = evt.id === timeline!.anchorEventId;
+                    return (
+                      <div
+                        key={evt.id}
+                        id={`sv2-row-${evt.id}`}
+                      >
+                        <SeasonRow
+                          event={evt}
+                          anchorRef={isAnchor ? anchorRef : undefined}
+                          onSelect={onSelectEvent}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+            ))}
+            <div style={{ paddingBottom: 88 }} />
+          </>
+        )}
       </div>
+
 
       {/* Floating "This week" chip */}
       {anchorId && !anchorVisible && (
