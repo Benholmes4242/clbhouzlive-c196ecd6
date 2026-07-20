@@ -464,8 +464,8 @@ const ProfilePageV2Content: React.FC = () => {
 
   const { data: viewedWhsConnection } = useWhsConnection(profileUserId ?? undefined);
   const resolvedHcp = resolveDisplayHandicap({
-    egHandicapIndex: (profile as any)?.eg_handicap_index ?? null,
-    manualHandicapIndex: (profile as any)?.manual_handicap_index ?? null,
+    egHandicapIndex: profile?.eg_handicap_index ?? null,
+    manualHandicapIndex: profile?.manual_handicap_index ?? null,
     hasWhsConnection: !!viewedWhsConnection,
   });
 
