@@ -68,7 +68,7 @@ import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleto
 import { CoursesListSkeleton } from '@/components/skeletons/CoursesListSkeleton';
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
 import { HandicapPageSkeleton } from '@/components/skeletons/HandicapPageSkeleton';
-import { DiscoverSkeleton } from '@/components/skeletons/DiscoverSkeleton';
+import { CoursesHubSkeleton } from '@/components/skeletons/CoursesHubSkeleton';
 
 
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
