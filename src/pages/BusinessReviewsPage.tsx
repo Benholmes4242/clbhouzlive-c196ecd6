@@ -641,7 +641,7 @@ export default function BusinessReviewsPage() {
           try {
             await del.mutateAsync({ responseId: deleteTarget.response.id });
             toast.success('Reply deleted');
-          } catch {}
+          } catch { /* toast fired inside mutation */ }
           setDeleteTarget(null);
         }}
         title="Delete reply"
