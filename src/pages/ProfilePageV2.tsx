@@ -164,7 +164,8 @@ const ProfilePageV2Content: React.FC = () => {
         ? pubQuery.eq('id', routeUsername!)
         : pubQuery.eq('username', routeUsername!)
       ).maybeSingle();
-      if (pubError || !pub) return { id: null as string | null, deleted: false, notFound: true };
+      if (pubError) throw pubError;
+      if (!pub) return { id: null as string | null, deleted: false, notFound: true };
       return { id: pub.id, deleted: false, notFound: false };
     },
   });
