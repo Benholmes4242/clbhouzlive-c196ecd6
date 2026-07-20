@@ -96,12 +96,19 @@ export function unlockBodyScroll() {
       : null;
     const navigatedAway = lockOwnerPath !== null
       && currentPath !== null && currentPath !== lockOwnerPath;
-    const target = navigatedAway
-      ? (scrollPositions.get(currentPath!) ?? 0)
-      : scrollY;
     saved = null;
     lockOwnerPath = null;
-    scrollPageTo(target, 'auto');
+    if (navigatedAway) {
+      // Incoming route's position belongs to THAT page's primary scroller
+      // (ScrollRestoration semantics) - keep scrollPageTo.
+      scrollPageTo(scrollPositions.get(currentPath!) ?? 0, 'auto');
+    } else {
+      // Same page: we only ever moved the document scroller - restore only it.
+      // Inner-scroller pages: scrollY is 0 -> harmless no-op; the inner feed's
+      // own offset was never touched. (scrollPageTo here would yank the inner
+      // feed to top on every sheet close - the regression this branch avoids.)
+      setDocScrollTop(scrollY);
+    }
   }
 }
 
