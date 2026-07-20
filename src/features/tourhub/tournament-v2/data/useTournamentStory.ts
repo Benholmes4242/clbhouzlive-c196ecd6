@@ -13,7 +13,18 @@ export interface TournamentStory {
   broadcast: string | null;
 }
 
-function buildStory(row: any): string | null {
+interface SummaryRow {
+  course_conditions: string | null;
+  weather_conditions: string | null;
+  temperature: number | null;
+  wind_speed: number | null;
+  wind_direction: string | null;
+  broadcast_network: string | null;
+  broadcast_cable: string | null;
+  broadcast_internet: string | null;
+}
+
+function buildStory(row: SummaryRow): string | null {
   const bits: string[] = [];
   if (row.course_conditions) bits.push(String(row.course_conditions).trim());
   if (row.weather_conditions) bits.push(String(row.weather_conditions).trim());
@@ -28,11 +39,12 @@ function buildStory(row: any): string | null {
   return text.length > 0 ? text : null;
 }
 
-function buildBroadcast(row: any): string | null {
+function buildBroadcast(row: SummaryRow): string | null {
   const parts = [row.broadcast_network, row.broadcast_cable, row.broadcast_internet]
     .filter(Boolean);
   return parts.length ? parts.join(' · ') : null;
 }
+
 
 export function useTournamentStory(tournamentId: string | null | undefined) {
   return useQuery<TournamentStory | null>({
