@@ -48,7 +48,7 @@ export function useFriendsFeed({
 
 
   const query = useInfiniteQuery({
-    queryKey: ['friends-feed', mode, searchQuery, userId, interleave, pageSize, activeActor?.type, activeActor?.id],
+    queryKey: ['friends-feed', version, mode, searchQuery, userId, interleave, pageSize, activeActor?.type, activeActor?.id],
     queryFn: async ({ pageParam }) => {
       if (!userId) return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
 
