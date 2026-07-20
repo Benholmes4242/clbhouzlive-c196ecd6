@@ -21,6 +21,8 @@ import { useAudit, type AuditEntry } from '../hooks/useAudit';
 import { useDashboard } from '../hooks/useDashboard';
 import { useAdminPillVisibility } from '@/hooks/useAdminPillVisibility';
 import { isPerfEnabled, setPerfLive, subscribePerfLive } from '@/perf/navTiming';
+import { audioDebugEnabled, setAudioDebugEnabled, subscribeAudioDebugEnabled } from '@/perf/audioDebug';
+
 
 type TabId = 'audit' | 'tools' | 'settings';
 
