@@ -1618,6 +1618,7 @@ function PhotoSheet({
       }
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'stretch' }}>
+        <DraftRestoredBar visible={draftRestored} onDiscard={discardDraft} />
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <div style={{
             width: 112, height: 112, borderRadius: t.radius.lg,
@@ -1635,7 +1636,7 @@ function PhotoSheet({
           <div style={{ display: 'flex', gap: 8 }}>
             <input
               value={override}
-              onChange={e => setOverride(e.target.value)}
+              onChange={e => onOverrideChange(e.target.value)}
               placeholder={name}
               style={{
                 flex: 1, minHeight: 44, padding: '10px 12px',
