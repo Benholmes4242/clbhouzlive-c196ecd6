@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { useSignedUrl } from '@/hooks/messaging/useSignedUrl';
+import { Skeleton } from '@/components/ui/skeleton';
 import type { MessageAttachment } from '@/types/messaging';
 
 interface Props {
