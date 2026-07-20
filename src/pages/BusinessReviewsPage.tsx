@@ -424,7 +424,7 @@ export default function BusinessReviewsPage() {
   const [chip, setChip] = useState<ChipKey>('all');
   const active = CHIPS.find((c) => c.key === chip)!;
 
-  const { data, isLoading } = useBusinessReviews(businessId, {
+  const { data, isLoading, isError, refetch } = useBusinessReviews(businessId, {
     filter: active.filter,
     sort: active.sort,
   });
