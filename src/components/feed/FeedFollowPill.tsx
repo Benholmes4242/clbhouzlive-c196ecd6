@@ -46,7 +46,6 @@ export const FeedFollowPill: React.FC<FeedFollowPillProps> = ({ onFollow, isFoll
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (isFollowed) return;
     onFollow();
   };
 
