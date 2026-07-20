@@ -34,7 +34,6 @@ export interface TourSideMenuProps {
   onClose: () => void;
   activeTab: string;
   onSelectTab: (tabId: string) => void;
-  handicapValue: string;
   onSettings: () => void;
   onProfile: () => void;
   onSignOut: () => void;
