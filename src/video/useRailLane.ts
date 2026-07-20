@@ -196,6 +196,13 @@ export function useRailLane(opts: UseRailLaneOptions): UseRailLaneResult {
       // Local deactivation — the pool.release effect above will fire the
       // engine release and unmount cleanup; here we just stop playback.
       VideoEngine.pause(laneId, { callerPostId: caller });
+      // v10 audio-focus — surrender focus if this rail lane still holds it.
+      try {
+        const cur = VideoEngine.getAudioFocus();
+        if (cur.source === 'rail' && cur.laneId === laneId) {
+          VideoEngine.setAudioFocus(null, 'rail');
+        }
+      } catch { /* noop */ }
     };
   }, [laneId, opts.hlsUrl, opts.posterUrl, opts.postId, opts.ownerKey]);
 
