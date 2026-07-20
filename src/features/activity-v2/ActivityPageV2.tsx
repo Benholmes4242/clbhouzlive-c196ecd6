@@ -355,7 +355,8 @@ export const ActivityPageV2: React.FC = () => {
     );
   };
 
-  const isEmpty = !feed.isLoading && allRows.length === 0;
+  const isErrored = feed.isError && allRows.length === 0;
+  const isEmpty = !feed.isLoading && !feed.isError && allRows.length === 0;
 
   return (
     <ManagePageShell
@@ -374,6 +375,41 @@ export const ActivityPageV2: React.FC = () => {
           </div>
         )}
 
+        {isErrored && (
+          <div
+            style={{
+              padding: '60px 24px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 12,
+              color: INK_60,
+              fontSize: 13,
+            }}
+          >
+            <div style={{ fontSize: 14, fontWeight: 700, color: INK }}>
+              Couldn't load your activity
+            </div>
+            <button
+              type="button"
+              onClick={() => feed.refetch()}
+              style={{
+                background: INK,
+                color: '#fff',
+                border: 'none',
+                borderRadius: 999,
+                padding: '8px 16px',
+                fontSize: 13,
+                fontWeight: 700,
+                cursor: 'pointer',
+                fontFamily: GEIST,
+              }}
+            >
+              Retry
+            </button>
+          </div>
+        )}
+
         {isEmpty && (
           <div style={{ padding: '60px 24px', textAlign: 'center', color: INK_60 }}>
             <div style={{ fontSize: 14, fontWeight: 700, color: INK, marginBottom: 6 }}>
@@ -385,7 +421,7 @@ export const ActivityPageV2: React.FC = () => {
           </div>
         )}
 
-        {!isEmpty && !feed.isLoading && (
+        {!isEmpty && !isErrored && !feed.isLoading && (
           <div style={{ paddingBottom: 40 }}>
             {renderBucket(BUCKET_LABELS.new, buckets.new, 'new')}
             {renderBucket(BUCKET_LABELS.today, buckets.today)}
