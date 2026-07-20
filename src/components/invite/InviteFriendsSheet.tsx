@@ -135,8 +135,8 @@ function ConnectedState({ ownerUserId, source }: { ownerUserId: string; source: 
 
   const sentByPassportId = useMemo(() => {
     const map = new Map<string, { created_at: string }>();
-    (sent ?? []).forEach((s: any) => {
-      if (s.invitee_passport_id) map.set(String(s.invitee_passport_id), { created_at: s.created_at });
+    (sent ?? []).forEach((s: WhsInviteStatus) => {
+      if (s.invitee_passport_id) map.set(String(s.invitee_passport_id), { created_at: s.sent_at });
     });
     return map;
   }, [sent]);
