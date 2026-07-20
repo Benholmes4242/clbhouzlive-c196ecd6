@@ -1,12 +1,12 @@
 /**
  * useTournamentMeta — sr_tournaments metadata for the new Leaderboard tab
  * (masthead + cut sentence) AND for tournament-v2 (hero + state panels).
- * Never-silent: errors are logged with the [leaderboard-v2] tag and
- * returned as null so consumers degrade gracefully.
- *
- * TD1 extensions: venue_course_name, purse, defending_champion, timezone,
- * plus season join for tour_code / tour_full_name.
+ * Errors throw so React Query surfaces isError; consumers gate on it and
+ * offer a Retry. TD1 extensions: venue_course_name, purse,
+ * defending_champion, timezone, plus season join for
+ * tour_code / tour_full_name.
  */
+
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
