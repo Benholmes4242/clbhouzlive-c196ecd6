@@ -51,12 +51,6 @@ export interface EmptyStatePayload {
   popular_courses: EmptyStateCourse[];
 }
 
-const EMPTY: EmptyStatePayload = {
-  players: [],
-  suggested_people: [],
-  popular_courses: [],
-};
-
 export function useSearchEmptyStateV2(enabled: boolean) {
   return useQuery({
     queryKey: ['search-empty-state-v2'],
@@ -78,6 +72,5 @@ export function useSearchEmptyStateV2(enabled: boolean) {
         popular_courses: j.popular_courses ?? [],
       };
     },
-    placeholderData: EMPTY,
   });
 }

@@ -37,7 +37,7 @@ interface Props {
 }
 
 export function SearchEmptyState({ onSelect }: Props) {
-  const { data, isLoading } = useSearchEmptyStateV2(true);
+  const { data, isLoading, isError, refetch } = useSearchEmptyStateV2(true);
   const navigate = useNavigate();
 
   const event = data?.event;
@@ -51,6 +51,43 @@ export function SearchEmptyState({ onSelect }: Props) {
     : 'TOUR PLAYERS';
   const isMajorEvent = liveEvent ? isAnyMajor(liveEvent.name) : false;
   const showPlayersRail = isLoading || players.length > 0;
+
+  if (isError) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 10,
+          padding: '32px 16px',
+          textAlign: 'center',
+        }}
+      >
+        <p style={{ fontSize: 13, fontWeight: 600, color: '#0F172A' }}>
+          Couldn't load suggestions
+        </p>
+        <button
+          type="button"
+          onClick={() => refetch()}
+          className="active:scale-[0.97]"
+          style={{
+            height: 32,
+            padding: '0 16px',
+            borderRadius: 999,
+            background: '#0F172A',
+            color: '#fff',
+            fontSize: 12,
+            fontWeight: 700,
+            border: 'none',
+            transition: 'transform 100ms ease',
+          }}
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div>
