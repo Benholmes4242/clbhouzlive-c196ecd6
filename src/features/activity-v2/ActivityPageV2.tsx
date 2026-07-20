@@ -256,7 +256,7 @@ export const ActivityPageV2: React.FC = () => {
   const handleMarkAllRead = async () => {
     if (!user?.id || !recipientActorId) return;
     const now = new Date().toISOString();
-    await supabase
+    const { error: notifErr } = await supabase
       .from('notifications')
       .update({ is_read: true })
       .eq('recipient_actor_type', recipientActorType)
@@ -264,10 +264,14 @@ export const ActivityPageV2: React.FC = () => {
       .eq('is_read', false)
       .neq('type', 'friend_request')
       .lte('created_at', now);
-    await supabase
+    const { error: seenErr } = await supabase
       .from('user_profiles')
       .update({ last_notifications_seen_at: now })
       .eq('id', user.id);
+    if (notifErr || seenErr) {
+      toast.error("Couldn't mark all read. Try again.");
+      return;
+    }
     qc.invalidateQueries({ queryKey: ['activity-v2'] });
     qc.invalidateQueries({ queryKey: ['activity-feed'] });
     qc.invalidateQueries({ queryKey: ['activity-unread-count'] });
