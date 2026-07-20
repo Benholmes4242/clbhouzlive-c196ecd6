@@ -45,16 +45,29 @@ export function useTeeTimesAll(
         .eq('round_number', round)
         .order('tee_time', { ascending: true });
 
-      if (error) {
-        console.error('[tournament-v2] useTeeTimesAll', error);
-        return [];
-      }
+      if (error) throw error;
 
-      return ((data ?? []) as any[])
+      type RawPlayer = {
+        id: string;
+        full_name: string | null;
+        first_name: string | null;
+        last_name: string | null;
+        country: string | null;
+        country_code: string | null;
+        photo_url: string | null;
+      };
+      type RawRow = {
+        tee_time: string;
+        tee_number: number | null;
+        back_nine: boolean | null;
+        players: Array<{ player: RawPlayer | null }> | null;
+      };
+
+      return ((data ?? []) as RawRow[])
         .map((row): TeeGroup => ({
           teeTime: row.tee_time,
           startingHole: row.back_nine ? 10 : (row.tee_number ?? 1),
-          players: (row.players ?? []).map((tp: any): TeeGroupPlayer => {
+          players: (row.players ?? []).map((tp): TeeGroupPlayer => {
             const p = tp.player;
             if (!p) return { id: null, name: 'TBA' };
             const name = p.full_name || `${p.first_name ?? ''} ${p.last_name ?? ''}`.trim();
@@ -67,6 +80,7 @@ export function useTeeTimesAll(
           }),
         }))
         .filter((g) => g.players.length > 0);
+
     },
   });
 }
