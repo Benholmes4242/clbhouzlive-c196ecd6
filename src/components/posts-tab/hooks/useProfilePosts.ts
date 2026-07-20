@@ -60,7 +60,8 @@ export function useProfilePosts({ userId, actorType, actorId }: UseProfilePostsP
         params.p_cursor_id = cursor.id;
       }
 
-      const { data, error } = await supabase.rpc('get_profile_posts', params as Parameters<typeof supabase.rpc>[1]);
+      // RPC arg type is a large generated union; cast through unknown to keep the wrapper structural.
+      const { data, error } = await supabase.rpc('get_profile_posts', params as unknown as Record<string, never>);
 
       if (error) {
         console.error('[ProfilePosts] RPC error:', error);
