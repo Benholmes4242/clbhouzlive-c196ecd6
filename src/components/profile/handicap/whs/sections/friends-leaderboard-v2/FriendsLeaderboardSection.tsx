@@ -35,7 +35,7 @@ const LABEL_STYLE: React.CSSProperties = {
 };
 
 export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 'owner', ownerFirstName = null }) => {
-  const { data, isLoading } = useFriendLeaderboard(userId);
+  const { data, isLoading, isError, refetch } = useFriendLeaderboard(userId);
   const percentileQuery = useHandicapPercentile(userId);
   const { data: deltasData } = useFriendLeaderboardRankDeltas(userId, 30);
   const { data: weeklyBanner } = useFriendLeaderboardWeeklyBanner(userId);
