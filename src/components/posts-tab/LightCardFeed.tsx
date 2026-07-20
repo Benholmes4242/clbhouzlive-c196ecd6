@@ -264,7 +264,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
 
   // Symmetric neighbour warm-up via role lookup — see CardFeed.
   useEffect(() => {
-    const warm = (role: 'next' | 'prev', post: any) => {
+    const warm = (role: 'next' | 'prev', post: FeedPost | undefined) => {
       const m = post?.mediaItems?.[0];
       if (!post || !m || m.type !== 'video' || !m.hlsUrl) return;
       try {
