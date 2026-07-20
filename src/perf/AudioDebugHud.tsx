@@ -351,6 +351,48 @@ function SummaryPane({ summary }: { summary: AudioSummary }) {
         <span style={{ color: '#fbbf24' }}>POS</span>{' '}
         tile {tilePos}s → fs {fsPos}s{cont}
       </div>
+      <SlotLine summary={summary} />
+    </div>
+  );
+}
+
+function SlotLine({ summary }: { summary: AudioSummary }) {
+  // The heartbeat's gist: who owns the ONE_UNMUTED_LANE slot right now?
+  //   SLOT feed-active(post-ab12) unmuted
+  //   SLOT NONE (active muted!)         ← silent-video symptom
+  //   SLOT feed-active — squatters: [rail-0]
+  const active = summary.activeLaneId;
+  const post = summary.activePostId;
+  const activeMuted = summary.activeElMuted;
+  const others = summary.unmutedLanes.filter((l) => l !== active);
+  let label: string;
+  let color: string;
+  if (!active) {
+    label = 'NONE (no active lane)';
+    color = '#94a3b8';
+  } else if (activeMuted === true) {
+    label = `NONE (active muted!) — active=${active}`;
+    color = '#f87171';
+  } else if (activeMuted === false) {
+    const postTag = post ? `(${String(post).slice(0, 12)})` : '';
+    label = `${active}${postTag} unmuted`;
+    color = '#4ade80';
+  } else {
+    label = `${active} — muted state unknown`;
+    color = '#94a3b8';
+  }
+  return (
+    <div>
+      <span style={{ color: '#fbbf24' }}>SLOT</span>{' '}
+      <span style={{ color }}>{label}</span>
+      {others.length > 0 && (
+        <>
+          {' '}
+          <span style={{ color: '#f87171' }}>
+            squatters=[{others.join(',')}]
+          </span>
+        </>
+      )}
     </div>
   );
 }
