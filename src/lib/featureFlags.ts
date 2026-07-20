@@ -13,7 +13,7 @@ export const ENABLE_MOCK_VIDEOS = false; // ⚠️ DISABLED for testing real dat
 
 /**
  * Suggested feed version switch.
- * `?feed=v3` persists v3 on the device; `?feed=v2` reverts. Default: v2.
+ * `?feed=v3` persists v3 on the device; `?feed=v2` reverts. Default: v3.
  */
 export function getFeedVersion(): 'v2' | 'v3' {
   try {
@@ -21,8 +21,8 @@ export function getFeedVersion(): 'v2' | 'v3' {
     if (url === 'v3' || url === 'v2') {
       localStorage.setItem('clbhouz.feedVersion', url);
     }
-    return localStorage.getItem('clbhouz.feedVersion') === 'v3' ? 'v3' : 'v2';
+    return localStorage.getItem('clbhouz.feedVersion') === 'v2' ? 'v2' : 'v3';
   } catch {
-    return 'v2';
+    return 'v3';
   }
 }
