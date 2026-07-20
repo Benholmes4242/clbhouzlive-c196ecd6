@@ -182,6 +182,23 @@ export function SnapFeed({
     const post = posts[activeIndex];
     if (!post) return;
 
+    // Forensic X-ray — announces the surface's active slot so downstream
+    // audio decision records can be correlated by (surface, activeIndex,
+    // postId). Fired on every settle; the clear log lives in the unmount
+    // effect below.
+    if (audioDebugEnabled()) {
+      try {
+        const laneId = surface === 'fullscreen' ? 'fullscreen' : 'feed-active';
+        logAudio('surface.active', {
+          surface: surface === 'fullscreen' ? 'fullscreen' : 'clubhouse',
+          activeIndex,
+          laneId,
+          postId: post.id,
+        });
+      } catch { /* noop */ }
+    }
+
+
     const hasVideo = (post as any)?.mediaItems?.some?.((m: any) => m?.type === 'video');
     const mediaType: 'image' | 'video' = hasVideo ? 'video' : 'image';
     // Surface-aware lane: fullscreen overlay plays on the singleton
