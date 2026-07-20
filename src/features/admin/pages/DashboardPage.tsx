@@ -115,7 +115,7 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
       title: `New member: ${name}`,
       subtitle: null,
       avatarUrl: m.profile_photo_url,
-      href: `/admin-v2/members?q=${encodeURIComponent(m.username ?? name)}`,
+      href: `/admin-v2/users?member=${m.id}`,
     });
   }
   for (const p of postRows) {
@@ -136,7 +136,7 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
       title: `Post from ${name}`,
       subtitle,
       avatarUrl: prof?.profile_photo_url ?? null,
-      href: `/p/${p.id}`,
+      href: `/admin-v2/users?member=${p.user_id}`,
     });
   }
   for (const r of reviewRows) {
@@ -149,7 +149,7 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
       title: `Review: ${course?.name ?? 'a course'}`,
       subtitle: (r.review ?? '').trim() || `by ${displayName(prof)}`,
       avatarUrl: prof?.profile_photo_url ?? null,
-      href: r.course_id ? `/course/${r.course_id}` : '/admin-v2/content?tab=courses',
+      href: `/admin-v2/users?member=${r.user_id}`,
     });
   }
 
@@ -318,7 +318,7 @@ function MetricGrid({ loading, data }: { loading: boolean; data: ReturnType<type
         delta={loading ? undefined : pctDelta(data?.dau.current ?? 0, data?.dau.previous ?? 0)}
         deltaLabel="vs same day last week"
         sparkline={data?.dau.sparkline}
-        to="/admin-v2/analytics?tab=growth"
+        to="/admin-v2/analytics?tab=engagement"
         loading={loading}
       />
       <MetricCard
@@ -345,7 +345,7 @@ function MetricGrid({ loading, data }: { loading: boolean; data: ReturnType<type
         delta={loading ? undefined : pctDelta(data?.posts.current ?? 0, data?.posts.previous ?? 0)}
         deltaLabel="vs prev 7d"
         sparkline={data?.posts.sparkline}
-        to="/admin-v2/content?tab=posts"
+        to="/admin-v2/analytics?tab=engagement"
         loading={loading}
       />
       <MetricCard
@@ -354,14 +354,14 @@ function MetricGrid({ loading, data }: { loading: boolean; data: ReturnType<type
         delta={loading ? undefined : pctDelta(data?.reviews.current ?? 0, data?.reviews.previous ?? 0)}
         deltaLabel="vs prev 7d"
         sparkline={data?.reviews.sparkline}
-        to="/admin-v2/content?tab=courses"
+        to="/admin-v2/analytics?tab=engagement"
         loading={loading}
       />
       <MetricCard
         label="Members"
         value={loading ? null : (data?.totalUsers ?? 0)}
         deltaLabel="total"
-        to="/admin-v2/members"
+        to="/admin-v2/users"
         loading={loading}
       />
     </section>
