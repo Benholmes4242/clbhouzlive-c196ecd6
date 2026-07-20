@@ -447,16 +447,16 @@ export function BusinessCommandCard({
         </AnimatePresence>
       </motion.div>
 
-      <DeleteBusinessDialog
-        open={showDeleteDialog}
-        onOpenChange={setShowDeleteDialog}
-        businessId={business.id}
-        businessName={business.name}
-        userId={userId}
-      />
+      {/* NOTE: the confirm dialog is intentionally NOT rendered here. It is
+          hoisted to `MyBusinessesPage` and opened via `onRequestDelete`. When
+          the mutation invalidates and evicts this card, the dialog host is
+          not in the evicted subtree, so Radix's `DismissableLayer` cleanup
+          can complete normally. See `src/lib/radixLockSanitizer.ts` for the
+          belt-and-braces safety net that pairs with this hoist. */}
     </>
   );
 }
+
 
 /* ─────────────────────── sub-components ─────────────────────── */
 
