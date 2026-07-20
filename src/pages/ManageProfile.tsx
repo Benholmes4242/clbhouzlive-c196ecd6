@@ -169,6 +169,21 @@ export default function ManageProfile() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.firstName, form.lastName, hasTouchedDisplayName]);
 
+  if (profileError && !isNewUser.current) {
+    return (
+      <PageRoot className="min-h-screen" style={{ background: PAGE_BG } as React.CSSProperties}>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center gap-4">
+          <h2 className="text-lg font-semibold" style={{ color: INK_TOKEN }}>Couldn't load your profile</h2>
+          <p className="text-sm" style={{ color: INK_45_TOKEN }}>Check your connection and try again. Nothing has been changed.</p>
+          <div className="flex gap-3">
+            <Button onClick={() => refetchProfile()}>Retry</Button>
+            <Button variant="outline" onClick={() => navigate(-1)}>Go back</Button>
+          </div>
+        </div>
+      </PageRoot>
+    );
+  }
+
   if (loading && !isNewUser.current) return <ProfileSkeleton />;
 
   const handleSave = async () => {
