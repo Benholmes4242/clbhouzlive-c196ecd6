@@ -16,13 +16,14 @@ export interface TournamentStory {
 interface SummaryRow {
   course_conditions: string | null;
   weather_conditions: string | null;
-  temperature: number | null;
-  wind_speed: number | null;
+  temperature: number | string | null;
+  wind_speed: number | string | null;
   wind_direction: string | null;
   broadcast_network: string | null;
   broadcast_cable: string | null;
   broadcast_internet: string | null;
 }
+
 
 function buildStory(row: SummaryRow): string | null {
   const bits: string[] = [];
