@@ -95,7 +95,7 @@ export function TheClass({ slug, collegeName }: Props) {
       >
         <div
           style={{
-            fontSize: 9,
+            fontSize: 10,
             fontWeight: 800,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
