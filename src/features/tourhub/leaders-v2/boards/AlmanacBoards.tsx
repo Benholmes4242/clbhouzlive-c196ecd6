@@ -286,7 +286,7 @@ function WorldBoardInner({
           <div
             style={{
               marginTop: 4,
-              fontSize: 9,
+              fontSize: 10,
               fontWeight: 700,
               letterSpacing: '0.08em',
               color: INK_MUTE,
