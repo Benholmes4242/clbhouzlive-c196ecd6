@@ -21,9 +21,11 @@ import {
   logAudio,
   setSummary,
   subscribe,
+  subscribeAudioDebugEnabled,
   type AudioLogEntry,
   type AudioSummary,
 } from '@/perf/audioDebug';
+
 import { useSessionAudio, getLastUnmuteGestureTs } from '@/audio/sessionAudioStore';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { VideoEngine } from '@/video/VideoEngine';
