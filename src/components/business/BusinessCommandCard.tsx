@@ -304,7 +304,18 @@ export function BusinessCommandCard({
                   <>
                     <DropdownMenuSeparator className="my-1" />
                     <DropdownMenuItem
-                      onClick={(e) => { e.stopPropagation(); setShowDeleteDialog(true); }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // Close the dropdown BEFORE asking the page to open
+                        // the (hoisted) confirm dialog. Both are Radix modal
+                        // layers — leaving the dropdown mid-close while a
+                        // new layer opens on the same tick is the race that
+                        // strands `pointer-events: none` on <body>.
+                        setDropdownOpen(false);
+                        requestAnimationFrame(() => {
+                          onRequestDelete?.({ id: business.id, name: business.name });
+                        });
+                      }}
                       className="gap-2.5 cursor-pointer min-h-[44px] text-destructive focus:text-destructive focus:bg-destructive/10"
                     >
                       <Trash2 className="h-4 w-4" />
