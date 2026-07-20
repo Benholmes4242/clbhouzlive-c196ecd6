@@ -28,6 +28,7 @@ import CourseInsight from '../components/CourseInsight';
 import AdminAccessDenied from '../components/AdminAccessDenied';
 import { VALID_CONTINENTS, COURSE_TYPES } from '../constants';
 import { useCourses, createCourse, type AdminCourseRow, type CourseFilter } from '../hooks/useCourses';
+import { saveDraft, loadDraft, clearDraft, draftKeys, draftsEqual } from '../lib/sheetDrafts';
 import HelpArticlesTab from '../components/HelpArticlesTab';
 import LegalDocumentsTab from '../components/LegalDocumentsTab';
 
