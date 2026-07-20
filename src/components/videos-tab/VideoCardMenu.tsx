@@ -82,10 +82,19 @@ export const VideoCardMenu = React.memo(function VideoCardMenu({
     toast.success('Saved');
   };
 
+  const handleBlockClick = () => {
+    if (!authorUserId) return;
+    setDropdownOpen(false);
+    requestAnimationFrame(() => setConfirmOpen(true));
+  };
+
   const handleBlockConfirm = async () => {
     if (!authorUserId) return;
-    await blockUser(authorUserId);
+    // Close FIRST, then mutate — Radix's exit cycle needs to complete
+    // before the invalidation-driven eviction races DismissableLayer.
     setConfirmOpen(false);
+    await new Promise((r) => setTimeout(r, 300));
+    await blockUser(authorUserId);
   };
 
   const canBlock = !!userId && !!authorUserId && authorUserId !== userId;
