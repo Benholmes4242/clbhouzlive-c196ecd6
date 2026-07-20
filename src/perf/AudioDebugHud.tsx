@@ -33,16 +33,30 @@ import { feedLaneRoles } from '@/video/feedLaneRoles';
 
 const HUD_BORDER = '1px solid rgba(251, 191, 36, 0.35)';
 
+export const AUDIO_HUD_OPEN_EVENT = 'clb:audio-hud-open';
+
 export const AudioDebugHud = memo(function AudioDebugHud() {
+  const [, forceEnable] = useState(0);
+  useEffect(() => subscribeAudioDebugEnabled(() => forceEnable((n) => n + 1)), []);
   const enabled = audioDebugEnabled();
   const [expanded, setExpanded] = useState(false);
   const [, force] = useState(0);
+
+  // External trigger — Audio Logs button dispatches this event to open the
+  // panel without requiring the floating pill to be visible or tapped.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const onOpen = () => setExpanded(true);
+    window.addEventListener(AUDIO_HUD_OPEN_EVENT, onOpen);
+    return () => window.removeEventListener(AUDIO_HUD_OPEN_EVENT, onOpen);
+  }, []);
 
   // Subscribe to the buffer so every logAudio() re-renders the panel.
   useEffect(() => {
     if (!enabled) return;
     return subscribe(() => force((n) => n + 1));
   }, [enabled]);
+
 
   // Session mute changes — mirror into the timeline + summary.
   useEffect(() => {
