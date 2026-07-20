@@ -9,7 +9,7 @@ import { useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Pressable from '@/components/ui/Pressable';
 import { SectionHeader } from '@/components/ui/SectionHeader';
-import { FormatBadge } from '@/features/watch-v2/components/FormatBadge';
+
 import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
 import { toFeedPosts } from '@/features/watch-v2/utils/toFeedPost';
 import { useWatchAutoplay } from '@/video/useWatchAutoplay';
@@ -118,7 +118,6 @@ function ClipTile({
             }}
           />
         ) : null}
-        <FormatBadge format="clip" />
         {row.duration_seconds ? (
           <div
             style={{
