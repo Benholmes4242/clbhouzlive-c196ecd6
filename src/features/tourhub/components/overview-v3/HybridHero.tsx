@@ -358,6 +358,38 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
     return null;
   }, [state, safeLeaderboard, tiedLeaders, champion, defendingChamp, t]);
 
+  // "Awaiting the field" empty-state facts for the HeroWireTicker (Upcoming
+  // only, when no field/prediction rows are available yet). Each entry is
+  // optional; the wire only renders facts that exist. Zero facts ⇒ band absent.
+  const emptyStateFacts: TickerFact[] | undefined = useMemo(() => {
+    if (state.kind !== 'upcoming') return undefined;
+    if (top10.length > 0) return undefined;
+    const facts: TickerFact[] = [];
+    if (datesString) facts.push({ label: t('overview.hero.teesOff'), value: datesString });
+    if (tournament.venueName) facts.push({ label: t('overview.hero.venueLabel'), value: tournament.venueName });
+    if (defendingChamp?.name) {
+      facts.push({ label: t('overview.hero.defendsLabel'), value: defendingChamp.name, labelGold: true });
+      if (defendingChamp.score && defendingChamp.year) {
+        const surname = defendingChamp.name.trim().split(/\s+/).slice(-1)[0];
+        facts.push({
+          label: t('overview.hero.prevWinner', { year: defendingChamp.year }),
+          value: surname ? `${defendingChamp.score} · ${surname}` : defendingChamp.score,
+        });
+      }
+    }
+    if (typeof tournament.purse === 'number' && tournament.purse > 0) {
+      const m = tournament.purse / 1_000_000;
+      const purseStr = m >= 10 ? `$${Math.round(m)}M` : `$${m.toFixed(1)}M`;
+      facts.push({ label: t('overview.hero.purse'), value: purseStr });
+    }
+    facts.push({
+      label: t('overview.leaderboardBand.fieldEyebrow').toUpperCase(),
+      value: t('overview.hero.fieldAnnouncedSoon'),
+      pulseLabel: true,
+    });
+    return facts;
+  }, [state.kind, top10.length, datesString, tournament.venueName, tournament.purse, defendingChamp, t]);
+
   if (!isCancelled) {
     return (
       <div
