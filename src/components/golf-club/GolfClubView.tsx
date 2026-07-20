@@ -13,6 +13,7 @@ import CourseRankBadges from '@/components/courses/CourseRankBadges';
 import { CourseTabs, type CourseTabId } from '@/components/courses/course-detail/CourseTabs';
 import CourseDetailShellTabs from '@/features/courses/components/CourseDetailShellTabs';
 // FloatingPageHeader removed (H3) — chrome now driven by ChromeIsland registry.
+import { buildOverviewHeroBackground } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 import { safeGoBack } from '@/utils/navigation';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
