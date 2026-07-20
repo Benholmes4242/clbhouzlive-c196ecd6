@@ -106,7 +106,7 @@ export function SettingsTabContent() {
   const [signingOut, setSigningOut] = useState(false);
 
   const queryClient = useQueryClient();
-  const hideHandicapChip = !!(profile as any)?.hide_handicap_chip;
+  const hideHandicapChip = !!profile?.hide_handicap_chip;
   const [chipUpdating, setChipUpdating] = useState(false);
   const handleToggleHandicapChip = async (nextChecked: boolean) => {
     if (!user?.id || chipUpdating) return;
