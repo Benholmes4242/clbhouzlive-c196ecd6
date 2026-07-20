@@ -1,7 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { toast } from '@/lib/toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { patchFollow } from '@/lib/followCache';
+
+// Minimal structural rpc caller — get_activity_friend_requests is not in the
+// generated Supabase types but the call/error shape is stable.
+type RpcResult<T> = { data: T | null; error: { message: string } | null };
+const rpcFriendRequests = supabase.rpc as unknown as (
+  name: string,
+  args: Record<string, unknown>,
+) => Promise<RpcResult<FriendRequestRowV2[]>>;
 
 /**
  * Friend-requests strip data for Activity V2.
