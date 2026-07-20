@@ -74,10 +74,10 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
             background: 'var(--hcp-bg-1)', border: `1px solid ${LINE}`,
             borderRadius: 18, padding: '16px 14px 12px',
           }}>
-            <div style={{ height: 10, background: 'var(--hcp-bg-3)', borderRadius: 2 }} />
-            <div style={{ height: 26, background: 'var(--hcp-bg-3)', borderRadius: 4, margin: '12px 0 8px' }} />
-            <div style={{ height: 118, background: 'var(--hcp-bg-3)', borderRadius: 4 }} />
-            <div style={{ height: 12, background: 'var(--hcp-bg-3)', borderRadius: 2, marginTop: 12 }} />
+            <Skeleton variant="dark" style={{ height: 10, borderRadius: 2 }} />
+            <Skeleton variant="dark" style={{ height: 26, borderRadius: 4, margin: '12px 0 8px' }} />
+            <Skeleton variant="dark" style={{ height: 118, borderRadius: 4 }} />
+            <Skeleton variant="dark" style={{ height: 12, borderRadius: 2, marginTop: 12 }} />
           </div>
         </div>
       </section>
