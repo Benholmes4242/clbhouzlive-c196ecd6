@@ -80,6 +80,12 @@ export const PostOwnerMenu: React.FC<PostOwnerMenuProps> = ({
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  // Controlled dropdown so we can force it closed BEFORE opening the confirm
+  // dialog. Radix auto-closes on `DropdownMenuItem` click, but the confirm
+  // opens on the same tick — leaving the dropdown mid-close while another
+  // Radix modal layer opens is the race that leaks `pointer-events: none`
+  // onto <body> when this item is later evicted by the delete mutation.
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   if (!isOwnPost) return null;
 
