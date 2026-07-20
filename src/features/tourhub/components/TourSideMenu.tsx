@@ -96,6 +96,21 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
     }
   }, [open, mounted]);
 
+  useEffect(() => {
+    if (!open) return;
+    lockBodyScroll();
+    return () => unlockBodyScroll();
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open, onClose]);
+
   if (!mounted) return null;
 
   const ease = 'cubic-bezier(0.4,0,0.2,1)';
