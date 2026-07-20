@@ -206,7 +206,7 @@ export function useInboxFeed(): InboxFeedResult {
           id: row.id,
           type: 'appeal',
           title: 'Suspension appeal',
-          meta: `Appeal - ${row.appellant?.display_name ?? row.appellant?.username ?? 'unknown'}`,
+          meta: `Appeal - ${row.appellant?.display_name ?? row.appellant?.username ?? 'A member'}`,
           createdAt: row.created_at,
           isHighPriority: false,
           payload: row,
