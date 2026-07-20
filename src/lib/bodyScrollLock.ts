@@ -6,7 +6,18 @@
  * and leave the body stuck `position: fixed` (which freezes the whole page).
  */
 import { scrollPositions } from '@/components/ScrollRestoration';
-import { getPageScrollTop, scrollPageTo } from '@/lib/getScrollParent';
+import { getDocumentScrollParent, scrollPageTo } from '@/lib/getScrollParent';
+
+function getDocScrollTop(): number {
+  const doc = getDocumentScrollParent();
+  return doc?.scrollTop ?? window.scrollY ?? 0;
+}
+
+function setDocScrollTop(top: number) {
+  const doc = getDocumentScrollParent();
+  if (doc) doc.scrollTop = Math.max(0, top);
+  else window.scrollTo(0, Math.max(0, top));
+}
 
 let lockCount = 0;
 let lockOwnerPath: string | null = null;
