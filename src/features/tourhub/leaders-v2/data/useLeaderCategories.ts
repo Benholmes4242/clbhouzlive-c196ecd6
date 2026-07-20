@@ -327,22 +327,22 @@ async function fetchPgaCategories(): Promise<LeaderCategoriesResult> {
 
 async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCategoriesResult> {
   const year = currentSeasonYear();
-  const primary = await supabase
-    .from('tour_season_rankings' as never)
+  const primary = await (supabase
+    .from('tour_season_rankings' as never) as unknown as ReturnType<typeof supabase.from>)
     .select('player_id, manual_player_id, player_name, position, points, wins, country, tour_code')
-    .eq('tour_code' as never, tour as never)
-    .eq('season_year' as never, year as never)
-    .order('position' as never, { ascending: true })
+    .eq('tour_code', tour)
+    .eq('season_year', year)
+    .order('position', { ascending: true })
     .limit(200);
   if (primary.error) throw primary.error;
   let rankings = (primary.data ?? []) as TourSeasonRankingRow[];
   if (!rankings.length) {
-    const alt = await supabase
-      .from('tour_season_rankings' as never)
+    const alt = await (supabase
+      .from('tour_season_rankings' as never) as unknown as ReturnType<typeof supabase.from>)
       .select('player_id, manual_player_id, player_name, position, points, wins, country, tour_code')
-      .eq('tour_code' as never, tour as never)
-      .eq('season_year' as never, (year - 1) as never)
-      .order('position' as never, { ascending: true })
+      .eq('tour_code', tour)
+      .eq('season_year', year - 1)
+      .order('position', { ascending: true })
       .limit(200);
     if (alt.error) throw alt.error;
     rankings = (alt.data ?? []) as TourSeasonRankingRow[];
