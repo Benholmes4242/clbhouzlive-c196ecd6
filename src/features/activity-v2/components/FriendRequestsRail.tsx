@@ -143,60 +143,72 @@ export const FriendRequestsRail: React.FC = () => {
     declineRequest,
   } = useFriendRequestsV2();
 
-  if (isLoading) return null;
-  if (!rows || rows.length === 0) return null;
+  const show = !isLoading && !!rows && rows.length > 0;
 
   return (
-    <section style={{ padding: '18px 0 6px', fontFamily: GEIST }}>
-      <div
-        style={{
-          padding: '0 16px 10px',
-          fontSize: 10.5,
-          fontWeight: 800,
-          letterSpacing: '0.14em',
-          textTransform: 'uppercase',
-          color: '#94A3B8',
-        }}
-      >
-        Friend requests · {rows.length}
-      </div>
-      <div
-        className="flex gap-2.5 overflow-x-auto scrollbar-none"
-        style={{ padding: '0 16px 4px' }}
-      >
-        {rows.map((r) => {
-          const pending =
-            (acceptRequest.isPending && acceptRequest.variables?.requestId === r.request_id) ||
-            (declineRequest.isPending && declineRequest.variables?.requestId === r.request_id);
-          return (
-            <RequestCard
-              key={r.request_id}
-              row={r}
-              pending={pending}
-              onOpen={() =>
-                navigate(
-                  r.requester_username
-                    ? `/user/${r.requester_username}`
-                    : `/profile/${r.requester_user_id}`,
-                )
-              }
-              onAccept={() =>
-                acceptRequest.mutate({
-                  requestId: r.request_id,
-                  requesterId: r.requester_user_id,
-                })
-              }
-              onDecline={() =>
-                declineRequest.mutate({
-                  requestId: r.request_id,
-                  requesterId: r.requester_user_id,
-                })
-              }
-            />
-          );
-        })}
-      </div>
-    </section>
+    <AnimatePresence initial={false}>
+      {show && (
+        <motion.div
+          key="friend-requests-rail"
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: 'auto', opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.22, ease: 'easeOut' }}
+          style={{ overflow: 'hidden' }}
+        >
+          <section style={{ padding: '18px 0 6px', fontFamily: GEIST }}>
+            <div
+              style={{
+                padding: '0 16px 10px',
+                fontSize: 10.5,
+                fontWeight: 800,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color: '#94A3B8',
+              }}
+            >
+              Friend requests · {rows!.length}
+            </div>
+            <div
+              className="flex gap-2.5 overflow-x-auto scrollbar-none"
+              style={{ padding: '0 16px 4px' }}
+            >
+              {rows!.map((r) => {
+                const pending =
+                  (acceptRequest.isPending && acceptRequest.variables?.requestId === r.request_id) ||
+                  (declineRequest.isPending && declineRequest.variables?.requestId === r.request_id);
+                return (
+                  <RequestCard
+                    key={r.request_id}
+                    row={r}
+                    pending={pending}
+                    onOpen={() =>
+                      navigate(
+                        r.requester_username
+                          ? `/user/${r.requester_username}`
+                          : `/profile/${r.requester_user_id}`,
+                      )
+                    }
+                    onAccept={() =>
+                      acceptRequest.mutate({
+                        requestId: r.request_id,
+                        requesterId: r.requester_user_id,
+                      })
+                    }
+                    onDecline={() =>
+                      declineRequest.mutate({
+                        requestId: r.request_id,
+                        requesterId: r.requester_user_id,
+                      })
+                    }
+                  />
+                );
+              })}
+            </div>
+          </section>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 
