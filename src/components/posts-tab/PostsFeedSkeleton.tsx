@@ -7,7 +7,7 @@ const SkeletonBlock: React.FC<{ className?: string; style?: React.CSSProperties;
   dark = false,
 }) => (
   <Skeleton
-    variant={dark ? 'dark' : 'default'}
+    variant={dark ? 'dark' : 'light'}
     className={`rounded-[4px] ${className}`}
     style={style}
   />
