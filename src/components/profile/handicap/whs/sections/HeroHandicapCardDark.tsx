@@ -3,6 +3,7 @@ import React, { useMemo } from 'react';
 import { useHandicapTrend, useHandicapHistory } from '@/lib/whs/hooks';
 import { useHandicapTrend12mo } from '@/hooks/useHandicapTrend12mo';
 import type { WhsConnection } from '@/lib/whs/types';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface Props {
   connection: WhsConnection;
