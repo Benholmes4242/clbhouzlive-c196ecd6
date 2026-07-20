@@ -310,28 +310,32 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
           </div>
 
           {/* Meta row */}
-          {!isLoading && !isError && allCourses.length > 0 && (
+          {!isError && (isLoading || allCourses.length > 0) && (
             <div className="flex items-center justify-between gap-3">
-              <span style={{
-                fontSize: 13, color: INK_MUTE, flex: 1, lineHeight: 1.35,
-                fontWeight: 500,
-              }}>
-                {searchTerm ? (
-                  <Trans
-                    i18nKey={allCourses.length === 1 ? 'top100.metaResults_one' : 'top100.metaResults_other'}
-                    ns="courses"
-                    values={{ count: allCourses.length }}
-                    components={{ 1: <strong style={{ color: INK, fontWeight: 700 }} /> }}
-                  />
-                ) : (
-                  <Trans
-                    i18nKey={totalCoursesInActiveList === 1 ? 'top100.metaCourses_one' : 'top100.metaCourses_other'}
-                    ns="courses"
-                    values={{ count: totalCoursesInActiveList, listLabel: activeListShortLabel }}
-                    components={{ 1: <strong style={{ color: INK, fontWeight: 700 }} /> }}
-                  />
-                )}
-              </span>
+              {isLoading ? (
+                <Skeleton className="h-4 w-44 rounded" />
+              ) : (
+                <span style={{
+                  fontSize: 13, color: INK_MUTE, flex: 1, lineHeight: 1.35,
+                  fontWeight: 500,
+                }}>
+                  {searchTerm ? (
+                    <Trans
+                      i18nKey={allCourses.length === 1 ? 'top100.metaResults_one' : 'top100.metaResults_other'}
+                      ns="courses"
+                      values={{ count: allCourses.length }}
+                      components={{ 1: <strong style={{ color: INK, fontWeight: 700 }} /> }}
+                    />
+                  ) : (
+                    <Trans
+                      i18nKey={totalCoursesInActiveList === 1 ? 'top100.metaCourses_one' : 'top100.metaCourses_other'}
+                      ns="courses"
+                      values={{ count: totalCoursesInActiveList, listLabel: activeListShortLabel }}
+                      components={{ 1: <strong style={{ color: INK, fontWeight: 700 }} /> }}
+                    />
+                  )}
+                </span>
+              )}
             </div>
           )}
 
@@ -341,8 +345,8 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-fade-in">
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div key={i} className="space-y-3 rounded-2xl overflow-hidden" style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_7}` }}>
-                  <Skeleton className="h-40 w-full rounded-xl" />
-                  <div className="space-y-2">
+                  <Skeleton className="w-full aspect-[16/9.5] rounded-xl" />
+                  <div className="space-y-2 px-4 pb-4">
                     <Skeleton className="h-5 w-3/4" />
                     <Skeleton className="h-4 w-1/2" />
                     <div className="flex gap-2 pt-1">
