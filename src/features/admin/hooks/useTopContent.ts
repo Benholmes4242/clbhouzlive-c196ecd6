@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { stripMentionMarkup } from '@/lib/mentions/format';
 import type { AnalyticsPeriod } from './useAnalytics';
 
 // Props keys reused:
