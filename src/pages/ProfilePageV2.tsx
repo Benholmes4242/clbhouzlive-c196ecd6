@@ -138,7 +138,7 @@ const ProfilePageV2Content: React.FC = () => {
   
   // If viewing via /profile/:username, fetch that profile; otherwise show own profile
   // Resolve profileUserId — cached query for username routes, synchronous for own profile
-  const { data: resolvedProfileId, isLoading: isResolvingId } = useQuery({
+  const { data: resolvedProfileId, isLoading: isResolvingId, isError: resolveError, refetch: refetchResolve } = useQuery({
     queryKey: ['profile-id-by-username', routeUsername],
     enabled: !!routeUsername,
     staleTime: 10 * 60 * 1000,
@@ -164,7 +164,8 @@ const ProfilePageV2Content: React.FC = () => {
         ? pubQuery.eq('id', routeUsername!)
         : pubQuery.eq('username', routeUsername!)
       ).maybeSingle();
-      if (pubError || !pub) return { id: null as string | null, deleted: false, notFound: true };
+      if (pubError) throw pubError;
+      if (!pub) return { id: null as string | null, deleted: false, notFound: true };
       return { id: pub.id, deleted: false, notFound: false };
     },
   });
@@ -175,7 +176,7 @@ const ProfilePageV2Content: React.FC = () => {
   const isProfileDeleted = resolvedProfileId?.deleted === true;
   const profileNotFound = resolvedProfileId?.notFound === true;
   
-  const { data: profile, isLoading: profileLoading } = useUserProfile(profileUserId);
+  const { data: profile, isLoading: profileLoading, isError: profileError, refetch: refetchProfile } = useUserProfile(profileUserId);
   const { data: postsCount = 0, isLoading: postsCountLoading } = usePersonalPostsCount(profileUserId);
   const { data: reviewsCount = 0, isLoading: reviewsCountLoading } = usePersonalReviewsCount(profileUserId);
   const { data: achievements } = useProfileAchievements(profileUserId);
@@ -463,8 +464,8 @@ const ProfilePageV2Content: React.FC = () => {
 
   const { data: viewedWhsConnection } = useWhsConnection(profileUserId ?? undefined);
   const resolvedHcp = resolveDisplayHandicap({
-    egHandicapIndex: (profile as any)?.eg_handicap_index ?? null,
-    manualHandicapIndex: (profile as any)?.manual_handicap_index ?? null,
+    egHandicapIndex: profile?.eg_handicap_index ?? null,
+    manualHandicapIndex: profile?.manual_handicap_index ?? null,
     hasWhsConnection: !!viewedWhsConnection,
   });
 
@@ -528,6 +529,36 @@ const ProfilePageV2Content: React.FC = () => {
 
   if (authLoading || (!!routeUsername && isResolvingId) || profileLoading) {
     return <ProfileSkeleton />;
+  }
+
+  if (resolveError || profileError) {
+    return (
+      <PageRoot className="min-h-screen bg-background" immersiveStatusBar>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center">
+          <h1 className="text-2xl font-semibold text-foreground mb-2">
+            Couldn't load this profile
+          </h1>
+          <p className="text-muted-foreground mb-6 max-w-sm">
+            Check your connection and try again.
+          </p>
+          <div className="flex gap-3">
+            <button
+              onClick={() => { if (resolveError) refetchResolve(); if (profileError) refetchProfile(); }}
+              className="px-6 py-2.5 text-white rounded-full text-sm font-semibold active:scale-[0.97]"
+              style={{ backgroundColor: '#F7931E' }}
+            >
+              Retry
+            </button>
+            <button
+              onClick={() => safeGoBack(navigate, '/clubhouse')}
+              className="px-6 py-2.5 rounded-full text-sm font-semibold border border-border text-foreground active:scale-[0.97]"
+            >
+              Go back
+            </button>
+          </div>
+        </div>
+      </PageRoot>
+    );
   }
 
   // Show "Profile unavailable" for deleted or not found profiles
@@ -1238,7 +1269,7 @@ const ProfilePageV2Content: React.FC = () => {
 
         {/* Social handles row */}
         {(() => {
-          const p: any = profile ?? {};
+          const p = (profile ?? {}) as { instagram_handle?: string | null; twitter_handle?: string | null; tiktok_handle?: string | null; youtube_handle?: string | null };
           const links: Array<{ key: string; url: string; icon: React.ReactNode; label: string }> = [];
           if (p.instagram_handle) {
             const h = String(p.instagram_handle).replace(/^@/, '').trim();
@@ -1445,7 +1476,7 @@ const ProfilePageV2: React.FC = () => {
     const params = new URLSearchParams(window.location.search);
     const forceOff = params.get('touchDebug') === '0' || params.get('touchDebug') === 'false';
     if (forceOff) {
-      try { window.localStorage.removeItem('touchDebug'); } catch {}
+      try { window.localStorage.removeItem('touchDebug'); } catch { /* localStorage unavailable */ }
       return false;
     }
     const byQuery = params.get('touchDebug') === '1' || params.get('touchDebug') === 'true';
@@ -1453,7 +1484,7 @@ const ProfilePageV2: React.FC = () => {
       try { return window.localStorage.getItem('touchDebug') === '1'; } catch { return false; }
     })();
     if (byQuery) {
-      try { window.localStorage.setItem('touchDebug', '1'); } catch {}
+      try { window.localStorage.setItem('touchDebug', '1'); } catch { /* localStorage unavailable */ }
     }
     return byQuery || byStorage;
   }, []);
