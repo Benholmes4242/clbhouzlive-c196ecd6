@@ -560,11 +560,12 @@ class VideoEngineImpl {
       return;
     }
     if (effectivePolicy === 'session') {
-      if (lane.el.muted !== sessionMuted) {
-        // Respect ONE_UNMUTED_LANE on unmute. Forward the resolve trigger
-        // so any slot-enforce log names the true cause (mount/activation/…).
-        this.setMuted(lane.id, sessionMuted, `policy:${trigger}`);
-      }
+      // v11 single-writer: the reconciler is the ONLY writer of session-lane
+      // mute state. applyAudioPolicy no longer forces mute on session lanes;
+      // the overlay-change / borrow / focus-change reconcile triggers cover
+      // mount, policy-change, and external-bind moments. Leaving this as a
+      // no-op prevents cold-open edge races where an unmute-before-focus
+      // beat could re-mute the active speaker.
       return;
     }
     // 'local' → leave alone.
