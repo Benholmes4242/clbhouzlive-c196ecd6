@@ -416,11 +416,18 @@
     }
   },
   "tournament": {
+    "error": {
+      "title": "Couldn't load this tournament",
+      "body": "We hit a snag pulling this event's details. Check your connection and try again.",
+      "retry": "Retry",
+      "back": "Back"
+    },
     "scorecard": {
       "roundEyebrow": "ROUND {{round}}",
       "eyebrowFallback": "SCORECARD",
       "courseFallback": "Scorecard"
     },
+
     "shell": {
       "board": {
         "eyebrow": "The Board",
