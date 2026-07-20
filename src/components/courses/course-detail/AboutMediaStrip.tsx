@@ -134,13 +134,13 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
         // like_count / comment_count / is_liked_by_me for each parent post)
         // BEFORE flipping readOnly off, or every viewed item will appear
         // zeroed and any like will patch a stale delta.
-        likeCount: 0,
-        commentCount: 0,
-        shareCount: 0,
+        likeCount: 0, // RPC lacks field
+        commentCount: 0, // RPC lacks field
+        shareCount: 0, // RPC lacks field
         review: null,
         isReview: false,
-        isLikedByMe: false,
-        isFollowedByMe: false,
+        isLikedByMe: false, // RPC lacks field
+        isFollowedByMe: false, // RPC lacks field
         tags: [],
       };
     });

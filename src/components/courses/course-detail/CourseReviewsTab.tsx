@@ -311,9 +311,9 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       // like_count / comment_count / is_liked_by_me for the review's
       // underlying post) BEFORE flipping readOnly off, or every viewed
       // review will appear zeroed and any like will patch a stale delta.
-      likeCount: 0,
-      commentCount: 0,
-      shareCount: 0,
+      likeCount: 0, // RPC lacks field
+      commentCount: 0, // RPC lacks field
+      shareCount: 0, // RPC lacks field
       review: {
         reviewId: review.id,
         courseId: review.course_id,
@@ -328,8 +328,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       isReview: true,
       courseId: review.course_id,
       courseName: review.course?.name ?? courseName,
-      isLikedByMe: false,
-      isFollowedByMe: false,
+      isLikedByMe: false, // RPC lacks field
+      isFollowedByMe: false, // RPC lacks field
       tags: [],
     };
   }, [courseName]);
