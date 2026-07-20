@@ -73,7 +73,7 @@ export function ScheduleTab() {
 
   const singleQuery = useSeasonTimeline(singleTour);
   const mergedQuery = useMergedSchedule({ enabled: tourLens === null });
-  const { data: timeline, isLoading, error } =
+  const { data: timeline, isLoading, error, refetch } =
     tourLens === null ? mergedQuery : singleQuery;
 
   const activeTour: TourId | 'all' = tourLens ?? 'all';
@@ -230,6 +230,24 @@ export function ScheduleTab() {
         <p className="text-sm text-muted-foreground max-w-[280px]">
           {t('schedule.error.body')}
         </p>
+        <button
+          type="button"
+          onClick={() => refetch()}
+          style={{
+            marginTop: 4,
+            background: '#0F172A',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 999,
+            padding: '10px 20px',
+            fontFamily: FONT,
+            fontSize: 13.5,
+            fontWeight: 700,
+            cursor: 'pointer',
+          }}
+        >
+          {t('schedule.error.retry', { defaultValue: 'Retry' })}
+        </button>
       </div>
     );
   }
