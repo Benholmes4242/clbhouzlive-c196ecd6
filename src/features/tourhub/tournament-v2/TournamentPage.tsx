@@ -53,9 +53,11 @@ import { useTeeTimesAll } from './data/useTeeTimesAll';
 import { useFieldTop3 } from './data/useFieldTop3';
 import { useTournamentStory } from './data/useTournamentStory';
 import { scrollElementIntoView } from '@/lib/getScrollParent';
+import { Skeleton } from '@/components/ui/skeleton';
+import { TournamentPageSkeleton } from '@/components/skeletons/TournamentPageSkeleton';
 
 import {
-  FONT, INK, INK_MUTE, INK_FAINT, SLATE_50, HAIRLINE_INK_8, INK_TINT_06, SURFACE,
+  FONT, INK, INK_MUTE, INK_FAINT, SLATE_50, HAIRLINE_INK_8, SURFACE,
 } from '../_shared/tokens';
 
 export function TournamentPage() {
@@ -96,8 +98,8 @@ export function TournamentPage() {
   // the tab=tee-times deep link is present (Brief F-TD-3 §4).
   const teeTimesRequested = searchParams.get('tab') === 'tee-times';
   const teeGroupsEnabled = pulse.state !== 'completed' || teeTimesRequested;
-  const { data: teeGroups = [] } = useTeeTimesAll(tournamentId, currentRound, { enabled: teeGroupsEnabled });
-  const { data: field } = useFieldTop3(pulse.state === 'upcoming' ? tournamentId : null);
+  const { data: teeGroups = [], isLoading: teesLoading } = useTeeTimesAll(tournamentId, currentRound, { enabled: teeGroupsEnabled });
+  const { data: field, isLoading: fieldLoading } = useFieldTop3(pulse.state === 'upcoming' ? tournamentId : null);
 
   const [teeTimesOpen, setTeeTimesOpen] = useState(false);
   const [fullBoardOpen, setFullBoardOpen] = useState(false);
@@ -179,21 +181,7 @@ export function TournamentPage() {
   if (isLoading || !meta) {
     return (
       <TourHubShell immersive immersiveStatusBar>
-        <div style={{ background: SLATE_50, minHeight: '100dvh' }}>
-          <div className="animate-pulse" style={{
-            height: 260, background: '#0A0E14',
-          }} />
-          <div className="animate-pulse" style={{ padding: 16 }}>
-            <div style={{ height: 10, width: 90, background: INK_TINT_06, borderRadius: 4, marginBottom: 10 }} />
-            {[0, 1, 2, 3].map((i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 0', borderBottom: `0.5px solid ${HAIRLINE_INK_8}` }}>
-                <div style={{ width: 28, height: 12, background: INK_TINT_06, borderRadius: 4 }} />
-                <div style={{ flex: 1, height: 12, background: INK_TINT_06, borderRadius: 4 }} />
-                <div style={{ width: 40, height: 12, background: INK_TINT_06, borderRadius: 4 }} />
-              </div>
-            ))}
-          </div>
-        </div>
+        <TournamentPageSkeleton />
       </TourHubShell>
     );
   }
@@ -249,6 +237,7 @@ export function TournamentPage() {
               meta={meta}
               field={field ?? null}
               teeGroups={teeGroups}
+              loading={Boolean(fieldLoading || teesLoading)}
               onOpenAllTimes={() => setTeeTimesOpen(true)}
             />
           )}
@@ -307,11 +296,12 @@ export function TournamentPage() {
 }
 
 function UpcomingAct({
-  meta, field, teeGroups, onOpenAllTimes,
+  meta, field, teeGroups, loading, onOpenAllTimes,
 }: {
   meta: NonNullable<ReturnType<typeof useTournamentMeta>['data']>;
   field: { fieldCount: number; topPlayers: { id: string; name: string; rank: number }[]; firstTeeTime: string | null } | null;
   teeGroups: import('./data/useTeeTimesAll').TeeGroup[];
+  loading: boolean;
   onOpenAllTimes: () => void;
 }) {
   const { t } = useTranslation('tourhub');
@@ -370,13 +360,18 @@ function UpcomingAct({
       {/* Empty fallback (Brief F-TD-3 §2): pre-sync upcoming events (no
           field yet, no tee times yet) get one always-on line so the act
           isn't silent under the hero. */}
-      {!hasField && !hasTimes && (
+      {loading && !hasField && !hasTimes ? (
+        <div style={{ padding: '8px 16px 4px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <Skeleton style={{ width: '85%', height: 12, borderRadius: 4 }} />
+          <Skeleton style={{ width: '60%', height: 12, borderRadius: 4 }} />
+        </div>
+      ) : !hasField && !hasTimes ? (
         <div style={{ padding: '8px 16px 4px' }}>
           <div style={{ fontSize: 12.5, fontWeight: 600, color: INK_MUTE, lineHeight: 1.5 }}>
             {t('tournament.shell.field.emptyFallback')}
           </div>
         </div>
-      )}
+      ) : null}
     </>
   );
 }

@@ -73,6 +73,7 @@ import { CoursesHubSkeleton } from '@/components/skeletons/CoursesHubSkeleton';
 
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
 import { PlayerPageSkeleton } from '@/components/skeletons/PlayerPageSkeleton';
+import { TournamentPageSkeleton } from '@/components/skeletons/TournamentPageSkeleton';
 import { CollegeHubSkeleton } from '@/components/skeletons/CollegeHubSkeleton';
 import { TourHubOverviewSkeleton } from '@/components/skeletons/TourHubOverviewSkeleton';
 import { WatchHubSkeleton, WatchClipsSkeleton, WatchVideosSkeleton } from '@/components/skeletons/WatchSkeletons';
@@ -599,7 +600,7 @@ function AppRoutes() {
         
         {/* Tour Hub routes */}
         <Route path="/tourhub" element={<Suspense fallback={<TourHubOverviewSkeleton />}><TourHubMainPage /></Suspense>} />
-        <Route path="/tourhub/tournament/:tournamentId" element={<Suspense fallback={<GenericPageSkeleton />}><TournamentDetailPage /></Suspense>} />
+        <Route path="/tourhub/tournament/:tournamentId" element={<Suspense fallback={<TournamentPageSkeleton />}><TournamentDetailPage /></Suspense>} />
         
         <Route path="/tourhub/player/:playerId" element={<Suspense fallback={<PlayerPageSkeleton />}><PlayerProfilePage /></Suspense>} />
         <Route path="/tourhub/college-golf" element={<Suspense fallback={<CollegeHubSkeleton />}><CollegeGolfHubPage /></Suspense>} />
