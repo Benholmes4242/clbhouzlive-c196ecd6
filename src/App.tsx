@@ -265,9 +265,6 @@ const CreateProfileRedirect = lazy(() => import("./components/redirects/CreatePr
 
 
 
-const Top100List = lazy(() => import("./pages/Top100List"));
-
-const AchievementsHubPage = lazy(() => import("./pages/AchievementsHubPage"));
 const AchievementsPage = lazy(() => import("./pages/AchievementsPage"));
 const AdminSetupPage = lazy(() => import("./pages/AdminSetupPage"));
 const AdminShell = lazy(() => import('./features/admin/AdminShell'));
@@ -552,7 +549,7 @@ function AppRoutes() {
         <Route path="/business/:idOrSlug" element={<Suspense fallback={<ProfileSkeleton />}><BusinessProfilePage /></Suspense>} />
         
         
-        <Route path="/top100/:slug" element={<Suspense fallback={<CoursesListSkeleton />}><Top100List /></Suspense>} />
+        <Route path="/top100/:slug" element={<Navigate to="/courses?tab=top100" replace />} />
         <Route path="/achievementshub" element={<Navigate to="/profile" replace />} />
         <Route path="/achievements" element={<Navigate to="/profile" replace />} />
         <Route path="/achievements/:userId" element={<Navigate to="/profile" replace />} />

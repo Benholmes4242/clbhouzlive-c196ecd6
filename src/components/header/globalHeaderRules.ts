@@ -12,7 +12,7 @@ export const IMMERSIVE_ROUTE_PREFIXES = [
   '/profile/',
   '/tourhub',         // All Tour Hub pages
   '/tour',            // Tour alias
-  '/top100/',         // Region Top 100 pages
+  
   '/discover/explore/region/', // Region pages
 ] as const;
 

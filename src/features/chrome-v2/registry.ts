@@ -124,7 +124,7 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   // /profile/ prefix — ISLAND (H3). Sits after /profile/quest above.
   { match: { prefix: '/profile/' },               spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/' }, tone: 'light', bleed: true } },
 
-  { match: { prefix: '/top100/' },                spec: { chrome: 'none', tone: 'light', bleed: true  } },
+  
   { match: { prefix: '/discover/explore/region/' },spec:{ chrome: 'none', tone: 'light', bleed: true  } },
   { match: { prefix: '/achievements/' },          spec: { chrome: 'none', tone: 'light', bleed: false } },
   // /handicap/ prefix — ISLAND (H3). Rivalry sub-routes handled above.
