@@ -183,11 +183,11 @@ export function ComparePage() {
               {[0, 1, 2, 3].map((i) => (
                 <div key={i} style={{ padding: '12px 16px 12px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                    <div style={{ height: 14, width: 60, background: 'rgba(15,23,42,0.06)', borderRadius: 3 }} />
-                    <div style={{ height: 10, width: 70, background: 'rgba(15,23,42,0.05)', borderRadius: 3 }} />
-                    <div style={{ height: 14, width: 60, background: 'rgba(15,23,42,0.06)', borderRadius: 3 }} />
+                    <Skeleton style={{ height: 14, width: 60, borderRadius: 3 }} />
+                    <Skeleton style={{ height: 10, width: 70, borderRadius: 3 }} />
+                    <Skeleton style={{ height: 14, width: 60, borderRadius: 3 }} />
                   </div>
-                  <div style={{ height: 4, background: 'rgba(15,23,42,0.05)', borderRadius: 2 }} />
+                  <Skeleton style={{ height: 4, borderRadius: 2 }} />
                 </div>
               ))}
             </div>
