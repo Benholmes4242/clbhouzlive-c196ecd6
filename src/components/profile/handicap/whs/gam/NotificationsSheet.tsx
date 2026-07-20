@@ -5,6 +5,7 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { supabase } from '@/integrations/supabase/client';
 import { GAM, relativeDays } from './tokens';
 import { notificationsBus, openGamAchievements } from './events';
+import { Skeleton } from '../../gam/_shared/GamAtoms';
 
 interface Props { userId: string }
 
