@@ -49,6 +49,18 @@ const MyBusinessesPage = () => {
   const { data: businesses, isLoading, error, refetch } = useMyBusinesses(user?.id);
   const { activeActor } = useActiveActor();
 
+  // Hoisted confirm-delete state — the dialog lives at page level so that
+  // when the mutation invalidates and evicts the target BusinessCommandCard,
+  // the dialog host is NOT in the evicted subtree. This is the canonical fix
+  // for the "delete-in-a-list-item + Radix dialog inside item" body
+  // pointer-events freeze. See `src/lib/radixLockSanitizer.ts` for the
+  // paired safety net in `useDeleteBusiness.onSuccess`.
+  const [pendingDelete, setPendingDelete] = useState<{ id: string; name: string } | null>(null);
+  const handleRequestDelete = useCallback(
+    (input: { id: string; name: string }) => setPendingDelete(input),
+    [],
+  );
+
   useHideBottomNav();
 
   // Sort businesses — active first, then alphabetical.
