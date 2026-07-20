@@ -176,7 +176,7 @@ const ProfilePageV2Content: React.FC = () => {
   const isProfileDeleted = resolvedProfileId?.deleted === true;
   const profileNotFound = resolvedProfileId?.notFound === true;
   
-  const { data: profile, isLoading: profileLoading } = useUserProfile(profileUserId);
+  const { data: profile, isLoading: profileLoading, isError: profileError, refetch: refetchProfile } = useUserProfile(profileUserId);
   const { data: postsCount = 0, isLoading: postsCountLoading } = usePersonalPostsCount(profileUserId);
   const { data: reviewsCount = 0, isLoading: reviewsCountLoading } = usePersonalReviewsCount(profileUserId);
   const { data: achievements } = useProfileAchievements(profileUserId);
