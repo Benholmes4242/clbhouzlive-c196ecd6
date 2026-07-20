@@ -237,7 +237,9 @@ const RivalryPage: React.FC = () => {
   const isLoading = isFriendView
     ? friend.isLoading
     : owner.isLoading || (adHocEnabled && adHoc.isLoading) || (profileCheckEnabled && profileExists.isLoading);
-  const errored = isFriendView ? !!friend.error : !!owner.error;
+  const errored = isFriendView
+    ? !!friend.error
+    : !!owner.error || (profileCheckEnabled && profileExists.isError);
 
 
   // Course-filter shared state
