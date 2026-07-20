@@ -1376,6 +1376,7 @@ class VideoEngineImpl {
           overlayOpen: fsOpen,
           borrowedLaneId: borrowLaneId,
           roleMap: this.buildRoleMapDump(),
+          audioFocus: this.audioFocus,
           resolution: { speaker, branch, whyNone },
           writes: changes.map((c) => ({ laneId: c.laneId, muted: c.to })),
           msSinceOpen: msSinceOpen(),
