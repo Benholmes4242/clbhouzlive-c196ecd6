@@ -56,8 +56,9 @@ export default function SupportThreadPage() {
     try {
       await postReply(id, trimmed);
       setBody('');
-    } catch (e: any) {
-      toast.error(e?.message || 'Could not send your reply. Please try again.');
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Could not send your reply. Please try again.';
+      toast.error(msg);
     } finally {
       setSending(false);
     }
