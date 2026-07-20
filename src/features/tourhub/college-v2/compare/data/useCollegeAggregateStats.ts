@@ -54,21 +54,23 @@ export function useCollegeAggregateStats(normalizedName: string | undefined) {
       };
       if (!normalizedName) return empty;
 
-      const { data: players } = await supabase
+      const { data: players, error: playersErr } = await supabase
         .from('sr_players')
         .select('id')
         .eq('college_normalized', normalizedName);
+      if (playersErr) throw playersErr;
       if (!players?.length) return empty;
       const ids = players.map((p) => p.id);
       const total = ids.length;
 
       if (!seasonId) return { ...empty, alumniTotal: total };
 
-      const { data: stats } = await supabase
+      const { data: stats, error: statsErr } = await supabase
         .from('sr_player_statistics')
         .select('player_id, raw_data')
         .eq('season_id', seasonId)
         .in('player_id', ids);
+      if (statsErr) throw statsErr;
 
       const scoring: number[] = [];
       const drive: number[] = [];
