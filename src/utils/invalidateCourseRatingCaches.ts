@@ -2,6 +2,8 @@ import type { QueryClient } from '@tanstack/react-query';
 import { FEED_QUERY_KEYS } from '@/lib/feedQueryKeys';
 
 
+
+
 /**
  * Invalidate every query cache that depends on course_ratings data.
  * Call after ANY course rating/review submission (useSubmitRating,
