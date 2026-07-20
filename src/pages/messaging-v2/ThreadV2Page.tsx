@@ -12,6 +12,7 @@ import { useKeyboardHeight } from '@/hooks/messaging/useKeyboardHeight';
 import { MessageBubble } from './MessageBubble';
 import { Composer } from './Composer';
 import { ConversationSettingsSheet } from './ConversationSettingsSheet';
+import { Skeleton } from '@/components/ui/skeleton';
 import type {
   ConversationDetail,
   ConversationMember,
