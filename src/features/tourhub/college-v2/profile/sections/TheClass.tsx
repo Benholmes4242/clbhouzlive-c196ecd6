@@ -117,13 +117,13 @@ export function TheClass({ slug, collegeName }: Props) {
           background: 'rgba(15,23,42,0.02)',
         }}
       >
-        <span style={{ width: 22, fontSize: 8, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+        <span style={{ width: 22, fontSize: 10, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
           #
         </span>
-        <span style={{ flex: 1, marginLeft: 8, fontSize: 8, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+        <span style={{ flex: 1, marginLeft: 8, fontSize: 10, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
           Player
         </span>
-        <span style={{ width: 78, textAlign: 'right', fontSize: 8, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+        <span style={{ width: 78, textAlign: 'right', fontSize: 10, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
           Earnings
         </span>
         <span style={{ width: 14 }} />
