@@ -125,20 +125,24 @@ async function fetchEgIssueUserIds(): Promise<string[]> {
 }
 
 async function fetchUserDetail(userId: string): Promise<AdminUserDetail> {
-  const [profile, role, posts, reviews, followers, following, top100, reports, whs] = await Promise.all([
-    supabase.from('user_profiles').select('*').eq('id', userId).single(),
-    supabase.from('user_roles').select('role').eq('user_id', userId).maybeSingle(),
-    supabase.from('posts').select('id', { count: 'exact', head: true }).eq('user_id', userId),
-    supabase.from('course_ratings').select('id', { count: 'exact', head: true }).eq('user_id', userId),
-    supabase.from('user_follows').select('id', { count: 'exact', head: true }).eq('following_id', userId),
-    supabase.from('user_follows').select('id', { count: 'exact', head: true }).eq('follower_id', userId),
-    supabase.from('user_courses').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('played', true),
-    supabase.from('post_reports').select('id', { count: 'exact', head: true }).eq('reported_user_id', userId),
-    supabase.from('whs_connections')
-      .select('last_sync_status, last_synced_at')
-      .eq('user_id', userId)
-      .maybeSingle(),
-  ]);
+  // Split into two batches to avoid TS "excessively deep" inference on the
+  // supabase query builder union.
+  const profileP = supabase.from('user_profiles').select('*').eq('id', userId).single();
+  const roleP = supabase.from('user_roles').select('role').eq('user_id', userId).maybeSingle();
+  const whsP = supabase.from('whs_connections')
+    .select('last_sync_status, last_synced_at')
+    .eq('user_id', userId).maybeSingle();
+  const countHead = (table: 'posts' | 'course_ratings' | 'user_follows' | 'user_courses' | 'post_reports') =>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase.from(table).select('id', { count: 'exact', head: true }) as any);
+  const postsP = countHead('posts').eq('user_id', userId);
+  const reviewsP = countHead('course_ratings').eq('user_id', userId);
+  const followersP = countHead('user_follows').eq('following_id', userId);
+  const followingP = countHead('user_follows').eq('follower_id', userId);
+  const top100P = countHead('user_courses').eq('user_id', userId).eq('played', true);
+  const reportsP = countHead('post_reports').eq('reported_user_id', userId);
+  const [profile, role, posts, reviews, followers, following, top100, reports, whs] =
+    await Promise.all([profileP, roleP, postsP, reviewsP, followersP, followingP, top100P, reportsP, whsP]);
   if (profile.error) throw profile.error;
   const p = profile.data;
   return {
