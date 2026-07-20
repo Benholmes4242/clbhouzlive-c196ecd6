@@ -78,13 +78,12 @@ export const Skeleton: React.FC<{ height: number | string; width?: number | stri
   width = '100%',
   radius = 12,
 }) => (
-  <div
+  <BaseSkeleton
+    variant="dark"
     style={{
       height,
       width,
       borderRadius: radius,
-      background: 'rgba(255,255,255,0.06)',
-      animation: 'gamPulse 1.6s ease-in-out infinite',
     }}
   />
 );
