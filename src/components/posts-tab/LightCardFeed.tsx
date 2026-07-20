@@ -295,7 +295,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
     const post = posts[playingIdx];
     if (!post) return;
     const ownerKey = `${post.id}:0`;
-    const hasVideo = (post as any)?.mediaItems?.some?.((m: any) => m?.type === 'video');
+    const hasVideo = post.mediaItems?.some?.((m) => m?.type === 'video');
     const mediaType: 'image' | 'video' = hasVideo ? 'video' : 'image';
     activateT0Ref.current = vperfFeedActivateStart('posts-tab');
     const raf = requestAnimationFrame(() => {
