@@ -181,7 +181,7 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onCli
         {(() => {
           const avatarSrc = pickAvatarSrc(entry.friend_thumbnail_url, entry.friend_profile_photo_url);
           const fbBg = getAvatarFallbackColor(
-            entry.friend_user_id ?? (entry as any).friend_row_id ?? entry.friend_name
+            entry.friend_user_id ?? (entry as { friend_row_id?: string | null }).friend_row_id ?? entry.friend_name
           );
           return (
             <div
