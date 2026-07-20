@@ -9,6 +9,7 @@ import { useCreateAdminActionRequest } from '../hooks/useAdminActionRequests';
 import { usePanelRole } from '@/hooks/usePanelRole';
 import { panelCan } from '@/lib/panelCan';
 import type { ModerationQueueRow, ReportStatus } from '../hooks/useModerationQueue';
+import { stripMentionMarkup } from '@/lib/mentions/format';
 
 interface Props {
   open: boolean;
