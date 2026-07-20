@@ -40,6 +40,8 @@ export default function AdminDrawer({ open, onClose, role, canManageAdmins }: Pr
   const location = useLocation();
   const triage = useTriageCounts();
   const badge = triage.data?.total ?? 0;
+  const health = useHealthChips();
+  const healthDegraded = health.nonOk > 0;
 
   useEffect(() => {
     if (!open) return;
