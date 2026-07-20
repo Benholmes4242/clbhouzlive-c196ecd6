@@ -1,4 +1,6 @@
 import type { QueryClient } from '@tanstack/react-query';
+import { FEED_QUERY_KEYS } from '@/lib/feedQueryKeys';
+
 
 /**
  * Invalidate every query cache that depends on course_ratings data.
@@ -64,35 +66,19 @@ export function invalidateCourseRatingCaches(queryClient: QueryClient) {
   queryClient.invalidateQueries({ queryKey: ['reviewer-stats'], exact: false });
 
   // ── Clubhouse + feed surfaces ──
-  // These cache reviews shared as posts. Keys must match the set
-  // invalidated by the review-v2 composer's DELETE branch
-  // and useShareReview. Centralising here ensures submit + edit
-  // paths also invalidate feed caches.
+  // These cache reviews shared as posts. Route through the canonical
+  // FEED_QUERY_KEYS registry so every live feed refreshes; dead keys
+  // (clubhouse-feed, clubhouse-posts, feed-posts, profile-feed, user-posts)
+  // are retired.
+  for (const key of FEED_QUERY_KEYS) {
+    queryClient.invalidateQueries({ queryKey: key as unknown as readonly unknown[], exact: false });
+  }
   queryClient.invalidateQueries({ queryKey: ['posts'], exact: false });
-  queryClient.invalidateQueries({ queryKey: ['user-posts'], exact: false });
   queryClient.invalidateQueries({ queryKey: ['profile-posts'], exact: false });
-  queryClient.invalidateQueries({ queryKey: ['profile-feed'], exact: false });
   queryClient.invalidateQueries({ queryKey: ['actor-posts'], exact: false });
-  queryClient.invalidateQueries({ queryKey: ['clubhouse-posts'], exact: false });
-  queryClient.invalidateQueries({ queryKey: ['clubhouse-feed'], exact: false });
-  queryClient.invalidateQueries({ queryKey: ['clubhouse-shorts'], exact: false });
-  queryClient.invalidateQueries({ queryKey: ['feed-posts'], exact: false });
-  queryClient.invalidateQueries({ queryKey: ['feed-pinned'], exact: false });
-  queryClient.invalidateQueries({ queryKey: ['explore-feed'], exact: false });
-  queryClient.invalidateQueries({ queryKey: ['explore-posts'], exact: false });
-  queryClient.invalidateQueries({ queryKey: ['explore-content'], exact: false });
-  queryClient.invalidateQueries({ queryKey: ['activity-feed'], exact: false });
-  queryClient.invalidateQueries({ queryKey: ['activity-posts'], exact: false });
-  queryClient.invalidateQueries({ queryKey: ['media-feed'], exact: false });
-  queryClient.invalidateQueries({ queryKey: ['trending-posts'], exact: false });
-  queryClient.invalidateQueries({ queryKey: ['real-posts'], exact: false });
-  queryClient.invalidateQueries({ queryKey: ['watch-feed'], exact: false });
-  queryClient.invalidateQueries({ queryKey: ['friends-feed'], exact: false });
-  queryClient.invalidateQueries({ queryKey: ['friends-shorts'], exact: false });
-  queryClient.invalidateQueries({ queryKey: ['followedUsersPosts'], exact: false });
-  queryClient.invalidateQueries({ queryKey: ['infinite-followed-posts'], exact: false });
   queryClient.invalidateQueries({ queryKey: ['userPosts'], exact: false });
-  queryClient.invalidateQueries({ queryKey: ['pinned-posts'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['explore-content'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['feed-pinned'], exact: false });
   queryClient.invalidateQueries({ queryKey: ['featured-post'], exact: false });
   queryClient.invalidateQueries({ queryKey: ['creator-features'], exact: false });
 }
