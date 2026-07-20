@@ -4720,6 +4720,24 @@ export type Database = {
         }
         Relationships: []
       }
+      feed_config: {
+        Row: {
+          description: string | null
+          key: string
+          value: number
+        }
+        Insert: {
+          description?: string | null
+          key: string
+          value: number
+        }
+        Update: {
+          description?: string | null
+          key?: string
+          value?: number
+        }
+        Relationships: []
+      }
       follows: {
         Row: {
           created_at: string
@@ -18462,6 +18480,72 @@ export type Database = {
           p_mode?: string
           p_page_size?: number
           p_review_bonus?: number
+          p_seen_post_ids?: string[]
+          p_user_id: string
+          p_viewer_actor_id?: string
+          p_viewer_actor_type?: string
+        }
+        Returns: {
+          business_is_verified: boolean
+          business_logo_url: string
+          business_name: string
+          comment_count: number
+          country_match: boolean
+          course_avg_overall_score: number
+          course_id: string
+          course_name: string
+          creator_avatar_url: string
+          creator_display_name: string
+          creator_is_verified: boolean
+          creator_relation: string
+          creator_username: string
+          display_order: number
+          duration_seconds: number
+          engagement_score: number
+          height: number
+          is_followed_by_me: boolean
+          is_liked_by_me: boolean
+          like_count: number
+          media_id: string
+          media_type: string
+          media_url: string
+          mutual_friends_count: number
+          post_actor_id: string
+          post_actor_type: string
+          post_content: string
+          post_created_at: string
+          post_id: string
+          post_status: string
+          post_tags: Json
+          post_type: string
+          post_user_id: string
+          poster_url: string
+          rated_post_course: boolean
+          review_clubhouse_score: number
+          review_condition_score: number
+          review_course_country: string
+          review_course_id: string
+          review_course_image: string
+          review_course_name: string
+          review_course_region: string
+          review_course_sub_country: string
+          review_design_score: number
+          review_facilities_score: number
+          review_rating: number
+          review_text: string
+          share_count: number
+          source_review_id: string
+          stream_id: string
+          top100_list_match: boolean
+          tournament_meta: Json
+          width: number
+        }[]
+      }
+      get_suggested_feed_v3: {
+        Args: {
+          p_cursor?: string
+          p_mode?: string
+          p_page_size?: number
           p_seen_post_ids?: string[]
           p_user_id: string
           p_viewer_actor_id?: string
