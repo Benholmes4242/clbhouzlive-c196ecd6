@@ -19,7 +19,7 @@ import { ArrowLeft, Search, ChevronRight } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useSearchEmptyStateV2, type EmptyStateSuggestion } from '@/features/search-v2/hooks/useSearchEmptyStateV2';
 import { getProfilePathById } from '@/lib/profileRoutes';
-import { VerifiedBadge } from '@/components/verified/VerifiedBadge';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import {
   RowAvatar,
   RowSubline,
