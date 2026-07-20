@@ -155,7 +155,18 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
 
   const likeState = getLikeState(activePost);
   const commentCount = getCommentCount(activePost);
-  const isFollowed = getFollowState(activePost);
+  const { activeActor } = useActiveActor();
+  const canFollowActor =
+    activePost.actorType === 'personal' || activePost.actorType === 'business';
+  const { isFollowing: canonicalFollowing } = useFollowState({
+    targetActorType: canFollowActor ? activePost.actorType : 'personal',
+    targetActorId: canFollowActor ? activePost.actorId : undefined,
+    viewerActorType: activeActor?.type ?? 'personal',
+    viewerActorId: activeActor?.id ?? undefined,
+  });
+  // Canonical cache wins (DB-seeded + patched live by every toggle);
+  // item-embedded state is only the pre-seed fallback.
+  const isFollowed = canonicalFollowing ?? getFollowState(activePost);
 
   const courseName =
     activePost.review?.courseName ??
