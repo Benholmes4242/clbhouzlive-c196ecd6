@@ -85,8 +85,9 @@ import { ReviewIslandLoader } from '@/ReviewIslandLoader';
 import { supabase } from '@/integrations/supabase/client';
 import { migrateChatHistory } from '@/utils/chatHistoryMigration';
 import { NavTimingProvider } from '@/perf/NavTimingProvider';
-import { AdminGatedPerfPill, AdminGatedBootTimelinePill, AdminGatedPerfHud, AdminGatedLogHud } from '@/perf/AdminGatedPills';
+import { AdminGatedPerfPill, AdminGatedBootTimelinePill, AdminGatedPerfHud, AdminGatedLogHud, AdminGatedAudioLogsButton } from '@/perf/AdminGatedPills';
 import { AudioDebugHud } from '@/perf/AudioDebugHud';
+
 
 
 
