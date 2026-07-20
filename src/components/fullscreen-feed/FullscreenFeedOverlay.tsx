@@ -431,11 +431,18 @@ export function FullscreenFeedOverlay() {
     }
     const b = borrowRef.current;
     if (b) {
+      // Synchronous audio-focus handoff — see comment in the instant-close
+      // path above. Prevents the reconciler's non-fullscreen branch from
+      // seeing "no audio focus" the instant close() flips fsOpen.
+      if (!b.laneId.startsWith('rail-')) {
+        try { VideoEngine.setAudioFocus(b.laneId, 'fs-close-handoff'); } catch {}
+      }
       returnBorrow(b, 'close');
       borrowRef.current = null;
     }
     close();
   }, [closeAnimDone, close]);
+
 
   // Reset close-animation local state when the overlay is re-opened.
   useEffect(() => {
