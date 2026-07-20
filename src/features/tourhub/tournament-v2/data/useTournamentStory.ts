@@ -46,10 +46,8 @@ export function useTournamentStory(tournamentId: string | null | undefined) {
         .select('course_conditions, weather_conditions, temperature, wind_speed, wind_direction, broadcast_network, broadcast_cable, broadcast_internet')
         .eq('tournament_id', tournamentId)
         .maybeSingle();
-      if (error) {
-        console.error('[tournament-v2] useTournamentStory', error);
-        return null;
-      }
+      if (error) throw error;
+
       if (!data) return { story: null, broadcast: null };
       return { story: buildStory(data), broadcast: buildBroadcast(data) };
     },
