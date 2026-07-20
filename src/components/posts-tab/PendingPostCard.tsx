@@ -102,9 +102,9 @@ export const PendingPostCard: React.FC<PendingPostCardProps> = ({ entry, theme =
       // OR can be re-added here — but for simplicity we let the user see
       // the new card via UploadProgressBanner if they re-enqueue manually.
       removeJob(entry.jobId);
-    } catch (err: any) {
+    } catch (err) {
       console.error('[PendingPostCard] retry failed:', err);
-      toast.error("Couldn't retry", { description: err?.message ?? 'Try again' });
+      toast.error("Couldn't retry", { description: (err as { message?: string } | null)?.message ?? 'Try again' });
     } finally {
       setRetrying(false);
     }

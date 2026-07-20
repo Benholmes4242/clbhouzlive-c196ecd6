@@ -13,7 +13,7 @@ import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { useReviewerStats } from '@/hooks/useReviewerStats';
 import { buildReviewSheetPayload } from '@/components/posts/buildReviewSheetPayload';
-import { Heart, MapPin, MessageCircle, Share } from 'lucide-react';
+import { Heart, MapPin, MessageCircle, Share, type LucideIcon } from 'lucide-react';
 import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
 import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
 import { canManagePost } from '@/lib/canManagePost';
@@ -271,7 +271,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
   const attachViewTracker = usePostViewTracker(post.id, true);
   return (
     <article
-      ref={attachViewTracker as any}
+      ref={attachViewTracker as React.RefCallback<HTMLElement>}
       style={{
         background: CARD,
         overflow: 'hidden',
@@ -437,7 +437,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
             onIndexChange={(idx) => onCarouselIndexChange?.(post, idx)}
             onOpen={(idx, mediaId, originEl, ownerKey) => {
               const slide = items[idx];
-              const posterUrl = slide?.thumbnailUrl ?? (slide as any)?.imageUrl ?? null;
+              const posterUrl = slide?.thumbnailUrl ?? slide?.imageUrl ?? null;
               onOpenMedia(
                 post,
                 idx,
@@ -456,7 +456,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
             onClick={() =>
               onOpenMedia(post, 0, {
                 el: singleMediaBtnRef.current,
-                posterUrl: media.thumbnailUrl ?? (media as any).imageUrl ?? null,
+                posterUrl: media.thumbnailUrl ?? media.imageUrl ?? null,
               })
             }
             style={{
@@ -666,7 +666,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
 };
 
 const FooterButton: React.FC<{
-  icon: React.ComponentType<any>;
+  icon: LucideIcon;
   label?: string;
   onClick: () => void;
   active?: boolean;

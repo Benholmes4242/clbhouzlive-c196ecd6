@@ -37,13 +37,14 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
     queryKey: ['user-avg-rating', userId],
     enabled: !!userId,
     queryFn: async () => {
-      const { data: ratings } = await supabase
+      const { data: ratings, error } = await supabase
         .from('course_ratings')
         .select('rating')
         .eq('user_id', userId)
         .eq('is_mock', false)
         .gt('rating', 0);
 
+      if (error) throw error;
       if (!ratings || ratings.length === 0) return null;
       return ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length;
     },

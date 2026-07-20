@@ -98,7 +98,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   const { data: userActivity = [] } = useUserCourseActivity(userId);
 
   // Fetch course details
-  const { data: courses = [], isLoading } = useQuery({
+  const { data: courses = [], isLoading, isError, refetch } = useQuery({
     queryKey: ['user-played-courses-full', userId],
     enabled: !!userId && userActivity.length > 0,
     queryFn: async () => {
@@ -187,7 +187,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
               c.clubhouse_score == null ||
               c.facilities_score == null),
         )
-        .map((c) => toRatedCourseData(c as any)),
+        .map((c) => toRatedCourseData(c)),
     [courses],
   );
 
@@ -242,7 +242,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
     }
 
     // Step 3: Sort
-    const buildOwnRow = (c: any) => ({
+    const buildOwnRow = (c: CourseCardData & { review_date?: string | null }) => ({
       course_id: c.id,
       course_name: c.name,
       rating: c.rating_value,
@@ -324,6 +324,22 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
           {[1, 2, 3].map(i => (
             <div key={i} className="h-20 bg-muted rounded-xl animate-pulse" />
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div ref={sectionRef} className="px-4">
+        <div className="flex flex-col items-center justify-center py-12 gap-3 text-center">
+          <p className="text-sm text-muted-foreground">Couldn't load courses</p>
+          <button
+            onClick={() => refetch()}
+            className="h-10 px-5 rounded-full text-sm font-semibold bg-foreground text-background active:scale-[0.97] transition-all"
+          >
+            Try again
+          </button>
         </div>
       </div>
     );
@@ -439,7 +455,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
                 elements.push(
                   <DossierCard
                     key={course.id}
-                    course={toRatedCourseData(course as any)}
+                    course={toRatedCourseData(course)}
                     rank={rank}
                     onCourseClick={handleCourseClick}
                     onFullReview={handleFullReview}
@@ -460,7 +476,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
                     return (
                       <DossierCard
                         key={course.id}
-                        course={toRatedCourseData(course as any)}
+                        course={toRatedCourseData(course)}
                         rank={rank}
                         onCourseClick={handleCourseClick}
                         onFullReview={handleFullReview}
@@ -533,12 +549,21 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
           missingCourses={playedUnrated.map((c) => ({
             id: c.course_id,
             name: c.name,
+            country: null,
+            sub_country: null,
             thumbnail_image: c.thumbnail_image,
-            region: c.region,
-            rating_value: 0,
-            review_date: null,
+            is_top100: false,
+            global_rank: null,
             last_played_at: c.last_played,
-          } as any))}
+            rating_value: 0,
+            rating_id: null,
+            design_score: null,
+            condition_score: null,
+            clubhouse_score: null,
+            facilities_score: null,
+            review: null,
+            review_date: null,
+          }))}
           onPickCourse={(courseId) => {
             setShowReviewPicker(false);
             navigate(`/courses/${courseId}/rate`);
