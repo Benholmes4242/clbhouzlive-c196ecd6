@@ -102,6 +102,9 @@ export const EVENT_LABELS: Record<string, string> = {
 
   // ─── Messaging ────────────────────────────────────────────────
   message_sent: 'Message sent',
+
+  // ─── Stability ────────────────────────────────────────────────
+  app_error: 'App error',
 };
 
 export function titleize(name: string): string {

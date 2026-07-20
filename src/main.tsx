@@ -84,6 +84,10 @@ initializePerformanceMonitoring();
 initWebVitals(sendToAnalytics);
 initPerformanceObserver();
 
+// C5-1 — install app_error tracking (window handlers only; ErrorBoundary
+// wires the React branch itself). Pure listener install — SR5.
+import('@/lib/errorTracking').then(m => m.installErrorTracking()).catch(() => {});
+
 // Silent video-perf telemetry (Phase 2). Sticky 10% sample per session.
 // Non-enrolled sessions do zero work beyond a boot-time coin-flip.
 import('@/perf/telemetry').then((m) => m.installVideoPerfTelemetry()).catch(() => {});

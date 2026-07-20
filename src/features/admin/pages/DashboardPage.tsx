@@ -5,7 +5,7 @@ import {
   CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis, LineChart, Line,
 } from 'recharts';
 import {
-  AlertTriangle, ChevronRight, Activity, Bell, Cpu,
+  AlertTriangle, ChevronRight, Activity, Bell, Cpu, ShieldCheck,
   MessageSquare, UserPlus, Star, RefreshCcw, Radio,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,8 +23,10 @@ import {
 } from '../hooks/useOverviewMetrics';
 import {
   computeEchoChip, computePushChip, computeEgChip, computeCronChip,
+  computeErrorsChip,
   toneColor, type ChipState,
 } from '../lib/healthChips';
+import { useErrorCount24h } from '../hooks/useStability';
 
 const num = (n: number) => n.toLocaleString();
 function relTime(iso: string): string {
@@ -189,7 +191,12 @@ export default function DashboardPage() {
   const pushChip = useMemo(() => computePushChip(push), [push.isLoading, push.isError, push.data]);
   const egChip = useMemo(() => computeEgChip(eg), [eg.isLoading, eg.isError, eg.data]);
   const cronChip = useMemo(() => computeCronChip(eg), [eg.isLoading, eg.isError, eg.data]);
-  const nonOkChips = [echoChip, pushChip, egChip, cronChip].filter(c => c.tone !== 'ok' && c.tone !== 'idle').length;
+  const errors = useErrorCount24h();
+  const errorsChip = useMemo(
+    () => computeErrorsChip(errors.data ?? null, errors.isLoading, errors.isError),
+    [errors.data, errors.isLoading, errors.isError],
+  );
+  const nonOkChips = [echoChip, pushChip, egChip, cronChip, errorsChip].filter(c => c.tone !== 'ok' && c.tone !== 'idle').length;
 
   const m = overview.data;
   const loading = overview.isLoading;
@@ -225,7 +232,7 @@ export default function DashboardPage() {
         onRetry={() => feed.refetch()}
       />
 
-      <HealthChipStrip echoChip={echoChip} pushChip={pushChip} egChip={egChip} cronChip={cronChip} />
+      <HealthChipStrip echoChip={echoChip} pushChip={pushChip} egChip={egChip} cronChip={cronChip} errorsChip={errorsChip} />
 
       <style>{`@keyframes admin-pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.55 } } @keyframes admin-pulse-dot { 0%,100% { opacity: 1 } 50% { opacity: 0.35 } }`}</style>
     </div>
@@ -578,9 +585,9 @@ function feedChip(kind: FeedKind): { icon: React.ReactNode; bg: string; fg: stri
 // ─── Health chip strip ────────────────────────────────────────────────────────
 
 function HealthChipStrip({
-  egChip, cronChip, echoChip, pushChip,
+  egChip, cronChip, echoChip, pushChip, errorsChip,
 }: {
-  egChip: ChipState; cronChip: ChipState; echoChip: ChipState; pushChip: ChipState;
+  egChip: ChipState; cronChip: ChipState; echoChip: ChipState; pushChip: ChipState; errorsChip: ChipState;
 }) {
   return (
     <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
@@ -588,6 +595,7 @@ function HealthChipStrip({
       <HealthChip to="/admin-v2/health?tab=status" icon={<Activity size={14} />} state={cronChip} />
       <HealthChip to="/admin-v2/health?tab=status" icon={<Cpu size={14} />} state={echoChip} />
       <HealthChip to="/admin-v2/health?tab=status" icon={<Bell size={14} />} state={pushChip} />
+      <HealthChip to="/admin-v2/health?tab=stability" icon={<ShieldCheck size={14} />} state={errorsChip} />
     </section>
   );
 }
