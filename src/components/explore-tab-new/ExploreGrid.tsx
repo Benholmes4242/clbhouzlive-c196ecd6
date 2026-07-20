@@ -197,10 +197,10 @@ export default function ExploreGrid({
       {isFetchingNextPage && (
         <div style={{ display: 'flex', gap: 4, padding: '8px 4px 0' }}>
           <div style={{ flex: 1 }}>
-            <Skeleton className="w-full rounded-md" style={{ aspectRatio: '9 / 14' }} />
+            <Skeleton className="w-full" style={{ aspectRatio: '9 / 14', borderRadius: 4 }} />
           </div>
           <div style={{ flex: 1 }}>
-            <Skeleton className="w-full rounded-md" style={{ aspectRatio: '9 / 14' }} />
+            <Skeleton className="w-full" style={{ aspectRatio: '16 / 9', borderRadius: 4 }} />
           </div>
         </div>
       )}

@@ -20,7 +20,7 @@ export const CoursesHubSkeleton = () => {
           minHeight: HERO_MIN_HEIGHT,
           width: '100%',
           background:
-            'linear-gradient(180deg, #0F172A 0%, #1E293B 60%, #0F172A 100%)',
+            'linear-gradient(180deg, #1E4D38, #0F172A)',
         }}
       />
 
