@@ -62,7 +62,7 @@ function AccordionRow({
 
 export default function HelpPage() {
   const navigate = useNavigate();
-  const { data, isLoading } = useHelpArticles();
+  const { data, isLoading, isError, refetch } = useHelpArticles();
   const [query, setQuery] = useState('');
   const [expanded, setExpanded] = useState<string | null>(null);
 
