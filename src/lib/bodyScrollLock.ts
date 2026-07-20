@@ -38,7 +38,7 @@ export function lockBodyScroll() {
   // scrollY so the final unlock can restore something sensible.
   const bodyIsFixed = document.body.style.position === 'fixed';
   if (lockCount === 0 || !bodyIsFixed) {
-    const scrollY = getPageScrollTop();
+    const scrollY = getDocScrollTop();
     saved = {
       overflow: document.body.style.overflow,
       position: document.body.style.position,
