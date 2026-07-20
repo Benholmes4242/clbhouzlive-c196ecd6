@@ -26,7 +26,9 @@ export type AudioLogEntry = {
   data: Record<string, unknown>;
 };
 
-const BUFFER_SIZE = 500;
+// ~2000 entries so a five-minute continuous capture fits at typical event
+// rates (heartbeat 1/s + play/pause/policy churn during scroll).
+const BUFFER_SIZE = 2000;
 
 let buffer: AudioLogEntry[] = [];
 const listeners = new Set<() => void>();
