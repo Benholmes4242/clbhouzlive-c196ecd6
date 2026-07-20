@@ -26,15 +26,16 @@ import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar
 import { PhotoBand } from './HybridHeroBands/PhotoBand';
 import { MiddleBand } from './HybridHeroBands/MiddleBand';
 import { LeaderboardBand } from './HybridHeroBands/LeaderboardBand';
-import { CinematicFrame } from './HybridHeroBands/CinematicFrame';
-import { CinematicHeroFullBleed } from './HybridHeroBands/CinematicHeroFullBleed';
+import { HeroWireTicker } from './HybridHeroBands/HeroWireTicker';
 import { setHeroFullBleed } from '../../_shared/heroFullBleedSignal';
 import { formatMonthDay } from '@/i18n/format';
+import { useAIPredictions } from '../../hooks/useAIPredictions';
 import {
   deriveHeroState,
   detectTopTie,
   deriveTickerRows,
   fmtScore,
+  todayFromEntry,
 } from './HybridHero.utils';
 import { BG, INK_15 } from './HybridHero.constants';
 
