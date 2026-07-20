@@ -38,56 +38,60 @@ export interface SupportMessageRow {
   } | null;
 }
 
+export async function fetchSupportTickets(opts?: { closed?: boolean }): Promise<SupportTicketRow[]> {
+  let q: any = supabase
+    .from('support_tickets')
+    .select('id, user_id, category, subject, status, last_sender, last_message_at, created_at')
+    .order('last_message_at', { ascending: false })
+    .limit(500);
+  if (opts?.closed) q = q.in('status', ['resolved', 'closed']);
+  const { data: tickets, error } = await q;
+  if (error) throw error;
+  if (!tickets || tickets.length === 0) return [];
+
+  const userIds = Array.from(new Set(tickets.map((t: any) => t.user_id)));
+  const ticketIds = tickets.map((t: any) => t.id);
+
+  const sb: any = supabase;
+  const profilesRes = await sb
+    .from('user_profiles')
+    .select('user_id, display_name, username, profile_photo_url')
+    .in('user_id', userIds);
+  const firstMsgsRes = await sb
+    .from('support_messages')
+    .select('ticket_id, body, created_at')
+    .in('ticket_id', ticketIds)
+    .order('created_at', { ascending: true });
+  const profiles = (profilesRes.data ?? []) as any[];
+  const firstMsgs = (firstMsgsRes.data ?? []) as any[];
+
+  const pMap = new Map<string, SupportTicketRow['profile']>();
+  profiles.forEach((p: any) => {
+    pMap.set(p.user_id, {
+      display_name: p.display_name,
+      username: p.username,
+      profile_photo_url: p.profile_photo_url,
+    });
+  });
+
+  const snippetMap = new Map<string, string>();
+  (firstMsgs ?? []).forEach((m: any) => {
+    if (!snippetMap.has(m.ticket_id)) snippetMap.set(m.ticket_id, m.body);
+  });
+
+  return tickets.map((t: any) => ({
+    ...t,
+    status: t.status as SupportStatus,
+    last_sender: t.last_sender as 'user' | 'admin',
+    profile: pMap.get(t.user_id) ?? null,
+    snippet: snippetMap.get(t.id) ?? null,
+  }));
+}
+
 export function useSupportTickets() {
   return useQuery({
     queryKey: SUPPORT_TICKETS_KEY,
-    queryFn: async (): Promise<SupportTicketRow[]> => {
-      const { data: tickets, error } = await supabase
-        .from('support_tickets')
-        .select('id, user_id, category, subject, status, last_sender, last_message_at, created_at')
-        .order('last_message_at', { ascending: false })
-        .limit(500);
-      if (error) throw error;
-      if (!tickets || tickets.length === 0) return [];
-
-      const userIds = Array.from(new Set(tickets.map((t) => t.user_id)));
-      const ticketIds = tickets.map((t) => t.id);
-
-      const sb: any = supabase;
-      const profilesRes = await sb
-        .from('user_profiles')
-        .select('user_id, display_name, username, profile_photo_url')
-        .in('user_id', userIds);
-      const firstMsgsRes = await sb
-        .from('support_messages')
-        .select('ticket_id, body, created_at')
-        .in('ticket_id', ticketIds)
-        .order('created_at', { ascending: true });
-      const profiles = (profilesRes.data ?? []) as any[];
-      const firstMsgs = (firstMsgsRes.data ?? []) as any[];
-
-      const pMap = new Map<string, SupportTicketRow['profile']>();
-      profiles.forEach((p: any) => {
-        pMap.set(p.user_id, {
-          display_name: p.display_name,
-          username: p.username,
-          profile_photo_url: p.profile_photo_url,
-        });
-      });
-
-      const snippetMap = new Map<string, string>();
-      (firstMsgs ?? []).forEach((m: any) => {
-        if (!snippetMap.has(m.ticket_id)) snippetMap.set(m.ticket_id, m.body);
-      });
-
-      return tickets.map((t: any) => ({
-        ...t,
-        status: t.status as SupportStatus,
-        last_sender: t.last_sender as 'user' | 'admin',
-        profile: pMap.get(t.user_id) ?? null,
-        snippet: snippetMap.get(t.id) ?? null,
-      }));
-    },
+    queryFn: () => fetchSupportTickets(),
     staleTime: 30_000,
   });
 }

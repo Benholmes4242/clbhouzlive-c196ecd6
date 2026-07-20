@@ -28,7 +28,7 @@ const STATUS_ORDER: Record<string, number> = {
   rejected: 3,
 };
 
-async function fetchCourseRequests(): Promise<CourseRequestRow[]> {
+export async function fetchCourseRequests(): Promise<CourseRequestRow[]> {
   const { data, error } = await supabase
     .from('course_requests')
     .select('id, requested_by, course_name, location, country, note, status, admin_notes, resolved_by, resolved_at, created_at')

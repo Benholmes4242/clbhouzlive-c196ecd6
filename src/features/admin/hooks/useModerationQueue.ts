@@ -96,7 +96,7 @@ async function fetchProfiles(ids: string[]): Promise<Record<string, ProfileLite>
   return map;
 }
 
-async function fetchQueue(): Promise<ModerationQueueRow[]> {
+export async function fetchModerationQueue(): Promise<ModerationQueueRow[]> {
   const [{ data: userReports, error: uErr }, { data: postReports, error: pErr }] = await Promise.all([
     supabase
       .from('reports')
@@ -209,7 +209,7 @@ async function fetchQueue(): Promise<ModerationQueueRow[]> {
 export function useModerationQueue(filters: QueueFilters = { status: 'all', type: 'all' }) {
   const query = useQuery({
     queryKey: ['admin-v2', 'moderation', 'queue'],
-    queryFn: fetchQueue,
+    queryFn: fetchModerationQueue,
     staleTime: 15_000,
   });
 

@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useState } from 'react';
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, RefreshCw } from 'lucide-react';
 import { usePanelRole } from '@/hooks/usePanelRole';
@@ -15,36 +15,31 @@ const UsersPage = lazy(() => import('./pages/UsersPage'));
 const ContentPage = lazy(() => import('./pages/ContentPage'));
 const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage'));
 const SystemPage = lazy(() => import('./pages/SystemPage'));
-const ModerationPage = lazy(() => import('./pages/ModerationPage'));
-const ApprovalsPage = lazy(() => import('./pages/ApprovalsPage'));
-const MatchRequestsPage = lazy(() => import('./pages/MatchRequestsPage'));
-const CourseMatchingPage = lazy(() => import('./pages/CourseMatchingPage'));
-const AppealsPage = lazy(() => import('./pages/AppealsPage'));
-
-const SupportPage = lazy(() => import('./pages/SupportPage'));
-const VerificationsPage = lazy(() => import('./pages/VerificationsPage'));
+const InboxPage = lazy(() => import('./pages/InboxPage'));
 const VideoPerfPage = lazy(() => import('./pages/VideoPerfPage'));
 const EchoHealthPage = lazy(() => import('./pages/EchoHealthPage'));
 const PushHealthPage = lazy(() => import('./pages/PushHealthPage'));
 
 const SECTION_TITLES: Record<string, string> = {
   dashboard:  'Dashboard',
-  moderation: 'Moderation',
-  approvals:  'Approvals',
-  'match-requests': 'Match Requests',
-  'course-matching': 'Course Matching',
-  appeals:    'Appeals',
+  inbox:      'Inbox',
   users:      'Users',
   content:    'Content',
   analytics:  'Analytics',
   system:     'System',
-  
-  support:    'Support',
-  verifications: 'Verifications',
   'video-perf': 'Video Perf',
   'echo-health': 'Echo Health',
   'push-health': 'Push Health',
 };
+
+// Preserve ALL query params across redirects; optionally set/override ?type=
+function RedirectPreserving({ to, forceType }: { to: string; forceType?: string }) {
+  const [params] = useSearchParams();
+  const next = new URLSearchParams(params);
+  if (forceType) next.set('type', forceType);
+  const qs = next.toString();
+  return <Navigate to={`${to}${qs ? `?${qs}` : ''}`} replace />;
+}
 
 export default function AdminShell() {
   const { role, loading } = usePanelRole();
@@ -60,9 +55,11 @@ export default function AdminShell() {
 
   const headerHeight = 'calc(52px + max(env(safe-area-inset-top, 0px), 47px))';
 
+  const defaultRoute = role === 'moderator' ? 'inbox?type=report' : 'dashboard';
+  const canInbox = can.viewModeration || can.viewUsers || can.approveRequests;
+
   return (
     <div style={{ minHeight: '100dvh', background: t.canvas, color: t.ink }}>
-      {/* Drawer */}
       <AdminDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
@@ -70,7 +67,6 @@ export default function AdminShell() {
         canManageAdmins={can.manageAdmins}
       />
 
-      {/* Header */}
       <header
         style={{
           position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
@@ -105,7 +101,6 @@ export default function AdminShell() {
         </div>
       </header>
 
-      {/* Content */}
       <main style={{ paddingTop: headerHeight, minHeight: '100dvh' }}>
         <AnimatePresence mode="wait">
           <motion.div
@@ -117,24 +112,27 @@ export default function AdminShell() {
           >
             <Suspense fallback={<AdminLoading />}>
               <Routes>
-                <Route index element={<Navigate to={role === 'moderator' ? 'moderation' : 'dashboard'} replace />} />
+                <Route index element={<Navigate to={defaultRoute} replace />} />
                 <Route path="dashboard" element={<DashboardPage />} />
-                <Route path="moderation/*" element={can.viewModeration ? <ModerationPage /> : <AdminAccessDenied />} />
-                <Route path="approvals/*"  element={can.approveRequests ? <ApprovalsPage /> : <AdminAccessDenied />} />
-                <Route path="match-requests/*" element={can.viewUsers ? <MatchRequestsPage /> : <AdminAccessDenied />} />
-                <Route path="course-matching/*" element={can.viewUsers ? <CourseMatchingPage /> : <AdminAccessDenied />} />
-                <Route path="appeals/*"    element={can.viewModeration ? <AppealsPage /> : <AdminAccessDenied />} />
+                <Route path="inbox/*" element={canInbox ? <InboxPage /> : <AdminAccessDenied />} />
                 <Route path="users/*"     element={can.viewUsers ? <UsersPage /> : <AdminAccessDenied />} />
                 <Route path="content/*"   element={<ContentPage />} />
                 <Route path="analytics/*" element={can.manageAdmins ? <AnalyticsPage /> : <AdminAccessDenied />} />
                 <Route path="system/*"    element={<SystemPage />} />
-                
-                <Route path="support/*"   element={can.viewModeration ? <SupportPage /> : <AdminAccessDenied />} />
-                <Route path="verifications/*" element={can.viewUsers ? <VerificationsPage /> : <AdminAccessDenied />} />
                 <Route path="video-perf/*" element={<VideoPerfPage />} />
                 <Route path="echo-health/*" element={can.manageAdmins ? <EchoHealthPage /> : <AdminAccessDenied />} />
                 <Route path="push-health/*" element={can.manageAdmins ? <PushHealthPage /> : <AdminAccessDenied />} />
-                <Route path="*" element={<Navigate to={role === 'moderator' ? 'moderation' : 'dashboard'} replace />} />
+
+                {/* Redirects: seven old queue routes -> unified inbox (preserving query params) */}
+                <Route path="moderation/*"      element={<RedirectPreserving to="/admin-v2/inbox" forceType="report" />} />
+                <Route path="appeals/*"         element={<RedirectPreserving to="/admin-v2/inbox" forceType="appeal" />} />
+                <Route path="support/*"         element={<RedirectPreserving to="/admin-v2/inbox" forceType="support" />} />
+                <Route path="verifications/*"   element={<RedirectPreserving to="/admin-v2/inbox" forceType="verification" />} />
+                <Route path="approvals/*"       element={<RedirectPreserving to="/admin-v2/inbox" forceType="approval" />} />
+                <Route path="match-requests/*"  element={<RedirectPreserving to="/admin-v2/inbox" forceType="match" />} />
+                <Route path="course-matching/*" element={<RedirectPreserving to="/admin-v2/inbox/matching" />} />
+
+                <Route path="*" element={<Navigate to={defaultRoute} replace />} />
               </Routes>
             </Suspense>
           </motion.div>
@@ -144,7 +142,6 @@ export default function AdminShell() {
   );
 }
 
-// Refresh button reads from the dashboard's query keys via window event
 function RefreshHeaderButton() {
   const [spinning, setSpinning] = useState(false);
   const onClick = () => {

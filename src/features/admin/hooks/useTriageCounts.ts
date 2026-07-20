@@ -1,16 +1,26 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
+export type InboxTypeSlug =
+  | 'report'
+  | 'appeal'
+  | 'support'
+  | 'verification'
+  | 'approval'
+  | 'match'
+  | 'courseRequest';
+
 export interface TriageQueueBucket {
   key: string;
   label: string;
   count: number;
+  type: InboxTypeSlug;
   route: string;
   oldestCreatedAt: string | null;
 }
 
 export interface TriageCounts {
-  moderationReports: number; // reports + post_reports (banner-facing total)
+  moderationReports: number; // reports + post_reports
   reports: number;
   postReports: number;
   suspensionAppeals: number;
@@ -24,88 +34,71 @@ export interface TriageCounts {
   total: number;
   byQueue: TriageQueueBucket[];
   oldestCreatedAt: string | null;
-  oldestQueueRoute: string;
+  oldestQueueRoute: string; // now an inbox link
+  oldestType: InboxTypeSlug | null;
   hadErrors: boolean;
 }
 
 type QueueSpec = {
   key: string;
   label: string;
-  route: string;
+  type: InboxTypeSlug;
   countBuilder: () => any;
   oldestBuilder: () => any;
 };
 
 const sb: any = supabase;
 
+const inboxRoute = (type: InboxTypeSlug) => `/admin-v2/inbox?type=${type}`;
+
 const QUEUES: QueueSpec[] = [
   {
-    key: 'reports',
-    label: 'User reports',
-    route: '/admin-v2/moderation',
+    key: 'reports', label: 'User reports', type: 'report',
     countBuilder: () => sb.from('reports').select('id', { count: 'exact', head: true }).in('status', ['pending', 'reviewing']),
     oldestBuilder: () => sb.from('reports').select('created_at').in('status', ['pending', 'reviewing']).order('created_at', { ascending: true }).limit(1),
   },
   {
-    key: 'postReports',
-    label: 'Post reports',
-    route: '/admin-v2/moderation',
+    key: 'postReports', label: 'Post reports', type: 'report',
     countBuilder: () => sb.from('post_reports').select('id', { count: 'exact', head: true }).in('status', ['pending', 'reviewing']),
     oldestBuilder: () => sb.from('post_reports').select('created_at').in('status', ['pending', 'reviewing']).order('created_at', { ascending: true }).limit(1),
   },
   {
-    key: 'appeals',
-    label: 'Suspension appeals',
-    route: '/admin-v2/appeals',
+    key: 'appeals', label: 'Suspension appeals', type: 'appeal',
     countBuilder: () => sb.from('suspension_appeals').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
     oldestBuilder: () => sb.from('suspension_appeals').select('created_at').eq('status', 'pending').order('created_at', { ascending: true }).limit(1),
   },
   {
-    key: 'businessVerifications',
-    label: 'Business verifications',
-    route: '/admin-v2/verifications',
+    key: 'businessVerifications', label: 'Business verifications', type: 'verification',
     countBuilder: () => sb.from('business_verification_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
     oldestBuilder: () => sb.from('business_verification_requests').select('created_at').eq('status', 'pending').order('created_at', { ascending: true }).limit(1),
   },
   {
-    key: 'golferVerifications',
-    label: 'Golfer verifications',
-    route: '/admin-v2/verifications',
+    key: 'golferVerifications', label: 'Golfer verifications', type: 'verification',
     countBuilder: () => sb.from('golfer_verification_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
     oldestBuilder: () => sb.from('golfer_verification_requests').select('created_at').eq('status', 'pending').order('created_at', { ascending: true }).limit(1),
   },
   {
-    key: 'courseClaims',
-    label: 'Course claims',
-    route: '/admin-v2/verifications',
+    key: 'courseClaims', label: 'Course claims', type: 'verification',
     countBuilder: () => sb.from('course_claim_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
     oldestBuilder: () => sb.from('course_claim_requests').select('created_at').eq('status', 'pending').order('created_at', { ascending: true }).limit(1),
   },
   {
-    key: 'courseRequests',
-    label: 'Course requests',
-    route: '/admin-v2/content',
+    key: 'courseRequests', label: 'Course requests', type: 'courseRequest',
     countBuilder: () => sb.from('course_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
     oldestBuilder: () => sb.from('course_requests').select('created_at').eq('status', 'pending').order('created_at', { ascending: true }).limit(1),
   },
   {
-    key: 'matchRequests',
-    label: 'Course matching',
-    route: '/admin-v2/course-matching',
+    key: 'matchRequests', label: 'Course matching', type: 'match',
     countBuilder: () => sb.from('whs_course_match_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
     oldestBuilder: () => sb.from('whs_course_match_requests').select('created_at').eq('status', 'pending').order('created_at', { ascending: true }).limit(1),
   },
   {
-    key: 'supportAwaitingReply',
-    label: 'Support tickets',
-    route: '/admin-v2/support',
+    key: 'supportAwaitingReply', label: 'Support tickets', type: 'support',
     countBuilder: () => sb.from('support_tickets').select('id', { count: 'exact', head: true }).eq('last_sender', 'user').not('status', 'in', '(resolved,closed)'),
     oldestBuilder: () => sb.from('support_tickets').select('created_at').eq('last_sender', 'user').not('status', 'in', '(resolved,closed)').order('created_at', { ascending: true }).limit(1),
   },
   {
-    key: 'approvals',
-    label: 'Approvals',
-    route: '/admin-v2/approvals',
+    key: 'approvals', label: 'Approvals', type: 'approval',
     countBuilder: () => sb.from('admin_action_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
     oldestBuilder: () => sb.from('admin_action_requests').select('created_at').eq('status', 'pending').order('created_at', { ascending: true }).limit(1),
   },
@@ -140,23 +133,23 @@ async function fetchTriageCounts(): Promise<TriageCounts> {
       hadErrors = true;
     }
 
-    byQueue.push({ key: q.key, label: q.label, count, route: q.route, oldestCreatedAt });
+    byQueue.push({ key: q.key, label: q.label, type: q.type, count, route: inboxRoute(q.type), oldestCreatedAt });
   });
 
   const get = (k: string) => byQueue.find(b => b.key === k)?.count ?? 0;
   const reports = get('reports');
   const postReports = get('postReports');
-
   const total = byQueue.reduce((n, b) => n + b.count, 0);
 
-  // Oldest across queues with count > 0
   let oldestCreatedAt: string | null = null;
-  let oldestQueueRoute = '/admin-v2/dashboard';
+  let oldestQueueRoute = '/admin-v2/inbox';
+  let oldestType: InboxTypeSlug | null = null;
   for (const b of byQueue) {
     if (!b.count || !b.oldestCreatedAt) continue;
     if (!oldestCreatedAt || b.oldestCreatedAt < oldestCreatedAt) {
       oldestCreatedAt = b.oldestCreatedAt;
       oldestQueueRoute = b.route;
+      oldestType = b.type;
     }
   }
 
@@ -176,6 +169,7 @@ async function fetchTriageCounts(): Promise<TriageCounts> {
     byQueue,
     oldestCreatedAt,
     oldestQueueRoute,
+    oldestType,
     hadErrors,
   };
 }
@@ -188,3 +182,4 @@ export function useTriageCounts() {
     refetchInterval: 60_000,
   });
 }
+

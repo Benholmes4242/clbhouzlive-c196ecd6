@@ -29,7 +29,7 @@ async function currentUserId(): Promise<string | null> {
   return data.user?.id ?? null;
 }
 
-async function fetchRequests(status: AdminRequestStatus | 'all'): Promise<AdminRequestRow[]> {
+export async function fetchAdminActionRequests(status: AdminRequestStatus | 'all'): Promise<AdminRequestRow[]> {
   let q = supabase
     .from('admin_action_requests')
     .select('*')
@@ -63,7 +63,7 @@ async function fetchRequests(status: AdminRequestStatus | 'all'): Promise<AdminR
 export function useAdminActionRequests(status: AdminRequestStatus | 'all' = 'pending') {
   const query = useQuery({
     queryKey: [...APPROVAL_QUERY_KEY, status],
-    queryFn: () => fetchRequests(status),
+    queryFn: () => fetchAdminActionRequests(status),
     staleTime: 30_000,
   });
   return query;

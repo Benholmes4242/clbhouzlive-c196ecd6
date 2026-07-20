@@ -1,12 +1,13 @@
 import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  LayoutDashboard, Users, MapPin, BarChart3, Settings, Shield, ShieldAlert, ShieldCheck, LifeBuoy, ArrowLeft,
-  ClipboardList, MessagesSquare, BadgeCheck, Gauge, Activity, Bell, Link2,
+  LayoutDashboard, Inbox, Users, MapPin, BarChart3, Settings, Shield, ArrowLeft,
+  Gauge, Activity, Bell,
   type LucideIcon,
 } from 'lucide-react';
 import { adminTheme as t } from './theme';
 import type { PanelRole } from '@/hooks/usePanelRole';
+import { useTriageCounts } from './hooks/useTriageCounts';
 
 interface NavItem {
   to: string;
@@ -14,23 +15,17 @@ interface NavItem {
   icon: LucideIcon;
   requireFull?: boolean;
   moderatorAllowed?: boolean;
+  showBadge?: boolean;
 }
 
 const NAV: NavItem[] = [
-  { to: '/admin-v2/dashboard',  label: 'Dashboard',  icon: LayoutDashboard },
-  { to: '/admin-v2/moderation', label: 'Moderation', icon: ShieldAlert, moderatorAllowed: true },
-  { to: '/admin-v2/approvals',  label: 'Approvals',  icon: ShieldCheck, requireFull: true },
-  { to: '/admin-v2/match-requests', label: 'Match Requests', icon: Link2 },
-  { to: '/admin-v2/course-matching', label: 'Course Matching', icon: Link2 },
-  { to: '/admin-v2/appeals',    label: 'Appeals',    icon: LifeBuoy, moderatorAllowed: true },
-  { to: '/admin-v2/verifications', label: 'Verifications', icon: BadgeCheck },
-  { to: '/admin-v2/users',      label: 'Users',      icon: Users },
-  { to: '/admin-v2/content',    label: 'Content',    icon: MapPin },
-  { to: '/admin-v2/analytics',  label: 'Analytics',  icon: BarChart3, requireFull: true },
-  
-  { to: '/admin-v2/support',    label: 'Support',    icon: MessagesSquare, moderatorAllowed: true },
-  { to: '/admin-v2/video-perf', label: 'Video Perf', icon: Gauge, requireFull: true },
-  { to: '/admin-v2/system',     label: 'System',     icon: Settings },
+  { to: '/admin-v2/dashboard',   label: 'Dashboard',   icon: LayoutDashboard },
+  { to: '/admin-v2/inbox',       label: 'Inbox',       icon: Inbox, moderatorAllowed: true, showBadge: true },
+  { to: '/admin-v2/users',       label: 'Users',       icon: Users },
+  { to: '/admin-v2/content',     label: 'Content',     icon: MapPin },
+  { to: '/admin-v2/analytics',   label: 'Analytics',   icon: BarChart3, requireFull: true },
+  { to: '/admin-v2/system',      label: 'System',      icon: Settings },
+  { to: '/admin-v2/video-perf',  label: 'Video Perf',  icon: Gauge, requireFull: true },
   { to: '/admin-v2/echo-health', label: 'Echo Health', icon: Activity, requireFull: true },
   { to: '/admin-v2/push-health', label: 'Push Health', icon: Bell, requireFull: true },
 ];
@@ -44,8 +39,9 @@ interface Props {
 
 export default function AdminDrawer({ open, onClose, role, canManageAdmins }: Props) {
   const location = useLocation();
+  const triage = useTriageCounts();
+  const badge = triage.data?.total ?? 0;
 
-  // Close on Esc
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
@@ -60,7 +56,6 @@ export default function AdminDrawer({ open, onClose, role, canManageAdmins }: Pr
 
   return (
     <>
-      {/* Backdrop */}
       <div
         onClick={onClose}
         aria-hidden={!open}
@@ -72,7 +67,6 @@ export default function AdminDrawer({ open, onClose, role, canManageAdmins }: Pr
           transition: 'opacity .22s ease',
         }}
       />
-      {/* Drawer */}
       <aside
         role="dialog"
         aria-label="Admin navigation"
@@ -86,7 +80,6 @@ export default function AdminDrawer({ open, onClose, role, canManageAdmins }: Pr
           paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
         }}
       >
-        {/* Brand */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '16px 18px', borderBottom: `1px solid ${t.line}` }}>
           <div
             style={{
@@ -104,11 +97,11 @@ export default function AdminDrawer({ open, onClose, role, canManageAdmins }: Pr
           </div>
         </div>
 
-        {/* Nav */}
         <nav style={{ flex: 1, padding: 10, display: 'flex', flexDirection: 'column', gap: 2, overflowY: 'auto' }}>
           {items.map((item) => {
             const active = location.pathname.startsWith(item.to);
             const Icon = item.icon;
+            const showBadge = item.showBadge && badge > 0;
             return (
               <Link
                 key={item.to}
@@ -125,13 +118,24 @@ export default function AdminDrawer({ open, onClose, role, canManageAdmins }: Pr
                 }}
               >
                 <Icon size={18} />
-                <span>{item.label}</span>
+                <span style={{ flex: 1 }}>{item.label}</span>
+                {showBadge && (
+                  <span
+                    style={{
+                      background: t.brand, color: t.surface,
+                      fontSize: 11, fontWeight: 700, padding: '1px 8px', borderRadius: 999,
+                      minWidth: 20, textAlign: 'center',
+                      fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
+                    {badge}
+                  </span>
+                )}
               </Link>
             );
           })}
         </nav>
 
-        {/* Footer */}
         <div style={{ padding: 14, borderTop: `1px solid ${t.line}`, display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span
@@ -141,7 +145,7 @@ export default function AdminDrawer({ open, onClose, role, canManageAdmins }: Pr
               }}
             />
             <span style={{ fontSize: 12, color: t.inkMuted }}>
-              {role === 'full' ? 'Full Admin' : role === 'limited' ? 'Limited Admin' : role === 'moderator' ? 'Moderator' : '—'}
+              {role === 'full' ? 'Full Admin' : role === 'limited' ? 'Limited Admin' : role === 'moderator' ? 'Moderator' : '-'}
             </span>
           </div>
           <Link
