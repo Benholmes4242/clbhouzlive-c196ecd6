@@ -804,10 +804,7 @@ export function useSinglePlayerStatistics(playerId: string | undefined) {
         .limit(1)
         .maybeSingle();
       
-      if (error) {
-        console.error('Error fetching single player stats:', error);
-        return null;
-      }
+      if (error) throw error;
       
       if (!data) return null;
       
