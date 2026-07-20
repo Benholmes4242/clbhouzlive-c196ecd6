@@ -10,6 +10,7 @@ import { DarkSectionHeader } from '../_shared/darkAtoms';
 import { SC_BIRDIE, SC_ALBATROSS, SC_PAR, SC_BOGEY, SC_DOUBLE, SC_ACE_DARK, SC_ALBATROSS_DARK, SC_EAGLE_DARK, SC_BIRDIE_DARK, SC_PAR_DARK, SC_BOGEY_DARK, SC_DOUBLE_DARK } from '@/features/courses/components/holes/_constants';
 import { useTrophyAggregates } from '@/lib/whs/hooks';
 import { formatNumber } from '@/i18n/format';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface Props {
   scores: WhsScore[];
@@ -786,26 +787,25 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
   if (shotsLoading) {
     return (
       <div style={{ padding: '16px' }}>
-        <div
-          className="animate-pulse"
+        <Skeleton
+          variant="dark"
           style={{
             height: 50,
             borderRadius: 12,
-            background: T.ink04,
             marginBottom: 12,
           }}
         />
-        <div
-          className="animate-pulse"
-          style={{ height: 16, borderRadius: 6, background: T.ink04, marginBottom: 8 }}
+        <Skeleton
+          variant="dark"
+          style={{ height: 16, borderRadius: 6, marginBottom: 8 }}
         />
-        <div
-          className="animate-pulse"
-          style={{ height: 16, borderRadius: 6, background: T.ink04, marginBottom: 8 }}
+        <Skeleton
+          variant="dark"
+          style={{ height: 16, borderRadius: 6, marginBottom: 8 }}
         />
-        <div
-          className="animate-pulse"
-          style={{ height: 16, borderRadius: 6, background: T.ink04 }}
+        <Skeleton
+          variant="dark"
+          style={{ height: 16, borderRadius: 6 }}
         />
       </div>
     );

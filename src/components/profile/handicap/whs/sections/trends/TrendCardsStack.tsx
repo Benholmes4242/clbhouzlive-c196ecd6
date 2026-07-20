@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Info } from 'lucide-react';
 import { useAllScores } from '@/lib/whs/hooks';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { Skeleton } from '@/components/ui/skeleton';
 import HandicapProjectionCard from './HandicapProjectionCard';
 import LastFiveTokens from './LastFiveTokens';
 import StablefordCard from './StablefordCard';
@@ -237,13 +238,12 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, userId, current
       ))}
 
       {isLoading ? (
-        [420, 320, 360].map((h, i) => (
-          <div
+        (splitAt === 'rest' ? [420] : splitAt === 'hero-only' ? [420, 320] : [420, 320, 360]).map((h, i) => (
+          <Skeleton
             key={i}
-            className="animate-pulse"
+            variant="dark"
             style={{
               height: h,
-              background: 'var(--hcp-bg-2)',
               borderRadius: 16,
               marginBottom: 12,
             }}

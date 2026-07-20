@@ -4,6 +4,7 @@ import { CourseImageFallback } from '@/components/whs/CourseImageFallback';
 import { useCourseForm } from '@/lib/whs/hooks';
 import type { CourseForm } from '@/lib/whs/types';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface Props {
   connectionId: string;
@@ -622,24 +623,22 @@ export const CourseFormCard: React.FC<Props> = ({
       <section style={sectionStyle}>
         <SectionHeader surface="dark" kicker="COURSE FORM" title={courseTitle} paddingX={16} />
         <div style={{ padding: '0 16px' }}>
-          <div
-            className="animate-pulse"
+          <Skeleton
+            variant="dark"
             style={{
               marginTop: 12,
               marginBottom: 4,
               height: 36,
-              background: T.slateTint,
               borderRadius: 10,
             }}
           />
           <div style={{ paddingTop: 12, paddingBottom: 16 }}>
             {Array.from({ length: 3 }).map((_, i) => (
-              <div
+              <Skeleton
                 key={i}
-                className="animate-pulse"
+                variant="dark"
                 style={{
                   height: 56,
-                  background: T.slateTint,
                   borderRadius: 4,
                   marginBottom: i < 2 ? 12 : 0,
                 }}
