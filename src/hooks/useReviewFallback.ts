@@ -43,12 +43,24 @@ export function useReviewFallback({ reviewId, enabled, hasText, hasBreakdown }: 
     gcTime: 15 * 60 * 1000,
     queryFn: async () => {
       if (!reviewId) return null;
+      // eslint-disable-next-line no-console
+      console.debug('[review-fallback] fetching', { reviewId, hasText, hasBreakdown });
       const { data, error } = await supabase
         .from('course_ratings')
         .select('review, design_score, condition_score, clubhouse_score, facilities_score')
         .eq('id', reviewId)
         .maybeSingle();
-      if (error) throw error;
+      if (error) {
+        // eslint-disable-next-line no-console
+        console.error('[review-fallback] error', error);
+        throw error;
+      }
+      // eslint-disable-next-line no-console
+      console.debug('[review-fallback] result', {
+        reviewId,
+        hasReview: !!data?.review,
+        len: data?.review?.length ?? 0,
+      });
       if (!data) return null;
       return {
         reviewText: (data.review as string | null) ?? null,

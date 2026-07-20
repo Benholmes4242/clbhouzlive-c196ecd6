@@ -136,6 +136,15 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   });
   const effectiveReviewText = reviewText ?? fallback?.reviewText ?? null;
   const effectiveBreakdown = hasBreakdown ? breakdown : (fallback?.breakdown ?? breakdown ?? null);
+  if (isOpen) {
+    // eslint-disable-next-line no-console
+    console.debug('[review-sheet] state', {
+      reviewId,
+      propHasText: !!reviewText,
+      fallbackHasText: !!fallback?.reviewText,
+      effectiveHasText: !!effectiveReviewText,
+    });
+  }
 
   // Scope drag to header only so the middle scrolls without dismissing.
   const dragControls = useDragControls();
