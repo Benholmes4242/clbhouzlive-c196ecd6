@@ -202,8 +202,10 @@ export const ManageRivalsSheet: React.FC<Props> = ({ userId, open, onClose }) =>
 
             <div style={{ flex: 1, overflowY: 'auto', padding: '0 16px 24px' }}>
               {isLoading && rivalries.length === 0 && (leaderboard?.length ?? 0) === 0 ? (
-                <div style={{ padding: 20, color: INK_MUTE, fontSize: 13 }}>
-                  Loading your circle…
+                <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {[0, 1, 2].map((i) => (
+                    <Skeleton key={i} height={64} radius={12} />
+                  ))}
                 </div>
               ) : (
                 <>
