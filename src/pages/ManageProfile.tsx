@@ -44,11 +44,21 @@ const GENDER_OPTIONS = [
 
 type TabId = 'profile' | 'settings';
 
+type UserProfileRow = {
+  id?: string;
+  username?: string | null;
+  has_completed_onboarding?: boolean | null;
+  user_type?: string | null;
+  eg_handicap_index?: number | null;
+  manual_handicap_index?: number | null;
+} | null | undefined;
+
 export default function ManageProfile() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user } = useSupabaseSession();
-  const { profile, loading } = useProfileData();
+  const { profile: profileRaw, loading, isError: profileError, refetch: refetchProfile } = useProfileData();
+  const profile = profileRaw as UserProfileRow;
   const [searchParams, setSearchParams] = useSearchParams();
 
   const {
@@ -59,16 +69,16 @@ export default function ManageProfile() {
 
   const { save, isSaving } = useProfileSave(user?.id ?? '');
 
-  const usernameIsLocked = !!(profile as any)?.has_completed_onboarding;
+  const usernameIsLocked = !!profile?.has_completed_onboarding;
   const isNewUser = useRef(
     searchParams.get('onboarding') === '1' ||
-    !(profile as any)?.has_completed_onboarding
+    !profile?.has_completed_onboarding
   );
   useEffect(() => {
     if (loading) return;
     isNewUser.current =
       searchParams.get('onboarding') === '1' ||
-      !(profile as any)?.has_completed_onboarding;
+      !profile?.has_completed_onboarding;
   }, [loading, profile, searchParams]);
 
   // Active tab (URL-backed). Onboarding always forces 'profile' and hides the bar.
