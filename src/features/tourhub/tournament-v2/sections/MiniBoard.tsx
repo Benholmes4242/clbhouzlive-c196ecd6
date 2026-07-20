@@ -68,7 +68,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5 }: Props) {
             display: 'flex', alignItems: 'center',
             padding: '8px 16px',
             borderBottom: `0.5px solid ${HAIRLINE_INK_8}`,
-            fontSize: 8.5, fontWeight: 800, letterSpacing: '0.10em',
+            fontSize: 10, fontWeight: 800, letterSpacing: '0.10em',
             color: INK_FAINT, textTransform: 'uppercase',
           }}
         >
