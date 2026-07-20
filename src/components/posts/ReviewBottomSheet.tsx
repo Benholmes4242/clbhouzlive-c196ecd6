@@ -117,6 +117,26 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   const { data: liveStats } = useReviewerStats(user?.id);
   const effectiveStats = liveStats ?? reviewerStats ?? null;
 
+  // Some feed RPCs (get_explore_feed, get_watch_shorts, get_course_media,
+  // get_long_form_videos) don't return review_text / per-category scores.
+  // Lazy-fetch straight from course_ratings so the sheet renders identically
+  // regardless of which surface opened it.
+  const hasText = !!reviewText;
+  const hasBreakdown = !!breakdown && (
+    breakdown.design != null ||
+    breakdown.conditions != null ||
+    breakdown.clubhouse != null ||
+    breakdown.facilities != null
+  );
+  const { data: fallback } = useReviewFallback({
+    reviewId: reviewId ?? null,
+    enabled: isOpen,
+    hasText,
+    hasBreakdown,
+  });
+  const effectiveReviewText = reviewText ?? fallback?.reviewText ?? null;
+  const effectiveBreakdown = hasBreakdown ? breakdown : (fallback?.breakdown ?? breakdown ?? null);
+
   // Scope drag to header only so the middle scrolls without dismissing.
   const dragControls = useDragControls();
 
