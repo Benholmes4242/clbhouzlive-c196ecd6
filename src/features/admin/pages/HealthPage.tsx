@@ -261,7 +261,7 @@ function EgSyncCard({ eg, chip }: { eg: ReturnType<typeof useDashboard>['egSyncH
       ) : undefined}
     >
       {eg.isLoading ? <CardSkeleton /> : eg.isError || !d ? (
-        <AdminErrorState message="Could not load EG sync." onRetry={() => eg.refetch?.()} />
+        <AdminErrorState message="Could not load EG sync." onRetry={() => window.dispatchEvent(new CustomEvent("admin-v2:refetch"))} />
       ) : (
         <StatGrid stats={[
           { label: 'Connected',   value: d.total_connected ?? 0 },
@@ -284,7 +284,7 @@ function CronCard({ eg, chip }: { eg: ReturnType<typeof useDashboard>['egSyncHea
   return (
     <SystemCard icon={<RefreshCw size={16} />} title="Sync cron" chip={chip}>
       {eg.isLoading ? <CardSkeleton /> : eg.isError || !d ? (
-        <AdminErrorState message="Could not load cron status." onRetry={() => eg.refetch?.()} />
+        <AdminErrorState message="Could not load cron status." onRetry={() => window.dispatchEvent(new CustomEvent("admin-v2:refetch"))} />
       ) : (
         <StatGrid stats={[
           {
