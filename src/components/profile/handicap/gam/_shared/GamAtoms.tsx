@@ -1,6 +1,7 @@
 import React from 'react';
 import type { BadgeRarity } from '@/lib/gam/types';
 import { rarityColor, rarityColorSoft } from '@/lib/gam/visuals';
+import { Skeleton as BaseSkeleton } from '@/components/ui/skeleton';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
