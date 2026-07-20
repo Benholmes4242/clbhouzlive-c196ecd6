@@ -37,7 +37,7 @@ import { CollegeHeroMasthead } from '../_shared/CollegeHeroMasthead';
 
 
 export function CollegeHubPage() {
-  const { data, isLoading } = useFranchiseStandings();
+  const { data, isLoading, isError, refetch } = useFranchiseStandings();
   const { data: liveAlumni } = useLiveAlumni();
 
   const [searchExpanded, setSearchExpanded] = useState(false);
