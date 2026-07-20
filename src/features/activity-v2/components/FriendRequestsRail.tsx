@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useFriendRequestsV2, type FriendRequestRowV2 } from '../hooks/useFriendRequestsV2';
 
 const GEIST =
