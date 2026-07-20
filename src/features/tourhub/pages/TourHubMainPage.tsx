@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
-import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import { TourHubShell } from '../components/TourHubShell';
 import type { TourHubTab } from '../components/types';
 import { OverviewTab } from '../components/tabs';
@@ -19,8 +18,6 @@ import { useSetChromeLeftSlot } from '@/features/chrome-v2/leftOverride';
 import { GlassHeaderPlate } from '@/components/chrome/GlassHeaderPlate';
 import { scrollPageToTop } from '@/lib/getScrollParent';
 
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useWhsConnection, useHandicapTrend } from '@/lib/whs/hooks';
 import { useLogout } from '@/hooks/useLogout';
 
 /**
@@ -32,7 +29,6 @@ import { useLogout } from '@/hooks/useLogout';
 function TourHubChromeBridge({
   activeTab,
   onSelectTab,
-  handicapValue,
   onSettings,
   onProfile,
   onSignOut,
@@ -41,7 +37,6 @@ function TourHubChromeBridge({
 }: {
   activeTab: TourHubTab;
   onSelectTab: (tabId: string) => void;
-  handicapValue: string;
   onSettings: () => void;
   onProfile: () => void;
   onSignOut: () => void;
@@ -86,7 +81,6 @@ function TourHubChromeBridge({
           onSelectTab(id);
           setMenuOpen(false);
         }}
-        handicapValue={handicapValue}
         onSettings={onSettings}
         onProfile={onProfile}
         onSignOut={onSignOut}
@@ -103,10 +97,9 @@ export function TourHubMainPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const backMode =
-    (location.state as any)?.from === 'tournament' && location.key !== 'default';
+    (location.state as { from?: string } | null)?.from === 'tournament' && location.key !== 'default';
   const tabParam = searchParams.get('tab') as TourHubTab | null;
   const [activeTab, setActiveTab] = useState<TourHubTab>(tabParam || 'overview');
-  const [searchOpen, setSearchOpen] = useState(false);
 
   useTournamentStatusRealtime();
 
@@ -150,12 +143,6 @@ export function TourHubMainPage() {
   // H4a: no longer suppress the global island on cinematic overview — the
   // ChromeIsland paints with a page-provided left capsule (see TourHubChromeBridge).
 
-  const { user } = useSupabaseSession();
-  const { data: connection } = useWhsConnection(user?.id);
-  const { data: trendData } = useHandicapTrend(connection?.id);
-  const handicapValue =
-    trendData?.current != null ? Number(trendData.current).toFixed(1) : '—';
-
   const { logout } = useLogout();
 
   const renderTab = () => {
@@ -193,7 +180,6 @@ export function TourHubMainPage() {
         <TourHubChromeBridge
           activeTab={activeTab}
           onSelectTab={handleSelectTab}
-          handicapValue={handicapValue}
           onSettings={() => navigate('/edit-profile?tab=settings')}
           onProfile={() => navigate('/profile')}
           onSignOut={() => { void logout(); }}
@@ -204,14 +190,7 @@ export function TourHubMainPage() {
             its own cinematic hero overlay chrome. Height 70 matches tour
             island HEADER_H (see ChromeIsland.tsx). */}
         <GlassHeaderPlate visible={activeTab !== 'overview'} />
-        {fullBleedHero ? (
-          <>
-            <div>{renderTab()}</div>
-            <SearchOverlayV2 isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
-          </>
-        ) : (
-          <div>{renderTab()}</div>
-        )}
+        <div>{renderTab()}</div>
       </TourHubShell>
     </TourSelectionProvider>
   );
