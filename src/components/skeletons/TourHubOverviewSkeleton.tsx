@@ -1,12 +1,13 @@
 /**
  * TourHubOverviewSkeleton — route-level Suspense fallback for /tourhub.
  * The hero block replicates EXACTLY the hold OverviewHero renders during its
- * own isLoading state (528px, radius 20, INK_TINT_06 diagonal gradient), so
- * chunk-load → hero-loading → hero is one continuous frame. Two section
- * frames follow at the LazySection reservation heights.
+ * own isLoading state, using the shared OVERVIEW_HERO_HEIGHT so chunk-load →
+ * hero-loading → hero is one continuous frame. Two section frames follow at
+ * the LazySection reservation heights.
  */
 import { Skeleton } from '@/components/ui/skeleton';
 import { INK_TINT_06 } from '@/features/tourhub/_shared/tokens';
+import { OVERVIEW_HERO_HEIGHT } from '@/features/tourhub/components/overview-v3/OverviewHero';
 import { SPACE } from '@/lib/spacing';
 
 export const TourHubOverviewSkeleton = () => {
@@ -15,7 +16,7 @@ export const TourHubOverviewSkeleton = () => {
       {/* Hero — MUST mirror the mounted OverviewHero.isLoading hold exactly. */}
       <div
         style={{
-          height: 528,
+          height: OVERVIEW_HERO_HEIGHT,
           borderRadius: 20,
           background: `linear-gradient(135deg, ${INK_TINT_06}, rgba(15,23,42,0.02))`,
         }}
