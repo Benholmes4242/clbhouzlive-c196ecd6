@@ -560,7 +560,21 @@ function SettingsTab() {
             onChange={() => setPerfLive(!perfEnabled)}
           />
         </div>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ color: t.ink, fontSize: 13, fontWeight: 600 }}>Audio debug</div>
+            <div style={{ color: t.inkMuted, fontSize: 12, marginTop: 2 }}>
+              Enables the AUDIO pill, per-second SLOT heartbeats, and the bottom-right AUDIO LOG button. A reload may be required for engine-side gates to start emitting.
+            </div>
+          </div>
+          <ToggleSwitch
+            checked={audioEnabled}
+            onChange={() => setAudioDebugEnabled(!audioEnabled)}
+          />
+        </div>
       </Card>
+
     </div>
   );
 }
