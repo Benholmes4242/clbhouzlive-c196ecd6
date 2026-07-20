@@ -28,10 +28,45 @@ const SkeletonView = () => (
 export const WhsHandicapTab: React.FC<Props> = ({ userId, ownerFirstName = null }) => {
   const navigate = useNavigate();
   const { user: sessionUser } = useSupabaseSession();
-  const { data: connection, isLoading, refetch } = useWhsConnection(userId);
+  const { data: connection, isLoading, isError, refetch } = useWhsConnection(userId);
   const declineHandicapChip = useDeclineHandicapChip();
 
   if (isLoading) return <SkeletonView />;
+
+  // Never fall through to WhsConnectScreen when the query errored — an
+  // already-connected user would be prompted to reconnect. Show a retry
+  // state instead (dark card matches the /handicap route theme).
+  if (isError) {
+    return (
+      <div
+        style={{
+          minHeight: '60vh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 14,
+          padding: 24,
+          textAlign: 'center',
+          fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
+        }}
+      >
+        <div style={{ fontSize: 16, fontWeight: 700, color: '#F8FAFC' }}>
+          Couldn't load your handicap
+        </div>
+        <div style={{ fontSize: 13, color: 'rgba(248,250,252,0.65)', maxWidth: 280 }}>
+          Check your connection and try again.
+        </div>
+        <button
+          type="button"
+          onClick={() => refetch()}
+          style={{ background: '#F7931E', color: '#0F172A', border: 'none', borderRadius: 999, padding: '10px 20px', fontSize: 13.5, fontWeight: 700, cursor: 'pointer' }}
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   if (!connection) {
     // Own profile and no connection: the full-page connect form lives in
