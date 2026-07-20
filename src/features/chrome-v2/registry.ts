@@ -121,6 +121,11 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   // Declared BEFORE the /profile/ prefix rule so it wins.
   { match: { test: (p) => /^\/profile\/[^/]+\/(followers|following)$/.test(p) },
     spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/' }, tone: 'light', bleed: false, note: 'social lists - padded island (F3)' } },
+  // Profile PAGE (/profile/:username, exactly 2 segments) — island WITHOUT back.
+  // (bottom nav is the way out). Sub-pages fall through to the prefix rule
+  // below and KEEP their back button.
+  { match: { test: (p) => /^\/profile\/[^/]+$/.test(p) },
+    spec: { chrome: 'island', tone: 'light', bleed: true } },
   // /profile/ prefix — ISLAND (H3). Sits after /profile/quest above.
   { match: { prefix: '/profile/' },               spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/' }, tone: 'light', bleed: true } },
 
@@ -141,8 +146,8 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   { match: { prefix: '/rate-course-v2/' },        spec: { chrome: 'none', tone: 'light', bleed: false } },
 
   // Business profile: /business/:idOrSlug (exactly 3 segments) — ISLAND (H3),
-  // back to '/clubhouse' explicit. Managed sub-pages (edit/verification/etc.)
-  // remain page-owned, non-immersive.
+  // no back button (bottom nav is the way out). Managed sub-pages
+  // (edit/verification/etc.) remain page-owned, non-immersive.
   {
     match: {
       test: (p) => {
@@ -153,7 +158,6 @@ export const CHROME_REGISTRY: ChromeRule[] = [
     },
     spec: {
       chrome: 'island',
-      left: { kind: 'back', title: null, backTarget: '/clubhouse' },
       tone: 'light',
       bleed: true,
     },
