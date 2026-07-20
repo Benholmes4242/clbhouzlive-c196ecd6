@@ -275,69 +275,27 @@ class VideoEngineImpl {
     this.borrowedLanes.add(laneId);
     DBG('markBorrowed', { laneId });
     logAudio('borrow.marked', { laneId, msSinceOpen: msSinceOpen() });
-    // Attach volumechange guard: while borrowed, the effective policy is
-    // 'session', so any external write that contradicts the session store
-    // must be corrected. Self-triggered volumechanges are naturally
-    // terminating — the reassert writes the expected value, the resulting
-    // volumechange matches sessionMuted, and the branch no-ops.
-    const lane = this.lanes.get(laneId);
-    if (lane) {
-      const el = lane.el;
-      const onVC = () => {
-        if (!this.borrowedLanes.has(laneId)) return;
-        const sessionMuted = useSessionAudio.getState().isMuted;
-        if (el.muted !== sessionMuted) {
-          logAudio('audio.guard.reassert', {
-            laneId,
-            externalValue: el.muted,
-            expected: sessionMuted,
-            msSinceOpen: msSinceOpen(),
-          });
-          this.applyAudioPolicy(lane, 'guard-reassert');
-        }
-      };
-      el.addEventListener('volumechange', onVC);
-      this.borrowGuardDetach.set(laneId, () => {
-        try { el.removeEventListener('volumechange', onVC); } catch {}
-      });
-    }
+    // v9: reconciler picks up the borrow and routes audio to this lane.
+    this.reconcileAudio('borrow.marked');
   }
 
   clearBorrowed(laneId: LaneId): void {
-    // Detach the borrow guard FIRST so the handback's applyAudioPolicy
-    // (which re-mutes rails) does not fire the reassert branch.
-    const detach = this.borrowGuardDetach.get(laneId);
-    if (detach) {
-      detach();
-      this.borrowGuardDetach.delete(laneId);
-    }
     this.borrowedLanes.delete(laneId);
     // Same-element return: the next load() on this lane must not seek from
     // stale lastPos. The element's currentTime is the authority.
     this.sameElementReturn.add(laneId);
     DBG('clearBorrowed', { laneId });
     logAudio('borrow.cleared', { laneId, msSinceOpen: msSinceOpen() });
-    // Handback returns the lane muted and audio-neutral. The returned lane
-    // is about to be rotated/idled by the feed's post-close activation flow;
-    // a muted return can never steal the ONE_UNMUTED_LANE slot from whichever
-    // lane the feed actually promotes. The feed's activation path
-    // (play() → applyAudioPolicy trigger='activation') then applies session
-    // policy to whichever lane actually speaks, unmuting the true speaker
-    // via the same invariant-respecting setMuted route.
-    const lane = this.lanes.get(laneId);
-    if (lane) {
-      this.setMuted(laneId, true);
-      logAudio('handback.done', {
-        laneId,
-        elMutedAfter: lane.el.muted,
-        elVolumeAfter: lane.el.volume,
-        elPausedAfter: lane.el.paused,
-        msSinceOpen: msSinceOpen(),
-      });
-      // handback.position — element's playback position at the moment the
-      // borrow flag is cleared. Compared later against resume.position to
-      // quantify any jump-back.
-      if (audioDebugEnabled()) {
+    // v9: reconciler routes audio to the post-close active feed lane (if
+    // session is unmuted). Runs immediately AND on the next rAF so the
+    // feed's role rotation has settled by the second pass.
+    this.reconcileAudio('borrow.cleared');
+    const kick = () => this.reconcileAudio('borrow.cleared.settled');
+    if (typeof requestAnimationFrame === 'function') requestAnimationFrame(kick);
+    else queueMicrotask(kick);
+    if (audioDebugEnabled()) {
+      const lane = this.lanes.get(laneId);
+      if (lane) {
         logAudio('handback.position', {
           laneId,
           elCurrentTime: +lane.el.currentTime.toFixed(3),
@@ -345,65 +303,8 @@ class VideoEngineImpl {
         });
       }
     }
-    // AUDIO FIX v6: borrowed elements keep playing through the borrow (the
-    // pause.borrowed swallow keeps them alive), so the feed's resume path
-    // never calls play() on them and the 'activation' policy hook inside
-    // play() never fires. Explicitly kick the post-close ACTIVE lane so it
-    // adopts session audio. Deferred one rAF (with microtask fallback) so
-    // the feed's role rotation has settled and laneForRole('active')
-    // reflects the promoted lane, not the returned one.
-    const kick = () => {
-      let activeLaneId: LaneId | null = null;
-      try { activeLaneId = feedLaneRoles.laneForRole('active'); } catch {}
-      const sessionMuted = useSessionAudio.getState().isMuted;
-      logAudio('resume.policyKick', {
-        returnedLaneId: laneId,
-        activeLaneId,
-        sessionMuted,
-        msSinceOpen: msSinceOpen(),
-      });
-      if (!activeLaneId) return;
-      const activeLane = this.lanes.get(activeLaneId);
-      if (!activeLane) return;
-      this.applyAudioPolicy(activeLane, 'activation');
-      // resume.position — active lane's playback position after the
-      // activation policy kick. Delta = resume - fsClose isolates the
-      // "jump-back" (positive delta = rewound; ~0 = continuous).
-      if (audioDebugEnabled()) {
-        const snap = getLastCloseSnapshot();
-        const nowT = +activeLane.el.currentTime.toFixed(3);
-        logAudio('resume.position', {
-          laneId: activeLaneId,
-          elCurrentTime: nowT,
-          fsCloseCurrentTime: snap?.fsCurrentTime ?? null,
-          delta: snap && snap.fsCurrentTime != null ? +(nowT - snap.fsCurrentTime).toFixed(3) : null,
-          when: 'activation',
-        });
-        // Second beat @ +500ms — quantifies drift after any late seeks/loads.
-        const t500 = setTimeout(() => {
-          try {
-            const lane500 = this.lanes.get(activeLaneId!);
-            if (!lane500) return;
-            const now500 = +lane500.el.currentTime.toFixed(3);
-            logAudio('resume.position', {
-              laneId: activeLaneId,
-              elCurrentTime: now500,
-              fsCloseCurrentTime: snap?.fsCurrentTime ?? null,
-              delta: snap && snap.fsCurrentTime != null ? +(now500 - snap.fsCurrentTime).toFixed(3) : null,
-              when: 'activation+500ms',
-            });
-          } catch {}
-        }, 500);
-        // Best-effort cleanup handle (no-op consumer).
-        void t500;
-      }
-    };
-    if (typeof requestAnimationFrame === 'function') {
-      requestAnimationFrame(kick);
-    } else {
-      queueMicrotask(kick);
-    }
   }
+
 
   /** Public read: is this lane currently borrowed by the fullscreen viewer?
    *  Tile-side hooks (useRailLane belt-and-braces mute, etc.) consult this
