@@ -26,6 +26,8 @@ import { BioWebsitesSection } from '@/components/profile/edit-v2/BioWebsitesSect
 import { LocationSection } from '@/components/profile/edit-v2/LocationSection';
 import { SocialLinksSection } from '@/components/profile/edit-v2/SocialLinksSection';
 import { DISPLAY_NAME_MAX, USERNAME_MAX } from '@/components/profile/profile-wizard/types';
+import type { ProfileFormData, ClubEntry, WebsiteEntry } from '@/components/profile/profile-wizard/types';
+import type { NavigateOptions, To } from 'react-router-dom';
 
 import { SettingsTabContent } from '@/components/settings/SettingsTabContent';
 
