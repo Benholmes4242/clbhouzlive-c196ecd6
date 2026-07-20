@@ -1,14 +1,14 @@
 import React from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export const CinemaCardSkeleton: React.FC = () => (
-  <div
-    className="animate-pulse"
+  <Skeleton
+    variant="dark"
     style={{
       width: '100%',
       height: 384,
       borderRadius: 24,
-      background: 'rgba(15,23,42,0.06)',
-      border: '0.5px solid rgba(15,23,42,0.07)',
+      border: '0.5px solid rgba(255,255,255,0.07)',
     }}
   />
 );

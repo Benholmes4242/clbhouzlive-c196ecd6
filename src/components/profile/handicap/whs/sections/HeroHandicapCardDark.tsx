@@ -3,6 +3,7 @@ import React, { useMemo } from 'react';
 import { useHandicapTrend, useHandicapHistory } from '@/lib/whs/hooks';
 import { useHandicapTrend12mo } from '@/hooks/useHandicapTrend12mo';
 import type { WhsConnection } from '@/lib/whs/types';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface Props {
   connection: WhsConnection;
@@ -129,13 +130,9 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
             Current Index
           </div>
           {isLoading ? (
-            <div
-              style={{
-                width: 96,
-                height: 48,
-                borderRadius: 8,
-                background: 'var(--hcp-bg-3)',
-              }}
+            <Skeleton
+              variant="dark"
+              style={{ width: 96, height: 48, borderRadius: 8 }}
             />
           ) : (
             <div

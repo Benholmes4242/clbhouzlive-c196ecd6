@@ -1,6 +1,7 @@
 import React from 'react';
 import type { BadgeRarity } from '@/lib/gam/types';
 import { rarityColor, rarityColorSoft } from '@/lib/gam/visuals';
+import { Skeleton as BaseSkeleton } from '@/components/ui/skeleton';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
@@ -78,13 +79,12 @@ export const Skeleton: React.FC<{ height: number | string; width?: number | stri
   width = '100%',
   radius = 12,
 }) => (
-  <div
+  <BaseSkeleton
+    variant="dark"
     style={{
       height,
       width,
       borderRadius: radius,
-      background: 'rgba(255,255,255,0.06)',
-      animation: 'gamPulse 1.6s ease-in-out infinite',
     }}
   />
 );
