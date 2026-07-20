@@ -1,7 +1,8 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/lib/toast';
-import { ChevronDown, Film, Loader2 } from 'lucide-react';
+import { ChevronDown, Film } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
@@ -325,8 +326,11 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
       )}
 
       {isFetchingNextPage && (
-        <div className="flex justify-center py-4">
-          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+        <div
+          className="overflow-hidden bg-white"
+          style={{ borderTop: '0.5px solid rgba(15,23,42,0.06)', borderBottom: '0.5px solid rgba(15,23,42,0.06)' }}
+        >
+          <Skeleton className="w-full rounded-none" style={{ aspectRatio: '16 / 10' }} />
         </div>
       )}
 
