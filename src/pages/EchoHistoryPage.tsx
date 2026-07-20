@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { ChevronLeft, MoreHorizontal, Pin, X } from 'lucide-react';
@@ -7,6 +7,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useEchoChats, type EchoChatRow } from '@/features/echo-v2/hooks/useEchoChats';
 import { AnimatedEchoWave } from '@/features/echo-v2/components/AnimatedEchoWave';
 import { formatRelativeRounded } from '@/i18n/format';
+import { toast } from '@/lib/toast';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 
 const CANVAS = '#F8FAFC';
 const INK = '#1F2428';
@@ -25,7 +27,7 @@ type SheetMode = null | 'actions' | 'rename' | 'confirm-delete';
 const EchoHistoryPage: React.FC = () => {
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const { data: chats = [], isLoading } = useEchoChats();
+  const { data: chats = [], isLoading, isError, refetch } = useEchoChats();
 
   const [sheetChatId, setSheetChatId] = useState<string | null>(null);
   const [sheetMode, setSheetMode] = useState<SheetMode>(null);
@@ -36,6 +38,12 @@ const EchoHistoryPage: React.FC = () => {
     () => chats.find((c) => c.id === sheetChatId) ?? null,
     [chats, sheetChatId],
   );
+
+  useEffect(() => {
+    if (sheetMode === null) return;
+    lockBodyScroll();
+    return () => unlockBodyScroll();
+  }, [sheetMode]);
 
   const closeSheet = useCallback(() => {
     setSheetMode(null);
@@ -79,6 +87,7 @@ const EchoHistoryPage: React.FC = () => {
       .eq('id', sheetChat.id);
     if (error) {
       // Rollback on failure
+      toast.error("Couldn't update this chat");
       void qc.invalidateQueries({ queryKey: ['echo-v2', 'chats'] });
     }
   }, [sheetChat, patchList, closeSheet, qc]);
@@ -96,6 +105,7 @@ const EchoHistoryPage: React.FC = () => {
       .update({ title: next })
       .eq('id', sheetChat.id);
     if (error) {
+      toast.error("Couldn't rename this chat");
       void qc.invalidateQueries({ queryKey: ['echo-v2', 'chats'] });
     }
     closeSheet();
@@ -109,6 +119,7 @@ const EchoHistoryPage: React.FC = () => {
     closeSheet();
     const { error } = await supabase.from('echo_chats').delete().eq('id', id);
     if (error) {
+      toast.error("Couldn't delete this chat");
       void qc.invalidateQueries({ queryKey: ['echo-v2', 'chats'] });
     }
   }, [sheetChat, patchList, closeSheet, qc]);
@@ -173,7 +184,39 @@ const EchoHistoryPage: React.FC = () => {
           className="flex-1 overflow-y-auto"
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
-          {isLoading ? null : chats.length === 0 ? (
+          {isLoading ? null : isError ? (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '80px 24px',
+                gap: 12,
+                textAlign: 'center',
+              }}
+            >
+              <span style={{ fontSize: 15, fontWeight: 600, color: INK }}>
+                Couldn't load your chats
+              </span>
+              <button
+                type="button"
+                onClick={() => { void refetch(); }}
+                className="active:opacity-70"
+                style={{
+                  padding: '10px 18px',
+                  borderRadius: 12,
+                  background: '#15171F',
+                  color: '#F5F6F7',
+                  border: 'none',
+                  fontSize: 14,
+                  fontWeight: 600,
+                }}
+              >
+                Retry
+              </button>
+            </div>
+          ) : !isError && chats.length === 0 ? (
             <div
               style={{
                 display: 'flex',
