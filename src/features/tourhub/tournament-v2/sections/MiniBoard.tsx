@@ -119,7 +119,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5 }: Props) {
                 {flag ? (
                   <span style={{ fontSize: 11, flexShrink: 0, lineHeight: 1 }} aria-label={cc ?? undefined}>{flag}</span>
                 ) : cc ? (
-                  <span style={{ fontSize: 8, fontWeight: 700, color: INK_FAINT, letterSpacing: '0.04em' }}>{countryFallback(cc)}</span>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: INK_FAINT, letterSpacing: '0.04em' }}>{countryFallback(cc)}</span>
                 ) : null}
                 <span style={{ fontSize: 13, fontWeight: 700, color: INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {r.player?.full_name ?? '—'}
