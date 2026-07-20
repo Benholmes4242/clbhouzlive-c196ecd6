@@ -214,19 +214,20 @@ export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHe
 
 
 
-      {/* Dots / counter row — hoisted above the wire-ticker band (36px) so
-          they sit inside the photo band per the Lower-Third redesign. */}
+      {/* Dots / counter row — vertically centered in the 36px gap between the
+          champion tile (bottom of PhotoBand's lower-third) and the wire-ticker
+          top edge. One size smaller than the pre-launch treatment. */}
       {count > 1 && (
         <div
           style={{
             position: 'absolute',
             left: 0,
             right: 0,
-            bottom: 46,
+            bottom: 43,
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            gap: 6,
+            gap: 5,
             zIndex: 15,
             pointerEvents: 'none',
           }}
@@ -235,14 +236,14 @@ export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHe
             <div
               style={{
                 fontFamily: "'Geist', -apple-system, BlinkMacSystemFont, sans-serif",
-                fontSize: 10.5,
+                fontSize: 9.5,
                 fontWeight: 800,
                 letterSpacing: '0.08em',
                 color: '#fff',
                 background: 'rgba(10,14,20,0.55)',
                 backdropFilter: 'blur(6px)',
                 WebkitBackdropFilter: 'blur(6px)',
-                padding: '4px 9px',
+                padding: '3px 8px',
                 borderRadius: 999,
                 fontVariantNumeric: 'tabular-nums',
                 pointerEvents: 'auto',
@@ -256,8 +257,8 @@ export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHe
                 key={i}
                 aria-hidden
                 style={{
-                  width: i === activeIndex ? 16 : 5,
-                  height: 5,
+                  width: i === activeIndex ? 12 : 4,
+                  height: 4,
                   borderRadius: 999,
                   background: i === activeIndex ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.45)',
                   transition: 'width 200ms ease, background 200ms ease',
