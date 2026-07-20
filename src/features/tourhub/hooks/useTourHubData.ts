@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import type { BoardEntry } from '../leaderboard/BoardTable';
 
 // Major tour code override — Sportradar stores Grand Slams under EURO season
 const MAJOR_NAMES_TO_PGA: string[] = [
