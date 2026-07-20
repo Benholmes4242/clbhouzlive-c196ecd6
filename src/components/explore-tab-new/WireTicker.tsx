@@ -45,7 +45,9 @@ export function WireTicker() {
   const { target, openByScore, close } = useScorecardOpener();
 
   const items = useMemo(() => (data ?? []).slice(0, 20), [data]);
-  const durationSec = useMemo(() => Math.max(40, items.length * 5.5), [items.length]);
+  // Slowed to match the Tour Overview HeroWireTicker's perceived cadence
+  // (shorter item strings here → needs a longer duration to feel the same).
+  const durationSec = useMemo(() => Math.max(60, items.length * 8), [items.length]);
 
   if (items.length === 0) return null;
 
