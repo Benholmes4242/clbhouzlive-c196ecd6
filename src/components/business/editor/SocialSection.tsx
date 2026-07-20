@@ -12,7 +12,7 @@ interface Row {
   label: string;
   placeholder: string;
   kind: 'handle' | 'url';
-  Icon: React.ComponentType<{ size?: number; className?: string }>;
+  Icon: React.ComponentType<{ size?: number | string; strokeWidth?: number; className?: string }>;
 }
 
 // Match personal SocialLinksSection ordering + iconography, plus Facebook.
