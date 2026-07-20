@@ -237,13 +237,12 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, userId, current
       ))}
 
       {isLoading ? (
-        [420, 320, 360].map((h, i) => (
-          <div
+        (splitAt === 'rest' ? [420] : splitAt === 'hero-only' ? [420, 320] : [420, 320, 360]).map((h, i) => (
+          <Skeleton
             key={i}
-            className="animate-pulse"
+            variant="dark"
             style={{
               height: h,
-              background: 'var(--hcp-bg-2)',
               borderRadius: 16,
               marginBottom: 12,
             }}
