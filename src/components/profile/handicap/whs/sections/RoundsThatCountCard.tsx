@@ -125,7 +125,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
   const [sheetScoreId, setSheetScoreId] = useState<string | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
-  if (isLoading) return <Skeleton />;
+  if (isLoading) return <CardSkeleton />;
 
   // Error branch — keep the section frame + header, surface a muted line
   // and a small Retry. Other sections self-hide on error (intended degrade).
