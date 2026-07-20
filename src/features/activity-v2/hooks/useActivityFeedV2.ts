@@ -63,7 +63,7 @@ export function useActivityFeedV2(filter: ActivityFilterV2) {
         p_page_size: PAGE_SIZE,
         p_cursor: pageParam ?? null,
       };
-      const { data, error } = await (supabase as any).rpc('get_activity_feed', args);
+      const { data, error } = await rpcActivityFeed('get_activity_feed', args);
       if (error) throw error;
       return (data ?? []) as ActivityFeedRowV2[];
     },
