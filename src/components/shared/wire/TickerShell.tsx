@@ -77,6 +77,11 @@ export interface TickerShellProps {
   minDurationSeconds?: number;
   /** Optional inline style overrides for the shell. */
   style?: CSSProperties;
+  /**
+   * Force-disable the marquee animation. When false, items render statically
+   * (still horizontally swipeable). Defaults to true.
+   */
+  animated?: boolean;
 }
 
 export function TickerShell({
@@ -90,6 +95,7 @@ export function TickerShell({
   perItemSeconds = 5.5,
   minDurationSeconds = 40,
   style,
+  animated = true,
 }: TickerShellProps) {
   const [paused, setPaused] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -126,7 +132,7 @@ export function TickerShell({
     ...style,
   };
 
-  const trackContainer = reducedMotion ? (
+  const trackContainer = reducedMotion || !animated ? (
     <div
       className="flex items-center overflow-x-auto scrollbar-hide"
       style={{ gap, padding: '0 14px', flex: 1 }}

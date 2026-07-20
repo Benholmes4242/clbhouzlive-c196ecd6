@@ -28,6 +28,7 @@ import { MiddleBand } from './HybridHeroBands/MiddleBand';
 import { LeaderboardBand } from './HybridHeroBands/LeaderboardBand';
 import { HeroWireTicker } from './HybridHeroBands/HeroWireTicker';
 import { setHeroFullBleed } from '../../_shared/heroFullBleedSignal';
+import { formatPurse } from '../../_shared/formatPurse';
 import { formatMonthDay } from '@/i18n/format';
 import { useAIPredictions } from '../../hooks/useAIPredictions';
 import {
@@ -413,7 +414,19 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
           state={state}
           leaderboard={safeLeaderboard}
           upcomingContenders={upcomingContenders}
+          emptyStateFacts={{
+            datesString,
+            venueName: tournament.venueName,
+            defenderName: defendingChamp?.name ?? null,
+            defenderYear: defendingChamp?.year ?? null,
+            defenderScore: defendingChamp?.score ?? null,
+            defenderSurname: defendingChamp?.name
+              ? defendingChamp.name.trim().split(/\s+/).slice(-1)[0]
+              : null,
+            purse: tournament.purse ? formatPurse(tournament.purse) : null,
+          }}
         />
+
       </div>
     );
   }

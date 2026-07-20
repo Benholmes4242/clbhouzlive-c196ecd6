@@ -13,7 +13,7 @@
  * Absent state → returns null (no band).
  */
 
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { TickerShell } from '@/components/shared/wire/TickerShell';
@@ -33,6 +33,42 @@ interface HeroWireTickerProps {
     worldRanking?: number | null;
     country?: string | null;
   }>;
+  /**
+   * Upcoming-state fallback facts used when `upcomingContenders` is empty.
+   * Every field is optional; the empty-state list is built from whatever is
+   * present, in the exact order documented in the addendum.
+   */
+  emptyStateFacts?: {
+    datesString?: string | null;
+    venueName?: string | null;
+    defenderName?: string | null;
+    defenderYear?: string | number | null;
+    defenderScore?: string | null;
+    defenderSurname?: string | null;
+    purse?: string | null;
+  };
+}
+
+/** Amber-toned chip used for the "FIELD SOON" empty state. */
+function EmptyLeadingChip({ label }: { label: string }) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        padding: '0 12px',
+        background: 'rgba(247,147,30,0.16)',
+        color: '#F7931E',
+        fontFamily: FONT,
+        fontSize: 10,
+        fontWeight: 800,
+        letterSpacing: '0.14em',
+        flexShrink: 0,
+      }}
+    >
+      {label}
+    </div>
+  );
 }
 
 function LeadingChip({
@@ -101,7 +137,41 @@ function derivePosition(entry: any): { rank: string; posNum: number | null } {
   return { rank: tied ? `T${pos}` : String(pos), posNum: Number(pos) };
 }
 
-export function HeroWireTicker({ state, leaderboard, upcomingContenders }: HeroWireTickerProps) {
+const PULSE_STYLE_ID = 'lovable-hero-wire-empty-pulse';
+function ensurePulseStyles() {
+  if (typeof document === 'undefined') return;
+  if (document.getElementById(PULSE_STYLE_ID)) return;
+  const el = document.createElement('style');
+  el.id = PULSE_STYLE_ID;
+  el.textContent = `
+@keyframes lovable-hero-wire-empty-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.45; }
+}
+.lovable-hero-wire-empty-pulse-label {
+  animation: lovable-hero-wire-empty-pulse 2.2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lovable-hero-wire-empty-pulse-label { animation: none !important; }
+}
+`;
+  document.head.appendChild(el);
+}
+
+interface FactItem {
+  key: string;
+  label: string;
+  value: string;
+  labelColor?: string;
+  labelPulse?: boolean;
+}
+
+export function HeroWireTicker({
+  state,
+  leaderboard,
+  upcomingContenders,
+  emptyStateFacts,
+}: HeroWireTickerProps) {
   const { t } = useTranslation('tourhub');
 
   const rows = useMemo<Row[]>(() => {
@@ -247,6 +317,145 @@ export function HeroWireTicker({ state, leaderboard, upcomingContenders }: HeroW
       )),
     [rows],
   );
+
+  // ---------------------------------------------------------------------------
+  // Empty state: upcoming tournament with no field predictions.
+  // Build a fact list from whatever the tournament row exposes, in this exact
+  // order: TEES OFF → VENUE → DEFENDS → {YEAR} WINNER → PURSE → FIELD (always
+  // last, always present).
+  // ---------------------------------------------------------------------------
+  const emptyFacts = useMemo<FactItem[]>(() => {
+    if (state.kind !== 'upcoming') return [];
+    if (items.length > 0) return [];
+    const f = emptyStateFacts ?? {};
+    const list: FactItem[] = [];
+    if (f.datesString) {
+      list.push({
+        key: 'tees-off',
+        label: t('hero.teesOff', { defaultValue: 'TEES OFF' }),
+        value: f.datesString,
+      });
+    }
+    if (f.venueName) {
+      list.push({
+        key: 'venue',
+        label: t('hero.venueLabel', { defaultValue: 'VENUE' }),
+        value: f.venueName,
+      });
+    }
+    if (f.defenderName) {
+      list.push({
+        key: 'defends',
+        label: t('hero.defendsLabel', { defaultValue: 'DEFENDS' }),
+        value: f.defenderName,
+        labelColor: '#FDE68A',
+      });
+    }
+    if (f.defenderYear && (f.defenderScore || f.defenderSurname)) {
+      const parts = [f.defenderScore, f.defenderSurname].filter(Boolean).join(' — ');
+      if (parts) {
+        list.push({
+          key: 'prev-winner',
+          label: t('hero.prevWinner', {
+            year: f.defenderYear,
+            defaultValue: `${f.defenderYear} WINNER`,
+          }),
+          value: parts,
+        });
+      }
+    }
+    if (f.purse) {
+      list.push({
+        key: 'purse',
+        label: t('hero.purse', { defaultValue: 'PURSE' }),
+        value: f.purse,
+      });
+    }
+    list.push({
+      key: 'field',
+      label: t('hero.fieldSoon', { defaultValue: 'FIELD SOON' }),
+      value: t('hero.fieldAnnouncedSoon', { defaultValue: 'Announced soon' }),
+      labelPulse: true,
+    });
+    return list;
+  }, [state.kind, items.length, emptyStateFacts, t]);
+
+  useEffect(() => {
+    if (emptyFacts.some((f) => f.labelPulse)) ensurePulseStyles();
+  }, [emptyFacts]);
+
+  const emptyItems = useMemo(
+    () =>
+      emptyFacts.map((f, idx) => (
+        <span
+          key={f.key}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            height: 36,
+            marginRight: idx === emptyFacts.length - 1 ? 0 : 24,
+            flexShrink: 0,
+            fontFamily: FONT,
+          }}
+        >
+          <span
+            className={f.labelPulse ? 'lovable-hero-wire-empty-pulse-label' : undefined}
+            style={{
+              fontSize: 9,
+              fontWeight: 800,
+              letterSpacing: '0.08em',
+              color: f.labelColor ?? 'rgba(255,255,255,0.45)',
+              marginRight: 8,
+              textTransform: 'uppercase',
+            }}
+          >
+            {f.label}
+          </span>
+          <span
+            style={{
+              fontSize: 13,
+              fontWeight: 700,
+              color: 'rgba(255,255,255,0.9)',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {f.value}
+          </span>
+          {idx === emptyFacts.length - 1 ? null : (
+            <span
+              aria-hidden="true"
+              style={{
+                width: 3,
+                height: 3,
+                borderRadius: 2,
+                background: 'rgba(255,255,255,0.25)',
+                marginLeft: 16,
+                display: 'inline-block',
+                flexShrink: 0,
+              }}
+            />
+          )}
+        </span>
+      )),
+    [emptyFacts],
+  );
+
+  if (items.length === 0 && state.kind === 'upcoming' && emptyFacts.length > 0) {
+    return (
+      <TickerShell
+        items={emptyItems}
+        background={WIRE_BG}
+        height={WIRE_HEIGHT}
+        gap={0}
+        leadingChip={
+          <EmptyLeadingChip label={t('hero.fieldSoon', { defaultValue: 'FIELD SOON' })} />
+        }
+        dividerTop="rgba(255,255,255,0.08)"
+        ariaLabel={t('hero.theField', { defaultValue: 'The field' })}
+        animated={emptyFacts.length >= 2}
+      />
+    );
+  }
 
   if (items.length === 0) return null;
 

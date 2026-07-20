@@ -813,6 +813,13 @@
     "finalRoundComplete": "Final round complete",
     "roundInPlay": "Round {{n}} in play",
     "eventCancelled": "Event cancelled",
-    "tournamentCta": "Tournament"
+    "tournamentCta": "Tournament",
+    "fieldSoon": "FIELD SOON",
+    "teesOff": "TEES OFF",
+    "venueLabel": "VENUE",
+    "defendsLabel": "DEFENDS",
+    "prevWinner": "{{year}} WINNER",
+    "purse": "PURSE",
+    "fieldAnnouncedSoon": "Announced soon"
   }
 }
