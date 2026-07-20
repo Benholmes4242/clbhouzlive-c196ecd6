@@ -83,13 +83,17 @@ function useRivalProfileExists(userId: string | undefined, enabled: boolean) {
     enabled: enabled && !!userId,
     staleTime: 5 * 60_000,
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('user_profiles')
         .select('id, display_name')
         .eq('id', userId!)
         .maybeSingle();
+      if (error) throw error;
       if (!data) return null;
-      return { exists: true, displayName: (data as any).display_name as string | null };
+      return {
+        exists: true,
+        displayName: (data as { display_name: string | null }).display_name,
+      };
     },
   });
 }
