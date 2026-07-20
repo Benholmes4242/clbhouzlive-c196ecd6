@@ -10,12 +10,22 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 const INK_55 = '#64748B';
 
+type BlockedUserRow = {
+  blocked_id: string;
+  user_profiles: {
+    id: string;
+    username: string | null;
+    avatar_url: string | null;
+    full_name: string | null;
+  } | null;
+};
+
 export default function BlockedPage() {
   const { user } = useSupabaseSession();
   const userId = user?.id;
   const queryClient = useQueryClient();
 
-  const { data: blocked = [], isLoading } = useQuery({
+  const { data: blocked = [], isLoading, isError, refetch } = useQuery<BlockedUserRow[]>({
     queryKey: ['blocked-users', userId],
     queryFn: async () => {
       if (!userId) return [];
@@ -24,7 +34,7 @@ export default function BlockedPage() {
         .select('blocked_id, user_profiles!user_blocks_blocked_id_fkey(id, username, avatar_url, full_name)')
         .eq('blocker_id', userId);
       if (error) throw error;
-      return data ?? [];
+      return (data ?? []) as unknown as BlockedUserRow[];
     },
     enabled: !!userId,
   });
