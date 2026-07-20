@@ -1259,21 +1259,61 @@ class VideoEngineImpl {
     const fsOpen = !!fs.isOpen;
     const borrowLaneId: LaneId | null = (fs.borrow?.laneId ?? null) as LaneId | null;
 
+    // Resolution log — every reconcile emits exactly one branch + at most one
+    // whyNone. Distinct labels per null path (no shared fallthrough) so the
+    // silence root cause is legible in a linear scan of the buffer.
     let speaker: LaneId | null = null;
-    if (!sessionMuted) {
-      if (fsOpen) {
-        if (borrowLaneId && this.lanes.has(borrowLaneId)) {
+    let branch: 'session-muted' | 'borrow' | 'active-role' | 'fullscreen-solo' | 'none' = 'none';
+    let whyNone: string | null = null;
+
+    if (sessionMuted) {
+      branch = 'none';
+      whyNone = 'session-muted';
+    } else if (fsOpen) {
+      if (borrowLaneId) {
+        if (this.lanes.has(borrowLaneId)) {
           speaker = borrowLaneId;
+          branch = 'borrow';
         } else {
-          const fsLane = this.lanes.get('fullscreen');
-          if (fsLane && fsLane.wantPlay) speaker = 'fullscreen';
+          branch = 'none';
+          whyNone = 'overlay-borrow-lane-unmounted';
         }
       } else {
-        let activeLaneId: LaneId | null = null;
-        try { activeLaneId = feedLaneRoles.laneForRole('active'); } catch {}
-        if (activeLaneId) {
-          const l = this.lanes.get(activeLaneId);
-          if (l && l.wantPlay && l.audioPolicy !== 'always-muted') speaker = activeLaneId;
+        const fsLane = this.lanes.get('fullscreen');
+        if (!fsLane) {
+          branch = 'none';
+          whyNone = 'overlay-fullscreen-lane-missing';
+        } else if (!fsLane.wantPlay) {
+          branch = 'none';
+          whyNone = 'overlay-fullscreen-not-want-play';
+        } else {
+          speaker = 'fullscreen';
+          branch = 'fullscreen-solo';
+        }
+      }
+    } else {
+      let activeLaneId: LaneId | null = null;
+      try { activeLaneId = feedLaneRoles.laneForRole('active'); } catch { /* noop */ }
+      if (!activeLaneId) {
+        branch = 'none';
+        whyNone = 'no-active-role-assigned';
+      } else {
+        const l = this.lanes.get(activeLaneId);
+        if (!l) {
+          branch = 'none';
+          whyNone = 'role-lane-unmounted';
+        } else if (!l.el) {
+          branch = 'none';
+          whyNone = 'role-lane-no-el';
+        } else if (l.audioPolicy === 'always-muted') {
+          branch = 'none';
+          whyNone = 'role-lane-always-muted';
+        } else if (!l.wantPlay) {
+          branch = 'none';
+          whyNone = 'role-lane-not-want-play';
+        } else {
+          speaker = activeLaneId;
+          branch = 'active-role';
         }
       }
     }
@@ -1290,6 +1330,24 @@ class VideoEngineImpl {
         changes.push({ laneId: lane.id, from: lane.el.muted, to: finalMuted, policy: lane.audioPolicy });
       }
     });
+
+    // Forensic decision X-ray — emitted on EVERY reconcile invocation (not
+    // just drift), gated on the audioDebug flag inside logAudio. Payload
+    // matches the heartbeat.state shape so both series can be diffed in the
+    // buffer without re-shaping.
+    if (audioDebugEnabled()) {
+      try {
+        logAudio('reconcile.decision', {
+          reason,
+          overlayOpen: fsOpen,
+          borrowedLaneId: borrowLaneId,
+          roleMap: this.buildRoleMapDump(),
+          resolution: { speaker, branch, whyNone },
+          writes: changes.map((c) => ({ laneId: c.laneId, muted: c.to })),
+          msSinceOpen: msSinceOpen(),
+        });
+      } catch { /* noop */ }
+    }
 
     if (changes.length === 0) {
       logAudio('reconcile.noop', { reason, speaker, sessionMuted, fsOpen, borrowLaneId, msSinceOpen: msSinceOpen() });
@@ -1332,15 +1390,135 @@ class VideoEngineImpl {
     });
   }
 
+  /**
+   * Forensic helper — full role→lane→postId dump for reconcile/heartbeat
+   * records. Includes lanes even when they hold no active role so the
+   * MISMATCH detector can attribute a visible-playing lane to its role.
+   */
+  private buildRoleMapDump(): Array<{ role: string; laneId: LaneId | null; postId: string | null }> {
+    const out: Array<{ role: string; laneId: LaneId | null; postId: string | null }> = [];
+    for (const role of ['active', 'next', 'prev'] as const) {
+      let laneId: LaneId | null = null;
+      try { laneId = feedLaneRoles.laneForRole(role); } catch { /* noop */ }
+      const lane = laneId ? this.lanes.get(laneId) : null;
+      out.push({ role, laneId, postId: lane?.postId ?? null });
+    }
+    // Also surface fullscreen + rail-adjacent lanes present in the pool
+    // (rail lanes are 'n-*'). Keeps the dump complete without dedup gymnastics.
+    this.lanes.forEach((lane) => {
+      if (lane.id === 'fullscreen' || String(lane.id).startsWith('n-')) {
+        out.push({ role: `pool:${lane.id}`, laneId: lane.id, postId: lane.postId ?? null });
+      }
+    });
+    return out;
+  }
+
+  /** Beat-time visibility snapshot for every lane element — used to flag
+   *  MISMATCH beats (lane ≥50% visible AND playing AND session unmuted AND
+   *  not the current speaker). Uses getBoundingClientRect (no observer setup
+   *  needed; runs at 250ms cadence only when audioDebug is on). */
+  private computeVisiblePlayingLanes(): Array<{
+    laneId: LaneId; postId: string | null; visibilityRatio: number; playing: boolean; muted: boolean;
+  }> {
+    const out: Array<{ laneId: LaneId; postId: string | null; visibilityRatio: number; playing: boolean; muted: boolean }> = [];
+    if (typeof window === 'undefined') return out;
+    const vw = window.innerWidth || 0;
+    const vh = window.innerHeight || 0;
+    if (!vw || !vh) return out;
+    this.lanes.forEach((lane) => {
+      const el = lane.el;
+      let ratio = 0;
+      try {
+        const r = el.getBoundingClientRect();
+        const iw = Math.max(0, Math.min(r.right, vw) - Math.max(r.left, 0));
+        const ih = Math.max(0, Math.min(r.bottom, vh) - Math.max(r.top, 0));
+        const area = r.width * r.height;
+        ratio = area > 0 ? (iw * ih) / area : 0;
+      } catch { /* noop */ }
+      const playing = !el.paused && !el.ended && el.readyState >= 2;
+      if (ratio > 0 && playing) {
+        out.push({
+          laneId: lane.id,
+          postId: lane.postId ?? null,
+          visibilityRatio: +ratio.toFixed(3),
+          playing,
+          muted: !!el.muted,
+        });
+      }
+    });
+    return out;
+  }
+
   /** v9: 250ms heartbeat. Only actively verifies when the session is unmuted
    *  (muted sessions can't drift — no one is audible). */
   private driftCheck(): void {
     try {
       if (typeof document !== 'undefined' && document.hidden) return;
-      if (useSessionAudio.getState().isMuted) return;
+      const sessionMuted = useSessionAudio.getState().isMuted;
+
+      // Instrumentation-only heartbeat record. Emitted on EVERY beat
+      // (regardless of session mute) so the buffer carries a continuous
+      // ground-truth trace correlating decision → surface → visibility.
+      if (audioDebugEnabled()) {
+        try {
+          const fs = useFullscreenFeedStore.getState();
+          const fsOpen = !!fs.isOpen;
+          const borrowLaneId: LaneId | null = (fs.borrow?.laneId ?? null) as LaneId | null;
+          // Recompute the resolution INDEPENDENTLY of reconcileAudio so the
+          // heartbeat log is decoupled from reconcile's exit path (noop
+          // reconciles no longer hide the decision).
+          let speaker: LaneId | null = null;
+          let branch: 'session-muted' | 'borrow' | 'active-role' | 'fullscreen-solo' | 'none' = 'none';
+          let whyNone: string | null = null;
+          if (sessionMuted) { branch = 'none'; whyNone = 'session-muted'; }
+          else if (fsOpen) {
+            if (borrowLaneId) {
+              if (this.lanes.has(borrowLaneId)) { speaker = borrowLaneId; branch = 'borrow'; }
+              else { branch = 'none'; whyNone = 'overlay-borrow-lane-unmounted'; }
+            } else {
+              const fsLane = this.lanes.get('fullscreen');
+              if (!fsLane) { branch = 'none'; whyNone = 'overlay-fullscreen-lane-missing'; }
+              else if (!fsLane.wantPlay) { branch = 'none'; whyNone = 'overlay-fullscreen-not-want-play'; }
+              else { speaker = 'fullscreen'; branch = 'fullscreen-solo'; }
+            }
+          } else {
+            let activeLaneId: LaneId | null = null;
+            try { activeLaneId = feedLaneRoles.laneForRole('active'); } catch { /* noop */ }
+            if (!activeLaneId) { branch = 'none'; whyNone = 'no-active-role-assigned'; }
+            else {
+              const l = this.lanes.get(activeLaneId);
+              if (!l) { branch = 'none'; whyNone = 'role-lane-unmounted'; }
+              else if (!l.el) { branch = 'none'; whyNone = 'role-lane-no-el'; }
+              else if (l.audioPolicy === 'always-muted') { branch = 'none'; whyNone = 'role-lane-always-muted'; }
+              else if (!l.wantPlay) { branch = 'none'; whyNone = 'role-lane-not-want-play'; }
+              else { speaker = activeLaneId; branch = 'active-role'; }
+            }
+          }
+          const visiblePlayingLanes = this.computeVisiblePlayingLanes();
+          // MISMATCH: a lane ≥50% visible, playing, session unmuted, and
+          // NOT the speaker. Self-labelled — the bug fingerprint the brief
+          // asked for.
+          const mismatch = !sessionMuted && visiblePlayingLanes.some(
+            (v) => v.visibilityRatio >= 0.5 && v.laneId !== speaker && !v.muted,
+          );
+          logAudio(mismatch ? 'heartbeat.MISMATCH' : 'heartbeat.state', {
+            overlayOpen: fsOpen,
+            borrowedLaneId: borrowLaneId,
+            roleMap: this.buildRoleMapDump(),
+            resolution: { speaker, branch, whyNone },
+            sessionMuted,
+            visiblePlayingLanes,
+            mismatch,
+            msSinceOpen: msSinceOpen(),
+          });
+        } catch { /* noop */ }
+      }
+
+      if (sessionMuted) return;
       this.reconcileAudio('drift');
     } catch {}
   }
+
 
   setMuted(laneId: LaneId, muted: boolean, trigger: string = 'setMuted'): void {
 
