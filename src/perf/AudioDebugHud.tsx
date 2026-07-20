@@ -113,7 +113,7 @@ export const AudioDebugHud = memo(function AudioDebugHud() {
     };
   }, [enabled]);
 
-  // 250ms live summary tick.
+  // 250ms live summary tick — panel-only (drives on-screen numbers).
   useEffect(() => {
     if (!enabled || !expanded) return;
     const iv = window.setInterval(() => {
@@ -138,6 +138,65 @@ export const AudioDebugHud = memo(function AudioDebugHud() {
     }, 250);
     return () => window.clearInterval(iv);
   }, [enabled, expanded]);
+
+  // 1s SLOT heartbeat — runs whenever the flag is on, independent of the
+  // panel being open. Emits one `audio.heartbeat` line per second saying
+  // who the visible speaker is, whether they're actually audible, and
+  // whether anyone else is squatting on the slot. A silent-video second
+  // reads as sessionMuted=0 + activeElMuted=1 + unmutedLanes=[…].
+  useEffect(() => {
+    if (!enabled) return;
+    const iv = window.setInterval(() => {
+      const engine = VideoEngine as unknown as {
+        _debugGetLanesSnapshot?: () => Array<{
+          laneId: string; postId: string | null; muted: boolean;
+          paused: boolean; currentTime: number; borrowed: boolean;
+        }>;
+      };
+      const snap = engine._debugGetLanesSnapshot?.() ?? [];
+      const fsSt = useFullscreenFeedStore.getState();
+      const sessionMuted = useSessionAudio.getState().isMuted;
+
+      // "Active" speaker = fullscreen borrow lane if open, else the feed
+      // lane currently holding the 'active' role.
+      let activeLaneId: string | null = null;
+      if (fsSt.isOpen) {
+        activeLaneId = fsSt.borrow ? fsSt.borrow.laneId : 'fullscreen';
+      } else {
+        try {
+          activeLaneId = feedLaneRoles.laneForRole('active') as string | null;
+        } catch { activeLaneId = null; }
+      }
+      const activeLane = activeLaneId
+        ? snap.find((l) => l.laneId === activeLaneId) ?? null
+        : null;
+      const unmutedLanes = snap.filter((l) => !l.muted).map((l) => l.laneId);
+      const borrowedLanes = snap.filter((l) => l.borrowed).map((l) => l.laneId);
+
+      logAudio('audio.heartbeat', {
+        activeLaneId,
+        activePostId: activeLane?.postId ?? null,
+        activeElMuted: activeLane ? activeLane.muted : null,
+        activeElPaused: activeLane ? activeLane.paused : null,
+        activeCurrentTime: activeLane ? activeLane.currentTime : null,
+        sessionMuted,
+        unmutedLanes,
+        borrowedLanes,
+      });
+
+      setSummary({
+        sessionMuted,
+        msSinceGesture: gestureAge(),
+        activeLaneId,
+        activePostId: activeLane?.postId ?? null,
+        activeElMuted: activeLane ? activeLane.muted : null,
+        unmutedLanes,
+        borrowedLanes,
+      });
+    }, 1000);
+    return () => window.clearInterval(iv);
+  }, [enabled]);
+
 
   const onCopy = useCallback(async () => {
     const txt = buildAudioLogText();
