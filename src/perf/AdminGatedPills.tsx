@@ -10,6 +10,7 @@ import { BootTimelineToggleButton } from '@/perf/BootTimelineToggleButton';
 import { PerfHud } from '@/perf/PerfHud';
 import { LogHud } from '@/perf/LogHud';
 import { AudioLogsButton } from '@/perf/AudioLogsButton';
+import { AudioDebugHud } from '@/perf/AudioDebugHud';
 
 
 
