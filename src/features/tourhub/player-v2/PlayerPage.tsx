@@ -2,7 +2,8 @@
  * PlayerPage (v2) — "The Feature".
  *
  * Cinematic dark hero + one continuous light scroll of Overview-grammar
- * sections. No ShellSlot identity chrome, no tabs, no framer-motion.
+ * sections. No ShellSlot identity chrome, no tabs, no framer-motion
+ * except the LiveNowStrip insertion.
  *
  * Route repoints at P2. Currently reachable directly via the section
  * hooks so it can be verified in isolation.
@@ -12,6 +13,7 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AlertCircle } from 'lucide-react';
 import { useParams } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { TourHubShell } from '../components/TourHubShell';
 import { useTourPlayer, useSinglePlayerStatistics } from '../hooks/useTourHubData';
 import { usePlayerResults } from '../hooks/usePlayerResults';
@@ -22,7 +24,7 @@ import { SeasonCards } from './sections/SeasonCards';
 import { FormSection } from './sections/FormSection';
 import { TournamentsSection } from './sections/TournamentsSection';
 import { AboutSection } from './sections/AboutSection';
-import { PlayerSkeleton } from './sections/PlayerSkeleton';
+import { PlayerPageSkeleton } from '@/components/skeletons/PlayerPageSkeleton';
 import { SLATE_50 } from '../_shared/tokens';
 import { scrollPageToTop } from '@/lib/getScrollParent';
 
@@ -31,8 +33,8 @@ export function PlayerPage() {
   const { playerId } = useParams<{ playerId: string }>();
 
   const { data: player, isLoading: playerLoading, isError: playerError, refetch } = useTourPlayer(playerId || '');
-  const { data: playerStats, isError: statsError, refetch: refetchStats } = useSinglePlayerStatistics(playerId);
-  const { data: results, isError: resultsError, refetch: refetchResults } = usePlayerResults(playerId, 30);
+  const { data: playerStats, isLoading: statsLoading, isError: statsError, refetch: refetchStats } = useSinglePlayerStatistics(playerId);
+  const { data: results, isLoading: resultsLoading, isError: resultsError, refetch: refetchResults } = usePlayerResults(playerId, 30);
   const playerState = usePlayerState(playerId);
 
   // Scroll-to-top on player switch (ported from PlayerProfilePage).
@@ -40,10 +42,10 @@ export function PlayerPage() {
     scrollPageToTop('auto');
   }, [playerId]);
 
-  if (playerLoading) {
+  if (playerLoading || statsLoading || resultsLoading) {
     return (
       <TourHubShell>
-        <PlayerSkeleton />
+        <PlayerPageSkeleton />
       </TourHubShell>
     );
   }
