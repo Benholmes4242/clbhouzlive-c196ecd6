@@ -39,6 +39,7 @@ import { COLLEGE_RIVALRY_FALLBACK } from '../../utils/editorialFallbacks';
 import { SectionShell } from './SectionShell';
 import { V4 } from '../tokens';
 import { getCollegeColor } from '../data/collegeColors';
+import { Skeleton } from '@/components/ui/skeleton';
 
 function displayName(stats: CollegeSeasonStats, media: CollegeMedia | undefined): string {
   return media?.short_name || media?.college_name || stats.normalized_name;
@@ -102,7 +103,7 @@ function SchoolSquircle({ size, logo, name }: { size: number; logo: string | nul
 export function CollegeFranchise() {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
-  const { data: collegeStats } = useCollegeSeasonStats();
+  const { data: collegeStats, isLoading } = useCollegeSeasonStats();
   const { data: mediaMap } = useCollegeMediaMap();
   const editorial = useDailyEditorial({
     surface: 'college_rivalry',
@@ -129,6 +130,58 @@ export function CollegeFranchise() {
   );
   const { data: captainMap } = useFranchiseCaptains(captainNames);
 
+  if (isLoading && (!leader || !chaser)) {
+    return (
+      <SectionShell
+        eyebrow={t('overview.collegeFranchise.eyebrow')}
+        linkLabel={t('overview.collegeFranchise.linkLabel')}
+        onLinkClick={() => navigate('/tourhub?tab=college')}
+      >
+        <div style={{ padding: '0 16px', marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <Skeleton className="h-4 w-4/5 rounded" />
+          <Skeleton className="h-4 w-2/3 rounded" />
+        </div>
+        <div style={{ padding: '0 16px 12px', display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', gap: 12 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+            <Skeleton className="h-11 w-11" style={{ borderRadius: 15 }} />
+            <Skeleton className="h-3.5 w-20 rounded" />
+          </div>
+          <span style={{ fontSize: 10, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.16em' }}>{t('overview.collegeFranchise.vs')}</span>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+            <Skeleton className="h-11 w-11" style={{ borderRadius: 15 }} />
+            <Skeleton className="h-3.5 w-20 rounded" />
+          </div>
+        </div>
+        <div style={{ padding: '0 16px 4px' }}>
+          <Skeleton className="h-[7px] w-full rounded" />
+        </div>
+        <div style={{ height: 1, background: V4.hairline, margin: '16px 16px 6px' }} />
+        <div style={{ padding: '0 4px' }}>
+          {[0, 1, 2, 3, 4].map((i) => (
+            <div
+              key={i}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '28px 26px 1fr auto',
+                alignItems: 'center',
+                gap: 12,
+                padding: '11px 12px',
+                borderBottom: i < 4 ? `0.5px solid ${V4.hairline}` : 'none',
+              }}
+            >
+              <Skeleton className="h-3.5 w-3 rounded" />
+              <Skeleton className="h-[26px] w-[26px]" style={{ borderRadius: 9 }} />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                <Skeleton className="h-3.5 w-2/5 rounded" />
+                <Skeleton className="h-3 w-1/3 rounded" />
+              </div>
+              <Skeleton className="h-3.5 w-14 rounded" />
+            </div>
+          ))}
+        </div>
+      </SectionShell>
+    );
+  }
   if (!leader || !chaser) return null;
 
   const leaderMedia = mediaMap?.get(leader.normalized_name);
