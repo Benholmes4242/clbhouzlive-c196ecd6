@@ -159,11 +159,10 @@ const SkeletonBubble: React.FC<{ side: 'left' | 'right'; w: number }> = ({ side,
     className="w-full flex"
     style={{ justifyContent: side === 'right' ? 'flex-end' : 'flex-start', marginTop: 10 }}
   >
-    <div
+    <Skeleton
       style={{
         width: `${w}%`,
         height: 34,
-        background: side === 'right' ? '#DDE1E6' : '#EDEFF2',
         borderRadius: 18,
       }}
     />
