@@ -106,7 +106,7 @@ export function PlayersTab() {
   }, [searchExpanded]);
 
   // ── Data
-  const { data: ranking, isLoading: rankingLoading } = usePlayersRanking(activeTour);
+  const { data: ranking, isLoading: rankingLoading, isError: rankingError, refetch: refetchRanking } = usePlayersRanking(activeTour);
   const { data: liveMap } = useLivePlayerIds();
   const { data: liveTournaments } = useLiveTournaments();
 
