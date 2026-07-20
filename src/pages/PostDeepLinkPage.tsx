@@ -50,6 +50,8 @@ const PostDeepLinkPage: React.FC = () => {
   const [feedPost, setFeedPost] = useState<ReturnType<typeof mapActivityPostToFeedPost> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [loadError, setLoadError] = useState(false);
+  const [retryTick, setRetryTick] = useState(0);
   const hasOpenedFullscreen = useRef(false);
 
   useEffect(() => {
