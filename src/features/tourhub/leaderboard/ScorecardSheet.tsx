@@ -75,7 +75,7 @@ function isDemotedStatus(s?: string | null): boolean {
 export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
-  const { data: scRows = [] } = useScorecard(tournamentId, target?.playerId ?? null);
+  const { data: scRows = [], isLoading: scLoading } = useScorecard(tournamentId, target?.playerId ?? null);
   const meta = useTournamentMeta(tournamentId);
 
   const availableRounds = useMemo(() => {
@@ -114,9 +114,11 @@ export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
         courseName=""
         holes={[]}
         playerName=""
+        loading={scLoading}
       />
     );
   }
+
 
   const demoted = isDemotedStatus(target.status);
   const roundLabel = selectedRound != null
@@ -148,6 +150,8 @@ export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
       coursePar={coursePar}
       courseSlope={null}
       holes={roundHoles}
+      loading={scLoading}
+
       heroMuted={demoted}
       rounds={availableRounds.length > 1 && selectedRound != null ? {
         available: availableRounds,

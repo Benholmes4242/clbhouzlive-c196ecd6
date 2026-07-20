@@ -24,6 +24,8 @@ import { BoardTable, todayFromEntry, type BoardEntry, type CutState } from './Bo
 import { ScorecardSheet, type ScorecardSheetTarget } from './ScorecardSheet';
 import { EditorialEmpty } from '../components/EditorialEmpty';
 import { tourPriorityIndex } from '../_shared/tourOrder';
+import { Skeleton } from '@/components/ui/skeleton';
+
 
 const F = 'Geist, system-ui, sans-serif';
 const INK = '#0F172A';
@@ -160,8 +162,9 @@ export function LeaderboardTab() {
   }, [searchOpen]);
 
   if (liveLoading && liveTournaments.length === 0) {
-    return <LeaderboardSkeleton />;
+    return <LeaderboardSkeleton variant="page" />;
   }
+
   if (!selected) {
     if (liveError) {
       return (
@@ -533,23 +536,47 @@ export function LeaderboardTab() {
   );
 }
 
-function LeaderboardSkeleton() {
-  return (
-    <div style={{ padding: '12px 16px' }}>
+function LeaderboardSkeleton({ variant = 'board' }: { variant?: 'page' | 'board' }) {
+  const rows = (
+    <div style={{ padding: '4px 16px 12px' }}>
       {[...Array(8)].map((_, i) => (
-        <div
+        <Skeleton
           key={i}
-          className="animate-pulse"
           style={{
             height: 42,
-            background: '#F1F5F9',
-            borderBottom: `1px solid ${HAIRLINE}`,
+            width: '100%',
+            borderRadius: 0,
             marginBottom: 1,
           }}
         />
       ))}
     </div>
   );
+
+  if (variant === 'board') return rows;
+
+  // 'page': initial load before any event is selected — mirror the real
+  // chassis (sat+69 clearance, header block, column strip) above the rows.
+  return (
+    <div style={{ paddingTop: 'calc(var(--sat, 0px) + 69px)', background: SURFACE, minHeight: '100dvh' }}>
+      <div style={{ padding: '12px 16px 8px' }}>
+        <Skeleton style={{ height: 10, width: 80, marginBottom: 10 }} />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+          <Skeleton style={{ height: 20, width: '55%' }} />
+          <Skeleton style={{ height: 20, width: 68, borderRadius: 999 }} />
+        </div>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px', borderTop: `1px solid ${HAIRLINE}`, borderBottom: `1px solid ${HAIRLINE}` }}>
+        <Skeleton style={{ height: 10, width: 30 }} />
+        <Skeleton style={{ height: 10, flex: 1 }} />
+        <Skeleton style={{ height: 10, width: 34 }} />
+        <Skeleton style={{ height: 10, width: 34 }} />
+        <Skeleton style={{ height: 10, width: 34 }} />
+      </div>
+      {rows}
+    </div>
+  );
 }
 
 export default LeaderboardTab;
+
