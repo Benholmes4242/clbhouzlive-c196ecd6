@@ -437,7 +437,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
             onIndexChange={(idx) => onCarouselIndexChange?.(post, idx)}
             onOpen={(idx, mediaId, originEl, ownerKey) => {
               const slide = items[idx];
-              const posterUrl = slide?.thumbnailUrl ?? (slide as any)?.imageUrl ?? null;
+              const posterUrl = slide?.thumbnailUrl ?? slide?.imageUrl ?? null;
               onOpenMedia(
                 post,
                 idx,
