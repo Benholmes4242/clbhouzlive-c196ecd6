@@ -187,7 +187,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
               c.clubhouse_score == null ||
               c.facilities_score == null),
         )
-        .map((c) => toRatedCourseData(c as any)),
+        .map((c) => toRatedCourseData(c)),
     [courses],
   );
 
