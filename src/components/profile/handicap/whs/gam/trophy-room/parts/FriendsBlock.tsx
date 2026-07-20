@@ -6,6 +6,7 @@ import { useFriendsWhoEarnedBadge } from '@/hooks/gam/useFriendsWhoEarnedBadge';
 import { useFriendsWhoHeldLegend } from '@/hooks/gam/useFriendsWhoHeldLegend';
 import { MATERIAL_PALETTES } from '../_shared/rarityPalette';
 import type { LegendCategory } from '@/lib/gam/types';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface Props {
   badgeId?: string;
