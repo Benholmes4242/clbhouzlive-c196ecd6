@@ -182,7 +182,7 @@ export function OverviewHero({ height = OVERVIEW_HERO_HEIGHT }: OverviewHeroProp
 
   return (
     <div
-      style={{ position: 'relative', width: '100%' }}
+      style={{ position: 'relative', width: '100%', height }}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
@@ -194,6 +194,7 @@ export function OverviewHero({ height = OVERVIEW_HERO_HEIGHT }: OverviewHeroProp
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
+          style={{ height: '100%' }}
         >
           <HybridHero
             slide={active}
