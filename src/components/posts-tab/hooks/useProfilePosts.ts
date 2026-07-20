@@ -45,7 +45,7 @@ export function useProfilePosts({ userId, actorType, actorId }: UseProfilePostsP
           ? (pageParam as { createdAt: string; id: string })
           : undefined;
 
-      const params: Record<string, any> = {
+      const params: Record<string, unknown> = {
         p_user_id: userId ?? null,
         p_actor_type: actorType,
         p_actor_id: actorId,
