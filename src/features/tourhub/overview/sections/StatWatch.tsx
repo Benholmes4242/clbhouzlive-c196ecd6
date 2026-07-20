@@ -12,12 +12,57 @@ import { PlayerAvatar } from '../../components/PlayerAvatar';
 import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { TOUR_LABEL } from '../../_shared/tourOrder';
 import type { TourId } from '../../hooks/useOverviewData';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export function StatWatch({ tour }: { tour: TourId }) {
   const navigate = useNavigate();
   const { t } = useTranslation('tourhub');
-  const { data } = useStatWatch(tour);
+  const { data, isLoading } = useStatWatch(tour);
   const categories = data?.categories ?? [];
+  if (isLoading && categories.length === 0) {
+    return (
+      <SectionShell
+        eyebrow={t('overview.statWatch.eyebrow')}
+        linkLabel={t('overview.statWatch.allStatsLink')}
+        onLinkClick={() => navigate('/tourhub?tab=leaderboards')}
+      >
+        <div style={{ padding: '0 16px 6px' }}>
+          <Skeleton className="h-3 w-40 rounded" />
+        </div>
+        <div style={{ display: 'flex', gap: 10, overflowX: 'hidden', padding: '10px 16px 10px' }}>
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              style={{
+                flex: '0 0 218px',
+                background: V4.surface,
+                border: `0.5px solid ${V4.cardBorder}`,
+                boxShadow: V4.cardShadow,
+                borderRadius: 16,
+                padding: 12,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 10,
+              }}
+            >
+              <Skeleton className="h-3 w-24 rounded" />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <Skeleton className="h-8 w-8" style={{ borderRadius: 12 }} />
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <Skeleton className="h-3.5 w-3/5 rounded" />
+                  <Skeleton className="h-3 w-2/5 rounded" />
+                </div>
+                <Skeleton className="h-5 w-10 rounded" />
+              </div>
+              <div style={{ height: '0.5px', background: V4.hairline }} />
+              <Skeleton className="h-3 w-3/4 rounded" />
+              <Skeleton className="h-3 w-2/3 rounded" />
+            </div>
+          ))}
+        </div>
+      </SectionShell>
+    );
+  }
   if (categories.length === 0) return null;
 
   return (
