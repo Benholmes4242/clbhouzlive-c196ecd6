@@ -335,7 +335,7 @@ export function PlayersTab() {
       </div>
 
       {/* PODIUM — synced only, hidden while searching */}
-      {synced && !isSearching && !rankingLoading && podiumRows.length >= 3 && (
+      {synced && !isSearching && !rankingLoading && !rankingError && podiumRows.length >= 3 && (
         <PodiumCards rows={podiumRows} statLabel={statLabel} />
       )}
 
