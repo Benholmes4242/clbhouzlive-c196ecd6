@@ -13,7 +13,7 @@
  * Absent state → returns null (no band).
  */
 
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { TickerShell } from '@/components/shared/wire/TickerShell';
