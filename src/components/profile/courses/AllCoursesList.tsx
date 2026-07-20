@@ -329,6 +329,22 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
     );
   }
 
+  if (isError) {
+    return (
+      <div ref={sectionRef} className="px-4">
+        <div className="flex flex-col items-center justify-center py-12 gap-3 text-center">
+          <p className="text-sm text-muted-foreground">Couldn't load courses</p>
+          <button
+            onClick={() => refetch()}
+            className="h-10 px-5 rounded-full text-sm font-semibold bg-foreground text-background active:scale-[0.97] transition-all"
+          >
+            Try again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div ref={sectionRef} className="pt-1 pb-4">
 
