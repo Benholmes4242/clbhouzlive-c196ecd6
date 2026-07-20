@@ -462,6 +462,7 @@ function CourseDetail({
     if (!course) return null;
     return {
       name: course.name ?? '',
+      continent: course.continent ?? '',
       country: course.country ?? '',
       sub_country: course.sub_country ?? '',
       region: course.region ?? '',
