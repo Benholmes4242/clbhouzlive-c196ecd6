@@ -7,6 +7,7 @@
  */
 import React from 'react';
 import { Trophy, ChevronRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { openGamAchievements } from '../gam/events';
 import { useUserAchievements } from '@/hooks/gam/useUserAchievements';
 import type { BadgeRarity } from '@/lib/gam/types';
