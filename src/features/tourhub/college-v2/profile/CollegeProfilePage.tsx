@@ -172,7 +172,7 @@ export function CollegeProfilePage() {
         )}
 
         {/* Sections */}
-        {!notFound && slug && (
+        {!isError && !notFound && slug && (
           <>
             <ThisWeek slug={slug} collegeName={displayName} />
             <TheClass slug={slug} collegeName={displayName} />
