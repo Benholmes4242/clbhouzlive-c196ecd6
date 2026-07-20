@@ -28,6 +28,7 @@ import { MiddleBand } from './HybridHeroBands/MiddleBand';
 import { LeaderboardBand } from './HybridHeroBands/LeaderboardBand';
 import { HeroWireTicker } from './HybridHeroBands/HeroWireTicker';
 import { setHeroFullBleed } from '../../_shared/heroFullBleedSignal';
+import { formatPurse } from '../../_shared/formatPurse';
 import { formatMonthDay } from '@/i18n/format';
 import { useAIPredictions } from '../../hooks/useAIPredictions';
 import {
