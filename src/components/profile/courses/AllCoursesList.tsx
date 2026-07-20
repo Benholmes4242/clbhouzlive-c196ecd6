@@ -7,6 +7,7 @@ import { TieredCourseCard, CourseCardData } from './TieredCourseCard';
 import { StickyFilterBar, CoursePrimaryTab, CourseSortOption } from './StickyFilterBar';
 import { type QuickRegion } from '@/components/leaderboard/courses/CourseRegionPills';
 import { ClipboardList } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 import { compareOwnRatings } from '@/lib/sortCoursesByRating';
 import DossierCard from './DossierCard';
@@ -318,11 +319,11 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   if (isLoading) {
     return (
       <div ref={sectionRef} className="py-4">
-        <div className="h-5 w-32 bg-muted rounded mb-1 animate-pulse" />
-        <div className="h-3 w-48 bg-muted rounded mb-4 animate-pulse" />
+        <Skeleton className="h-5 w-32 rounded mb-1" />
+        <Skeleton className="h-3 w-48 rounded mb-4" />
         <div className="space-y-2">
           {[1, 2, 3].map(i => (
-            <div key={i} className="h-20 bg-muted rounded-xl animate-pulse" />
+            <Skeleton key={i} className="h-20 rounded-xl" />
           ))}
         </div>
       </div>
