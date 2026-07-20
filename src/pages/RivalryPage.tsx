@@ -657,11 +657,10 @@ const PrivacyBlockedView: React.FC = () => (
 
 const RivalrySkeleton: React.FC = () => (
   <div style={{ padding: 16 }}>
-    <div
-      className="animate-pulse"
+    <Skeleton
+      variant="dark"
       style={{
         height: 260,
-        background: BG_1,
         border: `1px solid ${LINE_2}`,
         borderRadius: 16,
         marginBottom: 16,
@@ -676,20 +675,19 @@ const RivalrySkeleton: React.FC = () => (
       }}
     >
       {[0, 1, 2, 3].map((i) => (
-        <div
+        <Skeleton
           key={i}
-          className="animate-pulse"
-          style={{ height: 80, background: BG_1, borderRadius: 12 }}
+          variant="dark"
+          style={{ height: 80, borderRadius: 12 }}
         />
       ))}
     </div>
     {[0, 1, 2, 3, 4].map((i) => (
-      <div
+      <Skeleton
         key={i}
-        className="animate-pulse"
+        variant="dark"
         style={{
           height: 82,
-          background: BG_1,
           borderRadius: 12,
           marginBottom: 8,
         }}
