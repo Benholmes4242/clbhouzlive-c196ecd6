@@ -11,6 +11,7 @@ import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { ChevronLeft, Loader2, AlertCircle } from 'lucide-react';
+import { ManagePageSkeleton } from '@/components/skeletons/ManagePageSkeleton';
 import { toast } from '@/lib/toast';
 
 import { supabase } from '@/integrations/supabase/client';
@@ -678,11 +679,7 @@ export default function BusinessProfileEditor() {
 
   /* ── loading / error states (edit) ──────────────── */
   if (authLoading || (mode === 'edit' && (businessLoading || membershipLoading))) {
-    return (
-      <div className="fixed inset-0 z-[100] flex items-center justify-center" style={{ background: BIZ.pageBg }}>
-        <Loader2 className="w-8 h-8 animate-spin" style={{ color: BIZ.amber }} />
-      </div>
-    );
+    return <ManagePageSkeleton />;
   }
   if (mode === 'edit' && (businessError || !business)) {
     // Sentinel from useBusinessProfile — keep in sync.
