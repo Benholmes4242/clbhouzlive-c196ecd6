@@ -22,13 +22,19 @@ export function useSuggestedFeed(userId: string | undefined) {
 
 
   const query = useInfiniteQuery({
-    queryKey: ['media-feed', 'suggested', userId, activeActor?.type, activeActor?.id],
+    queryKey: ['media-feed', 'suggested', version, userId, activeActor?.type, activeActor?.id],
     queryFn: async ({ pageParam }) => {
       if (!userId) return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined, rawRowCount: 0 };
 
       const cursor = typeof pageParam === 'string' ? pageParam : undefined;
 
-      const { data, error } = await supabase.rpc('get_suggested_feed_v2' as any, {
+      if (!loggedVersionRef.current) {
+        console.debug('[feed] serving ' + version);
+        loggedVersionRef.current = true;
+      }
+
+      const rpcName = version === 'v3' ? 'get_suggested_feed_v3' : 'get_suggested_feed_v2';
+      const { data, error } = await supabase.rpc(rpcName as any, {
         p_user_id: userId,
         p_page_size: PAGE_SIZE,
         p_viewer_actor_type: activeActor?.type ?? 'personal',
