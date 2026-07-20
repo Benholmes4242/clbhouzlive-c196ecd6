@@ -26,7 +26,7 @@ import ConfirmDialog from '../components/ConfirmDialog';
 import AdminSheet from '../components/AdminSheet';
 import CourseInsight from '../components/CourseInsight';
 import AdminAccessDenied from '../components/AdminAccessDenied';
-import { VALID_CONTINENTS, COURSE_TYPES } from '../constants';
+import { COURSE_TYPES } from '../constants';
 import { ContinentCountrySelectors } from '../components/ContinentCountrySelectors';
 import { isCountryInContinent } from '../lib/countries';
 import { useCourses, createCourse, type AdminCourseRow, type CourseFilter } from '../hooks/useCourses';
