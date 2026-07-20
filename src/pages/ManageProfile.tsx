@@ -380,8 +380,8 @@ export default function ManageProfile() {
 // -------------------------------------------------------------------------
 // Profile tab body
 // -------------------------------------------------------------------------
-import type { NavigateOptions, To } from 'react-router-dom';
-import type { ProfileFormData, ClubEntry, WebsiteEntry } from '@/components/profile/profile-wizard/types';
+
+
 
 interface ProfileTabBodyProps {
   form: ProfileFormData;
