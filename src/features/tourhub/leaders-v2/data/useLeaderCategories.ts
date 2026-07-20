@@ -137,17 +137,19 @@ function currentSeasonYear(): number {
 async function resolvePgaSeasonId(): Promise<string | null> {
   const year = currentSeasonYear();
   for (const y of [year, year - 1]) {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('sr_seasons')
       .select('id')
       .eq('tour_name', 'pga')
       .eq('year', y)
       .limit(10);
+    if (error) throw error;
     for (const row of data ?? []) {
-      const { count } = await supabase
+      const { count, error: cntErr } = await supabase
         .from('sr_player_statistics')
         .select('id', { count: 'exact', head: true })
         .eq('season_id', row.id);
+      if (cntErr) throw cntErr;
       if ((count ?? 0) > 0) return row.id;
     }
   }
@@ -156,10 +158,36 @@ async function resolvePgaSeasonId(): Promise<string | null> {
 
 // PGA category definitions (accessor + sort + format). Labels are resolved via
 // LEADER_STAT_LABELS[key] at render — no display strings live here.
+type PgaStatRow = {
+  player_id: string | null;
+  earnings: number | null;
+  scoring_average: number | null;
+  wins: number | null;
+  top_10s: number | null;
+  driving_distance: number | null;
+  driving_accuracy: number | null;
+  greens_in_reg: number | null;
+  sand_saves: number | null;
+  putting_average: number | null;
+  strokes_gained_tee_green: number | null;
+  strokes_gained_putting: number | null;
+};
+
+type TourSeasonRankingRow = {
+  player_id: string | null;
+  manual_player_id: string | null;
+  player_name: string | null;
+  position: number | null;
+  points: number | null;
+  wins: number | null;
+  country: string | null;
+  tour_code: string | null;
+};
+
 interface PgaCatSpec {
   key: string;
   dir: 'asc' | 'desc';
-  accessor: (s: any) => number | null;
+  accessor: (s: PgaStatRow) => number | null;
   format: (v: number) => string;
 }
 
@@ -188,10 +216,11 @@ type PlayerRec = {
 
 async function fetchPlayers(ids: string[]): Promise<Map<string, PlayerRec>> {
   if (!ids.length) return new Map();
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('sr_players')
     .select('id, full_name, country, country_code, photo_url, tour_codes')
     .in('id', ids);
+  if (error) throw error;
   return new Map(((data ?? []) as PlayerRec[]).map((p) => [p.id, p]));
 }
 
