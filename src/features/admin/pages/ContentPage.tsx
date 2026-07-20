@@ -870,11 +870,19 @@ function AddCourseSheet({ open, onClose, onCreated, uploadPhoto }: {
     setPhotoPreview(f ? URL.createObjectURL(f) : null);
   };
 
-  const valid = form.name.trim() && form.country.trim() && form.continent;
+  const valid = !!(
+    form.name.trim() &&
+    form.continent &&
+    form.country.trim() &&
+    isCountryInContinent(form.country.trim(), form.continent)
+  );
 
   const submit = async () => {
-    if (!valid) {
-      toast.error('Name, country and continent are required');
+    if (!form.name.trim()) { toast.error('Name is required'); return; }
+    if (!form.continent) { toast.error('Continent is required'); return; }
+    if (!form.country.trim()) { toast.error('Country is required'); return; }
+    if (!isCountryInContinent(form.country.trim(), form.continent)) {
+      toast.error(`"${form.country}" is not a valid country for ${form.continent}`);
       return;
     }
     setBusy(true);
