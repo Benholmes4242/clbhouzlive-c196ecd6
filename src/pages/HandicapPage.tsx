@@ -454,6 +454,30 @@ const HandicapPage: React.FC = () => {
     return <Navigate to="/auth" replace />;
   }
 
+  // Own-mode error branch — a failed useWhsConnection must not fall through
+  // to the connect flow (would prompt an already-connected user to reconnect).
+  if (!isFriendView && connError) {
+    return (
+      <PageRoot dark={true}>
+        <div style={{ minHeight: '70vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, padding: 24, textAlign: 'center', fontFamily: FONT_GEIST }}>
+          <div style={{ fontSize: 16, fontWeight: 700, color: '#F8FAFC' }}>
+            Couldn't load your handicap
+          </div>
+          <div style={{ fontSize: 13, color: 'rgba(248,250,252,0.65)', maxWidth: 280 }}>
+            Check your connection and try again.
+          </div>
+          <button
+            type="button"
+            onClick={() => refetchConn()}
+            style={{ background: AMBER, color: '#0F172A', border: 'none', borderRadius: 999, padding: '10px 20px', fontSize: 13.5, fontWeight: 700, cursor: 'pointer', fontFamily: FONT_GEIST }}
+          >
+            Retry
+          </button>
+        </div>
+      </PageRoot>
+    );
+  }
+
   // Connect flow: Direction A header (matches /manage/handicap exactly).
   if (isConnectFlow) {
     return (
