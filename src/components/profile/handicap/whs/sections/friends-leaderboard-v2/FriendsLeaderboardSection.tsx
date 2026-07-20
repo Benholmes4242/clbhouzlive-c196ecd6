@@ -290,6 +290,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
           </button>
         )}
       </div>
+      )}
       {/* ===== END CARD ===== */}
 
       {/* Inactive section */}
