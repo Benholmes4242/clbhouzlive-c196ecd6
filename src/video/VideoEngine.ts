@@ -1499,7 +1499,7 @@ class VideoEngineImpl {
           // NOT the speaker. Self-labelled — the bug fingerprint the brief
           // asked for.
           const mismatch = !sessionMuted && visiblePlayingLanes.some(
-            (v) => v.visibilityRatio >= 0.5 && v.laneId !== speaker && !v.muted === false ? false : (v.visibilityRatio >= 0.5 && v.laneId !== speaker),
+            (v) => v.visibilityRatio >= 0.5 && v.laneId !== speaker && !v.muted,
           );
           logAudio(mismatch ? 'heartbeat.MISMATCH' : 'heartbeat.state', {
             overlayOpen: fsOpen,
