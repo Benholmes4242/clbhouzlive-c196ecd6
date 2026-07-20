@@ -11,6 +11,7 @@ import { useRivalCrowns, useRivalCrownsForOwner } from '@/lib/whs/hooks/useRival
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
+import { Skeleton } from '@/components/ui/skeleton';
 import { rivalKey, rivalryScore } from '@/lib/whs/utils/rivalryTiering';
 
 interface Props {
