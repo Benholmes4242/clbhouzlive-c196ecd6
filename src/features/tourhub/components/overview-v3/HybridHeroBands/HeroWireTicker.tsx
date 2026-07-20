@@ -6,9 +6,9 @@
  * Delegates to the shared `TickerShell` so behaviour matches the Explore-tab
  * WireTicker (seamless -50% loop, pause-on-touch, reduced-motion swap).
  *
- * Top-10 tie rule: consecutive T-positions with the same score collapse into a
- * single "T1 (n) · Name/Name … · −12" entry so the ticker mirrors what a
- * broadcast lower-third would say instead of stuttering three "T1" chips.
+ * Ties are NOT collapsed — every player renders as their own entry so the
+ * ticker reads "T6 · Herbert · −8 · T6 · Kim · −8 · T6 · Jarvis · −8" rather
+ * than grouping them into one chip.
  *
  * Live state feeds top-10 rows. Results state feeds the final top-10.
  * Upcoming with no rows: caller may pass `emptyStateFacts` — the band then
@@ -17,7 +17,7 @@
  * zero rows → the band is absent (returns null) so the hero collapses onto
  * the page divider.
  */
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TickerShell } from '@/components/shared/wire/TickerShell';
 import { fmtScore, type TickerRow } from '../HybridHero.utils';
@@ -33,38 +33,6 @@ function scoreColor(s: number): string {
   return 'rgba(255,255,255,0.90)';
 }
 
-type CollapsedRow =
-  | { kind: 'solo'; rank: string; name: string; score: number }
-  | { kind: 'tie'; rank: string; count: number; names: string[]; score: number };
-
-function collapseTies(rows: TickerRow[]): CollapsedRow[] {
-  const out: CollapsedRow[] = [];
-  let i = 0;
-  while (i < rows.length) {
-    let j = i;
-    while (
-      j < rows.length &&
-      rows[j].score === rows[i].score &&
-      rows[j].rank === rows[i].rank
-    )
-      j++;
-    const group = rows.slice(i, j);
-    if (group.length === 1) {
-      out.push({ kind: 'solo', rank: group[0].rank, name: group[0].shortName, score: group[0].score });
-    } else {
-      const rank = group[0].rank.startsWith('T') ? group[0].rank : `T${group[0].rank}`;
-      out.push({
-        kind: 'tie',
-        rank,
-        count: group.length,
-        names: group.map((g) => g.shortName),
-        score: group[0].score,
-      });
-    }
-    i = j;
-  }
-  return out;
-}
 
 export interface TickerFact {
   label: string;
