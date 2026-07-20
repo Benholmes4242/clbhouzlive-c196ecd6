@@ -42,7 +42,7 @@ export function TeeTimesFirstGroups({ groups, limit = 5, surface = 'white' }: Pr
             <span style={{ fontSize: 15, fontWeight: 200, color: INK, fontVariantNumeric: 'tabular-nums' }}>
               {formatTimeHm(new Date(g.teeTime))}
             </span>
-            <span style={{ fontSize: 9, fontWeight: 700, color: INK_MUTE, letterSpacing: '0.10em', textTransform: 'uppercase' }}>
+            <span style={{ fontSize: 10, fontWeight: 700, color: INK_MUTE, letterSpacing: '0.10em', textTransform: 'uppercase' }}>
               {t('tournament.teeTimes.teeChip', { hole: g.startingHole })}
             </span>
           </div>
