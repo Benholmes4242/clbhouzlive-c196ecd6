@@ -1269,7 +1269,7 @@ const ProfilePageV2Content: React.FC = () => {
 
         {/* Social handles row */}
         {(() => {
-          const p: any = profile ?? {};
+          const p = (profile ?? {}) as { instagram_handle?: string | null; twitter_handle?: string | null; tiktok_handle?: string | null; youtube_handle?: string | null };
           const links: Array<{ key: string; url: string; icon: React.ReactNode; label: string }> = [];
           if (p.instagram_handle) {
             const h = String(p.instagram_handle).replace(/^@/, '').trim();
