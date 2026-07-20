@@ -114,7 +114,7 @@ export function usePostInsight(postId: string | null) {
         authorName,
         authorAvatarUrl,
         createdAt: post?.created_at ?? null,
-        contentPreview: (post?.content ?? '').trim().slice(0, 220) || null,
+        contentPreview: stripMentionMarkup((post?.content ?? '').trim()).trim().slice(0, 220) || null,
         mediaLabel,
         likes: post?.like_count ?? 0,
         comments: post?.comment_count ?? 0,
