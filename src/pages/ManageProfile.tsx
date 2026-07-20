@@ -104,13 +104,14 @@ export default function ManageProfile() {
       if (error) throw error;
       queryClient.setQueryData(['onboarding-status', user.id], {
         hasCompletedOnboarding: true,
-        userType: (profile as any)?.user_type ?? null,
+        userType: profile?.user_type ?? null,
       });
       await queryClient.invalidateQueries({ queryKey: ['onboarding-status', user.id] });
       await queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
       navigate('/', { replace: true });
-    } catch (err: any) {
-      toast.error(err?.message ?? 'Could not skip onboarding. Please try again.');
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Could not skip onboarding. Please try again.';
+      toast.error(msg);
     } finally {
       setIsSkipping(false);
     }
@@ -119,8 +120,8 @@ export default function ManageProfile() {
   const { data: whsConnection } = useWhsConnection(user?.id);
   const hasWhsConnection = !!whsConnection;
   const resolved = resolveDisplayHandicap({
-    egHandicapIndex: (profile as any)?.eg_handicap_index ?? null,
-    manualHandicapIndex: (profile as any)?.manual_handicap_index ?? null,
+    egHandicapIndex: profile?.eg_handicap_index ?? null,
+    manualHandicapIndex: profile?.manual_handicap_index ?? null,
     hasWhsConnection,
   });
 
