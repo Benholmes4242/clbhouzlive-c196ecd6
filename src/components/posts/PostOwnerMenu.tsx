@@ -111,7 +111,11 @@ export const PostOwnerMenu: React.FC<PostOwnerMenuProps> = ({
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    setShowDeleteConfirm(true);
+    // Force the dropdown closed BEFORE we open the AlertDialog so the two
+    // Radix modal layers don't overlap mid-transition. Then defer opening
+    // the confirm by one frame to let the dropdown's exit start.
+    setDropdownOpen(false);
+    requestAnimationFrame(() => setShowDeleteConfirm(true));
   };
 
   const handleConfirmDelete = async (e: React.MouseEvent) => {
