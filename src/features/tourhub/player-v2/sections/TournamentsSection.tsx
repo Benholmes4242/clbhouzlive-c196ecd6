@@ -207,7 +207,7 @@ export function TournamentsSection({
                         borderRadius: 4,
                         background: 'rgba(34,197,94,0.12)',
                         color: LIVE_DOT,
-                        fontSize: 8.5,
+                        fontSize: 10,
                         fontWeight: 800,
                         letterSpacing: '0.10em',
                       }}
