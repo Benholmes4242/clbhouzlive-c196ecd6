@@ -73,7 +73,7 @@ export const RivalFightCard: React.FC<Props> = ({
   // Hero photo fallback chain — venue isn't on the hydrated type yet, so we
   // fall back through the available portrait sources.
   const heroPhoto =
-    (rivalry as any).most_played_venue_photo_url ??
+    (rivalry as { most_played_venue_photo_url?: string | null }).most_played_venue_photo_url ??
     rivalry.rival_header_photo_url ??
     rivalry.rival_profile_photo_url ??
     rivalry.rival_thumbnail_url ??
@@ -86,7 +86,7 @@ export const RivalFightCard: React.FC<Props> = ({
   const accentColor = isWinningOverall ? GOLD : '#94A3B8';
 
   const tappable = typeof onTap === 'function';
-  const Tag: any = tappable ? 'button' : 'div';
+  const Tag: React.ElementType = tappable ? 'button' : 'div';
 
   // Bar fill % for a mirrored stat row (you side). Even → 50/50.
   const barYouPct = (c: typeof crownInfos[number]): number => {

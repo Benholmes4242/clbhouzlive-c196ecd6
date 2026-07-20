@@ -117,7 +117,7 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onCli
     !isStaleRow &&
     entry.handicap_30d_delta != null &&
     entry.handicap_30d_delta <= -0.5;
-  const Tag: any = onClick ? 'button' : 'div';
+  const Tag: React.ElementType = onClick ? 'button' : 'div';
 
   const selfFrame: React.CSSProperties = isYou
     ? {
@@ -181,7 +181,7 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onCli
         {(() => {
           const avatarSrc = pickAvatarSrc(entry.friend_thumbnail_url, entry.friend_profile_photo_url);
           const fbBg = getAvatarFallbackColor(
-            entry.friend_user_id ?? (entry as any).friend_row_id ?? entry.friend_name
+            entry.friend_user_id ?? (entry as { friend_row_id?: string | null }).friend_row_id ?? entry.friend_name
           );
           return (
             <div

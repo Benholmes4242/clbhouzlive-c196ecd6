@@ -35,7 +35,7 @@ const LABEL_STYLE: React.CSSProperties = {
 };
 
 export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 'owner', ownerFirstName = null }) => {
-  const { data, isLoading } = useFriendLeaderboard(userId);
+  const { data, isLoading, isError, refetch } = useFriendLeaderboard(userId);
   const percentileQuery = useHandicapPercentile(userId);
   const { data: deltasData } = useFriendLeaderboardRankDeltas(userId, 30);
   const { data: weeklyBanner } = useFriendLeaderboardWeeklyBanner(userId);
@@ -107,8 +107,46 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
         sub={subLine}
       />
 
+      {isError && !isLoading && (
+        <div
+          style={{
+            margin: '0 16px',
+            background: 'var(--hcp-bg-1)',
+            border: '1px solid var(--hcp-line-2)',
+            borderRadius: 18,
+            padding: '20px 16px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 12,
+            fontFamily: FONT,
+          }}
+        >
+          <p style={{ margin: 0, fontSize: 13, color: 'var(--hcp-t-60)' }}>
+            Couldn't load the leaderboard.
+          </p>
+          <button
+            type="button"
+            onClick={() => refetch()}
+            style={{
+              padding: '6px 14px',
+              borderRadius: 999,
+              background: 'rgba(255,255,255,0.06)',
+              border: '1px solid var(--hcp-line-2)',
+              color: 'var(--hcp-t-100)',
+              fontSize: 12,
+              fontWeight: 700,
+              fontFamily: FONT,
+              cursor: 'pointer',
+            }}
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
       {/* THIS WEEK banner */}
-      {!isLoading && (
+      {!isLoading && !isError && (
         <WeeklyBanner
           banner={weeklyBanner ?? null}
           friends={cohorts.active.concat(cohorts.inactive)}
@@ -116,6 +154,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
       )}
 
       {/* ===== MERGED LEADERBOARD CARD ===== */}
+      {!isError && (
       <div
         style={{
           margin: '0 16px',
@@ -251,10 +290,11 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
           </button>
         )}
       </div>
+      )}
       {/* ===== END CARD ===== */}
 
       {/* Inactive section */}
-      {!isLoading && cohorts.totalInactive > 0 && (
+      {!isLoading && !isError && cohorts.totalInactive > 0 && (
         <>
           {showInactive ? (
             <>
