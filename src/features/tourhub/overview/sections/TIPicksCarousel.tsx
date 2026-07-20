@@ -7,6 +7,7 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAIPredictions } from '../../hooks/useAIPredictions';
 import { SectionShell } from './SectionShell';
 import { V4 } from '../tokens';
