@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import {
   Activity, AlertTriangle, Bell, CheckCircle2, ChevronDown, ChevronUp,
-  Play, Radio, RefreshCw, ShieldCheck, Zap,
+  Play, Radio, RefreshCw, Zap,
 } from 'lucide-react';
 import { usePanelRole } from '@/hooks/usePanelRole';
 import { panelCan } from '@/lib/panelCan';
