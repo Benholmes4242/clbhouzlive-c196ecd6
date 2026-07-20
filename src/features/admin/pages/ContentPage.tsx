@@ -1386,7 +1386,7 @@ function TourPlayersTab() {
         <EmptyState title="No players" />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {paginated.map(p => <PlayerRowCard key={p.id} player={p} cacheBust={cacheBust} onPhoto={() => setPhotoPlayer(p)} />)}
+          {paginated.map(p => <PlayerRowCard key={p.id} player={p} cacheBust={cacheBust} onPhoto={() => openPlayer(p.id)} />)}
         </div>
       )}
 
@@ -1404,14 +1404,15 @@ function TourPlayersTab() {
       )}
 
       <PhotoSheet
-        player={photoPlayer}
-        onClose={() => setPhotoPlayer(null)}
+        player={data.find(p => p.id === activePlayerId) ?? null}
+        onClose={closePlayer}
         cacheBust={cacheBust}
         onCacheBust={() => setCacheBust(p => p + 1)}
       />
     </div>
   );
 }
+
 
 function PlayerAvatar({ player, cacheBust, size = 40 }: { player: PlayerRow; cacheBust?: number; size?: number }) {
   const name = player.fullName || `${player.firstName || ''} ${player.lastName || ''}`.trim();
