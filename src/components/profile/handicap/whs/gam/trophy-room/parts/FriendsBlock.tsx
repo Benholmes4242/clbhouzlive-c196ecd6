@@ -194,13 +194,12 @@ const FriendRowLegend: React.FC<{ name: string; url: string | null; rank: number
 const FriendsSkeleton: React.FC = () => (
   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
     {[0, 1, 2].map((i) => (
-      <div
+      <Skeleton
         key={i}
+        variant="dark"
         style={{
           height: 44,
-          background: 'rgba(255,255,255,0.06)',
           borderRadius: 10,
-          animation: 'gamPulse 1.6s ease-in-out infinite',
         }}
       />
     ))}
