@@ -9,6 +9,8 @@ import { PerfToggleButton } from '@/perf/PerfToggleButton';
 import { BootTimelineToggleButton } from '@/perf/BootTimelineToggleButton';
 import { PerfHud } from '@/perf/PerfHud';
 import { LogHud } from '@/perf/LogHud';
+import { AudioLogsButton } from '@/perf/AudioLogsButton';
+
 
 
 export function AdminGatedPerfPill() {
