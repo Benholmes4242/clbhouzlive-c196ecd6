@@ -181,21 +181,7 @@ export function TournamentPage() {
   if (isLoading || !meta) {
     return (
       <TourHubShell immersive immersiveStatusBar>
-        <div style={{ background: SLATE_50, minHeight: '100dvh' }}>
-          <div className="animate-pulse" style={{
-            height: 260, background: '#0A0E14',
-          }} />
-          <div className="animate-pulse" style={{ padding: 16 }}>
-            <div style={{ height: 10, width: 90, background: INK_TINT_06, borderRadius: 4, marginBottom: 10 }} />
-            {[0, 1, 2, 3].map((i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 0', borderBottom: `0.5px solid ${HAIRLINE_INK_8}` }}>
-                <div style={{ width: 28, height: 12, background: INK_TINT_06, borderRadius: 4 }} />
-                <div style={{ flex: 1, height: 12, background: INK_TINT_06, borderRadius: 4 }} />
-                <div style={{ width: 40, height: 12, background: INK_TINT_06, borderRadius: 4 }} />
-              </div>
-            ))}
-          </div>
-        </div>
+        <TournamentPageSkeleton />
       </TourHubShell>
     );
   }
