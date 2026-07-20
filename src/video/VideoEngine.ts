@@ -1203,7 +1203,7 @@ class VideoEngineImpl {
   }
 
 
-  play(laneId: LaneId, opts: { callerPostId?: string | null; viaViewer?: boolean } = {}): Promise<void> {
+  play(laneId: LaneId, opts: { callerPostId?: string | null; viaViewer?: boolean; claimsAudio?: boolean } = {}): Promise<void> {
     const lane = this.getLane(laneId);
     const caller = opts.callerPostId ?? null;
     // Trace viewer-sourced play so device captures show the path.
@@ -1236,7 +1236,7 @@ class VideoEngineImpl {
     lane.wantPlay = true;
     // AUDIO POLICY: on activation, re-consult session store so an earlier
     // unmute carries to the NEXT video (inheritance on activation).
-    this.applyAudioPolicy(lane, 'activation');
+    this.applyAudioPolicy(lane, 'activation', { claimsAudio: opts.claimsAudio === true });
     logAudio('resume.activate', {
       laneId,
       callerPostId: caller ?? null,
