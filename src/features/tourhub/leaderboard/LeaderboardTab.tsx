@@ -162,8 +162,9 @@ export function LeaderboardTab() {
   }, [searchOpen]);
 
   if (liveLoading && liveTournaments.length === 0) {
-    return <LeaderboardSkeleton />;
+    return <LeaderboardSkeleton variant="page" />;
   }
+
   if (!selected) {
     if (liveError) {
       return (
