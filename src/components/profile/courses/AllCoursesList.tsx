@@ -455,7 +455,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
                 elements.push(
                   <DossierCard
                     key={course.id}
-                    course={toRatedCourseData(course as any)}
+                    course={toRatedCourseData(course)}
                     rank={rank}
                     onCourseClick={handleCourseClick}
                     onFullReview={handleFullReview}
