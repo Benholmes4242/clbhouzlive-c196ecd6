@@ -210,6 +210,7 @@ export function useCourses() {
     stats,
     search, setSearch: (v: string) => { setSearch(v); setPage(1); },
     country, setCountry: (v: string) => { setCountry(v); setPage(1); },
+    filter, setFilter: (v: CourseFilter) => { setFilter(v); setPage(1); },
     page, setPage, pageSize,
     updateCourse: (id: string, updates: CourseUpdate) => updateMutation.mutateAsync({ id, updates }),
     isUpdating: updateMutation.isPending,
