@@ -479,7 +479,7 @@ function ScoringBoardInner({ category, liveMap, onOpen }: BoardBaseProps) {
               <div
                 style={{
                   marginTop: 3,
-                  fontSize: 9,
+                  fontSize: 10,
                   fontWeight: 700,
                   letterSpacing: '0.08em',
                   color: isLeader ? AMBER : INK_FAINT,
