@@ -36,7 +36,7 @@ export default function ContentPage() {
   const { role } = usePanelRole();
   const can = panelCan(role);
   const [params, setParams] = useSearchParams();
-  const location = useLocation();
+  
 
   // Legacy redirect: ?tab=course-requests -> Inbox
   if (params.get('tab') === 'course-requests') {
