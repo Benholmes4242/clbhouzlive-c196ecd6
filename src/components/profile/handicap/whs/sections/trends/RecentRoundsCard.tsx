@@ -6,6 +6,7 @@ import { useAllScores, useHandicapTrend } from '@/lib/whs/hooks';
 import { computeRoundDeltas, type RoundWithDelta } from './computeRoundDeltas';
 import RoundDetailSheet from '../round-detail/RoundDetailSheet';
 import { DarkSectionHeader } from '../_shared/darkAtoms';
+import { Skeleton } from '@/components/ui/skeleton';
 
 
 interface Props {
@@ -594,14 +595,10 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap }) => {
 const SkeletonStack: React.FC = () => (
   <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
     {Array.from({ length: 5 }).map((_, i) => (
-      <div
+      <Skeleton
         key={i}
-        style={{
-          height: 72,
-          borderRadius: 12,
-          background: T.ink04,
-          border: `1px solid ${T.hairline}`,
-        }}
+        variant="dark"
+        style={{ height: 72, borderRadius: 12, border: `1px solid ${T.hairline}` }}
       />
     ))}
   </div>
