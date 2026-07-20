@@ -187,7 +187,7 @@ function CoursesTab() {
           />
         </div>
         <button
-          onClick={() => setAddOpen(true)}
+          onClick={openAdd}
           style={{
             padding: '10px 14px', borderRadius: t.radius.md,
             border: 'none', background: t.ink, color: t.surface,
