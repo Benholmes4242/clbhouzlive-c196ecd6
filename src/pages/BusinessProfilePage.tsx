@@ -40,7 +40,7 @@ import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
 import { ImageCropModal } from '@/components/business/ImageCropModal';
 import { BusinessProfileInfo } from '@/components/business/BusinessProfileInfo';
 import { BusinessTeamTab } from '@/components/business/BusinessTeamTab';
-import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
+import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
 
 import PostsTabContent from '@/components/posts-tab/PostsTabContent';
 // FloatingPageHeader removed (H3) — chrome now driven by ChromeIsland registry.
