@@ -4,6 +4,7 @@ import { CourseImageFallback } from '@/components/whs/CourseImageFallback';
 import { useCourseForm } from '@/lib/whs/hooks';
 import type { CourseForm } from '@/lib/whs/types';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface Props {
   connectionId: string;
