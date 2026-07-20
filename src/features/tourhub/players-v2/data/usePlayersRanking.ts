@@ -69,21 +69,55 @@ async function resolvePgaSeasonId(): Promise<string | null> {
   const year = currentSeasonYear();
   // Deterministic probe: prefer current year with stats rows, else walk back.
   for (const y of [year, year - 1]) {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('sr_seasons')
       .select('id')
       .eq('tour_name', 'pga')
       .eq('year', y)
       .limit(10);
+    if (error) throw error;
     for (const row of data ?? []) {
-      const { count } = await supabase
+      const { count, error: cntErr } = await supabase
         .from('sr_player_statistics')
         .select('id', { count: 'exact', head: true })
         .eq('season_id', row.id);
+      if (cntErr) throw cntErr;
       if ((count ?? 0) > 0) return row.id;
     }
   }
   return null;
+}
+
+// Minimal structural shapes for row casts.
+interface PgaStatRow {
+  player_id: string;
+  fedex_points: number | string | null;
+  fedex_rank: number | null;
+  wins: number | null;
+  top_10s: number | null;
+  events_played: number | null;
+  earnings: number | string | null;
+}
+interface PlayerRow {
+  id: string;
+  full_name: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  country: string | null;
+  country_code: string | null;
+  photo_url: string | null;
+  tour_codes: string[] | null;
+}
+interface TourSeasonRankingRow {
+  player_id: string | null;
+  manual_player_id: string | null;
+  player_name: string | null;
+  position: number | null;
+  points: number | string | null;
+  wins: number | null;
+  tournaments_played: number | null;
+  country: string | null;
+  tour_code: string | null;
 }
 
 export function usePlayersRanking(tour: TourId) {
@@ -100,20 +134,23 @@ export function usePlayersRanking(tour: TourId) {
       if (tour === 'pga') {
         const seasonId = await resolvePgaSeasonId();
         if (!seasonId) return { synced: false, statLabel: null, rows: [] };
-        const { data: stats } = await supabase
+        const { data: stats, error: statsErr } = await supabase
           .from('sr_player_statistics')
           .select('player_id, fedex_points, fedex_rank, wins, top_10s, events_played, earnings')
           .eq('season_id', seasonId)
           .order('fedex_points', { ascending: false, nullsFirst: false })
           .limit(300);
+        if (statsErr) throw statsErr;
         if (!stats?.length) return { synced: false, statLabel: null, rows: [] };
-        const playerIds = [...new Set(stats.map((s) => s.player_id))];
-        const { data: players } = await supabase
+        const statsRows = stats as unknown as PgaStatRow[];
+        const playerIds = [...new Set(statsRows.map((s) => s.player_id))];
+        const { data: players, error: playersErr } = await supabase
           .from('sr_players')
           .select('id, full_name, first_name, last_name, country, country_code, photo_url, tour_codes')
           .in('id', playerIds);
-        const pmap = new Map((players ?? []).map((p) => [p.id, p]));
-        let rows: RankedRow[] = stats.map((s, i) => {
+        if (playersErr) throw playersErr;
+        const pmap = new Map(((players ?? []) as unknown as PlayerRow[]).map((p) => [p.id, p]));
+        let rows: RankedRow[] = statsRows.map((s, i) => {
           const p = pmap.get(s.player_id);
           return {
             playerId: s.player_id,
@@ -137,39 +174,45 @@ export function usePlayersRanking(tour: TourId) {
 
       if (tour === 'euro' || tour === 'lpga' || tour === 'pgad' || tour === 'liv') {
         const year = currentSeasonYear();
-        let { data: rankings } = await supabase
-          .from('tour_season_rankings' as any)
+        const primary = await supabase
+          .from('tour_season_rankings' as never)
           .select('player_id, manual_player_id, player_name, position, points, wins, tournaments_played, country, tour_code')
           .eq('tour_code', tour)
           .eq('season_year', year)
           .order('position', { ascending: true })
           .limit(400);
-        if (!rankings?.length) {
+        if (primary.error) throw primary.error;
+        let rankings = (primary.data ?? []) as unknown as TourSeasonRankingRow[];
+        if (!rankings.length) {
           const alt = await supabase
-            .from('tour_season_rankings' as any)
+            .from('tour_season_rankings' as never)
             .select('player_id, manual_player_id, player_name, position, points, wins, tournaments_played, country, tour_code')
             .eq('tour_code', tour)
             .eq('season_year', year - 1)
             .order('position', { ascending: true })
             .limit(400);
-          rankings = alt.data ?? [];
+          if (alt.error) throw alt.error;
+          rankings = (alt.data ?? []) as unknown as TourSeasonRankingRow[];
         }
-        if (!rankings?.length) return { synced: false, statLabel: null, rows: [] };
+        if (!rankings.length) return { synced: false, statLabel: null, rows: [] };
         const playerIds = [
           ...new Set(
             rankings
-              .map((r: any) => (r.player_id ?? r.manual_player_id) as string | null)
-              .filter((v: string | null): v is string => !!v),
+              .map((r) => (r.player_id ?? r.manual_player_id) as string | null)
+              .filter((v): v is string => !!v),
           ),
         ];
-        const { data: players } = playerIds.length
-          ? await supabase
-              .from('sr_players')
-              .select('id, full_name, first_name, last_name, country, country_code, photo_url, tour_codes')
-              .in('id', playerIds)
-          : { data: [] as any[] };
-        const pmap = new Map((players ?? []).map((p: any) => [p.id, p]));
-        const rows: RankedRow[] = rankings.map((r: any) => {
+        let players: PlayerRow[] = [];
+        if (playerIds.length) {
+          const { data: pdata, error: playersErr } = await supabase
+            .from('sr_players')
+            .select('id, full_name, first_name, last_name, country, country_code, photo_url, tour_codes')
+            .in('id', playerIds);
+          if (playersErr) throw playersErr;
+          players = (pdata ?? []) as unknown as PlayerRow[];
+        }
+        const pmap = new Map(players.map((p) => [p.id, p]));
+        const rows: RankedRow[] = rankings.map((r) => {
           const pid = (r.player_id ?? r.manual_player_id ?? '') as string;
           const p = pid ? pmap.get(pid) : undefined;
           const parts = (r.player_name ?? '').split(/\s+/);
@@ -193,22 +236,24 @@ export function usePlayersRanking(tour: TourId) {
       }
 
       // champ (degrade) — world-ranking order from sr_world_rankings.
-      const { data: rankings } = await supabase
+      const { data: rankings, error: rankErr } = await supabase
         .from('sr_world_rankings')
         .select('player_id, rank, ranking_date')
         .order('ranking_date', { ascending: false })
         .order('rank', { ascending: true })
         .limit(500);
+      if (rankErr) throw rankErr;
       if (!rankings?.length) return { synced: false, statLabel: null, rows: [] };
       const latestDate = rankings[0].ranking_date;
       const latest = rankings.filter((r) => r.ranking_date === latestDate);
       const seen = new Set<string>();
       const dedup = latest.filter((r) => (seen.has(r.player_id) ? false : (seen.add(r.player_id), true)));
-      const { data: players } = await supabase
+      const { data: players, error: playersErr } = await supabase
         .from('sr_players')
         .select('id, full_name, first_name, last_name, country, country_code, photo_url, tour_codes')
         .in('id', dedup.map((r) => r.player_id));
-      const pmap = new Map((players ?? []).map((p) => [p.id, p]));
+      if (playersErr) throw playersErr;
+      const pmap = new Map(((players ?? []) as unknown as PlayerRow[]).map((p) => [p.id, p]));
       const rows: RankedRow[] = [...dedup
         .map((r) => {
           const p = pmap.get(r.player_id);
@@ -216,7 +261,7 @@ export function usePlayersRanking(tour: TourId) {
           return {
             playerId: r.player_id,
             rank: r.rank,
-            name: p.full_name,
+            name: p.full_name ?? 'Unknown',
             firstName: p.first_name ?? '',
             lastName: p.last_name ?? '',
             country: p.country ?? null,
