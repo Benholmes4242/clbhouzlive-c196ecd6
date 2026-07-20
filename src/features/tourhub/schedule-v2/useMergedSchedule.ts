@@ -279,5 +279,6 @@ export function useMergedSchedule(options?: { enabled?: boolean }): {
     data: timeline,
     isLoading: rowsQuery.isLoading,
     error: (rowsQuery.error as Error) ?? null,
+    refetch: rowsQuery.refetch,
   };
 }

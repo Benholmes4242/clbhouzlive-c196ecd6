@@ -69,10 +69,10 @@ async function resolveSeasonCandidates(
     console.error('[schedule-v2] sr_seasons fetch failed:', error);
     throw error;
   }
-  const rows = (data ?? []) as any[];
+  const rows = (data ?? []) as SrSeasonRow[];
   const matches = rows.filter(
-    (r: any) => mapTourSlug(r.tour_full_name) === tour,
-  ) as SrSeasonRow[];
+    (r: SrSeasonRow) => mapTourSlug(r.tour_full_name) === tour,
+  );
 
   // Same tie-break as useStatWatch: prefer exact 'pga' string matches over
   // fallback-mapped rows so DP-World / LIV rows can't masquerade as pga.
@@ -277,6 +277,7 @@ export function useSeasonTimeline(tour: TourId): {
   data: SeasonTimeline | null;
   isLoading: boolean;
   error: Error | null;
+  refetch: () => void;
 } {
   // 1. Season + raw tournament rows for the requested tour.
   const seasonQuery = useQuery({
@@ -493,5 +494,6 @@ export function useSeasonTimeline(tour: TourId): {
     data: timeline,
     isLoading: seasonQuery.isLoading,
     error: (seasonQuery.error as Error) ?? null,
+    refetch: seasonQuery.refetch,
   };
 }
