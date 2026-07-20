@@ -294,7 +294,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
       {/* ===== END CARD ===== */}
 
       {/* Inactive section */}
-      {!isLoading && cohorts.totalInactive > 0 && (
+      {!isLoading && !isError && cohorts.totalInactive > 0 && (
         <>
           {showInactive ? (
             <>
