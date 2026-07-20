@@ -296,11 +296,12 @@ export function TournamentPage() {
 }
 
 function UpcomingAct({
-  meta, field, teeGroups, onOpenAllTimes,
+  meta, field, teeGroups, loading, onOpenAllTimes,
 }: {
   meta: NonNullable<ReturnType<typeof useTournamentMeta>['data']>;
   field: { fieldCount: number; topPlayers: { id: string; name: string; rank: number }[]; firstTeeTime: string | null } | null;
   teeGroups: import('./data/useTeeTimesAll').TeeGroup[];
+  loading: boolean;
   onOpenAllTimes: () => void;
 }) {
   const { t } = useTranslation('tourhub');
