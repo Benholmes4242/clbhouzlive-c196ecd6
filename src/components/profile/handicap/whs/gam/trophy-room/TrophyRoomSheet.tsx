@@ -702,13 +702,12 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
               {/* Lifetime skeleton — mirrors 2-up ShowpieceCards. */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8, marginTop: 4 }}>
                 {Array.from({ length: 4 }).map((_, i) => (
-                  <div
+                  <Skeleton
                     key={`sk-life-${i}`}
+                    variant="dark"
                     style={{
                       minHeight: 148,
-                      background: 'rgba(255,255,255,0.06)',
                       borderRadius: 16,
-                      animation: 'gamPulse 1.6s ease-in-out infinite',
                     }}
                   />
                 ))}
@@ -716,13 +715,12 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
               {/* Category skeleton — 3-up matches every other section. */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginTop: 32 }}>
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <div
+                  <Skeleton
                     key={`sk-cat-${i}`}
+                    variant="dark"
                     style={{
                       aspectRatio: '1 / 1.22',
-                      background: 'rgba(255,255,255,0.06)',
                       borderRadius: 12,
-                      animation: 'gamPulse 1.6s ease-in-out infinite',
                     }}
                   />
                 ))}
