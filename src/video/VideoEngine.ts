@@ -95,6 +95,7 @@ function installMutedSetterProbe(el: HTMLVideoElement, laneId: LaneId): void {
             msSinceOpen: msSinceOpen(),
             stack: frames,
           });
+          lastMutedWriter.set(laneId, { value: !!value, stack: frames, ts: Date.now() });
         } catch {}
         nativeSet(value);
       },
