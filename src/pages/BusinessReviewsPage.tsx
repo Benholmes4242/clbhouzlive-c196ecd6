@@ -424,7 +424,7 @@ export default function BusinessReviewsPage() {
   const [chip, setChip] = useState<ChipKey>('all');
   const active = CHIPS.find((c) => c.key === chip)!;
 
-  const { data, isLoading } = useBusinessReviews(businessId, {
+  const { data, isLoading, isError, refetch } = useBusinessReviews(businessId, {
     filter: active.filter,
     sort: active.sort,
   });
@@ -461,7 +461,7 @@ export default function BusinessReviewsPage() {
     );
   }
 
-  const showEmpty = !isLoading && (summary?.count ?? 0) === 0;
+  const showEmpty = !isLoading && !isError && (summary?.count ?? 0) === 0;
 
   return (
     <ManagePageShell title="Reviews">
@@ -553,6 +553,26 @@ export default function BusinessReviewsPage() {
                 </div>
               ))}
             </div>
+          ) : isError ? (
+            <div
+              className="text-center py-10 px-6"
+              style={{ background: CARD_BG, border: `1px solid ${HAIR}`, borderRadius: 16 }}
+            >
+              <div className="text-[15px] font-bold" style={{ color: INK }}>
+                Couldn't load your reviews
+              </div>
+              <p className="text-[13px] leading-relaxed mt-1.5" style={{ color: INK_45 }}>
+                Check your connection and try again.
+              </p>
+              <button
+                type="button"
+                onClick={() => refetch()}
+                className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-[12.5px] font-bold text-white active:opacity-90"
+                style={{ background: AMBER, border: 'none' }}
+              >
+                Retry
+              </button>
+            </div>
           ) : showEmpty ? (
             <div
               className="text-center py-10 px-6"
@@ -621,7 +641,7 @@ export default function BusinessReviewsPage() {
           try {
             await del.mutateAsync({ responseId: deleteTarget.response.id });
             toast.success('Reply deleted');
-          } catch {}
+          } catch { /* toast fired inside mutation */ }
           setDeleteTarget(null);
         }}
         title="Delete reply"

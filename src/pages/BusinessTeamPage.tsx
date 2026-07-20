@@ -186,7 +186,7 @@ export default function BusinessTeamPage() {
 
   const { data: membership } = useBusinessMembership(businessId);
   const { data: business } = useBusinessProfile(businessId);
-  const { data: team, isLoading: teamLoading } = useBusinessTeam(businessId);
+  const { data: team, isLoading: teamLoading, isError: teamError, refetch: refetchTeam } = useBusinessTeam(businessId);
   const { data: invites } = useBusinessInvites(businessId);
   const removeMember = useRemoveMember(businessId || '');
   const updateRole = useUpdateMemberRole(businessId || '');
@@ -205,7 +205,7 @@ export default function BusinessTeamPage() {
 
   const handleRemoveMember = async () => {
     if (!removeConfirm.member) return;
-    try { await removeMember.mutateAsync(removeConfirm.member.user_profile_id); } catch {}
+    try { await removeMember.mutateAsync(removeConfirm.member.user_profile_id); } catch { /* toast fired inside mutation */ }
     setRemoveConfirm({ open: false, member: null });
   };
 
@@ -268,7 +268,7 @@ export default function BusinessTeamPage() {
                     memberUserId: m.user_profile_id,
                     isPublic: !isPublic,
                   });
-                } catch {}
+                } catch { /* toast fired inside mutation */ }
               }}
               disabled={setVisibility.isPending}
               className="mt-1.5 inline-flex items-center gap-1.5 text-[11px] active:opacity-70"
@@ -352,7 +352,7 @@ export default function BusinessTeamPage() {
                 {(team || []).length}
               </span>
             </div>
-            <div className="[&>*+*]:border-t" style={{ ['--tw-border-opacity' as any]: 1 }}>
+            <div className="[&>*+*]:border-t" style={{ ['--tw-border-opacity' as string]: 1 } as React.CSSProperties}>
               {teamLoading ? (
                 [0, 1, 2].map(i => (
                   <div key={i} className="flex items-center gap-3 py-3">
@@ -363,6 +363,23 @@ export default function BusinessTeamPage() {
                     </div>
                   </div>
                 ))
+              ) : teamError ? (
+                <div className="py-6 text-center">
+                  <div className="text-[13px] font-semibold" style={{ color: INK }}>
+                    Couldn't load your team
+                  </div>
+                  <p className="text-[12px] mt-1" style={{ color: INK_45 }}>
+                    Check your connection and try again.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => refetchTeam()}
+                    className="mt-3 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[12.5px] font-bold text-white active:opacity-90"
+                    style={{ background: AMBER, border: 'none' }}
+                  >
+                    Retry
+                  </button>
+                </div>
               ) : (team || []).length === 0 ? (
                 <div className="py-6 text-center text-[13px]" style={{ color: INK_45 }}>
                   No members yet.

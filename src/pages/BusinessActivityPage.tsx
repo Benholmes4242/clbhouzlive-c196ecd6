@@ -35,7 +35,7 @@ function formatDateHeader(dateStr: string) {
 export default function BusinessActivityPage() {
   const { businessId } = useParams<{ businessId: string }>();
   const navigate = useNavigate();
-  const { data: activities, isLoading } = useBusinessActivityLog(businessId);
+  const { data: activities, isLoading, isError, refetch } = useBusinessActivityLog(businessId);
 
   if (!businessId) return null;
 
@@ -56,6 +56,19 @@ export default function BusinessActivityPage() {
       <div className="max-w-2xl mx-auto px-4 py-6">
         {isLoading ? (
           <div className="text-center text-muted-foreground py-12">Loading activity...</div>
+        ) : isError ? (
+          <div className="text-center py-12">
+            <p className="font-medium text-sm">Couldn't load activity</p>
+            <p className="text-sm text-muted-foreground mt-1">Check your connection and try again.</p>
+            <Button
+              type="button"
+              onClick={() => refetch()}
+              className="mt-4 rounded-full text-white font-bold"
+              style={{ background: '#F7931E', border: 'none' }}
+            >
+              Retry
+            </Button>
+          </div>
         ) : groupedActivities.length === 0 ? (
           <div className="text-center py-12">
             <Clock className="h-12 w-12 text-muted-foreground/40 mx-auto mb-4" />
