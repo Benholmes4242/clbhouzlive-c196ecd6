@@ -40,7 +40,7 @@ export function useVideosFeedV2(params: {
     initialPageParam: [] as string[],
     queryFn: async ({ pageParam }) => {
       const seenIds = (pageParam as string[]) ?? [];
-      const { data, error } = await (supabase as unknown as RpcClient).rpc('get_long_form_videos', {
+      const { data, error } = await (supabase as unknown as RpcClient).rpc('get_long_form_videos_v2', {
         p_user_id: userId,
         p_mode: sort,
         p_category: category,
