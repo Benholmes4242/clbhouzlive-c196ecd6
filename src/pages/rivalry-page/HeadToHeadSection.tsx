@@ -7,7 +7,6 @@
  */
 import React, { useMemo } from 'react';
 import {
-  BG_1,
   LINE,
   FONT,
   T60,
