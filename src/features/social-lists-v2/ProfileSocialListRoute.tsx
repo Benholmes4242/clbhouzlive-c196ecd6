@@ -12,7 +12,7 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import { useUserByUsername } from '@/hooks/useUserByUsername';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import SocialListPage from './SocialListPage';
+import SocialListPage, { ListSkeleton } from './SocialListPage';
 
 interface Props {
   direction: 'followers' | 'following';
@@ -40,8 +40,8 @@ export default function ProfileSocialListRoute({ direction }: Props) {
 
   if (isLoading) {
     return (
-      <div style={{ minHeight: '100dvh', background: '#F8FAFC', padding: '80px 16px', color: '#64748B', fontSize: 13 }}>
-        Loading…
+      <div style={{ minHeight: '100dvh', background: '#F8FAFC', paddingTop: 'calc(var(--chrome-total-h, 0px) + 24px)' }}>
+        <ListSkeleton />
       </div>
     );
   }
