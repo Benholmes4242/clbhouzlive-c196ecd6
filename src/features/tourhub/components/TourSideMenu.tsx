@@ -71,7 +71,6 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
   onClose,
   activeTab,
   onSelectTab,
-  handicapValue,
   onSettings,
   onProfile,
   onSignOut,
