@@ -57,7 +57,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
 
   const courseIdQuery = useWhsCourseId(
     userData?.course?.name ?? null,
-    (userData?.course as any)?.country_code ?? null,
+    (userData?.course as { country_code?: string | null } | null | undefined)?.country_code ?? null,
     open,
   );
 
@@ -90,17 +90,17 @@ export const RoundDetailSheet: React.FC<Props> = ({
 
   const eyebrowText = fmtDateEyebrow(userData?.play_date);
   const courseName = userData?.course?.name ?? '';
-  const courseLocation = (userData?.course as any)?.country_name ?? null;
+  const courseLocation = (userData?.course as { country_name?: string | null } | null | undefined)?.country_name ?? null;
   const coursePar = totalPar > 0 ? totalPar : null;
-  const courseSlope = (userData as any)?.slope_rating ?? null;
+  const courseSlope = (userData as { slope_rating?: number | null } | null | undefined)?.slope_rating ?? null;
 
 
   const displayName = profile?.display_name ?? profile?.username ?? '';
   const playerHcp = profile?.show_handicap === false
     ? null
     : resolveDisplayHandicap({
-        egHandicapIndex: (profile as any)?.eg_handicap_index ?? null,
-        manualHandicapIndex: (profile as any)?.manual_handicap_index ?? null,
+        egHandicapIndex: (profile as { eg_handicap_index?: number | null } | null | undefined)?.eg_handicap_index ?? null,
+        manualHandicapIndex: (profile as { manual_handicap_index?: number | null } | null | undefined)?.manual_handicap_index ?? null,
         hasWhsConnection: !!whsConn,
       }).value;
 

@@ -128,7 +128,7 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
   const homeCourseName = useMemo<string | null>(() => {
     if (!allScores || allScores.length === 0) return null;
     const counts = new Map<string, number>();
-    for (const r of allScores as any[]) {
+    for (const r of allScores as ReadonlyArray<{ course?: { name?: string | null } | null }>) {
       const n = r?.course?.name;
       if (!n) continue;
       counts.set(n, (counts.get(n) ?? 0) + 1);
@@ -154,7 +154,7 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
         .split(/\s+/)
         .find(w => w.length > 2 && !['the', 'golf', 'club'].includes(w));
       if (!firstWord) return null;
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('golf_courses')
         .select('name, latitude, longitude')
         .ilike('name', `%${firstWord}%`)

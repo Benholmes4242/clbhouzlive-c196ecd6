@@ -304,7 +304,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
 // readOnly=true. If the friend has no connection, shows an empty state.
 // ───────────────────────────────────────────────────────────────────────
 const FriendHandicapDashboard: React.FC<{ userId: string; ownerFirstName: string | null }> = ({ userId, ownerFirstName }) => {
-  const { data: connection, isLoading } = useWhsConnection(userId);
+  const { data: connection, isLoading, isError, refetch } = useWhsConnection(userId);
 
   if (isLoading) {
     return (
@@ -312,6 +312,23 @@ const FriendHandicapDashboard: React.FC<{ userId: string; ownerFirstName: string
         <div className="h-3 w-44 bg-muted/60 rounded mb-5" />
         <div className="h-16 w-28 bg-muted rounded mb-3" />
         <div className="h-4 w-36 bg-muted/60 rounded" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="px-6 py-16 text-center" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+        <p style={{ fontSize: 14, color: INK_55, fontFamily: FONT_GEIST, margin: 0 }}>
+          Couldn't load this player's handicap.
+        </p>
+        <button
+          type="button"
+          onClick={() => refetch()}
+          style={{ background: INK, color: '#fff', border: 'none', borderRadius: 999, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: FONT_GEIST }}
+        >
+          Retry
+        </button>
       </div>
     );
   }
@@ -377,7 +394,7 @@ const HandicapPage: React.FC = () => {
     enabled: !!ownerUserId,
     staleTime: 5 * 60_000,
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('user_profiles')
         .select('username, display_name, profile_photo_url')
         .eq('id', ownerUserId!)
@@ -419,14 +436,14 @@ const HandicapPage: React.FC = () => {
   // on every render in the same order (rules of hooks).
   // `useWhsConnection` is guarded internally by `enabled: !!userId`, so
   // passing undefined is safe — it just stays disabled.
-  const { data: ownConnection, isLoading: connLoading } = useWhsConnection(
+  const { data: ownConnection, isLoading: connLoading, isError: connError, refetch: refetchConn } = useWhsConnection(
     isFriendView ? undefined : (ownerUserId ?? undefined)
   );
   const hasConnection = isFriendView ? true : !!ownConnection;
-  // Connect flow = own view, query settled, no connection. The whole page is
+  // Connect flow = own view, query settled, no error, no connection. The whole page is
   // light now (matches Clubhouse/Watch/Tours) — connect flow no longer needs
   // a special-case background.
-  const isConnectFlow = !isFriendView && !connLoading && !ownConnection;
+  const isConnectFlow = !isFriendView && !connLoading && !connError && !ownConnection;
 
   // Apply the dark route theming only when NOT in the connect flow.
   // The connect flow uses Direction A (light) and the dark theming would
@@ -452,6 +469,30 @@ const HandicapPage: React.FC = () => {
 
   if (!ownerUserId) {
     return <Navigate to="/auth" replace />;
+  }
+
+  // Own-mode error branch — a failed useWhsConnection must not fall through
+  // to the connect flow (would prompt an already-connected user to reconnect).
+  if (!isFriendView && connError) {
+    return (
+      <PageRoot dark={true}>
+        <div style={{ minHeight: '70vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, padding: 24, textAlign: 'center', fontFamily: FONT_GEIST }}>
+          <div style={{ fontSize: 16, fontWeight: 700, color: '#F8FAFC' }}>
+            Couldn't load your handicap
+          </div>
+          <div style={{ fontSize: 13, color: 'rgba(248,250,252,0.65)', maxWidth: 280 }}>
+            Check your connection and try again.
+          </div>
+          <button
+            type="button"
+            onClick={() => refetchConn()}
+            style={{ background: AMBER, color: '#0F172A', border: 'none', borderRadius: 999, padding: '10px 20px', fontSize: 13.5, fontWeight: 700, cursor: 'pointer', fontFamily: FONT_GEIST }}
+          >
+            Retry
+          </button>
+        </div>
+      </PageRoot>
+    );
   }
 
   // Connect flow: Direction A header (matches /manage/handicap exactly).
