@@ -45,7 +45,7 @@ const fmtDate = (iso: string) => {
 };
 
 // ── Skeleton ──────────────────────────────────────────────────────────────
-const Skeleton: React.FC = () => (
+const CardSkeleton: React.FC = () => (
   <section style={{ marginTop: 32 }}>
     <DarkSectionHeader eyebrow="ROUNDS THAT COUNT" title="" />
     <div style={{ padding: '0 16px' }}>
@@ -57,23 +57,25 @@ const Skeleton: React.FC = () => (
           padding: '16px 14px 12px',
         }}
       >
-        <div style={{ height: 10, background: 'var(--hcp-bg-3)', borderRadius: 2 }} />
-        <div
+        <Skeleton variant="dark" style={{ height: 10, borderRadius: 2 }} />
+        <Skeleton
+          variant="dark"
           style={{
             height: 40,
-            background: 'var(--hcp-bg-3)',
             borderRadius: 11,
             margin: '10px 0 8px',
           }}
         />
-        <div style={{ height: 108, background: 'var(--hcp-bg-3)', borderRadius: 4 }} />
-        <div
-          style={{ height: 12, background: 'var(--hcp-bg-3)', borderRadius: 2, marginTop: 12 }}
+        <Skeleton variant="dark" style={{ height: 108, borderRadius: 4 }} />
+        <Skeleton
+          variant="dark"
+          style={{ height: 12, borderRadius: 2, marginTop: 12 }}
         />
       </div>
     </div>
   </section>
 );
+
 
 // ── Component ─────────────────────────────────────────────────────────────
 export const RoundsThatCountCard: React.FC<Props> = ({
