@@ -409,13 +409,15 @@ export default function BusinessProfileEditor() {
   const exitTo = mode === 'edit' && id ? `/business/${id}` : -1;
   const handleClose = () => {
     if (isDirty) setShowCloseConfirm(true);
-    else (exitTo === -1 ? navigate(-1) : navigate(exitTo as string));
+    else if (exitTo === -1) navigate(-1);
+    else navigate(exitTo as string);
   };
   const confirmClose = () => {
     setShowCloseConfirm(false);
     if (logo.localPreview) URL.revokeObjectURL(logo.localPreview);
     if (cover.localPreview) URL.revokeObjectURL(cover.localPreview);
-    exitTo === -1 ? navigate(-1) : navigate(exitTo as string);
+    if (exitTo === -1) navigate(-1);
+    else navigate(exitTo as string);
   };
 
   /* ── save: edit mode uses this hook (needs id) ───── */
