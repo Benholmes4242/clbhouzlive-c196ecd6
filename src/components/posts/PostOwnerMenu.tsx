@@ -178,7 +178,7 @@ export const PostOwnerMenu: React.FC<PostOwnerMenuProps> = ({
   return (
     <>
       <div className={wrapperClass} onClick={stopAll}>
-        <DropdownMenu>
+        <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
           <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"
