@@ -892,6 +892,8 @@ const AppInner: React.FC = () => {
         <AdminGatedPerfPill />
         <AdminGatedBootTimelinePill />
         <AudioDebugHud />
+        <AdminGatedAudioLogsButton />
+
         
         
         
