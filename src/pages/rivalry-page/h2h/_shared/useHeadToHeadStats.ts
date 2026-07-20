@@ -156,12 +156,12 @@ export function useHeadToHeadStats(
 
       // 1. Rival's connection (any one)
       const { data: rivalConn } = await supabase
-        .from('whs_connections' as any)
+        .from('whs_connections' as never)
         .select('id')
         .eq('user_id', rivalUserId)
         .limit(1)
         .maybeSingle();
-      const rivalConnectionId = (rivalConn as any)?.id as string | undefined;
+      const rivalConnectionId = (rivalConn as { id?: string } | null)?.id as string | undefined;
 
       // 2. Both TrophyAggregates in parallel
       const [meAgg, themAgg] = await Promise.all([
@@ -173,7 +173,7 @@ export function useHeadToHeadStats(
 
       // 3. gam_round_stats for both users
       const { data: gamRows } = await supabase
-        .from('gam_round_stats' as any)
+        .from('gam_round_stats' as never)
         .select(
           'user_id, play_date, gross_score, stableford_points, sub_80, sub_70, beat_par, course_par, hcp_at_time, holes_played',
         )
