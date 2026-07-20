@@ -480,15 +480,17 @@ function StreamRow({ item, first, done, onClick }: {
 function VerificationInboxSheet({ row, onClose }: { row: VerificationRow | null; onClose: () => void }) {
   const { reviewMutation } = useVerifications();
   const [note, setNote] = useState('');
-  useEffect(() => { if (!row) setNote(''); }, [row]);
+  const [decision, setDecision] = useState<'approved' | 'rejected' | 'needs_more_info' | null>(null);
+  useEffect(() => { if (!row) { setNote(''); setDecision(null); } }, [row]);
 
   if (!row) return null;
 
-  const submit = (decision: 'approved' | 'rejected' | 'needs_more_info') => {
-    if (decision !== 'approved' && note.trim().length < 3) return;
-    if (row.type === 'golfer' && decision === 'needs_more_info') return;
+  const submit = (d: 'approved' | 'rejected' | 'needs_more_info') => {
+    if (d !== 'approved' && note.trim().length < 3) { setDecision(d); return; }
+    if (row.type === 'golfer' && d === 'needs_more_info') return;
     reviewMutation.mutate(
-      { id: row.id, type: row.type, decision: decision as any, adminNote: note },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      { id: row.id, type: row.type, decision: d as any, adminNote: note },
       { onSuccess: onClose },
     );
   };
@@ -532,32 +534,7 @@ function VerificationInboxSheet({ row, onClose }: { row: VerificationRow | null;
         </div>
       }
     >
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {row.note && (
-          <div style={{ padding: 12, background: t.canvas, borderRadius: t.radius.md, border: `1px solid ${t.line}`, fontSize: 13, color: t.ink, lineHeight: 1.5 }}>
-            {row.note}
-          </div>
-        )}
-        {row.evidenceUrl && (
-          <a href={row.evidenceUrl} target="_blank" rel="noopener noreferrer" style={{ color: t.brandText, fontSize: 13, fontWeight: 600 }}>
-            Open evidence
-          </a>
-        )}
-        <label style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.4, textTransform: 'uppercase', color: t.inkFaint }}>
-          Admin note (required to reject or ask for info)
-        </label>
-        <textarea
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          rows={3}
-          placeholder="Note for the requester"
-          style={{
-            width: '100%', padding: 10, borderRadius: t.radius.md,
-            border: `1px solid ${t.line}`, background: t.surface, color: t.ink,
-            fontSize: 13, fontFamily: 'inherit', resize: 'vertical', outline: 'none',
-          }}
-        />
-      </div>
+      <VerificationDetailBody row={row} note={note} setNote={setNote} decision={decision} />
     </AdminSheet>
   );
 }
