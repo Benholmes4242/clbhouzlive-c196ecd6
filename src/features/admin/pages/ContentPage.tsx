@@ -797,33 +797,50 @@ function AddCourseSheet({ open, onClose, onCreated, uploadPhoto }: {
   onCreated: () => void;
   uploadPhoto: (id: string, file: File) => Promise<any>;
 }) {
-  const [form, setForm] = useState({
+  const EMPTY = {
     name: '', country: '', continent: '',
     sub_country: '', region: '',
     latitude: '', longitude: '',
     website_url: '', course_type: '',
     has_hosted_major: false, description: '',
-  });
+  };
+  const [form, setForm] = useState(EMPTY);
   const [busy, setBusy] = useState(false);
+  const [draftRestored, setDraftRestored] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
-  const set = (k: keyof typeof form, v: any) => setForm(f => ({ ...f, [k]: v }));
+  const draftKey = draftKeys.courseNew();
+  const set = (k: keyof typeof form, v: any) => setForm(f => {
+    const next = { ...f, [k]: v };
+    saveDraft(draftKey, next);
+    return next;
+  });
 
   useEffect(() => {
-    if (!open) {
-      setForm({
-        name: '', country: '', continent: '',
-        sub_country: '', region: '',
-        latitude: '', longitude: '',
-        website_url: '', course_type: '',
-        has_hosted_major: false, description: '',
-      });
-      setPhotoFile(null);
-      if (photoPreview) URL.revokeObjectURL(photoPreview);
-      setPhotoPreview(null);
+    if (open) {
+      // Restore any prior draft when the sheet appears (fresh mount or reopen).
+      const draft = loadDraft(draftKey) as Partial<typeof EMPTY> | null;
+      if (draft && !draftsEqual(draft as any, EMPTY as any)) {
+        setForm({ ...EMPTY, ...draft });
+        setDraftRestored(true);
+      }
+      return;
     }
-  }, [open]);
+    // Closed: reset ephemeral form + photo, but leave the persisted draft alone.
+    setForm(EMPTY);
+    setDraftRestored(false);
+    setPhotoFile(null);
+    if (photoPreview) URL.revokeObjectURL(photoPreview);
+    setPhotoPreview(null);
+  }, [open]); // eslint-disable-line
+
+  const discardDraft = () => {
+    clearDraft(draftKey);
+    setForm(EMPTY);
+    setDraftRestored(false);
+  };
+
 
   const onPickPhoto = (f: File | null) => {
     if (photoPreview) URL.revokeObjectURL(photoPreview);
