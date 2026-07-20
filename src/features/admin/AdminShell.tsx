@@ -113,10 +113,13 @@ export default function AdminShell() {
                 <Route path="users/*"     element={can.viewUsers ? <UsersPage /> : <AdminAccessDenied />} />
                 <Route path="content/*"   element={<ContentPage />} />
                 <Route path="analytics/*" element={can.manageAdmins ? <AnalyticsPage /> : <AdminAccessDenied />} />
-                <Route path="system/*"    element={<SystemPage />} />
-                <Route path="video-perf/*" element={<VideoPerfPage />} />
-                <Route path="echo-health/*" element={can.manageAdmins ? <EchoHealthPage /> : <AdminAccessDenied />} />
-                <Route path="push-health/*" element={can.manageAdmins ? <PushHealthPage /> : <AdminAccessDenied />} />
+                <Route path="health/*" element={<HealthPage />} />
+
+                {/* Redirects: legacy health-family routes -> unified Health page */}
+                <Route path="system/*"      element={<RedirectPreserving to="/admin-v2/health" />} />
+                <Route path="echo-health/*" element={<RedirectPreserving to="/admin-v2/health" forceTab="status" />} />
+                <Route path="push-health/*" element={<RedirectPreserving to="/admin-v2/health" forceTab="status" />} />
+                <Route path="video-perf/*"  element={<RedirectPreserving to="/admin-v2/health" forceTab="video" />} />
 
                 {/* Redirects: seven old queue routes -> unified inbox (preserving query params) */}
                 <Route path="moderation/*"      element={<RedirectPreserving to="/admin-v2/inbox" forceType="report" />} />
