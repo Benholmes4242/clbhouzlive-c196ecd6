@@ -11,18 +11,3 @@ export const ENABLE_VERIFICATION_BYPASS = false;
 // Set to false for production deployments
 export const ENABLE_MOCK_VIDEOS = false; // ⚠️ DISABLED for testing real data
 
-/**
- * Suggested feed version switch.
- * `?feed=v3` persists v3 on the device; `?feed=v2` reverts. Default: v3.
- */
-export function getFeedVersion(): 'v2' | 'v3' {
-  try {
-    const url = new URLSearchParams(window.location.search).get('feed');
-    if (url === 'v3' || url === 'v2') {
-      localStorage.setItem('clbhouz.feedVersion', url);
-    }
-    return localStorage.getItem('clbhouz.feedVersion') === 'v2' ? 'v2' : 'v3';
-  } catch {
-    return 'v3';
-  }
-}
