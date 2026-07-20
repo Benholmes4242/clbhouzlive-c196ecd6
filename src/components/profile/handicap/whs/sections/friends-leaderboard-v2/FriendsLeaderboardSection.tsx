@@ -146,7 +146,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
       )}
 
       {/* THIS WEEK banner */}
-      {!isLoading && (
+      {!isLoading && !isError && (
         <WeeklyBanner
           banner={weeklyBanner ?? null}
           friends={cohorts.active.concat(cohorts.inactive)}
