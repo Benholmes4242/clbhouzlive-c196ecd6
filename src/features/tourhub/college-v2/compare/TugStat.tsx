@@ -114,7 +114,7 @@ function TugStatInner({ label, leftValue, rightValue, format, lowerWins = false 
         </div>
         <div
           style={{
-            fontSize: 8.5,
+            fontSize: 10,
             fontWeight: 800,
             color: INK_MUTE,
             letterSpacing: '0.16em',

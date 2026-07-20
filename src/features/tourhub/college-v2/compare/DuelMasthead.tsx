@@ -155,7 +155,7 @@ function Column({
           background: 'transparent',
           border: `0.75px solid ${WHITE_ALPHA_18}`,
           color: '#FFFFFF',
-          fontSize: 9,
+          fontSize: 10,
           fontWeight: 800,
           letterSpacing: '0.08em',
           textTransform: 'uppercase',
