@@ -6,6 +6,7 @@ import { projectNextRound } from '@/lib/whs/handicapMath';
 import { DarkSectionHeader } from './_shared/darkAtoms';
 import RoundDetailSheet from './round-detail/RoundDetailSheet';
 import { formatDayMonthShortGB } from '@/i18n/format';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface Props {
   connectionId: string;
