@@ -235,8 +235,9 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
             const Icon = !isLoading ? RECORD_ICON[tile.eyebrow] : null;
             const isEmpty = !isLoading && tile.value === '—';
             // Last card spans full width when there's an odd count (5 → last is full-width)
-            const isOddLast =
-              !isLoading && i === tiles.length - 1 && tiles.length % 2 === 1;
+            const isOddLast = isLoading
+              ? i === 4  // loading renders 5 tiles; the 5th spans, matching the loaded layout
+              : i === tiles.length - 1 && tiles.length % 2 === 1;
 
             return (
               <div
@@ -255,11 +256,11 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
                 {isLoading ? (
                   <>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <div style={{ width: 30, height: 30, borderRadius: 9, background: D_BG3 }} />
-                      <div style={{ width: 44, height: 26, background: D_BG3, borderRadius: 4 }} />
+                      <Skeleton variant="dark" style={{ width: 30, height: 30, borderRadius: 9 }} />
+                      <Skeleton variant="dark" style={{ width: 44, height: 26, borderRadius: 4 }} />
                     </div>
-                    <div style={{ height: 13, width: '70%', background: D_BG3, borderRadius: 2, marginTop: 12 }} />
-                    <div style={{ height: 10.5, width: '85%', background: D_BG3, borderRadius: 2, marginTop: 6 }} />
+                    <Skeleton variant="dark" style={{ height: 13, width: '70%', borderRadius: 2, marginTop: 12 }} />
+                    <Skeleton variant="dark" style={{ height: 10.5, width: '85%', borderRadius: 2, marginTop: 6 }} />
                   </>
                 ) : (
                   <>
