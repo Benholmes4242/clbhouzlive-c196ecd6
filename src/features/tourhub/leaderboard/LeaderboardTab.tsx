@@ -120,7 +120,7 @@ export function LeaderboardTab() {
   const [searchParams, setSearchParams] = useSearchParams();
   const eventParam = searchParams.get('event');
 
-  const { data: rawLive = [], isLoading: liveLoading } = useLiveTournaments();
+  const { data: rawLive = [], isLoading: liveLoading, isError: liveError, refetch: refetchLive } = useLiveTournaments();
   const [selectedId, setSelectedId] = useState<string | null>(eventParam);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
@@ -153,7 +153,7 @@ export function LeaderboardTab() {
   );
 
   const { data: meta } = useTournamentMeta(selected?.id ?? null);
-  const { data: boardRaw, isLoading: boardLoading } = useTourLeaderboard(selected?.id ?? '');
+  const { data: boardRaw, isLoading: boardLoading, isError: boardError, refetch: refetchBoard } = useTourLeaderboard(selected?.id ?? '');
 
   useEffect(() => {
     if (searchOpen) searchInputRef.current?.focus();
@@ -163,6 +163,25 @@ export function LeaderboardTab() {
     return <LeaderboardSkeleton />;
   }
   if (!selected) {
+    if (liveError) {
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, paddingTop: 'calc(var(--sat, 0px) + 90px)' }}>
+          <EditorialEmpty
+            tint="slate"
+            eyebrow={t('empty.leaderboard.error.eyebrow')}
+            title={t('empty.leaderboard.error.title')}
+            body={t('empty.leaderboard.error.body')}
+          />
+          <button
+            type="button"
+            onClick={() => refetchLive()}
+            style={{ background: INK, color: '#fff', border: 'none', borderRadius: 999, padding: '10px 20px', fontFamily: F, fontSize: 13.5, fontWeight: 700, cursor: 'pointer' }}
+          >
+            {t('board.retry')}
+          </button>
+        </div>
+      );
+    }
     return (
       <EditorialEmpty
         tint="slate"
@@ -173,7 +192,7 @@ export function LeaderboardTab() {
     );
   }
 
-  const boardEntries: BoardEntry[] = (boardRaw as any[] | undefined) ?? [];
+  const boardEntries: BoardEntry[] = boardRaw ?? [];
   const filteredEntries = searchQuery.trim()
     ? boardEntries.filter((e) =>
         (e.player?.full_name ?? '')
@@ -183,7 +202,7 @@ export function LeaderboardTab() {
     : boardEntries;
 
   const metaStatus = (meta?.status ?? selected.status ?? '').toLowerCase();
-  const currentRound = meta?.current_round ?? (selected as any).current_round ?? null;
+  const currentRound = meta?.current_round ?? selected.currentRound ?? null;
   const cutRound = meta?.cut_round ?? null;
   const cutline = meta?.cutline ?? null;
   const projectedCutline = meta?.projected_cutline ?? null;
@@ -470,7 +489,7 @@ export function LeaderboardTab() {
               today: todayFromEntry(row, currentRound),
               thru: row.thru,
               status: row.status ?? null,
-              playerPhotoUrl: (row.player as any)?.photo_url ?? null,
+              playerPhotoUrl: row.player?.photo_url ?? null,
             });
           }}
         />
