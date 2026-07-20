@@ -45,24 +45,18 @@ export function useProfilePosts({ userId, actorType, actorId }: UseProfilePostsP
           ? (pageParam as { createdAt: string; id: string })
           : undefined;
 
-      const params: {
-        p_user_id: string;
-        p_actor_type: string;
-        p_actor_id: string;
-        p_viewer_actor_type: string;
-        p_viewer_actor_id: string;
-        p_page_size: number;
-        p_seen_post_ids: string[];
-        p_cursor?: string;
-        p_cursor_id?: string;
-      } = {
-        p_user_id: userId ?? '',
+      type RpcParams = Parameters<typeof supabase.rpc<'get_profile_posts'>>[1];
+      const params = {
+        p_user_id: userId ?? null,
         p_actor_type: actorType,
         p_actor_id: actorId,
         p_viewer_actor_type: activeActor?.type ?? 'personal',
-        p_viewer_actor_id: activeActor?.id ?? userId ?? '',
+        p_viewer_actor_id: activeActor?.id ?? userId,
         p_page_size: PAGE_SIZE,
         p_seen_post_ids: seenPostIds.current,
+      } as unknown as RpcParams & {
+        p_cursor?: string;
+        p_cursor_id?: string;
       };
 
       if (cursor) {
