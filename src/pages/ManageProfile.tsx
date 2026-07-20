@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { ChevronLeft, Loader2, ChevronDown, ChevronUp, Flag, Sparkles, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { toast } from '@/lib/toast';
-import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
+import { ManagePageSkeleton } from '@/components/skeletons/ManagePageSkeleton';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileForm } from '@/hooks/useProfileForm';
@@ -186,7 +186,7 @@ export default function ManageProfile() {
     );
   }
 
-  if (loading && !isNewUser.current) return <ProfileSkeleton />;
+  if (loading && !isNewUser.current) return <ManagePageSkeleton />;
 
   const handleSave = async () => {
     if (isNewUser.current && form.username.trim()) {
@@ -685,8 +685,8 @@ function ProfileTabBody({
           disabled={isDisabled}
           className="w-full min-h-[52px] rounded-[13px] text-[15px] font-bold border-0 active:opacity-90 transition-opacity"
           style={{
-            background: isDisabled ? 'rgba(15,23,42,0.06)' : INK,
-            color: isDisabled ? 'rgba(15,23,42,0.45)' : '#fff',
+            background: (isDisabled && !isSaving) ? 'rgba(15,23,42,0.06)' : INK,
+            color: (isDisabled && !isSaving) ? 'rgba(15,23,42,0.45)' : '#fff',
             fontFamily: GEIST,
           }}
         >

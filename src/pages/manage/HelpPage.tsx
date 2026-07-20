@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronDown, Search, LifeBuoy } from 'lucide-react';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useHelpArticles, type HelpArticle } from '@/hooks/useHelpArticles';
 
 const INK = '#0F172A';
@@ -103,8 +104,13 @@ export default function HelpPage() {
     <ManagePageShell title="Help centre" belowTitle={searchBar}>
       <div className="px-4 pt-2 pb-0 space-y-6">
         {isLoading && (
-          <div className="text-[13px]" style={{ color: INK_55 }}>Loading articles...</div>
+          <div className="space-y-2">
+            {[0, 1, 2, 3].map((i) => (
+              <Skeleton key={i} className="h-14 w-full rounded-xl" />
+            ))}
+          </div>
         )}
+
 
         {!isLoading && isError && (
           <div

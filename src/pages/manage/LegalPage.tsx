@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useLegalDocuments } from '@/hooks/useLegalDocuments';
 
 const INK_55 = '#64748B';
@@ -18,8 +19,12 @@ export default function LegalPage() {
           style={{ background: '#fff', border: '1px solid rgba(15,23,42,0.07)' }}
         >
           {isLoading && (
-            <div className="p-4 text-[14px]" style={{ color: INK_55 }}>Loading…</div>
+            <div className="p-4 space-y-3">
+              <Skeleton className="h-12 w-full rounded-lg" />
+              <Skeleton className="h-12 w-full rounded-lg" />
+            </div>
           )}
+
 
           {!isLoading && docs.length === 0 && (
             <div className="p-4 text-[14px]" style={{ color: INK_55 }}>

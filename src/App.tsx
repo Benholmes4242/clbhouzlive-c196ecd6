@@ -67,6 +67,7 @@ import { FEATURE_FLAGS } from '@/config/featureFlags';
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
 import { CoursesListSkeleton } from '@/components/skeletons/CoursesListSkeleton';
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
+import { ManagePageSkeleton } from '@/components/skeletons/ManagePageSkeleton';
 import { HandicapPageSkeleton } from '@/components/skeletons/HandicapPageSkeleton';
 import { CoursesHubSkeleton } from '@/components/skeletons/CoursesHubSkeleton';
 
@@ -456,16 +457,17 @@ function AppRoutes() {
         <Route path="/profile/quest" element={<Suspense fallback={<ProfileSkeleton />}><ProfileQuestView /></Suspense>} />
         <Route path="/profile/quest/index" element={<Suspense fallback={<ProfileSkeleton />}><QuestIndexView /></Suspense>} />
         <Route path="/profile/quest/replay" element={<Navigate to="/profile" replace />} />
-        <Route path="/edit-profile" element={<Suspense fallback={<ProfileSkeleton />}><ManageProfilePage /></Suspense>} />
-        <Route path="/manage/email" element={<Suspense fallback={<ProfileSkeleton />}><ManageEmailPage /></Suspense>} />
-        <Route path="/manage/blocked" element={<Suspense fallback={<ProfileSkeleton />}><ManageBlockedPage /></Suspense>} />
-        <Route path="/manage/notifications" element={<Suspense fallback={<ProfileSkeleton />}><ManageNotificationsPage /></Suspense>} />
-        <Route path="/manage/help" element={<Suspense fallback={<ProfileSkeleton />}><ManageHelpPage /></Suspense>} />
-        <Route path="/manage/contact" element={<Suspense fallback={<ProfileSkeleton />}><ManageContactPage /></Suspense>} />
-        <Route path="/manage/requests" element={<Suspense fallback={<ProfileSkeleton />}><ManageMyRequestsPage /></Suspense>} />
-        <Route path="/support/thread/:id" element={<Suspense fallback={<ProfileSkeleton />}><SupportThreadPage /></Suspense>} />
-        <Route path="/manage/legal" element={<Suspense fallback={<ProfileSkeleton />}><ManageLegalPage /></Suspense>} />
-        <Route path="/manage/handicap" element={<Suspense fallback={<ProfileSkeleton />}><ManageHandicapPage /></Suspense>} />
+        <Route path="/edit-profile" element={<Suspense fallback={<ManagePageSkeleton />}><ManageProfilePage /></Suspense>} />
+        <Route path="/manage/email" element={<Suspense fallback={<ManagePageSkeleton />}><ManageEmailPage /></Suspense>} />
+        <Route path="/manage/blocked" element={<Suspense fallback={<ManagePageSkeleton />}><ManageBlockedPage /></Suspense>} />
+        <Route path="/manage/notifications" element={<Suspense fallback={<ManagePageSkeleton />}><ManageNotificationsPage /></Suspense>} />
+        <Route path="/manage/help" element={<Suspense fallback={<ManagePageSkeleton />}><ManageHelpPage /></Suspense>} />
+        <Route path="/manage/contact" element={<Suspense fallback={<ManagePageSkeleton />}><ManageContactPage /></Suspense>} />
+        <Route path="/manage/requests" element={<Suspense fallback={<ManagePageSkeleton />}><ManageMyRequestsPage /></Suspense>} />
+        <Route path="/support/thread/:id" element={<Suspense fallback={<ManagePageSkeleton />}><SupportThreadPage /></Suspense>} />
+        <Route path="/manage/legal" element={<Suspense fallback={<ManagePageSkeleton />}><ManageLegalPage /></Suspense>} />
+        <Route path="/manage/handicap" element={<Suspense fallback={<ManagePageSkeleton />}><ManageHandicapPage /></Suspense>} />
+
 
         
         
