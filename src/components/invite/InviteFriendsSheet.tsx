@@ -6,6 +6,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection, useFriendLeaderboard, useSentInvites, whsKeys } from '@/lib/whs/hooks';
+import type { FriendLeaderboardEntry, WhsInviteStatus } from '@/lib/whs/types';
 import { callCreateInvite } from '@/lib/whs/api';
 import { shareInvite, firstName } from '@/lib/whs/share';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
@@ -38,7 +39,10 @@ interface GenericInviteResp {
 
 async function createGenericInvite(source: string): Promise<GenericInviteResp | null> {
   try {
-    const { data, error } = await supabase.rpc('create_generic_invite' as any, {
+    const { data, error } = await (supabase.rpc as unknown as (
+      name: string,
+      params: { p_source: string },
+    ) => Promise<{ data: unknown; error: { message: string } | null }>)('create_generic_invite', {
       p_source: source,
     });
     if (error) {
@@ -131,8 +135,8 @@ function ConnectedState({ ownerUserId, source }: { ownerUserId: string; source: 
 
   const sentByPassportId = useMemo(() => {
     const map = new Map<string, { created_at: string }>();
-    (sent ?? []).forEach((s: any) => {
-      if (s.invitee_passport_id) map.set(String(s.invitee_passport_id), { created_at: s.created_at });
+    (sent ?? []).forEach((s: WhsInviteStatus) => {
+      if (s.invitee_passport_id) map.set(String(s.invitee_passport_id), { created_at: s.sent_at });
     });
     return map;
   }, [sent]);
@@ -247,7 +251,7 @@ function EGFriendRow({
   friend,
   already,
 }: {
-  friend: any;
+  friend: FriendLeaderboardEntry;
   already?: { created_at: string };
 }) {
   const queryClient = useQueryClient();
