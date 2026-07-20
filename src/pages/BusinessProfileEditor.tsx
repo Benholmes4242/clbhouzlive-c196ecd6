@@ -261,9 +261,9 @@ export default function BusinessProfileEditor() {
       n: business.name, d: business.description, fy: business.founded_year,
       w: business.website, e: business.email, p: business.phone,
       oh: business.opening_hours, sl, addr: business.address_label, loc: business.location,
-      am: (business as any).amenities || [],
-      pa: (business as any).primary_action || null,
-      soh: !!(business as any).show_opening_hours,
+      am: business.amenities || [],
+      pa: business.primary_action || null,
+      soh: !!business.show_opening_hours,
     });
   }, [mode, business]);
 
