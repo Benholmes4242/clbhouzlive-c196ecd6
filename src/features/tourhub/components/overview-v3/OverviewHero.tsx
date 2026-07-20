@@ -23,10 +23,18 @@ import { INK_TINT_06 } from '../../_shared/tokens';
 const NOOP = () => {};
 
 interface OverviewHeroProps {
-  height?: number;
+  height?: number | string;
 }
 
-export function OverviewHero({ height = 528 }: OverviewHeroProps) {
+/**
+ * Canonical hero height — matches the Courses Discover hero
+ * (`CoursesPageHero`) and the Course Details cinematic hero
+ * (`CinematicHeroFullBleed`). Keep in sync with those surfaces.
+ */
+export const OVERVIEW_HERO_HEIGHT =
+  'calc(clamp(380px, 44dvh, 460px) + env(safe-area-inset-top, 0px))';
+
+export function OverviewHero({ height = OVERVIEW_HERO_HEIGHT }: OverviewHeroProps) {
   const { t } = useTranslation('tourhub');
   const { data: rawSlides = [], isLoading } = useHeroCarouselData();
 
