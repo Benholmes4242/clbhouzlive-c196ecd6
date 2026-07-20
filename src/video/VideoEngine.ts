@@ -1316,15 +1316,30 @@ class VideoEngineImpl {
     return this.getLane(laneId).el.currentTime || 0;
   }
 
-  setMuted(laneId: LaneId, muted: boolean): void {
+  setMuted(laneId: LaneId, muted: boolean, trigger: string = 'setMuted'): void {
     const lane = this.getLane(laneId);
     const enforcedOn: LaneId[] = [];
-    logAudio('setMuted.enter', { laneId, desired: muted, msSinceOpen: msSinceOpen() });
+    logAudio('setMuted.enter', { laneId, desired: muted, trigger, msSinceOpen: msSinceOpen() });
     if (!muted && ONE_UNMUTED_LANE) {
       // Enforce: mute every other lane first.
+      let claimerRole: 'active' | 'next' | 'prev' | null = null;
+      try {
+        if (feedLaneRoles.isFeedLane(laneId)) claimerRole = feedLaneRoles.roleForLane(laneId);
+      } catch { /* noop */ }
       this.lanes.forEach((other) => {
         if (other.id !== laneId) {
-          if (!other.el.muted) enforcedOn.push(other.id);
+          if (!other.el.muted) {
+            enforcedOn.push(other.id);
+            // The theft record: someone else was audible and this claim
+            // silenced them. Heartbeat distinguishes theft from a simple
+            // "active lane never claimed" case (unmutedLanes=[]).
+            logAudio('audio.slot.enforce', {
+              victimLaneId: other.id,
+              claimerLaneId: laneId,
+              claimerRole,
+              trigger,
+            });
+          }
           other.el.muted = true;
         }
       });
@@ -1332,9 +1347,10 @@ class VideoEngineImpl {
     lane.el.muted = muted;
     this.emit(lane);
     logAudio('setMuted.exit', {
-      laneId, desired: muted, oneUnmutedEnforcedOn: enforcedOn,
+      laneId, desired: muted, trigger, oneUnmutedEnforcedOn: enforcedOn,
     });
   }
+
 
 
   /** Set object-fit on the lane's <video> element. */
