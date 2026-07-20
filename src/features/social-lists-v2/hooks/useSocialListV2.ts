@@ -11,6 +11,14 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
+// Minimal structural typing for the get_social_list RPC — supabase's
+// generated types don't include it. The RPC returns SocialListRow[].
+type SocialListRpc = (
+  fn: 'get_social_list',
+  args: Record<string, unknown>,
+) => Promise<{ data: SocialListRow[] | null; error: { message: string } | null }>;
+const rpcSocialList = supabase.rpc as unknown as SocialListRpc;
+
 export type FriendStatus =
   | 'friend'
   | 'pending_sent'
@@ -69,7 +77,7 @@ export function useSocialListV2({
     staleTime: 60_000,
     queryFn: async ({ pageParam }) => {
       if (!actorId) return { rows: [] as SocialListRow[], totalCount: 0 };
-      const { data, error } = await (supabase as any).rpc('get_social_list', {
+      const { data, error } = await rpcSocialList('get_social_list', {
         p_profile_actor_type: actorType,
         p_profile_actor_id: actorId,
         p_direction: direction,
@@ -111,7 +119,7 @@ export function useSocialListCounts(
     queryFn: async () => {
       if (!actorId) return { followers: 0, following: 0 };
       const [f, g] = await Promise.all([
-        (supabase as any).rpc('get_social_list', {
+        rpcSocialList('get_social_list', {
           p_profile_actor_type: actorType,
           p_profile_actor_id: actorId,
           p_direction: 'followers',
@@ -120,7 +128,7 @@ export function useSocialListCounts(
           p_page_size: 1,
           p_offset: 0,
         }),
-        (supabase as any).rpc('get_social_list', {
+        rpcSocialList('get_social_list', {
           p_profile_actor_type: actorType,
           p_profile_actor_id: actorId,
           p_direction: 'following',
