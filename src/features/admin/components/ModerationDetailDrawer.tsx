@@ -318,7 +318,7 @@ export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
                     </div>
                   </div>
                   <div style={{ color: t.ink, fontSize: 14, whiteSpace: 'pre-wrap', lineHeight: 1.45 }}>
-                    {row.targetPost.content?.trim() || <em style={{ color: t.inkFaint }}>(no text content)</em>}
+                    {stripMentionMarkup(row.targetPost.content ?? '').trim() || <em style={{ color: t.inkFaint }}>(no text content)</em>}
                   </div>
                   <div style={{ color: t.inkFaint, fontSize: 11, fontFamily: 'monospace' }}>{row.targetPost.id}</div>
                 </div>
