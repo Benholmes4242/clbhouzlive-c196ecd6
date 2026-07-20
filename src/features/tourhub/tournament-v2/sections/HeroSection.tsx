@@ -335,7 +335,8 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
               {leader.thru != null && (
                 <div
                   style={{
-                    fontSize: 9,
+                    fontSize: 10,
+
                     fontWeight: 700,
                     letterSpacing: '0.14em',
                     color: 'rgba(255,255,255,0.62)',
