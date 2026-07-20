@@ -7,6 +7,7 @@ import { ConversationRow } from './ConversationRow';
 import NewConversationSheet from './NewConversationSheet';
 import { useMessagingActor } from '@/hooks/messaging/useMessagingActor';
 import { safeLocalStorage } from '@/utils/safeLocalStorage';
+import { Skeleton } from '@/components/ui/skeleton';
 
 
 const CANVAS = '#F8FAFC';
