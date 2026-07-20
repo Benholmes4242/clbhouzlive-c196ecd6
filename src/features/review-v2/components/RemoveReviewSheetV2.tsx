@@ -3,9 +3,10 @@
  * and cleanup-review-media handles storage assets.
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { X, Trash2 } from 'lucide-react';
 import { RV2 } from '../tokens';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 
 interface Props {
   open: boolean;
@@ -15,6 +16,12 @@ interface Props {
 }
 
 export function RemoveReviewSheetV2({ open, submitting, onCancel, onConfirm }: Props) {
+  useEffect(() => {
+    if (!open) return;
+    lockBodyScroll();
+    return () => unlockBodyScroll();
+  }, [open]);
+
   if (!open) return null;
 
   return (
