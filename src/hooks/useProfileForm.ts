@@ -4,22 +4,44 @@ import { nanoid } from 'nanoid';
 import { formHcpFromDb } from '@/lib/formatHcp';
 import { supabase } from '@/integrations/supabase/client';
 
-type RawProfile = Record<string, unknown> & {
+interface RawProfile {
   id?: string;
-  social_links?: Record<string, string | null | undefined> | null;
-  additional_clubs?: Array<{ name?: string; club_id?: string | null }> | null;
-  websites?: string[] | null;
+  username?: string | null;
+  username_is_custom?: boolean | null;
+  has_completed_onboarding?: boolean | null;
+  display_name?: string | null;
+  first_name?: string | null;
+  last_name?: string | null;
+  profile_photo_url?: string | null;
+  header_photo_url?: string | null;
+  home_club?: string | null;
   primary_club_id?: string | null;
-} | null | undefined;
+  additional_clubs?: Array<{ name: string; club_id?: string | null }> | null;
+  manual_handicap_index?: number | null;
+  home_club_visibility?: string | null;
+  additional_clubs_visibility?: string | null;
+  bio?: string | null;
+  websites?: string[] | null;
+  instagram_handle?: string | null;
+  twitter_handle?: string | null;
+  tiktok_handle?: string | null;
+  youtube_handle?: string | null;
+  country?: string | null;
+  city?: string | null;
+  is_public?: boolean | null;
+  gender?: string | null;
+  social_links?: {
+    instagram?: string | null;
+    twitter?: string | null;
+    tiktok?: string | null;
+    youtube?: string | null;
+  } | null;
+}
 
 type HomeClubRow = { club_id: string | null; golf_clubs: { id: string; name: string } | null };
 
-function get<T = unknown>(profile: RawProfile, key: string): T | undefined {
-  return profile ? (profile as Record<string, unknown>)[key] as T | undefined : undefined;
-}
-
-function makeInitial(profile: RawProfile): ProfileFormData {
-  const social = (profile?.social_links ?? {}) as Record<string, string | undefined>;
+function makeInitial(profile: RawProfile | null | undefined): ProfileFormData {
+  const social = profile?.social_links ?? {};
 
   // Onboarding-aware username seed: never show the auto-generated username
   // to a first-time user. Seed empty so they actively choose one.
