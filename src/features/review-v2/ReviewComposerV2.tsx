@@ -11,8 +11,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, Trash2 } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { invalidateCourseRatingCaches } from '@/utils/invalidateCourseRatingCaches';
 import { toast } from '@/lib/toast';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { MentionsComposerInput } from '@/components/mentions/MentionsComposerInput';
