@@ -137,17 +137,19 @@ function currentSeasonYear(): number {
 async function resolvePgaSeasonId(): Promise<string | null> {
   const year = currentSeasonYear();
   for (const y of [year, year - 1]) {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('sr_seasons')
       .select('id')
       .eq('tour_name', 'pga')
       .eq('year', y)
       .limit(10);
+    if (error) throw error;
     for (const row of data ?? []) {
-      const { count } = await supabase
+      const { count, error: cntErr } = await supabase
         .from('sr_player_statistics')
         .select('id', { count: 'exact', head: true })
         .eq('season_id', row.id);
+      if (cntErr) throw cntErr;
       if ((count ?? 0) > 0) return row.id;
     }
   }
@@ -156,10 +158,36 @@ async function resolvePgaSeasonId(): Promise<string | null> {
 
 // PGA category definitions (accessor + sort + format). Labels are resolved via
 // LEADER_STAT_LABELS[key] at render — no display strings live here.
+type PgaStatRow = {
+  player_id: string | null;
+  earnings: number | null;
+  scoring_average: number | null;
+  wins: number | null;
+  top_10s: number | null;
+  driving_distance: number | null;
+  driving_accuracy: number | null;
+  greens_in_reg: number | null;
+  sand_saves: number | null;
+  putting_average: number | null;
+  strokes_gained_tee_green: number | null;
+  strokes_gained_putting: number | null;
+};
+
+type TourSeasonRankingRow = {
+  player_id: string | null;
+  manual_player_id: string | null;
+  player_name: string | null;
+  position: number | null;
+  points: number | null;
+  wins: number | null;
+  country: string | null;
+  tour_code: string | null;
+};
+
 interface PgaCatSpec {
   key: string;
   dir: 'asc' | 'desc';
-  accessor: (s: any) => number | null;
+  accessor: (s: PgaStatRow) => number | null;
   format: (v: number) => string;
 }
 
@@ -188,21 +216,23 @@ type PlayerRec = {
 
 async function fetchPlayers(ids: string[]): Promise<Map<string, PlayerRec>> {
   if (!ids.length) return new Map();
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('sr_players')
     .select('id, full_name, country, country_code, photo_url, tour_codes')
     .in('id', ids);
+  if (error) throw error;
   return new Map(((data ?? []) as PlayerRec[]).map((p) => [p.id, p]));
 }
 
 async function fetchWorldRankingCat(): Promise<LeaderCategoryDef | null> {
   // World ranking (OWGR) is PGA-centric / male-tour — restricted to PGA only.
-  const { data } = await supabase
+  const { data, error: rankErr } = await supabase
     .from('sr_world_rankings')
     .select('player_id, rank, points, ranking_date')
     .order('ranking_date', { ascending: false })
     .order('rank', { ascending: true })
     .limit(600);
+  if (rankErr) throw rankErr;
   if (!data?.length) return null;
   const latestDate = data[0].ranking_date;
   const latest = data.filter((r) => r.ranking_date === latestDate);
@@ -243,22 +273,23 @@ async function fetchPgaCategories(): Promise<LeaderCategoriesResult> {
     const world = await fetchWorldRankingCat();
     return { synced: false, categories: world ? [world] : [], year: currentSeasonYear() };
   }
-  const { data: stats } = await supabase
+  const { data: stats, error: statsErr } = await supabase
     .from('sr_player_statistics')
     .select(
       'player_id, earnings, scoring_average, wins, top_10s, driving_distance, driving_accuracy, greens_in_reg, sand_saves, putting_average, strokes_gained_tee_green, strokes_gained_putting'
     )
     .eq('season_id', seasonId)
     .limit(500);
+  if (statsErr) throw statsErr;
 
-  const pool = stats ?? [];
-  const playerIds = [...new Set(pool.map((s: any) => s.player_id).filter(Boolean))];
+  const pool = (stats ?? []) as PgaStatRow[];
+  const playerIds = [...new Set(pool.map((s) => s.player_id).filter((v): v is string => !!v))];
   const pmap = await fetchPlayers(playerIds);
 
   const categories: LeaderCategoryDef[] = PGA_CATS
     .map((cat) => {
       const rows: Array<{ pid: string; value: number }> = [];
-      for (const s of pool as any[]) {
+      for (const s of pool) {
         const v = cat.accessor(s);
         if (v == null || v === 0) continue;
         if (!s.player_id || !pmap.has(s.player_id)) continue;
@@ -296,39 +327,42 @@ async function fetchPgaCategories(): Promise<LeaderCategoriesResult> {
 
 async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCategoriesResult> {
   const year = currentSeasonYear();
-  let { data: rankings } = await supabase
-    .from('tour_season_rankings' as any)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const primary = await (supabase.from('tour_season_rankings' as any) as any)
     .select('player_id, manual_player_id, player_name, position, points, wins, country, tour_code')
     .eq('tour_code', tour)
     .eq('season_year', year)
     .order('position', { ascending: true })
     .limit(200);
-  if (!rankings?.length) {
-    const alt = await supabase
-      .from('tour_season_rankings' as any)
+  if (primary.error) throw primary.error;
+  let rankings = (primary.data ?? []) as TourSeasonRankingRow[];
+  if (!rankings.length) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const alt = await (supabase.from('tour_season_rankings' as any) as any)
       .select('player_id, manual_player_id, player_name, position, points, wins, country, tour_code')
       .eq('tour_code', tour)
       .eq('season_year', year - 1)
       .order('position', { ascending: true })
       .limit(200);
-    rankings = alt.data ?? [];
+    if (alt.error) throw alt.error;
+    rankings = (alt.data ?? []) as TourSeasonRankingRow[];
   }
 
   const categories: LeaderCategoryDef[] = [];
 
-  if (rankings?.length) {
-    const pool = rankings as any[];
+  if (rankings.length) {
+    const pool = rankings;
     const playerIds = [
       ...new Set(
         pool
-          .map((r) => (r.player_id ?? r.manual_player_id) as string | null)
+          .map((r) => (r.player_id ?? r.manual_player_id))
           .filter((v): v is string => !!v),
       ),
     ];
     const pmap = await fetchPlayers(playerIds);
 
-    const resolve = (r: any): LeaderRow | null => {
-      const pid = (r.player_id ?? r.manual_player_id ?? '') as string;
+    const resolve = (r: TourSeasonRankingRow): LeaderRow => {
+      const pid = (r.player_id ?? r.manual_player_id ?? '');
       const p = pid ? pmap.get(pid) : undefined;
       return {
         playerId: pid,
@@ -349,7 +383,7 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
       .sort((a, b) => Number(b.points) - Number(a.points))
       .slice(0, 50)
       .map((r, i) => {
-        const base = resolve(r)!;
+        const base = resolve(r);
         base.rank = i + 1;
         base.value = Number(r.points);
         base.valueFormatted = formatNumberMaxFrac(base.value, 2);
@@ -373,7 +407,7 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
       .sort((a, b) => Number(b.wins) - Number(a.wins))
       .slice(0, 50)
       .map((r, i) => {
-        const base = resolve(r)!;
+        const base = resolve(r);
         base.rank = i + 1;
         base.value = Number(r.wins);
         base.valueFormatted = fmtInt(base.value);

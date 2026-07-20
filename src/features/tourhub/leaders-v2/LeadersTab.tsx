@@ -21,6 +21,7 @@ import { TOUR_CONFIG, type TourId } from '../hooks/useOverviewData';
 import { useLivePlayerIds } from '../players-v2/data/useLivePlayerIds';
 import {
   FONT,
+  INK,
   INK_MUTE,
   SLATE_50,
 } from '../_shared/tokens';
@@ -63,7 +64,7 @@ export function LeadersTab() {
   const [activeTour, setActiveTour] = useState<TourId>(initialTour);
 
 
-  const { data: result, isLoading } = useLeaderCategories(activeTour);
+  const { data: result, isLoading, isError, refetch } = useLeaderCategories(activeTour);
   const { data: liveMap } = useLivePlayerIds();
 
   const categories = result?.categories ?? [];
@@ -163,6 +164,22 @@ export function LeadersTab() {
               style={{ height: 168, borderRadius: 16, margin: '0 16px 12px' }}
             />
           ))}
+        </div>
+      ) : isError ? (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '48px 16px', textAlign: 'center' }}>
+          <div style={{ fontFamily: FONT, fontSize: 15, fontWeight: 700, color: INK }}>
+            {t('leaders.error.title', { defaultValue: "Couldn't load the boards" })}
+          </div>
+          <div style={{ fontFamily: FONT, fontSize: 13, color: INK_MUTE, maxWidth: 280 }}>
+            {t('leaders.error.body', { defaultValue: 'Check your connection and try again.' })}
+          </div>
+          <button
+            type="button"
+            onClick={() => refetch()}
+            style={{ background: INK, color: '#fff', border: 'none', borderRadius: 999, padding: '10px 20px', fontFamily: FONT, fontSize: 13.5, fontWeight: 700, cursor: 'pointer' }}
+          >
+            {t('leaders.error.retry', { defaultValue: 'Retry' })}
+          </button>
         </div>
       ) : categories.length === 0 ? (
         <TourHubEmptyState variant="leaderboard" />
