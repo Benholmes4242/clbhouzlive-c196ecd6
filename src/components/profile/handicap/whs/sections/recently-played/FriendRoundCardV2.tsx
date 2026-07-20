@@ -37,12 +37,14 @@ export const FriendRoundCardV2: React.FC<Props> = ({
 
   const par = useMemo(() => {
     if (!detail?.holes?.length) return null;
-    const played = detail.holes.filter((h: any) => h.played && h.par != null);
+    type HoleRow = { played?: boolean | null; par?: number | null };
+    const holes = detail.holes as ReadonlyArray<HoleRow>;
+    const played = holes.filter((h) => h.played && h.par != null);
     if (!played.length) return null;
-    return played.reduce((sum: number, h: any) => sum + (h.par ?? 0), 0);
+    return played.reduce((sum: number, h) => sum + (h.par ?? 0), 0);
   }, [detail]);
 
-  const slope = (detail as any)?.slope_rating ?? null;
+  const slope = (detail as { slope_rating?: number | null } | null | undefined)?.slope_rating ?? null;
 
   const impactDelta =
     isSynced &&

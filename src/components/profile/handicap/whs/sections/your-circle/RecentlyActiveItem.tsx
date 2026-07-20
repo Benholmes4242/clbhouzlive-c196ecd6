@@ -14,7 +14,7 @@ interface Props {
 
 export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive, onClick }) => {
   const display = firstName(entry.friend_name);
-  const Tag: any = onClick ? 'button' : 'div';
+  const Tag = (onClick ? 'button' : 'div') as React.ElementType;
 
   const isOnApp = entry.is_clbhouz_user;
 
