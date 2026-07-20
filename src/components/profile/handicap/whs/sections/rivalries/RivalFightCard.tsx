@@ -86,7 +86,7 @@ export const RivalFightCard: React.FC<Props> = ({
   const accentColor = isWinningOverall ? GOLD : '#94A3B8';
 
   const tappable = typeof onTap === 'function';
-  const Tag: any = tappable ? 'button' : 'div';
+  const Tag: React.ElementType = tappable ? 'button' : 'div';
 
   // Bar fill % for a mirrored stat row (you side). Even → 50/50.
   const barYouPct = (c: typeof crownInfos[number]): number => {
