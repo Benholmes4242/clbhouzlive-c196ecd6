@@ -276,7 +276,7 @@ function CoursesTab() {
 
       <CourseDetail
         courseId={drawerId}
-        onClose={() => setDrawerId(null)}
+        onClose={closeSheet}
         update={c.updateCourse}
         uploadPhoto={c.uploadPhoto}
         uploading={c.isUploadingPhoto}
@@ -286,10 +286,11 @@ function CoursesTab() {
 
       <AddCourseSheet
         open={addOpen}
-        onClose={() => setAddOpen(false)}
+        onClose={closeSheet}
         onCreated={() => { c.refetch(); }}
         uploadPhoto={c.uploadPhoto}
       />
+
 
       <style>{`@keyframes admin-pulse { 0%,100%{opacity:.55} 50%{opacity:1} }`}</style>
     </div>
