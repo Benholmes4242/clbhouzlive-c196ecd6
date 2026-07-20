@@ -29,19 +29,20 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   try {
     const result = await runOnce();
-    return json(result);
+    return json(result, 200, corsHeaders);
   } catch (e) {
     console.error("[dispatcher] fatal", e);
-    return json({ error: (e as Error).message }, 500);
+    return json({ error: (e as Error).message }, 500, corsHeaders);
   }
 });
 
-function json(body: any, status = 200) {
+function json(body: any, status = 200, corsHeaders: Record<string, string> = {}) {
   return new Response(JSON.stringify(body), {
     headers: { ...corsHeaders, "Content-Type": "application/json" },
     status,
   });
 }
+
 
 async function runOnce() {
   const now = new Date();
