@@ -137,8 +137,21 @@ function CoursesTab() {
     return () => window.removeEventListener('admin-v2:refetch', h);
   }, [c]);
 
-  const [drawerId, setDrawerId] = useState<string | null>(null);
-  const [addOpen, setAddOpen] = useState(false);
+  // Sheet state lives in the URL so app-switch reloads restore it.
+  const drawerId = params.get('course');
+  const addOpen = params.get('add') === 'course';
+
+  const setSheetParam = (mutate: (p: URLSearchParams) => void, opening: boolean) => {
+    const next = new URLSearchParams(params);
+    const hadSheet = !!next.get('course') || next.get('add') === 'course';
+    mutate(next);
+    // push on the initial open (so back-swipe closes the sheet), replace otherwise.
+    setParams(next, { replace: !(opening && !hadSheet) });
+  };
+  const openCourse = (id: string) => setSheetParam(p => { p.set('course', id); p.delete('add'); }, true);
+  const openAdd = () => setSheetParam(p => { p.set('add', 'course'); p.delete('course'); }, true);
+  const closeSheet = () => setSheetParam(p => { p.delete('course'); p.delete('add'); }, false);
+
   const totalPages = Math.max(1, Math.ceil(c.total / c.pageSize));
 
   const totalLabel = c.stats.total > 0 ? c.stats.total.toLocaleString() : '';
