@@ -81,7 +81,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
   viewMode = 'owner',
   ownerFirstName = null,
 }) => {
-  const { data: counters, isLoading } = useCounters(connectionId);
+  const { data: counters, isLoading, isError, refetch } = useCounters(connectionId);
   const { data: allScores } = useAllScores(connectionId);
 
   // Chronological (oldest → newest) window of up to 20 rounds.
@@ -123,6 +123,54 @@ export const RoundsThatCountCard: React.FC<Props> = ({
   const svgRef = useRef<SVGSVGElement>(null);
 
   if (isLoading) return <Skeleton />;
+
+  // Error branch — keep the section frame + header, surface a muted line
+  // and a small Retry. Other sections self-hide on error (intended degrade).
+  if (isError) {
+    return (
+      <section style={{ marginTop: 32 }}>
+        <DarkSectionHeader eyebrow="ROUNDS THAT COUNT" title="" />
+        <div style={{ padding: '0 16px' }}>
+          <div
+            style={{
+              background: 'var(--hcp-bg-1)',
+              border: `1px solid ${LINE}`,
+              borderRadius: 18,
+              padding: '20px 14px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 12,
+              fontFamily: FONT_GEIST,
+            }}
+          >
+            <div style={{ fontSize: 12, color: DIM }}>
+              Couldn't load your rounds.
+            </div>
+            <button
+              type="button"
+              onClick={() => refetch()}
+              style={{
+                padding: '7px 14px',
+                borderRadius: 999,
+                background: 'rgba(255,255,255,0.06)',
+                border: `1px solid ${LINE}`,
+                color: INK,
+                fontSize: 12,
+                fontWeight: 700,
+                fontFamily: FONT_GEIST,
+                cursor: 'pointer',
+                WebkitTapHighlightColor: 'transparent',
+              }}
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   if (!enriched || enriched.n === 0 || currentHandicap == null) return null;
 
   const { rounds, n, fallingSet } = enriched;
