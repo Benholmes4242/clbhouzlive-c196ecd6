@@ -55,13 +55,27 @@ function mapRow(c: any, ratings: Map<string, RatingAgg>): AdminCourseRow {
   };
 }
 
-async function fetchCourses(search: string, country: string, page: number, pageSize: number) {
+export type CourseFilter = 'all' | 'top100' | 'missing_coords' | 'missing_photo';
+
+// Single source-of-truth predicates - shared with useGolfCoursesStats.
+export const TOP100_PREDICATE = 'global_rank.not.is.null,usa_rank.not.is.null,regional_rank.not.is.null';
+export const MISSING_COORDS_PREDICATE = 'latitude.is.null,longitude.is.null';
+
+function applyFilter(q: any, filter: CourseFilter) {
+  if (filter === 'top100') return q.or(TOP100_PREDICATE);
+  if (filter === 'missing_coords') return q.or(MISSING_COORDS_PREDICATE);
+  if (filter === 'missing_photo') return q.is('thumbnail_image', null);
+  return q;
+}
+
+async function fetchCourses(search: string, country: string, filter: CourseFilter, page: number, pageSize: number) {
   let q = supabase.from('golf_courses').select(COURSE_COLUMNS, { count: 'exact' });
   if (search.trim()) {
     const s = search.trim();
     q = q.or(`name.ilike.%${s}%,country.ilike.%${s}%,sub_country.ilike.%${s}%`);
   }
   if (country && country !== 'all') q = q.eq('country', country);
+  q = applyFilter(q, filter);
   q = q.order('name', { ascending: true });
   const from = (page - 1) * pageSize;
   q = q.range(from, from + pageSize - 1);
@@ -107,13 +121,14 @@ export function useCourses() {
   const qc = useQueryClient();
   const [search, setSearch] = useState('');
   const [country, setCountry] = useState('all');
+  const [filter, setFilter] = useState<CourseFilter>('all');
   const [page, setPage] = useState(1);
   const pageSize = 25;
   const debounced = useDebouncedValue(search, 250);
 
   const { data, isLoading, refetch } = useQuery({
-    queryKey: ['admin-v2', 'courses', debounced, country, page],
-    queryFn: () => fetchCourses(debounced, country, page, pageSize),
+    queryKey: ['admin-v2', 'courses', debounced, country, filter, page],
+    queryFn: () => fetchCourses(debounced, country, filter, page, pageSize),
     staleTime: 60_000,
   });
 
@@ -129,6 +144,7 @@ export function useCourses() {
     total: kpiStats?.totalCourses ?? 0,
     geocoded: (kpiStats?.totalCourses ?? 0) - (kpiStats?.missingCoordinates ?? 0),
     missingCoords: kpiStats?.missingCoordinates ?? 0,
+    missingPhoto: kpiStats?.missingImages ?? 0,
     top100: kpiStats?.verifiedCourses ?? 0,
   }), [kpiStats]);
 
@@ -194,6 +210,7 @@ export function useCourses() {
     stats,
     search, setSearch: (v: string) => { setSearch(v); setPage(1); },
     country, setCountry: (v: string) => { setCountry(v); setPage(1); },
+    filter, setFilter: (v: CourseFilter) => { setFilter(v); setPage(1); },
     page, setPage, pageSize,
     updateCourse: (id: string, updates: CourseUpdate) => updateMutation.mutateAsync({ id, updates }),
     isUpdating: updateMutation.isPending,
