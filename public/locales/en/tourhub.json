@@ -512,6 +512,11 @@
   "leaders": {
     "footer": "Season boards · live dot = on the course right now",
     "fullList": "Full list",
+    "error": {
+      "title": "Couldn't load the boards",
+      "body": "Check your connection and try again.",
+      "retry": "Retry"
+    },
     "sheet": {
       "eyebrow_one": "{{tourLabel}} · {{year}} · {{count}} PLAYER",
       "eyebrow_other": "{{tourLabel}} · {{year}} · {{count}} PLAYERS",
