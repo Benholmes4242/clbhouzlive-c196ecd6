@@ -144,16 +144,23 @@ export const PendingPostCard: React.FC<PendingPostCardProps> = ({ entry, theme =
     } finally {
       setRetrying(false);
     }
-  }, [entry, removeJob, retrying]);
+  }, [entry, isReview, removeJob, retrying]);
 
   const handleDismiss = useCallback(async () => {
+    // Review branch: pipeline manages its own File refs and any DB rows
+    // for items that DID upload are legitimately attached to the review.
+    // We just drop the visibility card.
+    if (isReview) {
+      removeJob(entry.jobId);
+      return;
+    }
     try {
       await cancelJob(entry.jobId);
     } catch {
       // ignore
     }
     removeJob(entry.jobId);
-  }, [entry.jobId, removeJob]);
+  }, [entry.jobId, isReview, removeJob]);
 
   return (
     <div
@@ -192,11 +199,17 @@ export const PendingPostCard: React.FC<PendingPostCardProps> = ({ entry, theme =
             </span>
             <span style={{ fontSize: 12, color: T.muted }}>·</span>
             <span style={{ fontSize: 12, color: T.muted, fontWeight: 500 }}>
-              {entry.status === 'failed'
-                ? 'Upload failed'
-                : entry.status === 'queued'
-                ? 'Queued'
-                : 'Posting…'}
+              {isReview
+                ? (entry.status === 'failed'
+                    ? 'Review · Upload failed'
+                    : entry.status === 'queued'
+                      ? 'Review · Queued'
+                      : 'Review · Posting…')
+                : (entry.status === 'failed'
+                    ? 'Upload failed'
+                    : entry.status === 'queued'
+                      ? 'Queued'
+                      : 'Posting…')}
             </span>
           </div>
 
