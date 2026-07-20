@@ -26,7 +26,7 @@ const EchoV2Page: React.FC = () => {
   const keyboardHeight = useKeyboardHeight();
   const scrollerRef = useRef<HTMLDivElement | null>(null);
 
-  const { data: messages = [] } = useEchoChatMessages(chatId ?? null);
+  const { data: messages = [], isError, refetch } = useEchoChatMessages(chatId ?? null);
   const { state, send } = useEchoStream();
 
   useEffect(() => {
@@ -122,6 +122,39 @@ const EchoV2Page: React.FC = () => {
         >
           {showWelcome ? (
             <EchoWelcome onPick={(p) => handleSend(p)} disabled={state.streaming} />
+          ) : inChat && isError && messages.length === 0 ? (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '80px 24px',
+                gap: 12,
+                textAlign: 'center',
+                minHeight: '100%',
+              }}
+            >
+              <span style={{ fontSize: 15, fontWeight: 600, color: '#1F2428' }}>
+                Couldn't load this conversation
+              </span>
+              <button
+                type="button"
+                onClick={() => { void refetch(); }}
+                className="active:opacity-70"
+                style={{
+                  padding: '10px 18px',
+                  borderRadius: 12,
+                  background: '#15171F',
+                  color: '#F5F6F7',
+                  border: 'none',
+                  fontSize: 14,
+                  fontWeight: 600,
+                }}
+              >
+                Retry
+              </button>
+            </div>
           ) : (
             <EchoMessageList
               messages={messages}

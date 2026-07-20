@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { ChevronLeft, MoreHorizontal, Pin, X } from 'lucide-react';
@@ -7,6 +7,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useEchoChats, type EchoChatRow } from '@/features/echo-v2/hooks/useEchoChats';
 import { AnimatedEchoWave } from '@/features/echo-v2/components/AnimatedEchoWave';
 import { formatRelativeRounded } from '@/i18n/format';
+import { toast } from '@/lib/toast';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 
 const CANVAS = '#F8FAFC';
 const INK = '#1F2428';
@@ -25,7 +27,7 @@ type SheetMode = null | 'actions' | 'rename' | 'confirm-delete';
 const EchoHistoryPage: React.FC = () => {
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const { data: chats = [], isLoading } = useEchoChats();
+  const { data: chats = [], isLoading, isError, refetch } = useEchoChats();
 
   const [sheetChatId, setSheetChatId] = useState<string | null>(null);
   const [sheetMode, setSheetMode] = useState<SheetMode>(null);
@@ -36,6 +38,12 @@ const EchoHistoryPage: React.FC = () => {
     () => chats.find((c) => c.id === sheetChatId) ?? null,
     [chats, sheetChatId],
   );
+
+  useEffect(() => {
+    if (sheetMode === null) return;
+    lockBodyScroll();
+    return () => unlockBodyScroll();
+  }, [sheetMode]);
 
   const closeSheet = useCallback(() => {
     setSheetMode(null);
