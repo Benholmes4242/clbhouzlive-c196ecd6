@@ -298,7 +298,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
         state: composer.state,
       });
       // Fire uploads AFTER the RPC (media picked before submit is held locally).
-      media.flushToReview(ratingId).catch(() => { /* per-item errors surfaced in tray */ });
+      media.flushToReview(ratingId, { caption: composer.state.reviewText }).catch(() => { /* per-item errors surfaced in tray */ });
       invalidateCourseRatingCaches(qc);
       setSuccess({ ratingId, shareToFeed });
     } catch (e) {
