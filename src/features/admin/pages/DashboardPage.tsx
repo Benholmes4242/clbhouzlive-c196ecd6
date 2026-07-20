@@ -5,7 +5,7 @@ import {
   CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis, LineChart, Line,
 } from 'recharts';
 import {
-  AlertTriangle, ChevronRight, Activity, Bell, Cpu,
+  AlertTriangle, ChevronRight, Activity, Bell, Cpu, ShieldCheck,
   MessageSquare, UserPlus, Star, RefreshCcw, Radio,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,8 +23,10 @@ import {
 } from '../hooks/useOverviewMetrics';
 import {
   computeEchoChip, computePushChip, computeEgChip, computeCronChip,
+  computeErrorsChip,
   toneColor, type ChipState,
 } from '../lib/healthChips';
+import { useErrorCount24h } from '../hooks/useStability';
 
 const num = (n: number) => n.toLocaleString();
 function relTime(iso: string): string {
@@ -189,7 +191,12 @@ export default function DashboardPage() {
   const pushChip = useMemo(() => computePushChip(push), [push.isLoading, push.isError, push.data]);
   const egChip = useMemo(() => computeEgChip(eg), [eg.isLoading, eg.isError, eg.data]);
   const cronChip = useMemo(() => computeCronChip(eg), [eg.isLoading, eg.isError, eg.data]);
-  const nonOkChips = [echoChip, pushChip, egChip, cronChip].filter(c => c.tone !== 'ok' && c.tone !== 'idle').length;
+  const errors = useErrorCount24h();
+  const errorsChip = useMemo(
+    () => computeErrorsChip(errors.data ?? null, errors.isLoading, errors.isError),
+    [errors.data, errors.isLoading, errors.isError],
+  );
+  const nonOkChips = [echoChip, pushChip, egChip, cronChip, errorsChip].filter(c => c.tone !== 'ok' && c.tone !== 'idle').length;
 
   const m = overview.data;
   const loading = overview.isLoading;
