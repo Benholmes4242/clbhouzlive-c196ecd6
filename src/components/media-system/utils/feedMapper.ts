@@ -61,11 +61,16 @@ export function mapRowToFeedPost(row: FeedRpcRow): FeedPost {
   };
 
   let review: ReviewData | null = null;
-  if (isReview && row.review_course_id) {
+  // Fall back to the post's own course_id/course_name when the RPC didn't
+  // flatten review_course_* columns — this keeps the fullscreen "read review ›"
+  // CTA visible on every review-sourced surface (Watch mixed grid included).
+  const reviewCourseId = row.review_course_id || row.course_id || null;
+  const reviewCourseName = row.review_course_name || row.course_name || null;
+  if (isReview && reviewCourseId) {
     review = {
       reviewId: row.source_review_id,
-      courseId: row.review_course_id,
-      courseName: row.review_course_name || 'Unknown Course',
+      courseId: reviewCourseId,
+      courseName: reviewCourseName || 'Unknown Course',
       courseImageUrl: row.review_course_image || null,
       rating: Number(row.review_rating) || 0,
       courseRegion: row.review_course_region || null,
