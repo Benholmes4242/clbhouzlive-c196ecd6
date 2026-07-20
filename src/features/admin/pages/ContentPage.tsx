@@ -273,6 +273,7 @@ function CoursesTab() {
         open={addOpen}
         onClose={() => setAddOpen(false)}
         onCreated={() => { c.refetch(); }}
+        uploadPhoto={c.uploadPhoto}
       />
 
       <style>{`@keyframes admin-pulse { 0%,100%{opacity:.55} 50%{opacity:1} }`}</style>
@@ -683,7 +684,12 @@ function Toggle({ label, value, onChange }: { label: string; value: boolean; onC
 
 /* ───────── Add course sheet ───────── */
 
-function AddCourseSheet({ open, onClose, onCreated }: { open: boolean; onClose: () => void; onCreated: () => void }) {
+function AddCourseSheet({ open, onClose, onCreated, uploadPhoto }: {
+  open: boolean;
+  onClose: () => void;
+  onCreated: () => void;
+  uploadPhoto: (id: string, file: File) => Promise<any>;
+}) {
   const [form, setForm] = useState({
     name: '', country: '', continent: '',
     sub_country: '', region: '',
@@ -692,6 +698,9 @@ function AddCourseSheet({ open, onClose, onCreated }: { open: boolean; onClose: 
     has_hosted_major: false, description: '',
   });
   const [busy, setBusy] = useState(false);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const photoInputRef = useRef<HTMLInputElement>(null);
   const set = (k: keyof typeof form, v: any) => setForm(f => ({ ...f, [k]: v }));
 
   useEffect(() => {
@@ -703,8 +712,17 @@ function AddCourseSheet({ open, onClose, onCreated }: { open: boolean; onClose: 
         website_url: '', course_type: '',
         has_hosted_major: false, description: '',
       });
+      setPhotoFile(null);
+      if (photoPreview) URL.revokeObjectURL(photoPreview);
+      setPhotoPreview(null);
     }
   }, [open]);
+
+  const onPickPhoto = (f: File | null) => {
+    if (photoPreview) URL.revokeObjectURL(photoPreview);
+    setPhotoFile(f);
+    setPhotoPreview(f ? URL.createObjectURL(f) : null);
+  };
 
   const valid = form.name.trim() && form.country.trim() && form.continent;
 
@@ -715,7 +733,14 @@ function AddCourseSheet({ open, onClose, onCreated }: { open: boolean; onClose: 
     }
     setBusy(true);
     try {
-      await createCourse(form);
+      const created = await createCourse(form);
+      if (photoFile && created?.id) {
+        try {
+          await uploadPhoto(created.id, photoFile);
+        } catch {
+          toast.error('Course created, but photo upload failed');
+        }
+      }
       toast.success(`"${form.name}" created`);
       onCreated();
       onClose();
