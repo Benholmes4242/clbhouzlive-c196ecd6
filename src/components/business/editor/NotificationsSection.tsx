@@ -63,7 +63,7 @@ export function NotificationsSection({ businessId }: Props) {
     setSaving(key);
     const { error } = await supabase
       .from('business_accounts')
-      .update({ notification_preferences: { muted_types: Array.from(next) } } as any)
+      .update({ notification_preferences: { muted_types: Array.from(next) } })
       .eq('id', businessId);
     setSaving(null);
     if (error) {
