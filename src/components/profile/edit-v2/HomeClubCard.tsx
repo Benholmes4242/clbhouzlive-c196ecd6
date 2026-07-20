@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Search, X, MapPin, Check } from 'lucide-react';
 import { useClubSearch } from '@/hooks/useClubSearch';
-import { VisibilityDropdown } from './VisibilityDropdown';
+import { VisibilityDropdown, type VisibilityValue } from './VisibilityDropdown';
 import { Label } from '@/components/manage/ui';
 
 interface Props {
@@ -9,7 +9,7 @@ interface Props {
   clubId: string | null;
   visibility: string;
   onClubSelect: (name: string, id: string | null) => void;
-  onVisibilityChange: (v: string) => void;
+  onVisibilityChange: (v: VisibilityValue) => void;
 }
 
 const INK = '#0F172A';
