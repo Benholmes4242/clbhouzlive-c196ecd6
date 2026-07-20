@@ -203,11 +203,12 @@ export const ActivityPageV2: React.FC = () => {
   // remains through the visit; badges are refreshed via invalidation which
   // re-runs the pure is_read=false count.
   const markRead = async (notifId: string) => {
-    qc.setQueriesData({ queryKey: ['activity-v2'] }, (old: any) => {
+    type FeedCache = { pages: ActivityFeedRowV2[][]; pageParams: unknown[] };
+    qc.setQueriesData<FeedCache>({ queryKey: ['activity-v2'] }, (old) => {
       if (!old?.pages) return old;
       return {
         ...old,
-        pages: old.pages.map((p: ActivityFeedRowV2[]) =>
+        pages: old.pages.map((p) =>
           p.map((r) => (r.notif_id === notifId ? { ...r, is_read: true } : r)),
         ),
       };
