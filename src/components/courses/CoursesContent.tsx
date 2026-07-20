@@ -135,10 +135,16 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
               <Search size={28} style={{ opacity: 0.3 }} />
               <p style={{ fontSize: 13, margin: 0 }}>{t('rateSheet.emptyLong')}</p>
             </div>
-          ) : isLoading ? (
-            <div style={{ padding: '32px 16px', textAlign: 'center', color: 'hsl(var(--muted-foreground))' }}>
-              <p style={{ fontSize: 13, margin: 0 }}>{t('rateSheet.searching')}</p>
-            </div>
+          ) : (isLoading || (isFetching && results.length === 0)) ? (
+            <>
+              {[0, 1, 2].map((i) => (
+                <div key={i} style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <Skeleton className="h-[14px] w-[60%] rounded" />
+                  <Skeleton className="h-[11px] w-[40%] rounded" />
+                </div>
+              ))}
+            </>
+          
           ) : isError ? (
             <div style={{ padding: '32px 16px', textAlign: 'center', color: 'hsl(var(--muted-foreground))' }}>
               <p style={{ fontSize: 13, margin: 0 }}>{t('rateSheet.searchError', { defaultValue: "Search isn't working right now — try again in a moment." })}</p>
