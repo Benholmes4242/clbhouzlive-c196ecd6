@@ -25,7 +25,8 @@ import CoursesErrorBoundary from './CoursesErrorBoundary';
 import { Search, X, Star, ChevronRight } from 'lucide-react';
 import CoursesShellTabs from '@/features/courses/components/CoursesShellTabs';
 import { supabase } from '@/integrations/supabase/client';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import { Skeleton } from '@/components/ui/skeleton';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, HAIRLINE_INK_12, INK, INK_MUTE, INK_TINT_05, SLATE_50, SURFACE } from '@/features/courses/_shared/tokens';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
@@ -35,21 +36,28 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
 
-  const { data: results = [], isLoading, isError } = useQuery({
-    queryKey: ['rate-course-search', query],
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedQuery(query), 250);
+    return () => clearTimeout(t);
+  }, [query]);
+
+  const { data: results = [], isLoading, isFetching, isError } = useQuery({
+    queryKey: ['rate-course-search', debouncedQuery],
     queryFn: async () => {
-      if (query.trim().length < 2) return [];
+      if (debouncedQuery.trim().length < 2) return [];
       const { data, error } = await supabase
         .from('golf_courses')
         .select('id, name, country, sub_country, global_rank')
-        .ilike('name', `%${query.trim()}%`)
+        .ilike('name', `%${debouncedQuery.trim()}%`)
         .order('global_rank', { ascending: true, nullsFirst: false })
         .limit(12);
       if (error) throw error;
       return data ?? [];
     },
-    enabled: query.trim().length >= 2,
+    enabled: debouncedQuery.trim().length >= 2,
+    placeholderData: keepPreviousData,
     staleTime: 30_000,
   });
 
@@ -127,10 +135,16 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
               <Search size={28} style={{ opacity: 0.3 }} />
               <p style={{ fontSize: 13, margin: 0 }}>{t('rateSheet.emptyLong')}</p>
             </div>
-          ) : isLoading ? (
-            <div style={{ padding: '32px 16px', textAlign: 'center', color: 'hsl(var(--muted-foreground))' }}>
-              <p style={{ fontSize: 13, margin: 0 }}>{t('rateSheet.searching')}</p>
-            </div>
+          ) : (isLoading || (isFetching && results.length === 0)) ? (
+            <>
+              {[0, 1, 2].map((i) => (
+                <div key={i} style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <Skeleton className="h-[14px] w-[60%] rounded" />
+                  <Skeleton className="h-[11px] w-[40%] rounded" />
+                </div>
+              ))}
+            </>
+          
           ) : isError ? (
             <div style={{ padding: '32px 16px', textAlign: 'center', color: 'hsl(var(--muted-foreground))' }}>
               <p style={{ fontSize: 13, margin: 0 }}>{t('rateSheet.searchError', { defaultValue: "Search isn't working right now — try again in a moment." })}</p>

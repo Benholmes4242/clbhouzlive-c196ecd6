@@ -4,7 +4,7 @@ const SCROLL_ROOT = typeof document !== 'undefined' ? document.getElementById('r
 import { useFullscreenFeedStore, useIsViewerOwnedBy } from '@/store/fullscreenFeedStore';
 import { useInView } from 'react-intersection-observer';
 import { useWatchAutoplay } from '@/video/useWatchAutoplay';
-import { Loader2 } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { FeedCard, type FeedCardRow } from '@/components/feed-cards/FeedCard';
 import { packColumns } from '@/components/feed-cards/packColumns';
@@ -195,8 +195,13 @@ export default function ExploreGrid({
       <div ref={sentinelRef} style={{ height: 1, width: '100%' }} />
 
       {isFetchingNextPage && (
-        <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0' }}>
-          <Loader2 className="w-5 h-5 animate-spin text-[#f59e0b]" />
+        <div style={{ display: 'flex', gap: 4, padding: '8px 4px 0' }}>
+          <div style={{ flex: 1 }}>
+            <Skeleton className="w-full rounded-md" style={{ aspectRatio: '9 / 14' }} />
+          </div>
+          <div style={{ flex: 1 }}>
+            <Skeleton className="w-full rounded-md" style={{ aspectRatio: '9 / 14' }} />
+          </div>
         </div>
       )}
     </div>

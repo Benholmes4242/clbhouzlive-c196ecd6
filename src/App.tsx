@@ -68,7 +68,7 @@ import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleto
 import { CoursesListSkeleton } from '@/components/skeletons/CoursesListSkeleton';
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
 import { HandicapPageSkeleton } from '@/components/skeletons/HandicapPageSkeleton';
-import { DiscoverSkeleton } from '@/components/skeletons/DiscoverSkeleton';
+import { CoursesHubSkeleton } from '@/components/skeletons/CoursesHubSkeleton';
 
 
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
@@ -187,7 +187,7 @@ const AppShellOnly: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   if (!isAppShellVisible(envStatus)) return null;
   return <>{children}</>;
 };
-import DiscoverWrapped from "./pages/DiscoverWrapped";
+
 import CoursesWrapped from "./pages/CoursesWrapped";
 import ProfileWrapped from "./pages/ProfileWrapped";
 
@@ -478,7 +478,7 @@ function AppRoutes() {
         <Route path="/watch/clips" element={<Suspense fallback={<WatchClipsSkeleton />}><ClipsPageV2 /></Suspense>} />
         <Route path="/watch/videos" element={<Suspense fallback={<WatchVideosSkeleton />}><VideosPageV2 /></Suspense>} />
         <Route path="/explore" element={<Navigate to="/courses?tab=discover" replace />} />
-        <Route path="/courses" element={<Suspense fallback={<CoursesListSkeleton />}><CoursesWrapped /></Suspense>} />
+        <Route path="/courses" element={<Suspense fallback={<CoursesHubSkeleton />}><CoursesWrapped /></Suspense>} />
         <Route path="/courses/:courseId" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseDetailPage /></Suspense>} />
         <Route path="/courses/:courseId/rate" element={<Suspense fallback={<RateCoursePageSkeleton />}><ReviewComposerV2 /></Suspense>} />
         <Route path="/rate-course-v2/:courseId" element={<RateCourseV2Redirect />} />
