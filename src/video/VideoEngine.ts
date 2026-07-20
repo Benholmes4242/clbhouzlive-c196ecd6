@@ -1453,9 +1453,9 @@ class VideoEngineImpl {
    *  not the current speaker). Uses getBoundingClientRect (no observer setup
    *  needed; runs at 250ms cadence only when audioDebug is on). */
   private computeVisiblePlayingLanes(): Array<{
-    laneId: LaneId; postId: string | null; visibilityRatio: number; playing: boolean; muted: boolean;
+    laneId: LaneId; postId: string | null; visibilityRatio: number; playing: boolean; muted: boolean; audioPolicy: LaneAudioPolicy;
   }> {
-    const out: Array<{ laneId: LaneId; postId: string | null; visibilityRatio: number; playing: boolean; muted: boolean }> = [];
+    const out: Array<{ laneId: LaneId; postId: string | null; visibilityRatio: number; playing: boolean; muted: boolean; audioPolicy: LaneAudioPolicy }> = [];
     if (typeof window === 'undefined') return out;
     const vw = window.innerWidth || 0;
     const vh = window.innerHeight || 0;
@@ -1478,6 +1478,7 @@ class VideoEngineImpl {
           visibilityRatio: +ratio.toFixed(3),
           playing,
           muted: !!el.muted,
+          audioPolicy: lane.audioPolicy,
         });
       }
     });
