@@ -237,6 +237,7 @@ export function TournamentPage() {
               meta={meta}
               field={field ?? null}
               teeGroups={teeGroups}
+              loading={Boolean(fieldLoading || teesLoading)}
               onOpenAllTimes={() => setTeeTimesOpen(true)}
             />
           )}
