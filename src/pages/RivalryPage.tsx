@@ -50,7 +50,7 @@ function useOwnerRivalry(
   viewerId: string | undefined,
   rivalParamId: string | undefined,
 ) {
-  const { data, isLoading, error } = useFriendRivalries(viewerId);
+  const { data, isLoading, error, refetch } = useFriendRivalries(viewerId);
   const row = useMemo(() => {
     if (!data || !rivalParamId) return null;
     return (
@@ -61,7 +61,7 @@ function useOwnerRivalry(
       ) ?? null
     );
   }, [data, rivalParamId]);
-  return { row, isLoading, error };
+  return { row, isLoading, error, refetch };
 }
 
 function useAdHocRivalry(
