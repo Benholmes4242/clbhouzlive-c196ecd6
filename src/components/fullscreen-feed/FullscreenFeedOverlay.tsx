@@ -360,12 +360,21 @@ export function FullscreenFeedOverlay() {
 
     if (!canAnimate) {
       if (b) {
+        // Handoff audio focus BEFORE close() flips fsOpen. Otherwise the
+        // reconciler runs in the non-fullscreen branch, finds no focus, and
+        // force-mutes the lane that just returned to the inline feed —
+        // producing an audible mute→unmute stutter one tick later when
+        // CardFeed's effect re-registers focus. Rails stay silent inline.
+        if (!b.laneId.startsWith('rail-')) {
+          try { VideoEngine.setAudioFocus(b.laneId, 'fs-close-handoff'); } catch {}
+        }
         returnBorrow(b, 'close');
         borrowRef.current = null;
       }
       close();
       return;
     }
+
 
     // Animated symmetric close.
     if (b) {
