@@ -205,7 +205,7 @@ export default function DashboardPage() {
   const nonOkChips = [echoChip, pushChip, egChip, cronChip].filter(c => c.tone !== 'ok' && c.tone !== 'idle').length;
 
   return (
-    <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 720, margin: '0 auto' }}>
+    <div style={{ padding: '8px 16px 0', display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 720, margin: '0 auto' }}>
       <AlertBannerRow
         triage={triage.data}
         pushRed={push.data?.status === 'red'}
