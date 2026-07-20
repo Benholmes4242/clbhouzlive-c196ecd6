@@ -67,7 +67,7 @@ interface Props {
   getLikeState: (post: FeedPost) => { isLiked: boolean; count: number };
   getCommentCount: (post: FeedPost) => number;
   getFollowState: (post: FeedPost) => boolean;
-  onFollow: (post: FeedPost) => void;
+  onFollow: (post: FeedPost, followedNow: boolean) => void;
   onViewProfile: () => void;
   onReviewTap: () => void;
   isOwnPost: boolean;
