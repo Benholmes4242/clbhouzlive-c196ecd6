@@ -30,8 +30,18 @@ export type PendingPostStatus = 'queued' | 'uploading' | 'failed';
 
 export interface PendingPost {
   jobId: string;
+  /**
+   * Discriminator. Defaults to 'post' when omitted so every existing
+   * addPending() call site keeps working unchanged. Review-v2 flushes
+   * set kind:'review' so PendingPostCard branches strictly and the
+   * post-only uploadManager/uploadPipeline retry paths stay unreachable
+   * from review entries.
+   */
+  kind?: 'post' | 'review';
   /** Filled in by attachPostId() when post:shell-created fires. */
   postId: string | null;
+  /** Present on review entries (the review DB row id). */
+  reviewId?: string;
 
   // Author identity
   actorType: 'personal' | 'business';
@@ -64,8 +74,10 @@ export interface PendingPost {
   error?: string;
 
   /**
-   * Original File[] kept for FULL re-enqueue on a totally-failed job.
-   * Retained as long as the entry lives in the store. Cleared on removal.
+   * Original File[] kept for FULL re-enqueue on a totally-failed job
+   * (post branch only). Review entries pass [] here — the review
+   * pipeline owns its own File refs and retry runs through
+   * reviewRetryRegistry, not UploadManager.
    */
   files: File[];
 

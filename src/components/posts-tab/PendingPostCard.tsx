@@ -8,6 +8,7 @@ import { toast } from '@/lib/toast';
 import { usePendingPostsStore, aggregatePendingProgress, type PendingPost } from '@/uploads/pendingPostsStore';
 import { uploadManager } from '@/uploads/UploadManager';
 import { retryJob, retryFailedItems, enqueuePostUpload, cancelJob } from '@/uploads/uploadPipeline';
+import { reviewRetryRegistry } from '@/uploads/reviewRetryRegistry';
 import { MentionText } from '@/components/mentions/MentionText';
 
 interface PendingPostCardProps {
@@ -38,12 +39,47 @@ export const PendingPostCard: React.FC<PendingPostCardProps> = ({ entry, theme =
   const T = theme === 'dark' ? DARK : LIGHT;
   const removeJob = usePendingPostsStore((s) => s.removeJob);
   const [retrying, setRetrying] = useState(false);
+  const isReview = entry.kind === 'review';
 
   const aggregate = useMemo(() => aggregatePendingProgress(entry), [entry]);
   const firstMedia = entry.media[0];
 
   const handleRetry = useCallback(async () => {
     if (retrying) return;
+
+    // Offline guard — don't even try while offline; the auth check inside
+    // the upload path would falsely surface "Not authenticated".
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      usePendingPostsStore
+        .getState()
+        .markFailed(entry.jobId, 'No connection - reconnect and try again');
+      return;
+    }
+
+    setRetrying(true);
+
+    // REVIEW BRANCH: never touches uploadManager / uploadPipeline. Retry
+    // runs through the review pipeline's own primitive, registered under
+    // the same jobId in reviewRetryRegistry.
+    if (isReview) {
+      try {
+        const fn = reviewRetryRegistry.get(entry.jobId);
+        if (!fn) {
+          toast.error("Can't resume this upload", {
+            description: 'Open the review and add the media again.',
+          });
+          removeJob(entry.jobId);
+          return;
+        }
+        await fn();
+      } catch (err) {
+        console.error('[PendingPostCard] review retry failed:', err);
+        toast.error("Couldn't retry", { description: (err as { message?: string } | null)?.message ?? 'Try again' });
+      } finally {
+        setRetrying(false);
+      }
+      return;
+    }
 
     // Offline guard — don't even try while offline; the auth check inside
     // the upload path would falsely surface "Not authenticated".
@@ -108,16 +144,23 @@ export const PendingPostCard: React.FC<PendingPostCardProps> = ({ entry, theme =
     } finally {
       setRetrying(false);
     }
-  }, [entry, removeJob, retrying]);
+  }, [entry, isReview, removeJob, retrying]);
 
   const handleDismiss = useCallback(async () => {
+    // Review branch: pipeline manages its own File refs and any DB rows
+    // for items that DID upload are legitimately attached to the review.
+    // We just drop the visibility card.
+    if (isReview) {
+      removeJob(entry.jobId);
+      return;
+    }
     try {
       await cancelJob(entry.jobId);
     } catch {
       // ignore
     }
     removeJob(entry.jobId);
-  }, [entry.jobId, removeJob]);
+  }, [entry.jobId, isReview, removeJob]);
 
   return (
     <div
@@ -156,11 +199,17 @@ export const PendingPostCard: React.FC<PendingPostCardProps> = ({ entry, theme =
             </span>
             <span style={{ fontSize: 12, color: T.muted }}>·</span>
             <span style={{ fontSize: 12, color: T.muted, fontWeight: 500 }}>
-              {entry.status === 'failed'
-                ? 'Upload failed'
-                : entry.status === 'queued'
-                ? 'Queued'
-                : 'Posting…'}
+              {isReview
+                ? (entry.status === 'failed'
+                    ? 'Review · Upload failed'
+                    : entry.status === 'queued'
+                      ? 'Review · Queued'
+                      : 'Review · Posting…')
+                : (entry.status === 'failed'
+                    ? 'Upload failed'
+                    : entry.status === 'queued'
+                      ? 'Queued'
+                      : 'Posting…')}
             </span>
           </div>
 

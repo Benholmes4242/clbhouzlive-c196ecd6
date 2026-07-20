@@ -16,6 +16,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { invalidateCourseRatingCaches } from '@/utils/invalidateCourseRatingCaches';
 import { toast } from '@/lib/toast';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import { MentionsComposerInput } from '@/components/mentions/MentionsComposerInput';
 import AccessControl from '@/components/AccessControl';
 
@@ -201,6 +202,7 @@ function InnerComposer() {
           profileQ.data?.username ||
           'You',
         avatarUrl: profileQ.data?.profile_photo_url ?? null,
+        username: profileQ.data?.username ?? null,
       }}
       onExit={() => {
         const hs = window.history.state as { idx?: number } | null;
@@ -221,7 +223,7 @@ interface ComposerProps {
   userId: string | null;
   existing: ExistingReview | null | undefined;
   existingMedia: ExistingMedia[];
-  author: { displayName: string; avatarUrl: string | null };
+  author: { displayName: string; avatarUrl: string | null; username: string | null };
   onExit: () => void;
 }
 
@@ -229,8 +231,25 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
   const isEditMode = !!existing;
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const { activeActor } = useActiveActor();
 
-  const media = useReviewMediaPipeline({ userId, existingMedia });
+  const media = useReviewMediaPipeline({
+    userId,
+    existingMedia,
+    identity: userId
+      ? {
+          actorType: 'personal',
+          actorId: userId,
+          viewerActorType: (activeActor?.type ?? 'personal') as 'personal' | 'business',
+          viewerActorId: activeActor?.id ?? userId,
+          authorName: author.displayName,
+          authorAvatarUrl: author.avatarUrl,
+          authorUsername: author.username,
+          courseId: course.id,
+          courseName: course.name,
+        }
+      : undefined,
+  });
   const composer = useReviewComposer(existing, media.hasNewMedia);
   const submit = useReviewSubmit();
 
@@ -279,7 +298,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
         state: composer.state,
       });
       // Fire uploads AFTER the RPC (media picked before submit is held locally).
-      media.flushToReview(ratingId).catch(() => { /* per-item errors surfaced in tray */ });
+      media.flushToReview(ratingId, { caption: composer.state.reviewText }).catch(() => { /* per-item errors surfaced in tray */ });
       invalidateCourseRatingCaches(qc);
       setSuccess({ ratingId, shareToFeed });
     } catch (e) {
