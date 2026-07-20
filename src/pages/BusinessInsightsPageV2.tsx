@@ -53,7 +53,7 @@ const SOURCE_LABEL: Record<string, string> = {
 // Reused Reviews section (kept intact, course-gated)
 // ─────────────────────────────────────────────────────────────
 const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate: (path: string) => void }) => {
-  const { data: reviewStats, isLoading, error } = useBusinessReviewStats(businessId);
+  const { data: reviewStats, isLoading, error, refetch } = useBusinessReviewStats(businessId);
 
   const shell = (children: React.ReactNode) => (
     <section className="rounded-[18px] p-4 md:p-5 space-y-5" style={cardStyle}>
@@ -62,7 +62,19 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
     </section>
   );
 
-  if (error) return shell(<p className="text-sm" style={{ color: BIZ.inkMute }}>Failed to load review stats.</p>);
+  if (error) return shell(
+    <div className="space-y-3">
+      <p className="text-sm" style={{ color: BIZ.inkMute }}>Failed to load review stats.</p>
+      <button
+        type="button"
+        onClick={() => refetch()}
+        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-[12.5px] font-bold text-white active:opacity-90"
+        style={{ background: BIZ.amber, border: 'none' }}
+      >
+        Retry
+      </button>
+    </div>
+  );
   if (isLoading) return shell(<><Skeleton className="h-20 rounded-2xl" /><Skeleton className="h-20 rounded-2xl" /></>);
   if (!reviewStats) {
     return shell(
