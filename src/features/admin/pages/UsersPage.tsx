@@ -3,7 +3,8 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import {
   CheckCircle2, ShieldCheck, Mail, KeyRound, Trash2, Ban, X,
-  UserPlus, MoreVertical, Search, ShieldAlert,
+  UserPlus, MoreVertical, Search, ShieldAlert, MapPin, Radio, BadgeCheck,
+  ChevronRight,
 } from 'lucide-react';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { useUserActions } from '@/hooks/admin/useUserDetails';
@@ -13,9 +14,8 @@ import StatusPill from '../components/StatusPill';
 import EmptyState from '../components/EmptyState';
 import DetailDrawer from '../components/DetailDrawer';
 import ConfirmDialog from '../components/ConfirmDialog';
-import StatTile from '../components/StatTile';
-import { useUsers, type AdminUserRow, type UserFilterStatus } from '../hooks/useUsers';
-import { useVerifications, useProofConflict, type VerificationRow } from '../hooks/useVerifications';
+import AdminErrorState from '../components/AdminErrorState';
+import { useUsers, type AdminUserRow, type UserFilterStatus, type AdminUserDetail } from '../hooks/useUsers';
 import { useTeam, type TeamMember } from '../hooks/useTeam';
 import { useInvites, type InviteRow } from '../hooks/useInvites';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
@@ -23,28 +23,31 @@ import { usePanelRole } from '@/hooks/usePanelRole';
 import { panelCan } from '@/lib/panelCan';
 import { useCreateAdminActionRequest } from '../hooks/useAdminActionRequests';
 
-type TabId = 'all' | 'team' | 'invites';
-
-const TAB_TITLES: Record<TabId, string> = {
-  all: 'All Users',
-  team: 'Team & Roles',
-  invites: 'Invites',
-};
+type TabId = 'members' | 'team' | 'invites';
 
 function relTime(iso: string | null | undefined): string {
-  if (!iso) return '—';
-  try {
-    return formatDistanceToNow(new Date(iso), { addSuffix: true });
-  } catch { return '—'; }
+  if (!iso) return '-';
+  try { return formatDistanceToNow(new Date(iso), { addSuffix: true }); }
+  catch { return '-'; }
 }
 
+/**
+ * MembersPage (D4). Route stays /admin-v2/users; edge-function emails deep
+ * link here. Tabs: Members / Team / Invites. Members = roster + Member 360
+ * bottom sheet with a ?member= deep link.
+ */
 export default function UsersPage() {
   const [params, setParams] = useSearchParams();
   const { role } = usePanelRole();
   const caps = panelCan(role);
   const isFullAdmin = caps.manageAdmins;
 
-  const tab = (params.get('tab') as TabId) ?? 'all';
+  // Legacy ?tab=all is mapped to the new "members" tab.
+  const rawTab = (params.get('tab') as string | null) ?? 'members';
+  const tab: TabId = rawTab === 'all' ? 'members'
+    : rawTab === 'team' || rawTab === 'invites' ? rawTab
+    : 'members';
+
   const setTab = (id: string) => {
     const next = new URLSearchParams(params);
     next.set('tab', id);
@@ -55,7 +58,7 @@ export default function UsersPage() {
 
   const tabs = useMemo(() => {
     const base: Array<{ id: TabId; label: string; count?: number }> = [
-      { id: 'all', label: 'All Users' },
+      { id: 'members', label: 'Members' },
     ];
     if (isFullAdmin) {
       base.push({ id: 'team', label: 'Team & Roles' });
@@ -64,36 +67,40 @@ export default function UsersPage() {
     return base;
   }, [invites.counts.pending, isFullAdmin]);
 
-  // Refetch on header refresh event
   useEffect(() => {
-    const handler = () => {
-      invites.refetch();
-    };
+    const handler = () => { invites.refetch(); };
     window.addEventListener('admin-v2:refetch', handler);
     return () => window.removeEventListener('admin-v2:refetch', handler);
   }, [invites]);
 
-  const effectiveTab: TabId = !isFullAdmin && (tab === 'team' || tab === 'invites') ? 'all' : tab;
+  const effectiveTab: TabId =
+    !isFullAdmin && (tab === 'team' || tab === 'invites') ? 'members' : tab;
 
   return (
     <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 1180, margin: '0 auto' }}>
       <SectionTabs tabs={tabs} activeId={effectiveTab} onChange={setTab} />
-      {effectiveTab === 'all' && <AllUsersTab />}
+      {effectiveTab === 'members' && <MembersTab />}
       {effectiveTab === 'team' && isFullAdmin && <TeamTab />}
       {effectiveTab === 'invites' && isFullAdmin && <InvitesTab />}
     </div>
   );
 }
 
-/* ─────────────────────── All Users ─────────────────────── */
+/* ─────────────────────── Members (roster) ─────────────────────── */
 
-function AllUsersTab() {
+const LEGACY_FILTER_VALUES = new Set(['verified', 'unverified', 'new_today']);
+const VALID_FILTERS: UserFilterStatus[] = [
+  'all', 'new_this_week', 'active_24h', 'dormant_14d', 'eg_issues', 'suspended', 'admin',
+];
+
+function MembersTab() {
+  const [params, setParams] = useSearchParams();
   const {
-    users, filteredCount, allCount, isLoading,
+    users, filteredCount, allCount, isLoading, refetch,
     search, setSearch, filter, setFilter, counts,
     page, setPage, pageSize,
-    drawerUserId, setDrawerUserId, userDetail, detailLoading,
-    updateRole, roleUpdating, refetch,
+    drawerUserId, setDrawerUserId, userDetail, detailLoading, detailError, refetchDetail,
+    updateRole, roleUpdating,
   } = useUsers();
 
   const [searchInput, setSearchInput] = useState(search);
@@ -106,13 +113,60 @@ function AllUsersTab() {
     return () => window.removeEventListener('admin-v2:refetch', handler);
   }, [refetch]);
 
-  const filters: { id: UserFilterStatus; label: string; count?: number }[] = [
-    { id: 'all', label: 'All', count: counts.all },
-    { id: 'verified', label: 'Verified', count: counts.verified },
-    { id: 'unverified', label: 'Unverified', count: counts.unverified },
-    { id: 'admin', label: 'Admins', count: counts.admin },
-    { id: 'new_today', label: 'New Today', count: counts.new_today },
-    { id: 'active_24h', label: 'Active 24h' },
+  // URL <-> filter binding. Legacy verified/unverified/new_today are silently
+  // remapped to All so old deep links keep working.
+  useEffect(() => {
+    const raw = params.get('filter');
+    if (!raw) {
+      if (filter !== 'all') setFilter('all');
+      return;
+    }
+    if (LEGACY_FILTER_VALUES.has(raw)) {
+      if (filter !== 'all') setFilter('all');
+      return;
+    }
+    const next = VALID_FILTERS.find(v => v === raw) ?? 'all';
+    if (next !== filter) setFilter(next);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params]);
+
+  const updateFilterUrl = (id: UserFilterStatus) => {
+    setFilter(id);
+    const next = new URLSearchParams(params);
+    if (id === 'all') next.delete('filter');
+    else next.set('filter', id);
+    setParams(next, { replace: true });
+  };
+
+  // ?member= deep link (matches the Inbox ?ticket= pattern).
+  useEffect(() => {
+    const member = params.get('member');
+    if (member && member !== drawerUserId) setDrawerUserId(member);
+    if (!member && drawerUserId) setDrawerUserId(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params]);
+
+  const openMember = (id: string) => {
+    const next = new URLSearchParams(params);
+    next.set('member', id);
+    setParams(next, { replace: true });
+    setDrawerUserId(id);
+  };
+  const closeMember = () => {
+    const next = new URLSearchParams(params);
+    next.delete('member');
+    setParams(next, { replace: true });
+    setDrawerUserId(null);
+  };
+
+  const chips: { id: UserFilterStatus; label: string; count?: number }[] = [
+    { id: 'all',           label: 'All',            count: counts.all },
+    { id: 'new_this_week', label: 'New this week',  count: counts.new_this_week },
+    { id: 'active_24h',    label: 'Active 24h',     count: counts.active_24h },
+    { id: 'dormant_14d',   label: 'Dormant 14d+',   count: counts.dormant_14d },
+    { id: 'eg_issues',     label: 'EG issues',      count: counts.eg_issues },
+    { id: 'suspended',     label: 'Suspended',      count: counts.suspended },
+    { id: 'admin',         label: 'Admins',         count: counts.admin },
   ];
 
   const totalPages = Math.max(1, Math.ceil(filteredCount / pageSize));
@@ -125,7 +179,7 @@ function AllUsersTab() {
         <input
           value={searchInput}
           onChange={e => setSearchInput(e.target.value)}
-          placeholder="Search by name, @username, club…"
+          placeholder="Search name, username, email, club"
           style={{
             width: '100%', padding: '10px 12px 10px 36px',
             borderRadius: t.radius.md,
@@ -135,33 +189,51 @@ function AllUsersTab() {
         />
       </div>
 
-      {/* Filter chips */}
       <SectionTabs
-        tabs={filters.map(f => ({ id: f.id, label: f.label, count: f.count }))}
+        tabs={chips.map(f => ({ id: f.id, label: f.label, count: f.count }))}
         activeId={filter}
-        onChange={(id) => setFilter(id as UserFilterStatus)}
+        onChange={(id) => updateFilterUrl(id as UserFilterStatus)}
       />
 
-      {/* List */}
-      {isLoading ? (
-        <SkeletonCards />
-      ) : users.length === 0 ? (
-        <EmptyState title="No users match" subtitle={search ? `for "${search}"` : undefined} />
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {users.map(u => <UserCard key={u.id} user={u} onOpen={() => setDrawerUserId(u.id)} />)}
+      {/* Roster list card with caption */}
+      <div style={{
+        background: t.surface, border: `1px solid ${t.line}`,
+        borderRadius: 18, overflow: 'hidden',
+      }}>
+        <div style={{
+          padding: '10px 14px', borderBottom: `1px solid ${t.line}`,
+          fontSize: 10, fontWeight: 700, color: t.inkFaint,
+          textTransform: 'uppercase', letterSpacing: 0.6,
+        }}>
+          Most recently active
         </div>
-      )}
+        {isLoading ? (
+          <SkeletonCards />
+        ) : users.length === 0 ? (
+          <EmptyState title="No members match" subtitle={search ? `for "${search}"` : undefined} />
+        ) : (
+          <div>
+            {users.map((u, i) => (
+              <RosterRow
+                key={u.id}
+                user={u}
+                divider={i > 0}
+                onOpen={() => openMember(u.id)}
+              />
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Pagination */}
       {filteredCount > pageSize && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 4, gap: 8, flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 12, color: t.inkMuted }}>
-            {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, filteredCount)} of {filteredCount.toLocaleString()} ({allCount.toLocaleString()} total)
+          <span style={{ fontSize: 12, color: t.inkMuted, fontVariantNumeric: 'tabular-nums' }}>
+            {(page - 1) * pageSize + 1}-{Math.min(page * pageSize, filteredCount)} of {filteredCount.toLocaleString()} ({allCount.toLocaleString()} total)
           </span>
           <div style={{ display: 'flex', gap: 6 }}>
             <PagerBtn disabled={page <= 1} onClick={() => setPage(p => p - 1)}>Prev</PagerBtn>
-            <span style={{ fontSize: 13, color: t.ink, padding: '6px 4px' }}>
+            <span style={{ fontSize: 13, color: t.ink, padding: '6px 4px', fontVariantNumeric: 'tabular-nums' }}>
               {page} / {totalPages}
             </span>
             <PagerBtn disabled={page >= totalPages} onClick={() => setPage(p => p + 1)}>Next</PagerBtn>
@@ -169,15 +241,76 @@ function AllUsersTab() {
         </div>
       )}
 
-      <UserDetailPanel
+      <Member360Sheet
         userId={drawerUserId}
         detail={userDetail ?? null}
         loading={detailLoading}
-        onClose={() => setDrawerUserId(null)}
+        error={detailError}
+        onRetry={() => refetchDetail()}
+        onClose={closeMember}
         onUpdateRole={updateRole}
         roleUpdating={roleUpdating}
       />
     </div>
+  );
+}
+
+/* ─────────────────────── Roster row ─────────────────────── */
+
+function RosterRow({ user, onOpen, divider }: { user: AdminUserRow; onOpen: () => void; divider: boolean }) {
+  const isNew = Date.now() - new Date(user.created_at).getTime() < 7 * 86400_000;
+  return (
+    <button
+      onClick={onOpen}
+      style={{
+        width: '100%', textAlign: 'left',
+        background: 'transparent',
+        borderTop: divider ? `1px solid ${t.line}` : 'none',
+        borderLeft: 'none', borderRight: 'none', borderBottom: 'none',
+        padding: '12px 14px',
+        display: 'flex', gap: 12, alignItems: 'center',
+        cursor: 'pointer',
+      }}
+    >
+      <SquircleAvatar size={38} src={user.avatar_url} alt={user.display_name ?? ''} userId={user.id} hairlineRing />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+          <span style={{
+            color: t.ink, fontSize: 14, fontWeight: 700,
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          }}>
+            {user.display_name ?? user.username ?? '-'}
+          </span>
+          {user.is_suspended && <StatusPill tone="danger">Suspended</StatusPill>}
+          {isNew && <StatusPill tone="brand">New</StatusPill>}
+          {user.role && <StatusPill tone="warn">{user.role}</StatusPill>}
+        </div>
+        <div style={{
+          color: t.inkMuted, fontSize: 12, marginTop: 2,
+          display: 'flex', alignItems: 'center', gap: 6,
+          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+        }}>
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {user.username ? `@${user.username}` : ''}
+          </span>
+          {user.home_club && (
+            <>
+              <span>|</span>
+              <MapPin size={11} style={{ flexShrink: 0 }} />
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.home_club}</span>
+            </>
+          )}
+        </div>
+      </div>
+      <div style={{ textAlign: 'right', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 4 }}>
+        <span style={{
+          fontSize: 12, color: t.inkMuted, fontVariantNumeric: 'tabular-nums',
+        }}>
+          {relTime(user.last_seen_at)}
+        </span>
+        <ChevronRight size={14} color={t.inkFaint} />
+      </div>
+    </button>
   );
 }
 
@@ -199,65 +332,23 @@ function PagerBtn({ children, ...rest }: React.ButtonHTMLAttributes<HTMLButtonEl
   );
 }
 
-function UserCard({ user, onOpen }: { user: AdminUserRow; onOpen: () => void }) {
-  return (
-    <button
-      onClick={onOpen}
-      style={{
-        width: '100%', textAlign: 'left',
-        background: t.surface, border: `1px solid ${t.line}`,
-        borderRadius: t.radius.md, padding: 12,
-        display: 'flex', gap: 12, alignItems: 'center',
-        cursor: 'pointer',
-      }}
-    >
-      <SquircleAvatar size={40} src={user.avatar_url} alt={user.display_name ?? ''} userId={user.id} hairlineRing />
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
-          <span style={{
-            color: t.ink, fontSize: 14, fontWeight: 600,
-            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-          }}>
-            {user.display_name ?? '—'}
-          </span>
-          {user.is_verified && <CheckCircle2 size={14} color={t.ok} style={{ flexShrink: 0 }} />}
-          {user.role && <StatusPill tone="warn">{user.role}</StatusPill>}
-        </div>
-        <div style={{
-          color: t.inkMuted, fontSize: 12, marginTop: 2,
-          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-        }}>
-          {user.username ? `@${user.username}` : ''}{user.country ? ` · ${user.country}` : ''}
-          {user.handicap_index != null ? ` · HCP ${user.handicap_index.toFixed(1)}` : ''}
-        </div>
-      </div>
-      <div style={{ textAlign: 'right', flexShrink: 0 }}>
-        <div style={{ fontSize: 11, color: t.inkFaint }}>last seen</div>
-        <div style={{ fontSize: 12, color: t.ink, fontWeight: 600 }}>{relTime(user.last_seen_at)}</div>
-      </div>
-    </button>
-  );
-}
-
 function SkeletonCards({ n = 6 }: { n?: number }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+    <div>
       {Array.from({ length: n }).map((_, i) => (
-        <div
-          key={i}
-          style={{
-            height: 64, background: t.canvas,
-            borderRadius: t.radius.md,
-            animation: 'admin-pulse 1.4s ease-in-out infinite',
-          }}
-        />
+        <div key={i} style={{
+          height: 64,
+          borderTop: i > 0 ? `1px solid ${t.line}` : 'none',
+          background: t.canvas,
+          animation: 'admin-pulse 1.4s ease-in-out infinite',
+        }} />
       ))}
       <style>{`@keyframes admin-pulse{0%,100%{opacity:1}50%{opacity:.55}}`}</style>
     </div>
   );
 }
 
-/* ─────────────────── User detail panel ─────────────────── */
+/* ─────────────────────── Member 360 sheet ─────────────────────── */
 
 const ROLE_OPTIONS = [
   { value: null,            label: 'No role' },
@@ -266,12 +357,27 @@ const ROLE_OPTIONS = [
   { value: 'limited_admin', label: 'Limited Admin' },
 ];
 
-function UserDetailPanel({
-  userId, detail, loading, onClose, onUpdateRole, roleUpdating,
+function egStatusView(conn: { last_sync_status: string | null; last_synced_at: string | null } | null) {
+  if (!conn) return { tone: 'muted' as const, label: 'Not linked', when: null as string | null };
+  const status = conn.last_sync_status ?? '';
+  if (status === 'ok') {
+    return {
+      tone: 'ok' as const,
+      label: 'Linked - syncing',
+      when: conn.last_synced_at ? `last synced ${relTime(conn.last_synced_at)}` : null,
+    };
+  }
+  return { tone: 'warn' as const, label: 'Needs re-auth', when: null };
+}
+
+function Member360Sheet({
+  userId, detail, loading, error, onRetry, onClose, onUpdateRole, roleUpdating,
 }: {
   userId: string | null;
-  detail: import('../hooks/useUsers').AdminUserDetail | null;
+  detail: AdminUserDetail | null;
   loading: boolean;
+  error: boolean;
+  onRetry: () => void;
   onClose: () => void;
   onUpdateRole: (userId: string, role: string | null) => void;
   roleUpdating: boolean;
@@ -287,10 +393,11 @@ function UserDetailPanel({
   const [busy, setBusy] = useState(false);
   const [requestMode, setRequestMode] = useState<null | 'delete' | 'ban' | 'role'>(null);
   const [reqReason, setReqReason] = useState('');
-  const [reqRoleAction, setReqRoleAction] = useState<'grant_limited' | 'grant_full' | 'downgrade' | 'revoke'>('grant_limited');
+  const [reqRoleAction, setReqRoleAction] =
+    useState<'grant_limited' | 'grant_full' | 'downgrade' | 'revoke'>('grant_limited');
 
   const close = () => { setConfirm(null); setRequestMode(null); setReqReason(''); onClose(); };
-  const name = detail?.display_name ?? detail?.username ?? 'user';
+  const name = detail?.display_name ?? detail?.username ?? 'member';
 
   const runConfirmed = async () => {
     if (!detail || !confirm) return;
@@ -339,11 +446,20 @@ function UserDetailPanel({
     }
   };
 
+  const joinedMonth = detail?.created_at
+    ? new Date(detail.created_at).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })
+    : null;
+
+  const egView = detail ? egStatusView(detail.whs_connection) : null;
+  const isNew = detail
+    ? Date.now() - new Date(detail.created_at).getTime() < 7 * 86400_000
+    : false;
+
   return (
     <DetailDrawer
       open={!!userId}
-      onClose={onClose}
-      title={detail?.display_name ?? (loading ? 'Loading…' : 'User')}
+      onClose={close}
+      title={detail?.display_name ?? (loading ? 'Loading...' : 'Member')}
       subtitle={detail?.username ? `@${detail.username}` : undefined}
       footer={
         detail ? (
@@ -351,9 +467,15 @@ function UserDetailPanel({
             <DrawerBtn onClick={() => navigate(`/profile/${detail.id}`)}>Public profile</DrawerBtn>
             {isFullAdmin && (
               <>
-                <DrawerBtn icon={<KeyRound size={14} />} onClick={() => setConfirm('reset')}>Reset password</DrawerBtn>
-                <DrawerBtn icon={<Ban size={14} />}  tone="warn"   onClick={() => setConfirm('suspend')}>Suspend</DrawerBtn>
-                <DrawerBtn icon={<Trash2 size={14} />} tone="danger" onClick={() => setConfirm('delete')}>Delete</DrawerBtn>
+                <DrawerBtn icon={<KeyRound size={14} />} onClick={() => setConfirm('reset')}>Send password reset</DrawerBtn>
+                <DrawerBtn
+                  icon={<Ban size={14} />}
+                  tone={detail.is_suspended ? undefined : 'warn'}
+                  onClick={() => setConfirm('suspend')}
+                >
+                  {detail.is_suspended ? 'Lift suspension' : 'Suspend member'}
+                </DrawerBtn>
+                <DrawerBtn icon={<Trash2 size={14} />} tone="danger" onClick={() => setConfirm('delete')}>Delete member</DrawerBtn>
               </>
             )}
             {isLimited && (
@@ -367,79 +489,147 @@ function UserDetailPanel({
         ) : undefined
       }
     >
-      {loading || !detail ? (
+      {loading && !detail ? (
         <SkeletonCards n={4} />
-      ) : (
+      ) : error && !detail ? (
+        <AdminErrorState title="Couldn't load member" message="Try again in a moment." onRetry={onRetry} />
+      ) : !detail ? null : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-            <SquircleAvatar size={56} src={detail.avatar_url} alt={detail.display_name ?? ''} userId={detail.id}
-              hairlineRing
-              ringColor={LIGHT_HAIRLINE}
+          {/* Identity header (sticky-ish via top position) */}
+          <div style={{
+            display: 'flex', gap: 12, alignItems: 'flex-start',
+            paddingBottom: 12, borderBottom: `1px solid ${t.line}`,
+          }}>
+            <SquircleAvatar size={46} src={detail.avatar_url} alt={detail.display_name ?? ''} userId={detail.id}
+              hairlineRing ringColor={LIGHT_HAIRLINE}
             />
-            <div style={{ minWidth: 0 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span style={{ fontSize: 15, fontWeight: 700, color: t.ink }}>{detail.display_name ?? '—'}</span>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                <span style={{ fontSize: 17, fontWeight: 800, color: t.ink }}>
+                  {detail.display_name ?? '-'}
+                </span>
                 {detail.is_verified && <CheckCircle2 size={14} color={t.ok} />}
+                {detail.is_suspended && <StatusPill tone="danger">Suspended</StatusPill>}
+                {isNew && <StatusPill tone="brand">New</StatusPill>}
+                {egView?.tone === 'warn' && <StatusPill tone="warn">EG re-auth</StatusPill>}
               </div>
-              <div style={{ fontSize: 12, color: t.inkMuted }}>
+              <div style={{ fontSize: 12, color: t.inkMuted, marginTop: 2 }}>
                 {detail.username ? `@${detail.username}` : ''}
-                {detail.country ? ` · ${detail.country}` : ''}
+                {joinedMonth ? ` - joined ${joinedMonth}` : ''}
               </div>
-              {detail.home_club && (
-                <div style={{ fontSize: 12, color: t.inkMuted, marginTop: 2 }}>{detail.home_club}</div>
+              {detail.email && (
+                <div style={{
+                  fontSize: 11, color: t.inkFaint, marginTop: 4,
+                  display: 'flex', alignItems: 'center', gap: 4, minWidth: 0,
+                }}>
+                  {detail.email_confirmed && <BadgeCheck size={12} color={t.ok} style={{ flexShrink: 0 }} />}
+                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {detail.email}
+                  </span>
+                </div>
               )}
             </div>
           </div>
 
-          {/* Stats */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
-            <StatTile label="Posts" value={detail.posts_count.toLocaleString()} />
-            <StatTile label="Reviews" value={detail.reviews_count.toLocaleString()} />
-            <StatTile label="Followers" value={detail.followers.toLocaleString()} />
-            <StatTile label="Following" value={detail.following.toLocaleString()} />
-            <StatTile label="Top 100 played" value={detail.top100_played.toLocaleString()} />
-            <StatTile label="Joined" value={relTime(detail.created_at)} />
-          </div>
-
-          {/* Role select (full-admin direct edit) */}
-          {isFullAdmin && (
+          {/* 1) Engagement rail: one card, four equal stats */}
+          <Section title="Engagement">
             <div style={{
-              background: t.canvas, border: `1px solid ${t.line}`,
-              borderRadius: t.radius.md, padding: 12,
+              display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 0,
+              border: `1px solid ${t.line}`, borderRadius: t.radius.md,
+              background: t.surface, overflow: 'hidden',
             }}>
-              <div style={{ fontSize: 11, color: t.inkFaint, fontWeight: 600, textTransform: 'uppercase' }}>
-                App Role
-              </div>
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
-                {ROLE_OPTIONS.map(opt => {
-                  const active = (detail.role ?? null) === opt.value;
-                  return (
-                    <button
-                      key={opt.value ?? 'none'}
-                      disabled={roleUpdating}
-                      onClick={() => onUpdateRole(detail.id, opt.value)}
-                      style={{
-                        padding: '6px 12px', borderRadius: 999,
-                        border: `1px solid ${active ? 'transparent' : t.line}`,
-                        background: active ? t.brandSoft : t.surface,
-                        color: active ? t.brandText : t.inkMuted,
-                        fontSize: 12, fontWeight: 600,
-                        cursor: roleUpdating ? 'progress' : 'pointer',
-                      }}
-                    >
-                      {opt.label}
-                    </button>
-                  );
-                })}
-              </div>
+              <Stat label="Posts" value={detail.posts_count} />
+              <Stat label="Reviews" value={detail.reviews_count} divider />
+              <Stat label="Followers" value={detail.followers} divider />
+              <Stat label="Top 100" value={detail.top100_played} divider />
             </div>
+          </Section>
+
+          {/* 2) Golf identity */}
+          <Section title="Golf identity">
+            <div style={{
+              border: `1px solid ${t.line}`, borderRadius: t.radius.md,
+              background: t.surface,
+            }}>
+              <IdentityRow icon={<MapPin size={14} color={t.inkMuted} />} label="Home club"
+                value={detail.home_club ?? 'Not set'} muted={!detail.home_club} />
+              <IdentityRow
+                icon={<Radio size={14} color={t.inkMuted} />}
+                label="England Golf"
+                divider
+                value={
+                  egView?.tone === 'muted' ? 'Not linked' :
+                  egView?.tone === 'warn' ? undefined :
+                  egView?.when ? `${egView.label} - ${egView.when}` : egView?.label
+                }
+                muted={egView?.tone === 'muted'}
+                pill={
+                  egView?.tone === 'ok'   ? { tone: 'ok', label: 'Linked - syncing' } :
+                  egView?.tone === 'warn' ? { tone: 'warn', label: 'Needs re-auth' } :
+                  null
+                }
+              />
+            </div>
+          </Section>
+
+          {/* 3) Moderation history */}
+          <Section title="Moderation">
+            <div style={{
+              border: `1px solid ${t.line}`, borderRadius: t.radius.md,
+              background: t.surface, padding: '10px 14px',
+              display: 'flex', flexDirection: 'column', gap: 6,
+            }}>
+              <div style={{
+                fontSize: 13, fontWeight: 600,
+                color: detail.is_suspended ? t.dangerText : t.ink,
+              }}>
+                {detail.is_suspended ? 'Suspended - active' : 'No suspensions'}
+              </div>
+              {detail.reports_received > 0 && (
+                <div style={{ fontSize: 12, color: t.inkMuted, fontVariantNumeric: 'tabular-nums' }}>
+                  {detail.reports_received.toLocaleString()} report{detail.reports_received === 1 ? '' : 's'} received
+                </div>
+              )}
+            </div>
+          </Section>
+
+          {/* Role (full-admin direct edit) */}
+          {isFullAdmin && (
+            <Section title="App role">
+              <div style={{
+                background: t.canvas, border: `1px solid ${t.line}`,
+                borderRadius: t.radius.md, padding: 12,
+              }}>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                  {ROLE_OPTIONS.map(opt => {
+                    const active = (detail.role ?? null) === opt.value;
+                    return (
+                      <button
+                        key={opt.value ?? 'none'}
+                        disabled={roleUpdating}
+                        onClick={() => onUpdateRole(detail.id, opt.value)}
+                        style={{
+                          padding: '6px 12px', borderRadius: 999,
+                          border: `1px solid ${active ? 'transparent' : t.line}`,
+                          background: active ? t.brandSoft : t.surface,
+                          color: active ? t.brandText : t.inkMuted,
+                          fontSize: 12, fontWeight: 600,
+                          cursor: roleUpdating ? 'progress' : 'pointer',
+                        }}
+                      >
+                        {opt.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </Section>
           )}
 
           {detail.bio && (
-            <div>
-              <div style={{ fontSize: 11, color: t.inkFaint, fontWeight: 600, textTransform: 'uppercase', marginBottom: 6 }}>Bio</div>
+            <Section title="Bio">
               <div style={{ fontSize: 13, color: t.ink, lineHeight: 1.5 }}>{detail.bio}</div>
-            </div>
+            </Section>
           )}
         </div>
       )}
@@ -457,11 +647,15 @@ function UserDetailPanel({
         open={confirm === 'suspend'}
         onClose={() => setConfirm(null)}
         onConfirm={runConfirmed}
-        title={`Suspend ${name}?`}
-        description="They will be signed out and unable to post or comment until reinstated."
-        requireText={detail?.username || detail?.display_name || 'SUSPEND'}
-        confirmLabel="Suspend user"
-        tone="danger"
+        title={detail?.is_suspended ? `Lift suspension on ${name}?` : `Suspend ${name}?`}
+        description={
+          detail?.is_suspended
+            ? 'They will regain access immediately.'
+            : 'They will be signed out and unable to post or comment until reinstated.'
+        }
+        requireText={detail?.is_suspended ? undefined : (detail?.username || detail?.display_name || 'SUSPEND')}
+        confirmLabel={detail?.is_suspended ? 'Lift suspension' : 'Suspend member'}
+        tone={detail?.is_suspended ? undefined : 'danger'}
         busy={busy}
       />
       <ConfirmDialog
@@ -469,9 +663,9 @@ function UserDetailPanel({
         onClose={() => setConfirm(null)}
         onConfirm={runConfirmed}
         title={`Delete ${name}?`}
-        description="This permanently deletes the user and their data. This cannot be undone."
+        description="This permanently deletes the member and their data. This cannot be undone."
         requireText={detail?.username || detail?.display_name || 'DELETE'}
-        confirmLabel="Delete user"
+        confirmLabel="Delete member"
         tone="danger"
         busy={busy}
       />
@@ -495,7 +689,7 @@ function UserDetailPanel({
           >
             <div>
               <div style={{ fontSize: 16, fontWeight: 700, color: t.ink }}>
-                {requestMode === 'delete' ? 'Request user deletion'
+                {requestMode === 'delete' ? 'Request member deletion'
                   : requestMode === 'ban' ? 'Request permanent ban'
                   : 'Request role change'}
               </div>
@@ -570,6 +764,81 @@ function UserDetailPanel({
   );
 }
 
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <div style={{
+        fontSize: 11, color: t.inkFaint, fontWeight: 700,
+        textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8,
+      }}>
+        {title}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function Stat({ label, value, divider }: { label: string; value: number; divider?: boolean }) {
+  return (
+    <div style={{
+      padding: 12, textAlign: 'center',
+      borderLeft: divider ? `1px solid ${t.line}` : 'none',
+    }}>
+      <div style={{
+        fontSize: 18, fontWeight: 800, color: t.ink,
+        fontVariantNumeric: 'tabular-nums',
+      }}>
+        {value.toLocaleString()}
+      </div>
+      <div style={{
+        fontSize: 10, color: t.inkFaint, fontWeight: 700,
+        textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 4,
+      }}>
+        {label}
+      </div>
+    </div>
+  );
+}
+
+function IdentityRow({
+  icon, label, value, muted, divider, pill,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value?: string;
+  muted?: boolean;
+  divider?: boolean;
+  pill?: { tone: 'ok' | 'warn'; label: string } | null;
+}) {
+  return (
+    <div style={{
+      padding: '10px 14px',
+      borderTop: divider ? `1px solid ${t.line}` : 'none',
+      display: 'flex', alignItems: 'center', gap: 10,
+    }}>
+      <div style={{ flexShrink: 0 }}>{icon}</div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{
+          fontSize: 10, color: t.inkFaint, fontWeight: 700,
+          textTransform: 'uppercase', letterSpacing: 0.5,
+        }}>
+          {label}
+        </div>
+        {value && (
+          <div style={{
+            fontSize: 13, marginTop: 2,
+            color: muted ? t.inkFaint : t.ink,
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          }}>
+            {value}
+          </div>
+        )}
+      </div>
+      {pill && <StatusPill tone={pill.tone}>{pill.label}</StatusPill>}
+    </div>
+  );
+}
+
 function DrawerBtn({
   children, onClick, tone, icon, disabled,
 }: { children: React.ReactNode; onClick: () => void; tone?: 'warn' | 'danger'; icon?: React.ReactNode; disabled?: boolean }) {
@@ -595,462 +864,7 @@ function DrawerBtn({
   );
 }
 
-/* ─────────────────────── Verifications ─────────────────────── */
-
-const PROOF_LABELS: Record<string, string> = {
-  official_website: 'Official website',
-  business_email: 'Business email',
-  registered_business: 'Registered business',
-  creator_business: 'Creator / brand',
-  golf_course: 'Golf course / facility',
-};
-
-const PROOF_NOUNS: Record<string, string> = {
-  official_website: 'website',
-  business_email: 'email address',
-  registered_business: 'company registration',
-  creator_business: 'contact',
-  golf_course: 'golf course website',
-};
-
-
-type EntityFilter = 'business' | 'golfer' | 'course_claim';
-
-export function VerificationsTab({
-  data, loading, review,
-}: {
-  data: VerificationRow[];
-  loading: boolean;
-  review: ReturnType<typeof useVerifications>['reviewMutation'];
-}) {
-  const [params, setParams] = useSearchParams();
-  const entityFromUrl = (params.get('entity') as EntityFilter | null) ?? null;
-
-  // Default to whichever entity has pending items (Businesses → Courses → Users),
-  // unless the URL explicitly requested one.
-  const pendingByEntity = useMemo(() => ({
-    business: data.filter(r => r.type === 'business' && r.status === 'pending').length,
-    course_claim: data.filter(r => r.type === 'course_claim' && r.status === 'pending').length,
-    golfer: data.filter(r => r.type === 'golfer' && r.status === 'pending').length,
-  }), [data]);
-
-  const defaultEntity: EntityFilter =
-    entityFromUrl ??
-    (pendingByEntity.business > 0 ? 'business'
-      : pendingByEntity.course_claim > 0 ? 'course_claim'
-      : pendingByEntity.golfer > 0 ? 'golfer'
-      : 'business');
-
-  const [entityFilter, setEntityFilterState] = useState<EntityFilter>(defaultEntity);
-  const setEntityFilter = (id: EntityFilter) => {
-    setEntityFilterState(id);
-    const next = new URLSearchParams(params);
-    next.set('entity', id);
-    setParams(next, { replace: true });
-  };
-
-  // Honour URL changes (e.g. dashboard deep-link with ?entity=course_claim).
-  useEffect(() => {
-    if (entityFromUrl && entityFromUrl !== entityFilter) {
-      setEntityFilterState(entityFromUrl);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [entityFromUrl]);
-
-  const [statusFilter, setStatusFilter] = useState<'pending' | 'needs_info' | 'approved' | 'rejected' | 'all'>('pending');
-  const [active, setActive] = useState<VerificationRow | null>(null);
-  const [note, setNote] = useState('');
-  const [decision, setDecision] = useState<'approved' | 'rejected' | 'needs_more_info' | null>(null);
-  const [bizDetail, setBizDetail] = useState<{ name?: string; category?: string; location?: string; website?: string; email?: string } | null>(null);
-  const [confirmApprove, setConfirmApprove] = useState(false);
-  const { data: proofConflict } = useProofConflict(active);
-
-
-  // Fetch business profile when opening a business request
-  useEffect(() => {
-    let cancelled = false;
-    setBizDetail(null);
-    if (active?.type === 'business' && active.businessId) {
-      import('@/integrations/supabase/client').then(({ supabase }) =>
-        supabase.from('business_accounts')
-          .select('name, category, location, website, email')
-          .eq('id', active.businessId!)
-          .maybeSingle()
-          .then(({ data }) => { if (!cancelled && data) setBizDetail(data as any); })
-      );
-    }
-    return () => { cancelled = true; };
-  }, [active?.id, active?.businessId, active?.type]);
-
-  const entityFiltered = useMemo(
-    () => data.filter(r => r.type === entityFilter),
-    [data, entityFilter],
-  );
-
-  const rows = useMemo(() => {
-    if (statusFilter === 'all') return entityFiltered;
-    if (statusFilter === 'needs_info') return entityFiltered.filter(r => r.status === 'needs_more_info');
-    if (statusFilter === 'approved') return entityFiltered.filter(r => r.status === 'approved' || r.status === 'accepted');
-    if (statusFilter === 'rejected') return entityFiltered.filter(r => r.status === 'rejected' || r.status === 'declined');
-    return entityFiltered.filter(r => r.status === 'pending');
-  }, [entityFiltered, statusFilter]);
-
-  const close = () => { setActive(null); setNote(''); setDecision(null); setBizDetail(null); setConfirmApprove(false); };
-
-  const doApprove = () => {
-    if (!active) return;
-    review.mutate(
-      { id: active.id, type: active.type, decision: 'approved', adminNote: note },
-      { onSuccess: close },
-    );
-  };
-
-  const submit = (d: 'approved' | 'rejected' | 'needs_more_info') => {
-    if (!active) return;
-    if ((d === 'rejected' || d === 'needs_more_info') && note.trim().length < 3) {
-      setDecision(d);
-      return;
-    }
-    if (active.type === 'golfer' && d === 'needs_more_info') return;
-    // Course claims: allow needs_more_info (note required, handled above)
-    if (d === 'approved' && proofConflict) {
-      setConfirmApprove(true);
-      return;
-    }
-    review.mutate(
-      { id: active.id, type: active.type, decision: d as any, adminNote: note },
-      { onSuccess: close },
-    );
-  };
-
-
-  const proofMetaEntries = active?.proofMetadata
-    ? Object.entries(active.proofMetadata).filter(([, v]) => v !== null && v !== undefined && v !== '')
-    : [];
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      {/* Entity segmentation — Businesses / Users / Courses */}
-      <SectionTabs
-        tabs={[
-          { id: 'business',     label: 'Businesses', count: pendingByEntity.business || undefined },
-          { id: 'golfer',       label: 'Users',      count: pendingByEntity.golfer || undefined },
-          { id: 'course_claim', label: 'Courses',    count: pendingByEntity.course_claim || undefined },
-        ]}
-        activeId={entityFilter}
-        onChange={(id) => setEntityFilter(id as EntityFilter)}
-      />
-
-      <SectionTabs
-        tabs={[
-          { id: 'pending',   label: 'Pending',    count: entityFiltered.filter(r => r.status === 'pending').length },
-          { id: 'needs_info', label: 'Needs info', count: entityFiltered.filter(r => r.status === 'needs_more_info').length },
-          { id: 'approved',  label: 'Approved' },
-          { id: 'rejected',  label: 'Rejected' },
-          { id: 'all',       label: 'All',        count: entityFiltered.length },
-        ]}
-        activeId={statusFilter}
-        onChange={(id) => setStatusFilter(id as any)}
-      />
-
-
-      {loading ? <SkeletonCards /> : rows.length === 0 ? (
-        <EmptyState title="No verification requests" subtitle="You're all caught up." />
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {rows.map(r => (
-            <VerificationCard key={r.id} row={r} disabled={review.isPending} onOpen={() => setActive(r)} onQuick={(d) => {
-              if (review.isPending) return;
-              setActive(r);
-              if (d === 'approved' && r.type === 'business') {
-                review.mutate({ id: r.id, type: r.type, decision: 'approved', adminNote: '' }, { onSuccess: close });
-              } else {
-                setDecision(d);
-              }
-            }} />
-          ))}
-        </div>
-      )}
-
-      <DetailDrawer
-        open={!!active}
-        onClose={close}
-        title={active ? (
-          active.type === 'course_claim'
-            ? (active.claimCourseName ?? active.claimBusinessName ?? 'Course claim')
-            : (bizDetail?.name ?? active.displayName ?? active.username ?? 'Verification request')
-        ) : ''}
-        subtitle={active ? (
-          active.type === 'course_claim'
-            ? `Course claim · requested by ${active.displayName ?? active.username ?? '—'} · ${relTime(active.createdAt)}`
-            : `${active.type === 'business' ? 'Business' : 'Golfer'} · ${relTime(active.createdAt)}`
-        ) : undefined}
-        footer={active && active.status === 'pending' ? (
-          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-            <DrawerBtn icon={<X size={14} />} tone="danger" disabled={review.isPending} onClick={() => submit('rejected')}>Reject</DrawerBtn>
-            {(active.type === 'business' || active.type === 'course_claim') && (
-              <DrawerBtn icon={<Mail size={14} />} tone="warn" disabled={review.isPending} onClick={() => submit('needs_more_info')}>Needs info</DrawerBtn>
-            )}
-            <DrawerBtn icon={<CheckCircle2 size={14} />} disabled={review.isPending} onClick={() => submit('approved')}>Approve</DrawerBtn>
-          </div>
-        ) : undefined}
-      >
-        {active && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              <StatusPill tone={
-                active.type === 'business' ? 'warn' :
-                active.type === 'course_claim' ? 'warn' : 'neutral'
-              }>
-                {active.type === 'business' ? 'Business' :
-                 active.type === 'course_claim' ? 'Course claim' : 'Golfer'}
-              </StatusPill>
-              <StatusPill tone={
-                active.status === 'pending' ? 'warn' :
-                active.status === 'needs_more_info' ? 'warn' :
-                active.status === 'approved' || active.status === 'accepted' ? 'ok' :
-                active.status === 'rejected' || active.status === 'declined' ? 'danger' : 'neutral'
-              }>
-                {active.status}
-              </StatusPill>
-            </div>
-
-            {active.type === 'course_claim' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {active.businessAlreadyVerified && (
-                  <div
-                    style={{
-                      background: 'rgba(245, 158, 11, 0.10)',
-                      border: '1px solid rgba(245, 158, 11, 0.35)',
-                      color: '#b45309',
-                      padding: '8px 10px',
-                      borderRadius: 8,
-                      fontSize: 12,
-                      lineHeight: 1.4,
-                    }}
-                  >
-                    Note: this business is already verified. Course claims grant club linkage,
-                    which the verified tick alone does not - review the claim on its own merits.
-                  </div>
-                )}
-                {active.claimBusinessName && <Field label="Business" value={active.claimBusinessName} />}
-                {active.claimCourseName && <Field label="Course / Club" value={active.claimCourseName} />}
-                {active.claimProofNote && <Field label="Proof note" value={active.claimProofNote} />}
-              </div>
-            )}
-
-            {active.type === 'business' && bizDetail && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {bizDetail.category && <Field label="Category" value={bizDetail.category} />}
-                {bizDetail.location && <Field label="Location" value={bizDetail.location} />}
-                {bizDetail.website && (
-                  <Field label="Website">
-                    <a href={bizDetail.website} target="_blank" rel="noreferrer" style={{ color: t.brandText, fontSize: 13, wordBreak: 'break-all' }}>
-                      {bizDetail.website}
-                    </a>
-                  </Field>
-                )}
-                {bizDetail.email && <Field label="Business email" value={bizDetail.email} />}
-              </div>
-            )}
-
-            {active.type === 'business' && active.proofMethod && (
-              <Field label="Proof method" value={PROOF_LABELS[active.proofMethod] ?? active.proofMethod} />
-            )}
-            {active.type === 'business' && active.proofValue && (
-              <Field label="Proof value">
-                {/^https?:\/\//i.test(active.proofValue) ? (
-                  <a href={active.proofValue} target="_blank" rel="noreferrer" style={{ color: t.brandText, fontSize: 13, wordBreak: 'break-all' }}>
-                    {active.proofValue}
-                  </a>
-                ) : (
-                  <span style={{ fontSize: 13, color: t.ink, wordBreak: 'break-all' }}>{active.proofValue}</span>
-                )}
-              </Field>
-            )}
-            {proofConflict && active.type === 'business' && (
-              <div
-                role="alert"
-                style={{
-                  background: t.dangerSoft,
-                  border: `1px solid ${t.danger}`,
-                  borderRadius: t.radius.md,
-                  padding: 12,
-                  display: 'flex',
-                  gap: 10,
-                  alignItems: 'flex-start',
-                }}
-              >
-                <span style={{ fontSize: 16, lineHeight: 1 }} aria-hidden>⚠️</span>
-                <div style={{ fontSize: 13, color: t.dangerText, lineHeight: 1.45 }}>
-                  <strong style={{ fontWeight: 700 }}>Duplicate proof</strong> — this{' '}
-                  {PROOF_NOUNS[active.proofMethod ?? ''] ?? 'proof'} is already verified for{' '}
-                  <strong style={{ fontWeight: 700 }}>{proofConflict.businessName}</strong>.
-                  Approving will verify a second business with the same proof.
-                </div>
-              </div>
-            )}
-
-            {proofMetaEntries.length > 0 && (
-              <Field label="Proof metadata">
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  {proofMetaEntries.map(([k, v]) => (
-                    <div key={k} style={{ fontSize: 12, color: t.ink }}>
-                      <span style={{ color: t.inkMuted }}>{k}:</span> {String(v)}
-                    </div>
-                  ))}
-                </div>
-              </Field>
-            )}
-            {active.domain && (
-              <Field label="Domain" value={`${active.domain}${active.domainConfirmed ? ' (confirmed)' : ' (unconfirmed)'}`} />
-            )}
-            {active.type === 'business' && active.proofMethod === 'business_email' && (
-              <Field label="Email verification">
-                {(active.proofMetadata as any)?.email_verified || active.domainConfirmed ? (
-                  <span style={{ fontSize: 12, fontWeight: 700, color: '#059669' }}>Email verified (OTP)</span>
-                ) : (
-                  <span style={{ fontSize: 12, fontWeight: 600, color: t.inkMuted }}>Email provided (unverified)</span>
-                )}
-              </Field>
-            )}
-            {active.type === 'business' && active.proofDocumentUrl && (
-              <Field label="Supporting document">
-                <SupportingDocLink path={active.proofDocumentUrl} tokens={t} />
-              </Field>
-            )}
-            {active.type === 'business' && active.contactEmail && (
-              <Field label="Applicant contact email" value={active.contactEmail} />
-            )}
-            {active.type === 'business' && active.contactRole && (
-              <Field label="Applicant role" value={active.contactRole} />
-            )}
-
-            {active.note && <Field label="Request note" value={active.note} />}
-            {active.evidenceUrl && (
-              <Field label="Evidence">
-                <a href={active.evidenceUrl} target="_blank" rel="noreferrer" style={{ color: t.brandText, fontSize: 13 }}>
-                  {active.evidenceUrl}
-                </a>
-              </Field>
-            )}
-            {active.inviteReason && <Field label="Reason" value={active.inviteReason} />}
-            {active.adminNote && <Field label="Admin note" value={active.adminNote} />}
-
-            {active.status === 'pending' && (
-              <div>
-                <label style={{ fontSize: 11, color: t.inkFaint, fontWeight: 600, textTransform: 'uppercase' }}>
-                  Admin note {(decision === 'rejected' || decision === 'needs_more_info') && <span style={{ color: t.danger }}>(required, min 3 chars)</span>}
-                </label>
-                <textarea
-                  value={note}
-                  onChange={e => setNote(e.target.value)}
-                  placeholder="Optional for approval, required for rejection or 'needs info'…"
-                  rows={3}
-                  style={{
-                    marginTop: 6, width: '100%',
-                    padding: 10, borderRadius: t.radius.md,
-                    border: `1px solid ${(decision === 'rejected' || decision === 'needs_more_info') && note.trim().length < 3 ? t.danger : t.line}`,
-                    background: t.canvas, color: t.ink, fontSize: 13,
-                    outline: 'none', resize: 'vertical',
-                  }}
-                />
-              </div>
-            )}
-          </div>
-        )}
-      </DetailDrawer>
-
-      <ConfirmDialog
-        open={confirmApprove}
-        onClose={() => setConfirmApprove(false)}
-        onConfirm={() => { setConfirmApprove(false); doApprove(); }}
-        title="Approve duplicate proof?"
-        description={
-          proofConflict && active?.proofMethod
-            ? `This ${PROOF_NOUNS[active.proofMethod] ?? 'proof'} is already verified for ${proofConflict.businessName}. Approving will verify a second business with the same proof.`
-            : 'This proof is already verified for another business. Approve anyway?'
-        }
-        confirmLabel="Approve anyway"
-        cancelLabel="Cancel"
-        tone="danger"
-        busy={review.isPending}
-      />
-    </div>
-  );
-}
-
-
-function VerificationCard({
-  row, onOpen, onQuick, disabled,
-}: { row: VerificationRow; onOpen: () => void; onQuick: (d: 'approved' | 'rejected' | 'needs_more_info') => void; disabled?: boolean }) {
-  const tone =
-    row.status === 'pending' || row.status === 'needs_more_info' ? 'warn' :
-    row.status === 'approved' || row.status === 'accepted' ? 'ok' :
-    row.status === 'rejected' || row.status === 'declined' ? 'danger' : 'neutral';
-  return (
-    <div style={{
-      background: t.surface, border: `1px solid ${t.line}`,
-      borderRadius: t.radius.md, padding: 12,
-      display: 'flex', flexDirection: 'column', gap: 10,
-    }}>
-      <button
-        onClick={onOpen}
-        style={{
-          all: 'unset', cursor: 'pointer',
-          display: 'flex', gap: 10, alignItems: 'center',
-        }}
-      >
-        <SquircleAvatar size={36} src={row.avatarUrl ?? null} alt={row.displayName ?? ''} userId={row.requestedBy} hairlineRing />
-        <div style={{ flex: 1, minWidth: 0 }}>
-          {row.type === 'course_claim' ? (
-            <>
-              <div style={{ fontSize: 14, fontWeight: 600, color: t.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {row.claimCourseName ?? row.claimBusinessName ?? 'Course claim'}
-              </div>
-              <div style={{ fontSize: 12, color: t.inkMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                Course claim · requested by {row.displayName ?? row.username ?? '—'} · {relTime(row.createdAt)}
-                {row.claimBusinessName && row.claimBusinessName !== row.claimCourseName ? ` · ${row.claimBusinessName}` : ''}
-              </div>
-            </>
-          ) : (
-            <>
-              <div style={{ fontSize: 14, fontWeight: 600, color: t.ink }}>
-                {row.displayName ?? row.username ?? row.requestedBy?.slice(0, 8) ?? '—'}
-              </div>
-              <div style={{ fontSize: 12, color: t.inkMuted }}>
-                {row.type === 'business' ? 'Business' : 'Golfer'} · {relTime(row.createdAt)}
-              </div>
-            </>
-          )}
-        </div>
-        <StatusPill tone={tone}>{row.status}</StatusPill>
-      </button>
-      {row.status === 'pending' && (
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          <DrawerBtn icon={<X size={14} />} tone="danger" disabled={disabled} onClick={() => onQuick('rejected')}>Reject</DrawerBtn>
-          {(row.type === 'business' || row.type === 'course_claim') && (
-            <DrawerBtn icon={<Mail size={14} />} tone="warn" disabled={disabled} onClick={() => onQuick('needs_more_info')}>Needs info</DrawerBtn>
-          )}
-          <DrawerBtn icon={<CheckCircle2 size={14} />} disabled={disabled} onClick={() => onQuick('approved')}>Approve</DrawerBtn>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function Field({ label, value, children }: { label: string; value?: string; children?: React.ReactNode }) {
-  return (
-    <div>
-      <div style={{ fontSize: 11, color: t.inkFaint, fontWeight: 600, textTransform: 'uppercase', marginBottom: 4 }}>
-        {label}
-      </div>
-      {children ?? <div style={{ fontSize: 13, color: t.ink, lineHeight: 1.45 }}>{value}</div>}
-    </div>
-  );
-}
-
-/* ─────────────────────── Team & Roles ─────────────────────── */
+/* ─────────────────────── Team & Roles (unchanged) ─────────────────────── */
 
 function TeamTab() {
   const team = useTeam();
@@ -1134,7 +948,7 @@ function TeamCard({
           )}
         </div>
         <div style={{ fontSize: 12, color: t.inkMuted, marginTop: 4 }}>
-          Granted {relTime(member.createdAt)}{member.grantedBy ? ` · by ${member.grantedBy.slice(0, 8)}` : ''}
+          Granted {relTime(member.createdAt)}{member.grantedBy ? ` - by ${member.grantedBy.slice(0, 8)}` : ''}
         </div>
         {member.notes && (
           <div style={{ fontSize: 12, color: t.inkMuted, marginTop: 4 }}>{member.notes}</div>
@@ -1198,7 +1012,7 @@ function MenuItem({ children, onClick, danger }: { children: React.ReactNode; on
   );
 }
 
-/* ─────────────────────── Invites ─────────────────────── */
+/* ─────────────────────── Invites (unchanged) ─────────────────────── */
 
 function InvitesTab() {
   const invites = useInvites();
@@ -1287,10 +1101,10 @@ function InviteCard({
         <SquircleAvatar size={36} src={invite.avatarUrl} alt={invite.displayName ?? invite.email ?? ''} userId={invite.invitedUserId} hairlineRing />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 14, fontWeight: 600, color: t.ink }}>
-            {invite.displayName ?? invite.username ?? invite.email ?? '—'}
+            {invite.displayName ?? invite.username ?? invite.email ?? '-'}
           </div>
           <div style={{ fontSize: 12, color: t.inkMuted }}>
-            {invite.role ?? 'admin'} · sent {relTime(invite.createdAt)}
+            {invite.role ?? 'admin'} - sent {relTime(invite.createdAt)}
           </div>
         </div>
         <StatusPill tone={s.tone}>{s.label}</StatusPill>
@@ -1344,7 +1158,7 @@ function CreateInviteDrawer({
             icon={<UserPlus size={14} />}
             onClick={() => selected && onCreate(selected.id, role)}
           >
-            {creating ? 'Sending…' : 'Send invite'}
+            {creating ? 'Sending...' : 'Send invite'}
           </DrawerBtn>
         </div>
       }
@@ -1379,7 +1193,7 @@ function CreateInviteDrawer({
             <>
               <input
                 autoFocus
-                placeholder={usersLoading ? 'Loading users…' : 'Search by name or @username…'}
+                placeholder={usersLoading ? 'Loading users...' : 'Search by name or @username...'}
                 value={q}
                 onChange={e => setQ(e.target.value)}
                 style={{
@@ -1444,42 +1258,5 @@ function CreateInviteDrawer({
         </div>
       </div>
     </DetailDrawer>
-  );
-}
-
-function SupportingDocLink({ path, tokens }: { path: string; tokens: any }) {
-  const [busy, setBusy] = React.useState(false);
-  const open = async () => {
-    setBusy(true);
-    try {
-      const { supabase } = await import('@/integrations/supabase/client');
-      const { data, error } = await supabase.storage
-        .from('business-verification-docs')
-        .createSignedUrl(path, 60 * 10);
-      if (error) throw error;
-      if (data?.signedUrl) window.open(data.signedUrl, '_blank', 'noopener,noreferrer');
-    } catch (e) {
-      console.warn('[verification] signed URL failed', e);
-    } finally {
-      setBusy(false);
-    }
-  };
-  return (
-    <button
-      type="button"
-      onClick={open}
-      disabled={busy}
-      style={{
-        fontSize: 13,
-        color: tokens?.brandText ?? '#F7931E',
-        textDecoration: 'underline',
-        background: 'transparent',
-        border: 'none',
-        padding: 0,
-        cursor: busy ? 'wait' : 'pointer',
-      }}
-    >
-      {busy ? 'Opening…' : 'View supporting document'}
-    </button>
   );
 }
