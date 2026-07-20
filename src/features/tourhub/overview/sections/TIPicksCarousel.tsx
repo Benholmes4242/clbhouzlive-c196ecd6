@@ -160,7 +160,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
     live: state === 'live',
   });
 
-  if (!tournamentId || picks.length === 0) return null;
+  const show = !!tournamentId && picks.length > 0;
 
   const closeCase = () => {
     if (sheet?.kind === 'case' && sheet.from === 'index') {
@@ -178,93 +178,106 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
   const orderedPicks = orderPicksByBoard(picks, state, liveMap);
 
   return (
-    <SectionShell eyebrow={t('overview.tiPicks.eyebrow')} linkLabel={t('overview.tiPicks.linkLabel')} onLinkClick={() => setSheet({ kind: 'index' })}>
-      <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 16px 10px', scrollPaddingLeft: 16, scrollSnapType: 'x mandatory' }}>
-        {orderedPicks.slice(0, 8).map((p) => (
-          <button
-            key={p.playerId}
-            onClick={() => setSheet({ kind: 'case', pick: p, from: 'card' })}
-            style={{
-              flex: '0 0 218px',
-              scrollSnapAlign: 'start',
-              textAlign: 'left',
-              background: V4.surface,
-              border: `0.5px solid ${V4.cardBorder}`,
-              boxShadow: V4.cardShadow,
-              borderRadius: V4.cardRadius,
-              padding: 13,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 0,
-              cursor: 'pointer',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-              <div
-                role="link"
-                onClick={(e) => { e.stopPropagation(); goToPlayer(p.playerId); }}
-                style={{ display: 'flex', alignItems: 'center', gap: 9, cursor: 'pointer', flex: 1, minWidth: 0 }}
-              >
-                <SquircleAvatar
-                  size={34}
-                  srcCandidates={p.photoUrl ? [p.photoUrl, ...getPlayerHeadshotCandidates(p.playerName, tourCode)] : getPlayerHeadshotCandidates(p.playerName, tourCode)}
-                  alt={p.playerName}
-                  userId={p.playerId}
-                  hairlineRing
-                  ringColor={LIGHT_HAIRLINE}
-                />
-                <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                  <div style={{ fontSize: 13.5, fontWeight: 800, color: V4.ink, letterSpacing: '-0.015em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.2 }}>
-                    {p.playerName}
+    <AnimatePresence initial={false}>
+      {show && (
+        <motion.div
+          key="ti"
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: 'auto', opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.25, ease: 'easeOut' }}
+          style={{ overflow: 'hidden' }}
+        >
+          <SectionShell eyebrow={t('overview.tiPicks.eyebrow')} linkLabel={t('overview.tiPicks.linkLabel')} onLinkClick={() => setSheet({ kind: 'index' })}>
+            <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 16px 10px', scrollPaddingLeft: 16, scrollSnapType: 'x mandatory' }}>
+              {orderedPicks.slice(0, 8).map((p) => (
+                <button
+                  key={p.playerId}
+                  onClick={() => setSheet({ kind: 'case', pick: p, from: 'card' })}
+                  style={{
+                    flex: '0 0 218px',
+                    scrollSnapAlign: 'start',
+                    textAlign: 'left',
+                    background: V4.surface,
+                    border: `0.5px solid ${V4.cardBorder}`,
+                    boxShadow: V4.cardShadow,
+                    borderRadius: V4.cardRadius,
+                    padding: 13,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 0,
+                    cursor: 'pointer',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+                    <div
+                      role="link"
+                      onClick={(e) => { e.stopPropagation(); goToPlayer(p.playerId); }}
+                      style={{ display: 'flex', alignItems: 'center', gap: 9, cursor: 'pointer', flex: 1, minWidth: 0 }}
+                    >
+                      <SquircleAvatar
+                        size={34}
+                        srcCandidates={p.photoUrl ? [p.photoUrl, ...getPlayerHeadshotCandidates(p.playerName, tourCode)] : getPlayerHeadshotCandidates(p.playerName, tourCode)}
+                        alt={p.playerName}
+                        userId={p.playerId}
+                        hairlineRing
+                        ringColor={LIGHT_HAIRLINE}
+                      />
+                      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                        <div style={{ fontSize: 13.5, fontWeight: 800, color: V4.ink, letterSpacing: '-0.015em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.2 }}>
+                          {p.playerName}
+                        </div>
+                        <div style={{ marginTop: 2, fontSize: 11.5, fontWeight: 800, lineHeight: 1.2 }}>
+                          <InlineStateValue state={state} pick={p} live={liveMap?.[p.playerId]} leader={leaderWinProb} />
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div style={{ marginTop: 2, fontSize: 11.5, fontWeight: 800, lineHeight: 1.2 }}>
-                    <InlineStateValue state={state} pick={p} live={liveMap?.[p.playerId]} leader={leaderWinProb} />
+
+                  <div style={{ fontSize: 11.5, color: V4.inkSoft, lineHeight: 1.45, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', margin: '8px 0' }}>
+                    {p.pulledQuote || p.reasons?.[0] || '—'}
                   </div>
-                </div>
-              </div>
+
+                  <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: 10, fontWeight: 800, color: V4.amber, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                      {t('overview.tiPicks.card.theCase')}
+                    </span>
+                    <span style={{ fontSize: 9, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                      {t('overview.tiPicks.card.pickLabel', { rank: p.rank })}
+                    </span>
+                  </div>
+                </button>
+              ))}
             </div>
 
-            <div style={{ fontSize: 11.5, color: V4.inkSoft, lineHeight: 1.45, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', margin: '8px 0' }}>
-              {p.pulledQuote || p.reasons?.[0] || '—'}
-            </div>
+            {sheet?.kind === 'index' ? (
+              <AllPicksSheet
+                picks={orderedPicks}
+                state={state}
+                tourCode={tourCode}
+                liveMap={liveMap}
+                leader={leaderWinProb}
+                onPick={(p) => setSheet({ kind: 'case', pick: p, from: 'index' })}
+                onClose={() => setSheet(null)}
+                onNavigatePlayer={goToPlayer}
+              />
+            ) : null}
 
-            <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: 10, fontWeight: 800, color: V4.amber, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                {t('overview.tiPicks.card.theCase')}
-              </span>
-              <span style={{ fontSize: 9, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                {t('overview.tiPicks.card.pickLabel', { rank: p.rank })}
-              </span>
-            </div>
-          </button>
-        ))}
-      </div>
-
-      {sheet?.kind === 'index' ? (
-        <AllPicksSheet
-          picks={orderedPicks}
-          state={state}
-          tourCode={tourCode}
-          liveMap={liveMap}
-          leader={leaderWinProb}
-          onPick={(p) => setSheet({ kind: 'case', pick: p, from: 'index' })}
-          onClose={() => setSheet(null)}
-          onNavigatePlayer={goToPlayer}
-        />
-      ) : null}
-
-      {sheet?.kind === 'case' ? (
-        <CaseSheet
-          pick={sheet.pick}
-          state={state}
-          live={liveMap?.[sheet.pick.playerId]}
-          tourCode={tourCode}
-          leader={leaderWinProb}
-          onClose={closeCase}
-          onNavigatePlayer={goToPlayer}
-        />
-      ) : null}
-    </SectionShell>
+            {sheet?.kind === 'case' ? (
+              <CaseSheet
+                pick={sheet.pick}
+                state={state}
+                live={liveMap?.[sheet.pick.playerId]}
+                tourCode={tourCode}
+                leader={leaderWinProb}
+                onClose={closeCase}
+                onNavigatePlayer={goToPlayer}
+              />
+            ) : null}
+          </SectionShell>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
