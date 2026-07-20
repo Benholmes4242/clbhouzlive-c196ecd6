@@ -9,7 +9,7 @@
 
 import { useParams } from 'react-router-dom';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
-import SocialListPage from './SocialListPage';
+import SocialListPage, { ListSkeleton } from './SocialListPage';
 
 interface Props {
   direction: 'followers' | 'following';
@@ -21,8 +21,8 @@ export default function BusinessSocialListRoute({ direction }: Props) {
 
   if (isLoading) {
     return (
-      <div style={{ minHeight: '100dvh', background: '#F8FAFC', padding: 'calc(var(--chrome-total-h, 0px) + 24px) 16px 80px', color: '#64748B', fontSize: 13 }}>
-        Loading…
+      <div style={{ minHeight: '100dvh', background: '#F8FAFC', paddingTop: 'calc(var(--chrome-total-h, 0px) + 24px)' }}>
+        <ListSkeleton />
       </div>
     );
   }

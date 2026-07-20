@@ -19,6 +19,7 @@ import { Search, UserPlus } from 'lucide-react';
 import { useInviteSheet } from '@/hooks/useInviteSheet';
 import { toast } from '@/lib/toast';
 
+import { Skeleton } from '@/components/ui/skeleton';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
@@ -790,7 +791,7 @@ function navigateToActor(
 }
 
 /* ── skeleton ───────────────────────────────────────────────────────── */
-function ListSkeleton({ compact }: { compact?: boolean } = {}) {
+export function ListSkeleton({ compact }: { compact?: boolean } = {}) {
   const n = compact ? 3 : 6;
   return (
     <div>
@@ -804,27 +805,19 @@ function ListSkeleton({ compact }: { compact?: boolean } = {}) {
             padding: '11px 16px',
           }}
         >
-          <div
-            style={{
-              width: 42,
-              height: 42,
-              borderRadius: '34%',
-              background: HAIR,
-            }}
-          />
+          <Skeleton style={{ width: 42, height: 42, borderRadius: '34%' }} />
           <div style={{ flex: 1 }}>
-            <div style={{ height: 10, width: '40%', background: HAIR, borderRadius: 4 }} />
-            <div
+            <Skeleton style={{ height: 10, width: '40%', borderRadius: 4 }} />
+            <Skeleton
               style={{
                 height: 8,
                 width: '55%',
-                background: 'rgba(15,23,42,0.06)',
                 borderRadius: 4,
                 marginTop: 6,
               }}
             />
           </div>
-          <div style={{ width: 76, height: 28, background: HAIR, borderRadius: 14 }} />
+          <Skeleton style={{ width: 76, height: 28, borderRadius: 14 }} />
         </div>
       ))}
     </div>
