@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { formatRelativeAgoLong } from '@/i18n/format';
 import { LifeBuoy, ChevronRight, Trash2 } from 'lucide-react';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useMyRequestsList, useHideMyRequest, type MyRequestStatus } from '@/hooks/useMyRequests';
 
 const INK = '#0F172A';
@@ -64,8 +65,13 @@ export default function MyRequestsPage() {
     <ManagePageShell title="My requests">
       <div className="px-4 pt-4 pb-0 space-y-3">
         {isLoading && (
-          <div className="text-[13px]" style={{ color: INK_55 }}>Loading your requests...</div>
+          <div className="space-y-2">
+            {[0, 1, 2].map((i) => (
+              <Skeleton key={i} className="h-[72px] w-full rounded-xl" />
+            ))}
+          </div>
         )}
+
 
         {!isLoading && isError && (
           <div

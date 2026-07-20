@@ -5,6 +5,7 @@ import { formatRelativeAgoLong } from '@/i18n/format';
 import { toast } from '@/lib/toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { callDisconnectWhs, callDeleteWhsData } from '@/lib/whs/api';
 import { useWhsConnection, whsKeys } from '@/lib/whs/hooks';
@@ -30,7 +31,7 @@ export default function HandicapManagePage() {
   const userId = user?.id;
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { data: connection } = useWhsConnection(userId);
+  const { data: connection, isLoading: connectionLoading } = useWhsConnection(userId);
   const [confirmDisconnect, setConfirmDisconnect] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [isWorking, setIsWorking] = useState(false);
@@ -87,6 +88,17 @@ export default function HandicapManagePage() {
       setIsWorking(false);
     }
   };
+
+  if (connectionLoading) {
+    return (
+      <ManagePageShell title="Handicap">
+        <div className="px-4 pt-4 pb-0 space-y-3">
+          <Skeleton className="h-24 w-full rounded-2xl" />
+          <Skeleton className="h-40 w-full rounded-2xl" />
+        </div>
+      </ManagePageShell>
+    );
+  }
 
   return (
     <ManagePageShell title={connection ? bodyNameForProvider(connection.provider) : 'Connect your official WHS handicap'}>

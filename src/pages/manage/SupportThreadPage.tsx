@@ -4,6 +4,7 @@ import { formatMonthDayHm24 } from '@/i18n/format';
 import { Send } from 'lucide-react';
 import { toast } from '@/lib/toast';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import {
   useMyRequestThread,
@@ -153,8 +154,13 @@ export default function SupportThreadPage() {
 
         <div ref={scrollRef} className="space-y-3">
           {isLoading && (
-            <div className="text-[13px]" style={{ color: INK_55 }}>Loading conversation...</div>
+            <div className="flex flex-col gap-3">
+              <Skeleton className="h-16 w-2/3 self-start rounded-2xl" />
+              <Skeleton className="h-12 w-1/2 self-end rounded-2xl" />
+              <Skeleton className="h-20 w-3/4 self-start rounded-2xl" />
+            </div>
           )}
+
           {!isLoading && messages.map((m) => {
             const mine = m.sender_id === user?.id || m.sender_role === 'user';
             return (
