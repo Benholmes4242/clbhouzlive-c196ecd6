@@ -736,8 +736,6 @@ function FeedRow({ item, first }: { item: FeedItem; first: boolean }) {
           >
             {item.subtitle}
           </div>
-            {item.subtitle}
-          </div>
         )}
       </div>
     </div>
