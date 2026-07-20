@@ -29,17 +29,24 @@ import {
   useContentAnalytics,
   useAuthAnalytics,
 } from '../hooks/useAnalytics';
+import { useFunnels } from '../hooks/useFunnels';
+import FunnelCard from '../components/FunnelCard';
+import AudiencesSection from '../components/AudiencesSection';
+import RetentionCurve from '../components/RetentionCurve';
 
-type TabId = 'live' | 'growth' | 'engagement' | 'retention' | 'events' | 'auth';
+
+type TabId = 'live' | 'growth' | 'engagement' | 'retention' | 'funnels' | 'events' | 'auth';
 
 const TABS: { id: TabId; label: string }[] = [
   { id: 'live',       label: 'Live' },
   { id: 'growth',     label: 'Growth' },
   { id: 'engagement', label: 'Engagement' },
   { id: 'retention',  label: 'Retention' },
+  { id: 'funnels',    label: 'Funnels' },
   { id: 'events',     label: 'Events' },
   { id: 'auth',       label: 'Auth' },
 ];
+
 
 const PERIODS: AnalyticsPeriod[] = ['7d', '30d', '90d'];
 const ALL_PERIODS: AnalyticsPeriod[] = ['7d', '14d', '30d', '90d'];
@@ -176,8 +183,10 @@ export default function AnalyticsPage() {
       {tab === 'growth'     && <GrowthTab     period={period} />}
       {tab === 'engagement' && <EngagementTab period={period} />}
       {tab === 'retention'  && <RetentionTab />}
+      {tab === 'funnels'    && <FunnelsTab    period={period} />}
       {tab === 'events'     && <EventsTab     period={period} />}
       {tab === 'auth'       && <AuthTab       period={period} />}
+
       <style>{`@keyframes admin-pulse-dot { 0%,100% { opacity: 1 } 50% { opacity: 0.35 } }`}</style>
     </div>
   );
@@ -391,9 +400,12 @@ function GrowthTab({ period }: { period: AnalyticsPeriod }) {
           </div>
         )}
       </Card>
+
+      <AudiencesSection />
     </>
   );
 }
+
 
 // ─── Engagement ───────────────────────────────────────────────────────────────
 
@@ -559,7 +571,10 @@ function RetentionTab() {
         loading={isLoading}
       />
 
+      {!isLoading && cohorts.length >= 2 && <RetentionCurve cohorts={cohorts} />}
+
       <Card>
+
         <div style={{ color: t.ink, fontWeight: 700, fontSize: 15, marginBottom: 4 }}>Cohort retention</div>
         <div style={{ color: t.inkMuted, fontSize: 12, marginBottom: 12 }}>Share of each cohort active in the weeks after joining.</div>
         {isLoading ? (
