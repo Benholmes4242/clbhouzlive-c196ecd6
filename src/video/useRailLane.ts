@@ -132,12 +132,10 @@ export function useRailLane(opts: UseRailLaneOptions): UseRailLaneResult {
     }).catch(() => {});
 
     VideoEngine.mountLane(laneId, host);
-    // Declare rails as always-muted; engine enforces. Belt-and-braces setMuted
-    // remains for immediate effect on first paint — BUT skip when the lane
-    // is currently borrowed by the fullscreen viewer. During borrow the
-    // effective policy is 'session' (see VideoEngine.applyAudioPolicy borrow
-    // override); a tile-side re-mute here would fight the viewer's audio.
-    // Handback's clearBorrowed → applyAudioPolicy restores rail muting.
+    // v11: rail lanes are ALWAYS muted inline (product spec — rails/grid
+    // tiles never speak inline; tap→fullscreen is how they sing). The
+    // reconciler's borrow branch handles unmuting when the fullscreen
+    // viewer borrows this lane.
     VideoEngine.setAudioPolicy(laneId, 'always-muted');
     if (willBeltMute) {
       VideoEngine.setMuted(laneId, true);

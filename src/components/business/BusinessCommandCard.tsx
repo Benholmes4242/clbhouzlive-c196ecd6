@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -11,7 +11,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { DeleteBusinessDialog } from './DeleteBusinessDialog';
 import { useBusinessStats7d } from '@/hooks/useBusinessStats7d';
 import { formatNumber } from '@/i18n/format';
 import { useBusinessFollowersCount } from '@/hooks/useBusinessFollow';
@@ -33,6 +32,13 @@ interface BusinessCommandCardProps {
   expanded?: boolean;
   /** Toggle handler — called when the user taps the summary row / chevron. */
   onToggle?: () => void;
+  /**
+   * Ask the page to open the confirm-delete dialog for this business.
+   * The dialog is hoisted to page level so invalidation-driven eviction of
+   * this card can never race Radix's DismissableLayer cleanup — the classic
+   * "delete-in-a-list-item" body pointer-events freeze.
+   */
+  onRequestDelete?: (input: { id: string; name: string }) => void;
 }
 
 // Access level labels for UI (not DB roles)
@@ -50,17 +56,12 @@ export function BusinessCommandCard({
   isActive: _isActive = false,
   expanded = false,
   onToggle,
+  onRequestDelete,
 }: BusinessCommandCardProps) {
   const navigate = useNavigate();
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  // CRITICAL: Close modals on unmount to prevent stuck overlay
-  useEffect(() => {
-    return () => {
-      setShowDeleteDialog(false);
-    };
-  }, []);
+
 
   const { business, role } = membership;
 
@@ -303,7 +304,18 @@ export function BusinessCommandCard({
                   <>
                     <DropdownMenuSeparator className="my-1" />
                     <DropdownMenuItem
-                      onClick={(e) => { e.stopPropagation(); setShowDeleteDialog(true); }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // Close the dropdown BEFORE asking the page to open
+                        // the (hoisted) confirm dialog. Both are Radix modal
+                        // layers — leaving the dropdown mid-close while a
+                        // new layer opens on the same tick is the race that
+                        // strands `pointer-events: none` on <body>.
+                        setDropdownOpen(false);
+                        requestAnimationFrame(() => {
+                          onRequestDelete?.({ id: business.id, name: business.name });
+                        });
+                      }}
                       className="gap-2.5 cursor-pointer min-h-[44px] text-destructive focus:text-destructive focus:bg-destructive/10"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -435,16 +447,16 @@ export function BusinessCommandCard({
         </AnimatePresence>
       </motion.div>
 
-      <DeleteBusinessDialog
-        open={showDeleteDialog}
-        onOpenChange={setShowDeleteDialog}
-        businessId={business.id}
-        businessName={business.name}
-        userId={userId}
-      />
+      {/* NOTE: the confirm dialog is intentionally NOT rendered here. It is
+          hoisted to `MyBusinessesPage` and opened via `onRequestDelete`. When
+          the mutation invalidates and evicts this card, the dialog host is
+          not in the evicted subtree, so Radix's `DismissableLayer` cleanup
+          can complete normally. See `src/lib/radixLockSanitizer.ts` for the
+          belt-and-braces safety net that pairs with this hoist. */}
     </>
   );
 }
+
 
 /* ─────────────────────── sub-components ─────────────────────── */
 

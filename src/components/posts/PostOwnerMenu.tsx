@@ -80,6 +80,12 @@ export const PostOwnerMenu: React.FC<PostOwnerMenuProps> = ({
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  // Controlled dropdown so we can force it closed BEFORE opening the confirm
+  // dialog. Radix auto-closes on `DropdownMenuItem` click, but the confirm
+  // opens on the same tick — leaving the dropdown mid-close while another
+  // Radix modal layer opens is the race that leaks `pointer-events: none`
+  // onto <body> when this item is later evicted by the delete mutation.
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   if (!isOwnPost) return null;
 
@@ -105,19 +111,29 @@ export const PostOwnerMenu: React.FC<PostOwnerMenuProps> = ({
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    setShowDeleteConfirm(true);
+    // Force the dropdown closed BEFORE we open the AlertDialog so the two
+    // Radix modal layers don't overlap mid-transition. Then defer opening
+    // the confirm by one frame to let the dropdown's exit start.
+    setDropdownOpen(false);
+    requestAnimationFrame(() => setShowDeleteConfirm(true));
   };
 
   const handleConfirmDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
     if (isDeleting) return;
+    // Close FIRST so Radix runs its exit cycle before the mutation's
+    // invalidations evict this item (and unmount the dialog host).
+    // Otherwise Radix leaves pointer-events:none on <body>, freezing the app.
     setIsDeleting(true);
+    setShowDeleteConfirm(false);
+    await new Promise((r) => setTimeout(r, 300));
     try {
       await deletePost(postId, actorType, actorId);
+    } catch {
+      // Failure surfaces via the deletion hook's own toast; row stays.
     } finally {
       setIsDeleting(false);
-      setShowDeleteConfirm(false);
     }
   };
 
@@ -162,7 +178,7 @@ export const PostOwnerMenu: React.FC<PostOwnerMenuProps> = ({
   return (
     <>
       <div className={wrapperClass} onClick={stopAll}>
-        <DropdownMenu>
+        <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
           <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"

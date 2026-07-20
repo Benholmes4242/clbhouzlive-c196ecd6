@@ -42,6 +42,11 @@ export const LoopCardMenu = React.memo(function LoopCardMenu({
 }: LoopCardMenuProps) {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  // Controlled dropdown so the delete/block flow can force it closed BEFORE
+  // opening the confirm AlertDialog. Overlapping Radix modal layers during
+  // an eviction commit are the source of the body pointer-events freeze.
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const { blockUser, loading: blockLoading } = useBlockActions({ currentUserId: userId ?? '' });
 
   const handleCopyLink = async () => {
@@ -82,18 +87,42 @@ export const LoopCardMenu = React.memo(function LoopCardMenu({
 
   const handleDelete = () => {
     if (!onDelete) return;
-    setDeleteConfirmOpen(true);
+    // Close the dropdown first, then open the confirm on the next frame so
+    // Radix's DismissableLayer can start its exit cycle before another
+    // layer mounts.
+    setDropdownOpen(false);
+    requestAnimationFrame(() => setDeleteConfirmOpen(true));
   };
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
+    if (isDeleting) return;
+    // Close FIRST so Radix's exit cycle completes before the mutation's
+    // invalidation evicts this item (and unmounts the dialog host). This
+    // is the class fix for the "delete-in-a-list-item + Radix dialog"
+    // pointer-events freeze.
+    setIsDeleting(true);
     setDeleteConfirmOpen(false);
-    onDelete?.();
+    await new Promise((r) => setTimeout(r, 300));
+    try {
+      onDelete?.();
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleBlock = () => {
+    if (!authorUserId) return;
+    setDropdownOpen(false);
+    requestAnimationFrame(() => setConfirmOpen(true));
   };
 
   const handleBlockConfirm = async () => {
     if (!authorUserId) return;
-    await blockUser(authorUserId);
+    // Same close-first-then-mutate ordering: block eviction rides the same
+    // cache invalidation path as delete on some hosts.
     setConfirmOpen(false);
+    await new Promise((r) => setTimeout(r, 300));
+    await blockUser(authorUserId);
   };
 
   const canBlock = !isOwnPost && !!userId && !!authorUserId && authorUserId !== userId;
@@ -101,7 +130,7 @@ export const LoopCardMenu = React.memo(function LoopCardMenu({
 
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
         <DropdownMenuTrigger asChild>
           <button
             className="p-3 -mr-3 rounded-full hover:bg-muted transition-colors"
@@ -151,7 +180,7 @@ export const LoopCardMenu = React.memo(function LoopCardMenu({
                 <>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
-                    onClick={() => setConfirmOpen(true)}
+                    onClick={handleBlock}
                     className="gap-2 text-sm text-destructive focus:text-destructive"
                   >
                     <Ban className="h-4 w-4" />
@@ -195,9 +224,10 @@ export const LoopCardMenu = React.memo(function LoopCardMenu({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteConfirm}
+              disabled={isDeleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Delete

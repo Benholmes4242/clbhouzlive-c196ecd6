@@ -12,7 +12,9 @@ import { vperfStart, vperfArmLane, vperfNextId, vperfFeedScrollTick, vperfFeedAc
 import { PrefetchController } from '@/video/PrefetchController';
 import { trace } from '@/perf/trace';
 import { VideoEngine } from '@/video/VideoEngine';
+import { feedLaneRoles } from '@/video/feedLaneRoles';
 import { isPerfEnabled } from '@/perf/navTiming';
+import { audioDebugEnabled, logAudio } from '@/perf/audioDebug';
 import { useInviteSheet } from '@/hooks/useInviteSheet';
 import clbhouzLogo from '@/assets/clbhouz-logo.png';
 
@@ -146,6 +148,46 @@ export function SnapFeed({
     return () => window.removeEventListener('clbhouz-active-tab-retap', onRetap);
   }, []);
 
+  // Forensic X-ray — clear log on surface teardown so the buffer records the
+  // active slot's disappearance (settle logs live in the activeIndex effect).
+  useEffect(() => {
+    return () => {
+      if (audioDebugEnabled()) {
+        try {
+          logAudio('surface.active', {
+            surface: surface === 'fullscreen' ? 'fullscreen' : 'clubhouse',
+            activeIndex: null,
+            laneId: null,
+            postId: null,
+            cleared: true,
+          });
+        } catch { /* noop */ }
+      }
+      // v10 audio-focus — release the inline feed's focus on unmount so the
+      // reconciler stops resolving to a lane that no visible surface owns.
+      if (surface !== 'fullscreen') {
+        try { VideoEngine.setAudioFocus(null, 'feed'); } catch { /* noop */ }
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+
+  // v11 audio-focus — dedicated registration that closes the two gaps found
+  // in the v10 audit:
+  //   (a) Initial mount of the active slide: the transition-settle effect
+  //       below early-returns when prevActiveRef already equals activeIndex
+  //       (true on mount), so focus never registered for the landing slide.
+  //   (b) Fullscreen round-trip: when the overlay closes while the inline
+  //       feed still owns the active slide, we re-assert focus so the
+  //       reconciler picks the inline feed lane back up.
+  // Mechanism for (b): subscribe to `useFullscreenFeedStore(s => s.isOpen)`
+  // and re-register in the same effect body whenever it flips (or on any
+  // activeIndex change). Inline surface only — the fullscreen surface's
+  // speaker is owned by the reconciler's overlay branch.
+  const fsOpen = useFullscreenFeedStore(s => s.isOpen);
+
+
   const storeActiveIndex = useClubhouseStore(s => s.activeIndex);
   const setActiveIndex = useClubhouseStore(s => s.setActiveIndex);
   // Opening-slide media selectors threaded from the tap opener. `mediaId` is
@@ -161,6 +203,32 @@ export function SnapFeed({
   // placeholders when the overlay opened at index ≥ VIRTUAL_WINDOW (4+).
   const activeIndex = activeIndexOverride ?? storeActiveIndex;
   const location = useLocation();
+
+  // v11 focus registration — see comment block above. Runs on mount (covers
+  // gap A: the landing slide) and again whenever `fsOpen` transitions
+  // (covers gap B: fullscreen→inline round-trip). Inline surface only.
+  useEffect(() => {
+    if (surface === 'fullscreen') return;
+    // When the overlay is open, do not fight the overlay branch for focus —
+    // the reconciler resolves the speaker via the borrow / fullscreen-solo
+    // paths. When it closes, re-assert inline focus below.
+    if (fsOpen) return;
+    const post = posts[activeIndex];
+    if (!post) return;
+    const hasVideo = (post as any)?.mediaItems?.some?.((m: any) => m?.type === 'video');
+    try {
+      if (hasVideo) {
+        const activeLane = feedLaneRoles.laneForRole('active');
+        VideoEngine.setAudioFocus(activeLane, 'feed');
+        if (audioDebugEnabled()) {
+          try { logAudio('focus.reassert', { trigger: 'mount-or-fs-close', activeIndex, postId: post.id, activeLane }); } catch {}
+        }
+      } else {
+        VideoEngine.setAudioFocus(null, 'feed');
+      }
+    } catch { /* noop */ }
+  }, [surface, fsOpen, activeIndex, posts]);
+
 
   // [VPERF] S4 swipe.vertical — a vertical settle on a video slide.
   // Closes on the next 'firstFrame' event on the surface's active lane
@@ -181,12 +249,44 @@ export function SnapFeed({
     const post = posts[activeIndex];
     if (!post) return;
 
+    // Forensic X-ray — announces the surface's active slot so downstream
+    // audio decision records can be correlated by (surface, activeIndex,
+    // postId). Fired on every settle; the clear log lives in the unmount
+    // effect below.
+    if (audioDebugEnabled()) {
+      try {
+        const laneId = surface === 'fullscreen' ? 'fullscreen' : 'feed-active';
+        logAudio('surface.active', {
+          surface: surface === 'fullscreen' ? 'fullscreen' : 'clubhouse',
+          activeIndex,
+          laneId,
+          postId: post.id,
+        });
+      } catch { /* noop */ }
+    }
+
+
     const hasVideo = (post as any)?.mediaItems?.some?.((m: any) => m?.type === 'video');
     const mediaType: 'image' | 'video' = hasVideo ? 'video' : 'image';
     // Surface-aware lane: fullscreen overlay plays on the singleton
     // 'fullscreen' lane; the inline feed plays on 'feed-active'.
     const armLane: 'fullscreen' | 'feed-active' =
       surface === 'fullscreen' ? 'fullscreen' : 'feed-active';
+
+    // v10 audio-focus registry — inline feed only. The fullscreen branch of
+    // the reconciler owns the overlay's speaker selection, so we do NOT
+    // register focus from the fullscreen surface. Image slides clear focus
+    // (there is no lane to unmute).
+    if (surface !== 'fullscreen') {
+      try {
+        if (mediaType === 'video') {
+          const activeLane = feedLaneRoles.laneForRole('active');
+          VideoEngine.setAudioFocus(activeLane, 'feed');
+        } else {
+          VideoEngine.setAudioFocus(null, 'feed');
+        }
+      } catch { /* noop */ }
+    }
 
     // swipe.vertical — video slides only. Image slides have no lane
     // events on either surface, so starting the span would guarantee

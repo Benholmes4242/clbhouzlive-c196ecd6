@@ -10,6 +10,10 @@ import {
   trackAuthFailed,
   trackAuthException,
   trackLoginSuccess,
+  trackSignupInitiated,
+  trackSignupSuccess,
+  trackSignupFailed,
+  trackAuthComplete,
 } from '@/lib/authAnalytics';
 
 import AuthHeroScreen from './components/AuthHeroScreen';
@@ -127,6 +131,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
           sanitiseErrorForAnalytics(error.message),
           Date.now() - sendStartRef.current,
         );
+        trackSignupFailed('email', sanitiseErrorForAnalytics(error.message), Date.now() - sendStartRef.current);
         setOtpError(msg);
         setOtpErrorNonce((n) => n + 1);
         setSubmittingMethod(null);
@@ -134,6 +139,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
       }
 
       trackAuthInitiated('email', Date.now() - sendStartRef.current);
+      trackSignupInitiated('email');
       setEmailState(normalised);
       setResendCooldown(RESEND_COOLDOWN_SECONDS);
       setSubmittingMethod(null);
@@ -201,6 +207,11 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
 
       if (data?.session?.user) {
         trackLoginSuccess('email', Date.now() - start);
+        // signup_success: verifyOtp lands the session; new users have created_at === last_sign_in_at
+        if (data.user?.created_at && data.user?.last_sign_in_at && data.user.created_at === data.user.last_sign_in_at) {
+          trackSignupSuccess('email', Date.now() - start);
+        }
+        trackAuthComplete('email');
         onWillNavigate?.();
         const dest = await resolvePostAuthRoute(
           data.session.user.id,
@@ -241,6 +252,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
         }
 
         trackAuthInitiated('apple');
+        trackSignupInitiated('apple');
 
         // Diagnostic: decode claims locally (never log the raw token).
         try {
@@ -289,6 +301,11 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
 
         if (data?.session?.user) {
           trackLoginSuccess('apple');
+          // signup_success: signInWithIdToken lands the session; new users have created_at === last_sign_in_at
+          if (data.user?.created_at && data.user?.last_sign_in_at && data.user.created_at === data.user.last_sign_in_at) {
+            trackSignupSuccess('apple');
+          }
+          trackAuthComplete('apple');
           onWillNavigate?.();
           const dest = await resolvePostAuthRoute(
             data.session.user.id,
@@ -339,6 +356,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
         }
 
         trackAuthInitiated('google');
+        trackSignupInitiated('google');
 
         // Decode claims once for diagnostics + names.
         let claims: GoogleClaims | null = null;
@@ -391,6 +409,11 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
 
         if (data?.session?.user) {
           trackLoginSuccess('google');
+          // signup_success: signInWithIdToken lands the session; new users have created_at === last_sign_in_at
+          if (data.user?.created_at && data.user?.last_sign_in_at && data.user.created_at === data.user.last_sign_in_at) {
+            trackSignupSuccess('google');
+          }
+          trackAuthComplete('google');
           onWillNavigate?.();
           const dest = await resolvePostAuthRoute(
             data.session.user.id,
