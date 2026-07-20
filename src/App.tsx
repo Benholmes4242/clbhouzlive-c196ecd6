@@ -72,6 +72,7 @@ import { CoursesHubSkeleton } from '@/components/skeletons/CoursesHubSkeleton';
 
 
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
+import { TourHubOverviewSkeleton } from '@/components/skeletons/TourHubOverviewSkeleton';
 import { WatchHubSkeleton, WatchClipsSkeleton, WatchVideosSkeleton } from '@/components/skeletons/WatchSkeletons';
 import { AchievementsSkeleton } from '@/components/skeletons/AchievementsSkeleton';
 import { ActivityPageSkeleton } from '@/components/skeletons/ActivityPageSkeleton';
