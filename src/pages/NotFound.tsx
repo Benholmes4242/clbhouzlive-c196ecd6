@@ -1,8 +1,9 @@
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 
 const NotFound = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     console.error(
@@ -12,13 +13,17 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center px-6" style={{ background: '#F8FAFC' }}>
       <div className="text-center">
-        <h1 className="font-display text-4xl font-bold mb-4">404</h1>
-        <p className="font-display text-xl text-gray-600 mb-4">Oops! Page not found</p>
-        <Link to="/" className="text-blue-500 hover:text-blue-700 underline">
-          Return to Home
-        </Link>
+        <h1 className="text-5xl font-black mb-3" style={{ color: '#0F172A', letterSpacing: '-0.02em' }}>404</h1>
+        <p className="text-base mb-6" style={{ color: '#64748B' }}>This page doesn't exist.</p>
+        <button
+          onClick={() => navigate('/clubhouse')}
+          className="px-5 py-2.5 rounded-full text-[14px] font-semibold"
+          style={{ background: '#F7931E', color: '#0F172A' }}
+        >
+          Back to Clubhouse
+        </button>
       </div>
     </div>
   );

@@ -50,10 +50,15 @@ const PostDeepLinkPage: React.FC = () => {
   const [feedPost, setFeedPost] = useState<ReturnType<typeof mapActivityPostToFeedPost> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [loadError, setLoadError] = useState(false);
+  const [retryTick, setRetryTick] = useState(0);
   const hasOpenedFullscreen = useRef(false);
 
   useEffect(() => {
     async function loadPost() {
+      setLoadError(false);
+      setNotFound(false);
+      setIsLoading(true);
       if (!postId) { setNotFound(true); setIsLoading(false); return; }
 
       // Schema-accurate fetch:
@@ -111,7 +116,12 @@ const PostDeepLinkPage: React.FC = () => {
         .eq('status', 'published')
         .maybeSingle();
 
-      if (error || !data) {
+      if (error) {
+        setLoadError(true);
+        setIsLoading(false);
+        return;
+      }
+      if (!data) {
         setNotFound(true);
         setIsLoading(false);
         return;
@@ -202,7 +212,7 @@ const PostDeepLinkPage: React.FC = () => {
 
     loadPost();
     if (postId) recordPostViewOnce(postId);
-  }, [postId, user?.id]);
+  }, [postId, user?.id, retryTick]);
 
   // Logged-in users: open the global fullscreen viewer with the loaded post
   // and the comments sheet open. Closing the viewer navigates back.
@@ -234,6 +244,35 @@ const PostDeepLinkPage: React.FC = () => {
     return (
       <div className="fixed inset-0 bg-[#0D0F11] flex items-center justify-center z-50">
         <Loader2 className="w-8 h-8 animate-spin text-white/40" />
+      </div>
+    );
+  }
+
+  // --- Load error (network/query failure) ---
+  if (loadError) {
+    return (
+      <div className="fixed inset-0 bg-[#0D0F11] flex flex-col items-center justify-center z-50 px-6">
+        <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
+          <span className="text-2xl">⚠️</span>
+        </div>
+        <p className="text-white text-[17px] font-semibold">Couldn't load this post</p>
+        <p className="text-white/50 text-[13px] mt-1">Check your connection and try again.</p>
+        <div className="flex gap-2 mt-5">
+          <button
+            onClick={() => setRetryTick((t) => t + 1)}
+            className="px-5 py-2.5 rounded-full text-[14px] font-semibold text-[#0F172A]"
+            style={{ background: '#F7931E' }}
+          >
+            Retry
+          </button>
+          <button
+            onClick={() => navigate('/clubhouse')}
+            className="px-5 py-2.5 rounded-full text-[14px] font-medium text-white/80"
+            style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)' }}
+          >
+            Go to Clubhouse
+          </button>
+        </div>
       </div>
     );
   }
