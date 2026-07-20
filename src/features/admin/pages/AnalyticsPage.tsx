@@ -1,13 +1,24 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
   Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from 'recharts';
-import { ArrowDownRight, ArrowUpRight, CheckCircle2, RefreshCcw, XCircle } from 'lucide-react';
+import { ArrowDownRight, ArrowUpRight, CheckCircle2, RefreshCcw, Search, XCircle } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { adminTheme as t } from '../theme';
 import ChartCard from '../components/ChartCard';
 import EmptyState from '../components/EmptyState';
+import AdminErrorState from '../components/AdminErrorState';
+import AdminSheet from '../components/AdminSheet';
+import { labelForEvent } from '../lib/eventLabels';
+import { useLiveInApp } from '../hooks/useOverviewMetrics';
+import { useLiveWindow30m, useProfilesByIds, type LiveEventRow, type LiteProfile } from '../hooks/useLiveStream';
+import {
+  useEventAggregates,
+  useRecentOccurrences,
+  dailyForEvent,
+  type EventAggregate,
+} from '../hooks/useEventsExplorer';
 import {
   AnalyticsPeriod,
   periodToDays,
@@ -19,12 +30,14 @@ import {
   useAuthAnalytics,
 } from '../hooks/useAnalytics';
 
-type TabId = 'growth' | 'engagement' | 'retention' | 'auth';
+type TabId = 'live' | 'growth' | 'engagement' | 'retention' | 'events' | 'auth';
 
 const TABS: { id: TabId; label: string }[] = [
+  { id: 'live',       label: 'Live' },
   { id: 'growth',     label: 'Growth' },
   { id: 'engagement', label: 'Engagement' },
   { id: 'retention',  label: 'Retention' },
+  { id: 'events',     label: 'Events' },
   { id: 'auth',       label: 'Auth' },
 ];
 
