@@ -204,6 +204,32 @@ export function SnapFeed({
   const activeIndex = activeIndexOverride ?? storeActiveIndex;
   const location = useLocation();
 
+  // v11 focus registration — see comment block above. Runs on mount (covers
+  // gap A: the landing slide) and again whenever `fsOpen` transitions
+  // (covers gap B: fullscreen→inline round-trip). Inline surface only.
+  useEffect(() => {
+    if (surface === 'fullscreen') return;
+    // When the overlay is open, do not fight the overlay branch for focus —
+    // the reconciler resolves the speaker via the borrow / fullscreen-solo
+    // paths. When it closes, re-assert inline focus below.
+    if (fsOpen) return;
+    const post = posts[activeIndex];
+    if (!post) return;
+    const hasVideo = (post as any)?.mediaItems?.some?.((m: any) => m?.type === 'video');
+    try {
+      if (hasVideo) {
+        const activeLane = feedLaneRoles.laneForRole('active');
+        VideoEngine.setAudioFocus(activeLane, 'feed');
+        if (audioDebugEnabled()) {
+          try { logAudio('focus.reassert', { trigger: 'mount-or-fs-close', activeIndex, postId: post.id, activeLane }); } catch {}
+        }
+      } else {
+        VideoEngine.setAudioFocus(null, 'feed');
+      }
+    } catch { /* noop */ }
+  }, [surface, fsOpen, activeIndex, posts]);
+
+
   // [VPERF] S4 swipe.vertical — a vertical settle on a video slide.
   // Closes on the next 'firstFrame' event on the surface's active lane
   // ('feed-active' in the Clubhouse feed; 'fullscreen' in the overlay —
