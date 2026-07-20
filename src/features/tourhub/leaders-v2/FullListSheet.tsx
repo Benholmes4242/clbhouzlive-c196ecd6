@@ -84,7 +84,7 @@ export function FullListSheet({
         <div style={{ minWidth: 0 }}>
           <div
             style={{
-              fontSize: 8.5,
+              fontSize: 10,
               fontWeight: 800,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
