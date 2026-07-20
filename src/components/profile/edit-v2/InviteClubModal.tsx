@@ -60,7 +60,7 @@ export const InviteClubModal: React.FC<InviteClubModalProps> = ({
         setManagerEmail('');
         setNote('');
       }, 1500);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error sending invite:', error);
       toast.error('Failed to send invite');
     } finally {
