@@ -72,7 +72,7 @@ export default function ContentPage() {
   }, [can.manageAdmins, can.viewModeration]);
 
   return (
-    <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 1180, margin: '0 auto' }}>
+    <div style={{ padding: '8px 16px 0', display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 1180, margin: '0 auto' }}>
       <SectionTabs tabs={tabs} activeId={tab} onChange={setTab} />
       {tab === 'courses' && <CoursesTab />}
       {tab === 'help' && (can.viewModeration ? <HelpArticlesTab /> : <AdminAccessDenied />)}

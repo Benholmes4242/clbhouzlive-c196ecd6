@@ -353,10 +353,7 @@ function NorthStarHero({
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
         <div>
           <div style={{ color: t.brandText, fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase' }}>
-            North Star
-          </div>
-          <div style={{ color: t.ink, fontSize: 17, fontWeight: 700, marginTop: 2 }}>
-            Live activity
+            Daily actives - today
           </div>
         </div>
         {triage && triage.total > 0 && (
@@ -369,7 +366,7 @@ function NorthStarHero({
               fontSize: 12, fontWeight: 700, textDecoration: 'none',
             }}
           >
-            {triage.total} to triage
+            {triage.total} to review
             <ChevronRight size={14} />
           </Link>
         )}
@@ -377,7 +374,7 @@ function NorthStarHero({
 
       {isError ? (
         <AdminErrorState
-          title="Couldn't load North Star"
+          title="Couldn't load activity"
           message="A retry usually fixes it."
           onRetry={onRetry}
         />

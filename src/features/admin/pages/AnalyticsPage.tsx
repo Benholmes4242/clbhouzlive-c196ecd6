@@ -74,7 +74,7 @@ export default function AnalyticsPage() {
   };
 
   return (
-    <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 1280, margin: '0 auto' }}>
+    <div style={{ padding: '8px 16px 0', display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 1280, margin: '0 auto' }}>
       <header style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         <div style={{
           color: t.inkFaint, fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase',

@@ -77,7 +77,7 @@ export default function UsersPage() {
     !isFullAdmin && (tab === 'team' || tab === 'invites') ? 'members' : tab;
 
   return (
-    <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 1180, margin: '0 auto' }}>
+    <div style={{ padding: '8px 16px 0', display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 1180, margin: '0 auto' }}>
       <SectionTabs tabs={tabs} activeId={effectiveTab} onChange={setTab} />
       {effectiveTab === 'members' && <MembersTab />}
       {effectiveTab === 'team' && isFullAdmin && <TeamTab />}
