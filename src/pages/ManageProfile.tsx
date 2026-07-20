@@ -378,15 +378,18 @@ export default function ManageProfile() {
 // -------------------------------------------------------------------------
 // Profile tab body
 // -------------------------------------------------------------------------
+import type { NavigateOptions, To } from 'react-router-dom';
+import type { ProfileFormData, ClubEntry, WebsiteEntry } from '@/components/profile/profile-wizard/types';
+
 interface ProfileTabBodyProps {
-  form: any;
-  setField: (k: any, v: any) => void;
-  errors: any;
-  addClub: any;
-  removeClub: any;
-  addWebsite: any;
-  removeWebsite: any;
-  updateWebsite: any;
+  form: ProfileFormData;
+  setField: <K extends keyof ProfileFormData>(k: K, v: ProfileFormData[K]) => void;
+  errors: Partial<Record<keyof ProfileFormData, string>>;
+  addClub: (club: Omit<ClubEntry, 'id'>) => void;
+  removeClub: (id: string) => void;
+  addWebsite: () => void;
+  removeWebsite: (id: string) => void;
+  updateWebsite: (id: string, url: string) => void;
   isNewUser: boolean;
   usernameIsLocked: boolean;
   usernameStatus: 'idle' | 'invalid' | 'checking' | 'available' | 'taken';
@@ -394,11 +397,11 @@ interface ProfileTabBodyProps {
   setHasTouchedDisplayName: (v: boolean) => void;
   resolved: { source: string; value: number | null };
   showManualEntry: boolean;
-  setShowManualEntry: (fn: any) => void;
-  
-  navigate: (to: any, opts?: any) => void;
+  setShowManualEntry: React.Dispatch<React.SetStateAction<boolean>>;
+
+  navigate: (to: To, opts?: NavigateOptions) => void;
   showSocial: boolean;
-  setShowSocial: (fn: any) => void;
+  setShowSocial: React.Dispatch<React.SetStateAction<boolean>>;
   handleSave: () => void;
   isDisabled: boolean;
   isSaving: boolean;
