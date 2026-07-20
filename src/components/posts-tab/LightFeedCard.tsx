@@ -666,7 +666,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
 };
 
 const FooterButton: React.FC<{
-  icon: React.ComponentType<{ size?: number | string; className?: string; color?: string; strokeWidth?: number }>;
+  icon: LucideIcon;
   label?: string;
   onClick: () => void;
   active?: boolean;
