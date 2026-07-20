@@ -164,7 +164,7 @@ export function useThisWeekAlumni(normalizedName: string | undefined) {
         if (teeErr) throw teeErr;
         // Pick the latest tee_time per (tournament, player).
         const teeByKey = new Map<string, { time: string; round: number }>();
-        for (const tr of (teeRows ?? []) as TeeRow[]) {
+        for (const tr of (teeRows ?? []) as unknown as TeeRow[]) {
           const t = tr.tee_time;
           if (!t?.tournament_id || !t?.tee_time) continue;
           const key = `${t.tournament_id}|${tr.player_id}`;
