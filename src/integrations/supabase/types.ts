@@ -19086,12 +19086,16 @@ export type Database = {
           duration_seconds: number
           height: number
           hls_url: string
+          is_followed_by_me: boolean
           is_liked_by_me: boolean
           like_count: number
           media_url: string
+          post_actor_id: string
+          post_actor_type: string
           post_content: string
           post_created_at: string
           post_id: string
+          post_user_id: string
           poster_url: string
           stream_id: string
           width: number
