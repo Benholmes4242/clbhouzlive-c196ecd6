@@ -147,6 +147,7 @@ export function useThread(conversationId: string | null) {
     isLoading: query.isLoading,
     isFetchingOlder: query.isFetchingNextPage,
     error: query.error,
+    refetch: query.refetch,
     insertOptimistic,
     resolveOptimistic,
     markFailed,
