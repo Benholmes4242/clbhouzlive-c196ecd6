@@ -60,8 +60,8 @@ export default function EmailPage() {
       if (error) throw error;
       setResendCooldown(30);
       return true;
-    } catch (err: any) {
-      const msg = err?.message ?? 'Could not send code. Try again.';
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Could not send code. Try again.';
       toast.error(msg);
       return false;
     } finally {
