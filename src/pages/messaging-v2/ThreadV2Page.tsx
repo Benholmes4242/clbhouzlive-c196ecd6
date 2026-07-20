@@ -401,7 +401,7 @@ const ThreadV2Page: React.FC = () => {
             </p>
             <button
               type="button"
-              onClick={() => window.location.reload()}
+              onClick={() => refetch()}
               className="rounded-full"
               style={{
                 background: AMBER,
