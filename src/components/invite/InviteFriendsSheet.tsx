@@ -39,7 +39,10 @@ interface GenericInviteResp {
 
 async function createGenericInvite(source: string): Promise<GenericInviteResp | null> {
   try {
-    const { data, error } = await supabase.rpc('create_generic_invite' as any, {
+    const { data, error } = await (supabase.rpc as unknown as (
+      name: string,
+      params: { p_source: string },
+    ) => Promise<{ data: unknown; error: { message: string } | null }>)('create_generic_invite', {
       p_source: source,
     });
     if (error) {
