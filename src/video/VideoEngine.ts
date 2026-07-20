@@ -229,24 +229,15 @@ class VideoEngineImpl {
    */
   private sameElementReturn = new Set<LaneId>();
   /**
-   * v8 belt: tracks the physical lane last observed to hold the ACTIVE feed
-   * role. When feedLaneRoles emits and this changes, the newly-active lane
-   * may need a role-promote sweep (see onFeedRoleChange) to catch the
-   * stranded-slot case where play() ran under a non-active role and v7's
-   * activation gate correctly skipped its session claim.
+   * v9: retained only for parity with pre-v9 subscribe/unsubscribe wiring
+   * in boot(). onFeedRoleChange now delegates to reconcileAudio unconditionally
+   * so we no longer need to track "did the active lane just change" here.
    */
-  private lastActiveFeedLane: LaneId | null = null;
   private roleUnsub: (() => void) | null = null;
-  /**
-   * Stage-7 Audio v3: per-borrow volumechange guard detachers. While a lane
-   * is borrowed by the fullscreen viewer, an element-level `volumechange`
-   * listener defends the session audio policy — any external writer that
-   * mutes the element out from under us (e.g. a tile-side effect firing on
-   * deactivate) is corrected on the next microtask and traced to the HUD.
-   * Cleared on clearBorrowed BEFORE the rail's own policy is restored so
-   * handback muting does not falsely trip the guard.
-   */
-  private borrowGuardDetach = new Map<LaneId, () => void>();
+  private fsStoreUnsub: (() => void) | null = null;
+  private sessionAudioUnsub: (() => void) | null = null;
+  private driftCheckIv: number | null = null;
+
 
   /**
    * Autoplay-blocked signal — fires when a 'session' lane's unmuted play()
