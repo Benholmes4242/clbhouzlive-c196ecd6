@@ -128,7 +128,7 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
   for (const p of postRows) {
     const prof = profMap.get(p.user_id);
     const name = displayName(prof);
-    const content = (p.content ?? '').trim();
+    const content = stripMentionMarkup((p.content ?? '').trim()).trim();
     let subtitle: string | null = null;
     if (content) subtitle = content;
     else {
