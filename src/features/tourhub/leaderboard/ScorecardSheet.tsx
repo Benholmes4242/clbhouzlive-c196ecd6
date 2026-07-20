@@ -75,7 +75,7 @@ function isDemotedStatus(s?: string | null): boolean {
 export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
-  const { data: scRows = [] } = useScorecard(tournamentId, target?.playerId ?? null);
+  const { data: scRows = [], isLoading: scLoading } = useScorecard(tournamentId, target?.playerId ?? null);
   const meta = useTournamentMeta(tournamentId);
 
   const availableRounds = useMemo(() => {
