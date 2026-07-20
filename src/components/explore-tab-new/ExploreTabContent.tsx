@@ -41,7 +41,7 @@ interface ExploreTabContentProps {
 }
 
 export default function ExploreTabContent({ embedded: _embedded = false, shellTabs }: ExploreTabContentProps) {
-  const { user } = useSupabaseSession();
+  const { user, loading: authLoading } = useSupabaseSession();
   const userId = user?.id;
   const gridRef = useRef<HTMLDivElement | null>(null);
   const [scope, setScope] = useState<RecordsMode>('latest');
