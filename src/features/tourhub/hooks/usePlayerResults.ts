@@ -49,10 +49,7 @@ export function usePlayerResults(playerId: string | undefined, limit = 10) {
         .eq('player_id', playerId)
         .limit(Math.max(limit * 3, 60));
 
-      if (error) {
-        console.error('Error fetching player results:', error);
-        return [];
-      }
+      if (error) throw error;
 
       const mapped = (data || []).map(row => ({
         id: row.id,
