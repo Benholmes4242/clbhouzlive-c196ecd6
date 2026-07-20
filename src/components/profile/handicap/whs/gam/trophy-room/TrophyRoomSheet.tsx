@@ -18,6 +18,7 @@ import { isShowpiece, LIFETIME_ORDER } from './_shared/showpieces';
 import { medalsOwned } from './_shared/levels';
 import { MATERIAL_PALETTES, FORGE_GOLD } from './_shared/rarityPalette';
 import { TrophyRoomSpine } from './TrophyRoomSpine';
+import { Skeleton } from '@/components/ui/skeleton';
 import { rarityColor } from '@/lib/gam/visuals';
 import type { BadgeCategory } from '@/lib/gam/types';
 
