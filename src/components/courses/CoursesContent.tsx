@@ -36,21 +36,28 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
 
-  const { data: results = [], isLoading, isError } = useQuery({
-    queryKey: ['rate-course-search', query],
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedQuery(query), 250);
+    return () => clearTimeout(t);
+  }, [query]);
+
+  const { data: results = [], isLoading, isFetching, isError } = useQuery({
+    queryKey: ['rate-course-search', debouncedQuery],
     queryFn: async () => {
-      if (query.trim().length < 2) return [];
+      if (debouncedQuery.trim().length < 2) return [];
       const { data, error } = await supabase
         .from('golf_courses')
         .select('id, name, country, sub_country, global_rank')
-        .ilike('name', `%${query.trim()}%`)
+        .ilike('name', `%${debouncedQuery.trim()}%`)
         .order('global_rank', { ascending: true, nullsFirst: false })
         .limit(12);
       if (error) throw error;
       return data ?? [];
     },
-    enabled: query.trim().length >= 2,
+    enabled: debouncedQuery.trim().length >= 2,
+    placeholderData: keepPreviousData,
     staleTime: 30_000,
   });
 
