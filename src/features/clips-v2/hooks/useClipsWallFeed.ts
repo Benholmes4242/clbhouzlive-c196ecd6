@@ -63,7 +63,7 @@ export function useClipsWallFeed(params: {
     initialPageParam: [] as string[],
     queryFn: async ({ pageParam }) => {
       const seenIds = (pageParam as string[]) ?? [];
-      const { data, error } = await (supabase as unknown as RpcClient).rpc('get_watch_shorts', {
+      const { data, error } = await (supabase as unknown as RpcClient).rpc('get_watch_shorts_v2', {
         p_user_id: userId,
         p_page_size: PAGE_SIZE,
         p_cursor: null,

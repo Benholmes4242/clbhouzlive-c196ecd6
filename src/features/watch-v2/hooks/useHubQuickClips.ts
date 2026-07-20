@@ -10,7 +10,7 @@ export function useHubQuickClips(userId: string | undefined) {
     enabled: !!userId,
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
-      const { data, error } = await (supabase as unknown as RpcClient).rpc('get_watch_shorts', {
+      const { data, error } = await (supabase as unknown as RpcClient).rpc('get_watch_shorts_v2', {
         p_user_id: userId,
         p_mode: 'trending',
         p_page_size: 12,

@@ -17644,77 +17644,6 @@ export type Database = {
           isSetofReturn: true
         }
       }
-      get_friends_feed: {
-        Args: {
-          p_cursor?: string
-          p_mode?: string
-          p_page_size?: number
-          p_search_query?: string
-          p_seen_post_ids?: string[]
-          p_user_id: string
-          p_viewer_actor_id?: string
-          p_viewer_actor_type?: string
-        }
-        Returns: {
-          business_is_verified: boolean
-          business_logo_url: string
-          business_name: string
-          comment_count: number
-          course_avg_overall_score: number
-          course_country: string
-          course_global_rank: number
-          course_id: string
-          course_latitude: number
-          course_longitude: number
-          course_name: string
-          course_region: string
-          course_thumbnail_image: string
-          creator_avatar_url: string
-          creator_display_name: string
-          creator_handicap_index: number
-          creator_home_club: string
-          creator_home_club_visibility: string
-          creator_is_verified: boolean
-          creator_relation: string
-          creator_show_handicap: boolean
-          creator_username: string
-          display_order: number
-          duration_seconds: number
-          engagement_score: number
-          height: number
-          is_followed_by_me: boolean
-          is_liked_by_me: boolean
-          like_count: number
-          media_id: string
-          media_type: string
-          media_url: string
-          post_actor_id: string
-          post_actor_type: string
-          post_content: string
-          post_created_at: string
-          post_id: string
-          post_status: string
-          post_tags: Json
-          post_user_id: string
-          poster_url: string
-          review_clubhouse_score: number
-          review_condition_score: number
-          review_course_country: string
-          review_course_id: string
-          review_course_image: string
-          review_course_name: string
-          review_course_region: string
-          review_course_sub_country: string
-          review_design_score: number
-          review_facilities_score: number
-          review_rating: number
-          review_text: string
-          share_count: number
-          source_review_id: string
-          stream_id: string
-          width: number
-        }[]
-      }
       get_friends_feed_v3: {
         Args: {
           p_cursor?: string
@@ -17952,6 +17881,53 @@ export type Database = {
         }[]
       }
       get_long_form_videos: {
+        Args: {
+          p_category?: string
+          p_cursor?: string
+          p_mode?: string
+          p_page_size?: number
+          p_search_query?: string
+          p_seen_post_ids?: string[]
+          p_user_id: string
+          p_viewer_actor_id?: string
+          p_viewer_actor_type?: string
+        }
+        Returns: {
+          actor_id: string
+          actor_type: string
+          comment_count: number
+          course_id: string
+          course_name: string
+          creator_avatar_url: string
+          creator_display_name: string
+          creator_is_verified: boolean
+          creator_relation: string
+          creator_username: string
+          display_order: number
+          duration_seconds: number
+          height: number
+          hls_url: string
+          is_followed_by_me: boolean
+          is_liked_by_me: boolean
+          like_count: number
+          media_id: string
+          media_type: string
+          media_url: string
+          post_content: string
+          post_created_at: string
+          post_id: string
+          post_tags: Json
+          post_user_id: string
+          poster_url: string
+          review_categories: Json
+          review_id: string
+          review_overall_score: number
+          share_count: number
+          stream_id: string
+          width: number
+        }[]
+      }
+      get_long_form_videos_v2: {
         Args: {
           p_category?: string
           p_cursor?: string
@@ -18457,84 +18433,6 @@ export type Database = {
         }[]
       }
       get_suggested_feed: {
-        Args: {
-          p_boost_country_match?: number
-          p_boost_followed?: number
-          p_boost_mutual_friends?: number
-          p_boost_rated_course?: number
-          p_boost_top100_list?: number
-          p_cursor?: string
-          p_engagement_per_comment?: number
-          p_engagement_per_like?: number
-          p_entropy_floor?: number
-          p_entropy_range?: number
-          p_freshness_base?: number
-          p_freshness_half_life_hours?: number
-          p_mode?: string
-          p_page_size?: number
-          p_review_bonus?: number
-          p_seen_post_ids?: string[]
-          p_user_id: string
-          p_viewer_actor_id?: string
-          p_viewer_actor_type?: string
-        }
-        Returns: {
-          business_is_verified: boolean
-          business_logo_url: string
-          business_name: string
-          comment_count: number
-          country_match: boolean
-          course_avg_overall_score: number
-          course_id: string
-          course_name: string
-          creator_avatar_url: string
-          creator_display_name: string
-          creator_is_verified: boolean
-          creator_relation: string
-          creator_username: string
-          display_order: number
-          duration_seconds: number
-          engagement_score: number
-          height: number
-          is_followed_by_me: boolean
-          is_liked_by_me: boolean
-          like_count: number
-          media_id: string
-          media_type: string
-          media_url: string
-          mutual_friends_count: number
-          post_actor_id: string
-          post_actor_type: string
-          post_content: string
-          post_created_at: string
-          post_id: string
-          post_status: string
-          post_tags: Json
-          post_type: string
-          post_user_id: string
-          poster_url: string
-          rated_post_course: boolean
-          review_clubhouse_score: number
-          review_condition_score: number
-          review_course_country: string
-          review_course_id: string
-          review_course_image: string
-          review_course_name: string
-          review_course_region: string
-          review_course_sub_country: string
-          review_design_score: number
-          review_facilities_score: number
-          review_rating: number
-          review_text: string
-          share_count: number
-          source_review_id: string
-          stream_id: string
-          top100_list_match: boolean
-          tournament_meta: Json
-          width: number
-        }[]
-      }
-      get_suggested_feed_v2: {
         Args: {
           p_boost_country_match?: number
           p_boost_followed?: number
@@ -19361,6 +19259,58 @@ export type Database = {
           width: number
         }[]
       }
+      get_watch_mixed_grid_v2: {
+        Args: {
+          p_cursor?: string
+          p_filter?: string
+          p_page_size?: number
+          p_seen_ids?: string[]
+          p_user_id: string
+          p_viewer_actor_id?: string
+          p_viewer_actor_type?: string
+        }
+        Returns: {
+          business_logo_url: string
+          business_name: string
+          comment_count: number
+          course_id: string
+          course_name: string
+          creator_avatar_url: string
+          creator_display_name: string
+          creator_is_verified: boolean
+          creator_username: string
+          derived_format: string
+          duration_seconds: number
+          height: number
+          hls_url: string
+          is_followed_by_me: boolean
+          is_liked_by_me: boolean
+          like_count: number
+          media_url: string
+          post_actor_id: string
+          post_actor_type: string
+          post_content: string
+          post_created_at: string
+          post_id: string
+          post_user_id: string
+          poster_url: string
+          review_clubhouse_score: number
+          review_condition_score: number
+          review_course_country: string
+          review_course_id: string
+          review_course_image: string
+          review_course_name: string
+          review_course_region: string
+          review_course_sub_country: string
+          review_design_score: number
+          review_facilities_score: number
+          review_rating: number
+          review_text: string
+          source_review_id: string
+          stream_id: string
+          width: number
+        }[]
+      }
       get_watch_most_loved_this_week: {
         Args: {
           p_format?: string
@@ -19414,6 +19364,67 @@ export type Database = {
         }[]
       }
       get_watch_shorts: {
+        Args: {
+          p_category?: string
+          p_cursor?: string
+          p_filter?: string
+          p_max_duration?: number
+          p_mode?: string
+          p_page_size?: number
+          p_search_query?: string
+          p_seen_ids?: string[]
+          p_user_id: string
+          p_user_lat?: number
+          p_user_lng?: number
+          p_viewer_actor_id?: string
+          p_viewer_actor_type?: string
+        }
+        Returns: {
+          business_is_verified: boolean
+          business_logo_url: string
+          business_name: string
+          comment_count: number
+          course_country: string
+          course_region: string
+          creator_avatar_url: string
+          creator_display_name: string
+          creator_is_verified: boolean
+          creator_relation: string
+          creator_username: string
+          display_order: number
+          duration_seconds: number
+          engagement_score: number
+          height: number
+          is_followed_by_me: boolean
+          is_liked_by_me: boolean
+          like_count: number
+          media_id: string
+          media_type: string
+          media_url: string
+          post_actor_id: string
+          post_actor_type: string
+          post_content: string
+          post_created_at: string
+          post_id: string
+          post_status: string
+          post_tags: Json
+          post_user_id: string
+          poster_url: string
+          review_clubhouse_score: number
+          review_condition_score: number
+          review_course_id: string
+          review_course_image: string
+          review_course_name: string
+          review_design_score: number
+          review_facilities_score: number
+          review_rating: number
+          share_count: number
+          source_review_id: string
+          stream_id: string
+          width: number
+        }[]
+      }
+      get_watch_shorts_v2: {
         Args: {
           p_category?: string
           p_cursor?: string
