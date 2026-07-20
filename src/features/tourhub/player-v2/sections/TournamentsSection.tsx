@@ -188,7 +188,7 @@ export function TournamentsSection({
                         borderRadius: 4,
                         background: `${AMBER}22`,
                         color: GOLD_DEEP,
-                        fontSize: 8.5,
+                        fontSize: 10,
                         fontWeight: 800,
                         letterSpacing: '0.10em',
                       }}
