@@ -400,7 +400,43 @@ const RivalryPage: React.FC = () => {
       {viewerId && isLoading && <RivalrySkeleton />}
 
       {viewerId && !isLoading && (errored || (!row && !isFriendView)) && (() => {
-        const noSharedRounds = !errored && !!profileExists.data?.exists;
+        if (errored) {
+          return (
+            <div
+              style={{
+                padding: '64px 24px',
+                textAlign: 'center',
+                fontFamily: FONT,
+              }}
+            >
+              <div style={{ color: T100, fontSize: 16, fontWeight: 700 }}>
+                Couldn't load this rivalry
+              </div>
+              <div style={{ color: T60, fontSize: 13, marginTop: 8 }}>
+                Check your connection and try again.
+              </div>
+              <button
+                type="button"
+                onClick={() => (isFriendView ? friend.refetch() : owner.refetch())}
+                style={{
+                  marginTop: 16,
+                  background: T100,
+                  color: '#0F172A',
+                  border: 'none',
+                  borderRadius: 999,
+                  padding: '10px 20px',
+                  fontSize: 13.5,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  fontFamily: FONT,
+                }}
+              >
+                Retry
+              </button>
+            </div>
+          );
+        }
+        const noSharedRounds = !!profileExists.data?.exists;
         const rivalDisplayFirst = firstName(profileExists.data?.displayName ?? null) || 'this player';
         return (
           <div
