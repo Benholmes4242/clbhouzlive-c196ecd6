@@ -56,7 +56,7 @@ export const HeroScoreboard: React.FC<Props> = ({
 
   const rivalAvatar = pickAvatarSrc(
     rivalry.rival_thumbnail_url,
-    (rivalry as any).rival_profile_photo_url,
+    (rivalry as { rival_profile_photo_url?: string | null }).rival_profile_photo_url,
   );
 
   const winsStr = String(wins);
