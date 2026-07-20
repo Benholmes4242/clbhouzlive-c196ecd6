@@ -471,7 +471,7 @@ export function FullscreenFeedOverlay() {
   const { activeActor: ctxActor } = useActiveActor();
   const activeActor = ctxActor ?? { type: "personal" as const, id: userId ?? "" };
   const { handleLike, getActiveLikeState } = useClubhouseLikes({ userId, activeActor });
-  const { followOverrides, handleFollow, handleFollowChange, getFollowState } = useClubhouseFollows({ userId });
+  const { followOverrides, handleFollowChange, getFollowState } = useClubhouseFollows({ userId });
   const { commentsOpen, overlayVisible, openComments, closeComments, getCommentCount } = useClubhouseComments();
   const safeOpenComments = useCallback(() => { if (!readOnly) openComments(); }, [readOnly, openComments]);
   const {
@@ -908,10 +908,7 @@ export function FullscreenFeedOverlay() {
                     isRefreshing={isFetchingNextPage}
                     hasNextPage={hasNextPage}
                     followOverrides={followOverrides}
-                    onFollowChange={(targetUserId, nextFollowed) => {
-                      const p = posts.find((x) => x.userId === targetUserId);
-                      if (p) handleFollow({ ...p, isFollowedByMe: !nextFollowed });
-                    }}
+                    onFollowChange={handleFollowChange}
                     onFirstFrameReady={handleSnapFeedFirstFrame}
                     startIndex={startIndex}
                     onActiveIndexChange={setActiveIndex}
@@ -934,7 +931,7 @@ export function FullscreenFeedOverlay() {
                     getLikeState={getActiveLikeState}
                     getCommentCount={getCommentCount}
                     getFollowState={getFollowState}
-                    onFollow={(post, followedNow) => handleFollow({ ...post, isFollowedByMe: followedNow })}
+                    onFollow={(post) => handleFollowChange(post.userId, !getFollowState(post))}
                     onViewProfile={handleViewProfile}
                     onReviewTap={handleReviewTap}
                     isOwnPost={isOwnPost}

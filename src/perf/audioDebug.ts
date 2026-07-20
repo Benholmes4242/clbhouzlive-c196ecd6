@@ -26,10 +26,9 @@ export type AudioLogEntry = {
   data: Record<string, unknown>;
 };
 
-// ~4000 entries — widened for the forensic X-ray captures which emit
-// heartbeat.state + reconcile.decision every ~250ms alongside the pre-existing
-// per-lane events. 4000 covers ~60-90s of continuous heavy churn.
-const BUFFER_SIZE = 4000;
+// ~2000 entries so a five-minute continuous capture fits at typical event
+// rates (heartbeat 1/s + play/pause/policy churn during scroll).
+const BUFFER_SIZE = 2000;
 
 let buffer: AudioLogEntry[] = [];
 const listeners = new Set<() => void>();

@@ -32,7 +32,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { useWatchRevealed } from './WatchRevealContext';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
-import { audioDebugEnabled, logAudio } from '@/perf/audioDebug';
 import { PrefetchController } from './PrefetchController';
 import type { FeedPost } from '@/components/media-system/types/media';
 
@@ -292,38 +291,6 @@ export function useWatchAutoplay(
     };
 
   }, [eligible, root, maxActive]);
-
-  // Forensic X-ray — grant/revoke logging for the Watch surface. Diffs the
-  // active set against the previous beat and emits `surface.active` for each
-  // tile that entered/left, so the decision buffer can correlate a
-  // "silence-noticed" marker on a visible rail tile with what the audio
-  // reconciler actually thought was the active surface.
-  const prevActiveSetRef = useRef<Set<number>>(new Set());
-  useEffect(() => {
-    if (!audioDebugEnabled()) { prevActiveSetRef.current = activeSet; return; }
-    try {
-      const prev = prevActiveSetRef.current;
-      const grants: number[] = [];
-      const revokes: number[] = [];
-      activeSet.forEach((idx) => { if (!prev.has(idx)) grants.push(idx); });
-      prev.forEach((idx) => { if (!activeSet.has(idx)) revokes.push(idx); });
-      const emit = (kind: 'grant' | 'revoke', idx: number) => {
-        const post = postsRef.current?.[idx];
-        logAudio('surface.active', {
-          surface: 'rail',
-          railId,
-          activeIndex: idx,
-          laneId: null, // resolved by the rail lane pool at play time
-          postId: post?.id ?? null,
-          kind,
-        });
-      };
-      grants.forEach((i) => emit('grant', i));
-      revokes.forEach((i) => emit('revoke', i));
-    } catch { /* noop */ }
-    prevActiveSetRef.current = activeSet;
-  }, [activeSet, railId]);
-
 
   const outSet = eligible ? activeSet : EMPTY_SET;
   // activeIdx = highest-visibility member of the set (back-compat).

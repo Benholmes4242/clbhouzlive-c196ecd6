@@ -8,7 +8,6 @@ import {
 import { formatDistanceToNow } from 'date-fns';
 import { adminTheme as t } from '../theme';
 import { useInboxFeed, type InboxItem, type InboxType } from '../hooks/useInboxFeed';
-import { useInboxOpsStats, formatDurationShort } from '../hooks/useInboxOpsStats';
 import EmptyState from '../components/EmptyState';
 import AdminAccessDenied from '../components/AdminAccessDenied';
 import ModerationDetailDrawer from '../components/ModerationDetailDrawer';
@@ -206,7 +205,6 @@ function InboxListPage() {
             {openCount} open{oldest ? ` - longest ${relTime(oldest)}` : ''}
           </div>
         )}
-        {view === 'open' && <InboxOpsStrip doneItems={feed.doneItems} />}
       </header>
 
       {feed.hadErrors && (
@@ -673,38 +671,3 @@ export default function InboxPage() {
     </Routes>
   );
 }
-
-// C4-6: Inbox ops strip - resolved this week + median time-to-resolution.
-// Duration only from sources with authoritative reviewed timestamps
-// (report, appeal, verification). Never fabricates a duration; when no
-// duration-eligible items exist in the recent done set, shows the resolved
-// count alone.
-function InboxOpsStrip({ doneItems }: { doneItems: InboxItem[] }) {
-  const { resolvedThisWeek, medianMs, sampleSize } = useInboxOpsStats(doneItems);
-  if (resolvedThisWeek === 0 && medianMs == null) return null;
-
-  const Chip: React.FC<{ label: string; value: string; note?: string }> = ({ label, value, note }) => (
-    <div style={{
-      background: t.canvas, border: `1px solid ${t.line}`,
-      borderRadius: t.radius.md, padding: '6px 10px', minWidth: 0,
-    }}>
-      <div style={{ color: t.inkMuted, fontSize: 10, letterSpacing: 0.4, textTransform: 'uppercase', fontWeight: 700 }}>{label}</div>
-      <div style={{ color: t.ink, fontWeight: 700, fontSize: 14, fontVariantNumeric: 'tabular-nums' }}>{value}</div>
-      {note && <div style={{ color: t.inkFaint, fontSize: 10 }}>{note}</div>}
-    </div>
-  );
-
-  return (
-    <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
-      <Chip label="Resolved this week" value={String(resolvedThisWeek)} />
-      {medianMs != null && (
-        <Chip
-          label="Median time to resolve"
-          value={formatDurationShort(medianMs)}
-          note={`n=${sampleSize}`}
-        />
-      )}
-    </div>
-  );
-}
-

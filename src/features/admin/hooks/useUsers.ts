@@ -3,11 +3,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/lib/toast';
 import type { Database } from '@/integrations/supabase/types';
-import {
-  isNewThisWeek, isDormant14dPlus, isActive24h, hasEgIssue, isSuspended,
-  EG_AUTH_FAILED_STATUSES as EG_AUTH_FAILED_STATUSES_SHARED,
-} from '../lib/memberPredicates';
-
 
 type AppRole = Database['public']['Enums']['app_role'];
 
@@ -48,10 +43,10 @@ export interface AdminUserDetail extends AdminUserRow {
  * EG-issue definition. `auth_failed` is the exact status the
  * egSyncHealth.auth_failed counter used by DashboardPage / HealthPage /
  * useDashboard reflects (see supabase/functions/sync-whs-due/index.ts).
- * Re-exported from memberPredicates so Members + Analytics resolve to the
- * same set.
+ * Kept as a single-element list so the Members chip filter and the
+ * Health EG card resolve to the same set of users.
  */
-export const EG_AUTH_FAILED_STATUSES = EG_AUTH_FAILED_STATUSES_SHARED;
+export const EG_AUTH_FAILED_STATUSES = ['auth_failed'] as const;
 
 export type UserFilterStatus =
   | 'all'
@@ -61,7 +56,6 @@ export type UserFilterStatus =
   | 'eg_issues'
   | 'suspended'
   | 'admin';
-
 
 const ANALYTICS_LOOKBACK_DAYS = 14;
 
@@ -224,17 +218,27 @@ export function useUsers() {
       );
     }
     if (filter === 'admin') rows = rows.filter(u => !!u.role);
-    if (filter === 'new_this_week') rows = rows.filter(u => isNewThisWeek(u));
+    if (filter === 'new_this_week') {
+      const cutoff = Date.now() - 7 * 86400_000;
+      rows = rows.filter(u => new Date(u.created_at).getTime() >= cutoff);
+    }
     if (filter === 'active_24h') {
       const s = new Set(activeIds);
-      rows = rows.filter(u => isActive24h(u, s));
+      rows = rows.filter(u => s.has(u.id));
     }
-    if (filter === 'dormant_14d') rows = rows.filter(u => isDormant14dPlus(u));
+    if (filter === 'dormant_14d') {
+      const cutoff = Date.now() - 14 * 86400_000;
+      rows = rows.filter(u => {
+        // No event in the lookback window OR last event older than 14d.
+        if (!u.last_seen_at) return true;
+        return new Date(u.last_seen_at).getTime() < cutoff;
+      });
+    }
     if (filter === 'eg_issues') {
       const s = new Set(egIssueIds);
-      rows = rows.filter(u => hasEgIssue(u, s));
+      rows = rows.filter(u => s.has(u.id));
     }
-    if (filter === 'suspended') rows = rows.filter(u => isSuspended(u));
+    if (filter === 'suspended') rows = rows.filter(u => u.is_suspended);
     return rows;
   }, [allUsers, search, filter, activeIds, egIssueIds]);
 
@@ -257,18 +261,17 @@ export function useUsers() {
   }, [sorted, page, pageSize]);
 
   const counts = useMemo(() => {
-    const activeSet = new Set(activeIds);
-    const egSet = new Set(egIssueIds);
+    const weekCutoff = Date.now() - 7 * 86400_000;
+    const dormantCutoff = Date.now() - 14 * 86400_000;
     return {
       all: allUsers.length,
-      new_this_week: allUsers.filter(u => isNewThisWeek(u)).length,
-      active_24h: allUsers.filter(u => isActive24h(u, activeSet)).length,
-      dormant_14d: allUsers.filter(u => isDormant14dPlus(u)).length,
-      eg_issues: allUsers.filter(u => hasEgIssue(u, egSet)).length,
-      suspended: allUsers.filter(u => isSuspended(u)).length,
+      new_this_week: allUsers.filter(u => new Date(u.created_at).getTime() >= weekCutoff).length,
+      active_24h: activeIds.length,
+      dormant_14d: allUsers.filter(u => !u.last_seen_at || new Date(u.last_seen_at).getTime() < dormantCutoff).length,
+      eg_issues: egIssueIds.length,
+      suspended: allUsers.filter(u => u.is_suspended).length,
       admin: allUsers.filter(u => !!u.role).length,
     };
-
   }, [allUsers, activeIds, egIssueIds]);
 
   const roleMutation = useMutation({

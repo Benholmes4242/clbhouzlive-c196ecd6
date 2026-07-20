@@ -13,7 +13,6 @@ import { PrefetchController } from '@/video/PrefetchController';
 import { trace } from '@/perf/trace';
 import { VideoEngine } from '@/video/VideoEngine';
 import { isPerfEnabled } from '@/perf/navTiming';
-import { audioDebugEnabled, logAudio } from '@/perf/audioDebug';
 import { useInviteSheet } from '@/hooks/useInviteSheet';
 import clbhouzLogo from '@/assets/clbhouz-logo.png';
 
@@ -147,26 +146,6 @@ export function SnapFeed({
     return () => window.removeEventListener('clbhouz-active-tab-retap', onRetap);
   }, []);
 
-  // Forensic X-ray — clear log on surface teardown so the buffer records the
-  // active slot's disappearance (settle logs live in the activeIndex effect).
-  useEffect(() => {
-    return () => {
-      if (audioDebugEnabled()) {
-        try {
-          logAudio('surface.active', {
-            surface: surface === 'fullscreen' ? 'fullscreen' : 'clubhouse',
-            activeIndex: null,
-            laneId: null,
-            postId: null,
-            cleared: true,
-          });
-        } catch { /* noop */ }
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-
   const storeActiveIndex = useClubhouseStore(s => s.activeIndex);
   const setActiveIndex = useClubhouseStore(s => s.setActiveIndex);
   // Opening-slide media selectors threaded from the tap opener. `mediaId` is
@@ -201,23 +180,6 @@ export function SnapFeed({
     prevActiveRef.current = activeIndex;
     const post = posts[activeIndex];
     if (!post) return;
-
-    // Forensic X-ray — announces the surface's active slot so downstream
-    // audio decision records can be correlated by (surface, activeIndex,
-    // postId). Fired on every settle; the clear log lives in the unmount
-    // effect below.
-    if (audioDebugEnabled()) {
-      try {
-        const laneId = surface === 'fullscreen' ? 'fullscreen' : 'feed-active';
-        logAudio('surface.active', {
-          surface: surface === 'fullscreen' ? 'fullscreen' : 'clubhouse',
-          activeIndex,
-          laneId,
-          postId: post.id,
-        });
-      } catch { /* noop */ }
-    }
-
 
     const hasVideo = (post as any)?.mediaItems?.some?.((m: any) => m?.type === 'video');
     const mediaType: 'image' | 'video' = hasVideo ? 'video' : 'image';

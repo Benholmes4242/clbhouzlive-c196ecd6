@@ -29,27 +29,17 @@ import {
   useContentAnalytics,
   useAuthAnalytics,
 } from '../hooks/useAnalytics';
-import { useFunnels } from '../hooks/useFunnels';
-import FunnelCard from '../components/FunnelCard';
-import AudiencesSection from '../components/AudiencesSection';
-import RetentionCurve from '../components/RetentionCurve';
-import PostInsightSheet from '../components/PostInsightSheet';
-import CourseInsightSheet from '../components/CourseInsightSheet';
-import { useTopContent } from '../hooks/useTopContent';
 
-
-type TabId = 'live' | 'growth' | 'engagement' | 'retention' | 'funnels' | 'events' | 'auth';
+type TabId = 'live' | 'growth' | 'engagement' | 'retention' | 'events' | 'auth';
 
 const TABS: { id: TabId; label: string }[] = [
   { id: 'live',       label: 'Live' },
   { id: 'growth',     label: 'Growth' },
   { id: 'engagement', label: 'Engagement' },
   { id: 'retention',  label: 'Retention' },
-  { id: 'funnels',    label: 'Funnels' },
   { id: 'events',     label: 'Events' },
   { id: 'auth',       label: 'Auth' },
 ];
-
 
 const PERIODS: AnalyticsPeriod[] = ['7d', '30d', '90d'];
 const ALL_PERIODS: AnalyticsPeriod[] = ['7d', '14d', '30d', '90d'];
@@ -186,10 +176,8 @@ export default function AnalyticsPage() {
       {tab === 'growth'     && <GrowthTab     period={period} />}
       {tab === 'engagement' && <EngagementTab period={period} />}
       {tab === 'retention'  && <RetentionTab />}
-      {tab === 'funnels'    && <FunnelsTab    period={period} />}
       {tab === 'events'     && <EventsTab     period={period} />}
       {tab === 'auth'       && <AuthTab       period={period} />}
-
       <style>{`@keyframes admin-pulse-dot { 0%,100% { opacity: 1 } 50% { opacity: 0.35 } }`}</style>
     </div>
   );
@@ -369,13 +357,11 @@ function GrowthTab({ period }: { period: AnalyticsPeriod }) {
         loading={isLoading}
       />
 
-      <ChartCard title="Daily signups" subtitle={`Signups per day, last ${period}`} loading={isLoading} isEmpty={trendEmpty}
-        dataTable={(platform.data?.signupTrend ?? []).map(d => ({ label: d.date, value: d.value }))}>
+      <ChartCard title="Daily signups" subtitle={`Signups per day, last ${period}`} loading={isLoading} isEmpty={trendEmpty}>
         <BarTrend data={platform.data?.signupTrend ?? []} />
       </ChartCard>
 
-      <ChartCard title="Members over time" subtitle={`Cumulative member count across the period`} loading={isLoading} isEmpty={cumulative.length === 0}
-        dataTable={cumulative.map(d => ({ label: d.date, value: d.value }))}>
+      <ChartCard title="Members over time" subtitle={`Cumulative member count across the period`} loading={isLoading} isEmpty={cumulative.length === 0}>
         <AreaTrend data={cumulative} />
       </ChartCard>
 
@@ -405,12 +391,9 @@ function GrowthTab({ period }: { period: AnalyticsPeriod }) {
           </div>
         )}
       </Card>
-
-      <AudiencesSection />
     </>
   );
 }
-
 
 // ─── Engagement ───────────────────────────────────────────────────────────────
 
@@ -450,14 +433,12 @@ function EngagementTab({ period }: { period: AnalyticsPeriod }) {
       />
 
       <ChartCard title="Daily active users" subtitle={`Unique active users, last ${period}`} loading={isLoading}
-        isEmpty={!isLoading && !platform.data?.dau?.some(d => d.value > 0)}
-        dataTable={(platform.data?.dau ?? []).map(d => ({ label: d.date, value: d.value }))}>
+        isEmpty={!isLoading && !platform.data?.dau?.some(d => d.value > 0)}>
         <AreaTrend data={platform.data?.dau ?? []} />
       </ChartCard>
 
       <ChartCard title="Daily event volume" loading={isLoading}
-        isEmpty={!isLoading && (!eng.data || eng.data.totalEvents === 0)}
-        dataTable={(eng.data?.dailyTrend ?? []).map(d => ({ label: d.date, value: d.value }))}>
+        isEmpty={!isLoading && (!eng.data || eng.data.totalEvents === 0)}>
         <ResponsiveContainer width="100%" height={220}>
           <BarChart data={eng.data?.dailyTrend ?? []} margin={{ top: 8, right: 8, bottom: 0, left: -16 }}>
             <CartesianGrid stroke={t.line} vertical={false} strokeDasharray="3 3" />
@@ -470,14 +451,12 @@ function EngagementTab({ period }: { period: AnalyticsPeriod }) {
       </ChartCard>
 
       <ChartCard title="Busy hours" subtitle="Events by hour of day" loading={isLoading}
-        isEmpty={!isLoading && (!eng.data || eng.data.totalEvents === 0)}
-        dataTable={(eng.data?.hourlyBreakdown ?? []).map(h => ({ label: `${h.hour}:00`, value: h.count }))}>
+        isEmpty={!isLoading && (!eng.data || eng.data.totalEvents === 0)}>
         <BarTrend data={(eng.data?.hourlyBreakdown ?? []).map(h => ({ date: `${h.hour}`, value: h.count }))} />
       </ChartCard>
 
       <ChartCard title="Posts and reviews" subtitle="Posts (brand) and reviews (ink)" loading={content.isLoading}
-        isEmpty={!content.isLoading && combined.every(d => d.posts === 0 && d.reviews === 0)}
-        dataTable={combined.map(d => ({ label: d.date, value: `${d.posts} / ${d.reviews}` }))}>
+        isEmpty={!content.isLoading && combined.every(d => d.posts === 0 && d.reviews === 0)}>
         <ResponsiveContainer width="100%" height={220}>
           <BarChart data={combined} margin={{ top: 8, right: 8, bottom: 0, left: -16 }}>
             <CartesianGrid stroke={t.line} vertical={false} strokeDasharray="3 3" />
@@ -489,9 +468,6 @@ function EngagementTab({ period }: { period: AnalyticsPeriod }) {
           </BarChart>
         </ResponsiveContainer>
       </ChartCard>
-
-      {/* C4-4: Top content */}
-      <TopContentSection period={period} />
 
       <Card>
         <div style={{ color: t.ink, fontWeight: 700, fontSize: 15, marginBottom: 4 }}>Most active members</div>
@@ -540,120 +516,7 @@ function EngagementTab({ period }: { period: AnalyticsPeriod }) {
   );
 }
 
-// ─── Top content ──────────────────────────────────────────────────────────────
-
-function TopContentSection({ period }: { period: AnalyticsPeriod }) {
-  const { data, isLoading } = useTopContent(period);
-  const [openPost, setOpenPost] = useState<string | null>(null);
-  const [openCourse, setOpenCourse] = useState<string | null>(null);
-
-  return (
-    <Card>
-      <div style={{ color: t.ink, fontWeight: 700, fontSize: 15, marginBottom: 4 }}>Top content</div>
-      <div style={{ color: t.inkMuted, fontSize: 12, marginBottom: 12 }}>
-        Top posts (likes + comments + shares) and top courses (views), last {period}
-      </div>
-
-      {isLoading ? (
-        <div style={{ height: 200, background: t.canvas, borderRadius: t.radius.md }} />
-      ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16 }}>
-          <div>
-            <div style={{
-              color: t.inkMuted, fontSize: 11, letterSpacing: 0.4,
-              textTransform: 'uppercase', fontWeight: 700, marginBottom: 6,
-            }}>Posts</div>
-            {!data || data.posts.length === 0 ? (
-              <EmptyState title="No post engagement yet" />
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                {data.posts.map((p, i) => (
-                  <button
-                    key={p.id}
-                    onClick={() => setOpenPost(p.id)}
-                    style={{
-                      display: 'flex', alignItems: 'flex-start', gap: 10,
-                      padding: '10px 0', width: '100%', textAlign: 'left',
-                      background: 'transparent', border: 'none', cursor: 'pointer',
-                      borderTop: i === 0 ? 'none' : `1px solid ${t.line}`,
-                    }}
-                  >
-                    <span style={{
-                      minWidth: 22, color: t.inkFaint, fontSize: 12, fontWeight: 700,
-                      fontVariantNumeric: 'tabular-nums', textAlign: 'right', marginTop: 2,
-                    }}>{i + 1}</span>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{
-                        color: t.ink, fontSize: 13.5, fontWeight: 600,
-                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                      }}>
-                        {p.contentPreview ?? '(no text)'}
-                      </div>
-                      <div style={{ color: t.inkFaint, fontSize: 11.5, marginTop: 2 }}>
-                        {p.authorName ?? 'A member'} - {p.likes} likes, {p.comments} comments, {p.shares} shares
-                      </div>
-                    </div>
-                    <span style={{
-                      color: t.inkMuted, fontSize: 13, fontWeight: 700,
-                      fontVariantNumeric: 'tabular-nums',
-                    }}>{p.score}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div>
-            <div style={{
-              color: t.inkMuted, fontSize: 11, letterSpacing: 0.4,
-              textTransform: 'uppercase', fontWeight: 700, marginBottom: 6,
-            }}>Courses</div>
-            {!data || data.courses.length === 0 ? (
-              <EmptyState title="No course views yet" />
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                {data.courses.map((c, i) => (
-                  <button
-                    key={c.id}
-                    onClick={() => setOpenCourse(c.id)}
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: 10,
-                      padding: '10px 0', width: '100%', textAlign: 'left',
-                      background: 'transparent', border: 'none', cursor: 'pointer',
-                      borderTop: i === 0 ? 'none' : `1px solid ${t.line}`,
-                    }}
-                  >
-                    <span style={{
-                      minWidth: 22, color: t.inkFaint, fontSize: 12, fontWeight: 700,
-                      fontVariantNumeric: 'tabular-nums', textAlign: 'right',
-                    }}>{i + 1}</span>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{
-                        color: t.ink, fontSize: 13.5, fontWeight: 600,
-                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                      }}>{c.name ?? 'Unnamed course'}</div>
-                    </div>
-                    <span style={{
-                      color: t.inkMuted, fontSize: 13, fontWeight: 700,
-                      fontVariantNumeric: 'tabular-nums',
-                    }}>{c.views}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      <PostInsightSheet postId={openPost} open={!!openPost} onClose={() => setOpenPost(null)} />
-      <CourseInsightSheet courseId={openCourse} open={!!openCourse} onClose={() => setOpenCourse(null)} />
-    </Card>
-  );
-}
-
 // ─── Retention ────────────────────────────────────────────────────────────────
-
-
 
 function heatBg(value: number | null): string {
   if (value === null || value === 0) return t.canvas;
@@ -696,10 +559,7 @@ function RetentionTab() {
         loading={isLoading}
       />
 
-      {!isLoading && cohorts.length >= 2 && <RetentionCurve cohorts={cohorts} />}
-
       <Card>
-
         <div style={{ color: t.ink, fontWeight: 700, fontSize: 15, marginBottom: 4 }}>Cohort retention</div>
         <div style={{ color: t.inkMuted, fontSize: 12, marginBottom: 12 }}>Share of each cohort active in the weeks after joining.</div>
         {isLoading ? (
@@ -1450,33 +1310,5 @@ function StatBox({ label, value }: { label: string; value: string }) {
         color: t.ink, fontSize: 18, fontWeight: 800, fontVariantNumeric: 'tabular-nums',
       }}>{value}</div>
     </div>
-  );
-}
-
-// ─── Funnels ──────────────────────────────────────────────────────────────────
-
-function FunnelsTab({ period }: { period: AnalyticsPeriod }) {
-  const { signup, rating, auth } = useFunnels(period);
-
-  const anyError = signup.isError || rating.isError || auth.isError;
-  const refetchAll = () => { signup.refetch(); rating.refetch(); auth.refetch(); };
-
-  return (
-    <>
-      {anyError && (
-        <AdminErrorState title="Couldn't load funnels" onRetry={refetchAll} />
-      )}
-      {signup.data
-        ? <FunnelCard view={signup.data} loading={signup.isLoading} />
-        : <FunnelCard view={{ id: 'signup', title: 'Sign-up', subtitle: '', steps: [], isEmpty: true }} loading />}
-      {rating.data
-        ? <FunnelCard view={rating.data} loading={rating.isLoading} />
-        : <FunnelCard view={{ id: 'rating', title: 'Course rating', subtitle: '', steps: [], isEmpty: true }} loading />}
-      {auth.data
-        ? <FunnelCard view={auth.data} loading={auth.isLoading} />
-        : <FunnelCard view={{ id: 'auth', title: 'Auth flow', subtitle: '', steps: [], isEmpty: true }} loading />}
-
-      <div style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 8px)' }} />
-    </>
   );
 }

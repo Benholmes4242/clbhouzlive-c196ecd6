@@ -5,7 +5,7 @@ import {
   CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis, LineChart, Line,
 } from 'recharts';
 import {
-  AlertTriangle, ChevronRight, Activity, Bell, Cpu, ShieldCheck,
+  AlertTriangle, ChevronRight, Activity, Bell, Cpu,
   MessageSquare, UserPlus, Star, RefreshCcw, Radio,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -14,8 +14,6 @@ import { adminTheme as t } from '../theme';
 import EmptyState from '../components/EmptyState';
 import AdminErrorState from '../components/AdminErrorState';
 import MetricCard from '../components/MetricCard';
-import PostInsightSheet from '../components/PostInsightSheet';
-import CourseInsightSheet from '../components/CourseInsightSheet';
 import { useTriageCounts } from '../hooks/useTriageCounts';
 import { useEchoEngineHealth } from '../hooks/useEchoEngineHealth';
 import { usePushHealth } from '../hooks/usePushHealth';
@@ -25,11 +23,8 @@ import {
 } from '../hooks/useOverviewMetrics';
 import {
   computeEchoChip, computePushChip, computeEgChip, computeCronChip,
-  computeErrorsChip,
   toneColor, type ChipState,
 } from '../lib/healthChips';
-import { useErrorCount24h } from '../hooks/useStability';
-import { stripMentionMarkup } from '@/lib/mentions/format';
 
 const num = (n: number) => n.toLocaleString();
 function relTime(iso: string): string {
@@ -54,8 +49,6 @@ interface FeedItem {
   subtitle: string | null;
   avatarUrl: string | null;
   href: string;
-  postId?: string;
-  courseId?: string;
 }
 
 async function fetchClubhouseFeed(): Promise<FeedItem[]> {
@@ -128,7 +121,7 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
   for (const p of postRows) {
     const prof = profMap.get(p.user_id);
     const name = displayName(prof);
-    const content = stripMentionMarkup((p.content ?? '').trim()).trim();
+    const content = (p.content ?? '').trim();
     let subtitle: string | null = null;
     if (content) subtitle = content;
     else {
@@ -144,7 +137,6 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
       subtitle,
       avatarUrl: prof?.profile_photo_url ?? null,
       href: `/admin-v2/users?member=${p.user_id}`,
-      postId: p.id,
     });
   }
   for (const r of reviewRows) {
@@ -155,10 +147,9 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
       kind: 'review',
       created_at: r.created_at,
       title: `Review: ${course?.name ?? 'a course'}`,
-      subtitle: stripMentionMarkup((r.review ?? '').trim()).trim() || `by ${displayName(prof)}`,
+      subtitle: (r.review ?? '').trim() || `by ${displayName(prof)}`,
       avatarUrl: prof?.profile_photo_url ?? null,
       href: `/admin-v2/users?member=${r.user_id}`,
-      courseId: r.course_id,
     });
   }
 
@@ -198,12 +189,7 @@ export default function DashboardPage() {
   const pushChip = useMemo(() => computePushChip(push), [push.isLoading, push.isError, push.data]);
   const egChip = useMemo(() => computeEgChip(eg), [eg.isLoading, eg.isError, eg.data]);
   const cronChip = useMemo(() => computeCronChip(eg), [eg.isLoading, eg.isError, eg.data]);
-  const errors = useErrorCount24h();
-  const errorsChip = useMemo(
-    () => computeErrorsChip(errors.data ?? null, errors.isLoading, errors.isError),
-    [errors.data, errors.isLoading, errors.isError],
-  );
-  const nonOkChips = [echoChip, pushChip, egChip, cronChip, errorsChip].filter(c => c.tone !== 'ok' && c.tone !== 'idle').length;
+  const nonOkChips = [echoChip, pushChip, egChip, cronChip].filter(c => c.tone !== 'ok' && c.tone !== 'idle').length;
 
   const m = overview.data;
   const loading = overview.isLoading;
@@ -239,7 +225,7 @@ export default function DashboardPage() {
         onRetry={() => feed.refetch()}
       />
 
-      <HealthChipStrip echoChip={echoChip} pushChip={pushChip} egChip={egChip} cronChip={cronChip} errorsChip={errorsChip} />
+      <HealthChipStrip echoChip={echoChip} pushChip={pushChip} egChip={egChip} cronChip={cronChip} />
 
       <style>{`@keyframes admin-pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.55 } } @keyframes admin-pulse-dot { 0%,100% { opacity: 1 } 50% { opacity: 0.35 } }`}</style>
     </div>
@@ -498,9 +484,6 @@ function LatestInClubhouse({
   items: FeedItem[];
   loading: boolean; isError: boolean; onRetry: () => void;
 }) {
-  const [openPost, setOpenPost] = React.useState<string | null>(null);
-  const [openCourse, setOpenCourse] = React.useState<string | null>(null);
-
   return (
     <section
       style={{
@@ -527,46 +510,26 @@ function LatestInClubhouse({
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           {items.map((it, idx) => (
-            <FeedRow
-              key={it.id} item={it} first={idx === 0}
-              onOpenPost={setOpenPost}
-              onOpenCourse={setOpenCourse}
-            />
+            <FeedRow key={it.id} item={it} first={idx === 0} />
           ))}
         </div>
       )}
-
-      <PostInsightSheet postId={openPost} open={!!openPost} onClose={() => setOpenPost(null)} />
-      <CourseInsightSheet courseId={openCourse} open={!!openCourse} onClose={() => setOpenCourse(null)} />
     </section>
   );
 }
 
-function FeedRow({
-  item, first, onOpenPost, onOpenCourse,
-}: {
-  item: FeedItem; first: boolean;
-  onOpenPost: (id: string) => void;
-  onOpenCourse: (id: string) => void;
-}) {
+function FeedRow({ item, first }: { item: FeedItem; first: boolean }) {
   const chip = feedChip(item.kind);
-  // C4-3: post rows -> post insight sheet (upgrades the temporary author-360 routing).
-  // C4-2 (b): review rows -> course insight sheet.
-  const opensSheet =
-    (item.kind === 'post' && !!item.postId) ||
-    (item.kind === 'review' && !!item.courseId);
-
-  const rowStyle: React.CSSProperties = {
-    display: 'flex', alignItems: 'flex-start', gap: 10,
-    padding: '10px 0',
-    borderTop: first ? 'none' : `1px solid ${t.line}`,
-    textDecoration: 'none', color: 'inherit',
-    background: 'transparent', border: 'none', width: '100%', textAlign: 'left',
-    cursor: 'pointer',
-  };
-
-  const inner = (
-    <>
+  return (
+    <Link
+      to={item.href}
+      style={{
+        display: 'flex', alignItems: 'flex-start', gap: 10,
+        padding: '10px 0',
+        borderTop: first ? 'none' : `1px solid ${t.line}`,
+        textDecoration: 'none', color: 'inherit',
+      }}
+    >
       <span
         aria-hidden
         style={{
@@ -599,31 +562,9 @@ function FeedRow({
         )}
       </div>
       <ChevronRight size={14} color={t.inkFaint} style={{ marginTop: 12, flexShrink: 0 }} />
-    </>
-  );
-
-  if (opensSheet) {
-    return (
-      <button
-        type="button"
-        onClick={() => {
-          if (item.kind === 'post' && item.postId) onOpenPost(item.postId);
-          else if (item.kind === 'review' && item.courseId) onOpenCourse(item.courseId);
-        }}
-        style={{ ...rowStyle, borderTopStyle: first ? 'none' : 'solid', borderTopWidth: first ? 0 : 1, borderTopColor: t.line }}
-      >
-        {inner}
-      </button>
-    );
-  }
-
-  return (
-    <Link to={item.href} style={rowStyle}>
-      {inner}
     </Link>
   );
 }
-
 
 function feedChip(kind: FeedKind): { icon: React.ReactNode; bg: string; fg: string } {
   switch (kind) {
@@ -637,9 +578,9 @@ function feedChip(kind: FeedKind): { icon: React.ReactNode; bg: string; fg: stri
 // ─── Health chip strip ────────────────────────────────────────────────────────
 
 function HealthChipStrip({
-  egChip, cronChip, echoChip, pushChip, errorsChip,
+  egChip, cronChip, echoChip, pushChip,
 }: {
-  egChip: ChipState; cronChip: ChipState; echoChip: ChipState; pushChip: ChipState; errorsChip: ChipState;
+  egChip: ChipState; cronChip: ChipState; echoChip: ChipState; pushChip: ChipState;
 }) {
   return (
     <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
@@ -647,7 +588,6 @@ function HealthChipStrip({
       <HealthChip to="/admin-v2/health?tab=status" icon={<Activity size={14} />} state={cronChip} />
       <HealthChip to="/admin-v2/health?tab=status" icon={<Cpu size={14} />} state={echoChip} />
       <HealthChip to="/admin-v2/health?tab=status" icon={<Bell size={14} />} state={pushChip} />
-      <HealthChip to="/admin-v2/health?tab=stability" icon={<ShieldCheck size={14} />} state={errorsChip} />
     </section>
   );
 }

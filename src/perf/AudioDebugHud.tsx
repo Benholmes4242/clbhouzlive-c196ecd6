@@ -295,21 +295,6 @@ export const AudioDebugHud = memo(function AudioDebugHud() {
       }}>
         <span style={{ color: '#fbbf24', fontWeight: 700 }}>AUDIO · continuity</span>
         <div style={{ display: 'flex', gap: 6 }}>
-          <button
-            onClick={() => {
-              try {
-                logAudio('user.marker', {
-                  note: 'silence-noticed',
-                  wallClockISO: new Date().toISOString(),
-                });
-              } catch { /* noop */ }
-            }}
-            style={{ ...btnStyle, color: '#f87171', borderColor: 'rgba(248,113,113,0.5)' }}
-            aria-label="Mark silence-noticed"
-            title="Log a user.marker { note: 'silence-noticed' } — pins your ear's timestamp into the buffer."
-          >
-            MARK
-          </button>
           <button onClick={onCopy} style={btnStyle}>Copy</button>
           <button onClick={() => clearEntries()} style={btnStyle}>Clear</button>
           <button onClick={() => setExpanded(false)} style={{ ...btnStyle, color: '#94a3b8' }}>×</button>

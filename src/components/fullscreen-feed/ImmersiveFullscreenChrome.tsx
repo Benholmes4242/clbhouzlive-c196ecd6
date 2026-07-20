@@ -67,7 +67,7 @@ interface Props {
   getLikeState: (post: FeedPost) => { isLiked: boolean; count: number };
   getCommentCount: (post: FeedPost) => number;
   getFollowState: (post: FeedPost) => boolean;
-  onFollow: (post: FeedPost, followedNow: boolean) => void;
+  onFollow: (post: FeedPost) => void;
   onViewProfile: () => void;
   onReviewTap: () => void;
   isOwnPost: boolean;
@@ -419,7 +419,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
               <div style={{ pointerEvents: 'auto', flexShrink: 0 }}>
                 <FeedFollowPill
                   isFollowed={isFollowed}
-                  onFollow={() => onFollow(activePost, isFollowed)}
+                  onFollow={() => onFollow(activePost)}
                 />
               </div>
             )}

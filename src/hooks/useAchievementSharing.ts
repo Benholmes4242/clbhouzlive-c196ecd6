@@ -27,7 +27,7 @@ export function useAchievementSharing() {
         levelName: achievement.levelName,
         totalXP: achievement.totalXP,
         levelColor: achievement.levelColor,
-        name: `Unlocked: ${achievement.levelName}`,
+        name: `Level Up: ${achievement.levelName}`,
         description: `Just reached ${achievement.levelName}!`,
       };
     } else {

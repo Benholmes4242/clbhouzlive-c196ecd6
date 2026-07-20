@@ -24,7 +24,6 @@ import EmptyState from '../components/EmptyState';
 import DetailDrawer from '../components/DetailDrawer';
 import ConfirmDialog from '../components/ConfirmDialog';
 import AdminSheet from '../components/AdminSheet';
-import CourseInsight from '../components/CourseInsight';
 import AdminAccessDenied from '../components/AdminAccessDenied';
 import { VALID_CONTINENTS, COURSE_TYPES } from '../constants';
 import { useCourses, createCourse, type AdminCourseRow, type CourseFilter } from '../hooks/useCourses';
@@ -485,28 +484,6 @@ function CourseDetail({
         <div style={{ color: t.inkMuted, fontSize: 13 }}>Loading…</div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          {/* C4-2: Course Insight (collapsed by default) */}
-          <details
-            style={{
-              border: `1px solid ${t.line}`, borderRadius: t.radius.md,
-              background: t.surface, padding: '10px 12px',
-            }}
-          >
-            <summary
-              style={{
-                cursor: 'pointer', listStyle: 'none',
-                color: t.ink, fontSize: 13, fontWeight: 700,
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              }}
-            >
-              <span>Insights</span>
-              <ChevronRight size={14} color={t.inkFaint} />
-            </summary>
-            <div style={{ marginTop: 10 }}>
-              <CourseInsight courseId={courseId} compact />
-            </div>
-          </details>
-
           {/* Hero */}
           <div style={{
             position: 'relative', aspectRatio: '16/9',
