@@ -114,9 +114,11 @@ export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
         courseName=""
         holes={[]}
         playerName=""
+        loading={scLoading}
       />
     );
   }
+
 
   const demoted = isDemotedStatus(target.status);
   const roundLabel = selectedRound != null
