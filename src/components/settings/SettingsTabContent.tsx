@@ -93,9 +93,9 @@ export function SettingsTabContent() {
 
   const privacy = usePrivacySettings(
     user?.id,
-    !!(profile as any)?.is_public,
-    ((profile as any)?.handicap_visibility ?? 'public') as VisibilityLevel,
-    ((profile as any)?.leaderboard_visibility ?? 'public') as VisibilityLevel,
+    !!profile?.is_public,
+    (profile?.handicap_visibility ?? 'public') as VisibilityLevel,
+    (profile?.leaderboard_visibility ?? 'public') as VisibilityLevel,
   );
 
   const deleteAccount = useDeleteAccount(user?.id);
