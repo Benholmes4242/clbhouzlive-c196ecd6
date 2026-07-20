@@ -456,7 +456,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
             onClick={() =>
               onOpenMedia(post, 0, {
                 el: singleMediaBtnRef.current,
-                posterUrl: media.thumbnailUrl ?? (media as any).imageUrl ?? null,
+                posterUrl: media.thumbnailUrl ?? media.imageUrl ?? null,
               })
             }
             style={{
