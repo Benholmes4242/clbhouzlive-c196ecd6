@@ -25,12 +25,6 @@
     "viewTrophyRoom": "View your Trophy Room",
     "keepPlaying": "Keep playing"
   },
-  "levelUpToast": {
-    "headline": "Level Up! 🎉",
-    "ringUnlocked": "{{level}} Ring Unlocked",
-    "totalXp": "Total XP: {{xp}}",
-    "viewJourney": "View Journey"
-  },
   "nudge": {
     "nextGlobal": "Next global milestone",
     "nextRegional": "Next regional milestone",

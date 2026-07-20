@@ -397,7 +397,7 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
                     to {nextLevel.label}
                   </>
                 ) : (
-                  'Max level'
+                  'Top of the ladder'
                 )}
               </div>
 
@@ -701,7 +701,7 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
                 to {nextLevel.label}
               </>
             ) : (
-              'Max level'
+              'Top of the ladder'
             )}
           </div>
         </div>

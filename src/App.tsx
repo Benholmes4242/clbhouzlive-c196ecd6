@@ -100,7 +100,7 @@ import { AdminGatedPerfPill, AdminGatedBootTimelinePill, AdminGatedPerfHud, Admi
 
 
 import { AchievementToastContainer } from '@/components/achievements/AchievementToastContainer';
-import { LevelUpToastContainer } from '@/components/achievements/LevelUpToastContainer';
+
 import { LevelUpGate } from '@/components/achievements/LevelUpGate';
 import { useAchievementSharing } from '@/hooks/useAchievementSharing';
 import { useTop100XpNotifications } from '@/hooks/useTop100XpNotifications';
@@ -692,7 +692,7 @@ const AchievementToastWrapper: React.FC = () => {
   return (
     <>
       <AchievementToastContainer onShare={prepareAchievementShare} />
-      <LevelUpToastContainer onShare={prepareAchievementShare} />
+      
     </>
   );
 };
