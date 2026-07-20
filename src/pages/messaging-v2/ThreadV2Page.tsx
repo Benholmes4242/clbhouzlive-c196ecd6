@@ -188,6 +188,7 @@ const ThreadV2Page: React.FC = () => {
     isLoading,
     isFetchingOlder,
     error,
+    refetch,
   } = useThread(conversationId || null);
   const { retry } = useSendMessage(conversationId);
   const keyboardHeight = useKeyboardHeight();
