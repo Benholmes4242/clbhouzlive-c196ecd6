@@ -173,6 +173,21 @@ export function SnapFeed({
   }, []);
 
 
+  // v11 audio-focus — dedicated registration that closes the two gaps found
+  // in the v10 audit:
+  //   (a) Initial mount of the active slide: the transition-settle effect
+  //       below early-returns when prevActiveRef already equals activeIndex
+  //       (true on mount), so focus never registered for the landing slide.
+  //   (b) Fullscreen round-trip: when the overlay closes while the inline
+  //       feed still owns the active slide, we re-assert focus so the
+  //       reconciler picks the inline feed lane back up.
+  // Mechanism for (b): subscribe to `useFullscreenFeedStore(s => s.isOpen)`
+  // and re-register in the same effect body whenever it flips (or on any
+  // activeIndex change). Inline surface only — the fullscreen surface's
+  // speaker is owned by the reconciler's overlay branch.
+  const fsOpen = useFullscreenFeedStore(s => s.isOpen);
+
+
   const storeActiveIndex = useClubhouseStore(s => s.activeIndex);
   const setActiveIndex = useClubhouseStore(s => s.setActiveIndex);
   // Opening-slide media selectors threaded from the tap opener. `mediaId` is
