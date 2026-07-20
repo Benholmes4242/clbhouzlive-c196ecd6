@@ -488,8 +488,7 @@ class VideoEngineImpl {
 
   private applyAudioPolicy(
     lane: Lane,
-    trigger: 'mount' | 'activation' | 'policy-change' | 'external-bind' | 'guard-reassert' | 'role-promote' | 'unknown' = 'unknown',
-    opts: { claimsAudio?: boolean } = {}
+    trigger: 'mount' | 'policy-change' | 'external-bind' | 'guard-reassert' | 'role-promote' | 'unknown' = 'unknown',
   ): void {
     // Borrow override: while the fullscreen viewer owns this lane's element,
     // the effective policy is 'session' regardless of the lane's declared
@@ -499,39 +498,14 @@ class VideoEngineImpl {
     const effectivePolicy: LaneAudioPolicy = borrowed ? 'session' : lane.audioPolicy;
     const sessionMuted = useSessionAudio.getState().isMuted;
     // Resolve the feed role of this lane (null for non-feed lanes like
-    // fullscreen / rails). Used both for HUD legitimacy and to gate
-    // 'activation'-trigger session claims to the ACTIVE-role lane only.
+    // fullscreen / rails). Kept for HUD legitimacy in logs.
     let role: 'active' | 'next' | 'prev' | null = null;
     try {
       if (feedLaneRoles.isFeedLane(lane.id)) {
         role = feedLaneRoles.roleForLane(lane.id);
       }
     } catch { /* noop */ }
-    // v7 gate + v8 override: activation-trigger session claim ONLY when this
-    // lane holds the ACTIVE role (or is a non-feed lane, e.g. fullscreen),
-    // OR the caller explicitly declared the claim legitimate via
-    // claimsAudio (feed promotion path). Preload / warm-up play() calls
-    // never set claimsAudio, so v7's steal protection is preserved.
-    if (
-      trigger === 'activation' &&
-      effectivePolicy === 'session' &&
-      feedLaneRoles.isFeedLane(lane.id) &&
-      role !== 'active' &&
-      !opts.claimsAudio
-    ) {
-      logAudio('policy.resolve', {
-        laneId: lane.id,
-        trigger,
-        role,
-        declaredPolicy: lane.audioPolicy,
-        borrowed,
-        effectivePolicy,
-        sessionMuted,
-        elMuted: lane.el.muted,
-        action: 'skip-nonactive-role',
-      });
-      return;
-    }
+
     let action: 'noop' | 'mute' | 'setMuted' = 'noop';
     if (effectivePolicy === 'always-muted') {
       if (!lane.el.muted) { action = 'mute'; }
@@ -1095,7 +1069,7 @@ class VideoEngineImpl {
   }
 
 
-  play(laneId: LaneId, opts: { callerPostId?: string | null; viaViewer?: boolean; claimsAudio?: boolean } = {}): Promise<void> {
+  play(laneId: LaneId, opts: { callerPostId?: string | null; viaViewer?: boolean } = {}): Promise<void> {
     const lane = this.getLane(laneId);
     const caller = opts.callerPostId ?? null;
     // Trace viewer-sourced play so device captures show the path.
@@ -1126,9 +1100,9 @@ class VideoEngineImpl {
 
     // Persistent intent: set now, honored on mount + on canplay after (re)load.
     lane.wantPlay = true;
-    // AUDIO POLICY: on activation, re-consult session store so an earlier
-    // unmute carries to the NEXT video (inheritance on activation).
-    this.applyAudioPolicy(lane, 'activation', { claimsAudio: opts.claimsAudio === true });
+    // v9: NO activation-time audio claim here. The role-change subscription
+    // (feedLaneRoles → reconcileAudio) is the single writer that promotes
+    // the newly-active lane's audio. play() is now audio-neutral.
     logAudio('resume.activate', {
       laneId,
       callerPostId: caller ?? null,
