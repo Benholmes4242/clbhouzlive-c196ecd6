@@ -9,8 +9,9 @@ export interface NorthStarData {
   mau: number;
   signups7d: number;
   signupsPrev7d: number;
-  d1Retention: number;
-  d7Retention: number;
+  d1Retention: number | null;
+  d7Retention: number | null;
+
   totalUsers: number;
 }
 
@@ -73,12 +74,14 @@ async function fetchNorthStar(): Promise<NorthStarData> {
 
   const d1Cohort = signupsD1Res.data ?? [];
   const d7Cohort = signupsD7Res.data ?? [];
-  const d1Retention = d1Cohort.length
+  const MIN_COHORT = 3;
+  const d1Retention = d1Cohort.length >= MIN_COHORT
     ? Math.round((d1Cohort.filter(u => activeIds.has(u.id)).length / d1Cohort.length) * 100)
-    : 0;
-  const d7Retention = d7Cohort.length
+    : null;
+  const d7Retention = d7Cohort.length >= MIN_COHORT
     ? Math.round((d7Cohort.filter(u => activeIdsD7.has(u.id)).length / d7Cohort.length) * 100)
-    : 0;
+    : null;
+
 
   return {
     dauToday,
