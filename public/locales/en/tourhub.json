@@ -371,6 +371,11 @@
         "eyebrow": "Leaderboard",
         "title": "Scoring not yet posted",
         "body": "Scoring will populate as players post numbers."
+      },
+      "error": {
+        "eyebrow": "LEADERBOARD",
+        "title": "Couldn't load the board",
+        "body": "Check your connection and try again."
       }
     }
   },
@@ -398,6 +403,7 @@
       "yardage": "{{yardage}} yards"
     },
     "unknownPlayer": "Unknown",
+    "retry": "Retry",
     "footnote": "F Finished",
     "cut": {
       "projected": "Projected cut",
