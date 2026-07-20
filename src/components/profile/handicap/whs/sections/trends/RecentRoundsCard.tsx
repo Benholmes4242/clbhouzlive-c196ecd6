@@ -6,6 +6,7 @@ import { useAllScores, useHandicapTrend } from '@/lib/whs/hooks';
 import { computeRoundDeltas, type RoundWithDelta } from './computeRoundDeltas';
 import RoundDetailSheet from '../round-detail/RoundDetailSheet';
 import { DarkSectionHeader } from '../_shared/darkAtoms';
+import { Skeleton } from '@/components/ui/skeleton';
 
 
 interface Props {
