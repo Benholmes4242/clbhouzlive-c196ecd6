@@ -34,7 +34,7 @@ export const AudioLogsButton = memo(function AudioLogsButton() {
         borderRadius: 6,
       }}
     >
-      AUDIO LOG
+      AUD LOG
     </button>,
     document.body,
   );
