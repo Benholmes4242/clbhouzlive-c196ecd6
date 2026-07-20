@@ -41,10 +41,10 @@ export function NotificationsSection({ businessId }: Props) {
         .from('business_accounts')
         .select('notification_preferences')
         .eq('id', businessId)
-        .maybeSingle();
+        .maybeSingle<{ notification_preferences: { muted_types?: string[] } | null }>();
       if (cancelled) return;
       if (!error && data) {
-        const prefs = (data as any).notification_preferences ?? {};
+        const prefs = data.notification_preferences ?? {};
         const list: string[] = Array.isArray(prefs.muted_types) ? prefs.muted_types : [];
         setMuted(new Set(list));
       }
@@ -63,7 +63,7 @@ export function NotificationsSection({ businessId }: Props) {
     setSaving(key);
     const { error } = await supabase
       .from('business_accounts')
-      .update({ notification_preferences: { muted_types: Array.from(next) } } as any)
+      .update({ notification_preferences: { muted_types: Array.from(next) } })
       .eq('id', businessId);
     setSaving(null);
     if (error) {

@@ -69,7 +69,7 @@ import {
 
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 
-import type { Database } from '@/integrations/supabase/types';
+import type { Database, Json } from '@/integrations/supabase/types';
 
 /* ─────────────────────── constants ─────────────────────── */
 
@@ -91,7 +91,7 @@ export default function BusinessProfileEditor() {
   useHideBottomNav();
 
   /* ── edit-mode data load ────────────────────────────── */
-  const { data: business, isLoading: businessLoading, error: businessError } =
+  const { data: business, isLoading: businessLoading, error: businessError, refetch: refetchBusiness } =
     useBusinessProfile(mode === 'edit' ? id : undefined);
   const { data: membership, isLoading: membershipLoading } = useBusinessMembership(
     mode === 'edit' ? id : undefined
@@ -238,11 +238,11 @@ export default function BusinessProfileEditor() {
       });
     }
 
-    setShowOpeningHours(!!(business as any).show_opening_hours);
+    setShowOpeningHours(!!business.show_opening_hours);
     setOpeningHours(business.opening_hours ? { ...business.opening_hours } : { ...DEFAULT_OPENING_HOURS });
 
-    setAmenities(Array.isArray((business as any).amenities) ? (business as any).amenities : []);
-    setPrimaryAction(((business as any).primary_action as PrimaryActionKey | null) || null);
+    setAmenities(Array.isArray(business.amenities) ? business.amenities : []);
+    setPrimaryAction((business.primary_action as PrimaryActionKey | null) || null);
 
     const sl = business.social_links || {};
     setSocial({
@@ -261,9 +261,9 @@ export default function BusinessProfileEditor() {
       n: business.name, d: business.description, fy: business.founded_year,
       w: business.website, e: business.email, p: business.phone,
       oh: business.opening_hours, sl, addr: business.address_label, loc: business.location,
-      am: (business as any).amenities || [],
-      pa: (business as any).primary_action || null,
-      soh: !!(business as any).show_opening_hours,
+      am: business.amenities || [],
+      pa: business.primary_action || null,
+      soh: !!business.show_opening_hours,
     });
   }, [mode, business]);
 
@@ -409,13 +409,15 @@ export default function BusinessProfileEditor() {
   const exitTo = mode === 'edit' && id ? `/business/${id}` : -1;
   const handleClose = () => {
     if (isDirty) setShowCloseConfirm(true);
-    else (exitTo === -1 ? navigate(-1) : navigate(exitTo as string));
+    else if (exitTo === -1) navigate(-1);
+    else navigate(exitTo as string);
   };
   const confirmClose = () => {
     setShowCloseConfirm(false);
     if (logo.localPreview) URL.revokeObjectURL(logo.localPreview);
     if (cover.localPreview) URL.revokeObjectURL(cover.localPreview);
-    exitTo === -1 ? navigate(-1) : navigate(exitTo as string);
+    if (exitTo === -1) navigate(-1);
+    else navigate(exitTo as string);
   };
 
   /* ── save: edit mode uses this hook (needs id) ───── */
@@ -447,13 +449,13 @@ export default function BusinessProfileEditor() {
           email: email.trim() || null,
           phone: phone?.fullNumber || null,
           booking_url: bookingUrl.trim() || null,
-          opening_hours: openingHours as any,
-          social_links: hasSocial ? (socialLinks as any) : null,
+          opening_hours: openingHours as unknown as Json,
+          social_links: hasSocial ? (socialLinks as unknown as Json) : null,
           is_verified: false,
-          amenities: amenities.length ? (amenities as any) : null,
+          amenities: amenities.length ? amenities : null,
           primary_action: primaryAction || null,
           show_opening_hours: showOpeningHours,
-        } as any;
+        };
 
 
 
@@ -606,8 +608,8 @@ export default function BusinessProfileEditor() {
         email: email || null,
         phone: phone?.fullNumber || null,
         booking_url: bookingUrl || null,
-        opening_hours: openingHours as any,
-        social_links: hasSocial ? (socialLinks as any) : null,
+        opening_hours: openingHours as unknown as Json,
+        social_links: hasSocial ? (socialLinks as unknown as Json) : null,
         amenities: amenities.length ? amenities : null,
         primary_action: primaryAction || null,
         show_opening_hours: showOpeningHours,
@@ -683,15 +685,34 @@ export default function BusinessProfileEditor() {
     );
   }
   if (mode === 'edit' && (businessError || !business)) {
+    // Sentinel from useBusinessProfile — keep in sync.
+    const isNotFound =
+      (businessError instanceof Error && businessError.message === 'Business not found') ||
+      (!businessError && !business);
     return (
       <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={{ background: BIZ.pageBg }}>
         <div className="max-w-md text-center">
           <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h1 className="text-[16px] font-bold text-foreground mb-2">Business not found</h1>
-          <p className="text-[13px] text-muted-foreground mb-6">This business may have been removed.</p>
-          <button onClick={() => navigate(-1)} className="text-[14px] font-semibold" style={{ color: BIZ.amber }}>
-            Go back
-          </button>
+          <h1 className="text-[16px] font-bold text-foreground mb-2">
+            {isNotFound ? 'Business not found' : "Couldn't load this business"}
+          </h1>
+          <p className="text-[13px] text-muted-foreground mb-6">
+            {isNotFound ? 'This business may have been removed.' : 'Check your connection and try again.'}
+          </p>
+          {!isNotFound && (
+            <button
+              onClick={() => refetchBusiness()}
+              className="inline-flex items-center justify-center h-11 px-6 rounded-[10px] text-white text-[14px] font-semibold mb-3"
+              style={{ background: BIZ.amber }}
+            >
+              Retry
+            </button>
+          )}
+          <div>
+            <button onClick={() => navigate(-1)} className="text-[14px] font-semibold" style={{ color: BIZ.amber }}>
+              Go back
+            </button>
+          </div>
         </div>
       </div>
     );
