@@ -571,7 +571,7 @@ function ProfileTabBody({
             <Label>Gender</Label>
             <SegToggle
               value={form.gender}
-              onChange={(v) => setField('gender', v as any)}
+              onChange={(v) => setField('gender', v)}
               options={GENDER_OPTIONS}
             />
           </div>
