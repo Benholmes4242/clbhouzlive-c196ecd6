@@ -5,6 +5,7 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { supabase } from '@/integrations/supabase/client';
 import { GAM, relativeDays } from './tokens';
 import { notificationsBus, openGamAchievements } from './events';
+import { Skeleton } from '../../gam/_shared/GamAtoms';
 
 interface Props { userId: string }
 
@@ -112,7 +113,11 @@ const NotificationsSheet: React.FC<Props> = ({ userId }) => {
         <div style={{ overflowY: 'auto', willChange: 'transform' }}>
           {isLoading && (
             <div style={{ padding: 16 }}>
-              {[0,1,2].map(i => <div key={i} style={{ height: 56, background: GAM.INK_06, borderRadius: 10, marginBottom: 8 }} />)}
+              {[0,1,2].map(i => (
+                <div key={i} style={{ marginBottom: 8 }}>
+                  <Skeleton height={56} radius={10} />
+                </div>
+              ))}
             </div>
           )}
           {!isLoading && (!data || data.length === 0) && (
