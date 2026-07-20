@@ -153,7 +153,7 @@ export function RequestCourseSheet({ open, onOpenChange, prefillName, zIndexBase
               type="button"
               onClick={handleSubmit}
               disabled={!canSubmit}
-              className="w-full h-11 mt-4 rounded-[12px] text-[15px] font-semibold text-white flex items-center justify-center gap-2 transition-opacity disabled:opacity-50"
+              className={`w-full h-11 mt-4 rounded-[12px] text-[15px] font-semibold text-white flex items-center justify-center gap-2 transition-opacity ${status === 'submitting' ? '' : 'disabled:opacity-50'}`}
               style={{ background: '#F7931E' }}
             >
               {status === 'submitting' ? (
