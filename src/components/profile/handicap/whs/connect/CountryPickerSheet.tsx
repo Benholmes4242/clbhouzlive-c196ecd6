@@ -1,5 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { X, Search, ChevronRight } from 'lucide-react';
 import { WHS_COUNTRIES, type WhsCountry } from '@/lib/whs/whsCountries';
 import { MiniFlag } from './MiniFlag';
@@ -23,6 +24,12 @@ interface Props {
 
 export const CountryPickerSheet: React.FC<Props> = ({ open, onClose, onSelect }) => {
   const [query, setQuery] = useState('');
+
+  useEffect(() => {
+    if (!open) return;
+    lockBodyScroll();
+    return () => unlockBodyScroll();
+  }, [open]);
 
   const { supported, comingSoon } = useMemo(() => {
     const q = query.trim().toLowerCase();

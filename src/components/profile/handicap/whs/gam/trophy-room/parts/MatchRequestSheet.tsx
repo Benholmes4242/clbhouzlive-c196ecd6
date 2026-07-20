@@ -4,10 +4,11 @@
  * Path 2: file a WHS match request for manual alias resolution.
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 
 const FONT = "'Geist', -apple-system, sans-serif";
 const AMBER = '#F7931E';
@@ -22,6 +23,11 @@ export function MatchRequestSheet({ courseId, courseName, onClose }: Props) {
   const navigate = useNavigate();
   const [whsName, setWhsName] = useState('');
   const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+
+  useEffect(() => {
+    lockBodyScroll();
+    return () => unlockBodyScroll();
+  }, []);
 
   const submitRequest = async () => {
     setState('sending');

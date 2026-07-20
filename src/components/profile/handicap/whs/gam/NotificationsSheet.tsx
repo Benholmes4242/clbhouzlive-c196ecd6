@@ -42,8 +42,11 @@ function useFeed(userId: string, enabled: boolean) {
           .limit(50),
       ]);
 
+      if (badges.error) throw badges.error;
+      if (legends.error) throw legends.error;
+
       const items: Item[] = [];
-      (badges.data ?? []).forEach((b: any) => items.push({
+      (badges.data ?? []).forEach((b: { id: string; badge_id?: string; earned_at: string }) => items.push({
         id: `b-${b.id}`,
         kind: 'badge',
         title: 'Badge unlocked',
@@ -52,7 +55,7 @@ function useFeed(userId: string, enabled: boolean) {
         icon: 'badge',
         badgeId: b.badge_id,
       }));
-      (legends.data ?? []).forEach((l: any) => items.push({
+      (legends.data ?? []).forEach((l: { id: string; category?: string; rank?: number; attained_at: string }) => items.push({
         id: `l-${l.id}`,
         kind: 'legend',
         title: l.rank === 1 ? 'Legend earned' : `Top ${l.rank} on course`,
