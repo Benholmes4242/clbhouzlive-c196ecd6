@@ -99,11 +99,28 @@ export const YourCircleSection: React.FC<Props> = ({ userId }) => {
 
   if (isLoading || !stats) {
     return (
-      <section style={{ marginTop: 32, padding: '0 16px' }}>
-        <div
-          className="animate-pulse"
-          style={{ height: 64, borderRadius: 12, background: 'var(--hcp-bg-3)' }}
-        />
+      <section style={{ marginTop: 32, fontFamily: FONT }}>
+        {/* Header mirror (eyebrow + title) */}
+        <div style={{ padding: '0 16px 12px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <Skeleton variant="dark" style={{ height: 10, width: 96, borderRadius: 2 }} />
+          <Skeleton variant="dark" style={{ height: 18, width: '70%', borderRadius: 3 }} />
+        </div>
+
+        {/* Position summary bar */}
+        <div style={{ padding: '4px 16px 0' }}>
+          <Skeleton variant="dark" style={{ height: 14, width: 120, borderRadius: 2 }} />
+        </div>
+
+        {/* Recently-active rail rows */}
+        <div style={{ display: 'flex', gap: 8, padding: '12px 16px 6px' }}>
+          {[0, 1, 2].map((i) => (
+            <Skeleton
+              key={i}
+              variant="dark"
+              style={{ flex: '0 0 auto', width: 92, height: 118, borderRadius: 14 }}
+            />
+          ))}
+        </div>
       </section>
     );
   }
