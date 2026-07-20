@@ -42,6 +42,9 @@ function useFeed(userId: string, enabled: boolean) {
           .limit(50),
       ]);
 
+      if (badges.error) throw badges.error;
+      if (legends.error) throw legends.error;
+
       const items: Item[] = [];
       (badges.data ?? []).forEach((b: any) => items.push({
         id: `b-${b.id}`,
