@@ -69,7 +69,8 @@ export function useFriendsFeed({
       if (cursor) params.p_cursor = cursor;
       if (searchQuery) params.p_search_query = searchQuery;
 
-      const { data, error } = await supabase.rpc('get_friends_feed', params as any);
+      const rpcName = version === 'v3' ? 'get_friends_feed_v3' : 'get_friends_feed';
+      const { data, error } = await supabase.rpc(rpcName as any, params as any);
 
       if (error) {
         if (import.meta.env.DEV) console.error('[FriendsFeed] RPC error:', error);
