@@ -95,6 +95,7 @@ export function TickerShell({
   perItemSeconds = 5.5,
   minDurationSeconds = 40,
   style,
+  animated = true,
 }: TickerShellProps) {
   const [paused, setPaused] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
