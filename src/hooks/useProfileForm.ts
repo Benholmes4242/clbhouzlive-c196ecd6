@@ -86,7 +86,7 @@ function makeInitial(profile: RawProfile | null | undefined): ProfileFormData {
   };
 }
 
-export function useProfileForm(profile: any, loading?: boolean) {
+export function useProfileForm(profile: RawProfile | null | undefined, loading?: boolean) {
   const [form, setForm] = useState<ProfileFormData>(() => makeInitial(null));
   const [initialData, setInitialData] = useState<ProfileFormData>(() => makeInitial(null));
   const hydrated = useRef(false);
@@ -111,14 +111,15 @@ export function useProfileForm(profile: any, loading?: boolean) {
           const { data: rows } = await supabase
             .from('user_home_clubs')
             .select('club_id, golf_clubs:club_id(id, name)')
-            .eq('user_profile_id', profile.id);
+            .eq('user_profile_id', profile.id!);
           const primaryId = profile.primary_club_id ?? null;
-          const clubs: ClubEntry[] = (rows ?? [])
-            .filter((r: any) => r.club_id && r.club_id !== primaryId && r.golf_clubs?.name)
-            .map((r: any) => ({
+          const typedRows = (rows ?? []) as unknown as HomeClubRow[];
+          const clubs: ClubEntry[] = typedRows
+            .filter((r) => !!r.club_id && r.club_id !== primaryId && !!r.golf_clubs?.name)
+            .map((r) => ({
               id: nanoid(),
-              name: r.golf_clubs.name as string,
-              clubId: r.club_id as string,
+              name: r.golf_clubs!.name,
+              clubId: r.club_id!,
             }));
           setForm(prev => ({ ...prev, additionalClubs: clubs }));
           setInitialData(prev => ({ ...prev, additionalClubs: clubs }));
