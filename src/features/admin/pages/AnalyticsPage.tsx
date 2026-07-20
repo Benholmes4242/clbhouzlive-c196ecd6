@@ -96,31 +96,33 @@ export default function AnalyticsPage() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
           <h1 style={{ color: t.ink, fontSize: 26, fontWeight: 700, margin: 0, letterSpacing: -0.2 }}>Analytics</h1>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{
-              display: 'inline-flex', border: `1px solid ${t.line}`, borderRadius: 999,
-              background: t.surface, padding: 2,
-            }}>
-              {PERIODS.map(p => {
-                const active = p === period;
-                return (
-                  <button
-                    key={p}
-                    onClick={() => setPeriod(p)}
-                    style={{
-                      padding: '6px 12px',
-                      borderRadius: 999,
-                      border: 'none',
-                      background: active ? t.ink : 'transparent',
-                      color: active ? t.surface : t.inkMuted,
-                      fontSize: 12,
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                      fontVariantNumeric: 'tabular-nums',
-                    }}
-                  >{p}</button>
-                );
-              })}
-            </div>
+            {showPeriodSelector && (
+              <div style={{
+                display: 'inline-flex', border: `1px solid ${t.line}`, borderRadius: 999,
+                background: t.surface, padding: 2,
+              }}>
+                {PERIODS.map(p => {
+                  const active = p === period;
+                  return (
+                    <button
+                      key={p}
+                      onClick={() => setPeriod(p)}
+                      style={{
+                        padding: '6px 12px',
+                        borderRadius: 999,
+                        border: 'none',
+                        background: active ? t.ink : 'transparent',
+                        color: active ? t.surface : t.inkMuted,
+                        fontSize: 12,
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        fontVariantNumeric: 'tabular-nums',
+                      }}
+                    >{p}</button>
+                  );
+                })}
+              </div>
+            )}
             <button
               onClick={refresh}
               aria-label="Refresh"
