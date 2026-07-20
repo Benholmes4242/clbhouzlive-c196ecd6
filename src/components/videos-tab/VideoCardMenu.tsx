@@ -136,7 +136,7 @@ export const VideoCardMenu = React.memo(function VideoCardMenu({
             <>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                onClick={() => setConfirmOpen(true)}
+                onClick={handleBlockClick}
                 className="gap-2 text-sm text-destructive focus:text-destructive"
               >
                 <Ban className="h-4 w-4" />
