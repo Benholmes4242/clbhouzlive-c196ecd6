@@ -30,6 +30,11 @@ export function LevelUpSheet({ eventId, label, medals, onClose }: Props) {
   const navigate = useNavigate();
 
   useEffect(() => {
+    lockBodyScroll();
+    return () => unlockBodyScroll();
+  }, []);
+
+  useEffect(() => {
     (async () => {
       try {
         await supabase
