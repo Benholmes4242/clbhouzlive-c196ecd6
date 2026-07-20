@@ -90,10 +90,18 @@ const MyBusinessesPage = () => {
   if (error) {
     return (
       <ManagePageShell title="Manage business profiles">
-        <div className="min-h-[40vh] flex items-center justify-center px-4">
+        <div className="min-h-[40vh] flex flex-col items-center justify-center gap-3 px-4">
           <p className="text-sm text-center" style={{ color: BIZ.inkMute }}>
             Failed to load your businesses.
           </p>
+          <button
+            type="button"
+            onClick={() => refetch()}
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-[12.5px] font-bold text-white active:opacity-90"
+            style={{ background: BIZ.amber, border: 'none' }}
+          >
+            Retry
+          </button>
         </div>
       </ManagePageShell>
     );
