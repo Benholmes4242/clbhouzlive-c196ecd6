@@ -359,9 +359,15 @@ const RivalryPage: React.FC = () => {
       record?.ties ?? 0
     } ties) over ${total} rounds. Clbhouz.`;
     const url = window.location.href;
-    if (typeof navigator !== 'undefined' && (navigator as any).share) {
+    const nav =
+      typeof navigator !== 'undefined'
+        ? (navigator as Navigator & {
+            share?: (d: { title?: string; text?: string; url?: string }) => Promise<void>;
+          })
+        : null;
+    if (nav?.share) {
       try {
-        await (navigator as any).share({
+        await nav.share({
           title: 'My Clbhouz Rivalry',
           text,
           url,
