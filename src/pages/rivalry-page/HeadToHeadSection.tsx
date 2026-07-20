@@ -24,6 +24,7 @@ import {
 import { whoLeads } from './h2h/_shared/whoLeads';
 import { H2HScoreBanner } from './h2h/H2HScoreBanner';
 import { StatsGroup, type StatItem } from './h2h/StatsGroup';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface Props {
   viewerId: string | undefined;
