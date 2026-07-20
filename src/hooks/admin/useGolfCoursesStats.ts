@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { TOP100_PREDICATE, MISSING_COORDS_PREDICATE } from '@/features/admin/hooks/useCourses';
 
 interface GolfCoursesStats {
   totalCourses: number;
@@ -23,7 +24,7 @@ export function useGolfCoursesStats() {
       const { count: missingCoordinates } = await supabase
         .from('golf_courses')
         .select('*', { count: 'exact', head: true })
-        .or('latitude.is.null,longitude.is.null');
+        .or(MISSING_COORDS_PREDICATE);
 
       // Get courses missing images
       const { count: missingImages } = await supabase
@@ -52,7 +53,7 @@ export function useGolfCoursesStats() {
       const { count: verifiedCourses } = await supabase
         .from('golf_courses')
         .select('*', { count: 'exact', head: true })
-        .or('global_rank.not.is.null,usa_rank.not.is.null,regional_rank.not.is.null');
+        .or(TOP100_PREDICATE);
 
       return {
         totalCourses: totalCourses || 0,

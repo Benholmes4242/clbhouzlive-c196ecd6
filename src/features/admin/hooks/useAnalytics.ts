@@ -120,6 +120,14 @@ export function usePlatformAnalytics(period: AnalyticsPeriod) {
 
 // ─── Engagement ───────────────────────────────────────────────────────────────
 
+export interface TopActiveUser {
+  id: string;
+  eventCount: number;
+  displayName: string | null;
+  username: string | null;
+  avatarUrl: string | null;
+}
+
 export interface EngagementAnalyticsData {
   totalEvents: number;
   avgEventsPerUserPerDay: number;
@@ -129,6 +137,7 @@ export interface EngagementAnalyticsData {
   topEvents: { name: string; count: number; uniqueUsers: number }[];
   hourlyBreakdown: { hour: number; count: number }[];
   social: { messagesSent: number; followActions: number; friendRequests: number };
+  topActiveUsers: TopActiveUser[];
 }
 
 async function fetchEngagement(period: AnalyticsPeriod): Promise<EngagementAnalyticsData> {
@@ -160,10 +169,14 @@ async function fetchEngagement(period: AnalyticsPeriod): Promise<EngagementAnaly
   const dailyTrend = fillBuckets(rows, days);
 
   const eventCounts: Record<string, { count: number; users: Set<string> }> = {};
+  const userEventCounts = new Map<string, number>();
   for (const r of rows) {
     if (!eventCounts[r.name]) eventCounts[r.name] = { count: 0, users: new Set() };
     eventCounts[r.name].count++;
-    if (r.user_id) eventCounts[r.name].users.add(r.user_id);
+    if (r.user_id) {
+      eventCounts[r.name].users.add(r.user_id);
+      userEventCounts.set(r.user_id, (userEventCounts.get(r.user_id) ?? 0) + 1);
+    }
   }
   const topEvents = Object.entries(eventCounts)
     .sort((a, b) => b[1].count - a[1].count)
@@ -172,6 +185,29 @@ async function fetchEngagement(period: AnalyticsPeriod): Promise<EngagementAnaly
 
   const hourlyBreakdown: { hour: number; count: number }[] = [];
   for (let h = 0; h < 24; h++) hourlyBreakdown.push({ hour: h, count: hourCounts[h] || 0 });
+
+  const top10 = Array.from(userEventCounts.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10);
+  let topActiveUsers: TopActiveUser[] = [];
+  if (top10.length > 0) {
+    const ids = top10.map(([id]) => id);
+    const { data: profiles } = await supabase
+      .from('user_profiles')
+      .select('id, display_name, username, profile_photo_url')
+      .in('id', ids);
+    const map = new Map((profiles ?? []).map(p => [p.id, p]));
+    topActiveUsers = top10.map(([id, count]) => {
+      const p = map.get(id);
+      return {
+        id,
+        eventCount: count,
+        displayName: p?.display_name ?? null,
+        username: p?.username ?? null,
+        avatarUrl: p?.profile_photo_url ?? null,
+      };
+    });
+  }
 
   return {
     totalEvents,
@@ -186,6 +222,7 @@ async function fetchEngagement(period: AnalyticsPeriod): Promise<EngagementAnaly
       followActions: followRes.count ?? 0,
       friendRequests: friendRes.count ?? 0,
     },
+    topActiveUsers,
   };
 }
 
@@ -300,13 +337,20 @@ export function useRetentionAnalytics() {
 
 export interface FunnelStep { label: string; count: number; pct: number; dropPct: number; }
 export interface GeoRow { country: string; userCount: number; newThisPeriod: number; pctOfTotal: number; }
-export interface GrowthData { funnel: FunnelStep[]; geo: GeoRow[]; }
+export interface GrowthData {
+  funnel: FunnelStep[];
+  geo: GeoRow[];
+  signupsThisPeriod: number;
+  signupsPriorPeriod: number;
+}
 
 async function fetchGrowth(period: AnalyticsPeriod): Promise<GrowthData> {
+  const days = periodToDays(period);
   const since = startOf(period).toISOString();
+  const priorSince = new Date(Date.now() - days * 2 * 86400_000).toISOString();
 
   // Funnel — only stages with confirmed real events
-  const [signupAttempts, signupSuccess, onboardingStarted, onboardingComplete, addedPhoto, allRes, newRes] = await Promise.all([
+  const [signupAttempts, signupSuccess, onboardingStarted, onboardingComplete, addedPhoto, allRes, newRes, priorSignupsRes, thisSignupsRes] = await Promise.all([
     supabase.from('analytics_events').select('id', { count: 'exact', head: true })
       .in('name', ['signup_success', 'signup_failed']).gte('created_at', since),
     supabase.from('analytics_events').select('id', { count: 'exact', head: true })
@@ -319,6 +363,10 @@ async function fetchGrowth(period: AnalyticsPeriod): Promise<GrowthData> {
       .gte('created_at', since).is('deleted_at', null).not('profile_photo_url', 'is', null),
     supabase.from('user_profiles').select('country').is('deleted_at', null).not('country', 'is', null),
     supabase.from('user_profiles').select('country').is('deleted_at', null).not('country', 'is', null).gte('created_at', since),
+    supabase.from('user_profiles').select('id', { count: 'exact', head: true })
+      .is('deleted_at', null).gte('created_at', priorSince).lt('created_at', since),
+    supabase.from('user_profiles').select('id', { count: 'exact', head: true })
+      .is('deleted_at', null).gte('created_at', since),
   ]);
 
   const rawCounts = [
@@ -356,7 +404,12 @@ async function fetchGrowth(period: AnalyticsPeriod): Promise<GrowthData> {
       pctOfTotal: Math.round((userCount / total) * 100 * 10) / 10,
     }));
 
-  return { funnel, geo };
+  return {
+    funnel,
+    geo,
+    signupsThisPeriod: thisSignupsRes.count ?? 0,
+    signupsPriorPeriod: priorSignupsRes.count ?? 0,
+  };
 }
 
 export function useGrowthAnalytics(period: AnalyticsPeriod) {
@@ -421,6 +474,17 @@ export function useContentAnalytics(period: AnalyticsPeriod) {
 
 // ─── Auth & Security ──────────────────────────────────────────────────────────
 
+export interface RecentAuthEvent {
+  id: string;
+  name: string;
+  createdAt: string;
+  userId: string | null;
+  email: string | null;
+  isFailure: boolean;
+  displayName: string | null;
+  username: string | null;
+}
+
 export interface AuthAnalyticsData {
   signupSuccessTrend: DailyBucket[];
   signupFailTrend: DailyBucket[];
@@ -428,20 +492,27 @@ export interface AuthAnalyticsData {
   loginFailTrend: DailyBucket[];
   totalSignups: number;
   totalLogins: number;
+  totalSuccesses: number;
+  totalFailures: number;
+  successRate: number;
+  successRatePrior: number | null;
   failedLogins: number;
   signupFailRate: number;
   loginFailRate: number;
   onboardingComplete: number;
   onboardingTotal: number;
+  recentEvents: RecentAuthEvent[];
 }
 
 async function fetchAuth(period: AnalyticsPeriod): Promise<AuthAnalyticsData> {
   const days = periodToDays(period);
   const since = startOf(period).toISOString();
+  const priorSince = new Date(Date.now() - days * 2 * 86400_000).toISOString();
   const names = ['signup_success', 'signup_failed', 'login_success', 'login_failed', 'auth_failed'];
 
-  const [authEvents, totalProfilesRes, completedOnboardingRes] = await Promise.all([
-    supabase.from('analytics_events').select('created_at, name, user_id').in('name', names).gte('created_at', since).limit(10000),
+  const [authEvents, priorAuthEvents, totalProfilesRes, completedOnboardingRes] = await Promise.all([
+    supabase.from('analytics_events').select('id, created_at, name, user_id, props').in('name', names).gte('created_at', since).order('created_at', { ascending: false }).limit(10000),
+    supabase.from('analytics_events').select('name').in('name', names).gte('created_at', priorSince).lt('created_at', since).limit(10000),
     supabase.from('user_profiles').select('id', { count: 'exact', head: true }).is('deleted_at', null),
     supabase.from('user_profiles').select('id', { count: 'exact', head: true }).is('deleted_at', null).eq('has_completed_onboarding', true),
   ]);
@@ -454,6 +525,43 @@ async function fetchAuth(period: AnalyticsPeriod): Promise<AuthAnalyticsData> {
 
   const totalSignups = signupSuccess.length + signupFail.length;
   const totalLogins = loginSuccess.length + loginFail.length;
+  const totalSuccesses = signupSuccess.length + loginSuccess.length;
+  const totalFailures = signupFail.length + loginFail.length;
+  const totalAll = totalSuccesses + totalFailures;
+  const successRate = totalAll > 0 ? Math.round((totalSuccesses / totalAll) * 100) : 0;
+
+  const priorRows = priorAuthEvents.data ?? [];
+  const priorSuccesses = priorRows.filter(e => e.name === 'signup_success' || e.name === 'login_success').length;
+  const priorTotal = priorRows.length;
+  const successRatePrior = priorTotal > 0 ? Math.round((priorSuccesses / priorTotal) * 100) : null;
+
+  // Recent 20 with identity resolution
+  const recentSlice = events.slice(0, 20);
+  const recentUserIds = Array.from(new Set(recentSlice.map(e => e.user_id).filter(Boolean))) as string[];
+  let profileMap = new Map<string, { display_name: string | null; username: string | null }>();
+  if (recentUserIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from('user_profiles')
+      .select('id, display_name, username')
+      .in('id', recentUserIds);
+    profileMap = new Map((profiles ?? []).map(p => [p.id, { display_name: p.display_name, username: p.username }]));
+  }
+  const recentEvents: RecentAuthEvent[] = recentSlice.map(e => {
+    const props = (e.props ?? {}) as Record<string, unknown>;
+    const email = typeof props.email === 'string' ? (props.email as string) : null;
+    const profile = e.user_id ? profileMap.get(e.user_id) : undefined;
+    const isFailure = e.name === 'signup_failed' || e.name === 'login_failed' || e.name === 'auth_failed';
+    return {
+      id: e.id as string,
+      name: e.name,
+      createdAt: e.created_at,
+      userId: e.user_id ?? null,
+      email,
+      isFailure,
+      displayName: profile?.display_name ?? null,
+      username: profile?.username ?? null,
+    };
+  });
 
   return {
     signupSuccessTrend: fillBuckets(signupSuccess, days),
@@ -462,11 +570,16 @@ async function fetchAuth(period: AnalyticsPeriod): Promise<AuthAnalyticsData> {
     loginFailTrend: fillBuckets(loginFail, days),
     totalSignups,
     totalLogins,
+    totalSuccesses,
+    totalFailures,
+    successRate,
+    successRatePrior,
     failedLogins: loginFail.length,
     signupFailRate: totalSignups > 0 ? Math.round((signupFail.length / totalSignups) * 100) : 0,
     loginFailRate: totalLogins > 0 ? Math.round((loginFail.length / totalLogins) * 100) : 0,
     onboardingComplete: completedOnboardingRes.count ?? 0,
     onboardingTotal: totalProfilesRes.count ?? 0,
+    recentEvents,
   };
 }
 
