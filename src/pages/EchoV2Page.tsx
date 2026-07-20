@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 
+import { Skeleton } from '@/components/ui/skeleton';
 import { EchoV2Header } from '@/features/echo-v2/components/EchoV2Header';
 import { EchoWelcome } from '@/features/echo-v2/components/EchoWelcome';
 import { EchoMessageList } from '@/features/echo-v2/components/EchoMessageList';
@@ -11,6 +12,27 @@ import { useEchoChatMessages } from '@/features/echo-v2/hooks/useEchoChatMessage
 import { useEchoStream } from '@/features/echo-v2/hooks/useEchoStream';
 
 const CANVAS = '#F8FAFC';
+
+const EchoBubbleSkeleton: React.FC<{ side: 'left' | 'right'; w: number }> = ({ side, w }) => (
+  <div
+    style={{
+      display: 'flex',
+      justifyContent: side === 'right' ? 'flex-end' : 'flex-start',
+      padding: '4px 16px',
+    }}
+  >
+    <Skeleton
+      variant="light"
+      style={{
+        width: w,
+        height: 38,
+        borderRadius: 18,
+        borderBottomLeftRadius: side === 'left' ? 4 : 18,
+        borderBottomRightRadius: side === 'right' ? 4 : 18,
+      }}
+    />
+  </div>
+);
 
 const EchoV2Page: React.FC = () => {
   const { chatId } = useParams<{ chatId?: string }>();
@@ -26,7 +48,7 @@ const EchoV2Page: React.FC = () => {
   const keyboardHeight = useKeyboardHeight();
   const scrollerRef = useRef<HTMLDivElement | null>(null);
 
-  const { data: messages = [], isError, refetch } = useEchoChatMessages(chatId ?? null);
+  const { data: messages = [], isLoading: messagesLoading, isError, refetch } = useEchoChatMessages(chatId ?? null);
   const { state, send } = useEchoStream();
 
   useEffect(() => {
@@ -122,6 +144,23 @@ const EchoV2Page: React.FC = () => {
         >
           {showWelcome ? (
             <EchoWelcome onPick={(p) => handleSend(p)} disabled={state.streaming} />
+          ) : inChat && messagesLoading && messages.length === 0 ? (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'flex-end',
+                minHeight: '100%',
+                paddingBottom: 16,
+                gap: 4,
+              }}
+            >
+              <EchoBubbleSkeleton side="left" w={210} />
+              <EchoBubbleSkeleton side="left" w={160} />
+              <EchoBubbleSkeleton side="right" w={140} />
+              <EchoBubbleSkeleton side="left" w={240} />
+              <EchoBubbleSkeleton side="left" w={130} />
+            </div>
           ) : inChat && isError && messages.length === 0 ? (
             <div
               style={{

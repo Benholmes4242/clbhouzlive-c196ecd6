@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { ChevronLeft, MoreHorizontal, Pin, X } from 'lucide-react';
 
+import { Skeleton } from '@/components/ui/skeleton';
 import { supabase } from '@/integrations/supabase/client';
 import { useEchoChats, type EchoChatRow } from '@/features/echo-v2/hooks/useEchoChats';
 import { AnimatedEchoWave } from '@/features/echo-v2/components/AnimatedEchoWave';
@@ -184,7 +185,30 @@ const EchoHistoryPage: React.FC = () => {
           className="flex-1 overflow-y-auto"
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
-          {isLoading ? null : isError ? (
+          {isLoading ? (
+            <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+              {[0, 1, 2, 3, 4].map((i) => (
+                <li
+                  key={i}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    padding: '12px 14px',
+                    borderBottom: `0.5px solid ${HAIRLINE}`,
+                  }}
+                >
+                  <Skeleton variant="light" style={{ width: 12, height: 12, borderRadius: 6, flexShrink: 0 }} />
+                  <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <Skeleton variant="light" style={{ width: '65%', height: 14, borderRadius: 7 }} />
+                    <Skeleton variant="light" style={{ width: '40%', height: 12, borderRadius: 6 }} />
+                  </div>
+                  <Skeleton variant="light" style={{ width: 36, height: 11, borderRadius: 5, flexShrink: 0 }} />
+                  <Skeleton variant="light" style={{ width: 32, height: 32, borderRadius: 16, flexShrink: 0 }} />
+                </li>
+              ))}
+            </ul>
+          ) : isError ? (
             <div
               style={{
                 display: 'flex',
