@@ -114,7 +114,8 @@ export function PhotoBand({
       style={{
         position: 'relative',
         width: '100%',
-        height: PHOTO_BAND_HEIGHT,
+        flex: 1,
+        minHeight: PHOTO_BAND_HEIGHT,
         overflow: 'hidden',
         flexShrink: 0,
       }}
