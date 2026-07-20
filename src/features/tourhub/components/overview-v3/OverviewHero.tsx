@@ -197,14 +197,15 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
 
 
 
-      {/* Dots / counter row */}
+      {/* Dots / counter row — hoisted above the wire-ticker band (36px) so
+          they sit inside the photo band per the Lower-Third redesign. */}
       {count > 1 && (
         <div
           style={{
             position: 'absolute',
             left: 0,
             right: 0,
-            bottom: 10,
+            bottom: 46,
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',

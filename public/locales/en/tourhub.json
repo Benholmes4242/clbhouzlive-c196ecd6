@@ -138,7 +138,17 @@
       "championIconLabel": "Champion"
     },
     "photoBand": {
-      "wonBy": "Won by {{winnerName}}"
+      "wonBy": "Won by {{winnerName}}",
+      "tournamentCta": "TOURNAMENT",
+      "leaderLabel": "LEADER",
+      "championLabel": "CHAMPION",
+      "defendingLabel": "DEFENDING"
+    },
+    "pillState": {
+      "cancelled": "CANCELLED",
+      "playoff": "PLAYOFF · FINAL",
+      "final": "FINAL",
+      "upcoming": "UPCOMING"
     },
     "trajectorySparkline": {
       "ariaLabel": "Trajectory: rounds {{rounds}}",

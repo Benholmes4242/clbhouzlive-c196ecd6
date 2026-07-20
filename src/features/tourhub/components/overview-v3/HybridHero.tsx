@@ -1,9 +1,15 @@
 /**
- * HybridHero — unified Tour Hub Overview hero.
- * Three-band architecture: PhotoBand (310px) + MiddleBand (40-62px) + LeaderboardBand.
- * Replaces EditorialLiveHero / EditorialResultsHero / EditorialUpcomingHero.
+ * HybridHero — unified Tour Hub Overview hero (Lower-Third + Wire Ticker).
  *
- * §2.1 of HYBRID_HERO_IMPLEMENTATION_BRIEF.
+ * Composition (all non-cancelled states):
+ *   1. PhotoBand         — full-bleed venue image with bottom-anchored
+ *                          editorial lower-third (state pill, insight line,
+ *                          title, venue, moment chip, TOURNAMENT CTA).
+ *   2. HeroWireTicker    — dark 36px marquee showing the top-10 (or T-1 tie).
+ *
+ * The legacy three-band path (PhotoBand + MiddleBand + LeaderboardBand) and
+ * the CinematicHeroFullBleed / CinematicFrame surfaces are retained only for
+ * the cancelled variant, which still wants the flat editorial column.
  */
 
 import React, { useEffect, useMemo, useState } from 'react';
@@ -18,6 +24,7 @@ import { useTournamentDefendingChamp } from '../../hooks/useTournamentDefendingC
 import { useTournamentLastYearTop4 } from '../../hooks/useTournamentLastYearTop4';
 import { useTournamentTeeTimes } from '../../hooks/useTournamentTeeTimes';
 import { useTournamentFieldStrength } from '../../hooks/useTournamentFieldStrength';
+import { useAIPredictions } from '../../hooks/useAIPredictions';
 
 import { useTournamentCourseStats } from '../../hooks/useTournamentCourseStats';
 import { tournamentRoute } from '../../routes';
@@ -26,8 +33,7 @@ import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar
 import { PhotoBand } from './HybridHeroBands/PhotoBand';
 import { MiddleBand } from './HybridHeroBands/MiddleBand';
 import { LeaderboardBand } from './HybridHeroBands/LeaderboardBand';
-import { CinematicFrame } from './HybridHeroBands/CinematicFrame';
-import { CinematicHeroFullBleed } from './HybridHeroBands/CinematicHeroFullBleed';
+import { HeroWireTicker } from './HybridHeroBands/HeroWireTicker';
 import { setHeroFullBleed } from '../../_shared/heroFullBleedSignal';
 import { formatMonthDay } from '@/i18n/format';
 import {
@@ -291,69 +297,68 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
   // gold "MAJOR" tag next to the eyebrow — no relocation, cosmetic only.
   const showMajorTag = !isPseudoMajor && tournament.isMajor;
 
-  // Direction A: CinematicFrame is the single hero surface for all three states.
-  // Legacy three-band path is retained only for the cancelled variant.
-  const useCinematicFrame =
-    state.kind === 'live' ||
-    state.kind === 'results' ||
-    state.kind === 'upcoming';
+  // NEW composition (Lower-Third + Wire Ticker) — used for live/results/upcoming.
+  // Cancelled falls back to the legacy three-band editorial column below.
+  const isCancelled = state.kind === 'results' && state.variant === 'cancelled';
 
-  // Signal the surrounding page when this hero is rendering the full-bleed
-  // cinematic variant (live/results). Used by TourHubMainPage to drop chrome
-  // padding + engage the transparent-chrome overlay.
-  const isFullBleedCinematic =
-    (state.kind === 'live' || state.kind === 'results' || state.kind === 'upcoming') &&
-    !(state.kind === 'results' && state.variant === 'cancelled');
+  // Signal full-bleed chrome for any non-cancelled state.
+  const isFullBleedCinematic = !isCancelled;
   useEffect(() => {
     setHeroFullBleed(isFullBleedCinematic);
     return () => setHeroFullBleed(false);
   }, [isFullBleedCinematic]);
 
-  // Compute hours-until-start for the cinematic upcoming countdown
-  const datesStringForHero =
-    startD && endD
-      ? `${formatMonthDay(startD).toUpperCase()} \u2013 ${endD.getDate()}`
-      : endD
-        ? formatMonthDay(endD).toUpperCase()
-        : null;
+  // AI insight — pulled quote surfaced in the lower-third.
+  const { data: aiPredictions } = useAIPredictions(tournament.id);
+  const aiInsight = aiPredictions?.courseAnalysis?.insight?.trim() || null;
 
-  if (useCinematicFrame && !(state.kind === 'results' && state.variant === 'cancelled')) {
-    // Full-bleed cinematic hero for live / results / upcoming.
-    if (state.kind === 'live' || state.kind === 'results' || state.kind === 'upcoming') {
-      return (
-        <div
-          style={{
-            background: BG,
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          <CinematicHeroFullBleed
-            title={tournament.name}
-            tourLabel={tourLabel}
-            state={state}
-            leaderboard={safeLeaderboard}
-            tiedLeaders={tiedLeaders}
-            fieldSize={safeLeaderboard.length}
-            venueImageUrl={venueImageUrl}
-            tourSlug={tournament.tourSlug}
-            isPseudoMajor={isPseudoMajor}
-            showMajorTag={showMajorTag}
-            onCtaTap={onCtaTap}
-            champion={champion}
-            defendingChamp={defendingChamp ?? null}
-            courseStats={courseStats ?? null}
-            hoursUntilStart={hoursUntilStart}
-            venueName={tournament.venueName}
-            datesString={datesStringForHero}
-          />
-        </div>
-      );
+  // Compute insight line by state.
+  const insightLine: string | null = useMemo(() => {
+    if (state.kind === 'live') {
+      // Live: prefer AI insight; fall back to null (state pill already carries round label).
+      return aiInsight;
     }
+    if (state.kind === 'results') {
+      // Results: prefer the champion narrative if the source data has one.
+      return tournament.championNarrative?.trim() || aiInsight;
+    }
+    // Upcoming: AI course insight is the strongest tell.
+    return aiInsight;
+  }, [state, aiInsight, tournament.championNarrative]);
 
+  // Moment row content — hero name/score chip.
+  const moment: { label: string; name: string; score: string | null } | null = useMemo(() => {
+    if (state.kind === 'live') {
+      const top: any = safeLeaderboard[0];
+      if (!top) return null;
+      const name =
+        top.player?.full_name ||
+        `${top.player?.first_name ?? ''} ${top.player?.last_name ?? ''}`.trim();
+      if (!name) return null;
+      return {
+        label: t('overview.photoBand.leaderLabel'),
+        name: tiedLeaders ? t('overview.leaderRow.tiedAtTop', { count: tiedLeaders.count }) : name,
+        score: tiedLeaders ? tiedLeaders.score : fmtScore(top.score),
+      };
+    }
+    if (state.kind === 'results' && champion) {
+      return {
+        label: t('overview.photoBand.championLabel'),
+        name: champion.name,
+        score: champion.score,
+      };
+    }
+    if (state.kind === 'upcoming' && defendingChamp) {
+      return {
+        label: t('overview.photoBand.defendingLabel'),
+        name: defendingChamp.name,
+        score: defendingChamp.score || null,
+      };
+    }
+    return null;
+  }, [state, safeLeaderboard, tiedLeaders, champion, defendingChamp, t]);
 
+  if (!isCancelled) {
     return (
       <div
         style={{
@@ -364,34 +369,29 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
           flexDirection: 'column',
         }}
       >
-        <CinematicFrame
+        <PhotoBand
           title={tournament.name}
           venueName={tournament.venueName}
           venueCity={tournament.venueCity}
           venueImageUrl={venueImageUrl}
           state={state}
           tourLabel={tourLabel}
+          winnerName={tournament.winnerName}
           isMajor={tournament.isMajor}
           isSignature={tournament.isSignature}
-          startDate={tournament.startDate}
-          endDate={tournament.endDate}
-          leaderboard={safeLeaderboard}
-          tiedLeaders={tiedLeaders}
-          fieldSize={safeLeaderboard.length}
-          top10={top10}
-          tourSlug={tournament.tourSlug}
-          defendingChamp={defendingChamp ?? null}
-          fieldStrength={fieldStrength ?? null}
-          
-          venuePar={tournament.venuePar}
-          venueYardage={tournament.venueYardage}
-          purse={tournament.purse}
-          winningShare={tournament.winningShare}
+          datesString={datesString}
+          insight={insightLine}
+          momentLabel={moment?.label ?? null}
+          momentName={moment?.name ?? null}
+          momentScore={moment?.score ?? null}
           onCtaTap={onCtaTap}
         />
+        <HeroWireTicker rows={top10} />
       </div>
     );
   }
+
+
 
   return (
     <div

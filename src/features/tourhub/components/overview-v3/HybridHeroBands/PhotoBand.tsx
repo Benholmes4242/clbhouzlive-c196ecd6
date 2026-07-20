@@ -1,26 +1,37 @@
 /**
- * PhotoBand — Pass 7. 360px hero photo with broadcast title block:
- * top eyebrow (status tag + tour meta), bottom title block with lede,
- * 2-line title split, and venue · dates row. TourSwitcherOverlay removed.
+ * PhotoBand — Tour Hub hero photo band (Lower-Third redesign).
+ *
+ * Full-bleed venue image with a bottom-anchored editorial lower-third that
+ * collapses everything the old MiddleBand tried to carry (status, insight,
+ * headline moment) into one legible stack over the image.
+ *
+ * Stack (bottom → up):
+ *   1. TOURNAMENT link (right-aligned CTA, amber)
+ *   2. Moment row      — leader / champion / defending champ chip
+ *   3. Venue · Dates
+ *   4. Title (2-line split — headline + subhead)
+ *   5. Insight line    — italic pulled quote (AI course insight / round label / winner narrative)
+ *   6. State pill      — LIVE · FINAL · UPCOMING (with round/countdown)
+ *
+ * The dots row (rendered by OverviewHero) sits above the wire ticker below.
  */
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-
+import { ChevronRight } from 'lucide-react';
 
 import {
   PHOTO_BAND_HEIGHT,
   COURSE_GRADIENT,
   COURSE_GRADIENT_DUSK,
   COURSE_SCRIMS,
-  GOLD,
   AMBER,
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
 import { FONT } from '../../../_shared/tokens';
 import { type HeroState, roundLabel } from '../HybridHero.utils';
 
-interface PhotoBandProps {
+export interface PhotoBandProps {
   title: string;
   venueName: string | null;
   venueCity: string | null;
@@ -31,25 +42,40 @@ interface PhotoBandProps {
   isMajor?: boolean;
   isSignature?: boolean;
   datesString?: string | null;
+  /** Italic editorial line — AI insight (upcoming) / round marker (live) / winner beat (results). */
+  insight?: string | null;
+  /** Moment row: single chip surfacing the headline person. */
+  momentLabel?: string | null;
+  momentName?: string | null;
+  momentScore?: string | null;
+  /** Optional right-side CTA (TOURNAMENT ›) */
+  onCtaTap?: () => void;
+  ctaLabel?: string;
 }
 
-function ledeLine(
+function statePillText(
   state: HeroState,
-  winnerName: string | null | undefined,
-  t: (key: string, opts?: Record<string, unknown>) => string,
-): string | null {
-  if (state.kind === 'results' && winnerName) {
-    return t('overview.photoBand.wonBy', { winnerName });
-  }
+  t: (k: string) => string,
+): { text: string; tone: 'live' | 'final' | 'upcoming' } {
   if (state.kind === 'live') {
-    return roundLabel(state.round, state.totalRounds);
+    return {
+      text: roundLabel(state.round, state.totalRounds).toUpperCase(),
+      tone: 'live',
+    };
   }
-  if (state.kind === 'upcoming') return state.countdown || null;
-  return null;
+  if (state.kind === 'results') {
+    if (state.variant === 'cancelled') return { text: t('overview.pillState.cancelled'), tone: 'final' };
+    if (state.variant === 'playoff') return { text: t('overview.pillState.playoff'), tone: 'final' };
+    return { text: t('overview.pillState.final'), tone: 'final' };
+  }
+  return {
+    text: state.countdown ? state.countdown.toUpperCase() : t('overview.pillState.upcoming'),
+    tone: 'upcoming',
+  };
 }
 
 function splitTitle(title: string): { main: string; sub: string } {
-  // NEVER-KEY: tournament title tokens are data-derived and must match source data in English.
+  // NEVER-KEY: source-derived title tokens (English data fields).
   const m = title.match(/^(.+?(?:CUP|OPEN|CHAMPIONSHIP|INVITATIONAL|CLASSIC))\s+(.+)$/i);
   if (m) return { main: m[1], sub: m[2] };
   return { main: title, sub: '' };
@@ -62,17 +88,26 @@ export function PhotoBand({
   venueImageUrl,
   state,
   tourLabel,
-  winnerName,
-  isMajor,
-  isSignature,
   datesString,
+  insight,
+  momentLabel,
+  momentName,
+  momentScore,
+  onCtaTap,
+  ctaLabel,
 }: PhotoBandProps) {
   const { t } = useTranslation('tourhub');
   const useDusk =
     state.kind === 'results' && (state.variant === 'declared' || state.variant === 'cancelled');
-  const lede = ledeLine(state, winnerName, t);
+  const pill = statePillText(state, t);
   const titleSplit = splitTitle(title);
 
+  const pillTone =
+    pill.tone === 'live'
+      ? { bg: 'rgba(220,38,38,0.92)', color: '#fff', dot: '#fff' }
+      : pill.tone === 'final'
+        ? { bg: 'rgba(255,255,255,0.14)', color: 'rgba(255,255,255,0.95)', dot: 'rgba(255,255,255,0.6)' }
+        : { bg: 'rgba(255,255,255,0.14)', color: 'rgba(255,255,255,0.95)', dot: 'rgba(255,255,255,0.6)' };
 
   return (
     <div
@@ -84,6 +119,7 @@ export function PhotoBand({
         flexShrink: 0,
       }}
     >
+      {/* Base gradient (behind photo) */}
       <div
         aria-hidden="true"
         style={{
@@ -104,67 +140,53 @@ export function PhotoBand({
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            objectPosition: 'center',
+            objectPosition: '50% 55%',
             zIndex: 1,
           }}
         />
       )}
       <div aria-hidden="true" style={{ position: 'absolute', inset: 0, background: COURSE_SCRIMS, zIndex: 2 }} />
 
-      {/* Lighter top scrim — Pass 7 */}
+      {/* Top scrim — protects the top eyebrow row */}
       <div
         aria-hidden="true"
         style={{
           position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 70,
-          background: 'linear-gradient(180deg, rgba(0,0,0,0.40) 0%, rgba(0,0,0,0) 100%)',
+          top: 0, left: 0, right: 0, height: 80,
+          background: 'linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0) 100%)',
           zIndex: 2,
         }}
       />
 
-      {/* Heavier bottom scrim — Pass 7 */}
+      {/* Bottom scrim — heavier so the lower-third holds legibility */}
       <div
         aria-hidden="true"
         style={{
           position: 'absolute',
-          left: 0,
-          right: 0,
-          bottom: 0,
-          height: 220,
+          left: 0, right: 0, bottom: 0, height: 260,
           background:
-            'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.45) 35%, rgba(0,0,0,0.78) 75%, rgba(0,0,0,0.88) 100%)',
+            'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.85) 78%, rgba(0,0,0,0.92) 100%)',
           zIndex: 2,
         }}
       />
 
-      {/* Top eyebrow row — tour name left, dates right */}
+      {/* Top eyebrow — tour left, dates right */}
       <div
         style={{
           position: 'absolute',
-          top: 16,
-          left: 20,
-          right: 20,
+          top: 16, left: 20, right: 20,
           zIndex: 4,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 12,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
         }}
       >
         {tourLabel && (
           <span
             style={{
               ...NUMERIC_STYLE,
-              fontSize: 10,
-              fontWeight: 700,
-              letterSpacing: '0.16em',
-              color: 'rgba(255,255,255,0.75)',
+              fontSize: 10, fontWeight: 700, letterSpacing: '0.16em',
+              color: 'rgba(255,255,255,0.78)',
               textShadow: '0 1px 3px rgba(0,0,0,0.45)',
-              textTransform: 'uppercase',
-              whiteSpace: 'nowrap',
+              textTransform: 'uppercase', whiteSpace: 'nowrap',
             }}
           >
             {tourLabel}
@@ -174,13 +196,10 @@ export function PhotoBand({
           <span
             style={{
               ...NUMERIC_STYLE,
-              fontSize: 10,
-              fontWeight: 700,
-              letterSpacing: '0.16em',
-              color: 'rgba(255,255,255,0.75)',
+              fontSize: 10, fontWeight: 700, letterSpacing: '0.16em',
+              color: 'rgba(255,255,255,0.78)',
               textShadow: '0 1px 3px rgba(0,0,0,0.45)',
-              textTransform: 'uppercase',
-              whiteSpace: 'nowrap',
+              textTransform: 'uppercase', whiteSpace: 'nowrap',
             }}
           >
             {datesString}
@@ -188,85 +207,200 @@ export function PhotoBand({
         )}
       </div>
 
-
-      {/* Bottom title block */}
+      {/* Lower-third stack */}
       <div
         style={{
           position: 'absolute',
-          left: 20,
-          right: 20,
-          bottom: 20,
+          left: 20, right: 20, bottom: 18,
           zIndex: 3,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 8,
+          display: 'flex', flexDirection: 'column', gap: 10,
         }}
       >
-      {lede && (
-          <div
+        {/* State pill */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: '0.14em',
-              color: 'rgba(255,255,255,0.85)',
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              padding: '4px 9px', borderRadius: 999,
+              background: pillTone.bg, color: pillTone.color,
+              fontSize: 10, fontWeight: 800, letterSpacing: '0.14em',
               textTransform: 'uppercase',
-              textShadow: '0 1px 3px rgba(0,0,0,0.45)',
+              ...NUMERIC_STYLE,
+              backdropFilter: 'blur(6px)',
+              WebkitBackdropFilter: 'blur(6px)',
             }}
           >
-            <span>{lede}</span>
+            {pill.tone === 'live' && (
+              <span
+                className="hybrid-live-pulse"
+                style={{ width: 6, height: 6, borderRadius: 999, background: pillTone.dot }}
+              />
+            )}
+            {pill.text}
+          </span>
+        </div>
+
+        {/* Insight line — italic pulled quote */}
+        {insight && (
+          <div
+            style={{
+              fontFamily: FONT,
+              fontSize: 12.5,
+              fontStyle: 'italic',
+              fontWeight: 400,
+              lineHeight: 1.35,
+              color: 'rgba(255,255,255,0.82)',
+              textShadow: '0 1px 3px rgba(0,0,0,0.55)',
+              maxWidth: '92%',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            }}
+          >
+            {insight}
           </div>
         )}
 
+        {/* Title */}
         <h1
           style={{
             margin: 0,
             color: 'white',
             fontFamily: FONT,
-            fontSize: 36,
+            fontSize: 34,
             fontWeight: 800,
-            lineHeight: 0.95,
-            letterSpacing: '-0.02em',
+            lineHeight: 0.96,
+            letterSpacing: '-0.025em',
             textShadow: '0 2px 12px rgba(0,0,0,0.55)',
+            textWrap: 'balance',
           }}
         >
           <span>{titleSplit.main}</span>
           {titleSplit.sub && (
             <>
               <br />
-              <span style={{ color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>
-                {titleSplit.sub}
-              </span>
+              <span style={{ color: 'rgba(255,255,255,0.72)', fontWeight: 600 }}>{titleSplit.sub}</span>
             </>
           )}
         </h1>
 
+        {/* Venue */}
         {venueName && (
           <div
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              fontSize: 11,
+              fontSize: 11.5,
               fontWeight: 600,
               color: 'rgba(255,255,255,0.75)',
               textShadow: '0 1px 3px rgba(0,0,0,0.45)',
               letterSpacing: '0.01em',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
             }}
           >
-            <span
-              style={{
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                minWidth: 0,
-              }}
-            >
-              {venueName}
-              {venueCity ? ` · ${venueCity}` : ''}
-            </span>
+            {venueName}
+            {venueCity ? ` · ${venueCity}` : ''}
+          </div>
+        )}
+
+        {/* Moment row + CTA */}
+        {(momentName || onCtaTap) && (
+          <div
+            style={{
+              marginTop: 4,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 12,
+            }}
+          >
+            {momentName ? (
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'baseline',
+                  gap: 8,
+                  padding: '6px 10px',
+                  background: 'rgba(255,255,255,0.10)',
+                  border: '0.5px solid rgba(255,255,255,0.18)',
+                  borderRadius: 6,
+                  backdropFilter: 'blur(6px)',
+                  WebkitBackdropFilter: 'blur(6px)',
+                  minWidth: 0,
+                  maxWidth: '78%',
+                }}
+              >
+                {momentLabel && (
+                  <span
+                    style={{
+                      fontSize: 9,
+                      fontWeight: 800,
+                      letterSpacing: '0.14em',
+                      color: 'rgba(255,255,255,0.65)',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    {momentLabel}
+                  </span>
+                )}
+                <span
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: 'white',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    minWidth: 0,
+                  }}
+                >
+                  {momentName}
+                </span>
+                {momentScore && (
+                  <span
+                    style={{
+                      ...NUMERIC_STYLE,
+                      fontSize: 13,
+                      fontWeight: 800,
+                      color: AMBER,
+                    }}
+                  >
+                    {momentScore}
+                  </span>
+                )}
+              </div>
+            ) : (
+              <span />
+            )}
+
+            {onCtaTap && (
+              <button
+                type="button"
+                onClick={onCtaTap}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 2,
+                  background: 'transparent',
+                  border: 'none',
+                  padding: '6px 4px',
+                  margin: '-6px -4px',
+                  cursor: 'pointer',
+                  fontFamily: FONT,
+                  fontSize: 12,
+                  fontWeight: 800,
+                  letterSpacing: '0.12em',
+                  color: AMBER,
+                  textTransform: 'uppercase',
+                  textShadow: '0 1px 3px rgba(0,0,0,0.55)',
+                  flexShrink: 0,
+                }}
+              >
+                {ctaLabel ?? t('overview.photoBand.tournamentCta')}
+                <ChevronRight size={14} strokeWidth={2.5} />
+              </button>
+            )}
           </div>
         )}
       </div>
