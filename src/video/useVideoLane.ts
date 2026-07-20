@@ -182,7 +182,7 @@ export function useVideoLane(
     if (!laneId || !opts.active) return;
     if (typeof document !== 'undefined' && document.hidden) return;
     const callerPostId = opts.ownerKey ?? opts.postId ?? null;
-    void VideoEngine.play(laneId, { callerPostId, claimsAudio: opts.claimsAudio === true });
+    void VideoEngine.play(laneId, { callerPostId });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [creationClosedAt]);
 
