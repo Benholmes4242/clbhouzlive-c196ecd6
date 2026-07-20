@@ -27,6 +27,7 @@ import {
 import { useSessionAudio, getLastUnmuteGestureTs } from '@/audio/sessionAudioStore';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { VideoEngine } from '@/video/VideoEngine';
+import { feedLaneRoles } from '@/video/feedLaneRoles';
 
 const HUD_BORDER = '1px solid rgba(251, 191, 36, 0.35)';
 
@@ -113,7 +114,7 @@ export const AudioDebugHud = memo(function AudioDebugHud() {
     };
   }, [enabled]);
 
-  // 250ms live summary tick.
+  // 250ms live summary tick — panel-only (drives on-screen numbers).
   useEffect(() => {
     if (!enabled || !expanded) return;
     const iv = window.setInterval(() => {
@@ -138,6 +139,65 @@ export const AudioDebugHud = memo(function AudioDebugHud() {
     }, 250);
     return () => window.clearInterval(iv);
   }, [enabled, expanded]);
+
+  // 1s SLOT heartbeat — runs whenever the flag is on, independent of the
+  // panel being open. Emits one `audio.heartbeat` line per second saying
+  // who the visible speaker is, whether they're actually audible, and
+  // whether anyone else is squatting on the slot. A silent-video second
+  // reads as sessionMuted=0 + activeElMuted=1 + unmutedLanes=[…].
+  useEffect(() => {
+    if (!enabled) return;
+    const iv = window.setInterval(() => {
+      const engine = VideoEngine as unknown as {
+        _debugGetLanesSnapshot?: () => Array<{
+          laneId: string; postId: string | null; muted: boolean;
+          paused: boolean; currentTime: number; borrowed: boolean;
+        }>;
+      };
+      const snap = engine._debugGetLanesSnapshot?.() ?? [];
+      const fsSt = useFullscreenFeedStore.getState();
+      const sessionMuted = useSessionAudio.getState().isMuted;
+
+      // "Active" speaker = fullscreen borrow lane if open, else the feed
+      // lane currently holding the 'active' role.
+      let activeLaneId: string | null = null;
+      if (fsSt.isOpen) {
+        activeLaneId = fsSt.borrow ? fsSt.borrow.laneId : 'fullscreen';
+      } else {
+        try {
+          activeLaneId = feedLaneRoles.laneForRole('active') as string | null;
+        } catch { activeLaneId = null; }
+      }
+      const activeLane = activeLaneId
+        ? snap.find((l) => l.laneId === activeLaneId) ?? null
+        : null;
+      const unmutedLanes = snap.filter((l) => !l.muted).map((l) => l.laneId);
+      const borrowedLanes = snap.filter((l) => l.borrowed).map((l) => l.laneId);
+
+      logAudio('audio.heartbeat', {
+        activeLaneId,
+        activePostId: activeLane?.postId ?? null,
+        activeElMuted: activeLane ? activeLane.muted : null,
+        activeElPaused: activeLane ? activeLane.paused : null,
+        activeCurrentTime: activeLane ? activeLane.currentTime : null,
+        sessionMuted,
+        unmutedLanes,
+        borrowedLanes,
+      });
+
+      setSummary({
+        sessionMuted,
+        msSinceGesture: gestureAge(),
+        activeLaneId,
+        activePostId: activeLane?.postId ?? null,
+        activeElMuted: activeLane ? activeLane.muted : null,
+        unmutedLanes,
+        borrowedLanes,
+      });
+    }, 1000);
+    return () => window.clearInterval(iv);
+  }, [enabled]);
+
 
   const onCopy = useCallback(async () => {
     const txt = buildAudioLogText();
@@ -291,6 +351,48 @@ function SummaryPane({ summary }: { summary: AudioSummary }) {
         <span style={{ color: '#fbbf24' }}>POS</span>{' '}
         tile {tilePos}s → fs {fsPos}s{cont}
       </div>
+      <SlotLine summary={summary} />
+    </div>
+  );
+}
+
+function SlotLine({ summary }: { summary: AudioSummary }) {
+  // The heartbeat's gist: who owns the ONE_UNMUTED_LANE slot right now?
+  //   SLOT feed-active(post-ab12) unmuted
+  //   SLOT NONE (active muted!)         ← silent-video symptom
+  //   SLOT feed-active — squatters: [rail-0]
+  const active = summary.activeLaneId;
+  const post = summary.activePostId;
+  const activeMuted = summary.activeElMuted;
+  const others = summary.unmutedLanes.filter((l) => l !== active);
+  let label: string;
+  let color: string;
+  if (!active) {
+    label = 'NONE (no active lane)';
+    color = '#94a3b8';
+  } else if (activeMuted === true) {
+    label = `NONE (active muted!) — active=${active}`;
+    color = '#f87171';
+  } else if (activeMuted === false) {
+    const postTag = post ? `(${String(post).slice(0, 12)})` : '';
+    label = `${active}${postTag} unmuted`;
+    color = '#4ade80';
+  } else {
+    label = `${active} — muted state unknown`;
+    color = '#94a3b8';
+  }
+  return (
+    <div>
+      <span style={{ color: '#fbbf24' }}>SLOT</span>{' '}
+      <span style={{ color }}>{label}</span>
+      {others.length > 0 && (
+        <>
+          {' '}
+          <span style={{ color: '#f87171' }}>
+            squatters=[{others.join(',')}]
+          </span>
+        </>
+      )}
     </div>
   );
 }

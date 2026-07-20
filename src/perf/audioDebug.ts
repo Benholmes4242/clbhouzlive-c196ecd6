@@ -26,7 +26,9 @@ export type AudioLogEntry = {
   data: Record<string, unknown>;
 };
 
-const BUFFER_SIZE = 500;
+// ~2000 entries so a five-minute continuous capture fits at typical event
+// rates (heartbeat 1/s + play/pause/policy churn during scroll).
+const BUFFER_SIZE = 2000;
 
 let buffer: AudioLogEntry[] = [];
 const listeners = new Set<() => void>();
@@ -114,6 +116,13 @@ export type AudioSummary = {
   tilePos: number | null;
   fsPos: number | null;
   continuityOk: boolean | null;
+  // v4 heartbeat: who currently owns the ONE_UNMUTED_LANE slot, and whether
+  // the visible ACTIVE lane is actually the one that owns it.
+  activeLaneId: string | null;
+  activePostId: string | null;
+  activeElMuted: boolean | null;
+  unmutedLanes: string[];
+  borrowedLanes: string[];
 };
 
 let summary: AudioSummary = {
@@ -128,6 +137,11 @@ let summary: AudioSummary = {
   tilePos: null,
   fsPos: null,
   continuityOk: null,
+  activeLaneId: null,
+  activePostId: null,
+  activeElMuted: null,
+  unmutedLanes: [],
+  borrowedLanes: [],
 };
 
 export function setSummary(patch: Partial<AudioSummary>): void {

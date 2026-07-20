@@ -606,8 +606,9 @@ class VideoEngineImpl {
     }
     if (effectivePolicy === 'session') {
       if (lane.el.muted !== sessionMuted) {
-        // Respect ONE_UNMUTED_LANE on unmute.
-        this.setMuted(lane.id, sessionMuted);
+        // Respect ONE_UNMUTED_LANE on unmute. Forward the resolve trigger
+        // so any slot-enforce log names the true cause (mount/activation/…).
+        this.setMuted(lane.id, sessionMuted, `policy:${trigger}`);
       }
       return;
     }
@@ -1316,15 +1317,30 @@ class VideoEngineImpl {
     return this.getLane(laneId).el.currentTime || 0;
   }
 
-  setMuted(laneId: LaneId, muted: boolean): void {
+  setMuted(laneId: LaneId, muted: boolean, trigger: string = 'setMuted'): void {
     const lane = this.getLane(laneId);
     const enforcedOn: LaneId[] = [];
-    logAudio('setMuted.enter', { laneId, desired: muted, msSinceOpen: msSinceOpen() });
+    logAudio('setMuted.enter', { laneId, desired: muted, trigger, msSinceOpen: msSinceOpen() });
     if (!muted && ONE_UNMUTED_LANE) {
       // Enforce: mute every other lane first.
+      let claimerRole: 'active' | 'next' | 'prev' | null = null;
+      try {
+        if (feedLaneRoles.isFeedLane(laneId)) claimerRole = feedLaneRoles.roleForLane(laneId);
+      } catch { /* noop */ }
       this.lanes.forEach((other) => {
         if (other.id !== laneId) {
-          if (!other.el.muted) enforcedOn.push(other.id);
+          if (!other.el.muted) {
+            enforcedOn.push(other.id);
+            // The theft record: someone else was audible and this claim
+            // silenced them. Heartbeat distinguishes theft from a simple
+            // "active lane never claimed" case (unmutedLanes=[]).
+            logAudio('audio.slot.enforce', {
+              victimLaneId: other.id,
+              claimerLaneId: laneId,
+              claimerRole,
+              trigger,
+            });
+          }
           other.el.muted = true;
         }
       });
@@ -1332,9 +1348,10 @@ class VideoEngineImpl {
     lane.el.muted = muted;
     this.emit(lane);
     logAudio('setMuted.exit', {
-      laneId, desired: muted, oneUnmutedEnforcedOn: enforcedOn,
+      laneId, desired: muted, trigger, oneUnmutedEnforcedOn: enforcedOn,
     });
   }
+
 
 
   /** Set object-fit on the lane's <video> element. */
@@ -1416,6 +1433,35 @@ class VideoEngineImpl {
   _debugGetElement(laneId: LaneId): HTMLMediaElement | null {
     try { return this.getLane(laneId).el; } catch { return null; }
   }
+
+  /** Debug-only: snapshot every lane's audio-relevant state for the
+   *  heartbeat. Used by AudioDebugHud to build the once-per-second SLOT
+   *  line ("who owns the ONE_UNMUTED_LANE slot right now?"). */
+  _debugGetLanesSnapshot(): Array<{
+    laneId: LaneId;
+    postId: string | null;
+    muted: boolean;
+    paused: boolean;
+    currentTime: number;
+    borrowed: boolean;
+  }> {
+    const out: Array<{
+      laneId: LaneId; postId: string | null; muted: boolean;
+      paused: boolean; currentTime: number; borrowed: boolean;
+    }> = [];
+    this.lanes.forEach((lane) => {
+      out.push({
+        laneId: lane.id,
+        postId: lane.postId,
+        muted: !!lane.el.muted,
+        paused: !!lane.el.paused,
+        currentTime: +(lane.el.currentTime || 0).toFixed(3),
+        borrowed: this.borrowedLanes.has(lane.id),
+      });
+    });
+    return out;
+  }
+
 
 
   /**
