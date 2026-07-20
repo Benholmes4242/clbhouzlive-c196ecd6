@@ -2,33 +2,31 @@ import React, { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-  BarChart, Bar, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis,
+  CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis, LineChart, Line,
 } from 'recharts';
 import {
-  AlertTriangle, ArrowDownRight, ArrowUpRight, ChevronRight, Activity, Bell, Cpu,
-  MessageSquare, UserPlus, Star, RefreshCcw,
+  AlertTriangle, ChevronRight, Activity, Bell, Cpu,
+  MessageSquare, UserPlus, Star, RefreshCcw, Radio,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { adminTheme as t } from '../theme';
-import ChartCard from '../components/ChartCard';
 import EmptyState from '../components/EmptyState';
 import AdminErrorState from '../components/AdminErrorState';
+import MetricCard from '../components/MetricCard';
 import { useTriageCounts } from '../hooks/useTriageCounts';
-import { useNorthStar, northStarDelta } from '../hooks/useNorthStar';
 import { useEchoEngineHealth } from '../hooks/useEchoEngineHealth';
 import { usePushHealth } from '../hooks/usePushHealth';
 import { useDashboard } from '../hooks/useDashboard';
+import {
+  useOverviewMetrics, useLiveInApp, useRightNowHourly, useActiveMembers28d, pctDelta,
+} from '../hooks/useOverviewMetrics';
 import {
   computeEchoChip, computePushChip, computeEgChip, computeCronChip,
   toneColor, type ChipState,
 } from '../lib/healthChips';
 
-
-// ─── Small helpers ────────────────────────────────────────────────────────────
-
 const num = (n: number) => n.toLocaleString();
-const fmtDateKey = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', day: 'numeric' });
 function relTime(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
   const m = Math.floor(diff / 60000);
@@ -39,7 +37,7 @@ function relTime(iso: string): string {
   return `${Math.floor(h / 24)}d ago`;
 }
 
-// ─── Clubhouse feed (members + posts + reviews) ───────────────────────────────
+// ─── Clubhouse feed ───────────────────────────────────────────────────────────
 
 type FeedKind = 'member' | 'post' | 'review';
 
@@ -50,6 +48,7 @@ interface FeedItem {
   title: string;
   subtitle: string | null;
   avatarUrl: string | null;
+  href: string;
 }
 
 async function fetchClubhouseFeed(): Promise<FeedItem[]> {
@@ -72,9 +71,9 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
       .limit(8),
   ]);
 
-  const postRows = (posts.data ?? []) as any[];
-  const reviewRows = (reviews.data ?? []) as any[];
-  const memberRows = (members.data ?? []) as any[];
+  const postRows = (posts.data ?? []) as { id: string; content: string | null; created_at: string; user_id: string }[];
+  const reviewRows = (reviews.data ?? []) as { id: string; created_at: string; user_id: string; course_id: string; review: string | null }[];
+  const memberRows = (members.data ?? []) as { id: string; display_name: string | null; username: string | null; profile_photo_url: string | null; created_at: string }[];
 
   const profileIds = Array.from(new Set([
     ...postRows.map(r => r.user_id),
@@ -88,33 +87,35 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
   const [profRes, courseRes, mediaRes] = await Promise.all([
     profileIds.length
       ? supabase.from('user_profiles').select('id, display_name, username, profile_photo_url').in('id', profileIds)
-      : Promise.resolve({ data: [] as any[] } as any),
+      : Promise.resolve({ data: [] } as { data: unknown[] }),
     courseIds.length
       ? supabase.from('golf_courses').select('id, name').in('id', courseIds)
-      : Promise.resolve({ data: [] as any[] } as any),
+      : Promise.resolve({ data: [] } as { data: unknown[] }),
     emptyContentPostIds.length
       ? supabase.from('post_media').select('post_id, media_type').in('post_id', emptyContentPostIds).limit(50)
-      : Promise.resolve({ data: [] as any[] } as any),
+      : Promise.resolve({ data: [] } as { data: unknown[] }),
   ]);
-  const profMap = new Map<string, any>(((profRes.data ?? []) as any[]).map(p => [p.id, p]));
-  const courseMap = new Map<string, any>(((courseRes.data ?? []) as any[]).map(c => [c.id, c]));
+  type Prof = { id: string; display_name: string | null; username: string | null; profile_photo_url: string | null };
+  const profMap = new Map<string, Prof>(((profRes.data ?? []) as Prof[]).map(p => [p.id, p]));
+  const courseMap = new Map<string, { id: string; name: string }>(((courseRes.data ?? []) as { id: string; name: string }[]).map(c => [c.id, c]));
   const mediaMap = new Map<string, string>();
-  for (const m of ((mediaRes.data ?? []) as any[])) {
+  for (const m of ((mediaRes.data ?? []) as { post_id: string; media_type: string }[])) {
     if (!mediaMap.has(m.post_id)) mediaMap.set(m.post_id, m.media_type);
   }
 
-  const displayName = (p: any) => p?.display_name ?? p?.username ?? 'A member';
+  const displayName = (p: Prof | undefined | null) => p?.display_name ?? p?.username ?? 'A member';
   const items: FeedItem[] = [];
 
   for (const m of memberRows) {
-    const name = displayName(m);
+    const name = m.display_name ?? m.username ?? 'A member';
     items.push({
       id: `member:${m.id}`,
       kind: 'member',
       created_at: m.created_at,
       title: `New member: ${name}`,
       subtitle: null,
-      avatarUrl: m.profile_photo_url ?? null,
+      avatarUrl: m.profile_photo_url,
+      href: `/admin-v2/members?q=${encodeURIComponent(m.username ?? name)}`,
     });
   }
   for (const p of postRows) {
@@ -122,9 +123,8 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
     const name = displayName(prof);
     const content = (p.content ?? '').trim();
     let subtitle: string | null = null;
-    if (content) {
-      subtitle = content;
-    } else {
+    if (content) subtitle = content;
+    else {
       const mt = mediaMap.get(p.id);
       if (mt === 'video') subtitle = 'Video post';
       else if (mt === 'image' || mt === 'photo') subtitle = 'Photo post';
@@ -136,6 +136,7 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
       title: `Post from ${name}`,
       subtitle,
       avatarUrl: prof?.profile_photo_url ?? null,
+      href: `/p/${p.id}`,
     });
   }
   for (const r of reviewRows) {
@@ -148,6 +149,7 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
       title: `Review: ${course?.name ?? 'a course'}`,
       subtitle: (r.review ?? '').trim() || `by ${displayName(prof)}`,
       avatarUrl: prof?.profile_photo_url ?? null,
+      href: r.course_id ? `/course/${r.course_id}` : '/admin-v2/content?tab=courses',
     });
   }
 
@@ -155,46 +157,20 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
   return items.slice(0, 8);
 }
 
-// ─── Posts & Reviews 14d ──────────────────────────────────────────────────────
-
-interface PRDay { date: string; posts: number; reviews: number }
-
-async function fetchPostsReviews14d(): Promise<PRDay[]> {
-  const start = new Date();
-  start.setDate(start.getDate() - 13);
-  start.setHours(0, 0, 0, 0);
-  const iso = start.toISOString();
-  const [posts, reviews] = await Promise.all([
-    supabase.from('posts').select('created_at').gte('created_at', iso).limit(5000),
-    supabase.from('course_ratings').select('created_at').gte('created_at', iso).limit(5000),
-  ]);
-  const buckets: Record<string, PRDay> = {};
-  for (let i = 13; i >= 0; i--) {
-    const d = new Date(); d.setDate(d.getDate() - i);
-    const key = fmtDateKey(d);
-    buckets[key] = { date: key, posts: 0, reviews: 0 };
-  }
-  for (const r of posts.data ?? []) {
-    const k = fmtDateKey(new Date(r.created_at));
-    if (buckets[k]) buckets[k].posts++;
-  }
-  for (const r of reviews.data ?? []) {
-    const k = fmtDateKey(new Date(r.created_at));
-    if (buckets[k]) buckets[k].reviews++;
-  }
-  return Object.values(buckets);
-}
-
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
   const qc = useQueryClient();
-  const northStar = useNorthStar();
   const triage = useTriageCounts();
   const echo = useEchoEngineHealth();
   const push = usePushHealth();
   const dashboard = useDashboard();
   const eg = dashboard.egSyncHealth;
+
+  const overview = useOverviewMetrics();
+  const live = useLiveInApp();
+  const intraday = useRightNowHourly();
+  const actives = useActiveMembers28d();
 
   const feed = useQuery({
     queryKey: ['admin-v2', 'dashboard', 'clubhouse-feed'],
@@ -203,26 +179,20 @@ export default function DashboardPage() {
     refetchInterval: 120_000,
   });
 
-  const prTrend = useQuery({
-    queryKey: ['admin-v2', 'dashboard', 'posts-reviews-14d'],
-    queryFn: fetchPostsReviews14d,
-    staleTime: 5 * 60_000,
-    refetchInterval: 10 * 60_000,
-  });
-
   useEffect(() => {
-    const handler = () => qc.invalidateQueries({ queryKey: ['admin-v2', 'dashboard'] });
+    const handler = () => qc.invalidateQueries({ queryKey: ['admin-v2'] });
     window.addEventListener('admin-v2:refetch', handler);
     return () => window.removeEventListener('admin-v2:refetch', handler);
   }, [qc]);
 
-  // ── Health chip statuses (computed here so banner can read them) ────────────
   const echoChip = useMemo(() => computeEchoChip(echo), [echo.isLoading, echo.isError, echo.data]);
   const pushChip = useMemo(() => computePushChip(push), [push.isLoading, push.isError, push.data]);
   const egChip = useMemo(() => computeEgChip(eg), [eg.isLoading, eg.isError, eg.data]);
   const cronChip = useMemo(() => computeCronChip(eg), [eg.isLoading, eg.isError, eg.data]);
-
   const nonOkChips = [echoChip, pushChip, egChip, cronChip].filter(c => c.tone !== 'ok' && c.tone !== 'idle').length;
+
+  const m = overview.data;
+  const loading = overview.isLoading;
 
   return (
     <div style={{ padding: '8px 16px 0', display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 720, margin: '0 auto' }}>
@@ -232,44 +202,21 @@ export default function DashboardPage() {
         nonOkChips={nonOkChips}
       />
 
-      <NorthStarHero
-        data={northStar.data}
-        loading={northStar.isLoading}
-        isError={northStar.isError}
-        onRetry={() => northStar.refetch()}
-        triage={triage.data}
+      <RightNowStrip
+        live={live.data ?? null}
+        loading={live.isLoading}
+        intraday={intraday.data ?? []}
+        intradayLoading={intraday.isLoading}
       />
 
-      <ThisWeekGrid
-        data={northStar.data}
-        loading={northStar.isLoading}
-      />
+      <MetricGrid loading={loading} data={m} />
 
-      <ChartCard
-        title="Posts and reviews"
-        subtitle="Last 14 days"
-        loading={prTrend.isLoading}
-        isEmpty={!prTrend.isLoading && (prTrend.data ?? []).every(d => !d.posts && !d.reviews)}
-        emptyTitle="No posts or reviews yet"
-        height={220}
-      >
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={prTrend.data ?? []} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
-            <CartesianGrid stroke={t.line} vertical={false} />
-            <XAxis dataKey="date" stroke={t.inkFaint} fontSize={11} tickLine={false} axisLine={false} />
-            <YAxis stroke={t.inkFaint} fontSize={11} tickLine={false} axisLine={false} width={28} allowDecimals={false} />
-            <Tooltip
-              contentStyle={{
-                background: t.surface, border: `1px solid ${t.line}`,
-                borderRadius: 8, fontSize: 12, boxShadow: t.shadowPop,
-              }}
-            />
-            <Legend wrapperStyle={{ fontSize: 12 }} />
-            <Bar dataKey="posts" stackId="a" fill={t.brand} radius={[0, 0, 0, 0]} />
-            <Bar dataKey="reviews" stackId="a" fill={t.ink} radius={[4, 4, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
-      </ChartCard>
+      <ActiveMembersChart
+        data={actives.data ?? []}
+        loading={actives.isLoading}
+        isError={actives.isError}
+        onRetry={() => actives.refetch()}
+      />
 
       <LatestInClubhouse
         items={feed.data ?? []}
@@ -279,11 +226,201 @@ export default function DashboardPage() {
       />
 
       <HealthChipStrip echoChip={echoChip} pushChip={pushChip} egChip={egChip} cronChip={cronChip} />
+
+      <style>{`@keyframes admin-pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.55 } } @keyframes admin-pulse-dot { 0%,100% { opacity: 1 } 50% { opacity: 0.35 } }`}</style>
     </div>
   );
 }
 
-// ─── Alert banner ─────────────────────────────────────────────────────────────
+// ─── RIGHT NOW ────────────────────────────────────────────────────────────────
+
+function RightNowStrip({
+  live, loading, intraday, intradayLoading,
+}: {
+  live: number | null; loading: boolean;
+  intraday: { hour: number; today: number | null; last: number | null }[];
+  intradayLoading: boolean;
+}) {
+  return (
+    <section
+      style={{
+        background: t.surface, border: `1px solid ${t.line}`,
+        borderRadius: 22, boxShadow: t.shadowCard,
+        padding: 16, display: 'flex', flexDirection: 'column', gap: 12,
+        position: 'relative', overflow: 'hidden',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span aria-hidden style={{
+          width: 8, height: 8, borderRadius: 999, background: t.ok,
+          animation: 'admin-pulse-dot 1.6s ease-in-out infinite', flexShrink: 0,
+        }} />
+        <span style={{ color: t.brandText, fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase' }}>
+          Right now
+        </span>
+        <span style={{ flex: 1 }} />
+        <Radio size={14} color={t.inkFaint} />
+      </div>
+
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+        <span style={{
+          color: t.ink, fontSize: 32, fontWeight: 800, lineHeight: 1,
+          fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
+        }}>
+          {loading || live === null ? '-' : num(live)}
+        </span>
+        <span style={{ color: t.inkMuted, fontSize: 13, fontWeight: 500 }}>
+          member{(live ?? 0) === 1 ? '' : 's'} active in last 5 min
+        </span>
+      </div>
+
+      <div style={{ height: 120, marginLeft: -8, marginRight: -8 }}>
+        {intradayLoading ? (
+          <div style={{ height: '100%', background: t.canvas, borderRadius: t.radius.md, animation: 'admin-pulse 1.4s ease-in-out infinite' }} />
+        ) : intraday.length < 2 ? (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: t.inkFaint, fontSize: 12 }}>
+            Not enough data yet
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={intraday} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+              <CartesianGrid stroke={t.line} vertical={false} />
+              <XAxis dataKey="hour" stroke={t.inkFaint} fontSize={10} tickLine={false} axisLine={false}
+                tickFormatter={(h: number) => `${h}h`} />
+              <YAxis stroke={t.inkFaint} fontSize={10} tickLine={false} axisLine={false} width={28} allowDecimals={false} />
+              <Tooltip contentStyle={{ background: t.surface, border: `1px solid ${t.line}`, borderRadius: 8, fontSize: 12, boxShadow: t.shadowPop }} />
+              <Line type="monotone" dataKey="last" name="Last week" stroke={t.inkFaint} strokeWidth={1.5} strokeDasharray="3 3" dot={false} isAnimationActive={false} />
+              <Line type="monotone" dataKey="today" name="Today" stroke={t.brand} strokeWidth={2} dot={false} isAnimationActive={false} />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
+            </LineChart>
+          </ResponsiveContainer>
+        )}
+      </div>
+    </section>
+  );
+}
+
+// ─── Metric grid ──────────────────────────────────────────────────────────────
+
+function MetricGrid({ loading, data }: { loading: boolean; data: ReturnType<typeof useOverviewMetrics>['data'] }) {
+  return (
+    <section
+      className="admin-v2-metric-grid"
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+        gap: 10,
+      }}
+    >
+      <MetricCard
+        label="DAU"
+        value={loading ? null : (data?.dau.current ?? 0)}
+        delta={loading ? undefined : pctDelta(data?.dau.current ?? 0, data?.dau.previous ?? 0)}
+        deltaLabel="vs same day last week"
+        sparkline={data?.dau.sparkline}
+        to="/admin-v2/analytics?tab=growth"
+        loading={loading}
+      />
+      <MetricCard
+        label="Signups 7d"
+        value={loading ? null : (data?.signups.current ?? 0)}
+        delta={loading ? undefined : pctDelta(data?.signups.current ?? 0, data?.signups.previous ?? 0)}
+        deltaLabel="vs prev 7d"
+        sparkline={data?.signups.sparkline}
+        to="/admin-v2/analytics?tab=growth"
+        loading={loading}
+      />
+      <MetricCard
+        label="Sessions 7d"
+        value={loading ? null : (data?.sessions.current ?? 0)}
+        delta={loading ? undefined : pctDelta(data?.sessions.current ?? 0, data?.sessions.previous ?? 0)}
+        deltaLabel="vs prev 7d"
+        sparkline={data?.sessions.sparkline}
+        to="/admin-v2/analytics?tab=engagement"
+        loading={loading}
+      />
+      <MetricCard
+        label="Posts 7d"
+        value={loading ? null : (data?.posts.current ?? 0)}
+        delta={loading ? undefined : pctDelta(data?.posts.current ?? 0, data?.posts.previous ?? 0)}
+        deltaLabel="vs prev 7d"
+        sparkline={data?.posts.sparkline}
+        to="/admin-v2/content?tab=posts"
+        loading={loading}
+      />
+      <MetricCard
+        label="Reviews 7d"
+        value={loading ? null : (data?.reviews.current ?? 0)}
+        delta={loading ? undefined : pctDelta(data?.reviews.current ?? 0, data?.reviews.previous ?? 0)}
+        deltaLabel="vs prev 7d"
+        sparkline={data?.reviews.sparkline}
+        to="/admin-v2/content?tab=courses"
+        loading={loading}
+      />
+      <MetricCard
+        label="Members"
+        value={loading ? null : (data?.totalUsers ?? 0)}
+        deltaLabel="total"
+        to="/admin-v2/members"
+        loading={loading}
+      />
+    </section>
+  );
+}
+
+// ─── Active members chart ─────────────────────────────────────────────────────
+
+function ActiveMembersChart({
+  data, loading, isError, onRetry,
+}: {
+  data: { date: string; d1: number; d7: number; d28: number }[];
+  loading: boolean; isError: boolean; onRetry: () => void;
+}) {
+  const empty = !loading && !isError && data.every(d => !d.d1 && !d.d7 && !d.d28);
+  return (
+    <section
+      style={{
+        background: t.surface, border: `1px solid ${t.line}`,
+        borderRadius: 18, boxShadow: t.shadowCard,
+        padding: 16, display: 'flex', flexDirection: 'column', gap: 8,
+      }}
+    >
+      <div>
+        <div style={{ color: t.ink, fontWeight: 700, fontSize: 15 }}>Active members</div>
+        <div style={{ color: t.inkMuted, fontSize: 12, marginTop: 2 }}>Last 28 days - 1 day, 7 day, 28 day rolling</div>
+      </div>
+
+      {loading ? (
+        <div style={{ height: 200, background: t.canvas, borderRadius: t.radius.md, animation: 'admin-pulse 1.4s ease-in-out infinite' }} />
+      ) : isError ? (
+        <AdminErrorState message="Couldn't load active members." onRetry={onRetry} />
+      ) : empty ? (
+        <EmptyState title="No activity yet" />
+      ) : (
+        <div style={{ height: 220 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={data} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+              <CartesianGrid stroke={t.line} vertical={false} />
+              <XAxis
+                dataKey="date" stroke={t.inkFaint} fontSize={10} tickLine={false} axisLine={false}
+                tickFormatter={(d: string) => new Date(d).toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })}
+                minTickGap={24}
+              />
+              <YAxis stroke={t.inkFaint} fontSize={10} tickLine={false} axisLine={false} width={28} allowDecimals={false} />
+              <Tooltip contentStyle={{ background: t.surface, border: `1px solid ${t.line}`, borderRadius: 8, fontSize: 12, boxShadow: t.shadowPop }} />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
+              <Line type="monotone" dataKey="d28" name="28-day" stroke={t.inkFaint} strokeWidth={1.5} dot={false} isAnimationActive={false} />
+              <Line type="monotone" dataKey="d7" name="7-day" stroke={t.ink} strokeWidth={1.5} dot={false} isAnimationActive={false} />
+              <Line type="monotone" dataKey="d1" name="1-day" stroke={t.brand} strokeWidth={2} dot={false} isAnimationActive={false} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+    </section>
+  );
+}
+
+// ─── Alert banner (unchanged copy from prior turn) ────────────────────────────
 
 function AlertBannerRow({
   triage, pushRed, nonOkChips,
@@ -294,10 +431,8 @@ function AlertBannerRow({
 }) {
   const total = triage?.total ?? 0;
   const hasTriage = total > 0;
-
   if (!hasTriage && !pushRed) return null;
 
-  // Triage-line wins when both exist; push becomes the appended health clause.
   if (hasTriage) {
     const rel = triage?.oldestCreatedAt ? relTime(triage.oldestCreatedAt) : 'moments ago';
     const healthClause = pushRed
@@ -308,8 +443,6 @@ function AlertBannerRow({
     const message = `${total} waiting - longest ${rel}${healthClause}`;
     return <BannerLink to={triage!.oldestQueueRoute} tone="warn" message={message} />;
   }
-
-  // Only push failing.
   return (
     <BannerLink
       to="/admin-v2/health?tab=status"
@@ -343,337 +476,31 @@ function BannerLink({ to, tone, message }: { to: string; tone: 'warn' | 'danger'
   );
 }
 
-// ─── North Star hero ──────────────────────────────────────────────────────────
-
-function NorthStarHero({
-  data, loading, isError, onRetry, triage,
-}: {
-  data: ReturnType<typeof useNorthStar>['data'];
-  loading: boolean;
-  isError: boolean;
-  onRetry: () => void;
-  triage: ReturnType<typeof useTriageCounts>['data'];
-}) {
-  return (
-    <section
-      style={{
-        background: t.surface,
-        border: `1px solid ${t.line}`,
-        borderRadius: 22,
-        boxShadow: t.shadowCard,
-        padding: 20,
-        display: 'flex', flexDirection: 'column', gap: 16,
-        position: 'relative', overflow: 'hidden',
-      }}
-    >
-      <div style={{
-        position: 'absolute', top: 0, left: 0, right: 0, height: 3,
-        background: `linear-gradient(90deg, ${t.brand}, ${t.brand}00)`,
-      }} />
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-        <div>
-          <div style={{ color: t.brandText, fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase' }}>
-            Daily actives - today
-          </div>
-        </div>
-        {triage && triage.total > 0 && (
-          <Link
-            to={triage.oldestQueueRoute}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 6,
-              background: t.ink, color: t.surface,
-              padding: '6px 12px', borderRadius: 999,
-              fontSize: 12, fontWeight: 700, textDecoration: 'none',
-            }}
-          >
-            {triage.total} to review
-            <ChevronRight size={14} />
-          </Link>
-        )}
-      </div>
-
-      {isError ? (
-        <AdminErrorState
-          title="Couldn't load activity"
-          message="A retry usually fixes it."
-          onRetry={onRetry}
-        />
-      ) : (
-        <>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: 8,
-            }}
-          >
-            <HeroStat
-              label="DAU"
-              value={loading ? null : (data?.dauToday ?? 0)}
-              delta={loading ? undefined : northStarDelta(data?.dauToday ?? 0, data?.dauYesterday ?? 0)}
-              subtitle="vs yesterday"
-            />
-            <HeroStat
-              label="WAU"
-              value={loading ? null : (data?.wau ?? 0)}
-              delta={loading ? undefined : northStarDelta(data?.wau ?? 0, data?.wauPrev ?? 0)}
-              subtitle="vs prev 7d"
-            />
-            <HeroStat
-              label="MAU"
-              value={loading ? null : (data?.mau ?? 0)}
-              subtitle="last 30 days"
-            />
-          </div>
-          <div
-            style={{
-              borderTop: `1px solid ${t.line}`,
-              paddingTop: 12,
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              color: t.inkMuted, fontSize: 12,
-            }}
-          >
-            <span>Total users</span>
-            <span style={{
-              color: t.ink, fontWeight: 700,
-              fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
-            }}>
-              {loading ? '-' : num(data?.totalUsers ?? 0)}
-            </span>
-          </div>
-        </>
-      )}
-    </section>
-  );
-}
-
-function HeroStat({
-  label, value, delta, subtitle,
-}: {
-  label: string;
-  value: number | null;
-  delta?: number;
-  subtitle?: string;
-}) {
-  const positive = (delta ?? 0) >= 0;
-  return (
-    <div
-      style={{
-        background: t.canvas,
-        border: `1px solid ${t.line}`,
-        borderRadius: t.radius.lg,
-        padding: '12px 10px',
-        display: 'flex', flexDirection: 'column', gap: 4,
-        minWidth: 0,
-      }}
-    >
-      <div style={{ color: t.inkFaint, fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>
-        {label}
-      </div>
-      <div style={{
-        color: t.ink, fontSize: 22, fontWeight: 700, lineHeight: 1.1,
-        fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
-      }}>
-        {value === null ? '-' : num(value)}
-      </div>
-      {typeof delta === 'number' ? (
-        <div
-          style={{
-            display: 'inline-flex', alignItems: 'center', gap: 2,
-            color: positive ? t.okText : t.dangerText,
-            fontSize: 11, fontWeight: 600,
-          }}
-        >
-          {positive ? <ArrowUpRight size={11} /> : <ArrowDownRight size={11} />}
-          {Math.abs(delta)}% <span style={{ color: t.inkFaint, fontWeight: 500 }}>· {subtitle}</span>
-        </div>
-      ) : subtitle ? (
-        <div style={{ color: t.inkFaint, fontSize: 11 }}>{subtitle}</div>
-      ) : null}
-    </div>
-  );
-}
-
-// ─── This week grid ───────────────────────────────────────────────────────────
-
-function ThisWeekGrid({
-  data, loading,
-}: {
-  data: ReturnType<typeof useNorthStar>['data'];
-  loading: boolean;
-}) {
-  return (
-    <section
-      style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr',
-        gap: 12,
-      }}
-      className="admin-v2-thisweek"
-    >
-      <MetricCard
-        title="Signups"
-        subtitle="Last 7 days"
-        value={loading ? null : (data?.signups7d ?? 0)}
-        delta={loading ? undefined : northStarDelta(data?.signups7d ?? 0, data?.signupsPrev7d ?? 0)}
-        deltaLabel="vs previous 7 days"
-      />
-      <RetentionCard
-        loading={loading}
-        d1={data?.d1Retention ?? null}
-        d7={data?.d7Retention ?? null}
-      />
-      <style>{`
-        @media (min-width: 640px) {
-          .admin-v2-thisweek { grid-template-columns: 1fr 1fr; }
-        }
-      `}</style>
-    </section>
-  );
-}
-
-function MetricCard({
-  title, subtitle, value, delta, deltaLabel,
-}: {
-  title: string;
-  subtitle?: string;
-  value: number | null;
-  delta?: number;
-  deltaLabel?: string;
-}) {
-  const positive = (delta ?? 0) >= 0;
-  return (
-    <div
-      style={{
-        background: t.surface,
-        border: `1px solid ${t.line}`,
-        borderRadius: 18,
-        boxShadow: t.shadowCard,
-        padding: 16,
-        display: 'flex', flexDirection: 'column', gap: 8,
-      }}
-    >
-      <div style={{ color: t.inkFaint, fontSize: 11, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>
-        {title}
-      </div>
-      <div style={{
-        color: t.ink, fontSize: 28, fontWeight: 700, lineHeight: 1.05,
-        fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
-      }}>
-        {value === null ? '-' : num(value)}
-      </div>
-      {typeof delta === 'number' && (
-        <div style={{
-          display: 'inline-flex', alignItems: 'center', gap: 4,
-          color: positive ? t.okText : t.dangerText,
-          fontSize: 12, fontWeight: 600,
-        }}>
-          {positive ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
-          {Math.abs(delta)}%
-          {deltaLabel && <span style={{ color: t.inkFaint, fontWeight: 500 }}>· {deltaLabel}</span>}
-        </div>
-      )}
-      {subtitle && !delta && (
-        <div style={{ color: t.inkMuted, fontSize: 12 }}>{subtitle}</div>
-      )}
-    </div>
-  );
-}
-
-function RetentionCard({ loading, d1, d7 }: { loading: boolean; d1: number | null; d7: number | null }) {
-  const sparse = !loading && d1 === null && d7 === null;
-  return (
-    <div
-      style={{
-        background: t.surface,
-        border: `1px solid ${t.line}`,
-        borderRadius: 18,
-        boxShadow: t.shadowCard,
-        padding: 16,
-        display: 'flex', flexDirection: 'column', gap: 12,
-      }}
-    >
-      <div style={{ color: t.inkFaint, fontSize: 11, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>
-        Retention
-      </div>
-      {sparse ? (
-        <div style={{ color: t.inkMuted, fontSize: 13 }}>Not enough data yet</div>
-      ) : (
-        <div style={{ display: 'flex', gap: 16 }}>
-          <RetentionBar label="D1" pct={d1} loading={loading} />
-          <RetentionBar label="D7" pct={d7} loading={loading} />
-        </div>
-      )}
-    </div>
-  );
-}
-
-function RetentionBar({ label, pct, loading }: { label: string; pct: number | null; loading: boolean }) {
-  const isNull = !loading && pct === null;
-  return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-        <span style={{ color: t.inkMuted, fontSize: 12, fontWeight: 600 }}>{label}</span>
-        <span style={{
-          color: t.ink, fontSize: 18, fontWeight: 700,
-          fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
-        }}>
-          {loading ? '-' : isNull ? '-' : `${pct}%`}
-        </span>
-      </div>
-      <div style={{
-        height: 6, background: t.canvas, borderRadius: 999, overflow: 'hidden',
-        border: `1px solid ${t.line}`,
-      }}>
-        <div style={{
-          width: `${Math.min(100, Math.max(0, pct ?? 0))}%`,
-          height: '100%',
-          background: t.brand,
-          borderRadius: 999,
-        }} />
-      </div>
-      {isNull && (
-        <span style={{ color: t.inkFaint, fontSize: 10 }}>Not enough data yet</span>
-      )}
-    </div>
-  );
-}
-
-// ─── Latest in the clubhouse ──────────────────────────────────────────────────
+// ─── Clubhouse feed ───────────────────────────────────────────────────────────
 
 function LatestInClubhouse({
   items, loading, isError, onRetry,
 }: {
   items: FeedItem[];
-  loading: boolean;
-  isError: boolean;
-  onRetry: () => void;
+  loading: boolean; isError: boolean; onRetry: () => void;
 }) {
   return (
     <section
       style={{
-        background: t.surface,
-        border: `1px solid ${t.line}`,
-        borderRadius: 18,
-        boxShadow: t.shadowCard,
-        padding: 16,
-        display: 'flex', flexDirection: 'column', gap: 12,
+        background: t.surface, border: `1px solid ${t.line}`,
+        borderRadius: 18, boxShadow: t.shadowCard,
+        padding: 16, display: 'flex', flexDirection: 'column', gap: 12,
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div>
-          <div style={{ color: t.ink, fontWeight: 700, fontSize: 15 }}>Latest in the clubhouse</div>
-          <div style={{ color: t.inkMuted, fontSize: 12, marginTop: 2 }}>New members, posts, and reviews</div>
-        </div>
+      <div>
+        <div style={{ color: t.ink, fontWeight: 700, fontSize: 15 }}>Latest in the clubhouse</div>
+        <div style={{ color: t.inkMuted, fontSize: 12, marginTop: 2 }}>New members, posts, and reviews</div>
       </div>
 
       {loading ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {[0, 1, 2].map(i => (
-            <div key={i} style={{
-              height: 52, background: t.canvas, borderRadius: t.radius.md,
-              animation: 'admin-pulse 1.4s ease-in-out infinite',
-            }} />
+            <div key={i} style={{ height: 52, background: t.canvas, borderRadius: t.radius.md, animation: 'admin-pulse 1.4s ease-in-out infinite' }} />
           ))}
         </div>
       ) : isError ? (
@@ -694,11 +521,13 @@ function LatestInClubhouse({
 function FeedRow({ item, first }: { item: FeedItem; first: boolean }) {
   const chip = feedChip(item.kind);
   return (
-    <div
+    <Link
+      to={item.href}
       style={{
         display: 'flex', alignItems: 'flex-start', gap: 10,
         padding: '10px 0',
         borderTop: first ? 'none' : `1px solid ${t.line}`,
+        textDecoration: 'none', color: 'inherit',
       }}
     >
       <span
@@ -712,20 +541,14 @@ function FeedRow({ item, first }: { item: FeedItem; first: boolean }) {
         {chip.icon}
       </span>
       {item.avatarUrl ? (
-        <SquircleAvatar
-          src={item.avatarUrl}
-          alt={item.title}
-          size={28}
-          hairlineRing
-          ringColor={LIGHT_HAIRLINE}
-        />
+        <SquircleAvatar src={item.avatarUrl} alt={item.title} size={28} hairlineRing ringColor={LIGHT_HAIRLINE} />
       ) : null}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
           <span style={{ color: t.ink, fontSize: 13, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {item.title}
           </span>
-          <span style={{ color: t.inkFaint, fontSize: 11 }}>· {relTime(item.created_at)}</span>
+          <span style={{ color: t.inkFaint, fontSize: 11 }}>- {relTime(item.created_at)}</span>
         </div>
         {item.subtitle && (
           <div
@@ -738,41 +561,29 @@ function FeedRow({ item, first }: { item: FeedItem; first: boolean }) {
           </div>
         )}
       </div>
-    </div>
+      <ChevronRight size={14} color={t.inkFaint} style={{ marginTop: 12, flexShrink: 0 }} />
+    </Link>
   );
 }
 
 function feedChip(kind: FeedKind): { icon: React.ReactNode; bg: string; fg: string } {
   switch (kind) {
-    case 'member':
-      return { icon: <UserPlus size={14} />, bg: '#DBEAFE', fg: '#1D4ED8' };
-    case 'review':
-      return { icon: <Star size={14} />, bg: t.brandSoft, fg: t.brandText };
+    case 'member': return { icon: <UserPlus size={14} />, bg: '#DBEAFE', fg: '#1D4ED8' };
+    case 'review': return { icon: <Star size={14} />, bg: t.brandSoft, fg: t.brandText };
     case 'post':
-    default:
-      return { icon: <MessageSquare size={14} />, bg: t.canvas, fg: t.ink };
+    default:       return { icon: <MessageSquare size={14} />, bg: t.canvas, fg: t.ink };
   }
 }
 
-// ─── Health chips ─────────────────────────────────────────────────────────────
-
-
-
+// ─── Health chip strip ────────────────────────────────────────────────────────
 
 function HealthChipStrip({
   egChip, cronChip, echoChip, pushChip,
 }: {
-  egChip: ChipState;
-  cronChip: ChipState;
-  echoChip: ChipState;
-  pushChip: ChipState;
+  egChip: ChipState; cronChip: ChipState; echoChip: ChipState; pushChip: ChipState;
 }) {
   return (
-    <section
-      style={{
-        display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8,
-      }}
-    >
+    <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
       <HealthChip to="/admin-v2/health?tab=status" icon={<RefreshCcw size={14} />} state={egChip} />
       <HealthChip to="/admin-v2/health?tab=status" icon={<Activity size={14} />} state={cronChip} />
       <HealthChip to="/admin-v2/health?tab=status" icon={<Cpu size={14} />} state={echoChip} />
@@ -781,13 +592,7 @@ function HealthChipStrip({
   );
 }
 
-function HealthChip({
-  to, icon, state,
-}: {
-  to: string;
-  icon: React.ReactNode;
-  state: ChipState;
-}) {
+function HealthChip({ to, icon, state }: { to: string; icon: React.ReactNode; state: ChipState }) {
   return (
     <Link
       to={to}
@@ -796,14 +601,10 @@ function HealthChip({
         background: t.surface, border: `1px solid ${t.line}`,
         borderRadius: t.radius.lg, boxShadow: t.shadowCard,
         padding: '10px 12px',
-        textDecoration: 'none', color: t.ink,
-        minWidth: 0,
+        textDecoration: 'none', color: t.ink, minWidth: 0,
       }}
     >
-      <span
-        aria-hidden
-        style={{ width: 8, height: 8, borderRadius: 999, background: toneColor(state.tone), flexShrink: 0 }}
-      />
+      <span aria-hidden style={{ width: 8, height: 8, borderRadius: 999, background: toneColor(state.tone), flexShrink: 0 }} />
       <span style={{ display: 'inline-flex', color: t.inkMuted }}>{icon}</span>
       <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
         <span style={{ fontSize: 13, fontWeight: 700, color: t.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{state.label}</span>
