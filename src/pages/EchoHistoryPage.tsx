@@ -9,7 +9,7 @@ import { useEchoChats, type EchoChatRow } from '@/features/echo-v2/hooks/useEcho
 import { AnimatedEchoWave } from '@/features/echo-v2/components/AnimatedEchoWave';
 import { formatRelativeRounded } from '@/i18n/format';
 import { toast } from '@/lib/toast';
-import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock;
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 
 const CANVAS = '#F8FAFC';
 const INK = '#1F2428';
