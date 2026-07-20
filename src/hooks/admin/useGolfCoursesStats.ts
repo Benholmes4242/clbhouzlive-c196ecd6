@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { TOP100_PREDICATE, MISSING_COORDS_PREDICATE } from '@/features/admin/hooks/useCourses';
 
 interface GolfCoursesStats {
   totalCourses: number;
