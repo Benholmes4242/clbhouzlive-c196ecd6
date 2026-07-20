@@ -119,6 +119,7 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId, viewMode = 'ow
   );
 
 
+
   const courseNames = useMemo(() => {
     const counts = new Map<string, number>();
     for (const r of rounds) {
