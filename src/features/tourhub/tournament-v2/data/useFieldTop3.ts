@@ -31,14 +31,16 @@ export function useFieldTop3(tournamentId: string | null | undefined) {
         .select('tee_time, round_number, players:sr_tee_time_players(player_id)')
         .eq('tournament_id', tournamentId);
 
-      if (error) {
-        console.error('[tournament-v2] useFieldTop3 tee_times', error);
-        return null;
-      }
+      if (error) throw error;
 
+      type TeeTimeRow = {
+        tee_time: string | null;
+        round_number: number | null;
+        players: Array<{ player_id: string | null }> | null;
+      };
       const playerIds = new Set<string>();
       let firstTee: string | null = null;
-      for (const r of (rows ?? []) as any[]) {
+      for (const r of (rows ?? []) as TeeTimeRow[]) {
         for (const p of (r.players ?? [])) {
           if (p?.player_id) playerIds.add(p.player_id);
         }
@@ -61,12 +63,13 @@ export function useFieldTop3(tournamentId: string | null | undefined) {
         .order('rank', { ascending: true })
         .limit(3);
 
-      if (rErr) {
-        console.error('[tournament-v2] useFieldTop3 rankings', rErr);
-        return { fieldCount: playerIds.size, topPlayers: [], firstTeeTime: firstTee };
-      }
+      if (rErr) throw rErr;
 
-      const topPlayers = ((rankings ?? []) as any[])
+      type RankingRow = {
+        rank: number;
+        player: { id: string; full_name: string | null; first_name: string | null; last_name: string | null } | null;
+      };
+      const topPlayers = ((rankings ?? []) as RankingRow[])
         .map((r) => {
           const p = r.player;
           if (!p) return null;
@@ -74,6 +77,7 @@ export function useFieldTop3(tournamentId: string | null | undefined) {
           return { id: p.id, name, rank: r.rank };
         })
         .filter(Boolean) as FieldTop3['topPlayers'];
+
 
       return { fieldCount: playerIds.size, topPlayers, firstTeeTime: firstTee };
     },
