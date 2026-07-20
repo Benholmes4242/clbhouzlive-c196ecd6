@@ -271,7 +271,7 @@ export function CourseSearchSheet({
                   <div className="p-8 text-center">
                     <p className="text-sm mb-3" style={{ color: '#7A7A7A' }}>{t('searchSheet.trouble')}</p>
                     <button
-                      onClick={() => window.location.reload()}
+                      onClick={() => refetch()}
                       className="text-sm font-medium hover:underline"
                       style={{ color: '#f59e0b' }}
                     >

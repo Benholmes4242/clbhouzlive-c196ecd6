@@ -541,9 +541,9 @@ export default function VerificationFlowSheet({
             />
           ) : isLoadingBusiness ? (
             <div className="space-y-3">
-              <div className="h-14 animate-pulse rounded-2xl" style={{ background: BIZ.fillStrong }} />
-              <div className="h-32 animate-pulse rounded-2xl" style={{ background: BIZ.fillStrong }} />
-              <div className="h-24 animate-pulse rounded-2xl" style={{ background: BIZ.fillStrong }} />
+              <Skeleton className="h-14 rounded-2xl" />
+              <Skeleton className="h-32 rounded-2xl" />
+              <Skeleton className="h-24 rounded-2xl" />
             </div>
           ) : (
             <div className="space-y-4">

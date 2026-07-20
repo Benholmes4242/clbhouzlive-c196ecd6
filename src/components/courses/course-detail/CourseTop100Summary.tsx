@@ -5,6 +5,7 @@ import type { Top100ListProgress } from '@/hooks/useTop100ProgressForUser';
 import { cn } from '@/lib/utils';
 import { getTop100Club } from '@/lib/top100Club';
 import { getTop100RingBorderClass } from '@/lib/top100RingStyles';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface CourseTop100SummaryProps {
   userId?: string;
@@ -18,15 +19,15 @@ export function CourseTop100Summary({ userId }: CourseTop100SummaryProps) {
   if (isLoading) {
     return (
       <section className="px-4 pt-4 pb-5 bg-muted/30 text-center">
-        <div className="animate-pulse space-y-3">
-          <div className="h-6 w-48 mx-auto rounded bg-surface-alt" />
-          <div className="h-4 w-64 mx-auto rounded bg-surface-alt" />
+        <div className="space-y-3">
+          <Skeleton className="h-6 w-48 mx-auto rounded" />
+          <Skeleton className="h-4 w-64 mx-auto rounded" />
           <div className="flex justify-center gap-2">
-            <div className="h-8 w-24 rounded-full bg-surface-alt" />
-            <div className="h-8 w-24 rounded-full bg-surface-alt" />
+            <Skeleton className="h-8 w-24 rounded-full" />
+            <Skeleton className="h-8 w-24 rounded-full" />
           </div>
-          <div className="h-20 rounded-xl bg-surface-alt" />
-          <div className="h-20 rounded-xl bg-surface-alt" />
+          <Skeleton className="h-20 rounded-xl" />
+          <Skeleton className="h-20 rounded-xl" />
         </div>
       </section>
     );

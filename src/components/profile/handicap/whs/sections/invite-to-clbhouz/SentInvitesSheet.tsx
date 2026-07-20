@@ -159,13 +159,12 @@ export const SentInvitesSheet: React.FC<Props> = ({ open, onClose }) => {
           >
             {isLoading ? (
               Array.from({ length: 3 }).map((_, i) => (
-                <div
+                <Skeleton
                   key={i}
-                  className="animate-pulse"
+                  variant="dark"
                   style={{
                     height: 56,
                     margin: '0 16px 8px',
-                    background: '#20242E',
                     borderRadius: 8,
                   }}
                 />

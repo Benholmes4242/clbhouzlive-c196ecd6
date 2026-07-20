@@ -41,6 +41,7 @@ export const LoopCardMenu = React.memo(function LoopCardMenu({
   onDelete,
 }: LoopCardMenuProps) {
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const { blockUser, loading: blockLoading } = useBlockActions({ currentUserId: userId ?? '' });
 
   const handleCopyLink = async () => {
@@ -81,7 +82,12 @@ export const LoopCardMenu = React.memo(function LoopCardMenu({
 
   const handleDelete = () => {
     if (!onDelete) return;
-    if (window.confirm('Delete this post?')) onDelete();
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    setDeleteConfirmOpen(false);
+    onDelete?.();
   };
 
   const handleBlockConfirm = async () => {
@@ -175,6 +181,26 @@ export const LoopCardMenu = React.memo(function LoopCardMenu({
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {blockLoading ? 'Blocking…' : 'Block'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this post?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This can't be undone. The post will be removed from your profile and feeds.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

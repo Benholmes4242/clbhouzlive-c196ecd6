@@ -107,9 +107,9 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
       <div className="mb-8">
         <div className="flex justify-evenly items-center gap-4 overflow-x-auto pb-2">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="flex items-center gap-2 animate-pulse">
-              <div className="w-6 h-4 bg-gray-200 rounded"></div>
-              <div className="h-4 bg-gray-200 rounded w-16"></div>
+            <div key={i} className="flex items-center gap-2">
+              <Skeleton className="w-6 h-4 rounded" />
+              <Skeleton className="h-4 w-16 rounded" />
             </div>
           ))}
         </div>

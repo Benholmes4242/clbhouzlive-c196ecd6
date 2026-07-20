@@ -103,16 +103,15 @@ export function AllTeeTimesSheet({
               {[0, 1, 2, 3, 4].map((i) => (
                 <div
                   key={i}
-                  className="animate-pulse"
                   style={{
                     display: 'flex', alignItems: 'center', gap: 10,
                     padding: '10px 0',
                     borderBottom: `0.5px solid ${HAIRLINE_INK_8}`,
                   }}
                 >
-                  <div style={{ width: 40, height: 12, background: 'rgba(15,23,42,0.06)', borderRadius: 4 }} />
-                  <div style={{ flex: 1, height: 12, background: 'rgba(15,23,42,0.06)', borderRadius: 4 }} />
-                  <div style={{ width: 36, height: 12, background: 'rgba(15,23,42,0.06)', borderRadius: 4 }} />
+                  <Skeleton style={{ width: 40, height: 12, borderRadius: 4 }} />
+                  <Skeleton style={{ flex: 1, height: 12, borderRadius: 4 }} />
+                  <Skeleton style={{ width: 36, height: 12, borderRadius: 4 }} />
                 </div>
               ))}
             </div>

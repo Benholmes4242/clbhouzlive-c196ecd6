@@ -485,12 +485,10 @@ function buildFooter(
 const SkeletonBody: React.FC = () => (
   <div style={{ padding: '0 20px 20px' }}>
     {[80, 100, 60].map((h, i) => (
-      <div
+      <Skeleton
         key={i}
-        className="animate-pulse"
         style={{
           height: h,
-          background: BG_1,
           borderRadius: 12,
           marginBottom: 10,
         }}
