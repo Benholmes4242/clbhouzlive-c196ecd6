@@ -419,7 +419,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
               <div style={{ pointerEvents: 'auto', flexShrink: 0 }}>
                 <FeedFollowPill
                   isFollowed={isFollowed}
-                  onFollow={() => onFollow(activePost)}
+                  onFollow={() => onFollow(activePost, isFollowed)}
                 />
               </div>
             )}
