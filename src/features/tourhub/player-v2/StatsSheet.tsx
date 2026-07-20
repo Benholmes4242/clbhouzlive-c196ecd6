@@ -286,7 +286,7 @@ export function StatsSheet({ open, onClose, playerStats, playerName }: StatsShee
               <p
                 style={{
                   margin: '0 0 6px',
-                  fontSize: 8.5,
+                  fontSize: 10,
                   fontWeight: 800,
                   color: AMBER,
                   letterSpacing: '0.14em',
