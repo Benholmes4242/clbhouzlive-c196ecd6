@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CheckCheck, Loader2 } from 'lucide-react';
+import { CheckCheck } from 'lucide-react';
 import { toast } from '@/lib/toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { startOfDay, startOfWeek, subDays } from 'date-fns';
@@ -21,6 +21,7 @@ import { FeaturedMomentCard, pickFeaturedRow } from './components/FeaturedMoment
 import { FriendRequestsRail } from './components/FriendRequestsRail';
 import { LedgerRow } from './components/LedgerRow';
 import { ActivityActionsSheet } from './components/ActivityActionsSheet';
+import { ActivityRowsSkeleton } from '@/components/skeletons/ActivityPageSkeleton';
 
 const GEIST =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -369,11 +370,7 @@ export const ActivityPageV2: React.FC = () => {
         {featured && <FeaturedMomentCard row={featured} />}
         <FriendRequestsRail />
 
-        {feed.isLoading && (
-          <div style={{ padding: 24, color: INK_60, fontSize: 13, textAlign: 'center' }}>
-            Loading…
-          </div>
-        )}
+        {feed.isLoading && <ActivityRowsSkeleton buckets={2} />}
 
         {isErrored && (
           <div
@@ -430,8 +427,8 @@ export const ActivityPageV2: React.FC = () => {
             {renderBucket(BUCKET_LABELS.earlier, buckets.earlier)}
             <div ref={sentinelRef} style={{ height: 1 }} />
             {feed.isFetchingNextPage && (
-              <div style={{ padding: 20, display: 'flex', justifyContent: 'center' }}>
-                <Loader2 size={18} color={AMBER} className="animate-spin" />
+              <div style={{ padding: '8px 0' }}>
+                <ActivityRowsSkeleton buckets={1} />
               </div>
             )}
           </div>
