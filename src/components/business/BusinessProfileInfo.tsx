@@ -77,7 +77,7 @@ function ContactRow({
   onClick?: () => void;
   isLink?: boolean;
 }) {
-  const Wrapper: any = onClick ? 'button' : 'div';
+  const Wrapper: React.ElementType = onClick ? 'button' : 'div';
   return (
     <Wrapper
       {...(onClick ? { type: 'button', onClick } : {})}
