@@ -481,11 +481,18 @@ function SettingsTab() {
   const { role } = usePanelRole();
   const [pillsVisible, setPillsVisible] = useAdminPillVisibility();
   const [perfEnabled, setPerfEnabled] = useState(() => isPerfEnabled());
+  const [audioEnabled, setAudioEnabled] = useState(() => audioDebugEnabled());
 
   useEffect(() => {
     const unsub = subscribePerfLive(() => setPerfEnabled(isPerfEnabled()));
     return unsub;
   }, []);
+
+  useEffect(() => {
+    const unsub = subscribeAudioDebugEnabled(() => setAudioEnabled(audioDebugEnabled()));
+    return unsub;
+  }, []);
+
 
   const signOut = async () => {
     try {
