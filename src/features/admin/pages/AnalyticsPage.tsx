@@ -65,8 +65,9 @@ export default function AnalyticsPage() {
   const viewParam = params.get('view');
   const tab: TabId = isTab(tabParam)
     ? tabParam
-    : legacyViewToTab(viewParam) ?? 'growth';
+    : legacyViewToTab(viewParam) ?? 'live';
   const period: AnalyticsPeriod = isPeriod(params.get('period')) ? (params.get('period') as AnalyticsPeriod) : '30d';
+  const showPeriodSelector = tab !== 'live';
 
   const setTab = (v: TabId) => {
     const next = new URLSearchParams(params);
