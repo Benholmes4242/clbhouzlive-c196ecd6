@@ -11,6 +11,7 @@ import UserCoursesContent from './UserCoursesContent';
 import Top100CoursesHubPanel from './Top100CoursesHubPanel';
 
 import ExploreTabContent from '@/components/explore-tab-new/ExploreTabContent';
+import { WireTicker } from '@/components/explore-tab-new/WireTicker';
 import RateNudge from './RateNudge';
 
 
