@@ -271,7 +271,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
   const attachViewTracker = usePostViewTracker(post.id, true);
   return (
     <article
-      ref={attachViewTracker as any}
+      ref={attachViewTracker as React.RefCallback<HTMLElement>}
       style={{
         background: CARD,
         overflow: 'hidden',
