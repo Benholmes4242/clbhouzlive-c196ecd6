@@ -165,14 +165,14 @@ export function useVideoLane(
     if (!laneId) return;
     const callerPostId = opts.ownerKey ?? opts.postId ?? null;
     if (opts.active) {
-      void VideoEngine.play(laneId, { callerPostId, claimsAudio: opts.claimsAudio === true });
+      void VideoEngine.play(laneId, { callerPostId });
     }
     return () => {
       if (opts.active) {
         VideoEngine.pause(laneId, { callerPostId });
       }
     };
-  }, [laneId, opts.active, opts.ownerKey, opts.postId, opts.claimsAudio]);
+  }, [laneId, opts.active, opts.ownerKey, opts.postId]);
 
   // Resume-on-creation-overlay-close. Re-issue play-intent on the currently
   // bound lane when the overlay closes.
