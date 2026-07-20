@@ -33,6 +33,42 @@ interface HeroWireTickerProps {
     worldRanking?: number | null;
     country?: string | null;
   }>;
+  /**
+   * Upcoming-state fallback facts used when `upcomingContenders` is empty.
+   * Every field is optional; the empty-state list is built from whatever is
+   * present, in the exact order documented in the addendum.
+   */
+  emptyStateFacts?: {
+    datesString?: string | null;
+    venueName?: string | null;
+    defenderName?: string | null;
+    defenderYear?: string | number | null;
+    defenderScore?: string | null;
+    defenderSurname?: string | null;
+    purse?: string | null;
+  };
+}
+
+/** Amber-toned chip used for the "FIELD SOON" empty state. */
+function EmptyLeadingChip({ label }: { label: string }) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        padding: '0 12px',
+        background: 'rgba(247,147,30,0.16)',
+        color: '#F7931E',
+        fontFamily: FONT,
+        fontSize: 10,
+        fontWeight: 800,
+        letterSpacing: '0.14em',
+        flexShrink: 0,
+      }}
+    >
+      {label}
+    </div>
+  );
 }
 
 function LeadingChip({
