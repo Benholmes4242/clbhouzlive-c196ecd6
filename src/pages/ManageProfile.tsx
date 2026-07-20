@@ -232,7 +232,7 @@ export default function ManageProfile() {
   const renderProfile = isNewUser.current || activeTab === 'profile';
 
   return (
-    <PageRoot hasBottomNav={!isNewUser.current} className="md:!max-w-[440px]" style={{ background: SLATE_BG } as any}>
+    <PageRoot hasBottomNav={!isNewUser.current} className="md:!max-w-[440px]" style={{ background: SLATE_BG } as React.CSSProperties}>
       <div className="min-h-screen flex flex-col w-full" style={{ background: SLATE_BG }}>
 
         {/* Sticky Header (Direction A) + Tab bar */}
