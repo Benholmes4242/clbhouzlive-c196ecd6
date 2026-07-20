@@ -170,6 +170,8 @@ function useUserProfileMini(userId: string | undefined) {
         .maybeSingle();
       if (error) {
         console.error('[useUserProfileMini] query error', error);
+        // Deliberate swallow: viewer-identity chrome only; an error
+        // degrades to initials/fallback avatar, never wrong data.
         return null;
       }
       return data as {
