@@ -171,8 +171,10 @@ function CitySearch({ value, onChange, country }: { value: string; onChange: (v:
         const res = await fetch(
           `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(q)}.json?${params}`
         );
-        const data = await res.json();
-        const cities: string[] = (data.features ?? []).map((f: any) => f.text as string);
+        const data: { features?: Array<{ text?: string }> } = await res.json();
+        const cities: string[] = (data.features ?? [])
+          .map((f) => f.text ?? '')
+          .filter((t): t is string => t.length > 0);
         setResults(cities);
         setOpen(cities.length > 0);
       } catch {
