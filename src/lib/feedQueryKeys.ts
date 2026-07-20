@@ -85,6 +85,18 @@ export const FEED_QUERY_KEYS: readonly (readonly unknown[])[] = [
   ['followedUsersPosts'],
   ['infinite-followed-posts'],
   ['pinned-posts'],
+
+  // Additional live feed keys (patchers no-op on non-engagement rows;
+  // over-registering is safe, under-registering is the bug).
+  ['clubhouse-explore-shorts'],
+  ['community-feed-base'],
+  ['user-course-moments'],
+  ['club-media'],
+  ['club-media-paginated'],
+  ['college-media'],
+  ['college-media-search'],
+  ['longform-videos-base'],
+  ['discover-rail-cache'],
 ] as const;
 
 /** Posts scoped to a specific profile (personal or business). */
