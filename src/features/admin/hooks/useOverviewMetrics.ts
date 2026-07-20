@@ -10,27 +10,45 @@ function dayKey(d: Date) { return d.toISOString().slice(0, 10); }
 type EventRow = { user_id: string | null; created_at: string };
 
 // ─── RIGHT NOW: live count (distinct users in last 5 min) ─────────────────────
+// Shared source for the Dashboard Right-Now strip AND the Analytics Live tab.
+// Same queryKey → react-query dedups; polling runs once regardless of how many
+// components mount it. Polling is visibility-gated (paused when tab is hidden).
 
-async function fetchLiveCount(): Promise<number> {
+export interface LiveUserRow { user_id: string; latestAt: string; }
+export interface LiveInApp { count: number; users: LiveUserRow[]; }
+
+const gatedInterval = (ms: number) => () =>
+  typeof document !== 'undefined' && document.visibilityState === 'hidden'
+    ? false
+    : ms;
+
+async function fetchLive(): Promise<LiveInApp> {
   const since = new Date(Date.now() - 5 * 60_000).toISOString();
   const { data, error } = await supabase
     .from('analytics_events')
-    .select('user_id')
+    .select('user_id, created_at')
     .gte('created_at', since)
     .not('user_id', 'is', null)
     .limit(2000);
   if (error) throw error;
-  const set = new Set<string>();
-  for (const r of (data as { user_id: string }[]) ?? []) if (r.user_id) set.add(r.user_id);
-  return set.size;
+  const latest = new Map<string, string>();
+  for (const r of (data as { user_id: string; created_at: string }[]) ?? []) {
+    if (!r.user_id) continue;
+    const prev = latest.get(r.user_id);
+    if (!prev || r.created_at > prev) latest.set(r.user_id, r.created_at);
+  }
+  const users: LiveUserRow[] = Array.from(latest, ([user_id, latestAt]) => ({ user_id, latestAt }))
+    .sort((a, b) => (a.latestAt < b.latestAt ? 1 : -1));
+  return { count: users.length, users };
 }
 
 export function useLiveInApp() {
   return useQuery({
     queryKey: ['admin-v2', 'overview', 'live-in-app'],
-    queryFn: fetchLiveCount,
-    refetchInterval: 30_000,
-    staleTime: 15_000,
+    queryFn: fetchLive,
+    refetchInterval: gatedInterval(15_000),
+    refetchIntervalInBackground: false,
+    staleTime: 10_000,
   });
 }
 
