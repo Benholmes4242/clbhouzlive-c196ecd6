@@ -40,16 +40,8 @@ export interface UseVideoLaneOptions {
    * release) may pass a null caller.
    */
   ownerKey?: string | null;
-  /**
-   * v8 activation-claim override. When true and opts.active is also true,
-   * the play() call is allowed to claim the ONE_UNMUTED_LANE slot even if
-   * the feedLaneRoles map hasn't yet flipped this lane to 'active'. Set
-   * ONLY by feed cards that ARE the promoted card (isActive). Preload /
-   * early-motion callers leave this false so v7's steal protection stays
-   * intact.
-   */
-  claimsAudio?: boolean;
 }
+
 
 export interface UseVideoLaneResult {
   hostRef: React.RefObject<HTMLDivElement>;
