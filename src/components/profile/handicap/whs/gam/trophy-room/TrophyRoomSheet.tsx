@@ -323,9 +323,13 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
   // not the viewer's, so friend cards reflect the owner's live status.
   const { data: ownerProfile } = useUserProfile(open ? userId : undefined);
   const { data: ownerConnection } = useWhsConnection(open ? userId : undefined);
+  const ownerProfileTyped = ownerProfile as
+    | { eg_handicap_index?: number | null; manual_handicap_index?: number | null }
+    | null
+    | undefined;
   const currentIndex: number | null = resolveDisplayHandicap({
-    egHandicapIndex: (ownerProfile as any)?.eg_handicap_index ?? null,
-    manualHandicapIndex: (ownerProfile as any)?.manual_handicap_index ?? null,
+    egHandicapIndex: ownerProfileTyped?.eg_handicap_index ?? null,
+    manualHandicapIndex: ownerProfileTyped?.manual_handicap_index ?? null,
     hasWhsConnection: !!ownerConnection,
   }).value;
 
