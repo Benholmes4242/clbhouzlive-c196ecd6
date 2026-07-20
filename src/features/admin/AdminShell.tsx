@@ -14,11 +14,8 @@ const DashboardPage = lazy(() => import('./pages/DashboardPage'));
 const UsersPage = lazy(() => import('./pages/UsersPage'));
 const ContentPage = lazy(() => import('./pages/ContentPage'));
 const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage'));
-const SystemPage = lazy(() => import('./pages/SystemPage'));
+const HealthPage = lazy(() => import('./pages/HealthPage'));
 const InboxPage = lazy(() => import('./pages/InboxPage'));
-const VideoPerfPage = lazy(() => import('./pages/VideoPerfPage'));
-const EchoHealthPage = lazy(() => import('./pages/EchoHealthPage'));
-const PushHealthPage = lazy(() => import('./pages/PushHealthPage'));
 
 const SECTION_TITLES: Record<string, string> = {
   dashboard:  'Dashboard',
@@ -26,11 +23,9 @@ const SECTION_TITLES: Record<string, string> = {
   users:      'Users',
   content:    'Content',
   analytics:  'Analytics',
-  system:     'System',
-  'video-perf': 'Video Perf',
-  'echo-health': 'Echo Health',
-  'push-health': 'Push Health',
+  health:     'Health',
 };
+
 
 // Preserve ALL query params across redirects; optionally set/override ?type=
 function RedirectPreserving({ to, forceType }: { to: string; forceType?: string }) {
