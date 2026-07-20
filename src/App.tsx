@@ -692,7 +692,7 @@ const AchievementToastWrapper: React.FC = () => {
   return (
     <>
       <AchievementToastContainer onShare={prepareAchievementShare} />
-      <LevelUpToastContainer onShare={prepareAchievementShare} />
+      
     </>
   );
 };
