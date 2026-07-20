@@ -78,12 +78,11 @@ export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
       {isLoading ? (
         <div style={{ padding: '0 16px' }}>
           {Array.from({ length: 3 }).map((_, i) => (
-            <div
+            <Skeleton
               key={i}
-              className="animate-pulse"
+              variant="dark"
               style={{
                 height: 280,
-                background: 'var(--hcp-bg-2)',
                 borderRadius: 16,
                 marginBottom: 12,
               }}
