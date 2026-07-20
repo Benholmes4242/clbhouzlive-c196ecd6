@@ -264,8 +264,13 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
               {t('search.prompt')}
             </div>
           ) : isLoading ? (
-            <div style={{ padding: '32px 16px', color: SUB, fontSize: 14, textAlign: 'center' }}>
-              {t('search.searching')}
+            <div style={{ padding: '8px 16px' }}>
+              {[0, 1, 2].map((i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0' }}>
+                  <Skeleton style={{ width: 44, height: 44, borderRadius: 16 }} />
+                  <Skeleton style={{ flex: 1, height: 12, borderRadius: 4 }} />
+                </div>
+              ))}
             </div>
           ) : candidates.length === 0 ? (
             <div style={{ padding: '32px 16px', color: SUB, fontSize: 14, textAlign: 'center' }}>
