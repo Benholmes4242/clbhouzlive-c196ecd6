@@ -337,13 +337,20 @@ export function useRetentionAnalytics() {
 
 export interface FunnelStep { label: string; count: number; pct: number; dropPct: number; }
 export interface GeoRow { country: string; userCount: number; newThisPeriod: number; pctOfTotal: number; }
-export interface GrowthData { funnel: FunnelStep[]; geo: GeoRow[]; }
+export interface GrowthData {
+  funnel: FunnelStep[];
+  geo: GeoRow[];
+  signupsThisPeriod: number;
+  signupsPriorPeriod: number;
+}
 
 async function fetchGrowth(period: AnalyticsPeriod): Promise<GrowthData> {
+  const days = periodToDays(period);
   const since = startOf(period).toISOString();
+  const priorSince = new Date(Date.now() - days * 2 * 86400_000).toISOString();
 
   // Funnel — only stages with confirmed real events
-  const [signupAttempts, signupSuccess, onboardingStarted, onboardingComplete, addedPhoto, allRes, newRes] = await Promise.all([
+  const [signupAttempts, signupSuccess, onboardingStarted, onboardingComplete, addedPhoto, allRes, newRes, priorSignupsRes, thisSignupsRes] = await Promise.all([
     supabase.from('analytics_events').select('id', { count: 'exact', head: true })
       .in('name', ['signup_success', 'signup_failed']).gte('created_at', since),
     supabase.from('analytics_events').select('id', { count: 'exact', head: true })
@@ -356,6 +363,10 @@ async function fetchGrowth(period: AnalyticsPeriod): Promise<GrowthData> {
       .gte('created_at', since).is('deleted_at', null).not('profile_photo_url', 'is', null),
     supabase.from('user_profiles').select('country').is('deleted_at', null).not('country', 'is', null),
     supabase.from('user_profiles').select('country').is('deleted_at', null).not('country', 'is', null).gte('created_at', since),
+    supabase.from('user_profiles').select('id', { count: 'exact', head: true })
+      .is('deleted_at', null).gte('created_at', priorSince).lt('created_at', since),
+    supabase.from('user_profiles').select('id', { count: 'exact', head: true })
+      .is('deleted_at', null).gte('created_at', since),
   ]);
 
   const rawCounts = [
@@ -393,7 +404,12 @@ async function fetchGrowth(period: AnalyticsPeriod): Promise<GrowthData> {
       pctOfTotal: Math.round((userCount / total) * 100 * 10) / 10,
     }));
 
-  return { funnel, geo };
+  return {
+    funnel,
+    geo,
+    signupsThisPeriod: thisSignupsRes.count ?? 0,
+    signupsPriorPeriod: priorSignupsRes.count ?? 0,
+  };
 }
 
 export function useGrowthAnalytics(period: AnalyticsPeriod) {
