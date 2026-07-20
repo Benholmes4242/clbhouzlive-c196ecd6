@@ -1292,28 +1292,30 @@ class VideoEngineImpl {
         }
       }
     } else {
-      let activeLaneId: LaneId | null = null;
-      try { activeLaneId = feedLaneRoles.laneForRole('active'); } catch { /* noop */ }
-      if (!activeLaneId) {
+      // v10: audio-focus registry replaces the role-map read. Feed and rail
+      // surfaces register their active lane on settle; the reconciler picks
+      // that lane (subject to per-lane eligibility) as the speaker.
+      const focusLaneId = this.audioFocus.laneId;
+      if (!focusLaneId) {
         branch = 'none';
-        whyNone = 'no-active-role-assigned';
+        whyNone = 'no-audio-focus';
       } else {
-        const l = this.lanes.get(activeLaneId);
+        const l = this.lanes.get(focusLaneId);
         if (!l) {
           branch = 'none';
-          whyNone = 'role-lane-unmounted';
+          whyNone = 'focus-lane-unmounted';
         } else if (!l.el) {
           branch = 'none';
-          whyNone = 'role-lane-no-el';
+          whyNone = 'focus-lane-no-el';
         } else if (l.audioPolicy === 'always-muted') {
           branch = 'none';
-          whyNone = 'role-lane-always-muted';
+          whyNone = 'focus-lane-always-muted';
         } else if (!l.wantPlay) {
           branch = 'none';
-          whyNone = 'role-lane-not-want-play';
+          whyNone = 'focus-lane-not-want-play';
         } else {
-          speaker = activeLaneId;
-          branch = 'active-role';
+          speaker = focusLaneId;
+          branch = 'focus';
         }
       }
     }
