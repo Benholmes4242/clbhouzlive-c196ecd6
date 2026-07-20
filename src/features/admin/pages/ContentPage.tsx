@@ -645,7 +645,13 @@ function CourseDetail({
 
           <Section title="Identity">
             <Field label="Name"><TextInput value={form.name} onChange={v => set('name', v)} /></Field>
-            <Field label="Country"><TextInput value={form.country} onChange={v => set('country', v)} /></Field>
+            <ContinentCountrySelectors
+              continent={form.continent ?? ''}
+              country={form.country ?? ''}
+              onContinentChange={v => set('continent', v)}
+              onCountryChange={v => set('country', v)}
+              required
+            />
             <Field label="Country code"><TextInput value={form.country_code} onChange={v => set('country_code', v)} placeholder="e.g. US" /></Field>
           </Section>
 
