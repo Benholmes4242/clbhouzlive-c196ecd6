@@ -88,7 +88,7 @@ export function PickerSheet({ open, onClose, target, standings, otherSlug }: Pro
       <div style={{ padding: '8px 16px 12px', borderBottom: `0.5px solid ${HAIRLINE_INK_10}`, background: SLATE_50 }}>
         <div
           style={{
-            fontSize: 8.5,
+            fontSize: 10,
             fontWeight: 800,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
