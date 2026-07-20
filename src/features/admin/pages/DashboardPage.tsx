@@ -62,7 +62,7 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
       .limit(8),
     supabase
       .from('course_ratings')
-      .select('id, created_at, user_id, course_id, comment')
+      .select('id, created_at, user_id, course_id, review')
       .order('created_at', { ascending: false })
       .limit(8),
   ]);
@@ -121,7 +121,7 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
       kind: 'review',
       created_at: r.created_at,
       title: `Review: ${course?.name ?? 'a course'}`,
-      subtitle: (r.comment ?? '').trim() || null,
+      subtitle: (r.review ?? '').trim() || null,
       avatarUrl: prof?.profile_photo_url ?? null,
     });
   }
