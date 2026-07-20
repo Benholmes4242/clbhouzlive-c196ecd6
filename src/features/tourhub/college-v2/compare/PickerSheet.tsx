@@ -191,7 +191,7 @@ export function PickerSheet({ open, onClose, target, standings, otherSlug }: Pro
                     {s.logoUrl ? (
                       <img src={s.logoUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                     ) : (
-                      <span style={{ fontSize: 9, fontWeight: 800, color: isTop ? GOLD_DEEP : INK }}>
+                      <span style={{ fontSize: 10, fontWeight: 800, color: isTop ? GOLD_DEEP : INK }}>
                         {(s.shortName ?? s.collegeName).slice(0, 3).toUpperCase()}
                       </span>
                     )}
