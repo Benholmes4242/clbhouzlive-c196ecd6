@@ -35,7 +35,7 @@ export function useFriendRequestsV2() {
     enabled: !!userId,
     staleTime: 60_000,
     queryFn: async () => {
-      const { data, error } = await (supabase as any).rpc('get_activity_friend_requests', {
+      const { data, error } = await rpcFriendRequests('get_activity_friend_requests', {
         p_user_id: userId,
       });
       if (error) throw error;
