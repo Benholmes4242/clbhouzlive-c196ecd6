@@ -53,9 +53,11 @@ import { useTeeTimesAll } from './data/useTeeTimesAll';
 import { useFieldTop3 } from './data/useFieldTop3';
 import { useTournamentStory } from './data/useTournamentStory';
 import { scrollElementIntoView } from '@/lib/getScrollParent';
+import { Skeleton } from '@/components/ui/skeleton';
+import { TournamentPageSkeleton } from '@/components/skeletons/TournamentPageSkeleton';
 
 import {
-  FONT, INK, INK_MUTE, INK_FAINT, SLATE_50, HAIRLINE_INK_8, INK_TINT_06, SURFACE,
+  FONT, INK, INK_MUTE, INK_FAINT, SLATE_50, HAIRLINE_INK_8, SURFACE,
 } from '../_shared/tokens';
 
 export function TournamentPage() {
