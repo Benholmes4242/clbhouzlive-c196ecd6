@@ -100,6 +100,16 @@ function useRivalProfileExists(userId: string | undefined, enabled: boolean) {
 
 
 
+type RpcClient = {
+  rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
+};
+
+type FriendViewProfileRow = {
+  user_id: string;
+  full_name: string | null;
+  profile_photo_url: string | null;
+};
+
 function useFriendViewRivalry(
   viewerId: string | undefined,
   friendId: string | undefined,
@@ -110,7 +120,7 @@ function useFriendViewRivalry(
     enabled: !!viewerId && !!friendId && !!rivalId,
     staleTime: 30_000,
     queryFn: async (): Promise<FriendRivalryHydrated | null> => {
-      const { data: rpcRows, error } = await (supabase as any).rpc(
+      const { data: rpcRows, error } = await (supabase as unknown as RpcClient).rpc(
         'get_friend_view_rivalry',
         {
           p_viewer_id: viewerId,
@@ -118,20 +128,18 @@ function useFriendViewRivalry(
           p_rival_id: rivalId,
         },
       );
-      if (error) {
-        // eslint-disable-next-line no-console
-        console.warn('[rivalry] friend-view RPC error', error);
-        return null;
-      }
-      const raw = (rpcRows as any[])?.[0];
+      if (error) throw error;
+      const raw = (rpcRows as unknown[] | null)?.[0] as FriendRivalryHydrated | undefined;
       if (!raw) return null;
       const ids = [friendId!, rivalId!];
-      const { data: profiles } = await (supabase as any)
+      const { data: profiles } = await supabase
         .from('user_profiles')
         .select('user_id, full_name, profile_photo_url')
         .in('user_id', ids);
-      const byId = new Map<string, any>();
-      (profiles ?? []).forEach((p: any) => byId.set(p.user_id, p));
+      const byId = new Map<string, FriendViewProfileRow>();
+      ((profiles ?? []) as unknown as FriendViewProfileRow[]).forEach((p) =>
+        byId.set(p.user_id, p),
+      );
       return {
         ...raw,
         rival_name: byId.get(rivalId!)?.full_name ?? null,
