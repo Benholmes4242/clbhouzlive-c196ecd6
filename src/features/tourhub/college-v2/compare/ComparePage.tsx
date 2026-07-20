@@ -69,7 +69,7 @@ export function ComparePage() {
     if (c1 && !c2) navigate(collegeProfileRoute(c1), { replace: true });
   }, [c1, c2, navigate]);
 
-  const { data, isLoading } = useFranchiseStandings();
+  const { data, isLoading, isError, refetch } = useFranchiseStandings();
   const { data: liveAlumni } = useLiveAlumni();
   const { data: leftRoster = [] } = useCollegeRoster(c1 || undefined);
   const { data: rightRoster = [] } = useCollegeRoster(c2 || undefined);
