@@ -22,10 +22,7 @@ export const useUserByUsername = (username: string | undefined) => {
         .eq('username', username)
         .single();
 
-      if (error) {
-        console.error('Error fetching user by username:', error);
-        return null;
-      }
+      if (error) throw error;
 
       return data;
     },
