@@ -47,7 +47,7 @@ export const InviteClubModal: React.FC<InviteClubModalProps> = ({
           requester_user_profile_id: userId,
           manager_email: managerEmail.trim(),
           note: note.trim() || null,
-        } as any);
+        });
 
       if (error) throw error;
 
