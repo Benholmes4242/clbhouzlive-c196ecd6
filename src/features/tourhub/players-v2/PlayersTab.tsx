@@ -384,11 +384,19 @@ export function PlayersTab() {
       </div>
 
       {rankingLoading ? (
-        <div style={{ padding: '0 16px' }}>
-          {Array.from({ length: 8 }).map((_, i) => (
-            <Skeleton key={i} className="w-full mb-1" style={{ height: 58, borderRadius: 6 }} />
-          ))}
-        </div>
+        <>
+          {/* Podium skeleton - three cards, centre elevated, mirrors PodiumCards */}
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, padding: '12px 16px 12px' }}>
+            <Skeleton className="flex-1 rounded-xl" style={{ height: 140 }} />
+            <Skeleton className="flex-1 rounded-xl" style={{ height: 164 }} />
+            <Skeleton className="flex-1 rounded-xl" style={{ height: 140 }} />
+          </div>
+          <div style={{ padding: '0 16px' }}>
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} className="w-full mb-1" style={{ height: 58, borderRadius: 6 }} />
+            ))}
+          </div>
+        </>
       ) : rankingError ? (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '48px 16px', textAlign: 'center' }}>
           <div style={{ fontFamily: FONT, fontSize: 15, fontWeight: 700, color: INK }}>
