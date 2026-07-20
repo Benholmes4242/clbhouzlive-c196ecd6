@@ -24,6 +24,11 @@ export function MatchRequestSheet({ courseId, courseName, onClose }: Props) {
   const [whsName, setWhsName] = useState('');
   const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
 
+  useEffect(() => {
+    lockBodyScroll();
+    return () => unlockBodyScroll();
+  }, []);
+
   const submitRequest = async () => {
     setState('sending');
     const { data: auth } = await supabase.auth.getUser();
