@@ -397,7 +397,7 @@ function CourseDetail({
   deleteCourse: (id: string) => Promise<any>;
   deleting: boolean;
 }) {
-  const { data: course } = useQuery({
+  const { data: course, isFetched } = useQuery({
     queryKey: ['admin-v2', 'courses', 'detail', courseId],
     queryFn: async () => {
       if (!courseId) return null;
@@ -414,11 +414,20 @@ function CourseDetail({
 
   const [form, setForm] = useState<Record<string, any>>({});
   const [confirmDel, setConfirmDel] = useState(false);
+  const [draftRestored, setDraftRestored] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const qc = useQueryClient();
+  const draftKey = courseId ? draftKeys.course(courseId) : null;
 
+  // Silently close if the id no longer resolves to a row.
   useEffect(() => {
-    if (course) setForm({
+    if (courseId && isFetched && course == null) onClose();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [courseId, isFetched, course]);
+
+  const courseValues = useMemo<Record<string, any> | null>(() => {
+    if (!course) return null;
+    return {
       name: course.name ?? '',
       country: course.country ?? '',
       sub_country: course.sub_country ?? '',
@@ -435,10 +444,36 @@ function CourseDetail({
       course_type: course.course_type ?? '',
       has_hosted_major: !!course.has_hosted_major,
       description: course.description ?? '',
-    });
+    };
   }, [course?.id]); // eslint-disable-line
 
-  const set = (k: string, v: any) => setForm(f => ({ ...f, [k]: v }));
+  // Hydrate form from record; if a matching draft exists AND differs from
+  // record values, apply the draft and surface the restored bar.
+  useEffect(() => {
+    if (!courseValues || !draftKey) return;
+    const draft = loadDraft(draftKey);
+    if (draft && !draftsEqual(draft, courseValues)) {
+      setForm({ ...courseValues, ...draft });
+      setDraftRestored(true);
+    } else {
+      setForm(courseValues);
+      setDraftRestored(false);
+    }
+  }, [courseValues, draftKey]);
+
+  const set = (k: string, v: any) => {
+    setForm(f => {
+      const next = { ...f, [k]: v };
+      if (draftKey) saveDraft(draftKey, next);
+      return next;
+    });
+  };
+
+  const discardDraft = () => {
+    if (draftKey) clearDraft(draftKey);
+    if (courseValues) setForm(courseValues);
+    setDraftRestored(false);
+  };
 
   const handleSave = async () => {
     if (!courseId) return;
@@ -461,6 +496,8 @@ function CourseDetail({
       description: form.description || null,
     };
     await update(courseId, updates);
+    if (draftKey) clearDraft(draftKey);
+    setDraftRestored(false);
     qc.invalidateQueries({ queryKey: ['admin-v2', 'courses', 'detail', courseId] });
   };
 
