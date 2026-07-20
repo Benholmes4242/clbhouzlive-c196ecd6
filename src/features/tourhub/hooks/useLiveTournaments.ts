@@ -43,10 +43,7 @@ export function useLiveTournaments() {
         .or(`status.eq.inprogress,and(status.in.(scheduled,created),start_date.eq.${todayStr})`)
         .order('purse', { ascending: false, nullsFirst: false });
 
-      if (error) {
-        console.error('useLiveTournaments', error);
-        return [];
-      }
+      if (error) throw error;
       return (data ?? []).map((t: any) => ({
         id: t.id,
         name: t.name,

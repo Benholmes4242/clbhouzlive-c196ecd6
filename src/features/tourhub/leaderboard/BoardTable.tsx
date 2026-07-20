@@ -56,12 +56,13 @@ export interface BoardEntry {
   round_2?: number | null;
   round_3?: number | null;
   round_4?: number | null;
-  raw_data?: any;
+  raw_data?: unknown;
   player?: {
     id: string;
     full_name: string;
     country_code?: string | null;
     country?: string | null;
+    photo_url?: string | null;
   } | null;
 }
 

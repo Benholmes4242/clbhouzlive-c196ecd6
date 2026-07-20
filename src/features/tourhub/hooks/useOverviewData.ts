@@ -128,69 +128,6 @@ function mapTourSlug(tourName: string): TourId {
   return 'pga';
 }
 
-/**
- * Fetch live tournaments across all tours
- */
-export function useLiveTournaments() {
-  return useQuery({
-    queryKey: ['overview-live-tournaments'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('sr_tournaments')
-        .select(`
-          id,
-          name,
-          status,
-          start_date,
-          end_date,
-          venue_name,
-          venue_city,
-          venue_country,
-          venue_par,
-          venue_yardage,
-          winning_share,
-          purse,
-          currency,
-          defending_champion,
-          season:sr_seasons!inner(
-            tour_id,
-            tour_name
-          )
-        `)
-        .in('status', [
-          'inprogress', 'in_progress',
-          'playoff', 'inplayoff', 'in_playoff',
-          'suspended', 'delayed', 'weather', 'holdup',
-        ])
-        .order('start_date', { ascending: true });
-
-      if (error) throw error;
-
-      return (data || []).map((row: any): TourTournament => ({
-        id: row.id,
-        name: row.name,
-        status: row.status,
-        startDate: row.start_date,
-        endDate: row.end_date,
-        venueName: row.venue_name,
-        venueCity: row.venue_city,
-        venueCountry: row.venue_country,
-        venuePar: row.venue_par,
-        venueYardage: row.venue_yardage,
-        winningShare: row.winning_share,
-        purse: row.purse,
-        currency: row.currency,
-        defendingChampion: row.defending_champion,
-        tourId: row.season.tour_id,
-        tourName: row.season.tour_name,
-        tourSlug: mapTourSlug(row.season.tour_name),
-      }));
-    },
-    staleTime: 5 * 1000,          // 5s — Realtime handles freshness
-    refetchInterval: false,        // No polling — Realtime pushes updates
-    refetchOnWindowFocus: true,
-  });
-}
 
 /**
  * Fetch upcoming tournaments (next 14 days) across all tours

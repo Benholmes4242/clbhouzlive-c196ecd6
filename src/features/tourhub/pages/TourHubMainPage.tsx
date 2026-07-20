@@ -103,7 +103,7 @@ export function TourHubMainPage() {
 
   useTournamentStatusRealtime();
 
-  const { data: liveTournaments, isFetched: liveFetched } = useLiveTournaments();
+  const { data: liveTournaments, isFetched: liveFetched, isError: liveError } = useLiveTournaments();
   const showLive = (liveTournaments?.length ?? 0) > 0;
 
   useEffect(() => {
@@ -120,11 +120,11 @@ export function TourHubMainPage() {
   }, [tabParam]);
 
   useEffect(() => {
-    if (activeTab === 'live' && liveFetched && !showLive) {
+    if (activeTab === 'live' && liveFetched && !liveError && !showLive) {
       setSearchParams({ tab: 'overview' }, { replace: true });
       setActiveTab('overview');
     }
-  }, [activeTab, liveFetched, showLive, setSearchParams]);
+  }, [activeTab, liveFetched, liveError, showLive, setSearchParams]);
 
   useEffect(() => {
     const onRetap = (e: Event) => {
