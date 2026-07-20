@@ -132,7 +132,7 @@ export function TickerShell({
     ...style,
   };
 
-  const trackContainer = reducedMotion ? (
+  const trackContainer = reducedMotion || !animated ? (
     <div
       className="flex items-center overflow-x-auto scrollbar-hide"
       style={{ gap, padding: '0 14px', flex: 1 }}
