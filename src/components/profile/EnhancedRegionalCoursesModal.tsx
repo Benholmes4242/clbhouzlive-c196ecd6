@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback, useDeferredValue } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Grid3X3, List, ChevronDown, Search, Lock } from 'lucide-react';
@@ -632,9 +633,9 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
       <div className="pt-4 px-4 sm:px-6">
         {!entered ? (
           <div className="p-4 space-y-3">
-            <div className="h-5 w-1/3 bg-muted animate-pulse rounded" />
-            <div className="h-24 w-full bg-muted animate-pulse rounded" />
-            <div className="h-24 w-full bg-muted animate-pulse rounded" />
+            <Skeleton className="h-5 w-1/3 rounded" />
+            <Skeleton className="h-24 w-full rounded" />
+            <Skeleton className="h-24 w-full rounded" />
           </div>
         ) : coursesLoading ? (
           <div className="flex items-center justify-center py-8">

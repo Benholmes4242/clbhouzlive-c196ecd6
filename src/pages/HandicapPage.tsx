@@ -1,3 +1,4 @@
+import { Skeleton } from '@/components/ui/skeleton';
 /**
  * HandicapPage — Top-level Handicap route.
  *
@@ -308,10 +309,10 @@ const FriendHandicapDashboard: React.FC<{ userId: string; ownerFirstName: string
 
   if (isLoading) {
     return (
-      <div className="px-4 pt-10 pb-6 animate-pulse">
-        <div className="h-3 w-44 bg-muted/60 rounded mb-5" />
-        <div className="h-16 w-28 bg-muted rounded mb-3" />
-        <div className="h-4 w-36 bg-muted/60 rounded" />
+      <div className="px-4 pt-10 pb-6">
+        <Skeleton variant="dark" className="h-3 w-44 rounded mb-5" />
+        <Skeleton variant="dark" className="h-16 w-28 rounded mb-3" />
+        <Skeleton variant="dark" className="h-4 w-36 rounded" />
       </div>
     );
   }

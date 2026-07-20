@@ -2,6 +2,16 @@ import React, { useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 import { Link } from 'react-router-dom';
 import type { ReviewResponse } from '@/hooks/useReviewResponses';
@@ -51,6 +61,7 @@ export const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
     (viewerClaim.role === 'owner' || viewerClaim.role === 'admin');
 
   const [isEditing, setIsEditing] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const [text, setText] = useState(response.response_text);
 
   const updateMutation = useUpdateReviewResponse(courseId);
@@ -70,7 +81,11 @@ export const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
   };
 
   const handleDelete = () => {
-    if (!window.confirm(t('review.response.deleteConfirm'))) return;
+    setDeleteOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    setDeleteOpen(false);
     deleteMutation.mutate({ responseId: response.id });
   };
 
@@ -245,6 +260,29 @@ export const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
           </div>
         </div>
       )}
+
+      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('review.response.deleteConfirm')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('review.response.deleteDescription', { defaultValue: "This can't be undone." })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteMutation.isPending}>
+              {t('review.response.cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              disabled={deleteMutation.isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {t('review.response.delete')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

@@ -4,6 +4,7 @@ import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { useLegalDocument } from '@/hooks/useLegalDocuments';
 import LegalBodyRenderer from '@/components/legal/LegalBodyRenderer';
 import { formatDayMonthLongYearGB } from '@/i18n/format';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const INK_55 = '#64748B';
 
@@ -37,7 +38,11 @@ const LegalDocumentPage: React.FC<Props> = ({ slug: slugProp }) => {
           style={{ background: '#fff', border: '1px solid rgba(15,23,42,0.07)' }}
         >
           {isLoading && (
-            <div style={{ color: INK_55, fontSize: 14 }}>Loading…</div>
+            <div className="space-y-2">
+              <Skeleton className="h-3 w-1/3 rounded" />
+              <Skeleton className="h-3 w-full rounded" />
+              <Skeleton className="h-3 w-11/12 rounded" />
+            </div>
           )}
 
           {!isLoading && (isError || !data) && (

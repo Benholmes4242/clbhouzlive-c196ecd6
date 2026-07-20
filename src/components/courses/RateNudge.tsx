@@ -5,6 +5,7 @@ import { ChevronRight, Star } from 'lucide-react';
 import { useRateNudgeCourse } from '@/hooks/useRateNudgeCourse';
 import { AMBER, HAIRLINE_INK_10, INK, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
 import CourseImageFallback from '@/components/whs/CourseImageFallback';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface Props {
   userId: string;
@@ -18,19 +19,14 @@ const RateNudge: React.FC<Props> = ({ userId, onEmptyFallback }) => {
 
   if (loading) {
     return (
-      <div
+      <Skeleton
+        aria-busy="true"
         style={{
           width: '100%',
           height: 76,
           marginBottom: 12,
-          background: SURFACE,
-          border: `1px solid ${HAIRLINE_INK_10}`,
           borderRadius: 14,
-          overflow: 'hidden',
-          position: 'relative',
         }}
-        className="animate-pulse"
-        aria-busy="true"
       />
     );
   }

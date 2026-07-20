@@ -29,6 +29,7 @@ export function useCourseSearch(query: string, options: UseCourseSearchOptions =
   const [data, setData] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [refetchToken, setRefetchToken] = useState(0);
 
   // Guard against state updates on unmounted component (Fix 5: race conditions)
   const mountedRef = useRef(true);
@@ -104,9 +105,11 @@ export function useCourseSearch(query: string, options: UseCourseSearchOptions =
     }, debounceMs);
 
     return () => clearTimeout(timeoutId);
-  }, [query, debounceMs, limit, userId]);
+  }, [query, debounceMs, limit, userId, refetchToken]);
 
-  return { data, loading, error };
+  const refetch = () => setRefetchToken((n) => n + 1);
+
+  return { data, loading, error, refetch };
 }
 
 /**

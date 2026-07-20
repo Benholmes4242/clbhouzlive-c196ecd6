@@ -5,6 +5,7 @@ import { useDeclineHandicapChip } from '@/lib/whs/useDeclineHandicapChip';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import WhsConnectScreen from './WhsConnectScreen';
 import HandicapDashboard from './HandicapDashboard';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface Props {
   userId: string;
@@ -13,14 +14,14 @@ interface Props {
 }
 
 const SkeletonView = () => (
-  <div className="px-5 pt-10 pb-6 animate-pulse">
-    <div className="h-3 w-44 bg-muted/60 rounded mb-5" />
-    <div className="h-16 w-28 bg-muted rounded mb-3" />
-    <div className="h-4 w-36 bg-muted/60 rounded mb-8" />
+  <div className="px-5 pt-10 pb-6">
+    <Skeleton variant="dark" className="h-3 w-44 rounded mb-5" />
+    <Skeleton variant="dark" className="h-16 w-28 rounded mb-3" />
+    <Skeleton variant="dark" className="h-4 w-36 rounded mb-8" />
     <div className="space-y-3">
-      <div className="h-4 w-32 bg-muted/60 rounded" />
-      <div className="h-20 w-full bg-muted/40 rounded-xl" />
-      <div className="h-20 w-full bg-muted/40 rounded-xl" />
+      <Skeleton variant="dark" className="h-4 w-32 rounded" />
+      <Skeleton variant="dark" className="h-20 w-full rounded-xl" />
+      <Skeleton variant="dark" className="h-20 w-full rounded-xl" />
     </div>
   </div>
 );

@@ -1,4 +1,5 @@
 import React, { forwardRef } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ChevronDown } from 'lucide-react';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -117,16 +118,14 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
             WebkitBackdropFilter: 'blur(20px) saturate(180%)',
           } : undefined}
         >
-          <div 
-            className={cn(
-              "h-7 w-7 animate-pulse rounded-lg",
-              useLightTheme ? "bg-muted" : "bg-white/10"
-            )} 
+          <Skeleton
+            variant={useLightTheme ? 'light' : 'dark'}
+            className="h-7 w-7 rounded-lg"
           />
-          <div className={cn(
-            "h-3 w-16 rounded animate-pulse",
-            useLightTheme ? "bg-muted" : "bg-white/10"
-          )} />
+          <Skeleton
+            variant={useLightTheme ? 'light' : 'dark'}
+            className="h-3 w-16 rounded"
+          />
         </div>
       );
     }

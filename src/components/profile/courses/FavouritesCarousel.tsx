@@ -1,3 +1,4 @@
+import { Skeleton } from '@/components/ui/skeleton';
 /**
  * FavouritesCarousel - Apple-style premium carousel for Top 10 Rated Courses
  */
@@ -150,18 +151,18 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
       <section className={cn("w-full", className)}>
         <div className="px-4 pb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-muted animate-pulse" />
+            <Skeleton className="w-10 h-10 rounded-full" />
             <div>
-              <div className="h-5 w-36 bg-muted rounded mb-1.5 animate-pulse" />
-              <div className="h-4 w-28 bg-muted rounded animate-pulse" />
+              <Skeleton className="h-5 w-36 rounded mb-1.5" />
+              <Skeleton className="h-4 w-28 rounded" />
             </div>
           </div>
         </div>
         <div className="flex gap-3 overflow-hidden px-1">
           {[1, 2].map((i) => (
-             <div 
-              key={i} 
-              className="flex-shrink-0 w-[210px] h-[269px] bg-muted rounded-[4px] animate-pulse" 
+            <Skeleton
+              key={i}
+              className="flex-shrink-0 w-[210px] h-[269px] rounded-[4px]"
             />
           ))}
         </div>
