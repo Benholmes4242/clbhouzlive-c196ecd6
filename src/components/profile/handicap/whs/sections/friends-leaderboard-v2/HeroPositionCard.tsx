@@ -75,7 +75,7 @@ export const HeroPositionCard: React.FC<Props> = ({
   const yourClub = selfRow.friend_home_club ?? null;
   const selfPhoto = pickAvatarSrc(selfRow.friend_thumbnail_url, selfRow.friend_profile_photo_url);
   const selfFbBg = getAvatarFallbackColor(
-    selfRow.friend_user_id ?? (selfRow as any).friend_row_id ?? selfRow.friend_name
+    selfRow.friend_user_id ?? (selfRow as { friend_row_id?: string | null }).friend_row_id ?? selfRow.friend_name
   );
 
   return (
