@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Navigate, useLocation } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { formatDistanceToNow, format } from 'date-fns';
 import { toast } from '@/lib/toast';
 import {
   MapPin, Plus, Search, RefreshCw, Image as ImageIcon,
   Trash2, Upload, Loader2, Zap, Users as UsersIcon,
+  Trophy, Compass, CheckCircle2, ChevronRight,
 } from 'lucide-react';
 
 import { supabase } from '@/integrations/supabase/client';
@@ -25,51 +26,55 @@ import ConfirmDialog from '../components/ConfirmDialog';
 import AdminSheet from '../components/AdminSheet';
 import AdminAccessDenied from '../components/AdminAccessDenied';
 import { VALID_CONTINENTS, COURSE_TYPES } from '../constants';
-import { useCourses, createCourse, type AdminCourseRow } from '../hooks/useCourses';
-import { useCourseRequests } from '../hooks/useCourseRequests';
-import CourseRequestsTab from '../components/CourseRequestsTab';
+import { useCourses, createCourse, type AdminCourseRow, type CourseFilter } from '../hooks/useCourses';
 import HelpArticlesTab from '../components/HelpArticlesTab';
 import LegalDocumentsTab from '../components/LegalDocumentsTab';
 
-type TabId = 'courses' | 'course-requests' | 'help' | 'legal' | 'tour' | 'players';
+type TabId = 'courses' | 'tour' | 'players' | 'help' | 'legal';
 
 export default function ContentPage() {
   const { role } = usePanelRole();
   const can = panelCan(role);
   const [params, setParams] = useSearchParams();
+  const location = useLocation();
+
+  // Legacy redirect: ?tab=course-requests -> Inbox
+  if (params.get('tab') === 'course-requests') {
+    return <Navigate to="/admin-v2/inbox?type=courseRequest" replace />;
+  }
+
   const requested = (params.get('tab') as TabId) || 'courses';
-  const allowedForLimited: TabId[] = ['courses', 'course-requests', 'help', 'legal'];
-  // Hide tour tabs from limited admins
-  const tab: TabId = !can.manageAdmins && !allowedForLimited.includes(requested) ? 'courses' : requested;
+  const isAllowed = (id: TabId): boolean => {
+    if (id === 'courses') return true;
+    if (id === 'help' || id === 'legal') return can.viewModeration;
+    if (id === 'tour' || id === 'players') return can.manageAdmins;
+    return false;
+  };
+  const tab: TabId = isAllowed(requested) ? requested : 'courses';
+
   const setTab = (id: string) => {
     const next = new URLSearchParams(params);
     next.set('tab', id);
     setParams(next, { replace: true });
   };
 
-  const { pendingCount } = useCourseRequests();
-
   const tabs = useMemo(() => {
-    const base: { id: TabId; label: string; count?: number }[] = [
-      { id: 'courses', label: 'Courses' },
-      { id: 'course-requests', label: 'Course requests', count: pendingCount > 0 ? pendingCount : undefined },
-    ];
+    const base: { id: TabId; label: string }[] = [{ id: 'courses', label: 'Courses' }];
+    if (can.manageAdmins) {
+      base.push({ id: 'tour', label: 'Tour data' });
+      base.push({ id: 'players', label: 'Players' });
+    }
     if (can.viewModeration) {
-      base.push({ id: 'help', label: 'Help articles' });
+      base.push({ id: 'help', label: 'Help' });
       base.push({ id: 'legal', label: 'Legal' });
     }
-    if (can.manageAdmins) {
-      base.push({ id: 'tour', label: 'Tour Data' });
-      base.push({ id: 'players', label: 'Tour Players' });
-    }
     return base;
-  }, [can.manageAdmins, can.viewModeration, pendingCount]);
+  }, [can.manageAdmins, can.viewModeration]);
 
   return (
     <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 1180, margin: '0 auto' }}>
       <SectionTabs tabs={tabs} activeId={tab} onChange={setTab} />
       {tab === 'courses' && <CoursesTab />}
-      {tab === 'course-requests' && <CourseRequestsTab />}
       {tab === 'help' && (can.viewModeration ? <HelpArticlesTab /> : <AdminAccessDenied />)}
       {tab === 'legal' && (can.viewModeration ? <LegalDocumentsTab /> : <AdminAccessDenied />)}
       {tab === 'tour' && (can.manageAdmins ? <TourDataTab /> : <AdminAccessDenied />)}
@@ -80,11 +85,49 @@ export default function ContentPage() {
 
 /* ───────────────────────── Courses tab ───────────────────────── */
 
+const FILTER_LABEL: Record<CourseFilter, string> = {
+  all: 'A TO Z',
+  top100: 'A TO Z',
+  missing_coords: 'NO COORDS',
+  missing_photo: 'NO PHOTO',
+};
+
+function isCourseFilter(v: string | null): v is CourseFilter {
+  return v === 'all' || v === 'top100' || v === 'missing_coords' || v === 'missing_photo';
+}
+
+function firstRank(course: AdminCourseRow): number | null {
+  return course.global_rank ?? course.usa_rank ?? course.regional_rank ?? course.country_rank ?? null;
+}
+
+function isTop100(course: AdminCourseRow): boolean {
+  return firstRank(course) != null;
+}
+
 function CoursesTab() {
   const c = useCourses();
-  const [searchInput, setSearchInput] = useState(c.search);
+  const [params, setParams] = useSearchParams();
+
+  // Hydrate hook from URL (?q= and ?filter=) on mount and when URL changes.
+  const urlQ = params.get('q') ?? '';
+  const urlFilter = params.get('filter');
+  const initialFilter: CourseFilter = isCourseFilter(urlFilter) ? urlFilter : 'all';
+
+  const [searchInput, setSearchInput] = useState(urlQ);
   const debounced = useDebouncedValue(searchInput, 250);
+
   useEffect(() => { c.setSearch(debounced); /* eslint-disable-next-line */ }, [debounced]);
+  useEffect(() => { c.setFilter(initialFilter); /* eslint-disable-next-line */ }, []);
+
+  // Reflect state back into URL.
+  useEffect(() => {
+    const next = new URLSearchParams(params);
+    if (debounced.trim()) next.set('q', debounced.trim()); else next.delete('q');
+    if (c.filter !== 'all') next.set('filter', c.filter); else next.delete('filter');
+    // preserve tab param if present
+    setParams(next, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debounced, c.filter]);
 
   useEffect(() => {
     const h = () => c.refetch();
@@ -96,24 +139,31 @@ function CoursesTab() {
   const [addOpen, setAddOpen] = useState(false);
   const totalPages = Math.max(1, Math.ceil(c.total / c.pageSize));
 
+  const totalLabel = c.stats.total > 0 ? c.stats.total.toLocaleString() : '';
+  const placeholder = totalLabel ? `Search ${totalLabel} courses` : 'Search courses';
+
+  const chips: { id: CourseFilter; label: string; count: number | null; issue: boolean }[] = [
+    { id: 'all',            label: 'All',       count: c.stats.total,         issue: false },
+    { id: 'top100',         label: 'Top 100',   count: c.stats.top100,        issue: false },
+    { id: 'missing_coords', label: 'No coords', count: c.stats.missingCoords, issue: true  },
+    { id: 'missing_photo',  label: 'No photo',  count: c.stats.missingPhoto,  issue: true  },
+  ];
+
+  const activeIssueChip = c.filter === 'missing_coords' || c.filter === 'missing_photo';
+  const caption = activeIssueChip
+    ? (c.filter === 'missing_coords' ? 'NO COORDS' : 'NO PHOTO')
+    : 'A TO Z';
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      {/* KPIs */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 8 }}>
-        <StatTile label="Total" value={c.stats.total.toLocaleString()} />
-        <StatTile label="Geocoded" value={c.stats.geocoded.toLocaleString()} />
-        <StatTile label="Missing Coords" value={c.stats.missingCoords.toLocaleString()} />
-        <StatTile label="Top 100" value={c.stats.top100.toLocaleString()} />
-      </div>
-
-      {/* Search + filters + Add */}
+      {/* Search + Add */}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 0 }}>
           <Search size={16} style={{ position: 'absolute', left: 12, top: 12, color: t.inkFaint }} />
           <input
             value={searchInput}
             onChange={e => setSearchInput(e.target.value)}
-            placeholder="Search courses…"
+            placeholder={placeholder}
             style={{
               width: '100%', padding: '10px 12px 10px 36px',
               borderRadius: t.radius.md, border: `1px solid ${t.line}`,
@@ -121,18 +171,6 @@ function CoursesTab() {
             }}
           />
         </div>
-        <select
-          value={c.country}
-          onChange={e => c.setCountry(e.target.value)}
-          style={{
-            padding: '10px 12px', borderRadius: t.radius.md,
-            border: `1px solid ${t.line}`, background: t.surface, color: t.ink,
-            fontSize: 14, outline: 'none', minWidth: 160,
-          }}
-        >
-          <option value="all">All countries</option>
-          {c.countries.map(co => <option key={co} value={co}>{co}</option>)}
-        </select>
         <button
           onClick={() => setAddOpen(true)}
           style={{
@@ -142,19 +180,63 @@ function CoursesTab() {
             display: 'inline-flex', alignItems: 'center', gap: 6,
           }}
         >
-          <Plus size={16} /> Add Course
+          <Plus size={16} /> Add course
         </button>
       </div>
+
+      {/* Filter chips */}
+      <div style={{ display: 'flex', gap: 8, overflowX: 'auto', scrollbarWidth: 'none', padding: '2px' }}>
+        {chips.map(chip => {
+          const active = c.filter === chip.id;
+          const hasCount = typeof chip.count === 'number';
+          const countText = hasCount ? chip.count!.toLocaleString() : '';
+          const inactiveIssueColor = chip.issue && !active ? t.warnText : t.inkMuted;
+          const label = chip.id === 'all' && hasCount ? `All ${countText}` : chip.label;
+          return (
+            <button
+              key={chip.id}
+              onClick={() => c.setFilter(chip.id)}
+              style={{
+                flexShrink: 0, padding: '8px 14px', borderRadius: 999,
+                border: `1px solid ${active ? 'transparent' : t.line}`,
+                background: active ? t.brandSoft : t.surface,
+                color: active ? t.brandText : inactiveIssueColor,
+                fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              <span>{label}</span>
+              {chip.id !== 'all' && hasCount && (
+                <span style={{
+                  background: active ? t.brand : t.neutralSoft,
+                  color: active ? t.surface : (chip.issue ? t.warnText : t.inkMuted),
+                  fontSize: 11, padding: '0 6px', borderRadius: 999,
+                  minWidth: 18, textAlign: 'center', fontVariantNumeric: 'tabular-nums',
+                }}>{countText}</span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Caption */}
+      <div style={{
+        fontSize: 11, fontWeight: 700, letterSpacing: 0.5,
+        color: t.inkFaint, textTransform: 'uppercase',
+      }}>{caption}</div>
 
       {/* List */}
       {c.isLoading ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} style={{ height: 64, background: t.canvas, borderRadius: t.radius.md, animation: 'admin-pulse 1.4s ease-in-out infinite' }} />
+            <div key={i} style={{ height: 64, background: t.canvas, borderRadius: 18, animation: 'admin-pulse 1.4s ease-in-out infinite' }} />
           ))}
         </div>
       ) : c.courses.length === 0 ? (
-        <EmptyState title="No courses" subtitle={searchInput ? `for "${searchInput}"` : undefined} />
+        activeIssueChip
+          ? <EmptyState icon={<CheckCircle2 size={22} color={t.ok} />} title="Nothing to fix here." />
+          : <EmptyState title="No courses" subtitle={searchInput ? `for "${searchInput}"` : undefined} />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {c.courses.map(course => (
@@ -166,12 +248,12 @@ function CoursesTab() {
       {/* Pagination */}
       {c.total > c.pageSize && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 12, color: t.inkMuted }}>
-            {(c.page - 1) * c.pageSize + 1}–{Math.min(c.page * c.pageSize, c.total)} of {c.total.toLocaleString()}
+          <span style={{ fontSize: 12, color: t.inkMuted, fontVariantNumeric: 'tabular-nums' }}>
+            {(c.page - 1) * c.pageSize + 1}-{Math.min(c.page * c.pageSize, c.total)} of {c.total.toLocaleString()}
           </span>
           <div style={{ display: 'flex', gap: 6 }}>
             <PagerBtn disabled={c.page <= 1} onClick={() => c.setPage(p => p - 1)}>Prev</PagerBtn>
-            <span style={{ fontSize: 13, color: t.ink, padding: '6px 4px' }}>{c.page} / {totalPages}</span>
+            <span style={{ fontSize: 13, color: t.ink, padding: '6px 4px', fontVariantNumeric: 'tabular-nums' }}>{c.page} / {totalPages}</span>
             <PagerBtn disabled={c.page >= totalPages} onClick={() => c.setPage(p => p + 1)}>Next</PagerBtn>
           </div>
         </div>
@@ -215,44 +297,72 @@ function PagerBtn({ children, ...rest }: React.ButtonHTMLAttributes<HTMLButtonEl
 }
 
 function CourseCard({ course, onOpen }: { course: AdminCourseRow; onOpen: () => void }) {
-  const geocoded = course.latitude != null && course.longitude != null;
+  const top100 = isTop100(course);
+  const rank = firstRank(course);
+  const noCoords = course.latitude == null || course.longitude == null;
+  const noPhoto = !course.thumbnail_image;
+  const region = [course.sub_country, course.country].filter(Boolean).join(', ') || course.country || '';
+
   return (
     <button
       onClick={onOpen}
       style={{
         width: '100%', textAlign: 'left',
         background: t.surface, border: `1px solid ${t.line}`,
-        borderRadius: t.radius.md, padding: 12,
+        borderRadius: 18, padding: 12,
         display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer',
       }}
     >
       <div style={{
-        width: 56, height: 56, borderRadius: t.radius.md,
-        background: t.canvas, overflow: 'hidden',
+        width: 38, height: 38, borderRadius: 12,
+        background: top100 ? t.brandSoft : t.neutralSoft,
         display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
       }}>
-        {course.thumbnail_image
-          ? <img src={course.thumbnail_image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          : <ImageIcon size={18} color={t.inkFaint} />
+        {top100
+          ? <Trophy size={18} color={t.brandText} />
+          : <Compass size={18} color={t.inkMuted} />
         }
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 14, fontWeight: 600, color: t.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {course.name}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+          <span style={{
+            fontSize: 13.5, fontWeight: 700, color: t.ink,
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            minWidth: 0, flex: '0 1 auto',
+          }}>{course.name}</span>
+          {top100 && (
+            <span style={{
+              flexShrink: 0,
+              background: t.brandSoft, color: t.brandText,
+              fontSize: 10, fontWeight: 700, letterSpacing: 0.3,
+              padding: '2px 6px', borderRadius: 999,
+              fontVariantNumeric: 'tabular-nums',
+            }}>
+              {rank != null ? `T100 #${rank}` : 'T100'}
+            </span>
+          )}
         </div>
-        <div style={{ fontSize: 12, color: t.inkMuted, marginTop: 2 }}>
-          {course.country}{course.sub_country ? ` · ${course.sub_country}` : ''}
-        </div>
-        <div style={{ display: 'flex', gap: 6, marginTop: 6, flexWrap: 'wrap' }}>
-          {course.global_rank && <StatusPill tone="warn">Global #{course.global_rank}</StatusPill>}
-          {course.regional_rank && <StatusPill tone="neutral">Reg #{course.regional_rank}</StatusPill>}
-          {course.usa_rank && <StatusPill tone="danger">USA #{course.usa_rank}</StatusPill>}
-          <StatusPill tone={geocoded ? 'ok' : 'warn'}>{geocoded ? 'Geocoded' : 'No coords'}</StatusPill>
-          {course.avg_rating != null && (
-            <StatusPill tone="neutral">★ {course.avg_rating.toFixed(1)} · {course.review_count ?? 0}</StatusPill>
+        <div style={{
+          fontSize: 12, color: t.inkMuted, marginTop: 2,
+          display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center',
+        }}>
+          <span style={{
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            maxWidth: '100%',
+          }}>{region || '-'}</span>
+          {noCoords && (
+            <span style={{ color: t.warnText, fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+              <MapPin size={11} /> No coords
+            </span>
+          )}
+          {noPhoto && (
+            <span style={{ color: t.warnText, fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+              <ImageIcon size={11} /> No photo
+            </span>
           )}
         </div>
       </div>
+      <ChevronRight size={16} color={t.inkFaint} style={{ flexShrink: 0 }} />
     </button>
   );
 }
