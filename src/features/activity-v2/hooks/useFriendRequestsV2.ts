@@ -1,7 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { toast } from '@/lib/toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { patchFollow } from '@/lib/followCache';
+
+// Minimal structural rpc caller — get_activity_friend_requests is not in the
+// generated Supabase types but the call/error shape is stable.
+type RpcResult<T> = { data: T | null; error: { message: string } | null };
+const rpcFriendRequests = supabase.rpc as unknown as (
+  name: string,
+  args: Record<string, unknown>,
+) => Promise<RpcResult<FriendRequestRowV2[]>>;
 
 /**
  * Friend-requests strip data for Activity V2.
@@ -26,7 +35,7 @@ export function useFriendRequestsV2() {
     enabled: !!userId,
     staleTime: 60_000,
     queryFn: async () => {
-      const { data, error } = await (supabase as any).rpc('get_activity_friend_requests', {
+      const { data, error } = await rpcFriendRequests('get_activity_friend_requests', {
         p_user_id: userId,
       });
       if (error) throw error;
@@ -66,10 +75,13 @@ function useFriendRequestMutations() {
   };
 
   const optimisticRemove = (requestId: string) => {
-    qc.setQueriesData({ queryKey: ['activity-v2-friend-requests'] }, (old: any) => {
-      if (!Array.isArray(old)) return old;
-      return old.filter((r: FriendRequestRowV2) => r.request_id !== requestId);
-    });
+    qc.setQueriesData<FriendRequestRowV2[]>(
+      { queryKey: ['activity-v2-friend-requests'] },
+      (old) => {
+        if (!Array.isArray(old)) return old;
+        return old.filter((r) => r.request_id !== requestId);
+      },
+    );
   };
 
   const accept = useMutation({
@@ -119,6 +131,9 @@ function useFriendRequestMutations() {
     onMutate: (args) => {
       optimisticRemove(args.requestId);
     },
+    onError: () => {
+      toast.error("Couldn't update this request. Try again.");
+    },
     onSettled: () => {
       if (user?.id) invalidateAll(user.id);
     },
@@ -146,6 +161,9 @@ function useFriendRequestMutations() {
     },
     onMutate: (args) => {
       optimisticRemove(args.requestId);
+    },
+    onError: () => {
+      toast.error("Couldn't update this request. Try again.");
     },
     onSettled: () => {
       if (user?.id) invalidateAll(user.id);

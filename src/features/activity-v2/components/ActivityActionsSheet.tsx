@@ -106,11 +106,12 @@ export const ActivityActionsSheet: React.FC<Props> = ({ open, row, onClose }) =>
 
   const handleDelete = async () => {
     // Optimistic removal across all activity-v2 pages
-    qc.setQueriesData({ queryKey: ['activity-v2'] }, (old: any) => {
+    type FeedCache = { pages: ActivityFeedRowV2[][]; pageParams: unknown[] };
+    qc.setQueriesData<FeedCache>({ queryKey: ['activity-v2'] }, (old) => {
       if (!old?.pages) return old;
       return {
         ...old,
-        pages: old.pages.map((p: ActivityFeedRowV2[]) => p.filter((r) => r.notif_id !== row.notif_id)),
+        pages: old.pages.map((p) => p.filter((r) => r.notif_id !== row.notif_id)),
       };
     });
     try {

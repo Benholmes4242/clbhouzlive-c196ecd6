@@ -51,7 +51,7 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
     data: rawData,
     actor_user_id,
   } = row;
-  const data: any = rawData && typeof rawData === 'object' ? rawData : {};
+  const data = (rawData && typeof rawData === 'object' ? rawData : {}) as Record<string, string | undefined>;
 
   // --- like ------------------------------------------------------------
   if (type === 'like' || type === 'like_post') {
@@ -205,7 +205,7 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
   return actor_user_id ? `/profile/${actor_user_id}` : '/';
 }
 
-function buildTopTenLink(row: ActivityFeedRowV2, data: any): string {
+function buildTopTenLink(row: ActivityFeedRowV2, data: Record<string, string | undefined>): string {
   const targetId = data.target_user_id ?? row.actor_user_id;
   const commentId = data.top_ten_comment_id ?? data.comment_id;
   const courseId = data.course_id;
