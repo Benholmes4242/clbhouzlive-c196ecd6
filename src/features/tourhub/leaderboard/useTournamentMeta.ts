@@ -52,12 +52,15 @@ export function useTournamentMeta(tournamentId: string | null | undefined) {
         return null;
       }
       if (!data) return null;
-      const season: any = (data as any).season;
+      type SeasonJoin = { tour_name: string | null; tour_full_name: string | null } | null;
+      const row = data as Record<string, unknown> & { season?: SeasonJoin | SeasonJoin[] };
+      const seasonRaw = row.season;
+      const season: SeasonJoin = Array.isArray(seasonRaw) ? seasonRaw[0] ?? null : seasonRaw ?? null;
       return {
-        ...(data as any),
+        ...(row as unknown as Omit<TournamentMeta, 'tour_code' | 'tour_full_name'>),
         tour_code: season?.tour_name ?? null,
         tour_full_name: season?.tour_full_name ?? null,
-      } as TournamentMeta;
+      };
     },
   });
 }

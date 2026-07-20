@@ -30,7 +30,7 @@ function useScorecard(tournamentId: string | null, playerId: string | null) {
     staleTime: 60_000,
     queryFn: async (): Promise<ScorecardRow[]> => {
       if (!tournamentId || !playerId) return [];
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('sr_scorecards')
         .select('hole_number, round_number, strokes, par, score_to_par')
         .eq('tournament_id', tournamentId)
