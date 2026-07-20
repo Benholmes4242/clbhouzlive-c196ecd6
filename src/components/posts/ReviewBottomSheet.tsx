@@ -22,6 +22,7 @@ import { MapPin } from 'lucide-react';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 import { useReviewerStats } from '@/hooks/useReviewerStats';
+import { useReviewFallback } from '@/hooks/useReviewFallback';
 import { MentionText } from '@/components/mentions/MentionText';
 import { REVIEW_SHEET_Z } from '@/lib/zLayers';
 import { ReviewGhostNumeral, ReviewVerdictLabel } from '@/components/shared/ReviewGhostScore';
