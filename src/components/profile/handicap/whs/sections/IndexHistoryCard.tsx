@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useHandicapHistory } from '@/lib/whs/hooks';
 import { DarkSectionHeader } from './_shared/darkAtoms';
 import { formatDayMonthShortGB } from '@/i18n/format';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const NUM: React.CSSProperties = { fontFamily: FONT, fontVariantNumeric: 'tabular-nums' };
