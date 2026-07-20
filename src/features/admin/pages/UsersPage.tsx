@@ -585,11 +585,11 @@ function Member360Sheet({
               }}>
                 {detail.is_suspended ? 'Suspended - active' : 'No suspensions'}
               </div>
-              {detail.reports_received > 0 && (
-                <div style={{ fontSize: 12, color: t.inkMuted, fontVariantNumeric: 'tabular-nums' }}>
-                  {detail.reports_received.toLocaleString()} report{detail.reports_received === 1 ? '' : 's'} received
-                </div>
-              )}
+              <div style={{ fontSize: 12, color: t.inkMuted, fontVariantNumeric: 'tabular-nums' }}>
+                {detail.reports_received > 0
+                  ? `${detail.reports_received.toLocaleString()} report${detail.reports_received === 1 ? '' : 's'} received`
+                  : 'No reports received'}
+              </div>
             </div>
           </Section>
 

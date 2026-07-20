@@ -20,6 +20,7 @@ import { usePanelRole } from '@/hooks/usePanelRole';
 import { panelCan } from '@/lib/panelCan';
 import { supabase } from '@/integrations/supabase/client';
 import { useVerifications, type VerificationRow } from '../hooks/useVerifications';
+import { VerificationDetailBody } from '../components/VerificationsReview';
 import type { ModerationQueueRow } from '../hooks/useModerationQueue';
 import type { AppealRow } from '../hooks/useAppeals';
 import type { AdminRequestRow } from '../hooks/useAdminActionRequests';

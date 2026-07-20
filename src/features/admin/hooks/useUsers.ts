@@ -132,7 +132,7 @@ async function fetchUserDetail(userId: string): Promise<AdminUserDetail> {
   const whsP = supabase.from('whs_connections')
     .select('last_sync_status, last_synced_at')
     .eq('user_id', userId).maybeSingle();
-  const countHead = (table: 'posts' | 'course_ratings' | 'user_follows' | 'user_courses' | 'post_reports') =>
+  const countHead = (table: 'posts' | 'course_ratings' | 'user_follows' | 'user_courses' | 'reports') =>
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (supabase.from(table).select('id', { count: 'exact', head: true }) as any);
   const postsP = countHead('posts').eq('user_id', userId);
@@ -140,7 +140,7 @@ async function fetchUserDetail(userId: string): Promise<AdminUserDetail> {
   const followersP = countHead('user_follows').eq('following_id', userId);
   const followingP = countHead('user_follows').eq('follower_id', userId);
   const top100P = countHead('user_courses').eq('user_id', userId).eq('played', true);
-  const reportsP = countHead('post_reports').eq('reported_user_id', userId);
+  const reportsP = countHead('reports').eq('reported_user_id', userId);
   const [profile, role, posts, reviews, followers, following, top100, reports, whs] =
     await Promise.all([profileP, roleP, postsP, reviewsP, followersP, followingP, top100P, reportsP, whsP]);
   if (profile.error) throw profile.error;
