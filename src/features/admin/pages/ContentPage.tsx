@@ -914,7 +914,9 @@ function AddCourseSheet({ open, onClose, onCreated, uploadPhoto }: {
       }
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+        <DraftRestoredBar visible={draftRestored} onDiscard={discardDraft} />
         <Section title="Photo">
+
           <div style={{
             position: 'relative', aspectRatio: '16/9',
             borderRadius: t.radius.md, overflow: 'hidden',
