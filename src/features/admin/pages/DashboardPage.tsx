@@ -6,6 +6,7 @@ import {
 } from 'recharts';
 import {
   AlertTriangle, ArrowDownRight, ArrowUpRight, ChevronRight, Activity, Bell, Cpu,
+  MessageSquare, UserPlus, Star, RefreshCcw,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
@@ -17,6 +18,7 @@ import { useTriageCounts } from '../hooks/useTriageCounts';
 import { useNorthStar, northStarDelta } from '../hooks/useNorthStar';
 import { useEchoEngineHealth } from '../hooks/useEchoEngineHealth';
 import { usePushHealth } from '../hooks/usePushHealth';
+import { useDashboard } from '../hooks/useDashboard';
 
 // ─── Small helpers ────────────────────────────────────────────────────────────
 
@@ -32,36 +34,100 @@ function relTime(iso: string): string {
   return `${Math.floor(h / 24)}d ago`;
 }
 
-// ─── Recent posts (Latest in the clubhouse) ───────────────────────────────────
+// ─── Clubhouse feed (members + posts + reviews) ───────────────────────────────
 
-interface LatestPost {
+type FeedKind = 'member' | 'post' | 'review';
+
+interface FeedItem {
   id: string;
-  content: string | null;
+  kind: FeedKind;
   created_at: string;
-  user: { display_name: string | null; username: string | null; profile_photo_url: string | null } | null;
+  title: string;
+  subtitle: string | null;
+  avatarUrl: string | null;
 }
 
-async function fetchLatestPosts(): Promise<LatestPost[]> {
-  const { data, error } = await supabase
-    .from('posts')
-    .select('id, content, created_at, user_id')
-    .order('created_at', { ascending: false })
-    .limit(6);
-  if (error) throw error;
-  const rows = (data ?? []) as any[];
-  const ids = Array.from(new Set(rows.map(r => r.user_id).filter(Boolean)));
-  if (!ids.length) return rows.map(r => ({ ...r, user: null }));
-  const { data: profiles } = await supabase
-    .from('user_profiles')
-    .select('id, display_name, username, profile_photo_url')
-    .in('id', ids);
-  const map = new Map((profiles ?? []).map((p: any) => [p.id, p]));
-  return rows.map(r => ({
-    id: r.id,
-    content: r.content,
-    created_at: r.created_at,
-    user: map.get(r.user_id) ?? null,
-  }));
+async function fetchClubhouseFeed(): Promise<FeedItem[]> {
+  const [members, posts, reviews] = await Promise.all([
+    supabase
+      .from('user_profiles')
+      .select('id, display_name, username, profile_photo_url, created_at')
+      .is('deleted_at', null)
+      .order('created_at', { ascending: false })
+      .limit(8),
+    supabase
+      .from('posts')
+      .select('id, content, created_at, user_id')
+      .order('created_at', { ascending: false })
+      .limit(8),
+    supabase
+      .from('course_ratings')
+      .select('id, created_at, user_id, course_id, comment')
+      .order('created_at', { ascending: false })
+      .limit(8),
+  ]);
+
+  const postRows = (posts.data ?? []) as any[];
+  const reviewRows = (reviews.data ?? []) as any[];
+  const memberRows = (members.data ?? []) as any[];
+
+  const profileIds = Array.from(new Set([
+    ...postRows.map(r => r.user_id),
+    ...reviewRows.map(r => r.user_id),
+  ].filter(Boolean)));
+  const courseIds = Array.from(new Set(reviewRows.map(r => r.course_id).filter(Boolean)));
+
+  const [profRes, courseRes] = await Promise.all([
+    profileIds.length
+      ? supabase.from('user_profiles').select('id, display_name, username, profile_photo_url').in('id', profileIds)
+      : Promise.resolve({ data: [] as any[] } as any),
+    courseIds.length
+      ? supabase.from('golf_courses').select('id, name').in('id', courseIds)
+      : Promise.resolve({ data: [] as any[] } as any),
+  ]);
+  const profMap = new Map<string, any>(((profRes.data ?? []) as any[]).map(p => [p.id, p]));
+  const courseMap = new Map<string, any>(((courseRes.data ?? []) as any[]).map(c => [c.id, c]));
+
+  const items: FeedItem[] = [];
+
+  for (const m of memberRows) {
+    const name = m.display_name ?? m.username ?? 'New golfer';
+    items.push({
+      id: `member:${m.id}`,
+      kind: 'member',
+      created_at: m.created_at,
+      title: `New member: ${name}`,
+      subtitle: null,
+      avatarUrl: m.profile_photo_url ?? null,
+    });
+  }
+  for (const p of postRows) {
+    const prof = profMap.get(p.user_id);
+    const name = prof?.display_name ?? prof?.username ?? 'Someone';
+    items.push({
+      id: `post:${p.id}`,
+      kind: 'post',
+      created_at: p.created_at,
+      title: `Post from ${name}`,
+      subtitle: (p.content ?? '').trim() || null,
+      avatarUrl: prof?.profile_photo_url ?? null,
+    });
+  }
+  for (const r of reviewRows) {
+    const course = courseMap.get(r.course_id);
+    const prof = profMap.get(r.user_id);
+    items.push({
+      id: `review:${r.id}`,
+      kind: 'review',
+      created_at: r.created_at,
+      title: `Review: ${course?.name ?? 'a course'}`,
+      subtitle: (r.comment ?? '').trim() || null,
+      avatarUrl: prof?.profile_photo_url ?? null,
+    });
+  }
+
+  items.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
+  return items.slice(0, 8);
 }
 
 // ─── Posts & Reviews 14d ──────────────────────────────────────────────────────
@@ -102,10 +168,12 @@ export default function DashboardPage() {
   const triage = useTriageCounts();
   const echo = useEchoEngineHealth();
   const push = usePushHealth();
+  const dashboard = useDashboard();
+  const eg = dashboard.egSyncHealth;
 
-  const latestPosts = useQuery({
-    queryKey: ['admin-v2', 'dashboard', 'latest-posts'],
-    queryFn: fetchLatestPosts,
+  const feed = useQuery({
+    queryKey: ['admin-v2', 'dashboard', 'clubhouse-feed'],
+    queryFn: fetchClubhouseFeed,
     staleTime: 60_000,
     refetchInterval: 120_000,
   });
@@ -123,16 +191,21 @@ export default function DashboardPage() {
     return () => window.removeEventListener('admin-v2:refetch', handler);
   }, [qc]);
 
-  const bannerReason = useMemo(() => {
-    if (push.data?.status === 'red') return 'Push notifications delivery is failing — investigate the queue.';
-    if ((triage.data?.total ?? 0) >= 25) return `${triage.data!.total} items are waiting in your triage queues.`;
-    if (push.data?.status === 'amber') return 'Push notifications delivery is degraded.';
-    return null;
-  }, [push.data?.status, triage.data]);
+  // ── Health chip statuses (computed here so banner can read them) ────────────
+  const echoChip = useMemo(() => computeEchoChip(echo), [echo.isLoading, echo.isError, echo.data]);
+  const pushChip = useMemo(() => computePushChip(push), [push.isLoading, push.isError, push.data]);
+  const egChip = useMemo(() => computeEgChip(eg), [eg.isLoading, eg.isError, eg.data]);
+  const cronChip = useMemo(() => computeCronChip(eg), [eg.isLoading, eg.isError, eg.data]);
+
+  const nonOkChips = [echoChip, pushChip, egChip, cronChip].filter(c => c.tone !== 'ok' && c.tone !== 'idle').length;
 
   return (
     <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 720, margin: '0 auto' }}>
-      {bannerReason && <AlertBanner message={bannerReason} />}
+      <AlertBannerRow
+        triage={triage.data}
+        pushRed={push.data?.status === 'red'}
+        nonOkChips={nonOkChips}
+      />
 
       <NorthStarHero
         data={northStar.data}
@@ -174,39 +247,74 @@ export default function DashboardPage() {
       </ChartCard>
 
       <LatestInClubhouse
-        posts={latestPosts.data ?? []}
-        loading={latestPosts.isLoading}
-        isError={latestPosts.isError}
-        onRetry={() => latestPosts.refetch()}
+        items={feed.data ?? []}
+        loading={feed.isLoading}
+        isError={feed.isError}
+        onRetry={() => feed.refetch()}
       />
 
-      <HealthChipStrip
-        echo={echo}
-        push={push}
-      />
+      <HealthChipStrip echoChip={echoChip} pushChip={pushChip} egChip={egChip} cronChip={cronChip} />
     </div>
   );
 }
 
 // ─── Alert banner ─────────────────────────────────────────────────────────────
 
-function AlertBanner({ message }: { message: string }) {
+function AlertBannerRow({
+  triage, pushRed, nonOkChips,
+}: {
+  triage: ReturnType<typeof useTriageCounts>['data'];
+  pushRed: boolean;
+  nonOkChips: number;
+}) {
+  const total = triage?.total ?? 0;
+  const hasTriage = total > 0;
+
+  if (!hasTriage && !pushRed) return null;
+
+  // Triage-line wins when both exist; push becomes the appended health clause.
+  if (hasTriage) {
+    const rel = triage?.oldestCreatedAt ? relTime(triage.oldestCreatedAt) : 'moments ago';
+    const healthClause = pushRed
+      ? ' - push notifications failing'
+      : nonOkChips > 0
+        ? ` - ${nonOkChips} health alert${nonOkChips === 1 ? '' : 's'}`
+        : '';
+    const message = `${total} waiting - longest ${rel}${healthClause}`;
+    return <BannerLink to={triage!.oldestQueueRoute} tone="warn" message={message} />;
+  }
+
+  // Only push failing.
   return (
-    <div
+    <BannerLink
+      to="/admin-v2/push-health"
+      tone="danger"
+      message="Push notifications failing - open push health"
+    />
+  );
+}
+
+function BannerLink({ to, tone, message }: { to: string; tone: 'warn' | 'danger'; message: string }) {
+  const isDanger = tone === 'danger';
+  return (
+    <Link
+      to={to}
       role="alert"
       style={{
         display: 'flex', alignItems: 'center', gap: 10,
         padding: '10px 12px',
-        background: t.warnSoft,
-        border: `1px solid ${t.warnText}22`,
-        color: t.warnText,
+        background: isDanger ? t.dangerSoft : t.warnSoft,
+        border: `1px solid ${(isDanger ? t.dangerText : t.warnText)}22`,
+        color: isDanger ? t.dangerText : t.warnText,
         borderRadius: t.radius.md,
         fontSize: 13, fontWeight: 600,
+        textDecoration: 'none',
       }}
     >
       <AlertTriangle size={16} />
       <span style={{ flex: 1 }}>{message}</span>
-    </div>
+      <ChevronRight size={16} />
+    </Link>
   );
 }
 
@@ -248,7 +356,7 @@ function NorthStarHero({
         </div>
         {triage && triage.total > 0 && (
           <Link
-            to="/admin-v2/verifications"
+            to={triage.oldestQueueRoute}
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 6,
               background: t.ink, color: t.surface,
@@ -308,7 +416,7 @@ function NorthStarHero({
               color: t.ink, fontWeight: 700,
               fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
             }}>
-              {loading ? '—' : num(data?.totalUsers ?? 0)}
+              {loading ? '-' : num(data?.totalUsers ?? 0)}
             </span>
           </div>
         </>
@@ -344,7 +452,7 @@ function HeroStat({
         color: t.ink, fontSize: 22, fontWeight: 700, lineHeight: 1.1,
         fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
       }}>
-        {value === null ? '—' : num(value)}
+        {value === null ? '-' : num(value)}
       </div>
       {typeof delta === 'number' ? (
         <div
@@ -390,8 +498,8 @@ function ThisWeekGrid({
       />
       <RetentionCard
         loading={loading}
-        d1={data?.d1Retention ?? 0}
-        d7={data?.d7Retention ?? 0}
+        d1={data?.d1Retention ?? null}
+        d7={data?.d7Retention ?? null}
       />
       <style>{`
         @media (min-width: 640px) {
@@ -430,7 +538,7 @@ function MetricCard({
         color: t.ink, fontSize: 28, fontWeight: 700, lineHeight: 1.05,
         fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
       }}>
-        {value === null ? '—' : num(value)}
+        {value === null ? '-' : num(value)}
       </div>
       {typeof delta === 'number' && (
         <div style={{
@@ -450,7 +558,8 @@ function MetricCard({
   );
 }
 
-function RetentionCard({ loading, d1, d7 }: { loading: boolean; d1: number; d7: number }) {
+function RetentionCard({ loading, d1, d7 }: { loading: boolean; d1: number | null; d7: number | null }) {
+  const sparse = !loading && d1 === null && d7 === null;
   return (
     <div
       style={{
@@ -465,15 +574,20 @@ function RetentionCard({ loading, d1, d7 }: { loading: boolean; d1: number; d7: 
       <div style={{ color: t.inkFaint, fontSize: 11, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>
         Retention
       </div>
-      <div style={{ display: 'flex', gap: 16 }}>
-        <RetentionBar label="D1" pct={loading ? 0 : d1} loading={loading} />
-        <RetentionBar label="D7" pct={loading ? 0 : d7} loading={loading} />
-      </div>
+      {sparse ? (
+        <div style={{ color: t.inkMuted, fontSize: 13 }}>Not enough data yet</div>
+      ) : (
+        <div style={{ display: 'flex', gap: 16 }}>
+          <RetentionBar label="D1" pct={d1} loading={loading} />
+          <RetentionBar label="D7" pct={d7} loading={loading} />
+        </div>
+      )}
     </div>
   );
 }
 
-function RetentionBar({ label, pct, loading }: { label: string; pct: number; loading: boolean }) {
+function RetentionBar({ label, pct, loading }: { label: string; pct: number | null; loading: boolean }) {
+  const isNull = !loading && pct === null;
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
@@ -482,7 +596,7 @@ function RetentionBar({ label, pct, loading }: { label: string; pct: number; loa
           color: t.ink, fontSize: 18, fontWeight: 700,
           fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
         }}>
-          {loading ? '—' : `${pct}%`}
+          {loading ? '-' : isNull ? '-' : `${pct}%`}
         </span>
       </div>
       <div style={{
@@ -490,12 +604,15 @@ function RetentionBar({ label, pct, loading }: { label: string; pct: number; loa
         border: `1px solid ${t.line}`,
       }}>
         <div style={{
-          width: `${Math.min(100, Math.max(0, pct))}%`,
+          width: `${Math.min(100, Math.max(0, pct ?? 0))}%`,
           height: '100%',
           background: t.brand,
           borderRadius: 999,
         }} />
       </div>
+      {isNull && (
+        <span style={{ color: t.inkFaint, fontSize: 10 }}>Not enough data yet</span>
+      )}
     </div>
   );
 }
@@ -503,9 +620,9 @@ function RetentionBar({ label, pct, loading }: { label: string; pct: number; loa
 // ─── Latest in the clubhouse ──────────────────────────────────────────────────
 
 function LatestInClubhouse({
-  posts, loading, isError, onRetry,
+  items, loading, isError, onRetry,
 }: {
-  posts: LatestPost[];
+  items: FeedItem[];
   loading: boolean;
   isError: boolean;
   onRetry: () => void;
@@ -524,7 +641,7 @@ function LatestInClubhouse({
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
           <div style={{ color: t.ink, fontWeight: 700, fontSize: 15 }}>Latest in the clubhouse</div>
-          <div style={{ color: t.inkMuted, fontSize: 12, marginTop: 2 }}>Fresh posts across the platform</div>
+          <div style={{ color: t.inkMuted, fontSize: 12, marginTop: 2 }}>New members, posts, and reviews</div>
         </div>
       </div>
 
@@ -538,110 +655,162 @@ function LatestInClubhouse({
           ))}
         </div>
       ) : isError ? (
-        <AdminErrorState message="Couldn't load recent posts." onRetry={onRetry} />
-      ) : posts.length === 0 ? (
-        <EmptyState title="No posts yet" />
+        <AdminErrorState message="Couldn't load recent activity." onRetry={onRetry} />
+      ) : items.length === 0 ? (
+        <EmptyState title="No activity yet" />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          {posts.map((p, idx) => {
-            const name = p.user?.display_name ?? p.user?.username ?? 'Someone';
-            return (
-              <div
-                key={p.id}
-                style={{
-                  display: 'flex', alignItems: 'flex-start', gap: 10,
-                  padding: '10px 0',
-                  borderTop: idx === 0 ? 'none' : `1px solid ${t.line}`,
-                }}
-              >
-                <SquircleAvatar
-                  src={p.user?.profile_photo_url ?? undefined}
-                  alt={name}
-                  size={32}
-                  hairlineRing
-                  ringColor={LIGHT_HAIRLINE}
-                />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-                    <span style={{ color: t.ink, fontSize: 13, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {name}
-                    </span>
-                    <span style={{ color: t.inkFaint, fontSize: 11 }}>· {relTime(p.created_at)}</span>
-                  </div>
-                  <div
-                    style={{
-                      color: t.inkMuted, fontSize: 13, marginTop: 2,
-                      display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden',
-                    }}
-                  >
-                    {p.content?.trim() || <em style={{ color: t.inkFaint }}>Media post</em>}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          {items.map((it, idx) => (
+            <FeedRow key={it.id} item={it} first={idx === 0} />
+          ))}
         </div>
       )}
     </section>
   );
 }
 
+function FeedRow({ item, first }: { item: FeedItem; first: boolean }) {
+  const chip = feedChip(item.kind);
+  return (
+    <div
+      style={{
+        display: 'flex', alignItems: 'flex-start', gap: 10,
+        padding: '10px 0',
+        borderTop: first ? 'none' : `1px solid ${t.line}`,
+      }}
+    >
+      <span
+        aria-hidden
+        style={{
+          width: 28, height: 28, borderRadius: 8,
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+          background: chip.bg, color: chip.fg, flexShrink: 0,
+        }}
+      >
+        {chip.icon}
+      </span>
+      {item.avatarUrl ? (
+        <SquircleAvatar
+          src={item.avatarUrl}
+          alt={item.title}
+          size={28}
+          hairlineRing
+          ringColor={LIGHT_HAIRLINE}
+        />
+      ) : null}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+          <span style={{ color: t.ink, fontSize: 13, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {item.title}
+          </span>
+          <span style={{ color: t.inkFaint, fontSize: 11 }}>· {relTime(item.created_at)}</span>
+        </div>
+        {item.subtitle && (
+          <div
+            style={{
+              color: t.inkMuted, fontSize: 13, marginTop: 2,
+              display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            }}
+          >
+            {item.subtitle}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function feedChip(kind: FeedKind): { icon: React.ReactNode; bg: string; fg: string } {
+  switch (kind) {
+    case 'member':
+      return { icon: <UserPlus size={14} />, bg: '#DBEAFE', fg: '#1D4ED8' };
+    case 'review':
+      return { icon: <Star size={14} />, bg: t.brandSoft, fg: t.brandText };
+    case 'post':
+    default:
+      return { icon: <MessageSquare size={14} />, bg: t.canvas, fg: t.ink };
+  }
+}
+
 // ─── Health chips ─────────────────────────────────────────────────────────────
 
+type ChipTone = 'ok' | 'warn' | 'danger' | 'idle';
+interface ChipState { tone: ChipTone; label: string; detail: string }
+
+function toneColor(tone: ChipTone): string {
+  if (tone === 'ok') return t.ok;
+  if (tone === 'warn') return t.warn;
+  if (tone === 'danger') return t.danger;
+  return t.inkFaint;
+}
+
+function computeEchoChip(echo: ReturnType<typeof useEchoEngineHealth>): ChipState {
+  if (echo.isLoading) return { tone: 'idle', label: 'Echo engines', detail: 'Loading' };
+  if (echo.isError) return { tone: 'warn', label: 'Echo engines', detail: 'Unavailable' };
+  const latest = echo.data?.latest ?? [];
+  if (!latest.length) return { tone: 'idle', label: 'Echo engines', detail: 'No checks' };
+  const failing = latest.filter(r => !r.ok).length;
+  if (failing > 0) return { tone: 'danger', label: 'Echo engines', detail: `${failing} of ${latest.length} failing` };
+  return { tone: 'ok', label: 'Echo engines', detail: `${latest.length} engines ok` };
+}
+
+function computePushChip(push: ReturnType<typeof usePushHealth>): ChipState {
+  if (push.isLoading) return { tone: 'idle', label: 'Push', detail: 'Loading' };
+  if (push.isError || !push.data) return { tone: 'warn', label: 'Push', detail: 'Unavailable' };
+  if (push.data.status === 'red') return { tone: 'danger', label: 'Push', detail: 'Failing' };
+  if (push.data.status === 'amber') return { tone: 'warn', label: 'Push', detail: 'Degraded' };
+  return { tone: 'ok', label: 'Push', detail: 'Healthy' };
+}
+
+function computeEgChip(eg: ReturnType<typeof useDashboard>['egSyncHealth']): ChipState {
+  if (eg.isLoading) return { tone: 'idle', label: 'EG sync', detail: 'Loading' };
+  if (eg.isError || !eg.data) return { tone: 'warn', label: 'EG sync', detail: 'Unavailable' };
+  const d = eg.data;
+  if (d.status === 'red') return { tone: 'danger', label: 'EG sync', detail: `${d.auth_failed} re-auth` };
+  if (d.auth_failed > 0) return { tone: 'warn', label: 'EG sync', detail: `${d.auth_failed} re-auth` };
+  if (d.eg_unavailable > 0) return { tone: 'warn', label: 'EG sync', detail: `${d.eg_unavailable} unavailable` };
+  return { tone: 'ok', label: 'EG sync', detail: `${d.status_ok_count}/${d.total_connected} ok` };
+}
+
+function computeCronChip(eg: ReturnType<typeof useDashboard>['egSyncHealth']): ChipState {
+  if (eg.isLoading) return { tone: 'idle', label: 'Cron', detail: 'Loading' };
+  if (eg.isError || !eg.data) return { tone: 'warn', label: 'Cron', detail: 'Unavailable' };
+  const h = eg.data.cron_hours_ago;
+  if (h === null || h === undefined) return { tone: 'danger', label: 'Cron', detail: 'stale' };
+  if (h > 48) return { tone: 'danger', label: 'Cron', detail: `${Math.round(h)}h ago` };
+  if (h > 26) return { tone: 'warn', label: 'Cron', detail: `${Math.round(h)}h ago` };
+  return { tone: 'ok', label: 'Cron', detail: `${Math.round(h)}h ago` };
+}
+
 function HealthChipStrip({
-  echo, push,
+  egChip, cronChip, echoChip, pushChip,
 }: {
-  echo: ReturnType<typeof useEchoEngineHealth>;
-  push: ReturnType<typeof usePushHealth>;
+  egChip: ChipState;
+  cronChip: ChipState;
+  echoChip: ChipState;
+  pushChip: ChipState;
 }) {
-  const echoStatus = (() => {
-    if (echo.isLoading) return { color: t.inkFaint, label: 'Loading…' };
-    if (echo.isError) return { color: t.warn, label: 'Unavailable' };
-    const latest = echo.data?.latest ?? [];
-    if (!latest.length) return { color: t.inkFaint, label: 'No checks' };
-    const failing = latest.filter(r => !r.ok).length;
-    if (failing > 0) return { color: t.danger, label: `${failing} of ${latest.length} failing` };
-    return { color: t.ok, label: `${latest.length} engines ok` };
-  })();
-
-  const pushStatus = (() => {
-    if (push.isLoading) return { color: t.inkFaint, label: 'Loading…' };
-    if (push.isError || !push.data) return { color: t.warn, label: 'Unavailable' };
-    if (push.data.status === 'red') return { color: t.danger, label: 'Failing' };
-    if (push.data.status === 'amber') return { color: t.warn, label: 'Degraded' };
-    return { color: t.ok, label: 'Healthy' };
-  })();
-
   return (
     <section
       style={{
         display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8,
       }}
     >
-      <HealthChip
-        to="/admin-v2/echo-health"
-        icon={<Cpu size={14} />}
-        label="Echo engines"
-        status={echoStatus}
-      />
-      <HealthChip
-        to="/admin-v2/push-health"
-        icon={<Bell size={14} />}
-        label="Push"
-        status={pushStatus}
-      />
+      <HealthChip to="/admin-v2/system" icon={<RefreshCcw size={14} />} state={egChip} />
+      <HealthChip to="/admin-v2/system" icon={<Activity size={14} />} state={cronChip} />
+      <HealthChip to="/admin-v2/echo-health" icon={<Cpu size={14} />} state={echoChip} />
+      <HealthChip to="/admin-v2/push-health" icon={<Bell size={14} />} state={pushChip} />
     </section>
   );
 }
 
 function HealthChip({
-  to, icon, label, status,
+  to, icon, state,
 }: {
   to: string;
   icon: React.ReactNode;
-  label: string;
-  status: { color: string; label: string };
+  state: ChipState;
 }) {
   return (
     <Link
@@ -657,17 +826,14 @@ function HealthChip({
     >
       <span
         aria-hidden
-        style={{ width: 8, height: 8, borderRadius: 999, background: status.color, flexShrink: 0 }}
+        style={{ width: 8, height: 8, borderRadius: 999, background: toneColor(state.tone), flexShrink: 0 }}
       />
       <span style={{ display: 'inline-flex', color: t.inkMuted }}>{icon}</span>
       <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
-        <span style={{ fontSize: 13, fontWeight: 700, color: t.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</span>
-        <span style={{ fontSize: 11, color: t.inkMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{status.label}</span>
+        <span style={{ fontSize: 13, fontWeight: 700, color: t.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{state.label}</span>
+        <span style={{ fontSize: 11, color: t.inkMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{state.detail}</span>
       </div>
       <ChevronRight size={14} color={t.inkFaint} />
     </Link>
   );
 }
-
-// Silence unused import warning if Activity ever gets used
-void Activity;
