@@ -202,7 +202,7 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
   const spec = resolveKind(row);
   const isUnread = !row.is_read;
   const body = row.message ?? row.title ?? '';
-  const data: any = row.data && typeof row.data === 'object' ? row.data : {};
+  const data = (row.data && typeof row.data === 'object' ? row.data : {}) as Record<string, string | undefined>;
 
   const holdTimer = useRef<number | null>(null);
   const heldRef = useRef(false);
