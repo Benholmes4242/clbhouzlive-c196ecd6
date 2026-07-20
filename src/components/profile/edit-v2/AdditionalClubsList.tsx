@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Plus, X, Search } from 'lucide-react';
 import { useClubSearch } from '@/hooks/useClubSearch';
 import { ClubEntry } from '@/components/profile/profile-wizard/types';
-import { VisibilityDropdown } from './VisibilityDropdown';
+import { VisibilityDropdown, type VisibilityValue } from './VisibilityDropdown';
 import { Label } from '@/components/manage/ui';
 
 interface Props {
@@ -10,7 +10,7 @@ interface Props {
   visibility: string;
   onAdd: (club: Omit<ClubEntry, 'id'>) => void;
   onRemove: (id: string) => void;
-  onVisibilityChange: (v: string) => void;
+  onVisibilityChange: (v: VisibilityValue) => void;
 }
 
 export function AdditionalClubsList({
