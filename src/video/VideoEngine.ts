@@ -606,8 +606,9 @@ class VideoEngineImpl {
     }
     if (effectivePolicy === 'session') {
       if (lane.el.muted !== sessionMuted) {
-        // Respect ONE_UNMUTED_LANE on unmute.
-        this.setMuted(lane.id, sessionMuted);
+        // Respect ONE_UNMUTED_LANE on unmute. Forward the resolve trigger
+        // so any slot-enforce log names the true cause (mount/activation/…).
+        this.setMuted(lane.id, sessionMuted, `policy:${trigger}`);
       }
       return;
     }
