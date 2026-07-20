@@ -77,7 +77,7 @@ function ContactRow({
   onClick?: () => void;
   isLink?: boolean;
 }) {
-  const Wrapper: any = onClick ? 'button' : 'div';
+  const Wrapper: React.ElementType = onClick ? 'button' : 'div';
   return (
     <Wrapper
       {...(onClick ? { type: 'button', onClick } : {})}
@@ -218,9 +218,10 @@ export function BusinessProfileInfo({ business, userId }: BusinessProfileInfoPro
 
   // Opening hours: respect show_opening_hours AND must have >=1 non-empty day
   const oh = business.opening_hours || {};
+  const ohTyped = oh as Record<string, { open?: string; close?: string; closed?: boolean } | undefined>;
   const ohHasContent = DAY_KEYS.some((k) => {
-    const h = (oh as any)[k];
-    return h && (h.closed === true || (h.open && h.close));
+    const h = ohTyped[k];
+    return !!h && (h.closed === true || (!!h.open && !!h.close));
   });
   const showOpeningHours = business.show_opening_hours === true && ohHasContent;
 
@@ -257,7 +258,7 @@ export function BusinessProfileInfo({ business, userId }: BusinessProfileInfoPro
         <>
           <section className="px-4 py-4">
             <SectionKicker>Contact</SectionKicker>
-            <div className="flex flex-col [&>*+*]:border-t" style={{ ['--tw-border-opacity' as any]: 1 }}>
+            <div className="flex flex-col [&>*+*]:border-t" style={{ '--tw-border-opacity': 1 } as React.CSSProperties}>
               {business.website && (
                 <ContactRow
                   icon={Globe}

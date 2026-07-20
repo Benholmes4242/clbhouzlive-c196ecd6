@@ -64,28 +64,28 @@ export function BusinessCommandCard({
 
   const { business, role } = membership;
 
-  // Null-guard: if the joined business row is missing (deleted or soft-deleted between
-  // fetch and render), bail out cleanly rather than crashing on business.id / business.name.
-  if (!business) return null;
-
   // Fetch 7-day stats for visits/impressions — only when expanded, to keep collapsed rows cheap.
-  const { data: stats, isLoading: statsLoading } = useBusinessStats7d(business.id);
+  const { data: stats, isLoading: statsLoading } = useBusinessStats7d(business?.id);
 
   // Fetch TOTAL followers count (source of truth)
-  const { data: totalFollowers, isLoading: followersLoading } = useBusinessFollowersCount(business.id);
+  const { data: totalFollowers, isLoading: followersLoading } = useBusinessFollowersCount(business?.id);
 
-  const { data: verificationRequest } = useBusinessVerificationRequest(business.id);
+  const { data: verificationRequest } = useBusinessVerificationRequest(business?.id);
 
   // Fetch pending access requests count for indicator
-  const { data: pendingRequestsCount } = useBusinessPendingRequestsCount(business.id);
+  const { data: pendingRequestsCount } = useBusinessPendingRequestsCount(business?.id);
 
   // Reviews summary — used for the Reviews action badge / rating.
-  const { data: reviewsData } = useBusinessReviews(business.id, { filter: 'all', sort: 'recent', limit: 1 });
+  const { data: reviewsData } = useBusinessReviews(business?.id, { filter: 'all', sort: 'recent', limit: 1 });
   const awaitingReplies = reviewsData?.summary?.awaiting_reply ?? 0;
   const avgReviewRating = reviewsData?.summary?.avg ?? null;
 
   // Subscribe to realtime updates for access requests
-  useBusinessAccessRequestsRealtime(business.id);
+  useBusinessAccessRequestsRealtime(business?.id);
+
+  // Null-guard: if the joined business row is missing (deleted or soft-deleted between
+  // fetch and render), bail out cleanly. Placed after hooks so the render order stays stable.
+  if (!business) return null;
 
   const canDelete = role === 'owner';
   const canManage = role === 'owner' || role === 'admin';

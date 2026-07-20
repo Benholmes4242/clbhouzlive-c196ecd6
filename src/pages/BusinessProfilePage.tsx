@@ -107,7 +107,7 @@ const BusinessProfilePage: React.FC = () => {
   useHideHeader();
   // Status bar transparency is owned by AppRoutes/applyRouteChrome (single owner).
 
-  const { data: business, isLoading, error } = useBusinessProfile(idOrSlug);
+  const { data: business, isLoading, error, refetch } = useBusinessProfile(idOrSlug);
   const { data: membership } = useBusinessMembership(business?.id);
   const { data: postsCount = 0 } = useBusinessPostsCount(business?.id);
   const { data: followersCount = 0 } = useBusinessFollowersCount(business?.id);
@@ -258,7 +258,7 @@ const BusinessProfilePage: React.FC = () => {
     const url = buildShareUrl();
     if (business?.id) trackBusinessAction(business.id, 'share_profile', user?.id);
     if (navigator.share) {
-      try { await navigator.share({ title: business?.name, url }); } catch {}
+      try { await navigator.share({ title: business?.name, url }); } catch { /* user cancelled share */ }
     } else {
       await navigator.clipboard.writeText(url);
       toast.success('Copied to clipboard');
@@ -289,6 +289,8 @@ const BusinessProfilePage: React.FC = () => {
     );
   }
 
+  // Sentinel string from useBusinessProfile — keep in sync.
+  const isNotFound = error instanceof Error && error.message === 'Business not found';
   if (error || !business) {
     return (
       <div className="min-h-screen flex items-center justify-center p-6 bg-background">
@@ -301,15 +303,27 @@ const BusinessProfilePage: React.FC = () => {
             <Flag className="h-9 w-9" style={{ color: '#F7931E' }} strokeWidth={2.2} />
           </div>
           <h1 className="text-[22px] font-semibold tracking-tight mb-2">
-            We couldn&apos;t find what you were looking for
+            {isNotFound
+              ? "We couldn't find what you were looking for"
+              : "Couldn't load this business"}
           </h1>
 
           <p className="text-muted-foreground text-[15px] leading-relaxed mb-6">
-            We couldn&apos;t find this business. It may have been removed, renamed, or the link
-            you followed is out of date.
+            {isNotFound
+              ? "We couldn't find this business. It may have been removed, renamed, or the link you followed is out of date."
+              : 'Check your connection and try again.'}
           </p>
           <div className="flex flex-col gap-3">
-            <Button onClick={() => navigate('/')} className="w-full h-12 text-[15px] font-semibold">
+            {!isNotFound && (
+              <Button onClick={() => refetch()} className="w-full h-12 text-[15px] font-semibold">
+                Retry
+              </Button>
+            )}
+            <Button
+              onClick={() => navigate('/')}
+              variant={isNotFound ? 'default' : 'outline'}
+              className="w-full h-12 text-[15px] font-semibold"
+            >
               Back to home
             </Button>
             <Button
