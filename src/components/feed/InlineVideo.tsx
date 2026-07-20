@@ -168,6 +168,11 @@ export const InlineVideo: React.FC<Props> = ({
     postId: resolvedOwnerKey,
 
     ownerKey: resolvedOwnerKey,
+    // v8: only the truly-promoted (isActive) card is allowed to claim the
+    // ONE_UNMUTED_LANE slot at play() time. Early-motion / neighbour bound
+    // roles run play() to warm decoders but MUST NOT steal audio — v7's
+    // gate covers them (claimsAudio stays false).
+    claimsAudio: isActive,
   });
 
   const snap = lane.snapshot;

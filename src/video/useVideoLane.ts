@@ -40,6 +40,15 @@ export interface UseVideoLaneOptions {
    * release) may pass a null caller.
    */
   ownerKey?: string | null;
+  /**
+   * v8 activation-claim override. When true and opts.active is also true,
+   * the play() call is allowed to claim the ONE_UNMUTED_LANE slot even if
+   * the feedLaneRoles map hasn't yet flipped this lane to 'active'. Set
+   * ONLY by feed cards that ARE the promoted card (isActive). Preload /
+   * early-motion callers leave this false so v7's steal protection stays
+   * intact.
+   */
+  claimsAudio?: boolean;
 }
 
 export interface UseVideoLaneResult {
@@ -164,14 +173,14 @@ export function useVideoLane(
     if (!laneId) return;
     const callerPostId = opts.ownerKey ?? opts.postId ?? null;
     if (opts.active) {
-      void VideoEngine.play(laneId, { callerPostId });
+      void VideoEngine.play(laneId, { callerPostId, claimsAudio: opts.claimsAudio === true });
     }
     return () => {
       if (opts.active) {
         VideoEngine.pause(laneId, { callerPostId });
       }
     };
-  }, [laneId, opts.active, opts.ownerKey, opts.postId]);
+  }, [laneId, opts.active, opts.ownerKey, opts.postId, opts.claimsAudio]);
 
   // Resume-on-creation-overlay-close. Re-issue play-intent on the currently
   // bound lane when the overlay closes.
@@ -181,7 +190,7 @@ export function useVideoLane(
     if (!laneId || !opts.active) return;
     if (typeof document !== 'undefined' && document.hidden) return;
     const callerPostId = opts.ownerKey ?? opts.postId ?? null;
-    void VideoEngine.play(laneId, { callerPostId });
+    void VideoEngine.play(laneId, { callerPostId, claimsAudio: opts.claimsAudio === true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [creationClosedAt]);
 

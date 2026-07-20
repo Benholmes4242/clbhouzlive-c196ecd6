@@ -219,6 +219,15 @@ class VideoEngineImpl {
    */
   private sameElementReturn = new Set<LaneId>();
   /**
+   * v8 belt: tracks the physical lane last observed to hold the ACTIVE feed
+   * role. When feedLaneRoles emits and this changes, the newly-active lane
+   * may need a role-promote sweep (see onFeedRoleChange) to catch the
+   * stranded-slot case where play() ran under a non-active role and v7's
+   * activation gate correctly skipped its session claim.
+   */
+  private lastActiveFeedLane: LaneId | null = null;
+  private roleUnsub: (() => void) | null = null;
+  /**
    * Stage-7 Audio v3: per-borrow volumechange guard detachers. While a lane
    * is borrowed by the fullscreen viewer, an element-level `volumechange`
    * listener defends the session audio policy — any external writer that
@@ -425,8 +434,50 @@ class VideoEngineImpl {
     if (PAUSE_ON_HIDDEN && typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', this.onVisibility);
     }
+    // v8 belt: subscribe to feed role rotations so we can self-heal the
+    // ONE_UNMUTED_LANE slot when a lane becomes active AFTER its play()
+    // already ran (and got skipped by v7's non-active gate).
+    try {
+      // Seed the tracker so the first emit has a baseline.
+      this.lastActiveFeedLane = feedLaneRoles.laneForRole('active');
+    } catch { /* noop */ }
+    this.roleUnsub = feedLaneRoles.subscribe(this.onFeedRoleChange);
     DBG('booted', { laneIds, saveDataGated: this.saveDataGated });
   }
+
+  /**
+   * v8 belt — fired whenever the feedLaneRoles map or freeze-set changes.
+   * If the ACTIVE-role lane just flipped to a different physical lane and
+   * that lane is playing under a 'session' policy while the session is
+   * unmuted but no lane currently holds the ONE_UNMUTED_LANE slot, run
+   * applyAudioPolicy with trigger='role-promote' to claim the slot.
+   * Distinct trigger so HUD captures show the belt firing.
+   */
+  private onFeedRoleChange = (): void => {
+    let activeLaneId: LaneId | null = null;
+    try { activeLaneId = feedLaneRoles.laneForRole('active'); } catch { return; }
+    if (!activeLaneId || activeLaneId === this.lastActiveFeedLane) return;
+    const prev = this.lastActiveFeedLane;
+    this.lastActiveFeedLane = activeLaneId;
+    const lane = this.lanes.get(activeLaneId);
+    if (!lane) return;
+    // Only care about session-policy lanes that intend to play.
+    if (lane.audioPolicy !== 'session') return;
+    if (!lane.wantPlay || lane.el.paused) return;
+    const sessionMuted = useSessionAudio.getState().isMuted;
+    if (sessionMuted) return; // session is muted → nothing to claim
+    // If any lane already holds the unmuted slot, no need to sweep.
+    let someoneUnmuted = false;
+    this.lanes.forEach((l) => { if (!l.el.muted) someoneUnmuted = true; });
+    if (someoneUnmuted) return;
+    logAudio('policy.role-promote', {
+      laneId: activeLaneId,
+      previousActiveLaneId: prev,
+      trigger: 'role-promote',
+      msSinceOpen: msSinceOpen(),
+    });
+    this.applyAudioPolicy(lane, 'role-promote');
+  };
 
   private onVisibility = () => {
     if (typeof document === 'undefined') return;
@@ -543,7 +594,11 @@ class VideoEngineImpl {
     this.applyAudioPolicy(lane, 'external-bind');
   }
 
-  private applyAudioPolicy(lane: Lane, trigger: 'mount' | 'activation' | 'policy-change' | 'external-bind' | 'guard-reassert' | 'unknown' = 'unknown'): void {
+  private applyAudioPolicy(
+    lane: Lane,
+    trigger: 'mount' | 'activation' | 'policy-change' | 'external-bind' | 'guard-reassert' | 'role-promote' | 'unknown' = 'unknown',
+    opts: { claimsAudio?: boolean } = {}
+  ): void {
     // Borrow override: while the fullscreen viewer owns this lane's element,
     // the effective policy is 'session' regardless of the lane's declared
     // policy (rails ship as 'always-muted'/'local' but must sing in the
@@ -560,15 +615,17 @@ class VideoEngineImpl {
         role = feedLaneRoles.roleForLane(lane.id);
       }
     } catch { /* noop */ }
-    // v7 gate: activation-trigger session claim ONLY when this lane holds
-    // the ACTIVE role (or is a non-feed lane, e.g. fullscreen). Preload
-    // lanes (next/prev) invoke play() to warm playback but must NOT claim
-    // the single ONE_UNMUTED_LANE slot away from the visible active lane.
+    // v7 gate + v8 override: activation-trigger session claim ONLY when this
+    // lane holds the ACTIVE role (or is a non-feed lane, e.g. fullscreen),
+    // OR the caller explicitly declared the claim legitimate via
+    // claimsAudio (feed promotion path). Preload / warm-up play() calls
+    // never set claimsAudio, so v7's steal protection is preserved.
     if (
       trigger === 'activation' &&
       effectivePolicy === 'session' &&
       feedLaneRoles.isFeedLane(lane.id) &&
-      role !== 'active'
+      role !== 'active' &&
+      !opts.claimsAudio
     ) {
       logAudio('policy.resolve', {
         laneId: lane.id,
@@ -1146,7 +1203,7 @@ class VideoEngineImpl {
   }
 
 
-  play(laneId: LaneId, opts: { callerPostId?: string | null; viaViewer?: boolean } = {}): Promise<void> {
+  play(laneId: LaneId, opts: { callerPostId?: string | null; viaViewer?: boolean; claimsAudio?: boolean } = {}): Promise<void> {
     const lane = this.getLane(laneId);
     const caller = opts.callerPostId ?? null;
     // Trace viewer-sourced play so device captures show the path.
@@ -1179,7 +1236,7 @@ class VideoEngineImpl {
     lane.wantPlay = true;
     // AUDIO POLICY: on activation, re-consult session store so an earlier
     // unmute carries to the NEXT video (inheritance on activation).
-    this.applyAudioPolicy(lane, 'activation');
+    this.applyAudioPolicy(lane, 'activation', { claimsAudio: opts.claimsAudio === true });
     logAudio('resume.activate', {
       laneId,
       callerPostId: caller ?? null,
