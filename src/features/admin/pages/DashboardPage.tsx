@@ -1,27 +1,27 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-  Area, AreaChart, CartesianGrid, Legend, ResponsiveContainer,
-  Tooltip, XAxis, YAxis, BarChart, Bar,
+  BarChart, Bar, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from 'recharts';
 import {
-  CheckCircle2, ChevronRight, Activity, ShieldCheck, Mail, Clock,
-  AlertCircle,
+  AlertTriangle, ArrowDownRight, ArrowUpRight, ChevronRight, Activity, Bell, Cpu,
 } from 'lucide-react';
-import { useDashboard } from '../hooks/useDashboard';
-import { panelCan } from '@/lib/panelCan';
-import { usePanelRole } from '@/hooks/usePanelRole';
+import { supabase } from '@/integrations/supabase/client';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { adminTheme as t } from '../theme';
-import KpiCard from '../components/KpiCard';
 import ChartCard from '../components/ChartCard';
-import DataList from '../components/DataList';
 import EmptyState from '../components/EmptyState';
-import StatTile from '../components/StatTile';
-import StatusPill from '../components/StatusPill';
+import AdminErrorState from '../components/AdminErrorState';
+import { useTriageCounts } from '../hooks/useTriageCounts';
+import { useNorthStar, northStarDelta } from '../hooks/useNorthStar';
 import { useEchoEngineHealth } from '../hooks/useEchoEngineHealth';
+import { usePushHealth } from '../hooks/usePushHealth';
 
+// ─── Small helpers ────────────────────────────────────────────────────────────
 
+const num = (n: number) => n.toLocaleString();
+const fmtDateKey = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', day: 'numeric' });
 function relTime(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
   const m = Math.floor(diff / 60000);
@@ -29,77 +29,137 @@ function relTime(iso: string): string {
   if (m < 60) return `${m}m ago`;
   const h = Math.floor(m / 60);
   if (h < 24) return `${h}h ago`;
-  const d = Math.floor(h / 24);
-  return `${d}d ago`;
+  return `${Math.floor(h / 24)}d ago`;
 }
 
-export default function DashboardPage() {
-  const { role } = usePanelRole();
-  const can = panelCan(role);
-  const { kpis, queue, trend, audit, glance, egSyncHealth, refetchAll } = useDashboard();
+// ─── Recent posts (Latest in the clubhouse) ───────────────────────────────────
 
-  // Header refresh hook-in
+interface LatestPost {
+  id: string;
+  content: string | null;
+  created_at: string;
+  user: { display_name: string | null; username: string | null; profile_photo_url: string | null } | null;
+}
+
+async function fetchLatestPosts(): Promise<LatestPost[]> {
+  const { data, error } = await supabase
+    .from('posts')
+    .select('id, content, created_at, user_id')
+    .order('created_at', { ascending: false })
+    .limit(6);
+  if (error) throw error;
+  const rows = (data ?? []) as any[];
+  const ids = Array.from(new Set(rows.map(r => r.user_id).filter(Boolean)));
+  if (!ids.length) return rows.map(r => ({ ...r, user: null }));
+  const { data: profiles } = await supabase
+    .from('user_profiles')
+    .select('id, display_name, username, profile_photo_url')
+    .in('id', ids);
+  const map = new Map((profiles ?? []).map((p: any) => [p.id, p]));
+  return rows.map(r => ({
+    id: r.id,
+    content: r.content,
+    created_at: r.created_at,
+    user: map.get(r.user_id) ?? null,
+  }));
+}
+
+// ─── Posts & Reviews 14d ──────────────────────────────────────────────────────
+
+interface PRDay { date: string; posts: number; reviews: number }
+
+async function fetchPostsReviews14d(): Promise<PRDay[]> {
+  const start = new Date();
+  start.setDate(start.getDate() - 13);
+  start.setHours(0, 0, 0, 0);
+  const iso = start.toISOString();
+  const [posts, reviews] = await Promise.all([
+    supabase.from('posts').select('created_at').gte('created_at', iso).limit(5000),
+    supabase.from('course_ratings').select('created_at').gte('created_at', iso).limit(5000),
+  ]);
+  const buckets: Record<string, PRDay> = {};
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const key = fmtDateKey(d);
+    buckets[key] = { date: key, posts: 0, reviews: 0 };
+  }
+  for (const r of posts.data ?? []) {
+    const k = fmtDateKey(new Date(r.created_at));
+    if (buckets[k]) buckets[k].posts++;
+  }
+  for (const r of reviews.data ?? []) {
+    const k = fmtDateKey(new Date(r.created_at));
+    if (buckets[k]) buckets[k].reviews++;
+  }
+  return Object.values(buckets);
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
+export default function DashboardPage() {
+  const qc = useQueryClient();
+  const northStar = useNorthStar();
+  const triage = useTriageCounts();
+  const echo = useEchoEngineHealth();
+  const push = usePushHealth();
+
+  const latestPosts = useQuery({
+    queryKey: ['admin-v2', 'dashboard', 'latest-posts'],
+    queryFn: fetchLatestPosts,
+    staleTime: 60_000,
+    refetchInterval: 120_000,
+  });
+
+  const prTrend = useQuery({
+    queryKey: ['admin-v2', 'dashboard', 'posts-reviews-14d'],
+    queryFn: fetchPostsReviews14d,
+    staleTime: 5 * 60_000,
+    refetchInterval: 10 * 60_000,
+  });
+
   useEffect(() => {
-    const handler = () => refetchAll();
+    const handler = () => qc.invalidateQueries({ queryKey: ['admin-v2', 'dashboard'] });
     window.addEventListener('admin-v2:refetch', handler);
     return () => window.removeEventListener('admin-v2:refetch', handler);
-  }, [refetchAll]);
+  }, [qc]);
+
+  const bannerReason = useMemo(() => {
+    if (push.data?.status === 'red') return 'Push notifications delivery is failing — investigate the queue.';
+    if ((triage.data?.total ?? 0) >= 25) return `${triage.data!.total} items are waiting in your triage queues.`;
+    if (push.data?.status === 'amber') return 'Push notifications delivery is degraded.';
+    return null;
+  }, [push.data?.status, triage.data]);
 
   return (
-    <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 1280, margin: '0 auto' }}>
-      {/* KPIs */}
-      <section className="admin-v2-kpis">
-        <KpiCard
-          label="Total Users"
-          value={kpis.data?.totalUsers.value ?? 0}
-          delta={kpis.data?.totalUsers.delta}
-          trend={kpis.data?.totalUsers.trend}
-          loading={kpis.isLoading}
-        />
-        <KpiCard
-          label="New Today"
-          value={kpis.data?.newUsersToday.value ?? 0}
-          delta={kpis.data?.newUsersToday.delta}
-          loading={kpis.isLoading}
-        />
-        <KpiCard
-          label="Active 24h"
-          value={kpis.data?.activeUsers24h.value ?? 0}
-          delta={kpis.data?.activeUsers24h.delta}
-          loading={kpis.isLoading}
-        />
-        <KpiCard
-          label="Posts Today"
-          value={kpis.data?.postsToday.value ?? 0}
-          delta={kpis.data?.postsToday.delta}
-          loading={kpis.isLoading}
-        />
-      </section>
+    <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 720, margin: '0 auto' }}>
+      {bannerReason && <AlertBanner message={bannerReason} />}
 
-      {/* Action Queue */}
-      <ActionQueueCard queue={queue.data} loading={queue.isLoading} />
+      <NorthStarHero
+        data={northStar.data}
+        loading={northStar.isLoading}
+        isError={northStar.isError}
+        onRetry={() => northStar.refetch()}
+        triage={triage.data}
+      />
 
-      {/* Activity Trend */}
+      <ThisWeekGrid
+        data={northStar.data}
+        loading={northStar.isLoading}
+      />
+
       <ChartCard
-        title="Activity (14 days)"
-        subtitle="Users, posts, reviews per day"
-        loading={trend.isLoading}
-        isEmpty={!trend.isLoading && (!trend.data || trend.data.every(d => !d.users && !d.posts && !d.reviews))}
-        emptyTitle="No activity yet"
-        emptySubtitle="Data will appear as users sign up and post."
-        height={240}
+        title="Posts and reviews"
+        subtitle="Last 14 days"
+        loading={prTrend.isLoading}
+        isEmpty={!prTrend.isLoading && (prTrend.data ?? []).every(d => !d.posts && !d.reviews)}
+        emptyTitle="No posts or reviews yet"
+        height={220}
       >
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={trend.data ?? []} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
-            <defs>
-              <linearGradient id="g-users" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={t.brand} stopOpacity={0.35} />
-                <stop offset="100%" stopColor={t.brand} stopOpacity={0} />
-              </linearGradient>
-            </defs>
+          <BarChart data={prTrend.data ?? []} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
             <CartesianGrid stroke={t.line} vertical={false} />
             <XAxis dataKey="date" stroke={t.inkFaint} fontSize={11} tickLine={false} axisLine={false} />
-            <YAxis stroke={t.inkFaint} fontSize={11} tickLine={false} axisLine={false} width={32} />
+            <YAxis stroke={t.inkFaint} fontSize={11} tickLine={false} axisLine={false} width={28} allowDecimals={false} />
             <Tooltip
               contentStyle={{
                 background: t.surface, border: `1px solid ${t.line}`,
@@ -107,306 +167,507 @@ export default function DashboardPage() {
               }}
             />
             <Legend wrapperStyle={{ fontSize: 12 }} />
-            <Area type="monotone" dataKey="users"   stroke={t.brand} strokeWidth={2} fill="url(#g-users)" />
-            <Area type="monotone" dataKey="posts"   stroke="#0EA5E9" strokeWidth={2} fill="transparent" />
-            <Area type="monotone" dataKey="reviews" stroke="#16A34A" strokeWidth={2} fill="transparent" />
-          </AreaChart>
+            <Bar dataKey="posts" stackId="a" fill={t.brand} radius={[0, 0, 0, 0]} />
+            <Bar dataKey="reviews" stackId="a" fill={t.ink} radius={[4, 4, 0, 0]} />
+          </BarChart>
         </ResponsiveContainer>
       </ChartCard>
 
-      {/* EG Sync Health */}
-      <EgSyncCard data={egSyncHealth.data} loading={egSyncHealth.isLoading} isError={egSyncHealth.isError} />
+      <LatestInClubhouse
+        posts={latestPosts.data ?? []}
+        loading={latestPosts.isLoading}
+        isError={latestPosts.isError}
+        onRetry={() => latestPosts.refetch()}
+      />
 
-      {/* Echo Engine Health — compact link row */}
-      <EchoHealthLinkRow />
-
-
-
-      {/* Today at a glance */}
-      <section className="admin-v2-twocol">
-        <ChartCard
-          title="Posts by hour (today)"
-          loading={glance.isLoading}
-          isEmpty={!glance.isLoading && (!glance.data?.postsByHour || glance.data.postsByHour.every(b => b.count === 0))}
-          emptyTitle="No posts yet today"
-          height={180}
-        >
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={glance.data?.postsByHour ?? []} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
-              <CartesianGrid stroke={t.line} vertical={false} />
-              <XAxis dataKey="hour" stroke={t.inkFaint} fontSize={11} tickLine={false} axisLine={false} />
-              <YAxis stroke={t.inkFaint} fontSize={11} tickLine={false} axisLine={false} width={28} allowDecimals={false} />
-              <Tooltip contentStyle={{ background: t.surface, border: `1px solid ${t.line}`, borderRadius: 8, fontSize: 12 }} />
-              <Bar dataKey="count" fill={t.brand} radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartCard>
-
-        <Card title="Top 3 active users">
-          {glance.isLoading ? (
-            <div style={{ height: 120, background: t.canvas, borderRadius: t.radius.md, animation: 'admin-pulse 1.4s ease-in-out infinite' }} />
-          ) : (glance.data?.topActiveUsers.length ?? 0) === 0 ? (
-            <EmptyState title="No activity yet today" />
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {glance.data!.topActiveUsers.map((u, i) => (
-                <div key={u.userId} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div
-                    style={{
-                      width: 22, textAlign: 'center', color: t.inkFaint,
-                      fontWeight: 700, fontSize: 13,
-                    }}
-                  >
-                    {i + 1}
-                  </div>
-                  <SquircleAvatar src={u.avatarUrl ?? undefined} alt={u.displayName} size={36}
-                    hairlineRing
-                    ringColor={LIGHT_HAIRLINE}
-                  />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ color: t.ink, fontSize: 14, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {u.displayName}
-                    </div>
-                    <div style={{ color: t.inkMuted, fontSize: 12 }}>
-                      {u.eventCount} events
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </Card>
-      </section>
-
-      {/* Recent Admin Activity (full only) */}
-      {can.manageAdmins && (
-        <Card title="Recent admin activity">
-          <DataList
-            loading={audit.isLoading}
-            rows={audit.data ?? []}
-            rowKey={(r) => r.id}
-            columns={[
-              { key: 'action', header: 'Action', render: (r) => <span style={{ fontWeight: 600 }}>{r.action}</span> },
-              { key: 'target', header: 'Target', render: (r) => r.targetEmail ?? '—' },
-              { key: 'when',   header: 'When',   align: 'right', render: (r) => <span style={{ color: t.inkMuted }}>{relTime(r.createdAt)}</span> },
-            ]}
-            renderCard={(r) => (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
-                  <span style={{ fontWeight: 600, color: t.ink, fontSize: 14 }}>{r.action}</span>
-                  <span style={{ color: t.inkMuted, fontSize: 12 }}>{relTime(r.createdAt)}</span>
-                </div>
-                <span style={{ color: t.inkMuted, fontSize: 12 }}>{r.targetEmail ?? '—'}</span>
-              </div>
-            )}
-            emptyTitle="No admin activity yet"
-          />
-        </Card>
-      )}
-
-      <style>{`
-        .admin-v2-kpis { display: grid; grid-template-columns: 1fr; gap: 12px; }
-        .admin-v2-twocol { display: grid; grid-template-columns: 1fr; gap: 16px; }
-        @media (min-width: 640px) {
-          .admin-v2-kpis { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (min-width: 1024px) {
-          .admin-v2-kpis { grid-template-columns: repeat(4, 1fr); }
-          .admin-v2-twocol { grid-template-columns: 1fr 1fr; }
-        }
-      `}</style>
+      <HealthChipStrip
+        echo={echo}
+        push={push}
+      />
     </div>
   );
 }
 
-// ─── Shared Card ──────────────────────────────────────────────────────────────
+// ─── Alert banner ─────────────────────────────────────────────────────────────
 
-function Card({ title, action, children }: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
+function AlertBanner({ message }: { message: string }) {
+  return (
+    <div
+      role="alert"
+      style={{
+        display: 'flex', alignItems: 'center', gap: 10,
+        padding: '10px 12px',
+        background: t.warnSoft,
+        border: `1px solid ${t.warnText}22`,
+        color: t.warnText,
+        borderRadius: t.radius.md,
+        fontSize: 13, fontWeight: 600,
+      }}
+    >
+      <AlertTriangle size={16} />
+      <span style={{ flex: 1 }}>{message}</span>
+    </div>
+  );
+}
+
+// ─── North Star hero ──────────────────────────────────────────────────────────
+
+function NorthStarHero({
+  data, loading, isError, onRetry, triage,
+}: {
+  data: ReturnType<typeof useNorthStar>['data'];
+  loading: boolean;
+  isError: boolean;
+  onRetry: () => void;
+  triage: ReturnType<typeof useTriageCounts>['data'];
+}) {
+  return (
+    <section
+      style={{
+        background: t.surface,
+        border: `1px solid ${t.line}`,
+        borderRadius: 22,
+        boxShadow: t.shadowCard,
+        padding: 20,
+        display: 'flex', flexDirection: 'column', gap: 16,
+        position: 'relative', overflow: 'hidden',
+      }}
+    >
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0, height: 3,
+        background: `linear-gradient(90deg, ${t.brand}, ${t.brand}00)`,
+      }} />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+        <div>
+          <div style={{ color: t.brandText, fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase' }}>
+            North Star
+          </div>
+          <div style={{ color: t.ink, fontSize: 17, fontWeight: 700, marginTop: 2 }}>
+            Live activity
+          </div>
+        </div>
+        {triage && triage.total > 0 && (
+          <Link
+            to="/admin-v2/verifications"
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              background: t.ink, color: t.surface,
+              padding: '6px 12px', borderRadius: 999,
+              fontSize: 12, fontWeight: 700, textDecoration: 'none',
+            }}
+          >
+            {triage.total} to triage
+            <ChevronRight size={14} />
+          </Link>
+        )}
+      </div>
+
+      {isError ? (
+        <AdminErrorState
+          title="Couldn't load North Star"
+          message="A retry usually fixes it."
+          onRetry={onRetry}
+        />
+      ) : (
+        <>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: 8,
+            }}
+          >
+            <HeroStat
+              label="DAU"
+              value={loading ? null : (data?.dauToday ?? 0)}
+              delta={loading ? undefined : northStarDelta(data?.dauToday ?? 0, data?.dauYesterday ?? 0)}
+              subtitle="vs yesterday"
+            />
+            <HeroStat
+              label="WAU"
+              value={loading ? null : (data?.wau ?? 0)}
+              delta={loading ? undefined : northStarDelta(data?.wau ?? 0, data?.wauPrev ?? 0)}
+              subtitle="vs prev 7d"
+            />
+            <HeroStat
+              label="MAU"
+              value={loading ? null : (data?.mau ?? 0)}
+              subtitle="last 30 days"
+            />
+          </div>
+          <div
+            style={{
+              borderTop: `1px solid ${t.line}`,
+              paddingTop: 12,
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              color: t.inkMuted, fontSize: 12,
+            }}
+          >
+            <span>Total users</span>
+            <span style={{
+              color: t.ink, fontWeight: 700,
+              fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
+            }}>
+              {loading ? '—' : num(data?.totalUsers ?? 0)}
+            </span>
+          </div>
+        </>
+      )}
+    </section>
+  );
+}
+
+function HeroStat({
+  label, value, delta, subtitle,
+}: {
+  label: string;
+  value: number | null;
+  delta?: number;
+  subtitle?: string;
+}) {
+  const positive = (delta ?? 0) >= 0;
+  return (
+    <div
+      style={{
+        background: t.canvas,
+        border: `1px solid ${t.line}`,
+        borderRadius: t.radius.lg,
+        padding: '12px 10px',
+        display: 'flex', flexDirection: 'column', gap: 4,
+        minWidth: 0,
+      }}
+    >
+      <div style={{ color: t.inkFaint, fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>
+        {label}
+      </div>
+      <div style={{
+        color: t.ink, fontSize: 22, fontWeight: 700, lineHeight: 1.1,
+        fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
+      }}>
+        {value === null ? '—' : num(value)}
+      </div>
+      {typeof delta === 'number' ? (
+        <div
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 2,
+            color: positive ? t.okText : t.dangerText,
+            fontSize: 11, fontWeight: 600,
+          }}
+        >
+          {positive ? <ArrowUpRight size={11} /> : <ArrowDownRight size={11} />}
+          {Math.abs(delta)}% <span style={{ color: t.inkFaint, fontWeight: 500 }}>· {subtitle}</span>
+        </div>
+      ) : subtitle ? (
+        <div style={{ color: t.inkFaint, fontSize: 11 }}>{subtitle}</div>
+      ) : null}
+    </div>
+  );
+}
+
+// ─── This week grid ───────────────────────────────────────────────────────────
+
+function ThisWeekGrid({
+  data, loading,
+}: {
+  data: ReturnType<typeof useNorthStar>['data'];
+  loading: boolean;
+}) {
+  return (
+    <section
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr',
+        gap: 12,
+      }}
+      className="admin-v2-thisweek"
+    >
+      <MetricCard
+        title="Signups"
+        subtitle="Last 7 days"
+        value={loading ? null : (data?.signups7d ?? 0)}
+        delta={loading ? undefined : northStarDelta(data?.signups7d ?? 0, data?.signupsPrev7d ?? 0)}
+        deltaLabel="vs previous 7 days"
+      />
+      <RetentionCard
+        loading={loading}
+        d1={data?.d1Retention ?? 0}
+        d7={data?.d7Retention ?? 0}
+      />
+      <style>{`
+        @media (min-width: 640px) {
+          .admin-v2-thisweek { grid-template-columns: 1fr 1fr; }
+        }
+      `}</style>
+    </section>
+  );
+}
+
+function MetricCard({
+  title, subtitle, value, delta, deltaLabel,
+}: {
+  title: string;
+  subtitle?: string;
+  value: number | null;
+  delta?: number;
+  deltaLabel?: string;
+}) {
+  const positive = (delta ?? 0) >= 0;
   return (
     <div
       style={{
         background: t.surface,
         border: `1px solid ${t.line}`,
-        borderRadius: t.radius.lg,
+        borderRadius: 18,
+        boxShadow: t.shadowCard,
+        padding: 16,
+        display: 'flex', flexDirection: 'column', gap: 8,
+      }}
+    >
+      <div style={{ color: t.inkFaint, fontSize: 11, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>
+        {title}
+      </div>
+      <div style={{
+        color: t.ink, fontSize: 28, fontWeight: 700, lineHeight: 1.05,
+        fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
+      }}>
+        {value === null ? '—' : num(value)}
+      </div>
+      {typeof delta === 'number' && (
+        <div style={{
+          display: 'inline-flex', alignItems: 'center', gap: 4,
+          color: positive ? t.okText : t.dangerText,
+          fontSize: 12, fontWeight: 600,
+        }}>
+          {positive ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
+          {Math.abs(delta)}%
+          {deltaLabel && <span style={{ color: t.inkFaint, fontWeight: 500 }}>· {deltaLabel}</span>}
+        </div>
+      )}
+      {subtitle && !delta && (
+        <div style={{ color: t.inkMuted, fontSize: 12 }}>{subtitle}</div>
+      )}
+    </div>
+  );
+}
+
+function RetentionCard({ loading, d1, d7 }: { loading: boolean; d1: number; d7: number }) {
+  return (
+    <div
+      style={{
+        background: t.surface,
+        border: `1px solid ${t.line}`,
+        borderRadius: 18,
         boxShadow: t.shadowCard,
         padding: 16,
         display: 'flex', flexDirection: 'column', gap: 12,
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-        <div style={{ color: t.ink, fontWeight: 700, fontSize: 15 }}>{title}</div>
-        {action}
+      <div style={{ color: t.inkFaint, fontSize: 11, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>
+        Retention
       </div>
-      {children}
+      <div style={{ display: 'flex', gap: 16 }}>
+        <RetentionBar label="D1" pct={loading ? 0 : d1} loading={loading} />
+        <RetentionBar label="D7" pct={loading ? 0 : d7} loading={loading} />
+      </div>
     </div>
   );
 }
 
-// ─── Action queue ─────────────────────────────────────────────────────────────
-
-function ActionQueueCard({ queue, loading }: { queue?: { pendingVerifications: number; pendingInvites: number; expiringAccess: number; pendingCourseClaims: number }; loading: boolean }) {
-  const items = [
-    { label: 'Pending Verifications', count: queue?.pendingVerifications ?? 0, to: '/admin-v2/verifications', Icon: ShieldCheck },
-    { label: 'Pending Course Claims', count: queue?.pendingCourseClaims ?? 0, to: '/admin-v2/verifications?entity=course_claim', Icon: ShieldCheck },
-    { label: 'Pending Invites',       count: queue?.pendingInvites ?? 0,       to: '/admin-v2/users?tab=invites',       Icon: Mail },
-    { label: 'Expiring Access',       count: queue?.expiringAccess ?? 0,       to: '/admin-v2/users?tab=team',          Icon: Clock },
-  ];
-  const visible = items.filter(i => i.count > 0);
-  const allClear = !loading && visible.length === 0;
-
+function RetentionBar({ label, pct, loading }: { label: string; pct: number; loading: boolean }) {
   return (
-    <Card title="Action queue">
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+        <span style={{ color: t.inkMuted, fontSize: 12, fontWeight: 600 }}>{label}</span>
+        <span style={{
+          color: t.ink, fontSize: 18, fontWeight: 700,
+          fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
+        }}>
+          {loading ? '—' : `${pct}%`}
+        </span>
+      </div>
+      <div style={{
+        height: 6, background: t.canvas, borderRadius: 999, overflow: 'hidden',
+        border: `1px solid ${t.line}`,
+      }}>
+        <div style={{
+          width: `${Math.min(100, Math.max(0, pct))}%`,
+          height: '100%',
+          background: t.brand,
+          borderRadius: 999,
+        }} />
+      </div>
+    </div>
+  );
+}
+
+// ─── Latest in the clubhouse ──────────────────────────────────────────────────
+
+function LatestInClubhouse({
+  posts, loading, isError, onRetry,
+}: {
+  posts: LatestPost[];
+  loading: boolean;
+  isError: boolean;
+  onRetry: () => void;
+}) {
+  return (
+    <section
+      style={{
+        background: t.surface,
+        border: `1px solid ${t.line}`,
+        borderRadius: 18,
+        boxShadow: t.shadowCard,
+        padding: 16,
+        display: 'flex', flexDirection: 'column', gap: 12,
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div>
+          <div style={{ color: t.ink, fontWeight: 700, fontSize: 15 }}>Latest in the clubhouse</div>
+          <div style={{ color: t.inkMuted, fontSize: 12, marginTop: 2 }}>Fresh posts across the platform</div>
+        </div>
+      </div>
+
       {loading ? (
-        <div style={{ height: 110, background: t.canvas, borderRadius: t.radius.md, animation: 'admin-pulse 1.4s ease-in-out infinite' }} />
-      ) : allClear ? (
-        <EmptyState
-          icon={<CheckCircle2 size={32} color={t.ok} />}
-          title="All clear"
-          subtitle="No pending actions need your attention right now."
-        />
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          {visible.map((it, idx) => (
-            <Link
-              key={it.label}
-              to={it.to}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 12,
-                padding: '12px 4px',
-                borderTop: idx === 0 ? 'none' : `1px solid ${t.line}`,
-                textDecoration: 'none',
-                color: t.ink,
-              }}
-            >
-              <div
-                style={{
-                  width: 36, height: 36, borderRadius: t.radius.md,
-                  background: t.brandSoft, color: t.brandText,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}
-              >
-                <it.Icon size={18} />
-              </div>
-              <div style={{ flex: 1, fontSize: 14, fontWeight: 600 }}>{it.label}</div>
-              <span
-                style={{
-                  background: t.ink, color: t.surface,
-                  fontSize: 12, fontWeight: 700,
-                  borderRadius: 999, padding: '2px 10px', minWidth: 28, textAlign: 'center',
-                }}
-              >
-                {it.count}
-              </span>
-              <ChevronRight size={16} color={t.inkFaint} />
-            </Link>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {[0, 1, 2].map(i => (
+            <div key={i} style={{
+              height: 52, background: t.canvas, borderRadius: t.radius.md,
+              animation: 'admin-pulse 1.4s ease-in-out infinite',
+            }} />
           ))}
         </div>
-      )}
-    </Card>
-  );
-}
-
-// ─── EG sync health ───────────────────────────────────────────────────────────
-
-function EgSyncCard({ data, loading, isError }: { data: any; loading: boolean; isError: boolean }) {
-  const statusToneMap: Record<string, { tone: any; label: string }> = {
-    green: { tone: 'ok',      label: 'Healthy' },
-    amber: { tone: 'warn',    label: 'Degraded' },
-    red:   { tone: 'danger',  label: 'Failing' },
-    idle:  { tone: 'neutral', label: 'Idle' },
-  };
-  const status = data?.status ?? 'idle';
-  const tone = statusToneMap[status] ?? statusToneMap.idle;
-  const cronHours = data?.cron_hours_ago;
-
-  return (
-    <Card
-      title="EG sync health"
-      action={
-        !loading && !isError ? (
-          <StatusPill tone={tone.tone}>
-            <Activity size={12} /> {tone.label}
-          </StatusPill>
-        ) : null
-      }
-    >
-      {loading ? (
-        <div style={{ height: 100, background: t.canvas, borderRadius: t.radius.md, animation: 'admin-pulse 1.4s ease-in-out infinite' }} />
-      ) : isError || !data ? (
-        <EmptyState
-          icon={<AlertCircle size={28} color={t.warn} />}
-          title="Status unavailable"
-          subtitle="Could not load EG sync health right now."
-        />
+      ) : isError ? (
+        <AdminErrorState message="Couldn't load recent posts." onRetry={onRetry} />
+      ) : posts.length === 0 ? (
+        <EmptyState title="No posts yet" />
       ) : (
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(2, 1fr)',
-            gap: 10,
-          }}
-          className="admin-v2-eg-grid"
-        >
-          <StatTile label="Connected" value={data.total_connected ?? 0} />
-          <StatTile label="OK" value={data.status_ok_count ?? 0} />
-          <StatTile label="Auth failed" value={data.auth_failed ?? 0} />
-          <StatTile
-            label="Last cron"
-            value={
-              cronHours == null
-                ? '—'
-                : cronHours < 1
-                ? '< 1h ago'
-                : `${Math.round(cronHours)}h ago`
-            }
-          />
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {posts.map((p, idx) => {
+            const name = p.user?.display_name ?? p.user?.username ?? 'Someone';
+            return (
+              <div
+                key={p.id}
+                style={{
+                  display: 'flex', alignItems: 'flex-start', gap: 10,
+                  padding: '10px 0',
+                  borderTop: idx === 0 ? 'none' : `1px solid ${t.line}`,
+                }}
+              >
+                <SquircleAvatar
+                  src={p.user?.profile_photo_url ?? undefined}
+                  alt={name}
+                  size={32}
+                  hairlineRing
+                  ringColor={LIGHT_HAIRLINE}
+                />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                    <span style={{ color: t.ink, fontSize: 13, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {name}
+                    </span>
+                    <span style={{ color: t.inkFaint, fontSize: 11 }}>· {relTime(p.created_at)}</span>
+                  </div>
+                  <div
+                    style={{
+                      color: t.inkMuted, fontSize: 13, marginTop: 2,
+                      display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    {p.content?.trim() || <em style={{ color: t.inkFaint }}>Media post</em>}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
-      <style>{`
-        @media (min-width: 640px) {
-          .admin-v2-eg-grid { grid-template-columns: repeat(4, 1fr) !important; }
-        }
-      `}</style>
-    </Card>
+    </section>
   );
 }
 
-function EchoHealthLinkRow() {
-  const { data, isLoading, isError } = useEchoEngineHealth();
-  const latest = data?.latest ?? [];
-  let dotColor: string = t.line;
-  let sub = 'No checks yet';
-  if (isLoading) {
-    sub = 'Loading…';
-  } else if (isError) {
-    dotColor = t.warn;
-    sub = 'Status unavailable';
-  } else if (latest.length > 0) {
-    const anyFail = latest.some(r => !r.ok);
-    dotColor = anyFail ? t.danger : t.ok;
-    const okCount = latest.filter(r => r.ok).length;
-    sub = anyFail ? `${latest.length - okCount} of ${latest.length} engines failing` : `${okCount} of ${latest.length} engines ok`;
-  }
+// ─── Health chips ─────────────────────────────────────────────────────────────
+
+function HealthChipStrip({
+  echo, push,
+}: {
+  echo: ReturnType<typeof useEchoEngineHealth>;
+  push: ReturnType<typeof usePushHealth>;
+}) {
+  const echoStatus = (() => {
+    if (echo.isLoading) return { color: t.inkFaint, label: 'Loading…' };
+    if (echo.isError) return { color: t.warn, label: 'Unavailable' };
+    const latest = echo.data?.latest ?? [];
+    if (!latest.length) return { color: t.inkFaint, label: 'No checks' };
+    const failing = latest.filter(r => !r.ok).length;
+    if (failing > 0) return { color: t.danger, label: `${failing} of ${latest.length} failing` };
+    return { color: t.ok, label: `${latest.length} engines ok` };
+  })();
+
+  const pushStatus = (() => {
+    if (push.isLoading) return { color: t.inkFaint, label: 'Loading…' };
+    if (push.isError || !push.data) return { color: t.warn, label: 'Unavailable' };
+    if (push.data.status === 'red') return { color: t.danger, label: 'Failing' };
+    if (push.data.status === 'amber') return { color: t.warn, label: 'Degraded' };
+    return { color: t.ok, label: 'Healthy' };
+  })();
+
+  return (
+    <section
+      style={{
+        display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8,
+      }}
+    >
+      <HealthChip
+        to="/admin-v2/echo-health"
+        icon={<Cpu size={14} />}
+        label="Echo engines"
+        status={echoStatus}
+      />
+      <HealthChip
+        to="/admin-v2/push-health"
+        icon={<Bell size={14} />}
+        label="Push"
+        status={pushStatus}
+      />
+    </section>
+  );
+}
+
+function HealthChip({
+  to, icon, label, status,
+}: {
+  to: string;
+  icon: React.ReactNode;
+  label: string;
+  status: { color: string; label: string };
+}) {
   return (
     <Link
-      to="/admin-v2/echo-health"
+      to={to}
       style={{
-        display: 'flex', alignItems: 'center', gap: 12,
+        display: 'flex', alignItems: 'center', gap: 10,
         background: t.surface, border: `1px solid ${t.line}`,
         borderRadius: t.radius.lg, boxShadow: t.shadowCard,
-        padding: '12px 14px',
+        padding: '10px 12px',
         textDecoration: 'none', color: t.ink,
+        minWidth: 0,
       }}
     >
       <span
         aria-hidden
-        style={{ width: 10, height: 10, borderRadius: 999, background: dotColor, flexShrink: 0 }}
+        style={{ width: 8, height: 8, borderRadius: 999, background: status.color, flexShrink: 0 }}
       />
+      <span style={{ display: 'inline-flex', color: t.inkMuted }}>{icon}</span>
       <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
-        <span style={{ fontSize: 14, fontWeight: 700, color: t.ink }}>Echo Engine Health</span>
-        <span style={{ fontSize: 11, color: t.inkMuted }}>{sub}</span>
+        <span style={{ fontSize: 13, fontWeight: 700, color: t.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</span>
+        <span style={{ fontSize: 11, color: t.inkMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{status.label}</span>
       </div>
-      <ChevronRight size={16} color={t.inkFaint} />
+      <ChevronRight size={14} color={t.inkFaint} />
     </Link>
   );
 }
+
+// Silence unused import warning if Activity ever gets used
+void Activity;
