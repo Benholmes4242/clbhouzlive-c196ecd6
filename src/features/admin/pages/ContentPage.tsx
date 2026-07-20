@@ -789,6 +789,42 @@ function AddCourseSheet({ open, onClose, onCreated, uploadPhoto }: {
       }
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+        <Section title="Photo">
+          <div style={{
+            position: 'relative', aspectRatio: '16/9',
+            borderRadius: t.radius.md, overflow: 'hidden',
+            background: t.canvas, border: `1px solid ${t.line}`,
+          }}>
+            {photoPreview
+              ? <img src={photoPreview} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <ImageIcon size={28} color={t.inkFaint} />
+                </div>}
+            <input
+              ref={photoInputRef} type="file" accept="image/*" style={{ display: 'none' }}
+              onChange={e => { const f = e.target.files?.[0] ?? null; onPickPhoto(f); e.target.value = ''; }}
+            />
+            <button
+              type="button"
+              onClick={() => photoInputRef.current?.click()}
+              disabled={busy}
+              style={{
+                position: 'absolute', right: 8, bottom: 8,
+                padding: '6px 10px', borderRadius: t.radius.sm,
+                background: 'rgba(15,23,42,.7)', color: '#fff', fontSize: 12, fontWeight: 600,
+                border: 'none', cursor: busy ? 'not-allowed' : 'pointer',
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+              }}
+            >
+              <Upload size={12} />
+              {photoFile ? 'Change photo' : 'Add photo'}
+            </button>
+          </div>
+          <div style={{ color: t.inkFaint, fontSize: 11, marginTop: 6 }}>
+            Optional - uploaded after the course is created.
+          </div>
+        </Section>
+
         <Section title="Identity">
           <Field label="Course name" required>
             <TextInput value={form.name} onChange={v => set('name', v)} placeholder="e.g. Augusta National" />
