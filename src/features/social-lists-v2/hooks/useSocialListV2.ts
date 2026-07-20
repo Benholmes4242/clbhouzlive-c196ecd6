@@ -11,6 +11,14 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
+// Minimal structural typing for the get_social_list RPC — supabase's
+// generated types don't include it. The RPC returns SocialListRow[].
+type SocialListRpc = (
+  fn: 'get_social_list',
+  args: Record<string, unknown>,
+) => Promise<{ data: SocialListRow[] | null; error: { message: string } | null }>;
+const rpcSocialList = supabase.rpc as unknown as SocialListRpc;
+
 export type FriendStatus =
   | 'friend'
   | 'pending_sent'
