@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useFriendsActivity } from '@/lib/whs/hooks';
+import { Skeleton } from '@/components/ui/skeleton';
 
 import Paged8 from '../_shared/Paged8';
 import FriendRoundCard from './FriendRoundCard';
