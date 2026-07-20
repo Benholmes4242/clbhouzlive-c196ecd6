@@ -31,7 +31,7 @@ export interface ActivityFeedRowV2 {
 // Minimal structural rpc caller — the generated Supabase types do not
 // include this RPC signature, but the call shape and error shape are stable.
 type RpcResult<T> = { data: T | null; error: { message: string } | null };
-const rpcActivityFeed = supabase.rpc as unknown as (
+const rpcActivityFeed = supabase.rpc.bind(supabase) as unknown as (
   name: string,
   args: Record<string, unknown>,
 ) => Promise<RpcResult<ActivityFeedRowV2[]>>;

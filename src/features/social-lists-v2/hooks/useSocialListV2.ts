@@ -17,7 +17,7 @@ type SocialListRpc = (
   fn: 'get_social_list',
   args: Record<string, unknown>,
 ) => Promise<{ data: SocialListRow[] | null; error: { message: string } | null }>;
-const rpcSocialList = supabase.rpc as unknown as SocialListRpc;
+const rpcSocialList = supabase.rpc.bind(supabase) as unknown as SocialListRpc;
 
 export type FriendStatus =
   | 'friend'

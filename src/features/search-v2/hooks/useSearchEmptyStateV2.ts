@@ -59,10 +59,7 @@ export function useSearchEmptyStateV2(enabled: boolean) {
     refetchOnWindowFocus: false,
     gcTime: 30 * 60 * 1000,
     queryFn: async (): Promise<EmptyStatePayload> => {
-      const rpc = supabase.rpc as unknown as (
-        fn: string,
-      ) => PromiseLike<{ data: unknown; error: { message: string } | null }>;
-      const { data, error } = await rpc('search_empty_state_v2');
+      const { data, error } = await (supabase.rpc('search_empty_state_v2') as unknown as PromiseLike<{ data: unknown; error: { message: string } | null }>);
       if (error) throw error;
       const j = (data ?? {}) as Partial<EmptyStatePayload>;
       return {
