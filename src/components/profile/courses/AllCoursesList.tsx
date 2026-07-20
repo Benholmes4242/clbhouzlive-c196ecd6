@@ -549,12 +549,21 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
           missingCourses={playedUnrated.map((c) => ({
             id: c.course_id,
             name: c.name,
+            country: null,
+            sub_country: null,
             thumbnail_image: c.thumbnail_image,
-            region: c.region,
-            rating_value: 0,
-            review_date: null,
+            is_top100: false,
+            global_rank: null,
             last_played_at: c.last_played,
-          } as any))}
+            rating_value: 0,
+            rating_id: null,
+            design_score: null,
+            condition_score: null,
+            clubhouse_score: null,
+            facilities_score: null,
+            review: null,
+            review_date: null,
+          }))}
           onPickCourse={(courseId) => {
             setShowReviewPicker(false);
             navigate(`/courses/${courseId}/rate`);
