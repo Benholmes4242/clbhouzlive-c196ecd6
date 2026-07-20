@@ -31,7 +31,7 @@ export function AdditionalClubsList({
 
   return (
     <div className="space-y-3">
-      <Label right={<VisibilityDropdown value={visibility as any} onChange={onVisibilityChange as any} />}>
+      <Label right={<VisibilityDropdown value={visibility as VisibilityValue} onChange={onVisibilityChange} />}>
         Additional clubs
       </Label>
 
