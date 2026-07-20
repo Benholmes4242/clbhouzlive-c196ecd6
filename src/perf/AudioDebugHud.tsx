@@ -27,6 +27,7 @@ import {
 import { useSessionAudio, getLastUnmuteGestureTs } from '@/audio/sessionAudioStore';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { VideoEngine } from '@/video/VideoEngine';
+import { feedLaneRoles } from '@/video/feedLaneRoles';
 
 const HUD_BORDER = '1px solid rgba(251, 191, 36, 0.35)';
 
