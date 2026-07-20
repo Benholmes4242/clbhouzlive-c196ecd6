@@ -24,7 +24,7 @@ export default function ProfileSocialListRoute({ direction }: Props) {
   const searchTab = search.get('tab');
   const initialTab: 'followers' | 'following' =
     searchTab === 'followers' || searchTab === 'following' ? searchTab : direction;
-  const { data: profile, isLoading } = useUserByUsername(username);
+  const { data: profile, isLoading, isError, refetch } = useUserByUsername(username);
   const { user: viewer } = useSupabaseSession();
   const isOwnProfile = !!viewer?.id && !!profile?.id && viewer.id === profile.id;
 
@@ -42,6 +42,21 @@ export default function ProfileSocialListRoute({ direction }: Props) {
     return (
       <div style={{ minHeight: '100dvh', background: '#F8FAFC', padding: '80px 16px', color: '#64748B', fontSize: 13 }}>
         Loading…
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div style={{ minHeight: '100dvh', background: '#F8FAFC', padding: '80px 16px', color: '#64748B', fontSize: 13, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 12 }}>
+        Couldn't load this profile.
+        <button
+          type="button"
+          onClick={() => refetch()}
+          style={{ background: '#0F172A', color: '#fff', border: 'none', borderRadius: 999, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
+        >
+          Retry
+        </button>
       </div>
     );
   }
