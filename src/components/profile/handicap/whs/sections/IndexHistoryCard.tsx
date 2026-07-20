@@ -43,12 +43,14 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
 
   const points = useMemo(() => {
     if (!history || history.length === 0) return [];
-    return [...history]
-      .filter((p: any) => p.handicap_index != null)
+    type HistoryPoint = { observed_at: string; handicap_index: number | null };
+    return (history as ReadonlyArray<HistoryPoint>)
+      .filter((p): p is { observed_at: string; handicap_index: number } => p.handicap_index != null)
+      .slice()
       .sort(
-        (a: any, b: any) =>
+        (a, b) =>
           new Date(a.observed_at).getTime() - new Date(b.observed_at).getTime(),
-      ) as { observed_at: string; handicap_index: number }[];
+      );
   }, [history]);
 
   const n = points.length;
