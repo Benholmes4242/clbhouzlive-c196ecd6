@@ -144,10 +144,10 @@ export function TheClass({ slug, collegeName }: Props) {
                 borderBottom: `0.5px solid ${HAIRLINE_INK_10}`,
               }}
             >
-              <div style={{ width: 22, height: 12, background: 'rgba(15,23,42,0.06)' }} />
-              <div style={{ width: 34, height: 34, borderRadius: '34%', background: 'rgba(15,23,42,0.06)' }} />
-              <div style={{ flex: 1, height: 12, background: 'rgba(15,23,42,0.06)' }} />
-              <div style={{ width: 78, height: 12, background: 'rgba(15,23,42,0.06)' }} />
+              <Skeleton style={{ width: 22, height: 12, borderRadius: 3 }} />
+              <Skeleton style={{ width: 34, height: 34, borderRadius: '34%' }} />
+              <Skeleton style={{ flex: 1, height: 12, borderRadius: 3 }} />
+              <Skeleton style={{ width: 78, height: 12, borderRadius: 3 }} />
             </div>
           ))}
         </>
