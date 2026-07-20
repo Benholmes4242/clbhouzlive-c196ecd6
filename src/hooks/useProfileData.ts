@@ -76,6 +76,8 @@ export const useProfileData = () => {
     profile,
     loading: sessionLoading || (!!user?.id && profileLoading),
     error: profileError,
+    isError: !!profileError,
+    refetch: fetchProfile,
     setProfile,
     fetchProfile: fetchProfileById, // Support calling with optional userId
     refreshProfile,
