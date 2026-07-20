@@ -251,7 +251,7 @@ function EGFriendRow({
   friend,
   already,
 }: {
-  friend: any;
+  friend: FriendLeaderboardEntry;
   already?: { created_at: string };
 }) {
   const queryClient = useQueryClient();
