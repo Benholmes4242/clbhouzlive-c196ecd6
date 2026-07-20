@@ -64,12 +64,12 @@ function statePillText(
     };
   }
   if (state.kind === 'results') {
-    if (state.variant === 'cancelled') return { text: t('overview.pill.cancelled'), tone: 'final' };
-    if (state.variant === 'playoff') return { text: t('overview.pill.playoff'), tone: 'final' };
-    return { text: t('overview.pill.final'), tone: 'final' };
+    if (state.variant === 'cancelled') return { text: t('overview.pillState.cancelled'), tone: 'final' };
+    if (state.variant === 'playoff') return { text: t('overview.pillState.playoff'), tone: 'final' };
+    return { text: t('overview.pillState.final'), tone: 'final' };
   }
   return {
-    text: state.countdown ? state.countdown.toUpperCase() : t('overview.pill.upcoming'),
+    text: state.countdown ? state.countdown.toUpperCase() : t('overview.pillState.upcoming'),
     tone: 'upcoming',
   };
 }
