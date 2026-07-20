@@ -79,6 +79,14 @@ const StatusBadge: React.FC<{ status: WhsInviteStatus['status'] }> = ({ status }
 export const SentInvitesSheet: React.FC<Props> = ({ open, onClose }) => {
   const { data: invites, isLoading } = useSentInvites();
 
+  useEffect(() => {
+    if (!open) return;
+    lockBodyScroll();
+    return () => unlockBodyScroll();
+  }, [open]);
+
+
+
   return (
     <DrawerPrimitive.Root
       open={open}
