@@ -26,7 +26,9 @@ import ConfirmDialog from '../components/ConfirmDialog';
 import AdminSheet from '../components/AdminSheet';
 import CourseInsight from '../components/CourseInsight';
 import AdminAccessDenied from '../components/AdminAccessDenied';
-import { VALID_CONTINENTS, COURSE_TYPES } from '../constants';
+import { COURSE_TYPES } from '../constants';
+import { ContinentCountrySelectors } from '../components/ContinentCountrySelectors';
+import { isCountryInContinent } from '../lib/countries';
 import { useCourses, createCourse, type AdminCourseRow, type CourseFilter } from '../hooks/useCourses';
 import { saveDraft, loadDraft, clearDraft, draftKeys, draftsEqual } from '../lib/sheetDrafts';
 import HelpArticlesTab from '../components/HelpArticlesTab';
@@ -460,6 +462,7 @@ function CourseDetail({
     if (!course) return null;
     return {
       name: course.name ?? '',
+      continent: course.continent ?? '',
       country: course.country ?? '',
       sub_country: course.sub_country ?? '',
       region: course.region ?? '',
@@ -508,9 +511,22 @@ function CourseDetail({
 
   const handleSave = async () => {
     if (!courseId) return;
+    const continent = (form.continent ?? '').trim();
+    const country = (form.country ?? '').trim();
+    if (!continent) { toast.error('Continent is required'); return; }
+    if (!country) { toast.error('Country is required'); return; }
+    // Legacy stored value that isn't in the list is allowed only when
+    // untouched (i.e. still equals the original record value).
+    const original = (course?.country ?? '').trim();
+    const legacyUntouched = country === original && !isCountryInContinent(country, continent);
+    if (!legacyUntouched && !isCountryInContinent(country, continent)) {
+      toast.error(`"${country}" is not a valid country for ${continent}`);
+      return;
+    }
     const updates: any = {
       name: form.name?.trim(),
-      country: form.country?.trim(),
+      continent: continent as any,
+      country,
       sub_country: form.sub_country || null,
       region: form.region || null,
       country_code: form.country_code || null,
@@ -629,7 +645,13 @@ function CourseDetail({
 
           <Section title="Identity">
             <Field label="Name"><TextInput value={form.name} onChange={v => set('name', v)} /></Field>
-            <Field label="Country"><TextInput value={form.country} onChange={v => set('country', v)} /></Field>
+            <ContinentCountrySelectors
+              continent={form.continent ?? ''}
+              country={form.country ?? ''}
+              onContinentChange={v => set('continent', v)}
+              onCountryChange={v => set('country', v)}
+              required
+            />
             <Field label="Country code"><TextInput value={form.country_code} onChange={v => set('country_code', v)} placeholder="e.g. US" /></Field>
           </Section>
 
@@ -848,11 +870,19 @@ function AddCourseSheet({ open, onClose, onCreated, uploadPhoto }: {
     setPhotoPreview(f ? URL.createObjectURL(f) : null);
   };
 
-  const valid = form.name.trim() && form.country.trim() && form.continent;
+  const valid = !!(
+    form.name.trim() &&
+    form.continent &&
+    form.country.trim() &&
+    isCountryInContinent(form.country.trim(), form.continent)
+  );
 
   const submit = async () => {
-    if (!valid) {
-      toast.error('Name, country and continent are required');
+    if (!form.name.trim()) { toast.error('Name is required'); return; }
+    if (!form.continent) { toast.error('Continent is required'); return; }
+    if (!form.country.trim()) { toast.error('Country is required'); return; }
+    if (!isCountryInContinent(form.country.trim(), form.continent)) {
+      toast.error(`"${form.country}" is not a valid country for ${form.continent}`);
       return;
     }
     setBusy(true);
@@ -956,15 +986,13 @@ function AddCourseSheet({ open, onClose, onCreated, uploadPhoto }: {
           <Field label="Course name" required>
             <TextInput value={form.name} onChange={v => set('name', v)} placeholder="e.g. Augusta National" />
           </Field>
-          <Field label="Country" required>
-            <TextInput value={form.country} onChange={v => set('country', v)} placeholder="e.g. USA" />
-          </Field>
-          <Field label="Continent" required>
-            <SelectInput value={form.continent} onChange={v => set('continent', v)}>
-              <option value="">Select…</option>
-              {VALID_CONTINENTS.map(c => <option key={c} value={c}>{c}</option>)}
-            </SelectInput>
-          </Field>
+          <ContinentCountrySelectors
+            continent={form.continent}
+            country={form.country}
+            onContinentChange={v => set('continent', v)}
+            onCountryChange={v => set('country', v)}
+            required
+          />
         </Section>
 
         <Section title="Location">
