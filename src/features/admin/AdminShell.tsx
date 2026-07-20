@@ -14,11 +14,8 @@ const DashboardPage = lazy(() => import('./pages/DashboardPage'));
 const UsersPage = lazy(() => import('./pages/UsersPage'));
 const ContentPage = lazy(() => import('./pages/ContentPage'));
 const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage'));
-const SystemPage = lazy(() => import('./pages/SystemPage'));
+const HealthPage = lazy(() => import('./pages/HealthPage'));
 const InboxPage = lazy(() => import('./pages/InboxPage'));
-const VideoPerfPage = lazy(() => import('./pages/VideoPerfPage'));
-const EchoHealthPage = lazy(() => import('./pages/EchoHealthPage'));
-const PushHealthPage = lazy(() => import('./pages/PushHealthPage'));
 
 const SECTION_TITLES: Record<string, string> = {
   dashboard:  'Dashboard',
@@ -26,17 +23,16 @@ const SECTION_TITLES: Record<string, string> = {
   users:      'Users',
   content:    'Content',
   analytics:  'Analytics',
-  system:     'System',
-  'video-perf': 'Video Perf',
-  'echo-health': 'Echo Health',
-  'push-health': 'Push Health',
+  health:     'Health',
 };
 
+
 // Preserve ALL query params across redirects; optionally set/override ?type=
-function RedirectPreserving({ to, forceType }: { to: string; forceType?: string }) {
+function RedirectPreserving({ to, forceType, forceTab }: { to: string; forceType?: string; forceTab?: string }) {
   const [params] = useSearchParams();
   const next = new URLSearchParams(params);
   if (forceType) next.set('type', forceType);
+  if (forceTab && !next.get('tab')) next.set('tab', forceTab);
   const qs = next.toString();
   return <Navigate to={`${to}${qs ? `?${qs}` : ''}`} replace />;
 }
@@ -118,10 +114,13 @@ export default function AdminShell() {
                 <Route path="users/*"     element={can.viewUsers ? <UsersPage /> : <AdminAccessDenied />} />
                 <Route path="content/*"   element={<ContentPage />} />
                 <Route path="analytics/*" element={can.manageAdmins ? <AnalyticsPage /> : <AdminAccessDenied />} />
-                <Route path="system/*"    element={<SystemPage />} />
-                <Route path="video-perf/*" element={<VideoPerfPage />} />
-                <Route path="echo-health/*" element={can.manageAdmins ? <EchoHealthPage /> : <AdminAccessDenied />} />
-                <Route path="push-health/*" element={can.manageAdmins ? <PushHealthPage /> : <AdminAccessDenied />} />
+                <Route path="health/*" element={<HealthPage />} />
+
+                {/* Redirects: legacy health-family routes -> unified Health page */}
+                <Route path="system/*"      element={<RedirectPreserving to="/admin-v2/health" />} />
+                <Route path="echo-health/*" element={<RedirectPreserving to="/admin-v2/health" forceTab="status" />} />
+                <Route path="push-health/*" element={<RedirectPreserving to="/admin-v2/health" forceTab="status" />} />
+                <Route path="video-perf/*"  element={<RedirectPreserving to="/admin-v2/health" forceTab="video" />} />
 
                 {/* Redirects: seven old queue routes -> unified inbox (preserving query params) */}
                 <Route path="moderation/*"      element={<RedirectPreserving to="/admin-v2/inbox" forceType="report" />} />

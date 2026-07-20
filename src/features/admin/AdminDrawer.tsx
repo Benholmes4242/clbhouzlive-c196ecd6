@@ -1,13 +1,14 @@
 import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  LayoutDashboard, Inbox, Users, MapPin, BarChart3, Settings, Shield, ArrowLeft,
-  Gauge, Activity, Bell,
+  LayoutDashboard, Inbox, Users, MapPin, BarChart3, Shield, ArrowLeft,
+  Activity,
   type LucideIcon,
 } from 'lucide-react';
 import { adminTheme as t } from './theme';
 import type { PanelRole } from '@/hooks/usePanelRole';
 import { useTriageCounts } from './hooks/useTriageCounts';
+import { useHealthChips } from './lib/healthChips';
 
 interface NavItem {
   to: string;
@@ -16,18 +17,16 @@ interface NavItem {
   requireFull?: boolean;
   moderatorAllowed?: boolean;
   showBadge?: boolean;
+  showHealthDot?: boolean;
 }
 
 const NAV: NavItem[] = [
-  { to: '/admin-v2/dashboard',   label: 'Dashboard',   icon: LayoutDashboard },
-  { to: '/admin-v2/inbox',       label: 'Inbox',       icon: Inbox, moderatorAllowed: true, showBadge: true },
-  { to: '/admin-v2/users',       label: 'Users',       icon: Users },
-  { to: '/admin-v2/content',     label: 'Content',     icon: MapPin },
-  { to: '/admin-v2/analytics',   label: 'Analytics',   icon: BarChart3, requireFull: true },
-  { to: '/admin-v2/system',      label: 'System',      icon: Settings },
-  { to: '/admin-v2/video-perf',  label: 'Video Perf',  icon: Gauge, requireFull: true },
-  { to: '/admin-v2/echo-health', label: 'Echo Health', icon: Activity, requireFull: true },
-  { to: '/admin-v2/push-health', label: 'Push Health', icon: Bell, requireFull: true },
+  { to: '/admin-v2/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/admin-v2/inbox',     label: 'Inbox',     icon: Inbox, moderatorAllowed: true, showBadge: true },
+  { to: '/admin-v2/users',     label: 'Users',     icon: Users },
+  { to: '/admin-v2/content',   label: 'Content',   icon: MapPin },
+  { to: '/admin-v2/analytics', label: 'Analytics', icon: BarChart3, requireFull: true },
+  { to: '/admin-v2/health',    label: 'Health',    icon: Activity, showHealthDot: true },
 ];
 
 interface Props {
@@ -41,6 +40,8 @@ export default function AdminDrawer({ open, onClose, role, canManageAdmins }: Pr
   const location = useLocation();
   const triage = useTriageCounts();
   const badge = triage.data?.total ?? 0;
+  const health = useHealthChips();
+  const healthDegraded = health.nonOk > 0;
 
   useEffect(() => {
     if (!open) return;
@@ -102,6 +103,7 @@ export default function AdminDrawer({ open, onClose, role, canManageAdmins }: Pr
             const active = location.pathname.startsWith(item.to);
             const Icon = item.icon;
             const showBadge = item.showBadge && badge > 0;
+            const showDot = item.showHealthDot && healthDegraded;
             return (
               <Link
                 key={item.to}
@@ -117,7 +119,16 @@ export default function AdminDrawer({ open, onClose, role, canManageAdmins }: Pr
                   textDecoration: 'none',
                 }}
               >
-                <Icon size={18} />
+                <span style={{ position: 'relative', display: 'inline-flex' }}>
+                  <Icon size={18} />
+                  {showDot && (
+                    <span style={{
+                      position: 'absolute', top: -2, right: -2,
+                      width: 8, height: 8, borderRadius: 999,
+                      background: t.warn, border: `1.5px solid ${t.surface}`,
+                    }} />
+                  )}
+                </span>
                 <span style={{ flex: 1 }}>{item.label}</span>
                 {showBadge && (
                   <span

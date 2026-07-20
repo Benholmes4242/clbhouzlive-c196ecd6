@@ -19,6 +19,11 @@ import { useNorthStar, northStarDelta } from '../hooks/useNorthStar';
 import { useEchoEngineHealth } from '../hooks/useEchoEngineHealth';
 import { usePushHealth } from '../hooks/usePushHealth';
 import { useDashboard } from '../hooks/useDashboard';
+import {
+  computeEchoChip, computePushChip, computeEgChip, computeCronChip,
+  toneColor, type ChipState,
+} from '../lib/healthChips';
+
 
 // ─── Small helpers ────────────────────────────────────────────────────────────
 
@@ -287,7 +292,7 @@ function AlertBannerRow({
   // Only push failing.
   return (
     <BannerLink
-      to="/admin-v2/push-health"
+      to="/admin-v2/health?tab=status"
       tone="danger"
       message="Push notifications failing - open push health"
     />
@@ -735,53 +740,8 @@ function feedChip(kind: FeedKind): { icon: React.ReactNode; bg: string; fg: stri
 
 // ─── Health chips ─────────────────────────────────────────────────────────────
 
-type ChipTone = 'ok' | 'warn' | 'danger' | 'idle';
-interface ChipState { tone: ChipTone; label: string; detail: string }
 
-function toneColor(tone: ChipTone): string {
-  if (tone === 'ok') return t.ok;
-  if (tone === 'warn') return t.warn;
-  if (tone === 'danger') return t.danger;
-  return t.inkFaint;
-}
 
-function computeEchoChip(echo: ReturnType<typeof useEchoEngineHealth>): ChipState {
-  if (echo.isLoading) return { tone: 'idle', label: 'Echo engines', detail: 'Loading' };
-  if (echo.isError) return { tone: 'warn', label: 'Echo engines', detail: 'Unavailable' };
-  const latest = echo.data?.latest ?? [];
-  if (!latest.length) return { tone: 'idle', label: 'Echo engines', detail: 'No checks' };
-  const failing = latest.filter(r => !r.ok).length;
-  if (failing > 0) return { tone: 'danger', label: 'Echo engines', detail: `${failing} of ${latest.length} failing` };
-  return { tone: 'ok', label: 'Echo engines', detail: `${latest.length} engines ok` };
-}
-
-function computePushChip(push: ReturnType<typeof usePushHealth>): ChipState {
-  if (push.isLoading) return { tone: 'idle', label: 'Push', detail: 'Loading' };
-  if (push.isError || !push.data) return { tone: 'warn', label: 'Push', detail: 'Unavailable' };
-  if (push.data.status === 'red') return { tone: 'danger', label: 'Push', detail: 'Failing' };
-  if (push.data.status === 'amber') return { tone: 'warn', label: 'Push', detail: 'Degraded' };
-  return { tone: 'ok', label: 'Push', detail: 'Healthy' };
-}
-
-function computeEgChip(eg: ReturnType<typeof useDashboard>['egSyncHealth']): ChipState {
-  if (eg.isLoading) return { tone: 'idle', label: 'EG sync', detail: 'Loading' };
-  if (eg.isError || !eg.data) return { tone: 'warn', label: 'EG sync', detail: 'Unavailable' };
-  const d = eg.data;
-  if (d.status === 'red') return { tone: 'danger', label: 'EG sync', detail: `${d.auth_failed} re-auth` };
-  if (d.auth_failed > 0) return { tone: 'warn', label: 'EG sync', detail: `${d.auth_failed} re-auth` };
-  if (d.eg_unavailable > 0) return { tone: 'warn', label: 'EG sync', detail: `${d.eg_unavailable} unavailable` };
-  return { tone: 'ok', label: 'EG sync', detail: `${d.status_ok_count}/${d.total_connected} ok` };
-}
-
-function computeCronChip(eg: ReturnType<typeof useDashboard>['egSyncHealth']): ChipState {
-  if (eg.isLoading) return { tone: 'idle', label: 'Cron', detail: 'Loading' };
-  if (eg.isError || !eg.data) return { tone: 'warn', label: 'Cron', detail: 'Unavailable' };
-  const h = eg.data.cron_hours_ago;
-  if (h === null || h === undefined) return { tone: 'danger', label: 'Cron', detail: 'stale' };
-  if (h > 48) return { tone: 'danger', label: 'Cron', detail: `${Math.round(h)}h ago` };
-  if (h > 26) return { tone: 'warn', label: 'Cron', detail: `${Math.round(h)}h ago` };
-  return { tone: 'ok', label: 'Cron', detail: `${Math.round(h)}h ago` };
-}
 
 function HealthChipStrip({
   egChip, cronChip, echoChip, pushChip,
@@ -797,10 +757,10 @@ function HealthChipStrip({
         display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8,
       }}
     >
-      <HealthChip to="/admin-v2/system" icon={<RefreshCcw size={14} />} state={egChip} />
-      <HealthChip to="/admin-v2/system" icon={<Activity size={14} />} state={cronChip} />
-      <HealthChip to="/admin-v2/echo-health" icon={<Cpu size={14} />} state={echoChip} />
-      <HealthChip to="/admin-v2/push-health" icon={<Bell size={14} />} state={pushChip} />
+      <HealthChip to="/admin-v2/health?tab=status" icon={<RefreshCcw size={14} />} state={egChip} />
+      <HealthChip to="/admin-v2/health?tab=status" icon={<Activity size={14} />} state={cronChip} />
+      <HealthChip to="/admin-v2/health?tab=status" icon={<Cpu size={14} />} state={echoChip} />
+      <HealthChip to="/admin-v2/health?tab=status" icon={<Bell size={14} />} state={pushChip} />
     </section>
   );
 }
