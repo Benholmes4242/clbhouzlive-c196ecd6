@@ -13,6 +13,7 @@
  */
 
 import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { tournamentRoute } from '@/features/tourhub/routes';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
