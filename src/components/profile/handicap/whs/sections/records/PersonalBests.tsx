@@ -20,7 +20,7 @@ const D_BG = 'var(--hcp-bg-1)';
 const D_LINE = 'var(--hcp-line)';
 const D_T100 = 'var(--hcp-t-100)';
 const D_T60 = 'var(--hcp-t-60)';
-const D_BG3 = 'var(--hcp-bg-3)';
+
 
 const RECORD_ICON: Record<string, LucideIcon> = {
   'Best Diff': TrendingDown,
