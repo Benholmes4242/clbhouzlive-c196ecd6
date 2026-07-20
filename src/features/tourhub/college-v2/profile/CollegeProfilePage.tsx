@@ -28,6 +28,7 @@ import { Masthead } from './sections/Masthead';
 import { ThisWeek } from './sections/ThisWeek';
 import { TheClass } from './sections/TheClass';
 import { scrollPageToTop } from '@/lib/getScrollParent';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export function CollegeProfilePage() {
   const { collegeSlug } = useParams<{ collegeSlug: string }>();
