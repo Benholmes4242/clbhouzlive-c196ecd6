@@ -7404,6 +7404,38 @@ export type Database = {
           },
         ]
       }
+      post_impressions: {
+        Row: {
+          first_seen_at: string
+          impression_count: number
+          last_seen_at: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          first_seen_at?: string
+          impression_count?: number
+          last_seen_at?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          first_seen_at?: string
+          impression_count?: number
+          last_seen_at?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_impressions_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       post_likes: {
         Row: {
           actor_id: string
@@ -19742,6 +19774,10 @@ export type Database = {
           rivals_passed: string[]
           season_name: string
         }[]
+      }
+      record_post_impressions: {
+        Args: { p_post_ids: string[] }
+        Returns: undefined
       }
       redeem_whs_invite: {
         Args: { p_invite_code: string; p_redeemed_by_user_id: string }

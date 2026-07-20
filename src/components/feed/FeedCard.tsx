@@ -43,6 +43,7 @@ import { triggerHaptic } from '@/lib/ui/haptics';
 import type { ActiveActor } from '@/types/actor';
 import { MentionText } from '@/components/mentions/MentionText';
 import { formatCountKilo as formatCount, formatRelativeWithSeconds as timeAgo } from '@/i18n/format';
+import { useImpressionObserver } from '@/lib/impressions/useImpressionObserver';
 
 
 // Full-bleed charcoal chrome — one charcoal (#15171F) across the app: tab
@@ -249,6 +250,10 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   // Actor selection is GLOBAL — picker reads and writes the session-wide activeActor.
   const effectiveActor: ActiveActor | null = activeActor;
   const captionTextRef = useRef<HTMLDivElement | null>(null);
+  const articleRef = useRef<HTMLElement | null>(null);
+  // Phase 0 impression tracker — silently records ≥50%/≥1s dwell views.
+  // Signed-out flushes are dropped in the tracker itself; observer is cheap.
+  useImpressionObserver(articleRef, post.id);
 
   // Fire-once paint-ready signal — gated to the first card so the skeleton
   // controller hears exactly one event per feed mount.
@@ -385,6 +390,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
 
   return (
     <article
+      ref={articleRef}
       style={{
         background: CARD,
         overflow: 'hidden',
