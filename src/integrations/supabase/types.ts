@@ -19157,6 +19157,19 @@ export type Database = {
           post_id: string
           post_user_id: string
           poster_url: string
+          review_clubhouse_score: number
+          review_condition_score: number
+          review_course_country: string
+          review_course_id: string
+          review_course_image: string
+          review_course_name: string
+          review_course_region: string
+          review_course_sub_country: string
+          review_design_score: number
+          review_facilities_score: number
+          review_rating: number
+          review_text: string
+          source_review_id: string
           stream_id: string
           width: number
         }[]
