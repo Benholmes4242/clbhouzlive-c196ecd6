@@ -144,9 +144,10 @@ export const AchievementsCard: React.FC<Props> = ({ userId, viewMode = 'owner', 
                 <div style={{ display: 'flex', gap: 8 }}>
                   {isLoading ? (
                     Array.from({ length: 4 }).map((_, i) => (
-                      <div
+                      <Skeleton
                         key={i}
-                        style={{ width: 34, height: 34, borderRadius: 10, background: D_BG2, border: `1px solid ${D_LINE}` }}
+                        variant="dark"
+                        style={{ width: 34, height: 34, borderRadius: 10, border: `1px solid ${D_LINE}` }}
                       />
                     ))
                   ) : (
