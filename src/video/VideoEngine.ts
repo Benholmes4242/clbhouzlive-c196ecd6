@@ -1532,10 +1532,11 @@ class VideoEngineImpl {
           }
           const visiblePlayingLanes = this.computeVisiblePlayingLanes();
           // MISMATCH: a lane ≥50% visible, playing, session unmuted, and
-          // NOT the speaker. Self-labelled — the bug fingerprint the brief
-          // asked for.
+          // NOT the speaker. v11: exclude always-muted-policy lanes — silent
+          // rails/grid tiles are design, not a defect. They are muted by
+          // policy and never speak inline regardless of visibility.
           const mismatch = !sessionMuted && visiblePlayingLanes.some(
-            (v) => v.visibilityRatio >= 0.5 && v.laneId !== speaker && !v.muted,
+            (v) => v.audioPolicy !== 'always-muted' && v.visibilityRatio >= 0.5 && v.laneId !== speaker && !v.muted,
           );
           logAudio(mismatch ? 'heartbeat.MISMATCH' : 'heartbeat.state', {
             overlayOpen: fsOpen,
