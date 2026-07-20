@@ -13,6 +13,7 @@ import { useComingUp, type ComingUpRow } from '../data/useComingUp';
 import type { TourId } from '../../hooks/useOverviewData';
 import { TOUR_LABEL } from '../../_shared/tourOrder';
 import { formatMonthShort } from '@/i18n/format';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const PAGE_SIZE = 5;
 
