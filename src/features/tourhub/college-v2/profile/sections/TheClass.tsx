@@ -152,14 +152,30 @@ export function TheClass({ slug, collegeName }: Props) {
         </>
       )}
 
+      {/* Error */}
+      {!isLoading && isError && (
+        <div style={{ padding: '32px 16px', textAlign: 'center' }}>
+          <div style={{ fontSize: 12, fontWeight: 600, color: INK_FAINT, marginBottom: 10 }}>
+            Couldn't load the roster.
+          </div>
+          <button
+            type="button"
+            onClick={() => refetch()}
+            style={{ background: INK, color: '#fff', border: 'none', borderRadius: 999, padding: '8px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
       {/* Empty */}
-      {!isLoading && sorted.length === 0 && (
+      {!isLoading && !isError && sorted.length === 0 && (
         <div style={{ padding: '32px 16px', fontSize: 12, fontWeight: 600, color: INK_FAINT, textAlign: 'center' }}>
           No alumni found for this program.
         </div>
       )}
 
-      {!isLoading &&
+      {!isLoading && !isError &&
         sorted.map((a, idx) => {
           const star = isStar(a);
           const isChampion = idx === 0;
