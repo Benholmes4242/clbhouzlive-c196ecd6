@@ -757,10 +757,10 @@ function HealthChipStrip({
         display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8,
       }}
     >
-      <HealthChip to="/admin-v2/system" icon={<RefreshCcw size={14} />} state={egChip} />
-      <HealthChip to="/admin-v2/system" icon={<Activity size={14} />} state={cronChip} />
-      <HealthChip to="/admin-v2/echo-health" icon={<Cpu size={14} />} state={echoChip} />
-      <HealthChip to="/admin-v2/push-health" icon={<Bell size={14} />} state={pushChip} />
+      <HealthChip to="/admin-v2/health?tab=status" icon={<RefreshCcw size={14} />} state={egChip} />
+      <HealthChip to="/admin-v2/health?tab=status" icon={<Activity size={14} />} state={cronChip} />
+      <HealthChip to="/admin-v2/health?tab=status" icon={<Cpu size={14} />} state={echoChip} />
+      <HealthChip to="/admin-v2/health?tab=status" icon={<Bell size={14} />} state={pushChip} />
     </section>
   );
 }
