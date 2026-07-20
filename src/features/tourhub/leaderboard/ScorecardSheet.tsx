@@ -150,6 +150,8 @@ export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
       coursePar={coursePar}
       courseSlope={null}
       holes={roundHoles}
+      loading={scLoading}
+
       heroMuted={demoted}
       rounds={availableRounds.length > 1 && selectedRound != null ? {
         available: availableRounds,
