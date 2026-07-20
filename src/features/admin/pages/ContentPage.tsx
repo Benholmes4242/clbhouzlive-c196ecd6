@@ -511,9 +511,22 @@ function CourseDetail({
 
   const handleSave = async () => {
     if (!courseId) return;
+    const continent = (form.continent ?? '').trim();
+    const country = (form.country ?? '').trim();
+    if (!continent) { toast.error('Continent is required'); return; }
+    if (!country) { toast.error('Country is required'); return; }
+    // Legacy stored value that isn't in the list is allowed only when
+    // untouched (i.e. still equals the original record value).
+    const original = (course?.country ?? '').trim();
+    const legacyUntouched = country === original && !isCountryInContinent(country, continent);
+    if (!legacyUntouched && !isCountryInContinent(country, continent)) {
+      toast.error(`"${country}" is not a valid country for ${continent}`);
+      return;
+    }
     const updates: any = {
       name: form.name?.trim(),
-      country: form.country?.trim(),
+      continent: continent as any,
+      country,
       sub_country: form.sub_country || null,
       region: form.region || null,
       country_code: form.country_code || null,
