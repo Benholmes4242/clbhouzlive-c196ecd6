@@ -54,10 +54,30 @@ function maskEmail(email: string): string {
  * Rows navigate to /manage/* sub-pages (Phase 3). Destructive confirms stay
  * as overlays.
  */
+type SettingsProfileRow = {
+  id?: string;
+  username?: string | null;
+  is_public?: boolean | null;
+  handicap_visibility?: VisibilityLevel | null;
+  leaderboard_visibility?: VisibilityLevel | null;
+  hide_handicap_chip?: boolean | null;
+  eg_handicap_index?: number | null;
+  manual_handicap_index?: number | null;
+  display_name?: string | null;
+  first_name?: string | null;
+  last_name?: string | null;
+  profile_photo_url?: string | null;
+} | null | undefined;
+
+interface WindowWithMedian extends Window {
+  median?: { onesignal?: { logout?: () => void } };
+}
+
 export function SettingsTabContent() {
   const navigate = useNavigate();
   const { user, loading: sessionLoading } = useSupabaseSession();
-  const { profile, loading } = useProfileData();
+  const { profile: profileRaw, loading } = useProfileData();
+  const profile = profileRaw as SettingsProfileRow;
   const { hasBusinesses, count } = useHasBusinesses(user?.id);
   const { openInviteSheet } = useInviteSheet();
 
