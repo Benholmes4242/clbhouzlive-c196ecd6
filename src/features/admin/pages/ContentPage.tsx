@@ -1321,26 +1321,25 @@ function PlayerAvatar({ player, cacheBust, size = 40 }: { player: PlayerRow; cac
 function PlayerRowCard({ player, cacheBust, onPhoto }: { player: PlayerRow; cacheBust: number; onPhoto: () => void }) {
   const name = player.fullName || `${player.firstName || ''} ${player.lastName || ''}`.trim() || 'Unknown';
   return (
-    <div style={{
-      background: t.surface, border: `1px solid ${t.line}`,
-      borderRadius: t.radius.md, padding: 10,
-      display: 'flex', alignItems: 'center', gap: 12,
-    }}>
-      <button
-        onClick={onPhoto}
-        title="Manage headshot"
-        style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
-      >
-        <PlayerAvatar player={player} cacheBust={cacheBust} />
-      </button>
+    <button
+      type="button"
+      onClick={onPhoto}
+      style={{
+        background: t.surface, border: `1px solid ${t.line}`,
+        borderRadius: t.radius.md, padding: 10,
+        display: 'flex', alignItems: 'center', gap: 12,
+        width: '100%', textAlign: 'left', cursor: 'pointer',
+      }}
+    >
+      <PlayerAvatar player={player} cacheBust={cacheBust} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 14, fontWeight: 600, color: t.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {name}
         </div>
         <div style={{ fontSize: 11, color: t.inkMuted, marginTop: 2, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-          <span>{player.country ?? player.countryCode ?? '—'}</span>
+          <span>{player.country ?? player.countryCode ?? '-'}</span>
           {player.tourCodes?.length ? (
-            <span>· {player.tourCodes.map(tc => TOURS[normalizeTourCode(tc)] || tc).join(', ')}</span>
+            <span>- {player.tourCodes.map(tc => TOURS[normalizeTourCode(tc)] || tc).join(', ')}</span>
           ) : null}
         </div>
       </div>
@@ -1349,7 +1348,8 @@ function PlayerRowCard({ player, cacheBust, onPhoto }: { player: PlayerRow; cach
           {formatDistanceToNow(new Date(player.updatedAt), { addSuffix: true })}
         </div>
       )}
-    </div>
+      <ChevronRight size={16} color={t.inkFaint} style={{ flexShrink: 0 }} />
+    </button>
   );
 }
 
