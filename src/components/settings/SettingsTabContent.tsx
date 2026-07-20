@@ -147,7 +147,7 @@ export function SettingsTabContent() {
 
   if (sessionLoading || loading || !profile) return <SettingsSkeleton />;
 
-  const p = profile as any;
+  const p = profile;
   const resolvedHcp = resolveDisplayHandicap({
     egHandicapIndex: p?.eg_handicap_index ?? null,
     manualHandicapIndex: p?.manual_handicap_index ?? null,
