@@ -273,22 +273,23 @@ async function fetchPgaCategories(): Promise<LeaderCategoriesResult> {
     const world = await fetchWorldRankingCat();
     return { synced: false, categories: world ? [world] : [], year: currentSeasonYear() };
   }
-  const { data: stats } = await supabase
+  const { data: stats, error: statsErr } = await supabase
     .from('sr_player_statistics')
     .select(
       'player_id, earnings, scoring_average, wins, top_10s, driving_distance, driving_accuracy, greens_in_reg, sand_saves, putting_average, strokes_gained_tee_green, strokes_gained_putting'
     )
     .eq('season_id', seasonId)
     .limit(500);
+  if (statsErr) throw statsErr;
 
-  const pool = stats ?? [];
-  const playerIds = [...new Set(pool.map((s: any) => s.player_id).filter(Boolean))];
+  const pool = (stats ?? []) as PgaStatRow[];
+  const playerIds = [...new Set(pool.map((s) => s.player_id).filter((v): v is string => !!v))];
   const pmap = await fetchPlayers(playerIds);
 
   const categories: LeaderCategoryDef[] = PGA_CATS
     .map((cat) => {
       const rows: Array<{ pid: string; value: number }> = [];
-      for (const s of pool as any[]) {
+      for (const s of pool) {
         const v = cat.accessor(s);
         if (v == null || v === 0) continue;
         if (!s.player_id || !pmap.has(s.player_id)) continue;
