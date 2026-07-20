@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Plus, X, Search } from 'lucide-react';
 import { useClubSearch } from '@/hooks/useClubSearch';
 import { ClubEntry } from '@/components/profile/profile-wizard/types';
-import { VisibilityDropdown } from './VisibilityDropdown';
+import { VisibilityDropdown, type VisibilityValue } from './VisibilityDropdown';
 import { Label } from '@/components/manage/ui';
 
 interface Props {
@@ -10,7 +10,7 @@ interface Props {
   visibility: string;
   onAdd: (club: Omit<ClubEntry, 'id'>) => void;
   onRemove: (id: string) => void;
-  onVisibilityChange: (v: string) => void;
+  onVisibilityChange: (v: VisibilityValue) => void;
 }
 
 export function AdditionalClubsList({
@@ -31,7 +31,7 @@ export function AdditionalClubsList({
 
   return (
     <div className="space-y-3">
-      <Label right={<VisibilityDropdown value={visibility as any} onChange={onVisibilityChange as any} />}>
+      <Label right={<VisibilityDropdown value={visibility as VisibilityValue} onChange={onVisibilityChange} />}>
         Additional clubs
       </Label>
 
@@ -87,7 +87,7 @@ export function AdditionalClubsList({
               ) : results.length === 0 ? (
                 <div className="px-4 py-3 text-[14px] text-muted-foreground">No clubs found</div>
               ) : (
-                results.map((club: any) => (
+                results.map((club) => (
                   <button
                     key={club.id}
                     onClick={() => handleSelect(club.name, club.id)}

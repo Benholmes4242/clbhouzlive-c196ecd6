@@ -47,7 +47,7 @@ export const InviteClubModal: React.FC<InviteClubModalProps> = ({
           requester_user_profile_id: userId,
           manager_email: managerEmail.trim(),
           note: note.trim() || null,
-        } as any);
+        });
 
       if (error) throw error;
 
@@ -60,7 +60,7 @@ export const InviteClubModal: React.FC<InviteClubModalProps> = ({
         setManagerEmail('');
         setNote('');
       }, 1500);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error sending invite:', error);
       toast.error('Failed to send invite');
     } finally {

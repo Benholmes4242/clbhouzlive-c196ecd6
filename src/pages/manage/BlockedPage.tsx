@@ -10,12 +10,22 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 const INK_55 = '#64748B';
 
+type BlockedUserRow = {
+  blocked_id: string;
+  user_profiles: {
+    id: string;
+    username: string | null;
+    avatar_url: string | null;
+    full_name: string | null;
+  } | null;
+};
+
 export default function BlockedPage() {
   const { user } = useSupabaseSession();
   const userId = user?.id;
   const queryClient = useQueryClient();
 
-  const { data: blocked = [], isLoading } = useQuery({
+  const { data: blocked = [], isLoading, isError, refetch } = useQuery<BlockedUserRow[]>({
     queryKey: ['blocked-users', userId],
     queryFn: async () => {
       if (!userId) return [];
@@ -24,7 +34,7 @@ export default function BlockedPage() {
         .select('blocked_id, user_profiles!user_blocks_blocked_id_fkey(id, username, avatar_url, full_name)')
         .eq('blocker_id', userId);
       if (error) throw error;
-      return data ?? [];
+      return (data ?? []) as unknown as BlockedUserRow[];
     },
     enabled: !!userId,
   });
@@ -59,6 +69,12 @@ export default function BlockedPage() {
               </div>
             ))}
           </div>
+        ) : isError ? (
+          <div className="flex flex-col items-center justify-center py-20 text-center gap-3">
+            <p className="text-[15px] font-medium text-foreground">Couldn't load blocked users</p>
+            <p className="text-[13px]" style={{ color: INK_55 }}>Check your connection and try again.</p>
+            <Button variant="outline" size="sm" onClick={() => refetch()}>Retry</Button>
+          </div>
         ) : blocked.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <UserX size={36} className="mb-3" style={{ color: INK_55 }} />
@@ -67,7 +83,7 @@ export default function BlockedPage() {
           </div>
         ) : (
           <div className="rounded-2xl overflow-hidden" style={{ background: '#fff', border: '1px solid rgba(15,23,42,0.07)' }}>
-            {blocked.map((item: any, idx: number) => {
+            {blocked.map((item, idx) => {
               const p = item.user_profiles;
               return (
                 <div

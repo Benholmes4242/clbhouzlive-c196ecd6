@@ -34,7 +34,7 @@ export default function SupportThreadPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
-  const { data, isLoading } = useMyRequestThread(id ?? null);
+  const { data, isLoading, isError, refetch } = useMyRequestThread(id ?? null);
   const postReply = useMyRequestReply();
 
   const [body, setBody] = useState('');
@@ -56,12 +56,40 @@ export default function SupportThreadPage() {
     try {
       await postReply(id, trimmed);
       setBody('');
-    } catch (e: any) {
-      toast.error(e?.message || 'Could not send your reply. Please try again.');
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Could not send your reply. Please try again.';
+      toast.error(msg);
     } finally {
       setSending(false);
     }
   };
+
+  if (!isLoading && isError) {
+    return (
+      <ManagePageShell title="Request">
+        <div className="px-4 pt-6">
+          <div
+            className="rounded-2xl p-6 text-center"
+            style={{ background: '#fff', border: `1px solid ${CARD_BORDER}` }}
+          >
+            <h3 className="text-[16px] font-semibold mb-1" style={{ color: INK }}>
+              Couldn't load this request
+            </h3>
+            <p className="text-[13px] mt-1 mb-3" style={{ color: INK_55 }}>
+              Check your connection and try again.
+            </p>
+            <button
+              onClick={() => refetch()}
+              className="text-[13px] font-semibold underline"
+              style={{ color: INK }}
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </ManagePageShell>
+    );
+  }
 
   if (!isLoading && !ticket) {
     return (

@@ -4,7 +4,43 @@ import { nanoid } from 'nanoid';
 import { formHcpFromDb } from '@/lib/formatHcp';
 import { supabase } from '@/integrations/supabase/client';
 
-function makeInitial(profile: any): ProfileFormData {
+interface RawProfile {
+  id?: string;
+  username?: string | null;
+  username_is_custom?: boolean | null;
+  has_completed_onboarding?: boolean | null;
+  display_name?: string | null;
+  first_name?: string | null;
+  last_name?: string | null;
+  profile_photo_url?: string | null;
+  header_photo_url?: string | null;
+  home_club?: string | null;
+  primary_club_id?: string | null;
+  additional_clubs?: Array<{ name: string; club_id?: string | null }> | null;
+  manual_handicap_index?: number | null;
+  home_club_visibility?: string | null;
+  additional_clubs_visibility?: string | null;
+  bio?: string | null;
+  websites?: string[] | null;
+  instagram_handle?: string | null;
+  twitter_handle?: string | null;
+  tiktok_handle?: string | null;
+  youtube_handle?: string | null;
+  country?: string | null;
+  city?: string | null;
+  is_public?: boolean | null;
+  gender?: string | null;
+  social_links?: {
+    instagram?: string | null;
+    twitter?: string | null;
+    tiktok?: string | null;
+    youtube?: string | null;
+  } | null;
+}
+
+type HomeClubRow = { club_id: string | null; golf_clubs: { id: string; name: string } | null };
+
+function makeInitial(profile: RawProfile | null | undefined): ProfileFormData {
   const social = profile?.social_links ?? {};
 
   // Onboarding-aware username seed: never show the auto-generated username
@@ -25,10 +61,10 @@ function makeInitial(profile: any): ProfileFormData {
     headerPhotoBlob: null,
     homeClubName: profile?.home_club ?? '',
     primaryClubId: profile?.primary_club_id ?? null,
-    additionalClubs: (profile?.additional_clubs ?? []).map((c: any) => ({
+    additionalClubs: (profile?.additional_clubs ?? []).map((c) => ({
       id: nanoid(),
       name: c.name,
-      clubId: c.club_id,
+      clubId: c.club_id ?? undefined,
     })),
     // MANUAL handicap entry (maps to user_profiles.manual_handicap_index, NOT
     // the WHS-synced eg_handicap_index). WHS always wins for display when a
@@ -50,7 +86,7 @@ function makeInitial(profile: any): ProfileFormData {
   };
 }
 
-export function useProfileForm(profile: any, loading?: boolean) {
+export function useProfileForm(profile: RawProfile | null | undefined, loading?: boolean) {
   const [form, setForm] = useState<ProfileFormData>(() => makeInitial(null));
   const [initialData, setInitialData] = useState<ProfileFormData>(() => makeInitial(null));
   const hydrated = useRef(false);
@@ -75,14 +111,15 @@ export function useProfileForm(profile: any, loading?: boolean) {
           const { data: rows } = await supabase
             .from('user_home_clubs')
             .select('club_id, golf_clubs:club_id(id, name)')
-            .eq('user_profile_id', profile.id);
+            .eq('user_profile_id', profile.id!);
           const primaryId = profile.primary_club_id ?? null;
-          const clubs: ClubEntry[] = (rows ?? [])
-            .filter((r: any) => r.club_id && r.club_id !== primaryId && r.golf_clubs?.name)
-            .map((r: any) => ({
+          const typedRows = (rows ?? []) as unknown as HomeClubRow[];
+          const clubs: ClubEntry[] = typedRows
+            .filter((r) => !!r.club_id && r.club_id !== primaryId && !!r.golf_clubs?.name)
+            .map((r) => ({
               id: nanoid(),
-              name: r.golf_clubs.name as string,
-              clubId: r.club_id as string,
+              name: r.golf_clubs!.name,
+              clubId: r.club_id!,
             }));
           setForm(prev => ({ ...prev, additionalClubs: clubs }));
           setInitialData(prev => ({ ...prev, additionalClubs: clubs }));

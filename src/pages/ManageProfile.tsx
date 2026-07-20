@@ -26,6 +26,8 @@ import { BioWebsitesSection } from '@/components/profile/edit-v2/BioWebsitesSect
 import { LocationSection } from '@/components/profile/edit-v2/LocationSection';
 import { SocialLinksSection } from '@/components/profile/edit-v2/SocialLinksSection';
 import { DISPLAY_NAME_MAX, USERNAME_MAX } from '@/components/profile/profile-wizard/types';
+import type { ProfileFormData, ClubEntry, WebsiteEntry } from '@/components/profile/profile-wizard/types';
+import type { NavigateOptions, To } from 'react-router-dom';
 
 import { SettingsTabContent } from '@/components/settings/SettingsTabContent';
 
@@ -44,11 +46,21 @@ const GENDER_OPTIONS = [
 
 type TabId = 'profile' | 'settings';
 
+type UserProfileRow = {
+  id?: string;
+  username?: string | null;
+  has_completed_onboarding?: boolean | null;
+  user_type?: string | null;
+  eg_handicap_index?: number | null;
+  manual_handicap_index?: number | null;
+} | null | undefined;
+
 export default function ManageProfile() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user } = useSupabaseSession();
-  const { profile, loading } = useProfileData();
+  const { profile: profileRaw, loading, isError: profileError, refetch: refetchProfile } = useProfileData();
+  const profile = profileRaw as UserProfileRow;
   const [searchParams, setSearchParams] = useSearchParams();
 
   const {
@@ -59,16 +71,16 @@ export default function ManageProfile() {
 
   const { save, isSaving } = useProfileSave(user?.id ?? '');
 
-  const usernameIsLocked = !!(profile as any)?.has_completed_onboarding;
+  const usernameIsLocked = !!profile?.has_completed_onboarding;
   const isNewUser = useRef(
     searchParams.get('onboarding') === '1' ||
-    !(profile as any)?.has_completed_onboarding
+    !profile?.has_completed_onboarding
   );
   useEffect(() => {
     if (loading) return;
     isNewUser.current =
       searchParams.get('onboarding') === '1' ||
-      !(profile as any)?.has_completed_onboarding;
+      !profile?.has_completed_onboarding;
   }, [loading, profile, searchParams]);
 
   // Active tab (URL-backed). Onboarding always forces 'profile' and hides the bar.
@@ -94,13 +106,14 @@ export default function ManageProfile() {
       if (error) throw error;
       queryClient.setQueryData(['onboarding-status', user.id], {
         hasCompletedOnboarding: true,
-        userType: (profile as any)?.user_type ?? null,
+        userType: profile?.user_type ?? null,
       });
       await queryClient.invalidateQueries({ queryKey: ['onboarding-status', user.id] });
       await queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
       navigate('/', { replace: true });
-    } catch (err: any) {
-      toast.error(err?.message ?? 'Could not skip onboarding. Please try again.');
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Could not skip onboarding. Please try again.';
+      toast.error(msg);
     } finally {
       setIsSkipping(false);
     }
@@ -109,8 +122,8 @@ export default function ManageProfile() {
   const { data: whsConnection } = useWhsConnection(user?.id);
   const hasWhsConnection = !!whsConnection;
   const resolved = resolveDisplayHandicap({
-    egHandicapIndex: (profile as any)?.eg_handicap_index ?? null,
-    manualHandicapIndex: (profile as any)?.manual_handicap_index ?? null,
+    egHandicapIndex: profile?.eg_handicap_index ?? null,
+    manualHandicapIndex: profile?.manual_handicap_index ?? null,
     hasWhsConnection,
   });
 
@@ -158,6 +171,21 @@ export default function ManageProfile() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.firstName, form.lastName, hasTouchedDisplayName]);
 
+  if (profileError && !isNewUser.current) {
+    return (
+      <PageRoot className="min-h-screen" style={{ background: PAGE_BG } as React.CSSProperties}>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center gap-4">
+          <h2 className="text-lg font-semibold" style={{ color: INK_TOKEN }}>Couldn't load your profile</h2>
+          <p className="text-sm" style={{ color: INK_45_TOKEN }}>Check your connection and try again. Nothing has been changed.</p>
+          <div className="flex gap-3">
+            <Button onClick={() => refetchProfile()}>Retry</Button>
+            <Button variant="outline" onClick={() => navigate(-1)}>Go back</Button>
+          </div>
+        </div>
+      </PageRoot>
+    );
+  }
+
   if (loading && !isNewUser.current) return <ProfileSkeleton />;
 
   const handleSave = async () => {
@@ -187,7 +215,7 @@ export default function ManageProfile() {
       if (user?.id) {
         queryClient.setQueryData(['onboarding-status', user.id], {
           hasCompletedOnboarding: true,
-          userType: (profile as any)?.user_type ?? null,
+          userType: profile?.user_type ?? null,
         });
       }
       if (isNewUser.current) {
@@ -206,7 +234,7 @@ export default function ManageProfile() {
   const renderProfile = isNewUser.current || activeTab === 'profile';
 
   return (
-    <PageRoot hasBottomNav={!isNewUser.current} className="md:!max-w-[440px]" style={{ background: SLATE_BG } as any}>
+    <PageRoot hasBottomNav={!isNewUser.current} className="md:!max-w-[440px]" style={{ background: SLATE_BG } as React.CSSProperties}>
       <div className="min-h-screen flex flex-col w-full" style={{ background: SLATE_BG }}>
 
         {/* Sticky Header (Direction A) + Tab bar */}
@@ -352,15 +380,18 @@ export default function ManageProfile() {
 // -------------------------------------------------------------------------
 // Profile tab body
 // -------------------------------------------------------------------------
+
+
+
 interface ProfileTabBodyProps {
-  form: any;
-  setField: (k: any, v: any) => void;
-  errors: any;
-  addClub: any;
-  removeClub: any;
-  addWebsite: any;
-  removeWebsite: any;
-  updateWebsite: any;
+  form: ProfileFormData;
+  setField: <K extends keyof ProfileFormData>(k: K, v: ProfileFormData[K]) => void;
+  errors: Partial<Record<keyof ProfileFormData, string>>;
+  addClub: (club: Omit<ClubEntry, 'id'>) => void;
+  removeClub: (id: string) => void;
+  addWebsite: () => void;
+  removeWebsite: (id: string) => void;
+  updateWebsite: (id: string, url: string) => void;
   isNewUser: boolean;
   usernameIsLocked: boolean;
   usernameStatus: 'idle' | 'invalid' | 'checking' | 'available' | 'taken';
@@ -368,11 +399,11 @@ interface ProfileTabBodyProps {
   setHasTouchedDisplayName: (v: boolean) => void;
   resolved: { source: string; value: number | null };
   showManualEntry: boolean;
-  setShowManualEntry: (fn: any) => void;
-  
-  navigate: (to: any, opts?: any) => void;
+  setShowManualEntry: React.Dispatch<React.SetStateAction<boolean>>;
+
+  navigate: (to: To, opts?: NavigateOptions) => void;
   showSocial: boolean;
-  setShowSocial: (fn: any) => void;
+  setShowSocial: React.Dispatch<React.SetStateAction<boolean>>;
   handleSave: () => void;
   isDisabled: boolean;
   isSaving: boolean;
@@ -540,7 +571,7 @@ function ProfileTabBody({
             <Label>Gender</Label>
             <SegToggle
               value={form.gender}
-              onChange={(v) => setField('gender', v as any)}
+              onChange={(v) => setField('gender', v)}
               options={GENDER_OPTIONS}
             />
           </div>

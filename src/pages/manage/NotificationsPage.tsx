@@ -52,18 +52,11 @@ export default function NotificationsPage() {
   const [mutedUserIds, setMutedUserIds] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
 
-  const isPushEnabled = 'isSubscribed' in pushNotifications
-    ? (pushNotifications as any).isSubscribed
-    : (pushNotifications as any).state === 'enabled';
+  const isPushEnabled = pushNotifications.state === 'enabled';
 
   const handleTogglePush = () => {
-    if ('requestPermission' in pushNotifications && 'unsubscribe' in pushNotifications) {
-      if (isPushEnabled) (pushNotifications as any).unsubscribe();
-      else (pushNotifications as any).requestPermission();
-    } else if ('enable' in pushNotifications && 'disable' in pushNotifications) {
-      if (isPushEnabled) (pushNotifications as any).disable();
-      else (pushNotifications as any).enable();
-    }
+    if (isPushEnabled) pushNotifications.disable();
+    else pushNotifications.enable();
   };
 
   // Read the REAL preference store — the notification_preferences table used

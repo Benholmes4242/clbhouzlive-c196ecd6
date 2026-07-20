@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Search, X, MapPin, Check } from 'lucide-react';
 import { useClubSearch } from '@/hooks/useClubSearch';
-import { VisibilityDropdown } from './VisibilityDropdown';
+import { VisibilityDropdown, type VisibilityValue } from './VisibilityDropdown';
 import { Label } from '@/components/manage/ui';
 
 interface Props {
@@ -9,7 +9,7 @@ interface Props {
   clubId: string | null;
   visibility: string;
   onClubSelect: (name: string, id: string | null) => void;
-  onVisibilityChange: (v: string) => void;
+  onVisibilityChange: (v: VisibilityValue) => void;
 }
 
 const INK = '#0F172A';
@@ -64,7 +64,7 @@ export function HomeClubCard({
   if (clubId) {
     return (
       <div className="space-y-3">
-        <Label right={<VisibilityDropdown value={visibility as any} onChange={onVisibilityChange as any} />}>
+        <Label right={<VisibilityDropdown value={visibility as VisibilityValue} onChange={onVisibilityChange} />}>
           Home club
         </Label>
 
@@ -96,7 +96,7 @@ export function HomeClubCard({
 
   return (
     <div className="space-y-3">
-      <Label right={<VisibilityDropdown value={visibility as any} onChange={onVisibilityChange as any} />}>
+      <Label right={<VisibilityDropdown value={visibility as VisibilityValue} onChange={onVisibilityChange} />}>
         Home club
       </Label>
       <div ref={containerRef} className="relative">
@@ -132,7 +132,7 @@ export function HomeClubCard({
             ) : clubs.length === 0 ? (
               <div className="px-4 py-3 text-[14px] text-muted-foreground">No clubs found</div>
             ) : (
-              clubs.map((club: any) => (
+              clubs.map((club) => (
                 <button
                   key={club.id}
                   onClick={() => handleSelect(club.name, club.id)}

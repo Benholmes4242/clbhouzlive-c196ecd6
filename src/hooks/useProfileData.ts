@@ -45,11 +45,13 @@ export const useProfileData = () => {
     return fetchProfile();
   };
 
-  const setProfile = (newProfile: any) => {
+  type ProfileRow = NonNullable<typeof profile>;
+
+  const setProfile = (newProfile: ProfileRow | null) => {
     queryClient.setQueryData(['profile', user?.id], newProfile);
   };
 
-  const updateProfileField = async (field: string, value: any) => {
+  const updateProfileField = async <K extends keyof ProfileRow>(field: K & string, value: ProfileRow[K]) => {
     if (!user?.id) return;
 
     try {
@@ -61,9 +63,9 @@ export const useProfileData = () => {
       if (error) throw error;
 
       // Update the cached profile data
-      queryClient.setQueryData(['profile', user?.id], (oldProfile: any) => ({
-        ...oldProfile,
-        [field]: value
+      queryClient.setQueryData(['profile', user?.id], (oldProfile: ProfileRow | null | undefined) => ({
+        ...(oldProfile ?? {}),
+        [field]: value,
       }));
     } catch (error) {
       console.error('Error updating profile field:', error);
@@ -76,6 +78,8 @@ export const useProfileData = () => {
     profile,
     loading: sessionLoading || (!!user?.id && profileLoading),
     error: profileError,
+    isError: !!profileError,
+    refetch: fetchProfile,
     setProfile,
     fetchProfile: fetchProfileById, // Support calling with optional userId
     refreshProfile,

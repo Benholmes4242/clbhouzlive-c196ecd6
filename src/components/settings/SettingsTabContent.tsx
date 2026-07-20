@@ -54,10 +54,30 @@ function maskEmail(email: string): string {
  * Rows navigate to /manage/* sub-pages (Phase 3). Destructive confirms stay
  * as overlays.
  */
+type SettingsProfileRow = {
+  id?: string;
+  username?: string | null;
+  is_public?: boolean | null;
+  handicap_visibility?: VisibilityLevel | null;
+  leaderboard_visibility?: VisibilityLevel | null;
+  hide_handicap_chip?: boolean | null;
+  eg_handicap_index?: number | null;
+  manual_handicap_index?: number | null;
+  display_name?: string | null;
+  first_name?: string | null;
+  last_name?: string | null;
+  profile_photo_url?: string | null;
+} | null | undefined;
+
+interface WindowWithMedian extends Window {
+  median?: { onesignal?: { logout?: () => void } };
+}
+
 export function SettingsTabContent() {
   const navigate = useNavigate();
   const { user, loading: sessionLoading } = useSupabaseSession();
-  const { profile, loading } = useProfileData();
+  const { profile: profileRaw, loading } = useProfileData();
+  const profile = profileRaw as SettingsProfileRow;
   const { hasBusinesses, count } = useHasBusinesses(user?.id);
   const { openInviteSheet } = useInviteSheet();
 
@@ -73,9 +93,9 @@ export function SettingsTabContent() {
 
   const privacy = usePrivacySettings(
     user?.id,
-    !!(profile as any)?.is_public,
-    ((profile as any)?.handicap_visibility ?? 'public') as VisibilityLevel,
-    ((profile as any)?.leaderboard_visibility ?? 'public') as VisibilityLevel,
+    !!profile?.is_public,
+    (profile?.handicap_visibility ?? 'public') as VisibilityLevel,
+    (profile?.leaderboard_visibility ?? 'public') as VisibilityLevel,
   );
 
   const deleteAccount = useDeleteAccount(user?.id);
@@ -86,7 +106,7 @@ export function SettingsTabContent() {
   const [signingOut, setSigningOut] = useState(false);
 
   const queryClient = useQueryClient();
-  const hideHandicapChip = !!(profile as any)?.hide_handicap_chip;
+  const hideHandicapChip = !!profile?.hide_handicap_chip;
   const [chipUpdating, setChipUpdating] = useState(false);
   const handleToggleHandicapChip = async (nextChecked: boolean) => {
     if (!user?.id || chipUpdating) return;
@@ -111,7 +131,11 @@ export function SettingsTabContent() {
   const handleConfirmSignOut = async () => {
     if (signingOut) return;
     setSigningOut(true);
-    try { (window as any).median?.onesignal?.logout?.(); } catch {}
+    try {
+      (window as WindowWithMedian).median?.onesignal?.logout?.();
+    } catch (e) {
+      void e;
+    }
     try {
       await logout();
     } catch {
@@ -123,7 +147,7 @@ export function SettingsTabContent() {
 
   if (sessionLoading || loading || !profile) return <SettingsSkeleton />;
 
-  const p = profile as any;
+  const p = profile;
   const resolvedHcp = resolveDisplayHandicap({
     egHandicapIndex: p?.eg_handicap_index ?? null,
     manualHandicapIndex: p?.manual_handicap_index ?? null,
