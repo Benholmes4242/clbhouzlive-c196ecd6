@@ -50,7 +50,7 @@ function useOwnerRivalry(
   viewerId: string | undefined,
   rivalParamId: string | undefined,
 ) {
-  const { data, isLoading, error } = useFriendRivalries(viewerId);
+  const { data, isLoading, error, refetch } = useFriendRivalries(viewerId);
   const row = useMemo(() => {
     if (!data || !rivalParamId) return null;
     return (
@@ -61,7 +61,7 @@ function useOwnerRivalry(
       ) ?? null
     );
   }, [data, rivalParamId]);
-  return { row, isLoading, error };
+  return { row, isLoading, error, refetch };
 }
 
 function useAdHocRivalry(
@@ -83,18 +83,32 @@ function useRivalProfileExists(userId: string | undefined, enabled: boolean) {
     enabled: enabled && !!userId,
     staleTime: 5 * 60_000,
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('user_profiles')
         .select('id, display_name')
         .eq('id', userId!)
         .maybeSingle();
+      if (error) throw error;
       if (!data) return null;
-      return { exists: true, displayName: (data as any).display_name as string | null };
+      return {
+        exists: true,
+        displayName: (data as { display_name: string | null }).display_name,
+      };
     },
   });
 }
 
 
+
+type RpcClient = {
+  rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
+};
+
+type FriendViewProfileRow = {
+  user_id: string;
+  full_name: string | null;
+  profile_photo_url: string | null;
+};
 
 function useFriendViewRivalry(
   viewerId: string | undefined,
@@ -106,7 +120,7 @@ function useFriendViewRivalry(
     enabled: !!viewerId && !!friendId && !!rivalId,
     staleTime: 30_000,
     queryFn: async (): Promise<FriendRivalryHydrated | null> => {
-      const { data: rpcRows, error } = await (supabase as any).rpc(
+      const { data: rpcRows, error } = await (supabase as unknown as RpcClient).rpc(
         'get_friend_view_rivalry',
         {
           p_viewer_id: viewerId,
@@ -114,20 +128,24 @@ function useFriendViewRivalry(
           p_rival_id: rivalId,
         },
       );
-      if (error) {
-        // eslint-disable-next-line no-console
-        console.warn('[rivalry] friend-view RPC error', error);
-        return null;
-      }
-      const raw = (rpcRows as any[])?.[0];
+      if (error) throw error;
+      const raw = (rpcRows as unknown[] | null)?.[0] as FriendRivalryHydrated | undefined;
       if (!raw) return null;
       const ids = [friendId!, rivalId!];
-      const { data: profiles } = await (supabase as any)
+      const { data: profiles } = await (supabase as unknown as {
+        from: (table: string) => {
+          select: (cols: string) => {
+            in: (col: string, values: string[]) => Promise<{ data: unknown; error: unknown }>;
+          };
+        };
+      })
         .from('user_profiles')
         .select('user_id, full_name, profile_photo_url')
         .in('user_id', ids);
-      const byId = new Map<string, any>();
-      (profiles ?? []).forEach((p: any) => byId.set(p.user_id, p));
+      const byId = new Map<string, FriendViewProfileRow>();
+      ((profiles ?? []) as unknown as FriendViewProfileRow[]).forEach((p) =>
+        byId.set(p.user_id, p),
+      );
       return {
         ...raw,
         rival_name: byId.get(rivalId!)?.full_name ?? null,
@@ -152,6 +170,8 @@ function useUserProfileMini(userId: string | undefined) {
         .maybeSingle();
       if (error) {
         console.error('[useUserProfileMini] query error', error);
+        // Deliberate swallow: viewer-identity chrome only; an error
+        // degrades to initials/fallback avatar, never wrong data.
         return null;
       }
       return data as {
@@ -217,7 +237,9 @@ const RivalryPage: React.FC = () => {
   const isLoading = isFriendView
     ? friend.isLoading
     : owner.isLoading || (adHocEnabled && adHoc.isLoading) || (profileCheckEnabled && profileExists.isLoading);
-  const errored = isFriendView ? !!friend.error : !!owner.error;
+  const errored = isFriendView
+    ? !!friend.error
+    : !!owner.error || (profileCheckEnabled && profileExists.isError);
 
 
   // Course-filter shared state
@@ -294,7 +316,7 @@ const RivalryPage: React.FC = () => {
   const { data: viewerConn } = useWhsConnection(
     !isFriendView ? viewerId : undefined,
   );
-  const viewerConnectionId = (viewerConn as any)?.id ?? undefined;
+  const viewerConnectionId = (viewerConn as { id?: string } | null | undefined)?.id ?? undefined;
 
   // H2H best gross margins from shared_round_results
   const bestMargins = useMemo(() => {
@@ -337,9 +359,15 @@ const RivalryPage: React.FC = () => {
       record?.ties ?? 0
     } ties) over ${total} rounds. Clbhouz.`;
     const url = window.location.href;
-    if (typeof navigator !== 'undefined' && (navigator as any).share) {
+    const nav =
+      typeof navigator !== 'undefined'
+        ? (navigator as Navigator & {
+            share?: (d: { title?: string; text?: string; url?: string }) => Promise<void>;
+          })
+        : null;
+    if (nav?.share) {
       try {
-        await (navigator as any).share({
+        await nav.share({
           title: 'My Clbhouz Rivalry',
           text,
           url,
@@ -380,7 +408,43 @@ const RivalryPage: React.FC = () => {
       {viewerId && isLoading && <RivalrySkeleton />}
 
       {viewerId && !isLoading && (errored || (!row && !isFriendView)) && (() => {
-        const noSharedRounds = !errored && !!profileExists.data?.exists;
+        if (errored) {
+          return (
+            <div
+              style={{
+                padding: '64px 24px',
+                textAlign: 'center',
+                fontFamily: FONT,
+              }}
+            >
+              <div style={{ color: T100, fontSize: 16, fontWeight: 700 }}>
+                Couldn't load this rivalry
+              </div>
+              <div style={{ color: T60, fontSize: 13, marginTop: 8 }}>
+                Check your connection and try again.
+              </div>
+              <button
+                type="button"
+                onClick={() => (isFriendView ? friend.refetch() : owner.refetch())}
+                style={{
+                  marginTop: 16,
+                  background: T100,
+                  color: '#0F172A',
+                  border: 'none',
+                  borderRadius: 999,
+                  padding: '10px 20px',
+                  fontSize: 13.5,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  fontFamily: FONT,
+                }}
+              >
+                Retry
+              </button>
+            </div>
+          );
+        }
+        const noSharedRounds = !!profileExists.data?.exists;
         const rivalDisplayFirst = firstName(profileExists.data?.displayName ?? null) || 'this player';
         return (
           <div

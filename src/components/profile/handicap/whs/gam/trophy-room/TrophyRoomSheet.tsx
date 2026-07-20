@@ -313,7 +313,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
 
   const effectiveViewerId = viewerUserId ?? userId;
   const isFriendView = viewerUserId !== undefined && viewerUserId !== userId;
-  const { data: badges = [], isLoading: badgesLoading } = useUserAchievements(open ? userId : undefined);
+  const { data: badges = [], isLoading: badgesLoading, isError: badgesError, refetch: refetchBadges } = useUserAchievements(open ? userId : undefined);
   const { data: legends = [], isLoading: legendsLoading } = useUserTopLegends(open ? userId : undefined, {
     limit: 500,
     maxRank: 1,
@@ -323,9 +323,13 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
   // not the viewer's, so friend cards reflect the owner's live status.
   const { data: ownerProfile } = useUserProfile(open ? userId : undefined);
   const { data: ownerConnection } = useWhsConnection(open ? userId : undefined);
+  const ownerProfileTyped = ownerProfile as
+    | { eg_handicap_index?: number | null; manual_handicap_index?: number | null }
+    | null
+    | undefined;
   const currentIndex: number | null = resolveDisplayHandicap({
-    egHandicapIndex: (ownerProfile as any)?.eg_handicap_index ?? null,
-    manualHandicapIndex: (ownerProfile as any)?.manual_handicap_index ?? null,
+    egHandicapIndex: ownerProfileTyped?.eg_handicap_index ?? null,
+    manualHandicapIndex: ownerProfileTyped?.manual_handicap_index ?? null,
     hasWhsConnection: !!ownerConnection,
   }).value;
 
@@ -356,8 +360,11 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
     // Fire and forget -- per-badge writes; failures are harmless (sheen
     // simply replays next open).
     void Promise.all(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ids.map((id) => (supabase.rpc as any)('gam_mark_badge_seen', { p_badge_id: id })),
+      ids.map((id) =>
+        (supabase as unknown as {
+          rpc: (fn: string, args: Record<string, unknown>) => Promise<unknown>;
+        }).rpc('gam_mark_badge_seen', { p_badge_id: id }),
+      ),
     );
   }, [open]);
 
@@ -665,7 +672,31 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
             </div>
           )}
 
-          {isLoading && (
+          {badgesError && !isLoading && (
+            <div style={{ padding: '48px 16px', textAlign: 'center' }}>
+              <div style={{ color: INK, fontSize: 15, fontWeight: 700, marginBottom: 12 }}>
+                Couldn't load the trophy room
+              </div>
+              <button
+                type="button"
+                onClick={() => refetchBadges()}
+                style={{
+                  background: AMBER,
+                  color: '#0F172A',
+                  border: 'none',
+                  borderRadius: 999,
+                  padding: '9px 18px',
+                  fontSize: 13,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                Retry
+              </button>
+            </div>
+          )}
+
+          {!badgesError && isLoading && (
             <>
               {/* Lifetime skeleton — mirrors 2-up ShowpieceCards. */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8, marginTop: 4 }}>
@@ -699,7 +730,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
           )}
 
 
-          {!isLoading && (() => {
+          {!badgesError && !isLoading && (() => {
             const lifetime = selectLifetime(allAchievements);
             const allGroups = groupAchievementsByCategory(allAchievements);
             const anyAchievements = allAchievements.length > 0;
