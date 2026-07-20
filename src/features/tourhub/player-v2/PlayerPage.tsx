@@ -48,7 +48,7 @@ export function PlayerPage() {
     );
   }
 
-  if (!player) {
+  if (playerError || !player) {
     return (
       <TourHubShell>
         <div
