@@ -66,7 +66,7 @@ function Cell({ row }: { row: Row }) {
     >
       <div
         style={{
-          fontSize: 8,
+          fontSize: 10,
           fontWeight: 800,
           color: INK_MUTE,
           letterSpacing: '0.16em',
