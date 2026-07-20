@@ -21,6 +21,8 @@ import { useAudit, type AuditEntry } from '../hooks/useAudit';
 import { useDashboard } from '../hooks/useDashboard';
 import { useAdminPillVisibility } from '@/hooks/useAdminPillVisibility';
 import { isPerfEnabled, setPerfLive, subscribePerfLive } from '@/perf/navTiming';
+import { audioDebugEnabled, setAudioDebugEnabled, subscribeAudioDebugEnabled } from '@/perf/audioDebug';
+
 
 type TabId = 'audit' | 'tools' | 'settings';
 
@@ -479,11 +481,18 @@ function SettingsTab() {
   const { role } = usePanelRole();
   const [pillsVisible, setPillsVisible] = useAdminPillVisibility();
   const [perfEnabled, setPerfEnabled] = useState(() => isPerfEnabled());
+  const [audioEnabled, setAudioEnabled] = useState(() => audioDebugEnabled());
 
   useEffect(() => {
     const unsub = subscribePerfLive(() => setPerfEnabled(isPerfEnabled()));
     return unsub;
   }, []);
+
+  useEffect(() => {
+    const unsub = subscribeAudioDebugEnabled(() => setAudioEnabled(audioDebugEnabled()));
+    return unsub;
+  }, []);
+
 
   const signOut = async () => {
     try {
@@ -551,7 +560,21 @@ function SettingsTab() {
             onChange={() => setPerfLive(!perfEnabled)}
           />
         </div>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ color: t.ink, fontSize: 13, fontWeight: 600 }}>Audio debug</div>
+            <div style={{ color: t.inkMuted, fontSize: 12, marginTop: 2 }}>
+              Enables the AUDIO pill, per-second SLOT heartbeats, and the bottom-right AUDIO LOG button. A reload may be required for engine-side gates to start emitting.
+            </div>
+          </div>
+          <ToggleSwitch
+            checked={audioEnabled}
+            onChange={() => setAudioDebugEnabled(!audioEnabled)}
+          />
+        </div>
       </Card>
+
     </div>
   );
 }
