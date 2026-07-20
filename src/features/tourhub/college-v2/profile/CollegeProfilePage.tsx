@@ -28,6 +28,7 @@ import { Masthead } from './sections/Masthead';
 import { ThisWeek } from './sections/ThisWeek';
 import { TheClass } from './sections/TheClass';
 import { scrollPageToTop } from '@/lib/getScrollParent';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export function CollegeProfilePage() {
   const { collegeSlug } = useParams<{ collegeSlug: string }>();
@@ -76,11 +77,11 @@ export function CollegeProfilePage() {
               alignItems: 'center',
             }}
           >
-            <div style={{ width: 66, height: 66, borderRadius: '34%', background: 'rgba(255,255,255,0.06)' }} />
+            <Skeleton variant="dark" style={{ width: 66, height: 66, borderRadius: '34%' }} />
             <div style={{ flex: 1 }}>
-              <div style={{ height: 10, width: 130, background: 'rgba(255,255,255,0.08)', marginBottom: 8 }} />
-              <div style={{ height: 20, width: '70%', background: 'rgba(255,255,255,0.12)', marginBottom: 8 }} />
-              <div style={{ height: 10, width: '55%', background: 'rgba(255,255,255,0.08)' }} />
+              <Skeleton variant="dark" style={{ height: 10, width: 130, marginBottom: 8, borderRadius: 3 }} />
+              <Skeleton variant="dark" style={{ height: 20, width: '70%', marginBottom: 8, borderRadius: 4 }} />
+              <Skeleton variant="dark" style={{ height: 10, width: '55%', borderRadius: 3 }} />
             </div>
           </div>
         )}

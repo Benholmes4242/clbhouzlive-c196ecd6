@@ -50,6 +50,7 @@ import { DuelMasthead } from './DuelMasthead';
 import { TugStat } from './TugStat';
 import { PickerSheet } from './PickerSheet';
 import { useCollegeAggregateStats } from './data/useCollegeAggregateStats';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const CLASS_CAP = 5;
 const OFF_INK = 'rgba(15,23,42,0.38)';
@@ -158,9 +159,9 @@ export function ComparePage() {
           >
             {[0, 1].map((i) => (
               <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-                <div style={{ width: 54, height: 54, borderRadius: '34%', background: 'rgba(255,255,255,0.06)' }} />
-                <div style={{ height: 10, width: 80, background: 'rgba(255,255,255,0.10)' }} />
-                <div style={{ height: 8, width: 60, background: 'rgba(255,255,255,0.06)' }} />
+                <Skeleton variant="dark" style={{ width: 54, height: 54, borderRadius: '34%' }} />
+                <Skeleton variant="dark" style={{ height: 10, width: 80, borderRadius: 3 }} />
+                <Skeleton variant="dark" style={{ height: 8, width: 60, borderRadius: 3 }} />
               </div>
             ))}
           </div>
@@ -182,11 +183,11 @@ export function ComparePage() {
               {[0, 1, 2, 3].map((i) => (
                 <div key={i} style={{ padding: '12px 16px 12px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                    <div style={{ height: 14, width: 60, background: 'rgba(15,23,42,0.06)', borderRadius: 3 }} />
-                    <div style={{ height: 10, width: 70, background: 'rgba(15,23,42,0.05)', borderRadius: 3 }} />
-                    <div style={{ height: 14, width: 60, background: 'rgba(15,23,42,0.06)', borderRadius: 3 }} />
+                    <Skeleton style={{ height: 14, width: 60, borderRadius: 3 }} />
+                    <Skeleton style={{ height: 10, width: 70, borderRadius: 3 }} />
+                    <Skeleton style={{ height: 14, width: 60, borderRadius: 3 }} />
                   </div>
-                  <div style={{ height: 4, background: 'rgba(15,23,42,0.05)', borderRadius: 2 }} />
+                  <Skeleton style={{ height: 4, borderRadius: 2 }} />
                 </div>
               ))}
             </div>

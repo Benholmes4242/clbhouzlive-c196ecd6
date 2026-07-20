@@ -13,6 +13,7 @@
  */
 
 import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { tournamentRoute } from '@/features/tourhub/routes';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
@@ -62,10 +63,19 @@ function formatTee(iso: string | null): string | null {
 export function ThisWeek({ slug, collegeName }: Props) {
   const { data } = useThisWeekAlumni(slug);
   const rows = data ?? [];
-  if (rows.length === 0) return null;
+  const show = rows.length > 0;
 
   return (
-    <section style={{ background: SURFACE, fontFamily: FONT }}>
+    <AnimatePresence initial={false}>
+      {show && (
+        <motion.section
+          key="this-week"
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: 'auto', opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+          style={{ background: SURFACE, fontFamily: FONT, overflow: 'hidden' }}
+        >
       <header style={{ padding: '16px 16px 8px' }}>
         <div
           style={{
@@ -235,6 +245,8 @@ export function ThisWeek({ slug, collegeName }: Props) {
           </Link>
         );
       })}
-    </section>
+        </motion.section>
+      )}
+    </AnimatePresence>
   );
 }
