@@ -13,6 +13,7 @@ import { PrefetchController } from '@/video/PrefetchController';
 import { trace } from '@/perf/trace';
 import { VideoEngine } from '@/video/VideoEngine';
 import { isPerfEnabled } from '@/perf/navTiming';
+import { audioDebugEnabled, logAudio } from '@/perf/audioDebug';
 import { useInviteSheet } from '@/hooks/useInviteSheet';
 import clbhouzLogo from '@/assets/clbhouz-logo.png';
 
