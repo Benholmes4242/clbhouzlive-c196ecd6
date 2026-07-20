@@ -1,3 +1,4 @@
+import { Skeleton } from '@/components/ui/skeleton';
 /**
  * VerificationFlowSheet — single-page "Get verified" flow.
  *

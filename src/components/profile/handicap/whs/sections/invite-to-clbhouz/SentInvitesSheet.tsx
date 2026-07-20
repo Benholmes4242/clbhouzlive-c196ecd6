@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Drawer as DrawerPrimitive } from 'vaul';
 import SheetHeader from '@/components/ui/SheetHeader';
 import { formatRelativeAgoLong } from '@/i18n/format';

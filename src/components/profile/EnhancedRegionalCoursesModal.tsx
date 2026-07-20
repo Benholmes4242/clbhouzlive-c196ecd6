@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback, useDeferredValue } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Grid3X3, List, ChevronDown, Search, Lock } from 'lucide-react';

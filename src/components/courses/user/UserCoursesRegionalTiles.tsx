@@ -1,3 +1,4 @@
+import { Skeleton } from '@/components/ui/skeleton';
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';

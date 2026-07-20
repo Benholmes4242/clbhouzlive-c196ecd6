@@ -1,3 +1,4 @@
+import { Skeleton } from '@/components/ui/skeleton';
 /**
  * HandicapPage — Top-level Handicap route.
  *

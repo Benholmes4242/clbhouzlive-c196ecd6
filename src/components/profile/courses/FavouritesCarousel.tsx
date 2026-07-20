@@ -1,3 +1,4 @@
+import { Skeleton } from '@/components/ui/skeleton';
 /**
  * FavouritesCarousel - Apple-style premium carousel for Top 10 Rated Courses
  */

@@ -1,3 +1,4 @@
+import { Skeleton } from '@/components/ui/skeleton';
 /**
  * FriendSheet — unified bottom sheet for all four friend states.
  *

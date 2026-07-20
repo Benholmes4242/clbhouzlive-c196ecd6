@@ -1,3 +1,4 @@
+import { Skeleton } from '@/components/ui/skeleton';
 /**
  * AllTeeTimesSheet — owns its round state. Renders the canonical Lens
  * segment (R1/R2/R3/R4), fetches per-round groups via useTeeTimesAll,
