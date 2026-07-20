@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { mapRowToFeedPost, groupMultiMedia } from '@/components/media-system/utils/feedMapper';
 import { buildFriendsFeed, deduplicatePosts } from '@/components/media-system/utils/feedAlgorithm';
+import { getFeedVersion } from '@/lib/featureFlags';
 import type { FeedPost, FeedRpcRow } from '@/components/media-system/types/media';
 
 export type FriendsMode = 'latest' | 'popular';
@@ -37,6 +38,7 @@ export function useFriendsFeed({
   pageSize = PAGE_SIZE_DEFAULT,
 }: UseFriendsFeedParams) {
   const { activeActor } = useActiveActor();
+  const version = getFeedVersion();
   const seenPostIds = useRef<string[]>([]);
 
   // Reset page-1 exclusion list when the query identity changes (incl. actor switch).
@@ -46,7 +48,7 @@ export function useFriendsFeed({
 
 
   const query = useInfiniteQuery({
-    queryKey: ['friends-feed', mode, searchQuery, userId, interleave, pageSize, activeActor?.type, activeActor?.id],
+    queryKey: ['friends-feed', version, mode, searchQuery, userId, interleave, pageSize, activeActor?.type, activeActor?.id],
     queryFn: async ({ pageParam }) => {
       if (!userId) return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
 
@@ -67,7 +69,8 @@ export function useFriendsFeed({
       if (cursor) params.p_cursor = cursor;
       if (searchQuery) params.p_search_query = searchQuery;
 
-      const { data, error } = await supabase.rpc('get_friends_feed', params as any);
+      const rpcName = version === 'v3' ? 'get_friends_feed_v3' : 'get_friends_feed';
+      const { data, error } = await supabase.rpc(rpcName as any, params as any);
 
       if (error) {
         if (import.meta.env.DEV) console.error('[FriendsFeed] RPC error:', error);
