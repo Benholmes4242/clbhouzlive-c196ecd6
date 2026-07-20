@@ -418,7 +418,7 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
           momentScore={moment?.score ?? null}
           onCtaTap={onCtaTap}
         />
-        <HeroWireTicker rows={top10} />
+        <HeroWireTicker rows={top10} emptyStateFacts={emptyStateFacts} />
       </div>
     );
   }
