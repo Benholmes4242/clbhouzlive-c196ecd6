@@ -33,7 +33,7 @@ function relTime(iso: string): string {
 
 export default function MyRequestsPage() {
   const navigate = useNavigate();
-  const { data, isLoading } = useMyRequestsList();
+  const { data, isLoading, isError, refetch } = useMyRequestsList();
   const hide = useHideMyRequest();
   const tickets = data ?? [];
   const [confirmId, setConfirmId] = useState<string | null>(null);
