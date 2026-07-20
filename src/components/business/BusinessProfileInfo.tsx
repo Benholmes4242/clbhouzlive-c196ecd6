@@ -218,9 +218,10 @@ export function BusinessProfileInfo({ business, userId }: BusinessProfileInfoPro
 
   // Opening hours: respect show_opening_hours AND must have >=1 non-empty day
   const oh = business.opening_hours || {};
+  const ohTyped = oh as Record<string, { open?: string; close?: string; closed?: boolean } | undefined>;
   const ohHasContent = DAY_KEYS.some((k) => {
-    const h = (oh as any)[k];
-    return h && (h.closed === true || (h.open && h.close));
+    const h = ohTyped[k];
+    return !!h && (h.closed === true || (!!h.open && !!h.close));
   });
   const showOpeningHours = business.show_opening_hours === true && ohHasContent;
 
