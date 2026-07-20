@@ -1,13 +1,14 @@
 import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  LayoutDashboard, Inbox, Users, MapPin, BarChart3, Settings, Shield, ArrowLeft,
-  Gauge, Activity, Bell,
+  LayoutDashboard, Inbox, Users, MapPin, BarChart3, Shield, ArrowLeft,
+  Activity,
   type LucideIcon,
 } from 'lucide-react';
 import { adminTheme as t } from './theme';
 import type { PanelRole } from '@/hooks/usePanelRole';
 import { useTriageCounts } from './hooks/useTriageCounts';
+import { useHealthChips } from './lib/healthChips';
 
 interface NavItem {
   to: string;
@@ -16,18 +17,16 @@ interface NavItem {
   requireFull?: boolean;
   moderatorAllowed?: boolean;
   showBadge?: boolean;
+  showHealthDot?: boolean;
 }
 
 const NAV: NavItem[] = [
-  { to: '/admin-v2/dashboard',   label: 'Dashboard',   icon: LayoutDashboard },
-  { to: '/admin-v2/inbox',       label: 'Inbox',       icon: Inbox, moderatorAllowed: true, showBadge: true },
-  { to: '/admin-v2/users',       label: 'Users',       icon: Users },
-  { to: '/admin-v2/content',     label: 'Content',     icon: MapPin },
-  { to: '/admin-v2/analytics',   label: 'Analytics',   icon: BarChart3, requireFull: true },
-  { to: '/admin-v2/system',      label: 'System',      icon: Settings },
-  { to: '/admin-v2/video-perf',  label: 'Video Perf',  icon: Gauge, requireFull: true },
-  { to: '/admin-v2/echo-health', label: 'Echo Health', icon: Activity, requireFull: true },
-  { to: '/admin-v2/push-health', label: 'Push Health', icon: Bell, requireFull: true },
+  { to: '/admin-v2/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/admin-v2/inbox',     label: 'Inbox',     icon: Inbox, moderatorAllowed: true, showBadge: true },
+  { to: '/admin-v2/users',     label: 'Users',     icon: Users },
+  { to: '/admin-v2/content',   label: 'Content',   icon: MapPin },
+  { to: '/admin-v2/analytics', label: 'Analytics', icon: BarChart3, requireFull: true },
+  { to: '/admin-v2/health',    label: 'Health',    icon: Activity, showHealthDot: true },
 ];
 
 interface Props {
