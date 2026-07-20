@@ -66,7 +66,7 @@ function Cell({ row }: { row: Row }) {
     >
       <div
         style={{
-          fontSize: 8,
+          fontSize: 10,
           fontWeight: 800,
           color: INK_MUTE,
           letterSpacing: '0.16em',
@@ -98,7 +98,7 @@ function SubSection({ label, rows }: { label: string; rows: Row[] }) {
       <p
         style={{
           margin: '0 0 6px',
-          fontSize: 8.5,
+          fontSize: 10,
           fontWeight: 800,
           color: AMBER,
           letterSpacing: '0.14em',
@@ -127,7 +127,7 @@ function SGBar({ label, value }: { label: string; value: number | null | undefin
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
         <span
           style={{
-            fontSize: 8,
+            fontSize: 10,
             fontWeight: 800,
             color: INK_MUTE,
             letterSpacing: '0.16em',
@@ -286,7 +286,7 @@ export function StatsSheet({ open, onClose, playerStats, playerName }: StatsShee
               <p
                 style={{
                   margin: '0 0 6px',
-                  fontSize: 8.5,
+                  fontSize: 10,
                   fontWeight: 800,
                   color: AMBER,
                   letterSpacing: '0.14em',

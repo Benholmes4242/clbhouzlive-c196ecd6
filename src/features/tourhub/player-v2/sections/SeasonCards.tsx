@@ -175,7 +175,7 @@ export function SeasonCards({ playerStats, results, player }: SeasonCardsProps) 
             <div
               style={{
                 marginTop: 8,
-                fontSize: 8.5,
+                fontSize: 10,
                 fontWeight: 800,
                 color: INK_FAINT,
                 letterSpacing: '0.14em',

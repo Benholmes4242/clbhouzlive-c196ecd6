@@ -89,7 +89,7 @@ export function LiveNowStrip({ liveData, playerName }: LiveNowStripProps) {
           />
           <span
             style={{
-              fontSize: 9,
+              fontSize: 10,
               fontWeight: 800,
               color: LIVE_DOT,
               letterSpacing: '0.14em',
