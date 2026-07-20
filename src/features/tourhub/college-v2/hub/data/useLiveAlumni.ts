@@ -39,6 +39,8 @@ export function useLiveAlumni() {
         .in('id', livePlayerIds)
         .not('college_normalized', 'is', null);
 
+      // Deliberate swallow: live counts decorate the yearbook; an error
+      // degrades to "0 playing now", never to wrong standings.
       if (error) return { totalLive: 0, byCollege: {} };
 
       const byCollege: Record<string, number> = {};
