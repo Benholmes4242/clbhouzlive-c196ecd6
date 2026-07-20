@@ -978,15 +978,13 @@ function AddCourseSheet({ open, onClose, onCreated, uploadPhoto }: {
           <Field label="Course name" required>
             <TextInput value={form.name} onChange={v => set('name', v)} placeholder="e.g. Augusta National" />
           </Field>
-          <Field label="Country" required>
-            <TextInput value={form.country} onChange={v => set('country', v)} placeholder="e.g. USA" />
-          </Field>
-          <Field label="Continent" required>
-            <SelectInput value={form.continent} onChange={v => set('continent', v)}>
-              <option value="">Select…</option>
-              {VALID_CONTINENTS.map(c => <option key={c} value={c}>{c}</option>)}
-            </SelectInput>
-          </Field>
+          <ContinentCountrySelectors
+            continent={form.continent}
+            country={form.country}
+            onContinentChange={v => set('continent', v)}
+            onCountryChange={v => set('country', v)}
+            required
+          />
         </Section>
 
         <Section title="Location">
