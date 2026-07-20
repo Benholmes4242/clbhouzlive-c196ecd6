@@ -363,6 +363,23 @@ export default function BusinessTeamPage() {
                     </div>
                   </div>
                 ))
+              ) : teamError ? (
+                <div className="py-6 text-center">
+                  <div className="text-[13px] font-semibold" style={{ color: INK }}>
+                    Couldn't load your team
+                  </div>
+                  <p className="text-[12px] mt-1" style={{ color: INK_45 }}>
+                    Check your connection and try again.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => refetchTeam()}
+                    className="mt-3 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[12.5px] font-bold text-white active:opacity-90"
+                    style={{ background: AMBER, border: 'none' }}
+                  >
+                    Retry
+                  </button>
+                </div>
               ) : (team || []).length === 0 ? (
                 <div className="py-6 text-center text-[13px]" style={{ color: INK_45 }}>
                   No members yet.
