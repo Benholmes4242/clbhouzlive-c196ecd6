@@ -75,10 +75,13 @@ function useFriendRequestMutations() {
   };
 
   const optimisticRemove = (requestId: string) => {
-    qc.setQueriesData({ queryKey: ['activity-v2-friend-requests'] }, (old: any) => {
-      if (!Array.isArray(old)) return old;
-      return old.filter((r: FriendRequestRowV2) => r.request_id !== requestId);
-    });
+    qc.setQueriesData<FriendRequestRowV2[]>(
+      { queryKey: ['activity-v2-friend-requests'] },
+      (old) => {
+        if (!Array.isArray(old)) return old;
+        return old.filter((r) => r.request_id !== requestId);
+      },
+    );
   };
 
   const accept = useMutation({
