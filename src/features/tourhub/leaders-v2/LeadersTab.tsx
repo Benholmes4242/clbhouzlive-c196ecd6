@@ -156,15 +156,15 @@ export function LeadersTab() {
 
       {/* Boards feed */}
       {isLoading ? (
-        <div style={{ padding: '16px 0 88px' }}>
+        <div style={{ padding: '16px 0 88px', display: 'flex', flexDirection: 'column', gap: 22 }}>
           {Array.from({ length: 3 }).map((_, i) => (
             <Skeleton
               key={i}
-              className="mb-3"
-              style={{ height: 168, borderRadius: 16, margin: '0 16px 12px' }}
+              style={{ height: i === 0 ? 320 : 168, borderRadius: 16, margin: '0 16px' }}
             />
           ))}
         </div>
+
       ) : isError ? (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '48px 16px', textAlign: 'center' }}>
           <div style={{ fontFamily: FONT, fontSize: 15, fontWeight: 700, color: INK }}>
