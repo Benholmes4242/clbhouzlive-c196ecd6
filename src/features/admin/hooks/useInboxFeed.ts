@@ -45,22 +45,18 @@ const humanAction = (action: string): string => {
   }
 };
 
-const titleCase = (s: string): string =>
-  s.replace(/[_-]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-
 const reportKindTitle = (row: ModerationQueueRow): string => {
-  return row.kind === 'post' ? 'Post reported' : 'User reported';
+  const reason = row.reasons[0] ?? 'reported';
+  if (row.kind === 'post') return `Post reported: ${reason}`;
+  return `User reported: ${reason}`;
 };
 
 const reportMeta = (row: ModerationQueueRow): string => {
   const who = row.kind === 'post'
-    ? (row.targetPost?.author?.display_name ?? row.targetPost?.author?.username ?? 'A member')
-    : (row.targetUser?.display_name ?? row.targetUser?.username ?? 'A member');
+    ? (row.targetPost?.author?.display_name ?? row.targetPost?.author?.username ?? 'unknown')
+    : (row.targetUser?.display_name ?? row.targetUser?.username ?? 'unknown');
   const n = row.report_count;
-  const raw = (row.reasons[0] ?? '').trim();
-  const hasReason = raw.length > 0 && raw.toLowerCase() !== 'reported';
-  const base = `Report - ${n} report${n === 1 ? '' : 's'} against ${who}`;
-  return hasReason ? `${base} - ${titleCase(raw)}` : base;
+  return `Report - ${n} report${n === 1 ? '' : 's'} against ${who}`;
 };
 
 // ---------------- hook ----------------
@@ -206,7 +202,7 @@ export function useInboxFeed(): InboxFeedResult {
           id: row.id,
           type: 'appeal',
           title: 'Suspension appeal',
-          meta: `Appeal - ${row.appellant?.display_name ?? row.appellant?.username ?? 'A member'}`,
+          meta: `Appeal - ${row.appellant?.display_name ?? row.appellant?.username ?? 'unknown'}`,
           createdAt: row.created_at,
           isHighPriority: false,
           payload: row,
@@ -220,7 +216,7 @@ export function useInboxFeed(): InboxFeedResult {
             id: `done-appeal-${row.id}`,
             type: 'appeal',
             title: 'Suspension appeal',
-            meta: `Appeal - ${row.appellant?.display_name ?? row.appellant?.username ?? 'A member'}`,
+            meta: `Appeal - ${row.appellant?.display_name ?? row.appellant?.username ?? 'unknown'}`,
             createdAt: row.reviewed_at ?? row.created_at,
             isHighPriority: false,
             payload: row,
@@ -234,12 +230,12 @@ export function useInboxFeed(): InboxFeedResult {
     if (canMod && supportOpen.data) {
       for (const row of supportOpen.data) {
         if (row.status === 'resolved' || row.status === 'closed') continue;
-        const who = row.profile?.display_name ?? row.profile?.username ?? (row.user_id ? 'A member' : null);
+        const who = row.profile?.display_name ?? row.profile?.username ?? 'unknown';
         open.push({
           id: row.id,
           type: 'support',
           title: row.subject,
-          meta: who ? `Support - from ${who}` : 'Support',
+          meta: `Support - from ${who}`,
           createdAt: row.created_at,
           isHighPriority: false,
           payload: row,
@@ -248,12 +244,12 @@ export function useInboxFeed(): InboxFeedResult {
     }
     if (canMod && supportDone.data) {
       for (const row of supportDone.data) {
-        const who = row.profile?.display_name ?? row.profile?.username ?? (row.user_id ? 'A member' : null);
+        const who = row.profile?.display_name ?? row.profile?.username ?? 'unknown';
         done.push({
           id: `done-support-${row.id}`,
           type: 'support',
           title: row.subject,
-          meta: who ? `Support - from ${who}` : 'Support',
+          meta: `Support - from ${who}`,
           createdAt: row.last_message_at ?? row.created_at,
           isHighPriority: false,
           payload: row,

@@ -9,7 +9,6 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useDeleteBusiness } from '@/hooks/useDeleteBusiness';
-import { useState } from 'react';
 
 interface DeleteBusinessDialogProps {
   open: boolean;
@@ -27,22 +26,10 @@ export function DeleteBusinessDialog({
   userId,
 }: DeleteBusinessDialogProps) {
   const { mutate: deleteBusiness, isPending } = useDeleteBusiness();
-  const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleDelete = async () => {
-    if (isDeleting || isPending) return;
-    // Close FIRST so Radix runs its exit cycle before invalidations evict
-    // this card (and unmount the dialog host). Otherwise pointer-events:none
-    // leaks onto <body> and freezes the app.
-    setIsDeleting(true);
-    onOpenChange(false);
-    await new Promise((r) => setTimeout(r, 300));
+  const handleDelete = () => {
     deleteBusiness({ businessId, userId });
-    // No need to reset isDeleting — host will unmount on success; on failure
-    // the hook surfaces its own toast and the card remains for retry.
   };
-
-  const busy = isPending || isDeleting;
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -50,17 +37,17 @@ export function DeleteBusinessDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Delete business profile?</AlertDialogTitle>
           <AlertDialogDescription>
-            This will permanently remove {businessName} from Clbhouz. This action can{"'"}t be undone.
+            This will permanently remove your business from Clbhouz. This action can{"'"}t be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={busy}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
-            disabled={busy}
+            disabled={isPending}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            Delete business
+            {isPending ? 'Deleting...' : 'Delete business'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

@@ -55,8 +55,8 @@ export async function fetchSupportTickets(opts?: { closed?: boolean }): Promise<
   const sb: any = supabase;
   const profilesRes = await sb
     .from('user_profiles')
-    .select('id, display_name, username, profile_photo_url')
-    .in('id', userIds);
+    .select('user_id, display_name, username, profile_photo_url')
+    .in('user_id', userIds);
   const firstMsgsRes = await sb
     .from('support_messages')
     .select('ticket_id, body, created_at')
@@ -67,7 +67,7 @@ export async function fetchSupportTickets(opts?: { closed?: boolean }): Promise<
 
   const pMap = new Map<string, SupportTicketRow['profile']>();
   profiles.forEach((p: any) => {
-    pMap.set(p.id, {
+    pMap.set(p.user_id, {
       display_name: p.display_name,
       username: p.username,
       profile_photo_url: p.profile_photo_url,
@@ -114,10 +114,10 @@ export function useSupportThread(ticketId: string | null) {
       if (senderIds.length === 0) return [];
       const { data: profiles } = await sb
         .from('user_profiles')
-        .select('id, display_name, username, profile_photo_url')
-        .in('id', senderIds);
+        .select('user_id, display_name, username, profile_photo_url')
+        .in('user_id', senderIds);
       const pMap = new Map<string, any>();
-      (profiles ?? []).forEach((p: any) => pMap.set(p.id, p));
+      (profiles ?? []).forEach((p: any) => pMap.set(p.user_id, p));
       return rows.map((r) => ({
         ...r,
         sender_role: r.sender_role as 'user' | 'admin',

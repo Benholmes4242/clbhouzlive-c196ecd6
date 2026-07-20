@@ -112,18 +112,12 @@ export const PostOwnerMenu: React.FC<PostOwnerMenuProps> = ({
     e.stopPropagation();
     e.preventDefault();
     if (isDeleting) return;
-    // Close FIRST so Radix runs its exit cycle before the mutation's
-    // invalidations evict this item (and unmount the dialog host).
-    // Otherwise Radix leaves pointer-events:none on <body>, freezing the app.
     setIsDeleting(true);
-    setShowDeleteConfirm(false);
-    await new Promise((r) => setTimeout(r, 300));
     try {
       await deletePost(postId, actorType, actorId);
-    } catch {
-      // Failure surfaces via the deletion hook's own toast; row stays.
     } finally {
       setIsDeleting(false);
+      setShowDeleteConfirm(false);
     }
   };
 
