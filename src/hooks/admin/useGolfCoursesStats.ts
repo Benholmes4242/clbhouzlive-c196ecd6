@@ -24,7 +24,7 @@ export function useGolfCoursesStats() {
       const { count: missingCoordinates } = await supabase
         .from('golf_courses')
         .select('*', { count: 'exact', head: true })
-        .or('latitude.is.null,longitude.is.null');
+        .or(MISSING_COORDS_PREDICATE);
 
       // Get courses missing images
       const { count: missingImages } = await supabase
