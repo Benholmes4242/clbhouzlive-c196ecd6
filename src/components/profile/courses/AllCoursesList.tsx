@@ -98,7 +98,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   const { data: userActivity = [] } = useUserCourseActivity(userId);
 
   // Fetch course details
-  const { data: courses = [], isLoading } = useQuery({
+  const { data: courses = [], isLoading, isError, refetch } = useQuery({
     queryKey: ['user-played-courses-full', userId],
     enabled: !!userId && userActivity.length > 0,
     queryFn: async () => {
