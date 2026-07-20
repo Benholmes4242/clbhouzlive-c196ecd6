@@ -258,7 +258,7 @@ const BusinessProfilePage: React.FC = () => {
     const url = buildShareUrl();
     if (business?.id) trackBusinessAction(business.id, 'share_profile', user?.id);
     if (navigator.share) {
-      try { await navigator.share({ title: business?.name, url }); } catch {}
+      try { await navigator.share({ title: business?.name, url }); } catch { /* user cancelled share */ }
     } else {
       await navigator.clipboard.writeText(url);
       toast.success('Copied to clipboard');
