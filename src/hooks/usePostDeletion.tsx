@@ -161,6 +161,12 @@ export const usePostDeletion = () => {
         detail: { postId, actorType, actorId } 
       }));
 
+      // Runs AFTER React commits the invalidation-driven card eviction.
+      // Only sanitizes a stuck body pointer-events lock when no legitimate
+      // Radix layer or bodyScrollLock owner is active. See
+      // `src/lib/radixLockSanitizer.ts`.
+      scheduleRadixBodyLockSanitize();
+
       return { success: true };
     } catch (error: any) {
       console.error('Error deleting post:', error);
