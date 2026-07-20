@@ -109,7 +109,7 @@ export function useThisWeekAlumni(normalizedName: string | undefined) {
 
       const rows: WeekAlumnusRow[] = [];
       const preTeeByTournament = new Map<string, Set<string>>();
-      for (const r of data as LbRow[]) {
+      for (const r of data as unknown as LbRow[]) {
         const t = r.tournament;
         if (!t) continue;
         const a = alumniById.get(r.player_id);
