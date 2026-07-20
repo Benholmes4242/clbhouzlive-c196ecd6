@@ -1273,17 +1273,24 @@ class VideoEngineImpl {
   }
 
   /**
-   * v9 reconciler — the ONLY function that decides what gets unmuted.
+   * v11 reconciler — the ONLY function that decides what gets unmuted.
    *
-   * Compute the "speaker lane" — the at-most-one lane that should be audible
-   * right now — from four inputs:
+   * PRODUCT SPEC (canon):
+   *   - Inline audio = the Clubhouse feed's ACTIVE slide only, session-gated.
+   *   - Rails and grid tiles are ALWAYS silent inline (policy 'always-muted').
+   *   - Fullscreen viewer is session-gated via the borrow / fullscreen-solo
+   *     branch below.
+   *   - Tap-to-fullscreen is the ONLY way rail/grid content speaks.
+   *
+   * Inputs:
    *   1. useSessionAudio.isMuted    (user intent)
    *   2. useFullscreenFeedStore     (isOpen + borrow.laneId)
-   *   3. feedLaneRoles.laneForRole('active')  (which feed lane is on screen)
-   *   4. per-lane wantPlay / audioPolicy       (declared roles)
+   *   3. audioFocus registry        (which surface owns the inline speaker)
+   *   4. per-lane wantPlay / audioPolicy
    *
    * Then apply: every lane other than the speaker is muted; the speaker,
    * if any, is unmuted. 'always-muted' stays muted; 'local' is left alone.
+   * This is the single writer for session-lane mute state.
    */
   private reconcileAudio(reason: string): void {
     const sessionMuted = useSessionAudio.getState().isMuted;
