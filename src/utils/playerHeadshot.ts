@@ -25,7 +25,7 @@ const TOUR_FOLDER: Record<string, string> = {
 
 // Player photos live in their HOME tour folder, which may differ from the
 // event's tour (majors, co-sanctioned events, Korn Ferry defending champs etc).
-// PGA Tour is the most common home folder, so it's the primary fallback.
+// PGA Tour is the maintained/current asset set, so it is always tried first.
 const FALLBACK_FOLDER_ORDER = [
   'PGA%20Tour',
   'LIV',
@@ -54,8 +54,8 @@ export function getPlayerHeadshotUrl(playerName: string, tourCode: string, heads
 
 /**
  * Returns an ORDERED list of candidate R2 URLs to try for a player.
- * Event-tour folder is tried first, then PGA Tour, then the rest. The avatar
- * walks the list on error and uses the first that loads.
+ * PGA Tour folder is tried first, then the event-tour folder, then the rest.
+ * The avatar walks the list on error and uses the first that loads.
  */
 export function getPlayerHeadshotCandidates(
   playerName: string,
@@ -64,8 +64,11 @@ export function getPlayerHeadshotCandidates(
 ): string[] {
   if (!playerName && !headshotOverride) return [];
   const nameKey = headshotOverride || playerName;
-  const primary = TOUR_FOLDER[tourCode];
-  const folders = [primary, ...FALLBACK_FOLDER_ORDER]
+  const eventFolder = TOUR_FOLDER[tourCode];
+  // PGA Tour folder is the maintained asset set - always tried FIRST.
+  // Players without a PGA file fall through to the event-tour folder,
+  // then the remaining tours. (Other folders may hold stale files.)
+  const folders = ['PGA%20Tour', eventFolder, ...FALLBACK_FOLDER_ORDER]
     .filter((f): f is string => Boolean(f))
     .filter((f, i, arr) => arr.indexOf(f) === i);
   return folders.map((folder) => buildUrl(folder, nameKey));

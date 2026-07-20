@@ -211,7 +211,9 @@ async function fetchScopedTournamentPredictions(
         .in('id', missingIds);
       const photoMap = new Map<string, string | null>();
       (playerRows ?? []).forEach((r: any) => {
-        photoMap.set(r.id, r.headshot_override || r.photo_url || null);
+        // headshot_override is a filename key for R2 lookups, not a URL.
+        // Only photo_url is a valid direct image src here.
+        photoMap.set(r.id, r.photo_url || null);
       });
       predictions.topContenders = predictions.topContenders.map((p) =>
         p.photoUrl ? p : { ...p, photoUrl: photoMap.get(p.playerId) ?? null },

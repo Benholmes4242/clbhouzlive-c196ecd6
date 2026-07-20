@@ -3,7 +3,7 @@ import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 /**
  * Canonical player-avatar resolver — single source of truth for every tour
  * page and subpage. DB photo_url wins; otherwise an ordered multi-folder
- * candidate list (event-tour folder first, then PGA Tour, then the rest).
+ * candidate list (PGA Tour folder first, then the event-tour folder, then the rest).
  * Feed the result to <SquircleAvatar srcCandidates={...}
                       />, which walks the
  * list and falls back to canonical initials when all miss.
