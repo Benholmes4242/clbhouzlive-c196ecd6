@@ -1484,7 +1484,7 @@ const ProfilePageV2: React.FC = () => {
       try { return window.localStorage.getItem('touchDebug') === '1'; } catch { return false; }
     })();
     if (byQuery) {
-      try { window.localStorage.setItem('touchDebug', '1'); } catch {}
+      try { window.localStorage.setItem('touchDebug', '1'); } catch { /* localStorage unavailable */ }
     }
     return byQuery || byStorage;
   }, []);
