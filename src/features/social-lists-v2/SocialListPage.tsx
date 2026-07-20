@@ -31,6 +31,7 @@ import {
   useSocialListCounts,
   type SocialListRow,
 } from './hooks/useSocialListV2';
+import { RowAvatar, RowSubline, FollowButton } from './rowParts';
 
 /* ── design tokens (Circle) ─────────────────────────────────────────── */
 const FONT =
@@ -583,18 +584,7 @@ function RichRow({
         cursor: 'pointer',
       }}
     >
-      {isBusiness ? (
-        <BusinessMark row={row} />
-      ) : (
-        <SquircleAvatar
-          src={row.avatar_url ?? undefined}
-          alt={row.display_name ?? row.username ?? ''}
-          size={42}
-          fallback={(row.display_name ?? row.username ?? '?').charAt(0)}
-          hairlineRing
-          ringColor={LIGHT_HAIRLINE}
-        />
-      )}
+      <RowAvatar row={row} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <div
@@ -629,147 +619,6 @@ function RichRow({
       </div>
       <FollowButton row={row} />
     </div>
-  );
-}
-
-function BusinessMark({ row }: { row: SocialListRow }) {
-  const initial = (row.display_name ?? '?').charAt(0);
-  if (row.avatar_url) {
-    return (
-      <div
-        style={{
-          width: 42,
-          height: 42,
-          borderRadius: '34%',
-          overflow: 'hidden',
-          background: SURFACE,
-          border: `0.5px solid ${LIGHT_HAIRLINE}`,
-          flexShrink: 0,
-        }}
-      >
-        <img
-          src={row.avatar_url}
-          alt={row.display_name ?? ''}
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-        />
-      </div>
-    );
-  }
-  return (
-    <div
-      style={{
-        width: 42,
-        height: 42,
-        borderRadius: '34%',
-        background: 'rgba(15,23,42,0.06)',
-        border: `0.5px solid ${LIGHT_HAIRLINE}`,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: 15,
-        fontWeight: 700,
-        color: INK_MUTE,
-        flexShrink: 0,
-      }}
-    >
-      {initial}
-    </div>
-  );
-}
-
-function RowSubline({ row }: { row: SocialListRow }) {
-  if (row.actor_type === 'business') {
-    const loc = row.business_location ?? row.business_category ?? '';
-    return (
-      <div style={{ fontSize: 11.5, fontWeight: 500, color: INK_MUTE, marginTop: 1 }}>
-        Business{loc ? ` · ${loc}` : ''}
-      </div>
-    );
-  }
-  const mutuals = row.mutual_usernames ?? [];
-  if (row.mutual_count > 0 && mutuals.length > 0) {
-    const extra = row.mutual_count - 1;
-    return (
-      <div style={{ fontSize: 11.5, fontWeight: 500, color: INK_MUTE, marginTop: 1 }}>
-        Followed by @{mutuals[0]}
-        {extra > 0 ? ` + ${extra} ${extra === 1 ? 'other' : 'others'}` : ''}
-      </div>
-    );
-  }
-  const home = row.home_club;
-  if (!home) return null;
-  return (
-    <div style={{ fontSize: 11.5, fontWeight: 500, color: INK_MUTE, marginTop: 1 }}>{home}</div>
-  );
-}
-
-/* ── follow button ──────────────────────────────────────────────────── */
-function FollowButton({ row }: { row: SocialListRow }) {
-  const { user: viewer } = useSupabaseSession();
-  const { activeActor } = useActiveActor();
-  const toggle = useToggleFollow();
-  const [pending, setPending] = useState(false);
-  const [optimistic, setOptimistic] = useState<boolean | null>(null);
-
-  const isSelf =
-    viewer?.id &&
-    row.actor_type === 'personal' &&
-    row.actor_id === viewer.id;
-  if (isSelf) return null;
-
-  const following = optimistic ?? !!row.viewer_follows;
-  const viewerActorType: 'personal' | 'business' = activeActor?.type ?? 'personal';
-  const viewerActorId = activeActor?.id ?? viewer?.id ?? '';
-
-  const onClick = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!viewer?.id) {
-      toast.error('Please sign in');
-      return;
-    }
-    const prev = following;
-    setOptimistic(!prev);
-    setPending(true);
-    try {
-      await toggle.mutateAsync({
-        targetActorType: row.actor_type,
-        targetActorId: row.actor_id,
-        targetUserId: row.actor_type === 'personal' ? row.actor_id : undefined,
-        viewerActorType,
-        viewerActorId,
-        viewerUserId: viewer.id,
-        isFollowing: prev,
-      });
-    } catch {
-      setOptimistic(prev);
-      toast.error(prev ? 'Could not unfollow' : 'Could not follow');
-    } finally {
-      setPending(false);
-    }
-  };
-
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={pending}
-      style={{
-        height: 30,
-        padding: '0 14px',
-        borderRadius: 15,
-        background: following ? SURFACE : INK,
-        color: following ? INK : '#FFFFFF',
-        border: following ? `1px solid ${HAIR_STRONG}` : 'none',
-        fontSize: 12,
-        fontWeight: 700,
-        fontFamily: FONT,
-        cursor: pending ? 'default' : 'pointer',
-        opacity: pending ? 0.7 : 1,
-        flexShrink: 0,
-      }}
-    >
-      {following ? 'Following' : 'Follow'}
-    </button>
   );
 }
 
