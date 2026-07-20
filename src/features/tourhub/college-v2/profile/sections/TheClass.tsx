@@ -61,7 +61,7 @@ interface Props {
 }
 
 export function TheClass({ slug, collegeName }: Props) {
-  const { data: roster = [], isLoading } = useCollegeRoster(slug);
+  const { data: roster = [], isLoading, isError, refetch } = useCollegeRoster(slug);
   const { data: liveMap = {} } = useLivePlayerIds();
   const { data: weekRows = [] } = useThisWeekAlumni(slug);
 
