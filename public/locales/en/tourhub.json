@@ -696,6 +696,11 @@
       "synced": "Season ranking · live dot = on the course right now",
       "unsynced": "Ranked by world ranking — season statistics arrive with the sync"
     },
+    "error": {
+      "title": "Couldn't load the ranking",
+      "body": "Check your connection and try again.",
+      "retry": "Retry"
+    },
     "podium": {
       "rank": "No.{{rank}}",
       "rankWithStat": "No.{{rank}} · {{statLabel}}"

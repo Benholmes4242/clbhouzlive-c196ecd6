@@ -106,7 +106,7 @@ export function PlayersTab() {
   }, [searchExpanded]);
 
   // ── Data
-  const { data: ranking, isLoading: rankingLoading } = usePlayersRanking(activeTour);
+  const { data: ranking, isLoading: rankingLoading, isError: rankingError, refetch: refetchRanking } = usePlayersRanking(activeTour);
   const { data: liveMap } = useLivePlayerIds();
   const { data: liveTournaments } = useLiveTournaments();
 
@@ -335,7 +335,7 @@ export function PlayersTab() {
       </div>
 
       {/* PODIUM — synced only, hidden while searching */}
-      {synced && !isSearching && !rankingLoading && podiumRows.length >= 3 && (
+      {synced && !isSearching && !rankingLoading && !rankingError && podiumRows.length >= 3 && (
         <PodiumCards rows={podiumRows} statLabel={statLabel} />
       )}
 
@@ -388,6 +388,22 @@ export function PlayersTab() {
           {Array.from({ length: 8 }).map((_, i) => (
             <Skeleton key={i} className="w-full mb-1" style={{ height: 58, borderRadius: 6 }} />
           ))}
+        </div>
+      ) : rankingError ? (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '48px 16px', textAlign: 'center' }}>
+          <div style={{ fontFamily: FONT, fontSize: 15, fontWeight: 700, color: INK }}>
+            {t('players.error.title', { defaultValue: "Couldn't load the ranking" })}
+          </div>
+          <div style={{ fontFamily: FONT, fontSize: 13, color: INK_MUTE, maxWidth: 280 }}>
+            {t('players.error.body', { defaultValue: 'Check your connection and try again.' })}
+          </div>
+          <button
+            type="button"
+            onClick={() => refetchRanking()}
+            style={{ background: INK, color: '#fff', border: 'none', borderRadius: 999, padding: '10px 20px', fontFamily: FONT, fontSize: 13.5, fontWeight: 700, cursor: 'pointer' }}
+          >
+            {t('players.error.retry', { defaultValue: 'Retry' })}
+          </button>
         </div>
       ) : orderedRows.length === 0 ? (
         <TourHubEmptyState variant="players" />

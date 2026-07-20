@@ -32,9 +32,20 @@ export function useLivePlayerIds() {
         )
         .eq('tournament.status', 'inprogress')
         .limit(2000);
+      // Deliberate swallow: this map decorates rows with live dots and
+      // feeds the Playing-now sort, which self-reverts to Ranking when
+      // the map is empty (see PlayersTab liveCount safety effect). An
+      // error here degrades to "no dots", never to wrong data.
       if (error) return {};
+      type LiveLbRow = {
+        player_id: string | null;
+        position: number | null;
+        position_tied: boolean | null;
+        score: number | null;
+        tournament: { id: string | null; name: string | null; status: string | null } | null;
+      };
       const map: LivePlayerMap = {};
-      for (const row of (data ?? []) as any[]) {
+      for (const row of ((data ?? []) as unknown as LiveLbRow[])) {
         if (!row.player_id) continue;
         map[row.player_id] = {
           position: row.position ?? null,
