@@ -116,7 +116,12 @@ const PostDeepLinkPage: React.FC = () => {
         .eq('status', 'published')
         .maybeSingle();
 
-      if (error || !data) {
+      if (error) {
+        setLoadError(true);
+        setIsLoading(false);
+        return;
+      }
+      if (!data) {
         setNotFound(true);
         setIsLoading(false);
         return;
