@@ -46,6 +46,35 @@ export function ComingUp({ tour }: { tour: TourId | null }) {
     return () => el.removeEventListener('scroll', onScroll);
   }, [pages.length]);
 
+  if (isLoading && rows.length === 0) {
+    return (
+      <SectionShell eyebrow={t('overview.comingUp.eyebrow')} linkLabel={t('overview.comingUp.linkLabel')} onLinkClick={() => navigate('/tourhub?tab=schedule')}>
+        <div style={{ margin: '0 16px' }}>
+          <V4Card style={{ overflow: 'hidden' }}>
+            {[0, 1, 2, 3, 4].map((i) => (
+              <div
+                key={i}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 14,
+                  padding: '11px 14px',
+                  borderTop: i === 0 ? 'none' : `0.5px solid ${V4.hairline}`,
+                }}
+              >
+                <Skeleton className="h-8 w-12 rounded" />
+                <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <Skeleton className="h-3.5 w-3/5 rounded" />
+                  <Skeleton className="h-3 w-2/5 rounded" />
+                </div>
+                <Skeleton className="h-6 w-8 rounded" />
+              </div>
+            ))}
+          </V4Card>
+        </div>
+      </SectionShell>
+    );
+  }
   if (rows.length === 0) return null;
 
   return (
