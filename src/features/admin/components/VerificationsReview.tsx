@@ -246,7 +246,210 @@ export function VerificationsTab({
 /* Default export mirrors the named one for import-style flexibility. */
 export default VerificationsTab;
 
+/* ─────────────────────── Shared detail body ─────────────────────── */
+
+/**
+ * Renders the full evidence set + admin-note textarea for a verification
+ * request. Single source of truth consumed by both VerificationsTab (this
+ * file) and VerificationInboxSheet in InboxPage.tsx. Loads business detail
+ * and duplicate-proof conflict internally; callers wire their own footer
+ * decisions and reviewMutation.
+ */
+export function VerificationDetailBody({
+  row, note, setNote, decision,
+}: {
+  row: VerificationRow;
+  note: string;
+  setNote: (v: string) => void;
+  decision: 'approved' | 'rejected' | 'needs_more_info' | null;
+}) {
+  const [bizDetail, setBizDetail] = useState<{ name?: string; category?: string; location?: string; website?: string; email?: string } | null>(null);
+  const { data: proofConflict } = useProofConflict(row);
+
+  useEffect(() => {
+    let cancelled = false;
+    setBizDetail(null);
+    if (row.type === 'business' && row.businessId) {
+      import('@/integrations/supabase/client').then(({ supabase }) =>
+        supabase.from('business_accounts')
+          .select('name, category, location, website, email')
+          .eq('id', row.businessId!)
+          .maybeSingle()
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .then(({ data }) => { if (!cancelled && data) setBizDetail(data as any); })
+      );
+    }
+    return () => { cancelled = true; };
+  }, [row.id, row.businessId, row.type]);
+
+  const proofMetaEntries = row.proofMetadata
+    ? Object.entries(row.proofMetadata).filter(([, v]) => v !== null && v !== undefined && v !== '')
+    : [];
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <StatusPill tone={
+          row.type === 'business' ? 'warn' :
+          row.type === 'course_claim' ? 'warn' : 'neutral'
+        }>
+          {row.type === 'business' ? 'Business' :
+           row.type === 'course_claim' ? 'Course claim' : 'Golfer'}
+        </StatusPill>
+        <StatusPill tone={
+          row.status === 'pending' ? 'warn' :
+          row.status === 'needs_more_info' ? 'warn' :
+          row.status === 'approved' || row.status === 'accepted' ? 'ok' :
+          row.status === 'rejected' || row.status === 'declined' ? 'danger' : 'neutral'
+        }>
+          {row.status}
+        </StatusPill>
+      </div>
+
+      {row.type === 'course_claim' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {row.businessAlreadyVerified && (
+            <div style={{
+              background: 'rgba(245, 158, 11, 0.10)',
+              border: '1px solid rgba(245, 158, 11, 0.35)',
+              color: '#b45309',
+              padding: '8px 10px',
+              borderRadius: 8,
+              fontSize: 12,
+              lineHeight: 1.4,
+            }}>
+              Note: this business is already verified. Course claims grant club linkage,
+              which the verified tick alone does not - review the claim on its own merits.
+            </div>
+          )}
+          {row.claimBusinessName && <Field label="Business" value={row.claimBusinessName} />}
+          {row.claimCourseName && <Field label="Course / Club" value={row.claimCourseName} />}
+          {row.claimProofNote && <Field label="Proof note" value={row.claimProofNote} />}
+        </div>
+      )}
+
+      {row.type === 'business' && bizDetail && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {bizDetail.category && <Field label="Category" value={bizDetail.category} />}
+          {bizDetail.location && <Field label="Location" value={bizDetail.location} />}
+          {bizDetail.website && (
+            <Field label="Website">
+              <a href={bizDetail.website} target="_blank" rel="noreferrer" style={{ color: t.brandText, fontSize: 13, wordBreak: 'break-all' }}>
+                {bizDetail.website}
+              </a>
+            </Field>
+          )}
+          {bizDetail.email && <Field label="Business email" value={bizDetail.email} />}
+        </div>
+      )}
+
+      {row.type === 'business' && row.proofMethod && (
+        <Field label="Proof method" value={PROOF_LABELS[row.proofMethod] ?? row.proofMethod} />
+      )}
+      {row.type === 'business' && row.proofValue && (
+        <Field label="Proof value">
+          {/^https?:\/\//i.test(row.proofValue) ? (
+            <a href={row.proofValue} target="_blank" rel="noreferrer" style={{ color: t.brandText, fontSize: 13, wordBreak: 'break-all' }}>
+              {row.proofValue}
+            </a>
+          ) : (
+            <span style={{ fontSize: 13, color: t.ink, wordBreak: 'break-all' }}>{row.proofValue}</span>
+          )}
+        </Field>
+      )}
+      {proofConflict && row.type === 'business' && (
+        <div role="alert" style={{
+          background: t.dangerSoft,
+          border: `1px solid ${t.danger}`,
+          borderRadius: t.radius.md,
+          padding: 12,
+          display: 'flex',
+          gap: 10,
+          alignItems: 'flex-start',
+        }}>
+          <span style={{ fontSize: 16, lineHeight: 1 }} aria-hidden>!</span>
+          <div style={{ fontSize: 13, color: t.dangerText, lineHeight: 1.45 }}>
+            <strong style={{ fontWeight: 700 }}>Duplicate proof</strong> - this{' '}
+            {PROOF_NOUNS[row.proofMethod ?? ''] ?? 'proof'} is already verified for{' '}
+            <strong style={{ fontWeight: 700 }}>{proofConflict.businessName}</strong>.
+            Approving will verify a second business with the same proof.
+          </div>
+        </div>
+      )}
+
+      {proofMetaEntries.length > 0 && (
+        <Field label="Proof metadata">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            {proofMetaEntries.map(([k, v]) => (
+              <div key={k} style={{ fontSize: 12, color: t.ink }}>
+                <span style={{ color: t.inkMuted }}>{k}:</span> {String(v)}
+              </div>
+            ))}
+          </div>
+        </Field>
+      )}
+      {row.domain && (
+        <Field label="Domain" value={`${row.domain}${row.domainConfirmed ? ' (confirmed)' : ' (unconfirmed)'}`} />
+      )}
+      {row.type === 'business' && row.proofMethod === 'business_email' && (
+        <Field label="Email verification">
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+          {(row.proofMetadata as any)?.email_verified || row.domainConfirmed ? (
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#059669' }}>Email verified (OTP)</span>
+          ) : (
+            <span style={{ fontSize: 12, fontWeight: 600, color: t.inkMuted }}>Email provided (unverified)</span>
+          )}
+        </Field>
+      )}
+      {row.type === 'business' && row.proofDocumentUrl && (
+        <Field label="Supporting document">
+          <SupportingDocLink path={row.proofDocumentUrl} />
+        </Field>
+      )}
+      {row.type === 'business' && row.contactEmail && (
+        <Field label="Applicant contact email" value={row.contactEmail} />
+      )}
+      {row.type === 'business' && row.contactRole && (
+        <Field label="Applicant role" value={row.contactRole} />
+      )}
+
+      {row.note && <Field label="Request note" value={row.note} />}
+      {row.evidenceUrl && (
+        <Field label="Evidence">
+          <a href={row.evidenceUrl} target="_blank" rel="noreferrer" style={{ color: t.brandText, fontSize: 13 }}>
+            {row.evidenceUrl}
+          </a>
+        </Field>
+      )}
+      {row.inviteReason && <Field label="Reason" value={row.inviteReason} />}
+      {row.adminNote && <Field label="Admin note" value={row.adminNote} />}
+
+      {row.status === 'pending' && (
+        <div>
+          <label style={{ fontSize: 11, color: t.inkFaint, fontWeight: 600, textTransform: 'uppercase' }}>
+            Admin note {(decision === 'rejected' || decision === 'needs_more_info') && <span style={{ color: t.danger }}>(required, min 3 chars)</span>}
+          </label>
+          <textarea
+            value={note}
+            onChange={e => setNote(e.target.value)}
+            placeholder="Optional for approval, required for rejection or 'needs info'..."
+            rows={3}
+            style={{
+              marginTop: 6, width: '100%',
+              padding: 10, borderRadius: t.radius.md,
+              border: `1px solid ${(decision === 'rejected' || decision === 'needs_more_info') && note.trim().length < 3 ? t.danger : t.line}`,
+              background: t.canvas, color: t.ink, fontSize: 13,
+              outline: 'none', resize: 'vertical',
+            }}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ─────────────────────── Local helpers ─────────────────────── */
+
 
 function VerificationCard({
   row, onOpen, onQuick, disabled,
