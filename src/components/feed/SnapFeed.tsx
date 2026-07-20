@@ -147,6 +147,26 @@ export function SnapFeed({
     return () => window.removeEventListener('clbhouz-active-tab-retap', onRetap);
   }, []);
 
+  // Forensic X-ray — clear log on surface teardown so the buffer records the
+  // active slot's disappearance (settle logs live in the activeIndex effect).
+  useEffect(() => {
+    return () => {
+      if (audioDebugEnabled()) {
+        try {
+          logAudio('surface.active', {
+            surface: surface === 'fullscreen' ? 'fullscreen' : 'clubhouse',
+            activeIndex: null,
+            laneId: null,
+            postId: null,
+            cleared: true,
+          });
+        } catch { /* noop */ }
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+
   const storeActiveIndex = useClubhouseStore(s => s.activeIndex);
   const setActiveIndex = useClubhouseStore(s => s.setActiveIndex);
   // Opening-slide media selectors threaded from the tap opener. `mediaId` is
