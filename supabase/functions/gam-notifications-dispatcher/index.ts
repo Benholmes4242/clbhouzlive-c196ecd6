@@ -223,6 +223,33 @@ function nextActiveWindow(now: Date, tz: string): Date {
   return next;
 }
 
+const LEGEND_LABELS: Record<string, string> = {
+  best_score_diff_90d: "Best Score (90-day)",
+  best_score_diff_all_time: "Best Score (all-time)",
+  lowest_gross_90d: "Lowest Gross (90-day)",
+  lowest_gross_all_time: "Lowest Gross (all-time)",
+  most_birdies_90d: "Most Birdies (90-day)",
+  most_birdies_all_time: "Most Birdies (all-time)",
+  best_stableford_90d: "Best Stableford (90-day)",
+  best_stableford_all_time: "Best Stableford (all-time)",
+  most_eagles_90d: "Most Eagles (90-day)",
+  most_eagles_all_time: "Most Eagles (all-time)",
+  most_aces_90d: "Most Aces (90-day)",
+  most_aces_all_time: "Most Aces (all-time)",
+  most_albatrosses_90d: "Most Albatrosses (90-day)",
+  most_albatrosses_all_time: "Most Albatrosses (all-time)",
+  most_rounds_90d: "Most Rounds (90-day)",
+  most_rounds_all_time: "Most Rounds (all-time)",
+};
+const legendLabel = (c?: string) => (c && LEGEND_LABELS[c]) || "course record";
+
+const STREAK_LABELS: Record<string, string> = {
+  round_played: "playing",
+  counter: "round",
+};
+// Returns "" for unknown so copy can degrade gracefully to "Your streak".
+const streakLabel = (s?: string) => (s && STREAK_LABELS[s]) || "";
+
 function renderPush(r: OutboxRow, badgeMap: Map<string, any>) {
   const p = r.template_payload ?? {};
   switch (r.notification_type) {
@@ -236,34 +263,46 @@ function renderPush(r: OutboxRow, badgeMap: Map<string, any>) {
     }
     case "legend_lost":
       return {
-        title: `⚠️ Someone took your spot at the course`,
-        body: `Your ${p.category} legend was beaten.`,
+        title: p.course_name
+          ? `⚠️ Someone took your spot at ${p.course_name}`
+          : `⚠️ Someone took your course record`,
+        body: `Your ${legendLabel(p.category)} record was beaten.`,
         data: { route: `/courses/${p.course_id}?tab=legends`, course_id: p.course_id },
       };
     case "legend_earned":
       return {
         title: `🏆 You're now a Course Legend`,
-        body: `Top of the ${p.category} board.`,
+        body: p.course_name
+          ? `Top of the ${legendLabel(p.category)} board at ${p.course_name}.`
+          : `Top of the ${legendLabel(p.category)} board.`,
         data: { route: `/courses/${p.course_id}?tab=legends`, course_id: p.course_id },
       };
-    case "streak_at_risk":
+    case "streak_at_risk": {
+      const s = streakLabel(p.streak_type);
       return {
-        title: `🔥 Your ${p.streak_type} streak is at risk`,
+        title: s ? `🔥 Your ${s} streak is at risk` : `🔥 Your streak is at risk`,
         body: "Play one round to keep it alive.",
         data: { route: "/handicap?sheet=streaks", streak_type: p.streak_type },
       };
-    case "streak_broken":
+    }
+    case "streak_broken": {
+      const s = streakLabel(p.streak_type);
       return {
         title: `Streak broken at ${p.count}`,
-        body: `Start a new ${p.streak_type} streak today.`,
+        body: s ? `Start a new ${s} streak today.` : `Start a new streak today.`,
         data: { route: "/handicap?sheet=streaks", streak_type: p.streak_type },
       };
-    case "streak_freeze_applied":
+    }
+    case "streak_freeze_applied": {
+      const s = streakLabel(p.streak_type);
       return {
         title: `❄️ Streak Freeze used`,
-        body: `Your ${p.streak_type} streak (${p.count}) is preserved.`,
+        body: s
+          ? `Your ${s} streak (${p.count}) is preserved.`
+          : `Your streak (${p.count}) is preserved.`,
         data: { route: "/handicap?sheet=streaks", streak_type: p.streak_type },
       };
+    }
     case "rival_played":
       return {
         title: `🎯 A rival just posted a round`,
