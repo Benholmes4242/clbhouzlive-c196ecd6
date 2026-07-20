@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Info } from 'lucide-react';
 import { useAllScores } from '@/lib/whs/hooks';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { Skeleton } from '@/components/ui/skeleton';
 import HandicapProjectionCard from './HandicapProjectionCard';
 import LastFiveTokens from './LastFiveTokens';
 import StablefordCard from './StablefordCard';
