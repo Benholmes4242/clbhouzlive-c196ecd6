@@ -220,7 +220,7 @@ export function useInboxFeed(): InboxFeedResult {
             id: `done-appeal-${row.id}`,
             type: 'appeal',
             title: 'Suspension appeal',
-            meta: `Appeal - ${row.appellant?.display_name ?? row.appellant?.username ?? 'unknown'}`,
+            meta: `Appeal - ${row.appellant?.display_name ?? row.appellant?.username ?? 'A member'}`,
             createdAt: row.reviewed_at ?? row.created_at,
             isHighPriority: false,
             payload: row,
@@ -234,12 +234,12 @@ export function useInboxFeed(): InboxFeedResult {
     if (canMod && supportOpen.data) {
       for (const row of supportOpen.data) {
         if (row.status === 'resolved' || row.status === 'closed') continue;
-        const who = row.profile?.display_name ?? row.profile?.username ?? 'unknown';
+        const who = row.profile?.display_name ?? row.profile?.username ?? (row.user_id ? 'A member' : null);
         open.push({
           id: row.id,
           type: 'support',
           title: row.subject,
-          meta: `Support - from ${who}`,
+          meta: who ? `Support - from ${who}` : 'Support',
           createdAt: row.created_at,
           isHighPriority: false,
           payload: row,
@@ -248,12 +248,12 @@ export function useInboxFeed(): InboxFeedResult {
     }
     if (canMod && supportDone.data) {
       for (const row of supportDone.data) {
-        const who = row.profile?.display_name ?? row.profile?.username ?? 'unknown';
+        const who = row.profile?.display_name ?? row.profile?.username ?? (row.user_id ? 'A member' : null);
         done.push({
           id: `done-support-${row.id}`,
           type: 'support',
           title: row.subject,
-          meta: `Support - from ${who}`,
+          meta: who ? `Support - from ${who}` : 'Support',
           createdAt: row.last_message_at ?? row.created_at,
           isHighPriority: false,
           payload: row,
