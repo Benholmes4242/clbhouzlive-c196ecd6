@@ -12,6 +12,8 @@ const PAGE_SIZE = 60;
 export function useSuggestedFeed(userId: string | undefined) {
   const { activeActor } = useActiveActor();
   const seenPostIds = useRef<Set<string>>(new Set());
+  const version = getFeedVersion();
+  const loggedVersionRef = useRef(false);
 
   // Reset page-1 exclusion set when the query identity changes (incl. actor switch).
   useEffect(() => {
