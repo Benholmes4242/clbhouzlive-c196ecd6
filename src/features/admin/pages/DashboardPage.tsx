@@ -81,22 +81,33 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
     ...reviewRows.map(r => r.user_id),
   ].filter(Boolean)));
   const courseIds = Array.from(new Set(reviewRows.map(r => r.course_id).filter(Boolean)));
+  const emptyContentPostIds = postRows
+    .filter(p => !((p.content ?? '').trim()))
+    .map(p => p.id);
 
-  const [profRes, courseRes] = await Promise.all([
+  const [profRes, courseRes, mediaRes] = await Promise.all([
     profileIds.length
       ? supabase.from('user_profiles').select('id, display_name, username, profile_photo_url').in('id', profileIds)
       : Promise.resolve({ data: [] as any[] } as any),
     courseIds.length
       ? supabase.from('golf_courses').select('id, name').in('id', courseIds)
       : Promise.resolve({ data: [] as any[] } as any),
+    emptyContentPostIds.length
+      ? supabase.from('post_media').select('post_id, media_type').in('post_id', emptyContentPostIds).limit(50)
+      : Promise.resolve({ data: [] as any[] } as any),
   ]);
   const profMap = new Map<string, any>(((profRes.data ?? []) as any[]).map(p => [p.id, p]));
   const courseMap = new Map<string, any>(((courseRes.data ?? []) as any[]).map(c => [c.id, c]));
+  const mediaMap = new Map<string, string>();
+  for (const m of ((mediaRes.data ?? []) as any[])) {
+    if (!mediaMap.has(m.post_id)) mediaMap.set(m.post_id, m.media_type);
+  }
 
+  const displayName = (p: any) => p?.display_name ?? p?.username ?? 'A member';
   const items: FeedItem[] = [];
 
   for (const m of memberRows) {
-    const name = m.display_name ?? m.username ?? 'New golfer';
+    const name = displayName(m);
     items.push({
       id: `member:${m.id}`,
       kind: 'member',
@@ -108,13 +119,22 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
   }
   for (const p of postRows) {
     const prof = profMap.get(p.user_id);
-    const name = prof?.display_name ?? prof?.username ?? 'Someone';
+    const name = displayName(prof);
+    const content = (p.content ?? '').trim();
+    let subtitle: string | null = null;
+    if (content) {
+      subtitle = content;
+    } else {
+      const mt = mediaMap.get(p.id);
+      if (mt === 'video') subtitle = 'Video post';
+      else if (mt === 'image' || mt === 'photo') subtitle = 'Photo post';
+    }
     items.push({
       id: `post:${p.id}`,
       kind: 'post',
       created_at: p.created_at,
       title: `Post from ${name}`,
-      subtitle: (p.content ?? '').trim() || null,
+      subtitle,
       avatarUrl: prof?.profile_photo_url ?? null,
     });
   }
@@ -126,7 +146,7 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
       kind: 'review',
       created_at: r.created_at,
       title: `Review: ${course?.name ?? 'a course'}`,
-      subtitle: (r.review ?? '').trim() || null,
+      subtitle: (r.review ?? '').trim() || `by ${displayName(prof)}`,
       avatarUrl: prof?.profile_photo_url ?? null,
     });
   }
@@ -205,7 +225,7 @@ export default function DashboardPage() {
   const nonOkChips = [echoChip, pushChip, egChip, cronChip].filter(c => c.tone !== 'ok' && c.tone !== 'idle').length;
 
   return (
-    <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 720, margin: '0 auto' }}>
+    <div style={{ padding: '8px 16px 0', display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 720, margin: '0 auto' }}>
       <AlertBannerRow
         triage={triage.data}
         pushRed={push.data?.status === 'red'}
@@ -353,10 +373,7 @@ function NorthStarHero({
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
         <div>
           <div style={{ color: t.brandText, fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase' }}>
-            North Star
-          </div>
-          <div style={{ color: t.ink, fontSize: 17, fontWeight: 700, marginTop: 2 }}>
-            Live activity
+            Daily actives - today
           </div>
         </div>
         {triage && triage.total > 0 && (
@@ -369,7 +386,7 @@ function NorthStarHero({
               fontSize: 12, fontWeight: 700, textDecoration: 'none',
             }}
           >
-            {triage.total} to triage
+            {triage.total} to review
             <ChevronRight size={14} />
           </Link>
         )}
@@ -377,7 +394,7 @@ function NorthStarHero({
 
       {isError ? (
         <AdminErrorState
-          title="Couldn't load North Star"
+          title="Couldn't load activity"
           message="A retry usually fixes it."
           onRetry={onRetry}
         />
@@ -714,8 +731,7 @@ function FeedRow({ item, first }: { item: FeedItem; first: boolean }) {
           <div
             style={{
               color: t.inkMuted, fontSize: 13, marginTop: 2,
-              display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
             }}
           >
             {item.subtitle}

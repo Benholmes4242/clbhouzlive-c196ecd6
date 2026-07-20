@@ -97,7 +97,11 @@ export default function AdminShell() {
         </div>
       </header>
 
-      <main style={{ paddingTop: headerHeight, minHeight: '100dvh' }}>
+      <main style={{
+        paddingTop: headerHeight,
+        paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
+        minHeight: '100dvh',
+      }}>
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}

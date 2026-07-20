@@ -76,7 +76,7 @@ export default function HealthPage() {
   const nonOk = [echoChip, pushChip, egChip, cronChip].filter(c => c.tone !== 'ok' && c.tone !== 'idle').length;
 
   return (
-    <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 1024, margin: '0 auto' }}>
+    <div style={{ padding: '8px 16px 0', display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 1024, margin: '0 auto' }}>
       {!anyLoading && can.manageAdmins && (
         <VerdictRow nonOk={nonOk} />
       )}

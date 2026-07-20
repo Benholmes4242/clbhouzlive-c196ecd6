@@ -188,7 +188,7 @@ function InboxListPage() {
   if (visibleTypes.length === 0) return <AdminAccessDenied />;
 
   return (
-    <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 14, maxWidth: 720, margin: '0 auto' }}>
+    <div style={{ padding: '8px 16px 0', display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 720, margin: '0 auto' }}>
       {/* Header */}
       <header style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <div style={{ color: t.brandText, fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase' }}>

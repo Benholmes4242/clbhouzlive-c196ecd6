@@ -72,7 +72,7 @@ export default function ContentPage() {
   }, [can.manageAdmins, can.viewModeration]);
 
   return (
-    <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 1180, margin: '0 auto' }}>
+    <div style={{ padding: '8px 16px 0', display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 1180, margin: '0 auto' }}>
       <SectionTabs tabs={tabs} activeId={tab} onChange={setTab} />
       {tab === 'courses' && <CoursesTab />}
       {tab === 'help' && (can.viewModeration ? <HelpArticlesTab /> : <AdminAccessDenied />)}
@@ -273,6 +273,7 @@ function CoursesTab() {
         open={addOpen}
         onClose={() => setAddOpen(false)}
         onCreated={() => { c.refetch(); }}
+        uploadPhoto={c.uploadPhoto}
       />
 
       <style>{`@keyframes admin-pulse { 0%,100%{opacity:.55} 50%{opacity:1} }`}</style>
@@ -683,7 +684,12 @@ function Toggle({ label, value, onChange }: { label: string; value: boolean; onC
 
 /* ───────── Add course sheet ───────── */
 
-function AddCourseSheet({ open, onClose, onCreated }: { open: boolean; onClose: () => void; onCreated: () => void }) {
+function AddCourseSheet({ open, onClose, onCreated, uploadPhoto }: {
+  open: boolean;
+  onClose: () => void;
+  onCreated: () => void;
+  uploadPhoto: (id: string, file: File) => Promise<any>;
+}) {
   const [form, setForm] = useState({
     name: '', country: '', continent: '',
     sub_country: '', region: '',
@@ -692,6 +698,9 @@ function AddCourseSheet({ open, onClose, onCreated }: { open: boolean; onClose: 
     has_hosted_major: false, description: '',
   });
   const [busy, setBusy] = useState(false);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const photoInputRef = useRef<HTMLInputElement>(null);
   const set = (k: keyof typeof form, v: any) => setForm(f => ({ ...f, [k]: v }));
 
   useEffect(() => {
@@ -703,8 +712,17 @@ function AddCourseSheet({ open, onClose, onCreated }: { open: boolean; onClose: 
         website_url: '', course_type: '',
         has_hosted_major: false, description: '',
       });
+      setPhotoFile(null);
+      if (photoPreview) URL.revokeObjectURL(photoPreview);
+      setPhotoPreview(null);
     }
   }, [open]);
+
+  const onPickPhoto = (f: File | null) => {
+    if (photoPreview) URL.revokeObjectURL(photoPreview);
+    setPhotoFile(f);
+    setPhotoPreview(f ? URL.createObjectURL(f) : null);
+  };
 
   const valid = form.name.trim() && form.country.trim() && form.continent;
 
@@ -715,7 +733,14 @@ function AddCourseSheet({ open, onClose, onCreated }: { open: boolean; onClose: 
     }
     setBusy(true);
     try {
-      await createCourse(form);
+      const created = await createCourse(form);
+      if (photoFile && created?.id) {
+        try {
+          await uploadPhoto(created.id, photoFile);
+        } catch {
+          toast.error('Course created, but photo upload failed');
+        }
+      }
       toast.success(`"${form.name}" created`);
       onCreated();
       onClose();
@@ -764,6 +789,42 @@ function AddCourseSheet({ open, onClose, onCreated }: { open: boolean; onClose: 
       }
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+        <Section title="Photo">
+          <div style={{
+            position: 'relative', aspectRatio: '16/9',
+            borderRadius: t.radius.md, overflow: 'hidden',
+            background: t.canvas, border: `1px solid ${t.line}`,
+          }}>
+            {photoPreview
+              ? <img src={photoPreview} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <ImageIcon size={28} color={t.inkFaint} />
+                </div>}
+            <input
+              ref={photoInputRef} type="file" accept="image/*" style={{ display: 'none' }}
+              onChange={e => { const f = e.target.files?.[0] ?? null; onPickPhoto(f); e.target.value = ''; }}
+            />
+            <button
+              type="button"
+              onClick={() => photoInputRef.current?.click()}
+              disabled={busy}
+              style={{
+                position: 'absolute', right: 8, bottom: 8,
+                padding: '6px 10px', borderRadius: t.radius.sm,
+                background: 'rgba(15,23,42,.7)', color: '#fff', fontSize: 12, fontWeight: 600,
+                border: 'none', cursor: busy ? 'not-allowed' : 'pointer',
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+              }}
+            >
+              <Upload size={12} />
+              {photoFile ? 'Change photo' : 'Add photo'}
+            </button>
+          </div>
+          <div style={{ color: t.inkFaint, fontSize: 11, marginTop: 6 }}>
+            Optional - uploaded after the course is created.
+          </div>
+        </Section>
+
         <Section title="Identity">
           <Field label="Course name" required>
             <TextInput value={form.name} onChange={v => set('name', v)} placeholder="e.g. Augusta National" />
@@ -1260,26 +1321,25 @@ function PlayerAvatar({ player, cacheBust, size = 40 }: { player: PlayerRow; cac
 function PlayerRowCard({ player, cacheBust, onPhoto }: { player: PlayerRow; cacheBust: number; onPhoto: () => void }) {
   const name = player.fullName || `${player.firstName || ''} ${player.lastName || ''}`.trim() || 'Unknown';
   return (
-    <div style={{
-      background: t.surface, border: `1px solid ${t.line}`,
-      borderRadius: t.radius.md, padding: 10,
-      display: 'flex', alignItems: 'center', gap: 12,
-    }}>
-      <button
-        onClick={onPhoto}
-        title="Manage headshot"
-        style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
-      >
-        <PlayerAvatar player={player} cacheBust={cacheBust} />
-      </button>
+    <button
+      type="button"
+      onClick={onPhoto}
+      style={{
+        background: t.surface, border: `1px solid ${t.line}`,
+        borderRadius: t.radius.md, padding: 10,
+        display: 'flex', alignItems: 'center', gap: 12,
+        width: '100%', textAlign: 'left', cursor: 'pointer',
+      }}
+    >
+      <PlayerAvatar player={player} cacheBust={cacheBust} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 14, fontWeight: 600, color: t.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {name}
         </div>
         <div style={{ fontSize: 11, color: t.inkMuted, marginTop: 2, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-          <span>{player.country ?? player.countryCode ?? '—'}</span>
+          <span>{player.country ?? player.countryCode ?? '-'}</span>
           {player.tourCodes?.length ? (
-            <span>· {player.tourCodes.map(tc => TOURS[normalizeTourCode(tc)] || tc).join(', ')}</span>
+            <span>- {player.tourCodes.map(tc => TOURS[normalizeTourCode(tc)] || tc).join(', ')}</span>
           ) : null}
         </div>
       </div>
@@ -1288,7 +1348,8 @@ function PlayerRowCard({ player, cacheBust, onPhoto }: { player: PlayerRow; cach
           {formatDistanceToNow(new Date(player.updatedAt), { addSuffix: true })}
         </div>
       )}
-    </div>
+      <ChevronRight size={16} color={t.inkFaint} style={{ flexShrink: 0 }} />
+    </button>
   );
 }
 
