@@ -370,11 +370,7 @@ export const ActivityPageV2: React.FC = () => {
         {featured && <FeaturedMomentCard row={featured} />}
         <FriendRequestsRail />
 
-        {feed.isLoading && (
-          <div style={{ padding: 24, color: INK_60, fontSize: 13, textAlign: 'center' }}>
-            Loading…
-          </div>
-        )}
+        {feed.isLoading && <ActivityRowsSkeleton buckets={2} />}
 
         {isErrored && (
           <div
