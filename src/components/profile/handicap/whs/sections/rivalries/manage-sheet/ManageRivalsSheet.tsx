@@ -96,8 +96,8 @@ export const ManageRivalsSheet: React.FC<Props> = ({ userId, open, onClose }) =>
       await clearDismissal.mutateAsync({ userId, identity });
       await upsert.mutateAsync({ userId, slotIndex, ...identity });
       toast.success('Rival pinned');
-    } catch (e: any) {
-      toast.error(e?.message ?? 'Could not pin rival');
+    } catch (e: unknown) {
+      toast.error((e instanceof Error ? e.message : null) ?? 'Could not pin rival');
     }
   };
 
@@ -111,8 +111,8 @@ export const ManageRivalsSheet: React.FC<Props> = ({ userId, open, onClose }) =>
         ...identity,
       });
       toast.success(`${firstName(rivalry.rival_name ?? 'Rival')} pinned`);
-    } catch (e: any) {
-      toast.error(e?.message ?? 'Could not pin rival');
+    } catch (e: unknown) {
+      toast.error((e instanceof Error ? e.message : null) ?? 'Could not pin rival');
     }
   };
 
@@ -121,8 +121,8 @@ export const ManageRivalsSheet: React.FC<Props> = ({ userId, open, onClose }) =>
     try {
       await dismiss.mutateAsync({ userId, identity });
       toast.success(`${firstName(rivalry.rival_name ?? 'Rival')} won't be suggested again`);
-    } catch (e: any) {
-      toast.error(e?.message ?? 'Could not dismiss');
+    } catch (e: unknown) {
+      toast.error((e instanceof Error ? e.message : null) ?? 'Could not dismiss');
     }
   };
 
@@ -138,8 +138,8 @@ export const ManageRivalsSheet: React.FC<Props> = ({ userId, open, onClose }) =>
     try {
       await remove.mutateAsync({ userId, slotIndex: rivalry.slot_index });
       toast.success(`${firstName(rivalry.rival_name ?? 'Rival')} removed`);
-    } catch (e: any) {
-      toast.error(e?.message ?? 'Could not remove rival');
+    } catch (e: unknown) {
+      toast.error((e instanceof Error ? e.message : null) ?? 'Could not remove rival');
     } finally {
       setRemovalTarget(null);
     }
