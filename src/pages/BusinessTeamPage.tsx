@@ -205,7 +205,7 @@ export default function BusinessTeamPage() {
 
   const handleRemoveMember = async () => {
     if (!removeConfirm.member) return;
-    try { await removeMember.mutateAsync(removeConfirm.member.user_profile_id); } catch {}
+    try { await removeMember.mutateAsync(removeConfirm.member.user_profile_id); } catch { /* toast fired inside mutation */ }
     setRemoveConfirm({ open: false, member: null });
   };
 
