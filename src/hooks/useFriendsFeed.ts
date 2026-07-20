@@ -38,6 +38,7 @@ export function useFriendsFeed({
   pageSize = PAGE_SIZE_DEFAULT,
 }: UseFriendsFeedParams) {
   const { activeActor } = useActiveActor();
+  const version = getFeedVersion();
   const seenPostIds = useRef<string[]>([]);
 
   // Reset page-1 exclusion list when the query identity changes (incl. actor switch).
