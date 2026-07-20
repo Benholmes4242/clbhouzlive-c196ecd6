@@ -187,7 +187,7 @@ const AppShellOnly: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   if (!isAppShellVisible(envStatus)) return null;
   return <>{children}</>;
 };
-import DiscoverWrapped from "./pages/DiscoverWrapped";
+
 import CoursesWrapped from "./pages/CoursesWrapped";
 import ProfileWrapped from "./pages/ProfileWrapped";
 
