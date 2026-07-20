@@ -67,9 +67,10 @@ export function TournamentPage() {
 
 
 
-  const { data: meta, isLoading } = useTournamentMeta(tournamentId);
+  const { data: meta, isLoading, isError: isMetaError, refetch: refetchMeta } = useTournamentMeta(tournamentId);
   const { data: leaderboard } = useTourLeaderboard(tournamentId ?? '');
   const { data: liveList = [] } = useLiveTournaments();
+
   const pulse = useTournamentPulse(tournamentId);
 
   // Realtime (equivalent to legacy TournamentDetailPage): board + status.
@@ -130,6 +131,51 @@ export function TournamentPage() {
     }
   }, [isLoading, meta, searchParams, pulse.state, teeGroups.length]);
 
+  if (isMetaError) {
+    return (
+      <TourHubShell immersive immersiveStatusBar>
+        <div style={{
+          background: SLATE_50, minHeight: '100dvh', fontFamily: FONT,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: '32px 20px', textAlign: 'center',
+        }}>
+          <div style={{ maxWidth: 320 }}>
+            <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: INK_FAINT, marginBottom: 10 }}>
+              {t('tournament.error.title')}
+            </div>
+            <div style={{ fontSize: 13, fontWeight: 500, color: INK_MUTE, lineHeight: 1.55, marginBottom: 18 }}>
+              {t('tournament.error.body')}
+            </div>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+              <button
+                type="button"
+                onClick={() => refetchMeta()}
+                style={{
+                  background: INK, color: '#fff', border: 'none', borderRadius: 999,
+                  padding: '10px 18px', fontSize: 12, fontWeight: 700, cursor: 'pointer',
+                  fontFamily: FONT, letterSpacing: '0.02em',
+                }}
+              >
+                {t('tournament.error.retry')}
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate(-1)}
+                style={{
+                  background: 'transparent', color: INK, border: `0.5px solid ${HAIRLINE_INK_8}`,
+                  borderRadius: 999, padding: '10px 18px', fontSize: 12, fontWeight: 700,
+                  cursor: 'pointer', fontFamily: FONT, letterSpacing: '0.02em',
+                }}
+              >
+                {t('tournament.error.back')}
+              </button>
+            </div>
+          </div>
+        </div>
+      </TourHubShell>
+    );
+  }
+
   if (isLoading || !meta) {
     return (
       <TourHubShell immersive immersiveStatusBar>
@@ -152,7 +198,7 @@ export function TournamentPage() {
     );
   }
 
-  const leaderboardRows = (leaderboard as any[] | undefined) ?? [];
+  const leaderboardRows = leaderboard ?? [];
   const hasBoard = leaderboardRows.length > 0;
 
   // Live: deep-link to the richer Leaderboards tab when this event is in
@@ -160,7 +206,7 @@ export function TournamentPage() {
   // Completed: always open the sheet in place.
   const openFullBoard = () => {
     if (pulse.state === 'live') {
-      const inLiveList = liveList.some((t: any) => t?.id === tournamentId);
+      const inLiveList = liveList.some((tRow) => tRow?.id === tournamentId);
       if (inLiveList) {
         navigate(`/tourhub?tab=live&event=${tournamentId}`, { state: { from: 'tournament' } });
         return;
@@ -168,6 +214,7 @@ export function TournamentPage() {
     }
     setFullBoardOpen(true);
   };
+
 
 
   return (
@@ -178,7 +225,7 @@ export function TournamentPage() {
           state={pulse.state}
           imageUrl={courseImage?.imageUrl ?? null}
           tourCode={tourCode}
-          leaderboard={leaderboard as any}
+          leaderboard={leaderboard}
         />
 
         {/* THE ACT */}
@@ -188,7 +235,7 @@ export function TournamentPage() {
               {hasBoard && (
                 <>
                   <SectionEyebrow kicker={t('tournament.shell.board.eyebrow')} actionLabel={t('tournament.shell.board.action')} onAction={openFullBoard} />
-                  <MiniBoard tournamentId={tournamentId!} entries={leaderboardRows as any} />
+                  <MiniBoard tournamentId={tournamentId!} entries={leaderboardRows} />
                 </>
               )}
               {/* Shared OnTheCourse — featured groups + FULL FIELD expander,
@@ -209,7 +256,7 @@ export function TournamentPage() {
           {pulse.state === 'completed' && hasBoard && (
             <>
               <SectionEyebrow kicker={t('tournament.shell.leaderboard.finalEyebrow')} actionLabel={t('tournament.shell.leaderboard.fullBoardAction')} onAction={openFullBoard} />
-              <MiniBoard tournamentId={tournamentId!} entries={leaderboardRows as any} />
+              <MiniBoard tournamentId={tournamentId!} entries={leaderboardRows} />
             </>
           )}
         </section>
@@ -253,7 +300,7 @@ export function TournamentPage() {
         onClose={() => setFullBoardOpen(false)}
         tournamentId={tournamentId!}
         meta={meta}
-        entries={leaderboardRows as any}
+        entries={leaderboardRows}
       />
     </TourHubShell>
   );

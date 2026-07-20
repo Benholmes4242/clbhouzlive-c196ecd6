@@ -103,7 +103,7 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
       <BottomSheet open={open} onClose={() => setOpen(false)} variant="light" surfaceColor={SLATE_50}>
         <div style={{ background: SLATE_50, fontFamily: FONT, maxHeight: 'calc(90vh - 24px)', display: 'flex', flexDirection: 'column' }}>
           <div style={{ padding: '4px 16px 12px' }}>
-            <div style={{ fontSize: 9, fontWeight: 800, color: INK, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+            <div style={{ fontSize: 10, fontWeight: 800, color: INK, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
               {t('tournament.moments.sheetTitle')}
             </div>
           </div>
@@ -150,7 +150,7 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
 function MomentCard({ moment, tourCode }: { moment: ReturnType<typeof useEventMoments>['data'] extends (infer T)[] | undefined ? T : never; tourCode: string }) {
   const navigate = useNavigate();
   const cfg = MOMENT_TYPE_CONFIG[moment!.moment_type as MomentType] ?? MOMENT_TYPE_CONFIG.highlight;
-  const player = (moment as any).player;
+  const player = (moment as unknown as { player?: { id?: string; full_name?: string | null; photo_url?: string | null } | null }).player;
   return (
     <button
       type="button"

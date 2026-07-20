@@ -77,7 +77,7 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
         }}
       >
         <div style={{ padding: '4px 16px 12px', borderBottom: `0.5px solid ${HAIRLINE_INK_8}` }}>
-          <div style={{ fontSize: 9, fontWeight: 800, color: AMBER, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+          <div style={{ fontSize: 10, fontWeight: 800, color: AMBER, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
             {t('tournament.fullBoard.title')}
 
           </div>
@@ -97,7 +97,7 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
           style={{
             display: 'flex', alignItems: 'center',
             padding: '8px 16px',
-            fontSize: 8.5, fontWeight: 800, color: INK_FAINT,
+            fontSize: 10, fontWeight: 800, color: INK_FAINT,
             letterSpacing: '0.10em', textTransform: 'uppercase',
             background: SLATE_50, borderBottom: `0.5px solid ${HAIRLINE_INK_8}`,
           }}

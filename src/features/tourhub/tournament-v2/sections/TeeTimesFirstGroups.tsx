@@ -42,7 +42,7 @@ export function TeeTimesFirstGroups({ groups, limit = 5, surface = 'white' }: Pr
             <span style={{ fontSize: 15, fontWeight: 200, color: INK, fontVariantNumeric: 'tabular-nums' }}>
               {formatTimeHm(new Date(g.teeTime))}
             </span>
-            <span style={{ fontSize: 9, fontWeight: 700, color: INK_MUTE, letterSpacing: '0.10em', textTransform: 'uppercase' }}>
+            <span style={{ fontSize: 10, fontWeight: 700, color: INK_MUTE, letterSpacing: '0.10em', textTransform: 'uppercase' }}>
               {t('tournament.teeTimes.teeChip', { hole: g.startingHole })}
             </span>
           </div>
@@ -62,7 +62,7 @@ export function TeeTimesFirstGroups({ groups, limit = 5, surface = 'white' }: Pr
                   {flag ? (
                     <span style={{ fontSize: 12, flexShrink: 0, lineHeight: 1 }} aria-label={cc ?? undefined}>{flag}</span>
                   ) : cc ? (
-                    <span style={{ fontSize: 8, fontWeight: 700, color: INK_FAINT, letterSpacing: '0.04em', flexShrink: 0 }}>
+                    <span style={{ fontSize: 10, fontWeight: 700, color: INK_FAINT, letterSpacing: '0.04em', flexShrink: 0 }}>
                       {countryFallback(cc)}
                     </span>
                   ) : null}

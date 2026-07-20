@@ -68,7 +68,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5 }: Props) {
             display: 'flex', alignItems: 'center',
             padding: '8px 16px',
             borderBottom: `0.5px solid ${HAIRLINE_INK_8}`,
-            fontSize: 8.5, fontWeight: 800, letterSpacing: '0.10em',
+            fontSize: 10, fontWeight: 800, letterSpacing: '0.10em',
             color: INK_FAINT, textTransform: 'uppercase',
           }}
         >
@@ -86,7 +86,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5 }: Props) {
             : `${r.position_tied ? 'T' : ''}${r.position}`;
           const cc = r.player?.country_code ?? r.player?.country ?? null;
           const flag = cc ? countryFlag(cc) : null;
-          const today = todayFromEntry(r as any);
+          const today = todayFromEntry(r as unknown as Parameters<typeof todayFromEntry>[0]);
           return (
             <button
               key={r.id}
@@ -119,7 +119,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5 }: Props) {
                 {flag ? (
                   <span style={{ fontSize: 11, flexShrink: 0, lineHeight: 1 }} aria-label={cc ?? undefined}>{flag}</span>
                 ) : cc ? (
-                  <span style={{ fontSize: 8, fontWeight: 700, color: INK_FAINT, letterSpacing: '0.04em' }}>{countryFallback(cc)}</span>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: INK_FAINT, letterSpacing: '0.04em' }}>{countryFallback(cc)}</span>
                 ) : null}
                 <span style={{ fontSize: 13, fontWeight: 700, color: INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {r.player?.full_name ?? '—'}
