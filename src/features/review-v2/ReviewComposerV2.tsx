@@ -11,8 +11,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, Trash2 } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { invalidateCourseRatingCaches } from '@/utils/invalidateCourseRatingCaches';
 import { toast } from '@/lib/toast';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { MentionsComposerInput } from '@/components/mentions/MentionsComposerInput';
@@ -227,10 +228,12 @@ interface ComposerProps {
 function Composer({ course, userId, existing, existingMedia, author, onExit }: ComposerProps) {
   const isEditMode = !!existing;
   const navigate = useNavigate();
+  const qc = useQueryClient();
 
   const media = useReviewMediaPipeline({ userId, existingMedia });
   const composer = useReviewComposer(existing, media.hasNewMedia);
   const submit = useReviewSubmit();
+
 
   const [success, setSuccess] = useState<{ ratingId: string; shareToFeed: boolean } | null>(null);
   const [removeOpen, setRemoveOpen] = useState(false);
@@ -277,30 +280,40 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
       });
       // Fire uploads AFTER the RPC (media picked before submit is held locally).
       media.flushToReview(ratingId).catch(() => { /* per-item errors surfaced in tray */ });
+      invalidateCourseRatingCaches(qc);
       setSuccess({ ratingId, shareToFeed });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Couldn't save your review");
     }
-  }, [submit, media, composer.state, course.id]);
+  }, [submit, media, composer.state, course.id, qc]);
 
   const handleRemove = useCallback(async () => {
     if (!existing) return;
     try {
       await submit.remove(existing.id);
-      // Clean up any storage assets for existing media.
-      for (const m of existingMedia) {
+      invalidateCourseRatingCaches(qc);
+      // Clean up any storage assets for existing media in ONE call.
+      if (existingMedia.length > 0) {
         supabase.functions
           .invoke('cleanup-review-media', {
-            body: { mediaId: m.id, streamId: m.stream_id, mediaUrl: m.media_url },
+            body: {
+              mediaItems: existingMedia.map((m) => ({
+                id: m.id,
+                media_url: m.media_url,
+                media_type: m.media_type === 'video' ? 'video' : 'image',
+                stream_id: m.stream_id ?? null,
+              })),
+            },
           })
-          .catch(() => { /* noop */ });
+          .catch((err) => { console.warn('[review-v2] cleanup-review-media failed', err); });
       }
       setRemoveOpen(false);
       onExit();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Couldn't remove your review");
     }
-  }, [existing, submit, existingMedia, onExit]);
+  }, [existing, submit, existingMedia, onExit, qc]);
+
 
   if (success) {
     const courseUrl = `${window.location.origin}/courses/${course.id}`;

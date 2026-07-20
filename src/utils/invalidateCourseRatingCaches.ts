@@ -2,6 +2,8 @@ import type { QueryClient } from '@tanstack/react-query';
 import { FEED_QUERY_KEYS } from '@/lib/feedQueryKeys';
 
 
+
+
 /**
  * Invalidate every query cache that depends on course_ratings data.
  * Call after ANY course rating/review submission (useSubmitRating,
@@ -81,4 +83,20 @@ export function invalidateCourseRatingCaches(queryClient: QueryClient) {
   queryClient.invalidateQueries({ queryKey: ['feed-pinned'], exact: false });
   queryClient.invalidateQueries({ queryKey: ['featured-post'], exact: false });
   queryClient.invalidateQueries({ queryKey: ['creator-features'], exact: false });
+
+  // ── Course media surfaces (review media appears here) ──
+  queryClient.invalidateQueries({ queryKey: ['club-media'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['club-media-paginated'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['course-media-counts'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['course-media-feed'], exact: false });
+
+  // ── Profile > Courses avg (key variant used by useUserCoursesData) ──
+  queryClient.invalidateQueries({ queryKey: ['user-average-rating'], exact: false });
+
+  // ── review-v2 composer's own queries (stale re-edit in-session) ──
+  queryClient.invalidateQueries({ queryKey: ['rv2-existing'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['rv2-existing-media'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['rv2-me'], exact: false });
+  queryClient.invalidateQueries({ queryKey: ['rv2-course'], exact: false });
 }
+
