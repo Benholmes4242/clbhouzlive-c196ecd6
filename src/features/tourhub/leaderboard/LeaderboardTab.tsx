@@ -24,6 +24,8 @@ import { BoardTable, todayFromEntry, type BoardEntry, type CutState } from './Bo
 import { ScorecardSheet, type ScorecardSheetTarget } from './ScorecardSheet';
 import { EditorialEmpty } from '../components/EditorialEmpty';
 import { tourPriorityIndex } from '../_shared/tourOrder';
+import { Skeleton } from '@/components/ui/skeleton';
+
 
 const F = 'Geist, system-ui, sans-serif';
 const INK = '#0F172A';
