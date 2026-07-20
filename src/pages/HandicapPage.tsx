@@ -419,14 +419,14 @@ const HandicapPage: React.FC = () => {
   // on every render in the same order (rules of hooks).
   // `useWhsConnection` is guarded internally by `enabled: !!userId`, so
   // passing undefined is safe — it just stays disabled.
-  const { data: ownConnection, isLoading: connLoading } = useWhsConnection(
+  const { data: ownConnection, isLoading: connLoading, isError: connError, refetch: refetchConn } = useWhsConnection(
     isFriendView ? undefined : (ownerUserId ?? undefined)
   );
   const hasConnection = isFriendView ? true : !!ownConnection;
-  // Connect flow = own view, query settled, no connection. The whole page is
+  // Connect flow = own view, query settled, no error, no connection. The whole page is
   // light now (matches Clubhouse/Watch/Tours) — connect flow no longer needs
   // a special-case background.
-  const isConnectFlow = !isFriendView && !connLoading && !ownConnection;
+  const isConnectFlow = !isFriendView && !connLoading && !connError && !ownConnection;
 
   // Apply the dark route theming only when NOT in the connect flow.
   // The connect flow uses Direction A (light) and the dark theming would
