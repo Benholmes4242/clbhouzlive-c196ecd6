@@ -107,7 +107,7 @@ const BusinessProfilePage: React.FC = () => {
   useHideHeader();
   // Status bar transparency is owned by AppRoutes/applyRouteChrome (single owner).
 
-  const { data: business, isLoading, error } = useBusinessProfile(idOrSlug);
+  const { data: business, isLoading, error, refetch } = useBusinessProfile(idOrSlug);
   const { data: membership } = useBusinessMembership(business?.id);
   const { data: postsCount = 0 } = useBusinessPostsCount(business?.id);
   const { data: followersCount = 0 } = useBusinessFollowersCount(business?.id);
