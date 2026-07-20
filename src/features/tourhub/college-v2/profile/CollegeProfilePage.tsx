@@ -33,7 +33,7 @@ export function CollegeProfilePage() {
   const { collegeSlug } = useParams<{ collegeSlug: string }>();
   const slug = collegeSlug ?? '';
 
-  const { data, isLoading, refetch } = useFranchiseStandings();
+  const { data, isLoading, isError, refetch } = useFranchiseStandings();
   const { data: liveAlumni } = useLiveAlumni();
 
   // Scroll to top when slug changes.
@@ -50,7 +50,7 @@ export function CollegeProfilePage() {
     standing?.shortName || standing?.collegeName || slug || 'College';
   const playingNow = liveAlumni?.byCollege?.[slug] ?? 0;
 
-  const notFound = !isLoading && data && !standing;
+  const notFound = !isLoading && !isError && data && !standing;
 
   return (
     <TourHubShell immersiveStatusBar>
@@ -96,6 +96,25 @@ export function CollegeProfilePage() {
             brandHex={standing.brandHex}
             rankChange={standing.rankChange}
           />
+        )}
+
+        {/* Error */}
+        {isError && (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '48px 16px', textAlign: 'center' }}>
+            <div style={{ fontFamily: FONT, fontSize: 15, fontWeight: 700, color: INK }}>
+              Couldn't load this college
+            </div>
+            <div style={{ fontFamily: FONT, fontSize: 13, color: INK_MUTE, maxWidth: 280 }}>
+              Check your connection and try again.
+            </div>
+            <button
+              type="button"
+              onClick={() => refetch()}
+              style={{ background: INK, color: '#fff', border: 'none', borderRadius: 999, padding: '10px 20px', fontFamily: FONT, fontSize: 13.5, fontWeight: 700, cursor: 'pointer' }}
+            >
+              Retry
+            </button>
+          </div>
         )}
 
         {/* Not found */}
@@ -153,7 +172,7 @@ export function CollegeProfilePage() {
         )}
 
         {/* Sections */}
-        {!notFound && slug && (
+        {!isError && !notFound && slug && (
           <>
             <ThisWeek slug={slug} collegeName={displayName} />
             <TheClass slug={slug} collegeName={displayName} />

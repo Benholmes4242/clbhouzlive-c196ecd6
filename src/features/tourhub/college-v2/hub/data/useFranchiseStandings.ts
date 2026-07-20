@@ -60,18 +60,20 @@ export function useFranchiseStandings() {
       if (!seasonId) return { year: null, standings: [] };
 
       // --- 1. Season year ---
-      const { data: seasonRow } = await supabase
+      const { data: seasonRow, error: seasonErr } = await supabase
         .from('sr_seasons')
         .select('year')
         .eq('id', seasonId)
         .maybeSingle();
+      if (seasonErr) throw seasonErr;
       const year = seasonRow?.year ?? null;
 
       // --- 2. Season stats ---
-      const { data: statsRows } = await supabase
+      const { data: statsRows, error: statsErr } = await supabase
         .from('college_season_stats')
         .select('normalized_name, player_count, earnings_total, wins_total, top10_total')
         .eq('season_id', seasonId);
+      if (statsErr) throw statsErr;
 
       const stats = statsRows ?? [];
       if (stats.length === 0) return { year, standings: [] };
@@ -79,10 +81,11 @@ export function useFranchiseStandings() {
       const slugs = stats.map((s) => s.normalized_name);
 
       // --- 3. Media (crest + name) ---
-      const { data: mediaRows } = await supabase
+      const { data: mediaRows, error: mediaErr } = await supabase
         .from('college_media')
         .select('normalized_name, college_name, short_name, logo_url, brand_hex')
         .in('normalized_name', slugs);
+      if (mediaErr) throw mediaErr;
       const mediaByName: Record<string, { college_name: string; short_name: string | null; logo_url: string | null; brand_hex: string | null }> = {};
       for (const m of mediaRows ?? []) {
         mediaByName[m.normalized_name] = {
@@ -94,21 +97,23 @@ export function useFranchiseStandings() {
       }
 
       // --- 4. Movement (latest week only) ---
-      const { data: latestWeekRow } = await supabase
+      const { data: latestWeekRow, error: latestErr } = await supabase
         .from('college_weekly_movers')
         .select('week_start')
         .eq('season_id', seasonId)
         .order('week_start', { ascending: false })
         .limit(1)
         .maybeSingle();
+      if (latestErr) throw latestErr;
 
       const rankChangeByName: Record<string, number> = {};
       if (latestWeekRow?.week_start) {
-        const { data: moveRows } = await supabase
+        const { data: moveRows, error: moveErr } = await supabase
           .from('college_weekly_movers')
           .select('normalized_name, earnings_rank_change')
           .eq('season_id', seasonId)
           .eq('week_start', latestWeekRow.week_start);
+        if (moveErr) throw moveErr;
         for (const row of moveRows ?? []) {
           if (row.earnings_rank_change != null) {
             rankChangeByName[row.normalized_name] = row.earnings_rank_change;
@@ -117,12 +122,13 @@ export function useFranchiseStandings() {
       }
 
       // --- 5. Top-3 alumni faces per college (one batched query) ---
-      const { data: alumniRows } = await supabase
+      const { data: alumniRows, error: alumniErr } = await supabase
         .from('sr_players')
         .select('id, first_name, last_name, full_name, photo_url, college_normalized')
         .in('college_normalized', slugs)
         .not('photo_url', 'is', null)
         .limit(slugs.length * 5);
+      if (alumniErr) throw alumniErr;
 
       const alumniByCollege: Record<string, YearbookAlumnus[]> = {};
       for (const p of alumniRows ?? []) {

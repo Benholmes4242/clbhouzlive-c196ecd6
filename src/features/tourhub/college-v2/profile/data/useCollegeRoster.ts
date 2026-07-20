@@ -48,11 +48,12 @@ export function useCollegeRoster(normalizedName: string | undefined) {
       const statsMap = new Map<string, { wins: number; events: number; earnings: number; owgr: number | null }>();
 
       if (seasonId) {
-        const { data: stats } = await supabase
+        const { data: stats, error: statsErr } = await supabase
           .from('sr_player_statistics')
           .select('player_id, wins, events_played, raw_data')
           .eq('season_id', seasonId)
           .in('player_id', ids);
+        if (statsErr) throw statsErr;
         for (const s of stats ?? []) {
           const raw = (s.raw_data ?? {}) as Record<string, unknown>;
           const statistics = (raw.statistics ?? {}) as Record<string, unknown>;
@@ -74,7 +75,7 @@ export function useCollegeRoster(normalizedName: string | undefined) {
           fullName: p.full_name || `${p.first_name ?? ''} ${p.last_name ?? ''}`.trim() || 'Alumnus',
           country: p.country ?? null,
           photoUrl: p.photo_url ?? null,
-          tourCodes: (p as any).tour_codes ?? null,
+          tourCodes: (p as { tour_codes?: string[] | null }).tour_codes ?? null,
           earnings: s?.earnings ?? 0,
           wins: s?.wins ?? 0,
           eventsPlayed: s?.events ?? 0,

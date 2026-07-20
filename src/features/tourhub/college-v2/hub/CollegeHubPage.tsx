@@ -37,7 +37,7 @@ import { CollegeHeroMasthead } from '../_shared/CollegeHeroMasthead';
 
 
 export function CollegeHubPage() {
-  const { data, isLoading } = useFranchiseStandings();
+  const { data, isLoading, isError, refetch } = useFranchiseStandings();
   const { data: liveAlumni } = useLiveAlumni();
 
   const [searchExpanded, setSearchExpanded] = useState(false);
@@ -401,6 +401,22 @@ export function CollegeHubPage() {
                   }}
                 />
               ))}
+            </div>
+          ) : isError ? (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '48px 16px', textAlign: 'center' }}>
+              <div style={{ fontFamily: FONT, fontSize: 15, fontWeight: 700, color: INK }}>
+                Couldn't load the yearbook
+              </div>
+              <div style={{ fontFamily: FONT, fontSize: 13, color: INK_MUTE, maxWidth: 280 }}>
+                Check your connection and try again.
+              </div>
+              <button
+                type="button"
+                onClick={() => refetch()}
+                style={{ background: INK, color: '#fff', border: 'none', borderRadius: 999, padding: '10px 20px', fontFamily: FONT, fontSize: 13.5, fontWeight: 700, cursor: 'pointer' }}
+              >
+                Retry
+              </button>
             </div>
           ) : filtered.length === 0 ? (
             <div
