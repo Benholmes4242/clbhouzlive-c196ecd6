@@ -1200,7 +1200,19 @@ function TourPlayersTab() {
   const [tourFilter, setTourFilter] = useState('all');
   const [syncing, setSyncing] = useState(false);
   const [syncLabel, setSyncLabel] = useState('');
-  const [photoPlayer, setPhotoPlayer] = useState<PlayerRow | null>(null);
+  const [playerParams, setPlayerParams] = useSearchParams();
+  const activePlayerId = playerParams.get('player');
+  const openPlayer = (id: string) => {
+    const next = new URLSearchParams(playerParams);
+    const wasOpen = !!next.get('player');
+    next.set('player', id);
+    setPlayerParams(next, { replace: wasOpen });
+  };
+  const closePlayer = () => {
+    const next = new URLSearchParams(playerParams);
+    next.delete('player');
+    setPlayerParams(next, { replace: true });
+  };
   const [cacheBust, setCacheBust] = useState(0);
   const PAGE_SIZE = 25;
 
