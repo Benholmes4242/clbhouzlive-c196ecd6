@@ -56,6 +56,9 @@ const PostDeepLinkPage: React.FC = () => {
 
   useEffect(() => {
     async function loadPost() {
+      setLoadError(false);
+      setNotFound(false);
+      setIsLoading(true);
       if (!postId) { setNotFound(true); setIsLoading(false); return; }
 
       // Schema-accurate fetch:
