@@ -1476,7 +1476,7 @@ const ProfilePageV2: React.FC = () => {
     const params = new URLSearchParams(window.location.search);
     const forceOff = params.get('touchDebug') === '0' || params.get('touchDebug') === 'false';
     if (forceOff) {
-      try { window.localStorage.removeItem('touchDebug'); } catch {}
+      try { window.localStorage.removeItem('touchDebug'); } catch { /* localStorage unavailable */ }
       return false;
     }
     const byQuery = params.get('touchDebug') === '1' || params.get('touchDebug') === 'true';
