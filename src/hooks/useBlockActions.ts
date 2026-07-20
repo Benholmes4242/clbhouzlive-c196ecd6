@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/lib/toast';
 import { useQueryClient } from '@tanstack/react-query';
+import { FEED_QUERY_KEYS } from '@/lib/feedQueryKeys';
+
 
 interface UseBlockActionsProps {
   currentUserId: string;
@@ -20,11 +22,13 @@ export const useBlockActions = ({ currentUserId }: UseBlockActionsProps) => {
     queryClient.invalidateQueries({ queryKey: ['nearby-users'] });
     queryClient.invalidateQueries({ queryKey: ['discovery-exclusions'] });
     // B3: blocking must instantly remove the blocked user's content across
-    // feed / comments / reviews / messages surfaces.
+    // feed / comments / reviews / messages surfaces. Blunt-force invalidation
+    // of every live feed key is CORRECT here — blocking is rare and must be
+    // immediate. The retired ['suggested-feed'] key has been removed.
     queryClient.invalidateQueries({ queryKey: ['blocked-user-ids'] });
-    queryClient.invalidateQueries({ queryKey: ['feed'] });
-    queryClient.invalidateQueries({ queryKey: ['suggested-feed'] });
-    queryClient.invalidateQueries({ queryKey: ['friends-feed'] });
+    for (const key of FEED_QUERY_KEYS) {
+      queryClient.invalidateQueries({ queryKey: key as unknown as readonly unknown[] });
+    }
     queryClient.invalidateQueries({ queryKey: ['comments-v2'] });
     queryClient.invalidateQueries({ queryKey: ['course-reviews'] });
     queryClient.invalidateQueries({ queryKey: ['inbox-v2'] });
