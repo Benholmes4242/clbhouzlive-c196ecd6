@@ -137,7 +137,7 @@ export function TrophyRoomSpine({ items, userId }: Props) {
         >
           <span style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.5)' }}>
             {next
-              ? `${next.medalsRequired - owned} ${next.medalsRequired - owned === 1 ? 'medal' : 'medals'} to Level ${next.level} · ${next.label}`
+              ? `${next.medalsRequired - owned} ${next.medalsRequired - owned === 1 ? 'medal' : 'medals'} to ${next.label}`
               : 'Every level earned. The wall is yours.'}
           </span>
           <span
