@@ -172,10 +172,13 @@ export default function AnalyticsPage() {
         })}
       </nav>
 
+      {tab === 'live'       && <LiveTab />}
       {tab === 'growth'     && <GrowthTab     period={period} />}
       {tab === 'engagement' && <EngagementTab period={period} />}
       {tab === 'retention'  && <RetentionTab />}
+      {tab === 'events'     && <EventsTab     period={period} />}
       {tab === 'auth'       && <AuthTab       period={period} />}
+      <style>{`@keyframes admin-pulse-dot { 0%,100% { opacity: 1 } 50% { opacity: 0.35 } }`}</style>
     </div>
   );
 }
