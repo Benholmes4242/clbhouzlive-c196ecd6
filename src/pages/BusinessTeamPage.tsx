@@ -268,7 +268,7 @@ export default function BusinessTeamPage() {
                     memberUserId: m.user_profile_id,
                     isPublic: !isPublic,
                   });
-                } catch {}
+                } catch { /* toast fired inside mutation */ }
               }}
               disabled={setVisibility.isPending}
               className="mt-1.5 inline-flex items-center gap-1.5 text-[11px] active:opacity-70"
