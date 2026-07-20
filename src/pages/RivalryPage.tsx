@@ -316,7 +316,7 @@ const RivalryPage: React.FC = () => {
   const { data: viewerConn } = useWhsConnection(
     !isFriendView ? viewerId : undefined,
   );
-  const viewerConnectionId = (viewerConn as any)?.id ?? undefined;
+  const viewerConnectionId = (viewerConn as { id?: string } | null | undefined)?.id ?? undefined;
 
   // H2H best gross margins from shared_round_results
   const bestMargins = useMemo(() => {
