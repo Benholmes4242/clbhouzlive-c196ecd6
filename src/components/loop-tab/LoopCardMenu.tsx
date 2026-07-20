@@ -42,6 +42,11 @@ export const LoopCardMenu = React.memo(function LoopCardMenu({
 }: LoopCardMenuProps) {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  // Controlled dropdown so the delete/block flow can force it closed BEFORE
+  // opening the confirm AlertDialog. Overlapping Radix modal layers during
+  // an eviction commit are the source of the body pointer-events freeze.
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const { blockUser, loading: blockLoading } = useBlockActions({ currentUserId: userId ?? '' });
 
   const handleCopyLink = async () => {
