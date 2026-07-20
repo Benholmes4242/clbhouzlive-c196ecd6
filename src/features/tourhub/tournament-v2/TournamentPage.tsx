@@ -360,13 +360,18 @@ function UpcomingAct({
       {/* Empty fallback (Brief F-TD-3 §2): pre-sync upcoming events (no
           field yet, no tee times yet) get one always-on line so the act
           isn't silent under the hero. */}
-      {!hasField && !hasTimes && (
+      {loading && !hasField && !hasTimes ? (
+        <div style={{ padding: '8px 16px 4px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <Skeleton style={{ width: '85%', height: 12, borderRadius: 4 }} />
+          <Skeleton style={{ width: '60%', height: 12, borderRadius: 4 }} />
+        </div>
+      ) : !hasField && !hasTimes ? (
         <div style={{ padding: '8px 16px 4px' }}>
           <div style={{ fontSize: 12.5, fontWeight: 600, color: INK_MUTE, lineHeight: 1.5 }}>
             {t('tournament.shell.field.emptyFallback')}
           </div>
         </div>
-      )}
+      ) : null}
     </>
   );
 }
