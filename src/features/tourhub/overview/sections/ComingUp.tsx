@@ -20,7 +20,7 @@ const PAGE_SIZE = 5;
 export function ComingUp({ tour }: { tour: TourId | null }) {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
-  const { data } = useComingUp(tour, 15);
+  const { data, isLoading } = useComingUp(tour, 15);
   const rows = data ?? [];
   const showTourTag = tour === null;
 
