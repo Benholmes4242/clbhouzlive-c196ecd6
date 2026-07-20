@@ -4,8 +4,22 @@ import { nanoid } from 'nanoid';
 import { formHcpFromDb } from '@/lib/formatHcp';
 import { supabase } from '@/integrations/supabase/client';
 
-function makeInitial(profile: any): ProfileFormData {
-  const social = profile?.social_links ?? {};
+type RawProfile = Record<string, unknown> & {
+  id?: string;
+  social_links?: Record<string, string | null | undefined> | null;
+  additional_clubs?: Array<{ name?: string; club_id?: string | null }> | null;
+  websites?: string[] | null;
+  primary_club_id?: string | null;
+} | null | undefined;
+
+type HomeClubRow = { club_id: string | null; golf_clubs: { id: string; name: string } | null };
+
+function get<T = unknown>(profile: RawProfile, key: string): T | undefined {
+  return profile ? (profile as Record<string, unknown>)[key] as T | undefined : undefined;
+}
+
+function makeInitial(profile: RawProfile): ProfileFormData {
+  const social = (profile?.social_links ?? {}) as Record<string, string | undefined>;
 
   // Onboarding-aware username seed: never show the auto-generated username
   // to a first-time user. Seed empty so they actively choose one.
