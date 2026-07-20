@@ -10,6 +10,10 @@ import {
   trackAuthFailed,
   trackAuthException,
   trackLoginSuccess,
+  trackSignupInitiated,
+  trackSignupSuccess,
+  trackSignupFailed,
+  trackAuthComplete,
 } from '@/lib/authAnalytics';
 
 import AuthHeroScreen from './components/AuthHeroScreen';
