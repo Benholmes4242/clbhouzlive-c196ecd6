@@ -39,6 +39,8 @@ import MapPinIcon from '@/components/icons/MapPinIcon';
 import { Z } from '@/config/zIndex';
 import { formatRatingValue } from '@/utils/formatters';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
+import { useFollowState } from '@/hooks/useFollowState';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { formatCountKilo, formatRelativeWithSeconds as timeAgo } from '@/i18n/format';
 
