@@ -58,7 +58,7 @@ export const T = {
 
 export function resolveKind(row: {
   notif_type: string;
-  liker_avatar_urls?: any;
+  liker_avatar_urls?: unknown;
   target_poster_url?: string | null;
   target_course_image?: string | null;
   target_review_rating?: number | null;
