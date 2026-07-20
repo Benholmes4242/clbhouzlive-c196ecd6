@@ -934,7 +934,7 @@ export function FullscreenFeedOverlay() {
                     getLikeState={getActiveLikeState}
                     getCommentCount={getCommentCount}
                     getFollowState={getFollowState}
-                    onFollow={(post) => handleFollowChange(post.userId, !getFollowState(post))}
+                    onFollow={(post, followedNow) => handleFollow({ ...post, isFollowedByMe: followedNow })}
                     onViewProfile={handleViewProfile}
                     onReviewTap={handleReviewTap}
                     isOwnPost={isOwnPost}
