@@ -44,7 +44,6 @@ import { AddCourseModal } from '@/components/profile/courses/AddCourseModal';
 import { PrivateProfileGate } from '@/components/profile/PrivateProfileGate';
 import { CoverPhotoFallback } from '@/components/ui/CoverPhotoFallback';
 // FloatingPageHeader removed (H3) — chrome now driven by ChromeIsland registry.
-import { useSetChromeLeftOverride } from '@/features/chrome-v2/leftOverride';
 import { FilterChips } from '@/components/ui/FilterChips';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
@@ -191,12 +190,6 @@ const ProfilePageV2Content: React.FC = () => {
   const isOwnAccount = user?.id === profileUserId;
   const isSelf = isOwnAccount; // legacy alias - preserves personal-identity-owned UI below
 
-  // H3: on own profile, route the island back button to settings (matches
-  // the prior FloatingPageHeader onBack behavior). Visitor profiles rely on
-  // the registry's '/' fallback.
-  useSetChromeLeftOverride(
-    isSelf ? { backTarget: '/edit-profile?tab=settings' } : null,
-  );
 
 
 
@@ -691,9 +684,8 @@ const ProfilePageV2Content: React.FC = () => {
           )}
         </div>
 
-        {/* H3: header rendered globally by ChromeIsland.
-            Own profile: leftOverride routes back to settings; visitor: registry
-            fallback '/'. See useSetChromeLeftOverride call above. */}
+        {/* H3: header rendered globally by ChromeIsland. Profile pages
+            intentionally have no back button; bottom nav is the exit. */}
 
 
 
