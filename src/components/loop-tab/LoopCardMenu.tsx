@@ -130,7 +130,7 @@ export const LoopCardMenu = React.memo(function LoopCardMenu({
 
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
         <DropdownMenuTrigger asChild>
           <button
             className="p-3 -mr-3 rounded-full hover:bg-muted transition-colors"
