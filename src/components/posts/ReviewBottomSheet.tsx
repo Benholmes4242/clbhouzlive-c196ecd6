@@ -22,6 +22,7 @@ import { MapPin } from 'lucide-react';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 import { useReviewerStats } from '@/hooks/useReviewerStats';
+import { useReviewFallback } from '@/hooks/useReviewFallback';
 import { MentionText } from '@/components/mentions/MentionText';
 import { REVIEW_SHEET_Z } from '@/lib/zLayers';
 import { ReviewGhostNumeral, ReviewVerdictLabel } from '@/components/shared/ReviewGhostScore';
@@ -116,6 +117,26 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   const { data: liveStats } = useReviewerStats(user?.id);
   const effectiveStats = liveStats ?? reviewerStats ?? null;
 
+  // Some feed RPCs (get_explore_feed, get_watch_shorts, get_course_media,
+  // get_long_form_videos) don't return review_text / per-category scores.
+  // Lazy-fetch straight from course_ratings so the sheet renders identically
+  // regardless of which surface opened it.
+  const hasText = !!reviewText;
+  const hasBreakdown = !!breakdown && (
+    breakdown.design != null ||
+    breakdown.conditions != null ||
+    breakdown.clubhouse != null ||
+    breakdown.facilities != null
+  );
+  const { data: fallback } = useReviewFallback({
+    reviewId: reviewId ?? null,
+    enabled: isOpen,
+    hasText,
+    hasBreakdown,
+  });
+  const effectiveReviewText = reviewText ?? fallback?.reviewText ?? null;
+  const effectiveBreakdown = hasBreakdown ? breakdown : (fallback?.breakdown ?? breakdown ?? null);
+
   // Scope drag to header only so the middle scrolls without dismissing.
   const dragControls = useDragControls();
 
@@ -163,14 +184,14 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   const monthLabel = formatMonthLabel(reviewDate ?? null);
 
   const breakdownEntries = useMemo(() => {
-    if (!breakdown) return [];
+    if (!effectiveBreakdown) return [];
     return BREAKDOWN_KEYS.flatMap((k) => {
-      const v = breakdown[k];
+      const v = effectiveBreakdown[k];
       return v == null || Number.isNaN(v)
         ? []
         : [{ key: k, label: BREAKDOWN_LABELS[k], value: v }];
     });
-  }, [breakdown]);
+  }, [effectiveBreakdown]);
 
   const relMonths = relativeMonths(reviewDate ?? effectiveStats?.memberSince ?? null);
   const handicapSeg =
@@ -182,9 +203,9 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   const metaSeg = [relMonths, handicapSeg].filter(Boolean).join(' · ');
 
   const paragraphs = useMemo(() => {
-    if (!reviewText) return [];
-    return reviewText.split(/\n\n+/).map((p) => p.trim()).filter(Boolean);
-  }, [reviewText]);
+    if (!effectiveReviewText) return [];
+    return effectiveReviewText.split(/\n\n+/).map((p) => p.trim()).filter(Boolean);
+  }, [effectiveReviewText]);
 
   const content = (
     <AnimatePresence>
