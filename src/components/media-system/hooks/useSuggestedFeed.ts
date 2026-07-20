@@ -2,7 +2,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { useRef, useCallback, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useActiveActor } from '@/context/ActiveActorContext';
-import { getFeedVersion } from '@/lib/featureFlags';
+
 import type { FeedPost, FeedRpcRow } from '../types/media';
 import { deduplicatePosts } from '../utils/feedAlgorithm';
 import { mapRowToFeedPost, groupMultiMedia } from '../utils/feedMapper';
@@ -12,8 +12,6 @@ const PAGE_SIZE = 60;
 export function useSuggestedFeed(userId: string | undefined) {
   const { activeActor } = useActiveActor();
   const seenPostIds = useRef<Set<string>>(new Set());
-  const version = getFeedVersion();
-  const loggedVersionRef = useRef(false);
 
   // Reset page-1 exclusion set when the query identity changes (incl. actor switch).
   useEffect(() => {
@@ -22,19 +20,13 @@ export function useSuggestedFeed(userId: string | undefined) {
 
 
   const query = useInfiniteQuery({
-    queryKey: ['media-feed', 'suggested', version, userId, activeActor?.type, activeActor?.id],
+    queryKey: ['media-feed', 'suggested', userId, activeActor?.type, activeActor?.id],
     queryFn: async ({ pageParam }) => {
       if (!userId) return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined, rawRowCount: 0 };
 
       const cursor = typeof pageParam === 'string' ? pageParam : undefined;
 
-      if (!loggedVersionRef.current) {
-        console.debug('[feed] serving ' + version);
-        loggedVersionRef.current = true;
-      }
-
-      const rpcName = version === 'v3' ? 'get_suggested_feed_v3' : 'get_suggested_feed_v2';
-      const { data, error } = await supabase.rpc(rpcName as any, {
+      const { data, error } = await supabase.rpc('get_suggested_feed_v3', {
         p_user_id: userId,
         p_page_size: PAGE_SIZE,
         p_viewer_actor_type: activeActor?.type ?? 'personal',
