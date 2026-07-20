@@ -20,7 +20,7 @@ const FONT = '"Geist", system-ui, sans-serif';
 const ordinal = (n: number): string => formatOrdinal(n);
 
 export const YourCircleSection: React.FC<Props> = ({ userId }) => {
-  const { data, isLoading } = useFriendLeaderboard(userId);
+  const { data, isLoading, isError, refetch } = useFriendLeaderboard(userId);
   const { open: openSheet } = useOpenFriendSheet();
   const [showAll, setShowAll] = useState(false);
 
@@ -51,6 +51,50 @@ export const YourCircleSection: React.FC<Props> = ({ userId }) => {
     });
     return { rail: rows };
   }, [data]);
+
+  if (isError && !isLoading) {
+    return (
+      <section style={{ marginTop: 32, fontFamily: FONT }}>
+        <DarkSectionHeader eyebrow="YOUR CIRCLE" title="" />
+        <div style={{ padding: '0 16px' }}>
+          <div
+            style={{
+              background: 'var(--hcp-bg-1)',
+              border: '1px solid var(--hcp-line)',
+              borderRadius: 16,
+              padding: '20px 14px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 12,
+            }}
+          >
+            <div style={{ fontSize: 12, color: 'var(--hcp-t-60)' }}>
+              Couldn't load your circle.
+            </div>
+            <button
+              type="button"
+              onClick={() => refetch()}
+              style={{
+                padding: '7px 14px',
+                borderRadius: 999,
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid var(--hcp-line)',
+                color: 'var(--hcp-t-100)',
+                fontSize: 12,
+                fontWeight: 700,
+                fontFamily: FONT,
+                cursor: 'pointer',
+                WebkitTapHighlightColor: 'transparent',
+              }}
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   if (isLoading || !stats) {
     return (
