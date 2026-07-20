@@ -343,7 +343,6 @@ const LegalDocumentPage = lazy(() => import("./pages/legal/LegalDocumentPage"));
 // PostsTabTestPage removed — Posts tab now integrated into profiles
 // CreateMomentPage removed — PostStudio is now the sole creation flow
 const PostDeepLinkPage = lazy(() => import("./pages/PostDeepLinkPage"));
-const SearchV2TestPage = lazy(() => import("./pages/SearchV2TestPage"));
 const CommentDeepLinkPage = lazy(() => import("./features/comments-v2/CommentDeepLinkV2"));
 
 // Import season wrap modal
