@@ -56,17 +56,12 @@ export function BusinessCommandCard({
   isActive: _isActive = false,
   expanded = false,
   onToggle,
+  onRequestDelete,
 }: BusinessCommandCardProps) {
   const navigate = useNavigate();
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  // CRITICAL: Close modals on unmount to prevent stuck overlay
-  useEffect(() => {
-    return () => {
-      setShowDeleteDialog(false);
-    };
-  }, []);
+
 
   const { business, role } = membership;
 
