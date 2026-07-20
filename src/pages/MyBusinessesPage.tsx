@@ -56,7 +56,7 @@ function BusinessCardSkeleton() {
 const MyBusinessesPage = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useSupabaseSession();
-  const { data: businesses, isLoading, error } = useMyBusinesses(user?.id);
+  const { data: businesses, isLoading, error, refetch } = useMyBusinesses(user?.id);
   const { activeActor } = useActiveActor();
 
   useHideBottomNav();
