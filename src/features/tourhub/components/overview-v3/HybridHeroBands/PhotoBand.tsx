@@ -55,7 +55,7 @@ export interface PhotoBandProps {
 
 function statePillText(
   state: HeroState,
-  t: (k: string, o?: Record<string, unknown>) => string,
+  t: (k: string) => string,
 ): { text: string; tone: 'live' | 'final' | 'upcoming' } {
   if (state.kind === 'live') {
     return {
@@ -64,12 +64,12 @@ function statePillText(
     };
   }
   if (state.kind === 'results') {
-    if (state.variant === 'cancelled') return { text: t('overview.pill.cancelled', 'CANCELLED'), tone: 'final' };
-    if (state.variant === 'playoff') return { text: t('overview.pill.playoff', 'PLAYOFF · FINAL'), tone: 'final' };
-    return { text: t('overview.pill.final', 'FINAL'), tone: 'final' };
+    if (state.variant === 'cancelled') return { text: t('overview.pill.cancelled'), tone: 'final' };
+    if (state.variant === 'playoff') return { text: t('overview.pill.playoff'), tone: 'final' };
+    return { text: t('overview.pill.final'), tone: 'final' };
   }
   return {
-    text: state.countdown ? state.countdown.toUpperCase() : t('overview.pill.upcoming', 'UPCOMING'),
+    text: state.countdown ? state.countdown.toUpperCase() : t('overview.pill.upcoming'),
     tone: 'upcoming',
   };
 }
