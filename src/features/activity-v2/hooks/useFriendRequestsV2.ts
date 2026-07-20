@@ -162,6 +162,9 @@ function useFriendRequestMutations() {
     onMutate: (args) => {
       optimisticRemove(args.requestId);
     },
+    onError: () => {
+      toast.error("Couldn't update this request. Try again.");
+    },
     onSettled: () => {
       if (user?.id) invalidateAll(user.id);
     },
