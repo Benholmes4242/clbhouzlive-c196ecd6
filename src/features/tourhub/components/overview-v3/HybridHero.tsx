@@ -1,9 +1,15 @@
 /**
- * HybridHero — unified Tour Hub Overview hero.
- * Three-band architecture: PhotoBand (310px) + MiddleBand (40-62px) + LeaderboardBand.
- * Replaces EditorialLiveHero / EditorialResultsHero / EditorialUpcomingHero.
+ * HybridHero — unified Tour Hub Overview hero (Lower-Third + Wire Ticker).
  *
- * §2.1 of HYBRID_HERO_IMPLEMENTATION_BRIEF.
+ * Composition (all non-cancelled states):
+ *   1. PhotoBand         — full-bleed venue image with bottom-anchored
+ *                          editorial lower-third (state pill, insight line,
+ *                          title, venue, moment chip, TOURNAMENT CTA).
+ *   2. HeroWireTicker    — dark 36px marquee showing the top-10 (or T-1 tie).
+ *
+ * The legacy three-band path (PhotoBand + MiddleBand + LeaderboardBand) and
+ * the CinematicHeroFullBleed / CinematicFrame surfaces are retained only for
+ * the cancelled variant, which still wants the flat editorial column.
  */
 
 import React, { useEffect, useMemo, useState } from 'react';
@@ -18,6 +24,7 @@ import { useTournamentDefendingChamp } from '../../hooks/useTournamentDefendingC
 import { useTournamentLastYearTop4 } from '../../hooks/useTournamentLastYearTop4';
 import { useTournamentTeeTimes } from '../../hooks/useTournamentTeeTimes';
 import { useTournamentFieldStrength } from '../../hooks/useTournamentFieldStrength';
+import { useAIPredictions } from '../../hooks/useAIPredictions';
 
 import { useTournamentCourseStats } from '../../hooks/useTournamentCourseStats';
 import { tournamentRoute } from '../../routes';
@@ -26,8 +33,7 @@ import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar
 import { PhotoBand } from './HybridHeroBands/PhotoBand';
 import { MiddleBand } from './HybridHeroBands/MiddleBand';
 import { LeaderboardBand } from './HybridHeroBands/LeaderboardBand';
-import { CinematicFrame } from './HybridHeroBands/CinematicFrame';
-import { CinematicHeroFullBleed } from './HybridHeroBands/CinematicHeroFullBleed';
+import { HeroWireTicker } from './HybridHeroBands/HeroWireTicker';
 import { setHeroFullBleed } from '../../_shared/heroFullBleedSignal';
 import { formatMonthDay } from '@/i18n/format';
 import {
