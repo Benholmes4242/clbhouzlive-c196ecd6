@@ -1069,7 +1069,7 @@ class VideoEngineImpl {
   }
 
 
-  play(laneId: LaneId, opts: { callerPostId?: string | null; viaViewer?: boolean; claimsAudio?: boolean } = {}): Promise<void> {
+  play(laneId: LaneId, opts: { callerPostId?: string | null; viaViewer?: boolean } = {}): Promise<void> {
     const lane = this.getLane(laneId);
     const caller = opts.callerPostId ?? null;
     // Trace viewer-sourced play so device captures show the path.
