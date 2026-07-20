@@ -77,6 +77,11 @@ export interface TickerShellProps {
   minDurationSeconds?: number;
   /** Optional inline style overrides for the shell. */
   style?: CSSProperties;
+  /**
+   * Force-disable the marquee animation. When false, items render statically
+   * (still horizontally swipeable). Defaults to true.
+   */
+  animated?: boolean;
 }
 
 export function TickerShell({
