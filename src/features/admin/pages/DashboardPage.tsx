@@ -19,6 +19,11 @@ import { useNorthStar, northStarDelta } from '../hooks/useNorthStar';
 import { useEchoEngineHealth } from '../hooks/useEchoEngineHealth';
 import { usePushHealth } from '../hooks/usePushHealth';
 import { useDashboard } from '../hooks/useDashboard';
+import {
+  computeEchoChip, computePushChip, computeEgChip, computeCronChip,
+  toneColor, type ChipState,
+} from '../lib/healthChips';
+
 
 // ─── Small helpers ────────────────────────────────────────────────────────────
 
