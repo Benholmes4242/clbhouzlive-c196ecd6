@@ -438,7 +438,7 @@ function AppRoutes() {
         <Route path="/auth" element={<AuthWrapped />} />
         <Route path="/auth/callback" element={<Suspense fallback={<BootHold />}><AuthCallback /></Suspense>} />
         <Route path="/signup" element={<Suspense fallback={<GenericPageSkeleton />}><Signup /></Suspense>} />
-        <Route path="/onboarding/account-type" element={<Suspense fallback={<GenericPageSkeleton />}><AccountTypeOnboarding /></Suspense>} />
+        <Route path="/onboarding/account-type" element={<Navigate to="/edit-profile?onboarding=1" replace />} />
         <Route path="/create-profile" element={<CreateProfileRedirect />} />
         <Route path="/profile" element={<ProfileWrapped />} />
         <Route path="/profile/handicap" element={<Navigate to="/handicap" replace />} />
@@ -450,9 +450,9 @@ function AppRoutes() {
         <Route path="/handicap/:friendUserId/rivalry/:rivalUserId" element={<Suspense fallback={<HandicapPageSkeleton />}><RivalryPage /></Suspense>} />
 
         
-        <Route path="/profile/quest" element={<Suspense fallback={<ProfileSkeleton />}><ProfileQuestView /></Suspense>} />
-        <Route path="/profile/quest/index" element={<Suspense fallback={<ProfileSkeleton />}><QuestIndexView /></Suspense>} />
-        <Route path="/profile/quest/replay" element={<Navigate to="/profile" replace />} />
+        <Route path="/profile/quest" element={<Navigate to="/handicap" replace />} />
+        <Route path="/profile/quest/index" element={<Navigate to="/handicap" replace />} />
+        <Route path="/profile/quest/replay" element={<Navigate to="/handicap" replace />} />
         <Route path="/edit-profile" element={<Suspense fallback={<ManagePageSkeleton />}><ManageProfilePage /></Suspense>} />
         <Route path="/manage/email" element={<Suspense fallback={<ManagePageSkeleton />}><ManageEmailPage /></Suspense>} />
         <Route path="/manage/blocked" element={<Suspense fallback={<ManagePageSkeleton />}><ManageBlockedPage /></Suspense>} />
@@ -468,7 +468,7 @@ function AppRoutes() {
         
         
         <Route path="/profile/:username" element={<ProfileWrapped />} />
-        <Route path="/profile/:username/reviews" element={<Suspense fallback={<ProfileSkeleton />}><UserReviewsPage /></Suspense>} />
+        <Route path="/profile/:username/reviews" element={<UserReviewsRedirect />} />
         
         
         <Route path="/watch" element={<Suspense fallback={<WatchHubSkeleton />}><WatchHubV2 /></Suspense>} />
@@ -486,7 +486,7 @@ function AppRoutes() {
         <Route path="/courses/:courseId/reviews" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseReviewsPage /></Suspense>} />
         <Route path="/user/:username/courses" element={<Suspense fallback={<CoursesListSkeleton />}><UserCoursesPage /></Suspense>} />
         
-        <Route path="/journey" element={<Suspense fallback={<CoursesListSkeleton />}><JourneyListPage /></Suspense>} />
+        <Route path="/journey" element={<Navigate to="/courses" replace />} />
         
         <Route path="/friends-activity" element={<Navigate to="/courses" replace />} />
         <Route path="/news" element={<Suspense fallback={<GenericPageSkeleton />}><News /></Suspense>} />
@@ -506,8 +506,8 @@ function AppRoutes() {
         {/* Legacy creator routes - redirect to home (creators now handled via Business profiles or Personal Creator Mode) */}
         <Route path="/creator/*" element={<Navigate to="/" replace />} />
         <Route path="/creators/*" element={<Navigate to="/" replace />} />
-<Route path="/season-shop" element={<Suspense fallback={<GenericPageSkeleton layout="grid" count={6} />}><SeasonShop /></Suspense>} />
-        <Route path="/challenges" element={<Suspense fallback={<GenericPageSkeleton />}><ChallengesPage /></Suspense>} />
+        <Route path="/season-shop" element={<Navigate to="/clubhouse" replace />} />
+        <Route path="/challenges" element={<Navigate to="/clubhouse" replace />} />
         
         
         <Route path="/messages" element={<Suspense fallback={<GenericPageSkeleton />}><InboxV2Page /></Suspense>} />
@@ -517,7 +517,7 @@ function AppRoutes() {
 
 
         <Route path="/notificationmessages" element={<Suspense fallback={<ActivityPageSkeleton />}><ActivityPageV2 /></Suspense>} />
-        <Route path="/golferstofollow" element={<Suspense fallback={<GenericPageSkeleton />}><GolfersToFollowPage /></Suspense>} />
+        <Route path="/golferstofollow" element={<Suspense fallback={<GenericPageSkeleton />}><GolfersToFollowV2 /></Suspense>} />
         <Route path="/friends" element={<Suspense fallback={<GenericPageSkeleton />}><OwnProfileSocialRedirect tab="friends" /></Suspense>} />
         
         <Route path="/followers" element={<Suspense fallback={<GenericPageSkeleton />}><OwnProfileSocialRedirect tab="followers" /></Suspense>} />
