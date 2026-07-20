@@ -103,7 +103,7 @@ function SchoolSquircle({ size, logo, name }: { size: number; logo: string | nul
 export function CollegeFranchise() {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
-  const { data: collegeStats } = useCollegeSeasonStats();
+  const { data: collegeStats, isLoading } = useCollegeSeasonStats();
   const { data: mediaMap } = useCollegeMediaMap();
   const editorial = useDailyEditorial({
     surface: 'college_rivalry',
