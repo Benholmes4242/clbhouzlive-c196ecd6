@@ -103,6 +103,7 @@ export default function AdminDrawer({ open, onClose, role, canManageAdmins }: Pr
             const active = location.pathname.startsWith(item.to);
             const Icon = item.icon;
             const showBadge = item.showBadge && badge > 0;
+            const showDot = item.showHealthDot && healthDegraded;
             return (
               <Link
                 key={item.to}
@@ -118,7 +119,16 @@ export default function AdminDrawer({ open, onClose, role, canManageAdmins }: Pr
                   textDecoration: 'none',
                 }}
               >
-                <Icon size={18} />
+                <span style={{ position: 'relative', display: 'inline-flex' }}>
+                  <Icon size={18} />
+                  {showDot && (
+                    <span style={{
+                      position: 'absolute', top: -2, right: -2,
+                      width: 8, height: 8, borderRadius: 999,
+                      background: t.warn, border: `1.5px solid ${t.surface}`,
+                    }} />
+                  )}
+                </span>
                 <span style={{ flex: 1 }}>{item.label}</span>
                 {showBadge && (
                   <span
