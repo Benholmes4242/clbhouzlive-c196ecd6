@@ -37,13 +37,42 @@ let currentOpenId: string | null = null;
 let openStartTs: number | null = null;
 let openSeq = 0;
 
+// Runtime-toggleable. localStorage override wins; falls back to the
+// compile-time FLAGS.audioDebug default. Mirrors the perf-toggle pattern
+// (setPerfLive / subscribePerfLive) so the admin console can flip it live.
+const AUDIO_DEBUG_KEY = 'clbhouz-flag-audio-debug';
+const enableSubs = new Set<() => void>();
+
 export const audioDebugEnabled = (): boolean => {
+  try {
+    if (typeof window !== 'undefined') {
+      const v = window.localStorage.getItem(AUDIO_DEBUG_KEY);
+      if (v === '1') return true;
+      if (v === '0') return false;
+    }
+  } catch { /* noop */ }
   try {
     return !!(FLAGS as unknown as Record<string, unknown>).audioDebug;
   } catch {
     return false;
   }
 };
+
+export function setAudioDebugEnabled(on: boolean): void {
+  try {
+    if (typeof window !== 'undefined') {
+      if (on) window.localStorage.setItem(AUDIO_DEBUG_KEY, '1');
+      else window.localStorage.setItem(AUDIO_DEBUG_KEY, '0');
+    }
+  } catch { /* noop */ }
+  enableSubs.forEach((f) => { try { f(); } catch { /* noop */ } });
+}
+
+export function subscribeAudioDebugEnabled(cb: () => void): () => void {
+  enableSubs.add(cb);
+  return () => { enableSubs.delete(cb); };
+}
+
 
 // ─── open-cycle correlation ─────────────────────────────────────────────
 
