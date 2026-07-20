@@ -50,6 +50,7 @@ import { DuelMasthead } from './DuelMasthead';
 import { TugStat } from './TugStat';
 import { PickerSheet } from './PickerSheet';
 import { useCollegeAggregateStats } from './data/useCollegeAggregateStats';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const CLASS_CAP = 5;
 const OFF_INK = 'rgba(15,23,42,0.38)';
