@@ -731,3 +731,584 @@ function AuthStackedBars({ data }: { data: { date: string; success: number; fail
 
 // Keep periodToDays exported symbol used implicitly to avoid TS lint on unused import.
 void periodToDays;
+
+// ═══ LIVE TAB (Firebase realtime) ═════════════════════════════════════════════
+// - useLiveInApp: shared 5-min distinct-users query (also feeds Dashboard).
+// - useLiveWindow30m: 30-min event window that powers the minute chart,
+//   the event stream, and the top-screens section (verified `path` prop on
+//   page_view via src/hooks/usePageTracking.ts).
+// - Both polling queries are visibility-gated in their hook definitions.
+
+function relTimeShort(iso: string): string {
+  const diff = Math.max(0, Date.now() - new Date(iso).getTime());
+  const s = Math.floor(diff / 1000);
+  if (s < 60) return `${s}s ago`;
+  const m = Math.floor(s / 60);
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  const d = Math.floor(h / 24);
+  return `${d}d ago`;
+}
+
+function displayNameOf(p?: LiteProfile | null): string {
+  if (!p) return 'Member';
+  return p.display_name || (p.username ? `@${p.username}` : 'Member');
+}
+
+function initialsOf(p?: LiteProfile | null): string {
+  const n = p?.display_name || p?.username || '?';
+  return (n[0] ?? '?').toUpperCase();
+}
+
+function LiveTab() {
+  const live = useLiveInApp();
+  const window30 = useLiveWindow30m();
+
+  // Collect all user ids we need to name (5-min who-is-here + 30-min stream).
+  const idSet = useMemo(() => {
+    const s = new Set<string>();
+    for (const u of live.data?.users ?? []) s.add(u.user_id);
+    for (const e of window30.data ?? []) if (e.user_id) s.add(e.user_id);
+    return Array.from(s);
+  }, [live.data, window30.data]);
+  const profiles = useProfilesByIds(idSet);
+
+  return (
+    <>
+      <LiveCountCard live={live.data?.count ?? null} loading={live.isLoading} />
+      <WhoIsHere
+        users={live.data?.users ?? []}
+        profilesMap={profiles.data ?? {}}
+        loading={live.isLoading}
+        isError={live.isError}
+        onRetry={() => live.refetch()}
+      />
+      <LastThirtyMinutesChart
+        events={window30.data ?? []}
+        loading={window30.isLoading}
+        isError={window30.isError}
+        onRetry={() => window30.refetch()}
+      />
+      <EventStream
+        events={window30.data ?? []}
+        profilesMap={profiles.data ?? {}}
+        loading={window30.isLoading}
+        isError={window30.isError}
+        onRetry={() => window30.refetch()}
+      />
+      <TopScreensRightNow
+        events={window30.data ?? []}
+        loading={window30.isLoading}
+      />
+    </>
+  );
+}
+
+function LiveCountCard({ live, loading }: { live: number | null; loading: boolean }) {
+  return (
+    <Card style={{ borderRadius: 22, padding: 20, display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span aria-hidden style={{
+          width: 8, height: 8, borderRadius: 999, background: t.ok,
+          animation: 'admin-pulse-dot 1.6s ease-in-out infinite', flexShrink: 0,
+        }} />
+        <span style={{ color: t.brandText, fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase' }}>
+          Live
+        </span>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
+        <div style={{
+          color: t.ink, fontSize: 42, fontWeight: 800, lineHeight: 1, fontVariantNumeric: 'tabular-nums',
+        }}>
+          {loading || live === null ? '-' : fmtInt(live)}
+        </div>
+        <div style={{ color: t.inkMuted, fontSize: 14 }}>
+          {live === 1 ? 'member' : 'members'} in the app right now
+        </div>
+      </div>
+      <div style={{ color: t.inkFaint, fontSize: 12 }}>
+        Distinct members with any event in the last 5 minutes. Refreshes every 15 seconds.
+      </div>
+    </Card>
+  );
+}
+
+function WhoIsHere({
+  users, profilesMap, loading, isError, onRetry,
+}: {
+  users: { user_id: string; latestAt: string }[];
+  profilesMap: Record<string, LiteProfile>;
+  loading: boolean; isError: boolean; onRetry: () => void;
+}) {
+  return (
+    <Card>
+      <div style={{ color: t.ink, fontWeight: 700, fontSize: 15, marginBottom: 4 }}>Who is here</div>
+      <div style={{ color: t.inkMuted, fontSize: 12, marginBottom: 12 }}>Members active in the last 5 minutes</div>
+      {isError ? (
+        <AdminErrorState title="Couldn't load who is here" onRetry={onRetry} />
+      ) : loading ? (
+        <div style={{ height: 160, background: t.canvas, borderRadius: t.radius.md }} />
+      ) : users.length === 0 ? (
+        <EmptyState title="Quiet right now" />
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {users.map((u, i) => {
+            const p = profilesMap[u.user_id];
+            const name = displayNameOf(p);
+            const isLast = i === users.length - 1;
+            return (
+              <Link
+                key={u.user_id}
+                to={`/admin-v2/users?member=${u.user_id}`}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 12,
+                  padding: '10px 0', textDecoration: 'none',
+                  borderBottom: isLast ? 'none' : `1px solid ${t.line}`,
+                }}
+              >
+                <Squircle src={p?.profile_photo_url ?? null} initials={initialsOf(p)} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{
+                    color: t.ink, fontSize: 13.5, fontWeight: 600,
+                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  }}>{name}</div>
+                  {p?.username && (
+                    <div style={{ color: t.inkFaint, fontSize: 11.5 }}>@{p.username}</div>
+                  )}
+                </div>
+                <span style={{
+                  color: t.inkMuted, fontSize: 12, fontVariantNumeric: 'tabular-nums',
+                  textAlign: 'right', minWidth: 68,
+                }}>
+                  active {relTimeShort(u.latestAt)}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      )}
+    </Card>
+  );
+}
+
+function LastThirtyMinutesChart({
+  events, loading, isError, onRetry,
+}: {
+  events: LiveEventRow[]; loading: boolean; isError: boolean; onRetry: () => void;
+}) {
+  const bars = useMemo(() => {
+    const now = Date.now();
+    const start = now - 30 * 60_000;
+    // 30 minute buckets aligned to now.
+    const buckets: { minute: string; value: number }[] = [];
+    for (let i = 29; i >= 0; i--) {
+      const t0 = now - (i + 1) * 60_000;
+      const t1 = now - i * 60_000;
+      let value = 0;
+      for (const e of events) {
+        const ts = new Date(e.created_at).getTime();
+        if (ts >= t0 && ts < t1) value += 1;
+      }
+      buckets.push({
+        minute: `${new Date(t1).getHours().toString().padStart(2, '0')}:${new Date(t1).getMinutes().toString().padStart(2, '0')}`,
+        value,
+      });
+      // Only used to sample from unused var to satisfy tsc when start is unused
+      void start;
+    }
+    return buckets;
+  }, [events]);
+
+  const empty = !loading && bars.every(b => b.value === 0);
+
+  return (
+    <ChartCard title="Last 30 minutes" subtitle="Events per minute" loading={loading} isEmpty={empty}>
+      {isError ? (
+        <AdminErrorState title="Couldn't load recent events" onRetry={onRetry} />
+      ) : (
+        <ResponsiveContainer width="100%" height={200}>
+          <BarChart data={bars} margin={{ top: 8, right: 8, bottom: 0, left: -16 }}>
+            <CartesianGrid stroke={t.line} vertical={false} strokeDasharray="3 3" />
+            <XAxis dataKey="minute" tick={{ fontSize: 10, fill: t.inkMuted }} axisLine={false} tickLine={false} interval={4} />
+            <YAxis tick={{ fontSize: 11, fill: t.inkMuted }} axisLine={false} tickLine={false} tickFormatter={fmtTick} width={36} />
+            <Tooltip contentStyle={{ background: t.surface, border: `1px solid ${t.line}`, borderRadius: 8, fontSize: 12 }} />
+            <Bar dataKey="value" fill={t.brand} radius={[4, 4, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      )}
+    </ChartCard>
+  );
+}
+
+function EventStream({
+  events, profilesMap, loading, isError, onRetry,
+}: {
+  events: LiveEventRow[]; profilesMap: Record<string, LiteProfile>;
+  loading: boolean; isError: boolean; onRetry: () => void;
+}) {
+  const latest = events.slice(0, 25);
+  return (
+    <Card>
+      <div style={{ color: t.ink, fontWeight: 700, fontSize: 15, marginBottom: 4 }}>Event stream</div>
+      <div style={{ color: t.inkMuted, fontSize: 12, marginBottom: 12 }}>Latest 25 events across the platform</div>
+      {isError ? (
+        <AdminErrorState title="Couldn't load stream" onRetry={onRetry} />
+      ) : loading ? (
+        <div style={{ height: 240, background: t.canvas, borderRadius: t.radius.md }} />
+      ) : latest.length === 0 ? (
+        <EmptyState title="No events in the last 30 minutes" />
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {latest.map((e, i) => {
+            const isLast = i === latest.length - 1;
+            const p = e.user_id ? profilesMap[e.user_id] : null;
+            const name = e.user_id ? displayNameOf(p) : 'System';
+            const row = (
+              <>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{
+                    color: t.ink, fontSize: 13.5, fontWeight: 700,
+                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  }}>{labelForEvent(e.name)}</div>
+                  <div style={{
+                    color: t.inkMuted, fontSize: 12,
+                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  }}>{name}</div>
+                </div>
+                <span style={{
+                  color: t.inkFaint, fontSize: 12, fontVariantNumeric: 'tabular-nums',
+                  textAlign: 'right', minWidth: 68,
+                }}>{relTimeShort(e.created_at)}</span>
+              </>
+            );
+            const style: React.CSSProperties = {
+              display: 'flex', alignItems: 'center', gap: 10,
+              padding: '10px 0', textDecoration: 'none',
+              borderBottom: isLast ? 'none' : `1px solid ${t.line}`,
+            };
+            return e.user_id
+              ? <Link key={e.id} to={`/admin-v2/users?member=${e.user_id}`} style={style}>{row}</Link>
+              : <div key={e.id} style={style}>{row}</div>;
+          })}
+        </div>
+      )}
+    </Card>
+  );
+}
+
+// Verified prop key: page_view events carry `path` in props.
+// See src/hooks/usePageTracking.ts line 23:
+//   analyticsEvents.track('page_view', { path });
+function TopScreensRightNow({ events, loading }: { events: LiveEventRow[]; loading: boolean }) {
+  const rows = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const e of events) {
+      if (e.name !== 'page_view') continue;
+      const path = (e.props as any)?.path;
+      if (typeof path !== 'string' || !path) continue;
+      counts.set(path, (counts.get(path) ?? 0) + 1);
+    }
+    return Array.from(counts, ([path, count]) => ({ path, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+  }, [events]);
+
+  return (
+    <Card>
+      <div style={{ color: t.ink, fontWeight: 700, fontSize: 15, marginBottom: 4 }}>Top screens right now</div>
+      <div style={{ color: t.inkMuted, fontSize: 12, marginBottom: 12 }}>Most-viewed paths in the last 30 minutes</div>
+      {loading ? (
+        <div style={{ height: 140, background: t.canvas, borderRadius: t.radius.md }} />
+      ) : rows.length === 0 ? (
+        <EmptyState title="No page views yet" />
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {rows.map((r, i) => {
+            const isLast = i === rows.length - 1;
+            return (
+              <div
+                key={r.path}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  padding: '10px 0',
+                  borderBottom: isLast ? 'none' : `1px solid ${t.line}`,
+                }}
+              >
+                <div style={{
+                  flex: 1, minWidth: 0,
+                  color: t.ink, fontSize: 13.5, fontWeight: 600,
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+                }}>{r.path}</div>
+                <span style={{
+                  color: t.inkMuted, fontSize: 13, fontWeight: 700, fontVariantNumeric: 'tabular-nums',
+                }}>{fmtInt(r.count)}</span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </Card>
+  );
+}
+
+// ═══ EVENTS TAB (Firebase events explorer) ════════════════════════════════════
+
+function EventsTab({ period }: { period: AnalyticsPeriod }) {
+  const [query, setQuery] = useState('');
+  const [selected, setSelected] = useState<EventAggregate | null>(null);
+  const { aggregates, data: raw, isLoading, isError, refetch } = useEventAggregates(period);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return aggregates;
+    return aggregates.filter(a =>
+      a.name.toLowerCase().includes(q) || labelForEvent(a.name).toLowerCase().includes(q),
+    );
+  }, [aggregates, query]);
+
+  const totals = useMemo(() => {
+    let count = 0; const users = new Set<string>();
+    for (const a of aggregates) count += a.count;
+    if (raw) {
+      for (const r of raw.rows) if (r.created_at >= raw.cutoffISO && r.user_id) users.add(r.user_id);
+    }
+    return { count, users: users.size };
+  }, [aggregates, raw]);
+
+  return (
+    <>
+      <Card style={{ borderRadius: 22, padding: 20, display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{
+          color: t.inkFaint, fontSize: 11.5, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase',
+        }}>Events in period</div>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 14, flexWrap: 'wrap' }}>
+          <div style={{
+            color: t.ink, fontSize: 38, fontWeight: 800, lineHeight: 1, fontVariantNumeric: 'tabular-nums',
+          }}>
+            {isLoading ? '-' : fmtInt(totals.count)}
+          </div>
+          <div style={{ color: t.inkMuted, fontSize: 13.5, fontVariantNumeric: 'tabular-nums' }}>
+            across {fmtInt(aggregates.length)} distinct events, {fmtInt(totals.users)} members
+          </div>
+        </div>
+      </Card>
+
+      <Card>
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 8,
+          border: `1px solid ${t.line}`, borderRadius: 999, background: t.canvas,
+          padding: '8px 12px', marginBottom: 12,
+        }}>
+          <Search size={14} color={t.inkMuted} />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search event name or label"
+            style={{
+              flex: 1, minWidth: 0, border: 'none', outline: 'none',
+              background: 'transparent', color: t.ink, fontSize: 13,
+            }}
+          />
+        </div>
+
+        {isError ? (
+          <AdminErrorState title="Couldn't load events" onRetry={() => refetch()} />
+        ) : isLoading ? (
+          <div style={{ height: 260, background: t.canvas, borderRadius: t.radius.md }} />
+        ) : filtered.length === 0 ? (
+          <EmptyState title="No events match" />
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {filtered.map((a, i) => {
+              const isLast = i === filtered.length - 1;
+              return (
+                <button
+                  key={a.name}
+                  onClick={() => setSelected(a)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    padding: '10px 0', width: '100%',
+                    background: 'transparent', border: 'none', textAlign: 'left',
+                    borderBottom: isLast ? 'none' : `1px solid ${t.line}`,
+                    cursor: 'pointer',
+                  }}
+                >
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{
+                      color: t.ink, fontSize: 13.5, fontWeight: 700,
+                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    }}>{labelForEvent(a.name)}</div>
+                    <div style={{
+                      color: t.inkFaint, fontSize: 10.5,
+                      fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    }}>{a.name}</div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{
+                        color: t.ink, fontSize: 13.5, fontWeight: 700, fontVariantNumeric: 'tabular-nums',
+                      }}>{fmtInt(a.count)}</div>
+                      <div style={{
+                        color: t.inkFaint, fontSize: 11, fontVariantNumeric: 'tabular-nums',
+                      }}>{fmtInt(a.users)} users</div>
+                    </div>
+                    <DeltaChip delta={a.deltaPct} />
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </Card>
+
+      <EventDetailSheet
+        aggregate={selected}
+        period={period}
+        rows={raw?.rows ?? []}
+        cutoffISO={raw?.cutoffISO ?? null}
+        onClose={() => setSelected(null)}
+      />
+    </>
+  );
+}
+
+function EventDetailSheet({
+  aggregate, period, rows, cutoffISO, onClose,
+}: {
+  aggregate: EventAggregate | null;
+  period: AnalyticsPeriod;
+  rows: { name: string; user_id: string | null; created_at: string }[];
+  cutoffISO: string | null;
+  onClose: () => void;
+}) {
+  const days = periodToDays(period);
+  const daily = useMemo(() => {
+    if (!aggregate || !cutoffISO) return [];
+    return dailyForEvent(rows, cutoffISO, aggregate.name, days);
+  }, [aggregate, cutoffISO, rows, days]);
+
+  const occurrences = useRecentOccurrences(aggregate?.name ?? null, cutoffISO);
+  const ids = useMemo(() => {
+    const s = new Set<string>();
+    for (const o of occurrences.data ?? []) if (o.user_id) s.add(o.user_id);
+    return Array.from(s);
+  }, [occurrences.data]);
+  const profiles = useProfilesByIds(ids);
+
+  const total = aggregate?.count ?? 0;
+  const users = aggregate?.users ?? 0;
+  const perUser = users > 0 ? Math.round((total / users) * 10) / 10 : 0;
+
+  return (
+    <AdminSheet
+      open={!!aggregate}
+      onClose={onClose}
+      title={aggregate ? labelForEvent(aggregate.name) : ''}
+      subtitle={aggregate?.name}
+      maxWidth={560}
+    >
+      {aggregate && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div style={{
+            display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 8,
+          }}>
+            <StatBox label="Total" value={fmtInt(total)} />
+            <StatBox label="Unique users" value={fmtInt(users)} />
+            <StatBox label="Per user" value={perUser.toFixed(1)} />
+          </div>
+
+          <ChartCard title="Daily count" subtitle={`Occurrences per day, last ${period}`} loading={false}
+            isEmpty={daily.every(d => d.value === 0)}>
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={daily} margin={{ top: 8, right: 8, bottom: 0, left: -16 }}>
+                <CartesianGrid stroke={t.line} vertical={false} strokeDasharray="3 3" />
+                <XAxis dataKey="date" tick={{ fontSize: 11, fill: t.inkMuted }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: t.inkMuted }} axisLine={false} tickLine={false} tickFormatter={fmtTick} width={36} />
+                <Tooltip contentStyle={{ background: t.surface, border: `1px solid ${t.line}`, borderRadius: 8, fontSize: 12 }} />
+                <Bar dataKey="value" fill={t.brand} radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartCard>
+
+          <div>
+            <div style={{ color: t.ink, fontWeight: 700, fontSize: 14, marginBottom: 4 }}>Recent occurrences</div>
+            <div style={{ color: t.inkMuted, fontSize: 12, marginBottom: 10 }}>Latest 15 in the selected period</div>
+            {occurrences.isError ? (
+              <AdminErrorState title="Couldn't load occurrences" onRetry={() => occurrences.refetch()} />
+            ) : occurrences.isLoading ? (
+              <div style={{ height: 180, background: t.canvas, borderRadius: t.radius.md }} />
+            ) : (occurrences.data ?? []).length === 0 ? (
+              <EmptyState title="No recent occurrences" />
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                {occurrences.data!.map((o, i) => {
+                  const isLast = i === occurrences.data!.length - 1;
+                  const p = o.user_id ? (profiles.data ?? {})[o.user_id] : null;
+                  const name = o.user_id ? displayNameOf(p) : 'System';
+                  const propsLine = o.props && Object.keys(o.props).length > 0
+                    ? (() => {
+                      const s = JSON.stringify(o.props);
+                      return s.length > 60 ? `${s.slice(0, 60)}…` : s;
+                    })()
+                    : null;
+                  const row = (
+                    <>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{
+                          color: t.ink, fontSize: 13, fontWeight: 600,
+                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                        }}>{name}</div>
+                        {propsLine && (
+                          <div style={{
+                            color: t.inkFaint, fontSize: 11,
+                            fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+                            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                          }}>{propsLine}</div>
+                        )}
+                      </div>
+                      <span style={{
+                        color: t.inkFaint, fontSize: 12, fontVariantNumeric: 'tabular-nums',
+                        textAlign: 'right', minWidth: 68,
+                      }}>{relTimeShort(o.created_at)}</span>
+                    </>
+                  );
+                  const style: React.CSSProperties = {
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    padding: '10px 0', textDecoration: 'none',
+                    borderBottom: isLast ? 'none' : `1px solid ${t.line}`,
+                  };
+                  return o.user_id
+                    ? <Link key={o.id} to={`/admin-v2/users?member=${o.user_id}`} style={style} onClick={onClose}>{row}</Link>
+                    : <div key={o.id} style={style}>{row}</div>;
+                })}
+              </div>
+            )}
+          </div>
+
+          <div style={{
+            paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 8px)',
+          }} />
+        </div>
+      )}
+    </AdminSheet>
+  );
+}
+
+function StatBox({ label, value }: { label: string; value: string }) {
+  return (
+    <div style={{
+      background: t.canvas, border: `1px solid ${t.line}`, borderRadius: 14,
+      padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: 4,
+    }}>
+      <div style={{
+        color: t.inkFaint, fontSize: 10.5, fontWeight: 700, letterSpacing: 0.4, textTransform: 'uppercase',
+      }}>{label}</div>
+      <div style={{
+        color: t.ink, fontSize: 18, fontWeight: 800, fontVariantNumeric: 'tabular-nums',
+      }}>{value}</div>
+    </div>
+  );
+}
