@@ -14,6 +14,8 @@ import { adminTheme as t } from '../theme';
 import EmptyState from '../components/EmptyState';
 import AdminErrorState from '../components/AdminErrorState';
 import MetricCard from '../components/MetricCard';
+import PostInsightSheet from '../components/PostInsightSheet';
+import CourseInsightSheet from '../components/CourseInsightSheet';
 import { useTriageCounts } from '../hooks/useTriageCounts';
 import { useEchoEngineHealth } from '../hooks/useEchoEngineHealth';
 import { usePushHealth } from '../hooks/usePushHealth';
@@ -51,6 +53,8 @@ interface FeedItem {
   subtitle: string | null;
   avatarUrl: string | null;
   href: string;
+  postId?: string;
+  courseId?: string;
 }
 
 async function fetchClubhouseFeed(): Promise<FeedItem[]> {
@@ -139,6 +143,7 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
       subtitle,
       avatarUrl: prof?.profile_photo_url ?? null,
       href: `/admin-v2/users?member=${p.user_id}`,
+      postId: p.id,
     });
   }
   for (const r of reviewRows) {
@@ -152,6 +157,7 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
       subtitle: (r.review ?? '').trim() || `by ${displayName(prof)}`,
       avatarUrl: prof?.profile_photo_url ?? null,
       href: `/admin-v2/users?member=${r.user_id}`,
+      courseId: r.course_id,
     });
   }
 
@@ -491,6 +497,9 @@ function LatestInClubhouse({
   items: FeedItem[];
   loading: boolean; isError: boolean; onRetry: () => void;
 }) {
+  const [openPost, setOpenPost] = React.useState<string | null>(null);
+  const [openCourse, setOpenCourse] = React.useState<string | null>(null);
+
   return (
     <section
       style={{
@@ -517,26 +526,46 @@ function LatestInClubhouse({
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           {items.map((it, idx) => (
-            <FeedRow key={it.id} item={it} first={idx === 0} />
+            <FeedRow
+              key={it.id} item={it} first={idx === 0}
+              onOpenPost={setOpenPost}
+              onOpenCourse={setOpenCourse}
+            />
           ))}
         </div>
       )}
+
+      <PostInsightSheet postId={openPost} open={!!openPost} onClose={() => setOpenPost(null)} />
+      <CourseInsightSheet courseId={openCourse} open={!!openCourse} onClose={() => setOpenCourse(null)} />
     </section>
   );
 }
 
-function FeedRow({ item, first }: { item: FeedItem; first: boolean }) {
+function FeedRow({
+  item, first, onOpenPost, onOpenCourse,
+}: {
+  item: FeedItem; first: boolean;
+  onOpenPost: (id: string) => void;
+  onOpenCourse: (id: string) => void;
+}) {
   const chip = feedChip(item.kind);
-  return (
-    <Link
-      to={item.href}
-      style={{
-        display: 'flex', alignItems: 'flex-start', gap: 10,
-        padding: '10px 0',
-        borderTop: first ? 'none' : `1px solid ${t.line}`,
-        textDecoration: 'none', color: 'inherit',
-      }}
-    >
+  // C4-3: post rows -> post insight sheet (upgrades the temporary author-360 routing).
+  // C4-2 (b): review rows -> course insight sheet.
+  const opensSheet =
+    (item.kind === 'post' && !!item.postId) ||
+    (item.kind === 'review' && !!item.courseId);
+
+  const rowStyle: React.CSSProperties = {
+    display: 'flex', alignItems: 'flex-start', gap: 10,
+    padding: '10px 0',
+    borderTop: first ? 'none' : `1px solid ${t.line}`,
+    textDecoration: 'none', color: 'inherit',
+    background: 'transparent', border: 'none', width: '100%', textAlign: 'left',
+    cursor: 'pointer',
+  };
+
+  const inner = (
+    <>
       <span
         aria-hidden
         style={{
@@ -569,9 +598,31 @@ function FeedRow({ item, first }: { item: FeedItem; first: boolean }) {
         )}
       </div>
       <ChevronRight size={14} color={t.inkFaint} style={{ marginTop: 12, flexShrink: 0 }} />
+    </>
+  );
+
+  if (opensSheet) {
+    return (
+      <button
+        type="button"
+        onClick={() => {
+          if (item.kind === 'post' && item.postId) onOpenPost(item.postId);
+          else if (item.kind === 'review' && item.courseId) onOpenCourse(item.courseId);
+        }}
+        style={{ ...rowStyle, borderTopStyle: first ? 'none' : 'solid', borderTopWidth: first ? 0 : 1, borderTopColor: t.line }}
+      >
+        {inner}
+      </button>
+    );
+  }
+
+  return (
+    <Link to={item.href} style={rowStyle}>
+      {inner}
     </Link>
   );
 }
+
 
 function feedChip(kind: FeedKind): { icon: React.ReactNode; bg: string; fg: string } {
   switch (kind) {
