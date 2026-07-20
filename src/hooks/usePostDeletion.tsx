@@ -3,6 +3,7 @@ import { toast } from '@/lib/toast';
 import { supabase } from '@/integrations/supabase/client';
 import { showToast } from '@/utils/toast';
 import { postKeys } from '@/queryKeys/posts';
+import { scheduleRadixBodyLockSanitize } from '@/lib/radixLockSanitizer';
 
 export const usePostDeletion = () => {
   const queryClient = useQueryClient();
@@ -159,6 +160,12 @@ export const usePostDeletion = () => {
       window.dispatchEvent(new CustomEvent('postDeleted', { 
         detail: { postId, actorType, actorId } 
       }));
+
+      // Runs AFTER React commits the invalidation-driven card eviction.
+      // Only sanitizes a stuck body pointer-events lock when no legitimate
+      // Radix layer or bodyScrollLock owner is active. See
+      // `src/lib/radixLockSanitizer.ts`.
+      scheduleRadixBodyLockSanitize();
 
       return { success: true };
     } catch (error: any) {
