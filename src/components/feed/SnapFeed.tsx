@@ -163,6 +163,11 @@ export function SnapFeed({
           });
         } catch { /* noop */ }
       }
+      // v10 audio-focus — release the inline feed's focus on unmount so the
+      // reconciler stops resolving to a lane that no visible surface owns.
+      if (surface !== 'fullscreen') {
+        try { VideoEngine.setAudioFocus(null, 'feed'); } catch { /* noop */ }
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
