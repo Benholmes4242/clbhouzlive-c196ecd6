@@ -162,7 +162,7 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
           <ExploreGrid
             posts={posts}
             coursePosts={coursePosts}
-            isLoading={isLoading}
+            isLoading={isLoading || (authLoading && coursePosts.length === 0)}
             isError={isError}
             hasNextPage={hasNextPage}
             isFetchingNextPage={isFetchingNextPage}
