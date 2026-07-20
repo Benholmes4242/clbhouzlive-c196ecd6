@@ -113,9 +113,20 @@ export function PlayerPage() {
           </div>
         )}
 
-        {playerState.state === 'live' && playerState.liveData && (
-          <LiveNowStrip liveData={playerState.liveData} playerName={player.full_name} />
-        )}
+        <AnimatePresence initial={false}>
+          {playerState.state === 'live' && playerState.liveData && (
+            <motion.div
+              key="live-now"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+              style={{ overflow: 'hidden' }}
+            >
+              <LiveNowStrip liveData={playerState.liveData} playerName={player.full_name} />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <SeasonCards
           playerStats={playerStats ?? null}
