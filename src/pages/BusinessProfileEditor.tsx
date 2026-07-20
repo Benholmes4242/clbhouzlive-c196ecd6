@@ -449,13 +449,13 @@ export default function BusinessProfileEditor() {
           email: email.trim() || null,
           phone: phone?.fullNumber || null,
           booking_url: bookingUrl.trim() || null,
-          opening_hours: openingHours as any,
-          social_links: hasSocial ? (socialLinks as any) : null,
+          opening_hours: openingHours as unknown as Json,
+          social_links: hasSocial ? (socialLinks as unknown as Json) : null,
           is_verified: false,
-          amenities: amenities.length ? (amenities as any) : null,
+          amenities: amenities.length ? amenities : null,
           primary_action: primaryAction || null,
           show_opening_hours: showOpeningHours,
-        } as any;
+        };
 
 
 
