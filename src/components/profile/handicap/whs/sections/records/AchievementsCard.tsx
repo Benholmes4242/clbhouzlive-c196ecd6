@@ -4,6 +4,7 @@ import { useUserAchievements } from '@/hooks/gam/useUserAchievements';
 import { openGamAchievements } from '../../gam/events';
 import { renderBadgeIcon } from '../../gam/badgeIcons';
 import { DarkSectionHeader } from '../_shared/darkAtoms';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface Props {
   userId: string;
