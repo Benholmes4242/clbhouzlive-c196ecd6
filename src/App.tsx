@@ -549,7 +549,7 @@ function AppRoutes() {
         <Route path="/business/:idOrSlug/followers" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessSocialListRoute direction="followers" /></Suspense>} />
         <Route path="/business/:idOrSlug/following" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessSocialListRoute direction="following" /></Suspense>} />
 
-        <Route path="/business/:idOrSlug" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessProfilePage /></Suspense>} />
+        <Route path="/business/:idOrSlug" element={<Suspense fallback={<ProfileSkeleton />}><BusinessProfilePage /></Suspense>} />
         
         
         <Route path="/top100/:slug" element={<Suspense fallback={<CoursesListSkeleton />}><Top100List /></Suspense>} />

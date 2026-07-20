@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useBusinessTeam, type BusinessRole } from '@/hooks/useBusinessTeam';
 
 const FRIENDLY_ROLE: Record<BusinessRole, string> = {
@@ -30,10 +31,10 @@ export const BusinessTeamTab: React.FC<BusinessTeamTabProps> = ({ businessId }) 
       <div className="px-0 pt-2">
         {[0, 1, 2].map(i => (
           <div key={i} className="flex items-center gap-3 py-3">
-            <div className="w-11 h-11 rounded-[34%] animate-pulse" style={{ background: 'rgba(15,23,42,0.06)' }} />
+            <Skeleton className="w-11 h-11 rounded-[34%]" />
             <div className="flex-1">
-              <div className="h-3.5 w-32 rounded animate-pulse mb-2" style={{ background: 'rgba(15,23,42,0.06)' }} />
-              <div className="h-3 w-20 rounded animate-pulse" style={{ background: 'rgba(15,23,42,0.04)' }} />
+              <Skeleton className="h-3.5 w-32 mb-2" />
+              <Skeleton className="h-3 w-20" />
             </div>
           </div>
         ))}
