@@ -137,7 +137,41 @@ function derivePosition(entry: any): { rank: string; posNum: number | null } {
   return { rank: tied ? `T${pos}` : String(pos), posNum: Number(pos) };
 }
 
-export function HeroWireTicker({ state, leaderboard, upcomingContenders }: HeroWireTickerProps) {
+const PULSE_STYLE_ID = 'lovable-hero-wire-empty-pulse';
+function ensurePulseStyles() {
+  if (typeof document === 'undefined') return;
+  if (document.getElementById(PULSE_STYLE_ID)) return;
+  const el = document.createElement('style');
+  el.id = PULSE_STYLE_ID;
+  el.textContent = `
+@keyframes lovable-hero-wire-empty-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.45; }
+}
+.lovable-hero-wire-empty-pulse-label {
+  animation: lovable-hero-wire-empty-pulse 2.2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lovable-hero-wire-empty-pulse-label { animation: none !important; }
+}
+`;
+  document.head.appendChild(el);
+}
+
+interface FactItem {
+  key: string;
+  label: string;
+  value: string;
+  labelColor?: string;
+  labelPulse?: boolean;
+}
+
+export function HeroWireTicker({
+  state,
+  leaderboard,
+  upcomingContenders,
+  emptyStateFacts,
+}: HeroWireTickerProps) {
   const { t } = useTranslation('tourhub');
 
   const rows = useMemo<Row[]>(() => {
