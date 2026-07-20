@@ -150,7 +150,7 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
 function MomentCard({ moment, tourCode }: { moment: ReturnType<typeof useEventMoments>['data'] extends (infer T)[] | undefined ? T : never; tourCode: string }) {
   const navigate = useNavigate();
   const cfg = MOMENT_TYPE_CONFIG[moment!.moment_type as MomentType] ?? MOMENT_TYPE_CONFIG.highlight;
-  const player = (moment as any).player;
+  const player = (moment as unknown as { player?: { id?: string; full_name?: string | null; photo_url?: string | null } | null }).player;
   return (
     <button
       type="button"
