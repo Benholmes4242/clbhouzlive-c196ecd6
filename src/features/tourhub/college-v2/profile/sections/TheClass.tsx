@@ -37,6 +37,7 @@ import {
 } from '@/features/tourhub/_shared/tokens';
 import { useCollegeRoster, type RosterAlumnus } from '../data/useCollegeRoster';
 import { useThisWeekAlumni } from '../data/useThisWeekAlumni';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const AMBER_WASH = 'rgba(247,147,30,0.045)';
 const AMBER_DEEP = '#c97a10';
