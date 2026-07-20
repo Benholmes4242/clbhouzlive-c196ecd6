@@ -1,11 +1,14 @@
 import React from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 
-const SkeletonBlock: React.FC<{ className?: string; style?: React.CSSProperties }> = ({
+const SkeletonBlock: React.FC<{ className?: string; style?: React.CSSProperties; dark?: boolean }> = ({
   className = '',
   style,
+  dark = false,
 }) => (
-  <div
-    className={`bg-slate-200/70 animate-pulse rounded-[4px] ${className}`}
+  <Skeleton
+    variant={dark ? 'dark' : 'light'}
+    className={`rounded-[4px] ${className}`}
     style={style}
   />
 );
@@ -26,12 +29,13 @@ export const PostsFeedSkeleton: React.FC = () => {
         />
         <div className="relative w-full bg-slate-800/50" style={{ aspectRatio: '16 / 10' }}>
           <SkeletonBlock
+            dark
             className="absolute"
             style={{ top: 12, right: 14, width: 56, height: 36 }}
           />
           <div className="absolute" style={{ left: 14, right: 100, bottom: 12 }}>
-            <SkeletonBlock style={{ width: '70%', height: 22, marginBottom: 6 }} />
-            <SkeletonBlock style={{ width: 120, height: 10 }} />
+            <SkeletonBlock dark style={{ width: '70%', height: 22, marginBottom: 6 }} />
+            <SkeletonBlock dark style={{ width: 120, height: 10 }} />
           </div>
         </div>
         <div className="px-3.5 pt-2.5 pb-3 flex flex-col gap-1.5">
@@ -65,9 +69,9 @@ export const PostsFeedSkeleton: React.FC = () => {
         <SkeletonBlock style={{ width: 80, height: 11, marginLeft: 14 }} />
         <div className="grid grid-cols-2 gap-px">
           {[0, 1].map((i) => (
-            <div
+            <Skeleton
               key={i}
-              className="relative overflow-hidden bg-slate-200 animate-pulse"
+              className="relative overflow-hidden rounded-none"
               style={{ aspectRatio: '4 / 5' }}
             />
           ))}
@@ -77,9 +81,9 @@ export const PostsFeedSkeleton: React.FC = () => {
       {/* Second compact row */}
       <div className="grid grid-cols-2 gap-px">
         {[0, 1].map((i) => (
-          <div
+          <Skeleton
             key={i}
-            className="relative overflow-hidden bg-slate-200 animate-pulse"
+            className="relative overflow-hidden rounded-none"
             style={{ aspectRatio: '4 / 5' }}
           />
         ))}

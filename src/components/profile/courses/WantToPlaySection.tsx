@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { useUserWantToPlay, WantToPlayCourse } from '@/hooks/useUserWantToPlay';
 import { formatRelativeAgoLong } from '@/i18n/format';
 import { toast } from '@/lib/toast';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface WantToPlaySectionProps {
   userId: string;
@@ -41,10 +42,10 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
   if (isLoading) {
     return (
       <div className={cn("", className)}>
-        <div className="h-5 w-32 bg-muted rounded animate-pulse mb-3" />
+        <Skeleton className="h-5 w-32 rounded mb-3" />
         <div className="space-y-2">
           {[1, 2].map(i => (
-            <div key={i} className="h-20 bg-muted rounded-xl animate-pulse" />
+            <Skeleton key={i} className="h-20 rounded-xl" />
           ))}
         </div>
       </div>

@@ -6,6 +6,7 @@ import { AllCoursesList } from './courses/AllCoursesList';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface ProfileCoursesTabProps {
   userId: string;
@@ -53,18 +54,18 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
 
   if (isLoading) {
     return (
-      <div className="pb-2 animate-pulse">
+      <div className="pb-2">
         {/* Journey summary skeleton */}
         <div className="px-5 pt-6 pb-5 space-y-3">
-          <div className="h-3 w-32 bg-muted rounded" />
-          <div className="h-12 w-24 bg-muted rounded" />
-          <div className="h-3 w-40 bg-muted rounded" />
+          <Skeleton className="h-3 w-32 rounded" />
+          <Skeleton className="h-12 w-24 rounded" />
+          <Skeleton className="h-3 w-40 rounded" />
         </div>
         {/* Course history skeleton */}
         <div className="mt-6 px-4 space-y-2">
-          <div className="h-5 w-32 bg-muted rounded" />
+          <Skeleton className="h-5 w-32 rounded" />
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-[200px] bg-muted rounded" />
+            <Skeleton key={i} className="h-[200px] rounded" />
           ))}
         </div>
       </div>
