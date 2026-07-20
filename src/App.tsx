@@ -85,8 +85,7 @@ import { ReviewIslandLoader } from '@/ReviewIslandLoader';
 import { supabase } from '@/integrations/supabase/client';
 import { migrateChatHistory } from '@/utils/chatHistoryMigration';
 import { NavTimingProvider } from '@/perf/NavTimingProvider';
-import { AdminGatedPerfPill, AdminGatedBootTimelinePill, AdminGatedPerfHud, AdminGatedLogHud, AdminGatedAudioLogsButton } from '@/perf/AdminGatedPills';
-import { AudioDebugHud } from '@/perf/AudioDebugHud';
+import { AdminGatedPerfPill, AdminGatedBootTimelinePill, AdminGatedPerfHud, AdminGatedLogHud, AdminGatedAudioLogsButton, AdminGatedAudioDebugHud } from '@/perf/AdminGatedPills';
 
 
 
@@ -891,7 +890,7 @@ const AppInner: React.FC = () => {
         <AdminGatedLogHud />
         <AdminGatedPerfPill />
         <AdminGatedBootTimelinePill />
-        <AudioDebugHud />
+        <AdminGatedAudioDebugHud />
         <AdminGatedAudioLogsButton />
 
         

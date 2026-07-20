@@ -10,6 +10,7 @@ import { BootTimelineToggleButton } from '@/perf/BootTimelineToggleButton';
 import { PerfHud } from '@/perf/PerfHud';
 import { LogHud } from '@/perf/LogHud';
 import { AudioLogsButton } from '@/perf/AudioLogsButton';
+import { AudioDebugHud } from '@/perf/AudioDebugHud';
 
 
 
@@ -43,9 +44,14 @@ export function AdminGatedLogHud() {
 
 export function AdminGatedAudioLogsButton() {
   const { role, loading } = usePanelRole();
-  const [visible] = useAdminPillVisibility();
-  if (loading || role !== 'full' || !visible) return null;
+  if (loading || role !== 'full') return null;
   return <AudioLogsButton />;
+}
+
+export function AdminGatedAudioDebugHud() {
+  const { role, loading } = usePanelRole();
+  if (loading || role !== 'full') return null;
+  return <AudioDebugHud />;
 }
 
 

@@ -244,17 +244,18 @@ export const AudioDebugHud = memo(function AudioDebugHud() {
         onClick={() => setExpanded(true)}
         style={{
           position: 'fixed',
-          top: 34,
-          right: 8,
-          zIndex: Z.logHud,
-          padding: '2px 6px',
-          fontSize: 10,
+          bottom: 80,
+          left: 120,
+          zIndex: 100000,
+          padding: '6px 10px',
+          fontSize: 11,
           fontFamily: 'monospace',
-          background: 'rgba(0,0,0,0.7)',
+          background: 'rgba(251,191,36,0.18)',
           color: '#fbbf24',
-          border: HUD_BORDER,
-          borderRadius: 4,
+          border: '1px solid rgba(251,191,36,0.35)',
+          borderRadius: 6,
           pointerEvents: 'auto',
+          WebkitTapHighlightColor: 'transparent',
         }}
         aria-label="Open AudioDebugHud"
       >
