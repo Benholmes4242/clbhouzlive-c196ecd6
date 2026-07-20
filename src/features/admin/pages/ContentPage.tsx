@@ -1505,8 +1505,32 @@ function PhotoSheet({
   const [removing, setRemoving] = useState(false);
   const [savingOverride, setSavingOverride] = useState(false);
   const [override, setOverride] = useState('');
+  const [draftRestored, setDraftRestored] = useState(false);
+  const draftKey = player ? draftKeys.player(player.id) : null;
 
-  useEffect(() => { setOverride(player?.headshotOverride ?? ''); }, [player?.id, player?.headshotOverride]);
+  useEffect(() => {
+    if (!player || !draftKey) { setOverride(''); setDraftRestored(false); return; }
+    const record = player.headshotOverride ?? '';
+    const draft = loadDraft(draftKey) as { override?: string } | null;
+    if (draft && typeof draft.override === 'string' && draft.override !== record) {
+      setOverride(draft.override);
+      setDraftRestored(true);
+    } else {
+      setOverride(record);
+      setDraftRestored(false);
+    }
+  }, [player?.id, player?.headshotOverride, draftKey]);
+
+  const onOverrideChange = (v: string) => {
+    setOverride(v);
+    if (draftKey) saveDraft(draftKey, { override: v });
+  };
+
+  const discardDraft = () => {
+    if (draftKey) clearDraft(draftKey);
+    setOverride(player?.headshotOverride ?? '');
+    setDraftRestored(false);
+  };
 
   if (!player) return null;
   const name = player.fullName || `${player.firstName || ''} ${player.lastName || ''}`.trim() || 'Unknown';
