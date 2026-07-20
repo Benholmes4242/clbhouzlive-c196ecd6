@@ -69,8 +69,10 @@ export const FeedFollowPill: React.FC<FeedFollowPillProps> = ({ onFollow, isFoll
   // - Following    → subdued glass "Following" chip (non-interactive)
   if (isFollowed) {
     return (
-      <span
-        aria-label="Following"
+      <button
+        type="button"
+        onClick={handleClick}
+        aria-label="Unfollow"
         style={{
           ...BASE_STYLE,
           color: 'rgba(255,255,255,0.85)',
@@ -78,11 +80,11 @@ export const FeedFollowPill: React.FC<FeedFollowPillProps> = ({ onFollow, isFoll
           border: '1px solid rgba(255,255,255,0.18)',
           backdropFilter: 'blur(8px)',
           WebkitBackdropFilter: 'blur(8px)',
-          cursor: 'default',
+          cursor: 'pointer',
         }}
       >
         FOLLOWING
-      </span>
+      </button>
     );
   }
 
