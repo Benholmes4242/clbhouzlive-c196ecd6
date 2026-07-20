@@ -12,6 +12,7 @@ import { vperfStart, vperfArmLane, vperfNextId, vperfFeedScrollTick, vperfFeedAc
 import { PrefetchController } from '@/video/PrefetchController';
 import { trace } from '@/perf/trace';
 import { VideoEngine } from '@/video/VideoEngine';
+import { feedLaneRoles } from '@/video/feedLaneRoles';
 import { isPerfEnabled } from '@/perf/navTiming';
 import { audioDebugEnabled, logAudio } from '@/perf/audioDebug';
 import { useInviteSheet } from '@/hooks/useInviteSheet';
