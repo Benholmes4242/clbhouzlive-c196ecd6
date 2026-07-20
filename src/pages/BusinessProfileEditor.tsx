@@ -685,15 +685,34 @@ export default function BusinessProfileEditor() {
     );
   }
   if (mode === 'edit' && (businessError || !business)) {
+    // Sentinel from useBusinessProfile — keep in sync.
+    const isNotFound =
+      (businessError instanceof Error && businessError.message === 'Business not found') ||
+      (!businessError && !business);
     return (
       <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={{ background: BIZ.pageBg }}>
         <div className="max-w-md text-center">
           <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h1 className="text-[16px] font-bold text-foreground mb-2">Business not found</h1>
-          <p className="text-[13px] text-muted-foreground mb-6">This business may have been removed.</p>
-          <button onClick={() => navigate(-1)} className="text-[14px] font-semibold" style={{ color: BIZ.amber }}>
-            Go back
-          </button>
+          <h1 className="text-[16px] font-bold text-foreground mb-2">
+            {isNotFound ? 'Business not found' : "Couldn't load this business"}
+          </h1>
+          <p className="text-[13px] text-muted-foreground mb-6">
+            {isNotFound ? 'This business may have been removed.' : 'Check your connection and try again.'}
+          </p>
+          {!isNotFound && (
+            <button
+              onClick={() => refetchBusiness()}
+              className="inline-flex items-center justify-center h-11 px-6 rounded-[10px] text-white text-[14px] font-semibold mb-3"
+              style={{ background: BIZ.amber }}
+            >
+              Retry
+            </button>
+          )}
+          <div>
+            <button onClick={() => navigate(-1)} className="text-[14px] font-semibold" style={{ color: BIZ.amber }}>
+              Go back
+            </button>
+          </div>
         </div>
       </div>
     );
