@@ -159,9 +159,9 @@ export function ComparePage() {
           >
             {[0, 1].map((i) => (
               <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-                <div style={{ width: 54, height: 54, borderRadius: '34%', background: 'rgba(255,255,255,0.06)' }} />
-                <div style={{ height: 10, width: 80, background: 'rgba(255,255,255,0.10)' }} />
-                <div style={{ height: 8, width: 60, background: 'rgba(255,255,255,0.06)' }} />
+                <Skeleton variant="dark" style={{ width: 54, height: 54, borderRadius: '34%' }} />
+                <Skeleton variant="dark" style={{ height: 10, width: 80, borderRadius: 3 }} />
+                <Skeleton variant="dark" style={{ height: 8, width: 60, borderRadius: 3 }} />
               </div>
             ))}
           </div>
