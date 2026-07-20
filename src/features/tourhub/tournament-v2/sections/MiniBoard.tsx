@@ -86,7 +86,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5 }: Props) {
             : `${r.position_tied ? 'T' : ''}${r.position}`;
           const cc = r.player?.country_code ?? r.player?.country ?? null;
           const flag = cc ? countryFlag(cc) : null;
-          const today = todayFromEntry(r as any);
+          const today = todayFromEntry(r as unknown as Parameters<typeof todayFromEntry>[0]);
           return (
             <button
               key={r.id}
