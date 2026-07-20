@@ -79,12 +79,12 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   { match: { exact: '/create-moment' },           spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { exact: '/business/intro' },          spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { exact: '/messages' },                spec: { chrome: 'none', tone: 'light', bleed: false } },
-  // ── /profile family — ISLAND (H3): back with fallback '/'. Own profile
-  // sets a leftOverride to route back to '/edit-profile?tab=settings'.
+  // ── /profile family — ISLAND (H3): light, immersive, no back.
   // /profile/quest keeps its history-back island rule (declared first so it
-  // wins before the /profile/ prefix rule below).
+  // wins before the /profile/ prefix rule below). Own profile and bare visitor
+  // profile pages intentionally omit the back button; bottom nav is the exit.
   { match: { exact: '/profile/quest' },           spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history' }, tone: 'light', bleed: false } },
-  { match: { exact: '/profile' },                 spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/' }, tone: 'light', bleed: true } },
+  { match: { exact: '/profile' },                 spec: { chrome: 'island', tone: 'light', bleed: true } },
   { match: { exact: '/achievements' },            spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { exact: '/golferstofollow' },         spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { exact: '/notificationmessages' },    spec: { chrome: 'none', tone: 'light', bleed: false } },
