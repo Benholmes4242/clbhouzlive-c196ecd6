@@ -597,9 +597,9 @@ export function useTourHubDataStatus() {
 // Returns rows joined with both player and team — consumers should use
 // resolveLeaderboardEntity to get a uniform entity object.
 export function useTourLeaderboard(tournamentId: string) {
-  return useQuery({
+  return useQuery<BoardEntry[]>({
     queryKey: ['tourhub', 'leaderboard', tournamentId],
-    queryFn: async () => {
+    queryFn: async (): Promise<BoardEntry[]> => {
       const { data, error } = await supabase
         .from('sr_leaderboards')
         .select(`
@@ -617,12 +617,9 @@ export function useTourLeaderboard(tournamentId: string) {
         `)
         .eq('tournament_id', tournamentId)
         .order('position', { ascending: true });
-      
-      if (error) {
-        console.error('Error fetching leaderboard:', error);
-        return [];
-      }
-      return data || [];
+
+      if (error) throw error;
+      return (data ?? []) as unknown as BoardEntry[];
     },
     enabled: !!tournamentId,
     staleTime: 30_000,             // 30s — matches sync interval
