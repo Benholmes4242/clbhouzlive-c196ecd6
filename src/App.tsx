@@ -251,7 +251,6 @@ const News = lazy(() => import("./pages/News"));
 
 
 const InboxV2Page = lazy(() => import("./pages/messaging-v2/InboxV2Page"));
-const CommentsV2Test = lazy(() => import("./pages/CommentsV2Test"));
 const ThreadV2Page = lazy(() => import("./pages/messaging-v2/ThreadV2Page"));
 
 const ActivityPageV2 = lazy(() => import("./features/activity-v2/ActivityPageV2"));
