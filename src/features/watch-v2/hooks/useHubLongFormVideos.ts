@@ -10,7 +10,7 @@ export function useHubLongFormVideos(userId: string | undefined) {
     enabled: !!userId,
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
-      const { data, error } = await (supabase as unknown as RpcClient).rpc('get_long_form_videos', {
+      const { data, error } = await (supabase as unknown as RpcClient).rpc('get_long_form_videos_v2', {
         p_user_id: userId,
         p_mode: 'latest',
         p_page_size: 10,
