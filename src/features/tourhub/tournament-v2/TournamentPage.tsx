@@ -225,7 +225,7 @@ export function TournamentPage() {
           state={pulse.state}
           imageUrl={courseImage?.imageUrl ?? null}
           tourCode={tourCode}
-          leaderboard={leaderboard as any}
+          leaderboard={leaderboard}
         />
 
         {/* THE ACT */}
@@ -235,7 +235,7 @@ export function TournamentPage() {
               {hasBoard && (
                 <>
                   <SectionEyebrow kicker={t('tournament.shell.board.eyebrow')} actionLabel={t('tournament.shell.board.action')} onAction={openFullBoard} />
-                  <MiniBoard tournamentId={tournamentId!} entries={leaderboardRows as any} />
+                  <MiniBoard tournamentId={tournamentId!} entries={leaderboardRows} />
                 </>
               )}
               {/* Shared OnTheCourse — featured groups + FULL FIELD expander,
@@ -256,7 +256,7 @@ export function TournamentPage() {
           {pulse.state === 'completed' && hasBoard && (
             <>
               <SectionEyebrow kicker={t('tournament.shell.leaderboard.finalEyebrow')} actionLabel={t('tournament.shell.leaderboard.fullBoardAction')} onAction={openFullBoard} />
-              <MiniBoard tournamentId={tournamentId!} entries={leaderboardRows as any} />
+              <MiniBoard tournamentId={tournamentId!} entries={leaderboardRows} />
             </>
           )}
         </section>
@@ -300,7 +300,7 @@ export function TournamentPage() {
         onClose={() => setFullBoardOpen(false)}
         tournamentId={tournamentId!}
         meta={meta}
-        entries={leaderboardRows as any}
+        entries={leaderboardRows}
       />
     </TourHubShell>
   );
