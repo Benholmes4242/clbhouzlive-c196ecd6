@@ -1,91 +1,59 @@
-# Wave 3d.iii — final courses sub-wave
+## Blocker before I build
 
-## Scope receipt (measured, not assumed)
+The brief tells me to compose `HybridHero` as `PhotoBand → HeroWireTicker`, with `MiddleBand` and `LeaderboardBand` removed from the composition. But the current `HybridHero.tsx` doesn't render the three-band path for live/results/upcoming — it routes those states to `CinematicHeroFullBleed` (a 1,243-line full-bleed hero that owns title, eyebrow, venue, insight, moment row, dots, and even leaderboard rows). The three-band path only fires for the `cancelled` variant today.
 
-Ran the WARN-as-ERROR probe over the five sub-wave paths. Baseline:
+The brief says "CinematicFrame/CinematicHeroFullBleed — if the current design uses them for specific slides, they keep doing so." Read literally against the current code, that means "keep doing so for all three primary states", which conflicts with "compose PhotoBand + HeroWireTicker" and the demo reference (which is a PhotoBand+ticker layout).
 
-- **152 violations across 26 files** in `course-detail/` + `network/` + `map/` + `phase5/` + `features/courses/components/`.
-- Distribution (files with hits):
-  - `course-detail/` — 14 files (Claim*, CommunityScoreCard, ConnectHandicapCue, CourseAboutTab, CourseExploreLinks, CourseLocationPills, CourseReviewsTab, CourseTop100*, SuggestEditModal, AboutMediaStrip)
-  - `map/` — MapCourseSheet, MapInsightChip
-  - `network/` — NetworkHighlightCarousel, UnseenReviewsBanner
-  - `phase5/` — CourseStatusToggle, PersonalReviewCard, PlanningSignals
-  - `features/courses/components/holes/` — CourseHolesTab, HoleFeatureCards, HolesCredibilityHeader, HolesEmptyState, HolesScoringKey
+**Please confirm one of these two intents before I build:**
 
-All of it is user-visible copy: JSX text, `aria-label`, `title`, `placeholder`, `alt`, and prop-passed `label`s. No literals sit in constants that legitimately stay in English (brand vocabulary lives in `achievements/` and stayed there in the previous ruling).
+**A) Retire CinematicHeroFullBleed for live/results/upcoming.** The new `PhotoBand` (reworked per demo) + `HeroWireTicker` becomes the hero for all non-cancelled states. `CinematicHeroFullBleed` stops being reached by `HybridHero` (I'll leave the file in place and report it as dead-code for the sweep). This matches the demo reference and the "MiddleBand + LeaderboardBand out, HeroWireTicker in" file-composition line.
 
-## How to execute
+**B) Keep CinematicHeroFullBleed as-is for those states.** Then this brief only rewires the `cancelled` path (the sole three-band consumer), which nobody looks at, and the ticker never actually reaches the tour overview. I don't think this is what you want.
 
-Because a single 26-file drop-and-pray is a bad shape (merge conflicts, review load, and the risk of a partial extraction leaving the gate un-flippable), I'll run this as **three tight sub-batches inside 3d.iii**, one per turn, each landing green before the next starts:
+Assuming **A** (most consistent reading), here's the plan:
 
-**3d.iii.a — course-detail/ (14 files, ~110 violations)**
-- The bulk of the wave. Every file gets `useTranslation('courses')` if missing, JSX text and user-visible attrs routed through `t(...)`, with keys namespaced under:
-  - `courseDetail.claim.*` (CTA, sheet states, under-review, claimed profile link)
-  - `courseDetail.about.*` (media strip, description toggle, location empty, website button)
-  - `courseDetail.locationPills.*`
-  - `courseDetail.exploreLinks.*`
-  - `courseDetail.top100.*` (spotlight, summary)
-  - `courseDetail.suggestEdit.*`
-  - Plus the "Category Scores" / "Based on N ratings" strings on `CommunityScoreCard` and the empty-state / "Be the first" copy.
-- Interpolation for `{{clubName}}`, `{{count}}` (pluralised where the source already branches on `n === 1`), `{{cat}}` category label in State C of the claim sheet.
+## Plan (assuming A)
 
-**3d.iii.b — map/ + network/ + phase5/ (7 files, ~28 violations)**
-- `map.*`, `network.*`, `phase5.*` sub-namespaces; the `ConnectHandicapCue` COPY table's inline sentences move into keyed variants (`courseDetail.handicapCue.<variant>.benefit|sub`).
+### Part 1 — Extract `TickerShell`
+- New: `src/components/shared/wire/TickerShell.tsx` — presentation-only marquee shell (chip, 36px row, gap 24, marquee keyframes with per-instance duration var, pause-on-touch/hover, prefers-reduced-motion → native horizontal scroll, static-when-fits detection via `ResizeObserver` on track vs viewport).
+- Refactor `src/components/explore-tab-new/WireTicker.tsx` to render `<TickerShell>` with its existing chip/rows. Preserve the exact `#15171F` background, height 36, gap 24, chip colors, and `almanac-ticker-*` cadence. Screenshot compare in ship report.
 
-**3d.iii.c — features/courses/components/holes/ (5 files, ~14 violations)**
-- Extends the existing `holes.*` namespace already in `courses.json`.
-- No new locale namespaces — just additional keys.
+### Part 2 — `HeroWireTicker`
+- New: `src/features/tourhub/components/overview-v3/HybridHeroBands/HeroWireTicker.tsx`.
+- Reuses `TickerShell` with `background = "#15171F"` (same constant, extracted to `shared/wire/tokens.ts` so both consumers import it), `dividerTop`.
+- Data:
+  - `results` / `live`: `safeLeaderboard.filter(r => r.position != null && r.position <= 10)` — full tie inclusion, no slice. `T{n}` label when `position_tied` (or derived duplicate-position). Reuse `getScoreColor` from `_shared/scoreColor` on dark theme.
+  - `live`: append `THRU {thru}` per row when `r.thru != null` and round incomplete.
+  - `upcoming`: rows from `useAIPredictions(tournament.id).topContenders`, sorted by `worldRanking` asc, right slot shows `OWGR {n}` muted. Zero new fetch — reuse the query-cache key already used by TI section. No predictions → return `null` (band absent).
+- Chip variants: `TOP 10` (red), `LIVE` (red bg + white pulsing dot — reuse existing `hybrid-live-pulse` class), `THE FIELD` (amber).
+- Team events: team rows (name + score, optional crest), same `<=10` rule.
 
-## Locale coverage
+### Part 3 — `PhotoBand` content rework
+Rebuild the lower-third stack per demo. Bottom-anchored (`left/right/bottom 16`):
+1. Eyebrow (10.5/800/ls1.2) — state-driven (`🏆 FINAL · TOUR`, `LIVE · TOUR` with pulse dot, `UPCOMING · TOUR`) + optional gold `MAJOR` chip.
+2. Title — 38/800/-1.1 uppercase, 2-line clamp, verified against `ISPS HANDA WOMEN'S SCOTTISH OPEN`.
+3. Venue line — 13/600, state-specific suffix (`Final round complete` / `Round {n} in play` / `{date range}`).
+4. Insight — 13.5/500, `courseAnalysis.insight` from `useAIPredictions`, 2-line clamp, omitted when empty.
+5. Moment row — champion (gold ring, `★ CHAMPION`, score + `Won by {margin}`) / leader (plain ring, `LEADER` or `TIED LEAD · n`, score + `THRU`) / defender + countdown (`D:H:M` clusters, or far-variant start-date).
+6. Dots + `TOURNAMENT ›` row moved inside PhotoBand.
 
-Every new key lands in all six locales in the same turn it's introduced:
-- `en`, `de`, `es`, `ja`, `ko`, `en-XA`.
-- `en-XA` gets pseudo-localised strings (`[!!ëẍáṁṗłë!!]` style) matching the existing convention in the file.
-- Non-English locales get English fallback text with a `// TODO: translate` sibling only if the existing file uses that convention; a quick scan says the file just carries English strings today, so I'll mirror that pattern rather than invent one.
+Preserves the current `PhotoBand` height contract (no new height token). All avatars via existing `PlayerAvatar` (PGA-first candidates untouched).
 
-## ESLint config — parent-dir gate consolidation
+### Part 4 — `HybridHero` composition
+- Route `live | results | upcoming` (non-cancelled) to `PhotoBand → HeroWireTicker`.
+- `cancelled` → keep existing three-band path (restyled cancelled message only).
+- Keep untouched: `useHeroCarouselData`, `useTournamentPulse`, `useTourLeaderboard`, `useAIPredictions`, carousel dots, `onSelectTour`, tournament link.
+- Grep `MiddleBand` / `LeaderboardBand` importers post-change; if zero, report for dead-code sweep (don't delete tonight).
 
-Only after all three sub-batches show 0 with the ERROR rule locally. The three sub-wave ERROR blocks (3d.i, 3d.ii, 3d.iii) collapse into a single block:
+### Part 5 — i18n
+Add to `public/locales/en/tourhub.json` under `hero.*`:
+`finalRoundComplete`, `roundInPlay` (with `{{n}}`), `leader`, `tiedLead` (with `{{n}}`), `champion`, `defends`, `top10`, `live`, `theField`, `wonBy` (with `{{margin}}`).
 
-```js
-// ─── Wave 3d — scope-dir ERROR flip for courses vertical ──────────
-{
-  files: [
-    "src/components/courses/**/*.{ts,tsx}",
-    "src/components/course-media-tab/**/*.{ts,tsx}",
-    "src/features/courses/**/*.{ts,tsx}",
-  ],
-  rules: {
-    "i18next/no-literal-string": ["error", i18nLiteralOptions],
-    "no-restricted-syntax": ["error", literalAttrSyntax, ...toLocaleSyntax],
-  },
-},
-```
+### Ship report contents
+- Side-by-side screenshot: courses Discover wire before/after `TickerShell` refactor.
+- Slide-by-slide capture: results (with ties — verify against The Open if data present), live (chip pulse + THRU), upcoming (predictions → THE FIELD; no predictions → no band), team event, cancelled.
+- Network diff: zero added requests on overview mount.
+- `CinematicHeroFullBleed` / `MiddleBand` / `LeaderboardBand` importer counts post-change.
+- `tsc` output.
 
-The three narrower blocks (`courses/*.{ts,tsx}`, `courses/review/**`, `courses/user/**`, `course-media-tab/**`, `_shared/**`) are removed as they're now covered by the two `**` globs. This closes the gap so any new file under `src/components/courses/**` or `src/features/courses/**` is gated on creation.
-
-## Carry-over items
-
-Both already landed in the previous turn per the summary:
-- `PersonalReviewCard` / `CommunityScoreCard` / `CourseReviewsTab` — `{ key, labelKey }` conversion is done; I verified `t(labelKey)` sites in the files I just read.
-- Achievements "pending-Ben" markers — flipped to "by product ruling".
-
-No re-work needed on these; the receipts below will confirm on grep.
-
-## Receipts each sub-batch will paste back
-
-1. `npx eslint --rule '{"i18next/no-literal-string":["error",...]}' <sub-batch paths>` → **0 errors**.
-2. Full-scope re-probe after the last sub-batch: same command over all five paths → **0 errors**.
-3. `grep -rn '\bpending Ben\b' src/components/achievements/` → 0 hits.
-4. `git diff --stat` per sub-batch.
-5. `npx tsc --noEmit` clean; `vite build` succeeds.
-
-## Non-goals for this wave
-
-- No visual changes; extraction is text-in-place with `t(...)` swaps.
-- No refactor of the ConnectHandicapCue variant table's structure — the COPY object stays, its string returns move to `t(...)`.
-- No touching files outside the five listed directories.
-
----
-
-**Ready to fire 3d.iii.a on your go.** Landing all three sub-batches plus the gate consolidation in one turn is technically possible but would ship ~40 file edits and ~150 locale-key additions without an intermediate green light — I'd rather you see 3d.iii.a's receipts first and greenlight .b and .c.
+## Reply with **A** or **B**, or amend, and I'll ship.
