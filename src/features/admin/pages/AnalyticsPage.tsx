@@ -1327,3 +1327,31 @@ function StatBox({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
+
+// ─── Funnels ──────────────────────────────────────────────────────────────────
+
+function FunnelsTab({ period }: { period: AnalyticsPeriod }) {
+  const { signup, rating, auth } = useFunnels(period);
+
+  const anyError = signup.isError || rating.isError || auth.isError;
+  const refetchAll = () => { signup.refetch(); rating.refetch(); auth.refetch(); };
+
+  return (
+    <>
+      {anyError && (
+        <AdminErrorState title="Couldn't load funnels" onRetry={refetchAll} />
+      )}
+      {signup.data
+        ? <FunnelCard view={signup.data} loading={signup.isLoading} />
+        : <FunnelCard view={{ id: 'signup', title: 'Sign-up', subtitle: '', steps: [], isEmpty: true }} loading />}
+      {rating.data
+        ? <FunnelCard view={rating.data} loading={rating.isLoading} />
+        : <FunnelCard view={{ id: 'rating', title: 'Course rating', subtitle: '', steps: [], isEmpty: true }} loading />}
+      {auth.data
+        ? <FunnelCard view={auth.data} loading={auth.isLoading} />
+        : <FunnelCard view={{ id: 'auth', title: 'Auth flow', subtitle: '', steps: [], isEmpty: true }} loading />}
+
+      <div style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 8px)' }} />
+    </>
+  );
+}
