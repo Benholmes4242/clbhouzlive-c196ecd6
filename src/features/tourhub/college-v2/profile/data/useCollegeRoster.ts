@@ -75,7 +75,7 @@ export function useCollegeRoster(normalizedName: string | undefined) {
           fullName: p.full_name || `${p.first_name ?? ''} ${p.last_name ?? ''}`.trim() || 'Alumnus',
           country: p.country ?? null,
           photoUrl: p.photo_url ?? null,
-          tourCodes: (p as any).tour_codes ?? null,
+          tourCodes: (p as { tour_codes?: string[] | null }).tour_codes ?? null,
           earnings: s?.earnings ?? 0,
           wins: s?.wins ?? 0,
           eventsPlayed: s?.events ?? 0,
