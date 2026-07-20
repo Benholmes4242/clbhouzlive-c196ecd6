@@ -69,7 +69,7 @@ export function ThisWeek({ slug, collegeName }: Props) {
       <header style={{ padding: '16px 16px 8px' }}>
         <div
           style={{
-            fontSize: 9,
+            fontSize: 10,
             fontWeight: 800,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
