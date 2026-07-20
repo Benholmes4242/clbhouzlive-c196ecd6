@@ -379,7 +379,7 @@ export function TheClass({ slug, collegeName }: Props) {
                 ) : tourTag ? (
                   <span
                     style={{
-                      fontSize: 9,
+                      fontSize: 10,
                       fontWeight: 700,
                       padding: '2px 6px',
                       borderRadius: 999,
