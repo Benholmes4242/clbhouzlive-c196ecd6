@@ -6,12 +6,21 @@
  * inserts. Media is HELD LOCALLY until the caller invokes flushToReview(),
  * which uploads each pending item and inserts a course_review_media row
  * (review_id = rating_id, status = 'attached').
+ *
+ * Visibility (pending card): flushToReview() also registers ONE pending
+ * job with usePendingPostsStore (kind:'review') so the author's profile
+ * Posts tab renders a "Review · Posting…" card while uploads run. This
+ * store integration is visibility-only — execution stays in this hook.
+ * The hard-fenced UploadManager / uploadPipeline are NEVER called from
+ * the review path.
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { uploadVideoResilient } from '@/uploads/resilientVideoUpload';
+import { usePendingPostsStore, type PendingPost } from '@/uploads/pendingPostsStore';
+import { reviewRetryRegistry } from '@/uploads/reviewRetryRegistry';
 import { REVIEW_V2_LIMITS } from '../tokens';
 import type { ExistingMedia, MediaItem } from '../types';
 
@@ -56,12 +65,31 @@ async function probeImageDims(file: File): Promise<{ width: number; height: numb
   });
 }
 
+export interface ReviewPipelineIdentity {
+  actorType: 'personal' | 'business';
+  actorId: string;
+  viewerActorType: 'personal' | 'business';
+  viewerActorId: string;
+  authorName: string;
+  authorAvatarUrl: string | null;
+  authorUsername: string | null;
+  courseId?: string;
+  courseName?: string;
+}
+
 interface UseReviewMediaPipelineArgs {
   userId: string | null;
   existingMedia?: ExistingMedia[];
+  /** Required to register a pending card on flush. Omit → no card. */
+  identity?: ReviewPipelineIdentity;
 }
 
-export function useReviewMediaPipeline({ userId, existingMedia }: UseReviewMediaPipelineArgs) {
+interface ActiveJob {
+  jobId: string;
+  reviewId: string;
+}
+
+export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseReviewMediaPipelineArgs) {
   const [items, setItems] = useState<MediaItem[]>(() =>
     (existingMedia ?? []).map<MediaItem>((m) => ({
       id: `existing-${m.id}`,
@@ -92,6 +120,13 @@ export function useReviewMediaPipeline({ userId, existingMedia }: UseReviewMedia
     blobUrlsRef.current.add(url);
     return url;
   };
+
+  // Refs so callbacks (e.g. retry) always see current items / active job.
+  const itemsRef = useRef<MediaItem[]>(items);
+  useEffect(() => { itemsRef.current = items; }, [items]);
+  const activeJobRef = useRef<ActiveJob | null>(null);
+  const identityRef = useRef<ReviewPipelineIdentity | undefined>(identity);
+  useEffect(() => { identityRef.current = identity; }, [identity]);
 
   const addFiles = useCallback(
     async (files: File[]) => {
@@ -196,6 +231,11 @@ export function useReviewMediaPipeline({ userId, existingMedia }: UseReviewMedia
 
   const updateItem = useCallback((id: string, patch: Partial<MediaItem>) => {
     setItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...patch } : i)));
+    // Mirror progress into the pending-card store when a review flush is active.
+    const active = activeJobRef.current;
+    if (active && typeof patch.progress === 'number') {
+      usePendingPostsStore.getState().updateProgress(active.jobId, id, patch.progress);
+    }
   }, []);
 
   const uploadOne = useCallback(
@@ -305,27 +345,100 @@ export function useReviewMediaPipeline({ userId, existingMedia }: UseReviewMedia
     [userId, updateItem],
   );
 
+  // Flush every pending/failed item to the given review. Registers ONE
+  // pending-card job for the whole flush (visibility only). On completion:
+  //   - all items ready → removeJob (card disappears)
+  //   - any item failed → markFailed (Retry primed via reviewRetryRegistry)
   const flushToReview = useCallback(
-    async (reviewId: string) => {
-      const pending = items.filter((i) => i.status === 'pending' || i.status === 'failed');
-      // Modest concurrency: sequential is fine for a review's media set.
-      for (const it of pending) {
-        // Skip items removed since dispatch.
-        if (!items.find((c) => c.id === it.id)) continue;
-        // eslint-disable-next-line no-await-in-loop
-        await uploadOne(it, reviewId);
+    async (reviewId: string, opts?: { caption?: string }) => {
+      const pending = itemsRef.current.filter((i) => i.status === 'pending' || i.status === 'failed');
+      if (pending.length === 0) return;
+
+      const store = usePendingPostsStore.getState();
+      const ident = identityRef.current;
+
+      // Register pending card only when we have identity (composer wires it).
+      let jobId: string | null = null;
+      if (ident && userId) {
+        jobId = (typeof crypto !== 'undefined' && crypto.randomUUID)
+          ? crypto.randomUUID()
+          : `rv2-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        const entry: PendingPost = {
+          jobId,
+          kind: 'review',
+          postId: null,
+          reviewId,
+          actorType: ident.actorType,
+          actorId: ident.actorId,
+          userId,
+          viewerActorType: ident.viewerActorType,
+          viewerActorId: ident.viewerActorId,
+          authorName: ident.authorName,
+          authorAvatarUrl: ident.authorAvatarUrl,
+          authorUsername: ident.authorUsername,
+          caption: (opts?.caption ?? '').trim() || (ident.courseName ? `Review · ${ident.courseName}` : 'New review'),
+          media: pending.map((it) => ({ id: it.id, kind: it.type, previewUrl: it.previewUrl })),
+          courseId: ident.courseId,
+          courseName: ident.courseName,
+          totalFiles: pending.length,
+          fileProgress: {},
+          status: 'uploading',
+          files: [], // review pipeline owns its own File refs; no re-enqueue via UploadManager.
+          createdAt: new Date().toISOString(),
+        };
+        store.addPending(entry);
+        activeJobRef.current = { jobId, reviewId };
+
+        // Retry primitive for the review branch of PendingPostCard.
+        reviewRetryRegistry.register(jobId, async () => {
+          const failed = itemsRef.current.filter((i) => i.status === 'failed');
+          if (failed.length === 0) return;
+          activeJobRef.current = { jobId: jobId!, reviewId };
+          for (const it of failed) {
+            // eslint-disable-next-line no-await-in-loop
+            await uploadOne(it, reviewId);
+          }
+          const anyStillFailed = itemsRef.current.some((i) => i.status === 'failed');
+          if (anyStillFailed) {
+            usePendingPostsStore.getState().markFailed(jobId!, 'Some items failed');
+          } else {
+            usePendingPostsStore.getState().removeJob(jobId!);
+            reviewRetryRegistry.unregister(jobId!);
+            activeJobRef.current = null;
+          }
+        });
+      }
+
+      try {
+        for (const it of pending) {
+          // Skip items removed since dispatch.
+          if (!itemsRef.current.find((c) => c.id === it.id)) continue;
+          // eslint-disable-next-line no-await-in-loop
+          await uploadOne(it, reviewId);
+        }
+      } finally {
+        if (jobId) {
+          const anyFailed = itemsRef.current.some((i) => i.status === 'failed');
+          if (anyFailed) {
+            usePendingPostsStore.getState().markFailed(jobId, 'Some items failed');
+          } else {
+            usePendingPostsStore.getState().removeJob(jobId);
+            reviewRetryRegistry.unregister(jobId);
+            activeJobRef.current = null;
+          }
+        }
       }
     },
-    [items, uploadOne],
+    [userId, uploadOne],
   );
 
   const retryItem = useCallback(
     async (id: string, reviewId: string) => {
-      const it = items.find((i) => i.id === id);
+      const it = itemsRef.current.find((i) => i.id === id);
       if (!it) return;
       await uploadOne(it, reviewId);
     },
-    [items, uploadOne],
+    [uploadOne],
   );
 
   const hasNewMedia = useCallback(() => items.some((i) => !i.isExisting), [items]);
