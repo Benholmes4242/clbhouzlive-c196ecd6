@@ -45,18 +45,22 @@ const humanAction = (action: string): string => {
   }
 };
 
+const titleCase = (s: string): string =>
+  s.replace(/[_-]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+
 const reportKindTitle = (row: ModerationQueueRow): string => {
-  const reason = row.reasons[0] ?? 'reported';
-  if (row.kind === 'post') return `Post reported: ${reason}`;
-  return `User reported: ${reason}`;
+  return row.kind === 'post' ? 'Post reported' : 'User reported';
 };
 
 const reportMeta = (row: ModerationQueueRow): string => {
   const who = row.kind === 'post'
-    ? (row.targetPost?.author?.display_name ?? row.targetPost?.author?.username ?? 'unknown')
-    : (row.targetUser?.display_name ?? row.targetUser?.username ?? 'unknown');
+    ? (row.targetPost?.author?.display_name ?? row.targetPost?.author?.username ?? 'A member')
+    : (row.targetUser?.display_name ?? row.targetUser?.username ?? 'A member');
   const n = row.report_count;
-  return `Report - ${n} report${n === 1 ? '' : 's'} against ${who}`;
+  const raw = (row.reasons[0] ?? '').trim();
+  const hasReason = raw.length > 0 && raw.toLowerCase() !== 'reported';
+  const base = `Report - ${n} report${n === 1 ? '' : 's'} against ${who}`;
+  return hasReason ? `${base} - ${titleCase(raw)}` : base;
 };
 
 // ---------------- hook ----------------
