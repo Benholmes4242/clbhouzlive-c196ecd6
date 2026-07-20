@@ -665,7 +665,31 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
             </div>
           )}
 
-          {isLoading && (
+          {badgesError && !isLoading && (
+            <div style={{ padding: '48px 16px', textAlign: 'center' }}>
+              <div style={{ color: INK, fontSize: 15, fontWeight: 700, marginBottom: 12 }}>
+                Couldn't load the trophy room
+              </div>
+              <button
+                type="button"
+                onClick={() => refetchBadges()}
+                style={{
+                  background: AMBER,
+                  color: '#0F172A',
+                  border: 'none',
+                  borderRadius: 999,
+                  padding: '9px 18px',
+                  fontSize: 13,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                Retry
+              </button>
+            </div>
+          )}
+
+          {!badgesError && isLoading && (
             <>
               {/* Lifetime skeleton — mirrors 2-up ShowpieceCards. */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8, marginTop: 4 }}>
