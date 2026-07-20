@@ -197,8 +197,8 @@ const TrophyRoomEntryRow: React.FC<Props> = ({
     return { weeklyCount: weekly, lifetimeCount: earned.length, recentRarities: recent };
   }, [achievements]);
 
-  // Wait for data before rendering anything (avoids empty-state flash)
-  if (!achievements) return null;
+  const show = !!achievements;
+
 
   const isLight = variant === 'light';
   const isFriend = viewMode === 'friend';
