@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -11,7 +11,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { DeleteBusinessDialog } from './DeleteBusinessDialog';
 import { useBusinessStats7d } from '@/hooks/useBusinessStats7d';
 import { formatNumber } from '@/i18n/format';
 import { useBusinessFollowersCount } from '@/hooks/useBusinessFollow';
