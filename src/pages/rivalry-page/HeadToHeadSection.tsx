@@ -7,7 +7,6 @@
  */
 import React, { useMemo } from 'react';
 import {
-  BG_1,
   LINE,
   FONT,
   T60,
@@ -24,6 +23,7 @@ import {
 import { whoLeads } from './h2h/_shared/whoLeads';
 import { H2HScoreBanner } from './h2h/H2HScoreBanner';
 import { StatsGroup, type StatItem } from './h2h/StatsGroup';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface Props {
   viewerId: string | undefined;
@@ -97,11 +97,10 @@ export const HeadToHeadSection: React.FC<Props> = ({
 
 const H2HSkeleton: React.FC = () => (
   <div style={{ padding: '20px 16px 0', fontFamily: FONT }}>
-    <div
-      className="animate-pulse"
+    <Skeleton
+      variant="dark"
       style={{
         height: 96,
-        background: BG_1,
         border: `1px solid ${LINE}`,
         borderRadius: 12,
         marginBottom: 16,
@@ -121,11 +120,10 @@ const H2HSkeleton: React.FC = () => (
         >
           Loading…
         </div>
-        <div
-          className="animate-pulse"
+        <Skeleton
+          variant="dark"
           style={{
             height: 220,
-            background: BG_1,
             border: `1px solid ${LINE}`,
             borderRadius: 12,
           }}
