@@ -7,6 +7,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { ComingUpSlot } from '../overview-v3/ComingUpSlot';
+import { CourseOfTheWeekSection } from '../../overview/sections/CourseOfTheWeekSection';
 import { CollegeFranchise } from '../../overview/sections/CollegeFranchise';
 import { ConnectHandicapTile } from '../../overview/sections/ConnectHandicapTile';
 import { LazySection } from '../overview-v3/LazySection';
@@ -99,6 +100,7 @@ export function OverviewPageV3() {
             <LazySection minHeight={350}>
               <CollegeFranchise />
             </LazySection>
+            <CourseOfTheWeekSection />
             <LazySection minHeight={90}>
               <ConnectHandicapTile />
             </LazySection>
