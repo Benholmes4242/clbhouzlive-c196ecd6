@@ -366,7 +366,7 @@ export function TheClass({ slug, collegeName }: Props) {
                     </span>
                     <span
                       style={{
-                        fontSize: 8.5,
+                        fontSize: 10,
                         fontWeight: 700,
                         color: INK_FAINT,
                         letterSpacing: '0.08em',
