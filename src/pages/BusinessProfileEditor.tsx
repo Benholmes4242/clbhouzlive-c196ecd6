@@ -238,11 +238,11 @@ export default function BusinessProfileEditor() {
       });
     }
 
-    setShowOpeningHours(!!(business as any).show_opening_hours);
+    setShowOpeningHours(!!business.show_opening_hours);
     setOpeningHours(business.opening_hours ? { ...business.opening_hours } : { ...DEFAULT_OPENING_HOURS });
 
-    setAmenities(Array.isArray((business as any).amenities) ? (business as any).amenities : []);
-    setPrimaryAction(((business as any).primary_action as PrimaryActionKey | null) || null);
+    setAmenities(Array.isArray(business.amenities) ? business.amenities : []);
+    setPrimaryAction((business.primary_action as PrimaryActionKey | null) || null);
 
     const sl = business.social_links || {};
     setSocial({
