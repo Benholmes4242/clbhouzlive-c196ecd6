@@ -35,6 +35,7 @@ export interface HubRpcRow {
   media_type?: string | null;
   media_url?: string | null;
   poster_url?: string | null;
+  hls_url?: string | null;
   stream_id?: string | null;
   duration_seconds?: number | null;
   width?: number | null;
@@ -55,6 +56,26 @@ export interface HubRpcRow {
   review_course_id?: string | null;
   review_course_name?: string | null;
   review_course_image?: string | null;
+  review_course_region?: string | null;
+  review_course_country?: string | null;
+  review_course_sub_country?: string | null;
+  review_text?: string | null;
+  review_design_score?: number | null;
+  review_condition_score?: number | null;
+  review_clubhouse_score?: number | null;
+  review_facilities_score?: number | null;
+  /**
+   * get_long_form_videos returns per-category scores as a single jsonb blob
+   * (`review_categories`) instead of flat columns. We unpack it below into
+   * review_*_score so `mapRowToFeedPost` builds a full breakdown identically
+   * to every other feed surface.
+   */
+  review_categories?: {
+    design?: number | null;
+    conditions?: number | null;
+    clubhouse?: number | null;
+    facilities?: number | null;
+  } | null;
   creator_relation?: string | null;
   is_liked_by_me?: boolean | null;
   is_followed_by_me?: boolean | null;
@@ -66,6 +87,15 @@ export interface HubRpcRow {
 }
 
 function rowDefaults(row: HubRpcRow): FeedRpcRow {
+  const cats = (row.review_categories && typeof row.review_categories === 'object')
+    ? row.review_categories
+    : null;
+  const isReview = !!(row.source_review_id ?? row.review_id);
+  // Long-form videos return course_id/course_name (not review_course_*), so
+  // fall back to those when the row is review-sourced so the sheet still
+  // receives a valid `review` object.
+  const reviewCourseId = row.review_course_id ?? (isReview ? row.course_id ?? null : null);
+  const reviewCourseName = row.review_course_name ?? (isReview ? row.course_name ?? null : null);
   return {
     post_id: row.post_id,
     post_content: row.post_content ?? null,
@@ -95,9 +125,17 @@ function rowDefaults(row: HubRpcRow): FeedRpcRow {
     comment_count: Number(row.comment_count ?? 0),
     share_count: Number(row.share_count ?? 0),
     review_rating: row.review_rating ?? row.review_overall_score ?? null,
-    review_course_id: row.review_course_id ?? null,
-    review_course_name: row.review_course_name ?? null,
+    review_course_id: reviewCourseId,
+    review_course_name: reviewCourseName,
     review_course_image: row.review_course_image ?? null,
+    review_course_region: row.review_course_region ?? null,
+    review_course_country: row.review_course_country ?? null,
+    review_course_sub_country: row.review_course_sub_country ?? null,
+    review_text: row.review_text ?? null,
+    review_design_score: row.review_design_score ?? cats?.design ?? null,
+    review_condition_score: row.review_condition_score ?? cats?.conditions ?? null,
+    review_clubhouse_score: row.review_clubhouse_score ?? cats?.clubhouse ?? null,
+    review_facilities_score: row.review_facilities_score ?? cats?.facilities ?? null,
     creator_relation: (row.creator_relation ?? 'none') as FeedRpcRow['creator_relation'],
     is_liked_by_me: !!row.is_liked_by_me,
     is_followed_by_me: !!row.is_followed_by_me,
