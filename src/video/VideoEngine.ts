@@ -1365,8 +1365,11 @@ class VideoEngineImpl {
     this.lanes.forEach((lane) => {
       if (lane.audioPolicy === 'local' && !this.borrowedLanes.has(lane.id)) return;
       const desiredMuted = lane.id !== speaker;
-      // always-muted lanes must stay muted regardless of speaker calc.
-      const finalMuted = lane.audioPolicy === 'always-muted' ? true : desiredMuted;
+      // always-muted lanes must stay muted regardless of speaker calc —
+      // EXCEPT while borrowed by the fullscreen viewer, which promotes the
+      // lane to 'session' semantics (mirrors applyAudioPolicy's contract).
+      const isBorrowed = this.borrowedLanes.has(lane.id);
+      const finalMuted = lane.audioPolicy === 'always-muted' && !isBorrowed ? true : desiredMuted;
       if (lane.el.muted !== finalMuted) {
         changes.push({ laneId: lane.id, from: lane.el.muted, to: finalMuted, policy: lane.audioPolicy });
       }
