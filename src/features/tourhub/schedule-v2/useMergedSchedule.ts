@@ -78,6 +78,7 @@ export function useMergedSchedule(options?: { enabled?: boolean }): {
   data: SeasonTimeline | null;
   isLoading: boolean;
   error: Error | null;
+  refetch: () => void;
 } {
   const enabled = options?.enabled ?? true;
   const year = new Date().getFullYear();
