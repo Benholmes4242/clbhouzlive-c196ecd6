@@ -313,7 +313,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
 
   const effectiveViewerId = viewerUserId ?? userId;
   const isFriendView = viewerUserId !== undefined && viewerUserId !== userId;
-  const { data: badges = [], isLoading: badgesLoading } = useUserAchievements(open ? userId : undefined);
+  const { data: badges = [], isLoading: badgesLoading, isError: badgesError, refetch: refetchBadges } = useUserAchievements(open ? userId : undefined);
   const { data: legends = [], isLoading: legendsLoading } = useUserTopLegends(open ? userId : undefined, {
     limit: 500,
     maxRank: 1,
