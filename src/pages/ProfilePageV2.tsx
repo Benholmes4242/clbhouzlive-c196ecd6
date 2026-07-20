@@ -32,6 +32,7 @@ import { useStartConversation } from '@/hooks/messaging/useStartConversation';
 import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
+import { Skeleton } from '@/components/ui/skeleton';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
 
@@ -179,7 +180,7 @@ const ProfilePageV2Content: React.FC = () => {
   const { data: profile, isLoading: profileLoading, isError: profileError, refetch: refetchProfile } = useUserProfile(profileUserId);
   const { data: postsCount = 0, isLoading: postsCountLoading } = usePersonalPostsCount(profileUserId);
   const { data: reviewsCount = 0, isLoading: reviewsCountLoading } = usePersonalReviewsCount(profileUserId);
-  const { data: achievements } = useProfileAchievements(profileUserId);
+  const { data: achievements, isLoading: achievementsLoading } = useProfileAchievements(profileUserId);
 
   // Two-flag model:
   //   isOwnAccount = the auth user owns this profile (drives personal-identity UI:
@@ -615,6 +616,18 @@ const ProfilePageV2Content: React.FC = () => {
           />
         );
       case 'achievements':
+        if (achievementsLoading) {
+          return (
+            <div className="px-4 pt-6">
+              <Skeleton className="h-4 w-32 rounded mb-4" />
+              <div className="grid grid-cols-2 gap-3">
+                {[0, 1, 2, 3, 4, 5].map((i) => (
+                  <Skeleton key={i} className="w-full rounded-xl" style={{ aspectRatio: '3 / 4' }} />
+                ))}
+              </div>
+            </div>
+          );
+        }
         return (
           <AchievementsPane 
             userId={profile?.id}
