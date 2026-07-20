@@ -266,7 +266,7 @@ function AuditCard({ row }: { row: AuditEntry }) {
 
 // ─── Tab 2: Dev Tools ─────────────────────────────────────────────────────────
 
-function DevToolsTab() {
+export function DevToolsTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <EgSyncDetailCard />
@@ -476,7 +476,7 @@ const ghostBtn: React.CSSProperties = {
 
 // ─── Tab 3: Settings ──────────────────────────────────────────────────────────
 
-function SettingsTab() {
+export function SettingsTab() {
   const { user } = useSupabaseSession();
   const { role } = usePanelRole();
   const [pillsVisible, setPillsVisible] = useAdminPillVisibility();
