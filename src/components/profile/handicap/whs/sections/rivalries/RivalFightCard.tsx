@@ -73,7 +73,7 @@ export const RivalFightCard: React.FC<Props> = ({
   // Hero photo fallback chain — venue isn't on the hydrated type yet, so we
   // fall back through the available portrait sources.
   const heroPhoto =
-    (rivalry as any).most_played_venue_photo_url ??
+    (rivalry as { most_played_venue_photo_url?: string | null }).most_played_venue_photo_url ??
     rivalry.rival_header_photo_url ??
     rivalry.rival_profile_photo_url ??
     rivalry.rival_thumbnail_url ??
