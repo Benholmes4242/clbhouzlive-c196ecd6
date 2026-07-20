@@ -159,7 +159,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   const canFollowActor =
     activePost.actorType === 'personal' || activePost.actorType === 'business';
   const { isFollowing: canonicalFollowing } = useFollowState({
-    targetActorType: canFollowActor ? activePost.actorType : 'personal',
+    targetActorType: canFollowActor ? (activePost.actorType as 'personal' | 'business') : 'personal',
     targetActorId: canFollowActor ? activePost.actorId : undefined,
     viewerActorType: activeActor?.type ?? 'personal',
     viewerActorId: activeActor?.id ?? undefined,
