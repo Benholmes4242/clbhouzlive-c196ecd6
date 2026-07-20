@@ -414,7 +414,19 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
           state={state}
           leaderboard={safeLeaderboard}
           upcomingContenders={upcomingContenders}
+          emptyStateFacts={{
+            datesString,
+            venueName: tournament.venueName,
+            defenderName: defendingChamp?.name ?? null,
+            defenderYear: defendingChamp?.year ?? null,
+            defenderScore: defendingChamp?.score ?? null,
+            defenderSurname: defendingChamp?.name
+              ? defendingChamp.name.trim().split(/\s+/).slice(-1)[0]
+              : null,
+            purse: tournament.purse ? formatPurse(tournament.purse) : null,
+          }}
         />
+
       </div>
     );
   }
