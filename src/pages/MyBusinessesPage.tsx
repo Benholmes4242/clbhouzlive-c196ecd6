@@ -168,10 +168,12 @@ function BusinessesAccordion({
   memberships,
   userId,
   activeBusinessId,
+  onRequestDelete,
 }: {
   memberships: ReturnType<typeof useMyBusinesses>['data'] extends (infer T)[] | undefined ? T[] : never;
   userId: string;
   activeBusinessId: string | null;
+  onRequestDelete: (input: { id: string; name: string }) => void;
 }) {
   // Default open: single business → itself; multi → first entry (sorted: active first).
   const defaultOpenId = memberships[0]?.business?.id ?? null;
@@ -202,6 +204,7 @@ function BusinessesAccordion({
             onToggle={() => {
               setOpenId((prev) => (prev === bizId ? null : bizId ?? null));
             }}
+            onRequestDelete={onRequestDelete}
           />
         );
       })}
