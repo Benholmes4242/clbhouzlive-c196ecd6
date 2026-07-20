@@ -292,7 +292,7 @@ function AlertBannerRow({
   // Only push failing.
   return (
     <BannerLink
-      to="/admin-v2/push-health"
+      to="/admin-v2/health?tab=status"
       tone="danger"
       message="Push notifications failing - open push health"
     />
