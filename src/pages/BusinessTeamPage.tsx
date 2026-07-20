@@ -352,7 +352,7 @@ export default function BusinessTeamPage() {
                 {(team || []).length}
               </span>
             </div>
-            <div className="[&>*+*]:border-t" style={{ ['--tw-border-opacity' as any]: 1 }}>
+            <div className="[&>*+*]:border-t" style={{ ['--tw-border-opacity' as string]: 1 } as React.CSSProperties}>
               {teamLoading ? (
                 [0, 1, 2].map(i => (
                   <div key={i} className="flex items-center gap-3 py-3">
