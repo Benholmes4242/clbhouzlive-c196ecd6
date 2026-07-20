@@ -347,7 +347,7 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  {tierName} {currentLevel.level}
+                  {tierName}
                 </span>
               </div>
 
@@ -658,7 +658,7 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
                 whiteSpace: 'nowrap',
               }}
             >
-              {tierName} {currentLevel.level}
+              {tierName}
             </span>
           </div>
 
