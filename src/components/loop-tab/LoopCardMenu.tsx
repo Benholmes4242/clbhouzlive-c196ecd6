@@ -180,7 +180,7 @@ export const LoopCardMenu = React.memo(function LoopCardMenu({
                 <>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
-                    onClick={() => setConfirmOpen(true)}
+                    onClick={handleBlock}
                     className="gap-2 text-sm text-destructive focus:text-destructive"
                   >
                     <Ban className="h-4 w-4" />
