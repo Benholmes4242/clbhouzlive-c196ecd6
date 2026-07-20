@@ -319,12 +319,46 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
       return aiInsight;
     }
     if (state.kind === 'results') {
-      // Results: prefer the champion narrative if the source data has one.
-      return tournament.championNarrative?.trim() || aiInsight;
+      // Results: derive the line from the actual leaderboard to avoid stale
+      // editorial strings contradicting the real outcome.
+      return buildResultLine() ?? aiInsight;
     }
     // Upcoming: AI course insight is the strongest tell.
     return aiInsight;
-  }, [state, aiInsight, tournament.championNarrative]);
+
+    function buildResultLine(): string | null {
+      if (!champion || isTeamEvent) return null;
+      const leader: any = safeLeaderboard[0];
+      if (!leader) return null;
+      const runner: any = safeLeaderboard[1];
+      const margin =
+        runner && leader && typeof runner.score === 'number' && typeof leader.score === 'number'
+          ? runner.score - leader.score
+          : null;
+      const name = champion.name;
+      const score = champion.score;
+      const runnerUp =
+        runner?.player?.full_name ||
+        `${runner?.player?.first_name ?? ''} ${runner?.player?.last_name ?? ''}`.trim() ||
+        null;
+
+      if (wasPlayoff) {
+        return t('overview.photoBand.resultPlayoff', { name, score });
+      }
+      if (margin !== null && margin >= 1) {
+        if (runnerUp) {
+          return t('overview.photoBand.resultWonBy', {
+            name,
+            score,
+            runnerUp,
+            count: margin,
+          });
+        }
+        return t('overview.photoBand.resultClosedAt', { name, score });
+      }
+      return t('overview.photoBand.resultClosedAt', { name, score });
+    }
+  }, [state, aiInsight, champion, isTeamEvent, safeLeaderboard, wasPlayoff, t]);
 
   // Moment row content — hero name/score chip.
   const moment: { label: string; name: string; score: string | null } | null = useMemo(() => {

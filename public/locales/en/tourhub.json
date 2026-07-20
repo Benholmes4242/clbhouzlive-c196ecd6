@@ -142,7 +142,11 @@
       "tournamentCta": "TOURNAMENT",
       "leaderLabel": "LEADER",
       "championLabel": "CHAMPION",
-      "defendingLabel": "DEFENDING"
+      "defendingLabel": "DEFENDING",
+      "resultPlayoff": "{{name}} closed at {{score}}, winning in a playoff",
+      "resultWonBy_one": "{{name}} closed at {{score}}, winning by one shot from {{runnerUp}}",
+      "resultWonBy_other": "{{name}} closed at {{score}}, winning by {{count}} shots from {{runnerUp}}",
+      "resultClosedAt": "{{name}} closed at {{score}}"
     },
     "pillState": {
       "cancelled": "CANCELLED",
