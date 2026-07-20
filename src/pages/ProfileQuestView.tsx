@@ -34,7 +34,13 @@ import { UnifiedAchievementSheet, type AchievementData } from '@/components/top1
 
 // Existing Quest components
 import { MilestoneLadder } from '@/components/quest/MilestoneLadder';
-import { type RegionProgress } from '@/components/quest/RegionalJourneySummary';
+interface RegionProgress {
+  id: string;
+  name: string;
+  shortName: string;
+  played: number;
+  total: number;
+}
 import { RecentlyAddedSection } from '@/components/quest/RecentlyAddedSection';
 import { QuestPageSkeleton } from '@/components/quest/QuestPageSkeleton';
 import { MomentumCard } from '@/components/quest/MomentumCard';
