@@ -5,7 +5,7 @@ import { BIZ } from '@/components/business/businessTokens';
 
 import { HINT_CLASS, LABEL_CLASS } from './editorStyles';
 import { SocialFields } from './editorTypes';
-import { Instagram, Music2, Youtube, Facebook } from 'lucide-react';
+import { Instagram, Music2, Youtube, Facebook, type LucideProps } from 'lucide-react';
 
 interface Row {
   field: keyof SocialFields;
