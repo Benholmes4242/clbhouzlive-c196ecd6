@@ -100,6 +100,7 @@ export function OverviewPageV3() {
             <LazySection minHeight={350}>
               <CollegeFranchise />
             </LazySection>
+            <CourseOfTheWeekSection />
             <LazySection minHeight={90}>
               <ConnectHandicapTile />
             </LazySection>
