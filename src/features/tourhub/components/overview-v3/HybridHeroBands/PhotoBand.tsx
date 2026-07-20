@@ -397,7 +397,7 @@ export function PhotoBand({
                   flexShrink: 0,
                 }}
               >
-                {ctaLabel ?? t('overview.photoBand.tournamentCta', 'TOURNAMENT')}
+                {ctaLabel ?? t('overview.photoBand.tournamentCta')}
                 <ChevronRight size={14} strokeWidth={2.5} />
               </button>
             )}
