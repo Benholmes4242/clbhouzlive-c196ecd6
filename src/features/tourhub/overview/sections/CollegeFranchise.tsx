@@ -39,6 +39,7 @@ import { COLLEGE_RIVALRY_FALLBACK } from '../../utils/editorialFallbacks';
 import { SectionShell } from './SectionShell';
 import { V4 } from '../tokens';
 import { getCollegeColor } from '../data/collegeColors';
+import { Skeleton } from '@/components/ui/skeleton';
 
 function displayName(stats: CollegeSeasonStats, media: CollegeMedia | undefined): string {
   return media?.short_name || media?.college_name || stats.normalized_name;
