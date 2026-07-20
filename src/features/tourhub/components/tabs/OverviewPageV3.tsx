@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { ComingUpSlot } from '../overview-v3/ComingUpSlot';
 import { CollegeFranchise } from '../../overview/sections/CollegeFranchise';
+import { CourseOfTheWeekSection } from '../../overview/sections/CourseOfTheWeekSection';
 import { ConnectHandicapTile } from '../../overview/sections/ConnectHandicapTile';
 import { LazySection } from '../overview-v3/LazySection';
 
