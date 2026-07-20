@@ -68,9 +68,10 @@ export default function ContactPage() {
       }).catch((e) => console.warn('support-ticket-notify failed', e));
 
       setSubmittedId(ticket.id);
-    } catch (e: any) {
+    } catch (e) {
       console.error('support submit failed', e);
-      toast.error(e?.message || 'Could not send your request. Please try again.');
+      const msg = e instanceof Error ? e.message : 'Could not send your request. Please try again.';
+      toast.error(msg);
     } finally {
       setSubmitting(false);
     }
