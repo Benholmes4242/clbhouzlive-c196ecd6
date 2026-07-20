@@ -13,6 +13,7 @@ import { usePendingPostsStore, type PendingPost } from '@/uploads/pendingPostsSt
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useProfileData } from '@/hooks/useProfileData';
 import { startPostUpload } from '../lib/postUploadController';
+import { extractMentions } from '@/lib/mentions/format';
 import type { StageMediaItem, StageCourse } from './useStageComposer';
 
 export interface SubmitInput {
@@ -123,6 +124,27 @@ export function usePostSubmit() {
           .eq('id', postId);
         if (tagErr) console.warn('[post-v2] tagged_course_ids write failed:', tagErr);
       }
+
+      // Mention notifications: insert into the canonical public.mentions
+      // pipeline (source_type='post'). The trg_create_mention_notification
+      // trigger fans out notifications with self-mention and block guards.
+      // Non-blocking: a mention-write failure must never fail the post.
+      const mentions = extractMentions(input.caption);
+      if (mentions.length > 0) {
+        const rows = mentions.map((m) => ({
+          source_type: 'post' as const,
+          source_id: postId,
+          mentioned_type: m.entityType,
+          mentioned_id: m.entityId,
+          mentioner_id: userId,
+        }));
+        const { error: mErr } = await supabase
+          .from('mentions')
+          .insert(rows as never);
+        if (mErr) console.warn('[post-v2] mentions write failed:', mErr);
+      }
+
+
 
       // Text-only or scheduled-text: single-shot. finalize is implicit on the server.
       if (!hasMedia) {
