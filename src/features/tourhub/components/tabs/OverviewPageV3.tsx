@@ -1,8 +1,7 @@
 /**
  * OverviewPageV3 - Tour Hub Overview
  *
- * NOTE: Hero carousel + tour switchers were nuked. A placeholder sits where the
- * hero was while we rebuild. Editorial modules below are unchanged.
+ * Hero: the self-contained Hero River carousel (OverviewHero). Editorial modules follow in lazy sections.
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
