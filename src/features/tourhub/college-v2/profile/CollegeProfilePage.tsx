@@ -33,7 +33,7 @@ export function CollegeProfilePage() {
   const { collegeSlug } = useParams<{ collegeSlug: string }>();
   const slug = collegeSlug ?? '';
 
-  const { data, isLoading, refetch } = useFranchiseStandings();
+  const { data, isLoading, isError, refetch } = useFranchiseStandings();
   const { data: liveAlumni } = useLiveAlumni();
 
   // Scroll to top when slug changes.
