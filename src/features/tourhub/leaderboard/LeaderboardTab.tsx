@@ -460,6 +460,22 @@ export function LeaderboardTab() {
       {/* BOARD */}
       {boardLoading && filteredEntries.length === 0 ? (
         <LeaderboardSkeleton />
+      ) : boardError ? (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '32px 16px' }}>
+          <EditorialEmpty
+            tint="slate"
+            eyebrow={t('empty.leaderboard.error.eyebrow')}
+            title={t('empty.leaderboard.error.title')}
+            body={t('empty.leaderboard.error.body')}
+          />
+          <button
+            type="button"
+            onClick={() => refetchBoard()}
+            style={{ background: INK, color: '#fff', border: 'none', borderRadius: 999, padding: '10px 20px', fontFamily: F, fontSize: 13.5, fontWeight: 700, cursor: 'pointer' }}
+          >
+            {t('board.retry')}
+          </button>
+        </div>
       ) : filteredEntries.length === 0 ? (
         <EditorialEmpty
           tint="slate"
