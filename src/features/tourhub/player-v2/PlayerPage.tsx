@@ -82,6 +82,35 @@ export function PlayerPage() {
       <div style={{ background: SLATE_50, minHeight: '100vh' }}>
         <HeroSection player={player} playerStats={playerStats ?? null} />
 
+        {(statsError || resultsError) && (
+          <div
+            style={{
+              margin: '12px 16px 0',
+              padding: '10px 14px',
+              borderRadius: 12,
+              background: 'rgba(220,38,38,0.06)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 10,
+            }}
+          >
+            <span style={{ fontSize: 12.5, fontWeight: 600, color: '#B91C1C' }}>
+              {t('player.error.partial', { defaultValue: "Some sections couldn't load" })}
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                if (statsError) refetchStats();
+                if (resultsError) refetchResults();
+              }}
+              style={{ background: 'transparent', border: 'none', padding: 0, fontSize: 12.5, fontWeight: 800, color: '#B91C1C', cursor: 'pointer', textDecoration: 'underline' }}
+            >
+              {t('player.error.retry')}
+            </button>
+          </div>
+        )}
+
         {playerState.state === 'live' && playerState.liveData && (
           <LiveNowStrip liveData={playerState.liveData} playerName={player.full_name} />
         )}
