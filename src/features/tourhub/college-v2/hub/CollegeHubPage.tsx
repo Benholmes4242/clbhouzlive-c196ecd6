@@ -34,6 +34,7 @@ import { useFranchiseStandings } from './data/useFranchiseStandings';
 import { useLiveAlumni } from './data/useLiveAlumni';
 import { YearbookCard } from './YearbookCard';
 import { CollegeHeroMasthead } from '../_shared/CollegeHeroMasthead';
+import { Skeleton } from '@/components/ui/skeleton';
 
 
 export function CollegeHubPage() {
@@ -390,14 +391,14 @@ export function CollegeHubPage() {
           {isLoading ? (
             <div style={{ padding: '8px 0' }}>
               {[0, 1, 2, 3].map((i) => (
-                <div
+                <Skeleton
                   key={i}
+                  variant="light"
                   style={{
                     height: 82,
                     margin: '0 16px',
+                    borderRadius: 0,
                     borderBottom: `0.5px solid ${HAIRLINE_INK_10}`,
-                    background: 'rgba(15,23,42,0.04)',
-                    animation: 'pulse 1.4s ease-in-out infinite',
                   }}
                 />
               ))}

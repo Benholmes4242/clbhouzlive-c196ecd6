@@ -72,6 +72,7 @@ import { CoursesHubSkeleton } from '@/components/skeletons/CoursesHubSkeleton';
 
 
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
+import { CollegeHubSkeleton } from '@/components/skeletons/CollegeHubSkeleton';
 import { TourHubOverviewSkeleton } from '@/components/skeletons/TourHubOverviewSkeleton';
 import { WatchHubSkeleton, WatchClipsSkeleton, WatchVideosSkeleton } from '@/components/skeletons/WatchSkeletons';
 import { AchievementsSkeleton } from '@/components/skeletons/AchievementsSkeleton';
@@ -600,9 +601,9 @@ function AppRoutes() {
         <Route path="/tourhub/tournament/:tournamentId" element={<Suspense fallback={<GenericPageSkeleton />}><TournamentDetailPage /></Suspense>} />
         
         <Route path="/tourhub/player/:playerId" element={<Suspense fallback={<GenericPageSkeleton />}><PlayerProfilePage /></Suspense>} />
-        <Route path="/tourhub/college-golf" element={<Suspense fallback={<GenericPageSkeleton />}><CollegeGolfHubPage /></Suspense>} />
+        <Route path="/tourhub/college-golf" element={<Suspense fallback={<CollegeHubSkeleton />}><CollegeGolfHubPage /></Suspense>} />
         <Route path="/tourhub/college-golf/compare" element={<Suspense fallback={<GenericPageSkeleton />}><CollegeComparePage /></Suspense>} />
-        <Route path="/tourhub/college-golf/:collegeSlug" element={<Suspense fallback={<GenericPageSkeleton />}><CollegeProfilePage /></Suspense>} />
+        <Route path="/tourhub/college-golf/:collegeSlug" element={<Suspense fallback={<CollegeHubSkeleton />}><CollegeProfilePage /></Suspense>} />
         
         {/* Hub routes removed — redirects to clubhouse */}
         <Route path="/hub" element={<Navigate to="/clubhouse" replace />} />
