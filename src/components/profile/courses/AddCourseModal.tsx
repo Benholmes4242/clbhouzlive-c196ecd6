@@ -84,7 +84,14 @@ const PlainScore: React.FC<{ value: number; size?: number }> = ({ value, size = 
 
 // ---- Sortable Manage row (Option C stacked card) ----
 interface SortableItemProps {
-  course: any;
+  course: {
+    course_id: string;
+    name: string;
+    country?: string | null;
+    sub_country?: string | null;
+    thumbnail_image?: string | null;
+    rating?: number | string | null;
+  };
   index: number;
   onMoveUp: (index: number) => void;
   onMoveDown: (index: number) => void;
