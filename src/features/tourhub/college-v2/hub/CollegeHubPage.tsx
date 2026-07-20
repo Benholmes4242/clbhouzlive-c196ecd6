@@ -34,6 +34,7 @@ import { useFranchiseStandings } from './data/useFranchiseStandings';
 import { useLiveAlumni } from './data/useLiveAlumni';
 import { YearbookCard } from './YearbookCard';
 import { CollegeHeroMasthead } from '../_shared/CollegeHeroMasthead';
+import { Skeleton } from '@/components/ui/skeleton';
 
 
 export function CollegeHubPage() {
