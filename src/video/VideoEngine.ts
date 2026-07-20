@@ -1434,6 +1434,35 @@ class VideoEngineImpl {
     try { return this.getLane(laneId).el; } catch { return null; }
   }
 
+  /** Debug-only: snapshot every lane's audio-relevant state for the
+   *  heartbeat. Used by AudioDebugHud to build the once-per-second SLOT
+   *  line ("who owns the ONE_UNMUTED_LANE slot right now?"). */
+  _debugGetLanesSnapshot(): Array<{
+    laneId: LaneId;
+    postId: string | null;
+    muted: boolean;
+    paused: boolean;
+    currentTime: number;
+    borrowed: boolean;
+  }> {
+    const out: Array<{
+      laneId: LaneId; postId: string | null; muted: boolean;
+      paused: boolean; currentTime: number; borrowed: boolean;
+    }> = [];
+    this.lanes.forEach((lane) => {
+      out.push({
+        laneId: lane.id,
+        postId: lane.postId,
+        muted: !!lane.el.muted,
+        paused: !!lane.el.paused,
+        currentTime: +(lane.el.currentTime || 0).toFixed(3),
+        borrowed: this.borrowedLanes.has(lane.id),
+      });
+    });
+    return out;
+  }
+
+
 
   /**
    * Live-read directly from the underlying element (no cached state). Used by
