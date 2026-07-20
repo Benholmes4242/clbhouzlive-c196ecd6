@@ -20,6 +20,7 @@ import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { PlayerAvatar } from '../../components/PlayerAvatar';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { formatNumber } from '@/i18n/format';
+import { Skeleton } from '@/components/ui/skeleton';
 
 // Board sub-label routed via i18n key (see overview.rankings.boards.*).
 const TOUR_TO_BOARD: Partial<Record<TourId, { board: RankingsBoard; labelKey: string; tourCode: string }>> = {
