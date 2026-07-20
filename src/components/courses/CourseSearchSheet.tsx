@@ -50,7 +50,7 @@ export function CourseSearchSheet({
   const isMobile = useIsMobile();
   const returnFocusRef = useRef<HTMLElement | null>(null);
 
-  const { data: searchResults, loading, error } = useCourseSearch(query, {
+  const { data: searchResults, loading, error, refetch } = useCourseSearch(query, {
     debounceMs: 250,
     limit: 20,
     userId
