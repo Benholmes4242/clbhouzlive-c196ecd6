@@ -130,13 +130,9 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
             Current Index
           </div>
           {isLoading ? (
-            <div
-              style={{
-                width: 96,
-                height: 48,
-                borderRadius: 8,
-                background: 'var(--hcp-bg-3)',
-              }}
+            <Skeleton
+              variant="dark"
+              style={{ width: 96, height: 48, borderRadius: 8 }}
             />
           ) : (
             <div
