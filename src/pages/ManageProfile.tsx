@@ -213,7 +213,7 @@ export default function ManageProfile() {
       if (user?.id) {
         queryClient.setQueryData(['onboarding-status', user.id], {
           hasCompletedOnboarding: true,
-          userType: (profile as any)?.user_type ?? null,
+          userType: profile?.user_type ?? null,
         });
       }
       if (isNewUser.current) {
