@@ -385,7 +385,10 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
             <div>
               <GlassHeaderPlate visible={tabsStuck} />
               {activeTab === 'discover' ? (
-                <AmateurCircuitHero fallback={<CoursesPageHero />} />
+                <>
+                  <AmateurCircuitHero fallback={<CoursesPageHero />} />
+                  <WireTicker />
+                </>
               ) : (
                 <CoursesPageHero />
               )}

@@ -200,11 +200,10 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
 
   // Standalone (non-modal) full-bleed cinematic hero — bleeds into the notch.
   // Pattern mirrors Tour hero: image as container `background` + paddingTop env(sat).
-  const heroScrim =
-    'linear-gradient(180deg, rgba(15,23,42,0.5) 0%, rgba(15,23,42,0.12) 22%, rgba(15,23,42,0) 42%, rgba(15,23,42,0) 55%, rgba(15,23,42,0.6) 100%)';
-  const heroBackground = course.thumbnail_image
-    ? `${heroScrim}, url(${course.thumbnail_image}) center 40% / cover no-repeat`
-    : 'linear-gradient(180deg,#1E4D38,#0F172A)';
+  // Same layered scrim as PhotoBand (Tour Overview hero) — see
+  // `buildOverviewHeroBackground` in HybridHero.constants. Kept as a
+  // dynamic import target so grep from either surface finds the pair.
+  const heroBackground = buildOverviewHeroBackground(course.thumbnail_image ?? null);
 
   const cinematicHero = (
     <div
