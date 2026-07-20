@@ -106,6 +106,24 @@ export default function HelpPage() {
           <div className="text-[13px]" style={{ color: INK_55 }}>Loading articles...</div>
         )}
 
+        {!isLoading && isError && (
+          <div
+            className="rounded-2xl p-6 text-center"
+            style={{ background: '#fff', border: `1px solid ${CARD_BORDER}` }}
+          >
+            <p className="text-[15px] font-medium" style={{ color: INK }}>Couldn't load help articles</p>
+            <p className="text-[13px] mt-1 mb-3" style={{ color: INK_55 }}>Check your connection and try again.</p>
+            <button
+              onClick={() => refetch()}
+              className="text-[13px] font-semibold underline"
+              style={{ color: INK }}
+            >
+              Retry
+            </button>
+          </div>
+        )}
+
+
         {!isLoading && searching && matches.length === 0 && (
           <div
             className="rounded-2xl p-4 text-center"
