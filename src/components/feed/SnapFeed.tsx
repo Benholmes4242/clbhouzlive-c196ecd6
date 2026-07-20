@@ -12,6 +12,7 @@ import { vperfStart, vperfArmLane, vperfNextId, vperfFeedScrollTick, vperfFeedAc
 import { PrefetchController } from '@/video/PrefetchController';
 import { trace } from '@/perf/trace';
 import { VideoEngine } from '@/video/VideoEngine';
+import { feedLaneRoles } from '@/video/feedLaneRoles';
 import { isPerfEnabled } from '@/perf/navTiming';
 import { audioDebugEnabled, logAudio } from '@/perf/audioDebug';
 import { useInviteSheet } from '@/hooks/useInviteSheet';
@@ -162,6 +163,11 @@ export function SnapFeed({
           });
         } catch { /* noop */ }
       }
+      // v10 audio-focus — release the inline feed's focus on unmount so the
+      // reconciler stops resolving to a lane that no visible surface owns.
+      if (surface !== 'fullscreen') {
+        try { VideoEngine.setAudioFocus(null, 'feed'); } catch { /* noop */ }
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -225,6 +231,21 @@ export function SnapFeed({
     // 'fullscreen' lane; the inline feed plays on 'feed-active'.
     const armLane: 'fullscreen' | 'feed-active' =
       surface === 'fullscreen' ? 'fullscreen' : 'feed-active';
+
+    // v10 audio-focus registry — inline feed only. The fullscreen branch of
+    // the reconciler owns the overlay's speaker selection, so we do NOT
+    // register focus from the fullscreen surface. Image slides clear focus
+    // (there is no lane to unmute).
+    if (surface !== 'fullscreen') {
+      try {
+        if (mediaType === 'video') {
+          const activeLane = feedLaneRoles.laneForRole('active');
+          VideoEngine.setAudioFocus(activeLane, 'feed');
+        } else {
+          VideoEngine.setAudioFocus(null, 'feed');
+        }
+      } catch { /* noop */ }
+    }
 
     // swipe.vertical — video slides only. Image slides have no lane
     // events on either surface, so starting the span would guarantee

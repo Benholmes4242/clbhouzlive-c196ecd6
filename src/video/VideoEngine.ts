@@ -370,6 +370,38 @@ class VideoEngineImpl {
     this.reconcileAudio('session-change');
   };
 
+  /**
+   * v10 audio-focus registry — the reconciler's single non-fullscreen input.
+   * Feed surfaces (SnapFeed on active-slide settle) and rail surfaces
+   * (useRailLane on lane acquisition) register the lane that owns audio.
+   * Last write wins. `null` clears focus (silence unless the fullscreen
+   * branch resolves a speaker).
+   */
+  private audioFocus: { laneId: LaneId | null; source: string | null } = {
+    laneId: null,
+    source: null,
+  };
+
+  setAudioFocus(laneId: LaneId | null, source: string): void {
+    const prev = this.audioFocus;
+    if (prev.laneId === laneId && prev.source === source) return;
+    this.audioFocus = { laneId, source };
+    if (audioDebugEnabled()) {
+      try {
+        logAudio('audio.focus', {
+          from: { laneId: prev.laneId, source: prev.source },
+          to: { laneId, source },
+          msSinceOpen: msSinceOpen(),
+        });
+      } catch { /* noop */ }
+    }
+    this.reconcileAudio('focus-change');
+  }
+
+  getAudioFocus(): { laneId: LaneId | null; source: string | null } {
+    return this.audioFocus;
+  }
+
 
   private onVisibility = () => {
     if (typeof document === 'undefined') return;
@@ -1263,7 +1295,7 @@ class VideoEngineImpl {
     // whyNone. Distinct labels per null path (no shared fallthrough) so the
     // silence root cause is legible in a linear scan of the buffer.
     let speaker: LaneId | null = null;
-    let branch: 'session-muted' | 'borrow' | 'active-role' | 'fullscreen-solo' | 'none' = 'none';
+    let branch: 'session-muted' | 'borrow' | 'focus' | 'active-role' | 'fullscreen-solo' | 'none' = 'none';
     let whyNone: string | null = null;
 
     if (sessionMuted) {
@@ -1292,28 +1324,30 @@ class VideoEngineImpl {
         }
       }
     } else {
-      let activeLaneId: LaneId | null = null;
-      try { activeLaneId = feedLaneRoles.laneForRole('active'); } catch { /* noop */ }
-      if (!activeLaneId) {
+      // v10: audio-focus registry replaces the role-map read. Feed and rail
+      // surfaces register their active lane on settle; the reconciler picks
+      // that lane (subject to per-lane eligibility) as the speaker.
+      const focusLaneId = this.audioFocus.laneId;
+      if (!focusLaneId) {
         branch = 'none';
-        whyNone = 'no-active-role-assigned';
+        whyNone = 'no-audio-focus';
       } else {
-        const l = this.lanes.get(activeLaneId);
+        const l = this.lanes.get(focusLaneId);
         if (!l) {
           branch = 'none';
-          whyNone = 'role-lane-unmounted';
+          whyNone = 'focus-lane-unmounted';
         } else if (!l.el) {
           branch = 'none';
-          whyNone = 'role-lane-no-el';
+          whyNone = 'focus-lane-no-el';
         } else if (l.audioPolicy === 'always-muted') {
           branch = 'none';
-          whyNone = 'role-lane-always-muted';
+          whyNone = 'focus-lane-always-muted';
         } else if (!l.wantPlay) {
           branch = 'none';
-          whyNone = 'role-lane-not-want-play';
+          whyNone = 'focus-lane-not-want-play';
         } else {
-          speaker = activeLaneId;
-          branch = 'active-role';
+          speaker = focusLaneId;
+          branch = 'focus';
         }
       }
     }
@@ -1342,6 +1376,7 @@ class VideoEngineImpl {
           overlayOpen: fsOpen,
           borrowedLaneId: borrowLaneId,
           roleMap: this.buildRoleMapDump(),
+          audioFocus: this.audioFocus,
           resolution: { speaker, branch, whyNone },
           writes: changes.map((c) => ({ laneId: c.laneId, muted: c.to })),
           msSinceOpen: msSinceOpen(),

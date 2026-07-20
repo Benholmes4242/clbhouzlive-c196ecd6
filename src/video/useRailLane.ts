@@ -132,16 +132,18 @@ export function useRailLane(opts: UseRailLaneOptions): UseRailLaneResult {
     }).catch(() => {});
 
     VideoEngine.mountLane(laneId, host);
-    // Declare rails as always-muted; engine enforces. Belt-and-braces setMuted
-    // remains for immediate effect on first paint — BUT skip when the lane
-    // is currently borrowed by the fullscreen viewer. During borrow the
-    // effective policy is 'session' (see VideoEngine.applyAudioPolicy borrow
-    // override); a tile-side re-mute here would fight the viewer's audio.
-    // Handback's clearBorrowed → applyAudioPolicy restores rail muting.
-    VideoEngine.setAudioPolicy(laneId, 'always-muted');
+    // v10: rail lanes now use 'session' policy — audibility is gated by the
+    // audio-focus registry + reconciler, not a blanket always-muted flag.
+    // Rails start muted; focus registration below promotes the current
+    // active tile.
+    VideoEngine.setAudioPolicy(laneId, 'session');
     if (willBeltMute) {
       VideoEngine.setMuted(laneId, true);
     }
+    // Register this rail lane as the audio-focus owner. Last-write-wins
+    // across concurrent active tiles; on scroll the newly-activated tile
+    // takes over.
+    try { VideoEngine.setAudioFocus(laneId, 'rail'); } catch { /* noop */ }
     // Resume at the engine's lastPos for this post — kept fresh by every lane
     // (feed-active/fullscreen/rail-*) via onTime. Means closing fullscreen at
     // 20s and returning to a re-acquired rail tile picks up at 20s, not 0.
@@ -194,6 +196,13 @@ export function useRailLane(opts: UseRailLaneOptions): UseRailLaneResult {
       // Local deactivation — the pool.release effect above will fire the
       // engine release and unmount cleanup; here we just stop playback.
       VideoEngine.pause(laneId, { callerPostId: caller });
+      // v10 audio-focus — surrender focus if this rail lane still holds it.
+      try {
+        const cur = VideoEngine.getAudioFocus();
+        if (cur.source === 'rail' && cur.laneId === laneId) {
+          VideoEngine.setAudioFocus(null, 'rail');
+        }
+      } catch { /* noop */ }
     };
   }, [laneId, opts.hlsUrl, opts.posterUrl, opts.postId, opts.ownerKey]);
 
