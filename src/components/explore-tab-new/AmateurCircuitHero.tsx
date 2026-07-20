@@ -125,14 +125,18 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
         />
       ) : null}
 
-      {/* Dual scrim */}
+      {/* Layered scrim — matches the Tour Overview PhotoBand stack
+          (top scrim + heavy bottom scrim + radial ambient). */}
       <div
         aria-hidden
         style={{
           position: 'absolute',
           inset: 0,
           background:
-            'linear-gradient(180deg, rgba(15,23,42,0.5) 0%, rgba(15,23,42,0) 24%), linear-gradient(0deg, rgba(15,23,42,0.78) 0%, rgba(15,23,42,0) 48%)',
+            'linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0) 100%) top / 100% 80px no-repeat,' +
+            'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.85) 78%, rgba(0,0,0,0.92) 100%) bottom / 100% 260px no-repeat,' +
+            'radial-gradient(ellipse 90% 60% at 50% 95%, rgba(0,0,0,0.55) 0%, transparent 70%),' +
+            'radial-gradient(ellipse 70% 50% at 30% 20%, rgba(0,80,40,0.30) 0%, transparent 60%)',
           pointerEvents: 'none',
         }}
       />

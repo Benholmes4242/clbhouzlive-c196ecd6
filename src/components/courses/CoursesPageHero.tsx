@@ -5,6 +5,10 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExploreHero } from '@/components/explore-tab-new/hooks/useExploreHero';
 import { useExploreMood } from '@/components/explore-tab-new/hooks/useExploreMood';
 import { formatRatingValue } from '@/utils/formatters';
+import {
+  buildOverviewHeroBackground,
+  COURSE_GRADIENT,
+} from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 
 /**
  * CoursesPageHero
@@ -14,12 +18,14 @@ import { formatRatingValue } from '@/utils/formatters';
  * hero (notch bleed, scrim, cover position) and the SAME data source as
  * the old Discover "Standout courses" card (useExploreHero).
  *
+ * Scrim treatment: shares the layered stack from the Tour Overview
+ * `PhotoBand` (top scrim + heavy bottom scrim + radial ambient) via
+ * `buildOverviewHeroBackground` so the Courses hero matches the Tour
+ * Overview hero pixel-for-pixel.
+ *
  * The global CompactHeader floats over this hero in transparent overlay
  * mode; this component reserves that space via env(safe-area-inset-top).
  */
-
-const HERO_SCRIM =
-  'linear-gradient(180deg, rgba(15,23,42,0.5) 0%, rgba(15,23,42,0.12) 22%, rgba(15,23,42,0) 42%, rgba(15,23,42,0) 55%, rgba(15,23,42,0.6) 100%)';
 
 const HERO_MIN_HEIGHT =
   'calc(clamp(380px, 44dvh, 460px) + env(safe-area-inset-top, 0px))';
@@ -33,9 +39,9 @@ function CoursesPageHeroInner() {
 
   const background = useMemo(() => {
     if (hero?.hero_image_url) {
-      return `${HERO_SCRIM}, url(${hero.hero_image_url}) center 40% / cover no-repeat`;
+      return buildOverviewHeroBackground(hero.hero_image_url);
     }
-    return 'linear-gradient(180deg,#1E4D38,#0F172A)';
+    return COURSE_GRADIENT;
   }, [hero?.hero_image_url]);
 
   const locationText = hero

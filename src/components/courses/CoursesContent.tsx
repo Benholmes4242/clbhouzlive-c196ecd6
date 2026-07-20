@@ -11,6 +11,7 @@ import UserCoursesContent from './UserCoursesContent';
 import Top100CoursesHubPanel from './Top100CoursesHubPanel';
 
 import ExploreTabContent from '@/components/explore-tab-new/ExploreTabContent';
+import { WireTicker } from '@/components/explore-tab-new/WireTicker';
 import RateNudge from './RateNudge';
 
 
@@ -385,7 +386,10 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
             <div>
               <GlassHeaderPlate visible={tabsStuck} />
               {activeTab === 'discover' ? (
-                <AmateurCircuitHero fallback={<CoursesPageHero />} />
+                <>
+                  <AmateurCircuitHero fallback={<CoursesPageHero />} />
+                  <WireTicker />
+                </>
               ) : (
                 <CoursesPageHero />
               )}

@@ -4,7 +4,9 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExploreFeed } from './hooks/useExploreFeed';
 import { useExploreRegion } from './hooks/useExploreRegion';
 
-import { WireTicker } from './WireTicker';
+// WireTicker is now attached directly under the Discover hero by
+// CoursesContent (`<AmateurCircuitHero fallback={…} /> + <WireTicker />`),
+// so this surface no longer owns the ticker.
 
 
 import { AlmanacLens, REGION_TABS } from './AlmanacSections';
@@ -93,9 +95,8 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
 
   return (
     <div style={{ background: SLATE_50, minHeight: '100vh' }}>
-      <WireTicker />
-
       <div>
+
         {shellTabs}
         <RankIdentityCard userId={userId} variant="strip" />
       </div>
