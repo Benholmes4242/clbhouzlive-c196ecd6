@@ -53,7 +53,7 @@ export function useGolfCoursesStats() {
       const { count: verifiedCourses } = await supabase
         .from('golf_courses')
         .select('*', { count: 'exact', head: true })
-        .or('global_rank.not.is.null,usa_rank.not.is.null,regional_rank.not.is.null');
+        .or(TOP100_PREDICATE);
 
       return {
         totalCourses: totalCourses || 0,
