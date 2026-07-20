@@ -46,7 +46,8 @@
     },
     "error": {
       "title": "Couldn't load the schedule",
-      "body": "Something went wrong. Please try again."
+      "body": "Something went wrong. Please try again.",
+      "retry": "Retry"
     },
     "floating": {
       "thisWeek": "This week",
