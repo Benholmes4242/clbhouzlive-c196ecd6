@@ -155,7 +155,7 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
       kind: 'review',
       created_at: r.created_at,
       title: `Review: ${course?.name ?? 'a course'}`,
-      subtitle: (r.review ?? '').trim() || `by ${displayName(prof)}`,
+      subtitle: stripMentionMarkup((r.review ?? '').trim()).trim() || `by ${displayName(prof)}`,
       avatarUrl: prof?.profile_photo_url ?? null,
       href: `/admin-v2/users?member=${r.user_id}`,
       courseId: r.course_id,
