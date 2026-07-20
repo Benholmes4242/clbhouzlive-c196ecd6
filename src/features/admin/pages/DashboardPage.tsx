@@ -29,6 +29,7 @@ import {
   toneColor, type ChipState,
 } from '../lib/healthChips';
 import { useErrorCount24h } from '../hooks/useStability';
+import { stripMentionMarkup } from '@/lib/mentions/format';
 
 const num = (n: number) => n.toLocaleString();
 function relTime(iso: string): string {
@@ -127,7 +128,7 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
   for (const p of postRows) {
     const prof = profMap.get(p.user_id);
     const name = displayName(prof);
-    const content = (p.content ?? '').trim();
+    const content = stripMentionMarkup((p.content ?? '').trim()).trim();
     let subtitle: string | null = null;
     if (content) subtitle = content;
     else {
@@ -154,7 +155,7 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
       kind: 'review',
       created_at: r.created_at,
       title: `Review: ${course?.name ?? 'a course'}`,
-      subtitle: (r.review ?? '').trim() || `by ${displayName(prof)}`,
+      subtitle: stripMentionMarkup((r.review ?? '').trim()).trim() || `by ${displayName(prof)}`,
       avatarUrl: prof?.profile_photo_url ?? null,
       href: `/admin-v2/users?member=${r.user_id}`,
       courseId: r.course_id,

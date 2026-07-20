@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { stripMentionMarkup } from '@/lib/mentions/format';
 
 // Props keys verified against callsites:
 // - post_like: src/components/clubhouse/hooks/useClubhouseLikes.ts L52 => { post_id, action }.
@@ -113,7 +114,7 @@ export function usePostInsight(postId: string | null) {
         authorName,
         authorAvatarUrl,
         createdAt: post?.created_at ?? null,
-        contentPreview: (post?.content ?? '').trim().slice(0, 220) || null,
+        contentPreview: stripMentionMarkup((post?.content ?? '').trim()).trim().slice(0, 220) || null,
         mediaLabel,
         likes: post?.like_count ?? 0,
         comments: post?.comment_count ?? 0,

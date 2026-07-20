@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { stripMentionMarkup } from '@/lib/mentions/format';
 import type { AnalyticsPeriod } from './useAnalytics';
 
 // Props keys reused:
@@ -110,7 +111,7 @@ export function useTopContent(period: AnalyticsPeriod) {
             comments,
             shares,
             score: likes + comments + shares,
-            contentPreview: (p.content ?? '').trim().slice(0, 140) || null,
+            contentPreview: stripMentionMarkup((p.content ?? '').trim()).trim().slice(0, 140) || null,
             authorName: authorMap.get(p.user_id) ?? null,
             createdAt: p.created_at,
           };
