@@ -820,5 +820,22 @@
         "strokesGained": "Strokes Gained"
       }
     }
+  },
+  "hero": {
+    "finalTag": "FINAL",
+    "live": "LIVE",
+    "upcomingTag": "UPCOMING",
+    "top10": "TOP 10",
+    "theField": "THE FIELD",
+    "leader": "Leader",
+    "tiedLead": "Tied lead · {{n}}",
+    "champion": "Champion",
+    "playoff": "Playoff",
+    "defends": "Defends",
+    "wonBy": "Won by {{margin}}",
+    "finalRoundComplete": "Final round complete",
+    "roundInPlay": "Round {{n}} in play",
+    "eventCancelled": "Event cancelled",
+    "tournamentCta": "Tournament"
   }
 }
