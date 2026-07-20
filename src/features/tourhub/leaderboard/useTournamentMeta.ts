@@ -47,20 +47,21 @@ export function useTournamentMeta(tournamentId: string | null | undefined) {
         .eq('id', tournamentId as string)
         .maybeSingle();
 
-      if (error) {
-        console.error('[leaderboard-v2] useTournamentMeta', error);
-        return null;
-      }
+      if (error) throw error;
       if (!data) return null;
       type SeasonJoin = { tour_name: string | null; tour_full_name: string | null } | null;
-      const row = data as Record<string, unknown> & { season?: SeasonJoin | SeasonJoin[] };
+      const row = data as Omit<TournamentMeta, 'tour_code' | 'tour_full_name'> & {
+        season?: SeasonJoin | SeasonJoin[];
+      };
       const seasonRaw = row.season;
       const season: SeasonJoin = Array.isArray(seasonRaw) ? seasonRaw[0] ?? null : seasonRaw ?? null;
+      const { season: _season, ...rest } = row;
       return {
-        ...(row as unknown as Omit<TournamentMeta, 'tour_code' | 'tour_full_name'>),
+        ...rest,
         tour_code: season?.tour_name ?? null,
         tour_full_name: season?.tour_full_name ?? null,
       };
+
     },
   });
 }
