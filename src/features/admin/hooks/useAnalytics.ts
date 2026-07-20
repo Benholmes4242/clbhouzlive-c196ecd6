@@ -120,6 +120,14 @@ export function usePlatformAnalytics(period: AnalyticsPeriod) {
 
 // ─── Engagement ───────────────────────────────────────────────────────────────
 
+export interface TopActiveUser {
+  id: string;
+  eventCount: number;
+  displayName: string | null;
+  username: string | null;
+  avatarUrl: string | null;
+}
+
 export interface EngagementAnalyticsData {
   totalEvents: number;
   avgEventsPerUserPerDay: number;
@@ -129,6 +137,7 @@ export interface EngagementAnalyticsData {
   topEvents: { name: string; count: number; uniqueUsers: number }[];
   hourlyBreakdown: { hour: number; count: number }[];
   social: { messagesSent: number; followActions: number; friendRequests: number };
+  topActiveUsers: TopActiveUser[];
 }
 
 async function fetchEngagement(period: AnalyticsPeriod): Promise<EngagementAnalyticsData> {
@@ -160,10 +169,14 @@ async function fetchEngagement(period: AnalyticsPeriod): Promise<EngagementAnaly
   const dailyTrend = fillBuckets(rows, days);
 
   const eventCounts: Record<string, { count: number; users: Set<string> }> = {};
+  const userEventCounts = new Map<string, number>();
   for (const r of rows) {
     if (!eventCounts[r.name]) eventCounts[r.name] = { count: 0, users: new Set() };
     eventCounts[r.name].count++;
-    if (r.user_id) eventCounts[r.name].users.add(r.user_id);
+    if (r.user_id) {
+      eventCounts[r.name].users.add(r.user_id);
+      userEventCounts.set(r.user_id, (userEventCounts.get(r.user_id) ?? 0) + 1);
+    }
   }
   const topEvents = Object.entries(eventCounts)
     .sort((a, b) => b[1].count - a[1].count)
@@ -172,6 +185,29 @@ async function fetchEngagement(period: AnalyticsPeriod): Promise<EngagementAnaly
 
   const hourlyBreakdown: { hour: number; count: number }[] = [];
   for (let h = 0; h < 24; h++) hourlyBreakdown.push({ hour: h, count: hourCounts[h] || 0 });
+
+  const top10 = Array.from(userEventCounts.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10);
+  let topActiveUsers: TopActiveUser[] = [];
+  if (top10.length > 0) {
+    const ids = top10.map(([id]) => id);
+    const { data: profiles } = await supabase
+      .from('user_profiles')
+      .select('id, display_name, username, profile_photo_url')
+      .in('id', ids);
+    const map = new Map((profiles ?? []).map(p => [p.id, p]));
+    topActiveUsers = top10.map(([id, count]) => {
+      const p = map.get(id);
+      return {
+        id,
+        eventCount: count,
+        displayName: p?.display_name ?? null,
+        username: p?.username ?? null,
+        avatarUrl: p?.profile_photo_url ?? null,
+      };
+    });
+  }
 
   return {
     totalEvents,
@@ -186,6 +222,7 @@ async function fetchEngagement(period: AnalyticsPeriod): Promise<EngagementAnaly
       followActions: followRes.count ?? 0,
       friendRequests: friendRes.count ?? 0,
     },
+    topActiveUsers,
   };
 }
 
