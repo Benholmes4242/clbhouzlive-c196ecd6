@@ -383,7 +383,7 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
       .sort((a, b) => Number(b.points) - Number(a.points))
       .slice(0, 50)
       .map((r, i) => {
-        const base = resolve(r)!;
+        const base = resolve(r);
         base.rank = i + 1;
         base.value = Number(r.points);
         base.valueFormatted = formatNumberMaxFrac(base.value, 2);
@@ -407,7 +407,7 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
       .sort((a, b) => Number(b.wins) - Number(a.wins))
       .slice(0, 50)
       .map((r, i) => {
-        const base = resolve(r)!;
+        const base = resolve(r);
         base.rank = i + 1;
         base.value = Number(r.wins);
         base.valueFormatted = fmtInt(base.value);
