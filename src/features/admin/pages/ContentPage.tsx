@@ -1552,6 +1552,8 @@ function PhotoSheet({
       const { error } = await supabase.from('sr_players').update({ headshot_override: val } as any).eq('id', player.id);
       if (error) throw error;
       toast.success('Override saved');
+      if (draftKey) clearDraft(draftKey);
+      setDraftRestored(false);
       invalidateAndBust();
     } catch (e: any) { toast.error(`Failed: ${e.message}`); }
     finally { setSavingOverride(false); }
