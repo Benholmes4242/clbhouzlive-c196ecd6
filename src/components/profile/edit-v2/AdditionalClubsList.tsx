@@ -87,7 +87,7 @@ export function AdditionalClubsList({
               ) : results.length === 0 ? (
                 <div className="px-4 py-3 text-[14px] text-muted-foreground">No clubs found</div>
               ) : (
-                results.map((club: any) => (
+                results.map((club) => (
                   <button
                     key={club.id}
                     onClick={() => handleSelect(club.name, club.id)}
