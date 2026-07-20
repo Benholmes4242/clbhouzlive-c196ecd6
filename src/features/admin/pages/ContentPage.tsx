@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams, Navigate, useLocation } from 'react-router-dom';
+import { useSearchParams, Navigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { formatDistanceToNow, format } from 'date-fns';
 import { toast } from '@/lib/toast';
 import {
   MapPin, Plus, Search, RefreshCw, Image as ImageIcon,
-  Trash2, Upload, Loader2, Zap, Users as UsersIcon,
+  Trash2, Upload, Loader2, Zap,
   Trophy, Compass, CheckCircle2, ChevronRight,
 } from 'lucide-react';
 
