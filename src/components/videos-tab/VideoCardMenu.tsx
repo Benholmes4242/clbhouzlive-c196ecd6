@@ -40,6 +40,9 @@ export const VideoCardMenu = React.memo(function VideoCardMenu({
   className,
 }: VideoCardMenuProps) {
   const [confirmOpen, setConfirmOpen] = useState(false);
+  // Controlled dropdown — force it closed BEFORE opening the block confirm.
+  // Prevents Radix layer overlap when the mutation evicts this card.
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const { blockUser, loading: blockLoading } = useBlockActions({ currentUserId: userId ?? '' });
 
   const handleCopyLink = async () => {
