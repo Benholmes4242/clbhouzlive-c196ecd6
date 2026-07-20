@@ -304,7 +304,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
 // readOnly=true. If the friend has no connection, shows an empty state.
 // ───────────────────────────────────────────────────────────────────────
 const FriendHandicapDashboard: React.FC<{ userId: string; ownerFirstName: string | null }> = ({ userId, ownerFirstName }) => {
-  const { data: connection, isLoading } = useWhsConnection(userId);
+  const { data: connection, isLoading, isError, refetch } = useWhsConnection(userId);
 
   if (isLoading) {
     return (
@@ -312,6 +312,23 @@ const FriendHandicapDashboard: React.FC<{ userId: string; ownerFirstName: string
         <div className="h-3 w-44 bg-muted/60 rounded mb-5" />
         <div className="h-16 w-28 bg-muted rounded mb-3" />
         <div className="h-4 w-36 bg-muted/60 rounded" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="px-6 py-16 text-center" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+        <p style={{ fontSize: 14, color: INK_55, fontFamily: FONT_GEIST, margin: 0 }}>
+          Couldn't load this player's handicap.
+        </p>
+        <button
+          type="button"
+          onClick={() => refetch()}
+          style={{ background: INK, color: '#fff', border: 'none', borderRadius: 999, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: FONT_GEIST }}
+        >
+          Retry
+        </button>
       </div>
     );
   }
