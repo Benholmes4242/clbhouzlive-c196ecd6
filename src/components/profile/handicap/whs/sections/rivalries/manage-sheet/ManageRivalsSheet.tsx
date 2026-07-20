@@ -18,6 +18,7 @@ import { CandidateRow } from './CandidateRow';
 import { RemoveLastConfirmation } from './RemoveLastConfirmation';
 import { nextAvailableSlot } from './_shared/nextAvailableSlot';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
+import { Skeleton } from '@/components/profile/handicap/gam/_shared/GamAtoms';
 
 const FONT = 'Geist, system-ui, -apple-system, sans-serif';
 const INK_MUTE = 'rgba(255,255,255,0.55)';
