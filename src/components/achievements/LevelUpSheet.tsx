@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { TierGlyph, TIER_COLOR_DARK } from '@/components/shared/TierGlyph';
 import { levelForMedals } from '@/components/profile/handicap/whs/gam/trophy-room/_shared/levels';
 import { openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 
 const FONT = "'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif";
 const GOLD = '#FBBC2E';
