@@ -203,7 +203,7 @@ export default function DashboardPage() {
       />
 
       <RightNowStrip
-        live={live.data ?? null}
+        live={live.data?.count ?? null}
         loading={live.isLoading}
         intraday={intraday.data ?? []}
         intradayLoading={intraday.isLoading}
