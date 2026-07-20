@@ -41,3 +41,11 @@ export function AdminGatedLogHud() {
   return <LogHud />;
 }
 
+export function AdminGatedAudioLogsButton() {
+  const { role, loading } = usePanelRole();
+  const [visible] = useAdminPillVisibility();
+  if (loading || role !== 'full' || !visible) return null;
+  return <AudioLogsButton />;
+}
+
+
