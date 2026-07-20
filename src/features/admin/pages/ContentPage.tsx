@@ -866,6 +866,7 @@ function AddCourseSheet({ open, onClose, onCreated, uploadPhoto }: {
         }
       }
       toast.success(`"${form.name}" created`);
+      clearDraft(draftKey);
       onCreated();
       onClose();
     } catch (e: any) {
