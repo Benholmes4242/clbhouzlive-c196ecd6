@@ -1266,7 +1266,110 @@ class VideoEngineImpl {
     return this.getLane(laneId).el.currentTime || 0;
   }
 
+  /**
+   * v9 reconciler — the ONLY function that decides what gets unmuted.
+   *
+   * Compute the "speaker lane" — the at-most-one lane that should be audible
+   * right now — from four inputs:
+   *   1. useSessionAudio.isMuted    (user intent)
+   *   2. useFullscreenFeedStore     (isOpen + borrow.laneId)
+   *   3. feedLaneRoles.laneForRole('active')  (which feed lane is on screen)
+   *   4. per-lane wantPlay / audioPolicy       (declared roles)
+   *
+   * Then apply: every lane other than the speaker is muted; the speaker,
+   * if any, is unmuted. 'always-muted' stays muted; 'local' is left alone.
+   */
+  private reconcileAudio(reason: string): void {
+    const sessionMuted = useSessionAudio.getState().isMuted;
+    const fs = useFullscreenFeedStore.getState();
+    const fsOpen = !!fs.isOpen;
+    const borrowLaneId: LaneId | null = (fs.borrow?.laneId ?? null) as LaneId | null;
+
+    let speaker: LaneId | null = null;
+    if (!sessionMuted) {
+      if (fsOpen) {
+        if (borrowLaneId && this.lanes.has(borrowLaneId)) {
+          speaker = borrowLaneId;
+        } else {
+          const fsLane = this.lanes.get('fullscreen');
+          if (fsLane && fsLane.wantPlay) speaker = 'fullscreen';
+        }
+      } else {
+        let activeLaneId: LaneId | null = null;
+        try { activeLaneId = feedLaneRoles.laneForRole('active'); } catch {}
+        if (activeLaneId) {
+          const l = this.lanes.get(activeLaneId);
+          if (l && l.wantPlay && l.audioPolicy !== 'always-muted') speaker = activeLaneId;
+        }
+      }
+    }
+
+    // Detect drift BEFORE we write, so the forensic snapshot captures the
+    // divergent world we're about to correct.
+    const changes: Array<{ laneId: LaneId; from: boolean; to: boolean; policy: LaneAudioPolicy }> = [];
+    this.lanes.forEach((lane) => {
+      if (lane.audioPolicy === 'local' && !this.borrowedLanes.has(lane.id)) return;
+      const desiredMuted = lane.id !== speaker;
+      // always-muted lanes must stay muted regardless of speaker calc.
+      const finalMuted = lane.audioPolicy === 'always-muted' ? true : desiredMuted;
+      if (lane.el.muted !== finalMuted) {
+        changes.push({ laneId: lane.id, from: lane.el.muted, to: finalMuted, policy: lane.audioPolicy });
+      }
+    });
+
+    if (changes.length === 0) {
+      logAudio('reconcile.noop', { reason, speaker, sessionMuted, fsOpen, borrowLaneId, msSinceOpen: msSinceOpen() });
+      return;
+    }
+
+    // Forensic dump on drift reconciles.
+    if (reason === 'drift') {
+      const writers: Record<string, MutedWriterRecord | null> = {};
+      lastMutedWriter.forEach((v, k) => { writers[k] = v; });
+      let roleSnap: unknown = null;
+      try { roleSnap = feedLaneRoles.snapshot(); } catch {}
+      logAudio('reconcile.drift.snapshot', {
+        reason, speaker, sessionMuted, fsOpen, borrowLaneId,
+        changes,
+        roles: roleSnap,
+        borrowedLanes: Array.from(this.borrowedLanes),
+        recentAudioEvents: (typeof getEntries === 'function' ? getEntries().slice(-5) : undefined),
+        lastMutedWriter: writers,
+        msSinceOpen: msSinceOpen(),
+      });
+    } else {
+      logAudio('reconcile.apply', { reason, speaker, sessionMuted, fsOpen, borrowLaneId, changes, msSinceOpen: msSinceOpen() });
+    }
+
+    // Apply. Mute non-speakers FIRST (ONE_UNMUTED_LANE invariant), then
+    // unmute the speaker. Skips 'local' non-borrowed lanes (early-return
+    // above kept them out of `changes`).
+    changes.forEach((c) => {
+      if (c.to === true) {
+        const lane = this.lanes.get(c.laneId);
+        if (lane) { lane.el.muted = true; this.emit(lane); }
+      }
+    });
+    changes.forEach((c) => {
+      if (c.to === false) {
+        const lane = this.lanes.get(c.laneId);
+        if (lane) { lane.el.muted = false; this.emit(lane); }
+      }
+    });
+  }
+
+  /** v9: 250ms heartbeat. Only actively verifies when the session is unmuted
+   *  (muted sessions can't drift — no one is audible). */
+  private driftCheck(): void {
+    try {
+      if (typeof document !== 'undefined' && document.hidden) return;
+      if (useSessionAudio.getState().isMuted) return;
+      this.reconcileAudio('drift');
+    } catch {}
+  }
+
   setMuted(laneId: LaneId, muted: boolean, trigger: string = 'setMuted'): void {
+
     const lane = this.getLane(laneId);
     const enforcedOn: LaneId[] = [];
     logAudio('setMuted.enter', { laneId, desired: muted, trigger, msSinceOpen: msSinceOpen() });
