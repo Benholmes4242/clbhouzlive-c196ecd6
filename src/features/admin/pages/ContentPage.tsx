@@ -255,7 +255,7 @@ function CoursesTab() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {c.courses.map(course => (
-            <CourseCard key={course.id} course={course} onOpen={() => setDrawerId(course.id)} />
+            <CourseCard key={course.id} course={course} onOpen={() => openCourse(course.id)} />
           ))}
         </div>
       )}
