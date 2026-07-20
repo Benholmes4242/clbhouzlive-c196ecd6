@@ -21,6 +21,7 @@ import { TOUR_CONFIG, type TourId } from '../hooks/useOverviewData';
 import { useLivePlayerIds } from '../players-v2/data/useLivePlayerIds';
 import {
   FONT,
+  INK,
   INK_MUTE,
   SLATE_50,
 } from '../_shared/tokens';
