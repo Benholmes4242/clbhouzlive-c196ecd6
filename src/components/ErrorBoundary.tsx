@@ -1,5 +1,6 @@
 import React from 'react';
 import { logError } from '@/utils/errorLogger';
+import { trackError } from '@/lib/errorTracking';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle } from 'lucide-react';
 
@@ -48,6 +49,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
       componentStack: errorInfo.componentStack,
       route: window.location.pathname,
     });
+    trackError({ kind: 'react', error });
 
     this.setState({
       error,
