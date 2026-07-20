@@ -394,7 +394,7 @@ const HandicapPage: React.FC = () => {
     enabled: !!ownerUserId,
     staleTime: 5 * 60_000,
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('user_profiles')
         .select('username, display_name, profile_photo_url')
         .eq('id', ownerUserId!)
