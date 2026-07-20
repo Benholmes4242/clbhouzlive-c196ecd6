@@ -13,6 +13,7 @@ import { usePendingPostsStore, type PendingPost } from '@/uploads/pendingPostsSt
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useProfileData } from '@/hooks/useProfileData';
 import { startPostUpload } from '../lib/postUploadController';
+import { extractMentions } from '@/lib/mentions/format';
 import type { StageMediaItem, StageCourse } from './useStageComposer';
 
 export interface SubmitInput {
