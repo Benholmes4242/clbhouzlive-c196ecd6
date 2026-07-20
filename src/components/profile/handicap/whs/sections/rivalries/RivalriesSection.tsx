@@ -331,13 +331,12 @@ const heroRailStyle: React.CSSProperties = {
 };
 
 const RivalrySkeleton: React.FC = () => (
-  <div
-    className="animate-pulse"
+  <Skeleton
+    variant="dark"
     style={{
       flex: '0 0 100%',
       height: 380,
       borderRadius: 18,
-      background: 'var(--hcp-bg-3)',
     }}
   />
 );
