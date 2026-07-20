@@ -370,6 +370,38 @@ class VideoEngineImpl {
     this.reconcileAudio('session-change');
   };
 
+  /**
+   * v10 audio-focus registry — the reconciler's single non-fullscreen input.
+   * Feed surfaces (SnapFeed on active-slide settle) and rail surfaces
+   * (useRailLane on lane acquisition) register the lane that owns audio.
+   * Last write wins. `null` clears focus (silence unless the fullscreen
+   * branch resolves a speaker).
+   */
+  private audioFocus: { laneId: LaneId | null; source: string | null } = {
+    laneId: null,
+    source: null,
+  };
+
+  setAudioFocus(laneId: LaneId | null, source: string): void {
+    const prev = this.audioFocus;
+    if (prev.laneId === laneId && prev.source === source) return;
+    this.audioFocus = { laneId, source };
+    if (audioDebugEnabled()) {
+      try {
+        logAudio('audio.focus', {
+          from: { laneId: prev.laneId, source: prev.source },
+          to: { laneId, source },
+          msSinceOpen: msSinceOpen(),
+        });
+      } catch { /* noop */ }
+    }
+    this.reconcileAudio('focus-change');
+  }
+
+  getAudioFocus(): { laneId: LaneId | null; source: string | null } {
+    return this.audioFocus;
+  }
+
 
   private onVisibility = () => {
     if (typeof document === 'undefined') return;
