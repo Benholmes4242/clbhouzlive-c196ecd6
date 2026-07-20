@@ -32,6 +32,13 @@ interface BusinessCommandCardProps {
   expanded?: boolean;
   /** Toggle handler — called when the user taps the summary row / chevron. */
   onToggle?: () => void;
+  /**
+   * Ask the page to open the confirm-delete dialog for this business.
+   * The dialog is hoisted to page level so invalidation-driven eviction of
+   * this card can never race Radix's DismissableLayer cleanup — the classic
+   * "delete-in-a-list-item" body pointer-events freeze.
+   */
+  onRequestDelete?: (input: { id: string; name: string }) => void;
 }
 
 // Access level labels for UI (not DB roles)
