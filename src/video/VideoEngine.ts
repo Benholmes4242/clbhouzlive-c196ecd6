@@ -488,8 +488,7 @@ class VideoEngineImpl {
 
   private applyAudioPolicy(
     lane: Lane,
-    trigger: 'mount' | 'activation' | 'policy-change' | 'external-bind' | 'guard-reassert' | 'role-promote' | 'unknown' = 'unknown',
-    opts: { claimsAudio?: boolean } = {}
+    trigger: 'mount' | 'policy-change' | 'external-bind' | 'guard-reassert' | 'role-promote' | 'unknown' = 'unknown',
   ): void {
     // Borrow override: while the fullscreen viewer owns this lane's element,
     // the effective policy is 'session' regardless of the lane's declared
@@ -499,39 +498,14 @@ class VideoEngineImpl {
     const effectivePolicy: LaneAudioPolicy = borrowed ? 'session' : lane.audioPolicy;
     const sessionMuted = useSessionAudio.getState().isMuted;
     // Resolve the feed role of this lane (null for non-feed lanes like
-    // fullscreen / rails). Used both for HUD legitimacy and to gate
-    // 'activation'-trigger session claims to the ACTIVE-role lane only.
+    // fullscreen / rails). Kept for HUD legitimacy in logs.
     let role: 'active' | 'next' | 'prev' | null = null;
     try {
       if (feedLaneRoles.isFeedLane(lane.id)) {
         role = feedLaneRoles.roleForLane(lane.id);
       }
     } catch { /* noop */ }
-    // v7 gate + v8 override: activation-trigger session claim ONLY when this
-    // lane holds the ACTIVE role (or is a non-feed lane, e.g. fullscreen),
-    // OR the caller explicitly declared the claim legitimate via
-    // claimsAudio (feed promotion path). Preload / warm-up play() calls
-    // never set claimsAudio, so v7's steal protection is preserved.
-    if (
-      trigger === 'activation' &&
-      effectivePolicy === 'session' &&
-      feedLaneRoles.isFeedLane(lane.id) &&
-      role !== 'active' &&
-      !opts.claimsAudio
-    ) {
-      logAudio('policy.resolve', {
-        laneId: lane.id,
-        trigger,
-        role,
-        declaredPolicy: lane.audioPolicy,
-        borrowed,
-        effectivePolicy,
-        sessionMuted,
-        elMuted: lane.el.muted,
-        action: 'skip-nonactive-role',
-      });
-      return;
-    }
+
     let action: 'noop' | 'mute' | 'setMuted' = 'noop';
     if (effectivePolicy === 'always-muted') {
       if (!lane.el.muted) { action = 'mute'; }
