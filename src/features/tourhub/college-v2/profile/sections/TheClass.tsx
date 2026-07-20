@@ -61,7 +61,7 @@ interface Props {
 }
 
 export function TheClass({ slug, collegeName }: Props) {
-  const { data: roster = [], isLoading } = useCollegeRoster(slug);
+  const { data: roster = [], isLoading, isError, refetch } = useCollegeRoster(slug);
   const { data: liveMap = {} } = useLivePlayerIds();
   const { data: weekRows = [] } = useThisWeekAlumni(slug);
 
@@ -95,7 +95,7 @@ export function TheClass({ slug, collegeName }: Props) {
       >
         <div
           style={{
-            fontSize: 9,
+            fontSize: 10,
             fontWeight: 800,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
@@ -117,13 +117,13 @@ export function TheClass({ slug, collegeName }: Props) {
           background: 'rgba(15,23,42,0.02)',
         }}
       >
-        <span style={{ width: 22, fontSize: 8, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+        <span style={{ width: 22, fontSize: 10, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
           #
         </span>
-        <span style={{ flex: 1, marginLeft: 8, fontSize: 8, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+        <span style={{ flex: 1, marginLeft: 8, fontSize: 10, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
           Player
         </span>
-        <span style={{ width: 78, textAlign: 'right', fontSize: 8, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+        <span style={{ width: 78, textAlign: 'right', fontSize: 10, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
           Earnings
         </span>
         <span style={{ width: 14 }} />
@@ -152,14 +152,30 @@ export function TheClass({ slug, collegeName }: Props) {
         </>
       )}
 
+      {/* Error */}
+      {!isLoading && isError && (
+        <div style={{ padding: '32px 16px', textAlign: 'center' }}>
+          <div style={{ fontSize: 12, fontWeight: 600, color: INK_FAINT, marginBottom: 10 }}>
+            Couldn't load the roster.
+          </div>
+          <button
+            type="button"
+            onClick={() => refetch()}
+            style={{ background: INK, color: '#fff', border: 'none', borderRadius: 999, padding: '8px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
       {/* Empty */}
-      {!isLoading && sorted.length === 0 && (
+      {!isLoading && !isError && sorted.length === 0 && (
         <div style={{ padding: '32px 16px', fontSize: 12, fontWeight: 600, color: INK_FAINT, textAlign: 'center' }}>
           No alumni found for this program.
         </div>
       )}
 
-      {!isLoading &&
+      {!isLoading && !isError &&
         sorted.map((a, idx) => {
           const star = isStar(a);
           const isChampion = idx === 0;
@@ -350,7 +366,7 @@ export function TheClass({ slug, collegeName }: Props) {
                     </span>
                     <span
                       style={{
-                        fontSize: 8.5,
+                        fontSize: 10,
                         fontWeight: 700,
                         color: INK_FAINT,
                         letterSpacing: '0.08em',
@@ -363,7 +379,7 @@ export function TheClass({ slug, collegeName }: Props) {
                 ) : tourTag ? (
                   <span
                     style={{
-                      fontSize: 9,
+                      fontSize: 10,
                       fontWeight: 700,
                       padding: '2px 6px',
                       borderRadius: 999,
@@ -378,7 +394,7 @@ export function TheClass({ slug, collegeName }: Props) {
                 ) : (
                   <span
                     style={{
-                      fontSize: 9,
+                      fontSize: 10,
                       fontWeight: 700,
                       padding: '2px 6px',
                       borderRadius: 999,
