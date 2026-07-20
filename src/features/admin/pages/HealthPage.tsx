@@ -14,12 +14,15 @@ import { usePushHealth } from '../hooks/usePushHealth';
 import { useDashboard } from '../hooks/useDashboard';
 import {
   computeEchoChip, computePushChip, computeEgChip, computeCronChip,
+  computeErrorsChip,
   type ChipState,
 } from '../lib/healthChips';
+import { useErrorCount24h } from '../hooks/useStability';
 import { AuditLogTab, DevToolsTab, SettingsTab } from './SystemPage';
 import VideoPerfPage from './VideoPerfPage';
+import StabilityTab from './StabilityTab';
 
-type TabId = 'status' | 'video' | 'audit' | 'tools' | 'settings';
+type TabId = 'status' | 'stability' | 'video' | 'audit' | 'tools' | 'settings';
 
 function relTime(iso: string | null | undefined): string {
   if (!iso) return '-';
@@ -47,11 +50,12 @@ export default function HealthPage() {
 
   const tabs: SectionTab[] = can.manageAdmins
     ? [
-        { id: 'status',   label: 'Status' },
-        { id: 'video',    label: 'Video' },
-        { id: 'audit',    label: 'Audit' },
-        { id: 'tools',    label: 'Tools' },
-        { id: 'settings', label: 'Settings' },
+        { id: 'status',    label: 'Status' },
+        { id: 'stability', label: 'Stability' },
+        { id: 'video',     label: 'Video' },
+        { id: 'audit',     label: 'Audit' },
+        { id: 'tools',     label: 'Tools' },
+        { id: 'settings',  label: 'Settings' },
       ]
     : [{ id: 'settings', label: 'Settings' }];
 
@@ -66,14 +70,19 @@ export default function HealthPage() {
   const push = usePushHealth();
   const dashboard = useDashboard();
   const eg = dashboard.egSyncHealth;
+  const errors = useErrorCount24h();
 
   const echoChip = useMemo(() => computeEchoChip(echo), [echo.isLoading, echo.isError, echo.data]);
   const pushChip = useMemo(() => computePushChip(push), [push.isLoading, push.isError, push.data]);
   const egChip   = useMemo(() => computeEgChip(eg),   [eg.isLoading, eg.isError, eg.data]);
   const cronChip = useMemo(() => computeCronChip(eg), [eg.isLoading, eg.isError, eg.data]);
+  const errorsChip = useMemo(
+    () => computeErrorsChip(errors.data ?? null, errors.isLoading, errors.isError),
+    [errors.data, errors.isLoading, errors.isError],
+  );
 
-  const anyLoading = echo.isLoading || push.isLoading || eg.isLoading;
-  const nonOk = [echoChip, pushChip, egChip, cronChip].filter(c => c.tone !== 'ok' && c.tone !== 'idle').length;
+  const anyLoading = echo.isLoading || push.isLoading || eg.isLoading || errors.isLoading;
+  const nonOk = [echoChip, pushChip, egChip, cronChip, errorsChip].filter(c => c.tone !== 'ok' && c.tone !== 'idle').length;
 
   return (
     <div style={{ padding: '8px 16px 0', display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 1024, margin: '0 auto' }}>
@@ -89,6 +98,7 @@ export default function HealthPage() {
           echoChip={echoChip} pushChip={pushChip} egChip={egChip} cronChip={cronChip}
         />
       )}
+      {tab === 'stability' && can.manageAdmins && <StabilityTab />}
       {tab === 'video' && can.manageAdmins && <VideoPerfPage />}
       {tab === 'audit' && can.manageAdmins && <AuditLogTab />}
       {tab === 'tools' && can.manageAdmins && <DevToolsTab />}

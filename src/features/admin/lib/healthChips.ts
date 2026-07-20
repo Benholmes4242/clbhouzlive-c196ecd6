@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useEchoEngineHealth } from '../hooks/useEchoEngineHealth';
 import { usePushHealth } from '../hooks/usePushHealth';
 import { useDashboard } from '../hooks/useDashboard';
+import { useErrorCount24h } from '../hooks/useStability';
 import { adminTheme as t } from '../theme';
 
 export type ChipTone = 'ok' | 'warn' | 'danger' | 'idle';
@@ -52,22 +53,39 @@ export function computeCronChip(eg: ReturnType<typeof useDashboard>['egSyncHealt
   return { tone: 'ok', label: 'Cron', detail: `${Math.round(h)}h ago` };
 }
 
+export function computeErrorsChip(
+  count24h: number | null | undefined,
+  isLoading: boolean,
+  isError: boolean,
+): ChipState {
+  if (isLoading) return { tone: 'idle', label: 'Errors', detail: 'Loading' };
+  if (isError || count24h == null) return { tone: 'warn', label: 'Errors', detail: 'Unavailable' };
+  if (count24h === 0) return { tone: 'ok', label: 'Errors', detail: '0 in 24h' };
+  if (count24h < 10) return { tone: 'warn', label: 'Errors', detail: `${count24h} in 24h` };
+  return { tone: 'danger', label: 'Errors', detail: `${count24h} in 24h` };
+}
+
 export function useHealthChips() {
   const echo = useEchoEngineHealth();
   const push = usePushHealth();
   const dashboard = useDashboard();
   const eg = dashboard.egSyncHealth;
+  const errors = useErrorCount24h();
 
   const echoChip = useMemo(() => computeEchoChip(echo), [echo.isLoading, echo.isError, echo.data]);
   const pushChip = useMemo(() => computePushChip(push), [push.isLoading, push.isError, push.data]);
   const egChip = useMemo(() => computeEgChip(eg), [eg.isLoading, eg.isError, eg.data]);
   const cronChip = useMemo(() => computeCronChip(eg), [eg.isLoading, eg.isError, eg.data]);
+  const errorsChip = useMemo(
+    () => computeErrorsChip(errors.data ?? null, errors.isLoading, errors.isError),
+    [errors.data, errors.isLoading, errors.isError],
+  );
 
-  const chips = { echo: echoChip, push: pushChip, eg: egChip, cron: cronChip };
-  const anyLoading = echo.isLoading || push.isLoading || eg.isLoading;
-  const nonOk = [echoChip, pushChip, egChip, cronChip].filter(
+  const chips = { echo: echoChip, push: pushChip, eg: egChip, cron: cronChip, errors: errorsChip };
+  const anyLoading = echo.isLoading || push.isLoading || eg.isLoading || errors.isLoading;
+  const nonOk = [echoChip, pushChip, egChip, cronChip, errorsChip].filter(
     c => c.tone !== 'ok' && c.tone !== 'idle',
   ).length;
 
-  return { chips, nonOk, isLoading: anyLoading, echo, push };
+  return { chips, nonOk, isLoading: anyLoading, echo, push, errors };
 }

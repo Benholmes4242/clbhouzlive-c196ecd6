@@ -24,9 +24,11 @@ import EmptyState from '../components/EmptyState';
 import DetailDrawer from '../components/DetailDrawer';
 import ConfirmDialog from '../components/ConfirmDialog';
 import AdminSheet from '../components/AdminSheet';
+import CourseInsight from '../components/CourseInsight';
 import AdminAccessDenied from '../components/AdminAccessDenied';
 import { VALID_CONTINENTS, COURSE_TYPES } from '../constants';
 import { useCourses, createCourse, type AdminCourseRow, type CourseFilter } from '../hooks/useCourses';
+import { saveDraft, loadDraft, clearDraft, draftKeys, draftsEqual } from '../lib/sheetDrafts';
 import HelpArticlesTab from '../components/HelpArticlesTab';
 import LegalDocumentsTab from '../components/LegalDocumentsTab';
 
@@ -135,8 +137,21 @@ function CoursesTab() {
     return () => window.removeEventListener('admin-v2:refetch', h);
   }, [c]);
 
-  const [drawerId, setDrawerId] = useState<string | null>(null);
-  const [addOpen, setAddOpen] = useState(false);
+  // Sheet state lives in the URL so app-switch reloads restore it.
+  const drawerId = params.get('course');
+  const addOpen = params.get('add') === 'course';
+
+  const setSheetParam = (mutate: (p: URLSearchParams) => void, opening: boolean) => {
+    const next = new URLSearchParams(params);
+    const hadSheet = !!next.get('course') || next.get('add') === 'course';
+    mutate(next);
+    // push on the initial open (so back-swipe closes the sheet), replace otherwise.
+    setParams(next, { replace: !(opening && !hadSheet) });
+  };
+  const openCourse = (id: string) => setSheetParam(p => { p.set('course', id); p.delete('add'); }, true);
+  const openAdd = () => setSheetParam(p => { p.set('add', 'course'); p.delete('course'); }, true);
+  const closeSheet = () => setSheetParam(p => { p.delete('course'); p.delete('add'); }, false);
+
   const totalPages = Math.max(1, Math.ceil(c.total / c.pageSize));
 
   const totalLabel = c.stats.total > 0 ? c.stats.total.toLocaleString() : '';
@@ -172,7 +187,7 @@ function CoursesTab() {
           />
         </div>
         <button
-          onClick={() => setAddOpen(true)}
+          onClick={openAdd}
           style={{
             padding: '10px 14px', borderRadius: t.radius.md,
             border: 'none', background: t.ink, color: t.surface,
@@ -240,7 +255,7 @@ function CoursesTab() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {c.courses.map(course => (
-            <CourseCard key={course.id} course={course} onOpen={() => setDrawerId(course.id)} />
+            <CourseCard key={course.id} course={course} onOpen={() => openCourse(course.id)} />
           ))}
         </div>
       )}
@@ -261,7 +276,7 @@ function CoursesTab() {
 
       <CourseDetail
         courseId={drawerId}
-        onClose={() => setDrawerId(null)}
+        onClose={closeSheet}
         update={c.updateCourse}
         uploadPhoto={c.uploadPhoto}
         uploading={c.isUploadingPhoto}
@@ -271,10 +286,11 @@ function CoursesTab() {
 
       <AddCourseSheet
         open={addOpen}
-        onClose={() => setAddOpen(false)}
+        onClose={closeSheet}
         onCreated={() => { c.refetch(); }}
         uploadPhoto={c.uploadPhoto}
       />
+
 
       <style>{`@keyframes admin-pulse { 0%,100%{opacity:.55} 50%{opacity:1} }`}</style>
     </div>
@@ -296,6 +312,37 @@ function PagerBtn({ children, ...rest }: React.ButtonHTMLAttributes<HTMLButtonEl
     >{children}</button>
   );
 }
+
+/* ───────── Draft-restored notice bar ───────── */
+
+function DraftRestoredBar({ visible, onDiscard }: { visible: boolean; onDiscard: () => void }) {
+  if (!visible) return null;
+  return (
+    <div
+      role="status"
+      style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        gap: 8, padding: '8px 12px', minHeight: 40,
+        borderRadius: t.radius.md, border: `1px solid ${t.line}`,
+        background: t.brandSoft, color: t.brandText,
+        fontSize: 12, fontWeight: 600,
+      }}
+    >
+      <span>Draft restored</span>
+      <button
+        type="button"
+        onClick={onDiscard}
+        style={{
+          background: 'transparent', border: 'none',
+          color: t.brandText, fontSize: 12, fontWeight: 700,
+          cursor: 'pointer', padding: '4px 8px',
+        }}
+      >Discard</button>
+    </div>
+  );
+}
+
+
 
 function CourseCard({ course, onOpen }: { course: AdminCourseRow; onOpen: () => void }) {
   const top100 = isTop100(course);
@@ -381,7 +428,7 @@ function CourseDetail({
   deleteCourse: (id: string) => Promise<any>;
   deleting: boolean;
 }) {
-  const { data: course } = useQuery({
+  const { data: course, isFetched } = useQuery({
     queryKey: ['admin-v2', 'courses', 'detail', courseId],
     queryFn: async () => {
       if (!courseId) return null;
@@ -398,11 +445,20 @@ function CourseDetail({
 
   const [form, setForm] = useState<Record<string, any>>({});
   const [confirmDel, setConfirmDel] = useState(false);
+  const [draftRestored, setDraftRestored] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const qc = useQueryClient();
+  const draftKey = courseId ? draftKeys.course(courseId) : null;
 
+  // Silently close if the id no longer resolves to a row.
   useEffect(() => {
-    if (course) setForm({
+    if (courseId && isFetched && course == null) onClose();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [courseId, isFetched, course]);
+
+  const courseValues = useMemo<Record<string, any> | null>(() => {
+    if (!course) return null;
+    return {
       name: course.name ?? '',
       country: course.country ?? '',
       sub_country: course.sub_country ?? '',
@@ -419,10 +475,36 @@ function CourseDetail({
       course_type: course.course_type ?? '',
       has_hosted_major: !!course.has_hosted_major,
       description: course.description ?? '',
-    });
+    };
   }, [course?.id]); // eslint-disable-line
 
-  const set = (k: string, v: any) => setForm(f => ({ ...f, [k]: v }));
+  // Hydrate form from record; if a matching draft exists AND differs from
+  // record values, apply the draft and surface the restored bar.
+  useEffect(() => {
+    if (!courseValues || !draftKey) return;
+    const draft = loadDraft(draftKey);
+    if (draft && !draftsEqual(draft, courseValues)) {
+      setForm({ ...courseValues, ...draft });
+      setDraftRestored(true);
+    } else {
+      setForm(courseValues);
+      setDraftRestored(false);
+    }
+  }, [courseValues, draftKey]);
+
+  const set = (k: string, v: any) => {
+    setForm(f => {
+      const next = { ...f, [k]: v };
+      if (draftKey) saveDraft(draftKey, next);
+      return next;
+    });
+  };
+
+  const discardDraft = () => {
+    if (draftKey) clearDraft(draftKey);
+    if (courseValues) setForm(courseValues);
+    setDraftRestored(false);
+  };
 
   const handleSave = async () => {
     if (!courseId) return;
@@ -445,6 +527,8 @@ function CourseDetail({
       description: form.description || null,
     };
     await update(courseId, updates);
+    if (draftKey) clearDraft(draftKey);
+    setDraftRestored(false);
     qc.invalidateQueries({ queryKey: ['admin-v2', 'courses', 'detail', courseId] });
   };
 
@@ -484,6 +568,29 @@ function CourseDetail({
         <div style={{ color: t.inkMuted, fontSize: 13 }}>Loading…</div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <DraftRestoredBar visible={draftRestored} onDiscard={discardDraft} />
+          {/* C4-2: Course Insight (collapsed by default) */}
+          <details
+            style={{
+              border: `1px solid ${t.line}`, borderRadius: t.radius.md,
+              background: t.surface, padding: '10px 12px',
+            }}
+          >
+            <summary
+              style={{
+                cursor: 'pointer', listStyle: 'none',
+                color: t.ink, fontSize: 13, fontWeight: 700,
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              }}
+            >
+              <span>Insights</span>
+              <ChevronRight size={14} color={t.inkFaint} />
+            </summary>
+            <div style={{ marginTop: 10 }}>
+              <CourseInsight courseId={courseId} compact />
+            </div>
+          </details>
+
           {/* Hero */}
           <div style={{
             position: 'relative', aspectRatio: '16/9',
@@ -690,33 +797,50 @@ function AddCourseSheet({ open, onClose, onCreated, uploadPhoto }: {
   onCreated: () => void;
   uploadPhoto: (id: string, file: File) => Promise<any>;
 }) {
-  const [form, setForm] = useState({
+  const EMPTY = {
     name: '', country: '', continent: '',
     sub_country: '', region: '',
     latitude: '', longitude: '',
     website_url: '', course_type: '',
     has_hosted_major: false, description: '',
-  });
+  };
+  const [form, setForm] = useState(EMPTY);
   const [busy, setBusy] = useState(false);
+  const [draftRestored, setDraftRestored] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
-  const set = (k: keyof typeof form, v: any) => setForm(f => ({ ...f, [k]: v }));
+  const draftKey = draftKeys.courseNew();
+  const set = (k: keyof typeof form, v: any) => setForm(f => {
+    const next = { ...f, [k]: v };
+    saveDraft(draftKey, next);
+    return next;
+  });
 
   useEffect(() => {
-    if (!open) {
-      setForm({
-        name: '', country: '', continent: '',
-        sub_country: '', region: '',
-        latitude: '', longitude: '',
-        website_url: '', course_type: '',
-        has_hosted_major: false, description: '',
-      });
-      setPhotoFile(null);
-      if (photoPreview) URL.revokeObjectURL(photoPreview);
-      setPhotoPreview(null);
+    if (open) {
+      // Restore any prior draft when the sheet appears (fresh mount or reopen).
+      const draft = loadDraft(draftKey) as Partial<typeof EMPTY> | null;
+      if (draft && !draftsEqual(draft as any, EMPTY as any)) {
+        setForm({ ...EMPTY, ...draft });
+        setDraftRestored(true);
+      }
+      return;
     }
-  }, [open]);
+    // Closed: reset ephemeral form + photo, but leave the persisted draft alone.
+    setForm(EMPTY);
+    setDraftRestored(false);
+    setPhotoFile(null);
+    if (photoPreview) URL.revokeObjectURL(photoPreview);
+    setPhotoPreview(null);
+  }, [open]); // eslint-disable-line
+
+  const discardDraft = () => {
+    clearDraft(draftKey);
+    setForm(EMPTY);
+    setDraftRestored(false);
+  };
+
 
   const onPickPhoto = (f: File | null) => {
     if (photoPreview) URL.revokeObjectURL(photoPreview);
@@ -742,6 +866,7 @@ function AddCourseSheet({ open, onClose, onCreated, uploadPhoto }: {
         }
       }
       toast.success(`"${form.name}" created`);
+      clearDraft(draftKey);
       onCreated();
       onClose();
     } catch (e: any) {
@@ -789,7 +914,9 @@ function AddCourseSheet({ open, onClose, onCreated, uploadPhoto }: {
       }
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+        <DraftRestoredBar visible={draftRestored} onDiscard={discardDraft} />
         <Section title="Photo">
+
           <div style={{
             position: 'relative', aspectRatio: '16/9',
             borderRadius: t.radius.md, overflow: 'hidden',
@@ -1073,7 +1200,19 @@ function TourPlayersTab() {
   const [tourFilter, setTourFilter] = useState('all');
   const [syncing, setSyncing] = useState(false);
   const [syncLabel, setSyncLabel] = useState('');
-  const [photoPlayer, setPhotoPlayer] = useState<PlayerRow | null>(null);
+  const [playerParams, setPlayerParams] = useSearchParams();
+  const activePlayerId = playerParams.get('player');
+  const openPlayer = (id: string) => {
+    const next = new URLSearchParams(playerParams);
+    const wasOpen = !!next.get('player');
+    next.set('player', id);
+    setPlayerParams(next, { replace: wasOpen });
+  };
+  const closePlayer = () => {
+    const next = new URLSearchParams(playerParams);
+    next.delete('player');
+    setPlayerParams(next, { replace: true });
+  };
   const [cacheBust, setCacheBust] = useState(0);
   const PAGE_SIZE = 25;
 
@@ -1247,7 +1386,7 @@ function TourPlayersTab() {
         <EmptyState title="No players" />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {paginated.map(p => <PlayerRowCard key={p.id} player={p} cacheBust={cacheBust} onPhoto={() => setPhotoPlayer(p)} />)}
+          {paginated.map(p => <PlayerRowCard key={p.id} player={p} cacheBust={cacheBust} onPhoto={() => openPlayer(p.id)} />)}
         </div>
       )}
 
@@ -1265,14 +1404,15 @@ function TourPlayersTab() {
       )}
 
       <PhotoSheet
-        player={photoPlayer}
-        onClose={() => setPhotoPlayer(null)}
+        player={data.find(p => p.id === activePlayerId) ?? null}
+        onClose={closePlayer}
         cacheBust={cacheBust}
         onCacheBust={() => setCacheBust(p => p + 1)}
       />
     </div>
   );
 }
+
 
 function PlayerAvatar({ player, cacheBust, size = 40 }: { player: PlayerRow; cacheBust?: number; size?: number }) {
   const name = player.fullName || `${player.firstName || ''} ${player.lastName || ''}`.trim();
@@ -1365,8 +1505,32 @@ function PhotoSheet({
   const [removing, setRemoving] = useState(false);
   const [savingOverride, setSavingOverride] = useState(false);
   const [override, setOverride] = useState('');
+  const [draftRestored, setDraftRestored] = useState(false);
+  const draftKey = player ? draftKeys.player(player.id) : null;
 
-  useEffect(() => { setOverride(player?.headshotOverride ?? ''); }, [player?.id, player?.headshotOverride]);
+  useEffect(() => {
+    if (!player || !draftKey) { setOverride(''); setDraftRestored(false); return; }
+    const record = player.headshotOverride ?? '';
+    const draft = loadDraft(draftKey) as { override?: string } | null;
+    if (draft && typeof draft.override === 'string' && draft.override !== record) {
+      setOverride(draft.override);
+      setDraftRestored(true);
+    } else {
+      setOverride(record);
+      setDraftRestored(false);
+    }
+  }, [player?.id, player?.headshotOverride, draftKey]);
+
+  const onOverrideChange = (v: string) => {
+    setOverride(v);
+    if (draftKey) saveDraft(draftKey, { override: v });
+  };
+
+  const discardDraft = () => {
+    if (draftKey) clearDraft(draftKey);
+    setOverride(player?.headshotOverride ?? '');
+    setDraftRestored(false);
+  };
 
   if (!player) return null;
   const name = player.fullName || `${player.firstName || ''} ${player.lastName || ''}`.trim() || 'Unknown';
@@ -1388,6 +1552,8 @@ function PhotoSheet({
       const { error } = await supabase.from('sr_players').update({ headshot_override: val } as any).eq('id', player.id);
       if (error) throw error;
       toast.success('Override saved');
+      if (draftKey) clearDraft(draftKey);
+      setDraftRestored(false);
       invalidateAndBust();
     } catch (e: any) { toast.error(`Failed: ${e.message}`); }
     finally { setSavingOverride(false); }
@@ -1452,6 +1618,7 @@ function PhotoSheet({
       }
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'stretch' }}>
+        <DraftRestoredBar visible={draftRestored} onDiscard={discardDraft} />
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <div style={{
             width: 112, height: 112, borderRadius: t.radius.lg,
@@ -1469,7 +1636,7 @@ function PhotoSheet({
           <div style={{ display: 'flex', gap: 8 }}>
             <input
               value={override}
-              onChange={e => setOverride(e.target.value)}
+              onChange={e => onOverrideChange(e.target.value)}
               placeholder={name}
               style={{
                 flex: 1, minHeight: 44, padding: '10px 12px',

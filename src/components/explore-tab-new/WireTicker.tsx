@@ -1,9 +1,7 @@
-import { useMemo } from 'react';
+import { useMemo, useRef, useState, useEffect } from 'react';
 import { useWireActivity, type WireActivityRow, type WireFeatType } from './hooks/useWireActivity';
 import { useScorecardOpener } from './useScorecardOpener';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
-import { TickerShell } from '@/components/shared/wire/TickerShell';
-import { WIRE_BG, WIRE_HEIGHT, WIRE_ITEM_GAP } from '@/components/shared/wire/tokens';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
@@ -41,84 +39,165 @@ function achievementPhrase(row: WireActivityRow): string {
   return 'set a mark';
 }
 
+const TICKER_STYLE_ID = 'almanac-ticker-keyframes';
+function ensureTickerStyles() {
+  if (typeof document === 'undefined') return;
+  if (document.getElementById(TICKER_STYLE_ID)) return;
+  const style = document.createElement('style');
+  style.id = TICKER_STYLE_ID;
+  // Keyframes only — per-instance duration comes from an inline style var so
+  // the loop cadence can scale with item count without CSS rebuilds.
+  style.textContent = `
+@keyframes almanac-ticker-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.almanac-ticker-track {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  width: max-content;
+  animation-name: almanac-ticker-scroll;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-duration: var(--almanac-ticker-duration, 28s);
+  will-change: transform;
+}
+.almanac-ticker-track[data-paused="true"] { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .almanac-ticker-track { animation: none !important; }
+}
+`;
+  document.head.appendChild(style);
+}
+
 export function WireTicker() {
   const { data } = useWireActivity();
   const { target, openByScore, close } = useScorecardOpener();
+  const [paused, setPaused] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
 
-  const rows = useMemo(() => (data ?? []).slice(0, 20), [data]);
+  useEffect(() => {
+    ensureTickerStyles();
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setReducedMotion(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
+    mq.addEventListener?.('change', handler);
+    return () => mq.removeEventListener?.('change', handler);
+  }, []);
 
-  const items = useMemo(
-    () =>
-      rows.map((r, i) => {
-        const friend = formatFriendName(r.friend_name);
-        const chipLabel = CHIP_LABEL[r.feat_type] ?? 'HIGHLIGHT';
-        const detail = (r.feat_value ?? '').trim();
-        const phrase = achievementPhrase(r);
-        const text = `${friend} · ${phrase} at ${r.course_name}${detail ? ` · ${detail}` : ''}`;
-        return (
-          <button
-            key={`${r.score_id}-${i}`}
-            type="button"
-            onClick={() => openByScore(r.score_id, r.connection_id, r.friend_user_id)}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              background: 'transparent',
-              border: 'none',
-              padding: 0,
-              paddingBlock: 12,
-              marginBlock: -12,
-              cursor: 'pointer',
-              fontFamily: FONT,
-              flexShrink: 0,
-            }}
-          >
-            <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                padding: '2px 6px',
-                borderRadius: 4,
-                background: '#FBBC2E',
-                color: '#0F172A',
-                fontSize: 10,
-                fontWeight: 700,
-                letterSpacing: '0.06em',
-                lineHeight: 1.3,
-                flexShrink: 0,
-              }}
-            >
-              {chipLabel}
-            </span>
-            <span
-              style={{
-                fontSize: 13,
-                fontWeight: 500,
-                color: 'rgba(255,255,255,0.72)',
-                whiteSpace: 'nowrap',
-                lineHeight: 1,
-              }}
-            >
-              {text}
-            </span>
-          </button>
-        );
-      }),
-    [rows, openByScore],
+  const items = useMemo(() => (data ?? []).slice(0, 20), [data]);
+  // Duplicate the sequence once so translateX(-50%) yields a seamless join.
+  const loopItems = useMemo(() => [...items, ...items], [items]);
+  // Scale duration with content so 20 items scroll at the same per-item speed
+  // as 6 rather than whipping past. Floor keeps very short sets readable.
+  const durationSec = useMemo(
+    () => Math.max(40, items.length * 5.5),
+    [items.length],
   );
+
+  const trackRef = useRef<HTMLDivElement | null>(null);
 
   if (items.length === 0) return null;
 
+  const renderItem = (r: WireActivityRow, i: number) => {
+    const friend = formatFriendName(r.friend_name);
+    const chipLabel = CHIP_LABEL[r.feat_type] ?? 'HIGHLIGHT';
+    const detail = (r.feat_value ?? '').trim();
+    const phrase = achievementPhrase(r);
+    const text = `${friend} · ${phrase} at ${r.course_name}${detail ? ` · ${detail}` : ''}`;
+    return (
+      <button
+        key={`${r.score_id}-${i}`}
+        type="button"
+        onClick={() => openByScore(r.score_id, r.connection_id, r.friend_user_id)}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 8,
+        background: 'transparent',
+        border: 'none',
+        padding: 0,
+        paddingBlock: 12,
+        marginBlock: -12,
+        cursor: 'pointer',
+        fontFamily: FONT,
+        flexShrink: 0,
+      }}
+      >
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            padding: '2px 6px',
+            borderRadius: 4,
+            background: '#FBBC2E',
+            color: '#0F172A',
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: '0.06em',
+            lineHeight: 1.3,
+            flexShrink: 0,
+          }}
+        >
+          {chipLabel}
+        </span>
+        <span
+          style={{
+            fontSize: 13,
+            fontWeight: 500,
+            color: 'rgba(255,255,255,0.72)',
+            whiteSpace: 'nowrap',
+            lineHeight: 1,
+          }}
+        >
+          {text}
+        </span>
+      </button>
+    );
+  };
+
+  const content = reducedMotion ? (
+    <div
+      className="flex items-center overflow-x-auto scrollbar-hide"
+      style={{ gap: 24, padding: '0 14px' }}
+    >
+      {items.map(renderItem)}
+    </div>
+  ) : (
+    <div style={{ overflow: 'hidden', padding: '0 14px' }}>
+      <div
+        ref={trackRef}
+        className="almanac-ticker-track"
+        data-paused={paused || undefined}
+        style={{ ['--almanac-ticker-duration' as string]: `${durationSec}s` }}
+        onPointerDown={() => setPaused(true)}
+        onPointerUp={() => setPaused(false)}
+        onPointerLeave={() => setPaused(false)}
+        onPointerCancel={() => setPaused(false)}
+        onTouchStart={() => setPaused(true)}
+        onTouchEnd={() => setPaused(false)}
+        onTouchCancel={() => setPaused(false)}
+      >
+        {loopItems.map(renderItem)}
+      </div>
+    </div>
+  );
+
   return (
-    <>
-      <TickerShell
-        items={items}
-        background={WIRE_BG}
-        height={WIRE_HEIGHT}
-        gap={WIRE_ITEM_GAP}
-        ariaLabel="Live achievements wire"
-      />
+    <section
+      style={{
+        background: '#15171F',
+        height: 36,
+        display: 'flex',
+        alignItems: 'center',
+        width: '100%',
+        overflow: 'hidden',
+      }}
+      aria-label="Live achievements wire"
+    >
+      {content}
       <RoundDetailSheet
         open={!!target}
         onClose={close}
@@ -126,7 +205,7 @@ export function WireTicker() {
         connectionId={target?.connectionId ?? null}
         profileUserId={target?.profileUserId ?? null}
       />
-    </>
+    </section>
   );
 }
 

@@ -55,18 +55,6 @@ export interface HubRpcRow {
   review_course_id?: string | null;
   review_course_name?: string | null;
   review_course_image?: string | null;
-  // Full review parity so ReviewBottomSheet gets caption + per-category scores
-  // when opened from a Watch surface. Underlying RPCs (get_watch_shorts,
-  // get_watch_mixed_grid) already return these columns; declaring them here
-  // lets rowDefaults pass them through to mapRowToFeedPost.
-  review_text?: string | null;
-  review_course_region?: string | null;
-  review_course_country?: string | null;
-  review_course_sub_country?: string | null;
-  review_design_score?: number | null;
-  review_condition_score?: number | null;
-  review_facilities_score?: number | null;
-  review_clubhouse_score?: number | null;
   creator_relation?: string | null;
   is_liked_by_me?: boolean | null;
   is_followed_by_me?: boolean | null;
@@ -110,14 +98,6 @@ function rowDefaults(row: HubRpcRow): FeedRpcRow {
     review_course_id: row.review_course_id ?? null,
     review_course_name: row.review_course_name ?? null,
     review_course_image: row.review_course_image ?? null,
-    review_course_region: row.review_course_region ?? null,
-    review_course_country: row.review_course_country ?? null,
-    review_course_sub_country: row.review_course_sub_country ?? null,
-    review_text: row.review_text ?? null,
-    review_design_score: row.review_design_score ?? null,
-    review_condition_score: row.review_condition_score ?? null,
-    review_facilities_score: row.review_facilities_score ?? null,
-    review_clubhouse_score: row.review_clubhouse_score ?? null,
     creator_relation: (row.creator_relation ?? 'none') as FeedRpcRow['creator_relation'],
     is_liked_by_me: !!row.is_liked_by_me,
     is_followed_by_me: !!row.is_followed_by_me,

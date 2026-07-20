@@ -26,17 +26,15 @@ import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar
 import { PhotoBand } from './HybridHeroBands/PhotoBand';
 import { MiddleBand } from './HybridHeroBands/MiddleBand';
 import { LeaderboardBand } from './HybridHeroBands/LeaderboardBand';
-import { HeroWireTicker } from './HybridHeroBands/HeroWireTicker';
+import { CinematicFrame } from './HybridHeroBands/CinematicFrame';
+import { CinematicHeroFullBleed } from './HybridHeroBands/CinematicHeroFullBleed';
 import { setHeroFullBleed } from '../../_shared/heroFullBleedSignal';
-import { formatPurse } from '../../_shared/formatPurse';
 import { formatMonthDay } from '@/i18n/format';
-import { useAIPredictions } from '../../hooks/useAIPredictions';
 import {
   deriveHeroState,
   detectTopTie,
   deriveTickerRows,
   fmtScore,
-  todayFromEntry,
 } from './HybridHero.utils';
 import { BG, INK_15 } from './HybridHero.constants';
 
@@ -293,97 +291,69 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
   // gold "MAJOR" tag next to the eyebrow — no relocation, cosmetic only.
   const showMajorTag = !isPseudoMajor && tournament.isMajor;
 
-  // v11 composition: PhotoBand + HeroWireTicker for live/results/upcoming.
-  // Legacy three-band path (PhotoBand + MiddleBand + LeaderboardBand) is
-  // retained only for the cancelled variant.
-  const isCancelled = state.kind === 'results' && state.variant === 'cancelled';
+  // Direction A: CinematicFrame is the single hero surface for all three states.
+  // Legacy three-band path is retained only for the cancelled variant.
+  const useCinematicFrame =
+    state.kind === 'live' ||
+    state.kind === 'results' ||
+    state.kind === 'upcoming';
 
   // Signal the surrounding page when this hero is rendering the full-bleed
-  // variant. Used by TourHubMainPage to drop chrome padding + engage the
-  // transparent-chrome overlay.
-  const isFullBleedCinematic = !isCancelled;
+  // cinematic variant (live/results). Used by TourHubMainPage to drop chrome
+  // padding + engage the transparent-chrome overlay.
+  const isFullBleedCinematic =
+    (state.kind === 'live' || state.kind === 'results' || state.kind === 'upcoming') &&
+    !(state.kind === 'results' && state.variant === 'cancelled');
   useEffect(() => {
     setHeroFullBleed(isFullBleedCinematic);
     return () => setHeroFullBleed(false);
   }, [isFullBleedCinematic]);
 
-  // AI predictions — shared cache with TIPicksCarousel. Only requested for
-  // upcoming / live states; results state renders champion+leaderboard and
-  // doesn't consume predictions data.
-  const needsPredictions = state.kind === 'upcoming' || state.kind === 'live';
-  const { data: aiData } = useAIPredictions(needsPredictions ? tournament.id : null);
-  const insight =
-    (aiData?.courseAnalysis?.insight && aiData.courseAnalysis.insight.trim()) || null;
-  const upcomingContenders = useMemo(() => {
-    if (state.kind !== 'upcoming' || !aiData?.topContenders) return [];
-    return [...aiData.topContenders]
-      .sort((a, b) => (a.worldRanking ?? 999) - (b.worldRanking ?? 999))
-      .slice(0, 10)
-      .map((c) => ({
-        playerName: c.playerName,
-        worldRanking: c.worldRanking ?? null,
-        country: (c as any).country ?? null,
-      }));
-  }, [state.kind, aiData]);
+  // Compute hours-until-start for the cinematic upcoming countdown
+  const datesStringForHero =
+    startD && endD
+      ? `${formatMonthDay(startD).toUpperCase()} \u2013 ${endD.getDate()}`
+      : endD
+        ? formatMonthDay(endD).toUpperCase()
+        : null;
 
-  // Derive leader-row data for live state.
-  const leaderRow = useMemo(() => {
-    if (state.kind !== 'live') return null;
-    const top: any = safeLeaderboard[0];
-    if (!top) return null;
-    const p = top.player;
-    const name = p?.full_name || `${p?.first_name ?? ''} ${p?.last_name ?? ''}`.trim() || '—';
-    const today = todayFromEntry(top);
-    const totalScore = typeof top.score === 'number' ? top.score : null;
-    const thruRaw = top.thru;
-    const thruLabel =
-      thruRaw != null && thruRaw !== ''
-        ? typeof thruRaw === 'number'
-          ? `THRU ${thruRaw}`
-          : String(thruRaw)
-        : today != null
-          ? `${fmtScore(today)} TODAY`
-          : null;
-    return {
-      name,
-      score: totalScore != null ? fmtScore(totalScore) : null,
-      thru: thruLabel,
-      photoUrl: p?.photo_url ?? null,
-      tourCode: tournament.tourSlug ?? 'pga',
-      tiedCount: tiedLeaders?.count ?? null,
-    };
-  }, [state.kind, safeLeaderboard, tournament.tourSlug, tiedLeaders]);
-
-  // Compute champion "wonBy" margin from leaderboard.
-  const championWithMargin = useMemo(() => {
-    if (!champion) return null;
-    const first: any = safeLeaderboard[0];
-    const second: any = safeLeaderboard[1];
-    let wonBy: string | null = null;
-    if (
-      first &&
-      second &&
-      typeof first.score === 'number' &&
-      typeof second.score === 'number' &&
-      !champion.playoffWin
-    ) {
-      const diff = second.score - first.score;
-      if (diff > 0) wonBy = diff === 1 ? '1 shot' : `${diff} shots`;
+  if (useCinematicFrame && !(state.kind === 'results' && state.variant === 'cancelled')) {
+    // Full-bleed cinematic hero for live / results / upcoming.
+    if (state.kind === 'live' || state.kind === 'results' || state.kind === 'upcoming') {
+      return (
+        <div
+          style={{
+            background: BG,
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          <CinematicHeroFullBleed
+            title={tournament.name}
+            tourLabel={tourLabel}
+            state={state}
+            leaderboard={safeLeaderboard}
+            tiedLeaders={tiedLeaders}
+            fieldSize={safeLeaderboard.length}
+            venueImageUrl={venueImageUrl}
+            tourSlug={tournament.tourSlug}
+            isPseudoMajor={isPseudoMajor}
+            showMajorTag={showMajorTag}
+            onCtaTap={onCtaTap}
+            champion={champion}
+            defendingChamp={defendingChamp ?? null}
+            courseStats={courseStats ?? null}
+            hoursUntilStart={hoursUntilStart}
+            venueName={tournament.venueName}
+            datesString={datesStringForHero}
+          />
+        </div>
+      );
     }
-    return { ...champion, wonBy };
-  }, [champion, safeLeaderboard]);
 
-  const defenderRow = useMemo(() => {
-    if (state.kind !== 'upcoming' || !defendingChamp) return null;
-    return {
-      name: defendingChamp.name,
-      photoUrl: (defendingChamp as any).photoUrl ?? null,
-      year: defendingChamp.year ?? null,
-      tourCode: tournament.tourSlug ?? 'pga',
-    };
-  }, [state.kind, defendingChamp, tournament.tourSlug]);
 
-  if (!isCancelled) {
     return (
       <div
         style={{
@@ -394,44 +364,35 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
           flexDirection: 'column',
         }}
       >
-        <PhotoBand
+        <CinematicFrame
           title={tournament.name}
-          tourLabel={tourLabel}
-          state={state}
           venueName={tournament.venueName}
           venueCity={tournament.venueCity}
           venueImageUrl={venueImageUrl}
-          datesString={datesString}
-          isMajor={tournament.isMajor}
-          isPseudoMajor={isPseudoMajor}
-          insight={insight}
-          champion={championWithMargin ?? null}
-          leader={leaderRow}
-          defender={defenderRow}
-          onTournamentTap={onCtaTap}
-        />
-        <HeroWireTicker
           state={state}
+          tourLabel={tourLabel}
+          isMajor={tournament.isMajor}
+          isSignature={tournament.isSignature}
+          startDate={tournament.startDate}
+          endDate={tournament.endDate}
           leaderboard={safeLeaderboard}
-          upcomingContenders={upcomingContenders}
-          emptyStateFacts={{
-            datesString,
-            venueName: tournament.venueName,
-            defenderName: defendingChamp?.name ?? null,
-            defenderYear: defendingChamp?.year ?? null,
-            defenderScore: defendingChamp?.score ?? null,
-            defenderSurname: defendingChamp?.name
-              ? defendingChamp.name.trim().split(/\s+/).slice(-1)[0]
-              : null,
-            purse: tournament.purse ? formatPurse(tournament.purse) : null,
-          }}
+          tiedLeaders={tiedLeaders}
+          fieldSize={safeLeaderboard.length}
+          top10={top10}
+          tourSlug={tournament.tourSlug}
+          defendingChamp={defendingChamp ?? null}
+          fieldStrength={fieldStrength ?? null}
+          
+          venuePar={tournament.venuePar}
+          venueYardage={tournament.venueYardage}
+          purse={tournament.purse}
+          winningShare={tournament.winningShare}
+          onCtaTap={onCtaTap}
         />
-
       </div>
     );
   }
 
-  // Cancelled — legacy three-band path.
   return (
     <div
       style={{
@@ -444,15 +405,15 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
     >
       <PhotoBand
         title={tournament.name}
-        tourLabel={tourLabel}
-        state={state}
         venueName={tournament.venueName}
         venueCity={tournament.venueCity}
         venueImageUrl={venueImageUrl}
-        datesString={datesString}
+        state={state}
+        tourLabel={tourLabel}
+        winnerName={tournament.winnerName}
         isMajor={tournament.isMajor}
-        isPseudoMajor={isPseudoMajor}
-        onTournamentTap={onCtaTap}
+        isSignature={tournament.isSignature}
+        datesString={datesString}
       />
 
       <MiddleBand

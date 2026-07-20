@@ -25,12 +25,6 @@
     "viewTrophyRoom": "[~~Ṽíéŵ ýőúř Ţřőƥĥý Řőőɱ~~]",
     "keepPlaying": "[~~Ǩééƥ ƥļáýíñĝ~~]"
   },
-  "levelUpToast": {
-    "headline": "[~~Ļéṽéļ Úƥ! 🎉~~]",
-    "ringUnlocked": "[~~{{level}} Říñĝ Úñļőĉǩéđ~~]",
-    "totalXp": "[~~Ţőţáļ ẊƤ: {{xp}}~~]",
-    "viewJourney": "[~~Ṽíéŵ Ĵőúřñéý~~]"
-  },
   "nudge": {
     "nextGlobal": "[~~Ñéẋţ ĝļőƀáļ ɱíļéšţőñé~~]",
     "nextRegional": "[~~Ñéẋţ řéĝíőñáļ ɱíļéšţőñé~~]",

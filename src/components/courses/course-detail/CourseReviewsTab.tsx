@@ -324,12 +324,6 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         courseRegion: review.course?.region ?? null,
         courseSubCountry: review.course?.sub_country ?? null,
         reviewText: review.review ?? null,
-        breakdown: {
-          design: review.design_score ?? null,
-          conditions: review.condition_score ?? null,
-          clubhouse: review.clubhouse_score ?? null,
-          facilities: review.facilities_score ?? null,
-        },
       },
       isReview: true,
       courseId: review.course_id,
