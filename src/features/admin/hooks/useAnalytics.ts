@@ -349,7 +349,7 @@ async function fetchGrowth(period: AnalyticsPeriod): Promise<GrowthData> {
   const since = startOf(period).toISOString();
   const priorSince = new Date(Date.now() - days * 2 * 86400_000).toISOString();
 
-  // Funnel — only stages with confirmed real events
+  // Funnel - only stages with confirmed real events
   const [signupAttempts, signupSuccess, onboardingStarted, onboardingComplete, addedPhoto, allRes, newRes, priorSignupsRes, thisSignupsRes] = await Promise.all([
     supabase.from('analytics_events').select('id', { count: 'exact', head: true })
       .in('name', ['signup_success', 'signup_failed']).gte('created_at', since),

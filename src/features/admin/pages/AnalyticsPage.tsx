@@ -231,7 +231,7 @@ function Headline({
         <div style={{
           color: t.ink, fontSize: 38, fontWeight: 800, lineHeight: 1, fontVariantNumeric: 'tabular-nums',
         }}>
-          {loading ? '—' : value}
+          {loading ? '-' : value}
         </div>
         {!loading && typeof delta === 'number' && (
           <DeltaChip delta={delta} unit={deltaUnit ?? '%'} />
@@ -533,7 +533,7 @@ function RetentionTab() {
     <>
       <Headline
         eyebrow="Week 1 retention"
-        value={w1Value !== null ? `${w1Value}%` : '—'}
+        value={w1Value !== null ? `${w1Value}%` : '-'}
         delta={w1DeltaPts !== null ? w1DeltaPts : undefined}
         deltaUnit="pt"
         note={w1Cohort ? `${w1Cohort.cohortLabel} cohort, ${fmtInt(w1Cohort.cohortSize)} members` : 'No qualifying cohort yet'}
