@@ -169,7 +169,14 @@
     "hero": {
       "prevAria": "Previous tournament",
       "nextAria": "Next tournament",
-      "counter": "{{current}} / {{total}}"
+      "counter": "{{current}} / {{total}}",
+      "fieldSoon": "FIELD SOON",
+      "teesOff": "TEES OFF",
+      "venueLabel": "VENUE",
+      "defendsLabel": "DEFENDS",
+      "prevWinner": "{{year}} WINNER",
+      "purse": "PURSE",
+      "fieldAnnouncedSoon": "Announced soon"
     },
     "leaderboardBand": {
       "ctaLive": "OPEN LIVE LEADERBOARD",
