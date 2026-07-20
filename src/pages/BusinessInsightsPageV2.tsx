@@ -382,8 +382,8 @@ const BusinessInsightsPageV2 = () => {
     return (
       <ManagePageShell title="Insights">
         <div className="space-y-4 px-4 pt-4">
-          <div className="h-32 animate-pulse rounded-2xl" style={{ background: BIZ.fillStrong }} />
-          <div className="h-24 animate-pulse rounded-2xl" style={{ background: BIZ.fillStrong }} />
+          <Skeleton className="h-32 rounded-2xl" />
+          <Skeleton className="h-24 rounded-2xl" />
         </div>
       </ManagePageShell>
     );

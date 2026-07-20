@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { ChevronLeft, Clock, XCircle, BadgeCheck, Mail, AlertCircle, ArrowRight, Check, FileCheck } from 'lucide-react';
 import { formatMonthDayYearShort } from '@/i18n/format';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
@@ -75,8 +76,8 @@ export default function BusinessVerificationPage() {
 
         {isLoading ? (
           <div className="space-y-3">
-            <div className="h-24 animate-pulse rounded-xl" style={{ background: 'rgba(15,23,42,0.08)' }} />
-            <div className="h-40 animate-pulse rounded-xl" style={{ background: 'rgba(15,23,42,0.08)' }} />
+            <Skeleton className="h-24 rounded-xl" />
+            <Skeleton className="h-40 rounded-xl" />
           </div>
         ) : state === 'none' ? (
           <NoneState onStart={() => openFlow('submit')} />
