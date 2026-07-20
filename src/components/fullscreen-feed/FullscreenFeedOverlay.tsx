@@ -8,6 +8,7 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 
 import { SnapFeed } from '@/components/feed/SnapFeed';
 import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
+import { track as trackImpression } from '@/lib/impressions/impressionTracker';
 
 // NOTE: intentionally NOT using the shared bodyScrollLock. It freezes body at
 // position:fixed; top:-scrollY. On iOS/WKWebView that offsets fixed descendants,
@@ -512,6 +513,12 @@ export function FullscreenFeedOverlay() {
   );
   const openReviewSheet = useReviewSheetStore((s) => s.open);
   const { data: reviewerStats } = useReviewerStats(activePost?.userId);
+
+  // Phase 0 impression tracker — count each active fullscreen post view.
+  useEffect(() => {
+    if (!isOpen || !activePost?.id) return;
+    trackImpression(activePost.id);
+  }, [isOpen, activePost?.id]);
 
   // Watch-progress tracking lives inside SnapFeed (the actual video host),
   // which the overlay renders below.
