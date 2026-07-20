@@ -4,6 +4,7 @@
  * Does NOT depend on any shared drawer/sheet component.
  */
 import React, { useEffect, useState } from 'react';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { useTranslation } from 'react-i18next';
 import { Z } from '@/config/zIndex';
 import {
@@ -33,7 +34,6 @@ export interface TourSideMenuProps {
   onClose: () => void;
   activeTab: string;
   onSelectTab: (tabId: string) => void;
-  handicapValue: string;
   onSettings: () => void;
   onProfile: () => void;
   onSignOut: () => void;
@@ -71,7 +71,6 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
   onClose,
   activeTab,
   onSelectTab,
-  handicapValue,
   onSettings,
   onProfile,
   onSignOut,
@@ -96,6 +95,21 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
       return () => clearTimeout(t);
     }
   }, [open, mounted]);
+
+  useEffect(() => {
+    if (!open) return;
+    lockBodyScroll();
+    return () => unlockBodyScroll();
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open, onClose]);
 
   if (!mounted) return null;
 

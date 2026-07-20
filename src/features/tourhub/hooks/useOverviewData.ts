@@ -795,6 +795,7 @@ export function useTournamentTopLeaders(tournamentId: string | null) {
         .order('position', { ascending: true })
         .limit(10);
 
+      // Deliberate swallow: these rows decorate hero bands - quiet emptiness beats an error card inside a cinematic frame.
       if (error || !data) return [];
 
       return data.map((row: any): LeaderEntry => {
