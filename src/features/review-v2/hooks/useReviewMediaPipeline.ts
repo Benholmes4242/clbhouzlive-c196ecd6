@@ -160,9 +160,16 @@ export function useReviewMediaPipeline({ userId, existingMedia }: UseReviewMedia
       await supabase.from('course_review_media').delete().eq('id', target.dbRowId);
       supabase.functions
         .invoke('cleanup-review-media', {
-          body: { mediaId: target.dbRowId, streamId: target.streamId, mediaUrl: target.uploadedUrl },
+          body: {
+            mediaItems: [{
+              id: target.dbRowId,
+              media_url: target.uploadedUrl ?? '',
+              media_type: target.type,
+              stream_id: target.streamId ?? null,
+            }],
+          },
         })
-        .catch(() => { /* best-effort */ });
+        .catch((err) => { console.warn('[review-v2] cleanup-review-media failed', err); });
       return;
     }
 
@@ -173,11 +180,19 @@ export function useReviewMediaPipeline({ userId, existingMedia }: UseReviewMedia
     if (target.streamId) {
       supabase.functions
         .invoke('cleanup-review-media', {
-          body: { streamId: target.streamId },
+          body: {
+            mediaItems: [{
+              id: target.dbRowId ?? target.id,
+              media_url: target.uploadedUrl ?? '',
+              media_type: 'video',
+              stream_id: target.streamId,
+            }],
+          },
         })
-        .catch(() => { /* noop */ });
+        .catch((err) => { console.warn('[review-v2] cleanup-review-media failed', err); });
     }
   }, [items]);
+
 
   const updateItem = useCallback((id: string, patch: Partial<MediaItem>) => {
     setItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...patch } : i)));
