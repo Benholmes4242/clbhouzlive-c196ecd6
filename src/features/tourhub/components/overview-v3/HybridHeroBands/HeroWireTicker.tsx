@@ -69,7 +69,7 @@ function factNode(fact: TickerFact, key: string): ReactNode {
       key={key}
       style={{
         display: 'inline-flex',
-        alignItems: 'baseline',
+        alignItems: 'center',
         gap: 6,
         height: 36,
         marginRight: 24,
