@@ -50,7 +50,7 @@ export function CollegeProfilePage() {
     standing?.shortName || standing?.collegeName || slug || 'College';
   const playingNow = liveAlumni?.byCollege?.[slug] ?? 0;
 
-  const notFound = !isLoading && data && !standing;
+  const notFound = !isLoading && !isError && data && !standing;
 
   return (
     <TourHubShell immersiveStatusBar>
