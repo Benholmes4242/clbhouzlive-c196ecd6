@@ -78,11 +78,8 @@ export function TrophyRoomSpine({ items, userId }: Props) {
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 17, fontWeight: 800, color: '#FFFFFF' }}>
             {level ? <TierGlyph tierKey={level.key} color={activeAccent} size={22} /> : null}
             {level ? (
-              <span>
-                Level {level.level} &middot;{' '}
-                <span style={{ color: activeAccent }}>
-                  {levelDisplay(level, owned)}
-                </span>
+              <span style={{ color: activeAccent }}>
+                {levelDisplay(level, owned)}
               </span>
             ) : (
               'Earn your first medal'
