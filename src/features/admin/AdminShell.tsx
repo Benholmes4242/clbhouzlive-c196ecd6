@@ -28,10 +28,11 @@ const SECTION_TITLES: Record<string, string> = {
 
 
 // Preserve ALL query params across redirects; optionally set/override ?type=
-function RedirectPreserving({ to, forceType }: { to: string; forceType?: string }) {
+function RedirectPreserving({ to, forceType, forceTab }: { to: string; forceType?: string; forceTab?: string }) {
   const [params] = useSearchParams();
   const next = new URLSearchParams(params);
   if (forceType) next.set('type', forceType);
+  if (forceTab && !next.get('tab')) next.set('tab', forceTab);
   const qs = next.toString();
   return <Navigate to={`${to}${qs ? `?${qs}` : ''}`} replace />;
 }
