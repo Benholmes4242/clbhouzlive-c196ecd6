@@ -108,6 +108,31 @@ export function ComparePage() {
   // c1 && !c2 → we're about to redirect; render nothing.
   if (c1 && !c2) return null;
 
+  if (isError) {
+    return (
+      <TourHubShell immersiveStatusBar>
+        <div style={{ background: SLATE_50, minHeight: '100vh', fontFamily: FONT, paddingBottom: 88 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '48px 16px', textAlign: 'center' }}>
+            <div style={{ fontFamily: FONT, fontSize: 15, fontWeight: 700, color: INK }}>
+              Couldn't load the duel
+            </div>
+            <div style={{ fontFamily: FONT, fontSize: 13, color: INK_MUTE, maxWidth: 280 }}>
+              Check your connection and try again.
+            </div>
+            <button
+              type="button"
+              onClick={() => refetch()}
+              style={{ background: INK, color: '#fff', border: 'none', borderRadius: 999, padding: '10px 20px', fontFamily: FONT, fontSize: 13.5, fontWeight: 700, cursor: 'pointer' }}
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </TourHubShell>
+    );
+  }
+
+
   return (
     <TourHubShell immersiveStatusBar>
       <div
