@@ -91,7 +91,7 @@ export default function BusinessProfileEditor() {
   useHideBottomNav();
 
   /* ── edit-mode data load ────────────────────────────── */
-  const { data: business, isLoading: businessLoading, error: businessError } =
+  const { data: business, isLoading: businessLoading, error: businessError, refetch: refetchBusiness } =
     useBusinessProfile(mode === 'edit' ? id : undefined);
   const { data: membership, isLoading: membershipLoading } = useBusinessMembership(
     mode === 'edit' ? id : undefined
