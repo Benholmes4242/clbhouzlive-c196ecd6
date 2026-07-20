@@ -27,14 +27,22 @@ interface OverviewHeroProps {
 }
 
 /**
- * Canonical hero height — matches the Courses Discover hero
+ * Canonical PHOTO BAND height — matches the Courses Discover hero
  * (`CoursesPageHero`) and the Course Details cinematic hero
- * (`CinematicHeroFullBleed`). Keep in sync with those surfaces.
+ * (`CinematicHeroFullBleed`). The wire ticker (36px) sits BELOW this,
+ * so the full overview hero container is `OVERVIEW_HERO_TOTAL_HEIGHT`.
  */
 export const OVERVIEW_HERO_HEIGHT =
   'calc(clamp(380px, 44dvh, 460px) + env(safe-area-inset-top, 0px))';
 
-export function OverviewHero({ height = OVERVIEW_HERO_HEIGHT }: OverviewHeroProps) {
+/** Wire-ticker band height (kept in sync with HeroWireTicker). */
+export const OVERVIEW_HERO_TICKER_HEIGHT = 36;
+
+/** Full hero container height = photo band + wire ticker. */
+export const OVERVIEW_HERO_TOTAL_HEIGHT =
+  `calc(${OVERVIEW_HERO_HEIGHT} + ${OVERVIEW_HERO_TICKER_HEIGHT}px)`;
+
+export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHeroProps) {
   const { t } = useTranslation('tourhub');
   const { data: rawSlides = [], isLoading } = useHeroCarouselData();
 
