@@ -553,6 +553,26 @@ export default function BusinessReviewsPage() {
                 </div>
               ))}
             </div>
+          ) : isError ? (
+            <div
+              className="text-center py-10 px-6"
+              style={{ background: CARD_BG, border: `1px solid ${HAIR}`, borderRadius: 16 }}
+            >
+              <div className="text-[15px] font-bold" style={{ color: INK }}>
+                Couldn't load your reviews
+              </div>
+              <p className="text-[13px] leading-relaxed mt-1.5" style={{ color: INK_45 }}>
+                Check your connection and try again.
+              </p>
+              <button
+                type="button"
+                onClick={() => refetch()}
+                className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-[12.5px] font-bold text-white active:opacity-90"
+                style={{ background: AMBER, border: 'none' }}
+              >
+                Retry
+              </button>
+            </div>
           ) : showEmpty ? (
             <div
               className="text-center py-10 px-6"
