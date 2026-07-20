@@ -1,11 +1,10 @@
 import { useNavigate } from 'react-router-dom';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMyBusinesses } from '@/hooks/useMyBusinesses';
 import { BusinessCommandCard } from '@/components/business/BusinessCommandCard';
 import { AddBusinessCard } from '@/components/business/AddBusinessCard';
 import { BusinessEmptyState } from '@/components/business/BusinessEmptyState';
-import { DeleteBusinessDialog } from '@/components/business/DeleteBusinessDialog';
 
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
@@ -48,18 +47,6 @@ const MyBusinessesPage = () => {
   const { user, loading: authLoading } = useSupabaseSession();
   const { data: businesses, isLoading, error, refetch } = useMyBusinesses(user?.id);
   const { activeActor } = useActiveActor();
-
-  // Hoisted confirm-delete state — the dialog lives at page level so that
-  // when the mutation invalidates and evicts the target BusinessCommandCard,
-  // the dialog host is NOT in the evicted subtree. This is the canonical fix
-  // for the "delete-in-a-list-item + Radix dialog inside item" body
-  // pointer-events freeze. See `src/lib/radixLockSanitizer.ts` for the
-  // paired safety net in `useDeleteBusiness.onSuccess`.
-  const [pendingDelete, setPendingDelete] = useState<{ id: string; name: string } | null>(null);
-  const handleRequestDelete = useCallback(
-    (input: { id: string; name: string }) => setPendingDelete(input),
-    [],
-  );
 
   useHideBottomNav();
 
@@ -135,28 +122,12 @@ const MyBusinessesPage = () => {
                 activeBusinessId={
                   activeActor?.type === 'business' ? activeActor?.id ?? null : null
                 }
-                onRequestDelete={handleRequestDelete}
               />
 
               <AddBusinessCard onClick={handleCreateBusiness} />
             </>
           )}
         </div>
-      )}
-
-      {/* Hoisted confirm-delete dialog — lives outside the accordion so the
-          mutation's cache invalidation can evict the target card without
-          racing Radix's DismissableLayer cleanup. */}
-      {pendingDelete && user?.id && (
-        <DeleteBusinessDialog
-          open={!!pendingDelete}
-          onOpenChange={(open) => {
-            if (!open) setPendingDelete(null);
-          }}
-          businessId={pendingDelete.id}
-          businessName={pendingDelete.name}
-          userId={user.id}
-        />
       )}
     </ManagePageShell>
   );
@@ -168,12 +139,10 @@ function BusinessesAccordion({
   memberships,
   userId,
   activeBusinessId,
-  onRequestDelete,
 }: {
   memberships: ReturnType<typeof useMyBusinesses>['data'] extends (infer T)[] | undefined ? T[] : never;
   userId: string;
   activeBusinessId: string | null;
-  onRequestDelete: (input: { id: string; name: string }) => void;
 }) {
   // Default open: single business → itself; multi → first entry (sorted: active first).
   const defaultOpenId = memberships[0]?.business?.id ?? null;
@@ -204,7 +173,6 @@ function BusinessesAccordion({
             onToggle={() => {
               setOpenId((prev) => (prev === bizId ? null : bizId ?? null));
             }}
-            onRequestDelete={onRequestDelete}
           />
         );
       })}

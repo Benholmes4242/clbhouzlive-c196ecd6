@@ -370,38 +370,6 @@ class VideoEngineImpl {
     this.reconcileAudio('session-change');
   };
 
-  /**
-   * v10 audio-focus registry — the reconciler's single non-fullscreen input.
-   * Feed surfaces (SnapFeed on active-slide settle) and rail surfaces
-   * (useRailLane on lane acquisition) register the lane that owns audio.
-   * Last write wins. `null` clears focus (silence unless the fullscreen
-   * branch resolves a speaker).
-   */
-  private audioFocus: { laneId: LaneId | null; source: string | null } = {
-    laneId: null,
-    source: null,
-  };
-
-  setAudioFocus(laneId: LaneId | null, source: string): void {
-    const prev = this.audioFocus;
-    if (prev.laneId === laneId && prev.source === source) return;
-    this.audioFocus = { laneId, source };
-    if (audioDebugEnabled()) {
-      try {
-        logAudio('audio.focus', {
-          from: { laneId: prev.laneId, source: prev.source },
-          to: { laneId, source },
-          msSinceOpen: msSinceOpen(),
-        });
-      } catch { /* noop */ }
-    }
-    this.reconcileAudio('focus-change');
-  }
-
-  getAudioFocus(): { laneId: LaneId | null; source: string | null } {
-    return this.audioFocus;
-  }
-
 
   private onVisibility = () => {
     if (typeof document === 'undefined') return;
@@ -520,7 +488,8 @@ class VideoEngineImpl {
 
   private applyAudioPolicy(
     lane: Lane,
-    trigger: 'mount' | 'policy-change' | 'external-bind' | 'guard-reassert' | 'role-promote' | 'unknown' = 'unknown',
+    trigger: 'mount' | 'activation' | 'policy-change' | 'external-bind' | 'guard-reassert' | 'role-promote' | 'unknown' = 'unknown',
+    opts: { claimsAudio?: boolean } = {}
   ): void {
     // Borrow override: while the fullscreen viewer owns this lane's element,
     // the effective policy is 'session' regardless of the lane's declared
@@ -530,14 +499,39 @@ class VideoEngineImpl {
     const effectivePolicy: LaneAudioPolicy = borrowed ? 'session' : lane.audioPolicy;
     const sessionMuted = useSessionAudio.getState().isMuted;
     // Resolve the feed role of this lane (null for non-feed lanes like
-    // fullscreen / rails). Kept for HUD legitimacy in logs.
+    // fullscreen / rails). Used both for HUD legitimacy and to gate
+    // 'activation'-trigger session claims to the ACTIVE-role lane only.
     let role: 'active' | 'next' | 'prev' | null = null;
     try {
       if (feedLaneRoles.isFeedLane(lane.id)) {
         role = feedLaneRoles.roleForLane(lane.id);
       }
     } catch { /* noop */ }
-
+    // v7 gate + v8 override: activation-trigger session claim ONLY when this
+    // lane holds the ACTIVE role (or is a non-feed lane, e.g. fullscreen),
+    // OR the caller explicitly declared the claim legitimate via
+    // claimsAudio (feed promotion path). Preload / warm-up play() calls
+    // never set claimsAudio, so v7's steal protection is preserved.
+    if (
+      trigger === 'activation' &&
+      effectivePolicy === 'session' &&
+      feedLaneRoles.isFeedLane(lane.id) &&
+      role !== 'active' &&
+      !opts.claimsAudio
+    ) {
+      logAudio('policy.resolve', {
+        laneId: lane.id,
+        trigger,
+        role,
+        declaredPolicy: lane.audioPolicy,
+        borrowed,
+        effectivePolicy,
+        sessionMuted,
+        elMuted: lane.el.muted,
+        action: 'skip-nonactive-role',
+      });
+      return;
+    }
     let action: 'noop' | 'mute' | 'setMuted' = 'noop';
     if (effectivePolicy === 'always-muted') {
       if (!lane.el.muted) { action = 'mute'; }
@@ -560,11 +554,11 @@ class VideoEngineImpl {
       return;
     }
     if (effectivePolicy === 'session') {
-      // v11 single-writer: the reconciler is the ONLY writer of session-lane
-      // mute state. applyAudioPolicy no longer forces mute on session lanes;
-      // instead we schedule a reconcile so the current focus/borrow/session
-      // resolution converges without racing a direct setMuted here.
-      this.reconcileAudio(`policy:${trigger}`);
+      if (lane.el.muted !== sessionMuted) {
+        // Respect ONE_UNMUTED_LANE on unmute. Forward the resolve trigger
+        // so any slot-enforce log names the true cause (mount/activation/…).
+        this.setMuted(lane.id, sessionMuted, `policy:${trigger}`);
+      }
       return;
     }
     // 'local' → leave alone.
@@ -1101,7 +1095,7 @@ class VideoEngineImpl {
   }
 
 
-  play(laneId: LaneId, opts: { callerPostId?: string | null; viaViewer?: boolean } = {}): Promise<void> {
+  play(laneId: LaneId, opts: { callerPostId?: string | null; viaViewer?: boolean; claimsAudio?: boolean } = {}): Promise<void> {
     const lane = this.getLane(laneId);
     const caller = opts.callerPostId ?? null;
     // Trace viewer-sourced play so device captures show the path.
@@ -1132,9 +1126,9 @@ class VideoEngineImpl {
 
     // Persistent intent: set now, honored on mount + on canplay after (re)load.
     lane.wantPlay = true;
-    // v9: NO activation-time audio claim here. The role-change subscription
-    // (feedLaneRoles → reconcileAudio) is the single writer that promotes
-    // the newly-active lane's audio. play() is now audio-neutral.
+    // AUDIO POLICY: on activation, re-consult session store so an earlier
+    // unmute carries to the NEXT video (inheritance on activation).
+    this.applyAudioPolicy(lane, 'activation', { claimsAudio: opts.claimsAudio === true });
     logAudio('resume.activate', {
       laneId,
       callerPostId: caller ?? null,
@@ -1273,24 +1267,17 @@ class VideoEngineImpl {
   }
 
   /**
-   * v11 reconciler — the ONLY function that decides what gets unmuted.
+   * v9 reconciler — the ONLY function that decides what gets unmuted.
    *
-   * PRODUCT SPEC (canon):
-   *   - Inline audio = the Clubhouse feed's ACTIVE slide only, session-gated.
-   *   - Rails and grid tiles are ALWAYS silent inline (policy 'always-muted').
-   *   - Fullscreen viewer is session-gated via the borrow / fullscreen-solo
-   *     branch below.
-   *   - Tap-to-fullscreen is the ONLY way rail/grid content speaks.
-   *
-   * Inputs:
+   * Compute the "speaker lane" — the at-most-one lane that should be audible
+   * right now — from four inputs:
    *   1. useSessionAudio.isMuted    (user intent)
    *   2. useFullscreenFeedStore     (isOpen + borrow.laneId)
-   *   3. audioFocus registry        (which surface owns the inline speaker)
-   *   4. per-lane wantPlay / audioPolicy
+   *   3. feedLaneRoles.laneForRole('active')  (which feed lane is on screen)
+   *   4. per-lane wantPlay / audioPolicy       (declared roles)
    *
    * Then apply: every lane other than the speaker is muted; the speaker,
    * if any, is unmuted. 'always-muted' stays muted; 'local' is left alone.
-   * This is the single writer for session-lane mute state.
    */
   private reconcileAudio(reason: string): void {
     const sessionMuted = useSessionAudio.getState().isMuted;
@@ -1298,63 +1285,21 @@ class VideoEngineImpl {
     const fsOpen = !!fs.isOpen;
     const borrowLaneId: LaneId | null = (fs.borrow?.laneId ?? null) as LaneId | null;
 
-    // Resolution log — every reconcile emits exactly one branch + at most one
-    // whyNone. Distinct labels per null path (no shared fallthrough) so the
-    // silence root cause is legible in a linear scan of the buffer.
     let speaker: LaneId | null = null;
-    let branch: 'session-muted' | 'borrow' | 'focus' | 'active-role' | 'fullscreen-solo' | 'none' = 'none';
-    let whyNone: string | null = null;
-
-    if (sessionMuted) {
-      branch = 'none';
-      whyNone = 'session-muted';
-    } else if (fsOpen) {
-      if (borrowLaneId) {
-        if (this.lanes.has(borrowLaneId)) {
+    if (!sessionMuted) {
+      if (fsOpen) {
+        if (borrowLaneId && this.lanes.has(borrowLaneId)) {
           speaker = borrowLaneId;
-          branch = 'borrow';
         } else {
-          branch = 'none';
-          whyNone = 'overlay-borrow-lane-unmounted';
+          const fsLane = this.lanes.get('fullscreen');
+          if (fsLane && fsLane.wantPlay) speaker = 'fullscreen';
         }
       } else {
-        const fsLane = this.lanes.get('fullscreen');
-        if (!fsLane) {
-          branch = 'none';
-          whyNone = 'overlay-fullscreen-lane-missing';
-        } else if (!fsLane.wantPlay) {
-          branch = 'none';
-          whyNone = 'overlay-fullscreen-not-want-play';
-        } else {
-          speaker = 'fullscreen';
-          branch = 'fullscreen-solo';
-        }
-      }
-    } else {
-      // v10: audio-focus registry replaces the role-map read. Feed and rail
-      // surfaces register their active lane on settle; the reconciler picks
-      // that lane (subject to per-lane eligibility) as the speaker.
-      const focusLaneId = this.audioFocus.laneId;
-      if (!focusLaneId) {
-        branch = 'none';
-        whyNone = 'no-audio-focus';
-      } else {
-        const l = this.lanes.get(focusLaneId);
-        if (!l) {
-          branch = 'none';
-          whyNone = 'focus-lane-unmounted';
-        } else if (!l.el) {
-          branch = 'none';
-          whyNone = 'focus-lane-no-el';
-        } else if (l.audioPolicy === 'always-muted') {
-          branch = 'none';
-          whyNone = 'focus-lane-always-muted';
-        } else if (!l.wantPlay) {
-          branch = 'none';
-          whyNone = 'focus-lane-not-want-play';
-        } else {
-          speaker = focusLaneId;
-          branch = 'focus';
+        let activeLaneId: LaneId | null = null;
+        try { activeLaneId = feedLaneRoles.laneForRole('active'); } catch {}
+        if (activeLaneId) {
+          const l = this.lanes.get(activeLaneId);
+          if (l && l.wantPlay && l.audioPolicy !== 'always-muted') speaker = activeLaneId;
         }
       }
     }
@@ -1371,25 +1316,6 @@ class VideoEngineImpl {
         changes.push({ laneId: lane.id, from: lane.el.muted, to: finalMuted, policy: lane.audioPolicy });
       }
     });
-
-    // Forensic decision X-ray — emitted on EVERY reconcile invocation (not
-    // just drift), gated on the audioDebug flag inside logAudio. Payload
-    // matches the heartbeat.state shape so both series can be diffed in the
-    // buffer without re-shaping.
-    if (audioDebugEnabled()) {
-      try {
-        logAudio('reconcile.decision', {
-          reason,
-          overlayOpen: fsOpen,
-          borrowedLaneId: borrowLaneId,
-          roleMap: this.buildRoleMapDump(),
-          audioFocus: this.audioFocus,
-          resolution: { speaker, branch, whyNone },
-          writes: changes.map((c) => ({ laneId: c.laneId, muted: c.to })),
-          msSinceOpen: msSinceOpen(),
-        });
-      } catch { /* noop */ }
-    }
 
     if (changes.length === 0) {
       logAudio('reconcile.noop', { reason, speaker, sessionMuted, fsOpen, borrowLaneId, msSinceOpen: msSinceOpen() });
@@ -1432,137 +1358,15 @@ class VideoEngineImpl {
     });
   }
 
-  /**
-   * Forensic helper — full role→lane→postId dump for reconcile/heartbeat
-   * records. Includes lanes even when they hold no active role so the
-   * MISMATCH detector can attribute a visible-playing lane to its role.
-   */
-  private buildRoleMapDump(): Array<{ role: string; laneId: LaneId | null; postId: string | null }> {
-    const out: Array<{ role: string; laneId: LaneId | null; postId: string | null }> = [];
-    for (const role of ['active', 'next', 'prev'] as const) {
-      let laneId: LaneId | null = null;
-      try { laneId = feedLaneRoles.laneForRole(role); } catch { /* noop */ }
-      const lane = laneId ? this.lanes.get(laneId) : null;
-      out.push({ role, laneId, postId: lane?.postId ?? null });
-    }
-    // Also surface fullscreen + rail-adjacent lanes present in the pool
-    // (rail lanes are 'n-*'). Keeps the dump complete without dedup gymnastics.
-    this.lanes.forEach((lane) => {
-      if (lane.id === 'fullscreen' || String(lane.id).startsWith('n-')) {
-        out.push({ role: `pool:${lane.id}`, laneId: lane.id, postId: lane.postId ?? null });
-      }
-    });
-    return out;
-  }
-
-  /** Beat-time visibility snapshot for every lane element — used to flag
-   *  MISMATCH beats (lane ≥50% visible AND playing AND session unmuted AND
-   *  not the current speaker). Uses getBoundingClientRect (no observer setup
-   *  needed; runs at 250ms cadence only when audioDebug is on). */
-  private computeVisiblePlayingLanes(): Array<{
-    laneId: LaneId; postId: string | null; visibilityRatio: number; playing: boolean; muted: boolean; audioPolicy: LaneAudioPolicy;
-  }> {
-    const out: Array<{ laneId: LaneId; postId: string | null; visibilityRatio: number; playing: boolean; muted: boolean; audioPolicy: LaneAudioPolicy }> = [];
-    if (typeof window === 'undefined') return out;
-    const vw = window.innerWidth || 0;
-    const vh = window.innerHeight || 0;
-    if (!vw || !vh) return out;
-    this.lanes.forEach((lane) => {
-      const el = lane.el;
-      let ratio = 0;
-      try {
-        const r = el.getBoundingClientRect();
-        const iw = Math.max(0, Math.min(r.right, vw) - Math.max(r.left, 0));
-        const ih = Math.max(0, Math.min(r.bottom, vh) - Math.max(r.top, 0));
-        const area = r.width * r.height;
-        ratio = area > 0 ? (iw * ih) / area : 0;
-      } catch { /* noop */ }
-      const playing = !el.paused && !el.ended && el.readyState >= 2;
-      if (ratio > 0 && playing) {
-        out.push({
-          laneId: lane.id,
-          postId: lane.postId ?? null,
-          visibilityRatio: +ratio.toFixed(3),
-          playing,
-          muted: !!el.muted,
-          audioPolicy: lane.audioPolicy,
-        });
-      }
-    });
-    return out;
-  }
-
   /** v9: 250ms heartbeat. Only actively verifies when the session is unmuted
    *  (muted sessions can't drift — no one is audible). */
   private driftCheck(): void {
     try {
       if (typeof document !== 'undefined' && document.hidden) return;
-      const sessionMuted = useSessionAudio.getState().isMuted;
-
-      // Instrumentation-only heartbeat record. Emitted on EVERY beat
-      // (regardless of session mute) so the buffer carries a continuous
-      // ground-truth trace correlating decision → surface → visibility.
-      if (audioDebugEnabled()) {
-        try {
-          const fs = useFullscreenFeedStore.getState();
-          const fsOpen = !!fs.isOpen;
-          const borrowLaneId: LaneId | null = (fs.borrow?.laneId ?? null) as LaneId | null;
-          // Recompute the resolution INDEPENDENTLY of reconcileAudio so the
-          // heartbeat log is decoupled from reconcile's exit path (noop
-          // reconciles no longer hide the decision).
-          let speaker: LaneId | null = null;
-          let branch: 'session-muted' | 'borrow' | 'active-role' | 'fullscreen-solo' | 'none' = 'none';
-          let whyNone: string | null = null;
-          if (sessionMuted) { branch = 'none'; whyNone = 'session-muted'; }
-          else if (fsOpen) {
-            if (borrowLaneId) {
-              if (this.lanes.has(borrowLaneId)) { speaker = borrowLaneId; branch = 'borrow'; }
-              else { branch = 'none'; whyNone = 'overlay-borrow-lane-unmounted'; }
-            } else {
-              const fsLane = this.lanes.get('fullscreen');
-              if (!fsLane) { branch = 'none'; whyNone = 'overlay-fullscreen-lane-missing'; }
-              else if (!fsLane.wantPlay) { branch = 'none'; whyNone = 'overlay-fullscreen-not-want-play'; }
-              else { speaker = 'fullscreen'; branch = 'fullscreen-solo'; }
-            }
-          } else {
-            let activeLaneId: LaneId | null = null;
-            try { activeLaneId = feedLaneRoles.laneForRole('active'); } catch { /* noop */ }
-            if (!activeLaneId) { branch = 'none'; whyNone = 'no-active-role-assigned'; }
-            else {
-              const l = this.lanes.get(activeLaneId);
-              if (!l) { branch = 'none'; whyNone = 'role-lane-unmounted'; }
-              else if (!l.el) { branch = 'none'; whyNone = 'role-lane-no-el'; }
-              else if (l.audioPolicy === 'always-muted') { branch = 'none'; whyNone = 'role-lane-always-muted'; }
-              else if (!l.wantPlay) { branch = 'none'; whyNone = 'role-lane-not-want-play'; }
-              else { speaker = activeLaneId; branch = 'active-role'; }
-            }
-          }
-          const visiblePlayingLanes = this.computeVisiblePlayingLanes();
-          // MISMATCH: a lane ≥50% visible, playing, session unmuted, and
-          // NOT the speaker. v11: exclude always-muted-policy lanes — silent
-          // rails/grid tiles are design, not a defect. They are muted by
-          // policy and never speak inline regardless of visibility.
-          const mismatch = !sessionMuted && visiblePlayingLanes.some(
-            (v) => v.audioPolicy !== 'always-muted' && v.visibilityRatio >= 0.5 && v.laneId !== speaker && !v.muted,
-          );
-          logAudio(mismatch ? 'heartbeat.MISMATCH' : 'heartbeat.state', {
-            overlayOpen: fsOpen,
-            borrowedLaneId: borrowLaneId,
-            roleMap: this.buildRoleMapDump(),
-            resolution: { speaker, branch, whyNone },
-            sessionMuted,
-            visiblePlayingLanes,
-            mismatch,
-            msSinceOpen: msSinceOpen(),
-          });
-        } catch { /* noop */ }
-      }
-
-      if (sessionMuted) return;
+      if (useSessionAudio.getState().isMuted) return;
       this.reconcileAudio('drift');
     } catch {}
   }
-
 
   setMuted(laneId: LaneId, muted: boolean, trigger: string = 'setMuted'): void {
 

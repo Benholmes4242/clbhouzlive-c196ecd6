@@ -8,8 +8,7 @@
  * user_courses, or user_top10_exclusions directly.
  */
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { analyticsEvents } from '@/utils/analyticsEvents';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, Trash2 } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -260,46 +259,6 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
   const [exitGuardOpen, setExitGuardOpen] = useState(false);
   const [dictationFlashKey, setDictationFlashKey] = useState(0);
 
-  // rating_modal_opened: fired once when the composer mounts (open == mounted)
-  useEffect(() => {
-    analyticsEvents.ratings.modalOpened({
-      courseId: course.id,
-      courseName: course.name,
-      isEditMode,
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // rating_slider_changed: first slider interaction per open (ref guard, no state churn)
-  const sliderFiredRef = useRef(false);
-  useEffect(() => {
-    if (sliderFiredRef.current) return;
-    if (
-      composer.state.overall == null &&
-      composer.state.scores.design == null &&
-      composer.state.scores.condition == null &&
-      composer.state.scores.clubhouse == null &&
-      composer.state.scores.facilities == null
-    ) return;
-    sliderFiredRef.current = true;
-    const s = composer.state.scores;
-    const first: 'overall' | 'design' | 'condition' | 'clubhouse' | 'facilities' =
-      composer.state.overall != null ? 'overall'
-      : s.design != null ? 'design'
-      : s.condition != null ? 'condition'
-      : s.clubhouse != null ? 'clubhouse'
-      : 'facilities';
-    const value =
-      first === 'overall' ? composer.state.overall!
-      : (s[first] as number);
-    analyticsEvents.ratings.sliderChanged({
-      courseId: course.id,
-      courseName: course.name,
-      category: first,
-      value,
-    });
-  }, [composer.state.overall, composer.state.scores, course.id, course.name]);
-
   const isDirty = useMemo(() => {
     if (isEditMode) {
       return (
@@ -342,16 +301,6 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
       media.flushToReview(ratingId, { caption: composer.state.reviewText }).catch(() => { /* per-item errors surfaced in tray */ });
       invalidateCourseRatingCaches(qc);
       setSuccess({ ratingId, shareToFeed });
-      analyticsEvents.ratings.submitted({
-        courseId: course.id,
-        courseName: course.name,
-        isNewReview: !isEditMode,
-        overallRating: composer.state.overall ?? 0,
-        design: composer.state.scores.design ?? undefined,
-        condition: composer.state.scores.condition ?? undefined,
-        clubhouse: composer.state.scores.clubhouse ?? undefined,
-        facilities: composer.state.scores.facilities ?? undefined,
-      });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Couldn't save your review");
     }

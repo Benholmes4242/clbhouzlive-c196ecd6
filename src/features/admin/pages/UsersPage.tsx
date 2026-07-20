@@ -22,7 +22,6 @@ import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { usePanelRole } from '@/hooks/usePanelRole';
 import { panelCan } from '@/lib/panelCan';
 import { useCreateAdminActionRequest } from '../hooks/useAdminActionRequests';
-import MemberActivityCard from '../components/MemberActivityCard';
 
 type TabId = 'members' | 'team' | 'invites';
 
@@ -545,9 +544,6 @@ function Member360Sheet({
               <Stat label="Top 100" value={detail.top100_played} divider />
             </div>
           </Section>
-
-          {/* C4-1: Member activity - 30-day event bars + session chips */}
-          <MemberActivityCard userId={detail.id} />
 
           {/* 2) Golf identity */}
           <Section title="Golf identity">

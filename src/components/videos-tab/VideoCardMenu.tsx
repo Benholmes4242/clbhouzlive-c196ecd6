@@ -40,9 +40,6 @@ export const VideoCardMenu = React.memo(function VideoCardMenu({
   className,
 }: VideoCardMenuProps) {
   const [confirmOpen, setConfirmOpen] = useState(false);
-  // Controlled dropdown — force it closed BEFORE opening the block confirm.
-  // Prevents Radix layer overlap when the mutation evicts this card.
-  const [dropdownOpen, setDropdownOpen] = useState(false);
   const { blockUser, loading: blockLoading } = useBlockActions({ currentUserId: userId ?? '' });
 
   const handleCopyLink = async () => {
@@ -82,19 +79,10 @@ export const VideoCardMenu = React.memo(function VideoCardMenu({
     toast.success('Saved');
   };
 
-  const handleBlockClick = () => {
-    if (!authorUserId) return;
-    setDropdownOpen(false);
-    requestAnimationFrame(() => setConfirmOpen(true));
-  };
-
   const handleBlockConfirm = async () => {
     if (!authorUserId) return;
-    // Close FIRST, then mutate — Radix's exit cycle needs to complete
-    // before the invalidation-driven eviction races DismissableLayer.
-    setConfirmOpen(false);
-    await new Promise((r) => setTimeout(r, 300));
     await blockUser(authorUserId);
+    setConfirmOpen(false);
   };
 
   const canBlock = !!userId && !!authorUserId && authorUserId !== userId;
@@ -102,7 +90,7 @@ export const VideoCardMenu = React.memo(function VideoCardMenu({
 
   return (
     <>
-      <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
+      <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button
             className={`p-3 -mr-3 rounded-full hover:bg-muted transition-colors ${className || ''}`}
@@ -136,7 +124,7 @@ export const VideoCardMenu = React.memo(function VideoCardMenu({
             <>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                onClick={handleBlockClick}
+                onClick={() => setConfirmOpen(true)}
                 className="gap-2 text-sm text-destructive focus:text-destructive"
               >
                 <Ban className="h-4 w-4" />

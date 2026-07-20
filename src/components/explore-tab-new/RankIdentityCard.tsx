@@ -347,7 +347,7 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  {tierName}
+                  {tierName} {currentLevel.level}
                 </span>
               </div>
 
@@ -397,7 +397,7 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
                     to {nextLevel.label}
                   </>
                 ) : (
-                  'Top of the ladder'
+                  'Max level'
                 )}
               </div>
 
@@ -658,7 +658,7 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
                 whiteSpace: 'nowrap',
               }}
             >
-              {tierName}
+              {tierName} {currentLevel.level}
             </span>
           </div>
 
@@ -701,7 +701,7 @@ export function RankIdentityCard({ userId, variant = 'card' }: Props) {
                 to {nextLevel.label}
               </>
             ) : (
-              'Top of the ladder'
+              'Max level'
             )}
           </div>
         </div>

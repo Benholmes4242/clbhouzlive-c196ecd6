@@ -330,7 +330,7 @@ function renderPush(r: OutboxRow, badgeMap: Map<string, any>) {
     }
     case "level_up":
       return {
-        title: "New rank unlocked",
+        title: "Level up",
         body: `You reached ${p.label}. ${p.medals} medals and climbing.`,
         data: { route: "/handicap", level: p.level, label: p.label },
       };

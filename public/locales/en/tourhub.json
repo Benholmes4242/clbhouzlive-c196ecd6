@@ -247,12 +247,11 @@
         "live": "Live"
       },
       "verdict": {
-        "won": "WON",
+        "won": "WON · {{score}}",
         "hit": "HIT · {{pos}} · {{score}}",
         "miss": "MISS · {{pos}} · {{score}}",
         "missOnly": "MISS",
-        "missCut": "MISS · {{cut}}",
-        "mc": "MC"
+        "missCut": "MISS · {{cut}}"
       },
       "chip": {
         "won": "Won",
@@ -262,24 +261,12 @@
       },
       "card": {
         "theCase": "The case ›",
-        "pickLabel": "Pick {{rank}}",
-        "courseFit": "COURSE FIT {{score}}"
+        "pickLabel": "Pick {{rank}}"
       },
       "case": {
-        "eyebrow": "THE CASE FOR",
+        "eyebrow": "The case for",
         "concernLabel": "Concern",
-        "courseFit": "COURSE FIT",
-        "finished": "FINISHED",
-        "champion": "CHAMPION",
-        "onCourse": "ON THE COURSE",
-        "seasonSnapshot": "SEASON SNAPSHOT",
-        "last5": "LAST 5 STARTS",
-        "viewPlayer": "View player profile",
-        "reasonNumber": "{{n}}",
-        "worldRankTile": "WORLD",
-        "winsTile": "WINS",
-        "top10sTile": "TOP 10s",
-        "sgTotalTile": "SG TOTAL"
+        "courseFit": "course fit {{score}}"
       },
       "sheet": {
         "picksHeader": "{{count}} PICKS · TAP FOR THE CASE",
@@ -289,18 +276,7 @@
         "finished": "F",
         "thruN": "thru {{n}}"
       },
-      "thruSep": " · {{value}}",
-      "board": {
-        "title": "The board",
-        "eyebrow": "{{n}} PICKS · TAP FOR THE CASE",
-        "record": "{{inside}} OF {{total}} INSIDE THE TOP 20",
-        "fit": "FIT {{score}}",
-        "methodology": "Picks generated before the first tee time from course DNA, current form and field strength. Verdicts settle with the final leaderboard."
-      },
-      "live": {
-        "thru": "THRU {{n}}",
-        "finished": "F"
-      }
+      "thruSep": " · {{value}}"
     },
     "collegeFranchise": {
       "eyebrow": "COLLEGE FRANCHISE",
@@ -451,6 +427,7 @@
       "eyebrowFallback": "SCORECARD",
       "courseFallback": "Scorecard"
     },
+
     "shell": {
       "board": {
         "eyebrow": "The Board",

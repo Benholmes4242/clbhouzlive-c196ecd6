@@ -66,13 +66,10 @@ export function useAppeals(status: AppealStatus | 'all' = 'pending') {
 
 async function notifyUser(userId: string, title: string, message: string) {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
     await supabase.from('notifications').insert({
       user_id: userId,
       recipient_actor_type: 'user',
       recipient_actor_id: userId,
-      actor_id: user.id,
       type: 'moderation',
       title,
       message,

@@ -120,20 +120,14 @@ export const MoreOptionsDrawer: React.FC<MoreOptionsDrawerProps> = ({
 
   const handleConfirmDelete = async () => {
     if (!post || isDeleting) return;
-    // Close FIRST (both the inner AlertDialog and the outer drawer) so
-    // Radix/vaul run their exit cycles before invalidation evicts the post
-    // and unmounts this host. Otherwise pointer-events:none leaks onto <body>.
     setIsDeleting(true);
-    setConfirmDeleteOpen(false);
-    onOpenChange(false);
-    await new Promise((r) => setTimeout(r, 300));
     try {
       const actorType = post.actorType === 'business' ? 'business' : 'personal';
       await deletePost(post.id, actorType, post.actorId);
-    } catch {
-      // Failure surfaces via the deletion hook's own toast.
     } finally {
       setIsDeleting(false);
+      setConfirmDeleteOpen(false);
+      onOpenChange(false);
     }
   };
 

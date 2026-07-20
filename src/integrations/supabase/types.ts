@@ -17145,14 +17145,12 @@ export type Database = {
           country: string
           course_id: string
           course_name: string
-          list_label: string
-          list_rank: number
-          quote: string
-          region: string
+          description: string
+          global_rank: number
           review_count: number
-          reviewer_name: string
-          reviews_this_week: number
+          sub_country: string
           thumbnail_image: string
+          week_label: string
         }[]
       }
       get_course_regions: {

@@ -69,7 +69,7 @@ export function InviteFriendsSheet({ open, onClose, source }: Props) {
           padding: '4px 16px 24px',
           fontFamily: FONT,
           background: SURFACE,
-          maxHeight: '75dvh',
+          maxHeight: '84vh',
           overflowY: 'auto',
         }}
       >
