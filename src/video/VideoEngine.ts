@@ -560,11 +560,11 @@ class VideoEngineImpl {
       return;
     }
     if (effectivePolicy === 'session') {
-      if (lane.el.muted !== sessionMuted) {
-        // Respect ONE_UNMUTED_LANE on unmute. Forward the resolve trigger
-        // so any slot-enforce log names the true cause (mount/activation/…).
-        this.setMuted(lane.id, sessionMuted, `policy:${trigger}`);
-      }
+      // v11 single-writer: the reconciler is the ONLY writer of session-lane
+      // mute state. applyAudioPolicy no longer forces mute on session lanes;
+      // instead we schedule a reconcile so the current focus/borrow/session
+      // resolution converges without racing a direct setMuted here.
+      this.reconcileAudio(`policy:${trigger}`);
       return;
     }
     // 'local' → leave alone.
@@ -1273,17 +1273,24 @@ class VideoEngineImpl {
   }
 
   /**
-   * v9 reconciler — the ONLY function that decides what gets unmuted.
+   * v11 reconciler — the ONLY function that decides what gets unmuted.
    *
-   * Compute the "speaker lane" — the at-most-one lane that should be audible
-   * right now — from four inputs:
+   * PRODUCT SPEC (canon):
+   *   - Inline audio = the Clubhouse feed's ACTIVE slide only, session-gated.
+   *   - Rails and grid tiles are ALWAYS silent inline (policy 'always-muted').
+   *   - Fullscreen viewer is session-gated via the borrow / fullscreen-solo
+   *     branch below.
+   *   - Tap-to-fullscreen is the ONLY way rail/grid content speaks.
+   *
+   * Inputs:
    *   1. useSessionAudio.isMuted    (user intent)
    *   2. useFullscreenFeedStore     (isOpen + borrow.laneId)
-   *   3. feedLaneRoles.laneForRole('active')  (which feed lane is on screen)
-   *   4. per-lane wantPlay / audioPolicy       (declared roles)
+   *   3. audioFocus registry        (which surface owns the inline speaker)
+   *   4. per-lane wantPlay / audioPolicy
    *
    * Then apply: every lane other than the speaker is muted; the speaker,
    * if any, is unmuted. 'always-muted' stays muted; 'local' is left alone.
+   * This is the single writer for session-lane mute state.
    */
   private reconcileAudio(reason: string): void {
     const sessionMuted = useSessionAudio.getState().isMuted;
@@ -1453,9 +1460,9 @@ class VideoEngineImpl {
    *  not the current speaker). Uses getBoundingClientRect (no observer setup
    *  needed; runs at 250ms cadence only when audioDebug is on). */
   private computeVisiblePlayingLanes(): Array<{
-    laneId: LaneId; postId: string | null; visibilityRatio: number; playing: boolean; muted: boolean;
+    laneId: LaneId; postId: string | null; visibilityRatio: number; playing: boolean; muted: boolean; audioPolicy: LaneAudioPolicy;
   }> {
-    const out: Array<{ laneId: LaneId; postId: string | null; visibilityRatio: number; playing: boolean; muted: boolean }> = [];
+    const out: Array<{ laneId: LaneId; postId: string | null; visibilityRatio: number; playing: boolean; muted: boolean; audioPolicy: LaneAudioPolicy }> = [];
     if (typeof window === 'undefined') return out;
     const vw = window.innerWidth || 0;
     const vh = window.innerHeight || 0;
@@ -1478,6 +1485,7 @@ class VideoEngineImpl {
           visibilityRatio: +ratio.toFixed(3),
           playing,
           muted: !!el.muted,
+          audioPolicy: lane.audioPolicy,
         });
       }
     });
@@ -1531,10 +1539,11 @@ class VideoEngineImpl {
           }
           const visiblePlayingLanes = this.computeVisiblePlayingLanes();
           // MISMATCH: a lane ≥50% visible, playing, session unmuted, and
-          // NOT the speaker. Self-labelled — the bug fingerprint the brief
-          // asked for.
+          // NOT the speaker. v11: exclude always-muted-policy lanes — silent
+          // rails/grid tiles are design, not a defect. They are muted by
+          // policy and never speak inline regardless of visibility.
           const mismatch = !sessionMuted && visiblePlayingLanes.some(
-            (v) => v.visibilityRatio >= 0.5 && v.laneId !== speaker && !v.muted,
+            (v) => v.audioPolicy !== 'always-muted' && v.visibilityRatio >= 0.5 && v.laneId !== speaker && !v.muted,
           );
           logAudio(mismatch ? 'heartbeat.MISMATCH' : 'heartbeat.state', {
             overlayOpen: fsOpen,

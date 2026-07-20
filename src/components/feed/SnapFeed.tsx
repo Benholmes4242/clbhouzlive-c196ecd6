@@ -173,6 +173,21 @@ export function SnapFeed({
   }, []);
 
 
+  // v11 audio-focus — dedicated registration that closes the two gaps found
+  // in the v10 audit:
+  //   (a) Initial mount of the active slide: the transition-settle effect
+  //       below early-returns when prevActiveRef already equals activeIndex
+  //       (true on mount), so focus never registered for the landing slide.
+  //   (b) Fullscreen round-trip: when the overlay closes while the inline
+  //       feed still owns the active slide, we re-assert focus so the
+  //       reconciler picks the inline feed lane back up.
+  // Mechanism for (b): subscribe to `useFullscreenFeedStore(s => s.isOpen)`
+  // and re-register in the same effect body whenever it flips (or on any
+  // activeIndex change). Inline surface only — the fullscreen surface's
+  // speaker is owned by the reconciler's overlay branch.
+  const fsOpen = useFullscreenFeedStore(s => s.isOpen);
+
+
   const storeActiveIndex = useClubhouseStore(s => s.activeIndex);
   const setActiveIndex = useClubhouseStore(s => s.setActiveIndex);
   // Opening-slide media selectors threaded from the tap opener. `mediaId` is
@@ -188,6 +203,32 @@ export function SnapFeed({
   // placeholders when the overlay opened at index ≥ VIRTUAL_WINDOW (4+).
   const activeIndex = activeIndexOverride ?? storeActiveIndex;
   const location = useLocation();
+
+  // v11 focus registration — see comment block above. Runs on mount (covers
+  // gap A: the landing slide) and again whenever `fsOpen` transitions
+  // (covers gap B: fullscreen→inline round-trip). Inline surface only.
+  useEffect(() => {
+    if (surface === 'fullscreen') return;
+    // When the overlay is open, do not fight the overlay branch for focus —
+    // the reconciler resolves the speaker via the borrow / fullscreen-solo
+    // paths. When it closes, re-assert inline focus below.
+    if (fsOpen) return;
+    const post = posts[activeIndex];
+    if (!post) return;
+    const hasVideo = (post as any)?.mediaItems?.some?.((m: any) => m?.type === 'video');
+    try {
+      if (hasVideo) {
+        const activeLane = feedLaneRoles.laneForRole('active');
+        VideoEngine.setAudioFocus(activeLane, 'feed');
+        if (audioDebugEnabled()) {
+          try { logAudio('focus.reassert', { trigger: 'mount-or-fs-close', activeIndex, postId: post.id, activeLane }); } catch {}
+        }
+      } else {
+        VideoEngine.setAudioFocus(null, 'feed');
+      }
+    } catch { /* noop */ }
+  }, [surface, fsOpen, activeIndex, posts]);
+
 
   // [VPERF] S4 swipe.vertical — a vertical settle on a video slide.
   // Closes on the next 'firstFrame' event on the surface's active lane

@@ -132,18 +132,14 @@ export function useRailLane(opts: UseRailLaneOptions): UseRailLaneResult {
     }).catch(() => {});
 
     VideoEngine.mountLane(laneId, host);
-    // v10: rail lanes now use 'session' policy — audibility is gated by the
-    // audio-focus registry + reconciler, not a blanket always-muted flag.
-    // Rails start muted; focus registration below promotes the current
-    // active tile.
-    VideoEngine.setAudioPolicy(laneId, 'session');
+    // v11: rail lanes are ALWAYS muted inline (product spec — rails/grid
+    // tiles never speak inline; tap→fullscreen is how they sing). The
+    // reconciler's borrow branch handles unmuting when the fullscreen
+    // viewer borrows this lane.
+    VideoEngine.setAudioPolicy(laneId, 'always-muted');
     if (willBeltMute) {
       VideoEngine.setMuted(laneId, true);
     }
-    // Register this rail lane as the audio-focus owner. Last-write-wins
-    // across concurrent active tiles; on scroll the newly-activated tile
-    // takes over.
-    try { VideoEngine.setAudioFocus(laneId, 'rail'); } catch { /* noop */ }
     // Resume at the engine's lastPos for this post — kept fresh by every lane
     // (feed-active/fullscreen/rail-*) via onTime. Means closing fullscreen at
     // 20s and returning to a re-acquired rail tile picks up at 20s, not 0.
@@ -196,13 +192,6 @@ export function useRailLane(opts: UseRailLaneOptions): UseRailLaneResult {
       // Local deactivation — the pool.release effect above will fire the
       // engine release and unmount cleanup; here we just stop playback.
       VideoEngine.pause(laneId, { callerPostId: caller });
-      // v10 audio-focus — surrender focus if this rail lane still holds it.
-      try {
-        const cur = VideoEngine.getAudioFocus();
-        if (cur.source === 'rail' && cur.laneId === laneId) {
-          VideoEngine.setAudioFocus(null, 'rail');
-        }
-      } catch { /* noop */ }
     };
   }, [laneId, opts.hlsUrl, opts.posterUrl, opts.postId, opts.ownerKey]);
 
