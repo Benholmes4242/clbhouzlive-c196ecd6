@@ -117,7 +117,7 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onCli
     !isStaleRow &&
     entry.handicap_30d_delta != null &&
     entry.handicap_30d_delta <= -0.5;
-  const Tag: any = onClick ? 'button' : 'div';
+  const Tag: React.ElementType = onClick ? 'button' : 'div';
 
   const selfFrame: React.CSSProperties = isYou
     ? {
