@@ -98,15 +98,17 @@ export default function EmailPage() {
       });
       if (error) throw error;
       setStep('success');
-    } catch (err: any) {
-      const msg = (err?.message ?? '').toLowerCase();
-      const status = err?.status;
+    } catch (err) {
+      const e = err as { message?: string; status?: number } | undefined;
+      const rawMessage = e?.message ?? '';
+      const msg = rawMessage.toLowerCase();
+      const status = e?.status;
       if (msg.includes('expired')) {
         setOtpError('That code is no longer valid. If you requested more than one, use the newest email.');
       } else if (status === 401 || status === 403 || msg.includes('invalid') || msg.includes('token')) {
         setOtpError('That code is not right. Check the email and try again.');
       } else {
-        setOtpError(err?.message ?? 'Could not verify code.');
+        setOtpError(rawMessage || 'Could not verify code.');
       }
       setCode('');
     } finally {
