@@ -32,6 +32,12 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
       id: m.id,
       userId: user?.id ?? '',
       actorType: 'personal',
+      // Author id, NOT viewer id. Safe today because useUserCourseMoments is
+      // viewer-scoped (fetches only the signed-in user's own moments), so
+      // author === viewer. If this hook is ever broadened to include other
+      // users' moments, switch this to the moment's real author id — otherwise
+      // the fullscreen follow pill (canonical cache) will key on the wrong
+      // actor and any Follow tap will land on self.
       actorId: user?.id ?? '',
       username: profile?.username ?? '',
       displayName: profile?.display_name ?? profile?.username ?? '',

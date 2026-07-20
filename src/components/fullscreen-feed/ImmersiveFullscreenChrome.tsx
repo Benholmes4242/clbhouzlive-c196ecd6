@@ -39,6 +39,8 @@ import MapPinIcon from '@/components/icons/MapPinIcon';
 import { Z } from '@/config/zIndex';
 import { formatRatingValue } from '@/utils/formatters';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
+import { useFollowState } from '@/hooks/useFollowState';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { formatCountKilo, formatRelativeWithSeconds as timeAgo } from '@/i18n/format';
 
@@ -153,7 +155,18 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
 
   const likeState = getLikeState(activePost);
   const commentCount = getCommentCount(activePost);
-  const isFollowed = getFollowState(activePost);
+  const { activeActor } = useActiveActor();
+  const canFollowActor =
+    activePost.actorType === 'personal' || activePost.actorType === 'business';
+  const { isFollowing: canonicalFollowing } = useFollowState({
+    targetActorType: canFollowActor ? (activePost.actorType as 'personal' | 'business') : 'personal',
+    targetActorId: canFollowActor ? activePost.actorId : undefined,
+    viewerActorType: activeActor?.type ?? 'personal',
+    viewerActorId: activeActor?.id ?? undefined,
+  });
+  // Canonical cache wins (DB-seeded + patched live by every toggle);
+  // item-embedded state is only the pre-seed fallback.
+  const isFollowed = canonicalFollowing ?? getFollowState(activePost);
 
   const courseName =
     activePost.review?.courseName ??
