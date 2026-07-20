@@ -34,7 +34,7 @@ export default function SupportThreadPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
-  const { data, isLoading } = useMyRequestThread(id ?? null);
+  const { data, isLoading, isError, refetch } = useMyRequestThread(id ?? null);
   const postReply = useMyRequestReply();
 
   const [body, setBody] = useState('');
