@@ -98,7 +98,7 @@ function SubSection({ label, rows }: { label: string; rows: Row[] }) {
       <p
         style={{
           margin: '0 0 6px',
-          fontSize: 8.5,
+          fontSize: 10,
           fontWeight: 800,
           color: AMBER,
           letterSpacing: '0.14em',
