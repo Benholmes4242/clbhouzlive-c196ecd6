@@ -230,6 +230,16 @@ const Pressable = forwardRef<HTMLElement, PressableProps>(function Pressable(
       s.startY = e.clientY;
       s.startT = performance.now();
       s.pointerId = e.pointerId;
+      // Pin pointerup to THIS element regardless of layout shifts under the
+      // finger (grid reflow from autoplay promotion, poster→video swaps,
+      // infinite-scroll landings). Without capture, the browser hit-tests
+      // pointerup against whatever tile now sits at those coordinates and
+      // fires the WRONG Pressable's onPress. If the browser decides scrolling
+      // wins (touch-action: manipulation), it fires pointercancel and
+      // releases capture automatically — scrolling stays intact.
+      try {
+        (e.currentTarget as Element).setPointerCapture?.(e.pointerId);
+      } catch {}
       applyPressed();
 
       // Scroll-guarded preroute: schedule a fire after PREROUTE_FIRE_MS iff
