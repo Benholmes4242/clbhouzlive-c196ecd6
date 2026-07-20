@@ -30,9 +30,9 @@ export function PlayerPage() {
   const { t } = useTranslation('tourhub');
   const { playerId } = useParams<{ playerId: string }>();
 
-  const { data: player, isLoading: playerLoading, refetch } = useTourPlayer(playerId || '');
-  const { data: playerStats } = useSinglePlayerStatistics(playerId);
-  const { data: results } = usePlayerResults(playerId, 30);
+  const { data: player, isLoading: playerLoading, isError: playerError, refetch } = useTourPlayer(playerId || '');
+  const { data: playerStats, isError: statsError, refetch: refetchStats } = useSinglePlayerStatistics(playerId);
+  const { data: results, isError: resultsError, refetch: refetchResults } = usePlayerResults(playerId, 30);
   const playerState = usePlayerState(playerId);
 
   // Scroll-to-top on player switch (ported from PlayerProfilePage).
