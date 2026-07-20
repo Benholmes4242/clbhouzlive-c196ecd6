@@ -245,6 +245,8 @@ export function ThisWeek({ slug, collegeName }: Props) {
           </Link>
         );
       })}
-    </section>
+        </motion.section>
+      )}
+    </AnimatePresence>
   );
 }
