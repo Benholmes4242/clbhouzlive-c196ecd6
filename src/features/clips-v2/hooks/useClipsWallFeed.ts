@@ -47,7 +47,7 @@ function moodParams(mood: ClipsV2Mood): Record<string, unknown> {
       return { p_mode: 'latest', p_filter: 'played_courses' };
     case 'for_you':
     default:
-      return { p_mode: 'trending' };
+      return { p_mode: 'for_you' };
   }
 }
 
