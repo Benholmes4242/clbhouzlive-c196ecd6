@@ -12,6 +12,7 @@ import {
 } from '@/lib/whs/hooks';
 import { useHandicapPercentile } from '@/lib/whs/usePercentile';
 import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
+import { Skeleton } from '@/components/ui/skeleton';
 import { firstName } from '@/lib/whs/utils/initials';
 
 import { buildLeaderboardCohorts } from '@/lib/whs/utils/buildLeaderboardCohorts';
@@ -166,7 +167,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
       >
         {/* Hero as header strip */}
         {isLoading ? (
-          <div className="animate-pulse" style={{ height: 120, background: 'var(--hcp-bg-2)' }} />
+          <Skeleton variant="dark" style={{ height: 120, width: '100%', borderRadius: 0 }} />
         ) : (
           <HeroPositionCard
             selfRow={selfRow}
@@ -207,10 +208,10 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
         {/* Rows */}
         {isLoading ? (
           Array.from({ length: 5 }).map((_, i) => (
-            <div
+            <Skeleton
               key={i}
-              className="animate-pulse"
-              style={{ margin: '0 0 1px', height: 54, background: 'var(--hcp-bg-2)' }}
+              variant="dark"
+              style={{ margin: '0 0 1px', height: 54, width: '100%', borderRadius: 0 }}
             />
           ))
         ) : (

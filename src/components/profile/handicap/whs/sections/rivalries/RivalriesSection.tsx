@@ -11,6 +11,7 @@ import { useRivalCrowns, useRivalCrownsForOwner } from '@/lib/whs/hooks/useRival
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
+import { Skeleton } from '@/components/ui/skeleton';
 import { rivalKey, rivalryScore } from '@/lib/whs/utils/rivalryTiering';
 
 interface Props {
@@ -330,13 +331,12 @@ const heroRailStyle: React.CSSProperties = {
 };
 
 const RivalrySkeleton: React.FC = () => (
-  <div
-    className="animate-pulse"
+  <Skeleton
+    variant="dark"
     style={{
       flex: '0 0 100%',
       height: 380,
       borderRadius: 18,
-      background: 'var(--hcp-bg-3)',
     }}
   />
 );
