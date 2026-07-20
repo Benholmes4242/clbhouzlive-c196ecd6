@@ -226,12 +226,13 @@ async function fetchPlayers(ids: string[]): Promise<Map<string, PlayerRec>> {
 
 async function fetchWorldRankingCat(): Promise<LeaderCategoryDef | null> {
   // World ranking (OWGR) is PGA-centric / male-tour — restricted to PGA only.
-  const { data } = await supabase
+  const { data, error: rankErr } = await supabase
     .from('sr_world_rankings')
     .select('player_id, rank, points, ranking_date')
     .order('ranking_date', { ascending: false })
     .order('rank', { ascending: true })
     .limit(600);
+  if (rankErr) throw rankErr;
   if (!data?.length) return null;
   const latestDate = data[0].ranking_date;
   const latest = data.filter((r) => r.ranking_date === latestDate);
