@@ -10,6 +10,7 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { BIZ } from '@/components/business/businessTokens';
+import { Skeleton } from '@/components/ui/skeleton';
 
 // Inline skeleton used by loading state — kept local since it is private to this page.
 function BusinessCardSkeleton() {
@@ -23,31 +24,19 @@ function BusinessCardSkeleton() {
       }}
     >
       <div className="p-4 flex items-center gap-3">
-        <div
-          className="w-12 h-12 animate-pulse"
-          style={{ background: BIZ.fillStrong, borderRadius: BIZ.rInner }}
+        <Skeleton
+          className="w-12 h-12"
+          style={{ borderRadius: BIZ.rInner }}
         />
         <div className="flex-1 space-y-2">
-          <div
-            className="h-4 animate-pulse rounded-lg w-2/3"
-            style={{ background: BIZ.fillStrong }}
-          />
-          <div
-            className="h-3 animate-pulse rounded-lg w-1/3"
-            style={{ background: BIZ.fill }}
-          />
+          <Skeleton className="h-4 rounded-lg w-2/3" />
+          <Skeleton className="h-3 rounded-lg w-1/3" />
         </div>
       </div>
       <div style={{ height: '0.5px', background: BIZ.hair }} />
       <div className="p-4 space-y-3">
-        <div
-          className="h-16 animate-pulse"
-          style={{ background: BIZ.fillStrong, borderRadius: BIZ.rInner }}
-        />
-        <div
-          className="h-11 animate-pulse"
-          style={{ background: BIZ.fill, borderRadius: BIZ.rInner }}
-        />
+        <Skeleton className="h-16" style={{ borderRadius: BIZ.rInner }} />
+        <Skeleton className="h-11" style={{ borderRadius: BIZ.rInner }} />
       </div>
     </div>
   );

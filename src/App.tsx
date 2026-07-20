@@ -534,9 +534,9 @@ function AppRoutes() {
         {/* Business routes */}
         <Route path="/businesses/manage" element={<Suspense fallback={<GenericPageSkeleton />}><MyBusinessesPage /></Suspense>} />
         
-        <Route path="/business/create" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessProfileEditor /></Suspense>} />
+        <Route path="/business/create" element={<Suspense fallback={<ManagePageSkeleton />}><BusinessProfileEditor /></Suspense>} />
         <Route path="/business/:id/insights" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessInsightsPageV2 /></Suspense>} />
-        <Route path="/business/:id/edit" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessProfileEditor /></Suspense>} />
+        <Route path="/business/:id/edit" element={<Suspense fallback={<ManagePageSkeleton />}><BusinessProfileEditor /></Suspense>} />
 
         <Route path="/business/success" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessProfileLiveSuccessPage /></Suspense>} />
         <Route path="/business/:id/verification" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessVerificationPage /></Suspense>} />
