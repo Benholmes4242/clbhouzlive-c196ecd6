@@ -82,10 +82,7 @@ export const MessageImage: React.FC<Props> = ({ attachment, onOpen }) => {
           }}
         />
       ) : loading ? (
-        <div
-          className="animate-pulse"
-          style={{ width: '100%', height: '100%', background: '#EDEFF2' }}
-        />
+        <Skeleton className="rounded-none" style={{ width: '100%', height: '100%' }} />
       ) : null}
 
       {uploading ? (
