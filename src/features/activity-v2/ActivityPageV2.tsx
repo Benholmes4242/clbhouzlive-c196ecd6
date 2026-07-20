@@ -427,8 +427,8 @@ export const ActivityPageV2: React.FC = () => {
             {renderBucket(BUCKET_LABELS.earlier, buckets.earlier)}
             <div ref={sentinelRef} style={{ height: 1 }} />
             {feed.isFetchingNextPage && (
-              <div style={{ padding: 20, display: 'flex', justifyContent: 'center' }}>
-                <Loader2 size={18} color={AMBER} className="animate-spin" />
+              <div style={{ padding: '8px 0' }}>
+                <ActivityRowsSkeleton buckets={1} />
               </div>
             )}
           </div>
