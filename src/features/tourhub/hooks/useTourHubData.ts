@@ -398,10 +398,7 @@ export function useTourPlayer(playerId: string) {
         .eq('id', playerId)
         .single();
       
-      if (error) {
-        console.error('Error fetching player:', error);
-        return null;
-      }
+      if (error) throw error;
       return data as TourPlayer;
     },
     enabled: !!playerId,
