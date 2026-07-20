@@ -7,7 +7,7 @@
  */
 import { Skeleton } from '@/components/ui/skeleton';
 import { INK_TINT_06 } from '@/features/tourhub/_shared/tokens';
-import { OVERVIEW_HERO_HEIGHT } from '@/features/tourhub/components/overview-v3/OverviewHero';
+import { OVERVIEW_HERO_TOTAL_HEIGHT } from '@/features/tourhub/components/overview-v3/OverviewHero';
 import { SPACE } from '@/lib/spacing';
 
 export const TourHubOverviewSkeleton = () => {
@@ -16,7 +16,7 @@ export const TourHubOverviewSkeleton = () => {
       {/* Hero — MUST mirror the mounted OverviewHero.isLoading hold exactly. */}
       <div
         style={{
-          height: OVERVIEW_HERO_HEIGHT,
+          height: OVERVIEW_HERO_TOTAL_HEIGHT,
           borderRadius: 20,
           background: `linear-gradient(135deg, ${INK_TINT_06}, rgba(15,23,42,0.02))`,
         }}
