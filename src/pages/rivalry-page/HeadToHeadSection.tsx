@@ -98,11 +98,10 @@ export const HeadToHeadSection: React.FC<Props> = ({
 
 const H2HSkeleton: React.FC = () => (
   <div style={{ padding: '20px 16px 0', fontFamily: FONT }}>
-    <div
-      className="animate-pulse"
+    <Skeleton
+      variant="dark"
       style={{
         height: 96,
-        background: BG_1,
         border: `1px solid ${LINE}`,
         borderRadius: 12,
         marginBottom: 16,
@@ -122,11 +121,10 @@ const H2HSkeleton: React.FC = () => (
         >
           Loading…
         </div>
-        <div
-          className="animate-pulse"
+        <Skeleton
+          variant="dark"
           style={{
             height: 220,
-            background: BG_1,
             border: `1px solid ${LINE}`,
             borderRadius: 12,
           }}
