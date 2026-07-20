@@ -31,7 +31,7 @@ async function currentUserId(): Promise<string | null> {
   return data.user?.id ?? null;
 }
 
-async function fetchAppeals(status: AppealStatus | 'all'): Promise<AppealRow[]> {
+export async function fetchAppeals(status: AppealStatus | 'all'): Promise<AppealRow[]> {
   let q = supabase
     .from('suspension_appeals')
     .select('*')

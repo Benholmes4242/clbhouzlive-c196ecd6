@@ -44,7 +44,7 @@ export interface VerificationRow {
   businessAlreadyVerified?: boolean | null;
 }
 
-async function fetchVerifications(): Promise<VerificationRow[]> {
+export async function fetchVerifications(): Promise<VerificationRow[]> {
   const [biz, golfer, claims] = await Promise.all([
     supabase
       .from('business_verification_requests')
