@@ -227,6 +227,21 @@ export function SnapFeed({
     const armLane: 'fullscreen' | 'feed-active' =
       surface === 'fullscreen' ? 'fullscreen' : 'feed-active';
 
+    // v10 audio-focus registry — inline feed only. The fullscreen branch of
+    // the reconciler owns the overlay's speaker selection, so we do NOT
+    // register focus from the fullscreen surface. Image slides clear focus
+    // (there is no lane to unmute).
+    if (surface !== 'fullscreen') {
+      try {
+        if (mediaType === 'video') {
+          const activeLane = feedLaneRoles.laneForRole('active');
+          VideoEngine.setAudioFocus(activeLane, 'feed');
+        } else {
+          VideoEngine.setAudioFocus(null, 'feed');
+        }
+      } catch { /* noop */ }
+    }
+
     // swipe.vertical — video slides only. Image slides have no lane
     // events on either surface, so starting the span would guarantee
     // a 15001ms watchdog orphan.
