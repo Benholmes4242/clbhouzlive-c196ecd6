@@ -291,8 +291,17 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
 
       <div style={{ background: CANVAS, paddingBottom: 32 }}>
         {isLoading || !detail ? (
-          <div style={{ padding: 32, textAlign: 'center', color: SUB, fontSize: 14 }}>
-            {t('common:state.loading')}
+          <div style={{ padding: '20px 16px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, marginBottom: 24 }}>
+              <Skeleton style={{ width: 72, height: 72, borderRadius: 24 }} />
+              <Skeleton style={{ width: 140, height: 16, borderRadius: 4 }} />
+            </div>
+            {[0, 1, 2].map((i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0' }}>
+                <Skeleton style={{ width: 44, height: 44, borderRadius: 16 }} />
+                <Skeleton style={{ flex: 1, height: 12, borderRadius: 4 }} />
+              </div>
+            ))}
           </div>
         ) : (
           <>
