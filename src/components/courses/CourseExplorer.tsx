@@ -205,10 +205,10 @@ async function fetchCoursePage({ selectedRegion, selectedSubregion, debouncedSea
 const LoadingSkeleton = () => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-200">
     {[1, 2, 3, 4, 5, 6].map((i) => (
-      <div key={i} className="space-y-3 animate-pulse">
-        <Skeleton className="h-48 w-full rounded-sq-sm bg-gradient-to-r from-muted via-muted/50 to-muted animate-shimmer" />
-        <Skeleton className="h-6 w-3/4 bg-gradient-to-r from-muted via-muted/50 to-muted" />
-        <Skeleton className="h-4 w-1/2 bg-gradient-to-r from-muted via-muted/50 to-muted" />
+      <div key={i} className="space-y-3">
+        <Skeleton className="h-48 w-full rounded-sq-sm" />
+        <Skeleton className="h-6 w-3/4" />
+        <Skeleton className="h-4 w-1/2" />
       </div>
     ))}
   </div>
@@ -580,35 +580,39 @@ const CourseExplorer = () => {
       </div>
 
       {/* Context row with sort — scrolls with content */}
-      {!isLoading && totalCount > 0 && (
+      {(isLoading || totalCount > 0) && (
         <div className="flex items-center justify-between gap-3">
-          <span style={{
-            fontSize: 13, color: INK_MUTE, flex: 1, lineHeight: 1.35,
-            fontWeight: 500,
-          }}>
-            {hasSearch ? (
-              <Trans
-                i18nKey={totalCount === 1 ? 'explorer.results_one' : 'explorer.results_other'}
-                ns="courses"
-                values={{ count: totalCount, formattedCount: formatNumber(totalCount) }}
-                components={{ 1: <strong style={{ color: '#0F172A', fontWeight: 700 }} /> }}
-              />
-            ) : selectedRegion === PRIMARY_REGIONS.ALL ? (
-              <Trans
-                i18nKey={totalCount === 1 ? 'explorer.countWorldwide_one' : 'explorer.countWorldwide_other'}
-                ns="courses"
-                values={{ count: totalCount, formattedCount: formatNumber(totalCount) }}
-                components={{ 1: <strong style={{ color: '#0F172A', fontWeight: 700 }} /> }}
-              />
-            ) : (
-              <Trans
-                i18nKey={totalCount === 1 ? 'explorer.countInRegion_one' : 'explorer.countInRegion_other'}
-                ns="courses"
-                values={{ count: totalCount, formattedCount: formatNumber(totalCount), region: getRegionLabel() }}
-                components={{ 1: <strong style={{ color: '#0F172A', fontWeight: 700 }} /> }}
-              />
-            )}
-          </span>
+          {isLoading ? (
+            <Skeleton className="h-4 w-40 rounded" />
+          ) : (
+            <span style={{
+              fontSize: 13, color: INK_MUTE, flex: 1, lineHeight: 1.35,
+              fontWeight: 500,
+            }}>
+              {hasSearch ? (
+                <Trans
+                  i18nKey={totalCount === 1 ? 'explorer.results_one' : 'explorer.results_other'}
+                  ns="courses"
+                  values={{ count: totalCount, formattedCount: formatNumber(totalCount) }}
+                  components={{ 1: <strong style={{ color: '#0F172A', fontWeight: 700 }} /> }}
+                />
+              ) : selectedRegion === PRIMARY_REGIONS.ALL ? (
+                <Trans
+                  i18nKey={totalCount === 1 ? 'explorer.countWorldwide_one' : 'explorer.countWorldwide_other'}
+                  ns="courses"
+                  values={{ count: totalCount, formattedCount: formatNumber(totalCount) }}
+                  components={{ 1: <strong style={{ color: '#0F172A', fontWeight: 700 }} /> }}
+                />
+              ) : (
+                <Trans
+                  i18nKey={totalCount === 1 ? 'explorer.countInRegion_one' : 'explorer.countInRegion_other'}
+                  ns="courses"
+                  values={{ count: totalCount, formattedCount: formatNumber(totalCount), region: getRegionLabel() }}
+                  components={{ 1: <strong style={{ color: '#0F172A', fontWeight: 700 }} /> }}
+                />
+              )}
+            </span>
+          )}
           <AppSelect
             value={sortOption}
             onChange={(v) => setSortOption(v as SortOption)}
