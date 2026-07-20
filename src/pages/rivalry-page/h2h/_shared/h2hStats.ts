@@ -101,7 +101,7 @@ export function valueFor(
 ): unknown {
   if (stat.key === 'h2h_best_margin') return bestMargin;
   if (stat.format === 'hot_flag') return player.is_hot ? 'HOT' : 'STEADY';
-  return (player as any)[stat.key];
+  return (player as unknown as Record<string, unknown>)[stat.key];
 }
 
 /** Render a value for display. */
