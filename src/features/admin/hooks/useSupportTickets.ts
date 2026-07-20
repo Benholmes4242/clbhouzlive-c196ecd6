@@ -114,10 +114,10 @@ export function useSupportThread(ticketId: string | null) {
       if (senderIds.length === 0) return [];
       const { data: profiles } = await sb
         .from('user_profiles')
-        .select('user_id, display_name, username, profile_photo_url')
-        .in('user_id', senderIds);
+        .select('id, display_name, username, profile_photo_url')
+        .in('id', senderIds);
       const pMap = new Map<string, any>();
-      (profiles ?? []).forEach((p: any) => pMap.set(p.user_id, p));
+      (profiles ?? []).forEach((p: any) => pMap.set(p.id, p));
       return rows.map((r) => ({
         ...r,
         sender_role: r.sender_role as 'user' | 'admin',
