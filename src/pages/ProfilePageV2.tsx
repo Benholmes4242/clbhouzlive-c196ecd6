@@ -684,9 +684,8 @@ const ProfilePageV2Content: React.FC = () => {
           )}
         </div>
 
-        {/* H3: header rendered globally by ChromeIsland.
-            Own profile: leftOverride routes back to settings; visitor: registry
-            fallback '/'. See useSetChromeLeftOverride call above. */}
+        {/* H3: header rendered globally by ChromeIsland. Profile pages
+            intentionally have no back button; bottom nav is the exit. */}
 
 
 
