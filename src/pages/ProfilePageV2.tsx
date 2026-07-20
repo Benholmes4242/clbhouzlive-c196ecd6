@@ -531,6 +531,36 @@ const ProfilePageV2Content: React.FC = () => {
     return <ProfileSkeleton />;
   }
 
+  if (resolveError || profileError) {
+    return (
+      <PageRoot className="min-h-screen bg-background" immersiveStatusBar>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center">
+          <h1 className="text-2xl font-semibold text-foreground mb-2">
+            Couldn't load this profile
+          </h1>
+          <p className="text-muted-foreground mb-6 max-w-sm">
+            Check your connection and try again.
+          </p>
+          <div className="flex gap-3">
+            <button
+              onClick={() => { if (resolveError) refetchResolve(); if (profileError) refetchProfile(); }}
+              className="px-6 py-2.5 text-white rounded-full text-sm font-semibold active:scale-[0.97]"
+              style={{ backgroundColor: '#F7931E' }}
+            >
+              Retry
+            </button>
+            <button
+              onClick={() => safeGoBack(navigate, '/clubhouse')}
+              className="px-6 py-2.5 rounded-full text-sm font-semibold border border-border text-foreground active:scale-[0.97]"
+            >
+              Go back
+            </button>
+          </div>
+        </div>
+      </PageRoot>
+    );
+  }
+
   // Show "Profile unavailable" for deleted or not found profiles
   if (isProfileDeleted || profileNotFound) {
     return (
