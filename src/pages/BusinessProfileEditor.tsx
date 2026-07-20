@@ -69,7 +69,7 @@ import {
 
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 
-import type { Database } from '@/integrations/supabase/types';
+import type { Database, Json } from '@/integrations/supabase/types';
 
 /* ─────────────────────── constants ─────────────────────── */
 
