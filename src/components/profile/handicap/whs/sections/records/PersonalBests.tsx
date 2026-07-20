@@ -53,7 +53,7 @@ function monthLabel(yyyyMm: string): string {
 }
 
 export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, viewMode = 'owner', ownerFirstName = null }) => {
-  const { data: scores, isLoading } = useAllScores(connectionId);
+  const { data: scores, isLoading, isError, refetch } = useAllScores(connectionId);
 
   const tiles: Tile[] = useMemo(() => {
     const list = scores ?? [];
@@ -159,6 +159,57 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
     return [bestDiff, bestGross, bestSF, bestVsHcp, mostMonth];
   }, [scores, currentHandicap]);
 
+  if (isError && !isLoading) {
+    return (
+      <section style={{ marginTop: 0, fontFamily: FONT }}>
+        <DarkSectionHeader
+          eyebrow="PERSONAL BESTS"
+          title={
+            viewMode === 'friend'
+              ? `${ownerFirstName ? `${ownerFirstName}'s` : 'Their'} records to break`
+              : 'Records to break'
+          }
+        />
+        <div style={{ padding: '0 16px 8px' }}>
+          <div
+            style={{
+              background: D_BG,
+              border: `1px solid ${D_LINE}`,
+              borderRadius: 16,
+              padding: '20px 14px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 12,
+            }}
+          >
+            <div style={{ fontSize: 12, color: D_T60 }}>
+              Couldn't load your bests.
+            </div>
+            <button
+              type="button"
+              onClick={() => refetch()}
+              style={{
+                padding: '7px 14px',
+                borderRadius: 999,
+                background: 'rgba(255,255,255,0.06)',
+                border: `1px solid ${D_LINE}`,
+                color: D_T100,
+                fontSize: 12,
+                fontWeight: 700,
+                fontFamily: FONT,
+                cursor: 'pointer',
+                WebkitTapHighlightColor: 'transparent',
+              }}
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section style={{ marginTop: 0, fontFamily: FONT }}>
       <DarkSectionHeader
@@ -170,6 +221,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
         }
       />
       <div style={{ padding: '0 16px 8px' }}>
+
         <div
           style={{
             display: 'grid',
