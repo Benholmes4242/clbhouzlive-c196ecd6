@@ -471,7 +471,7 @@ export function FullscreenFeedOverlay() {
   const { activeActor: ctxActor } = useActiveActor();
   const activeActor = ctxActor ?? { type: "personal" as const, id: userId ?? "" };
   const { handleLike, getActiveLikeState } = useClubhouseLikes({ userId, activeActor });
-  const { followOverrides, handleFollowChange, getFollowState } = useClubhouseFollows({ userId });
+  const { followOverrides, handleFollow, handleFollowChange, getFollowState } = useClubhouseFollows({ userId });
   const { commentsOpen, overlayVisible, openComments, closeComments, getCommentCount } = useClubhouseComments();
   const safeOpenComments = useCallback(() => { if (!readOnly) openComments(); }, [readOnly, openComments]);
   const {
