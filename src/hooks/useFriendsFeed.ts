@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { mapRowToFeedPost, groupMultiMedia } from '@/components/media-system/utils/feedMapper';
 import { buildFriendsFeed, deduplicatePosts } from '@/components/media-system/utils/feedAlgorithm';
+import { getFeedVersion } from '@/lib/featureFlags';
 import type { FeedPost, FeedRpcRow } from '@/components/media-system/types/media';
 
 export type FriendsMode = 'latest' | 'popular';
