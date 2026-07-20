@@ -33,7 +33,7 @@ import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar
 import { PhotoBand } from './HybridHeroBands/PhotoBand';
 import { MiddleBand } from './HybridHeroBands/MiddleBand';
 import { LeaderboardBand } from './HybridHeroBands/LeaderboardBand';
-import { HeroWireTicker } from './HybridHeroBands/HeroWireTicker';
+import { HeroWireTicker, type TickerFact } from './HybridHeroBands/HeroWireTicker';
 import { setHeroFullBleed } from '../../_shared/heroFullBleedSignal';
 import { formatMonthDay } from '@/i18n/format';
 import {
