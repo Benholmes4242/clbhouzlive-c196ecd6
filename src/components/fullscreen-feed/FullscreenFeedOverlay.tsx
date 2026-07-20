@@ -908,7 +908,10 @@ export function FullscreenFeedOverlay() {
                     isRefreshing={isFetchingNextPage}
                     hasNextPage={hasNextPage}
                     followOverrides={followOverrides}
-                    onFollowChange={handleFollowChange}
+                    onFollowChange={(targetUserId, nextFollowed) => {
+                      const p = posts.find((x) => x.userId === targetUserId);
+                      if (p) handleFollow({ ...p, isFollowedByMe: !nextFollowed });
+                    }}
                     onFirstFrameReady={handleSnapFeedFirstFrame}
                     startIndex={startIndex}
                     onActiveIndexChange={setActiveIndex}
