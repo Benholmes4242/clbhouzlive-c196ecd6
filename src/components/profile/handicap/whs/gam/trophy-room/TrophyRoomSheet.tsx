@@ -723,7 +723,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
           )}
 
 
-          {!isLoading && (() => {
+          {!badgesError && !isLoading && (() => {
             const lifetime = selectLifetime(allAchievements);
             const allGroups = groupAchievementsByCategory(allAchievements);
             const anyAchievements = allAchievements.length > 0;
