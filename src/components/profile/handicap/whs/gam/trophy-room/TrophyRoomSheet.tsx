@@ -360,8 +360,11 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
     // Fire and forget -- per-badge writes; failures are harmless (sheen
     // simply replays next open).
     void Promise.all(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ids.map((id) => (supabase.rpc as any)('gam_mark_badge_seen', { p_badge_id: id })),
+      ids.map((id) =>
+        (supabase as unknown as {
+          rpc: (fn: string, args: Record<string, unknown>) => Promise<unknown>;
+        }).rpc('gam_mark_badge_seen', { p_badge_id: id }),
+      ),
     );
   }, [open]);
 
