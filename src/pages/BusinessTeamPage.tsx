@@ -186,7 +186,7 @@ export default function BusinessTeamPage() {
 
   const { data: membership } = useBusinessMembership(businessId);
   const { data: business } = useBusinessProfile(businessId);
-  const { data: team, isLoading: teamLoading } = useBusinessTeam(businessId);
+  const { data: team, isLoading: teamLoading, isError: teamError, refetch: refetchTeam } = useBusinessTeam(businessId);
   const { data: invites } = useBusinessInvites(businessId);
   const removeMember = useRemoveMember(businessId || '');
   const updateRole = useUpdateMemberRole(businessId || '');
