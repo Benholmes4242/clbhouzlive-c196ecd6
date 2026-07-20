@@ -4,10 +4,11 @@
  * Path 2: file a WHS match request for manual alias resolution.
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 
 const FONT = "'Geist', -apple-system, sans-serif";
 const AMBER = '#F7931E';
