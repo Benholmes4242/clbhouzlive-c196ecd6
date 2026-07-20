@@ -121,13 +121,14 @@ export function useCourses() {
   const qc = useQueryClient();
   const [search, setSearch] = useState('');
   const [country, setCountry] = useState('all');
+  const [filter, setFilter] = useState<CourseFilter>('all');
   const [page, setPage] = useState(1);
   const pageSize = 25;
   const debounced = useDebouncedValue(search, 250);
 
   const { data, isLoading, refetch } = useQuery({
-    queryKey: ['admin-v2', 'courses', debounced, country, page],
-    queryFn: () => fetchCourses(debounced, country, page, pageSize),
+    queryKey: ['admin-v2', 'courses', debounced, country, filter, page],
+    queryFn: () => fetchCourses(debounced, country, filter, page, pageSize),
     staleTime: 60_000,
   });
 
@@ -143,6 +144,7 @@ export function useCourses() {
     total: kpiStats?.totalCourses ?? 0,
     geocoded: (kpiStats?.totalCourses ?? 0) - (kpiStats?.missingCoordinates ?? 0),
     missingCoords: kpiStats?.missingCoordinates ?? 0,
+    missingPhoto: kpiStats?.missingImages ?? 0,
     top100: kpiStats?.verifiedCourses ?? 0,
   }), [kpiStats]);
 
