@@ -1,24 +1,28 @@
 /**
- * PlayerSkeleton — matches the P1 anatomy: dark hero block + section
- * bones. No shimmer, no framer-motion — a flat static loading state.
+ * PlayerPageSkeleton — matches the P1 anatomy: dark hero block + section
+ * bones. Canonical shimmer via the base Skeleton (dark variant on the hero band).
+ *
+ * Eager-imported (used as the Suspense route fallback and as the in-page
+ * loading hold) so token values are inlined to keep this off the tourhub
+ * chunk.
  */
 
-import { HAIRLINE_INK_8, INK_TINT_06, SLATE_50, SURFACE, WHITE_ALPHA_08 } from '../../_shared/tokens';
+import { Skeleton } from '@/components/ui/skeleton';
+
+const SLATE_50 = '#F8FAFC';
+const SURFACE = '#FFFFFF';
+const HAIRLINE_INK_8 = 'rgba(15,23,42,0.08)';
 
 function Bone({ w, h, radius = 6, dark = false }: { w: number | string; h: number; radius?: number; dark?: boolean }) {
   return (
-    <div
-      style={{
-        width: w,
-        height: h,
-        borderRadius: radius,
-        background: dark ? WHITE_ALPHA_08 : INK_TINT_06,
-      }}
+    <Skeleton
+      variant={dark ? 'dark' : 'light'}
+      style={{ width: w, height: h, borderRadius: radius }}
     />
   );
 }
 
-export function PlayerSkeleton() {
+export function PlayerPageSkeleton() {
   return (
     <div style={{ background: SLATE_50, minHeight: '100vh' }}>
       {/* Hero bone */}
@@ -30,7 +34,7 @@ export function PlayerSkeleton() {
         }}
       >
         <div style={{ padding: '10px 16px 0', display: 'flex', gap: 16, alignItems: 'flex-end' }}>
-          <div style={{ width: 74, height: 74, borderRadius: '34%', background: WHITE_ALPHA_08 }} />
+          <Skeleton variant="dark" style={{ width: 74, height: 74, borderRadius: '34%' }} />
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
             <Bone w={100} h={10} dark />
             <Bone w={180} h={22} dark />
