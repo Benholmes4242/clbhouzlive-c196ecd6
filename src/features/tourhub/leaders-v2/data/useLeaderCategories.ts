@@ -327,8 +327,8 @@ async function fetchPgaCategories(): Promise<LeaderCategoriesResult> {
 
 async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCategoriesResult> {
   const year = currentSeasonYear();
-  const primary = await (supabase
-    .from('tour_season_rankings' as never) as unknown as ReturnType<typeof supabase.from>)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const primary = await (supabase.from('tour_season_rankings' as any) as any)
     .select('player_id, manual_player_id, player_name, position, points, wins, country, tour_code')
     .eq('tour_code', tour)
     .eq('season_year', year)
@@ -337,8 +337,8 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
   if (primary.error) throw primary.error;
   let rankings = (primary.data ?? []) as TourSeasonRankingRow[];
   if (!rankings.length) {
-    const alt = await (supabase
-      .from('tour_season_rankings' as never) as unknown as ReturnType<typeof supabase.from>)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const alt = await (supabase.from('tour_season_rankings' as any) as any)
       .select('player_id, manual_player_id, player_name, position, points, wins, country, tour_code')
       .eq('tour_code', tour)
       .eq('season_year', year - 1)
