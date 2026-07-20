@@ -286,7 +286,7 @@ export default function BusinessInvitePage() {
             type="button"
             onClick={handleSend}
             disabled={!canSend || pending}
-            className="w-full flex items-center justify-center gap-2 active:opacity-90 disabled:opacity-50"
+            className={`w-full flex items-center justify-center gap-2 active:opacity-90 ${pending ? '' : 'disabled:opacity-50'}`}
             style={{
               minHeight: 52,
               borderRadius: 14,

@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, CheckCircle2, Users, FileText, Settings, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useBusinessActivityLog, getActivityDescription, BusinessActivityLogEntry } from '@/hooks/useBusinessActivityLog';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { isToday, isYesterday, startOfDay } from 'date-fns';
@@ -55,7 +56,11 @@ export default function BusinessActivityPage() {
 
       <div className="max-w-2xl mx-auto px-4 py-6">
         {isLoading ? (
-          <div className="text-center text-muted-foreground py-12">Loading activity...</div>
+          <div className="space-y-3">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="h-16 rounded-sq-md" />
+            ))}
+          </div>
         ) : isError ? (
           <div className="text-center py-12">
             <p className="font-medium text-sm">Couldn't load activity</p>
