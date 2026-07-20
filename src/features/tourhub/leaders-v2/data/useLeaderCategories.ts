@@ -327,39 +327,42 @@ async function fetchPgaCategories(): Promise<LeaderCategoriesResult> {
 
 async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCategoriesResult> {
   const year = currentSeasonYear();
-  let { data: rankings } = await supabase
-    .from('tour_season_rankings' as any)
+  const primary = await supabase
+    .from('tour_season_rankings' as never)
     .select('player_id, manual_player_id, player_name, position, points, wins, country, tour_code')
-    .eq('tour_code', tour)
-    .eq('season_year', year)
-    .order('position', { ascending: true })
+    .eq('tour_code' as never, tour as never)
+    .eq('season_year' as never, year as never)
+    .order('position' as never, { ascending: true })
     .limit(200);
-  if (!rankings?.length) {
+  if (primary.error) throw primary.error;
+  let rankings = (primary.data ?? []) as TourSeasonRankingRow[];
+  if (!rankings.length) {
     const alt = await supabase
-      .from('tour_season_rankings' as any)
+      .from('tour_season_rankings' as never)
       .select('player_id, manual_player_id, player_name, position, points, wins, country, tour_code')
-      .eq('tour_code', tour)
-      .eq('season_year', year - 1)
-      .order('position', { ascending: true })
+      .eq('tour_code' as never, tour as never)
+      .eq('season_year' as never, (year - 1) as never)
+      .order('position' as never, { ascending: true })
       .limit(200);
-    rankings = alt.data ?? [];
+    if (alt.error) throw alt.error;
+    rankings = (alt.data ?? []) as TourSeasonRankingRow[];
   }
 
   const categories: LeaderCategoryDef[] = [];
 
-  if (rankings?.length) {
-    const pool = rankings as any[];
+  if (rankings.length) {
+    const pool = rankings;
     const playerIds = [
       ...new Set(
         pool
-          .map((r) => (r.player_id ?? r.manual_player_id) as string | null)
+          .map((r) => (r.player_id ?? r.manual_player_id))
           .filter((v): v is string => !!v),
       ),
     ];
     const pmap = await fetchPlayers(playerIds);
 
-    const resolve = (r: any): LeaderRow | null => {
-      const pid = (r.player_id ?? r.manual_player_id ?? '') as string;
+    const resolve = (r: TourSeasonRankingRow): LeaderRow => {
+      const pid = (r.player_id ?? r.manual_player_id ?? '');
       const p = pid ? pmap.get(pid) : undefined;
       return {
         playerId: pid,
