@@ -9,8 +9,9 @@ export interface NorthStarData {
   mau: number;
   signups7d: number;
   signupsPrev7d: number;
-  d1Retention: number;
-  d7Retention: number;
+  d1Retention: number | null;
+  d7Retention: number | null;
+
   totalUsers: number;
 }
 
