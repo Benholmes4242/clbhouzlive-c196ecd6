@@ -55,8 +55,8 @@ export async function fetchSupportTickets(opts?: { closed?: boolean }): Promise<
   const sb: any = supabase;
   const profilesRes = await sb
     .from('user_profiles')
-    .select('user_id, display_name, username, profile_photo_url')
-    .in('user_id', userIds);
+    .select('id, display_name, username, profile_photo_url')
+    .in('id', userIds);
   const firstMsgsRes = await sb
     .from('support_messages')
     .select('ticket_id, body, created_at')
@@ -67,7 +67,7 @@ export async function fetchSupportTickets(opts?: { closed?: boolean }): Promise<
 
   const pMap = new Map<string, SupportTicketRow['profile']>();
   profiles.forEach((p: any) => {
-    pMap.set(p.user_id, {
+    pMap.set(p.id, {
       display_name: p.display_name,
       username: p.username,
       profile_photo_url: p.profile_photo_url,
