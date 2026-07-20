@@ -537,6 +537,7 @@ function CourseDetail({
         <div style={{ color: t.inkMuted, fontSize: 13 }}>Loading…</div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <DraftRestoredBar visible={draftRestored} onDiscard={discardDraft} />
           {/* C4-2: Course Insight (collapsed by default) */}
           <details
             style={{
