@@ -25,6 +25,12 @@ interface Props {
 export const CountryPickerSheet: React.FC<Props> = ({ open, onClose, onSelect }) => {
   const [query, setQuery] = useState('');
 
+  useEffect(() => {
+    if (!open) return;
+    lockBodyScroll();
+    return () => unlockBodyScroll();
+  }, [open]);
+
   const { supported, comingSoon } = useMemo(() => {
     const q = query.trim().toLowerCase();
     const filtered = q
