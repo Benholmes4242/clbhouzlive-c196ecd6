@@ -110,6 +110,8 @@ function useLivePlayerRow(playerId: string | undefined) {
         .limit(1)
         .maybeSingle();
 
+      // Deliberate swallow: the live row only powers the LiveNow strip;
+      // an error degrades to "strip hidden", never to wrong live data.
       if (error) {
         console.error('[usePlayerState] live row error:', error);
         return null;
