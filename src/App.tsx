@@ -210,7 +210,7 @@ const HomeLanding = lazy(() => import("./pages/HomeLanding"));
 const WatchHubV2 = lazy(() => import("./features/watch-v2/WatchHubV2"));
 const VideosPageV2 = lazy(() => import("./features/videos-v2/VideosPageV2"));
 const ClipsPageV2 = lazy(() => import("./features/clips-v2/ClipsPageV2"));
-const AccountTypeOnboarding = lazy(() => import("./pages/onboarding/AccountTypeOnboarding"));
+
 
 
 const ManageProfilePage = lazy(() => import("./pages/ManageProfile"));
@@ -228,11 +228,11 @@ const HandicapPage = lazy(() => import("./pages/HandicapPage"));
 const RivalryPage = lazy(() => import("./pages/RivalryPage"));
 
 
-const ProfileQuestView = lazy(() => import("./pages/ProfileQuestView"));
-const QuestIndexView = lazy(() => import("./pages/QuestIndexView"));
-const QuestReplayView = lazy(() => import("./pages/QuestReplayView"));
-
-const UserReviewsPage = lazy(() => import("./pages/UserReviewsPage"));
+// Legacy quest/user-reviews pages removed — routes below redirect.
+const UserReviewsRedirect: React.FC = () => {
+  const { username } = useParams<{ username: string }>();
+  return <Navigate to={username ? `/profile/${username}` : '/'} replace />;
+};
 
 // Courses page now uses CoursesWrapped (imported above) which handles header/dim reset
 const CourseDetailPage = lazy(() => import("./pages/CourseDetailPage"));
@@ -243,7 +243,7 @@ const PostV2Page = lazy(() => import("./features/post-v2/PostV2Page"));
 // ShareReviewPage removed in PR-5 Part 2 (zero navigators — orphan preview surface, ReviewWizard shares inline).
 const UserCoursesPage = lazy(() => import("./pages/UserCoursesPage"));
 
-const JourneyListPage = lazy(() => import("./pages/JourneyListPage"));
+
 
 const News = lazy(() => import("./pages/News"));
 
@@ -254,7 +254,7 @@ const InboxV2Page = lazy(() => import("./pages/messaging-v2/InboxV2Page"));
 const ThreadV2Page = lazy(() => import("./pages/messaging-v2/ThreadV2Page"));
 
 const ActivityPageV2 = lazy(() => import("./features/activity-v2/ActivityPageV2"));
-const GolfersToFollowPage = lazy(() => import("./pages/GolfersToFollowPage"));
+const GolfersToFollowV2 = lazy(() => import("./pages/GolfersToFollowV2"));
 const OwnProfileSocialRedirect = lazy(() => import("./components/profile/OwnProfileSocialRedirect"));
 const FriendsRedirectToFollowing = lazy(() => import("./pages/FriendsRedirectToFollowing"));
 const ProfileSocialListRoute = lazy(() => import("./features/social-lists-v2/ProfileSocialListRoute"));
@@ -265,7 +265,7 @@ const CreateProfileRedirect = lazy(() => import("./components/redirects/CreatePr
 
 
 
-const AchievementsPage = lazy(() => import("./pages/AchievementsPage"));
+
 const AdminSetupPage = lazy(() => import("./pages/AdminSetupPage"));
 const AdminShell = lazy(() => import('./features/admin/AdminShell'));
 
@@ -310,8 +310,6 @@ const RateCourseV2Redirect: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
   return <Navigate to={courseId ? `/courses/${courseId}/rate` : '/'} replace />;
 };
-const SeasonShop = lazy(() => import("./pages/SeasonShop"));
-const ChallengesPage = lazy(() => import("./pages/ChallengesPage"));
 
 
 const BusinessDirectoryPage = lazy(() => import("./pages/BusinessDirectoryPage"));
