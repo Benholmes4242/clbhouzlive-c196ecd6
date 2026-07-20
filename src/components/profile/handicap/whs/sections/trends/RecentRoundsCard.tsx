@@ -595,14 +595,10 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap }) => {
 const SkeletonStack: React.FC = () => (
   <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
     {Array.from({ length: 5 }).map((_, i) => (
-      <div
+      <Skeleton
         key={i}
-        style={{
-          height: 72,
-          borderRadius: 12,
-          background: T.ink04,
-          border: `1px solid ${T.hairline}`,
-        }}
+        variant="dark"
+        style={{ height: 72, borderRadius: 12, border: `1px solid ${T.hairline}` }}
       />
     ))}
   </div>
