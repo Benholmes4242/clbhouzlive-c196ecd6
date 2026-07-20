@@ -17,12 +17,25 @@ interface Props {
 
 export default function BusinessSocialListRoute({ direction }: Props) {
   const { idOrSlug } = useParams<{ idOrSlug: string }>();
-  const { data: business, isLoading } = useBusinessProfile(idOrSlug);
+  const { data: business, isLoading, error, refetch } = useBusinessProfile(idOrSlug);
 
   if (isLoading) {
     return (
       <div style={{ minHeight: '100dvh', background: '#F8FAFC', padding: 'calc(var(--chrome-total-h, 0px) + 24px) 16px 80px', color: '#64748B', fontSize: 13 }}>
         Loading…
+      </div>
+    );
+  }
+
+  const isNotFound = error instanceof Error && error.message === 'Business not found'; // Sentinel from useBusinessProfile - keep in sync (same pattern as BusinessProfilePage).
+
+  if (error && !isNotFound) {
+    return (
+      <div style={{ minHeight: '100dvh', background: '#F8FAFC', padding: 'calc(var(--chrome-total-h, 0px) + 24px) 16px 80px', color: '#64748B', fontSize: 13, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 12 }}>
+        Couldn't load this business.
+        <button type="button" onClick={() => refetch()} style={{ background: '#0F172A', color: '#fff', border: 'none', borderRadius: 999, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+          Retry
+        </button>
       </div>
     );
   }
