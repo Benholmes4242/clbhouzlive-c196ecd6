@@ -44,8 +44,7 @@ export function useExploreFeed({ userId, region, searchQuery, enabled: externalE
       if (cursor) params.p_cursor = cursor;
       if (searchQuery) params.p_search_query = searchQuery;
 
-      const rpc = (supabase as unknown as RpcClient).rpc;
-      const { data, error } = await rpc('get_explore_feed', params);
+      const { data, error } = await (supabase as unknown as RpcClient).rpc('get_explore_feed', params);
 
       if (error) throw error;
 
