@@ -199,158 +199,176 @@ const TrophyRoomEntryRow: React.FC<Props> = ({
 
   const show = !!achievements;
 
+  const renderContent = (): React.ReactNode => {
+    const isLight = variant === 'light';
+    const isFriend = viewMode === 'friend';
+    const name = ownerFirstName ?? 'them';
+    const poss = ownerFirstName ? `${ownerFirstName}'s` : 'their';
 
-  const isLight = variant === 'light';
-  const isFriend = viewMode === 'friend';
-  const name = ownerFirstName ?? 'them';
-  const poss = ownerFirstName ? `${ownerFirstName}'s` : 'their';
+    const rowStyle: React.CSSProperties = isLight
+      ? {
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          width: '100%',
+          textAlign: 'left',
+          padding: '12px 14px',
+          borderRadius: 14,
+          background: '#FFFFFF',
+          border: '0.5px solid rgba(15,23,42,0.10)',
+        }
+      : {
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          width: '100%',
+          textAlign: 'left',
+          padding: '12px 16px',
+          borderRadius: 16,
+          background: 'var(--hcp-bg-1)',
+          border: '1px solid var(--hcp-line)',
+        };
 
-  const rowStyle: React.CSSProperties = isLight
-    ? {
-        display: 'flex',
-        alignItems: 'center',
-        gap: 12,
-        width: '100%',
-        textAlign: 'left',
-        padding: '12px 14px',
-        borderRadius: 14,
-        background: '#FFFFFF',
-        border: '0.5px solid rgba(15,23,42,0.10)',
-      }
-    : {
-        display: 'flex',
-        alignItems: 'center',
-        gap: 12,
-        width: '100%',
-        textAlign: 'left',
-        padding: '12px 16px',
-        borderRadius: 16,
-        background: 'var(--hcp-bg-1)',
-        border: '1px solid var(--hcp-line)',
-      };
+    const titleStyle: React.CSSProperties = isLight
+      ? {
+          fontSize: 14,
+          fontWeight: 800,
+          color: '#0F172A',
+          letterSpacing: '-0.01em',
+          lineHeight: 1.2,
+        }
+      : {
+          fontSize: 15,
+          fontWeight: 800,
+          color: 'var(--hcp-t-100)',
+          letterSpacing: '-0.01em',
+          lineHeight: 1.2,
+        };
 
-  const titleStyle: React.CSSProperties = isLight
-    ? {
-        fontSize: 14,
-        fontWeight: 800,
-        color: '#0F172A',
-        letterSpacing: '-0.01em',
-        lineHeight: 1.2,
-      }
-    : {
-        fontSize: 15,
-        fontWeight: 800,
-        color: 'var(--hcp-t-100)',
-        letterSpacing: '-0.01em',
-        lineHeight: 1.2,
-      };
+    const subStyle: React.CSSProperties = isLight
+      ? { fontSize: 12, color: '#64748B', marginTop: 3 }
+      : { fontSize: 12, color: 'var(--hcp-t-60)', marginTop: 3 };
 
-  const subStyle: React.CSSProperties = isLight
-    ? { fontSize: 12, color: '#64748B', marginTop: 3 }
-    : { fontSize: 12, color: 'var(--hcp-t-60)', marginTop: 3 };
+    const outerWrapStyle: React.CSSProperties = isLight
+      ? { fontFamily: FONT }
+      : { padding: '0 16px 4px', fontFamily: FONT };
 
-  const outerWrapStyle: React.CSSProperties = isLight
-    ? { fontFamily: FONT }
-    : { padding: '0 16px 4px', fontFamily: FONT };
+    // ---- EMPTY STATE: ghost shelf ----
+    if (lifetimeCount === 0) {
+      const ghostShelf = (
+        <div style={shelfStyle}>
+          <GhostMedallion z={3} first={true} variant={variant} />
+          <GhostMedallion z={2} first={false} variant={variant} />
+          <GhostMedallion z={1} first={false} variant={variant} />
+        </div>
+      );
 
-  // ---- EMPTY STATE: ghost shelf ----
-  if (lifetimeCount === 0) {
-    const ghostShelf = (
-      <div style={shelfStyle}>
-        <GhostMedallion z={3} first={true} variant={variant} />
-        <GhostMedallion z={2} first={false} variant={variant} />
-        <GhostMedallion z={1} first={false} variant={variant} />
-      </div>
-    );
-
-    if (isFriend) {
-      return (
-        <div style={outerWrapStyle}>
-          <div style={rowStyle}>
-            {ghostShelf}
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={titleStyle}>
-                {ownerFirstName
-                  ? `${ownerFirstName} hasn't earned trophies yet`
-                  : "They haven't earned trophies yet"}
+      if (isFriend) {
+        return (
+          <div style={outerWrapStyle}>
+            <div style={rowStyle}>
+              {ghostShelf}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={titleStyle}>
+                  {ownerFirstName
+                    ? `${ownerFirstName} hasn't earned trophies yet`
+                    : "They haven't earned trophies yet"}
+                </div>
+                <div style={subStyle}>Check back after their next round</div>
               </div>
-              <div style={subStyle}>Check back after their next round</div>
             </div>
           </div>
+        );
+      }
+
+      return (
+        <div style={outerWrapStyle}>
+          <button
+            type="button"
+            onClick={() => openGamAchievements()}
+            aria-label="Open trophies -- browse what you can earn"
+            style={{ ...rowStyle, cursor: 'pointer' }}
+          >
+            {ghostShelf}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={titleStyle}>Your case is waiting</div>
+              <div style={subStyle}>Log a round to earn your first trophy</div>
+            </div>
+            <ChevronRight size={18} strokeWidth={2.4} color="#F7931E" style={{ flexShrink: 0 }} />
+          </button>
         </div>
       );
     }
+
+    // ---- FILLED STATE: shelf preview ----
+    const title =
+      weeklyCount > 0 ? (
+        <>
+          <span style={{ color: '#F7931E', fontVariantNumeric: 'tabular-nums' }}>{weeklyCount}</span>{' '}
+          new {trophyWord(weeklyCount)}{isFriend ? ` for ${name}` : ''} this week
+        </>
+      ) : (
+        <>
+          <span style={{ color: '#F7931E', fontVariantNumeric: 'tabular-nums' }}>{lifetimeCount}</span>{' '}
+          {trophyWord(lifetimeCount)} in {isFriend ? `${poss} case` : 'your case'}
+        </>
+      );
+
+    const sub =
+      weeklyCount > 0
+        ? isFriend
+          ? `Tap to see what ${name} unlocked`
+          : 'Tap to see what you unlocked'
+        : 'See them all';
 
     return (
       <div style={outerWrapStyle}>
         <button
           type="button"
           onClick={() => openGamAchievements()}
-          aria-label="Open trophies -- browse what you can earn"
+          aria-label={
+            weeklyCount > 0
+              ? `Open trophies -- ${weeklyCount} new ${weeklyCount === 1 ? 'unlock' : 'unlocks'} this week`
+              : `Open trophies -- ${lifetimeCount} earned`
+          }
           style={{ ...rowStyle, cursor: 'pointer' }}
         >
-          {ghostShelf}
+          <div style={shelfStyle}>
+            {recentRarities.map((r, i) => (
+              <Medallion
+                key={i}
+                rarity={r}
+                z={recentRarities.length - i}
+                first={i === 0}
+                variant={variant}
+              />
+            ))}
+          </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={titleStyle}>Your case is waiting</div>
-            <div style={subStyle}>Log a round to earn your first trophy</div>
+            <div style={titleStyle}>{title}</div>
+            <div style={subStyle}>{sub}</div>
           </div>
           <ChevronRight size={18} strokeWidth={2.4} color="#F7931E" style={{ flexShrink: 0 }} />
         </button>
       </div>
     );
-  }
-
-  // ---- FILLED STATE: shelf preview ----
-  const title =
-    weeklyCount > 0 ? (
-      <>
-        <span style={{ color: '#F7931E', fontVariantNumeric: 'tabular-nums' }}>{weeklyCount}</span>{' '}
-        new {trophyWord(weeklyCount)}{isFriend ? ` for ${name}` : ''} this week
-      </>
-    ) : (
-      <>
-        <span style={{ color: '#F7931E', fontVariantNumeric: 'tabular-nums' }}>{lifetimeCount}</span>{' '}
-        {trophyWord(lifetimeCount)} in {isFriend ? `${poss} case` : 'your case'}
-      </>
-    );
-
-  const sub =
-    weeklyCount > 0
-      ? isFriend
-        ? `Tap to see what ${name} unlocked`
-        : 'Tap to see what you unlocked'
-      : 'See them all';
+  };
 
   return (
-    <div style={outerWrapStyle}>
-      <button
-        type="button"
-        onClick={() => openGamAchievements()}
-        aria-label={
-          weeklyCount > 0
-            ? `Open trophies -- ${weeklyCount} new ${weeklyCount === 1 ? 'unlock' : 'unlocks'} this week`
-            : `Open trophies -- ${lifetimeCount} earned`
-        }
-        style={{ ...rowStyle, cursor: 'pointer' }}
-      >
-        <div style={shelfStyle}>
-          {recentRarities.map((r, i) => (
-            <Medallion
-              key={i}
-              rarity={r}
-              z={recentRarities.length - i}
-              first={i === 0}
-              variant={variant}
-            />
-          ))}
-        </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={titleStyle}>{title}</div>
-          <div style={subStyle}>{sub}</div>
-        </div>
-        <ChevronRight size={18} strokeWidth={2.4} color="#F7931E" style={{ flexShrink: 0 }} />
-      </button>
-    </div>
+    <AnimatePresence initial={false}>
+      {show && (
+        <motion.div
+          key="trophy-room-row"
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: 'auto', opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.25, ease: 'easeOut' }}
+          style={{ overflow: 'hidden' }}
+        >
+          {renderContent()}
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 
