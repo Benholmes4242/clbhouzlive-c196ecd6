@@ -336,50 +336,40 @@ class VideoEngineImpl {
     if (PAUSE_ON_HIDDEN && typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', this.onVisibility);
     }
-    // v8 belt: subscribe to feed role rotations so we can self-heal the
-    // ONE_UNMUTED_LANE slot when a lane becomes active AFTER its play()
-    // already ran (and got skipped by v7's non-active gate).
-    try {
-      // Seed the tracker so the first emit has a baseline.
-      this.lastActiveFeedLane = feedLaneRoles.laneForRole('active');
-    } catch { /* noop */ }
+    // v9 reconciler triggers.
     this.roleUnsub = feedLaneRoles.subscribe(this.onFeedRoleChange);
+    this.fsStoreUnsub = useFullscreenFeedStore.subscribe(this.onFullscreenChange);
+    this.sessionAudioUnsub = useSessionAudio.subscribe(this.onSessionAudioChange);
+    // 250ms drift check while the session is unmuted. When actual state
+    // diverges from computed, reconcile with reason='drift' and dump a
+    // forensic snapshot (role map, borrow state, last 5 audio events,
+    // last muted writer per lane).
+    if (typeof window !== 'undefined') {
+      this.driftCheckIv = window.setInterval(() => this.driftCheck(), 250);
+    }
     DBG('booted', { laneIds, saveDataGated: this.saveDataGated });
   }
 
-  /**
-   * v8 belt — fired whenever the feedLaneRoles map or freeze-set changes.
-   * If the ACTIVE-role lane just flipped to a different physical lane and
-   * that lane is playing under a 'session' policy while the session is
-   * unmuted but no lane currently holds the ONE_UNMUTED_LANE slot, run
-   * applyAudioPolicy with trigger='role-promote' to claim the slot.
-   * Distinct trigger so HUD captures show the belt firing.
-   */
+  /** v9: any role rotation → reconcile. */
   private onFeedRoleChange = (): void => {
-    let activeLaneId: LaneId | null = null;
-    try { activeLaneId = feedLaneRoles.laneForRole('active'); } catch { return; }
-    if (!activeLaneId || activeLaneId === this.lastActiveFeedLane) return;
-    const prev = this.lastActiveFeedLane;
-    this.lastActiveFeedLane = activeLaneId;
-    const lane = this.lanes.get(activeLaneId);
-    if (!lane) return;
-    // Only care about session-policy lanes that intend to play.
-    if (lane.audioPolicy !== 'session') return;
-    if (!lane.wantPlay || lane.el.paused) return;
-    const sessionMuted = useSessionAudio.getState().isMuted;
-    if (sessionMuted) return; // session is muted → nothing to claim
-    // If any lane already holds the unmuted slot, no need to sweep.
-    let someoneUnmuted = false;
-    this.lanes.forEach((l) => { if (!l.el.muted) someoneUnmuted = true; });
-    if (someoneUnmuted) return;
-    logAudio('policy.role-promote', {
-      laneId: activeLaneId,
-      previousActiveLaneId: prev,
-      trigger: 'role-promote',
-      msSinceOpen: msSinceOpen(),
-    });
-    this.applyAudioPolicy(lane, 'role-promote');
+    this.reconcileAudio('role-change');
   };
+
+  /** v9: overlay open/close (or borrow flip) → reconcile. */
+  private lastFsSnapshot: { isOpen: boolean; borrowLaneId: LaneId | null } = { isOpen: false, borrowLaneId: null };
+  private onFullscreenChange = (): void => {
+    const s = useFullscreenFeedStore.getState();
+    const next = { isOpen: !!s.isOpen, borrowLaneId: (s.borrow?.laneId ?? null) as LaneId | null };
+    if (next.isOpen === this.lastFsSnapshot.isOpen && next.borrowLaneId === this.lastFsSnapshot.borrowLaneId) return;
+    this.lastFsSnapshot = next;
+    this.reconcileAudio('overlay-change');
+  };
+
+  /** v9: session mute/unmute → reconcile. */
+  private onSessionAudioChange = (): void => {
+    this.reconcileAudio('session-change');
+  };
+
 
   private onVisibility = () => {
     if (typeof document === 'undefined') return;
