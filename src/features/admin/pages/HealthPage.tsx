@@ -255,8 +255,9 @@ function EgSyncCard({ eg, chip }: { eg: ReturnType<typeof useDashboard>['egSyncH
       title="England Golf sync"
       chip={chip}
       footer={d && d.auth_failed > 0 ? (
-        <CardFooterButton to="/admin-v2/users" tone="brand" icon={<ChevronDown size={0} style={{ display: 'none' }} />}>
-          View affected members in Users
+        <CardFooterButton to="/admin-v2/users?filter=eg_issues" tone="brand" icon={<ChevronDown size={0} style={{ display: 'none' }} />}>
+          View affected members
+
         </CardFooterButton>
       ) : undefined}
     >

@@ -20,7 +20,7 @@ const InboxPage = lazy(() => import('./pages/InboxPage'));
 const SECTION_TITLES: Record<string, string> = {
   dashboard:  'Dashboard',
   inbox:      'Inbox',
-  users:      'Users',
+  users:      'Members',
   content:    'Content',
   analytics:  'Analytics',
   health:     'Health',
