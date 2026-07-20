@@ -107,6 +107,44 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
         sub={subLine}
       />
 
+      {isError && !isLoading && (
+        <div
+          style={{
+            margin: '0 16px',
+            background: 'var(--hcp-bg-1)',
+            border: '1px solid var(--hcp-line-2)',
+            borderRadius: 18,
+            padding: '20px 16px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 12,
+            fontFamily: FONT,
+          }}
+        >
+          <p style={{ margin: 0, fontSize: 13, color: 'var(--hcp-t-60)' }}>
+            Couldn't load the leaderboard.
+          </p>
+          <button
+            type="button"
+            onClick={() => refetch()}
+            style={{
+              padding: '6px 14px',
+              borderRadius: 999,
+              background: 'rgba(255,255,255,0.06)',
+              border: '1px solid var(--hcp-line-2)',
+              color: 'var(--hcp-t-100)',
+              fontSize: 12,
+              fontWeight: 700,
+              fontFamily: FONT,
+              cursor: 'pointer',
+            }}
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
       {/* THIS WEEK banner */}
       {!isLoading && (
         <WeeklyBanner
