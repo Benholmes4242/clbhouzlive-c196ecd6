@@ -55,14 +55,14 @@ export interface LiteProfile {
   id: string;
   display_name: string | null;
   username: string | null;
-  avatar_url: string | null;
+  profile_photo_url: string | null;
 }
 
 async function fetchProfilesByIds(ids: string[]): Promise<Record<string, LiteProfile>> {
   if (ids.length === 0) return {};
   const { data, error } = await supabase
     .from('user_profiles')
-    .select('id, display_name, username, avatar_url')
+    .select('id, display_name, username, profile_photo_url')
     .in('id', ids)
     .limit(ids.length);
   if (error) throw error;
