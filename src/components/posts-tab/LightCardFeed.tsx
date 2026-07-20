@@ -255,9 +255,9 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
         recheckActive();
       });
     };
-    scroller.addEventListener('scroll', onScroll, { passive: true, capture: true } as any);
+    scroller.addEventListener('scroll', onScroll, { passive: true, capture: true } as AddEventListenerOptions);
     return () => {
-      scroller.removeEventListener('scroll', onScroll, { capture: true } as any);
+      scroller.removeEventListener('scroll', onScroll, { capture: true } as EventListenerOptions);
       if (raf) cancelAnimationFrame(raf);
     };
   }, [recheckActive]);
