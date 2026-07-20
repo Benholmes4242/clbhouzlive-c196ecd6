@@ -21,6 +21,7 @@ import { FeaturedMomentCard, pickFeaturedRow } from './components/FeaturedMoment
 import { FriendRequestsRail } from './components/FriendRequestsRail';
 import { LedgerRow } from './components/LedgerRow';
 import { ActivityActionsSheet } from './components/ActivityActionsSheet';
+import { ActivityRowsSkeleton } from '@/components/skeletons/ActivityPageSkeleton';
 
 const GEIST =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
