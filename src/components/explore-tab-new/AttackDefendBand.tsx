@@ -481,7 +481,7 @@ function AttackRail({ picks }: { picks: TitleInReach[] }) {
     <div
       className="flex overflow-x-auto scrollbar-hide"
       style={{
-        gap: 8,
+        gap: 10,
         marginTop: 10,
         paddingLeft: PAGE_PAD,
         paddingRight: PAGE_PAD,
@@ -489,9 +489,8 @@ function AttackRail({ picks }: { picks: TitleInReach[] }) {
         WebkitOverflowScrolling: 'touch',
       }}
     >
-
       {picks.map((row) => (
-        <AttackChip
+        <AttackCard
           key={`${row.course_id}-${row.category}`}
           row={row}
           onTap={() => navigate(`/courses/${row.course_id}?tab=legends`)}
@@ -501,87 +500,106 @@ function AttackRail({ picks }: { picks: TitleInReach[] }) {
   );
 }
 
-function AttackChip({ row, onTap }: { row: TitleInReach; onTap: () => void }) {
+function AttackCard({ row, onTap }: { row: TitleInReach; onTap: () => void }) {
   const pct = progressPct(row.category, row.gap);
   const gap = gapCopyAttack(row.category, row.gap);
   const category = categoryLabel(row.category);
-  const record = recordCopy(row.category, row.leader_value);
   return (
     <button
       type="button"
       onClick={onTap}
-      className="text-left active:opacity-80 transition-opacity"
       style={{
         flexShrink: 0,
-        width: 196,
-        borderRadius: 10,
-        background: CHIP_BG,
-        border: 'none',
-        padding: '10px 11px',
+        width: 220,
+        height: CARD_HEIGHT,
+        boxSizing: 'border-box',
+        padding: 12,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 8,
+        background: CARD_BG,
+        border: `1px solid ${HAIRLINE}`,
+        borderRadius: 14,
+        boxShadow: CARD_SHADOW,
+        textAlign: 'left',
         cursor: 'pointer',
         fontFamily: FONT,
-        color: INK,
+        position: 'relative',
       }}
     >
+      {/* Category chip */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+        <span aria-hidden style={{ fontSize: 12, lineHeight: 1 }}>
+          🎯
+        </span>
+        <span
+          style={{
+            fontSize: 9.5,
+            fontWeight: 700,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            color: GREEN_DEEP,
+            padding: '3px 7px',
+            borderRadius: 999,
+            background: GREEN_TINT_BG,
+            lineHeight: 1,
+            flexShrink: 0,
+          }}
+        >
+          {category}
+        </span>
+      </div>
+
       <div
         style={{
-          fontSize: 12.5,
-          fontWeight: 600,
-          letterSpacing: '-0.01em',
+          fontSize: 13.5,
+          fontWeight: 800,
           color: INK,
-          lineHeight: 1.2,
+          lineHeight: 1.25,
+          letterSpacing: '-0.01em',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
+          display: '-webkit-box',
+          WebkitBoxOrient: 'vertical',
+          WebkitLineClamp: 2,
         }}
       >
         {row.course_name}
       </div>
-      <div
-        style={{
-          marginTop: 3,
-          fontSize: 10.5,
-          fontWeight: 500,
-          color: 'rgba(15,23,42,0.5)',
-          lineHeight: 1.2,
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        {`${category} · record ${record}`}
-      </div>
-      <div
-        style={{
-          marginTop: 8,
-          height: 3,
-          borderRadius: 999,
-          background: TRACK_BG,
-          overflow: 'hidden',
-        }}
-      >
+
+      {/* Footer — pinned; progress bar + "N to take it" */}
+      <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
         <div
           style={{
-            width: `${Math.max(8, pct)}%`,
-            height: '100%',
-            background: AMBER,
+            height: 3,
             borderRadius: 999,
+            background: TRACK_BG,
+            overflow: 'hidden',
           }}
-        />
-      </div>
-      <div
-        style={{
-          marginTop: 7,
-          fontSize: 11,
-          fontWeight: 500,
-          color: 'rgba(15,23,42,0.55)',
-          lineHeight: 1.25,
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        <span style={{ color: INK, fontWeight: 700 }}>{gap}</span> to take it
+        >
+          <div
+            style={{
+              width: `${Math.max(8, pct)}%`,
+              height: '100%',
+              background: GREEN,
+              borderRadius: 999,
+            }}
+          />
+        </div>
+        <div
+          style={{
+            fontSize: 11.5,
+            fontWeight: 700,
+            color: GREEN_DEEP,
+            letterSpacing: '-0.005em',
+            lineHeight: 1.25,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          <span className="tabular-nums">{gap}</span> to take it
+        </div>
       </div>
     </button>
   );
