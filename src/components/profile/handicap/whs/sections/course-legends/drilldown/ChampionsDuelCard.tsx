@@ -44,6 +44,8 @@ interface ChampionsDuelCardProps {
   /** When true, section sits on a soft alternating band (matches the
    *  course-records ledger on the discover page). No card chrome either way. */
   banded?: boolean;
+  /** Optional kicker override — replaces the category label in the section header. */
+  titleOverride?: string;
 }
 
 
