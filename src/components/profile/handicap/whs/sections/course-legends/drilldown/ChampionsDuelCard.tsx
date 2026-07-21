@@ -1,17 +1,13 @@
 import React from 'react';
 import { Crown, Swords, type LucideIcon } from 'lucide-react';
 import type { LegendCategory } from '@/lib/gam/types';
-import {
-  ChampionsListRow,
-  CHAMPS_GRID_COMPACT,
-  CHAMPS_GRID_GAP_COMPACT,
-  CHAMPS_ROW_PADDING_X,
-} from './ChampionsListRow';
 import { MovementCell } from './_shared/MovementCell';
 import { duelLine, chaseProgress } from './_shared/duelTension';
 import { ProBenchmarkBand } from './ProBenchmarkBand';
 import type { ProProfile, ProBandBase } from './_shared/proBenchmark';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { StatRow } from '@/components/explore-tab-new/StatRow';
+
 
 export interface DuelRow {
   rank: number;
@@ -524,22 +520,16 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
         </div>
       )}
 
-      {/* Caption row (merged with former 30D/SCORE header) */}
+      {/* Chase-line caption */}
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns: CHAMPS_GRID_COMPACT,
-          gap: CHAMPS_GRID_GAP_COMPACT,
-          alignItems: 'end',
           marginTop: showTrack ? 8 : 12,
-          marginLeft: -16,
-          marginRight: -16,
-          padding: `0 ${CHAMPS_ROW_PADDING_X}px`,
+          marginBottom: 6,
         }}
       >
         <span
           style={{
-            gridColumn: '1 / 4',
+            display: 'block',
             fontSize: 11,
             fontWeight: 600,
             color: defending ? DEEP_AMBER : INK_55,
@@ -550,40 +540,11 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
         >
           {line}
         </span>
-        {!standsAlone && inlineRows.length > 0 && (
-          <>
-            <span
-              style={{
-                textAlign: 'center',
-                fontSize: 9,
-                fontWeight: 800,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                color: INK_55,
-              }}
-            >
-              30D
-            </span>
-            <span
-              style={{
-                textAlign: 'center',
-                fontSize: 9,
-                fontWeight: 800,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                color: INK_55,
-              }}
-            >
-              SCORE
-            </span>
-          </>
-        )}
       </div>
 
-      {/* Inline top 5 */}
+      {/* Inline top 5 — StatRow canonical */}
       <div
         style={{
-          marginTop: 6,
           marginLeft: -16,
           marginRight: -16,
         }}
@@ -591,21 +552,15 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
         {standsAlone ? null : (
           <>
             {inlineRows.map((row, i) => (
-              <ChampionsListRow
+              <StatRow
                 key={`${row.rank}-${i}`}
                 rank={row.rank}
-                name={row.name}
-                photoUrl={row.photoUrl}
-                valueDisplay={row.valueDisplay}
-                unitLabel=""
-                isSelf={row.isSelf}
-                isChampion={false}
-                gapToChampion={row.gapToChampion}
-                holdDuration={null}
-                compact
-                theme={theme}
-                rank30d={row.rank30d}
-                delta={row.delta}
+                avatarUrl={row.photoUrl}
+                avatarUserId={row.userId ?? null}
+                name={row.isSelf ? 'You' : row.name}
+                subline={row.gapToChampion ?? undefined}
+                statValue={row.valueDisplay}
+                isLast={i === inlineRows.length - 1}
               />
             ))}
           </>
@@ -630,6 +585,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
           </button>
         </div>
       </div>
+
     </div>
   );
 };
