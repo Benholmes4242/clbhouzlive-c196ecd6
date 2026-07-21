@@ -172,6 +172,7 @@ export default function ExploreGrid({
               isAutoplayActive={activeIndices.has(i)}
               openedFrom="explore"
               hideFormatBadge
+              bareTile
             />
           ))}
         </div>
@@ -186,6 +187,7 @@ export default function ExploreGrid({
               isAutoplayActive={activeIndices.has(i)}
               openedFrom="explore"
               hideFormatBadge
+              bareTile
             />
           ))}
 

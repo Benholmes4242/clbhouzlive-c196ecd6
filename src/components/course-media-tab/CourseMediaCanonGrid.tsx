@@ -283,6 +283,7 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
                 openedFrom="course-media"
                 hideCourseAttribution
                 hideFormatBadge
+              bareTile
               />
 
             );
@@ -302,6 +303,7 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
                 openedFrom="course-media"
                 hideCourseAttribution
                 hideFormatBadge
+              bareTile
               />
 
             );

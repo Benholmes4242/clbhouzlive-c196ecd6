@@ -55,7 +55,9 @@ export function FeedCard({
   openedFrom,
   hideCourseAttribution = false,
   hideFormatBadge = false,
+  bareTile = false,
 }: {
+
   row: FeedCardRow;
   feedPost: FeedPost;
   posts: FeedPost[];
@@ -84,7 +86,16 @@ export function FeedCard({
    * (e.g. the dedicated Clips subpage). Default false.
    */
   hideFormatBadge?: boolean;
+  /**
+   * When true, no text is rendered beneath the tile. Long-form video tiles
+   * get a title overlay on the lower portion of the thumbnail; clips get
+   * no overlay. A tiny amber like-count is overlaid bottom-left when
+   * like_count > 0. Used on bare-tile grids: clips wall, Watch mixed grid,
+   * courses Discover on-the-course, course details Media tab.
+   */
+  bareTile?: boolean;
 }) {
+
 
   const rootRef = useRef<HTMLElement>(null);
   const isClip = row.derived_format === 'clip';
@@ -212,53 +223,64 @@ export function FeedCard({
             {duration}
           </div>
         ) : null}
-      </div>
-      <div
-        style={{
-          fontWeight: 700,
-          fontSize: 12.5,
-          lineHeight: 1.28,
-          color: '#0F172A',
-          marginTop: 6,
-          display: '-webkit-box',
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: 'vertical',
-          overflow: 'hidden',
-        }}
-      >
-        {title}
-      </div>
-      <div
-        style={{
-          fontWeight: 500,
-          fontSize: 11,
-          color: '#64748B',
-          marginTop: 2,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 6,
-          minWidth: 0,
-        }}
-      >
-        {row.creator_username ? (
-          <span
-            style={{
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-              minWidth: 0,
-            }}
-          >
-            @{row.creator_username}
-          </span>
+        {bareTile && isVideo && !isClip && title ? (
+          <>
+            <div
+              aria-hidden
+              style={{
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                bottom: 0,
+                height: '55%',
+                zIndex: 1,
+                background:
+                  'linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0) 100%)',
+                pointerEvents: 'none',
+              }}
+            />
+            <div
+              style={{
+                position: 'absolute',
+                left: 8,
+                right: 8,
+                bottom: 8,
+                zIndex: 2,
+                color: '#fff',
+                fontWeight: 600,
+                fontSize: 13,
+                lineHeight: 1.25,
+                fontFamily: FONT_FAMILY,
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+                textShadow: '0 1px 2px rgba(0,0,0,0.35)',
+                pointerEvents: 'none',
+                // Leave room for duration badge on the right
+                paddingRight: duration ? 44 : 0,
+              }}
+            >
+              {title}
+            </div>
+          </>
         ) : null}
-        {row.like_count > 0 && (
-          <span
+        {bareTile && row.like_count > 0 ? (
+          <div
             style={{
+              position: 'absolute',
+              bottom: 6,
+              left: 6,
+              zIndex: 2,
               display: 'inline-flex',
               alignItems: 'center',
               gap: 3,
-              flexShrink: 0,
+              color: '#F7931E',
+              fontWeight: 700,
+              fontSize: 11,
+              fontFamily: FONT_FAMILY,
+              textShadow: '0 1px 2px rgba(0,0,0,0.45)',
+              pointerEvents: 'none',
             }}
           >
             <Heart
@@ -266,9 +288,70 @@ export function FeedCard({
               strokeWidth={1.8}
             />
             {formatCount(row.like_count)}
-          </span>
-        )}
+          </div>
+        ) : null}
       </div>
+      {!bareTile ? (
+        <>
+          <div
+            style={{
+              fontWeight: 700,
+              fontSize: 12.5,
+              lineHeight: 1.28,
+              color: '#0F172A',
+              marginTop: 6,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            }}
+          >
+            {title}
+          </div>
+          <div
+            style={{
+              fontWeight: 500,
+              fontSize: 11,
+              color: '#64748B',
+              marginTop: 2,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              minWidth: 0,
+            }}
+          >
+            {row.creator_username ? (
+              <span
+                style={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  minWidth: 0,
+                }}
+              >
+                @{row.creator_username}
+              </span>
+            ) : null}
+            {row.like_count > 0 && (
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 3,
+                  flexShrink: 0,
+                }}
+              >
+                <Heart
+                  style={{ width: 12, height: 12, color: '#F7931E', fill: '#F7931E' }}
+                  strokeWidth={1.8}
+                />
+                {formatCount(row.like_count)}
+              </span>
+            )}
+          </div>
+        </>
+      ) : null}
+
     </Pressable>
   );
 }
