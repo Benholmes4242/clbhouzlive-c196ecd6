@@ -1,6 +1,5 @@
 import { useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { TierSeeAllSheet } from './TierSeeAllSheet';
 import {
   useRegionFeats,
@@ -16,6 +15,7 @@ import { useTitlesInReach, type TitleInReach } from '@/hooks/gam/useTitlesInReac
 import type { ScorecardOpener } from './useScorecardOpener';
 import { SPACE } from '@/lib/spacing';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
+import { StatRow, StatList, getStatToParColor } from '@/components/discover/StatRow';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const INK = '#0F172A';
