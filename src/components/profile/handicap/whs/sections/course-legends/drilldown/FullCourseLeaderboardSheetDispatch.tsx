@@ -15,7 +15,6 @@ import { ChevronUp, ChevronDown } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import {
   AMBER,
   FONT,
@@ -24,8 +23,11 @@ import {
   INK,
   INK_MUTE,
   SLATE_50,
+  TOPAR_UNDER_LIGHT,
 } from '@/features/tourhub/_shared/tokens';
+import { StatRow } from '@/components/explore-tab-new/StatRow';
 import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
+
 
 interface SectionRow {
   rank: number;
