@@ -36,6 +36,9 @@ import { RivalryCard } from './RivalryCard';
 import { WeeklyChallengeCard } from './WeeklyChallengeCard';
 import { SeasonRaceCard } from './SeasonRaceCard';
 import { PickemCard } from './PickemCard';
+import { YourStandingStrip } from './YourStandingStrip';
+import { AttackDefendBand } from './AttackDefendBand';
+
 
 import { SLATE_50 } from '@/features/courses/_shared/tokens';
 import { SPACE } from '@/lib/spacing';
@@ -103,6 +106,8 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
       <div>
 
         {shellTabs}
+        {/* Your standing — glanceable crowns / rank / streak strip at the very top */}
+        <YourStandingStrip userId={userId} />
         <RankIdentityCard userId={userId} variant="strip" />
       </div>
 
@@ -118,11 +123,15 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
 
         <TheRecordBook region={activeRegion} opener={opener} mode={scope} userId={userId} />
 
-        {/* Rivalry — sits directly below the Attack/Defend band (which absorbed "Your next conquests") */}
+        {/* Attack / Defend band — absorbs "Your next conquests" */}
+        <AttackDefendBand userId={userId} region={activeRegion} />
+
+        {/* Rivalry — sits directly below the Attack/Defend band */}
         <RivalryCard userId={userId} />
 
         {/* This week in golf — honours rail */}
         <WeekInGolfRail />
+
 
         {/* Weekly challenge + Season race pair, right after This week in golf */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 24 }}>
