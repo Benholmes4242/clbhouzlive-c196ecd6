@@ -1,13 +1,16 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
+import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   CheckCircle2, ShieldCheck, Mail, KeyRound, Trash2, Ban, X,
   UserPlus, MoreVertical, Search, ShieldAlert, MapPin, Radio, BadgeCheck,
-  ChevronRight,
+  ChevronRight, AtSign,
 } from 'lucide-react';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { useUserActions } from '@/hooks/admin/useUserDetails';
+import { supabase } from '@/integrations/supabase/client';
 import { adminTheme as t } from '../theme';
 import SectionTabs from '../components/SectionTabs';
 import StatusPill from '../components/StatusPill';
@@ -15,6 +18,7 @@ import EmptyState from '../components/EmptyState';
 import DetailDrawer from '../components/DetailDrawer';
 import ConfirmDialog from '../components/ConfirmDialog';
 import AdminErrorState from '../components/AdminErrorState';
+import AdminSheet from '../components/AdminSheet';
 import { useUsers, type AdminUserRow, type UserFilterStatus, type AdminUserDetail } from '../hooks/useUsers';
 import { useTeam, type TeamMember } from '../hooks/useTeam';
 import { useInvites, type InviteRow } from '../hooks/useInvites';
