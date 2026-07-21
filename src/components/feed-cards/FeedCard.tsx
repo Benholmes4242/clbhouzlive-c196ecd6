@@ -84,7 +84,16 @@ export function FeedCard({
    * (e.g. the dedicated Clips subpage). Default false.
    */
   hideFormatBadge?: boolean;
+  /**
+   * When true, no text is rendered beneath the tile. Long-form video tiles
+   * get a title overlay on the lower portion of the thumbnail; clips get
+   * no overlay. A tiny amber like-count is overlaid bottom-left when
+   * like_count > 0. Used on bare-tile grids: clips wall, Watch mixed grid,
+   * courses Discover on-the-course, course details Media tab.
+   */
+  bareTile?: boolean;
 }) {
+
 
   const rootRef = useRef<HTMLElement>(null);
   const isClip = row.derived_format === 'clip';
