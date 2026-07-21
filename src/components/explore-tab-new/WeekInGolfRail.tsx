@@ -33,7 +33,11 @@ interface WeekRow {
   line2: string | null;
   course_id: string | null;
   window_days: number | null;
+  event_key: string | null;
+  reaction_count: number | null;
+  my_reacted: boolean | null;
 }
+
 
 const AMBER = '#F7931E';
 const AMBER_DEEP = '#B45309';
@@ -65,17 +69,82 @@ const GROUP_ORDER: Array<'moments' | 'crowns' | 'big_rounds' | 'ranks' | 'record
   'records',
 ];
 
-function useWeekInGolf(limit: number) {
+function useWeekInGolf(limit: number, userId: string | undefined) {
   return useQuery({
-    queryKey: ['week-in-golf', limit],
+    queryKey: ['week-in-golf', limit, userId ?? 'anon'],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc('get_week_in_golf', { p_limit: limit });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase.rpc as any)('get_week_in_golf', {
+        p_limit: limit,
+        p_user_id: userId ?? null,
+      });
       if (error) throw error;
       return (data ?? []) as WeekRow[];
     },
     staleTime: 10 * 60 * 1000,
   });
 }
+
+function useApplauseMutation(userId: string | undefined) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ eventKey }: { eventKey: string; nextReacted: boolean }) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase.rpc as any)('toggle_feat_reaction', {
+        p_event_key: eventKey,
+      });
+      if (error) throw error;
+      const row = Array.isArray(data) ? data[0] : data;
+      return {
+        reacted: !!row?.reacted,
+        reaction_count: Number(row?.reaction_count ?? 0),
+      };
+    },
+    onMutate: async ({ eventKey, nextReacted }) => {
+      await qc.cancelQueries({ queryKey: ['week-in-golf'] });
+      const snapshots = qc.getQueriesData<WeekRow[]>({ queryKey: ['week-in-golf'] });
+      for (const [key, rows] of snapshots) {
+        if (!rows) continue;
+        qc.setQueryData<WeekRow[]>(key, (prev) =>
+          (prev ?? []).map((r) => {
+            if (r.event_key !== eventKey) return r;
+            const currentCount = r.reaction_count ?? 0;
+            const wasReacted = !!r.my_reacted;
+            const delta = nextReacted && !wasReacted ? 1 : !nextReacted && wasReacted ? -1 : 0;
+            return {
+              ...r,
+              my_reacted: nextReacted,
+              reaction_count: Math.max(0, currentCount + delta),
+            };
+          }),
+        );
+      }
+      return { snapshots };
+    },
+    onError: (_err, _vars, ctx) => {
+      if (!ctx?.snapshots) return;
+      for (const [key, rows] of ctx.snapshots) {
+        qc.setQueryData(key, rows);
+      }
+      toast.error('Could not save applause — try again');
+    },
+    onSuccess: (result, { eventKey }) => {
+      const snapshots = qc.getQueriesData<WeekRow[]>({ queryKey: ['week-in-golf'] });
+      for (const [key, rows] of snapshots) {
+        if (!rows) continue;
+        qc.setQueryData<WeekRow[]>(key, (prev) =>
+          (prev ?? []).map((r) =>
+            r.event_key === eventKey
+              ? { ...r, my_reacted: result.reacted, reaction_count: result.reaction_count }
+              : r,
+          ),
+        );
+      }
+    },
+  });
+  void userId;
+}
+
 
 /**
  * Adjacent-type interleave: stable swap-forward so no two adjacent cards
