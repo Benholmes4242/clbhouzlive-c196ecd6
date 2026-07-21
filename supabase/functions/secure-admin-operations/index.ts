@@ -197,7 +197,7 @@ serve(async (req) => {
 
     switch (action) {
       case 'delete_user': {
-        if (!targetUserId || !targetEmail) {
+        if (!targetUserId) {
           return new Response(JSON.stringify({ error: 'Missing required fields' }), {
             status: 400, headers: { ...headers, 'Content-Type': 'application/json' },
           });
@@ -207,12 +207,21 @@ serve(async (req) => {
             status: 400, headers: { ...headers, 'Content-Type': 'application/json' },
           });
         }
+        // Resolve email server-side for audit/log line if not provided by caller.
+        let resolvedEmail = targetEmail;
+        if (!resolvedEmail) {
+          try {
+            const { data: lookup } = await supabase.auth.admin.getUserById(targetUserId);
+            resolvedEmail = lookup?.user?.email ?? undefined;
+          } catch (_) { /* proceed without email */ }
+        }
+        const label = resolvedEmail ?? targetUserId;
         const { error: deleteError } = await supabase.auth.admin.deleteUser(targetUserId);
         if (deleteError) {
           auditDetails.error = deleteError.message;
           result = { error: deleteError.message };
         } else {
-          result = { success: true, message: `User ${targetEmail} deleted successfully` };
+          result = { success: true, message: `User ${label} deleted successfully` };
         }
         break;
       }
