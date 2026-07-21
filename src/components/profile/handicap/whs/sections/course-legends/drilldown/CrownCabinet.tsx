@@ -11,7 +11,7 @@ export interface CabinetSlot {
   short: string;
   icon: LucideIcon;
   held: boolean;
-  /** ISO date the viewer took this crown — used to render "Held Nd" and pick the longest reign. */
+  /** ISO date the viewer took this crown — used to render "Held Nd". */
   attainedAt?: string | null;
 }
 
