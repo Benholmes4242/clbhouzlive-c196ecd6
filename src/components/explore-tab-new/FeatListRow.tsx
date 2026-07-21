@@ -1,14 +1,7 @@
 import { useMemo } from 'react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { StatRow, type StatRowChip } from './StatRow';
 import { rowToPar, toParText, type FeatRow, type FeatTier, type RecordsMode } from './hooks/useRegionFeats';
-import { INK as INK_TOKEN } from '@/features/courses/components/holes/_constants';
-
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
-const AMBER = '#F7931E';
-const INK = '#0F172A';
-const INK_SUB = 'rgba(15,23,42,0.5)';
-const INK_LABEL = 'rgba(15,23,42,0.4)';
-const INK_RANK = 'rgba(15,23,42,0.35)';
+import { TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
 
 function formatHolderName(raw?: string | null): string {
   const s = (raw ?? '').trim();
@@ -18,17 +11,6 @@ function formatHolderName(raw?: string | null): string {
     if (before && after) return `${after} ${before}`;
   }
   return s;
-}
-
-function initials(name: string): string {
-  return (
-    (name || '?')
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((p) => p[0]?.toUpperCase() ?? '')
-      .join('') || '?'
-  );
 }
 
 function relDate(iso?: string | null): string {
@@ -55,324 +37,84 @@ interface Props {
   mode?: RecordsMode;
   bestToPar?: number | null;
   maxCount?: number | null;
+  isLast?: boolean;
 }
 
-// Canonical sheet/page leaderboard row. Refinement token spec applied:
-// rank 11/600, name 13/600, subline 11/500, value 15/700 (amber champion,
-// ink others), microlabel 9/600/0.06em, bar 3px solid amber (8% floor).
-export function FeatListRow({ row, tier, onTap, index = 0, mode = 'latest', bestToPar = null, maxCount = null }: Props) {
+/**
+ * FeatListRow — delegates to the canonical StatRow for the TierSeeAllSheet.
+ * Preserves per-tier semantics (to-par red, ACE/ALBATROSS chip, rank-1 watermark).
+ */
+export function FeatListRow({ row, tier, onTap, index = 0, mode, isLast = false }: Props) {
+  void mode;
   const holder = useMemo(() => formatHolderName(row.holder_name), [row.holder_name]);
-  const when = relDate(row.play_date ?? row.attained_at ?? null);
   const rank = index + 1;
-  const isTop = rank === 1;
   const isRecordsRow = tier === 'records';
   const isBirdieHauls = tier === 'birdie_hauls';
   const isLegendary = tier === 'legendary';
+  const isEagles = tier === 'eagles';
   const isStableford = row.category === 'best_stableford_all_time';
   const d = isRecordsRow ? rowToPar(row) : null;
   const showToParPrimary = isRecordsRow && d != null && !isStableford;
-  const grossStr = row.value != null ? String(row.value) : (row.feat_value ?? '').match(/\d+/)?.[0] ?? '';
+  const when = relDate(row.play_date ?? row.attained_at ?? null);
 
-  const WORST = 15;
-  const anchor = bestToPar ?? 0;
-  const span = WORST - anchor;
-  const recordsBarPct = showToParPrimary && d != null
-    ? Math.max(0.08, Math.min(1, (WORST - d) / (span || 1)))
-    : 0;
-
-  // Birdie hauls: count-proportional bar with 8% floor.
-  const birdieCount = isBirdieHauls
-    ? parseFloat(String(row.feat_value ?? row.value ?? '').replace(/[^\d.]/g, '')) || 0
-    : 0;
-  const birdieBarPct = isBirdieHauls && maxCount && maxCount > 0
-    ? Math.max(0.08, Math.min(1, birdieCount / maxCount))
-    : 0;
-
-  const showRecordsBar = showToParPrimary;
-  const showBirdieBar = isBirdieHauls && maxCount != null && maxCount > 0;
-  const showBar = showRecordsBar || showBirdieBar;
-  const barPct = showRecordsBar ? recordsBarPct : birdieBarPct;
-  void mode;
-  const showDate = !!when && !isRecordsRow && !isBirdieHauls;
-
-  // Value + label vary by tier.
-  const { value, label } = useMemo(() => {
+  const { value, label, statColor } = useMemo(() => {
     const digits = (s: string | null | undefined): string => {
       const m = (s ?? '').match(/\d+/);
       return m ? m[0] : '';
     };
     if (tier === 'records') {
+      if (showToParPrimary && d != null) {
+        return {
+          value: toParText(d),
+          label: 'TO PAR',
+          statColor: d < 0 ? TOPAR_UNDER_LIGHT : undefined,
+        };
+      }
       const v = row.value != null ? String(row.value) : digits(row.feat_value);
-      return { value: v || '—', label: 'GROSS' };
+      return { value: v || '—', label: 'GROSS', statColor: undefined as string | undefined };
     }
     if (tier === 'eagles' || tier === 'legendary') {
       const v = digits(row.feat_value) || (row.value != null ? String(row.value) : '');
-      return { value: v || '—', label: 'HOLE' };
+      return { value: v || '—', label: 'HOLE', statColor: undefined as string | undefined };
     }
     // birdie_hauls
     const v = (row.feat_value ?? (row.value != null ? String(row.value) : '')).replace(/[^\d.]/g, '');
-    return { value: v || '—', label: 'BIRDIES' };
-  }, [tier, row.feat_value, row.value]);
+    return { value: v || '—', label: 'BIRDIES', statColor: undefined as string | undefined };
+  }, [tier, row.feat_value, row.value, showToParPrimary, d]);
 
-  // Records tier: to-par value follows score semantics at every rank and both
-  // scopes (under par -> red, even/over -> ink), overriding champion amber.
-  // Amber-as-champion still applies to eagles/birdie-haul counts (no score
-  // semantics). See RATING_RAMPS canon: red = under-par data, amber = champion
-  // chrome + interactivity.
-  const recordsValueColor = showToParPrimary && d != null && d < 0 ? '#D2222D' : INK;
-  const valueColor = isRecordsRow
-    ? recordsValueColor
-    : isTop ? AMBER : INK;
+  // Legendary chip (ACE / ALBATROSS) replaces the stat value.
+  const legendaryChip: StatRowChip | undefined =
+    isLegendary && (row.feat_type === 'ace' || row.feat_type === 'albatross')
+      ? {
+          label: row.feat_type === 'ace' ? 'HOLE IN ONE' : 'ALBATROSS',
+          tone: row.feat_type === 'ace' ? 'ace' : 'albatross',
+        }
+      : undefined;
 
-  // Legendary tier (aces & albatrosses): champion adopts the exceptional gold
-  // treatment — champagne gradient + gold-edge border, shimmer rank/value.
-  const legendaryChampion = isLegendary && isTop;
+  // Ranked tiers (records, birdie_hauls) get rank chip 1–3 + watermark on rank 1.
+  const isRanked = isRecordsRow || isBirdieHauls;
+  const showWatermark = isRanked && rank === 1;
 
-  // Flat, alternating-band row (mirrors the on-page Record Book / Champions).
-  // No card container: band background with a uniform 0.5px hairline separator.
-  const bandBg = index % 2 === 0 ? 'rgba(15,23,42,0.035)' : 'transparent';
-  const topRule = index === 0 ? 'none' : `0.5px solid rgba(15,23,42,0.08)`;
+  // Subline: course name (+ date for non-ranked latest views).
+  const showDate = !!when && !isRanked;
+  const subline = showDate ? `${row.course_name} · ${when}` : row.course_name;
 
   return (
-    <button
-      type="button"
-      onClick={onTap}
-      className="w-full text-left active:scale-[0.995] transition-transform"
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'stretch',
-        gap: 8,
-        padding: '10px 16px',
-        background: bandBg,
-        borderTop: topRule,
-        cursor: 'pointer',
-        fontFamily: FONT,
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 11, minWidth: 0 }}>
-        <div
-          className={legendaryChampion ? 'clbhouz-gold-shimmer-light' : undefined}
-          style={{
-            width: 20,
-            textAlign: 'center',
-            flexShrink: 0,
-            fontSize: 11,
-            fontWeight: 600,
-            fontVariantNumeric: 'tabular-nums',
-            lineHeight: 1,
-            ...(legendaryChampion ? {} : { color: isTop ? AMBER : INK_RANK }),
-          }}
-        >
-          {rank}
-        </div>
-        <div style={{ flexShrink: 0 }}>
-          <SquircleAvatar
-            size={34}
-            src={row.holder_avatar}
-            alt={holder}
-            fallback={initials(holder)}
-            hairlineRing
-          />
-        </div>
-        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              minWidth: 0,
-            }}
-          >
-            <div
-              style={{
-                fontSize: 13,
-                fontWeight: 600,
-                color: INK,
-                letterSpacing: '-0.01em',
-                lineHeight: 1.2,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                minWidth: 0,
-                flex: '0 1 auto',
-              }}
-            >
-              {holder}
-            </div>
-            {tier === 'legendary' && (row.feat_type === 'ace' || row.feat_type === 'albatross') ? (
-              <span
-                style={{
-                  flexShrink: 0,
-                  fontSize: 9,
-                  fontWeight: 700,
-                  letterSpacing: '0.06em',
-                  padding: '3px 7px',
-                  borderRadius: 999,
-                  background: '#E8B530',
-                  color: INK_TOKEN,
-                  lineHeight: 1,
-                  textTransform: 'uppercase',
-                }}
-              >
-                {row.feat_type === 'ace' ? 'ACE' : 'ALBATROSS'}
-              </span>
-            ) : null}
-          </div>
-          <div
-            style={{
-              marginTop: 2,
-              fontSize: 11,
-              fontWeight: 500,
-              color: INK_SUB,
-              lineHeight: 1.2,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {row.course_name}
-          </div>
-          {showDate ? (
-            <div
-              style={{
-                marginTop: 2,
-                fontSize: 11,
-                fontWeight: 500,
-                color: INK_SUB,
-                lineHeight: 1.2,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {when}
-            </div>
-          ) : null}
-        </div>
-
-        <div
-          style={{
-            flexShrink: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-end',
-            justifyContent: 'center',
-            minWidth: 42,
-          }}
-        >
-          {tier === 'eagles' || tier === 'legendary' ? (
-            <>
-              <div
-                style={{
-                  fontSize: 9,
-                  fontWeight: 600,
-                  letterSpacing: '0.06em',
-                  textTransform: 'uppercase',
-                  color: INK_LABEL,
-                  lineHeight: 1,
-                }}
-              >
-                {label}
-              </div>
-              <div
-                className={legendaryChampion ? 'clbhouz-gold-shimmer-light' : undefined}
-                style={{
-                  marginTop: 3,
-                  fontSize: 15,
-                  fontWeight: 700,
-                  lineHeight: 1,
-                  fontVariantNumeric: 'tabular-nums',
-                  ...(legendaryChampion ? {} : { color: valueColor }),
-                }}
-              >
-                {value}
-              </div>
-            </>
-          ) : showToParPrimary ? (
-            <>
-              <div
-                style={{
-                  fontSize: 15,
-                  fontWeight: 700,
-                  lineHeight: 1,
-                  letterSpacing: '-0.01em',
-                  fontVariantNumeric: 'tabular-nums',
-                  color: valueColor,
-                }}
-              >
-                {toParText(d!)}
-              </div>
-              <div
-                style={{
-                  marginTop: 3,
-                  fontSize: 9,
-                  fontWeight: 600,
-                  letterSpacing: '0.06em',
-                  textTransform: 'uppercase',
-                  color: INK_LABEL,
-                  lineHeight: 1,
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {grossStr} GROSS <span style={{ color: '#CBD5E1' }}>PAR {row.course_par}</span>
-              </div>
-            </>
-          ) : (
-            <>
-              <div
-                style={{
-                  fontSize: 15,
-                  fontWeight: 700,
-                  color: valueColor,
-                  lineHeight: 1,
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {value}
-              </div>
-              <div
-                style={{
-                  marginTop: 3,
-                  fontSize: 9,
-                  fontWeight: 600,
-                  letterSpacing: '0.06em',
-                  textTransform: 'uppercase',
-                  color: INK_LABEL,
-                  lineHeight: 1,
-                }}
-              >
-                {label}
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-
-      {showBar ? (
-        <div style={{ paddingLeft: 35, width: '100%' }}>
-          <div
-            style={{
-              width: '100%',
-              height: 3,
-              borderRadius: 999,
-              background: 'rgba(15,23,42,0.08)',
-              overflow: 'hidden',
-            }}
-          >
-            <div
-              style={{
-                width: `${barPct * 100}%`,
-                height: '100%',
-                borderRadius: 999,
-                background: AMBER,
-                transition: 'width .35s cubic-bezier(.2,.8,.2,1)',
-              }}
-            />
-          </div>
-        </div>
-      ) : null}
-    </button>
+    <StatRow
+      rank={isRanked ? rank : undefined}
+      avatarUrl={row.holder_avatar}
+      avatarUserId={row.user_id ?? null}
+      name={holder}
+      subline={subline}
+      statValue={legendaryChip ? undefined : value}
+      statLabel={legendaryChip ? undefined : label}
+      statColor={statColor}
+      chip={legendaryChip}
+      timestamp={legendaryChip || isEagles ? when || undefined : undefined}
+      showWatermark={showWatermark}
+      isLast={isLast}
+      onPress={onTap}
+    />
   );
 }
 
