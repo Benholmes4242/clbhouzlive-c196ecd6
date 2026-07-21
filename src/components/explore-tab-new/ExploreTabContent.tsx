@@ -114,14 +114,14 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
           onScopeChange={setScope}
         />
 
-        {/* Rivalry — sits below the identity/Attack-Defend band */}
-        <RivalryCard userId={userId} />
-
         <AlmanacEmptyCard region={activeRegion} />
 
         <TheRecordBook region={activeRegion} opener={opener} mode={scope} userId={userId} />
 
-        {/* This week in golf — honours rail (between "Your next conquests" and "Latest honours") */}
+        {/* Rivalry — sits directly below the Attack/Defend band (which absorbed "Your next conquests") */}
+        <RivalryCard userId={userId} />
+
+        {/* This week in golf — honours rail */}
         <WeekInGolfRail />
 
         {/* Weekly challenge + Season race pair, right after This week in golf */}
