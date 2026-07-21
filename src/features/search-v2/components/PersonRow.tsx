@@ -1,4 +1,4 @@
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import type { PersonHit } from '../lib/searchNavigation';
 import { Highlight } from './Highlight';
 
@@ -17,6 +17,8 @@ export function PersonRow({ person, query, onSelect }: Props) {
         alt={name}
         userId={person.id}
         size={42}
+        hairlineRing
+        ringColor={LIGHT_HAIRLINE}
       />
       <div className="flex-1 min-w-0">
         <p className="text-[14px] font-medium truncate" style={{ color: '#0F172A' }}>
