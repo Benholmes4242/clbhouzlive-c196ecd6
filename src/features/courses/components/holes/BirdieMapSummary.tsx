@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { FONT, INK } from './_constants';
 import { INK_MUTE } from '@/features/courses/_shared/tokens';
 
