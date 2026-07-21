@@ -312,15 +312,15 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   }, [media]);
 
   const reviewRating = post.review?.rating ?? null;
-  const isDeal = post.actorType === 'business';
+  const isDeal = false;
 
   const subLine = useMemo(() => {
     const parts: string[] = [];
-    if (isDeal) parts.push('Sponsored');
-    else if (post.creatorRelation === 'system') parts.push('clbhouz');
+    if (post.creatorRelation === 'system') parts.push('clbhouz');
     parts.push(timeAgo(post.createdAt));
     return parts.filter(Boolean).join(' · ');
-  }, [post, isDeal]);
+  }, [post]);
+
 
   const mediaUrl = media?.imageUrl || media?.thumbnailUrl || '';
 
