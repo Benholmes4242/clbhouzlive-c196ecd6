@@ -254,8 +254,8 @@ function RecordStatRow({
   const when = row.play_date ?? row.attained_at ?? null;
   const showToPar = par != null && !isStableford;
   const toParDisplay = showToPar ? toParText(par!) : '—';
-  // Colour from canonical ramps — under-par earns the gold reward, otherwise ink.
-  const statColor = showToPar && par! < 0 ? RATING_RAMPS.gold.mid : INK;
+  // Canonical to-par colour: red under par on the light Discover surface.
+  const statColor = showToPar && par! < 0 ? TOPAR_UNDER_LIGHT : INK;
   const sub = [holder, when ? relativeTime(when) : null].filter(Boolean).join(' · ');
   return (
     <StatRow
