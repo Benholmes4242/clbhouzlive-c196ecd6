@@ -39,6 +39,13 @@ export const FEATURE_FLAGS = {
  */
 export const SHOW_HANDICAP_NEW_BADGE = true;
 
+/**
+ * Discover gamification (G1) — presentational shells only, default OFF.
+ * No live wiring; toggling ON renders mock/preview affordances.
+ */
+export const DISCOVER_YOU_STRIP = false;
+export const COURSE_REGULAR_CHIP = false;
+
 // Vertical aspect ratio band - expanded to catch encoder drift
 // 9:16 = 0.5625, but real-world videos vary. Range: 0.52-0.70
 export const VERTICAL_MIN_AR = 0.52;  // Generous lower bound for vertical
