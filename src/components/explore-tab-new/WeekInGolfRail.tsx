@@ -1,7 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { useQuery } from '@tanstack/react-query';
 
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -85,65 +84,6 @@ function useWeekInGolf(limit: number, userId: string | undefined) {
   });
 }
 
-function useApplauseMutation(userId: string | undefined) {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: async ({ eventKey }: { eventKey: string; nextReacted: boolean }) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (supabase.rpc as any)('toggle_feat_reaction', {
-        p_event_key: eventKey,
-      });
-      if (error) throw error;
-      const row = Array.isArray(data) ? data[0] : data;
-      return {
-        reacted: !!row?.reacted,
-        reaction_count: Number(row?.reaction_count ?? 0),
-      };
-    },
-    onMutate: async ({ eventKey, nextReacted }) => {
-      await qc.cancelQueries({ queryKey: ['week-in-golf'] });
-      const snapshots = qc.getQueriesData<WeekRow[]>({ queryKey: ['week-in-golf'] });
-      for (const [key, rows] of snapshots) {
-        if (!rows) continue;
-        qc.setQueryData<WeekRow[]>(key, (prev) =>
-          (prev ?? []).map((r) => {
-            if (r.event_key !== eventKey) return r;
-            const currentCount = r.reaction_count ?? 0;
-            const wasReacted = !!r.my_reacted;
-            const delta = nextReacted && !wasReacted ? 1 : !nextReacted && wasReacted ? -1 : 0;
-            return {
-              ...r,
-              my_reacted: nextReacted,
-              reaction_count: Math.max(0, currentCount + delta),
-            };
-          }),
-        );
-      }
-      return { snapshots };
-    },
-    onError: (_err, _vars, ctx) => {
-      if (!ctx?.snapshots) return;
-      for (const [key, rows] of ctx.snapshots) {
-        qc.setQueryData(key, rows);
-      }
-      toast.error('Could not save applause — try again');
-    },
-    onSuccess: (result, { eventKey }) => {
-      const snapshots = qc.getQueriesData<WeekRow[]>({ queryKey: ['week-in-golf'] });
-      for (const [key, rows] of snapshots) {
-        if (!rows) continue;
-        qc.setQueryData<WeekRow[]>(key, (prev) =>
-          (prev ?? []).map((r) =>
-            r.event_key === eventKey
-              ? { ...r, my_reacted: result.reacted, reaction_count: result.reaction_count }
-              : r,
-          ),
-        );
-      }
-    },
-  });
-  void userId;
-}
 
 
 /**
@@ -180,7 +120,6 @@ export function WeekInGolfRail(_props: WeekInGolfRailProps = {}) {
   const { user } = useSupabaseSession();
   const userId = user?.id;
   const { data, isLoading, isError, error } = useWeekInGolf(12, userId);
-  const applause = useApplauseMutation(userId);
   const [sheetOpen, setSheetOpen] = useState(false);
 
   if (isError) {
@@ -201,15 +140,6 @@ export function WeekInGolfRail(_props: WeekInGolfRailProps = {}) {
   const goToProfile = (username: string | null) => {
     if (!username) return;
     navigate(`/profile/${username}`);
-  };
-
-  const onApplause = (row: WeekRow) => {
-    if (!row.event_key) return;
-    if (!userId) {
-      toast('Sign in to applaud');
-      return;
-    }
-    applause.mutate({ eventKey: row.event_key, nextReacted: !row.my_reacted });
   };
 
   return (
@@ -237,7 +167,6 @@ export function WeekInGolfRail(_props: WeekInGolfRailProps = {}) {
             key={`${row.user_id}-${row.occurred_at}-${i}`}
             row={row}
             onTap={() => goToProfile(row.username)}
-            onApplause={() => onApplause(row)}
           />
         ))}
         <SeeAllTile onTap={() => setSheetOpen(true)} />
@@ -247,7 +176,6 @@ export function WeekInGolfRail(_props: WeekInGolfRailProps = {}) {
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
         userId={userId}
-        onApplause={onApplause}
       />
     </section>
   );
@@ -256,7 +184,7 @@ export function WeekInGolfRail(_props: WeekInGolfRailProps = {}) {
 
 export default WeekInGolfRail;
 
-function RailCard({ row, onTap, onApplause }: { row: WeekRow; onTap: () => void; onApplause: () => void }) {
+function RailCard({ row, onTap }: { row: WeekRow; onTap: () => void }) {
   const meta = TYPE_META[row.event_type];
   const gold = isGold(row.event_type);
   const displayName = row.display_name || row.username || 'Golfer';
@@ -361,14 +289,6 @@ function RailCard({ row, onTap, onApplause }: { row: WeekRow; onTap: () => void;
             hairlineRing
           />
           <div style={{ fontSize: 10.5, color: MUTE, lineHeight: 1.2, flex: 1, minWidth: 0 }}>{rel}</div>
-          <ApplauseChip
-            reacted={!!row.my_reacted}
-            count={row.reaction_count ?? 0}
-            onTap={(e) => {
-              e.stopPropagation();
-              onApplause();
-            }}
-          />
         </div>
         <div
           style={{
@@ -437,12 +357,10 @@ function WeekInGolfSheet({
   open,
   onClose,
   userId,
-  onApplause,
 }: {
   open: boolean;
   onClose: () => void;
   userId: string | undefined;
-  onApplause: (row: WeekRow) => void;
 }) {
   const navigate = useNavigate();
   const { data } = useWeekInGolf(open ? 100 : 12, userId);
@@ -503,7 +421,6 @@ function WeekInGolfSheet({
                     key={`${row.user_id}-${row.occurred_at}-${i}`}
                     row={row}
                     onTap={() => handleRowTap(row.username)}
-                    onApplause={() => onApplause(row)}
                   />
                 ))}
               </div>
@@ -533,11 +450,9 @@ function WeekInGolfSheet({
 function SheetRow({
   row,
   onTap,
-  onApplause,
 }: {
   row: WeekRow;
   onTap: () => void;
-  onApplause: () => void;
 }) {
   const displayName = row.display_name || row.username || 'Golfer';
   const meta = TYPE_META[row.event_type];
@@ -609,54 +524,8 @@ function SheetRow({
           {formatRelativeAgo(row.occurred_at)}
         </div>
       </button>
-      <ApplauseChip
-        reacted={!!row.my_reacted}
-        count={row.reaction_count ?? 0}
-        onTap={(e) => {
-          e.stopPropagation();
-          onApplause();
-        }}
-      />
     </div>
   );
 }
 
-function ApplauseChip({
-  reacted,
-  count,
-  onTap,
-}: {
-  reacted: boolean;
-  count: number;
-  onTap: (e: React.MouseEvent) => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onTap}
-      aria-pressed={reacted}
-      aria-label={reacted ? 'Remove applause' : 'Applaud'}
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 4,
-        padding: '4px 8px',
-        borderRadius: 999,
-        background: reacted ? AMBER_TINT_BG : 'transparent',
-        border: `1px solid ${reacted ? 'rgba(247,147,30,0.35)' : HAIRLINE}`,
-        color: reacted ? AMBER_DEEP : MUTE,
-        fontFamily: FONT,
-        fontSize: 11,
-        fontWeight: 700,
-        lineHeight: 1,
-        cursor: 'pointer',
-        flexShrink: 0,
-        fontFeatureSettings: '"tnum" 1',
-      }}
-    >
-      <span aria-hidden style={{ fontSize: 12 }}>👏</span>
-      {count > 0 ? <span style={{ fontVariantNumeric: 'tabular-nums' }}>{count}</span> : null}
-    </button>
-  );
-}
 

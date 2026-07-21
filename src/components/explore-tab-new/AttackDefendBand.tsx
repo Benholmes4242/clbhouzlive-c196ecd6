@@ -20,9 +20,12 @@ const HAIRLINE = 'rgba(15,23,42,0.08)';
 const CARD_BG = '#FFFFFF';
 const CARD_SHADOW = '0 1px 3px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.05)';
 const TRACK_BG = 'rgba(15,23,42,0.08)';
-const CHIP_BG = 'rgba(15,23,42,0.04)';
 const PAGE_PAD = 16;
 const RED = '#DC2626';
+const GREEN = '#16A34A';
+const GREEN_DEEP = '#15803D';
+const GREEN_TINT_BG = 'rgba(22,163,74,0.10)';
+const CARD_HEIGHT = 168;
 
 interface DefendRow {
   course_id: string;
@@ -84,18 +87,6 @@ function gapCopyAttack(category: string, gap: number): string {
 function categoryLabel(category: string): string {
   const base = stripWindow(category);
   return CATEGORY_META[base]?.label ?? base.replace(/_/g, ' ');
-}
-function recordCopy(category: string, value: number): string {
-  const base = stripWindow(category);
-  if (base === 'best_score_diff') {
-    const n = Math.round(value * 10) / 10;
-    return `${n} differential`;
-  }
-  const meta = CATEGORY_META[base];
-  const n = Math.round(value);
-  if (!meta) return String(n);
-  const unit = n === 1 ? meta.unitSingular : meta.unit;
-  return `${n} ${unit}`;
 }
 function progressPct(_category: string, gap: number): number {
   const n = Math.max(1, Math.round(gap));
@@ -211,6 +202,7 @@ export function AttackDefendBand({ userId }: Props) {
             onClick={() => setTab('defend')}
             label="Defend"
             count={defendRows.length}
+            accent="ink"
           />
           <TabButton
             active={tab === 'attack'}
@@ -218,6 +210,7 @@ export function AttackDefendBand({ userId }: Props) {
             onClick={() => setTab('attack')}
             label="Attack"
             count={attackPicks.length}
+            accent="green"
           />
         </div>
       </div>
@@ -238,13 +231,17 @@ function TabButton({
   onClick,
   label,
   count,
+  accent = 'ink',
 }: {
   active: boolean;
   disabled: boolean;
   onClick: () => void;
   label: string;
   count: number;
+  accent?: 'ink' | 'green';
 }) {
+  const activeBg = accent === 'green' ? GREEN : INK;
+  const activeBorder = accent === 'green' ? GREEN : INK;
   return (
     <button
       type="button"
@@ -253,8 +250,8 @@ function TabButton({
       style={{
         padding: '5px 10px',
         borderRadius: 999,
-        background: active ? INK : 'transparent',
-        border: `1px solid ${active ? INK : HAIRLINE}`,
+        background: active ? activeBg : 'transparent',
+        border: `1px solid ${active ? activeBorder : HAIRLINE}`,
         color: active ? '#FFFFFF' : disabled ? 'rgba(15,23,42,0.30)' : INK,
         fontSize: 11.5,
         fontWeight: 700,
@@ -327,6 +324,7 @@ function DefendCard({ row, onTap }: { row: DefendRow; onTap: () => void }) {
       style={{
         flexShrink: 0,
         width: 220,
+        height: CARD_HEIGHT,
         boxSizing: 'border-box',
         padding: 12,
         display: 'flex',
@@ -344,10 +342,7 @@ function DefendCard({ row, onTap }: { row: DefendRow; onTap: () => void }) {
     >
       {/* Category chip + course */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
-        <span
-          aria-hidden
-          style={{ fontSize: 12, lineHeight: 1 }}
-        >
+        <span aria-hidden style={{ fontSize: 12, lineHeight: 1 }}>
           👑
         </span>
         <span
@@ -385,90 +380,84 @@ function DefendCard({ row, onTap }: { row: DefendRow; onTap: () => void }) {
         {row.course_name}
       </div>
 
-      {/* Challenger block */}
-      {hasChallenger ? (
-        <>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              minWidth: 0,
-            }}
-          >
-            <SquircleAvatar
-              size="xs"
-              src={row.challenger_avatar ?? undefined}
-              alt={row.challenger_name ?? 'Challenger'}
-              hairlineRing
-            />
+      {/* Footer — pinned to the bottom so every card baselines identically */}
+      <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 4 }}>
+        {hasChallenger ? (
+          <>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+              <SquircleAvatar
+                size="xs"
+                src={row.challenger_avatar ?? undefined}
+                alt={row.challenger_name ?? 'Challenger'}
+                hairlineRing
+              />
+              <div
+                style={{
+                  flex: 1,
+                  minWidth: 0,
+                  fontSize: 11.5,
+                  fontWeight: 600,
+                  color: INK,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {row.challenger_name ?? 'Challenger'}
+              </div>
+              {active ? (
+                <span
+                  aria-hidden
+                  title="Played this week"
+                  style={{
+                    width: 7,
+                    height: 7,
+                    borderRadius: 999,
+                    background: AMBER,
+                    flexShrink: 0,
+                    boxShadow: '0 0 0 2px rgba(247,147,30,0.16)',
+                  }}
+                />
+              ) : null}
+            </div>
+
             <div
               style={{
-                flex: 1,
-                minWidth: 0,
                 fontSize: 11.5,
-                fontWeight: 600,
-                color: INK,
+                fontWeight: 700,
+                color: tied ? RED : INK,
+                letterSpacing: '-0.005em',
+                lineHeight: 1.25,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
               }}
             >
-              {row.challenger_name ?? 'Challenger'}
+              {tied ? (
+                <>LEVEL with you</>
+              ) : (
+                <>
+                  is <span className="tabular-nums">{gapNum}</span> behind
+                </>
+              )}
             </div>
-            {active ? (
-              <span
-                aria-hidden
-                title="Played this week"
-                style={{
-                  width: 7,
-                  height: 7,
-                  borderRadius: 999,
-                  background: AMBER,
-                  flexShrink: 0,
-                  boxShadow: '0 0 0 2px rgba(247,147,30,0.16)',
-                }}
-              />
-            ) : null}
-          </div>
-
+          </>
+        ) : (
           <div
             style={{
               fontSize: 11.5,
-              fontWeight: 700,
-              color: tied ? RED : INK,
-              letterSpacing: '-0.005em',
-              lineHeight: 1.25,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
+              fontWeight: 600,
+              color: MUTE,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
             }}
           >
-            {tied ? (
-              <>LEVEL with you</>
-            ) : (
-              <>
-                is <span className="tabular-nums">{gapNum}</span> behind
-              </>
-            )}
+            <span aria-hidden>👑</span>
+            No challengers
           </div>
-        </>
-      ) : (
-        <div
-          style={{
-            marginTop: 2,
-            fontSize: 11.5,
-            fontWeight: 600,
-            color: MUTE,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-          }}
-        >
-          <span aria-hidden>👑</span>
-          No challengers
-        </div>
-      )}
+        )}
+      </div>
     </button>
   );
 }
@@ -480,7 +469,7 @@ function AttackRail({ picks }: { picks: TitleInReach[] }) {
     <div
       className="flex overflow-x-auto scrollbar-hide"
       style={{
-        gap: 8,
+        gap: 10,
         marginTop: 10,
         paddingLeft: PAGE_PAD,
         paddingRight: PAGE_PAD,
@@ -488,9 +477,8 @@ function AttackRail({ picks }: { picks: TitleInReach[] }) {
         WebkitOverflowScrolling: 'touch',
       }}
     >
-
       {picks.map((row) => (
-        <AttackChip
+        <AttackCard
           key={`${row.course_id}-${row.category}`}
           row={row}
           onTap={() => navigate(`/courses/${row.course_id}?tab=legends`)}
@@ -500,87 +488,106 @@ function AttackRail({ picks }: { picks: TitleInReach[] }) {
   );
 }
 
-function AttackChip({ row, onTap }: { row: TitleInReach; onTap: () => void }) {
+function AttackCard({ row, onTap }: { row: TitleInReach; onTap: () => void }) {
   const pct = progressPct(row.category, row.gap);
   const gap = gapCopyAttack(row.category, row.gap);
   const category = categoryLabel(row.category);
-  const record = recordCopy(row.category, row.leader_value);
   return (
     <button
       type="button"
       onClick={onTap}
-      className="text-left active:opacity-80 transition-opacity"
       style={{
         flexShrink: 0,
-        width: 196,
-        borderRadius: 10,
-        background: CHIP_BG,
-        border: 'none',
-        padding: '10px 11px',
+        width: 220,
+        height: CARD_HEIGHT,
+        boxSizing: 'border-box',
+        padding: 12,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 8,
+        background: CARD_BG,
+        border: `1px solid ${HAIRLINE}`,
+        borderRadius: 14,
+        boxShadow: CARD_SHADOW,
+        textAlign: 'left',
         cursor: 'pointer',
         fontFamily: FONT,
-        color: INK,
+        position: 'relative',
       }}
     >
+      {/* Category chip */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+        <span aria-hidden style={{ fontSize: 12, lineHeight: 1 }}>
+          🎯
+        </span>
+        <span
+          style={{
+            fontSize: 9.5,
+            fontWeight: 700,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            color: GREEN_DEEP,
+            padding: '3px 7px',
+            borderRadius: 999,
+            background: GREEN_TINT_BG,
+            lineHeight: 1,
+            flexShrink: 0,
+          }}
+        >
+          {category}
+        </span>
+      </div>
+
       <div
         style={{
-          fontSize: 12.5,
-          fontWeight: 600,
-          letterSpacing: '-0.01em',
+          fontSize: 13.5,
+          fontWeight: 800,
           color: INK,
-          lineHeight: 1.2,
+          lineHeight: 1.25,
+          letterSpacing: '-0.01em',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
+          display: '-webkit-box',
+          WebkitBoxOrient: 'vertical',
+          WebkitLineClamp: 2,
         }}
       >
         {row.course_name}
       </div>
-      <div
-        style={{
-          marginTop: 3,
-          fontSize: 10.5,
-          fontWeight: 500,
-          color: 'rgba(15,23,42,0.5)',
-          lineHeight: 1.2,
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        {`${category} · record ${record}`}
-      </div>
-      <div
-        style={{
-          marginTop: 8,
-          height: 3,
-          borderRadius: 999,
-          background: TRACK_BG,
-          overflow: 'hidden',
-        }}
-      >
+
+      {/* Footer — pinned; progress bar + "N to take it" */}
+      <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
         <div
           style={{
-            width: `${Math.max(8, pct)}%`,
-            height: '100%',
-            background: AMBER,
+            height: 3,
             borderRadius: 999,
+            background: TRACK_BG,
+            overflow: 'hidden',
           }}
-        />
-      </div>
-      <div
-        style={{
-          marginTop: 7,
-          fontSize: 11,
-          fontWeight: 500,
-          color: 'rgba(15,23,42,0.55)',
-          lineHeight: 1.25,
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        <span style={{ color: INK, fontWeight: 700 }}>{gap}</span> to take it
+        >
+          <div
+            style={{
+              width: `${Math.max(8, pct)}%`,
+              height: '100%',
+              background: GREEN,
+              borderRadius: 999,
+            }}
+          />
+        </div>
+        <div
+          style={{
+            fontSize: 11.5,
+            fontWeight: 700,
+            color: GREEN_DEEP,
+            letterSpacing: '-0.005em',
+            lineHeight: 1.25,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          <span className="tabular-nums">{gap}</span> to take it
+        </div>
       </div>
     </button>
   );
