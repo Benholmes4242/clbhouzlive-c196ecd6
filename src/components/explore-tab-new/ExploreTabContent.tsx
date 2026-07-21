@@ -124,7 +124,7 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
         <TheRecordBook region={activeRegion} opener={opener} mode={scope} userId={userId} />
 
         {/* Attack / Defend band — absorbs "Your next conquests" */}
-        <AttackDefendBand userId={userId} region={activeRegion} />
+        <AttackDefendBand userId={userId} />
 
         {/* Rivalry — sits directly below the Attack/Defend band */}
         <RivalryCard userId={userId} />
