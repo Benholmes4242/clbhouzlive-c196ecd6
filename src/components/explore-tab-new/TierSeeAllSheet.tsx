@@ -514,7 +514,6 @@ function CountLeaderSheetRow({
   const parts: string[] = [];
   if (subline) parts.push(subline);
   if (holderClub) parts.push(holderClub);
-  if (!isGold && holderHcp != null) parts.push(`HCP ${formatHcp(holderHcp)}`);
   const combined = parts.join(' \u00B7 ');
 
   return (
