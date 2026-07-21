@@ -73,7 +73,8 @@
     "youPlayItTo": "You play it to {{playsTo}}",
     "fieldPlaysTo": "Field: {{playsTo}}",
     "yourBirdieMap": "Your birdie map",
-    "birdiedOfTotal": "Birdied {{n}} of {{total}}"
+    "birdiedOfTotal": "Birdied {{n}} of {{total}}",
+    "youValue": "You: {{value}}"
   },
   "scorecard": {
     "syncingTitle": "[~~Šĉőřéĉářđ őñ ţĥé ŵáý~~]",
