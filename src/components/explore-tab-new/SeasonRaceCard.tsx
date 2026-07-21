@@ -99,9 +99,16 @@ export function SeasonRaceCard({ userId }: Props) {
   return (
     <>
       <section style={{ padding: '0 16px', fontFamily: FONT }}>
-        <button
-          type="button"
+        <div
+          role="button"
+          tabIndex={0}
           onClick={() => setSheetOpen(true)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setSheetOpen(true);
+            }
+          }}
           style={{
             width: '100%',
             background: CARD_BG,
@@ -201,7 +208,7 @@ export function SeasonRaceCard({ userId }: Props) {
           >
             Crowns this season
           </div>
-        </button>
+        </div>
       </section>
 
       <SeasonStandingsSheet
@@ -214,6 +221,7 @@ export function SeasonRaceCard({ userId }: Props) {
     </>
   );
 }
+
 
 function PodiumRow({
   row,
