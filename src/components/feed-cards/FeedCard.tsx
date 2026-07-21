@@ -23,6 +23,7 @@ import { Heart } from 'lucide-react';
 import { FormatBadge } from '@/features/watch-v2/components/FormatBadge';
 import { formatCountShort as formatCount } from '@/i18n/format';
 import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
+import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
 import { stripMentionMarkup } from '@/lib/mentions/format';
 import Pressable from '@/components/ui/Pressable';
 import { useRailLane } from '@/video/useRailLane';
@@ -163,7 +164,10 @@ export function FeedCard({
       style={{
         display: 'block',
         width: '100%',
-        marginBottom: 12,
+        // Bare tiles live in mosaic grids where the column gap is 4px — match
+        // vertical spacing to the horizontal gutter. Full cards (with caption
+        // block) keep the roomier 12px stack rhythm.
+        marginBottom: bareTile ? 4 : 12,
         cursor: 'pointer',
         fontFamily: FONT_FAMILY,
       }}
@@ -242,25 +246,8 @@ export function FeedCard({
           </div>
         ) : null}
 
-        {duration ? (
-          <div
-            style={{
-              position: 'absolute',
-              bottom: 6,
-              right: 6,
-              zIndex: 2,
-              background: 'rgba(0,0,0,0.72)',
-              color: '#fff',
-              fontWeight: 600,
-              fontSize: 9.5,
-              padding: '2px 6px',
-              borderRadius: 5,
-              fontFamily: FONT_FAMILY,
-            }}
-          >
-            {duration}
-          </div>
-        ) : null}
+        <GlassDurationBadge seconds={row.duration_seconds} fontSize={9.5} />
+
         {bareTile && isVideo && !isClip && title ? (
           <>
             <div

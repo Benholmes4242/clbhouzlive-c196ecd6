@@ -1,7 +1,7 @@
 import { useMemo, useRef } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useHubQuickClips } from '../hooks/useHubQuickClips';
-import { formatDuration } from '../utils/formatDuration';
+import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
 import { toFeedPosts } from '../utils/toFeedPost';
 import Pressable from '@/components/ui/Pressable';
 import { useWatchAutoplay } from '@/video/useWatchAutoplay';
@@ -105,24 +105,8 @@ function Tile({
             }}
           />
         ) : null}
-        {row.duration_seconds ? (
-          <div
-            style={{
-              position: 'absolute',
-              bottom: 6,
-              right: 6,
-              zIndex: 2,
-              background: 'rgba(0,0,0,0.6)',
-              color: '#fff',
-              fontWeight: 600,
-              fontSize: 9.5,
-              padding: '2px 5px',
-              borderRadius: 5,
-            }}
-          >
-            {formatDuration(row.duration_seconds)}
-          </div>
-        ) : null}
+        <GlassDurationBadge seconds={row.duration_seconds} fontSize={9.5} />
+
       </div>
       <div
         style={{
