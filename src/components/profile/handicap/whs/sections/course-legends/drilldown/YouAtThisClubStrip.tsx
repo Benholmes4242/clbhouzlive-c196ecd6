@@ -55,9 +55,12 @@ interface Props {
   userId: string | undefined;
   courseId: string;
   theme?: 'light' | 'dark';
+  /** When provided, overrides the strip's own RPC-derived crown count so it stays in sync with the cabinet's window-scoped fraction. */
+  heldCountOverride?: number;
 }
 
-export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 'dark' }) => {
+export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 'dark', heldCountOverride }) => {
+
   const { data: crowns } = useQuery({
     queryKey: ['course-legends', 'crowns-held-here', userId ?? 'anon', courseId],
     enabled: !!userId && !!courseId,
