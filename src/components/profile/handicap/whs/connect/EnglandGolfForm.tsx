@@ -90,7 +90,7 @@ export const EnglandGolfForm: React.FC<Props> = ({
             Connecting to
           </div>
           <div style={{ fontSize: 16, fontWeight: 700, color: INK }}>
-            England Golf · MyEG
+            England Golf
           </div>
         </div>
         <button
@@ -132,7 +132,7 @@ export const EnglandGolfForm: React.FC<Props> = ({
               type="text"
               inputMode="numeric"
               autoComplete="off"
-              placeholder="e.g. 1013726541"
+              placeholder="e.g. 1013567548"
               value={membershipNumber}
               onChange={(e) => setMembershipNumber(e.target.value.replace(/[^0-9]/g, ''))}
               disabled={submitting}
