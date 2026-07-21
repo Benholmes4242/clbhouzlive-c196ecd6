@@ -81,7 +81,7 @@ export function CourseOfTheWeekSection() {
           linkLabel="Top 100"
           onLinkClick={() => navigate('/top100')}
         >
-          <div style={{ padding: `0 ${SPACE.pagePadX}px 6px`, fontSize: 15, fontWeight: 700, color: V4.ink, letterSpacing: '-0.01em' }}>
+          <div style={{ padding: `0 ${SPACE.pagePadX}px 6px`, fontSize: 13, fontWeight: 700, color: V4.ink, letterSpacing: '-0.005em', lineHeight: 1.35 }}>
             The clubhouse verdict
           </div>
 
