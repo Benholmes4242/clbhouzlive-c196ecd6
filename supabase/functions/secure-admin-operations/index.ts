@@ -40,7 +40,8 @@ type AdminAction =
   | 'warn_user'
   | 'hide_post'
   | 'unhide_post'
-  | 'delete_course';
+  | 'delete_course'
+  | 'change_username';
 
 interface AdminOperationRequest {
   action: AdminAction;
@@ -52,7 +53,12 @@ interface AdminOperationRequest {
   message?: string;
   suspended?: boolean;
   durationDays?: number | null;
+  newUsername?: string;
 }
+
+// Username format — source of truth: src/pages/ManageProfile.tsx L140
+// /^[a-z0-9_.]{3,20}$/ applied after trim + lowercase.
+const USERNAME_RE = /^[a-z0-9_.]{3,20}$/;
 
 const ALLOWED_NONFULL_DURATIONS = new Set<number>([1, 7, 30]);
 
