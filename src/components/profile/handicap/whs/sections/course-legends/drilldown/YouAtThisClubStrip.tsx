@@ -252,15 +252,15 @@ export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 
             letterSpacing: '0.06em',
             textTransform: 'uppercase',
             color: emphasize ? AMBER : MUTE,
-            lineHeight: 1.15,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
+            lineHeight: 1.2,
             maxWidth: '100%',
+            wordBreak: 'break-word',
+            textAlign: 'center',
           }}
         >
           {label}
         </div>
+
       </div>
     );
   }
