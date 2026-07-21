@@ -8,7 +8,6 @@ import {
   INK_MUTE,
   SLATE_50,
 } from '@/features/tourhub/_shared/tokens';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ScopeSegment } from '@/components/shared/ScopeSegment';
 
 import { formatHcp } from '@/lib/formatHcp';
@@ -27,7 +26,10 @@ import {
   type RecordsMode,
 } from './hooks/useRegionFeats';
 import { FeatListRow } from './FeatListRow';
+import { StatRow } from './StatRow';
 import { useScorecardOpener } from './useScorecardOpener';
+
+
 
 
 const PAGE = 20;
