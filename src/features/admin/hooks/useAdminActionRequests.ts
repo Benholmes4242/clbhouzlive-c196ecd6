@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/lib/toast';
 import { supabase } from '@/integrations/supabase/client';
+import { parseAdminOpError } from '@/features/admin/lib/parseAdminOpError';
 
 export type AdminActionType = 'permanent_ban' | 'delete_user' | 'role_change';
 export type AdminRequestStatus = 'pending' | 'approved' | 'rejected' | 'cancelled';
