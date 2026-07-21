@@ -185,7 +185,8 @@
       "linkLabel": "Full schedule",
       "chipPlayoffs": "Playoffs",
       "daysLabel": "DAYS",
-      "venueDefendsSep": " · {{name}} defends"
+      "venueDefendsSep": " · {{name}} defends",
+      "subline": "ツアースケジュール"
     },
     "onTheCourse": {
       "eyebrow": "On the course",

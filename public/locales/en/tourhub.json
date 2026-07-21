@@ -207,7 +207,8 @@
       "linkLabel": "Full schedule",
       "chipPlayoffs": "Playoffs",
       "daysLabel": "DAYS",
-      "venueDefendsSep": " · {{name}} defends"
+      "venueDefendsSep": " · {{name}} defends",
+      "subline": "The tour schedule"
     },
     "onTheCourse": {
       "eyebrow": "On the course",

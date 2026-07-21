@@ -185,7 +185,8 @@
       "linkLabel": "Full schedule",
       "chipPlayoffs": "Playoffs",
       "daysLabel": "DAYS",
-      "venueDefendsSep": " · {{name}} defends"
+      "venueDefendsSep": " · {{name}} defends",
+      "subline": "투어 일정"
     },
     "onTheCourse": {
       "eyebrow": "On the course",
