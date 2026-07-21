@@ -76,6 +76,8 @@ function toFeedCardRow(post: FeedPost): FeedCardRow {
     poster_url: media?.thumbnailUrl ?? media?.imageUrl ?? null,
     duration_seconds: duration,
     creator_username: post.username ?? null,
+    creator_display_name: post.displayName ?? null,
+
     like_count: Number(post.likeCount ?? 0),
     course_name: post.courseName ?? post.review?.courseName ?? null,
     width,

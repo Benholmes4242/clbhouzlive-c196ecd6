@@ -188,7 +188,7 @@ function Card({
           >
             {title}
           </div>
-          {(row.creator_username || Number(row.like_count ?? 0) > 0) ? (
+          {((row.creator_display_name || row.creator_username) || Number(row.like_count ?? 0) > 0) ? (
             <div
               style={{
                 display: 'flex',
@@ -201,11 +201,12 @@ function Card({
                 minWidth: 0,
               }}
             >
-              {row.creator_username ? (
+              {(row.creator_display_name || row.creator_username) ? (
                 <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
-                  @{row.creator_username}
+                  {row.creator_display_name || row.creator_username}
                 </span>
               ) : null}
+
               {Number(row.like_count ?? 0) > 0 && (
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, flexShrink: 0 }}>
                   <Heart style={{ width: 12, height: 12, color: '#F7931E', fill: '#F7931E' }} strokeWidth={1.8} />

@@ -40,6 +40,8 @@ export interface FeedCardRow {
   poster_url: string | null;
   duration_seconds: number | null;
   creator_username: string | null;
+  creator_display_name?: string | null;
+
   like_count: number;
   course_name: string | null;
   width?: number | null;
@@ -204,6 +206,42 @@ export function FeedCard({
           />
         ) : null}
         {!hideFormatBadge ? <FormatBadge format={row.derived_format} /> : null}
+        {bareTile && !hideCourseAttribution && row.course_name ? (
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              top: 6,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 2,
+              maxWidth: '85%',
+              padding: '3px 10px',
+              borderRadius: 999,
+              background: 'rgba(15,23,42,0.35)',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+              color: '#fff',
+              fontWeight: 600,
+              fontSize: 11,
+              lineHeight: 1.2,
+              fontFamily: FONT_FAMILY,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              pointerEvents: 'none',
+            }}
+          >
+            <span style={{ flexShrink: 0 }}>📍</span>
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {row.course_name}
+            </span>
+          </div>
+        ) : null}
+
         {duration ? (
           <div
             style={{
@@ -320,7 +358,7 @@ export function FeedCard({
               minWidth: 0,
             }}
           >
-            {row.creator_username ? (
+            {(row.creator_display_name || row.creator_username) ? (
               <span
                 style={{
                   overflow: 'hidden',
@@ -329,9 +367,10 @@ export function FeedCard({
                   minWidth: 0,
                 }}
               >
-                @{row.creator_username}
+                {row.creator_display_name || row.creator_username}
               </span>
             ) : null}
+
             {row.like_count > 0 && (
               <span
                 style={{

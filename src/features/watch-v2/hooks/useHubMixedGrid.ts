@@ -10,6 +10,8 @@ export interface MixedGridRow {
   poster_url: string | null;
   duration_seconds: number | null;
   creator_username: string | null;
+  creator_display_name?: string | null;
+
   like_count: number;
   course_name: string | null;
   width?: number | null;

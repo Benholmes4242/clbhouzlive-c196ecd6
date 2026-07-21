@@ -72,6 +72,8 @@ export function ClipsWall({ mood }: { mood: ClipsV2Mood }) {
         poster_url: r.poster_url ?? null,
         duration_seconds: r.duration_seconds ?? null,
         creator_username: r.creator_username ?? null,
+        creator_display_name: r.creator_display_name ?? null,
+
         like_count: Number(r.like_count ?? 0),
         course_name: r.course_name ?? null,
         width: r.width ?? null,
