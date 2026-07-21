@@ -177,7 +177,10 @@ interface WeekInGolfRailProps {
 
 export function WeekInGolfRail(_props: WeekInGolfRailProps = {}) {
   const navigate = useNavigate();
-  const { data, isLoading, isError, error } = useWeekInGolf(12);
+  const { user } = useSupabaseSession();
+  const userId = user?.id;
+  const { data, isLoading, isError, error } = useWeekInGolf(12, userId);
+  const applause = useApplauseMutation(userId);
   const [sheetOpen, setSheetOpen] = useState(false);
 
   if (isError) {
@@ -198,6 +201,15 @@ export function WeekInGolfRail(_props: WeekInGolfRailProps = {}) {
   const goToProfile = (username: string | null) => {
     if (!username) return;
     navigate(`/profile/${username}`);
+  };
+
+  const onApplause = (row: WeekRow) => {
+    if (!row.event_key) return;
+    if (!userId) {
+      toast('Sign in to applaud');
+      return;
+    }
+    applause.mutate({ eventKey: row.event_key, nextReacted: !row.my_reacted });
   };
 
   return (
@@ -221,15 +233,26 @@ export function WeekInGolfRail(_props: WeekInGolfRailProps = {}) {
         className="no-scrollbar"
       >
         {ordered.map((row, i) => (
-          <RailCard key={`${row.user_id}-${row.occurred_at}-${i}`} row={row} onTap={() => goToProfile(row.username)} />
+          <RailCard
+            key={`${row.user_id}-${row.occurred_at}-${i}`}
+            row={row}
+            onTap={() => goToProfile(row.username)}
+            onApplause={() => onApplause(row)}
+          />
         ))}
         <SeeAllTile onTap={() => setSheetOpen(true)} />
       </div>
 
-      <WeekInGolfSheet open={sheetOpen} onClose={() => setSheetOpen(false)} />
+      <WeekInGolfSheet
+        open={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        userId={userId}
+        onApplause={onApplause}
+      />
     </section>
   );
 }
+
 
 export default WeekInGolfRail;
 
