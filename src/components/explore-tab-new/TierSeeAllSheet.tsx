@@ -457,13 +457,8 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Generalized count-leader row - used for legendary (aces/albatrosses) and
-// eagles all-time views. Distinct data shape from FeatRow.
+// eagles all-time views. Delegates to the canonical StatRow.
 // ─────────────────────────────────────────────────────────────────────────────
-
-const LEGEND_INK = '#0F172A';
-const LEGEND_SUB = 'rgba(15,23,42,0.5)';
-const LEGEND_LABEL = 'rgba(15,23,42,0.4)';
-const LEGEND_RANK = 'rgba(15,23,42,0.35)';
 
 function formatLeaderName(raw?: string | null): string {
   const s = (raw ?? '').trim();
@@ -473,17 +468,6 @@ function formatLeaderName(raw?: string | null): string {
     if (before && after) return `${after} ${before}`;
   }
   return s;
-}
-
-function leaderInitials(name: string): string {
-  return (
-    (name || '?')
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((p) => p[0]?.toUpperCase() ?? '')
-      .join('') || '?'
-  );
 }
 
 interface CountLeaderSheetRowProps {
@@ -497,16 +481,10 @@ interface CountLeaderSheetRowProps {
   max: number;
   countLabelSingular: string;
   countLabelPlural: string;
-  /** Optional secondary line, e.g. cross-metric or club. */
   subline: string | null;
   onTap?: () => void;
-  /**
-   * 'amber' (default) = eagles all-time champion chrome.
-   * 'gold' = legendary (aces & albatrosses) — champion adopts the exceptional
-   * review gold system (shimmer rank/value, gold-edge border, champagne
-   * gradient, shimmering bar); HCP suppressed sheet-wide.
-   */
   variant?: 'amber' | 'gold';
+  isLast?: boolean;
 }
 
 function CountLeaderSheetRow({
@@ -523,175 +501,35 @@ function CountLeaderSheetRow({
   subline,
   onTap,
   variant = 'amber',
+  isLast = false,
 }: CountLeaderSheetRowProps) {
+  void max;
   const rank = index + 1;
-  const isTop = rank === 1;
   const isGold = variant === 'gold';
-  const goldChampion = isGold && isTop;
   const name = formatLeaderName(holderName);
-  const pct = Math.max(0.08, Math.min(1, count / (max || 1)));
   const countLabel = count === 1 ? countLabelSingular : countLabelPlural;
-  const secondLine =
-    subline && holderClub
-      ? `${subline} \u00B7 ${holderClub}`
-      : subline
-        ? subline
-        : holderClub;
+  const parts: string[] = [];
+  if (subline) parts.push(subline);
+  if (holderClub) parts.push(holderClub);
+  if (!isGold && holderHcp != null) parts.push(`HCP ${formatHcp(holderHcp)}`);
+  const combined = parts.join(' \u00B7 ');
 
   return (
-    <button
-      type="button"
-      onClick={onTap}
-      className="w-full text-left active:scale-[0.995] transition-transform"
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'stretch',
-        gap: 8,
-        padding: '10px 16px',
-        background: index % 2 === 0 ? 'rgba(15,23,42,0.035)' : 'transparent',
-        borderTop: index === 0 ? 'none' : '0.5px solid rgba(15,23,42,0.08)',
-        cursor: onTap ? 'pointer' : 'default',
-        fontFamily: FONT,
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 11, minWidth: 0 }}>
-        <div
-          className={goldChampion ? 'clbhouz-gold-shimmer-light' : undefined}
-          style={{
-            width: 20,
-            flexShrink: 0,
-            fontSize: 11,
-            fontWeight: 600,
-            fontVariantNumeric: 'tabular-nums',
-            lineHeight: 1,
-            textAlign: 'center',
-            ...(goldChampion ? {} : { color: isTop ? AMBER : LEGEND_RANK }),
-          }}
-        >
-          {rank}
-        </div>
-        <div style={{ flexShrink: 0 }}>
-          <SquircleAvatar
-            size={34}
-            srcCandidates={holderAvatar ? [holderAvatar] : []}
-            alt={name}
-            fallback={leaderInitials(name)}
-            userId={userId ?? undefined}
-            hairlineRing
-          />
-        </div>
-        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, minWidth: 0 }}>
-            <span
-              style={{
-                fontSize: 13,
-                fontWeight: 600,
-                color: LEGEND_INK,
-                lineHeight: 1.2,
-                letterSpacing: '-0.01em',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                minWidth: 0,
-                flex: '0 1 auto',
-              }}
-            >
-              {name}
-            </span>
-            {!isGold && holderHcp != null ? (
-              <span
-                style={{
-                  flexShrink: 0,
-                  fontSize: 11.5,
-                  fontWeight: 600,
-                  color: AMBER,
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {formatHcp(holderHcp)}
-              </span>
-            ) : null}
-          </div>
-          {secondLine && (
-            <div
-              style={{
-                marginTop: 2,
-                fontSize: 11,
-                fontWeight: 500,
-                color: LEGEND_SUB,
-                lineHeight: 1.2,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {secondLine}
-            </div>
-          )}
-        </div>
-        <div
-          style={{
-            flexShrink: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-end',
-            justifyContent: 'center',
-            minWidth: 42,
-          }}
-        >
-          <div
-            style={{
-              fontSize: 9,
-              fontWeight: 600,
-              letterSpacing: '0.06em',
-              textTransform: 'uppercase',
-              color: LEGEND_LABEL,
-              lineHeight: 1,
-            }}
-          >
-            {countLabel}
-          </div>
-          <div
-            className={goldChampion ? 'clbhouz-gold-shimmer-light' : undefined}
-            style={{
-              marginTop: 3,
-              fontSize: 15,
-              fontWeight: 700,
-              lineHeight: 1,
-              fontVariantNumeric: 'tabular-nums',
-              ...(goldChampion ? {} : { color: isTop ? AMBER : LEGEND_INK }),
-            }}
-          >
-            {count}
-          </div>
-        </div>
-      </div>
-      <div style={{ paddingLeft: 35, width: '100%' }}>
-        <div
-          style={{
-            width: '100%',
-            height: 3,
-            borderRadius: 999,
-            background: 'rgba(15,23,42,0.08)',
-            overflow: 'hidden',
-          }}
-        >
-          <div
-            className={isGold ? 'clbhouz-gold-shimmer-bar' : undefined}
-            style={{
-              width: `${pct * 100}%`,
-              height: '100%',
-              borderRadius: 999,
-              transition: 'width .35s cubic-bezier(.2,.8,.2,1)',
-              ...(isGold ? {} : { background: AMBER }),
-            }}
-          />
-        </div>
-      </div>
-    </button>
+    <StatRow
+      rank={rank}
+      avatarUrl={holderAvatar}
+      avatarUserId={userId ?? null}
+      name={name}
+      subline={combined || undefined}
+      statValue={count}
+      statLabel={countLabel}
+      showWatermark={rank === 1}
+      isLast={isLast}
+      onPress={onTap}
+    />
   );
 }
 
 export default TierSeeAllSheet;
+
 
