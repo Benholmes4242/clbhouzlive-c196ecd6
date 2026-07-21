@@ -32,11 +32,12 @@ const Card: React.FC<{ eyebrow: string; hole: PairHole }> = ({ eyebrow, hole }) 
         background: AMBER_TINT,
         border: `1px solid ${AMBER_BORDER}`,
         borderRadius: 14,
-        padding: '12px 14px',
+        padding: '12px 12px',
         fontFamily: FONT,
         display: 'flex',
         flexDirection: 'column',
-        gap: 6,
+        gap: 8,
+        minWidth: 0,
       }}
     >
       <div
@@ -46,20 +47,22 @@ const Card: React.FC<{ eyebrow: string; hole: PairHole }> = ({ eyebrow, hole }) 
           letterSpacing: '0.16em',
           textTransform: 'uppercase',
           color: AMBER,
+          whiteSpace: 'nowrap',
         }}
       >
         {eyebrow}
       </div>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, minWidth: 0 }}>
         <div
           style={{
-            fontSize: 40,
+            fontSize: 36,
             fontWeight: 200,
             color: INK,
             letterSpacing: '-0.02em',
             lineHeight: 1,
             fontFamily: MONO,
             fontVariantNumeric: 'tabular-nums',
+            flexShrink: 0,
           }}
         >
           {hole.hole_no}
@@ -71,6 +74,7 @@ const Card: React.FC<{ eyebrow: string; hole: PairHole }> = ({ eyebrow, hole }) 
             color: INK_MUTE,
             fontFamily: MONO,
             fontVariantNumeric: 'tabular-nums',
+            whiteSpace: 'nowrap',
           }}
         >
           {t('courses:holes.youPlayItTo', { playsTo: fmtPlaysTo(hole.par, hole.avg_to_par) })}
@@ -85,6 +89,8 @@ const Card: React.FC<{ eyebrow: string; hole: PairHole }> = ({ eyebrow, hole }) 
           textTransform: 'uppercase',
           fontFamily: MONO,
           fontVariantNumeric: 'tabular-nums',
+          whiteSpace: 'nowrap',
+          marginTop: 'auto',
         }}
       >
         {t('courses:holes.fieldPlaysTo', { playsTo: fmtPlaysTo(hole.par, hole.community_avg_to_par) })}
@@ -96,7 +102,7 @@ const Card: React.FC<{ eyebrow: string; hole: PairHole }> = ({ eyebrow, hole }) 
 export const PersonalHoleFeatureCards: React.FC<Props> = ({ nemesis, scoring }) => {
   const { t } = useTranslation(['courses']);
   return (
-    <div style={{ padding: '4px 16px 4px', display: 'flex', gap: 12 }}>
+    <div style={{ padding: '16px 16px 32px', display: 'flex', gap: 12, alignItems: 'stretch' }}>
       <Card eyebrow={t('courses:holes.yourNemesisTitle')} hole={nemesis} />
       <Card eyebrow={t('courses:holes.yourScoringHoleTitle')} hole={scoring} />
     </div>

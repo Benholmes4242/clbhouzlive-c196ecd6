@@ -73,7 +73,7 @@
     },
     "yourNemesisTitle": "Your nemesis",
     "yourScoringHoleTitle": "Your scoring hole",
-    "youPlayItTo": "You play it to {{playsTo}}",
+    "youPlayItTo": "You: {{playsTo}}",
     "fieldPlaysTo": "Field: {{playsTo}}",
     "yourBirdieMap": "Your birdie map",
     "birdiedOfTotal": "Birdied {{n}} of {{total}}",
