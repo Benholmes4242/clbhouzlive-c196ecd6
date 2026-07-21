@@ -182,6 +182,7 @@ export function HubMixedGrid({
                 isAutoplayActive={activeIndices.has(i)}
                 openedFrom="watch"
                 hideFormatBadge
+              bareTile
               />
             ))}
           </div>
@@ -196,6 +197,7 @@ export function HubMixedGrid({
                 isAutoplayActive={activeIndices.has(i)}
                 openedFrom="watch"
                 hideFormatBadge
+              bareTile
               />
             ))}
 

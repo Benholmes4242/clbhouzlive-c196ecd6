@@ -175,6 +175,7 @@ export function ClipsWall({ mood }: { mood: ClipsV2Mood }) {
               isAutoplayActive={activeIndices.has(i)}
               openedFrom="clips"
               hideFormatBadge
+              bareTile
             />
           ))}
         </div>
@@ -189,6 +190,7 @@ export function ClipsWall({ mood }: { mood: ClipsV2Mood }) {
               isAutoplayActive={activeIndices.has(i)}
               openedFrom="clips"
               hideFormatBadge
+              bareTile
             />
           ))}
 
