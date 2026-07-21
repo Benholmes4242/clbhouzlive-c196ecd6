@@ -25,6 +25,11 @@ export interface SharedHoleCardProps {
   onToggle: () => void;
   /** Optional feature tag (HARDEST / EASIEST) rendered under the Par line. */
   tag?: 'hardest' | 'easiest' | null;
+  /** Viewer's own avg_to_par for this hole. When present, renders a delta chip
+   *  coloured vs the community avg. */
+  viewerAvgToPar?: number | null;
+  /** Viewer's personal marker on the hole tile — ace trumps eagle trumps birdie. */
+  viewerBadge?: 'ace' | 'eagle' | 'birdie' | null;
 }
 
 const AVG_EPSILON = 0.05;
