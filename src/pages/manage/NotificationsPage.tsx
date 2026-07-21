@@ -38,7 +38,7 @@ const CATEGORIES: { key: string; label: string; sub: string; types: string[] }[]
     sub: 'Friend reviews and responses to your reviews',
     types: ['friend_course_review', 'course_review', 'course_review_received', 'review_response', 'review_response_posted', 'friend_review'] },
   { key: 'gamification', label: 'Streaks and achievements',
-    sub: 'Badges, streaks, legends and rivals',
+    sub: 'Badges, streaks, crowns and rivals',
     types: ['badge_earned', 'legend_earned', 'legend_lost', 'rival_played', 'streak_at_risk', 'streak_broken', 'streak_freeze_applied'] },
 ];
 
