@@ -265,7 +265,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
         <div style={{ flex: 1, minWidth: 0 }}>
           <SectionHeader
             role="section"
-            kicker={categoryLabel.toUpperCase()}
+            kicker={(titleOverride ?? categoryLabel).toUpperCase()}
             inlineIcon
             icon={CatIcon}
           />
