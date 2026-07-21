@@ -88,18 +88,6 @@ function categoryLabel(category: string): string {
   const base = stripWindow(category);
   return CATEGORY_META[base]?.label ?? base.replace(/_/g, ' ');
 }
-function recordCopy(category: string, value: number): string {
-  const base = stripWindow(category);
-  if (base === 'best_score_diff') {
-    const n = Math.round(value * 10) / 10;
-    return `${n} differential`;
-  }
-  const meta = CATEGORY_META[base];
-  const n = Math.round(value);
-  if (!meta) return String(n);
-  const unit = n === 1 ? meta.unitSingular : meta.unit;
-  return `${n} ${unit}`;
-}
 function progressPct(_category: string, gap: number): number {
   const n = Math.max(1, Math.round(gap));
   return Math.max(20, 96 - (n - 1) * 14);
