@@ -543,6 +543,14 @@ function AttackCard({ row, onTap }: { row: TitleInReach; onTap: () => void }) {
   const pct = progressPct(row.category, row.gap);
   const gap = gapCopyAttack(row.category, row.gap);
   const category = categoryLabel(row.category);
+  const recordValue = formatGapNumber(row.leader_value);
+  const recordLabelUnit = (() => {
+    const base = stripWindow(row.category);
+    const meta = CATEGORY_META[base];
+    if (!meta) return '';
+    // Show just "Record 8.6" for differentials / gross; keep phrasing consistent.
+    return ` ${meta.unit === 'strokes' ? '' : meta.unit}`.trimEnd();
+  })();
   return (
     <button
       type="button"
@@ -564,10 +572,13 @@ function AttackCard({ row, onTap }: { row: TitleInReach; onTap: () => void }) {
         cursor: 'pointer',
         fontFamily: FONT,
         position: 'relative',
+        overflow: 'hidden',
       }}
     >
+      <GhostGlyph glyph="🎯" />
+
       {/* Category chip */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, position: 'relative' }}>
         <span aria-hidden style={{ fontSize: 12, lineHeight: 1 }}>
           🎯
         </span>
@@ -601,13 +612,30 @@ function AttackCard({ row, onTap }: { row: TitleInReach; onTap: () => void }) {
           display: '-webkit-box',
           WebkitBoxOrient: 'vertical',
           WebkitLineClamp: 2,
+          position: 'relative',
         }}
       >
         {row.course_name}
       </div>
 
-      {/* Footer — pinned; progress bar + "N to take it" */}
-      <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
+      {/* Footer — pinned; record + progress bar + "N to take it" */}
+      <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 5, position: 'relative' }}>
+        <div
+          style={{
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: '0.04em',
+            textTransform: 'uppercase',
+            color: MUTE,
+            lineHeight: 1,
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
+          Record <span className="tabular-nums" style={{ color: INK }}>{recordValue}</span>
+          {recordLabelUnit}
+        </div>
         <div
           style={{
             height: 3,
@@ -643,5 +671,6 @@ function AttackCard({ row, onTap }: { row: TitleInReach; onTap: () => void }) {
     </button>
   );
 }
+
 
 export default AttackDefendBand;
