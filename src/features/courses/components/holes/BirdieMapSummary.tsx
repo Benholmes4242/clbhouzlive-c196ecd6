@@ -12,6 +12,7 @@ interface Props {
 }
 
 export const BirdieMapSummary: React.FC<Props> = ({ birdiedCount, totalHoles }) => {
+  const { t } = useTranslation(['courses']);
   const pct = totalHoles > 0 ? Math.min(1, birdiedCount / totalHoles) : 0;
   return (
     <div
