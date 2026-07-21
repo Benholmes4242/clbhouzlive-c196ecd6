@@ -503,9 +503,11 @@ function WeekInGolfSheet({
                     key={`${row.user_id}-${row.occurred_at}-${i}`}
                     row={row}
                     onTap={() => handleRowTap(row.username)}
+                    onApplause={() => onApplause(row)}
                   />
                 ))}
               </div>
+
             </div>
           );
         })}
@@ -528,64 +530,133 @@ function WeekInGolfSheet({
   );
 }
 
-function SheetRow({ row, onTap }: { row: WeekRow; onTap: () => void }) {
+function SheetRow({
+  row,
+  onTap,
+  onApplause,
+}: {
+  row: WeekRow;
+  onTap: () => void;
+  onApplause: () => void;
+}) {
   const displayName = row.display_name || row.username || 'Golfer';
   const meta = TYPE_META[row.event_type];
   return (
-    <button
-      type="button"
-      onClick={onTap}
+    <div
       style={{
         display: 'flex',
         alignItems: 'center',
         gap: 12,
         padding: '10px 0',
         borderBottom: `1px solid ${HAIRLINE}`,
-        background: 'transparent',
-        textAlign: 'left',
-        cursor: 'pointer',
         fontFamily: FONT,
       }}
     >
-      <SquircleAvatar src={row.avatar_url ?? undefined} alt={displayName} size="sm" hairlineRing />
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, minWidth: 0 }}>
-          <div
-            style={{
-              fontSize: 14,
-              fontWeight: 700,
-              color: INK,
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              flexShrink: 1,
-              minWidth: 0,
-            }}
-          >
-            {displayName}
+      <button
+        type="button"
+        onClick={onTap}
+        style={{
+          flex: 1,
+          minWidth: 0,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          background: 'transparent',
+          border: 'none',
+          padding: 0,
+          textAlign: 'left',
+          cursor: 'pointer',
+          fontFamily: FONT,
+        }}
+      >
+        <SquircleAvatar src={row.avatar_url ?? undefined} alt={displayName} size="sm" hairlineRing />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, minWidth: 0 }}>
+            <div
+              style={{
+                fontSize: 14,
+                fontWeight: 700,
+                color: INK,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                flexShrink: 1,
+                minWidth: 0,
+              }}
+            >
+              {displayName}
+            </div>
+            <span
+              style={{
+                fontSize: 9,
+                fontWeight: 700,
+                letterSpacing: '0.1em',
+                color: AMBER_DEEP,
+                flexShrink: 0,
+              }}
+            >
+              {meta.glyph} {meta.label}
+            </span>
           </div>
-          <span
-            style={{
-              fontSize: 9,
-              fontWeight: 700,
-              letterSpacing: '0.1em',
-              color: AMBER_DEEP,
-              flexShrink: 0,
-            }}
-          >
-            {meta.glyph} {meta.label}
-          </span>
+          {row.line1 ? (
+            <div style={{ fontSize: 13, color: INK, marginTop: 2, lineHeight: 1.3 }}>{row.line1}</div>
+          ) : null}
+          {row.line2 ? (
+            <div style={{ fontSize: 12, color: MUTE, marginTop: 1, lineHeight: 1.3 }}>{row.line2}</div>
+          ) : null}
         </div>
-        {row.line1 ? (
-          <div style={{ fontSize: 13, color: INK, marginTop: 2, lineHeight: 1.3 }}>{row.line1}</div>
-        ) : null}
-        {row.line2 ? (
-          <div style={{ fontSize: 12, color: MUTE, marginTop: 1, lineHeight: 1.3 }}>{row.line2}</div>
-        ) : null}
-      </div>
-      <div style={{ fontSize: 11, color: MUTE, whiteSpace: 'nowrap', flexShrink: 0 }}>
-        {formatRelativeAgo(row.occurred_at)}
-      </div>
+        <div style={{ fontSize: 11, color: MUTE, whiteSpace: 'nowrap', flexShrink: 0 }}>
+          {formatRelativeAgo(row.occurred_at)}
+        </div>
+      </button>
+      <ApplauseChip
+        reacted={!!row.my_reacted}
+        count={row.reaction_count ?? 0}
+        onTap={(e) => {
+          e.stopPropagation();
+          onApplause();
+        }}
+      />
+    </div>
+  );
+}
+
+function ApplauseChip({
+  reacted,
+  count,
+  onTap,
+}: {
+  reacted: boolean;
+  count: number;
+  onTap: (e: React.MouseEvent) => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onTap}
+      aria-pressed={reacted}
+      aria-label={reacted ? 'Remove applause' : 'Applaud'}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 4,
+        padding: '4px 8px',
+        borderRadius: 999,
+        background: reacted ? AMBER_TINT_BG : 'transparent',
+        border: `1px solid ${reacted ? 'rgba(247,147,30,0.35)' : HAIRLINE}`,
+        color: reacted ? AMBER_DEEP : MUTE,
+        fontFamily: FONT,
+        fontSize: 11,
+        fontWeight: 700,
+        lineHeight: 1,
+        cursor: 'pointer',
+        flexShrink: 0,
+        fontFeatureSettings: '"tnum" 1',
+      }}
+    >
+      <span aria-hidden style={{ fontSize: 12 }}>👏</span>
+      {count > 0 ? <span style={{ fontVariantNumeric: 'tabular-nums' }}>{count}</span> : null}
     </button>
   );
 }
+
