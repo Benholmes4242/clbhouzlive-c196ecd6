@@ -1,5 +1,6 @@
 import React from 'react';
-import { FONT, INK, MONO, SC_ACCENT } from './_constants';
+import { useTranslation } from 'react-i18next';
+import { FONT, INK, MONO } from './_constants';
 import { INK_MUTE } from '@/features/courses/_shared/tokens';
 
 const AMBER = '#F7931E';
