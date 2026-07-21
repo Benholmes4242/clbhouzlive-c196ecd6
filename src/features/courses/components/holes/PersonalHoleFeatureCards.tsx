@@ -1,0 +1,101 @@
+import React from 'react';
+import { FONT, INK, MONO, SC_ACCENT } from './_constants';
+import { INK_MUTE } from '@/features/courses/_shared/tokens';
+
+const AMBER = '#F7931E';
+const AMBER_TINT = 'rgba(247,147,30,0.06)';
+const AMBER_BORDER = 'rgba(247,147,30,0.22)';
+
+interface PairHole {
+  hole_no: number;
+  par: number;
+  avg_to_par: number;
+  community_avg_to_par: number;
+}
+
+interface Props {
+  nemesis: PairHole;
+  scoring: PairHole;
+}
+
+function fmtPlaysTo(par: number, avg: number): string {
+  return (par + avg).toFixed(1);
+}
+
+const Card: React.FC<{ eyebrow: string; hole: PairHole }> = ({ eyebrow, hole }) => (
+  <div
+    style={{
+      flex: 1,
+      background: AMBER_TINT,
+      border: `1px solid ${AMBER_BORDER}`,
+      borderRadius: 14,
+      padding: '12px 14px',
+      fontFamily: FONT,
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 6,
+    }}
+  >
+    <div
+      style={{
+        fontSize: 10,
+        fontWeight: 800,
+        letterSpacing: '0.16em',
+        textTransform: 'uppercase',
+        color: AMBER,
+      }}
+    >
+      {eyebrow}
+    </div>
+    <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+      <div
+        style={{
+          fontSize: 40,
+          fontWeight: 200,
+          color: INK,
+          letterSpacing: '-0.02em',
+          lineHeight: 1,
+          fontFamily: MONO,
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
+        {hole.hole_no}
+      </div>
+      <div
+        style={{
+          fontSize: 11.5,
+          fontWeight: 600,
+          color: INK_MUTE,
+          fontFamily: MONO,
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
+        You play it to {fmtPlaysTo(hole.par, hole.avg_to_par)}
+      </div>
+    </div>
+    <div
+      style={{
+        fontSize: 10,
+        fontWeight: 700,
+        color: INK_MUTE,
+        letterSpacing: '0.04em',
+        textTransform: 'uppercase',
+        fontFamily: MONO,
+        fontVariantNumeric: 'tabular-nums',
+      }}
+    >
+      Field: {fmtPlaysTo(hole.par, hole.community_avg_to_par)}
+    </div>
+  </div>
+);
+
+export const PersonalHoleFeatureCards: React.FC<Props> = ({ nemesis, scoring }) => {
+  return (
+    <div style={{ padding: '4px 16px 4px', display: 'flex', gap: 12 }}>
+      <Card eyebrow="Your nemesis" hole={nemesis} />
+      <Card eyebrow="Your scoring hole" hole={scoring} />
+    </div>
+  );
+};
+
+export default PersonalHoleFeatureCards;
