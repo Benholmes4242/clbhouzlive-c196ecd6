@@ -250,7 +250,7 @@ export const SharedHoleCard: React.FC<SharedHoleCardProps> = ({
           {hole.hole_no}
           {viewerBadge === 'ace' && (
             <span
-              aria-label="Hole in one"
+              aria-label={t('courses:holes.aceA11y')}
               style={{
                 position: 'absolute',
                 top: -4,
@@ -259,7 +259,7 @@ export const SharedHoleCard: React.FC<SharedHoleCardProps> = ({
                 lineHeight: 1,
               }}
             >
-              ⭐
+              {'\u2B50'}
             </span>
           )}
           {viewerBadge === 'birdie' && (
