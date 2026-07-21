@@ -227,15 +227,25 @@ function PodiumRow({
   row,
   isLast,
   highlighted,
+  onNavigate,
 }: {
   row: SeasonRow;
   isLast?: boolean;
   highlighted?: boolean;
+  onNavigate?: (userId: string) => void;
 }) {
+  const navigate = useNavigate();
   const isViewer = !!row.is_viewer || !!highlighted;
   const name = row.display_name ?? 'Golfer';
   const rank = row.rank ?? 0;
   const chip = RANK_CHIP[rank];
+
+  const goToProfile = (e: React.MouseEvent | React.KeyboardEvent) => {
+    e.stopPropagation();
+    if (!row.user_id) return;
+    if (onNavigate) onNavigate(row.user_id);
+    else navigate(`/profile/${row.user_id}`);
+  };
 
   return (
     <div
