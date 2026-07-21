@@ -63,31 +63,12 @@ interface Props {
 }
 
 const SELF_TINT = 'rgba(247,147,30,0.06)';
-const SELF_BORDER = 'rgba(247,147,30,0.28)';
-const BAR_TRACK = 'rgba(15,23,42,0.08)';
 
 /** Lower-value-wins categories. */
 function isLowerBetter(cat: LegendCategory): boolean {
   return cat.startsWith('lowest_gross_') || cat.startsWith('best_score_diff_');
 }
 
-function computeBarPct(
-  cat: LegendCategory,
-  rowValue: number,
-  championValue: number,
-): number {
-  if (!Number.isFinite(rowValue) || !Number.isFinite(championValue) || championValue === 0) {
-    return 0.08;
-  }
-  if (isLowerBetter(cat)) {
-    // Champion has the smallest value; higher values fill less.
-    // Handle negatives (score_diff) by using absolute distance from 0.
-    const c = Math.abs(championValue);
-    const r = Math.abs(rowValue) || c;
-    return Math.max(0.08, Math.min(1, c / r));
-  }
-  return Math.max(0.08, Math.min(1, rowValue / championValue));
-}
 
 export const FullCourseLeaderboardSheetDispatch: React.FC<Props> = ({
   open,
