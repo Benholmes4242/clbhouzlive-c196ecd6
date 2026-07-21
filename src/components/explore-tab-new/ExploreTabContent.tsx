@@ -146,6 +146,10 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
         {/* Toughest courses index */}
         <ToughestIndex />
 
+        {/* This week in golf — honours rail */}
+        <WeekInGolfRail />
+
+
         {/* Feed block */}
         <div
           style={{
