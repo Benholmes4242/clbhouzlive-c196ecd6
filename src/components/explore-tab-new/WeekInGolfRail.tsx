@@ -357,12 +357,10 @@ function WeekInGolfSheet({
   open,
   onClose,
   userId,
-  onApplause,
 }: {
   open: boolean;
   onClose: () => void;
   userId: string | undefined;
-  onApplause: (row: WeekRow) => void;
 }) {
   const navigate = useNavigate();
   const { data } = useWeekInGolf(open ? 100 : 12, userId);
@@ -423,7 +421,6 @@ function WeekInGolfSheet({
                     key={`${row.user_id}-${row.occurred_at}-${i}`}
                     row={row}
                     onTap={() => handleRowTap(row.username)}
-                    onApplause={() => onApplause(row)}
                   />
                 ))}
               </div>
@@ -453,11 +450,9 @@ function WeekInGolfSheet({
 function SheetRow({
   row,
   onTap,
-  onApplause,
 }: {
   row: WeekRow;
   onTap: () => void;
-  onApplause: () => void;
 }) {
   const displayName = row.display_name || row.username || 'Golfer';
   const meta = TYPE_META[row.event_type];
@@ -529,54 +524,8 @@ function SheetRow({
           {formatRelativeAgo(row.occurred_at)}
         </div>
       </button>
-      <ApplauseChip
-        reacted={!!row.my_reacted}
-        count={row.reaction_count ?? 0}
-        onTap={(e) => {
-          e.stopPropagation();
-          onApplause();
-        }}
-      />
     </div>
   );
 }
 
-function ApplauseChip({
-  reacted,
-  count,
-  onTap,
-}: {
-  reacted: boolean;
-  count: number;
-  onTap: (e: React.MouseEvent) => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onTap}
-      aria-pressed={reacted}
-      aria-label={reacted ? 'Remove applause' : 'Applaud'}
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 4,
-        padding: '4px 8px',
-        borderRadius: 999,
-        background: reacted ? AMBER_TINT_BG : 'transparent',
-        border: `1px solid ${reacted ? 'rgba(247,147,30,0.35)' : HAIRLINE}`,
-        color: reacted ? AMBER_DEEP : MUTE,
-        fontFamily: FONT,
-        fontSize: 11,
-        fontWeight: 700,
-        lineHeight: 1,
-        cursor: 'pointer',
-        flexShrink: 0,
-        fontFeatureSettings: '"tnum" 1',
-      }}
-    >
-      <span aria-hidden style={{ fontSize: 12 }}>👏</span>
-      {count > 0 ? <span style={{ fontVariantNumeric: 'tabular-nums' }}>{count}</span> : null}
-    </button>
-  );
-}
 
