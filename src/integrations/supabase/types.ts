@@ -17186,6 +17186,13 @@ export type Database = {
           course_count: number
         }[]
       }
+      get_course_crown_activity: {
+        Args: { p_course_id: string }
+        Returns: {
+          changes_30d: number
+          last_change_at: string
+        }[]
+      }
       get_course_hall_of_fame: {
         Args: never
         Returns: {
@@ -18171,7 +18178,7 @@ export type Database = {
       }
       get_my_handicap_percentile: { Args: never; Returns: Json }
       get_my_rival: {
-        Args: { p_user_id: string }
+        Args: { p_course_id?: string; p_user_id: string }
         Returns: {
           last_event_at: string
           last_event_desc: string
@@ -19096,7 +19103,7 @@ export type Database = {
         Returns: Json
       }
       get_under_threat: {
-        Args: { p_limit?: number; p_user_id: string }
+        Args: { p_course_id?: string; p_limit?: number; p_user_id: string }
         Returns: {
           attained_at: string
           category: string
