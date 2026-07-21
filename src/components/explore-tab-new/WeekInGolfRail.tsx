@@ -185,7 +185,7 @@ function RailCard({ row, onTap }: { row: WeekRow; onTap: () => void }) {
         borderRadius: 14,
         boxShadow: CARD_SHADOW,
         cursor: 'pointer',
-        cursor: 'pointer',
+
 
         fontFamily: FONT,
       }}
