@@ -289,14 +289,6 @@ function RailCard({ row, onTap }: { row: WeekRow; onTap: () => void }) {
             hairlineRing
           />
           <div style={{ fontSize: 10.5, color: MUTE, lineHeight: 1.2, flex: 1, minWidth: 0 }}>{rel}</div>
-          <ApplauseChip
-            reacted={!!row.my_reacted}
-            count={row.reaction_count ?? 0}
-            onTap={(e) => {
-              e.stopPropagation();
-              onApplause();
-            }}
-          />
         </div>
         <div
           style={{
