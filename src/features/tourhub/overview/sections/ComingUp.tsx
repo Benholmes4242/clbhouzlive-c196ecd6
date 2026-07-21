@@ -48,7 +48,8 @@ export function ComingUp({ tour }: { tour: TourId | null }) {
 
   if (isLoading && rows.length === 0) {
     return (
-      <SectionShell eyebrow={t('overview.comingUp.eyebrow')} linkLabel={t('overview.comingUp.linkLabel')} onLinkClick={() => navigate('/tourhub?tab=schedule')}>
+      <SectionShell eyebrow={t('overview.comingUp.eyebrow')} subline={t('overview.comingUp.subline')} linkLabel={t('overview.comingUp.linkLabel')} onLinkClick={() => navigate('/tourhub?tab=schedule')}>
+
         <div style={{ margin: '0 16px' }}>
           <V4Card style={{ overflow: 'hidden' }}>
             {[0, 1, 2, 3, 4].map((i) => (
