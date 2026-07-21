@@ -130,7 +130,7 @@ export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 
   return (
     <div
       style={{
-        margin: '0 16px 4px',
+        margin: '16px 16px 4px',
         padding: '10px 14px 10px',
         background: bg,
         border: `0.5px solid ${HAIRLINE}`,
@@ -154,7 +154,7 @@ export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 
         <Cell
           icon="👑"
           value={String(crownCount)}
-          label={crownCount === 1 ? 'crown here' : 'crowns here'}
+          label="crowns"
           emphasize={crownCount > 0}
         />
         {nearestMiss ? (
@@ -163,7 +163,7 @@ export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 
             <Cell
               icon="🎯"
               value={nearestMiss.split(' from')[0]}
-              label={`from a crown`}
+              label="from a crown"
               emphasize
               wide
             />
@@ -171,13 +171,14 @@ export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 
         ) : null}
         <Divider />
         <Cell
-          icon={changes > 0 ? '📈' : '·'}
-          value={changes > 0 ? String(changes) : '—'}
-          label={movementLabel}
+          icon="📈"
+          value={String(changes)}
+          label="changes this month"
           emphasize={changes > 0}
           wide
         />
       </div>
+
     </div>
   );
 
