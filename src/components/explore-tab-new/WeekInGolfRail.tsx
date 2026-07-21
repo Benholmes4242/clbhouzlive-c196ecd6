@@ -144,7 +144,6 @@ export function WeekInGolfRail(_props: WeekInGolfRailProps = {}) {
           gap: 12,
           overflowX: 'auto',
           padding: '4px 16px 12px',
-          scrollSnapType: 'x proximity',
           WebkitOverflowScrolling: 'touch',
         }}
         className="no-scrollbar"
@@ -186,7 +185,8 @@ function RailCard({ row, onTap }: { row: WeekRow; onTap: () => void }) {
         borderRadius: 14,
         boxShadow: CARD_SHADOW,
         cursor: 'pointer',
-        scrollSnapAlign: 'start',
+
+
         fontFamily: FONT,
       }}
     >
@@ -291,8 +291,8 @@ function SeeAllTile({ onTap }: { onTap: () => void }) {
         fontWeight: 600,
         fontFamily: FONT,
         cursor: 'pointer',
-        scrollSnapAlign: 'start',
       }}
+
     >
       See all ›
     </button>
