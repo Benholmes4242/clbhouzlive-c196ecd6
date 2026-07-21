@@ -843,7 +843,7 @@ const BusinessProfilePage: React.FC = () => {
       </section>
 
       {/* ───── Tab content ───── */}
-      <div className="pt-4 px-4 min-h-[60vh]">
+      <div className={cn('min-h-[60vh]', activeTab === 'posts' ? 'pt-0 px-0' : 'pt-4 px-4')}>
         {renderTab()}
       </div>
 
