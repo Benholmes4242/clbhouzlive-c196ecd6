@@ -204,7 +204,7 @@ export function FeedCard({
           />
         ) : null}
         {!hideFormatBadge ? <FormatBadge format={row.derived_format} /> : null}
-        {bareTile && row.course_name ? (
+        {bareTile && !hideCourseAttribution && row.course_name ? (
           <div
             aria-hidden
             style={{
