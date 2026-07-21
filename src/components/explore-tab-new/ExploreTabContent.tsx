@@ -31,6 +31,7 @@ import { SectionHead } from './SectionHead';
 import { AlmanacEmptyCard } from './AlmanacEmptyCard';
 
 import ExploreGrid from './ExploreGrid';
+import WeekInGolfRail from './WeekInGolfRail';
 
 import { SLATE_50 } from '@/features/courses/_shared/tokens';
 import { SPACE } from '@/lib/spacing';
@@ -144,6 +145,10 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
 
         {/* Toughest courses index */}
         <ToughestIndex />
+
+        {/* This week in golf — honours rail */}
+        <WeekInGolfRail />
+
 
         {/* Feed block */}
         <div

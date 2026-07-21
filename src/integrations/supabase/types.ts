@@ -19485,6 +19485,22 @@ export type Database = {
           width: number
         }[]
       }
+      get_week_in_golf: {
+        Args: { p_limit?: number }
+        Returns: {
+          avatar_url: string
+          course_id: string
+          display_name: string
+          event_type: string
+          line1: string
+          line2: string
+          occurred_at: string
+          rarity: number
+          user_id: string
+          username: string
+          window_days: number
+        }[]
+      }
       get_wire_activity: {
         Args: never
         Returns: {
