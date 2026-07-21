@@ -20,6 +20,8 @@ import { DrilldownHeader } from './drilldown/DrilldownHeader';
 import { CrownCabinet } from './drilldown/CrownCabinet';
 import { ChampionsDuelCard } from './drilldown/ChampionsDuelCard';
 import { ChampionsUnclaimedCard } from './drilldown/ChampionsUnclaimedCard';
+import { YouAtThisClubStrip } from './drilldown/YouAtThisClubStrip';
+import { CourseRivalryLine } from './drilldown/CourseRivalryLine';
 
 import { FullCourseLeaderboardSheet } from './drilldown/FullCourseLeaderboardSheet';
 import { FullCourseLeaderboardSheetDispatch } from './drilldown/FullCourseLeaderboardSheetDispatch';
