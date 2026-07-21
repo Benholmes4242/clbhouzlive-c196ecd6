@@ -87,7 +87,7 @@ export function AcesAlbatrossesPodium({
             avatarUserId={row.user_id}
             name={name}
             subline={row.course_name ?? undefined}
-            chip={{ label: isAce ? 'ACE' : 'ALBATROSS', tone: isAce ? 'ace' : 'albatross' }}
+            chip={{ label: isAce ? 'HOLE IN ONE' : 'ALBATROSS', tone: isAce ? 'ace' : 'albatross' }}
             timestamp={when ? relativeTime(when) : undefined}
             isLast={i === merged.length - 1}
             onPress={
