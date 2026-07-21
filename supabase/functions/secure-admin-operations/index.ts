@@ -40,7 +40,8 @@ type AdminAction =
   | 'warn_user'
   | 'hide_post'
   | 'unhide_post'
-  | 'delete_course';
+  | 'delete_course'
+  | 'change_username';
 
 interface AdminOperationRequest {
   action: AdminAction;
@@ -52,7 +53,12 @@ interface AdminOperationRequest {
   message?: string;
   suspended?: boolean;
   durationDays?: number | null;
+  newUsername?: string;
 }
+
+// Username format — source of truth: src/pages/ManageProfile.tsx L140
+// /^[a-z0-9_.]{3,20}$/ applied after trim + lowercase.
+const USERNAME_RE = /^[a-z0-9_.]{3,20}$/;
 
 const ALLOWED_NONFULL_DURATIONS = new Set<number>([1, 7, 30]);
 
@@ -133,10 +139,11 @@ serve(async (req) => {
       message,
       suspended,
       durationDays,
+      newUsername,
     } = body;
 
     // Per-action gate
-    const fullOnlyActions: AdminAction[] = ['delete_user', 'reset_password', 'delete_course'];
+    const fullOnlyActions: AdminAction[] = ['delete_user', 'reset_password', 'delete_course', 'change_username'];
     const moderationActions: AdminAction[] = [
       'suspend_user', 'unsuspend', 'warn_user', 'hide_post', 'unhide_post',
     ];
@@ -560,6 +567,83 @@ serve(async (req) => {
         }
 
         auditDetails = { courseId, reason };
+        break;
+      }
+
+      case 'change_username': {
+        if (!targetUserId || !newUsername) {
+          return new Response(JSON.stringify({ error: 'targetUserId and newUsername required' }), {
+            status: 400, headers: { ...headers, 'Content-Type': 'application/json' },
+          });
+        }
+        const candidate = String(newUsername).trim().toLowerCase();
+        if (!USERNAME_RE.test(candidate)) {
+          return new Response(JSON.stringify({ error: 'invalid_format' }), {
+            status: 400, headers: { ...headers, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Load target current username first (for audit + no-op check).
+        const { data: targetProfile, error: targetErr } = await supabase
+          .from('user_profiles')
+          .select('username')
+          .eq('id', targetUserId)
+          .maybeSingle();
+        if (targetErr || !targetProfile) {
+          return new Response(JSON.stringify({ error: 'target_not_found' }), {
+            status: 404, headers: { ...headers, 'Content-Type': 'application/json' },
+          });
+        }
+        const oldUsername = targetProfile.username ?? null;
+        if (oldUsername === candidate) {
+          result = { success: true, message: 'Username unchanged' };
+          auditDetails = { newUsername: candidate, oldUsername, noop: true };
+          break;
+        }
+
+        // Case-insensitive uniqueness check, excluding the target.
+        const escaped = candidate.replace(/[\\%_]/g, '\\$&');
+        const { count: takenCount, error: takenErr } = await supabase
+          .from('user_profiles')
+          .select('id', { count: 'exact', head: true })
+          .ilike('username', escaped)
+          .neq('id', targetUserId);
+        if (takenErr) {
+          result = { error: takenErr.message };
+          auditDetails.error = takenErr.message;
+          break;
+        }
+        if ((takenCount ?? 0) > 0) {
+          return new Response(JSON.stringify({ error: 'username_taken' }), {
+            status: 409, headers: { ...headers, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // username_is_custom semantics (src/hooks/useProfileSave.ts L90-97):
+        // setting true locks the username the same way a user-chosen save does.
+        const { error: updErr } = await supabase
+          .from('user_profiles')
+          .update({ username: candidate, username_is_custom: true })
+          .eq('id', targetUserId);
+        if (updErr) {
+          result = { error: updErr.message };
+          auditDetails.error = updErr.message;
+          break;
+        }
+
+        // Analytics audit trail (required by brief).
+        await supabase.from('analytics_events').insert({
+          name: 'admin_username_changed',
+          user_id: user.id,
+          props: {
+            target_user_id: targetUserId,
+            old_username: oldUsername,
+            new_username: candidate,
+          },
+        });
+
+        auditDetails = { oldUsername, newUsername: candidate };
+        result = { success: true, message: `Username changed to @${candidate}`, username: candidate };
         break;
       }
     }

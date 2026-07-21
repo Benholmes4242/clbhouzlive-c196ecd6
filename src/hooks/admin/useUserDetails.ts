@@ -212,11 +212,43 @@ export function useUserActions() {
     }
   }, []);
 
+  const changeUsername = useCallback(async (userId: string, newUsername: string) => {
+    setLoading(userId);
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      const token = sess.session?.access_token;
+      const url = `${(supabase as any).functionsUrl ?? ''}/secure-admin-operations`;
+      const res = await fetch(url || `https://ybxkehyomcakqjvuhnna.supabase.co/functions/v1/secure-admin-operations`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token ?? ''}`,
+        },
+        body: JSON.stringify({
+          action: 'change_username',
+          targetUserId: userId,
+          newUsername,
+        }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok || body?.error) {
+        return { success: false, error: body?.error ?? `HTTP ${res.status}` };
+      }
+      return { success: true, data: body };
+    } catch (error) {
+      console.error('Error changing username:', error);
+      return { success: false, error };
+    } finally {
+      setLoading(null);
+    }
+  }, []);
+
   return {
     loading,
     changeRole,
     suspendUser,
     deleteUser,
     resetPassword,
+    changeUsername,
   };
 }
