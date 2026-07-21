@@ -65,16 +65,21 @@ const CATEGORY_META: Record<
   string,
   { label: string; unit: string; unitSingular: string }
 > = {
-  lowest_gross: { label: 'Gross', unit: 'strokes', unitSingular: 'stroke' },
-  best_score_diff: { label: 'Score', unit: 'strokes', unitSingular: 'stroke' },
-  most_birdies: { label: 'Birdies', unit: 'birdies', unitSingular: 'birdie' },
-  best_stableford: { label: 'Stableford', unit: 'points', unitSingular: 'point' },
-  most_eagles: { label: 'Eagles', unit: 'eagles', unitSingular: 'eagle' },
-  most_aces: { label: 'Hole-in-one', unit: 'aces', unitSingular: 'ace' },
+  lowest_gross: { label: 'Lowest gross', unit: 'strokes', unitSingular: 'stroke' },
+  best_score_diff: { label: 'Best score diff', unit: 'strokes', unitSingular: 'stroke' },
+  most_birdies: { label: 'Most birdies', unit: 'birdies', unitSingular: 'birdie' },
+  best_stableford: { label: 'Best stableford', unit: 'points', unitSingular: 'point' },
+  most_eagles: { label: 'Most eagles', unit: 'eagles', unitSingular: 'eagle' },
+  most_aces: { label: 'Most hole-in-one', unit: 'aces', unitSingular: 'ace' },
   most_rounds: { label: 'Most rounds', unit: 'rounds', unitSingular: 'round' },
 };
 function stripWindow(category: string): string {
   return category.replace(/_(90d|all_time)$/, '');
+}
+function windowSuffix(category: string): string {
+  if (category.endsWith('_all_time')) return ' (all-time)';
+  if (category.endsWith('_90d')) return ' (90 days)';
+  return '';
 }
 function gapCopyAttack(category: string, gap: number): string {
   const base = stripWindow(category);
@@ -84,10 +89,25 @@ function gapCopyAttack(category: string, gap: number): string {
   const unit = n === 1 ? meta.unitSingular : meta.unit;
   return `${n} ${unit}`;
 }
+function sentenceCase(raw: string): string {
+  const s = raw.replace(/_/g, ' ').trim();
+  return s.length ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : s;
+}
 function categoryLabel(category: string): string {
   const base = stripWindow(category);
-  return CATEGORY_META[base]?.label ?? base.replace(/_/g, ' ');
+  const meta = CATEGORY_META[base];
+  if (!meta) {
+    // Unknown key — sentence-case the raw string and flag once for triage.
+    if (typeof console !== 'undefined' && !seenUnmapped.has(base)) {
+      seenUnmapped.add(base);
+      // eslint-disable-next-line no-console
+      console.warn('[AttackDefendBand] unmapped conquest category:', base);
+    }
+    return sentenceCase(base) + windowSuffix(category);
+  }
+  return meta.label + windowSuffix(category);
 }
+const seenUnmapped = new Set<string>();
 function progressPct(_category: string, gap: number): number {
   const n = Math.max(1, Math.round(gap));
   return Math.max(20, 96 - (n - 1) * 14);
