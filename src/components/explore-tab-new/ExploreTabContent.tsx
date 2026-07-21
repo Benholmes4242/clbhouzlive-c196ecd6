@@ -35,6 +35,7 @@ import WeekInGolfRail from './WeekInGolfRail';
 import { RivalryCard } from './RivalryCard';
 import { WeeklyChallengeCard } from './WeeklyChallengeCard';
 import { SeasonRaceCard } from './SeasonRaceCard';
+import { PickemCard } from './PickemCard';
 
 import { SLATE_50 } from '@/features/courses/_shared/tokens';
 import { SPACE } from '@/lib/spacing';
@@ -127,6 +128,7 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 24 }}>
           <WeeklyChallengeCard userId={userId} />
           <SeasonRaceCard userId={userId} />
+          <PickemCard userId={userId} />
         </div>
 
         {/* Feats: header + aces/albatrosses podium pair */}
