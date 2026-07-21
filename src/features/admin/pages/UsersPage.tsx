@@ -770,7 +770,169 @@ function Member360Sheet({
           </div>
         </div>
       )}
+      {detail && (
+        <ChangeUsernameSheet
+          open={renameOpen}
+          onClose={() => setRenameOpen(false)}
+          userId={detail.id}
+          currentUsername={detail.username ?? null}
+        />
+      )}
     </DetailDrawer>
+  );
+}
+
+/* ─── Change username sheet (Full admins only) ─── */
+
+const USERNAME_RE = /^[a-z0-9_.]{3,20}$/;
+
+function ChangeUsernameSheet({
+  open, onClose, userId, currentUsername,
+}: {
+  open: boolean;
+  onClose: () => void;
+  userId: string;
+  currentUsername: string | null;
+}) {
+  const qc = useQueryClient();
+  const actions = useUserActions();
+  const [value, setValue] = useState('');
+  const [status, setStatus] = useState<'idle' | 'invalid' | 'checking' | 'available' | 'taken' | 'error'>('idle');
+  const [saving, setSaving] = useState(false);
+  const checkRef = useRef<ReturnType<typeof setTimeout>>();
+
+  useEffect(() => {
+    if (open) {
+      setValue('');
+      setStatus('idle');
+    }
+    return () => { if (checkRef.current) clearTimeout(checkRef.current); };
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    if (checkRef.current) clearTimeout(checkRef.current);
+    const candidate = value.trim().toLowerCase();
+    if (!candidate) { setStatus('idle'); return; }
+    if (!USERNAME_RE.test(candidate)) { setStatus('invalid'); return; }
+    if (candidate === (currentUsername ?? '')) { setStatus('idle'); return; }
+    setStatus('checking');
+    checkRef.current = setTimeout(async () => {
+      try {
+        const escaped = candidate.replace(/[\\%_]/g, '\\$&');
+        const { count, error } = await supabase
+          .from('user_profiles')
+          .select('id', { count: 'exact', head: true })
+          .ilike('username', escaped)
+          .neq('id', userId);
+        if (error) { setStatus('error'); return; }
+        setStatus((count ?? 0) > 0 ? 'taken' : 'available');
+      } catch {
+        setStatus('error');
+      }
+    }, 400);
+  }, [value, open, userId, currentUsername]);
+
+  const canSave = status === 'available' && !saving;
+
+  const onSave = async () => {
+    if (!canSave) return;
+    const candidate = value.trim().toLowerCase();
+    setSaving(true);
+    const res = await actions.changeUsername(userId, candidate);
+    setSaving(false);
+    if (res.success) {
+      toast.success('Username changed');
+      qc.invalidateQueries({ queryKey: ['admin-v2', 'users'] });
+      qc.invalidateQueries({ queryKey: ['admin-v2', 'users', 'detail', userId] });
+      qc.invalidateQueries({ queryKey: ['admin-user-details', userId] });
+      qc.invalidateQueries({ queryKey: ['user-profile', userId] });
+      onClose();
+    } else {
+      const err = String((res as any).error ?? '');
+      if (err === 'username_taken') {
+        toast.error('That username was just taken');
+        setStatus('taken');
+      } else if (err === 'invalid_format') {
+        toast.error('Invalid username format');
+        setStatus('invalid');
+      } else {
+        toast.error(err || 'Failed to change username');
+      }
+    }
+  };
+
+  const hint =
+    status === 'invalid' ? 'Use 3–20 characters: lowercase letters, digits, underscores, or dots.'
+    : status === 'checking' ? 'Checking availability…'
+    : status === 'available' ? 'Available'
+    : status === 'taken' ? 'Taken'
+    : status === 'error' ? 'Check failed — try again'
+    : '3–20 chars: a–z, 0–9, underscore, dot.';
+  const hintColor =
+    status === 'available' ? t.ok
+    : (status === 'taken' || status === 'invalid' || status === 'error') ? t.danger
+    : t.inkMuted;
+
+  return (
+    <AdminSheet
+      open={open}
+      onClose={onClose}
+      title="Change username"
+      subtitle={currentUsername ? `Current: @${currentUsername}` : 'No current username'}
+      footer={
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+          <button
+            onClick={onClose}
+            disabled={saving}
+            style={{
+              padding: '8px 14px', borderRadius: t.radius.md,
+              border: `1px solid ${t.line}`, background: t.surface, color: t.ink,
+              fontSize: 13, fontWeight: 600, cursor: 'pointer',
+            }}
+          >Cancel</button>
+          <button
+            onClick={onSave}
+            disabled={!canSave}
+            style={{
+              padding: '8px 14px', borderRadius: t.radius.md,
+              border: 'none', background: t.ink, color: t.surface,
+              fontSize: 13, fontWeight: 700,
+              cursor: canSave ? 'pointer' : 'not-allowed',
+              opacity: canSave ? 1 : 0.55,
+            }}
+          >{saving ? 'Saving…' : 'Save'}</button>
+        </div>
+      }
+    >
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <label style={{ fontSize: 12, fontWeight: 700, color: t.inkMuted, textTransform: 'uppercase', letterSpacing: 0.6 }}>
+          New username
+        </label>
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 6,
+          border: `1px solid ${t.line}`, borderRadius: t.radius.md,
+          background: t.surface, padding: '10px 12px',
+        }}>
+          <span style={{ color: t.inkMuted, fontSize: 14, fontWeight: 600 }}>@</span>
+          <input
+            autoFocus
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            placeholder="new_username"
+            maxLength={20}
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+            style={{
+              flex: 1, border: 'none', outline: 'none', background: 'transparent',
+              fontSize: 14, color: t.ink, fontFamily: 'inherit',
+            }}
+          />
+        </div>
+        <div style={{ fontSize: 12, color: hintColor }}>{hint}</div>
+      </div>
+    </AdminSheet>
   );
 }
 
