@@ -239,6 +239,7 @@
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
+      "subline": "Our picks for the tournament",
       "linkLabel": "All picks",
       "confidenceHigh": "High",
       "confidenceSolid": "Solid",

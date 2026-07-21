@@ -9,6 +9,7 @@ import { SPACE } from '@/lib/spacing';
 
 export function SectionShell({
   eyebrow,
+  subline,
   linkLabel,
   onLinkClick,
   children,
@@ -16,6 +17,7 @@ export function SectionShell({
   rightMeta,
 }: {
   eyebrow: string;
+  subline?: string;
   linkLabel?: string;
   onLinkClick?: () => void;
   children: ReactNode;
@@ -24,10 +26,17 @@ export function SectionShell({
 }) {
   return (
     <section style={{ padding: '0 0 4px' }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', padding: `0 ${SPACE.pagePadX}px`, marginBottom: SPACE.sectionHeaderContent }}>
-        <span style={{ fontSize: 10.5, fontWeight: 800, color: eyebrowColor ?? V4.slate, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-          {eyebrow}
-        </span>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: `0 ${SPACE.pagePadX}px`, marginBottom: SPACE.sectionHeaderContent }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <span style={{ fontSize: 10.5, fontWeight: 800, color: eyebrowColor ?? V4.slate, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+            {eyebrow}
+          </span>
+          {subline && (
+            <span style={{ fontSize: 13, fontWeight: 600, color: V4.ink, letterSpacing: '-0.01em' }}>
+              {subline}
+            </span>
+          )}
+        </div>
         {rightMeta ? (
           <span style={{ color: V4.inkFaint, fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', fontVariantNumeric: 'tabular-nums' }}>
             {rightMeta}
