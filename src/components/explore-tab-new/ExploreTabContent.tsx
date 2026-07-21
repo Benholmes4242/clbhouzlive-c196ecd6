@@ -19,7 +19,7 @@ import { TierSeeAllSheet } from './TierSeeAllSheet';
 
 import { scrollPageToTop } from '@/lib/getScrollParent';
 
-import { RankIdentityCard } from './RankIdentityCard';
+
 import { TheRecordBook } from './TheRecordBook';
 
 import { AcesAlbatrossesPodium } from './AcesAlbatrossesPodium';
