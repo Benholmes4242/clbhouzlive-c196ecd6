@@ -212,7 +212,7 @@ function RailCard({ row, onTap }: { row: WeekRow; onTap: () => void }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10, minWidth: 0, width: '100%' }}>
         <SquircleAvatar
           src={row.avatar_url ?? undefined}
-          name={displayName}
+          alt={displayName}
           size="xs"
           hairlineRing
         />
@@ -402,7 +402,7 @@ function SheetRow({ row, onTap }: { row: WeekRow; onTap: () => void }) {
         fontFamily: FONT,
       }}
     >
-      <SquircleAvatar src={row.avatar_url ?? undefined} name={displayName} size="sm" hairlineRing />
+      <SquircleAvatar src={row.avatar_url ?? undefined} alt={displayName} size="sm" hairlineRing />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, minWidth: 0 }}>
           <div
