@@ -104,7 +104,11 @@ export const EVENT_LABELS: Record<string, string> = {
   message_sent: 'Message sent',
 
   // ─── Stability ────────────────────────────────────────────────
+  // ─── Stability ────────────────────────────────────────────────
   app_error: 'App error',
+
+  // ─── Admin operations ─────────────────────────────────────────
+  admin_username_changed: 'Username changed by admin',
 };
 
 export function titleize(name: string): string {
