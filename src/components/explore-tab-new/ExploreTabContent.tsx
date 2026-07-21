@@ -113,7 +113,8 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
           onScopeChange={setScope}
         />
 
-
+        {/* Rivalry — sits below the identity/Attack-Defend band */}
+        <RivalryCard userId={userId} />
 
         <AlmanacEmptyCard region={activeRegion} />
 
@@ -121,6 +122,12 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
 
         {/* This week in golf — honours rail (between "Your next conquests" and "Latest honours") */}
         <WeekInGolfRail />
+
+        {/* Weekly challenge + Season race pair, right after This week in golf */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 24 }}>
+          <WeeklyChallengeCard userId={userId} />
+          <SeasonRaceCard userId={userId} />
+        </div>
 
         {/* Feats: header + aces/albatrosses podium pair */}
         <LegendarySection
