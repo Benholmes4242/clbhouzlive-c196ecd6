@@ -77,6 +77,20 @@ serve(async (req) => {
     });
   }
 
+  // Unauthenticated ping to verify running function version.
+  // Bump FUNCTION_VERSION on every change to this function.
+  const FUNCTION_VERSION = '2026-07-21T09:00:00Z';
+  try {
+    const peek = req.clone();
+    const peekBody = await peek.json().catch(() => null);
+    if (peekBody?.action === 'ping') {
+      return new Response(JSON.stringify({ version: FUNCTION_VERSION }), {
+        status: 200,
+        headers: { ...headers, 'Content-Type': 'application/json' },
+      });
+    }
+  } catch (_) { /* fall through */ }
+
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
     const anonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
