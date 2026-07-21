@@ -4702,6 +4702,24 @@ export type Database = {
         }
         Relationships: []
       }
+      feat_reactions: {
+        Row: {
+          created_at: string
+          event_key: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_key: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event_key?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       featured_rounds_history: {
         Row: {
           featured_at: string
@@ -18092,6 +18110,18 @@ export type Database = {
         }[]
       }
       get_my_handicap_percentile: { Args: never; Returns: Json }
+      get_my_rival: {
+        Args: { p_user_id: string }
+        Returns: {
+          last_event_at: string
+          last_event_desc: string
+          my_takes: number
+          rival_avatar: string
+          rival_name: string
+          rival_user_id: string
+          their_takes: number
+        }[]
+      }
       get_my_streaks: {
         Args: never
         Returns: {
@@ -18444,6 +18474,20 @@ export type Database = {
           season_start_handicap: number
           user_id: string
           username: string
+        }[]
+      }
+      get_season_race: {
+        Args: { p_user_id?: string }
+        Returns: {
+          avatar_url: string
+          crowns_taken: number
+          days_left: number
+          display_name: string
+          is_viewer: boolean
+          rank: number
+          season_name: string
+          season_number: number
+          user_id: string
         }[]
       }
       get_season_recap: {
@@ -18978,6 +19022,24 @@ export type Database = {
           p_user_id: string
         }
         Returns: Json
+      }
+      get_under_threat: {
+        Args: { p_limit?: number; p_user_id: string }
+        Returns: {
+          attained_at: string
+          category: string
+          category_label: string
+          challenger_active_7d: boolean
+          challenger_avatar: string
+          challenger_name: string
+          challenger_user_id: string
+          challenger_value: number
+          course_id: string
+          course_name: string
+          gap: number
+          my_value: number
+          threat_score: number
+        }[]
       }
       get_unread_notification_count: {
         Args: { p_actor_id?: string; p_actor_type?: string; p_user_id: string }
@@ -19583,19 +19645,39 @@ export type Database = {
         }[]
       }
       get_week_in_golf: {
-        Args: { p_limit?: number }
+        Args: { p_limit?: number; p_user_id?: string }
         Returns: {
           avatar_url: string
           course_id: string
           display_name: string
+          event_key: string
           event_type: string
           line1: string
           line2: string
+          my_reacted: boolean
           occurred_at: string
           rarity: number
+          reaction_count: number
           user_id: string
           username: string
           window_days: number
+        }[]
+      }
+      get_weekly_challenge: {
+        Args: { p_user_id?: string }
+        Returns: {
+          avatar_url: string
+          challenge_key: string
+          challenge_metric: string
+          challenge_title: string
+          days_left: number
+          display_name: string
+          is_viewer: boolean
+          metric_value: number
+          rank: number
+          user_id: string
+          week_end: string
+          week_start: string
         }[]
       }
       get_wire_activity: {
@@ -20993,6 +21075,13 @@ export type Database = {
         Returns: undefined
       }
       toggle_comment_like_v2: { Args: { p_comment_id: string }; Returns: Json }
+      toggle_feat_reaction: {
+        Args: { p_event_key: string }
+        Returns: {
+          reacted: boolean
+          reaction_count: number
+        }[]
+      }
       toggle_whs_round_reaction: {
         Args: { p_reaction_type?: string; p_score_id: string }
         Returns: {
