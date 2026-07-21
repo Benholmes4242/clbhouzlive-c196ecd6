@@ -32,7 +32,7 @@ export function SectionShell({
             {eyebrow}
           </span>
           {subline && (
-            <span style={{ fontSize: 13, fontWeight: 600, color: V4.ink, letterSpacing: '-0.01em' }}>
+            <span style={{ fontSize: 13, fontWeight: 700, color: V4.ink, letterSpacing: '-0.005em', lineHeight: 1.35 }}>
               {subline}
             </span>
           )}

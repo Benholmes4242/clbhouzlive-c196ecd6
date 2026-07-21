@@ -86,7 +86,7 @@ export function WorldRankings({ tour }: { tour: TourId }) {
 
   return (
     <SectionShell eyebrow={t('overview.rankings.sectionEyebrow')} linkLabel={t('overview.rankings.linkLabel')} onLinkClick={() => navigate('/tourhub?tab=leaderboards')}>
-      <div style={{ padding: '0 16px 10px', fontSize: 11, fontWeight: 600, color: V4.inkMute }}>
+      <div style={{ padding: '0 16px 10px', fontSize: 13, fontWeight: 700, color: V4.ink, letterSpacing: '-0.005em', lineHeight: 1.35 }}>
         {t(mapping.labelKey)}
       </div>
 
