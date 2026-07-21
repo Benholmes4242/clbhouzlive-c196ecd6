@@ -108,7 +108,7 @@ export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 
     },
   });
 
-  const crownCount = crowns?.length ?? 0;
+  const crownCount = heldCountOverride ?? crowns?.length ?? 0;
 
   const nearestMiss = useMemo(() => {
     if (!reach) return null;
@@ -120,14 +120,12 @@ export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 
   }, [reach, courseId]);
 
   const changes = activity?.changes_30d ?? 0;
-  const movementLabel = changes > 0
-    ? `${changes} crown change${changes === 1 ? '' : 's'} this month`
-    : 'Quiet month';
 
   if (!userId) return null;
 
   const isLight = theme === 'light';
   const bg = isLight ? 'rgba(15,23,42,0.02)' : 'rgba(255,255,255,0.02)';
+
 
   return (
     <div
