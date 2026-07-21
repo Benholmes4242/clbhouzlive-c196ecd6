@@ -212,11 +212,38 @@ export function useUserActions() {
     }
   }, []);
 
+  const changeUsername = useCallback(async (userId: string, newUsername: string) => {
+    setLoading(userId);
+    try {
+      const { data, error } = await supabase.functions.invoke('secure-admin-operations', {
+        body: {
+          action: 'change_username',
+          targetUserId: userId,
+          newUsername,
+        },
+      });
+      if (error) {
+        // Edge function non-2xx bodies are surfaced as FunctionsHttpError; try to unwrap.
+        const anyErr = error as any;
+        const bodyErr = anyErr?.context?.error ?? anyErr?.message;
+        return { success: false, error: bodyErr ?? 'unknown_error' };
+      }
+      if (data?.error) return { success: false, error: data.error };
+      return { success: true, data };
+    } catch (error) {
+      console.error('Error changing username:', error);
+      return { success: false, error };
+    } finally {
+      setLoading(null);
+    }
+  }, []);
+
   return {
     loading,
     changeRole,
     suspendUser,
     deleteUser,
     resetPassword,
+    changeUsername,
   };
 }
