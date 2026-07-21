@@ -529,7 +529,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
               <span style={{ opacity: 0.4 }}>·</span>
               <span>
                 <b style={{ color: 'rgba(255,255,255,0.85)', fontWeight: 800 }}>{legendTitles}</b>{' '}
-                legend titles
+                {legendTitles === 1 ? 'course crown' : 'course crowns'}
               </span>
             </div>
           </div>
