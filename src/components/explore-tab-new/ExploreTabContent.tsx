@@ -19,7 +19,7 @@ import { TierSeeAllSheet } from './TierSeeAllSheet';
 
 import { scrollPageToTop } from '@/lib/getScrollParent';
 
-import { RankIdentityCard } from './RankIdentityCard';
+
 import { TheRecordBook } from './TheRecordBook';
 
 import { AcesAlbatrossesPodium } from './AcesAlbatrossesPodium';
@@ -104,9 +104,8 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
       <div>
 
         {shellTabs}
-        {/* Your standing — glanceable crowns / rank / streak strip at the very top */}
+        {/* Your standing — merged identity + standing band (crowns / rank+progress / hcp) */}
         <YourStandingStrip userId={userId} />
-        <RankIdentityCard userId={userId} variant="strip" />
       </div>
 
       <div>
