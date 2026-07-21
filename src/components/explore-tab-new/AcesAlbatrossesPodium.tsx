@@ -108,7 +108,6 @@ export function AcesAlbatrossesPodium({
           const parts: string[] = [];
           if (otherLabel) parts.push(otherLabel);
           if (r.holder_club) parts.push(r.holder_club);
-          if (r.holder_hcp != null) parts.push(`HCP ${formatHcp(r.holder_hcp)}`);
           const combined = parts.join(' \u00B7 ');
           const name = formatHolderName(r.holder_name) || 'A member';
           return (
