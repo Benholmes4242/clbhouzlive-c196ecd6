@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
+import { parseAdminOpError } from '@/features/admin/lib/parseAdminOpError';
 
 export interface UserStats {
   postsCount: number;
@@ -123,21 +124,6 @@ export function useUserDetails(userId: string | null) {
   });
 }
 
-async function extractFnError(error: unknown): Promise<string> {
-  const anyErr = error as any;
-  try {
-    const ctx = anyErr?.context;
-    if (ctx && typeof ctx.json === 'function') {
-      const body = await ctx.json();
-      if (body?.error) return String(body.error);
-    }
-    if (ctx && typeof ctx.text === 'function') {
-      const txt = await ctx.text();
-      if (txt) return txt;
-    }
-  } catch (_) { /* ignore */ }
-  return anyErr?.message ?? 'Request failed';
-}
 
 export function useUserActions() {
   const [loading, setLoading] = useState<string | null>(null);
@@ -174,11 +160,10 @@ export function useUserActions() {
           reason: 'Admin suspended user',
         },
       });
-      if (error) {
-        const msg = await extractFnError(error);
+      if (error || (data as any)?.error) {
+        const msg = await parseAdminOpError(error, data, 'Failed to suspend user');
         return { success: false, error: new Error(msg) };
       }
-      if (data?.error) return { success: false, error: new Error(String(data.error)) };
       return { success: true, data };
     } catch (error) {
       console.error('Error suspending user:', error);
@@ -198,11 +183,10 @@ export function useUserActions() {
           reason: 'Admin requested user deletion',
         },
       });
-      if (error) {
-        const msg = await extractFnError(error);
+      if (error || (data as any)?.error) {
+        const msg = await parseAdminOpError(error, data, 'Failed to delete user');
         return { success: false, error: new Error(msg) };
       }
-      if (data?.error) return { success: false, error: new Error(String(data.error)) };
       return { success: true };
     } catch (error) {
       console.error('Error deleting user:', error);
@@ -223,11 +207,10 @@ export function useUserActions() {
           reason: 'Admin requested password reset',
         },
       });
-      if (error) {
-        const msg = await extractFnError(error);
+      if (error || (data as any)?.error) {
+        const msg = await parseAdminOpError(error, data, 'Failed to reset password');
         return { success: false, error: new Error(msg) };
       }
-      if (data?.error) return { success: false, error: new Error(String(data.error)) };
       return { success: true };
     } catch (error) {
       console.error('Error resetting password:', error);
@@ -240,26 +223,18 @@ export function useUserActions() {
   const changeUsername = useCallback(async (userId: string, newUsername: string) => {
     setLoading(userId);
     try {
-      const { data: sess } = await supabase.auth.getSession();
-      const token = sess.session?.access_token;
-      const url = `${(supabase as any).functionsUrl ?? ''}/secure-admin-operations`;
-      const res = await fetch(url || `https://ybxkehyomcakqjvuhnna.supabase.co/functions/v1/secure-admin-operations`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token ?? ''}`,
-        },
-        body: JSON.stringify({
+      const { data, error } = await supabase.functions.invoke('secure-admin-operations', {
+        body: {
           action: 'change_username',
           targetUserId: userId,
           newUsername,
-        }),
+        },
       });
-      const body = await res.json().catch(() => ({}));
-      if (!res.ok || body?.error) {
-        return { success: false, error: body?.error ?? `HTTP ${res.status}` };
+      if (error || (data as any)?.error) {
+        const msg = await parseAdminOpError(error, data, 'Failed to change username');
+        return { success: false, error: msg };
       }
-      return { success: true, data: body };
+      return { success: true, data };
     } catch (error) {
       console.error('Error changing username:', error);
       return { success: false, error };

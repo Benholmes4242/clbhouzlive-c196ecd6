@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/lib/toast';
 import { supabase } from '@/integrations/supabase/client';
 import { QUEUE_QUERY_KEY, type ReportKind } from './useModerationQueue';
+import { parseAdminOpError } from '@/features/admin/lib/parseAdminOpError';
 
 type Table = 'reports' | 'post_reports';
 
@@ -14,9 +15,9 @@ async function currentUserId(): Promise<string | null> {
 
 async function invokeAdmin(body: Record<string, unknown>): Promise<{ data: any; error: Error | null }> {
   const { data, error } = await supabase.functions.invoke('secure-admin-operations', { body });
-  if (error) return { data: null, error };
-  if (data && typeof data === 'object' && 'error' in data && (data as any).error) {
-    return { data: null, error: new Error(String((data as any).error)) };
+  if (error || (data as any)?.error) {
+    const msg = await parseAdminOpError(error, data, 'Admin operation failed');
+    return { data: null, error: new Error(msg) };
   }
   return { data, error: null };
 }

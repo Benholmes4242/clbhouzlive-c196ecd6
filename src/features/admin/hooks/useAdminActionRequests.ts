@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/lib/toast';
 import { supabase } from '@/integrations/supabase/client';
+import { parseAdminOpError } from '@/features/admin/lib/parseAdminOpError';
 
 export type AdminActionType = 'permanent_ban' | 'delete_user' | 'role_change';
 export type AdminRequestStatus = 'pending' | 'approved' | 'rejected' | 'cancelled';
@@ -207,20 +208,21 @@ export function useAdminActionRequestActions() {
             reason: payload.reason ?? 'Permanent ban approved',
           },
         });
-        if (error) throw error;
-        if (data && (data as any).error) throw new Error((data as any).error);
+        if (error || (data as any)?.error) {
+          throw new Error(await parseAdminOpError(error, data, 'Failed to apply permanent ban'));
+        }
       } else if (req.action_type === 'delete_user') {
         if (!req.target_user_id) throw new Error('Missing target user');
         const { data, error } = await supabase.functions.invoke('secure-admin-operations', {
           body: {
             action: 'delete_user',
             targetUserId: req.target_user_id,
-            targetEmail: req.target_email ?? payload.targetEmail ?? undefined,
             reason: payload.reason ?? 'Deletion approved',
           },
         });
-        if (error) throw error;
-        if (data && (data as any).error) throw new Error((data as any).error);
+        if (error || (data as any)?.error) {
+          throw new Error(await parseAdminOpError(error, data, 'Failed to delete user'));
+        }
       } else if (req.action_type === 'role_change') {
         if (!req.target_user_id) throw new Error('Missing target user');
         const roleAction = payload.roleAction as

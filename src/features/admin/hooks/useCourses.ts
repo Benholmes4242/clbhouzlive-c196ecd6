@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/lib/toast';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useGolfCoursesStats } from '@/hooks/admin/useGolfCoursesStats';
+import { parseAdminOpError } from '@/features/admin/lib/parseAdminOpError';
 
 export interface AdminCourseRow {
   id: string;
@@ -183,10 +184,10 @@ export function useCourses() {
       const { data, error } = await supabase.functions.invoke('secure-admin-operations', {
         body: { action: 'delete_course', courseId: id },
       });
-      if (error) throw error;
-      if (data?.error) {
-        const e = new Error(data.reason ?? data.error) as any;
-        e.counts = data.counts;
+      if (error || (data as any)?.error) {
+        const msg = await parseAdminOpError(error, data, 'Failed to delete course');
+        const e = new Error(msg) as any;
+        e.counts = (data as any)?.counts;
         throw e;
       }
       return data;
@@ -197,7 +198,7 @@ export function useCourses() {
     },
     onError: (err: any) => {
       if (err?.counts) toast.error('Cannot delete this course', { description: err.message, duration: 8000 });
-      else toast.error('Failed to delete course');
+      else toast.error(err?.message ?? 'Failed to delete course');
     },
   });
 

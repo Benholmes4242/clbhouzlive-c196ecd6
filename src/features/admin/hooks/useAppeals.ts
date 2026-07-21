@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/lib/toast';
 import { supabase } from '@/integrations/supabase/client';
+import { parseAdminOpError } from '@/features/admin/lib/parseAdminOpError';
 
 export type AppealStatus = 'pending' | 'upheld' | 'overturned';
 
@@ -134,8 +135,9 @@ export function useAppealActions() {
       const { data: unsData, error: unsErr } = await supabase.functions.invoke('secure-admin-operations', {
         body: { action: 'unsuspend', targetUserId: existing.user_id },
       });
-      if (unsErr) throw unsErr;
-      if (unsData && (unsData as any).error) throw new Error((unsData as any).error);
+      if (unsErr || (unsData as any)?.error) {
+        throw new Error(await parseAdminOpError(unsErr, unsData, 'Failed to lift suspension'));
+      }
 
       const { error } = await supabase
         .from('suspension_appeals')

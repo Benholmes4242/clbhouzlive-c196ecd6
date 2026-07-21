@@ -17409,6 +17409,8 @@ export type Database = {
           p_search_query?: string
           p_seen_post_ids?: string[]
           p_user_id: string
+          p_viewer_actor_id?: string
+          p_viewer_actor_type?: string
         }
         Returns: {
           business_is_verified: boolean
@@ -17438,20 +17440,17 @@ export type Database = {
           post_created_at: string
           post_id: string
           post_status: string
+          post_tags: Json
           post_user_id: string
           poster_url: string
           review_clubhouse_score: number
           review_condition_score: number
-          review_course_country: string
           review_course_id: string
           review_course_image: string
           review_course_name: string
-          review_course_region: string
-          review_course_sub_country: string
           review_design_score: number
           review_facilities_score: number
           review_rating: number
-          review_text: string
           share_count: number
           source_review_id: string
           stream_id: string
