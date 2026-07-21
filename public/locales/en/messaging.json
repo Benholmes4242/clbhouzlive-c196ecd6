@@ -37,7 +37,7 @@
     "deleted": "Message deleted",
     "edited": "(edited)",
     "failedTapRetry": "Failed — tap to retry",
-    "unknownSender": "Unknown"
+    "unknownSender": "Deleted member"
   },
   "composer": {
     "placeholder": "Message"
