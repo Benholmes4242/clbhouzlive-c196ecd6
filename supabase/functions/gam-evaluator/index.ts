@@ -1470,18 +1470,38 @@ function dedupKey(type: string, userId: string, payload: any): string {
 }
 
 async function enqueueNotification(userId: string, type: string, payload: any) {
+  // Write-time dedup semantics.
+  //
+  // The prior pending-only existence check was unsafe: the dispatcher flips
+  // rows out of `pending` within ~60s, so any subsequent evaluator pass that
+  // re-detected the same event (see recomputeLegend note below) would re-insert
+  // the same deduplication_key — producing thousands of duplicate rows and
+  // repeated pushes to the same user.
+  //
+  // The correct dedup boundary is at the writer, keyed on deduplication_key.
+  // The owner has installed a DB trigger that silently skips inserts whose
+  // deduplication_key already exists within a 24h window, and will follow up
+  // with a unique index. We match that intent here by using an upsert with
+  // ignoreDuplicates so an eventual unique index resolves cleanly instead of
+  // erroring, and any current trigger-skip is a no-op on our side.
   try {
-    await supabase.from("gam_notification_outbox").insert({
-      user_id: userId,
-      notification_type: type,
-      template_id: type,
-      template_payload: payload,
-      trigger_whs_score_id: payload?.whs_score_id ?? null,
-      deduplication_key: dedupKey(type, userId, payload),
-      scheduled_for: new Date().toISOString(),
-      urgency: URGENCY[type] ?? "low",
-      status: "pending",
-    });
+    const { error } = await supabase
+      .from("gam_notification_outbox")
+      .upsert(
+        {
+          user_id: userId,
+          notification_type: type,
+          template_id: type,
+          template_payload: payload,
+          trigger_whs_score_id: payload?.whs_score_id ?? null,
+          deduplication_key: dedupKey(type, userId, payload),
+          scheduled_for: new Date().toISOString(),
+          urgency: URGENCY[type] ?? "low",
+          status: "pending",
+        },
+        { onConflict: "deduplication_key", ignoreDuplicates: true },
+      );
+    if (error) console.warn("[enqueueNotification]", type, error.message);
   } catch (e) {
     console.warn("[enqueueNotification]", type, (e as Error).message);
   }
