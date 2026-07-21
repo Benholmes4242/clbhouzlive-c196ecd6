@@ -205,41 +205,18 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
         </button>
       </div>
 
-      {/* Column caption row — 14px side padding; course caption offset to line up
-          with the row's course text edge (rank 12 + gap 8 + avatar 24 + gap 8 = 52). */}
-      <div
-        style={{
-          marginTop: 12,
-          padding: `0 ${PAGE_PAD}px 0 ${PAGE_PAD + 52}px`,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          fontSize: 9,
-          fontWeight: 600,
-          letterSpacing: '0.06em',
-          textTransform: 'uppercase',
-          color: 'rgba(15,23,42,0.35)',
-          lineHeight: 1,
-        }}
-      >
-        <div style={{ flex: 1, minWidth: 0 }}>Course</div>
-        <div style={{ width: 40, textAlign: 'center' }}>To par</div>
-        <div style={{ width: 30, textAlign: 'right' }}>Gross</div>
-        <div style={{ width: 10 }} aria-hidden />
-      </div>
-
-      {/* Ledger — full-bleed banded table */}
+      {/* Ledger — canonical StatList */}
       <div style={{ marginTop: 8 }}>
-        {ledgerRows.map((row, i) => (
-          <LedgerRow
-            key={`${row.course_id ?? i}-${i}`}
-            row={row}
-            rank={i + 1}
-            banded={i === 1 || i === 3}
-            isLast={i === ledgerRows.length - 1}
-            onTap={() => handleRowTap(row)}
-          />
-        ))}
+        <StatList>
+          {ledgerRows.map((row, i) => (
+            <RecordLedgerRow
+              key={`${row.course_id ?? i}-${i}`}
+              row={row}
+              rank={i + 1}
+              onTap={() => handleRowTap(row)}
+            />
+          ))}
+        </StatList>
       </div>
 
       {/* Conquests sub-section (personal, does not follow Lens scope) */}
