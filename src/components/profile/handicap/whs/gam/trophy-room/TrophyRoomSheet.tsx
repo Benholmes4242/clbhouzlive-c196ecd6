@@ -270,7 +270,7 @@ const CourseLegendsCollapsibleSection: React.FC<{
       >
         <Crown size={12} color={GAM.GOLD} strokeWidth={2.4} />
         <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.18em', textTransform: 'uppercase' }}>
-          Course legends
+          Course crowns
         </span>
         <span style={{ color: 'rgba(255,255,255,0.55)', ...GAM.TABULAR, fontWeight: 700, fontSize: 10, letterSpacing: '0.18em' }}>
           ({groups.length} {groups.length === 1 ? 'course' : 'courses'} · {totalRecords} {totalRecords === 1 ? 'record' : 'records'})
