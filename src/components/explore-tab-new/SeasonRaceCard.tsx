@@ -383,6 +383,11 @@ function SeasonStandingsSheet({
   seasonTitle: string;
   daysLeft: number | null;
 }) {
+  const navigate = useNavigate();
+  const handleNavigate = (uid: string) => {
+    onClose();
+    setTimeout(() => navigate(`/profile/${uid}`), 60);
+  };
   const { data, isLoading } = useQuery({
     queryKey: ['discover', 'season-race', 'all', userId],
     enabled: open,
