@@ -51,21 +51,6 @@ export const CrownCabinet: React.FC<CrownCabinetProps> = ({
   const cols = slots.length || 6;
   const orderedSlots = [...slots].sort((a, b) => Number(b.held) - Number(a.held));
 
-  // Longest-standing crown = the held slot with the earliest attainedAt.
-  const longestReignKey = React.useMemo(() => {
-    let bestKey: string | null = null;
-    let bestTs = Infinity;
-    for (const s of slots) {
-      if (!s.held || !s.attainedAt) continue;
-      const t = new Date(s.attainedAt).getTime();
-      if (Number.isFinite(t) && t < bestTs) {
-        bestTs = t;
-        bestKey = s.key;
-      }
-    }
-    return bestKey;
-  }, [slots]);
-
   return (
     <div
       style={{
