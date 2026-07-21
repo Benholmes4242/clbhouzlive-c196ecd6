@@ -6959,6 +6959,65 @@ export type Database = {
           },
         ]
       }
+      pickem_picks: {
+        Row: {
+          created_at: string
+          pick: boolean
+          question_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          pick: boolean
+          question_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          pick?: boolean
+          question_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pickem_picks_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "pickem_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pickem_questions: {
+        Row: {
+          created_at: string
+          id: string
+          outcome: boolean | null
+          question_key: string
+          question_text: string
+          settled: boolean
+          week_start: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          outcome?: boolean | null
+          question_key: string
+          question_text: string
+          settled?: boolean
+          week_start: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          outcome?: boolean | null
+          question_key?: string
+          question_text?: string
+          settled?: boolean
+          week_start?: string
+        }
+        Relationships: []
+      }
       ping_matches: {
         Row: {
           created_at: string
@@ -16704,6 +16763,7 @@ export type Database = {
           streaks_deleted: number
         }[]
       }
+      generate_weekly_pickem: { Args: never; Returns: number }
       generate_whs_invite_code: { Args: never; Returns: string }
       geometry: { Args: { "": string }; Returns: unknown }
       geometry_above: {
@@ -18212,6 +18272,18 @@ export type Database = {
           total_rounds: number
         }[]
       }
+      get_pickem_leaderboard: {
+        Args: { p_user_id?: string }
+        Returns: {
+          avatar_url: string
+          correct_picks: number
+          display_name: string
+          is_viewer: boolean
+          rank: number
+          total_picks: number
+          user_id: string
+        }[]
+      }
       get_played_unrated_courses: {
         Args: { p_user_id: string }
         Returns: {
@@ -19680,6 +19752,20 @@ export type Database = {
           week_start: string
         }[]
       }
+      get_weekly_pickem: {
+        Args: { p_user_id?: string }
+        Returns: {
+          my_pick: boolean
+          no_count: number
+          outcome: boolean
+          question_id: string
+          question_key: string
+          question_text: string
+          settled: boolean
+          week_start: string
+          yes_count: number
+        }[]
+      }
       get_wire_activity: {
         Args: never
         Returns: {
@@ -19798,6 +19884,10 @@ export type Database = {
         Returns: undefined
       }
       longtransactionsenabled: { Args: never; Returns: boolean }
+      make_pickem_pick: {
+        Args: { p_pick: boolean; p_question_id: string }
+        Returns: boolean
+      }
       mark_conversation_messages_read: {
         Args: { p_conversation_id: string }
         Returns: undefined
@@ -20388,6 +20478,7 @@ export type Database = {
         Args: { p_conversation_id: string }
         Returns: undefined
       }
+      settle_weekly_pickem: { Args: never; Returns: number }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
       snapshot_daily_ranks: { Args: never; Returns: undefined }
