@@ -213,8 +213,9 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
         ))}
       </div>
 
-      {/* Conquests sub-section (personal, does not follow Lens scope) */}
-      <ConquestsStrip userId={userId} />
+      {/* NOTE: "Your next conquests" strip has moved into <AttackDefendBand />
+          (the Attack tab). It used to render here as <ConquestsStrip />. */}
+
 
       <TierSeeAllSheet
         open={sheetOpen}
