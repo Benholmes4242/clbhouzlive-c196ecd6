@@ -379,9 +379,9 @@ export const SharedHoleCard: React.FC<SharedHoleCardProps> = ({
                   fontFamily: MONO,
                   fontVariantNumeric: 'tabular-nums',
                 }}
-                aria-label={`Your average ${fmtAvg(viewerAvgToPar)} vs field ${fmtAvg(hole.avg_to_par)}`}
+                aria-label={t('courses:holes.youValue', { value: fmtAvg(viewerAvgToPar) })}
               >
-                You: {fmtAvg(viewerAvgToPar)}
+                {t('courses:holes.youValue', { value: fmtAvg(viewerAvgToPar) })}
               </div>
             );
           })()}
