@@ -33,9 +33,7 @@ import { AlmanacEmptyCard } from './AlmanacEmptyCard';
 import ExploreGrid from './ExploreGrid';
 import WeekInGolfRail from './WeekInGolfRail';
 import { RivalryCard } from './RivalryCard';
-import { WeeklyChallengeCard } from './WeeklyChallengeCard';
 import { SeasonRaceCard } from './SeasonRaceCard';
-import { PickemCard } from './PickemCard';
 import { YourStandingStrip } from './YourStandingStrip';
 import { AttackDefendBand } from './AttackDefendBand';
 
