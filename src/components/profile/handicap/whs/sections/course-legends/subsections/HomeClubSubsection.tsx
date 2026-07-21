@@ -65,7 +65,7 @@ const DiscoveryFramingCard: React.FC<{ onTap: () => void }> = ({ onTap }) => (
         }}
       >
         <Crown size={11} strokeWidth={2.4} />
-        DISCOVER COURSE LEGENDS
+        DISCOVER COURSE CROWNS
       </div>
 
       <div

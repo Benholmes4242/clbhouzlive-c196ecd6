@@ -34,7 +34,7 @@ export const ChampionsEmptyState: React.FC<{ courseName: string | null }> = ({ c
         lineHeight: 1.15,
       }}
     >
-      Be the first legend
+      Claim the first crown
     </div>
     <div style={{ fontSize: 13.5, color: SLATE, lineHeight: 1.55, maxWidth: 300, margin: '0 auto' }}>
       No one's posted a round at{' '}
@@ -63,7 +63,7 @@ export const ChampionsWindowEmptyState: React.FC<{
         lineHeight: 1.2,
       }}
     >
-      {window === '90d' ? 'No legends in the last 90 days' : 'No all-time legends yet'}
+      {window === '90d' ? 'No crowns in the last 90 days' : 'No all-time crowns yet'}
     </div>
     <div style={{ fontSize: 13.5, color: SLATE, lineHeight: 1.55, maxWidth: 290, margin: '0 auto 16px' }}>
       {window === '90d'

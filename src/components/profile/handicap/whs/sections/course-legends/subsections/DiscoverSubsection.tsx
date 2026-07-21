@@ -34,7 +34,7 @@ export const DiscoverSubsection: React.FC<Props> = ({
         {!isLoading && courses.length === 0 && (
           <EmptyStub
             title="Nothing trending yet"
-            body="Hot legend chases at courses across the network will surface here."
+            body="Hot crown chases at courses across the network will surface here."
           />
         )}
         {courses.map((c) => (

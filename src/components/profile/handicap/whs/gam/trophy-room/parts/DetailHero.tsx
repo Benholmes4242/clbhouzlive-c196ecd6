@@ -109,13 +109,13 @@ export const DetailHero: React.FC<Props> = ({ item, index, total, onPrev, onNext
   const rarityLabel =
     item.kind === 'achievement'
       ? String(item.rarity).toUpperCase()
-      : 'LEGENDARY';
+      : 'COURSE CROWN';
 
   // Solid material pill on hero: material-tinted background, near-black ink derived from material.
   const solidPillBg = isTiered && !locked && !started ? (isObsidian ? FORGE_GOLD : c) : null;
   const pillLabel = (() => {
     if (item.kind === 'legend') {
-      return item.rank === 1 ? '#1 LEGEND' : `#${item.rank}`;
+      return item.rank === 1 ? 'CROWN HOLDER' : `#${item.rank}`;
     }
     if (started) return 'IN PROGRESS';
     if (isTiered && !locked) {
