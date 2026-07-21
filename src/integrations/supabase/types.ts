@@ -12171,6 +12171,48 @@ export type Database = {
           },
         ]
       }
+      user_deletion_asset_manifest: {
+        Row: {
+          attempts: number
+          completed_at: string | null
+          created_at: string
+          deletion_audit_id: string
+          error: string | null
+          id: string
+          kind: string
+          ref: string
+          status: string
+          target_user_id: string
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          completed_at?: string | null
+          created_at?: string
+          deletion_audit_id: string
+          error?: string | null
+          id?: string
+          kind: string
+          ref: string
+          status?: string
+          target_user_id: string
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          completed_at?: string | null
+          created_at?: string
+          deletion_audit_id?: string
+          error?: string | null
+          id?: string
+          kind?: string
+          ref?: string
+          status?: string
+          target_user_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_exploration_stats: {
         Row: {
           continent_list: string[] | null
