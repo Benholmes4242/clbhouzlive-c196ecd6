@@ -246,8 +246,9 @@ export function StatRow({
         style={{
           flexShrink: 0,
           display: 'flex',
-          alignItems: 'center',
-          gap: 8,
+          alignItems: chip ? 'flex-end' : 'center',
+          flexDirection: chip ? 'column' : 'row',
+          gap: chip ? 4 : 8,
           position: 'relative',
         }}
       >
