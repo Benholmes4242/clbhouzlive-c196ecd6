@@ -139,6 +139,7 @@ serve(async (req) => {
       message,
       suspended,
       durationDays,
+      newUsername,
     } = body;
 
     // Per-action gate
