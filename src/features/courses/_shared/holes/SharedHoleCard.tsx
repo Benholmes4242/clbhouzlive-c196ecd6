@@ -25,6 +25,11 @@ export interface SharedHoleCardProps {
   onToggle: () => void;
   /** Optional feature tag (HARDEST / EASIEST) rendered under the Par line. */
   tag?: 'hardest' | 'easiest' | null;
+  /** Viewer's own avg_to_par for this hole. When present, renders a delta chip
+   *  coloured vs the community avg. */
+  viewerAvgToPar?: number | null;
+  /** Viewer's personal marker on the hole tile — ace trumps eagle trumps birdie. */
+  viewerBadge?: 'ace' | 'eagle' | 'birdie' | null;
 }
 
 const AVG_EPSILON = 0.05;
@@ -154,6 +159,8 @@ export const SharedHoleCard: React.FC<SharedHoleCardProps> = ({
   expanded,
   onToggle,
   tag = null,
+  viewerAvgToPar = null,
+  viewerBadge = null,
 }) => {
   const { t } = useTranslation(['courses']);
   const [mounted, setMounted] = useState(false);
@@ -218,14 +225,17 @@ export const SharedHoleCard: React.FC<SharedHoleCardProps> = ({
         }}
         style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }}
       >
-        {/* Hole tile — 42px slate */}
+        {/* Hole tile — 42px slate, with optional viewer marker */}
         <div
           style={{
+            position: 'relative',
             width: 42,
             height: 42,
             borderRadius: 12,
             background: '#F8FAFC',
-            border: '1px solid rgba(15,23,42,0.08)',
+            border: viewerBadge === 'eagle'
+              ? '1.5px solid #F5B301'
+              : '1px solid rgba(15,23,42,0.08)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -238,6 +248,35 @@ export const SharedHoleCard: React.FC<SharedHoleCardProps> = ({
           }}
         >
           {hole.hole_no}
+          {viewerBadge === 'ace' && (
+            <span
+              aria-label={t('courses:holes.aceA11y')}
+              style={{
+                position: 'absolute',
+                top: -4,
+                right: -4,
+                fontSize: 11,
+                lineHeight: 1,
+              }}
+            >
+              {'\u2B50'}
+            </span>
+          )}
+          {viewerBadge === 'birdie' && (
+            <span
+              aria-hidden
+              style={{
+                position: 'absolute',
+                top: -2,
+                right: -2,
+                width: 8,
+                height: 8,
+                borderRadius: 999,
+                background: '#F5B301',
+                boxShadow: '0 0 0 2px #ffffff',
+              }}
+            />
+          )}
         </div>
 
         {/* Middle column */}
@@ -313,6 +352,39 @@ export const SharedHoleCard: React.FC<SharedHoleCardProps> = ({
           >
             {t('courses:holes.avgToPar')}
           </div>
+          {viewerAvgToPar != null && (() => {
+            const delta = viewerAvgToPar - hole.avg_to_par;
+            const beats = delta < -0.05;
+            const worse = delta > 0.05;
+            const bg = beats
+              ? 'rgba(34,139,79,0.10)'
+              : worse
+              ? 'rgba(210,34,45,0.08)'
+              : 'rgba(15,23,42,0.05)';
+            const fg = beats ? '#22874F' : worse ? TOPAR_UNDER_LIGHT : INK_MUTE;
+            return (
+              <div
+                style={{
+                  marginTop: 6,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  padding: '2px 7px',
+                  borderRadius: 999,
+                  background: bg,
+                  color: fg,
+                  fontSize: 10.5,
+                  fontWeight: 800,
+                  letterSpacing: '0.02em',
+                  fontFamily: MONO,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+                aria-label={t('courses:holes.youValue', { value: fmtAvg(viewerAvgToPar) })}
+              >
+                {t('courses:holes.youValue', { value: fmtAvg(viewerAvgToPar) })}
+              </div>
+            );
+          })()}
         </div>
 
         <ChevronDown

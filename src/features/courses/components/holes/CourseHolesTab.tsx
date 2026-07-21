@@ -2,8 +2,13 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCourseHoleAnalysis, type CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import { useCourseMeta } from '@/hooks/gam/useCourseMeta';
+import { useMyHolePerformance } from '@/hooks/gam/useMyHolePerformance';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useWhsConnection } from '@/lib/whs/hooks';
 import { HolesCredibilityHeader } from './HolesCredibilityHeader';
 import { HoleFeatureCards } from './HoleFeatureCards';
+import { PersonalHoleFeatureCards } from './PersonalHoleFeatureCards';
+import { BirdieMapSummary } from './BirdieMapSummary';
 import { HolesEmptyState } from './HolesEmptyState';
 import { FONT, INK, SC_ACCENT } from './_constants';
 import { HAIRLINE_INK_8, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
@@ -35,10 +40,23 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
   const { t } = useTranslation(['courses']);
   const { data, isLoading, isError, refetch } = useCourseHoleAnalysis(courseId);
   const { data: meta } = useCourseMeta(courseId);
+  const { user } = useSupabaseSession();
+  const { data: connection } = useWhsConnection(user?.id);
+  const { data: myPerf } = useMyHolePerformance(user?.id, courseId, {
+    enabled: Boolean(user?.id && courseId && connection),
+  });
   const [sort, setSort] = useState<'hole' | 'difficulty'>('hole');
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
 
   const holes = data?.holes ?? [];
+
+  const myByHole = useMemo(() => {
+    const map = new Map<number, NonNullable<typeof myPerf>[number]>();
+    (myPerf ?? []).forEach((row) => map.set(row.hole_no, row));
+    return map;
+  }, [myPerf]);
+
+  const viewerHasPlayed = Boolean(user && connection && myPerf && myPerf.length > 0);
 
   const sorted = useMemo(() => {
     if (sort === 'difficulty') return [...holes].sort((a, b) => b.avg_to_par - a.avg_to_par);
@@ -57,6 +75,38 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
     () => Math.max(0.01, ...holes.map((h) => Math.abs(h.avg_to_par))),
     [holes],
   );
+
+  // Personal nemesis / scoring hole — worst / best viewer avg_to_par, min 2 plays.
+  const personalPair = useMemo(() => {
+    if (!viewerHasPlayed) return null;
+    const eligible = (myPerf ?? []).filter((r) => r.times_played >= 2);
+    if (eligible.length === 0) return null;
+    const worst = eligible.reduce((m, r) => (r.avg_to_par > m.avg_to_par ? r : m), eligible[0]);
+    const best = eligible.reduce((m, r) => (r.avg_to_par < m.avg_to_par ? r : m), eligible[0]);
+    if (worst.hole_no === best.hole_no) return null;
+    const communityByHole = new Map(holes.map((h) => [h.hole_no, h.avg_to_par]));
+    const nemesis = {
+      hole_no: worst.hole_no,
+      par: worst.par,
+      avg_to_par: worst.avg_to_par,
+      community_avg_to_par: communityByHole.get(worst.hole_no) ?? 0,
+    };
+    const scoring = {
+      hole_no: best.hole_no,
+      par: best.par,
+      avg_to_par: best.avg_to_par,
+      community_avg_to_par: communityByHole.get(best.hole_no) ?? 0,
+    };
+    return { nemesis, scoring };
+  }, [viewerHasPlayed, myPerf, holes]);
+
+  const birdiedCount = useMemo(() => {
+    if (!viewerHasPlayed) return 0;
+    return (myPerf ?? []).reduce(
+      (acc, r) => acc + (r.birdie_count > 0 || r.eagle_or_better_count > 0 || r.ace_count > 0 ? 1 : 0),
+      0,
+    );
+  }, [viewerHasPlayed, myPerf]);
 
   const toggle = (holeNo: number) =>
     setExpanded((prev) => {
@@ -119,6 +169,9 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
       {hardest && easiest && hardest.hole_no !== easiest.hole_no && (
         <HoleFeatureCards hardest={hardest} easiest={easiest} />
       )}
+      {personalPair && (
+        <PersonalHoleFeatureCards nemesis={personalPair.nemesis} scoring={personalPair.scoring} />
+      )}
       <div
         style={{
           padding: '0 16px 12px',
@@ -145,26 +198,42 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
 
 
       </div>
-      {sorted.map((h) => (
-        <SharedHoleCard
-          key={h.hole_no}
-          hole={toShared(h)}
-          maxAbs={maxAbs}
-          countLabel="rounds"
-          expanded={expanded.has(h.hole_no)}
-          onToggle={() => toggle(h.hole_no)}
-          tag={
-            hardest && h.hole_no === hardest.hole_no
-              ? 'hardest'
-              : easiest && h.hole_no === easiest.hole_no
-              ? 'easiest'
-              : null
-          }
-        />
-      ))}
+      {viewerHasPlayed && (
+        <BirdieMapSummary birdiedCount={birdiedCount} totalHoles={holes.length} />
+      )}
+      {sorted.map((h) => {
+        const mine = myByHole.get(h.hole_no);
+        const viewerBadge: 'ace' | 'eagle' | 'birdie' | null = !mine
+          ? null
+          : mine.ace_count > 0
+          ? 'ace'
+          : mine.eagle_or_better_count > 0
+          ? 'eagle'
+          : mine.birdie_count > 0
+          ? 'birdie'
+          : null;
+        return (
+          <SharedHoleCard
+            key={h.hole_no}
+            hole={toShared(h)}
+            maxAbs={maxAbs}
+            countLabel="rounds"
+            expanded={expanded.has(h.hole_no)}
+            onToggle={() => toggle(h.hole_no)}
+            tag={
+              hardest && h.hole_no === hardest.hole_no
+                ? 'hardest'
+                : easiest && h.hole_no === easiest.hole_no
+                ? 'easiest'
+                : null
+            }
+            viewerAvgToPar={mine ? mine.avg_to_par : null}
+            viewerBadge={viewerBadge}
+          />
+        );
+      })}
     </div>
   );
 };
 
 export default CourseHolesTab;
-
