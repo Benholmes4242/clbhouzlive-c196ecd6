@@ -18549,7 +18549,7 @@ export type Database = {
         }[]
       }
       get_season_race: {
-        Args: { p_user_id?: string }
+        Args: { p_limit?: number; p_user_id?: string }
         Returns: {
           avatar_url: string
           crowns_taken: number
@@ -18558,7 +18558,7 @@ export type Database = {
           is_viewer: boolean
           rank: number
           season_name: string
-          season_number: number
+          season_quarter: number
           user_id: string
         }[]
       }

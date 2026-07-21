@@ -1,15 +1,17 @@
-import { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronRight, Crown } from 'lucide-react';
 
 import { supabase } from '@/integrations/supabase/client';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { BottomSheet } from '@/components/ui/BottomSheet';
 import { FONT } from './gamingLightTokens';
+import { seasonName as computeSeasonName } from '@/lib/gam/seasonClock';
+import { useViewerHemisphere } from '@/hooks/gam/useViewerHemisphere';
 
 interface SeasonRow {
   season_name: string | null;
-  season_number: number | null;
+  season_quarter: number | null;
   days_left: number | null;
   rank: number | null;
   user_id: string;
@@ -56,7 +58,9 @@ interface Props {
 }
 
 export function SeasonRaceCard({ userId }: Props) {
-  const navigate = useNavigate();
+  const hemi = useViewerHemisphere();
+  const [sheetOpen, setSheetOpen] = useState(false);
+
   const { data } = useQuery({
     queryKey: ['discover', 'season-race', userId ?? 'anon'],
     enabled: !!userId,
@@ -65,6 +69,7 @@ export function SeasonRaceCard({ userId }: Props) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error } = await (supabase.rpc as any)('get_season_race', {
         p_user_id: userId,
+        p_limit: 3,
       });
       if (error) throw error;
       return (data ?? []) as SeasonRow[];
@@ -84,99 +89,127 @@ export function SeasonRaceCard({ userId }: Props) {
   if (!header || podium.length === 0) return null;
 
   const daysLeft = header.days_left ?? null;
-  const seasonName = header.season_name ?? 'Season';
+  const resolvedSeasonName =
+    (header.season_quarter != null ? computeSeasonName(header.season_quarter, hemi) : null) ||
+    header.season_name ||
+    'Season';
 
   return (
-    <section style={{ padding: '0 16px', fontFamily: FONT }}>
-      <button
-        type="button"
-        onClick={() => navigate('/championship')}
-        style={{
-          width: '100%',
-          background: CARD_BG,
-          border: `1px solid ${HAIRLINE}`,
-          borderRadius: 16,
-          boxShadow: CARD_SHADOW,
-          overflow: 'hidden',
-          textAlign: 'left',
-          cursor: 'pointer',
-          fontFamily: FONT,
-          padding: 0,
-        }}
-      >
-        {/* Header */}
-        <div
+    <>
+      <section style={{ padding: '0 16px', fontFamily: FONT }}>
+        <button
+          type="button"
+          onClick={() => setSheetOpen(true)}
           style={{
-            padding: '14px 14px 10px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            borderBottom: `1px solid ${HAIRLINE}`,
+            width: '100%',
+            background: CARD_BG,
+            border: `1px solid ${HAIRLINE}`,
+            borderRadius: 16,
+            boxShadow: CARD_SHADOW,
+            overflow: 'hidden',
+            textAlign: 'left',
+            cursor: 'pointer',
+            fontFamily: FONT,
+            padding: 0,
           }}
         >
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div
-              style={{
-                fontSize: 10.5,
-                fontWeight: 700,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                color: AMBER_DEEP,
-                lineHeight: 1,
-              }}
-            >
-              Season race
+          {/* Header */}
+          <div
+            style={{
+              padding: '14px 14px 10px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              borderBottom: `1px solid ${HAIRLINE}`,
+            }}
+          >
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div
+                style={{
+                  fontSize: 10.5,
+                  fontWeight: 700,
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  color: AMBER_DEEP,
+                  lineHeight: 1,
+                }}
+              >
+                Season race
+              </div>
+              <div
+                style={{
+                  marginTop: 5,
+                  fontSize: 16,
+                  fontWeight: 700,
+                  letterSpacing: '-0.01em',
+                  color: INK,
+                  lineHeight: 1.15,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {resolvedSeasonName}
+              </div>
             </div>
-            <div
-              style={{
-                marginTop: 5,
-                fontSize: 16,
-                fontWeight: 700,
-                letterSpacing: '-0.01em',
-                color: INK,
-                lineHeight: 1.15,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {seasonName}
-            </div>
+            {daysLeft != null ? (
+              <div
+                className="tabular-nums"
+                style={{
+                  flexShrink: 0,
+                  background: AMBER_TINT_BG,
+                  color: AMBER_DEEP,
+                  padding: '5px 9px',
+                  borderRadius: 999,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: '0.02em',
+                  lineHeight: 1,
+                }}
+              >
+                {daysLeft} {daysLeft === 1 ? 'day' : 'days'} left
+              </div>
+            ) : null}
+            <ChevronRight size={18} color={MUTE} style={{ flexShrink: 0 }} />
           </div>
-          {daysLeft != null ? (
-            <div
-              className="tabular-nums"
-              style={{
-                flexShrink: 0,
-                background: AMBER_TINT_BG,
-                color: AMBER_DEEP,
-                padding: '5px 9px',
-                borderRadius: 999,
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: '0.02em',
-                lineHeight: 1,
-              }}
-            >
-              {daysLeft} {daysLeft === 1 ? 'day' : 'days'} left
-            </div>
+
+          {/* Podium rows */}
+          {podium.map((row, idx) => (
+            <PodiumRow key={row.user_id + idx} row={row} isLast={idx === podium.length - 1 && !viewer} />
+          ))}
+
+          {viewer ? (
+            <>
+              <div style={{ height: 1, background: HAIRLINE, margin: '0 14px' }} />
+              <PodiumRow row={viewer} isLast highlighted />
+            </>
           ) : null}
-          <ChevronRight size={18} color={MUTE} style={{ flexShrink: 0 }} />
-        </div>
 
-        {/* Podium rows */}
-        {podium.map((row, idx) => (
-          <PodiumRow key={row.user_id + idx} row={row} isLast={idx === podium.length - 1 && !viewer} />
-        ))}
+          {/* Footer count label */}
+          <div
+            style={{
+              padding: '10px 14px 12px',
+              borderTop: `1px solid ${HAIRLINE}`,
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+              color: MUTE,
+            }}
+          >
+            Crowns this season
+          </div>
+        </button>
+      </section>
 
-        {viewer ? (
-          <>
-            <div style={{ height: 1, background: HAIRLINE, margin: '0 14px' }} />
-            <PodiumRow row={viewer} isLast highlighted />
-          </>
-        ) : null}
-      </button>
-    </section>
+      <SeasonStandingsSheet
+        open={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        userId={userId}
+        seasonTitle={resolvedSeasonName}
+        daysLeft={daysLeft}
+      />
+    </>
   );
 }
 
@@ -295,6 +328,140 @@ function PodiumRow({
         </span>
       </div>
     </div>
+  );
+}
+
+function SeasonStandingsSheet({
+  open,
+  onClose,
+  userId,
+  seasonTitle,
+  daysLeft,
+}: {
+  open: boolean;
+  onClose: () => void;
+  userId: string;
+  seasonTitle: string;
+  daysLeft: number | null;
+}) {
+  const { data, isLoading } = useQuery({
+    queryKey: ['discover', 'season-race', 'all', userId],
+    enabled: open,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase.rpc as any)('get_season_race', {
+        p_user_id: userId,
+        p_limit: null,
+      });
+      if (error) throw error;
+      return (data ?? []) as SeasonRow[];
+    },
+  });
+
+  const rows = useMemo(
+    () => (data ?? []).slice().sort((a, b) => (a.rank ?? 999) - (b.rank ?? 999)),
+    [data],
+  );
+
+  return (
+    <BottomSheet
+      open={open}
+      onClose={onClose}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '75dvh',
+        maxHeight: '75dvh',
+        minHeight: 0,
+        overflow: 'hidden',
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        background: '#FFFFFF',
+      }}
+    >
+      <div
+        style={{
+          padding: '18px 18px 12px',
+          borderBottom: `1px solid ${HAIRLINE}`,
+          fontFamily: FONT,
+          flexShrink: 0,
+        }}
+      >
+        <div
+          style={{
+            fontSize: 10.5,
+            fontWeight: 700,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            color: AMBER_DEEP,
+            lineHeight: 1,
+          }}
+        >
+          Season standings
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 6 }}>
+          <div
+            style={{
+              flex: 1,
+              minWidth: 0,
+              fontSize: 20,
+              fontWeight: 700,
+              letterSpacing: '-0.01em',
+              color: INK,
+              lineHeight: 1.15,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {seasonTitle}
+          </div>
+          {daysLeft != null ? (
+            <div
+              className="tabular-nums"
+              style={{
+                flexShrink: 0,
+                background: AMBER_TINT_BG,
+                color: AMBER_DEEP,
+                padding: '5px 9px',
+                borderRadius: 999,
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: '0.02em',
+                lineHeight: 1,
+              }}
+            >
+              {daysLeft} {daysLeft === 1 ? 'day' : 'days'} left
+            </div>
+          ) : null}
+        </div>
+      </div>
+
+      <div
+        style={{
+          flex: 1,
+          minHeight: 0,
+          overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch',
+          fontFamily: FONT,
+        }}
+      >
+        {isLoading ? (
+          <div style={{ padding: 24, textAlign: 'center', color: MUTE, fontSize: 13 }}>
+            Loading…
+          </div>
+        ) : rows.length === 0 ? (
+          <div style={{ padding: 32, textAlign: 'center', color: MUTE, fontSize: 14 }}>
+            No crowns claimed yet this season.
+          </div>
+        ) : (
+          rows.map((row, idx) => (
+            <PodiumRow key={row.user_id + idx} row={row} isLast={idx === rows.length - 1} />
+          ))
+        )}
+      </div>
+    </BottomSheet>
   );
 }
 
