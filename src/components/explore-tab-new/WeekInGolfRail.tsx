@@ -50,7 +50,7 @@ const TYPE_META: Record<EventType, { glyph: string; label: string; groupLabel: s
   eagle: { glyph: '🦅', label: 'EAGLE', groupLabel: 'Moments', group: 'moments' },
   crown_taken: { glyph: '👑', label: 'CROWN TAKEN', groupLabel: 'Crowns', group: 'crowns' },
   big_round: { glyph: '🎯', label: 'BIG ROUND', groupLabel: 'Big rounds', group: 'big_rounds' },
-  rank_unlocked: { glyph: '⛰', label: 'RANK UNLOCKED', groupLabel: 'Ranks', group: 'ranks' },
+  rank_unlocked: { glyph: '🏅', label: 'RANK UNLOCKED', groupLabel: 'Ranks', group: 'ranks' },
   course_record: { glyph: '📋', label: 'COURSE RECORD', groupLabel: 'Records', group: 'records' },
 };
 
