@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/lib/toast';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useGolfCoursesStats } from '@/hooks/admin/useGolfCoursesStats';
+import { parseAdminOpError } from '@/features/admin/lib/parseAdminOpError';
 
 export interface AdminCourseRow {
   id: string;
