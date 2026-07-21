@@ -382,7 +382,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
 
       {!isLoading && !isError && (data ?? []).length > 0 && activeWindowHasData && (
         <>
-          <YouAtThisClubStrip userId={activeActor?.id} courseId={ctx.courseId} theme={theme} />
+          <YouAtThisClubStrip userId={activeActor?.id} courseId={ctx.courseId} theme={theme} heldCountOverride={youOwnedCount} />
           <CrownCabinet
             slots={visibleCategories.map((cat) => ({
               key: cat,

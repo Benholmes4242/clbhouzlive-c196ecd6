@@ -55,12 +55,15 @@ interface Props {
   userId: string | undefined;
   courseId: string;
   theme?: 'light' | 'dark';
+  /** When provided, overrides the strip's own RPC-derived crown count so it stays in sync with the cabinet's window-scoped fraction. */
+  heldCountOverride?: number;
 }
 
-export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 'dark' }) => {
+export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 'dark', heldCountOverride }) => {
+
   const { data: crowns } = useQuery({
     queryKey: ['course-legends', 'crowns-held-here', userId ?? 'anon', courseId],
-    enabled: !!userId && !!courseId,
+    enabled: !!userId && !!courseId && heldCountOverride === undefined,
     staleTime: 60_000,
     queryFn: async () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -73,6 +76,7 @@ export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 
       return (data ?? []) as UnderThreatRow[];
     },
   });
+
 
   const { data: reach } = useQuery({
     queryKey: ['course-legends', 'nearest-miss', userId ?? 'anon', courseId],
@@ -104,7 +108,7 @@ export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 
     },
   });
 
-  const crownCount = crowns?.length ?? 0;
+  const crownCount = heldCountOverride ?? crowns?.length ?? 0;
 
   const nearestMiss = useMemo(() => {
     if (!reach) return null;
@@ -116,19 +120,17 @@ export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 
   }, [reach, courseId]);
 
   const changes = activity?.changes_30d ?? 0;
-  const movementLabel = changes > 0
-    ? `${changes} crown change${changes === 1 ? '' : 's'} this month`
-    : 'Quiet month';
 
   if (!userId) return null;
 
   const isLight = theme === 'light';
   const bg = isLight ? 'rgba(15,23,42,0.02)' : 'rgba(255,255,255,0.02)';
 
+
   return (
     <div
       style={{
-        margin: '0 16px 4px',
+        margin: '16px 16px 4px',
         padding: '10px 14px 10px',
         background: bg,
         border: `0.5px solid ${HAIRLINE}`,
@@ -152,7 +154,7 @@ export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 
         <Cell
           icon="👑"
           value={String(crownCount)}
-          label={crownCount === 1 ? 'crown here' : 'crowns here'}
+          label="crowns"
           emphasize={crownCount > 0}
         />
         {nearestMiss ? (
@@ -161,7 +163,7 @@ export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 
             <Cell
               icon="🎯"
               value={nearestMiss.split(' from')[0]}
-              label={`from a crown`}
+              label="from a crown"
               emphasize
               wide
             />
@@ -169,13 +171,14 @@ export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 
         ) : null}
         <Divider />
         <Cell
-          icon={changes > 0 ? '📈' : '·'}
-          value={changes > 0 ? String(changes) : '—'}
-          label={movementLabel}
+          icon="📈"
+          value={String(changes)}
+          label="changes this month"
           emphasize={changes > 0}
           wide
         />
       </div>
+
     </div>
   );
 
@@ -249,15 +252,15 @@ export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 
             letterSpacing: '0.06em',
             textTransform: 'uppercase',
             color: emphasize ? AMBER : MUTE,
-            lineHeight: 1.15,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
+            lineHeight: 1.2,
             maxWidth: '100%',
+            wordBreak: 'break-word',
+            textAlign: 'center',
           }}
         >
           {label}
         </div>
+
       </div>
     );
   }
