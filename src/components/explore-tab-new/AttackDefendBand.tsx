@@ -214,6 +214,7 @@ export function AttackDefendBand({ userId }: Props) {
             onClick={() => setTab('defend')}
             label="Defend"
             count={defendRows.length}
+            accent="ink"
           />
           <TabButton
             active={tab === 'attack'}
@@ -221,6 +222,7 @@ export function AttackDefendBand({ userId }: Props) {
             onClick={() => setTab('attack')}
             label="Attack"
             count={attackPicks.length}
+            accent="green"
           />
         </div>
       </div>
