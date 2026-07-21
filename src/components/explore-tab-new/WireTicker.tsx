@@ -64,14 +64,14 @@ export function WireTicker() {
         style={{
           display: 'inline-flex', alignItems: 'center', gap: 8,
           background: 'transparent', border: 'none', padding: 0,
-          paddingBlock: 12, marginBlock: -12, cursor: 'pointer', fontFamily: FONT,
+          height: 36, cursor: 'pointer', fontFamily: FONT,
         }}
       >
         <span
           style={{
             display: 'inline-flex', alignItems: 'center', padding: '2px 6px',
             borderRadius: 4, background: '#FBBC2E', color: '#0F172A',
-            fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', lineHeight: 1.3,
+            fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', lineHeight: 1,
             flexShrink: 0,
           }}
         >
@@ -79,6 +79,7 @@ export function WireTicker() {
         </span>
         <span
           style={{
+            display: 'inline-flex', alignItems: 'center',
             fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.72)',
             whiteSpace: 'nowrap', lineHeight: 1,
           }}
@@ -86,6 +87,7 @@ export function WireTicker() {
           {text}
         </span>
       </button>
+
     );
   });
 
