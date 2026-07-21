@@ -184,7 +184,7 @@ export function WeekInGolfRail(_props: WeekInGolfRailProps = {}) {
 
 export default WeekInGolfRail;
 
-function RailCard({ row, onTap, onApplause }: { row: WeekRow; onTap: () => void; onApplause: () => void }) {
+function RailCard({ row, onTap }: { row: WeekRow; onTap: () => void }) {
   const meta = TYPE_META[row.event_type];
   const gold = isGold(row.event_type);
   const displayName = row.display_name || row.username || 'Golfer';
