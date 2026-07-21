@@ -21,7 +21,7 @@ const CARD_BG = '#FFFFFF';
 const CARD_SHADOW = '0 1px 3px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.05)';
 const TRACK_BG = 'rgba(15,23,42,0.08)';
 const CHIP_BG = 'rgba(15,23,42,0.04)';
-const PAGE_PAD = 14;
+const PAGE_PAD = 16;
 const RED = '#DC2626';
 
 interface DefendRow {
@@ -293,11 +293,13 @@ function DefendRail({ rows }: { rows: DefendRow[] }) {
       className="flex overflow-x-auto scrollbar-hide"
       style={{
         gap: 10,
-        margin: `10px -${PAGE_PAD}px 0`,
+        marginTop: 10,
         paddingLeft: PAGE_PAD,
         paddingRight: PAGE_PAD,
         paddingBottom: 4,
+        WebkitOverflowScrolling: 'touch',
       }}
+
     >
       {rows.map((row) => (
         <DefendCard
@@ -479,12 +481,14 @@ function AttackRail({ picks }: { picks: TitleInReach[] }) {
       className="flex overflow-x-auto scrollbar-hide"
       style={{
         gap: 8,
-        margin: `10px -${PAGE_PAD}px 0`,
+        marginTop: 10,
         paddingLeft: PAGE_PAD,
         paddingRight: PAGE_PAD,
         paddingBottom: 4,
+        WebkitOverflowScrolling: 'touch',
       }}
     >
+
       {picks.map((row) => (
         <AttackChip
           key={`${row.course_id}-${row.category}`}
