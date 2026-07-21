@@ -32,6 +32,9 @@ import { AlmanacEmptyCard } from './AlmanacEmptyCard';
 
 import ExploreGrid from './ExploreGrid';
 import WeekInGolfRail from './WeekInGolfRail';
+import { RivalryCard } from './RivalryCard';
+import { WeeklyChallengeCard } from './WeeklyChallengeCard';
+import { SeasonRaceCard } from './SeasonRaceCard';
 
 import { SLATE_50 } from '@/features/courses/_shared/tokens';
 import { SPACE } from '@/lib/spacing';
