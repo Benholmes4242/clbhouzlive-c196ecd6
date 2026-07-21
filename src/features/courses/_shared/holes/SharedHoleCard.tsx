@@ -225,14 +225,17 @@ export const SharedHoleCard: React.FC<SharedHoleCardProps> = ({
         }}
         style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }}
       >
-        {/* Hole tile — 42px slate */}
+        {/* Hole tile — 42px slate, with optional viewer marker */}
         <div
           style={{
+            position: 'relative',
             width: 42,
             height: 42,
             borderRadius: 12,
             background: '#F8FAFC',
-            border: '1px solid rgba(15,23,42,0.08)',
+            border: viewerBadge === 'eagle'
+              ? '1.5px solid #F5B301'
+              : '1px solid rgba(15,23,42,0.08)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -245,6 +248,35 @@ export const SharedHoleCard: React.FC<SharedHoleCardProps> = ({
           }}
         >
           {hole.hole_no}
+          {viewerBadge === 'ace' && (
+            <span
+              aria-label="Hole in one"
+              style={{
+                position: 'absolute',
+                top: -4,
+                right: -4,
+                fontSize: 11,
+                lineHeight: 1,
+              }}
+            >
+              ⭐
+            </span>
+          )}
+          {viewerBadge === 'birdie' && (
+            <span
+              aria-hidden
+              style={{
+                position: 'absolute',
+                top: -2,
+                right: -2,
+                width: 8,
+                height: 8,
+                borderRadius: 999,
+                background: '#F5B301',
+                boxShadow: '0 0 0 2px #ffffff',
+              }}
+            />
+          )}
         </div>
 
         {/* Middle column */}
