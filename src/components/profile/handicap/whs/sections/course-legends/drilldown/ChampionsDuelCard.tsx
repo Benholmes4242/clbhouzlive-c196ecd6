@@ -1,17 +1,13 @@
 import React from 'react';
 import { Crown, Swords, type LucideIcon } from 'lucide-react';
 import type { LegendCategory } from '@/lib/gam/types';
-import {
-  ChampionsListRow,
-  CHAMPS_GRID_COMPACT,
-  CHAMPS_GRID_GAP_COMPACT,
-  CHAMPS_ROW_PADDING_X,
-} from './ChampionsListRow';
 import { MovementCell } from './_shared/MovementCell';
 import { duelLine, chaseProgress } from './_shared/duelTension';
 import { ProBenchmarkBand } from './ProBenchmarkBand';
 import type { ProProfile, ProBandBase } from './_shared/proBenchmark';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { StatRow } from '@/components/explore-tab-new/StatRow';
+
 
 export interface DuelRow {
   rank: number;
