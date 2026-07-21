@@ -18177,6 +18177,19 @@ export type Database = {
         }[]
       }
       get_my_handicap_percentile: { Args: never; Returns: Json }
+      get_my_hole_performance: {
+        Args: { p_course_id: string; p_user_id: string }
+        Returns: {
+          ace_count: number
+          avg_to_par: number
+          best_to_par: number
+          birdie_count: number
+          eagle_or_better_count: number
+          hole_no: number
+          par: number
+          times_played: number
+        }[]
+      }
       get_my_rival: {
         Args: { p_course_id?: string; p_user_id: string }
         Returns: {
