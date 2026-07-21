@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 
 import { supabase } from '@/integrations/supabase/client';
+import { useUserProfile } from '@/hooks/useUserProfile';
+import { useWhsConnection } from '@/lib/whs/hooks';
 import { useUserAchievements } from '@/hooks/gam/useUserAchievements';
 import { useUserTopLegends } from '@/hooks/gam/useUserTopLegends';
 import { useMyStreaks } from '@/hooks/gam/useMyStreaks';
@@ -17,6 +19,10 @@ import {
   WALL_LEVELS,
 } from '@/components/profile/handicap/whs/gam/trophy-room/_shared/levels';
 import { openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
+import { quarterOf, daysLeft, seasonName } from '@/lib/gam/seasonClock';
+import { useViewerHemisphere } from '@/hooks/gam/useViewerHemisphere';
+import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
+import { formatHcp } from '@/lib/formatHcp';
 
 import { FONT } from './gamingLightTokens';
 
@@ -60,9 +66,12 @@ function scrollToDefendRail() {
 export function YourStandingStrip({ userId }: Props) {
   const navigate = useNavigate();
   const { data: crowns } = useCrownsHeld(userId);
+  const { data: profile } = useUserProfile(userId);
+  const { data: connection } = useWhsConnection(userId);
   const { data: badges = [] } = useUserAchievements(userId);
   const { data: legends = [] } = useUserTopLegends(userId, { limit: 500, maxRank: 1 });
   const { data: streaks = [] } = useMyStreaks(!!userId);
+  const hemi = useViewerHemisphere();
 
   const medals = useMemo(() => {
     const a = badges.map(normalizeBadge);
@@ -70,70 +79,154 @@ export function YourStandingStrip({ userId }: Props) {
     return medalsOwned([...a, ...l]);
   }, [badges, legends]);
 
-  const currentLevel = medals > 0 ? levelForMedals(medals) ?? WALL_LEVELS[0] : null;
+  const hasMedals = medals > 0;
+  const currentLevel = hasMedals ? levelForMedals(medals) ?? WALL_LEVELS[0] : null;
   const nextLevel = nextLevelForMedals(medals);
   const medalsToNext = nextLevel ? Math.max(0, nextLevel.medalsRequired - medals) : 0;
+
+  // Progress bar (from old identity band)
+  const floor = currentLevel?.medalsRequired ?? 0;
+  const ceiling = nextLevel?.medalsRequired ?? floor;
+  const span = Math.max(1, ceiling - floor);
+  const raw = hasMedals ? (medals - floor) / span : 0.04;
+  const barPct = nextLevel ? Math.max(4, Math.min(100, Math.round(raw * 100))) : 100;
+
+  const profileWithHcp = profile as
+    | (typeof profile & {
+        eg_handicap_index?: number | null;
+        manual_handicap_index?: number | null;
+      })
+    | null
+    | undefined;
+  const resolvedHcp = resolveDisplayHandicap({
+    egHandicapIndex: profileWithHcp?.eg_handicap_index ?? null,
+    manualHandicapIndex: profileWithHcp?.manual_handicap_index ?? null,
+    hasWhsConnection: !!connection,
+  });
+  const hcpValue = resolvedHcp.value;
+  const hasHcp = hcpValue != null;
 
   const primaryStreak = useMemo(
     () => streaks.find((s) => s.streak_type === 'round_played') ?? null,
     [streaks],
   );
   const streakCount = primaryStreak?.current_count ?? 0;
+  const showStreak = streakCount > 0;
 
   const crownCount = crowns?.length ?? 0;
 
-  // Hide when signed-out or nothing to say (no crowns, no tier, no streak)
+  // Hide when signed-out or nothing meaningful to show
   if (!userId) return null;
-  if (crownCount === 0 && !currentLevel && streakCount === 0) return null;
+  if (crownCount === 0 && !currentLevel && !hasHcp && !showStreak) return null;
 
   const openTrophyRoom = () => {
     navigate('/handicap');
     setTimeout(() => openGamAchievements(), 0);
   };
 
+  // Season ribbon
+  const now = new Date();
+  const { quarter } = quarterOf(now);
+  const seasonLabel = seasonName(quarter, hemi);
+  const daysRemaining = daysLeft(now);
+
+  const tierValue = currentLevel ? currentLevel.label : 'Unranked';
+  const tierSub = nextLevel
+    ? `${medalsToNext} medal${medalsToNext === 1 ? '' : 's'} to ${nextLevel.label}`
+    : currentLevel
+      ? 'Top of the ladder'
+      : 'Earn your first medal';
+
   return (
     <div
       style={{
         padding: '10px 14px 8px',
         borderBottom: `0.5px solid ${HAIRLINE}`,
-        display: 'flex',
-        alignItems: 'stretch',
-        gap: 0,
         fontFamily: FONT,
         background: 'transparent',
       }}
     >
-      <StandingCell
-        icon="👑"
-        value={crownCount > 0 ? String(crownCount) : '—'}
-        label={crownCount === 1 ? 'crown held' : 'crowns held'}
-        onClick={crownCount > 0 ? scrollToDefendRail : undefined}
-        emphasize={crownCount > 0}
-      />
-      <Divider />
-      <StandingCell
-        icon="🏆"
-        value={currentLevel ? currentLevel.label : 'Unranked'}
-        label={
-          nextLevel
-            ? `${medalsToNext} medal${medalsToNext === 1 ? '' : 's'} to ${nextLevel.label}`
-            : currentLevel
-              ? 'Top of the ladder'
-              : 'Earn your first medal'
-        }
-        onClick={openTrophyRoom}
-        valueSize={12}
-        emphasize={!!currentLevel}
-        wide
-      />
-      <Divider />
-      <StandingCell
-        icon="🔥"
-        value={streakCount > 0 ? String(streakCount) : '—'}
-        label={streakCount === 1 ? 'week streak' : 'week streak'}
-        onClick={() => navigate('/handicap')}
-        emphasize={streakCount > 0}
-      />
+      {/* Trio */}
+      <div style={{ display: 'flex', alignItems: 'stretch', gap: 0 }}>
+        <StandingCell
+          icon="👑"
+          value={crownCount > 0 ? String(crownCount) : '0'}
+          label={crownCount === 1 ? 'crown held' : 'crowns held'}
+          onClick={crownCount > 0 ? scrollToDefendRail : undefined}
+          emphasize={crownCount > 0}
+        />
+        <Divider />
+        <StandingCell
+          icon="🏆"
+          value={tierValue}
+          label={tierSub}
+          onClick={openTrophyRoom}
+          valueSize={12}
+          emphasize={!!currentLevel}
+          wide
+          progressPct={nextLevel ? barPct : undefined}
+        />
+        <Divider />
+        <StandingCell
+          value={hasHcp ? formatHcp(hcpValue) : '—'}
+          label="HCP"
+          onClick={() => navigate('/handicap')}
+          emphasize={hasHcp}
+        />
+        {showStreak ? (
+          <>
+            <Divider />
+            <StandingCell
+              icon="🔥"
+              value={String(streakCount)}
+              label="week streak"
+              onClick={() => navigate('/handicap')}
+              emphasize
+            />
+          </>
+        ) : null}
+      </div>
+
+      {/* Season ribbon */}
+      <div
+        style={{
+          marginTop: 8,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 8,
+        }}
+      >
+        <span
+          style={{
+            fontSize: 9.5,
+            fontWeight: 600,
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+            color: AMBER,
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            minWidth: 0,
+          }}
+        >
+          {seasonLabel} · Official WHS
+        </span>
+        <span
+          className="tabular-nums"
+          style={{
+            fontSize: 9.5,
+            fontWeight: 600,
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+            color: 'rgba(15,23,42,0.45)',
+            whiteSpace: 'nowrap',
+            flexShrink: 0,
+          }}
+        >
+          {daysRemaining} days left
+        </span>
+      </div>
     </div>
   );
 }
@@ -160,14 +253,16 @@ function StandingCell({
   valueSize = 15,
   emphasize,
   wide,
+  progressPct,
 }: {
-  icon: string;
+  icon?: string;
   value: string;
   label: string;
   onClick?: () => void;
   valueSize?: number;
   emphasize?: boolean;
   wide?: boolean;
+  progressPct?: number;
 }) {
   const disabled = !onClick;
   return (
@@ -176,7 +271,7 @@ function StandingCell({
       onClick={onClick}
       disabled={disabled}
       style={{
-        flex: wide ? 1.4 : 1,
+        flex: wide ? 1.6 : 1,
         minWidth: 0,
         background: 'transparent',
         border: 'none',
@@ -194,9 +289,11 @@ function StandingCell({
       }}
     >
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 5, minWidth: 0, maxWidth: '100%' }}>
-        <span aria-hidden style={{ fontSize: 13, lineHeight: 1 }}>
-          {icon}
-        </span>
+        {icon ? (
+          <span aria-hidden style={{ fontSize: 13, lineHeight: 1 }}>
+            {icon}
+          </span>
+        ) : null}
         <span
           className="tabular-nums"
           style={{
@@ -230,11 +327,31 @@ function StandingCell({
       >
         {label}
       </div>
+      {progressPct !== undefined ? (
+        <div
+          aria-hidden
+          style={{
+            marginTop: 3,
+            width: '78%',
+            maxWidth: 140,
+            height: 2,
+            borderRadius: 999,
+            background: 'rgba(15,23,42,0.08)',
+            overflow: 'hidden',
+          }}
+        >
+          <div
+            style={{
+              width: `${progressPct}%`,
+              height: '100%',
+              background: AMBER,
+              borderRadius: 999,
+            }}
+          />
+        </div>
+      ) : null}
     </button>
   );
 }
-
-// keep AMBER imported so tokens ride together even when unused visually
-void AMBER;
 
 export default YourStandingStrip;
