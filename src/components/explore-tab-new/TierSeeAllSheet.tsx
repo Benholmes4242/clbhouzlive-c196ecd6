@@ -372,10 +372,12 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
                     countLabelPlural={metric === 'aces' ? 'ACES' : 'ALBATROSSES'}
                     subline={otherLabel}
                     variant="gold"
+                    isLast={i === legendaryLeaderRows.length - 1}
                     onTap={() => {
                       if (r.user_id) opener.openProfile(r.user_id);
                     }}
                   />
+
                 );
               })}
             </div>
@@ -409,10 +411,12 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
                   countLabelSingular="EAGLE"
                   countLabelPlural="EAGLES"
                   subline={null}
+                  isLast={i === eagleLeaderRows.length - 1}
                   onTap={() => {
                     if (r.user_id) opener.openProfile(r.user_id);
                   }}
                 />
+
               ))}
             </div>
           )
@@ -436,11 +440,13 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
                 row={row}
                 tier={tier}
                 index={i}
+                isLast={i === visibleRows.length - 1}
                 onTap={() => handleRowTap(row)}
                 mode={mode}
                 bestToPar={bestToPar}
                 maxCount={birdieMaxCount}
               />
+
             ))}
           </div>
         )}
