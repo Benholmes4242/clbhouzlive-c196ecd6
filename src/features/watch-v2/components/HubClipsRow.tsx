@@ -137,7 +137,7 @@ function Tile({
       >
         {title}
       </div>
-      {row.creator_username ? (
+      {(row.creator_display_name || row.creator_username) ? (
         <div
           style={{
             fontWeight: 500,
@@ -149,9 +149,10 @@ function Tile({
             textOverflow: 'ellipsis',
           }}
         >
-          @{row.creator_username}
+          {row.creator_display_name || row.creator_username}
         </div>
       ) : null}
+
     </Pressable>
   );
 }
