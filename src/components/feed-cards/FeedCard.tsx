@@ -55,7 +55,9 @@ export function FeedCard({
   openedFrom,
   hideCourseAttribution = false,
   hideFormatBadge = false,
+  bareTile = false,
 }: {
+
   row: FeedCardRow;
   feedPost: FeedPost;
   posts: FeedPost[];
