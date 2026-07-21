@@ -243,13 +243,17 @@ function TabButton({
   onClick,
   label,
   count,
+  accent = 'ink',
 }: {
   active: boolean;
   disabled: boolean;
   onClick: () => void;
   label: string;
   count: number;
+  accent?: 'ink' | 'green';
 }) {
+  const activeBg = accent === 'green' ? GREEN : INK;
+  const activeBorder = accent === 'green' ? GREEN : INK;
   return (
     <button
       type="button"
@@ -258,8 +262,8 @@ function TabButton({
       style={{
         padding: '5px 10px',
         borderRadius: 999,
-        background: active ? INK : 'transparent',
-        border: `1px solid ${active ? INK : HAIRLINE}`,
+        background: active ? activeBg : 'transparent',
+        border: `1px solid ${active ? activeBorder : HAIRLINE}`,
         color: active ? '#FFFFFF' : disabled ? 'rgba(15,23,42,0.30)' : INK,
         fontSize: 11.5,
         fontWeight: 700,
