@@ -63,7 +63,7 @@ export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 
 
   const { data: crowns } = useQuery({
     queryKey: ['course-legends', 'crowns-held-here', userId ?? 'anon', courseId],
-    enabled: !!userId && !!courseId,
+    enabled: !!userId && !!courseId && heldCountOverride === undefined,
     staleTime: 60_000,
     queryFn: async () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -76,6 +76,7 @@ export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 
       return (data ?? []) as UnderThreatRow[];
     },
   });
+
 
   const { data: reach } = useQuery({
     queryKey: ['course-legends', 'nearest-miss', userId ?? 'anon', courseId],
