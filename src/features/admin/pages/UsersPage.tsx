@@ -474,6 +474,7 @@ function Member360Sheet({
             {isFullAdmin && (
               <>
                 <DrawerBtn icon={<KeyRound size={14} />} onClick={() => setConfirm('reset')}>Send password reset</DrawerBtn>
+                <DrawerBtn icon={<AtSign size={14} />} onClick={() => setRenameOpen(true)}>Change username</DrawerBtn>
                 <DrawerBtn
                   icon={<Ban size={14} />}
                   tone={detail.is_suspended ? undefined : 'warn'}
