@@ -67,7 +67,13 @@
       "birdie": "[~~Ɓířđíé~~]",
       "bogey": "[~~Ɓőĝéý~~]",
       "doublePlus": "[~~Đƀļ+~~]"
-    }
+    },
+    "yourNemesisTitle": "Your nemesis",
+    "yourScoringHoleTitle": "Your scoring hole",
+    "youPlayItTo": "You play it to {{playsTo}}",
+    "fieldPlaysTo": "Field: {{playsTo}}",
+    "yourBirdieMap": "Your birdie map",
+    "birdiedOfTotal": "Birdied {{n}} of {{total}}"
   },
   "scorecard": {
     "syncingTitle": "[~~Šĉőřéĉářđ őñ ţĥé ŵáý~~]",

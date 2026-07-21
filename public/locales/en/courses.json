@@ -70,7 +70,13 @@
       "birdie": "Birdie",
       "bogey": "Bogey",
       "doublePlus": "Dbl+"
-    }
+    },
+    "yourNemesisTitle": "Your nemesis",
+    "yourScoringHoleTitle": "Your scoring hole",
+    "youPlayItTo": "You play it to {{playsTo}}",
+    "fieldPlaysTo": "Field: {{playsTo}}",
+    "yourBirdieMap": "Your birdie map",
+    "birdiedOfTotal": "Birdied {{n}} of {{total}}"
   },
   "scorecard": {
     "syncingTitle": "Scorecard on the way",
