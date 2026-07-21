@@ -270,48 +270,45 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
 
             {isLegendaryLeaders && (
               <div
+                role="tablist"
+                aria-label="Metric"
                 style={{
-                  display: 'inline-flex',
                   flexShrink: 0,
+                  display: 'inline-flex',
                   gap: 2,
-                  padding: 3,
+                  padding: 2,
+                  background: '#FFFFFF',
+                  border: '1px solid rgba(15,23,42,0.08)',
                   borderRadius: 999,
-                  background: 'rgba(15,23,42,0.06)',
                 }}
               >
                 {([
-                  { v: 'aces', label: 'ACES' },
-                  { v: 'albatrosses', label: 'ALBATROSSES' },
+                  { v: 'aces', label: 'Aces' },
+                  { v: 'albatrosses', label: 'Albatrosses' },
                 ] as const).map((o) => {
                   const active = metric === o.v;
                   return (
                     <button
                       key={o.v}
                       type="button"
+                      role="tab"
+                      aria-selected={active}
                       onClick={() => setMetric(o.v)}
                       style={{
-                        padding: '4px 10px',
+                        padding: '5px 11px',
                         borderRadius: 999,
-                        background: active ? '#FFFFFF' : 'transparent',
+                        background: active ? '#15171F' : 'transparent',
+                        color: active ? '#FFFFFF' : 'rgba(15,23,42,0.55)',
                         border: 'none',
-                        cursor: 'pointer',
-                        boxShadow: active ? '0 1px 4px rgba(15,23,42,0.14)' : 'none',
-                        transition: 'all .15s',
                         fontFamily: FONT,
+                        fontSize: 10.5,
+                        fontWeight: 600,
+                        whiteSpace: 'nowrap',
+                        cursor: 'pointer',
+                        transition: 'all .15s',
                       }}
                     >
-                      <span
-                        className={active ? 'clbhouz-gold-shimmer-light' : undefined}
-                        style={{
-                          fontSize: 9.5,
-                          fontWeight: 700,
-                          letterSpacing: '0.08em',
-                          whiteSpace: 'nowrap',
-                          ...(active ? {} : { color: 'rgba(15,23,42,0.55)' }),
-                        }}
-                      >
-                        {o.label}
-                      </span>
+                      {o.label}
                     </button>
                   );
                 })}
