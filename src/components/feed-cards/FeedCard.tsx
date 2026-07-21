@@ -358,7 +358,7 @@ export function FeedCard({
               minWidth: 0,
             }}
           >
-            {row.creator_username ? (
+            {(row.creator_display_name || row.creator_username) ? (
               <span
                 style={{
                   overflow: 'hidden',
@@ -367,9 +367,10 @@ export function FeedCard({
                   minWidth: 0,
                 }}
               >
-                @{row.creator_username}
+                {row.creator_display_name || row.creator_username}
               </span>
             ) : null}
+
             {row.like_count > 0 && (
               <span
                 style={{
