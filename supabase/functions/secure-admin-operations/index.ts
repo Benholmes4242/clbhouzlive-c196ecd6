@@ -77,6 +77,20 @@ serve(async (req) => {
     });
   }
 
+  // Unauthenticated ping to verify running function version.
+  // Bump FUNCTION_VERSION on every change to this function.
+  const FUNCTION_VERSION = '2026-07-21T09:00:00Z';
+  try {
+    const peek = req.clone();
+    const peekBody = await peek.json().catch(() => null);
+    if (peekBody?.action === 'ping') {
+      return new Response(JSON.stringify({ version: FUNCTION_VERSION }), {
+        status: 200,
+        headers: { ...headers, 'Content-Type': 'application/json' },
+      });
+    }
+  } catch (_) { /* fall through */ }
+
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
     const anonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
@@ -216,10 +230,46 @@ serve(async (req) => {
           } catch (_) { /* proceed without email */ }
         }
         const label = resolvedEmail ?? targetUserId;
+
+        // Pre-cleanup: delete the target's OWN rows in bounded tables before
+        // auth.admin.deleteUser. Admin-actor / podium references intentionally
+        // remain blocking so the caller sees the constraint verbatim.
+        const preCleanupSpec: Array<{ table: string; column: string }> = [
+          { table: 'post_views', column: 'viewer_id' },
+          { table: 'user_courses', column: 'user_id' },
+          { table: 'user_top100_courses', column: 'user_id' },
+          { table: 'business_analytics_events', column: 'user_id' },
+          { table: 'creator_profile_events', column: 'user_id' },
+          { table: 'profile_analytics_events', column: 'user_id' },
+        ];
+        const preCleanup: Record<string, number> = {};
+        let preCleanupFailed: { table: string; error: string } | null = null;
+        for (const { table, column } of preCleanupSpec) {
+          const { error: delErr, count } = await supabase
+            .from(table)
+            .delete({ count: 'exact' })
+            .eq(column, targetUserId);
+          if (delErr) {
+            preCleanupFailed = { table, error: delErr.message };
+            break;
+          }
+          preCleanup[table] = count ?? 0;
+        }
+        auditDetails.preCleanup = preCleanup;
+        if (preCleanupFailed) {
+          auditDetails.error = `Pre-cleanup failed on ${preCleanupFailed.table}: ${preCleanupFailed.error}`;
+          result = { error: auditDetails.error };
+          break;
+        }
+
         const { error: deleteError } = await supabase.auth.admin.deleteUser(targetUserId);
         if (deleteError) {
-          auditDetails.error = deleteError.message;
-          result = { error: deleteError.message };
+          const msg = deleteError.message || 'Delete failed';
+          // Surface constraint name verbatim when the DB names it.
+          const constraintMatch = msg.match(/"([^"]+)"/);
+          const surfaced = constraintMatch ? `Blocked by ${constraintMatch[1]}: ${msg}` : msg;
+          auditDetails.error = surfaced;
+          result = { error: surfaced };
         } else {
           result = { success: true, message: `User ${label} deleted successfully` };
         }
