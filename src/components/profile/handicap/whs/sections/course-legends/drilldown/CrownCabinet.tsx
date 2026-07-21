@@ -103,7 +103,6 @@ export const CrownCabinet: React.FC<CrownCabinetProps> = ({
           const SlotIcon = slot.icon;
           const held = slot.held;
           const reignDays = held ? daysHeld(slot.attainedAt) : null;
-          const isLongest = held && slot.key === longestReignKey;
           return (
             <div
               key={slot.key}
@@ -117,50 +116,25 @@ export const CrownCabinet: React.FC<CrownCabinetProps> = ({
                 scrollSnapAlign: 'start',
               }}
             >
-              <div style={{ position: 'relative' }}>
-                <div
-                  style={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: 14,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background: held
-                      ? 'linear-gradient(135deg, #FBBC2E, #E07F0E)'
-                      : 'var(--hcp-tint-3)',
-                    border: held ? 'none' : '1.5px dashed var(--hcp-dash)',
-                    boxShadow: held ? '0 2px 8px rgba(247,147,30,0.35)' : 'none',
-                  }}
-                >
-                  {held ? (
-                    <Crown size={18} strokeWidth={2.4} color="#FFFFFF" fill="rgba(255,255,255,0.35)" />
-                  ) : (
-                    <SlotIcon size={15} color="var(--hcp-t-30)" strokeWidth={2.2} />
-                  )}
-                </div>
-                {isLongest && (
-                  <span
-                    aria-label="Longest reign"
-                    style={{
-                      position: 'absolute',
-                      top: -6,
-                      right: -8,
-                      fontSize: 7.5,
-                      fontWeight: 900,
-                      letterSpacing: '0.08em',
-                      textTransform: 'uppercase',
-                      color: '#7C2D12',
-                      background: 'linear-gradient(135deg, #FBBC2E, #F7931E)',
-                      borderRadius: 999,
-                      padding: '2px 5px',
-                      lineHeight: 1,
-                      boxShadow: '0 1px 3px rgba(247,147,30,0.4)',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    Longest
-                  </span>
+              <div
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 14,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: held
+                    ? 'linear-gradient(135deg, #FBBC2E, #E07F0E)'
+                    : 'var(--hcp-tint-3)',
+                  border: held ? 'none' : '1.5px dashed var(--hcp-dash)',
+                  boxShadow: held ? '0 2px 8px rgba(247,147,30,0.35)' : 'none',
+                }}
+              >
+                {held ? (
+                  <Crown size={18} strokeWidth={2.4} color="#FFFFFF" fill="rgba(255,255,255,0.35)" />
+                ) : (
+                  <SlotIcon size={15} color="var(--hcp-t-30)" strokeWidth={2.2} />
                 )}
               </div>
               <span
