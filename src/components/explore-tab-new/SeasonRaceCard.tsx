@@ -501,7 +501,12 @@ function SeasonStandingsSheet({
           </div>
         ) : (
           rows.map((row, idx) => (
-            <PodiumRow key={row.user_id + idx} row={row} isLast={idx === rows.length - 1} />
+            <PodiumRow
+              key={row.user_id + idx}
+              row={row}
+              isLast={idx === rows.length - 1}
+              onNavigate={handleNavigate}
+            />
           ))
         )}
       </div>
