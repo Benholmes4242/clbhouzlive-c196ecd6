@@ -164,7 +164,10 @@ export function FeedCard({
       style={{
         display: 'block',
         width: '100%',
-        marginBottom: 12,
+        // Bare tiles live in mosaic grids where the column gap is 4px — match
+        // vertical spacing to the horizontal gutter. Full cards (with caption
+        // block) keep the roomier 12px stack rhythm.
+        marginBottom: bareTile ? 4 : 12,
         cursor: 'pointer',
         fontFamily: FONT_FAMILY,
       }}
