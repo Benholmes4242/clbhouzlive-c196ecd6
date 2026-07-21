@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
+import { parseAdminOpError } from '@/features/admin/lib/parseAdminOpError';
 
 export interface UserStats {
   postsCount: number;
