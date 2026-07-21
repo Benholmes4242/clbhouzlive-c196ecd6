@@ -218,8 +218,68 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
         ))}
       </div>
 
+      {/* Conquests sub-section (personal, does not follow Lens scope) */}
+      <ConquestsStrip userId={userId} />
 
-// ---- Conquests sub-section ------------------------------------------------
+      <TierSeeAllSheet
+        open={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        tier="records"
+        region={region}
+        rows={allRows}
+        onRowTap={handleRowTap}
+        initialMode={mode}
+      />
+    </section>
+  );
+}
+
+// ---- Record Book row (flat StatRow) ---------------------------------------
+function RecordStatRow({
+  row,
+  rank,
+  isLast,
+  onTap,
+}: {
+  row: FeatRow;
+  rank: number;
+  isLast: boolean;
+  onTap: () => void;
+}) {
+  const holder = formatHolderName(row.holder_name) || row.holder_username || 'A member';
+  const par = rowToPar(row);
+  const isStableford = row.category === 'best_stableford_all_time';
+  const numericValue =
+    typeof row.value === 'number'
+      ? row.value
+      : typeof row.value === 'string' && row.value.trim() !== '' && !isNaN(Number(row.value))
+        ? Number(row.value)
+        : null;
+  const grossText = numericValue != null ? String(numericValue) : row.feat_value ?? '';
+  const when = row.play_date ?? row.attained_at ?? null;
+  const showToPar = par != null && !isStableford;
+  const toParDisplay = showToPar ? toParText(par!) : '—';
+  // Colour from canonical ramps — under-par earns the gold reward, otherwise ink.
+  const statColor = showToPar && par! < 0 ? RATING_RAMPS.gold.mid : INK;
+  const sub = [holder, when ? relativeTime(when) : null].filter(Boolean).join(' · ');
+  return (
+    <StatRow
+      rank={rank}
+      avatarUrl={row.holder_avatar}
+      avatarUserId={row.user_id}
+      name={row.course_name}
+      subline={sub}
+      statValue={toParDisplay}
+      statColor={statColor}
+      statSubLabel={grossText ? `${grossText} GROSS` : undefined}
+      showWatermark={rank === 1}
+      isLast={isLast}
+      onPress={onTap}
+    />
+  );
+}
+
+
 function ConquestsStrip({ userId }: { userId: string | undefined }) {
   const { user } = useSupabaseSession();
   const effectiveUserId = userId ?? user?.id;
