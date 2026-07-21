@@ -256,7 +256,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
   }, [media]);
 
   const reviewRating = post.review?.rating ?? null;
-  const isDeal = post.actorType === 'business';
+  const isDeal = false;
 
   const subLine = useMemo(() => {
     const parts: string[] = [];
