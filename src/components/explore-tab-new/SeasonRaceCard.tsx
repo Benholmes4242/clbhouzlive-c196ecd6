@@ -302,29 +302,48 @@ function PodiumRow({
           </div>
         )}
       </div>
-      <SquircleAvatar
-        size={36}
-        srcCandidates={row.avatar_url ? [row.avatar_url] : []}
-        alt={name}
-        fallback={initials(name)}
-        userId={row.user_id}
-        hairlineRing
-      />
-      <div
+      <button
+        type="button"
+        onClick={goToProfile}
         style={{
           flex: 1,
           minWidth: 0,
-          fontSize: 14,
-          fontWeight: isViewer ? 700 : 600,
-          color: INK,
-          letterSpacing: '-0.005em',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          background: 'transparent',
+          border: 'none',
+          padding: 0,
+          margin: 0,
+          textAlign: 'left',
+          cursor: row.user_id ? 'pointer' : 'default',
+          fontFamily: 'inherit',
         }}
       >
-        {isViewer ? 'You' : name}
-      </div>
+        <SquircleAvatar
+          size={36}
+          srcCandidates={row.avatar_url ? [row.avatar_url] : []}
+          alt={name}
+          fallback={initials(name)}
+          userId={row.user_id}
+          hairlineRing
+        />
+        <span
+          style={{
+            flex: 1,
+            minWidth: 0,
+            fontSize: 14,
+            fontWeight: isViewer ? 700 : 600,
+            color: INK,
+            letterSpacing: '-0.005em',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {isViewer ? 'You' : name}
+        </span>
+      </button>
       <div
         style={{
           flexShrink: 0,
