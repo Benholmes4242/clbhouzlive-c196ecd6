@@ -131,11 +131,9 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
         <WeekInGolfRail />
 
 
-        {/* Weekly challenge + Season race pair, right after This week in golf */}
+        {/* Season race */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 24 }}>
-          <WeeklyChallengeCard userId={userId} />
           <SeasonRaceCard userId={userId} />
-          <PickemCard userId={userId} />
         </div>
 
         {/* Feats: header + aces/albatrosses podium pair */}
