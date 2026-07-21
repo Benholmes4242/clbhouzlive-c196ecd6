@@ -22,16 +22,9 @@ import { StatRow } from './StatRow';
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const INK = '#0F172A';
 const AMBER = '#F7931E';
-const UNDER_PAR = '#D2222D';
-const HAIRLINE = 'rgba(15,23,42,0.08)';
-const BAND_BG = 'rgba(15,23,42,0.035)';
 const MUTED = 'rgba(15,23,42,0.45)';
-const FADED = 'rgba(15,23,42,0.35)';
-const GHOST = 'rgba(15,23,42,0.45)';
 const CHIP_BG = 'rgba(15,23,42,0.04)';
 const TRACK_BG = 'rgba(15,23,42,0.08)';
-const AVATAR_RING_MUTED = 'rgba(15,23,42,0.2)';
-const CHEVRON_COLOR = 'rgba(15,23,42,0.3)';
 const PAGE_PAD = 14;
 
 
