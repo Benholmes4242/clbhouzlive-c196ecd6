@@ -142,7 +142,7 @@ serve(async (req) => {
     } = body;
 
     // Per-action gate
-    const fullOnlyActions: AdminAction[] = ['delete_user', 'reset_password', 'delete_course'];
+    const fullOnlyActions: AdminAction[] = ['delete_user', 'reset_password', 'delete_course', 'change_username'];
     const moderationActions: AdminAction[] = [
       'suspend_user', 'unsuspend', 'warn_user', 'hide_post', 'unhide_post',
     ];
