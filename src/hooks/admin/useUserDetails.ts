@@ -215,21 +215,26 @@ export function useUserActions() {
   const changeUsername = useCallback(async (userId: string, newUsername: string) => {
     setLoading(userId);
     try {
-      const { data, error } = await supabase.functions.invoke('secure-admin-operations', {
-        body: {
+      const { data: sess } = await supabase.auth.getSession();
+      const token = sess.session?.access_token;
+      const url = `${(supabase as any).functionsUrl ?? ''}/secure-admin-operations`;
+      const res = await fetch(url || `https://ybxkehyomcakqjvuhnna.supabase.co/functions/v1/secure-admin-operations`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token ?? ''}`,
+        },
+        body: JSON.stringify({
           action: 'change_username',
           targetUserId: userId,
           newUsername,
-        },
+        }),
       });
-      if (error) {
-        // Edge function non-2xx bodies are surfaced as FunctionsHttpError; try to unwrap.
-        const anyErr = error as any;
-        const bodyErr = anyErr?.context?.error ?? anyErr?.message;
-        return { success: false, error: bodyErr ?? 'unknown_error' };
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok || body?.error) {
+        return { success: false, error: body?.error ?? `HTTP ${res.status}` };
       }
-      if (data?.error) return { success: false, error: data.error };
-      return { success: true, data };
+      return { success: true, data: body };
     } catch (error) {
       console.error('Error changing username:', error);
       return { success: false, error };
