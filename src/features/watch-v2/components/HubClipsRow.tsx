@@ -105,24 +105,8 @@ function Tile({
             }}
           />
         ) : null}
-        {row.duration_seconds ? (
-          <div
-            style={{
-              position: 'absolute',
-              bottom: 6,
-              right: 6,
-              zIndex: 2,
-              background: 'rgba(0,0,0,0.6)',
-              color: '#fff',
-              fontWeight: 600,
-              fontSize: 9.5,
-              padding: '2px 5px',
-              borderRadius: 5,
-            }}
-          >
-            {formatDuration(row.duration_seconds)}
-          </div>
-        ) : null}
+        <GlassDurationBadge seconds={row.duration_seconds} fontSize={9.5} />
+
       </div>
       <div
         style={{

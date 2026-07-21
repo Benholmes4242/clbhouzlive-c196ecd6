@@ -118,24 +118,8 @@ function ClipTile({
             }}
           />
         ) : null}
-        {row.duration_seconds ? (
-          <div
-            style={{
-              position: 'absolute',
-              bottom: 5,
-              right: 5,
-              zIndex: 2,
-              background: 'rgba(0,0,0,0.6)',
-              color: '#fff',
-              fontWeight: 600,
-              fontSize: 9,
-              padding: '1px 5px',
-              borderRadius: 4,
-            }}
-          >
-            {formatDuration(row.duration_seconds)}
-          </div>
-        ) : null}
+        <GlassDurationBadge seconds={row.duration_seconds} bottom={5} right={5} fontSize={9} />
+
       </Pressable>
       <div
         style={{

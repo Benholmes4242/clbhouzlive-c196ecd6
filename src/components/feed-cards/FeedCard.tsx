@@ -242,25 +242,8 @@ export function FeedCard({
           </div>
         ) : null}
 
-        {duration ? (
-          <div
-            style={{
-              position: 'absolute',
-              bottom: 6,
-              right: 6,
-              zIndex: 2,
-              background: 'rgba(0,0,0,0.72)',
-              color: '#fff',
-              fontWeight: 600,
-              fontSize: 9.5,
-              padding: '2px 6px',
-              borderRadius: 5,
-              fontFamily: FONT_FAMILY,
-            }}
-          >
-            {duration}
-          </div>
-        ) : null}
+        <GlassDurationBadge seconds={row.duration_seconds} fontSize={9.5} />
+
         {bareTile && isVideo && !isClip && title ? (
           <>
             <div

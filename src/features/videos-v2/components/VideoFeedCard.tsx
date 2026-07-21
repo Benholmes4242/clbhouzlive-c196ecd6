@@ -127,24 +127,8 @@ export function VideoFeedCard({ row, post, index, posts, isAutoplayActive }: Pro
           />
         ) : null}
         <FormatBadge format="video" />
-        {row.duration_seconds ? (
-          <div
-            style={{
-              position: 'absolute',
-              bottom: 7,
-              right: 7,
-              zIndex: 2,
-              background: 'rgba(0,0,0,0.72)',
-              color: '#fff',
-              fontWeight: 600,
-              fontSize: 10,
-              padding: '2px 6px',
-              borderRadius: 5,
-            }}
-          >
-            {formatDuration(row.duration_seconds)}
-          </div>
-        ) : null}
+        <GlassDurationBadge seconds={row.duration_seconds} bottom={7} right={7} fontSize={10} />
+
       </div>
 
       <div style={{ display: 'flex', gap: 9, marginTop: 8, alignItems: 'flex-start' }}>
