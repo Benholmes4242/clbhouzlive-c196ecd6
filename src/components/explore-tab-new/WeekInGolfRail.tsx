@@ -50,7 +50,7 @@ const TYPE_META: Record<EventType, { glyph: string; label: string; groupLabel: s
   eagle: { glyph: '🦅', label: 'EAGLE', groupLabel: 'Moments', group: 'moments' },
   crown_taken: { glyph: '👑', label: 'CROWN TAKEN', groupLabel: 'Crowns', group: 'crowns' },
   big_round: { glyph: '🎯', label: 'BIG ROUND', groupLabel: 'Big rounds', group: 'big_rounds' },
-  rank_unlocked: { glyph: '⛰', label: 'RANK UNLOCKED', groupLabel: 'Ranks', group: 'ranks' },
+  rank_unlocked: { glyph: '🏅', label: 'RANK UNLOCKED', groupLabel: 'Ranks', group: 'ranks' },
   course_record: { glyph: '📋', label: 'COURSE RECORD', groupLabel: 'Records', group: 'records' },
 };
 
@@ -174,7 +174,6 @@ function RailCard({ row, onTap }: { row: WeekRow; onTap: () => void }) {
       style={{
         flexShrink: 0,
         width: 168,
-        minHeight: 176,
         padding: 12,
         display: 'flex',
         flexDirection: 'column',
@@ -185,9 +184,9 @@ function RailCard({ row, onTap }: { row: WeekRow; onTap: () => void }) {
         borderRadius: 14,
         boxShadow: CARD_SHADOW,
         cursor: 'pointer',
-
-
         fontFamily: FONT,
+        position: 'relative',
+        overflow: 'hidden',
       }}
     >
       <span
@@ -209,43 +208,14 @@ function RailCard({ row, onTap }: { row: WeekRow; onTap: () => void }) {
         {meta.label}
       </span>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10, minWidth: 0, width: '100%' }}>
-        <SquircleAvatar
-          src={row.avatar_url ?? undefined}
-          alt={displayName}
-          size="xs"
-          hairlineRing
-        />
-        <div style={{ minWidth: 0, flex: 1 }}>
-          <div
-            style={{
-              fontSize: 12,
-              fontWeight: 600,
-              color: INK,
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              lineHeight: 1.2,
-            }}
-          >
-            {displayName}
-          </div>
-          <div style={{ fontSize: 10.5, color: MUTE, marginTop: 1 }}>{rel}</div>
-        </div>
-      </div>
-
       {row.line1 ? (
         <div
           style={{
             marginTop: 10,
-            fontSize: 13,
-            fontWeight: 600,
+            fontSize: 14,
+            fontWeight: 800,
             color: INK,
             lineHeight: 1.3,
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
           }}
         >
           {row.line1}
@@ -258,15 +228,61 @@ function RailCard({ row, onTap }: { row: WeekRow; onTap: () => void }) {
             fontSize: 11.5,
             color: MUTE,
             lineHeight: 1.3,
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
           }}
         >
           {row.line2}
         </div>
       ) : null}
+
+      <div
+        style={{
+          width: '100%',
+          height: 1,
+          background: HAIRLINE,
+          marginTop: 10,
+        }}
+      />
+
+      <div style={{ width: '100%', marginTop: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
+          <SquircleAvatar
+            src={row.avatar_url ?? undefined}
+            alt={displayName}
+            size="xs"
+            hairlineRing
+          />
+          <div style={{ fontSize: 10.5, color: MUTE, lineHeight: 1.2 }}>{rel}</div>
+        </div>
+        <div
+          style={{
+            marginTop: 4,
+            fontSize: 12,
+            fontWeight: 600,
+            color: INK,
+            lineHeight: 1.2,
+            width: '100%',
+          }}
+        >
+          {displayName}
+        </div>
+      </div>
+
+      <span
+        aria-hidden
+        style={{
+          position: 'absolute',
+          right: -6,
+          bottom: -10,
+          fontSize: 64,
+          opacity: 0.07,
+          transform: 'rotate(-10deg)',
+          filter: 'grayscale(100%)',
+          pointerEvents: 'none',
+          userSelect: 'none',
+        }}
+      >
+        {meta.glyph}
+      </span>
     </button>
   );
 }
