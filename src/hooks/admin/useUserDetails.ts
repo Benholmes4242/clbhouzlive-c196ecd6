@@ -123,6 +123,22 @@ export function useUserDetails(userId: string | null) {
   });
 }
 
+async function extractFnError(error: unknown): Promise<string> {
+  const anyErr = error as any;
+  try {
+    const ctx = anyErr?.context;
+    if (ctx && typeof ctx.json === 'function') {
+      const body = await ctx.json();
+      if (body?.error) return String(body.error);
+    }
+    if (ctx && typeof ctx.text === 'function') {
+      const txt = await ctx.text();
+      if (txt) return txt;
+    }
+  } catch (_) { /* ignore */ }
+  return anyErr?.message ?? 'Request failed';
+}
+
 export function useUserActions() {
   const [loading, setLoading] = useState<string | null>(null);
 
@@ -158,7 +174,11 @@ export function useUserActions() {
           reason: 'Admin suspended user',
         },
       });
-      if (error) throw error;
+      if (error) {
+        const msg = await extractFnError(error);
+        return { success: false, error: new Error(msg) };
+      }
+      if (data?.error) return { success: false, error: new Error(String(data.error)) };
       return { success: true, data };
     } catch (error) {
       console.error('Error suspending user:', error);
@@ -168,19 +188,21 @@ export function useUserActions() {
     }
   }, []);
 
-  const deleteUser = useCallback(async (userId: string, userEmail: string) => {
+  const deleteUser = useCallback(async (userId: string, _userEmail?: string) => {
     setLoading(userId);
     try {
       const { data, error } = await supabase.functions.invoke('secure-admin-operations', {
         body: {
           action: 'delete_user',
           targetUserId: userId,
-          targetEmail: userEmail,
           reason: 'Admin requested user deletion',
         },
       });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
+      if (error) {
+        const msg = await extractFnError(error);
+        return { success: false, error: new Error(msg) };
+      }
+      if (data?.error) return { success: false, error: new Error(String(data.error)) };
       return { success: true };
     } catch (error) {
       console.error('Error deleting user:', error);
@@ -201,8 +223,11 @@ export function useUserActions() {
           reason: 'Admin requested password reset',
         },
       });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
+      if (error) {
+        const msg = await extractFnError(error);
+        return { success: false, error: new Error(msg) };
+      }
+      if (data?.error) return { success: false, error: new Error(String(data.error)) };
       return { success: true };
     } catch (error) {
       console.error('Error resetting password:', error);

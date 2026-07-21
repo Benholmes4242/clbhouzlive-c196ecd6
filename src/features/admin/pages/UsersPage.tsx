@@ -409,9 +409,20 @@ function Member360Sheet({
     if (!detail || !confirm) return;
     setBusy(true);
     try {
-      if (confirm === 'suspend') await actions.suspendUser(detail.id);
-      if (confirm === 'delete') await actions.deleteUser(detail.id, detail.email ?? `${detail.username ?? detail.id}@user`);
-      if (confirm === 'reset')  await actions.resetPassword(detail.id, detail.email ?? `${detail.username ?? detail.id}@user`);
+      let res: { success: boolean; error?: any } | undefined;
+      if (confirm === 'suspend') res = await actions.suspendUser(detail.id);
+      if (confirm === 'delete')  res = await actions.deleteUser(detail.id);
+      if (confirm === 'reset')   res = await actions.resetPassword(detail.id, detail.email ?? `${detail.username ?? detail.id}@user`);
+      if (res && !res.success) {
+        const msg = res.error instanceof Error ? res.error.message : (typeof res.error === 'string' ? res.error : 'Action failed');
+        toast.error(msg);
+      } else if (res?.success) {
+        toast.success(
+          confirm === 'delete' ? 'User deleted' :
+          confirm === 'suspend' ? 'User suspended' :
+          'Password reset email sent'
+        );
+      }
     } finally {
       setBusy(false);
       setConfirm(null);
