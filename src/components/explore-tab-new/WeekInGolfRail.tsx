@@ -291,8 +291,8 @@ function SeeAllTile({ onTap }: { onTap: () => void }) {
         fontWeight: 600,
         fontFamily: FONT,
         cursor: 'pointer',
-        }}
       }}
+
     >
       See all ›
     </button>
