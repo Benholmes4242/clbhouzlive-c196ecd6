@@ -400,6 +400,7 @@ function Member360Sheet({
   const [reqReason, setReqReason] = useState('');
   const [reqRoleAction, setReqRoleAction] =
     useState<'grant_limited' | 'grant_full' | 'downgrade' | 'revoke'>('grant_limited');
+  const [renameOpen, setRenameOpen] = useState(false);
 
   const close = () => { setConfirm(null); setRequestMode(null); setReqReason(''); onClose(); };
   const name = detail?.display_name ?? detail?.username ?? 'member';
