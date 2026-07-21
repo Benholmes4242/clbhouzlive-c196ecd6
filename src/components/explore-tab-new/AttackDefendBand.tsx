@@ -20,9 +20,12 @@ const HAIRLINE = 'rgba(15,23,42,0.08)';
 const CARD_BG = '#FFFFFF';
 const CARD_SHADOW = '0 1px 3px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.05)';
 const TRACK_BG = 'rgba(15,23,42,0.08)';
-const CHIP_BG = 'rgba(15,23,42,0.04)';
 const PAGE_PAD = 16;
 const RED = '#DC2626';
+const GREEN = '#16A34A';
+const GREEN_DEEP = '#15803D';
+const GREEN_TINT_BG = 'rgba(22,163,74,0.10)';
+const CARD_HEIGHT = 168;
 
 interface DefendRow {
   course_id: string;
