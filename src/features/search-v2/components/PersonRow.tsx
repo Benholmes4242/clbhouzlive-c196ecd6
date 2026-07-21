@@ -1,4 +1,4 @@
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import type { PersonHit } from '../lib/searchNavigation';
 import { Highlight } from './Highlight';
 
