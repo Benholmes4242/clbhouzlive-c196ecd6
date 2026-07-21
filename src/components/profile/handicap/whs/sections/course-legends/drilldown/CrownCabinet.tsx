@@ -11,6 +11,23 @@ export interface CabinetSlot {
   short: string;
   icon: LucideIcon;
   held: boolean;
+  /** ISO date the viewer took this crown — used to render "Held Nd" and pick the longest reign. */
+  attainedAt?: string | null;
+}
+
+function daysHeld(iso: string | null | undefined): number | null {
+  if (!iso) return null;
+  const t = new Date(iso).getTime();
+  if (!Number.isFinite(t)) return null;
+  return Math.max(0, Math.floor((Date.now() - t) / 86400000));
+}
+
+function reignLabel(days: number): string {
+  if (days === 0) return 'Held today';
+  if (days === 1) return 'Held 1d';
+  if (days < 30) return `Held ${days}d`;
+  if (days < 365) return `Held ${Math.floor(days / 30)}mo`;
+  return `Held ${Math.floor(days / 365)}y`;
 }
 
 interface CrownCabinetProps {
@@ -33,6 +50,21 @@ export const CrownCabinet: React.FC<CrownCabinetProps> = ({
 }) => {
   const cols = slots.length || 6;
   const orderedSlots = [...slots].sort((a, b) => Number(b.held) - Number(a.held));
+
+  // Longest-standing crown = the held slot with the earliest attainedAt.
+  const longestReignKey = React.useMemo(() => {
+    let bestKey: string | null = null;
+    let bestTs = Infinity;
+    for (const s of slots) {
+      if (!s.held || !s.attainedAt) continue;
+      const t = new Date(s.attainedAt).getTime();
+      if (Number.isFinite(t) && t < bestTs) {
+        bestTs = t;
+        bestKey = s.key;
+      }
+    }
+    return bestKey;
+  }, [slots]);
 
   return (
     <div
@@ -84,6 +116,9 @@ export const CrownCabinet: React.FC<CrownCabinetProps> = ({
       >
         {orderedSlots.map((slot) => {
           const SlotIcon = slot.icon;
+          const held = slot.held;
+          const reignDays = held ? daysHeld(slot.attainedAt) : null;
+          const isLongest = held && slot.key === longestReignKey;
           return (
             <div
               key={slot.key}
@@ -91,31 +126,56 @@ export const CrownCabinet: React.FC<CrownCabinetProps> = ({
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: 6,
+                gap: 4,
                 flexShrink: 0,
                 width: 64,
                 scrollSnapAlign: 'start',
               }}
             >
-              <div
-                style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: 14,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: slot.held
-                    ? 'linear-gradient(135deg, #FBBC2E, #E07F0E)'
-                    : 'var(--hcp-tint-3)',
-                  border: slot.held ? 'none' : '1.5px dashed var(--hcp-dash)',
-                  boxShadow: slot.held ? '0 2px 8px rgba(247,147,30,0.35)' : 'none',
-                }}
-              >
-                {slot.held ? (
-                  <Crown size={18} strokeWidth={2.4} color="#FFFFFF" fill="rgba(255,255,255,0.35)" />
-                ) : (
-                  <SlotIcon size={15} color="var(--hcp-t-30)" strokeWidth={2.2} />
+              <div style={{ position: 'relative' }}>
+                <div
+                  style={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: 14,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: held
+                      ? 'linear-gradient(135deg, #FBBC2E, #E07F0E)'
+                      : 'var(--hcp-tint-3)',
+                    border: held ? 'none' : '1.5px dashed var(--hcp-dash)',
+                    boxShadow: held ? '0 2px 8px rgba(247,147,30,0.35)' : 'none',
+                  }}
+                >
+                  {held ? (
+                    <Crown size={18} strokeWidth={2.4} color="#FFFFFF" fill="rgba(255,255,255,0.35)" />
+                  ) : (
+                    <SlotIcon size={15} color="var(--hcp-t-30)" strokeWidth={2.2} />
+                  )}
+                </div>
+                {isLongest && (
+                  <span
+                    aria-label="Longest reign"
+                    style={{
+                      position: 'absolute',
+                      top: -6,
+                      right: -8,
+                      fontSize: 7.5,
+                      fontWeight: 900,
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
+                      color: '#7C2D12',
+                      background: 'linear-gradient(135deg, #FBBC2E, #F7931E)',
+                      borderRadius: 999,
+                      padding: '2px 5px',
+                      lineHeight: 1,
+                      boxShadow: '0 1px 3px rgba(247,147,30,0.4)',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    Longest
+                  </span>
                 )}
               </div>
               <span
@@ -124,13 +184,28 @@ export const CrownCabinet: React.FC<CrownCabinetProps> = ({
                   fontWeight: 800,
                   letterSpacing: '0.08em',
                   textTransform: 'uppercase',
-                  color: slot.held ? HELD_LABEL : 'var(--hcp-t-40)',
+                  color: held ? HELD_LABEL : 'var(--hcp-t-40)',
                   textAlign: 'center',
                   lineHeight: 1.15,
                 }}
               >
                 {slot.short}
               </span>
+              {held && reignDays != null && (
+                <span
+                  className="tabular-nums"
+                  style={{
+                    fontSize: 9,
+                    fontWeight: 700,
+                    color: 'var(--hcp-t-55)',
+                    letterSpacing: '-0.005em',
+                    lineHeight: 1,
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {reignLabel(reignDays)}
+                </span>
+              )}
             </div>
           );
         })}
@@ -146,6 +221,7 @@ export const CrownCabinet: React.FC<CrownCabinetProps> = ({
           ]}
         />
       </div>
+
 
     </div>
   );

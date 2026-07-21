@@ -44,6 +44,8 @@ interface ChampionsDuelCardProps {
   /** When true, section sits on a soft alternating band (matches the
    *  course-records ledger on the discover page). No card chrome either way. */
   banded?: boolean;
+  /** Optional kicker override — replaces the category label in the section header. */
+  titleOverride?: string;
 }
 
 
@@ -181,6 +183,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
   proBenchmark,
   theme = 'dark',
   banded = false,
+  titleOverride,
 }) => {
   const isLight = theme === 'light';
   const avatarRing = isLight ? 'rgba(15,23,42,0.12)' : 'rgba(255,255,255,0.22)';
@@ -262,7 +265,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
         <div style={{ flex: 1, minWidth: 0 }}>
           <SectionHeader
             role="section"
-            kicker={categoryLabel.toUpperCase()}
+            kicker={(titleOverride ?? categoryLabel).toUpperCase()}
             inlineIcon
             icon={CatIcon}
           />
