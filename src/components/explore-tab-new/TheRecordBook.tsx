@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { TierSeeAllSheet } from './TierSeeAllSheet';
 import {
   useRegionFeats,
@@ -15,7 +16,6 @@ import { useTitlesInReach, type TitleInReach } from '@/hooks/gam/useTitlesInReac
 import type { ScorecardOpener } from './useScorecardOpener';
 import { SPACE } from '@/lib/spacing';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
-import { StatRow, StatList, getStatToParColor } from '@/components/discover/StatRow';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const INK = '#0F172A';
@@ -205,18 +205,41 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
         </button>
       </div>
 
-      {/* Ledger — canonical StatList */}
+      {/* Column caption row — 14px side padding; course caption offset to line up
+          with the row's course text edge (rank 12 + gap 8 + avatar 24 + gap 8 = 52). */}
+      <div
+        style={{
+          marginTop: 12,
+          padding: `0 ${PAGE_PAD}px 0 ${PAGE_PAD + 52}px`,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          fontSize: 9,
+          fontWeight: 600,
+          letterSpacing: '0.06em',
+          textTransform: 'uppercase',
+          color: 'rgba(15,23,42,0.35)',
+          lineHeight: 1,
+        }}
+      >
+        <div style={{ flex: 1, minWidth: 0 }}>Course</div>
+        <div style={{ width: 40, textAlign: 'center' }}>To par</div>
+        <div style={{ width: 30, textAlign: 'right' }}>Gross</div>
+        <div style={{ width: 10 }} aria-hidden />
+      </div>
+
+      {/* Ledger — full-bleed banded table */}
       <div style={{ marginTop: 8 }}>
-        <StatList>
-          {ledgerRows.map((row, i) => (
-            <RecordLedgerRow
-              key={`${row.course_id ?? i}-${i}`}
-              row={row}
-              rank={i + 1}
-              onTap={() => handleRowTap(row)}
-            />
-          ))}
-        </StatList>
+        {ledgerRows.map((row, i) => (
+          <LedgerRow
+            key={`${row.course_id ?? i}-${i}`}
+            row={row}
+            rank={i + 1}
+            banded={i === 1 || i === 3}
+            isLast={i === ledgerRows.length - 1}
+            onTap={() => handleRowTap(row)}
+          />
+        ))}
       </div>
 
       {/* Conquests sub-section (personal, does not follow Lens scope) */}
@@ -236,14 +259,18 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
 }
 
 
-// ---- Ledger row (canonical StatRow) ---------------------------------------
-function RecordLedgerRow({
+// ---- Ledger row -----------------------------------------------------------
+function LedgerRow({
   row,
   rank,
+  banded,
+  isLast,
   onTap,
 }: {
   row: FeatRow;
   rank: number;
+  banded: boolean;
+  isLast: boolean;
   onTap: () => void;
 }) {
   const holder = formatHolderName(row.holder_name);
@@ -261,29 +288,125 @@ function RecordLedgerRow({
 
   const showToPar = par != null && !isStableford;
   const toParDisplay = showToPar ? toParText(par!) : '—';
-  const toParColor = showToPar
-    ? getStatToParColor(par!, 'light')
-    : undefined;
-
-  const subline = (
-    <>
-      {holder}
-      {when ? ` · ${relativeTime(when)}` : ''}
-    </>
-  );
+  const toParColor = showToPar && par! < 0 ? UNDER_PAR : INK;
 
   return (
-    <StatRow
-      rank={rank}
-      avatarUrl={row.holder_avatar}
-      avatarUserId={row.user_id}
-      name={row.course_name}
-      subline={subline}
-      statValue={toParDisplay}
-      statColor={toParColor}
-      statSubLabel={grossText ? `${grossText} GROSS` : undefined}
-      onPress={onTap}
-    />
+    <button
+      type="button"
+      onClick={onTap}
+      className="text-left active:opacity-80 transition-opacity"
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+        padding: `10px ${PAGE_PAD}px`,
+        width: '100%',
+        background: banded ? BAND_BG : 'transparent',
+        border: 'none',
+        borderTop: `0.5px solid ${HAIRLINE}`,
+        borderBottom: isLast ? `0.5px solid ${HAIRLINE}` : 'none',
+        cursor: 'pointer',
+        fontFamily: FONT,
+        color: INK,
+      }}
+    >
+      {/* Rank */}
+      <div
+        style={{
+          width: 12,
+          flexShrink: 0,
+          fontSize: 11,
+          fontWeight: 600,
+          color: FADED,
+          fontVariantNumeric: 'tabular-nums',
+          textAlign: 'center',
+        }}
+      >
+        {rank}
+      </div>
+
+
+
+      {/* Avatar */}
+      <div style={{ flexShrink: 0 }}>
+        <SquircleAvatar
+          size={24}
+          src={row.holder_avatar}
+          alt={holder}
+          fallback={initials(holder)}
+          hairlineRing
+          ringColor={AVATAR_RING_MUTED}
+        />
+      </div>
+
+      {/* Middle: course + holder line */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div
+          style={{
+            fontSize: 13,
+            fontWeight: 600,
+            letterSpacing: '-0.01em',
+            color: INK,
+            lineHeight: 1.2,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {row.course_name}
+        </div>
+        <div
+          style={{
+            marginTop: 2,
+            fontSize: 11,
+            fontWeight: 500,
+            color: MUTED,
+            lineHeight: 1.2,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {holder}
+          {when ? ` · ${relativeTime(when)}` : ''}
+        </div>
+      </div>
+
+      {/* To par column */}
+      <div
+        className="tabular-nums"
+        style={{
+          width: 36,
+          flexShrink: 0,
+          textAlign: 'center',
+          fontSize: 14,
+          fontWeight: 700,
+          color: toParColor,
+          lineHeight: 1,
+        }}
+      >
+        {toParDisplay}
+      </div>
+
+      {/* Gross column */}
+      <div
+        className="tabular-nums"
+        style={{
+          width: 26,
+          flexShrink: 0,
+          textAlign: 'right',
+          fontSize: 11,
+          fontWeight: 500,
+          color: GHOST,
+          lineHeight: 1,
+        }}
+      >
+        {grossText || '—'}
+      </div>
+
+      {/* Chevron */}
+      <span style={{ width: 12, textAlign: 'right', fontSize: 12, fontWeight: 600, color: CHEVRON_COLOR, lineHeight: 1, flexShrink: 0 }}>›</span>
+    </button>
   );
 }
 
