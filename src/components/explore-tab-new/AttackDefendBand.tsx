@@ -481,16 +481,14 @@ function AttackRail({ picks }: { picks: TitleInReach[] }) {
       className="flex overflow-x-auto scrollbar-hide"
       style={{
         gap: 8,
-      style={{
-        gap: 10,
         marginTop: 10,
         paddingLeft: PAGE_PAD,
         paddingRight: PAGE_PAD,
         paddingBottom: 4,
         WebkitOverflowScrolling: 'touch',
       }}
-
     >
+
       {picks.map((row) => (
         <AttackChip
           key={`${row.course_id}-${row.category}`}
