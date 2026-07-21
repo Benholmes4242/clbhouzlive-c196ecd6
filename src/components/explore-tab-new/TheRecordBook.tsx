@@ -16,6 +16,8 @@ import { useTitlesInReach, type TitleInReach } from '@/hooks/gam/useTitlesInReac
 import type { ScorecardOpener } from './useScorecardOpener';
 import { SPACE } from '@/lib/spacing';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
+import { RATING_RAMPS } from '@/lib/ratingTier';
+import { StatRow } from './StatRow';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const INK = '#0F172A';
