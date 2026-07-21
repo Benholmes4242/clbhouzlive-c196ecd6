@@ -238,14 +238,61 @@ function LegendarySection({
         overline={mode === 'alltime' ? 'All-time honours' : 'Latest honours'}
         title="Moments of the game"
         meta="View all"
-        onMeta={() => openSheet('aces')}
+        onMeta={() => openSheet(sheetMetric)}
         paddingX={14}
       />
 
+      {mode === 'alltime' && (
+        <div
+          role="tablist"
+          aria-label="Metric"
+          style={{
+            margin: '0 14px 8px',
+            display: 'inline-flex',
+            gap: 2,
+            padding: 2,
+            background: '#FFFFFF',
+            border: '1px solid rgba(15,23,42,0.08)',
+            borderRadius: 999,
+          }}
+        >
+          {([
+            { v: 'aces', label: 'Aces' },
+            { v: 'albatrosses', label: 'Albatrosses' },
+          ] as const).map((o) => {
+            const active = sheetMetric === o.v;
+            return (
+              <button
+                key={o.v}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                onClick={() => setSheetMetric(o.v)}
+                style={{
+                  padding: '4px 10px',
+                  borderRadius: 999,
+                  background: active ? '#15171F' : 'transparent',
+                  color: active ? '#FFFFFF' : 'rgba(15,23,42,0.55)',
+                  border: 'none',
+                  fontFamily: 'inherit',
+                  fontSize: 10,
+                  fontWeight: 600,
+                  whiteSpace: 'nowrap',
+                  cursor: 'pointer',
+                  transition: 'all .15s',
+                }}
+              >
+                {o.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       <AcesAlbatrossesPodium
         region={region}
         mode={mode}
+        metric={sheetMetric}
         onRowTap={onLeaderTap}
         onLatestRowTap={onRowTap}
       />

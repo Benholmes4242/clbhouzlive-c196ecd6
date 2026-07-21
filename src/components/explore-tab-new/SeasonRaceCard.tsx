@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { ChevronRight, Crown } from 'lucide-react';
+
 
 import { supabase } from '@/integrations/supabase/client';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -97,9 +99,16 @@ export function SeasonRaceCard({ userId }: Props) {
   return (
     <>
       <section style={{ padding: '0 16px', fontFamily: FONT }}>
-        <button
-          type="button"
+        <div
+          role="button"
+          tabIndex={0}
           onClick={() => setSheetOpen(true)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setSheetOpen(true);
+            }
+          }}
           style={{
             width: '100%',
             background: CARD_BG,
@@ -199,7 +208,7 @@ export function SeasonRaceCard({ userId }: Props) {
           >
             Crowns this season
           </div>
-        </button>
+        </div>
       </section>
 
       <SeasonStandingsSheet
@@ -213,19 +222,30 @@ export function SeasonRaceCard({ userId }: Props) {
   );
 }
 
+
 function PodiumRow({
   row,
   isLast,
   highlighted,
+  onNavigate,
 }: {
   row: SeasonRow;
   isLast?: boolean;
   highlighted?: boolean;
+  onNavigate?: (userId: string) => void;
 }) {
+  const navigate = useNavigate();
   const isViewer = !!row.is_viewer || !!highlighted;
   const name = row.display_name ?? 'Golfer';
   const rank = row.rank ?? 0;
   const chip = RANK_CHIP[rank];
+
+  const goToProfile = (e: React.MouseEvent | React.KeyboardEvent) => {
+    e.stopPropagation();
+    if (!row.user_id) return;
+    if (onNavigate) onNavigate(row.user_id);
+    else navigate(`/profile/${row.user_id}`);
+  };
 
   return (
     <div
@@ -282,29 +302,48 @@ function PodiumRow({
           </div>
         )}
       </div>
-      <SquircleAvatar
-        size={36}
-        srcCandidates={row.avatar_url ? [row.avatar_url] : []}
-        alt={name}
-        fallback={initials(name)}
-        userId={row.user_id}
-        hairlineRing
-      />
-      <div
+      <button
+        type="button"
+        onClick={goToProfile}
         style={{
           flex: 1,
           minWidth: 0,
-          fontSize: 14,
-          fontWeight: isViewer ? 700 : 600,
-          color: INK,
-          letterSpacing: '-0.005em',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          background: 'transparent',
+          border: 'none',
+          padding: 0,
+          margin: 0,
+          textAlign: 'left',
+          cursor: row.user_id ? 'pointer' : 'default',
+          fontFamily: 'inherit',
         }}
       >
-        {isViewer ? 'You' : name}
-      </div>
+        <SquircleAvatar
+          size={36}
+          srcCandidates={row.avatar_url ? [row.avatar_url] : []}
+          alt={name}
+          fallback={initials(name)}
+          userId={row.user_id}
+          hairlineRing
+        />
+        <span
+          style={{
+            flex: 1,
+            minWidth: 0,
+            fontSize: 14,
+            fontWeight: isViewer ? 700 : 600,
+            color: INK,
+            letterSpacing: '-0.005em',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {isViewer ? 'You' : name}
+        </span>
+      </button>
       <div
         style={{
           flexShrink: 0,
@@ -344,6 +383,11 @@ function SeasonStandingsSheet({
   seasonTitle: string;
   daysLeft: number | null;
 }) {
+  const navigate = useNavigate();
+  const handleNavigate = (uid: string) => {
+    onClose();
+    setTimeout(() => navigate(`/profile/${uid}`), 60);
+  };
   const { data, isLoading } = useQuery({
     queryKey: ['discover', 'season-race', 'all', userId],
     enabled: open,
@@ -457,7 +501,12 @@ function SeasonStandingsSheet({
           </div>
         ) : (
           rows.map((row, idx) => (
-            <PodiumRow key={row.user_id + idx} row={row} isLast={idx === rows.length - 1} />
+            <PodiumRow
+              key={row.user_id + idx}
+              row={row}
+              isLast={idx === rows.length - 1}
+              onNavigate={handleNavigate}
+            />
           ))
         )}
       </div>
