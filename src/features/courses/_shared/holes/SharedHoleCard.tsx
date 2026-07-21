@@ -159,6 +159,8 @@ export const SharedHoleCard: React.FC<SharedHoleCardProps> = ({
   expanded,
   onToggle,
   tag = null,
+  viewerAvgToPar = null,
+  viewerBadge = null,
 }) => {
   const { t } = useTranslation(['courses']);
   const [mounted, setMounted] = useState(false);
