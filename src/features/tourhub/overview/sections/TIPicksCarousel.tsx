@@ -4,7 +4,9 @@
  * case banner, board row chip and last-5 tokens share one treatment.
  */
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
+
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { useNavigate } from 'react-router-dom';
