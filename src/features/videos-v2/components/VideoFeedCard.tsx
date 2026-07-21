@@ -178,35 +178,40 @@ export function VideoFeedCard({ row, post, index, posts, isAutoplayActive }: Pro
           >
             {title}
           </div>
-          {(row.creator_username || likeCount > 0 || row.post_created_at) ? (
-            <div
-              style={{
-                fontWeight: 500,
-                fontSize: 11.5,
-                color: '#64748B',
-                marginTop: 3,
-              }}
-            >
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, minWidth: 0 }}>
-                {row.creator_username && (
-                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
-                    @{row.creator_username}
-                  </span>
-                )}
-                {likeCount > 0 && (
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, flexShrink: 0 }}>
-                    <Heart style={{ width: 12, height: 12, color: '#F7931E', fill: '#F7931E' }} strokeWidth={1.8} />
-                    {formatCount(likeCount)}
-                  </span>
-                )}
-                {row.post_created_at && (
-                  <span style={{ flexShrink: 0 }}>
-                    {(row.creator_username || likeCount > 0) ? `\u00B7 ${relativeTime(row.post_created_at)}` : relativeTime(row.post_created_at)}
-                  </span>
-                )}
-              </span>
-            </div>
-          ) : null}
+          {(() => {
+            const creatorName = row.creator_display_name || row.creator_username || '';
+            const showCreator = creatorName.length > 0;
+            if (!showCreator && likeCount === 0 && !row.post_created_at) return null;
+            return (
+              <div
+                style={{
+                  fontWeight: 500,
+                  fontSize: 11.5,
+                  color: '#64748B',
+                  marginTop: 3,
+                }}
+              >
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, minWidth: 0 }}>
+                  {showCreator && (
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
+                      {creatorName}
+                    </span>
+                  )}
+                  {likeCount > 0 && (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, flexShrink: 0 }}>
+                      <Heart style={{ width: 12, height: 12, color: '#F7931E', fill: '#F7931E' }} strokeWidth={1.8} />
+                      {formatCount(likeCount)}
+                    </span>
+                  )}
+                  {row.post_created_at && (
+                    <span style={{ flexShrink: 0 }}>
+                      {(showCreator || likeCount > 0) ? `\u00B7 ${relativeTime(row.post_created_at)}` : relativeTime(row.post_created_at)}
+                    </span>
+                  )}
+                </span>
+              </div>
+            );
+          })()}
         </div>
         <VideoCardMoreButton post={post} />
       </div>
