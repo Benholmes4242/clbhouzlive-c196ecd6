@@ -123,6 +123,22 @@ export function useUserDetails(userId: string | null) {
   });
 }
 
+async function extractFnError(error: unknown): Promise<string> {
+  const anyErr = error as any;
+  try {
+    const ctx = anyErr?.context;
+    if (ctx && typeof ctx.json === 'function') {
+      const body = await ctx.json();
+      if (body?.error) return String(body.error);
+    }
+    if (ctx && typeof ctx.text === 'function') {
+      const txt = await ctx.text();
+      if (txt) return txt;
+    }
+  } catch (_) { /* ignore */ }
+  return anyErr?.message ?? 'Request failed';
+}
+
 export function useUserActions() {
   const [loading, setLoading] = useState<string | null>(null);
 
