@@ -256,7 +256,7 @@ export function WeekInGolfRail(_props: WeekInGolfRailProps = {}) {
 
 export default WeekInGolfRail;
 
-function RailCard({ row, onTap }: { row: WeekRow; onTap: () => void }) {
+function RailCard({ row, onTap, onApplause }: { row: WeekRow; onTap: () => void; onApplause: () => void }) {
   const meta = TYPE_META[row.event_type];
   const gold = isGold(row.event_type);
   const displayName = row.display_name || row.username || 'Golfer';
@@ -360,7 +360,15 @@ function RailCard({ row, onTap }: { row: WeekRow; onTap: () => void }) {
             size="xs"
             hairlineRing
           />
-          <div style={{ fontSize: 10.5, color: MUTE, lineHeight: 1.2 }}>{rel}</div>
+          <div style={{ fontSize: 10.5, color: MUTE, lineHeight: 1.2, flex: 1, minWidth: 0 }}>{rel}</div>
+          <ApplauseChip
+            reacted={!!row.my_reacted}
+            count={row.reaction_count ?? 0}
+            onTap={(e) => {
+              e.stopPropagation();
+              onApplause();
+            }}
+          />
         </div>
         <div
           style={{
@@ -375,6 +383,7 @@ function RailCard({ row, onTap }: { row: WeekRow; onTap: () => void }) {
           {displayName}
         </div>
       </div>
+
 
       <span
         aria-hidden
@@ -424,9 +433,20 @@ function SeeAllTile({ onTap }: { onTap: () => void }) {
   );
 }
 
-function WeekInGolfSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
+function WeekInGolfSheet({
+  open,
+  onClose,
+  userId,
+  onApplause,
+}: {
+  open: boolean;
+  onClose: () => void;
+  userId: string | undefined;
+  onApplause: (row: WeekRow) => void;
+}) {
   const navigate = useNavigate();
-  const { data } = useWeekInGolf(open ? 100 : 12);
+  const { data } = useWeekInGolf(open ? 100 : 12, userId);
+
 
   const grouped = useMemo(() => {
     const rows = data ?? [];
