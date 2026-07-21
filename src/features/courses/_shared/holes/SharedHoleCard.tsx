@@ -352,6 +352,39 @@ export const SharedHoleCard: React.FC<SharedHoleCardProps> = ({
           >
             {t('courses:holes.avgToPar')}
           </div>
+          {viewerAvgToPar != null && (() => {
+            const delta = viewerAvgToPar - hole.avg_to_par;
+            const beats = delta < -0.05;
+            const worse = delta > 0.05;
+            const bg = beats
+              ? 'rgba(34,139,79,0.10)'
+              : worse
+              ? 'rgba(210,34,45,0.08)'
+              : 'rgba(15,23,42,0.05)';
+            const fg = beats ? '#22874F' : worse ? TOPAR_UNDER_LIGHT : INK_MUTE;
+            return (
+              <div
+                style={{
+                  marginTop: 6,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  padding: '2px 7px',
+                  borderRadius: 999,
+                  background: bg,
+                  color: fg,
+                  fontSize: 10.5,
+                  fontWeight: 800,
+                  letterSpacing: '0.02em',
+                  fontFamily: MONO,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+                aria-label={`Your average ${fmtAvg(viewerAvgToPar)} vs field ${fmtAvg(hole.avg_to_par)}`}
+              >
+                You: {fmtAvg(viewerAvgToPar)}
+              </div>
+            );
+          })()}
         </div>
 
         <ChevronDown
