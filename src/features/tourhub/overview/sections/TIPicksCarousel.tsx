@@ -4,7 +4,9 @@
  * case banner, board row chip and last-5 tokens share one treatment.
  */
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
+
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { useNavigate } from 'react-router-dom';
@@ -123,6 +125,17 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
   const { data } = useAIPredictions(tournamentId ?? null);
   const [sheet, setSheet] = useState<SheetState>(null);
   const picks = data?.topContenders ?? [];
+
+  // Hide the floating bottom nav while any TI sheet is open so it doesn't
+  // sit on top of the sheet content.
+  const { hideBottomNav, showBottomNav } = useBottomNavigation();
+  useEffect(() => {
+    if (sheet) {
+      hideBottomNav();
+      return () => showBottomNav();
+    }
+  }, [sheet, hideBottomNav, showBottomNav]);
+
 
   const playerIds = useMemo(() => picks.map((p) => p.playerId).filter(Boolean), [picks]);
   const needsLiveData = state === 'live' || state === 'completed';
