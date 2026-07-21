@@ -1,6 +1,4 @@
 import { useMemo, useState } from 'react';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
-import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 import {
   useRegionFeats,
   sortBirdieHauls,
@@ -11,34 +9,24 @@ import { TierSeeAllSheet } from './TierSeeAllSheet';
 import { SectionHead } from './SectionHead';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import { FONT } from './gamingLightTokens';
+import { StatRow } from './StatRow';
 
-const AMBER = '#F7931E';
-const INK = '#0F172A';
-const INK_MUTE = 'rgba(15,23,42,0.45)';
-const RANK_MUTE = 'rgba(15,23,42,0.35)';
-const HAIRLINE = 'rgba(15,23,42,0.08)';
-const BAND_BG = 'rgba(15,23,42,0.035)';
-const BAR_TRACK = 'rgba(15,23,42,0.08)';
-const CHEVRON_COLOR = 'rgba(15,23,42,0.3)';
 const ROWS = 5;
 
 function formatHolderName(raw?: string | null): string {
   const s = (raw ?? '').trim();
-  if (!s) return 'A golfer';
+  if (!s) return '';
   if (s.includes(', ')) {
     const [before, after] = s.split(', ').map((x) => x.trim());
     if (before && after) return `${after} ${before}`;
   }
   return s;
 }
-function initials(name: string): string {
+function displayIdentity(row: FeatRow): string {
   return (
-    (name || '?')
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((p) => p[0]?.toUpperCase() ?? '')
-      .join('') || '?'
+    formatHolderName(row.holder_name) ||
+    (row.holder_username ?? '').trim() ||
+    'A member'
   );
 }
 function birdieCount(row: FeatRow): number {
@@ -52,18 +40,12 @@ interface Props {
   onRowTap?: (row: FeatRow) => void;
 }
 
-export function BirdieHaulsLedger({ region, regionUpper, mode, onRowTap }: Props) {
+export function BirdieHaulsLedger({ region, mode, onRowTap }: Props) {
   const { data, isLoading } = useRegionFeats(region, 'birdie_hauls', mode);
   const rows = useMemo(() => sortBirdieHauls(data ?? [], mode), [data, mode]);
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const display = rows.slice(0, ROWS);
-  const maxCount = useMemo(() => {
-    let m = 0;
-    for (const r of display) m = Math.max(m, birdieCount(r));
-    return m > 0 ? m : 1;
-  }, [display]);
-
   if (!isLoading && display.length === 0) return null;
 
   const overlineLabel = mode === 'alltime' ? 'All-time birdie hauls' : 'Latest birdie hauls';
@@ -78,147 +60,31 @@ export function BirdieHaulsLedger({ region, regionUpper, mode, onRowTap }: Props
       />
 
       <div>
-        <div>
-          {display.map((row, i) => {
-            const isFirst = i === 0;
-            const isLast = i === display.length - 1;
-            const banded = i === 1 || i === 3;
-            const name = formatHolderName(row.holder_name);
-            const count = birdieCount(row);
-            const pct = Math.max(0.08, Math.min(1, count / maxCount));
-            const when = row.play_date ?? row.attained_at ?? null;
-            return (
-              <button
-                key={`${row.score_id ?? row.course_id ?? i}-${i}`}
-                type="button"
-                onClick={() => onRowTap?.(row)}
-                className="text-left active:opacity-80 transition-opacity"
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 6,
-                  padding: '10px 14px',
-                  width: '100%',
-                  background: banded ? BAND_BG : 'transparent',
-                  border: 'none',
-                  borderTop: `0.5px solid ${HAIRLINE}`,
-                  borderBottom: isLast ? `0.5px solid ${HAIRLINE}` : 'none',
-                  cursor: 'pointer',
-                  fontFamily: FONT,
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div
-                    style={{
-                      width: 16,
-                      fontSize: 11,
-                      fontWeight: 600,
-                      color: isFirst ? AMBER : RANK_MUTE,
-                      fontVariantNumeric: 'tabular-nums',
-                      textAlign: 'center',
-                    }}
-                  >
-                    {i + 1}
-                  </div>
-                  <SquircleAvatar
-                    size={24}
-                    srcCandidates={row.holder_avatar ? [row.holder_avatar] : []}
-                    alt={name}
-                    fallback={initials(name)}
-                    userId={row.user_id}
-                    hairlineRing
-                    ringColor={isFirst ? SC_FILL_GOLD : LIGHT_HAIRLINE}
-                  />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div
-                      style={{
-                        fontSize: 13,
-                        fontWeight: 600,
-                        letterSpacing: '-0.01em',
-                        color: INK,
-                        lineHeight: 1.2,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {name}
-                    </div>
-                    <div
-                      style={{
-                        marginTop: 2,
-                        fontSize: 11,
-                        fontWeight: 500,
-                        color: INK_MUTE,
-                        lineHeight: 1.2,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {row.course_name}
-                      {when ? ` · ${relativeTime(when)}` : ''}
-                    </div>
-                  </div>
-                  <div
-                    style={{
-                      flexShrink: 0,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'flex-end',
-                      minWidth: 44,
-                    }}
-                  >
-                    <div
-                      className="tabular-nums"
-                      style={{
-                        fontSize: 15,
-                        fontWeight: 700,
-                        color: isFirst ? AMBER : INK,
-                        lineHeight: 1,
-                      }}
-                    >
-                      {count}
-                    </div>
-                    <div
-                      style={{
-                        marginTop: 3,
-                        fontSize: 9,
-                        fontWeight: 600,
-                        letterSpacing: '0.06em',
-                        textTransform: 'uppercase',
-                        color: 'rgba(15,23,42,0.45)',
-                        lineHeight: 1,
-                      }}
-                    >
-                      BIRDIES
-                    </div>
-                  </div>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: CHEVRON_COLOR, lineHeight: 1 }}>›</span>
-                </div>
-                <div
-                  style={{
-                    marginLeft: 34,
-                    height: 3,
-                    borderRadius: 999,
-                    background: BAR_TRACK,
-                    overflow: 'hidden',
-                  }}
-                >
-                  <div
-                    style={{
-                      width: `${pct * 100}%`,
-                      height: '100%',
-                      borderRadius: 999,
-                      background: AMBER,
-                    }}
-                  />
-                </div>
-              </button>
-            );
-          })}
-        </div>
+        {display.map((row, i) => {
+          const name = displayIdentity(row);
+          const count = birdieCount(row);
+          const when = row.play_date ?? row.attained_at ?? null;
+          const sub = [row.course_name, when ? relativeTime(when) : null]
+            .filter(Boolean)
+            .join(' · ');
+          return (
+            <StatRow
+              key={`${row.score_id ?? row.course_id ?? i}-${i}`}
+              rank={i + 1}
+              avatarUrl={row.holder_avatar}
+              avatarUserId={row.user_id}
+              name={name}
+              subline={sub}
+              statValue={count}
+              statLabel="BIRDIES"
+              showWatermark={i === 0}
+              isLast={i === display.length - 1}
+              onPress={() => onRowTap?.(row)}
+            />
+          );
+        })}
       </div>
+
       <TierSeeAllSheet
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
