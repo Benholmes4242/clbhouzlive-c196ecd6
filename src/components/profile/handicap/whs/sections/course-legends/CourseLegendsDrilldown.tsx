@@ -218,6 +218,38 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
 
   const youOwnedCount = Object.values(yourRanks).filter((r) => r === 1).length;
 
+  // ISO attained_at per crown the viewer holds — feeds CrownCabinet reign lengths.
+  const yourAttainedAt = useMemo(() => {
+    const r: Partial<Record<LegendCategory, string | null>> = {};
+    visibleCategories.forEach((cat) => {
+      const entry = groupedWithTotals.get(cat);
+      const self = entry?.rows.find((row) => row.isSelf && row.rank === 1);
+      r[cat] = self?.attained_at ?? null;
+    });
+    return r;
+  }, [groupedWithTotals, visibleCategories]);
+
+  // Viewer's closest duel: category where they're on the board but not #1
+  // and the numeric gap to the champion is smallest.
+  const closestDuelCategory = useMemo<LegendCategory | null>(() => {
+    let bestCat: LegendCategory | null = null;
+    let bestGap = Infinity;
+    visibleCategories.forEach((cat) => {
+      const entry = groupedWithTotals.get(cat);
+      if (!entry || entry.rows.length === 0) return;
+      const champ = entry.rows[0];
+      const self = entry.rows.find((r) => r.isSelf);
+      if (!self || self.rank === 1) return;
+      const gap = Math.abs(self.value - champ.value);
+      if (gap < bestGap) {
+        bestGap = gap;
+        bestCat = cat;
+      }
+    });
+    return bestCat;
+  }, [groupedWithTotals, visibleCategories]);
+
+
   const containerRef = useRef<HTMLDivElement>(null);
 
   const sheetCategoryDescriptors = useMemo(
