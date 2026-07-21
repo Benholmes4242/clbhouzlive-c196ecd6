@@ -120,7 +120,6 @@ export function WeekInGolfRail(_props: WeekInGolfRailProps = {}) {
   const { user } = useSupabaseSession();
   const userId = user?.id;
   const { data, isLoading, isError, error } = useWeekInGolf(12, userId);
-  const applause = useApplauseMutation(userId);
   const [sheetOpen, setSheetOpen] = useState(false);
 
   if (isError) {
@@ -141,15 +140,6 @@ export function WeekInGolfRail(_props: WeekInGolfRailProps = {}) {
   const goToProfile = (username: string | null) => {
     if (!username) return;
     navigate(`/profile/${username}`);
-  };
-
-  const onApplause = (row: WeekRow) => {
-    if (!row.event_key) return;
-    if (!userId) {
-      toast('Sign in to applaud');
-      return;
-    }
-    applause.mutate({ eventKey: row.event_key, nextReacted: !row.my_reacted });
   };
 
   return (
@@ -177,7 +167,6 @@ export function WeekInGolfRail(_props: WeekInGolfRailProps = {}) {
             key={`${row.user_id}-${row.occurred_at}-${i}`}
             row={row}
             onTap={() => goToProfile(row.username)}
-            onApplause={() => onApplause(row)}
           />
         ))}
         <SeeAllTile onTap={() => setSheetOpen(true)} />
@@ -187,7 +176,6 @@ export function WeekInGolfRail(_props: WeekInGolfRailProps = {}) {
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
         userId={userId}
-        onApplause={onApplause}
       />
     </section>
   );
