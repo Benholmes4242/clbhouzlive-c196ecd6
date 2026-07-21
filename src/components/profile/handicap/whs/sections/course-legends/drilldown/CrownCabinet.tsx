@@ -11,6 +11,23 @@ export interface CabinetSlot {
   short: string;
   icon: LucideIcon;
   held: boolean;
+  /** ISO date the viewer took this crown — used to render "Held Nd" and pick the longest reign. */
+  attainedAt?: string | null;
+}
+
+function daysHeld(iso: string | null | undefined): number | null {
+  if (!iso) return null;
+  const t = new Date(iso).getTime();
+  if (!Number.isFinite(t)) return null;
+  return Math.max(0, Math.floor((Date.now() - t) / 86400000));
+}
+
+function reignLabel(days: number): string {
+  if (days === 0) return 'Held today';
+  if (days === 1) return 'Held 1d';
+  if (days < 30) return `Held ${days}d`;
+  if (days < 365) return `Held ${Math.floor(days / 30)}mo`;
+  return `Held ${Math.floor(days / 365)}y`;
 }
 
 interface CrownCabinetProps {
