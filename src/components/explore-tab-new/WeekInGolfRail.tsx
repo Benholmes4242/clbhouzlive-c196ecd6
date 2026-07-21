@@ -174,6 +174,8 @@ function RailCard({ row, onTap }: { row: WeekRow; onTap: () => void }) {
       style={{
         flexShrink: 0,
         width: 168,
+        height: 176,
+        boxSizing: 'border-box',
         padding: 12,
         display: 'flex',
         flexDirection: 'column',
@@ -202,37 +204,48 @@ function RailCard({ row, onTap }: { row: WeekRow; onTap: () => void }) {
           fontWeight: 700,
           letterSpacing: '0.08em',
           lineHeight: 1,
+          flexShrink: 0,
         }}
       >
         <span aria-hidden style={{ fontSize: 11 }}>{meta.glyph}</span>
         {meta.label}
       </span>
 
-      {row.line1 ? (
-        <div
-          style={{
-            marginTop: 10,
-            fontSize: 14,
-            fontWeight: 800,
-            color: INK,
-            lineHeight: 1.3,
-          }}
-        >
-          {row.line1}
-        </div>
-      ) : null}
-      {row.line2 ? (
-        <div
-          style={{
-            marginTop: 4,
-            fontSize: 11.5,
-            color: MUTE,
-            lineHeight: 1.3,
-          }}
-        >
-          {row.line2}
-        </div>
-      ) : null}
+      <div
+        style={{
+          marginTop: 10,
+          fontSize: 14,
+          fontWeight: 800,
+          color: INK,
+          lineHeight: 1.3,
+          minHeight: '2.6em',
+          display: '-webkit-box',
+          WebkitBoxOrient: 'vertical',
+          WebkitLineClamp: 2,
+          overflow: 'hidden',
+          width: '100%',
+          flexShrink: 0,
+        }}
+      >
+        {row.line1 || '\u00A0'}
+      </div>
+
+      <div
+        style={{
+          marginTop: 4,
+          fontSize: 11.5,
+          color: MUTE,
+          lineHeight: 1.3,
+          minHeight: '1.3em',
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          width: '100%',
+          flexShrink: 0,
+        }}
+      >
+        {row.line2 || '\u00A0'}
+      </div>
 
       <div
         style={{
@@ -240,10 +253,11 @@ function RailCard({ row, onTap }: { row: WeekRow; onTap: () => void }) {
           height: 1,
           background: HAIRLINE,
           marginTop: 10,
+          flexShrink: 0,
         }}
       />
 
-      <div style={{ width: '100%', marginTop: 10 }}>
+      <div style={{ width: '100%', marginTop: 'auto', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
           <SquircleAvatar
             src={row.avatar_url ?? undefined}
