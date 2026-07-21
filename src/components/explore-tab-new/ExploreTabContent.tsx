@@ -116,6 +116,9 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
 
         <TheRecordBook region={activeRegion} opener={opener} mode={scope} userId={userId} />
 
+        {/* This week in golf — honours rail (between "Your next conquests" and "Latest honours") */}
+        <WeekInGolfRail />
+
         {/* Feats: header + aces/albatrosses podium pair */}
         <LegendarySection
           region={activeRegion}
@@ -146,8 +149,6 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
         {/* Toughest courses index */}
         <ToughestIndex />
 
-        {/* This week in golf — honours rail */}
-        <WeekInGolfRail />
 
 
         {/* Feed block */}
