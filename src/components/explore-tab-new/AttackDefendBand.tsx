@@ -336,6 +336,7 @@ function DefendCard({ row, onTap }: { row: DefendRow; onTap: () => void }) {
       style={{
         flexShrink: 0,
         width: 220,
+        height: CARD_HEIGHT,
         boxSizing: 'border-box',
         padding: 12,
         display: 'flex',
@@ -353,10 +354,7 @@ function DefendCard({ row, onTap }: { row: DefendRow; onTap: () => void }) {
     >
       {/* Category chip + course */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
-        <span
-          aria-hidden
-          style={{ fontSize: 12, lineHeight: 1 }}
-        >
+        <span aria-hidden style={{ fontSize: 12, lineHeight: 1 }}>
           👑
         </span>
         <span
@@ -394,90 +392,84 @@ function DefendCard({ row, onTap }: { row: DefendRow; onTap: () => void }) {
         {row.course_name}
       </div>
 
-      {/* Challenger block */}
-      {hasChallenger ? (
-        <>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              minWidth: 0,
-            }}
-          >
-            <SquircleAvatar
-              size="xs"
-              src={row.challenger_avatar ?? undefined}
-              alt={row.challenger_name ?? 'Challenger'}
-              hairlineRing
-            />
+      {/* Footer — pinned to the bottom so every card baselines identically */}
+      <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 4 }}>
+        {hasChallenger ? (
+          <>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+              <SquircleAvatar
+                size="xs"
+                src={row.challenger_avatar ?? undefined}
+                alt={row.challenger_name ?? 'Challenger'}
+                hairlineRing
+              />
+              <div
+                style={{
+                  flex: 1,
+                  minWidth: 0,
+                  fontSize: 11.5,
+                  fontWeight: 600,
+                  color: INK,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {row.challenger_name ?? 'Challenger'}
+              </div>
+              {active ? (
+                <span
+                  aria-hidden
+                  title="Played this week"
+                  style={{
+                    width: 7,
+                    height: 7,
+                    borderRadius: 999,
+                    background: AMBER,
+                    flexShrink: 0,
+                    boxShadow: '0 0 0 2px rgba(247,147,30,0.16)',
+                  }}
+                />
+              ) : null}
+            </div>
+
             <div
               style={{
-                flex: 1,
-                minWidth: 0,
                 fontSize: 11.5,
-                fontWeight: 600,
-                color: INK,
+                fontWeight: 700,
+                color: tied ? RED : INK,
+                letterSpacing: '-0.005em',
+                lineHeight: 1.25,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
               }}
             >
-              {row.challenger_name ?? 'Challenger'}
+              {tied ? (
+                <>LEVEL with you</>
+              ) : (
+                <>
+                  is <span className="tabular-nums">{gapNum}</span> behind
+                </>
+              )}
             </div>
-            {active ? (
-              <span
-                aria-hidden
-                title="Played this week"
-                style={{
-                  width: 7,
-                  height: 7,
-                  borderRadius: 999,
-                  background: AMBER,
-                  flexShrink: 0,
-                  boxShadow: '0 0 0 2px rgba(247,147,30,0.16)',
-                }}
-              />
-            ) : null}
-          </div>
-
+          </>
+        ) : (
           <div
             style={{
               fontSize: 11.5,
-              fontWeight: 700,
-              color: tied ? RED : INK,
-              letterSpacing: '-0.005em',
-              lineHeight: 1.25,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
+              fontWeight: 600,
+              color: MUTE,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
             }}
           >
-            {tied ? (
-              <>LEVEL with you</>
-            ) : (
-              <>
-                is <span className="tabular-nums">{gapNum}</span> behind
-              </>
-            )}
+            <span aria-hidden>👑</span>
+            No challengers
           </div>
-        </>
-      ) : (
-        <div
-          style={{
-            marginTop: 2,
-            fontSize: 11.5,
-            fontWeight: 600,
-            color: MUTE,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-          }}
-        >
-          <span aria-hidden>👑</span>
-          No challengers
-        </div>
-      )}
+        )}
+      </div>
     </button>
   );
 }
