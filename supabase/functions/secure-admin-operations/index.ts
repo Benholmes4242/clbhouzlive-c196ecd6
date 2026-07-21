@@ -41,7 +41,8 @@ type AdminAction =
   | 'hide_post'
   | 'unhide_post'
   | 'delete_course'
-  | 'change_username';
+  | 'change_username'
+  | 'retry_asset_cleanup';
 
 interface AdminOperationRequest {
   action: AdminAction;
@@ -703,6 +704,52 @@ serve(async (req) => {
 
         auditDetails = { oldUsername, newUsername: candidate };
         result = { success: true, message: `Username changed to @${candidate}`, username: candidate };
+        break;
+      }
+
+      case 'retry_asset_cleanup': {
+        // Drain any 'pending' or 'failed' manifest rows for the target user.
+        // Safe to invoke repeatedly; missing/already-deleted assets are treated as success.
+        if (!targetUserId) {
+          return new Response(JSON.stringify({ error: 'targetUserId required' }),
+            { status: 400, headers: { ...headers, 'Content-Type': 'application/json' } });
+        }
+        const cfAccountId = Deno.env.get('CLOUDFLARE_ACCOUNT_ID');
+        const cfStreamToken = Deno.env.get('CLOUDFLARE_STREAM_API_TOKEN');
+        const { data: rows } = await supabase.from('user_deletion_asset_manifest')
+          .select('id,kind,ref,attempts').eq('target_user_id', targetUserId).in('status', ['pending','failed']);
+        let deleted = 0, failed = 0;
+        for (const row of rows ?? []) {
+          try {
+            if (row.kind === 'stream') {
+              if (!cfAccountId || !cfStreamToken) throw new Error('cf_env_missing');
+              const resp = await fetch(
+                `https://api.cloudflare.com/client/v4/accounts/${cfAccountId}/stream/${row.ref}`,
+                { method: 'DELETE', headers: { Authorization: `Bearer ${cfStreamToken}` } });
+              if (!resp.ok && resp.status !== 404) {
+                const body = await resp.text().catch(() => '');
+                throw new Error(`cf_${resp.status}:${body.slice(0,200)}`);
+              }
+            } else {
+              const slash = row.ref.indexOf('/');
+              const bucket = row.ref.slice(0, slash);
+              const key = row.ref.slice(slash + 1);
+              const { error } = await supabase.storage.from(bucket).remove([key]);
+              if (error) throw new Error(error.message);
+            }
+            await supabase.from('user_deletion_asset_manifest')
+              .update({ status: 'deleted', completed_at: new Date().toISOString(), attempts: (row.attempts ?? 0) + 1, error: null })
+              .eq('id', row.id);
+            deleted++;
+          } catch (e) {
+            await supabase.from('user_deletion_asset_manifest')
+              .update({ status: 'failed', error: String(e).slice(0, 500), attempts: (row.attempts ?? 0) + 1 })
+              .eq('id', row.id);
+            failed++;
+          }
+        }
+        auditDetails = { targetUserId, deleted, failed, total: rows?.length ?? 0 };
+        result = { success: true, deleted, failed, total: rows?.length ?? 0 };
         break;
       }
     }
