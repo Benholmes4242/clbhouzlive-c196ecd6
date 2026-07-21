@@ -127,126 +127,40 @@ export const FullCourseLeaderboardSheetDispatch: React.FC<Props> = ({
 
   if (!category) return null;
 
+  const totalRows = rows.length;
+  const isScoreDiff = initialCategory.startsWith('best_score_diff_');
+
   const renderRow = (r: SectionRow, opts: { isChampion: boolean; index: number }) => {
-    const { isChampion, index } = opts;
-    const barPct = isChampion ? 1 : computeBarPct(initialCategory, r.value, championValue);
-    const bandBg = index % 2 === 0 ? 'rgba(15,23,42,0.035)' : 'transparent';
-    const rowBg = r.isSelf ? SELF_TINT : bandBg;
-    const topRule = index === 0 ? 'none' : `0.5px solid rgba(15,23,42,0.08)`;
-    const rankColor = isChampion ? GOLD_DEEP : '#94A3B8';
-    const valueColor = isChampion ? GOLD_DEEP : INK;
+    const { index } = opts;
+    const isLast = index === totalRows - 1;
+    const underPar = isScoreDiff && r.value < 0;
+    const statColor = underPar ? TOPAR_UNDER_LIGHT : undefined;
 
     return (
       <div
         key={`${r.rank}-${r.attained_at}-${r.name}`}
-        ref={r.isSelf && !isChampion ? selfRowRef : undefined}
+        ref={r.isSelf && r.rank !== 1 ? selfRowRef : undefined}
         style={{
-          padding: '10px 16px',
-          background: rowBg,
-          borderTop: topRule,
-          fontFamily: FONT,
+          background: r.isSelf ? SELF_TINT : 'transparent',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
-          <div
-            style={{
-              width: 24,
-              textAlign: 'center',
-              flexShrink: 0,
-              fontSize: 14,
-              fontWeight: 900,
-              fontVariantNumeric: 'tabular-nums',
-              color: rankColor,
-              lineHeight: 1,
-            }}
-          >
-            {r.rank}
-          </div>
-          <div style={{ flexShrink: 0 }}>
-            <SquircleAvatar
-              size={34}
-              srcCandidates={r.photoUrl ? [r.photoUrl] : []}
-              alt={r.name}
-              hairlineRing
-              ringColor={isChampion ? GOLD_DEEP : LIGHT_HAIRLINE}
-            />
-          </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div
-              style={{
-                fontSize: 13,
-                fontWeight: 700,
-                color: INK,
-                lineHeight: 1.2,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {r.isSelf ? 'You' : r.name}
-            </div>
-          </div>
-          <div
-            style={{
-              flexShrink: 0,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-end',
-              justifyContent: 'center',
-              minWidth: 42,
-            }}
-          >
-            <div
-              style={{
-                fontSize: 15,
-                fontWeight: 900,
-                color: valueColor,
-                lineHeight: 1,
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {r.valueDisplay}
-            </div>
-            <div
-              style={{
-                marginTop: 2,
-                fontSize: 8,
-                fontWeight: 800,
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                color: '#94A3B8',
-                lineHeight: 1,
-              }}
-            >
-              {category.short}
-            </div>
-          </div>
-        </div>
-        {/* Power bar — indexed to champion. */}
-        <div
-          aria-hidden
-          style={{
-            marginTop: 8,
-            marginLeft: 35, // 24 rank + 11 gap
-            height: 3,
-            borderRadius: 999,
-            background: BAR_TRACK,
-            overflow: 'hidden',
-          }}
-        >
-          <div
-            style={{
-              width: `${Math.round(barPct * 100)}%`,
-              height: '100%',
-              background: AMBER,
-              borderRadius: 999,
-              transition: 'width .2s ease',
-            }}
-          />
-        </div>
+        <StatRow
+          rank={r.rank}
+          avatarUrl={r.photoUrl}
+          name={r.isSelf ? 'You' : r.name}
+          statValue={r.valueDisplay}
+          statLabel={category.short}
+          statColor={statColor}
+          showWatermark={r.rank === 1}
+          isLast={isLast}
+        />
       </div>
     );
   };
+
+  void AMBER;
+  void isLowerBetter;
+
 
   return (
     <BottomSheet
