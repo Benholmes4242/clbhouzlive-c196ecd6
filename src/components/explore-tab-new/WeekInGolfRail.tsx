@@ -144,7 +144,6 @@ export function WeekInGolfRail(_props: WeekInGolfRailProps = {}) {
           gap: 12,
           overflowX: 'auto',
           padding: '4px 16px 12px',
-          scrollSnapType: 'x proximity',
           WebkitOverflowScrolling: 'touch',
         }}
         className="no-scrollbar"
