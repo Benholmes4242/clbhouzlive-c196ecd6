@@ -126,6 +126,17 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
   const [sheet, setSheet] = useState<SheetState>(null);
   const picks = data?.topContenders ?? [];
 
+  // Hide the floating bottom nav while any TI sheet is open so it doesn't
+  // sit on top of the sheet content.
+  const { hideBottomNav, showBottomNav } = useBottomNavigation();
+  useEffect(() => {
+    if (sheet) {
+      hideBottomNav();
+      return () => showBottomNav();
+    }
+  }, [sheet, hideBottomNav, showBottomNav]);
+
+
   const playerIds = useMemo(() => picks.map((p) => p.playerId).filter(Boolean), [picks]);
   const needsLiveData = state === 'live' || state === 'completed';
   const { data: liveMap } = usePickLiveState(tournamentId, needsLiveData ? playerIds : [], {
