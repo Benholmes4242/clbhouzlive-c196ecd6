@@ -246,13 +246,12 @@ export function StatRow({
         style={{
           flexShrink: 0,
           display: 'flex',
-          alignItems: chip ? 'flex-end' : 'center',
+          alignItems: chip ? 'center' : 'center',
           flexDirection: chip ? 'column' : 'row',
           gap: chip ? 4 : 8,
           position: 'relative',
         }}
       >
-        {chip ? <Chip chip={chip} /> : null}
         {(chip || rightTimestamp) && timestamp ? (
           <span
             style={{
@@ -266,6 +265,7 @@ export function StatRow({
             {timestamp}
           </span>
         ) : null}
+        {chip ? <Chip chip={chip} /> : null}
         {hasStat ? (
           <div
             style={{
