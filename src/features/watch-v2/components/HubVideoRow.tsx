@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Heart } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useHubLongFormVideos } from '../hooks/useHubLongFormVideos';
-import { formatDuration } from '../utils/formatDuration';
+import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
 import { formatCountShort as formatCount } from '@/i18n/format';
 import { FormatBadge } from './FormatBadge';
 import { stripMentionMarkup } from '@/lib/mentions/format';

@@ -1,7 +1,7 @@
 import { useMemo, useRef } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useHubQuickClips } from '../hooks/useHubQuickClips';
-import { formatDuration } from '../utils/formatDuration';
+import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
 import { toFeedPosts } from '../utils/toFeedPost';
 import Pressable from '@/components/ui/Pressable';
 import { useWatchAutoplay } from '@/video/useWatchAutoplay';

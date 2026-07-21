@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import Pressable from '@/components/ui/Pressable';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 
-import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
+import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
 import { toFeedPosts } from '@/features/watch-v2/utils/toFeedPost';
 import { useWatchAutoplay } from '@/video/useWatchAutoplay';
 import { useRailLane } from '@/video/useRailLane';
