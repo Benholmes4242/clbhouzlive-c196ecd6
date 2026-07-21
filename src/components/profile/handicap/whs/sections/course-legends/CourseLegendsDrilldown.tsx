@@ -382,18 +382,62 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
 
       {!isLoading && !isError && (data ?? []).length > 0 && activeWindowHasData && (
         <>
+          <YouAtThisClubStrip userId={activeActor?.id} courseId={ctx.courseId} theme={theme} />
           <CrownCabinet
             slots={visibleCategories.map((cat) => ({
               key: cat,
               short: SHORT_LABELS[cat],
               icon: legendCategoryIcon[cat],
               held: yourRanks[cat] === 1,
+              attainedAt: yourAttainedAt[cat] ?? null,
             }))}
             heldCount={youOwnedCount}
             window={window}
             onWindowChange={handleWindowChange}
             toggleVariant={theme === 'light' ? 'light' : 'dark'}
           />
+
+          {/* Your closest duel — highlight the tightest gap for the viewer at this club.
+              Hidden when the viewer holds every crown here or has no on-board data. */}
+          {closestDuelCategory && youOwnedCount < visibleCategories.length && (() => {
+            const cat = closestDuelCategory;
+            const entry = groupedWithTotals.get(cat);
+            if (!entry) return null;
+            const champion = entry.rows[0];
+            const sectionRows = entry.rows.map((r) => ({
+              rank: r.rank,
+              name: r.isSelf ? 'You' : r.name,
+              photoUrl: r.photoUrl,
+              valueDisplay: r.valueDisplay,
+              value: r.value,
+              isSelf: r.isSelf,
+              gapToChampion: r.rank === champion.rank ? null : formatGapFromChampion(cat, r.value, champion.value),
+              userId: r.userId,
+              rank30d: r.rank30d,
+              delta: r.delta,
+            }));
+            return (
+              <div data-closest-duel>
+                <ChampionsDuelCard
+                  category={cat}
+                  categoryLabel={legendCategoryLabel[cat]}
+                  categoryIcon={legendCategoryIcon[cat]}
+                  rows={sectionRows}
+                  yourRank={yourRanks[cat] ?? null}
+                  holdDuration={`Held ${formatHeldDuration(champion.attained_at)}`}
+                  totalCount={entry.total}
+                  onFullLeaderboardTap={() => setFullLeaderboardCategory(cat)}
+                  proBenchmark={null}
+                  theme={theme}
+                  banded={false}
+                  titleOverride="Your closest duel"
+                />
+              </div>
+            );
+          })()}
+
+          <CourseRivalryLine userId={activeActor?.id} courseId={ctx.courseId} theme={theme} />
+
 
 
 
