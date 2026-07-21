@@ -330,18 +330,23 @@ function DefendCard({ row, onTap }: { row: DefendRow; onTap: () => void }) {
         display: 'flex',
         flexDirection: 'column',
         gap: 8,
-        background: CARD_BG,
-        border: `1px solid ${tied ? 'rgba(220,38,38,0.35)' : HAIRLINE}`,
+        background: tied ? 'rgba(220,38,38,0.03)' : CARD_BG,
+        border: `1px solid ${tied ? 'rgba(220,38,38,0.42)' : HAIRLINE}`,
         borderRadius: 14,
-        boxShadow: CARD_SHADOW,
+        boxShadow: tied
+          ? '0 1px 3px rgba(220,38,38,0.06), 0 8px 24px rgba(220,38,38,0.08)'
+          : CARD_SHADOW,
         textAlign: 'left',
         cursor: 'pointer',
         fontFamily: FONT,
         position: 'relative',
+        overflow: 'hidden',
       }}
     >
+      <GhostGlyph glyph="👑" />
+
       {/* Category chip + course */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, position: 'relative' }}>
         <span aria-hidden style={{ fontSize: 12, lineHeight: 1 }}>
           👑
         </span>
@@ -375,13 +380,14 @@ function DefendCard({ row, onTap }: { row: DefendRow; onTap: () => void }) {
           display: '-webkit-box',
           WebkitBoxOrient: 'vertical',
           WebkitLineClamp: 2,
+          position: 'relative',
         }}
       >
         {row.course_name}
       </div>
 
       {/* Footer — pinned to the bottom so every card baselines identically */}
-      <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 4, position: 'relative' }}>
         {hasChallenger ? (
           <>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
@@ -405,21 +411,42 @@ function DefendCard({ row, onTap }: { row: DefendRow; onTap: () => void }) {
               >
                 {row.challenger_name ?? 'Challenger'}
               </div>
-              {active ? (
+            </div>
+
+            {active ? (
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 5,
+                  alignSelf: 'flex-start',
+                }}
+              >
                 <span
                   aria-hidden
-                  title="Played this week"
                   style={{
-                    width: 7,
-                    height: 7,
+                    width: 6,
+                    height: 6,
                     borderRadius: 999,
                     background: AMBER,
                     flexShrink: 0,
-                    boxShadow: '0 0 0 2px rgba(247,147,30,0.16)',
+                    boxShadow: '0 0 0 2px rgba(247,147,30,0.18)',
                   }}
                 />
-              ) : null}
-            </div>
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    letterSpacing: '0.04em',
+                    textTransform: 'uppercase',
+                    color: AMBER_DEEP,
+                    lineHeight: 1,
+                  }}
+                >
+                  Played this week
+                </span>
+              </div>
+            ) : null}
 
             <div
               style={{
@@ -461,6 +488,30 @@ function DefendCard({ row, onTap }: { row: DefendRow; onTap: () => void }) {
     </button>
   );
 }
+
+// Oversized greyscale ghost glyph — mirrors the Moments card watermark
+function GhostGlyph({ glyph }: { glyph: string }) {
+  return (
+    <span
+      aria-hidden
+      style={{
+        position: 'absolute',
+        right: -6,
+        bottom: -18,
+        fontSize: 96,
+        lineHeight: 1,
+        opacity: 0.07,
+        transform: 'rotate(-10deg)',
+        filter: 'grayscale(1)',
+        pointerEvents: 'none',
+        userSelect: 'none',
+      }}
+    >
+      {glyph}
+    </span>
+  );
+}
+
 
 // ---- Attack rail (mirrors old ConquestsStrip) -----------------------------
 function AttackRail({ picks }: { picks: TitleInReach[] }) {
