@@ -55,7 +55,7 @@ export const BirdieMapSummary: React.FC<Props> = ({ birdiedCount, totalHoles }) 
               display: 'inline-block',
             }}
           />
-          Birdied {birdiedCount} of {totalHoles}
+          {t('courses:holes.birdiedOfTotal', { n: birdiedCount, total: totalHoles })}
         </span>
         <span
           style={{
