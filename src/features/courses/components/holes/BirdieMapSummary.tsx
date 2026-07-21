@@ -66,7 +66,7 @@ export const BirdieMapSummary: React.FC<Props> = ({ birdiedCount, totalHoles }) 
             textTransform: 'uppercase',
           }}
         >
-          Your birdie map
+          {t('courses:holes.yourBirdieMap')}
         </span>
       </div>
       <div
