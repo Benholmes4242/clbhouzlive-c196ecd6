@@ -60,11 +60,7 @@ export function useRailLane(opts: UseRailLaneOptions): UseRailLaneResult {
   const [ready, setReady] = useState(false);
   const scrollQuiescent = useScrollQuiescent();
 
-  // Gate acquisition on scroll quiescence: while the user is mid-flick
-  // through a rail/grid, holding posters avoids pool thrash + frame drops.
-  // Owners that already hold a lane keep it (this only blocks fresh
-  // acquisition), so an active tile mid-scroll doesn't pop off.
-  const eligible = !!(opts.active && opts.hlsUrl && opts.ownerKey && scrollQuiescent);
+  const eligible = !!(opts.active && opts.hlsUrl && opts.ownerKey);
 
   // Log hasHls resolve rate exactly once per (ownerKey, hasHls) combination.
   const trackedRef = useRef<string | null>(null);
