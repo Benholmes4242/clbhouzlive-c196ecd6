@@ -231,7 +231,15 @@ function LegendarySection({
   onLeaderTap: (uid: string) => void;
 }) {
   const { data } = useRegionFeats(region, 'legendary');
-  const rows = data ?? [];
+  const rows = useMemo(
+    () =>
+      (data ?? []).filter((r) =>
+        // reuse the compact rail region key predicate
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        matchesRailRegionScope(region, (r as any).region),
+      ),
+    [data, region],
+  );
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetMetric, setSheetMetric] = useState<'aces' | 'albatrosses'>('aces');
 
@@ -240,10 +248,28 @@ function LegendarySection({
     setSheetOpen(true);
   };
 
+  const overline = mode === 'alltime' ? 'All-time honours' : 'Latest honours';
+
+  // Scoped-empty: render the unconquered empty-state.
+  if ((data ?? []).length > 0 && rows.length === 0 && region != null) {
+    return (
+      <section style={{ marginTop: 32 }}>
+        <SectionHead overline={overline} title="Moments of the game" paddingX={14} />
+        <EmptyScopeCard
+          title={`No moments ${regionScopePhrase(region)} yet.`}
+          subline="This region is unconquered — be the first."
+        />
+      </section>
+    );
+  }
+
+  // Suppress region-only used prop lint
+  void regionUpper;
+
   return (
     <section style={{ marginTop: 32 }}>
       <SectionHead
-        overline={mode === 'alltime' ? 'All-time honours' : 'Latest honours'}
+        overline={overline}
         title="Moments of the game"
         meta="View all"
         onMeta={() => openSheet(sheetMetric)}
