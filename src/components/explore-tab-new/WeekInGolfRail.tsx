@@ -33,6 +33,8 @@ interface WeekRow {
   line1: string | null;
   line2: string | null;
   course_id: string | null;
+  course_country?: string | null;
+  course_region?: string | null;
   window_days: number | null;
   event_key: string | null;
   reaction_count: number | null;
