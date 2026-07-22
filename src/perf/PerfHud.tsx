@@ -167,3 +167,31 @@ function PhaseBar({ s }: { s: Summary }) {
 }
 
 export default PerfHud;
+
+function VideoBlock() {
+  const [, tick] = useState(0);
+  useEffect(() => {
+    const i = setInterval(() => tick((n) => n + 1), 1000);
+    return () => clearInterval(i);
+  }, []);
+  const pool = VideoPool.getStats();
+  const t = getVideoTelemetryStats();
+  const stalls = t.counters['video.stall'] ?? 0;
+  const evicts = t.counters['video.pool_evict'] ?? 0;
+  const abr = t.counters['video.abr_switch'] ?? 0;
+  return (
+    <div style={{ marginBottom: 8, padding: 4, background: 'rgba(74,222,128,0.06)', borderRadius: 4 }}>
+      <div style={{ color: '#4ade80', fontWeight: 600 }}>VIDEO</div>
+      <div style={{ color: '#94a3b8' }}>
+        pool {pool.inUse}/{pool.size} · warm {pool.warmUrls}
+        {' · '}TTFF <span style={{ color: TIER(t.avgFirstFrameMs, 300, 800) }}>{t.avgFirstFrameMs}ms</span>
+        {' (n=' + t.firstFrameCount + ')'}
+      </div>
+      <div style={{ color: '#94a3b8' }}>
+        stalls <span style={{ color: stalls > 0 ? '#fbbf24' : '#4ade80' }}>{stalls}</span>
+        {' · '}evict {evicts}
+        {' · '}abrΔ {abr}
+      </div>
+    </div>
+  );
+}
