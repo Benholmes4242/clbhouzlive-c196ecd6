@@ -126,9 +126,13 @@ export function YourStandingStrip({ userId }: Props) {
   if (crownCount === 0 && !currentLevel && !hasHcp && !showStreak) return null;
 
   const openTrophyRoom = () => {
-    navigate('/handicap');
-    setTimeout(() => openGamAchievements(), 0);
+    // Use the existing ?gam=trophies deep-link pattern in HandicapPage
+    // (see src/pages/HandicapPage.tsx). It opens the sheet once on arrival
+    // then strips the param, so back-nav / revisits do not re-open.
+    navigate('/handicap?gam=trophies');
   };
+  const openHandicap = () => navigate('/handicap');
+
 
   // Season ribbon
   const now = new Date();
