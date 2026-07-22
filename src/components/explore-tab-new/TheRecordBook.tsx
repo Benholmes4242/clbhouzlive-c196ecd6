@@ -125,9 +125,9 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
   const { data } = useRegionFeats(region, 'records', mode);
 
   const allRows = useMemo(() => {
-    const raw = (data ?? []).filter((r) => matchesRailRegionScope(region, r.region));
+    const raw = data ?? [];
     return mode === 'alltime' ? sortRecordsAllTime(raw) : raw;
-  }, [data, mode, region]);
+  }, [data, mode]);
 
   const ledgerRows = useMemo(() => allRows.slice(0, LEDGER_ROWS), [allRows]);
 
