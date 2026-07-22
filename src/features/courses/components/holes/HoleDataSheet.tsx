@@ -72,6 +72,7 @@ export const HoleDataSheet: React.FC<Props> = ({
   myByHole,
   viewerHasPlayed,
 }) => {
+  const { t } = useTranslation(['courses']);
   const [sort, setSort] = useState<'hole' | 'tough'>('hole');
   const [openHole, setOpenHole] = useState<number | null>(null);
 
