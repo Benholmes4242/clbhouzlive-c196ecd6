@@ -191,10 +191,7 @@ export const HoleDataSheet: React.FC<Props> = ({
         missingBirdieHole={missingBirdieHole}
       />
 
-      {/* 4. Notation key */}
-      <NotationKey viewerHasPlayed={viewerHasPlayed} />
-
-      {/* 5. Hole by hole */}
+      {/* 4. Hole by hole */}
       <section style={{ scrollMarginTop: STICKY_SAFE, display: 'flex', flexDirection: 'column', gap: 8 }}>
         <div
           style={{
