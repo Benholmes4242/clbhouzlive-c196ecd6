@@ -80,7 +80,7 @@ serve(async (req) => {
 
   // Unauthenticated ping to verify running function version.
   // Bump FUNCTION_VERSION on every change to this function.
-  const FUNCTION_VERSION = '2026-07-21T09:00:00Z';
+  const FUNCTION_VERSION = '2026-07-22T10:30:00Z-v4-engagement-sweep';
   try {
     const peek = req.clone();
     const peekBody = await peek.json().catch(() => null);
