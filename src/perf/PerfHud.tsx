@@ -110,6 +110,8 @@ export const PerfHud = memo(function PerfHud() {
         <button onClick={close} style={{ background: 'transparent', color: '#94a3b8', border: 'none', cursor: 'pointer' }}>×</button>
       </div>
 
+      <VideoBlock />
+
       {cur && (
         <div style={{ marginBottom: 8, padding: 4, background: 'rgba(103,232,249,0.06)', borderRadius: 4 }}>
           <div style={{ color: '#fbbf24' }}>LIVE nav#{cur.id} {cur.path}</div>
