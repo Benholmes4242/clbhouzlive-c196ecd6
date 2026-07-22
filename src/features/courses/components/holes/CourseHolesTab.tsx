@@ -6,7 +6,7 @@ import { useMyHolePerformance, type MyHolePerformanceRow } from '@/hooks/gam/use
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { HolesEmptyState } from './HolesEmptyState';
-import { FONT, INK } from './_constants';
+import { FONT } from './_constants';
 import { INK_MUTE } from '@/features/courses/_shared/tokens';
 import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHandicapCue';
 import { HoleDataSheet } from './HoleDataSheet';
