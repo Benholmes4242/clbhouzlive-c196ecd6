@@ -153,7 +153,7 @@ export function useRegionLegendaryLeaders(region: string | null) {
   const cacheRegion = toCacheRegion(region);
   const railKey = `legendary_leaders:${cacheRegion}`;
   return useQuery<LegendaryLeaderRow[]>({
-    queryKey: ['discover-rail-cache', railKey],
+    queryKey: ['discover-rail-cache', railKey, cacheRegion],
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
