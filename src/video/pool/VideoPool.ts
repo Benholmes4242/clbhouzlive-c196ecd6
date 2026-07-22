@@ -18,8 +18,8 @@
  *     source is requested — the coldest idle element gets its source
  *     swapped or, if origins mismatch, gets its HLS torn down and rebuilt.
  *
- * Feature-flagged: nothing calls into this unless `VITE_VIDEO_POOL === '1'`
- * (see `src/video/pool/flag.ts`). Flag OFF = byte-for-byte legacy path.
+ * Always-on: the pool is the canonical playback path across feed, profile,
+ * and fullscreen surfaces.
  */
 
 import Hls, { type HlsConfig } from 'hls.js';
