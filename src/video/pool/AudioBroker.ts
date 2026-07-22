@@ -14,7 +14,6 @@
  */
 
 import { useSessionAudio } from '@/audio/sessionAudioStore';
-import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { videoDebug } from '@/config/videoDebug';
 import { logAudio } from '@/perf/audioDebug';
 
