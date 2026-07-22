@@ -764,19 +764,8 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
               );
             }
             const lifetimeEarned = lifetime.filter((a) => a.earned).length;
-            // When deep-linked via the Discover "crowns held" tile, promote the
-            // Course crowns section to the TOP of the sheet body so users land
-            // on it immediately instead of scrolling to the bottom.
-            const promoteCrowns = crownsRevealToken > 0 && anyLegends;
             return (
               <>
-                {promoteCrowns && (
-                  <CourseLegendsCollapsibleSection
-                    items={allLegends}
-                    onOpenGroup={(records) => setDetailCtx({ items: records, index: 0 })}
-                    revealToken={crownsRevealToken}
-                  />
-                )}
                 {lifetime.length > 0 && (
                   <>
                     <TrophyGroupLabel label="Lifetime" earned={lifetimeEarned} total={lifetime.length} />
@@ -798,7 +787,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                     </React.Fragment>
                   );
                 })}
-                {anyLegends && !promoteCrowns && (
+                {anyLegends && (
                   <CourseLegendsCollapsibleSection
                     items={allLegends}
                     onOpenGroup={(records) => setDetailCtx({ items: records, index: 0 })}
@@ -809,6 +798,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
               </>
             );
           })()}
+
 
 
         </div>
