@@ -53,6 +53,7 @@ function noteScroll() {
   lastScrollAt = performance.now();
   if (quiescent) {
     quiescent = false;
+    stats.scrollBursts += 1;
     emit();
   }
   armSettleTimer();
@@ -82,6 +83,14 @@ export const scrollActivity = {
     ensureBootstrapped();
     listeners.add(fn);
     return () => { listeners.delete(fn); };
+  },
+  /** Increment when a rail-lane acquire is deferred by the dampener. */
+  noteDeferred(): void { stats.deferredAcquires += 1; },
+  /** Increment when a deferred acquire finally fires on settle. */
+  noteReleased(): void { stats.releasedAcquires += 1; },
+  /** Snapshot for PerfHud. */
+  getStats(): { deferredAcquires: number; releasedAcquires: number; scrollBursts: number } {
+    return { ...stats };
   },
 };
 
