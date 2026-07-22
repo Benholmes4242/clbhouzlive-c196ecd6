@@ -707,9 +707,9 @@ const HoleCard: React.FC<{
         {/* Middle */}
         <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: 5 }}>
           <div style={{ fontSize: 11.5, color: INK_55, ...NUM }}>
-            Par {row.par} · SI {row.stroke_index ?? '\u2014'}
+            {t('courses:holes.parAndSi', { par: row.par, si: row.stroke_index ?? '\u2014' })}
             {isHardest && (
-              <span style={{ color: GOLD_INK, fontWeight: 700 }}> · the beast</span>
+              <span style={{ color: GOLD_INK, fontWeight: 700 }}>{t('courses:holes.theBeastSuffix')}</span>
             )}
           </div>
           <MixStrip row={row} />
