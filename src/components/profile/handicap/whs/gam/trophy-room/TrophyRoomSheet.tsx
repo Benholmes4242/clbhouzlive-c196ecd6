@@ -791,7 +791,9 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                   <CourseLegendsCollapsibleSection
                     items={allLegends}
                     onOpenGroup={(records) => setDetailCtx({ items: records, index: 0 })}
+                    revealToken={crownsRevealToken}
                   />
+
                 )}
               </>
             );
