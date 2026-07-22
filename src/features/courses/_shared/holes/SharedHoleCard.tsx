@@ -41,7 +41,6 @@ function avgColorFor(avg: number): string {
   return INK_MUTE;
 }
 
-import { fmtToPar as fmtAvg } from './formatToPar';
 
 // Diverging difficulty bar: centre baseline; UNDER par grows LEFT (red),
 // OVER par grows RIGHT (blue). Each side width = min(1, |avg|/maxAbs) * 50%.
