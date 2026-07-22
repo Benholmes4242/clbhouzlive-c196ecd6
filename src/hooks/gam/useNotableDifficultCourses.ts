@@ -15,20 +15,23 @@ export interface DifficultCourse {
   thumbnail_image: string | null;
 }
 
+export type CourseIndexMode = 'toughest' | 'friendliest';
+
 /**
- * Editorial / global shelf: courses ranked by how far over par they actually play,
- * gated on a credible round sample. No personalisation.
- * Reads from the precomputed discover_rail_cache table.
+ * Reads the precomputed 'toughest_courses' / 'friendliest_courses' rail from
+ * discover_rail_cache. Refreshed daily by cron. In the 'friendliest' payload
+ * the hardest_hole_* fields carry the most scoreable hole (signature flips).
  */
-export function useNotableDifficultCourses() {
+export function useNotableDifficultCourses(mode: CourseIndexMode = 'toughest') {
+  const railKey = mode === 'friendliest' ? 'friendliest_courses' : 'toughest_courses';
   return useQuery<DifficultCourse[]>({
-    queryKey: ['gam', 'toughest-courses-cache'],
+    queryKey: ['gam', 'course-index-cache', railKey],
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('discover_rail_cache')
         .select('payload')
-        .eq('rail_key', 'toughest_courses')
+        .eq('rail_key', railKey)
         .maybeSingle();
       if (error) throw error;
       return (data?.payload ?? []) as unknown as DifficultCourse[];
