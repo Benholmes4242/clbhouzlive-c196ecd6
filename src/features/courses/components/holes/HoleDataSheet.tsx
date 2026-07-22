@@ -31,10 +31,8 @@ const CAP: React.CSSProperties = {
   textTransform: 'uppercase',
   color: INK_55,
 };
-const CARD: React.CSSProperties = {
-  background: '#FFFFFF',
-  border: `1px solid ${INK_08}`,
-  borderRadius: 16,
+const SECTION_RULE: React.CSSProperties = {
+  borderTop: `1px solid ${INK_08}`,
 };
 
 // ── Helpers ──────────────────────────────────────────────────────────
@@ -128,7 +126,7 @@ export const HoleDataSheet: React.FC<Props> = ({
   const toggle = (n: number) => setOpenHole((cur) => (cur === n ? null : n));
 
   return (
-    <div style={{ background: '#F8FAFC', fontFamily: FONT, padding: '16px 12px 24px' }}>
+    <div style={{ background: 'transparent', fontFamily: FONT, padding: '16px 12px 24px' }}>
       <HoleGlyphDefs />
 
       {/* 1. Header */}
@@ -149,8 +147,8 @@ export const HoleDataSheet: React.FC<Props> = ({
             PAR {parTotal} · {totalRounds.toLocaleString()} RDS
           </div>
         </div>
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
-          {['OFFICIAL WHS', courseName?.toUpperCase() || '—', 'UPDATED RECENTLY'].map((label) => (
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 8 }}>
+          {['OFFICIAL WHS', courseName?.toUpperCase() || '—'].map((label) => (
             <span
               key={label}
               style={{
@@ -158,16 +156,13 @@ export const HoleDataSheet: React.FC<Props> = ({
                 fontWeight: 800,
                 letterSpacing: '0.10em',
                 color: INK_55,
-                padding: '3px 8px',
-                borderRadius: 999,
-                border: `1px solid ${INK_08}`,
-                background: '#FFFFFF',
               }}
             >
               {label}
             </span>
           ))}
         </div>
+
       </div>
 
       {/* 2. Skyline */}
@@ -197,12 +192,15 @@ export const HoleDataSheet: React.FC<Props> = ({
       {/* 5. Sort toggle */}
       <div
         style={{
+          ...SECTION_RULE,
+          marginTop: 20,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '20px 4px 10px',
         }}
       >
+
         <div style={CAP}>Scorecard</div>
         <div
           role="tablist"
@@ -327,7 +325,8 @@ const SkylineCard: React.FC<{
   }
 
   return (
-    <div style={{ ...CARD, padding: 14, marginBottom: 12 }}>
+    <div style={{ ...SECTION_RULE, padding: '20px 4px 4px', marginTop: 12 }}>
+
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 }}>
         <div>
           <div style={CAP}>Difficulty profile</div>
@@ -461,7 +460,8 @@ const LedgerCard: React.FC<{
 }> = ({ hardest, scoreable, nemesis, viewerHasPlayed, birdiedCount, totalHoles, missingBirdieHole }) => {
   if (!viewerHasPlayed) {
     return (
-      <div style={{ ...CARD, padding: 0, marginBottom: 12, overflow: 'hidden' }}>
+      <div style={{ ...SECTION_RULE, marginTop: 20 }}>
+
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
           {hardest && (
             <LedgerCell
@@ -484,7 +484,7 @@ const LedgerCard: React.FC<{
   }
 
   return (
-    <div style={{ ...CARD, padding: 0, marginBottom: 12, overflow: 'hidden' }}>
+    <div style={{ ...SECTION_RULE, marginTop: 20 }}>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
         {hardest && (
           <LedgerCell
@@ -594,7 +594,7 @@ const NotationKey: React.FC<{ viewerHasPlayed: boolean }> = ({ viewerHasPlayed }
     { kind: 'double-plus', label: 'Double+' },
   ];
   return (
-    <div style={{ ...CARD, padding: 14, marginBottom: 12 }}>
+    <div style={{ ...SECTION_RULE, padding: '20px 4px 4px', marginTop: 20 }}>
       <div style={CAP}>How to read</div>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, rowGap: 10, marginTop: 10 }}>
         {items.map((it) => (
@@ -639,17 +639,17 @@ const ScorecardTable: React.FC<{
   const cols = showYou ? '32px 26px 22px 1fr 1fr 60px' : '32px 26px 22px 1fr 60px';
 
   return (
-    <div style={{ ...CARD, overflow: 'hidden' }}>
+    <div>
       <div
         style={{
           display: 'grid',
           gridTemplateColumns: cols,
           alignItems: 'center',
-          padding: '10px 12px',
+          padding: '10px 4px',
           borderBottom: `1px solid ${INK_08}`,
-          background: '#FBFBFC',
         }}
       >
+
         <TH>{label}</TH>
         <TH>PAR</TH>
         <TH>SI</TH>
@@ -679,10 +679,11 @@ const ScorecardTable: React.FC<{
                 display: 'grid',
                 gridTemplateColumns: cols,
                 alignItems: 'center',
-                padding: '10px 12px',
+                padding: '10px 4px',
                 borderBottom: `1px solid ${INK_08}`,
                 cursor: 'pointer',
-                background: isOpen ? '#FAFBFC' : '#FFFFFF',
+                background: isOpen ? 'rgba(15,23,42,0.03)' : 'transparent',
+
               }}
             >
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
@@ -740,9 +741,9 @@ const ScorecardTable: React.FC<{
             display: 'grid',
             gridTemplateColumns: cols,
             alignItems: 'center',
-            padding: '12px 12px',
-            background: '#FAFBFC',
+            padding: '12px 4px',
             borderTop: `1.5px solid ${INK}`,
+
           }}
         >
           <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.10em', color: INK, textTransform: 'uppercase' }}>
@@ -833,9 +834,10 @@ const ExpandedRow: React.FC<{
   return (
     <div
       style={{
-        padding: '14px 12px 12px',
-        background: '#FAFBFC',
+        padding: '14px 4px 12px',
+        background: 'rgba(15,23,42,0.03)',
         borderBottom: `1px solid ${INK_08}`,
+
         display: 'flex',
         flexDirection: 'column',
         gap: 14,
@@ -945,14 +947,12 @@ const ExpandedRow: React.FC<{
 const SummaryTile: React.FC<{ cap: string; value: string; gold?: boolean }> = ({ cap, value, gold }) => (
   <div
     style={{
-      background: '#FFFFFF',
-      border: `1px solid ${INK_08}`,
-      borderRadius: 10,
-      padding: '8px 10px',
+      padding: '4px 2px',
       display: 'flex',
       flexDirection: 'column',
       gap: 2,
     }}
+
   >
     <div style={CAP}>{cap}</div>
     <div style={{ fontSize: 16, fontWeight: 800, color: gold ? GOLD_INK : INK, ...NUM, lineHeight: 1.1 }}>
