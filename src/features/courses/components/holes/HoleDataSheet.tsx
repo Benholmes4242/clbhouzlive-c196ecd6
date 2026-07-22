@@ -738,9 +738,9 @@ const ScorecardTable: React.FC<{
             display: 'grid',
             gridTemplateColumns: cols,
             alignItems: 'center',
-            padding: '12px 12px',
-            background: '#FAFBFC',
+            padding: '12px 4px',
             borderTop: `1.5px solid ${INK}`,
+
           }}
         >
           <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.10em', color: INK, textTransform: 'uppercase' }}>
