@@ -50,16 +50,6 @@ function formatHolderName(raw?: string | null): string {
   return s;
 }
 
-function initials(name: string): string {
-  return (
-    (name || '?')
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((p) => p[0]?.toUpperCase() ?? '')
-      .join('') || '?'
-  );
-}
 
 // ---- Conquests helpers (retained from NextConquestsRail) ------------------
 const CATEGORY_META: Record<
@@ -288,7 +278,7 @@ function RecordStatRow({
     <StatRow
       avatarUrl={row.holder_avatar}
       avatarUserId={row.user_id}
-      name={row.course_name}
+      name={holder}
       subline={sub}
       statValue={toParDisplay}
       statColor={statColor}
