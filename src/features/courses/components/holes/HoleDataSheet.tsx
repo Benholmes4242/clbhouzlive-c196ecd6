@@ -47,17 +47,6 @@ function ord(n: number): string {
 
 const SHORT_MARKERS = new Set([
   'East','West','North','South','Old','New','Championship','Ocean','Highland',
-  'Lake','Valley','Ailsa','Kittocks','Postage','Blue','Red','Gold','Green',
-  'Silver','Black','White','Dunes','Links','Heath','Moor','Park','Castle',
-  'Woodland','Forest','Meadow','Riverside','Coastal','Cliffs','Bay','Point',
-]);
-function shortCourseName(name?: string): string | null {
-  if (!name) return null;
-  const words = name.split(/\s+/);
-  for (const w of words) if (SHORT_MARKERS.has(w)) return `${w} course`;
-  return null;
-}
-
 function characterClause(hardestHole: number): string {
   if (hardestHole >= 16) return 'It builds to the finish';
   if (hardestHole <= 3) return 'It bites early';
