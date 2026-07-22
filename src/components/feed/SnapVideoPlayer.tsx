@@ -52,6 +52,11 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
   onFirstFrameReady,
 }: SnapVideoPlayerProps) {
   const userPaused = useClubhouseStore((s) => s.userPaused);
+  const sessionMuted = useSessionAudio((s) => s.isMuted);
+  const ducked = useDucked();
+  // Only the currently-active slide gets to voice audio; everything else stays
+  // silent so we never get two lanes talking at once.
+  const muted = sessionMuted || ducked || !isActive || userPaused;
   const aspect = (height ?? 1) > 0 && (width ?? 0) > 0
     ? (height as number) / (width as number)
     : 1;
