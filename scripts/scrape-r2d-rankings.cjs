@@ -10,6 +10,24 @@ const TOUR_CODE = 'euro';
 // If we're in Jan-Oct, use current year. If Nov-Dec, use next year.
 const now = new Date();
 const SEASON_YEAR = now.getMonth() >= 10 ? now.getFullYear() + 1 : now.getFullYear();
+const RUN_START = new Date().toISOString();
+
+// Delete rows for a tour that this run did NOT refresh (departed players,
+// renamed players). Only ever called after a successful non-zero upsert so a
+// broken site can never wipe a tour's table.
+async function sweepStaleRows(supabase, tourCode, seasonYear, label) {
+  const { count, error } = await supabase
+    .from('tour_season_rankings')
+    .delete({ count: 'exact' })
+    .eq('tour_code', tourCode)
+    .eq('season_year', seasonYear)
+    .lt('scraped_at', RUN_START);
+  if (error) {
+    console.error(`[${label}] Stale sweep error:`, error.message);
+  } else {
+    console.log(`[${label}] Swept ${count ?? 0} stale rows`);
+  }
+}
 
 async function scrape() {
   console.log(`[R2D Scraper] Starting for season ${SEASON_YEAR}...`);
@@ -145,6 +163,9 @@ async function scrape() {
     if (upserted === 0 && players.length > 0) {
       console.error('[R2D Scraper] Wrote ZERO rows despite parsing players - failing the run');
       process.exitCode = 1;
+    }
+    if (upserted > 0) {
+      await sweepStaleRows(supabase, TOUR_CODE, SEASON_YEAR, 'R2D Scraper');
     }
 
     // Run player matching RPC
@@ -289,6 +310,9 @@ async function scrapeLPGA(browser, supabase) {
       }
     }
     console.log(`[LPGA Scraper] Upserted ${upserted} players`);
+    if (upserted > 0) {
+      await sweepStaleRows(supabase, LPGA_TOUR_CODE, LPGA_SEASON_YEAR, 'LPGA Scraper');
+    }
 
     // Match LPGA players
     const { data: lpgaPlayers } = await supabase
@@ -453,6 +477,9 @@ async function scrapeKornFerry(browser, supabase) {
       }
     }
     console.log(`[KFT Scraper] Upserted ${upserted} players`);
+    if (upserted > 0) {
+      await sweepStaleRows(supabase, KFT_TOUR_CODE, KFT_SEASON_YEAR, 'KFT Scraper');
+    }
 
     // Match players to sr_players
     const { data: kftPlayers } = await supabase
@@ -573,12 +600,41 @@ async function scrapeLIV(browser, supabase) {
 
     console.log(`[LIV Scraper] Parsed ${players.length} players`);
 
-    if (players.length === 0) {
-      console.log('[LIV Scraper] No players parsed — skipping');
+    // Clean the parse: the standings page renders players on two surfaces -
+    // a main list with the TEAM NAME appended ("Jon Rahm Legion XIII") and an
+    // ordinal strip whose "1ST/2ND/3RD" splits into junk fragments
+    // ("ST J. Rahm"). Strip team suffixes, drop ordinal fragments, dedupe.
+    const LIV_TEAMS = [
+      'Legion XIII', 'Crushers GC', 'Torque GC', '4Aces GC', 'Ripper GC',
+      'Fireballs GC', 'Stinger GC', 'Smash GC', 'RangeGoats GC',
+      'HyFlyers GC', 'Iron Heads GC', 'Cleeks GC', 'Majesticks GC'
+    ];
+    const seenClean = new Set();
+    const cleaned = [];
+    for (const p of players) {
+      let name = p.name.trim().replace(/\s+/g, ' ');
+      // Ordinal fragments: "ST J. Rahm" (from 1ST), "ND B. DeChambeau" (2ND), "RD ..." (3RD), "TH ..." (4TH+)
+      if (/^(ST|ND|RD|TH)\s/i.test(name)) continue;
+      for (const t of LIV_TEAMS) {
+        if (name.toUpperCase().endsWith(' ' + t.toUpperCase())) {
+          name = name.slice(0, name.length - t.length - 1).trim();
+          break;
+        }
+      }
+      if (!name || name.length < 3) continue;
+      const key = name.toUpperCase();
+      if (seenClean.has(key)) continue;
+      seenClean.add(key);
+      cleaned.push({ ...p, name });
+    }
+    console.log(`[LIV Scraper] Cleaned ${players.length} -> ${cleaned.length} players`);
+
+    if (cleaned.length === 0) {
+      console.log('[LIV Scraper] No players after cleaning — skipping');
       return;
     }
 
-    const rows = players.map(p => ({
+    const rows = cleaned.map(p => ({
       player_name: p.name,
       tour_code: LIV_TOUR_CODE,
       season_year: LIV_SEASON_YEAR,
@@ -604,6 +660,9 @@ async function scrapeLIV(browser, supabase) {
       }
     }
     console.log(`[LIV Scraper] Upserted ${upserted} players`);
+    if (upserted > 0) {
+      await sweepStaleRows(supabase, LIV_TOUR_CODE, LIV_SEASON_YEAR, 'LIV Scraper');
+    }
 
     // Match to sr_players
     const { data: livPlayers } = await supabase
