@@ -18,7 +18,7 @@ import {
   nextLevelForMedals,
   WALL_LEVELS,
 } from '@/components/profile/handicap/whs/gam/trophy-room/_shared/levels';
-import { openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
+
 import { quarterOf, daysLeft, seasonName } from '@/lib/gam/seasonClock';
 import { useViewerHemisphere } from '@/hooks/gam/useViewerHemisphere';
 import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
