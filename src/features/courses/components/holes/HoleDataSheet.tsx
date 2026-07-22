@@ -45,8 +45,6 @@ function ord(n: number): string {
   return `${n}${ordinalSuffix(n)}`;
 }
 
-const SHORT_MARKERS = new Set([
-  'East','West','North','South','Old','New','Championship','Ocean','Highland',
 function characterClause(hardestHole: number): string {
   if (hardestHole >= 16) return 'It builds to the finish';
   if (hardestHole <= 3) return 'It bites early';
