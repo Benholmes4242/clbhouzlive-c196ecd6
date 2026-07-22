@@ -3,6 +3,8 @@ import { useWhsConnection } from '@/lib/whs/hooks';
 import { useMyNemesisHoles } from '@/hooks/gam/useMyNemesisHoles';
 import { SectionHead } from './SectionHead';
 import { FONT } from './gamingLightTokens';
+import { matchesRegionScope, regionScopePhrase } from './regionScope';
+import { EmptyScopeCard } from './EmptyScopeCard';
 
 const RED = '#D2222D';
 const INK = '#0F172A';
@@ -22,17 +24,41 @@ const numFmt = (n: number | null | undefined, d = 1) =>
 
 interface Props {
   userId: string | undefined;
+  region?: string | null;
 }
 
-export function NemesisHolesStrip({ userId }: Props) {
+export function NemesisHolesStrip({ userId, region = null }: Props) {
   const navigate = useNavigate();
   const { data: connection } = useWhsConnection(userId);
   const hasWhs = !!connection;
-  const { data } = useMyNemesisHoles(hasWhs ? userId : undefined, 3);
-  const rows = data ?? [];
+  // Pull a wider pool so client-side region filter still yields three rows.
+  const { data } = useMyNemesisHoles(hasWhs ? userId : undefined, 24);
+  const all = data ?? [];
+  const filtered = all.filter((h) =>
+    matchesRegionScope(
+      region,
+      // Types not yet regenerated — course_country / course_region live on the payload.
+      (h as unknown as { course_country?: string | null }).course_country,
+      (h as unknown as { course_region?: string | null }).course_region,
+    ),
+  );
+  const rows = filtered.slice(0, 3);
 
+  // Personal section: hide entirely when signed-out / no WHS.
   if (!userId || !hasWhs) return null;
-  if (rows.length === 0) return null;
+
+  // Under a scoped toggle, render the unconquered empty state instead of hiding.
+  if (rows.length === 0) {
+    if (region == null) return null;
+    return (
+      <section style={{ marginTop: 32 }}>
+        <SectionHead overline="Personal statistics" title="Your nemesis holes" />
+        <EmptyScopeCard
+          title={`No history ${regionScopePhrase(region)} yet — your nemesis awaits.`}
+        />
+      </section>
+    );
+  }
 
   return (
     <section style={{ marginTop: 32 }}>

@@ -44,6 +44,8 @@ import { SLATE_50 } from '@/features/courses/_shared/tokens';
 import { SPACE } from '@/lib/spacing';
 import { useScorecardOpener } from './useScorecardOpener';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
+import { matchesRailRegionScope, regionScopePhrase } from './regionScope';
+import { EmptyScopeCard } from './EmptyScopeCard';
 
 interface ExploreTabContentProps {
   embedded?: boolean;
@@ -123,13 +125,13 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
         <TheRecordBook region={activeRegion} opener={opener} mode={scope} userId={userId} />
 
         {/* Attack / Defend band — absorbs "Your next conquests" */}
-        <AttackDefendBand userId={userId} />
+        <AttackDefendBand userId={userId} region={activeRegion} />
 
         {/* Rivalry — sits directly below the Attack/Defend band */}
         <RivalryCard userId={userId} />
 
         {/* This week in golf — honours rail */}
-        <WeekInGolfRail />
+        <WeekInGolfRail region={activeRegion} />
 
 
         {/* Season race */}
@@ -170,8 +172,8 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
         {/* Hardest holes rail — siblings to the sternest tests: courses then holes */}
         <HardestHolesRail region={activeRegion} />
 
-        {/* Your nemesis holes — signed-in + WHS gated; never region-scoped */}
-        <NemesisHolesStrip userId={userId} />
+        {/* Your nemesis holes — signed-in + WHS gated; filters by course_country */}
+        <NemesisHolesStrip userId={userId} region={activeRegion} />
 
 
 
@@ -231,7 +233,15 @@ function LegendarySection({
   onLeaderTap: (uid: string) => void;
 }) {
   const { data } = useRegionFeats(region, 'legendary');
-  const rows = data ?? [];
+  const rows = useMemo(
+    () =>
+      (data ?? []).filter((r) =>
+        // reuse the compact rail region key predicate
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        matchesRailRegionScope(region, (r as any).region),
+      ),
+    [data, region],
+  );
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetMetric, setSheetMetric] = useState<'aces' | 'albatrosses'>('aces');
 
@@ -240,10 +250,28 @@ function LegendarySection({
     setSheetOpen(true);
   };
 
+  const overline = mode === 'alltime' ? 'All-time honours' : 'Latest honours';
+
+  // Scoped-empty: render the unconquered empty-state.
+  if ((data ?? []).length > 0 && rows.length === 0 && region != null) {
+    return (
+      <section style={{ marginTop: 32 }}>
+        <SectionHead overline={overline} title="Moments of the game" paddingX={14} />
+        <EmptyScopeCard
+          title={`No moments ${regionScopePhrase(region)} yet.`}
+          subline="This region is unconquered — be the first."
+        />
+      </section>
+    );
+  }
+
+  // Suppress region-only used prop lint
+  void regionUpper;
+
   return (
     <section style={{ marginTop: 32 }}>
       <SectionHead
-        overline={mode === 'alltime' ? 'All-time honours' : 'Latest honours'}
+        overline={overline}
         title="Moments of the game"
         meta="View all"
         onMeta={() => openSheet(sheetMetric)}

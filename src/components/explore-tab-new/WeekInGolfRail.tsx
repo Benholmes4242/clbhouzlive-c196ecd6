@@ -9,6 +9,8 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SectionHead } from './SectionHead';
 import { FONT } from './gamingLightTokens';
 import { formatRelativeAgo } from '@/i18n/format';
+import { matchesRegionScope, regionScopePhrase } from './regionScope';
+import { EmptyScopeCard } from './EmptyScopeCard';
 
 
 type EventType =
@@ -31,6 +33,8 @@ interface WeekRow {
   line1: string | null;
   line2: string | null;
   course_id: string | null;
+  course_country?: string | null;
+  course_region?: string | null;
   window_days: number | null;
   event_key: string | null;
   reaction_count: number | null;
@@ -112,14 +116,16 @@ function isGold(type: EventType) {
 }
 
 interface WeekInGolfRailProps {
+  region?: string | null;
   onSectionShown?: () => void;
 }
 
-export function WeekInGolfRail(_props: WeekInGolfRailProps = {}) {
+export function WeekInGolfRail({ region = null }: WeekInGolfRailProps = {}) {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const userId = user?.id;
-  const { data, isLoading, isError, error } = useWeekInGolf(12, userId);
+  // Pull a wider pool so client-side region filter still yields a full rail.
+  const { data, isLoading, isError, error } = useWeekInGolf(48, userId);
   const [sheetOpen, setSheetOpen] = useState(false);
 
   if (isError) {
@@ -130,12 +136,31 @@ export function WeekInGolfRail(_props: WeekInGolfRailProps = {}) {
   }
   if (isLoading) return null;
 
-  const rows = data ?? [];
-  if (rows.length < 3) return null;
+  const allRows = data ?? [];
+  // rank_unlocked events are region-agnostic by design — show only worldwide.
+  const scoped = allRows.filter((r) => {
+    if (r.event_type === 'rank_unlocked') return region == null;
+    return matchesRegionScope(region, r.course_country ?? null, r.course_region ?? null);
+  });
 
-  const ordered = interleave(rows);
+  const eyebrow = 'THIS WEEK IN GOLF';
+
+  if (scoped.length < 3) {
+    if (region == null) return null;
+    return (
+      <section style={{ marginTop: 32, fontFamily: FONT }}>
+        <SectionHead overline={eyebrow} title="Moments from the community" paddingX={16} />
+        <EmptyScopeCard
+          title={`A quiet week ${regionScopePhrase(region)}.`}
+          subline="Log a round on your official WHS record and make the board."
+        />
+      </section>
+    );
+  }
+
+  const ordered = interleave(scoped.slice(0, 12));
   const hasOlder = ordered.some((r) => (r.window_days ?? 0) > 7);
-  const eyebrow = hasOlder ? 'RECENTLY IN GOLF' : 'THIS WEEK IN GOLF';
+  const dynamicEyebrow = hasOlder ? 'RECENTLY IN GOLF' : eyebrow;
 
   const goToProfile = (username: string | null) => {
     if (!username) return;
@@ -145,7 +170,7 @@ export function WeekInGolfRail(_props: WeekInGolfRailProps = {}) {
   return (
     <section style={{ marginTop: 32, fontFamily: FONT }}>
       <SectionHead
-        overline={eyebrow}
+        overline={dynamicEyebrow}
         title="Moments from the community"
         meta="See all"
         onMeta={() => setSheetOpen(true)}

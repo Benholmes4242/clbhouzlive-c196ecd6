@@ -10,6 +10,8 @@ import { SectionHead } from './SectionHead';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import { FONT } from './gamingLightTokens';
 import { StatRow } from './StatRow';
+import { matchesRailRegionScope, regionScopePhrase } from './regionScope';
+import { EmptyScopeCard } from './EmptyScopeCard';
 
 const ROWS = 5;
 
@@ -52,22 +54,37 @@ interface Props {
 export function EaglesLedger({ region, mode, onRowTap, onLeaderTap }: Props) {
   const { data: featsData, isLoading } = useRegionFeats(region, 'eagles', 'latest');
   const { data: leadersData } = useRegionEagleLeaders(region);
-  const feats = featsData ?? [];
+  const feats = useMemo(
+    () => (featsData ?? []).filter((r) => matchesRailRegionScope(region, r.region)),
+    [featsData, region],
+  );
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const leaders = useMemo(
     () =>
       (leadersData ?? [])
+        .filter((r) => matchesRailRegionScope(region, r.region))
         .filter((r) => (r.eagles ?? 0) > 0)
         .sort((a, b) => (b.eagles ?? 0) - (a.eagles ?? 0))
         .slice(0, ROWS),
-    [leadersData],
+    [leadersData, region],
   );
 
   const hasData = mode === 'alltime' ? leaders.length > 0 : feats.length > 0;
-  if (!isLoading && !hasData) return null;
-
   const overlineLabel = mode === 'alltime' ? 'All-time eagles' : 'Latest eagles';
+
+  if (!isLoading && !hasData) {
+    if (region == null) return null;
+    return (
+      <section style={{ marginTop: 32, fontFamily: FONT }}>
+        <SectionHead overline={overlineLabel} paddingX={14} />
+        <EmptyScopeCard
+          title={`No eagles ${regionScopePhrase(region)} yet.`}
+          subline="This region is unconquered — be the first."
+        />
+      </section>
+    );
+  }
 
   return (
     <section style={{ marginTop: 32, fontFamily: FONT }}>

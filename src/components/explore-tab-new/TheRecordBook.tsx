@@ -18,6 +18,8 @@ import { SPACE } from '@/lib/spacing';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import { TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
 import { StatRow } from './StatRow';
+import { matchesRailRegionScope, regionScopePhrase } from './regionScope';
+import { EmptyScopeCard } from './EmptyScopeCard';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const INK = '#0F172A';
@@ -123,13 +125,39 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
   const { data } = useRegionFeats(region, 'records', mode);
 
   const allRows = useMemo(() => {
-    const raw = data ?? [];
+    const raw = (data ?? []).filter((r) => matchesRailRegionScope(region, r.region));
     return mode === 'alltime' ? sortRecordsAllTime(raw) : raw;
-  }, [data, mode]);
+  }, [data, mode, region]);
 
   const ledgerRows = useMemo(() => allRows.slice(0, LEDGER_ROWS), [allRows]);
 
-  if (ledgerRows.length === 0) return null;
+  if (ledgerRows.length === 0) {
+    if (region == null) return null;
+    return (
+      <section style={{ marginTop: SPACE.sectionSection, fontFamily: FONT, color: INK }}>
+        <div style={{ padding: `0 ${PAGE_PAD}px` }}>
+          <div
+            style={{
+              fontSize: 10.5,
+              fontWeight: 600,
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+              color: MUTED,
+              lineHeight: 1,
+            }}
+          >
+            {mode === 'alltime' ? 'All-time course records' : 'Latest course records'}
+          </div>
+          <div style={{ marginTop: 6, fontSize: 17, fontWeight: 700, letterSpacing: '-0.02em', color: INK, lineHeight: 1.15 }}>
+            The record book
+          </div>
+        </div>
+        <EmptyScopeCard
+          title={`No records set ${regionScopePhrase(region)} yet — the book is open.`}
+        />
+      </section>
+    );
+  }
 
   const handleRowTap = (row: FeatRow) => {
     if (row.score_id) opener?.openByScore(row.score_id, null, row.user_id);
