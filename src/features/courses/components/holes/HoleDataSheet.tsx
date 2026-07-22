@@ -760,7 +760,7 @@ const HoleCard: React.FC<{
                 ...NUM,
               }}
             >
-              {t('courses:holes.youAvg', { avg: Math.max(0, mine!.avg_to_par).toFixed(2) })}
+              {t('courses:holes.youAvg', { avg: fmtToPar(mine!.avg_to_par) })}
             </div>
           )}
         </div>
