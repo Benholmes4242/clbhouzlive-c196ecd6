@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { adminTheme as t } from '../theme';
-import { confirmMatches } from '@/lib/text/confirmMatch';
 
 interface Props {
   open: boolean;
@@ -14,15 +13,13 @@ interface Props {
   cancelLabel?: string;
   tone?: 'danger' | 'default';
   busy?: boolean;
-  /** When true, compare typed vs requireText using NFKC + smart-quote fold + case-insensitive match. */
-  normalizeMatch?: boolean;
 }
 
 export default function ConfirmDialog({
   open, onClose, onConfirm,
   title, description, requireText,
   confirmLabel = 'Confirm', cancelLabel = 'Cancel',
-  tone = 'default', busy, normalizeMatch = false,
+  tone = 'default', busy,
 }: Props) {
   const [typed, setTyped] = useState('');
 
@@ -39,11 +36,7 @@ export default function ConfirmDialog({
 
   if (!open) return null;
 
-  const matches = !requireText
-    ? true
-    : normalizeMatch
-      ? confirmMatches(typed, requireText)
-      : typed.trim() === requireText.trim();
+  const matches = !requireText || typed.trim() === requireText.trim();
   const confirmBg = tone === 'danger' ? t.danger : t.ink;
 
   return (
@@ -88,10 +81,6 @@ export default function ConfirmDialog({
               autoFocus
               value={typed}
               onChange={e => setTyped(e.target.value)}
-              autoCorrect="off"
-              autoCapitalize="none"
-              autoComplete="off"
-              spellCheck={false}
               style={{
                 padding: '10px 12px',
                 borderRadius: t.radius.md,

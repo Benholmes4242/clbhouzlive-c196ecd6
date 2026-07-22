@@ -9,6 +9,7 @@ import { createPortal } from 'react-dom';
 import { navTiming, isPerfEnabled, subscribePerfLive, type NavTransaction } from './navTiming';
 import { Z } from '@/config/zIndex';
 import { VideoPool } from '@/video/pool/VideoPool';
+import { getVideoTelemetryStats } from '@/video/telemetry';
 
 
 type Summary = ReturnType<typeof navTiming.getRecent>[number];
@@ -109,6 +110,8 @@ export const PerfHud = memo(function PerfHud() {
         <button onClick={close} style={{ background: 'transparent', color: '#94a3b8', border: 'none', cursor: 'pointer' }}>×</button>
       </div>
 
+      <VideoBlock />
+
       {cur && (
         <div style={{ marginBottom: 8, padding: 4, background: 'rgba(103,232,249,0.06)', borderRadius: 4 }}>
           <div style={{ color: '#fbbf24' }}>LIVE nav#{cur.id} {cur.path}</div>
@@ -117,8 +120,6 @@ export const PerfHud = memo(function PerfHud() {
           </div>
         </div>
       )}
-
-      <PoolStatsRow />
 
       {recent.length === 0 && <div style={{ color: '#64748b' }}>No navigations yet. Navigate the app.</div>}
 
@@ -165,23 +166,32 @@ function PhaseBar({ s }: { s: Summary }) {
   );
 }
 
-function PoolStatsRow() {
-  const [stats, setStats] = useState(VideoPool.getStats());
+export default PerfHud;
+
+function VideoBlock() {
+  const [, tick] = useState(0);
   useEffect(() => {
-    let raf = 0;
-    const tick = () => {
-      setStats(VideoPool.getStats());
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+    const i = setInterval(() => tick((n) => n + 1), 1000);
+    return () => clearInterval(i);
   }, []);
+  const pool = VideoPool.getStats();
+  const t = getVideoTelemetryStats();
+  const stalls = t.counters['video.stall'] ?? 0;
+  const evicts = t.counters['video.pool_evict'] ?? 0;
+  const abr = t.counters['video.abr_switch'] ?? 0;
   return (
-    <div style={{ marginBottom: 8, padding: 4, background: 'rgba(74,222,128,0.06)', borderRadius: 4, color: '#94a3b8' }}>
-      Pool: {stats.inUse}/{stats.size} warm
-      {stats.lastAcquireMs !== null && ` · last acquire ${stats.lastAcquireMs}ms`}
+    <div style={{ marginBottom: 8, padding: 4, background: 'rgba(74,222,128,0.06)', borderRadius: 4 }}>
+      <div style={{ color: '#4ade80', fontWeight: 600 }}>VIDEO</div>
+      <div style={{ color: '#94a3b8' }}>
+        pool {pool.inUse}/{pool.size} · warm {pool.warmUrls}
+        {' · '}TTFF <span style={{ color: TIER(t.avgFirstFrameMs, 300, 800) }}>{t.avgFirstFrameMs}ms</span>
+        {' (n=' + t.firstFrameCount + ')'}
+      </div>
+      <div style={{ color: '#94a3b8' }}>
+        stalls <span style={{ color: stalls > 0 ? '#fbbf24' : '#4ade80' }}>{stalls}</span>
+        {' · '}evict {evicts}
+        {' · '}abrΔ {abr}
+      </div>
     </div>
   );
 }
-
-export default PerfHud;

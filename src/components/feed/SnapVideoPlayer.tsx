@@ -12,7 +12,7 @@
  */
 import React, { useCallback, memo } from 'react';
 import { useClubhouseStore } from '@/store/clubhouseStore';
-import { useSessionAudio } from '@/audio/sessionAudioStore';
+import { isVideoPoolEnabled } from '@/video/pool/flag';
 import { VideoSlot } from '@/video/pool/VideoSlot';
 
 interface SnapVideoPlayerProps {
@@ -42,8 +42,8 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
   postId,
   onFirstFrameReady,
 }: SnapVideoPlayerProps) {
+  const poolEnabled = isVideoPoolEnabled();
   const userPaused = useClubhouseStore((s) => s.userPaused);
-  const isSessionMuted = useSessionAudio((s) => s.isMuted);
   const aspect = (height ?? 1) > 0 && (width ?? 0) > 0
     ? (height as number) / (width as number)
     : 1;
@@ -95,14 +95,15 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
         <div className="absolute inset-0" style={{ background: '#0A0E14' }} aria-hidden="true" />
       )}
 
-      {/* Pooled <video> path — Phase 2 default. */}
-      {hlsUrl ? (
+      {/* Pooled <video> path — active when the VITE_VIDEO_POOL flag is on.
+          Falls back to the poster-only chassis otherwise. */}
+      {poolEnabled && hlsUrl ? (
         <VideoSlot
           slotKey={postId || hlsUrl}
           hlsUrl={hlsUrl}
           posterUrl={thumbnailUrl}
           isActive={isActive && !userPaused}
-          muted={isSessionMuted}
+          muted={true}
           objectFit={objectFit}
           onFirstFrame={onFirstFrameReady}
         />

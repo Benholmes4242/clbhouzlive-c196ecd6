@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { slugToCacheRegion } from '../regionScope';
 
 export type FeatTier = 'legendary' | 'eagles' | 'birdie_hauls' | 'records';
 
@@ -28,10 +27,10 @@ export interface FeatRow {
   course_par?: number | null;
 }
 
-// Cached rails are pre-computed per region on the server. Fetch the row
-// scoped to the active Discover toggle; do NOT filter items client-side.
-export function toCacheRegion(r: string | null | undefined): string {
-  return slugToCacheRegion(r);
+// Rails now carry per-item region keys inside their worldwide payload.
+// The client fetches the worldwide row and filters via `matchesRailRegionScope`.
+export function toCacheRegion(_r: string | null): string {
+  return 'worldwide';
 }
 
 export type RecordsMode = 'latest' | 'alltime';
@@ -119,7 +118,7 @@ export function useRegionFeats(
 
 
   return useQuery<FeatRow[]>({
-    queryKey: ['discover-rail-cache', railKey, cacheRegion],
+    queryKey: ['discover-rail-cache', railKey],
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
@@ -153,7 +152,7 @@ export function useRegionLegendaryLeaders(region: string | null) {
   const cacheRegion = toCacheRegion(region);
   const railKey = `legendary_leaders:${cacheRegion}`;
   return useQuery<LegendaryLeaderRow[]>({
-    queryKey: ['discover-rail-cache', railKey, cacheRegion],
+    queryKey: ['discover-rail-cache', railKey],
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
@@ -186,7 +185,7 @@ export function useRegionEagleLeaders(region: string | null) {
   const cacheRegion = toCacheRegion(region);
   const railKey = `eagle_leaders:${cacheRegion}`;
   return useQuery<EagleLeaderRow[]>({
-    queryKey: ['discover-rail-cache', railKey, cacheRegion],
+    queryKey: ['discover-rail-cache', railKey],
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase

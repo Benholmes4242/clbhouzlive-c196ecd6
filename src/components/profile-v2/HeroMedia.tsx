@@ -1,16 +1,13 @@
 /**
- * HeroMedia - Full-bleed hero section
+ * HeroMedia - Full-bleed hero section (poster-only chassis)
  *
- * Images render as before. Videos render through the pooled VideoSlot,
- * committing the poster only after the first decoded frame is ready.
+ * Video playback severed per BRIEF_VIDEO_TEARDOWN.md. Videos render their
+ * poster frame as an <img>; images render as before. No <video>, no runtime.
  */
 
 import React, { useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { isPosterFailed } from '@/utils/posterPrefetch';
-import { VideoSlot } from '@/video/pool/VideoSlot';
-import { uidFromNode } from '@/utils/cloudflareStreamTransform';
-import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 
 interface HeroMediaProps {
   mediaId: string;
@@ -22,7 +19,6 @@ interface HeroMediaProps {
 }
 
 export const HeroMedia: React.FC<HeroMediaProps> = ({
-  mediaId,
   mediaType,
   url,
   posterUrl,
@@ -42,26 +38,15 @@ export const HeroMedia: React.FC<HeroMediaProps> = ({
       style={{
         height,
         backgroundColor: 'hsl(var(--clubhouse-bg-page, 222 47% 11%))',
+        ...(mediaType === 'video' && posterSafe ? {
+          backgroundImage: `url(${posterSafe})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        } : {}),
       }}
     >
-      {mediaType === 'video' && displaySrc ? (
-        (() => {
-          const streamId = uidFromNode({ src: url });
-          const hlsUrl = streamId ? generateStreamHlsUrl(streamId) : url;
-          return (
-            <VideoSlot
-              slotKey={`hero:${mediaId}`}
-              hlsUrl={hlsUrl}
-              posterUrl={posterSafe}
-              isActive={true}
-              muted={true}
-              objectFit="cover"
-              audioPolicy="always-muted"
-              onFirstFrame={() => setIsLoaded(true)}
-            />
-          );
-        })()
-      ) : displaySrc ? (
+      {displaySrc && (
         <img
           src={displaySrc}
           alt=""
@@ -72,7 +57,7 @@ export const HeroMedia: React.FC<HeroMediaProps> = ({
           onLoad={() => setIsLoaded(true)}
           loading="eager"
         />
-      ) : null}
+      )}
 
       {!isLoaded && !posterSafe && mediaType !== 'video' && (
         <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 animate-pulse" />

@@ -1,74 +1,69 @@
-# Phase 2 — AudioBroker + Profile/Fullscreen Pool Adoption
 
-Phase 1 gave us a 3-element `VideoPool` + `VideoSlot` and wired it into the Clubhouse feed behind `VITE_VIDEO_POOL`. Phase 2 makes audio deterministic across every surface, expands the pool to profile feeds and the fullscreen viewer, then removes the flag.
+# Phase 1 — Video Element Pool + Reparenting
 
-## What Phase 2 is (and isn't)
+Kill the class of bugs where each feed card mounts its own `<video>` on scroll, causing black flashes, poster re-shows, and mid-swipe stutters as HLS re-parses and first-frame re-decodes.
 
-Phase 2 is **not** just "remove the flag". The flag comes off only after:
-1. One canonical `AudioBroker` decides which single video element is allowed to be unmuted.
-2. Profile feeds and the fullscreen viewer render through the same pooled `VideoSlot`.
-3. Poster frames cross-fade away only after the first real frame is committed.
+## The core idea
 
-Phase 2 is **not** ABR/buffer tuning or neighbor prefetch — that is Phase 3.
+Today every card owns its own `<video>` element. When you scroll, the outgoing card unmounts (destroys `<video>` + HLS instance + decoded frames) and the incoming card mounts fresh — racing `play()` against manifest parse and first-frame decode. That's the jump.
+
+Instead: keep a small pool of `<video>` elements alive at the app root. When a card becomes active, we **move** (reparent via `appendChild`) a pooled video into the card's slot, hand it the new source, and keep the decoded frame buffer alive across the swap. No teardown, no re-decode, no black flash.
+
+This is the exact mechanism Instagram, TikTok, and the Twitter/X feed use.
+
+## Scope (Phase 1 only)
+
+Just the pool + reparenting infrastructure and Clubhouse feed integration. Profile feeds and fullscreen viewer come in Phase 2 once the pool is proven.
 
 ## Deliverables
 
-### 1. `AudioBroker` singleton (`src/video/pool/AudioBroker.ts`)
-- Maintains a registry of every slot that wants audio (Clubhouse active slide, fullscreen viewer, profile hero, etc.).
-- Each registration carries a policy: `inline-session`, `fullscreen-session`, or `always-muted`.
-- Subscribes to `useSessionAudio` and re-evaluates on every focus change / fullscreen open / session mute toggle.
-- Resolution rule (last-write-wins for focus, fullscreen beats inline):
-  - If session is muted → every registered element is muted.
-  - If fullscreen viewer is open → the fullscreen slot owns unmuted audio.
-  - Otherwise → the most recent inline slot that claimed focus is unmuted.
-  - Rails/grids/profile lists default to `always-muted`.
-- Writes `video.muted = true/false` directly on the pooled `<video>` element.
-- Logs every decision to `videoDebug('audio', ...)` and the existing audio debug buffer.
+1. **`VideoPool` singleton** (`src/video/pool/VideoPool.ts`)
+   - Maintains N=3 pre-created `<video>` elements (current + prev + next in a snap feed)
+   - `acquire(slotKey, hlsUrl, posterUrl)` → returns a live `<video>` element already attached to HLS
+   - `release(slotKey)` → returns element to pool, keeps HLS attached (warm)
+   - LRU eviction when pool is full — evicted element detaches HLS
+   - Elements never unmount from the DOM tree; only reparent between slot containers
 
-### 2. `VideoSlot` audio integration
-- Add `audioPolicy` and `claimAudioFocus` props.
-- On mount, register with `AudioBroker`; on unmount, unregister.
-- `isActive && !muted` causes the slot to claim focus (last-write-wins).
-- The existing `muted` prop is still honored as a local override.
+2. **`VideoSlot` component** (`src/video/pool/VideoSlot.tsx`)
+   - Replaces the direct `<video>` render inside `SnapVideoPlayer` / feed cards
+   - Renders an empty container `<div ref>` and a poster `<img>` underneath
+   - On mount: `pool.acquire()` → `container.appendChild(video)`
+   - On unmount: `pool.release()` (video stays alive in the pool, just detached from container)
+   - Poster cross-fade only clears once the pooled video fires `loadeddata` (first frame committed)
 
-### 3. Commit-on-first-frame poster fade (site-wide)
-- `VideoSlot` already cross-fades the poster after `loadeddata`.
-- Harden it so the poster never disappears before `videoWidth > 0`.
-- Add a 200ms CSS opacity transition for smoothness.
-- Ensure the first-frame gate also works on warm-hit re-acquires (element already decoded).
+3. **HLS attachment lives with the pooled element**, not the slot
+   - `VideoPool` owns the `Hls` instance per pooled `<video>`
+   - Source swap uses `hls.loadSource(newUrl)` on the same instance where possible (same origin) — avoids the full teardown that causes today's re-parse stall
+   - Existing `registerHlsForDebug` registry keeps working, keyed by pool slot id
 
-### 4. Profile feed adoption
-- `MomentCard.tsx`: when `mediaType === 'video'`, render `VideoSlot` instead of the static poster `<img>`.
-- `HeroMedia.tsx`: when `mediaType === 'video'`, render `VideoSlot` behind the fading poster.
-- `MomentFullscreenViewer.tsx`: render a single `VideoSlot` for the current moment, with `audioPolicy="fullscreen-session"`.
-- Profile grids/lists stay `always-muted`.
+4. **Wire Clubhouse feed only**
+   - `SnapVideoPlayer.tsx` (currently a poster-only chassis after the teardown) gains a `<VideoSlot>` render path
+   - Feature-flagged behind `VITE_VIDEO_POOL` — flag ON in dev, OFF in prod until we verify
+   - Profile pages, fullscreen viewer, watch grids: **unchanged** in Phase 1
 
-### 5. Fullscreen viewer adoption
-- `FeedSlide.tsx` fullscreen branch: replace the `VideoEngine` lane mount with `VideoSlot`.
-- Borrow/return animation still needs to work. Approach:
-  - Keep the origin-host registry and FLIP animation in `FullscreenFeedOverlay.tsx`.
-  - The borrowed element is now a pooled `<video>` reparented into the fullscreen host.
-  - On close, reparent it back to its origin slot (or let the pool reclaim it).
-- Horizontal media pager inside fullscreen also uses `VideoSlot`.
+5. **Instrumentation**
+   - Log `pool.acquire` / `pool.release` / `pool.evict` to `bootTimeline` + `videoDebug('pool', ...)`
+   - New PerfHud row: "Pool: 3/3 warm, last acquire 12ms"
+   - So Phase 2 has real data to tune the pool size against.
 
-### 6. Remove the feature flag
-- Change `isVideoPoolEnabled()` to return `true` by default (keep the localStorage override as an emergency kill-switch).
-- Delete the poster-only fallback branch in `SnapVideoPlayer.tsx`.
-- Update `.env.example` to remove `VITE_VIDEO_POOL` (or leave it documented but default true).
-- Add a `PerfHud` row showing pool occupancy and last acquire time.
+## Non-goals (later phases)
+
+- AudioBroker singleton (Phase 2)
+- Commit-on-first-frame poster fade site-wide (Phase 2, mostly free after pool)
+- Neighbor 2-segment prefetch (Phase 3)
+- Profile + fullscreen adoption (Phase 2)
+- Telemetry sampling (Phase 4)
 
 ## Technical notes
 
-- `VideoEngine` lanes and `VideoPool` will coexist during this phase. `AudioBroker` is the bridge: `VideoEngine` lanes already respect `useSessionAudio` and `audioFocus`; `VideoPool` slots register with the same `useSessionAudio` store so they never fight.
-- The fullscreen borrow path is the riskiest surface. We will keep the existing `FullscreenFeedOverlay` close-animation logic and only swap the element source from `VideoEngine.mountLane` to `VideoPool.acquire`.
-- Safari native HLS path remains supported: `AudioBroker` still works because it mutates the `<video>` element directly.
+- Pool size 3 is deliberate: matches SnapFeed's window (prev/current/next). We'll tune with the new PerfHud row.
+- Reparenting a playing `<video>` via `appendChild` is well-supported and does NOT reset playback in Chromium/WebKit — this is the property the pool depends on.
+- HLS.js instance reuse across source swaps is safe when the new URL comes from the same manifest origin (which all our Cloudflare Stream URLs do). If ever mixed, we recycle the whole element.
+- Nothing changes for profile/fullscreen this phase — those still use their existing paths. This keeps blast radius small and lets us prove the mechanic on the busiest surface first.
 
 ## Acceptance
 
-- Clubhouse feed swipes remain black-flash-free with the flag removed.
-- Unmuting the active Clubhouse slide unmutes exactly that video; all other inline videos stay silent.
-- Opening fullscreen from a rail/grid/feed tile transfers audio to fullscreen without a second tap.
-- Closing fullscreen returns audio to the originating surface (or stays muted if session is muted).
-- Profile `MomentCard` and `HeroMedia` videos autoplay muted inline; tapping into `MomentFullscreenViewer` speaks if session is unmuted.
-- `videoDebug('audio', ...)` logs show a single speaker at all times.
-- tsc + eslint clean; no regressions in tap-to-pause or looping.
+- Clubhouse feed swipes forward/back 20 items with no black flash and no poster re-show once a card has been visited
+- No regressions in muted/unmuted state, tap-to-pause, or looping
+- `videoDebug('pool', ...)` shows acquire on first visit, release on scroll-off, and re-acquire on scroll-back within <5ms (no re-parse)
+- Flag OFF path is byte-for-byte identical to today (no behavior change when disabled)

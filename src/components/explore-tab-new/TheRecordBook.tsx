@@ -18,7 +18,7 @@ import { SPACE } from '@/lib/spacing';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import { TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
 import { StatRow } from './StatRow';
-import { regionScopePhrase } from './regionScope';
+import { matchesRailRegionScope, regionScopePhrase } from './regionScope';
 import { EmptyScopeCard } from './EmptyScopeCard';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
@@ -125,9 +125,9 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
   const { data } = useRegionFeats(region, 'records', mode);
 
   const allRows = useMemo(() => {
-    const raw = data ?? [];
+    const raw = (data ?? []).filter((r) => matchesRailRegionScope(region, r.region));
     return mode === 'alltime' ? sortRecordsAllTime(raw) : raw;
-  }, [data, mode]);
+  }, [data, mode, region]);
 
   const ledgerRows = useMemo(() => allRows.slice(0, LEDGER_ROWS), [allRows]);
 

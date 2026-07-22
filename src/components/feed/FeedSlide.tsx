@@ -19,7 +19,6 @@ import { FS_TRANSITION_MODE } from '@/lib/media/transitionMode';
 import { TapForSoundPill } from '@/audio/MuteButton';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
 import { VideoProcessingCard } from './VideoProcessingCard';
-import { AudioBroker } from '@/video/pool/AudioBroker';
 
 
 import { usePostViewTracker } from '@/hooks/usePostViewTracker';
@@ -669,34 +668,6 @@ const FullscreenVideoSlot: React.FC<{
     } catch {}
   }, [isActive, isBorrowSlide, resumeKey, startPosition]);
 
-  // Coordinate the engine's fullscreen lane with the pooled-video AudioBroker.
-  // When fullscreen is open, this manual speaker claims focus so inline pool
-  // videos are muted; on close/unmount the claim is released.
-  React.useEffect(() => {
-    if (isBorrowSlide || !isActive) return;
-    const slotKey = `engine:fullscreen:${resumeKey}`;
-    const tryRegister = () => {
-      const el = (VideoEngine as unknown as { _debugGetElement?: (id: string) => HTMLMediaElement | null })._debugGetElement?.('fullscreen') ?? null;
-      if (el && el instanceof HTMLVideoElement) {
-        AudioBroker.registerManual(slotKey, el, 'fullscreen-session');
-        AudioBroker.claimManualFocus(slotKey);
-        return true;
-      }
-      return false;
-    };
-    if (!tryRegister()) {
-      const t = window.setTimeout(tryRegister, 80);
-      return () => {
-        clearTimeout(t);
-        AudioBroker.releaseManualFocus(slotKey);
-        AudioBroker.unregisterManual(slotKey);
-      };
-    }
-    return () => {
-      AudioBroker.releaseManualFocus(slotKey);
-      AudioBroker.unregisterManual(slotKey);
-    };
-  }, [isActive, isBorrowSlide, resumeKey]);
 
   // [TRACE] slot.render — once per active mount of this slot for correlation.
   const didTraceRenderRef = React.useRef(false);
@@ -1134,6 +1105,7 @@ const BorrowedFullscreenSlot: React.FC<{
       }
     }
 
+
     // Aspect-aware expand target — grow INTO the media's resting rect so
     // there is no post-expand shrink.
     //
@@ -1254,32 +1226,6 @@ const BorrowedFullscreenSlot: React.FC<{
       setClosing(true);
     });
   }, [closeAnim, closing, originRect, borrow.laneId, borrow.ownerKey]);
-
-  // Coordinate the borrowed engine lane with the pooled-video AudioBroker.
-  React.useEffect(() => {
-    const slotKey = `engine:borrow:${borrow.ownerKey}`;
-    const tryRegister = () => {
-      const bEl = (VideoEngine as unknown as { _debugGetElement?: (id: string) => HTMLMediaElement | null })._debugGetElement?.(borrow.laneId) ?? null;
-      if (bEl && bEl instanceof HTMLVideoElement) {
-        AudioBroker.registerManual(slotKey, bEl, 'fullscreen-session');
-        AudioBroker.claimManualFocus(slotKey);
-        return true;
-      }
-      return false;
-    };
-    if (!tryRegister()) {
-      const t = window.setTimeout(tryRegister, 80);
-      return () => {
-        clearTimeout(t);
-        AudioBroker.releaseManualFocus(slotKey);
-        AudioBroker.unregisterManual(slotKey);
-      };
-    }
-    return () => {
-      AudioBroker.releaseManualFocus(slotKey);
-      AudioBroker.unregisterManual(slotKey);
-    };
-  }, [borrow.laneId, borrow.ownerKey]);
 
   const handleTransitionEnd = React.useCallback((e: React.TransitionEvent<HTMLDivElement>) => {
     // Only respond to the wrapper's own size/transform transitions.
