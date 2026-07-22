@@ -10,9 +10,19 @@
  * MediaCarousel, FeedSlide, etc.) continues to import without churn. When
  * the new VideoEngine lands it will re-mount here.
  */
-import React, { useCallback, memo } from 'react';
+import React, { useCallback, memo, useSyncExternalStore } from 'react';
 import { useClubhouseStore } from '@/store/clubhouseStore';
+import { useSessionAudio } from '@/audio/sessionAudioStore';
+import { audioDuck } from '@/audio/audioDuckStore';
 import { VideoSlot } from '@/video/pool/VideoSlot';
+
+function useDucked(): boolean {
+  return useSyncExternalStore(
+    (cb) => audioDuck.subscribe(cb),
+    () => audioDuck.isDucked(),
+    () => false,
+  );
+}
 
 interface SnapVideoPlayerProps {
   hlsUrl: string;
