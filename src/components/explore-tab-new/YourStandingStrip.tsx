@@ -60,8 +60,11 @@ function useCrownsHeld(userId: string | undefined) {
 
 function scrollToDefendRail() {
   const el = document.getElementById('discover-defend-rail');
-  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if (!el) return;
+  // scroll-margin-top on the section handles the sticky header offset.
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
+
 
 export function YourStandingStrip({ userId }: Props) {
   const navigate = useNavigate();
