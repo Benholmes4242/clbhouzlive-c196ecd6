@@ -65,6 +65,27 @@ export function railKeyToRegionKey(
 }
 
 /**
+ * Map the Discover toggle slug to the compact rail cache-region key used by
+ * `discover_rail_cache` (rows are keyed as `records:{r}`, `feats:{r}:{tier}`,
+ * `legendary_leaders:{r}`, `eagle_leaders:{r}` where {r} is one of these
+ * values). Null / undefined → 'worldwide'.
+ */
+export function slugToCacheRegion(slug: string | null | undefined): string {
+  switch (slug) {
+    case 'uk-ireland':
+      return 'gbi';
+    case 'usa':
+      return 'usa';
+    case 'continental-europe':
+      return 'europe';
+    case 'rest-of-world':
+      return 'row';
+    default:
+      return 'worldwide';
+  }
+}
+
+/**
  * Shared scope predicate for the Discover region toggle. Feeds the payload's
  * country/region strings through `dbValueToRegionKey` — the same util the
  * sternest-tests Course Index and the rest of the app use to decide which
