@@ -102,10 +102,12 @@ export function useRailLane(opts: UseRailLaneOptions): UseRailLaneResult {
     if (scrollActivity.isQuiescent()) {
       doAcquire();
     } else {
+      scrollActivity.noteDeferred();
       unsubQuiescent = scrollActivity.subscribe(() => {
         if (scrollActivity.isQuiescent()) {
           unsubQuiescent?.();
           unsubQuiescent = null;
+          scrollActivity.noteReleased();
           doAcquire();
         }
       });

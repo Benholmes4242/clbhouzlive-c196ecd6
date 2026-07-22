@@ -24,6 +24,14 @@ let quiescent = true;
 let timer: ReturnType<typeof setTimeout> | null = null;
 const listeners = new Set<() => void>();
 
+// Diagnostic counters — surfaced via PerfHud so we can verify the dampener
+// is doing meaningful work in the field.
+const stats = {
+  deferredAcquires: 0,   // rail-lane acquire skipped because mid-scroll
+  releasedAcquires: 0,   // deferred acquire finally fired on settle
+  scrollBursts: 0,       // count of quiescent → active transitions
+};
+
 function emit() {
   for (const fn of listeners) {
     try { fn(); } catch { /* noop */ }
@@ -45,6 +53,7 @@ function noteScroll() {
   lastScrollAt = performance.now();
   if (quiescent) {
     quiescent = false;
+    stats.scrollBursts += 1;
     emit();
   }
   armSettleTimer();
@@ -74,6 +83,14 @@ export const scrollActivity = {
     ensureBootstrapped();
     listeners.add(fn);
     return () => { listeners.delete(fn); };
+  },
+  /** Increment when a rail-lane acquire is deferred by the dampener. */
+  noteDeferred(): void { stats.deferredAcquires += 1; },
+  /** Increment when a deferred acquire finally fires on settle. */
+  noteReleased(): void { stats.releasedAcquires += 1; },
+  /** Snapshot for PerfHud. */
+  getStats(): { deferredAcquires: number; releasedAcquires: number; scrollBursts: number } {
+    return { ...stats };
   },
 };
 

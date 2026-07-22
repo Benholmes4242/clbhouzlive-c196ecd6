@@ -10,6 +10,7 @@ import { navTiming, isPerfEnabled, subscribePerfLive, type NavTransaction } from
 import { Z } from '@/config/zIndex';
 import { VideoPool } from '@/video/pool/VideoPool';
 import { getVideoTelemetryStats } from '@/video/telemetry';
+import { scrollActivity } from '@/video/scrollActivity';
 
 
 type Summary = ReturnType<typeof navTiming.getRecent>[number];
@@ -191,6 +192,12 @@ function VideoBlock() {
         stalls <span style={{ color: stalls > 0 ? '#fbbf24' : '#4ade80' }}>{stalls}</span>
         {' · '}evict {evicts}
         {' · '}abrΔ {abr}
+      </div>
+      <div style={{ color: '#94a3b8' }}>
+        {(() => {
+          const s = scrollActivity.getStats();
+          return `scroll defer ${s.deferredAcquires}/${s.releasedAcquires} · bursts ${s.scrollBursts}`;
+        })()}
       </div>
     </div>
   );
