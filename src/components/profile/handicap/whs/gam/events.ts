@@ -21,8 +21,11 @@ function bus<T = void>() {
 
 export const allStreaksBus = bus<void>();
 export const notificationsBus = bus<void>();
-export const gamAchievementsBus = bus<{ badgeId?: string } | undefined>();
+export const gamAchievementsBus = bus<{ badgeId?: string; section?: 'crowns' } | undefined>();
 
 export const openAllStreaks = () => allStreaksBus.emit();
 export const openNotifications = () => notificationsBus.emit();
-export const openGamAchievements = (badgeId?: string) => gamAchievementsBus.emit(badgeId ? { badgeId } : undefined);
+export const openGamAchievements = (
+  opts?: { badgeId?: string; section?: 'crowns' },
+) => gamAchievementsBus.emit(opts && (opts.badgeId || opts.section) ? opts : undefined);
+
