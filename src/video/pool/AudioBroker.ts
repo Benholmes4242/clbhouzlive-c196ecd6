@@ -31,13 +31,11 @@ class AudioBrokerImpl {
   private regs = new Map<string, AudioRegistration>();
   private manualRegs = new Map<string, AudioRegistration>(); // non-VideoSlot speakers (e.g. VideoEngine)
   private sessionUnsub: (() => void) | null = null;
-  private fsUnsub: (() => void) | null = null;
   private initialized = false;
 
   private ensureInit() {
     if (this.initialized || typeof window === 'undefined') return;
     this.sessionUnsub = useSessionAudio.subscribe(() => this.reconcile('session-change'));
-    this.fsUnsub = useFullscreenFeedStore.subscribe(() => this.reconcile('overlay-change'));
     this.initialized = true;
   }
 
