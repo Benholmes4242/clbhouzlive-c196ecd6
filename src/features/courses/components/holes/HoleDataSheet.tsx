@@ -819,7 +819,7 @@ const ExpandedRow: React.FC<{
   const overPar = pctOf(row, ['bogey', 'double']);
 
   const bars: { kind: HoleGlyphKind; label: string; pct: number; isGold: boolean; fill: string }[] = [
-    { kind: 'eagle-or-better', label: 'EAG', pct: pctOf(row, ['ace', 'albatross', 'eagle']), isGold: true, fill: GOLD },
+    { kind: 'eagle-or-better', label: 'EAG+', pct: pctOf(row, ['ace', 'albatross', 'eagle']), isGold: true, fill: GOLD },
     { kind: 'birdie', label: 'BIRD', pct: row.dist.birdie ?? 0, isGold: true, fill: GOLD_GRAD },
     { kind: 'par', label: 'PAR', pct: row.dist.par ?? 0, isGold: false, fill: INK_20 },
     { kind: 'bogey', label: 'BOG', pct: row.dist.bogey ?? 0, isGold: false, fill: INK_55 },
