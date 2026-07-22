@@ -7,8 +7,10 @@
  * distributions. No SQL/RPC changes.
  */
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import type { MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
+import { formatNumber } from '@/i18n/format';
 import { HoleGlyph, HoleGlyphDefs, type HoleGlyphKind } from './HoleGlyph';
 
 // ── Tokens ────────────────────────────────────────────────────────────
