@@ -241,12 +241,27 @@ function groupLegendsByCourse(items: TrophyItem[]): CourseGroup[] {
 const CourseLegendsCollapsibleSection: React.FC<{
   items: TrophyItem[];
   onOpenGroup: (records: LegendItem[]) => void;
-}> = ({ items, onOpenGroup }) => {
+  /** Increments each time an external caller asks to reveal this section
+   *  (e.g. Discover crowns tile deep-link). Expands and scrolls into view. */
+  revealToken?: number;
+}> = ({ items, onOpenGroup, revealToken = 0 }) => {
   const [expanded, setExpanded] = useState(false);
+  const rootRef = React.useRef<HTMLDivElement>(null);
   const groups = useMemo(() => groupLegendsByCourse(items), [items]);
   const totalRecords = groups.reduce((n, g) => n + g.records.length, 0);
+
+  useEffect(() => {
+    if (!revealToken) return;
+    setExpanded(true);
+    // Wait a frame for the grid to mount, then scroll the header into view.
+    const id = requestAnimationFrame(() => {
+      rootRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    return () => cancelAnimationFrame(id);
+  }, [revealToken]);
+
   return (
-    <>
+    <div ref={rootRef}>
       <button
         type="button"
         onClick={() => setExpanded((v) => !v)}
@@ -301,9 +316,10 @@ const CourseLegendsCollapsibleSection: React.FC<{
           ))}
         </div>
       )}
-    </>
+    </div>
   );
 };
+
 
 export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFirstName }) => {
   const [open, setOpen] = useState(false);
