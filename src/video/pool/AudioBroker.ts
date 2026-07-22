@@ -177,7 +177,6 @@ class AudioBrokerImpl {
     logAudio('broker.decision', {
       reason,
       sessionMuted,
-      fsOpen,
       branch,
       whyNone,
       speaker: speaker?.slotKey ?? null,
