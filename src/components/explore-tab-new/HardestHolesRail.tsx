@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useHardestHoles } from '@/hooks/gam/useHardestHoles';
 import { SectionHead } from './SectionHead';
+import { regionScopePhrase } from './regionScope';
 import { FONT } from './gamingLightTokens';
 
 const RED = '#D2222D';
@@ -9,7 +10,7 @@ const MUTE = 'rgba(15,23,42,0.45)';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
 const CARD_BG = '#FFFFFF';
 const CARD_SHADOW = '0 1px 3px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.05)';
-const MAX = 12;
+const MAX = 10;
 
 function ordinal(n: number): string {
   const s = ['th', 'st', 'nd', 'rd'];
@@ -115,13 +116,14 @@ function HardestCard({
   );
 }
 
-export function HardestHolesRail() {
+export function HardestHolesRail({ region }: { region?: string | null } = {}) {
   const { data } = useHardestHoles();
-  const rows = (data ?? []).slice(0, MAX);
+  const filtered = (data ?? []).filter((h) => (region == null ? true : h.region === region));
+  const rows = filtered.slice(0, MAX);
   if (rows.length === 0) return null;
   return (
     <section style={{ marginTop: 32 }}>
-      <SectionHead overline="The hardest holes" title="Where scorecards go to die" />
+      <SectionHead overline="The hardest holes" title={`The toughest holes ${regionScopePhrase(region)}`} />
       <div
         className="flex overflow-x-auto scrollbar-hide"
         style={{ padding: '0 16px', gap: 10 }}
