@@ -206,6 +206,7 @@ export function AttackDefendBand({ userId, region = null }: Props) {
         marginTop: SPACE?.sectionSection ?? 24,
         fontFamily: FONT,
         color: INK,
+        scrollMarginTop: 96,
       }}
     >
       {/* Header + tabs */}
