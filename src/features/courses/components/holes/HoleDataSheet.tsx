@@ -676,10 +676,11 @@ const ScorecardTable: React.FC<{
                 display: 'grid',
                 gridTemplateColumns: cols,
                 alignItems: 'center',
-                padding: '10px 12px',
+                padding: '10px 4px',
                 borderBottom: `1px solid ${INK_08}`,
                 cursor: 'pointer',
-                background: isOpen ? '#FAFBFC' : '#FFFFFF',
+                background: isOpen ? 'rgba(15,23,42,0.03)' : 'transparent',
+
               }}
             >
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
