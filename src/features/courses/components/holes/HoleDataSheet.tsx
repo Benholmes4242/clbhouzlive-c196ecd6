@@ -201,7 +201,7 @@ export const HoleDataSheet: React.FC<Props> = ({
           }}
         >
           <h3 style={{ margin: 0, fontSize: 14, fontWeight: 800, color: INK, letterSpacing: '-0.005em' }}>
-            Hole by hole
+            {t('courses:holes.holeByHole')}
           </h3>
           <div
             role="tablist"
@@ -214,8 +214,8 @@ export const HoleDataSheet: React.FC<Props> = ({
             }}
           >
             {([
-              ['hole', 'By hole'],
-              ['tough', 'Toughest first'],
+              ['hole', t('courses:holes.sortByHole')],
+              ['tough', t('courses:holes.sortByDifficulty')],
             ] as const).map(([v, label]) => (
               <button
                 key={v}
@@ -243,7 +243,7 @@ export const HoleDataSheet: React.FC<Props> = ({
 
         {viewerHasPlayed && (
           <p style={{ margin: 0, padding: '0 4px', fontSize: 11.5, color: INK_55, lineHeight: 1.5 }}>
-            A gold ring by a hole number means you&rsquo;ve birdied it.
+            {t('courses:holes.birdieRingNote')}
           </p>
         )}
 
