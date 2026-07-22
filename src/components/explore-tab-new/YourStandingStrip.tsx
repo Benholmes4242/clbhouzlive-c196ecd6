@@ -276,11 +276,17 @@ function StandingCell({
   progressPct?: number;
 }) {
   const disabled = !onClick;
+  const [pressed, setPressed] = useState(false);
+  const clearPress = () => setPressed(false);
   return (
     <button
       type="button"
       onClick={onClick}
       disabled={disabled}
+      onPointerDown={disabled ? undefined : () => setPressed(true)}
+      onPointerUp={clearPress}
+      onPointerLeave={clearPress}
+      onPointerCancel={clearPress}
       style={{
         flex: wide ? 1.6 : 1,
         minWidth: 0,
@@ -296,9 +302,13 @@ function StandingCell({
         alignItems: 'center',
         justifyContent: 'center',
         gap: 3,
-        opacity: emphasize ? 1 : 0.65,
+        opacity: emphasize ? (pressed ? 0.7 : 1) : 0.65,
+        transform: pressed ? 'scale(0.97)' : 'scale(1)',
+        transition: 'transform 120ms ease, opacity 120ms ease',
+        WebkitTapHighlightColor: 'transparent',
       }}
     >
+
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 5, minWidth: 0, maxWidth: '100%' }}>
         {icon ? (
           <span aria-hidden style={{ fontSize: 13, lineHeight: 1 }}>
