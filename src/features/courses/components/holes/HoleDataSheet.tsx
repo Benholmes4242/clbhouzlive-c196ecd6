@@ -243,6 +243,12 @@ export const HoleDataSheet: React.FC<Props> = ({
           </div>
         </div>
 
+        {viewerHasPlayed && (
+          <p style={{ margin: 0, padding: '0 4px', fontSize: 11.5, color: INK_55, lineHeight: 1.5 }}>
+            A gold ring by a hole number means you&rsquo;ve birdied it.
+          </p>
+        )}
+
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {rows.map((h) => (
             <HoleCard
