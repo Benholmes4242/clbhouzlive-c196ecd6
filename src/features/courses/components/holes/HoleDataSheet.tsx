@@ -12,6 +12,7 @@ import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import type { MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
 import { formatNumber } from '@/i18n/format';
 import { HoleGlyph, HoleGlyphDefs, type HoleGlyphKind } from './HoleGlyph';
+import { fmtToPar } from '@/features/courses/_shared/holes/formatToPar';
 
 // ── Tokens ────────────────────────────────────────────────────────────
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
@@ -286,6 +287,7 @@ const SkylineCard: React.FC<{
   );
   const domainMin = Math.min(
     0,
+    ...sorted.map((h) => h.avg_to_par),
     ...sorted.map((h) => myByHole.get(h.hole_no)?.avg_to_par ?? 0),
   );
   const span = Math.max(0.5, domainMax - domainMin);
@@ -302,6 +304,7 @@ const SkylineCard: React.FC<{
   const rx = barW / 2.6;
   const yFor = (v: number) => PYT + chartH - ((v - domainMin) / span) * chartH;
   const yBaseline = yFor(0);
+  const hasNegative = domainMin < 0;
 
   type Pt = { x: number; y: number };
   const segments: Pt[][] = [];
@@ -321,9 +324,10 @@ const SkylineCard: React.FC<{
   }
 
   const clause = characterClause(hardest.hole_no);
+  const beastFrag = `The ${ord(hardest.hole_no)} is the beast: ${fmtToPar(hardest.avg_to_par)} for the field.`;
   const caption = viewerHasPlayed
-    ? `${clause} — and your gold line stays under everyone\u2019s on ${beatFieldCount} of ${sorted.length}. The ${ord(hardest.hole_no)} is the beast: +${hardest.avg_to_par.toFixed(2)} for the field.`
-    : `The ${ord(hardest.hole_no)} is the beast: +${hardest.avg_to_par.toFixed(2)} for the field.`;
+    ? `${clause} — and your gold line stays under everyone\u2019s on ${beatFieldCount} of ${sorted.length}. ${beastFrag}`
+    : beastFrag;
 
   return (
     <section style={{ ...CARD, padding: 16, scrollMarginTop: STICKY_SAFE }}>
@@ -351,11 +355,26 @@ const SkylineCard: React.FC<{
               <stop offset="100%" stopColor={GOLD} />
             </linearGradient>
           </defs>
+          {hasNegative && (
+            <line
+              x1={PX}
+              x2={W - PX}
+              y1={yBaseline}
+              y2={yBaseline}
+              stroke={INK_20}
+              strokeWidth={0.75}
+              strokeDasharray="2 3"
+            />
+          )}
           {sorted.map((h, i) => {
             const isHardest = h.hole_no === hardest.hole_no;
             const cx = PX + stepX * i + stepX / 2;
-            const yTop = yFor(h.avg_to_par);
-            const barH = Math.max(2, yBaseline - yTop);
+            const yVal = yFor(h.avg_to_par);
+            const isUnder = h.avg_to_par < 0;
+            const yTop = Math.min(yVal, yBaseline);
+            const yBot = Math.max(yVal, yBaseline);
+            const barH = Math.max(2, yBot - yTop);
+            const fill = isUnder ? GOLD : (isHardest ? INK : INK_20);
             return (
               <rect
                 key={h.hole_no}
@@ -364,7 +383,7 @@ const SkylineCard: React.FC<{
                 width={barW}
                 height={barH}
                 rx={rx}
-                fill={isHardest ? INK : INK_20}
+                fill={fill}
               />
             );
           })}
@@ -461,13 +480,17 @@ const StoryTiles: React.FC<{
     );
   }
   if (easiest) {
+    const underPar = easiest.avg_to_par < -0.005;
+    const sentence = underPar
+      ? `Plays to ${fmtToPar(easiest.avg_to_par)} — the field's happy place.`
+      : "The friendliest hole on the card — the field's happy place.";
     communityTiles.push(
       <StoryTile
         key="best"
         emoji="🎯"
         cap="BEST CHANCE"
         headline={`Hole ${easiest.hole_no}`}
-        sentence="The friendliest hole on the card — the field's happy place."
+        sentence={sentence}
       />,
     );
   }
@@ -485,12 +508,12 @@ const StoryTiles: React.FC<{
   // Your battle
   if (nemesis) {
     const fieldRow = holes.find((h) => h.hole_no === nemesis.hole_no);
-    const youOver = Math.max(0, nemesis.avg_to_par);
-    const fieldOver = fieldRow ? fieldRow.avg_to_par : 0;
+    const youStr = fmtToPar(nemesis.avg_to_par);
+    const fieldStr = fieldRow ? fmtToPar(fieldRow.avg_to_par) : fmtToPar(0);
     const youBeats = fieldRow ? nemesis.avg_to_par <= fieldRow.avg_to_par + 0.005 : false;
     const sentence = youBeats
-      ? `You play it to +${youOver.toFixed(2)} — better than most, still unbeaten.`
-      : `You play it to +${youOver.toFixed(2)} against the field's +${fieldOver.toFixed(2)}. Time to settle it.`;
+      ? `You play it to ${youStr} — better than most, still unbeaten.`
+      : `You play it to ${youStr} against the field's ${fieldStr}. Time to settle it.`;
     tiles.push(
       <StoryTile
         key="battle"
@@ -726,7 +749,7 @@ const HoleCard: React.FC<{
               lineHeight: 1,
             }}
           >
-            +{Math.max(0, fieldOver).toFixed(2)}
+            {fmtToPar(fieldOver)}
           </div>
           {showYou && (
             <div
@@ -737,7 +760,7 @@ const HoleCard: React.FC<{
                 ...NUM,
               }}
             >
-              {t('courses:holes.youAvg', { avg: Math.max(0, mine!.avg_to_par).toFixed(2) })}
+              {t('courses:holes.youAvg', { avg: fmtToPar(mine!.avg_to_par) })}
             </div>
           )}
         </div>

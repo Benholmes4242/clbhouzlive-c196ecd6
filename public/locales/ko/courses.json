@@ -87,7 +87,7 @@
     "legendEveryone": "Everyone",
     "legendYou": "You",
     "theBeastSuffix": " · the beast",
-    "youAvg": "you +{{avg}}"
+    "youAvg": "you {{avg}}"
   },
   "scorecard": {
     "syncingTitle": "Scorecard on the way",
