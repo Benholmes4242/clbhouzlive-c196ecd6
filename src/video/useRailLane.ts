@@ -58,7 +58,7 @@ export function useRailLane(opts: UseRailLaneOptions): UseRailLaneResult {
   const hostRef = useRef<HTMLDivElement>(null);
   const [laneId, setLaneId] = useState<LaneId | null>(null);
   const [ready, setReady] = useState(false);
-  const scrollQuiescent = useScrollQuiescent();
+  // scrollActivity used imperatively inside acquire effect (see below).
 
   const eligible = !!(opts.active && opts.hlsUrl && opts.ownerKey);
 
