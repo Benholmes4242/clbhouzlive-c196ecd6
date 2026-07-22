@@ -22,12 +22,42 @@
  * (see `src/video/pool/flag.ts`). Flag OFF = byte-for-byte legacy path.
  */
 
-import Hls from 'hls.js';
+import Hls, { type HlsConfig } from 'hls.js';
 import { logBootEvent } from '@/utils/bootTimeline';
 import { videoDebug } from '@/config/videoDebug';
 import { registerHlsForDebug, unregisterHlsForDebug } from '@/components/debug/hlsDebugRegistry';
+import { HLS_CONFIG } from '@/video/lanePolicy';
+import { emitVideoTelemetry } from '@/video/telemetry';
 
 const POOL_SIZE = 3; // prev / current / next
+
+/**
+ * Surface hint — tunes HLS buffer / ABR budget per rendering context.
+ *  - `inline`     : feed/profile tiles. Small buffers, mobile-safe ABR seed.
+ *  - `fullscreen` : immersive viewer. Larger buffer for smoother seeking.
+ */
+export type PoolSurface = 'inline' | 'fullscreen';
+
+const INLINE_HLS_CONFIG: Partial<HlsConfig> = {
+  ...HLS_CONFIG,
+  maxBufferLength: 12,
+  maxMaxBufferLength: 24,
+  backBufferLength: 15,
+  maxBufferSize: 20 * 1024 * 1024,
+  abrEwmaDefaultEstimate: 500_000,
+};
+
+const FULLSCREEN_HLS_CONFIG: Partial<HlsConfig> = {
+  ...HLS_CONFIG,
+  maxBufferLength: 30,
+  maxMaxBufferLength: 60,
+  backBufferLength: 30,
+  maxBufferSize: 40 * 1024 * 1024,
+  abrEwmaDefaultEstimate: 1_200_000,
+};
+
+const configFor = (surface: PoolSurface): Partial<HlsConfig> =>
+  surface === 'fullscreen' ? FULLSCREEN_HLS_CONFIG : INLINE_HLS_CONFIG;
 
 interface PoolEntry {
   id: string;                    // stable "pool-0", "pool-1", ...
