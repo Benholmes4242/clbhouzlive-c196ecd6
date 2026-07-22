@@ -1,91 +1,69 @@
-# Wave 3d.iii — final courses sub-wave
 
-## Scope receipt (measured, not assumed)
+# Phase 1 — Video Element Pool + Reparenting
 
-Ran the WARN-as-ERROR probe over the five sub-wave paths. Baseline:
+Kill the class of bugs where each feed card mounts its own `<video>` on scroll, causing black flashes, poster re-shows, and mid-swipe stutters as HLS re-parses and first-frame re-decodes.
 
-- **152 violations across 26 files** in `course-detail/` + `network/` + `map/` + `phase5/` + `features/courses/components/`.
-- Distribution (files with hits):
-  - `course-detail/` — 14 files (Claim*, CommunityScoreCard, ConnectHandicapCue, CourseAboutTab, CourseExploreLinks, CourseLocationPills, CourseReviewsTab, CourseTop100*, SuggestEditModal, AboutMediaStrip)
-  - `map/` — MapCourseSheet, MapInsightChip
-  - `network/` — NetworkHighlightCarousel, UnseenReviewsBanner
-  - `phase5/` — CourseStatusToggle, PersonalReviewCard, PlanningSignals
-  - `features/courses/components/holes/` — CourseHolesTab, HoleFeatureCards, HolesCredibilityHeader, HolesEmptyState, HolesScoringKey
+## The core idea
 
-All of it is user-visible copy: JSX text, `aria-label`, `title`, `placeholder`, `alt`, and prop-passed `label`s. No literals sit in constants that legitimately stay in English (brand vocabulary lives in `achievements/` and stayed there in the previous ruling).
+Today every card owns its own `<video>` element. When you scroll, the outgoing card unmounts (destroys `<video>` + HLS instance + decoded frames) and the incoming card mounts fresh — racing `play()` against manifest parse and first-frame decode. That's the jump.
 
-## How to execute
+Instead: keep a small pool of `<video>` elements alive at the app root. When a card becomes active, we **move** (reparent via `appendChild`) a pooled video into the card's slot, hand it the new source, and keep the decoded frame buffer alive across the swap. No teardown, no re-decode, no black flash.
 
-Because a single 26-file drop-and-pray is a bad shape (merge conflicts, review load, and the risk of a partial extraction leaving the gate un-flippable), I'll run this as **three tight sub-batches inside 3d.iii**, one per turn, each landing green before the next starts:
+This is the exact mechanism Instagram, TikTok, and the Twitter/X feed use.
 
-**3d.iii.a — course-detail/ (14 files, ~110 violations)**
-- The bulk of the wave. Every file gets `useTranslation('courses')` if missing, JSX text and user-visible attrs routed through `t(...)`, with keys namespaced under:
-  - `courseDetail.claim.*` (CTA, sheet states, under-review, claimed profile link)
-  - `courseDetail.about.*` (media strip, description toggle, location empty, website button)
-  - `courseDetail.locationPills.*`
-  - `courseDetail.exploreLinks.*`
-  - `courseDetail.top100.*` (spotlight, summary)
-  - `courseDetail.suggestEdit.*`
-  - Plus the "Category Scores" / "Based on N ratings" strings on `CommunityScoreCard` and the empty-state / "Be the first" copy.
-- Interpolation for `{{clubName}}`, `{{count}}` (pluralised where the source already branches on `n === 1`), `{{cat}}` category label in State C of the claim sheet.
+## Scope (Phase 1 only)
 
-**3d.iii.b — map/ + network/ + phase5/ (7 files, ~28 violations)**
-- `map.*`, `network.*`, `phase5.*` sub-namespaces; the `ConnectHandicapCue` COPY table's inline sentences move into keyed variants (`courseDetail.handicapCue.<variant>.benefit|sub`).
+Just the pool + reparenting infrastructure and Clubhouse feed integration. Profile feeds and fullscreen viewer come in Phase 2 once the pool is proven.
 
-**3d.iii.c — features/courses/components/holes/ (5 files, ~14 violations)**
-- Extends the existing `holes.*` namespace already in `courses.json`.
-- No new locale namespaces — just additional keys.
+## Deliverables
 
-## Locale coverage
+1. **`VideoPool` singleton** (`src/video/pool/VideoPool.ts`)
+   - Maintains N=3 pre-created `<video>` elements (current + prev + next in a snap feed)
+   - `acquire(slotKey, hlsUrl, posterUrl)` → returns a live `<video>` element already attached to HLS
+   - `release(slotKey)` → returns element to pool, keeps HLS attached (warm)
+   - LRU eviction when pool is full — evicted element detaches HLS
+   - Elements never unmount from the DOM tree; only reparent between slot containers
 
-Every new key lands in all six locales in the same turn it's introduced:
-- `en`, `de`, `es`, `ja`, `ko`, `en-XA`.
-- `en-XA` gets pseudo-localised strings (`[!!ëẍáṁṗłë!!]` style) matching the existing convention in the file.
-- Non-English locales get English fallback text with a `// TODO: translate` sibling only if the existing file uses that convention; a quick scan says the file just carries English strings today, so I'll mirror that pattern rather than invent one.
+2. **`VideoSlot` component** (`src/video/pool/VideoSlot.tsx`)
+   - Replaces the direct `<video>` render inside `SnapVideoPlayer` / feed cards
+   - Renders an empty container `<div ref>` and a poster `<img>` underneath
+   - On mount: `pool.acquire()` → `container.appendChild(video)`
+   - On unmount: `pool.release()` (video stays alive in the pool, just detached from container)
+   - Poster cross-fade only clears once the pooled video fires `loadeddata` (first frame committed)
 
-## ESLint config — parent-dir gate consolidation
+3. **HLS attachment lives with the pooled element**, not the slot
+   - `VideoPool` owns the `Hls` instance per pooled `<video>`
+   - Source swap uses `hls.loadSource(newUrl)` on the same instance where possible (same origin) — avoids the full teardown that causes today's re-parse stall
+   - Existing `registerHlsForDebug` registry keeps working, keyed by pool slot id
 
-Only after all three sub-batches show 0 with the ERROR rule locally. The three sub-wave ERROR blocks (3d.i, 3d.ii, 3d.iii) collapse into a single block:
+4. **Wire Clubhouse feed only**
+   - `SnapVideoPlayer.tsx` (currently a poster-only chassis after the teardown) gains a `<VideoSlot>` render path
+   - Feature-flagged behind `VITE_VIDEO_POOL` — flag ON in dev, OFF in prod until we verify
+   - Profile pages, fullscreen viewer, watch grids: **unchanged** in Phase 1
 
-```js
-// ─── Wave 3d — scope-dir ERROR flip for courses vertical ──────────
-{
-  files: [
-    "src/components/courses/**/*.{ts,tsx}",
-    "src/components/course-media-tab/**/*.{ts,tsx}",
-    "src/features/courses/**/*.{ts,tsx}",
-  ],
-  rules: {
-    "i18next/no-literal-string": ["error", i18nLiteralOptions],
-    "no-restricted-syntax": ["error", literalAttrSyntax, ...toLocaleSyntax],
-  },
-},
-```
+5. **Instrumentation**
+   - Log `pool.acquire` / `pool.release` / `pool.evict` to `bootTimeline` + `videoDebug('pool', ...)`
+   - New PerfHud row: "Pool: 3/3 warm, last acquire 12ms"
+   - So Phase 2 has real data to tune the pool size against.
 
-The three narrower blocks (`courses/*.{ts,tsx}`, `courses/review/**`, `courses/user/**`, `course-media-tab/**`, `_shared/**`) are removed as they're now covered by the two `**` globs. This closes the gap so any new file under `src/components/courses/**` or `src/features/courses/**` is gated on creation.
+## Non-goals (later phases)
 
-## Carry-over items
+- AudioBroker singleton (Phase 2)
+- Commit-on-first-frame poster fade site-wide (Phase 2, mostly free after pool)
+- Neighbor 2-segment prefetch (Phase 3)
+- Profile + fullscreen adoption (Phase 2)
+- Telemetry sampling (Phase 4)
 
-Both already landed in the previous turn per the summary:
-- `PersonalReviewCard` / `CommunityScoreCard` / `CourseReviewsTab` — `{ key, labelKey }` conversion is done; I verified `t(labelKey)` sites in the files I just read.
-- Achievements "pending-Ben" markers — flipped to "by product ruling".
+## Technical notes
 
-No re-work needed on these; the receipts below will confirm on grep.
+- Pool size 3 is deliberate: matches SnapFeed's window (prev/current/next). We'll tune with the new PerfHud row.
+- Reparenting a playing `<video>` via `appendChild` is well-supported and does NOT reset playback in Chromium/WebKit — this is the property the pool depends on.
+- HLS.js instance reuse across source swaps is safe when the new URL comes from the same manifest origin (which all our Cloudflare Stream URLs do). If ever mixed, we recycle the whole element.
+- Nothing changes for profile/fullscreen this phase — those still use their existing paths. This keeps blast radius small and lets us prove the mechanic on the busiest surface first.
 
-## Receipts each sub-batch will paste back
+## Acceptance
 
-1. `npx eslint --rule '{"i18next/no-literal-string":["error",...]}' <sub-batch paths>` → **0 errors**.
-2. Full-scope re-probe after the last sub-batch: same command over all five paths → **0 errors**.
-3. `grep -rn '\bpending Ben\b' src/components/achievements/` → 0 hits.
-4. `git diff --stat` per sub-batch.
-5. `npx tsc --noEmit` clean; `vite build` succeeds.
-
-## Non-goals for this wave
-
-- No visual changes; extraction is text-in-place with `t(...)` swaps.
-- No refactor of the ConnectHandicapCue variant table's structure — the COPY object stays, its string returns move to `t(...)`.
-- No touching files outside the five listed directories.
-
----
-
-**Ready to fire 3d.iii.a on your go.** Landing all three sub-batches plus the gate consolidation in one turn is technically possible but would ship ~40 file edits and ~150 locale-key additions without an intermediate green light — I'd rather you see 3d.iii.a's receipts first and greenlight .b and .c.
+- Clubhouse feed swipes forward/back 20 items with no black flash and no poster re-show once a card has been visited
+- No regressions in muted/unmuted state, tap-to-pause, or looping
+- `videoDebug('pool', ...)` shows acquire on first visit, release on scroll-off, and re-acquire on scroll-back within <5ms (no re-parse)
+- Flag OFF path is byte-for-byte identical to today (no behavior change when disabled)
