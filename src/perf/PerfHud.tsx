@@ -10,6 +10,7 @@ import { navTiming, isPerfEnabled, subscribePerfLive, type NavTransaction } from
 import { Z } from '@/config/zIndex';
 import { VideoPool } from '@/video/pool/VideoPool';
 import { getVideoTelemetryStats } from '@/video/telemetry';
+import { scrollActivity } from '@/video/scrollActivity';
 
 
 type Summary = ReturnType<typeof navTiming.getRecent>[number];
