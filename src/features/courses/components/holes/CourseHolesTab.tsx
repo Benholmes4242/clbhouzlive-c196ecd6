@@ -74,7 +74,6 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
             fontWeight: 700,
             cursor: 'pointer',
             minHeight: 44,
-            color: INK && '#fff',
           }}
         >
           {t('courses:holes.retry')}
