@@ -50,16 +50,6 @@ function formatHolderName(raw?: string | null): string {
   return s;
 }
 
-function initials(name: string): string {
-  return (
-    (name || '?')
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((p) => p[0]?.toUpperCase() ?? '')
-      .join('') || '?'
-  );
-}
 
 // ---- Conquests helpers (retained from NextConquestsRail) ------------------
 const CATEGORY_META: Record<
@@ -283,12 +273,12 @@ function RecordStatRow({
   const toParDisplay = showToPar ? toParText(par!) : '—';
   // Canonical to-par colour: red under par on the light Discover surface.
   const statColor = showToPar && par! < 0 ? TOPAR_UNDER_LIGHT : INK;
-  const sub = [holder, when ? relativeTime(when) : null].filter(Boolean).join(' · ');
+  const sub = [row.course_name, when ? relativeTime(when) : null].filter(Boolean).join(' · ');
   return (
     <StatRow
       avatarUrl={row.holder_avatar}
       avatarUserId={row.user_id}
-      name={row.course_name}
+      name={holder}
       subline={sub}
       statValue={toParDisplay}
       statColor={statColor}

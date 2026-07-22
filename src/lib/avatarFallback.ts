@@ -47,11 +47,11 @@ export function getAvatarFallbackColor(
  *
  * Rules:
  * - Two tokens or more → first letter of first two tokens ("Danny Holmes" → "DH")
- * - One token → first two letters ("neilbryan" → "NE")
+ * - One token → first letter only ("neilbryan" → "N")
  * - Single character → that character ("n" → "N")
  * - Empty/nullish → returns empty string (caller should fall back to "?")
  *
- * Numbers and non-letter characters are filtered OUT — "user42" → "US".
+ * Numbers and non-letter characters are filtered OUT — "user42" → "U".
  */
 export function getInitialsFromName(
   name: string | null | undefined
@@ -64,5 +64,5 @@ export function getInitialsFromName(
   if (tokens.length >= 2) {
     return (tokens[0][0] + tokens[1][0]).toUpperCase();
   }
-  return tokens[0].slice(0, 2).toUpperCase();
+  return tokens[0].charAt(0).toUpperCase();
 }

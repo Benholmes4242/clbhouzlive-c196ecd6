@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 import TrophyIcon from '@/components/icons/TrophyIcon';
 
 /**
@@ -42,16 +43,6 @@ export interface StatRowProps {
   onPress?: () => void;
 }
 
-function initials(name: string): string {
-  return (
-    (name || '?')
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((p) => p[0]?.toUpperCase() ?? '')
-      .join('') || '?'
-  );
-}
 
 function RankCell({ rank }: { rank: number }) {
   if (rank < 1) return <div style={{ width: 28, flexShrink: 0 }} />;
@@ -204,7 +195,7 @@ export function StatRow({
           size={40}
           srcCandidates={avatarUrl ? [avatarUrl] : []}
           alt={name}
-          fallback={initials(name)}
+          fallback={getInitialsFromName(name)}
           userId={avatarUserId ?? undefined}
           hairlineRing
         />
