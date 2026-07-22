@@ -32,12 +32,18 @@ interface SnapVideoPlayerProps {
 }
 
 export const SnapVideoPlayer = memo(function SnapVideoPlayer({
+  hlsUrl,
   thumbnailUrl,
   width,
   height,
+  isActive,
   isSuggestedFeed,
   isFullscreen = false,
+  postId,
+  onFirstFrameReady,
 }: SnapVideoPlayerProps) {
+  const poolEnabled = isVideoPoolEnabled();
+  const userPaused = useClubhouseStore((s) => s.userPaused);
   const aspect = (height ?? 1) > 0 && (width ?? 0) > 0
     ? (height as number) / (width as number)
     : 1;
