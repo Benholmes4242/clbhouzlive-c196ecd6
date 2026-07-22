@@ -324,9 +324,17 @@ const CourseLegendsCollapsibleSection: React.FC<{
 export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFirstName }) => {
   const [open, setOpen] = useState(false);
   const [detailCtx, setDetailCtx] = useState<DetailContext | null>(null);
+  const [crownsRevealToken, setCrownsRevealToken] = useState(0);
 
 
-  useEffect(() => gamAchievementsBus.subscribe(() => setOpen(true)), []);
+  useEffect(() => gamAchievementsBus.subscribe((payload) => {
+    setOpen(true);
+    if (payload?.section === 'crowns') {
+      // Bump each time so repeat deep-links re-scroll + re-expand.
+      setCrownsRevealToken((n) => n + 1);
+    }
+  }), []);
+
 
   const effectiveViewerId = viewerUserId ?? userId;
   const isFriendView = viewerUserId !== undefined && viewerUserId !== userId;
