@@ -39,7 +39,11 @@ export default function ConfirmDialog({
 
   if (!open) return null;
 
-  const matches = !requireText || typed.trim() === requireText.trim();
+  const matches = !requireText
+    ? true
+    : normalizeMatch
+      ? confirmMatches(typed, requireText)
+      : typed.trim() === requireText.trim();
   const confirmBg = tone === 'danger' ? t.danger : t.ink;
 
   return (
