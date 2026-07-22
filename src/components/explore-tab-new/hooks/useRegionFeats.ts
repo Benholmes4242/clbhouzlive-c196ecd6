@@ -143,6 +143,7 @@ export interface LegendaryLeaderRow {
   holder_hcp?: number | null;
   holder_club?: string | null;
   first_feat?: string | null;
+  region?: string | null;
   aces: number;
   albatrosses: number;
 }
