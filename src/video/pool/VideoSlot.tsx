@@ -131,7 +131,7 @@ export const VideoSlot: React.FC<VideoSlotProps> = ({
       AudioBroker.releaseFocus(slotKey);
       try { video.pause(); } catch { /* ignore */ }
     }
-  }, [isActive, muted, slotKey]);
+  }, [isActive, muted, slotKey, hlsUrl]);
 
   return (
     <>
