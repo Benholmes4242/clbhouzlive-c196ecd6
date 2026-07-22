@@ -186,7 +186,7 @@ export function useRegionEagleLeaders(region: string | null) {
   const cacheRegion = toCacheRegion(region);
   const railKey = `eagle_leaders:${cacheRegion}`;
   return useQuery<EagleLeaderRow[]>({
-    queryKey: ['discover-rail-cache', railKey],
+    queryKey: ['discover-rail-cache', railKey, cacheRegion],
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
