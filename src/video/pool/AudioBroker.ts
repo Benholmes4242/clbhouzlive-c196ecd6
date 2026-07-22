@@ -132,8 +132,6 @@ class AudioBrokerImpl {
 
   private reconcile(reason: string) {
     const sessionMuted = useSessionAudio.getState().isMuted;
-    const fs = useFullscreenFeedStore.getState();
-    const fsOpen = !!fs.isOpen;
 
     let speaker: AudioRegistration | null = null;
     let branch: 'session-muted' | 'fullscreen' | 'inline' | 'none' = 'none';
@@ -142,30 +140,27 @@ class AudioBrokerImpl {
     if (sessionMuted) {
       branch = 'none';
       whyNone = 'session-muted';
-    } else if (fsOpen) {
-      const candidates = [
+    } else {
+      // Fullscreen-session speakers (Clubhouse viewer, profile viewer,
+      // manual engine lanes) always outrank inline sessions.
+      const fsCandidates = [
         ...Array.from(this.regs.values()),
         ...Array.from(this.manualRegs.values()),
-      ].filter(
-        (r) => r.policy === 'fullscreen-session' && r.wantsFocus
-      );
-      if (candidates.length === 0) {
-        branch = 'none';
-        whyNone = 'no-fullscreen-focus';
-      } else {
-        speaker = candidates.sort((a, b) => b.lastFocusAt - a.lastFocusAt)[0];
+      ].filter((r) => r.policy === 'fullscreen-session' && r.wantsFocus);
+      if (fsCandidates.length > 0) {
+        speaker = fsCandidates.sort((a, b) => b.lastFocusAt - a.lastFocusAt)[0];
         branch = 'fullscreen';
-      }
-    } else {
-      const candidates = Array.from(this.regs.values()).filter(
-        (r) => r.policy === 'inline-session' && r.wantsFocus
-      );
-      if (candidates.length === 0) {
-        branch = 'none';
-        whyNone = 'no-inline-focus';
       } else {
-        speaker = candidates.sort((a, b) => b.lastFocusAt - a.lastFocusAt)[0];
-        branch = 'inline';
+        const inlineCandidates = Array.from(this.regs.values()).filter(
+          (r) => r.policy === 'inline-session' && r.wantsFocus
+        );
+        if (inlineCandidates.length === 0) {
+          branch = 'none';
+          whyNone = 'no-inline-focus';
+        } else {
+          speaker = inlineCandidates.sort((a, b) => b.lastFocusAt - a.lastFocusAt)[0];
+          branch = 'inline';
+        }
       }
     }
 
