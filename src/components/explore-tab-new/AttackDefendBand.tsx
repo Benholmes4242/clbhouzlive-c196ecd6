@@ -125,11 +125,12 @@ function formatGapNumber(gap: number): string {
 
 interface Props {
   userId: string | undefined;
+  region?: string | null;
 }
 
 const CONQUEST_CAP = 6;
 
-export function AttackDefendBand({ userId }: Props) {
+export function AttackDefendBand({ userId, region = null }: Props) {
   const { user } = useSupabaseSession();
   const effectiveUserId = userId ?? user?.id;
 
@@ -137,6 +138,10 @@ export function AttackDefendBand({ userId }: Props) {
   const { data: attackData } = useTitlesInReach(effectiveUserId);
   const { data: defendData } = useUnderThreat(effectiveUserId);
 
+  // Attack — TitlesInReach doesn't yet carry course_country/region on the client
+  // type; leave unfiltered (worldwide passthrough by construction).
+  // TODO(owner): extend get_player_titles_in_reach to return course_country and
+  // wire matchesRegionScope here so Attack respects the toggle end-to-end.
   const attackPicks = useMemo(() => {
     if (!attackData || attackData.length === 0) return [];
     const seen = new Set<string>();
@@ -149,7 +154,13 @@ export function AttackDefendBand({ userId }: Props) {
     return unique.slice(0, CONQUEST_CAP);
   }, [attackData]);
 
-  const defendRows = defendData ?? [];
+  const defendRows = useMemo(
+    () =>
+      (defendData ?? []).filter((r) =>
+        matchesRegionScope(region, r.course_country ?? null, r.course_region ?? null),
+      ),
+    [defendData, region],
+  );
   const hasDefend = defendRows.length > 0;
   const hasAttack = attackPicks.length > 0;
 
@@ -166,7 +177,28 @@ export function AttackDefendBand({ userId }: Props) {
 
   if (!effectiveUserId) return null;
   if (!connection) return null;
-  if (!hasDefend && !hasAttack) return null;
+  if (!hasDefend && !hasAttack) {
+    if (region == null) return null;
+    return (
+      <section
+        id="discover-defend-rail"
+        style={{ marginTop: SPACE?.sectionSection ?? 24, fontFamily: FONT, color: INK }}
+      >
+        <div style={{ padding: `0 ${PAGE_PAD}px` }}>
+          <div style={{ fontSize: 10.5, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: MUTE, lineHeight: 1 }}>
+            The board
+          </div>
+          <div style={{ marginTop: 6, fontSize: 17, fontWeight: 700, letterSpacing: '-0.02em', color: INK, lineHeight: 1.15 }}>
+            Attack &amp; defend
+          </div>
+        </div>
+        <EmptyScopeCard
+          title={`No crowns ${regionScopePhrase(region)} — untaken territory.`}
+          subline="Go claim the first."
+        />
+      </section>
+    );
+  }
 
   return (
     <section
