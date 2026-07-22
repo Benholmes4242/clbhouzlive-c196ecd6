@@ -137,8 +137,6 @@ export const HoleDataSheet: React.FC<Props> = ({
     return n;
   }, [viewerHasPlayed, holes, myByHole]);
 
-  const title = 'How the course plays';
-
   const rows = sort === 'hole' ? sortedByHole : sortedByTough;
   const toggle = (n: number) => setOpenHole((cur) => (cur === n ? null : n));
 
@@ -158,15 +156,12 @@ export const HoleDataSheet: React.FC<Props> = ({
             lineHeight: 1.15,
           }}
         >
-          {title}
+          {t('courses:holes.clubGuide.title')}
         </h2>
         <p style={{ margin: '8px 0 0', fontSize: 12.5, color: INK_55, lineHeight: 1.5 }}>
-          Built from{' '}
-          <span style={{ color: INK, fontWeight: 800, ...NUM }}>
-            {totalRounds.toLocaleString()}
-          </span>{' '}
-          official rounds — the community&rsquo;s scoring on every hole
-          {viewerHasPlayed ? ', with your own game alongside.' : '.'}
+          {viewerHasPlayed
+            ? t('courses:holes.clubGuide.bodySignedIn', { count: formatNumber(totalRounds) })
+            : t('courses:holes.clubGuide.bodySignedOut', { count: formatNumber(totalRounds) })}
         </p>
       </section>
 
