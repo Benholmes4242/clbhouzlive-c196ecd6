@@ -373,6 +373,11 @@ class VideoEngineImpl {
     this.reconcileAudio('session-change');
   };
 
+  /** Sheet ducking → reconcile. Non-empty duck set forces silence. */
+  private onDuckChange = (): void => {
+    this.reconcileAudio('duck-change');
+  };
+
   /**
    * v10 audio-focus registry — the reconciler's single non-fullscreen input.
    * Feed surfaces (SnapFeed on active-slide settle) and rail surfaces
