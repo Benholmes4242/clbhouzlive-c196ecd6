@@ -138,21 +138,20 @@ export function AttackDefendBand({ userId, region = null }: Props) {
   const { data: attackData } = useTitlesInReach(effectiveUserId);
   const { data: defendData } = useUnderThreat(effectiveUserId);
 
-  // Attack — TitlesInReach doesn't yet carry course_country/region on the client
-  // type; leave unfiltered (worldwide passthrough by construction).
-  // TODO(owner): extend get_player_titles_in_reach to return course_country and
-  // wire matchesRegionScope here so Attack respects the toggle end-to-end.
+  // Attack — filter via the same shared predicate as Defend. RPC now returns
+  // course_country + course_region.
   const attackPicks = useMemo(() => {
     if (!attackData || attackData.length === 0) return [];
     const seen = new Set<string>();
     const unique: TitleInReach[] = [];
     for (const row of attackData) {
       if (seen.has(row.course_id)) continue;
+      if (!matchesRegionScope(region, row.course_country ?? null, row.course_region ?? null)) continue;
       seen.add(row.course_id);
       unique.push(row);
     }
     return unique.slice(0, CONQUEST_CAP);
-  }, [attackData]);
+  }, [attackData, region]);
 
   const defendRows = useMemo(
     () =>

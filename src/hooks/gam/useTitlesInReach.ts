@@ -3,6 +3,8 @@ import { useGamRpc } from './_useGamRpc';
 export interface TitleInReach {
   course_id: string;
   course_name: string;
+  course_country: string | null;
+  course_region: string | null;
   hero_image_url: string | null;
   category: string;
   user_rank: number;
