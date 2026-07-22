@@ -46,6 +46,7 @@ import { useSessionAudio } from '@/audio/sessionAudioStore';
 import { audioDebugEnabled, logAudio, msSinceOpen, getEntries } from '@/perf/audioDebug';
 import { getLastCloseSnapshot } from '@/perf/positionContinuity';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { audioDuck } from '@/audio/audioDuckStore';
 
 /**
  * v9 reconciler — module-level record of the last writer to each lane's
