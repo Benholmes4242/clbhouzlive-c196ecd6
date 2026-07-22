@@ -355,11 +355,26 @@ const SkylineCard: React.FC<{
               <stop offset="100%" stopColor={GOLD} />
             </linearGradient>
           </defs>
+          {hasNegative && (
+            <line
+              x1={PX}
+              x2={W - PX}
+              y1={yBaseline}
+              y2={yBaseline}
+              stroke={INK_20}
+              strokeWidth={0.75}
+              strokeDasharray="2 3"
+            />
+          )}
           {sorted.map((h, i) => {
             const isHardest = h.hole_no === hardest.hole_no;
             const cx = PX + stepX * i + stepX / 2;
-            const yTop = yFor(h.avg_to_par);
-            const barH = Math.max(2, yBaseline - yTop);
+            const yVal = yFor(h.avg_to_par);
+            const isUnder = h.avg_to_par < 0;
+            const yTop = Math.min(yVal, yBaseline);
+            const yBot = Math.max(yVal, yBaseline);
+            const barH = Math.max(2, yBot - yTop);
+            const fill = isUnder ? GOLD : (isHardest ? INK : INK_20);
             return (
               <rect
                 key={h.hole_no}
@@ -368,7 +383,7 @@ const SkylineCard: React.FC<{
                 width={barW}
                 height={barH}
                 rx={rx}
-                fill={isHardest ? INK : INK_20}
+                fill={fill}
               />
             );
           })}
