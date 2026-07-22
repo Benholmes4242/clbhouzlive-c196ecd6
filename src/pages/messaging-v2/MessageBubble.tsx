@@ -152,10 +152,10 @@ export const MessageBubble: React.FC<Props> = ({
         style={{
           position: "relative",
           maxWidth: '78%',
-          background: isDeleted ? 'transparent' : bg,
+          background: isDeleted || hugMedia ? 'transparent' : bg,
           color: fg,
           borderRadius,
-          padding: isDeleted ? '0' : hugMedia ? '3px' : '8px 12px',
+          padding: isDeleted ? '0' : hugMedia ? '0' : '8px 12px',
           border: isDeleted ? `0.5px dashed ${HAIRLINE}` : 'none',
           opacity: isSending ? 0.7 : 1,
           display: 'flex',

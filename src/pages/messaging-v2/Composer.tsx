@@ -1,6 +1,6 @@
-import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, ArrowUp } from 'lucide-react';
+import { Plus, ArrowUp, X, Play } from 'lucide-react';
 import { useSendMessage } from '@/hooks/messaging/useSendMessage';
 import { useKeyboardHeight } from '@/hooks/messaging/useKeyboardHeight';
 import { pickMediaFiles, validateMediaFiles } from '@/utils/media/pickMediaFiles';
@@ -27,6 +27,18 @@ interface Props {
   onAfterSend?: () => void;
 }
 
+type PendingKind = 'image' | 'video';
+
+interface PendingAttachment {
+  id: string;
+  file: File;
+  kind: PendingKind;
+  localPreviewUrl: string;
+}
+
+let pendingSeq = 0;
+const nextPendingId = () => `pending-${Date.now()}-${++pendingSeq}`;
+
 export const Composer: React.FC<Props> = ({
   conversationId,
   disabled,
@@ -39,10 +51,15 @@ export const Composer: React.FC<Props> = ({
   const [picking, setPicking] = useState(false);
   const keyboardHeight = useKeyboardHeight();
   const [text, setText] = useState('');
+  const [pending, setPending] = useState<PendingAttachment[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  // Track URLs we've minted so we can revoke on unmount even after state clears.
+  const mintedUrlsRef = useRef<Set<string>>(new Set());
 
-  const canSend = text.trim().length > 0 && !disabled;
+  const hasPending = pending.length > 0;
+  const hasText = text.trim().length > 0;
+  const canSend = (hasText || hasPending) && !disabled;
 
   // Auto-grow textarea between MIN and MAX heights.
   useLayoutEffect(() => {
@@ -60,17 +77,74 @@ export const Composer: React.FC<Props> = ({
     const el = containerRef.current;
     if (!el) return;
     onHeightChange(el.getBoundingClientRect().height);
-  }, [onHeightChange, text, keyboardHeight]);
+  }, [onHeightChange, text, keyboardHeight, pending.length]);
+
+  // Revoke any outstanding object URLs on unmount.
+  useEffect(() => {
+    return () => {
+      for (const url of mintedUrlsRef.current) {
+        try {
+          URL.revokeObjectURL(url);
+        } catch {
+          /* noop */
+        }
+      }
+      mintedUrlsRef.current.clear();
+    };
+  }, []);
+
+  const revoke = useCallback((url: string) => {
+    try {
+      URL.revokeObjectURL(url);
+    } catch {
+      /* noop */
+    }
+    mintedUrlsRef.current.delete(url);
+  }, []);
+
+  const removePending = useCallback(
+    (id: string) => {
+      setPending((prev) => {
+        const next: PendingAttachment[] = [];
+        for (const p of prev) {
+          if (p.id === id) revoke(p.localPreviewUrl);
+          else next.push(p);
+        }
+        return next;
+      });
+    },
+    [revoke],
+  );
 
   const handleSend = useCallback(() => {
+    if (!canSend) return;
     const body = text.trim();
-    if (!body || disabled) return;
-    // Clear immediately so the input is ready for the next message —
-    // optimism handles the bubble.
+    const attachments = pending;
+    // Clear immediately so the composer is ready — optimism handles bubbles.
     setText('');
-    void send({ body });
-    onAfterSend?.();
-  }, [text, disabled, send, onAfterSend]);
+    setPending([]);
+
+    // Fire media in order; keep going on individual failures so the rest still send.
+    (async () => {
+      for (const att of attachments) {
+        try {
+          await sendMedia({ file: att.file, kind: 'image' });
+        } catch (e) {
+          console.warn('[composer] sendMedia failed', e);
+        } finally {
+          revoke(att.localPreviewUrl);
+        }
+      }
+      if (body) {
+        try {
+          void send({ body });
+        } catch (e) {
+          console.warn('[composer] send text failed', e);
+        }
+      }
+      onAfterSend?.();
+    })();
+  }, [canSend, text, pending, sendMedia, send, revoke, onAfterSend]);
 
   const handleAttach = useCallback(async () => {
     if (disabled || picking) return;
@@ -83,17 +157,22 @@ export const Composer: React.FC<Props> = ({
       });
       if (!picked.length) return;
       const valid = await validateMediaFiles(picked);
-      const images = valid.filter((f) => f.type.startsWith('image/'));
-      for (const file of images) {
-        void sendMedia({ file, kind: 'image' });
+      const staged: PendingAttachment[] = [];
+      for (const file of valid) {
+        const kind: PendingKind = file.type.startsWith('video/') ? 'video' : 'image';
+        const url = URL.createObjectURL(file);
+        mintedUrlsRef.current.add(url);
+        staged.push({ id: nextPendingId(), file, kind, localPreviewUrl: url });
       }
-      if (images.length > 0) onAfterSend?.();
+      if (staged.length > 0) {
+        setPending((prev) => [...prev, ...staged]);
+      }
     } catch (e) {
       console.warn('[composer] attach failed', e);
     } finally {
       setPicking(false);
     }
-  }, [disabled, picking, sendMedia, onAfterSend]);
+  }, [disabled, picking]);
 
   return (
     <div
@@ -106,7 +185,7 @@ export const Composer: React.FC<Props> = ({
         paddingLeft: 12,
         paddingRight: 12,
         display: 'flex',
-        alignItems: 'flex-end',
+        flexDirection: 'column',
         gap: 8,
         flexShrink: 0,
         // Dock above the keyboard.
@@ -114,77 +193,156 @@ export const Composer: React.FC<Props> = ({
         transition: 'transform 120ms ease-out',
       }}
     >
-      <button
-        type="button"
-        aria-label={t('a11y.attachImage')}
-        onClick={handleAttach}
-        disabled={disabled || picking}
-        className="active:opacity-60"
-        style={{
-          width: 36,
-          height: 36,
-          borderRadius: 999,
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: 'transparent',
-          border: 'none',
-          color: SUB,
-          flexShrink: 0,
-        }}
-      >
-        <Plus size={22} />
-      </button>
+      {hasPending ? (
+        <div
+          style={{
+            display: 'flex',
+            gap: 8,
+            overflowX: 'auto',
+            paddingBottom: 2,
+            WebkitOverflowScrolling: 'touch',
+          }}
+        >
+          {pending.map((p) => (
+            <div
+              key={p.id}
+              style={{
+                position: 'relative',
+                width: 64,
+                height: 64,
+                borderRadius: 12,
+                overflow: 'hidden',
+                flexShrink: 0,
+                background: COMPOSER_INPUT_BG,
+              }}
+            >
+              <img
+                src={p.localPreviewUrl}
+                alt=""
+                draggable={false}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  display: 'block',
+                }}
+              />
+              {p.kind === 'video' ? (
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: 'rgba(0,0,0,0.25)',
+                    color: '#FFFFFF',
+                  }}
+                >
+                  <Play size={18} fill="#FFFFFF" />
+                </div>
+              ) : null}
+              <button
+                type="button"
+                aria-label={t('a11y.removeAttachment', { defaultValue: 'Remove attachment' })}
+                onClick={() => removePending(p.id)}
+                style={{
+                  position: 'absolute',
+                  top: 2,
+                  right: 2,
+                  width: 20,
+                  height: 20,
+                  borderRadius: 999,
+                  background: 'rgba(0,0,0,0.65)',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: 0,
+                  cursor: 'pointer',
+                }}
+              >
+                <X size={12} />
+              </button>
+            </div>
+          ))}
+        </div>
+      ) : null}
 
-      <textarea
-        ref={textareaRef}
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        placeholder={t('composer.placeholder')}
-        rows={1}
-        disabled={disabled}
-        style={{
-          flex: 1,
-          minHeight: MIN_HEIGHT,
-          maxHeight: MAX_HEIGHT,
-          background: COMPOSER_INPUT_BG,
-          borderRadius: 18,
-          padding: '8px 14px',
-          color: INK,
-          fontSize: 14,
-          lineHeight: `${LINE_HEIGHT}px`,
-          border: 'none',
-          outline: 'none',
-          resize: 'none',
-          fontFamily: 'inherit',
-        }}
-      />
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8 }}>
+        <button
+          type="button"
+          aria-label={t('a11y.attachImage')}
+          onClick={handleAttach}
+          disabled={disabled || picking}
+          className="active:opacity-60"
+          style={{
+            width: 36,
+            height: 36,
+            borderRadius: 999,
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'transparent',
+            border: 'none',
+            color: SUB,
+            flexShrink: 0,
+          }}
+        >
+          <Plus size={22} />
+        </button>
 
-      <button
-        type="button"
-        aria-label={t('a11y.send')}
-        onClick={handleSend}
-        disabled={!canSend}
-        className={canSend ? 'active:opacity-80' : ''}
-        style={{
-          width: 34,
-          height: 34,
-          borderRadius: 999,
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: SEND_BG,
-          border: 'none',
-          color: SEND_FG,
-          opacity: canSend ? 1 : 0.4,
-          pointerEvents: canSend ? 'auto' : 'none',
-          flexShrink: 0,
-          alignSelf: 'flex-end',
-          marginBottom: 1,
-        }}
-      >
-        <ArrowUp size={18} />
-      </button>
+        <textarea
+          ref={textareaRef}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder={t('composer.placeholder')}
+          rows={1}
+          disabled={disabled}
+          style={{
+            flex: 1,
+            minHeight: MIN_HEIGHT,
+            maxHeight: MAX_HEIGHT,
+            background: COMPOSER_INPUT_BG,
+            borderRadius: 18,
+            padding: '8px 14px',
+            color: INK,
+            fontSize: 14,
+            lineHeight: `${LINE_HEIGHT}px`,
+            border: 'none',
+            outline: 'none',
+            resize: 'none',
+            fontFamily: 'inherit',
+          }}
+        />
+
+        <button
+          type="button"
+          aria-label={t('a11y.send')}
+          onClick={handleSend}
+          disabled={!canSend}
+          className={canSend ? 'active:opacity-80' : ''}
+          style={{
+            width: 34,
+            height: 34,
+            borderRadius: 999,
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: SEND_BG,
+            border: 'none',
+            color: SEND_FG,
+            opacity: canSend ? 1 : 0.4,
+            pointerEvents: canSend ? 'auto' : 'none',
+            flexShrink: 0,
+            alignSelf: 'flex-end',
+            marginBottom: 1,
+          }}
+        >
+          <ArrowUp size={18} />
+        </button>
+      </div>
     </div>
   );
 };
