@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useClubhouseStore } from '@/store/clubhouseStore';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
 import { triggerHaptic } from '@/lib/ui/haptics';
 import { CarouselDots } from '@/components/media/CarouselDots';
