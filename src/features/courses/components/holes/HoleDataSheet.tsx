@@ -192,12 +192,15 @@ export const HoleDataSheet: React.FC<Props> = ({
       {/* 5. Sort toggle */}
       <div
         style={{
+          ...SECTION_RULE,
+          marginTop: 20,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '20px 4px 10px',
         }}
       >
+
         <div style={CAP}>Scorecard</div>
         <div
           role="tablist"
