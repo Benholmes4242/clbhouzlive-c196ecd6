@@ -341,6 +341,7 @@ class VideoEngineImpl {
     this.roleUnsub = feedLaneRoles.subscribe(this.onFeedRoleChange);
     this.fsStoreUnsub = useFullscreenFeedStore.subscribe(this.onFullscreenChange);
     this.sessionAudioUnsub = useSessionAudio.subscribe(this.onSessionAudioChange);
+    this.duckUnsub = audioDuck.subscribe(this.onDuckChange);
     // 250ms drift check while the session is unmuted. When actual state
     // diverges from computed, reconcile with reason='drift' and dump a
     // forensic snapshot (role map, borrow state, last 5 audio events,
