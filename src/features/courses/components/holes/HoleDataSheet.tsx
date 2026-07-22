@@ -31,10 +31,8 @@ const CAP: React.CSSProperties = {
   textTransform: 'uppercase',
   color: INK_55,
 };
-const CARD: React.CSSProperties = {
-  background: '#FFFFFF',
-  border: `1px solid ${INK_08}`,
-  borderRadius: 16,
+const SECTION_RULE: React.CSSProperties = {
+  borderTop: `1px solid ${INK_08}`,
 };
 
 // ── Helpers ──────────────────────────────────────────────────────────
