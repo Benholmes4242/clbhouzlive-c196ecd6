@@ -547,6 +547,20 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
         >
           {line}
         </span>
+        {chaseCta && (
+          <span
+            style={{
+              display: 'block',
+              marginTop: 4,
+              fontSize: 12,
+              fontWeight: 700,
+              color: INK,
+              letterSpacing: '-0.005em',
+            }}
+          >
+            {chaseCta}
+          </span>
+        )}
       </div>
 
       {/* Inline top 5 — StatRow canonical */}
