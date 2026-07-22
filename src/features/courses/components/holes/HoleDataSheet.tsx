@@ -629,6 +629,7 @@ const HoleCard: React.FC<{
   onToggle: () => void;
   viewerHasPlayed: boolean;
 }> = ({ row, mine, isHardest, isBirdied, open, onToggle, viewerHasPlayed }) => {
+  const { t } = useTranslation(['courses']);
   const fieldOver = row.avg_to_par;
   const showYou = viewerHasPlayed && mine != null;
   const youBeats = showYou ? (mine!.avg_to_par <= fieldOver + 0.005) : false;
