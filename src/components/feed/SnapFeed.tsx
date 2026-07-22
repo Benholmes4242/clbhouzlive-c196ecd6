@@ -464,7 +464,7 @@ export function SnapFeed({
           PrefetchController.request(`${post.id}:0`, hlsUrl);
           // Warm a pooled <video> for the +1 neighbour so the swipe is
           // a same-slot reuse (readyState≥2), not a cold hls rebuild.
-          if (k === 1 && isVideoPoolEnabled()) VideoPool.prewarm(hlsUrl, 'inline');
+          if (k === 1) VideoPool.prewarm(hlsUrl, 'inline');
         }
       }
     };
