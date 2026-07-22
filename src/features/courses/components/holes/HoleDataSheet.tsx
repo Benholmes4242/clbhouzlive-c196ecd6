@@ -749,7 +749,7 @@ const HoleCard: React.FC<{
               lineHeight: 1,
             }}
           >
-            +{Math.max(0, fieldOver).toFixed(2)}
+            {fmtToPar(fieldOver)}
           </div>
           {showYou && (
             <div
