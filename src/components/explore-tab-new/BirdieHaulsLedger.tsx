@@ -44,13 +44,28 @@ interface Props {
 
 export function BirdieHaulsLedger({ region, mode, onRowTap }: Props) {
   const { data, isLoading } = useRegionFeats(region, 'birdie_hauls', mode);
-  const rows = useMemo(() => sortBirdieHauls(data ?? [], mode), [data, mode]);
+  const scoped = useMemo(
+    () => (data ?? []).filter((r) => matchesRailRegionScope(region, r.region)),
+    [data, region],
+  );
+  const rows = useMemo(() => sortBirdieHauls(scoped, mode), [scoped, mode]);
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const display = rows.slice(0, ROWS);
-  if (!isLoading && display.length === 0) return null;
-
   const overlineLabel = mode === 'alltime' ? 'All-time birdie hauls' : 'Latest birdie hauls';
+
+  if (!isLoading && display.length === 0) {
+    if (region == null) return null;
+    return (
+      <section style={{ marginTop: 32, fontFamily: FONT }}>
+        <SectionHead overline={overlineLabel} paddingX={14} />
+        <EmptyScopeCard
+          title={`No birdie hauls ${regionScopePhrase(region)} yet.`}
+          subline="This region is unconquered — be the first."
+        />
+      </section>
+    );
+  }
 
   return (
     <section style={{ marginTop: 32, fontFamily: FONT }}>
