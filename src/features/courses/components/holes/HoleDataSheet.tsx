@@ -134,8 +134,7 @@ export const HoleDataSheet: React.FC<Props> = ({
     return n;
   }, [viewerHasPlayed, holes, myByHole]);
 
-  const short = shortCourseName(courseName);
-  const title = short ? `How the ${short} plays` : 'How this course plays';
+  const title = 'How the course plays';
 
   const rows = sort === 'hole' ? sortedByHole : sortedByTough;
   const toggle = (n: number) => setOpenHole((cur) => (cur === n ? null : n));
