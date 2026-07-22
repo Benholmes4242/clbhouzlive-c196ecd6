@@ -12,6 +12,7 @@
  */
 import React, { useCallback, memo } from 'react';
 import { useClubhouseStore } from '@/store/clubhouseStore';
+import { useSessionAudio } from '@/audio/sessionAudioStore';
 import { VideoSlot } from '@/video/pool/VideoSlot';
 
 interface SnapVideoPlayerProps {
