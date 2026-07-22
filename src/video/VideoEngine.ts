@@ -237,6 +237,7 @@ class VideoEngineImpl {
   private roleUnsub: (() => void) | null = null;
   private fsStoreUnsub: (() => void) | null = null;
   private sessionAudioUnsub: (() => void) | null = null;
+  private duckUnsub: (() => void) | null = null;
   private driftCheckIv: number | null = null;
 
 
