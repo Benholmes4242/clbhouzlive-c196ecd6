@@ -17,6 +17,8 @@ export interface FeatRow {
   score_id?: string;
   user_id?: string;
   course_id?: string;
+  // per-item region key used by cached rails ('gbi' | 'usa' | 'europe' | 'row')
+  region?: string | null;
   // records-only
   category?: string;
   value?: number | string;
@@ -25,15 +27,10 @@ export interface FeatRow {
   course_par?: number | null;
 }
 
-const CACHE_REGION: Record<string, string> = {
-  usa: 'usa',
-  'uk-ireland': 'gbi',
-  'continental-europe': 'europe',
-  'rest-of-world': 'row',
-};
-
-export function toCacheRegion(r: string | null): string {
-  return r ? CACHE_REGION[r] ?? 'worldwide' : 'worldwide';
+// Rails now carry per-item region keys inside their worldwide payload.
+// The client fetches the worldwide row and filters via `matchesRailRegionScope`.
+export function toCacheRegion(_r: string | null): string {
+  return 'worldwide';
 }
 
 export type RecordsMode = 'latest' | 'alltime';
