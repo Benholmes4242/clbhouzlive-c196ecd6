@@ -12,6 +12,8 @@
  */
 import React, { useCallback, memo } from 'react';
 import { useClubhouseStore } from '@/store/clubhouseStore';
+import { isVideoPoolEnabled } from '@/video/pool/flag';
+import { VideoSlot } from '@/video/pool/VideoSlot';
 
 interface SnapVideoPlayerProps {
   hlsUrl: string;
