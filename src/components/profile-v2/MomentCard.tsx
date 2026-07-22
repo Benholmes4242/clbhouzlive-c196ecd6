@@ -8,6 +8,9 @@ import { Heart, MessageCircle, MapPin } from 'lucide-react';
 import { MomentPost } from './types';
 import { formatRelativeAgoLong } from '@/i18n/format';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
+import { VideoSlot } from '@/video/pool/VideoSlot';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 
 interface MomentCardProps {
   moment: MomentPost;
@@ -34,15 +37,29 @@ export const MomentCard: React.FC<MomentCardProps> = ({
         className
       )}
     >
-      {/* Media — poster-only chassis: videos render their poster frame as an <img> */}
+      {/* Media — pooled video for clips, static image otherwise. */}
       <div className="relative aspect-[4/5] overflow-hidden">
         {(() => {
-          const posterSrc = moment.mediaType === 'video'
-            ? (moment.posterUrl || moment.mediaUrl)
-            : moment.mediaUrl;
+          if (moment.mediaType === 'video') {
+            const streamId = uidFromNode({ src: moment.mediaUrl });
+            const hlsUrl = streamId ? generateStreamHlsUrl(streamId) : moment.mediaUrl;
+            const posterSrc = moment.posterUrl || moment.mediaUrl;
+            return (
+              <VideoSlot
+                slotKey={`moment:${moment.id}`}
+                hlsUrl={hlsUrl}
+                posterUrl={posterSrc}
+                isActive={true}
+                muted={true}
+                objectFit="cover"
+                audioPolicy="always-muted"
+                onFirstFrame={() => setIsLoaded(true)}
+              />
+            );
+          }
           return (
             <img
-              src={posterSrc}
+              src={moment.mediaUrl}
               alt=""
               className={cn(
                 'w-full h-full object-cover transition-opacity duration-300',

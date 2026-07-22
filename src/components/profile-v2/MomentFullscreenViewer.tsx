@@ -1,7 +1,7 @@
 /**
  * MomentFullscreenViewer - Fullscreen post viewer with swipe navigation
  * 
- * UNIFIED WITH CLUBHOUSE: Uses direct visibility-based autoplay pattern
+ * UNIFIED WITH CLUBHOUSE: Uses the pooled VideoSlot for smooth video playback.
  */
 
 import React, { useState, useCallback } from 'react';
@@ -14,7 +14,8 @@ import { formatMonthDayYearShort } from '@/i18n/format';
 import { useSwipeable } from 'react-swipeable';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
-import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
+import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
+import { VideoSlot } from '@/video/pool/VideoSlot';
 
 interface MomentFullscreenViewerProps {
   moments: MomentPost[];
@@ -115,18 +116,24 @@ export const MomentFullscreenViewer: React.FC<MomentFullscreenViewerProps> = ({
             </button>
           )}
 
-          {/* Media — poster-only chassis (playback severed) */}
+          {/* Media — pooled video path for clips, static image otherwise. */}
           <div className="absolute inset-0 flex items-center justify-center">
             {isVideo ? (
-              posterUrl ? (
-                <img
-                  src={posterUrl}
-                  alt=""
-                  className="max-w-full max-h-full object-contain"
-                />
-              ) : (
-                <div className="absolute inset-0 bg-black" />
-              )
+              (() => {
+                const streamId = uidFromNode({ src: currentMoment.mediaUrl });
+                const hlsUrl = streamId ? generateStreamHlsUrl(streamId) : currentMoment.mediaUrl;
+                return (
+                  <VideoSlot
+                    slotKey={`moment-fs:${currentMoment.id}`}
+                    hlsUrl={hlsUrl}
+                    posterUrl={posterUrl}
+                    isActive={open}
+                    muted={false}
+                    objectFit="contain"
+                    audioPolicy="fullscreen-session"
+                  />
+                );
+              })()
             ) : (
               <img
                 src={currentMoment.mediaUrl}

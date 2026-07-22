@@ -44,6 +44,9 @@ export const VIDEO_DEBUG = {
 
   // Video element pool (Phase 1 — reparenting pool)
   pool: false || getDebugFlag('pool'),
+
+  // AudioBroker decisions (Phase 2 — single unmuted speaker)
+  audio: false || getDebugFlag('audio'),
 } as const;
 
 export type VideoDebugCategory = keyof typeof VIDEO_DEBUG;

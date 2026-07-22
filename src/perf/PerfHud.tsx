@@ -8,6 +8,7 @@ import React, { useEffect, useState, useCallback, memo } from 'react';
 import { createPortal } from 'react-dom';
 import { navTiming, isPerfEnabled, subscribePerfLive, type NavTransaction } from './navTiming';
 import { Z } from '@/config/zIndex';
+import { VideoPool } from '@/video/pool/VideoPool';
 
 
 type Summary = ReturnType<typeof navTiming.getRecent>[number];
@@ -116,6 +117,8 @@ export const PerfHud = memo(function PerfHud() {
           </div>
         </div>
       )}
+
+      <PoolStatsRow />
 
       {recent.length === 0 && <div style={{ color: '#64748b' }}>No navigations yet. Navigate the app.</div>}
 

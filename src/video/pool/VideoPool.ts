@@ -38,6 +38,12 @@ interface PoolEntry {
   lastUsed: number;
 }
 
+interface PoolStats {
+  size: number;
+  inUse: number;
+  lastAcquireMs: number | null;
+}
+
 const originOf = (u: string): string => {
   try { return new URL(u).origin; } catch { return ''; }
 };
@@ -80,6 +86,8 @@ class VideoPoolImpl {
    * Get a warm <video> element pointed at `hlsUrl`. Caller must appendChild
    * the returned element into their container.
    */
+  private lastAcquireMs: number | null = null;
+
   acquire(slotKey: string, hlsUrl: string): HTMLVideoElement {
     this.ensureInit();
     const t0 = performance.now();
@@ -91,7 +99,8 @@ class VideoPoolImpl {
       if (entry.currentUrl !== hlsUrl) {
         this.attachSource(entry, hlsUrl);
       }
-      videoDebug('pool', 'acquire (same-slot reuse)', { slotKey, id: entry.id, ms: +(performance.now() - t0).toFixed(1) });
+      this.lastAcquireMs = +(performance.now() - t0).toFixed(1);
+      videoDebug('pool', 'acquire (same-slot reuse)', { slotKey, id: entry.id, ms: this.lastAcquireMs });
       return entry.video;
     }
 
@@ -100,7 +109,8 @@ class VideoPoolImpl {
     if (entry) {
       entry.slotKey = slotKey;
       entry.lastUsed = performance.now();
-      videoDebug('pool', 'acquire (warm hit)', { slotKey, id: entry.id, ms: +(performance.now() - t0).toFixed(1) });
+      this.lastAcquireMs = +(performance.now() - t0).toFixed(1);
+      videoDebug('pool', 'acquire (warm hit)', { slotKey, id: entry.id, ms: this.lastAcquireMs });
       return entry.video;
     }
 
@@ -115,7 +125,8 @@ class VideoPoolImpl {
     entry.slotKey = slotKey;
     entry.lastUsed = performance.now();
     this.attachSource(entry, hlsUrl);
-    videoDebug('pool', 'acquire (cold)', { slotKey, id: entry.id, ms: +(performance.now() - t0).toFixed(1) });
+    this.lastAcquireMs = +(performance.now() - t0).toFixed(1);
+    videoDebug('pool', 'acquire (cold)', { slotKey, id: entry.id, ms: this.lastAcquireMs });
     return entry.video;
   }
 
@@ -171,10 +182,11 @@ class VideoPoolImpl {
     videoDebug('pool', 'hls attached (fresh)', { id: entry.id });
   }
 
-  getStats() {
+  getStats(): PoolStats {
     return {
       size: this.entries.length,
       inUse: this.entries.filter(e => e.slotKey !== null).length,
+      lastAcquireMs: this.lastAcquireMs,
     };
   }
 }
