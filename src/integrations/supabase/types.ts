@@ -18190,6 +18190,18 @@ export type Database = {
           times_played: number
         }[]
       }
+      get_my_nemesis_holes: {
+        Args: { p_limit?: number; p_user_id: string }
+        Returns: {
+          course_id: string
+          course_name: string
+          field_avg_over: number
+          hole_no: number
+          my_avg_over: number
+          par: number
+          times_played: number
+        }[]
+      }
       get_my_rival: {
         Args: { p_course_id?: string; p_user_id: string }
         Returns: {
@@ -20264,6 +20276,10 @@ export type Database = {
       refresh_eagle_leaders: { Args: never; Returns: undefined }
       refresh_expired_course_mood_blurbs: { Args: never; Returns: number }
       refresh_gam_league_standings: { Args: never; Returns: undefined }
+      refresh_hardest_holes_cache: {
+        Args: { p_limit?: number }
+        Returns: number
+      }
       refresh_hero_stories: { Args: never; Returns: undefined }
       refresh_latest_records_cache: {
         Args: { p_limit?: number }
