@@ -18333,8 +18333,10 @@ export type Database = {
         Returns: {
           attained_at: string
           category: string
+          course_country: string
           course_id: string
           course_name: string
+          course_region: string
           gap: number
           hero_image_url: string
           leader_value: number
