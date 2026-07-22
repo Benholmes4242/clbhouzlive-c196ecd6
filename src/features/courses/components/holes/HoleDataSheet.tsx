@@ -591,7 +591,7 @@ const NotationKey: React.FC<{ viewerHasPlayed: boolean }> = ({ viewerHasPlayed }
     { kind: 'double-plus', label: 'Double+' },
   ];
   return (
-    <div style={{ ...CARD, padding: 14, marginBottom: 12 }}>
+    <div style={{ ...SECTION_RULE, padding: '20px 4px 4px', marginTop: 20 }}>
       <div style={CAP}>How to read</div>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, rowGap: 10, marginTop: 10 }}>
         {items.map((it) => (
