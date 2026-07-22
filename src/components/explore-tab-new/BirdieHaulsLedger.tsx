@@ -44,10 +44,7 @@ interface Props {
 
 export function BirdieHaulsLedger({ region, mode, onRowTap }: Props) {
   const { data, isLoading } = useRegionFeats(region, 'birdie_hauls', mode);
-  const scoped = useMemo(
-    () => (data ?? []).filter((r) => matchesRailRegionScope(region, r.region)),
-    [data, region],
-  );
+  const scoped = useMemo(() => data ?? [], [data]);
   const rows = useMemo(() => sortBirdieHauls(scoped, mode), [scoped, mode]);
   const [sheetOpen, setSheetOpen] = useState(false);
 
