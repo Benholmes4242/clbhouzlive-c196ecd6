@@ -75,7 +75,19 @@
     "yourBirdieMap": "Your birdie map",
     "birdiedOfTotal": "Birdied {{n}} of {{total}}",
     "youValue": "You: {{value}}",
-    "aceA11y": "Hole in one"
+    "aceA11y": "Hole in one",
+    "clubGuide": {
+      "title": "[~~Ĥőŵ ţĥé ĉőúřšé ƥļáýš~~]",
+      "bodySignedIn": "[~~Ɓúíļţ ƒřőɱ {{count}} őƒƒíĉíáļ řőúñđš — ţĥé ĉőɱɱúñíţý'š šĉőříñĝ óñ évéřý ĥőļé, ŵíţĥ ýőúř óŵñ ĝáɱé áļőñĝšíđé.~~]",
+      "bodySignedOut": "[~~Ɓúíļţ ƒřőɱ {{count}} őƒƒíĉíáļ řőúñđš — ţĥé ĉőɱɱúñíţý'š šĉőříñĝ óñ évéřý ĥőļé.~~]"
+    },
+    "holeByHole": "[~~Ĥőļé ƀý ĥőļé~~]",
+    "birdieRingNote": "[~~Á ĝőļđ říñĝ ƀý á ĥőļé ńúɱƀéř ɱéáñš ýőú'vé ƀířđíéđ íţ.~~]",
+    "shapeOfCourse": "[~~Ţĥé šĥáƥé őƒ ţĥé ĉőúřšé~~]",
+    "legendEveryone": "[~~Évéřýőñé~~]",
+    "legendYou": "[~~Ýőú~~]",
+    "theBeastSuffix": "[~~ · ţĥé ƀéášţ~~]",
+    "youAvg": "[~~ÿőú +{{avg}}~~]"
   },
   "scorecard": {
     "syncingTitle": "[~~Šĉőřéĉářđ őñ ţĥé ŵáý~~]",

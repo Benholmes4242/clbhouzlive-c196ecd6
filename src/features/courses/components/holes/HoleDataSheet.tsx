@@ -2,13 +2,15 @@
  * HoleDataSheet — "The Club Guide" (Holes tab v2).
  *
  * Full presentational replacement of the previous data-sheet build:
- * editorial header → skyline → story tiles → notation key →
+ * editorial header → skyline → story tiles →
  * "Hole by hole" list (By hole | Toughest first) with expandable card
  * distributions. No SQL/RPC changes.
  */
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import type { MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
+import { formatNumber } from '@/i18n/format';
 import { HoleGlyph, HoleGlyphDefs, type HoleGlyphKind } from './HoleGlyph';
 
 // ── Tokens ────────────────────────────────────────────────────────────
@@ -70,6 +72,7 @@ export const HoleDataSheet: React.FC<Props> = ({
   myByHole,
   viewerHasPlayed,
 }) => {
+  const { t } = useTranslation(['courses']);
   const [sort, setSort] = useState<'hole' | 'tough'>('hole');
   const [openHole, setOpenHole] = useState<number | null>(null);
 
@@ -134,8 +137,6 @@ export const HoleDataSheet: React.FC<Props> = ({
     return n;
   }, [viewerHasPlayed, holes, myByHole]);
 
-  const title = 'How the course plays';
-
   const rows = sort === 'hole' ? sortedByHole : sortedByTough;
   const toggle = (n: number) => setOpenHole((cur) => (cur === n ? null : n));
 
@@ -155,15 +156,12 @@ export const HoleDataSheet: React.FC<Props> = ({
             lineHeight: 1.15,
           }}
         >
-          {title}
+          {t('courses:holes.clubGuide.title')}
         </h2>
         <p style={{ margin: '8px 0 0', fontSize: 12.5, color: INK_55, lineHeight: 1.5 }}>
-          Built from{' '}
-          <span style={{ color: INK, fontWeight: 800, ...NUM }}>
-            {totalRounds.toLocaleString()}
-          </span>{' '}
-          official rounds — the community&rsquo;s scoring on every hole
-          {viewerHasPlayed ? ', with your own game alongside.' : '.'}
+          {viewerHasPlayed
+            ? t('courses:holes.clubGuide.bodySignedIn', { count: formatNumber(totalRounds) })
+            : t('courses:holes.clubGuide.bodySignedOut', { count: formatNumber(totalRounds) })}
         </p>
       </section>
 
@@ -191,10 +189,7 @@ export const HoleDataSheet: React.FC<Props> = ({
         missingBirdieHole={missingBirdieHole}
       />
 
-      {/* 4. Notation key */}
-      <NotationKey viewerHasPlayed={viewerHasPlayed} />
-
-      {/* 5. Hole by hole */}
+      {/* 4. Hole by hole */}
       <section style={{ scrollMarginTop: STICKY_SAFE, display: 'flex', flexDirection: 'column', gap: 8 }}>
         <div
           style={{
@@ -206,7 +201,7 @@ export const HoleDataSheet: React.FC<Props> = ({
           }}
         >
           <h3 style={{ margin: 0, fontSize: 14, fontWeight: 800, color: INK, letterSpacing: '-0.005em' }}>
-            Hole by hole
+            {t('courses:holes.holeByHole')}
           </h3>
           <div
             role="tablist"
@@ -219,8 +214,8 @@ export const HoleDataSheet: React.FC<Props> = ({
             }}
           >
             {([
-              ['hole', 'By hole'],
-              ['tough', 'Toughest first'],
+              ['hole', t('courses:holes.sortByHole')],
+              ['tough', t('courses:holes.sortByDifficulty')],
             ] as const).map(([v, label]) => (
               <button
                 key={v}
@@ -245,6 +240,12 @@ export const HoleDataSheet: React.FC<Props> = ({
             ))}
           </div>
         </div>
+
+        {viewerHasPlayed && (
+          <p style={{ margin: 0, padding: '0 4px', fontSize: 11.5, color: INK_55, lineHeight: 1.5 }}>
+            {t('courses:holes.birdieRingNote')}
+          </p>
+        )}
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {rows.map((h) => (
@@ -276,6 +277,7 @@ const SkylineCard: React.FC<{
   viewerHasPlayed: boolean;
   beatFieldCount: number;
 }> = ({ holes, hardest, myByHole, viewerHasPlayed, beatFieldCount }) => {
+  const { t } = useTranslation(['courses']);
   const sorted = holes;
   const domainMax = Math.max(
     0.5,
@@ -326,16 +328,16 @@ const SkylineCard: React.FC<{
   return (
     <section style={{ ...CARD, padding: 16, scrollMarginTop: STICKY_SAFE }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-        <div style={{ fontSize: 13.5, fontWeight: 800, color: INK }}>The shape of the course</div>
+        <div style={{ fontSize: 13.5, fontWeight: 800, color: INK }}>{t('courses:holes.shapeOfCourse')}</div>
         <div style={{ display: 'inline-flex', gap: 10, alignItems: 'center' }}>
           <LegendSwatch
             swatch={<span style={{ display: 'inline-block', width: 10, height: 6, background: INK_20, borderRadius: 2 }} />}
-            label="Everyone"
+            label={t('courses:holes.legendEveryone')}
           />
           {viewerHasPlayed && (
             <LegendSwatch
               swatch={<span style={{ display: 'inline-block', width: 14, height: 2, background: GOLD, borderRadius: 2 }} />}
-              label="You"
+              label={t('courses:holes.legendYou')}
             />
           )}
         </div>
@@ -591,38 +593,6 @@ const StoryTile: React.FC<{
   </div>
 );
 
-// ──────────────────────────────────────────────────────────────────────
-// Notation key
-// ──────────────────────────────────────────────────────────────────────
-
-const NotationKey: React.FC<{ viewerHasPlayed: boolean }> = ({ viewerHasPlayed }) => {
-  const items: { kind: HoleGlyphKind; label: string }[] = [
-    { kind: 'eagle-or-better', label: 'Eagle+' },
-    { kind: 'birdie', label: 'Birdie' },
-    { kind: 'par', label: 'Par' },
-    { kind: 'bogey', label: 'Bogey' },
-    { kind: 'double-plus', label: 'Double+' },
-  ];
-  return (
-    <section style={{ ...CARD, padding: 16, scrollMarginTop: STICKY_SAFE }}>
-      <div style={{ fontSize: 12.5, fontWeight: 800, color: INK }}>What the shapes mean</div>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, rowGap: 10, marginTop: 10 }}>
-        {items.map((it) => (
-          <div key={it.kind} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-            <HoleGlyph kind={it.kind} size={14} />
-            <span style={{ fontSize: 11.5, fontWeight: 700, color: INK }}>{it.label}</span>
-          </div>
-        ))}
-      </div>
-      <div style={{ marginTop: 10, fontSize: 10.5, color: INK_35, lineHeight: 1.55 }}>
-        Gold circles are the good stuff. Every hole&rsquo;s bar below shows how the community scores, in this order
-        {viewerHasPlayed
-          ? ' \u2014 and a little gold ring by a hole number means you\u2019ve birdied it. \u2728'
-          : '.'}
-      </div>
-    </section>
-  );
-};
 
 // ──────────────────────────────────────────────────────────────────────
 // Mix strip (community distribution, per hole card)
@@ -659,6 +629,7 @@ const HoleCard: React.FC<{
   onToggle: () => void;
   viewerHasPlayed: boolean;
 }> = ({ row, mine, isHardest, isBirdied, open, onToggle, viewerHasPlayed }) => {
+  const { t } = useTranslation(['courses']);
   const fieldOver = row.avg_to_par;
   const showYou = viewerHasPlayed && mine != null;
   const youBeats = showYou ? (mine!.avg_to_par <= fieldOver + 0.005) : false;
@@ -736,9 +707,9 @@ const HoleCard: React.FC<{
         {/* Middle */}
         <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: 5 }}>
           <div style={{ fontSize: 11.5, color: INK_55, ...NUM }}>
-            Par {row.par} · SI {row.stroke_index ?? '\u2014'}
+            {t('courses:holes.parAndSi', { par: row.par, si: row.stroke_index ?? '\u2014' })}
             {isHardest && (
-              <span style={{ color: GOLD_INK, fontWeight: 700 }}> · the beast</span>
+              <span style={{ color: GOLD_INK, fontWeight: 700 }}>{t('courses:holes.theBeastSuffix')}</span>
             )}
           </div>
           <MixStrip row={row} />
@@ -746,26 +717,27 @@ const HoleCard: React.FC<{
 
         {/* Right */}
         <div style={{ textAlign: 'right', minWidth: 60 }}>
-          {showYou ? (
-            <>
-              <div
-                style={{
-                  fontSize: 14.5,
-                  fontWeight: 800,
-                  color: youBeats ? GOLD_INK : INK_85,
-                  ...NUM,
-                  lineHeight: 1,
-                }}
-              >
-                +{Math.max(0, mine!.avg_to_par).toFixed(2)}
-              </div>
-              <div style={{ fontSize: 9.5, color: INK_35, marginTop: 3, ...NUM }}>
-                field +{fieldOver.toFixed(2)}
-              </div>
-            </>
-          ) : (
-            <div style={{ fontSize: 14.5, fontWeight: 700, color: INK, ...NUM, lineHeight: 1 }}>
-              +{fieldOver.toFixed(2)}
+          <div
+            style={{
+              fontSize: 14.5,
+              fontWeight: 800,
+              color: INK,
+              ...NUM,
+              lineHeight: 1,
+            }}
+          >
+            +{Math.max(0, fieldOver).toFixed(2)}
+          </div>
+          {showYou && (
+            <div
+              style={{
+                fontSize: 9.5,
+                color: youBeats ? GOLD_INK : INK_85,
+                marginTop: 3,
+                ...NUM,
+              }}
+            >
+              {t('courses:holes.youAvg', { avg: Math.max(0, mine!.avg_to_par).toFixed(2) })}
             </div>
           )}
         </div>
