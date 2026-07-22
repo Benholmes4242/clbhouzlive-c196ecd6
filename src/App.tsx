@@ -346,6 +346,7 @@ const CommentDeepLinkPage = lazy(() => import("./features/comments-v2/CommentDee
 // Import season wrap modal
 import { SeasonWrapModal } from '@/components/season/SeasonWrapModal';
 import { InAppNotificationsMount } from '@/components/notifications/InAppNotificationsMount';
+import { useSilentSwitchHint } from '@/audio/useSilentSwitchHint';
 
 
 
