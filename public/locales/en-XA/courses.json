@@ -87,7 +87,7 @@
     "legendEveryone": "[~~Évéřýőñé~~]",
     "legendYou": "[~~Ýőú~~]",
     "theBeastSuffix": "[~~ · ţĥé ƀéášţ~~]",
-    "youAvg": "[~~ÿőú +{{avg}}~~]"
+    "youAvg": "[~~ÿőú {{avg}}~~]"
   },
   "scorecard": {
     "syncingTitle": "[~~Šĉőřéĉářđ őñ ţĥé ŵáý~~]",
