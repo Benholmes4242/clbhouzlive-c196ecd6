@@ -417,8 +417,38 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
               rank30d: r.rank30d,
               delta: r.delta,
             }));
+            const selfRow = entry.rows.find((r) => r.isSelf);
+            const ctaLine = selfRow
+              ? chaseCtaLine(cat, champion.value, selfRow.value)
+              : undefined;
             return (
               <div data-closest-duel>
+                {/* Eyebrow + explainer — teaches the section, then the card
+                    below headlines the actual crown name. */}
+                <div style={{ padding: '4px 16px 0' }}>
+                  <div
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 800,
+                      letterSpacing: '0.14em',
+                      textTransform: 'uppercase',
+                      color: 'var(--hcp-t-60)',
+                    }}
+                  >
+                    Your closest duel
+                  </div>
+                  <div
+                    style={{
+                      marginTop: 2,
+                      fontSize: 11.5,
+                      fontWeight: 500,
+                      color: 'var(--hcp-t-40)',
+                      lineHeight: 1.35,
+                    }}
+                  >
+                    The crown you're closest to taking at this club.
+                  </div>
+                </div>
                 <ChampionsDuelCard
                   category={cat}
                   categoryLabel={legendCategoryLabel[cat]}
@@ -431,7 +461,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
                   proBenchmark={null}
                   theme={theme}
                   banded={false}
-                  titleOverride="Your closest duel"
+                  chaseCta={ctaLine}
                 />
               </div>
             );
