@@ -10,9 +10,19 @@
  * MediaCarousel, FeedSlide, etc.) continues to import without churn. When
  * the new VideoEngine lands it will re-mount here.
  */
-import React, { useCallback, memo } from 'react';
+import React, { useCallback, memo, useSyncExternalStore } from 'react';
 import { useClubhouseStore } from '@/store/clubhouseStore';
+import { useSessionAudio } from '@/audio/sessionAudioStore';
+import { audioDuck } from '@/audio/audioDuckStore';
 import { VideoSlot } from '@/video/pool/VideoSlot';
+
+function useDucked(): boolean {
+  return useSyncExternalStore(
+    (cb) => audioDuck.subscribe(cb),
+    () => audioDuck.isDucked(),
+    () => false,
+  );
+}
 
 interface SnapVideoPlayerProps {
   hlsUrl: string;
@@ -42,6 +52,11 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
   onFirstFrameReady,
 }: SnapVideoPlayerProps) {
   const userPaused = useClubhouseStore((s) => s.userPaused);
+  const sessionMuted = useSessionAudio((s) => s.isMuted);
+  const ducked = useDucked();
+  // Only the currently-active slide gets to voice audio; everything else stays
+  // silent so we never get two lanes talking at once.
+  const muted = sessionMuted || ducked || !isActive || userPaused;
   const aspect = (height ?? 1) > 0 && (width ?? 0) > 0
     ? (height as number) / (width as number)
     : 1;
@@ -100,8 +115,9 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
           hlsUrl={hlsUrl}
           posterUrl={thumbnailUrl}
           isActive={isActive && !userPaused}
-          muted={true}
+          muted={muted}
           objectFit={objectFit}
+          surface={isFullscreen ? 'fullscreen' : 'inline'}
           onFirstFrame={onFirstFrameReady}
         />
       ) : (
