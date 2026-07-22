@@ -162,9 +162,14 @@ export function YourStandingStrip({ userId }: Props) {
           icon="👑"
           value={crownCount > 0 ? String(crownCount) : '0'}
           label={crownCount === 1 ? 'crown held' : 'crowns held'}
-          onClick={!isLoading && crownCount > 0 ? scrollToDefendRail : undefined}
+          onClick={
+            isLoading || crownCount === 0
+              ? undefined
+              : () => navigate('/handicap?gam=trophies&section=crowns')
+          }
           emphasize={crownCount > 0}
         />
+
         <Divider />
         <StandingCell
           icon="🏆"

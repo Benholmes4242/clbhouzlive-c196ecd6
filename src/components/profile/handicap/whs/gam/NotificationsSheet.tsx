@@ -136,7 +136,7 @@ const NotificationsSheet: React.FC<Props> = ({ userId }) => {
               onClick={() => {
                 if (item.kind === 'badge') {
                   setOpen(false);
-                  setTimeout(() => openGamAchievements(item.badgeId), 220);
+                  setTimeout(() => openGamAchievements({ badgeId: item.badgeId }), 220);
                 }
               }}
               style={{
