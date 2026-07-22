@@ -8,6 +8,8 @@ import React, { useEffect, useState, useCallback, memo } from 'react';
 import { createPortal } from 'react-dom';
 import { navTiming, isPerfEnabled, subscribePerfLive, type NavTransaction } from './navTiming';
 import { Z } from '@/config/zIndex';
+import { VideoPool } from '@/video/pool/VideoPool';
+import { getVideoTelemetryStats } from '@/video/telemetry';
 
 
 type Summary = ReturnType<typeof navTiming.getRecent>[number];
