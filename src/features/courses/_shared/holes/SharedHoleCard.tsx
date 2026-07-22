@@ -14,6 +14,7 @@ import {
 } from '@/features/courses/components/holes/_constants';
 import { SharedHoleDistributionBar } from './SharedHoleDistributionBar';
 import type { SharedHole } from './types';
+import { fmtToPar as fmtAvg } from './formatToPar';
 
 export interface SharedHoleCardProps {
   hole: SharedHole;
