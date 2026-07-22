@@ -944,14 +944,12 @@ const ExpandedRow: React.FC<{
 const SummaryTile: React.FC<{ cap: string; value: string; gold?: boolean }> = ({ cap, value, gold }) => (
   <div
     style={{
-      background: '#FFFFFF',
-      border: `1px solid ${INK_08}`,
-      borderRadius: 10,
-      padding: '8px 10px',
+      padding: '4px 2px',
       display: 'flex',
       flexDirection: 'column',
       gap: 2,
     }}
+
   >
     <div style={CAP}>{cap}</div>
     <div style={{ fontSize: 16, fontWeight: 800, color: gold ? GOLD_INK : INK, ...NUM, lineHeight: 1.1 }}>
