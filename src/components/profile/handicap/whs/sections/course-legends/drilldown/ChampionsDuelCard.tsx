@@ -46,6 +46,9 @@ interface ChampionsDuelCardProps {
   banded?: boolean;
   /** Optional kicker override — replaces the category label in the section header. */
   titleOverride?: string;
+  /** Optional CTA sentence rendered beneath the chase caption (used by
+   *  the "Your closest duel" section to name the gap in category units). */
+  chaseCta?: string;
 }
 
 
@@ -184,6 +187,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
   theme = 'dark',
   banded = false,
   titleOverride,
+  chaseCta,
 }) => {
   const isLight = theme === 'light';
   const avatarRing = isLight ? 'rgba(15,23,42,0.12)' : 'rgba(255,255,255,0.22)';
@@ -543,6 +547,20 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
         >
           {line}
         </span>
+        {chaseCta && (
+          <span
+            style={{
+              display: 'block',
+              marginTop: 4,
+              fontSize: 12,
+              fontWeight: 700,
+              color: INK,
+              letterSpacing: '-0.005em',
+            }}
+          >
+            {chaseCta}
+          </span>
+        )}
       </div>
 
       {/* Inline top 5 — StatRow canonical */}
