@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 
@@ -18,7 +18,7 @@ import {
   nextLevelForMedals,
   WALL_LEVELS,
 } from '@/components/profile/handicap/whs/gam/trophy-room/_shared/levels';
-import { openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
+
 import { quarterOf, daysLeft, seasonName } from '@/lib/gam/seasonClock';
 import { useViewerHemisphere } from '@/hooks/gam/useViewerHemisphere';
 import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
@@ -60,18 +60,24 @@ function useCrownsHeld(userId: string | undefined) {
 
 function scrollToDefendRail() {
   const el = document.getElementById('discover-defend-rail');
-  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if (!el) return;
+  // scroll-margin-top on the section handles the sticky header offset.
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
+
 
 export function YourStandingStrip({ userId }: Props) {
   const navigate = useNavigate();
-  const { data: crowns } = useCrownsHeld(userId);
-  const { data: profile } = useUserProfile(userId);
-  const { data: connection } = useWhsConnection(userId);
-  const { data: badges = [] } = useUserAchievements(userId);
-  const { data: legends = [] } = useUserTopLegends(userId, { limit: 500, maxRank: 1 });
+  const { data: crowns, isLoading: crownsLoading } = useCrownsHeld(userId);
+  const { data: profile, isLoading: profileLoading } = useUserProfile(userId);
+  const { data: connection, isLoading: connLoading } = useWhsConnection(userId);
+  const { data: badges = [], isLoading: badgesLoading } = useUserAchievements(userId);
+  const { data: legends = [], isLoading: legendsLoading } = useUserTopLegends(userId, { limit: 500, maxRank: 1 });
   const { data: streaks = [] } = useMyStreaks(!!userId);
   const hemi = useViewerHemisphere();
+
+  const isLoading = crownsLoading || profileLoading || connLoading || badgesLoading || legendsLoading;
+
 
   const medals = useMemo(() => {
     const a = badges.map(normalizeBadge);
@@ -120,9 +126,13 @@ export function YourStandingStrip({ userId }: Props) {
   if (crownCount === 0 && !currentLevel && !hasHcp && !showStreak) return null;
 
   const openTrophyRoom = () => {
-    navigate('/handicap');
-    setTimeout(() => openGamAchievements(), 0);
+    // Use the existing ?gam=trophies deep-link pattern in HandicapPage
+    // (see src/pages/HandicapPage.tsx). It opens the sheet once on arrival
+    // then strips the param, so back-nav / revisits do not re-open.
+    navigate('/handicap?gam=trophies');
   };
+  const openHandicap = () => navigate('/handicap');
+
 
   // Season ribbon
   const now = new Date();
@@ -152,7 +162,7 @@ export function YourStandingStrip({ userId }: Props) {
           icon="👑"
           value={crownCount > 0 ? String(crownCount) : '0'}
           label={crownCount === 1 ? 'crown held' : 'crowns held'}
-          onClick={crownCount > 0 ? scrollToDefendRail : undefined}
+          onClick={!isLoading && crownCount > 0 ? scrollToDefendRail : undefined}
           emphasize={crownCount > 0}
         />
         <Divider />
@@ -160,7 +170,7 @@ export function YourStandingStrip({ userId }: Props) {
           icon="🏆"
           value={tierValue}
           label={tierSub}
-          onClick={openTrophyRoom}
+          onClick={isLoading ? undefined : openTrophyRoom}
           valueSize={12}
           emphasize={!!currentLevel}
           wide
@@ -170,7 +180,7 @@ export function YourStandingStrip({ userId }: Props) {
         <StandingCell
           value={hasHcp ? formatHcp(hcpValue) : '—'}
           label="HCP"
-          onClick={() => navigate('/handicap')}
+          onClick={isLoading ? undefined : openHandicap}
           emphasize={hasHcp}
         />
         {showStreak ? (
@@ -180,12 +190,13 @@ export function YourStandingStrip({ userId }: Props) {
               icon="🔥"
               value={String(streakCount)}
               label="week streak"
-              onClick={() => navigate('/handicap')}
+              onClick={isLoading ? undefined : openHandicap}
               emphasize
             />
           </>
         ) : null}
       </div>
+
 
       {/* Season ribbon */}
       <div
@@ -265,11 +276,17 @@ function StandingCell({
   progressPct?: number;
 }) {
   const disabled = !onClick;
+  const [pressed, setPressed] = useState(false);
+  const clearPress = () => setPressed(false);
   return (
     <button
       type="button"
       onClick={onClick}
       disabled={disabled}
+      onPointerDown={disabled ? undefined : () => setPressed(true)}
+      onPointerUp={clearPress}
+      onPointerLeave={clearPress}
+      onPointerCancel={clearPress}
       style={{
         flex: wide ? 1.6 : 1,
         minWidth: 0,
@@ -285,9 +302,13 @@ function StandingCell({
         alignItems: 'center',
         justifyContent: 'center',
         gap: 3,
-        opacity: emphasize ? 1 : 0.65,
+        opacity: emphasize ? (pressed ? 0.7 : 1) : 0.65,
+        transform: pressed ? 'scale(0.97)' : 'scale(1)',
+        transition: 'transform 120ms ease, opacity 120ms ease',
+        WebkitTapHighlightColor: 'transparent',
       }}
     >
+
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 5, minWidth: 0, maxWidth: '100%' }}>
         {icon ? (
           <span aria-hidden style={{ fontSize: 13, lineHeight: 1 }}>
