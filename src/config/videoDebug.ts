@@ -41,6 +41,9 @@ export const VIDEO_DEBUG = {
   
   // HLS Pool Manager logging
   hlsPool: false || getDebugFlag('hlsPool'),
+
+  // Video element pool (Phase 1 — reparenting pool)
+  pool: false || getDebugFlag('pool'),
 } as const;
 
 export type VideoDebugCategory = keyof typeof VIDEO_DEBUG;
