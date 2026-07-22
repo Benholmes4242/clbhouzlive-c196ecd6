@@ -346,6 +346,7 @@ const CommentDeepLinkPage = lazy(() => import("./features/comments-v2/CommentDee
 // Import season wrap modal
 import { SeasonWrapModal } from '@/components/season/SeasonWrapModal';
 import { InAppNotificationsMount } from '@/components/notifications/InAppNotificationsMount';
+import { useSilentSwitchHint } from '@/audio/useSilentSwitchHint';
 
 
 
@@ -701,6 +702,8 @@ const AchievementToastWrapper: React.FC = () => {
 const AppInner: React.FC = () => {
   // Global focus re-auth hook
   useReauthOnFocus();
+  // iOS silent-switch tap-to-unmute hint.
+  useSilentSwitchHint();
 
   // Push notification registration — runs on every cold launch.
   // Waits for the Median bridge to be ready (avoids TLS-cold-pool transport

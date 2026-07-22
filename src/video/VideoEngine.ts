@@ -46,6 +46,7 @@ import { useSessionAudio } from '@/audio/sessionAudioStore';
 import { audioDebugEnabled, logAudio, msSinceOpen, getEntries } from '@/perf/audioDebug';
 import { getLastCloseSnapshot } from '@/perf/positionContinuity';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { audioDuck } from '@/audio/audioDuckStore';
 
 /**
  * v9 reconciler — module-level record of the last writer to each lane's
@@ -236,6 +237,7 @@ class VideoEngineImpl {
   private roleUnsub: (() => void) | null = null;
   private fsStoreUnsub: (() => void) | null = null;
   private sessionAudioUnsub: (() => void) | null = null;
+  private duckUnsub: (() => void) | null = null;
   private driftCheckIv: number | null = null;
 
 
@@ -340,6 +342,7 @@ class VideoEngineImpl {
     this.roleUnsub = feedLaneRoles.subscribe(this.onFeedRoleChange);
     this.fsStoreUnsub = useFullscreenFeedStore.subscribe(this.onFullscreenChange);
     this.sessionAudioUnsub = useSessionAudio.subscribe(this.onSessionAudioChange);
+    this.duckUnsub = audioDuck.subscribe(this.onDuckChange);
     // 250ms drift check while the session is unmuted. When actual state
     // diverges from computed, reconcile with reason='drift' and dump a
     // forensic snapshot (role map, borrow state, last 5 audio events,
@@ -368,6 +371,11 @@ class VideoEngineImpl {
   /** v9: session mute/unmute → reconcile. */
   private onSessionAudioChange = (): void => {
     this.reconcileAudio('session-change');
+  };
+
+  /** Sheet ducking → reconcile. Non-empty duck set forces silence. */
+  private onDuckChange = (): void => {
+    this.reconcileAudio('duck-change');
   };
 
   /**
@@ -1302,12 +1310,16 @@ class VideoEngineImpl {
     // whyNone. Distinct labels per null path (no shared fallthrough) so the
     // silence root cause is legible in a linear scan of the buffer.
     let speaker: LaneId | null = null;
-    let branch: 'session-muted' | 'borrow' | 'focus' | 'active-role' | 'fullscreen-solo' | 'none' = 'none';
+    let branch: 'session-muted' | 'ducked' | 'borrow' | 'focus' | 'active-role' | 'fullscreen-solo' | 'none' = 'none';
     let whyNone: string | null = null;
 
+    const ducked = audioDuck.isDucked();
     if (sessionMuted) {
       branch = 'none';
       whyNone = 'session-muted';
+    } else if (ducked) {
+      branch = 'none';
+      whyNone = 'ducked:' + audioDuck.keys().join(',');
     } else if (fsOpen) {
       if (borrowLaneId) {
         if (this.lanes.has(borrowLaneId)) {
