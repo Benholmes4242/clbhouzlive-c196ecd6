@@ -165,4 +165,23 @@ function PhaseBar({ s }: { s: Summary }) {
   );
 }
 
+function PoolStatsRow() {
+  const [stats, setStats] = useState(VideoPool.getStats());
+  useEffect(() => {
+    let raf = 0;
+    const tick = () => {
+      setStats(VideoPool.getStats());
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  return (
+    <div style={{ marginBottom: 8, padding: 4, background: 'rgba(74,222,128,0.06)', borderRadius: 4, color: '#94a3b8' }}>
+      Pool: {stats.inUse}/{stats.size} warm
+      {stats.lastAcquireMs !== null && ` · last acquire ${stats.lastAcquireMs}ms`}
+    </div>
+  );
+}
+
 export default PerfHud;
