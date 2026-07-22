@@ -14,6 +14,8 @@ interface Props {
   cancelLabel?: string;
   tone?: 'danger' | 'default';
   busy?: boolean;
+  /** When true, compare typed vs requireText using NFKC + smart-quote fold + case-insensitive match. */
+  normalizeMatch?: boolean;
 }
 
 export default function ConfirmDialog({
