@@ -481,7 +481,7 @@ const LedgerCard: React.FC<{
   }
 
   return (
-    <div style={{ ...CARD, padding: 0, marginBottom: 12, overflow: 'hidden' }}>
+    <div style={{ ...SECTION_RULE, marginTop: 20 }}>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
         {hardest && (
           <LedgerCell
