@@ -383,14 +383,17 @@ const HandicapPage: React.FC = () => {
   useEffect(() => {
     if (searchParams.get('gam') !== 'trophies') return;
     if (!ownerUserId) return;
+    const section = searchParams.get('section') === 'crowns' ? 'crowns' : undefined;
     const id = setTimeout(() => {
-      openGamAchievements();
+      openGamAchievements(section ? { section } : undefined);
       const next = new URLSearchParams(searchParams);
       next.delete('gam');
+      next.delete('section');
       setSearchParams(next, { replace: true });
     }, 0);
     return () => clearTimeout(id);
   }, [searchParams, setSearchParams, ownerUserId]);
+
 
 
   // Fetch profile for greeting/title.
