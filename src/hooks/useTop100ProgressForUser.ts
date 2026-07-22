@@ -314,8 +314,13 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
         .map(buildRound)
         .filter((r): r is Top100RecentRound => r !== null);
 
-      // Normalize to canonical field
-      const totalTop100Played = playedTop100Courses.size;
+      // Hero/tier count = Worldwide (global) list's played count from the view.
+      // Falls back to the max per-list played if the global row is missing.
+      const globalRow = viewBySlug.get('global');
+      const totalTop100Played = globalRow
+        ? Number(globalRow.courses_played_in_list ?? 0)
+        : listProgress.reduce((max, l) => Math.max(max, l.played), 0);
+
       
       // Use new tier helpers
       const club = getTop100Club(totalTop100Played);
