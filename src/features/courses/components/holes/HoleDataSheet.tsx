@@ -277,6 +277,7 @@ const SkylineCard: React.FC<{
   viewerHasPlayed: boolean;
   beatFieldCount: number;
 }> = ({ holes, hardest, myByHole, viewerHasPlayed, beatFieldCount }) => {
+  const { t } = useTranslation(['courses']);
   const sorted = holes;
   const domainMax = Math.max(
     0.5,
