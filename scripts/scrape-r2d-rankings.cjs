@@ -34,6 +34,22 @@ async function scrape() {
     // Wait for the rankings table to load
     await page.waitForSelector('table tbody tr', { timeout: 15000 });
 
+    // Lazy-load exhaust: scroll (and click any load-more) until row count stops growing
+    let prevCount = 0;
+    for (let i = 0; i < 30; i++) {
+      const count = await page.evaluate(() => {
+        window.scrollTo(0, document.body.scrollHeight);
+        const btn = [...document.querySelectorAll('button')]
+          .find(b => /load more|show more/i.test(b.textContent || ''));
+        if (btn) btn.click();
+        return document.querySelectorAll('table tbody tr').length;
+      });
+      await new Promise(r => setTimeout(r, 800));
+      if (count === prevCount && i > 2) break;
+      prevCount = count;
+    }
+    console.log(`[R2D Scraper] Rows in DOM after lazy-load exhaust: ${prevCount}`);
+
     // Extract data from the table
     const players = await page.evaluate(() => {
       const rows = document.querySelectorAll('table tbody tr');
@@ -86,8 +102,17 @@ async function scrape() {
     // Connect to Supabase
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    // Dedupe by conflict key (the page can render duplicate rows)
+    const seen = new Map();
+    for (const p of players) {
+      const key = `${TOUR_CODE}|${SEASON_YEAR}|${p.name}`;
+      if (!seen.has(key)) seen.set(key, p);
+    }
+    const deduped = [...seen.values()];
+    console.log(`[R2D Scraper] Deduped ${players.length} -> ${deduped.length}`);
+
     // Build rows for upsert
-    const rows = players.map(p => ({
+    const rows = deduped.map(p => ({
       player_name: p.name,
       tour_code: TOUR_CODE,
       season_year: SEASON_YEAR,
@@ -110,12 +135,17 @@ async function scrape() {
         .upsert(batch, { onConflict: 'tour_code,season_year,player_name' });
       if (error) {
         console.error('[R2D Scraper] Upsert error:', error.message);
+        process.exitCode = 1;
       } else {
         upserted += batch.length;
       }
     }
 
     console.log(`[R2D Scraper] Upserted ${upserted} players`);
+    if (upserted === 0 && players.length > 0) {
+      console.error('[R2D Scraper] Wrote ZERO rows despite parsing players - failing the run');
+      process.exitCode = 1;
+    }
 
     // Run player matching RPC
     const { error: matchError } = await supabase.rpc('match_tour_rankings_players');
