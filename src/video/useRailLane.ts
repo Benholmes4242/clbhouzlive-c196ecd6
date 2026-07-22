@@ -79,30 +79,50 @@ export function useRailLane(opts: UseRailLaneOptions): UseRailLaneResult {
   // (typically borrow-unpin + a re-activation) retry.
   useEffect(() => {
     if (!eligible) return;
-    // Scroll-dampener: skip FRESH acquisition mid-flick. The effect will
-    // re-run when scrollQuiescent flips true (deps below). Owners that
-    // already hold a lane are unaffected — we're only guarding acquire.
-    if (!scrollQuiescent) return;
     const key = opts.ownerKey as string;
-    const lane = RailLanePool.acquire(key);
-    setLaneId(lane);
-    setReady(false);
-    if (lane == null) {
-      // No acquisition happened — no owner record to release. Still subscribe
-      // in case another owner unpins and we get notified via a later touch.
-      return;
+    let released = false;
+    let unsub: (() => void) | null = null;
+    let unsubQuiescent: (() => void) | null = null;
+
+    const doAcquire = () => {
+      if (released) return;
+      const lane = RailLanePool.acquire(key);
+      setLaneId(lane);
+      setReady(false);
+      if (lane == null) return;
+      unsub = RailLanePool.subscribe(key, (l) => {
+        setLaneId(l);
+        if (l == null) setReady(false);
+      });
+    };
+
+    // Scroll-dampener: while mid-flick, defer FRESH acquisition until the
+    // scroll settles. Owners that already hold a lane are unaffected —
+    // this only gates the first-time acquire on this ownerKey.
+    if (scrollActivityRef().isQuiescent()) {
+      doAcquire();
+    } else {
+      unsubQuiescent = scrollActivityRef().subscribe(() => {
+        if (scrollActivityRef().isQuiescent()) {
+          unsubQuiescent?.();
+          unsubQuiescent = null;
+          doAcquire();
+        }
+      });
     }
-    const unsub = RailLanePool.subscribe(key, (l) => {
-      setLaneId(l);
-      if (l == null) setReady(false);
-    });
+
     return () => {
-      unsub();
+      released = true;
+      unsubQuiescent?.();
+      unsub?.();
       RailLanePool.release(key);
       setLaneId(null);
       setReady(false);
     };
-  }, [eligible, opts.ownerKey, scrollQuiescent]);
+    // scrollQuiescent intentionally NOT in deps — we subscribe imperatively
+    // so a mid-scroll flip does not tear down an in-flight/held lane.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [eligible, opts.ownerKey]);
 
   // Mount + load + play the rented lane. Rails are ALWAYS muted.
   useEffect(() => {
