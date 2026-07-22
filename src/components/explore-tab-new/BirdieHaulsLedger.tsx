@@ -83,14 +83,14 @@ export function BirdieHaulsLedger({ region, mode, onRowTap }: Props) {
           return (
             <StatRow
               key={`${row.score_id ?? row.course_id ?? i}-${i}`}
-              rank={i + 1}
+              rank={mode === 'alltime' ? i + 1 : undefined}
               avatarUrl={row.holder_avatar}
               avatarUserId={row.user_id}
               name={name}
               subline={sub}
               statValue={count}
               statLabel="BIRDIES"
-              showWatermark={i === 0}
+              showWatermark={mode === 'alltime' && i === 0}
               isLast={i === display.length - 1}
               onPress={() => onRowTap?.(row)}
             />
