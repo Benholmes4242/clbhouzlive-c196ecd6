@@ -234,7 +234,6 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
           <RecordStatRow
             key={`${row.course_id ?? i}-${i}`}
             row={row}
-            rank={i + 1}
             isLast={i === ledgerRows.length - 1}
             onTap={() => handleRowTap(row)}
           />
