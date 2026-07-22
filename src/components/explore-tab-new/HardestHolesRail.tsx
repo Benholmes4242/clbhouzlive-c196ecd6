@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useHardestHoles } from '@/hooks/gam/useHardestHoles';
 import { SectionHead } from './SectionHead';
-import { regionScopePhrase } from './regionScope';
+import { regionScopePhrase, matchesRegionScope } from './regionScope';
 import { FONT } from './gamingLightTokens';
 
 const RED = '#D2222D';
