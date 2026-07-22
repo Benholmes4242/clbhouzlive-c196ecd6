@@ -12,8 +12,8 @@ interface Props {
   onOpen?: (resolvedUrl: string) => void;
 }
 
-const MAX_W = 220;
-const MAX_H = 280;
+const MAX_W = 240;
+const MAX_H = 320;
 const RADIUS = 14;
 
 export const MessageImage: React.FC<Props> = ({ attachment, onOpen }) => {
@@ -23,16 +23,21 @@ export const MessageImage: React.FC<Props> = ({ attachment, onOpen }) => {
     hasLocal ? null : attachment.path,
   );
   const [imgError, setImgError] = useState(false);
+  const [imgLoaded, setImgLoaded] = useState(false);
 
   const src = attachment.localUrl ?? signedUrl;
   const uploading = attachment.uploadStatus === 'uploading';
   const failed = attachment.uploadStatus === 'failed';
 
+  // Aspect ratio is used ONLY while the image hasn't loaded yet — so the
+  // shimmer has a sensible box. Once loaded, we clear it and let the image
+  // define its own height (no letterboxing).
   const w = attachment.w ?? undefined;
   const h = attachment.h ?? undefined;
-  const aspectRatio = w && h ? `${w} / ${h}` : '16 / 11';
+  const placeholderAspect = w && h ? `${w} / ${h}` : '4 / 3';
 
   const isError = (!hasLocal && (error || imgError)) || (hasLocal && imgError);
+  const showPlaceholder = !imgLoaded && !isError;
 
   return (
     <div
@@ -41,10 +46,12 @@ export const MessageImage: React.FC<Props> = ({ attachment, onOpen }) => {
         width: '100%',
         maxWidth: MAX_W,
         maxHeight: MAX_H,
-        aspectRatio,
         borderRadius: RADIUS,
         overflow: 'hidden',
-        background: '#EDEFF2',
+        // Transparent — no dark frame around loaded media.
+        background: 'transparent',
+        // Reserve space with a neutral shimmer only while loading.
+        aspectRatio: showPlaceholder ? placeholderAspect : undefined,
         cursor: src && !isError ? 'pointer' : 'default',
       }}
       onClick={() => {
@@ -72,17 +79,27 @@ export const MessageImage: React.FC<Props> = ({ attachment, onOpen }) => {
           src={src}
           alt=""
           onError={() => setImgError(true)}
+          onLoad={() => setImgLoaded(true)}
           draggable={false}
           style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
             display: 'block',
+            width: '100%',
+            height: 'auto',
+            maxHeight: MAX_H,
+            objectFit: 'contain',
+            borderRadius: RADIUS,
             opacity: uploading ? 0.55 : 1,
           }}
         />
       ) : loading ? (
         <Skeleton className="rounded-none" style={{ width: '100%', height: '100%' }} />
+      ) : null}
+
+      {showPlaceholder && src ? (
+        <Skeleton
+          className="rounded-none"
+          style={{ position: 'absolute', inset: 0 }}
+        />
       ) : null}
 
       {uploading ? (
@@ -94,6 +111,7 @@ export const MessageImage: React.FC<Props> = ({ attachment, onOpen }) => {
             alignItems: 'center',
             justifyContent: 'center',
             background: 'rgba(0,0,0,0.15)',
+            borderRadius: RADIUS,
           }}
         >
           <Loader2 size={22} className="animate-spin" style={{ color: '#FFFFFF' }} />
@@ -113,6 +131,7 @@ export const MessageImage: React.FC<Props> = ({ attachment, onOpen }) => {
             fontSize: 12,
             fontWeight: 500,
             gap: 6,
+            borderRadius: RADIUS,
           }}
         >
           <AlertCircle size={14} />
