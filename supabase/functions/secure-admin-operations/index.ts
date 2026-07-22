@@ -233,15 +233,51 @@ serve(async (req) => {
         const label = resolvedEmail ?? targetUserId;
 
         // Pre-cleanup: delete the target's OWN rows in bounded tables before
-        // auth.admin.deleteUser. Admin-actor / podium references intentionally
-        // remain blocking so the caller sees the constraint verbatim.
+        // auth.admin.deleteUser. Covers both (i) tables whose FK to auth.users
+        // has NO ACTION (which would block deletion) and (ii) tables with no
+        // FK at all (which would leave orphans — see the post_likes incident).
+        // Admin-actor / podium references intentionally remain blocking so the
+        // caller sees the constraint verbatim. Audit/immutable-ledger tables
+        // (analytics_events, admin_audit_log, user_xp_events, gam_user_level_events,
+        // profile_daily_metrics, events.created_by, business_team_members.created_by,
+        // and polymorphic actor_id columns) are intentionally retained.
         const preCleanupSpec: Array<{ table: string; column: string }> = [
+          // Already-tracked blocking FKs
           { table: 'post_views', column: 'viewer_id' },
           { table: 'user_courses', column: 'user_id' },
           { table: 'user_top100_courses', column: 'user_id' },
           { table: 'business_analytics_events', column: 'user_id' },
           { table: 'creator_profile_events', column: 'user_id' },
           { table: 'profile_analytics_events', column: 'user_id' },
+          // v4 engagement sweep — orphan gaps (no FK enforcement)
+          { table: 'post_likes', column: 'user_id' },
+          { table: 'post_shares', column: 'user_id' },
+          { table: 'post_impressions', column: 'user_id' },
+          { table: 'comment_likes_v2', column: 'user_id' },
+          { table: 'comments_v2', column: 'user_id' },
+          { table: 'review_votes', column: 'user_id' },
+          { table: 'course_media_likes', column: 'user_id' },
+          { table: 'feat_reactions', column: 'user_id' },
+          { table: 'hidden_comments', column: 'user_id' },
+          { table: 'message_hidden', column: 'actor_id' },
+          { table: 'message_reactions', column: 'user_id' },
+          { table: 'conversation_members', column: 'actor_id' },
+          { table: 'pickem_picks', column: 'user_id' },
+          { table: 'event_participants', column: 'user_id' },
+          { table: 'user_followed_colleges', column: 'user_id' },
+          { table: 'user_top_ten_lists', column: 'user_id' },
+          { table: 'user_badges', column: 'user_id' },
+          { table: 'user_suggestion_dismissals', column: 'user_id' },
+          { table: 'swing_sessions', column: 'user_id' },
+          { table: 'swing_shares', column: 'user_id' },
+          { table: 'caddie_logs', column: 'user_id' },
+          { table: 'pro_ai_analyses', column: 'user_id' },
+          { table: 'ai_caption_usage', column: 'user_id' },
+          { table: 'echo_v2_rate_limits', column: 'user_id' },
+          { table: 'leaderboard_highlights', column: 'user_id' },
+          { table: 'profile_immersive_telemetry', column: 'user_id' },
+          { table: 'profile_immersive_telemetry', column: 'viewer_id' },
+          { table: 'whs_friend_leaderboard_snapshots', column: 'user_id' },
         ];
         const preCleanup: Record<string, number> = {};
         let preCleanupFailed: { table: string; error: string } | null = null;
@@ -250,18 +286,21 @@ serve(async (req) => {
             .from(table)
             .delete({ count: 'exact' })
             .eq(column, targetUserId);
+          const key = `${table}.${column}`;
           if (delErr) {
-            preCleanupFailed = { table, error: delErr.message };
+            preCleanupFailed = { table: key, error: delErr.message };
             break;
           }
-          preCleanup[table] = count ?? 0;
+          preCleanup[key] = count ?? 0;
         }
         auditDetails.preCleanup = preCleanup;
+        auditDetails.preCleanupVersion = FUNCTION_VERSION;
         if (preCleanupFailed) {
           auditDetails.error = `Pre-cleanup failed on ${preCleanupFailed.table}: ${preCleanupFailed.error}`;
           result = { error: auditDetails.error };
           break;
         }
+
 
         const { error: deleteError } = await supabase.auth.admin.deleteUser(targetUserId);
         if (deleteError) {
