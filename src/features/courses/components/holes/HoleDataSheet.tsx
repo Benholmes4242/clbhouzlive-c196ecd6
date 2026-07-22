@@ -594,38 +594,6 @@ const StoryTile: React.FC<{
   </div>
 );
 
-// ──────────────────────────────────────────────────────────────────────
-// Notation key
-// ──────────────────────────────────────────────────────────────────────
-
-const NotationKey: React.FC<{ viewerHasPlayed: boolean }> = ({ viewerHasPlayed }) => {
-  const items: { kind: HoleGlyphKind; label: string }[] = [
-    { kind: 'eagle-or-better', label: 'Eagle+' },
-    { kind: 'birdie', label: 'Birdie' },
-    { kind: 'par', label: 'Par' },
-    { kind: 'bogey', label: 'Bogey' },
-    { kind: 'double-plus', label: 'Double+' },
-  ];
-  return (
-    <section style={{ ...CARD, padding: 16, scrollMarginTop: STICKY_SAFE }}>
-      <div style={{ fontSize: 12.5, fontWeight: 800, color: INK }}>What the shapes mean</div>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, rowGap: 10, marginTop: 10 }}>
-        {items.map((it) => (
-          <div key={it.kind} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-            <HoleGlyph kind={it.kind} size={14} />
-            <span style={{ fontSize: 11.5, fontWeight: 700, color: INK }}>{it.label}</span>
-          </div>
-        ))}
-      </div>
-      <div style={{ marginTop: 10, fontSize: 10.5, color: INK_35, lineHeight: 1.55 }}>
-        Gold circles are the good stuff. Every hole&rsquo;s bar below shows how the community scores, in this order
-        {viewerHasPlayed
-          ? ' \u2014 and a little gold ring by a hole number means you\u2019ve birdied it. \u2728'
-          : '.'}
-      </div>
-    </section>
-  );
-};
 
 // ──────────────────────────────────────────────────────────────────────
 // Mix strip (community distribution, per hole card)
