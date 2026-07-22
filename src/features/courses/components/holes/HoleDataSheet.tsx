@@ -328,16 +328,16 @@ const SkylineCard: React.FC<{
   return (
     <section style={{ ...CARD, padding: 16, scrollMarginTop: STICKY_SAFE }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-        <div style={{ fontSize: 13.5, fontWeight: 800, color: INK }}>The shape of the course</div>
+        <div style={{ fontSize: 13.5, fontWeight: 800, color: INK }}>{t('courses:holes.shapeOfCourse')}</div>
         <div style={{ display: 'inline-flex', gap: 10, alignItems: 'center' }}>
           <LegendSwatch
             swatch={<span style={{ display: 'inline-block', width: 10, height: 6, background: INK_20, borderRadius: 2 }} />}
-            label="Everyone"
+            label={t('courses:holes.legendEveryone')}
           />
           {viewerHasPlayed && (
             <LegendSwatch
               swatch={<span style={{ display: 'inline-block', width: 14, height: 2, background: GOLD, borderRadius: 2 }} />}
-              label="You"
+              label={t('courses:holes.legendYou')}
             />
           )}
         </div>
