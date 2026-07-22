@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { slugToCacheRegion } from '../regionScope';
 
 export type FeatTier = 'legendary' | 'eagles' | 'birdie_hauls' | 'records';
 
@@ -27,10 +28,10 @@ export interface FeatRow {
   course_par?: number | null;
 }
 
-// Rails now carry per-item region keys inside their worldwide payload.
-// The client fetches the worldwide row and filters via `matchesRailRegionScope`.
-export function toCacheRegion(_r: string | null): string {
-  return 'worldwide';
+// Cached rails are pre-computed per region on the server. Fetch the row
+// scoped to the active Discover toggle; do NOT filter items client-side.
+export function toCacheRegion(r: string | null | undefined): string {
+  return slugToCacheRegion(r);
 }
 
 export type RecordsMode = 'latest' | 'alltime';
