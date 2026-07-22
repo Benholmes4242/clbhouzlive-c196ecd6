@@ -258,14 +258,13 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
 }
 
 // ---- Record Book row (flat StatRow) ---------------------------------------
+// Recency list — no rank number (the "· 3w" timestamp is the ordering cue).
 function RecordStatRow({
   row,
-  rank,
   isLast,
   onTap,
 }: {
   row: FeatRow;
-  rank: number;
   isLast: boolean;
   onTap: () => void;
 }) {
@@ -287,7 +286,6 @@ function RecordStatRow({
   const sub = [holder, when ? relativeTime(when) : null].filter(Boolean).join(' · ');
   return (
     <StatRow
-      rank={rank}
       avatarUrl={row.holder_avatar}
       avatarUserId={row.user_id}
       name={row.course_name}
@@ -295,7 +293,6 @@ function RecordStatRow({
       statValue={toParDisplay}
       statColor={statColor}
       statSubLabel={grossText ? `${grossText} GROSS` : undefined}
-      showWatermark={rank === 1}
       isLast={isLast}
       onPress={onTap}
     />
