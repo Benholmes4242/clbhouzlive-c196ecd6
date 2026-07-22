@@ -508,12 +508,12 @@ const StoryTiles: React.FC<{
   // Your battle
   if (nemesis) {
     const fieldRow = holes.find((h) => h.hole_no === nemesis.hole_no);
-    const youOver = Math.max(0, nemesis.avg_to_par);
-    const fieldOver = fieldRow ? fieldRow.avg_to_par : 0;
+    const youStr = fmtToPar(nemesis.avg_to_par);
+    const fieldStr = fieldRow ? fmtToPar(fieldRow.avg_to_par) : fmtToPar(0);
     const youBeats = fieldRow ? nemesis.avg_to_par <= fieldRow.avg_to_par + 0.005 : false;
     const sentence = youBeats
-      ? `You play it to +${youOver.toFixed(2)} — better than most, still unbeaten.`
-      : `You play it to +${youOver.toFixed(2)} against the field's +${fieldOver.toFixed(2)}. Time to settle it.`;
+      ? `You play it to ${youStr} — better than most, still unbeaten.`
+      : `You play it to ${youStr} against the field's ${fieldStr}. Time to settle it.`;
     tiles.push(
       <StoryTile
         key="battle"
