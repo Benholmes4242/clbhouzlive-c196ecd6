@@ -20256,6 +20256,10 @@ export type Database = {
         }
         Returns: number
       }
+      rebuild_euro_season_rankings: {
+        Args: { p_year?: number }
+        Returns: string
+      }
       recalculate_review_vote_counts: {
         Args: { review_id_param: string }
         Returns: undefined
