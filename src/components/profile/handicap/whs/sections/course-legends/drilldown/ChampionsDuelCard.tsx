@@ -46,6 +46,9 @@ interface ChampionsDuelCardProps {
   banded?: boolean;
   /** Optional kicker override — replaces the category label in the section header. */
   titleOverride?: string;
+  /** Optional CTA sentence rendered beneath the chase caption (used by
+   *  the "Your closest duel" section to name the gap in category units). */
+  chaseCta?: string;
 }
 
 
