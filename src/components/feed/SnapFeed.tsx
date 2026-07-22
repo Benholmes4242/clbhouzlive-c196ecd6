@@ -11,7 +11,7 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { vperfStart, vperfArmLane, vperfNextId, vperfFeedScrollTick, vperfFeedActivateStart, vperfFeedActivateEnd, vperfEnd, vperfSupersede } from '@/perf/vperf';
 import { PrefetchController } from '@/video/PrefetchController';
 import { VideoPool } from '@/video/pool/VideoPool';
-import { isVideoPoolEnabled } from '@/video/pool/flag';
+
 import { trace } from '@/perf/trace';
 import { VideoEngine } from '@/video/VideoEngine';
 import { feedLaneRoles } from '@/video/feedLaneRoles';
