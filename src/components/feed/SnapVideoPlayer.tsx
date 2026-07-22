@@ -93,9 +93,8 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
         <div className="absolute inset-0" style={{ background: '#0A0E14' }} aria-hidden="true" />
       )}
 
-      {/* Pooled <video> path — active when the VITE_VIDEO_POOL flag is on.
-          Falls back to the poster-only chassis otherwise. */}
-      {poolEnabled && hlsUrl ? (
+      {/* Pooled <video> path — always on. Poster fallback when no HLS. */}
+      {hlsUrl ? (
         <VideoSlot
           slotKey={postId || hlsUrl}
           hlsUrl={hlsUrl}
