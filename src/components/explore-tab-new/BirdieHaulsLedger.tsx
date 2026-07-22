@@ -10,7 +10,7 @@ import { SectionHead } from './SectionHead';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import { FONT } from './gamingLightTokens';
 import { StatRow } from './StatRow';
-import { matchesRailRegionScope, regionScopePhrase } from './regionScope';
+import { regionScopePhrase } from './regionScope';
 import { EmptyScopeCard } from './EmptyScopeCard';
 
 const ROWS = 5;
@@ -44,11 +44,7 @@ interface Props {
 
 export function BirdieHaulsLedger({ region, mode, onRowTap }: Props) {
   const { data, isLoading } = useRegionFeats(region, 'birdie_hauls', mode);
-  const scoped = useMemo(
-    () => (data ?? []).filter((r) => matchesRailRegionScope(region, r.region)),
-    [data, region],
-  );
-  const rows = useMemo(() => sortBirdieHauls(scoped, mode), [scoped, mode]);
+  const rows = useMemo(() => sortBirdieHauls(data ?? [], mode), [data, mode]);
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const display = rows.slice(0, ROWS);
