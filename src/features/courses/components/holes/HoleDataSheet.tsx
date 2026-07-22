@@ -126,7 +126,7 @@ export const HoleDataSheet: React.FC<Props> = ({
   const toggle = (n: number) => setOpenHole((cur) => (cur === n ? null : n));
 
   return (
-    <div style={{ background: '#F8FAFC', fontFamily: FONT, padding: '16px 12px 24px' }}>
+    <div style={{ background: 'transparent', fontFamily: FONT, padding: '16px 12px 24px' }}>
       <HoleGlyphDefs />
 
       {/* 1. Header */}
