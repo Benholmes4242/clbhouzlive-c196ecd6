@@ -126,7 +126,7 @@ export function HardestHolesRail({ region }: { region?: string | null } = {}) {
   const rows = filtered.slice(0, MAX);
   const accent = mode === 'easiest' ? GREEN : RED;
   const scope = regionScopePhrase(region);
-  const title = mode === 'easiest' ? `Best scoring opportunities ${scope}` : `The toughest holes ${scope}`;
+  const title = mode === 'easiest' ? `The easiest holes ${scope}` : `The toughest holes ${scope}`;
 
   if (rows.length === 0) return null;
 
