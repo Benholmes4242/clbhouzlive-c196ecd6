@@ -689,6 +689,7 @@ function Member360Sheet({
         confirmLabel="Delete member"
         tone="danger"
         busy={busy}
+        normalizeMatch
       />
       {requestMode !== null && detail && (
         <div
