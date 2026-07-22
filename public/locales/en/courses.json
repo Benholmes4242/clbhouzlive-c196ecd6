@@ -78,7 +78,19 @@
     "yourBirdieMap": "Your birdie map",
     "birdiedOfTotal": "Birdied {{n}} of {{total}}",
     "youValue": "You: {{value}}",
-    "aceA11y": "Hole in one"
+    "aceA11y": "Hole in one",
+    "clubGuide": {
+      "title": "How the course plays",
+      "bodySignedIn": "Built from {{count}} official rounds — the community's scoring on every hole, with your own game alongside.",
+      "bodySignedOut": "Built from {{count}} official rounds — the community's scoring on every hole."
+    },
+    "holeByHole": "Hole by hole",
+    "birdieRingNote": "A gold ring by a hole number means you've birdied it.",
+    "shapeOfCourse": "The shape of the course",
+    "legendEveryone": "Everyone",
+    "legendYou": "You",
+    "theBeastSuffix": " · the beast",
+    "youAvg": "you +{{avg}}"
   },
   "scorecard": {
     "syncingTitle": "Scorecard on the way",
