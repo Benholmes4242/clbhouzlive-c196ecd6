@@ -181,7 +181,7 @@ export function AttackDefendBand({ userId, region = null }: Props) {
     return (
       <section
         id="discover-defend-rail"
-        style={{ marginTop: SPACE?.sectionSection ?? 24, fontFamily: FONT, color: INK }}
+        style={{ marginTop: SPACE?.sectionSection ?? 24, fontFamily: FONT, color: INK, scrollMarginTop: 96 }}
       >
         <div style={{ padding: `0 ${PAGE_PAD}px` }}>
           <div style={{ fontSize: 10.5, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: MUTE, lineHeight: 1 }}>
