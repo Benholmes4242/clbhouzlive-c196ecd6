@@ -54,20 +54,16 @@ interface Props {
 export function EaglesLedger({ region, mode, onRowTap, onLeaderTap }: Props) {
   const { data: featsData, isLoading } = useRegionFeats(region, 'eagles', 'latest');
   const { data: leadersData } = useRegionEagleLeaders(region);
-  const feats = useMemo(
-    () => (featsData ?? []).filter((r) => matchesRailRegionScope(region, r.region)),
-    [featsData, region],
-  );
+  const feats = useMemo(() => featsData ?? [], [featsData]);
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const leaders = useMemo(
     () =>
       (leadersData ?? [])
-        .filter((r) => matchesRailRegionScope(region, r.region))
         .filter((r) => (r.eagles ?? 0) > 0)
         .sort((a, b) => (b.eagles ?? 0) - (a.eagles ?? 0))
         .slice(0, ROWS),
-    [leadersData, region],
+    [leadersData],
   );
 
   const hasData = mode === 'alltime' ? leaders.length > 0 : feats.length > 0;
