@@ -44,6 +44,8 @@ import { SLATE_50 } from '@/features/courses/_shared/tokens';
 import { SPACE } from '@/lib/spacing';
 import { useScorecardOpener } from './useScorecardOpener';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
+import { matchesRailRegionScope, regionScopePhrase } from './regionScope';
+import { EmptyScopeCard } from './EmptyScopeCard';
 
 interface ExploreTabContentProps {
   embedded?: boolean;
