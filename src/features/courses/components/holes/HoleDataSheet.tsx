@@ -636,17 +636,17 @@ const ScorecardTable: React.FC<{
   const cols = showYou ? '32px 26px 22px 1fr 1fr 60px' : '32px 26px 22px 1fr 60px';
 
   return (
-    <div style={{ ...CARD, overflow: 'hidden' }}>
+    <div>
       <div
         style={{
           display: 'grid',
           gridTemplateColumns: cols,
           alignItems: 'center',
-          padding: '10px 12px',
+          padding: '10px 4px',
           borderBottom: `1px solid ${INK_08}`,
-          background: '#FBFBFC',
         }}
       >
+
         <TH>{label}</TH>
         <TH>PAR</TH>
         <TH>SI</TH>
