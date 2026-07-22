@@ -22,7 +22,7 @@ export default function ConfirmDialog({
   open, onClose, onConfirm,
   title, description, requireText,
   confirmLabel = 'Confirm', cancelLabel = 'Cancel',
-  tone = 'default', busy,
+  tone = 'default', busy, normalizeMatch = false,
 }: Props) {
   const [typed, setTyped] = useState('');
 
