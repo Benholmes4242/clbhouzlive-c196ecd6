@@ -87,6 +87,10 @@ export default function ConfirmDialog({
               autoFocus
               value={typed}
               onChange={e => setTyped(e.target.value)}
+              autoCapitalize="off"
+              autoCorrect="off"
+              autoComplete="off"
+              spellCheck={false}
               style={{
                 padding: '10px 12px',
                 borderRadius: t.radius.md,
@@ -95,6 +99,7 @@ export default function ConfirmDialog({
                 color: t.ink, fontSize: 14, outline: 'none',
               }}
             />
+
           </div>
         )}
 
