@@ -79,6 +79,10 @@ export function useRailLane(opts: UseRailLaneOptions): UseRailLaneResult {
   // (typically borrow-unpin + a re-activation) retry.
   useEffect(() => {
     if (!eligible) return;
+    // Scroll-dampener: skip FRESH acquisition mid-flick. The effect will
+    // re-run when scrollQuiescent flips true (deps below). Owners that
+    // already hold a lane are unaffected — we're only guarding acquire.
+    if (!scrollQuiescent) return;
     const key = opts.ownerKey as string;
     const lane = RailLanePool.acquire(key);
     setLaneId(lane);
