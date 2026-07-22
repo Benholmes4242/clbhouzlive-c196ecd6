@@ -10,7 +10,7 @@ import { SectionHead } from './SectionHead';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import { FONT } from './gamingLightTokens';
 import { StatRow } from './StatRow';
-import { matchesRailRegionScope, regionScopePhrase } from './regionScope';
+import { regionScopePhrase } from './regionScope';
 import { EmptyScopeCard } from './EmptyScopeCard';
 
 const ROWS = 5;
