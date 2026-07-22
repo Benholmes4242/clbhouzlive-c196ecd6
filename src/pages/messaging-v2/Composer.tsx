@@ -128,7 +128,7 @@ export const Composer: React.FC<Props> = ({
     (async () => {
       for (const att of attachments) {
         try {
-          await sendMedia({ file: att.file, kind: att.kind === 'video' ? 'image' : 'image' });
+          await sendMedia({ file: att.file, kind: 'image' });
         } catch (e) {
           console.warn('[composer] sendMedia failed', e);
         } finally {
