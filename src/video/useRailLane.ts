@@ -99,11 +99,11 @@ export function useRailLane(opts: UseRailLaneOptions): UseRailLaneResult {
     // Scroll-dampener: while mid-flick, defer FRESH acquisition until the
     // scroll settles. Owners that already hold a lane are unaffected —
     // this only gates the first-time acquire on this ownerKey.
-    if (scrollActivityRef().isQuiescent()) {
+    if (scrollActivity.isQuiescent()) {
       doAcquire();
     } else {
-      unsubQuiescent = scrollActivityRef().subscribe(() => {
-        if (scrollActivityRef().isQuiescent()) {
+      unsubQuiescent = scrollActivity.subscribe(() => {
+        if (scrollActivity.isQuiescent()) {
           unsubQuiescent?.();
           unsubQuiescent = null;
           doAcquire();
