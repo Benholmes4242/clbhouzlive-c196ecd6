@@ -63,3 +63,22 @@ export function duelLine(
     ? `Defending by ${gapText}`
     : `${gapText} to take the crown from ${championFirstName}`;
 }
+
+/**
+ * CTA line for the "Your closest duel" section — names the gap in the
+ * category's own unit with an action prompt. Falls back to a level line
+ * when the viewer is tied for the crown.
+ */
+export function chaseCtaLine(
+  cat: LegendCategory,
+  championValue: number,
+  myValue: number,
+): string {
+  const gap = Math.abs(championValue - myValue);
+  if (gap === 0) return 'Level for the crown — one better takes it.';
+  // Reuse the shared unit formatter but strip the "vs HCP" suffix for
+  // differential categories so the CTA reads naturally ("0.4 behind").
+  const raw = formatLegendGap(cat, gap);
+  const unit = raw.replace(/\s*vs HCP\s*$/i, '');
+  return `You're ${unit} behind — go take it.`;
+}
