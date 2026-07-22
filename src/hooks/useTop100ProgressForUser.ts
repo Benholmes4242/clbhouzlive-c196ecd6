@@ -94,7 +94,7 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
         };
       }
 
-      // Fetch all Top 100 lists
+      // Fetch all Top 100 lists (for stable ordering + any list not yet in view rows)
       const { data: lists, error: listsError } = await supabase
         .from('top100_lists')
         .select('id, slug, name')
@@ -103,7 +103,25 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
 
       if (listsError) throw listsError;
 
-      // Fetch user's course activity
+      // CANONICAL COUNT SOURCE: user_top100_progress_view
+      // This view is the single source of truth for per-list played counts.
+      // Do NOT re-derive counts by joining user_course_activity + course_top100_memberships —
+      // that path under-reports (see BRIEF: Top 100 tile/hero count wrong).
+      const { data: viewRows, error: viewError } = await supabase
+        .from('user_top100_progress_view' as any)
+        .select('list_id, list_slug, list_name, total_courses_in_list, courses_rated_in_list, courses_played_in_list')
+        .eq('user_id', userId);
+
+      if (viewError) throw viewError;
+
+      const viewByListId = new Map<string, any>(
+        (viewRows || []).map((r: any) => [r.list_id, r]),
+      );
+      const viewBySlug = new Map<string, any>(
+        (viewRows || []).map((r: any) => [r.list_slug, r]),
+      );
+
+      // Fetch user's course activity (kept for recent/year/streak round display below)
       const { data: userActivity, error: activityError } = await supabase
         .from('user_course_activity' as any)
         .select('course_id')
@@ -113,7 +131,8 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
 
       const playedCourseIds = new Set((userActivity || []).map((a: any) => a.course_id));
 
-      // Fetch all Top 100 memberships for played courses
+      // Memberships for played courses — used to build recent/year/streak round metadata
+      // (list_slugs, ranks). Counts do NOT come from this join anymore.
       const { data: memberships, error: membershipsError } = await supabase
         .from('course_top100_memberships')
         .select(`
@@ -136,41 +155,43 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
 
       if (membershipsError) throw membershipsError;
 
-      // Build list progress
+      // Set of played course ids that appear on ANY Top 100 list — used to filter
+      // rounds surfaced to Top-100 timelines/streaks. This is display-only; counts
+      // come from the view.
+      const playedTop100Courses = new Set<string>(
+        (memberships || []).map((m: any) => m.course_id),
+      );
+
+      // Build per-list progress from the view.
       const listProgress: Top100ListProgress[] = [];
-      const playedTop100Courses = new Set<string>();
       const regionsWithProgress = new Set<string>();
 
       for (const list of lists || []) {
-        // Get total courses in this list
-        const { count, error: countError } = await supabase
-          .from('course_top100_memberships')
-          .select('*', { count: 'exact', head: true })
-          .eq('list_id', list.id);
+        const row = viewByListId.get(list.id);
+        const played = Number(row?.courses_played_in_list ?? 0);
+        const total = Number(row?.total_courses_in_list ?? 0);
 
-        if (countError) throw countError;
+        // course_ids are still useful for downstream consumers; derive from memberships.
+        const courseIdsInList = Array.from(
+          new Set(
+            (memberships || [])
+              .filter((m: any) => m.top100_lists.id === list.id)
+              .map((m: any) => m.course_id as string),
+          ),
+        );
 
-        // Get played courses in this list
-        const playedInList = (memberships || [])
-          .filter((m: any) => m.top100_lists.id === list.id)
-          .map((m: any) => m.course_id);
-
-        const uniquePlayedInList = [...new Set(playedInList)];
-
-        if (uniquePlayedInList.length > 0) {
-          regionsWithProgress.add(list.slug);
-          uniquePlayedInList.forEach(id => playedTop100Courses.add(id));
-        }
+        if (played > 0) regionsWithProgress.add(list.slug);
 
         listProgress.push({
           listId: list.id,
           listSlug: list.slug,
           listName: list.name,
-          played: uniquePlayedInList.length,
-          total: count || 0,
-          course_ids: uniquePlayedInList,
+          played,
+          total,
+          course_ids: courseIdsInList,
         });
       }
+
 
       // === FETCH RECENT ROUNDS ===
       // Order: played_at DESC, first_activity_at DESC, course_id ASC (stable tie-breaker)
