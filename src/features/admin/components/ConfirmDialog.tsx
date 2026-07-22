@@ -88,6 +88,10 @@ export default function ConfirmDialog({
               autoFocus
               value={typed}
               onChange={e => setTyped(e.target.value)}
+              autoCorrect="off"
+              autoCapitalize="none"
+              autoComplete="off"
+              spellCheck={false}
               style={{
                 padding: '10px 12px',
                 borderRadius: t.radius.md,
