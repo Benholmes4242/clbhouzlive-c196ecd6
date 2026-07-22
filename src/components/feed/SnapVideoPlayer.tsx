@@ -95,18 +95,31 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
         <div className="absolute inset-0" style={{ background: '#0A0E14' }} aria-hidden="true" />
       )}
 
-      {/* Poster — the only rendered media surface in the poster-only chassis. */}
-      {thumbnailUrl && (
-        <img
-          src={thumbnailUrl}
-          aria-hidden="true"
-          className="absolute inset-0 w-full h-full"
-          style={{
-            objectFit,
-            objectPosition: 'center',
-            zIndex: 1,
-          }}
+      {/* Pooled <video> path — active when the VITE_VIDEO_POOL flag is on.
+          Falls back to the poster-only chassis otherwise. */}
+      {poolEnabled && hlsUrl ? (
+        <VideoSlot
+          slotKey={postId || hlsUrl}
+          hlsUrl={hlsUrl}
+          posterUrl={thumbnailUrl}
+          isActive={isActive && !userPaused}
+          muted={true}
+          objectFit={objectFit}
+          onFirstFrame={onFirstFrameReady}
         />
+      ) : (
+        thumbnailUrl && (
+          <img
+            src={thumbnailUrl}
+            aria-hidden="true"
+            className="absolute inset-0 w-full h-full"
+            style={{
+              objectFit,
+              objectPosition: 'center',
+              zIndex: 1,
+            }}
+          />
+        )
       )}
     </div>
   );
