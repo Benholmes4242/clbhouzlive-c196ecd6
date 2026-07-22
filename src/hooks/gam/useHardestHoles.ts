@@ -14,19 +14,22 @@ export interface HardestHoleRow {
   rounds: number;
 }
 
+export type HoleIndexMode = 'hardest' | 'easiest';
+
 /**
- * Reads the precomputed 'hardest_holes' rail from discover_rail_cache.
- * Refreshed daily by cron.
+ * Reads the precomputed 'hardest_holes' / 'easiest_holes' rail from
+ * discover_rail_cache. Refreshed daily by cron.
  */
-export function useHardestHoles() {
+export function useHardestHoles(mode: HoleIndexMode = 'hardest') {
+  const railKey = mode === 'easiest' ? 'easiest_holes' : 'hardest_holes';
   return useQuery<HardestHoleRow[]>({
-    queryKey: ['gam', 'hardest-holes-cache'],
+    queryKey: ['gam', 'hole-index-cache', railKey],
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('discover_rail_cache')
         .select('payload')
-        .eq('rail_key', 'hardest_holes')
+        .eq('rail_key', railKey)
         .maybeSingle();
       if (error) throw error;
       return (data?.payload ?? []) as unknown as HardestHoleRow[];
