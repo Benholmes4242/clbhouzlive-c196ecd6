@@ -23,10 +23,7 @@ export function regionScopePhrase(slug: string | null | undefined): string {
 
 /**
  * Convert a Discover toggle slug to the app-wide PrimaryRegionKey used by
- * the Course Index / courseRegions.ts scope predicate. Keeps toggle tokens
- * ('uk-ireland', 'continental-europe', 'rest-of-world') aligned with the
- * canonical keys ('gb-i', 'europe', 'rest') without introducing bespoke
- * per-section mappings.
+ * the Course Index / courseRegions.ts scope predicate.
  */
 export function discoverSlugToRegionKey(
   slug: string | null | undefined,
@@ -42,6 +39,28 @@ export function discoverSlugToRegionKey(
       return 'rest';
     default:
       return 'all';
+  }
+}
+
+/**
+ * Map the cached-rail region key vocabulary
+ * ('gbi' | 'usa' | 'europe' | 'row') to the canonical PrimaryRegionKey.
+ * Cached rails use these compact keys inside `payload[i].region`.
+ */
+export function railKeyToRegionKey(
+  key: string | null | undefined,
+): PrimaryRegionKey | null {
+  switch (key) {
+    case 'gbi':
+      return 'gb-i';
+    case 'usa':
+      return 'usa';
+    case 'europe':
+      return 'europe';
+    case 'row':
+      return 'rest';
+    default:
+      return null;
   }
 }
 
@@ -63,3 +82,17 @@ export function matchesRegionScope(
   return itemKey === key;
 }
 
+/**
+ * Companion predicate for cached rail payloads that carry the compact
+ * region key vocabulary ('gbi' | 'usa' | 'europe' | 'row') per item.
+ * Worldwide passes through everything.
+ */
+export function matchesRailRegionScope(
+  slug: string | null | undefined,
+  itemRailKey: string | null | undefined,
+): boolean {
+  const key = discoverSlugToRegionKey(slug);
+  if (key === 'all') return true;
+  const mapped = railKeyToRegionKey(itemRailKey);
+  return mapped === key;
+}
