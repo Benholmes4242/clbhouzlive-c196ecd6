@@ -43,6 +43,7 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
   onFirstFrameReady,
 }: SnapVideoPlayerProps) {
   const userPaused = useClubhouseStore((s) => s.userPaused);
+  const isSessionMuted = useSessionAudio((s) => s.isMuted);
   const aspect = (height ?? 1) > 0 && (width ?? 0) > 0
     ? (height as number) / (width as number)
     : 1;
