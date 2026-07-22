@@ -147,8 +147,8 @@ export const HoleDataSheet: React.FC<Props> = ({
             PAR {parTotal} · {totalRounds.toLocaleString()} RDS
           </div>
         </div>
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
-          {['OFFICIAL WHS', courseName?.toUpperCase() || '—', 'UPDATED RECENTLY'].map((label) => (
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 8 }}>
+          {['OFFICIAL WHS', courseName?.toUpperCase() || '—'].map((label) => (
             <span
               key={label}
               style={{
@@ -156,16 +156,13 @@ export const HoleDataSheet: React.FC<Props> = ({
                 fontWeight: 800,
                 letterSpacing: '0.10em',
                 color: INK_55,
-                padding: '3px 8px',
-                borderRadius: 999,
-                border: `1px solid ${INK_08}`,
-                background: '#FFFFFF',
               }}
             >
               {label}
             </span>
           ))}
         </div>
+
       </div>
 
       {/* 2. Skyline */}
