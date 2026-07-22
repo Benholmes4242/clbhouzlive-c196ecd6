@@ -18306,6 +18306,22 @@ export type Database = {
           total_rounds: number
         }[]
       }
+      get_notable_friendly_courses: {
+        Args: { p_limit?: number; p_min_rounds?: number }
+        Returns: {
+          avg_over_par: number
+          course_country: string
+          course_id: string
+          course_name: string
+          course_region: string
+          hardest_avg_to_par: number
+          hardest_hole_no: number
+          hardest_hole_par: number
+          hardest_hole_si: number
+          thumbnail_image: string
+          total_rounds: number
+        }[]
+      }
       get_pickem_leaderboard: {
         Args: { p_user_id?: string }
         Returns: {
