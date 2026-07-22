@@ -233,15 +233,8 @@ function LegendarySection({
   onLeaderTap: (uid: string) => void;
 }) {
   const { data } = useRegionFeats(region, 'legendary');
-  const rows = useMemo(
-    () =>
-      (data ?? []).filter((r) =>
-        // reuse the compact rail region key predicate
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        matchesRailRegionScope(region, (r as any).region),
-      ),
-    [data, region],
-  );
+  // Cached rail is pre-scoped to the active region; no client-side filter.
+  const rows = useMemo(() => data ?? [], [data]);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetMetric, setSheetMetric] = useState<'aces' | 'albatrosses'>('aces');
 
@@ -253,7 +246,7 @@ function LegendarySection({
   const overline = mode === 'alltime' ? 'All-time honours' : 'Latest honours';
 
   // Scoped-empty: render the unconquered empty-state.
-  if ((data ?? []).length > 0 && rows.length === 0 && region != null) {
+  if (rows.length === 0 && region != null) {
     return (
       <section style={{ marginTop: 32 }}>
         <SectionHead overline={overline} title="Moments of the game" paddingX={14} />
