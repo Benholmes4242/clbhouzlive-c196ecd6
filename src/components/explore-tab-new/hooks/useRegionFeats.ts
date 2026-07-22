@@ -119,7 +119,7 @@ export function useRegionFeats(
 
 
   return useQuery<FeatRow[]>({
-    queryKey: ['discover-rail-cache', railKey],
+    queryKey: ['discover-rail-cache', railKey, cacheRegion],
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
