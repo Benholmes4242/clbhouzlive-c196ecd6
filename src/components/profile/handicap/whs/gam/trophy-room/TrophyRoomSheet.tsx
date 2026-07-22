@@ -253,12 +253,28 @@ const CourseLegendsCollapsibleSection: React.FC<{
   useEffect(() => {
     if (!revealToken) return;
     setExpanded(true);
-    // Wait a frame for the grid to mount, then scroll the header into view.
+    // Wait a frame for the grid to mount, then scroll the section so its
+    // header sits near the top of the sheet's scroll container.
     const id = requestAnimationFrame(() => {
-      rootRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const node = rootRef.current;
+      if (!node) return;
+      // Find the nearest scrollable ancestor (the sheet body).
+      let scroller: HTMLElement | null = node.parentElement;
+      while (scroller) {
+        const style = window.getComputedStyle(scroller);
+        if (/(auto|scroll)/.test(style.overflowY)) break;
+        scroller = scroller.parentElement;
+      }
+      if (scroller) {
+        const top = node.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop - 8;
+        scroller.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+      } else {
+        node.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     });
     return () => cancelAnimationFrame(id);
   }, [revealToken]);
+
 
   return (
     <div ref={rootRef}>
@@ -764,19 +780,8 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
               );
             }
             const lifetimeEarned = lifetime.filter((a) => a.earned).length;
-            // When deep-linked via the Discover "crowns held" tile, promote the
-            // Course crowns section to the TOP of the sheet body so users land
-            // on it immediately instead of scrolling to the bottom.
-            const promoteCrowns = crownsRevealToken > 0 && anyLegends;
             return (
               <>
-                {promoteCrowns && (
-                  <CourseLegendsCollapsibleSection
-                    items={allLegends}
-                    onOpenGroup={(records) => setDetailCtx({ items: records, index: 0 })}
-                    revealToken={crownsRevealToken}
-                  />
-                )}
                 {lifetime.length > 0 && (
                   <>
                     <TrophyGroupLabel label="Lifetime" earned={lifetimeEarned} total={lifetime.length} />
@@ -798,7 +803,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                     </React.Fragment>
                   );
                 })}
-                {anyLegends && !promoteCrowns && (
+                {anyLegends && (
                   <CourseLegendsCollapsibleSection
                     items={allLegends}
                     onOpenGroup={(records) => setDetailCtx({ items: records, index: 0 })}
@@ -809,6 +814,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
               </>
             );
           })()}
+
 
 
         </div>
