@@ -162,7 +162,7 @@ export function YourStandingStrip({ userId }: Props) {
           icon="👑"
           value={crownCount > 0 ? String(crownCount) : '0'}
           label={crownCount === 1 ? 'crown held' : 'crowns held'}
-          onClick={crownCount > 0 ? scrollToDefendRail : undefined}
+          onClick={!isLoading && crownCount > 0 ? scrollToDefendRail : undefined}
           emphasize={crownCount > 0}
         />
         <Divider />
@@ -170,7 +170,7 @@ export function YourStandingStrip({ userId }: Props) {
           icon="🏆"
           value={tierValue}
           label={tierSub}
-          onClick={openTrophyRoom}
+          onClick={isLoading ? undefined : openTrophyRoom}
           valueSize={12}
           emphasize={!!currentLevel}
           wide
@@ -180,7 +180,7 @@ export function YourStandingStrip({ userId }: Props) {
         <StandingCell
           value={hasHcp ? formatHcp(hcpValue) : '—'}
           label="HCP"
-          onClick={() => navigate('/handicap')}
+          onClick={isLoading ? undefined : openHandicap}
           emphasize={hasHcp}
         />
         {showStreak ? (
@@ -190,12 +190,13 @@ export function YourStandingStrip({ userId }: Props) {
               icon="🔥"
               value={String(streakCount)}
               label="week streak"
-              onClick={() => navigate('/handicap')}
+              onClick={isLoading ? undefined : openHandicap}
               emphasize
             />
           </>
         ) : null}
       </div>
+
 
       {/* Season ribbon */}
       <div
