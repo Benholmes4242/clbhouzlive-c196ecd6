@@ -287,6 +287,7 @@ const SkylineCard: React.FC<{
   );
   const domainMin = Math.min(
     0,
+    ...sorted.map((h) => h.avg_to_par),
     ...sorted.map((h) => myByHole.get(h.hole_no)?.avg_to_par ?? 0),
   );
   const span = Math.max(0.5, domainMax - domainMin);
@@ -303,6 +304,7 @@ const SkylineCard: React.FC<{
   const rx = barW / 2.6;
   const yFor = (v: number) => PYT + chartH - ((v - domainMin) / span) * chartH;
   const yBaseline = yFor(0);
+  const hasNegative = domainMin < 0;
 
   type Pt = { x: number; y: number };
   const segments: Pt[][] = [];
@@ -322,9 +324,10 @@ const SkylineCard: React.FC<{
   }
 
   const clause = characterClause(hardest.hole_no);
+  const beastFrag = `The ${ord(hardest.hole_no)} is the beast: ${fmtToPar(hardest.avg_to_par)} for the field.`;
   const caption = viewerHasPlayed
-    ? `${clause} — and your gold line stays under everyone\u2019s on ${beatFieldCount} of ${sorted.length}. The ${ord(hardest.hole_no)} is the beast: +${hardest.avg_to_par.toFixed(2)} for the field.`
-    : `The ${ord(hardest.hole_no)} is the beast: +${hardest.avg_to_par.toFixed(2)} for the field.`;
+    ? `${clause} — and your gold line stays under everyone\u2019s on ${beatFieldCount} of ${sorted.length}. ${beastFrag}`
+    : beastFrag;
 
   return (
     <section style={{ ...CARD, padding: 16, scrollMarginTop: STICKY_SAFE }}>
