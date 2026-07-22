@@ -1310,12 +1310,16 @@ class VideoEngineImpl {
     // whyNone. Distinct labels per null path (no shared fallthrough) so the
     // silence root cause is legible in a linear scan of the buffer.
     let speaker: LaneId | null = null;
-    let branch: 'session-muted' | 'borrow' | 'focus' | 'active-role' | 'fullscreen-solo' | 'none' = 'none';
+    let branch: 'session-muted' | 'ducked' | 'borrow' | 'focus' | 'active-role' | 'fullscreen-solo' | 'none' = 'none';
     let whyNone: string | null = null;
 
+    const ducked = audioDuck.isDucked();
     if (sessionMuted) {
       branch = 'none';
       whyNone = 'session-muted';
+    } else if (ducked) {
+      branch = 'none';
+      whyNone = 'ducked:' + audioDuck.keys().join(',');
     } else if (fsOpen) {
       if (borrowLaneId) {
         if (this.lanes.has(borrowLaneId)) {
