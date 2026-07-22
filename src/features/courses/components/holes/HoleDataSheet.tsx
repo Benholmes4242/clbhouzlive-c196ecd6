@@ -749,26 +749,27 @@ const HoleCard: React.FC<{
 
         {/* Right */}
         <div style={{ textAlign: 'right', minWidth: 60 }}>
-          {showYou ? (
-            <>
-              <div
-                style={{
-                  fontSize: 14.5,
-                  fontWeight: 800,
-                  color: youBeats ? GOLD_INK : INK_85,
-                  ...NUM,
-                  lineHeight: 1,
-                }}
-              >
-                +{Math.max(0, mine!.avg_to_par).toFixed(2)}
-              </div>
-              <div style={{ fontSize: 9.5, color: INK_35, marginTop: 3, ...NUM }}>
-                field +{fieldOver.toFixed(2)}
-              </div>
-            </>
-          ) : (
-            <div style={{ fontSize: 14.5, fontWeight: 700, color: INK, ...NUM, lineHeight: 1 }}>
-              +{fieldOver.toFixed(2)}
+          <div
+            style={{
+              fontSize: 14.5,
+              fontWeight: 800,
+              color: INK,
+              ...NUM,
+              lineHeight: 1,
+            }}
+          >
+            +{Math.max(0, fieldOver).toFixed(2)}
+          </div>
+          {showYou && (
+            <div
+              style={{
+                fontSize: 9.5,
+                color: youBeats ? GOLD_INK : INK_85,
+                marginTop: 3,
+                ...NUM,
+              }}
+            >
+              you +{Math.max(0, mine!.avg_to_par).toFixed(2)}
             </div>
           )}
         </div>
