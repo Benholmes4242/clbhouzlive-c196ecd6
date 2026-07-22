@@ -102,7 +102,7 @@ export function useRailLane(opts: UseRailLaneOptions): UseRailLaneResult {
       setLaneId(null);
       setReady(false);
     };
-  }, [eligible, opts.ownerKey]);
+  }, [eligible, opts.ownerKey, scrollQuiescent]);
 
   // Mount + load + play the rented lane. Rails are ALWAYS muted.
   useEffect(() => {
