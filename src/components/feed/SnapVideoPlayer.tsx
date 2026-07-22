@@ -102,7 +102,7 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
           hlsUrl={hlsUrl}
           posterUrl={thumbnailUrl}
           isActive={isActive && !userPaused}
-          muted={true}
+          muted={isSessionMuted}
           objectFit={objectFit}
           onFirstFrame={onFirstFrameReady}
         />
