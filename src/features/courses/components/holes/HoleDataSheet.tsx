@@ -831,9 +831,10 @@ const ExpandedRow: React.FC<{
   return (
     <div
       style={{
-        padding: '14px 12px 12px',
-        background: '#FAFBFC',
+        padding: '14px 4px 12px',
+        background: 'rgba(15,23,42,0.03)',
         borderBottom: `1px solid ${INK_08}`,
+
         display: 'flex',
         flexDirection: 'column',
         gap: 14,
