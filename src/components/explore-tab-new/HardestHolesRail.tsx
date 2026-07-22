@@ -118,7 +118,7 @@ function HardestCard({
 
 export function HardestHolesRail({ region }: { region?: string | null } = {}) {
   const { data } = useHardestHoles();
-  const filtered = (data ?? []).filter((h) => (region == null ? true : h.region === region));
+  const filtered = (data ?? []).filter((h) => matchesRegionScope(region, h.country, h.region));
   const rows = filtered.slice(0, MAX);
   if (rows.length === 0) return null;
   return (
