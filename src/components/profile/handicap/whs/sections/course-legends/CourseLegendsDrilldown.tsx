@@ -30,6 +30,7 @@ import { WindowToggle } from './CourseLegendsSection';
 import { ChampionsCourseSearch } from './drilldown/ChampionsCourseSearch';
 import { ChampionsInfoCarousel } from './drilldown/ChampionsInfoCarousel';
 import { formatGapFromChampion } from './drilldown/_shared/helpers';
+import { chaseCtaLine } from './drilldown/_shared/duelTension';
 import { CHAMPIONS_ORDER_90D, CHAMPIONS_ORDER_ALL_TIME } from './_shared/championsOrder';
 import { useProBenchmarks } from '@/hooks/gam/useProBenchmarks';
 import { pickProBenchmark, PRO_BAND_BASES, type ProBandBase } from './drilldown/_shared/proBenchmark';
