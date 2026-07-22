@@ -45,7 +45,6 @@ interface Props {
  * Preserves per-tier semantics (to-par red, ACE/ALBATROSS chip, rank-1 watermark).
  */
 export function FeatListRow({ row, tier, onTap, index = 0, mode, isLast = false }: Props) {
-  void mode;
   const holder = useMemo(() => formatHolderName(row.holder_name), [row.holder_name]);
   const rank = index + 1;
   const isRecordsRow = tier === 'records';
@@ -91,8 +90,9 @@ export function FeatListRow({ row, tier, onTap, index = 0, mode, isLast = false 
         }
       : undefined;
 
-  // Ranked tiers (records, birdie_hauls) get rank chip 1–3 + watermark on rank 1.
-  const isRanked = isRecordsRow || isBirdieHauls;
+  // Rank number asserts "ranked #N by achievement" — only correct on all-time
+  // leaderboards. Records are recency-only; birdie hauls rank only in alltime.
+  const isRanked = isBirdieHauls && mode === 'alltime';
   const showWatermark = isRanked && rank === 1;
 
   // Subline: course name (+ date for non-ranked latest views).
