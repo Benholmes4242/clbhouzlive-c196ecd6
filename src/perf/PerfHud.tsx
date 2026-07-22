@@ -193,6 +193,12 @@ function VideoBlock() {
         {' · '}evict {evicts}
         {' · '}abrΔ {abr}
       </div>
+      <div style={{ color: '#94a3b8' }}>
+        {(() => {
+          const s = scrollActivity.getStats();
+          return `scroll defer ${s.deferredAcquires}/${s.releasedAcquires} · bursts ${s.scrollBursts}`;
+        })()}
+      </div>
     </div>
   );
 }
