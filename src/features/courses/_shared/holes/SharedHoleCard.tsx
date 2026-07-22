@@ -40,12 +40,7 @@ function avgColorFor(avg: number): string {
   return INK_MUTE;
 }
 
-// fmtAvg: |v|<0.005 -> \u00B10.00; v>0 -> "+"+2dp; v<0 -> \u2212+abs 2dp.
-function fmtAvg(v: number): string {
-  if (Math.abs(v) < 0.005) return `\u00B10.00`;
-  if (v > 0) return `+${v.toFixed(2)}`;
-  return `\u2212${Math.abs(v).toFixed(2)}`;
-}
+import { fmtToPar as fmtAvg } from './formatToPar';
 
 // Diverging difficulty bar: centre baseline; UNDER par grows LEFT (red),
 // OVER par grows RIGHT (blue). Each side width = min(1, |avg|/maxAbs) * 50%.
