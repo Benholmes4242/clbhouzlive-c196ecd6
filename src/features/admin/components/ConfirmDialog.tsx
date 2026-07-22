@@ -36,7 +36,13 @@ export default function ConfirmDialog({
 
   if (!open) return null;
 
-  const matches = !requireText || typed.trim() === requireText.trim();
+  // Normalise curly apostrophes (U+2018/U+2019) to straight (U+0027) on both
+  // sides, then compare case-insensitively so iOS "smart punctuation" and
+  // display-name capitalisation never block a valid confirmation.
+  const normalise = (s: string) =>
+    s.replace(/[\u2018\u2019]/g, "'").trim().toLowerCase();
+  const matches = !requireText || normalise(typed) === normalise(requireText);
+
   const confirmBg = tone === 'danger' ? t.danger : t.ink;
 
   return (
@@ -81,6 +87,10 @@ export default function ConfirmDialog({
               autoFocus
               value={typed}
               onChange={e => setTyped(e.target.value)}
+              autoCapitalize="off"
+              autoCorrect="off"
+              autoComplete="off"
+              spellCheck={false}
               style={{
                 padding: '10px 12px',
                 borderRadius: t.radius.md,
@@ -89,6 +99,7 @@ export default function ConfirmDialog({
                 color: t.ink, fontSize: 14, outline: 'none',
               }}
             />
+
           </div>
         )}
 
