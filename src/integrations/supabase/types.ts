@@ -18193,8 +18193,10 @@ export type Database = {
       get_my_nemesis_holes: {
         Args: { p_limit?: number; p_user_id: string }
         Returns: {
+          course_country: string
           course_id: string
           course_name: string
+          course_region: string
           field_avg_over: number
           hole_no: number
           my_avg_over: number
@@ -19138,8 +19140,10 @@ export type Database = {
           challenger_name: string
           challenger_user_id: string
           challenger_value: number
+          course_country: string
           course_id: string
           course_name: string
+          course_region: string
           gap: number
           my_value: number
           threat_score: number
@@ -19752,7 +19756,9 @@ export type Database = {
         Args: { p_limit?: number; p_user_id?: string }
         Returns: {
           avatar_url: string
+          course_country: string
           course_id: string
+          course_region: string
           display_name: string
           event_key: string
           event_type: string
