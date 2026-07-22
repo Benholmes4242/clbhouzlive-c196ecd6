@@ -68,13 +68,16 @@ function scrollToDefendRail() {
 
 export function YourStandingStrip({ userId }: Props) {
   const navigate = useNavigate();
-  const { data: crowns } = useCrownsHeld(userId);
-  const { data: profile } = useUserProfile(userId);
-  const { data: connection } = useWhsConnection(userId);
-  const { data: badges = [] } = useUserAchievements(userId);
-  const { data: legends = [] } = useUserTopLegends(userId, { limit: 500, maxRank: 1 });
+  const { data: crowns, isLoading: crownsLoading } = useCrownsHeld(userId);
+  const { data: profile, isLoading: profileLoading } = useUserProfile(userId);
+  const { data: connection, isLoading: connLoading } = useWhsConnection(userId);
+  const { data: badges = [], isLoading: badgesLoading } = useUserAchievements(userId);
+  const { data: legends = [], isLoading: legendsLoading } = useUserTopLegends(userId, { limit: 500, maxRank: 1 });
   const { data: streaks = [] } = useMyStreaks(!!userId);
   const hemi = useViewerHemisphere();
+
+  const isLoading = crownsLoading || profileLoading || connLoading || badgesLoading || legendsLoading;
+
 
   const medals = useMemo(() => {
     const a = badges.map(normalizeBadge);
