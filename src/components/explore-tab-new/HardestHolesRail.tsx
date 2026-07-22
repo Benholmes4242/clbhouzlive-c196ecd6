@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useHardestHoles } from '@/hooks/gam/useHardestHoles';
 import { SectionHead } from './SectionHead';
-import { regionScopePhrase } from './regionScope';
+import { regionScopePhrase, matchesRegionScope } from './regionScope';
 import { FONT } from './gamingLightTokens';
 
 const RED = '#D2222D';
@@ -118,7 +118,7 @@ function HardestCard({
 
 export function HardestHolesRail({ region }: { region?: string | null } = {}) {
   const { data } = useHardestHoles();
-  const filtered = (data ?? []).filter((h) => (region == null ? true : h.region === region));
+  const filtered = (data ?? []).filter((h) => matchesRegionScope(region, h.country, h.region));
   const rows = filtered.slice(0, MAX);
   if (rows.length === 0) return null;
   return (
