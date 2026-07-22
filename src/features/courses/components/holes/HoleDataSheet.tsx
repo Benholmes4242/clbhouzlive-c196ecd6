@@ -480,13 +480,17 @@ const StoryTiles: React.FC<{
     );
   }
   if (easiest) {
+    const underPar = easiest.avg_to_par < -0.005;
+    const sentence = underPar
+      ? `Plays to ${fmtToPar(easiest.avg_to_par)} — the field's happy place.`
+      : "The friendliest hole on the card — the field's happy place.";
     communityTiles.push(
       <StoryTile
         key="best"
         emoji="🎯"
         cap="BEST CHANCE"
         headline={`Hole ${easiest.hole_no}`}
-        sentence="The friendliest hole on the card — the field's happy place."
+        sentence={sentence}
       />,
     );
   }
