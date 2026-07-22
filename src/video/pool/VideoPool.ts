@@ -64,8 +64,12 @@ interface PoolEntry {
   video: HTMLVideoElement;
   hls: Hls | null;               // null on Safari native-HLS path
   currentUrl: string | null;
+  currentSurface: PoolSurface | null;
   slotKey: string | null;        // null when idle
   lastUsed: number;
+  acquiredAt: number;            // for first-frame telemetry
+  ttffReported: boolean;
+  stallHandlerBound: boolean;
 }
 
 const originOf = (u: string): string => {
@@ -75,6 +79,8 @@ const originOf = (u: string): string => {
 class VideoPoolImpl {
   private entries: PoolEntry[] = [];
   private initialized = false;
+  private activePrewarms = 0;
+  private static readonly PREWARM_BUDGET = 2;
 
   private ensureInit() {
     if (this.initialized || typeof document === 'undefined') return;
@@ -92,25 +98,47 @@ class VideoPoolImpl {
       video.style.position = 'absolute';
       video.style.inset = '0';
 
-      this.entries.push({
+      const entry: PoolEntry = {
         id: `pool-${i}`,
         video,
         hls: null,
         currentUrl: null,
+        currentSurface: null,
         slotKey: null,
         lastUsed: 0,
-      });
+        acquiredAt: 0,
+        ttffReported: false,
+        stallHandlerBound: false,
+      };
+      this.bindMediaTelemetry(entry);
+      this.entries.push(entry);
     }
     this.initialized = true;
     logBootEvent('VIDEO_POOL_INIT', { size: POOL_SIZE });
     videoDebug('pool', 'pool initialized', { size: POOL_SIZE });
   }
 
+  private bindMediaTelemetry(entry: PoolEntry) {
+    if (entry.stallHandlerBound) return;
+    const onLoaded = () => {
+      if (entry.ttffReported || !entry.acquiredAt) return;
+      entry.ttffReported = true;
+      const ms = Math.round(performance.now() - entry.acquiredAt);
+      emitVideoTelemetry('video.first_frame_ms', { ms, id: entry.id });
+    };
+    const onWaiting = () => {
+      emitVideoTelemetry('video.stall', { id: entry.id, t: entry.video.currentTime });
+    };
+    entry.video.addEventListener('loadeddata', onLoaded);
+    entry.video.addEventListener('waiting', onWaiting);
+    entry.stallHandlerBound = true;
+  }
+
   /**
    * Get a warm <video> element pointed at `hlsUrl`. Caller must appendChild
    * the returned element into their container.
    */
-  acquire(slotKey: string, hlsUrl: string): HTMLVideoElement {
+  acquire(slotKey: string, hlsUrl: string, surface: PoolSurface = 'inline'): HTMLVideoElement {
     this.ensureInit();
     const t0 = performance.now();
 
@@ -118,8 +146,10 @@ class VideoPoolImpl {
     let entry = this.entries.find(e => e.slotKey === slotKey);
     if (entry) {
       entry.lastUsed = performance.now();
-      if (entry.currentUrl !== hlsUrl) {
-        this.attachSource(entry, hlsUrl);
+      if (entry.currentUrl !== hlsUrl || entry.currentSurface !== surface) {
+        entry.acquiredAt = performance.now();
+        entry.ttffReported = false;
+        this.attachSource(entry, hlsUrl, surface);
       }
       videoDebug('pool', 'acquire (same-slot reuse)', { slotKey, id: entry.id, ms: +(performance.now() - t0).toFixed(1) });
       return entry.video;
@@ -130,6 +160,11 @@ class VideoPoolImpl {
     if (entry) {
       entry.slotKey = slotKey;
       entry.lastUsed = performance.now();
+      // If surface changed (inline→fullscreen), reconfigure but keep buffer.
+      if (entry.currentSurface !== surface) {
+        this.reconfigureLevels(entry, surface);
+        entry.currentSurface = surface;
+      }
       videoDebug('pool', 'acquire (warm hit)', { slotKey, id: entry.id, ms: +(performance.now() - t0).toFixed(1) });
       return entry.video;
     }
@@ -139,12 +174,15 @@ class VideoPoolImpl {
     if (!entry) {
       // 4. Fully saturated — LRU steal from oldest slot.
       entry = [...this.entries].sort((a, b) => a.lastUsed - b.lastUsed)[0];
+      emitVideoTelemetry('video.pool_evict', { evicted: entry.slotKey, id: entry.id });
       videoDebug('pool', 'acquire (LRU evict)', { slotKey, evicted: entry.slotKey, id: entry.id });
     }
 
     entry.slotKey = slotKey;
     entry.lastUsed = performance.now();
-    this.attachSource(entry, hlsUrl);
+    entry.acquiredAt = performance.now();
+    entry.ttffReported = false;
+    this.attachSource(entry, hlsUrl, surface);
     videoDebug('pool', 'acquire (cold)', { slotKey, id: entry.id, ms: +(performance.now() - t0).toFixed(1) });
     return entry.video;
   }
@@ -158,9 +196,52 @@ class VideoPoolImpl {
     videoDebug('pool', 'release', { slotKey, id: entry.id });
   }
 
-  private attachSource(entry: PoolEntry, hlsUrl: string) {
+  /**
+   * Pre-warm an idle pool entry with a manifest so a subsequent acquire is
+   * a warm hit. No-op if all entries are in use, if the URL is already
+   * loaded anywhere, or if concurrent prewarms exceed budget.
+   */
+  prewarm(hlsUrl: string, surface: PoolSurface = 'inline') {
+    this.ensureInit();
+    if (!hlsUrl) return;
+    if (this.activePrewarms >= VideoPoolImpl.PREWARM_BUDGET) return;
+    // Already loaded somewhere — nothing to do.
+    if (this.entries.some(e => e.currentUrl === hlsUrl)) return;
+    // Need an idle entry that isn't the LRU-hottest one (leave headroom).
+    const idle = this.entries.filter(e => e.slotKey === null)
+      .sort((a, b) => a.lastUsed - b.lastUsed);
+    const entry = idle[0];
+    if (!entry) return;
+    this.activePrewarms += 1;
+    try {
+      this.attachSource(entry, hlsUrl, surface);
+      emitVideoTelemetry('video.pool_prewarm', { id: entry.id });
+      videoDebug('pool', 'prewarm', { id: entry.id, url: hlsUrl });
+    } finally {
+      // Decrement on next tick — attachSource is sync but network is async.
+      setTimeout(() => { this.activePrewarms = Math.max(0, this.activePrewarms - 1); }, 500);
+    }
+  }
+
+  private reconfigureLevels(entry: PoolEntry, surface: PoolSurface) {
+    if (!entry.hls) return;
+    // Cheap surface-aware tweak that doesn't require reattach.
+    try {
+      const cfg = configFor(surface);
+      // Only mutate runtime-safe fields.
+      if (typeof cfg.maxBufferLength === 'number') {
+        (entry.hls.config as HlsConfig).maxBufferLength = cfg.maxBufferLength;
+      }
+      if (typeof cfg.maxMaxBufferLength === 'number') {
+        (entry.hls.config as HlsConfig).maxMaxBufferLength = cfg.maxMaxBufferLength;
+      }
+    } catch { /* ignore */ }
+  }
+
+  private attachSource(entry: PoolEntry, hlsUrl: string, surface: PoolSurface) {
     const prevUrl = entry.currentUrl;
     const sameOrigin = prevUrl && originOf(prevUrl) === originOf(hlsUrl);
+    entry.currentSurface = surface;
 
     // Native HLS (Safari) — just set src.
     if (!Hls.isSupported()) {
@@ -174,39 +255,46 @@ class VideoPoolImpl {
       return;
     }
 
-    // hls.js path — try to reuse the instance across same-origin swaps.
+    // hls.js path — reuse the instance across same-origin swaps.
+    // Do NOT re-attachMedia; loadSource on an attached instance is enough.
     if (entry.hls && sameOrigin) {
       try {
+        this.reconfigureLevels(entry, surface);
         entry.hls.loadSource(hlsUrl);
         entry.currentUrl = hlsUrl;
-        videoDebug('pool', 'hls loadSource swap', { id: entry.id });
+        videoDebug('pool', 'hls loadSource swap', { id: entry.id, surface });
         return;
       } catch (err) {
         videoDebug('pool', 'hls loadSource failed → rebuild', { id: entry.id, err: String(err) });
       }
     }
 
-    // Rebuild HLS.
+    // Rebuild HLS with surface-tuned config.
     if (entry.hls) {
       try { entry.hls.destroy(); } catch { /* ignore */ }
       unregisterHlsForDebug(entry.id);
       entry.hls = null;
     }
-    const hls = new Hls({ enableWorker: true, lowLatencyMode: false });
+    const hls = new Hls(configFor(surface));
+    hls.on(Hls.Events.LEVEL_SWITCHED, (_evt, data) => {
+      emitVideoTelemetry('video.abr_switch', { id: entry.id, level: data?.level });
+    });
     hls.loadSource(hlsUrl);
     hls.attachMedia(entry.video);
     entry.hls = hls;
     entry.currentUrl = hlsUrl;
     registerHlsForDebug(entry.id, hls, entry.video);
-    videoDebug('pool', 'hls attached (fresh)', { id: entry.id });
+    videoDebug('pool', 'hls attached (fresh)', { id: entry.id, surface });
   }
 
   getStats() {
     return {
       size: this.entries.length,
       inUse: this.entries.filter(e => e.slotKey !== null).length,
+      warmUrls: this.entries.filter(e => e.currentUrl !== null).length,
     };
   }
 }
 
 export const VideoPool = new VideoPoolImpl();
+
