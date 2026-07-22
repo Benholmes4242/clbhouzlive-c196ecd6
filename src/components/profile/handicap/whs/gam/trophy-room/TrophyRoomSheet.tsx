@@ -247,6 +247,7 @@ const CourseLegendsCollapsibleSection: React.FC<{
 }> = ({ items, onOpenGroup, revealToken = 0 }) => {
   const [expanded, setExpanded] = useState(false);
   const rootRef = React.useRef<HTMLDivElement>(null);
+  const [minHeight, setMinHeight] = useState<number | undefined>(undefined);
   const groups = useMemo(() => groupLegendsByCourse(items), [items]);
   const totalRecords = groups.reduce((n, g) => n + g.records.length, 0);
 
@@ -254,11 +255,12 @@ const CourseLegendsCollapsibleSection: React.FC<{
     if (!revealToken) return;
     setExpanded(true);
     // Wait a frame for the grid to mount, then scroll the section so its
-    // header sits near the top of the sheet's scroll container.
+    // header sits at the top of the sheet's scroll container. Pad the
+    // section's own min-height so there's room to scroll it up to the top
+    // even when it sits at the end of the document.
     const id = requestAnimationFrame(() => {
       const node = rootRef.current;
       if (!node) return;
-      // Find the nearest scrollable ancestor (the sheet body).
       let scroller: HTMLElement | null = node.parentElement;
       while (scroller) {
         const style = window.getComputedStyle(scroller);
@@ -266,8 +268,16 @@ const CourseLegendsCollapsibleSection: React.FC<{
         scroller = scroller.parentElement;
       }
       if (scroller) {
-        const top = node.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop - 8;
-        scroller.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+        // Reserve enough height so the header can sit near the top.
+        setMinHeight(scroller.clientHeight);
+        requestAnimationFrame(() => {
+          const top =
+            node.getBoundingClientRect().top -
+            scroller!.getBoundingClientRect().top +
+            scroller!.scrollTop -
+            8;
+          scroller!.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+        });
       } else {
         node.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
@@ -277,7 +287,7 @@ const CourseLegendsCollapsibleSection: React.FC<{
 
 
   return (
-    <div ref={rootRef}>
+    <div ref={rootRef} style={minHeight ? { minHeight } : undefined}>
       <button
         type="button"
         onClick={() => setExpanded((v) => !v)}
@@ -334,6 +344,7 @@ const CourseLegendsCollapsibleSection: React.FC<{
       )}
     </div>
   );
+
 };
 
 
