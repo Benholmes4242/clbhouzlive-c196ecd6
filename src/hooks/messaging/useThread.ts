@@ -107,8 +107,14 @@ export function useThread(conversationId: string | null) {
         p_as_actor_id: actor.actorId,
         p_up_to_message_id: newestId,
       })
-      .then(() => undefined, () => undefined);
-  }, [conversationId, actor, newestId]);
+      .then(({ error }) => {
+        if (error) return;
+        // Force the actor-scoped DM unread recount so header / tile badges drop
+        // immediately. Safe alongside the realtime subscription below: refetch
+        // is idempotent and the RPC itself is actor-scoped.
+        queryClient.invalidateQueries({ queryKey: ['actor-unread-counts'] });
+      });
+  }, [conversationId, actor, newestId, queryClient]);
 
   // Cache mutators bound to this conversationId (convenience for consumers).
   const insertOptimistic = useCallback(
