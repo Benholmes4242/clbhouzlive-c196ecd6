@@ -9,7 +9,7 @@
  * This component is the ONLY consumer of `VideoPool.acquire/release`.
  */
 import React, { useEffect, useRef, useState } from 'react';
-import { VideoPool } from './VideoPool';
+import { VideoPool, type PoolSurface } from './VideoPool';
 
 interface VideoSlotProps {
   slotKey: string;             // stable id, e.g. postId
@@ -18,6 +18,7 @@ interface VideoSlotProps {
   isActive: boolean;
   muted: boolean;
   objectFit?: 'cover' | 'contain';
+  surface?: PoolSurface;       // 'inline' (default) or 'fullscreen'
   onFirstFrame?: () => void;
 }
 
@@ -28,6 +29,7 @@ export const VideoSlot: React.FC<VideoSlotProps> = ({
   isActive,
   muted,
   objectFit = 'cover',
+  surface = 'inline',
   onFirstFrame,
 }) => {
   const hostRef = useRef<HTMLDivElement>(null);
@@ -38,7 +40,7 @@ export const VideoSlot: React.FC<VideoSlotProps> = ({
     const host = hostRef.current;
     if (!host) return;
 
-    const video = VideoPool.acquire(slotKey, hlsUrl);
+    const video = VideoPool.acquire(slotKey, hlsUrl, surface);
     video.style.objectFit = objectFit;
     if (host.firstChild !== video) host.appendChild(video);
 
@@ -56,7 +58,7 @@ export const VideoSlot: React.FC<VideoSlotProps> = ({
       // Do NOT remove the element from `host` — React will unmount `host`
       // itself and the pooled <video> continues living in the pool.
     };
-  }, [slotKey, hlsUrl, objectFit, onFirstFrame]);
+  }, [slotKey, hlsUrl, objectFit, surface, onFirstFrame]);
 
   // Drive play/pause + mute from props on whichever element currently owns this slot.
   useEffect(() => {
