@@ -13,9 +13,14 @@ const SEASON_YEAR = now.getMonth() >= 10 ? now.getFullYear() + 1 : now.getFullYe
 const RUN_START = new Date().toISOString();
 
 // Delete rows for a tour that this run did NOT refresh (departed players,
-// renamed players). Only ever called after a successful non-zero upsert so a
-// broken site can never wipe a tour's table.
-async function sweepStaleRows(supabase, tourCode, seasonYear, label) {
+// renamed players). Threshold-guarded: a partial or garbage parse must never
+// authorise deleting a healthy table, so the sweep refuses to run unless this
+// run upserted at least minExpected rows.
+async function sweepStaleRows(supabase, tourCode, seasonYear, label, upsertedCount, minExpected) {
+  if (upsertedCount < minExpected) {
+    console.log(`[${label}] Skipping stale sweep - only ${upsertedCount} rows upserted (min ${minExpected}); existing data kept`);
+    return;
+  }
   const { count, error } = await supabase
     .from('tour_season_rankings')
     .delete({ count: 'exact' })
@@ -113,6 +118,11 @@ async function scrape() {
 
     console.log(`[R2D Scraper] Parsed ${players.length} players`);
 
+    if (players.length > 0 && players.length < 100) {
+      console.error(`[R2D Scraper] Suspiciously few players parsed (${players.length}) - site likely served a bad variant. Failing the run; stale sweep will not fire.`);
+      process.exitCode = 1;
+    }
+
     if (players.length === 0) {
       throw new Error('No players parsed — HTML structure may have changed');
     }
@@ -164,9 +174,7 @@ async function scrape() {
       console.error('[R2D Scraper] Wrote ZERO rows despite parsing players - failing the run');
       process.exitCode = 1;
     }
-    if (upserted > 0) {
-      await sweepStaleRows(supabase, TOUR_CODE, SEASON_YEAR, 'R2D Scraper');
-    }
+    await sweepStaleRows(supabase, TOUR_CODE, SEASON_YEAR, 'R2D Scraper', upserted, 100);
 
     // Run player matching RPC
     const { error: matchError } = await supabase.rpc('match_tour_rankings_players');
@@ -310,9 +318,7 @@ async function scrapeLPGA(browser, supabase) {
       }
     }
     console.log(`[LPGA Scraper] Upserted ${upserted} players`);
-    if (upserted > 0) {
-      await sweepStaleRows(supabase, LPGA_TOUR_CODE, LPGA_SEASON_YEAR, 'LPGA Scraper');
-    }
+    await sweepStaleRows(supabase, LPGA_TOUR_CODE, LPGA_SEASON_YEAR, 'LPGA Scraper', upserted, 100);
 
     // Match LPGA players
     const { data: lpgaPlayers } = await supabase
@@ -477,9 +483,7 @@ async function scrapeKornFerry(browser, supabase) {
       }
     }
     console.log(`[KFT Scraper] Upserted ${upserted} players`);
-    if (upserted > 0) {
-      await sweepStaleRows(supabase, KFT_TOUR_CODE, KFT_SEASON_YEAR, 'KFT Scraper');
-    }
+    await sweepStaleRows(supabase, KFT_TOUR_CODE, KFT_SEASON_YEAR, 'KFT Scraper', upserted, 100);
 
     // Match players to sr_players
     const { data: kftPlayers } = await supabase
@@ -660,9 +664,7 @@ async function scrapeLIV(browser, supabase) {
       }
     }
     console.log(`[LIV Scraper] Upserted ${upserted} players`);
-    if (upserted > 0) {
-      await sweepStaleRows(supabase, LIV_TOUR_CODE, LIV_SEASON_YEAR, 'LIV Scraper');
-    }
+    await sweepStaleRows(supabase, LIV_TOUR_CODE, LIV_SEASON_YEAR, 'LIV Scraper', upserted, 30);
 
     // Match to sr_players
     const { data: livPlayers } = await supabase
