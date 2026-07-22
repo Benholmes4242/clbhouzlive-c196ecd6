@@ -26,6 +26,8 @@ import { AcesAlbatrossesPodium } from './AcesAlbatrossesPodium';
 import { EaglesLedger } from './EaglesLedger';
 import { BirdieHaulsLedger } from './BirdieHaulsLedger';
 import { ToughestIndex } from './ToughestIndex';
+import { HardestHolesRail } from './HardestHolesRail';
+import { NemesisHolesStrip } from './NemesisHolesStrip';
 import { SectionHead } from './SectionHead';
 
 import { AlmanacEmptyCard } from './AlmanacEmptyCard';
@@ -164,6 +166,12 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
 
         {/* Toughest courses index */}
         <ToughestIndex />
+
+        {/* Hardest holes rail — siblings to the sternest tests: courses then holes */}
+        <HardestHolesRail />
+
+        {/* Your nemesis holes — signed-in + WHS gated */}
+        <NemesisHolesStrip userId={userId} />
 
 
 
