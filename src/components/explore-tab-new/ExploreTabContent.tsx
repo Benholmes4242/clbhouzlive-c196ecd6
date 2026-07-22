@@ -44,7 +44,7 @@ import { SLATE_50 } from '@/features/courses/_shared/tokens';
 import { SPACE } from '@/lib/spacing';
 import { useScorecardOpener } from './useScorecardOpener';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
-import { matchesRailRegionScope, regionScopePhrase } from './regionScope';
+import { regionScopePhrase } from './regionScope';
 import { EmptyScopeCard } from './EmptyScopeCard';
 
 interface ExploreTabContentProps {
@@ -233,15 +233,7 @@ function LegendarySection({
   onLeaderTap: (uid: string) => void;
 }) {
   const { data } = useRegionFeats(region, 'legendary');
-  const rows = useMemo(
-    () =>
-      (data ?? []).filter((r) =>
-        // reuse the compact rail region key predicate
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        matchesRailRegionScope(region, (r as any).region),
-      ),
-    [data, region],
-  );
+  const rows = useMemo(() => data ?? [], [data]);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetMetric, setSheetMetric] = useState<'aces' | 'albatrosses'>('aces');
 

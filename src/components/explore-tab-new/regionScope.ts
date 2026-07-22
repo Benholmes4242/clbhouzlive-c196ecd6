@@ -86,6 +86,12 @@ export function matchesRegionScope(
  * Companion predicate for cached rail payloads that carry the compact
  * region key vocabulary ('gbi' | 'usa' | 'europe' | 'row') per item.
  * Worldwide passes through everything.
+ *
+ * NOTE: Only the hardest/easiest holes rail should still use this — its
+ * payload genuinely carries per-item region/country. The leader rails
+ * (records / birdie_hauls / honours / eagles) fetch a per-region cache
+ * row directly via slugToCacheRegion — do not filter their payloads
+ * with this predicate.
  */
 export function matchesRailRegionScope(
   slug: string | null | undefined,
@@ -95,4 +101,26 @@ export function matchesRailRegionScope(
   if (key === 'all') return true;
   const mapped = railKeyToRegionKey(itemRailKey);
   return mapped === key;
+}
+
+/**
+ * Map the Discover region toggle slug to the compact cache-region key
+ * used inside `discover_rail_cache.rail_key` (e.g. `records:gbi`,
+ * `feats:usa:eagles`). Single source of truth for that mapping.
+ */
+export function slugToCacheRegion(slug: string | null | undefined): string {
+  switch (slug) {
+    case 'uk-ireland':
+      return 'gbi';
+    case 'usa':
+      return 'usa';
+    case 'continental-europe':
+      return 'europe';
+    case 'rest-of-world':
+      return 'row';
+    case null:
+    case undefined:
+    default:
+      return 'worldwide';
+  }
 }

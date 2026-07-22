@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { slugToCacheRegion } from '../regionScope';
 
 export type FeatTier = 'legendary' | 'eagles' | 'birdie_hauls' | 'records';
 
@@ -27,11 +28,9 @@ export interface FeatRow {
   course_par?: number | null;
 }
 
-// Rails now carry per-item region keys inside their worldwide payload.
-// The client fetches the worldwide row and filters via `matchesRailRegionScope`.
-export function toCacheRegion(_r: string | null): string {
-  return 'worldwide';
-}
+// Rails are bucketed server-side into per-region cache rows. The client
+// picks the correct row via `slugToCacheRegion` (see regionScope.ts) — no
+// per-item client-side filtering.
 
 export type RecordsMode = 'latest' | 'alltime';
 
@@ -105,7 +104,7 @@ export function useRegionFeats(
   tier: FeatTier,
   mode: RecordsMode = 'latest',
 ) {
-  const cacheRegion = toCacheRegion(region);
+  const cacheRegion = slugToCacheRegion(region);
   const isAllTime = mode === 'alltime';
   const railKey =
     tier === 'records'
@@ -118,7 +117,7 @@ export function useRegionFeats(
 
 
   return useQuery<FeatRow[]>({
-    queryKey: ['discover-rail-cache', railKey],
+    queryKey: ['discover-rail-cache', tier, cacheRegion, mode, railKey],
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
@@ -149,10 +148,10 @@ export interface LegendaryLeaderRow {
 }
 
 export function useRegionLegendaryLeaders(region: string | null) {
-  const cacheRegion = toCacheRegion(region);
+  const cacheRegion = slugToCacheRegion(region);
   const railKey = `legendary_leaders:${cacheRegion}`;
   return useQuery<LegendaryLeaderRow[]>({
-    queryKey: ['discover-rail-cache', railKey],
+    queryKey: ['discover-rail-cache', 'legendary_leaders', cacheRegion, railKey],
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
@@ -182,10 +181,10 @@ export interface EagleLeaderRow {
 }
 
 export function useRegionEagleLeaders(region: string | null) {
-  const cacheRegion = toCacheRegion(region);
+  const cacheRegion = slugToCacheRegion(region);
   const railKey = `eagle_leaders:${cacheRegion}`;
   return useQuery<EagleLeaderRow[]>({
-    queryKey: ['discover-rail-cache', railKey],
+    queryKey: ['discover-rail-cache', 'eagle_leaders', cacheRegion, railKey],
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
