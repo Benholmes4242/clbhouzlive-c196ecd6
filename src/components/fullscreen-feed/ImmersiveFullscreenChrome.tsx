@@ -101,6 +101,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
 }: Props) {
   const navigate = useNavigate();
   const carouselPositions = useClubhouseStore((s) => s.carouselPositions);
+  const activePagerIdx = useFullscreenFeedStore((s) => s.activePagerIdx);
   const isTournamentCardActive = useClubhouseStore((s) => s.isTournamentCardActive);
   const isAudioMuted = useSessionAudio((s) => s.isMuted);
 
@@ -110,7 +111,10 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   }, []);
 
   const activePost = posts[activeIndex] ?? null;
-  const carouselSlide = carouselPositions.get(activeIndex) ?? 0;
+  // Prefer the FullscreenMediaPager's live index (updates on every scroll
+  // settle inside the fullscreen viewer). Fall back to the clubhouseStore
+  // position map (which lags horizontal swipes in fullscreen).
+  const carouselSlide = activePagerIdx ?? carouselPositions.get(activeIndex) ?? 0;
   const mediaCount = activePost?.mediaItems?.length ?? 0;
 
 
