@@ -12,6 +12,7 @@ import { VideoEngine, type LaneId } from './VideoEngine';
 import { RailLanePool } from './railLanePool';
 import { isPerfEnabled } from '@/perf/navTiming';
 import { vperfStart, vperfMark, vperfArmLane, vperfNextId } from '@/perf/vperf';
+import { scrollActivity } from './scrollActivity';
 
 // Session-wide hasHls resolve-rate counter, flushed to console at 25-item
 // intervals when the DBG pill is on. Lets us confirm gate #2 (hlsUrl null
@@ -57,6 +58,7 @@ export function useRailLane(opts: UseRailLaneOptions): UseRailLaneResult {
   const hostRef = useRef<HTMLDivElement>(null);
   const [laneId, setLaneId] = useState<LaneId | null>(null);
   const [ready, setReady] = useState(false);
+  // scrollActivity used imperatively inside acquire effect (see below).
 
   const eligible = !!(opts.active && opts.hlsUrl && opts.ownerKey);
 
@@ -78,24 +80,48 @@ export function useRailLane(opts: UseRailLaneOptions): UseRailLaneResult {
   useEffect(() => {
     if (!eligible) return;
     const key = opts.ownerKey as string;
-    const lane = RailLanePool.acquire(key);
-    setLaneId(lane);
-    setReady(false);
-    if (lane == null) {
-      // No acquisition happened — no owner record to release. Still subscribe
-      // in case another owner unpins and we get notified via a later touch.
-      return;
+    let released = false;
+    let unsub: (() => void) | null = null;
+    let unsubQuiescent: (() => void) | null = null;
+
+    const doAcquire = () => {
+      if (released) return;
+      const lane = RailLanePool.acquire(key);
+      setLaneId(lane);
+      setReady(false);
+      if (lane == null) return;
+      unsub = RailLanePool.subscribe(key, (l) => {
+        setLaneId(l);
+        if (l == null) setReady(false);
+      });
+    };
+
+    // Scroll-dampener: while mid-flick, defer FRESH acquisition until the
+    // scroll settles. Owners that already hold a lane are unaffected —
+    // this only gates the first-time acquire on this ownerKey.
+    if (scrollActivity.isQuiescent()) {
+      doAcquire();
+    } else {
+      unsubQuiescent = scrollActivity.subscribe(() => {
+        if (scrollActivity.isQuiescent()) {
+          unsubQuiescent?.();
+          unsubQuiescent = null;
+          doAcquire();
+        }
+      });
     }
-    const unsub = RailLanePool.subscribe(key, (l) => {
-      setLaneId(l);
-      if (l == null) setReady(false);
-    });
+
     return () => {
-      unsub();
+      released = true;
+      unsubQuiescent?.();
+      unsub?.();
       RailLanePool.release(key);
       setLaneId(null);
       setReady(false);
     };
+    // scrollQuiescent intentionally NOT in deps — we subscribe imperatively
+    // so a mid-scroll flip does not tear down an in-flight/held lane.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eligible, opts.ownerKey]);
 
   // Mount + load + play the rented lane. Rails are ALWAYS muted.
