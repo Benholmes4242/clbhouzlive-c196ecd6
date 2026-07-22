@@ -5,6 +5,8 @@ export interface HardestHoleRow {
   course_id: string;
   course_name: string;
   course_image: string | null;
+  region: string | null;
+  country: string | null;
   hole_no: number;
   par: number;
   plays_to: number;

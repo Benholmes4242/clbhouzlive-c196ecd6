@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useNotableDifficultCourses } from '@/hooks/gam/useNotableDifficultCourses';
 import { SectionHead } from './SectionHead';
+import { regionScopePhrase } from './regionScope';
 import { FONT } from './gamingLightTokens';
 
 const RED = '#D2222D';
@@ -109,13 +110,13 @@ function ToughCard({
   );
 }
 
-export function ToughestIndex() {
+export function ToughestIndex({ region }: { region?: string | null } = {}) {
   const { data } = useNotableDifficultCourses();
   const rows = (data ?? []).slice(0, MAX);
   if (rows.length === 0) return null;
   return (
     <section style={{ marginTop: 32 }}>
-      <SectionHead overline="Course index" title="The sternest tests" />
+      <SectionHead overline="Official WHS" title={`Toughest courses ${regionScopePhrase(region)}`} />
       <div
         className="flex overflow-x-auto scrollbar-hide"
         style={{ padding: '0 16px', gap: 10 }}
