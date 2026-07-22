@@ -375,14 +375,23 @@ const HandicapPage: React.FC = () => {
   }, [searchParams, setSearchParams]);
 
   // Deep-link: ?gam=trophies opens the Trophy Room sheet once on arrival.
+  // Defer the emit until after GamMount has mounted and subscribed. The
+  // early-return `loading` / `!ownerUserId` branches above unmount the
+  // subscriber, and a synchronous emit here would fire into the void on
+  // first render. Gate on `ownerUserId` (mount precondition) AND use a
+  // microtask so subscription effects run first in the same commit.
   useEffect(() => {
-    if (searchParams.get('gam') === 'trophies') {
+    if (searchParams.get('gam') !== 'trophies') return;
+    if (!ownerUserId) return;
+    const id = setTimeout(() => {
       openGamAchievements();
       const next = new URLSearchParams(searchParams);
       next.delete('gam');
       setSearchParams(next, { replace: true });
-    }
-  }, [searchParams, setSearchParams]);
+    }, 0);
+    return () => clearTimeout(id);
+  }, [searchParams, setSearchParams, ownerUserId]);
+
 
   // Fetch profile for greeting/title.
   // Uses display_name when available (extracts first name), falls back to username.
