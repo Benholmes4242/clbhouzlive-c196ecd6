@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { slugToCacheRegion } from '../regionScope';
 
 export type FeatTier = 'legendary' | 'eagles' | 'birdie_hauls' | 'records';
 
