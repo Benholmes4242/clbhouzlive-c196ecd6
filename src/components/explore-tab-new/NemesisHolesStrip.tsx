@@ -36,7 +36,7 @@ export function NemesisHolesStrip({ userId }: Props) {
 
   return (
     <section style={{ marginTop: 32 }}>
-      <SectionHead overline="Personal" title="Your nemesis holes" />
+      <SectionHead overline="Personal statistics" title="Your nemesis holes" />
       <div
         style={{
           display: 'flex',

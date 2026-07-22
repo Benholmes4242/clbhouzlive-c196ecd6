@@ -165,12 +165,12 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
         />
 
         {/* Toughest courses index */}
-        <ToughestIndex />
+        <ToughestIndex region={activeRegion} />
 
         {/* Hardest holes rail — siblings to the sternest tests: courses then holes */}
-        <HardestHolesRail />
+        <HardestHolesRail region={activeRegion} />
 
-        {/* Your nemesis holes — signed-in + WHS gated */}
+        {/* Your nemesis holes — signed-in + WHS gated; never region-scoped */}
         <NemesisHolesStrip userId={userId} />
 
 
