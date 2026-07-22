@@ -10,6 +10,8 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { SPACE } from '@/lib/spacing';
 
 import { FONT } from './gamingLightTokens';
+import { matchesRegionScope, regionScopePhrase } from './regionScope';
+import { EmptyScopeCard } from './EmptyScopeCard';
 
 const INK = '#0F172A';
 const MUTE = 'rgba(15,23,42,0.55)';
