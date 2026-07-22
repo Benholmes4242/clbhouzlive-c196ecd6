@@ -32,6 +32,8 @@ const CARD_HEIGHT = 168;
 interface DefendRow {
   course_id: string;
   course_name: string;
+  course_country?: string | null;
+  course_region?: string | null;
   category: string;
   category_label: string | null;
   my_value: number;
