@@ -2,7 +2,7 @@
  * HoleDataSheet — "The Club Guide" (Holes tab v2).
  *
  * Full presentational replacement of the previous data-sheet build:
- * editorial header → skyline → story tiles → notation key →
+ * editorial header → skyline → story tiles →
  * "Hole by hole" list (By hole | Toughest first) with expandable card
  * distributions. No SQL/RPC changes.
  */
