@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { adminTheme as t } from '../theme';
+import { confirmMatches } from '@/lib/text/confirmMatch';
 
 interface Props {
   open: boolean;
