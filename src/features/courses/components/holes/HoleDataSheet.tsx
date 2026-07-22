@@ -322,7 +322,8 @@ const SkylineCard: React.FC<{
   }
 
   return (
-    <div style={{ ...CARD, padding: 14, marginBottom: 12 }}>
+    <div style={{ ...SECTION_RULE, padding: '20px 4px 4px', marginTop: 12 }}>
+
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 }}>
         <div>
           <div style={CAP}>Difficulty profile</div>
