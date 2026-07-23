@@ -404,8 +404,19 @@ function renderPush(r: OutboxRow, badgeMap: Map<string, any>) {
                 course_id: p.course_id },
       };
     }
+    case "weekly_digest": {
+      // Producer (gam-weekly-digest) has already composed truthful copy per
+      // its conditional-line rules. We forward as-is and only supply defaults
+      // if the payload is malformed — no numeric fallback that could render
+      // "0" or "undefined" per the digest brief.
+      const title = typeof p.title === 'string' && p.title.trim() ? p.title.trim() : `Your week in golf`;
+      const body  = typeof p.body  === 'string' && p.body.trim()  ? p.body.trim()  : `Open the app to see your week.`;
+      const data  = (p.data && typeof p.data === 'object') ? p.data : { route: '/handicap' };
+      return { title, body, data };
+    }
     default:
       return null;
+
 
   }
 }
