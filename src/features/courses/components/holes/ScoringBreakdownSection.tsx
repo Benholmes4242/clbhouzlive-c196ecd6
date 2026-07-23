@@ -492,11 +492,11 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
               t('courses:holes.scoringBreakdown.s3Sub'),
             )}
             {(() => {
-              const MIN_H = 26;
-              const MAX_H = 78;
+              const MIN_H = 52;
+              const MAX_H = 92;
               const neutralAll = spread < 1.5;
               return (
-                <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, height: 130 }}>
+                <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, height: 150 }}>
                   {thirdSums.map((v, i) => {
                     const barH = MIN_H + (v / maxThird) * (MAX_H - MIN_H);
                     const color = neutralAll
