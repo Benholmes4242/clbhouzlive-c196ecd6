@@ -114,6 +114,8 @@
       "doublesLabel": "DOUBLES",
       "nDoubles_one": "{{count}} double",
       "nDoubles_other": "{{count}} doubles",
+      "nHoles_one": "{{count}} hole",
+      "nHoles_other": "{{count}} holes",
       "holeOne": "Hole {{n}}",
       "holeMany": "Holes {{list}}",
       "third1": "Holes 1-6",
