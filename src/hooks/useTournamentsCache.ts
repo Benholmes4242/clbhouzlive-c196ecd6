@@ -37,7 +37,9 @@ export interface CachedTournament {
   currency: string | null;
   venue_id: string | null;
   venue_name: string | null;
+  venue_course_name: string | null;
   venue_city: string | null;
+  venue_state: string | null;
   venue_country: string | null;
   venue_par: number | null;
   venue_yardage: number | null;
