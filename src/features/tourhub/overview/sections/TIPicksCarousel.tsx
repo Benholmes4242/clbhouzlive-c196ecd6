@@ -460,6 +460,10 @@ function CaseSheet({
 
   const { data: stats, isLoading: statsLoading } = useSinglePlayerStatistics(pick.playerId);
   const { data: results, isLoading: resultsLoading } = usePlayerResults(pick.playerId, 5);
+  const currentYear = new Date().getUTCFullYear();
+  const { data: seasonSummary } = useSeasonResultsSummary(pick.playerId, currentYear);
+  const winsValue = typeof stats?.wins === 'number' ? stats.wins : seasonSummary?.wins;
+  const top10sValue = typeof stats?.top_10s === 'number' ? stats.top_10s : seasonSummary?.top10s;
 
   const header = (
     <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 4 }}>
