@@ -94,6 +94,7 @@ export const WhsHandicapTab: React.FC<Props> = ({ userId, ownerFirstName = null 
           }
         }}
         onDecline={declineHandicapChip}
+        layout="embedded"
       />
     );
   }
