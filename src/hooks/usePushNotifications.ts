@@ -21,23 +21,51 @@ export function usePushNotifications(): UsePushNotificationsResult {
 
   useEffect(() => {
     if (!user) return;
-    const os = getOS();
-    if (!os) { setState('unavailable'); setIsLoading(false); return; }
+    let cancelled = false;
 
-    (async () => {
+    const loadDeviceState = async () => {
       try {
         const { data } = await supabase
           .from('user_push_devices')
           .select('enabled')
           .eq('user_id', user.id)
           .maybeSingle();
+        if (cancelled) return;
         setState(data ? (data.enabled ? 'enabled' : 'disabled') : 'enabled');
       } catch {
-        setState('unknown');
+        if (!cancelled) setState('unknown');
       } finally {
-        setIsLoading(false);
+        if (!cancelled) setIsLoading(false);
       }
-    })();
+    };
+
+    if (getOS()) {
+      loadDeviceState();
+      return () => { cancelled = true; };
+    }
+
+    // Bridge not present yet — mark unavailable, but re-check when Median
+    // signals readiness. Preserve any existing handler.
+    setState('unavailable');
+    setIsLoading(false);
+
+    const w = window as any;
+    const prev = w.median_library_ready;
+    w.median_library_ready = () => {
+      if (typeof prev === 'function') {
+        try { prev(); } catch { /* noop */ }
+      }
+      if (cancelled) return;
+      if (getOS()) {
+        setIsLoading(true);
+        loadDeviceState();
+      }
+    };
+
+    return () => {
+      cancelled = true;
+      w.median_library_ready = prev;
+    };
   }, [user]);
 
   const enable = useCallback(async (): Promise<boolean> => {
