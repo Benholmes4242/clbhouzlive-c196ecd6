@@ -206,18 +206,23 @@ serve(async (req) => {
 
     console.log(`[generate-predictions] Processing: ${tournament.name}`);
 
-    // Determine ranking source (Rolex for LPGA, WGR otherwise) via the season's tour_name.
-    let rankingType: 'wgr' | 'rolex' = 'wgr';
+    // Determine ranking source per tour:
+    //   PGA / DP World / etc. -> sr_world_rankings (OWGR)
+    //   LPGA                  -> tour_season_rankings (CME points, tour_code='lpga')
+    //     Sportradar does not ship a Rolex feed; CME is the same board the
+    //     LPGA players tab uses, so Tournament Intelligence stays consistent.
+    let rankingSource: 'owgr' | 'cme_lpga' = 'owgr';
+    let tourNameLower = '';
     if (tournament.season_id) {
       const { data: seasonRow } = await supabase
         .from('sr_seasons')
         .select('tour_name')
         .eq('id', tournament.season_id)
         .maybeSingle();
-      const tourName = String(seasonRow?.tour_name ?? '').toLowerCase();
-      if (tourName === 'lpga') rankingType = 'rolex';
+      tourNameLower = String(seasonRow?.tour_name ?? '').toLowerCase();
+      if (tourNameLower === 'lpga') rankingSource = 'cme_lpga';
     }
-    console.log(`[generate-predictions] Ranking source: ${rankingType}`);
+    console.log(`[generate-predictions] Ranking source: ${rankingSource}`);
 
     // Check for existing predictions (unless force regenerate)
     if (!forceRegenerate) {
