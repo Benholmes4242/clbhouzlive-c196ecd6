@@ -206,6 +206,19 @@ serve(async (req) => {
 
     console.log(`[generate-predictions] Processing: ${tournament.name}`);
 
+    // Determine ranking source (Rolex for LPGA, WGR otherwise) via the season's tour_name.
+    let rankingType: 'wgr' | 'rolex' = 'wgr';
+    if (tournament.season_id) {
+      const { data: seasonRow } = await supabase
+        .from('sr_seasons')
+        .select('tour_name')
+        .eq('id', tournament.season_id)
+        .maybeSingle();
+      const tourName = String(seasonRow?.tour_name ?? '').toLowerCase();
+      if (tourName === 'lpga') rankingType = 'rolex';
+    }
+    console.log(`[generate-predictions] Ranking source: ${rankingType}`);
+
     // Check for existing predictions (unless force regenerate)
     if (!forceRegenerate) {
       const { data: existing } = await supabase
