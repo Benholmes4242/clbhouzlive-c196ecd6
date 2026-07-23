@@ -18179,6 +18179,7 @@ export type Database = {
       get_my_course_scoring_breakdown: {
         Args: { p_golf_course_id: string }
         Returns: {
+          avg_gross: number
           holes: Json
           rounds: number
           total_over_par: number
