@@ -17,7 +17,7 @@ import { MotionConfig } from "framer-motion";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { queryPersister, shouldPersistQuery, PERSIST_MAX_AGE_MS } from "@/lib/queryPersister";
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { BrowserRouter, Routes, Route, useLocation, Navigate, useParams, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, Navigate, useParams, useNavigate, type Location as RouterLocation } from "react-router-dom";
 import { setNavigateRef, appNavigate } from '@/utils/navigation';
 import ScrollToTop from '@/components/ScrollToTop';
 import { ScrollRestoration } from '@/components/ScrollRestoration';
@@ -306,10 +306,28 @@ const EchoV2Redirect: React.FC = () => {
   const { chatId } = useParams<{ chatId: string }>();
   return <Navigate to={chatId ? `/echo/${chatId}` : '/echo'} replace />;
 };
-const RateCourseV2Redirect: React.FC = () => {
-  const { courseId } = useParams<{ courseId: string }>();
-  return <Navigate to={courseId ? `/courses/${courseId}/rate` : '/'} replace />;
-};
+const ReviewComposerRoute: React.FC = () => (
+  <Suspense fallback={<RateCoursePageSkeleton />}>
+    <ReviewComposerV2 />
+  </Suspense>
+);
+
+const ReviewComposerOverlay: React.FC = () => (
+  <div
+    role="dialog"
+    aria-modal="true"
+    style={{
+      position: 'fixed',
+      inset: 0,
+      zIndex: 10000,
+      overflowY: 'auto',
+      WebkitOverflowScrolling: 'touch',
+      background: '#F8FAFC',
+    }}
+  >
+    <ReviewComposerRoute />
+  </div>
+);
 
 
 const BusinessDirectoryPage = lazy(() => import("./pages/BusinessDirectoryPage"));
@@ -356,10 +374,11 @@ import { useSilentSwitchHint } from '@/audio/useSilentSwitchHint';
 // Component to set navigate ref for use outside React components
 function NavigationRefSetter() {
   const navigate = useNavigate();
+  const location = useLocation();
   
   useEffect(() => {
-    setNavigateRef(navigate);
-  }, [navigate]);
+    setNavigateRef(navigate, location);
+  }, [navigate, location]);
 
   return null;
 }
@@ -368,7 +387,7 @@ function NavigationRefSetter() {
 function AppRoutes() {
   usePageTracking();
   const location = useLocation();
-  const state = location.state as { backgroundLocation?: Location; fromHub?: boolean; fromVideo?: boolean } | null;
+  const state = location.state as { backgroundLocation?: RouterLocation; fromHub?: boolean; fromVideo?: boolean } | null;
   const { shouldHideHeader } = useModalContext();
 
   // [VPERF] page tag — feeds every emit so metrics are comparable across pages.
@@ -479,8 +498,8 @@ function AppRoutes() {
         <Route path="/explore" element={<Navigate to="/courses?tab=discover" replace />} />
         <Route path="/courses" element={<Suspense fallback={<CoursesHubSkeleton />}><CoursesWrapped /></Suspense>} />
         <Route path="/courses/:courseId" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseDetailPage /></Suspense>} />
-        <Route path="/courses/:courseId/rate" element={<Suspense fallback={<RateCoursePageSkeleton />}><ReviewComposerV2 /></Suspense>} />
-        <Route path="/rate-course-v2/:courseId" element={<RateCourseV2Redirect />} />
+        <Route path="/courses/:courseId/rate" element={<ReviewComposerRoute />} />
+        <Route path="/rate-course-v2/:courseId" element={<ReviewComposerRoute />} />
         <Route path="/post-v2" element={<Suspense fallback={<GenericPageSkeleton />}><PostV2Page /></Suspense>} />
         
         {/* /courses/:courseId/share-review/:reviewId removed in PR-5 Part 2 — orphan surface. ReviewWizard shares inline. */}
@@ -623,6 +642,13 @@ function AppRoutes() {
 
         <Route path="*" element={<Suspense fallback={<GenericPageSkeleton />}><NotFound /></Suspense>} />
       </Routes>
+
+      {state?.backgroundLocation && (
+        <Routes>
+          <Route path="/courses/:courseId/rate" element={<ReviewComposerOverlay />} />
+          <Route path="/rate-course-v2/:courseId" element={<ReviewComposerOverlay />} />
+        </Routes>
+      )}
 
 
       

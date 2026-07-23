@@ -13,6 +13,7 @@ export const ScrollRestoration = () => {
   const location = useLocation();
   const navigationType = useNavigationType();
   const prevPathnameRef = useRef<string | null>(null);
+  const hasBackgroundLocation = Boolean((location.state as { backgroundLocation?: unknown } | null)?.backgroundLocation);
 
   // Save current scroll position before leaving
   useEffect(() => {
@@ -24,6 +25,8 @@ export const ScrollRestoration = () => {
 
   // Restore or reset scroll based on navigation type
   useEffect(() => {
+    if (hasBackgroundLocation) return;
+
     const currentPath = location.pathname + location.search;
     const pathnameChanged = prevPathnameRef.current !== location.pathname;
     prevPathnameRef.current = location.pathname;
@@ -50,7 +53,7 @@ export const ScrollRestoration = () => {
       scrollPositions.delete(currentPath);
       scrollPageToTop('instant');
     }
-  }, [location, navigationType]);
+  }, [location, navigationType, hasBackgroundLocation]);
 
 
   return null;

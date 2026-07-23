@@ -3,25 +3,37 @@
  * Allows toast actions and other non-component code to trigger React Router navigation
  */
 
-import { NavigateFunction } from 'react-router-dom';
+import { NavigateFunction, type Location, type NavigateOptions } from 'react-router-dom';
 
 let navigateRef: NavigateFunction | null = null;
+let currentLocationRef: Location | null = null;
+
+function isReviewWizardRoute(to: string): boolean {
+  const path = to.startsWith('http') ? new URL(to).pathname : to.split('?')[0].split('#')[0];
+  return path.startsWith('/rate-course-v2/') || /^\/courses\/[^/]+\/rate\/?$/.test(path);
+}
 
 /**
  * Store the navigate function reference from React Router
  * Called once during app initialization
  */
-export function setNavigateRef(navigate: NavigateFunction) {
+export function setNavigateRef(navigate: NavigateFunction, location?: Location) {
   navigateRef = navigate;
+  if (location) currentLocationRef = location;
 }
 
 /**
  * Navigate to a path using React Router (SPA navigation)
  * Falls back to window.location.href if navigate ref not set
  */
-export function appNavigate(to: string) {
+export function appNavigate(to: string, options?: NavigateOptions) {
   if (navigateRef) {
-    navigateRef(to);
+    const navigateOptions = options ?? (
+      isReviewWizardRoute(to) && currentLocationRef && !isReviewWizardRoute(currentLocationRef.pathname)
+        ? { state: { backgroundLocation: currentLocationRef } }
+        : undefined
+    );
+    navigateRef(to, navigateOptions);
   } else {
     // Fallback to window.location if ref not set
     console.warn('[appNavigate] Navigate ref not set, using window.location');
