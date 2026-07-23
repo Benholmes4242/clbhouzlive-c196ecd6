@@ -1,69 +1,54 @@
+## What's actually broken
 
-# Phase 1 — Video Element Pool + Reparenting
+I audited the data behind the "The Case For …" sheet. Two independent failures conspire to blank the tiles for every non-PGA tour:
 
-Kill the class of bugs where each feed card mounts its own `<video>` on scroll, causing black flashes, poster re-shows, and mid-swipe stutters as HLS re-parses and first-frame re-decodes.
+**1. Season Snapshot (Wins / Top 10s / SG Total)** reads `sr_player_statistics`. That table has:
+- 312 rows for PGA players
+- **0 rows for LPGA**
+- 21 for PGAD, 8 for EURO, 1 for LIV
 
-## The core idea
+So Anna Nordqvist's tiles blank out even though her Last-5 shows a 3rd and a T7 — the results are in `sr_leaderboards`, not `sr_player_statistics`.
 
-Today every card owns its own `<video>` element. When you scroll, the outgoing card unmounts (destroys `<video>` + HLS instance + decoded frames) and the incoming card mounts fresh — racing `play()` against manifest parse and first-frame decode. That's the jump.
+**2. World Rank** reads `sr_world_rankings`. That table only holds OWGR (men). LPGA needs the Rolex Women's World Golf Rankings, which we've never synced.
 
-Instead: keep a small pool of `<video>` elements alive at the app root. When a card becomes active, we **move** (reparent via `appendChild`) a pooled video into the card's slot, hand it the new source, and keep the decoded frame buffer alive across the swap. No teardown, no re-decode, no black flash.
+## Fix, in two parts
 
-This is the exact mechanism Instagram, TikTok, and the Twitter/X feed use.
+### Part A — Results-derived fallback for Wins / Top 10s (all tours)
 
-## Scope (Phase 1 only)
+The Case sheet already loads `usePlayerResults` for Last-5. Extend the Season Snapshot tiles to:
 
-Just the pool + reparenting infrastructure and Clubhouse feed integration. Profile feeds and fullscreen viewer come in Phase 2 once the pool is proven.
+1. Prefer `sr_player_statistics.wins` / `top_10s` when present (keeps PGA numbers exactly as today).
+2. Fall back to counting the player's completed events in the **current season year** from `sr_leaderboards`:
+   - Wins = `position === 1` (ignore `status in ('cut','WD','DQ')`)
+   - Top 10s = `position !== null && position <= 10` (same status filter)
+3. Extend the results fetch to the full season (not just the last 5) so counts are accurate. Add a `useSeasonResultsSummary(playerId, year)` hook that queries `sr_leaderboards` filtered by tournament season year and returns `{ wins, top10s, starts }`.
+4. SG Total stays "—" when stats are absent — it isn't recoverable from finish positions and we don't fake numbers.
 
-## Deliverables
+This fixes every non-PGA tour immediately, without any new sync.
 
-1. **`VideoPool` singleton** (`src/video/pool/VideoPool.ts`)
-   - Maintains N=3 pre-created `<video>` elements (current + prev + next in a snap feed)
-   - `acquire(slotKey, hlsUrl, posterUrl)` → returns a live `<video>` element already attached to HLS
-   - `release(slotKey)` → returns element to pool, keeps HLS attached (warm)
-   - LRU eviction when pool is full — evicted element detaches HLS
-   - Elements never unmount from the DOM tree; only reparent between slot containers
+### Part B — Per-tour World Rank (Rolex for LPGA, WGR otherwise)
 
-2. **`VideoSlot` component** (`src/video/pool/VideoSlot.tsx`)
-   - Replaces the direct `<video>` render inside `SnapVideoPlayer` / feed cards
-   - Renders an empty container `<div ref>` and a poster `<img>` underneath
-   - On mount: `pool.acquire()` → `container.appendChild(video)`
-   - On unmount: `pool.release()` (video stays alive in the pool, just detached from container)
-   - Poster cross-fade only clears once the pooled video fires `loadeddata` (first frame committed)
+1. **Schema**: add `ranking_type text` (`'wgr'` | `'rolex'`) to `sr_world_rankings`, backfill existing rows to `'wgr'`, and change the unique constraint to `(player_id, ranking_date, ranking_type)`.
+2. **Sync**: extend `sportradar-sync` `rankings` action to accept a `rankingType` param and hit the correct endpoint:
+   - `wgr` → `/players/wgr/{year}/rankings.json` (unchanged)
+   - `rolex` → `/players/rolex/{year}/rankings.json`
+   Stamp each row with the correct `ranking_type`.
+3. **Cron**: add a scheduled Rolex sync alongside the existing WGR sync.
+4. **generate-predictions**: pick the ranking source per tournament — LPGA tour ⇒ `rolex`, otherwise ⇒ `wgr` — when building `rankingsMap`. Everything downstream (`worldRanking`, `priorRank`, momentum) then reflects the right board.
+5. Kick off a one-off Rolex sync for 2026 so the LPGA sheets aren't blank until the next scheduled run.
 
-3. **HLS attachment lives with the pooled element**, not the slot
-   - `VideoPool` owns the `Hls` instance per pooled `<video>`
-   - Source swap uses `hls.loadSource(newUrl)` on the same instance where possible (same origin) — avoids the full teardown that causes today's re-parse stall
-   - Existing `registerHlsForDebug` registry keeps working, keyed by pool slot id
+### Files touched
 
-4. **Wire Clubhouse feed only**
-   - `SnapVideoPlayer.tsx` (currently a poster-only chassis after the teardown) gains a `<VideoSlot>` render path
-   - Feature-flagged behind `VITE_VIDEO_POOL` — flag ON in dev, OFF in prod until we verify
-   - Profile pages, fullscreen viewer, watch grids: **unchanged** in Phase 1
+- `src/features/tourhub/overview/sections/TIPicksCarousel.tsx` — read derived wins/top10s.
+- `src/features/tourhub/hooks/useSeasonResultsSummary.ts` — new hook.
+- `supabase/migrations/*` — add `ranking_type` + unique index change.
+- `supabase/functions/sportradar-sync/index.ts` — Rolex branch + `rankingType` param.
+- `supabase/functions/generate-predictions/index.ts` — per-tour ranking source; bump `PREDICTION_LOGIC_VERSION` to 3.
+- `src/features/tourhub/lib/predictionLogicVersion.ts` — bump to 3.
+- Cron entry for Rolex weekly sync.
 
-5. **Instrumentation**
-   - Log `pool.acquire` / `pool.release` / `pool.evict` to `bootTimeline` + `videoDebug('pool', ...)`
-   - New PerfHud row: "Pool: 3/3 warm, last acquire 12ms"
-   - So Phase 2 has real data to tune the pool size against.
+### Out of scope (flag for later)
 
-## Non-goals (later phases)
+- Ingesting full LPGA player statistics (`sr_player_statistics` for LPGA) — needs a separate season-stats sync path per tour. Once shipped, the Part-A fallback quietly hands over to real stats without any UI change.
 
-- AudioBroker singleton (Phase 2)
-- Commit-on-first-frame poster fade site-wide (Phase 2, mostly free after pool)
-- Neighbor 2-segment prefetch (Phase 3)
-- Profile + fullscreen adoption (Phase 2)
-- Telemetry sampling (Phase 4)
-
-## Technical notes
-
-- Pool size 3 is deliberate: matches SnapFeed's window (prev/current/next). We'll tune with the new PerfHud row.
-- Reparenting a playing `<video>` via `appendChild` is well-supported and does NOT reset playback in Chromium/WebKit — this is the property the pool depends on.
-- HLS.js instance reuse across source swaps is safe when the new URL comes from the same manifest origin (which all our Cloudflare Stream URLs do). If ever mixed, we recycle the whole element.
-- Nothing changes for profile/fullscreen this phase — those still use their existing paths. This keeps blast radius small and lets us prove the mechanic on the busiest surface first.
-
-## Acceptance
-
-- Clubhouse feed swipes forward/back 20 items with no black flash and no poster re-show once a card has been visited
-- No regressions in muted/unmuted state, tap-to-pause, or looping
-- `videoDebug('pool', ...)` shows acquire on first visit, release on scroll-off, and re-acquire on scroll-back within <5ms (no re-parse)
-- Flag OFF path is byte-for-byte identical to today (no behavior change when disabled)
+Confirm and I'll ship all of the above in one pass.
