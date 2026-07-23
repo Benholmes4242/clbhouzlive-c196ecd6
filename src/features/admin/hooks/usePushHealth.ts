@@ -16,7 +16,12 @@ export interface PushHealthQueue {
 export interface PushHealthWatchdog {
   notifications_24h_push_eligible: number;
   queue_rows_24h: number;
+  notifications_60m_push_eligible: number;
+  queue_rows_60m: number;
+  missing_60m: number;
   enqueue_ok: boolean;
+  latest_error: string | null;
+  latest_error_at: string | null;
 }
 
 export interface PushHealthDevices {
@@ -67,7 +72,12 @@ async function fetchPushHealth(): Promise<PushHealthSummary> {
     watchdog: {
       notifications_24h_push_eligible: d?.watchdog?.notifications_24h_push_eligible ?? 0,
       queue_rows_24h: d?.watchdog?.queue_rows_24h ?? 0,
-      enqueue_ok: !!d?.watchdog?.enqueue_ok,
+      notifications_60m_push_eligible: d?.watchdog?.notifications_60m_push_eligible ?? 0,
+      queue_rows_60m: d?.watchdog?.queue_rows_60m ?? 0,
+      missing_60m: d?.watchdog?.missing_60m ?? 0,
+      enqueue_ok: d?.watchdog?.enqueue_ok !== false,
+      latest_error: d?.watchdog?.latest_error ?? null,
+      latest_error_at: d?.watchdog?.latest_error_at ?? null,
     },
     devices: {
       total: d?.devices?.total ?? 0,

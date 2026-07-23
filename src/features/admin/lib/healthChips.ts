@@ -28,8 +28,20 @@ export function computeEchoChip(echo: ReturnType<typeof useEchoEngineHealth>): C
 export function computePushChip(push: ReturnType<typeof usePushHealth>): ChipState {
   if (push.isLoading) return { tone: 'idle', label: 'Push', detail: 'Loading' };
   if (push.isError || !push.data) return { tone: 'warn', label: 'Push', detail: 'Unavailable' };
-  if (push.data.status === 'red') return { tone: 'danger', label: 'Push', detail: 'Failing' };
-  if (push.data.status === 'amber') return { tone: 'warn', label: 'Push', detail: 'Degraded' };
+  const wd = push.data.watchdog;
+  const missing = wd?.missing_60m ?? 0;
+  if (push.data.status === 'red') {
+    if (wd && wd.enqueue_ok === false) {
+      return { tone: 'danger', label: 'Push', detail: 'Not queueing' };
+    }
+    return { tone: 'danger', label: 'Push', detail: 'Failing' };
+  }
+  if (push.data.status === 'amber') {
+    if (missing > 0) {
+      return { tone: 'warn', label: 'Push', detail: `${missing} not queued` };
+    }
+    return { tone: 'warn', label: 'Push', detail: 'Degraded' };
+  }
   return { tone: 'ok', label: 'Push', detail: 'Healthy' };
 }
 
