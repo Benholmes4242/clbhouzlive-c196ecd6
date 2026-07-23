@@ -49,6 +49,15 @@ if (!i18n.isInitialized) {
         lookupLocalStorage: LOCALE_STORAGE_KEY,
         caches: ['localStorage'],
       },
+      // DEV-ONLY: surface missing i18n keys in the console so they don't ship silently.
+      missingKeyHandler: import.meta.env.DEV
+        ? (_lngs, ns, key, fallbackValue) => {
+            if (fallbackValue === key) {
+              // eslint-disable-next-line no-console
+              console.warn(`[i18n missing key] ${ns}:${key}`);
+            }
+          }
+        : undefined,
     })
     .catch(() => {
       // Non-fatal: fallbackLng keeps English rendering.

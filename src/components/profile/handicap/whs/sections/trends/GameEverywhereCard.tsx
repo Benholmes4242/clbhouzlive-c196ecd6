@@ -106,7 +106,7 @@ const Ring: React.FC<{ row: RingRow; color: string; t: (k: string, opts?: any) =
           lineHeight: 1.35,
         }}
       >
-        {t('courses.gameEverywhere.parNs', { n: row.parN })}
+        {t('holes.gameEverywhere.parNs', { n: row.parN })}
       </div>
       <div
         style={{
@@ -117,7 +117,7 @@ const Ring: React.FC<{ row: RingRow; color: string; t: (k: string, opts?: any) =
           marginTop: 2,
         }}
       >
-        {t('courses.gameEverywhere.nHoles', { count: row.data.holes_played })}
+        {t('holes.gameEverywhere.nHoles', { count: row.data.holes_played })}
       </div>
     </div>
   );
@@ -164,27 +164,27 @@ const GameEverywhereBody: React.FC<{ d: ScoringBreakdownAllCourses }> = ({ d }) 
 
   const thirdLabel = (i: number): string =>
     i === 0
-      ? t('courses.gameEverywhere.third1')
+      ? t('holes.gameEverywhere.third1')
       : i === 1
-      ? t('courses.gameEverywhere.third2')
-      : t('courses.gameEverywhere.third3');
+      ? t('holes.gameEverywhere.third2')
+      : t('holes.gameEverywhere.third3');
 
   let s2Sentence = '';
   if (showS2) {
     if (evenSpread) {
-      s2Sentence = t('courses.gameEverywhere.s2SentenceEven');
+      s2Sentence = t('holes.gameEverywhere.s2SentenceEven');
     } else if (worstIdx === 0) {
-      s2Sentence = t('courses.gameEverywhere.s2SentenceEarly', {
+      s2Sentence = t('holes.gameEverywhere.s2SentenceEarly', {
         best: thirdLabel(bestIdx),
         spread: spread.toFixed(1),
       });
     } else if (worstIdx === 1) {
-      s2Sentence = t('courses.gameEverywhere.s2SentenceMiddle', {
+      s2Sentence = t('holes.gameEverywhere.s2SentenceMiddle', {
         best: thirdLabel(bestIdx),
         spread: spread.toFixed(1),
       });
     } else {
-      s2Sentence = t('courses.gameEverywhere.s2SentenceLate', {
+      s2Sentence = t('holes.gameEverywhere.s2SentenceLate', {
         best: thirdLabel(bestIdx),
         spread: spread.toFixed(1),
       });
@@ -225,7 +225,7 @@ const GameEverywhereBody: React.FC<{ d: ScoringBreakdownAllCourses }> = ({ d }) 
             whiteSpace: 'pre-line',
           }}
         >
-          {t('courses.gameEverywhere.headlineUnit')}
+          {t('holes.gameEverywhere.headlineUnit')}
         </span>
       </div>
       <div
@@ -236,7 +236,7 @@ const GameEverywhereBody: React.FC<{ d: ScoringBreakdownAllCourses }> = ({ d }) 
           color: 'var(--hcp-t-40)',
         }}
       >
-        {t('courses.gameEverywhere.builtFrom', {
+        {t('holes.gameEverywhere.builtFrom', {
           count: d.rounds,
           rounds: d.rounds,
           courses: d.courses_played,
@@ -254,10 +254,10 @@ const GameEverywhereBody: React.FC<{ d: ScoringBreakdownAllCourses }> = ({ d }) 
               letterSpacing: '-0.01em',
             }}
           >
-            {t('courses.gameEverywhere.s1Title')}
+            {t('holes.gameEverywhere.s1Title')}
           </div>
           <div style={{ marginTop: 3, fontSize: 12, color: 'var(--hcp-t-60)' }}>
-            {t('courses.gameEverywhere.s1Sub')}
+            {t('holes.gameEverywhere.s1Sub')}
           </div>
           <div style={{ display: 'flex', gap: 6, marginTop: 18 }}>
             {rings.map((row) => (
@@ -274,7 +274,7 @@ const GameEverywhereBody: React.FC<{ d: ScoringBreakdownAllCourses }> = ({ d }) 
                 lineHeight: 1.5,
               }}
             >
-              {t('courses.gameEverywhere.s1Sentence', {
+              {t('holes.gameEverywhere.s1Sentence', {
                 worst: worst.parN,
                 worstAvg: worst.data.avg_over.toFixed(2),
                 best: best.parN,
@@ -297,10 +297,10 @@ const GameEverywhereBody: React.FC<{ d: ScoringBreakdownAllCourses }> = ({ d }) 
               letterSpacing: '-0.01em',
             }}
           >
-            {t('courses.gameEverywhere.s2Title')}
+            {t('holes.gameEverywhere.s2Title')}
           </div>
           <div style={{ marginTop: 3, fontSize: 12, color: 'var(--hcp-t-60)' }}>
-            {t('courses.gameEverywhere.s2Sub')}
+            {t('holes.gameEverywhere.s2Sub')}
           </div>
           <div
             style={{
@@ -393,8 +393,8 @@ export const GameEverywhereCard: React.FC<Props> = ({ readOnly = false }) => {
     return (
       <section style={{ marginTop: 24 }}>
         <DarkSectionHeader
-          eyebrow={t('courses.gameEverywhere.eyebrow')}
-          title={t('courses.gameEverywhere.title')}
+          eyebrow={t('holes.gameEverywhere.eyebrow')}
+          title={t('holes.gameEverywhere.title')}
         />
         <DarkCard>
           <div style={{ padding: 18 }}>
@@ -424,8 +424,8 @@ export const GameEverywhereCard: React.FC<Props> = ({ readOnly = false }) => {
   return (
     <section style={{ marginTop: 24 }}>
       <DarkSectionHeader
-        eyebrow={t('courses.gameEverywhere.eyebrow')}
-        title={t('courses.gameEverywhere.title')}
+        eyebrow={t('holes.gameEverywhere.eyebrow')}
+        title={t('holes.gameEverywhere.title')}
       />
       <DarkCard>
         <GameEverywhereBody d={data} />
