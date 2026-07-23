@@ -268,6 +268,7 @@ export function useUsers() {
       dormant_14d: allUsers.filter(u => isDormant14dPlus(u)).length,
       eg_issues: allUsers.filter(u => hasEgIssue(u, egSet)).length,
       suspended: allUsers.filter(u => isSuspended(u)).length,
+      verified: allUsers.filter(u => u.is_verified).length,
       admin: allUsers.filter(u => !!u.role).length,
     };
 
