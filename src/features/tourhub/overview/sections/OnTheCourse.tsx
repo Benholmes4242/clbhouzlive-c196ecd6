@@ -212,7 +212,7 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                   flexShrink: 0,
                   scrollSnapAlign: 'start',
                   background: V4.surface,
-                  border: `1.5px solid ${AMBER}`,
+                  border: `1px solid ${AMBER}`,
                   boxShadow: V4.cardShadow,
                   borderRadius: 14,
                   padding: '12px 12px 10px',
