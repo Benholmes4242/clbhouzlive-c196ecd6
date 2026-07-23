@@ -13,6 +13,7 @@ import type { MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
 import { formatNumber } from '@/i18n/format';
 import { HoleGlyph, HoleGlyphDefs, type HoleGlyphKind } from './HoleGlyph';
 import { fmtToPar } from '@/features/courses/_shared/holes/formatToPar';
+import { ScoringBreakdownSection } from './ScoringBreakdownSection';
 
 // ── Tokens ────────────────────────────────────────────────────────────
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
