@@ -226,9 +226,6 @@ export const CountryPickerSheet: React.FC<Props> = ({ open, onClose, onSelect })
               <div
                 style={{
                   padding: '18px 20px 8px',
-              <div
-                style={{
-                  padding: '18px 20px 8px',
                   fontSize: 10.5,
                   fontWeight: 800,
                   color: INK_45,
