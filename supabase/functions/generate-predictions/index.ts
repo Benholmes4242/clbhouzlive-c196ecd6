@@ -29,7 +29,7 @@ import type { CourseDNAProfile } from './courseFitCalculator.ts';
 // The client compares ai_predictions.logic_version against its own copy of this
 // number and forces a regeneration when the stored row is older. Keep the client
 // constant in src/features/tourhub/lib/predictionLogicVersion.ts IN SYNC.
-export const PREDICTION_LOGIC_VERSION = 2;
+export const PREDICTION_LOGIC_VERSION = 3;
 
 // =============================================
 // TYPES
