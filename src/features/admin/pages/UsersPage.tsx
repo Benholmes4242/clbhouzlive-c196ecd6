@@ -395,7 +395,7 @@ function Member360Sheet({
   const isLimited = panelRole === 'limited';
   const createRequest = useCreateAdminActionRequest();
 
-  const [confirm, setConfirm] = useState<null | 'suspend' | 'delete' | 'reset'>(null);
+  const [confirm, setConfirm] = useState<null | 'suspend' | 'delete' | 'reset' | 'verify' | 'unverify'>(null);
   const [busy, setBusy] = useState(false);
   const [requestMode, setRequestMode] = useState<null | 'delete' | 'ban' | 'role'>(null);
   const [reqReason, setReqReason] = useState('');
