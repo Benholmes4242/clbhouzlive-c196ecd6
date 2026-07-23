@@ -1316,8 +1316,35 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg) {
   if (newTopUser !== prevTopUser) {
     if (prevTopUser) {
       if (newTopUser) {
+        // Look up taker display name + course name from user_profiles /
+        // golf_courses ONLY. Never read whs_friends/whs_friend_matches — those
+        // hold England Golf PII. Both lookups degrade gracefully to null so
+        // the dispatcher can fall back to generic copy.
+        let takerName: string | null = null;
+        let courseName: string | null = null;
+        try {
+          const { data: takerProfile } = await supabase
+            .from('user_profiles')
+            .select('display_name, username')
+            .eq('id', newTopUser)
+            .maybeSingle();
+          takerName = (takerProfile?.display_name?.trim() || takerProfile?.username?.trim() || null);
+        } catch { /* non-fatal */ }
+        try {
+          const { data: course } = await supabase
+            .from('golf_courses')
+            .select('name')
+            .eq('id', courseId)
+            .maybeSingle();
+          courseName = course?.name?.trim() || null;
+        } catch { /* non-fatal */ }
+
         await enqueueNotification(prevTopUser, "legend_lost", {
-          course_id: courseId, category: cfg.category, taken_by: newTopUser,
+          course_id: courseId,
+          category: cfg.category,
+          taken_by: newTopUser,
+          taker_name: takerName,
+          course_name: courseName,
         });
       }
       // Loser side: their rank-1 count went down — recompute authoritatively.
