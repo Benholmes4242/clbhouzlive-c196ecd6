@@ -41,7 +41,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
 
   const parsed = useMemo(() => {
     if (!data || !Array.isArray(data.holes)) return null;
-    if ((data.rounds ?? 0) < 5) return null;
+    if ((data.rounds ?? 0) < 1) return null;
     const holes = data.holes.filter((h) => (h.rounds_played ?? 0) > 0);
     if (holes.length === 0) return null;
     return { rounds: data.rounds, total: Number(data.total_over_par) || 0, holes };
@@ -67,6 +67,8 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
   if (!parsed) return null;
 
   const { rounds, total, holes } = parsed;
+  const hasInterpretation = rounds >= 5;
+
 
   // Stratum 1: top 5 by shots_over_par desc
   const damaging = [...holes]
@@ -245,13 +247,10 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                 fontWeight: 700,
                 color: INK_60,
                 lineHeight: 1.25,
+                whiteSpace: 'pre-line',
               }}
             >
-              {t('courses:holes.scoringBreakdown.headlineUnit')
-                .split(',')
-                .map((line, i) => (
-                  <div key={i}>{i === 0 ? `${line.trim()},` : line.trim()}</div>
-                ))}
+              {t('courses:holes.scoringBreakdown.headlineUnit')}
             </div>
           </div>
           <div style={{ fontSize: 12.5, fontWeight: 500, color: INK_45, marginTop: 10 }}>
@@ -345,11 +344,27 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
               );
             })}
           </div>
-          <Sentence>{s1Sentence}</Sentence>
+          {hasInterpretation ? (
+            <Sentence>{s1Sentence}</Sentence>
+          ) : (
+            <p
+              style={{
+                margin: 0,
+                marginTop: 13,
+                fontSize: 12.5,
+                fontWeight: 500,
+                color: INK_45,
+                lineHeight: 1.45,
+              }}
+            >
+              {t('courses:holes.scoringBreakdown.moreRoundsHint')}
+            </p>
+          )}
         </div>
 
+
         {/* 3c. Stratum 2 */}
-        <div style={{ padding: '16px', borderBottom: `1px solid ${HAIR}` }}>
+        <div style={{ padding: '16px', borderBottom: hasInterpretation ? `1px solid ${HAIR}` : 'none' }}>
           {stratumHeader(
             t('courses:holes.scoringBreakdown.s2Title'),
             t('courses:holes.scoringBreakdown.s2Sub'),
@@ -421,7 +436,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
           })()}
 
           {/* Projection card — only when doubles-per-round >= 1 and we have an avg gross */}
-          {showProjection && avgGross != null && projected != null && (
+          {hasInterpretation && showProjection && avgGross != null && projected != null && (
             <div
               style={{
                 marginTop: 14,
@@ -527,60 +542,62 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
               </div>
             </>
           )}
-          <Sentence>{s2Sentence}</Sentence>
+          {hasInterpretation && <Sentence>{s2Sentence}</Sentence>}
         </div>
 
-        {/* 3d. Stratum 3 */}
-        <div style={{ padding: '16px' }}>
-          {stratumHeader(
-            t('courses:holes.scoringBreakdown.s3Title'),
-            t('courses:holes.scoringBreakdown.s3Sub'),
-          )}
-          {(() => {
-            const MIN_H = 26;
-            const MAX_H = 78;
-            const neutralAll = spread < 1.5;
-            return (
-              <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, height: 130 }}>
-                {thirdSums.map((v, i) => {
-                  const barH = MIN_H + (v / maxThird) * (MAX_H - MIN_H);
-                  const color = neutralAll
-                    ? 'rgba(15,23,42,0.20)'
-                    : i === worstIdx
-                      ? RED
-                      : 'rgba(232,137,12,0.75)';
-                  return (
-                    <div
-                      key={i}
-                      style={{
-                        flex: 1,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: 6,
-                      }}
-                    >
-                      <div style={{ fontSize: 15.5, fontWeight: 800, color: INK, ...NUM }}>
-                        +{v.toFixed(1)}
-                      </div>
+        {/* 3d. Stratum 3 — interpretation only */}
+        {hasInterpretation && (
+          <div style={{ padding: '16px' }}>
+            {stratumHeader(
+              t('courses:holes.scoringBreakdown.s3Title'),
+              t('courses:holes.scoringBreakdown.s3Sub'),
+            )}
+            {(() => {
+              const MIN_H = 26;
+              const MAX_H = 78;
+              const neutralAll = spread < 1.5;
+              return (
+                <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, height: 130 }}>
+                  {thirdSums.map((v, i) => {
+                    const barH = MIN_H + (v / maxThird) * (MAX_H - MIN_H);
+                    const color = neutralAll
+                      ? 'rgba(15,23,42,0.20)'
+                      : i === worstIdx
+                        ? RED
+                        : 'rgba(232,137,12,0.75)';
+                    return (
                       <div
+                        key={i}
                         style={{
-                          width: '100%',
-                          height: `${barH}%`,
-                          background: color,
-                          borderRadius: '9px 9px 5px 5px',
+                          flex: 1,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          gap: 6,
                         }}
-                      />
-                      <div style={{ width: '100%', height: 2, background: 'rgba(15,23,42,0.10)' }} />
-                      <div style={{ fontSize: 10.5, fontWeight: 800, color: INK_60 }}>{thirdLabels[i]}</div>
-                    </div>
-                  );
-                })}
-              </div>
-            );
-          })()}
-          <Sentence>{s3Sentence}</Sentence>
-        </div>
+                      >
+                        <div style={{ fontSize: 15.5, fontWeight: 800, color: INK, ...NUM }}>
+                          +{v.toFixed(1)}
+                        </div>
+                        <div
+                          style={{
+                            width: '100%',
+                            height: `${barH}%`,
+                            background: color,
+                            borderRadius: '9px 9px 5px 5px',
+                          }}
+                        />
+                        <div style={{ width: '100%', height: 2, background: 'rgba(15,23,42,0.10)' }} />
+                        <div style={{ fontSize: 10.5, fontWeight: 800, color: INK_60 }}>{thirdLabels[i]}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()}
+            <Sentence>{s3Sentence}</Sentence>
+          </div>
+        )}
 
       </div>
     </section>
