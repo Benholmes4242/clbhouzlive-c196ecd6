@@ -245,13 +245,10 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                 fontWeight: 700,
                 color: INK_60,
                 lineHeight: 1.25,
+                whiteSpace: 'pre-line',
               }}
             >
-              {t('courses:holes.scoringBreakdown.headlineUnit')
-                .split(',')
-                .map((line, i) => (
-                  <div key={i}>{i === 0 ? `${line.trim()},` : line.trim()}</div>
-                ))}
+              {t('courses:holes.scoringBreakdown.headlineUnit')}
             </div>
           </div>
           <div style={{ fontSize: 12.5, fontWeight: 500, color: INK_45, marginTop: 10 }}>
