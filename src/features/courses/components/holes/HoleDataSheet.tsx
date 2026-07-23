@@ -192,6 +192,9 @@ export const HoleDataSheet: React.FC<Props> = ({
         missingBirdieHole={missingBirdieHole}
       />
 
+      {/* Scoring breakdown — renders nothing when RPC missing / <5 rounds / no WHS */}
+      <ScoringBreakdownSection golfCourseId={courseId} />
+
       {/* 4. Hole by hole */}
       <section style={{ scrollMarginTop: STICKY_SAFE, display: 'flex', flexDirection: 'column', gap: 8 }}>
         <div
