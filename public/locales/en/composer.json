@@ -14,5 +14,17 @@
     "uploadFailedFallback": "Something went wrong - your post was not published.",
     "uploadingBody": "Uploading - we'll take it from here. You can keep using the app.",
     "uploadingScheduledBody": "Uploading - it'll go out {{when}}."
+  },
+  "emptyState": {
+    "headline": "Put it on the wall",
+    "shareLead": "Share {{phrase}}",
+    "ctaLabel": "Add photos or video",
+    "microcopy": "Up to 10 · photos, video, or both",
+    "phrases": [
+      "that green you just stuck",
+      "the fourball on the first tee",
+      "your card from this morning",
+      "the view from the 18th"
+    ]
   }
 }
