@@ -14,6 +14,7 @@ export interface ScoringBreakdownHole {
 
 export interface ScoringBreakdown {
   rounds: number;
+  complete_rounds: number;
   total_over_par: number;
   avg_gross: number | null;
   holes: ScoringBreakdownHole[];
