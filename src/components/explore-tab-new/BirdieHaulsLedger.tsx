@@ -12,6 +12,9 @@ import { FONT } from './gamingLightTokens';
 import { StatRow } from './StatRow';
 import { regionScopePhrase } from './regionScope';
 import { EmptyScopeCard } from './EmptyScopeCard';
+import { DiscoverYouStripMount } from './DiscoverYouStripMount';
+import { slugToCacheRegion } from './regionScope';
+
 
 const ROWS = 5;
 
