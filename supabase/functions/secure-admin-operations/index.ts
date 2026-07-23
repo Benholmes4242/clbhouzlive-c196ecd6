@@ -42,7 +42,9 @@ type AdminAction =
   | 'unhide_post'
   | 'delete_course'
   | 'change_username'
-  | 'retry_asset_cleanup';
+  | 'retry_asset_cleanup'
+  | 'verify_golfer'
+  | 'unverify_golfer';
 
 interface AdminOperationRequest {
   action: AdminAction;
