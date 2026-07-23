@@ -306,18 +306,6 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
           </span>
           <div style={{ position: 'relative', flexShrink: 0 }}>
             <ChampionsSquircle photoUrl={champion?.photoUrl ?? null} size={38} ringColor={avatarRing} />
-            <div
-              aria-hidden
-              style={{
-                position: 'absolute',
-                top: -7,
-                left: -4,
-                transform: 'rotate(-18deg)',
-                lineHeight: 0,
-              }}
-            >
-              <Crown size={13} fill={GOLD} color={DEEP_AMBER} strokeWidth={2.4} />
-            </div>
           </div>
           <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column' }}>
             <span
