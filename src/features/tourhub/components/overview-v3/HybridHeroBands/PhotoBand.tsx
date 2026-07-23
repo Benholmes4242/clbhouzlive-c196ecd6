@@ -241,25 +241,55 @@ export function PhotoBand({
           </span>
         </div>
 
-        {/* Insight line — italic pulled quote */}
+        {/* Insight line — italic pulled quote (clamped to 2 lines) */}
         {insight && (
-          <div
-            style={{
-              fontFamily: FONT,
-              fontSize: 12.5,
-              fontStyle: 'italic',
-              fontWeight: 400,
-              lineHeight: 1.35,
-              color: 'rgba(255,255,255,0.82)',
-              textShadow: '0 1px 3px rgba(0,0,0,0.55)',
-              maxWidth: '92%',
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-            }}
-          >
-            {insight}
+          <div>
+            <div
+              ref={insightRef}
+              onClick={truncated ? () => setSheetOpen(true) : undefined}
+              style={{
+                fontFamily: FONT,
+                fontSize: 12.5,
+                fontStyle: 'italic',
+                fontWeight: 400,
+                lineHeight: 1.35,
+                color: 'rgba(255,255,255,0.82)',
+                textShadow: '0 1px 3px rgba(0,0,0,0.55)',
+                maxWidth: '92%',
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+                cursor: truncated ? 'pointer' : 'default',
+              }}
+            >
+              {insight}
+            </div>
+            {truncated && (
+              <button
+                type="button"
+                onClick={() => setSheetOpen(true)}
+                aria-expanded={false}
+                aria-haspopup="dialog"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  minHeight: 44,
+                  padding: '10px 0',
+                  marginTop: 5,
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: 9.5,
+                  fontWeight: 800,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  color: 'rgba(255,255,255,0.6)',
+                }}
+              >
+                {t('overview.photoBand.readMore')} {'\u203A'}
+              </button>
+            )}
           </div>
         )}
 
