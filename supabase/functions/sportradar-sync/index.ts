@@ -560,8 +560,9 @@ async function syncWorldRankings(supabase: any, apiKey: string, year: number, ra
         ranking_id: ranking.id,
         ranking_status: ranking.status,
         ranking_date: rankingDate,
+        ranking_type: rankingType,
         raw_data: playerData,
-      }, { onConflict: 'player_id,ranking_date' });
+      }, { onConflict: 'player_id,ranking_date,ranking_type' });
       if (!error) totalRecords++;
     }
   }
