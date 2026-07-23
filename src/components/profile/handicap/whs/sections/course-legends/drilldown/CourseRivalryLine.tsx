@@ -126,7 +126,7 @@ export const CourseRivalryLine: React.FC<Props> = ({ userId, courseId }) => {
               minWidth: 0,
             }}
           >
-            · {data.last_event_desc}
+            {data.last_event_desc}
           </span>
         ) : null}
       </div>
