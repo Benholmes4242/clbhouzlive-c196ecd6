@@ -67,6 +67,8 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
   if (!parsed) return null;
 
   const { rounds, total, holes } = parsed;
+  const hasInterpretation = rounds >= 5;
+
 
   // Stratum 1: top 5 by shots_over_par desc
   const damaging = [...holes]
