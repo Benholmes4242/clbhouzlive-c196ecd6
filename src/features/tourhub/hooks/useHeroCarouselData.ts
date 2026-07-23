@@ -31,7 +31,9 @@ export interface HeroTournament {
   startDate: string;
   endDate: string;
   venueName: string | null;
+  venueCourseName: string | null;
   venueCity: string | null;
+  venueState: string | null;
   venueCountry: string | null;
   venuePar: number | null;
   venueYardage: number | null;
