@@ -69,6 +69,9 @@ export function useActorUnreadCounts() {
     enabled: !!user?.id && availableActors.length > 0,
     staleTime: 10_000,
     refetchInterval: 30_000,
+    // Foreground/tab-focus should refresh badges even if the query is
+    // between its 30s intervals. Per-query only — global default stays off.
+    refetchOnWindowFocus: true,
   });
 
 
