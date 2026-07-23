@@ -139,7 +139,7 @@ Deno.serve(async (req) => {
           result = await syncPlayers(supabase, sportradarApiKey, effectiveTour, effectiveYear);
           break;
         case 'rankings':
-          result = await syncWorldRankings(supabase, sportradarApiKey, effectiveYear);
+          result = await syncWorldRankings(supabase, sportradarApiKey, effectiveYear, rankingType || 'wgr');
           break;
         case 'leaderboard':
           result = await syncLeaderboard(supabase, sportradarApiKey, effectiveTour, effectiveYear, tournamentId);
