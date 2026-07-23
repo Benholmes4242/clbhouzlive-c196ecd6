@@ -236,6 +236,7 @@ export function useUsers() {
       rows = rows.filter(u => hasEgIssue(u, s));
     }
     if (filter === 'suspended') rows = rows.filter(u => isSuspended(u));
+    if (filter === 'verified') rows = rows.filter(u => u.is_verified);
     return rows;
   }, [allUsers, search, filter, activeIds, egIssueIds]);
 
