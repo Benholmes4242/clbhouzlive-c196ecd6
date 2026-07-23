@@ -130,6 +130,10 @@ Deno.serve(async (req) => {
     // Shim so downstream code that referenced `user.id` / `user.email` keeps working.
     const user = { id: targetId, email: targetEmail } as { id: string; email?: string };
     console.log(`[delete-account v4] mode=${mode} user=${targetId}`);
+    const deletedAt = new Date().toISOString();
+    const auditAction = mode === 'admin' ? 'ADMIN_DELETE_ACCOUNT_GDPR' : 'SELF_DELETE_ACCOUNT_GDPR';
+
+
 
 
     // ---------- Double-submit guard ----------
@@ -146,7 +150,7 @@ Deno.serve(async (req) => {
       const twoMinAgo = new Date(Date.now() - 120_000).toISOString();
       const { count } = await admin.from('admin_audit_log')
         .select('id', { count: 'exact', head: true })
-        .eq('action', 'SELF_DELETE_ACCOUNT_GDPR')
+        .eq('action', auditAction)
         .eq('target_user_id', targetId)
         .gte('created_at', twoMinAgo);
       if ((count ?? 0) >= 1) {
@@ -158,12 +162,13 @@ Deno.serve(async (req) => {
     // ---------- Start-marker audit row (returns id we thread through the manifest). ----------
     const { data: auditStart } = await admin.from('admin_audit_log').insert({
       admin_user_id: targetId,
-      action: 'SELF_DELETE_ACCOUNT_GDPR',
+      action: auditAction,
       target_user_id: targetId,
       target_email: user.email,
-      details: { phase: 'started', started_at: deletedAt, version: FUNCTION_VERSION },
+      details: { phase: 'started', started_at: deletedAt, version: FUNCTION_VERSION, mode },
     }).select('id').maybeSingle();
     const deletionAuditId = auditStart?.id ?? crypto.randomUUID();
+
 
     // =========================================================================
     // STEP 1 — ENUMERATE assets while pointers still exist.
