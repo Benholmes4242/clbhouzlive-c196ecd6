@@ -942,6 +942,8 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
           enrichmentStats: {
             playersEnriched: enrichedPlayers.length,
             courseFitCalculated: courseFitScores.size,
+            courseDnaAvailable: !!courseDNA,
+            venueLookupName: tournament.venue_name ?? null,
             venueHistoryCalculated: venueHistoryScores.size,
           },
         },
