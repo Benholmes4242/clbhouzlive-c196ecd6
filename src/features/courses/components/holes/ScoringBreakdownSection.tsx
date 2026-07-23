@@ -354,42 +354,131 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
             t('courses:holes.scoringBreakdown.s2Title'),
             t('courses:holes.scoringBreakdown.s2Sub'),
           )}
-          <div style={{ display: 'flex', gap: 6 }}>
-            {[
-              { pct: pctPar, count: sumPar, label: t('courses:holes.scoringBreakdown.parOrBetter'), color: GREEN, tint: 'rgba(18,161,80,0.10)' },
-              { pct: pctBog, count: sumBog, label: t('courses:holes.scoringBreakdown.bogey'), color: WARN, tint: 'rgba(232,137,12,0.10)' },
-              { pct: pctDbl, count: sumDbl, label: t('courses:holes.scoringBreakdown.doubleOrWorse'), color: RED, tint: 'rgba(229,72,77,0.10)' },
-            ].map((b) => (
+          {(() => {
+            const played = Math.max(1, stratum2Total);
+            const cols = [
+              { key: 'par', v: sumPar, pct: pctPar, label: t('courses:holes.scoringBreakdown.parOrBetter'), color: GREEN, bg: 'rgba(18,161,80,0.10)', fill: 'rgba(18,161,80,0.22)' },
+              { key: 'bog', v: sumBog, pct: pctBog, label: t('courses:holes.scoringBreakdown.bogey'), color: WARN, bg: 'rgba(232,137,12,0.12)', fill: 'rgba(232,137,12,0.26)' },
+              { key: 'dbl', v: sumDbl, pct: pctDbl, label: t('courses:holes.scoringBreakdown.doubleOrWorse'), color: RED, bg: 'rgba(229,72,77,0.10)', fill: 'rgba(229,72,77,0.24)' },
+            ];
+            return (
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+                {cols.map((c) => (
+                  <div key={c.key}>
+                    <div
+                      style={{
+                        height: 72,
+                        background: c.bg,
+                        borderRadius: 12,
+                        position: 'relative',
+                        overflow: 'hidden',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <div
+                        style={{
+                          position: 'absolute',
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          height: `${c.pct}%`,
+                          background: c.fill,
+                        }}
+                      />
+                      <span
+                        style={{
+                          position: 'relative',
+                          fontSize: 20,
+                          fontWeight: 800,
+                          color: c.color,
+                          letterSpacing: '-0.5px',
+                          ...NUM,
+                        }}
+                      >
+                        {c.pct}%
+                      </span>
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 9,
+                        fontWeight: 800,
+                        letterSpacing: '0.5px',
+                        color: INK_45,
+                        textAlign: 'center',
+                        marginTop: 7,
+                        whiteSpace: 'pre-line',
+                        lineHeight: 1.35,
+                      }}
+                    >
+                      {c.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
+
+          {/* Projection card — only when doubles-per-round >= 1 and we have an avg gross */}
+          {showProjection && avgGross != null && projected != null && (
+            <div
+              style={{
+                marginTop: 14,
+                background: 'linear-gradient(160deg,#FFFFFF,#FFF7EC)',
+                border: '1px solid rgba(247,147,30,0.28)',
+                borderRadius: 14,
+                padding: 14,
+              }}
+            >
               <div
-                key={b.label}
                 style={{
-                  flex: Math.max(1, b.count),
-                  minWidth: 40,
-                  height: 44,
-                  borderRadius: 10,
-                  background: b.tint,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  fontSize: 10,
+                  fontWeight: 800,
+                  color: AMBER,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
                 }}
               >
-                <div style={{ fontSize: 15, fontWeight: 800, color: b.color, ...NUM }}>{b.pct}%</div>
+                {t('courses:holes.scoringBreakdown.projectionEyebrow')}
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  flexWrap: 'wrap',
+                  gap: 10,
+                  marginTop: 8,
+                }}
+              >
                 <div
                   style={{
-                    fontSize: 9,
+                    fontSize: 26,
                     fontWeight: 800,
                     color: INK_45,
-                    letterSpacing: '0.06em',
-                    marginTop: 2,
-                    whiteSpace: 'nowrap',
+                    textDecoration: 'line-through',
+                    ...NUM,
                   }}
                 >
-                  {b.label}
+                  {avgGross.toFixed(1)}
+                </div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: INK_45 }}>→</div>
+                <div style={{ fontSize: 36, fontWeight: 800, color: INK, letterSpacing: '-1px', ...NUM }}>
+                  {projected.toFixed(1)}
+                </div>
+                <div style={{ fontSize: 12.5, fontWeight: 800, color: GREEN, ...NUM }}>
+                  {t('courses:holes.scoringBreakdown.projectionShotsSaved', { n: convertible.toFixed(1) })}
                 </div>
               </div>
-            ))}
-          </div>
+              <div style={{ fontSize: 12.5, fontWeight: 500, color: INK_60, marginTop: 8, lineHeight: 1.45 }}>
+                {t('courses:holes.scoringBreakdown.projectionBody', {
+                  avg: avgGross.toFixed(1),
+                  perRound: doublesPR1.toFixed(1),
+                })}
+              </div>
+            </div>
+          )}
+
           {topDoubles.length > 0 && (
             <>
               <div
@@ -405,23 +494,33 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
               >
                 {t('courses:holes.scoringBreakdown.doublesFrom')}
               </div>
-              <div style={{ display: 'flex', gap: 6 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 6 }}>
                 {topDoubles.map((h) => (
                   <div
                     key={h.hole_no}
                     style={{
-                      flex: 1,
                       background: 'rgba(229,72,77,0.06)',
                       borderRadius: 12,
-                      padding: '8px 6px',
+                      padding: '8px 4px',
                       textAlign: 'center',
                     }}
                   >
-                    <div style={{ fontSize: 12.5, fontWeight: 800, color: INK, ...NUM }}>
+                    <div style={{ fontSize: 12, fontWeight: 800, color: INK, lineHeight: 1.15, ...NUM }}>
                       {t('courses:holes.scoringBreakdown.holeN', { n: h.hole_no })}
                     </div>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: RED, marginTop: 2, ...NUM }}>
-                      {t('courses:holes.scoringBreakdown.nDoubles', { count: h.doubles_plus })}
+                    <div style={{ fontSize: 14, fontWeight: 800, color: RED, marginTop: 3, lineHeight: 1, ...NUM }}>
+                      {h.doubles_plus}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 8.5,
+                        fontWeight: 800,
+                        color: INK_45,
+                        letterSpacing: '0.06em',
+                        marginTop: 2,
+                      }}
+                    >
+                      {t('courses:holes.scoringBreakdown.doublesLabel')}
                     </div>
                   </div>
                 ))}
@@ -437,24 +536,52 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
             t('courses:holes.scoringBreakdown.s3Title'),
             t('courses:holes.scoringBreakdown.s3Sub'),
           )}
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, height: 130 }}>
-            {thirdSums.map((v, i) => {
-              const h = Math.max(6, (v / maxThird) * 100);
-              const color =
-                i === worstIdx && spread >= 0.01 ? RED : i === bestIdx ? 'rgba(15,23,42,0.20)' : 'rgba(232,137,12,0.55)';
-              return (
-                <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-                  <div style={{ fontSize: 15.5, fontWeight: 800, color: INK, ...NUM }}>
-                    +{v.toFixed(1)}
-                  </div>
-                  <div style={{ width: '100%', height: `${h}%`, background: color, borderRadius: '9px 9px 5px 5px' }} />
-                  <div style={{ fontSize: 10.5, fontWeight: 800, color: INK_60 }}>{thirdLabels[i]}</div>
-                </div>
-              );
-            })}
-          </div>
+          {(() => {
+            const MIN_H = 26;
+            const MAX_H = 78;
+            const neutralAll = spread < 1.5;
+            return (
+              <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, height: 130 }}>
+                {thirdSums.map((v, i) => {
+                  const barH = MIN_H + (v / maxThird) * (MAX_H - MIN_H);
+                  const color = neutralAll
+                    ? 'rgba(15,23,42,0.20)'
+                    : i === worstIdx
+                      ? RED
+                      : 'rgba(232,137,12,0.75)';
+                  return (
+                    <div
+                      key={i}
+                      style={{
+                        flex: 1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: 6,
+                      }}
+                    >
+                      <div style={{ fontSize: 15.5, fontWeight: 800, color: INK, ...NUM }}>
+                        +{v.toFixed(1)}
+                      </div>
+                      <div
+                        style={{
+                          width: '100%',
+                          height: `${barH}%`,
+                          background: color,
+                          borderRadius: '9px 9px 5px 5px',
+                        }}
+                      />
+                      <div style={{ width: '100%', height: 2, background: 'rgba(15,23,42,0.10)' }} />
+                      <div style={{ fontSize: 10.5, fontWeight: 800, color: INK_60 }}>{thirdLabels[i]}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
           <Sentence>{s3Sentence}</Sentence>
         </div>
+
       </div>
     </section>
   );
