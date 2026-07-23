@@ -80,6 +80,12 @@ export function routeForNotif(input: NotifRouteInput): string {
     return buildTopTenLink(actor_user_id, data);
   }
 
+  // rate-course prompt (must come before generic course cases)
+  if (type === 'rate_course_prompt') {
+    const cid = (data.course_id as string | undefined) ?? (entity_type === 'course' ? entity_id : null);
+    if (cid) return `/rate-course-v2/${cid}`;
+  }
+
   // course reviews / responses
   if (
     type === 'friend_course_review' ||
