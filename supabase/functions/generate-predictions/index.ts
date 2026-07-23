@@ -29,7 +29,7 @@ import type { CourseDNAProfile } from './courseFitCalculator.ts';
 // The client compares ai_predictions.logic_version against its own copy of this
 // number and forces a regeneration when the stored row is older. Keep the client
 // constant in src/features/tourhub/lib/predictionLogicVersion.ts IN SYNC.
-export const PREDICTION_LOGIC_VERSION = 2;
+export const PREDICTION_LOGIC_VERSION = 3;
 
 // =============================================
 // TYPES
@@ -206,6 +206,19 @@ serve(async (req) => {
 
     console.log(`[generate-predictions] Processing: ${tournament.name}`);
 
+    // Determine ranking source (Rolex for LPGA, WGR otherwise) via the season's tour_name.
+    let rankingType: 'wgr' | 'rolex' = 'wgr';
+    if (tournament.season_id) {
+      const { data: seasonRow } = await supabase
+        .from('sr_seasons')
+        .select('tour_name')
+        .eq('id', tournament.season_id)
+        .maybeSingle();
+      const tourName = String(seasonRow?.tour_name ?? '').toLowerCase();
+      if (tourName === 'lpga') rankingType = 'rolex';
+    }
+    console.log(`[generate-predictions] Ranking source: ${rankingType}`);
+
     // Check for existing predictions (unless force regenerate)
     if (!forceRegenerate) {
       const { data: existing } = await supabase
@@ -316,17 +329,19 @@ serve(async (req) => {
     const { data: latestRankingDateRow, error: latestRankingDateErr } = await supabase
       .from('sr_world_rankings')
       .select('ranking_date')
+      .eq('ranking_type', rankingType)
       .order('ranking_date', { ascending: false })
       .limit(1)
       .maybeSingle();
 
     let rankings: Array<{ player_id: string; rank: number; prior_rank: number | null; points: number | null; ranking_date: string }> = [];
     if (latestRankingDateErr || !latestRankingDateRow?.ranking_date) {
-      console.error('[generate-predictions] No latest ranking_date found in sr_world_rankings — proceeding with empty rankings map', latestRankingDateErr);
+      console.error(`[generate-predictions] No latest ranking_date found in sr_world_rankings for ranking_type="${rankingType}" — proceeding with empty rankings map`, latestRankingDateErr);
     } else {
       const { data: rankingRows, error: rankingsErr } = await supabase
         .from('sr_world_rankings')
         .select('player_id, rank, prior_rank, points, ranking_date')
+        .eq('ranking_type', rankingType)
         .eq('ranking_date', latestRankingDateRow.ranking_date)
         .limit(2000);
       if (rankingsErr) {

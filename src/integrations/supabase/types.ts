@@ -10623,6 +10623,7 @@ export type Database = {
           ranking_date: string
           ranking_id: string | null
           ranking_status: string | null
+          ranking_type: string
           raw_data: Json | null
           tied: boolean | null
         }
@@ -10640,6 +10641,7 @@ export type Database = {
           ranking_date: string
           ranking_id?: string | null
           ranking_status?: string | null
+          ranking_type?: string
           raw_data?: Json | null
           tied?: boolean | null
         }
@@ -10657,6 +10659,7 @@ export type Database = {
           ranking_date?: string
           ranking_id?: string | null
           ranking_status?: string | null
+          ranking_type?: string
           raw_data?: Json | null
           tied?: boolean | null
         }

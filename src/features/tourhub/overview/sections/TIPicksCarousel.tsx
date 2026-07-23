@@ -23,6 +23,7 @@ import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { useSinglePlayerStatistics } from '../../hooks/useTourHubData';
 import { usePlayerResults } from '../../hooks/usePlayerResults';
+import { useSeasonResultsSummary } from '../../hooks/useSeasonResultsSummary';
 import { Skeleton } from '@/components/ui/skeleton';
 
 // ---- Design tokens (per approved TIRedesign) ----
@@ -459,6 +460,10 @@ function CaseSheet({
 
   const { data: stats, isLoading: statsLoading } = useSinglePlayerStatistics(pick.playerId);
   const { data: results, isLoading: resultsLoading } = usePlayerResults(pick.playerId, 5);
+  const currentYear = new Date().getUTCFullYear();
+  const { data: seasonSummary } = useSeasonResultsSummary(pick.playerId, currentYear);
+  const winsValue = typeof stats?.wins === 'number' ? stats.wins : seasonSummary?.wins;
+  const top10sValue = typeof stats?.top_10s === 'number' ? stats.top_10s : seasonSummary?.top10s;
 
   const header = (
     <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 4 }}>
@@ -616,11 +621,11 @@ function CaseSheet({
               <StatTile label={t('overview.tiPicks.case.worldRankTile')} value={pick.worldRanking ? `#${pick.worldRanking}` : '—'} />
               <StatTile
                 label={t('overview.tiPicks.case.winsTile')}
-                value={typeof stats?.wins === 'number' ? String(stats.wins) : '—'}
+                value={typeof winsValue === 'number' ? String(winsValue) : '—'}
               />
               <StatTile
                 label={t('overview.tiPicks.case.top10sTile')}
-                value={typeof stats?.top_10s === 'number' ? String(stats.top_10s) : '—'}
+                value={typeof top10sValue === 'number' ? String(top10sValue) : '—'}
               />
               <StatTile
                 label={t('overview.tiPicks.case.sgTotalTile')}

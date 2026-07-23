@@ -91,15 +91,16 @@ Deno.serve(async (req) => {
     }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    const { 
-      action, 
-      tourId, 
-      year, 
-      tournamentId, 
+    const {
+      action,
+      tourId,
+      year,
+      tournamentId,
       playerId,
       seasonYear,
       roundType,
-      roundNumber
+      roundNumber,
+      rankingType,
     } = await req.json();
 
     const effectiveYear = year || seasonYear || 2026;
@@ -138,7 +139,7 @@ Deno.serve(async (req) => {
           result = await syncPlayers(supabase, sportradarApiKey, effectiveTour, effectiveYear);
           break;
         case 'rankings':
-          result = await syncWorldRankings(supabase, sportradarApiKey, effectiveYear);
+          result = await syncWorldRankings(supabase, sportradarApiKey, effectiveYear, rankingType || 'wgr');
           break;
         case 'leaderboard':
           result = await syncLeaderboard(supabase, sportradarApiKey, effectiveTour, effectiveYear, tournamentId);
@@ -491,9 +492,10 @@ async function syncSeasons(supabase: any, apiKey: string) {
 // Per docs: GET https://api.sportradar.com/golf/production/v3/en/players/wgr/2025/rankings.json
 // Captures new fields: prior_rank, tied, avg_points, ranking_id, ranking_status
 // ============================================================================
-async function syncWorldRankings(supabase: any, apiKey: string, year: number) {
-  // Per API docs: /golf/{access_level}/v3/{lang}/players/wgr/{year}/rankings.json
-  const url = `${getGlobalBaseUrl()}/players/wgr/${year}/rankings.json`;
+async function syncWorldRankings(supabase: any, apiKey: string, year: number, rankingType: 'wgr' | 'rolex' = 'wgr') {
+  // Per API docs: /golf/{access_level}/v3/{lang}/players/{wgr|rolex}/{year}/rankings.json
+  const endpoint = rankingType === 'rolex' ? 'rolex' : 'wgr';
+  const url = `${getGlobalBaseUrl()}/players/${endpoint}/${year}/rankings.json`;
   
   let data: any = null;
   try {
@@ -558,16 +560,17 @@ async function syncWorldRankings(supabase: any, apiKey: string, year: number) {
         ranking_id: ranking.id,
         ranking_status: ranking.status,
         ranking_date: rankingDate,
+        ranking_type: rankingType,
         raw_data: playerData,
-      }, { onConflict: 'player_id,ranking_date' });
+      }, { onConflict: 'player_id,ranking_date,ranking_type' });
       if (!error) totalRecords++;
     }
   }
 
-  return { 
-    records: totalRecords, 
-    message: `Synced ${totalRecords} rankings`,
-    debug: { url, playersInResponse: players.length }
+  return {
+    records: totalRecords,
+    message: `Synced ${totalRecords} ${rankingType.toUpperCase()} rankings`,
+    debug: { url, rankingType, playersInResponse: players.length }
   };
 }
 
