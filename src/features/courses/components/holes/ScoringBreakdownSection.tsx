@@ -49,7 +49,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
 
   if (isLoading) {
     return (
-      <section style={{ padding: '0 16px', marginTop: 20, fontFamily: FONT }}>
+      <section style={{ padding: '0 16px', fontFamily: FONT }}>
         <div style={{ ...CARD, padding: 16 }}>
           <Skeleton className="h-12 w-40 mb-4" />
           <Skeleton className="h-[210px] w-full mb-3" />
@@ -186,7 +186,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
   );
 
   return (
-    <section style={{ padding: '0 16px', marginTop: 24, fontFamily: FONT }}>
+    <section style={{ padding: '0 16px', fontFamily: FONT }}>
       {/* Section heading OUTSIDE card */}
       <div style={{ padding: '0 2px', marginBottom: 10 }}>
         <div
