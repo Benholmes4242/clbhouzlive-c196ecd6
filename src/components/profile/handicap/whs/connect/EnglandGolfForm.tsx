@@ -1,16 +1,9 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, ShieldCheck, AlertCircle, ArrowRight } from 'lucide-react';
 import { MiniFlag } from './MiniFlag';
-
-const INK = '#0F172A';
-const INK_45 = '#64748B';
-const INK_30 = '#94A3B8';
-const HAIR = 'rgba(15,23,42,0.08)';
-const FIELD_FILL = '#F8FAFC';
-const GREEN = '#059669';
-const GREEN_BG = 'rgba(5,150,105,0.08)';
-const DANGER = '#EF4444';
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+import {
+  INK, DIM, FAINT, HAIR, GREEN, GREEN_BG, DANGER, FONT,
+} from './approachStages';
 
 interface Props {
   onSubmit: (membershipNumber: string, password: string) => void;
@@ -19,19 +12,13 @@ interface Props {
   onChangeCountry: () => void;
 }
 
-const cardBase: React.CSSProperties = {
-  background: '#fff',
-  border: `1px solid ${HAIR}`,
-  borderRadius: 16,
-};
-
 const inputStyle: React.CSSProperties = {
   width: '100%',
-  background: FIELD_FILL,
+  background: '#fff',
   border: `1px solid ${HAIR}`,
-  borderRadius: 12,
-  padding: '12px 13px',
-  fontSize: 15,
+  borderRadius: 14,
+  padding: '15px 16px',
+  fontSize: 16,
   color: INK,
   fontFamily: FONT,
   outline: 'none',
@@ -39,15 +26,15 @@ const inputStyle: React.CSSProperties = {
 
 const labelStyle: React.CSSProperties = {
   fontSize: 13,
-  fontWeight: 600,
-  color: INK_45,
+  fontWeight: 700,
+  color: DIM,
   marginBottom: 6,
   display: 'block',
 };
 
 const helperStyle: React.CSSProperties = {
   fontSize: 12,
-  color: INK_45,
+  color: FAINT,
   marginTop: 6,
 };
 
@@ -62,71 +49,52 @@ export const EnglandGolfForm: React.FC<Props> = ({
   const [showPassword, setShowPassword] = useState(false);
 
   const isValid = membershipNumber.trim().length >= 8 && password.length > 0;
+  const buttonDisabled = !isValid || submitting;
 
   return (
-    <div style={{ padding: '4px 0 12px', fontFamily: FONT, display: 'flex', flexDirection: 'column', gap: 14 }}>
-      {/* Connecting-to header card */}
-      <div
-        style={{
-          ...cardBase,
-          padding: '12px 14px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 12,
-        }}
-      >
-        <MiniFlag iso="GB-ENG" />
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div
-            style={{
-              fontSize: 10.5,
-              fontWeight: 700,
-              color: INK_45,
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-              marginBottom: 2,
-            }}
-          >
-            Connecting to
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (!isValid || submitting) return;
+        onSubmit(membershipNumber.trim(), password);
+      }}
+      className="flex flex-col flex-1 min-h-0"
+      style={{ fontFamily: FONT, padding: '18px 0 8px', justifyContent: 'space-between' }}
+    >
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 20 }}>
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ transform: 'scale(1.15)', transformOrigin: 'left center' }}>
+            <MiniFlag iso="GB-ENG" />
           </div>
-          <div style={{ fontSize: 16, fontWeight: 700, color: INK }}>
+          <div style={{ flex: 1, minWidth: 0, fontSize: 25, fontWeight: 900, color: INK, letterSpacing: '-0.03em' }}>
             England Golf
           </div>
+          <button
+            type="button"
+            onClick={onChangeCountry}
+            disabled={submitting}
+            style={{
+              background: '#fff',
+              border: `1px solid ${HAIR}`,
+              borderRadius: 10,
+              padding: '7px 12px',
+              fontFamily: FONT,
+              fontSize: 12.5,
+              fontWeight: 700,
+              color: DIM,
+              cursor: submitting ? 'default' : 'pointer',
+              opacity: submitting ? 0.5 : 1,
+            }}
+          >
+            Change
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={onChangeCountry}
-          disabled={submitting}
-          style={{
-            fontSize: 13,
-            fontWeight: 600,
-            color: INK,
-            background: 'transparent',
-            border: 'none',
-            cursor: submitting ? 'default' : 'pointer',
-            opacity: submitting ? 0.5 : 1,
-            fontFamily: FONT,
-            padding: '6px 4px',
-          }}
-        >
-          Change
-        </button>
-      </div>
 
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (!isValid || submitting) return;
-          onSubmit(membershipNumber.trim(), password);
-        }}
-        style={{ display: 'flex', flexDirection: 'column', gap: 14 }}
-      >
-        {/* Combined credentials card */}
-        <div style={{ ...cardBase, padding: 16 }}>
+        {/* Fields */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 15 }}>
           <div>
-            <label htmlFor="whs-membership" style={labelStyle}>
-              Membership number
-            </label>
+            <label htmlFor="whs-membership" style={labelStyle}>Membership number</label>
             <input
               id="whs-membership"
               type="text"
@@ -138,15 +106,11 @@ export const EnglandGolfForm: React.FC<Props> = ({
               disabled={submitting}
               style={{ ...inputStyle, fontVariantNumeric: 'tabular-nums', opacity: submitting ? 0.5 : 1 }}
             />
-            <div style={helperStyle}>Find this on your member card or in MyEG</div>
+            <div style={helperStyle}>On your member card or in MyEG</div>
           </div>
 
-          <div style={{ height: 1, background: HAIR, margin: '16px 0' }} />
-
           <div>
-            <label htmlFor="whs-password" style={labelStyle}>
-              Password
-            </label>
+            <label htmlFor="whs-password" style={labelStyle}>Password</label>
             <div style={{ position: 'relative' }}>
               <input
                 id="whs-password"
@@ -178,39 +142,38 @@ export const EnglandGolfForm: React.FC<Props> = ({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: INK_45,
+                  color: DIM,
                 }}
               >
                 {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
               </button>
             </div>
-            <div style={helperStyle}>Same password you use for the MyEG app</div>
+            <div style={helperStyle}>Same one you use for the MyEG app</div>
           </div>
+
+          {error && (
+            <div
+              role="alert"
+              style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 10,
+                background: 'rgba(239,68,68,0.06)',
+                border: '1px solid rgba(239,68,68,0.20)',
+                padding: '12px 14px',
+                borderRadius: 12,
+                fontSize: 13,
+                color: DANGER,
+                lineHeight: 1.45,
+              }}
+            >
+              <AlertCircle size={16} style={{ marginTop: 1, flexShrink: 0 }} />
+              <span style={{ fontWeight: 500 }}>{error}</span>
+            </div>
+          )}
         </div>
 
-        {/* Error panel */}
-        {error && (
-          <div
-            role="alert"
-            style={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: 10,
-              background: 'rgba(239,68,68,0.06)',
-              border: '1px solid rgba(239,68,68,0.20)',
-              padding: '12px 14px',
-              borderRadius: 12,
-              fontSize: 13,
-              color: DANGER,
-              lineHeight: 1.45,
-            }}
-          >
-            <AlertCircle size={16} style={{ marginTop: 1, flexShrink: 0 }} />
-            <span style={{ color: '#EF4444', fontWeight: 500 }}>{error}</span>
-          </div>
-        )}
-
-        {/* Reassurance panel */}
+        {/* Trust panel */}
         <div
           style={{
             display: 'flex',
@@ -219,7 +182,7 @@ export const EnglandGolfForm: React.FC<Props> = ({
             background: GREEN_BG,
             border: '1px solid rgba(5,150,105,0.24)',
             padding: '12px 14px',
-            borderRadius: 12,
+            borderRadius: 14,
           }}
         >
           <ShieldCheck size={18} color={GREEN} strokeWidth={2.2} style={{ marginTop: 1, flexShrink: 0 }} />
@@ -228,34 +191,35 @@ export const EnglandGolfForm: React.FC<Props> = ({
             Stored encrypted and used only to sync your handicap from England Golf. You can disconnect or delete it anytime.
           </div>
         </div>
+      </div>
 
-        {/* Connect button */}
+      <div style={{ padding: '14px 0 8px' }}>
         <button
           type="submit"
-          disabled={!isValid || submitting}
+          disabled={buttonDisabled}
           style={{
             width: '100%',
-            minHeight: 54,
-            padding: '15px',
-            borderRadius: 14,
-            background: !isValid || submitting ? 'rgba(15,23,42,0.10)' : INK,
-            color: !isValid || submitting ? INK_30 : '#fff',
-            fontSize: 16,
-            fontWeight: 600,
+            minHeight: 56,
+            borderRadius: 16,
+            background: buttonDisabled ? 'rgba(15,23,42,0.08)' : INK,
+            color: buttonDisabled ? FAINT : '#fff',
             border: 'none',
-            cursor: !isValid || submitting ? 'not-allowed' : 'pointer',
+            fontFamily: FONT,
+            fontSize: 16.5,
+            fontWeight: 800,
+            cursor: buttonDisabled ? 'not-allowed' : 'pointer',
             display: 'inline-flex',
             alignItems: 'center',
             justifyContent: 'center',
             gap: 8,
-            fontFamily: FONT,
+            boxShadow: buttonDisabled ? 'none' : '0 8px 22px rgba(15,23,42,0.22)',
           }}
         >
           Connect official WHS handicap
-          {isValid && !submitting && <ArrowRight size={18} strokeWidth={2.4} />}
+          {!buttonDisabled && <ArrowRight size={18} strokeWidth={2.4} />}
         </button>
-      </form>
-    </div>
+      </div>
+    </form>
   );
 };
 
