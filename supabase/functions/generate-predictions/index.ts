@@ -1169,8 +1169,8 @@ For this course type (${courseType.type}), identify which strokes gained categor
 
 Each contender's reasons MUST reference specific strokes gained categories that match the course DNA.
 
-## IMPORTANT: The courseFitScore values above are STATISTICALLY CALCULATED from historical correlations at this venue. 
-Use them as a strong signal for your rankings. You may adjust ±10 points based on intangibles, but do not ignore them.
+## IMPORTANT: The courseFitScore values above are STATISTICALLY CALCULATED from historical correlations at this venue.
+Use them as a STRONG signal to inform your rankings and reasoning. **Do NOT include a `courseFitScore` field in your output** — the server attaches the calculated value. Reason from the numbers, do not restate them.
 
 ## ANALYSIS TASK
 
