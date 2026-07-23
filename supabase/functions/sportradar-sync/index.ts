@@ -567,10 +567,10 @@ async function syncWorldRankings(supabase: any, apiKey: string, year: number, ra
     }
   }
 
-  return { 
-    records: totalRecords, 
-    message: `Synced ${totalRecords} rankings`,
-    debug: { url, playersInResponse: players.length }
+  return {
+    records: totalRecords,
+    message: `Synced ${totalRecords} ${rankingType.toUpperCase()} rankings`,
+    debug: { url, rankingType, playersInResponse: players.length }
   };
 }
 
