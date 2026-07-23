@@ -219,13 +219,18 @@ export default function PostEmptyStage({ onRequestAdd }: Props) {
         </div>
         <div
           aria-hidden
+          onTransitionEnd={handleTransitionEnd}
           style={{
             marginTop: 5,
             fontSize: 13.5,
             color: 'rgba(30,58,43,0.62)',
-            height: 19,
-            lineHeight: '19px',
-            opacity: phraseVisible ? 1 : 0,
+            lineHeight: 1.35,
+            minHeight: 19,
+            width: '100%',
+            maxWidth: '100%',
+            whiteSpace: 'normal',
+            overflow: 'visible',
+            opacity: fade === 'in' ? 1 : 0,
             transition: `opacity ${FADE_MS}ms ease`,
           }}
         >
