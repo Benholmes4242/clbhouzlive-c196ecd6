@@ -57,6 +57,7 @@ interface AdminOperationRequest {
   suspended?: boolean;
   durationDays?: number | null;
   newUsername?: string;
+  adminNote?: string;
 }
 
 // Username format — source of truth: src/pages/ManageProfile.tsx L140
