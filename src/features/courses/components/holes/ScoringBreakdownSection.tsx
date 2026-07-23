@@ -364,7 +364,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
 
 
         {/* 3c. Stratum 2 */}
-        <div style={{ padding: '16px', borderBottom: `1px solid ${HAIR}` }}>
+        <div style={{ padding: '16px', borderBottom: hasInterpretation ? `1px solid ${HAIR}` : 'none' }}>
           {stratumHeader(
             t('courses:holes.scoringBreakdown.s2Title'),
             t('courses:holes.scoringBreakdown.s2Sub'),
