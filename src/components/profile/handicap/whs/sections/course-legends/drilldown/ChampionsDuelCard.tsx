@@ -49,6 +49,9 @@ interface ChampionsDuelCardProps {
   /** Optional CTA sentence rendered beneath the chase caption (used by
    *  the "Your closest duel" section to name the gap in category units). */
   chaseCta?: string;
+  /** Suppresses the top hairline border — used when the card sits directly
+   *  beneath an eyebrow/explainer block with no visual separation needed. */
+  suppressTopBorder?: boolean;
 }
 
 
@@ -174,6 +177,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
   banded = false,
   titleOverride,
   chaseCta,
+  suppressTopBorder = false,
 }) => {
   const isLight = theme === 'light';
   const avatarRing = isLight ? 'rgba(15,23,42,0.12)' : 'rgba(255,255,255,0.22)';
@@ -245,7 +249,11 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
       data-category-section
       style={{
         background: banded ? bandBg : 'transparent',
-        borderTop: defending ? `2px solid ${GOLD}` : `0.5px solid ${hairline}`,
+        borderTop: suppressTopBorder
+          ? 'none'
+          : defending
+            ? `2px solid ${GOLD}`
+            : `0.5px solid ${hairline}`,
         padding: '12px 16px',
       }}
 
