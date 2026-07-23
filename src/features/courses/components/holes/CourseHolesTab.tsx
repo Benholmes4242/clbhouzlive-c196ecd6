@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useCourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
 import { useCourseMeta } from '@/hooks/gam/useCourseMeta';
@@ -8,7 +9,8 @@ import { useWhsConnection } from '@/lib/whs/hooks';
 import { HolesEmptyState } from './HolesEmptyState';
 import { FONT } from './_constants';
 import { INK_MUTE } from '@/features/courses/_shared/tokens';
-import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHandicapCue';
+import ConnectGhostPrompt from '@/components/handicap/ConnectGhostPrompt';
+import { HolesGhost } from '@/components/handicap/ConnectGhostPreviews';
 import { HoleDataSheet } from './HoleDataSheet';
 
 interface Props {
