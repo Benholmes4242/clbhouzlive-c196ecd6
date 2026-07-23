@@ -959,6 +959,7 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
         confidence: consensus.consensusConfidence,
         model_version: 'consensus_v1',
         prompt_version: 'v4',
+        logic_version: PREDICTION_LOGIC_VERSION,
         consensus_data: {
          pipeline: 'ti-9',
           method: consensus.consensusMethod,
@@ -1044,7 +1045,10 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
 // =============================================
 
 function isPredictionStale(prediction: any): boolean {
-  return false;
+  // A stored row is stale when its logic_version predates the current one.
+  // See PREDICTION_LOGIC_VERSION at the top of this file.
+  const stored = typeof prediction?.logic_version === 'number' ? prediction.logic_version : 0;
+  return stored < PREDICTION_LOGIC_VERSION;
 }
 
 function formatStoredPredictions(stored: any) {
@@ -1246,7 +1250,8 @@ Return a JSON object with this exact structure:
       "photoUrl": null,
       "pgaTourId": null,
       "country": "USA",
-      "worldRanking": 1,
+      // NOTE: Do NOT output worldRanking — the server attaches it from
+      // sr_world_rankings. Any value emitted here is ignored.
       "winProbability": 15.5,
       "reasons": [
         "MAX 50 CHARS. Recent form insight",
