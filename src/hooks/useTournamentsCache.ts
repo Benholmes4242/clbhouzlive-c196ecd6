@@ -20,7 +20,7 @@ import {
 // Union of all fields needed by any consumer hook
 const CACHE_SELECT = `
   id, name, status, start_date, end_date, purse, currency, winning_share,
-  venue_id, venue_name, venue_city, venue_country, venue_par, venue_yardage,
+  venue_id, venue_name, venue_course_name, venue_city, venue_state, venue_country, venue_par, venue_yardage,
   winner_id, defending_champion, champion_narrative, season_id,
   current_round,
   season:sr_seasons!inner(id, tour_id, tour_name, year)
