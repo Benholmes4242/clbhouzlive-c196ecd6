@@ -41,7 +41,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
 
   const parsed = useMemo(() => {
     if (!data || !Array.isArray(data.holes)) return null;
-    if ((data.rounds ?? 0) < 5) return null;
+    if ((data.rounds ?? 0) < 1) return null;
     const holes = data.holes.filter((h) => (h.rounds_played ?? 0) > 0);
     if (holes.length === 0) return null;
     return { rounds: data.rounds, total: Number(data.total_over_par) || 0, holes };
