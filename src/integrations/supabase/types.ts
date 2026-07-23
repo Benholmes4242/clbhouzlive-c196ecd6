@@ -18226,6 +18226,21 @@ export type Database = {
           their_takes: number
         }[]
       }
+      get_my_scoring_breakdown_all_courses: {
+        Args: never
+        Returns: {
+          avg_gross: number
+          avg_over_par: number
+          complete_rounds: number
+          courses_played: number
+          par3: Json
+          par4: Json
+          par5: Json
+          rounds: number
+          thirds: Json
+          worst_courses: Json
+        }[]
+      }
       get_my_streaks: {
         Args: never
         Returns: {
