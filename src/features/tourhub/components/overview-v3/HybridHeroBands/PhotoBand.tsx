@@ -105,10 +105,42 @@ export function PhotoBand({
 
   const pillTone =
     pill.tone === 'live'
-      ? { bg: 'rgba(220,38,38,0.92)', color: '#fff', dot: '#fff' }
+      ? { bg: 'rgba(255,255,255,0.16)', color: 'rgba(255,255,255,0.95)', dot: '#EF4444' }
       : pill.tone === 'final'
         ? { bg: 'rgba(255,255,255,0.14)', color: 'rgba(255,255,255,0.95)', dot: 'rgba(255,255,255,0.6)' }
         : { bg: 'rgba(255,255,255,0.14)', color: 'rgba(255,255,255,0.95)', dot: 'rgba(255,255,255,0.6)' };
+
+  // Insight overflow detection — only render "Read more" when the clamped
+  // insight actually overflows its 2-line box. Re-measures on value + resize.
+  const insightRef = useRef<HTMLDivElement>(null);
+  const [truncated, setTruncated] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  useLayoutEffect(() => {
+    const el = insightRef.current;
+    if (!el || !insight) {
+      setTruncated(false);
+      return;
+    }
+    const measure = () => {
+      setTruncated(el.scrollHeight > el.clientHeight + 1);
+    };
+    measure();
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null;
+    ro?.observe(el);
+    return () => ro?.disconnect();
+  }, [insight]);
+
+  useEffect(() => {
+    if (!insight) return;
+    const onResize = () => {
+      const el = insightRef.current;
+      if (!el) return;
+      setTruncated(el.scrollHeight > el.clientHeight + 1);
+    };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [insight]);
 
   return (
     <div
