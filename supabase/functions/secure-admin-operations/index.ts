@@ -83,7 +83,7 @@ serve(async (req) => {
 
   // Unauthenticated ping to verify running function version.
   // Bump FUNCTION_VERSION on every change to this function.
-  const FUNCTION_VERSION = '2026-07-23T04:50:00Z-v5-delegated-erasure';
+  const FUNCTION_VERSION = '2026-07-23T18:00:00Z-v6-golfer-verify';
 
   try {
     const peek = req.clone();
