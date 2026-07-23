@@ -542,60 +542,62 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
               </div>
             </>
           )}
-          <Sentence>{s2Sentence}</Sentence>
+          {hasInterpretation && <Sentence>{s2Sentence}</Sentence>}
         </div>
 
-        {/* 3d. Stratum 3 */}
-        <div style={{ padding: '16px' }}>
-          {stratumHeader(
-            t('courses:holes.scoringBreakdown.s3Title'),
-            t('courses:holes.scoringBreakdown.s3Sub'),
-          )}
-          {(() => {
-            const MIN_H = 26;
-            const MAX_H = 78;
-            const neutralAll = spread < 1.5;
-            return (
-              <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, height: 130 }}>
-                {thirdSums.map((v, i) => {
-                  const barH = MIN_H + (v / maxThird) * (MAX_H - MIN_H);
-                  const color = neutralAll
-                    ? 'rgba(15,23,42,0.20)'
-                    : i === worstIdx
-                      ? RED
-                      : 'rgba(232,137,12,0.75)';
-                  return (
-                    <div
-                      key={i}
-                      style={{
-                        flex: 1,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: 6,
-                      }}
-                    >
-                      <div style={{ fontSize: 15.5, fontWeight: 800, color: INK, ...NUM }}>
-                        +{v.toFixed(1)}
-                      </div>
+        {/* 3d. Stratum 3 — interpretation only */}
+        {hasInterpretation && (
+          <div style={{ padding: '16px' }}>
+            {stratumHeader(
+              t('courses:holes.scoringBreakdown.s3Title'),
+              t('courses:holes.scoringBreakdown.s3Sub'),
+            )}
+            {(() => {
+              const MIN_H = 26;
+              const MAX_H = 78;
+              const neutralAll = spread < 1.5;
+              return (
+                <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, height: 130 }}>
+                  {thirdSums.map((v, i) => {
+                    const barH = MIN_H + (v / maxThird) * (MAX_H - MIN_H);
+                    const color = neutralAll
+                      ? 'rgba(15,23,42,0.20)'
+                      : i === worstIdx
+                        ? RED
+                        : 'rgba(232,137,12,0.75)';
+                    return (
                       <div
+                        key={i}
                         style={{
-                          width: '100%',
-                          height: `${barH}%`,
-                          background: color,
-                          borderRadius: '9px 9px 5px 5px',
+                          flex: 1,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          gap: 6,
                         }}
-                      />
-                      <div style={{ width: '100%', height: 2, background: 'rgba(15,23,42,0.10)' }} />
-                      <div style={{ fontSize: 10.5, fontWeight: 800, color: INK_60 }}>{thirdLabels[i]}</div>
-                    </div>
-                  );
-                })}
-              </div>
-            );
-          })()}
-          <Sentence>{s3Sentence}</Sentence>
-        </div>
+                      >
+                        <div style={{ fontSize: 15.5, fontWeight: 800, color: INK, ...NUM }}>
+                          +{v.toFixed(1)}
+                        </div>
+                        <div
+                          style={{
+                            width: '100%',
+                            height: `${barH}%`,
+                            background: color,
+                            borderRadius: '9px 9px 5px 5px',
+                          }}
+                        />
+                        <div style={{ width: '100%', height: 2, background: 'rgba(15,23,42,0.10)' }} />
+                        <div style={{ fontSize: 10.5, fontWeight: 800, color: INK_60 }}>{thirdLabels[i]}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()}
+            <Sentence>{s3Sentence}</Sentence>
+          </div>
+        )}
 
       </div>
     </section>
