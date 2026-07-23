@@ -11,7 +11,7 @@ interface Props {
 }
 
 const ROTATE_MS = 2600;
-const FADE_MS = 300;
+const FADE_MS = 150;
 
 interface Frame {
   x: number; y: number; w: number; h: number; r: number; fill: string; play?: boolean;
