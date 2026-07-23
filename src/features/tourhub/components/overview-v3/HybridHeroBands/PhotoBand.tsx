@@ -435,6 +435,9 @@ export function PhotoBand({
           </div>
         )}
       </div>
+      {insight && (
+        <InsightSheet open={sheetOpen} onClose={() => setSheetOpen(false)} insight={insight} />
+      )}
     </div>
   );
 }
