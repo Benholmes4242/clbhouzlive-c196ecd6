@@ -441,6 +441,7 @@ function PushCard({ push, chip }: { push: ReturnType<typeof usePushHealth>; chip
         <AdminErrorState message="Could not load push health." onRetry={() => push.refetch()} />
       ) : (
         <>
+          <WatchdogRow wd={d.watchdog} />
           <StatGrid stats={[
             { label: 'Sent 24h', value: d.queue.sent_24h.toLocaleString() },
             { label: 'Errors',   value: errors.toLocaleString(), bad: errors > 0 },
@@ -494,5 +495,58 @@ function PushCard({ push, chip }: { push: ReturnType<typeof usePushHealth>; chip
         </>
       )}
     </SystemCard>
+  );
+}
+
+// ─── Push enqueue watchdog row ────────────────────────────────────────────────
+
+function WatchdogRow({
+  wd,
+}: {
+  wd: {
+    notifications_60m_push_eligible: number;
+    queue_rows_60m: number;
+    missing_60m: number;
+    enqueue_ok: boolean;
+    latest_error: string | null;
+    latest_error_at: string | null;
+  };
+}) {
+  const bad = wd.enqueue_ok === false;
+  const warn = !bad && wd.missing_60m > 0;
+  const countColor = bad ? t.dangerText : warn ? t.warnText : t.ink;
+  return (
+    <div style={{
+      display: 'flex', flexDirection: 'column', gap: 4,
+      padding: '10px 12px',
+      background: bad ? t.dangerSoft : warn ? t.warnSoft : t.canvas,
+      border: `1px solid ${t.line}`, borderRadius: t.radius.md,
+    }}>
+      <div style={{ color: t.inkFaint, fontSize: 10.5, fontWeight: 700, letterSpacing: 0.4, textTransform: 'uppercase' }}>
+        Enqueue watchdog (last 60m)
+      </div>
+      <div style={{ color: t.ink, fontSize: 13, fontWeight: 600, lineHeight: 1.35 }}>
+        Queued{' '}
+        <span style={{
+          color: countColor, fontWeight: 800,
+          fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
+        }}>
+          {wd.queue_rows_60m}
+        </span>
+        {' of '}
+        <span style={{
+          color: t.ink, fontWeight: 800,
+          fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
+        }}>
+          {wd.notifications_60m_push_eligible}
+        </span>
+        {' notifications in the last hour'}
+      </div>
+      {wd.latest_error ? (
+        <div style={{ color: t.dangerText, fontSize: 12, fontWeight: 600, wordBreak: 'break-word' }}>
+          Last enqueue error: {wd.latest_error}
+        </div>
+      ) : null}
+    </div>
   );
 }
