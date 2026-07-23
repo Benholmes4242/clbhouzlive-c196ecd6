@@ -1456,8 +1456,25 @@ async function applyRivalryResults(userId: string, stats: any, whsScoreId: strin
       }
     }
 
+    // Look up rival display name from user_profiles ONLY (never
+    // whs_friends/whs_friend_matches — England Golf PII). Degrade to null
+    // so the dispatcher can render generic copy.
+    let rivalName: string | null = null;
+    try {
+      const { data: rivalProfile } = await supabase
+        .from('user_profiles')
+        .select('display_name, username')
+        .eq('id', rival.user_id)
+        .maybeSingle();
+      rivalName = (rivalProfile?.display_name?.trim() || rivalProfile?.username?.trim() || null);
+    } catch { /* non-fatal */ }
+
     await enqueueNotification(userId, "rival_played", {
-      rival_user_id: rival.user_id, course_id: stats.course_id, play_date: stats.play_date,
+      rival_user_id: rival.user_id,
+      rival_name: rivalName,
+      course_id: stats.course_id,
+      course_name: stats.course_name ?? null,
+      play_date: stats.play_date,
     });
   }
 }
