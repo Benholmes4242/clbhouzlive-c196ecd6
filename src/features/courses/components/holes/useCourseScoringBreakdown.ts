@@ -33,6 +33,7 @@ export function useCourseScoringBreakdown(golfCourseId: string | undefined) {
         // Missing function / not signed in / no WHS bridge → render nothing.
         return null;
       }
+      if (!data) return null;
       const row = Array.isArray(data) ? data[0] : data;
       return (row as ScoringBreakdown | null) ?? null;
     },
