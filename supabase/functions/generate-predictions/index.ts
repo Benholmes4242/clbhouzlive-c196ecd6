@@ -878,6 +878,12 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
 
     const enrichedContenders = consensus.topContenders.map(tc => {
       const player = findPlayer(tc.playerId, tc.playerName);
+      // Distinguish "genuinely unranked (outside top 200)" from a lookup sentinel.
+      // world_rank === 999 is our internal sort sentinel — never a display value.
+      const wr = player?.world_rank;
+      const worldRankingDisplay = (typeof wr === 'number' && wr > 0 && wr !== 999) ? wr : null;
+      const priorRankRaw = player?.prior_rank;
+      const priorRankDisplay = (typeof priorRankRaw === 'number' && priorRankRaw > 0 && priorRankRaw !== 999) ? priorRankRaw : null;
       return {
         rank: tc.rank,
         playerId: player?.player_id || tc.playerId,
@@ -885,10 +891,13 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
         photoUrl: player?.photo_url || null,
         pgaTourId: player?.pga_tour_id || null,
         country: player?.country || 'USA',
-        worldRanking: player?.world_rank || 999,
+        worldRanking: worldRankingDisplay,
+        priorRank: priorRankDisplay,
         winProbability: tc.winProbability,
-        // CRITICAL: Use CALCULATED fit score, not AI-guessed
-        courseFitScore: fitScoreMap.get(player?.player_id || tc.playerId) ?? tc.courseFitScore ?? null,
+        // FIX (Bug 1B): ONLY the calculated map may supply courseFitScore.
+        // Never fall back to `tc.courseFitScore` — the LLM fabricates that
+        // value for venues without a course_dna_profiles row.
+        courseFitScore: fitScoreMap.get(player?.player_id || tc.playerId) ?? null,
         reasons: tc.reasons,
         concern: '',
         isDarkHorse: tc.isDarkHorse,
