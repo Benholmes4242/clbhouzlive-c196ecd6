@@ -269,11 +269,18 @@ serve(async (req) => {
           ? winningScores.reduce((a, b) => a + b, 0) / winningScores.length
           : null;
 
-        // Build importance map for DB columns
+        // Build importance map for DB columns. All 9 stats are required to
+        // reach this point, so every dbField will be assigned a real number.
+        // NEVER default to 50 — a uniform-importance profile is meaningless
+        // for course fit and must not be written.
         const importanceMap: Record<string, number> = {};
-        for (const { key, dbField } of statKeys) {
-          const corr = correlations.find((c) => c.statName === statKeys.find((s) => s.key === key)?.name);
-          importanceMap[dbField] = corr?.importance || 50;
+        for (const { name, dbField } of statKeys) {
+          const corr = correlations.find((c) => c.statName === name);
+          if (!corr) {
+            // Guarded by the correlations.length < statKeys.length check above.
+            throw new Error(`[CourseDNA] Unexpected missing correlation for ${name} at ${venue}`);
+          }
+          importanceMap[dbField] = corr.importance;
         }
 
         // Upsert the profile
