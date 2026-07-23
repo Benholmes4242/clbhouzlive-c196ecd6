@@ -52,6 +52,13 @@ export interface PhotoBandProps {
   /** Optional right-side CTA (TOURNAMENT ›) */
   onCtaTap?: () => void;
   ctaLabel?: string;
+  /** Extra venue data — surfaced by the enriched Insight sheet. All optional. */
+  venueCourseName?: string | null;
+  venueState?: string | null;
+  venueCountry?: string | null;
+  venuePar?: number | null;
+  venueYardage?: number | null;
+  purse?: number | null;
 }
 
 function statePillText(
