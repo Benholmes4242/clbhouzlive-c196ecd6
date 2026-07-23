@@ -54,8 +54,11 @@ export default function NotificationsPage() {
   const [isSaving, setIsSaving] = useState(false);
 
   const isPushEnabled = pushNotifications.state === 'enabled';
+  const isPushUnavailable = pushNotifications.state === 'unavailable' && !pushNotifications.isLoading;
+  const isPushLoading = pushNotifications.isLoading || pushNotifications.state === 'unknown';
 
   const handleTogglePush = () => {
+    if (isPushUnavailable || isPushLoading) return;
     if (isPushEnabled) pushNotifications.disable();
     else pushNotifications.enable();
   };
@@ -114,6 +117,12 @@ export default function NotificationsPage() {
     }
   };
 
+  const pushSubline = isPushUnavailable
+    ? 'Push needs the latest clbhouz app. Update from the App Store, then come back here.'
+    : 'Allow clbhouz to send push alerts';
+  const pushSwitchChecked = isPushUnavailable ? false : isPushEnabled;
+  const pushSwitchDisabled = isPushUnavailable || isPushLoading;
+
   return (
     <ManagePageShell title="Notifications">
       <div className="px-4 pt-4 space-y-6">
@@ -124,9 +133,13 @@ export default function NotificationsPage() {
         >
           <div className="min-w-0 pr-3">
             <p className="text-[15px] font-medium text-foreground">Push notifications</p>
-            <p className="text-[13px]" style={{ color: INK_55 }}>Allow clbhouz to send push alerts</p>
+            <p className="text-[13px]" style={{ color: INK_55 }}>{pushSubline}</p>
           </div>
-          <Switch checked={isPushEnabled} onCheckedChange={handleTogglePush} />
+          <Switch
+            checked={pushSwitchChecked}
+            disabled={pushSwitchDisabled}
+            onCheckedChange={handleTogglePush}
+          />
         </div>
 
         {/* Categories */}
