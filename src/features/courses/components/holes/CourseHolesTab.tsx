@@ -19,6 +19,7 @@ interface Props {
 
 export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
   const { t } = useTranslation(['courses']);
+  const navigate = useNavigate();
   const { data, isLoading, isError, refetch } = useCourseHoleAnalysis(courseId);
   const { data: meta } = useCourseMeta(courseId);
   const { user } = useSupabaseSession();
