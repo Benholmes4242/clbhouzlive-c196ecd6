@@ -139,7 +139,22 @@ const ProfileHandicapCard: React.FC<Props> = ({
   // suppress their simple card. WHS users still wait for both.
   if (connLoading) return null;
   if (!isManual && trendLoading) return null;
-  if (handicap == null) return null;
+  if (handicap == null) {
+    // Own profile only: pitch the connect ghost prompt where the card would render.
+    if (isOwnProfile) {
+      return (
+        <div style={{ padding: '8px 0 16px' }}>
+          <ConnectGhostPrompt
+            surface="profile"
+            blurPx={6}
+            ghost={<ProfileGhost />}
+            onConnect={() => navigate('/handicap')}
+          />
+        </div>
+      );
+    }
+    return null;
+  }
 
   const resolvedName = (displayName ?? '').trim().split(/\s+/)[0] || 'this golfer';
 
