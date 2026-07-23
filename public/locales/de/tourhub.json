@@ -137,7 +137,9 @@
       "championIconLabel": "Champion"
     },
     "photoBand": {
-      "wonBy": "Won by {{winnerName}}"
+      "wonBy": "Won by {{winnerName}}",
+      "readMore": "Read more",
+      "insightTitle": "Course insight"
     },
     "trajectorySparkline": {
       "ariaLabel": "Trajectory: rounds {{rounds}}",
