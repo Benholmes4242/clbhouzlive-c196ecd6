@@ -60,6 +60,7 @@ function pctSum(row: CourseHole, keys: (keyof CourseHole['dist'])[]): number {
 
 interface Props {
   courseName: string;
+  courseId?: string;
   holes: CourseHole[];
   totalRounds: number;
   myByHole: Map<number, MyHolePerformanceRow>;
@@ -68,6 +69,7 @@ interface Props {
 
 export const HoleDataSheet: React.FC<Props> = ({
   courseName,
+  courseId,
   holes,
   totalRounds,
   myByHole,
