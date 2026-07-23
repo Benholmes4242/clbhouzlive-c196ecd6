@@ -407,6 +407,29 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
           if (nameErr) console.error('[google-auth] name persist failed:', nameErr.message);
         }
 
+        // Harvest Google avatar. Both `picture` (Google id_token claim) and
+        // `avatar_url` (Supabase normalisation) end up in user_metadata with
+        // the same URL — prefer picture, fall back to avatar_url. Only write
+        // when the profile currently has NO photo; never overwrite a user's
+        // uploaded picture. Failures here must never block sign-in.
+        try {
+          const meta = (data?.user?.user_metadata ?? {}) as Record<string, unknown>;
+          const googlePhoto =
+            (typeof meta.picture === 'string' && meta.picture) ||
+            (typeof meta.avatar_url === 'string' && meta.avatar_url) ||
+            null;
+          if (data?.user && googlePhoto) {
+            const { error: photoErr } = await supabase
+              .from('user_profiles')
+              .update({ profile_photo_url: googlePhoto })
+              .eq('id', data.user.id)
+              .is('profile_photo_url', null);
+            if (photoErr) console.warn('[google-auth] avatar harvest failed:', photoErr.message);
+          }
+        } catch (harvestErr) {
+          console.warn('[google-auth] avatar harvest threw:', harvestErr);
+        }
+
         if (data?.session?.user) {
           trackLoginSuccess('google');
           // signup_success: signInWithIdToken lands the session; new users have created_at === last_sign_in_at
