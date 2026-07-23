@@ -535,7 +535,8 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
               return (
                 <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, height: 150 }}>
                   {thirdSums.map((v, i) => {
-                    const barH = MIN_H + (v / maxThird) * (MAX_H - MIN_H);
+                    const safeMax = maxThird > 0 ? maxThird : 1;
+                    const barH = Math.round(MIN_H + (v / safeMax) * (MAX_H - MIN_H));
                     const color = neutralAll
                       ? 'rgba(15,23,42,0.20)'
                       : i === worstIdx
@@ -548,8 +549,10 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                           flex: 1,
                           display: 'flex',
                           flexDirection: 'column',
+                          justifyContent: 'flex-end',
                           alignItems: 'center',
                           gap: 6,
+                          height: '100%',
                         }}
                       >
                         <div style={{ fontSize: 15.5, fontWeight: 800, color: INK, ...NUM }}>
@@ -558,7 +561,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                         <div
                           style={{
                             width: '100%',
-                            height: `${barH}%`,
+                            height: `${barH}px`,
                             background: color,
                             borderRadius: '9px 9px 5px 5px',
                           }}
