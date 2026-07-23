@@ -208,6 +208,11 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
     const cid = (data.course_id as string | undefined) ?? entity_id;
     if (cid) return `/rate-course-v2/${cid}`;
   }
+  // --- golfer verified (system-authored) -----------------------------
+  if (type === 'golfer_verified') {
+    return '/profile';
+  }
+
 
 
   // --- unknown ---------------------------------------------------------
