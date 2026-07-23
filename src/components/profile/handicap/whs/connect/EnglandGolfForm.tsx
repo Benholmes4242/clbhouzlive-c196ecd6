@@ -17,15 +17,15 @@ const inputStyle: React.CSSProperties = {
   background: '#fff',
   border: `1px solid ${HAIR}`,
   borderRadius: 14,
-  padding: '15px 16px',
-  fontSize: 16,
+  padding: '16px 16px',
+  fontSize: 17,
   color: INK,
   fontFamily: FONT,
   outline: 'none',
 };
 
 const labelStyle: React.CSSProperties = {
-  fontSize: 13,
+  fontSize: 14,
   fontWeight: 700,
   color: DIM,
   marginBottom: 6,
