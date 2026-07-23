@@ -191,7 +191,13 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             </button>
           </div>
         )}
-        <ConnectHandicapCue variant="about" courseName={course.name} />
+        {user && !aboutConnection && (
+          <ConnectGhostPrompt
+            surface="about"
+            ghost={<AboutGhost />}
+            onConnect={() => navigate('/handicap')}
+          />
+        )}
       </div>
 
 
