@@ -329,17 +329,19 @@ serve(async (req) => {
     const { data: latestRankingDateRow, error: latestRankingDateErr } = await supabase
       .from('sr_world_rankings')
       .select('ranking_date')
+      .eq('ranking_type', rankingType)
       .order('ranking_date', { ascending: false })
       .limit(1)
       .maybeSingle();
 
     let rankings: Array<{ player_id: string; rank: number; prior_rank: number | null; points: number | null; ranking_date: string }> = [];
     if (latestRankingDateErr || !latestRankingDateRow?.ranking_date) {
-      console.error('[generate-predictions] No latest ranking_date found in sr_world_rankings — proceeding with empty rankings map', latestRankingDateErr);
+      console.error(`[generate-predictions] No latest ranking_date found in sr_world_rankings for ranking_type="${rankingType}" — proceeding with empty rankings map`, latestRankingDateErr);
     } else {
       const { data: rankingRows, error: rankingsErr } = await supabase
         .from('sr_world_rankings')
         .select('player_id, rank, prior_rank, points, ranking_date')
+        .eq('ranking_type', rankingType)
         .eq('ranking_date', latestRankingDateRow.ranking_date)
         .limit(2000);
       if (rankingsErr) {
