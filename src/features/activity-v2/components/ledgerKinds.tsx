@@ -274,6 +274,16 @@ export function resolveKind(row: {
       bold: 'course_name',
     };
   }
+  if (t === 'golfer_verified') {
+    // System-authored verification confirmation. Amber verified glyph tile,
+    // no actor avatar (actor_id is NULL server-side).
+    return {
+      left: 'tile',
+      right: 'none',
+      tile: { icon: BadgeCheck, fg: T.AMBER_DEEP, bg: T.AMBER_SOFT },
+      isSystem: true,
+    };
+  }
 
 
   // Unknown: safe fallback ----------------------------------------
