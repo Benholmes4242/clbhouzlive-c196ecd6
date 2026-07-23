@@ -96,6 +96,7 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
       <ConnectHandicapCue variant="holes" courseName={meta?.course_name ?? ''} />
       <HoleDataSheet
         courseName={meta?.course_name ?? ''}
+        courseId={courseId}
         holes={holes}
         totalRounds={data.total_rounds}
         myByHole={myByHole}
