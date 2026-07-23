@@ -492,9 +492,10 @@ async function syncSeasons(supabase: any, apiKey: string) {
 // Per docs: GET https://api.sportradar.com/golf/production/v3/en/players/wgr/2025/rankings.json
 // Captures new fields: prior_rank, tied, avg_points, ranking_id, ranking_status
 // ============================================================================
-async function syncWorldRankings(supabase: any, apiKey: string, year: number) {
-  // Per API docs: /golf/{access_level}/v3/{lang}/players/wgr/{year}/rankings.json
-  const url = `${getGlobalBaseUrl()}/players/wgr/${year}/rankings.json`;
+async function syncWorldRankings(supabase: any, apiKey: string, year: number, rankingType: 'wgr' | 'rolex' = 'wgr') {
+  // Per API docs: /golf/{access_level}/v3/{lang}/players/{wgr|rolex}/{year}/rankings.json
+  const endpoint = rankingType === 'rolex' ? 'rolex' : 'wgr';
+  const url = `${getGlobalBaseUrl()}/players/${endpoint}/${year}/rankings.json`;
   
   let data: any = null;
   try {
