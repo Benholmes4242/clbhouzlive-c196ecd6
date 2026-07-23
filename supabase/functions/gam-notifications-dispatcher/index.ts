@@ -374,7 +374,38 @@ function renderPush(r: OutboxRow, badgeMap: Map<string, any>) {
         data: { route: "/handicap", level: p.level, label: p.label },
       };
     }
+    case "crown_taken": {
+      // Gainer copy — new Regular at the course.
+      // ASCII-only, no internal ids. Falls back if course_name is null.
+      const courseName = typeof p.course_name === 'string' ? p.course_name.trim() : '';
+      return {
+        title: courseName
+          ? `You're now the Regular at ${courseName}`
+          : `You're now a Regular`,
+        body: courseName
+          ? `Your rounds at ${courseName} lead the field.`
+          : `Your rounds at this course lead the field.`,
+        data: { route: p.course_id ? `/courses/${p.course_id}?tab=legends` : '/handicap',
+                course_id: p.course_id },
+      };
+    }
+    case "crown_lost": {
+      // Loser copy — someone took your Regular crown.
+      const holderName = typeof p.new_holder_name === 'string' ? p.new_holder_name.trim() : '';
+      const courseName = typeof p.course_name === 'string' ? p.course_name.trim() : '';
+      const namePart = holderName || 'Someone';
+      const wherePart = courseName ? ` at ${courseName}` : '';
+      return {
+        title: `${namePart} took your Regular crown${wherePart}`,
+        body: courseName
+          ? `Play a round at ${courseName} to take it back.`
+          : `Play a round to take it back.`,
+        data: { route: p.course_id ? `/courses/${p.course_id}?tab=legends` : '/handicap',
+                course_id: p.course_id },
+      };
+    }
     default:
       return null;
+
   }
 }
