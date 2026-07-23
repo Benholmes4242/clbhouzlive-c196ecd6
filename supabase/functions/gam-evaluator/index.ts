@@ -1316,8 +1316,35 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg) {
   if (newTopUser !== prevTopUser) {
     if (prevTopUser) {
       if (newTopUser) {
+        // Look up taker display name + course name from user_profiles /
+        // golf_courses ONLY. Never read whs_friends/whs_friend_matches — those
+        // hold England Golf PII. Both lookups degrade gracefully to null so
+        // the dispatcher can fall back to generic copy.
+        let takerName: string | null = null;
+        let courseName: string | null = null;
+        try {
+          const { data: takerProfile } = await supabase
+            .from('user_profiles')
+            .select('display_name, username')
+            .eq('id', newTopUser)
+            .maybeSingle();
+          takerName = (takerProfile?.display_name?.trim() || takerProfile?.username?.trim() || null);
+        } catch { /* non-fatal */ }
+        try {
+          const { data: course } = await supabase
+            .from('golf_courses')
+            .select('name')
+            .eq('id', courseId)
+            .maybeSingle();
+          courseName = course?.name?.trim() || null;
+        } catch { /* non-fatal */ }
+
         await enqueueNotification(prevTopUser, "legend_lost", {
-          course_id: courseId, category: cfg.category, taken_by: newTopUser,
+          course_id: courseId,
+          category: cfg.category,
+          taken_by: newTopUser,
+          taker_name: takerName,
+          course_name: courseName,
         });
       }
       // Loser side: their rank-1 count went down — recompute authoritatively.
@@ -1429,8 +1456,25 @@ async function applyRivalryResults(userId: string, stats: any, whsScoreId: strin
       }
     }
 
+    // Look up rival display name from user_profiles ONLY (never
+    // whs_friends/whs_friend_matches — England Golf PII). Degrade to null
+    // so the dispatcher can render generic copy.
+    let rivalName: string | null = null;
+    try {
+      const { data: rivalProfile } = await supabase
+        .from('user_profiles')
+        .select('display_name, username')
+        .eq('id', rival.user_id)
+        .maybeSingle();
+      rivalName = (rivalProfile?.display_name?.trim() || rivalProfile?.username?.trim() || null);
+    } catch { /* non-fatal */ }
+
     await enqueueNotification(userId, "rival_played", {
-      rival_user_id: rival.user_id, course_id: stats.course_id, play_date: stats.play_date,
+      rival_user_id: rival.user_id,
+      rival_name: rivalName,
+      course_id: stats.course_id,
+      course_name: stats.course_name ?? null,
+      play_date: stats.play_date,
     });
   }
 }

@@ -262,14 +262,20 @@ function renderPush(r: OutboxRow, badgeMap: Map<string, any>) {
         data: { route: "/handicap?sheet=achievements", badge_id: p.badge_id },
       };
     }
-    case "legend_lost":
+    case "legend_lost": {
+      const takerName = typeof p.taker_name === 'string' ? p.taker_name.trim() : '';
+      const courseName = typeof p.course_name === 'string' ? p.course_name.trim() : '';
+      const title = takerName && courseName
+        ? `⚠️ ${takerName} took your ${courseName} record`
+        : courseName
+          ? `⚠️ Someone took your spot at ${courseName}`
+          : `⚠️ Someone took your course record`;
       return {
-        title: p.course_name
-          ? `⚠️ Someone took your spot at ${p.course_name}`
-          : `⚠️ Someone took your course record`,
+        title,
         body: `Your ${legendLabel(p.category)} record was beaten.`,
         data: { route: `/courses/${p.course_id}?tab=legends`, course_id: p.course_id },
       };
+    }
     case "legend_earned":
       return {
         title: `🏆 You're now a Course Legend`,
@@ -304,12 +310,23 @@ function renderPush(r: OutboxRow, badgeMap: Map<string, any>) {
         data: { route: "/handicap?sheet=streaks", streak_type: p.streak_type },
       };
     }
-    case "rival_played":
+    case "rival_played": {
+      const rivalName = typeof p.rival_name === 'string' ? p.rival_name.trim() : '';
+      const courseName = typeof p.course_name === 'string' ? p.course_name.trim() : '';
+      const title = rivalName
+        ? `🎯 ${rivalName} just posted a round`
+        : `🎯 A rival just posted a round`;
+      const body = rivalName && courseName
+        ? `${courseName} · see how you compare`
+        : courseName
+          ? `${courseName} · see how you compare`
+          : "See how you compare.";
       return {
-        title: `🎯 A rival just posted a round`,
-        body: "See how you compare.",
+        title,
+        body,
         data: { route: `/handicap/rivalry/${p.rival_user_id}` },
       };
+    }
     case "status_at_risk": {
       const b = badgeMap.get(p.badge_id);
       const name = b?.title ?? "Your status";

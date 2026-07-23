@@ -14,6 +14,21 @@ const supabase = createClient(
 Deno.serve(async (req) => {
   const corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  // Two modes on the same handler:
+  //   ?mode=at-risk  — Friday warning pass over the IN-FLIGHT week.
+  //   default        — Sunday end-of-week apply-freeze / break pass.
+  const url = new URL(req.url);
+  const mode = url.searchParams.get('mode');
+  if (mode === 'at-risk') {
+    try {
+      const result = await runAtRiskCheck();
+      return json({ ok: true, ...result }, 200, corsHeaders);
+    } catch (e) {
+      console.error("[refresh-streaks-weekly:at-risk]", e);
+      return json({ error: (e as Error).message }, 500, corsHeaders);
+    }
+  }
   try {
     // Week that just ended: ISO week starting on Monday containing (now - 1 day)
     const yesterday = new Date(Date.now() - 86400_000);
@@ -95,9 +110,9 @@ Deno.serve(async (req) => {
   }
 });
 
-function json(body: any, status = 200) {
+function json(body: any, status = 200, headers: Record<string, string> = {}) {
   return new Response(JSON.stringify(body), {
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
+    headers: { ...headers, "Content-Type": "application/json" },
     status,
   });
 }
@@ -125,4 +140,76 @@ async function enqueue(userId: string, type: string, payload: any) {
     urgency: type === "streak_freeze_applied" ? "medium" : "low",
     status: "pending",
   });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// At-risk check — Friday warning pass over the CURRENT (in-flight) ISO week.
+// For each active round_played streak with current_count >= 2 that has NOT yet
+// logged a qualifying round this week, enqueue one streak_at_risk push. The
+// dedupe key includes the current weekStart so a user gets at most one at-risk
+// push per streak per week (repeat runs same week collapse; next week's Friday
+// starts fresh).
+//
+// Users with freeze credits are STILL warned — a warned user who plays keeps
+// the credit for a future week; a warned user who does nothing quietly burns a
+// credit on Sunday. Warning is the better outcome either way.
+// ─────────────────────────────────────────────────────────────────────────────
+async function runAtRiskCheck() {
+  const now = new Date();
+  // Current ISO week (Mon 00:00 UTC .. next Mon 00:00 UTC).
+  const weekStart = isoWeekStart(now);
+  const weekEnd = new Date(weekStart);
+  weekEnd.setUTCDate(weekEnd.getUTCDate() + 7);
+  const weekStartISO = weekStart.toISOString().slice(0, 10);
+
+  const { data: active } = await supabase
+    .from("gam_streaks")
+    .select("user_id, streak_type, current_count")
+    .eq("streak_type", "round_played")
+    .eq("is_active", true)
+    .gte("current_count", 2);
+
+  let warned = 0, safe = 0;
+  for (const s of active ?? []) {
+    const { data: had } = await supabase
+      .from("gam_round_stats")
+      .select("whs_score_id")
+      .eq("user_id", s.user_id)
+      .eq("is_counter", true)
+      .gte("play_date", weekStartISO)
+      .lt("play_date", weekEnd.toISOString().slice(0, 10))
+      .limit(1);
+    if (had && had.length > 0) { safe++; continue; }
+
+    // Upsert with ignoreDuplicates so re-runs same week collapse. Key includes
+    // weekStart to allow a fresh warning the following week.
+    const dedupKey = `streak_risk:${s.user_id}:${s.streak_type}:${weekStartISO}`;
+    const { error } = await supabase
+      .from("gam_notification_outbox")
+      .upsert(
+        {
+          user_id: s.user_id,
+          notification_type: "streak_at_risk",
+          template_id: "streak_at_risk",
+          template_payload: {
+            streak_type: s.streak_type,
+            count: s.current_count ?? 0,
+          },
+          deduplication_key: dedupKey,
+          scheduled_for: new Date().toISOString(),
+          urgency: "high",
+          status: "pending",
+        },
+        { onConflict: "deduplication_key", ignoreDuplicates: true },
+      );
+    if (error) {
+      console.warn("[at-risk] upsert failed", s.user_id, error.message);
+      continue;
+    }
+    warned++;
+  }
+
+  const summary = { active: (active ?? []).length, warned, safe, weekStart: weekStartISO };
+  console.log(JSON.stringify({ evt: "gam_streaks_at_risk", ...summary }));
+  return summary;
 }
