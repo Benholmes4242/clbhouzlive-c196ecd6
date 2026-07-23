@@ -2,8 +2,9 @@ import { useEffect, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useMessagingActor } from './useMessagingActor';
-import type { InboxConversation, InboxParticipant, ConversationType, MemberRole } from '@/types/messaging';
-import type { Json } from '@/integrations/supabase/types';
+import { registerMessagingChannel } from './messagingResumeRegistry';
+import type { InboxConversation } from '@/types/messaging';
+import type { RealtimeChannel } from '@supabase/supabase-js';
 
 
 export function useConversations() {
@@ -16,6 +17,12 @@ export function useConversations() {
   const query = useQuery<InboxConversation[]>({
     queryKey: ['messaging', 'inbox', actorType, actorId],
     enabled: !!actor,
+    // Per-query overrides (FIX 4): the Messages tab must always reflect
+    // reality on open. 10s staleTime dampens rapid tab flips without
+    // starving the list.
+    staleTime: 10_000,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
     queryFn: async () => {
       if (!actorType || !actorId) return [];
       const { data, error } = await supabase.rpc('get_inbox', {
@@ -32,11 +39,14 @@ export function useConversations() {
   });
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const channelRef = useRef<RealtimeChannel | null>(null);
+  const subscribeTickRef = useRef(0);
+  const buildAndSubscribeRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     if (!actorType || !actorId) return;
 
-    const key = ['messaging', 'inbox', actorType, actorId];
+    const key = ['messaging', 'inbox', actorType, actorId] as const;
     const scheduleInvalidate = () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
       debounceRef.current = setTimeout(() => {
@@ -44,26 +54,48 @@ export function useConversations() {
       }, 300);
     };
 
-    const channel = supabase
-      .channel(`inbox:${actorType}:${actorId}`)
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'messages' },
-        scheduleInvalidate,
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'conversation_members' },
-        scheduleInvalidate,
-      )
-      .subscribe();
+    const buildAndSubscribe = () => {
+      if (channelRef.current) {
+        try { supabase.removeChannel(channelRef.current); } catch { /* noop */ }
+        channelRef.current = null;
+      }
+      subscribeTickRef.current += 1;
+      const channel = supabase
+        .channel(`inbox:${actorType}:${actorId}:${subscribeTickRef.current}`)
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'messages' },
+          scheduleInvalidate,
+        )
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'conversation_members' },
+          scheduleInvalidate,
+        )
+        .subscribe();
+      channelRef.current = channel;
+    };
+    buildAndSubscribeRef.current = buildAndSubscribe;
+    buildAndSubscribe();
+
+    const unregister = registerMessagingChannel({
+      getChannel: () => channelRef.current,
+      resubscribe: () => {
+        buildAndSubscribeRef.current?.();
+      },
+    });
 
     return () => {
+      unregister();
       if (debounceRef.current) {
         clearTimeout(debounceRef.current);
         debounceRef.current = null;
       }
-      supabase.removeChannel(channel);
+      if (channelRef.current) {
+        try { supabase.removeChannel(channelRef.current); } catch { /* noop */ }
+        channelRef.current = null;
+      }
+      buildAndSubscribeRef.current = null;
     };
   }, [actorType, actorId, queryClient]);
 

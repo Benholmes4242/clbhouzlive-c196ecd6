@@ -252,6 +252,7 @@ const News = lazy(() => import("./pages/News"));
 
 const InboxV2Page = lazy(() => import("./pages/messaging-v2/InboxV2Page"));
 const ThreadV2Page = lazy(() => import("./pages/messaging-v2/ThreadV2Page"));
+const MessagingShell = lazy(() => import("./pages/messaging-v2/MessagingShell"));
 
 const ActivityPageV2 = lazy(() => import("./features/activity-v2/ActivityPageV2"));
 const GolfersToFollowV2 = lazy(() => import("./pages/GolfersToFollowV2"));
@@ -530,8 +531,10 @@ function AppRoutes() {
         <Route path="/challenges" element={<Navigate to="/clubhouse" replace />} />
         
         
-        <Route path="/messages" element={<Suspense fallback={<GenericPageSkeleton />}><InboxV2Page /></Suspense>} />
-        <Route path="/messages/:conversationId" element={<Suspense fallback={<GenericPageSkeleton />}><ThreadV2Page /></Suspense>} />
+        <Route element={<Suspense fallback={<GenericPageSkeleton />}><MessagingShell /></Suspense>}>
+          <Route path="/messages" element={<Suspense fallback={<GenericPageSkeleton />}><InboxV2Page /></Suspense>} />
+          <Route path="/messages/:conversationId" element={<Suspense fallback={<GenericPageSkeleton />}><ThreadV2Page /></Suspense>} />
+        </Route>
         
 
 

@@ -9,7 +9,9 @@ import {
   markFailed as cacheMarkFailed,
   removeOptimistic as cacheRemoveOptimistic,
 } from './threadCache';
-import type { ThreadMessage, MessageReaction } from '@/types/messaging';
+import { registerMessagingChannel } from './messagingResumeRegistry';
+import type { ThreadMessage, MessageReaction, InboxConversation } from '@/types/messaging';
+import type { RealtimeChannel } from '@supabase/supabase-js';
 
 const PAGE_SIZE = 30;
 
@@ -23,6 +25,12 @@ export function useThread(conversationId: string | null) {
     queryKey,
     enabled: !!conversationId && !!actor,
     initialPageParam: null as string | null,
+    // Per-query overrides (FIX 1): opening a thread must always show current
+    // messages. Global QueryClient defaults (perfTuning) keep 5m staleTime
+    // and refetchOnMount:false, which is why this must be scoped here.
+    staleTime: 0,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
     queryFn: async ({ pageParam }) => {
       const { data, error } = await supabase.rpc('get_thread', {
         p_conversation_id: conversationId as string,
@@ -56,6 +64,10 @@ export function useThread(conversationId: string | null) {
 
   // Realtime channel
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const channelRef = useRef<RealtimeChannel | null>(null);
+  const subscribeTickRef = useRef(0);
+  const buildAndSubscribeRef = useRef<(() => void) | null>(null);
+
   useEffect(() => {
     if (!conversationId) return;
 
@@ -68,31 +80,56 @@ export function useThread(conversationId: string | null) {
       }, 200);
     };
 
-    const channel = supabase
-      .channel(`thread:${conversationId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'messages',
-          filter: `conversation_id=eq.${conversationId}`,
-        },
-        scheduleInvalidate,
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'message_reactions' },
-        scheduleInvalidate,
-      )
-      .subscribe();
+    const buildAndSubscribe = () => {
+      // Tear down previous channel if any.
+      if (channelRef.current) {
+        try { supabase.removeChannel(channelRef.current); } catch { /* noop */ }
+        channelRef.current = null;
+      }
+      subscribeTickRef.current += 1;
+      const name = `thread:${conversationId}:${subscribeTickRef.current}`;
+      const channel = supabase
+        .channel(name)
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'messages',
+            filter: `conversation_id=eq.${conversationId}`,
+          },
+          scheduleInvalidate,
+        )
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'message_reactions' },
+          scheduleInvalidate,
+        )
+        .subscribe();
+      channelRef.current = channel;
+    };
+    buildAndSubscribeRef.current = buildAndSubscribe;
+    buildAndSubscribe();
+
+    // FIX 2: expose channel + resubscribe callback to the messaging resume hook.
+    const unregister = registerMessagingChannel({
+      getChannel: () => channelRef.current,
+      resubscribe: () => {
+        buildAndSubscribeRef.current?.();
+      },
+    });
 
     return () => {
+      unregister();
       if (debounceRef.current) {
         clearTimeout(debounceRef.current);
         debounceRef.current = null;
       }
-      supabase.removeChannel(channel);
+      if (channelRef.current) {
+        try { supabase.removeChannel(channelRef.current); } catch { /* noop */ }
+        channelRef.current = null;
+      }
+      buildAndSubscribeRef.current = null;
     };
   }, [conversationId, queryClient]);
 
@@ -100,19 +137,49 @@ export function useThread(conversationId: string | null) {
   const newestId = messages.length ? messages[messages.length - 1].id : null;
   useEffect(() => {
     if (!conversationId || !actor || !newestId) return;
+    const actorType = actor.actorType;
+    const actorId = actor.actorId;
     supabase
       .rpc('msg_mark_read', {
         p_conversation_id: conversationId,
-        p_as_actor_type: actor.actorType,
-        p_as_actor_id: actor.actorId,
+        p_as_actor_type: actorType,
+        p_as_actor_id: actorId,
         p_up_to_message_id: newestId,
       })
       .then(({ error }) => {
         if (error) return;
-        // Force the actor-scoped DM unread recount so header / tile badges drop
-        // immediately. Safe alongside the realtime subscription below: refetch
-        // is idempotent and the RPC itself is actor-scoped.
-        queryClient.invalidateQueries({ queryKey: ['actor-unread-counts'] });
+
+        // FIX 3.1: Optimistic row clear on the inbox cache — set unread_count
+        // to 0 for the conversation just read so per-row badges drop instantly.
+        const inboxKey = ['messaging', 'inbox', actorType, actorId] as const;
+        queryClient.setQueryData<InboxConversation[] | undefined>(
+          inboxKey,
+          (prev) => {
+            if (!Array.isArray(prev)) return prev;
+            let changed = false;
+            const next = prev.map((row) => {
+              if (row.conversation_id === conversationId && (row.unread_count ?? 0) !== 0) {
+                changed = true;
+                return { ...row, unread_count: 0 };
+              }
+              return row;
+            });
+            return changed ? next : prev;
+          },
+        );
+
+        // FIX 3.2: Invalidate inbox (prefix) for consistency across actors.
+        queryClient.invalidateQueries({
+          queryKey: ['messaging', 'inbox'],
+          refetchType: 'active',
+        });
+
+        // FIX 3.3: Force refetch of actor-unread-counts even if inactive
+        // (badge query may be inactive while on a thread route).
+        queryClient.invalidateQueries({
+          queryKey: ['actor-unread-counts'],
+          refetchType: 'all',
+        });
       });
   }, [conversationId, actor, newestId, queryClient]);
 
