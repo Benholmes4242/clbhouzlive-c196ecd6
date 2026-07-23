@@ -84,10 +84,19 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
     );
   }
 
+  const showGhost = Boolean(user) && !connection;
+  const ghost = showGhost ? (
+    <ConnectGhostPrompt
+      surface="holes"
+      ghost={<HolesGhost />}
+      onConnect={() => navigate('/handicap')}
+    />
+  ) : null;
+
   if (!data?.available || holes.length === 0) {
     return (
       <>
-        <ConnectHandicapCue variant="holes" courseName={meta?.course_name ?? ''} />
+        {ghost}
         <HolesEmptyState courseName={meta?.course_name ?? null} />
       </>
     );
@@ -95,7 +104,7 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
 
   return (
     <>
-      <ConnectHandicapCue variant="holes" courseName={meta?.course_name ?? ''} />
+      {ghost}
       <HoleDataSheet
         courseName={meta?.course_name ?? ''}
         courseId={courseId}
