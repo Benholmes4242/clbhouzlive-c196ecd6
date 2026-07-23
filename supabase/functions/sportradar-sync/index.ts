@@ -91,15 +91,16 @@ Deno.serve(async (req) => {
     }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    const { 
-      action, 
-      tourId, 
-      year, 
-      tournamentId, 
+    const {
+      action,
+      tourId,
+      year,
+      tournamentId,
       playerId,
       seasonYear,
       roundType,
-      roundNumber
+      roundNumber,
+      rankingType,
     } = await req.json();
 
     const effectiveYear = year || seasonYear || 2026;
