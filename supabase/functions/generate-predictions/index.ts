@@ -298,14 +298,43 @@ serve(async (req) => {
       }
     }
 
-    // Fetch world rankings (used for ordering; missing = unranked)
-    const { data: rankings } = await supabase
+    // FIX (Bug 2): Fetch the LATEST snapshot only.
+    // sr_world_rankings holds ~21 historical rows per player (4,211 total).
+    // The previous query ordered by rank ascending and limited to 500, which
+    // (a) captured only ~24 ranks' worth of historical duplicates, and
+    // (b) after Map dedup by player_id, kept each player's WORST historical rank.
+    const { data: latestRankingDateRow, error: latestRankingDateErr } = await supabase
       .from('sr_world_rankings')
-      .select('player_id, rank, prior_rank, points')
-      .order('rank', { ascending: true })
-      .limit(500);
+      .select('ranking_date')
+      .order('ranking_date', { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
-    const rankingsMap = new Map(rankings?.map(r => [r.player_id, r]) || []);
+    let rankings: Array<{ player_id: string; rank: number; prior_rank: number | null; points: number | null; ranking_date: string }> = [];
+    if (latestRankingDateErr || !latestRankingDateRow?.ranking_date) {
+      console.error('[generate-predictions] No latest ranking_date found in sr_world_rankings — proceeding with empty rankings map', latestRankingDateErr);
+    } else {
+      const { data: rankingRows, error: rankingsErr } = await supabase
+        .from('sr_world_rankings')
+        .select('player_id, rank, prior_rank, points, ranking_date')
+        .eq('ranking_date', latestRankingDateRow.ranking_date)
+        .limit(2000);
+      if (rankingsErr) {
+        console.error('[generate-predictions] Failed to fetch latest-snapshot rankings:', rankingsErr);
+      } else {
+        rankings = rankingRows ?? [];
+      }
+    }
+
+    // Defensive dedup: if a duplicate row exists for a player on the same date,
+    // keep the LOWEST (best) rank rather than blindly overwriting.
+    const rankingsMap = new Map<string, { player_id: string; rank: number; prior_rank: number | null; points: number | null }>();
+    for (const r of rankings) {
+      const existing = rankingsMap.get(r.player_id);
+      if (!existing || (typeof r.rank === 'number' && r.rank < existing.rank)) {
+        rankingsMap.set(r.player_id, r);
+      }
+    }
 
     // Build stats index by player_id (may be empty for non-PGA tours)
     const statsById = new Map<string, { raw_data: any; player: any }>();
