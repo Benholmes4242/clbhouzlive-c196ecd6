@@ -1,0 +1,437 @@
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { Skeleton } from '@/components/ui/skeleton';
+import { DarkCard, DarkSectionHeader } from '../_shared/darkAtoms';
+import {
+  useScoringBreakdownAllCourses,
+  type ParSplit,
+  type ScoringBreakdownAllCourses,
+} from '@/lib/whs/hooks';
+
+const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+
+// Verdict hues (lifted for contrast on charcoal)
+const GREEN = '#3DD68C';
+const AMBER = '#FFB020';
+const RED = '#FF6B72';
+
+const MIN_HOLES_PAR_TYPE = 50;
+const MIN_ROUNDS = 10;
+const MIN_COURSES = 3;
+
+interface Props {
+  readOnly?: boolean;
+}
+
+type ParTypeKey = 'par3' | 'par4' | 'par5';
+interface RingRow {
+  key: ParTypeKey;
+  parN: 3 | 4 | 5;
+  data: ParSplit;
+}
+
+const HEX_TO_RGBA = (hex: string, a: number) => {
+  const h = hex.replace('#', '');
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${a})`;
+};
+
+const Ring: React.FC<{ row: RingRow; color: string; t: (k: string, opts?: any) => string }> = ({
+  row,
+  color,
+  t,
+}) => {
+  const size = 92;
+  const stroke = 9;
+  const r = (size - stroke) / 2;
+  const c = 2 * Math.PI * r;
+  const pct = Math.min(1, Math.max(0, row.data.avg_over / 1.2));
+  const dash = pct * c;
+  const gap = c - dash;
+
+  return (
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          stroke={HEX_TO_RGBA(color, 0.16)}
+          strokeWidth={stroke}
+        />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          stroke={color}
+          strokeWidth={stroke}
+          strokeDasharray={`${dash} ${gap}`}
+          strokeLinecap="round"
+        />
+        <text
+          x={size / 2}
+          y={size / 2}
+          textAnchor="middle"
+          dominantBaseline="central"
+          transform={`rotate(90 ${size / 2} ${size / 2})`}
+          style={{
+            fontFamily: FONT,
+            fontSize: 19,
+            fontWeight: 800,
+            fill: 'var(--hcp-t-100)',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          +{row.data.avg_over.toFixed(2)}
+        </text>
+      </svg>
+      <div
+        style={{
+          marginTop: 10,
+          minHeight: 26,
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'center',
+          fontSize: 9.5,
+          fontWeight: 800,
+          letterSpacing: '0.14em',
+          color: 'var(--hcp-t-60)',
+          textTransform: 'uppercase',
+          whiteSpace: 'pre-line',
+          textAlign: 'center',
+          lineHeight: 1.35,
+        }}
+      >
+        {t('courses.gameEverywhere.parNs', { n: row.parN })}
+      </div>
+      <div
+        style={{
+          fontSize: 11,
+          fontWeight: 700,
+          color,
+          fontVariantNumeric: 'tabular-nums',
+          marginTop: 2,
+        }}
+      >
+        {t('courses.gameEverywhere.nHoles', { count: row.data.holes_played })}
+      </div>
+    </div>
+  );
+};
+
+const GameEverywhereBody: React.FC<{ d: ScoringBreakdownAllCourses }> = ({ d }) => {
+  const { t } = useTranslation('courses');
+
+  const rings: RingRow[] = ([
+    { key: 'par3', parN: 3, data: d.par3 },
+    { key: 'par4', parN: 4, data: d.par4 },
+    { key: 'par5', parN: 5, data: d.par5 },
+  ] as Array<{ key: ParTypeKey; parN: 3 | 4 | 5; data: ParSplit | null }>)
+    .filter((r): r is RingRow => !!r.data && r.data.holes_played >= MIN_HOLES_PAR_TYPE);
+
+  const showS1 = rings.length >= 2;
+
+  // Rank rings by avg_over: highest = RED, lowest = GREEN, middle = AMBER
+  const ranked = [...rings].sort((a, b) => a.data.avg_over - b.data.avg_over);
+  const colorFor = (row: RingRow): string => {
+    if (ranked.length <= 1) return AMBER;
+    if (row === ranked[ranked.length - 1]) return RED;
+    if (row === ranked[0]) return GREEN;
+    return AMBER;
+  };
+
+  // Stratum 1 sentence
+  const worst = ranked[ranked.length - 1];
+  const best = ranked[0];
+  const totalHoles = rings.reduce((s, r) => s + r.data.holes_played, 0);
+  const share =
+    worst && totalHoles > 0 ? Math.round((worst.data.holes_played / totalHoles) * 100) : 0;
+
+  // Stratum 2
+  const thirds = [...(d.thirds ?? [])].sort((a, b) => a.third - b.third);
+  const showS2 = thirds.length === 3;
+  const vals = thirds.map((x) => x.avg_over_six);
+  const maxV = Math.max(...vals, 0.0001);
+  const minV = Math.min(...vals);
+  const spread = maxV - minV;
+  const worstIdx = vals.indexOf(maxV);
+  const bestIdx = vals.indexOf(minV);
+  const evenSpread = spread < 1.5;
+
+  const thirdLabel = (i: number): string =>
+    i === 0
+      ? t('courses.gameEverywhere.third1')
+      : i === 1
+      ? t('courses.gameEverywhere.third2')
+      : t('courses.gameEverywhere.third3');
+
+  let s2Sentence = '';
+  if (showS2) {
+    if (evenSpread) {
+      s2Sentence = t('courses.gameEverywhere.s2SentenceEven');
+    } else if (worstIdx === 0) {
+      s2Sentence = t('courses.gameEverywhere.s2SentenceEarly', {
+        best: thirdLabel(bestIdx),
+        spread: spread.toFixed(1),
+      });
+    } else if (worstIdx === 1) {
+      s2Sentence = t('courses.gameEverywhere.s2SentenceMiddle', {
+        best: thirdLabel(bestIdx),
+        spread: spread.toFixed(1),
+      });
+    } else {
+      s2Sentence = t('courses.gameEverywhere.s2SentenceLate', {
+        best: thirdLabel(bestIdx),
+        spread: spread.toFixed(1),
+      });
+    }
+  }
+
+  return (
+    <>
+      {/* Headline */}
+      <div
+        style={{
+          padding: '18px 0',
+          margin: '0 18px',
+          borderBottom: '1px solid var(--hcp-line)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 14,
+        }}
+      >
+        <span
+          style={{
+            fontSize: 48,
+            fontWeight: 800,
+            letterSpacing: '-0.022em',
+            lineHeight: 1,
+            color: 'var(--hcp-t-100)',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          +{(d.avg_over_par ?? 0).toFixed(1)}
+        </span>
+        <span
+          style={{
+            fontSize: 13.5,
+            fontWeight: 700,
+            color: 'var(--hcp-t-80)',
+            lineHeight: 1.3,
+            whiteSpace: 'pre-line',
+          }}
+        >
+          {t('courses.gameEverywhere.headlineUnit')}
+        </span>
+      </div>
+      <div
+        style={{
+          padding: '10px 18px 0',
+          fontSize: 12.5,
+          fontWeight: 500,
+          color: 'var(--hcp-t-40)',
+        }}
+      >
+        {t('courses.gameEverywhere.builtFrom', {
+          count: d.rounds,
+          rounds: d.rounds,
+          courses: d.courses_played,
+        })}
+      </div>
+
+      {/* Stratum 1 — rings */}
+      {showS1 && (
+        <div style={{ padding: '22px 18px 18px', borderBottom: '1px solid var(--hcp-line)' }}>
+          <div
+            style={{
+              fontSize: 14,
+              fontWeight: 800,
+              color: 'var(--hcp-t-100)',
+              letterSpacing: '-0.01em',
+            }}
+          >
+            {t('courses.gameEverywhere.s1Title')}
+          </div>
+          <div style={{ marginTop: 3, fontSize: 12, color: 'var(--hcp-t-60)' }}>
+            {t('courses.gameEverywhere.s1Sub')}
+          </div>
+          <div style={{ display: 'flex', gap: 6, marginTop: 18 }}>
+            {rings.map((row) => (
+              <Ring key={row.key} row={row} color={colorFor(row)} t={t} />
+            ))}
+          </div>
+          {worst && best && worst !== best && (
+            <div
+              style={{
+                marginTop: 13,
+                fontSize: 13.5,
+                fontWeight: 500,
+                color: 'var(--hcp-t-80)',
+                lineHeight: 1.5,
+              }}
+            >
+              {t('courses.gameEverywhere.s1Sentence', {
+                worst: worst.parN,
+                worstAvg: worst.data.avg_over.toFixed(2),
+                best: best.parN,
+                bestAvg: best.data.avg_over.toFixed(2),
+                share,
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Stratum 2 — thirds */}
+      {showS2 && (
+        <div style={{ padding: '22px 18px 20px' }}>
+          <div
+            style={{
+              fontSize: 14,
+              fontWeight: 800,
+              color: 'var(--hcp-t-100)',
+              letterSpacing: '-0.01em',
+            }}
+          >
+            {t('courses.gameEverywhere.s2Title')}
+          </div>
+          <div style={{ marginTop: 3, fontSize: 12, color: 'var(--hcp-t-60)' }}>
+            {t('courses.gameEverywhere.s2Sub')}
+          </div>
+          <div
+            style={{
+              display: 'flex',
+              gap: 12,
+              marginTop: 18,
+              height: 150,
+              alignItems: 'stretch',
+            }}
+          >
+            {thirds.map((row, i) => {
+              const barH = 52 + (row.avg_over_six / maxV) * (92 - 52);
+              const isWorst = !evenSpread && i === worstIdx;
+              const barColor = isWorst ? RED : 'rgba(255,255,255,0.22)';
+              return (
+                <div
+                  key={row.third}
+                  style={{
+                    flex: 1,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'flex-end',
+                    height: '100%',
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: 15.5,
+                      fontWeight: 800,
+                      color: 'var(--hcp-t-100)',
+                      fontVariantNumeric: 'tabular-nums',
+                      textAlign: 'center',
+                      marginBottom: 6,
+                    }}
+                  >
+                    +{row.avg_over_six.toFixed(1)}
+                  </div>
+                  <div
+                    style={{
+                      height: `${barH}px`,
+                      background: barColor,
+                      borderRadius: 4,
+                    }}
+                  />
+                  <div style={{ height: 2, background: 'var(--hcp-line-2)', marginTop: 0 }} />
+                  <div
+                    style={{
+                      marginTop: 8,
+                      fontSize: 10.5,
+                      fontWeight: 800,
+                      color: 'var(--hcp-t-60)',
+                      letterSpacing: '0.12em',
+                      textTransform: 'uppercase',
+                      textAlign: 'center',
+                    }}
+                  >
+                    {thirdLabel(i)}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          {s2Sentence && (
+            <div
+              style={{
+                marginTop: 16,
+                fontSize: 13.5,
+                fontWeight: 500,
+                color: 'var(--hcp-t-80)',
+                lineHeight: 1.5,
+              }}
+            >
+              {s2Sentence}
+            </div>
+          )}
+        </div>
+      )}
+    </>
+  );
+};
+
+export const GameEverywhereCard: React.FC<Props> = ({ readOnly = false }) => {
+  const { t } = useTranslation('courses');
+  const enabled = !readOnly;
+  const { data, isLoading, isError } = useScoringBreakdownAllCourses(enabled);
+
+  if (readOnly) return null;
+
+  if (isLoading) {
+    return (
+      <section style={{ marginTop: 24 }}>
+        <DarkSectionHeader
+          eyebrow={t('courses.gameEverywhere.eyebrow')}
+          title={t('courses.gameEverywhere.title')}
+        />
+        <DarkCard>
+          <div style={{ padding: 18 }}>
+            <Skeleton className="h-12 w-40 mb-3" />
+            <Skeleton className="h-4 w-64 mb-6" />
+            <div style={{ display: 'flex', gap: 6, marginBottom: 20 }}>
+              <Skeleton className="h-24 flex-1 rounded-full" />
+              <Skeleton className="h-24 flex-1 rounded-full" />
+              <Skeleton className="h-24 flex-1 rounded-full" />
+            </div>
+            <div style={{ display: 'flex', gap: 12, height: 120 }}>
+              <Skeleton className="flex-1 h-full" />
+              <Skeleton className="flex-1 h-full" />
+              <Skeleton className="flex-1 h-full" />
+            </div>
+          </div>
+        </DarkCard>
+      </section>
+    );
+  }
+
+  if (isError || !data) return null;
+  if (data.rounds < MIN_ROUNDS) return null;
+  if (data.courses_played < MIN_COURSES) return null;
+  if (data.avg_over_par == null) return null;
+
+  return (
+    <section style={{ marginTop: 24 }}>
+      <DarkSectionHeader
+        eyebrow={t('courses.gameEverywhere.eyebrow')}
+        title={t('courses.gameEverywhere.title')}
+      />
+      <DarkCard>
+        <GameEverywhereBody d={data} />
+      </DarkCard>
+    </section>
+  );
+};
+
+export default GameEverywhereCard;
