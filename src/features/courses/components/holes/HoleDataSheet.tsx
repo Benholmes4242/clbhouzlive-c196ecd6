@@ -13,6 +13,7 @@ import type { MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
 import { formatNumber } from '@/i18n/format';
 import { HoleGlyph, HoleGlyphDefs, type HoleGlyphKind } from './HoleGlyph';
 import { fmtToPar } from '@/features/courses/_shared/holes/formatToPar';
+import { ScoringBreakdownSection } from './ScoringBreakdownSection';
 
 // ── Tokens ────────────────────────────────────────────────────────────
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
@@ -60,6 +61,7 @@ function pctSum(row: CourseHole, keys: (keyof CourseHole['dist'])[]): number {
 
 interface Props {
   courseName: string;
+  courseId?: string;
   holes: CourseHole[];
   totalRounds: number;
   myByHole: Map<number, MyHolePerformanceRow>;
@@ -68,6 +70,7 @@ interface Props {
 
 export const HoleDataSheet: React.FC<Props> = ({
   courseName,
+  courseId,
   holes,
   totalRounds,
   myByHole,
@@ -189,6 +192,9 @@ export const HoleDataSheet: React.FC<Props> = ({
         totalHoles={totalHoles}
         missingBirdieHole={missingBirdieHole}
       />
+
+      {/* Scoring breakdown — renders nothing when RPC missing / <5 rounds / no WHS */}
+      <ScoringBreakdownSection golfCourseId={courseId} />
 
       {/* 4. Hole by hole */}
       <section style={{ scrollMarginTop: STICKY_SAFE, display: 'flex', flexDirection: 'column', gap: 8 }}>
