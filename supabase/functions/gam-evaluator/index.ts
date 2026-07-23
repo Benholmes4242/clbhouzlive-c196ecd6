@@ -93,11 +93,18 @@ Deno.serve(async (req) => {
 });
 
 function json(body: any, status = 200) {
+  // Note: CORS is applied at the edge via `corsFor()` in the handler; this
+  // helper intentionally emits a permissive baseline so pings/replies don't
+  // crash when the module-scoped `corsHeaders` symbol isn't in scope.
   return new Response(JSON.stringify(body), {
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Content-Type': 'application/json',
+    },
     status,
   });
 }
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Queue
