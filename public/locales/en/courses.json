@@ -94,7 +94,7 @@
     "scoringBreakdown": {
       "eyebrow": "Your scoring breakdown",
       "title": "Where your shots go",
-      "headlineUnit": "shots over par in an, average round here",
+      "headlineUnit": "shots over par in an\naverage round here",
       "builtFrom_one": "Built from your {{count}} round at this course.",
       "builtFrom_other": "Built from your last {{count}} rounds at this course.",
       "moreRoundsHint": "Play a few more rounds here and we'll show you the patterns.",
