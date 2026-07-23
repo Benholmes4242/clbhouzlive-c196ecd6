@@ -82,6 +82,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [showWebsiteSheet, setShowWebsiteSheet] = useState(false);
   const { user } = useSupabaseSession();
+  const { data: aboutConnection } = useWhsConnection(user?.id);
   
   
   const navigate = useNavigate();
