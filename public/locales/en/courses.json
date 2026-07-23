@@ -94,8 +94,10 @@
     "scoringBreakdown": {
       "eyebrow": "Your scoring breakdown",
       "title": "Where your shots go",
-      "headlineUnit": "shots over par, every round here",
-      "builtFrom": "Built from your last {{count}} rounds at this course.",
+      "headlineUnit": "shots over par in an, average round here",
+      "builtFrom_one": "Built from your {{count}} round at this course.",
+      "builtFrom_other": "Built from your last {{count}} rounds at this course.",
+      "moreRoundsHint": "Play a few more rounds here and we'll show you the patterns.",
       "s1Title": "Your most damaging holes",
       "s1Sub": "Ranked by shots lost, not by difficulty",
       "s2Title": "What's costing you the shots",
