@@ -17,7 +17,8 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsFor } from '../_shared/cors.ts';
 
-export const FUNCTION_VERSION = '2026-07-21T14:00:00Z-v3';
+export const FUNCTION_VERSION = '2026-07-23T04:45:00Z-v4-admin-consolidated';
+
 
 // -------- URL parsing helpers (public storage URL convention). ----------
 // Public URL: {SUPABASE_URL}/storage/v1/object/public/{bucket}/{key...}
@@ -77,29 +78,63 @@ Deno.serve(async (req) => {
   } catch (_) { /* fall through */ }
 
   try {
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: 'Missing authorization header' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
-
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const admin = createClient(supabaseUrl, serviceKey);
 
-    const userClient = createClient(supabaseUrl, anonKey, {
-      global: { headers: { Authorization: authHeader } },
-    });
-    const { data: { user }, error: userErr } = await userClient.auth.getUser();
-    if (userErr || !user) {
-      return new Response(JSON.stringify({ error: 'Authentication failed' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    // -------- Resolve target: self-serve (JWT) OR admin-mode (internal secret) ----
+    // Admin mode: secure-admin-operations delegates the full erasure to us so
+    // there is exactly ONE code path that sweeps a user. Guarded by
+    // INTERNAL_FN_SECRET header (fail-closed).
+    let targetId: string;
+    let targetEmail: string | undefined;
+    let mode: 'self' | 'admin' = 'self';
+
+    const rawBody = await req.clone().json().catch(() => null) as any;
+    if (rawBody?.action === 'admin_delete') {
+      const expected = Deno.env.get('INTERNAL_FN_SECRET');
+      const provided = req.headers.get('x-internal-secret');
+      if (!expected || provided !== expected) {
+        return new Response(JSON.stringify({ error: 'Unauthorized (admin_delete)' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+      if (!rawBody.targetUserId) {
+        return new Response(JSON.stringify({ error: 'Missing targetUserId' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+      mode = 'admin';
+      targetId = rawBody.targetUserId as string;
+      try {
+        const { data: lookup } = await admin.auth.admin.getUserById(targetId);
+        targetEmail = lookup?.user?.email ?? undefined;
+      } catch (_) { /* proceed without email */ }
+    } else {
+      const authHeader = req.headers.get('Authorization');
+      if (!authHeader) {
+        return new Response(JSON.stringify({ error: 'Missing authorization header' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+      const userClient = createClient(supabaseUrl, anonKey, {
+        global: { headers: { Authorization: authHeader } },
+      });
+      const { data: { user }, error: userErr } = await userClient.auth.getUser();
+      if (userErr || !user) {
+        return new Response(JSON.stringify({ error: 'Authentication failed' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+      targetId = user.id;
+      targetEmail = user.email ?? undefined;
     }
 
-    console.log(`[delete-account v3] user=${user.id}`);
-    const admin = createClient(supabaseUrl, serviceKey);
-    const targetId = user.id;
+    // Shim so downstream code that referenced `user.id` / `user.email` keeps working.
+    const user = { id: targetId, email: targetEmail } as { id: string; email?: string };
+    console.log(`[delete-account v4] mode=${mode} user=${targetId}`);
     const deletedAt = new Date().toISOString();
+    const auditAction = mode === 'admin' ? 'ADMIN_DELETE_ACCOUNT_GDPR' : 'SELF_DELETE_ACCOUNT_GDPR';
+
+
+
 
     // ---------- Double-submit guard ----------
     try {
@@ -115,7 +150,7 @@ Deno.serve(async (req) => {
       const twoMinAgo = new Date(Date.now() - 120_000).toISOString();
       const { count } = await admin.from('admin_audit_log')
         .select('id', { count: 'exact', head: true })
-        .eq('action', 'SELF_DELETE_ACCOUNT_GDPR')
+        .eq('action', auditAction)
         .eq('target_user_id', targetId)
         .gte('created_at', twoMinAgo);
       if ((count ?? 0) >= 1) {
@@ -127,12 +162,13 @@ Deno.serve(async (req) => {
     // ---------- Start-marker audit row (returns id we thread through the manifest). ----------
     const { data: auditStart } = await admin.from('admin_audit_log').insert({
       admin_user_id: targetId,
-      action: 'SELF_DELETE_ACCOUNT_GDPR',
+      action: auditAction,
       target_user_id: targetId,
       target_email: user.email,
-      details: { phase: 'started', started_at: deletedAt, version: FUNCTION_VERSION },
+      details: { phase: 'started', started_at: deletedAt, version: FUNCTION_VERSION, mode },
     }).select('id').maybeSingle();
     const deletionAuditId = auditStart?.id ?? crypto.randomUUID();
+
 
     // =========================================================================
     // STEP 1 — ENUMERATE assets while pointers still exist.
@@ -532,29 +568,32 @@ Deno.serve(async (req) => {
     };
     try { await drain(); } catch (e) { console.error('[delete-account v3] drain failed:', e); }
 
-    // Terminal audit row with full details.
+    // Terminal audit row with full details (includes per-table sweep counts).
     try {
       await admin.from('admin_audit_log').insert({
         admin_user_id: targetId,
-        action: 'SELF_DELETE_ACCOUNT_GDPR',
+        action: auditAction,
         target_user_id: targetId,
         target_email: user.email,
         details: {
           phase: 'completed',
           deleted_at: deletedAt,
           version: FUNCTION_VERSION,
+          mode,
           deletionAuditId,
           deletion_results: results,
           assetCounts,
           gdpr_compliant: true,
         },
       });
-    } catch (e) { console.error('[delete-account v3] terminal audit failed:', e); }
+    } catch (e) { console.error('[delete-account v4] terminal audit failed:', e); }
 
-    console.log(`[delete-account v3] done user=${targetId} assets=`, assetCounts);
+    console.log(`[delete-account v4] done mode=${mode} user=${targetId} assets=`, assetCounts);
     return new Response(JSON.stringify({
-      success: true, message: 'Account deleted', version: FUNCTION_VERSION, assetCounts,
+      success: true, message: 'Account deleted', version: FUNCTION_VERSION, mode,
+      assetCounts, deletion_results: results,
     }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+
   } catch (error) {
     console.error('[delete-account v3] unexpected:', error);
     return new Response(JSON.stringify({ error: 'An unexpected error occurred' }),

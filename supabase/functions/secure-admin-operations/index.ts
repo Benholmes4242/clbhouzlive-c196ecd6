@@ -80,7 +80,8 @@ serve(async (req) => {
 
   // Unauthenticated ping to verify running function version.
   // Bump FUNCTION_VERSION on every change to this function.
-  const FUNCTION_VERSION = '2026-07-22T10:30:00Z-v4-engagement-sweep';
+  const FUNCTION_VERSION = '2026-07-23T04:50:00Z-v5-delegated-erasure';
+
   try {
     const peek = req.clone();
     const peekBody = await peek.json().catch(() => null);
@@ -232,89 +233,55 @@ serve(async (req) => {
         }
         const label = resolvedEmail ?? targetUserId;
 
-        // Pre-cleanup: delete the target's OWN rows in bounded tables before
-        // auth.admin.deleteUser. Covers both (i) tables whose FK to auth.users
-        // has NO ACTION (which would block deletion) and (ii) tables with no
-        // FK at all (which would leave orphans — see the post_likes incident).
-        // Admin-actor / podium references intentionally remain blocking so the
-        // caller sees the constraint verbatim. Audit/immutable-ledger tables
-        // (analytics_events, admin_audit_log, user_xp_events, gam_user_level_events,
-        // profile_daily_metrics, events.created_by, business_team_members.created_by,
-        // and polymorphic actor_id columns) are intentionally retained.
-        const preCleanupSpec: Array<{ table: string; column: string }> = [
-          // Already-tracked blocking FKs
-          { table: 'post_views', column: 'viewer_id' },
-          { table: 'user_courses', column: 'user_id' },
-          { table: 'user_top100_courses', column: 'user_id' },
-          { table: 'business_analytics_events', column: 'user_id' },
-          { table: 'creator_profile_events', column: 'user_id' },
-          { table: 'profile_analytics_events', column: 'user_id' },
-          // v4 engagement sweep — orphan gaps (no FK enforcement)
-          { table: 'post_likes', column: 'user_id' },
-          { table: 'post_shares', column: 'user_id' },
-          { table: 'post_impressions', column: 'user_id' },
-          { table: 'comment_likes_v2', column: 'user_id' },
-          { table: 'comments_v2', column: 'user_id' },
-          { table: 'review_votes', column: 'user_id' },
-          { table: 'course_media_likes', column: 'user_id' },
-          { table: 'feat_reactions', column: 'user_id' },
-          { table: 'hidden_comments', column: 'user_id' },
-          { table: 'message_hidden', column: 'actor_id' },
-          { table: 'message_reactions', column: 'user_id' },
-          { table: 'conversation_members', column: 'actor_id' },
-          { table: 'pickem_picks', column: 'user_id' },
-          { table: 'event_participants', column: 'user_id' },
-          { table: 'user_followed_colleges', column: 'user_id' },
-          { table: 'user_top_ten_lists', column: 'user_id' },
-          { table: 'user_badges', column: 'user_id' },
-          { table: 'user_suggestion_dismissals', column: 'user_id' },
-          { table: 'swing_sessions', column: 'user_id' },
-          { table: 'swing_shares', column: 'user_id' },
-          { table: 'caddie_logs', column: 'user_id' },
-          { table: 'pro_ai_analyses', column: 'user_id' },
-          { table: 'ai_caption_usage', column: 'user_id' },
-          { table: 'echo_v2_rate_limits', column: 'user_id' },
-          { table: 'leaderboard_highlights', column: 'user_id' },
-          { table: 'profile_immersive_telemetry', column: 'user_id' },
-          { table: 'profile_immersive_telemetry', column: 'viewer_id' },
-          { table: 'whs_friend_leaderboard_snapshots', column: 'user_id' },
-        ];
-        const preCleanup: Record<string, number> = {};
-        let preCleanupFailed: { table: string; error: string } | null = null;
-        for (const { table, column } of preCleanupSpec) {
-          const { error: delErr, count } = await supabase
-            .from(table)
-            .delete({ count: 'exact' })
-            .eq(column, targetUserId);
-          const key = `${table}.${column}`;
-          if (delErr) {
-            preCleanupFailed = { table: key, error: delErr.message };
+        // CANONICAL ERASURE PATH — delegate to delete-account (admin mode).
+        // Prior to v5 this function maintained its own preCleanup list which
+        // drifted from delete-account and left orphans (see Jul 22 incident:
+        // 45 orphan post_likes for a deleted user_id). We now have exactly
+        // one path that sweeps a user; both self-serve and admin console go
+        // through delete-account/index.ts. Per-table counts + assetCounts
+        // come back in the response and land in this audit row's details.
+        const internalSecret = Deno.env.get('INTERNAL_FN_SECRET');
+        if (!internalSecret) {
+          auditDetails.error = 'INTERNAL_FN_SECRET not configured';
+          result = { error: auditDetails.error };
+          break;
+        }
+        const deleteAcctUrl = `${supabaseUrl}/functions/v1/delete-account`;
+        let delegated: any = null;
+        try {
+          const resp = await fetch(deleteAcctUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-internal-secret': internalSecret,
+              // Service-role Authorization satisfies Supabase's function gateway;
+              // delete-account itself gates admin mode on x-internal-secret.
+              'Authorization': `Bearer ${serviceRoleKey}`,
+              'apikey': serviceRoleKey,
+            },
+            body: JSON.stringify({ action: 'admin_delete', targetUserId }),
+          });
+          delegated = await resp.json().catch(() => ({ error: 'invalid_json' }));
+          if (!resp.ok || delegated?.error) {
+            auditDetails.error = `delete-account failed: ${delegated?.error ?? resp.status}`;
+            auditDetails.delegated = delegated;
+            result = { error: auditDetails.error };
             break;
           }
-          preCleanup[key] = count ?? 0;
-        }
-        auditDetails.preCleanup = preCleanup;
-        auditDetails.preCleanupVersion = FUNCTION_VERSION;
-        if (preCleanupFailed) {
-          auditDetails.error = `Pre-cleanup failed on ${preCleanupFailed.table}: ${preCleanupFailed.error}`;
+        } catch (e) {
+          auditDetails.error = `delete-account invoke failed: ${String(e)}`;
           result = { error: auditDetails.error };
           break;
         }
 
-
-        const { error: deleteError } = await supabase.auth.admin.deleteUser(targetUserId);
-        if (deleteError) {
-          const msg = deleteError.message || 'Delete failed';
-          // Surface constraint name verbatim when the DB names it.
-          const constraintMatch = msg.match(/"([^"]+)"/);
-          const surfaced = constraintMatch ? `Blocked by ${constraintMatch[1]}: ${msg}` : msg;
-          auditDetails.error = surfaced;
-          result = { error: surfaced };
-        } else {
-          result = { success: true, message: `User ${label} deleted successfully` };
-        }
+        auditDetails.deleteAccountVersion = delegated?.version;
+        auditDetails.deletion_results = delegated?.deletion_results;
+        auditDetails.assetCounts = delegated?.assetCounts;
+        auditDetails.orchestratorVersion = FUNCTION_VERSION;
+        result = { success: true, message: `User ${label} deleted successfully`, delegated };
         break;
       }
+
 
       case 'reset_password': {
         const { error: resetError } = await supabase.auth.admin.generateLink({
