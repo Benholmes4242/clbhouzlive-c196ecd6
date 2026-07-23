@@ -40,6 +40,7 @@ import { safeGoBack } from '@/utils/navigation';
 import { uploadToR2Only } from '@/utils/r2OnlyUpload';
 import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
 import { FavouritesCarousel } from '@/components/profile/courses/FavouritesCarousel';
+import { VerifiedAccountsNote } from '@/components/profile/VerifiedAccountsNote';
 import { AddCourseModal } from '@/components/profile/courses/AddCourseModal';
 import { PrivateProfileGate } from '@/components/profile/PrivateProfileGate';
 import { CoverPhotoFallback } from '@/components/ui/CoverPhotoFallback';
@@ -1384,6 +1385,13 @@ const ProfilePageV2Content: React.FC = () => {
         <div className={cn(activeSection === 'activity' ? 'pt-0 px-0' : activeSection === 'courses' || activeSection === 'stats' ? 'pt-4 px-2.5' : 'pt-4 px-4')}>
           {getCurrentContent()}
         </div>
+
+        {/* Verified accounts informational note — own profile, unverified personal users only */}
+        {isSelf && isPersonal && profile && !profile.is_verified_golfer && (
+          <div className="px-4 pt-4">
+            <VerifiedAccountsNote variant="profile" />
+          </div>
+        )}
         </>
         )}
       </div>

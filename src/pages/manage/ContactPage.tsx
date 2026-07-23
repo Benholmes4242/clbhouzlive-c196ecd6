@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckCircle2 } from 'lucide-react';
 import { toast } from '@/lib/toast';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
@@ -24,10 +24,18 @@ type CategoryValue = (typeof CATEGORIES)[number]['value'];
 
 export default function ContactPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user } = useSupabaseSession();
 
-  const [category, setCategory] = useState<CategoryValue>('bug');
-  const [subject, setSubject] = useState('');
+  const initialCategory: CategoryValue = (() => {
+    const raw = searchParams.get('category');
+    const match = CATEGORIES.find((c) => c.value === raw);
+    return match ? match.value : 'bug';
+  })();
+  const initialSubject = searchParams.get('subject') ?? '';
+
+  const [category, setCategory] = useState<CategoryValue>(initialCategory);
+  const [subject, setSubject] = useState(initialSubject);
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submittedId, setSubmittedId] = useState<string | null>(null);

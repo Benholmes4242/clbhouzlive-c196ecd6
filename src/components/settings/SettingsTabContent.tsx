@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { formatRelativeAgoLong } from '@/i18n/format';
 import {
   ChevronRight, Mail, Bell, Shield, UserX,
-  HelpCircle, MessageSquare, FileText, Trash2, LogOut, Eye, BarChart2, Link2, Briefcase, UserPlus,
+  HelpCircle, MessageSquare, FileText, Trash2, LogOut, Eye, BarChart2, Link2, Briefcase, UserPlus, BadgeCheck,
 } from 'lucide-react';
 import { useInviteSheet } from '@/hooks/useInviteSheet';
 import { useHasBusinesses } from '@/hooks/useMyBusinesses';
@@ -300,6 +300,15 @@ export function SettingsTabContent() {
             title="Help Centre"
             iconTheme="support"
             onClick={() => navigate('/manage/help')}
+          />
+          <SettingsChevronRow
+            icon={<BadgeCheck size={18} />}
+            title="Verified accounts"
+            subtitle="How verification works"
+            iconTheme="support"
+            onClick={() =>
+              navigate('/manage/contact?category=account&subject=Verification%20enquiry')
+            }
           />
           <SettingsChevronRow
             icon={<MessageSquare size={18} />}

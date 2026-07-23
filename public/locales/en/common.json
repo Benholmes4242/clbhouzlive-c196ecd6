@@ -105,5 +105,13 @@
       "sub": "Connect your handicap and every round you play here counts automatically - no logging, no admin. Take a crown and your name sits on the board.",
       "slim": "Play for the crowns at this club"
     }
+  },
+  "verifiedAccounts": {
+    "title": "Verified accounts",
+    "body": "We verify golfers and professionals ourselves - there's nothing to apply for. If you're seeking verification, contact support and we'll take a look. If you represent a club, brand or business, set up a business page and you can request verification there.",
+    "cta": "Contact support \u2192",
+    "dismissA11y": "Dismiss",
+    "settingsRowTitle": "Verified accounts",
+    "settingsRowSubtitle": "How verification works"
   }
 }
