@@ -132,6 +132,8 @@ export function calculateCourseFitScores(
     const breakdown: FitBreakdownItem[] = [];
     let totalWeightedScore = 0;
     let totalWeight = 0;
+    let dnaDrivenStats = 0;
+    let dnaDrivenWeight = 0;
 
     for (const { dnaField, statKey, fallbackKey, displayName } of STAT_MAPPING) {
       const importance = (courseDNA as any)[dnaField] as number;
@@ -147,6 +149,8 @@ export function calculateCourseFitScores(
       const contribution = (importance * percentile) / 100;
       totalWeightedScore += contribution;
       totalWeight += importance;
+      dnaDrivenStats += 1;
+      dnaDrivenWeight += importance;
 
       breakdown.push({
         statName: displayName,
@@ -179,13 +183,21 @@ export function calculateCourseFitScores(
       });
     }
 
+    // FIX (Fault 2, follow-up): if the player is missing most DNA-driven
+    // stats (e.g. only 1-2 of 9 percentiles resolved), the fit score
+    // degenerates towards whichever tail the player sits in — commonly
+    // producing a "1" or "99" that looks authoritative but is meaningless.
+    // Require at least 3 DNA-driven stats AND ≥100 units of DNA weight
+    // before returning a score. Otherwise skip — the caller stores null.
+    if (dnaDrivenStats < 3 || dnaDrivenWeight < 100 || totalWeight <= 0) {
+      continue;
+    }
+
     // FIX (Bug 1A): `contribution = (weight * percentile) / 100` already produces a
     // 0-1 ratio when divided by totalWeight. Multiplying by 100 restores the 0-100
     // scale. The previous trailing `/ 100` collapsed every score back to 0-1, which
     // Math.round at the results.set call then floored to 0 or 1.
-    const fitScore = totalWeight > 0
-      ? (totalWeightedScore / totalWeight) * 100
-      : 50;
+    const fitScore = (totalWeightedScore / totalWeight) * 100;
 
     breakdown.sort((a, b) => b.contribution - a.contribution);
 
