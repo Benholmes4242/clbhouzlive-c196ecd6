@@ -179,8 +179,12 @@ export function calculateCourseFitScores(
       });
     }
 
+    // FIX (Bug 1A): `contribution = (weight * percentile) / 100` already produces a
+    // 0-1 ratio when divided by totalWeight. Multiplying by 100 restores the 0-100
+    // scale. The previous trailing `/ 100` collapsed every score back to 0-1, which
+    // Math.round at the results.set call then floored to 0 or 1.
     const fitScore = totalWeight > 0
-      ? Math.round((totalWeightedScore / totalWeight) * 100) / 100
+      ? (totalWeightedScore / totalWeight) * 100
       : 50;
 
     breakdown.sort((a, b) => b.contribution - a.contribution);

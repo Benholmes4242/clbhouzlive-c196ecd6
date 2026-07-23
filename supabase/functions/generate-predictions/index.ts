@@ -298,14 +298,43 @@ serve(async (req) => {
       }
     }
 
-    // Fetch world rankings (used for ordering; missing = unranked)
-    const { data: rankings } = await supabase
+    // FIX (Bug 2): Fetch the LATEST snapshot only.
+    // sr_world_rankings holds ~21 historical rows per player (4,211 total).
+    // The previous query ordered by rank ascending and limited to 500, which
+    // (a) captured only ~24 ranks' worth of historical duplicates, and
+    // (b) after Map dedup by player_id, kept each player's WORST historical rank.
+    const { data: latestRankingDateRow, error: latestRankingDateErr } = await supabase
       .from('sr_world_rankings')
-      .select('player_id, rank, prior_rank, points')
-      .order('rank', { ascending: true })
-      .limit(500);
+      .select('ranking_date')
+      .order('ranking_date', { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
-    const rankingsMap = new Map(rankings?.map(r => [r.player_id, r]) || []);
+    let rankings: Array<{ player_id: string; rank: number; prior_rank: number | null; points: number | null; ranking_date: string }> = [];
+    if (latestRankingDateErr || !latestRankingDateRow?.ranking_date) {
+      console.error('[generate-predictions] No latest ranking_date found in sr_world_rankings — proceeding with empty rankings map', latestRankingDateErr);
+    } else {
+      const { data: rankingRows, error: rankingsErr } = await supabase
+        .from('sr_world_rankings')
+        .select('player_id, rank, prior_rank, points, ranking_date')
+        .eq('ranking_date', latestRankingDateRow.ranking_date)
+        .limit(2000);
+      if (rankingsErr) {
+        console.error('[generate-predictions] Failed to fetch latest-snapshot rankings:', rankingsErr);
+      } else {
+        rankings = rankingRows ?? [];
+      }
+    }
+
+    // Defensive dedup: if a duplicate row exists for a player on the same date,
+    // keep the LOWEST (best) rank rather than blindly overwriting.
+    const rankingsMap = new Map<string, { player_id: string; rank: number; prior_rank: number | null; points: number | null }>();
+    for (const r of rankings) {
+      const existing = rankingsMap.get(r.player_id);
+      if (!existing || (typeof r.rank === 'number' && r.rank < existing.rank)) {
+        rankingsMap.set(r.player_id, r);
+      }
+    }
 
     // Build stats index by player_id (may be empty for non-PGA tours)
     const statsById = new Map<string, { raw_data: any; player: any }>();
@@ -571,7 +600,7 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
       if (!courseDNA) {
         console.log('[generate-predictions] No course DNA profile — attempting on-the-fly build');
         try {
-          await fetch(`${supabaseUrl}/functions/v1/build-course-dna`, {
+          const buildRes = await fetch(`${supabaseUrl}/functions/v1/build-course-dna`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${supabaseServiceKey}`,
@@ -579,6 +608,12 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
             },
             body: JSON.stringify({ venueName: tournament.venue_name }),
           });
+          if (!buildRes.ok) {
+            const bodyText = await buildRes.text().catch(() => '');
+            console.error(
+              `[generate-predictions] build-course-dna returned ${buildRes.status} for venue="${tournament.venue_name}": ${bodyText.slice(0, 300)}`,
+            );
+          }
           const { data: freshDNA } = await supabase
             .from('course_dna_profiles')
             .select('*')
@@ -586,12 +621,17 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
             .single();
           courseDNA = freshDNA;
         } catch (e) {
-          console.warn('[generate-predictions] On-the-fly course DNA build failed:', e);
+          console.error('[generate-predictions] On-the-fly course DNA build failed:', e);
         }
       }
 
       if (courseDNA) {
         console.log(`[generate-predictions] Course DNA: ${courseDNA.course_type} for ${courseDNA.venue_name}`);
+      } else {
+        // Escalated: Course Fit row will be absent for this venue.
+        console.error(
+          `[generate-predictions] No course DNA available for venue="${tournament.venue_name}" — Course Fit will be omitted from all picks`,
+        );
       }
     } catch (err) {
       console.warn('[generate-predictions] Course DNA fetch failed:', err);
@@ -838,6 +878,12 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
 
     const enrichedContenders = consensus.topContenders.map(tc => {
       const player = findPlayer(tc.playerId, tc.playerName);
+      // Distinguish "genuinely unranked (outside top 200)" from a lookup sentinel.
+      // world_rank === 999 is our internal sort sentinel — never a display value.
+      const wr = player?.world_rank;
+      const worldRankingDisplay = (typeof wr === 'number' && wr > 0 && wr !== 999) ? wr : null;
+      const priorRankRaw = player?.prior_rank;
+      const priorRankDisplay = (typeof priorRankRaw === 'number' && priorRankRaw > 0 && priorRankRaw !== 999) ? priorRankRaw : null;
       return {
         rank: tc.rank,
         playerId: player?.player_id || tc.playerId,
@@ -845,10 +891,13 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
         photoUrl: player?.photo_url || null,
         pgaTourId: player?.pga_tour_id || null,
         country: player?.country || 'USA',
-        worldRanking: player?.world_rank || 999,
+        worldRanking: worldRankingDisplay,
+        priorRank: priorRankDisplay,
         winProbability: tc.winProbability,
-        // CRITICAL: Use CALCULATED fit score, not AI-guessed
-        courseFitScore: fitScoreMap.get(player?.player_id || tc.playerId) ?? tc.courseFitScore ?? null,
+        // FIX (Bug 1B): ONLY the calculated map may supply courseFitScore.
+        // Never fall back to `tc.courseFitScore` — the LLM fabricates that
+        // value for venues without a course_dna_profiles row.
+        courseFitScore: fitScoreMap.get(player?.player_id || tc.playerId) ?? null,
         reasons: tc.reasons,
         concern: '',
         isDarkHorse: tc.isDarkHorse,
@@ -893,6 +942,8 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
           enrichmentStats: {
             playersEnriched: enrichedPlayers.length,
             courseFitCalculated: courseFitScores.size,
+            courseDnaAvailable: !!courseDNA,
+            venueLookupName: tournament.venue_name ?? null,
             venueHistoryCalculated: venueHistoryScores.size,
           },
         },
@@ -1118,8 +1169,8 @@ For this course type (${courseType.type}), identify which strokes gained categor
 
 Each contender's reasons MUST reference specific strokes gained categories that match the course DNA.
 
-## IMPORTANT: The courseFitScore values above are STATISTICALLY CALCULATED from historical correlations at this venue. 
-Use them as a strong signal for your rankings. You may adjust ±10 points based on intangibles, but do not ignore them.
+## IMPORTANT: The courseFitScore values above are STATISTICALLY CALCULATED from historical correlations at this venue.
+Use them as a STRONG signal to inform your rankings and reasoning. **Do NOT include a `courseFitScore` field in your output** — the server attaches the calculated value. Reason from the numbers, do not restate them.
 
 ## ANALYSIS TASK
 
@@ -1161,7 +1212,6 @@ Return a JSON object with this exact structure:
       "country": "USA",
       "worldRanking": 1,
       "winProbability": 15.5,
-      "courseFitScore": 92,
       "reasons": [
         "MAX 50 CHARS. Recent form insight",
         "MAX 50 CHARS. Course fit or key stat",
@@ -1188,7 +1238,7 @@ Return a JSON object with this exact structure:
 3. **Each contender MUST have exactly 3 reasons**
 4. **Win probabilities should sum to approximately 60-80%** for all 8
 5. **Be specific in reasons** - cite actual statistics and course history
-6. **Course fit scores should be 1-100**
+6. **Do NOT output a `courseFitScore` field** — the server attaches it
 7. **Return ONLY valid JSON** - no markdown, no explanation outside the JSON
 8. **No gambling language**
 
