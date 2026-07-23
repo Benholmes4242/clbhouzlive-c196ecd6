@@ -302,6 +302,15 @@ export function SettingsTabContent() {
             onClick={() => navigate('/manage/help')}
           />
           <SettingsChevronRow
+            icon={<BadgeCheck size={18} />}
+            title="Verified accounts"
+            subtitle="How verification works"
+            iconTheme="support"
+            onClick={() =>
+              navigate('/manage/contact?category=account&subject=Verification%20enquiry')
+            }
+          />
+          <SettingsChevronRow
             icon={<MessageSquare size={18} />}
             title="Contact Us"
             iconTheme="support"
