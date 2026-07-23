@@ -31,7 +31,9 @@ export interface HeroTournament {
   startDate: string;
   endDate: string;
   venueName: string | null;
+  venueCourseName: string | null;
   venueCity: string | null;
+  venueState: string | null;
   venueCountry: string | null;
   venuePar: number | null;
   venueYardage: number | null;
@@ -279,7 +281,9 @@ export function useHeroCarouselData() {
           startDate: row.start_date,
           endDate: row.end_date,
           venueName: row.venue_name,
+          venueCourseName: row.venue_course_name,
           venueCity: row.venue_city,
+          venueState: row.venue_state,
           venueCountry: row.venue_country,
           venuePar: row.venue_par,
           venueYardage: row.venue_yardage,

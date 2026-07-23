@@ -52,6 +52,13 @@ export interface PhotoBandProps {
   /** Optional right-side CTA (TOURNAMENT ›) */
   onCtaTap?: () => void;
   ctaLabel?: string;
+  /** Extra venue data — surfaced by the enriched Insight sheet. All optional. */
+  venueCourseName?: string | null;
+  venueState?: string | null;
+  venueCountry?: string | null;
+  venuePar?: number | null;
+  venueYardage?: number | null;
+  purse?: number | null;
 }
 
 function statePillText(
@@ -96,6 +103,12 @@ export function PhotoBand({
   momentScore,
   onCtaTap,
   ctaLabel,
+  venueCourseName = null,
+  venueState = null,
+  venueCountry = null,
+  venuePar = null,
+  venueYardage = null,
+  purse = null,
 }: PhotoBandProps) {
   const { t } = useTranslation('tourhub');
   const useDusk =
@@ -436,7 +449,19 @@ export function PhotoBand({
         )}
       </div>
       {insight && (
-        <InsightSheet open={sheetOpen} onClose={() => setSheetOpen(false)} insight={insight} />
+        <InsightSheet
+          open={sheetOpen}
+          onClose={() => setSheetOpen(false)}
+          insight={insight}
+          venueName={venueName}
+          venueCourseName={venueCourseName}
+          venueCity={venueCity}
+          venueState={venueState}
+          venueCountry={venueCountry}
+          venuePar={venuePar}
+          venueYardage={venueYardage}
+          purse={purse}
+        />
       )}
     </div>
   );

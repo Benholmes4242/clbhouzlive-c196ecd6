@@ -148,7 +148,9 @@
       "resultWonBy_other": "{{name}} closed at {{score}}, winning by {{count}} shots from {{runnerUp}}",
       "resultClosedAt": "{{name}} closed at {{score}}",
       "readMore": "Read more",
-      "insightTitle": "Course insight"
+      "insightTitle": "Course insight",
+      "courseCharacter": "What this course rewards",
+      "avgWinningScore": "Winners typically post {{score}}"
     },
     "pillState": {
       "cancelled": "CANCELLED",

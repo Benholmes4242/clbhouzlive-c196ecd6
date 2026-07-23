@@ -451,6 +451,12 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
           momentName={moment?.name ?? null}
           momentScore={moment?.score ?? null}
           onCtaTap={onCtaTap}
+          venueCourseName={tournament.venueCourseName}
+          venueState={tournament.venueState}
+          venueCountry={tournament.venueCountry}
+          venuePar={tournament.venuePar}
+          venueYardage={tournament.venueYardage}
+          purse={tournament.purse}
         />
         <HeroWireTicker rows={top10} emptyStateFacts={emptyStateFacts} />
       </div>

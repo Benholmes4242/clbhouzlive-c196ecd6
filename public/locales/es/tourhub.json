@@ -139,7 +139,9 @@
     "photoBand": {
       "wonBy": "Won by {{winnerName}}",
       "readMore": "Read more",
-      "insightTitle": "Course insight"
+      "insightTitle": "Course insight",
+      "courseCharacter": "What this course rewards",
+      "avgWinningScore": "Winners typically post {{score}}"
     },
     "trajectorySparkline": {
       "ariaLabel": "Trajectory: rounds {{rounds}}",
