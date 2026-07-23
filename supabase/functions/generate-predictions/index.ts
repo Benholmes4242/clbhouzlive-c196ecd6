@@ -331,33 +331,69 @@ serve(async (req) => {
     // The previous query ordered by rank ascending and limited to 500, which
     // (a) captured only ~24 ranks' worth of historical duplicates, and
     // (b) after Map dedup by player_id, kept each player's WORST historical rank.
-    const { data: latestRankingDateRow, error: latestRankingDateErr } = await supabase
-      .from('sr_world_rankings')
-      .select('ranking_date')
-      .eq('ranking_type', rankingType)
-      .order('ranking_date', { ascending: false })
-      .limit(1)
-      .maybeSingle();
+    let rankings: Array<{ player_id: string; rank: number; prior_rank: number | null; points: number | null }> = [];
 
-    let rankings: Array<{ player_id: string; rank: number; prior_rank: number | null; points: number | null; ranking_date: string }> = [];
-    if (latestRankingDateErr || !latestRankingDateRow?.ranking_date) {
-      console.error(`[generate-predictions] No latest ranking_date found in sr_world_rankings for ranking_type="${rankingType}" — proceeding with empty rankings map`, latestRankingDateErr);
-    } else {
-      const { data: rankingRows, error: rankingsErr } = await supabase
-        .from('sr_world_rankings')
-        .select('player_id, rank, prior_rank, points, ranking_date')
-        .eq('ranking_type', rankingType)
-        .eq('ranking_date', latestRankingDateRow.ranking_date)
+    if (rankingSource === 'cme_lpga') {
+      // LPGA: read CME points board from tour_season_rankings.
+      // position = rank; prior_rank derived from position_change (position + change = previous position).
+      const currentYear = new Date().getUTCFullYear();
+      const { data: cmeRows, error: cmeErr } = await supabase
+        .from('tour_season_rankings')
+        .select('player_id, manual_player_id, position, position_change, points')
+        .eq('tour_code', 'lpga')
+        .eq('season_year', currentYear)
         .limit(2000);
-      if (rankingsErr) {
-        console.error('[generate-predictions] Failed to fetch latest-snapshot rankings:', rankingsErr);
+      if (cmeErr) {
+        console.error('[generate-predictions] Failed to fetch LPGA CME rankings:', cmeErr);
       } else {
-        rankings = rankingRows ?? [];
+        rankings = (cmeRows ?? [])
+          .map((r: any) => {
+            const pid = r.player_id ?? r.manual_player_id ?? null;
+            if (!pid || !r.position || r.position < 1) return null;
+            const change = r.position_change != null ? parseInt(String(r.position_change), 10) : NaN;
+            const priorRank = Number.isFinite(change) ? r.position + change : null;
+            return {
+              player_id: pid as string,
+              rank: r.position as number,
+              prior_rank: priorRank,
+              points: r.points ?? null,
+            };
+          })
+          .filter((v): v is NonNullable<typeof v> => v !== null);
+      }
+    } else {
+      // OWGR: latest snapshot from sr_world_rankings.
+      const { data: latestRankingDateRow, error: latestRankingDateErr } = await supabase
+        .from('sr_world_rankings')
+        .select('ranking_date')
+        .eq('ranking_type', 'wgr')
+        .order('ranking_date', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (latestRankingDateErr || !latestRankingDateRow?.ranking_date) {
+        console.error('[generate-predictions] No latest ranking_date in sr_world_rankings (wgr) — proceeding with empty rankings map', latestRankingDateErr);
+      } else {
+        const { data: rankingRows, error: rankingsErr } = await supabase
+          .from('sr_world_rankings')
+          .select('player_id, rank, prior_rank, points, ranking_date')
+          .eq('ranking_type', 'wgr')
+          .eq('ranking_date', latestRankingDateRow.ranking_date)
+          .limit(2000);
+        if (rankingsErr) {
+          console.error('[generate-predictions] Failed to fetch latest-snapshot rankings:', rankingsErr);
+        } else {
+          rankings = (rankingRows ?? []).map((r: any) => ({
+            player_id: r.player_id,
+            rank: r.rank,
+            prior_rank: r.prior_rank,
+            points: r.points,
+          }));
+        }
       }
     }
 
-    // Defensive dedup: if a duplicate row exists for a player on the same date,
-    // keep the LOWEST (best) rank rather than blindly overwriting.
+    // Defensive dedup: keep the LOWEST (best) rank per player.
     const rankingsMap = new Map<string, { player_id: string; rank: number; prior_rank: number | null; points: number | null }>();
     for (const r of rankings) {
       const existing = rankingsMap.get(r.player_id);
@@ -365,6 +401,7 @@ serve(async (req) => {
         rankingsMap.set(r.player_id, r);
       }
     }
+    console.log(`[generate-predictions] rankingsMap size: ${rankingsMap.size} (source=${rankingSource})`);
 
     // Build stats index by player_id (may be empty for non-PGA tours)
     const statsById = new Map<string, { raw_data: any; player: any }>();
