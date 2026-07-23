@@ -406,6 +406,7 @@ function Member360Sheet({
   const close = () => { setConfirm(null); setRequestMode(null); setReqReason(''); onClose(); };
   const name = detail?.display_name ?? detail?.username ?? 'member';
 
+  const qc = useQueryClient();
   const runConfirmed = async () => {
     if (!detail || !confirm) return;
     setBusy(true);
@@ -414,15 +415,28 @@ function Member360Sheet({
       if (confirm === 'suspend') res = await actions.suspendUser(detail.id);
       if (confirm === 'delete')  res = await actions.deleteUser(detail.id);
       if (confirm === 'reset')   res = await actions.resetPassword(detail.id, detail.email ?? `${detail.username ?? detail.id}@user`);
+      if (confirm === 'verify')  res = await actions.verifyGolfer(detail.id);
+      if (confirm === 'unverify') res = await actions.unverifyGolfer(detail.id);
       if (res && !res.success) {
-        const msg = res.error instanceof Error ? res.error.message : (typeof res.error === 'string' ? res.error : 'Action failed');
-        toast.error(msg);
+        const errAny: any = (res as any).error;
+        const msg = errAny instanceof Error ? errAny.message : (typeof errAny === 'string' ? errAny : 'Action failed');
+        if (msg === 'already_verified') toast.error('This member is already verified');
+        else if (msg === 'already_unverified') toast.error('This member is not verified');
+        else toast.error(msg);
       } else if (res?.success) {
         toast.success(
           confirm === 'delete' ? 'User deleted' :
           confirm === 'suspend' ? 'User suspended' :
+          confirm === 'verify' ? 'Golfer verified' :
+          confirm === 'unverify' ? 'Verification removed' :
           'Password reset email sent'
         );
+        if (confirm === 'verify' || confirm === 'unverify') {
+          qc.invalidateQueries({ queryKey: ['admin-v2', 'users'] });
+          qc.invalidateQueries({ queryKey: ['admin-v2', 'users', 'detail', detail.id] });
+          qc.invalidateQueries({ queryKey: ['admin-user-details', detail.id] });
+          qc.invalidateQueries({ queryKey: ['user-profile', detail.id] });
+        }
       }
     } finally {
       setBusy(false);
