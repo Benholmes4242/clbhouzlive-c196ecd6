@@ -23,6 +23,7 @@ import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { useSinglePlayerStatistics } from '../../hooks/useTourHubData';
 import { usePlayerResults } from '../../hooks/usePlayerResults';
+import { useSeasonResultsSummary } from '../../hooks/useSeasonResultsSummary';
 import { Skeleton } from '@/components/ui/skeleton';
 
 // ---- Design tokens (per approved TIRedesign) ----
