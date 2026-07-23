@@ -1281,8 +1281,8 @@ Return a JSON object with this exact structure:
 5. **Be specific in reasons** - cite actual statistics and course history
 6. **Do NOT output a `courseFitScore` field** — the server attaches it
 7. **Do NOT output a `worldRanking` field** — the server attaches it from official rankings
-7. **Return ONLY valid JSON** - no markdown, no explanation outside the JSON
-8. **No gambling language**
+8. **Return ONLY valid JSON** - no markdown, no explanation outside the JSON
+9. **No gambling language**
 
 Provide your analysis now:`;
 }
