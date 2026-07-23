@@ -98,8 +98,8 @@ export const CountryPickerSheet: React.FC<Props> = ({ open, onClose, onSelect })
           <div style={{ minWidth: 0 }}>
             <div
               style={{
-                fontSize: 11,
-                fontWeight: 700,
+                fontSize: 10.5,
+                fontWeight: 800,
                 color: INK_45,
                 letterSpacing: '0.14em',
                 textTransform: 'uppercase',
@@ -108,7 +108,7 @@ export const CountryPickerSheet: React.FC<Props> = ({ open, onClose, onSelect })
             >
               Select country
             </div>
-            <div style={{ fontSize: 22, fontWeight: 700, color: INK, letterSpacing: '-0.02em' }}>
+            <div style={{ fontSize: 27, fontWeight: 900, color: INK, letterSpacing: '-0.03em' }}>
               Where do you golf?
             </div>
           </div>
