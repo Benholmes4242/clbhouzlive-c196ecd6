@@ -150,20 +150,6 @@ function TrackFace({
       >
         {!photoUrl && initials}
       </div>
-      {crowned && (
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            top: -6,
-            left: -3,
-            transform: 'rotate(-18deg)',
-            lineHeight: 0,
-          }}
-        >
-          <Crown size={10} fill={GOLD} color={DEEP_AMBER} strokeWidth={2.4} />
-        </div>
-      )}
     </div>
   );
 }
