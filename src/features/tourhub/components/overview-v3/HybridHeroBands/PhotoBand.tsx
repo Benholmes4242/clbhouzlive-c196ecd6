@@ -449,7 +449,19 @@ export function PhotoBand({
         )}
       </div>
       {insight && (
-        <InsightSheet open={sheetOpen} onClose={() => setSheetOpen(false)} insight={insight} />
+        <InsightSheet
+          open={sheetOpen}
+          onClose={() => setSheetOpen(false)}
+          insight={insight}
+          venueName={venueName}
+          venueCourseName={venueCourseName}
+          venueCity={venueCity}
+          venueState={venueState}
+          venueCountry={venueCountry}
+          venuePar={venuePar}
+          venueYardage={venueYardage}
+          purse={purse}
+        />
       )}
     </div>
   );
