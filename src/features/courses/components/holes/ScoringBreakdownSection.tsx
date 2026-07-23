@@ -436,7 +436,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
           })()}
 
           {/* Projection card — only when doubles-per-round >= 1 and we have an avg gross */}
-          {showProjection && avgGross != null && projected != null && (
+          {hasInterpretation && showProjection && avgGross != null && projected != null && (
             <div
               style={{
                 marginTop: 14,
