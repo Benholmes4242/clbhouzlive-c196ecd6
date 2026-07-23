@@ -102,8 +102,8 @@ export default function HandicapManagePage() {
   }
 
   return (
-    <ManagePageShell title={connection ? bodyNameForProvider(connection.provider) : 'Connect your official WHS handicap'} fill={!connection}>
-      <div className={connection ? 'px-4 pt-4 pb-0' : 'px-4 pt-4 pb-0 flex flex-col flex-1 min-h-0'}>
+    <ManagePageShell title={connection ? bodyNameForProvider(connection.provider) : 'Connect your official WHS handicap'} fill>
+      <div className="px-4 pt-4 pb-0 flex flex-col flex-1 min-h-0">
         {connection ? (
           <SyncedBody
             connection={connection}
