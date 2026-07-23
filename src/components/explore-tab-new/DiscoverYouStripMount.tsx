@@ -1,4 +1,4 @@
-import { useAuthContext } from '@/contexts/AuthContext';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { YouStrip, type YouStripPreview, type YouStripVariant } from './YouStrip';
 import { useViewerListContext } from './hooks/useViewerListContext';
 import { DISCOVER_YOU_STRIP } from '@/config/featureFlags';
@@ -38,11 +38,13 @@ export function DiscoverYouStripMount({
   onViewerOnList,
   onPress,
 }: DiscoverYouStripMountProps) {
-  const { user } = useAuthContext();
-  const { data } = useViewerListContext(user?.id ? railKey : null);
+  const { user } = useSupabaseSession();
+  const userId = user?.id ?? null;
+  const { data } = useViewerListContext(userId ? railKey : null);
 
   // Signed-out → render nothing (no empty state on Discover for anon).
-  if (!user?.id) return null;
+  if (!userId) return null;
+
   // Flag OFF → render nothing (also guarded inside <YouStrip/> itself).
   if (!DISCOVER_YOU_STRIP) return null;
 
