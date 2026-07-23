@@ -7,4 +7,4 @@
  * this value; rows below the current version are treated as a cache miss
  * and force a regeneration via the generate-predictions edge function.
  */
-export const PREDICTION_LOGIC_VERSION = 3;
+export const PREDICTION_LOGIC_VERSION = 4;
