@@ -65,7 +65,7 @@ export const ComingSoonScreen: React.FC<Props> = ({ country, onChangeCountry }) 
               <Check size={14} color="#fff" strokeWidth={3} />
             </div>
             <div style={{ fontSize: 13, color: DIM, lineHeight: 1.5 }}>
-              You will not lose your spot {'\u2014'} choose England Golf if you also hold an EG membership, or check back soon.
+              You will not lose your spot - choose England Golf if you also hold an EG membership, or check back soon.
             </div>
           </div>
         </div>
