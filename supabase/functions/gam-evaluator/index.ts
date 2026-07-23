@@ -5,9 +5,11 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 import { corsFor } from '../_shared/cors.ts';
+export const FUNCTION_VERSION = '2026-07-23T05:10:00Z-v2-crown-events';
 const EVALUATOR_VERSION = parseInt(Deno.env.get("GAM_EVALUATOR_VERSION") ?? "1", 10);
 const BATCH_SIZE = 50;
 const MAX_ATTEMPTS = 5;
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Top 100 list mapping
@@ -44,11 +46,17 @@ Deno.serve(async (req) => {
       try { body = await req.json(); } catch { body = {}; }
     }
 
+    // Ping — surfaces the deployed version without touching state.
+    if (body?.action === 'ping' || req.method === 'GET') {
+      return json({ version: FUNCTION_VERSION });
+    }
+
     // Single-row mode
     if (body?.whs_score_id) {
       const res = await processSingle(body.whs_score_id);
       return json({ ok: true, result: res });
     }
+
 
     // User replay mode
     if (body?.user_id && body?.replay) {
